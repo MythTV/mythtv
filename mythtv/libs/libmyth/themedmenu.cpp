@@ -1968,6 +1968,11 @@ QString ThemedMenuPrivate::findMenuFile(const QString &menuname)
     QFile file(testdir);
     if (file.exists())
         return testdir;
+
+    testdir = gContext->GetThemeDir() + "/" + menuname;
+    file.setName(testdir);
+    if (file.exists())
+        return testdir;
         
     testdir = prefix + "/share/mythtv/" + menuname;
     file.setName(testdir);

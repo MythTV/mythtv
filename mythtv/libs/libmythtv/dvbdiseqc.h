@@ -31,21 +31,26 @@ private:
     dvb_tuning_t prev_tuning;
     int repeat;
 
+    
+    bool SendDiSEqCMessage(dvb_tuning_t& tuning, dvb_diseqc_master_cmd &cmd);
+    bool SendDiSEqCMessage(dvb_diseqc_master_cmd &cmd);
+    
     bool ToneVoltageLnb(dvb_tuning_t& tuning, bool reset, bool& havetuned);
     bool ToneSwitch(dvb_tuning_t& tuning, bool reset, bool& havetuned);
-    bool PreDiseqcCmd();
-    bool OneWayProtocol(dvb_tuning_t& tuning, bool reset, bool& havetuned);
-    bool WritePortGroup(dvb_tuning_t& tuning);
+    bool Diseqc1xSwitch(dvb_tuning_t& tuning, bool reset, bool& havetuned);
+    bool PositionerGoto(dvb_tuning_t& tuning, bool reset, bool& havetuned);
+    bool PositionerStore(dvb_tuning_t& tuning);
+    bool PositionerStopMovement();
+    bool PositionerStoreEastLimit();
+    bool PositionerStoreWestLimit();
+    bool PositionerDisableLimits();   
+    bool PositionerDriveEast(int timestep);
+    bool PositionerDriveWest(int timestep);
+    bool PositionerGotoAngular(dvb_tuning_t& tuning, bool reset, 
+                               bool& havetuned);
 
-    bool Positioner_DriveEast(int timestep);
-    bool Positioner_DriveWest(int timestep);
-    bool Positioner_Goto(int satpos);
-    bool Positioner_Store(int satpos);
-    bool Positioner_StoreEastLimit();
-    bool Positioner_StoreWestLimit();
-    bool Positioner_Halt();
+    // Still need to be written
     bool Positioner_Status();
-    bool Positioner_DisableLimits();
 
     enum diseqc_cmd_bytes {
         FRAME               = 0x0,
@@ -68,11 +73,13 @@ private:
     };
         
     enum diseqc_address {
-        MASTER_TO_ALL       = 0x00,
-        MASTER_TO_LSS       = 0x10,
-        MASTER_TO_LNB       = 0x11,
-        MASTER_TO_SWITCH    = 0x14
+        MASTER_TO_ALL        = 0x00,
+        MASTER_TO_LSS        = 0x10,
+        MASTER_TO_LNB        = 0x11,
+        MASTER_TO_SWITCH     = 0x14,
+        MASTER_TO_POSITIONER = 0x31
     };
+
 
     enum diseqc_commands {
         RESET               = 0x00,
@@ -102,7 +109,8 @@ private:
         DRIVE_E             = 0x68,
         DRIVE_W             = 0x69,
         STORE               = 0x6A,
-        GOTO                = 0x6B
+        GOTO                = 0x6B,
+        GOTO_ANGULAR        = 0x6E
     };
 
 };

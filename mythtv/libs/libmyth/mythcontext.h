@@ -10,6 +10,7 @@
 #include <qevent.h>
 #include <qmutex.h>
 #include <qsocketdevice.h>
+#include <qstringlist.h>
 #include <qnetwork.h> 
 
 #include <iostream>

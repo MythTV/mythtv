@@ -6,6 +6,9 @@
  *  Description:
  *
  *  Author(s):
+ *      Taylor Jacob (rtjacob at earthlink.net)
+ *	    - Finished Implimenting Petri's DiSEqC 1.0 - 1.1 code
+ *          - DiSEqC 1.2 Positioner control 
  *      Petri Nykanen
  *          - DiSEqC 1.0 - 1.1.
  *      Kenneth Aafloy (ke-aa at frisurf.no)
@@ -39,6 +42,8 @@
 DVBDiSEqC::DVBDiSEqC(int _cardnum, int _fd_frontend):
     cardnum(_cardnum), fd_frontend(_fd_frontend)
 {
+
+    // Number of repeats for DiSEqC 1.1 devices
     repeat = 1;
 }
 
@@ -48,6 +53,7 @@ DVBDiSEqC::~DVBDiSEqC()
 
 bool DVBDiSEqC::Set(dvb_tuning_t& tuning, bool reset, bool& havetuned)
 {
+
     switch(tuning.diseqc_type)
     {
         case 1:
@@ -58,13 +64,24 @@ bool DVBDiSEqC::Set(dvb_tuning_t& tuning, bool reset, bool& havetuned)
             if (!ToneVoltageLnb(tuning, reset, havetuned))
                 return false;
             break;
-        case 2: // v1.0
-        case 3: // v1.1
-            if (!OneWayProtocol(tuning, reset, havetuned))
+        case 2: // v1.0 2 Way
+        case 3: // v1.1 2 Way
+        case 4: // v1.0 4 Way
+        case 5: // v1.1 4 Way
+            if (!Diseqc1xSwitch(tuning, reset, havetuned))
                 return false;
             break;
+        case 6: // 1.2 Positioner (HH Motor)
+            if (!PositionerGoto(tuning,reset,havetuned))
+		return false;
+            break;
+        case 7: // 1.3 Positioner (HH Motor with USALS)
+            if (!PositionerGotoAngular(tuning,reset,havetuned))
+		return false;
+            break;
+ 
         default:
-            ERROR("Unsupported DiSEqC type.");
+            ERRNO("Unsupported DiSEqC type.");
     }
     
     return true;
@@ -92,6 +109,8 @@ bool DVBDiSEqC::ToneVoltageLnb(dvb_tuning_t& tuning, bool reset, bool& havetuned
         havetuned = true;
     }
 
+    usleep(DISEQC_SHORT_WAIT);
+
     if (prev_tuning.voltage != tuning.voltage || reset)
     {
         if (ioctl(fd_frontend, FE_SET_VOLTAGE, tuning.voltage) < 0)
@@ -109,12 +128,12 @@ bool DVBDiSEqC::ToneVoltageLnb(dvb_tuning_t& tuning, bool reset, bool& havetuned
 
 bool DVBDiSEqC::ToneSwitch(dvb_tuning_t& tuning, bool reset, bool& havetuned)
 {
-    CHANNEL(QString("Tone Switch - Port %1/2").arg(tuning.diseqc_port));
+    CHANNEL(QString("DiSEqC Tone Switch - Port %1/2").arg(tuning.diseqc_port));
 
     if (prev_tuning.diseqc_port != tuning.diseqc_port || reset)
     {
         if (tuning.diseqc_port > 2)
-            ERROR("Tone Switches only supports two ports.");
+            ERRNO("Tone Switches only supports two ports.");
 
         if (ioctl(fd_frontend, FE_DISEQC_SEND_BURST,
             (tuning.diseqc_port == 1 ? SEC_MINI_A : SEC_MINI_B )) < 0)
@@ -134,22 +153,190 @@ bool DVBDiSEqC::ToneSwitch(dvb_tuning_t& tuning, bool reset, bool& havetuned)
                     Diseqc 1.x Compatible Methods
  ****************************************************************************/
 
-bool DVBDiSEqC::OneWayProtocol(dvb_tuning_t& tuning, bool reset, bool& havetuned)
+bool DVBDiSEqC::SendDiSEqCMessage(dvb_tuning_t& tuning, dvb_diseqc_master_cmd &cmd)
 {
+    // Turn off tone burst
+    if (ioctl(fd_frontend, FE_SET_TONE, SEC_TONE_OFF) == -1) 
+    {
+        ERRNO("FE_SET_TONE failed");
+        return false;
+    }
+
+/* 
+   Old version of the code set the voltage to 13V everytime.  After looking at the EutelSat
+   specs I saw no reason that this was done. I have tested this with my DiSEqC switch and all
+   is fine. 
+*/
+
+    if (ioctl(fd_frontend, FE_SET_VOLTAGE, tuning.voltage) == -1) 
+    {
+        ERRNO("FE_SET_VOLTAGE failed");
+        return false;
+    }   
+
+    usleep(DISEQC_SHORT_WAIT);
+
+    GENERAL(QString("DiSEqC Sending 1.0 Command: %1 %2 %3 %4").
+                   .arg(cmd.msg[0], 2, 16)
+                   .arg(cmd.msg[1], 2, 16)
+                   .arg(cmd.msg[2], 2, 16)
+                   .arg(cmd.msg[3], 2, 16));
+
+    if (ioctl(fd_frontend, FE_DISEQC_SEND_MASTER_CMD, &cmd) == -1) 
+    {
+        ERRNO("FE_DISEQC_SEND_MASTER_CMD failed");
+        return false;
+    }
+
+    usleep(DISEQC_SHORT_WAIT);
+
+    // Check to see if its a 1.1 or 1.2 device. If so repeat the message repeats times.
+    if ((tuning.diseqc_type == 3) || (tuning.diseqc_type == 5) || 
+        (tuning.diseqc_type == 6) || (tuning.diseqc_type == 7)) 
+    {
+
+        int repeats = repeat;
+        while (repeats--) 
+        {
+
+            GENERAL(QString("DiSEqC Sending 1.1/1.2/1.3 Repeat Command: %1 %2 %3 %4")
+                           .arg(cmd.msg[0],2,16)
+                           .arg(cmd.msg[1],2,16)
+                           .arg(cmd.msg[2],2,16)
+                           .arg(cmd.msg[3],2,16));
+
+            cmd.msg[0] = CMD_REPEAT;      
+            if (ioctl(fd_frontend, FE_DISEQC_SEND_MASTER_CMD, &cmd) == -1) 
+            {
+                ERRNO("FE_DISEQC_SEND_MASTER_CMD failed");
+                return false;
+            }
+            usleep(DISEQC_SHORT_WAIT);
+     
+            cmd.msg[0] = CMD_FIRST;      
+            if (ioctl(fd_frontend, FE_DISEQC_SEND_MASTER_CMD, &cmd) == -1) 
+            {
+                ERRNO("FE_DISEQC_SEND_MASTER_CMD failed");
+                return false;
+            }
+            usleep(DISEQC_SHORT_WAIT);
+        }
+    }
+
+    if (ioctl(fd_frontend, FE_DISEQC_SEND_BURST, SEC_MINI_A ) == -1) 
+    {
+        ERRNO("FE_DISEQC_SEND_BURST failed");
+        return false;
+    }
+
+    usleep(DISEQC_SHORT_WAIT);
+
+    if (ioctl(fd_frontend, FE_SET_TONE, tuning.tone) == -1) 
+    {
+        ERRNO("FE_SET_TONE failed");
+        return false;
+    }
+
+    return true;
+}
+
+
+bool DVBDiSEqC::SendDiSEqCMessage(dvb_diseqc_master_cmd &cmd)
+{
+    // Turn off tone burst
+    if (ioctl(fd_frontend, FE_SET_TONE, SEC_TONE_OFF) == -1) 
+    {
+        ERRNO("FE_SET_TONE failed");
+        return false;
+    }
+
+    usleep(DISEQC_SHORT_WAIT);
+
+    GENERAL(QString("DiSEqC Sending 1.0 Command: %1 %2 %3 %4")
+                   .arg(cmd.msg[0], 2, 16)
+                   .arg(cmd.msg[1], 2, 16)
+                   .arg(cmd.msg[2], 2, 16)
+                   .arg(cmd.msg[3], 2, 16));
+
+    if (ioctl(fd_frontend, FE_DISEQC_SEND_MASTER_CMD, &cmd) == -1) 
+    {
+        ERRNO("FE_DISEQC_SEND_MASTER_CMD failed");
+        return false;
+    }
+
+    usleep(DISEQC_SHORT_WAIT);
+  
+    int repeats = repeat;
+    while (repeats--) 
+    {
+        GENERAL(QString("DiSEqC Sending 1.1/1.2/1.3 Repeat Command: %1 %2 %3 %4")
+                       .arg(cmd.msg[0], 2, 16)
+                       .arg(cmd.msg[1], 2, 16)
+                       .arg(cmd.msg[2], 2, 16)
+                       .arg(cmd.msg[3], 2, 16));
+
+        cmd.msg[0] = CMD_REPEAT;      
+        if (ioctl(fd_frontend, FE_DISEQC_SEND_MASTER_CMD, &cmd) == -1) 
+        {
+            ERRNO("FE_DISEQC_SEND_MASTER_CMD failed");
+            return false;
+        }
+        usleep(DISEQC_SHORT_WAIT);
+    
+        cmd.msg[0] = CMD_FIRST;      
+        if (ioctl(fd_frontend, FE_DISEQC_SEND_MASTER_CMD, &cmd) == -1) 
+        {
+            ERRNO("FE_DISEQC_SEND_MASTER_CMD failed");
+            return false;
+        }
+        usleep(DISEQC_SHORT_WAIT); 
+    }
+
+    if (ioctl(fd_frontend, FE_DISEQC_SEND_BURST, SEC_MINI_A ) == -1) 
+    {
+        ERRNO("FE_DISEQC_SEND_BURST failed");
+        return false;
+    }
+
+    return true;
+}
+
+bool DVBDiSEqC::Diseqc1xSwitch(dvb_tuning_t& tuning, bool reset, 
+                               bool& havetuned)
+{
+    if (reset) 
+    {
+      	if (!DiseqcReset()) 
+        {
+      	    ERRNO("DiseqcReset() failed");
+      	    return false;
+      	}
+    }
+
+    GENERAL(QString("DiSEqC 1.0 Switch - Port %1").arg(tuning.diseqc_port));
+
     if (tuning.diseqc_port != 0 &&
         ((prev_tuning.diseqc_port != tuning.diseqc_port ||
           prev_tuning.tone != tuning.tone ||
           prev_tuning.voltage != tuning.voltage) || reset))
     {
-        if (tuning.diseqc_port > 4)
+        if (tuning.diseqc_port > 3)
         {
-            ERROR("Supports only up to 4-way switches.");
+            ERRNO("Supports only up to 4-way switches.");
             return false;
         }
 
-        if (!WritePortGroup(tuning))
+        dvb_diseqc_master_cmd cmd = 
+            {{CMD_FIRST, MASTER_TO_LSS, WRITE_N0, 0xf0, 0x00, 0x00}, 4};
+
+        cmd.msg[DATA_1] = 0xF0 
+                          | (((tuning.diseqc_port) * 4) & 0x0F) 
+                          | ((tuning.voltage == SEC_VOLTAGE_18) ? 2 : 0) 
+                          | ((tuning.tone == SEC_TONE_ON) ? 0 : 1);
+
+        if(!SendDiSEqCMessage(tuning,cmd)) 
         {
-            ERROR("Setting DiSEqC failed.\n");
+            ERRNO("Setting DiSEqC failed.\n");
             return false;
         }
 
@@ -157,95 +344,8 @@ bool DVBDiSEqC::OneWayProtocol(dvb_tuning_t& tuning, bool reset, bool& havetuned
         prev_tuning.tone = tuning.tone;
         prev_tuning.voltage = tuning.voltage;
         havetuned = true;
+
     }
-
-    if (!ToneVoltageLnb(tuning, reset, havetuned))
-        return false;
-
-    return true;
-}
-
-bool DVBDiSEqC::WritePortGroup(dvb_tuning_t& tuning)
-{
-    struct dvb_diseqc_master_cmd cmd =
-        {{CMD_FIRST, MASTER_TO_LSS, WRITE_N0, 0xf0, 0x00, 0x00}, 4};
-
-    // param: high nibble: reset bits, low nibble set bits,
-    // bits are: option, position, polarization, band.
-    cmd.msg[DATA_1] = 0xf0 |
-        ((((tuning.diseqc_port-1) * 4) & 0x0f) |
-        ((tuning.voltage == SEC_VOLTAGE_13) ? 1 : 0) |
-        ((tuning.tone == SEC_TONE_ON) ? 0 : 2));
-   
-    if (!PreDiseqcCmd())
-        return false;
-
-    /*
-      See Eutelsat DiSEqC Update and recommendations for Implementation V2.1
-      Sections 4.1.1, 4.2.1, 4.2.3. Note that the PreDiseqcCmd() may need to
-      be set already in the start the correct voltage level, now it is set at
-      the end as some Eutelsat instructions indicated.
-    */
-
-    if(ioctl(fd_frontend, FE_DISEQC_SEND_MASTER_CMD, &cmd) < 0)
-    {
-        ERRNO("OneWayProtocol: Sending command failed.");
-        return false;
-    }
-
-    usleep(DISEQC_LONG_WAIT);
-
-    int repeats = repeat;
-    while(repeats--)
-    {
-        if(tuning.diseqc_type == 3)
-        {
-            cmd.msg[COMMAND] = WRITE_N1; // uncommitted
-            if(ioctl(fd_frontend, FE_DISEQC_SEND_MASTER_CMD, &cmd) <0)
-            {
-                ERRNO("OneWayProtocol: Sending uncommitted command failed.");
-                return false;
-            }
-            usleep(DISEQC_LONG_WAIT);
-            cmd.msg[COMMAND] = WRITE_N0; // change back to committed
-        }
-
-        if(ioctl(fd_frontend, FE_DISEQC_SEND_MASTER_CMD, &cmd) < 0)
-        {
-            ERRNO("OneWayProtocol: Sending committed command failed.");
-            return false;
-        }
-        usleep(DISEQC_LONG_WAIT);
-    } 
-
-    usleep(DISEQC_SHORT_WAIT);
-    if(ioctl(fd_frontend, FE_DISEQC_SEND_BURST,
-        ((tuning.diseqc_port-1) / 4) % 2 ? SEC_MINI_B : SEC_MINI_A) < 0)
-    {
-        ERRNO("OneWayProtocol: Sending burst failed.");
-        return false;
-    }
-    usleep(DISEQC_SHORT_WAIT);
-    
-    return true;
-}
-
-bool DVBDiSEqC::PreDiseqcCmd()
-{
-    usleep(DISEQC_SHORT_WAIT);
-    if (ioctl(fd_frontend, FE_SET_TONE, SEC_TONE_OFF) < 0)
-    {
-        ERRNO("OneWayProtocol: Setting tone off failed.");
-        return false;
-    }
-    usleep(DISEQC_SHORT_WAIT);
-
-    if (ioctl(fd_frontend, FE_SET_VOLTAGE, SEC_VOLTAGE_13) < 0)
-    {
-        ERRNO("OneWayProtocol: Setting voltage failed.");
-        return false;
-    }
-    usleep(DISEQC_SHORT_WAIT);
 
     return true;
 }
@@ -253,10 +353,10 @@ bool DVBDiSEqC::PreDiseqcCmd()
 bool DVBDiSEqC::DiseqcReset()
 {
     struct dvb_diseqc_master_cmd reset_cmd =
-       {{CMD_FIRST, MASTER_TO_LSS, RESET, 0x00, 0x00, 0x00}, 3};
+       {{CMD_FIRST, MASTER_TO_LSS, RESET, 0x00, 0x00}, 3};
  
     struct dvb_diseqc_master_cmd init_cmd =
-       {{CMD_FIRST, MASTER_TO_LSS, POWERON, 0x00, 0x00, 0x00}, 3};
+       {{CMD_FIRST, MASTER_TO_LSS, POWERON, 0x00, 0x00}, 3};
 
     if (ioctl(fd_frontend, FE_DISEQC_SEND_MASTER_CMD, &init_cmd) <0)
     {
@@ -286,56 +386,283 @@ bool DVBDiSEqC::DiseqcReset()
                             Positioner Control
  *****************************************************************************/
 
-bool DVBDiSEqC::Positioner_DriveEast(int timestep)
+bool DVBDiSEqC::PositionerDriveEast(int timestep)
 {
-    (void)timestep;
-    return false;
+    if (!DiseqcReset()) 
+    {
+      	ERRNO("DiseqcReset() failed");
+    	return false;
+    }
+
+    dvb_diseqc_master_cmd cmd = 
+        {{CMD_FIRST, MASTER_TO_POSITIONER, DRIVE_E, timestep ,0x00,0x00}, 4};
+
+    if (!SendDiSEqCMessage(cmd)) 
+    {
+        ERRNO("Setting DiSEqC failed.\n");
+        return false;
+    }
+    
+    return true;
 }
 
-bool DVBDiSEqC::Positioner_DriveWest(int timestep)
+bool DVBDiSEqC::PositionerDriveWest(int timestep)
 {
-    (void)timestep;
-    return false;
+    if (!DiseqcReset()) 
+    {
+      	ERRNO("DiseqcReset() failed");
+    	return false;
+    }
+
+    dvb_diseqc_master_cmd cmd = 
+        {{CMD_FIRST, MASTER_TO_POSITIONER, DRIVE_W, timestep ,0x00,0x00}, 4};
+
+    if (!SendDiSEqCMessage(cmd)) 
+    {
+        ERRNO("Setting DiSEqC failed.\n");
+        return false;
+    }
+
+    return true;
 }
 
-bool DVBDiSEqC::Positioner_Goto(int satpos)
+bool DVBDiSEqC::PositionerGoto(dvb_tuning_t& tuning, bool reset, bool& havetuned)
 {
-    (void)satpos;
-    return false;
+    // A reset seems to be required for my positioner to work consistently
+    GENERAL(QString("DiSEqC 1.2 Motor - Goto Stored Position %1")
+                    .arg(tuning.diseqc_port));
+
+    if ((prev_tuning.diseqc_port != tuning.diseqc_port ||
+         prev_tuning.tone != tuning.tone ||
+         prev_tuning.voltage != tuning.voltage) || reset)
+    {
+        if (!DiseqcReset()) 
+        {
+      	    ERRNO("DiseqcReset() failed");
+    	    return false;
+        }
+        
+        dvb_diseqc_master_cmd cmd = 
+            {{CMD_FIRST, MASTER_TO_POSITIONER, GOTO, tuning.diseqc_port, 
+              0x00, 0x00}, 4};
+
+        if (!SendDiSEqCMessage(tuning,cmd)) 
+        {
+            ERRNO("Setting DiSEqC failed.\n");
+            return false;
+        }
+
+        prev_tuning.diseqc_port = tuning.diseqc_port;
+        prev_tuning.tone = tuning.tone;
+        prev_tuning.voltage = tuning.voltage;
+        havetuned = true;
+    }
+
+    return true;
 }
 
-bool DVBDiSEqC::Positioner_Store(int satpos)
+bool DVBDiSEqC::PositionerStore(dvb_tuning_t& tuning)
 {
-    (void)satpos;
-    return false;
+    if (!DiseqcReset()) 
+    {
+      	ERRNO("DiseqcReset() failed");
+    	return false;
+    }
+
+    GENERAL(QString("DiSEqC 1.2 Motor - Store Stored Position %1")
+        .arg(tuning.diseqc_port));
+
+    dvb_diseqc_master_cmd cmd = 
+        {{CMD_FIRST, MASTER_TO_POSITIONER, STORE, tuning.diseqc_port , 0x00, 
+          0x00}, 4};
+
+    if (!SendDiSEqCMessage(cmd)) 
+    {
+        ERRNO("Setting DiSEqC failed.\n");
+        return false;
+    }
+
+    return true;
 }
 
-bool DVBDiSEqC::Positioner_StoreEastLimit()
+bool DVBDiSEqC::PositionerStoreEastLimit()
 {
-    return false;
+    if (!DiseqcReset()) 
+    {
+      	ERRNO("DiseqcReset() failed");
+    	return false;
+    }
+
+    dvb_diseqc_master_cmd cmd = 
+        {{CMD_FIRST, MASTER_TO_POSITIONER, LIMIT_E, 0x00,0x00,0x00}, 3};
+
+    if (!SendDiSEqCMessage(cmd)) 
+    {
+        ERRNO("Setting DiSEqC failed.\n");
+        return false;
+    }
+
+    return true;
 }
 
-bool DVBDiSEqC::Positioner_StoreWestLimit()
+bool DVBDiSEqC::PositionerStoreWestLimit()
 {
-    return false;
+    if (!DiseqcReset()) 
+    {
+      	ERRNO("DiseqcReset() failed");
+    	return false;
+    }
+
+    dvb_diseqc_master_cmd cmd = 
+        {{CMD_FIRST, MASTER_TO_POSITIONER, LIMIT_W, 0x00,0x00,0x00}, 3};
+
+    if (!SendDiSEqCMessage(cmd)) 
+    {
+        ERRNO("Setting DiSEqC failed.\n");
+        return false;
+    }
+
+    return true;
 }
 
-bool DVBDiSEqC::Positioner_Halt()
+bool DVBDiSEqC::PositionerStopMovement()
 {
-    return false;
+    if (!DiseqcReset()) 
+    {
+      	ERRNO("DiseqcReset() failed");
+    	return false;
+    }
+
+    dvb_diseqc_master_cmd cmd = 
+        {{CMD_FIRST, MASTER_TO_POSITIONER, HALT, 0x00,0x00,0x00}, 3};
+
+    if (!SendDiSEqCMessage(cmd)) 
+    {
+        ERRNO("Setting DiSEqC failed.\n");
+        return false;
+    }
+    return true;
+
 }
 
 bool DVBDiSEqC::Positioner_Status()
 {
+    // Not sure if this function is possible without being DiSEqC >= v2
+    // Someone with a DVB card that supports v2 cards will need to help me out 
+    // here
     return false;
 }
 
-bool DVBDiSEqC::Positioner_DisableLimits()
+bool DVBDiSEqC::PositionerDisableLimits()
 {
-    return false;
+    if (!DiseqcReset()) 
+    {
+      	ERRNO("DiseqcReset() failed");
+    	return false;
+    }
+
+    dvb_diseqc_master_cmd cmd = 
+        {{CMD_FIRST, MASTER_TO_POSITIONER, LIMITS_OFF, 0x00,0x00,0x00}, 3};
+
+    if (!SendDiSEqCMessage(cmd)) 
+    {
+        ERRNO("Setting DiSEqC failed.\n");
+        return false;
+    }
+
+    return true;
 }
 
 /*****************************************************************************
-                                Diseqc v2
+                                Diseqc v1.3 (AKA USALS)
  ****************************************************************************/
 
+bool DVBDiSEqC::PositionerGotoAngular(dvb_tuning_t& tuning, bool reset, 
+                                      bool& havetuned) 
+{
+    // Some of this code taken from satpos.c from linuxtv.org by J.Mourer
+   
+    // I have not verified this because my dish is not easily accesable and is 
+    // slightly out of alignment so I use DiSEqC 1.2 Stored Positions
+
+    double H = 180.0 / M_PI;		// Cheat on Radians
+    double B, GSLon, GSLat, SatLon, Azimuth;
+    int CMD1=0x00,CMD2=0x00;		// Bytes sent to motor
+    double USALS=0.0;
+    int DecimalLookup[11] = 
+       { 0x00, 0x02, 0x03, 0x05, 0x06, 0x08, 0x0A, 0x0B, 0x0D, 0x0E, 0x00 };
+  
+    // Hard Coded Test Values 
+    // These vaules should be stored in the settings table when implimentation 
+    // is complete
+    GSLat = 35.0;
+    GSLon = -78.0;
+    SatLon = -95.0;
+
+    // Calcualte Azimuth required to aim satellite antenna
+    B = GSLon - SatLon;
+    Azimuth = 180.0 + (H * atan2( tan(B / H), sin(GSLat / H) ) );
+    Azimuth += .5;
+
+    if (Azimuth < 180) 
+    {
+        // Bird is east of ground station
+   	USALS=180.0-Azimuth;
+        CMD1=0xE0;
+    } 
+    else 
+    {
+        // Bird is west of ground station
+        USALS=Azimuth-180.0;
+        CMD1=0xD0;
+    }
+   
+    while (USALS > 16) 
+    {
+        CMD1++;
+   	USALS -=16;
+    }
+
+    while (USALS >= 1.0) 
+    {
+   	CMD2+=0x10;
+        USALS--;
+    }
+
+    CMD2 += DecimalLookup[(int)round(USALS*10)];
+  
+    if (!DiseqcReset()) 
+    {
+      	ERRNO("DiseqcReset() failed");
+    	return false;
+    }
+
+    // required db changes - get lat and lon for ground station location in db 
+    // and added to tuning
+    // sat_pos be passed into tuning, and be a float not an int./
+
+    GENERAL(QString("DiSEqC 1.3 Motor - Goto Angular Position %1").arg(SatLon));
+
+    if ((prev_tuning.diseqc_port != tuning.diseqc_port ||
+          prev_tuning.tone != tuning.tone ||
+          prev_tuning.voltage != tuning.voltage) || reset)
+    {
+
+        dvb_diseqc_master_cmd cmd = 
+            {{CMD_FIRST, MASTER_TO_POSITIONER, GOTO_ANGULAR, CMD1 , CMD2 , 
+              0x00}, 5};
+
+        if (!SendDiSEqCMessage(tuning,cmd)) 
+        {
+            ERRNO("Setting DiSEqC failed.\n");
+            return false;
+        }
+
+        prev_tuning.diseqc_port = tuning.diseqc_port;
+        prev_tuning.tone = tuning.tone;
+        prev_tuning.voltage = tuning.voltage;
+        havetuned = true;
+    }
+
+    return true;
+}
