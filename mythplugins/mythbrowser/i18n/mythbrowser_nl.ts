@@ -104,5 +104,17 @@ De OK toets verwijders het item uit de lijst.</translation>
         <source>       zoom In        </source>
         <translation>      zoom In         </translation>
     </message>
+    <message>
+        <source>Enter URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

@@ -104,5 +104,17 @@ Ett tryck på Mellanslag/Enter på en markerad post tar bort den från listvisar
         <source>       zoom In        </source>
         <translation>       Zooma in       </translation>
     </message>
+    <message>
+        <source>Enter URL</source>
+        <translation>Skriv in adress</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
 </context>
 </TS>

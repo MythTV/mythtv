@@ -104,5 +104,17 @@ Appuyez sur ESPACE/ENTREE afin de supprimer l&apos;élément sélectionné de la
         <source>MythBrowser Menu</source>
         <translation>Menu de MythBrowser</translation>
     </message>
+    <message>
+        <source>Enter URL</source>
+        <translation>Entrer l&apos;URL</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
 </context>
 </TS>

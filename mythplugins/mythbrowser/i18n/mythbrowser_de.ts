@@ -104,5 +104,17 @@ SPACE/Enter löscht den selektierten Eintrag.</translation>
         <source>MythBrowser Menu</source>
         <translation>MythBrowser Menü</translation>
     </message>
+    <message>
+        <source>Enter URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

@@ -104,5 +104,17 @@ Z pritiskom na PRESLEDNICO/ENTER nad izbranim vnosom, se le ta izbriše. </trans
         <source>       zoom In        </source>
         <translation>       Povečaj       </translation>
     </message>
+    <message>
+        <source>Enter URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
