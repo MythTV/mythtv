@@ -275,7 +275,7 @@ int main(int argc, char **argv)
        nfsfd = open(lockfile_location.ascii(), O_WRONLY|O_CREAT|O_APPEND, 0664);
        if (nfsfd < 0) 
        { 
-          perror("Error)"); 
+          perror("Error opening nfs lock file"); 
           return -1;
        }
        close(nfsfd);
