@@ -138,6 +138,7 @@ class TV : public QObject
     void ToggleSleepTimer(void);
 
     void DoInfo(void);
+    void DoPlay(void);
     void DoPause(void);
     bool UpdatePosOSD(float time, const QString &mesg);
     void DoSeek(float time, const QString &mesg);

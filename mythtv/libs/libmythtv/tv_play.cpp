@@ -93,7 +93,6 @@ void TV::InitKeys(void)
             "guide in Live TV mode.", "X");
 
 
-
     REG_KEY("TV Playback", "PAUSE", "Pause", "P");
     REG_KEY("TV Playback", "SEEKFFWD", "Fast Forward", "Right");
     REG_KEY("TV Playback", "SEEKRWND", "Rewind", "Left");
@@ -140,6 +139,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "TOGGLEEDIT", "Start Edit Mode", "E");
     REG_KEY("TV Playback", "GUIDE", "Show the Program Guide", "S");
     REG_KEY("TV Playback", "TOGGLESLEEP", "Toggle the Sleep Timer", "F8");
+    REG_KEY("TV Playback", "PLAY", "Play", "");
 
 
     REG_KEY("TV Editing", "CLEARMAP", "Clear editing cut points", "C,Q,Home");
@@ -1333,6 +1333,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
             DoSkipCommercials(-1);
         else if (action == "QUEUETRANSCODE")
             DoQueueTranscode();
+        else if (action == "PLAY")
+            DoPlay();
         else if (action == "PAUSE") 
             DoPause();
         else if (action == "SPEEDINC")
@@ -1722,6 +1724,29 @@ void TV::SwapPIP(void)
     ChangeChannelByString(bigchanname);
 
     ToggleActiveWindow();
+}
+
+void TV::DoPlay(void)
+{
+    speed_index = 0;
+    float time = 0.0;
+
+    if(doing_ff_rew)
+    {
+        time = StopFFRew();
+        activenvp->Play(1.0, true);
+    }
+    else if(paused)
+    {
+        activenvp->Play(1.0, true);
+        paused = false;
+    }
+
+
+    if (activenvp != nvp)
+        return;
+
+    UpdatePosOSD(time, tr("Play"));    
 }
 
 void TV::DoPause(void)
