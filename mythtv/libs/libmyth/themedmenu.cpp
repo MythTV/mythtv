@@ -17,6 +17,7 @@ using namespace std;
 
 #include "themedmenu.h"
 #include "mythcontext.h"
+#include "util.h"
 
 ThemedMenu::ThemedMenu(const char *cdir, const char *menufile, 
                        QWidget *parent, const char *name)
@@ -362,13 +363,13 @@ void ThemedMenu::parseButtonDefinition(QString dir, QDomElement &element)
             if (info.tagName() == "normal")
             {
                 setting = dir + getFirstText(info);
-                buttonnormal = gContext->LoadScalePixmap(setting);
+                buttonnormal = gContext->LoadScaleImage(setting);
                 hasnormal = true;
             }
             else if (info.tagName() == "active")
             {
                 setting = dir + getFirstText(info);
-                buttonactive = gContext->LoadScalePixmap(setting);
+                buttonactive = gContext->LoadScaleImage(setting);
                 hasactive = true;
             }
             else if (info.tagName() == "text")
@@ -517,8 +518,8 @@ void ThemedMenu::parseButton(QString dir, QDomElement &element)
     bool hasicon = false;
 
     QString name = "";
-    QPixmap *image = NULL;
-    QPixmap *activeimage = NULL;
+    QImage *image = NULL;
+    QImage *activeimage = NULL;
     QPoint offset;
 
     name = element.attribute("name", "");
@@ -534,13 +535,13 @@ void ThemedMenu::parseButton(QString dir, QDomElement &element)
             if (info.tagName() == "image")
             {
                 QString imagepath = dir + getFirstText(info); 
-                image = gContext->LoadScalePixmap(imagepath);
+                image = gContext->LoadScaleImage(imagepath);
                 hasicon = true;
             }
             else if (info.tagName() == "activeimage")
             {
                 QString imagepath = dir + getFirstText(info);
-                activeimage = gContext->LoadScalePixmap(imagepath);
+                activeimage = gContext->LoadScaleImage(imagepath);
             }
             else if (info.tagName() == "offset")
             {
@@ -1085,16 +1086,19 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased)
     newRect.moveBy(buttonList[button].posRect.x() - cr.x(), 
                    buttonList[button].posRect.y() - cr.y());
 
+    QImage *buttonback = NULL;
     if (&(buttonList[button]) == activebutton)
     {
-        tmp.drawPixmap(newRect.topLeft(), *buttonactive);
+        buttonback = buttonactive;
         buttonList[button].status = 1;
     }
     else
     {
-        tmp.drawPixmap(newRect.topLeft(), *buttonnormal);
+        buttonback = buttonnormal;
         buttonList[button].status = 0;
     }
+
+    blendImageToPixmap(&pix, newRect.x(), newRect.y(), buttonback, &tmp, 0, 0);
 
     QRect buttonTextRect = textRect;
     buttonTextRect.moveBy(newRect.x(), newRect.y());
@@ -1161,13 +1165,14 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased)
                         buttonList[button].iconRect.width(),
                         buttonList[button].iconRect.height());
 
+        QImage *blendImage = buttonList[button].buttonicon->icon;
+
         if ((&(buttonList[button]) == activebutton) && 
             (buttonList[button].buttonicon->activeicon))
-            tmp.drawPixmap(newRect.topLeft(),
-                           *(buttonList[button].buttonicon->activeicon));
-        else
-            tmp.drawPixmap(newRect.topLeft(), 
-                           *(buttonList[button].buttonicon->icon));
+            blendImage = buttonList[button].buttonicon->activeicon;
+
+        blendImageToPixmap(&pix, newRect.x(), newRect.y(), blendImage,
+                           &tmp, 0, 0);
     }
 
 

@@ -26,6 +26,7 @@ using namespace std;
 #include "oldsettings.h"
 #include "tv.h"
 #include "progfind.h"
+#include "util.h"
 
 QString RunProgramGuide(QString startchannel, bool thread, TV *player)
 {
@@ -1184,28 +1185,6 @@ QBrush GuideGrid::getBGColor(const QString &category)
 
     return br;
 }
-
-QRgb blendColors(QRgb source, QRgb add, int alpha)
-{
-    int sred = qRed(source);
-    int sgreen = qGreen(source);
-    int sblue = qBlue(source);
-
-    int tmp1 = (qRed(add) - sred) * alpha;
-    int tmp2 = sred + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-    sred = tmp2 & 0xff;
-
-    tmp1 = (qGreen(add) - sgreen) * alpha;
-    tmp2 = sgreen + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-    sgreen = tmp2 & 0xff;
-
-    tmp1 = (qBlue(add) - sblue) * alpha;
-    tmp2 = sblue + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-    sblue = tmp2 & 0xff;
-
-    return qRgb(sred, sgreen, sblue);
-}
-
 
 void GuideGrid::paintPrograms(QPainter *p)
 {

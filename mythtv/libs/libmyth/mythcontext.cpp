@@ -450,6 +450,45 @@ void MythContext::ThemeWidget(QWidget *widget)
     }
 }
 
+QImage *MythContext::LoadScaleImage(QString filename)
+{
+    if (filename.left(5) == "myth:")
+        return NULL;
+
+    QImage *ret = NULL;
+
+    int width, height;
+    float wmult, hmult;
+
+    GetScreenSettings(width, wmult, height, hmult);
+
+    if (width != 800 || height != 600)
+    {
+        QImage tmpimage;
+
+        if (!tmpimage.load(filename))
+        {
+            cerr << "Error loading image file: " << filename << endl;
+            return NULL;
+        }
+        QImage tmp2 = tmpimage.smoothScale((int)(tmpimage.width() * wmult),
+                                           (int)(tmpimage.height() * hmult));
+        ret = new QImage(tmp2);
+    }
+    else
+    {
+        ret = new QImage(filename);
+        if (ret->width() == 0)
+        {
+            cerr << "Error loading image file: " << filename << endl;
+            delete ret;
+            return NULL;
+        }
+    }
+
+    return ret;
+}
+
 QPixmap *MythContext::LoadScalePixmap(QString filename) 
 { 
     if (filename.left(5) == "myth:")

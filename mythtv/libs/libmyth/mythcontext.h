@@ -91,6 +91,7 @@ class MythContext : public QObject
     void ThemeWidget(QWidget *widget);
 
     QPixmap *LoadScalePixmap(QString filename); 
+    QImage *LoadScaleImage(QString filename);
 
     void addListener(QObject *obj);
     void removeListener(QObject *obj);

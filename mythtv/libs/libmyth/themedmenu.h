@@ -12,13 +12,14 @@
 using namespace std;
 
 class QPixmap;
+class QImage;
 class QWidget;
 
 struct ButtonIcon
 {
     QString name;
-    QPixmap *icon;
-    QPixmap *activeicon;
+    QImage *icon;
+    QImage *activeicon;
     QPoint offset;
 };
 
@@ -114,8 +115,8 @@ class ThemedMenu : public MythDialog
     QRect logoRect;
     QPixmap *logo;
 
-    QPixmap *buttonnormal;
-    QPixmap *buttonactive;
+    QImage *buttonnormal;
+    QImage *buttonactive;
 
     QMap<QString, ButtonIcon> allButtonIcons;
 
