@@ -317,7 +317,10 @@ void VideoOutputIvtv::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
     VideoFrame *pipimage = pipplayer->GetCurrentFrame(pipw, piph);
 
     if (!pipimage || !pipimage->buf || pipimage->codec != FMT_YV12)
+    {
+        pipplayer->ReleaseCurrentFrame(pipimage);
         return;
+    }
 
     int xoff;
     int yoff;
@@ -373,6 +376,8 @@ void VideoOutputIvtv::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
     convert(outputbuf, pipbuf, pipbuf + (pipw * piph), 
             pipbuf + (pipw * piph * 5 / 4), pipw, piph,
             pipw * 4, pipw, pipw / 2, 1);
+
+    pipplayer->ReleaseCurrentFrame(pipimage);
 
     if (frame->width < 0)
         frame->width = XJ_width;

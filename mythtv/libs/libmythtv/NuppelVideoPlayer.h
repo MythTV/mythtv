@@ -114,6 +114,7 @@ class NuppelVideoPlayer
     int FlagCommercials(bool showPercentage = false, bool fullSpeed = false);
 
     VideoFrame *GetCurrentFrame(int &w, int &h);
+    void ReleaseCurrentFrame(VideoFrame *frame);
 
     void SetPipPlayer(NuppelVideoPlayer *pip) { setpipplayer = pip; 
                                                 needsetpipplayer = true; }
@@ -425,6 +426,8 @@ class NuppelVideoPlayer
     bool limitKeyRepeat;
 
     QWidget *parentWidget;
+
+    QMutex vidExitLock;
 };
 
 #endif

@@ -535,7 +535,10 @@ void PlaybackBox::updateVideo(QPainter *p)
         VideoFrame *frame = nvp->GetCurrentFrame(w, h);
 
         if (w == 0 || h == 0 || !frame || !(frame->buf))
+        {
+            nvp->ReleaseCurrentFrame(frame);
             return;
+        }
 
         unsigned char *buf = frame->buf;
 
@@ -544,6 +547,8 @@ void PlaybackBox::updateVideo(QPainter *p)
 
         convert(outputbuf, buf, buf + (w * h), buf + (w * h * 5 / 4), w, h, 
                 w * 4, w, w / 2, 0);
+
+        nvp->ReleaseCurrentFrame(frame);
 
         QImage img(outputbuf, w, h, 32, NULL, 65536 * 65536, 
                    QImage::LittleEndian);

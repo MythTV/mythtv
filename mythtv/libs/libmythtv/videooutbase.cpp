@@ -697,7 +697,10 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
     VideoFrame *pipimage = pipplayer->GetCurrentFrame(pipw, piph);
 
     if (!pipimage || !pipimage->buf || pipimage->codec != FMT_YV12)
+    {
+        pipplayer->ReleaseCurrentFrame(pipimage);
         return;
+    }
 
     int xoff;
     int yoff;
@@ -769,6 +772,8 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
         memcpy(uptr + (i + yoff) * vidw + xoff, pipuptr + i * pipw, pipw);
         memcpy(vptr + (i + yoff) * vidw + xoff, pipvptr + i * pipw, pipw);
     }
+
+    pipplayer->ReleaseCurrentFrame(pipimage);
 }
 
 int VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd, int stride)

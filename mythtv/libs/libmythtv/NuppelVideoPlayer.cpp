@@ -716,9 +716,22 @@ VideoFrame *NuppelVideoPlayer::GetCurrentFrame(int &w, int &h)
     w = video_width;
     h = video_height;
 
+    VideoFrame *retval = NULL;
+
+    vidExitLock.lock();
     if (videoOutput)
-        return videoOutput->GetLastShownFrame();
-    return NULL;
+        retval = videoOutput->GetLastShownFrame();
+
+    if (!retval)
+        vidExitLock.unlock();
+
+    return retval;
+}
+
+void NuppelVideoPlayer::ReleaseCurrentFrame(VideoFrame *frame)
+{
+    if (frame)
+        vidExitLock.unlock();
 }
 
 void NuppelVideoPlayer::EmbedInWidget(unsigned long wid, int x, int y, int w, 
@@ -1571,8 +1584,10 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         //sched_yield();
     }
 
+    vidExitLock.lock();
     delete videoOutput;
     videoOutput = NULL;
+    vidExitLock.unlock();
 
     if (usevideotimebase)
         ShutdownVTAVSync();
@@ -1614,6 +1629,7 @@ void NuppelVideoPlayer::IvtvVideoLoop(void)
         usleep(delay);
     }
 
+    // no need to lock this, we don't have any video frames
     delete videoOutput;
     videoOutput = NULL;
 }
