@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2004-06-11, v0.15.04
+<date>2004-06-17, v0.15.05
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -688,8 +688,8 @@ url="http://ATrpms.net/topic/multimedia/" name="ATrpms"> for
 the drivers you need.
 
 Further documentation on using ATrpms packages can be found in Jarod
-Wilson's <url url="mailto:jcw@wilsonet.com"
-name="mailto:jcw@wilsonet.com"> at <url
+Wilson's (<url url="mailto:jcw@wilsonet.com"
+name="mailto:jcw@wilsonet.com">) HOWTO at <url
 url="http://wilsonet.com/mythtv/" name="http://wilsonet.com/mythtv/">
 Just like 3rd-party packages, any 3rd-party documentation problems
 should be brought up with the 3rd-parties (maintainer, lists, bugzillas etc.).
@@ -1184,9 +1184,9 @@ After downloading, be sure to install both:
 
 </code>
 
-Get lame from <url url="http://www.mp3dev.org/mp3"
-name="http://www.mp3dev.org/mp3">.  Download the source code to v3.93.1 by
-following the links to sourceforge.net
+Get lame from <url url="http://lame.sourceforge.net/"
+name="http://lame.sourceforge.net/">.  Download the source code to v3.93.1
+by following the links from "About".
 
 <sect1>Notes on compiling on a system with non-Intel processors <label
 id="nonintelcpu_">
@@ -5666,6 +5666,8 @@ mysql>drop table channel_copy;
 mysql>exit
 $
 </verb></tscreen>
+<sect1>What do the icons on the Watch Recordings screen mean?
+<p>Press "1" or F1 to get a popup.
 <sect>Example Configurations.
 <p>This section contains configurations which you may find useful.
 <sect1>Hauppauge PVR-250/350 hardware MPEG-2 encoder <label id="pvr250">
@@ -6462,6 +6464,8 @@ something is in the wrong place then speak up).  Make some changes right at
 the top.  All sorts of crap changed throughout the document.
 v0.15.04, 2004-06-11.  Fix a broken tag.  Fix Bug 11 (icon grabber for DD in wrong
 section)
+v0.15.05, 2004-06-17.  Add "What do those icons mean?".  Update website for
+"lame".
 -->
 
 <!--

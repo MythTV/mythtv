@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2004-06-11, v0.15.04
+  2004-06-17, v0.15.05
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -262,6 +262,7 @@
      21.17 Can a wireless connection be used between the frontend and the backend?
      21.18 How can I burn shows that I have recorded to a DVD?
      21.19 Migrating from XMLTV to DataDirect
+     21.20 What do the icons on the Watch Recordings screen mean?
 
   22. Example Configurations.
      22.1 Hauppauge PVR-250/350 hardware MPEG-2 encoder
@@ -275,7 +276,6 @@
         22.4.3 ReiserFS
         22.4.4 JFS
         22.4.5 XFS
-
 
 
   ______________________________________________________________________
@@ -1015,7 +1015,7 @@
   <http://ATrpms.net/topic/multimedia/> for the drivers you need.
 
   Further documentation on using ATrpms packages can be found in Jarod
-  Wilson's mailto:jcw@wilsonet.com <mailto:jcw@wilsonet.com> at
+  Wilson's (mailto:jcw@wilsonet.com <mailto:jcw@wilsonet.com>) HOWTO at
   http://wilsonet.com/mythtv/ <http://wilsonet.com/mythtv/> Just like
   3rd-party packages, any 3rd-party documentation problems should be
   brought up with the 3rd-parties (maintainer, lists, bugzillas etc.).
@@ -1573,9 +1573,9 @@
 
 
 
-  Get lame from http://www.mp3dev.org/mp3 <http://www.mp3dev.org/mp3>.
-  Download the source code to v3.93.1 by following the links to
-  sourceforge.net
+  Get lame from http://lame.sourceforge.net/
+  <http://lame.sourceforge.net/>.  Download the source code to v3.93.1
+  by following the links from "About".
 
 
   [1m5.1.  Notes on compiling on a system with non-Intel processors[0m
@@ -6656,6 +6656,10 @@
 
 
 
+  [1m21.20.  What do the icons on the Watch Recordings screen mean?[0m
+
+  Press "1" or F1 to get a popup.
+
   [1m22.  Example Configurations.[0m
 
   This section contains configurations which you may find useful.
@@ -6679,12 +6683,14 @@
   then alter the [1murpmi [22mcommand appropriately.)
 
 
-       $ uname -a
-       Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
-       unknown GNU/Linux
 
-       $ su
-       # urpmi kernel-source
+  $ uname -a
+  Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
+  unknown GNU/Linux
+
+  $ su
+  # urpmi kernel-source
+
 
 
              [1mNOTE[22m:  You do not need to recompile your kernel.
@@ -6779,14 +6785,15 @@
   if you will not be using the IR remote that came with the card.
 
 
-       alias char-major-81     videodev
-       alias char-major-81-0   ivtv
-       alias char-major-61 lirc_i2c
-       options ivtv debug=1
-       options tuner type=2
-       options msp3400 once=1 simple=1
-       add below ivtv msp3400 saa7115 tuner
-       add above ivtv lirc_dev lirc_i2c
+
+  alias char-major-81     videodev
+  alias char-major-81-0   ivtv
+  alias char-major-61 lirc_i2c
+  options ivtv debug=1
+  options tuner type=2
+  options msp3400 once=1 simple=1
+  add below ivtv msp3400 saa7115 tuner
+  add above ivtv lirc_dev lirc_i2c
 
 
 
@@ -6830,15 +6837,16 @@
   Check that the card is being recognized on the PCI bus:
 
 
-       $ lspci -v
-       <snip>
 
-       00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
-       Encoder (rev 01)
-               Subsystem: Hauppauge computer works Inc.: Unknown device 4801
-               Flags: bus master, medium devsel, latency 32, IRQ 11
-               Memory at d0000000 (32-bit, prefetchable) [size=64M]
-               Capabilities: <available only to root>
+  $ lspci -v
+  <snip>
+
+  00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
+  Encoder (rev 01)
+          Subsystem: Hauppauge computer works Inc.: Unknown device 4801
+          Flags: bus master, medium devsel, latency 32, IRQ 11
+          Memory at d0000000 (32-bit, prefetchable) [size=64M]
+          Capabilities: <available only to root>
 
 
 
@@ -6853,6 +6861,7 @@
        crw-------    1 mythtv   sys       81, 224 Dec 31  1969 vbi0
        crw-------    1 mythtv   sys       81,   0 Dec 31  1969 video0
        crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
+
 
 
   In this case, the ivtv device is video0.
@@ -6963,11 +6972,10 @@
   going to be version 0.6.6, and that won't work.  Uninstall it:
 
 
-
-  $ su
-  # urpme lirc lirc-remotes liblirc-devel
-  # rm -rf /dev/lirc*
-  # exit
+       $ su
+       # urpme lirc lirc-remotes liblirc-devel
+       # rm -rf /dev/lirc*
+       # exit
 
 
 
@@ -6975,39 +6983,40 @@
   programs on your system:
 
 
-       $ su
-       # updatedb
-       # locate lirc_i2c|grep `uname -r`
-       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_i2c.c
-       /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_i2c.o.gz
 
-       # locate lirc_dev|grep `uname -r`
-       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.c
-       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.h
-       /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.stamp
-       /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.ver
-       /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_dev.o.gz
+  $ su
+  # updatedb
+  # locate lirc_i2c|grep `uname -r`
+  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_i2c.c
+  /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_i2c.o.gz
 
-       # locate irw|grep "/usr"
-       /usr/bin/irw
-       /usr/local/bin/irw
-       /usr/local/man/man1/irw.1
+  # locate lirc_dev|grep `uname -r`
+  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.c
+  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.h
+  /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.stamp
+  /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.ver
+  /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_dev.o.gz
 
-       # locate lircd|grep "/usr"
-       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lircd.conf.RM-050
-       /usr/share/man/man8/lircd.8.bz2
-       /usr/share/doc/lirc-0.6.6/html/lircd.html
-       /usr/sbin/lircd
-       /usr/local/sbin/lircd
-       /usr/local/man/man8/lircd.8
+  # locate irw|grep "/usr"
+  /usr/bin/irw
+  /usr/local/bin/irw
+  /usr/local/man/man1/irw.1
 
-       # locate irxevent|grep "/usr"
-       /usr/share/man/man1/irxevent.1.bz2
-       /usr/share/doc/lirc-0.6.6/html/irxevent.html
-       /usr/share/doc/lirc-0.6.6/irxevent.keys
-       /usr/bin/irxevent
-       /usr/local/bin/irxevent
-       /usr/local/man/man1/irxevent.1
+  # locate lircd|grep "/usr"
+  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lircd.conf.RM-050
+  /usr/share/man/man8/lircd.8.bz2
+  /usr/share/doc/lirc-0.6.6/html/lircd.html
+  /usr/sbin/lircd
+  /usr/local/sbin/lircd
+  /usr/local/man/man8/lircd.8
+
+  # locate irxevent|grep "/usr"
+  /usr/share/man/man1/irxevent.1.bz2
+  /usr/share/doc/lirc-0.6.6/html/irxevent.html
+  /usr/share/doc/lirc-0.6.6/irxevent.keys
+  /usr/bin/irxevent
+  /usr/local/bin/irxevent
+  /usr/local/man/man1/irxevent.1
 
 
 
@@ -7027,8 +7036,9 @@
 
   Download the lirc-0.7.0pre2 tarball:
 
-  $ wget http://lirc.sourceforge.net/software/snapshots/lirc-0.7.0pre2.tar.bz2
-  $ tar -xjf lirc-0.7.0pre2.tar.bz2
+
+       $ wget http://lirc.sourceforge.net/software/snapshots/lirc-0.7.0pre2.tar.bz2
+       $ tar -xjf lirc-0.7.0pre2.tar.bz2
 
 
 
@@ -7037,9 +7047,9 @@
   work correctly.  Download the patch and install:
 
 
-       $ cd lirc-0.7.0pre2
-       $ wget http://delvare.nerim.net/i2c/other/lirc-CVS-i2c-2.8.0.patch
-       $ patch -p1 < lirc-CVS-i2c-2.8.0.patch
+  $ cd lirc-0.7.0pre2
+  $ wget http://delvare.nerim.net/i2c/other/lirc-CVS-i2c-2.8.0.patch
+  $ patch -p1 < lirc-CVS-i2c-2.8.0.patch
 
 
 
@@ -7087,21 +7097,22 @@
   your /var/log/messages and /var/log/lircd files.
 
 
-       $ su
-       # modprobe lirc_i2c
-       # lsmod
-       Module                  Size  Used by    Not tainted
-       lirc_i2c                5124   0
-       lirc_dev               10096   1  [lirc_i2c]
-       ...
-       # lircd
-       # tail /var/log/messages
-       Sep 18 15:38:26 frontend kernel: lirc_i2c: chip found @ 0x18 (Hauppauge IR)
-       Sep 18 15:38:26 frontend kernel: lirc_dev: lirc_register_plugin:sample_rate:
-       10
-       ...
-       # tail /var/log/lircd
-       Sep 18 15:24:52 frontend lircd 0.7.0pre2: lircd(hauppauge) ready
+
+  $ su
+  # modprobe lirc_i2c
+  # lsmod
+  Module                  Size  Used by    Not tainted
+  lirc_i2c                5124   0
+  lirc_dev               10096   1  [lirc_i2c]
+  ...
+  # lircd
+  # tail /var/log/messages
+  Sep 18 15:38:26 frontend kernel: lirc_i2c: chip found @ 0x18 (Hauppauge IR)
+  Sep 18 15:38:26 frontend kernel: lirc_dev: lirc_register_plugin:sample_rate:
+  10
+  ...
+  # tail /var/log/lircd
+  Sep 18 15:24:52 frontend lircd 0.7.0pre2: lircd(hauppauge) ready
 
 
 
@@ -7148,9 +7159,12 @@
   native LIRC support within MythTV, you will need to modify your
   settings.pro file and recompile.  Your settings.pro should look like
   this:
-       # Native lirc support
-       CONFIG += using_lirc
-       LIRC_LIBS = -llirc_client
+
+
+
+  # Native lirc support
+  CONFIG += using_lirc
+  LIRC_LIBS = -llirc_client
 
 
 
