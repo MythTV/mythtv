@@ -1,6 +1,9 @@
 #include <qstyle.h>
 #include <qpainter.h>
 #include <qcursor.h>
+#include <qapplication.h>
+#include <qvbox.h>
+#include <qlayout.h>
 
 #include <iostream>
 
@@ -813,12 +816,63 @@ void MythDialog::Show(void)
     setActiveWindow();
 }
 
-MythProgressDialog::MythProgressDialog(const QString& labelText, int totalSteps,
-                                       QWidget* parent, const char* name,
-                                       bool modal):
-     QProgressDialog(labelText, "Cancel", totalSteps, parent, name, modal) {
-     QPushButton* mcancelButton = new MythPushButton("Cancel", this);
-     this->setCancelButton(mcancelButton);
+MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)
+                  : MythDialog(NULL, 0, true)
+{
+    int yoff = screenheight / 3; int xoff = screenwidth / 10;
+    setGeometry(xoff, yoff, screenwidth - xoff * 2, yoff);
+    setFixedSize(QSize(screenwidth - xoff * 2, yoff));
+
+    qApp->processEvents();
+
+    QVBoxLayout *lay = new QVBoxLayout(this, 0);
+
+    QVBox *vbox = new QVBox(this);
+    lay->addWidget(vbox);
+
+    vbox->setLineWidth(3);
+    vbox->setMidLineWidth(3);
+    vbox->setFrameShape(QFrame::Panel);
+    vbox->setFrameShadow(QFrame::Raised);
+    vbox->setMargin((int)(15 * wmult));
+
+    QLabel *msglabel = new QLabel(vbox);
+    msglabel->setBackgroundOrigin(WindowOrigin);
+    msglabel->setText(message);
+
+    progress = new QProgressBar(totalSteps, vbox);
+    progress->setBackgroundOrigin(WindowOrigin);
+    progress->setProgress(0);
+
+    steps = totalSteps / 1000;
+    if (steps == 0)
+        steps = 1;
+
+    Show();
+
+    qApp->processEvents();
+
+    setGeometry(xoff, yoff, screenwidth - xoff * 2, yoff);
+}
+
+void MythProgressDialog::Close(void)
+{
+    accept();
+}
+
+void MythProgressDialog::setProgress(int curprogress)
+{
+    progress->setProgress(curprogress);
+    if (curprogress % steps == 0)
+        qApp->processEvents();
+}
+
+void MythProgressDialog::keyPressEvent(QKeyEvent *e)
+{
+    if (e->key() == Key_Escape)
+        ;
+    else
+        MythDialog::keyPressEvent(e);
 }
 
 MythListView::MythListView(QWidget *parent)

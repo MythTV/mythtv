@@ -10,10 +10,10 @@
 #include <qpushbutton.h>
 #include <qtoolbutton.h>
 #include <qdialog.h>
-#include <qprogressdialog.h>
 #include <qlistview.h>
 #include <qheader.h>
 #include <qtable.h>
+#include <qprogressbar.h>
 #include <qbuttongroup.h>
 #include <qlistbox.h>
 #include <qcheckbox.h>
@@ -291,12 +291,18 @@ class MythDialog : public QDialog
     int screenwidth, screenheight;
 };
 
-class MythProgressDialog: public QProgressDialog {
-public:
-    MythProgressDialog(const QString& labelText, int totalSteps,
-                       QWidget* parent=NULL, const char* name=0,
-                       bool modal=FALSE);
-        
+class MythProgressDialog: public MythDialog 
+{
+  public:
+    MythProgressDialog(const QString& message, int totalSteps);
+ 
+    void Close(void);
+    void setProgress(int curprogress);
+    void keyPressEvent(QKeyEvent *);
+  
+  private:
+    QProgressBar *progress;
+    int steps;     
 };
 
 class MythListView : public QListView

@@ -77,11 +77,6 @@ void ProviderSelector::fillSelections(const QString& location) {
         .arg(grabber)
         .arg(location);
 
-    MythProgressDialog pleaseWait("Retrieving provider list", 2, NULL, NULL, TRUE);
-    pleaseWait.setMinimumDuration(0);
-    pleaseWait.setProgress(1);
-    qApp->processEvents();
-
     FILE* fp = popen(command.ascii(), "r");
 
     if (fp == NULL) {
@@ -98,8 +93,6 @@ void ProviderSelector::fillSelections(const QString& location) {
 
     f.close();
     fclose(fp);
-
-    pleaseWait.setProgress(2);
 }
 
 void XMLTV_na_config::save(QSqlDatabase* db) {
