@@ -1369,11 +1369,11 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
                         xmltv_grabber.ascii(), offset,
                         configfile.ascii(), filename.ascii());
     else if (xmltv_grabber == "tv_grab_es")
-        // Use fixed of 4 days for Spanish grabber
-        command.sprintf("nice %s --days=4 --offset %d --config-file '%s' --output %s",
-                        xmltv_grabber.ascii(), offset,
+        // Use fixed interval of 3 days for Spanish grabber
+        command.sprintf("nice %s --days=4  --config-file '%s' --output %s",
+                        xmltv_grabber.ascii(), 
                         configfile.ascii(), filename.ascii());
-     else if (xmltv_grabber == "tv_grab_ja")
+    else if (xmltv_grabber == "tv_grab_ja")
          // Use fixed interval of 3 days for Japanese grabber
          command.sprintf("nice %s --days 3 --config-file '%s' --output %s",
                          xmltv_grabber.ascii(), configfile.ascii(),
