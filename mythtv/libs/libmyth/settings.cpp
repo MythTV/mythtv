@@ -233,7 +233,7 @@ QWidget* LabelSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
     QLabel* label = new QLabel(widget);
-    label->setText(getLabel() + ":");
+    label->setText(getLabel() + ":     ");
     label->setBackgroundOrigin(QWidget::WindowOrigin);
 
     QLabel* value = new QLabel(widget);
@@ -254,7 +254,7 @@ QWidget* LineEditSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
     QLabel* label = new QLabel(widget);
-    label->setText(getLabel() + ":");
+    label->setText(getLabel() + ":     ");
     label->setBackgroundOrigin(QWidget::WindowOrigin);
 
     MythLineEdit* edit = new MythLineEdit(settingValue, widget,
@@ -281,7 +281,7 @@ QWidget* SliderSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
     QLabel* label = new QLabel(widget, QString(widgetName) + "-label");
-    label->setText(getLabel() + ":");
+    label->setText(getLabel() + ":     ");
     label->setBackgroundOrigin(QWidget::WindowOrigin);
 
     MythSlider* slider = new MythSlider(widget, 
@@ -317,7 +317,7 @@ QWidget* SpinBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
 
     QLabel* label = new QLabel(box);
     label->setBackgroundOrigin(QWidget::WindowOrigin);
-    label->setText(getLabel() + ":");
+    label->setText(getLabel() + ":     ");
 
     MythSpinBox* spinbox = new MythSpinBox(box);
     spinbox->setHelpText(getHelpText());
@@ -344,7 +344,7 @@ QWidget* SelectLabelSetting::configWidget(ConfigurationGroup *cg,
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
 
     QLabel* label = new QLabel(widget);
-    label->setText(getLabel() + ":");
+    label->setText(getLabel() + ":     ");
     label->setBackgroundOrigin(QWidget::WindowOrigin);
 
     QLabel* value = new QLabel(widget);
@@ -361,16 +361,18 @@ QWidget* SelectLabelSetting::configWidget(ConfigurationGroup *cg,
 
 QWidget* ComboBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                        const char* widgetName) {
-    QWidget* box = new QHBox(parent, widgetName);
+    QHBox* box = new QHBox(parent, widgetName);
     box->setBackgroundOrigin(QWidget::WindowOrigin);
 
     QLabel* label = new QLabel(box);
-    label->setText(getLabel() + ":");
+    label->setText(getLabel() + ":     ");
     label->setBackgroundOrigin(QWidget::WindowOrigin);
+    box->setStretchFactor(label, 0);
 
     MythComboBox* widget = new MythComboBox(rw, box);
     widget->setHelpText(getHelpText());
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
+    box->setStretchFactor(widget, 1);
 
     for(unsigned int i = 0 ; i < labels.size() ; ++i)
         widget->insertItem(labels[i]);
