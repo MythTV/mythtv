@@ -1873,6 +1873,9 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
                 encodeLongLong(retlist, value);
             }
         }
+
+        if (!retlist.size())
+            retlist << "ok";
     }
     else if (command == "SETUP_RING_BUFFER")
     {
