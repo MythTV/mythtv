@@ -323,7 +323,7 @@ void SnesHandler::start_game(RomInfo * romdata)
     QString emulator = gContext->GetSetting("SnesEmulator", "SNES9x");
 
     //Set these bools to make seting up the options easier
-    bool zsnes = (emulator = "zSNES")? true : false;
+    bool zsnes = (emulator == "zSNES");
     bool snes9x = !zsnes;
 
     //bool bNoSound = false;
