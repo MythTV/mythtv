@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-12-13, v0.13.01
+<date>2003-12-14, v0.13.02
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -554,9 +554,6 @@ system; the woody packages cannot be installed on unstable, nor vice
 versa.  Installation instructions can be found on those pages as well.
 All of the prerequisites for MythTV are available as Debian packages,
 most of them from the official Debian archive.
-
-<bf>NOTE</bf>:  As of 2003-11-03, the .debs are still for MythTV 0.11.  New
-.debs will be created some time in December 2003.
 
 <p>
 If you are running woody, be sure to follow the instructions on the
@@ -4873,6 +4870,7 @@ dumped unless a maintainer comes forward.  Look out, Redhat 8.0.  You're
 next.
 v0.13.01, 2003-12-13.  Add step for alsa compile for Red Hat. Mike Smith,
 easygreenus at yahoo.com
+v0.13.02, 2003-12-14.  MythTV .debs are now available.
 -->
 
 <!--
