@@ -8,6 +8,14 @@
 #include "libmyth/mythdialogs.h"
 #include "libmythtv/programinfo.h"
 
+enum ProgListType {
+    plUnknown = 0,
+    plTitle = 1,
+    plNewListings = 2,
+    plTitleSearch = 3,
+    plDescSearch = 4
+};
+
 class QSqlDatabase;
 
 class ProgLister : public MythDialog
@@ -15,7 +23,7 @@ class ProgLister : public MythDialog
     Q_OBJECT
 
   public:
-    ProgLister(const QString &ltitle, QSqlDatabase *ldb, 
+    ProgLister(ProgListType pltype, const QString &ltitle, QSqlDatabase *ldb, 
 	       MythMainWindow *parent, const char *name = 0);
     ~ProgLister();
 
@@ -32,6 +40,7 @@ class ProgLister : public MythDialog
     void quickRecord(void);
 
   private:
+    ProgListType type;
     QString title;
     QSqlDatabase *db;
     QDateTime startTime;

@@ -787,7 +787,7 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
 
 void ScheduledRecording::runProgList(void)
 {
-    ProgLister *pl = new ProgLister(title->getValue(),
+    ProgLister *pl = new ProgLister(plTitle, title->getValue(),
                                     QSqlDatabase::database(),
                                     gContext->GetMainWindow(), "proglist");
     pl->exec();

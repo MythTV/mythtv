@@ -244,7 +244,7 @@ void InfoDialog::numberPress(QListViewItem *, int num)
 {
     if (num == 5)
     {
-        ProgLister *pl = new ProgLister(myinfo->title, 
+        ProgLister *pl = new ProgLister(plTitle, myinfo->title, 
                                         QSqlDatabase::database(),
                                         gContext->GetMainWindow(), "proglist");
         pl->exec();

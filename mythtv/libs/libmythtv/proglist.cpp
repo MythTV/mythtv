@@ -22,10 +22,12 @@ using namespace std;
 #include "mythcontext.h"
 #include "remoteutil.h"
 
-ProgLister::ProgLister(const QString &ltitle, QSqlDatabase *ldb, 
-		   MythMainWindow *parent, const char *name)
+ProgLister::ProgLister(ProgListType pltype, const QString &ltitle,
+                       QSqlDatabase *ldb, MythMainWindow *parent,
+                       const char *name)
             : MythDialog(parent, name)
 {
+    type = pltype;
     title = ltitle;
     db = ldb;
     startTime = QDateTime::currentDateTime();
@@ -262,12 +264,47 @@ void ProgLister::edit()
 
 void ProgLister::fillItemList(void)
 {
-    QString where = QString("WHERE program.title = \"%1\" AND "
-			    "program.chanid = channel.chanid "
-			    "AND program.endtime > %2 "
-			    "ORDER BY program.starttime,channel.channum;")
-	                    .arg(title.utf8())
-	                    .arg(startTime.toString("yyyyMMddhhmm50"));
+    QString where;
+
+    if (type == plTitle) // per title listings
+    {
+        where = QString("WHERE program.title = \"%1\" "
+                        "AND program.endtime > %2 "
+                        "AND program.chanid = channel.chanid "
+                        "ORDER BY program.starttime,channel.channum;")
+                        .arg(title.utf8())
+                        .arg(startTime.toString("yyyyMMddhhmm50"));
+    }
+    else if (type == plNewListings) // what's new list
+    {
+        where = QString("LEFT JOIN oldprogram ON title=oldtitle "
+                        "WHERE oldtitle IS NULL AND program.endtime > %1 "
+                        "AND  program.chanid = channel.chanid "
+                        "GROUP BY title ORDER BY starttime LIMIT 500;")
+                        .arg(startTime.toString("yyyyMMddhhmm50"));
+    }
+    else if (type == plTitleSearch) // keyword search
+    {
+        where = QString("WHERE program.title LIKE \"\%%1\%\" "
+                        "AND program.endtime > %2 "
+                        "AND program.chanid = channel.chanid "
+                        "ORDER BY program.starttime,channel.channum "
+                        "LIMIT 500;")
+                        .arg(title.utf8())
+                        .arg(startTime.toString("yyyyMMddhhmm50"));
+    }
+    else if (type == plDescSearch) // description search
+    {
+        where = QString("WHERE (program.title LIKE \"\%%1\%\" "
+                        "OR program.subtitle LIKE \"\%%2\%\" "
+                        "OR program.description LIKE \"\%%3\%\") "
+                        "AND program.endtime > %4 "
+                        "AND program.chanid = channel.chanid "
+                        "ORDER BY program.starttime,channel.channum "
+                        "LIMIT 500;")
+                        .arg(title.utf8()).arg(title.utf8()).arg(title.utf8())
+                        .arg(startTime.toString("yyyyMMddhhmm50"));
+    }
 
     itemList.clear();
     ProgramInfo::GetProgramListByQuery(db, &itemList, where);
@@ -298,6 +335,8 @@ void ProgLister::updateList(QPainter *p)
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
+
+    QString tmptitle;
     
     LayerSet *container = theme->GetSet("selector");
     if (container)
@@ -328,10 +367,21 @@ void ProgLister::updateList(QPainter *p)
 
                 ltype->SetItemText(i, 1, pi->startts.toString(timeFormat));
                 ltype->SetItemText(i, 2, pi->chanstr + " " + pi->chansign);
+
                 if (pi->subtitle == "")
-                    ltype->SetItemText(i, 3, pi->title);
+                    tmptitle = pi->title;
                 else
-                    ltype->SetItemText(i, 3, pi->subtitle);
+                {
+                    if (type == plTitle)
+                        tmptitle = pi->subtitle;
+                    else
+                        tmptitle = QString("%1 - \"%2\"")
+                                           .arg(pi->title)
+                                           .arg(pi->subtitle);
+                }
+
+                ltype->SetItemText(i, 3, tmptitle);
+
                 if (pi->conflicting)
                     ltype->EnableForcedFont(i, "conflicting");
                 else if (pi->recording)
