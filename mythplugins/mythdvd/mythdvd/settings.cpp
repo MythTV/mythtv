@@ -25,10 +25,10 @@
 */
 
 #ifdef VCD_SUPPORT
-class SetVCDDevice: public LineEditSetting, public GlobalSetting {
+class SetVCDDevice: public GlobalLineEdit {
 public:
     SetVCDDevice():
-        GlobalSetting("VCDDeviceLocation") {
+        GlobalLineEdit("VCDDeviceLocation") {
         setLabel(QObject::tr("Location of VCD device"));
         setValue("/dev/cdrom");
         setHelpText(QObject::tr("This device must exist, and the user "
@@ -38,10 +38,10 @@ public:
 };
 #endif
 
-class SetDVDDevice: public LineEditSetting, public GlobalSetting {
+class SetDVDDevice: public GlobalLineEdit {
 public:
     SetDVDDevice():
-        GlobalSetting("DVDDeviceLocation") {
+        GlobalLineEdit("DVDDeviceLocation") {
         setLabel(QObject::tr("Location of DVD device"));
         setValue("/dev/dvd");
         setHelpText(QObject::tr("This device must exist, and the user "
@@ -50,10 +50,10 @@ public:
     };
 };
 
-class SetOnInsertDVD: public ComboBoxSetting, public GlobalSetting {
+class SetOnInsertDVD: public GlobalComboBox {
 public :
     SetOnInsertDVD():
-       GlobalSetting("DVDOnInsertDVD") {
+       GlobalComboBox("DVDOnInsertDVD") {
        setLabel(QObject::tr("On DVD insertion"));
        addSelection(QObject::tr("Display mythdvd menu"),"1");
        addSelection(QObject::tr("Do nothing"),"0");
@@ -85,10 +85,10 @@ DVDGeneralSettings::DVDGeneralSettings()
 */
 
 
-class PlayerCommand: public LineEditSetting, public GlobalSetting {
+class PlayerCommand: public GlobalLineEdit {
 public:
     PlayerCommand():
-        GlobalSetting("DVDPlayerCommand") {
+        GlobalLineEdit("DVDPlayerCommand") {
         setLabel(QObject::tr("DVD Player Command"));
         setValue("mplayer dvd:// -dvd-device %d -fs -zoom -vo xv");
         setHelpText(QObject::tr("This can be any command to launch a DVD player "
@@ -98,10 +98,10 @@ public:
 };
 
 #ifdef VCD_SUPPORT
-class VCDPlayerCommand: public LineEditSetting, public GlobalSetting {
+class VCDPlayerCommand: public GlobalLineEdit {
 public:
     VCDPlayerCommand():
-        GlobalSetting("VCDPlayerCommand") {
+        GlobalLineEdit("VCDPlayerCommand") {
         setLabel(QObject::tr("VCD Player Command"));
         setValue("mplayer vcd:// -cdrom-device %d -fs -zoom -vo xv");
         setHelpText(QObject::tr("This can be any command to launch a VCD player "
@@ -132,10 +132,10 @@ DVDPlayerSettings::DVDPlayerSettings()
 --------------- Ripper Settings ---------------
 */
 
-class SetRipDirectory: public LineEditSetting, public GlobalSetting {
+class SetRipDirectory: public GlobalLineEdit {
 public:
     SetRipDirectory():
-        GlobalSetting("DVDRipLocation") {
+        GlobalLineEdit("DVDRipLocation") {
         setLabel(QObject::tr("Directory to hold temporary files"));
         setValue("/var/lib/mythdvd/temp");
         setHelpText(QObject::tr("This directory must exist, and the user "
@@ -144,10 +144,10 @@ public:
     };
 };
 
-class TitlePlayCommand: public LineEditSetting, public GlobalSetting {
+class TitlePlayCommand: public GlobalLineEdit {
 public:
     TitlePlayCommand():
-        GlobalSetting("TitlePlayCommand"){
+        GlobalLineEdit("TitlePlayCommand"){
         setLabel(QObject::tr("Title Playing Command"));
         setValue("mplayer dvd://%t -dvd-device %d -fs -zoom -vo xv -aid %a -channels %c");
         setHelpText(QObject::tr("This is a command used to preview a given "
@@ -157,10 +157,10 @@ public:
     };
 };
 
-class SubTitleCommand: public LineEditSetting, public GlobalSetting {
+class SubTitleCommand: public GlobalLineEdit {
 public:
     SubTitleCommand():
-        GlobalSetting("SubTitleCommand"){
+        GlobalLineEdit("SubTitleCommand"){
         setLabel(QObject::tr("Subtitle arguments:"));
         setValue("-sid %s");
         setHelpText(QObject::tr("If you choose any subtitles for ripping, this "
@@ -170,10 +170,10 @@ public:
     };
 };
 
-class TranscodeCommand: public LineEditSetting, public GlobalSetting {
+class TranscodeCommand: public GlobalLineEdit {
 public:
     TranscodeCommand():
-        GlobalSetting("TranscodeCommand"){
+        GlobalLineEdit("TranscodeCommand"){
         setLabel(QObject::tr("Base transcode command"));
         setValue("transcode");
         setHelpText(QObject::tr("This is the base (without arguments) command "
@@ -181,11 +181,10 @@ public:
     };
 };
 
-class MTDPortNumber: public SpinBoxSetting, public GlobalSetting {
+class MTDPortNumber: public GlobalSpinBox {
 public:
     MTDPortNumber():
-        SpinBoxSetting(1024, 65535, 1),
-        GlobalSetting("MTDPort") {
+        GlobalSpinBox("MTDPort", 1024, 65535, 1) {
         setLabel(QObject::tr("MTD port number"));
         setValue(2442);
         setHelpText(QObject::tr("The port number that should be used for "
@@ -194,10 +193,10 @@ public:
     };
 };
 
-class MTDLogFlag: public CheckBoxSetting, public GlobalSetting {
+class MTDLogFlag: public GlobalCheckBox {
 public:
     MTDLogFlag():
-        GlobalSetting("MTDLogFlag") {
+        GlobalCheckBox("MTDLogFlag") {
         setLabel(QObject::tr("MTD logs to terminal window"));
         setValue(false);
         setHelpText(QObject::tr("If set, the MTD (Myth Transcoding Daemon) "
@@ -208,10 +207,10 @@ public:
 };
 
 
-class MTDac3Flag: public CheckBoxSetting, public GlobalSetting {
+class MTDac3Flag: public GlobalCheckBox {
 public:
     MTDac3Flag():
-        GlobalSetting("MTDac3Flag") {
+        GlobalCheckBox("MTDac3Flag") {
         setLabel(QObject::tr("Transcode AC3 Audio"));
         setValue(false);
         setHelpText(QObject::tr("If set, the MTD (Myth Transcoding Daemon) "
@@ -221,10 +220,10 @@ public:
 };
 
 
-class MTDxvidFlag: public CheckBoxSetting, public GlobalSetting {
+class MTDxvidFlag: public GlobalCheckBox {
 public:
     MTDxvidFlag():
-        GlobalSetting("MTDxvidFlag") {
+        GlobalCheckBox("MTDxvidFlag") {
         setLabel(QObject::tr("Use xvid rather than divx"));
         setValue(true);
         setHelpText(QObject::tr("If set, mythdvd will use the (open, free) "
@@ -234,11 +233,10 @@ public:
 };
 
 
-class MTDNiceLevel: public SpinBoxSetting, public GlobalSetting {
+class MTDNiceLevel: public GlobalSpinBox {
 public:
     MTDNiceLevel():
-        SpinBoxSetting(0, 20, 1),
-        GlobalSetting("MTDNiceLevel") {
+        GlobalSpinBox("MTDNiceLevel", 0, 20, 1) {
         setLabel(QObject::tr("Nice level for MTD"));
         setValue(20);
         setHelpText(QObject::tr("This determines the priority of the Myth "
@@ -247,11 +245,10 @@ public:
     };
 };
 
-class MTDConcurrentTranscodes: public SpinBoxSetting, public GlobalSetting {
+class MTDConcurrentTranscodes: public GlobalSpinBox {
 public:
     MTDConcurrentTranscodes():
-        SpinBoxSetting(1, 99, 1),
-        GlobalSetting("MTDConcurrentTranscodes") {
+        GlobalSpinBox("MTDConcurrentTranscodes", 1, 99, 1) {
         setLabel(QObject::tr("Simultaneous Transcode Jobs"));
         setValue(1);
         setHelpText(QObject::tr("This determines the number of simultaneous "
@@ -260,11 +257,10 @@ public:
     };
 };
 
-class MTDRipSize: public SpinBoxSetting, public GlobalSetting {
+class MTDRipSize: public GlobalSpinBox {
 public:
     MTDRipSize():
-        SpinBoxSetting(0, 4096, 1),
-        GlobalSetting("MTDRipSize") {
+        GlobalSpinBox("MTDRipSize", 0, 4096, 1) {
         setLabel(QObject::tr("Ripped video segments"));
         setValue(0);
         setHelpText(QObject::tr("If set to something other than 0, ripped "
