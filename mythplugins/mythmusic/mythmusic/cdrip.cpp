@@ -327,6 +327,7 @@ void Ripper::handleFileTokens(QString &filename, Metadata *track)
 
             if (no_ws)
                 filename.replace(rx_ws, "_");
+
             mkdir(filename, 0775);
         }
     }

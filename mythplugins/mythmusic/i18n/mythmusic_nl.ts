@@ -603,6 +603,22 @@
         <source>and</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Use variable bitrates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the MP3 encoder will use variable bitrates (VBR) except for the low quality setting. The Ogg encoder will always use variable bitrates.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AlbumArt</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CD Ripper Settings (part 2)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Ripper</name>
