@@ -277,25 +277,6 @@ void TV::Playback(ProgramInfo *rcinfo)
     {
         inputFilename = rcinfo->pathname;
 
-        // see if we can read the file locally even if it's a myth:// url
-        if ((inputFilename.left(7) == "myth://") &&
-            (inputFilename.length() > 7 ))
-        {
-            QString local_pathname = gContext->GetSetting("RecordFilePrefix");
-            int hostlen = inputFilename.find( QRegExp("/"), 7 );
-
-            if (hostlen != -1)
-            {
-                local_pathname +=
-                        inputFilename.right(inputFilename.length() - hostlen);
-
-                QFile checkFile(local_pathname);
-    
-                if (checkFile.exists())
-                    inputFilename = local_pathname;
-            }
-        }
-
         playbackLen = rcinfo->CalculateLength();
         playbackinfo = rcinfo;
 

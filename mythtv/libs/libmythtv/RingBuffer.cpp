@@ -8,6 +8,8 @@
 #include <fcntl.h>
 #include <pthread.h>
 #include <qsocket.h>
+#include <qfile.h>
+#include <qregexp.h>
 
 #include <iostream>
 using namespace std;
@@ -256,10 +258,34 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write, bool needevents)
     }
     else
     {
-        if (filename.left(7) == "myth://")
-            remotefile = new RemoteFile(filename, needevents);
+        bool is_local = false;
+        if ((filename.left(7) == "myth://") &&
+            (filename.length() > 7 ))
+        {
+            QString local_pathname = gContext->GetSetting("RecordFilePrefix");
+            int hostlen = filename.find( QRegExp("/"), 7 );
+
+            if (hostlen != -1)
+            {
+                local_pathname +=
+                        filename.right(filename.length() - hostlen);
+
+                QFile checkFile(local_pathname);
+
+                if (checkFile.exists())
+                {
+                    is_local = true;
+                    filename = local_pathname;
+                }
+            }
+        }
         else
+            is_local = true;
+
+        if (is_local)
             fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE);
+        else
+            remotefile = new RemoteFile(filename, needevents);
         writemode = false;
     }
 
