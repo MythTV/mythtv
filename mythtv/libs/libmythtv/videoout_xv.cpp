@@ -503,7 +503,7 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
     pauseFrame.qstride = 0;
     pauseFrame.frameNumber = scratchFrame->frameNumber;
 
-    InitColorKey();
+    InitColorKey(true);
     
     if (gContext->GetNumSetting("UseOutputPictureControls", 0))
     {
@@ -518,7 +518,7 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
     return true;
 }
 
-void VideoOutputXv::InitColorKey(void)
+void VideoOutputXv::InitColorKey(bool turnoffautopaint)
 {
     int ret = Success;
     data->needdrawcolor = true;
@@ -539,15 +539,10 @@ void VideoOutputXv::InitColorKey(void)
                 if (xv_atom == None)
                     continue;
 
-                if (m_deinterlacing && m_deintfiltername == "bobdeint")
+                if (turnoffautopaint)
                     XvSetPortAttribute(data->XJ_disp, xv_port, xv_atom, 0);
                 else
-                {
-                    ret = XvSetPortAttribute(data->XJ_disp, xv_port, xv_atom,
-                                             1);
-                    if (ret == Success)
-                        data->needdrawcolor = false;
-                }
+                    XvSetPortAttribute(data->XJ_disp, xv_port, xv_atom, 1);
             }
         }
         XFree(attributes);
@@ -576,7 +571,6 @@ void VideoOutputXv::InitColorKey(void)
 bool VideoOutputXv::SetupDeinterlace(bool interlaced)
 {
     bool deint = VideoOutput::SetupDeinterlace(interlaced);
-    InitColorKey();
     return deint;
 }
 
@@ -723,7 +717,7 @@ void VideoOutputXv::Exit(void)
     if (XJ_started) 
     {
         m_deinterlacing = false;
-        InitColorKey();
+        InitColorKey(false);
 
         XJ_started = false;
 

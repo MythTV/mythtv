@@ -42,7 +42,7 @@ class VideoOutputXv : public VideoOutput
     int ChangePictureAttribute(int attributeType, int newValue);
 
   private:
-    void InitColorKey(void);
+    void InitColorKey(bool turnoffautopaint);
     void Exit(void);
     bool CreateXvBuffers(void);
     bool CreateShmBuffers(void);

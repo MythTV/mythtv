@@ -46,7 +46,7 @@ class VideoOutputXvMC : public VideoOutput
     inline bool hasVLDAcceleration() const;
 
   private:
-    void InitColorKey(void);
+    void InitColorKey(bool turnoffautopaint);
     void Exit(void);
     bool CreateXvMCBuffers(void);
     void DeleteXvMCBuffers(void);
