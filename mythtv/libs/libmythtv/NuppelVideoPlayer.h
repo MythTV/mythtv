@@ -160,6 +160,7 @@ class NuppelVideoPlayer
     void DeleteMark(long long frames);
     void HandleSelect(void);
     void HandleResponse(void);
+    void HandleArbSeek(bool right);
 
     int audiofd;
 
@@ -300,6 +301,7 @@ class NuppelVideoPlayer
     QMap<long long, int> deleteMap;
     QString dialogname;
     int dialogtype;
+    long long deleteframe;
 };
 
 #endif

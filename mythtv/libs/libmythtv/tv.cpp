@@ -215,7 +215,7 @@ int TV::AllowRecording(ProgramInfo *rcinfo, int timeuntil)
 
     dialogname = "allowrecordingbox";
     osd->NewDialogBox(dialogname, message, option1, option2, option3, 
-                      timeuntil);
+                      "", timeuntil);
 
     while (osd->DialogShowing(dialogname))
         usleep(500);

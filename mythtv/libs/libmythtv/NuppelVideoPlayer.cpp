@@ -1697,12 +1697,18 @@ long long NuppelVideoPlayer::CalcMaxFFTime(long long ff)
 	if (behind < maxtime) // if we're close, do nothing
 	    ret = 0;
 	else if (behind - fftime <= maxtime)
-	{
             ret = behind - maxtime;
-	}
     }
     else
     {
+        if (totalFrames > 0)
+        {
+            long long behind = totalFrames - framesPlayed;
+            if (behind < maxtime)
+                ret = 0;
+            else if (behind - fftime <= maxtime)
+                ret = behind - maxtime;
+        }
     }
 
     return ret;
@@ -1889,18 +1895,28 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
         }
         case wsLeft: case 'a': case 'A': 
         {
-            rewindtime = seekamount;
-            while (rewindtime != 0)
-                usleep(50);
-            UpdateEditSlider();
+            if (seekamount > 0)
+            {
+                rewindtime = seekamount;
+                while (rewindtime != 0)
+                    usleep(50);
+                UpdateEditSlider();
+            }
+            else
+                HandleArbSeek(false);
             break;           
         }
         case wsRight: case 'd': case 'D':
         {
-            fftime = seekamount;
-            while (fftime != 0)
-                usleep(50);
-            UpdateEditSlider();
+            if (seekamount > 0)
+            {
+                fftime = seekamount;
+                while (fftime != 0)
+                    usleep(50);
+                UpdateEditSlider();
+            }
+            else
+                HandleArbSeek(true);
             break;
         }
         case wsUp: 
@@ -1927,7 +1943,7 @@ void NuppelVideoPlayer::UpdateSeekAmount(bool up)
 
     if (seekamountpos > 0 && !up)
         seekamountpos--;
-    if (seekamountpos < 7 && up) 
+    if (seekamountpos < 10 && up) 
         seekamountpos++;
 
     QString text = "";
@@ -1936,14 +1952,16 @@ void NuppelVideoPlayer::UpdateSeekAmount(bool up)
 
     switch (seekamountpos)
     {
-        case 0: text = "1 frame"; seekamount = 1; break;
-        case 1: text = "0.5 seconds"; seekamount = fps / 2; break;
-        case 2: text = "1 second"; seekamount = fps; break;
-        case 3: text = "5 seconds"; seekamount = fps * 5; break;
-        case 4: text = "20 seconds"; seekamount = fps * 20; break;
-        case 5: text = "1 minute"; seekamount = fps * 60; break;
-        case 6: text = "5 mintues"; seekamount = fps * 300; break;
-        case 7: text = "10 minutes"; seekamount = fps * 600; break;
+        case 0: text = "cut point"; seekamount = -2; break;
+        case 1: text = "keyframe"; seekamount = -1; break;
+        case 2: text = "1 frame"; seekamount = 1; break;
+        case 3: text = "0.5 seconds"; seekamount = fps / 2; break;
+        case 4: text = "1 second"; seekamount = fps; break;
+        case 5: text = "5 seconds"; seekamount = fps * 5; break;
+        case 6: text = "20 seconds"; seekamount = fps * 20; break;
+        case 7: text = "1 minute"; seekamount = fps * 60; break;
+        case 8: text = "5 mintues"; seekamount = fps * 300; break;
+        case 9: text = "10 minutes"; seekamount = fps * 600; break;
         default: text = "error"; seekamount = fps; break;
     }
 
@@ -2001,9 +2019,38 @@ void NuppelVideoPlayer::UpdateTimeDisplay(void)
 
 void NuppelVideoPlayer::HandleSelect(void)
 {
-    if (0)
-    {
+    bool deletepoint = false;
+    QMap<long long, int>::Iterator i;
+    int direction = 0;
 
+    for (i = deleteMap.begin(); i != deleteMap.end(); ++i)
+    {
+        if (llabs(framesPlayed - i.key()) < (int)ceil(20 * video_frame_rate))
+        {
+            deletepoint = true;
+            deleteframe = i.key();
+            direction = i.data();
+            break;
+        }
+    }
+
+    if (deletepoint)
+    {
+        QString message = "You are close to an existing cut point.  Would you "
+                          "like to:";
+        QString option1 = "Delete this cut point";
+        QString option2 = "Move this cut point to the current position";
+        QString option3 = "Filp directions - delete to the ";
+        if (direction == 0)
+            option3 += "right";
+        else
+            option3 += "left";
+        QString option4 = "Cancel";
+
+        dialogname = "deletemark";
+        dialogtype = 0;
+        osd->NewDialogBox(dialogname, message, option1, option2, option3, 
+                          option4, -1);
     }
     else
     {
@@ -2015,7 +2062,7 @@ void NuppelVideoPlayer::HandleSelect(void)
         dialogname = "addmark";
         dialogtype = 1;
         osd->NewDialogBox(dialogname, message, option1, option2, option3,
-                          -1);
+                          "", -1);
     }
 }
 
@@ -2026,7 +2073,19 @@ void NuppelVideoPlayer::HandleResponse(void)
 
     if (dialogtype == 0)
     {
-
+        int type = deleteMap[deleteframe];
+        if (result == 1)
+            DeleteMark(deleteframe);
+        if (result == 2)
+        {
+            DeleteMark(deleteframe);
+            AddMark(framesPlayed, type);
+        }
+        else if (result == 3)
+        {
+            DeleteMark(deleteframe);
+            AddMark(deleteframe, 1 - type);
+        }
     }
     else if (dialogtype == 1)
     {
@@ -2052,6 +2111,67 @@ void NuppelVideoPlayer::AddMark(long long frames, int type)
 void NuppelVideoPlayer::DeleteMark(long long frames)
 {
     deleteMap.remove(frames);
+    osd->HideEditArrow(frames);
+    UpdateEditSlider();
+}
+
+void NuppelVideoPlayer::HandleArbSeek(bool right)
+{
+    if (seekamount == -2)
+    {
+        QMap<long long, int>::Iterator i = deleteMap.begin();
+        long long framenum = -1;
+        if (right)
+        {
+            for (; i != deleteMap.end(); ++i)
+            {
+                if (i.key() > framesPlayed)
+                {
+                    framenum = i.key();
+                    break;
+                }
+            }
+            if (framenum == -1)
+                framenum = totalFrames;
+
+            fftime = framenum - framesPlayed;
+            while (fftime > 0)
+                usleep(50);
+        }
+        else
+        {
+            for (; i != deleteMap.end(); ++i)
+            {
+                if (i.key() >= framesPlayed)
+                    break;
+                framenum = i.key();
+            }
+            if (framenum == -1)
+                framenum = 0;
+            
+            rewindtime = framesPlayed - framenum;
+            while (rewindtime > 0)
+                usleep(50);
+        }
+    }
+    else
+    {
+        if (right)
+        {
+            exactseeks = false;
+            fftime = keyframedist * 3 / 2;
+            while (fftime > 0)
+                usleep(50);
+        }
+        else
+        {
+            exactseeks = false;
+            rewindtime = 2;
+            while (rewindtime > 0)
+                usleep(50);
+        }
+    }
+
     UpdateEditSlider();
 }
 

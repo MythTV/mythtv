@@ -733,7 +733,8 @@ void OSD::SetChannumText(const QString &text, int length)
 
 void OSD::NewDialogBox(const QString &name, const QString &message, 
                        const QString &optionone, const QString &optiontwo, 
-                       const QString &optionthree, int length)
+                       const QString &optionthree, const QString &optionfour,
+                       int length)
 {
     pthread_mutex_lock(&osdlock);
     OSDSet *container = GetSet(name);
@@ -751,6 +752,14 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
         return;
     }
 
+    int numoptions = 4;
+    if (optionfour == "")
+        numoptions = 3;
+    if (optionthree == "")
+        numoptions = 2;
+    if (optiontwo == "")
+        numoptions = 1;
+
     container = new OSDSet(name, false, vid_width, vid_height, wmult, hmult);
     container->SetPriority(0);
     container->SetAllowFade(false);
@@ -766,7 +775,7 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
     container->AddType(box);
 
     QRect rect = dialogRect;
-    rect.setBottom(rect.bottom() - font->Size() * 2 * 3 - 5);
+    rect.setBottom(rect.bottom() - font->Size() * 2 * numoptions - 5);
     rect.setTop(rect.top() + 5);
     rect.setLeft(rect.left() + 5);
     rect.setRight(rect.right() - 5);
@@ -774,47 +783,40 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
     text->SetMultiLine(true);
     container->AddType(text);
 
-    rect = dialogRect;
-    rect.setTop(rect.bottom() - font->Size() * 2 * 3 + 5);
-    rect.setBottom(rect.bottom() - font->Size() * (3 / 2) * 2 - 5);
-    rect.setLeft(rect.left() + 5);
-    rect.setRight(rect.right() - 5);
-    text = new OSDTypeText("option1", font, optionone, rect);
-    container->AddType(text);
+    for (int i = 1; i <= numoptions; i++)
+    {
+        int off = numoptions - i + 1;
 
-    rect = dialogRect;
-    rect.setTop(rect.bottom() - font->Size() * 2 * 2 + 5);
-    rect.setBottom(rect.bottom() - font->Size() / 2 - 5);
-    rect.setLeft(rect.left() + 5);
-    rect.setRight(rect.right() - 5);
-    text = new OSDTypeText("option2", font, optiontwo, rect);
-    container->AddType(text);
+        rect = dialogRect;
+        rect.setTop(rect.bottom() - font->Size() * 2 * off + 5);
+        rect.setBottom(rect.bottom() + font->Size() - 5);
+        rect.setLeft(rect.left() + 5);
+        rect.setRight(rect.right() - 5);
 
-    rect = dialogRect;
-    rect.setTop(rect.bottom() - font->Size() * 2 + 5);
-    rect.setBottom(rect.bottom() + font->Size() - 5);
-    rect.setLeft(rect.left() + 5);
-    rect.setRight(rect.right() - 5);
-    text = new OSDTypeText("option3", font, optionthree, rect);
-    container->AddType(text);
+        QString name, option;
+        switch (i)
+        {
+            case 1: name = "option1"; option = optionone; break;
+            case 2: name = "option2"; option = optiontwo; break;
+            case 3: name = "option3"; option = optionthree; break;
+            case 4: name = "option4"; option = optionfour; break;
+            default: name = "blah"; option = "error, unknown option"; break;
+        }
 
+        text = new OSDTypeText(name, font, option, rect);
+        container->AddType(text);
+    }
+ 
     OSDTypePositionRectangle *opr = new OSDTypePositionRectangle("selector");
     container->AddType(opr);
 
-    rect = dialogRect;
-    rect.setTop(rect.bottom() - font->Size() * 2 * 3 - 2);
-    rect.setBottom(rect.bottom() - font->Size() * 2 * 2 - 2);
-    opr->AddPosition(rect);
-
-    rect = dialogRect;
-    rect.setTop(rect.bottom() - font->Size() * 2 * 2 - 2);
-    rect.setBottom(rect.bottom() - font->Size() * 2 - 2);
-    opr->AddPosition(rect);
-
-    rect = dialogRect;
-    rect.setTop(rect.bottom() - font->Size() * 2 - 2);
-    rect.setBottom(rect.bottom() - 2);
-    opr->AddPosition(rect);
+    for (int i = numoptions; i > 0; i--)
+    {
+        rect = dialogRect;
+        rect.setTop(rect.bottom() - font->Size() * 2 * i - 2);
+        rect.setBottom(rect.bottom() - font->Size() * 2 * (i - 1) - 2);
+        opr->AddPosition(rect);
+    }
 
     opr->SetPosition(0);
     dialogResponseList[name] = 0;
@@ -935,7 +937,9 @@ void OSD::HideEditArrow(long long number)
     sprintf(name, "%lld", number);
 
     pthread_mutex_lock(&osdlock);
-
+    OSDSet *set = GetSet(name);
+    if (set)
+        set->Hide();
     pthread_mutex_unlock(&osdlock);
 }
 
@@ -1005,6 +1009,7 @@ void OSD::DoEditSlider(QMap<long long, int> deleteMap, long long curFrame,
             bool indelete = false;
             int startpos = 0;
             int endpos = 0;
+            bool first = true;
 
             QMap<long long, int>::Iterator i = deleteMap.begin();
             for (; i != deleteMap.end(); ++i)
@@ -1012,22 +1017,24 @@ void OSD::DoEditSlider(QMap<long long, int> deleteMap, long long curFrame,
                 long long frame = i.key();
                 int direction = i.data();
 
-                if (direction == 0 && !indelete)
+                if (direction == 0 && !indelete && first)
                 {
                     startpos = 0;
                     endpos = frame * 1000 / totalFrames;
                     tes->SetRange(startpos, endpos);
                 }
-                else if (direction == 0 && indelete)
+                else if (direction == 0)
                 {
                     endpos = frame * 1000 / totalFrames;
                     tes->SetRange(startpos, endpos);
                     indelete = false;
+                    first = false;
                 }
                 else if (direction == 1 && !indelete)
                 {
                     startpos = frame * 1000 / totalFrames;
                     indelete = true;
+                    first = false;
                 }
             }
            
