@@ -606,8 +606,7 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
             update_request.addGetVariable("meta", 
                                           QString(
                                                     "dmap.itemname,"
-                                                    "dmap.itemid,"
-                                                    "daap.songbeatsperminute"
+                                                    "dmap.itemid"
                                                  ));
             
             update_request.send(client_socket_to_daap_server);
@@ -1187,7 +1186,7 @@ void DaapInstance::parseDatabaseListings(TagInput& dmap_data, int how_many)
 
                 default:
                     
-                    warning("unkown tag while parsing for database listing");
+                    warning("unknown tag while parsing database listing");
                     internal_listing >> emergency_throwaway_chunk;
             }
             internal_listing >> end;
@@ -1343,11 +1342,11 @@ void DaapInstance::parseItems(TagInput& dmap_data, int how_many)
                     internal_listing >> a_u8_variable;
                     break;
 
-                case 'mper':
+                case 'asdk':
             
                     //
                     //  data kind ... I think this is file vs. network
-                    //  stream or something
+                    //  stream or something (1 = radio, 2 = file) ... dunno
                     //
                 
                     internal_listing >> a_u8_variable;
@@ -1373,7 +1372,7 @@ void DaapInstance::parseItems(TagInput& dmap_data, int how_many)
                 
                 default:
                     
-                    warning("unkown tag while parsing for database listing");
+                    warning("unknown tag while parsing database item");
                     internal_listing >> emergency_throwaway_chunk;
             }
             internal_listing >> end;
