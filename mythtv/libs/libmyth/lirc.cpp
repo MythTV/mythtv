@@ -27,14 +27,16 @@ int LircClient::Init(QString &config_file, QString &program)
     fd = lirc_init((char *)program.latin1(), 1);
     if (fd == -1)
     {
-        cerr << "Failed to create lirc socket for " << program <<endl;
+        cerr << "lirc_init failed for " << program
+             << ", see preceding messages\n";
         return -1;
     }
 
     /* parse the config file */
     if (lirc_readconfig((char *)config_file.latin1(), &lircConfig, NULL))
     {
-        cerr << "Failed to init " << config_file << " for " << program <<endl;
+         cerr << "Failed to read lirc config " << config_file << " for " 
+              << program << endl;
         lirc_deinit();
         return -1;
     }
