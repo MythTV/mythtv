@@ -296,67 +296,75 @@ void TTFFont::merge_text(unsigned char *yuv, Raster_Map * rmap, int offset_x,
                          int height, int video_width, int video_height, 
                          int color, int alphamod)
 {
-   int                 x, y;
-   unsigned char      *ptr, *src;
-   unsigned char       a;
+    int                 x, y;
+    unsigned char      *ptr, *src;
+    unsigned char       a;
 
-   unsigned char *uptr, *usrc;
-   unsigned char *vptr, *vsrc;
+    unsigned char *uptr, *usrc;
+    unsigned char *vptr, *vsrc;
  
-   int ucol, vcol;
+    int ucol, vcol;
 
-   uptr = yuv + video_height * video_width;
-   vptr = uptr + (video_height * video_width) / 4;   
-   int offset; 
+    uptr = yuv + video_height * video_width;
+    vptr = uptr + (video_height * video_width) / 4;   
+    int offset; 
 
-   if (height + ystart > video_height)
-       height = video_height - ystart - 1;
+    if (height + ystart > video_height)
+        height = video_height - ystart - 1;
+    if (width + xstart > video_width)
+        width = video_width - xstart - 1;
 
-   int tmp1, tmp2;
+    int tmp1, tmp2;
  
-   for (y = 0; y < height; y++)
-     {
+    for (y = 0; y < height; y++)
+    {
+        if (y + ystart < 0)
+            continue;
+
 	ptr = (unsigned char *)rmap->bitmap + offset_x + 
               ((y + offset_y) * rmap->cols);
-	for (x = 0; x < width; x++)
-	  {
-	     if ((a = *ptr) > 0)
-	       {
-                  a = ((a * alphamod) + 0x80) >> 8;
-		  src = yuv + (y + ystart) * video_width + (x + xstart);
-		  if (color > 0)
-                  {
-                      tmp1 = (color - *src) * a;
-                      tmp2 = *src + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-                      *src = tmp2 & 0xff;
-                      if (a >= 230)
-                      {
-                          offset = ((y + ystart + 1) / 2) * (video_width / 2) + 
-                                   (x + xstart + 1) / 2;
-                          usrc = uptr + offset; 
-                          vsrc = vptr + offset; 
-                          ucol = 128;
-                          vcol = 128;
 
-                          tmp1 = (ucol - *usrc) * a;
-                          tmp2 = *usrc + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-                          *usrc = tmp2 & 0xff;
+	for (x = 0; x < width; x++, ptr++)
+	{
+            if (x + xstart < 0)
+                continue;
 
-                          tmp1 = (vcol - *vsrc) * a;
-                          tmp2 = *vsrc + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-                          *vsrc = tmp2 & 0xff;
-                      }
-                  }
-		  else
-                  {
-                      tmp1 = (color - *src) * a;
-                      tmp2 = *src + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-                      *src = tmp2 & 0xff;
-                  }
-	       }
-	     ptr++;
-	  }
-     }
+	    if ((a = *ptr) > 0)
+	    {
+                a = ((a * alphamod) + 0x80) >> 8;
+		src = yuv + (y + ystart) * video_width + (x + xstart);
+		if (color > 0)
+                {
+                    tmp1 = (color - *src) * a;
+                    tmp2 = *src + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+                    *src = tmp2 & 0xff;
+                    if (a >= 230)
+                    {
+                        offset = ((y + ystart + 1) / 2) * (video_width / 2) + 
+                                 (x + xstart + 1) / 2;
+                        usrc = uptr + offset; 
+                        vsrc = vptr + offset; 
+                        ucol = 128;
+                        vcol = 128;
+
+                        tmp1 = (ucol - *usrc) * a;
+                        tmp2 = *usrc + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+                        *usrc = tmp2 & 0xff;
+
+                        tmp1 = (vcol - *vsrc) * a;
+                        tmp2 = *vsrc + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+                        *vsrc = tmp2 & 0xff;
+                    }
+                }
+                else
+                {
+                    tmp1 = (color - *src) * a;
+                    tmp2 = *src + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+                    *src = tmp2 & 0xff;
+                }
+	    }
+        }
+    }
 }
 
 void TTFFont::DrawString(unsigned char *yuvptr, int x, int y, 
