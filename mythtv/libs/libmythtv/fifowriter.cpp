@@ -5,6 +5,8 @@
 #include <cassert>
 #include <cerrno>
 #include <sys/time.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <ctime>
 #include <cmath>
 
