@@ -161,8 +161,6 @@ bool VideoOutputXv::Init(int width, int height, float aspect, int num_buffers,
     XJ_white = XWhitePixel(data->XJ_disp, XJ_screen_num);
     XJ_black = XBlackPixel(data->XJ_disp, XJ_screen_num);
   
-    XJ_fullscreen = 0;
-  
     data->XJ_root = DefaultRootWindow(data->XJ_disp);
 
     ret = XvQueryExtension(data->XJ_disp, &p_version, &p_release, 

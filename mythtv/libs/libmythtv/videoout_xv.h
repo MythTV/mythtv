@@ -42,7 +42,6 @@ class VideoOutputXv : public VideoOutput
     int XJ_caught_error;
     int XJ_screenx, XJ_screeny;
     int XJ_screenwidth, XJ_screenheight;
-    int XJ_fullscreen;
 
     int xv_port;
     int colorid;
