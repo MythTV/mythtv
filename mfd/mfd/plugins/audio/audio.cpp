@@ -40,8 +40,6 @@ void AudioPlugin::swallowOutputUpdate(int type, int numb_seconds, int channels, 
 
     if(type == OutputEvent::Info)
     {
-        int current_playlist = -1;
-        int current_playlist_item = -1;
 
         playlist_mode_mutex.lock();
             play_data_mutex.lock();
@@ -54,26 +52,31 @@ void AudioPlugin::swallowOutputUpdate(int type, int numb_seconds, int channels, 
                     current_playlist = current_playlist_id;
                     current_playlist_item = current_playlist_item_index;
                 }
+                else
+                {
+                    current_playlist = -1;
+                    current_playlist_item = -1;
+                }
+
+                //
+                //  Tell the client(s) what's going on
+                //
+
+                if(is_playing)
+                {
+                    sendMessage(QString("playing %1 %2 %3 %4 %5 %6 %7 %8")
+                                        .arg(current_playlist)
+                                        .arg(current_playlist_item)
+                                        .arg(current_collection)
+                                        .arg(current_metadata)
+                                        .arg(elapsed_time)
+                                        .arg(current_channels)
+                                        .arg(current_bitrate)
+                                        .arg(current_frequency));
+                }
+
             play_data_mutex.unlock();
         playlist_mode_mutex.unlock();
-
-        //
-        //  Tell the clients what's going on
-        //
-    
-
-        if(is_playing)
-        {
-            sendMessage(QString("playing %1 %2 %3 %4 %5 %6 %7 %8")
-                                .arg(current_playlist)
-                                .arg(current_playlist_item)
-                                .arg(current_collection)
-                                .arg(current_metadata)
-                                .arg(elapsed_time)
-                                .arg(current_channels)
-                                .arg(current_bitrate)
-                                .arg(current_frequency));
-        }
     }
 }
 
@@ -287,6 +290,47 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
         else if(tokens[0] == "previous" || tokens[0] == "prev")
         {
             nextPrevAudio(false);
+        }
+        else if(tokens[0] == "status")
+        {
+            //
+            //  Most/many/(all?) clients will want to get the status of the
+            //  current audio state when they first connect
+            //
+
+            playlist_mode_mutex.lock();
+                play_data_mutex.lock();
+            
+                    if(is_playing)
+                    {
+                        sendMessage(QString("playing %1 %2 %3 %4 %5 %6 %7 %8")
+                                            .arg(current_playlist)
+                                            .arg(current_playlist_item)
+                                            .arg(current_collection)
+                                            .arg(current_metadata)
+                                            .arg(elapsed_time)
+                                            .arg(current_channels)
+                                            .arg(current_bitrate)
+                                            .arg(current_frequency),
+                                            socket_identifier);
+                        if(is_paused)
+                        {
+                            sendMessage("pause on",  socket_identifier);
+                        }
+                        else
+                        {
+                            sendMessage("pause off",  socket_identifier);
+                        }
+                    }
+                    else
+                    {
+                        sendMessage("stop", socket_identifier);
+                    }
+
+                play_data_mutex.unlock();
+            playlist_mode_mutex.unlock();
+            
+
         }
         else
         {

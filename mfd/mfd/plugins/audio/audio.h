@@ -61,6 +61,8 @@ class AudioPlugin: public MFDServicePlugin
     int     current_frequency;
     int     current_collection;
     int     current_metadata;
+    int     current_playlist;
+    int     current_playlist_item;
     QMutex  play_data_mutex;
 
 
