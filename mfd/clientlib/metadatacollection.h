@@ -54,6 +54,14 @@ class MetadataCollection
     void         deleteItem(uint which_item);
     void         deleteList(uint which_list);
     void         printMetadata();   // Debugging
+
+
+    //
+    //  Get at the contents
+    //
+
+    QIntDict<Metadata>* getMetadata(){ return &metadata;}
+    QIntDict<Playlist>* getPlaylists(){ return &playlists;}
     
   private:
   

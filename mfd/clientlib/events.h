@@ -12,10 +12,13 @@
 
 #include <qevent.h>
 
+#include <mythtv/generictree.h>
+
 #define MFD_CLIENTLIB_EVENT_DISCOVERY  65432
 #define MFD_CLIENTLIB_EVENT_AUDIOPAUSE 65431
 #define MFD_CLIENTLIB_EVENT_AUDIOSTOP  65430
 #define MFD_CLIENTLIB_EVENT_AUDIOPLAY  65429
+#define MFD_CLIENTLIB_EVENT_METADATA   65428
 
 
 class MfdDiscoveryEvent: public QCustomEvent
@@ -136,5 +139,27 @@ class MfdAudioPlayingEvent: public QCustomEvent
     int bit_rate;
     int sample_frequency;
 };
+
+class MfdMetadataChangedEvent: public QCustomEvent
+{
+    //
+    //  Sent by a metadata client when a new metadata tree is available
+    //
+    
+  public:
+  
+    MfdMetadataChangedEvent(int which_mfd, GenericTree *new_tree);
+
+    int          getMfd();
+    GenericTree* getNewTree();
+    
+
+  private:
+  
+    int         mfd_id;
+    GenericTree *new_metadata_tree;   
+};
+
+
 
 #endif

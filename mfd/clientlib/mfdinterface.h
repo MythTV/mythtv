@@ -12,6 +12,9 @@
 
 #include <qobject.h>
 #include <qptrlist.h>
+#include <qintdict.h>
+
+#include <mythtv/generictree.h>
 
 class DiscoveryThread;
 class MfdInstance;
@@ -26,6 +29,7 @@ class MfdInterface : public QObject
     MfdInterface();
     ~MfdInterface();
 
+    void playAudio(int which_mfd, int container, int type, int which_id);
 
   signals:
 
@@ -38,6 +42,7 @@ class MfdInterface : public QObject
     void audioPaused(int, bool);
     void audioStopped(int);
     void audioPlaying(int, int, int, int, int, int, int, int, int);
+    void metadataChanged(int, GenericTree*);
 
   protected:
   
@@ -52,10 +57,13 @@ class MfdInterface : public QObject
                             const QString &an_ip_addesss,
                             int a_port
                            );
+    void            swapMetadataTree(int which_mfd, GenericTree *new_metadata_tree);
   
     DiscoveryThread       *discovery_thread;
     QPtrList<MfdInstance> *mfd_instances;
     int                   mfd_id_counter;
+    
+    QIntDict<GenericTree>   metadata_trees;
 };
 
 #endif

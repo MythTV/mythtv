@@ -47,6 +47,7 @@ class MfdInstance : public QThread
     void    announceMyDemise();
     int     getId(){return mfd_id;}
     
+    void    playAudio(int container, int type, int which_id);
     
     //
     //  Adding and removing interfaces to services _this_ mfd offers

@@ -79,7 +79,8 @@ class MetadataClient : public ServiceClient
 
     MetadataCollection* findCollection(int collection_id);
     void printMetadata();   // Debugging
-    
+    void buildTree();
+        
   private:
   
     uint32_t session_id;

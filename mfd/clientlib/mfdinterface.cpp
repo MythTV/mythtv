@@ -39,6 +39,28 @@ MfdInterface::MfdInterface()
     mfd_id_counter = 0;
 }
 
+void MfdInterface::playAudio(int which_mfd, int container, int type, int which_id)
+{
+    //
+    //  Find the instance, ask it to play something
+    //  
+
+    for(
+        MfdInstance *an_mfd = mfd_instances->first();
+        an_mfd;
+        an_mfd = mfd_instances->next()
+       )
+    {
+        if(an_mfd->getId() == which_mfd)
+        {
+            an_mfd->playAudio(container, type, which_id);
+            break;
+        }
+    }
+}
+
+
+
 void MfdInterface::customEvent(QCustomEvent *ce)
 {
     //
@@ -145,6 +167,11 @@ void MfdInterface::customEvent(QCustomEvent *ce)
                             ape->getSampleFrequency()
                          );
     }
+    else if(ce->type() == MFD_CLIENTLIB_EVENT_METADATA)
+    {
+        MfdMetadataChangedEvent *mce = (MfdMetadataChangedEvent*)ce;
+        swapMetadataTree(mce->getMfd(), mce->getNewTree());
+    }
     else
     {
         cerr << "mfdinterface is getting CustomEvent's it does not understand" 
@@ -175,6 +202,46 @@ MfdInstance* MfdInterface::findMfd(
     }
     return NULL;
 }                                  
+
+void MfdInterface::swapMetadataTree(int which_mfd, GenericTree *new_tree)
+{
+    //
+    //  One of those darn metadata clients running in a sub thread somewhere
+    //  has handed me a new metadata tree
+    //
+    
+    GenericTree *old_tree = NULL;
+    
+    //
+    //  See if we already have one for this mfd.
+    //
+    
+    old_tree = metadata_trees.find(which_mfd);
+    
+    if(old_tree)
+    {
+        cout << "swapped in new tree for old" << endl;
+        metadata_trees.remove(which_mfd);
+    }
+    else
+    {
+        cout << "no old tree, sticking in new one" << endl;
+    }
+    
+    emit metadataChanged(which_mfd, new_tree);
+    
+    //
+    //  Keep a reference so we can delete it when the next swap comes in
+    //
+    
+    metadata_trees.insert(which_mfd, new_tree);
+    
+    //
+    //  Delete the old one
+    //
+    
+    delete old_tree;
+}
                                                                                             
 
 MfdInterface::~MfdInterface()

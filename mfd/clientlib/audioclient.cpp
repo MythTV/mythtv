@@ -33,6 +33,15 @@ AudioClient::AudioClient(
 {
 }
 
+void AudioClient::playTrack(int container, int id)
+{
+    QString command = QString("play item %1 %2")
+                              .arg(container)
+                              .arg(id);
+
+    client_socket_to_service->writeBlock(command.ascii(), command.length());
+}
+
 void AudioClient::handleIncoming()
 {
     //

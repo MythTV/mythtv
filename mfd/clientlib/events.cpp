@@ -121,3 +121,26 @@ MfdAudioPlayingEvent::MfdAudioPlayingEvent(
     sample_frequency = what_sample_frequency;
 }
 
+/*
+---------------------------------------------------------------------
+*/
+
+MfdMetadataChangedEvent::MfdMetadataChangedEvent(
+                                                    int which_mfd,
+                                                    GenericTree *new_tree)
+                    :QCustomEvent(MFD_CLIENTLIB_EVENT_METADATA)
+
+{
+    mfd_id = which_mfd;
+    new_metadata_tree = new_tree;
+}
+
+int MfdMetadataChangedEvent::getMfd()
+{
+    return mfd_id;
+}
+
+GenericTree* MfdMetadataChangedEvent::getNewTree()
+{
+    return new_metadata_tree;
+}
