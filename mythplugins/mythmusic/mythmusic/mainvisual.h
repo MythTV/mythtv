@@ -98,7 +98,12 @@ public slots:
 
 signals:
     void hidingVisualization();
+    void keyPress(QKeyEvent *e);
 
+protected:
+
+    virtual void keyPressEvent(QKeyEvent *e);
+    
 private:
     VisualBase *vis;
     QPixmap pixmap;

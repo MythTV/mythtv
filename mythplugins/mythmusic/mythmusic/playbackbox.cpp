@@ -295,12 +295,66 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
 
     visualizer_is_active = false;
     connect(visual_mode_timer, SIGNAL(timeout()), this, SLOT(visEnable()));
-    connect(mainvisual, SIGNAL(hidingVisualization()), this, SLOT(restartTimer()));
+
+    connect(mainvisual, SIGNAL(hidingVisualization()), 
+            this, SLOT(restartTimer()));
+    connect(mainvisual, SIGNAL(keyPress(QKeyEvent *)),
+            this, SLOT(keyPressFromVisual(QKeyEvent *)));
 }
 
 PlaybackBox::~PlaybackBox(void)
 {
     stopAll();
+}
+
+void PlaybackBox::keyPressFromVisual(QKeyEvent *e)
+{
+    if(keyboard_accelerator_flag == "true")
+    {
+        //  This is really stupid ... I cannot for the life of me
+        //  force Qt to have this (object) accept the keypresses
+        //  automatically to the buttons they were assigned to in
+        //  the constructor ... so ... repeat the same logic here
+        switch(e->key())
+        {
+            case Key_Up:
+                previous();
+                break;
+                
+            case Key_Left:
+                seekback();
+                break;
+                
+            case Key_P:
+                pause();
+                break;
+                
+            case Key_Space:
+                play();
+                break;
+                
+            case Key_S:
+                stop();
+                break;
+                
+            case Key_Right:
+                seekforward();
+                break;
+               
+            case Key_Down:
+                next();
+                break;
+                
+            case Key_1:
+                toggleRepeat();
+                break; 
+
+            case Key_2:
+                toggleShuffle();
+                break; 
+
+        }
+    }
 }
 
 void PlaybackBox::resetTimer()

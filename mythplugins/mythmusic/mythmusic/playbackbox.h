@@ -60,6 +60,7 @@ class PlaybackBox : public MythDialog
     void restartTimer();
     void jumpToItem(QListViewItem *curItem);
     void jumpToItem();   
+    void keyPressFromVisual(QKeyEvent *e);
  
   private slots:
     void startseek();
