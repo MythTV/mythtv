@@ -481,7 +481,7 @@
         <columnpadding>10</columnpadding>
         <column number="1" width="60" context="-1"></column>
         <column number="2" width="150" context="-1"></column>
-        <column number="3" width="400" context="-1"></column>
+        <column number="3" width="525" context="-1"></column>
         <items>9</items>
         <image function="selectionbar" filename="cr-selectbar.png" location="-14,-5"></image>
         <image function="uparrow" filename="uparrow.png" location="755,22"></image>
