@@ -32,11 +32,13 @@ class VideoTree : public MythThemedDialog
     void handleTreeListSelection(int, IntVector*);
     void handleTreeListEntry(int, IntVector*);
 
+  protected:
+    void keyPressEvent(QKeyEvent *e);
+
   private:
 
     void         wireUpTheme();
     int          currentParentalLevel;
-    QAccel       *accel;
     QSqlDatabase *db;
     
     //
@@ -44,6 +46,7 @@ class VideoTree : public MythThemedDialog
     //
 
     UIManagedTreeListType *video_tree_list;
+    GenericTree           *video_tree_root;
     GenericTree           *video_tree_data;
     UITextType            *video_title;
     UITextType            *video_file;

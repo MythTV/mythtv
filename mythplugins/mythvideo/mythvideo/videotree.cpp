@@ -24,22 +24,11 @@ VideoTree::VideoTree(MythMainWindow *parent, QSqlDatabase *ldb,
     //
 
     wireUpTheme();
-    video_tree_data = new GenericTree("video root", 0, false);
+    video_tree_root = new GenericTree("video root", 0, false);
+    video_tree_data = video_tree_root->addNode("videos", 0, false);
+
     buildVideoList();
     
-    //
-    //  Map some keys
-    //
-    
-    accel = new QAccel(this);
-    accel->connectItem(accel->insertItem(Key_Space), video_tree_list, SLOT(select()));
-    accel->connectItem(accel->insertItem(Key_Enter), video_tree_list, SLOT(select()));
-    accel->connectItem(accel->insertItem(Key_Return), video_tree_list, SLOT(select()));
-    accel->connectItem(accel->insertItem(Key_Up), video_tree_list, SLOT(moveUp()));
-    accel->connectItem(accel->insertItem(Key_Down), video_tree_list, SLOT(moveDown()));
-    accel->connectItem(accel->insertItem(Key_Left), video_tree_list, SLOT(popUp()));
-    accel->connectItem(accel->insertItem(Key_Right), video_tree_list, SLOT(pushDown()));
-
     //  
     //  Tell the tree list to highlight the 
     //  first leaf and then draw the GUI as
@@ -52,7 +41,23 @@ VideoTree::VideoTree(MythMainWindow *parent, QSqlDatabase *ldb,
 
 VideoTree::~VideoTree()
 {
-    delete video_tree_data;
+    delete video_tree_root;
+}
+
+void VideoTree::keyPressEvent(QKeyEvent *e)
+{
+    switch (e->key())
+    {
+        case Key_Space: case Key_Enter: case Key_Return:
+            video_tree_list->select(); break;
+        
+        case Key_Up: video_tree_list->moveUp(); break;
+        case Key_Down: video_tree_list->moveDown(); break;
+        case Key_Left: video_tree_list->popUp(); break;
+        case Key_Right: video_tree_list->pushDown(); break;
+       
+        default: MythThemedDialog::keyPressEvent(e); break;
+    }
 }
 
 void VideoTree::buildVideoList()
@@ -103,11 +108,12 @@ void VideoTree::buildVideoList()
                     }
                     else
                     {
+                        QString dirname = *an_it + "/";
                         GenericTree *sub_node;
-                        sub_node = where_to_add->getChildByName(*an_it);
+                        sub_node = where_to_add->getChildByName(dirname);
                         if(!sub_node)
                         {
-                            sub_node = where_to_add->addNode(*an_it, 0, false);
+                            sub_node = where_to_add->addNode(dirname, 0, false);
                         }
                         where_to_add = sub_node;
                     }
@@ -122,7 +128,7 @@ void VideoTree::buildVideoList()
             delete myData;
         }
     }
-    video_tree_list->assignTreeData(video_tree_data);
+    video_tree_list->assignTreeData(video_tree_root);
 }
 
 
