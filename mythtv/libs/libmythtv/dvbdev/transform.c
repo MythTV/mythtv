@@ -2121,7 +2121,7 @@ static void write_ipack(ipack *p, uint8_t *data, int count)
 		p->count += rest;
 //		fprintf(stderr,"count: %d \n",p->count);
 		send_ipack(p);
-		if (count - rest > 0)
+		if (rest > 0 && count - rest > 0)
 			write_ipack(p, data+rest, count-rest);
 	}
 }
