@@ -71,6 +71,16 @@ void IconView::paintEvent(QPaintEvent *e)
 {
     e = e;
 
+    QString bgtype = gContext->GetSetting("SlideshowBackground");
+    if (bgtype != "theme" && !bgtype.isEmpty())
+        setPalette(QPalette (QColor(bgtype)));
+
+    if (bgtype == "black") 
+    {
+        fgcolor = Qt::white;
+        highlightcolor = fgcolor;
+    }
+
     QRect r = QRect(0, 0, screenwidth, screenheight);
     QPainter p(this);
 
