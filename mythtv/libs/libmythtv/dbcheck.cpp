@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythcontext.h"
 
-const QString currentDatabaseVersion = "1064";
+const QString currentDatabaseVersion = "1065";
 
 void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -1201,6 +1201,25 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 };
         performActualUpdate(updates, "1064", dbver);
     }
+
+    if (dbver == "1064")
+    {
+        const QString updates[] = {
+"ALTER TABLE `program` CHANGE `stereo` `stereo` TINYINT( 1 ) DEFAULT '0' NOT NULL;",
+"ALTER TABLE `program` CHANGE `subtitled` `subtitled` TINYINT( 1 ) DEFAULT '0' NOT NULL;",
+"ALTER TABLE `program` CHANGE `hdtv` `hdtv` TINYINT( 1 ) DEFAULT '0' NOT NULL;",
+"ALTER TABLE `program` CHANGE `closecaptioned` `closecaptioned` TINYINT( 1 ) DEFAULT '0' NOT NULL;",
+"ALTER TABLE `program` CHANGE `partnumber` `partnumber` INT( 11 ) DEFAULT '0' NOT NULL;",
+"ALTER TABLE `program` CHANGE `parttotal` `parttotal` INT( 11 ) DEFAULT '0' NOT NULL;",
+"ALTER TABLE `program` CHANGE `programid` `programid` VARCHAR( 20 ) NOT NULL;",
+"ALTER TABLE `oldrecorded` CHANGE `programid` `programid` VARCHAR( 20 ) NOT NULL;",
+"ALTER TABLE `recorded` CHANGE `programid` `programid` VARCHAR( 20 ) NOT NULL;",
+"ALTER TABLE `record` CHANGE `programid` `programid` VARCHAR( 20 ) NOT NULL;",
+""
+};
+        performActualUpdate(updates, "1065", dbver);
+    }
+
 }
 
 void InitializeDatabase(void)

@@ -98,49 +98,73 @@ class ProgInfo
 {
   public:
     ProgInfo() { }
-    ProgInfo(const ProgInfo &other) { startts = other.startts;
+    ProgInfo(const ProgInfo &other) { channel = other.channel;
+                                      startts = other.startts;
                                       endts = other.endts;
-                                      channel = other.channel;
+                                      start = other.start;
+                                      end = other.end;
                                       title = other.title;
-                                      pronounce = other.pronounce;
-                                      clumpidx = other.clumpidx;
-                                      clumpmax = other.clumpmax;
                                       subtitle = other.subtitle;
                                       desc = other.desc;
                                       category = other.category;
                                       catType = other.catType;
-                                      start = other.start;
-                                      end = other.end;
                                       airdate = other.airdate;
                                       stars = other.stars;
+                                      previouslyshown = other.previouslyshown;
+                                      title_pronounce = other.title_pronounce;
+                                      stereo = other.stereo;
+                                      subtitled = other.subtitled;
+                                      hdtv = other.hdtv;
+                                      closecaptioned = other.closecaptioned;
+                                      partnumber = other.partnumber;
+                                      parttotal = other.parttotal;
+                                      seriesid = other.seriesid;
+                                      originalairdate = other.originalairdate;
+                                      showtype = other.showtype;
+                                      colorcode = other.colorcode;
+                                      syndicatedepisodenumber = other.syndicatedepisodenumber;
+                                      programid = other.programid;
+        
+                                      clumpidx = other.clumpidx;
+                                      clumpmax = other.clumpmax;
                                       ratings = other.ratings;
-                                      repeat = other.repeat;
                                       credits = other.credits;
                                       content = other.content;
                                     }
 
+
+    QString channel;
     QString startts;
     QString endts;
-    QString channel;
+    QDateTime start;
+    QDateTime end;
     QString title;
-    QString pronounce;
     QString subtitle;
     QString desc;
     QString category;
     QString catType;
     QString airdate;
     QString stars;
-    QString content;
-    QValueList<ProgRating> ratings;
-
-    QDateTime start;
-    QDateTime end;
+    bool previouslyshown;
+    QString title_pronounce;
+    bool stereo;
+    bool subtitled;
+    bool hdtv;
+    bool closecaptioned;
+    QString partnumber;
+    QString parttotal;
+    QString seriesid;                                
+    QString originalairdate;
+    QString showtype;
+    QString colorcode;
+    QString syndicatedepisodenumber;
+    QString programid;
 
     QString clumpidx;
     QString clumpmax;
-
-    bool repeat;
+    QValueList<ProgRating> ratings;
     QValueList<ProgCredit> credits;
+    QString content;
 };
 
 bool operator<(const ProgInfo &a, const ProgInfo &b)
@@ -167,6 +191,25 @@ struct Source
     QString password;
     QString lineupid;
 };
+
+
+unsigned int ELFHash(const char *s)
+{
+    /* ELF hash uses unsigned chars and unsigned arithmetic for portability */
+    const unsigned char *name = (const unsigned char *)s;
+    unsigned long h = 0, g;
+
+    while (*name)
+    { /* do some fancy bitwanking on the string */
+        h = (h << 4) + (unsigned long)(*name++);
+        if ((g = (h & 0xF0000000UL))!=0)
+            h ^= (g >> 24);
+        h &= ~g;
+
+    }
+
+    return (int)h;
+}
 
 void clearDataByChannel(int chanid, QDateTime from, QDateTime to) 
 {
@@ -1243,8 +1286,18 @@ void parseCredits(QDomElement &element, ProgInfo *pginfo)
 
 ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
 {
+    QString uniqueid, seriesid, season, episode;
     ProgInfo *pginfo = new ProgInfo;
  
+    pginfo->previouslyshown = pginfo->stereo = pginfo->subtitled =
+    pginfo->hdtv = pginfo->closecaptioned = false;
+
+    pginfo->subtitle = pginfo->title = pginfo->desc =
+    pginfo->category = pginfo->content = pginfo->catType =
+    pginfo->syndicatedepisodenumber =  pginfo->partnumber =
+    pginfo->parttotal = pginfo->showtype = pginfo->colorcode =
+    pginfo->stars = "";
+
     QString text = element.attribute("start", "");
     addTimeOffset(text, localTimezoneOffset);
     pginfo->startts = text;
@@ -1269,11 +1322,6 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
     pginfo->start = fromXMLTVDate(pginfo->startts);
     pginfo->end = fromXMLTVDate(pginfo->endts);
 
-    pginfo->subtitle = pginfo->title = pginfo->desc = pginfo->category = pginfo->content = "";
-    
-    pginfo->catType = "";
-    pginfo->repeat = false;   
- 
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
     {
@@ -1290,7 +1338,7 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
                     }
                     else if (info.attribute("lang") == "ja_JP@kana")
                     {
-                        pginfo->pronounce = getFirstText(info);
+                        pginfo->title_pronounce = getFirstText(info);
                     }
                 }
                 else if (pginfo->title == "")
@@ -1306,7 +1354,6 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
             {
                 pginfo->content = getFirstText(info);
             }
-            
             else if (info.tagName() == "desc" && pginfo->desc == "")
             {
                 pginfo->desc = getFirstText(info);
@@ -1314,21 +1361,16 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
             else if (info.tagName() == "category")
             {
                 QString cat = getFirstText(info);
-                if (pginfo->category == "")
+                
+                if (cat == "movie" || cat == "series" || 
+                    cat == "sports" || cat == "tvshow")
+                {
+                    if (pginfo->catType.isEmpty())
+                        pginfo->catType = cat;
+                }
+                else if (pginfo->category.isEmpty())
                 {
                     pginfo->category = cat;
-                }
-                else if (cat == "movie" || cat == "series" || cat == "sports" ||
-                         cat == "tvshow")
-                    /* Hack until we have the new XMLTV DTD with category
-                       "system"s.
-                       I can't use a new tag, because I'd then
-                       be incompliant with the (current) XMLTV (I think),
-                       unless I use XML namespaces etc., and it's category
-                       info after all, just formalized and narrow. */
-                {
-                    if (pginfo->catType == "")
-                        pginfo->catType = cat;
                 }
 
                 if ((cat == "Film" || cat == "film") && !isNorthAmerica)
@@ -1383,16 +1425,56 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
             }
             else if (info.tagName() == "previously-shown")
             {
-                pginfo->repeat = true;
+                pginfo->previouslyshown = true;
+
+                QString prevdate = getFirstText(info);
+                pginfo->originalairdate = prevdate;
             } 
             else if (info.tagName() == "credits")
             {
                 parseCredits(info, pginfo);
-            }  
+            }
+            else if (info.tagName() == "episode-num" && info.attribute("system") == "xmltv_ns")
+            {
+                int tmp;
+                QString episodenum(getFirstText(info));
+                episode = episodenum.section('.',1,1);
+                episode = episode.section('/',0,0).stripWhiteSpace();
+                season = episodenum.section('.',0,0).stripWhiteSpace();
+                QString part(episodenum.section('.',2,2));
+                QString partnumber(part.section('/',0,0).stripWhiteSpace());
+                QString parttotal(part.section('/',1,1).stripWhiteSpace());
+
+                if (!episode.isEmpty())
+                {
+                    tmp = episode.toInt() + 1;
+                    episode = QString::number(tmp);
+                    pginfo->syndicatedepisodenumber = QString("E" + episode);
+                }
+
+                if (!season.isEmpty())
+                {
+                    tmp = season.toInt() + 1;
+                    season = QString::number(tmp);
+                    pginfo->syndicatedepisodenumber.append(QString("S" + season));
+                }
+
+                if (!partnumber.isEmpty())
+                {                
+                    tmp = partnumber.toInt() + 1;
+                    partnumber = QString::number(tmp);
+                }
+                
+                if (partnumber != 0 && parttotal >= partnumber && !parttotal.isEmpty())
+                {
+                    pginfo->parttotal = parttotal;
+                    pginfo->partnumber = partnumber;
+                }
+            }
         }
     }
 
-    if (pginfo->category == "" && pginfo->catType != "")
+    if (pginfo->category.isEmpty() && !pginfo->catType.isEmpty())
         pginfo->category = pginfo->catType;
 
     /* Do what MythWeb does and assume that programmes with
@@ -1421,8 +1503,52 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
         }
     }
     
-    if (pginfo->airdate == "")
+    if (pginfo->airdate.isEmpty())
         pginfo->airdate = QDate::currentDate().toString("yyyy");
+
+    /* Let's build ourself a programid */
+    QString programid;
+    
+    if (pginfo->catType == "movie")
+        programid = "MV";
+    else if (pginfo->catType == "series")
+        programid = "EP";
+    else if (pginfo->catType == "sports")
+        programid = "SP";
+    else
+        programid = "SH";
+    
+    if (!uniqueid.isEmpty()) // we already have a unique id ready for use
+        programid.append(uniqueid);
+    else
+    {
+        if (seriesid.isEmpty()) //need to hash ourself a seriesid from the title
+        {
+            seriesid = QString::number(ELFHash(pginfo->title));
+        }
+        pginfo->seriesid = seriesid;
+        programid.append(seriesid);
+
+        if (!episode.isEmpty() && !season.isEmpty())
+        {
+            programid.append(episode);
+            programid.append(season);
+            if (!pginfo->partnumber.isEmpty() && !pginfo->parttotal.isEmpty())
+            {
+                programid.append(pginfo->partnumber);
+                programid.append(pginfo->parttotal);
+            }
+        }
+        else
+        {
+            /* No ep/season info? Well then remove the programid and rely on
+               normal dupchecking methods instead. */
+            if (pginfo->catType != "movie")
+                programid = "";
+        }
+    }
+    
+    pginfo->programid = programid;
 
     return pginfo;
 }
@@ -1773,12 +1899,14 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
 
         QString querystr;
 
-        if ((*i).old_xmltvid != "") {
+        if ((*i).old_xmltvid != "")
+        {
             querystr.sprintf("SELECT xmltvid FROM channel WHERE xmltvid = \"%s\"",
                              (*i).old_xmltvid.ascii());
             query.exec(querystr);
 
-            if (query.isActive() && query.numRowsAffected() > 0) {
+            if (query.isActive() && query.numRowsAffected() > 0)
+            {
                 if (!quiet)
                     cout << "Converting old xmltvid (" << (*i).old_xmltvid << ") to new ("
                          << (*i).xmltvid << ")\n";
@@ -2044,14 +2172,14 @@ void clearDBAtOffset(int offset, int chanid, QDate *qCurrentDate)
     clearDataByChannel(chanid, from, to);
 }
 
-void handlePrograms(int id, int offset, QMap<QString, 
-                    QValueList<ProgInfo> > *proglist, QDate *qCurrentDate)
+void handlePrograms(int id, QMap<QString, QValueList<ProgInfo> > *proglist)
 {
+    int unchanged = 0, updated = 0;
     QMap<QString, QValueList<ProgInfo> >::Iterator mapiter;
+
     for (mapiter = proglist->begin(); mapiter != proglist->end(); ++mapiter)
     {
         QSqlQuery query;
-        QString querystr;
 
         if (mapiter.key() == "")
             continue;
@@ -2068,19 +2196,15 @@ void handlePrograms(int id, int offset, QMap<QString,
         if (query.isActive() && query.numRowsAffected() > 0)
         {
             query.next();
-            
             chanid = query.value(0).toInt();
         }
 
         if (chanid == 0)
         {
-            cerr << "Unknown xmltv channel identifier: " << mapiter.key() 
-                 << endl;
-            cerr << "Skipping channel.\n";
+            cerr << "Unknown xmltv channel identifier: " << mapiter.key()
+                 << endl << "Skipping channel.\n";
             continue;
         }
-
-        clearDBAtOffset(offset, chanid, qCurrentDate);
 
         QValueList<ProgInfo> *sortlist = &((*proglist)[mapiter.key()]);
 
@@ -2089,38 +2213,69 @@ void handlePrograms(int id, int offset, QMap<QString,
         QValueList<ProgInfo>::iterator i = sortlist->begin();
         for (; i != sortlist->end(); i++)
         {
-            QString startstr = (*i).start.toString("yyyyMMddhhmmss");
-            QString endstr = (*i).end.toString("yyyyMMddhhmmss");
+            QString startstr = (*i).start.toString(Qt::ISODate);
+            QString endstr = (*i).end.toString(Qt::ISODate);
 
-            if ("" == (*i).airdate)
-                (*i).airdate = "0";
-            if ("" == (*i).stars)
-                (*i).stars = "0";
+            query.prepare("SELECT * FROM program WHERE "
+                          "chanid=:CHANID AND "
+                          "starttime=:START AND "
+                          "endtime=:END AND "
+                          "title=:TITLE AND "
+                          "subtitle=:SUBTITLE AND "
+                          "description=:DESC AND "
+                          "category=:CATEGORY AND "
+                          "category_type=:CATEGORY_TYPE AND "
+                          "airdate=:AIRDATE AND "
+                          "stars=:STARS AND "
+                          "previouslyshown=:PREVIOUSLYSHOWN AND "
+                          "title_pronounce=:TITLE_PRONOUNCE AND "
+                          "stereo=:STEREO AND "
+                          "subtitled=:SUBTITLED AND "
+                          "hdtv=:HDTV AND "
+                          "closecaptioned=:CLOSECAPTIONED AND "
+                          "partnumber=:PARTNUMBER AND "
+                          "parttotal=:PARTTOTAL AND "
+                          "seriesid=:SERIESID AND "
+                          "showtype=:SHOWTYPE AND "
+                          "colorcode=:COLORCODE AND "
+                          "syndicatedepisodenumber=:SYNDICATEDEPISODENUMBER AND "
+                          "programid=:PROGRAMID;");
+            query.bindValue(":CHANID", chanid);
+            query.bindValue(":START", startstr);
+            query.bindValue(":END", endstr);
+            query.bindValue(":TITLE", (*i).title.utf8());
+            query.bindValue(":SUBTITLE", (*i).subtitle.utf8());
+            query.bindValue(":DESC", (*i).desc.utf8());
+            query.bindValue(":CATEGORY", (*i).category.utf8());
+            query.bindValue(":CATEGORY_TYPE", (*i).catType.utf8());
+            query.bindValue(":AIRDATE", (*i).airdate);
+            query.bindValue(":STARS", (*i).stars);
+            query.bindValue(":PREVIOUSLYSHOWN", (*i).previouslyshown);
+            query.bindValue(":TITLE_PRONOUNCE", (*i).title_pronounce.utf8());
+            query.bindValue(":STEREO", (*i).stereo);
+            query.bindValue(":SUBTITLED", (*i).subtitled);
+            query.bindValue(":HDTV", (*i).hdtv);
+            query.bindValue(":CLOSECAPTIONED", (*i).closecaptioned);
+            query.bindValue(":PARTNUMBER", (*i).partnumber);
+            query.bindValue(":PARTTOTAL", (*i).parttotal);
+            query.bindValue(":SERIESID", (*i).seriesid);
+            query.bindValue(":SHOWTYPE", (*i).showtype);
+            query.bindValue(":COLORCODE", (*i).colorcode);
+            query.bindValue(":SYNDICATEDEPISODENUMBER", (*i).syndicatedepisodenumber);
+            query.bindValue(":PROGRAMID", (*i).programid);
+            query.exec();
 
-            if (no_delete)
+            if (query.isActive() && query.numRowsAffected() > 0)
             {
-                query.prepare("SELECT * FROM program WHERE chanid=:CHANID AND "
-                              "starttime=:START AND endtime=:END AND "
-                              "title=:TITLE AND subtitle=:SUBTITLE AND "
-                              "description=:DESC AND category=:CATEGORY AND "
-                              "stars=:STARS;");
-                query.bindValue(":CHANID", chanid);
-                query.bindValue(":START", startstr);
-                query.bindValue(":END", endstr);
-                query.bindValue(":TITLE", (*i).title.utf8()); 
-                query.bindValue(":SUBTITLE", (*i).subtitle.utf8()); 
-                query.bindValue(":DESC", (*i).desc.utf8()); 
-                query.bindValue(":CATEGORY", (*i).category.utf8());
-                query.bindValue(":STARS", (*i).stars);
+                unchanged++;
+                continue;
+            }
 
-                query.exec();
-
-                if (query.isActive() && query.numRowsAffected() > 0)
-                    continue;
-
-                query.prepare("SELECT title,subtitle,starttime,endtime "
-                              "FROM program WHERE chanid=:CHANID AND "
-                              "starttime>=:START AND starttime<:END;");
+            if (!no_delete)
+            {
+                query.prepare("SELECT title,starttime,endtime FROM program WHERE "
+                              "chanid=:CHANID AND starttime>=:START AND "
+                              "starttime<:END;");
                 query.bindValue(":CHANID", chanid);
                 query.bindValue(":START", startstr);
                 query.bindValue(":END", endstr);
@@ -2128,20 +2283,22 @@ void handlePrograms(int id, int offset, QMap<QString,
 
                 if (query.isActive() && query.numRowsAffected() > 0)
                 {
-                    while(query.next())
+                    if (!quiet)
                     {
-                        cerr << "removing existing program: "
-                             << (*i).channel << " "
-                             << query.value(0).toString().local8Bit() << " "
-                             << query.value(2).toDateTime().toString("yyyyMMddhhmmss") << "-"
-                             << query.value(3).toDateTime().toString("yyyyMMddhhmmss") << endl;
-                    }
+                        while(query.next())
+                        {
+                            cerr << "removing existing program: "
+                                 << (*i).channel.local8Bit() << " "
+                                 << query.value(0).toString().local8Bit() << " "
+                                 << query.value(1).toDateTime().toString(Qt::ISODate) << " - "
+                                 << query.value(2).toDateTime().toString(Qt::ISODate) << endl;
+                        }
 
-                    cerr << "inserting new program    : "
-                         << (*i).channel << " "
-                         << (*i).title.local8Bit() << " "
-                         << (*i).startts << "-" << (*i).endts << endl;
-                    cerr << endl;
+                        cerr << "inserting new program    : "
+                             << (*i).channel.local8Bit() << " "
+                             << (*i).title.local8Bit() << " "
+                             << startstr << " - " << endstr << endl << endl;
+                    }
 
                     QSqlQuery subquery;
                     subquery.prepare("DELETE FROM program WHERE "
@@ -2174,29 +2331,47 @@ void handlePrograms(int id, int offset, QMap<QString,
             }
 
             query.prepare("INSERT INTO program (chanid,starttime,endtime,"
-                          "title,title_pronounce,subtitle,description,category,"
-                          "category_type,airdate,stars,previouslyshown) "
+                          "title,subtitle,description,category,category_type,"
+                          "airdate,stars,previouslyshown,title_pronounce,stereo,"
+                          "subtitled,hdtv,closecaptioned,partnumber,parttotal,"
+                          "seriesid,originalairdate,showtype,colorcode,"
+                          "syndicatedepisodenumber,programid) "
                           "VALUES(:CHANID,:STARTTIME,:ENDTIME,:TITLE,"
-                          ":TITLE_PRONOUNCE,:SUBTITLE,"
-                          ":DESCRIPTION,:CATEGORY,:CATEGORY_TYPE,:AIRDATE,"
-                          ":STARS,:PREVIOUSLYSHOWN);");
+                          ":SUBTITLE,:DESCRIPTION,:CATEGORY,:CATEGORY_TYPE,:AIRDATE,:STARS,"
+                          ":PREVIOUSLYSHOWN,:TITLE_PRONOUNCE,:STEREO,:SUBTITLED,"
+                          ":HDTV,:CLOSECAPTIONED,:PARTNUMBER,:PARTTOTAL,:SERIESID,"
+                          ":ORIGINALAIRDATE,:SHOWTYPE,:COLORCODE,:SYNDICATEDEPISODENUMBER,"
+                          ":PROGRAMID);");
             query.bindValue(":CHANID", chanid);
             query.bindValue(":STARTTIME", startstr);
             query.bindValue(":ENDTIME", endstr);
             query.bindValue(":TITLE", (*i).title.utf8());
-            query.bindValue(":TITLE_PRONOUNCE", (*i).pronounce.utf8());
             query.bindValue(":SUBTITLE", (*i).subtitle.utf8());
             query.bindValue(":DESCRIPTION", (*i).desc.utf8());
             query.bindValue(":CATEGORY", (*i).category.utf8());
             query.bindValue(":CATEGORY_TYPE", (*i).catType.utf8());
             query.bindValue(":AIRDATE", (*i).airdate.utf8());
             query.bindValue(":STARS", (*i).stars.utf8());
-            query.bindValue(":PREVIOUSLYSHOWN", (*i).repeat);
-
+            query.bindValue(":PREVIOUSLYSHOWN", (*i).previouslyshown);
+            query.bindValue(":TITLE_PRONOUNCE", (*i).title_pronounce.utf8());
+            query.bindValue(":STEREO", (*i).stereo);
+            query.bindValue(":SUBTITLED", (*i).subtitled);
+            query.bindValue(":HDTV", (*i).hdtv);
+            query.bindValue(":CLOSECAPTIONED", (*i).closecaptioned);
+            query.bindValue(":PARTNUMBER", (*i).partnumber);
+            query.bindValue(":PARTTOTAL", (*i).parttotal);
+            query.bindValue(":SERIESID", (*i).seriesid);
+            query.bindValue(":ORIGINALAIRDATE", (*i).originalairdate);
+            query.bindValue(":SHOWTYPE", (*i).showtype);
+            query.bindValue(":COLORCODE", (*i).colorcode);
+            query.bindValue(":SYNDICATEDEPISODENUMBER", (*i).syndicatedepisodenumber);
+            query.bindValue(":PROGRAMID", (*i).programid);
             if (!query.exec())
             {
                 MythContext::DBError("program insert", query);
             }
+
+            updated++;
 
             QValueList<ProgRating>::iterator j = (*i).ratings.begin();
             for (; j != (*i).ratings.end(); j++)
@@ -2285,10 +2460,14 @@ void handlePrograms(int id, int offset, QMap<QString,
             }
         }
     }
+    if (!quiet)
+    {
+        cerr << "Updated programs: " << updated
+             << "  Unchanged programs: " << unchanged << endl;
+    }
 }
 
-void grabDataFromFile(int id, int offset, QString &filename, 
-                      QDate *qCurrentDate = 0)
+void grabDataFromFile(int id, QString &filename)
 {
     QValueList<ChanInfo> chanlist;
     QMap<QString, QValueList<ProgInfo> > proglist;
@@ -2296,7 +2475,7 @@ void grabDataFromFile(int id, int offset, QString &filename,
     parseFile(filename, &chanlist, &proglist);
 
     handleChannels(id, &chanlist);
-    handlePrograms(id, offset, &proglist, qCurrentDate);
+    handlePrograms(id, &proglist);
 }
 
 time_t toTime_t(QDateTime &dt)
@@ -2381,11 +2560,14 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
                          filename.ascii());
          isJapan = true;
     }
-    else if (xmltv_grabber == "tv_grab_se" ||
-             xmltv_grabber == "tv_grab_no")
+    else if (xmltv_grabber == "tv_grab_no")
         command.sprintf("nice %s --days 1 --offset %d --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), offset, configfile.ascii(),
                         filename.ascii());
+    else if (xmltv_grabber == "tv_grab_se_swedb")
+         command.sprintf("nice %s --days 1 --offset %d --config-file '%s' --output %s",
+                         xmltv_grabber.ascii(), offset, configfile.ascii(),
+                         filename.ascii());
     else if (xmltv_grabber == "tv_grab_dk")
         // Use fixed interval of 7 days for Danish grabber
         command.sprintf("nice %s --days 7 --config-file '%s' --output %s",
@@ -2405,7 +2587,7 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
          xmltv_grabber == "tv_grab_fi" ||
          xmltv_grabber == "tv_grab_es" ||
          xmltv_grabber == "tv_grab_nz" ||
-         xmltv_grabber == "tv_grab_se" ||
+         xmltv_grabber == "tv_grab_se_swedb" ||
          xmltv_grabber == "tv_grab_no" ||
          xmltv_grabber == "tv_grab_dk" ||
          xmltv_grabber == "tv_grab_uk" ||
@@ -2461,7 +2643,7 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
     if (!quiet)
          cout << "------------------ End of XMLTV output ------------------" << endl;
 
-    grabDataFromFile(source.id, offset, filename, qCurrentDate);
+    grabDataFromFile(source.id, filename);
 
     QFile thefile(filename);
     thefile.remove();
@@ -2538,7 +2720,7 @@ bool fillData(QValueList<Source> &sourcelist)
     QDateTime GuideDataBefore, GuideDataAfter;
 
     query.exec(QString("SELECT MAX(endtime) FROM program;"));
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.numRowsAffected() > 0)
     {
         query.next();
 
@@ -2607,11 +2789,10 @@ bool fillData(QValueList<Source> &sourcelist)
             grabData(*it, 0, &qCurrentDate);
         }
         else if (xmltv_grabber == "datadirect" ||
-                 xmltv_grabber == "tv_grab_se" ||
+                 xmltv_grabber == "tv_grab_se_swedb" ||
                  xmltv_grabber == "tv_grab_no")
         {
-            if (xmltv_grabber == "tv_grab_se" ||
-                xmltv_grabber == "tv_grab_no")
+            if (xmltv_grabber == "tv_grab_no")
                 listing_wrap_offset = 6 * 3600;
 
             QDate qCurrentDate = QDate::currentDate();
@@ -2642,12 +2823,11 @@ bool fillData(QValueList<Source> &sourcelist)
 
             int maxday = 9;
 
-            if (xmltv_grabber == "tv_grab_se" ||
+            if (xmltv_grabber == "datadirect" ||
                 xmltv_grabber == "tv_grab_no")
                 maxday = 14;
-
-            if (xmltv_grabber == "datadirect")
-                maxday = 14;
+            else if (xmltv_grabber == "tv_grab_se_swedb")
+                maxday = 10;
 
             for (int i = 0; i < maxday; i++)
             {
@@ -2776,7 +2956,7 @@ bool fillData(QValueList<Source> &sourcelist)
     }
 
     query.exec(QString("SELECT MAX(endtime) FROM program;"));
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.numRowsAffected() > 0)
     {
         query.next();
 
@@ -3224,7 +3404,7 @@ int main(int argc, char *argv[])
             cout << "\n";
             cout << "--refresh-today\n";
             cout << "--refresh-second\n";
-            cout << "   (Only valid for grabbers: na, se, no)\n";
+            cout << "   (Only valid for grabbers: na, se_swedb, no)\n";
             cout << "   Force a refresh today or two days from now, to catch the latest changes\n";
             cout << "--dont-refresh-tomorrow\n";
             cout << "   Tomorrow will be refreshed always unless this argument is used\n";
@@ -3300,7 +3480,7 @@ int main(int argc, char *argv[])
                            .arg(status));
 
         query.exec(QString("SELECT MAX(endtime) FROM program;"));
-        if (query.isActive() && query.numRowsAffected())
+        if (query.isActive() && query.numRowsAffected() > 0)
         {
             query.next();
 
@@ -3309,7 +3489,7 @@ int main(int argc, char *argv[])
                                                     Qt::ISODate);
         }
 
-        grabDataFromFile(fromfile_id, fromfile_offset, fromfile_name);
+        grabDataFromFile(fromfile_id, fromfile_name);
         clearOldDBEntries();
 
         query.exec(QString("UPDATE settings SET data ='%1' "
@@ -3317,7 +3497,7 @@ int main(int argc, char *argv[])
                           .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm")));
 
         query.exec(QString("SELECT MAX(endtime) FROM program;"));
-        if (query.isActive() && query.numRowsAffected())
+        if (query.isActive() && query.numRowsAffected() > 0)
         {
             query.next();
 
@@ -3389,9 +3569,7 @@ int main(int argc, char *argv[])
              exit(17);
         }
     
-        bool ret = fillData(sourcelist);
-
-        if (!ret)
+        if (!fillData(sourcelist))
         {
              cerr << "Failed to fetch some program info\n";
              gContext->LogEntry("mythfilldatabase", LP_WARNING,
@@ -3471,9 +3649,7 @@ int main(int argc, char *argv[])
         if (!quiet)
             cout << "found " << query.numRowsAffected() << endl;
     }
-    
-    
-    
+
     query.exec( "SELECT count(previouslyshown) FROM program WHERE previouslyshown = 1;");
     if (query.isActive() && query.numRowsAffected() > 0)
     {
@@ -3484,7 +3660,6 @@ int main(int argc, char *argv[])
             query.exec("UPDATE settings SET data = '0' WHERE value = 'HaveRepeats';");
     }
 
-    
     delete gContext;
 
     return 0;
