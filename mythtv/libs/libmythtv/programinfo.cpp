@@ -2389,6 +2389,7 @@ void ProgramInfo::showDetails(QSqlDatabase *db)
         tmpSize.sprintf("%0.2f ", filesize / 1024.0 / 1024.0 / 1024.0);
         tmpSize += QObject::tr("GB", "GigaBytes");
     
+        msg += QObject::tr("Recording Host") + ":  " + hostname + "\n";
         msg += QObject::tr("Filesize") + ":  " + tmpSize + "\n";
         msg += QObject::tr("Recording Group") + ":  " + recgroup + "\n";
     }
