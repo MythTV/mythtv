@@ -29,9 +29,14 @@ class MythContext;
 
 
 class MythComboBox: public QComboBox {
+    Q_OBJECT
 public:
     MythComboBox(bool rw, QWidget* parent=0, const char* name=0):
         QComboBox(rw, parent, name) {};
+public slots:
+    void insertItem(const QString& item) {
+        QComboBox::insertItem(item);
+    };
 protected:
     virtual void keyPressEvent (QKeyEvent* e);
 };

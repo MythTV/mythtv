@@ -21,11 +21,12 @@ void MythComboBox::keyPressEvent(QKeyEvent *e)
     case Key_Left:
         if (currentItem() == 0)
             setCurrentItem(count()-1);
-        else
+        else if (count() > 0)
             setCurrentItem((currentItem() - 1) % count());
         break;
     case Key_Right:
-        setCurrentItem((currentItem() + 1) % count());
+        if (count() > 0)
+            setCurrentItem((currentItem() + 1) % count());
         break;
     case Key_Space:
         popup();
