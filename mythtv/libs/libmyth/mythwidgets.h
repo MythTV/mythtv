@@ -8,6 +8,7 @@
 #include <qpushbutton.h>
 #include <qtoolbutton.h>
 #include <qdialog.h>
+#include <qprogressdialog.h>
 #include <qlistview.h>
 #include <qheader.h>
 #include <qtable.h>
@@ -205,6 +206,14 @@ class MythDialog : public QDialog
     MythContext *m_context;
     float wmult, hmult;
     int screenwidth, screenheight;
+};
+
+class MythProgressDialog: public QProgressDialog {
+public:
+    MythProgressDialog(const QString& labelText, int totalSteps,
+                       QWidget* parent=NULL, const char* name=0,
+                       bool modal=FALSE);
+        
 };
 
 class MythListView : public QListView
