@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-05-14, v2.34
+<date>2003-05-19, v2.35
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -226,13 +226,6 @@ for Live TV at 416x480.
 <item>A Celeron 450 (no SSE) can decode a 480x480 16Mbps MPEG-2 file with
 80% CPU.
 </itemize>
-
-<code>
-NOTE:  As of 2003-04-15 the current IVTV driver does not support multiple
-hardware encoder cards in the same chassis.
-
-NOTE:  The MPEG-2 decoder on the PVR-350 is not yet supported.
-</code>
 
 See the <ref id="pvr250" name="I'd like to use a hardware MPEG-2 encoder">
 section for information on installing a PVR-250 on Mandrake 9.1.
@@ -3269,9 +3262,6 @@ $ su
 # depmod -a
 </verb></tscreen>
 
-<bf>NOTE</bf>:  <tt>depmod</tt> may give errors at this point, but it doesn't
-seem to impact functionality.
-
 Finally, load the ivtv driver:
 <tscreen><verb>
 # modprobe ivtv
@@ -3320,9 +3310,10 @@ The remaining setup is just like a standard V4L card; define a video source
 if you have not already done so, and assign the video source to a video card
 input on the Input Connections screen.
 
-You should also <bf>modprobe</bf> the ivtv driver before using it.  The
-simplest technique is to add the <bf/modprobe/> command to
-<tt>/etc/rc.d/rc.local</tt>:
+Some people report issues with the ivtv module not being loaded when
+required by MythTV.  To get around this, you can <bf>modprobe</bf> the ivtv driver
+before using it.  The simplest technique is to add the <bf/modprobe/>
+command to <tt>/etc/rc.d/rc.local</tt>:
 <tscreen><verb>
 # echo "/sbin/modprobe ivtv" >> /etc/rc.d/rc.local
 </verb></tscreen>
@@ -3542,6 +3533,9 @@ people to the contributors section.
 v2.34, 2003-05-14.  Updated PVR-250 example.  Remove ptune.pl stuff; it's
 changing too fast.  Updated gdb troubleshooting section.  Updated "can't CVS
 checkout anymore" section.
+v2.35, 2003-05-19.  Remove the depmod error advice in the PVR-250 since IVTV has fixed
+their Makefile.  Get rid of stuff that is too hard to keep up with, like the
+status of the ivtv driver and what it can and can't do.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

@@ -411,8 +411,6 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P><B>NOTE</B>:  <CODE>depmod</CODE> may give errors at this point, but it doesn't
-seem to impact functionality.</P>
 <P>Finally, load the ivtv driver:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -461,9 +459,10 @@ press ENTER.</P>
 <P>The remaining setup is just like a standard V4L card; define a video source
 if you have not already done so, and assign the video source to a video card
 input on the Input Connections screen.</P>
-<P>You should also <B>modprobe</B> the ivtv driver before using it.  The
-simplest technique is to add the <B>modprobe</B>> command to
-<CODE>/etc/rc.d/rc.local</CODE>:
+<P>Some people report issues with the ivtv module not being loaded when
+required by MythTV.  To get around this, you can <B>modprobe</B> the ivtv driver
+before using it.  The simplest technique is to add the <B>modprobe</B>>
+command to <CODE>/etc/rc.d/rc.local</CODE>:
 <BLOCKQUOTE><CODE>
 <PRE>
 # echo "/sbin/modprobe ivtv" >> /etc/rc.d/rc.local
