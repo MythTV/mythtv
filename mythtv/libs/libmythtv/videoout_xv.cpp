@@ -294,6 +294,9 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
         XSetWMProperties(data->XJ_disp, data->XJ_win, 
                          &windowName, &iconName,
                          NULL, 0, &(data->hints), &wmhints, NULL);
+
+        XFree(iconName.value);
+        XFree(windowName.value);
   
         XSelectInput(data->XJ_disp, data->XJ_win,
                      ExposureMask|KeyPressMask|StructureNotifyMask);
@@ -522,6 +525,7 @@ void XvVideoOutput::Exit(void)
 
         if (created_win)
             XDestroyWindow(data->XJ_disp, data->XJ_win);
+        XFreeGC(data->XJ_disp, data->XJ_gc);
         XCloseDisplay(data->XJ_disp);
     }
 }
