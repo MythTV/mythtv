@@ -1,9 +1,9 @@
 # lircrc.example.pinnaclestudiopctv
-# 2003-04-08, Robert Kulagowski
+# 2003-04-11, Robert Kulagowski
 # mailto:rkulagow@rocketmail.com
 # Native support for volume and mute within MythTV now
 # Commercial skipping button
-# repeat = for volume and channel
+# repeat = for volume and channel and diamond
 
 # These are standard definitions which should exist on any remote control
 
@@ -128,14 +128,14 @@ end
 begin
     prog = irxevent
     button = vol+
-    repeat = 5
+    repeat = 3
     config = Key braceright CurrentWindow
 end
 
 begin
     prog = irxevent
     button = vol-
-    repeat = 5
+    repeat = 3
     config = Key bracketleft CurrentWindow    
 end
 
@@ -150,14 +150,14 @@ end
 begin
     prog = irxevent
     button = channel+
-    repeat = 7
+    repeat = 3
     config = Key Up CurrentWindow
 end
 
 begin
     prog = irxevent
     button = channel-
-    repeat = 7
+    repeat = 3
     config = Key Down CurrentWindow
 end
 
@@ -165,6 +165,7 @@ begin
     prog = irxevent
     button = Chan+Play
 # This is the "up" on the central diamond 
+    repeat = 3
     config = Key Up CurrentWindow
 end
 
@@ -172,6 +173,7 @@ begin
     prog = irxevent
     button = Chan-Stop
 # This is the "down" on the central diamond 
+    repeat = 3
     config = Key Down CurrentWindow
 end
 
@@ -179,6 +181,7 @@ begin
     prog = irxevent
     button = Vol-REW
 # This is the "left" on the central diamond 
+    repeat = 3
     config = Key Left CurrentWindow
 end
 
@@ -186,6 +189,7 @@ begin
     prog = irxevent
     button = Vol+FF
 # This is the "right" on the central diamond 
+    repeat = 3
     config = Key Right CurrentWindow
 end
 
@@ -221,8 +225,7 @@ begin
 begin
   prog = irxevent
   button = Record
-# Not used for anything yet
-   config = Key R CurrentWindow
+  config = Key R CurrentWindow
 end
 
 begin
