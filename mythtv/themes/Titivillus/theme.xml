@@ -14,22 +14,23 @@
       <bold>yes</bold>
       <size:big>24</size:big>
       <size:small>18</size:small>
+      <shadow>3,3</shadow>
     </font>
     
     <font name="subtitle" base="basefont">
       <color>#ffffdd</color>
-      <size>18</size>
-      <size:big>20</size:big>
-      <size:small>14</size:small>
+      <size>19</size>
+      <size:big>21</size:big>
+      <size:small>17</size:small>
+      <shadow>2,2</shadow>
     </font>
     
     <font name="info" base="basefont">
-      <shadow>1,1</shadow>
+      <shadow>2,2</shadow>
     </font>
     
     <font name="metadata" base="info">
       <color>#ffffdd</color>
-      <shadow>1,1</shadow>
     </font>
     
     <font name="help" base="info">
@@ -47,8 +48,8 @@
       <size:big>17</size:big>
     </font>
 
-    <font name="list-active" base="basefont" face="Freesans">
-      <shadow>1,1</shadow>
+    <font name="list-active" base="basefont">
+      <shadow>2,2</shadow>
       <color>#ddddff</color>
     </font>
 
@@ -85,7 +86,7 @@
   <background style="normal">
     <image>background.jpg</image>
 
-    <buttonarea>118,115,600,390</buttonarea>
+    <buttonarea>30,115,650,390</buttonarea>
     <visiblerowlimit>7</visiblerowlimit>
     <columns>1</columns>
   </background>
@@ -118,9 +119,9 @@
   <genericbutton>
     <watermarkposition>524,105</watermarkposition> <!-- 20px right margin -->
     <normal>text-blank.png</normal>
-    <active>forward.png</active>
+    <active>text-blank.png</active>
     <text>
-      <area>60,15,3,3</area>
+      <area>1,15,3,0</area>
       <color>white</color>
       <fontname>Trebuchet Ms</fontname>
       <fontsize>28</fontsize>
@@ -138,7 +139,7 @@
       </shadow>-->
     </text>
     <activetext>
-      <area>60,15,3,3</area>
+      <area>1,15,3,0</area>
       <color>#0086FF</color>
       <fontname>Trebuchet Ms</fontname>
       <fontsize>28</fontsize>
