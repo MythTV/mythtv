@@ -211,23 +211,23 @@
     </message>
     <message>
         <source>Match an exact title</source>
-        <translation type="unfinished"></translation>
+        <translation>&gt;Nach einem best. Titel suchen</translation>
     </message>
     <message>
         <source>Match an exact episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Nach einer best. Folge suchen</translation>
     </message>
     <message>
         <source>An error was found when checking</source>
-        <translation type="unfinished"></translation>
+        <translation>Bei der Überprüfung  wurde ein Fehler gefunden.</translation>
     </message>
     <message>
         <source>The database error was</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Datenbankfehler war</translation>
     </message>
     <message>
         <source>Only shows marked as HDTV</source>
-        <translation type="unfinished"></translation>
+        <translation>Nur Sendungen in HDTV</translation>
     </message>
 </context>
 <context>
@@ -348,7 +348,7 @@
     </message>
     <message>
         <source>Cancelled</source>
-        <translation type="unfinished"></translation>
+        <translation>Abgebrochen</translation>
     </message>
 </context>
 <context>
@@ -406,27 +406,27 @@
     </message>
     <message>
         <source>Date or day of the week</source>
-        <translation type="unfinished"></translation>
+        <translation>Datum oder Tag der Woche</translation>
     </message>
     <message>
         <source>minute</source>
-        <translation type="unfinished"></translation>
+        <translation>Minute</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished">Minuten</translation>
+        <translation>Minuten</translation>
     </message>
     <message>
         <source>Title (optional):</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel (optional):</translation>
     </message>
     <message>
         <source>Set Recording Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnahmeoptionen</translation>
     </message>
     <message>
         <source>Manual Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Manuelle Aufnahme</translation>
     </message>
 </context>
 <context>
@@ -773,23 +773,23 @@
     </message>
     <message>
         <source>User Job</source>
-        <translation type="unfinished"></translation>
+        <translation>Auftrag</translation>
     </message>
     <message>
         <source>Stop</source>
-        <translation type="unfinished">Stopp</translation>
+        <translation>Stopp</translation>
     </message>
     <message>
         <source>Begin</source>
-        <translation type="unfinished"></translation>
+        <translation>Starten</translation>
     </message>
     <message>
         <source>Delete it, but allow it to re-record</source>
-        <translation type="unfinished"></translation>
+        <translation>Löschen, aber wieder aufnehmen lassen</translation>
     </message>
     <message>
         <source>Delete it</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitte löschen</translation>
     </message>
     <message>
         <source>Save it so I can watch it again</source>
@@ -1018,15 +1018,15 @@
     </message>
     <message>
         <source>(Any Program Type)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Jeder Programmtyp)</translation>
     </message>
     <message>
         <source>(Any Category)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Jedes Genre)</translation>
     </message>
     <message>
         <source>(Any Station)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Jeder Sender)</translation>
     </message>
 </context>
 <context>
@@ -1332,7 +1332,7 @@
     </message>
     <message>
         <source>Automatically Flag Commercials</source>
-        <translation>Werbung autom. markieren</translation>
+        <translation type="obsolete">Werbung autom. markieren</translation>
     </message>
     <message>
         <source>Strict Commercial Detection</source>
@@ -1576,7 +1576,7 @@
     </message>
     <message>
         <source>Halt command</source>
-        <translation>Befehl für Systemstop</translation>
+        <translation>Befehl für Systemstopp</translation>
     </message>
     <message>
         <source>Xinerama screen</source>
@@ -3029,7 +3029,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>If set automatic commercial flagging will be skipped for this channel.  Useful for premium channels like HBO.</source>
-        <translation>Falls gesetzt, werden Aufnahmen von diesem Sender nicht auf Werbung untersucht. Nützlich z.B. bei Premiere oder  Öffentlich-Rechtlichen Sendern.</translation>
+        <translation>Falls gesetzt, werden Aufnahmen von diesem Sender nicht auf Werbung untersucht. Nützlich z.B. bei Premiere oder Öffentlich-Rechtlichen Sendern.</translation>
     </message>
     <message>
         <source>Position Saved</source>
@@ -3373,31 +3373,31 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>LCD Displays Time</source>
-        <translation>LCD - Zeitanzeige</translation>
+        <translation>Uhrzeit</translation>
     </message>
     <message>
         <source>Display current time on idle LCD display. Need to restart mythfrontend to (de)activate it.</source>
-        <translation>Zeigt die aktuelle Uhrzeit in der LCD Anzeige an. mythfrontend muß nach einer Änderung dieser Einstellung neu gestartet werden.</translation>
+        <translation>Zeigt die aktuelle Uhrzeit im LCD-Display an. mythfrontend muß nach einer Änderung dieser Einstellung neu gestartet werden.</translation>
     </message>
     <message>
         <source>LCD Displays Menus</source>
-        <translation>LCD - Menüanzeige</translation>
+        <translation>Menüs</translation>
     </message>
     <message>
         <source>Display selected menu on LCD display. Need to restart mythfrontend to (de)activate it.</source>
-        <translation>Zeigt das gewählte Menü auf der LCD Anzeige an. mythfrontend muß nach einer Änderung dieser Einstellung neu gestartet werden.</translation>
+        <translation>Zeigt das gewählte Menü auf dem LCD-Display an. mythfrontend muß nach einer Änderung dieser Einstellung neu gestartet werden.</translation>
     </message>
     <message>
         <source>LCD Displays Music Artist and Title</source>
-        <translation>LCD - Künstler/Titel</translation>
+        <translation>Interpret/Titel</translation>
     </message>
     <message>
         <source>Display playing artist and song title in MythMusic. Need to restart mythfrontend to (de)activate it.</source>
-        <translation>Zeigt den aktuellen Künstler und Liedtitel in MythMusic an. mythfrontend muß nach einer Änderung dieser Einstellung neu gestartet werden.</translation>
+        <translation>Zeigt den aktuellen Interpreten und Liedtitel in MythMusic an. mythfrontend muß nach einer Änderung dieser Einstellung neu gestartet werden.</translation>
     </message>
     <message>
         <source>LCD Displays Channel Information</source>
-        <translation>LCD - Senderinformationen</translation>
+        <translation>Senderinformationen</translation>
     </message>
     <message>
         <source>Display tuned channel information. Need to restart mythfrontend to (de)activate it.</source>
@@ -3405,7 +3405,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>LCD Displays Volume Information</source>
-        <translation>LCD - Lautstärke</translation>
+        <translation>Lautstärke</translation>
     </message>
     <message>
         <source>Display volume level information. Need to restart mythfrontend to (de)activate it.</source>
@@ -3413,7 +3413,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>LCD Displays Generic Information</source>
-        <translation>LCD - Allgemeines</translation>
+        <translation>Allgemeines</translation>
     </message>
     <message>
         <source>Display generic information. Need to restart mythfrontend to (de)activate it.</source>
@@ -3421,7 +3421,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>LCD device display</source>
-        <translation>LCD Gerät</translation>
+        <translation>LCD-Display</translation>
     </message>
     <message>
         <source>Default</source>
@@ -4050,7 +4050,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Alt Aspect</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt Aspekt</translation>
     </message>
     <message>
         <source>If X&apos;s DisplaySize indicates 16:9, fudge vertical size into 4:3, and visa-versa</source>
@@ -4078,15 +4078,15 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Time limit for ATSC signal lock (msec)</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeitlimit für das ATSC-Signal (in Millisek.)</translation>
     </message>
     <message>
         <source>MythTV can check the signal strength when you tune into a HDTV or other over-the-air digital station. This value is the number of milliseconds to allow before MythTV gives up trying to get an acceptable signal.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV kann die Signalstärke messen, während auf einen HDTV oder anderen terrestrisch empfangenen Digitalsender umgeschaltet wird. Dieser Wert in Millisekunden gibt an, wie lange MythTV auf ein akzeptables Signal wartet.</translation>
     </message>
     <message>
         <source>Threshold for a signal to be considered acceptable. If you set this too low MythTV may crash, and if you set it too high you may not be able to tune a channel on which reception would be acceptable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Mindestwert des Empfangssignals. Falls Sie ihn zu niedrig setzen könnte MythTV abstürzen. Aber falls er zu hoch gesetzt wird könnte es sein, daß Sie manche Sender nicht empfangen können, obwohl das Empfangssignal ausreichend wäre.</translation>
     </message>
     <message>
         <source>Avoid conflicts between live TV and scheduled shows.</source>
@@ -4186,11 +4186,11 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>LCD Backlight Always On</source>
-        <translation>LCD Beleuchtung</translation>
+        <translation>LCD-Beleuchtung immer ein</translation>
     </message>
     <message>
         <source>Turn on the backlight permanently. Need to restart mythfrontend to (de)activate it.</source>
-        <translation>Die LCD Beleuchtung dauerhaft einschalten. mythfrontend muß nach einer Änderung dieser Einstellung neu gestartet werden.</translation>
+        <translation>Die LCD Hintergrundbeleuchtung permanent einschalten. mythfrontend muß nach einer Änderung dieser Einstellung neu gestartet werden.</translation>
     </message>
     <message>
         <source>Directed By</source>
@@ -4568,7 +4568,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Run Jobs only on original recording host</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufträge nur lokal bearbeiten</translation>
     </message>
     <message>
         <source>If set, jobs in the queue will be required to run on the backend that made the original recording.</source>
@@ -4616,7 +4616,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Allow jobs of this type to run on this backend.</source>
-        <translation>Erlaube die folgenden Auftragstypen für dieses Backend.</translation>
+        <translation>Erlaube die folgenden Aufträge für dieses Backend.</translation>
     </message>
     <message>
         <source>Allow Commercial Detection jobs</source>
@@ -4962,7 +4962,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>%1% Completed @ %2 fps.</source>
-        <translation>%1% Fertig @ %2 fps.</translation>
+        <translation>%1% fertig @ %2 fps.</translation>
     </message>
     <message>
         <source>Use custom identifier for frontend preferences</source>
@@ -5070,23 +5070,23 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Deinterlace algorithm. &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deinterlace Algorithmus. &apos;Kernel&apos; benötigt SSE Unterstützung. &apos;Bob&apos; funktioniert nur falls Xv oder XvMC zur Videoausgabe vewendet werden.</translation>
     </message>
     <message>
         <source>Enable gamma correction for video</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiviere Gamma-Korrektur</translation>
     </message>
     <message>
         <source>If checked, QuickTime will correct the gamma of the video to match your monitor.  Turning this off can save some CPU cycles.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, wird QuickTime den Gammawert des Videobildes an Ihren Monitor anpassen. Diese Funktion belastet die CPU geringfügig.</translation>
     </message>
     <message>
         <source>Use Altivec-enhanced color space conversion</source>
-        <translation type="unfinished"></translation>
+        <translation>Nutze für Altivec optimierte Farbraumumwandlung</translation>
     </message>
     <message>
         <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec-enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, werden Videodaten vom YUV 4:2:0 ins UYVY 4:2:2 Format über eine für Altivec optimierte Routine umgewandelt. Ansonsten wird QuickTime für die Umwandlung verwendet.</translation>
     </message>
     <message>
         <source>Recording Host</source>
@@ -5446,7 +5446,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>This is the default policy used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
-        <translation>Die Voreinstellung der &apos;Werbung markieren&apos; Funktion für neu geplante Aufnahmen.</translation>
+        <translation type="obsolete">Die Voreinstellung der &apos;Werbung markieren&apos; Funktion für neu geplante Aufnahmen.</translation>
     </message>
     <message>
         <source>Use libmpeg2 for decoding</source>
@@ -5566,7 +5566,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Firewire Model is for future use in case there is a need to model specific workarounds.</source>
-        <translation type="unfinished"></translation>
+        <translation>Firewire Modell wird momentan nicht verwendet und dient für Modellspezifische Anpassungen.</translation>
     </message>
     <message>
         <source>Frequency (Option has no default)
@@ -5625,7 +5625,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Enable realtime priority threads</source>
-        <translation type="unfinished"></translation>
+        <translation>Erlaube Echtzeit-Threads</translation>
     </message>
     <message>
         <source>When running mythfrontend with root privileges, some threads can be given enhanced priority. Disable this if mythfrontend freezes during video playback.</source>
@@ -5633,19 +5633,19 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Enable LCD device</source>
-        <translation>LCD-Geräte erlauben</translation>
+        <translation>Nutze LCD-Display</translation>
     </message>
     <message>
         <source>Use an LCD display to view MythTV status information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV kann verschiedene Statusinformationen auf einem LCD-Display ausgeben. mythfrontend muß nach einer Änderung dieser Einstellung neu gestartet werden.</translation>
     </message>
     <message>
         <source>This global setting allows the recorder to start before the scheduled start time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese globale Einstellung erlaubt es MythTV, eine Aufnahme vorzeitig zu beginnen. Dies hat keine Auswirkung auf die Aufnahmeplanung und wird ignoriert, falls zwischen zwei Aufnahmen nicht genügend Zeit ist.</translation>
     </message>
     <message>
         <source>This global setting allows the recorder to record beyond the scheduled end time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese globale Einstellung erlaubt es MythTV, eine Aufnahme später als geplant zu beenden. Dies hat keine Auswirkung auf die Aufnahmeplanung und wird ignoriert, falls zwischen zwei Aufnahmen nicht genügend Zeit ist.</translation>
     </message>
     <message>
         <source>Resize Video while transcoding</source>
@@ -5653,39 +5653,39 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Absolutely don&apos;t record</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicht aufnehmen</translation>
     </message>
     <message>
         <source>Firewire Connection Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Firewire Verbindungstyp</translation>
     </message>
     <message>
         <source>Point to Point</source>
-        <translation type="unfinished"></translation>
+        <translation>Point to Point</translation>
     </message>
     <message>
         <source>Broadcast</source>
-        <translation type="unfinished"></translation>
+        <translation>Broadcast</translation>
     </message>
     <message>
         <source>USB Mpeg-4 Encoder (Plextor ConvertX, etc)</source>
-        <translation type="unfinished"></translation>
+        <translation>USB MPEG-4 Enkoder (Plextor ConvertX, u.a.)</translation>
     </message>
     <message>
         <source>Original Air date</source>
-        <translation type="unfinished"></translation>
+        <translation>Erstausstrahlung</translation>
     </message>
     <message>
         <source>If using Xinerama, run only on the specified screen. A value of -1 means use all screens.</source>
-        <translation type="unfinished"></translation>
+        <translation>Für Xinerama Nutzer; benutze nur den angegebenen Bildschirm. Bei -1 werden alle Bildschirme genutzt.</translation>
     </message>
     <message>
         <source>TV audio through PVR-350 only</source>
-        <translation type="unfinished"></translation>
+        <translation>TV-Ton nur über PVR-350</translation>
     </message>
     <message>
         <source>Normally PVR-350 audio is looped into a soundcard, here you can indicate when that is not the case. MythTV cannot control TV volume when this option is checked.</source>
-        <translation type="unfinished"></translation>
+        <translation>Normalerweise wird bei PVR-350 TV-Karten der Ton über eine Soundkarte geschleift. Aktivieren Sie diese Option falls dies bei Ihnen nicht der Fall ist. MythTV kann in diesem Fall die Lautstärke nicht regeln.</translation>
     </message>
     <message>
         <source>Building Detection Buffer</source>
@@ -5693,75 +5693,119 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>%1 Frames Completed @ %2 fps.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Frames fertig @ %2 fps.</translation>
     </message>
     <message>
         <source>Terrestrial</source>
-        <translation type="unfinished"></translation>
+        <translation>Terrestrisch</translation>
     </message>
     <message>
         <source>Cable</source>
-        <translation type="unfinished"></translation>
+        <translation>Kabel</translation>
     </message>
     <message>
         <source>ATSC Transport</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC Transport</translation>
     </message>
     <message>
         <source>ATSC transport, cable or terrestrial</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC Transport, Kabel oder Terrestrisch</translation>
     </message>
     <message>
         <source>Use hardware MPEG decoder</source>
-        <translation type="unfinished"></translation>
+        <translation>Nutze Harware MPEG Dekoder</translation>
     </message>
     <message>
         <source>If your DVB card has a built in MPEG decoder you can activate it here. (Only for full featured cards &amp; certain USB devices).</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls Ihre DVB-Karte einen MPEG-Dekoder besitzt, können Sie Ihn hiermit aktivieren (nur bei bestimmten Karten und USB-Geräten).</translation>
     </message>
     <message>
         <source>Hide Mouse Cursor in Myth</source>
-        <translation type="unfinished"></translation>
+        <translation>Unsichtbarer Mauszeiger in Myth</translation>
     </message>
     <message>
         <source>Toggles mouse cursor visibility. Most of the Myth GUI does not respond to mouse clicks, this is only to avoid &quot;losing&quot; your mouse cursor.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestimmt, ob der Mauzeiger sichtbar ist. Diese Option dient nur zur Anzeige des Mauszeigers, da MythTV nicht für die Bedienung mit einer Maus ausgelegt ist.</translation>
     </message>
     <message>
         <source>Job Queue Start Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Auftragsliste Startzeit</translation>
     </message>
     <message>
         <source>This setting controls the start of the Job Queue time window which determines when new jobs will be started.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestimmt, ab wann die Auftragsliste abgearbeitet wird.</translation>
     </message>
     <message>
         <source>Job Queue End Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Auftragsliste Stoppzeit</translation>
     </message>
     <message>
         <source>This setting controls the end of the Job Queue time window which determines when new jobs will be started.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestimmt, bis zu welcher Zeit die Auftragsliste abgearbeitet wird. Bereits laufende Aufträge sind davon nicht betroffen.</translation>
     </message>
     <message>
         <source>Run Transcode Jobs before Auto-Commercial Flagging</source>
-        <translation type="unfinished"></translation>
+        <translation>Werbungserkennung erst nach der Umwandlung</translation>
     </message>
     <message>
         <source>If set, if both auto-transcode and auto commercial flagging are turned ON for a recording, transcoding will run first, otherwise, commercial flagging runs first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, werden Aufnahmen zuerst umgewandelt und danach auf Werbung untersucht. Nur wirksam falls autom. Umwandlung und autom. Werbungssuche aktiviert sind.</translation>
     </message>
     <message>
         <source>Start Auto-Commercial Flagging jobs when the recording starts</source>
-        <translation type="unfinished"></translation>
+        <translation>Werbungserkennung bereits während der Aufnahme</translation>
     </message>
     <message>
         <source>If set and Auto Commercial Flagging is ON for a recording, the flagging job will be started as soon as the recording starts.  NOT recommended on underpowered systems</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, wird bereits während der Aufnahme nach Werbung gesucht. Dazu muß autom. Werbemarkierung aktiviert sein. Nur bei leistungsstarken Rechnern empfohlen.</translation>
     </message>
     <message>
         <source>Job Queue (Job Commands)</source>
-        <translation type="unfinished"></translation>
+        <translation>Auftragsliste (Befehle)</translation>
+    </message>
+    <message>
+        <source>Skipping Back.</source>
+        <translation>Springe zurück</translation>
+    </message>
+    <message>
+        <source>Default Auto Commercial Flagging setting</source>
+        <translation>Voreinstellung der &apos;Werbung markieren&apos; Funktion</translation>
+    </message>
+    <message>
+        <source>This is the default value used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
+        <translation>Falls gesetzt, wird für neue Aufnahmen die &apos;Werbung markieren&apos; Funktion standardmäßig aktiviert sein.</translation>
+    </message>
+    <message>
+        <source>Default &apos;Run User Job #1&apos; setting</source>
+        <translation>Voreinstellung für den Auftragstyp 1</translation>
+    </message>
+    <message>
+        <source>This is the default value used for the &apos;Run User Job #1&apos; setting when a new scheduled recording is created.</source>
+        <translation>Falls gesetzt, wird für neue Aufnahmen der Auftragstyp 1 standardmäßig aktiviert sein.</translation>
+    </message>
+    <message>
+        <source>Default &apos;Run User Job #2&apos; setting</source>
+        <translation>Voreinstellung für den Auftragstyp 2</translation>
+    </message>
+    <message>
+        <source>This is the default value used for the &apos;Run User Job #2&apos; setting when a new scheduled recording is created.</source>
+        <translation>Falls gesetzt, wird für neue Aufnahmen der Auftragstyp 2 standardmäßig aktiviert sein.</translation>
+    </message>
+    <message>
+        <source>Default &apos;Run User Job #3&apos; setting</source>
+        <translation>Voreinstellung für den Auftragstyp 3</translation>
+    </message>
+    <message>
+        <source>This is the default value used for the &apos;Run User Job #3&apos; setting when a new scheduled recording is created.</source>
+        <translation>Falls gesetzt, wird für neue Aufnahmen der Auftragstyp 3 standardmäßig aktiviert sein.</translation>
+    </message>
+    <message>
+        <source>Default &apos;Run User Job #4&apos; setting</source>
+        <translation>Voreinstellung für den Auftragstyp 4</translation>
+    </message>
+    <message>
+        <source>This is the default value used for the &apos;Run User Job #4&apos; setting when a new scheduled recording is created.</source>
+        <translation>Falls gesetzt, wird für neue Aufnahmen der Auftragstyp 4 standardmäßig aktiviert sein.</translation>
     </message>
 </context>
 <context>
@@ -5817,11 +5861,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Failed to open the card</source>
-        <translation type="unfinished"></translation>
+        <translation>Konnte die Karte nicht ansprechen</translation>
     </message>
     <message>
         <source>Failed to probe the card</source>
-        <translation type="unfinished"></translation>
+        <translation>Konnte die Karte nicht finden</translation>
     </message>
 </context>
 <context>
