@@ -40,6 +40,7 @@ DecoderBase::DecoderBase(NuppelVideoPlayer *parent, MythSqlDatabase *db,
 
     getrawframes = false;
     getrawvideo = false; 
+    errored = false;
 }
 
 void DecoderBase::Reset(void)

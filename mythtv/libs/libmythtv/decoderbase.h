@@ -67,6 +67,7 @@ class DecoderBase
     virtual void decCurrentAudioTrack(){}
     virtual bool setCurrentAudioTrack(int){ return false;}
                                                           
+    bool IsErrored() { return errored; }
   protected:
     typedef struct posmapentry
     {
@@ -116,6 +117,7 @@ class DecoderBase
     bool getrawvideo;
 
     int currentAudioTrack;
+    bool errored;
 };
 
 #endif

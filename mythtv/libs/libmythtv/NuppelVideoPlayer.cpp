@@ -596,8 +596,13 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 
     if (!decoder)
     {
-        cerr << "Couldn't find a matching decoder for: "
-             << ringBuffer->GetFilename() << endl;
+        VERBOSE(VB_IMPORTANT, QString("NVP: Couldn't find a matching decoder for: %1").
+                arg(ringBuffer->GetFilename()));
+        return -1;
+    } else if (decoder->IsErrored())
+    {
+        VERBOSE(VB_IMPORTANT, "NVP: NuppelDecoder encountered error during creation.");
+        delete decoder;
         return -1;
     }
 
@@ -3226,8 +3231,9 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm
 {
     if (dm_iter == NULL && honorCutList)
         dm_iter = deleteMap.begin();
-
-    decoder->GetFrame(0);
+    
+    if (!decoder->GetFrame(0))
+        return false;
     if (eof)
         return false;
 

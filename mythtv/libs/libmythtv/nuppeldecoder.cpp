@@ -24,56 +24,50 @@ pthread_mutex_t avcodeclock = PTHREAD_MUTEX_INITIALIZER;
 
 NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
                              ProgramInfo *pginfo)
-             : DecoderBase(parent, db, pginfo)
+    : DecoderBase(parent, db, pginfo),
+      gf(0), rtjd(0), video_width(0), video_height(0), video_size(0),
+      video_frame_rate(0.0f), audio_samplerate(44100), 
+#ifdef WORDS_BIGENDIAN
+      audio_bits_per_sample(0),
+#endif
+      ffmpeg_extradatasize(0), ffmpeg_extradata(0), usingextradata(false),
+      disablevideo(false), totalLength(0), totalFrames(0), effdsp(0), 
+      directbuf(0), mpa_codec(0), mpa_ctx(0), mpa_pic(0), directrendering(false),
+      lastct('1'), strm(0), buf(0), buf2(0), 
+      videosizetotal(0), videoframesread(0), setreadahead(false)
 {
-    ffmpeg_extradata = NULL;
-    ffmpeg_extradatasize = 0;
-
-    usingextradata = false;
+    // initialize structures
+    memset(&fileheader, 0, sizeof(rtfileheader));
+    memset(&frameheader, 0, sizeof(rtframeheader));
     memset(&extradata, 0, sizeof(extendeddata));
+    memset(&tmppicture, 0, sizeof(AVPicture));
+    memset(&mpa_pic_tmp, 0, sizeof(AVPicture));
+    planes[0] = planes[1] = planes[2] = 0;
 
+    // set parent class variables
     positionMapType = MARK_KEYFRAME;
-
-    totalLength = 0;
-    totalFrames = 0;
+    lastKey = 0;
+    framesPlayed = 0;
+    getrawframes = false;
+    getrawvideo = false;
 
     gf = lame_init();
     lame_set_decode_only(gf, 1);
     lame_decode_init();
     lame_init_params(gf);
 
-    int i;
     rtjd = new RTjpeg();
-    i = RTJ_YUV420;
-    rtjd->SetFormat(&i);
-
-    if (lzo_init() != LZO_E_OK)
-    {
-        cerr << "lzo_init() failed, exiting\n";
-    }
+    int format = RTJ_YUV420;
+    rtjd->SetFormat(&format);
 
     avcodec_init();
     avcodec_register_all();
-
-    mpa_codec = 0;
-    mpa_ctx = NULL;
-    mpa_pic = NULL;
-    directrendering = false;
-    directbuf = NULL;
-
-    buf = NULL;
-    buf2 = NULL;
-    strm = NULL;
-
-    lastct = '1';
-
-    audio_samplerate = 44100;
-
-    lastKey = 0;
-    framesPlayed = 0;
-
-    getrawframes = false;
-    getrawvideo = false;
+    if (lzo_init() != LZO_E_OK)
+    {
+        VERBOSE(VB_IMPORTANT, "NuppelDecoder: lzo_init() failed, aborting");
+        errored = true;
+        return;
+    }
 }
 
 NuppelDecoder::~NuppelDecoder()
@@ -1070,7 +1064,8 @@ bool NuppelDecoder::GetFrame(int avignore)
                     else if (lameret < 0)
                     {
                         VERBOSE(VB_IMPORTANT, QString("lame decode error: %1, exiting").arg(lameret));
-                        exit(-15);
+                        errored = true;
+                        return false;
                     }
                     packetlen = 0;
                 } while (lameret > 0);
