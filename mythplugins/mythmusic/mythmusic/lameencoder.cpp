@@ -63,6 +63,7 @@ int LameEncoder::init_encoder(lame_global_flags *gf, int quality, int vbr)
             break;
     }
 
+    lame_set_preset(gf, STANDARD);
     lame_set_num_channels(gf, channels);
     lame_set_mode(gf, channels == 2 ? STEREO : MONO);
     lame_set_in_samplerate(gf, samplerate);

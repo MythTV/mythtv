@@ -398,8 +398,7 @@ void Ripper::ripthedisc(void)
     MythDialog *newdiag = new MythDialog(gContext->GetMainWindow(), 
                                          tr("Ripping..."));
     
-    newdiag->setFont(QFont("Arial", (int)(gContext->GetBigFontSize() * hmult),
-                     QFont::Bold));
+    newdiag->setFont(gContext->GetBigFont());
 
     QVBoxLayout *vb = new QVBoxLayout(newdiag, 20);
 
