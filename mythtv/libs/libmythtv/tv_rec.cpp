@@ -30,7 +30,7 @@ void *SpawnEncode(void *param)
     return NULL;
 }
 
-TVRec::TVRec(const QString &startchannel, int capturecardnum) 
+TVRec::TVRec(int capturecardnum) 
 {
     db_conn = NULL;
     channel = NULL;
@@ -50,18 +50,19 @@ TVRec::TVRec(const QString &startchannel, int capturecardnum)
 
     audiosamplerate = -1;
 
-    QString inputname;
+    QString inputname, startchannel;
 
     GetDevices(capturecardnum, videodev, vbidev, audiodev, audiosamplerate,
-               inputname);
+               inputname, startchannel);
 
     channel = new Channel(this, videodev);
     channel->Open();
     channel->SetFormat(gContext->GetSetting("TVFormat"));
     channel->SetFreqTable(gContext->GetSetting("FreqTable"));
-    if (inputname != "")
-        channel->SwitchToInput(inputname);
-    channel->SetChannelByString(startchannel);
+    if (inputname.isEmpty())
+        channel->SetChannelByString(startchannel);
+    else
+        channel->SwitchToInput(inputname, startchannel);
     channel->SetChannelOrdering(chanorder);
     channel->Close();
 }
@@ -255,6 +256,8 @@ void TVRec::HandleStateChange(void)
     else if (internalState == kState_WatchingLiveTV && 
              nextState == kState_None)
     {
+        channel->StoreInputChannels();
+
         closeRecorder = true;
 
         internalState = nextState;
@@ -292,6 +295,8 @@ void TVRec::HandleStateChange(void)
     else if (internalState == kState_WatchingLiveTV &&
              nextState == kState_WatchingRecording)
     {
+        channel->StoreInputChannels();
+
         nvr->Pause();
         while (!nvr->GetPause())
             usleep(5);
@@ -580,8 +585,7 @@ void TVRec::SetChannel(bool needopen)
 
     pthread_mutex_unlock(&db_lock);
 
-    channel->SwitchToInput(inputname);
-    channel->SetChannelByString(chanstr);
+    channel->SwitchToInput(inputname, chanstr);
 
     if (needopen)
         channel->Close();
@@ -770,12 +774,14 @@ void TVRec::DisconnectDB(void)
 }
 
 void TVRec::GetDevices(int cardnum, QString &video, QString &vbi, 
-                       QString &audio, int &rate, QString &defaultinput)
+                       QString &audio, int &rate, QString &defaultinput,
+                       QString &startchan)
 {
     video = "";
     vbi = "";
     audio = "";
     defaultinput = "Television";
+    startchan = "3";
 
     pthread_mutex_lock(&db_lock);
 
@@ -815,6 +821,25 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
             rate = testnum;
         else
             rate = -1;
+    }
+
+    thequery = QString("SELECT if(startchan, startchan, '3') "
+                       "FROM capturecard,cardinput WHERE inputname = \"%1\" "
+                       "AND capturecard.cardid = %2 "
+                       "AND capturecard.cardid = cardinput.cardid;")
+                       .arg(defaultinput).arg(cardnum);
+
+    query = db_conn->exec(thequery);
+
+    if (!query.isActive())
+        MythContext::DBError("getstartchan", query);
+    else if (query.numRowsAffected() > 0)
+    {
+        query.next();
+
+        test = query.value(0).toString();
+        if (test != QString::null)
+            startchan = QString::fromUtf8(test);
     }
 
     pthread_mutex_unlock(&db_lock);
@@ -1066,7 +1091,9 @@ QString TVRec::GetNextChannel(Channel *chan, int channeldirection)
     else
     {
         cerr << "Channel: \'" << channum << "\' was not found in the database.";
-        cerr << "\nMost likely, your DefaultTVChannel setting is wrong\n";
+        cerr << "\nMost likely, the default channel set for this input\n";
+        cerr << "(" << device << " " << channelinput << " )\n";
+        cerr << "in setup is wrong\n";
 
         thequery = QString("SELECT %1 FROM channel,capturecard,cardinput "
                            "WHERE channel.sourceid = cardinput.sourceid AND "
@@ -1169,44 +1196,6 @@ QString TVRec::GetNextChannel(Channel *chan, int channeldirection)
     pthread_mutex_unlock(&db_lock);
 
     return ret;
-}
-
-bool TVRec::ChangeExternalChannel(const QString& channum)
-{
-    QString query = QString("SELECT cardinput.externalcommand "
-                            "FROM cardinput,channel,capturecard "
-                            "WHERE channel.channum = %1 "
-                            "AND channel.sourceid = cardinput.sourceid "
-                            "AND cardinput.inputname = '%2' "
-                            "AND cardinput.cardid = capturecard.cardid "
-                            "AND capturecard.videodevice = '%3' "
-                            "AND capturecard.hostname = \"%4\";")
-                           .arg(channum).arg(channel->GetCurrentInput())
-                           .arg(channel->GetDevice())
-                           .arg(gContext->GetHostName());
-
-    QString command(QString::null);
-
-    pthread_mutex_lock(&db_lock);
-
-    QSqlQuery result = db_conn->exec(query);
-    if (!result.isActive())
-        MythContext::DBError("changeexternalchannel", result);
-    else if (result.numRowsAffected()) {
-        result.next();
-        command = QString("%1 %2")
-            .arg(result.value(0).toString())
-            .arg(channum);
-
-    }
-    pthread_mutex_unlock(&db_lock);
-
-    if (command != QString::null) {
-        cout << "External channel change: " << command << endl;
-        system(command.ascii());
-    }
-
-    return true;
 }
 
 bool TVRec::IsReallyRecording(void)
@@ -1618,3 +1607,70 @@ void TVRec::FlagBlankFrames()
         curRecording->SetCommBreakList(comm_breaks, db_conn);
     }
 }
+
+void TVRec::RetrieveInputChannels(map<int, QString> &inputChannel,
+                                  map<int, QString> &inputTuneTo,
+                                  map<int, QString> &externalChanger)
+{
+    pthread_mutex_lock(&db_lock);
+    MythContext::KickDatabase(db_conn);
+
+    QString query = QString("SELECT inputname, trim(externalcommand), "
+                            "if(tunechan='', 'Undefined', tunechan), "
+                            "if(startchan, startchan, '') "
+                            "FROM capturecard, cardinput "
+                            "WHERE capturecard.cardid = %1 "
+                            "AND capturecard.cardid = cardinput.cardid;")
+                            .arg(m_capturecardnum);
+
+    QSqlQuery result = db_conn->exec(query);
+
+    if (!result.isActive())
+        MythContext::DBError("RetrieveInputChannels", result);
+    else if (!result.numRowsAffected())
+    {
+        cerr << "Error getting inputs for the capturecard.  Perhaps you have\n"
+                "forgotten to bind video sources to your card's inputs?\n";
+    }
+    else
+    {
+        int cap;
+
+        while (result.next())
+        {
+            cap = channel->GetInputByName(result.value(0).toString());
+            externalChanger[cap] = result.value(1).toString();
+            inputTuneTo[cap] = result.value(2).toString();
+            inputChannel[cap] = result.value(3).toString();
+        }
+    }
+
+    pthread_mutex_unlock(&db_lock);
+}
+
+void TVRec::StoreInputChannels(map<int, QString> &inputChannel)
+{
+    QString query, input;
+
+    pthread_mutex_lock(&db_lock);
+    MythContext::KickDatabase(db_conn);
+
+    for (int i = 0;; i++)
+    {
+        input = channel->GetInputByNum(i);
+        if (input.isEmpty())
+            break;
+
+        query = QString("UPDATE cardinput set startchan = '%1' "
+                        "WHERE cardid = %2 AND inputname = '%3';")
+                        .arg(inputChannel[i]).arg(m_capturecardnum).arg(input);
+
+        QSqlQuery result = db_conn->exec(query);
+
+        if (!result.isActive())
+            MythContext::DBError("StoreInputChannels", result);
+    }
+
+    pthread_mutex_unlock(&db_lock);
+}
+

@@ -99,6 +99,9 @@ void Channel::SetFormat(const QString &format)
 
         cout << "Probed: " << device << " - " << test.name << endl;
         channelnames[i] = test.name;
+        inputChannel[i] = "";
+        inputTuneTo[i] = "";
+        externalChanger[i] = "";
     }
 
     struct video_channel vc;
@@ -108,6 +111,8 @@ void Channel::SetFormat(const QString &format)
     ioctl(videofd, VIDIOCSCHAN, &vc);
 
     videomode = mode;
+
+    pParent->RetrieveInputChannels(inputChannel, inputTuneTo, externalChanger);
 }
 
 void Channel::SetFreqTable(const QString &name)
@@ -148,41 +153,41 @@ bool Channel::SetChannelByString(const QString &chan)
 
     if (pParent->CheckChannel(this, chan, finetune))
     {
-
-        if (GetCurrentInput() == "Television")
+        if (externalChanger[currentcapchannel].isEmpty())
         {
             int i = GetCurrentChannelNum(chan);
-            if (i == -1)
+            if (i == -1 || !TuneTo(chan, finetune))
                 return false;
-
-            int frequency = curList[i].freq * 16 / 1000 + finetune;
-            if (ioctl(videofd, VIDIOCSFREQ, &frequency) == -1)
-                perror("channel set:");
-
-            curchannelname = chan;
-
-            pParent->SetVideoFiltersForChannel(this, chan);
-            SetContrast();
-            SetColour();
-            SetBrightness();
-            return true;
         }
-        else
-        {
-            if (pParent->ChangeExternalChannel(chan))
-            {
-                curchannelname = chan;
+        else if (!ChangeExternalChannel(chan))
+            return false;
 
-                pParent->SetVideoFiltersForChannel(this, chan);
-                SetContrast();
-                SetColour();
-                SetBrightness();
-                return true;
-            }
-        }
+        curchannelname = chan;
+
+        pParent->SetVideoFiltersForChannel(this, chan);
+        SetContrast();
+        SetColour();
+        SetBrightness();
+
+        inputChannel[currentcapchannel] = curchannelname;
+
+        return true;
     }
 
     return false;
+}
+
+bool Channel::TuneTo(const QString &chan, int finetune)
+{
+    int i = GetCurrentChannelNum(chan);
+    int frequency = curList[i].freq * 16 / 1000 + finetune;
+    if (ioctl(videofd, VIDIOCSFREQ, &frequency) == -1)
+    {
+        perror("channel set:");
+        return false;
+    }
+
+    return true;
 }
 
 int Channel::GetCurrentChannelNum(const QString &channame)
@@ -289,41 +294,73 @@ QString Channel::GetCurrentInput(void)
 
 void Channel::ToggleInputs(void)
 {
-    currentcapchannel++;
-    if (currentcapchannel >= capchannels)
-        currentcapchannel = 0;
+    int newcapchannel = currentcapchannel;
 
-    struct video_channel set;
-    memset(&set, 0, sizeof(set));
-    ioctl(videofd, VIDIOCGCHAN, &set);
-    set.channel = currentcapchannel;
-    set.norm = videomode;
-    ioctl(videofd, VIDIOCSCHAN, &set);
+    do 
+    {
+        newcapchannel = (newcapchannel + 1) % capchannels;
+    } while (inputTuneTo[newcapchannel].isEmpty());
+
+    SwitchToInput(newcapchannel, true);
 }
 
-void Channel::SwitchToInput(const QString &input)
+QString Channel::GetInputByNum(int capchannel)
 {
-    int inputnum = 0;
-    for (int i = 0; i < capchannels; i++)
-    {
+    if (capchannel > capchannels)
+        return "";
+    return channelnames[capchannel];
+}
+
+int Channel::GetInputByName(const QString &input)
+{
+    for (int i = capchannels-1; i >= 0; i--)
         if (channelnames[i] == input)
-            inputnum = i;
+            return i;
+    return -1;
+}
+
+void Channel::SwitchToInput(const QString &inputname)
+{
+    int input = GetInputByName(inputname);
+
+    if (input >= 0)
+        SwitchToInput(input, true);
+}
+
+void Channel::SwitchToInput(const QString &inputname, const QString &chan)
+{
+    int input = GetInputByName(inputname);
+
+    if (input >= 0)
+    {
+        SwitchToInput(input, false);
+        SetChannelByString(chan);
     }
+}
 
-    if (inputnum == currentcapchannel)
+void Channel::SwitchToInput(int newcapchannel, bool setstarting)
+{
+    if (newcapchannel == currentcapchannel)
         return;
-
-    currentcapchannel = inputnum;
 
     struct video_channel set;
     memset(&set, 0, sizeof(set));
     ioctl(videofd, VIDIOCGCHAN, &set);
-    set.channel = currentcapchannel;
+    set.channel = newcapchannel;
     set.norm = videomode;
     if (ioctl(videofd, VIDIOCSCHAN, &set) < 0)
     {
         perror("VIDIOCSCHAN: ");
     }
+
+    currentcapchannel = newcapchannel;
+    curchannelname = "";
+
+    if (inputTuneTo[currentcapchannel] != "Undefined")
+        TuneTo(inputTuneTo[currentcapchannel], 0);
+
+    if (setstarting && !inputChannel[currentcapchannel].isEmpty())
+        SetChannelByString(inputChannel[currentcapchannel]);
 }
 
 void Channel::SetContrast()
@@ -581,5 +618,24 @@ int Channel::ChangeColour(bool up)
     }
     
     return vid_pic.colour;
+}
+
+bool Channel::ChangeExternalChannel(const QString &channum)
+{
+    if (externalChanger[currentcapchannel].isEmpty())
+        return false;
+
+    QString command = QString("%1 %2").arg(externalChanger[currentcapchannel])
+                                      .arg(channum);
+
+    cout << "External channel change: " << command << endl;
+    system(command.ascii());
+
+    return true;
+}
+
+void Channel::StoreInputChannels(void)
+{
+    pParent->StoreInputChannels(inputChannel);
 }
 

@@ -1,5 +1,8 @@
 USE mythconverg;
 
+ALTER TABLE cardinput ADD tunechan CHAR(5) NOT NULL;
+ALTER TABLE cardinput ADD startchan CHAR(5) NOT NULL;
+
 ALTER TABLE channel ADD COLUMN contrast INT DEFAULT 32768;
 ALTER TABLE channel ADD COLUMN brightness INT DEFAULT 32768;
 ALTER TABLE channel ADD COLUMN colour INT DEFAULT 32768;

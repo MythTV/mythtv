@@ -7,6 +7,9 @@
 
 #include "tv.h"
 
+#include <map>
+using namespace std;
+
 class QSqlDatabase;
 class QSocket;
 class Channel;
@@ -17,7 +20,7 @@ class NuppelVideoRecorder;
 class TVRec
 {
  public:
-    TVRec(const QString &startchannel, int capturecardnum);
+    TVRec(int capturecardnum);
    ~TVRec(void);
 
     void Init(void);
@@ -39,11 +42,17 @@ class TVRec
     bool IsRecording(void) { return StateIsRecording(internalState); }
 
     bool CheckChannel(Channel *chan, const QString &channum, int &finetuning); 
-    void SetChannelValue(QString &field_name,int value, Channel *chan, const QString &channum);
-    int GetChannelValue(const QString &channel_field,Channel *chan, const QString &channum);
-    bool ChangeExternalChannel(const QString &channum);
+    void SetChannelValue(QString &field_name,int value, Channel *chan,
+                         const QString &channum);
+    int GetChannelValue(const QString &channel_field,Channel *chan, 
+                        const QString &channum);
     bool SetVideoFiltersForChannel(Channel *chan, const QString &channum);
     QString GetNextChannel(Channel *chan, int channeldirection);
+
+    void RetrieveInputChannels(map<int, QString> &inputChannel,
+                               map<int, QString> &inputTuneTo,
+                               map<int, QString> &externalChanger);
+    void StoreInputChannels(map<int, QString> &inputChannel);
 
     bool IsReallyRecording(void);
     float GetFramerate(void);
@@ -100,7 +109,7 @@ class TVRec
                         QString &channelname);
 
     void GetDevices(int cardnum, QString &video, QString &vbi, QString &audio,
-                    int &rate, QString &defaultinput);
+                    int &rate, QString &defaultinput, QString &startchannel);
 
     void ConnectDB(int cardnum);
     void DisconnectDB(void);

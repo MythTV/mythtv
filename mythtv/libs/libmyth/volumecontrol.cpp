@@ -14,10 +14,20 @@ using namespace std;
 VolumeControl::VolumeControl(bool setstartingvolume)
 {
     mute = false;
-    volume = 0;
   
     QString device = gContext->GetSetting("MixerDevice", "/dev/mixer");
     mixerfd = open(device.ascii(), O_RDONLY);
+
+    QString controlLabel = gContext->GetSetting("MixerControl", "PCM");
+
+    if (controlLabel == "Master")
+    {
+        control = SOUND_MIXER_VOLUME;
+    }
+    else
+    {
+        control = SOUND_MIXER_PCM;
+    }
 
     if (mixerfd < 0)
     {
@@ -41,15 +51,8 @@ VolumeControl::VolumeControl(bool setstartingvolume)
         if (ret < 0)
             perror("Setting PCM volume: ");
     }
-    else
-    {
-        int realvol;
-        int ret = ioctl(mixerfd, MIXER_READ(SOUND_MIXER_PCM), &realvol);
-        if (ret < 0)
-            perror("Reading PCM volume: ");
 
-        volume = realvol & 0xff; // just use the left channel
-    }
+    GetCurrentVolume();
 }
 
 VolumeControl::~VolumeControl()
@@ -60,6 +63,13 @@ VolumeControl::~VolumeControl()
 
 int VolumeControl::GetCurrentVolume(void)
 {
+    int realvol;
+    int ret = ioctl(mixerfd, MIXER_READ(control), &realvol);
+    if (ret < 0)
+        perror("Reading PCM volume: ");
+
+    volume = realvol & 0xff; // just use the left channel
+
     return volume;
 }
 
@@ -75,9 +85,9 @@ void VolumeControl::SetCurrentVolume(int value)
     if (mixerfd > 0)
     {
         int realvol = (volume << 8) + volume;
-        int ret = ioctl(mixerfd, MIXER_WRITE(SOUND_MIXER_PCM), &realvol);
+        int ret = ioctl(mixerfd, MIXER_WRITE(control), &realvol);
         if (ret < 0)
-            perror("Setting PCM volume: ");
+            perror("Setting volume: ");
     }
 
     mute = false;
@@ -85,7 +95,7 @@ void VolumeControl::SetCurrentVolume(int value)
 
 void VolumeControl::AdjustCurrentVolume(int change)
 {
-    int newvol = volume + change;
+    int newvol = GetCurrentVolume() + change;
 
     SetCurrentVolume(newvol);
 }
@@ -101,9 +111,9 @@ void VolumeControl::SetMute(bool on)
 
     if (mixerfd > 0)
     {
-        int ret = ioctl(mixerfd, MIXER_WRITE(SOUND_MIXER_PCM), &realvol);
+        int ret = ioctl(mixerfd, MIXER_WRITE(control), &realvol);
         if (ret < 0)
-            perror("Setting PCM volume: ");
+            perror("Setting mute:");
     }
 
     mute = on;

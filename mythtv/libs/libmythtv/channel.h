@@ -38,6 +38,13 @@ class Channel
 
     void ToggleInputs(void); 
     void SwitchToInput(const QString &input);
+    void SwitchToInput(const QString &input, const QString &chan);
+    void SwitchToInput(int newcapchannel, bool setstarting);
+
+    int GetInputByName(const QString &input);
+    QString GetInputByNum(int capchannel);
+
+    void StoreInputChannels(void);
  
     QString GetCurrentName(void);
     QString GetCurrentInput(void);
@@ -49,7 +56,10 @@ class Channel
 
   private:
     int GetCurrentChannelNum(const QString &channame);
- 
+
+    bool TuneTo(const QString &chan, int finetune);
+    bool ChangeExternalChannel(const QString &newchan);
+
     QString device;
     bool isopen;  
     int videofd;
@@ -65,6 +75,9 @@ class Channel
     int capchannels;
     int currentcapchannel;
     map<int, QString> channelnames;
+    map<int, QString> inputTuneTo;
+    map<int, QString> externalChanger;
+    map<int, QString> inputChannel;
 
     QString channelorder;
 };

@@ -19,6 +19,8 @@ class VolumeControl
     int mixerfd;
     int volume;
 
+    int control;
+
     bool mute;
 };
 

@@ -428,6 +428,29 @@ public:
     };
 };
 
+class PresetTuner: public LineEditSetting, public CISetting {
+public:
+    PresetTuner(const CardInput& parent):
+        CISetting(parent, "tunechan") {
+        setLabel("Preset tuner to channel");
+        setValue("");
+        setHelpText("If specified, the tuner will change to this channel "
+                    "when the input is selected.  This is only useful if you "
+                    "use your tuner input with an external channel changer");
+    };
+};
+
+class StartingChannel: public LineEditSetting, public CISetting {
+public:
+    StartingChannel(const CardInput& parent):
+        CISetting(parent, "startchan") {
+        setLabel("Starting channel");
+        setValue("3");
+        setHelpText("LiveTV will change to the above channel when the "
+                    "input is first selected");
+    };
+};
+
 class CardInput: public VerticalConfigurationGroup, public ConfigurationDialog {
 public:
     CardInput() {
@@ -437,6 +460,8 @@ public:
         addChild(inputname = new InputName(*this));
         addChild(sourceid = new SourceID(*this));
         addChild(new ExternalChannelCommand(*this));
+        addChild(new PresetTuner(*this));
+        addChild(new StartingChannel(*this));
     };
 
     int getInputID(void) const { return id->intValue(); };

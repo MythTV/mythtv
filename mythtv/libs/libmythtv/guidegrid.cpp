@@ -1894,15 +1894,15 @@ QRect GuideGrid::programRect() const
         unsigned int min_datewidth = 74;   // also min_chanwidth
         unsigned int titleheight = (int)((showtitle ? 40 : 0) * hmult);
 
-        unsigned int programheight = (int)((600 - min_dateheight - 
-                                           titleheight) * hmult);
+        unsigned int programheight = (int)((600 - min_dateheight) * hmult) - 
+                                     titleheight;
 
         if (showProgramBar == 0)
             programheight = DISPLAY_CHANS * (int)(programheight / DISPLAY_CHANS);
         else
             programheight = (DISPLAY_CHANS * (int)(programheight / DISPLAY_CHANS)) - (int)(25 * 1.5 * hmult);
 
-        unsigned int programwidth = (int)((800 - min_datewidth) * hmult);
+        unsigned int programwidth = (int)((800 - min_datewidth) * wmult);
         programwidth = DISPLAY_TIMES * (int)(programwidth / DISPLAY_TIMES);
 
         if (showProgramBar == 0)

@@ -146,7 +146,9 @@ CREATE TABLE IF NOT EXISTS cardinput
     inputname VARCHAR(32) NOT NULL,
     externalcommand VARCHAR(128) NULL,
     preference INT,
-    shareable CHAR DEFAULT 'N'
+    shareable CHAR DEFAULT 'N',
+    tunechan CHAR(5) NOT NULL,
+    startchan CHAR(5) NOT NULL
 );
 CREATE TABLE IF NOT EXISTS favorites (
     favid int(11) unsigned NOT NULL auto_increment,
