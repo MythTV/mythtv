@@ -1,6 +1,7 @@
 .qmake.internal.cache
 Makefile
 libmyth.so.*
+libmyth-*
 moc_dialogbox.cpp
 moc_guidegrid.cpp
 moc_infodialog.cpp

@@ -10,7 +10,7 @@ target.path = $${PREFIX}/bin
 INSTALLS = target
 
 INCLUDEPATH += ../../libs/libNuppelVideo ../../libs
-LIBS += -lmyth -L/usr/local/lib -L../../libs/libmyth
+LIBS += -lmyth-$$LIBVERSION -L/usr/local/lib -L../../libs/libmyth
 
 # Input
 SOURCES += main.cpp

@@ -9,7 +9,7 @@ TARGET = menutest
 include ( ../../settings.pro )
 
 INCLUDEPATH += ../../libs/libmyth
-LIBS += -lmyth -L/usr/local/lib -L../../libs/libmyth
+LIBS += -lmyth-$$LIBVERSION -L/usr/local/lib -L../../libs/libmyth
 
 # Input
 SOURCES += main.cpp

@@ -5,12 +5,12 @@
 include ( ../../settings.pro )
 
 TEMPLATE = lib
-TARGET = myth
+TARGET = myth-$$LIBVERSION
 CONFIG += thread dll
 target.path = $${PREFIX}/lib
 INSTALLS = target
 
-VERSION = 0.6.0
+VERSION = 0.7.0
 
 # Input
 HEADERS += dialogbox.h guidegrid.h infodialog.h infostructs.h lcddevice.h 
