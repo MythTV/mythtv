@@ -184,10 +184,12 @@ char myHostname[64];
     if (gContext->GetNumSetting("SipRegisterWithProxy", 1))
         Uri = gContext->GetSetting("SipProxyAuthName");
     else
+    {
         Uri = "MythPhone@" + GetMySipIp();
-    int     myPort    = atoi((const char *)gContext->GetSetting("SipLocalPort"));
-    if (myPort != 5060)
-        Uri += ":" + QString::number(myPort);
+        int     myPort    = atoi((const char *)gContext->GetSetting("SipLocalPort"));
+        if (myPort != 5060)
+            Uri += ":" + QString::number(myPort);
+    }
 
 
     // First check if an entry already exists; and if it is up-to-date (IP address etc)
