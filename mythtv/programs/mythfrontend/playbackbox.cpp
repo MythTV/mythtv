@@ -1280,8 +1280,6 @@ void PlaybackBox::selected()
 
 void PlaybackBox::showActionsSelected()
 {
-    state = kStopping;
-
     if (!curitem)
         return;
 
@@ -1446,9 +1444,6 @@ void PlaybackBox::showActions(ProgramInfo *toExp)
 
 void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
 {
-    timer->stop();
-    playingVideo = false;
-
     updateFreeSpace = true;
 
     backup.begin(this);
@@ -1546,9 +1541,6 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
 
 void PlaybackBox::showActionPopup(ProgramInfo *program)
 {
-    timer->stop();
-    playingVideo = false;
-
     backup.begin(this);
     grayOut(&backup);
     backup.end();
@@ -1587,6 +1579,8 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
 void PlaybackBox::initPopup(MythPopupBox *popup, ProgramInfo *program,
                             QString message, QString message2)
 {
+    killPlayerSafe();
+
     QDateTime startts = program->startts;
     QDateTime endts = program->endts;
 
@@ -1671,6 +1665,8 @@ void PlaybackBox::noStop(void)
     delete delitem;
     delitem = NULL;
 
+    state = kChanging;
+
     timer->start(500);
 }
 
@@ -1685,6 +1681,8 @@ void PlaybackBox::doStop(void)
 
     delete delitem;
     delitem = NULL;
+
+    state = kChanging;
 
     timer->start(500);
 }
@@ -1709,6 +1707,8 @@ void PlaybackBox::noDelete(void)
     delete delitem;
     delitem = NULL;
 
+    state = kChanging;
+
     timer->start(500);
 }
 
@@ -1723,6 +1723,8 @@ void PlaybackBox::doDelete(void)
 
     delete delitem;
     delitem = NULL;
+
+    state = kChanging;
 
     timer->start(500);
 }
@@ -1739,6 +1741,8 @@ void PlaybackBox::doDeleteForgetHistory(void)
     delete delitem;
     delitem = NULL;
 
+    state = kChanging;
+
     timer->start(500);
 }
 
@@ -1754,6 +1758,8 @@ void PlaybackBox::noAutoExpire(void)
 
     delete delitem;
     delitem = NULL;
+
+    state = kChanging;
 }
 
 void PlaybackBox::doAutoExpire(void)
@@ -1768,6 +1774,8 @@ void PlaybackBox::doAutoExpire(void)
 
     delete delitem;
     delitem = NULL;
+
+    state = kChanging;
 }
 
 void PlaybackBox::doCancel(void)
@@ -1779,6 +1787,8 @@ void PlaybackBox::doCancel(void)
 
     delete delitem;
     delitem = NULL;
+
+    state = kChanging;
 }
 
 void PlaybackBox::promptEndOfRecording(ProgramInfo *rec)
@@ -2106,8 +2116,7 @@ void PlaybackBox::showIconHelp(void)
         return;
     }
 
-    timer->stop();
-    playingVideo = false;
+    killPlayerSafe();
 
     backup.begin(this);
     grayOut(&backup);
@@ -2126,11 +2135,11 @@ void PlaybackBox::showIconHelp(void)
     backup.drawPixmap(0, 0, myBackground);
     backup.end();
 
+    state = kChanging;
+
     skipUpdate = false;
     skipCnt = 2;
     update(fullRect);
 
     setActiveWindow();
-
-    timer->start(500);
 }
