@@ -131,9 +131,11 @@ void TVMenuCallback(void *data, QString &selection)
         startDelete(context);
     else if (sel == "tv_fix_conflicts")
         startManaged(context);
-    else if (sel == "settings themes")
-        themesSettings(context);
-    else if (sel == "settings recording") {
+    else if (sel == "settings themes") {
+        ThemeSettings settings(context);
+        settings.exec(QSqlDatabase::database());
+        //themesSettings(context);
+    } else if (sel == "settings recording") {
         RecordingProfileEditor editor(context, QSqlDatabase::database());
         editor.exec(QSqlDatabase::database());
     } else if (sel == "settings general") {
