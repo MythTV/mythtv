@@ -206,11 +206,14 @@ void ViewScheduled::FillList(void)
     vector<ProgramInfo *> schedListFilter;
     conflictBool = RemoteGetAllPendingRecordings(schedList);
 
+    QDateTime now = QDateTime::currentDateTime();
+
     vector<ProgramInfo *>::iterator i;
     for (i = schedList.begin(); i != schedList.end(); i++)
     {
         ProgramInfo *p = *i;
-        if (p->recording || showAll || p->norecord > nrOtherShowing)
+        if ((p->recording || showAll || p->recstatus > rsOtherShowing) &&
+            p->recendts >= now)
             schedListFilter.push_back(p);
         else
             delete p;
@@ -282,10 +285,7 @@ void ViewScheduled::updateList(QPainter *p)
                     temp += " - \"" + p->subtitle + "\"";
                 ltype->SetItemText(i, 3, temp);
 
-                if (p->recording)
-                    temp = QString::number(p->cardid);
-                else
-                    temp = p->NoRecordChar();
+                temp = p->RecStatusChar();
                 ltype->SetItemText(i, 4, temp);
 
                 if (i + skip == listPos)

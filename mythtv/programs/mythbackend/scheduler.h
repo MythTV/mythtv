@@ -29,6 +29,7 @@ class Scheduler : public QObject
 
     void FillEncoderFreeSpaceCache();
 
+    void AddToDontRecord(ProgramInfo *pginfo);
     void RemoveRecording(ProgramInfo *pginfo);
 
     list<ProgramInfo *> *getAllPending(void) { return &recordingList; }
@@ -117,7 +118,6 @@ class Scheduler : public QObject
 
     bool threadrunning;
 
-    void AddToDontRecord(ProgramInfo *pginfo);
     void PruneDontRecords(void);
 
     QValueList<ProgramInfo> dontRecordList;

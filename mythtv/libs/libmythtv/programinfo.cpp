@@ -37,7 +37,7 @@ ProgramInfo::ProgramInfo(void)
     conflicting = false;
     recording = false;
     override = 0;
-    norecord = nrUnknown;
+    recstatus = rsUnknown;
     recordid = 0;
     rectype = kNotRecording;
     recdups = kRecordDupsNever;
@@ -77,7 +77,7 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
     conflicting = other.conflicting;
     recording = other.recording;
     override = other.override;
-    norecord = other.norecord;
+    recstatus = other.recstatus;
     recordid = other.recordid;
     rectype = other.rectype;
     recdups = other.recdups;
@@ -121,7 +121,7 @@ ProgramInfo &ProgramInfo::operator=(const ProgramInfo &other)
     conflicting = other.conflicting;
     recording = other.recording;
     override = other.override;
-    norecord = other.norecord;
+    recstatus = other.recstatus;
     recordid = other.recordid;
     rectype = other.rectype;
     recdups = other.recdups;
@@ -173,7 +173,7 @@ void ProgramInfo::ToStringList(QStringList &list)
     list << QString::number(cardid);
     list << QString::number(inputid);
     list << ((recpriority != "") ? recpriority : QString(" "));
-    list << QString::number(norecord);
+    list << QString::number(recstatus);
     list << QString::number(recordid);
     list << QString::number(rectype);
     list << QString::number(recdups);
@@ -219,7 +219,7 @@ void ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     cardid = (*(it++)).toInt();
     inputid = (*(it++)).toInt();
     recpriority = *(it++);
-    norecord = NoRecordType((*(it++)).toInt());
+    recstatus = RecStatusType((*(it++)).toInt());
     recordid = (*(it++)).toInt();
     rectype = RecordingType((*(it++)).toInt());
     recdups = RecordingDupsType((*(it++)).toInt());
@@ -299,8 +299,13 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
     length.sprintf("%d:%02d", hours, minutes);
     progMap["lentime"] = length;
 
-    progMap["rec_type"] = RecordingChar();
-    progMap["rec_str"] = RecordingText();
+    progMap["rec_type"] = RecTypeChar();
+    progMap["rec_str"] = RecTypeText();
+    if (rectype != kNotRecording)
+    {
+        progMap["rec_str"] += " - ";
+        progMap["rec_str"] += RecStatusText();
+    }
     progMap["recordingstatus"] = progMap["rec_str"];
     progMap["type"] = progMap["rec_str"];
 
@@ -330,53 +335,7 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
         if (query.next())
             progMap["iconpath"] = query.value(0).toString();
 
-    QString recstatus = "";
-    if (recording)
-    {
-        recstatus = QObject::tr("Recording on cardid: ") +
-                    QString::number(cardid);
-    }
-    else
-    {
-        recstatus = QObject::tr("Not Recording: ");
-        switch (norecord)
-        {
-            case nrManualOverride:
-                    recstatus += QObject::tr("Manual Override");
-                    break;
-            case nrPreviousRecording:
-                    recstatus += QObject::tr("Previously Recorded");
-                    break;
-            case nrCurrentRecording:
-                    recstatus += QObject::tr("Currently Recording");
-                    break;
-            case nrOtherShowing:
-                    recstatus += QObject::tr("Other Showing");
-                    break;
-            case nrTooManyRecordings:
-                    recstatus += QObject::tr("Too Many Recordings");
-                    break;
-            case nrDontRecordList:
-                    recstatus += QObject::tr("Don't Record List");
-                    break;
-            case nrLowerRecPriority:
-                    recstatus += QObject::tr("Lower Rec Priority");
-                    break;
-            case nrManualConflict:
-                    recstatus += QObject::tr("Manual Conflict");
-                    break;
-            case nrAutoConflict:
-                    recstatus += QObject::tr("Auto Conflict");
-                    break;
-            case nrOverlap:
-                    recstatus += QObject::tr("Overlap");
-                    break;
-            case nrUnknown:
-                    recstatus += QObject::tr("Reason Unknown");
-                    break;
-        }
-    }
-    progMap["RECSTATUS"] = recstatus;
+    progMap["RECSTATUS"] = RecStatusText();
 
     if (repeat)
         progMap["REPEAT"] = QObject::tr("Repeat");
@@ -817,9 +776,10 @@ bool ProgramInfo::IsSameTimeslot(const ProgramInfo& other) const
 bool ProgramInfo::IsSameProgramTimeslot(const ProgramInfo &other) const
 {
     if (chanid == other.chanid &&
-        startts == other.startts &&
-        endts == other.endts &&
-        sourceid == other.sourceid)
+        startts <= other.endts &&
+        endts >= other.startts &&
+        (sourceid == -1 || other.sourceid == -1 ||
+         sourceid == other.sourceid))
         return true;
     return false;
 }
@@ -1512,67 +1472,7 @@ void ProgramInfo::setOverride(QSqlDatabase *db, int override)
     }
 }
 
-QString ProgramInfo::NoRecordText(void)
-{
-    switch (norecord)
-    {
-    case nrManualOverride:
-        return "it was manually set to not record";
-    case nrPreviousRecording:
-        return "this episode was previously recorded according to the duplicate policy chosen for this title";
-    case nrCurrentRecording:
-        return "this episode was previously recorded and is still available in the list of recordings";
-    case nrOtherShowing:
-        return "this episode will be recorded at another time instead";
-    case nrTooManyRecordings:
-        return "too many recordings of this program have already been recorded";
-    case nrDontRecordList:
-        return "it is currently being recorded or was manually canceled";
-    case nrLowerRecPriority:
-        return "another program with a higher recording priority will be recorded";
-    case nrManualConflict:
-        return "another program was manually chosen to be recorded instead";
-    case nrAutoConflict:
-        return "another program was automatically chosen to be recorded instead";
-    case nrOverlap:
-        return "it is covered by another scheduled recording for the same program";
-    case nrUnknown:
-    default:
-        return "you should never see this";
-    }
-}
-
-QString ProgramInfo::NoRecordChar(void)
-{
-    switch (norecord)
-    {
-    case nrManualOverride:
-        return "X";
-    case nrPreviousRecording:
-        return "P";
-    case nrCurrentRecording:
-        return "C";
-    case nrOtherShowing:
-        return "O";
-    case nrTooManyRecordings:
-        return "T";
-    case nrDontRecordList:
-        return "D";
-    case nrLowerRecPriority:
-        return "R";
-    case nrManualConflict:
-        return "M";
-    case nrAutoConflict:
-        return "A";
-    case nrOverlap:
-        return "V";
-    case nrUnknown:
-    default:
-        return "-";
-    }
-}
-
-QString ProgramInfo::RecordingChar(void)
+QString ProgramInfo::RecTypeChar(void)
 {
     QString recstring = "";
 
@@ -1602,7 +1502,7 @@ QString ProgramInfo::RecordingChar(void)
     return recstring;
 }
 
-QString ProgramInfo::RecordingText(void)
+QString ProgramInfo::RecTypeText(void)
 {
     QString recstring;
 
@@ -1623,25 +1523,203 @@ QString ProgramInfo::RecordingText(void)
     case kAllRecord:
         recstring = QObject::tr("All Recording");
         break;
-    case kNotRecording:
     default:
         recstring = QObject::tr("Not Recording");
         break;
     }
 
-    if (rectype != kNotRecording)
+    return recstring;
+}
+
+QString ProgramInfo::RecStatusChar(void)
+{
+    switch (recstatus)
     {
-        recstring += " - ";
-        if (conflicting)
-            recstring += QObject::tr("Conflicting");
-        else if (recording)
-            recstring += QObject::tr("Will Record");
-        else
-            recstring += QObject::tr("Won't Record") +
-                " (" + NoRecordChar() + ")";
+    case rsDeleted:
+        return "D";
+    case rsStopped:
+        return "S";
+    case rsWillRecord:
+        return QString::number(cardid);
+    case rsRecording:
+        return QString::number(cardid);
+    case rsManualOverride:
+        return "X";
+    case rsPreviousRecording:
+        return "P";
+    case rsCurrentRecording:
+        return "C";
+    case rsOtherShowing:
+        return "O";
+    case rsTooManyRecordings:
+        return "T";
+    case rsCancelled:
+        return "N";
+    case rsLowerRecPriority:
+        return "R";
+    case rsManualConflict:
+        return "M";
+    case rsAutoConflict:
+        return "A";
+    case rsOverlap:
+        return "V";
+    case rsLowDiskSpace:
+        return "K";
+    case rsTunerBusy:
+        return "B";
+    default:
+        return "-";
+    }
+}
+
+QString ProgramInfo::RecStatusText(void)
+{
+    if (rectype == kNotRecording)
+        return QObject::tr("Not Recording");
+    else if (conflicting)
+        return QObject::tr("Conflicting");
+    else
+    {
+        switch (recstatus)
+        {
+        case rsDeleted:
+            return QObject::tr("Deleted");
+        case rsStopped:
+            return QObject::tr("Stopped");
+        case rsRecorded:
+            return QObject::tr("Recorded");
+        case rsRecording:
+            return QObject::tr("Recording");
+        case rsWillRecord:
+            return QObject::tr("Will Record");
+        case rsManualOverride:
+            return QObject::tr("Manual Override");
+        case rsPreviousRecording:
+            return QObject::tr("Previous Recording");
+        case rsCurrentRecording:
+            return QObject::tr("Current Recording");
+        case rsOtherShowing:
+            return QObject::tr("Other Showing");
+        case rsTooManyRecordings:
+            return QObject::tr("Max Recordings");
+        case rsCancelled:
+            return QObject::tr("Manual Cancel");
+        case rsLowerRecPriority:
+            return QObject::tr("Low Priority");
+        case rsManualConflict:
+            return QObject::tr("Manual Conflict");
+        case rsAutoConflict:
+            return QObject::tr("Auto Conflict");
+        case rsOverlap:
+            return QObject::tr("Overlap");
+        case rsLowDiskSpace:
+            return QObject::tr("Low Disk Space");
+        case rsTunerBusy:
+            return QObject::tr("Tuner Busy");
+        default:
+            return QObject::tr("Unknown");
+        }
     }
 
-    return recstring;
+    return QObject::tr("Unknown");;
+}
+
+QString ProgramInfo::RecStatusDesc(void)
+{
+    QString message;
+    QDateTime now = QDateTime::currentDateTime();
+
+    if (conflicting)
+        message += QObject::tr("This showing conflicts with one or more other "
+                               "scheduled programs.");
+    else if (recording)
+    {
+        switch (recstatus)
+        {
+        case rsWillRecord:
+            message = QObject::tr("This showing will be recorded.");
+            break;
+        case rsRecording:
+            message = QObject::tr("This showing is being recorded.");
+            break;
+        case rsRecorded:
+            message = QObject::tr("This showing was recorded.");
+            break;
+        case rsStopped:
+            message = QObject::tr("This showing was recorded but was stopped "
+                                   "before recording was completed.");
+            break;
+        case rsDeleted:
+            message = QObject::tr("This showing was recorded but was deleted "
+                                   "before recording was completed.");
+            break;
+        default:
+            message = QObject::tr("The status of this showing is unknown.");
+            break;
+        }
+    }
+    else
+    {
+        if (recstartts > now)
+            message = QObject::tr("This showing will not be recorded because ");
+        else
+            message = QObject::tr("This showing was not recorded because ");
+
+        switch (recstatus)
+        {
+        case rsManualOverride:
+            message += QObject::tr("it was manually set to not record.");
+            break;
+        case rsPreviousRecording:
+            message += QObject::tr("this episode was previously recorded "
+                                   "according to the duplicate policy chosen "
+                                   "for this title.");
+            break;
+        case rsCurrentRecording:
+            message += QObject::tr("this episode was previously recorded and "
+                                   "is still available in the list of "
+                                   "recordings.");
+            break;
+        case rsOtherShowing:
+            message += QObject::tr("this episode will be recorded at another "
+                                   "time instead.");
+            break;
+        case rsTooManyRecordings:
+            message += QObject::tr("too many recordings of this program have "
+                                   "already been recorded.");
+            break;
+        case rsCancelled:
+            message += QObject::tr("it was manually cancelled.");
+            break;
+        case rsLowerRecPriority:
+            message += QObject::tr("another program with a higher recording "
+                                   "priority will be recorded.");
+            break;
+        case rsManualConflict:
+            message += QObject::tr("another program was manually chosen to be "
+                                    "recorded instead.");
+            break;
+        case rsAutoConflict:
+            message += QObject::tr("another program was automatically chosen "
+                                   "to be recorded instead.");
+            break;
+        case rsOverlap:
+            message += QObject::tr("it is covered by another scheduled "
+                                   "recording for the same program.");
+            break;
+        case rsLowDiskSpace:
+            message += QObject::tr("there wasn't enough disk space available.");
+            break;
+        case rsTunerBusy:
+            message += QObject::tr("the tuner card was already being used.");
+            break;
+        default:
+            message += QObject::tr("you should never see this.");
+            break;
+        }
+    }
+
+    return message;
 }
 
 void ProgramInfo::FillInRecordInfo(vector<ProgramInfo *> &reclist)
@@ -1675,7 +1753,7 @@ void ProgramInfo::FillInRecordInfo(vector<ProgramInfo *> &reclist)
         conflicting = found->conflicting;
         recording = found->recording;
         override = found->override;
-        norecord = found->norecord;
+        recstatus = found->recstatus;
         recordid = found->recordid;
         rectype = found->rectype;
         recdups = found->recdups;
@@ -1859,14 +1937,18 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
     if (subtitle != "")
         message += QString(" - \"%1\"").arg(subtitle);
 
-    message += "\n\nThis showing will be recorded.";
+    message += "\n\n";
+    message += RecStatusDesc();
 
     DialogBox diag(gContext->GetMainWindow(), QObject::tr(message));
     diag.AddButton(QObject::tr("OK"));
-    diag.AddButton(QObject::tr("Don't record it"));
 
-    if (subtitle != "" && description != "")
-        diag.AddButton(QObject::tr("Never record this episode"));
+    if (recstatus == rsWillRecord)
+    {
+        diag.AddButton(QObject::tr("Don't record it"));
+        if (subtitle != "" && description != "")
+            diag.AddButton(QObject::tr("Never record this episode"));
+    }
 
     int ret = diag.exec();
 
@@ -1893,16 +1975,21 @@ void ProgramInfo::handleNotRecording(QSqlDatabase *db)
     if (subtitle != "")
         message += QString(" - \"%1\"").arg(subtitle);
 
-    message += QString("\n\nThis showing will not be recorded because %1.")
-        .arg(NoRecordText());
+    message += "\n\n";
+    message += RecStatusDesc();
 
     DialogBox diag(gContext->GetMainWindow(), QObject::tr(message));
     diag.AddButton(QObject::tr("OK"));
 
-    if (norecord != nrTooManyRecordings &&
-        norecord != nrDontRecordList &&
-        norecord != nrLowerRecPriority &&
-        norecord != nrOverlap)
+    QDateTime now = QDateTime::currentDateTime();
+
+    if (recstartts > now &&
+        recstatus != rsTooManyRecordings &&
+        recstatus != rsCancelled &&
+        recstatus != rsLowerRecPriority &&
+        recstatus != rsOverlap &&
+        recstatus != rsLowDiskSpace &&
+        recstatus != rsTunerBusy)
         diag.AddButton(QObject::tr("Record it anyway"));
 
     int ret = diag.exec();
@@ -1910,8 +1997,8 @@ void ProgramInfo::handleNotRecording(QSqlDatabase *db)
     if (ret <= 1)
         return;
 
-    if (norecord != nrManualConflict &&
-        norecord != nrAutoConflict)
+    if (recstatus != rsManualConflict &&
+        recstatus != rsAutoConflict)
     {
         setOverride(db, 1);
         return;

@@ -45,18 +45,25 @@ enum FlagMask {
     FL_BOOKMARK  = 0x10,
 };
 
-enum NoRecordType {
-    nrUnknown = 0,
-    nrManualOverride = 1,
-    nrPreviousRecording = 2,
-    nrCurrentRecording = 3,
-    nrOtherShowing = 4,
-    nrTooManyRecordings = 5,
-    nrDontRecordList = 6,
-    nrLowerRecPriority = 7,
-    nrManualConflict = 8,
-    nrAutoConflict = 9,
-    nrOverlap = 10
+enum RecStatusType {
+    rsDeleted = -5,
+    rsStopped = -4,
+    rsRecorded = -3,
+    rsRecording = -2,
+    rsWillRecord = -1,
+    rsUnknown = 0,
+    rsManualOverride = 1,
+    rsPreviousRecording = 2,
+    rsCurrentRecording = 3,
+    rsOtherShowing = 4,
+    rsTooManyRecordings = 5,
+    rsCancelled = 6,
+    rsLowerRecPriority = 7,
+    rsManualConflict = 8,
+    rsAutoConflict = 9,
+    rsOverlap = 10,
+    rsLowDiskSpace = 11,
+    rsTunerBusy = 12
 };
 
 class QSqlDatabase;
@@ -156,10 +163,11 @@ class ProgramInfo
                         long long min_frame = -1, long long max_frame = -1);
 
     void DeleteHistory(QSqlDatabase *db);
-    QString NoRecordText(void);
-    QString NoRecordChar(void);
-    QString RecordingChar(void);
-    QString RecordingText(void);
+    QString RecTypeChar(void);
+    QString RecTypeText(void);
+    QString RecStatusChar(void);
+    QString RecStatusText(void);
+    QString RecStatusDesc(void);
     void FillInRecordInfo(vector<ProgramInfo *> &reclist);
     void EditScheduled(QSqlDatabase *db);
     void EditRecording(QSqlDatabase *db);
@@ -215,7 +223,7 @@ class ProgramInfo
     bool conflicting;
     bool recording;
     int override;
-    NoRecordType norecord;
+    RecStatusType recstatus;
     unsigned recordid;
     RecordingType rectype;
     RecordingDupsType recdups;

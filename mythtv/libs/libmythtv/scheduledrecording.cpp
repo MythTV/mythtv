@@ -346,6 +346,7 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
          while (result.next()) {
              ProgramInfo *proginfo = new ProgramInfo;
              proginfo->recording = true;
+             proginfo->recstatus = rsWillRecord;
              proginfo->chanid = result.value(0).toString();
              proginfo->sourceid = result.value(1).toInt();
              proginfo->startts = result.value(2).toDateTime();
@@ -378,7 +379,7 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
              if (proginfo->override == 2)
              {
                  proginfo->recording = false;
-                 proginfo->norecord = nrManualOverride;
+                 proginfo->recstatus = rsManualOverride;
              }
              else if (proginfo->rectype != kSingleRecord &&
                       proginfo->override != 1 &&
@@ -389,7 +390,7 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
                      if (result.value(14).toInt())
                      {
                          proginfo->recording = false;
-                         proginfo->norecord = nrCurrentRecording;
+                         proginfo->recstatus = rsCurrentRecording;
                      }
                  }
                  else
@@ -397,7 +398,7 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
                      if (result.value(10).toInt())
                      {
                          proginfo->recording = false;
-                         proginfo->norecord = nrPreviousRecording;
+                         proginfo->recstatus = rsPreviousRecording;
                      }
                  }
              }
@@ -416,7 +417,7 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
              if (proginfo->category == QString::null)
                  proginfo->category = "";
 
-             if (proginfo->endts < now)
+             if (proginfo->recendts < now)
                  delete proginfo;
              else 
                  proglist.push_back(proginfo);
