@@ -31,7 +31,7 @@ bool mfdplugin_run()
 {
     if(mmusic_watcher)
     {
-        mmusic_watcher->start(QThread::LowestPriority);
+        mmusic_watcher->start();
         return true;
     }
     return false;
