@@ -104,7 +104,7 @@ package nuv_utils;
          $info{keyframedist}
             ) = unpack('Z12 Z5 xxx i i i i a xxx d d i i i i', $buffer);
     # Is this even a NUV file?
-        return mpeg_info($file) unless ($info{finfo} =~ /\w/);
+        return mpeg_info($file) unless ($info{finfo} =~ /MythTVVideo/);
     # Perl occasionally over-reads on the previous read()
         seek(DATA, 72, 0);
     # Read and parse the first frame header
