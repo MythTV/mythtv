@@ -834,10 +834,10 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
         return false;
     }
     else
-        totalMB = sinfo.totalram/MB,
-        freeMB  = sinfo.freeram/MB,
-        totalVM = sinfo.totalswap/MB,
-        freeVM  = sinfo.freeswap/MB;
+        totalMB = (sinfo.totalram  * sinfo.mem_unit)/MB,
+        freeMB  = (sinfo.freeram   * sinfo.mem_unit)/MB,
+        totalVM = (sinfo.totalswap * sinfo.mem_unit)/MB,
+        freeVM  = (sinfo.freeswap  * sinfo.mem_unit)/MB;
 
 #elif defined(CONFIG_DARWIN)
     mach_port_t             mp;
