@@ -1096,7 +1096,7 @@ void DaapInstance::doServerInfoResponse(TagInput& dmap_data)
                 
                 dmap_data >> a_string;
                 {
-                    QString q_string = QString::fromUtf8(a_string.c_str());
+                    QString q_string = a_string.c_str();
                     service_details_mutex.lock();
                     if(q_string != service_name)
                     {
