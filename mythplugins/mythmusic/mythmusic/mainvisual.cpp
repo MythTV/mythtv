@@ -26,7 +26,9 @@
 
 // fast inlines
 #include "inlines.h"
-#include "settings.h"
+
+
+#include <mythtv/settings.h>
 
 extern Settings *globalsettings;
 

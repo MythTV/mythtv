@@ -14,7 +14,8 @@ using namespace std;
 #include "output.h"
 #include "recycler.h"
 #include "metadata.h"
-#include "settings.h"
+
+#include <mythtv/settings.h>
 
 extern Settings *globalsettings;
 

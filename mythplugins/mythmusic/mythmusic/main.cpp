@@ -14,9 +14,10 @@ using namespace std;
 #include "vorbisdecoder.h"
 #include "databasebox.h"
 #include "playbackbox.h"
-#include "themedmenu.h"
 #include "cdrip.h"
-#include "settings.h"
+
+#include <mythtv/themedmenu.h>
+#include <mythtv/settings.h>
 
 Settings *globalsettings;
 

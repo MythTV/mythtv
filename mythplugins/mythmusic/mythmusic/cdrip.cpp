@@ -27,7 +27,8 @@ extern "C" {
 #include "cddecoder.h"
 #include "vorbisencoder.h"
 #include "flacencoder.h"
-#include "settings.h"
+
+#include <mythtv/settings.h>
 
 extern Settings *globalsettings;
 

@@ -10,7 +10,8 @@
 #include "databasebox.h"
 #include "treecheckitem.h"
 #include "cddecoder.h"
-#include "settings.h"
+
+#include <mythtv/settings.h>
 
 extern Settings *globalsettings;
 

@@ -22,8 +22,9 @@
 #include "decoder.h"
 #include "playbackbox.h"
 #include "databasebox.h"
-#include "settings.h"
 #include "mainvisual.h"
+
+#include <mythtv/settings.h>
 
 #include "res/nextfile.xpm"
 #include "res/next.xpm"

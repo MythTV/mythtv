@@ -16,18 +16,18 @@ INSTALLS += installfiles
 include ( ../settings.pro )
 
 LIBS += -lmad -lid3tag -logg -lvorbisfile -lvorbis -lvorbisenc -lcdaudio -lFLAC
-LIBS += -lcdda_paranoia -lcdda_interface
+LIBS += -lcdda_paranoia -lcdda_interface -L/usr/local/lib -lmyth
 
 # Input
 HEADERS += audiooutput.h buffer.h cddecoder.h cdrip.h constants.h databasebox.h 
 HEADERS += decoder.h flacdecoder.h flacencoder.h maddecoder.h mainvisual.h
 HEADERS += metadata.h playbackbox.h polygon.h output.h recycler.h 
-HEADERS += settings.h scrolllabel.h streaminput.h synaesthesia.h themedmenu.h 
+HEADERS += scrolllabel.h streaminput.h synaesthesia.h 
 HEADERS += treecheckitem.h visual.h vorbisdecoder.h vorbisencoder.h polygon.h
 
 SOURCES += audiooutput.cpp cddecoder.cpp cdrip.cpp databasebox.cpp decoder.cpp 
 SOURCES += flacdecoder.cpp flacencoder.cpp maddecoder.cpp main.cpp 
 SOURCES += mainvisual.cpp metadata.cpp playbackbox.cpp output.cpp 
-SOURCES += recycler.cpp settings.cpp scrolllabel.cpp streaminput.cpp 
-SOURCES += synaesthesia.cpp themedmenu.cpp treecheckitem.cpp vorbisdecoder.cpp 
+SOURCES += recycler.cpp scrolllabel.cpp streaminput.cpp 
+SOURCES += synaesthesia.cpp treecheckitem.cpp vorbisdecoder.cpp 
 SOURCES += vorbisencoder.cpp
