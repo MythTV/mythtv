@@ -423,6 +423,11 @@ void c_zoom (unsigned int *expix1, unsigned int *expix2, unsigned int prevX, uns
 		brutSmypos = brutS[myPos2];
 		py = brutSmypos + (((brutD[myPos2] - brutSmypos) * buffratio) >> BUFFPOINTNB);
 
+                if (px < 0)
+                    px = 0;
+                if (py < 0)
+                    py = 0;
+
 		pos = ((px >> PERTEDEC) + prevX * (py >> PERTEDEC));
 		// coef en modulo 15
 		coeffs = precalCoef[px & PERTEMASK][py & PERTEMASK];

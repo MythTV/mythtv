@@ -16,7 +16,7 @@ struct FieldSplitInfo {
    QString dispStr;
 };
 
-FieldSplitInfo splitArray[] =
+static FieldSplitInfo splitArray[] =
 { 
   {"ABCDE", " (A B C D E)"},
   {"FGHIJ", " (F G H I J)"},
@@ -24,6 +24,8 @@ FieldSplitInfo splitArray[] =
   {"PQRST", " (P Q R S T)"},
   {"UVWXYZ", " (U V W X Y Z)"}
 };
+
+static QString thePrefix = "the ";
 
 const int kSplitArray_Max = sizeof splitArray / sizeof splitArray[0];
 
@@ -440,7 +442,12 @@ void Metadata::getField(const QString &field, QString *data)
     else if (field == "splitartist")
     {
         bool set = false;
-        QString firstchar = FormatArtist().left(1).upper();
+        QString firstchar;
+        if (FormatArtist().left(4).lower() == thePrefix)
+            firstchar = FormatArtist().mid(4, 1).upper();
+        else
+            firstchar = FormatArtist().left(1).upper();
+
         for (int i = 0; i < kSplitArray_Max; i++)
         {
             if (splitArray[i].testStr.contains(firstchar))
@@ -751,6 +758,8 @@ void AllMusic::sortTree()
     root_node->sort();
 
     bool something_changed;
+    QString Title1;
+    QString Title2;
     
     //  sort top level nodes
     
@@ -764,7 +773,15 @@ void AllMusic::sortTree()
         something_changed = false;
         for(uint i = 0; i < top_nodes.count() - 1;)
         {
-            if(qstrcmp(top_nodes.at(i)->getTitle(), top_nodes.at(i+1)->getTitle()) > 0)
+            Title1 = top_nodes.at(i)->getTitle().lower();
+            Title2 = top_nodes.at(i+1)->getTitle().lower();
+
+            if (Title1.left(4) == thePrefix)
+                Title1 = Title1.mid(4);
+            if (Title2.left(4) == thePrefix)
+                Title2 = Title2.mid(4);
+           
+            if(qstrcmp(Title1, Title2) > 0)
             {
                 something_changed = true;
                 MusicNode *temp = top_nodes.take(i + 1);
@@ -1189,6 +1206,8 @@ MusicNode* MusicNode::findRightNode(QStringList tree_levels,
                                     Metadata *inserter, uint depth)
 {
     QString a_field = "";
+    QString a_lowercase_field = "";
+    QString a_title = "";
 
     //
     //  Search and create from my node downards
@@ -1202,11 +1221,20 @@ MusicNode* MusicNode::findRightNode(QStringList tree_levels,
     else
     {
         inserter->getField(tree_levels, &a_field, m_paths, m_startdir, depth);
+
+        a_lowercase_field = a_field.lower();
+        if (a_lowercase_field.left(4) == "the ")
+            a_lowercase_field = a_lowercase_field.mid(4);
+
         QPtrListIterator<MusicNode> iter(my_subnodes);
         MusicNode *search;
-        while( (search = iter.current() ) != 0)
+        while ((search = iter.current() ) != 0)
         {
-            if(a_field == search->getTitle())
+            a_title = search->getTitle().lower();
+            if (a_title.left(4) == thePrefix)
+                a_title = a_title.mid(4);
+
+            if (a_lowercase_field == a_title)
             {
                 return( search->findRightNode(tree_levels, inserter, depth + 1) );
             }
@@ -1321,6 +1349,7 @@ void MusicNode::writeTree(GenericTree *tree_to_write_to, int a_counter)
 void MusicNode::sort()
 {
     bool something_changed;
+    QString Title1, Title2;
 
     //  Sort any tracks
     
@@ -1334,7 +1363,6 @@ void MusicNode::sort()
         something_changed = false;
         for(uint i = 0; i < my_tracks.count() - 1;)
         {
-
             if(my_tracks.at(i)->Track() > my_tracks.at(i+1)->Track())
             {
                 something_changed = true;
@@ -1360,7 +1388,15 @@ void MusicNode::sort()
         something_changed = false;
         for(uint i = 0; i < my_subnodes.count() - 1;)
         {
-            if(qstrcmp(my_subnodes.at(i)->getTitle(), my_subnodes.at(i+1)->getTitle()) > 0)
+            Title1 = my_subnodes.at(i)->getTitle().lower();
+            Title2 = my_subnodes.at(i+1)->getTitle().lower();
+
+            if (Title1.left(4) == thePrefix)
+                Title1 = Title1.mid(4);
+            if (Title2.left(4) == thePrefix)
+                Title2 = Title2.mid(4);
+
+            if(qstrcmp(Title1, Title2) > 0)
             {
                 something_changed = true;
                 MusicNode *temp = my_subnodes.take(i + 1);
