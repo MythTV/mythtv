@@ -81,7 +81,7 @@ class NuppelVideoPlayer
               bool unpauseaudio = true);
     bool GetPause(void);
     int GetFFRewSkip(void) { return ffrew_skip; }
-    bool AtNormalSpeed(void) { return normal_speed; }
+    bool AtNormalSpeed(void) { return next_normal_speed; }
 
     bool FastForward(float seconds);
     bool Rewind(float seconds);
@@ -229,6 +229,8 @@ class NuppelVideoPlayer
                      unsigned char *strm, unsigned char *outbuf);
     bool GetFrame(int onlyvideo, bool unsafe = false);
 
+    void DoPause();
+    void DoPlay();
     bool DoFastForward();
     bool DoRewind();
 
@@ -425,10 +427,11 @@ class NuppelVideoPlayer
     QMutex decoder_lock;
     int frame_interval; // always adjusted for play_speed
     float play_speed;
-    bool speed_changed;
     bool normal_speed;
     int ffrew_skip;
-    bool skip_changed;
+    float next_play_speed;
+    bool next_normal_speed;
+    int videobuf_retries;
 
     float warpfactor;
     float warpfactor_avg;

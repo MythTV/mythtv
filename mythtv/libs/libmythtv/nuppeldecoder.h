@@ -45,7 +45,7 @@ class NuppelDecoder : public DecoderBase
     static bool CanHandle(char testbuf[2048]);
 
     int OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[2048]);
-    void GetFrame(int onlyvideo);
+    bool GetFrame(int onlyvideo);
 
     bool isLastFrameKey(void) { return (lastKey == framesPlayed); }
     void WriteStoredData(RingBuffer *rb, bool writevid);

@@ -26,6 +26,7 @@ IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
            : DecoderBase(parent, db, pginfo)
 {
     lastStartFrame = 0;
+    videoPlayed = 0;
 
     gopset = false;
     firstgoppos = 0;
@@ -110,7 +111,7 @@ void IvtvDecoder::SeekReset(long long newkey, int skipframes, bool needFlush)
         // Note: decoderbase::DoRewdind/DoFastforward will add 1 to
         // framesPlayed so we shouldn't do it here.
         framesPlayed = newkey + skipframes;
-        m_parent->SetFramesPlayed(framesPlayed);
+        videoPlayed = framesPlayed+1;
     }
     else
     {
@@ -465,11 +466,12 @@ bool IvtvDecoder::ReadWrite(int onlyvideo)
     return true;
 }
 
-void IvtvDecoder::GetFrame(int onlyvideo)
+bool IvtvDecoder::GetFrame(int onlyvideo)
 {
+    long long last_read = framesRead;
+
     if (onlyvideo < 0 || m_parent->GetFFRewSkip() != 1)
     {
-        long long last_read = framesRead;
         do {
             ReadWrite(onlyvideo);
         } while (!ateof && framesRead == last_read);
@@ -482,17 +484,22 @@ void IvtvDecoder::GetFrame(int onlyvideo)
 
     if (ateof && !m_parent->GetEditMode())
         m_parent->SetEof();
+
+    framesPlayed = framesRead;
+
+    return (framesRead != last_read);
 }
 
 bool IvtvDecoder::DoFastForward(long long desiredFrame, bool doflush)
 {
-    long long number = desiredFrame - framesPlayed;
+    long long number = desiredFrame - videoPlayed;
 
-    if (m_parent->GetPause() && number < 15)
+    if (m_parent->GetPause() && number < keyframedist)
     {
-        StepFrames(framesPlayed, number+1);
+        StepFrames(videoPlayed, number+1);
         framesPlayed = desiredFrame + 1;
-        m_parent->SetFramesPlayed(framesPlayed);
+        videoPlayed = framesPlayed;
+        m_parent->SetFramesPlayed(videoPlayed);
         return !ateof;
     }
 
@@ -519,15 +526,15 @@ void IvtvDecoder::UpdateFramesPlayed(void)
                 break;
             }
             lastdequeued = queuedlist.front().raw;
-            framesPlayed = queuedlist.front().actual;
+            videoPlayed = queuedlist.front().actual;
             queuedlist.pop_front();
             //cout << "                        "
             //     << "dequeued: r=" << lastdequeued 
-            //     << ", p=" << framesPlayed << endl;
+            //     << ", p=" << videoPlayed << endl;
         }
     }
 
-    m_parent->SetFramesPlayed(framesPlayed);
+    m_parent->SetFramesPlayed(videoPlayed);
 }
 
 bool IvtvDecoder::StepFrames(int start, int count)

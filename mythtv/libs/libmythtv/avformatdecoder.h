@@ -41,7 +41,7 @@ class AvFormatDecoder : public DecoderBase
     int OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[2048]);
 
     /// Decode a frame of video/audio.  If onlyvideo is set, just decode the video portion.
-    void GetFrame(int onlyvideo);
+    bool GetFrame(int onlyvideo);
 
     bool isLastFrameKey(void) { return false; }
 

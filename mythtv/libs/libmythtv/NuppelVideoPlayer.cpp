@@ -138,10 +138,11 @@ NuppelVideoPlayer::NuppelVideoPlayer(MythSqlDatabase *ldb,
     totalLength = 0;
     totalFrames = 0;
     play_speed = 1.0;
-    speed_changed = false;
     normal_speed = true;
     ffrew_skip = 1;
-    skip_changed = false;
+    next_play_speed = 1.0;
+    next_normal_speed = true;
+    videobuf_retries = 0;
 
     osdtheme = "none";
 
@@ -253,31 +254,9 @@ void NuppelVideoPlayer::SetRecorder(RemoteEncoder *recorder)
 
 void NuppelVideoPlayer::Pause(bool waitvideo)
 {
-    if (paused)
-        return;
-
     decoder_lock.lock();
-
-    speed_changed = true;
-    if (ffrew_skip != 1)
-    {
-        skip_changed = true;
-        ffrew_skip = 1;
-    }
-
-    play_speed = audio_stretchfactor;
-    normal_speed = false;
-    frame_interval = (int)(1000000.0 / video_frame_rate / play_speed);
-    if (osd && forceVideoOutput != kVideoOutput_IVTV)
-        osd->SetFrameInterval(frame_interval);
-    if (videosync != NULL)
-        videosync->SetFrameInterval(frame_interval, m_double_framerate);
-
-    actuallypaused = false;
-    // pause the decoder thread first, as it's usually waiting for the video
-    // thread.  Make sure that it's done pausing before continuing on.
-    paused = true;
-
+    next_play_speed = 0.0;
+    next_normal_speed = false;
     decoder_lock.unlock();
 
     if (!actuallypaused)
@@ -286,84 +265,35 @@ void NuppelVideoPlayer::Pause(bool waitvideo)
             VERBOSE(VB_IMPORTANT, "Waited too long for decoder to pause");
     }
 
-    decoder_lock.lock();
-
+    //cout << "stopping other threads" << endl;
     PauseVideo(waitvideo);
     if (audioOutput)
         audioOutput->Pause(true);
-
     if (ringBuffer)
         ringBuffer->Pause();
 
-#ifdef USING_IVTV
-    if (forceVideoOutput == kVideoOutput_IVTV)
-    {
-        VideoOutputIvtv *vidout = (VideoOutputIvtv *)videoOutput;
-        vidout->Pause();
-    }
-#endif
+    //cout << "updating frames played" << endl;
     if (disablevideo || forceVideoOutput == kVideoOutput_IVTV)
         decoder->UpdateFramesPlayed();
     else
         framesPlayed = videoOutput->GetFramesPlayed();
-
-    decoder_lock.unlock();
 }
 
 bool NuppelVideoPlayer::Play(float speed, bool normal, bool unpauseaudio)
 {
-    decoder_lock.lock();
-
-    speed_changed = true;
-    play_speed = speed;
-    normal_speed = normal;
-
-    if (speed > 0.0 && speed <= 3.0)
-    {
-        if (ffrew_skip != 1)
-        {
-            skip_changed = true;
-            ffrew_skip = 1;
-        }
-    }
-    else
-    {
-        skip_changed = true;
-        ffrew_skip = int(ceil(4.0 * fabs(speed) / keyframedist)) * keyframedist;
-        if (speed < 0.0)
-            ffrew_skip = -ffrew_skip;
-    }
-    frame_interval = (int)(1000000.0 * ffrew_skip / 
-                           video_frame_rate / speed);
-    //cout << "ffrew_skip=" << ffrew_skip 
-    //     << ", frame_interval=" << frame_interval << endl;
-
-    if (osd && forceVideoOutput != kVideoOutput_IVTV)
-        osd->SetFrameInterval(frame_interval);
-    if (videosync != NULL)
-        videosync->SetFrameInterval(frame_interval, m_double_framerate);
-
-    if (normal && (speed != audio_stretchfactor))
-    {
-        audio_stretchfactor = speed;
-        audioOutput->SetStretchFactor(speed);
-    }
-
-    paused = false;
-
-    decoder_lock.unlock();
-
+    //cout << "starting other threads" << endl;
     UnpauseVideo();
     if (audioOutput && unpauseaudio)
         audioOutput->Pause(false);
-
-#ifdef USING_DIRECTX
-    if (audioOutput && !normal_speed)
-        audioOutput->Reset();
-#endif
-
     if (ringBuffer)
         ringBuffer->Unpause();
+
+    decoder_lock.lock();
+    next_play_speed = speed;
+    next_normal_speed = normal;
+    if (normal)
+        audio_stretchfactor = speed;
+    decoder_lock.unlock();
 
     return true;
 }
@@ -561,7 +491,8 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
     if (fps > 0 && fps < 120)
     {
         video_frame_rate = fps;
-        frame_interval = (int)(1000000.0 / video_frame_rate / play_speed);
+        float temp_speed = (play_speed == 0.0) ? audio_stretchfactor : play_speed;
+        frame_interval = (int)(1000000.0 / video_frame_rate / temp_speed);
     }
 
     video_size = video_height * video_width * 3 / 2;
@@ -806,24 +737,30 @@ bool NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
     if (forceVideoOutput != kVideoOutput_IVTV)
 #endif
     {
-        while (!videoOutput->EnoughFreeFrames() && !unsafe)
+        if (!videoOutput->EnoughFreeFrames() && !unsafe)
         {
             //cout << "waiting for video buffer to drain.\n";
             setPrebuffering(false);
-            if (!videoOutput->availableVideoBuffersWait()->wait(2000))
+            if (!videoOutput->availableVideoBuffersWait()->wait(10))
             {
-                VERBOSE(VB_IMPORTANT, "Timed out waiting for free video buffers.");
-
-                if (videosync==NULL && tryingVideoSync)
+                if (++videobuf_retries >= 200)
                 {
-                    VERBOSE(VB_IMPORTANT, "Attempting video sync thread restart");
-                    return false;
+                    VERBOSE(VB_IMPORTANT, "Timed out waiting for free video buffers.");
+                    if (videosync==NULL && tryingVideoSync)
+                    {
+                        VERBOSE(VB_IMPORTANT, "Attempting video sync thread restart");
+                        //pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);
+                    }
+                    videobuf_retries = 0;
                 }
+                return false;
             }
         }
+        videobuf_retries = 0;
     }
 
-    decoder->GetFrame(onlyvideo);
+    if (!decoder->GetFrame(onlyvideo))
+        return false;
 
 #ifdef USING_IVTV
     if (forceVideoOutput != kVideoOutput_IVTV)
@@ -853,7 +790,7 @@ bool NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
             stop = framesPlayed <= keyframedist;
         }
         if (stop)
-            Play(1.0, true, true);
+            Play(audio_stretchfactor, true, true);
     }
 
     return true;
@@ -1483,7 +1420,8 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
     refreshrate = frame_interval;
 
-    int fr_int = (int)(1000000.0 / video_frame_rate / play_speed);
+    float temp_speed = (play_speed == 0.0) ? audio_stretchfactor : play_speed;
+    int fr_int = (int)(1000000.0 / video_frame_rate / temp_speed);
     if (disablevideo)
     {
         videosync = new USleepVideoSync(fr_int, 0, false);
@@ -1665,8 +1603,6 @@ bool NuppelVideoPlayer::FastForward(float seconds)
     if (!videoOutput)
         return false;
 
-    //QMutexLocker decoder_locker(&decoder_lock);
-
     if (fftime == 0)
         fftime = (int)(seconds * video_frame_rate);
 
@@ -1677,8 +1613,6 @@ bool NuppelVideoPlayer::Rewind(float seconds)
 {
     if (!videoOutput)
         return false;
-
-    //QMutexLocker decoder_locker(&decoder_lock);
 
     if (rewindtime == 0)
         rewindtime = (int)(seconds * video_frame_rate);
@@ -1800,8 +1734,7 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     if (bookmarkseek > 30)
     {
-        if (!GetFrame(audioOutput == NULL || !normal_speed))
-            pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);
+        GetFrame(audioOutput == NULL || !normal_speed);
 
         bool seeks = exactseeks;
 
@@ -1840,22 +1773,29 @@ void NuppelVideoPlayer::StartPlaying(void)
         if (nvr_enc && nvr_enc->GetErrorStatus())
             killplayer = true;
 
-        // Yield before acquiring the decoder lock to give the TV
-        // thread a chance to get in.
-        sched_yield();
-        QMutexLocker decoder_locker(&decoder_lock);
+        if (play_speed != next_play_speed)
+        {
+            decoder_lock.lock();
+
+            play_speed = next_play_speed;
+            normal_speed = next_normal_speed;
+            //cout << "changing speed to " << play_speed << endl;
+
+            if (play_speed == 0.0)
+                DoPause();
+            else
+                DoPlay();
+
+            decoder_lock.unlock();
+        }
 
         if (rewindtime < 0)
             rewindtime = 0;
         if (fftime < 0)
             fftime = 0;
 
-        if (paused && ffrew_skip == 1 && !skip_changed)
+        if (paused)
         {
-            if (speed_changed)
-                speed_changed = false;
-
-            actuallypaused = true;
             decoderThreadPaused.wakeAll();
             pausecheck++;
 
@@ -1873,8 +1813,7 @@ void NuppelVideoPlayer::StartPlaying(void)
             {
                 DoRewind();
 
-                if (!GetFrame(audioOutput == NULL || !normal_speed))
-                    pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);
+                GetFrame(audioOutput == NULL || !normal_speed);
                 resetvideo = true;
                 while (resetvideo)
                     usleep(50);
@@ -1887,8 +1826,7 @@ void NuppelVideoPlayer::StartPlaying(void)
                 fftime = CalcMaxFFTime(fftime);
                 DoFastForward();
 
-                if (!GetFrame(audioOutput == NULL || !normal_speed))
-                    pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);
+                GetFrame(audioOutput == NULL || !normal_speed);
                 resetvideo = true;
                 while (resetvideo)
                     usleep(50);
@@ -1902,41 +1840,6 @@ void NuppelVideoPlayer::StartPlaying(void)
                 usleep(500);
                 continue;
             }
-        }
-
-        if (skip_changed)
-        {
-            //cout << "change: s=" << ffrew_skip 
-            //     << ", p=" << framesPlayed << endl;
-            skip_changed = false;
-            speed_changed = false;
-
-            videoOutput->SetPrebuffering(ffrew_skip == 1);
-#ifdef USING_IVTV
-            if (forceVideoOutput == kVideoOutput_IVTV)
-            {
-                VideoOutputIvtv *vidout = (VideoOutputIvtv *)videoOutput;
-                vidout->NextPlay(play_speed / ffrew_skip, normal_speed, 
-                                 (ffrew_skip == 1) ? 2 : 0);
-            }
-#endif
-
-            decoder->setExactSeeks(exactseeks && ffrew_skip == 1);
-            decoder->DoRewind(framesPlayed);
-            ClearAfterSeek();
-        }
-
-        if (speed_changed)
-        {
-            speed_changed = false;
-#ifdef USING_IVTV
-            if (forceVideoOutput == kVideoOutput_IVTV)
-            {
-                VideoOutputIvtv *vidout = (VideoOutputIvtv *)videoOutput;
-                vidout->Play(play_speed / ffrew_skip, normal_speed, 
-                             (ffrew_skip == 1) ? 2 : 0);
-            }
-#endif
         }
 
         if (rewindtime > 0 && ffrew_skip == 1)
@@ -1982,8 +1885,7 @@ void NuppelVideoPlayer::StartPlaying(void)
             continue;
         }
 
-        if (!GetFrame(audioOutput == NULL || !normal_speed))
-            pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this); 
+        GetFrame(audioOutput == NULL || !normal_speed);
 
         if (disablevideo || forceVideoOutput == kVideoOutput_IVTV)
             decoder->UpdateFramesPlayed();
@@ -2205,6 +2107,108 @@ long long NuppelVideoPlayer::GetBookmark(void)
 
     QMutexLocker lockit(m_db->mutex());
     return m_playbackinfo->GetBookmark(m_db->db());
+}
+
+void NuppelVideoPlayer::DoPause(void)
+{
+    bool skip_changed;
+
+#ifdef USING_IVTV
+    if (forceVideoOutput == kVideoOutput_IVTV)
+    {
+        VideoOutputIvtv *vidout = (VideoOutputIvtv *)videoOutput;
+        vidout->Pause();
+    }
+#endif
+
+    skip_changed = (ffrew_skip != 1);
+    ffrew_skip = 1;
+
+    if (skip_changed)
+    {
+        //cout << "handling skip change" << endl;
+        videoOutput->SetPrebuffering(ffrew_skip == 1);
+
+        decoder->setExactSeeks(exactseeks && ffrew_skip == 1);
+        decoder->DoRewind(framesPlayed);
+        ClearAfterSeek();
+    }
+
+    float temp_speed = audio_stretchfactor;
+    frame_interval = (int)(1000000.0 * ffrew_skip / video_frame_rate / temp_speed);
+    if (osd && forceVideoOutput != kVideoOutput_IVTV)
+        osd->SetFrameInterval(frame_interval);
+    if (videosync != NULL)
+        videosync->SetFrameInterval(frame_interval, m_double_framerate);
+
+    //cout << "setting paused" << endl << endl;
+    paused = actuallypaused = true;
+}
+
+void NuppelVideoPlayer::DoPlay(void)
+{
+    bool skip_changed;
+
+    if (play_speed > 0.0 && play_speed <= 3.0)
+    {
+        skip_changed = (ffrew_skip != 1);
+        ffrew_skip = 1;
+    }
+    else
+    {
+        skip_changed = true;
+        ffrew_skip = int(ceil(4.0 * fabs(play_speed) / keyframedist)) * keyframedist;
+        if (play_speed < 0.0)
+            ffrew_skip = -ffrew_skip;
+    }
+    //cout << "skip changed to " << ffrew_skip << endl;
+
+    if (skip_changed)
+    {
+        //cout << "handling skip change" << endl;
+        videoOutput->SetPrebuffering(ffrew_skip == 1);
+
+#ifdef USING_IVTV
+        if (forceVideoOutput == kVideoOutput_IVTV)
+        {
+            VideoOutputIvtv *vidout = (VideoOutputIvtv *)videoOutput;
+            vidout->NextPlay(play_speed / ffrew_skip, normal_speed, 
+                             (ffrew_skip == 1) ? 2 : 0);
+        }
+#endif
+
+        decoder->setExactSeeks(exactseeks && ffrew_skip == 1);
+        decoder->DoRewind(framesPlayed);
+        ClearAfterSeek();
+    }
+
+    float temp_speed = play_speed;
+    frame_interval = (int)(1000000.0 * ffrew_skip / video_frame_rate / temp_speed);
+    if (osd && forceVideoOutput != kVideoOutput_IVTV)
+        osd->SetFrameInterval(frame_interval);
+    if (videosync != NULL)
+        videosync->SetFrameInterval(frame_interval, m_double_framerate);
+
+#ifdef USING_IVTV
+    if (forceVideoOutput == kVideoOutput_IVTV)
+    {
+        VideoOutputIvtv *vidout = (VideoOutputIvtv *)videoOutput;
+        vidout->Play(play_speed / ffrew_skip, normal_speed, 
+                     (ffrew_skip == 1) ? 2 : 0);
+    }
+#endif
+
+    if (normal_speed)
+    {
+        audioOutput->SetStretchFactor(play_speed);
+#ifdef USING_DIRECTX
+        if (audioOutput)
+            audioOutput->Reset();
+#endif
+    }
+
+    //cout << "setting unpaused" << endl << endl;
+    paused = actuallypaused = false;
 }
 
 bool NuppelVideoPlayer::DoRewind(void)
@@ -2446,16 +2450,6 @@ bool NuppelVideoPlayer::EnableEdit(void)
     Pause();
     while (!GetPause())
         usleep(50);
-
-    // jump to the frame being displayed since framesPlayed is actually ahead
-    // of us because of videoOutput's buffering
-    int bufferedFrames = videoOutput->ValidVideoFrames();
-    if (bufferedFrames);
-    {
-        rewindtime = bufferedFrames - 1;
-        while (rewindtime)
-            usleep(50);
-    }
 
     seekamount = keyframedist;
     seekamountpos = 3;
@@ -3283,6 +3277,7 @@ bool NuppelVideoPlayer::LastFrameIsBlank(void)
 int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
                                        int *controlFlag, bool inJobQueue)
 {
+    (void)controlFlag;
     int comms_found = 0;
     int percentage = 0;
     int jobID = -1;

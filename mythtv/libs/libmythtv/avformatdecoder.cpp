@@ -1115,7 +1115,7 @@ void AvFormatDecoder::SetupAudioStream(void)
     m_parent->SetAudioParams(16, audio_channels, audio_sampling_rate);
 }
 
-void AvFormatDecoder::GetFrame(int onlyvideo)
+bool AvFormatDecoder::GetFrame(int onlyvideo)
 {
     AVPacket *pkt = NULL;
     int len, ret = 0;
@@ -1170,7 +1170,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
             {
                 ateof = true;
                 m_parent->SetEof();
-                return;
+                return false;
             }
         }
 
@@ -1295,6 +1295,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                 {
                     if (onlyvideo < 0)
                     {
+                        framesPlayed++;
                         ptr += pkt->size;
                         len -= pkt->size;
                         continue;
@@ -1427,6 +1428,8 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
 
     if (pkt)
         delete pkt;
+
+    return true;
 }
 
 int AvFormatDecoder::EncodeAC3Frame(unsigned char *data, int len,

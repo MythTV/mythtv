@@ -877,7 +877,7 @@ void NuppelDecoder::WriteStoredData(RingBuffer *rb, bool storevid)
 //          = 1  : video only
 //          = -1 : neither, just parse
 
-void NuppelDecoder::GetFrame(int avignore)
+bool NuppelDecoder::GetFrame(int avignore)
 {
     bool gotvideo = false;
     bool ret = false;
@@ -892,7 +892,7 @@ void NuppelDecoder::GetFrame(int avignore)
         {
             ateof = true;
             m_parent->SetEof();
-            return;
+            return false;
         }
 
         bool framesearch = false;
@@ -910,7 +910,7 @@ void NuppelDecoder::GetFrame(int avignore)
             {
                 ateof = true;
                 m_parent->SetEof();
-                return;
+                return false;
             }
             seeklen = 1;
         }
@@ -925,7 +925,7 @@ void NuppelDecoder::GetFrame(int avignore)
                 delete [] dummy;
                 ateof = true;
                 m_parent->SetEof();
-                return;
+                return false;
             }
 
             delete [] dummy;
@@ -988,14 +988,14 @@ void NuppelDecoder::GetFrame(int avignore)
                      << " " << frameheader.packetlength << endl;
                 ateof = true;
                 m_parent->SetEof();
-                return;
+                return false;
             }
             if (ringBuffer->Read(strm, frameheader.packetlength) !=
                 frameheader.packetlength)
             {
                 ateof = true;
                 m_parent->SetEof();
-                return;
+                return false;
             }
         }
         else
@@ -1005,7 +1005,7 @@ void NuppelDecoder::GetFrame(int avignore)
         {
             if (avignore == -1)
             {
-                //framesPlayed++;
+                framesPlayed++;
                 gotvideo = 1;
                 continue;
             }
@@ -1108,6 +1108,8 @@ void NuppelDecoder::GetFrame(int avignore)
 
     // temporary fix until framesRead conversion is finished
     framesRead = framesPlayed;
+
+    return true;
 }
 
 void NuppelDecoder::SeekReset(long long, int skipFrames,

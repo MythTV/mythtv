@@ -29,7 +29,7 @@ class DecoderBase
     void setLowBuffers(void) { lowbuffers = true; }
 
     virtual void setWatchingRecording(bool mode);
-    virtual void GetFrame(int onlyvideo) = 0;
+    virtual bool GetFrame(int onlyvideo) = 0;
     
     virtual bool DoRewind(long long desiredFrame, bool doflush = true);
     virtual bool DoFastForward(long long desiredFrame, bool doflush = true);

@@ -35,7 +35,7 @@ class IvtvDecoder : public DecoderBase
     static bool CanHandle(char testbuf[2048], const QString &filename);
 
     int OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[2048]);
-    void GetFrame(int onlyvideo);
+    bool GetFrame(int onlyvideo);
 
     bool DoFastForward(long long desiredFrame, bool doflush = true);
 
@@ -89,6 +89,7 @@ class IvtvDecoder : public DecoderBase
     unsigned mpeg_state;
     long long framesScanned;
     bool needPlay;
+    long long videoPlayed;
 
     int nexttoqueue;
     int lastdequeued;
