@@ -35,7 +35,7 @@ class AudioPlugin: public MFDServicePlugin
     void    stopAudio();
     void    pauseAudio(bool true_or_false);
     void    seekAudio(int seek_amount);
-    void    swallowOutputUpdate(int numb_seconds, int channels, int bitrate, int frequency);
+    void    swallowOutputUpdate(int type, int numb_seconds, int channels, int bitrate, int frequency);
     void    handleInternalMessage(QString the_message);
     void    setPlaylistMode(int container, int id, int index = 0);
     void    stopPlaylistMode();

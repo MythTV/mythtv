@@ -32,45 +32,48 @@ AudioPlugin::AudioPlugin(MFD *owner, int identity)
     stopPlaylistMode();
 }
 
-void AudioPlugin::swallowOutputUpdate(int numb_seconds, int channels, int bitrate, int frequency)
+void AudioPlugin::swallowOutputUpdate(int type, int numb_seconds, int channels, int bitrate, int frequency)
 {
     //
-    //  Get the latest data about the state of play
+    //  Get the latest data about the state of play if this is an info event
     //
 
-    int current_playlist = -1;
-    int current_playlist_item = -1;
+    if(type == OutputEvent::Info)
+    {
+        int current_playlist = -1;
+        int current_playlist_item = -1;
 
-    playlist_mode_mutex.lock();
-        play_data_mutex.lock();
-            elapsed_time = numb_seconds;
-            current_channels = channels;
-            current_bitrate = bitrate;
-            current_frequency = frequency;
-            if(playlist_mode)
-            {
-                current_playlist = current_playlist_id;
-                current_playlist_item = current_playlist_item_index;
-            }
-        play_data_mutex.unlock();
-    playlist_mode_mutex.unlock();
+        playlist_mode_mutex.lock();
+            play_data_mutex.lock();
+                elapsed_time = numb_seconds;
+                current_channels = channels;
+                current_bitrate = bitrate;
+                current_frequency = frequency;
+                if(playlist_mode)
+                {
+                    current_playlist = current_playlist_id;
+                    current_playlist_item = current_playlist_item_index;
+                }
+            play_data_mutex.unlock();
+        playlist_mode_mutex.unlock();
 
-    //
-    //  Tell the clients what's going on
-    //
+        //
+        //  Tell the clients what's going on
+        //
     
 
-    if(is_playing)
-    {
-        sendMessage(QString("playing %1 %2 %3 %4 %5 %6 %7 %8")
-                            .arg(current_playlist)
-                            .arg(current_playlist_item)
-                            .arg(current_collection)
-                            .arg(current_metadata)
-                            .arg(elapsed_time)
-                            .arg(current_channels)
-                            .arg(current_bitrate)
-                            .arg(current_frequency));
+        if(is_playing)
+        {
+            sendMessage(QString("playing %1 %2 %3 %4 %5 %6 %7 %8")
+                                .arg(current_playlist)
+                                .arg(current_playlist_item)
+                                .arg(current_collection)
+                                .arg(current_metadata)
+                                .arg(elapsed_time)
+                                .arg(current_channels)
+                                .arg(current_bitrate)
+                                .arg(current_frequency));
+        }
     }
 }
 

@@ -320,7 +320,7 @@ void MMAudioOutput::run()
 
 	done = user_stop;
 
-	while (! done && (recycler()->empty() || paus)) {
+	while (! done && (recycler()->empty() || paus)){
 	    post();
 
 	    mutex()->unlock();
@@ -438,6 +438,7 @@ void MMAudioOutput::dispatch(OutputEvent &e)
     //
     
     parent->swallowOutputUpdate(
+                                e.type(),
                                 e.elapsedSeconds(),
                                 e.channels(),
                                 e.bitrate(),
