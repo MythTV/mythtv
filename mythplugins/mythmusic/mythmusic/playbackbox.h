@@ -71,6 +71,16 @@ class PlaybackBoxMusic : public MythThemedDialog
     void showVolume(bool on_or_off);
     void wipeTrackInfo();
     void toggleFullBlankVisualizer();
+
+    // popup menu
+    void showMenu();
+    void closePlaylistPopup();
+    void allTracks();
+    void byArtist();
+    void byAlbum();
+    void byGenre();
+    void byYear();    
+    void showSmartPlaylistDialog();
     
   signals:
   
@@ -79,7 +89,8 @@ class PlaybackBoxMusic : public MythThemedDialog
   private:
 
     void wireUpTheme();
-    
+    void updatePlaylistFromQuickPlaylist(QString whereClause);
+    void updatePlaylistFromSmartPlaylist(QString category, QString name);
     void CycleVisualizer(void);
 
     QIODevice *input;
@@ -88,7 +99,9 @@ class PlaybackBoxMusic : public MythThemedDialog
 
     QString playfile;
     QString statusString;
-
+    QString curSmartPlaylistCategory;
+    QString curSmartPlaylistName;
+    
     enum RepeatMode
     { REPEAT_OFF = 0,
       REPEAT_TRACK, 
@@ -135,12 +148,13 @@ class PlaybackBoxMusic : public MythThemedDialog
     QTimer  *volume_display_timer;
 
     GenericTree *playlist_tree;
-
+    
     bool cycle_visualizer;
     bool show_whole_tree;
     bool keyboard_accelerators;
-
     bool volume_control;
+
+    MythPopupBox *playlist_popup;
 
     //
     //  Theme-related "widgets"

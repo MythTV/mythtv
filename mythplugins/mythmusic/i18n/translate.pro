@@ -15,6 +15,7 @@ SOURCES += ../mythmusic/synaesthesia.cpp
 SOURCES += ../mythmusic/visualize.cpp
 SOURCES += ../mythmusic/vorbisdecoder.cpp
 SOURCES += ../mythmusic/goom/mythgoom.cpp
+SOURCES += ../mythmusic/smartplaylist.cpp
 SOURCES += ./themestrings.h
 
 TRANSLATIONS  = mythmusic_it.ts mythmusic_es.ts mythmusic_ca.ts

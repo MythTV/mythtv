@@ -12,6 +12,7 @@ using namespace std;
 #include "playbackbox.h"
 #include "databasebox.h"
 #include "mainvisual.h"
+#include "smartplaylist.h"
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythwidgets.h>
@@ -34,6 +35,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     lcd_update_timer = NULL;
     waiting_for_playlists_timer = NULL;
     playlist_tree = NULL;
+    playlist_popup = NULL;    
     
     lcd_volume_visible = false; 
     isplaying = false;
@@ -46,7 +48,9 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     visual_mode_timer = new QTimer(this);
     visualizer_status = 0;
     curMeta = NULL;
-
+    curSmartPlaylistCategory = "";
+    curSmartPlaylistName = "";
+    
     // Set our pointers the playlists and the metadata containers
 
     all_playlists = the_playlists;
@@ -304,6 +308,8 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
             changeVolume(true);
         else if (action == "MUTE")
             toggleMute();
+        else if (action == "MENU")
+            showMenu();
         else if (action == "INFO")
             showEditMetadataDialog();
         else
@@ -404,6 +410,187 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
 
     if (!handled)
         MythThemedDialog::keyPressEvent(e);
+}
+
+void PlaybackBoxMusic::showMenu()
+{
+    if (playlist_popup)
+        return;
+
+    playlist_popup = new MythPopupBox(gContext->GetMainWindow(),
+                                      "playlist_popup");
+
+    QButton *button = playlist_popup->addButton(tr("Smart playlists"), this,
+                              SLOT(showSmartPlaylistDialog()));
+    
+    QLabel *splitter = playlist_popup->addLabel(" ", MythPopupBox::Small);
+    splitter->setLineWidth(2);
+    splitter->setFrameShape(QFrame::HLine);
+    splitter->setFrameShadow(QFrame::Sunken);
+    splitter->setMaximumHeight((int) (5 * hmult));
+    splitter->setMaximumHeight((int) (5 * hmult));
+    
+    playlist_popup->addButton(tr("All Tracks"), this,
+                              SLOT(allTracks()));
+    if (curMeta)
+    {
+        playlist_popup->addButton(tr("Tracks by current Artist"), this,
+                                  SLOT(byArtist()));
+        playlist_popup->addButton(tr("Tracks from current Album"), this,
+                                  SLOT(byAlbum()));
+        playlist_popup->addButton(tr("Tracks from current Genre"), this,
+                                  SLOT(byGenre()));
+        playlist_popup->addButton(tr("Tracks from current Year"), this,
+                                  SLOT(byYear()));
+    }
+    
+    playlist_popup->ShowPopup(this, SLOT(closePlaylistPopup()));
+
+    button->setFocus();
+}
+
+void PlaybackBoxMusic::closePlaylistPopup()
+{
+    if (!playlist_popup)
+        return;
+
+    playlist_popup->hide();
+    delete playlist_popup;
+    playlist_popup = NULL;
+}
+
+void PlaybackBoxMusic::allTracks()
+{
+   if (!playlist_popup)
+        return;
+
+    updatePlaylistFromQuickPlaylist("ORDER BY artist, album, tracknum");
+    closePlaylistPopup();
+}
+
+void PlaybackBoxMusic::showSmartPlaylistDialog()
+{
+   if (!playlist_popup)
+        return;
+
+    closePlaylistPopup();
+    
+    SmartPlaylistDialog dialog(gContext->GetMainWindow(), "smartplaylistdialog");
+    dialog.setSmartPlaylist(curSmartPlaylistCategory, curSmartPlaylistName);
+
+    int res = dialog.ExecPopup();
+    
+    if (res > 0)
+    {
+        dialog.getSmartPlaylist(curSmartPlaylistCategory, curSmartPlaylistName);
+        updatePlaylistFromSmartPlaylist(curSmartPlaylistCategory, curSmartPlaylistName);
+    }    
+}    
+
+void PlaybackBoxMusic::byArtist()
+{
+    if (!playlist_popup || !curMeta)
+        return;
+
+    QString value = formattedFieldValue(curMeta->Artist().utf8());
+    QString whereClause = "WHERE artist = " + value +
+                          " ORDER BY album, tracknum"; 
+  
+    updatePlaylistFromQuickPlaylist(whereClause);
+    closePlaylistPopup();
+}
+
+void PlaybackBoxMusic::byAlbum()
+{
+    if (!playlist_popup || !curMeta)
+        return;
+
+    QString value = formattedFieldValue(curMeta->Album().utf8());
+    QString whereClause = "WHERE album = " + value + 
+                          " ORDER BY tracknum";
+    closePlaylistPopup();
+    updatePlaylistFromQuickPlaylist(whereClause);
+}
+
+void PlaybackBoxMusic::byGenre()
+{
+   if (!playlist_popup || !curMeta)
+        return;
+
+    QString value = formattedFieldValue(curMeta->Genre().utf8()); 
+    QString whereClause = "WHERE genre = " + value +
+                          " ORDER BY artist, album, tracknum";   
+    closePlaylistPopup();
+    updatePlaylistFromQuickPlaylist(whereClause);
+}
+
+void PlaybackBoxMusic::byYear()
+{
+   if (!playlist_popup || !curMeta)
+        return;
+
+    QString value = formattedFieldValue(curMeta->Year()); 
+    QString whereClause = "WHERE year = " + value + 
+                          " ORDER BY artist, album, tracknum";
+    
+    updatePlaylistFromQuickPlaylist(whereClause);
+    closePlaylistPopup();
+}
+
+void PlaybackBoxMusic::updatePlaylistFromQuickPlaylist(QString whereClause)
+{
+    QValueList <int> branches_to_current_node;
+    
+    visual_mode_timer->stop();
+
+    all_playlists->getActive()->removeAllTracks();
+    all_playlists->getActive()->fillSonglistFromQuery(whereClause);
+    all_playlists->getActive()->fillSongsFromSonglist();
+    all_playlists->getActive()->postLoad();
+
+    if (visual_mode_delay > 0)
+        visual_mode_timer->start(visual_mode_delay * 1000);
+
+    constructPlaylistTree();
+    
+    stop();
+    wipeTrackInfo();
+    
+    // move to first track in list
+    branches_to_current_node.clear();
+    branches_to_current_node.append(0); //  Root node
+    branches_to_current_node.append(1); //  We're on a playlist (not "My Music")
+    branches_to_current_node.append(0); //  Active play Queue
+    music_tree_list->moveToNodesFirstChild(branches_to_current_node);
+    music_tree_list->refresh();
+}
+
+void PlaybackBoxMusic::updatePlaylistFromSmartPlaylist(QString category, QString name)
+{
+    QValueList <int> branches_to_current_node;
+    
+    visual_mode_timer->stop();
+
+    all_playlists->getActive()->removeAllTracks();
+    all_playlists->getActive()->fillSonglistFromSmartPlaylist(category, name);
+    all_playlists->getActive()->fillSongsFromSonglist();
+    all_playlists->getActive()->postLoad();
+
+    if (visual_mode_delay > 0)
+        visual_mode_timer->start(visual_mode_delay * 1000);
+
+    constructPlaylistTree();
+    
+    stop();
+    wipeTrackInfo();
+    
+    // move to first track in list
+    branches_to_current_node.clear();
+    branches_to_current_node.append(0); //  Root node
+    branches_to_current_node.append(1); //  We're on a playlist (not "My Music")
+    branches_to_current_node.append(0); //  Active play Queue
+    music_tree_list->moveToNodesFirstChild(branches_to_current_node);
+    music_tree_list->refresh();
 }
 
 void PlaybackBoxMusic::showEditMetadataDialog()

@@ -78,7 +78,9 @@ class Playlist
 
     void fillSongsFromSonglist();
     void fillSonglistFromSongs();
-
+    void fillSonglistFromQuery(QString whereClause);
+    void fillSonglistFromSmartPlaylist(QString category, QString name);
+    
     void moveTrackUpDown(bool flag, Track *the_track);
 
     bool checkTrack(int a_track_id, bool cd_flag);
@@ -87,7 +89,8 @@ class Playlist
 
     void removeTrack(int the_track_id, bool cd_flag);
     void removeAllTracks(void);
-
+    void removeAllWidgets(void);
+    
     void copyTracks(Playlist *to_ptr, bool update_display);
 
     bool hasChanged(void) { return changed; }

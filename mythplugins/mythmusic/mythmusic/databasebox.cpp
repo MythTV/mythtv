@@ -146,7 +146,9 @@ DatabaseBox::~DatabaseBox()
     }
 
     all_music->resetListings();
-
+    
+    the_playlists->getActive()->removeAllWidgets();
+    
     if (class LCD * lcd = LCD::Get())
         lcd->switchToTime();
 

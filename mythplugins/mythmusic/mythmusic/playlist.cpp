@@ -4,6 +4,7 @@ using namespace std;
 #include "playlist.h"
 #include "qdatetime.h"
 #include <mythtv/mythcontext.h>
+#include "smartplaylist.h"
 
 #include <qfileinfo.h>
 #include <qprocess.h>
@@ -122,7 +123,7 @@ void Track::deleteYourWidget()
 {
     if (my_widget)
     {
-        my_widget->RemoveFromParent();
+       my_widget->RemoveFromParent();
     //    delete my_widget;  Deleted by the parent..
         my_widget = NULL;
     }
@@ -138,6 +139,15 @@ void Playlist::removeAllTracks()
     }
 
     changed = true;
+}
+
+void Playlist::removeAllWidgets()
+{
+    Track *it;
+    for (it = songs.first(); it; it = songs.next())
+    {
+        it->deleteYourWidget();
+    }
 }
 
 void Playlist::ripOutAllCDTracksNow()
@@ -561,6 +571,115 @@ void Playlist::fillSonglistFromSongs()
     raw_songlist = a_list;
 }
 
+void Playlist::fillSonglistFromQuery(QString whereClause)
+{
+    QSqlDatabase *db_conn = QSqlDatabase::database();
+    QSqlQuery query(QString::null, db_conn);
+
+    QString theQuery;
+
+    theQuery = "SELECT intid FROM musicmetadata ";
+    
+    if (whereClause.length() > 0)
+      theQuery += whereClause;
+
+    if (!query.exec(theQuery))
+    {    
+        MythContext::DBError("Load songlist from query", query);
+        raw_songlist = "";
+        return;
+    }
+    
+    raw_songlist = "";
+    while (query.next())
+    {
+        raw_songlist += ", " + query.value(0).toString();
+    }
+    raw_songlist.remove(0, 2);
+}
+
+void Playlist::fillSonglistFromSmartPlaylist(QString category, QString name)
+{
+    QSqlDatabase *db_conn = QSqlDatabase::database();
+    QSqlQuery query(QString::null, db_conn);
+
+    // find the correct categoryid
+    int categoryID = SmartPlaylistEditor::lookupCategoryID(category);
+    if (categoryID == -1)
+    {
+        cout << "Cannot find Smartplaylist Category: " << category << endl;
+        return;
+    }
+    
+    // find smartplaylist
+    int ID;
+    QString matchType;
+    QString orderBy; 
+    int limitTo;
+    
+    query.prepare("SELECT smartplaylistid, matchtype, orderby, limitto "
+                  "FROM smartplaylist WHERE categoryid = :CATEGORYID AND name = :NAME;");
+    query.bindValue(":NAME", name.utf8());
+    query.bindValue(":CATEGORYID", categoryID);
+        
+    if (query.exec())
+    {
+        if (query.isActive() && query.numRowsAffected() > 0)
+        {
+            query.first();
+            ID = query.value(0).toInt();
+            matchType = (query.value(1).toString() == "All") ? " AND " : " OR ";
+            orderBy = QString::fromUtf8(query.value(2).toString());
+            limitTo = query.value(3).toInt();
+        }
+        else
+        {
+            cout << "Cannot find smartplaylist: " << name << endl;
+            return;
+        }
+    }
+    else
+    {
+        MythContext::DBError("Find SmartPlaylist", query);
+        return;   
+    }
+    
+    // get smartplaylist items
+    QString whereClause = "WHERE ";
+    
+    query.prepare("SELECT field, operator, value1, value2 "
+                  "FROM smartplaylistitem WHERE smartplaylistid = :ID;");
+    query.bindValue(":ID", ID);
+    query.exec();
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        bool bFirst = true;
+        while (query.next())
+        {
+            QString fieldName = QString::fromUtf8(query.value(0).toString());
+            QString operatorName = QString::fromUtf8(query.value(1).toString());
+            QString value1 = QString::fromUtf8(query.value(2).toString());
+            QString value2 = QString::fromUtf8(query.value(3).toString());
+            if (!bFirst)
+                whereClause += matchType + getCriteriaSQL(fieldName, operatorName, value1, value2); 
+            else
+            {
+               bFirst = false;
+               whereClause += " " + getCriteriaSQL(fieldName, operatorName, value1, value2);
+            }
+        }
+    }
+    
+    // add order by clause
+    whereClause += getOrderBySQL(orderBy);
+    
+    // add limit
+    if (limitTo > 0)
+        whereClause +=  " LIMIT " + QString::number(limitTo); 
+             
+    fillSonglistFromQuery(whereClause); 
+}
+    
 void Playlist::savePlaylist(QString a_name, QSqlDatabase *a_db)
 {
     if (!a_db)
@@ -1007,7 +1126,7 @@ QString PlaylistsContainer::getPlaylistName(int index, bool &reference)
         Playlist *a_list;
         for(a_list = all_other_playlists->last(); a_list; a_list = all_other_playlists->prev())
         {
-            if(a_list->getID() == index)
+            if (a_list->getID() * -1 == index)
             {
                 return a_list->getName();   
             }

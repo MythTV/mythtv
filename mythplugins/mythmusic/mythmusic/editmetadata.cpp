@@ -348,7 +348,7 @@ void EditMetadataDialog::fillSearchList(QString field)
     {
         while (query.next())
         {
-            searchList << query.value(0).toString();
+            searchList << QString::fromUtf8(query.value(0).toString());
         }
     }         
 }
@@ -445,6 +445,15 @@ void EditMetadataDialog::saveToDatabase()
 void EditMetadataDialog::saveToFile()
 {
    cancelPopup();
+   
+   if (!MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(), 
+            "Save To File",
+            tr("Are you sure you want to save the modified metadata to the file?"), 
+            false))
+   {
+       return;
+   }    
+   
    Decoder *decoder = Decoder::create(m_metadata->Filename(), NULL, NULL, true);
    if (decoder)
    {
@@ -456,6 +465,8 @@ void EditMetadataDialog::saveToFile()
 void EditMetadataDialog::saveAll()
 {
    cancelPopup();
+   saveToFile();
+   saveToDatabase();
 }
 
 EditMetadataDialog::~EditMetadataDialog()
