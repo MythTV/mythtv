@@ -873,7 +873,7 @@ void ProgramInfo::SetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
 }
 
 void ProgramInfo::GetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
-                  int type, bool mergeIntoMap = false)
+                  int type, bool mergeIntoMap)
 {
     if (!mergeIntoMap)
         marks.clear();
