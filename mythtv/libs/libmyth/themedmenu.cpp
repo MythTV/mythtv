@@ -58,7 +58,7 @@ struct ThemedButton
 
     QString text;
     QString altText;
-    QString action;
+    QStringList action;
 
     int row;
     int col;
@@ -110,7 +110,7 @@ class ThemedMenuPrivate
     void setDefaults(void);
 
     void addButton(const QString &type, const QString &text,
-                   const QString &alttext, const QString &action);
+                   const QString &alttext, const QStringList &action);
     void layoutButtons(void);
     void positionButtons(bool resetpos);
     bool makeRowVisible(int newrow, int oldrow, bool forcedraw = true);
@@ -973,6 +973,14 @@ void ThemedMenuPrivate::parseSettings(const QString &dir,
         cerr << "at line: " << errorLine << "  column: " << errorColumn << endl;
         cerr << errorMsg << endl;
         f.close();
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
+                                  QObject::tr("Bad Menu File"),
+                                  QObject::tr(QString("The menu file %1 is "
+                                              "incomplete.\n\nWe will now "
+                                              "return to the main menu.")
+                                              .arg(menuname)));
+        menulevel = 0;
+        parseMenu("mainmenu.xml");
         return;
     }
 
@@ -1048,7 +1056,7 @@ void ThemedMenuPrivate::parseThemeButton(QDomElement &element)
 {
     QString type = "";
     QString text = "";
-    QString action = "";
+    QStringList action;
     QString alttext = "";
 
     bool addit = true;
@@ -1091,7 +1099,7 @@ void ThemedMenuPrivate::parseThemeButton(QDomElement &element)
             }
             else if (info.tagName() == "action")
             {
-                action = getFirstText(info);
+                action += getFirstText(info);
             }
             else if (info.tagName() == "depends")
             {
@@ -1119,7 +1127,7 @@ void ThemedMenuPrivate::parseThemeButton(QDomElement &element)
         return;
     }
    
-    if (action == "")
+    if (action.empty())
     {
         cerr << "Missing 'action' in button\n";
         return;
@@ -1167,7 +1175,21 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
         cerr << "at line: " << errorLine << "  column: " << errorColumn << endl;
         cerr << errorMsg << endl;
         f.close();
-        exit(1);
+
+        if (menuname == "mainmenu.xml" )
+        {
+            exit(0);
+        }
+
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
+                                  QObject::tr("Bad Menu File"),
+                                  QObject::tr(QString("The menu file %1 is "
+                                              "incomplete.\n\nWe will now "
+                                              "return to the main menu.")
+                                              .arg(menuname)));
+        menulevel = 0;
+        parseMenu("mainmenu.xml");
+        return;
     }
 
     f.close();
@@ -1300,7 +1322,8 @@ QRect ThemedMenuPrivate::parseRect(const QString &text)
 }
 
 void ThemedMenuPrivate::addButton(const QString &type, const QString &text, 
-                                  const QString &alttext, const QString &action)
+                                  const QString &alttext, 
+                                  const QStringList &action)
 {
     ThemedButton newbutton;
 
@@ -1920,7 +1943,11 @@ bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
             lastbutton = activebutton;
             activebutton = NULL;
             parent->repaint(lastbutton->posRect);
-            handleAction(lastbutton->action);
+            for (QStringList::Iterator it = lastbutton->action.begin();
+                 it != lastbutton->action.end(); ++it)
+            {
+                handleAction(*it);
+            }
             lastbutton = NULL;
         }
         else if (action == "ESCAPE")
