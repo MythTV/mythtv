@@ -14,6 +14,7 @@
 #include "util.h"
 #include "remotefile.h"
 #include "lcddevice.h"
+#include "dialogbox.h"
 
 bool print_verbose_messages = false;    
 
@@ -846,5 +847,25 @@ void MythContext::SetMainWindow(MythMainWindow *mainwin)
 MythMainWindow *MythContext::GetMainWindow(void)
 {
     return mainWindow;
+}
+
+bool MythContext::TestPopupVersion(const QString &name, 
+                                   const QString &libversion,
+                                   const QString &pluginversion)
+{
+    if (libversion == pluginversion)
+        return true;
+
+    QString err = "The " + name + " plugin was compiled against libmyth " +
+                  "version: " + pluginversion + ", but the installed " +
+                  "libmyth is at version: " + libversion + ".  You probably " +
+                  "want to recompile the " + name + " plugin after doing a " +
+                  "make distclean.";
+                  
+    DialogBox dbox(gContext->GetMainWindow(), err);
+    dbox.AddButton("OK");
+    dbox.exec();
+
+    return false;
 }
 

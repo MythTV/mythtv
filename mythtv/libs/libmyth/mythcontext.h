@@ -138,7 +138,9 @@ class MythContext : public QObject
     void LCDswitchToNothing();
     void LCDpopMenu(QString menu_choice, QString menu_title);
     void LCDdestroy();
-	
+
+    bool TestPopupVersion(const QString &name, const QString &libversion,
+                          const QString &pluginversion);	
   private slots:
     void readSocket();
 
