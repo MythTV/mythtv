@@ -430,7 +430,7 @@ Metadata *FlacDecoder::getMetadata(QSqlDatabase *db)
         return NULL;
 
     FLAC__Metadata_Chain *chain = FLAC__metadata_chain_new();
-    if (!FLAC__metadata_chain_read(chain, filename.ascii()))
+    if (!FLAC__metadata_chain_read(chain, filename.local8Bit()))
     {
         FLAC__metadata_chain_delete(chain); 
         return NULL;
@@ -505,7 +505,7 @@ void FlacDecoder::commitMetadata(Metadata *mdata)
         return;
 
     FLAC__Metadata_Chain *chain = FLAC__metadata_chain_new();
-    if (!FLAC__metadata_chain_read(chain, filename.ascii()))
+    if (!FLAC__metadata_chain_read(chain, filename.local8Bit()))
     {
         FLAC__metadata_chain_delete(chain);
         return;

@@ -553,7 +553,7 @@ Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
     if (!ignore_id3)
     {
         // use ID3 header
-        id3_file *id3file = id3_file_open(filename.ascii(), 
+        id3_file *id3file = id3_file_open(filename.local8Bit(), 
                                           ID3_FILE_MODE_READONLY);
         if (!id3file)
         {
