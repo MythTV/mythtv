@@ -301,6 +301,16 @@ public:
     bool Record;
 };
 
+class Person
+{
+public:
+    Person() {};
+    Person(const QString &r, const QString &n)
+        :role(r),name(n) {};
+    QString role;
+    QString name;
+};
+
 class Event
 {
 //TODO: Int conversion
@@ -329,6 +339,9 @@ public:
     bool SubTitled;
     int ETM_Location;    /* Used to flag still waiting ETTs for ATSC */
     bool ATSC;
+    //bool PreviouslyShown;
+    QDate OriginalAirDate;
+    QValueList<Person> Credits;
 };
 
 // DVB TransportObject - Used with NIT Scanning

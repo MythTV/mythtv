@@ -376,7 +376,7 @@ void DVBRecorder::SetDemuxFilters()
 
     // Record all streams flagged for recording
     bool need_pcr_pid = true;
-    QValueList<ElementaryPIDObject>::Iterator es;
+    QValueList<ElementaryPIDObject>::const_iterator es;
     for (es = m_pmt.Components.begin(); es != m_pmt.Components.end(); ++es)
     {
         if ((*es).Record)

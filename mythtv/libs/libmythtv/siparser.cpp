@@ -2813,6 +2813,7 @@ QString SIParser::ProcessDescriptorHuffmanTextLarge(unsigned char *buf,unsigned 
 
 void SIParser::EITFixUp(Event& event)
 {
+    event.Year = event.StartTime.toString(QString("yyyy"));
     if (event.Description == "" && event.Event_Subtitle != "") 
     {
          event.Description = event.Event_Subtitle;        
@@ -2832,6 +2833,10 @@ void SIParser::EITFixUp(Event& event)
         default:
                    break; 
     }
+
+    event.Event_Name.stripWhiteSpace();
+    event.Event_Subtitle.stripWhiteSpace();
+    event.Description.stripWhiteSpace();
 
 }
 
@@ -2927,6 +2932,7 @@ void SIParser::EITFixUpStyle2(Event& event)
     event.Description = event.Description.replace("Brand New Series","");
     event.Description = event.Description.replace("New Series","");
 
+
     position = event.Description.find(':');
     if (position != -1)
     {
@@ -2939,6 +2945,24 @@ void SIParser::EITFixUpStyle2(Event& event)
             QString Temp = event.Event_Subtitle;
             event.Event_Subtitle = event.Description;
             event.Description = Temp;
+        }
+    }
+
+    if (event.Event_Name.endsWith("...") && 
+        event.Event_Subtitle.startsWith("..."))
+    {
+        //try and make the subtitle
+        QString Full = event.Event_Name.left(event.Event_Name.length()-3)+" "+
+                    event.Event_Subtitle.right(event.Event_Subtitle.length()-3);
+        if ((position = Full.find(":")) != -1)
+        {
+           event.Event_Name = Full.left(position);
+           event.Event_Subtitle = Full.right(Full.length()-position-2);
+        }
+        else if ((position = Full.find(".")) != -1)
+        {
+           event.Event_Name = Full.left(position);
+           event.Event_Subtitle = Full.right(Full.length()-position-2);
         }
     }
 }
@@ -2976,7 +3000,7 @@ void SIParser::EITFixUpStyle4(Event& event)
         QStringList list = rx.capturedTexts();
 
         // sometimes the category is empty, in that case use the category from
-        // the one from subtitle. this category is in swedish and all others 
+        // the subtitle. this category is in swedish and all others
         // are in english
         if (event.ContentDescription.length() == 0)
         {
@@ -3007,17 +3031,113 @@ void SIParser::EITFixUpStyle4(Event& event)
         // in a row is a list of director(s) and actors.
         // different lists are separated by 3 spaces in a row
         // end of all lists is when there is 4 spaces in a row
+        bool bDontRemove=false;
+        pos = event.Description.find("    ");
+        if (pos != -1)
+        {
+            QStringList lists;
+            lists=QStringList::split("   ",event.Description.left(pos));
+            for (QStringList::Iterator it=lists.begin();it!=lists.end();it++)
+            {
+                QStringList list=QStringList::split(": ",(*it).remove(QRegExp("\\.$")));
+                if (list.count()==2)
+                {
+                    if (list[0].find(QRegExp("[Rr]egi"))!=-1)
+                    {
+                        //director(s)
+                        QStringList persons=QStringList::split(", ",list[1]);
+                        for(QStringList::Iterator it2=persons.begin();it2!=persons.end();it2++)
+                        {
+                            event.Credits.append(Person("director",*it2));
+                        }
+                    }
+                    else if (list[0].find(QRegExp("[Ss]kådespelare"))!=-1)
+                    {
+                        //actor(s)
+                        QStringList persons=QStringList::split(", ",list[1]);
+                        for(QStringList::Iterator it2=persons.begin();it2!=persons.end();it2++)
+                        {
+                            event.Credits.append(Person("actor",*it2));
+                        }
+                    }
+                    else
+                    {
+                        //unknown type, posibly a new one that this code shoud be updated to handle
+                        fprintf(stdout,"SIParser::EITFixUpStyle4: %s is not actor or director\n",list[0].ascii());
+                        bDontRemove=true;
+                    }
+                }
+                else
+                {
+                    //oops, improperly formated list, ignore it
+                    //fprintf(stdout,"SIParser::EITFixUpStyle4: %s is not a properly formated list of persons\n",(*it).ascii());
+                    bDontRemove=true;
+                }
+            }
+            //remove list of persons from description if we coud parse it properly
+            if (!bDontRemove)
+            {
+                event.Description=event.Description.mid(pos).stripWhiteSpace();
+            }
+        }
+
+        //fprintf(stdout,"SIParser::EITFixUpStyle4: Number of persons: %d\n",event.Credits.count());
 
         /*
         a regexp like this coud be used to get the episode number, shoud be at
         the begining of the description
-        "^(?:[dD]el|[eE]pisode)\\s([0-9]+)(?:(?:\\s|/)av\\s([0-9]+))?\\."
+        "^(?:[dD]el|[eE]pisode)\\s([0-9]+)(?:\\s?(?:/|:|av)\\s?([0-9]+))?\\."
         */
 
-        /*
-        we coud also tell if this show is a rerun and when it was last shown
-        by looking for "Repris från day/month."
-        and future showings by looking for "Även day/month."
-        */
+        //try to findout if this is a rerun and if so the date.
+        QRegExp rx("[Rr]epris\\sfrån\\s([^\\.]+)(?:\\.|$)");
+        if (rx.search(event.Description) != -1)
+        {
+            QStringList list = rx.capturedTexts();
+            if (list[1]=="i dag")
+            {
+                event.OriginalAirDate=event.StartTime.date();
+            }
+            else if (list[1]=="eftermiddagen")
+            {
+                event.OriginalAirDate=event.StartTime.date().addDays(-1);
+            }
+            else
+            {
+                QRegExp rxdate("([0-9]+)/([0-9]+)(?:\\s-\\s([0-9]{4}))?");
+                if (rxdate.search(list[1]) != -1)
+                {
+                    QStringList datelist = rxdate.capturedTexts();
+                    int day=datelist[1].toInt();
+                    int month=datelist[2].toInt();
+                    int year;
+                    if (datelist[3].length() > 0)
+                    {
+                        year=datelist[3].toInt();
+                    }
+                    else
+                    {
+                        year=event.StartTime.date().year();
+                    }
+
+                    if(day>0 && month>0)
+                    {
+                        QDate date(event.StartTime.date().year(),month,day);
+                        //it's a rerun so it must be in the past
+                        if (date>event.StartTime.date())
+                        {
+                            date=date.addYears(-1);
+                        }
+                        event.OriginalAirDate=date;
+                        //fprintf(stdout,"SIParser::EITFixUpStyle4: OriginalAirDate set to: %s for '%s'\n",event.OriginalAirDate.toString(Qt::ISODate).ascii(),event.Description.ascii());
+                    }
+                }
+                else
+                {
+                    //unknown date, posibly only a year.
+                    //fprintf(stdout,"SIParser::EITFixUpStyle4: unknown rerun date: %s\n",list[1].ascii());
+                }
+            }
+        }
     }
 }

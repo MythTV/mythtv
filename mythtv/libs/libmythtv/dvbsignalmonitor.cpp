@@ -50,7 +50,6 @@ void DVBSignalMonitor::MonitorLoop()
     {
         if (FillFrontendStats(stats))
         {
-//            emit Status(stats);
             emit StatusSignalToNoise((int) stats.snr);
             emit StatusSignalStrength((int) stats.ss);
             emit StatusBitErrorRate(stats.ber);
@@ -105,10 +104,13 @@ bool DVBSignalMonitor::FillFrontendStats(dvb_stats_t& stats)
     if (fd_frontend < 0)
         return false;
 
-    memset (&stats,0,sizeof(dvb_stats_t));
+    stats.snr=0;
     ioctl(fd_frontend, FE_READ_SNR, &stats.snr);
+    stats.ss=0;
     ioctl(fd_frontend, FE_READ_SIGNAL_STRENGTH, &stats.ss);
+    stats.ber=0;
     ioctl(fd_frontend, FE_READ_BER, &stats.ber);
+    stats.ub=0;
     ioctl(fd_frontend, FE_READ_UNCORRECTED_BLOCKS, &stats.ub);
     ioctl(fd_frontend, FE_READ_STATUS, &stats.status);
 

@@ -153,6 +153,7 @@ void SIScan::StartScanner()
                 if (fAll)
                     emit ServiceScanComplete();
 */
+                emit PctServiceScanComplete(((transportsToScan-transportsCount)*100)/transportsToScan);
                 sourceIDTransportTuned = false;
             }
             else
@@ -178,12 +179,6 @@ void SIScan::StartScanner()
 
         if (scanMode == TRANSPORT_LIST)
         {
-            if (transportsCount == 0)
-            {
-                emit PctServiceScanComplete(100);
-                emit ServiceScanComplete();
-                scanMode = IDLE; 
-            }
             if ((!sourceIDTransportTuned) || ((ScanTimeout > 0) && (timer.elapsed() > ScanTimeout)))
             {
                 QValueList<TransportScanList>::Iterator i;
@@ -198,7 +193,8 @@ void SIScan::StartScanner()
                         emit ServiceScanUpdateText((*i).FriendlyName);
                         SISCAN(QString("Tuning to mplexid %1").arg((*i).mplexid));
                         transportsCount--;
-                        emit PctServiceScanComplete(((transportsToScan-transportsCount-1)*100)/transportsToScan);
+                        if (transportsCount == 0)
+                            scanMode = IDLE; 
          
                         bool result = false;                
                         if ((*i).mplexid == -1)
@@ -213,7 +209,13 @@ void SIScan::StartScanner()
                             result = chan->SetTransportByInt((*i).mplexid);
 
                         if (!result)
+                        {
+                            int pct = ((transportsToScan-transportsCount)*100)/transportsToScan;
+                            emit PctServiceScanComplete(pct);
                             emit ServiceScanUpdateText("Failed to tune");
+                            if (transportsCount == 0)
+                                emit ServiceScanComplete();
+                        }
                         else
                         {
                             if ((*i).mplexid == -1)
@@ -997,11 +999,11 @@ void SIScan::AddEvents()
         {
 
             query.prepare("select * from  program where chanid=:CHANID and "
-                      "starttime=:STARTTIME and programid=:PROGRAMID;");
+                      "starttime=:STARTTIME and title=:TITLE;");
             query.bindValue(":CHANID",ChanID);
             query.bindValue(":STARTTIME",(*e).StartTime.toString(QString("yyyy-MM-dd hh:mm:00")));
             query.bindValue(":ENDTIME",(*e).EndTime.toString(QString("yyyy-MM-dd hh:mm:00")));
-            query.bindValue(":PROGRAMID",(*e).EventID);
+            query.bindValue(":TITLE",(*e).Event_Name.utf8());
 
             if(!query.exec())
                 MythContext::DBError("Checking Event", query);
@@ -1014,9 +1016,9 @@ void SIScan::AddEvents()
                  counter++;
 
                  query.prepare("INSERT INTO program (chanid,starttime,endtime,"
-                          "title,description,subtitle,category,programid,"
-                          "stereo,closecaptioned,hdtv)"
-                          "VALUES (:CHANID,:STARTTIME,:ENDTIME,:TITLE,:DESCRIPTION,:SUBTITLE,:CATEGORY,:PROGRAMID,:STEREO,:CLOSECAPTIONED,:HDTV);");
+                          "title,description,subtitle,category,"
+                          "stereo,closecaptioned,hdtv,airdate,originalairdate)"
+                          "VALUES (:CHANID,:STARTTIME,:ENDTIME,:TITLE,:DESCRIPTION,:SUBTITLE,:CATEGORY,:STEREO,:CLOSECAPTIONED,:HDTV,:AIRDATE,:ORIGINALAIRDATE);");
                 query.bindValue(":CHANID",ChanID);
                 query.bindValue(":STARTTIME",(*e).StartTime.toString(QString("yyyy-MM-dd hh:mm:00")));
                 query.bindValue(":ENDTIME",(*e).EndTime.toString(QString("yyyy-MM-dd hh:mm:00")));
@@ -1024,10 +1026,11 @@ void SIScan::AddEvents()
                 query.bindValue(":DESCRIPTION",(*e).Description.utf8());
                 query.bindValue(":SUBTITLE",(*e).Event_Subtitle.utf8());
                 query.bindValue(":CATEGORY",(*e).ContentDescription.utf8());
-                query.bindValue(":PROGRAMID",(*e).EventID);
                 query.bindValue(":STEREO",(*e).Stereo);
                 query.bindValue(":CLOSECAPTIONED",(*e).SubTitled);
                 query.bindValue(":HDTV",(*e).HDTV);
+                query.bindValue(":AIRDATE",(*e).Year);
+                query.bindValue(":ORIGINALAIRDATE",(*e).OriginalAirDate.toString(QString("yyyy-MM-dd")));
 
                 if(!query.exec())
                     MythContext::DBError("Adding Event", query);

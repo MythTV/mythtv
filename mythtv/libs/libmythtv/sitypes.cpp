@@ -246,6 +246,9 @@ void Event::clearEventValues()
     Stereo = false;
     HDTV = false;
     ATSC = false;
+    //PreviouslyShown = false;
+    OriginalAirDate = QDate();
+    Credits.clear();
 }
 
 void TransportObject::Reset()
