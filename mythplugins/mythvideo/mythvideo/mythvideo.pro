@@ -10,16 +10,21 @@ TARGET = mythvideo
 target.path = $${PREFIX}/bin
 INSTALLS += target
 
-installfiles.path = $${PREFIX}/share/mythtv
+uifiles.path = $${PREFIX}/share/mythtv/themes/default
+uifiles.files = video-ui.xml
+installfiles.path = $${PREFIX}/share/mythtv/
 installfiles.files = mythvideo-settings.txt videomenu.xml
 
-INSTALLS += installfiles
+trans.path = $${PREFIX}/share/mythtv/i18n/
+trans.files = mythvideo_it.qm
 
-LIBS += -L/usr/local/lib -lmyth-$$LIBVERSION
+INSTALLS += installfiles trans uifiles
+
+LIBS += -L$${PREFIX}/lib -lmyth-$$LIBVERSION
 
 # Input
 
 HEADERS += metadata.h databasebox.h treecheckitem.h dirlist.h
 
 SOURCES += main.cpp metadata.cpp databasebox.cpp treecheckitem.cpp dirlist.cpp 
-
+TRANSLATIONS = mythvideo_it.ts

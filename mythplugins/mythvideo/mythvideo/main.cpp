@@ -6,6 +6,7 @@ using namespace std;
 #include <qsqldatabase.h>
 #include <unistd.h>
 #include <qsocketnotifier.h>
+#include <qtextcodec.h>
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -59,8 +60,9 @@ void startDatabaseTree(QSqlDatabase *db, QValueList<Metadata> *playlist)
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    QTranslator translator( 0 );
     
-    gContext = new MythContext();
+    gContext = new MythContext(MYTH_BINARY_VERSION);
 
 #ifdef ENABLE_LIRC
     lfd=lirc_init("mythvideo",1);
@@ -82,6 +84,11 @@ int main(int argc, char *argv[])
     gContext->LoadQtConfig();
 
     gContext->LoadSettingsFiles("mythvideo-settings.txt");
+
+    translator.load(PREFIX + QString("/share/mythtv/i18n/mythvideo_") + 
+                    QString(gContext->GetSetting("Locale")) + QString(".qm"),
+                    ".");
+    a.installTranslator(&translator);
 
     if (a.argc() > 1)
         gContext->SetSetting("StartDir",a.argv()[1]);

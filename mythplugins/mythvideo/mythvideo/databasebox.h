@@ -7,6 +7,9 @@
 
 #include "metadata.h"
 #include <mythtv/mythwidgets.h>
+#include <qdom.h>
+#include <mythtv/uitypes.h>
+#include <mythtv/xmlparse.h>
 
 class QSqlDatabase;
 class QListViewItem;
@@ -20,22 +23,75 @@ class DatabaseBox : public MythDialog
     DatabaseBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
                 QWidget *parent = 0, const char *name = 0);
 
-  public slots:
-    void selected(QListViewItem *);
+  signals:
+    void killTheApp();
+
+  protected slots:
+    void selected();
+    void cursorDown(bool page = false);
+    void cursorUp(bool page = false);
+    void pageDown() { cursorDown(true); }
+    void pageUp() { cursorUp(true); }
+    void exitWin();
+
+  protected:
+    void paintEvent(QPaintEvent *);
 
   private:
-    void doSelected(QListViewItem *);
-    void fillList(MythListView *listview, QValueList<Metadata> *playlist );
-
     QPixmap getPixmap(QString &level);
-
     QSqlDatabase *db;
+    QValueList<Metadata> *m_list;
 
-    TreeCheckItem *cditem;
+    void LoadWindow(QDomElement &);
+    void parseContainer(QDomElement &);
+    XMLParse *theme;
+    QDomElement xmldata;
 
-    QValueList<Metadata> *plist;
+    void updateBackground(void);
+    void updateList(QPainter *);
+    void updateInfo(QPainter *);
+    void updatePlayWait(QPainter *);
 
-    MythListView *listview;
+    void grayOut(QPainter *);
+    void resizeImage(QPixmap *, QString);
+
+    QAccel *accel;
+
+    QPixmap *bgTransBackup;
+    Metadata *curitem;
+
+    QPainter backup;
+    QPixmap myBackground;
+    bool pageDowner;
+
+    int inList;
+    int inData;
+    int listCount;
+    int dataCount;
+
+    int m_status;
+
+    int space_itemid;
+    int enter_itemid;
+    int return_itemid;
+
+    int rectListLeft;
+    int rectListTop;
+    int rectListWidth;
+    int rectListHeight;
+    int rectInfoLeft;
+    int rectInfoTop;
+    int rectInfoWidth;
+    int rectInfoHeight;
+  
+    int listsize;
+    QRect listRect() const;
+    QRect infoRect() const;
+    QRect fullRect() const;
+
+    QString m_cmd;   
+    QString m_title;
+
 };
 
 #endif
