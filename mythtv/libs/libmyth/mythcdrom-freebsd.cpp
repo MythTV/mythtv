@@ -2,6 +2,7 @@
 #include <errno.h>
 #include <sys/ioctl.h>
 #include <sys/cdio.h>
+#include "mythcontext.h"
 
 
 #define ASSUME_WANT_AUDIO 1
