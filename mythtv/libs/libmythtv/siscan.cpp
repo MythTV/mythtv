@@ -194,7 +194,7 @@ void SIScan::StartScanner()
                     {
                         (*i).complete = true;
                         if ((ScanTimeout > 0) && (timer.elapsed() > ScanTimeout))
-                            emit ServiceScanUpdateText("Timeout Scaning Channel");
+                            emit ServiceScanUpdateText("Timeout Scanning Channel");
                         emit ServiceScanUpdateText((*i).FriendlyName);
                         SISCAN(QString("Tuning to mplexid %1").arg((*i).mplexid));
                         transportsCount--;
