@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythtv/mythcontext.h"
 
-const QString currentDatabaseVersion = "1003";
+const QString currentDatabaseVersion = "1004";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -268,7 +268,7 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (156,'Defender 2',152,19,1988,483,'1PL ACT SHO');",
 "INSERT INTO nestitle VALUES (157,'Defender of the Crown',103,58,1989,484,'1PL');",
 "INSERT INTO nestitle VALUES (158,'Defenders Of Dynatron City',106,75,1991,482,'1PL TVA');",
-"INSERT INTO nestitle VALUES (159,'Déjà Vù',56,16,1991,485,'1PL ADV MYS RPG');",
+"INSERT INTO nestitle VALUES (159,'Dï¿½ï¿½V',56,16,1991,485,'1PL ADV MYS RPG');",
 "INSERT INTO nestitle VALUES (16,'The Adventures Of Lolo 3',19,19,1991,895,'1PL ACT PUZ');",
 "INSERT INTO nestitle VALUES (160,'Demon Sword',10,10,1989,486,'1PL');",
 "INSERT INTO nestitle VALUES (161,'Desert Commander',77,77,1989,854,'1PL 2PX SIM STR');",
@@ -535,7 +535,7 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (397,'Metal Fighter',120,43,1989,611,'1PL ACT SHO UNL');",
 "INSERT INTO nestitle VALUES (398,'Metal Gear',4,58,1988,612,'1PL ACT ADV PSS');",
 "INSERT INTO nestitle VALUES (399,'Metal Mech',105,23,1990,920,'1PL ACT ADV');",
-"INSERT INTO nestitle VALUES (4,'720°',20,24,1989,898,'1PL ARC SKA SPT');",
+"INSERT INTO nestitle VALUES (4,'720',20,24,1989,898,'1PL ARC SKA SPT');",
 "INSERT INTO nestitle VALUES (40,'Back To The Future 2 & 3',96,35,1989,756,'1PL ACT MOV TIM');",
 "INSERT INTO nestitle VALUES (400,'Metal Storm',12,12,1990,613,'1PL ACT');",
 "INSERT INTO nestitle VALUES (401,'Metroid',2,2,1986,378,'1PL ACT ADV PSS');",
@@ -1097,4 +1097,12 @@ void UpgradeGameDatabaseSchema(void)
         performActualUpdate(updates, "1003", dbver);
     }
 
+    if (dbver == "1003")
+    {
+        const QString updates[] = {
+QString("update mamemetadata set rom_path ='%1' WHERE rom_path ='';").arg(gContext->GetSetting("MameRomLocation")),
+""
+};
+        performActualUpdate(updates, "1004", dbver);
+    }
 }
