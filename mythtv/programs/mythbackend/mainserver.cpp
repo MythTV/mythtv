@@ -800,6 +800,16 @@ void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs)
     }
 
     QStringList strlist;
+    QString filename = gContext->GetSetting("RecordFilePrefix") + "/nfslockfile.lock";
+    QFile checkFile(filename);
+
+    if (!ismaster)
+       if (checkFile.exists())  //found the lockfile, so don't count the space
+       {
+         totalspace = 0;
+         usedspace = 0;
+       }
+
     strlist << QString::number(totalspace) << QString::number(usedspace);
     WriteStringList(pbs->getSocket(), strlist);
 }

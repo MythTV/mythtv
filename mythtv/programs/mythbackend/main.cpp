@@ -236,6 +236,26 @@ int main(int argc, char **argv)
 
     VERBOSE("Verbose mode activated.");
 
+    QString lockfile_location = gContext->GetSetting("RecordFilePrefix") + "/nfslockfile.lock";
+    int nfsfd = -1;
+
+    if (ismaster)
+// Create a file in the recording directory.  A slave encoder will 
+// look for this file and return 0 bytes free if it finds it when it's
+// queried about its available/used diskspace.  This will prevent double (or
+// more) counting of available disk space.
+// If the slave doesn't find this file then it will assume that it has
+// a seperate store.
+    {
+       nfsfd = open(lockfile_location.ascii(), O_WRONLY|O_CREAT|O_APPEND, 0664);
+       if (nfsfd < 0) 
+       { 
+          perror("Error)"); 
+          return -1;
+       }
+       close(nfsfd);
+    }
+
     new MainServer(ismaster, port, statusport, &tvList);
 
     a.exec();
@@ -249,6 +269,8 @@ int main(int argc, char **argv)
 
     if (pidfile != "")
         unlink(pidfile.ascii());
+
+    unlink(lockfile_location.ascii());
 
     return 0;
 }
