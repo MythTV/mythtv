@@ -455,7 +455,6 @@ bool CommDetect::CheckRatingSymbol(void)
     int max_x = (int)(width * 0.25);
     int min_y = (int)(height * 0.05);
     int max_y = (int)(height * 0.27);
-    int ratMin = 30;
     int ratMax = 160;
     int r, g, b;
     int Y, U, V;
