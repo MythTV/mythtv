@@ -362,7 +362,15 @@ bool MetadataMythMusicMonitor::sweepMetadata()
     return false;
 #endif
 
-    if(startdir.length() < 1)
+    startdir = QDir::cleanDirPath(startdir);
+    if(!startdir.endsWith("/"));
+    {
+        startdir += "/";
+    }
+            
+            
+
+    if(startdir.length() < 2)
     {
         warning("metadata mythmusic monitor cannot look for music file paths starting with a null string");
         return false;
