@@ -1352,7 +1352,11 @@ void *NuppelVideoPlayer::kickoffOutputVideoLoop(void *player)
 bool NuppelVideoPlayer::FastForward(float seconds)
 {
     if (fftime == 0)
+    {
         fftime = (int)(seconds * video_frame_rate);
+        if (decoder)
+            decoder->InterruptDisplay();
+    }
 
     return fftime > CalcMaxFFTime(fftime);
 }
@@ -1360,7 +1364,11 @@ bool NuppelVideoPlayer::FastForward(float seconds)
 bool NuppelVideoPlayer::Rewind(float seconds)
 {
     if (rewindtime == 0)
+    {
         rewindtime = (int)(seconds * video_frame_rate);
+        if (decoder)
+            decoder->InterruptDisplay();
+    }
 
     return rewindtime >= framesPlayed;
 }

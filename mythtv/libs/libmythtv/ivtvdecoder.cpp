@@ -46,6 +46,8 @@ IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
     lastKey = 0;
 
     prvpkt[0] = prvpkt[1] = prvpkt[2] = 0;
+
+    ingetframe = false;
 }
 
 IvtvDecoder::~IvtvDecoder()
@@ -253,15 +255,20 @@ void IvtvDecoder::GetFrame(int onlyvideo)
     long long startpos = ringBuffer->GetReadPosition();
     int count = 0;
     int newframes = 0;
-
+    int onlywrote = 0;
+    
     while (!allowedquit)
     {
         count = ringBuffer->Read(buf, 131072);
 
         MpegPreProcessPkt(buf, count, startpos);
         if (onlyvideo >= 0)
-            newframes = videoout->WriteBuffer(buf, count);
-
+        {
+            ingetframe = true;
+            onlywrote = videoout->WriteBuffer(buf, count, newframes);
+            ingetframe = false;
+	}
+	    
         allowedquit = true;
     }                    
 
@@ -269,6 +276,15 @@ void IvtvDecoder::GetFrame(int onlyvideo)
         framesPlayed = newframes;
 
     m_parent->SetFramesPlayed(framesPlayed);
+}
+
+void IvtvDecoder::InterruptDisplay(void)
+{
+    if (ingetframe)
+    {
+        VideoOutputIvtv *videoout = (VideoOutputIvtv *)m_parent->getVideoOutput();
+        videoout->InterruptDisplay();
+    }
 }
 
 bool IvtvDecoder::DoRewind(long long desiredFrame)

@@ -33,7 +33,7 @@ class VideoOutputIvtv: public VideoOutput
                       FilterChain *filterList,
                       NuppelVideoPlayer *pipPlayer);
 
-    int WriteBuffer(unsigned char *buf, int count);
+    int WriteBuffer(unsigned char *buf, int count, int &frames);
     void Pause(void);
     void Play(void);
 
@@ -42,6 +42,8 @@ class VideoOutputIvtv: public VideoOutput
     void SetFPS(float lfps) { fps = lfps; }
 
     void ClearOSD(void);
+
+    void InterruptDisplay(void);
 
   private:
     int videofd;
@@ -72,6 +74,9 @@ class VideoOutputIvtv: public VideoOutput
     bool firstframe;
 
     int osdbufsize;
+
+    bool skipplay;
+    bool interruptdisplay;
 };
 
 #endif

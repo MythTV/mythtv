@@ -46,6 +46,8 @@ class DecoderBase
 
     virtual QString GetEncodingType(void) = 0;
 
+    virtual void InterruptDisplay(void) { }
+       
   protected:
     NuppelVideoPlayer *m_parent;
     RingBuffer *ringBuffer;

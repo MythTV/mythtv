@@ -1,3 +1,4 @@
 Makefile
+.qmake.internal.cache
 mythlcd
 moc_mythlcd.cpp

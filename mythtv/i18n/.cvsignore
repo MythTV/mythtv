@@ -1,2 +1,3 @@
 Makefile
 i18n
+.qmake.internal.cache

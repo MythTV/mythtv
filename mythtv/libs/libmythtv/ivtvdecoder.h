@@ -48,6 +48,8 @@ class IvtvDecoder : public DecoderBase
 
     QString GetEncodingType(void) { return QString("MPEG-2"); }
 
+    void InterruptDisplay(void);
+
   protected:
     RingBuffer *getRingBuf(void) { return ringBuffer; }
 
@@ -89,6 +91,8 @@ class IvtvDecoder : public DecoderBase
     unsigned char prvpkt[3];
 
     static bool ntsc;
+
+    bool ingetframe;
 };
 
 #endif

@@ -1135,14 +1135,30 @@ void OSD::UpdatePause(int position, QString slidertext)
     {
         OSDTypeText *type = (OSDTypeText *)container->GetType("slidertext");
         if (type)
-            type->SetText(slidertext);
+        {
+            if (type->GetText() != slidertext)
+            {
+                type->SetText(slidertext);
+                m_setsvisible = true;
+                changed = true;
+            }
+        }
+
         OSDTypeFillSlider *slider =
                       (OSDTypeFillSlider *)container->GetType("statusslider");
         if (slider)
-            slider->SetPosition(position);
+        {
+            if (slider->GetPosition() != position)
+            {
+                slider->SetPosition(position);
+                m_setsvisible = true;
+                changed = true;
+            }
+        }
 
-        m_setsvisible = true;
-        changed = true;
+        //test w/ this later.
+        //m_setsvisible = true; 
+        //changed = true;
     }
     osdlock.unlock();
 }

@@ -13,10 +13,14 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/user.h>
+#include <sys/poll.h>
 
 #include <map>
 #include <iostream>
 using namespace std;
+
+#include "videodev_myth.h"
+#include "videodev2_myth.h"
 
 #include "videoout_ivtv.h"
 extern "C" {
@@ -33,6 +37,8 @@ VideoOutputIvtv::VideoOutputIvtv(void)
     pixels = NULL;
     lastcleared = false;
     videoDevice = "/dev/video16";
+    skipplay = false;
+    interruptdisplay = false;
 }
 
 VideoOutputIvtv::~VideoOutputIvtv()
@@ -212,6 +218,8 @@ void VideoOutputIvtv::Reopen(int skipframes, int newstartframe)
 
         ioctl(videofd, IVTV_IOC_S_STOP_DECODE, &sd);
         close(videofd);
+
+        skipplay = true;
     }
 
     videofd = -1;
@@ -223,6 +231,19 @@ void VideoOutputIvtv::Reopen(int skipframes, int newstartframe)
     }
     else
     {
+        struct v4l2_control ctrl;
+        memset(&ctrl, 0, sizeof(ctrl));
+
+        ctrl.id = V4L2_CID_IVTV_DEC_PREBUFFER;
+        ctrl.value = 0;
+
+        ioctl(videofd, VIDIOC_S_CTRL, &ctrl);
+
+        ctrl.id = V4L2_CID_IVTV_DEC_NUM_BUFFERS;
+        ctrl.value = 0;
+
+        ioctl(videofd, VIDIOC_S_CTRL, &ctrl);
+        
         ivtv_cfg_start_decode startd;
         memset(&startd, 0, sizeof(startd));
 
@@ -335,34 +356,23 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
 
         if (ret > 0 || drawanyway)
         {
-            struct ivtv_osd_coords osdcoords;
-            memset(&osdcoords, 0, sizeof(osdcoords));
-
             struct ivtvfb_ioctl_dma_host_to_ivtv_args prep;
             memset(&prep, 0, sizeof(prep));
-
-            ioctl(fbfd, IVTVFB_IOCTL_GET_ACTIVE_BUFFER, &osdcoords);
 
             prep.source = osdbuf_aligned;
             prep.dest_offset = 0;
             prep.count = XJ_height * stride;
 
             ioctl(fbfd, IVTVFB_IOCTL_PREP_FRAME, &prep);
-
-            usleep(20000);
-
-            osdcoords.offset = 0;
-            osdcoords.lines = XJ_height;
-            osdcoords.pixel_stride = XJ_width * 2;
-
-            ioctl(fbfd, IVTVFB_IOCTL_SET_ACTIVE_BUFFER, &osdcoords);
         }
     }
 }
 
 void VideoOutputIvtv::Play()
 {
-    ioctl(videofd, IVTV_IOC_PLAY, 0);
+    if (!skipplay)
+        ioctl(videofd, IVTV_IOC_PLAY, 0);
+    skipplay = false;
 }
 
 void VideoOutputIvtv::Pause()
@@ -370,28 +380,55 @@ void VideoOutputIvtv::Pause()
     ioctl(videofd, IVTV_IOC_PAUSE, 0);
 }
 
-int VideoOutputIvtv::WriteBuffer(unsigned char *buf, int count)
+void VideoOutputIvtv::InterruptDisplay(void)
+{
+    interruptdisplay = true;
+}
+
+int VideoOutputIvtv::WriteBuffer(unsigned char *buf, int count, int &frames)
 {
     int n = 0;
 
-    while (count > 0)
+    struct pollfd polls;
+    polls.fd = videofd;
+    polls.events = POLLOUT;
+    polls.revents = 0;
+
+    int ret = 0;
+    int totalpassed = count;
+    const int maxwrite = 32768;
+    
+    while (count > 0 && !interruptdisplay)
     {
-        n = write(videofd, buf, count);
-        if (n < 0)
+        ret = poll(&polls, 1, 20);
+
+        if (ret == 1 && polls.revents & POLLOUT)
         {
-            perror("Writing to videodev");
-            return n;
+            n = write(videofd, buf, (count > maxwrite) ? maxwrite : count);
+            if (n < 0)
+            {
+                perror("Writing to videodev");
+                return n;
+            }
+            count -= n;
+            buf += n;
         }
-        count -= n;
-        buf += n;
+
+        if (interruptdisplay)
+        {
+            break;
+        }
     }
 
+    interruptdisplay = false;
+       
     struct ivtv_ioctl_framesync frameinfo;
     memset(&frameinfo, 0, sizeof(frameinfo));
     if (ioctl(videofd, IVTV_IOC_GET_TIMING, &frameinfo) < 0)
     {
         perror("IVTV_IOC_FRAMESYNC");
-        return 0;
+        frames = 0;
+        return (totalpassed - count);
     }
 
     // seems the decoder doesn't initialize this properly.
@@ -406,6 +443,9 @@ int VideoOutputIvtv::WriteBuffer(unsigned char *buf, int count)
             firstframe = false;
     }
 
-    return frameinfo.frame + startframenum;
+    interruptdisplay = false;
+    
+    frames = frameinfo.frame + startframenum;
+    return totalpassed - count;
 }
 
