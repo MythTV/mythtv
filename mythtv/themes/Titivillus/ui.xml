@@ -1011,7 +1011,7 @@
         <value>Priority:</value>
       </textarea>
       <textarea name="recpriority" draworder="6">
-        <<area>150,100,400,30</area>
+        <area>150,100,400,30</area>
         <font>info</font>
       </textarea>
     </container>
