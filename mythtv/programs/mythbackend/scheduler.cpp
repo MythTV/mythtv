@@ -741,7 +741,6 @@ void Scheduler::RunScheduler(void)
             idleWaitForRecordingTime =
                        gContext->GetNumSetting("idleWaitForRecordingTime", 15);
 
-
             if (firstRun)
             {
                 //the parameter given to the startup_cmd. "user" means a user
@@ -789,14 +788,14 @@ void Scheduler::RunScheduler(void)
 
             nextRecording = *recIter;
 
+            if (nextRecording->recstatus != rsWillRecord)
+                continue;
+
             nextrectime = nextRecording->recstartts;
             secsleft = curtime.secsTo(nextrectime);
 
             if (secsleft - prerollseconds > 35)
                 break;
-
-            if (nextRecording->recstatus != rsWillRecord)
-                continue;
 
             if (m_tvList->find(nextRecording->cardid) == m_tvList->end())
             {
@@ -1000,6 +999,7 @@ void Scheduler::RunScheduler(void)
 bool Scheduler::CheckShutdownServer(int prerollseconds, QDateTime &idleSince, 
                                     bool &blockShutdown)
 {
+    (void)prerollseconds;
     bool retval = false;
     QString preSDWUCheckCommand = gContext->GetSetting("preSDWUCheckCommand", 
                                                        "");
@@ -1047,6 +1047,9 @@ void Scheduler::ShutdownServer(int prerollseconds)
     m_isShuttingDown = true;
   
     RecIter recIter = reclist.begin();
+    for ( ; recIter != reclist.end(); recIter++)
+        if ((*recIter)->recstatus == rsWillRecord)
+            break;
 
     // set the wakeuptime if needed
     if (recIter != reclist.end())
