@@ -207,7 +207,7 @@ bool DVDThread::ripTitle(int title_number,
         dvd_device_access->unlock();
         return false;
     }
-
+    
     //
     //  OK, we got the device. 
     //  Lets open our destination file
@@ -590,6 +590,7 @@ DVDTranscodeThread::DVDTranscodeThread(MTD *owner,
         length_in_seconds = 1;
     }
     subtitle_track = subtitle_track_numb;
+    used_transcode_slot = false;
 }
 
 void DVDTranscodeThread::run()
@@ -651,6 +652,39 @@ void DVDTranscodeThread::run()
         }
     }
     
+    //
+    //  Ask if we can start transcoding
+    //  (ask mtd about # of concurrent 
+    //  transcoding jobs)
+    //
+    
+    setSubName("Waiting for Permission to Start Transcoding", 1);
+    
+    bool loop = true;
+    
+    while(loop)
+    {
+        if(parent->isItOkToStartTranscoding() && keepGoing())
+        {
+            used_transcode_slot = true;
+            loop = false;
+        }
+        else
+        {
+            if(keepGoing())
+            {
+                sleep(5);
+            }
+            else
+            {
+                problem("abandonded job because master control said we need to shut down");
+                return;
+            }
+        }
+    }
+    
+    
+
     //
     //  Run the first (only?) crack at transcoding
     //    

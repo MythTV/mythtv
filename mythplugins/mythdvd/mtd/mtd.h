@@ -59,6 +59,7 @@ class MTD : public QObject
   
     MTD(QSqlDatabase *ldb, int port, bool log_stdout);
     bool threadsShouldContinue(){return keep_running;}
+    bool isItOkToStartTranscoding();
     
   signals:
   
@@ -97,6 +98,9 @@ class MTD : public QObject
     DVDProbe            *dvd_probe;
     DiscCheckingThread  *disc_checking_thread;
     int                 nice_level;
+    QMutex              *concurrent_transcodings_mutex;
+    int                 concurrent_transcodings;
+    int                 max_concurrent_transcodings;
 };
 
 #endif  // mtd_h_

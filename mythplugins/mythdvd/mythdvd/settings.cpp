@@ -233,6 +233,19 @@ public:
     };
 };
 
+class MTDConcurrentTranscodes: public SpinBoxSetting, public GlobalSetting {
+public:
+    MTDConcurrentTranscodes():
+        SpinBoxSetting(1, 99, 1),
+        GlobalSetting("MTDConcurrentTranscodes") {
+        setLabel("Simultaneous Transcode Jobs");
+        setValue(1);
+        setHelpText("This determines the number of simultaneous "
+                    "transcode jobs. If set at 1 (the default), "
+                    "there will only be one active job at a time.");
+    };
+};
+
 class MTDRipSize: public SpinBoxSetting, public GlobalSetting {
 public:
     MTDRipSize():
@@ -262,6 +275,7 @@ RipperSettings::RipperSettings()
     mtdsettings->setLabel("MTD Settings");
     mtdsettings->addChild(new MTDPortNumber());
     mtdsettings->addChild(new MTDNiceLevel());
+    mtdsettings->addChild(new MTDConcurrentTranscodes());
     mtdsettings->addChild(new MTDRipSize());
     mtdsettings->addChild(new MTDLogFlag());
     mtdsettings->addChild(new MTDac3Flag());

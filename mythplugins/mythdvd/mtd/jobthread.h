@@ -36,6 +36,7 @@ class JobThread : public QThread
     JobThread(MTD *owner, const QString &start_string, int nice_priority);
     virtual void run();
     bool keepGoing();
+    virtual bool transcodeSlotUsed(){return false;}
     
     QString getJobName(){return job_name;}
     QString getSubName(){return subjob_name;}
@@ -166,12 +167,14 @@ class DVDTranscodeThread : public DVDThread
     ~DVDTranscodeThread();
     
     virtual void run();
+    bool transcodeSlotUsed(){return used_transcode_slot;}
     
     bool    makeWorkingDirectory();
     bool    buildTranscodeCommandLine();
     bool    runTranscode(int run);
     void    cleanUp();
     void    wipeClean();
+    bool    used_transcode_slot;
     
   private:
   

@@ -160,6 +160,16 @@ MTD::MTD(QSqlDatabase *ldb, int port, bool log_stdout)
     titles_mutex = new QMutex();
 
     //
+    //  Create a mutex for protecting the variable for
+    //  the number of concurrent jobs and set start up
+    //  values.
+    //
+    
+    concurrent_transcodings_mutex = new QMutex();
+    concurrent_transcodings = 0;
+    max_concurrent_transcodings = gContext->GetNumSetting("MTDConcurrentTranscodings", 1);
+
+    //
     //  Create a timer to occassionally 
     //  clean out dead threads
     //
@@ -267,6 +277,25 @@ void MTD::cleanThreads()
             {
                 emit writeToLog(QString("job finished succesfully: %1").arg(job_command)); 
             }
+            
+            //
+            //  If this is a transcoding thread, adjust the
+            //  count.
+            //
+            
+            if(iterator->transcodeSlotUsed())
+            {
+                concurrent_transcodings_mutex->lock();
+                concurrent_transcodings--;
+                if(concurrent_transcodings < 0)
+                {
+                    cerr << "mtd.o: Your number of transcode jobs ended up negative. That should be impossible." << endl;
+                    concurrent_transcodings = 0;
+                }
+                concurrent_transcodings_mutex->unlock();
+            }
+            
+            
             job_threads.remove(iterator);
         }
     }
@@ -782,5 +811,18 @@ bool MTD::checkFinalFile(QFile *final_file, const QString &extension)
     }
     
     return true;
+}
+
+bool MTD::isItOkToStartTranscoding()
+{
+    concurrent_transcodings_mutex->lock();
+    if(concurrent_transcodings < max_concurrent_transcodings)
+    {
+        concurrent_transcodings++;
+        concurrent_transcodings_mutex->unlock();
+        return true;
+    }
+    concurrent_transcodings_mutex->unlock();
+    return false;
 }
 
