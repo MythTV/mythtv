@@ -824,11 +824,11 @@ void CommDetect::BuildAllMethodsCommList(void)
     int lastScore = 0;
     int thisScore = 0;
     int nextScore = 0;
-    long long curFrame = 0;
-    long long breakStart = 0;
-    long long lastStart = 0;
-    long long lastEnd = 0;
-    long long firstLogoFrame = -1;
+    long curFrame = 0;
+    long breakStart = 0;
+    long lastStart = 0;
+    long lastEnd = 0;
+    long firstLogoFrame = -1;
     bool nextFrameIsBlank = false;
     bool lastFrameWasBlank = false;
     QString msg;
@@ -1452,13 +1452,15 @@ void CommDetect::BuildBlankFrameCommList(void)
 
     VERBOSE(VB_COMMFLAG, "Blank-Frame Commercial Map" );
     for(it = blankCommMap.begin(); it != blankCommMap.end(); ++it)
-        VERBOSE(VB_COMMFLAG, QString("    %1:%2").arg(it.key()).arg(it.data()));
+        VERBOSE(VB_COMMFLAG, QString("    %1:%2")
+                .arg((long int)it.key()).arg(it.data()));
 
     MergeBlankCommList();
 
     VERBOSE(VB_COMMFLAG, "Merged Blank-Frame Commercial Break Map" );
     for(it = blankCommBreakMap.begin(); it != blankCommBreakMap.end(); ++it)
-        VERBOSE(VB_COMMFLAG, QString("    %1:%2").arg(it.key()).arg(it.data()));
+        VERBOSE(VB_COMMFLAG, QString("    %1:%2")
+                .arg((long int)it.key()).arg(it.data()));
 }
 
 void CommDetect::BuildSceneChangeCommList(void)
@@ -1555,7 +1557,8 @@ void CommDetect::BuildSceneChangeCommList(void)
 
     VERBOSE(VB_COMMFLAG, "Scene-Change Commercial Break Map" );
     for(it = sceneCommBreakMap.begin(); it != sceneCommBreakMap.end(); ++it)
-        VERBOSE(VB_COMMFLAG, QString("    %1:%2").arg(it.key()).arg(it.data()));
+        VERBOSE(VB_COMMFLAG, QString("    %1:%2")
+                .arg((long int)it.key()).arg(it.data()));
 }
 
 void CommDetect::BuildLogoCommList()
@@ -1566,7 +1569,8 @@ void CommDetect::BuildLogoCommList()
     QMap<long long, int>::Iterator it;
     VERBOSE(VB_COMMFLAG, "Logo Commercial Break Map" );
     for(it = logoCommBreakMap.begin(); it != logoCommBreakMap.end(); ++it)
-        VERBOSE(VB_COMMFLAG, QString("    %1:%2").arg(it.key()).arg(it.data()));
+        VERBOSE(VB_COMMFLAG, QString("    %1:%2")
+                .arg((long int)it.key()).arg(it.data()));
 }
 
 void CommDetect::MergeBlankCommList(void)
@@ -1937,7 +1941,8 @@ void CommDetect::CondenseMarkMap(QMap<long long, int>&map, int spacing,
     VERBOSE(VB_COMMFLAG, "Commercial Map Before condense:" );
     for (it = map.begin(); it != map.end(); it++)
     {
-        VERBOSE(VB_COMMFLAG, QString("    %1:%2").arg(it.key()).arg(it.data()));
+        VERBOSE(VB_COMMFLAG, QString("    %1:%2")
+                .arg((long int)it.key()).arg(it.data()));
         tmpMap[it.key()] = it.data();
     }
 
@@ -1983,7 +1988,8 @@ void CommDetect::CondenseMarkMap(QMap<long long, int>&map, int spacing,
 
     VERBOSE(VB_COMMFLAG, "Commercial Map After condense:" );
     for (it = map.begin(); it != map.end(); it++)
-        VERBOSE(VB_COMMFLAG, QString("    %1:%2").arg(it.key()).arg(it.data()));
+        VERBOSE(VB_COMMFLAG, QString("    %1:%2")
+                .arg((long int)it.key()).arg(it.data()));
 }
 
 void CommDetect::ConvertShowMapToCommMap(QMap<long long, int>&map)
