@@ -8,6 +8,8 @@
 #include <qptrlist.h>
 #include <qpixmap.h>
 
+#include "uitypes.h"
+
 class XMLParse;
 class UIType;
 class UIManagedTreeListType;
