@@ -1028,8 +1028,7 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
                     packetlen = 0;
                 } while (lameret > 0);
 
-                audbuf_timecode = frameheader.timecode + (int)((double)len *
-                                  25000.0 / (double)effdsp); // time at end 
+                audbuf_timecode = frameheader.timecode; // time at end 
                 lastaudiolen = audiolen(false);
                
                 pthread_mutex_unlock(&audio_buflock); // end critical section
@@ -1060,8 +1059,7 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
 		waud = (waud + len) % AUDBUFSIZE;
 
                 lastaudiolen = audiolen(false);
-                audbuf_timecode = frameheader.timecode + (int)((double)len *
-                                  25000.0 / (double)effdsp); // time at end
+                audbuf_timecode = frameheader.timecode; // time at end
 
                 pthread_mutex_unlock(&audio_buflock); // end critical section
             }
@@ -1296,7 +1294,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         {
 	    videoOutput->Show(video_width, video_height);
         }
-        /* a/v sync assumes that when 'XJ_show' returns, that is the instant
+        /* a/v sync assumes that when 'Show' returns, that is the instant
            the frame has become visible on screen */
 	
         //output_jmeter->RecordCycleTime();
@@ -1317,14 +1315,20 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 	    
 	    if (laudiotime != 0) // laudiotime = 0 after a seek
 	    {
-		/* if we were perfect, timecodes[rpos] and laudiotime would
-		   match and this adjustment wouldn't do anything */
-		avsync_delay = (timecodes[rpos] - laudiotime) * 1000; // uSecs
+		/* The time at the start of this frame (ie, now) is
+		   given by (timecodes[rpos] - frame_time). Because the
+		   timecode was taken at the end of the frame. */
+
+		/* if we were perfect, (timecodes[rpos] - frame_time) 
+		   and laudiotime would match, and this adjustment 
+		   wouldn't do anything */
+		avsync_delay = ( (timecodes[rpos] - (int)(1000.0 / video_frame_rate) )
+				 - laudiotime) * 1000; // uSecs
 		
 		if(avsync_delay < -100000 || avsync_delay > 100000)
 		    nexttrigger.tv_usec += avsync_delay / 3; // re-syncing
 		else
-		    nexttrigger.tv_usec += avsync_delay / 50; // steady state
+		    nexttrigger.tv_usec += avsync_delay / 30; // steady state
             }
         }
 

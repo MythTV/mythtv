@@ -167,7 +167,7 @@ class NuppelVideoRecorder
     long video_buffer_size;
     long audio_buffer_size;
 
-    struct timeval now, anow, vnow, stm;
+    struct timeval stm;
     struct timezone tzone;
 
     bool childrenLive;

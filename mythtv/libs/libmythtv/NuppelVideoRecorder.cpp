@@ -921,6 +921,7 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len)
     int act;
     long tcres;
     int fn;
+    struct timeval now;
 
     act = act_video_buffer;
  
@@ -965,9 +966,8 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len)
 	
     videobuffer[act]->sample = tf;
 
-    // record the time at the start of this frame.
-    // 'tcres' is at the end of the frame, so subtract the right # of ms
-    videobuffer[act]->timecode = (ntsc) ? (tcres - 33) : (tcres - 40);
+    // record the time at the end of this frame.
+    videobuffer[act]->timecode = tcres;
 
     memcpy(videobuffer[act]->buffer, buf, len);
     videobuffer[act]->bufferlen = len;
@@ -1240,7 +1240,8 @@ void NuppelVideoRecorder::doAudioThread(void)
     int afd = 0, act = 0, lastread = 0;
     int frag = 0, channels = 0, rate = 0, blocksize = 0;
     unsigned char *buffer;
-    long tcres;
+    audio_buf_info ispace;
+    struct timeval anow;
 
     act_audio_sample = 0;
 
@@ -1305,12 +1306,6 @@ void NuppelVideoRecorder::doAudioThread(void)
             continue;
         }
 
-        gettimeofday(&anow, &tzone);
-        // In steady state, we get here very soon after the previous call
-        // to 'read' returned. So, the timecode for the current chunk of audio
-        // is recorded near the start of the chunk, when most of the chunk
-        // hasn't been recorded yet.  This is what we want.
-
         if (audio_buffer_size != (lastread = read(afd, buffer,
                                                   audio_buffer_size))) 
         {
@@ -1318,6 +1313,13 @@ void NuppelVideoRecorder::doAudioThread(void)
                  << " bytes from '" << audiodevice << "'\n";
             perror("read audio");
         }
+
+	/* record the current time */
+	/* Don't assume that the sound device's record buffer is empty
+	   (like we used to.) Measure to see how much stuff is in there,
+	   and correct for it when calculating the timestamp */
+        gettimeofday(&anow, &tzone);
+	ioctl( afd, SNDCTL_DSP_GETISPACE, &ispace );
 
         act = act_audio_buffer;
 
@@ -1328,10 +1330,17 @@ void NuppelVideoRecorder::doAudioThread(void)
             continue;
         }
 
-        tcres = (anow.tv_sec-stm.tv_sec)*1000 + anow.tv_usec/1000 - 
-                stm.tv_usec/1000;
         audiobuffer[act]->sample = act_audio_sample;
-        audiobuffer[act]->timecode = tcres;
+
+	/* timecode, as if the sound capture device's buffer was empty. */
+        audiobuffer[act]->timecode = 
+	    (anow.tv_sec-stm.tv_sec)*1000 + 
+	    anow.tv_usec/1000 - stm.tv_usec/1000;
+	/* Back up the timecode. The more stuff is in the hw buffer,
+	   the earlier this audio was actually recorded. */
+	audiobuffer[act]->timecode -=
+	    (int) ( ( (double)ispace.fragments * (double)ispace.fragsize * 1000.0 ) /
+		    ( (double)audio_samplerate * 4.0 ) );
 
         memcpy(audiobuffer[act]->buffer, buffer, audio_buffer_size);
 
