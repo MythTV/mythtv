@@ -96,6 +96,9 @@ class MainServer : public QObject
     void HandleFreeTuner(int cardid, PlaybackSock *pbs);
     void HandleVersion(QSocket *socket, QString version);
     void HandleBackendRefresh(QSocket *socket);
+    void HandleQueryLoad(PlaybackSock *pbs);
+    void HandleQueryUptime(PlaybackSock *pbs);
+    void HandleQueryMemStats(PlaybackSock *pbs);
 
     void SendResponse(QSocket *pbs, QStringList &commands);
 
