@@ -307,12 +307,12 @@ void VideoBrowser::updatePlayWait(QPainter *p)
     Metadata *childItem = new Metadata;
     Metadata *parentItem = new Metadata(*curitem);
 
-    while (parentItem->ChildID() && playing_time.elapsed() > 10000)
+    while (parentItem->ChildID() > 0 && playing_time.elapsed() > 10000)
     {
         childItem->setID(parentItem->ChildID());
         childItem->fillDataFromID(db);
 
-        if (parentItem->ChildID())
+        if (parentItem->ChildID() > 0)
         {
             //Load up data about this child
             selected(childItem);
