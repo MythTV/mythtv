@@ -488,7 +488,6 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
         delete pixmap;
     }
     
-    cerr << "2" << endl;
     
     UITextType *itype = (UITextType*)0;
     UITextType *ttype = (UITextType*)0;
@@ -515,7 +514,7 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
         area.setWidth(bw-2*sw);
         area.setHeight(bh-2*sh-yoffset);
         itype->SetDisplayArea(area);
-
+        itype->calculateScreenArea();
         itype->SetText(curTreePos->getString());
 
         itype->Draw(p, 0, 0);
