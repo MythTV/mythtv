@@ -308,6 +308,8 @@ QWidget* ComboBoxSetting::configWidget(QWidget* parent,
 
     connect(widget, SIGNAL(highlighted(int)),
             this, SLOT(setValue(int)));
+    connect(this, SIGNAL(selectionAdded(const QString&,QString)),
+            widget, SLOT(insertItem(const QString&)));
 
     return box;
 }

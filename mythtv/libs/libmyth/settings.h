@@ -410,6 +410,12 @@ protected:
     };
 };
 
+class TransientStorage: virtual public Setting {
+public:
+    virtual void load(QSqlDatabase* db) { (void)db; }
+    virtual void save(QSqlDatabase* db) { (void)db; }
+};
+
 class AutoIncrementStorage: virtual public IntegerSetting, public DBStorage {
 public:
     AutoIncrementStorage(QString table, QString column):
