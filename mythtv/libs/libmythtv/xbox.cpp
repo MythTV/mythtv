@@ -21,7 +21,7 @@ void XBox::GetSettings(void)
 
     RecordingLED = gContext->GetSetting("XboxLEDRecording","rrrr");
     DefaultLED = gContext->GetSetting("XboxLEDDefault","gggg");
-    BlinkBIN = gContext->GetSetting("XboxLEDBlinkBIN");
+    BlinkBIN = gContext->GetSetting("XboxBlinkBIN");
 
     if (!BlinkBIN)
         return;
