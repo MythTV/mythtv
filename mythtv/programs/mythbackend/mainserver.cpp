@@ -1274,7 +1274,9 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     {
         cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
              << " Unknown encoder." << endl;
-        exit(0);
+        QStringList retlist = "bad";
+        SendResponse(pbssock, retlist);
+        return;
     }
 
     EncoderLink *enc = iter.data();  

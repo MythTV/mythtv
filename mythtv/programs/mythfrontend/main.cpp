@@ -27,6 +27,7 @@ using namespace std;
 #include "dialogbox.h"
 #include "guidegrid.h"
 #include "mythplugin.h"
+#include "remoteutil.h"
 
 #define QUIT     1
 #define HALTWKUP 2
@@ -458,7 +459,10 @@ int main(int argc, char **argv)
     lcd_port = gContext->GetNumSetting("LCDPort");
 
     if (lcd_host.length() > 0 && lcd_port > 1024 && gContext->GetLCDDevice())
+    {
         gContext->GetLCDDevice()->connectToHost(lcd_host, lcd_port);
+        gContext->GetLCDDevice()->setupLEDs(RemoteGetRecordingMask);
+    }
 
     if (a.argc() == 2)
     {

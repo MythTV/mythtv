@@ -170,6 +170,8 @@ class LCD : public QObject
     // gContext->LCDsetGenericProgress(percent_heard) for an example
     void outputText(QPtrList<LCDTextItem> *textItems);
 
+    void setupLEDs(int(*LedMaskFunc)(void)) { GetLEDMask = LedMaskFunc; }
+
   private slots: 
     void veryBadThings(int);       // Communication Errors
     void serverSendingData();      // Data coming back from LCDd
@@ -178,6 +180,7 @@ class LCD : public QObject
                                    // LCDd every 10 seconds
 
     void outputTime();             // Fire from a timer
+    void outputLEDs();             // Fire from a timer
     void outputMusic();            // Short timer (equalizer)
     void outputChannel();          // Longer timer (progress bar)
     void outputGeneric();          // Longer timer (progress bar)
@@ -217,6 +220,7 @@ class LCD : public QObject
     unsigned int theMode;
 
     QSocket *socket;
+    QTimer *LEDTimer;
     QTimer *timeTimer;
     QTimer *musicTimer;
     QTimer *channelTimer;
@@ -261,6 +265,8 @@ class LCD : public QObject
     unsigned int port;
 
     bool lcd_ready;
+
+    int (*GetLEDMask)(void);
 };
 
 #endif

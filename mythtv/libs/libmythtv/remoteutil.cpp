@@ -218,4 +218,31 @@ int RemoteIsRecording(void)
     return strlist[0].toInt();
 }
 
+int RemoteGetRecordingMask(void)
+{
+    int mask=0;
+
+    QString cmd = "QUERY_ISRECORDING";
+    QStringList strlist = cmd;
+    gContext->SendReceiveStringList(strlist);
+    int recCount = strlist[0].toInt();
+
+    for (int i = 0, j = 0; j < recCount; i++)
+    {
+        cmd = QString("QUERY_RECORDER %1").arg(i + 1);
+
+        strlist = cmd;
+        strlist << "IS_RECORDING";
+
+        gContext->SendReceiveStringList(strlist);
+        if (strlist[0].toInt())
+        {
+            mask |= 1<<i;
+            j++;       // count active recorder
+        }
+    }
+
+    return mask;
+}
+
 

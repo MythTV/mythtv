@@ -29,6 +29,8 @@ LCD::LCD()
     cout << "lcddevice: An LCD object now exists (LCD() was called)" << endl ;
 #endif
 
+    GetLEDMask = NULL;
+
     socket = new QSocket(this);
     connect(socket, SIGNAL(error(int)), this, SLOT(veryBadThings(int)));
     connect(socket, SIGNAL(readyRead()), this, SLOT(serverSendingData()));
@@ -56,7 +58,11 @@ LCD::LCD()
 
     timeTimer = new QTimer(this);
     connect(timeTimer, SIGNAL(timeout()), this, SLOT(outputTime()));    
-    
+   
+    LEDTimer = new QTimer(this);
+    connect(LEDTimer, SIGNAL(timeout()), this, SLOT(outputLEDs()));
+    LEDTimer->start(1000, FALSE);      // start the timer here
+ 
     scrollTimer = new QTimer(this);
     connect(scrollTimer, SIGNAL(timeout()), this, SLOT(scrollText()));
     
@@ -1207,6 +1213,17 @@ void LCD::setVolumeLevel(float value)
         volume_level = 1.0;
 
     outputVolume();
+}
+
+void LCD::outputLEDs()
+{
+    QString aString;
+    int mask = 0;
+    if (GetLEDMask)
+        mask = GetLEDMask();
+    aString = "output ";
+    aString += QString::number(mask);
+    sendToServer(aString);
 }
 
 void LCD::outputTime()
