@@ -617,7 +617,7 @@
       <textarea name="showinstr" align="center" draworder="0">
         <area>0,570,800,30</area>
         <font>message</font>
-        <value>Show  (1) All  (2) Important  (3) Recording</value>
+        <value>Show  (1) All  (2) Important</value>
       </textarea>
     </container>
  

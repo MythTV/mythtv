@@ -30,12 +30,16 @@ class ViewScheduled : public MythDialog
   protected:
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
+    void customEvent(QCustomEvent *e);
 
   private:
     void FillList(void);
-    QMap<QString, ProgramInfo> conflictData;
+    void setShowAll(bool all);
 
-    void grayOut(QPainter *);
+    int curRec;
+    int recCount;
+    QPtrList<ProgramInfo> recList;
+
     void updateBackground(void);
     void updateList(QPainter *);
     void updateConflict(QPainter *);
@@ -43,31 +47,18 @@ class ViewScheduled : public MythDialog
     void updateInfo(QPainter *);
 
     void LoadWindow(QDomElement &);
-    void parsePopup(QDomElement &);
     void parseContainer(QDomElement &);
     XMLParse *theme;
     QDomElement xmldata;
 
-    ProgramInfo *curitem;
-
     QSqlDatabase *db;
 
-    MythPopupBox *popup;
     QPixmap myBackground;
-    QPixmap *bgTransBackup;
 
     bool conflictBool;
-    bool graphicPopup;
-    bool pageDowner;
     QString dateformat;
     QString timeformat;
-    QString shortdateformat;
     bool displayChanNum;
-
-    int inList;
-    int inData;
-    int listCount;
-    int dataCount;
 
     QRect listRect;
     QRect infoRect;
@@ -75,25 +66,14 @@ class ViewScheduled : public MythDialog
     QRect showLevelRect;
     QRect fullRect;
 
-    bool allowselect;
-
     int listsize;
-    int titleitems;
 
-    QColor popupForeground;
-    QColor popupBackground;
-    QColor popupHighlight;
+    bool allowEvents;
+    bool allowUpdates;
+    bool updateAll;
+    bool refillAll;
 
-    bool doingSel;
-    bool allowKeys;
-
-    enum ShowLevel
-    {
-        showAll = 1,
-        showImportant,
-        showRecording
-    };
-    ShowLevel showLevel;
+    bool showAll;
 };
 
 #endif
