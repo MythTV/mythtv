@@ -1112,12 +1112,14 @@ SipFsmBase::SipFsmBase(SipFsm *p)
     toUrl = 0;
     contactUrl = 0;
     recRouteUrl = 0;
+    myTag = "abcdef";
     remoteTag = "";
     remoteEpid = "";
     rxedTo = "";
     rxedFrom = "";
     MyUrl = 0;
     MyContactUrl = 0;
+    rxedTimestamp = -1;
     sentAuthenticated = false;
 }
 
@@ -1174,6 +1176,7 @@ void SipFsmBase::ParseSipMsg(int Event, SipMsg *sipMsg)
         CallId   = sipMsg->getCallId();
         viaIp    = sipMsg->getViaIp();
         viaPort  = sipMsg->getViaPort();
+        rxedTimestamp = sipMsg->getTimestamp();
         if (remoteUrl == 0)
             remoteUrl = new SipUrl(sipMsg->getFromUrl());
         if (toUrl == 0)
@@ -1213,12 +1216,15 @@ void SipFsmBase::BuildSendStatus(int Code, QString Method, int statusCseq, int O
     if (Via.length() > 0)
         Status.addViaCopy(Via);
     Status.addFromCopy(rxedFrom);
-    Status.addToCopy(rxedTo);
+    Status.addToCopy(rxedTo, myTag);
     Status.addCallId(CallId);
     Status.addCSeq(statusCseq);
+    Status.addUserAgent();
+    
     if ((Option & SIP_OPT_EXPIRES) && (statusExpires >= 0))
         Status.addExpires(statusExpires);
-
+    if (Option & SIP_OPT_TIMESTAMP) // Add Timestamp if there was one in the INVITE
+        Status.addTimestamp(rxedTimestamp);
     if (Option & SIP_OPT_ALLOW) // Add my Contact URL to the message
         Status.addAllow();
     if (Option & SIP_OPT_CONTACT) // Add my Contact URL to the message
@@ -1490,7 +1496,7 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
                 if (audioPayloadIdx != -1) // INVITE had a codec we support; proces
                 {
                     AlertUser(sipMsg);
-                    BuildSendStatus(100, "INVITE", sipMsg->getCSeqValue(), SIP_OPT_CONTACT); //100 Trying
+                    BuildSendStatus(100, "INVITE", sipMsg->getCSeqValue(), SIP_OPT_CONTACT | SIP_OPT_TIMESTAMP); //100 Trying
                     BuildSendStatus(180, "INVITE", sipMsg->getCSeqValue(), SIP_OPT_CONTACT); //180 Ringing
                     State = SIP_ICONNECTING;
                 }
@@ -1695,7 +1701,7 @@ void SipCall::BuildSendInvite(SipMsg *authMsg)
     SipMsg Invite("INVITE");
     Invite.addRequestLine(*remoteUrl);
     Invite.addVia(sipLocalIP, sipLocalPort);
-    Invite.addFrom(*MyUrl, "ae1d8a43cf3f4d8a8f4f0e1004", "3622b728e3");
+    Invite.addFrom(*MyUrl, myTag);
     Invite.addTo(*remoteUrl);
     Invite.addCallId(CallId);
     Invite.addCSeq(++cseq);
@@ -1757,7 +1763,7 @@ void SipCall::BuildSendAck()
     SipMsg Ack("ACK");
     Ack.addRequestLine(*remoteUrl);
     Ack.addVia(sipLocalIP, sipLocalPort);
-    Ack.addFrom(*MyUrl, "ae1d8a43cf3f4d8a8f4f0e1004", "3622b728e3");
+    Ack.addFrom(*MyUrl, myTag);
     Ack.addTo(*remoteUrl, remoteTag);
     Ack.addCallId(CallId);
     Ack.addCSeq(cseq);
@@ -1783,7 +1789,7 @@ void SipCall::BuildSendCancel(SipMsg *authMsg)
     Cancel.addRequestLine(*remoteUrl);
     Cancel.addVia(sipLocalIP, sipLocalPort);
     Cancel.addTo(*remoteUrl, remoteTag);
-    Cancel.addFrom(*MyUrl);
+    Cancel.addFrom(*MyUrl, myTag);
     Cancel.addCallId(CallId);
     Cancel.addCSeq(cseq);
     Cancel.addUserAgent();
@@ -1828,11 +1834,11 @@ void SipCall::BuildSendBye(SipMsg *authMsg)
     if (rxedFrom.length() > 0)
     {
         Bye.addFromCopy(rxedFrom);
-        Bye.addToCopy(rxedTo);
+        Bye.addToCopy(rxedTo, myTag);
     } 
     else
     {
-        Bye.addFrom(*MyUrl);
+        Bye.addFrom(*MyUrl, myTag);
         Bye.addTo(*remoteUrl, remoteTag);
     }
     Bye.addCallId(CallId);
@@ -2158,7 +2164,7 @@ void SipRegistrar::SendResponse(int Code, SipMsg *sipMsg, QString rIp, int rPort
     Status.addStatusLine(Code);
     Status.addVia(sipLocalIp, sipLocalPort);
     Status.addFrom(*(sipMsg->getFromUrl()), sipMsg->getFromTag());
-    Status.addTo(*(sipMsg->getFromUrl()));
+    Status.addTo(*(sipMsg->getFromUrl()), myTag);
     Status.addCallId(sipMsg->getCallId());
     Status.addCSeq(sipMsg->getCSeqValue());
     Status.addExpires(sipMsg->getExpires());
@@ -2291,7 +2297,7 @@ void SipRegistration::SendRegister(SipMsg *authMsg)
     SipMsg Register("REGISTER");
     Register.addRequestLine(*ProxyUrl);
     Register.addVia(sipLocalIp, sipLocalPort);
-    Register.addFrom(*MyUrl);
+    Register.addFrom(*MyUrl, myTag);
     Register.addTo(*MyUrl);
     Register.addCallId(CallId);
     Register.addCSeq(++cseq);
@@ -2426,7 +2432,7 @@ void SipSubscriber::SendNotify(SipMsg *authMsg)
     SipMsg Notify("NOTIFY");
     Notify.addRequestLine(*watcherUrl);
     Notify.addVia(sipLocalIp, sipLocalPort);
-    Notify.addFrom(*MyUrl);
+    Notify.addFrom(*MyUrl, myTag);
     Notify.addTo(*watcherUrl, remoteTag, remoteEpid);
     Notify.addCallId(CallId);
     Notify.addCSeq(++cseq);
@@ -2662,7 +2668,7 @@ void SipWatcher::SendSubscribe(SipMsg *authMsg)
     SipMsg Subscribe("SUBSCRIBE");
     Subscribe.addRequestLine(*watchedUrl);
     Subscribe.addVia(sipLocalIp, sipLocalPort);
-    Subscribe.addFrom(*MyUrl);
+    Subscribe.addFrom(*MyUrl, myTag);
     Subscribe.addTo(*watchedUrl);
     Subscribe.addCallId(CallId);
     Subscribe.addCSeq(++cseq);
@@ -2818,7 +2824,7 @@ void SipIM::SendMessage(SipMsg *authMsg, QString Text)
     SipMsg Message("MESSAGE");
     Message.addRequestLine(*imUrl);
     Message.addVia(sipLocalIp, sipLocalPort);
-    Message.addFrom(*MyUrl);
+    Message.addFrom(*MyUrl, myTag);
     Message.addTo(*imUrl, remoteTag, remoteEpid);
     Message.addCallId(CallId);
     Message.addCSeq(++txCseq);

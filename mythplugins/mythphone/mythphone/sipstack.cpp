@@ -50,6 +50,7 @@ SipMsg::SipMsg(QString Method)
     cseqValue = 0;
     cseqMethod = "";
     Expires = -1;
+    Timestamp = -1;
     msgContainsSDP = false;
     msgContainsXPIDF = false;
     msgContainsPlainText = false;
@@ -78,6 +79,7 @@ SipMsg::SipMsg()
     cseqValue = 0;
     cseqMethod = "";
     Expires = -1;
+    Timestamp = -1;
     msgContainsSDP = false;
     msgContainsXPIDF = false;
     msgContainsPlainText = false;
@@ -174,6 +176,14 @@ void SipMsg::addTo(SipUrl &to, QString tag, QString epid)
     Msg += "\r\n";
 }
 
+void SipMsg::addToCopy(QString To, QString Tag)
+{
+    if ((Tag.length() != 0) && (To.endsWith("\r\n")))
+        Msg += To.insert(To.length()-2, QString(";tag="+Tag));
+    else
+        Msg += To;
+}
+
 void SipMsg::addFrom(SipUrl &from, QString tag, QString epid)
 {
     Msg += "From: " + from.string();
@@ -254,6 +264,12 @@ void SipMsg::addProxyAuthorization(QString authMethod, QString Username, QString
 void SipMsg::addExpires(int e)
 {
     Msg += "Expires: " + QString::number(e) + "\r\n";
+}
+
+void SipMsg::addTimestamp(int t)
+{
+    if (t >= 0)
+        Msg += "Timestamp: " + QString::number(t) + "\r\n";
 }
 
 void SipMsg::addNullContent()
@@ -384,6 +400,8 @@ void SipMsg::decodeLine(QString line)
         decodeCseq(line);
     else if (line.find("Expires:", 0, false) == 0)
         decodeExpires(line);
+    else if (line.find("Timestamp:", 0, false) == 0)
+        decodeTimestamp(line);
     else if (line.find("Content-Type:", 0, false) == 0)
         decodeContentType(line);
     else if (line.find("WWW-Authenticate:", 0, false) == 0)
@@ -546,6 +564,11 @@ void SipMsg::decodeCseq(QString cseq)
 void SipMsg::decodeExpires(QString Exp)
 {
     Expires = (Exp.section(' ', 1, 1)).toInt();
+}
+
+void SipMsg::decodeTimestamp(QString ts)
+{
+    Timestamp = (ts.section(' ', 1, 1)).toInt();
 }
 
 void SipMsg::decodeCallid(QString callid)

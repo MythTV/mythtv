@@ -199,11 +199,12 @@ private:
 
 
 // Build Options logically OR'ed and sent to build procs
-#define SIP_OPT_SDP		                    1
-#define SIP_OPT_CONTACT		                2
+#define SIP_OPT_SDP		          1
+#define SIP_OPT_CONTACT		          2
 #define SIP_OPT_VIA                       4
 #define SIP_OPT_ALLOW                     8
 #define SIP_OPT_EXPIRES                   16
+#define SIP_OPT_TIMESTAMP                 32
 
 // Timers
 #define REG_RETRY_TIMER                   3000 // seconds
@@ -354,6 +355,8 @@ class SipFsmBase
     SipCallId CallId;
     QString viaIp;
     int viaPort;
+    int rxedTimestamp;
+    QString myTag;
     QString remoteTag;
     QString remoteEpid;
     QString rxedTo;

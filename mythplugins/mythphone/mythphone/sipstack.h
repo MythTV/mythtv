@@ -35,7 +35,7 @@ public:
     void addTo(SipUrl &to, QString tag="", QString epid="");
     void addFrom(SipUrl &from, QString tag="", QString epid="");
     void addViaCopy(QString Via)    { addGenericLine(Via); }
-    void addToCopy(QString To)      { addGenericLine(To); }
+    void addToCopy(QString To, QString Tag="");
     void addFromCopy(QString From)  { addGenericLine(From); }
     void addRRCopy(QString RR)      { addGenericLine(RR); }
     void addCallId(SipCallId id);
@@ -48,6 +48,7 @@ public:
     void addAuthorization(QString authMethod, QString Username, QString Password, QString realm, QString nonce, QString uri, bool Proxy=false);
     void addProxyAuthorization(QString authMethod, QString Username, QString Password, QString realm, QString nonce, QString uri);
     void addExpires(int e);
+    void addTimestamp(int t);
     void addNullContent();
     void addContent(QString contentType, QString contentData);
     void insertVia(QString Hostname, int Port);
@@ -59,6 +60,7 @@ public:
     int getCSeqValue() { return cseqValue; }
     QString getCSeqMethod() { return cseqMethod; }
     int getExpires() { return Expires; }
+    int getTimestamp() { return Timestamp; }
     int getStatusCode() { return statusCode; }
     QString getReasonPhrase() { return statusText; }
     SipCallId &getCallId() { return *callId; }
@@ -95,6 +97,7 @@ private:
     void decodeRecordRoute(QString rr);
     void decodeCseq(QString cseq);
     void decodeExpires(QString Exp);
+    void decodeTimestamp(QString ts);
     void decodeCallid(QString callid);
     void decodeAuthenticate(QString auth);
     void decodeContentType(QString cType);
@@ -116,6 +119,7 @@ private:
     int cseqValue;
     QString cseqMethod;
     int Expires;
+    int Timestamp;
     bool msgContainsSDP;
     bool msgContainsXPIDF;
     bool msgContainsPlainText;
