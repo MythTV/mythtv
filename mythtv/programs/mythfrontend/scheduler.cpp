@@ -64,7 +64,7 @@ class comp_proginfo
     }
 };
 
-bool Scheduler::FillRecordLists(void)
+bool Scheduler::FillRecordLists(bool doautoconflicts)
 {
     while (recordingList.size() > 0)
     {
@@ -94,7 +94,6 @@ bool Scheduler::FillRecordLists(void)
                                                     Qt::ISODate);
             proginfo->channum = query.value(0).toString();
             proginfo->recordtype = 1;
-            proginfo->conflicting = false;
 
             recordingList.push_back(proginfo);
         }
@@ -149,7 +148,6 @@ bool Scheduler::FillRecordLists(void)
                                                    Qt::ISODate);
                     proginfo->channum = subquery.value(0).toString();
                     proginfo->recordtype = 2;
-                    proginfo->conflicting = false;
 
                     recordingList.push_back(proginfo);
                 }
@@ -201,7 +199,6 @@ bool Scheduler::FillRecordLists(void)
                                                    Qt::ISODate);
                     proginfo->channum = subquery.value(0).toString();
                     proginfo->recordtype = 3;
-                    proginfo->conflicting = false;
 
                     recordingList.push_back(proginfo);
                 }
@@ -214,6 +211,10 @@ bool Scheduler::FillRecordLists(void)
         recordingList.sort(comp_proginfo());
         MarkConflicts();
         PruneList();
+        MarkConflicts();
+        MarkConflictsToRemove();
+        if (doautoconflicts)
+            RemoveConflicts();
         MarkConflicts();
     }
 
@@ -287,6 +288,8 @@ void Scheduler::MarkConflicts(void)
             ProgramInfo *first = (*i);
             ProgramInfo *second = (*j);
 
+            if (!first->recording || !second->recording)
+                continue;
             if (Conflict(first, second))
             {
                 first->conflicting = true;
@@ -302,7 +305,6 @@ void Scheduler::PruneList(void)
     list<ProgramInfo *>::reverse_iterator i = recordingList.rbegin();
     list<ProgramInfo *>::iterator deliter;
 
-prunebegin:
     i = recordingList.rbegin();
     for (; i != recordingList.rend(); i++)
     {
@@ -340,4 +342,210 @@ prunebegin:
             }
         }
     }    
+}
+
+list<ProgramInfo *> *Scheduler::getConflicting(ProgramInfo *pginfo,
+                                               bool removenonplaying)
+{
+    if (!pginfo->conflicting && removenonplaying)
+        return NULL;
+
+    list<ProgramInfo *> *retlist = new list<ProgramInfo *>;
+
+    list<ProgramInfo *>::iterator i = recordingList.begin();
+    for (; i != recordingList.end(); i++)
+    {
+        ProgramInfo *second = (*i);
+
+        if (second->title == pginfo->title && 
+            second->startts == pginfo->startts)
+            continue;
+
+        if (removenonplaying && (!pginfo->recording || !second->recording))
+            continue;
+        if (Conflict(pginfo, second))
+            retlist->push_back(second);
+    }
+
+    return retlist;
+}
+
+void Scheduler::CheckOverride(ProgramInfo *info,
+                              list<ProgramInfo *> *conflictList)
+{
+    QSqlQuery query;
+    char thequery[512];
+
+    QString starts = info->startts.toString("yyyyMMddhhmm");
+    starts += "00";
+    QString ends = info->endts.toString("yyyyMMddhhmm");
+    ends += "00";
+
+    sprintf(thequery, "SELECT * FROM conflictresolutionoverride WHERE "
+                      "channum = %d AND starttime = %s AND "
+                      "endtime = %s;", info->channum.toInt(),
+                      starts.ascii(), ends.ascii());
+
+
+    query = db->exec(thequery);
+
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+        
+        list<ProgramInfo *>::iterator i = conflictList->begin();
+        for (; i != conflictList->end(); i++)
+        {
+            ProgramInfo *del = (*i);
+
+            del->recording = false;
+        }
+        info->conflicting = false;
+    }
+}
+
+void Scheduler::MarkSingleConflict(ProgramInfo *info,
+                                   list<ProgramInfo *> *conflictList)
+{
+    QSqlQuery query;
+    char thequery[512];
+
+    list<ProgramInfo *>::iterator i;
+
+    QString starts = info->startts.toString("yyyyMMddhhmm");
+    starts += "00";
+    QString ends = info->endts.toString("yyyyMMddhhmm");
+    ends += "00";
+  
+    sprintf(thequery, "SELECT * FROM conflictresolutionsingle WHERE "
+                      "preferchannum = %d AND preferstarttime = %s AND "
+                      "preferendtime = %s;", info->channum.toInt(), 
+                      starts.ascii(), ends.ascii());
+ 
+    query = db->exec(thequery);
+
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        while (query.next())
+        {
+            QString badchannum = query.value(3).toString();
+            QDateTime badst = QDateTime::fromString(query.value(4).toString(),
+                                                    Qt::ISODate);
+            QDateTime badend = QDateTime::fromString(query.value(5).toString(),
+                                                     Qt::ISODate);
+
+            i = conflictList->begin();
+            for (; i != conflictList->end(); i++)
+            {
+                ProgramInfo *test = (*i);
+                if (test->channum == badchannum && test->startts == badst && 
+                    test->endts == badend)
+                {
+                    test->recording = false;
+                }
+            }
+        }
+    }
+
+    bool conflictsleft = false;
+    i = conflictList->begin();
+    for (; i != conflictList->end(); i++)
+    {
+        ProgramInfo *test = (*i);
+        if (test->recording == true)
+            conflictsleft = true;
+    }
+
+    if (!conflictsleft)
+    {
+        info->conflicting = false;
+        return;
+    }
+
+    sprintf(thequery, "SELECT * FROM conflictresolutionany WHERE "
+                      "prefertitle = \"%s\";", info->title.ascii());
+
+    query = db->exec(thequery);
+
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        while (query.next())
+        {
+            QString badtitle = query.value(1).toString();
+
+            i = conflictList->begin();
+            for (; i != conflictList->end(); i++)
+            {
+                ProgramInfo *test = (*i);
+                if (test->title == badtitle)
+                {
+                    test->recording = false;
+                }
+            }
+        }
+    }
+    
+    conflictsleft = false;
+    i = conflictList->begin();
+    for (; i != conflictList->end(); i++)
+    {
+        ProgramInfo *test = (*i);
+        if (test->recording == true)
+            conflictsleft = true;
+    }
+
+    if (!conflictsleft)
+    {
+        info->conflicting = false;
+    }
+}
+
+void Scheduler::MarkConflictsToRemove(void)
+{
+    list<ProgramInfo *>::iterator i = recordingList.begin();
+    for (; i != recordingList.end(); i++)
+    {
+        ProgramInfo *first = (*i);
+    
+        if (first->conflicting && first->recording)
+        {
+            list<ProgramInfo *> *conflictList = getConflicting(first);
+            CheckOverride(first, conflictList); 
+            delete conflictList;
+        }
+    }
+
+    i = recordingList.begin();
+    for (; i != recordingList.end(); i++)
+    {
+        ProgramInfo *first = (*i);
+  
+        if (first->conflicting && first->recording)
+        {
+            list<ProgramInfo *> *conflictList = getConflicting(first);
+            MarkSingleConflict(first, conflictList);
+            delete conflictList;
+        }
+        else if (!first->recording)
+            first->conflicting = false;
+    }
+}
+
+void Scheduler::RemoveConflicts(void)
+{
+    list<ProgramInfo *>::iterator del;
+    list<ProgramInfo *>::iterator i = recordingList.begin();
+    while (i != recordingList.end())
+    {
+        ProgramInfo *first = (*i);
+
+        del = i;
+        i++;
+
+        if (!first->recording)
+        {
+            delete first;
+            recordingList.erase(del);
+        }
+    }
 }

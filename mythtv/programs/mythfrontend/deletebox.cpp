@@ -224,14 +224,14 @@ void DeleteBox::selected(QListViewItem *lvitem)
 
     message += "<br><br>It will be gone forever.";
 
-    DialogBox *diag = new DialogBox(message);
+    DialogBox diag(message);
 
-    diag->AddButton("Yes, get rid of it");
-    diag->AddButton("No, keep it, I changed my mind");
+    diag.AddButton("Yes, get rid of it");
+    diag.AddButton("No, keep it, I changed my mind");
 
-    diag->Show();
+    diag.Show();
 
-    int result = diag->exec();
+    int result = diag.exec();
 
     if (result == 1)
     {

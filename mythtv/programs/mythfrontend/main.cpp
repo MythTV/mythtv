@@ -137,7 +137,7 @@ void *runScheduler(void *dummy)
                    secsleft = curtime.secsTo(nextrectime);
                 }
             }
-            else
+            else 
                 cout << secsleft << " secs left until " << nextRecording->title << endl;
         }
     }

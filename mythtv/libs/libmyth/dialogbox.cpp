@@ -6,8 +6,8 @@
 
 #include "dialogbox.h"
 
-DialogBox::DialogBox(const QString &text, QWidget *parent = 0, 
-                     const char *name = 0)
+DialogBox::DialogBox(const QString &text, const char *checkboxtext = 0,
+                     QWidget *parent = 0, const char *name = 0)
          : QDialog(parent, name)
 {
     setGeometry(0, 0, 800, 600);
@@ -24,8 +24,17 @@ DialogBox::DialogBox(const QString &text, QWidget *parent = 0,
 
     box->addWidget(maintext, 1);
 
-    buttongroup = new QButtonGroup(0);
+    checkbox = NULL;
+    if (checkboxtext)
+    {
+        checkbox = new QCheckBox(checkboxtext, this);
+        box->addWidget(checkbox, 0);
+    }
 
+    buttongroup = new QButtonGroup(0);
+  
+    if (checkbox)
+        buttongroup->insert(checkbox);
     connect(buttongroup, SIGNAL(clicked(int)), this, SLOT(buttonPressed(int)));
 }
 
@@ -44,5 +53,9 @@ void DialogBox::Show()
 
 void DialogBox::buttonPressed(int which)
 {
-    done(which);
+    if (buttongroup->find(which) == checkbox)
+    {
+    }
+    else
+        done(which+1);
 }

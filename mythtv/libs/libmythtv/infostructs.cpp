@@ -5,6 +5,34 @@
 
 #include "infostructs.h"
 
+ProgramInfo::ProgramInfo(void)
+{
+    spread = -1;
+    startCol = -1;
+
+    recordtype = -1;
+    conflicting = false;
+    recording = true;
+}
+
+ProgramInfo::ProgramInfo(const ProgramInfo &other)
+{
+    title = other.title;
+    subtitle = other.subtitle;
+    description = other.description;
+    category = other.category;
+    channum = other.channum;
+
+    startts = other.startts;
+    endts = other.endts;
+    spread = other.spread;
+    startCol = other.startCol;
+ 
+    recordtype = other.recordtype;
+    conflicting = other.conflicting;
+    recording = other.recording;
+}
+
 ProgramInfo *GetProgramAtDateTime(int channel, const char *time)
 {
     char thequery[512];

@@ -37,6 +37,9 @@ class TimeInfo
 class ProgramInfo
 {
   public:
+    ProgramInfo();
+    ProgramInfo(const ProgramInfo &other);
+
     QString title;
     QString subtitle;
     QString description;
@@ -51,6 +54,7 @@ class ProgramInfo
 
     int recordtype;
     bool conflicting;
+    bool recording;
 };
 
 ProgramInfo *GetProgramAtDateTime(int channel, const char *time);

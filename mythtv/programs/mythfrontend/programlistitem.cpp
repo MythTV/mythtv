@@ -86,7 +86,12 @@ void ProgramListItem::paintCell(QPainter *p, const QColorGroup &cg,
     QColorGroup _cg(cg);
     QColor c = _cg.text();
 
-    if (pginfo->conflicting)
+    if (!pginfo->recording)
+    {
+        _cg.setColor(QColorGroup::Text, Qt::gray);
+        _cg.setColor(QColorGroup::HighlightedText, Qt::gray);
+    }
+    else if (pginfo->conflicting)
     {
         _cg.setColor(QColorGroup::Text, Qt::red);
         _cg.setColor(QColorGroup::HighlightedText, Qt::red);

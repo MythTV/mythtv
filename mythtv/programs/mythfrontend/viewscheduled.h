@@ -10,6 +10,7 @@ class QListView;
 class QLabel;
 class TV;
 class Scheduler;
+class ProgramInfo;
 
 class ViewScheduled : public QDialog
 {
@@ -26,6 +27,8 @@ class ViewScheduled : public QDialog
 
   private:
     void FillList(void);
+    void handleConflicting(ProgramInfo *rec);
+    void handleNotRecording(ProgramInfo *rec);
 
     QSqlDatabase *db;
     TV *tv;
