@@ -67,10 +67,12 @@ void IvtvDecoder::Reset(void)
 
 bool IvtvDecoder::CanHandle(char testbuf[2048], const QString &filename)
 {
-    // remove to enable..
-    return false;
+    if (!gContext->GetNumSetting("PVR350OutputEnable", 0))
+        return false;
 
-    int testfd = open("/dev/video16", O_RDWR);
+    QString videodev = gContext->GetSetting("PVR350VideoDev");
+
+    int testfd = open(videodev.ascii(), O_RDWR);
     if (testfd <= 0)
         return false;
 

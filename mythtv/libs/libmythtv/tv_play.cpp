@@ -713,10 +713,7 @@ void TV::RunTV(void)
     int updatecheck = 0;
     update_osd_pos = false;
 
-    channelqueued = false;
-    channelKeys[0] = channelKeys[1] = channelKeys[2] = channelKeys[3] = ' ';
-    channelKeys[4] = 0;
-    channelkeysstored = 0;    
+    ChannelClear();
 
     runMainLoop = true;
     exitPlayer = false;
@@ -1042,7 +1039,13 @@ void TV::ProcessKeypress(int keypressed)
         {
             StopFFRew();
 
-            if (StateIsPlaying(internalState) && 
+            if (osd && osd->Visible())
+            {
+                ChannelClear();
+                osd->HideAll();
+                return;
+            }
+            else if (StateIsPlaying(internalState) &&
                 gContext->GetNumSetting("PlaybackExitPrompt") == 1) 
             {
                 nvp->Pause();
@@ -1660,12 +1663,18 @@ void TV::ChangeChannel(int direction)
         AddPreviousChannel();
     }
 
-    channelqueued = false;
-    channelKeys[0] = channelKeys[1] = channelKeys[2] = channelKeys[3] = ' ';
-    channelkeysstored = 0;
+    ChannelClear();
 
     if (muted)
         muteTimer->start(kMuteTimeout * 2, true);
+}
+
+void TV::ChannelClear(void)
+{
+    channelqueued = false;
+    channelKeys[0] = channelKeys[1] = channelKeys[2] = channelKeys[3] = ' ';
+    channelKeys[4] = 0;
+    channelkeysstored = 0;
 }
 
 void TV::ChannelKey(int key)
@@ -1718,9 +1727,7 @@ void TV::ChannelCommit(void)
     QString chan = QString(channelKeys).stripWhiteSpace();
     ChangeChannelByString(chan);
 
-    channelqueued = false;
-    channelKeys[0] = channelKeys[1] = channelKeys[2] = channelKeys[3] = ' ';
-    channelkeysstored = 0;
+    ChannelClear();
 }
 
 void TV::ChangeChannelByString(QString &name)

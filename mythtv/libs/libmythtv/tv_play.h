@@ -115,7 +115,8 @@ class TV : public QObject
     void ChangeBrightness(bool up, bool recorder);
     void ChangeColour(bool up, bool recorder);
     void ChangeHue(bool up, bool recorder);
- 
+
+    void ChannelClear(void); 
     void ChannelKey(int key);
     void ChannelCommit(void);
 

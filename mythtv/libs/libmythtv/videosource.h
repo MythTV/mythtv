@@ -427,8 +427,9 @@ public:
 class V4LConfigurationGroup: public VerticalConfigurationGroup {
 public:
     V4LConfigurationGroup(CaptureCard& a_parent):
-        VerticalConfigurationGroup(),
+        VerticalConfigurationGroup(false),
         parent(a_parent) {
+        setUseLabel(false);
 
         VideoDevice* device;
         TunerCardInput* input;
@@ -451,8 +452,9 @@ class DVBConfigurationGroup: public VerticalConfigurationGroup {
     Q_OBJECT
 public:
     DVBConfigurationGroup(CaptureCard& a_parent):
-        VerticalConfigurationGroup(),
+        VerticalConfigurationGroup(false),
         parent(a_parent) {
+        setUseLabel(false);
 
         DVBCardNum* cardnum = new DVBCardNum(parent);
         cardname = new DVBCardName();

@@ -1,5 +1,5 @@
 /*
- * Quick DNR 0.5
+ * Quick DNR 0.6
  * (C)opyright 2003, Debabrata Banerjee
  * GNU GPL 2 or later
  * 
@@ -180,18 +180,17 @@ int quickdnr(VideoFilter *f, VideoFrame *frame)
     else
       return -1;
   }
-  
+
   for(y = 0;y < tf->Luma_size;y++) {
-    //Compare absolute value.
-    if(((tf->average[y] - frame->buf[y]) | (frame->buf[y] - tf->average[y])) < tf->Luma_threshold) {
-       tf->average[y] = (tf->average[y] + frame->buf[y]) >> 1;
+    if(abs(tf->average[y] - frame->buf[y]) < tf->Luma_threshold) {
+      tf->average[y] = (tf->average[y] + frame->buf[y]) >> 1;
       frame->buf[y] = tf->average[y];
     }
     else tf->average[y] = frame->buf[y];
   }
   
   for(y = tf->Luma_size;y < tf->UV_size;y++) {
-     if(((tf->average[y] - frame->buf[y]) | (frame->buf[y] - tf->average[y])) < tf->Chroma_threshold) {
+    if(abs(tf->average[y] - frame->buf[y]) < tf->Chroma_threshold) {
       tf->average[y] = (tf->average[y] + frame->buf[y]) >> 1;
       frame->buf[y] = tf->average[y];
     }
@@ -223,37 +222,44 @@ int quickdnrMMX(VideoFilter *f, VideoFrame *frame)
     else
       return -1;
   }
-  
+ 
   av_p = (uint64_t *)tf->average;
 
   asm volatile("prefetch 64(%0)     \n\t" //Experimental values from athlon
 	       "prefetch 64(%1)     \n\t"
 	       "prefetch 64(%2)     \n\t"
-	       "movq (%0), %%mm4     \n\t" //av-p
-	       "movq (%1), %%mm5     \n\t"
-	       "movq (%2), %%mm6     \n\t"
+	       "movq (%0), %%mm4    \n\t"
+	       "movq (%1), %%mm5    \n\t"
+	       "movq (%2), %%mm6    \n\t"
 	       : : "r" (&sign_convert), "r" (&tf->Luma_threshold_mask), "r" (&tf->Chroma_threshold_mask)		  
 	       );
 
-  for(y = 0;y < tf->Luma_size;y += 8) { //Luma
+  for(y = 0;y < (tf->Luma_size);y += 8) { //Luma
     asm volatile("prefetchw 256(%0)    \n\t" //Experimental values from athlon
 		 "prefetch 384(%1)     \n\t"
+
 		 "movq (%0), %%mm0     \n\t" //av-p
 		 "movq (%1), %%mm1     \n\t" //buf
 		 "movq %%mm0, %%mm2    \n\t" 
-		 "movq %%mm1, %%mm3    \n\t"
-		 "pavgb %%mm3, %%mm0   \n\t"
-		 "movq %%mm0, (%0)     \n\t"
-		 "psubb %%mm0, %%mm1   \n\t" //Absolute difference algorithm
-		 "psubb %%mm1, %%mm2   \n\t"
-		 "por %%mm1, %%mm2     \n\t"
-		 "psubb %%mm4, %%mm2   \n\t" //hack! No proper unsigned mmx compares!
-		 "pcmpgtb %%mm5, %%mm1 \n\t" //compare select.
-		 "pand %%mm1, %%mm0    \n\t"
-		 "pandn %%mm3, %%mm1   \n\t"
-		 "por %%mm0, %%mm1     \n\t"
-		 "movq %%mm1, (%1)     \n\t"
+		 "movq %%mm1, %%mm3    \n\t"		 
+		 "movq %%mm1, %%mm7    \n\t"
 
+		 "pcmpgtb %%mm0, %%mm1 \n\t" //1 if av greater
+		 "psubb %%mm0, %%mm3   \n\t" //mm3=buf-av
+		 "psubb %%mm7, %%mm0   \n\t" //mm0=av-buf
+		 "pand %%mm1, %%mm3    \n\t" //select buf
+		 "pandn %%mm0,%%mm1    \n\t" //select av
+		 "por %%mm1, %%mm3     \n\t" //mm3=abs()
+
+		 "paddb %%mm4, %%mm3   \n\t" //hack! No proper unsigned mmx compares!
+		 "pcmpgtb %%mm5, %%mm3 \n\t" //compare buf with mask
+
+		 "pavgb %%mm7, %%mm2   \n\t"
+		 "pand %%mm3, %%mm7    \n\t"
+		 "pandn %%mm2,%%mm3    \n\t"
+		 "por %%mm7, %%mm3     \n\t"
+		 "movq %%mm3, (%0)     \n\t"
+		 "movq %%mm3, (%1)     \n\t"
 		 : : "r" (av_p), "r" (buf)
 		 );
     buf++;
@@ -263,24 +269,29 @@ int quickdnrMMX(VideoFilter *f, VideoFrame *frame)
   for(y = tf->Luma_size;y < tf->UV_size;y += 8) { //Chroma
     asm volatile("prefetchw 256(%0)    \n\t" //Experimental values for athlon
 		 "prefetch 384(%1)     \n\t"
- 
+
 		 "movq (%0), %%mm0     \n\t" //av-p
 		 "movq (%1), %%mm1     \n\t" //buf
-		 "movq %%mm0, %%mm2    \n\t" 
+		 "movq %%mm0, %%mm2    \n\t"
 		 "movq %%mm1, %%mm3    \n\t"
-	 
-		 "pavgb %%mm3, %%mm0   \n\t"
-		 "movq %%mm0, (%0)     \n\t"
-		 "psubb %%mm0, %%mm1   \n\t" //Absolute difference algorithm
-		 "psubb %%mm1, %%mm2   \n\t"
-		 "por %%mm1, %%mm2     \n\t"
-		 "psubb %%mm4, %%mm2   \n\t" //hack! No proper unsigned mmx compares!
-		 "pcmpgtb %%mm6, %%mm1 \n\t" //compare select.
-		 "pand %%mm1, %%mm0    \n\t"
-		 "pandn %%mm3, %%mm1   \n\t"
-		 "por %%mm0, %%mm1     \n\t"
-		 "movq %%mm1, (%1)     \n\t"
+		 "movq %%mm1, %%mm7    \n\t"
 
+		 "pcmpgtb %%mm0, %%mm1 \n\t" //1 if av greater
+		 "psubb %%mm0, %%mm3   \n\t" //mm3=buf-av
+		 "psubb %%mm7, %%mm0   \n\t" //mm0=av-buf
+		 "pand %%mm1, %%mm3    \n\t" //select buf
+		 "pandn %%mm0,%%mm1    \n\t" //select av
+		 "por %%mm1, %%mm3     \n\t" //mm3=abs()
+
+		 "paddb %%mm4, %%mm3   \n\t" //hack! No proper unsigned mmx compares!
+		 "pcmpgtb %%mm6, %%mm3 \n\t" //compare buf with mask
+
+		 "pavgb %%mm7, %%mm2   \n\t"
+		 "pand %%mm3, %%mm7    \n\t"
+		 "pandn %%mm2,%%mm3    \n\t"
+		 "por %%mm7, %%mm3     \n\t"
+		 "movq %%mm3, (%0)     \n\t"
+		 "movq %%mm3, (%1)     \n\t"
 		 : : "r" (av_p), "r" (buf)
 		 );
     buf++;
@@ -325,11 +336,11 @@ VideoFilter *new_filter(char *options)
     filter->Luma_threshold_mask = 0;
     filter->Chroma_threshold_mask = 0;
     for(i = 0;i < 8;i++) {
-      // 8 Inverse sign-shifted bytes! 0=0x80 255=0x7F
+      // 8 sign-shifted bytes!
       filter->Luma_threshold_mask = (filter->Luma_threshold_mask << 8)\
-	+((filter->Luma_threshold<128) ? (0x7F - filter->Luma_threshold) : (0xFF-( filter->Luma_threshold-0x80)));
+	+ ((filter->Luma_threshold > 0x80) ? (filter->Luma_threshold - 0x80) : (filter->Luma_threshold + 0x80));
       filter->Chroma_threshold_mask = (filter->Chroma_threshold_mask << 8)\
-	+ ((filter->Chroma_threshold<128) ? (0x7F - filter->Chroma_threshold) : (0xFF-(filter->Chroma_threshold-0x80)));	   
+	+ ((filter->Chroma_threshold > 0x80) ? (filter->Chroma_threshold - 0x80) :  (filter->Chroma_threshold + 0x80));
     }
   }
   else filter->filter = &quickdnr;

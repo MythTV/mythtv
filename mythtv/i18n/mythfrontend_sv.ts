@@ -630,7 +630,7 @@
     </message>
     <message>
         <source>Initial volume for the Master Mixer.  This affects all sound created by the soundcard.  Note: Do not set this too low.</source>
-        <translation>Initiellt värde för huvudvolymen. Denna påverkar volymen på alla ljudkällor på ljudkortet. Not: Sätt inte denna för lågt.</translation>
+        <translation>Initialt värde för huvudvolymen. Denna påverkar volymen på alla ljudkällor på ljudkortet. Tips: Sätt inte denna för lågt.</translation>
     </message>
     <message>
         <source>PCM Mixer Volume</source>
@@ -646,7 +646,7 @@
     </message>
     <message>
         <source>Make the video look normal on a progressive display (i.e. monitor).  Deinterlace requires that your CPU supports SSE instructions.  Enabling this without proper CPU support will cause the program to segfault. See the HOWTO document for more information.</source>
-        <translation>Gör så att video ser normal ut i de fall den visas på en monitor. Om inte denna funktion slås på vid visning på monitor kommer bilden att dela upp sig vid snabba rörelser i bilden. Vid visning på TV skall denna funktion vara avslagen. OBS: Kräver att CPUn stödjer SSE-instruktioner. Om den inte stödjer SSE kommer programmet att krasha. Se dokumentationen för mer information.</translation>
+        <translation>Gör så att video ser normal ut i de fall den visas på en monitor. Om inte denna funktion slås på vid visning på monitor kommer bilden att dela upp sig vid snabba rörelser i bilden. Vid visning på TV skall denna funktion normalt vara avslagen. OBS: Kräver att CPUn stödjer SSE-instruktioner. Om den inte stödjer SSE kommer programmet att krasha. Se dokumentationen för mer information.</translation>
     </message>
     <message>
         <source>Extra audio buffering</source>
@@ -686,7 +686,7 @@
     </message>
     <message>
         <source>If enabled, seeking is frame exact, but slower.</source>
-        <translation>Om funktionen är aktiverad kommer sökning att vara exakt på bildrutor men långsammare.</translation>
+        <translation>Om funktionen är aktiverad kommer snabbspolning att vara exakt på bildrutor men långsammare.</translation>
     </message>
     <message>
         <source>Commercial Skip Method</source>
@@ -738,7 +738,7 @@
     </message>
     <message>
         <source>Trigger AutoExpire when free space in Gigabytes goes below this value.  Turn OFF AutoExpire by setting to 0.</source>
-        <translation>Automatisk radering av filer startas när ledigt diskutrymme har gått under den specifierade nivån. För att slå av funktionen, sätt värdet till 0.</translation>
+        <translation>Automatisk radering av filer startas när ledigt diskutrymme har gått under den specificerade nivån. För att slå av funktionen, sätt värdet till 0.</translation>
     </message>
     <message>
         <source>Auto Expire Frequency (in minutes)</source>
@@ -866,31 +866,31 @@
     </message>
     <message>
         <source>Reposition after fast forward/rewind</source>
-        <translation type="unfinished"></translation>
+        <translation>Positionera om efter snabbspolning framåt/bakåt</translation>
     </message>
     <message>
         <source>When exiting sticky keys fast forward/rewind mode, reposition before resuming normal playback.  This is to compensate for the reaction time between seeing where to resume playback and actually exiting fast forward/rewind mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>När snabbspolning framåt/bakåt m h a &quot;klistriga tangenter&quot; används är det svårt att stoppa på exakt rätt ställe. Denna funktion hoppar framåt/bakåt en bit vid stopp för att kompensera för detta.</translation>
     </message>
     <message>
         <source>Number of seconds for OSD information</source>
-        <translation type="unfinished"></translation>
+        <translation>Antal sekunder som information visas</translation>
     </message>
     <message>
         <source>How long the program information remains on the On Screen Display after a channel change.</source>
-        <translation type="unfinished"></translation>
+        <translation>Antal sekunder som programinformation visas efter ett kanalbyte.</translation>
     </message>
     <message>
         <source>OSD theme</source>
-        <translation type="unfinished"></translation>
+        <translation>Tema för informationsvisning i TV-bilden</translation>
     </message>
     <message>
         <source>OSD font</source>
-        <translation type="unfinished"></translation>
+        <translation>Typsnitt för informationsvisning i TV-bilden</translation>
     </message>
     <message>
         <source>Closed Caption font</source>
-        <translation type="unfinished"></translation>
+        <translation>Typsnitt för textning</translation>
     </message>
     <message>
         <source>Channel ordering</source>
@@ -914,75 +914,75 @@
     </message>
     <message>
         <source>Vertical over/underscan percentage</source>
-        <translation type="unfinished"></translation>
+        <translation>Vertikal över/underskanning (procent)</translation>
     </message>
     <message>
         <source>Adjust this if the image does not fill your screen vertically.</source>
-        <translation type="unfinished"></translation>
+        <translation>Justera denna om TV-bilden inte fyller ut hela TVn i vertikalled.</translation>
     </message>
     <message>
         <source>Horizontal over/underscan percentage</source>
-        <translation type="unfinished"></translation>
+        <translation>Horisontell över/underskanning (procent)</translation>
     </message>
     <message>
         <source>Adjust this if the image does not fill your screen horizontally.</source>
-        <translation type="unfinished"></translation>
+        <translation>Justera denna om TV-bilden inte fyller ut hela TVn i horisontalled.</translation>
     </message>
     <message>
         <source>Scan displacement (X)</source>
-        <translation type="unfinished"></translation>
+        <translation>Horisontell bildjustering</translation>
     </message>
     <message>
         <source>Adjust this to move the image horizontally.</source>
-        <translation type="unfinished"></translation>
+        <translation>Justera denna för att flytta bilden horisontellt.</translation>
     </message>
     <message>
         <source>Scan displacement (Y)</source>
-        <translation type="unfinished"></translation>
+        <translation>Vertikal bildjustering</translation>
     </message>
     <message>
         <source>Adjust this to move the image vertically.</source>
-        <translation type="unfinished"></translation>
+        <translation>Justera denna för att flytta bilden vertikalt.</translation>
     </message>
     <message>
         <source>Jitter reduction</source>
-        <translation type="unfinished"></translation>
+        <translation>Jitterreducering</translation>
     </message>
     <message>
         <source>If this is set, frame timing will be adjusted for smoother motion.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om denna funktion är aktiverad kommer tajmingen för bildrutor att justeras för jämnare rörelser.</translation>
     </message>
     <message>
         <source>Experimental A/V Sync</source>
-        <translation type="unfinished"></translation>
+        <translation>Experimentell bildsynkronisering</translation>
     </message>
     <message>
         <source>If this is set, more experimental code will be in charge of video output. Use at your own risk.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om denna funktion är aktiverad kommer experimentell programvara att köras som kan förbättra bildkvaliteten vid uppspelning. Använd på egen risk.</translation>
     </message>
     <message>
         <source>Default setting for Closed Captioning</source>
-        <translation type="unfinished"></translation>
+        <translation>Textning aktiverad som standard</translation>
     </message>
     <message>
         <source>If this is set, captions will be on by default when playing back recordings or watching live TV.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiverar textning som standard vid uppspelning av inspelningar och vid TV-tittande.</translation>
     </message>
     <message>
         <source>Always use Browse mode when changing channels in LiveTV</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd alltid bläddringsläge vid byte av TV-kanal</translation>
     </message>
     <message>
         <source>If this is set, Browse mode will automatically be activated whenever you use Channel UP/DOWN when watching Live TV.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivera denna för att automatiskt komma in i bläddringsläge när UPP/NER-tangenterna används vid TV-tittande.</translation>
     </message>
     <message>
         <source>Aggressive Soundcard Buffering</source>
-        <translation type="unfinished"></translation>
+        <translation>Agressiv Ljudkortsbuffring</translation>
     </message>
     <message>
         <source>If this is set, MythTV will pretend to have a smaller soundcard buffer than is really present.  This may speed up seeking, but can also cause playback problems.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om denna funktion aktiveras kommer MythTV att låtsas att ljudkortsbufferten är mindre än vad den egentligen är. Detta kan snabba upp snabbspolning i videoströmmen men kan också orsaka avspelningsproblem.</translation>
     </message>
     <message>
         <source>Clear Saved Position on playback</source>
@@ -998,7 +998,7 @@
     </message>
     <message>
         <source>If set, during playback the select key (Enter or Space) will alternate between &quot;Position Saved&quot; and &quot;Position Cleared&quot;. If UNset, select will save the current position for each keypress.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om funktionen aktiveras så kommer aktiveringstangenten (enter eller mellanslag) att alternera mellan &quot;Spara position&quot; och &quot;Rensa position&quot;. Om den inte aktiveras kommer den att spara positionen för varje tryck.</translation>
     </message>
     <message>
         <source>Action on playback exit</source>
@@ -1018,7 +1018,7 @@
     </message>
     <message>
         <source>If set to prompt, a menu will be displayed when you exit playback mode.  The options available will allow you to save your position, delete the recording, or continue watching.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om denna funktion aktiveras kommer en meny att visas när avspelningsläget avslutas. Där visas alternativ för att spara nuvarande position, radera inspelningen eller fortsätta titta.</translation>
     </message>
     <message>
         <source>Prompt at end of recording</source>
@@ -1030,499 +1030,719 @@
     </message>
     <message>
         <source>Generate thumbnail preview images for recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa förhandsvisningsbilder för inspelningar</translation>
     </message>
     <message>
         <source>If set, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivera denna funktion för att visa en stillbild tagen ur den markerade inspeningen i avspelningsvyn.</translation>
     </message>
     <message>
         <source>Display live preview of recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa en rörlig förhandsvisning för inspelningar</translation>
     </message>
     <message>
         <source>If set, a preview of the recording will play in a small window on the &quot;Watch a Recording&quot; menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivera denna funktion för att visa en rörlig förhandsvisning i ett litet fönster för vald inspening i avspelningsvyn.</translation>
     </message>
     <message>
         <source>Use Transparent Boxes</source>
-        <translation type="unfinished"></translation>
+        <translation>Genomskinliga listboxar för inspelningar</translation>
     </message>
     <message>
         <source>If set, the Watch Recording and Delete Recording screens will use transparency. Unset this option if selecting the recordings is slow.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivera denna funktion för att göra listboxarna för inspeningar genomskinliga. Om det går långsamt att välja inspeningar, slå av funktionen.</translation>
     </message>
     <message>
         <source>Popup Background Shading Method</source>
-        <translation type="unfinished"></translation>
+        <translation>Metod för skuggning av bakgrund</translation>
     </message>
     <message>
         <source>Fill</source>
-        <translation type="unfinished"></translation>
+        <translation>Fyll</translation>
     </message>
     <message>
         <source>Image</source>
-        <translation type="unfinished"></translation>
+        <translation>Bild</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen</translation>
     </message>
     <message>
         <source>Fill is the quickest method, but it doesn&apos;t look good up close. Image looks good from up close, but is somewhat slow. And of course no shading will be the fastest.</source>
-        <translation type="unfinished"></translation>
+        <translation>Anger metoden som används för skuggning av bakgrunden bakom dialogfönster. Metoden &quot;Fyll&quot; är den snabbaste men ser inte så bra ut på nära håll, &quot;Bild&quot; ser bra ut på nära håll men är lite långsam och självklart är &quot;Ingen&quot; snabbast.</translation>
     </message>
     <message>
         <source>Always use Advanced Recording Options screen</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd alltid den avancerade inspelningsvyn</translation>
     </message>
     <message>
         <source>Always use the Advanced Recording Options screen when editing a scheduled recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd alltid den avancerade vyn för att schemalägga inspelningar.</translation>
     </message>
     <message>
         <source>System shutdown</source>
-        <translation type="unfinished"></translation>
+        <translation>Nedstängning av systemet</translation>
     </message>
     <message>
         <source>No exit key</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen avslutningsknapp</translation>
     </message>
     <message>
         <source>ESC</source>
-        <translation type="unfinished"></translation>
+        <translation>ESC</translation>
     </message>
     <message>
         <source>Control-ESC</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl-ESC</translation>
     </message>
     <message>
         <source>Meta-ESC</source>
-        <translation type="unfinished"></translation>
+        <translation>Meta-ESC</translation>
     </message>
     <message>
         <source>Alt-ESC</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt-ESC</translation>
     </message>
     <message>
         <source>MythTV is designed to run continuously. If you wish, you may use the ESC key or the ESC key + a modifier to exit MythTV. Do not choose a key combination that will be intercepted by your window manager.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV är gjord för att köras hela tiden. Om du ändå vill ha möjlighet att avsluta programmet kan ESC, Ctrl-ESC, Meta-ESC eller Alt-ESC mappas till att avsluta. Se till att välja en tangentkombination som inte redan är upptagen av din fönsterhanterare.</translation>
     </message>
     <message>
         <source>Halt command</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando för avstängning av datorn</translation>
     </message>
     <message>
         <source>If you have configured an exit key on the System Shutdown menu, you will be given the opportunity to exit MythTV or halt the system completely. Another possibility for this field is poweroff</source>
-        <translation type="unfinished"></translation>
+        <translation>Om en tangent för avslutning av programmet har konfigurerats får man också möjligheten att stänga av datorn helt från den meny som kommer upp. I fältet anges kommandot som skall användas för att stänga av datorn. Normalt kan &quot;halt&quot; eller &quot;poweroff&quot; användas</translation>
     </message>
     <message>
         <source>Xinerama screen</source>
-        <translation type="unfinished"></translation>
+        <translation>Xinerama-skärm</translation>
     </message>
     <message>
         <source>If using Xinerama, run only on the specified screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om Xinerama används, kör endast på den specificerade skärmen.</translation>
     </message>
     <message>
         <source>GUI width</source>
-        <translation type="unfinished"></translation>
+        <translation>Bredd</translation>
     </message>
     <message>
         <source>The width of the GUI.  Do not make the GUI wider than your actual screen resolution.  Set to 0 to automatically scale to fullscreen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ange bredden för det grafiska gränssnittet. Ange inte en bredd som är större än den faktiska upplösningen. Sätt till 0 för att automatiskt använda hela bredden.</translation>
     </message>
     <message>
         <source>GUI height</source>
-        <translation type="unfinished"></translation>
+        <translation>Höjd</translation>
     </message>
     <message>
         <source>The height of the GUI.  Do not make the GUI taller than your actual screen resolution.  Set to 0 to automatically scale to fullscreen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ange höjden för det grafiska gränssnittet. Ange inte en höjd som är större än den faktiska upplösningen. Sätt till 0 för att automatiskt använda hela höjden.</translation>
     </message>
     <message>
         <source>GUI X offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Positionering i horisontalled</translation>
     </message>
     <message>
         <source>The horizontal offset the GUI will be displayed at.</source>
-        <translation type="unfinished"></translation>
+        <translation>Justering av bildens position i horisontalled.</translation>
     </message>
     <message>
         <source>GUI Y offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Positionering i vertikalled</translation>
     </message>
     <message>
         <source>The vertical offset the GUI will be displayed at.</source>
-        <translation type="unfinished"></translation>
+        <translation>Justering av bildens position i vertikalled.</translation>
     </message>
     <message>
         <source>Run the frontend in a window</source>
-        <translation type="unfinished"></translation>
+        <translation>Kör användargränssnittet i ett fönster</translation>
     </message>
     <message>
         <source>Toggles between borderless operation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kör det grafiska gränssnittet i ett fönster i stället för i helskärmsläge.</translation>
     </message>
     <message>
         <source>Use a random theme</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd ett slumpvis tema</translation>
     </message>
     <message>
         <source>Use a random theme each time MythTV is started.</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd ett slumpvis valt tema när MythTV startas.</translation>
     </message>
     <message>
         <source>Date format</source>
-        <translation type="unfinished"></translation>
+        <translation>Datumformat</translation>
     </message>
     <message>
         <source>ddd MMM d</source>
-        <translation type="unfinished"></translation>
+        <translation>ddd MMM d</translation>
     </message>
     <message>
         <source>ddd MMMM d</source>
-        <translation type="unfinished"></translation>
+        <translation>ddd MMMM d</translation>
     </message>
     <message>
         <source>MMM d</source>
-        <translation type="unfinished"></translation>
+        <translation>MMM d</translation>
     </message>
     <message>
         <source>MM/dd</source>
-        <translation type="unfinished"></translation>
+        <translation>MM/dd</translation>
     </message>
     <message>
         <source>MM.dd</source>
-        <translation type="unfinished"></translation>
+        <translation>MM.dd</translation>
     </message>
     <message>
         <source>ddd d MMM</source>
-        <translation type="unfinished"></translation>
+        <translation>ddd d MMM</translation>
     </message>
     <message>
         <source>dd.MM.yyyy</source>
-        <translation type="unfinished"></translation>
+        <translation>dd.MM.åååå</translation>
     </message>
     <message>
         <source>Your preferred date format.</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj det datumformat du föredrar.</translation>
     </message>
     <message>
         <source>Short Date format</source>
-        <translation type="unfinished"></translation>
+        <translation>Kort datumformat</translation>
     </message>
     <message>
         <source>M/d</source>
-        <translation type="unfinished"></translation>
+        <translation>M/d</translation>
     </message>
     <message>
         <source>d/M</source>
-        <translation type="unfinished"></translation>
+        <translation>d/M</translation>
     </message>
     <message>
         <source>dd/MM</source>
-        <translation type="unfinished"></translation>
+        <translation>dd/MM</translation>
     </message>
     <message>
         <source>d.M.</source>
-        <translation type="unfinished"></translation>
+        <translation>d.M.</translation>
     </message>
     <message>
         <source>dd.MM.</source>
-        <translation type="unfinished"></translation>
+        <translation>dd.MM.</translation>
     </message>
     <message>
         <source>Your preferred short date format.</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj den korta representationen av det datumformat du föredrar.</translation>
     </message>
     <message>
         <source>Time format</source>
-        <translation type="unfinished"></translation>
+        <translation>Tidformat</translation>
     </message>
     <message>
         <source>h:mm AP</source>
-        <translation type="unfinished"></translation>
+        <translation>t:mm AP</translation>
     </message>
     <message>
         <source>h:mm ap</source>
-        <translation type="unfinished"></translation>
+        <translation>t:mm ap</translation>
     </message>
     <message>
         <source>hh:mm AP</source>
-        <translation type="unfinished"></translation>
+        <translation>tt:mm AP</translation>
     </message>
     <message>
         <source>hh:mm ap</source>
-        <translation type="unfinished"></translation>
+        <translation>tt:mm ap</translation>
     </message>
     <message>
         <source>h:mm</source>
-        <translation type="unfinished"></translation>
+        <translation>t:mm</translation>
     </message>
     <message>
         <source>hh:mm</source>
-        <translation type="unfinished"></translation>
+        <translation>tt:mm</translation>
     </message>
     <message>
         <source>Your preferred time format.  Choose a format with &quot;AP&quot; in it for an AM/PM display, otherwise your time display will be 24-hour or &quot;military&quot; time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj det tidformat du föredrar. Välj ett format med &quot;AP&quot; i formatmallen för att få tider med AM/PM angivelse. Övriga format ger 24-timmars visning.</translation>
     </message>
     <message>
         <source>Theme</source>
-        <translation type="unfinished"></translation>
+        <translation>Tema</translation>
     </message>
     <message>
         <source>Problem reading theme preview image </source>
-        <translation type="unfinished"></translation>
+        <translation>Kunde ej läsa temats förhandsvisningsbild</translation>
     </message>
     <message>
         <source>Display channel names instead of numbers</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa kanalnamn i stället för kanalnummer</translation>
     </message>
     <message>
         <source>&quot;Big&quot; font</source>
-        <translation type="unfinished"></translation>
+        <translation>Stort typsnitt</translation>
     </message>
     <message>
         <source>&quot;Medium&quot; font</source>
-        <translation type="unfinished"></translation>
+        <translation>Mellanstort typsnitt</translation>
     </message>
     <message>
         <source>&quot;Small&quot; font</source>
-        <translation type="unfinished"></translation>
+        <translation>Litet typsnitt</translation>
     </message>
     <message>
         <source>Program Guide Selection Placement</source>
-        <translation type="unfinished"></translation>
+        <translation>Rörlig markör i programguiden</translation>
     </message>
     <message>
         <source>If unchecked, the program guide&apos;s selector will stay in the middle of the guide at all times.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om denna funktion INTE är aktiverad kommer markören i programguiden alltid att vara placerad i mitten på bilden.</translation>
     </message>
     <message>
         <source>Guide Shading Method</source>
-        <translation type="unfinished"></translation>
+        <translation>Skuggningsmetod för programguiden</translation>
     </message>
     <message>
         <source>Colorized (alpha)</source>
-        <translation type="unfinished"></translation>
+        <translation>Färgad (genomskinlig)</translation>
     </message>
     <message>
         <source>Colorized (shaded)</source>
-        <translation type="unfinished"></translation>
+        <translation>Färgad (skuggad)</translation>
     </message>
     <message>
         <source>Embossed (shaded)</source>
-        <translation type="unfinished"></translation>
+        <translation>Relief (skuggad)</translation>
     </message>
     <message>
         <source>Embossed (solid)</source>
-        <translation type="unfinished"></translation>
+        <translation>Relief (solid)</translation>
     </message>
     <message>
         <source>Rounded (shaded)</source>
-        <translation type="unfinished"></translation>
+        <translation>Rundad (skuggad)</translation>
     </message>
     <message>
         <source>Rounded (solid)</source>
-        <translation type="unfinished"></translation>
+        <translation>Rundad (solid)</translation>
     </message>
     <message>
         <source>Display the channel icon</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa kanalikonen</translation>
     </message>
     <message>
         <source>Channels to Display</source>
-        <translation type="unfinished"></translation>
+        <translation>Antalet kanaler att visa</translation>
     </message>
     <message>
         <source>Time Blocks (30 mins) to Display</source>
-        <translation type="unfinished"></translation>
+        <translation>Antal tidluckor (30 min) att visa</translation>
     </message>
     <message>
         <source>Use Rankings</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd rankning</translation>
     </message>
     <message>
         <source>Use program rankings to resolve conflicts.</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd programrankningar för att reda ut inspelningskonflikter.</translation>
     </message>
     <message>
         <source>Rankings First.</source>
-        <translation type="unfinished"></translation>
+        <translation>Rankningar först.</translation>
     </message>
     <message>
         <source>Use rankings to resolve conflicts before using traditional conflict resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd rankningar för att reda ut inspelningskonflikter innan traditionell konfliktlösning används.</translation>
     </message>
     <message>
         <source>Single Recordings Rank</source>
-        <translation type="unfinished"></translation>
+        <translation>Rank för enstaka inspelning</translation>
     </message>
     <message>
         <source>Single Recordings will receive this additional ranking value.</source>
-        <translation type="unfinished"></translation>
+        <translation>Det angivna värdet kommer att läggas till rankningen för inspelningar av typen &quot;enstaka inspelning&quot;.</translation>
     </message>
     <message>
         <source>Weekslot Recordings Rank</source>
-        <translation type="unfinished"></translation>
+        <translation>Rank för veckovis inspelning</translation>
     </message>
     <message>
         <source>Weekslot Recordings will receive this additional ranking value.</source>
-        <translation type="unfinished"></translation>
+        <translation>Det angivna värdet kommer att läggas till rankningen för inspelningar av typen &quot;veckovis inspelning&quot;.</translation>
     </message>
     <message>
         <source>Timeslot Recordings Rank</source>
-        <translation type="unfinished"></translation>
+        <translation>Rank för daglig inspelning</translation>
     </message>
     <message>
         <source>Timeslot Recordings will receive this additional ranking value.</source>
-        <translation type="unfinished"></translation>
+        <translation>Det angivna värdet kommer att läggas till rankningen för inspelningar av typen &quot;daglig inspelning&quot;.</translation>
     </message>
     <message>
         <source>Channel Recordings Rank</source>
-        <translation type="unfinished"></translation>
+        <translation>Rank för kanalinspelning</translation>
     </message>
     <message>
         <source>Channel Recordings will receive this additional ranking value.</source>
-        <translation type="unfinished"></translation>
+        <translation>Det angivna värdet kommer att läggas till rankningen för inspelningar av typen &quot;kanalinspelning&quot;.</translation>
     </message>
     <message>
         <source>All Recordings Rank</source>
-        <translation type="unfinished"></translation>
+        <translation>Rank för &quot;spela in alla&quot;</translation>
     </message>
     <message>
         <source>All Recording types will receive this additional ranking value.</source>
-        <translation type="unfinished"></translation>
+        <translation>Det angivna värdet kommer att läggas till rankningen för inspelningar av typen &quot;spela in alla visningar&quot;.</translation>
     </message>
     <message>
         <source>Guide starts at channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Programguiden startar på kanal</translation>
     </message>
     <message>
         <source>The program guide starts on this channel if it is run from outside of LiveTV mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Programguiden startar på den angivna kanalen om guiden startas utanför TV-läget. I TV-läget startas alltid guiden på den kanal man tittar på för tillfället.</translation>
     </message>
     <message>
         <source>What to call &apos;unknown&apos; programs</source>
-        <translation type="unfinished"></translation>
+        <translation>Okända programpunkter benämns</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Okänt</translation>
     </message>
     <message>
         <source>What category to give &apos;unknown&apos; programs</source>
-        <translation type="unfinished"></translation>
+        <translation>Okända programkategorier benämns</translation>
     </message>
     <message>
         <source>Audio</source>
-        <translation type="unfinished"></translation>
+        <translation>Ljud</translation>
     </message>
     <message>
         <source>Enable Xbox Hardware</source>
-        <translation type="unfinished"></translation>
+        <translation>Slå på stöd för Xbox-hårdvara</translation>
     </message>
     <message>
         <source>This enables support for Xbox Specific hardware. Requires a frontend restart for changes to take effect.</source>
-        <translation type="unfinished"></translation>
+        <translation>Slår på stöd för hårdvara som är specifik för Xbox. Kräver en omstart av datorn för att ändringarna aktiveras.</translation>
     </message>
     <message>
         <source>Xbox Linux Distribution</source>
-        <translation type="unfinished"></translation>
+        <translation>Xbox Linuxdistribution</translation>
     </message>
     <message>
         <source>Other</source>
-        <translation type="unfinished"></translation>
+        <translation>Annan</translation>
     </message>
     <message>
         <source>This is used to determine the name of the blink binary led will be used on GentooX, blink otherwise.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ange vilket lib som skall användas för att styra lysdioden på Xboxen under GentooX. Om inget anges används &quot;blink&quot;.</translation>
     </message>
     <message>
         <source>Default LED mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Standardläge för LED</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Av</translation>
     </message>
     <message>
         <source>Green</source>
-        <translation type="unfinished"></translation>
+        <translation>Grön</translation>
     </message>
     <message>
         <source>Orange</source>
-        <translation type="unfinished"></translation>
+        <translation>Orange</translation>
     </message>
     <message>
         <source>Red</source>
-        <translation type="unfinished"></translation>
+        <translation>Röd</translation>
     </message>
     <message>
         <source>This sets the LED mode when there is nothing else to display</source>
-        <translation type="unfinished"></translation>
+        <translation>Sätter läget på LEDen när inget annat skall indikeras</translation>
     </message>
     <message>
         <source>Recording LED mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Läge för LED vid inspelning</translation>
     </message>
     <message>
         <source>This sets the LED mode when a backend is recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Läge för LEDen när en inspelningsserver spelar in</translation>
     </message>
     <message>
         <source>Recording Check Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontrollfrekvens för inspelning</translation>
     </message>
     <message>
         <source>General playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Generellt inspelning</translation>
     </message>
     <message>
         <source>Seeking</source>
-        <translation type="unfinished"></translation>
+        <translation>Snabbspolning</translation>
     </message>
     <message>
         <source>Commercial Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklamdetektering</translation>
     </message>
     <message>
         <source>Overscan</source>
-        <translation type="unfinished"></translation>
+        <translation>Överskanning</translation>
     </message>
     <message>
         <source>On-screen display</source>
-        <translation type="unfinished"></translation>
+        <translation>Informationsvisning i TV-bilden</translation>
     </message>
     <message>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>Generellt</translation>
     </message>
     <message>
         <source>Global Auto Expire Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Globala inställningar för autoradering</translation>
     </message>
     <message>
         <source>Program Guide</source>
-        <translation type="unfinished"></translation>
+        <translation>Programguide</translation>
     </message>
     <message>
         <source>General Ranking Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Generella inställningar för rankning</translation>
     </message>
     <message>
         <source>Screen settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Skärminställningar</translation>
     </message>
     <message>
         <source>Localization</source>
-        <translation type="unfinished"></translation>
+        <translation>Lokalisering</translation>
     </message>
     <message>
         <source>This specifies how often in seconds to check if a recording is in progress and update the Xbox LED.</source>
-        <translation type="unfinished"></translation>
+        <translation>Specificerar hur ofta, i sekunder, en kontroll skall göras för att se om en inspelning är aktiv och i så fall uppdatera lysdioden på Xboxen .</translation>
+    </message>
+    <message>
+        <source>If set, Xv picture controls (brightness, contrast, etc.) are used during playback. These are independent of the v4l controls used for recording. The Xv controls may not work properly on some systems.</source>
+        <translation>Aktiverar bildkontrollerna för ljusstyrka, kontrast etc vid uppspelning. Dessa kontroller är skiljda från de som används vid inspelning. På vissa system fungerar inte kontrollerna riktigt bra.</translation>
+    </message>
+    <message>
+        <source>Mixer Controls</source>
+        <translation>Mixerkontroller</translation>
+    </message>
+    <message>
+        <source>Use Xv picture controls</source>
+        <translation>Använd bildinställningar för avspelning</translation>
+    </message>
+    <message>
+        <source>Smart Fast Forwarding</source>
+        <translation>Smart snabbspolning</translation>
+    </message>
+    <message>
+        <source>If enabled, then immediately after rewinding, only skip forward the same amount as skipping backwards.</source>
+        <translation>Om denna funktion aktiveras kommer framspolning omedelbart efter en återspolning att hoppa framåt lika mycket som det föregående hoppet hoppade bakåt.</translation>
+    </message>
+    <message>
+        <source>(Create new profile group)</source>
+        <translation>(Skapa ny profilgrupp)</translation>
+    </message>
+    <message>
+        <source>Profile name</source>
+        <translation>Profilnamn</translation>
+    </message>
+    <message>
+        <source>Codec</source>
+        <translation>Kodek</translation>
+    </message>
+    <message>
+        <source>MP3 Quality</source>
+        <translation>MP3-kvalitet</translation>
+    </message>
+    <message>
+        <source>The higher the slider number, the lower the quality of the audio.  Better quality audio (lower numbers) requires more CPU.</source>
+        <translation>Högre värden ger lägre ljudkvalitet. Högre ljudkvalitet (lägre värden) kräver mer datorkraft.</translation>
+    </message>
+    <message>
+        <source>Sampling rate</source>
+        <translation>Samplingshastighet</translation>
+    </message>
+    <message>
+        <source>Sets the audio sampling rate for your DSP. Ensure that you choose a sampling rate appropriate for your device.  btaudio may only allow 32000.</source>
+        <translation>Sätter samplinghastigheten för ljud. Säkerställ att du väljer en hastighet som lämpar sig för din hårdvara. btaudio tillåter eventuellt bara 32000.</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Typ</translation>
+    </message>
+    <message>
+        <source>Sets the audio type</source>
+        <translation>Sätter typ av ljud</translation>
+    </message>
+    <message>
+        <source>Bitrate</source>
+        <translation>Bithastighet</translation>
+    </message>
+    <message>
+        <source>Sets the audio bitrate</source>
+        <translation>Sätter bithastigheten för ljud</translation>
+    </message>
+    <message>
+        <source>Volume (%)</source>
+        <translation>Volym (%)</translation>
+    </message>
+    <message>
+        <source>Volume of the recording </source>
+        <translation>Volym för inspening</translation>
+    </message>
+    <message>
+        <source>Bitrate Settings</source>
+        <translation>Inställningar för bithastighet</translation>
+    </message>
+    <message>
+        <source>Audio Quality</source>
+        <translation>Ljudkvalitet</translation>
+    </message>
+    <message>
+        <source>RTjpeg Quality</source>
+        <translation>RTjpeg-kvalitet</translation>
+    </message>
+    <message>
+        <source>Higher is better quality.</source>
+        <translation>Högre värden ger bättre kvalitet.</translation>
+    </message>
+    <message>
+        <source>Luma filter</source>
+        <translation>Ljusfilter</translation>
+    </message>
+    <message>
+        <source>Lower is better.</source>
+        <translation>Lägre värden ger högre kvalitet.</translation>
+    </message>
+    <message>
+        <source>Chroma filter</source>
+        <translation>Färgfilter</translation>
+    </message>
+    <message>
+        <source>Bitrate in kilobits/second.  2200Kbps is approximately 1 Gigabyte per hour.</source>
+        <translation>Bithastighet i kbit/s. 2200kbps ger ungefär en Gigabyte/timme.</translation>
+    </message>
+    <message>
+        <source>Scale bitrate for frame size</source>
+        <translation>Skala bithastigheten efter bildstorlek</translation>
+    </message>
+    <message>
+        <source>If set, the MPEG4 bitrate will be used for 640x480.  If other resolutions are used, the bitrate will be scaled appropriately.</source>
+        <translation>Om denna funktion aktivers kommer den konfigurerade bithastigheten att användas vid upplösningen 640x480. Används andra upplösningar skalas bithastigheten för att bibehålla samma bildkvalitet.</translation>
+    </message>
+    <message>
+        <source>Minimum quality</source>
+        <translation>Minimal kvalitet</translation>
+    </message>
+    <message>
+        <source>Modifying the default may have severe consequences.</source>
+        <translation>Om standardvärdena ändras kan det få svåra följder.</translation>
+    </message>
+    <message>
+        <source>Maximum quality</source>
+        <translation>Maximal kvalitet</translation>
+    </message>
+    <message>
+        <source>Max quality difference between frames</source>
+        <translation>Högsta kvalitetsdifferens mellan bildrutor</translation>
+    </message>
+    <message>
+        <source>Enable high-quality encoding</source>
+        <translation>Aktivera högkvalitetskodning</translation>
+    </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use &apos;high-quality&apos; encoding options.  This requires much more processing, but can result in better video.</source>
+        <translation>Om denna funktion aktiveras kommer MPEG4-enkodern att köra i &apos;högkvalitetsläge&apos;. Detta kräver mycker mer beräkningar men kan resultera i högre kvalitet.</translation>
+    </message>
+    <message>
+        <source>Enable 4MV encoding</source>
+        <translation>Aktivera 4MV-kodning</translation>
+    </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use &apos;4MV&apos; motion-vector encoding.  This requires much more processing, but can result in better video. It is highly recommended that the HQ option is enabled if 4MV is enabled.</source>
+        <translation>Om denna funktion aktiveras kommer MPEG4-kodaren att använda &apos;4MV&apos; (motion-vector encoding). Detta kräver mycket mer processorkraft men kan resultera i högre kvalitet. Det är starkt rekommenderat att högkvalitetskodning är aktiverad när 4MV är aktiverad.</translation>
+    </message>
+    <message>
+        <source>Max. Bitrate</source>
+        <translation>Maximal bithastighet</translation>
+    </message>
+    <message>
+        <source>Maximum Bitrate in kilobits/second.  2200Kbps is approximately 1 Gigabyte per hour.</source>
+        <translation>Maximal bithastighet i kbit/s. 2200kbps är ungefär en Gigabyte/timme.</translation>
+    </message>
+    <message>
+        <source>Stream Type</source>
+        <translation>Strömtyp</translation>
+    </message>
+    <message>
+        <source>Sets the type of stream generated by your PVR.</source>
+        <translation>Väljer vilken typ av ström som ditt PVR-kort genererar.</translation>
+    </message>
+    <message>
+        <source>Aspect Ratio</source>
+        <translation>Bildaspekt</translation>
+    </message>
+    <message>
+        <source>Square</source>
+        <translation>Fyrkantig</translation>
+    </message>
+    <message>
+        <source>Sets the aspect ratio of stream generated by your PVR.</source>
+        <translation>Sätter aspekten på den videoström som genereras av PVR-kortet.</translation>
+    </message>
+    <message>
+        <source>Quality</source>
+        <translation>Kvalitet</translation>
+    </message>
+    <message>
+        <source>Horizontal Decimation</source>
+        <translation>Horisontell decimering</translation>
+    </message>
+    <message>
+        <source>Vertical Decimation</source>
+        <translation>Vertikal decimering</translation>
+    </message>
+    <message>
+        <source>Video Compression</source>
+        <translation>Videokompression</translation>
+    </message>
+    <message>
+        <source>RTjpeg Parameters</source>
+        <translation>RTjpeg-parametrar</translation>
+    </message>
+    <message>
+        <source>MPEG-4 Parameters</source>
+        <translation>MPEG4-parametrar</translation>
+    </message>
+    <message>
+        <source>Hardware MJPEG Parameters</source>
+        <translation>Hårdvaru MJPEG-parametrar</translation>
+    </message>
+    <message>
+        <source>MPEG-2 Hardware Encoder</source>
+        <translation>MPEG-2 hårdvarukodare</translation>
+    </message>
+    <message>
+        <source>Automatically transcode after recording</source>
+        <translation>Omkoda automatiskt efter inspelning</translation>
+    </message>
+    <message>
+        <source>Width</source>
+        <translation>Bredd</translation>
+    </message>
+    <message>
+        <source>Height</source>
+        <translation>Höjd</translation>
+    </message>
+    <message>
+        <source>Image size</source>
+        <translation>Bildstorlek</translation>
     </message>
 </context>
 <context>

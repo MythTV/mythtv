@@ -59,7 +59,7 @@ protected:
             LineEditSetting(false),
             RecordingProfileParam(parent, "name") {
 
-            setLabel("Profile name");
+            setLabel(QObject::tr("Profile name"));
         };
     };
 public:

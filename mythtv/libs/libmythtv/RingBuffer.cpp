@@ -459,7 +459,8 @@ int RingBuffer::safe_read(int fd, void *data, unsigned sz)
                 break;
 
             zerocnt++;
-            if (zerocnt >= 50) // 3 second timeout with usleep(60000)
+            if ((normalfile && zerocnt > 15) || 
+                zerocnt >= 50) // 3 second timeout with usleep(60000)
             {
                 break;
             }

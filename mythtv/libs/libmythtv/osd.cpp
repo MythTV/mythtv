@@ -1425,6 +1425,19 @@ void OSD::HideEditArrow(long long number, int type)
     osdlock.unlock();
 }
 
+void OSD::HideAll(void)
+{
+    osdlock.lock();
+
+    vector<OSDSet *>::iterator i;
+    for (i = setList->begin(); i != setList->end(); i++)
+        if (*i)
+            (*i)->Hide();
+
+    changed = true;
+    osdlock.unlock();
+}
+
 void OSD::HideSet(const QString &name)
 {
     osdlock.lock();

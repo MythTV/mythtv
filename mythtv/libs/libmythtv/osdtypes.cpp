@@ -309,7 +309,8 @@ void OSDSet::FadeFor(int time)
 
 void OSDSet::Hide(void)
 {
-    m_timeleft = 1;
+    m_timeleft = -1;
+    m_fadetime = 0;
     m_notimeout = false;
 }
 

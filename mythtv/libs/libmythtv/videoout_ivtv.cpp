@@ -25,6 +25,8 @@ extern "C" {
 #include "ivtv-ext-api.h"
 }
 
+#include "libmyth/mythcontext.h"
+
 VideoOutputIvtv::VideoOutputIvtv(void)
 {
     videofd = -1;
@@ -131,6 +133,8 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
                            unsigned int winid, int winx, int winy, int winw, 
                            int winh, unsigned int embedid)
 {
+    videoDevice = gContext->GetSetting("PVR350VideoDev");
+
     VideoOutput::Init(width, height, aspect, winid, winx, winy, winw, winh, 
                       embedid);
     MoveResize();

@@ -83,7 +83,7 @@ MixerControl::MixerControl():
     ComboBoxSetting(true),
     GlobalSetting("MixerControl") {
 
-    setLabel("Mixer Controls");
+    setLabel(QObject::tr("Mixer Controls"));
     for(unsigned int i = 0; i < sizeof(controls) / sizeof(char*); ++i) {
         addSelection(QObject::tr(controls[i]), controls[i]);
     }
@@ -181,10 +181,11 @@ class SmartForward: public CheckBoxSetting, public GlobalSetting {
 public:
     SmartForward():
         GlobalSetting("SmartForward") {
-        setLabel("Smart Fast Forwarding");
+        setLabel(QObject::tr("Smart Fast Forwarding"));
         setValue(false);
-        setHelpText("If enabled, then immediately after rewinding, only skip "
-                    "forward the same amount as skipping backwards.");
+        setHelpText(QObject::tr("If enabled, then immediately after "
+                    "rewinding, only skip forward the same amount as "
+                    "skipping backwards."));
     };
 };
 
@@ -586,7 +587,7 @@ class UsePicControls: public CheckBoxSetting, public GlobalSetting {
 public:
     UsePicControls():
        GlobalSetting("UseOutputPictureControls") {
-       setLabel("Use Xv picture controls");
+       setLabel(QObject::tr("Use Xv picture controls"));
        setValue(false);
        setHelpText(QObject::tr("If set, Xv picture controls (brightness, "
                    "contrast, etc.) are used during playback. These are "
@@ -1219,6 +1220,49 @@ public:
     };
 };
 
+class PVR350OutputEnable: public CheckBoxSetting, public GlobalSetting {
+public:
+    PVR350OutputEnable():
+        GlobalSetting("PVR350OutputEnable") {
+        setLabel(QObject::tr("Use the PVR-350's TV out / MPEG decoder"));
+        setValue(false);
+        setHelpText(QObject::tr("MythTV can use the PVR-350's TV out and MPEG "
+                    "decoder for high quality playback.  This requires that "
+                    "the ivtv-fb kernel module is also loaded and set up "
+                    "properly."));
+    };
+};
+
+class PVR350VideoDev: public LineEditSetting, public GlobalSetting {
+public:
+    PVR350VideoDev():
+        GlobalSetting("PVR350VideoDev") {
+        setLabel(QObject::tr("Video device for the PVR-350 MPEG decoder"));
+        setValue("/dev/video16");
+    };
+};
+
+class PVR350Settings: public  VerticalConfigurationGroup,
+                      public TriggeredConfigurationGroup {
+public:
+     PVR350Settings():
+         VerticalConfigurationGroup(false),
+         TriggeredConfigurationGroup(false) {
+         setLabel(QObject::tr("PVR-350 Settings"));
+         setUseLabel(false);
+
+         Setting* pvr350output = new PVR350OutputEnable();
+         addChild(pvr350output);
+         setTrigger(pvr350output);
+
+         ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
+         settings->addChild(new PVR350VideoDev());
+         addTarget("1", settings);
+
+         addTarget("0", new VerticalConfigurationGroup(true));
+    };
+};
+
 MainGeneralSettings::MainGeneralSettings()
 {
     AudioSettings *audio = new AudioSettings();
@@ -1247,6 +1291,8 @@ PlaybackSettings::PlaybackSettings()
     general->addChild(new AltClearSavedPosition());
     general->addChild(new UsePicControls());
     addChild(general);
+
+    addChild(new PVR350Settings());
 
     VerticalConfigurationGroup* seek = new VerticalConfigurationGroup(false);
     seek->setLabel(QObject::tr("Seeking"));
