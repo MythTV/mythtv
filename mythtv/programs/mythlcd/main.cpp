@@ -46,12 +46,12 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    lcd_host = gContext->GetSetting("LCDHost");
-    lcd_port = gContext->GetNumSetting("LCDPort");
+    lcd_host = gContext->GetSetting("LCDHost", "localhost");
+    lcd_port = gContext->GetNumSetting("LCDPort", 13666);
 
     if (lcd_host.length() > 0 && lcd_port > 1024 && gContext->GetLCDDevice())
     {
-        gContext->GetLCDDevice()->connectToHost("localhost", 13666);
+        gContext->GetLCDDevice()->connectToHost(lcd_host, lcd_port);
         MythLCD mythLCD;
         a.setMainWidget(&mythLCD);
         mythLCD.show();
@@ -59,8 +59,9 @@ int main(int argc, char **argv)
     }
     else
     {
-        cout << "Could not get LCD host and port settings from database" << endl;
-        cout << "Did you run cvs.sql in the database directory?" << endl;
+        cout << "Could not get LCD host and port settings from database." << endl;
+        cout << "You do know that this is just a toy application that will " << endl;
+        cout << "not suddenly make your MythTV box work with with an LCD device. " << endl;
     }
 }
 
