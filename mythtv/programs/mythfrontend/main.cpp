@@ -249,6 +249,8 @@ int main(int argc, char **argv)
         return -1;
     }
 
+    WriteDefaults(context, db);
+
     QString themename = context->GetSetting("Theme");
     QString themedir = context->FindThemeDir(themename);
     if (themedir == "")
@@ -260,8 +262,6 @@ int main(int argc, char **argv)
     context->LoadQtConfig();
 
     qApp->unlock();
-
-    WriteDefaults(context, db);
 
     int exitstatus = RunMenu(themedir, context);
 
