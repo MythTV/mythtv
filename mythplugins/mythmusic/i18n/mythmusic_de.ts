@@ -43,7 +43,7 @@
     </message>
     <message>
         <source>Blechy Blech Blah</source>
-        <translation type="unfinished"></translation>
+        <translation>Blabli Blabla</translation>
     </message>
     <message>
         <source>All My Music ~ Loading Music Data </source>
@@ -221,11 +221,11 @@
     </message>
     <message>
         <source>Tree Sorting</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortierreihenfolge</translation>
     </message>
     <message>
         <source>Order in which to sort the Music Selection Tree. Possible values are space-separated list of genre, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the actual directory tree.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortierreihenfolge in der Musikauswahl. Mögliche Werte sind (durch Leerzeichen getrennt): Genre, Künstler, Album, Titel ODER das Schlüsselwort Verzeichnis. Damit entspricht die Darstellung der tatsächlichen Verzeichnisstruktur.</translation>
     </message>
     <message>
         <source>Script Path</source>
@@ -249,7 +249,7 @@
     </message>
     <message>
         <source>If set, MythMusic will skip checking ID3 tags in files and just try to determine Genre, Artist, Album, and Track number and title from the filename.</source>
-        <translation>Falls gesetzt werden ID3 Marken ignoriert und Genre,Künstler, Album und Titel aus dem Dateinamen bestimmt.</translation>
+        <translation>Falls gesetzt werden ID3 Marken ignoriert und Genre, Künstler, Album und Titel aus dem Dateinamen bestimmt.</translation>
     </message>
     <message>
         <source>Automatically lookup CDs</source>
@@ -257,7 +257,7 @@
     </message>
     <message>
         <source>Automatically lookup an audio CD if it is present and show its information in the Music Selection Tree.</source>
-        <translation type="unfinished"></translation>
+        <translation>CDs automatisch nachschlagen und die Informationen in der Musikauswahl anzeigen.</translation>
     </message>
     <message>
         <source>Use Keyboard/Remote Accelerated Buttons</source>
@@ -313,11 +313,11 @@
     </message>
     <message>
         <source>Paranoia Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Genauigkeit</translation>
     </message>
     <message>
         <source>Full</source>
-        <translation>Genauer</translation>
+        <translation>Besser</translation>
     </message>
     <message>
         <source>Faster</source>
@@ -325,7 +325,7 @@
     </message>
     <message>
         <source>Paranoia level of the CD ripper. Set to faster if you&apos;re not concerned about possible errors in the audio.</source>
-        <translation type="unfinished"></translation>
+        <translation>Genauigkeit des CD Rippers. Wählen Sie &apos;Schneller&apos; wenn Sie mögliche Audiofehler akzeptieren wollen.</translation>
     </message>
     <message>
         <source>Automatically eject CDs after ripping</source>
@@ -389,7 +389,7 @@
     </message>
     <message>
         <source>If selected, you can navigate your entire music tree from the playing screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, können Sie im Wiedergabebildschirm auf Ihre Musiksammlung zugreifen.</translation>
     </message>
     <message>
         <source>Play mode</source>
@@ -401,7 +401,7 @@
     </message>
     <message>
         <source>Random</source>
-        <translation>Random</translation>
+        <translation>Zufall</translation>
     </message>
     <message>
         <source>Intelligent</source>
@@ -409,7 +409,7 @@
     </message>
     <message>
         <source>Starting shuffle mode for the player.  Can be either normal, random, or intelligent (random).</source>
-        <translation type="unfinished"></translation>
+        <translation>Gewünschter Abspielmodus. Möglich ist Normal, Zufall oder Intelligent (zufällig).</translation>
     </message>
     <message>
         <source>Delay before Visualizations start (seconds)</source>
@@ -497,7 +497,7 @@
     </message>
     <message>
         <source>Default quality for new CD rips.</source>
-        <translation type="unfinished">Standard Qualität für neue CD Rips. Bei der Einstellung &apos;Perfekt&apos; wird der FLAC Kodierer verwendet.</translation>
+        <translation>Standard Qualität für neue CD Rips. Bei der Einstellung &apos;Perfekt&apos; wird der FLAC Kodierer verwendet.</translation>
     </message>
     <message>
         <source>General Settings</source>
@@ -648,7 +648,7 @@ MythMusic Tabellen fehlen in der Datenbank.</translation>
     </message>
     <message>
         <source>Artist: </source>
-        <translation>Interpret:</translation>
+        <translation>Künstler:</translation>
     </message>
     <message>
         <source>Album: </source>
