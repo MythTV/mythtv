@@ -597,7 +597,12 @@ void Webcam::KillThread()
     if (!killWebcamThread) // Is the thread even running?
     {
         killWebcamThread = true;
-        wait();
+        if (!wait(2000))
+        {
+            terminate();
+            wait();
+            cout << "SIP Webcam thread failed to terminate gracefully and was killed\n";
+        }
     }
 #endif
 }
