@@ -13,7 +13,7 @@
     die "usage:\n\n   nuvinfo /path/to/file.nuv\n\n" unless ($ARGV[0]);
 
 # Get the info about the requested file
-    my $file = $ARGV[0];
+    my $file = ($ARGV[0] or '');
     my %info = nuv_info($file);
 
 # Print the info

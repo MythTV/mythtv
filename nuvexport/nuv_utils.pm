@@ -65,7 +65,7 @@ package nuv_utils;
 		my $file = shift;
 		my(%info, $buffer);
 	# open the file
-        if (-e $main::video_dir and -e "$main::video_dir/$file") {
+        if ($main::video_dir and -e $main::video_dir and -e "$main::video_dir/$file") {
             open(DATA, "$main::video_dir/$file") or die "Can't open $file:  $!\n\n";
         }
         else {
