@@ -1578,7 +1578,7 @@ void CommDetect::BuildAllMethodsCommList(void)
         }
         else if ((thisScore > 0) && (lastScore < 0) && (breakStart != -1))
         {
-            if ((fbp->end - breakStart) > (MIN_COMM_BREAK_LENGTH * fps))
+            if ((fbp->start - breakStart) > (MIN_COMM_BREAK_LENGTH * fps))
             {
                 commBreakMap[breakStart] = MARK_COMM_START;
                 commBreakMap[fbp->start] = MARK_COMM_END;
