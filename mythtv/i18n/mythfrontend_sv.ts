@@ -1328,11 +1328,11 @@
     </message>
     <message>
         <source>Time to record before start of show (in seconds)</source>
-        <translation>Antalet sekunder före programstart som inspelning börjar</translation>
+        <translation>Tid att spela in före programstart (i sekunder)</translation>
     </message>
     <message>
         <source>Time to record past end of show (in seconds)</source>
-        <translation>Antalet sekunder inspelning fortsätter efter programslut</translation>
+        <translation>Tid att spela in efter programslut (i sekunder)</translation>
     </message>
     <message>
         <source>List Newest Recording First</source>
@@ -2659,7 +2659,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Use default unless this source uses a different frequency table than the system wide table defined in the General settings.</source>
-        <translation>Använd standard om källan inte använder en annan frekvenstabell än vad som definierats i under Generella inställningar.</translation>
+        <translation>Använd standard om källan inte använder en annan frekvenstabell än vad som angetts i Globala inställningar för inspelningsservrar (under Generellt).</translation>
     </message>
     <message>
         <source>tv_grab_uk configuration</source>
@@ -4599,11 +4599,11 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Maximum simultaneous jobs on this backend</source>
-        <translation>Maximalt antal samtidiga jobb på denna inspelningsserver</translation>
+        <translation>Max antal jobb på denna inspelningsserver</translation>
     </message>
     <message>
         <source>The Job Queue will be limited to running this many simultaneous jobs on this backend.</source>
-        <translation>Jobbkön kommer att begränsas till att köra så här många jobb på denna inspelningsserver.</translation>
+        <translation>Jobbkön kommer att begränsas till att köra så här många samtidiga jobb på denna inspelningsserver.</translation>
     </message>
     <message>
         <source>Job Queue Check frequency (in seconds)</source>
