@@ -29,6 +29,7 @@ using namespace std;
 
 #include "mythcontext.h"
 #include "programinfo.h"
+#include "infodialog.h"
 #include "remoteutil.h"
 
 PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent, 
@@ -1631,6 +1632,8 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
     popup->addButton(tr("Change Recording Group"), this,
                      SLOT(showRecGroupChanger()));
 
+    popup->addButton(tr("Edit Recording Schedule"), this,
+                     SLOT(doEditScheduled()));
     popup->addButton(tr("Delete"), this, SLOT(askDelete()));
     popup->addButton(tr("Cancel"), this, SLOT(doCancel()));
 
@@ -1751,6 +1754,32 @@ void PlaybackBox::doStop(void)
 
     timer->start(500);
 }
+
+void PlaybackBox::doEditScheduled()
+{
+    if (!expectingPopup)
+        return;
+
+    cancelPopup();
+
+    QSqlDatabase *db = QSqlDatabase::database();
+
+    if (gContext->GetNumSetting("AdvancedRecord", 0))
+    {
+        ScheduledRecording record;
+        record.loadByProgram(db, curitem);
+        record.exec(db);
+    }
+    else
+    {
+        InfoDialog diag(curitem, gContext->GetMainWindow(), "Program Info");
+        diag.exec();
+    }
+    
+    ScheduledRecording::signalChange(db);
+    connected = FillList();
+    update(fullRect);
+}    
 
 void PlaybackBox::askDelete(void)
 {

@@ -57,6 +57,8 @@ class PlaybackBox : public MythDialog
     void doStop();
     void noStop();
 
+    void doEditScheduled();
+
     void askDelete();
     void doDelete();
     void doDeleteForgetHistory();
