@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.11 (xris)
+#Last Updated: 2005.02.14 (xris)
 #
 #  transcode.pm
 #
@@ -19,10 +19,7 @@ package export::transcode;
     use mythtv::recordings;
 
 # Load the following extra parameters from the commandline
-    $cli_args{'deinterlace:s'}             = 1; # Deinterlace video
-    $cli_args{'denoise|noise_reduction:s'} = 1; # Enable noise reduction
-    $cli_args{'zoom_filter:s'}             = 1; # Which zoom filter to use
-    $cli_args{'crop'}                      = 1; # Crop out broadcast overscan
+    add_arg('zoom_filter:s', 'Which zoom filter to use.');
 
 # This superclass defines several object variables:
 #
@@ -60,26 +57,6 @@ package export::transcode;
             else {
                 die "Unknown zoom_filter:  $Args{'zoom_filter'}\n";
             }
-        }
-    # Defaults?
-        $Args{'denoise'}     = ''         if (defined $Args{'denoise'} && $Args{'denoise'} eq '');
-        $Args{'deinterlace'} = 'smartyuv' if (defined $Args{'deinterlace'} && $Args{'deinterlace'} eq '');
-    # Noise reduction?
-        $self->{'denoise'} = query_text('Enable noise reduction (slower, but better results)?',
-                                                'yesno',
-                                                $self->{'denoise'} ? 'Yes' : 'No');
-    # Deinterlace video?
-        $self->{'deinterlace'} = query_text('Enable deinterlacing?',
-                                            'yesno',
-                                            $self->{'deinterlace'} ? 'Yes' : 'No');
-    # Crop video to get rid of broadcast padding
-        if ($Args{'crop'}) {
-            $self->{'crop'} = 1;
-        }
-        else {
-            $self->{'crop'} = query_text('Crop broadcast overscan (2% border)?',
-                                         'yesno',
-                                         $self->{'crop'} ? 'Yes' : 'No');
         }
     }
 

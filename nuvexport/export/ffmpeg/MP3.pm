@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.01.26 (xris)
+#Last Updated: 2005.02.15 (xris)
 #
 #  export::ffmpeg::MP3
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
@@ -15,7 +15,7 @@ package export::ffmpeg::MP3;
     use mythtv::recordings;
 
 # Load the following extra parameters from the commandline
-    $cli_args{'bitrate=i'}    = 1; # Audio bitrate
+    add_arg('bitrate=i',    'Audio bitrate');
 
     sub new {
         my $class = shift;
@@ -31,11 +31,13 @@ package export::ffmpeg::MP3;
 
     # Initialize and check for transcode
         $self->init_ffmpeg(1);
-
     # Make sure that we have an mplexer
         $Prog{'id3tag'} = find_program('id3tag');
         push @{$self->{'errors'}}, 'You need id3tag to export an mp3.' unless ($Prog{'id3tag'});
-
+    # Can we even encode vcd?
+        if (!$self->can_encode('mp3')) {
+            push @{$self->{'errors'}}, "Your ffmpeg installation doesn't support encoding to mp3 audio.";
+        }
     # Any errors?  disable this function
         $self->{'enabled'} = 0 if ($self->{'errors'} && @{$self->{'errors'}} > 0);
     # Return

@@ -1,4 +1,4 @@
-#Last Updated: 2005.01.26 (xris)
+#Last Updated: 2005.02.15 (xris)
 #
 #  export::ffmpeg::ASF
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
@@ -14,8 +14,8 @@ package export::ffmpeg::ASF;
     use mythtv::recordings;
 
 # Load the following extra parameters from the commandline
-    $cli_args{'a_bitrate|a=i'}    = 1; # Audio bitrate
-    $cli_args{'v_bitrate|v=i'}    = 1; # Video bitrate
+    add_arg('a_bitrate|a=i',    'Audio bitrate');
+    add_arg('v_bitrate|v=i',    'Video bitrate');
 
     sub new {
         my $class = shift;
@@ -38,7 +38,13 @@ package export::ffmpeg::ASF;
 
     # Initialize and check for ffmpeg
         $self->init_ffmpeg();
-
+    # Can we even encode asf?
+        if (!$self->can_encode('msmpeg4')) {
+            push @{$self->{'errors'}}, "Your ffmpeg installation doesn't support encoding to msmpeg4.";
+        }
+        if (!$self->can_encode('mp3')) {
+            push @{$self->{'errors'}}, "Your ffmpeg installation doesn't support encoding to mp3 audio.";
+        }
     # Any errors?  disable this function
         $self->{'enabled'} = 0 if ($self->{'errors'} && @{$self->{'errors'}} > 0);
     # Return

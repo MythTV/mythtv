@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.01.26 (xris)
+#Last Updated: 2005.02.14 (xris)
 #
 #  export::transcode::XviD
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
@@ -15,10 +15,10 @@ package export::transcode::XviD;
     use mythtv::recordings;
 
 # Load the following extra parameters from the commandline
-    $cli_args{'quantisation|q=i'} = 1; # Quantisation
-    $cli_args{'a_bitrate|a=i'}    = 1; # Audio bitrate
-    $cli_args{'v_bitrate|v=i'}    = 1; # Video bitrate
-    $cli_args{'multipass'}        = 1; # Two-pass encoding
+    add_arg('quantisation|q=i', 'Quantisation');
+    add_arg('a_bitrate|a=i',    'Audio bitrate');
+    add_arg('v_bitrate|v=i',    'Video bitrate');
+    add_arg('multipass!',       'Enably two-pass encoding.');
 
     sub new {
         my $class = shift;

@@ -20,42 +20,53 @@ package nuv_export::ui;
         use Exporter;
         our @ISA = qw/ Exporter /;
 
-        our @EXPORT = qw/ &load_cli_args &load_episodes &load_cli_episodes
-                          &query_savepath &query_exporters &query_text
+        our @EXPORT = qw/ &add_arg        &load_cli_args      &arg
+                          &load_episodes  &load_cli_episodes
+                          &query_savepath &query_exporters    &query_text
                           $is_cli
                         /;
     }
 
+# Only need to keep track of cli args here
+    my %cli_args;
+
 # Load the following extra parameters from the commandline
-    $cli_args{'search-only'}            = 1; # Search only, do not do anything with the found recordings
-    $cli_args{'confirm'}                = 1; # Confirm commandline-entered choices
+    add_arg('search-only',            'Search only, do not do anything with the found recordings');
+    add_arg('confirm',                'Confirm commandline-entered choices');
 
-    $cli_args{'title=s'}                = 1; # Used for searching or group-encoding
-    $cli_args{'subtitle|episode=s'}     = 1;
-    $cli_args{'description=s'}          = 1;
-    $cli_args{'infile|input|i=s'}       = 1; # Input filename
-    $cli_args{'chanid|channel=i'}       = 1; # Used to specify a program
-    $cli_args{'starttime|start_time=i'} = 1;
+    add_arg('title=s',                'Find programs to convert based on their title.');
+    add_arg('subtitle|episode=s',     'Find programs to convert based on their subtitle (episode name).');
+    add_arg('description=s',          'Find programs to convert based on their description.');
+    add_arg('infile|input|i=s',       'Input filename');
+    add_arg('chanid|channel=i',       'Find programs to convert based on their chanid');
+    add_arg('starttime|start_time=i', 'Find programs to convert based on their starttime.');
 
-    $cli_args{'require_cutlist'}        = 1; # Only show programs that have a cutlist?
+    add_arg('require_cutlist',        'Only show programs that have a cutlist?');
 
-    $cli_args{'mode|function|export=s'} = 1; # CLI for which export mode to use
+    add_arg('mode|export=s',          'Specify which export mode to use');
 
-    $cli_args{'noserver|no-server'}     = 1; # Don't talk to the server -- do all encodes here in this execution
+    add_arg('noserver|no-server',     "Don't talk to the server -- do all encodes here in this execution");
 
-    $cli_args{'nice=i'}                 = 1; # Set the value of "nice" for subprocesses
-    $cli_args{'version'}                = 1; # Show the version and exit
+    add_arg('nice=i',                 'Set the value of "nice" for subprocesses');
+    add_arg('version',                'Show the version and exit');
 
 # Load the commandline options
-    $cli_args{'help'}  = 1;
-    $cli_args{'debug'} = 1;
+    add_arg('help',  'Show nuvexport help');
+    add_arg('debug', 'Enable debug mode');
 
 # Look for certain commandline options to determine if this is cli-mode
     our $is_cli = 0;
 
 # Load the commandline arguments
     sub load_cli_args {
-        die "Invalid commandline parameter(s).\n" unless GetOptions(\%Args, keys %cli_args);
+    # Build an array of the requested commandline arguments
+        my @args;
+        foreach my $key (keys %cli_args) {
+            push @args, $cli_args{$key}[0];
+        }
+    # Get the options
+        GetOptions(\%Args, keys %cli_args)
+            or die "Invalid commandline parameter(s).\n";
     # Make sure nice is defined
         if (defined($Args{'nice'})) {
             die "--nice must be between -20 (highest priority) and 19 (lowest)\n" if (int($Args{'nice'}) != $Args{'nice'} || $Args{'nice'} > 19 || $Args{'nice'} < -20);
@@ -68,6 +79,19 @@ package nuv_export::ui;
         if (!$Args{'confirm'} && ($Args{'title'} || $Args{'subtitle'} || $Args{'description'} || $Args{'infile'} || $Args{'starttime'} || $Args{'chanid'})) {
             $is_cli = 1;
         }
+    }
+
+# Add an argument to check for on the commandline
+    sub add_arg {
+        my ($arg, $description) = @_;
+        my ($name) = $arg =~ /^([^!=:\|]+)/;
+        $cli_args{$name} = [$arg, $description];
+    }
+
+# Retrieve the value of a commandline argument
+    sub arg {
+        my ($arg, $default) = @_;
+        return defined($Args{$arg}) ? $Args{$arg} : $default;
     }
 
 # Load episodes from the commandline

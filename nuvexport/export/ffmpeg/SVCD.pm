@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.06 (xris)
+#Last Updated: 2005.02.15 (xris)
 #
 #  export::ffmpeg::SVCD
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
@@ -15,9 +15,9 @@ package export::ffmpeg::SVCD;
     use mythtv::recordings;
 
 # Load the following extra parameters from the commandline
-    $cli_args{'quantisation|q=i'} = 1; # Quantisation
-    $cli_args{'a_bitrate|a=i'}    = 1; # Audio bitrate
-    $cli_args{'v_bitrate|v=i'}    = 1; # Video bitrate
+    add_arg('quantisation|q=i', 'Quantisation');
+    add_arg('a_bitrate|a=i',    'Audio bitrate');
+    add_arg('v_bitrate|v=i',    'Video bitrate');
 
     sub new {
         my $class = shift;
@@ -39,7 +39,13 @@ package export::ffmpeg::SVCD;
 
     # Initialize and check for ffmpeg
         $self->init_ffmpeg();
-
+    # Can we even encode svcd?
+        if (!$self->can_encode('mpeg2video')) {
+            push @{$self->{'errors'}}, "Your ffmpeg installation doesn't support encoding to mpeg2video.";
+        }
+        if (!$self->can_encode('mp2')) {
+            push @{$self->{'errors'}}, "Your ffmpeg installation doesn't support encoding to mp2 audio.";
+        }
     # Any errors?  disable this function
         $self->{'enabled'} = 0 if ($self->{'errors'} && @{$self->{'errors'}} > 0);
     # Return

@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.12.26 (xris)
+#Last Updated: 2005.02.13 (xris)
 #
 #  generic.pm
 #
@@ -23,12 +23,15 @@ package export::generic;
     }
 
 # Load the following extra parameters from the commandline
-    $cli_args{'path:s'}              = 1; # Save path (only used with the noserver option)
-    $cli_args{'cutlist|use_cutlist'} = 1; # Use the myth cutlist
+    add_arg('path:s',                        'Save path (only used with the noserver option)');
+    add_arg('cutlist|use_cutlist!',          'Use the myth cutlist (or not)');
 
 # These aren't used by all modules, but the routine to define them is here, so here they live
-    $cli_args{'height|v_res|h=i'} = 1; # Height
-    $cli_args{'width|h_res|w=i'}  = 1; # Width
+    add_arg('height|v_res|h=i',              'Output height.');
+    add_arg('width|h_res|w=i',               'Output width.');
+    add_arg('deinterlace:s!',                'Deinterlace video.');
+    add_arg('noise_reduction|denoise|nr:s!', 'Enable noise reduction.');
+    add_arg('crop!',                         'Crop out broadcast overscan.');
 
 # Gather generic export settings
     sub gather_settings {
@@ -38,7 +41,30 @@ package export::generic;
     # Ask the user if he/she wants to use the cutlist
         $self->{'use_cutlist'} = query_text('Enable Myth cutlist?',
                                             'yesno',
-                                            'Yes');
+                                            (defined($Args{'cutlist'}) && $Args{'cutlist'} == 0) ? 'No' : 'Yes');
+    # Video settings
+        if (!$self->{'audioonly'}) {
+        # Defaults?
+            $Args{'denoise'}     = '' if (defined $Args{'denoise'} && $Args{'denoise'} eq '');
+            $Args{'deinterlace'} = 1  if (defined $Args{'deinterlace'} && $Args{'deinterlace'} eq '');
+        # Noise reduction?
+            $self->{'denoise'} = query_text('Enable noise reduction (slower, but better results)?',
+                                                    'yesno',
+                                                    $self->{'denoise'} ? 'Yes' : 'No');
+        # Deinterlace video?
+            $self->{'deinterlace'} = query_text('Enable deinterlacing?',
+                                                'yesno',
+                                                $self->{'deinterlace'} ? 'Yes' : 'No');
+        # Crop video to get rid of broadcast padding
+            if ($Args{'crop'}) {
+                $self->{'crop'} = 1;
+            }
+            else {
+                $self->{'crop'} = query_text('Crop broadcast overscan (2% border)?',
+                                             'yesno',
+                                             $self->{'crop'} ? 'Yes' : 'No');
+            }
+        }
     }
 
 # Check for a duplicate filename, and return a full path to the output filename

@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.01.26 (gjhurlbu)
+#Last Updated: 2005.02.15 (xris)
 #
 #  export::ffmpeg::DVCD
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
@@ -32,6 +32,13 @@ package export::ffmpeg::DVCD;
 
     # Initialize and check for ffmpeg
         $self->init_ffmpeg();
+    # Can we even encode vcd?
+        if (!$self->can_encode('mpeg1video')) {
+            push @{$self->{'errors'}}, "Your ffmpeg installation doesn't support encoding to mpeg1video.";
+        }
+        if (!$self->can_encode('mp2')) {
+            push @{$self->{'errors'}}, "Your ffmpeg installation doesn't support encoding to mp2 audio.";
+        }
     # Any errors?  disable this function
         $self->{'enabled'} = 0 if ($self->{'errors'} && @{$self->{'errors'}} > 0);
     # Return

@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.12 (xris)
+#Last Updated: 2005.02.15 (xris)
 #
 #  ffmpeg.pm
 #
@@ -19,11 +19,6 @@ package export::ffmpeg;
     use nuv_export::ui;
     use mythtv::recordings;
 
-# Load the following extra parameters from the commandline
-    $cli_args{'deinterlace:s'}             = 1; # Deinterlace video
-    $cli_args{'denoise|noise_reduction:s'} = 1; # Enable noise reduction
-    $cli_args{'crop'}                      = 1; # Crop out broadcast overscan
-
 # This superclass defines several object variables:
 #
 #   path        (defined by generic)
@@ -35,12 +30,31 @@ package export::ffmpeg;
 
 # Check for ffmpeg
     sub init_ffmpeg {
-        my $self = shift;
+        my $self      = shift;
         my $audioonly = (shift or 0);
     # Make sure we have ffmpeg
         $Prog{'ffmpeg'} = find_program('ffmpeg');
         push @{$self->{'errors'}}, 'You need ffmpeg to use this exporter.' unless ($Prog{'ffmpeg'});
+    # Audio only?
         $self->{'audioonly'} = $audioonly;
+    # Gather the supported codecs
+        my $formats = `$Prog{'ffmpeg'} -formats`;
+        $formats =~ s/^.+?\n\s*Codecs:\s*\n(.+?\n)\s*\n.*?$/$1/s;
+        while ($formats =~ /^\s(.{6})\s(\S+)\s*$/mg) {
+            $self->{'codecs'}{$2} = $1;
+        }
+    }
+
+# Returns true or false for the requested codec
+    sub can_decode {
+        my $self  = shift;
+        my $codec = shift;
+        return ($self->{'codecs'}{$codec} && $self->{'codecs'}{$codec} =~ /^D/) ? 1 : 0;
+    }
+    sub can_encode {
+        my $self  = shift;
+        my $codec = shift;
+        return ($self->{'codecs'}{$codec} && $self->{'codecs'}{$codec} =~ /^.E/) ? 1 : 0;
     }
 
 # Gather data for ffmpeg
@@ -48,29 +62,7 @@ package export::ffmpeg;
         my $self = shift;
         my $skip = shift;
     # Gather generic settings
-        $self->SUPER::gather_settings($skip ? $skip - 1 : 0);
-        return if ($skip);
-    # Defaults?
-        $Args{'noise_reduction'} = ''         if (defined $Args{'noise_reduction'} && $Args{'noise_reduction'} eq '');
-        $Args{'deinterlace'}     = '' if (defined $Args{'deinterlace'} && $Args{'deinterlace'} eq '');
-    # Noise reduction?
-        $self->{'noise_reduction'} = query_text('Enable noise reduction (slower, but better results)?',
-                                                'yesno',
-                                                $self->{'noise_reduction'} ? 'Yes' : 'No');
-    # Deinterlace video?
-        $self->{'deinterlace'} = query_text('Enable deinterlacing?',
-                                            'yesno',
-                                            $self->{'deinterlace'} ? 'Yes' : 'No');
-
-    # Crop video to get rid of broadcast padding
-        if ($Args{'crop'}) {
-            $self->{'crop'} = 1;
-        }
-        else {
-            $self->{'crop'} = query_text('Crop broadcast overscan (2% border)?',
-                                         'yesno',
-                                         $self->{'crop'} ? 'Yes' : 'No');
-        }
+        $self->SUPER::gather_settings();
     }
 
     sub export {

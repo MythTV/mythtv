@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.12.14 (xris)
+#Last Updated: 2005.02.13 (xris)
 #
 #  nuv_export::shared_utils
 #
@@ -15,7 +15,7 @@ package nuv_export::shared_utils;
         our @ISA = qw/ Exporter /;
 
         our @EXPORT = qw/ &clear &find_program &shell_escape &wrap &system &mkdir &wipe_tmpfiles
-                          @Exporters %Prog %Args %cli_args $DEBUG
+                          @Exporters %Prog %Args $DEBUG
                           $num_cpus $is_child
                           @tmpfiles %children
                         /;
@@ -25,7 +25,6 @@ package nuv_export::shared_utils;
     our @Exporters;     # A list of the various exporters
     our %Prog;          # Locations of preferred programs for various tasks (mplex, etc) -- DEPRECATED
     our %Args;          # Edit this to store command line arguments in individual variables
-    our %cli_args;      # Add keys to this this in order to add more command line parse strings
     our $is_child = 0;  # This is set to 1 after forking to a new process
     our @tmpfiles;      # Keep track of temporary files, so we can clean them up upon quit
     our %children;      # Keep track of child pid's so we can kill them off if we quit unexpectedly
@@ -61,9 +60,14 @@ package nuv_export::shared_utils;
     our $terminal = Term::Cap->Tgetent({OSPEED=>$OSPEED});
 
 # Gather info about how many cpu's this machine has
-    my $cpuinfo = `cat /proc/cpuinfo`;
-    while ($cpuinfo =~ /^processor\s*:\s*\d+/mg) {
-        $num_cpus++;
+    if (-e '/proc/cpuinfo') {
+        my $cpuinfo = `cat /proc/cpuinfo`;
+        while ($cpuinfo =~ /^processor\s*:\s*\d+/mg) {
+            $num_cpus++;
+        }
+    }
+    else {
+        $num_cpus = 1;
     }
 
 # Clear the screen
