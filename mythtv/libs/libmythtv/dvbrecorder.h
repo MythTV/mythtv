@@ -22,7 +22,6 @@ class DVBRecorder : public RecorderBase
     void SetOption(const QString &name, const QString &value)
                                        { RecorderBase::SetOption(name, value); }
     void SetPID(const vector<int>& some_pids);
-    void ChangeDeinterlacer(int deint_mode);
     void SetVideoFilters(QString &filters);
 
     void Initialize(void);

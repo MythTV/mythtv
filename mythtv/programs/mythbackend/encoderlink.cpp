@@ -438,17 +438,6 @@ int EncoderLink::ChangeHue(bool direction)
     return ret;
 }
 
-void EncoderLink::ChangeDeinterlacer(int deinterlacer_mode)
-{
-    if (local)
-    {
-        tv->ChangeDeinterlacer(deinterlacer_mode);
-        return;
-    }
-
-    cerr << "Should be local only query: ChangeDeinterlacer\n";
-}
-
 bool EncoderLink::CheckChannel(QString name)
 {
     if (local)

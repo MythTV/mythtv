@@ -229,11 +229,6 @@ void MpegRecorder::FinishRecording(void)
     }
 }
 
-void MpegRecorder::ChangeDeinterlacer(int deint_mode)
-{
-    (void)deint_mode;
-}
-
 void MpegRecorder::SetVideoFilters(QString &filters)
 {
     (void)filters;

@@ -735,6 +735,13 @@ void ProgramInfo::StartedRecording(QSqlDatabase *db)
     if (!qquery.isActive())
         MythContext::DBError("WriteRecordedToDB", qquery);
 
+    query = QString("DELETE FROM recordedmarkup WHERE chanid = %1 "
+                    "AND starttime = %2;")
+                    .arg(chanid).arg(starts);
+
+    qquery = db->exec(query);
+    if (!qquery.isActive())
+        MythContext::DBError("Clear markup on record", qquery);
 }
 
 void ProgramInfo::FinishedRecording(QSqlDatabase* db) 

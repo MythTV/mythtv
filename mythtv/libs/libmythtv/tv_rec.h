@@ -101,7 +101,6 @@ class TVRec
     int ChangeContrast(bool direction);
     int ChangeBrightness(bool direction);
     int ChangeHue(bool direction);
-    void ChangeDeinterlacer(int deinterlace_mode);
     bool CheckChannel(QString name);
     void GetNextProgram(int direction,
                         QString &title, QString &subtitle, QString &desc,
@@ -170,8 +169,6 @@ class TVRec
     RecorderBase *nvr;
     RingBuffer *rbuffer;
     ChannelBase *channel;
-
-    int deinterlace_mode;
 
     QSqlDatabase *db_conn;
     pthread_mutex_t db_lock;

@@ -57,11 +57,8 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     h = 240;
     pip_mode = 0;
 
-    deinterlace_mode = DEINTERLACE_NONE;
     framerate_multiplier = 1.0;
     height_multiplier = 1.0;
-    myfd.src = NULL;
-    myfd.picsize = -1;
 
     mp3quality = 3;
     gf = NULL;
@@ -168,9 +165,6 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         seektable->clear();
         delete seektable;  
     }  
-
-    if (myfd.src)
-        delete [] myfd.src;
 
     while (videobuffer.size() > 0)
     {
@@ -2246,7 +2240,6 @@ void NuppelVideoRecorder::doWriteThread(void)
             firsttimecode = videobuffer[act_video_encode]->timecode;
         }
 
-
         if (audio_buffer_count && 
             audiobuffer[act_audio_encode]->freeToEncode &&
             (action == ACTION_NONE ||
@@ -2268,80 +2261,17 @@ void NuppelVideoRecorder::doWriteThread(void)
         {
             case ACTION_VIDEO:
             {
-                switch (deinterlace_mode)
-                {
-                    case DEINTERLACE_BOB:
-                    case DEINTERLACE_BOB_FULLHEIGHT_COPY:
-                    case DEINTERLACE_BOB_FULLHEIGHT_LINEAR_INTERPOLATION:
-                    {
-                        Frame *top_frame = 
-                                  GetField(videobuffer[act_video_encode], true,
-                                           (deinterlace_mode != DEINTERLACE_BOB)
-                                            ? true : false);
-
-                        Frame *bottom_frame =
-                                  GetField(videobuffer[act_video_encode], false,
-                                           (deinterlace_mode != DEINTERLACE_BOB)
-                                            ? true : false);
-
-                        WriteVideo(top_frame);
-                        WriteVideo(bottom_frame);
-                        delete [] top_frame->buf;
-                        delete [] bottom_frame->buf;
-                        delete top_frame;
-                        delete bottom_frame;
-                    }
-                    break;
-                    case DEINTERLACE_DISCARD_TOP:
-                    {
-                        Frame *top_frame =
-                             GetField(videobuffer[act_video_encode],true,false);
-                        WriteVideo(top_frame);
-                        delete [] top_frame->buf;
-                        delete top_frame;
-                    }
-                    break;
-                    case DEINTERLACE_DISCARD_BOTTOM:
-                    {
-                        Frame *bottom_frame =
-                            GetField(videobuffer[act_video_encode],false,false);
-                        WriteVideo(bottom_frame);
-                        delete [] bottom_frame->buf;
-                        delete bottom_frame;
-                    }
-                    break;
-                    case DEINTERLACE_AREA:
-                    {
-                        Frame *frame = 
-                            areaDeinterlace(
-                                        videobuffer[act_video_encode]->buffer,
-                                         w, h);
-                        frame->frameNumber =
-                            videobuffer[act_video_encode]->sample;
-                        frame->timecode = 
-                            videobuffer[act_video_encode]->timecode;
-                        WriteVideo(frame);
-                        delete frame;
-                    }
-                    break;
-                    case DEINTERLACE_NONE:
-                    case DEINTERLACE_LAST:
-                    {
-                        Frame frame;
-                        frame.codec = CODEC_YUV;
-                        frame.width = w;
-                        frame.height = h;
-                        frame.buf = videobuffer[act_video_encode]->buffer;
-                        frame.len = videobuffer[act_video_encode]->bufferlen;
-                        frame.frameNumber = 
-                                videobuffer[act_video_encode]->sample;
-                        frame.timecode = 
-                                videobuffer[act_video_encode]->timecode;
-                        frame.is_field = FALSE;
+                Frame frame;
+                frame.codec = CODEC_YUV;
+                frame.width = w;
+                frame.height = h;
+                frame.buf = videobuffer[act_video_encode]->buffer;
+                frame.len = videobuffer[act_video_encode]->bufferlen;
+                frame.frameNumber = videobuffer[act_video_encode]->sample;
+                frame.timecode = videobuffer[act_video_encode]->timecode;
+                frame.is_field = FALSE;
     
-                        WriteVideo(&frame);
-                    }
-                }
+                WriteVideo(&frame);
 
                 videobuffer[act_video_encode]->sample = 0;
                 videobuffer[act_video_encode]->freeToEncode = 0;
@@ -2394,346 +2324,6 @@ long long NuppelVideoRecorder::GetKeyframePosition(long long desired)
         ret = positionMap[desired];
 
     return ret;
-}
-
-void NuppelVideoRecorder::ChangeDeinterlacer(int deint_mode)
-{
-    if (deinterlace_mode == DEINTERLACE_AREA && deint_mode != DEINTERLACE_AREA)
-    {
-        if (myfd.src)
-            delete [] myfd.src;
-        myfd.src = NULL;
-        myfd.picsize = -1;
-    }
-
-    switch (deint_mode)
-    {
-        case DEINTERLACE_NONE:
-            height_multiplier = 1;
-            framerate_multiplier = 1;
-            break;
-        case DEINTERLACE_BOB:
-            height_multiplier = 0.5;
-            framerate_multiplier = 2;
-            break;
-        case DEINTERLACE_BOB_FULLHEIGHT_COPY:
-        case DEINTERLACE_BOB_FULLHEIGHT_LINEAR_INTERPOLATION:
-            height_multiplier = 1;
-            framerate_multiplier = 2;
-            break;
-        case DEINTERLACE_DISCARD_TOP:
-        case DEINTERLACE_DISCARD_BOTTOM:
-            height_multiplier = 0.5;
-            framerate_multiplier = 1;
-            break;
-        case DEINTERLACE_AREA:
-            height_multiplier = 1;
-            framerate_multiplier = 1;
-            myfd.bShowDeinterlacedAreaOnly = 0;
-            myfd.bBlend = 0;
-            // myfd->bBlend = 1; there should be a another threshold for us to
-            // know from which threshold to begin with blending up to the next
-            // when we start interpolating that would give us much better
-            // results and better resolution within the interlacing area
-
-            // myfd.iThreshold  = 27;
-            myfd.iThreshold  = 50;
-            myfd.iEdgeDetect = 25;
-
-            if (myfd.picsize != (w*h)) 
-            {
-                if (myfd.src) 
-                    delete [] myfd.src;
-                // only width*height coz we only need to save Y
-                myfd.picsize = w * h;
-                myfd.src = new unsigned char[myfd.picsize];
-            }
-            break;
-        case DEINTERLACE_LAST:
-        default:
-            cerr << "Unknown deinterlace mode: " << deint_mode << endl;
-            return;
-    }
-    deinterlace_mode = (DeinterlaceMode)deint_mode;
-}
-
-// Taken from NuppelVideo areaDeinterlace.c
-// GPLed (c)Roman Hochleitner <roman@mars.tuwien.ac.at>
-// based on Area Based Deinterlacer (for RGB frames) by
-// Gunnar Thalin <guth@home.se>
-
-// note: yuvptr gets modified gets modified here
-Frame* NuppelVideoRecorder::areaDeinterlace(unsigned char *yuvptr, int width,
-                                            int height)
-{
-
-    int bShowDeinterlacedAreaOnly = myfd.bShowDeinterlacedAreaOnly;
-    int y0, y1, y2, y3;
-    unsigned char *psrc1, *psrc2, *psrc3, *pdst1;
-    int iInterlaceValue0, iInterlaceValue1, iInterlaceValue2;
-    int x, y;
-    int y_line;
-
-    unsigned char *y_dst, *y_src, *src;
-
-    int picsize;
-
-    int bBlend = myfd.bBlend;
-    int iThreshold = myfd.iThreshold;
-    int iEdgeDetect = myfd.iEdgeDetect;
-
-    if (w*h != myfd.picsize)
-    {
-        if (myfd.src)
-            delete [] myfd.src;
-        myfd.picsize = w*h;
-        myfd.src = new unsigned char[myfd.picsize];
-    }
-
-    src = myfd.src;
-    picsize = myfd.picsize;
-
-    // now copy the real source (which will be overwritten)
-    memcpy(src, yuvptr, picsize);
-    // to src (our buffer)
-
-    // dst y pointer
-    y_dst = yuvptr;
-    // we should not change u,v because one u, v value stands for
-    // 2 pixels per 2 lines = 4 pixel and we don't want to change
-    // the color of
-
-    y_line  = width;
-    y_src = src;
-
-
-    iThreshold = iThreshold * iThreshold * 4;
-    // We don't want an integer overflow in the  interlace calculation.
-    if (iEdgeDetect > 180)
-        iEdgeDetect = 180;
-    iEdgeDetect = iEdgeDetect * iEdgeDetect;
-
-    y1 = 0;                // Avoid compiler warning. The value is not used.
-    for (x = 0; x < width; x++)
-    {
-        psrc3 = y_src + x;
-        y3    = *psrc3;
-        psrc2 = psrc3 + y_line;
-        y2 = *psrc2;
-        pdst1 = y_dst + x;
-        iInterlaceValue1 = iInterlaceValue2 = 0;
-        for (y = 0; y <= height; y++)
-        {
-            psrc1 = psrc2;
-            psrc2 = psrc3;
-            psrc3 = psrc3 + y_line;
-            y0 = y1;
-            y1 = y2;
-            y2 = y3;
-            if (y < height - 1)
-            {
-                y3 = *psrc3;
-            }
-            else
-            {
-                y3 = y1;
-            }
-
-            iInterlaceValue0 = iInterlaceValue1;
-            iInterlaceValue1 = iInterlaceValue2;
-            
-            if (y < height)
-                iInterlaceValue2 = ((y1 - y2) * (y3 - y2) - 
-                                    ((iEdgeDetect * (y1 - y3) *
-                                      (y1 - y3)) >> 12))*10;
-            else
-                iInterlaceValue2 = 0;
-
-            if (y > 0) 
-            {
-                if (iInterlaceValue0 + 2 * iInterlaceValue1 + 
-                    iInterlaceValue2 > iThreshold)
-                {
-                    if (bBlend)
-                    { 
-                        *pdst1 = (unsigned char)((y0 + 2*y1 + y2) >> 2);
-                    } 
-                    else
-                    {
-                        // this method seems to work better than blending if
-                        // the quality is pretty bad and the half pics don't 
-                        // fit together
-                        if ((y % 2)==1) 
-                        {  // if odd simply copy the value
-                            *pdst1 = *psrc1;
-
-                            // FIXME this is for adjusting an initial 
-                            // iThreshold
-                            //*pdst1 = 0; 
-                        }
-                        else 
-                        {   // even interpolate the even line (upper + lower)/2
-                            *pdst1 = (unsigned char)((y0 + y2) >> 1);
-                            // FIXME this is for adjusting an initial
-                            // iThreshold
-                            //*pdst1 = 0;
-                        }
-                    }
-                } 
-                else
-                {
-                    // so we went below the treshold and therefore we don't
-                    // have to  change anything
-                    if (bShowDeinterlacedAreaOnly)
-                    {
-                        // this is for testing to see how we should tune the
-                        // treshhold and shows as the things that haven't 
-                        // change because the  threshhold was to low??
-                        // or shows that everything is ok 
-
-                        *pdst1 = 0; //blank the point and so the interlac area
-                    }
-                    else 
-                    {
-                        *pdst1 = *psrc1;
-                    }
-                }
-                pdst1 = pdst1 + y_line;
-            }
-        }
-    }
-    Frame *frame = new Frame();
-    frame->codec = CODEC_YUV;
-    frame->width = width;
-    frame->height = height;
-    frame->len = (frame->width * frame->height) + 
-                 (frame->width * frame->height) / 2;
-    frame->bpp = -1;
-    frame->is_field = FALSE;
-    frame->buf = yuvptr;
-
-    return frame;
-}
-
-Frame *NuppelVideoRecorder::GetField(struct vidbuffertype *vidbuf,
-                                     bool top_field, bool interpolate)
-{
-
-    unsigned char *buf = vidbuf->buffer;
-
-    Frame *frame = new Frame();
-    frame->codec = CODEC_YUV;
-    frame->width = w;
-    frame->height = (int) (h * height_multiplier);
-    frame->len = (frame->width * frame->height) +
-                 (frame->width * frame->height)/2;
-    frame->bpp = -1;
-    frame->is_field = interpolate ? FALSE : TRUE;
-
-    if (top_field)
-    {
-        frame->frameNumber = (int)(vidbuf->sample *  framerate_multiplier);
-        frame->timecode =  vidbuf->timecode;
-    }
-    else
-    {
-        frame->frameNumber = (int)(vidbuf->sample * framerate_multiplier) + 1;
-        /* Note we need to add the time between fields to timecode
-           to adjust for two field situation */
-        int field_delay = (ntsc) ? (int)(33 / framerate_multiplier) :
-                                   (int)(40 / framerate_multiplier);
-        frame->timecode =  vidbuf->timecode + field_delay;
-    }
-
-    unsigned char *planes[3];
-    unsigned int planes_height[3];
-    unsigned int planes_width[3];
-
-    unsigned char *buf_out;
-    unsigned char *plane_out;
-    unsigned char *plane_out_end;
-
-    planes_height[0] = h;
-    planes_width[0] = w;
-    planes[0] = buf;
-    planes[1] = planes[0] + w * h;
-
-    switch (picture_format)
-    {
-        case PIX_FMT_YUV420P:
-            planes[2] = planes[1] + (w * h) / 4;
-            planes_height[1] = planes_height[2] = h/2;
-            planes_width[1] = planes_width[2] = w/2;
-            break;
-        case PIX_FMT_YUV422P:
-            planes[2] = planes[1] + (w * h) / 2;
-            planes_height[1] = planes_height[2] = h;
-            planes_width[1] = planes_width[2] = w/2;
-            break;
-        default:
-            cerr << "Unknown picture format: " << picture_format << endl;
-    }
-
-    buf_out = new unsigned char[(int)(vidbuf->bufferlen * height_multiplier)];
-
-    plane_out = buf_out;
-    frame->buf = buf_out;
-
-    for (int i = 0; i < 3; i++)
-    {
-        unsigned char *plane_in = planes[i];
-        plane_out_end = plane_out + (int) (planes_width[i] * planes_height[i] *
-                        height_multiplier);
-
-        /* Always do first field */
-        memcpy(plane_out, plane_in, planes_width[i]);
-        plane_out += planes_width[i];
-        plane_in += planes_width[i];
-
-        if (!top_field)
-        {
-            memcpy(plane_out, plane_in, planes_width[i]);
-            plane_out += planes_width[i];
-            plane_in += planes_width[i];
-        }
-
-        plane_in += planes_width[i];
-
-        while (plane_out < plane_out_end)
-        {
-            // Replace with optimised memcpy later FIX
-            memcpy(plane_out, plane_in, planes_width[i]);
-            plane_out += planes_width[i];
-            if (interpolate)
-            {
-                if (deinterlace_mode == 
-                                DEINTERLACE_BOB_FULLHEIGHT_LINEAR_INTERPOLATION)
-                {
-                    unsigned char *top = plane_in - 2 * planes_width[i];
-                    unsigned char *bottom = plane_in;
-
-                    // Take average of this field line and the next
-                    // to fill in this field, probably only slightly
-                    // better than copying the line. Also 
-                    // slow for situations where memcpy is optimised
-                    // with asm.
-
-                    for (unsigned int j = 0; j < planes_width[i]; j++)
-                    {
-                        *plane_out++ = ((int)(*top++) + (int)(*bottom++)) >> 1;
-                    }
-                }
-                else // just line double
-                {
-                    memcpy(plane_out, plane_in, planes_width[i]);
-                    plane_out += planes_width[i];
-                }
-            }
-            plane_in += planes_width[i] * 2;
-        }
-    }
-    
-    return frame;
 }
 
 void NuppelVideoRecorder::WriteVideo(Frame *frame, bool skipsync, bool forcekey)

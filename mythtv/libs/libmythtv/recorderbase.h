@@ -25,7 +25,6 @@ class RecorderBase
 
     virtual void SetOption(const QString &opt, const QString &value);
     virtual void SetOption(const QString &opt, int value);
-    virtual void ChangeDeinterlacer(int deint_mode) = 0;
     virtual void SetVideoFilters(QString &filters) = 0;
 
     virtual void Initialize(void) = 0;

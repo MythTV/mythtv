@@ -15,7 +15,6 @@ class MpegRecorder : public RecorderBase
     void SetOption(const QString &opt, int value);
     void SetOption(const QString &name, const QString &value)
                        { RecorderBase::SetOption(name, value); }
-    void ChangeDeinterlacer(int deint_mode);
     void SetVideoFilters(QString &filters);
 
     void Initialize(void);

@@ -108,7 +108,6 @@ class TV : public QObject
     void ChangeBrightness(bool up);
     void ChangeColour(bool up);
     void ChangeHue(bool up);
-    void ChangeDeinterlacer();   
  
     void ChannelKey(int key);
     void ChannelCommit(void);
@@ -213,8 +212,6 @@ class TV : public QObject
     QSqlDatabase *m_db;
 
     VolumeControl *volumeControl;
-
-    int deinterlace_mode;
 
     unsigned int embedid;
     int embx, emby, embw, embh;

@@ -36,17 +36,6 @@ struct cc;
 class RTjpeg;
 class RingBuffer;
 
-struct MyFilterData
-{
-    int bShowDeinterlacedAreaOnly;
-    int bBlend;
-    // int iThresholdBlend; // here we start blending
-    int iThreshold;         // here we start interpolating TODO FIXME
-    int iEdgeDetect;
-    int picsize;
-    unsigned char *src;
-};
-
 class NuppelVideoRecorder : public RecorderBase
 {
  public:
@@ -56,7 +45,6 @@ class NuppelVideoRecorder : public RecorderBase
     void SetOption(const QString &name, int value);
     void SetOption(const QString &name, const QString &value)
                   { RecorderBase::SetOption(name, value); }
-    void ChangeDeinterlacer(int deint_mode);   
  
     void Initialize(void);
     void StartRecording(void);
@@ -111,10 +99,6 @@ class NuppelVideoRecorder : public RecorderBase
     void BufferIt(unsigned char *buf, int len = -1);
     
     int CreateNuppelFile(void);
-
-    Frame * areaDeinterlace(unsigned char *yuvptr, int width, int height);
-    Frame * GetField(struct vidbuffertype *vidbuf, bool top_field, 
-                     bool interpolate);
 
     void DoV4L2(void);
     void DoMJPEG(void);
@@ -212,23 +196,9 @@ class NuppelVideoRecorder : public RecorderBase
     bool audiopaused;
     bool mainpaused;
 
-    enum DeinterlaceMode {
-        DEINTERLACE_NONE =0,
-        DEINTERLACE_BOB,
-        DEINTERLACE_BOB_FULLHEIGHT_COPY,
-        DEINTERLACE_BOB_FULLHEIGHT_LINEAR_INTERPOLATION,
-        DEINTERLACE_DISCARD_TOP,
-        DEINTERLACE_DISCARD_BOTTOM,
-        DEINTERLACE_AREA,
-        DEINTERLACE_LAST
-    };
-
-    DeinterlaceMode deinterlace_mode;
     double framerate_multiplier;
     double height_multiplier;
 
-    struct MyFilterData myfd;   
- 
     int last_block;
     int firsttc;
     long int oldtc;

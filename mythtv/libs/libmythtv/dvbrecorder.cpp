@@ -309,11 +309,6 @@ void DVBRecorder::FinishRecording()
     }
 }
 
-void DVBRecorder::ChangeDeinterlacer(int deint_mode)
-{
-    (void)deint_mode;
-}
-
 void DVBRecorder::SetVideoFilters(QString &filters)
 {
     (void)filters;

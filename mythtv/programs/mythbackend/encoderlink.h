@@ -64,7 +64,6 @@ class EncoderLink
     int ChangeBrightness(bool direction);
     int ChangeColour(bool direction);
     int ChangeHue(bool direction);
-    void ChangeDeinterlacer(int deinterlacer_mode);
     bool CheckChannel(QString name);
     void GetNextProgram(int direction,
                         QString &title, QString &subtitle, QString &desc,

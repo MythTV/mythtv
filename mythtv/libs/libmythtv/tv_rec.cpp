@@ -48,8 +48,6 @@ TVRec::TVRec(int capturecardnum)
     curRecording = NULL;
     pendingRecording = NULL;
 
-    deinterlace_mode = 0;
-
     pthread_mutex_init(&db_lock, NULL);
     pthread_mutex_init(&commLock, NULL);
 
@@ -522,8 +520,6 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
     // V4L from here on
 
     nvr = new NuppelVideoRecorder();
-
-    nvr->ChangeDeinterlacer(deinterlace_mode);
 
     nvr->SetRingBuffer(rbuffer);
 
@@ -1725,12 +1721,6 @@ int TVRec::ChangeHue(bool direction)
 {
     int ret = channel->ChangeHue(direction);
     return ret;
-}
-
-void TVRec::ChangeDeinterlacer(int deint_mode)
-{
-    deinterlace_mode = deint_mode;
-    return;
 }
 
 void TVRec::SetChannel(QString name)

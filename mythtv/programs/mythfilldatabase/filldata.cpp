@@ -490,10 +490,19 @@ void parseFile(QString filename, QValueList<ChanInfo> *chanlist,
                QMap<QString, QValueList<ProgInfo> > *proglist)
 {
     QDomDocument doc;
-    QFile f(filename);
+    QFile f;
 
-    if (!f.open(IO_ReadOnly))
-        return;
+    if (filename.compare("-"))
+    {
+        f.setName(filename);
+        if (!f.open(IO_ReadOnly))
+            return;
+    }
+    else
+    {
+        if (!f.open(IO_ReadOnly, stdin))
+            return;
+    }
 
     QString errorMsg = "unknown";
     int errorLine = 0;

@@ -55,27 +55,6 @@ SeekSpeedInfo seek_speed_array[] =
    {"10X", 11.18},
    {"16X", 16.72}};
 
-enum DeinterlaceMode {
-  DEINTERLACE_NONE =0,
-  DEINTERLACE_BOB,
-  DEINTERLACE_BOB_FULLHEIGHT_COPY,
-  DEINTERLACE_BOB_FULLHEIGHT_LINEAR_INTERPOLATION,
-  DEINTERLACE_DISCARD_TOP,
-  DEINTERLACE_DISCARD_BOTTOM,
-  DEINTERLACE_AREA,
-  DEINTERLACE_LAST
-};
-
-const char *deinterlacer_names[] =
-{ "None",
-  "Field Bob",
-  "Line Doubler",
-  "Interpolated",
-  "Discard Top",
-  "Discard Bottom",
-  "Area Based"
-};
-
 void *SpawnDecode(void *param)
 {
     NuppelVideoPlayer *nvp = (NuppelVideoPlayer *)param;
@@ -109,7 +88,6 @@ TV::TV(QSqlDatabase *db)
 
     myWindow = NULL;
 
-    deinterlace_mode = DEINTERLACE_NONE;
     gContext->addListener(this);
 
     PrevChannelVector channame_vector(30);
@@ -880,16 +858,19 @@ void TV::ProcessKeypress(int keypressed)
                     {
                         case 1:
                             nvp->SetBookmark();
+                            wantsToQuit = true;
                             exitPlayer = true;
                             break;
                         case 3: case 0:
                             nvp->Unpause();
                             break;
                         case 4:
+                            wantsToQuit = true;
                             exitPlayer = true;
                             requestDelete = true;
                             break;
                         default:
+                            wantsToQuit = true;
                             exitPlayer = true;
                             break;
                     }
@@ -1089,9 +1070,7 @@ void TV::ProcessKeypress(int keypressed)
             case Key_F6: ChangeColour(true); break;
             case Key_F7: ChangeHue(false); break;
             case Key_F8: ChangeHue(true); break;
-/*
-            case 'x': ChangeDeinterlacer(); break;
-*/
+
             case Key_O: BrowseStart(); break;
             case Key_H: PreviousChannel(); break;
 
@@ -2036,22 +2015,6 @@ void TV::ChangeHue(bool up)
 
     if (osd)
         osd->StartPause(colour * 10, true, tr("Adjust Picture"), text, 5);
-}
-
-void TV::ChangeDeinterlacer()
-{
-    QString text;
-
-    deinterlace_mode++;
-    if (deinterlace_mode == DEINTERLACE_LAST)
-        deinterlace_mode = 0;
-
-    activerecorder->ChangeDeinterlacer(deinterlace_mode);
-
-    text = QString("Deint %1").arg(deinterlacer_names[deinterlace_mode]);
-
-    if (activenvp == nvp)
-        osd->SetSettingsText(text, text.length());
 }
 
 void TV::ChangeVolume(bool up)

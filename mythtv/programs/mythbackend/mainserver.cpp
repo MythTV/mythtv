@@ -1270,12 +1270,6 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         bool up = slist[2].toInt(); 
         retlist << QString::number(enc->ChangeHue(up));
     }
-    else if (command == "CHANGE_DEINTERLACER")
-    {
-        int deinterlacer_mode = slist[2].toInt();
-        enc->ChangeDeinterlacer(deinterlacer_mode);
-        retlist << "OK";
-    }
     else if (command == "CHECK_CHANNEL")
     {
         QString name = slist[2];
