@@ -14,38 +14,14 @@ using namespace std;
 class FilterChain : public QPtrList<VideoFilter>
 {
   public:
-    FilterChain() { setAutoDelete(TRUE); }
+    FilterChain();
 
-    virtual ~FilterChain() { clear(); }
+    virtual ~FilterChain();
 
-    void ProcessFrame(VideoFrame * Frame)
-    {
-        if (!Frame)
-            return;
-
-        VideoFilter *VF = first();
-        while (VF)
-        {
-            VF->filter(VF, Frame);
-            VF = next();
-        }
-    }
+    void ProcessFrame(VideoFrame *Frame);
 
   private:
-
-    void deleteItem(QPtrCollection::Item d)
-    {
-        if (del_item)
-        {
-            VideoFilter *Filter = (VideoFilter *)d;
-            if (Filter->opts)
-                free(Filter->opts);
-            if (Filter->cleanup)
-                Filter->cleanup(Filter);
-            dlclose(Filter->handle);
-            free(Filter);
-        }
-    }
+    void deleteItem(QPtrCollection::Item d);
 };
 
 class FilterManager

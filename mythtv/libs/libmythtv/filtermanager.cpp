@@ -7,6 +7,43 @@
 using namespace std;
 #include "filtermanager.h"
 
+FilterChain::FilterChain(void)
+{
+    setAutoDelete(true);
+}
+
+FilterChain::~FilterChain()
+{
+    clear();
+}
+
+void FilterChain::ProcessFrame(VideoFrame *Frame)
+{
+    if (!Frame)
+        return;
+
+    VideoFilter *VF = first();
+    while (VF)
+    {
+        VF->filter(VF, Frame);
+        VF = next();
+    }
+}
+
+void FilterChain::deleteItem(QPtrCollection::Item d)
+{
+    if (del_item)
+    {
+        VideoFilter *Filter = (VideoFilter *)d;
+        if (Filter->opts)
+            free(Filter->opts);
+        if (Filter->cleanup)
+            Filter->cleanup(Filter);
+        dlclose(Filter->handle);
+        free(Filter);
+    }
+}
+
 FilterManager::FilterManager()
 {
     QDir FiltDir(MYTHTV_FILTER_PATH);
