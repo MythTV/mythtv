@@ -8,19 +8,21 @@ MANS	          = man/nuvexport.1 \
                     man/nuvexport-vcd.1 \
                     man/nuvexport-xvid.1
 
-EXPORT_MODULES	  = export/generic.pm   \
-		    export/ffmpeg.pm    \
-		    export/transcode.pm \
-		    export/DivX.pm      \
-		    export/DVCD.pm      \
-		    export/DVD.pm       \
-		    export/MP3.pm       \
-		    export/MPEG2_cut.pm \
-		    export/NUV_SQL.pm   \
-		    export/SVCD.pm      \
-		    export/VCD.pm       \
-		    export/ASF.pm       \
-		    export/XviD.pm
+EXPORT_MODULES	  = export/generic.pm         \
+		    export/ffmpeg.pm          \
+		    export/transcode.pm       \
+		    export/MPEG2_cut.pm       \
+		    export/NUV_SQL.pm         \
+		    export/transcode/DVCD.pm  \
+		    export/transcode/DVD.pm   \
+		    export/transcode/SVCD.pm  \
+		    export/transcode/VCD.pm   \
+		    export/transcode/XviD.pm  \
+		    export/ffmpeg/DivX.pm     \
+		    export/ffmpeg/MP3.pm      \
+		    export/ffmpeg/ASF.pm
+MODULE_SUBDIRS    = transcode \
+		    ffmpeg
 MYTHTV_MODULES	  = mythtv/nuvinfo.pm \
 		    mythtv/db.pm      \
 		    mythtv/recordings.pm

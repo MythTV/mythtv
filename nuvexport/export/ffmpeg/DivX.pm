@@ -1,10 +1,10 @@
-#Last Updated: 2004.12.14 (xris)
+#Last Updated: 2005.01.26 (xris)
 #
-#  export::DivX
+#  export::ffmpeg::DivX
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
 #
 
-package export::DivX;
+package export::ffmpeg::DivX;
     use base 'export::ffmpeg';
 
 # Load the myth and nuv utilities, and make sure we're connected to the database

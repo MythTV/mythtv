@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.01.26 (gjhurlbu)
+#Last Updated: 2005.01.26 (xris)
 #
-#  export::SVCD
+#  export::transcode::SVCD
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
 #
 
-package export::SVCD;
+package export::transcode::SVCD;
     use base 'export::transcode';
 
 # Load the myth and nuv utilities, and make sure we're connected to the database

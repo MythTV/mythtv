@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# Last Updated: 2005.01.20 (xris)
+# Last Updated: 2005.01.26 (xris)
 
 # Autoflush buffers
     $|++;
@@ -36,24 +36,25 @@
 # Load the recordings, and the $video_dir variable
     use mythtv::recordings;
 
-# Load the export modules
-    use export::XviD;
-        push @Exporters, export::XviD->new;
-    use export::SVCD;
-        push @Exporters, export::SVCD->new;
-    use export::VCD;
-        push @Exporters, export::VCD->new;
-    use export::DVCD;
-        push @Exporters, export::DVCD->new;
-    use export::DVD;
-        push @Exporters, export::DVD->new;
-# This is disabled until someone shows me how to get transcode to export divx
-    use export::DivX;
-        push @Exporters, export::DivX->new;
-    use export::ASF;
-        push @Exporters, export::ASF->new;
-    use export::MP3;
-        push @Exporters, export::MP3->new;
+# Load the transcode-based export modules
+    use export::transcode::XviD;
+        push @Exporters, export::transcode::XviD->new;
+    use export::transcode::SVCD;
+        push @Exporters, export::transcode::SVCD->new;
+    use export::transcode::VCD;
+        push @Exporters, export::transcode::VCD->new;
+    use export::transcode::DVCD;
+        push @Exporters, export::transcode::DVCD->new;
+    use export::transcode::DVD;
+        push @Exporters, export::transcode::DVD->new;
+# Load the ffmpeg-based export modules
+    use export::ffmpeg::DivX;
+        push @Exporters, export::ffmpeg::DivX->new;
+    use export::ffmpeg::ASF;
+        push @Exporters, export::ffmpeg::ASF->new;
+    use export::ffmpeg::MP3;
+        push @Exporters, export::ffmpeg::MP3->new;
+# Load the other export modules
     use export::MPEG2_cut;
         push @Exporters, export::MPEG2_cut->new;
     use export::NUV_SQL;

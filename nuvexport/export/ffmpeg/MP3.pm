@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.12.26 (xris)
+#Last Updated: 2005.01.26 (xris)
 #
-#  export::MP3
+#  export::ffmpeg::MP3
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
 #
 
-package export::MP3;
+package export::ffmpeg::MP3;
     use base 'export::ffmpeg';
 
 # Load the myth and nuv utilities, and make sure we're connected to the database

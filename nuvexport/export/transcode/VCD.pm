@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.01.26 (gjhurlbu)
+#Last Updated: 2005.01.26 (xris)
 #
-#  export::VCD
+#  export::transcode::VCD
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
 #
 
-package export::VCD;
+package export::transcode::VCD;
     use base 'export::transcode';
 
 # Load the myth and nuv utilities, and make sure we're connected to the database

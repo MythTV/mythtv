@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.01.26 (gjhurlbu)
+#Last Updated: 2005.01.26 (xris)
 #
-#  export::DVD
+#  export::transcode::DVD
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
 #
 
-package export::DVD;
+package export::transcode::DVD;
     use base 'export::transcode';
 
 # Load the myth and nuv utilities, and make sure we're connected to the database
