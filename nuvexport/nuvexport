@@ -45,7 +45,7 @@ directory, and extracts all related database info into a matching .sql file.
 To import this into another myth setup, just copy the nuv to your video directory
 and run:
 
-	mysql mythconverg < sql_file_name.sql
+    mysql mythconverg < sql_file_name.sql
 
 =head2 SVCD
 
@@ -83,257 +83,257 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
 =cut
 
 # Load some modules that we'll use
-	use DBI;
-	use Getopt::Long;
-	use File::Basename;
+    use DBI;
+    use Getopt::Long;
+    use File::Basename;
 
 # Add a couple of include paths so we can load the various export and gui modules
-	use lib dirname($ENV{'_'}), '/usr/share/nuvexport', '/usr/local/share/nuvexport';
+    use lib dirname($ENV{'_'}), '/usr/share/nuvexport', '/usr/local/share/nuvexport';
 
 # A global list of the various programs (and full paths) we'll be needing/using
-	our %Prog;
-	our %Shows;
-	our @Functions;
-	our %Args;			# Edit this to store command line arguments in individual variables
-	our @Arg_str;		# Edit this to add more command line parse strings
-	our $DEBUG;
-	our $gui;
-	our $video_dir;
-	our $num_shows;
-	our $dbh;
-	our $hostname;
+    our %Prog;
+    our %Shows;
+    our @Functions;
+    our %Args;          # Edit this to store command line arguments in individual variables
+    our @Arg_str;       # Edit this to add more command line parse strings
+    our $DEBUG;
+    our $gui;
+    our $video_dir;
+    our $num_shows;
+    our $dbh;
+    our $hostname;
 
 # Load the nuv utilities
-	use nuv_utils;
+    use nuv_utils;
 
 # Load the gui modules
-	use gui_text;
-	use gui_cli;
+    use gui_text;
+    use gui_cli;
 
 # Load the export modules
-	use export_DivX;
-	use export_NUV_SQL;
-	use export_SVCD;
-	use export_VCD;
-	use export_DVD;
-	use export_OGM;
-	use export_WMV;
-	use export_MP3;
-	use export_Trans_XviD;
-	use export_Trans_VCD;
-	use export_Trans_SVCD;
+    use export_DivX;
+    use export_NUV_SQL;
+    use export_SVCD;
+    use export_VCD;
+    use export_DVD;
+    use export_OGM;
+    use export_WMV;
+    use export_MP3;
+    use export_Trans_XviD;
+    use export_Trans_VCD;
+    use export_Trans_SVCD;
 
 # Make sure that we have mythtranscode installed
-	$Prog{mythtranscode} = find_program('mythtranscode');
-	die "You need mythtranscode to use this program.\n\n" unless ($Prog{mythtranscode});
+    $Prog{mythtranscode} = find_program('mythtranscode');
+    die "You need mythtranscode to use this program.\n\n" unless ($Prog{mythtranscode});
 
 # Make sure that we have ffmpeg installed
-	$Prog{ffmpeg} = find_program('ffmpeg');
-	die "You need ffmpeg to use this program.\n\n" unless ($Prog{ffmpeg});
+    $Prog{ffmpeg} = find_program('ffmpeg');
+    die "You need ffmpeg to use this program.\n\n" unless ($Prog{ffmpeg});
 
 # Make sure that we have nice installed
-	$Prog{nice} = find_program('nice');
-	die "You need nice to use this program.\n\n" unless ($Prog{nice});
+    $Prog{nice} = find_program('nice');
+    die "You need nice to use this program.\n\n" unless ($Prog{nice});
 
 # Find out which encoders are available to use, and load any extra command line argument variables
-	push @Functions, export_SVCD->new,
-					 export_NUV_SQL->new,
-					 export_DivX->new,
-					 export_WMV->new,
-					 export_VCD->new,
-					 export_DVD->new,
-					 export_OGM->new,
-					 export_MP3->new,
-					 export_Trans_XviD->new,
-					 export_Trans_VCD->new,
-					 export_Trans_SVCD->new;
+    push @Functions, export_SVCD->new,
+                     export_NUV_SQL->new,
+                     export_DivX->new,
+                     export_WMV->new,
+                     export_VCD->new,
+                     export_DVD->new,
+                     export_OGM->new,
+                     export_MP3->new,
+                     export_Trans_XviD->new,
+                     export_Trans_VCD->new,
+                     export_Trans_SVCD->new;
 
 # Set up the signal handlers
-	$SIG{INT}  = \&Quit;
-	$SIG{QUIT} = \&Quit;
+    $SIG{INT}  = \&Quit;
+    $SIG{QUIT} = \&Quit;
 
 # Load the commandline options
-	%Args = ('debug' => \$DEBUG);
-	push @Arg_str,
-				'help',
-				'debug',
-			# GUI override - not really needed at this point
-				'gui|ui=s',
-			# Used for searching
-				'title=s',
-				'subtitle|episode=s',
-				'description=s',
-			# CLI for which export mode to use
-				'mode|function|export=s',
-			# Used to specify a program
-				'chanid|channel=i',
-				'starttime|start_time=i',
-			# Save path - used by most exporters, so it's included here
-				'outfile|out=s';
-	GetOptions(\%Args, @Arg_str);
+    %Args = ('debug' => \$DEBUG);
+    push @Arg_str,
+                'help',
+                'debug',
+            # GUI override - not really needed at this point
+                'gui|ui=s',
+            # Used for searching
+                'title=s',
+                'subtitle|episode=s',
+                'description=s',
+            # CLI for which export mode to use
+                'mode|function|export=s',
+            # Used to specify a program
+                'chanid|channel=i',
+                'starttime|start_time=i',
+            # Save path - used by most exporters, so it's included here
+                'outfile|out=s';
+    GetOptions(\%Args, @Arg_str);
 
 # Print the help - for now, this is just perldoc
-	if ($Args{help}) {
-		exec("perldoc $0");
-	}
+    if ($Args{help}) {
+        exec("perldoc $0");
+    }
 
-	if ($Args{function}) {
-		print "function: $Args{function}\n\n";
-		exit;
-	}
+    if ($Args{function}) {
+        print "function: $Args{function}\n\n";
+        exit;
+    }
 
-	if ($Args{ui}) {
-		print "ui: $Args{ui}\n\n";
-		exit;
-	}
+    if ($Args{ui}) {
+        print "ui: $Args{ui}\n\n";
+        exit;
+    }
 
 # Get the hostname of this machine
-	$hostname = `hostname`;
-	chomp($hostname);
+    $hostname = `hostname`;
+    chomp($hostname);
 
 # Read the mysql.txt file in use by MythTV.
 # could be in a couple places, so try the usual suspects
-	open(CONF, "$ENV{HOME}/.mythtv/mysql.txt")
-		or open(CONF, "/usr/share/mythtv/mysql.txt")
-		or open(CONF, "/usr/local/share/mythtv/mysql.txt")
-		or die ("Unable to open /usr/share/mythtv/mysql.txt:  $!\n\n");
-	while (my $line = <CONF>) {
-		chomp($line);
-		$line =~ s/^str //;
-		my ($var, $val) = split(/\=/, $line, 2);
-		next unless ($var && $var =~ /\w/);
-		if ($var eq 'DBHostName') {
-			$db_host = $val;
-		}
-		elsif ($var eq 'DBUserName') {
-			$db_user = $val;
-		}
-		elsif ($var eq 'DBName') {
-			$db_name = $val;
-		}
-		elsif ($var eq 'DBPassword') {
-			$db_pass = $val;
-		}
-		elsif ($var eq 'LocalHostName') {
-			$hostname = $val;
-		}
-	}
-	close CONF;
+    open(CONF, "$ENV{HOME}/.mythtv/mysql.txt")
+        or open(CONF, "/usr/share/mythtv/mysql.txt")
+        or open(CONF, "/usr/local/share/mythtv/mysql.txt")
+        or die ("Unable to open /usr/share/mythtv/mysql.txt:  $!\n\n");
+    while (my $line = <CONF>) {
+        chomp($line);
+        $line =~ s/^str //;
+        my ($var, $val) = split(/\=/, $line, 2);
+        next unless ($var && $var =~ /\w/);
+        if ($var eq 'DBHostName') {
+            $db_host = $val;
+        }
+        elsif ($var eq 'DBUserName') {
+            $db_user = $val;
+        }
+        elsif ($var eq 'DBName') {
+            $db_name = $val;
+        }
+        elsif ($var eq 'DBPassword') {
+            $db_pass = $val;
+        }
+        elsif ($var eq 'LocalHostName') {
+            $hostname = $val;
+        }
+    }
+    close CONF;
 
 # Connect to the database
-	$dbh = DBI->connect("dbi:mysql:database=$db_name:host=$db_host", $db_user, $db_pass)
-		or die "Cannot connect to database: $!\n\n";
+    $dbh = DBI->connect("dbi:mysql:database=$db_name:host=$db_host", $db_user, $db_pass)
+        or die "Cannot connect to database: $!\n\n";
 
 
 # Find the directory where the recordings are located, and grab all of the filenames
-	my $q = "SELECT data FROM settings WHERE value='RecordFilePrefix' AND hostname=?";
-	my $sh = $dbh->prepare($q);
-		$sh->execute($hostname) or die "Could not execute ($q):  $!\n\n";
-	($video_dir) = $sh->fetchrow_array;
-	die "This host not configured for myth.\n\n" unless ($video_dir);
-	die "Recordings directory $video_dir doesn't exist!\n\n" unless (-d $video_dir);
-	opendir(DIR, $video_dir) or die "Can't open $video_dir:  $!\n\n";
-	my @Files = grep /\.nuv$/, readdir(DIR);
-	closedir DIR;
-	die "No recordings found!\n\n" unless (@Files);
+    my $q = "SELECT data FROM settings WHERE value='RecordFilePrefix' AND hostname=?";
+    my $sh = $dbh->prepare($q);
+        $sh->execute($hostname) or die "Could not execute ($q):  $!\n\n";
+    ($video_dir) = $sh->fetchrow_array;
+    die "This host not configured for myth.\n\n" unless ($video_dir);
+    die "Recordings directory $video_dir doesn't exist!\n\n" unless (-d $video_dir);
+    opendir(DIR, $video_dir) or die "Can't open $video_dir:  $!\n\n";
+    my @Files = grep /\.nuv$/, readdir(DIR);
+    closedir DIR;
+    die "No recordings found!\n\n" unless (@Files);
 
 # Parse out the record data for each file
-	$q = "SELECT title, subtitle, description, hostname, cutlist FROM recorded WHERE chanid=? AND starttime=? AND endtime=?";
-	$sh = $dbh->prepare($q);
-	foreach $file (@Files) {
-		next unless ($file =~ /\.nuv$/);
-	# Pull out the various parts that make up the filename
-		($channel,
-			$syear, $smonth, $sday, $shour, $sminute, $ssecond,
-			$eyear, $emonth, $eday, $ehour, $eminute, $esecond) = $file =~/^([a-z0-9]+)_(....)(..)(..)(..)(..)(..)_(....)(..)(..)(..)(..)(..)\.nuv$/i;
-	# Found a bad filename?
-		unless ($channel) {
-			print "Unknown filename format:  $file\n";
-			next;
-		}
-	# Execute the query
-		$sh->execute($channel, "$syear$smonth$sday$shour$sminute$ssecond", "$eyear$emonth$eday$ehour$eminute$esecond")
-			or die "Could not execute ($q):  $!\n\n";
-		my ($show, $episode, $description, $show_hostname, $cutlist) = $sh->fetchrow_array;
-	# Unknown file - someday we should report this
-		next unless ($show);
-	#$description =~ s/(?:''|``)/"/sg;
-		push @{$Shows{$show}}, {'filename'       => $file,
-								'channel'        => $channel,
-								'start_time'     => "$syear$smonth$sday$shour$sminute$ssecond",
-								'end_time'       => "$eyear$emonth$eday$ehour$eminute$esecond",
-								'start_time_sep' => "$syear-$smonth-$sday-$shour-$sminute-$ssecond",
-								'show_name'      => $show,
-								'title'          => ($episode or 'Untitled'),
-								'description'    => ($description or 'No Description'),
-								'hostname'       => $show_hostname,
-								'cutlist'        => $cutlist,
-								'showtime'       => generate_showtime($syear, $smonth, $sday, $shour, $sminute, $ssecond)};
-	}
-	$sh->finish();
+    $q = "SELECT title, subtitle, description, hostname, cutlist FROM recorded WHERE chanid=? AND starttime=? AND endtime=?";
+    $sh = $dbh->prepare($q);
+    foreach $file (@Files) {
+        next unless ($file =~ /\.nuv$/);
+    # Pull out the various parts that make up the filename
+        ($channel,
+            $syear, $smonth, $sday, $shour, $sminute, $ssecond,
+            $eyear, $emonth, $eday, $ehour, $eminute, $esecond) = $file =~/^([a-z0-9]+)_(....)(..)(..)(..)(..)(..)_(....)(..)(..)(..)(..)(..)\.nuv$/i;
+    # Found a bad filename?
+        unless ($channel) {
+            print "Unknown filename format:  $file\n";
+            next;
+        }
+    # Execute the query
+        $sh->execute($channel, "$syear$smonth$sday$shour$sminute$ssecond", "$eyear$emonth$eday$ehour$eminute$esecond")
+            or die "Could not execute ($q):  $!\n\n";
+        my ($show, $episode, $description, $show_hostname, $cutlist) = $sh->fetchrow_array;
+    # Unknown file - someday we should report this
+        next unless ($show);
+    #$description =~ s/(?:''|``)/"/sg;
+        push @{$Shows{$show}}, {'filename'       => $file,
+                                'channel'        => $channel,
+                                'start_time'     => "$syear$smonth$sday$shour$sminute$ssecond",
+                                'end_time'       => "$eyear$emonth$eday$ehour$eminute$esecond",
+                                'start_time_sep' => "$syear-$smonth-$sday-$shour-$sminute-$ssecond",
+                                'show_name'      => $show,
+                                'title'          => ($episode or 'Untitled'),
+                                'description'    => ($description or 'No Description'),
+                                'hostname'       => $show_hostname,
+                                'cutlist'        => $cutlist,
+                                'showtime'       => generate_showtime($syear, $smonth, $sday, $shour, $sminute, $ssecond)};
+    }
+    $sh->finish();
 
 # We now have a hash of show names, containing an array of episodes
 # We should probably do some sorting by timestamp (and also count how many shows there are)
-	$num_shows = 0;
-	foreach my $show (sort keys %Shows) {
-		@{$Shows{$show}} = sort {$a->{start_time} <=> $b->{start_time} || $a->{channel} <=> $b->{channel}} @{$Shows{$show}};
-		$num_shows++;
-	}
+    $num_shows = 0;
+    foreach my $show (sort keys %Shows) {
+        @{$Shows{$show}} = sort {$a->{start_time} <=> $b->{start_time} || $a->{channel} <=> $b->{channel}} @{$Shows{$show}};
+        $num_shows++;
+    }
 
 # No shows found?
-	die 'Found '.@Files." files, but no matching database entries.\n\n" unless ($num_shows);
+    die 'Found '.@Files." files, but no matching database entries.\n\n" unless ($num_shows);
 
 # Command line search?
-	if ($Args{title} || $Args{subtitle} || $Args{description}) {
-		my @matches;
-		foreach my $show (sort keys %Shows) {
-		# Title search?
-			next unless (!$Args{title} || $show =~ /$Args{title}/si);
-		# Search episodes
-			foreach my $episode (@{$Shows{$show}}) {
-				next unless (!$Args{subtitle}    || $episode->{title}       =~ /$Args{subtitle}/si);
-				next unless (!$Args{description} || $episode->{description} =~ /$Args{description}/si);
-				push @matches, $episode;
-			}
-		}
-	# Display matching shows
-		if (@matches) {
-			print "\nMatching Shows:\n\n";
-			foreach my $episode (@matches) {
-				print "     title:  $episode->{show_name}\n",
-					  "  subtitle:  $episode->{title}\n",
-					  "    chanid:  $episode->{channel}\n",
-					  "    starts:  $episode->{start_time}\n",
-					  "      ends:  $episode->{end_time}\n",
-					  "  filename:  $video_dir/$episode->{filename}\n\n";
-			}
-		}
-	# No matches?
-		else {
-			print "\nNo matching shows were found.\n\n";
-		}
-	# Exit gracefully
-		Quit();
-	}
+    if ($Args{title} || $Args{subtitle} || $Args{description}) {
+        my @matches;
+        foreach my $show (sort keys %Shows) {
+        # Title search?
+            next unless (!$Args{title} || $show =~ /$Args{title}/si);
+        # Search episodes
+            foreach my $episode (@{$Shows{$show}}) {
+                next unless (!$Args{subtitle}    || $episode->{title}       =~ /$Args{subtitle}/si);
+                next unless (!$Args{description} || $episode->{description} =~ /$Args{description}/si);
+                push @matches, $episode;
+            }
+        }
+    # Display matching shows
+        if (@matches) {
+            print "\nMatching Shows:\n\n";
+            foreach my $episode (@matches) {
+                print "     title:  $episode->{show_name}\n",
+                      "  subtitle:  $episode->{title}\n",
+                      "    chanid:  $episode->{channel}\n",
+                      "    starts:  $episode->{start_time}\n",
+                      "      ends:  $episode->{end_time}\n",
+                      "  filename:  $video_dir/$episode->{filename}\n\n";
+            }
+        }
+    # No matches?
+        else {
+            print "\nNo matching shows were found.\n\n";
+        }
+    # Exit gracefully
+        Quit();
+    }
 
 # Command line export request?
-	if ($Args{starttime} || $Args{chanid} || $Args{mode}) {
-		$gui = gui_cli->new;
-	}
+    if ($Args{starttime} || $Args{chanid} || $Args{mode}) {
+        $gui = gui_cli->new;
+    }
 
 # Load another gui here?
-	# Nope, we don't have one
+    # Nope, we don't have one
 
 # Load the text-based gui by default
-	else {
-		$gui = gui_text->new;
-	}
+    else {
+        $gui = gui_text->new;
+    }
 
 # Run the main GUI loop
-	$gui->main_loop;
+    $gui->main_loop;
 
 # Exit gracefully, in case we might accidentally execute some code below
-	Quit();
+    Quit();
 
 
 

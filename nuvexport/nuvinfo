@@ -3,11 +3,11 @@
 #nuvinfo.pl
 
 # Add a couple of include paths so we can load the various export and gui modules
-	use File::Basename;
-	use lib dirname($ENV{'_'}), '/usr/share/nuvexport', '/usr/local/share/nuvexport';
+    use File::Basename;
+    use lib dirname($ENV{'_'}), '/usr/share/nuvexport', '/usr/local/share/nuvexport';
 
 # Load the nuv utilities
-	use nuv_utils;
+    use nuv_utils;
 
 # No file specified?
     die "usage:\n\n   nuvinfo /path/to/file.nuv\n\n" unless ($ARGV[0]);
