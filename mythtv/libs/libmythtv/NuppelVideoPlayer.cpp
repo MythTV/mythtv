@@ -1279,7 +1279,7 @@ void NuppelVideoPlayer::OutputAudioLoop(void)
                                   ((double)effdsp/100.0) + 0.5);
 	
         // wait for the buffer to fill with enough to play
-        if (bytesperframe > audiolen(true))
+        if (bytesperframe >= audiolen(true))
         { 
             //printf("audio thread waiting for buffer to fill\n");
             usleep(200);
