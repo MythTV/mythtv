@@ -12,8 +12,8 @@ QMAKE_CFLAGS_DEBUG = -g -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGE
 
 # Input
 using_dvb {
-    HEADERS += dvbdev.h tune.h dvb_defaults.h transform.h remux.h ctools.h ringbuffy.h
-    SOURCES += dvbdev.c tune.c transform.c remux.c ctools.c ringbuffy.c
+    HEADERS += dvbdev.h tune.h dvb_defaults.h transform.h remux.h ctools.h ringbuffy.h dvbci.h
+    SOURCES += dvbdev.c tune.c transform.c remux.c ctools.c ringbuffy.c dvbci.cpp
 }
 
 !contains(DEFINES, OLDSTRUCT) {

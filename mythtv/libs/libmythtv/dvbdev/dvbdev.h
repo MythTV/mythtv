@@ -52,6 +52,7 @@ extern "C" {
 #define dvbdev_dvr 2
 #define dvbdev_sec 3
 #define dvbdev_demux 4
+#define dvbdev_ca 5
 const char* devicenodename(int type, int cardnum);
 
 // here is the meat

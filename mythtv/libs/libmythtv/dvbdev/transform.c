@@ -2153,8 +2153,8 @@ void instant_repack (uint8_t *buf, int count, ipack *p)
 			case PADDING_STREAM :
 			case DSM_CC_STREAM  :
 			case ISO13522_STREAM:
-				p->done = 1;
 			case PRIVATE_STREAM1:
+				p->done = 1;
 			case VIDEO_STREAM_S ... VIDEO_STREAM_E:
 			case AUDIO_STREAM_S ... AUDIO_STREAM_E:
 				p->found++;
