@@ -149,7 +149,8 @@ PlaybackBox::PlaybackBox(MythMainWindow *parent, QString window_name,
     
     mainvisual = new MainVisual(this);
     mainvisual->setGeometry(visual_blackhole->getScreenArea());
-    
+    mainvisual->show();   
+ 
     visual_mode = gContext->GetSetting("VisualMode");
     visual_mode.simplifyWhiteSpace();
     visual_mode.replace(QRegExp("\\s"), ",");
@@ -361,7 +362,6 @@ void PlaybackBox::checkForPlaylists()
     if(all_playlists->doneLoading() &&
        all_music->doneLoading())
     {
-        mainvisual->setVisual(visual_mode);
         music_tree_list->showWholeTree(show_whole_tree);
         waiting_for_playlists_timer->stop();
         constructPlaylistTree();
@@ -380,6 +380,7 @@ void PlaybackBox::checkForPlaylists()
             setContext(2);
         }
         updateForeground();
+        mainvisual->setVisual(visual_mode);
     }
     else
     {

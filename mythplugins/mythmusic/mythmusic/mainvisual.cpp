@@ -87,6 +87,7 @@ void MainVisual::setVisual( const QString &visualname )
 
     allowed_modes = QStringList::split(",", visualname);
 
+cout << isVisible() << endl;
     if (allowed_modes.contains("Random"))
     {
         newvis = randomVis(this, winId());
