@@ -956,7 +956,7 @@ int SipFsm::MsgToEvent(SipMsg *sipMsg)
         cerr << "SIP: Unknown STATUS method " << statusMethod << endl;
     }
     else
-        cerr << "SIP: Unknown method " << Method << endl;
+        cerr << "SIP: Unknown method " << Method << endl << sipMsg->string() << endl;
     return 0;
 }
 
