@@ -1010,7 +1010,6 @@ void ProgFinder::selectSearchData()
                        "FROM program "
                        "WHERE title LIKE '%1%' "
 		       "AND starttime > %2 "
-		       "GROUP BY title "
                        "ORDER BY title;")
                         .arg(searchData[curSearch]).arg(progStart.toString("yyyyMMddhhmm50"));
     }
@@ -1335,6 +1334,10 @@ void ProgFinder::selectShowData(QString progTitle)
 void ProgFinder::getInitialProgramData()
 {
     getRecordingInfo();
+    clock_t tv1, tv2;
+    double time;
+    tv1 = clock();
+
     getSearchData(8);
     getSearchData(9);
     getSearchData(11);
@@ -1347,6 +1350,11 @@ void ProgFinder::getInitialProgramData()
 
 	getSearchData(charNum);
     }
+
+    tv2 = clock();
+    time = (tv2 - tv1)/(CLOCKS_PER_SEC / (double) 1000.0);
+
+    cout << "Time: " << time << endl;
 
 }
 
