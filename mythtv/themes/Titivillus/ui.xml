@@ -8,7 +8,7 @@
       <size>24</size>
       <size:small>14</size:small>
       <size:big>24</size:big>
-      <shadow>4,4</shadow>
+      <shadow>5,5</shadow>
       <bold>yes</bold>
     </font>
 
@@ -17,24 +17,26 @@
       <size>17</size>
       <size:small>13</size:small>
       <size:big>19</size:big>
-      <shadow>3,3</shadow>
+      <shadow>4,4</shadow>
       <bold>yes</bold>
     </font>
 
     <font name="descinfo2" face="Arial">
       <color>#ffffee</color>
-      <size>13</size>
+      <size>14</size>
       <size:small>12</size:small>
-      <size:big>15</size:big>
-      <shadow>1,1</shadow>
+      <size:big>16</size:big>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
     </font>
 
     <font name="descinfo" face="Arial">
-      <shadow>2,2</shadow>
       <color>#ffffff</color>
       <size>16</size>
       <size:small>11</size:small>
       <size:big>18</size:big>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
     </font>
 
     <font name="chaninfo" face="Arial">
@@ -52,6 +54,7 @@
       <size:small>12</size:small>
       <size:big>17</size:big>
       <shadow>2,2</shadow>
+      <bold>yes</bold>
     </font>
 
     <font name="small" face="Arial">
@@ -112,7 +115,7 @@
         <conflictingcolor>#ff6600</conflictingcolor>
         <cutdown>no</cutdown>
         <multiline>yes</multiline>
-        <textoffset>9,6</textoffset>
+        <textoffset>3,3</textoffset>
         <catcolor category="Unknown" color="#222200"></catcolor>
         <catcolor category="Shopping" color="#222200"></catcolor>
         <catcolor category="Educational" color="CornflowerBlue"></catcolor>
@@ -299,12 +302,12 @@
         <font>title</font>
       </textarea>
       <textarea name="subtitle" draworder="6">
-        <area>4,42,720,30</area>
+        <area>4,44,720,30</area>
         <font>info</font>
         <value>%SUBTITLE|"|"%</value>
       </textarea>
       <textarea name="description" draworder="6">
-        <area>4,69,780,65</area>
+        <area>4,69,775,65</area>
         <font>descinfo</font>
         <multiline>yes</multiline>
 	<value>%LONGREPEAT%%STARS%%DESCRIPTION%</value>
@@ -323,8 +326,9 @@
     <font name="title" face="Arial">
       <color>#DDDDff</color>
       <dropcolor>#000000</dropcolor>
-      <size>24</size>
+      <size>22</size>
       <size:small>14</size:small>
+      <size:big>24</size:big>
       <shadow>4,4</shadow>
       <bold>yes</bold>
     </font>
@@ -334,29 +338,31 @@
       <size>17</size>
       <size:small>13</size:small>
       <size:big>19</size:big>
-      <shadow>3,3</shadow>
+      <shadow>4,4</shadow>
       <bold>yes</bold>
     </font>
 
     <font name="descinfo2" face="Arial">
       <color>#ffffee</color>
-      <size>13</size>
+      <size>14</size>
       <size:small>12</size:small>
-      <size:big>15</size:big>
-      <shadow>1,1</shadow>
+      <size:big>16</size:big>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
     </font>
 
     <font name="descinfo" face="Arial">
-      <shadow>2,2</shadow>
       <color>#ffffff</color>
-      <size>16</size>
-      <size:small>9</size:small>
+      <size>15</size>
+      <size:small>11</size:small>
       <size:big>18</size:big>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
     </font>
 
     <font name="chaninfo" face="Arial">
       <shadow>1,1</shadow>
-      <color>#ffffff</color>
+      <color>#ffffee</color>
       <size>15</size>
       <size:small>12</size:small>
       <size:big>17</size:big>
@@ -365,18 +371,18 @@
 
     <font name="recstatus" face="Arial">
       <color>#ffff33</color>
-      <size>17</size>
+      <size>15</size>
       <size:small>12</size:small>
-      <size:big>19</size:big>
+      <size:big>17</size:big>
       <shadow>2,2</shadow>
-
+      <bold>yes</bold>
     </font>
 
     <font name="small" face="Arial">
       <color>#ffff33</color>
       <size>16</size>
-      <size:big>18</size:big>
       <size:small>10</size:small>
+      <size:big>18</size:big>
     </font>
 
     <container name="background">
@@ -420,7 +426,7 @@
         <area>0,0,640,31</area>
         <align>allcenter</align>
         <imagefile>gg-times.png</imagefile>
-        <font>descinfo</font>
+        <font>descinfo2</font>
       </bar>
     </container>
 
@@ -432,7 +438,8 @@
         <selector type="box" color="#ffff33"></selector>
         <recordingcolor>#00aa00</recordingcolor>
         <conflictingcolor>#ff6600</conflictingcolor>
-        <textoffset>9,6</textoffset>
+        <textoffset>3,3</textoffset>
+        <multiline>yes</multiline>
         <catcolor category="Unknown" color="#222200"></catcolor>
         <catcolor category="Shopping" color="#222200"></catcolor>
         <catcolor category="Educational" color="CornflowerBlue"></catcolor>
@@ -612,12 +619,8 @@
         <area>4,46,504,30</area>
         <font>info</font>
       </textarea>
-      <textarea name="timedate" draworder="6">
-        <area>4,93,504,30</area>
-        <font>info</font>
-      </textarea>
       <textarea name="description" draworder="6">
-        <area>4,125,504,99</area>
+        <area>4,90,504,159</area>
         <font>descinfo</font>
         <multiline>yes</multiline>
         <value>%LONGREPEAT%%STARS%%DESCRIPTION%</value>
@@ -1300,34 +1303,38 @@
 
     <font name="active" face="Arial">
       <color>#ffffff</color>
-      <size>15</size>
+      <size>16</size>
       <size:big>20</size:big>
-      <size:small>13</size:small>
-      <shadow>1,1</shadow>
+      <size:small>14</size:small>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
     </font>
 
     <font name="inactive" face="Arial">
       <color>#9999cc</color>
-      <size>15</size>
+      <size>16</size>
       <size:big>20</size:big>
       <size:small>13</size:small>
-      <shadow>1,1</shadow>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
     </font>
 
     <font name="record_font" face="Arial">
       <color>#F7862B</color>
-      <size>15</size>
+      <size>16</size>
       <size:big>20</size:big>
       <size:small>13</size:small>
-      <shadow>1,1</shadow>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
     </font>
 
     <font name="overunderrecfont" face="Arial">
       <color>#ffffAA</color>
-      <size>15</size>
+      <size>16</size>
       <size:big>20</size:big>
       <size:small>13</size:small>
-      <shadow>1,1</shadow>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
     </font>
 
     <font name="currenttitle" face="Arial">
@@ -1335,7 +1342,8 @@
       <size>16</size>
       <size:big>22</size:big>
       <size:small>14</size:small>
-      <shadow>1,1</shadow>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
     </font>
 
     <font name="title" face="Arial">
@@ -1364,8 +1372,8 @@
       <size>17</size>
       <size:big>20</size:big>
       <size:small>10</size:small>
-      <shadow>1,1</shadow>
-
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
     </font>
 
     <font name="message" face="Arial">
@@ -1374,6 +1382,7 @@
       <size:big>20</size:big>
       <size:small>12</size:small>
       <shadow>2,2</shadow>
+      <bold>yes</bold>
     </font>
 
     <container name="background">
@@ -1493,8 +1502,8 @@
         <area>20,140,765,125</area>
         <altarea>20,140,765,125</altarea>
         <font>info</font>
-	<multiline>yes</multiline>
-	<value>%LONGREPEAT%%STARS%%DESCRIPTION%</value>
+        <multiline>yes</multiline>
+        <value>%LONGREPEAT%%STARS%%DESCRIPTION%</value>
         </textarea>
 
       <image name="commflagged" draworder="6">
@@ -1608,22 +1617,27 @@
       <color>#ffffff</color>
       <size>15</size>
       <size:small>11</size:small>
-      <shadow>1,1</shadow>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
     </font>
 
     <font name="inactive" face="Arial">
       <color>#9999cc</color>
       <size>15</size>
       <size:small>11</size:small>
-      <shadow>1,1</shadow>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
+
     </font>
 
     <font name="record_font" face="Arial">
       <color>#F7862B</color>
       <size>15</size>
       <size:small>11</size:small>
-      <shadow>1,1</shadow>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
     </font>
+    
     <font name="titleinfo" face="Arial">
       <color>#bbbbff</color>
       <dropcolor>#000000</dropcolor>
@@ -1666,10 +1680,11 @@
     </font>
 
     <font name="descinfo" face="Arial">
-      <shadow>2,2</shadow>
       <color>#ffffff</color>
       <size>16</size>
       <size:small>9</size:small>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
     </font>
 
 
@@ -1835,27 +1850,32 @@
       <color>#ffffff</color>
       <size>15</size>
       <size:small>11</size:small>
-      <shadow>1,1</shadow>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
     </font>
 
     <font name="inactive_font" face="Arial">
       <color>#9999cc</color>
       <size>15</size>
       <size:small>11</size:small>
-      <shadow>1,1</shadow>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
+
     </font>
 
     <font name="record_font" face="Arial">
       <color>#F7862B</color>
       <size>15</size>
       <size:small>11</size:small>
-      <shadow>1,1</shadow>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
     </font>
 
     <font name="conflict_font" face="Arial">
       <color>#ffff33</color>
       <size>15</size>
       <size:small>11</size:small>
+      <shadow>2,2</shadow>
       <bold>yes</bold>
     </font>
 
@@ -1880,14 +1900,17 @@
       <color>#ffffff</color>
       <size>15</size>
       <size:small>10</size:small>
-      <shadow>1,1</shadow>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
     </font>
 
     <font name="yellowinfo" face="Arial">
       <color>#ffff33</color>
       <size>15</size>
       <size:small>10</size:small>
-      <shadow>1,1</shadow>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
+
     </font>
 
     <font name="message" face="Arial">
@@ -1995,7 +2018,8 @@
       <size:big>18</size:big>
       <size>15</size>
       <size:small>11</size:small>
-      <shadow>1,1</shadow>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>      
     </font>
 
     <font name="enabled_state_0_font" face="Arial">
@@ -2012,7 +2036,7 @@
       <size:big>17</size:big>
       <size>15</size>
       <size:small>10</size:small>
-      <shadow>1,1</shadow>
+      <shadow>2,2</shadow>
       <bold>yes</bold>
     </font>
 
@@ -2022,14 +2046,16 @@
       <size:big>18</size:big>
       <size>15</size>
       <size:small>11</size:small>
-      <shadow>1,1</shadow>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
     </font>
 
     <font name="currenttitle" face="Arial">
       <color>#ffff33</color>
       <size>15</size>
       <size:small>12</size:small>
-      <shadow>1,1</shadow>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
     </font>
 
     <font name="title" face="Arial">
@@ -2046,15 +2072,16 @@
       <color>#ffffdd</color>
       <size>17</size>
       <size:small>12</size:small>
-      <shadow>1,1</shadow>
+      <shadow>2,2</shadow>
       <bold>yes</bold>
     </font>
 
     <font name="info" face="Arial">
-      <color>#ffffff</color>
-      <size>17</size>
+      <color>#ffffee</color>
+      <size>16</size>
       <size:small>10</size:small>
-      <shadow>1,1</shadow>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
     </font>
 
     <font name="tinyinfo" face="Arial">
@@ -2085,7 +2112,8 @@
       <color>#ffffDD</color>
       <size>15</size>
       <size:small>10</size:small>
-      <shadow>1,1</shadow>
+       <shadow>2,2</shadow>
+      <bold>yes</bold>
     </font>
 
     <container name="background">
@@ -2120,7 +2148,7 @@
     </container>
 
     <container name="program_info">
-      <area>0,20,800,210</area>
+      <area>0,10,800,250</area>
       <textarea name="title" draworder="6">
         <area>20,0,800,40</area>
         <font>title</font>
@@ -2130,30 +2158,30 @@
         <font>subtitle</font>
       </textarea>
       <textarea name="infotime" draworder="6" align="right">
-        <area>20,66,150,30</area>
+        <area>20,66,125,30</area>
         <font>infob</font>
         <value>Airdate:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
-        <area>180,66,600,30</area>
+        <area>150,66,600,30</area>
         <font>info</font>
       </textarea>
       <textarea name="infochan" draworder="6" align="right">
-        <area>20,95,150,30</area>
+        <area>20,95,125,30</area>
         <font>infob</font>
         <value>Channel:</value>
       </textarea>
       <textarea name="longchannel" draworder="6">
-        <area>180,95,400,30</area>
+        <area>150,95,400,30</area>
         <font>info</font>
       </textarea>
       <textarea name="infodesc" draworder="6" align="right">
-        <area>20,125,150,30</area>
+        <area>20,125,125,30</area>
         <font>infob</font>
         <value>Description:</value>
       </textarea>
       <textarea name="description" draworder="6">
-        <area>180,125,600,120</area>
+        <area>150,125,630,160</area>
         <font>info</font>
         <multiline>yes</multiline>
       </textarea>
