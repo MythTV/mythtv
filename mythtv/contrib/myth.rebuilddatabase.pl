@@ -58,7 +58,7 @@ if ($argc == 0) {
    print "usage:  myth.rebuilddatabase.pl --dir /path/to/video/ [options]
 
 Where [options] is:
---host          - hostname of the mysql server (default: \"192.168.1.103\")
+--host          - hostname or IP address of the mysql server (default: \"192.168.1.103\")
 --user          - DBUSERNAME (default: \"mythtv\")
 --pass          - DBPASSWORD (default: \"mythtv\")
 --database      - DATABASENAME (default: \"mythconverg\")
