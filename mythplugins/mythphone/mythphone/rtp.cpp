@@ -430,6 +430,7 @@ void rtp::OpenSocket()
         rtpSocket = 0;
     }
 
+    // Had to remove this; as sometimes packets were arriving with a different src port because of a NAT somewhere
     //if (!rtpSocket->connect(yourIP, yourPort))
     //{
     //    cerr << "Failed to connect for RTP connection " << myIP.toString() << ":" << myPort << endl;
@@ -549,19 +550,22 @@ void rtp::Transmit(int ms)
 
 void rtp::Transmit(short *pcmBuffer, int Samples)
 {
-    rtpMutex.lock();
-    if (txBuffer)
-       cerr << "Don't tell me to transmit something whilst I'm already busy\n";
-    else
+    if (pcmBuffer && (Samples > 0))
     {
-        txBuffer = new short[Samples+txPCMSamplesPerPacket]; // Increase space to multiples of full packets
-        memcpy(txBuffer, pcmBuffer, Samples*sizeof(short));
-        memset(txBuffer+Samples, 0, txPCMSamplesPerPacket*2);
-        txBufferLen=Samples;
-        txBufferPtr=0;
-        txMode = RTP_TX_AUDIO_FROM_BUFFER;
+        rtpMutex.lock();
+        if (txBuffer)
+           cerr << "Don't tell me to transmit something whilst I'm already busy\n";
+        else
+        {
+            txBuffer = new short[Samples+txPCMSamplesPerPacket]; // Increase space to multiples of full packets
+            memcpy(txBuffer, pcmBuffer, Samples*sizeof(short));
+            memset(txBuffer+Samples, 0, txPCMSamplesPerPacket*2);
+            txBufferLen=Samples;
+            txBufferPtr=0;
+            txMode = RTP_TX_AUDIO_FROM_BUFFER;
+        }
+        rtpMutex.unlock();
     }
-    rtpMutex.unlock();
 }
 
 void rtp::Record(short *pcmBuffer, int Samples)
