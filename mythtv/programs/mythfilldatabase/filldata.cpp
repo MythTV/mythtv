@@ -49,7 +49,7 @@ bool refresh_tba = true;
 int listing_wrap_offset = 0;
 bool dd_grab_all = false;
 bool dddataretrieved = false;
-bool mark_repeats = false;
+bool mark_repeats = true;
 
 QString lastdduserid;
 DataDirectProcessor ddprocessor;
@@ -2274,8 +2274,8 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
                         filename.ascii());
     else if (xmltv_grabber == "tv_grab_uk_rt")
         command.sprintf("nice %s --days 1 --offset %d --config-file '%s' --output %s",
-	                 xmltv_grabber.ascii(), offset, 
-			 configfile.ascii(), filename.ascii());
+                     xmltv_grabber.ascii(), offset, 
+             configfile.ascii(), filename.ascii());
     else if (xmltv_grabber == "tv_grab_au")
         command.sprintf("nice %s --days 7 --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), configfile.ascii(),
@@ -2967,6 +2967,10 @@ int main(int argc, char *argv[])
         {
              mark_repeats = true;
         }
+        else if (!strcmp(a.argv()[argpos], "--nomark-repeats"))
+        {
+             mark_repeats = false;
+        }
         else if (!strcmp(a.argv()[argpos], "--export-icon-map"))
         {
             export_iconmap = true;
@@ -3296,6 +3300,18 @@ int main(int argc, char *argv[])
                     "AND (to_days(starttime) - to_days(originalairdate)) > %1;")
                     .arg(newEpiWindow));
         
+        if (!quiet)
+            cout << "found " << query.numRowsAffected() << endl;
+            
+        if (!quiet)
+             cout << "Unmarking repeats from grabber that fall within our new episode window...";            
+             
+        query.exec( QString( "UPDATE program SET previouslyshown = 0 "
+                             "WHERE previouslyshown = 1 "
+                             "AND originalairdate is not null "
+                             "AND (to_days(starttime) - to_days(originalairdate)) <= %1;")
+                             .arg(newEpiWindow));             
+    
         if (!quiet)
             cout << "found " << query.numRowsAffected() << endl;
     }
