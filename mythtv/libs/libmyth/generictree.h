@@ -17,11 +17,13 @@ class GenericTree
   public:
     GenericTree(const QString &a_string = "", int an_int = 0, 
                 bool selectable_flag = false);
-    ~GenericTree();
+    virtual ~GenericTree();
 
     GenericTree *addNode(const QString &a_string, int an_int = 0, 
                          bool selectable_flag = false);
     GenericTree *addNode(GenericTree *child);
+
+    void removeNode(GenericTree *child);
 
     GenericTree *findLeaf(int ordering_index = -1);
 
@@ -31,6 +33,8 @@ class GenericTree
 
     GenericTree *nextSibling(int number_down, int ordering_index = -1);
     GenericTree *prevSibling(int number_up, int ordering_index = -1);
+
+    QPtrListIterator<GenericTree> getFirstChildIterator(int ordering = -1);
 
     GenericTree *getSelectedChild(int ordering_index);
     GenericTree *getChildAt(uint reference, int ordering_index = -1);
@@ -49,6 +53,7 @@ class GenericTree
     GenericTree *getParent(void);
 
     const QString getString(void) { return m_string; }
+    void setString(const QString &str) { m_string = str; }
 
     int calculateDepth(int start);
 
@@ -80,8 +85,10 @@ class GenericTree
     void sortBySelectable();
     void deleteAllChildren();
 
-  private:
+    // only changes m_subnodes.  resort it if you want the others to change
+    void MoveItemUpDown(GenericTree *item, bool flag);
 
+  private:
     QString m_string;
     int m_int;
 

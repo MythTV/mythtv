@@ -22,6 +22,7 @@ using namespace std;
 #endif
 
 #include "uitypes.h"
+#include "uilistbtntype.h"
 #include "xmlparse.h"
 #include "mythdialogs.h"
 #include "lcddevice.h"
@@ -1292,6 +1293,8 @@ MythThemedDialog::MythThemedDialog(MythMainWindow *parent, QString window_name,
                     SLOT(updateForeground()));
             connect(type, SIGNAL(requestUpdate(const QRect &)), this, 
                     SLOT(updateForeground(const QRect &)));
+            connect(type, SIGNAL(requestRegionUpdate(const QRect &)), this,
+                    SLOT(updateForegroundRegion(const QRect &)));
         }
         ++an_it;
     }
@@ -1558,6 +1561,49 @@ void MythThemedDialog::updateForeground(const QRect &r)
     {
         whole_dialog_painter.end();
     }
+
+    update(r);
+}
+
+void MythThemedDialog::updateForegroundRegion(const QRect &r)
+{
+    QRect area = r;
+    QPainter whole_dialog_painter(&my_foreground);
+
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
+
+    while ((looper = an_it.current()) != 0)
+    {
+        QRect container_area = looper->GetAreaRect();
+
+        if (container_area.isValid() &&
+            r.intersects(container_area) &&
+            looper->GetName().lower() != "background")
+        {
+            QPixmap container_picture(r.size());
+            QPainter offscreen_painter(&container_picture);
+            offscreen_painter.drawPixmap(0, 0, my_background,
+                                         r.left(), r.top());
+
+            for (int i = 0; i <= looper->getLayers(); i++)
+            {
+                looper->DrawRegion(&offscreen_painter, area, i, context);
+            }
+
+            if (offscreen_painter.isActive())
+            {
+                offscreen_painter.end();
+                whole_dialog_painter.drawPixmap(r.topLeft(),
+                                                container_picture);
+            }
+
+        }
+        ++an_it;
+    }
+
+    if (whole_dialog_painter.isActive())
+        whole_dialog_painter.end();
 
     update(r);
 }
@@ -1917,6 +1963,48 @@ UIStatusBarType* MythThemedDialog::getUIStatusBarType(const QString &name)
         {
             UIStatusBarType *hunted;
             if( (hunted = dynamic_cast<UIStatusBarType*>(hunter)) )
+            {
+                return hunted;
+            }
+        }
+        ++an_it;
+    }
+    return NULL;
+}
+
+UIListBtnType* MythThemedDialog::getUIListBtnType(const QString &name)
+{
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
+
+    while( (looper = an_it.current()) != 0)
+    {
+        UIType *hunter = looper->GetType(name);
+        if (hunter)
+        {
+            UIListBtnType *hunted;
+            if ((hunted = dynamic_cast<UIListBtnType*>(hunter)) )
+            {
+                return hunted;
+            }
+        }
+        ++an_it;
+    }
+    return NULL;
+}
+
+UIListTreeType* MythThemedDialog::getUIListTreeType(const QString &name)
+{
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
+
+    while( (looper = an_it.current()) != 0)
+    {
+        UIType *hunter = looper->GetType(name);
+        if (hunter)
+        {
+            UIListTreeType *hunted;
+            if ((hunted = dynamic_cast<UIListTreeType*>(hunter)) )
             {
                 return hunted;
             }

@@ -61,9 +61,6 @@ GenericTree::GenericTree(const QString &a_string, int an_int,
     m_subnodes->setAutoDelete(true);
 
     m_parent = NULL;
-    m_subnodes->clear();
-    m_flatened_subnodes->clear();
-    m_ordered_subnodes->clear();
     m_selected_subnode = NULL;
     m_current_ordering_index = -1;
 
@@ -99,6 +96,16 @@ GenericTree *GenericTree::addNode(GenericTree *child)
     m_ordered_subnodes->append(child);
 
     return child;
+}
+
+void GenericTree::removeNode(GenericTree *child)
+{
+    if (m_selected_subnode == child)
+        m_selected_subnode = NULL;
+
+    m_ordered_subnodes->removeRef(child);
+    m_flatened_subnodes->removeRef(child);
+    m_subnodes->removeRef(child);
 }
 
 int GenericTree::calculateDepth(int start)
@@ -301,7 +308,7 @@ GenericTree* GenericTree::prevSibling(int number_up, int ordering_index)
         // not enough siblings "above" me
         return NULL;
     }
-    
+
     return m_parent->getChildAt(position - number_up, ordering_index);
 }
 
@@ -320,8 +327,22 @@ GenericTree* GenericTree::nextSibling(int number_down, int ordering_index)
         // not enough siblings "below" me
         return NULL;
     }
-    
+   
     return m_parent->getChildAt(position + number_down, ordering_index);
+}
+
+QPtrListIterator<GenericTree> GenericTree::getFirstChildIterator(int ordering)
+{
+    if (ordering == -1)
+        return QPtrListIterator<GenericTree>(*m_subnodes);
+
+    if (ordering != m_current_ordering_index)
+    {
+        reorderSubnodes(ordering);
+        m_current_ordering_index = ordering;
+    }
+
+    return QPtrListIterator<GenericTree>(*m_ordered_subnodes);
 }
 
 GenericTree* GenericTree::getParent()
@@ -486,7 +507,25 @@ void GenericTree::deleteAllChildren()
     m_ordered_subnodes->clear();
     m_selected_subnode = NULL;
     m_current_ordering_index = -1;
-    m_subnodes->setAutoDelete(true);
-    
     m_subnodes->clear();
 }
+
+void GenericTree::MoveItemUpDown(GenericTree *item, bool flag)
+{
+    if (item == m_subnodes->getFirst() && flag)
+        return;
+    if (item == m_subnodes->getLast() && !flag)
+        return;
+
+    int num = m_subnodes->findRef(item);
+
+    int insertat = 0;
+    if (flag)
+        insertat = num - 1;
+    else
+        insertat = num + 1;
+
+    m_subnodes->take();
+    m_subnodes->insert(insertat, item);
+}
+

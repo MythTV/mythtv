@@ -68,6 +68,21 @@ void LayerSet::Draw(QPainter *dr, int drawlayer, int context)
   }
 }
 
+void LayerSet::DrawRegion(QPainter *dr, QRect &area, int drawlayer, int context)
+{
+  if (m_context == context || m_context == -1)
+  {
+    vector<UIType *>::iterator i = allTypes->begin();
+    for (; i != allTypes->end(); i++)
+    {
+        if (m_debug == true)
+            cerr << "-LayerSet::Draw\n";
+        UIType *type = (*i);
+        type->DrawRegion(dr, area, drawlayer, context);
+    }
+  }
+}
+
 void LayerSet::ClearAllText(void)
 {
     vector<UIType *>::iterator i = allTypes->begin();
@@ -174,6 +189,14 @@ void UIType::Draw(QPainter *dr, int drawlayer, int context)
     dr->end();
     drawlayer = 0;
     context = 0;
+}
+
+void UIType::DrawRegion(QPainter *dr, QRect &area, int drawlayer, int context)
+{
+    (void)dr;
+    (void)area;
+    (void)drawlayer;
+    (void)context;
 }
 
 void UIType::SetParent(LayerSet *parent) 

@@ -25,10 +25,487 @@
 
 #include "uilistbtntype.h"
 
+UIListGenericTree::UIListGenericTree(UIListGenericTree *parent, 
+                                     const QString &name, const QString &action,
+                                     int check, QPixmap *image)
+                 : GenericTree(name)
+{
+    m_check = check;
+    m_action = action;
+    m_image = image;
+    m_active = true;
+
+    m_physitem = NULL;
+
+    if (!action.isEmpty() && !action.isNull())
+        setSelectable(true);
+
+    if (parent)
+    {
+        parent->addNode(this);
+        parent->setDrawArrow(true);
+    }
+}
+
+UIListGenericTree::~UIListGenericTree()
+{
+}
+
+void UIListGenericTree::RemoveFromParent(void)
+{
+    if (m_physitem)
+        delete m_physitem;
+    m_physitem = NULL;
+
+    if (getParent())
+    {
+        if (getParent()->childCount() == 1)
+            ((UIListGenericTree *)getParent())->setDrawArrow(false);
+
+        getParent()->removeNode(this);
+    }
+}
+
+void UIListGenericTree::setText(const QString &text)
+{
+    setString(text);
+    if (m_physitem)
+        m_physitem->setText(text);
+}
+
+void UIListGenericTree::setPixmap(QPixmap *pixmap)
+{
+    if (m_physitem)
+        m_physitem->setPixmap(pixmap);
+}
+
+void UIListGenericTree::setDrawArrow(bool flag)
+{
+    if (m_physitem)
+        m_physitem->setDrawArrow(flag);
+}
+
+void UIListGenericTree::setCheck(int flag)
+{
+    m_check = flag;
+
+    if (m_physitem)
+    {
+        m_physitem->setCheckable(flag >= 0);
+        m_physitem->setChecked((UIListBtnTypeItem::CheckState)flag);
+    }
+}
+
+void UIListGenericTree::setActive(bool flag)
+{
+    if (m_physitem)
+        m_physitem->setOverrideInactive(!flag);
+    m_active = flag;
+}
+
+bool UIListGenericTree::getActive(void)
+{
+    return m_active;
+}
+
+bool UIListGenericTree::movePositionUpDown(bool flag)
+{
+    if (getParent())
+        getParent()->MoveItemUpDown(this, flag);
+
+    if (m_physitem)
+        return m_physitem->moveUpDown(flag);
+
+    return false;
+}
+ 
+//////////////////////////////////////////////////////////////////////////////
+
+UIListTreeType::UIListTreeType(const QString &name, const QRect &area,
+                               const QRect &levelsize, int levelspacing,
+                               int order)
+              : UIType(name)
+{
+    m_totalarea = area;
+    m_levelsize = levelsize;
+    m_levelspacing = levelspacing;
+
+    levels = 0;
+    curlevel = -1;
+
+    treetop = NULL;
+    currentpos = NULL;
+
+    currentlevel = NULL;
+
+    listLevels.setAutoDelete(true);
+
+    m_active = NULL;
+    m_inactive = NULL;
+
+    SetItemRegColor(Qt::black,QColor(80,80,80),100);
+    SetItemSelColor(QColor(82,202,56),QColor(52,152,56),255);
+
+    m_spacing = 0;
+    m_margin = 0;
+
+    m_order = order;
+}
+
+UIListTreeType::~UIListTreeType()
+{
+}
+
+void UIListTreeType::SetItemRegColor(const QColor& beg, const QColor& end,
+                                     uint alpha)
+{
+    m_itemRegBeg   = beg;
+    m_itemRegEnd   = end;
+    m_itemRegAlpha = alpha;
+}
+
+void UIListTreeType::SetItemSelColor(const QColor& beg, const QColor& end,
+                                     uint alpha)
+{
+    m_itemSelBeg   = beg;
+    m_itemSelEnd   = end;
+    m_itemSelAlpha = alpha;
+}
+
+void UIListTreeType::SetFontActive(fontProp *font)
+{
+    m_active = font;
+}
+
+void UIListTreeType::SetFontInactive(fontProp *font)
+{
+    m_inactive = font;
+}
+
+void UIListTreeType::SetSpacing(int spacing)
+{
+    m_spacing = spacing;
+}
+
+void UIListTreeType::SetMargin(int margin)
+{
+    m_margin = margin;
+}
+
+void UIListTreeType::SetTree(UIListGenericTree *toplevel)
+{
+    if (treetop)
+    {
+        listLevels.clear();
+        currentlevel = NULL;
+        treetop = NULL;
+        currentpos = NULL;
+        levels = 0;
+        curlevel = -1;
+    }
+
+    levels = - 1;
+
+    currentpos = (UIListGenericTree *)toplevel->getChildAt(0);
+
+    if (!currentpos)
+    {
+        cerr << "No top-level children?\n";
+        return;
+    }
+
+    treetop = toplevel;
+
+    CreateLevel(0);
+
+    currentlevel = GetLevel(0);
+
+    if (!currentlevel)
+    {
+        cerr << "Something is seriously wrong (currentlevel = NULL)\n";
+        return;
+    }
+
+    FillLevelFromTree(toplevel, currentlevel);
+
+    currentlevel->SetVisible(true);
+    currentlevel->SetActive(true);
+
+    currentpos = (UIListGenericTree *)(currentlevel->GetItemFirst()->getData());
+    curlevel = 0;
+
+    emit requestUpdate();
+    emit itemEntered(this, currentpos);
+}
+
+void UIListTreeType::CreateLevel(int level)
+{
+    if (level > levels)
+    {
+        int oldlevels = levels + 1;
+        levels = level;
+        for (int i = oldlevels; i <= levels; i++)
+        {
+            QString levelname = QString("level%1").arg(i + 1);
+
+            QRect curlevelarea = m_levelsize;
+            curlevelarea.moveBy(m_totalarea.x(), m_totalarea.y());
+            curlevelarea.moveBy((m_levelsize.width() + m_levelspacing) * i, 0);
+
+            UIListBtnType *newlevel = new UIListBtnType(levelname, curlevelarea,
+                                                        m_order, false, true);
+
+            newlevel->SetFontActive(m_active);
+            newlevel->SetFontInactive(m_inactive);
+            newlevel->SetItemRegColor(m_itemRegBeg, m_itemRegEnd, 
+                                      m_itemRegAlpha);
+            newlevel->SetItemSelColor(m_itemSelBeg, m_itemSelEnd, 
+                                      m_itemSelAlpha);
+            newlevel->SetSpacing(m_spacing);
+            newlevel->SetMargin(m_margin);
+
+            listLevels.append(newlevel);
+        }
+    }
+}
+
+UIListGenericTree *UIListTreeType::GetCurrentPosition(void)
+{
+    return currentpos;
+}
+
+void UIListTreeType::Draw(QPainter *p, int order, int blah)
+{
+    QPtrListIterator<UIListBtnType> it(listLevels);
+    UIListBtnType *child;
+
+    int maxx = 0;
+    while ((child = it.current()) != 0)
+    {
+        if (child->IsVisible())
+            maxx = child->GetArea().right();
+        ++it;
+    }
+
+    it.toFirst();
+    while ((child = it.current()) != 0)
+    {
+        if (!child->IsVisible())
+            break;
+
+        int offset = 0;
+        if (maxx > m_totalarea.right())
+            offset = -1 * (maxx - m_totalarea.right());
+        child->SetDrawOffset(offset);
+
+        if (child->GetArea().right() + offset > m_totalarea.left())
+            child->Draw(p, order, blah);
+        ++it;
+    }
+}
+
+void UIListTreeType::DrawRegion(QPainter *p, QRect &area, int order, int blah)
+{
+    QPtrListIterator<UIListBtnType> it(listLevels);
+    UIListBtnType *child;
+
+    int maxx = 0;
+    while ((child = it.current()) != 0)
+    {
+        if (child->IsVisible())
+            maxx = child->GetArea().right();
+        ++it;
+    }
+
+    it.toFirst();
+    while ((child = it.current()) != 0)
+    {
+        if (!child->IsVisible())
+            break;
+
+        int offset = 0;
+        if (maxx > m_totalarea.right())
+            offset = -1 * (maxx - m_totalarea.right());
+        child->SetDrawOffset(offset);
+
+        QRect drawRect = child->GetArea();
+        drawRect.moveBy(offset, 0);
+        drawRect.moveBy(m_parent->GetAreaRect().x(), 
+                        m_parent->GetAreaRect().y());
+
+        if (child->GetArea().right() + offset > m_totalarea.left() &&
+            drawRect == area)
+        {
+            child->SetDrawOffset(0 - child->GetArea().x());
+            child->Draw(p, order, blah);
+            child->SetDrawOffset(offset);
+        }
+
+        ++it;
+    }
+}
+
+void UIListTreeType::ClearLevel(UIListBtnType *list)
+{
+    UIListBtnTypeItem *clear = list->GetItemFirst();
+    while (clear)
+    {
+        UIListGenericTree *gt = (UIListGenericTree *)clear->getData();
+        gt->setItem(NULL);
+        clear = list->GetItemNext(clear);
+    }
+
+    list->Reset();
+}
+
+void UIListTreeType::RefreshCurrentLevel(void)
+{
+    QPtrListIterator<UIListBtnTypeItem> it = currentlevel->GetIterator();
+
+    UIListBtnTypeItem *item;
+    while ((item = it.current()))
+    {
+        UIListGenericTree *ui = (UIListGenericTree *)item->getData();
+        ui->setActive(ui->getActive());
+        ++it;
+    }
+}
+
+void UIListTreeType::FillLevelFromTree(UIListGenericTree *item,
+                                       UIListBtnType *list)
+{
+    if (!item || !list)
+        return;
+
+    ClearLevel(list);
+
+    QPtrList<GenericTree> *itemlist = item->getAllChildren();
+
+    QPtrListIterator<GenericTree> it(*itemlist);
+    GenericTree *child;
+
+    while ((child = it.current()) != 0)
+    {
+        UIListGenericTree *uichild = (UIListGenericTree *)child;
+
+        UIListBtnTypeItem *newitem;
+
+        int check = uichild->getCheck();
+        newitem = new UIListBtnTypeItem(list, child->getString(),
+                                        uichild->getImage(), (check >= 0),
+                                        (UIListBtnTypeItem::CheckState)check,
+                                        (child->childCount() > 0));
+        newitem->setData(uichild);
+
+        uichild->setItem(newitem);
+
+        if (!uichild->getActive())
+            newitem->setOverrideInactive(true);
+
+        ++it;
+    }
+}
+
+UIListBtnType *UIListTreeType::GetLevel(int levelnum)
+{
+    if ((uint)levelnum > listLevels.count())
+    {
+        cerr << "OOB GetLevel call\n";
+        return NULL;
+    }
+
+    return listLevels.at(levelnum);
+}
+
+void UIListTreeType::SetCurrentPosition(void)
+{
+    if (!currentlevel)
+        return;
+
+    UIListBtnTypeItem *lbt = currentlevel->GetItemCurrent();
+
+    if (!lbt)
+        return;
+
+    currentpos = (UIListGenericTree *)(lbt->getData());
+    emit itemEntered(this, currentpos);
+}
+
+void UIListTreeType::Redraw(void)
+{
+    if (currentlevel->GetCount() == 0)
+        MoveLeft();
+    else
+        emit requestUpdate();
+}
+
+void UIListTreeType::RedrawCurrent(void)
+{
+    QRect dr = currentlevel->GetArea();
+    dr.moveBy(currentlevel->GetDrawOffset(), 0);
+    dr.moveBy(m_parent->GetAreaRect().x(), m_parent->GetAreaRect().y());
+
+    emit requestRegionUpdate(dr);
+}
+
+void UIListTreeType::MoveDown(MovementUnit unit)
+{
+    currentlevel->MoveDown((UIListBtnType::MovementUnit)unit);
+    SetCurrentPosition();
+    RedrawCurrent();
+}
+
+void UIListTreeType::MoveUp(MovementUnit unit)
+{
+    currentlevel->MoveUp((UIListBtnType::MovementUnit)unit);
+    SetCurrentPosition();
+    RedrawCurrent();
+}
+
+void UIListTreeType::MoveLeft(void)
+{
+    if (curlevel > 0)
+    {
+        ClearLevel(currentlevel);
+        currentlevel->SetVisible(false);
+
+        curlevel--;
+
+        currentlevel = GetLevel(curlevel);
+        currentlevel->SetActive(true);
+        SetCurrentPosition();
+
+        Redraw();
+    }
+}
+
+void UIListTreeType::MoveRight(void)
+{
+    if (currentpos->childCount() > 0)
+    {
+        currentlevel->SetActive(false);
+
+        curlevel++;
+
+        CreateLevel(curlevel);
+
+        currentlevel = GetLevel(curlevel);
+
+        FillLevelFromTree(currentpos, currentlevel);
+
+        currentlevel->SetVisible(true);
+        currentlevel->SetActive(true);
+        SetCurrentPosition();
+
+        Redraw();
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
 
 UIListBtnType::UIListBtnType(const QString& name, const QRect& area,
                              int order, bool showArrow, bool showScrollArrows)
-    : UIType(name)
+             : UIType(name)
 {
     m_order            = order;
     m_rect             = area;
@@ -37,12 +514,18 @@ UIListBtnType::UIListBtnType(const QString& name, const QRect& area,
     m_showScrollArrows = showScrollArrows;
 
     m_active           = false;
+    m_visible          = true;
     m_showUpArrow      = false;
     m_showDnArrow      = false;
 
     m_itemList.setAutoDelete(false);
     m_topItem = 0;
     m_selItem = 0;
+    m_selIterator = new QPtrListIterator<UIListBtnTypeItem>(m_itemList);
+    m_topIterator = new QPtrListIterator<UIListBtnTypeItem>(m_itemList);
+    m_selPosition = 0;
+    m_topPosition = 0;
+    m_itemCount = 0;
 
     m_initialized     = false;
     m_clearing        = false;
@@ -53,6 +536,8 @@ UIListBtnType::UIListBtnType(const QString& name, const QRect& area,
     m_fontActive      = 0;
     m_fontInactive    = 0;
 
+    m_xdrawoffset     = 0;
+
     SetItemRegColor(Qt::black,QColor(80,80,80),100);
     SetItemSelColor(QColor(82,202,56),QColor(52,152,56),255);
 }
@@ -60,6 +545,8 @@ UIListBtnType::UIListBtnType(const QString& name, const QRect& area,
 UIListBtnType::~UIListBtnType()
 {    
     Reset();
+    delete m_topIterator;
+    delete m_selIterator;
 }
 
 void UIListBtnType::SetItemRegColor(const QColor& beg, 
@@ -119,6 +606,12 @@ void UIListBtnType::Reset()
     
     m_topItem     = 0;
     m_selItem     = 0;
+    m_selPosition = 0;
+    m_topPosition = 0;
+    m_itemCount   = 0;
+    m_selIterator->toFirst(); 
+    m_topIterator->toFirst();
+
     m_showUpArrow = false;
     m_showDnArrow = false;
 }
@@ -128,7 +621,9 @@ void UIListBtnType::InsertItem(UIListBtnTypeItem *item)
     UIListBtnTypeItem* lastItem = m_itemList.last();
     m_itemList.append(item);
 
-    if (m_showScrollArrows && m_itemList.count() > m_itemsVisible)
+    m_itemCount++;
+
+    if (m_showScrollArrows && m_itemCount > (int)m_itemsVisible)
         m_showDnArrow = true;
     else
         m_showDnArrow = false;
@@ -137,6 +632,9 @@ void UIListBtnType::InsertItem(UIListBtnTypeItem *item)
     {
         m_topItem = item;
         m_selItem = item;
+        m_selIterator->toFirst();
+        m_topIterator->toFirst();
+        m_selPosition = m_topPosition = 0;
         emit itemSelected(item);
     }
 }
@@ -146,35 +644,100 @@ void UIListBtnType::RemoveItem(UIListBtnTypeItem *item)
     if (m_clearing)
         return;
     
-    if (m_itemList.find(item) == -1)
+    if (m_itemList.findRef(item) == -1)
         return;
 
-    m_topItem = m_itemList.first();
-    m_selItem = m_itemList.first();
+    if (item == m_topItem)
+    {
+        if (m_topItem != m_itemList.last())
+        {
+            ++(*m_topIterator);
+            ++m_topPosition;
+            m_topItem = m_topIterator->current();
+        }
+        else if (m_topItem != m_itemList.first())
+        {
+            --(*m_topIterator);
+            --m_topPosition;
+            m_topItem = m_topIterator->current();
+        }
+        else
+        {
+            m_topItem = NULL;
+            m_topPosition = 0;
+            m_topIterator->toFirst();
+        }
+    }
+
+    if (item == m_selItem)
+    {
+        if (m_selItem != m_itemList.last())
+        {
+            ++(*m_selIterator);
+            ++m_selPosition;
+            m_selItem = m_selIterator->current();
+        }
+        else if (m_selItem != m_itemList.first())
+        {
+            --(*m_selIterator);
+            --m_selPosition;
+            m_selItem = m_selIterator->current();
+        }
+        else
+        {
+            m_selItem = NULL;
+            m_selPosition = 0;
+            m_selIterator->toFirst();
+        }
+    }
 
     m_itemList.remove(item);
+    m_itemCount--;
 
-    m_showUpArrow = false;
-    
-    if (m_showScrollArrows && m_itemList.count() > m_itemsVisible)
+    if (m_topItem != m_itemList.first())
+        m_showUpArrow = true;
+    else
+        m_showUpArrow = false;
+
+    if (m_topPosition + (int)m_itemsVisible < m_itemCount)
         m_showDnArrow = true;
     else
         m_showDnArrow = false;
 
-    if (m_selItem) {
+    if (m_selItem) 
         emit itemSelected(m_selItem);
-    }
 }
 
 void UIListBtnType::SetItemCurrent(UIListBtnTypeItem* item)
 {
-    if (m_itemList.find(item) == -1)
-        return;
+    m_selIterator->toFirst();
+    UIListBtnTypeItem *cur;
+    bool found = false;
+    m_selPosition = 0;
+    while ((cur = m_selIterator->current()) != 0)
+    {
+        if (cur == item)
+        {
+            found = true;
+            break;
+        }
 
+        ++(*m_selIterator);
+        ++m_selPosition;
+    }
+
+    if (!found)
+    {
+        m_selIterator->toFirst();
+        m_selPosition = 0;
+    }
+
+    m_itemCount = m_selPosition;
     m_topItem = item;
     m_selItem = item;
+    (*m_topIterator) = (*m_selIterator);
 
-    if (m_showScrollArrows && m_itemList.count() > m_itemsVisible)
+    if (m_showScrollArrows && m_itemCount > (int)m_itemsVisible)
         m_showDnArrow = true;
     else
         m_showDnArrow = false;
@@ -203,7 +766,7 @@ UIListBtnTypeItem* UIListBtnType::GetItemFirst()
 
 UIListBtnTypeItem* UIListBtnType::GetItemNext(UIListBtnTypeItem *item)
 {
-    if (m_itemList.find(item) == -1)
+    if (m_itemList.findRef(item) == -1)
         return 0;
 
     return m_itemList.next();
@@ -211,7 +774,12 @@ UIListBtnTypeItem* UIListBtnType::GetItemNext(UIListBtnTypeItem *item)
 
 int UIListBtnType::GetCount()
 {
-    return m_itemList.count();
+    return m_itemCount;
+}
+
+QPtrListIterator<UIListBtnTypeItem> UIListBtnType::GetIterator(void)
+{
+    return QPtrListIterator<UIListBtnTypeItem>(m_itemList);
 }
 
 UIListBtnTypeItem* UIListBtnType::GetItemAt(int pos)
@@ -221,46 +789,59 @@ UIListBtnTypeItem* UIListBtnType::GetItemAt(int pos)
 
 int UIListBtnType::GetItemPos(UIListBtnTypeItem* item)
 {
-    return m_itemList.find(item);    
+    return m_itemList.findRef(item);    
 }
 
 void UIListBtnType::MoveUp(MovementUnit unit)
 {
-    int pos = m_itemList.find(m_selItem);
+    int pos = m_selPosition;
     if (pos == -1)
         return;
 
-    UIListBtnTypeItem *item = NULL;
     switch (unit)
     {
-    case MoveItem:
-        item = m_itemList.prev();
-        break;
-    case MovePage:
-        if (pos > (int)m_itemsVisible)
-        {
-            item = m_itemList.at(pos - m_itemsVisible);
+        case MoveItem:
+            if (!m_selIterator->atFirst())
+            {
+                --(*m_selIterator);
+                --m_selPosition;
+            }
             break;
-        }
-        // fall through
-    case MoveMax:
-        item = m_itemList.first();
-        break;
+        case MovePage:
+            if (pos > (int)m_itemsVisible)
+            {
+                for (int i = 0; i < (int)m_itemsVisible; i++)
+                {
+                    --(*m_selIterator);
+                    --m_selPosition;
+                }
+                break;
+            }
+            // fall through
+        case MoveMax:
+            m_selIterator->toFirst();
+            m_selPosition = 0;
+            break;
     }
-    if (!item) 
+
+    if (!m_selIterator->current())
         return;
 
-    m_selItem = item;
+    m_selItem = m_selIterator->current();
 
-    if (m_itemList.find(m_selItem) < m_itemList.find(m_topItem))
+    if (m_selPosition <= m_topPosition)
+    {
         m_topItem = m_selItem;
+        (*m_topIterator) = (*m_selIterator);
+        m_topPosition = m_selPosition;
+    }
 
     if (m_topItem != m_itemList.first())
         m_showUpArrow = true;
     else
         m_showUpArrow = false;
 
-    if (m_itemList.find(m_topItem) + m_itemsVisible < m_itemList.count())
+    if (m_topPosition + (int)m_itemsVisible < m_itemCount)
         m_showDnArrow = true;
     else
         m_showDnArrow = false;
@@ -270,45 +851,55 @@ void UIListBtnType::MoveUp(MovementUnit unit)
 
 void UIListBtnType::MoveDown(MovementUnit unit)
 {
-    int pos = m_itemList.find(m_selItem);
+    int pos = m_selPosition;
     if (pos == -1)
         return;
 
-    UIListBtnTypeItem *item = NULL;
     switch (unit)
     {
-    case MoveItem:
-        item = m_itemList.next();
-        break;
-    case MovePage:
-        if ((pos + m_itemsVisible) < m_itemList.count()-1)
-        {
-            item = m_itemList.at(pos + m_itemsVisible);
+        case MoveItem:
+            if (!m_selIterator->atLast())
+            {
+                ++(*m_selIterator);
+                ++m_selPosition;
+            }
             break;
-        }
-        // fall through
-    case MoveMax:
-        item = m_itemList.last();
-        break;
+        case MovePage:
+            if ((pos + (int)m_itemsVisible) < m_itemCount - 1)
+            {
+                for (int i = 0; i < (int)m_itemsVisible; i++)
+                {
+                    ++(*m_selIterator);
+                    ++m_selPosition;
+                }
+                break;
+            }
+            // fall through
+        case MoveMax:
+            m_selIterator->toLast();
+            m_selPosition = m_itemCount - 1;
+            break;
     }
 
-    if (!item) 
+    if (!m_selIterator->current()) 
         return;
 
-    m_selItem = item;
+    m_selItem = m_selIterator->current();
 
-    if (m_itemList.find(m_topItem) + m_itemsVisible <=
-        (unsigned int)m_itemList.find(m_selItem)) 
+    while (m_topPosition + (int)m_itemsVisible < m_selPosition + 1) 
     {
-        m_topItem = m_itemList.at(m_itemList.find(m_selItem) - m_itemsVisible + 1);
+        ++(*m_topIterator);
+        ++m_topPosition;
     }
-    
+   
+    m_topItem = m_topIterator->current();
+
     if (m_topItem != m_itemList.first())
         m_showUpArrow = true;
     else
         m_showUpArrow = false;
 
-    if (m_itemList.find(m_topItem) + m_itemsVisible < m_itemList.count())
+    if (m_topPosition + (int)m_itemsVisible < m_itemCount)
         m_showDnArrow = true;
     else
         m_showDnArrow = false;
@@ -316,8 +907,64 @@ void UIListBtnType::MoveDown(MovementUnit unit)
     emit itemSelected(m_selItem);
 }
 
+bool UIListBtnType::MoveItemUpDown(UIListBtnTypeItem *item, bool flag)
+{
+    if (item != m_selItem)
+    {
+        cerr << "Can't move non-selected item\n";
+        return false;
+    }
+
+    if (item == m_itemList.getFirst() && flag)
+        return false;
+    if (item == m_itemList.getLast() && !flag)
+        return false;
+
+    int oldpos = m_selPosition;
+    int insertat = 0;
+    bool dolast = false;
+
+    if (flag)
+    {
+        insertat = m_selPosition - 1;
+        if (item == m_itemList.getLast())
+            dolast = true;
+        else
+            ++m_selPosition;
+
+        if (item == m_topItem)
+            ++m_topPosition;
+    }
+    else
+        insertat = m_selPosition + 1;
+
+    if (m_itemList.current() == item)
+    {
+        m_itemList.take();
+        cout << "speedy\n";
+    }
+    else
+        m_itemList.take(oldpos);
+
+    m_itemList.insert(insertat, item);
+
+    if (flag)
+    {
+        MoveUp();
+        if (!dolast)
+            MoveUp();
+    }
+    else
+        MoveDown();
+
+    return true;
+}
+
 void UIListBtnType::Draw(QPainter *p, int order, int)
 {
+    if (!m_visible)
+        return;
+
     if (!m_initialized)
         Init();
 
@@ -329,35 +976,51 @@ void UIListBtnType::Draw(QPainter *p, int order, int)
     p->setFont(font->face);
     p->setPen(font->color);
 
+    int x = m_rect.x() + m_xdrawoffset;
+
     int y = m_rect.y();
-    m_itemList.find(m_topItem);
-    UIListBtnTypeItem *it = m_itemList.current();
-    while (it && (y - m_rect.y()) <= (m_contentsRect.height() - m_itemHeight)) 
+    QPtrListIterator<UIListBtnTypeItem> it = (*m_topIterator);
+    while (it.current() && 
+           (y - m_rect.y()) <= (m_contentsRect.height() - m_itemHeight)) 
     {
-        it->paint(p, font, m_rect.x(), y);
+        if (it.current()->getOverrideInactive())
+        {
+            font = m_fontInactive;
+            p->setFont(font->face);
+            p->setPen(font->color);
+        }
+
+        it.current()->paint(p, font, x, y);
+
+        if (it.current()->getOverrideInactive())
+        {
+            font = m_active ? m_fontActive : m_fontInactive;;
+            p->setFont(font->face);
+            p->setPen(font->color);
+        }
 
         y += m_itemHeight + m_itemSpacing;
 
-        it = m_itemList.next();
+        ++it;
     }
 
     if (m_showScrollArrows) 
     {
         if (m_showUpArrow)
-            p->drawPixmap(m_rect.x() + m_arrowsRect.x(),
+            p->drawPixmap(x + m_arrowsRect.x(),
                           m_rect.y() + m_arrowsRect.y(),
                           m_upArrowActPix);
         else
-            p->drawPixmap(m_rect.x() + m_arrowsRect.x(),
+            p->drawPixmap(x + m_arrowsRect.x(),
                           m_rect.y() + m_arrowsRect.y(),
                           m_upArrowRegPix);
         if (m_showDnArrow)
-            p->drawPixmap(m_rect.x() + m_arrowsRect.x() +
+            p->drawPixmap(x + m_arrowsRect.x() +
                           m_upArrowRegPix.width() + m_itemMargin,
                           m_rect.y() + m_arrowsRect.y(),
                           m_dnArrowActPix);
         else
-            p->drawPixmap(m_rect.x() + m_arrowsRect.x() +
+            p->drawPixmap(x + m_arrowsRect.x() +
                           m_upArrowRegPix.width() + m_itemMargin,
                           m_rect.y() + m_arrowsRect.y(),
                           m_dnArrowRegPix);
@@ -401,10 +1064,7 @@ void UIListBtnType::Init()
     LoadPixmap(m_checkHalfPix, "check-half");
     LoadPixmap(m_checkFullPix, "check-full");
     
-    if (m_showArrow) 
-    {
-        LoadPixmap(m_arrowPix, "arrow");
-    }
+    LoadPixmap(m_arrowPix, "arrow");
 
     QImage img(m_rect.width(), m_itemHeight, 32);
     img.setAlphaBuffer(true);
@@ -525,9 +1185,11 @@ void UIListBtnType::LoadPixmap(QPixmap& pix, const QString& fileName)
     }
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
 UIListBtnTypeItem::UIListBtnTypeItem(UIListBtnType* lbtype, const QString& text,
                                      QPixmap *pixmap, bool checkable,
-                                     UIListBtnTypeItem::CheckState state )
+                                     CheckState state, bool showArrow)
 {
     if (!lbtype) {
         std::cerr << "UIListBtnTypeItem: trying to creating item without parent"
@@ -540,15 +1202,29 @@ UIListBtnTypeItem::UIListBtnTypeItem(UIListBtnType* lbtype, const QString& text,
     m_pixmap    = pixmap;
     m_checkable = checkable;
     m_state     = state;
+    m_showArrow = showArrow;
     m_data      = 0;
+    m_overrideInactive = false;
 
+    if (state >= NotChecked)
+        m_checkable = true;
+
+    CalcDimensions();
+
+    m_parent->InsertItem(this);
+}
+
+void UIListBtnTypeItem::CalcDimensions(void)
+{
     if (!m_parent->m_initialized)
         m_parent->Init();
 
     int  margin    = m_parent->m_itemMargin;
     int  width     = m_parent->m_rect.width();
     int  height    = m_parent->m_itemHeight;
-    bool showArrow = m_parent->m_showArrow;
+    bool arrow = false;
+    if (m_parent->m_showArrow || m_showArrow)
+        arrow = true;
 
     QPixmap& checkPix = m_parent->m_checkNonePix;
     QPixmap& arrowPix = m_parent->m_arrowPix;
@@ -559,13 +1235,13 @@ UIListBtnTypeItem::UIListBtnTypeItem(UIListBtnType* lbtype, const QString& text,
     int ah = arrowPix.height();
     int pw = m_pixmap ? m_pixmap->width() : 0;
     int ph = m_pixmap ? m_pixmap->height() : 0;
-    
+   
     if (m_checkable) 
         m_checkRect = QRect(margin, (height - ch)/2, cw, ch);
     else
         m_checkRect = QRect(0,0,0,0);
 
-    if (showArrow) 
+    if (arrow) 
         m_arrowRect = QRect(width - aw - margin, (height - ah)/2,
                             aw, ah);
     else
@@ -584,11 +1260,9 @@ UIListBtnTypeItem::UIListBtnTypeItem(UIListBtnType* lbtype, const QString& text,
                        0,
                        width - 2*margin -
                        (m_checkable ? m_checkRect.width() + margin : 0) -
-                       (showArrow ? m_arrowRect.width() + margin : 0) -
+                       (arrow ? m_arrowRect.width() + margin : 0) -
                        (m_pixmap ? m_pixmapRect.width() + margin : 0),
                        height);
-
-    m_parent->InsertItem(this);
 }
 
 UIListBtnTypeItem::~UIListBtnTypeItem()
@@ -602,9 +1276,21 @@ QString UIListBtnTypeItem::text() const
     return m_text;
 }
 
+void UIListBtnTypeItem::setText(const QString &text)
+{
+    m_text = text;
+    CalcDimensions();
+}
+
 const QPixmap* UIListBtnTypeItem::pixmap() const
 {
     return m_pixmap;
+}
+
+void UIListBtnTypeItem::setPixmap(QPixmap *pixmap)
+{
+    m_pixmap = pixmap;
+    CalcDimensions();
 }
 
 bool UIListBtnTypeItem::checkable() const
@@ -629,26 +1315,53 @@ void UIListBtnTypeItem::setChecked(UIListBtnTypeItem::CheckState state)
     m_state = state;
 }
 
+void UIListBtnTypeItem::setCheckable(bool flag)
+{
+    m_checkable = flag;
+    CalcDimensions();
+}
+
+void UIListBtnTypeItem::setDrawArrow(bool flag)
+{
+    m_showArrow = flag;
+    CalcDimensions();
+}
+
 void UIListBtnTypeItem::setData(void *data)
 {
     m_data = data;    
 }
 
-void* UIListBtnTypeItem::getData()
+void *UIListBtnTypeItem::getData()
 {
     return m_data;
+}
+
+void UIListBtnTypeItem::setOverrideInactive(bool flag)
+{
+    m_overrideInactive = flag;
+}
+
+bool UIListBtnTypeItem::getOverrideInactive(void)
+{
+    return m_overrideInactive;
+}
+
+bool UIListBtnTypeItem::moveUpDown(bool flag)
+{
+    return m_parent->MoveItemUpDown(this, flag);
 }
 
 void UIListBtnTypeItem::paint(QPainter *p, fontProp *font, int x, int y)
 {
     if (this == m_parent->m_selItem)
     {
-        if (m_parent->m_active)
+        if (m_parent->m_active && !m_overrideInactive)
             p->drawPixmap(x, y, m_parent->m_itemSelActPix);
         else
             p->drawPixmap(x, y, m_parent->m_itemSelInactPix);
 
-        if (m_parent->m_showArrow)
+        if (m_parent->m_showArrow || m_showArrow)
         {
             QRect ar(m_arrowRect);
             ar.moveBy(x,y);
@@ -657,7 +1370,7 @@ void UIListBtnTypeItem::paint(QPainter *p, fontProp *font, int x, int y)
     }
     else
     {
-        if (m_parent->m_active)
+        if (m_parent->m_active && !m_overrideInactive)
             p->drawPixmap(x, y, m_parent->m_itemRegPix);
         else
             p->drawPixmap(x, y, m_parent->m_itemRegPix);

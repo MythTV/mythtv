@@ -43,6 +43,7 @@ class XMLParse
     void parseSelector(LayerSet *, QDomElement &);
     void parseBlackHole(LayerSet *, QDomElement &);
     void parseListBtnArea(LayerSet *, QDomElement &); 
+    void parseListTreeArea(LayerSet *, QDomElement &);
     void parseKeyboard(LayerSet *, QDomElement &);
     void parseKey(LayerSet *, QDomElement &);
  

@@ -39,6 +39,7 @@ class LayerSet
    ~LayerSet();
  
     void    Draw(QPainter *, int, int);
+    void    DrawRegion(QPainter *, QRect &, int, int);
 
     QString GetName() { return m_name; }
     void    SetName(const QString &name) { m_name = name; }
@@ -101,6 +102,7 @@ class UIType : public QObject
     bool    canTakeFocus(){ return takes_focus;}
     int     getOrder(){return m_order;}
     virtual void Draw(QPainter *, int, int);
+    virtual void DrawRegion(QPainter *, QRect &, int, int);
     virtual void calculateScreenArea();
     QRect   getScreenArea(){return screen_area;}
     QString cutDown(const QString &data, QFont *font, bool multiline = false, 
@@ -123,6 +125,7 @@ class UIType : public QObject
 
     void requestUpdate();
     void requestUpdate(const QRect &);
+    void requestRegionUpdate(const QRect &);
     void takingFocus();
     void loosingFocus();
 

@@ -30,6 +30,8 @@ class UISelectorType;
 class UIBlackHoleType;
 class UIImageType;
 class UIStatusBarType;
+class UIListBtnType;
+class UIListTreeType;
 class LayerSet;
 class GenericTree;
 class MythMediaDevice;
@@ -245,7 +247,9 @@ class MythThemedDialog : public MythDialog
     UISelectorType *getUISelectorType(const QString &name);
     UIBlackHoleType *getUIBlackHoleType(const QString &name);
     UIImageType *getUIImageType(const QString &name);
-    UIStatusBarType*        getUIStatusBarType(const QString &name);
+    UIStatusBarType *getUIStatusBarType(const QString &name);
+    UIListBtnType *getUIListBtnType(const QString &name);
+    UIListTreeType *getUIListTreeType(const QString &name);
 
     void setContext(int a_context) { context = a_context; }
     int  getContext(){return context;}
@@ -255,7 +259,8 @@ class MythThemedDialog : public MythDialog
     virtual void updateBackground();
     virtual void initForeground();
     virtual void updateForeground();
-    virtual void updateForeground(const QRect &);
+    virtual void updateForeground(const QRect &); // draws anything that intersects
+    virtual void updateForegroundRegion(const QRect &); // only draws the region
     virtual bool assignFirstFocus();
     virtual bool nextPrevWidgetFocus(bool up_or_down);
     virtual void activateCurrent();
@@ -263,12 +268,9 @@ class MythThemedDialog : public MythDialog
   protected:
 
     void paintEvent(QPaintEvent* e);
-    UIType              *widget_with_current_focus;
+    UIType *widget_with_current_focus;
 
-    //
-    //  These need to be just "protected"
-    //  so that subclasses can mess with them
-    //
+    // These need to be just "protected" so that subclasses can mess with them
 
     QPixmap my_background;
     QPixmap my_foreground;
