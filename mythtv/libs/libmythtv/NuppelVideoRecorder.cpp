@@ -452,11 +452,12 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     }
 
     mpa_ctx = avcodec_alloc_context();
-  
+ 
     switch (picture_format)
     {
         case PIX_FMT_YUV420P:
         case PIX_FMT_YUV422P:
+        case PIX_FMT_YUVJ420P:
             mpa_ctx->pix_fmt = picture_format; 
             mpa_picture.linesize[0] = w_out;
             mpa_picture.linesize[1] = w_out / 2;
@@ -507,7 +508,7 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     mpa_ctx->dct_algo = FF_DCT_AUTO;
     mpa_ctx->idct_algo = FF_IDCT_AUTO;
     mpa_ctx->prediction_method = FF_PRED_LEFT;
-    if (codec.lower() == "huffyuv")
+    if (codec.lower() == "huffyuv" || codec.lower() == "mjpeg")
         mpa_ctx->strict_std_compliance = -1;
 
     pthread_mutex_lock(&avcodeclock); 
@@ -922,7 +923,7 @@ void NuppelVideoRecorder::StartRecording(void)
     positionMap.clear();
     positionMapDelta.clear();
 
-    if (codec.lower() == "rtjpeg" || codec.lower() == "mjpeg")
+    if (codec.lower() == "rtjpeg")
         useavcodec = false;
     else
         useavcodec = true;
