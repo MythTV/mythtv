@@ -1142,6 +1142,7 @@ MythPopupBox::MythPopupBox(QWidget *parent)
     setFrameShadow(QFrame::Raised);
     setPalette(parent->palette());
     setFont(parent->font());
+    setCursor(QCursor(Qt::BlankCursor));
 
     vbox = new QVBoxLayout(this, (int)(10 * hmult));
 }
