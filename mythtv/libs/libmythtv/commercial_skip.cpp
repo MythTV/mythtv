@@ -1483,15 +1483,19 @@ void CommDetect::BuildAllMethodsCommList(void)
             {
                 if ((fbp->end - breakStart) > (MIN_COMM_BREAK_LENGTH * fps))
                 {
-                    commBreakMap[breakStart] = MARK_COMM_START;
-                    commBreakMap[fbp->end] = MARK_COMM_END;
-                    lastStart = breakStart;
-                    lastEnd = fbp->end;
-
-                    if (verboseDebugging)
-                        VERBOSE(VB_COMMFLAG,
-                                QString("Closing final commercial block at "
+                    if (fbp->end <= (framesProcessed - (int)(2 * fps) - 2))
+                    {
+                        if (verboseDebugging)
+                            VERBOSE(VB_COMMFLAG,
+                                    QString("Closing final commercial block at "
                                         "frame %1").arg(fbp->end));
+
+                        commBreakMap[breakStart] = MARK_COMM_START;
+                        commBreakMap[fbp->end] = MARK_COMM_END;
+                        lastStart = breakStart;
+                        lastEnd = fbp->end;
+                        breakStart = -1;
+                    }
                 }
                 else
                 {
@@ -1505,8 +1509,8 @@ void CommDetect::BuildAllMethodsCommList(void)
                                         .arg(fbp->start - breakStart)
                                         .arg(fbp->frames)
                                         .arg(MIN_COMM_BREAK_LENGTH));
+                    breakStart = -1;
                 }
-                breakStart = -1;
             }
         }
         else if ((thisScore > 0) && (lastScore < 0) && (breakStart != -1))
@@ -1551,7 +1555,8 @@ void CommDetect::BuildAllMethodsCommList(void)
         curBlock++;
     }
 
-    if (breakStart != -1)
+    if ((breakStart != -1) &&
+        (breakStart <= (framesProcessed - (int)(2 * fps) - 2)))
     {
         if (verboseDebugging)
             VERBOSE(VB_COMMFLAG,
@@ -1562,7 +1567,7 @@ void CommDetect::BuildAllMethodsCommList(void)
                             .arg((long)(framesProcessed - breakStart - 1)));
 
         commBreakMap[breakStart] = MARK_COMM_START;
-        commBreakMap[framesProcessed - 1] = MARK_COMM_END;
+        commBreakMap[framesProcessed - (int)(2 * fps) - 2] = MARK_COMM_END;
     }
 
     delete [] fblock;
