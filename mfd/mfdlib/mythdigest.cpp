@@ -95,9 +95,9 @@ QString MythDigest::calculate()
         //  Get string representatin of file size
         //
          
-        QString file_size_string = QString("%1").arg(file_size);
+        //QString file_size_string = QString("%1").arg(file_size);
 
-        cout << "file_size_string is " << file_size_string.ascii() << endl;
+        //cout << "file_size_string is " << file_size_string.ascii() << endl;
 
         //
         //  Calculate the digest (md5, from openssl)
@@ -113,7 +113,7 @@ QString MythDigest::calculate()
         EVP_MD_CTX_init(&mdctx);
         EVP_DigestInit_ex(&mdctx, md, NULL);
         EVP_DigestUpdate(&mdctx, first_four_kbytes, 4096);
-        EVP_DigestUpdate(&mdctx, file_size_string.ascii(), strlen(file_size_string.ascii()));
+        //EVP_DigestUpdate(&mdctx, file_size_string.ascii(), strlen(file_size_string.ascii()));
         EVP_DigestUpdate(&mdctx, last_four_kbytes, 4096);
         EVP_DigestFinal_ex(&mdctx, md_value, &md_len);
         EVP_MD_CTX_cleanup(&mdctx);
