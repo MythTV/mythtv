@@ -268,6 +268,8 @@ void NuppelVideoPlayer::Pause(bool waitvideo)
     frame_interval = (int)(1000000.0 / video_frame_rate / 1.0);
     if (osd && forceVideoOutput != kVideoOutput_IVTV)
         osd->SetFrameInterval(frame_interval);
+    if (videosync != NULL)
+        videosync->SetFrameInterval(frame_interval, m_deinterlace);
 }
 
 bool NuppelVideoPlayer::Play(float speed, bool normal, bool unpauseaudio)
@@ -280,6 +282,8 @@ bool NuppelVideoPlayer::Play(float speed, bool normal, bool unpauseaudio)
     frame_interval = (int)(1000000.0 / video_frame_rate / speed);
     if (osd && forceVideoOutput != kVideoOutput_IVTV)
         osd->SetFrameInterval(frame_interval);
+    if (videosync != NULL)
+        videosync->SetFrameInterval(frame_interval, m_deinterlace);
 
     if (!paused)
     {
