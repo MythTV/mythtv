@@ -232,9 +232,7 @@ int main(int argc, char **argv)
     }
 
     QSqlDatabase *trandb = QSqlDatabase::database("TRANSDB");
-    Transcoder *trans = new Transcoder(&tvList, trandb);
-
-// cout << "verbose is: " << print_verbose_messages << endl;
+//    Transcoder *trans = new Transcoder(&tvList, trandb);
 
     new MainServer(ismaster, port, statusport, &tvList);
 
@@ -245,7 +243,7 @@ int main(int argc, char **argv)
     if (sched)
         delete sched;
 
-    delete trans;
+//    delete trans;
 
     if (pidfile != "")
         unlink(pidfile.ascii());
