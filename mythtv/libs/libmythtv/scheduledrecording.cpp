@@ -33,6 +33,7 @@ class SRRecordingType: public ComboBoxSetting, public SRSetting {
 public:
     SRRecordingType(const ScheduledRecording& parent):
         SRSetting(parent, "type") {
+        setLabel("When");
         addSelection("Do not record this program",
                      QString::number(ScheduledRecording::NotRecording));
         addSelection("Record only this showing of the program",
@@ -50,6 +51,7 @@ class SRProfileSelector: public ComboBoxSetting, public SRSetting {
 public:
     SRProfileSelector(const ScheduledRecording& parent):
         SRSetting(parent, "profile") {
+        setLabel("Profile");
     };
 
     virtual void load(QSqlDatabase* db) {
@@ -59,7 +61,7 @@ public:
 
     virtual void fillSelections(QSqlDatabase* db) {
         clearSelections();
-        addSelection("Default", "0");
+        addSelection("(unspecified)", "0");
         RecordingProfile::fillSelections(db, this);
     };
 };
@@ -431,14 +433,14 @@ MythDialog* ScheduledRecording::dialogWidget(MythContext* context, QWidget* pare
     f->setLineWidth((int)(4 * hmult));
     vbox->addWidget(f);    
 
-    vbox->addWidget(profile->configWidget(this, dialog));
     vbox->addWidget(type->configWidget(this, dialog));
+    vbox->addWidget(profile->configWidget(this, dialog));
 
     return dialog;
 }
 
 void ScheduledRecording::fillSelections(QSqlDatabase* db, SelectSetting* setting) {
-    QSqlQuery result = db->exec("SELECT recordid FROM recordingprofiles");
+    QSqlQuery result = db->exec("SELECT recordid FROM record");
     if (result.isActive() && result.numRowsAffected() > 0)
         while (result.next()) {
             int id = result.value(0).toInt();
