@@ -1129,7 +1129,8 @@ void MythListBox::keyPressEvent(QKeyEvent* e) {
 }
 
 MythPopupBox::MythPopupBox(QWidget *parent)
-            : QFrame(parent, 0, WType_Popup)
+            : QFrame(parent, 0, WType_TopLevel | WStyle_Customize | 
+                                WStyle_NoBorder | WShowModal)
 {
     int w, h;
     float wmult, hmult;
