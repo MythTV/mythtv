@@ -1312,6 +1312,7 @@ void Scheduler::UpdateManuals(int recordid)
     int progcount;
     int skipdays;
     bool weekday;
+    int weeksoff;
 
     switch (rectype)
     {
@@ -1335,8 +1336,8 @@ void Scheduler::UpdateManuals(int recordid)
         progcount = 2;
         skipdays = 7;
         weekday = false;
-        startdt.addDays(((startdt.date().daysTo(QDate::currentDate())
-                          + 6) % 7) * 7);
+        weeksoff = (startdt.date().daysTo(QDate::currentDate()) + 6) / 7;
+        startdt = startdt.addDays(weeksoff * 7);
         break;
     default:
         VERBOSE(VB_IMPORTANT, QString("Invalid rectype for manual "
