@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-03-21, v0.14.07
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-04-15, v0.14.08
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -47,8 +47,9 @@ necessary.</EM>
 <LI><A NAME="toc5.1">5.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.1">Notes on compiling on a system with non-Intel processors. </A>
 <LI><A NAME="toc5.2">5.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.2">Building LAME.</A>
 <LI><A NAME="toc5.3">5.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.3">XMLTV. </A>
-<LI><A NAME="toc5.4">5.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.4">Manually building MythTV.</A>
-<LI><A NAME="toc5.5">5.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.5">Gentoo. </A>
+<LI><A NAME="toc5.4">5.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.4">Configuring the Zap2It.com Data Direct service.</A>
+<LI><A NAME="toc5.5">5.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.5">Manually building MythTV.</A>
+<LI><A NAME="toc5.6">5.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.6">Gentoo. </A>
 </UL>
 <P>
 <H2><A NAME="toc6">6.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s6">MySQL.</A></H2>
@@ -1312,7 +1313,7 @@ join the
 </FIGURE>
 </P>
 <P>Get XMLTV from 
-<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download version 0.5.30 if you're in
+<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download version 0.5.32 if you're in
 North America.</P>
 <P>
 <HR>
@@ -1424,7 +1425,15 @@ does not have <B>XMLTV</B>, so you may install the XMLTV prerequisites by typing
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>and skipping straight to the XMLTV compilation step.</P>
+<P>If you are using the Zap2It Data Direct service, you'll need to load the
+SOAP::Lite module
+<BLOCKQUOTE><CODE>
+<PRE>
+# urpmi perl-SOAP-Lite
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>and skip straight to the XMLTV compilation step.</P>
 
 <H3>Other distributions and manual installation.</H3>
 
@@ -1472,7 +1481,7 @@ $
 <A NAME="untarring_xmltv"></A> Untar the xmltv file:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf xmltv-0.5.30.tar.bz2
+$ tar -xjf xmltv-0.5.32.tar.bz2
 </PRE>
 </CODE></BLOCKQUOTE>
 
@@ -1494,7 +1503,7 @@ cpan> exit
 <P>Change to the XMLTV directory and compile it:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd xmltv-0.5.30
+$ cd xmltv-0.5.32
 $ perl Makefile.PL
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -1514,9 +1523,36 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+
+<H2><A NAME="ss5.4">5.4</A> <A HREF="#toc5.4">Configuring the Zap2It.com Data Direct service.</A>
+</H2>
+
+<P><B>NOTE</B>:  Still under development.</P>
+<P>Zap2It Data Direct is a service provided by Zap2It, a subsidiary of
+Tribune Media Services.  TMS is one of the primary providers for program
+listing data in the United States and Canada.  There are a number of
+advantages to using Data Direct rather than the standard XMLTV
+<CODE>tv_grab_na</CODE> grabber.</P>
+<P>
+<UL>
+<LI>It's much faster, because the grabber isn't downloading hundreds of
+HTML pages and trying to parse the program data out of the HTML.</LI>
+<LI>It contains more program information.</LI>
+<LI>It's easier on the Zap2It servers, since they're not generating
+hundreds of custom HTML pages when you scrape their listings.</LI>
+<LI>As of right now, it's free.</LI>
+</UL>
+</P>
+<P>If you wish to use Zap2It Data Direct, you'll need to establish a user
+account.  Go to 
+<A HREF="http://labs.zap2it.com">http://labs.zap2it.com</A> and click on the "New User? Sign Up" link. 
+Read the license terms, and if you agree with them click "Accept".  The next
+screen is the subscription registration.  In the "Certificate Code" field,
+enter <B>ZIYN-DQZO-SBUT</B>.</P>
+<P>Fill in the survey.</P>
 <P>
 <A NAME="manually_building_mythtv"></A> </P>
-<H2><A NAME="ss5.4">5.4</A> <A HREF="#toc5.4">Manually building MythTV.</A>
+<H2><A NAME="ss5.5">5.5</A> <A HREF="#toc5.5">Manually building MythTV.</A>
 </H2>
 
 <P>Unpack MythTV
@@ -1632,7 +1668,7 @@ to the real external IP address - 127.0.0.1 is the loopback address and no
 external machine can access it. Change the Master Server IP setting to the
 same IP address as well.</P>
 
-<H2><A NAME="Gentoo_build"></A> <A NAME="ss5.5">5.5</A> <A HREF="#toc5.5">Gentoo. </A>
+<H2><A NAME="Gentoo_build"></A> <A NAME="ss5.6">5.6</A> <A HREF="#toc5.6">Gentoo. </A>
 </H2>
 
 <P>Installation of MythTV on Gentoo consists of simply emerging the desired
@@ -2946,7 +2982,9 @@ depending on any number of factors, most of which you can't control.  It's
 best to just let the program run to completion.</CAPTION>
 </FIGURE>
 
-<B>mythfilldatabase --manual</B> is another option; the manual option will
+<B>mythfilldatabase --help</B> will give a full listing of the options
+available.  </P>
+<P><B>mythfilldatabase --manual</B> is another option; the manual option will
 allow you to fine tune channel frequencies and specify which channels will
 be added to the database.  If you are not using the tv_grab_na grabber, you
 must use the <B>--manual</B> option.</P>
@@ -2956,6 +2994,8 @@ created by some other program.</P>
 <P><B>mythfilldatabase --xawchannels</B> is an option if you have used
 <B>xawtv</B> to fine-tune your channels and would like to import the fine
 tuning offsets into MythTV.</P>
+<P><B>mythfilldatabase --refresh-today</B> will only pull guide data for
+today (in case of late-breaking changes to the schedule).</P>
 
 
 <H3>Setting <B>mythfilldatabase</B> to run from <B>cron</B></H3>
@@ -4367,6 +4407,7 @@ $ make
 $ su
 # make install
 # exit
+$ ./configure
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -4868,9 +4909,8 @@ type
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>The backtrace information for all the threads should be posted to the
-mythtv-dev mailing list, along with the steps you followed to get the
-program to crash.</P>
+<P>All of the output from gdb should be posted to the mythtv-dev mailing
+list, along with the steps you followed to get the program to crash.</P>
 <P>If you're trying to troubleshoot and you can't get back to the gdb window
 for some reason, it may be easier to use two systems or to start
 mythfrontend from the text console.</P>

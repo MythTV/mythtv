@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2004-03-21, v0.14.07
+  2004-04-15, v0.14.08
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -75,10 +75,10 @@
         5.3.1 Red Hat Linux 9:
         5.3.2 Mandrake
         5.3.3 Other distributions and manual installation.
-     5.4 Manually building MythTV.
-        5.4.1 Frontend-only configuration
-     5.5 Gentoo.
-
+     5.4 Configuring the Zap2It.com Data Direct service.
+     5.5 Manually building MythTV.
+        5.5.1 Frontend-only configuration
+     5.6 Gentoo.
   6. MySQL.
      6.1 Mandrake 9.0
      6.2 Red Hat Linux
@@ -1441,7 +1441,7 @@
   <http://www.mythtv.org/mailman/listinfo/mythtv-dev/> mailing lists.
 
   Get XMLTV from http://xmltv.sourceforge.net
-  <http://xmltv.sourceforge.net>.  Download version 0.5.30 if you're in
+  <http://xmltv.sourceforge.net>.  Download version 0.5.32 if you're in
   North America.
 
 
@@ -1554,7 +1554,15 @@
 
 
 
-  and skipping straight to the XMLTV compilation step.
+  If you are using the Zap2It Data Direct service, you'll need to load
+  the SOAP::Lite module
+
+
+       # urpmi perl-SOAP-Lite
+
+
+
+  and skip straight to the XMLTV compilation step.
 
 
   [1m5.3.3.  Other distributions and manual installation.[0m
@@ -1583,16 +1591,15 @@
   Open a shell prompt:
 
 
-
-  $ tar -xzf expat-1.95.5.tar.gz
-  $ cd expat-1.95.5
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # /sbin/ldconfig
-  # exit
-  $
+       $ tar -xzf expat-1.95.5.tar.gz
+       $ cd expat-1.95.5
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # /sbin/ldconfig
+       # exit
+       $
 
 
 
@@ -1601,7 +1608,7 @@
   Untar the xmltv file:
 
 
-       $ tar -xjf xmltv-0.5.30.tar.bz2
+       $ tar -xjf xmltv-0.5.32.tar.bz2
 
 
 
@@ -1623,7 +1630,7 @@
   Change to the XMLTV directory and compile it:
 
 
-       $ cd xmltv-0.5.30
+       $ cd xmltv-0.5.32
        $ perl Makefile.PL
 
 
@@ -1636,15 +1643,47 @@
   instructions to this point.
 
 
-       $ make
-       $ make test
-       $ su
-       # make install
-       # exit
+
+  $ make
+  $ make test
+  $ su
+  # make install
+  # exit
 
 
 
-  [1m5.4.  Manually building MythTV.[0m
+  [1m5.4.  Configuring the Zap2It.com Data Direct service.[0m
+
+  [1mNOTE[22m:  Still under development.
+
+  Zap2It Data Direct is a service provided by Zap2It, a subsidiary of
+  Tribune Media Services.  TMS is one of the primary providers for
+  program listing data in the United States and Canada.  There are a
+  number of advantages to using Data Direct rather than the standard
+  XMLTV tv_grab_na grabber.
+
+
+  +o  It's much faster, because the grabber isn't downloading hundreds of
+     HTML pages and trying to parse the program data out of the HTML.
+
+  +o  It contains more program information.
+
+  +o  It's easier on the Zap2It servers, since they're not generating
+     hundreds of custom HTML pages when you scrape their listings.
+
+  +o  As of right now, it's free.
+
+  If you wish to use Zap2It Data Direct, you'll need to establish a user
+  account.  Go to http://labs.zap2it.com <http://labs.zap2it.com> and
+  click on the "New User? Sign Up" link.  Read the license terms, and if
+  you agree with them click "Accept".  The next screen is the
+  subscription registration.  In the "Certificate Code" field, enter
+  [1mZIYN-DQZO-SBUT[22m.
+
+  Fill in the survey.
+
+
+  [1m5.5.  Manually building MythTV.[0m
 
   Unpack MythTV
 
@@ -1733,7 +1772,7 @@
      [1mNOTE[22m:  subsequent configuration steps assume that you are within
   the MythTV directory that you cd'd to above.
 
-  [1m5.4.1.  Frontend-only configuration[0m
+  [1m5.5.1.  Frontend-only configuration[0m
 
   Since MythTV uses a client/server architecture, multiple frontend
   computers can simultaneously access content on a Myth system.  Live
@@ -1766,7 +1805,7 @@
   Master Server IP setting to the same IP address as well.
 
 
-  [1m5.5.  Gentoo.[0m
+  [1m5.6.  Gentoo.[0m
 
   Installation of MythTV on Gentoo consists of simply emerging the
   desired ebuild because all of the packages are now part of the
@@ -1940,6 +1979,7 @@
   There are two ways to do this.  Graphically, and from the command
   line.
 
+
   [1m7.1.  Graphically setting up the mixer.[0m
 
   [1m7.1.1.  Mandrake 9.0 and Red Hat Linux[0m
@@ -2006,6 +2046,7 @@
   Download the development release (0.9.x) from the ALSA web site
   http://www.alsa-project.org <http://www.alsa-project.org>.  You need
   at least three files:
+
   +o  alsa-driver-0.9.x.tar.bz2
 
   +o  alsa-lib-0.9.x.tar.bz2
@@ -2027,7 +2068,6 @@
 
        mkdir -p include/linux
        touch include/linux/workqueue.h
-
 
 
   Continuing on:
@@ -2064,6 +2104,8 @@
        $ su
        # make install
 
+
+
   Next, you must edit /etc/modules.conf so that the ALSA modules are
   loaded automatically. The first step is to remove your old OSS
   configuration to ensure that you don't end up with mysterious
@@ -2091,7 +2133,6 @@
   options are descried in the "INSTALL" file in the alsa-driver
   directory or at http://www.alsa-project.org/alsa-doc/
   <http://www.alsa-project.org/alsa-doc/>.
-
   For now we will assume that no extra options are required.  The next
   step is to ensure that the ALSA drivers are started during boot-up.
 
@@ -2127,6 +2168,8 @@
 
        $ aplay /usr/share/sounds/info.wav
 
+
+
   If it works, you're done installing ALSA!
 
 
@@ -2148,13 +2191,13 @@
 
 
 
-       $ amixer set Master,0 100%,100% unmute
-       $ amixer set Line,0 75%,75% mute captur
-       $ amixer set Capture,0 100%,100% mute captur
-       $ su
-       # alsactl store
-       # exit
-       $
+  $ amixer set Master,0 100%,100% unmute
+  $ amixer set Line,0 75%,75% mute captur
+  $ amixer set Capture,0 100%,100% mute captur
+  $ su
+  # alsactl store
+  # exit
+  $
 
 
 
@@ -2191,6 +2234,7 @@
   file keys.txt describes the keys used to control MythTV.
 
 
+
           [1mNOTE[22m:If you are running Mandrake 9.1, you may install
   [1mlirc [22mby executing: # urpmi lirc lirc-remotes and bypass the manual
   compilation steps described below by jumping to the ``Completing the
@@ -2206,8 +2250,6 @@
   require a kernel recompile, and some don't. However, all at least
   require having the kernel source available as a resource for the lirc
   build process.
-
-
   [1m8.1.  Gentoo[0m
 
   To install lirc on Gentoo, all you need to do is:
@@ -2249,6 +2291,8 @@
        $ su
        # ln -s linux-2.4 /usr/src/linux
        # exit
+
+
 
   [1m8.4.  Obtaining and compiling lirc.[0m
 
@@ -2313,6 +2357,8 @@
 
        crw-------    1 root     root      61,   0 Dec 31  1969 lirc
 
+
+
   Some IR receivers (including some homebrew units) use a character
   device as their data interface as opposed to a link to a serial port.
   If the make install step has created a character device for you, don't
@@ -2326,8 +2372,6 @@
   create the link/character device manually.  In this example, the IR
   device is connected to ttyS0.  If it were connected to "COM2", then
   use ttyS1, etc.
-
-
        $ su
        # cd /dev
        # ln -sf ttyS0 lirc
@@ -2443,6 +2487,7 @@
       [1mNOTE to Mandrake 9.1 users[22m: skip to the manual start paragraph
   below.
 
+
   If the lirc configure program / compile did not mention anything about
   a kernel module, then you are finished. If it did mention a kernel
   module, you must edit the /etc/modules.conf file. Add this line as the
@@ -2491,8 +2536,9 @@
   If your remote ends up working well, you should consider submitting
   your lircd.conf file back to the lirc developers. Once finished:
 
-  $ su
-  # cp myremote /etc/lircd.conf
+
+       $ su
+       # cp myremote /etc/lircd.conf
 
 
 
@@ -2562,6 +2608,7 @@
   thing at this point, you need to troubleshoot further by going back to
   the lirc home page and investigating from there.
 
+
   If it is working, then press [1mCTRL-C [22mto abort the program.  Once you
   know that your remote is working, you can either recompile MythTV with
   native lirc support (edit the settings.pro file and remove the "#"
@@ -2617,19 +2664,20 @@
   my /home/[yourusername]/.lircrc file:
 
 
-       begin
-           prog = irxevent
-           button = channel+
-           repeat = 3
-           config = Key Up CurrentWindow
-       end
 
-       begin
-           prog = irxevent
-           button = channel-
-           repeat = 3
-           config = Key Down CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = channel+
+      repeat = 3
+      config = Key Up CurrentWindow
+  end
+
+  begin
+      prog = irxevent
+      button = channel-
+      repeat = 3
+      config = Key Down CurrentWindow
+  end
 
 
 
@@ -2681,19 +2729,19 @@
   kernel module you might see the following message during make:
 
 
-       lirc_sir.c:56:2: warning: #warning
-       "******************************************"
+  lirc_sir.c:56:2: warning: #warning
+  "******************************************"
 
-       lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
+  lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
 
-       lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
+  lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
 
-       lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
+  lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
 
-       lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
+  lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
 
-       lirc_sir.c:61:2: warning: #warning
-       "******************************************"
+  lirc_sir.c:61:2: warning: #warning
+  "******************************************"
 
 
 
@@ -2739,13 +2787,10 @@
   something similar to the following:
 
 
-
-  $ irw
-  0000000000007ff0 00 1 gi-motorola-dct2000
-  000000000000bff8 00 2 gi-motorola-dct2000
-  000000000000f7f0 00 ENTER gi-motorola-dct2000
-
-
+       $ irw
+       0000000000007ff0 00 1 gi-motorola-dct2000
+       000000000000bff8 00 2 gi-motorola-dct2000
+       000000000000f7f0 00 ENTER gi-motorola-dct2000
 
   Once you've verified lirc is working you can press [1mCTRL-C [22mto exit [1mirw[0m
   and configure the channel changing script.
@@ -2800,6 +2845,8 @@
        $ su -
        # apt-get install libqt3c102-mt-mysql
        # exit
+
+
 
   [1m9.1.  Configuring the Master backend system.[0m
 
@@ -2864,8 +2911,8 @@
   machine and restart MySQL.
 
 
-       skip-innodb
-       set-variable=thread_stack=256k
+  skip-innodb
+  set-variable=thread_stack=256k
 
 
 
@@ -2922,7 +2969,6 @@
 
   Once you're satisfied with the values, move the focus down to Next and
   hit the space bar.
-
 
   The next screen details the Host-specific Backend setup.  This is
   where you will set the specific directory paths for this particular
@@ -3043,18 +3089,17 @@
   As of 2003-10-03, the available options are:
 
 
-
-  $ mythbackend -h
-  Valid options are:
-  -l or --logfile filename       Writes STDERR and STDOUT messages to filename
-  -p or --pidfile filename       Write PID of mythbackend to filename
-  -d or --daemon                 Runs mythbackend as a daemon
-  -v or --verbose debug-level    Prints more information
-                                 Accepts any combination (separated by comma)
-                                 of all,none,quiet,record,playback,
-                                 channel,osd,file,schedule,network
-  --printexpire                  List of auto-expire programs
-  --printsched                   Upcoming scheduled programs
+       $ mythbackend -h
+       Valid options are:
+       -l or --logfile filename       Writes STDERR and STDOUT messages to filename
+       -p or --pidfile filename       Write PID of mythbackend to filename
+       -d or --daemon                 Runs mythbackend as a daemon
+       -v or --verbose debug-level    Prints more information
+                                      Accepts any combination (separated by comma)
+                                      of all,none,quiet,record,playback,
+                                      channel,osd,file,schedule,network
+       --printexpire                  List of auto-expire programs
+       --printsched                   Upcoming scheduled programs
 
 
 
@@ -3096,10 +3141,12 @@
          [1mNOTE[22m:  [1mmythfilldatabase [22mmight take a while to complete,
   depending on any number of factors, most of which you can't control.
   It's best to just let the program run to completion.  [1mmythfilldatabase[0m
-  [1m--manual [22mis another option; the manual option will allow you to fine
-  tune channel frequencies and specify which channels will be added to
-  the database.  If you are not using the tv_grab_na grabber, you must
-  use the [1m--manual [22moption.
+  [1m--help [22mwill give a full listing of the options available.
+
+  [1mmythfilldatabase --manual [22mis another option; the manual option will
+  allow you to fine tune channel frequencies and specify which channels
+  will be added to the database.  If you are not using the tv_grab_na
+  grabber, you must use the [1m--manual [22moption.
 
   [1mmythfilldatabase --file [22mis an option if there isn't an XMLTV grabber
   for your country, but you [1mdo [22mhave an XML formatted listings file
@@ -3108,6 +3155,9 @@
   [1mmythfilldatabase --xawchannels [22mis an option if you have used [1mxawtv [22mto
   fine-tune your channels and would like to import the fine tuning
   offsets into MythTV.
+
+  [1mmythfilldatabase --refresh-today [22mwill only pull guide data for today
+  (in case of late-breaking changes to the schedule).
 
 
 
@@ -3167,20 +3217,22 @@
   [1mmythfilldatabase [22mwill run, save and exit, and return to the shell
   prompt.
 
-       $ cp ~/mythtv/configfiles/mythfilldatabasecron ~/.mythtv
-       $ cp ~/mythtv/configfiles/mythcrontab ~/.mythtv
-       $ cd ~/.mythtv
-       $ crontab mythcrontab
-       $ crontab -l  NOTE: this is a lowercase L.
-       # The following will run the mythfilldatabase shell script at 0430
-       # every day.  Format is
-       # minutes hour day_of_month month day_of_week
-       # man 5 crontab for more information
-       # Need to use a shell script because the QTDIR environment variable isn't
-       # being honored by crontab?
-       # The next text should be all on the same line.
-       30 04 * * * /bin/bash $HOME/.mythtv/mythfilldatabasecron
-       $
+
+
+  $ cp ~/mythtv/configfiles/mythfilldatabasecron ~/.mythtv
+  $ cp ~/mythtv/configfiles/mythcrontab ~/.mythtv
+  $ cd ~/.mythtv
+  $ crontab mythcrontab
+  $ crontab -l  NOTE: this is a lowercase L.
+  # The following will run the mythfilldatabase shell script at 0430
+  # every day.  Format is
+  # minutes hour day_of_month month day_of_week
+  # man 5 crontab for more information
+  # Need to use a shell script because the QTDIR environment variable isn't
+  # being honored by crontab?
+  # The next text should be all on the same line.
+  30 04 * * * /bin/bash $HOME/.mythtv/mythfilldatabasecron
+  $
 
 
 
@@ -4572,6 +4624,7 @@
        $ su
        # make install
        # exit
+       $ ./configure
 
 
 
@@ -5115,9 +5168,8 @@
 
 
 
-  The backtrace information for all the threads should be posted to the
-  mythtv-dev mailing list, along with the steps you followed to get the
-  program to crash.
+  All of the output from gdb should be posted to the mythtv-dev mailing
+  list, along with the steps you followed to get the program to crash.
 
   If you're trying to troubleshoot and you can't get back to the gdb
   window for some reason, it may be easier to use two systems or to

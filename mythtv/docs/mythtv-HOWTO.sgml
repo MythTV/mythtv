@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2004-03-21, v0.14.07
+<date>2004-04-15, v0.14.08
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1058,7 +1058,7 @@ name="http://www.mythtv.org/mailman/listinfo/mythtv-dev/"> mailing lists.
 </figure>
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
-name="http://xmltv.sourceforge.net">.  Download version 0.5.30 if you're in
+name="http://xmltv.sourceforge.net">.  Download version 0.5.32 if you're in
 North America.
 
 <code>
@@ -1146,7 +1146,13 @@ does not have <bf>XMLTV</bf>, so you may install the XMLTV prerequisites by typi
 # urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
 </verb></tscreen>
 
-and skipping straight to the XMLTV compilation step.
+If you are using the Zap2It Data Direct service, you'll need to load the
+SOAP::Lite module
+<tscreen><verb>
+# urpmi perl-SOAP-Lite
+</verb></tscreen>
+
+and skip straight to the XMLTV compilation step.
 
 <sect2>Other distributions and manual installation.
 <p><figure loc="here">
@@ -1189,7 +1195,7 @@ Continuing on:
 
 <label id="untarring_xmltv">Untar the xmltv file:
 <tscreen><verb>
-$ tar -xjf xmltv-0.5.30.tar.bz2
+$ tar -xjf xmltv-0.5.32.tar.bz2
 </verb></tscreen>
 Install the xmltv prerequisites:
 
@@ -1206,7 +1212,7 @@ cpan> exit
 
 Change to the XMLTV directory and compile it:
 <tscreen><verb>
-$ cd xmltv-0.5.30
+$ cd xmltv-0.5.32
 $ perl Makefile.PL
 </verb></tscreen>
 You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
@@ -1222,6 +1228,32 @@ $ su
 # make install
 # exit
 </verb></tscreen>
+
+<sect1>Configuring the Zap2It.com Data Direct service.
+<p><bf>NOTE</bf>:  Still under development.
+<p>Zap2It Data Direct is a service provided by Zap2It, a subsidiary of
+Tribune Media Services.  TMS is one of the primary providers for program
+listing data in the United States and Canada.  There are a number of
+advantages to using Data Direct rather than the standard XMLTV
+<tt>tv_grab_na</tt> grabber.
+
+<itemize>
+<item>It's much faster, because the grabber isn't downloading hundreds of
+HTML pages and trying to parse the program data out of the HTML.
+<item>It contains more program information.
+<item>It's easier on the Zap2It servers, since they're not generating
+hundreds of custom HTML pages when you scrape their listings.
+<item>As of right now, it's free.
+</itemize>
+
+If you wish to use Zap2It Data Direct, you'll need to establish a user
+account.  Go to <url url="http://labs.zap2it.com"
+name="http://labs.zap2it.com"> and click on the "New User? Sign Up" link. 
+Read the license terms, and if you agree with them click "Accept".  The next
+screen is the subscription registration.  In the "Certificate Code" field,
+enter <bf>ZIYN-DQZO-SBUT</bf>.
+
+Fill in the survey.
 
 <label id="manually_building_mythtv">
 <sect1>Manually building MythTV.
@@ -2501,6 +2533,9 @@ depending on any number of factors, most of which you can't control.  It's
 best to just let the program run to completion.
 </caption>
 </figure>
+<bf>mythfilldatabase --help</bf> will give a full listing of the options
+available.  
+
 <bf>mythfilldatabase --manual</bf> is another option; the manual option will
 allow you to fine tune channel frequencies and specify which channels will
 be added to the database.  If you are not using the tv_grab_na grabber, you
@@ -2513,6 +2548,9 @@ created by some other program.
 <bf>mythfilldatabase --xawchannels</bf> is an option if you have used
 <bf>xawtv</bf> to fine-tune your channels and would like to import the fine
 tuning offsets into MythTV.
+
+<bf>mythfilldatabase --refresh-today</bf> will only pull guide data for
+today (in case of late-breaking changes to the schedule).
 
 <!-- get more information on the manual setting -->
 
@@ -3853,6 +3891,7 @@ $ make
 $ su
 # make install
 # exit
+$ ./configure
 </verb></tscreen>
 
 <sect1>Configuring MythMusic.
@@ -6138,7 +6177,10 @@ Bump XMLTV version.  David Blevins' DVD burning contribution.
 v0.14.07, 2004-03-21.  Update DVB; TwinHan card is supported by
 linuxtv.org DVB driver.  Don't know if anyone is using it in US though. 
 Change some more "stop"s to "notes".
-v0.14.08, 2004-03-25  Include all gdb output, not just backtrace (mdz)
+v0.14.08, 2004-04-15.  XMLTV version bump.  Start adding stuff for data
+direct. Include all gdb output, not just backtrace (mdz).  Add additional
+configure step for mythmusic.  (even though the text does talk about it.)
+Add some more text on mythfilldatabase -help
 -->
 
 <!--
