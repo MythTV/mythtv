@@ -91,6 +91,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(MythSqlDatabase *ldb,
     video_aspect = 1.33333;
     m_scan = kScan_Detect;
     m_double_framerate = false;
+    video_frame_rate = 29.97;
 
     forceVideoOutput = kVideoOutput_Default;
     decoder = NULL;
