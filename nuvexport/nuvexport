@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# Last Updated: 2005.02.25 (xris)
+# Last Updated: 2005.02.28 (xris)
 
 # Version
     $VERSION = '0.2 cvs20050221';
@@ -56,6 +56,12 @@
         require export::ffmpeg::ASF;
         require export::ffmpeg::MP3;
     }
+    elsif ($export_prog eq 'mencoder') {
+        find_program('mencoder')
+            or die "You need mencoder in order to use nuvexport in --mencoder mode\n";
+    # ffmpeg - seems to work better and is the default
+        require export::mencoder::XviD;
+    }
 
 # Load the other export modules
     require export::MPEG2_cut;
@@ -81,6 +87,9 @@
         push @Exporters, export::ffmpeg::DivX->new;
         push @Exporters, export::ffmpeg::ASF->new;
         push @Exporters, export::ffmpeg::MP3->new;
+    }
+    elsif ($export_prog eq 'mencoder') {
+        push @Exporters, export::mencoder::XviD->new;
     }
     push @Exporters, export::MPEG2_cut->new;
     push @Exporters, export::NUV_SQL->new;

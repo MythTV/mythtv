@@ -15,8 +15,9 @@
 <nuvexport>
 
 #
-#  Set export_prog to ffmpeg or transcode, depending on your preference of
-#    program for exports.  This is equivalent to --ffmpeg or --transcode.
+#  Set export_prog to ffmpeg, transcode or mencoder, depending on your
+#    preference of program for exports.  This is equivalent to --ffmpeg,
+#    --transcode or --mencoder
 #
 export_prog=transcode
 
@@ -48,51 +49,61 @@ underscores=no
 
 <generic>
 
-path = /home/xris/Video
+    path = /home/xris/Video
 
-use_cutlist   = yes
-multipass     = yes
+    use_cutlist     = yes
+    multipass       = yes
 
-noise_reduction = yes
-deinterlace     = yes
-crop            = yes
+    noise_reduction = yes
+    deinterlace     = yes
+    crop            = yes
 
 </generic>
 
+#
+#  You can create settings for each export module type.  These are the
+#    second-most generic sections, and will only be reached if there are no
+#    matches in the full or generic module names.
+#
 
 <ffmpeg>
+    noise_reduction = no
 </ffmpeg>
-
-<ffmpeg::XviD>
-
-vbr             = yes   # Enable vbr to get the multipass/quantisation options
-                        # (enabling multipass or quantisation automatically enables vbr)
-multipass       = yes   # You get either multipass or quantisation; multipass will override
-quantisation    = 6     # 4 through 6 is probably right...  1..31 are allowed (lower is better quality)
-
-a_bitrate       = 128   # Audio bitrate of 128 kbps
-v_bitrate       = 960   # Remember, quantisation overrides video bitrate
-
-width           = 624   # Height adjusts automatically to width, according to aspect ratio
-height          = auto
-
-</ffmpeg::XviD>
 
 <transcode>
 </transcode>
 
-<transcode::XviD>
+<mencoder>
+</mencoder>
 
-vbr             = yes   # Enable vbr to get the multipass/quantisation options
-                        # (enabling multipass or quantisation automatically enables vbr)
-multipass       = yes   # You get either multipass or quantisation; multipass will override
-quantisation    = 6     # 4 through 6 is probably right...  1..31 are allowed (lower is better quality)
+#
+#  You can also create settings for generic export module names.  These will
+#    only be overridden by full module names.
+#
 
-a_bitrate       = 128   # Audio bitrate of 128 kbps
-v_bitrate       = 960   # Remember, quantisation overrides video bitrate
+<XviD>
 
-width           = 624   # Height adjusts automatically to width, according to aspect ratio
-height          = auto
+    vbr          = yes   # Enable vbr to get the multipass/quantisation options
+                         # (enabling multipass or quantisation automatically enables vbr)
+    multipass    = yes   # You get either multipass or quantisation; multipass will override
+    quantisation = 6     # 4 through 6 is probably right...  1..31 are allowed (lower is better quality)
 
-</transcode::XviD>
+    a_bitrate    = 128   # Audio bitrate of 128 kbps
+    v_bitrate    = 960   # Remember, quantisation overrides video bitrate
+
+    width        = 624   # Height adjusts automatically to width, according to aspect ratio
+    height       = auto
+
+</XviD>
+
+#
+#  If you want to provide settings for a very specific export module, you can
+#    use its full name, and it will override any more generic settings.
+#
+
+<mencoder::XviD>
+
+    multipass = no
+
+</mencoder::XviD>
 

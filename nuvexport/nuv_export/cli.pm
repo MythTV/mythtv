@@ -29,9 +29,10 @@ package nuv_export::cli;
 # --ffmpeg, --transcode and --config
     our $export_prog = undef;
     our $config_file = undef;
-    GetOptions('ffmpeg'    => sub { $export_prog = 'ffmpeg';    },
-               'transcode' => sub { $export_prog = 'transcode'; },
-               'config|c=s'  => \$config_file,
+    GetOptions('ffmpeg'     => sub { $export_prog = 'ffmpeg';    },
+               'transcode'  => sub { $export_prog = 'transcode'; },
+               'mencoder'   => sub { $export_prog = 'mencoder'; },
+               'config|c=s' => \$config_file,
               );
 
 # Make sure the specified config file exists
@@ -82,13 +83,17 @@ package nuv_export::cli;
 # Make sure the export_prog exists
     if (!$export_prog) {
         if ($export_prog = lc($rc_args{'nuvexport'}{'export_prog'})) {
-            if ($export_prog !~ /(?:ffmpeg|transcode)$/) {
+            if ($export_prog !~ /(?:ffmpeg|transcode|mencoder)$/) {
                 print "Unknown export_prog in nuvexportrc:  $export_prog\n\n";
                 exit;
             }
         }
         else {
-            $export_prog = find_program('ffmpeg') ? 'ffmpeg' : 'transcode';
+            $export_prog = find_program('ffmpeg')
+                            ? 'ffmpeg'
+                            : find_program('transcode')
+                                ? 'transcode'
+                                : 'mencoder';
         }
     }
 
@@ -174,10 +179,17 @@ package nuv_export::cli;
     # Remove an unused package parent name, and any leftovers from $self
         $package =~ s/^export:://;
         $package =~ s/=.+?$//;
+    # Scan the package from parent to child, looking for matches
+        my $path = $package;
+        while ($path) {
+            return $rc_args{$path}{$arg} if (defined $rc_args{$path}{$arg});
+            last unless ($path =~ s/^.+?:://);
+        }
     # Scan the package from child to parent, looking for matches
-        while ($package) {
-            return $rc_args{$package}{$arg} if (defined $rc_args{$package}{$arg});
-            last unless ($package =~ s/::.+?$//);
+        $path = $package;
+        while ($path) {
+            return $rc_args{$path}{$arg} if (defined $rc_args{$path}{$arg});
+            last unless ($path =~ s/::.+?$//);
         }
     # Finally, try "generic"
         return $rc_args{'generic'}{$arg} if (defined $rc_args{'generic'}{$arg});

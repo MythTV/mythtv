@@ -11,6 +11,7 @@ MANS	          = man/nuvexport.1 \
 EXPORT_MODULES	  = export/generic.pm         \
 		    export/ffmpeg.pm          \
 		    export/transcode.pm       \
+		    export/mencoder.pm        \
 		    export/MPEG2_cut.pm       \
 		    export/NUV_SQL.pm         \
 		    export/transcode/DVCD.pm  \
@@ -25,9 +26,11 @@ EXPORT_MODULES	  = export/generic.pm         \
 		    export/ffmpeg/SVCD.pm     \
 		    export/ffmpeg/DVCD.pm     \
 		    export/ffmpeg/DVD.pm      \
-		    export/ffmpeg/VCD.pm
+		    export/ffmpeg/VCD.pm      \
+		    export/mencoder/XviD.pm
 MODULE_SUBDIRS    = transcode \
-		    ffmpeg
+		    ffmpeg    \
+		    mencoder
 MYTHTV_MODULES	  = mythtv/nuvinfo.pm \
 		    mythtv/db.pm      \
 		    mythtv/recordings.pm

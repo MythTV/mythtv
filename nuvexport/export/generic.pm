@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.25 (xris)
+#Last Updated: 2005.02.28 (xris)
 #
 #  generic.pm
 #
@@ -213,7 +213,7 @@ package export::generic;
                 if ($data && length $data > 0) {
                     print $write $data;
                 }
-            # Sleep for 1/100 second so we don't go too fast and annoy the cpu,
+            # Sleep for 1/20 second so we don't go too fast and annoy the cpu,
             # but still read fast enough that transcode won't slow down, either.
                 usleep(5000);
             }

@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.25 (xris)
+#Last Updated: 2005.02.28 (xris)
 #
 #  nuv_export::shared_utils
 #
@@ -210,6 +210,7 @@ BEGIN {
         my $command = shift;
         if ($DEBUG) {
             $command =~ s#\ [12]\s*>\s*/dev/null##sg;
+            $command =~ s/\ [12]\s*>\s*\&[12]\s*$//sg;
             print "\nsystem call:\n$command\n";
         }
         else {
