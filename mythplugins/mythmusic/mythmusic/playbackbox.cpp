@@ -278,6 +278,7 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
         {
             visualizer_status = 1;
             mainvisual->setGeometry(visual_blackhole->getScreenArea());
+            setUpdatesEnabled(true);
             handled = true;
         }
     }
@@ -559,6 +560,7 @@ void PlaybackBox::visEnable()
 {
     if (!visualizer_status != 2 && isplaying)
     {
+        setUpdatesEnabled(false);
         //visual_mode_timer->stop();
         mainvisual->setGeometry(0, 0, screenwidth, screenheight);
         visualizer_status = 2;
