@@ -162,7 +162,7 @@ class NuppelVideoPlayer
 
     VideoOutput *getVideoOutput(void) { return videoOutput; }
 
-    int calcSliderPos(float offset, QString &desc);
+    int calcSliderPos(QString &desc);
 
     bool GetLimitKeyRepeat(void) { return limitKeyRepeat; }
 

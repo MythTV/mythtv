@@ -891,7 +891,7 @@ void TV::RunTV(void)
                  internalState == kState_WatchingPreRecorded))
             {
                 QString desc = "";
-                int pos = nvp->calcSliderPos(0, desc);
+                int pos = nvp->calcSliderPos(desc);
                 osd->UpdatePause(pos, desc);
             }
 
@@ -1537,7 +1537,7 @@ void TV::DoInfo(void)
             oset->Display(false);
 
         QString desc = "";
-        int pos = nvp->calcSliderPos(0, desc);
+        int pos = nvp->calcSliderPos(desc);
         osd->StartPause(pos, false, tr("Position"), desc, osd_display_time);
         update_osd_pos = true;
     }
@@ -1556,7 +1556,7 @@ bool TV::UpdatePosOSD(float time, const QString &mesg)
     if (activenvp == nvp)
     {
         QString desc = "";
-        int pos = nvp->calcSliderPos(time, desc);
+        int pos = nvp->calcSliderPos(desc);
         bool slidertype = (internalState == kState_WatchingLiveTV);
         int disptime = (mesg == tr("Paused")) ? -1 : 2;
         int osdtype = (doSmartForward) ? kOSDFunctionalType_SmartForward :
@@ -1775,9 +1775,9 @@ void TV::DoSkipCommercials(int direction)
     {
         QString dummy = "";
         QString desc = tr("Searching...");
-        int pos = nvp->calcSliderPos(0, dummy);
+        int pos = nvp->calcSliderPos(dummy);
         osd->StartPause(pos, slidertype, tr("Skip"), desc, 6);
-        update_osd_pos = false;
+        update_osd_pos = true;
     }
 
     activenvp->SkipCommercials(direction);
@@ -2886,7 +2886,7 @@ void TV::ProgramMenuAction(int result)
     if (activenvp == nvp && desc != "" )
     {
         QString curTime = "";
-        int pos = nvp->calcSliderPos(0, curTime);
+        int pos = nvp->calcSliderPos(curTime);
         osd->StartPause(pos, false, desc, curTime, 1);
         update_osd_pos = false;
     }

@@ -3384,7 +3384,7 @@ int NuppelVideoPlayer::GetStatusbarPos(void)
     return((int)spos);
 }
 
-int NuppelVideoPlayer::calcSliderPos(float offset, QString &desc)
+int NuppelVideoPlayer::calcSliderPos(QString &desc)
 {
     float ret;
 
@@ -3399,7 +3399,6 @@ int NuppelVideoPlayer::calcSliderPos(float offset, QString &desc)
         long long written = nvr_enc->GetFramesWritten();
         long long played = framesPlayed;
 
-        played += (int)(offset * video_frame_rate);
         if (played > written)
             played = written;
         if (played < 0)
@@ -3452,7 +3451,7 @@ int NuppelVideoPlayer::calcSliderPos(float offset, QString &desc)
     else
         playbackLen = totalLength;
 
-    float secsplayed = ((float)framesPlayed / video_frame_rate) + offset;
+    float secsplayed = ((float)framesPlayed / video_frame_rate);
     if (secsplayed < 0)
         secsplayed = 0;
     if (secsplayed > playbackLen)
@@ -3531,7 +3530,7 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
                                    .arg(skipped_seconds);
                     }
                     QString desc;
-                    int spos = calcSliderPos(skipped_seconds, desc);
+                    int spos = calcSliderPos(desc);
                     osd->StartPause(spos, false, comm_msg, desc, 2);
                 }
 
@@ -3680,7 +3679,7 @@ void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
                 {
                     QString comm_msg;
                     QString desc;
-                    int spos = calcSliderPos(0, desc);
+                    int spos = calcSliderPos(desc);
 
                     blank_seq_found = 1;
 
@@ -3746,12 +3745,10 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
         if ((commBreakIter == commBreakMap.begin()) &&
             (direction < 0))
         {
-            int skipped_seconds = (int)((0 - framesPlayed) / video_frame_rate);
-
             QString comm_msg = QString(QObject::tr("Start of program."));
             QString desc;
-            int spos = calcSliderPos(skipped_seconds, desc);
-            osd->StartPause(spos, false, comm_msg, desc, 1);
+            int spos = calcSliderPos(desc);
+            osd->StartPause(spos, false, comm_msg, desc, 2);
 
             JumpToFrame(0);
             return true;
@@ -3762,8 +3759,8 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
         {
             QString comm_msg = QString(QObject::tr("At End, can not Skip."));
             QString desc;
-            int spos = calcSliderPos(0,desc);
-            osd->StartPause(spos, false, comm_msg, desc, 1);
+            int spos = calcSliderPos(desc);
+            osd->StartPause(spos, false, comm_msg, desc, 2);
             return false;
         }
 
@@ -3783,8 +3780,8 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
                     QString desc;
                     skipped_seconds = (int)((0 -
                                              framesPlayed) / video_frame_rate);
-                    int spos = calcSliderPos(skipped_seconds, desc);
-                    osd->StartPause(spos, false, comm_msg, desc, 1);
+                    int spos = calcSliderPos(desc);
+                    osd->StartPause(spos, false, comm_msg, desc, 2);
 
                     JumpToFrame(0);
                     return true;
@@ -3808,8 +3805,8 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
                     QString comm_msg =
                                 QString(QObject::tr("At End, can not Skip."));
                     QString desc;
-                    int spos = calcSliderPos(0,desc);
-                    osd->StartPause(spos, false, comm_msg, desc, 1);
+                    int spos = calcSliderPos(desc);
+                    osd->StartPause(spos, false, comm_msg, desc, 2);
                     return false;
                 }
             }
@@ -3822,8 +3819,8 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
             QString comm_msg = QString(QObject::tr("Skip %1 seconds"))
                                   .arg(skipped_seconds);
             QString desc;
-            int spos = calcSliderPos(skipped_seconds, desc);
-            osd->StartPause(spos, false, comm_msg, desc, 1);
+            int spos = calcSliderPos(desc);
+            osd->StartPause(spos, false, comm_msg, desc, 2);
         }
         JumpToFrame(commBreakIter.key());
         commBreakIter++;
