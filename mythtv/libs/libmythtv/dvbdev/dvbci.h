@@ -142,6 +142,7 @@ private:
   int numSlots;
   bool newCaSupport;
   bool hasUserIO;
+  bool needCaPmt;
   cCiSession *sessions[MAX_CI_SESSION];
   cCiTransportLayer *tpl;
   cCiTransportConnection *tc;
@@ -160,6 +161,7 @@ public:
   int NumSlots(void) { return numSlots; }
   bool Process(void);
   bool HasUserIO(void) { return hasUserIO; }
+  bool NeedCaPmt(void) { return needCaPmt; }
   bool EnterMenu(int Slot);
   cCiMenu *GetMenu(void);
   cCiEnquiry *GetEnquiry(void);

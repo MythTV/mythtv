@@ -357,6 +357,30 @@ public:
     };
 };
 
+class MPEG4OptionIDCT: public CodecParam, public CheckBoxSetting {
+public:
+    MPEG4OptionIDCT(const RecordingProfile& parent):
+        CodecParam(parent, "mpeg4optionidct") {
+        setLabel(QObject::tr("Enable interlaced DCT encoding"));
+        setValue(false);
+        setHelpText(QObject::tr("If set, the MPEG4 encoder will use interlaced "
+                    "DCT encoding.  You probably want this when encoding "
+                    "interlaced video."));
+    };
+};
+
+class MPEG4OptionIME: public CodecParam, public CheckBoxSetting {
+public:
+    MPEG4OptionIME(const RecordingProfile& parent):
+        CodecParam(parent, "mpeg4optionime") {
+        setLabel(QObject::tr("Enable interlaced motion estimation"));
+        setValue(false);
+        setHelpText(QObject::tr("If set, the MPEG4 encoder will use interlaced "
+                    "motion estimation.  You probably want this when encoding "
+                    "interlaced video."));
+    };
+};
+
 class MPEG4OptionVHQ: public CodecParam, public CheckBoxSetting {
 public:
     MPEG4OptionVHQ(const RecordingProfile& parent):
@@ -516,6 +540,8 @@ public:
         params->addChild(new MPEG4ScaleBitrate(parent));
         params->addChild(new MPEG4OptionVHQ(parent));
         params->addChild(new MPEG4Option4MV(parent));
+        params->addChild(new MPEG4OptionIDCT(parent));
+        params->addChild(new MPEG4OptionIME(parent));
 
         addTarget("MPEG-4", params);
 

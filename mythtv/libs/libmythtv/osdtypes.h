@@ -439,6 +439,9 @@ class OSDTypeCC : public OSDType
     void AddCCText(const QString &text, int x, int y, int color, 
                    bool teletextmode = false);
     void ClearAllCCText();
+    int UpdateCCText(vector<ccText*> *ccbuf,
+                     int replace = 0, int scroll = 0, bool scroll_prsv = false,
+                     int scroll_yoff = 0, int scroll_ymax = 15);
 
     void Draw(OSDSurface *surface, int fade, int maxfade, int xoff, int yoff);
 

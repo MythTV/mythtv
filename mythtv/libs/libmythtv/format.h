@@ -193,9 +193,14 @@ typedef struct ccsubtitle
 // resumetext special codes
 #define CC_LINE_CONT  0x02
 #define CC_MODE_MASK  0xf0
+#define CC_TXT_MASK   0x20
 #define CC_CC1        0x00
 #define CC_CC2        0x10
 #define CC_TXT1       0x20
 #define CC_TXT2       0x30
+#define CC_CC3        0x40
+#define CC_CC4        0x50
+#define CC_TXT3       0x60
+#define CC_TXT4       0x70
 
 #endif

@@ -3730,6 +3730,102 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <source>Reactivate it</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>TXT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CC/TXT disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation type="unfinished">minuti</translation>
+    </message>
+    <message>
+        <source>MythTV wants to record &quot;%1&quot; on %2 in %3 seconds. Do you want to:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording volume of the capture card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable interlaced DCT encoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use interlaced DCT encoding.  You probably want this when encoding interlaced video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable interlaced motion estimation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the MPEG4 encoder will use interlaced motion estimation.  You probably want this when encoding interlaced video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keypress Application</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>External application or script to run when a keypress is received by lirc</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LCD Displays Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display current time on idle LCD display. Need to restart mythfrontend to (de)activate it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LCD Displays Menus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display selected menu on LCD display. Need to restart mythfrontend to (de)activate it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LCD Displays Music Artist and Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display playing artist and song title in MythMusic. Need to restart mythfrontend to (de)activate it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LCD Displays Channel Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display tuned channel information. Need to restart mythfrontend to (de)activate it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LCD Displays Volume Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display volume level information. Need to restart mythfrontend to (de)activate it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LCD Displays Generic Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display generic information. Need to restart mythfrontend to (de)activate it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LCD device display</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScheduledRecording</name>
@@ -4093,10 +4189,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>CC%1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Commercial Auto-Skip</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4114,6 +4206,18 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Manual Zoom Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation type="unfinished">minuti</translation>
+    </message>
+    <message>
+        <source>CC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TXT</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

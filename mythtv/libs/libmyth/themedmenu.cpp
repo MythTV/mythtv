@@ -1101,6 +1101,10 @@ void ThemedMenuPrivate::parseThemeButton(QDomElement &element)
             {
                 addit = gContext->GetNumSetting(getFirstText(info));
             }
+            else if (info.tagName() == "dependjumppoint")
+            {
+                addit = gContext->GetMainWindow()->DestinationExists(getFirstText(info));
+            }
             else
             {
                 cerr << "Unknown tag " << info.tagName() << " in button\n";
@@ -2065,6 +2069,11 @@ void ThemedMenuPrivate::handleAction(const QString &action)
     {
         if (menulevel == 1)
             parent->done(0);
+    }
+    else if (action.left(5) == "JUMP ")
+    {
+        QString rest = action.right(action.length() - 5);
+        gContext->GetMainWindow()->JumpTo(rest);
     }
     else
     {

@@ -59,7 +59,7 @@ static int SysLogLevel = 3;
 
 // Set these to 'true' for debug output:
 static bool DumpTPDUDataTransfer = false;
-static bool DebugProtocol = false;
+static bool DebugProtocol = true;
 static bool _connected = false;
 
 #define dbgprotocol(a...) if (DebugProtocol) fprintf(stderr, a)
@@ -876,6 +876,7 @@ public:
   virtual ~cCiApplicationInformation();
   virtual bool Process(int Length = 0, const uint8_t *Data = NULL);
   bool EnterMenu(void);
+  char *GetApplicationString() { return strdup(menuString); };
   uint16_t GetApplicationManufacturer() { return applicationManufacturer; };
   uint16_t GetManufacturerCode()        { return manufacturerCode; };
   };
@@ -1399,6 +1400,7 @@ cCiHandler::cCiHandler(int Fd, int NumSlots)
   tpl = new cCiTransportLayer(Fd, numSlots);
   tc = NULL;
   fdCa = Fd;
+  needCaPmt = true;
 }
 
 cCiHandler::~cCiHandler()
@@ -1413,27 +1415,29 @@ cCiHandler::~cCiHandler()
 
 cCiHandler *cCiHandler::CreateCiHandler(const char *FileName)
 {
-  int fd_ca = open(FileName, O_RDWR);
-  if (fd_ca >= 0) {
-     ca_caps_t Caps;
-     if (ioctl(fd_ca, CA_GET_CAP, &Caps) == 0) {
-        int NumSlots = Caps.slot_num;
-        if (NumSlots > 0) {
-           //XXX dsyslog("CAM: found %d CAM slots", NumSlots);
-// TODO let's do this only once we can be sure that there _really_ is a CAM adapter!
-           if (Caps.slot_type & CA_CI_LINK)
-              return new cCiHandler(fd_ca, NumSlots);
-           else
-              isyslog("CAM doesn't support link layer interface, Caps.slot_type=%i", Caps.slot_type);
-           }
-           else
-           esyslog("ERROR: no CAM slots found");
-      }
-     else
-        LOG_ERROR_STR(FileName);
-     close(fd_ca);
-     }
-  return NULL;
+    int fd_ca = open(FileName, O_RDWR);
+    if (fd_ca >= 0)
+    {
+        ca_caps_t Caps;
+        if (ioctl(fd_ca, CA_GET_CAP, &Caps) == 0)
+        {
+            int NumSlots = Caps.slot_num;
+            if (NumSlots > 0)
+            {
+                if (Caps.slot_type & CA_CI_LINK)
+                    return new cCiHandler(fd_ca, NumSlots);
+                else
+                    isyslog("CAM doesn't support link layer interface,"
+                            " Caps.slot_type=%i", Caps.slot_type);
+            }
+            else
+                esyslog("ERROR: no CAM slots found");
+        }
+        else
+            LOG_ERROR_STR(FileName);
+        close(fd_ca);
+    }
+    return NULL;
 }
 
 int cCiHandler::ResourceIdToInt(const uint8_t *Data)
@@ -1554,53 +1558,83 @@ int cCiHandler::CloseAllSessions(int Slot)
 
 bool cCiHandler::Process(void)
 {
-  bool result = true;
-  cMutexLock MutexLock(&mutex);
-  for (int Slot = 0; Slot < numSlots; Slot++) {
-      tc = tpl->Process(Slot);
-      if (tc) {
-         int Length;
-         const uint8_t *Data = tc->Data(Length);
-         if (Data && Length > 1) {
-            switch (*Data) {
-              case ST_SESSION_NUMBER:          if (Length > 4) {
-                                                  int SessionId = ntohs(*(short *)&Data[2]);
-                                                  cCiSession *Session = GetSessionBySessionId(SessionId);
-                                                  if (Session)
-                                                     Session->Process(Length - 4, Data + 4);
-                                                  else
-                                                     esyslog("ERROR: unknown session id: %d", SessionId);
-                                                  }
-                                               break;
-              case ST_OPEN_SESSION_REQUEST:    OpenSession(Length, Data);
-                                               break;
-              case ST_CLOSE_SESSION_REQUEST:   if (Length == 4)
-                                                  CloseSession(ntohs(*(short *)&Data[2]));
-                                               break;
-              case ST_CREATE_SESSION_RESPONSE: //XXX fall through to default
-              case ST_CLOSE_SESSION_RESPONSE:  //XXX fall through to default
-              default: esyslog("ERROR: unknown session tag: %02X", *Data);
-              }
+    bool result = true;
+    needCaPmt = false;
+    cMutexLock MutexLock(&mutex);
+
+    for (int Slot = 0; Slot < numSlots; Slot++)
+    {
+        tc = tpl->Process(Slot);
+        if (tc)
+        {
+            int Length;
+            const uint8_t *Data = tc->Data(Length);
+            if (Data && Length > 1)
+            {
+                switch (*Data)
+                {
+                    case ST_SESSION_NUMBER:         
+                        if (Length > 4)
+                        {
+                            int SessionId = ntohs(*(short *)&Data[2]);
+                            cCiSession *Session = GetSessionBySessionId(SessionId);
+                            if (Session)
+                            {
+                                Session->Process(Length - 4, Data + 4);
+                                if (Session->ResourceId() == RI_APPLICATION_INFORMATION)
+                                {
+#if 0
+                                    fprintf(stderr, "Test: %x\n",
+                                            ((cCiApplicationInformation*)Session)->GetApplicationManufacturer());
+#endif
+                                }
+                            }
+                            else
+                                esyslog("ERROR: unknown session id: %d", SessionId);
+                        }
+                        break;
+                    
+                    case ST_OPEN_SESSION_REQUEST:
+                        OpenSession(Length, Data);
+                        break;
+
+                    case ST_CLOSE_SESSION_REQUEST:
+                        if (Length == 4)
+                            CloseSession(ntohs(*(short *)&Data[2]));
+                        break;
+
+                    case ST_CREATE_SESSION_RESPONSE: //XXX fall through to default
+                    case ST_CLOSE_SESSION_RESPONSE:  //XXX fall through to default
+                    default:
+                        esyslog("ERROR: unknown session tag: %02X", *Data);
+                }
             }
-         }
-      else if (CloseAllSessions(Slot)) {
-         tpl->ResetSlot(Slot);
-         result = false;
-         }
-      else if (tpl->ModuleReady(Slot)) {
-         dbgprotocol("Module ready in slot %d\n", Slot);
-         tpl->NewConnection(Slot);
-         }
-      }
+        }
+        else if (CloseAllSessions(Slot))
+        {
+            tpl->ResetSlot(Slot);
+            result = false;
+//            needCaPmt = true;
+        }
+        else if (tpl->ModuleReady(Slot))
+        {
+            dbgprotocol("Module ready in slot %d\n", Slot);
+            tpl->NewConnection(Slot);
+            needCaPmt = true;
+        }
+    }
+
     bool UserIO = false;
-    for (int i = 0; i < MAX_CI_SESSION; i++) {
-         if (sessions[i] && sessions[i]->Process())
+    for (int i = 0; i < MAX_CI_SESSION; i++)
+    {
+        if (sessions[i] && sessions[i]->Process())
             UserIO |= sessions[i]->HasUserIO();
-       }
-  hasUserIO = UserIO;
-  if (newCaSupport)
-     newCaSupport = result = false; // triggers new SetCaPmt at caller!
-  return result;
+    }
+    hasUserIO = UserIO;
+
+    if (newCaSupport)
+        newCaSupport = result = false; // triggers new SetCaPmt at caller!
+    return result;
 }
 
 bool cCiHandler::EnterMenu(int Slot)
@@ -1657,3 +1691,4 @@ bool cCiHandler::connected() const
 {
   return _connected;
 }
+

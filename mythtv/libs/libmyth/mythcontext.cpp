@@ -1264,7 +1264,6 @@ void MythContext::EventSocketRead(void)
 
         QString prefix = strlist[0];
         QString message = strlist[1];
-        QString extra = strlist[2];
         
         if (prefix != "BACKEND_MESSAGE")
         {
@@ -1273,7 +1272,9 @@ void MythContext::EventSocketRead(void)
         }
         else
         {
-            MythEvent me(message, extra);
+            strlist.pop_front();
+            strlist.pop_front();
+            MythEvent me(message, strlist);
             dispatch(me);
         }
     }

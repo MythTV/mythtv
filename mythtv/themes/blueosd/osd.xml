@@ -68,7 +68,7 @@
       <area>45,423,560,27</area>
       <font>infofont</font>
 <!--
-      <value>%DESCRIPTION% (%LENMINS% minutes)</value>
+      <value>%DESCRIPTION% (%LENMINS%)</value>
 -->
     </textarea>
     <textarea name="callsign" align="center">
@@ -94,7 +94,7 @@
     <textarea name="title">
       <area>40,398,440,27</area>
       <font>infofont</font>
-      <value>%TITLE% (%STARTTIME% %LENMINS% minutes)</value>
+      <value>%TITLE% (%STARTTIME% %LENMINS%)</value>
     </textarea>
     <textarea name="description">
       <multiline>no</multiline>

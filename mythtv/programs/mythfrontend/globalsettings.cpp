@@ -1938,6 +1938,73 @@ public:
      };
 };
 
+class LCDShowTime: public CheckBoxSetting, public GlobalSetting {
+public:
+    LCDShowTime(): 
+        GlobalSetting("LCDShowTime") {
+        setLabel(QObject::tr("LCD Displays Time"));
+        setHelpText(QObject::tr("Display current time on idle LCD display. "
+                    "Need to restart mythfrontend to (de)activate it."));
+        setValue(true);
+    };
+};
+
+class LCDShowMenu: public CheckBoxSetting, public GlobalSetting {
+public:
+    LCDShowMenu(): 
+        GlobalSetting("LCDShowMenu") {
+        setLabel(QObject::tr("LCD Displays Menus"));
+        setHelpText(QObject::tr("Display selected menu on LCD display. "
+                    "Need to restart mythfrontend to (de)activate it."));
+        setValue(true);
+    };
+};
+
+class LCDShowMusic: public CheckBoxSetting, public GlobalSetting {
+public:
+    LCDShowMusic(): 
+        GlobalSetting("LCDShowMusic") {
+        setLabel(QObject::tr("LCD Displays Music Artist and Title"));
+        setHelpText(QObject::tr("Display playing artist and song title in "
+                    "MythMusic. Need to restart mythfrontend to (de)activate "
+                    "it."));
+        setValue(true);
+    };
+};
+
+class LCDShowChannel: public CheckBoxSetting, public GlobalSetting {
+public:
+    LCDShowChannel(): 
+        GlobalSetting("LCDShowChannel") {
+        setLabel(QObject::tr("LCD Displays Channel Information"));
+        setHelpText(QObject::tr("Display tuned channel information. Need to "
+                    "restart mythfrontend to (de)activate it."));
+        setValue(true);
+    };
+};
+
+class LCDShowVolume: public CheckBoxSetting, public GlobalSetting {
+public:
+    LCDShowVolume(): 
+        GlobalSetting("LCDShowVolume") {
+        setLabel(QObject::tr("LCD Displays Volume Information"));
+        setHelpText(QObject::tr("Display volume level information. Need to "
+                    "restart mythfrontend to (de)activate it."));
+        setValue(true);
+    };
+};
+
+class LCDShowGeneric: public CheckBoxSetting, public GlobalSetting {
+public:
+    LCDShowGeneric(): 
+        GlobalSetting("LCDShowGeneric") {
+        setLabel(QObject::tr("LCD Displays Generic Information"));
+        setHelpText(QObject::tr("Display generic information. Need to "
+                    "restart mythfrontend to (de)activate it."));
+        setValue(true);
+    };
+};
+
 MainGeneralSettings::MainGeneralSettings()
 {
     AudioSettings *audio = new AudioSettings();
@@ -2150,6 +2217,18 @@ AppearanceSettings::AppearanceSettings()
     qttheme->addChild(new PlayBoxTransparency());
     qttheme->addChild(new PlayBoxShading());
     addChild(qttheme);
+
+#ifdef LCD_DEVICE
+    VerticalConfigurationGroup* lcdscreen = new VerticalConfigurationGroup(false);
+    lcdscreen->setLabel(QObject::tr("LCD device display"));
+    lcdscreen->addChild(new LCDShowTime());
+    lcdscreen->addChild(new LCDShowMenu());
+    lcdscreen->addChild(new LCDShowMusic());
+    lcdscreen->addChild(new LCDShowChannel());
+    lcdscreen->addChild(new LCDShowVolume());
+    lcdscreen->addChild(new LCDShowGeneric());
+    addChild(lcdscreen);
+#endif
 }
 
 XboxSettings::XboxSettings()

@@ -1438,7 +1438,7 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
                         xmltv_grabber.ascii(), configfile.ascii(), 
                         filename.ascii());
     else if (xmltv_grabber == "tv_grab_uk_rt")
-        command.sprintf("nice %s --days 1 --offset %d --config-file '%s' > %s",
+        command.sprintf("nice %s --days 1 --offset %d --config-file '%s' --output %s > %s",
 	                 xmltv_grabber.ascii(), offset, 
 			 configfile.ascii(), filename.ascii());
     else if (xmltv_grabber == "tv_grab_au")
@@ -1749,8 +1749,10 @@ bool fillData(QValueList<Source> &sourcelist)
                
                 if (query.isActive()) 
                 {
+                    // We also need to get this day's data if there's only a 
+                    // suspiciously small amount in the DB.
                     if (!query.numRowsAffected() ||
-                        (query.next() && query.value(0).toInt() <= 1)) 
+                        (query.next() && query.value(0).toInt() <= 20)) 
                     {
                         download_needed = true;
                     }

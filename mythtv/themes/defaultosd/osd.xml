@@ -96,7 +96,7 @@
       <multiline>yes</multiline>
       <area>14,419,615,122</area>
       <font>infofont</font>
-      <value>%DESCRIPTION%%BR%(%STARTTIME% - %LENMINS% minutes)</value>
+      <value>%DESCRIPTION%%BR%(%STARTTIME% - %LENMINS%)</value>
     </textarea>
     <image name="channelicon">
       <position>7,363</position>

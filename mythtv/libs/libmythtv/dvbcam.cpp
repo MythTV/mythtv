@@ -204,6 +204,9 @@ void DVBCam::CiHandlerLoop()
         if (!ciHandler->Process())
             continue;
 
+        if (ciHandler->NeedCaPmt())
+            first_send = true;
+
         if (ciHandler->HasUserIO())
         {
             cCiEnquiry* enq = ciHandler->GetEnquiry();
@@ -225,9 +228,9 @@ void DVBCam::CiHandlerLoop()
                     cerr << "CAM Menu BottomText: " << menu->BottomText() << endl;
 
                 for (int i=0; i<menu->NumEntries(); i++)
-                if (menu->Entry(i) != NULL)
-                    cerr << "CAM Menu Entry(" << i << "): " << menu->Entry(i) << endl;
-                
+                    if (menu->Entry(i) != NULL)
+                        cerr << "CAM Menu Entry(" << i << "): " << menu->Entry(i) << endl;
+
                 if (menu->Selectable())
                 {
                     cerr << "Menu is selectable" << endl;
@@ -262,41 +265,19 @@ void DVBCam::CiHandlerLoop()
                     pthread_mutex_unlock(&pmt_lock);
                     continue;
                 }
-                first_send = false;
-                GENERAL(QString("CAM - Sending PMT to slot %1.").arg(s));
 
                 cCiCaPmt capmt(chan_opts.serviceID, CPLM_FIRST);
 
-                uint16_t prg_len = ((*(pmtbuf+2)&0x0f)<<8) | *(pmtbuf+3);
-                uint8_t *b = pmtbuf + 3;
-                uint8_t *e = pmtbuf + 4 + prg_len;
-                if (e+2 > pmtbuf+pmtlen)
+                /* FIXME:
+                 * We have to make some kind of CAM association map like VDR has,
+                 * for now we just clear the CAM that has no provider support.
+                 */
+                if (FindCaDescriptors(capmt, caids, s))
                 {
-                    pthread_mutex_unlock(&pmt_lock);
-                    continue;
+                    SetPids(capmt, chan_opts.pids);
+                    GENERAL(QString("CAM - Sending PMT to slot %1.").arg(s));
+                    first_send = false;
                 }
-
-                do {
-                    uint8_t tag = *(b+1);
-                    uint8_t len = *(b+2);
-                    if (b+2+len > e)
-                        break;
-                    if (tag == 0x09)
-                    {
-                        uint16_t ca_system_id = ((*(b+3))<<8) | *(b+4);
-                        for (int i=0; caids[i] != 0; i++)
-                        {
-                            if (ca_system_id == caids[i])
-                            {
-                                fprintf(stderr,"Adding CA Descriptor (SID=%0.4X)\n", ca_system_id);
-                                capmt.AddCaDescriptor(len + 2, b+1);
-                            }
-                        }
-                    }
-                    b += len + 2;
-                } while (b+2 <= e);
-
-                SetPids(capmt, chan_opts.pids);
 
                 ciHandler->SetCaPmt(capmt,s);
             }
@@ -326,5 +307,64 @@ void DVBCam::SetPids(cCiCaPmt& capmt, dvb_pids_t& pids)
 
     for (unsigned int i=0; i<pids.other.size(); i++)
         capmt.AddPid(pids.other[i]);
+}
+
+bool DVBCam::FindCaDescriptors(cCiCaPmt &capmt, const unsigned short *caids, int slot)
+{
+    bool found = false;
+    uint16_t prg_len = ((*(pmtbuf+2)&0x0f)<<8) | *(pmtbuf+3);
+    uint8_t *b = pmtbuf + 3;
+    uint8_t *e = pmtbuf + 4 + prg_len;
+
+    for ( ;; )
+    {
+        if (e+2 > pmtbuf+pmtlen)
+            break;
+
+        while ( prg_len > 0 && b+2 <= e )
+        {
+            uint8_t tag = *(b+1);
+            uint8_t len = *(b+2);
+
+            if (b+2+len > e)
+                break;
+
+            prg_len -= len - 2;
+
+            if (tag == 0x09)
+            {
+                uint16_t ca_system_id = ((*(b+3))<<8) | *(b+4);
+                uint16_t ca_pid = ((*(b+5))<<8) | *(b+6);
+                fprintf(stderr,"Found CA Descriptor (CASID=%0.4X,"
+                        " CAPID=%0.4X)\n", ca_system_id, ca_pid);
+
+                for (int i=0; caids[i] != 0; i++)
+                {
+                    if (ca_system_id == caids[i] && ca_pid != 0)
+                    {
+                        if (slot == 1 && ca_system_id == 0x0B00)
+                            continue;
+
+                        if (first_send)
+                            fprintf(stderr,"Adding CA Descriptor (CASID=%0.4X, "
+                                    "CAPID=%0.4X)\n", ca_system_id, ca_pid);
+
+                        capmt.AddCaDescriptor(len + 2, b+1);
+                        found = true;
+                    }
+                }
+            }
+            b += len + 2;
+        }
+
+        if (e+5 > pmtbuf+pmtlen)
+            break;
+
+        prg_len = ((*(e+3)&0x0f)<<8) | *(e+4);
+        b = e + 4;
+        e = b + 1 + prg_len;
+    }
+
+    return found;
 }
 

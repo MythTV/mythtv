@@ -246,6 +246,20 @@ void NuppelVideoRecorder::SetOption(const QString &opt, int value)
         else
             mp4opts &= ~CODEC_FLAG_4MV;
     }
+    else if (opt == "mpeg4optionidct")
+    {
+        if (value)
+            mp4opts |= CODEC_FLAG_INTERLACED_DCT;
+        else
+            mp4opts &= ~CODEC_FLAG_INTERLACED_DCT;
+    }
+    else if (opt == "mpeg4optionime")
+    {
+        if (value)
+            mp4opts |= CODEC_FLAG_INTERLACED_ME;
+        else
+            mp4opts &= ~CODEC_FLAG_INTERLACED_ME;
+    }
     else if (opt == "hardwaremjpegquality")
         hmjpg_quality = value;
     else if (opt == "hardwaremjpeghdecimation")
@@ -2219,7 +2233,7 @@ void NuppelVideoRecorder::FormatTeletextSubtitles(struct VBIData *vbidata)
     textbuffer[act]->freeToEncode = 1;
 }
 
-void NuppelVideoRecorder::FormatCC(struct cc *cc, int data)
+void NuppelVideoRecorder::FormatCC(struct cc *cc)
 {
     struct timeval tnow;
     gettimeofday (&tnow, &tzone);
@@ -2229,33 +2243,63 @@ void NuppelVideoRecorder::FormatCC(struct cc *cc, int data)
     int tc = (tnow.tv_sec - stm.tv_sec) * 1000 +
              tnow.tv_usec / 1000 - stm.tv_usec / 1000;
 
+    for (int field = 0; field < 2; field++)
+        FormatCCField(cc, tc, field);
+}
+
+void NuppelVideoRecorder::FormatCCField(struct cc *cc, int tc, int field)
+{
     const int rowdata[] = { 11, -1, 1, 2, 3, 4, 12, 13,
                             14, 15, 5, 6, 7, 8, 9, 10 };
-    const char *specialchar[] =
-    { "®", "°", "½", "¿", "(TM)", "¢", "£", "o/~ ",
-      "à", " ", "è", "â", "ê", "î", "ô", "û"
+    const QChar specialchar[] =
+    { '®', '°', '½', '¿', 0x2122 /* TM */, '¢', '£', 0x266A /* 1/8 note */,
+      'à', ' ', 'è', 'â', 'ê', 'î', 'ô', 'û'
     };
-
+    const QChar extendedchar2[] =
+    { 'Á', 'É', 'Ó', 'Ú', 'Ü', 'ü', '`', '¡',
+      '*', '\'', 0x2014 /* dash */, '©', 0x2120 /* SM */, '·', 0x201C, 0x201D /* dquotes */,
+      'À', 'Â', 'Ç', 'È', 'Ê', 'Ë', 'ë', 'Î',
+      'Ï', 'ï', 'Ô', 'Ù', 'ù', 'Û', '«', '»'
+    };
+    const QChar extendedchar3[] =
+    { 'Ã', 'ã', 'Í', 'Ì', 'ì', 'Ò', 'ò', 'Õ',
+      'õ', '{', '}', '\\', '^', '_', '¦', '~',
+      'Ä', 'ä', 'Ö', 'ö', 'ß', '¥', '¤', '|',
+      'Å', 'å', 'Ø', 'ø', 0x250C, 0x2510, 0x2514, 0x2518 /* box drawing */
+    };
     int b1, b2, len, x;
     int mode;
+    int data;
+
+    if (field == 0)
+        data = cc->code1;
+    else
+        data = cc->code2;
 
     if (data == -1)              // invalid data. flush buffers to be safe.
     {
         // TODO: write textbuffer[act]
         //printf (" TODO: write textbuffer[act]\n");
-        for (mode = 0; mode < 4; mode++)
-            ResetCC(cc, mode);
-        cc->ccmode = 0;
-        cc->txtmode[0] = 0;
-        cc->txtmode[1] = 0;
+        if (cc->ccmode[field] != -1)
+        {
+            for (mode = field*4; mode < (field*4 + 4); mode++)
+                ResetCC(cc, mode);
+            cc->xds[field] = 0;
+            cc->badvbi[field] = 0;
+            cc->ccmode[field] = -1;
+            cc->txtmode[field*2] = 0;
+            cc->txtmode[field*2 + 1] = 0;
+        }
         return;
     }
 
     b1 = data & 0x7f;
     b2 = (data >> 8) & 0x7f;
-    if (cc->ccmode >= 0)
+    if (cc->ccmode[field] >= 0)
     {
-        mode = (cc->txtmode[cc->ccmode] << 1) | cc->ccmode;
+        mode = field << 2 |
+               (cc->txtmode[field*2 + cc->ccmode[field]] << 1) |
+               cc->ccmode[field];
         len = cc->ccbuf[mode].length();
     }
     else
@@ -2269,15 +2313,15 @@ void NuppelVideoRecorder::FormatCC(struct cc *cc, int data)
     // vary from this, be more conservative in detecting duplicate
     // CC codes.
     int dup_text_fudge, dup_ctrl_fudge;
-    if (cc->badvbi < 100 && b1 != 0 && b2 != 0)
+    if (cc->badvbi[field] < 100 && b1 != 0 && b2 != 0)
     {
-        int d = tc - cc->lasttc;
+        int d = tc - cc->lasttc[field];
         if (d < 25 || d > 42)
-            cc->badvbi++;
-        else if (cc->badvbi > 0)
-            cc->badvbi--;
+            cc->badvbi[field]++;
+        else if (cc->badvbi[field] > 0)
+            cc->badvbi[field]--;
     }
-    if (cc->badvbi < 4)
+    if (cc->badvbi[field] < 4)
     {
         dup_text_fudge = -2;  // should pick up all codes
         dup_ctrl_fudge = 33 - 4;  // should pick up 1st, 4th, 6th, 8th, ... codes
@@ -2288,14 +2332,63 @@ void NuppelVideoRecorder::FormatCC(struct cc *cc, int data)
         dup_ctrl_fudge = 33 - 4;
     }
 
-    if (b1 & 0x60 &&
-        (data != cc->lastcode ||
-         tc > (cc->lastcodetc + 33 + dup_text_fudge)))
+    if (data == cc->lastcode[field])
+    {
+        int false_dup = 1;
+        if ((b1 & 0x70) == 0x10)
+        {
+            if (tc > (cc->lastcodetc[field] + 67 + dup_ctrl_fudge))
+                false_dup = 0;
+        }
+        else if (b1)
+        {
+            // text, XDS
+            if (tc > (cc->lastcodetc[field] + 33 + dup_text_fudge))
+                false_dup = 0;
+        }
+
+        if (false_dup)
+            goto skip;
+    }
+
+    if ((field == 1) &&
+        (cc->xds[field] || b1 && ((b1 & 0x70) == 0x00)))
+        // 0x01 <= b1 <= 0x0F
+        // start XDS
+        // or inside XDS packet
+    {
+        int xds_packet = 1;
+
+        // TODO: process XDS packets
+        if (b1 == 0x0F)
+        {
+            // end XDS
+            cc->xds[field] = 0;
+            xds_packet = 1;
+        }
+        else if ((b1 & 0x70) == 0x10)
+        {
+            // ctrl code -- interrupt XDS
+            cc->xds[field] = 0;
+            xds_packet = 0;
+        }
+        else
+        {
+            cc->xds[field] = 1;
+            xds_packet = 1;
+        }
+
+        if (xds_packet)
+            goto skip;
+    }
+
+    if (b1 & 0x60)
+        // 0x20 <= b1 <= 0x7F
         // text codes
     {
         if (mode >= 0)
         {
-            cc->lastcodetc += 33;
+            cc->lastcodetc[field] += 33;
             cc->timecode[mode] = tc;
 
             // commit row number only when first text code
@@ -2303,44 +2396,60 @@ void NuppelVideoRecorder::FormatCC(struct cc *cc, int data)
             if (cc->newrow[mode])
                 len = NewRowCC(cc, mode, len);
 
-            cc->ccbuf[mode] += (char)b1;
+            cc->ccbuf[mode] += CharCC(b1);
             len++;
             cc->col[mode]++;
             if (b2 & 0x60)
             {
-                cc->ccbuf[mode] += (char)b2;
+                cc->ccbuf[mode] += CharCC(b2);
                 len++;
                 cc->col[mode]++;
             }
         }
     }
-    else if ((b1 & 0x10) && (b2 > 0x1F) &&
-             (data != cc->lastcode ||
-              tc > (cc->lastcodetc + 67 + dup_ctrl_fudge)))
+
+    else if ((b1 & 0x10) && (b2 > 0x1F))
+        // 0x10 <= b1 <= 0x1F
         // control codes
     {
-        cc->lastcodetc += 67;
+        cc->lastcodetc[field] += 67;
 
         int newccmode = (b1 >> 3) & 1;
-        int newtxtmode = cc->txtmode[newccmode];
-        if ((b1 & 0x06) == 0x04) {
-            if ((b2 == 0x29) || (b2 == 0x2c)) {
+        int newtxtmode = cc->txtmode[field*2 + newccmode];
+        if ((b1 & 0x06) == 0x04)
+        {
+            switch (b2)
+            {
+            case 0x29:
+            case 0x2C:
+            case 0x20:
+            case 0x2F:
+            case 0x25:
+            case 0x26:
+            case 0x27:
                 // CC1,2
                 newtxtmode = 0;
-            } else if (b2 == 0x2A) {
+                break;
+            case 0x2A:
+            case 0x2B:
                 // TXT1,2
                 newtxtmode = 1;
+                break;
             }
         }
-        cc->ccmode = newccmode;
-        cc->txtmode[newccmode] = newtxtmode;
-        mode = (newtxtmode << 1) | cc->ccmode;
+        cc->ccmode[field] = newccmode;
+        cc->txtmode[field*2 + newccmode] = newtxtmode;
+        mode = (field << 2) | (newtxtmode << 1) | cc->ccmode[field];
 
         cc->timecode[mode] = tc;
         len = cc->ccbuf[mode].length();
 
         if (b2 & 0x40)           //preamble address code (row & indent)
         {
+            if (newtxtmode)
+                // no address codes in TXT mode?
+                goto skip;
+
             cc->newrow[mode] = rowdata[((b1 << 1) & 14) | ((b2 >> 5) & 1)];
             if (cc->newrow[mode] == -1)
                 // bogus code?
@@ -2378,9 +2487,37 @@ void NuppelVideoRecorder::FormatCC(struct cc *cc, int data)
                            break;
                        case 0x30:      //special character..
                            cc->ccbuf[mode] += specialchar[b2 & 0x0f];
-                           len = cc->ccbuf[mode].length();
+                           len++;
                            cc->col[mode]++;
                            break;
+                   }
+                   break;
+               case 0x02:          //extended char
+                   // extended char is preceded by alternate char
+                   // - if there's no alternate, it could be noise
+                   if (!len)
+                       break;
+
+                   if (b2 & 0x30)
+                   {
+                       cc->ccbuf[mode].remove(len - 1, 1);
+                       cc->ccbuf[mode] += extendedchar2[b2 - 0x20];
+                       len = cc->ccbuf[mode].length();
+                       break;
+                   }
+                   break;
+               case 0x03:          //extended char
+                   // extended char is preceded by alternate char
+                   // - if there's no alternate, it could be noise
+                   if (!len)
+                       break;
+
+                   if (b2 & 0x30)
+                   {
+                       cc->ccbuf[mode].remove(len - 1, 1);
+                       cc->ccbuf[mode] += extendedchar3[b2 - 0x20];
+                       len = cc->ccbuf[mode].length();
+                       break;
                    }
                    break;
                case 0x04:          //misc
@@ -2408,22 +2545,9 @@ void NuppelVideoRecorder::FormatCC(struct cc *cc, int data)
                            }
                            break;
                        case 0x25:      //2 row caption
-                           cc->rowcount[mode] = 2;
-                           cc->style[mode] = CC_STYLE_ROLLUP;
-                           break;
                        case 0x26:      //3 row caption
-                           cc->rowcount[mode] = 3;
-                           cc->style[mode] = CC_STYLE_ROLLUP;
-                           break;
                        case 0x27:      //4 row caption
-                           cc->rowcount[mode] = 4;
-                           cc->style[mode] = CC_STYLE_ROLLUP;
-                           break;
-                       case 0x2D:      //carriage return
-                           if (cc->newrow[mode])
-                               len = NewRowCC(cc, mode, len);
-
-                           if (len)
+                           if (cc->style[mode] == CC_STYLE_PAINT && len)
                            {
                                // flush
                                BufferCC(cc, mode, len, 0);
@@ -2431,6 +2555,38 @@ void NuppelVideoRecorder::FormatCC(struct cc *cc, int data)
                                cc->row[mode] = 0;
                                cc->col[mode] = 0;
                            }
+                           else if (cc->style[mode] == CC_STYLE_POPUP)
+                               ResetCC(cc, mode);
+
+                           cc->rowcount[mode] = b2 - 0x25 + 2;
+                           cc->style[mode] = CC_STYLE_ROLLUP;
+                           break;
+                       case 0x2D:      //carriage return
+                           if (cc->style[mode] != CC_STYLE_ROLLUP)
+                               break;
+
+                           if (cc->newrow[mode])
+                               cc->row[mode] = cc->newrow[mode];
+
+                           // flush if there is text or need to scroll
+                           // TODO:  decode ITV (WebTV) link in TXT2
+                           if (len ||
+                               cc->row[mode] != 0 &&
+                               !cc->linecont[mode] &&
+                               (!newtxtmode || cc->row[mode] >= 16))
+                               BufferCC(cc, mode, len, 0);
+
+                           if (newtxtmode)
+                           {
+                               if (cc->row[mode] < 16)
+                                   cc->newrow[mode] = cc->row[mode] + 1;
+                               else
+                                   // scroll up previous lines
+                                   cc->newrow[mode] = 16;
+                           }
+
+                           cc->ccbuf[mode] = "";
+                           cc->col[mode] = 0;
                            cc->linecont[mode] = 0;
                            break;
 
@@ -2443,6 +2599,9 @@ void NuppelVideoRecorder::FormatCC(struct cc *cc, int data)
                                cc->row[mode] = 0;
                                cc->col[mode] = 0;
                            }
+                           else if (cc->style[mode] == CC_STYLE_POPUP)
+                               ResetCC(cc, mode);
+
                            cc->style[mode] = CC_STYLE_PAINT;
                            cc->rowcount[mode] = 0;
                            cc->linecont[mode] = 0;
@@ -2450,9 +2609,19 @@ void NuppelVideoRecorder::FormatCC(struct cc *cc, int data)
 
                        case 0x2B:      //resume text display
                            cc->resumetext[mode] = 1;
+                           if (cc->row[mode] == 0)
+                           {
+                               cc->newrow[mode] = 1;
+                               cc->newcol[mode] = 0;
+                           }
+                           cc->style[mode] = CC_STYLE_ROLLUP;
                            break;
                        case 0x2C:      //erase displayed memory
-                           BufferCC(cc, mode, 0, 1);
+                           if ((tc - cc->lastclr[mode]) > 5000 ||
+                               cc->lastclr[mode] == 0)
+                               // don't overflow the frontend with
+                               // too many redundant erase codes
+                               BufferCC(cc, mode, 0, 1);
                            if (cc->style[mode] != CC_STYLE_POPUP)
                            {
                                cc->row[mode] = 0;
@@ -2464,8 +2633,9 @@ void NuppelVideoRecorder::FormatCC(struct cc *cc, int data)
                        case 0x20:      //resume caption (pop-up style)
                            if (cc->style[mode] != CC_STYLE_POPUP)
                            {
-                               // clear and flush
-                               BufferCC(cc, mode, len, 1);
+                               if (len)
+                                   // flush
+                                   BufferCC(cc, mode, len, 0);
                                cc->ccbuf[mode] = "";
                                cc->row[mode] = 0;
                                cc->col[mode] = 0;
@@ -2475,20 +2645,37 @@ void NuppelVideoRecorder::FormatCC(struct cc *cc, int data)
                            cc->linecont[mode] = 0;
                            break;
                        case 0x2F:      //end caption + swap memory
-                           if (cc->style[mode] != CC_STYLE_ROLLUP)
+                           if (cc->style[mode] != CC_STYLE_POPUP)
                            {
+                               if (len)
+                                   // flush
+                                   BufferCC(cc, mode, len, 0);
+                           }
+                           else if ((tc - cc->lastclr[mode]) > 5000 ||
+                                    cc->lastclr[mode] == 0)
                                // clear and flush
                                BufferCC(cc, mode, len, 1);
-                               cc->ccbuf[mode] = "";
-                               cc->row[mode] = 0;
-                               cc->col[mode] = 0;
-                           }
+                           else if (len)
+                               // flush
+                               BufferCC(cc, mode, len, 0);
+                           cc->ccbuf[mode] = "";
+                           cc->row[mode] = 0;
+                           cc->col[mode] = 0;
                            cc->style[mode] = CC_STYLE_POPUP;
                            cc->rowcount[mode] = 0;
                            cc->linecont[mode] = 0;
                            break;
 
                        case 0x2A:      //text restart
+                           // clear display
+                           BufferCC(cc, mode, 0, 1);
+                           ResetCC(cc, mode);
+                           // TXT starts at row 1
+                           cc->newrow[mode] = 1;
+                           cc->newcol[mode] = 0;
+                           cc->style[mode] = CC_STYLE_ROLLUP;
+                           break;
+
                        case 0x2E:      //erase non-displayed memory
                            ResetCC(cc, mode);
                            break;
@@ -2509,11 +2696,12 @@ void NuppelVideoRecorder::FormatCC(struct cc *cc, int data)
                            cc->col[mode]++;
                        }
                    break;
-           }
+            }
         }
     }
 
-    for (mode = 0; mode < 4; mode++)
+skip:
+    for (mode = field*4; mode < (field*4 + 4); mode++)
     {
         len = cc->ccbuf[mode].length();
         if (((tc - cc->timecode[mode]) > 100) &&
@@ -2529,12 +2717,30 @@ void NuppelVideoRecorder::FormatCC(struct cc *cc, int data)
         }
     }
 
-    if (data != cc->lastcode)
+    if (data != cc->lastcode[field])
     {
-        cc->lastcode = data;
-        cc->lastcodetc = tc;
+        cc->lastcode[field] = data;
+        cc->lastcodetc[field] = tc;
     }
-    cc->lasttc = tc;
+    cc->lasttc[field] = tc;
+}
+
+QChar NuppelVideoRecorder::CharCC(int code)
+{
+    switch (code)
+    {
+    case 42:  return 'á';
+    case 92:  return 'é';
+    case 94:  return 'í';
+    case 95:  return 'ó';
+    case 96:  return 'ú';
+    case 123: return 'ç';
+    case 124: return '÷';
+    case 125: return 'Ñ';
+    case 126: return 'ñ';
+    case 127: return 0x2588; /* full block */
+    default : return QChar(code);
+    }
 }
 
 void NuppelVideoRecorder::ResetCC(struct cc *cc, int mode)
@@ -2549,6 +2755,7 @@ void NuppelVideoRecorder::ResetCC(struct cc *cc, int mode)
 //    cc->style[mode] = CC_STYLE_POPUP;
     cc->linecont[mode] = 0;
     cc->resumetext[mode] = 0;
+    cc->lastclr[mode] = 0;
     cc->ccbuf[mode] = "";
 }
 
@@ -2564,8 +2771,15 @@ void NuppelVideoRecorder::BufferCC(struct cc *cc, int mode, int len, int clr)
     textbuffer[act]->timecode = cc->timecode[mode];
 
     // NOTE:  text_buffer_size happens to be > (sizeof(ccsubtitle)+255)
-    if (len > 255)
-        len = 255;
+    QCString tmpbuf;
+    if (len)
+    {
+        // calculate UTF-8 encoding length
+        tmpbuf = cc->ccbuf[mode].utf8();
+        len = tmpbuf.length();
+        if (len > 255)
+            len = 255;
+    }
 
     unsigned char f;
     unsigned char *bp = textbuffer[act]->buffer;
@@ -2574,13 +2788,7 @@ void NuppelVideoRecorder::BufferCC(struct cc *cc, int mode, int len, int clr)
     *(bp++) = cc->style[mode];
     // overload resumetext field
     f = cc->resumetext[mode];
-    switch (mode)
-    {
-        case 1 : f |= CC_CC2;  break;
-        case 2 : f |= CC_TXT1; break;
-        case 3 : f |= CC_TXT2; break;
-        default: f |= CC_CC1;
-    }
+    f |= mode << 4;
     if (cc->linecont[mode])
         f |= CC_LINE_CONT;
     *(bp++) = f;
@@ -2589,7 +2797,7 @@ void NuppelVideoRecorder::BufferCC(struct cc *cc, int mode, int len, int clr)
     if (len)
     {
         memcpy(bp,
-               cc->ccbuf[mode].ascii(),
+               tmpbuf,
                len);
         textbuffer[act]->bufferlen = len + sizeof(ccsubtitle);
     }
@@ -2603,26 +2811,26 @@ void NuppelVideoRecorder::BufferCC(struct cc *cc, int mode, int len, int clr)
     textbuffer[act]->freeToEncode = 1;
 
     cc->resumetext[mode] = 0;
+    if (clr && !len)
+        cc->lastclr[mode] = cc->timecode[mode];
+    else if (len)
+        cc->lastclr[mode] = 0;
 }
 
 int NuppelVideoRecorder::NewRowCC(struct cc *cc, int mode, int len)
 {
     if (cc->style[mode] == CC_STYLE_ROLLUP)
     {
-        if (len == 0)
-            cc->row[mode] = cc->newrow[mode];
-        else
+        // previous line was likely missing a carriage return
+        cc->row[mode] = cc->newrow[mode];
+        if (len)
         {
-            // previous line was likely missing a carriage return
-            if (cc->row[mode] == 0)
-                cc->row[mode] = cc->newrow[mode];
-
             BufferCC(cc, mode, len, 0);
             cc->ccbuf[mode] = "";
             len = 0;
-            cc->col[mode] = 0;
-            cc->linecont[mode] = 0;
         }
+        cc->col[mode] = 0;
+        cc->linecont[mode] = 0;
     }
     else
     {
@@ -2657,10 +2865,20 @@ int NuppelVideoRecorder::NewRowCC(struct cc *cc, int mode, int len)
         else if (cc->newrow[mode] == cc->lastrow[mode])
         {
             // same row
-            // - assume new line appends to current line
-            cc->newcol[mode] -= cc->col[mode];
-            if (cc->newcol[mode] < 0)
-                cc->newcol[mode] = 0;
+            if (cc->newcol[mode] >= cc->col[mode])
+                // new line appends to current line
+                cc->newcol[mode] -= cc->col[mode];
+            else
+            {
+                // new line overwrites current line;
+                // could be legal (overwrite spaces?) but
+                // more likely we have bad address codes
+                // - just move to next line; may exceed row 15
+                // but frontend will adjust
+                cc->ccbuf[mode] += (char)'\n';
+                len++;
+                cc->col[mode] = 0;
+            }
         }
         else
         {
@@ -2684,6 +2902,7 @@ int NuppelVideoRecorder::NewRowCC(struct cc *cc, int mode, int len)
         len++;
         cc->col[mode]++;
     }
+    cc->newcol[mode] = 0;
 
     return len;
 }
@@ -2784,7 +3003,8 @@ void NuppelVideoRecorder::doVbiThread(void)
                 }
                 break;
             case 2:
-                FormatCC(cc, cc_handler(cc));
+                cc_handler(cc);
+                FormatCC(cc);
                 break;
         }
     }

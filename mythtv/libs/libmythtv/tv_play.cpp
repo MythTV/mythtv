@@ -132,6 +132,10 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "DISPCC2", "Display CC2", "");
     REG_KEY("TV Playback", "DISPCC3", "Display CC3", "");
     REG_KEY("TV Playback", "DISPCC4", "Display CC4", "");
+    REG_KEY("TV Playback", "DISPTXT1", "Display TXT1", "");
+    REG_KEY("TV Playback", "DISPTXT2", "Display TXT2", "");
+    REG_KEY("TV Playback", "DISPTXT3", "Display TXT3", "");
+    REG_KEY("TV Playback", "DISPTXT4", "Display TXT4", "");
     REG_KEY("TV Playback", "QUEUETRANSCODE", "Queue the current recording for "
             "transcoding", "X");
     REG_KEY("TV Playback", "SPEEDINC", "Increase the playback speed", "U");
@@ -389,12 +393,33 @@ void TV::FinishRecording(void)
     activerecorder->FinishRecording();
 }
 
-void TV::AskAllowRecording(const QString &message, int timeuntil)
+void TV::AskAllowRecording(const QStringList &messages, int timeuntil)
 {
     //TODO: integrate this dialog so that event doesn't have to wait
     if (GetState() != kState_WatchingLiveTV)
        return;
 
+    QString title = messages[0];
+    QString chanstr = messages[1];
+    QString chansign = messages[2];
+    QString channame = messages[3];
+
+    QString channel;
+    if (gContext->GetNumSetting("DisplayChanNum") != 0)
+    {
+        if (channame != chansign)
+            channel = channame + " [" +  chansign + "]";
+        else
+            channel = channame;
+    }
+    else
+        channel = chanstr;
+    
+    QString message = QObject::tr("MythTV wants to record \"%1\" on %2"
+                                  " in %3 seconds. Do you want to:")
+                                 .arg(title)
+                                 .arg(channel)
+                                 .arg(" %d ");
     dialogname = "allowrecordingbox";
 
     while (!osd)
@@ -1032,7 +1057,7 @@ void TV::RunTV(void)
         if (channelqueued && nvp->GetOSD())
         {
             OSDSet *set = osd->GetSet("channel_number");
-            if (set && !set->Displaying())
+            if ((set && !set->Displaying()) || !set)
             {
                 if (internalState == kState_WatchingLiveTV)
                     ChannelCommit();
@@ -2550,7 +2575,7 @@ void TV::GetNextProgram(RemoteEncoder *enc, int direction,
 
     seconds = startts.secsTo(endts);
     minutes = seconds / 60;
-    infoMap["lenmins"] = QString("%1").arg(minutes);
+    infoMap["lenmins"] = QString("%1 %2").arg(minutes).arg(tr("minutes"));
     hours   = minutes / 60;
     minutes = minutes % 60;
     length.sprintf("%d:%02d", hours, minutes);
@@ -2608,7 +2633,7 @@ void TV::GetChannelInfo(RemoteEncoder *enc, QMap<QString, QString> &infoMap)
 
     seconds = startts.secsTo(endts);
     minutes = seconds / 60;
-    infoMap["lenmins"] = QString("%1").arg(minutes);
+    infoMap["lenmins"] = QString("%1 %2").arg(minutes).arg(tr("minutes"));
     hours   = minutes / 60;
     minutes = minutes % 60;
     length.sprintf("%d:%02d", hours, minutes);
@@ -2987,7 +3012,7 @@ void TV::customEvent(QCustomEvent *e)
             if (cardnum == recorder->GetRecorderNumber())
             {
                 menurunning = false;
-                AskAllowRecording(me->ExtraData(), timeuntil);
+                AskAllowRecording(me->ExtraDataList(), timeuntil);
             }
         }
         else if (GetState() == kState_WatchingLiveTV &&
@@ -3351,6 +3376,8 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         DoToggleCC(0);
     else if (action.left(6) == "DISPCC")
         DoToggleCC(action.right(1).toInt());
+    else if (action.left(7) == "DISPTXT")
+        DoToggleCC(action.right(1).toInt() + 4);
     else if (action == "TOGGLEMANUALZOOM")
         SetManualZoom(true);
     else if (action.left(12) == "TOGGLEASPECT")
@@ -3484,8 +3511,11 @@ void TV::BuildOSDTreeMenu(void)
         item = new OSDGenericTree(treeMenu, tr("Closed Captioning"));
         subitem = new OSDGenericTree(item, tr("Toggle CC"), "TOGGLECC");
         for (int i = 1; i <= 4; i++)
-            subitem = new OSDGenericTree(item, QString(tr("CC%1")).arg(i),
+            subitem = new OSDGenericTree(item, QString("%1%2").arg(tr("CC")).arg(i),
                                          QString("DISPCC%1").arg(i));
+        for (int i = 1; i <= 4; i++)
+            subitem = new OSDGenericTree(item, QString("%1%2").arg(tr("TXT")).arg(i),
+                                         QString("DISPTXT%1").arg(i));
     }
 
     item = new OSDGenericTree(treeMenu, tr("Change Aspect Ratio"));

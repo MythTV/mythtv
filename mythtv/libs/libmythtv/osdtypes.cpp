@@ -1720,6 +1720,100 @@ void OSDTypeCC::ClearAllCCText()
     }
 }
 
+int OSDTypeCC::UpdateCCText(vector<ccText*> *ccbuf,
+                            int replace, int scroll, bool scroll_prsv,
+                            int scroll_yoff, int scroll_ymax)
+// ccbuf      :  new text
+// replace    :  replace last lines
+// scroll     :  scroll amount
+// scroll_prsv:  preserve last lines and move into scroll window
+// scroll_yoff:  yoff < scroll window <= ymax
+// scroll_ymax:
+{
+    vector<ccText*>::iterator i;
+    int visible = 0;
+
+    if (m_textlist && (scroll || replace))
+    {
+        ccText *cc;
+
+        // get last row
+        int ylast = 0;
+        i = m_textlist->end() - 1;
+        cc = *i;
+        if (cc)
+            ylast = cc->y;
+
+        // calculate row positions to delete, keep
+        int ydel = scroll_yoff + scroll;
+        int ykeep = scroll_ymax;
+        int ymove = 0;
+        if (scroll_prsv && ylast)
+        {
+            ymove = ylast - scroll_ymax;
+            ydel += ymove;
+            ykeep += ymove;
+        }
+
+        i = m_textlist->begin();
+        while (i < m_textlist->end())
+        {
+            cc = (*i);
+            if (!cc)
+            {
+                i = m_textlist->erase(i);
+                continue;
+            }
+
+            if (cc->y > (ylast - replace))
+            {
+                // delete last lines
+                delete cc;
+                i = m_textlist->erase(i);
+            }
+            else if (scroll)
+            {
+                if (cc->y > ydel && cc->y <= ykeep)
+                {
+                    // scroll up
+                    cc->y -= (scroll + ymove);
+                    i++;
+                }
+                else
+                {
+                    // delete lines outside scroll window
+                    i = m_textlist->erase(i);
+                    delete cc;
+                }
+            }
+            else
+                i++;
+        }
+    }
+
+    if (m_textlist)
+        visible += m_textlist->size();
+
+    if (ccbuf)
+    {
+        // add new text
+        i = ccbuf->begin();
+        while (i < ccbuf->end())
+        {
+            if (*i)
+            {
+                visible++;
+                if (!m_textlist)
+                    m_textlist = new vector<ccText *>;
+                m_textlist->push_back(*i);
+            }
+            i++;
+        }
+    }
+
+    return visible;
+}
+
 void OSDTypeCC::Draw(OSDSurface *surface, int fade, int maxfade, int xoff, 
                      int yoff)
 {

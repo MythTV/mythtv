@@ -318,7 +318,8 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
 
     seconds = recstartts.secsTo(recendts);
     minutes = seconds / 60;
-    progMap["lenmins"] = QString("%1").arg(minutes);
+    progMap["lenmins"] = QString("%1 %2").
+        arg(minutes).arg(QObject::tr("minutes"));
     hours   = minutes / 60;
     minutes = minutes % 60;
     length.sprintf("%d:%02d", hours, minutes);

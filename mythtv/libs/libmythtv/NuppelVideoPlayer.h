@@ -302,7 +302,7 @@ class NuppelVideoPlayer
     QWaitCondition decoderThreadPaused, videoThreadPaused;
  
     bool cc;
-    int ccmode;
+    unsigned char ccmode;
 
     bool playing;
     bool decoder_thread_alive;
@@ -382,10 +382,9 @@ class NuppelVideoPlayer
     int commercialskipmethod;
     bool tryunflaggedskip;
 
-    QString cclines[4];
-    int ccptr;
-    int cccol[4];
-    int ccrow[4];
+    QString ccline;
+    int cccol;
+    int ccrow;
 
     DecoderBase *decoder;
 

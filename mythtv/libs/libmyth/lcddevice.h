@@ -252,6 +252,7 @@ class LCD : public QObject
     QString scrollWidget;
     int scrollRow;
     unsigned int scrollPosition;
+    QString timeformat;
         
     unsigned int menuScrollPosition;
     QPtrList<LCDMenuItem> *lcdMenuItems;
@@ -265,6 +266,13 @@ class LCD : public QObject
     unsigned int port;
 
     bool lcd_ready;
+
+    bool lcd_showtime;
+    bool lcd_showmenu;
+    bool lcd_showgeneric;
+    bool lcd_showmusic;
+    bool lcd_showchannel;
+    bool lcd_showvolume;
 
     int (*GetLEDMask)(void);
 };

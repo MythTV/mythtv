@@ -44,7 +44,7 @@ class TV : public QObject
     int GetLastRecorderNum(void) { return lastRecorderNum; }
     int PlayFromRecorder(int recordernum);
 
-    void AskAllowRecording(const QString &message, int timeuntil);
+    void AskAllowRecording(const QStringList &messages, int timeuntil);
 
     // next two functions only work on recorded programs.
     int Playback(ProgramInfo *rcinfo);

@@ -31,6 +31,7 @@ public slots:
 
 private:
     void SetPids(cCiCaPmt& capmt, dvb_pids_t& pid);
+    bool FindCaDescriptors(cCiCaPmt& capmt, const unsigned short *caids, int slot);
 
     QSqlDatabase*   db;
     pthread_mutex_t* db_lock;

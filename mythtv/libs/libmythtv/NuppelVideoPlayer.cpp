@@ -172,14 +172,10 @@ NuppelVideoPlayer::NuppelVideoPlayer(MythSqlDatabase *ldb,
     pausevideo = false;
 
     cc = false;
-    ccmode = 1;
-    for (int j = 0; j < 4; j++)
-    {
-        cclines[j] = "";
-        cccol[j] = 0;
-        ccrow[j] = 0;
-    }
-    ccptr = 0;
+    ccmode = CC_CC1;
+    ccline = "";
+    cccol = 0;
+    ccrow = 0;
 
     limitKeyRepeat = false;
 
@@ -802,11 +798,52 @@ void NuppelVideoPlayer::ToggleCC(char mode, int arg)
         }
         else if (mode == 2)
         {
-            if (arg)
-                ccmode = arg;
+            cc = true;
+            switch (arg)
+            {
+            case  0:                   break;  // same mode
+            case  2: ccmode = CC_CC2;  break;
+            case  3: ccmode = CC_CC3;  break;
+            case  4: ccmode = CC_CC4;  break;
+            case  5: ccmode = CC_TXT1; break;
+            case  6: ccmode = CC_TXT2; break;
+            case  7: ccmode = CC_TXT3; break;
+            case  8: ccmode = CC_TXT4; break;
+            default: ccmode = CC_CC1;
+            }
+
             ResetCC();
-            msg = QString("%1%2").arg(QObject::tr("CC")).arg(ccmode);
+
+            switch (ccmode)
+            {
+            case CC_CC2 :
+                msg = QString("%1%2").arg(QObject::tr("CC")).arg(2);
+                break;
+            case CC_CC3 :
+                msg = QString("%1%2").arg(QObject::tr("CC")).arg(3);
+                break;
+            case CC_CC4 :
+                msg = QString("%1%2").arg(QObject::tr("CC")).arg(4);
+                break;
+            case CC_TXT1:
+                msg = QString("%1%2").arg(QObject::tr("TXT")).arg(1);
+                break;
+            case CC_TXT2:
+                msg = QString("%1%2").arg(QObject::tr("TXT")).arg(2);
+                break;
+            case CC_TXT3:
+                msg = QString("%1%2").arg(QObject::tr("TXT")).arg(3);
+                break;
+            case CC_TXT4:
+                msg = QString("%1%2").arg(QObject::tr("TXT")).arg(4);
+                break;
+            default     :
+                msg = QString("%1%2").arg(QObject::tr("CC")).arg(1);
+                break;
+            }
         }
+        else
+            msg = QString(QObject::tr("CC/TXT disabled"));
     }
 
     if (osd)
@@ -867,35 +904,22 @@ void NuppelVideoPlayer::ShowText(void)
 
 void NuppelVideoPlayer::ResetCC(void)
 {
-    for (int j = 0; j < 4; j++)
-    {
-        cclines[j] = "";
-        cccol[j] = 0;
-        ccrow[j] = 0;
-    }
-    ccptr = 0;
+    ccline = "";
+    cccol = 0;
+    ccrow = 0;
     if (osd)
         osd->ClearAllCCText();
 }
 
 void NuppelVideoPlayer::UpdateCC(unsigned char *inpos)
 {
-    int j;
     struct ccsubtitle subtitle;
 
     memcpy(&subtitle, inpos, sizeof(subtitle));
     inpos += sizeof(ccsubtitle);
 
     // skip undisplayed streams
-    unsigned char dispmode;
-    switch (ccmode)
-    {
-        case 2 : dispmode = CC_CC2;  break;
-        case 3 : dispmode = CC_TXT1; break;
-        case 4 : dispmode = CC_TXT2; break;
-        default: dispmode = CC_CC1;
-    }
-    if ((subtitle.resumetext & CC_MODE_MASK) != dispmode)
+    if ((subtitle.resumetext & CC_MODE_MASK) != ccmode)
         return;
 
     if (subtitle.row == 0)
@@ -905,22 +929,31 @@ void NuppelVideoPlayer::UpdateCC(unsigned char *inpos)
     {
         //printf ("erase displayed memory\n");
         ResetCC();
+        if (!subtitle.len)
+            return;
     }
 
-    if (subtitle.len)
+//    if (subtitle.len || !subtitle.clr)
     {
         unsigned char *end = inpos + subtitle.len;
         int row = 0;
         int linecont = (subtitle.resumetext & CC_LINE_CONT);
-            
-        while (inpos < end)
+
+        vector<ccText*> *ccbuf = new vector<ccText*>;
+        vector<ccText*>::iterator ccp;
+        ccText *tmpcc = NULL;
+        int replace = linecont;
+        int scroll = 0;
+        bool scroll_prsv = false;
+        int scroll_yoff = 0;
+        int scroll_ymax = 15;
+
+        do
         {
             if (linecont)
             {
-                // append to last line
-                ccptr--;
-                if (ccptr < 0)
-                    ccptr = 3;
+                // append to last line; needs to be redrawn
+                replace = 1;
                 // backspace into existing line if needed
                 int bscnt = 0;
                 while ((inpos < end) && *inpos != 0 && (char)*inpos == '\b')
@@ -929,19 +962,22 @@ void NuppelVideoPlayer::UpdateCC(unsigned char *inpos)
                     inpos++;
                 }
                 if (bscnt)
-                    cclines[ccptr].remove(cclines[ccptr].length() - 1, 1);
+                    ccline.remove(ccline.length() - bscnt, bscnt);
             }
             else
             {
                 // new line:  count spaces to calculate column position
-                cccol[ccptr] = 0;
+                row++;
+                cccol = 0;
+                ccline = "";
                 while ((inpos < end) && *inpos != 0 && (char)*inpos == ' ')
                 {
                     inpos++;
-                    cccol[ccptr]++;
+                    cccol++;
                 }
             }
 
+            ccrow = subtitle.row;
             unsigned char *cur = inpos;
 
             //null terminate at EOL
@@ -949,89 +985,86 @@ void NuppelVideoPlayer::UpdateCC(unsigned char *inpos)
                 cur++;
             *cur = 0;
 
-#if 0
-            if (row >= 4)
-                printf("CC overflow: %s\n", (const char *)inpos);
-#endif
-
-            if (*inpos != 0)
+            if (*inpos != 0 || linecont)
             {
                 if (linecont)
-                    cclines[ccptr] += QString((const char *)inpos);
+                    ccline += QString::fromUtf8((const char *)inpos, -1);
                 else
+                    ccline = QString::fromUtf8((const char *)inpos, -1);
+                tmpcc = new ccText();
+                tmpcc->text = ccline;
+                tmpcc->x = cccol;
+                tmpcc->y = ccrow;
+                tmpcc->color = 1;
+                tmpcc->teletextmode = false;
+                ccbuf->push_back(tmpcc);
+#if 0
+                if (ccbuf->size() > 4)
                 {
-                    cclines[ccptr] = QString((const char *)inpos);
-                    row++;
+                    printf("CC overflow:  ");
+                    printf("%d %d %s\n", cccol, ccrow, ccline.ascii());
                 }
-                ccrow[ccptr] = subtitle.row;
-                ccptr++;
-                if (ccptr >= 4)
-                    ccptr = 0;
+#endif
             }
             subtitle.row++;
             inpos = cur + 1;
             linecont = 0;
+        } while (inpos < end);
+
+        // adjust row position
+        if (subtitle.resumetext & CC_TXT_MASK)
+        {
+            // TXT mode
+            // - can use entire 15 rows
+            // - scroll up when reaching bottom
+            if (ccrow > 15)
+            {
+                if (row)
+                    scroll = ccrow - 15;
+                if (tmpcc)
+                    tmpcc->y = 15;
+            }
         }
-
-        int lastccptr = ccptr - 1;
-        if (lastccptr < 0)
-            lastccptr = 3;
-
-        // set row position
-        if (subtitle.rowcount == 0 || row > 1)
+        else if (subtitle.rowcount == 0 || row > 1)
         {
             // multi-line text
             // - fix display of old (badly-encoded) files
-            for (j = 0; j < 4; j++)
-                if (ccrow[lastccptr] > 15)
-                    ccrow[j] -= (ccrow[lastccptr] - 15);
+            if (ccrow > 15)
+            {
+                ccp = ccbuf->begin();
+                for (; ccp != ccbuf->end(); ccp++)
+                {
+                    tmpcc = *ccp;
+                    tmpcc->y -= (ccrow - 15);
+                }
+            }
         }
         else
         {
             // scrolling text
-            // - scroll up previous lines
+            // - scroll up previous lines if adding new line
             // - if caption is at bottom, row address is for last
             // row
             // - if caption is at top, row address is for first row (?)
             if (subtitle.rowcount > 4)
                 subtitle.rowcount = 4;
-            int tmpccptr = lastccptr;
-            int uprow;
-            if (ccrow[lastccptr] - subtitle.rowcount < 0)
-                ccrow[lastccptr] = subtitle.rowcount;
-            uprow = ccrow[lastccptr] - 1;
-            for (j = 1; j < 4; j++)
+            if (ccrow < subtitle.rowcount)
             {
-                tmpccptr--;
-                if (tmpccptr < 0)
-                    tmpccptr = 3;
-                if (j < subtitle.rowcount)
-                    ccrow[tmpccptr] = uprow--;
-                else
-                {
-                    cclines[tmpccptr] = "";
-                    ccrow[tmpccptr] = 0;
-                    cccol[tmpccptr] = 0;
-                }
+                ccrow = subtitle.rowcount;
+                if (tmpcc)
+                    tmpcc->y = ccrow;
+            }
+            if (row)
+            {
+                scroll = row;
+                scroll_prsv = true;
+                scroll_yoff = ccrow - subtitle.rowcount;
+                scroll_ymax = ccrow;
             }
         }
-    }
 
-    //redraw
-    osd->ClearAllCCText ();
-    for (j = 0; j < 4; j++)
-    {
-        if (cclines[j].isNull() || cclines[j].isEmpty())
-            continue;
-        if (ccrow[j] < 1)
-        {
-            cclines[j] = "";
-            ccrow[j] = 0;
-            cccol[j] = 0;
-            continue;
-        }
-        osd->AddCCText(cclines[j], cccol[j], ccrow[j],
-                       1, false);
+        osd->UpdateCCText(ccbuf, replace, scroll, scroll_prsv, scroll_yoff, scroll_ymax);
+        delete ccbuf;
     }
 }
 

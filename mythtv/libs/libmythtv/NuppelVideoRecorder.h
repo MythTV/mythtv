@@ -118,7 +118,9 @@ class NuppelVideoRecorder : public RecorderBase
     void DoMJPEG(void);
 
     void FormatTeletextSubtitles(struct VBIData *vbidata);
-    void FormatCC(struct cc *cc, int data);
+    void FormatCC(struct cc *cc);
+    void FormatCCField(struct cc *cc, int tc, int field);
+    QChar CharCC(int code);
     void ResetCC(struct cc *cc, int mode);
     void BufferCC(struct cc *cc, int mode, int len, int clr);
     int NewRowCC(struct cc *cc, int mode, int len);

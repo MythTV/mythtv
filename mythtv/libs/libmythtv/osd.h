@@ -34,6 +34,7 @@ class UDPNotifyOSDSet;
 class OSDListTreeType;
 class QKeyEvent;
 class OSDGenericTree;
+class ccText;
 
 class OSD : public QObject
 {
@@ -59,6 +60,9 @@ class OSD : public QObject
     void AddCCText(const QString &text, int x, int y, int color, 
                    bool teletextmode = false);
     void ClearAllCCText();
+    void UpdateCCText(vector<ccText*> *ccbuf,
+                      int replace = 0, int scroll = 0, bool scroll_prsv = false,
+                      int scroll_yoff = 0, int scroll_ymax = 15);
     void SetSettingsText(const QString &text, int length);
 
     void NewDialogBox(const QString &name, const QString &message, 

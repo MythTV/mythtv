@@ -1437,6 +1437,29 @@ void OSD::ClearAllCCText()
     osdlock.unlock();
 }
 
+void OSD::UpdateCCText(vector<ccText*> *ccbuf,
+                       int replace, int scroll, bool scroll_prsv,
+                       int scroll_yoff, int scroll_ymax)
+{
+    osdlock.lock();
+    OSDSet *container = GetSet("cc_page");
+    if (container)
+    {
+        OSDTypeCC *ccpage = (OSDTypeCC *)container->GetType("cc_page");
+        int visible = 0;
+
+        if (ccpage)
+            visible = ccpage->UpdateCCText(ccbuf,
+                                           replace, scroll, scroll_prsv,
+                                           scroll_yoff, scroll_ymax);
+
+        container->Display(visible);
+        m_setsvisible = true;
+        changed = true;
+    }
+    osdlock.unlock();
+}
+
 void OSD::SetSettingsText(const QString &text, int length)
 {
     osdlock.lock();

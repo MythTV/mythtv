@@ -190,15 +190,22 @@ struct cc *cc_open(const char *vbi_name)
 	return 0;
     }
 
-    cc->badvbi = 0;
-    cc->lasttc = 0;
-    cc->lastcode = -1;
-    cc->lastcodetc = 0;
+    cc->code1 = -1;
+    cc->code2 = -1;
 
-    cc->ccmode = -1;
-    cc->txtmode[0] = 0;
-    cc->txtmode[1] = 0;
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 2; i++)
+    {
+        cc->badvbi[i] = 0;
+        cc->lasttc[i] = 0;
+        cc->lastcode[i] = -1;
+        cc->lastcodetc[i] = 0;
+        cc->ccmode[i] = -1;
+        cc->txtmode[i*2 + 0] = 0;
+        cc->txtmode[i*2 + 1] = 0;
+        cc->xds[i] = 0;
+    }
+
+    for (int i = 0; i < 8; i++)
     {
         cc->lastrow[i] = 0;
         cc->newrow[i] = 0;
@@ -210,6 +217,7 @@ struct cc *cc_open(const char *vbi_name)
         cc->style[i] = 0;
         cc->linecont[i] = 0;
         cc->resumetext[i] = 0;
+        cc->lastclr[i] = 0;
         cc->ccbuf[i] = "";
     }
 
@@ -228,15 +236,17 @@ void cc_close(struct cc *cc)
 // 2 = new channel 2 data present in outtext
 // -1 = invalid cc data, reset all outtext
 // -2 = readerror
-int cc_handler(struct cc *cc)
+void cc_handler(struct cc *cc)
 {
     if (read(cc->fd, cc->buffer, CC_VBIBUFSIZE) != CC_VBIBUFSIZE)
     {
         printf("Can't read vbi data\n");
-        return -2;
+        cc->code1 = -2;
+        cc->code2 = -2;
     }
     else
     {
-        return decode((unsigned char *)(cc->buffer + (2048 * 11)));
+        cc->code1 = decode((unsigned char *)(cc->buffer + (2048 * 11)));
+        cc->code2 = decode((unsigned char *)(cc->buffer + (2048 * 27)));
     }
 }

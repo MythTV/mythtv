@@ -426,7 +426,7 @@ void MainServer::customEvent(QCustomEvent *e)
 
         broadcast = "BACKEND_MESSAGE";
         broadcast << me->Message();
-        broadcast << me->ExtraData();
+        broadcast += me->ExtraDataList();
         sendstuff = true;
     }
 

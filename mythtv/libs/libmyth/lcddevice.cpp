@@ -304,7 +304,16 @@ void LCD::init()
 
     QString aString;
     int i;
+
+    timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
     
+    lcd_showmusic=(gContext->GetSetting("LCDShowMusic", "1")=="1");
+    lcd_showtime=(gContext->GetSetting("LCDShowTime", "1")=="1");
+    lcd_showchannel=(gContext->GetSetting("LCDShowChannel", "1")=="1");
+    lcd_showgeneric=(gContext->GetSetting("LCDShowGeneric", "1")=="1");
+    lcd_showvolume=(gContext->GetSetting("LCDShowVolume", "1")=="1");
+    lcd_showmenu=(gContext->GetSetting("LCDShowMenu", "1")=="1");
+
     connected = TRUE;
 
     // This gets called when we receive the "connect" string from the server
@@ -319,7 +328,7 @@ void LCD::init()
 
     sendToServer("screen_add Time");
     sendToServer("widget_del Time heartbeat");
-    sendToServer("screen_set Time priority 128");
+    sendToServer("screen_set Time priority 255");
     sendToServer("widget_add Time timeWidget string");
     sendToServer("widget_add Time topWidget string");
 
@@ -502,7 +511,8 @@ void LCD::stopAll()
 
 void LCD::startTime()
 {
-    sendToServer("screen_set Time priority 128");
+    if (lcd_showtime)
+        sendToServer("screen_set Time priority 128");
     timeTimer->start(1000, FALSE);
     outputTime();
     theMode = 0;    
@@ -662,7 +672,8 @@ void LCD::assignScrollingText(QString theText, QString theWidget, int theRow)
 void LCD::startMusic(QString artist, QString track)
 {
     QString aString;
-    sendToServer("screen_set Music priority 64");
+    if (lcd_showmusic)
+      sendToServer("screen_set Music priority 64");
     musicTimer->start(100, FALSE);
     aString = artist;
     aString += " - ";
@@ -674,7 +685,8 @@ void LCD::startMusic(QString artist, QString track)
 void LCD::startChannel(QString channum, QString title, QString subtitle)
 {
     QString aString;
-    sendToServer("screen_set Channel priority 64");
+    if (lcd_showchannel)
+      sendToServer("screen_set Channel priority 64");
     channelTimer->start(500, FALSE);
     aString = channum;
     aString += ": ";
@@ -697,7 +709,8 @@ void LCD::startGeneric(QPtrList<LCDTextItem> * textItems)
     QPtrListIterator<LCDTextItem> it( *textItems );
     QString aString;
 
-    sendToServer("screen_set Generic priority 64");
+    if (lcd_showgeneric)
+      sendToServer("screen_set Generic priority 64");
 
     // Clear out the LCD.  Do this before checking if its empty incase the user
     //  wants to just clear the lcd
@@ -743,7 +756,8 @@ void LCD::startMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name,
     menuScrollTimer->stop();
 
     // Menu is higher priority than volume
-    sendToServer("screen_set Menu priority 15");
+    if (lcd_showmenu) 
+        sendToServer("screen_set Menu priority 15");
 
     // Write out the app name
     outputCenteredText("Menu", app_name, "topWidget", 1);
@@ -1131,7 +1145,8 @@ void LCD::scrollMenuText()
 
 void LCD::startVolume(QString app_name)
 {
-    sendToServer("screen_set Volume priority 32");
+    if (lcd_showvolume)
+      sendToServer("screen_set Volume priority 32");
     outputCenteredText("Volume", "Myth " + app_name + " Volume");
     volume_level = 0.0;
     outputVolume();
@@ -1237,7 +1252,6 @@ void LCD::outputTime()
     aString += " ";
     aString += QString::number(y);
     aString += " \"";
-    QString timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
     aString += QTime::currentTime().toString(timeformat).left(8) + "\"";
     if (timeFlash)
     {

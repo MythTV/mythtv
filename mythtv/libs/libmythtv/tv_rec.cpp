@@ -793,21 +793,15 @@ void TVRec::RunTV(void)
             int timeuntil = QDateTime::currentDateTime()
                                 .secsTo(recordPendingStart);
 
-            QString message = QString("MythTV wants to record \"")
-                               + pendingRecording->title;
-
-            if (gContext->GetNumSetting("DisplayChanNum") != 0)
-                message += QString("\" on ")
-                        + pendingRecording->channame
-                        + " [" +  pendingRecording->chansign + "]";
-            else
-                message += "\" on Channel " + pendingRecording->chanstr;
-
-            message += " in %d seconds.  Do you want to:";
-
             QString query = QString("ASK_RECORDING %1 %2").arg(m_capturecardnum)
-                                                        .arg(timeuntil);
-            MythEvent me(query, message);
+                                                          .arg(timeuntil);
+            QStringList messages;
+            messages << pendingRecording->title
+                    << pendingRecording->chanstr
+                    << pendingRecording->chansign
+                    << pendingRecording->channame;
+            
+            MythEvent me(query, messages);
 
             gContext->dispatch(me);
         }

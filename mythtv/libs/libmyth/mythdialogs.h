@@ -96,6 +96,9 @@ class MythMainWindow : public QDialog
                              MediaPlayCallback fn);
     bool HandleMedia(QString &handler, const QString &mrl);
 
+    void JumpTo(const QString &destination);
+    bool DestinationExists(const QString &destination) const;
+
   protected:
     void keyPressEvent(QKeyEvent *e);
     void customEvent(QCustomEvent *ce);

@@ -103,7 +103,8 @@ class MythMainWindowPrivate
     bool exitingtomain;
 
     QDict<KeyContext> keyContexts;
-    QMap<int, JumpData> jumpMap;
+    QMap<int, JumpData*> jumpMap;
+    QMap<QString, JumpData> destinationMap;
     QMap<QString, MHData> mediaHandlerMap;
     QMap<QString, MPData> mediaPluginMap;
 
@@ -317,7 +318,7 @@ bool MythMainWindow::TranslateKeyPress(const QString &context,
     if (d->jumpMap.count(keynum) > 0 && d->exitmenucallback == NULL)
     {
         d->exitingtomain = true;
-        d->exitmenucallback = d->jumpMap[keynum].callback;
+        d->exitmenucallback = d->jumpMap[keynum]->callback;
         QApplication::postEvent(this, new ExitToMainMenuEvent());
         return false;
     }
@@ -449,7 +450,10 @@ void MythMainWindow::RegisterJump(const QString &destination,
         if (!query.isActive())
             MythContext::DBError("Insert Jump Point", query);
     }
-    
+   
+    JumpData jd = { callback, destination, description };
+    d->destinationMap[destination] = jd;
+ 
     QKeySequence keyseq(keybind);
 
     if (!keyseq.isEmpty())
@@ -459,12 +463,10 @@ void MythMainWindow::RegisterJump(const QString &destination,
 
         if (d->jumpMap.count(keynum) == 0)
         {
-            JumpData jd = { callback, destination, description };
-
             //VERBOSE(VB_GENERAL, QString("Binding: %1 to JumpPoint: %2")
             //                           .arg(keybind).arg(destination));
 
-            d->jumpMap[keynum] = jd;
+            d->jumpMap[keynum] = &d->destinationMap[destination];
         }
         else
         {
@@ -475,6 +477,22 @@ void MythMainWindow::RegisterJump(const QString &destination,
     //else
     //    VERBOSE(VB_GENERAL, QString("JumpPoint: %2 exists, no keybinding")
     //                               .arg(destination));
+}
+
+void MythMainWindow::JumpTo(const QString& destination)
+{
+    if (d->destinationMap.count(destination) > 0 && d->exitmenucallback == NULL)
+    {
+        d->exitingtomain = true;
+        d->exitmenucallback = d->destinationMap[destination].callback;
+        QApplication::postEvent(this, new ExitToMainMenuEvent());
+        return;
+    }
+}
+
+bool MythMainWindow::DestinationExists(const QString& destination) const
+{
+    return (d->destinationMap.count(destination) > 0) ? true : false;
 }
 
 void MythMainWindow::RegisterMediaHandler(const QString &destination,
@@ -1281,6 +1299,7 @@ MythThemedDialog::MythThemedDialog(MythMainWindow *parent, QString window_name,
     if(!theme->LoadTheme(xmldata, window_name, theme_filename))
     {
         cerr << "dialogbox.o: Couldn't find your theme. I'm outta here" << endl;
+        cerr << window_name << " - " <<  theme_filename << endl;
         exit(0);
     }
 
@@ -2316,15 +2335,11 @@ void MythImageFileDialog::buildFileList(QString directory)
 {
     QStringList imageExtensions = QImage::inputFormatList();
 
-    //
-    //  Expand the list Qt gives us, working off what we know was built into
-    //  Qt based on the list it gave us
-    // 
+    // Expand the list Qt gives us, working off what we know was built into
+    // Qt based on the list it gave us
 
-    if(imageExtensions.contains("jpeg"))
-    {
+    if (imageExtensions.contains("jpeg") || imageExtensions.contains("JPEG"))
         imageExtensions += "jpg";
-    }
 
     QDir d(directory);
        

@@ -73,7 +73,7 @@ class MythEvent : public QCustomEvent
         message = lmessage;
         extradata = "empty";
     }
-    MythEvent(const QString &lmessage, const QString &lextradata)
+    MythEvent(const QString &lmessage, const QStringList &lextradata)
            : QCustomEvent(MythEventMessage)
     {
         message = lmessage;
@@ -82,16 +82,18 @@ class MythEvent : public QCustomEvent
     
     ~MythEvent() {}
 
-    const QString Message() const { return message; }
-    const QString ExtraData() const { return extradata; } 
+    const QString& Message() const { return message; }
+    const QString& ExtraData(int idx = 0) const { return extradata[idx]; } 
+    const QStringList& ExtraDataList() const { return extradata; } 
+    int ExtraDataCount() const { return extradata.size(); }
 
   private:
     QString message;
-    QString extradata;
+    QStringList extradata;
 };
 
-#define MYTH_BINARY_VERSION "0.15.20040324-1"
-#define MYTH_PROTO_VERSION "4"
+#define MYTH_BINARY_VERSION "0.15.20040331-1"
+#define MYTH_PROTO_VERSION "5"
 
 extern int print_verbose_messages;
 
