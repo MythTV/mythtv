@@ -31,6 +31,7 @@ public:
 
     void setStart(const QDateTime& start);
     void setEnd(const QDateTime& end);
+    void setRank(const QString& rank);
 
     virtual MythDialog* dialogWidget(MythMainWindow *parent, 
                                      const char *name = 0);
@@ -43,7 +44,10 @@ public:
     int getRecordID(void) const { return id->intValue(); };
     int getProfileID(void) const;
 
-    static void findAllProgramsToRecord(QSqlDatabase* db, list<ProgramInfo*>& proglist);
+    static void findAllProgramsToRecord(QSqlDatabase* db, 
+                                        list<ProgramInfo*>& proglist);
+    static void findAllScheduledPrograms(QSqlDatabase *db, 
+                                         list<ProgramInfo*>& proglist);
     void findMatchingPrograms(QSqlDatabase* db, list<ProgramInfo*>& proglist);
 
     // Do any necessary bookkeeping after a matching program has been
@@ -83,6 +87,7 @@ private:
     class SREndTime* endTime;
     class SREndDate* endDate;
     class SRCategory* category;
+    class SRRank* rank;
 
     ProgramInfo* m_pginfo;
 };

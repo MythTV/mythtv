@@ -225,6 +225,10 @@ void MainServer::ProcessRequest(QStringList &listline, QStringList &tokens,
     {
         HandleGetPendingRecordings(pbs);
     }
+    else if (command == "QUERY_GETALLSCHEDULED")
+    {
+        HandleGetScheduledRecordings(pbs);
+    }
     else if (command == "QUERY_GETCONFLICTING")
     {
         if (tokens.size() != 2)
@@ -888,6 +892,32 @@ void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs)
     QStringList strlist;
 
     strlist << QString::number(conflicts);
+    strlist << QString::number(recordinglist->size());
+
+    list<ProgramInfo *>::iterator iter = recordinglist->begin();
+    for (; iter != recordinglist->end(); iter++)
+        (*iter)->ToStringList(strlist);
+
+    WriteStringList(pbs->getSocket(), strlist);
+
+    delete sched;
+}
+
+void MainServer::HandleGetScheduledRecordings(PlaybackSock *pbs)
+{
+    dblock.lock();
+
+    MythContext::KickDatabase(QSqlDatabase::database());
+
+    Scheduler *sched = new Scheduler(false, encoderList,
+                                     QSqlDatabase::database());
+
+    list<ProgramInfo *> *recordinglist = sched->getAllScheduled();
+
+    dblock.unlock();
+
+    QStringList strlist;
+
     strlist << QString::number(recordinglist->size());
 
     list<ProgramInfo *>::iterator iter = recordinglist->begin();

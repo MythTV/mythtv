@@ -7,7 +7,7 @@
 #include <qmap.h>
 #include "scheduledrecording.h"
 
-#define NUMPROGRAMLINES 20
+#define NUMPROGRAMLINES 21
 
 #define MARK_UPDATED_CUT  -3
 #define MARK_EDIT_MODE    -2
@@ -44,11 +44,16 @@ class ProgramInfo
     void Save(void);
 
     ScheduledRecording::RecordingType GetProgramRecordingStatus(QSqlDatabase *db);
+    int getChannelRank(QString chanid, QSqlDatabase *db);
+    int getTypeRank(ScheduledRecording::RecordingType type);
+
     void ApplyRecordStateChange(QSqlDatabase *db,
                                 ScheduledRecording::RecordingType newstate);
     void ApplyRecordTimeChange(QSqlDatabase *db, 
                                const QDateTime &newstartts,
                                const QDateTime &newendts);
+    void ApplyRecordRankChange(QSqlDatabase *db,
+                               const QString &newrank);
     void ToggleRecord(QSqlDatabase *dB);
     ScheduledRecording* GetScheduledRecording(QSqlDatabase *db) {
         GetProgramRecordingStatus(db);
@@ -123,6 +128,7 @@ class ProgramInfo
     QString chanstr;
     QString chansign;
     QString channame;
+    QString rank;
 
     QString pathname;
     long long filesize;

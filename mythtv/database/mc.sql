@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS channel
     finetune INT,
     videofilters VARCHAR(255) NULL,
     xmltvid VARCHAR(64) NULL,
+    rank INT(10) DEFAULT '0' NOT NULL,
     contrast INT DEFAULT 32768,
     brightness INT DEFAULT 32768,
     colour INT DEFAULT 32768
@@ -88,6 +89,7 @@ CREATE TABLE IF NOT EXISTS record
     description TEXT NULL,
     category VARCHAR(64) NULL,
     profile INT UNSIGNED NOT NULL DEFAULT 0,
+    rank INT(10) DEFAULT '0' NOT NULL,
     INDEX (chanid, starttime),
     INDEX (title)
 );
@@ -236,7 +238,7 @@ CREATE TABLE IF NOT EXISTS transcoding (
     hostname VARCHAR(255)
 );
 
-INSERT INTO settings VALUES ('DBSchemaVer', 902, NULL);
+INSERT INTO settings VALUES ('DBSchemaVer', 903, NULL);
 
 INSERT INTO recordingprofiles (name) VALUES ('Default');
 INSERT INTO recordingprofiles (name) VALUES ('Live TV');

@@ -7,13 +7,16 @@ USE mythconverg;
 #
 
 DELETE FROM settings WHERE value='DBSchemaVer';
-INSERT INTO settings VALUES ('DBSchemaVer', 902, NULL);
+INSERT INTO settings VALUES ('DBSchemaVer', 903, NULL);
 
 #
 #   Below are the recent alterations to the database.
 #   The most recent are listed first. Execution should fail
 #   when a previously executed command is encountered.
 #
+
+ALTER TABLE record ADD rank INT(10) DEFAULT '0' NOT NULL;
+ALTER TABLE channel ADD rank INT(10) DEFAULT '0' NOT NULL;
 
 ALTER TABLE record ADD COLUMN category VARCHAR(64) NULL;
 ALTER TABLE recorded ADD COLUMN category VARCHAR(64) NULL;

@@ -784,6 +784,84 @@ public:
     };
 };
 
+// General Ranking settings
+
+class GRUseRanking: public CheckBoxSetting, public BackendSetting {
+public:
+    GRUseRanking():
+        BackendSetting("RankingActive") {
+        setLabel("Use Rankings");
+        setHelpText("Use program rankings to resolve conflicts.");
+        setValue(false);
+    };
+};
+
+class GRRankingFirst: public CheckBoxSetting, public BackendSetting {
+public:
+    GRRankingFirst():
+        BackendSetting("RankingOrder") {
+        setLabel("Rankings First.");
+        setHelpText("Use rankings to resolve conflicts before using "
+                    "traditional conflict resolution.");
+        setValue(true);
+    };
+};
+
+class GRSingleRecordRank: public SpinBoxSetting, public BackendSetting {
+public:
+    GRSingleRecordRank():
+        SpinBoxSetting(-1000, 1000, 1), BackendSetting("SingleRecordRank") {
+        setLabel("Single Recordings Rank");
+        setHelpText("Single Recordings will receive this additional "
+                    "ranking value.");
+        setValue(0);
+    };
+};
+
+class GRWeekslotRecordRank: public SpinBoxSetting, public BackendSetting {
+public:
+    GRWeekslotRecordRank():
+        SpinBoxSetting(-1000, 1000, 1), BackendSetting("WeekslotRecordRank") {
+        setLabel("Weekslot Recordings Rank");
+        setHelpText("Weekslot Recordings will receive this additional "
+                    "ranking value.");
+        setValue(0);
+    };
+};
+
+class GRTimeslotRecordRank: public SpinBoxSetting, public BackendSetting {
+public:
+    GRTimeslotRecordRank():
+        SpinBoxSetting(-1000, 1000, 1), BackendSetting("TimeslotRecordRank") {
+        setLabel("Timeslot Recordings Rank");
+        setHelpText("Timeslot Recordings will receive this additional "
+                    "ranking value.");
+        setValue(0);
+    };
+};
+
+class GRChannelRecordRank: public SpinBoxSetting, public BackendSetting {
+public:
+    GRChannelRecordRank():
+        SpinBoxSetting(-99, 99, 1), BackendSetting("ChannelRecordRank") {
+        setLabel("Channel Recordings Rank");
+        setHelpText("Channel Recordings will receive this additional "
+                    "ranking value.");
+        setValue(0);
+    };
+};
+
+class GRAllRecordRank: public SpinBoxSetting, public BackendSetting {
+public:
+    GRAllRecordRank():
+        SpinBoxSetting(-99, 99, 1), BackendSetting("AllRecordRank") {
+        setLabel("All Recordings Rank");
+        setHelpText("All Recording types will receive this additional "
+                    "ranking value.");
+        setValue(0);
+    };
+};
+
 class DefaultTVChannel: public LineEditSetting, public GlobalSetting {
 public:
     DefaultTVChannel():
@@ -945,6 +1023,21 @@ EPGSettings::EPGSettings()
     gen->addChild(new UnknownCategory());
     gen->addChild(new DefaultTVChannel());
     addChild(gen);
+}
+
+GeneralRankingSettings::GeneralRankingSettings()
+{
+    VerticalConfigurationGroup* gr = new VerticalConfigurationGroup(false);
+    gr->setLabel("General Ranking Settings");
+
+    gr->addChild(new GRUseRanking());
+    gr->addChild(new GRRankingFirst());
+    gr->addChild(new GRSingleRecordRank());
+    gr->addChild(new GRWeekslotRecordRank());
+    gr->addChild(new GRTimeslotRecordRank());
+    gr->addChild(new GRChannelRecordRank());
+    gr->addChild(new GRAllRecordRank());
+    addChild(gr);
 }
 
 AppearanceSettings::AppearanceSettings()

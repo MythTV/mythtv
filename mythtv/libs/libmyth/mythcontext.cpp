@@ -769,7 +769,8 @@ void MythContext::addListener(QObject *obj)
 
 void MythContext::removeListener(QObject *obj)
 {
-    listeners.remove(obj);
+    if (listeners.find(obj) != -1)
+        listeners.remove(obj);
 }
 
 void MythContext::dispatch(MythEvent &e)

@@ -637,6 +637,381 @@
 
   </window>
 
+  <window name="rankchannels">
+
+    <font name="active_font" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="inactive_font" face="Arial">
+      <color>#9999cc</color>
+      <size>16</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="currenttitle" face="Arial">
+      <color>#ffff33</color>
+      <size>18</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="title" face="Arial">
+      <color>#ffffff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>29</size>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="info" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="message" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <container name="background">
+      <textarea name="sched" draworder="0">
+        <area>20,10,800,40</area>
+        <font>info</font>
+        <value>Channel Rankings</value>
+      </textarea>
+      <image name="filler" draworder="0" fleximage="yes">
+        <filename>rk-background.png</filename>
+        <position>0,35</position>
+      </image>
+      <textarea name="keyinstr" align="center" draworder="0">
+        <area>0,570,800,30</area>
+        <font>message</font>
+        <value>(1) Sort by Title    (2) Sort by Rank</value>
+      </textarea>
+    </container>
+
+    <container name="selector">
+     <area>0,39,800,375</area>
+      <listarea name="ranklist" draworder="4">
+        <area>20,12,760,330</area>
+        <fcnfont name="active_font" function="active"></fcnfont>
+        <fcnfont name="inactive_font" function="inactive"></fcnfont>
+        <fcnfont name="active_font" function="selected"></fcnfont>
+        <columnpadding>1</columnpadding>
+        <column number="1" width="75" context="-1"></column>
+        <column number="2" width="590" context="-1"></column>
+        <column number="3" width="13" context="-1"></column>
+        <column number="4" width="50" context="-1"></column>
+        <items>11</items>
+        <image function="selectionbar" filename="rk-selectbar.png" location="-6,-2"></image>
+        <image function="uparrow" filename="uparrow.png" location="755,22"></image>
+        <image function="downarrow" filename="downarrow.png" location="755,290"></image>
+      </listarea>
+      <image name="showinglines" draworder="5" fleximage="no">
+        <filename>rk-lines.png</filename>
+        <position>0,0</position>
+      </image>
+    </container>
+
+    <container name="channel_info">
+      <area>0,414,800,240</area>
+      <image name="icon" draworder="6">
+        <position>20,0</position>
+               <filename>blankicon.jpg</filename>
+        <staticsize>60,60</staticsize>
+      </image>
+      <textarea name="title" draworder="6">
+        <area>120,12,800,40</area>
+        <font>title</font>
+      </textarea>
+      <textarea name="inforank" draworder="6">
+        <area>20,90,160,30</area>
+        <font>info</font>
+        <value>Rank:</value>
+      </textarea>
+      <textarea name="rank" draworder="6">
+        <area>200,90,400,30</area>
+        <font>info</font>
+      </textarea>
+    </container>
+
+
+   <container name="norecordings_list">
+      <textarea name="msg" align="center" draworder="8">
+         <area>0,110,800,70</area>
+         <font>info</font>
+         <value>You Haven't Scheduled Any Programs To Be Recorded</value>
+         <value lang="IT">Non hai programmato nessuna registrazione</value>
+         <value lang="ES">No tiene programada ninguna grabaci√≥Ûn</value>
+         <value lang="CA">No hi ha prevista cap gravaci√≥Û</value>
+         <value lang="NL">Er zijn geen geplande opnames</value>
+         <value lang="DE">Sie haben noch keine Aufnahmen geplant</value>
+         <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+    <container name="norecordings_info">
+      <textarea name="topline" align="center" draworder="8">
+         <area>20,40,760,30</area>
+         <font>info</font>
+         <value>To schedule a recording, exit this screen and</value>
+         <value lang="IT">Per programmare una registrazione,</value>
+         <value lang="ES">Para programar una grabaci√≥Ûn salga y</value>
+         <value lang="CA">Per programar una gravaci√≥Û surti i</value>
+         <value lang="NL">Om een opname te plannen, verlaat dit scherm en</value>
+         <value lang="DE">Um eine Aufnahme zu planen, verlassen Sie dieses Men√º und</value>
+      </textarea>
+      <textarea name="botline" align="center" draworder="8">
+         <area>20,70,760,30</area>
+         <font>info</font>
+         <value>Select 'Program Guide' or 'Program Finder'</value>
+         <value lang="IT">esci e seleziona "Guida Programmi" o "Ricerca Programmi"</value>
+         <value lang="ES">"seleccione "Guia de Programas" o "Busqueda de programas"</value>
+         <value lang="CA">vagi a "Guia de programes" Û "Cercar Programes"</value>
+         <value lang="NL">kies "Programmagids" of "Programma Zoeker"</value>
+         <value lang="DE">w√§hlen Sie 'TV Planer' oder 'Sendung suchen'</value>
+      </textarea>
+    </container>
+
+  </window>
+
+  <window name="rankprograms">
+
+    <font name="active_font" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="inactive_font" face="Arial">
+      <color>#9999cc</color>
+      <size>16</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="currenttitle" face="Arial">
+      <color>#ffff33</color>
+      <size>18</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="title" face="Arial">
+      <color>#ffffff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>27</size>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="info" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="grayinfo" face="Arial">
+      <color>#777777</color>
+      <size>17</size>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="yellowinfo" face="Arial">
+      <color>#ffff33</color>
+      <size>17</size>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="message" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <container name="background">
+      <textarea name="sched" draworder="0">
+        <area>20,10,800,40</area>
+        <font>info</font>
+        <value>Program Rankings</value>
+      </textarea>
+      <image name="filler" draworder="0" fleximage="yes">
+        <filename>rk-background.png</filename>
+        <position>0,35</position>
+      </image>
+      <textarea name="keyinstr" align="center" draworder="0">
+        <area>0,570,800,30</area>
+        <font>message</font>
+        <value>(1) Sort by Title    (2) Sort by Rank</value>
+      </textarea>
+    </container>
+
+    <container name="selector">
+      <area>0,39,800,375</area>
+      <listarea name="ranklist" draworder="4">
+        <area>20,12,760,330</area>
+        <fcnfont name="active_font" function="active"></fcnfont>
+        <fcnfont name="inactive_font" function="inactive"></fcnfont>
+        <fcnfont name="active_font" function="selected"></fcnfont>
+        <columnpadding>1</columnpadding>
+        <column number="1" width="655" context="-1"></column>
+        <column number="2" width="13" context="-1"></column>
+        <column number="3" width="50" context="-1"></column>
+        <items>11</items>
+        <image function="selectionbar" filename="rk-selectbar.png" location="-6,-2"></image>
+        <image function="uparrow" filename="uparrow.png" location="755,22"></image>
+        <image function="downarrow" filename="downarrow.png" location="755,290"></image>
+      </listarea>
+      <image name="showinglines" draworder="5" fleximage="no">
+        <filename>rk-lines.png</filename>
+        <position>0,0</position>
+      </image>
+    </container>
+
+    <container name="program_info">
+      <area>0,400,800,240</area>
+      <textarea name="title" draworder="6">
+        <area>20,0,800,50</area>
+        <font>title</font>
+      </textarea>
+      <textarea name="subtitle" draworder="6">
+        <area>20,40,579,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="infotype" draworder="6">
+        <area>20,80,180,30</area>
+        <font>info</font>
+        <value>Recording Type:</value>
+      </textarea>
+      <textarea name="type" draworder="6">
+        <area>200,80,430,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="typebracketA" draworder="6">
+        <area>640,80,100,30</area>
+        <font>grayinfo</font>
+        <value>[</value>
+      </textarea>
+      <textarea name="typesign" draworder="6">
+        <area>650,80,100,30</area>
+        <font>grayinfo</font>
+      </textarea>
+      <textarea name="typerank" draworder="6">
+        <area>663,80,100,30</area>
+        <font>grayinfo</font>
+      </textarea>
+      <textarea name="typebracketB" draworder="6">
+        <area>688,80,100,30</area>
+        <font>grayinfo</font>
+        <value>]</value>
+      </textarea>
+      <textarea name="infochannel" draworder="6">
+        <area>20,110,160,30</area>
+        <font>info</font>
+        <value>Channel:</value>
+      </textarea>
+      <textarea name="channel" draworder="6">
+        <area>200,110,400,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="channelbracketA" draworder="6">
+        <area>640,110,100,30</area>
+        <font>grayinfo</font>
+        <value>[</value>
+      </textarea>
+      <textarea name="channelsign" draworder="6">
+        <area>650,110,100,30</area>
+        <font>grayinfo</font>
+      </textarea>
+      <textarea name="channelrank" draworder="6">
+        <area>663,110,100,30</area>
+        <font>grayinfo</font>
+      </textarea>
+      <textarea name="channelbracketB" draworder="6">
+        <area>688,110,100,30</area>
+        <font>grayinfo</font>
+        <value>]</value>
+      </textarea>
+      <textarea name="inforank" draworder="6">
+        <area>20,140,160,30</area>
+        <font>info</font>
+        <value>Rank:</value>
+      </textarea>
+      <textarea name="rank" draworder="6">
+        <area>200,140,400,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="rankbracketA" draworder="6">
+        <area>640,140,100,30</area>
+        <font>grayinfo</font>
+        <value>[</value>
+      </textarea>
+      <textarea name="ranksign" draworder="6">
+        <area>650,140,100,30</area>
+        <font>grayinfo</font>
+      </textarea>
+      <textarea name="rankB" draworder="6">
+        <area>663,140,100,30</area>
+        <font>grayinfo</font>
+      </textarea>
+      <textarea name="rankbracketB" draworder="6">
+        <area>688,140,100,30</area>
+        <font>grayinfo</font>
+        <value>]  = </value>
+      </textarea>
+      <textarea name="totalrank" draworder="6">
+        <area>730,140,150,30</area>
+        <font>yellowinfo</font>
+      </textarea>
+    </container>
+
+    <container name="norecordings_list">
+      <textarea name="msg" align="center" draworder="8">
+         <area>0,110,800,70</area>
+         <font>info</font>
+         <value>You Haven't Scheduled Any Programs To Be Recorded</value>
+         <value lang="IT">Non hai programmato nessuna registrazione</value>
+         <value lang="ES">No tiene programada ninguna grabaci√≥Ûn</value>
+         <value lang="CA">No hi ha prevista cap gravaci√≥Û</value>
+         <value lang="NL">Er zijn geen geplande opnames</value>
+         <value lang="DE">Sie haben noch keine Aufnahmen geplant</value>
+         <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+    <container name="norecordings_info">
+      <textarea name="topline" align="center" draworder="8">
+         <area>20,40,760,30</area>
+         <font>info</font>
+         <value>To schedule a recording, exit this screen and</value>
+         <value lang="IT">Per programmare una registrazione,</value>
+         <value lang="ES">Para programar una grabaci√≥Ûn salga y</value>
+         <value lang="CA">Per programar una gravaci√≥Û surti i</value>
+         <value lang="NL">Om een opname te plannen, verlaat dit scherm en</value>
+         <value lang="DE">Um eine Aufnahme zu planen, verlassen Sie dieses Men√º und</value>
+      </textarea>
+      <textarea name="botline" align="center" draworder="8">
+         <area>20,70,760,30</area>
+         <font>info</font>
+         <value>Select 'Program Guide' or 'Program Finder'</value>
+         <value lang="IT">esci e seleziona "Guida Programmi" o "Ricerca Programmi"</value>
+         <value lang="ES">"seleccione "Guia de Programas" o "Busqueda de programas"</value>
+         <value lang="CA">vagi a "Guia de programes" Û "Cercar Programes"</value>
+         <value lang="NL">kies "Programmagids" of "Programma Zoeker"</value>
+         <value lang="DE">w√§hlen Sie 'TV Planer' oder 'Sendung suchen'</value>
+      </textarea>
+    </container>
+
+  </window>
+
   <window name="playback">
 
     <font name="active" face="Arial">

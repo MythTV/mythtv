@@ -801,6 +801,12 @@ HostnameSetting::HostnameSetting(void)  {
     setValue(gContext->GetHostName());
 }
 
+RankSetting::RankSetting(void)  {
+    setVisible(false);
+
+    setValue("0");
+}
+
 void ChannelSetting::fillSelections(QSqlDatabase* db, SelectSetting* setting) {
 
     // this should go somewhere else, in something that knows about

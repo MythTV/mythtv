@@ -94,6 +94,25 @@ bool RemoteGetAllPendingRecordings(vector<ProgramInfo *> &recordinglist)
     return conflicting;
 }
 
+void RemoteGetAllScheduledRecordings(vector<ProgramInfo *> &scheduledlist)
+{
+    QStringList strlist = QString("QUERY_GETALLSCHEDULED");
+
+    gContext->SendReceiveStringList(strlist);
+
+    int numrecordings = strlist[0].toInt();
+    int offset = 1;
+
+    for (int i = 0; i < numrecordings; i++)
+    {
+        ProgramInfo *pginfo = new ProgramInfo();
+        pginfo->FromStringList(strlist, offset);
+        scheduledlist.push_back(pginfo);
+
+        offset += NUMPROGRAMLINES;
+    }
+}
+
 vector<ProgramInfo *> *RemoteGetConflictList(ProgramInfo *pginfo,
                                              bool removenonplaying)
 {

@@ -16,6 +16,8 @@ using namespace std;
 #include "manualschedule.h"
 #include "playbackbox.h"
 #include "viewscheduled.h"
+#include "rankprograms.h"
+#include "rankchannels.h"
 #include "globalsettings.h"
 #include "recordingprofile.h"
 
@@ -49,6 +51,30 @@ int startManaged(void)
 
     qApp->unlock();
     vsb.exec();
+    qApp->lock();
+
+    return 0;
+}
+
+int startProgramRankings(void)
+{
+    QSqlDatabase *db = QSqlDatabase::database();
+    RankPrograms rsb(db, gContext->GetMainWindow(), "rank scheduled");
+
+    qApp->unlock();
+    rsb.exec();
+    qApp->lock();
+
+    return 0;
+}
+
+int startChannelRankings(void)
+{
+    QSqlDatabase *db = QSqlDatabase::database();
+    RankChannels rch(db, gContext->GetMainWindow(), "rank channels");
+
+    qApp->unlock();
+    rch.exec();
     qApp->lock();
 
     return 0;
@@ -151,32 +177,53 @@ void TVMenuCallback(void *data, QString &selection)
         startManualSchedule();
     else if (sel == "tv_fix_conflicts")
         startManaged();
+    else if (sel == "tv_set_rankings")
+        startProgramRankings();
     else if (sel == "tv_progfind")
         RunProgramFind();
-    else if (sel == "settings appearance") {
+    else if (sel == "settings appearance") 
+    {
         AppearanceSettings settings;
         settings.exec(QSqlDatabase::database());
         gContext->LoadQtConfig();
         gContext->GetMainWindow()->Init();
         menu->ReloadTheme();
-    } else if (sel == "settings recording") {
+    } 
+    else if (sel == "settings recording") 
+    {
         RecordingProfileEditor editor(QSqlDatabase::database());
         editor.exec(QSqlDatabase::database());
-    } else if (sel == "settings general") {
+    } 
+    else if (sel == "settings general") 
+    {
         GeneralSettings settings;
         settings.exec(QSqlDatabase::database());
-    } else if (sel == "settings maingeneral") {
+    } 
+    else if (sel == "settings maingeneral") 
+    {
         MainGeneralSettings mainsettings;
         mainsettings.exec(QSqlDatabase::database());
         menu->ReloadExitKey();
-    } else if (sel == "settings playback") {
+    } 
+    else if (sel == "settings playback") 
+    {
         PlaybackSettings settings;
         settings.exec(QSqlDatabase::database());
-    } else if (sel == "settings epg") {
+    } 
+    else if (sel == "settings epg") 
+    {
         EPGSettings settings;
         settings.exec(QSqlDatabase::database());
+    } 
+    else if (sel == "settings generalranking") 
+    {
+        GeneralRankingSettings settings;
+        settings.exec(QSqlDatabase::database());
+    } 
+    else if (sel == "settings channelranking") 
+    {
+        startChannelRankings();
     }
-
 }
 
 int handleExit(void)

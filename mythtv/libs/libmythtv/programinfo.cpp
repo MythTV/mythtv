@@ -34,6 +34,7 @@ ProgramInfo::ProgramInfo(void)
     inputid = -1;
     cardid = -1;
     schedulerid = "";
+    rank = "";
 
     record = NULL;
 }   
@@ -65,6 +66,7 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
     inputid = other.inputid;
     cardid = other.cardid;
     schedulerid = other.schedulerid;
+    rank = other.rank;
 
     record = NULL;
 }
@@ -98,6 +100,8 @@ void ProgramInfo::ToStringList(QStringList &list)
         channame = " ";
     if (pathname == "")
         pathname = " ";
+    if (rank == "")
+        rank = " ";
 
     list << title;
     list << subtitle;
@@ -118,6 +122,7 @@ void ProgramInfo::ToStringList(QStringList &list)
     list << QString::number(sourceid);
     list << QString::number(cardid);
     list << QString::number(inputid);
+    list << rank;
 }
 
 void ProgramInfo::FromStringList(QStringList &list, int offset)
@@ -148,6 +153,7 @@ void ProgramInfo::FromStringList(QStringList &list, int offset)
     sourceid = list[offset + 17].toInt();
     cardid = list[offset + 18].toInt();
     inputid = list[offset + 19].toInt();
+    rank = list[offset + 20];
 
     if (title == " ")
         title = "";
@@ -171,8 +177,8 @@ void ProgramInfo::FromStringList(QStringList &list, int offset)
         channame = "";
     if (chansign == " ")
         chansign = "";
-    if (channame == " ")
-        channame = "";
+    if (rank == " ")
+        rank = "";
 }
 
 void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
@@ -233,6 +239,7 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
              progMap["rec_type"] = "A";
              break;
     }
+    progMap["rank"] = rank;
 
     QSqlQuery query;
     QString thequery;
@@ -470,6 +477,42 @@ ScheduledRecording::RecordingType ProgramInfo::GetProgramRecordingStatus(QSqlDat
     return record->getRecordingType();
 }
 
+int ProgramInfo::getChannelRank(QString chanid, QSqlDatabase *db)
+{
+    QString thequery;
+
+    thequery = QString("SELECT rank FROM channel WHERE chanid = %1;")
+                       .arg(chanid);
+
+    QSqlQuery query = db->exec(thequery);
+
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+        return query.value(0).toInt();
+    }
+    return 0;
+}
+
+int ProgramInfo::getTypeRank(ScheduledRecording::RecordingType type)
+{
+    switch(type)
+    {
+        case ScheduledRecording::SingleRecord:
+            return gContext->GetNumSetting("SingleRecordRank", 0);
+        case ScheduledRecording::TimeslotRecord:
+            return gContext->GetNumSetting("TimeslotRecordRank", 0);
+        case ScheduledRecording::WeekslotRecord:
+            return gContext->GetNumSetting("WeekslotRecordRank", 0);
+        case ScheduledRecording::ChannelRecord:
+            return gContext->GetNumSetting("ChannelRecordRank", 0);
+        case ScheduledRecording::AllRecord:
+            return gContext->GetNumSetting("AllRecordRank", 0);
+        default:
+            return 0;
+    }
+}
+
 // newstate uses same values as return of GetProgramRecordingState
 void ProgramInfo::ApplyRecordStateChange(QSqlDatabase *db, 
                                          ScheduledRecording::RecordingType newstate)
@@ -488,6 +531,14 @@ void ProgramInfo::ApplyRecordTimeChange(QSqlDatabase *db,
         record->setStart(newstartts);
         record->setEnd(newendts);
     }
+}
+
+void ProgramInfo::ApplyRecordRankChange(QSqlDatabase *db,
+                                        const QString &newrank)
+{
+    GetProgramRecordingStatus(db);
+    record->setRank(newrank);
+    record->save(db);
 }
 
 void ProgramInfo::ToggleRecord(QSqlDatabase *db)

@@ -18,6 +18,7 @@ class ChannelInfo
     QString chanstr;
     int chanid;
     int favid;
+    QString rank;
 
     QPixmap *icon;
 };

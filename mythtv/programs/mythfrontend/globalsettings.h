@@ -73,4 +73,9 @@ public:
     MainGeneralSettings();
 };
 
+class GeneralRankingSettings: virtual public ConfigurationWizard {
+public:
+    GeneralRankingSettings();
+};
+
 #endif

@@ -9,6 +9,7 @@ class EncoderLink;
 #include <list>
 #include <vector>
 #include <qobject.h>
+
 using namespace std;
 
 class Scheduler : public QObject
@@ -24,6 +25,7 @@ class Scheduler : public QObject
     void RemoveRecording(ProgramInfo *pginfo);
 
     list<ProgramInfo *> *getAllPending(void) { return &recordingList; }
+    list<ProgramInfo *> *getAllScheduled(void);
 
     list<ProgramInfo *> *getConflicting(ProgramInfo *pginfo,
                                         bool removenonplaying = true,
@@ -47,6 +49,7 @@ class Scheduler : public QObject
     void MarkConflictsToRemove(void);
     void MarkSingleConflict(ProgramInfo *info,
                             list<ProgramInfo *> *conflictList);
+    void CheckRank(ProgramInfo *info, list<ProgramInfo *> *conflictList);
     void CheckOverride(ProgramInfo *info, list<ProgramInfo *> *conflictList);
     void RemoveConflicts(void);
     void GuessSingle(ProgramInfo *info, list<ProgramInfo *> *conflictList);
@@ -65,6 +68,7 @@ class Scheduler : public QObject
     QSqlDatabase *db;
 
     list<ProgramInfo *> recordingList;
+    list<ProgramInfo *> scheduledList;
 
     bool hasconflicts;
 

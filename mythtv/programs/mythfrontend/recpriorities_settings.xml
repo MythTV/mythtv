@@ -1,0 +1,16 @@
+<mythmenu name="SETUP_TVRANKINGS">
+
+   <button>
+      <type>TV_RANKINGS</type>
+      <text>General</text>
+      <action>SETTINGS GENERALRANKING</action>
+   </button>
+
+   <button>
+      <type>TV_RANKINGS</type>
+      <text>Set Channel Rankings</text>
+      <action>SETTINGS CHANNELRANKING</action>
+   </button>
+
+</mythmenu>
+

@@ -47,5 +47,11 @@
       <action>SETTINGS RECORDING</action>
    </button>
 
+   <button>
+      <type>TV_RANKINGS</type>
+      <text>Rankings</text>
+      <action>MENU rank_settings.xml</action>
+   </button>
+
 </mythmenu>
 

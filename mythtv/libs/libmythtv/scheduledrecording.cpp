@@ -134,6 +134,13 @@ public:
     };
 };
 
+class SRRank: public RankSetting, public SRSetting {
+public:
+    SRRank(const ScheduledRecording& parent): SRSetting(parent, "rank") {
+        setVisible(false);
+    };
+};
+
 class SRCategory: public LineEditSetting, public SRSetting {
 public:
     SRCategory(const ScheduledRecording& parent):
@@ -155,6 +162,7 @@ ScheduledRecording::ScheduledRecording() {
     addChild(startDate = new SRStartDate(*this));
     addChild(endDate = new SREndDate(*this));
     addChild(category = new SRCategory(*this));
+    addChild(rank = new SRRank(*this));
 
     m_pginfo = NULL;
 }
@@ -170,6 +178,7 @@ void ScheduledRecording::fromProgramInfo(ProgramInfo* proginfo)
     endTime->setValue(proginfo->endts.time());
     endDate->setValue(proginfo->endts.date());
     category->setValue(proginfo->category);
+    rank->setValue(proginfo->rank);
 }
 
 void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
@@ -179,7 +188,8 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
 "program.starttime, program.endtime, "
 "program.title, program.subtitle, program.description, "
 "channel.channum, channel.callsign, channel.name, "
-"oldrecorded.starttime IS NOT NULL AS duplicate, program.category "
+"oldrecorded.starttime IS NOT NULL AS duplicate, program.category, "
+"record.rank "
 "FROM record "
 " INNER JOIN channel ON (channel.chanid = program.chanid) "
 " INNER JOIN program ON (program.title = record.title) "
@@ -243,6 +253,7 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
              proginfo->channame = result.value(9).toString();
              proginfo->duplicate = result.value(10).toInt();
              proginfo->category = QString::fromUtf8(result.value(11).toString());
+             proginfo->rank = result.value(12).toString();
 
              // would save many queries to create and populate a
              // ScheduledRecording and put it in the proginfo at the
@@ -265,6 +276,65 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
              
          }
 }
+
+void ScheduledRecording::findAllScheduledPrograms(QSqlDatabase* db,
+                                                  list<ProgramInfo*>& proglist)
+{
+    QString temptime, tempdate;
+    QString query = QString("SELECT record.chanid, record.starttime, "
+"record.startdate, record.endtime, record.enddate, record.title, "
+"record.subtitle, record.description, record.rank, record.type, "
+"channel.name FROM record "
+"LEFT JOIN channel ON (channel.chanid = record.chanid) "
+"ORDER BY title ASC;");
+
+    QSqlQuery result = db->exec(query);
+
+    if (result.isActive() && result.numRowsAffected() > 0)
+        while (result.next()) 
+        {
+            ProgramInfo *proginfo = new ProgramInfo;
+            proginfo->chanid = result.value(0).toString();
+
+            int type = result.value(9).toInt();
+            if (type == ScheduledRecording::SingleRecord ||
+                type == ScheduledRecording::TimeslotRecord ||
+                type == ScheduledRecording::WeekslotRecord) 
+            {
+                temptime = result.value(1).toString();
+                tempdate = result.value(2).toString();
+                proginfo->startts = QDateTime::fromString(tempdate+":"+temptime,
+                                                          Qt::ISODate);
+                temptime = result.value(3).toString();
+                tempdate = result.value(4).toString();
+                proginfo->endts = QDateTime::fromString(tempdate+":"+temptime,
+                                                        Qt::ISODate);
+            }
+            else 
+            {
+                // put currentDateTime() in time fields to prevent
+                // Invalid date/time warnings later
+                proginfo->startts = QDateTime::currentDateTime();
+                proginfo->endts = QDateTime::currentDateTime();
+            }
+
+            proginfo->title = QString::fromUtf8(result.value(5).toString());
+            proginfo->subtitle = QString::fromUtf8(result.value(6).toString());
+            proginfo->description = QString::fromUtf8(result.value(7).toString());
+            proginfo->rank = result.value(8).toString();
+            proginfo->channame = result.value(10).toString();
+
+            if (proginfo->title == QString::null)
+                proginfo->title = "";
+            if (proginfo->subtitle == QString::null)
+                proginfo->subtitle = "";
+            if (proginfo->description == QString::null)
+                proginfo->description = "";
+
+            proglist.push_back(proginfo);
+        }
+}
+
 
 bool ScheduledRecording::loadByProgram(QSqlDatabase* db,
                                        ProgramInfo* proginfo) {
@@ -606,6 +676,10 @@ void ScheduledRecording::setStart(const QDateTime& start) {
 void ScheduledRecording::setEnd(const QDateTime& end) {
     endTime->setValue(end.time());
     endDate->setValue(end.date());
+}
+
+void ScheduledRecording::setRank(const QString& newrank) {
+    rank->setValue(newrank);
 }
 
 int ScheduledRecording::getProfileID(void) const {

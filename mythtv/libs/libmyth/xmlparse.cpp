@@ -89,7 +89,7 @@ bool XMLParse::LoadTheme(QDomElement &ele, QString winName, QString specialfile)
         n = n.nextSibling();
     }
 
-    return true;
+    return false;
 }
 
 QString XMLParse::getFirstText(QDomElement &element)

@@ -456,6 +456,20 @@ void Scheduler::PruneList(void)
     }    
 }
 
+list<ProgramInfo *> *Scheduler::getAllScheduled(void)
+{
+    while (scheduledList.size() > 0)
+    {
+        ProgramInfo *pginfo = scheduledList.back();
+        delete pginfo;
+        scheduledList.pop_back();
+    }
+
+    ScheduledRecording::findAllScheduledPrograms(db, scheduledList);
+
+    return &scheduledList;
+}
+
 list<ProgramInfo *> *Scheduler::getConflicting(ProgramInfo *pginfo,
                                                bool removenonplaying,
                                                list<ProgramInfo *> *uselist)
@@ -486,6 +500,47 @@ list<ProgramInfo *> *Scheduler::getConflicting(ProgramInfo *pginfo,
     }
 
     return retlist;
+}
+
+void Scheduler::CheckRank(ProgramInfo *info,
+                          list<ProgramInfo *> *conflictList)
+{
+    int rank, srank, resolved = 0;
+
+    rank = info->rank.toInt();
+    rank += info->getChannelRank(info->chanid, db);
+    rank += info->getTypeRank(info->GetProgramRecordingStatus(db));
+//    cerr << "Scheduler::CheckRank()" << endl;
+//    cerr << " title = " << info->title << endl;
+//    cerr << " chanid = " << info->chanid << endl;
+//    cerr << " type = " << info->GetProgramRecordingStatus(db) << endl;
+//    cerr << " rank = " << info->rank << endl;
+//    cerr << " chanrank = " << info->getChannelRank(info->chanid, db) << endl;
+//    cerr << " typerank = " << info->getTypeRank(info->GetProgramRecordingStatus(db)) << endl;
+//    cerr << " totalrank = " << rank << endl;
+//    cerr << endl;
+
+    list<ProgramInfo *>::iterator i = conflictList->begin();
+    for (; i != conflictList->end(); i++)
+    {
+        ProgramInfo *second = (*i);
+
+        srank = second->rank.toInt();
+        srank += info->getChannelRank(second->chanid, db);
+        srank += info->getTypeRank(second->GetProgramRecordingStatus(db));
+
+        if (rank == srank)
+            continue;
+
+        if(rank > srank)
+        {
+            second->recording = false;
+            resolved++;
+        }
+    }
+
+    if (resolved == (int)conflictList->size())
+        info->conflicting = false;
 }
 
 void Scheduler::CheckOverride(ProgramInfo *info,
@@ -618,7 +673,28 @@ void Scheduler::MarkSingleConflict(ProgramInfo *info,
 
 void Scheduler::MarkConflictsToRemove(void)
 {
-    list<ProgramInfo *>::iterator i = recordingList.begin();
+    list<ProgramInfo *>::iterator i;
+
+    bool doRank = (bool)gContext->GetNumSetting("RankingActive");
+    bool doRankFirst = (bool)gContext->GetNumSetting("RankingOrder");
+
+    if (doRank and doRankFirst) 
+    {
+        i = recordingList.begin();
+        for (; i != recordingList.end(); i++)
+        {
+            ProgramInfo *first = (*i);
+
+            if (first->conflicting && first->recording)
+            {
+                list<ProgramInfo *> *conflictList = getConflicting(first);
+                CheckRank(first, conflictList);
+                delete conflictList;
+            }
+        }
+    }
+
+    i = recordingList.begin();
     for (; i != recordingList.end(); i++)
     {
         ProgramInfo *first = (*i);
@@ -644,6 +720,22 @@ void Scheduler::MarkConflictsToRemove(void)
         }
         else if (!first->recording)
             first->conflicting = false;
+    }
+
+    if (doRank and !doRankFirst) 
+    {
+        i = recordingList.begin();
+        for (; i != recordingList.end(); i++)
+        {
+            ProgramInfo *first = (*i);
+
+            if (first->conflicting && first->recording)
+            {
+                list<ProgramInfo *> *conflictList = getConflicting(first);
+                CheckRank(first, conflictList);
+                delete conflictList;
+            }
+        }
     }
 }
 
