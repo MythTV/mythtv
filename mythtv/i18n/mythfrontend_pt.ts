@@ -3646,6 +3646,26 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <source>Mythfilldatabase</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>TXT off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CC off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TXT on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reactivate it</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScheduledRecording</name>
@@ -3998,6 +4018,22 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Edit Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle CC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Teletext</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Closed Captioning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CC%1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

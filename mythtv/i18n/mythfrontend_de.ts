@@ -3731,6 +3731,26 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <source>Mythfilldatabase</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>TXT off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CC off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TXT on</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reactivate it</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScheduledRecording</name>
@@ -4083,6 +4103,22 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Edit Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle CC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Teletext</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Closed Captioning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CC%1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
