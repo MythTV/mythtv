@@ -1332,7 +1332,7 @@
     </message>
     <message>
         <source>Automatically Flag Commercials</source>
-        <translation>Automatisk reklamdetektering</translation>
+        <translation type="obsolete">Automatisk reklamdetektering</translation>
     </message>
     <message>
         <source>Strict Commercial Detection</source>
@@ -3297,7 +3297,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>mythfilldatabase Log Path</source>
-        <translation>mythfilldatabase loggkatalog</translation>
+        <translation>mythfilldatabase loggsökväg</translation>
     </message>
     <message>
         <source>Myth Database Logging</source>
@@ -3615,7 +3615,7 @@ MythTV kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Path to use for logging output from the mythfilldatabase program.  Leave blank to disable logging.</source>
-        <translation>Katalog att använda för loggdata från mythfilldatabase. Lämna tomt för att avaktivera loggning.</translation>
+        <translation>Full sökväg till fil för loggdata från mythfilldatabase. Lämna tomt för att avaktivera loggning.</translation>
     </message>
     <message>
         <source>If enabled, the master backend will stream and delete files if it finds them in the video directory. Useful if you are using a central storage location, like a NFS share, and your slave backend isn&apos;t running.</source>
@@ -5215,7 +5215,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>This is the default policy used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
-        <translation>Detta är den förvalda policyn för automatisk reklamdetektering när en ny schemalagd inspelning skapas.</translation>
+        <translation type="obsolete">Detta är den förvalda policyn för automatisk reklamdetektering när en ny schemalagd inspelning skapas.</translation>
     </message>
     <message>
         <source>4/3</source>
@@ -5785,6 +5785,50 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>Job Queue (Job Commands)</source>
         <translation>Jobbkö (jobbkommando)</translation>
+    </message>
+    <message>
+        <source>Skipping Back.</source>
+        <translation>Hoppar bakåt.</translation>
+    </message>
+    <message>
+        <source>Default Auto Commercial Flagging setting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the default value used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default &apos;Run User Job #1&apos; setting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the default value used for the &apos;Run User Job #1&apos; setting when a new scheduled recording is created.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default &apos;Run User Job #2&apos; setting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the default value used for the &apos;Run User Job #2&apos; setting when a new scheduled recording is created.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default &apos;Run User Job #3&apos; setting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the default value used for the &apos;Run User Job #3&apos; setting when a new scheduled recording is created.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default &apos;Run User Job #4&apos; setting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the default value used for the &apos;Run User Job #4&apos; setting when a new scheduled recording is created.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
