@@ -119,8 +119,8 @@ package nuv_utils;
             if ($frametype eq 'X') {
                 my $frame_version;
                 ($frame_version,
-                 $info{video_fourcc},
-                 $info{audio_fourcc},
+                 $info{video_type},
+                 $info{audio_type},
                  $info{audio_sample_rate},
                  $info{audio_bits_per_sample},
                  $info{audio_channels},
@@ -135,7 +135,7 @@ package nuv_utils;
                  $info{lavc_maxqdiff},
                  $info{seektable_offset},
                  $info{keyframeadjust_offset}
-                 ) = unpack('iiiiiiiiiiiiiiill', $buffer);
+                 ) = unpack('ia4a4iiiiiiiiiiiill', $buffer);
             # Found the audio data we want - time to leave
                  last;
             }
@@ -163,19 +163,27 @@ package nuv_utils;
     # Nothing found?  Die
         die "You need tcprobe (transcode) or mpgtx to use this script on mpeg-based nuv files.\n\n" unless ($program);
     # Set the is_mpeg flag
-        $info{is_mpeg} = 1;
+        $info{is_mpeg}    = 1;
+        $info{video_type} = 'MPEG';
     # Grab tcprobe info
         if ($program =~ /tcprobe$/) {
             my $data = `$program -i '$file'`;
             ($info{width}, $info{height}) = $data =~ /frame\s+size:\s+-g\s+(\d+)x(\d+)\b/m;
             ($info{fps})                  = $data =~ /frame\s+rate:\s+-f\s+(\d+(?:\.\d+)?)\b/m;
             ($info{audio_sample_rate})    = $data =~ /audio\s+track:.+?-e\s+(\d+)\b/m;
+            if ($data =~ m/MPEG\s+(system|program)/i) {
+                $info{mpeg_stream_type}  = "\L$1";
+            }
         }
     # Grab tcmplex info
         elsif ($program =~ /mpgtx$/) {
             my $data = `$program -i '$file'`;
             ($info{width}, $info{height}, $info{fps}) = $data =~ /\bSize\s+\[(\d+)\s*x\s*(\d+)\]\s+(\d+(?:\.\d+)?)\s*fps/m;
-            ($info{audio_sample_rate})    = $data =~ /\b(\d+)\s*Hz/m;
+            ($info{audio_sample_rate})                = $data =~ /\b(\d+)\s*Hz/m;
+            if ($data =~ m/Mpeg\s+(\d)\s+(system|program)/i) {
+                $info{video_type}       .= $1;
+                $info{mpeg_stream_type}  = "\L$2";
+            }
         }
     # Return
         return %info;
