@@ -35,6 +35,8 @@ Then;
 
 PREREQUISITES
 =============
+Currently needs QT-3.2 or later.
+
 There are no mandatory prerequisites other than Myth itself; but you can
 compile in support for a Text to Speech (TTS) engine called Festival. This
 enables support for voicemail and reading of the TV Guide over the phone.
@@ -160,9 +162,13 @@ select the option "Web Server" and enter a URL such as "checkip.dyndns.org".
 This is a web site which returns your real address in response to a HTTP GET.
 It will consult this web server for every call.
 
-If you have several MYTH machines and want to make calls between them, then
-you can disable NAT within your home by making directory entries for each
-Myth device in your home and setting the "On My Local LAN" checkbox.
+If you have several MYTH machines and want to make calls between them, and you 
+have NAT enabled, then you need to turn off NAT for calls between these machines.
+To do this, you must create a directory entry for each machine and check the "on
+local LAN" checkbox. Also, you MUST enter its destination address as 
+"number@ip-address-of-machine" and not just "number". This means that - even if 
+the machine is registered to a Service Provider, the call will stay local to the 
+LAN.
 
 At your network router, you may need to configure it to forward port 5060 
 to your Myth box that you want to receive calls.
