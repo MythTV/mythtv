@@ -15,3 +15,8 @@ DEPENDPATH += ../../libs/libmyth
 
 # Input
 SOURCES += main.cpp
+
+menu.path = $${PREFIX}/share/mythtv/
+menu.files += setup.xml
+
+INSTALLS += menu

@@ -18,6 +18,7 @@
 
 #include "libmyth/mythcontext.h"
 #include "libmythtv/videosource.h"
+#include "libmyth/themedmenu.h"
 
 using namespace std;
 
@@ -108,6 +109,37 @@ void clearDB(void)
     query.exec("DELETE FROM cardinput;");
 }
 
+void SetupMenuCallback(void* data, QString& selection) {
+    MythContext* context = (MythContext*)data;
+    QString sel = selection.lower();
+
+    if (sel == "capture cards") {
+        CaptureCardEditor cce(context, db);
+        cce.exec(db);
+    } else if (sel == "video sources") {
+        VideoSourceEditor vse(context, db);
+        vse.exec(db);
+    } else if (sel == "card inputs") {
+        CardInputEditor cie(context, db);
+        cie.exec(db);
+    } else if (sel == "exit") {
+        return;
+    }
+}
+
+void SetupMenu(MythContext* context) {
+    QString theme = context->FindThemeDir("blue");
+    ThemedMenu* menu = new ThemedMenu(context, theme, "setup.xml");
+    menu->setCallback(SetupMenuCallback, context);
+
+    if (menu->foundTheme()) {
+            menu->Show();
+            menu->exec();
+    } else {
+        cerr << "Couldn't find theme " << theme << endl;
+    }
+}
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -139,14 +171,7 @@ int main(int argc, char *argv[])
     if (response == "y")
         clearDB();
 
-    CaptureCardEditor cce(context, db);
-    cce.exec(db);
-
-    VideoSourceEditor vse(context, db);
-    vse.exec(db);
-
-    CardInputEditor cie(context, db);
-    cie.exec(db);
+    SetupMenu(context);
 
     configXMLTV();
 
