@@ -590,7 +590,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
         pthread_mutex_unlock(&avcodeclock);
         if (ret < 0)
         {
-            cout << "decoding error\n";
+            cout << "decoding error: " << ret << " back from avcodec\n";
             return false;
         }
 

@@ -643,7 +643,7 @@ void OSDTypeImage::Draw(unsigned char *screenptr, int vid_width, int vid_height,
     for (int y = startline; y < height; y++)
     {
         ysrcwidth = y * width;
-        ydestwidth = (y + ystart) * vid_width;
+        ydestwidth = (y + ystart - startline) * vid_width;
 
         for (int x = startcol; x < width; x++)
         {
@@ -654,7 +654,7 @@ void OSDTypeImage::Draw(unsigned char *screenptr, int vid_width, int vid_height,
 
             alpha = ((alpha * alphamod) + 0x80) >> 8;
 
-            dest = screenptr + x + xstart + ydestwidth;
+            dest = screenptr + (x + xstart - startcol) + ydestwidth;
             src = m_ybuffer + x + ysrcwidth;
 
             tmp1 = (*src - *dest) * alpha;
@@ -678,7 +678,7 @@ void OSDTypeImage::Draw(unsigned char *screenptr, int vid_width, int vid_height,
     for (int y = startline; y < height; y++)
     {
         ysrcwidth = y * width;
-        ydestwidth = (y + ystart) * (vid_width / 2);
+        ydestwidth = (y + ystart - startline) * (vid_width / 2);
 
         for (int x = startcol; x < width; x++)
         {
@@ -689,14 +689,14 @@ void OSDTypeImage::Draw(unsigned char *screenptr, int vid_width, int vid_height,
 
             alpha = ((alpha * alphamod) + 0x80) >> 8;
 
-            dest = destuptr + x + xstart + ydestwidth;
+            dest = destuptr + (x + xstart - startcol) + ydestwidth;
             src = m_ubuffer + x + ysrcwidth;
 
             tmp1 = (*src - *dest) * alpha;
             tmp2 = *dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
             *dest = tmp2 & 0xff;
 
-            dest = destvptr + x + xstart + ydestwidth;
+            dest = destvptr + (x + xstart - startcol) + ydestwidth;
             src = m_vbuffer + x + ysrcwidth;
 
             tmp1 = (*src - *dest) * alpha;
@@ -825,7 +825,7 @@ void OSDTypeFillSlider::Draw(unsigned char *screenptr, int vid_width,
     for (int y = startline; y < height; y++)
     {
         ysrcwidth = y * iwidth;
-        ydestwidth = (y + ystart) * vid_width;
+        ydestwidth = (y + ystart - startline) * vid_width;
 
         for (int x = startcol; x < width; x++)
         {
@@ -836,7 +836,7 @@ void OSDTypeFillSlider::Draw(unsigned char *screenptr, int vid_width,
 
             alpha = ((alpha * alphamod) + 0x80) >> 8;
 
-            dest = screenptr + x + xstart + ydestwidth;
+            dest = screenptr + (x + xstart - startcol) + ydestwidth;
             src = m_ybuffer + ysrcwidth;
 
             tmp1 = (*src - *dest) * alpha;
@@ -861,7 +861,7 @@ void OSDTypeFillSlider::Draw(unsigned char *screenptr, int vid_width,
     for (int y = startline; y < height; y++)
     {
         ysrcwidth = y * iwidth;
-        ydestwidth = (y + ystart) * (vid_width / 2);
+        ydestwidth = (y + ystart - startline) * (vid_width / 2);
 
         for (int x = startcol; x < width; x++)
         {
@@ -872,14 +872,14 @@ void OSDTypeFillSlider::Draw(unsigned char *screenptr, int vid_width,
 
             alpha = ((alpha * alphamod) + 0x80) >> 8;
 
-            dest = destuptr + x + xstart + ydestwidth;
+            dest = destuptr + (x + xstart - startcol) + ydestwidth;
             src = m_ubuffer + ysrcwidth;
 
             tmp1 = (*src - *dest) * alpha;
             tmp2 = *dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
             *dest = tmp2 & 0xff;
 
-            dest = destvptr + x + xstart + ydestwidth;
+            dest = destvptr + (x + xstart - startcol) + ydestwidth;
             src = m_vbuffer + ysrcwidth;
 
             tmp1 = (*src - *dest) * alpha;
@@ -1034,7 +1034,7 @@ void OSDTypeEditSlider::Draw(unsigned char *screenptr, int vid_width,
 
     for (int y = startline; y < height; y++)
     {
-        ydestwidth = (y + ystart) * vid_width;
+        ydestwidth = (y + ystart - startline) * vid_width;
 
         for (int x = startcol; x < width; x++)
         {
@@ -1058,7 +1058,7 @@ void OSDTypeEditSlider::Draw(unsigned char *screenptr, int vid_width,
 
             a = ((a * alphamod) + 0x80) >> 8;
 
-            dest = screenptr + x + xstart + ydestwidth;
+            dest = screenptr + (x + xstart - startcol) + ydestwidth;
             src = ybuf + ysrcwidth;
 
             tmp1 = (*src - *dest) * a;
@@ -1083,7 +1083,7 @@ void OSDTypeEditSlider::Draw(unsigned char *screenptr, int vid_width,
 
     for (int y = startline; y < height; y++)
     {
-        ydestwidth = (y + ystart) * (vid_width / 2);
+        ydestwidth = (y + ystart - startline) * (vid_width / 2);
 
         for (int x = startcol; x < width; x++)
         {
@@ -1109,14 +1109,14 @@ void OSDTypeEditSlider::Draw(unsigned char *screenptr, int vid_width,
 
             a = ((a * alphamod) + 0x80) >> 8;
 
-            dest = destuptr + x + xstart + ydestwidth;
+            dest = destuptr + (x + xstart - startcol) + ydestwidth;
             src = ubuf + ysrcwidth;
 
             tmp1 = (*src - *dest) * a;
             tmp2 = *dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
             *dest = tmp2 & 0xff;
 
-            dest = destvptr + x + xstart + ydestwidth;
+            dest = destvptr + (x + xstart - startcol) + ydestwidth;
             src = vbuf + ysrcwidth;
 
             tmp1 = (*src - *dest) * a;
