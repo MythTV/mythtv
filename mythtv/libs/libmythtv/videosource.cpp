@@ -1,4 +1,6 @@
 #include "videosource.h"
+#include "libmyth/mythwidgets.h"
+#include <qapplication.h>
 #include <qsqldatabase.h>
 #include <qcursor.h>
 #include <qlayout.h>
@@ -46,13 +48,10 @@ QString CISetting::setClause(void) {
         .arg(getValue());
 }
 
-void ProviderSelector::fillSelections(const QString& zipcode) {
-    if (zipcode.length() < 5)
-        return;
-
+void RegionSelector::fillSelections() {
     clearSelections();
 
-    QString command = QString("tv_grab_na --configure --postalcode %1 --list-providers")
+    /*QString command = QString("tv_grab_uk --configure --list-regions")
         .arg(zipcode);
     FILE* fp = popen(command.ascii(), "r");
 
@@ -69,7 +68,60 @@ void ProviderSelector::fillSelections(const QString& zipcode) {
     }
 
     f.close();
+    fclose(fp);*/
+
+    // this would be better read in from tv_grab_uk, moreorless, as above
+    addSelection("Anglia");
+    addSelection("Border");
+    addSelection("Border North");
+    addSelection("Carlton");
+    addSelection("Central");
+    addSelection("Channel");
+    addSelection("East Midlands");
+    addSelection("Grampian");
+    addSelection("Granada");
+    addSelection("HTV Wales");
+    addSelection("HTV West");
+    addSelection("London");
+    addSelection("Meridian");
+    addSelection("Scottish");
+    addSelection("South East");
+    addSelection("Tyne Tees");
+    addSelection("Ulster");
+    addSelection("Westcountry");
+    addSelection("Yorkshire");
+}
+
+void ProviderSelector::fillSelections(const QString& location) {
+    clearSelections();
+
+    QString command = QString("%1 --configure --postalcode %2 --list-providers")
+        .arg(grabber)
+        .arg(location);
+
+    MythProgressDialog pleaseWait("Retrieving provider list", 2, NULL, NULL, TRUE);
+    pleaseWait.setMinimumDuration(0);
+    pleaseWait.setProgress(1);
+    qApp->processEvents();
+
+    FILE* fp = popen(command.ascii(), "r");
+
+    if (fp == NULL) {
+        perror("open");
+        return;
+    }
+
+    QFile f;
+    f.open(IO_ReadOnly, fp);
+    for(QString line ; f.readLine(line, 1024) > 0 ; ) {
+        QStringList fields = QStringList::split(":", line.stripWhiteSpace());
+        addSelection(fields.last(), fields.first());
+    }
+
+    f.close();
     fclose(fp);
+
+    pleaseWait.setProgress(2);
 }
 
 void XMLTV_na_config::save(QSqlDatabase* db) {
@@ -82,6 +134,24 @@ void XMLTV_na_config::save(QSqlDatabase* db) {
         .arg(2)
         .arg(30)
         .arg(postalcode->getValue())
+        .arg(provider->getValue());
+
+    int ret = system(command);
+
+    if (ret != 0)
+        cout << command << endl << "exited with status " << ret << endl;
+}
+
+void XMLTV_uk_config::save(QSqlDatabase* db) {
+    (void)db;
+
+    QString filename = QString("%1/.mythtv/%2.xmltv")
+        .arg(getenv("HOME")).arg(parent.getSourceName());
+    QString command = QString("tv_grab_uk --config-file %1 --configure --retry-limit %2 --retry-delay %3 --postalcode %4 --provider %5 --auto-new-channels add")
+        .arg(filename)
+        .arg(2)
+        .arg(30)
+        .arg(region->getValue())
         .arg(provider->getValue());
 
     int ret = system(command);
@@ -107,8 +177,7 @@ void XMLTV_generic_config::save(QSqlDatabase* db) {
     if (ret != 0)
         cout << command << endl << "exited with status " << ret << endl;
 
-    if (grabber == "tv_grab_uk" || grabber == "tv_grab_de" ||
-        grabber == "tv_grab_sn") {
+    if (grabber == "tv_grab_de" || grabber == "tv_grab_sn") {
         cout << "You _MUST_ run 'mythfilldatabase --manual the first time, "
              << "instead\n";
         cout << "of just 'mythfilldatabase'.  Your grabber does not provide\n";

@@ -5,6 +5,7 @@
 #include "libmyth/mythcontext.h"
 #include <qlistview.h>
 #include <qdialog.h>
+#include <qregexp.h>
 #include <vector>
 
 class VideoSource;
@@ -34,26 +35,72 @@ class PostalCode: public LineEditSetting, public TransientStorage {
 public: PostalCode() { setLabel("ZIP/postal code"); };
 };
 
+class RegionSelector: public ComboBoxSetting, public TransientStorage {
+    Q_OBJECT
+public:
+    RegionSelector() {
+        setLabel("Region");
+        fillSelections();
+    };
+
+public slots:
+    void fillSelections();
+};
+
 class ProviderSelector: public ComboBoxSetting, public TransientStorage {
     Q_OBJECT
 public:
-    ProviderSelector() { setLabel("Provider"); };
+    ProviderSelector(const QString& _grabber) :
+        grabber(_grabber) { setLabel("Provider"); };
 
 public slots:
-    void fillSelections(const QString& zipcode);
+    void fillSelections(const QString& location);
+
+protected:
+    QString grabber;
 };
 
 class XMLTV_na_config: public VerticalConfigurationGroup {
+    Q_OBJECT
 public:
     XMLTV_na_config(const VideoSource& _parent): parent(_parent) {
         setLabel("tv_grab_na configuration");
         postalcode = new PostalCode();
         addChild(postalcode);
 
-        provider = new ProviderSelector();
+        provider = new ProviderSelector("tv_grab_na");
         addChild(provider);
 
         connect(postalcode, SIGNAL(valueChanged(const QString&)),
+                this, SLOT(fillProviderSelections(const QString&)));
+    };
+
+    virtual void save(QSqlDatabase* db);
+
+protected slots:
+     void fillProviderSelections(const QString& maybePostalCode) {
+         if (QRegExp("\\d{5}").exactMatch(maybePostalCode) ||
+             QRegExp("[a-z]\\d[a-z]\\d[a-z]\\d").exactMatch(maybePostalCode))
+                 provider->fillSelections(maybePostalCode);
+     }
+
+protected:
+    const VideoSource& parent;
+    PostalCode* postalcode;
+    ProviderSelector* provider;
+};
+
+class XMLTV_uk_config: public VerticalConfigurationGroup {
+public:
+    XMLTV_uk_config(const VideoSource& _parent): parent(_parent) {
+        setLabel("tv_grab_uk configuration");
+        region = new RegionSelector();
+        addChild(region);
+
+        provider = new ProviderSelector("tv_grab_uk");
+        addChild(provider);
+
+        connect(region, SIGNAL(valueChanged(const QString&)),
                 provider, SLOT(fillSelections(const QString&)));
     };
 
@@ -61,7 +108,7 @@ public:
 
 protected:
     const VideoSource& parent;
-    PostalCode* postalcode;
+    RegionSelector* region;
     ProviderSelector* provider;
 };
 
@@ -93,19 +140,19 @@ public:
         setSaveAll(false);
 
         addTarget("tv_grab_na", new XMLTV_na_config(parent));
-        grabber->addSelection("tv_grab_na");
+        grabber->addSelection("North America", "tv_grab_na");
 
         addTarget("tv_grab_de", new XMLTV_generic_config(parent, "tv_grab_de"));
-        grabber->addSelection("tv_grab_de");
+        grabber->addSelection("Germany/Austria", "tv_grab_de");
 
         addTarget("tv_grab_sn", new XMLTV_generic_config(parent, "tv_grab_sn"));
-        grabber->addSelection("tv_grab_sn");
+        grabber->addSelection("Sweden/Norway","tv_grab_sn");
 
-        addTarget("tv_grab_uk", new XMLTV_generic_config(parent, "tv_grab_uk"));
-        grabber->addSelection("tv_grab_uk");
+        addTarget("tv_grab_uk", new XMLTV_uk_config(parent));
+        grabber->addSelection("United Kingdom","tv_grab_uk");
 
         addTarget("tv_grab_uk_rt", new XMLTV_generic_config(parent, "tv_grab_uk_rt"));
-        grabber->addSelection("tv_grab_uk_rt");
+        grabber->addSelection("United Kingdom (alternative)","tv_grab_uk_rt");
     };
 };
 
