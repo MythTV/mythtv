@@ -891,9 +891,9 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
         {
 	  /* we didnt get a known frametype! 
 	     so move down one char and look again... */
-            ringBuffer->Seek(1-FRAMEHEADERSIZE, SEEK_CUR);
+            ringBuffer->Seek((long long)1-FRAMEHEADERSIZE, SEEK_CUR);
 
-            if (ringBuffer->Read(&frameheader, FRAMEHEADERSIZE) 
+            if (ringBuffer->Read(&frameheader, FRAMEHEADERSIZE)
                 != FRAMEHEADERSIZE)
             {
                 eof = 1;
