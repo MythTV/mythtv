@@ -60,6 +60,7 @@ class ProgramRecPriority : public MythDialog
     void SortList();
     QMap<QString, ProgramRecPriorityInfo> programData;
     QMap<QString, int> origRecPriorityData;
+    QMap<int, int> recMatch;
 
     void updateBackground(void);
     void updateList(QPainter *);

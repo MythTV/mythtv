@@ -141,6 +141,7 @@ ProgramRecPriority::ProgramRecPriority(QSqlDatabase *ldb, MythMainWindow *parent
 
     updateBackground();
 
+    MythContext::KickDatabase(db);
     FillList();
     sortType = (SortType)gContext->GetNumSetting("ProgramRecPrioritySorting", 
                                                  (int)byTitle);
@@ -510,7 +511,6 @@ void ProgramRecPriority::edit(void)
                 progInfo->recpriority = recPriority;
                 progInfo->recType = (RecordingType)rectype;
                 progInfo->recTypeRecPriority = rtRecPriors[progInfo->recType-1];
-
                 // also set the origRecPriorityData with new recording 
                 // priority so we don't save to db again when we exit
                 QString key = progInfo->MakeUniqueKey(); 
@@ -718,8 +718,6 @@ void ProgramRecPriority::FillList(void)
 
     QSqlQuery result = db->exec(query);
    
-//    cerr << "db query returned " << result.numRowsAffected() << " programs";
-//    cerr << endl; 
     int matches = 0;
 
     if (result.isActive() && result.numRowsAffected() > 0)
@@ -765,7 +763,20 @@ void ProgramRecPriority::FillList(void)
     else
         MythContext::DBError("Get program recording priorities query", query);
 
-//    cerr << matches << " matches made" << endl;
+    query = QString("SELECT recordid, count(*) FROM recordmatch "
+                    "group by recordid;");
+
+    QSqlQuery qcnt = db->exec(query);
+
+    if (qcnt.isActive() && qcnt.numRowsAffected() > 0)
+    {
+        while (qcnt.next()) 
+        {
+            recMatch[qcnt.value(0).toInt()] = qcnt.value(1).toInt();
+        }
+    }
+    else
+        MythContext::DBError("Get recordmatch count query", query);
 }
 
 typedef struct RecPriorityInfo 
@@ -997,9 +1008,6 @@ void ProgramRecPriority::updateList(QPainter *p)
                             ltype->SetItemCurrent(cnt);
                         }
 
-                        if (progInfo->recstatus == rsInactive)
-                            ltype->EnableForcedFont(cnt, "inactive");
-
                         ltype->SetItemText(cnt, 1, progInfo->RecTypeChar());
                         ltype->SetItemText(cnt, 2, tempSubTitle);
 
@@ -1018,7 +1026,9 @@ void ProgramRecPriority::updateList(QPainter *p)
                         ltype->SetItemText(cnt, 6, 
                                 QString::number(abs(finalRecPriority)));
 
-                        if (progInfo->rectype == kDontRecord)
+                        if (progInfo->recType == kDontRecord ||
+                            progInfo->recstatus == rsInactive ||
+                            recMatch[progInfo->recordid] < 1)
                             ltype->EnableForcedFont(cnt, "inactive");
 
                         cnt++;
@@ -1078,14 +1088,24 @@ void ProgramRecPriority::updateInfo(QPainter *p)
         rectype = curitem->recType;
 
         QString subtitle = "";
-        if (curitem->subtitle != "(null)")
+        if (curitem->subtitle != "(null)" &&
+            (curitem->rectype == kSingleRecord ||
+             curitem->rectype == kOverrideRecord ||
+             curitem->rectype == kDontRecord))
+        {
             subtitle = curitem->subtitle;
-        else
-            subtitle = "";
+        }
 
+        QString matchInfo;
+        int listings = recMatch[curitem->recordid];
         if (curitem->recstatus == rsInactive)
-            subtitle = QString("(%1) %2").arg(curitem->RecStatusText())
-                               .arg(subtitle);
+            matchInfo = curitem->RecStatusText();
+        else if (listings == 1)
+            matchInfo = QString("%1 %2").arg(listings).arg(tr("listing"));
+        else
+            matchInfo = QString("%1 %2").arg(listings).arg(tr("listings"));
+
+        subtitle = QString("(%1) %2").arg(matchInfo).arg(subtitle);
 
         LayerSet *container = NULL;
         container = theme->GetSet("program_info");
