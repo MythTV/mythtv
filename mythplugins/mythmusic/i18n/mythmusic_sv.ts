@@ -218,6 +218,30 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
         <source>Decoder error.</source>
         <translation>Avkodningsfel.</translation>
     </message>
+    <message>
+        <source>Smart playlists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Tracks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tracks by current Artist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tracks from current Album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tracks from current Genre</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tracks from current Year</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -833,6 +857,213 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
 </source>
         <translation>Kopierar från CD:
 </translation>
+    </message>
+</context>
+<context>
+    <name>SmartPLCriteriaRow</name>
+    <message>
+        <source>Select an Artist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select an Album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a Genre</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SmartPLOrderByDialog</name>
+    <message>
+        <source>Order By Fields</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1 Add</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2 Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>3 Move Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4 Move Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>5 Ascending</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ascending</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>6 Descending</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Descending</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>7 OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+</context>
+<context>
+    <name>SmartPLResultViewer</name>
+    <message>
+        <source>Smart Playlist Result Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SmartPlaylistDialog</name>
+    <message>
+        <source>Smart Playlists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1 Select</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2 New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>3 Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4 Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SmartPlaylistEditor</name>
+    <message>
+        <source>Smart Playlist Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title:</source>
+        <translation type="unfinished">Titel: </translation>
+    </message>
+    <message>
+        <source>Match</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Of The Following Conditions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Order By:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Matches:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Limit:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Results</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smart Playlist Categories</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rename Category</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
