@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-02-14, v1.093
+  2003-02-14, v1.094
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -249,10 +249,16 @@
   them will maintain the master database and will need mysql installed.
 
   In order to compile MythTV, we need to make sure that the software it
-  needs is installed.  As of 2002-12-17, this list includes [1mperl[22m, [1mmysql[22m,
-  [1mgcc[22m, [1mfreetype2-devel[22m, [1mXFree86-devel [22mand [1mqt-devel[22m.  If you're going to
-  use a remote control with MythTV, you're going to need the [1mcdialog[0m
-  package in order to compile [1mlircd[22m.
+  needs is installed.  As of 2003-02-15, this list includes [1mperl[22m, [1mmysql[22m,
+  [1mgcc[22m, [1mfreetype2-devel[22m, [1mXFree86-devel[22m, [1mqt-devel [22mand [1mlame[22m.  If you're
+  going to use a remote control with MythTV, you're going to need the
+  [1mcdialog [22mpackage in order to compile [1mlircd[22m.
+
+  [1mNOTE[22m:  If you are going to be using RPMs to install various
+  components, you should be aware that not all packages include the
+  necessary headers for compiling packages.  If you're having trouble
+  compiling, ensure that you've installed the -devel version of a
+  prerequisite.
 
   There appears to be issues with ALSA and simultaneously recording and
   playing sound, which is a core requirement for MythTV.  If you are not
@@ -417,7 +423,7 @@
   [1mNOTE[22m: Mandrake 8.2 users, [4mdo[24m [4mnot[24m execute the following command.
   You've already manually installed the files in the previous section.
 
-       # urpmi libqt3-devel
+  # urpmi libqt3-devel
 
   However, you might get this when you execute the command above:
 
@@ -510,10 +516,10 @@
   LANG="en_US".  If you want the change to only affect a single user,
   you could create a file called ~/.i18n:
 
-       $ cat > ~/.i18n
-       LANG="en_US"
-       ^D
-       $ exit
+  $ cat > ~/.i18n
+  LANG="en_US"
+  ^D
+  $ exit
 
   [1m4.2.  Checking QTDIR and the PATH.[0m
 
@@ -570,6 +576,7 @@
 
   If you've got a system with an AMD K6-2 or a VIA C3 processor, make
   the following change in the settings.pro file.
+
   Look for
 
   -march=pentiumpro
@@ -621,10 +628,10 @@
   If you get errors installing XML::Twig or other XMLTV prerequisites,
   try deleting the old versions of libexpat
 
-  $ su
-  # rm -f /usr/lib/libexpat*
-  # /sbin/ldconfig
-  # exit
+       $ su
+       # rm -f /usr/lib/libexpat*
+       # /sbin/ldconfig
+       # exit
 
   Download version 1.95.5 from sourceforge.net:
   http://sourceforge.net/projects/expat/
@@ -715,11 +722,11 @@
 
   Once you have downloaded the portage file, installation is simple.
 
-  $ su -
-  # emerge rsync # make sure portage is up to date.
-  # cd /usr/local
-  # tar xvfjp Path_To/mythtv-gentoo-portage.tar.bz2
-  # vi /etc/make.conf
+       $ su -
+       # emerge rsync # make sure portage is up to date.
+       # cd /usr/local
+       # tar xvfjp Path_To/mythtv-gentoo-portage.tar.bz2
+       # vi /etc/make.conf
 
   Add mysql to your USE variable.  ie USE="mysql ...."
 
@@ -922,18 +929,18 @@
   conflicts in the future.  You should end up with a /etc/modules.conf
   file that has this configuration:
 
-  alias char-major-116 snd
-  alias snd-card-0 snd-XXX
-  # module options should go here
-  # OSS/Free portion
-  alias char-major-14 soundcore
-  alias sound-slot-0 snd-card-0
-  # card #1
-  alias sound-service-0-0 snd-mixer-oss
-  alias sound-service-0-1 snd-seq-oss
-  alias sound-service-0-3 snd-pcm-oss
-  alias sound-service-0-8 snd-seq-oss
-  alias sound-service-0-12 snd-pcm-oss
+       alias char-major-116 snd
+       alias snd-card-0 snd-XXX
+       # module options should go here
+       # OSS/Free portion
+       alias char-major-14 soundcore
+       alias sound-slot-0 snd-card-0
+       # card #1
+       alias sound-service-0-0 snd-mixer-oss
+       alias sound-service-0-1 snd-seq-oss
+       alias sound-service-0-3 snd-pcm-oss
+       alias sound-service-0-8 snd-seq-oss
+       alias sound-service-0-12 snd-pcm-oss
 
   "XXX" should be the ALSA driver name for your sound card/chip. In some
   rare cases you need to supply extra options to the driver. These
@@ -967,7 +974,7 @@
 
   Test the driver by playing a simple file:
 
-       $ aplay /usr/share/sounds/info.wav
+  $ aplay /usr/share/sounds/info.wav
 
   If it works, you're done installing ALSA!
 
@@ -1164,7 +1171,6 @@
   <http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/
   s1-custom-kernel-bootloader.html> Remember, if you have any custom
   kernel modules (alsa, etc) you will have to recompile/reinstall those.
-
   [1m8.5.  Completing the lirc install.[0m
 
   If configure did not mention anything about a kernel module, then you
@@ -1172,7 +1178,7 @@
   /etc/modules.conf file. Add this line as the first thing in the file.
   It must come first, or it may not work.
 
-  alias char-major-61 XXX
+       alias char-major-61 XXX
 
   replace XXX with the name which you determined earlier, which in this
   example was "lirc_serial"
@@ -1206,18 +1212,18 @@
 
   now try to start lircd again:
 
-       # /usr/local/sbin/lircd
+  # /usr/local/sbin/lircd
 
   Now, we're going to add the commands necessary for lircd to run each
   time we boot:
 
-  # cd /etc/rc.d
-  # cat >> rc.local
-  echo "Starting lircd"
-  /usr/local/sbin/lircd
-  ^D
-  # exit
-  $
+       # cd /etc/rc.d
+       # cat >> rc.local
+       echo "Starting lircd"
+       /usr/local/sbin/lircd
+       ^D
+       # exit
+       $
 
   This takes care of the lircd portion, which "listens" for the IR sig-
   nals. If everything went well, the install script for lircd put an
@@ -1410,16 +1416,16 @@
   /dev/device. Unlike bourne or bash, csh scripts automatically close
   parent file descriptors before they start.
 
-  $ cd /usr/local/bin
-  # su
-  # cat > change_channel.csh
-  #!/bin/csh
-  echo "changing to $1"
-  /usr/local/bin/channel.pl $1 &
-  ^D
-  # chmod a+x change_channel.csh
-  # exit
-  $ exit
+       $ cd /usr/local/bin
+       # su
+       # cat > change_channel.csh
+       #!/bin/csh
+       echo "changing to $1"
+       /usr/local/bin/channel.pl $1 &
+       ^D
+       # chmod a+x change_channel.csh
+       # exit
+       $ exit
 
   The following file should be saved as /usr/local/bin/channel.pl
 
@@ -1567,19 +1573,19 @@
   If you want to know what time your job will run, you can do the
   following:
 
-  # cat /etc/crontab
-  SHELL=/bin/bash
-  PATH=/sbin:/bin:/usr/sbin:/usr/bin
-  MAILTO=root
-  HOME=/
+       # cat /etc/crontab
+       SHELL=/bin/bash
+       PATH=/sbin:/bin:/usr/sbin:/usr/bin
+       MAILTO=root
+       HOME=/
 
-  # run-parts
-  01 * * * * root nice -n 19 run-parts /etc/cron.hourly
-  02 4 * * * root nice -n 19 run-parts /etc/cron.daily
-  22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
-  42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
-  # exit
-  $
+       # run-parts
+       01 * * * * root nice -n 19 run-parts /etc/cron.hourly
+       02 4 * * * root nice -n 19 run-parts /etc/cron.daily
+       22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
+       42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
+       # exit
+       $
 
   We can see from the display that the cron.daily job will run at 0402
   every morning.
@@ -1677,7 +1683,7 @@
   have an external tuner, such as a DirecTV or digital cable set top
   box, the following command should be added to your settings.txt file:
 
-  str ExternalChannelCommand=/usr/local/bin/changechannel
+       str ExternalChannelCommand=/usr/local/bin/changechannel
 
   The [1mchangechannel [22mprogram is not supplied with MythTV, so this is
   going to be dependent on what sort of external tuner you have.
@@ -1731,6 +1737,7 @@
 
   [1mNOTE[22m: Make sure that you have a trailing slash on the URL, otherwise
   you will get a 404 Page not Found error.
+
   [1m12.  MythGallery.[0m
 
   MythGallery is a photo and slideshow application.  MythGallery is a
@@ -1840,19 +1847,19 @@
   <http://www.xiph.org/paranoia/download/cdparanoia-III-
   alpha9.8.src.tgz>.
 
-  $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
-  $ cd cdparanoia-III-alpha9.8
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  <!-- see if the next step is a Mandrake only issue -->
-  # cp interface/cdda_interface.h /usr/local/include
-  # cd /usr/lib
-  # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
-  # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
-  # exit
-  $
+       $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
+       $ cd cdparanoia-III-alpha9.8
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       <!-- see if the next step is a Mandrake only issue -->
+       # cp interface/cdda_interface.h /usr/local/include
+       # cd /usr/lib
+       # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
+       # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
+       # exit
+       $
 
   [1m14.2.  Mandrake 9.0[0m
 
@@ -1891,6 +1898,7 @@
 
   The MythWeather module will obtain the weather information for the
   location that you specify.
+
   Change into the MythWeather directory, then make and make install:
 
        $ cd mythweather
@@ -1935,11 +1943,11 @@
 
   An example for Paris, France:
 
-       $ mysql -u root
-       mysql> use mythconverg;
-       mysql> insert into settings (value, data) VALUES ('locale','FRXX0076');
-       mysql> exit
-       $
+  $ mysql -u root
+  mysql> use mythconverg;
+  mysql> insert into settings (value, data) VALUES ('locale','FRXX0076');
+  mysql> exit
+  $
 
   If you wish to use Celsius as the default:
 
@@ -1984,11 +1992,11 @@
 
   Change into the MythVideo directory, then make and make install:
 
-       $ cd mythvideo
-       $ make
-       $ su
-       # make install
-       # exit
+  $ cd mythvideo
+  $ make
+  $ su
+  # make install
+  # exit
 
   The next step is to edit the /usr/local/share/mythvideo/mythexplorer-
   settings.txt file.  Change the StartDir to a valid mount point on your
@@ -2099,13 +2107,13 @@
 
   Also, look for:
 
-       Section "Device"
-           Identifier "device1"
-           VendorName "nVidia Corporation"
-           BoardName "NVIDIA GeForce 256 (generic)"
-           Driver "nv"
-           Option "DPMS"
-       EndSection
+  Section "Device"
+      Identifier "device1"
+      VendorName "nVidia Corporation"
+      BoardName "NVIDIA GeForce 256 (generic)"
+      Driver "nv"
+      Option "DPMS"
+  EndSection
 
   In this case, you would need to either delete the Option "DPMS" line,
   or change it to # Option "DPMS" to comment it out.  The next time you
@@ -2161,9 +2169,9 @@
   Edit the settings.pro file.  Make sure that the top of the file looks
   like this:
 
-  $ cat settings.pro
-  CONFIG += debug
-  #CONFIG += release
+       $ cat settings.pro
+       CONFIG += debug
+       #CONFIG += release
 
   Now, you need to clear out the old versions of the software to ensure
   that you're running with the debugging code, then compile and install.
@@ -2261,7 +2269,7 @@
   instructions on disabling the sound manager.  If you wish to see what
   application is grabbing a resource, you can use the fuser command:
 
-       # fuser -v /dev/dsp
+  # fuser -v /dev/dsp
 
   If you're using multiple sound cards and multiple tuners, use
   alsamixer -c 1 to work with the second sound card.  The first card is
@@ -2310,20 +2318,19 @@
   MythTV is not dependent on any particular window manager.  If you wish
   to run a lightweight window manager, the configfiles/ directory has an
   example of a .twmrc file you may use.
-
   [1m18.3.  I'd like MythTV to automatically startup.[0m
 
   Here's an example submitted to the mythtv-dev list by Pat Pflaum
   mailto:pat@netburp.com <mailto:pat@netburp.com> using fvwm:
 
-  $ cat > .xinitrc
-  fvwm &
-  mythfrontend
-  ^D
-  $ cat > .fvwmrc
-  Style "myth*"      NoTitle, NoHandles, Sticky, WindowListSkip, BorderWidth 0
-  ^D
-  $
+       $ cat > .xinitrc
+       fvwm &
+       mythfrontend
+       ^D
+       $ cat > .fvwmrc
+       Style "myth*"      NoTitle, NoHandles, Sticky, WindowListSkip, BorderWidth 0
+       ^D
+       $
 
   [1m18.4.  What capture resolution should I use?  How does video work?[0m
 
@@ -2371,7 +2378,6 @@
   720x240 is possible, but isn't a good tradeoff relative to the number
   of vertical lines lost.  In a PAL country, the you would use values
   like 720x576 or x288.
-
   The higher resolutions will be more CPU intensive. If the CPU is
   overtaxed, frames will be dropped causing uneven motion. You will
   likely see the best results at resolutions which average at least 10%

@@ -71,11 +71,15 @@ depends on your comfort level with Linux.</P>
 <P><B>NOTE</B>: If you are using MythTV on multiple systems, at least one of
 them will maintain the master database and will need mysql installed.  </P>
 <P>In order to compile MythTV, we need to make sure that the software it needs
-is installed.  As of 2002-12-17, this list includes <B>perl</B>,
+is installed.  As of 2003-02-15, this list includes <B>perl</B>,
 <B>mysql</B>, <B>gcc</B>, <B>freetype2-devel</B>,
-<B>XFree86-devel</B> and <B>qt-devel</B>.  If you're going to use a
+<B>XFree86-devel</B>, <B>qt-devel</B> and <B>lame</B>.  If you're going to use a
 remote control with MythTV, you're going to need the <B>cdialog</B>
 package in order to compile <B>lircd</B>.</P>
+<P><B>NOTE</B>:  If you are going to be using RPMs to install various
+components, you should be aware that not all packages include the necessary
+headers for compiling packages.  If you're having trouble compiling, ensure
+that you've installed the <CODE>-devel</CODE> version of a prerequisite.</P>
 <P>There appears to be issues with ALSA and simultaneously recording and playing 
 sound, which is a core requirement for MythTV.  If you are not running 
 ALSA 0.9.0rc6 and experience lock-ups of your system when trying to use MythTV, 

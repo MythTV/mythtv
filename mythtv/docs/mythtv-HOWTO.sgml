@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-02-14, v1.093
+<date>2003-02-14, v1.094
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -116,11 +116,16 @@ depends on your comfort level with Linux.
 them will maintain the master database and will need mysql installed.  
 
 In order to compile MythTV, we need to make sure that the software it needs
-is installed.  As of 2002-12-17, this list includes <bf>perl</bf>,
+is installed.  As of 2003-02-15, this list includes <bf>perl</bf>,
 <bf>mysql</bf>, <bf>gcc</bf>, <bf>freetype2-devel</bf>,
-<bf>XFree86-devel</bf> and <bf>qt-devel</bf>.  If you're going to use a
+<bf>XFree86-devel</bf>, <bf>qt-devel</bf> and <bf>lame</bf>.  If you're going to use a
 remote control with MythTV, you're going to need the <bf>cdialog</bf>
 package in order to compile <bf>lircd</bf>.
+
+<bf>NOTE</bf>:  If you are going to be using RPMs to install various
+components, you should be aware that not all packages include the necessary
+headers for compiling packages.  If you're having trouble compiling, ensure
+that you've installed the <tt>-devel</tt> version of a prerequisite.
 
 There appears to be issues with ALSA and simultaneously recording and playing 
 sound, which is a core requirement for MythTV.  If you are not running 
@@ -2614,6 +2619,7 @@ v1.092, 2003-02-12.  Bruce Markey submission on MythTV GUI and X Display
 Sizes
 v1.093, 2003-02-14.  Updated troubleshooting text about RedHat 7.2 and 8.0
 not symlinking correctly.
+v1.094, 2003-02-15.  Added note about -devel .rpms
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
