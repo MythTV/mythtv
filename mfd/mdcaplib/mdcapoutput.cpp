@@ -89,6 +89,48 @@ void MdcapOutput::addCollectionGroup()
     append((uint32_t) 0);
 }
 
+void MdcapOutput::addItemGroup()
+{
+    append(MarkupCodes::item_group);
+    open_groups.push(contents.size());
+    append((uint32_t) 0);
+}
+
+void MdcapOutput::addAddedItemsGroup()
+{
+    append(MarkupCodes::added_items_group);
+    open_groups.push(contents.size());
+    append((uint32_t) 0);
+}
+
+void MdcapOutput::addAddedItemGroup()
+{
+    append(MarkupCodes::added_item_group);
+    open_groups.push(contents.size());
+    append((uint32_t) 0);
+}
+
+void MdcapOutput::addListGroup()
+{
+    append(MarkupCodes::list_group);
+    open_groups.push(contents.size());
+    append((uint32_t) 0);
+}
+
+void MdcapOutput::addAddedListsGroup()
+{
+    append(MarkupCodes::added_lists_group);
+    open_groups.push(contents.size());
+    append((uint32_t) 0);
+}
+
+void MdcapOutput::addAddedListGroup()
+{
+    append(MarkupCodes::added_list_group);
+    open_groups.push(contents.size());
+    append((uint32_t) 0);
+}
+
 void MdcapOutput::endGroup()
 {
     //
@@ -196,7 +238,7 @@ void MdcapOutput::addCollectionName(const QString &collection_name)
 void MdcapOutput::addProtocolVersion()
 {
     //
-    //  protocol version is always 4 bytes long
+    //  protocol version is always 5 bytes long
     //
     
     append(MarkupCodes::protocol_version);
@@ -207,7 +249,7 @@ void MdcapOutput::addProtocolVersion()
 void MdcapOutput::addSessionId(uint32_t session_id)
 {
     //
-    //  session id is always 4 bytes long
+    //  session id is always 5 bytes long
     //
     
     append(MarkupCodes::session_id);
@@ -217,7 +259,7 @@ void MdcapOutput::addSessionId(uint32_t session_id)
 void MdcapOutput::addCollectionCount(int collection_count)
 {
     //
-    //  collection count is always 4 bytes long
+    //  collection count is always 5 bytes long
     //
     
     append(MarkupCodes::collection_count);
@@ -227,22 +269,241 @@ void MdcapOutput::addCollectionCount(int collection_count)
 void MdcapOutput::addCollectionId(int collection_id)
 {
     //
-    //  collection id is always 4 bytes long
+    //  collection id is always 5 bytes long
     //
     
     append(MarkupCodes::collection_id);
     append((uint32_t) collection_id);
 }
 
+void MdcapOutput::addCollectionType(int collection_type)
+{
+    //
+    //  collection type is always 5 bytes long
+    //
+    
+    append(MarkupCodes::collection_type);
+    append((uint32_t) collection_type);
+}
+
 void MdcapOutput::addCollectionGeneration(int collection_generation)
 {
     //
-    //  collection generation is always 4 bytes long
+    //  collection generation is always 5 bytes long
     //
     
     append(MarkupCodes::collection_generation);
     append((uint32_t) collection_generation);
 }
+
+void MdcapOutput::addUpdateType(bool full_or_not)
+{
+    //
+    //  Update type is 3 bytes
+    //
+
+    append(MarkupCodes::update_type);
+    if(full_or_not)
+    {
+        append((uint8_t) 1);
+    }    
+    else
+    {
+        append((uint8_t) 0);
+    }
+}
+
+void MdcapOutput::addTotalItems(uint count)
+{
+    //
+    //  Total items is 5 bytes
+    //  1 - markup code
+    //  4 = 32 bit unsigned int
+    
+    append(MarkupCodes::total_items);
+    append((uint32_t) count);
+}
+
+void MdcapOutput::addAddedItems(uint count)
+{
+    //
+    //  Added items is 5 bytes
+    //  1 - markup code
+    //  4 = 32 bit unsigned int
+    
+    append(MarkupCodes::added_items);
+    append((uint32_t) count);
+}
+
+void MdcapOutput::addDeletedItems(uint count)
+{
+    //
+    //  Deleted items is 5 bytes
+    //  1 - markup code
+    //  4 = 32 bit unsigned int
+    
+    append(MarkupCodes::deleted_items);
+    append((uint32_t) count);
+}
+
+void MdcapOutput::addItemType(int item_type)
+{
+    //
+    //  item type
+    //  1 - markup code
+    //  1 = 8 bit type
+    
+    if(item_type < 1)
+    {
+        cerr << "sending out a negative item id, not good" << endl;
+    }
+    
+    append(MarkupCodes::item_type);
+    append((uint8_t) item_type);
+}
+
+
+
+void MdcapOutput::addItemId(int item_id)
+{
+    //
+    //  item id
+    //  1 - markup code
+    //  4 = 32 bit unsigned int
+    
+    if(item_id < 1)
+    {
+        cerr << "sending out a negative item id, not good" << endl;
+    }
+    
+    append(MarkupCodes::item_id);
+    append((uint32_t) item_id);
+}
+
+void MdcapOutput::addItemUrl(const QString &item_url)
+{
+    QCString utf8_string = item_url.utf8();
+    append(MarkupCodes::item_url);
+    open_groups.push(contents.size());
+    append((uint32_t) 0);
+    append(utf8_string, utf8_string.length());
+    endGroup();
+}
+
+void MdcapOutput::addItemRating(int item_rating)
+{
+    append(MarkupCodes::item_rating);
+    append((uint8_t) item_rating);
+}
+
+void MdcapOutput::addItemLastPlayed(uint item_last_played)
+{
+    append(MarkupCodes::item_last_played);
+    append((uint32_t) item_last_played);
+}
+
+void MdcapOutput::addItemPlayCount(int item_play_count)
+{
+    append(MarkupCodes::item_play_count);
+    append((uint32_t) item_play_count);
+}
+
+void MdcapOutput::addItemArtist(const QString &item_artist)
+{
+    QCString utf8_string = item_artist.utf8();
+    append(MarkupCodes::item_artist);
+    open_groups.push(contents.size());
+    append((uint32_t) 0);
+    append(utf8_string, utf8_string.length());
+    endGroup();
+}
+
+void MdcapOutput::addItemAlbum(const QString &item_album)
+{
+    QCString utf8_string = item_album.utf8();
+    append(MarkupCodes::item_album);
+    open_groups.push(contents.size());
+    append((uint32_t) 0);
+    append(utf8_string, utf8_string.length());
+    endGroup();
+}
+
+void MdcapOutput::addItemTitle(const QString &item_title)
+{
+    QCString utf8_string = item_title.utf8();
+    append(MarkupCodes::item_title);
+    open_groups.push(contents.size());
+    append((uint32_t) 0);
+    append(utf8_string, utf8_string.length());
+    endGroup();
+}
+
+void MdcapOutput::addItemGenre(const QString &item_genre)
+{
+    QCString utf8_string = item_genre.utf8();
+    append(MarkupCodes::item_genre);
+    open_groups.push(contents.size());
+    append((uint32_t) 0);
+    append(utf8_string, utf8_string.length());
+    endGroup();
+}
+
+void MdcapOutput::addItemYear(int item_year)
+{
+    append(MarkupCodes::item_year);
+    append((uint32_t) item_year);
+}
+
+void MdcapOutput::addItemTrack(int item_track)
+{
+    append(MarkupCodes::item_track);
+    append((uint32_t) item_track);
+}
+
+void MdcapOutput::addItemLength(int item_length)
+{
+    append(MarkupCodes::item_length);
+    append((uint32_t) item_length);
+}
+
+void MdcapOutput::addListId(int list_id)
+{
+    //
+    //  list id
+    //  1 - markup code
+    //  4 = 32 bit unsigned int
+    
+    if(list_id < 1)
+    {
+        cerr << "sending out a negative list id, not good" << endl;
+    }
+    
+    append(MarkupCodes::list_id);
+    append((uint32_t) list_id);
+}
+
+void MdcapOutput::addListName(const QString &list_name)
+{
+    QCString utf8_string = list_name.utf8();
+    append(MarkupCodes::list_name);
+    open_groups.push(contents.size());
+    append((uint32_t) 0);
+    append(utf8_string, utf8_string.length());
+    endGroup();
+}
+
+void MdcapOutput::addListItem(int list_item)
+{
+    //
+    //  list item
+    //  1 - markup code
+    //  4 = 32 bit unsigned int
+    
+    append(MarkupCodes::list_item);
+    append((uint32_t) list_item);
+}
+
+
 
 void MdcapOutput::append(char a_char)
 {

@@ -252,6 +252,8 @@ class Playlist
   public:
   
     Playlist(int l_collection_id, QString new_name, QString raw_songlist, uint new_id);
+    Playlist(int l_collection_id, QString new_name, QValueList<int> *l_song_references, uint new_id);
+
     virtual ~Playlist();
 
     uint             getId(){return id;}

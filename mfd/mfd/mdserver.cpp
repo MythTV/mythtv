@@ -163,6 +163,14 @@ void MetadataServer::handleIncoming(HttpInRequest *http_request, int client_id)
     {
         possiblySendUpdate(http_request, client_id);
     }
+    else if(mdcap_request->getRequestType() == MDCAP_REQUEST_CONTAINERS)
+    {
+        sendContainers(http_request, mdcap_request);
+    }
+    else
+    {
+        warning("unhandled request type");
+    }
     
     delete mdcap_request;
     mdcap_request = NULL;
@@ -1094,6 +1102,19 @@ void MetadataServer::possiblySendUpdate(HttpInRequest *http_request, int /* clie
                 ++it;
                 response.addCollectionGroup();
                     response.addCollectionId(container->getIdentifier());
+                    if(container->isAudio())
+                    {
+                        response.addCollectionType(MDT_audio);
+                    }
+                    else if(container->isVideo())
+                    {
+                        response.addCollectionType(MDT_video);
+                    }
+                    else
+                    {
+                        warning("collection that is neither audio not video");
+                    }
+                    response.addCollectionCount(container->getMetadataCount());
                     response.addCollectionName(container->getName());
                     response.addCollectionGeneration(container->getGeneration());
                 response.endGroup();
@@ -1102,6 +1123,175 @@ void MetadataServer::possiblySendUpdate(HttpInRequest *http_request, int /* clie
     unlockMetadata();
 
     sendResponse(http_request, response);
+}
+
+void MetadataServer::sendContainers(HttpInRequest *http_request, MdcapRequest *mdcap_request)
+{
+    //
+    //  This method is called whenever we get an http request for
+    //  "/containers". We need to figure out whether it's a request for
+    //  items or lists, parse out the container id, and figure out of it's a
+    //  full or delta request
+    //
+    
+
+    bool full_update = true;
+    
+    metadata_mutex.lock();
+    MetadataContainer *container = getMetadataContainer(mdcap_request->getContainerId());
+    if(!container)
+    {
+        warning("bad container id in mdcap request");
+        http_request->getResponse()->setError(400);
+        metadata_mutex.unlock();
+        return;
+    }
+
+    if(
+        mdcap_request->getDelta() > 0      &&
+        mdcap_request->getGeneration() > 0 &&
+        mdcap_request->getDelta() + 1 == mdcap_request->getGeneration() &&
+        mdcap_request->getGeneration() == container->getGeneration()
+       )
+    {
+        full_update = false;    // delta
+    }  
+        
+
+    if(mdcap_request->itemRequest())
+    {
+        //
+        //  Are we sending everything, or just deltas?
+        //  We send deltas if the client is only off by one.
+        //
+        
+        if(full_update)
+        {
+            //
+            //  Send all the metadata items in this container
+            //
+        
+            QIntDict<Metadata> *metadata = container->getMetadata();
+            
+            MdcapOutput response;
+        
+            response.addItemGroup();
+
+                response.addCollectionId(container->getIdentifier());
+                response.addCollectionGeneration(container->getGeneration());
+                response.addUpdateType(full_update);
+                response.addTotalItems(metadata->count());
+                response.addAddedItems(metadata->count());
+                response.addDeletedItems(0);
+                
+                response.addAddedItemsGroup();
+                    
+                    QIntDictIterator<Metadata> it( *metadata ); 
+                    Metadata *a_metadata;
+                    for ( ; (a_metadata = it.current()); ++it )   
+                    {
+                        if(a_metadata->getType() == MDT_audio)
+                        {
+                            AudioMetadata *audio_metadata = (AudioMetadata *)a_metadata;
+                            response.addAddedItemGroup();
+                                response.addItemType(audio_metadata->getType());
+                                response.addItemId(audio_metadata->getId());
+                                response.addItemUrl(audio_metadata->getUrl().toString());
+                                response.addItemRating(audio_metadata->getRating());
+                                response.addItemLastPlayed(audio_metadata->getLastPlayed().toTime_t());
+                                response.addItemPlayCount(audio_metadata->getPlayCount());
+                                response.addItemArtist(audio_metadata->getArtist());
+                                response.addItemAlbum(audio_metadata->getAlbum());
+                                response.addItemTitle(audio_metadata->getTitle());
+                                response.addItemGenre(audio_metadata->getGenre());
+                                response.addItemYear(audio_metadata->getYear());
+                                response.addItemTrack(audio_metadata->getTrack());
+                                response.addItemLength(audio_metadata->getLength());
+                            response.endGroup();
+                        }
+                        else
+                        {
+                            warning("don't know how to handle non audio metadata yet");
+                        }
+                    }
+                
+                response.endGroup();
+
+            response.endGroup();
+    
+            sendResponse(http_request, response);
+        }
+        else
+        {
+            //
+            //  Send the deltas from the last change for items in this
+            //  container
+            //
+        }
+        
+    }
+    else if(mdcap_request->listRequest())
+    {
+        if(full_update)
+        {
+            //
+            //  Send all the lists in this container
+            //
+        
+            QIntDict<Playlist> *playlists = container->getPlaylists();
+            
+            MdcapOutput response;
+        
+            response.addListGroup();
+
+                response.addCollectionId(container->getIdentifier());
+                response.addCollectionGeneration(container->getGeneration());
+                response.addUpdateType(full_update);
+                response.addTotalItems(playlists->count());
+                response.addAddedItems(playlists->count());
+                response.addDeletedItems(0);
+                
+                response.addAddedListsGroup();
+                    
+                    QIntDictIterator<Playlist> it( *playlists ); 
+                    Playlist *a_playlist;
+                    for ( ; (a_playlist = it.current()); ++it )   
+                    {
+                        response.addAddedListGroup();
+                            response.addListId(a_playlist->getId());
+                            response.addListName(a_playlist->getName());
+                            QValueList<int> *list_items = a_playlist->getListPtr();
+                            QValueList<int>::iterator item_it;
+                            for(item_it = list_items->begin(); item_it != list_items->end(); ++item_it)
+                            {
+                                response.addListItem((*item_it));
+                            }
+                        response.endGroup();
+                    }
+                
+                response.endGroup();
+
+            response.endGroup();
+    
+            sendResponse(http_request, response);
+        }
+        else
+        {
+            //
+            //  Send the deltas from the last change for items in this
+            //  container
+            //
+        }
+        
+    }
+    else
+    {
+        warning("bad request type from mdcap client");
+        http_request->getResponse()->setError(400);
+    }    
+
+    metadata_mutex.unlock();
+    
 }
 
 

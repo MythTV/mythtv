@@ -22,6 +22,7 @@
 #include "mdcapsession.h"
 
 class MFD;
+class MdcapRequest;
 
 class MetadataServer : public MFDHttpPlugin
 {
@@ -101,6 +102,7 @@ class MetadataServer : public MFDHttpPlugin
     void sendServerInfo(HttpInRequest *http_request);
     void sendLogin(HttpInRequest *http_request, uint32_t session_id);
     void possiblySendUpdate(HttpInRequest *http_request, int client_id);
+    void sendContainers(HttpInRequest *http_request, MdcapRequest *mdcap_request);
 
     void sendResponse(HttpInRequest *http_request, MdcapOutput &response);
 

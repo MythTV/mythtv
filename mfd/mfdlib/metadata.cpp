@@ -227,6 +227,27 @@ Playlist::Playlist(
     waiting_for_list = false;
 }
 
+Playlist::Playlist(
+                    int l_collection_id, 
+                    QString new_name, 
+                    QValueList<int> *l_song_references,
+                    uint new_id
+                  )
+{
+    collection_id = l_collection_id;
+    id = new_id;
+    name = new_name;
+
+    QValueList<int>::iterator it;
+    for(it = l_song_references->begin(); it != l_song_references->end(); ++it)
+    {
+        song_references.push_back((*it));
+    }
+
+    internal_change = false;
+    waiting_for_list = false;
+}
+
 void Playlist::mapDatabaseToId(
                                 QIntDict<Metadata> *the_metadata, 
                                 QValueList<int> *reference_list,

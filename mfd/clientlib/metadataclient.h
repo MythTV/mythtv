@@ -10,8 +10,11 @@
 
 */
 
+#include <qptrlist.h>
+
 #include "serviceclient.h"
 #include "../mdcaplib/mdcapinput.h"
+#include "metadatacollection.h"
 
 class MdcapResponse;
 
@@ -39,10 +42,35 @@ class MetadataClient : public ServiceClient
     void parseServerInfo(MdcapInput &mdcap_input);
     void parseLogin(MdcapInput &mdcap_input);
     void parseUpdate(MdcapInput &mdcap_input);
+    void parseItems(MdcapInput &mdcap_input);
+    void parseLists(MdcapInput &mdcap_input);
 
+    int  parseCollection(MdcapInput &mdcap_input);
+
+    void parseNewItemData(
+                            int  collection_id,
+                            int  collection_generation,
+                            bool update_type,
+                            int  total_count,
+                            int  add_count,
+                            int  del_count,
+                            MdcapInput &mdcap_input
+                         );
+    
+    void parseNewListData(
+                            int  collection_id,
+                            int  collection_generation,
+                            bool update_type,
+                            int  total_count,
+                            int  add_count,
+                            int  del_count,
+                            MdcapInput &mdcap_input
+                         );
+    
   private:
   
     uint32_t session_id;
+    QPtrList<MetadataCollection>    metadata_collections;
 };
 
 #endif

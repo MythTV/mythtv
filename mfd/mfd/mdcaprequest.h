@@ -20,7 +20,9 @@ enum MdcapRequestType {
 	MDCAP_REQUEST_SERVINFO,
 	MDCAP_REQUEST_LOGIN,
 	MDCAP_REQUEST_UPDATE,
-	MDCAP_REQUEST_LOGOUT
+	MDCAP_REQUEST_CONTAINERS,
+	MDCAP_REQUEST_LOGOUT,
+	MDCAP_REQUEST_SCREWEDUP
 };
 
 
@@ -46,11 +48,23 @@ class MdcapRequest
     //
     
     MdcapRequestType getRequestType(){return mdcap_request_type;}
+    int getContainerId(){return container_id;}
+    int getGeneration(){return generation;}
+    int getDelta(){return delta;}
+
+    bool itemRequest(){return item_request;}
+    bool listRequest(){return list_request;}
 
   private:
   
     MdcapRequestType    mdcap_request_type;
 
+    int container_id;
+    int generation;
+    int delta;
+
+    bool item_request;
+    bool list_request;
 };
 
 

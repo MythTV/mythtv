@@ -56,11 +56,23 @@ char MdcapInput::popGroup(QValueVector<char> *group_contents)
     //
     
     if(
-        return_value != MarkupCodes::server_info_group &&
-        return_value != MarkupCodes::login_group &&
-        return_value != MarkupCodes::update_group &&
-        return_value != MarkupCodes::collection_group &&
-        return_value != MarkupCodes::name
+        return_value != MarkupCodes::server_info_group  &&
+        return_value != MarkupCodes::login_group        &&
+        return_value != MarkupCodes::update_group       &&
+        return_value != MarkupCodes::collection_group   &&
+        return_value != MarkupCodes::item_group         &&
+        return_value != MarkupCodes::added_items_group  &&
+        return_value != MarkupCodes::added_item_group   &&
+        return_value != MarkupCodes::name               &&
+        return_value != MarkupCodes::item_url           &&
+        return_value != MarkupCodes::item_artist        &&
+        return_value != MarkupCodes::item_album         &&
+        return_value != MarkupCodes::item_title         &&
+        return_value != MarkupCodes::item_genre         &&
+        return_value != MarkupCodes::list_group         &&
+        return_value != MarkupCodes::added_lists_group  &&
+        return_value != MarkupCodes::added_list_group   &&
+        return_value != MarkupCodes::list_name
       )
     {
         cerr << "mdcapinput.o: asked to pop a group, but first code "
@@ -82,10 +94,10 @@ char MdcapInput::popGroup(QValueVector<char> *group_contents)
         return 0;
     }
 
-    uint32_t group_size  = contents[4];
-             group_size += contents[3] * 256;
-             group_size += contents[2] * 256 * 256;
-             group_size += contents[1] * 256 * 256 * 256;
+    uint32_t group_size  = ((int) ((uint8_t) contents[4]));
+             group_size += ((int) ((uint8_t) contents[3])) * 256;
+             group_size += ((int) ((uint8_t) contents[2])) * 256 * 256;
+             group_size += ((int) ((uint8_t) contents[1])) * 256 * 256 * 256;
              
     //
     //  Make sure there are at least as many bytes available as the group
@@ -201,6 +213,7 @@ QString MdcapInput::popName()
     
     QString the_name = QString::fromUtf8(utf8_name);
     
+    delete [] utf8_name;
     return the_name;
 }
 
@@ -305,7 +318,7 @@ uint32_t MdcapInput::popSessionId()
 uint32_t MdcapInput::popCollectionCount()
 {
     //
-    //  Session id is always 5 bytes
+    //  Collection count is always 5 bytes
     //  1st byte - session id markup code
     //    next 4 - 32 bit integer = number of collections
     //
@@ -331,6 +344,703 @@ uint32_t MdcapInput::popCollectionCount()
 }
 
 
+uint32_t MdcapInput::popCollectionId()
+{
+    //
+    //  Collection id is always 5 bytes
+    //  1st byte - session id markup code
+    //    next 4 - 32 bit integer = collection id
+    //
+    
+    if(contents.size() < 5)
+    {
+        cerr << "mdcapinput.o: asked to popCollectionId(), but "
+             << "there are not enough bytes left in the stream "
+             << endl;
+        return 0;
+    }
+
+    char content_code = popByte();
+    if(content_code != MarkupCodes::collection_id)
+    {
+        cerr << "mdcapinput.o: asked to popCollectionId(), but "
+             << "content code is not collection_id "
+             << endl;
+        return 0;       
+    }
+
+    return popU32();    
+}
+
+
+uint32_t MdcapInput::popCollectionType()
+{
+    //
+    //  Collection type is always 5 bytes
+    //  1st byte - session id markup code
+    //    next 4 - 32 bit integer = collection id
+    //
+    
+    if(contents.size() < 5)
+    {
+        cerr << "mdcapinput.o: asked to popCollectionType(), but "
+             << "there are not enough bytes left in the stream "
+             << endl;
+        return 0;
+    }
+
+    char content_code = popByte();
+    if(content_code != MarkupCodes::collection_type)
+    {
+        cerr << "mdcapinput.o: asked to popCollectionType(), but "
+             << "content code is not collection_type "
+             << endl;
+        return 0;       
+    }
+
+    return popU32();    
+}
+
+
+uint32_t MdcapInput::popCollectionGeneration()
+{
+    //
+    //  Collection generation is always 5 bytes
+    //  1st byte - session id markup code
+    //    next 4 - 32 bit integer = generation number
+    //
+    
+    if(contents.size() < 5)
+    {
+        cerr << "mdcapinput.o: asked to popCollectionGeneration(), but "
+             << "there are not enough bytes left in the stream "
+             << endl;
+        return 0;
+    }
+
+    char content_code = popByte();
+    if(content_code != MarkupCodes::collection_generation)
+    {
+        cerr << "mdcapinput.o: asked to popCollectionGeneration(), but "
+             << "content code is not collection_generation "
+             << endl;
+        return 0;       
+    }
+
+    return popU32();    
+}
+
+bool MdcapInput::popUpdateType()
+{
+    //
+    //  Update type is 2 bytes
+    //  1 - content markup code
+    //  2 - int; 0 is false (partial update)
+    //           1 is true  (full update)
+    //
+    
+    if(contents.size() < 2)
+    {
+        cerr << "mdcapinput.o: asked to popUpdateType(), but not enough "
+             << "bytes left";
+        return false;
+    }
+    
+    char content_code = popByte();
+    if(content_code != MarkupCodes::update_type)
+    {
+        cerr << "mdcapinput.o: asked to popUpdateType(), but "
+             << "content code is not update_type "
+             << endl;
+        return false;
+    }
+    
+    uint8_t result = popByte();
+    if(result == 1)
+    {
+        return true;
+    }
+    else if(result == 0)
+    {
+        return false;
+    }
+    
+    cerr << "mdcapinput.o: asked to popUpdateType(), but value was "
+         << "neither true not false"
+         << endl;
+    return false;
+}
+
+
+uint32_t MdcapInput::popTotalItems()
+{
+    //
+    //  Total items is always 5 bytes
+    //  1st byte - markup code
+    //    next 4 - 32 bit integer = total items
+    //
+    
+    if(contents.size() < 5)
+    {
+        cerr << "mdcapinput.o: asked to popTotalItems(), but "
+             << "there are not enough bytes left in the stream "
+             << endl;
+        return 0;
+    }
+
+    char content_code = popByte();
+    if(content_code != MarkupCodes::total_items)
+    {
+        cerr << "mdcapinput.o: asked to popTotalItems(), but "
+             << "content code is not total_items "
+             << endl;
+        return 0;       
+    }
+
+    return popU32();    
+}
+
+uint32_t MdcapInput::popAddedItems()
+{
+    //
+    //  Added items is always 5 bytes
+    //  1st byte - markup code
+    //    next 4 - 32 bit integer = total items
+    //
+    
+    if(contents.size() < 5)
+    {
+        cerr << "mdcapinput.o: asked to popAddedItems(), but "
+             << "there are not enough bytes left in the stream "
+             << endl;
+        return 0;
+    }
+
+    char content_code = popByte();
+    if(content_code != MarkupCodes::added_items)
+    {
+        cerr << "mdcapinput.o: asked to popAddedItems(), but "
+             << "content code is not added_items "
+             << endl;
+        return 0;       
+    }
+
+    return popU32();    
+}
+
+uint32_t MdcapInput::popDeletedItems()
+{
+    //
+    //  Deleted items is always 5 bytes
+    //  1st byte - markup code
+    //    next 4 - 32 bit integer = total items
+    //
+    
+    if(contents.size() < 5)
+    {
+        cerr << "mdcapinput.o: asked to popDeletedItems(), but "
+             << "there are not enough bytes left in the stream "
+             << endl;
+        return 0;
+    }
+
+    char content_code = popByte();
+
+    if(content_code != MarkupCodes::deleted_items)
+    {
+        cerr << "mdcapinput.o: asked to popDeletedItems(), but "
+             << "content code is not deleted_items "
+             << endl;
+        return 0;       
+    }
+
+    return popU32();    
+}
+
+uint8_t MdcapInput::popItemType()
+{
+    //
+    //  item id is always 2 bytes
+    //  1st byte - markup code
+    //  2nd byte - item type
+    //
+    
+    if(contents.size() < 2)
+    {
+        cerr << "mdcapinput.o: asked to popItemType(), but "
+             << "there are not enough bytes left in the stream "
+             << endl;
+        return 0;
+    }
+
+    char content_code = popByte();
+    if(content_code != MarkupCodes::item_type)
+    {
+        cerr << "mdcapinput.o: asked to popItemType(), but "
+             << "content code is not item_type "
+             << endl;
+        return 0;       
+    }
+
+    return popByte();    
+}
+
+uint32_t MdcapInput::popItemId()
+{
+    //
+    //  item id is always 5 bytes
+    //  1st byte - markup code
+    //    next 4 - 32 bit integer = item id
+    //
+    
+    if(contents.size() < 5)
+    {
+        cerr << "mdcapinput.o: asked to popItemId(), but "
+             << "there are not enough bytes left in the stream "
+             << endl;
+        return 0;
+    }
+
+    char content_code = popByte();
+    if(content_code != MarkupCodes::item_id)
+    {
+        cerr << "mdcapinput.o: asked to popItemId(), but "
+             << "content code is not item_id "
+             << endl;
+        return 0;       
+    }
+
+    return popU32();    
+}
+
+uint8_t MdcapInput::popItemRating()
+{
+    //
+    //  item rating is always 2 bytes
+    //  1st byte - markup code
+    //  2nd byte - rating (0-10)
+    //
+    
+    if(contents.size() < 2)
+    {
+        cerr << "mdcapinput.o: asked to popItemRating(), but "
+             << "there are not enough bytes left in the stream "
+             << endl;
+        return 0;
+    }
+
+    char content_code = popByte();
+    if(content_code != MarkupCodes::item_rating)
+    {
+        cerr << "mdcapinput.o: asked to popItemRating(), but "
+             << "content code is not item_rating "
+             << endl;
+        return 0;       
+    }
+
+    return popByte();
+}
+
+uint32_t MdcapInput::popItemLastPlayed()
+{
+    //
+    //  last played is always 5 bytes
+    //  1st byte - markup code
+    //  next 4 - 32 bit integer = seconds since disco
+    //
+    
+    if(contents.size() < 5)
+    {
+        cerr << "mdcapinput.o: asked to popItemLastPlayed(), but "
+             << "there are not enough bytes left in the stream "
+             << endl;
+        return 0;
+    }
+
+    char content_code = popByte();
+    if(content_code != MarkupCodes::item_last_played)
+    {
+        cerr << "mdcapinput.o: asked to popItemLastPlayed(), but "
+             << "content code is not item_last_played "
+             << endl;
+        return 0;       
+    }
+
+    return popU32();    
+}
+
+uint32_t MdcapInput::popItemPlayCount()
+{
+    //
+    //  play count is always 5 bytes
+    //  1st byte - markup code
+    //  next 4 - 32 bit integer = number of times played
+    //
+    
+    if(contents.size() < 5)
+    {
+        cerr << "mdcapinput.o: asked to popItemPlayCount(), but "
+             << "there are not enough bytes left in the stream "
+             << endl;
+        return 0;
+    }
+
+    char content_code = popByte();
+    if(content_code != MarkupCodes::item_play_count)
+    {
+        cerr << "mdcapinput.o: asked to popItemPlayCount(), but "
+             << "content code is not item_play_count "
+             << endl;
+        return 0;       
+    }
+
+    return popU32();    
+}
+
+uint32_t MdcapInput::popItemYear()
+{
+    //
+    //  item year is always 5 bytes
+    //  1st byte - markup code
+    //  next 4 - 32 bit integer = year
+    //
+    
+    if(contents.size() < 5)
+    {
+        cerr << "mdcapinput.o: asked to popItemYear(), but "
+             << "there are not enough bytes left in the stream "
+             << endl;
+        return 0;
+    }
+
+    char content_code = popByte();
+    if(content_code != MarkupCodes::item_year)
+    {
+        cerr << "mdcapinput.o: asked to popItemYear(), but "
+             << "content code is not item_year "
+             << endl;
+        return 0;       
+    }
+
+    return popU32();    
+}
+
+uint32_t MdcapInput::popItemTrack()
+{
+    //
+    //  item track is always 5 bytes
+    //  1st byte - markup code
+    //  next 4 - 32 bit integer = track number
+    //
+    
+    if(contents.size() < 5)
+    {
+        cerr << "mdcapinput.o: asked to popTrack(), but "
+             << "there are not enough bytes left in the stream "
+             << endl;
+        return 0;
+    }
+
+    char content_code = popByte();
+    if(content_code != MarkupCodes::item_track)
+    {
+        cerr << "mdcapinput.o: asked to popItemTrack(), but "
+             << "content code is not item_track "
+             << endl;
+        return 0;       
+    }
+
+    return popU32();    
+}
+
+uint32_t MdcapInput::popItemLength()
+{
+    //
+    //  item length is always 5 bytes
+    //  1st byte - markup code
+    //  next 4 - 32 bit integer = length in seconds
+    //
+    
+    if(contents.size() < 5)
+    {
+        cerr << "mdcapinput.o: asked to popLength(), but "
+             << "there are not enough bytes left in the stream "
+             << endl;
+        return 0;
+    }
+
+    char content_code = popByte();
+    if(content_code != MarkupCodes::item_length)
+    {
+        cerr << "mdcapinput.o: asked to popItemLength(), but "
+             << "content code is not item_length "
+             << endl;
+        return 0;       
+    }
+
+    return popU32();    
+}
+
+QString MdcapInput::popItemUrl()
+{
+    QValueVector<char> url_string_vector;
+    char content_code = popGroup(&url_string_vector);
+    
+    if(content_code != MarkupCodes::item_url)
+    {
+        cerr << "mdcapinput.o: asked to do popItemUrl(), but this "
+             << "doesn't look like an item_url ("
+             << (int) ((uint8_t )content_code)
+             << ")"
+             << endl;
+        return QString("");
+    }
+    
+    
+    char *utf8_url = new char [url_string_vector.size() + 1];
+    for(uint i = 0; i < url_string_vector.size(); i++)
+    {
+        utf8_url[i] = url_string_vector[i];
+    }
+    utf8_url[url_string_vector.size()] = '\0';
+    
+    QString the_url = QString::fromUtf8(utf8_url);
+    
+    delete [] utf8_url;
+    
+    return the_url;
+}
+
+QString MdcapInput::popItemArtist()
+{
+    QValueVector<char> artist_string_vector;
+    char content_code = popGroup(&artist_string_vector);
+    
+    if(content_code != MarkupCodes::item_artist)
+    {
+        cerr << "mdcapinput.o: asked to do popItemArtist(), but this "
+             << "doesn't look like an item_artist ("
+             << (int) ((uint8_t )content_code)
+             << ")"
+             << endl;
+        return QString("");
+    }
+    
+    
+    char *utf8_artist = new char [artist_string_vector.size() + 1];
+    for(uint i = 0; i < artist_string_vector.size(); i++)
+    {
+        utf8_artist[i] = artist_string_vector[i];
+    }
+    utf8_artist[artist_string_vector.size()] = '\0';
+    
+    QString the_artist = QString::fromUtf8(utf8_artist);
+    
+    delete [] utf8_artist;
+    
+    return the_artist;
+}
+
+QString MdcapInput::popItemAlbum()
+{
+    QValueVector<char> album_string_vector;
+    char content_code = popGroup(&album_string_vector);
+    
+    if(content_code != MarkupCodes::item_album)
+    {
+        cerr << "mdcapinput.o: asked to do popItemAlbum(), but this "
+             << "doesn't look like an item_album ("
+             << (int) ((uint8_t )content_code)
+             << ")"
+             << endl;
+        return QString("");
+    }
+    
+    
+    char *utf8_album = new char [album_string_vector.size() + 1];
+    for(uint i = 0; i < album_string_vector.size(); i++)
+    {
+        utf8_album[i] = album_string_vector[i];
+    }
+    utf8_album[album_string_vector.size()] = '\0';
+    
+    QString the_album = QString::fromUtf8(utf8_album);
+    
+    delete [] utf8_album;
+    
+    return the_album;
+}
+
+QString MdcapInput::popItemTitle()
+{
+    QValueVector<char> title_string_vector;
+    char content_code = popGroup(&title_string_vector);
+    
+    if(content_code != MarkupCodes::item_title)
+    {
+        cerr << "mdcapinput.o: asked to do popItemTitle(), but this "
+             << "doesn't look like an item_title ("
+             << (int) ((uint8_t )content_code)
+             << ")"
+             << endl;
+        return QString("");
+    }
+    
+    
+    char *utf8_title = new char [title_string_vector.size() + 1];
+    for(uint i = 0; i < title_string_vector.size(); i++)
+    {
+        utf8_title[i] = title_string_vector[i];
+    }
+    utf8_title[title_string_vector.size()] = '\0';
+    
+    QString the_title = QString::fromUtf8(utf8_title);
+    
+    delete [] utf8_title;
+    
+    return the_title;
+}
+
+QString MdcapInput::popItemGenre()
+{
+    QValueVector<char> genre_string_vector;
+    char content_code = popGroup(&genre_string_vector);
+    
+    if(content_code != MarkupCodes::item_genre)
+    {
+        cerr << "mdcapinput.o: asked to do popItemGenre(), but this "
+             << "doesn't look like an item_genre ("
+             << (int) ((uint8_t )content_code)
+             << ")"
+             << endl;
+        return QString("");
+    }
+    
+    
+    char *utf8_genre = new char [genre_string_vector.size() + 1];
+    for(uint i = 0; i < genre_string_vector.size(); i++)
+    {
+        utf8_genre[i] = genre_string_vector[i];
+    }
+    utf8_genre[genre_string_vector.size()] = '\0';
+    
+    QString the_genre = QString::fromUtf8(utf8_genre);
+    
+    delete [] utf8_genre;
+    
+    return the_genre;
+}
+
+int MdcapInput::popListId()
+{
+    //
+    //  list id is always 5 bytes
+    //  1st byte - markup code
+    //  next 4 - 32 bit integer = list id
+    //
+    
+    if(contents.size() < 5)
+    {
+        cerr << "mdcapinput.o: asked to popListId(), but "
+             << "there are not enough bytes left in the stream "
+             << endl;
+        return 0;
+    }
+
+    char content_code = popByte();
+    if(content_code != MarkupCodes::list_id)
+    {
+        cerr << "mdcapinput.o: asked to popListId(), but "
+             << "content code is not list_id "
+             << endl;
+        return 0;       
+    }
+
+    return popU32();    
+}
+
+QString MdcapInput::popListName()
+{
+    QValueVector<char> listname_string_vector;
+    char content_code = popGroup(&listname_string_vector);
+    
+    if(content_code != MarkupCodes::list_name)
+    {
+        cerr << "mdcapinput.o: asked to do popListName(), but this "
+             << "doesn't look like a list_name ("
+             << (int) ((uint8_t )content_code)
+             << ")"
+             << endl;
+        return QString("");
+    }
+    
+    
+    char *utf8_listname = new char [listname_string_vector.size() + 1];
+    for(uint i = 0; i < listname_string_vector.size(); i++)
+    {
+        utf8_listname[i] = listname_string_vector[i];
+    }
+    utf8_listname[listname_string_vector.size()] = '\0';
+    
+    QString the_listname = QString::fromUtf8(utf8_listname);
+    
+    delete [] utf8_listname;
+    
+    return the_listname;
+}
+
+uint32_t MdcapInput::popListItem()
+{
+    //
+    //  list item is always 5 bytes
+    //  1st byte - markup code
+    //  next 4 - 32 bit integer = id of the item
+    //
+    
+    if(contents.size() < 5)
+    {
+        cerr << "mdcapinput.o: asked to popListItem(), but "
+             << "there are not enough bytes left in the stream "
+             << endl;
+        return 0;
+    }
+
+    char content_code = popByte();
+    if(content_code != MarkupCodes::list_item)
+    {
+        cerr << "mdcapinput.o: asked to popListItem(), but "
+             << "content code is not list_item "
+             << endl;
+        return 0;       
+    }
+
+    return popU32();    
+}
+
+
+
+void MdcapInput::printContents()
+{
+    //
+    //  For debugging
+    //
+    
+    cout << "&&&&&&&&&&&&&&&&&&&& DEBUGGING OUTPUT &&&&&&&&&&&&&&&&&&&&"
+         << endl
+         << "contents of this MdcapInput object (size is "
+         << contents.size()
+         << ")"
+         << endl;
+    for(uint i = 0; i < contents.size(); i++)
+    {
+        cout << "[" 
+             << i
+             << "]="
+             << (int) ((uint8_t) contents[i])
+             << " ";
+    }
+    cout << endl;
+}
 MdcapInput::~MdcapInput()
 {
 }

@@ -20,7 +20,7 @@ HEADERS += mfdinterface.h   discoverythread.h   mfdinstance.h \
            ../mfdlib/httpinresponse.h \
            ../mfdlib/httpheader.h \
            ../mfdlib/httpgetvar.h \
-           mdcaprequest.h mdcapresponse.h
+           mdcaprequest.h mdcapresponse.h metadatacollection.h ../mfdlib/metadata.h
 
 SOURCES += mfdinterface.cpp discoverythread.cpp mfdinstance.cpp \
            ./mdnsd/mdnsd.c ./mdnsd/1035.c discovered.cpp \
@@ -29,7 +29,7 @@ SOURCES += mfdinterface.cpp discoverythread.cpp mfdinstance.cpp \
            ../mfdlib/httpinresponse.cpp \
            ../mfdlib/httpheader.cpp \
            ../mfdlib/httpgetvar.cpp \
-           mdcaprequest.cpp mdcapresponse.cpp
+           mdcaprequest.cpp mdcapresponse.cpp metadatacollection.cpp ../mfdlib/metadata.cpp
 
 inc.path = $${PREFIX}/include/mfdclient/
 inc.files  = mfdinterface.h

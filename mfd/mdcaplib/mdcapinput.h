@@ -39,7 +39,33 @@ class MdcapInput
     void        popProtocol(int *major, int *minor);   
     uint32_t    popSessionId();
     uint32_t    popCollectionCount();
+    uint32_t    popCollectionId();
+    uint32_t    popCollectionType();
+    uint32_t    popCollectionGeneration();
+    bool        popUpdateType();
+    uint32_t    popTotalItems();
+    uint32_t    popAddedItems();
+    uint32_t    popDeletedItems();
+    uint8_t     popItemType();
+    uint32_t    popItemId();
+    uint8_t     popItemRating();
+    uint32_t    popItemLastPlayed();
+    uint32_t    popItemPlayCount();
+    uint32_t    popItemYear();
+    uint32_t    popItemTrack();
+    uint32_t    popItemLength();
+    QString     popItemUrl();
+    QString     popItemArtist();
+    QString     popItemAlbum();
+    QString     popItemTitle();
+    QString     popItemGenre();
+    int         popListId();
+    QString     popListName();
+    uint32_t    popListItem();
 
+    void        printContents();    // Debugging
+    
+    
   private:
 
     QValueVector<char> contents;

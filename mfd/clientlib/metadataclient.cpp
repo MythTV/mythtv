@@ -38,6 +38,12 @@ MetadataClient::MetadataClient(
     //
     
     session_id = 0;
+    
+    //
+    //  if we remove our delete a metadata collection, it should get deleted from memory
+    //
+    
+    metadata_collections.setAutoDelete(true);
 }
 
 void MetadataClient::sendFirstRequest()
@@ -218,7 +224,7 @@ void MetadataClient::processResponse(MdcapResponse *mdcap_response)
              << "can't determine protocol version"
              << endl;
     }
-    
+
 
     //
     //  Create an mdcap input object with the payload from the response
@@ -231,21 +237,69 @@ void MetadataClient::processResponse(MdcapResponse *mdcap_response)
     if(first_tag == MarkupCodes::server_info_group)
     {
         parseServerInfo(mdcap_input);
+        return;
     }
     else if(first_tag == MarkupCodes::login_group)
     {
         parseLogin(mdcap_input);
+        return;
     }
     else if(first_tag == MarkupCodes::update_group)
     {
         parseUpdate(mdcap_input);
     }
+    else if(first_tag == MarkupCodes::item_group)
+    {
+        parseItems(mdcap_input);
+    }
+    else if(first_tag == MarkupCodes::list_group)
+    {
+        parseLists(mdcap_input);
+    } 
     else
     {
         cerr << "metadataclient.o: did not understand first markup code "
              << "in a mdcap payload "
              << endl;
     }
+    
+    //
+    //  Ok, if we're down here, we are logged in and know at least about
+    //  which containers exist (although we may well not know anything about
+    //  what's in them). Query anything we need to find out
+    //
+    
+    QPtrListIterator<MetadataCollection> it( metadata_collections );
+    MetadataCollection *a_collection;
+    while ( (a_collection = it.current()) != 0 )
+    {
+        if(!a_collection->itemsUpToDate())
+        {
+            //
+            //  This collection's items are not up to date, we need to ask
+            //  for an update
+            //
+            
+            QString a_request = a_collection->getItemsRequest(session_id);
+            MdcapRequest items_request(a_request, ip_address);   
+            items_request.send(client_socket_to_service);
+            return;
+        }
+        else if(!a_collection->listsUpToDate())
+        {
+            //
+            //  This collection's lists are not up to date, we need to ask
+            //  for an update
+            //
+            
+            QString a_request = a_collection->getListsRequest(session_id);
+            MdcapRequest lists_request(a_request, ip_address);   
+            lists_request.send(client_socket_to_service);
+            return;
+        }
+        ++it;
+    }
+    
 }
 
 void MetadataClient::parseServerInfo(MdcapInput &mdcap_input)
@@ -456,11 +510,18 @@ void MetadataClient::parseUpdate(MdcapInput &mdcap_input)
     //  Make a list of all our current collections ('cause we're going to go
     //  through the whole list from the server in a sec, and if we have
     //  something here at the client end that does not appear in that list,
-    //  we'll need to delete it.
+    //  we'll need to delete it.)
     //
 
-    // FIX
+    QValueList<int> pre_existing_collections;
 
+    QPtrListIterator<MetadataCollection> it( metadata_collections );
+    MetadataCollection *a_collection;
+    while ( (a_collection = it.current()) != 0 )
+    {
+        ++it;
+        pre_existing_collections.append(a_collection->getId());
+    }
 
     //
     //  For each, collection, parse out the details
@@ -474,22 +535,573 @@ void MetadataClient::parseUpdate(MdcapInput &mdcap_input)
         if(collection_code != MarkupCodes::collection_group)
         {
             cerr << "metadataclient.o: trying to parse a collection group "
-                 << "inside an update group, but not getting collection_"
-                 << "group as the content code. Buggered!"
+                 << "inside an update group, but not getting "
+                 << "collection_group as the content code. Buggered!"
                  << endl;
 
             delete collection_contents;
             return;   
         }
         
-        //int collection_id = parseCollection(collection_contents)
+        MdcapInput re_rebuilt_internals(collection_contents);
+        int collection_id = parseCollection(re_rebuilt_internals);
+        pre_existing_collections.remove(collection_id);
     }
 
     delete group_contents;
+
+    //
+    //  If any collections went away completely, deal with with
+    //
+
+    QValueList<int>::iterator away_it;
+    for( 
+            away_it  = pre_existing_collections.begin(); 
+            away_it != pre_existing_collections.end(); 
+            ++away_it 
+       )
+    {
+        //  do something
+    }
 }
+
+void MetadataClient::parseItems(MdcapInput &mdcap_input)
+{
+    QValueVector<char> *group_contents = new QValueVector<char>;
+    
+    char group_code = mdcap_input.popGroup(group_contents);
+    
+    if(group_code != MarkupCodes::item_group)
+    {
+        cerr << "metadataclient.o: asked to parseItems(), but "
+             << "group code was not item_group "
+             << endl;
+        delete group_contents;
+        return;
+    }
+    
+
+    MdcapInput rebuilt_internals(group_contents);
+
+    //
+    //  Go through the top level tags in an item_group collection, and do
+    //  whatever need to be done to parse through all the data sent
+    //
+    
+    int     new_collection_id = -1;
+    int     new_collection_generation = -1;
+    bool    new_update_type = false;
+    int     new_total_items = -1;
+    int     new_added_items = -1;
+    int     new_deleted_items = -1;
+
+    bool all_is_well = true;
+    while(rebuilt_internals.size() > 0 && all_is_well)
+    {
+        char content_code = rebuilt_internals.peekAtNextCode();
+        
+        //
+        //  Depending on what the code is, we set various things
+        //
+        
+        switch(content_code)
+        {
+            case MarkupCodes::collection_id:
+                new_collection_id = rebuilt_internals.popCollectionId();
+                break;
+                
+            case MarkupCodes::collection_generation:
+                new_collection_generation = rebuilt_internals.popCollectionGeneration();
+                break;
+                
+            case MarkupCodes::update_type:
+                new_update_type = rebuilt_internals.popUpdateType();
+                break;
+                
+            case MarkupCodes::total_items:
+                new_total_items = rebuilt_internals.popTotalItems();
+                break;
+                
+            case MarkupCodes::added_items:
+                new_added_items = rebuilt_internals.popAddedItems();
+                break;
+                
+            case MarkupCodes::deleted_items:
+                new_deleted_items = rebuilt_internals.popDeletedItems();
+                break;
+                
+            case MarkupCodes::added_items_group:
+                parseNewItemData(
+                                    new_collection_id, 
+                                    new_collection_generation,
+                                    new_update_type,
+                                    new_total_items,
+                                    new_added_items,
+                                    new_deleted_items,
+                                    rebuilt_internals
+                                 );
+                break;
+
+            default:
+
+                cerr << "metadataclient.o getting content codes I don't "
+                     << "understand while doing parseItems(). "
+                     << "code is " << (int) content_code
+                     << endl;
+                all_is_well = false;
+
+            break;
+        }
+    }
+    
+}
+
+void MetadataClient::parseLists(MdcapInput &mdcap_input)
+{
+    QValueVector<char> *group_contents = new QValueVector<char>;
+    
+    char group_code = mdcap_input.popGroup(group_contents);
+    
+    if(group_code != MarkupCodes::list_group)
+    {
+        cerr << "metadataclient.o: asked to parseLists(), but "
+             << "group code was not list_group "
+             << endl;
+        delete group_contents;
+        return;
+    }
+    
+
+    MdcapInput rebuilt_internals(group_contents);
+
+    //
+    //  Go through the top level tags in an item_group collection, and do
+    //  whatever need to be done to parse through all the data sent
+    //
+    
+    int     new_collection_id = -1;
+    int     new_collection_generation = -1;
+    bool    new_update_type = false;
+    int     new_total_items = -1;
+    int     new_added_items = -1;
+    int     new_deleted_items = -1;
+
+    bool all_is_well = true;
+
+    while(rebuilt_internals.size() > 0 && all_is_well)
+    {
+        char content_code = rebuilt_internals.peekAtNextCode();
+        
+        //
+        //  Depending on what the code is, we set various things
+        //
+        
+        switch(content_code)
+        {
+            case MarkupCodes::collection_id:
+                new_collection_id = rebuilt_internals.popCollectionId();
+                break;
+                
+            case MarkupCodes::collection_generation:
+                new_collection_generation = rebuilt_internals.popCollectionGeneration();
+                break;
+                
+            case MarkupCodes::update_type:
+                new_update_type = rebuilt_internals.popUpdateType();
+                break;
+                
+            case MarkupCodes::total_items:
+                new_total_items = rebuilt_internals.popTotalItems();
+                break;
+                
+            case MarkupCodes::added_items:
+                new_added_items = rebuilt_internals.popAddedItems();
+                break;
+                
+            case MarkupCodes::deleted_items:
+                new_deleted_items = rebuilt_internals.popDeletedItems();
+                break;
+                
+            case MarkupCodes::added_lists_group:
+                parseNewListData(
+                                    new_collection_id, 
+                                    new_collection_generation,
+                                    new_update_type,
+                                    new_total_items,
+                                    new_added_items,
+                                    new_deleted_items,
+                                    rebuilt_internals
+                                 );
+                break;
+
+            default:
+
+                cerr << "metadataclient.o getting content codes I don't "
+                     << "understand while doing parseLists(). "
+                     << "code is " << (int) content_code
+                     << endl;
+                all_is_well = false;
+
+            break;
+        }
+    }
+    
+}
+
+int MetadataClient::parseCollection(MdcapInput &mdcap_input)
+{
+    //
+    //  Look through the guts of a collection group and pull out the id, the
+    //  number of items, and the current generation number
+    //
+
+    uint32_t new_collection_count = 0;
+    uint32_t new_collection_id = 0;
+    uint32_t new_collection_generation = 0;
+    QString  new_collection_name = "";
+    uint32_t new_collection_type = 0;
+
+    bool all_is_well = true;
+    while(mdcap_input.size() > 0 && all_is_well)
+    {
+        char content_code = mdcap_input.peekAtNextCode();
+        
+        //
+        //  Depending on what the code is, we set various things
+        //
+        
+        switch(content_code)
+        {
+            case MarkupCodes::collection_id:
+                new_collection_id =  mdcap_input.popCollectionId();   
+                break;
+                
+            case MarkupCodes::collection_type:
+                new_collection_type =  mdcap_input.popCollectionType();   
+                break;
+                
+            case MarkupCodes::collection_count:
+                new_collection_count = mdcap_input.popCollectionCount();
+                break;
+                
+            case MarkupCodes::name:
+                new_collection_name = mdcap_input.popName();
+                break;
+                
+            case MarkupCodes::collection_generation:
+                new_collection_generation = mdcap_input.popCollectionGeneration();
+                break;
+                
+            default:
+                cerr << "metadataclient.o getting content codes I don't "
+                     << "understand ("
+                     << (int) content_code
+                     << ") while doing parseCollection(). "
+                     << endl;
+                all_is_well = false;
+
+            break;
+        }
+    }
+    
+    if(all_is_well && new_collection_id > 0)
+    {
+        //
+        //  See if we have already seen this collection
+        //
+        
+        QPtrListIterator<MetadataCollection> it( metadata_collections );
+        MetadataCollection *a_collection = NULL;
+        
+        for( ; it.current(); ++it)
+        {
+            if(it.current()->getId() == (int) new_collection_id)
+            {
+                a_collection = it.current();
+                break;
+            }
+        }
+
+        if(a_collection)
+        {
+            //
+            //  update an existing collection
+            //
+            
+        }
+        else
+        {
+            //
+            //  create a new collection
+            //
+            
+            MetadataType metadata_type = MDT_unknown;
+            if(new_collection_type == MDT_audio)
+            {
+                metadata_type = MDT_audio;
+            }
+            else if(new_collection_type == MDT_video)
+            {
+                metadata_type = MDT_video;
+            }
+            cout << "creating a new collection with id of " << new_collection_id << endl;
+            MetadataCollection *new_collection = 
+                new MetadataCollection(
+                                        new_collection_id,
+                                        new_collection_count,
+                                        new_collection_name,
+                                        new_collection_generation,
+                                        metadata_type
+                                       );
+            metadata_collections.append(new_collection);
+        }
+             
+        return new_collection_id;
+    }
+    else
+    {
+        cerr << "problem with a collection" << endl;
+    }
+    
+    return -1;
+}
+
+void MetadataClient::parseNewItemData(
+                                        int  collection_id,
+                                        int  collection_generation,
+                                        bool update_type,
+                                        int  total_count,
+                                        int  add_count,
+                                        int  del_count,
+                                        MdcapInput &mdcap_input
+                                     )
+{
+    //
+    //  Make sure all the incoming stuff is set
+    //
+    
+    if(
+        collection_id < 1           ||
+        collection_generation < 1   ||
+        total_count < 0             ||
+        add_count < 0               ||
+        del_count < 0
+      )
+    {
+        cerr << "metadataclient.o: asked to parseNewItemData(), but passed "
+             << "invalid parameter(s)"
+             << endl;
+        return;
+    }
+    
+
+    //
+    //  Make sure we are dealing with what we think we're dealing with
+    //
+
+    QValueVector<char> *new_item_contents = new QValueVector<char>;
+    
+    char group_code = mdcap_input.popGroup(new_item_contents);
+
+    if(group_code != MarkupCodes::added_items_group)
+    {
+        cerr << "metadataclient.o: asked to parseNewItemData(), but "
+             << "group code was not addded_items_group, it was "
+             << (int) group_code
+             << endl;
+        delete new_item_contents;
+        return;
+    }
+    
+
+    MdcapInput rebuilt_internals(new_item_contents);
+
+    //
+    //  Try and find the right collection
+    //
+
+    QPtrListIterator<MetadataCollection> it( metadata_collections );
+    MetadataCollection *which_one = NULL;
+    MetadataCollection *a_collection;
+    while ( (a_collection = it.current()) != 0 )
+    {
+        ++it;
+        if(a_collection->getId() == collection_id)
+        {
+            which_one = a_collection;
+            break;
+        }
+    }
+    
+    if(!which_one)
+    {
+        cerr << "metadataclient.o: asked to parseNewItemData(), but "
+             << "passed collection id is invalid"
+             << endl;
+             delete new_item_contents;
+             return;
+    }
+
+    
+
+    if(update_type)
+    {
+        //
+        //  It's all the items (not a delta)
+        //
+
+        which_one->clearAllMetadata();
+    }
+
+    while(rebuilt_internals.size() > 0)
+    {
+        char content_code = rebuilt_internals.peekAtNextCode();
+        if(content_code == MarkupCodes::added_item_group)
+        {
+            QValueVector<char> *item_contents = new QValueVector<char>;
+            rebuilt_internals.popGroup(item_contents);
+            MdcapInput re_rebuilt_internals(item_contents);
+            which_one->addItem(re_rebuilt_internals);
+            delete item_contents;
+        }
+        else
+        {
+            cerr << "metadataclient.o: while doing parseNewItemData(), "
+                 << "seeing content codes that should not be there"
+                 << endl;
+            break;
+        }
+    }
+
+    //
+    //  Mark this collections metadata with the right generation number
+    //
+
+    which_one->setMetadataGeneration(collection_generation);
+
+    delete new_item_contents;
+}
+                                        
+void MetadataClient::parseNewListData(
+                                        int  collection_id,
+                                        int  collection_generation,
+                                        bool update_type,
+                                        int  total_count,
+                                        int  add_count,
+                                        int  del_count,
+                                        MdcapInput &mdcap_input
+                                     )
+{
+    //
+    //  Make sure all the incoming stuff is set
+    //
+    
+    if(
+        collection_id < 1           ||
+        collection_generation < 1   ||
+        total_count < 0             ||
+        add_count < 0               ||
+        del_count < 0
+      )
+    {
+        cerr << "metadataclient.o: asked to parseNewListData(), but passed "
+             << "invalid parameter(s)"
+             << endl;
+        return;
+    }
+    
+
+    //
+    //  Make sure we are dealing with what we think we're dealing with
+    //
+
+    QValueVector<char> *new_list_contents = new QValueVector<char>;
+    
+    char group_code = mdcap_input.popGroup(new_list_contents);
+
+    if(group_code != MarkupCodes::added_lists_group)
+    {
+        cerr << "metadataclient.o: asked to parseNewListData(), but "
+             << "group code was not addded_listss_group, it was "
+             << (int) group_code
+             << endl;
+        delete new_list_contents;
+        return;
+    }
+    
+
+    MdcapInput rebuilt_internals(new_list_contents);
+
+    //
+    //  Try and find the right collection
+    //
+
+    QPtrListIterator<MetadataCollection> it( metadata_collections );
+    MetadataCollection *which_one = NULL;
+    MetadataCollection *a_collection;
+    while ( (a_collection = it.current()) != 0 )
+    {
+        ++it;
+        if(a_collection->getId() == collection_id)
+        {
+            which_one = a_collection;
+            break;
+        }
+    }
+    
+    if(!which_one)
+    {
+        cerr << "metadataclient.o: asked to parseNewListData(), but "
+             << "passed collection id is invalid"
+             << endl;
+             delete new_list_contents;
+             return;
+    }
+
+    
+
+    if(update_type)
+    {
+        //
+        //  It's all the items (not a delta)
+        //
+
+        which_one->clearAllPlaylists();
+    }
+
+    while(rebuilt_internals.size() > 0)
+    {
+        char content_code = rebuilt_internals.peekAtNextCode();
+        if(content_code == MarkupCodes::added_list_group)
+        {
+            QValueVector<char> *list_contents = new QValueVector<char>;
+            rebuilt_internals.popGroup(list_contents);
+            MdcapInput re_rebuilt_internals(list_contents);
+            which_one->addList(re_rebuilt_internals);
+            delete list_contents;
+        }
+        else
+        {
+            cerr << "metadataclient.o: while doing parseNewListData(), "
+                 << "seeing content codes that should not be there"
+                 << endl;
+            break;
+        }
+    }
+
+    //
+    //  Mark this collections metadata with the right generation number
+    //
+
+    which_one->setPlaylistGeneration(collection_generation);
+
+    delete new_list_contents;
+}
+                                        
 
 MetadataClient::~MetadataClient()
 {
+    metadata_collections.clear();
 }
 
 

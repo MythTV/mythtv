@@ -41,6 +41,16 @@ class MdcapOutput
     void addLoginGroup();
     void addUpdateGroup();
     void addCollectionGroup();
+
+    void addItemGroup();
+    void addAddedItemsGroup();
+    void addAddedItemGroup();
+
+    void addListGroup();
+    void addAddedListsGroup();
+    void addAddedListGroup();
+    
+
     void endGroup();
     
     //
@@ -59,8 +69,38 @@ class MdcapOutput
     void addSessionId(uint32_t session_id);
     void addCollectionCount(int collection_count);
     void addCollectionId(int collection_id);
+    void addCollectionType(int collection_type);
     void addCollectionGeneration(int collection_generation);    
+    void addUpdateType(bool full_or_not);
+    void addTotalItems(uint count);
+    void addAddedItems(uint count);
+    void addDeletedItems(uint count);
 
+    //
+    //  "element" functions for items
+    //
+
+    void addItemType(int item_type);
+    void addItemId(int item_id);
+    void addItemUrl(const QString &item_url);
+    void addItemRating(int item_rating);
+    void addItemLastPlayed(uint item_last_played);
+    void addItemPlayCount(int item_play_count);
+    void addItemArtist(const QString &item_artist);
+    void addItemAlbum(const QString &item_album);
+    void addItemTitle(const QString &item_title);
+    void addItemGenre(const QString &item_genre);
+    void addItemYear(int item_year);
+    void addItemTrack(int item_track);
+    void addItemLength(int item_length); 
+
+    //
+    //  "element" functions for lists
+    //
+    
+    void addListId(int list_id);
+    void addListName(const QString &list_name);
+    void addListItem(int list_item);
 
   private:
 
