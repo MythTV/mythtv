@@ -7,7 +7,7 @@
 class GlobalSetting: public SimpleDBStorage, virtual public Configurable {
 public:
     GlobalSetting(QString name):
-        SimpleDBStorage("settings", "name") {
+        SimpleDBStorage("settings", "data") {
         setName(name);
     };
 
