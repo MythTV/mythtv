@@ -811,6 +811,12 @@ int main(int argc, char **argv)
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         cerr << "Unable to ignore SIGPIPE\n";
 
+    QString fileprefix = QDir::homeDirPath() + "/.mythtv";
+
+    QDir dir(fileprefix);
+    if (!dir.exists())
+        dir.mkdir(fileprefix);
+
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
