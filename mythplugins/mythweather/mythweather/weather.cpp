@@ -2326,7 +2326,7 @@ void Weather::setWeatherTypeIcon(QString wt[5])
             if (wt[i].toInt() == wData[j].typeNum)
             {
                 wt[i] = tr(wData[j].typeName);
-                weatherIcon[i] = wData[j].typeIcon;
+                weatherIcon[i] = "weather/" + wData[j].typeIcon;
                 isSet = true;
                 j = 128;
             }
@@ -2335,7 +2335,7 @@ void Weather::setWeatherTypeIcon(QString wt[5])
         if (isSet == false)
         {
             wt[i] = tr("Unknown") + " [" + wt[i] + "]";
-            weatherIcon[i] = "unknown.png";
+            weatherIcon[i] = "weather/unknown.png";
         }
     }
 }
@@ -2360,7 +2360,7 @@ void Weather::setWeatherIcon(QString txtType)
         }
     }
     
-    curIcon = "unknown.png";
+    curIcon = "weather/unknown.png";
 }
 
 QString Weather::GetString(QString tag)
