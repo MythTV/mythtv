@@ -151,7 +151,9 @@ int main(int argc, char **argv)
                     "-p or --pidfile filename       Write PID of mythbackend " <<
                                                     "to filename" << endl <<
                     "-d or --daemon                 Runs mythbackend as a daemon" << endl <<
-                    "-v or --verbose                Prints more information" << endl;
+                    "-v or --verbose                Prints more information" << endl <<
+                    "--printexpire                  List of auto-expire programs" << endl <<
+                    "--printsched                   Upcoming scheduled programs" << endl;
             return -1;
         }
 
