@@ -1017,6 +1017,8 @@ void NuppelDecoder::SeekReset(long long newKey, int skipFrames)
     while (skipFrames > 0)
     {
         GetFrame(0);
+        if (ateof)
+            break;
         skipFrames--;
     }
 }

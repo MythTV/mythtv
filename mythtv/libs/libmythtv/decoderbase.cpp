@@ -363,7 +363,6 @@ bool DecoderBase::DoRewind(long long desiredFrame)
 
     long long keyPos = m_positionMap[pos_idx].pos;
     long long curPosition = ringBuffer->GetTotalReadPosition();
-    int normalframes = desiredFrame - lastKey;
     long long diff = keyPos - curPosition;
 
     // Don't rewind further than we have space to store video
@@ -373,14 +372,12 @@ bool DecoderBase::DoRewind(long long desiredFrame)
         if (pos_idx >= (int)m_positionMap.size())
         {
             diff = 0;
-            normalframes = 0;
             return false;
         }
         lastKey = m_positionMap[pos_idx].index * keyframedist;
         keyPos = m_positionMap[pos_idx].pos;
 
         diff = keyPos - curPosition;
-        normalframes = 0;
     }
 
     ringBuffer->Seek(diff, SEEK_CUR);
@@ -388,12 +385,12 @@ bool DecoderBase::DoRewind(long long desiredFrame)
     framesPlayed = lastKey;
     framesRead = lastKey;
 
-    normalframes = desiredFrame - framesPlayed;
+    int normalframes = desiredFrame - framesPlayed;
 
     if (!exactseeks)
         normalframes = 0;
 
-    SeekReset(lastKey, desiredFrame - framesPlayed);
+    SeekReset(lastKey, normalframes);
 
     UpdateFramesPlayed();
 
@@ -453,14 +450,9 @@ bool DecoderBase::DoFastForward(long long desiredFrame)
     int pos_idx = exactseeks ? pos_idx1 : pos_idx2;
     lastKey = m_positionMap[pos_idx].index * keyframedist;
     long long keyPos = m_positionMap[pos_idx].pos;
-    
     long long number = desiredFrame - framesPlayed;
     long long desiredKey = lastKey;
 
-    int normalframes = desiredFrame - desiredKey;
-
-    if (desiredKey == lastKey)
-        normalframes = number;
 
     if (framesPlayed < lastKey)
     {
@@ -473,23 +465,15 @@ bool DecoderBase::DoFastForward(long long desiredFrame)
         framesRead = lastKey;
     }
 
-    normalframes = desiredFrame - framesPlayed;
+    int normalframes = desiredFrame - framesPlayed;
 
     if (!exactseeks)
         normalframes = 0;
 
-    if (needflush)
-        SeekReset(lastKey, desiredFrame - framesPlayed);
+    if (needflush || normalframes)
+        SeekReset(lastKey, normalframes);
 
     getrawframes = oldrawstate;
-
-    while (normalframes > 0)
-    {
-        GetFrame(0);
-        if (ateof)
-            break;
-        normalframes--;
-    }
 
     UpdateFramesPlayed();
 
