@@ -735,10 +735,7 @@ void ViewScheduled::selected()
         diag.setCaption("BLAH!!!");
         diag.exec();
 
-        QString thequery = "UPDATE settings SET data = \"yes\" WHERE value = "
-                           "\"RecordChanged\";";
-
-        db->exec(thequery);
+        ScheduledRecording::signalChange(db);
 
         FillList();
         update(fullRect);
