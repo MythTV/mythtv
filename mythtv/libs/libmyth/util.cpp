@@ -6,7 +6,7 @@
 using namespace std;
 
 #include "util.h"
-#include "../libmyth/oldsettings.h"
+#include "mythcontext.h"
 
 extern "C" {
 #include <X11/Xlib.h>
@@ -127,15 +127,10 @@ long long decodeLongLong(QStringList &list, int offset)
     return retval;
 } 
 
-void GetMythTVGeometry(Display *dpy, int screen_num, int *x, int *y, int *w, 
-                       int *h) 
+void GetMythTVGeometry(MythContext *context, Display *dpy, int screen_num, 
+                       int *x, int *y, int *w, int *h) 
 {
     int event_base, error_base;
-
-    char *prefix = (char *)PREFIX;
-
-    Settings *settings = new Settings();
-    settings->LoadSettingsFiles(QString("settings.txt"), QString(prefix));
 
     if( XineramaQueryExtension(dpy, &event_base, &error_base) &&
         XineramaIsActive(dpy) ) {
@@ -144,7 +139,7 @@ void GetMythTVGeometry(Display *dpy, int screen_num, int *x, int *y, int *w,
         XineramaScreenInfo *screen;
         int nr_xinerama_screens;
 
-        int screen_nr = settings->GetNumSetting("XineramaScreen",0);
+        int screen_nr = context->GetNumSetting("XineramaScreen",0);
 
         xinerama_screens = XineramaQueryScreens(dpy, &nr_xinerama_screens);
 
@@ -172,7 +167,5 @@ void GetMythTVGeometry(Display *dpy, int screen_num, int *x, int *y, int *w,
         *h = DisplayHeight(dpy, screen_num);
         *x = 0; *y = 0;
     }
-
-    delete settings;
 }
 

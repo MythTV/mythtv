@@ -329,7 +329,7 @@ public:
 class GuiWidth: public SpinBoxSetting, public GlobalSetting {
 public:
     GuiWidth():
-        SpinBoxSetting(160, 1600, 16), GlobalSetting("GuiWidth") {
+        SpinBoxSetting(160, 1600, 8), GlobalSetting("GuiWidth") {
         setLabel("GUI width");
         setValue(800);
     };
@@ -338,7 +338,7 @@ public:
 class GuiHeight: public SpinBoxSetting, public GlobalSetting {
 public:
     GuiHeight():
-        SpinBoxSetting(160, 1600, 16), GlobalSetting("GuiHeight") {
+        SpinBoxSetting(160, 1600, 8), GlobalSetting("GuiHeight") {
         setLabel("GUI height");
         setValue(600);
     };
@@ -420,8 +420,8 @@ class DisplayChanNum: public CheckBoxSetting, public GlobalSetting {
 public:
     DisplayChanNum():
         GlobalSetting("DisplayChanNum") {
-        setLabel("Display channel numbers instead of names");
-        setValue(true);
+        setLabel("Display channel names instead of numbers");
+        setValue(false);
     };
 };
 
@@ -633,6 +633,7 @@ GeneralSettings::GeneralSettings(MythContext *context)
     general2->addChild(new ChannelSorting());
     general2->addChild(new DefaultTVChannel());
     general2->addChild(new TunerCardInput());
+    general2->addChild(new DisplayChanNum());
     addChild(general2);
 
 
@@ -656,6 +657,7 @@ EPGSettings::EPGSettings(MythContext *context)
     epg->addChild(new EPGShowChannelIcon());
     epg->addChild(new EPGShowCurrentTime());
     epg->addChild(new EPGCurrentTimeColor());
+    epg->addChild(new EPGType());
     addChild(epg);
 
     VerticalConfigurationGroup* fonts = new VerticalConfigurationGroup(false);
@@ -665,7 +667,6 @@ EPGSettings::EPGSettings(MythContext *context)
     fonts->addChild(new EPGChanCallsignFontSize());
     fonts->addChild(new EPGProgFontSize());
     fonts->addChild(new EPGTitleFontSize());
-    fonts->addChild(new EPGType());
     addChild(fonts);
 
     VerticalConfigurationGroup* gen = new VerticalConfigurationGroup(false);

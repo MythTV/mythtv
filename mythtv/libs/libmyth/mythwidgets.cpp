@@ -320,7 +320,7 @@ MythDialog::MythDialog(MythContext *context, QWidget *parent, const char *name,
     context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     int x, y, w, h;
-    GetMythTVGeometry(qt_xdisplay(), qt_xscreen(), &x, &y, &w, &h);
+    GetMythTVGeometry(context, qt_xdisplay(), qt_xscreen(), &x, &y, &w, &h);
 
     setGeometry(x, y, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));

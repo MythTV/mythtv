@@ -164,7 +164,7 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
   
     data->XJ_root = DefaultRootWindow(data->XJ_disp);
 
-    GetMythTVGeometry(data->XJ_disp, XJ_screen_num, &curx, &cury, 
+    GetMythTVGeometry(m_context, data->XJ_disp, XJ_screen_num, &curx, &cury, 
                       &XJ_screenwidth, &XJ_screenheight);
     curw = XJ_width; curh = XJ_height;
 

@@ -16,7 +16,7 @@ enum RecordingType
     kAllRecord
 };
 
-#define NUMPROGRAMLINES 15
+#define NUMPROGRAMLINES 16
 
 class ProgramInfo
 {

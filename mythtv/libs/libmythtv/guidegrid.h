@@ -19,7 +19,6 @@ class ProgramInfo;
 class TimeInfo;
 class ChannelInfo;
 class MythContext;
-class Settings;
 
 namespace libmyth 
 {
@@ -174,11 +173,17 @@ class GuideGrid : public MythDialog
     QColor misChanIcon_fgColor;
     int progArrow_Type;
 
-    Settings *m_settings;
-
     void (*embedcallback)(void *data, unsigned long wid, int x, int y,
                           int w, int h);
     void *callbackdata;
+
+    QString channelOrdering;
+    QString dateformat;
+    QString timeformat;
+    QString unknownTitle;
+    QString unknownCategory;
+    bool showCurrentTime;
+    QString currentTimeColor;
 };
 
 }

@@ -36,48 +36,48 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel,
 
     embedcallback = embedcb;
     callbackdata = data;
-    m_settings = context->settings();
 
     context->KickDatabase(QSqlDatabase::database());
 
-    usetheme = m_settings->GetNumSetting("ThemeQt");
-    showtitle = m_settings->GetNumSetting("EPGShowTitle");
-    showIcon = m_settings->GetNumSetting("EPGShowChannelIcon");
+    usetheme = m_context->GetNumSetting("ThemeQt");
+    showtitle = m_context->GetNumSetting("EPGShowTitle");
+    showIcon = m_context->GetNumSetting("EPGShowChannelIcon");
+
+    channelOrdering = context->GetSetting("ChannelSorting", "channum + 0");
+
+    dateformat = m_context->settings()->GetSetting("DateFormat", "ddd MMMM d");
+    timeformat = m_context->settings()->GetSetting("TimeFormat", "h:mm AP");
+
+    unknownTitle = m_context->GetSetting("UnknownTitle", "Unknown");
+    unknownCategory = m_context->GetSetting("UnknownCategory", "Unknown");
+
+    showCurrentTime = m_context->GetNumSetting("EPGShowCurrentTime", 0);
+    currentTimeColor = m_context->GetSetting("EPGCurrentTimeColor", "red");
 
     bgcolor = paletteBackgroundColor();
     fgcolor = paletteForegroundColor();
 
-    programGuideType = m_settings->GetNumSetting("EPGType");
+    programGuideType = m_context->GetNumSetting("EPGType");
     if (programGuideType == 1)
     {
         DISPLAY_CHANS = 8;
         setupColorScheme();
     }
 
-    int timefontsize = m_settings->GetNumSetting("EPGTimeFontSize");
-    if (timefontsize == 0) 
-        timefontsize = 13;
+    int timefontsize = m_context->GetNumSetting("EPGTimeFontSize", 13);
     m_timeFont = new QFont("Arial", (int)(timefontsize * hmult), QFont::Bold);
 
-    int chanfontsize = m_settings->GetNumSetting("EPGChanFontSize");
-    if (chanfontsize == 0) 
-        chanfontsize = 13;
+    int chanfontsize = m_context->GetNumSetting("EPGChanFontSize", 13);
     m_chanFont = new QFont("Arial", (int)(chanfontsize * hmult), QFont::Bold);
 
-    chanfontsize = m_settings->GetNumSetting("EPGChanCallsignFontSize");
-    if (chanfontsize == 0)
-        chanfontsize = 11;
+    chanfontsize = m_context->GetNumSetting("EPGChanCallsignFontSize", 11);
     m_chanCallsignFont = new QFont("Arial", (int)(chanfontsize * hmult), 
                                    QFont::Bold);
 
-    int progfontsize = m_settings->GetNumSetting("EPGProgFontSize");
-    if (progfontsize == 0) 
-        progfontsize = 13;
+    int progfontsize = m_context->GetNumSetting("EPGProgFontSize", 13);
     m_progFont = new QFont("Arial", (int)(progfontsize * hmult), QFont::Bold);
 
-    int titlefontsize = m_settings->GetNumSetting("EPGTitleFontSize");
-    if (titlefontsize == 0) 
-        titlefontsize = 19;
+    int titlefontsize = m_context->GetNumSetting("EPGTitleFontSize", 19);
     m_titleFont = new QFont("Arial", (int)(titlefontsize * hmult), QFont::Bold);
 
     m_originalStartTime = QDateTime::currentDateTime();
@@ -250,7 +250,7 @@ void GuideGrid::setupColorScheme()
     if (curColor != "")
         time_fgColor = QColor(curColor);
 
-        curColor = themed->GetSetting("prog_bgColor");
+    curColor = themed->GetSetting("prog_bgColor");
     if (curColor != "")
         prog_bgColor = QColor(curColor);
 
@@ -424,13 +424,6 @@ QString GuideGrid::getDateLabel(ProgramInfo *pginfo)
     QDateTime startts = pginfo->startts;
     QDateTime endts = pginfo->endts;
 
-    QString dateformat = m_context->settings()->GetSetting("DateFormat");
-    if (dateformat == "")
-        dateformat = "ddd MMMM d";
-    QString timeformat = m_context->settings()->GetSetting("TimeFormat");
-    if (timeformat == "")
-        timeformat = "h:mm AP";
-
     QString timedate = endts.date().toString(dateformat) + QString(", ") +
                        startts.time().toString(timeformat) + QString(" - ") +
                        endts.time().toString(timeformat);
@@ -467,12 +460,8 @@ void GuideGrid::fillChannelInfos()
     QString thequery;
     QSqlQuery query;
 
-    QString ordering = m_settings->GetSetting("ChannelSorting");
-    if (ordering == "")
-        ordering = "channum + 0";
-    
     thequery = "SELECT channum,callsign,icon,chanid FROM channel "
-               "ORDER BY " + ordering + ";";
+               "ORDER BY " + channelOrdering + ";";
     query.exec(thequery);
     
     bool set = false;
@@ -532,10 +521,6 @@ void GuideGrid::fillTimeInfos()
             int hour = t.time().hour();
             timeinfo->hour = hour;
             timeinfo->min = mins;
-
-            QString timeformat = m_settings->GetSetting("TimeFormat");
-            if (timeformat == "")
-                timeformat = "h:mm AP";
 
             timeinfo->usertime = QTime(hour, mins).toString(timeformat);
 
@@ -630,9 +615,8 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
                 {
                     proginfo = new ProgramInfo;
                     unknownlist.append(proginfo);
-                    proginfo->title = m_settings->GetSetting("UnknownTitle");
-                    proginfo->category = 
-                                      m_settings->GetSetting("UnknownCategory");
+                    proginfo->title = unknownTitle;
+                    proginfo->category = unknownCategory;
                     proginfo->startCol = x;
                     proginfo->spread = 1;
                     proginfo->startts = ts;
@@ -924,9 +908,9 @@ void GuideGrid::paintTimes(QPainter *p)
     if (programGuideType != 1)
         tmp.drawLine(0, tr.height() - 1, tr.right(), tr.height() - 1);
 
-    if (m_settings->GetNumSetting("EPGShowCurrentTime"))
+    if (showCurrentTime)
     {
-        QColor color = QColor(m_settings->GetSetting("EPGCurrentTimeColor"));
+        QColor color = QColor(currentTimeColor);
         if (!color.isValid())
             color.setRgb(255,0,0);
         
@@ -945,8 +929,6 @@ void GuideGrid::paintTimes(QPainter *p)
                          tr.bottom());
 
             QString nows;
-            QString timeformat = m_settings->GetSetting("TimeFormat", 
-                                                        "h:mm AP");
             nows.sprintf(now.time().toString(timeformat));
             tmp.drawText((nowpos) * xdifference + 3, tr.bottom() - 3, nows);
         }

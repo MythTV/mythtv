@@ -81,6 +81,7 @@ void ProgramInfo::ToStringList(QStringList &list)
     list << chanid;
     list << chanstr;
     list << chansign;
+    list << channame;
     list << pathname;
     encodeLongLong(list, filesize);
     list << startts.toString();
@@ -106,13 +107,14 @@ void ProgramInfo::FromStringList(QStringList &list, int offset)
     chanid = list[offset + 4];
     chanstr = list[offset + 5];
     chansign = list[offset + 6];
-    pathname = list[offset + 7];
-    filesize = decodeLongLong(list, offset + 8);
-    startts = QDateTime::fromString(list[offset + 10]);
-    endts = QDateTime::fromString(list[offset + 11]);
-    recordtype = (RecordingType)(list[offset + 12].toInt());
-    conflicting = list[offset + 13].toInt();
-    recording = list[offset + 14].toInt();
+    channame = list[offset + 7];
+    pathname = list[offset + 8];
+    filesize = decodeLongLong(list, offset + 9);
+    startts = QDateTime::fromString(list[offset + 11]);
+    endts = QDateTime::fromString(list[offset + 12]);
+    recordtype = (RecordingType)(list[offset + 13].toInt());
+    conflicting = list[offset + 14].toInt();
+    recording = list[offset + 15].toInt();
 
     if (title == " ")
         title = "";
@@ -130,6 +132,8 @@ void ProgramInfo::FromStringList(QStringList &list, int offset)
         chanstr = "";
     if (pathname == " ")
         pathname = "";
+    if (channame == " ")
+        channame = "";
 }
 
 int ProgramInfo::CalculateLength(void)
