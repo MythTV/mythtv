@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-06-12, v2.49
+<date>2003-06-18, v2.50
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -409,31 +409,87 @@ the "Plus" version above)
 </itemize>
 
 <sect1>Software.
-<p>There are a few ways of installing programs on Linux systems; you can either
-use the graphical tools that come with your distribution, or you can use
-command-line utilities.  Either system will get the job done, and it all
-depends on your comfort level with Linux.
+<p>There are a few ways of installing programs on Linux systems; you can
+either use a pre-compiled package, or install from a tarball after
+satisfying any prerequisites.
 
-<bf>NOTE for Red Hat users</bf>:  Axel Thimm has created RPMs for MythTV
-which may be obtained from <url
+<bf>NOTE</bf>: you must have the MySQL database software installed on a
+system to store the master database.  This does not necessarily mean that
+MySQL must run on one of the MythTV boxes.
+
+<sect2>Pre-compiled packages.
+<p>A number of people have created pre-compiled packages for MythTV that may
+make your installation easier.
+
+<bf>BIG FAT WARNING</bf>:  This HOWTO assumes that you have <em>not</em>
+installed MythTV from a package.  All example command lines and file
+locations are based on the MythTV tarball defaults.  Some packagers have
+modified the filenames, binaries and file locations to match what is
+commonly found in that distribution.  Any issues with MythTV installed via a
+pre-compiled package <bf>MUST</bf> be raised with the packager.
+
+If you use any of the pre-compiled packages you may not need to perform any
+additional configuration steps in this HOWTO.  The next logical step is 
+<ref id="mysql" name="configuring MySQL">, which you may or may not have to
+perform.  See your package documentation.
+
+<sect3>Red Hat 
+<p>Axel Thimm has created RPMs for MythTV which may be obtained from <url
 url="http://atrpms.physik.fu-berlin.de/name/mythtv/"
 name="http://atrpms.physik.fu-berlin.de/name/mythtv/">.  If you have
 problems with the RPMs, please send him email directly at <url
 url="mailto:Axel.Thimm@physik.fu-berlin.de"
 name="mailto:Axel.Thimm@physik.fu-berlin.de">.
 
-<bf>NOTE for Mandrake users</bf>:  Thac has created RPMs for MythTV for
-Mandrake 9.0 and 9.1 which may be obtained from <url
-url="http://rpm.nyvalls.se/" name="http://rpm.nyvalls.se/"> If you have
-problems with the RPMs, please send him email directly at <url
-url="thac@nyvalls.se" name="thac@nyvalls.se">.
+A meta-package created by Axel, called mythtv-suite, will allow you to
+install all of MythTV and its add-ons, plus all dependencies, but is
+dependant on having <bf>apt</bf> or <bf>yum</bf> installed and have
+<tt>atrpms</tt> enabled as a source. If you haven't downloaded the
+atrpms-kickstart packages, you can download it here:
 
-<bf>NOTE</bf>: you must have the MySQL database software installed on a
-system to store the master database.  This does not necessarily mean that
-MySQL must run on one of the MythTV boxes.
+<url url="http://atrpms.physik.fu-berlin.de/dist/rh9/atrpms-kickstart/"
+name="http://atrpms.physik.fu-berlin.de/dist/rh9/atrpms-kickstart/">
+
+Install the package with:
+<tscreen><verb>
+# rpm -Uvh atrpms-kickstart*
+</verb></tscreen>
+Then update your <bf>apt</bf> package listings:
+<tscreen><verb>
+# apt-get update
+</verb></tscreen>
+And finally:
+<tscreen><verb>
+# apt-get install mythtv-suite
+</verb></tscreen>	
+These steps however, do NOT perform the installation of any drivers 
+required for <bf>ALSA</bf>, capture cards, <bf>lirc</bf>, etc.
+
+<sect3>Mandrake
+<p>Thac has created RPMs for MythTV for Mandrake 9.0 and 9.1 which may be
+obtained from <url url="http://rpm.nyvalls.se/"
+name="http://rpm.nyvalls.se/"> If you have problems with the RPMs, please
+send him email directly at <url url="thac@nyvalls.se"
+name="thac@nyvalls.se">.
+
+<sect3>Debian
+<p>Debian packages for MythTV and some of its add-on modules have been
+packaged by Matt Zimmerman <url url="mailto:mdz@debian.org"> and are
+available at <url
+url="http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/"
+name="http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/"
+>, including installation instructions.  All of the prerequisites for
+MythTV are available as Debian packages.
+
+See <tt>/usr/share/doc/<package>/README.Debian</tt> for more information.
+
+<sect2>Manual installation
+<p>You may use the graphical tools that come with your distribution, or you
+can use command-line utilities.  Either system will get the job done, and it
+all depends on your comfort level with Linux.
 
 In order to compile MythTV, we need to make sure that the software it needs
-is installed.  As of 2003-03-15, this list includes <bf>mysql,</bf>
+is installed.  As of 2003-03-15, this list includes <bf>mysql</bf>,
 <bf>gcc</bf>, <bf>freetype2-devel</bf>, <bf>XFree86-devel</bf>,
 <bf>qt-devel</bf> and <bf>lame</bf>.  If you're going to use a remote
 control with MythTV, you're going to need the <bf>cdialog</bf> package in
@@ -555,7 +611,7 @@ from the command line.
 
 <sect3>Mandrake
 <p><bf>urpmi</bf> is the simplest tool for installation of packages from the
-command line.  The difficult part is the configuration aspect.  The
+command line, but properly configuring it can be difficult.  The
 following website <url url="http://plf.zarb.org/~nanardon/urpmiweb.php"
 name="http://plf.zarb.org/~nanardon/urpmiweb.php"> will allow you to choose
 a mirror site and then present the command-line configuration text for that
@@ -612,19 +668,16 @@ continue by following the Mandrake 9.0 instructions.
 Open a shell, and execute the following, all on the same line. You may get
 asked a number of questions regarding dependencies.  It's best to answer
 "YES".
-
 <tscreen><verb>
 $ su
 # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
 # urpmi XFree86-devel perl
 </verb></tscreen>
-
 <code>
 NOTE for Mandrake 8.2 users: do not execute the following
 command.  You've already manually installed the files in the previous
 section.
 </code>
-
 <tscreen><verb>
 # urpmi libqt3-devel
 </verb></tscreen>
@@ -634,7 +687,6 @@ NOTE for Mandrake 9.1 users: execute the following command.
 
 # urpmi libqt3-mysql
 </code>
-
 However, you might get this when you execute the command above:
 <tscreen><verb>
 [root@pvr root]# urpmi mysql gcc gcc-c++ freetype2-devel libqt3-devel alsa-utils XFree86-devel perl
@@ -783,6 +835,12 @@ NOTE for Mandrake users:  If you have added a "PLF" mirror, you may skip the
 next step and type:
 
 # urpmi libmp3lame0 libmp3lame0-devel
+
+NOTE for Red Hat users:  lame and lame-devel may be obtained from
+http://freshrpms.net/rpm/lame/. After downloading, be sure to install both:
+
+# rpm -Uvh lame*
+
 </code>
 
 Get lame from <url url="http://www.mp3dev.org/mp3"
@@ -830,7 +888,28 @@ libmp3lame.so.0.0.0*
 $ 
 </verb></tscreen>
 
-<sect1>Building XMLTV. 
+<sect1>XMLTV. 
+<sect2>Red Hat Linux 8.0 & 9:
+<p>RPMs for <bf>XMLTV</bf> and all of its dependencies can be obtained from
+<url url="http://atrpms.physik.fu-berlin.de/name/xmltv/"
+name="http://atrpms.physik.fu-berlin.de/name/xmltv/">. The web page has a
+list of all the dependent packages you must download and install.
+<tscreen><verb>
+# rpm -Uvh xmltv* perl*
+</verb></tscreen>
+
+If you install from this location you may skip to <ref id="manually_building_mythtv"
+name="Manually building MythTV">.
+<sect2>Mandrake
+<p>You may install the XMLTV prerequisites if you have added a contrib
+mirror by typing:
+<tscreen></verb>
+# urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
+</verb></tscreen>
+
+and skipping straight to the XMLTV compililation step.
+
+<sect2>Other distributions and manual installation.
 <p><bf>NOTE</bf>: Red Hat Linux 8.0 and Suse 8.1 users, you <em>must</em>
 download and install an updated version of libexpat.  The version that ships
 with Red Hat Linux 8.0 and Suse 8.1 (version 1.95.4) is buggy, and will
@@ -875,14 +954,6 @@ $ cd xmltv-0.5.10
 </verb></tscreen>
 Install the xmltv prerequisites:
 
-<code>
-NOTE for Mandrake Users: you may install the XMLTV prerequisites if you
-have added a cooker mirror by typing:
-
-# urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
-
-and skipping to the compile step.
-</code>
 <tscreen><verb>
 $ su
 # perl -MCPAN -e shell
@@ -969,20 +1040,8 @@ Locate the line that contains: <tt>#/usr/local/portage</tt> and remove the #
 
 <bf>NOTE</bf>: If you have perl dependency problems update to >=ExtUtils-MakeMaker-6.05-r4
 
-<sect1>Debian.
-<p>Debian packages for MythTV and some of its add-on modules have been
-packaged by Matt Zimmerman <url url="mailto:mdz@debian.org"> and are
-available at <url
-url="http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/"
-name="http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/"
->, including installation instructions.  All of the prerequisites for
-MythTV are available as Debian packages.
 
-The mailing list message for this announcement can be accessed at <url
-url="http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html"
-name="http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html">.
-
-<sect>MySQL.
+<sect>MySQL.<label id="mysql">
 <sect1>Mandrake 9.0
 <p>If this is the system maintaining the database, make sure that mysql is
 running and started at boot.  Click on Mandrake Control
@@ -997,11 +1056,17 @@ $ su
 # exit
 </verb></tscreen>
 
-<sect1>Red Hat Linux 8.0
+<sect1>Red Hat Linux
 <p>If this is the system maintaining the database, make sure that mysql is
 running and started at boot. Click on Redhat menu>Server Settings>Services
 and enter the root password when asked. Check "mysqld" and then click Start.
 Click Save, then close the window.
+
+This can be done from the command line by typing:
+<tscreen><verb>
+# /sbin/chkconfig mysqld on
+# /sbin/service mysqld start
+</verb></tscreen>
 
 <sect1>Gentoo
 <p>After installing mysql you need to initialise the database by running
@@ -1010,13 +1075,13 @@ mysql_install_db as root.
 <sect1>Setting up the initial database.
 <p>This step is only required on the system maintaining the database, which
 may or may not be one of your MythTV boxes.  If the database is on a
-non-MythTV machine, then copy the <tt>database/mc.sql</tt> file to it.
+non-MythTV machine you'll need to copy the <tt>database/mc.sql</tt> file to it.
 
 To setup the initial mysql databases:
 <tscreen><verb>
 $ cd database
 </verb></tscreen>
-<sect2>Mandrake 9.0
+<sect2>Mandrake 9.0 and Red Hat Linux
 <p>
 <tscreen><verb>
 $ mysql -u root < mc.sql
@@ -1025,12 +1090,6 @@ $ mysql -u root < mc.sql
 <p>
 <tscreen><verb>
 $ mysql < mc.sql
-</verb></tscreen>
-<sect2>Red Hat Linux 8.0
-<p>
-<tscreen><verb>
-$ su
-# mysql < mc.sql
 </verb></tscreen>
 <sect2>Gentoo
 <p>
@@ -1043,6 +1102,11 @@ If you've already got a copy of the database installed and need to update the
 schema, use the <tt>-f</tt> flag to force <bf>mysql</bf> to continue setting
 up the tables even if they already exist.  By default, <bf>mysql</bf> will
 stop at the first error.
+
+<bf>NOTE</bf>: It is good practice to set a root password for mysql. 
+Instructions for doing so can be found on MySQL's web site at <url
+url="http://www.mysql.com/doc/en/Security.html"
+name="http://www.mysql.com/doc/en/Security.html">.
 
 <sect2>Modifying access to the MySQL database for multiple systems <label
 id="modify_perm_mysql">
@@ -1097,8 +1161,9 @@ set it as the recording source.
 There are two ways to do this.  Graphically, and from the command line.
 
 <sect1>Graphically setting up the mixer.
-<sect2>Mandrake 9.0
-<p>Open Kmix by K->Multimedia->Sound->Kmix
+<sect2>Mandrake 9.0 and Red Hat Linux
+<p>Open Kmix by clicking K->Multimedia->Sound->Kmix for Mandrake, or
+<verb>RedHat Menu>Sound & Video>Volume Control</verb> on Red Hat.
 
 Click on Settings->Configure  Make sure that "Tick Marks" and "Show
 labels" have "X"'s in them.  This will make it easier to find the correct
@@ -1112,7 +1177,6 @@ so that it turns bright red, indicating that it's "ON"; this insures that
 the Line-in is used as the source.  Click OK, and make sure that you save
 the settings so that this is your default.
 
-<sect2>Red Hat Linux 8.0
 <sect3>Using OSS drivers.
 <p>Red Hat Linux 8.0 ships with OSS sound drivers rather than the ALSA
 drivers recommended by the MythTV team. The OSS drivers do work for many
@@ -1330,18 +1394,18 @@ $ su
 # urpmi kernel-source
 </verb></tscreen>
 
-<sect1>Red Hat Linux 8.0
+<sect1>Red Hat Linux
 <p>You should already have the source from the "Kernel Development" package
 you installed in section 3.2. Ensure that a symlink has been created:
 <tscreen><verb>
 $ cd /usr/src
 $ su
-# ln -s linux-2.4.18-x.x.x linux
+# ln -s linux-2.4 /usr/src/linux
 # exit
 </verb></tscreen>
 
 <sect1>Obtaining and compiling lirc.
-<p>You're going to need to download and compile lircd.  Go to <url
+<p>You're going to need to download and compile <bf>lircd</bf>.  Go to <url
 url="http://www.lirc.org" name="http://www.lirc.org"> and download lirc; as
 of 2002-11-07, the version available is 0.6.6.  Grab the remotes.tgz file as
 well. 
@@ -1466,7 +1530,7 @@ according to
 <url url="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/ 
 s1-custom-kernel-bootloader.html" name="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/ 
 s1-custom-kernel-bootloader.html"> Remember, if you have any custom  
-kernel modules (alsa, etc) you will have to recompile/reinstall those.
+kernel modules (ALSA, etc) you will have to recompile/reinstall those.
 
 <sect1>Completing the lirc install. <label id="completing_lirc_install">
 <p><bf>NOTE to Mandrake 9.1 users</bf>: skip to the manual start paragraph
@@ -1734,7 +1798,7 @@ setting and not change it to bourne or bash. This will create a frustrating
 symptom to diagnose where MythTV cannot open /dev/device. Unlike bourne or
 bash, csh scripts automatically close parent file descriptors before they
 start.
- <tscreen><verb>
+<tscreen><verb>
 $ cd /usr/local/bin
 # su
 # cat > change_channel.csh
@@ -2289,10 +2353,9 @@ $ make
 # exit
 $ 
 </verb></tscreen>
-The configuration file for MythGallery is located in
-<tt>/usr/local/share/mythtv</tt>.  This file needs to be edited:  ensure
-that your GalleryDir variable is set to the directory where your pictures are
-stored.
+The configuration for MythGallery is accessed through the main Setup option
+in mythfrontend.  Make sure you set your pictures directory to wherever
+you're storing your photos.
 
 <itemize>
 <item>Use the arrow keys to move around the thumbnails.
@@ -2300,9 +2363,9 @@ stored.
 <itemize><item>Use p or P to start the slideshow of all the files in the
 directory.  "Play" or "Pause" on your remote may also work.
 <item>Use SPACE or ENTER to advance to the next photo.
-</itemize>
 <item>Use ESC to go up one level, or to exit out of the module if
 you're at the first level.
+<item>Use the [ and ] keys to rotate the image.
 </itemize>
 
 <sect>MythGame.
@@ -3095,6 +3158,7 @@ around this, edit <tt>libs/libavcodec/Makefile</tt> and remove any
 <p>This error happens when there's a missing link in the
 <tt>/usr/lib/qt3/mkspecs</tt> directory.  There are two ways to fix this
 error:
+
 1.  Create the link manually:
 <tscreen><verb>
 $ su
@@ -3177,7 +3241,7 @@ fvwm &
 mythfrontend
 ^D
 $ cat > .fvwmrc
-Style "myth*"      NoTitle, NoHandles, Sticky, WindowListSkip, BorderWidth 0
+Style myth* NoTitle, NoHandles, Sticky, WindowListSkip, SloppyFocus, GrabFocus, BorderWidth 0
 ^D
 $
 </verb></tscreen>
@@ -3435,7 +3499,7 @@ mysql> delete from program where chanid = '1015';
 </verb></tscreen>
 
 <label id="pvr250">
-<sect1>I'd like to use a hardware MPEG-2 encoder.
+<sect1>I'd like to use a hardware MPEG-2 encoder (ie, a PVR-250/350).
 <p><bf>NOTE</bf>:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS
 NOT GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR IVTV DRIVER ASSISTANCE,
 SEE THE IVTV MAILING LIST.  <url
@@ -3923,6 +3987,10 @@ v2.48, 2003-06-12.  Removed the note for Canadians since the setup screen
 now allows spaces for postal code.
 v2.49, 2003-06-12.  Incorporate items that are in the FAQ that aren't in the
 HOWTO yet.
+v2.50, 2003-06-18.  Updated MythGallery docs to fix itemize tag and added
+image rotation keys.  Add updated .fvwmrc example.  Added RH9.0
+stuff from Cedar, Matt and Jarod.  Reorg of some sections.  Added "PVR-250"
+to the "I'd like to use a hardware MPEG-2 encoder" title.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
