@@ -98,7 +98,7 @@ class TVRec
     void ConnectDB(int cardnum);
     void DisconnectDB(void);
 
-    void SetupRecorder(int profile);
+    void SetupRecorder(class RecordingProfile& profile);
     void TeardownRecorder(bool killFile = false);
     
     void StateToString(TVState state, QString &statestr);

@@ -336,10 +336,14 @@ void TVRec::HandleStateChange(void)
  
     if (startRecorder)
     {
-        if (curRecording && curRecording->recordingprofileid > 0)
-            SetupRecorder(curRecording->recordingprofileid);
+        RecordingProfile profile(context);
+        if (curRecording)
+            if (curRecording->recordingprofileid > 0)
+                profile.loadByID(db_conn, curRecording->recordingprofileid);
+            else
+                profile.loadByName(db_conn, "Default");
         else
-            SetupRecorder(1);
+            profile.loadByName(db_conn, "Live TV");
 
         pthread_create(&encode, NULL, SpawnEncode, nvr);
 
@@ -359,20 +363,10 @@ void TVRec::HandleStateChange(void)
     changeState = false;
 }
 
-void TVRec::SetupRecorder(int profileid)
-{
-    if (nvr)
-    {  
-        printf("Attempting to setup a recorder, but it already exists\n");
-        return;
-    }
-
+void TVRec::SetupRecorder(RecordingProfile& profile) {
     nvr = new NuppelVideoRecorder();
     nvr->SetRingBuffer(rbuffer);
     nvr->SetVideoDevice(videodev);
-
-    RecordingProfile profile(context);
-    profile.loadByID(db_conn, profileid);
 
     QString setting = profile.byName("videocodec")->getValue();
     if (setting == "MPEG-4") {
@@ -496,6 +490,8 @@ void TVRec::SetChannel(bool needopen)
 
         chanstr = query.value(0).toString();
         inputname = query.value(1).toString();
+    } else {
+        cout << "Channel query failed: " << thequery << endl;
     }
 
     channel->SwitchToInput(inputname);
