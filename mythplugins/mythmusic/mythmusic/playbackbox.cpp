@@ -55,11 +55,6 @@ PlaybackBox::PlaybackBox(QString window_name,
     //
 
     show_whole_tree = gContext->GetNumSetting("ShowWholeTree", 1);
-    keyboard_accelerator_flag = gContext->GetNumSetting("KeyboardAccelerators");
-    if(!keyboard_accelerator_flag)
-    {
-        show_whole_tree = false;
-    }
     showrating = gContext->GetNumSetting("MusicShowRatings", 0);
     listAsShuffled = gContext->GetNumSetting("ListAsShuffled", 0);
     cycle_visualizer = gContext->GetNumSetting("VisualCycleOnSongChange", 0);
@@ -94,7 +89,7 @@ PlaybackBox::PlaybackBox(QString window_name,
     //  Set some button values
     //
     
-    if (!keyboard_accelerator_flag) 
+    if (!show_whole_tree) 
     {
         pledit_button->setText("Edit Playlist");
         vis_button->setText("Visualize");
@@ -163,61 +158,79 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
 
-    if(visualizer_status == 2)
+    switch (e->key())
     {
-        if(e->key() == Key_Escape)
+        case Key_PageDown:
+            next_button->push();
+            handled = true;
+            break;
+        case Key_PageUp:
+            prev_button->push();
+            handled = true;
+            break;
+        case Key_F:
+            ff_button->push();
+            handled = true;
+            break;
+        case Key_R:
+            rew_button->push();
+            handled = true;
+            break;
+        case Key_P:
+            if (isplaying)
+                pause_button->push();
+            else
+                play_button->push();
+            handled = true;
+            break;
+        case Key_S:
+            stop_button->push();
+            handled = true;
+            break;
+        case Key_U:
+            increaseRating();
+            handled = true;
+            break;
+        case Key_D:
+            decreaseRating();
+            handled = true;
+            break;
+        case Key_1:
+            shuffle_button->push();
+            handled = true;
+            break;
+        case Key_2:
+            repeat_button->push();
+            handled = true;
+            break;
+        case Key_3:
+            pledit_button->push();
+            handled = true;
+            break;
+        case Key_4:
+            vis_button->push();
+            handled = true;
+            break;
+        case Key_6:
+            CycleVisualizer();
+            handled = true;
+            break;
+    }
+
+    if (visualizer_status == 2)
+    {
+        if (e->key() == Key_Escape)
         {
             visualizer_status = 1;
             mainvisual->setGeometry(visual_blackhole->getScreenArea());
             handled = true;
         }
-        else if(keyboard_accelerator_flag)
-        {
-            switch(e->key())
-            {
-                case Key_PageDown:
-                    next_button->push();
-                    handled = true;
-                    break;
-                case Key_PageUp:
-                    prev_button->push();
-                    handled = true;
-                    break;
-                case Key_F:
-                    ff_button->push();
-                    handled = true;
-                    break;
-                case Key_R:
-                    rew_button->push();
-                    handled = true;
-                    break;
-                case Key_P:
-                    if(isplaying)
-                    {
-                        pause_button->push();
-                    }
-                    else
-                    {
-                        play_button->push();
-                    }
-                    handled = true;
-                    break;
-                case Key_S:
-                    stop_button->push();
-                    handled = true;
-                    break;
-                case Key_6:
-                    CycleVisualizer();
-                    handled = true;
-                    break;
-            }
-        }
     }
     else
     {
-        if(keyboard_accelerator_flag)
+        if (show_whole_tree)
         {
-            switch(e->key())
+            switch (e->key())
             {
                 case Key_Up:
                     music_tree_list->moveUp();
@@ -235,65 +248,6 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                     music_tree_list->pushDown();
                     handled = true;
                     break;
-                case Key_PageDown:
-                    next_button->push();
-                    handled = true;
-                    break;
-                case Key_PageUp:
-                    prev_button->push();
-                    handled = true;
-                    break;
-                case Key_F:
-                    ff_button->push();
-                    handled = true;
-                    break;
-                case Key_R:
-                    rew_button->push();
-                    handled = true;
-                    break;
-                case Key_P:
-                    if(isplaying)
-                    {
-                        pause_button->push();
-                    }
-                    else
-                    {
-                        play_button->push();
-                    }
-                    handled = true;
-                    break;
-                case Key_S:
-                    stop_button->push();
-                    handled = true;
-                    break;
-                case Key_U:
-                    increaseRating();
-                    handled = true;
-                    break;
-                case Key_D:
-                    decreaseRating();
-                    handled = true;
-                    break;
-                case Key_1:
-                    shuffle_button->push();
-                    handled = true;
-                    break;
-                case Key_2:
-                    repeat_button->push();
-                    handled = true;
-                    break;
-                case Key_3:
-                    pledit_button->push();
-                    handled = true;
-                    break;
-                case Key_4:
-                    vis_button->push();
-                    handled = true;
-                    break;
-                case Key_6:
-                    CycleVisualizer();
-                    handled = true;
-                    break;
                 case Key_Space:
                 case Key_Return:
                 case Key_Enter:
@@ -304,7 +258,7 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
         }
         else
         {
-            switch(e->key())
+            switch (e->key())
             {
                 case Key_Up:
                 case Key_Left:
@@ -326,6 +280,7 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
             }
         }
     }
+
     if(!handled)
     {
         MythThemedDialog::keyPressEvent(e);
@@ -791,34 +746,22 @@ void PlaybackBox::setShuffleMode(unsigned int mode)
     switch (shufflemode)
     {
         case SHUFFLE_INTELLIGENT:
-            if(keyboard_accelerator_flag)
-            {
+            if (show_whole_tree)
                 shuffle_button->setText("1 Shuffle: Intelligent");
-            }
             else
-            {
                 shuffle_button->setText("Shuffle: Intelligent");
-            }
             break;
         case SHUFFLE_RANDOM:
-            if(keyboard_accelerator_flag)
-            {
+            if (show_whole_tree)
                 shuffle_button->setText("1 Shuffle: Random");
-            }
             else
-            {
                 shuffle_button->setText("Shuffle: Random");
-            }
             break;
         default:
-            if(keyboard_accelerator_flag)
-            {
+            if (show_whole_tree)
                 shuffle_button->setText("1 Shuffle: None");
-            }
             else
-            {
                 shuffle_button->setText("Shuffle: None");
-            }
             break;
     }
     music_tree_list->setTreeOrdering(shufflemode + 1);
@@ -878,34 +821,22 @@ void PlaybackBox::setRepeatMode(unsigned int mode)
     switch (repeatmode)
     {
         case REPEAT_ALL:
-            if(keyboard_accelerator_flag)
-            {
+            if (show_whole_tree)
                 repeat_button->setText("2 Repeat: All");
-            }
             else
-            {
                 repeat_button->setText("Repeat: All");
-            }
             break;
         case REPEAT_TRACK:
-            if(keyboard_accelerator_flag)
-            {
+            if (show_whole_tree)
                 repeat_button->setText("2 Repeat: Track");
-            }
             else
-            {
                 repeat_button->setText("Repeat: Track");
-            }
             break;
         default:
-            if(keyboard_accelerator_flag)
-            {
+            if (show_whole_tree)
                 repeat_button->setText("2 Repeat: None");
-            }
             else
-            {
                 repeat_button->setText("Repeat: None");
-            }
             break;
     }
 }

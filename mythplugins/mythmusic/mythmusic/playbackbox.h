@@ -114,7 +114,6 @@ class PlaybackBox : public MythThemedDialog
     QTimer *visual_mode_timer;
     QTimer *lcd_update_timer;
     int visualizer_status;
-    bool keyboard_accelerator_flag;
 
     bool showrating;
     bool vis_is_big;

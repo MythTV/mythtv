@@ -130,17 +130,6 @@ public:
     };
 };
 
-class UseKeyboardAccel: public CheckBoxSetting, public GlobalSetting {
-public:
-    UseKeyboardAccel():
-        GlobalSetting("KeyboardAccelerators") {
-        setLabel("Use Keyboard Accelerators");
-        setValue(false);
-        setHelpText("Use keyboard remote control accelerators in "
-                    "the playback screen.");
-    };
-};
-
 class UseShowRatings: public CheckBoxSetting, public GlobalSetting {
 public:
     UseShowRatings():
@@ -169,9 +158,7 @@ public:
         setLabel("Show entire music tree");
         setValue(false);
         setHelpText("If selected, you can navigate your entire music "
-                    "tree from the playing screen. This value will "
-                    "be ignored if keyboard accelerators are turned "
-                    "off.");
+                    "tree from the playing screen.");
     };
 };
 
@@ -349,7 +336,6 @@ GeneralSettings::GeneralSettings()
     general->addChild(new NonID3FileNameFormat());
     general->addChild(new IgnoreID3Tags());
     general->addChild(new AutoLookupCD());
-    general->addChild(new UseKeyboardAccel());
     addChild(general);
 
     VerticalConfigurationGroup *general2 = new VerticalConfigurationGroup(false);
