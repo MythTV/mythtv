@@ -72,6 +72,17 @@ public:
     };
 };
 
+class PostCDRipScript: public LineEditSetting, public GlobalSetting {
+public:
+    PostCDRipScript():
+        GlobalSetting("PostCDRipScript") {
+        setLabel("Script Path");
+        setValue("");
+        setHelpText("If present this script will be executed after a CD Rip "
+                    "is completed.");
+    };
+};
+
 class NonID3FileNameFormat: public LineEditSetting, public GlobalSetting {
 public:
     NonID3FileNameFormat():
@@ -412,6 +423,7 @@ GeneralSettings::GeneralSettings()
     VerticalConfigurationGroup *general2 = new VerticalConfigurationGroup(false);
     general2->setLabel("General Settings");
     general2->addChild(new CDDevice());
+    general2->addChild(new PostCDRipScript());
     general2->addChild(new ParanoiaLevel());
     general2->addChild(new EjectCD());
     addChild(general2);

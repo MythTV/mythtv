@@ -11,6 +11,7 @@
 #include <qvbox.h>
 #include <qprogressbar.h>
 #include <qradiobutton.h>
+#include <iostream>
 
 #include <unistd.h>
 #include <sys/stat.h>
@@ -31,6 +32,8 @@ extern "C" {
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythwidgets.h>
+
+using namespace std;
 
 Ripper::Ripper(QSqlDatabase *ldb, MythMainWindow *parent, const char *name)
       : MythDialog(parent, name)
@@ -247,6 +250,15 @@ void Ripper::fixFilename(QString &filename, const QString &addition)
     filename += "/" + tempcopy;
 }
 
+void Ripper::reject() 
+{
+    QString cddevice = gContext->GetSetting("CDDevice");
+    bool EjectCD = gContext->GetNumSetting("EjectCDAfterRipping",1);
+    if (EjectCD) 
+        ejectCD(cddevice);	
+    done(Rejected);
+}
+
 void Ripper::ripthedisc(void)
 {
     firstdiag->hide();
@@ -354,19 +366,44 @@ void Ripper::ripthedisc(void)
 
     bool EjectCD = gContext->GetNumSetting("EjectCDAfterRipping",1);
     if (EjectCD) 
+        ejectCD(cddevice);
+
+    QString PostRipCDScript = gContext->GetSetting("PostCDRipScript");
+
+    if (!PostRipCDScript.isEmpty()) 
     {
-        int cdrom_fd;
-        cdrom_fd = cd_init_device((char*)cddevice.ascii());
-        if (cdrom_fd != -1)
+        cout << "PostCDRipScript: " << PostRipCDScript << endl;
+        pid_t child = fork();
+        if (child < 0)
         {
-            if (cd_eject(cdrom_fd) == -1) perror("Failed on cd_eject");
-            cd_finish(cdrom_fd);              
-        } else perror("Failed on cd_init_device");
+            perror("fork");
+        }
+        else if (child == 0)
+        {
+            execl("/bin/sh", "sh", "-c", PostRipCDScript.ascii(), NULL);
+            perror("exec");
+            _exit(1);
+        }
     }
 
     delete newdiag;
 
     hide();
+}
+
+
+void Ripper::ejectCD(QString& cddev)
+{
+    int cdrom_fd;
+    cdrom_fd = cd_init_device((char*)cddev.ascii());
+    if (cdrom_fd != -1)
+    {
+        if (cd_eject(cdrom_fd) == -1) 
+            perror("Failed on cd_eject");
+        cd_finish(cdrom_fd);              
+    } 
+    else  
+        perror("Failed on cd_init_device");
 }
 
 static void paranoia_cb(long inpos, int function)

@@ -16,6 +16,8 @@ for opt do
   ;;
   --enable-sdl) sdl="yes"
   ;;
+  --enable-all) sdl="yes"; opengl="yes"; fftw_lib="yes";
+  ;;
   esac
 done
 
@@ -30,7 +32,7 @@ Standard options:
   --enable-fftw            enable fftw visualizers [default=no]
   --enable-opengl          enable OpenGL visualizers [default=no]
   --enable-sdl             use SDL for the synaesthesia output [default=no]
-
+  --enable-all             Enable all of the above.
 EOF
 exit 1
 fi

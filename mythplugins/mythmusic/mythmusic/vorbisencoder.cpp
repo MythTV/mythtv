@@ -39,6 +39,10 @@ VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
     char *album = utf8str.data();
     vorbis_comment_add_tag(&vc, (char *)"album", album);
 
+    utf8str = metadata->Genre().utf8();
+    char *genre = utf8str.data();
+    vorbis_comment_add_tag(&vc, (char *)"genre", genre);
+
     char tracknum[10];
     sprintf(tracknum, "%d", metadata->Track());
     vorbis_comment_add_tag(&vc, (char *)"tracknumber", tracknum);

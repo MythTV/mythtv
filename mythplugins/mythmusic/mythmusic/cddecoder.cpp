@@ -430,6 +430,15 @@ Metadata *CdDecoder::getMetadata()
 
     artist = discdata.data_artist;
     album = discdata.data_title;
+    genre = cddb_genre(discdata.data_genre);
+ 
+    if (!genre.isEmpty()) 
+    {
+        QString flet = genre.upper().left(1);
+        QString rt = genre.right(genre.length()-1).lower();
+        genre = flet + rt;
+    }
+
     QString temptitle = discdata.data_track[tracknum - 1].track_name;        
     QString trackartist = discdata.data_track[tracknum - 1].track_artist;
 

@@ -32,10 +32,12 @@ class Ripper : public MythDialog
     void artistChanged(const QString &newartist);
     void albumChanged(const QString &newalbum);
     void tableChanged(int row, int col);
+    void reject();
 
   private:
     int ripTrack(QString &cddevice, Encoder *encoder, int tracknum);
     void fixFilename(QString &filename, const QString &addition);
+    void ejectCD(QString &cddev);
 
     QSqlDatabase *db;
     QVBoxLayout *bigvb;
