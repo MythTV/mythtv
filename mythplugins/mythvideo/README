@@ -1,11 +1,11 @@
                                    MythVideo
-                                  Version 0.12
+                                  Version 0.13
 
 BUILD/CONFIGURATION INSTRUCTIONS
 --------------------------------
 
 Requirements:
-	MythTV 0.12 installed and working
+	MythTV 0.13 installed and working
 
 If you have met the requirements above, simply type 'qmake mythvideo.pro' then 
 'make' in the main directory to begin compiling.

@@ -422,12 +422,13 @@ QString VideoManager::GetMoviePoster(QString movieNum)
     // Check for posters on impawards.com first, since their posters
     // are usually much better quality
 
-    beg = "Posters on other sites</h2></p>\n<ul>\n<li><a href=\"";
+    beg = "<a href=\"http://www.impawards.com";
     end = "\">http://www.impawards.com";
     QString impsite = parseDataAnchorEnd(res, beg, end);
     if (impsite != "<NULL>")
     {
 
+        impsite = "http://www.impawards.com" + impsite;
 	//cout << "Retreiving poster from " << impsite << endl; 
 	    
         QUrl impurl(impsite);
