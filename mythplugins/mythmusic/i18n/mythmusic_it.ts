@@ -680,6 +680,14 @@ You have no MythMusic tables in your database.</source>
         <source>Something is Wrong</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Visualization requires FFT library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Did you run configure?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Ripper</name>
@@ -733,17 +741,6 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>Ripping...</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Spectrum</name>
-    <message>
-        <source>Visualization requires FFT library</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Did you run configure?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -900,11 +900,19 @@ Não existem dados do MythMusic na base de dados.</translation>
     </message>
     <message>
         <source>Audio Device used for playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>O dispositivo àudio a usar para tocar.</translation>
     </message>
     <message>
         <source>CDRom device used for ripping/playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>O dispositivo do CDROM a usar para tocar ou copiar.</translation>
+    </message>
+    <message>
+        <source>Visualization requires FFT library</source>
+        <translation>Este modo necessita da biblioteca FFT</translation>
+    </message>
+    <message>
+        <source>Did you run configure?</source>
+        <translation>Executou o configure?</translation>
     </message>
 </context>
 <context>
@@ -970,11 +978,11 @@ Não existem dados do MythMusic na base de dados.</translation>
     <name>Spectrum</name>
     <message>
         <source>Visualization requires FFT library</source>
-        <translation>Este modo necessita da biblioteca FFT</translation>
+        <translation type="obsolete">Este modo necessita da biblioteca FFT</translation>
     </message>
     <message>
         <source>Did you run configure?</source>
-        <translation>Executou o configure?</translation>
+        <translation type="obsolete">Executou o configure?</translation>
     </message>
 </context>
 <context>
