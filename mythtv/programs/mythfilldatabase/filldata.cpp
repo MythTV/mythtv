@@ -1027,6 +1027,60 @@ void readXawtvChannels(int id, QString xawrcfile)
     handleChannels(id, &chanlist);
 }
 
+int fix_end_times(void)
+{
+    int count = 0;
+    QString chanid, starttime, endtime, querystr;
+    QSqlQuery query1, query2;
+
+    querystr = "SELECT chanid, starttime, endtime FROM program "
+               "WHERE (DATE_FORMAT(endtime,\"%H%i\") = \"0000\") "
+               "ORDER BY chanid, starttime;";
+
+    if (!query1.exec(querystr))
+    {
+        cerr << "fix_end_times:  " << querystr << " failed!\n";
+        return -1;
+    }
+
+    while (query1.next())
+    {
+        starttime = query1.value(1).toString();
+        chanid = query1.value(0).toString();
+        endtime = query1.value(2).toString();
+
+        querystr.sprintf("SELECT chanid, starttime, endtime FROM program "
+                         "WHERE (DATE_FORMAT(starttime, \"%%Y-%%m-%%d\") = "
+                         "\"%s\") AND chanid = \"%s\" "
+                         "ORDER BY starttime LIMIT 1;", 
+                         endtime.left(10).ascii(), chanid.ascii());
+
+        if (!query2.exec(querystr))
+        {
+            cerr << "fix_end_times:  " << querystr << " failed!\n";
+            return -1;
+        }
+
+        if (query2.next() && (endtime != query2.value(1).toString()))
+        {
+            count++;
+            endtime = query2.value(1).toString();
+            querystr.sprintf("UPDATE program SET starttime = \"%s\", "
+                             "endtime = \"%s\" WHERE (chanid = \"%s\" AND "
+                             "starttime = \"%s\");", starttime.ascii(), 
+                             endtime.ascii(), chanid.ascii(), 
+                             starttime.ascii());
+
+            if (!query2.exec(querystr)) 
+            {
+                cerr << "fix_end_times:  " << querystr << " failed!\n";
+                return -1;
+            }
+        }
+    }
+
+    return count;
+}
 
 int main(int argc, char *argv[])
 {
@@ -1191,6 +1245,13 @@ int main(int argc, char *argv[])
              exit(1);
         }
     }
+
+     cout << "Adjusting program database end times...\n";
+     int update_count = fix_end_times();
+     if (update_count == -1)
+         cout << "fix_end_times failed!\a\n";
+     else
+         cout << update_count << " replacements made.\n";
 
     delete gContext;
 
