@@ -35,7 +35,8 @@
       <size>15</size>
       <size:big>17</size:big>
       <size:small>13</size:small>
-      <shadow>1,1</shadow>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
     </font>
 
     <font name="inactive_font" face="Arial">
@@ -85,7 +86,7 @@
 
     <container name="background">
       <image name="filler" draworder="0" fleximage="yes">
-        <filename>cr-background.png</filename>
+        <filename>conflict/cr-background.png</filename>
         <position>0,285</position>
         <staticsize>800,290</staticsize>
       </image>
@@ -94,97 +95,75 @@
     <container name="info">
       <area>0,0,800,280</area>
       <textarea name="title" draworder="4">
-        <area>20,10,800,80</area>
+        <area>108,40,690,80</area>
         <font>leadfnt</font>
       </textarea>
-      <textarea name="dirlbl" draworder="4">
-        <area>20,105,150,35</area>
-        <font>labels</font>
-        <value>Director:</value>
-      </textarea>
-      <textarea name="director" draworder="4">
-        <area>170,105,350,35</area>        
-        <font>moviedata</font>
-      </textarea>
-      <textarea name="yrlbl" draworder="4" align="right">
-        <area>500,75,170,35</area>
-        <font>labels</font>
-        <value>Year:</value>
-      </textarea>
-      <textarea name="year" draworder="4">
-        <area>680,75,100,35</area>
-        <font>moviedata</font>
-      </textarea>
       <textarea name="ratlbl" draworder="4">
-        <area>20,75,150,35</area>
+        <area>144,164,150,35</area>
         <font>labels</font>
         <value>Rated:</value>
       </textarea>
       <textarea name="rating" draworder="4">
-        <area>170,75,450,35</area>
+        <area>205,164,580,35</area>
         <font>moviedata</font>
       </textarea>
-      <textarea name="lvllbl" draworder="4" align="right">
-        <area>500,105,170,35</area>
+      <textarea name="lvllbl" draworder="4" align="left">
+        <area>625,16,170,35</area>
         <font>labels</font>
         <value>Parental Level:</value>
       </textarea>
       <textarea name="level" draworder="4">
-        <area>680,105,100,35</area>
+        <area>766,16,100,35</area>
         <font>moviedata</font>
       </textarea>
       <textarea name="browselbl" draworder="4" align="right">
-        <area>500,135,170,35</area>
+        <area>430,135,170,35</area>
         <font>labels</font>
         <value>Browsable:</value>
       </textarea>
       <textarea name="browseable" draworder="4">
-        <area>680,135,100,35</area>
+        <area>606,135,100,35</area>
         <font>moviedata</font>
       </textarea>
       <textarea name="lenlbl" draworder="4">
-        <area>20,135,150,35</area>
+        <area>300,135,150,35</area>
         <font>labels</font>
         <value>Runtime:</value>
       </textarea>
       <textarea name="length" draworder="4">
-        <area>170,135,350,35</area>
+        <area>380,135,350,35</area>
         <font>moviedata</font>
-      </textarea>
-      <textarea name="pltlbl" draworder="4">
-        <area>20,165,150,35</area>
-        <font>labels</font>
-        <value>Plot:</value>
       </textarea>
       <textarea name="plot" draworder="4">
-        <area>170,165,600,35</area>
+        <area>108,195,670,100</area>
         <font>moviedata</font>
+        <multiline>yes</multiline>
       </textarea>
       <textarea name="fillbl" draworder="4">
-        <area>20,195,150,35</area>
+        <area>117,80,150,35</area>
         <font>labels</font>
         <value>Filename:</value>
       </textarea>
       <textarea name="filename" draworder="4">
-        <area>170,195,600,35</area>
+        <area>205,80,600,35</area>
         <font>moviedata</font>
       </textarea>
       <textarea name="cvflbl" draworder="4">
-        <area>20,225,150,35</area>
+        <area>108,108,150,35</area>
         <font>labels</font>
         <value>Cover File:</value>
       </textarea>
       <textarea name="coverfile" draworder="4">
-        <area>170,225,600,35</area>
+        <area>205,108,600,35</area>
         <font>moviedata</font>
       </textarea>
       <textarea name="imdblbl" draworder="4">
-        <area>20,255,155,35</area>
+        <area>134,135,155,35</area>
         <font>labels</font>
-        <value>IMDB Num.:</value>
+        <value>IMDB #:</value>
       </textarea>
       <textarea name="inetref" draworder="4">
-        <area>170,255,500,35</area>
+        <area>205,135,500,35</area>
         <font>moviedata</font>
       </textarea>
     </container>
@@ -201,12 +180,12 @@
         <column number="2" width="250" context="-1"></column>
         <column number="3" width="100" context="-1"></column>
         <items>8</items>
-        <image function="selectionbar" filename="tit-cr-selectbar.png" location="-12,-5"></image>
-        <image function="uparrow" filename="mv_up_arrow.png" location="750,22"></image>
-        <image function="downarrow" filename="mv_down_arrow.png" location="750,220"></image>
+        <image function="selectionbar" filename="conflict/tit-cr-selectbar.png" location="-12,-5"></image>
+        <image function="uparrow" filename="shared/up_arrow.png" location="750,22"></image>
+        <image function="downarrow" filename="shared/down_arrow.png" location="750,220"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="no">
-        <filename>cr-lines.png</filename>
+        <filename>conflict/cr-lines.png</filename>
         <position>0,0</position>
         <staticsize>800,290</staticsize>
       </image>
@@ -256,8 +235,8 @@
         <column number="1" width="355" context="-1"></column>
         <items>11</items>
         <image function="selectionbar" filename="mv-sel.png" location="-14,-5"></image>
-        <image function="uparrow" filename="uparrow.png" location="350,15"></image>
-        <image function="downarrow" filename="downarrow.png" location="350,330"></image>
+        <image function="uparrow" filename="shared/up_arrow.png" location="350,15"></image>
+        <image function="downarrow" filename="shared/down_arrow.png" location="350,330"></image>
       </listarea>
       <image name="showinglines" draworder="3" fleximage="no">
         <filename>mv-mselect.png</filename>
@@ -393,7 +372,7 @@
 
     <container name="background">
       <image name="filler" draworder="0" fleximage="no">
-        <filename>mv-background.png</filename>
+        <filename>video/mv-background.png</filename>
         <position>0,0</position>
       </image>
     </container>
@@ -571,7 +550,7 @@
         
         <container name="background">
             <image name="filler" draworder="0" fleximage="yes">
-                <filename>background.png</filename>
+                <filename>background.jpg</filename>
                 <position>0,10</position>
             </image>
             <image name="morefiller" draworder="0" fleximage="no">
@@ -583,16 +562,16 @@
         <container name="videoselector">
             <area>0,10,800,295</area>
             <image name="titlelines" draworder="5" fleximage="no">
-                <filename>trans-titles.png</filename>
+                <filename>shared/trans-titles.png</filename>
                 <position>0,0</position>
             </image>
             <managedtreelist name="videotreelist" draworder="1" bins="2">
                 <area>40,10,720,270</area>
-                <image function="selectionbar" filename="mv_selectionbar.png" location="150,-5"> </image>
-                <image function="uparrow" filename="mv_up_arrow.png"></image>
-                <image function="downarrow" filename="mv_down_arrow.png"></image>
-                <image function="leftarrow" filename="mv_left_arrow.png"></image>
-                <image function="rightarrow" filename="mv_right_arrow.png"></image>
+                <image function="selectionbar" filename="shared/long_bar.png" location="150,-5"> </image>
+                <image function="uparrow" filename="shared/up_arrow.png"></image>
+                <image function="downarrow" filename="shared/down_arrow.png"></image>
+                <image function="leftarrow" filename="shared/left_arrow.png"></image>
+                <image function="rightarrow" filename="shared/right_arrow.png"></image>
                 <bin number="1">
                     <area>30,16,190,250</area>
                     <fcnfont name="active" function="active"></fcnfont>
@@ -610,7 +589,7 @@
             </managedtreelist>
 
             <image name="showinglines" draworder="5" fleximage="yes">
-                <filename>showings.png</filename>
+                <filename>playback_box/showings.png</filename>
                 <position>0,0</position>
             </image>
     
@@ -948,11 +927,11 @@
             <area>0,0,600,250</area>
             <managedtreelist name="file_browser" draworder="1" bins="2">
                 <area>185,20,400,210</area>
-                <image function="selectionbar" filename="cr-selectbar.png"></image>
-                <image function="uparrow" filename="mv_up_arrow.png"></image>
-                <image function="downarrow" filename="mv_down_arrow.png"></image>
-                <image function="leftarrow" filename="mv_left_arrow.png"></image>
-                <image function="rightarrow" filename="mv_right_arrow.png"></image>
+                <image function="selectionbar" filename="conflict/tit-cr-selectbar.png"></image>
+                <image function="uparrow" filename="shared/up_arrow.png"></image>
+                <image function="downarrow" filename="shared/down_arrow.png"></image>
+                <image function="leftarrow" filename="shared/left_arrow.png"></image>
+                <image function="rightarrow" filename="shared/right_arrow.png"></image>
                 <bin number="1">
                     <area>185,20,145,210</area>
                     <fcnfont name="chooser_font" function="active"></fcnfont>
@@ -1154,15 +1133,16 @@
       <dropcolor>#000000</dropcolor>
       <shadow>4,4</shadow>
       <size:small>20</size:small>
-      <size>20</size>
+      <size>30</size>
       <bold>yes</bold>
     </font>
 
 
     <font name="menu" face="Arial">
       <color>#ffffff</color>
-      <size>20</size>
-      <bold>no</bold>
+      <size>18</size>
+      <bold>yes</bold>
+      <shadow>2,2</shadow>
     </font>
 
     <font name="subtitle" face="Arial">
@@ -1170,15 +1150,17 @@
       <size:big>18</size:big>
       <size>16</size>
       <size:small>14</size:small>
-      <shadow>1,1</shadow>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
     </font>
 
     <font name="icontitle" face="Arial">
       <color>#ffffbb</color>
       <size:big>20</size:big>
       <size>18</size>
-      <size:small>15</size:small>
-      <shadow>1,1</shadow>
+      <size:small>18</size:small>
+      <shadow>2,2</shadow>
+      <bold>yes</bold>
     </font>
 
 
@@ -1190,12 +1172,12 @@
 	<font>menu</font>
       </textarea>
 
-      <textarea name="pl_label" draworder="0" align="left">
+      <textarea name="pl_label" draworder="1" align="left">
         <area>0,540,30,20</area>
         <font>subtitle</font>
         <value>PL</value>
       </textarea>
-      <textarea name="pl_value" draworder="0" align="left">
+      <textarea name="pl_value" draworder="1" align="left">
         <area>30,540,30,20</area>
         <font>subtitle</font>
         <value>1</value>
@@ -1204,7 +1186,7 @@
     </container>
 
     <container name="arrows">
-      <area>760,530,780,60</area>
+      <area>76,530,730,60</area>
 
       <image name="scrollUpReg" draworder="0" fleximage="no">
         <context>0</context>
@@ -1229,13 +1211,31 @@
         <filename>lb-dnarrow-sel.png</filename>
         <position>0,20</position>
       </image>
+      
+      <textarea name="help1" draworder="1">
+        <area>60,15,175,35</area>
+        <font>menu</font>
+        <value>SELECT: Details</value>
+      </textarea>
 
+       <textarea name="help1" draworder="1">
+        <area>275,15,175,35</area>
+        <font>menu</font>
+        <value>MENU: Options</value>
+      </textarea>
+
+      <textarea name="help1" draworder="1">
+        <area>500,15,200,35</area>
+        <font>menu</font>
+        <value>INFO: Action Menu</value>
+      </textarea>
+      
     </container>
 
     <container name="text">
 
-      <area>50,10,700,30</area>
-      <textarea name="text" draworder="0">
+      <area>110,40,680,30</area>
+      <textarea name="text" draworder="0" align="center">
         <area>0,0,700,30</area>
         <font>title</font>
         <cutdown>yes</cutdown>
@@ -1245,10 +1245,10 @@
     </container>
 
     <container name="view">
-      <area>50,50,700,530</area>
+      <area>110,77,680,450</area>
 
       <blackhole name="view" draworder="0">
-            <area>0,0,700,530</area>
+            <area>0,0,680,450</area>
       </blackhole>
 
       <textarea name="icontext" draworder="1" align="left">

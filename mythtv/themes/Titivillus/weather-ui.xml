@@ -82,22 +82,22 @@
   
     <container name="background">
       <image name="backup" draworder="0">
-        <filename>mw-background.png</filename>
+        <filename>weather/mw-background.png</filename>
         <position>22,175</position>
       </image>
       <image name="lines" draworder="0">
-        <filename>mw-lines.png</filename>
+        <filename>weather/mw-lines.png</filename>
         <position>22,175</position>
       </image>
     </container>
 
     <container name="startup">
       <image name="shading" draworder="0">
-        <filename>trans-backup.png</filename>
+        <filename>weather/trans-backup.png</filename>
         <position>0,0</position>
       </image>
       <image name="logo" draworder="1">
-        <filename>logo.png</filename>
+        <filename>weather/logo.png</filename>
         <position>400,200</position>
       </image>
       <textarea name="loading" draworder="2" align="right"> 
@@ -156,7 +156,7 @@
  
       <image name="logo1" draworder="2">
         <context>1</context>
-        <filename>logo.png</filename>
+        <filename>weather/logo.png</filename>
         <position>25,25</position>
         <staticsize>157,118</staticsize>
       </image>
@@ -264,7 +264,7 @@
 
       <image name="logo2" draworder="2">
         <context>2</context>
-        <filename>logo.png</filename>
+        <filename>weather/logo.png</filename>
         <position>25,25</position>
         <staticsize>157,118</staticsize>
       </image>
@@ -403,7 +403,7 @@
    
       <image name="logo3" draworder="2">
         <context>3</context>
-        <filename>logo.png</filename>
+        <filename>weather/logo.png</filename>
         <position>25,25</position>
         <staticsize>157,118</staticsize>
       </image>
@@ -434,7 +434,7 @@
 
       <image name="logo4" draworder="2">
         <context>4</context>
-        <filename>logo.png</filename>
+        <filename>weather/logo.png</filename>
         <position>25,25</position>
         <staticsize>157,118</staticsize>
       </image>
@@ -575,7 +575,7 @@
 
       <image name="radarbk" draworder="4">
         <context>5</context>
-        <filename>mw-map.png</filename>
+        <filename>weather/mw-map.png</filename>
         <position>0,0</position>
       </image>
       <image name="radarimg" draworder="6">
@@ -596,7 +596,7 @@
 
       <image name="logo" draworder="7">
         <context>5</context>
-        <filename>logo.png</filename>
+        <filename>weather/logo.png</filename>
         <position>30,22</position>
         <staticsize>80,60</staticsize>
       </image>
@@ -604,7 +604,7 @@
 
     <container name="newlocation">
       <image name="box" draworder="7">
-        <filename>mw-popup.png</filename>
+        <filename>weather/mw-popup.png</filename>
         <position>220,200</position>
       </image>
       <textarea name="msg" draworder="7" align="center">

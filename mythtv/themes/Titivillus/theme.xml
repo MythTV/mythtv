@@ -1,34 +1,36 @@
 <myththeme>
 
   <background style="normal">
-    <image>background.jpeg</image>
-    <buttonarea>100,115,410,390</buttonarea>
+    <image>background.jpg</image>
+
+    <buttonarea>118,115,600,390</buttonarea>
     <visiblerowlimit>7</visiblerowlimit>
+    <columns>1</columns>
   </background>
 
   <titles>
-    <position>20,20</position>
-    <image mode="TV">title/title_tv.png</image>
-    <image mode="MAIN">title/title_main.png</image>
-    <image mode="MUSIC">title/title_music.png</image>
-    <image mode="GALLERY">title/title_gallery.png</image>
-    <image mode="VIDEO">title/title_video.png</image>
-    <image mode="SCHEDULE">title/title_schedule.png</image>
-    <image mode="SEARCH">title/title_search.png</image>
-    <image mode="SETUP">title/title_setup.png</image>
-    <image mode="MEDIA_SETUP">title/title_setup.png</image>
-    <image mode="INFO_SETUP">title/title_setup.png</image>
-    <image mode="TVSETUP">title/title_tv_settings.png</image>
-    <image mode="DVD">title/title_dvd.png</image>
-    <image mode="DVD_SETTINGS">title/title_dvd_setup.png</image>
-    <image mode="MUSIC_SETTINGS">title/title_music_setup.png</image>
-    <image mode="VIDEO_SETTINGS">title/title_video_setup.png</image>
-    <image mode="GAME_SETTINGS">title/title_game_setup.png</image>
-    <image mode="LIBRARY">title/title_library.png</image>
-    <image mode="MANAGE_RECORDINGS">title/title_manage_recordings.png</image>
-    <image mode="INFO">title/title_info_center.png</image>
-    <image mode="OPTICAL_DISK">title/title_optical_disks.png</image>
-    <image mode="UTIL">title/title_util.png</image>
+    <position>108,33</position>
+    <image mode="TV">title/title_tv.jpg</image>
+    <image mode="MAIN">title/title_main.jpg</image>
+    <image mode="MUSIC">title/title_music.jpg</image>
+    <image mode="GALLERY">title/title_gallery.jpg</image>
+    <image mode="VIDEO">title/title_video.jpg</image>
+    <image mode="SCHEDULE">title/title_schedule.jpg</image>
+    <image mode="SEARCH">title/title_search.jpg</image>
+    <image mode="SETUP">title/title_setup.jpg</image>
+    <image mode="MEDIA_SETUP">title/title_media_setup.jpg</image>
+    <image mode="INFO_SETUP">title/title_info_setup.jpg</image>
+    <image mode="TVSETUP">title/title_tv_setup.jpg</image>
+    <image mode="DVD">title/title_dvd.jpg</image>
+    <image mode="DVD_SETTINGS">title/title_dvd_setup.jpg</image>
+    <image mode="MUSIC_SETTINGS">title/title_music_setup.jpg</image>
+    <image mode="VIDEO_SETTINGS">title/title_video_setup.jpg</image>
+    <image mode="GAME_SETTINGS">title/title_game_setup.jpg</image>
+    <image mode="LIBRARY">title/title_library.jpg</image>
+    <image mode="MANAGE_RECORDINGS">title/title_manage_recordings.jpg</image>
+    <image mode="INFO">title/title_info_center.jpg</image>
+    <image mode="OPTICAL_DISK">title/title_optical_disks.jpg</image>
+    <image mode="UTIL">title/title_util.jpg</image>
   </titles>
 
   <genericbutton>
@@ -36,16 +38,16 @@
     <normal>text-blank.png</normal>
     <active>text-blank.png</active>
     <text>
-    <area>5,3,3,3</area>
+    <area>1,3,3,3</area>
     <color>white</color>
-      <fontname>Arial</fontname>
+      <fontname>Trebuchet Ms</fontname>
       <fontsize>28</fontsize>
       <bold>yes</bold>
       <italics>no</italics>
       <centered>no</centered>
       <outline>
          <color>black</color>
-         <size>2</size>
+         <size>3</size>
       </outline>
       <!--<shadow>
          <color>black</color>
@@ -54,9 +56,9 @@
       </shadow>-->
     </text>
     <activetext>
-      <area>5,3,3,3</area>
+      <area>1,3,3,3</area>
       <color>#0086FF</color>
-      <fontname>Arial</fontname>
+      <fontname>Trebuchet Ms</fontname>
       <fontsize>28</fontsize>
       <bold>yes</bold>
       <italics>no</italics>
@@ -75,12 +77,12 @@
   
 
   <uparrow>
-    <image>arrow_up.png</image>
+    <image>shared/up_arrow.png</image>
     <position>65,120</position>
   </uparrow>
 
   <downarrow>
-    <image>arrow_down.png</image>
+    <image>shared/down_arrow.png</image>
     <position>65,460</position>
   </downarrow>
 

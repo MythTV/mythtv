@@ -40,7 +40,7 @@
 
     <container name="background">
         <image name="filler" draworder="0" fleximage="yes">
-            <filename>background.png</filename>
+            <filename>games/background.png</filename>
             <position>0,10</position>
         </image>
         <image name="titlelines" draworder="0" fleximage="no">
@@ -48,7 +48,7 @@
             <position>0,10</position>
         </image>
         <image name="infofiller" draworder="0" fleximage="no">
-            <filename>pf-top.png</filename>
+            <filename>profind/progfind_top.png</filename>
             <position>26,350</position>
         </image>
     </container>
@@ -57,9 +57,9 @@
         <area>0,10,800,310</area>
         <managedtreelist name="gametreelist" draworder="1" bins="2">
             <area>40,10,720,270</area>
-            <image function="selectionbar" filename="selrec-bar.png"></image>
-            <image function="uparrow" filename="mv_up_arrow.png"></image>
-            <image function="downarrow" filename="mv_down_arrow.png"></image>
+            <image function="selectionbar" filename="shared/long_bar.png"></image>
+            <image function="uparrow" filename="shared/up_arrow.png"></image>
+            <image function="downarrow" filename="shared/down_arrow.png"></image>
             <image function="leftarrow" filename="mv_left_arrow.png"></image>
             <image function="rightarrow" filename="mv_right_arrow.png"></image>
             <bin number="1">
@@ -79,8 +79,8 @@
         </managedtreelist>
 
         <image name="showinglines" draworder="2" fleximage="yes">
-            <filename>showings.png</filename>
-            <position>0,0</position>
+              <filename>playback_box/showings.png</filename>
+              <position>0,0</position>
         </image>
     </container>
 

@@ -97,38 +97,43 @@
             <color>#ffffff</color>
             <size>17</size>
 	    <shadow>2,2</shadow>
+	    <bold>yes</bold>
         </font>
 
         <font name="inactive" face="Arial">
             <color>#9999cc</color>
             <size>17</size>
 	    <shadow>2,2</shadow>
+	    <bold>yes</bold>
         </font>
   
         <font name="selected" face="Arial">
             <color>#ffff00</color>
             <size>18</size>
 	    <shadow>2,2</shadow>
+	    <bold>yes</bold>
         </font>
 
         <font name="currenttitle" face="Arial">
             <color>#DDDDFF</color>
-            <size>18</size>
+            <size>20</size>
 	    <shadow>3,3</shadow>
             <bold>yes</bold>
+	    <bold>yes</bold>
         </font>
 
         <font name="currentartist" face="Arial">
             <color>#ffffbb</color>
-            <size>16</size>
+            <size>18</size>
 	    <shadow>2,2</shadow>
             <bold>yes</bold>
         </font>
 
         <font name="infotext" face="Arial">
             <color>#ffffff</color>
-            <size>12</size>
+            <size>16</size>
 	    <shadow>1,1</shadow>
+	    <bold>yes</bold>
         </font>
 
         <font name="infotext2" face="Arial">
@@ -150,7 +155,7 @@
 
         <container name="background">
             <image name="filler" draworder="0" fleximage="yes">
-                <filename>mm-background.png</filename>
+                <filename>music/mm-background.png</filename>
                 <position>0,10</position>
             </image>
             <!-- <image name="titlelines" draworder="0" fleximage="no">
@@ -159,11 +164,11 @@
             </image>
 	     -->
             <image name="track_info_background" draworder="0" fleximage="no">
-                <filename>mm_track_info_background.png</filename>
+                <filename>music/mm_track_info_background.png</filename>
                 <position>0,315</position>
             </image>
-            <image name="mm_blackhole_border" draworder="0" fleximage="no">
-                <filename>mm_blackhole_border.png</filename>
+            <image name="music/mm_blackhole_border" draworder="0" fleximage="no">
+                <filename>music/mm_blackhole_border.png</filename>
                 <position>130,330</position>
             </image>
             
@@ -190,14 +195,14 @@
                 <!--
                     An image to show the current navigation node
                 -->
-                <image function="selectionbar" filename="mm_selectionbar.png"></image>
+                <image function="selectionbar" filename="music/mm_selectionbar.png"></image>
                 <!--
                     Some arrow images
                 -->
-                <image function="uparrow" filename="mm_up_arrow.png"></image>
-                <image function="downarrow" filename="mm_down_arrow.png"></image>
-                <image function="leftarrow" filename="mm_left_arrow.png"></image>
-                <image function="rightarrow" filename="mm_right_arrow.png"></image>
+                <image function="uparrow" filename="shared/up_arrow.png"></image>
+                <image function="downarrow" filename="shared/down_arrow.png"></image>
+                <image function="leftarrow" filename="shared/left_arrow.png"></image>
+                <image function="rightarrow" filename="shared/right_arrow.png"></image>
                 <!-- 
                     the area of particular bins
                     you can make them show right to left,
@@ -227,16 +232,16 @@
 
             <image name="showinglines" draworder="2" fleximage="yes">
                 <context>1</context>
-                <filename>mm-showings.png</filename>
+                <filename>music/mm-showings.png</filename>
                 <position>0,0</position>
             </image>
 
             <!--
                 An image for when we're waiting for data
             -->
-            <image name="mm_waiting" draworder="0" fleximage="no">
+            <image name="music/mm_waiting" draworder="0" fleximage="no">
                 <context>0</context>
-                <filename>mm_waiting.png</filename>
+                <filename>music/mm_waiting.png</filename>
                 <position>0,0</position>
             </image>
             <textarea name="waiting_text" draworder="1" align="center">
@@ -259,9 +264,9 @@
                 (ie. just the active playlist)
             -->
 
-            <image name="mm_waiting" draworder="0" fleximage="no">
+            <image name="music/mm_waiting" draworder="0" fleximage="no">
                 <context>2</context>
-                <filename>mm_waiting.png</filename>
+                <filename>music/mm_waiting.png</filename>
                 <position>0,0</position>
             </image>
         </container>
@@ -293,7 +298,7 @@
             </textarea>
 
             <repeatedimage name="ratings_image" draworder="1" fleximage="no">
-                <filename>mm_rating.png</filename>
+                <filename>music/mm_rating.png</filename>
                 <position>270,105</position>
                 <orientation>LeftToRight</orientation>
             </repeatedimage>
@@ -327,8 +332,8 @@
         <container name="volumedisplay">
             <area>690,315,40,160</area>
             <statusbar name="volume_status" draworder="-1" whitespace="5">
-                <container fleximage="no">mm_volume_background.png</container>
-                <fill>mm_volume_tick.png</fill>
+                <container fleximage="no">music/mm_volume_background.png</container>
+                <fill>music/mm_volume_tick.png</fill>
                 <position>0,0</position>
                 <orientation>BottomToTop</orientation>
             </statusbar>
@@ -343,83 +348,83 @@
 
             <textbutton name="shuffle_button" draworder="0">
                 <position>20,0</position>
-                <image function="on" filename="mm_simple_button_on.png"></image>
-                <image function="off" filename="mm_simple_button_off.png"></image>
-                <image function="pushed" filename="mm_simple_button_active.png"></image>
+                <image function="on" filename="music/mm_simple_button_on.png"></image>
+                <image function="off" filename="music/mm_simple_button_off.png"></image>
+                <image function="pushed" filename="music/mm_simple_button_active.png"></image>
                 <font>buttons</font>
             </textbutton>
 
             <textbutton name="repeat_button" draworder="0">
                 <position>215,0</position>
-                <image function="on" filename="mm_simple_button_on.png"></image>
-                <image function="off" filename="mm_simple_button_off.png"></image>
-                <image function="pushed" filename="mm_simple_button_active.png"></image>
+                <image function="on" filename="music/mm_simple_button_on.png"></image>
+                <image function="off" filename="music/mm_simple_button_off.png"></image>
+                <image function="pushed" filename="music/mm_simple_button_active.png"></image>
                 <font>buttons</font>
             </textbutton>
 
             <textbutton name="pledit_button" draworder="0">
                 <position>410,0</position>
-                <image function="on" filename="mm_simple_button_on.png"></image>
-                <image function="off" filename="mm_simple_button_off.png"></image>
-                <image function="pushed" filename="mm_simple_button_active.png"></image>
+                <image function="on" filename="music/mm_simple_button_on.png"></image>
+                <image function="off" filename="music/mm_simple_button_off.png"></image>
+                <image function="pushed" filename="music/mm_simple_button_active.png"></image>
                 <font>buttons</font>
             </textbutton>
 
             <textbutton name="vis_button" draworder="0">
                 <position>605,0</position>
-                <image function="on" filename="mm_simple_button_on.png"></image>
-                <image function="off" filename="mm_simple_button_off.png"></image>
-                <image function="pushed" filename="mm_simple_button_active.png"></image>
+                <image function="on" filename="music/mm_simple_button_on.png"></image>
+                <image function="off" filename="music/mm_simple_button_off.png"></image>
+                <image function="pushed" filename="music/mm_simple_button_active.png"></image>
                 <font>buttons</font>
             </textbutton>
 
             <pushbutton name="prev_button" draworder="0">
                 <position>10,40</position>
-                <image function="on" filename="mm_prev_button_on.png"></image>
-                <image function="off" filename="mm_prev_button_off.png"></image>
-                <image function="pushed" filename="mm_prev_button_pushed.png"></image>
+                <image function="on" filename="music/mm_prev_button_on.png"></image>
+                <image function="off" filename="music/mm_prev_button_off.png"></image>
+                <image function="pushed" filename="music/mm_prev_button_pushed.png"></image>
             </pushbutton>
             
             <pushbutton name="rew_button" draworder="0">
                 <position>125,40</position>
-                <image function="on" filename="mm_rew_button_on.png"></image>
-                <image function="off" filename="mm_rew_button_off.png"></image>
-                <image function="pushed" filename="mm_rew_button_pushed.png"></image>
+                <image function="on" filename="music/mm_rew_button_on.png"></image>
+                <image function="off" filename="music/mm_rew_button_off.png"></image>
+                <image function="pushed" filename="music/mm_rew_button_pushed.png"></image>
             </pushbutton>
             
             <pushbutton name="pause_button" draworder="0">
                 <position>240,40</position>
-                <image function="on" filename="mm_pause_button_on.png"></image>
-                <image function="off" filename="mm_pause_button_off.png"></image>
-                <image function="pushed" filename="mm_pause_button_pushed.png"></image>
+                <image function="on" filename="music/mm_pause_button_on.png"></image>
+                <image function="off" filename="music/mm_pause_button_off.png"></image>
+                <image function="pushed" filename="music/mm_pause_button_pushed.png"></image>
             </pushbutton>
             
             <pushbutton name="play_button" draworder="0">
                 <position>355,40</position>
-                <image function="on" filename="mm_play_button_on.png"></image>
-                <image function="off" filename="mm_play_button_off.png"></image>
-                <image function="pushed" filename="mm_play_button_pushed.png"></image>
+                <image function="on" filename="music/mm_play_button_on.png"></image>
+                <image function="off" filename="music/mm_play_button_off.png"></image>
+                <image function="pushed" filename="music/mm_play_button_pushed.png"></image>
             </pushbutton>
             
             <pushbutton name="stop_button" draworder="0">
                 <position>470,40</position>
-                <image function="on" filename="mm_stop_button_on.png"></image>
-                <image function="off" filename="mm_stop_button_off.png"></image>
-                <image function="pushed" filename="mm_stop_button_pushed.png"></image>
+                <image function="on" filename="music/mm_stop_button_on.png"></image>
+                <image function="off" filename="music/mm_stop_button_off.png"></image>
+                <image function="pushed" filename="music/mm_stop_button_pushed.png"></image>
             </pushbutton>
             
             <pushbutton name="ff_button" draworder="0">
                 <position>585,40</position>
-                <image function="on" filename="mm_ff_button_on.png"></image>
-                <image function="off" filename="mm_ff_button_off.png"></image>
-                <image function="pushed" filename="mm_ff_button_pushed.png"></image>
+                <image function="on" filename="music/mm_ff_button_on.png"></image>
+                <image function="off" filename="music/mm_ff_button_off.png"></image>
+                <image function="pushed" filename="music/mm_ff_button_pushed.png"></image>
             </pushbutton>
             
             <pushbutton name="next_button" draworder="0">
                 <position>700,40</position>
-                <image function="on" filename="mm_next_button_on.png"></image>
-                <image function="off" filename="mm_next_button_off.png"></image>
-                <image function="pushed" filename="mm_next_button_pushed.png"></image>
+                <image function="on" filename="music/mm_next_button_on.png"></image>
+                <image function="off" filename="music/mm_next_button_off.png"></image>
+                <image function="pushed" filename="music/mm_next_button_pushed.png"></image>
             </pushbutton>
             
         </container>
