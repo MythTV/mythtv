@@ -817,7 +817,12 @@ uint32_t aacDecoder::aacRead(char *buffer, uint32_t length)
 {
     if(input())
     {
-        return input()->readBlock(buffer, length);
+        Q_LONG read_result = input()->readBlock(buffer, length);
+        if(read_result < 1)
+        {
+            return 0;
+        }
+        return read_result; 
     }
     warning("aacDecoder: aacRead() was called, but there is no input");
     return 0;
