@@ -274,6 +274,15 @@ public:
     };
 };
 
+class ExternalChannelCommand: public LineEditSetting, public GlobalSetting {
+public:
+    ExternalChannelCommand():
+        GlobalSetting("ExternalChannelCommand") {
+        setLabel("External channel change command");
+        setValue("");
+    };
+};
+
 class PlaybackSettings: virtual public ConfigurationWizard {
 public:
     PlaybackSettings(MythContext *context) : ConfigurationWizard(context),
@@ -322,6 +331,7 @@ public:
         addChild(new TVFormat());
         addChild(new FreqTable());
         addChild(new RecordOverTime());
+        addChild(new ExternalChannelCommand());
     };
 };
 
