@@ -503,7 +503,8 @@ void Scheduler::PruneList(void)
         ProgramInfo *first = (*i);
 
         if (!first->recording || first->rectype == kSingleRecord ||
-            first->subtitle.length() <= 2 && first->description.length() <= 2)
+            (!first->rectype == kFindOneRecord &&
+            first->subtitle.length() <= 2 && first->description.length() <= 2))
             continue;
 
         list<ProgramInfo *>::reverse_iterator j = i;

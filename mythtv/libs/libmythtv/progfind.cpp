@@ -500,6 +500,9 @@ void ProgFinder::getInfo(bool toggle)
                 case kSingleRecord:
                     data = tr("Recording just this showing");
                     break;
+                case kFindOneRecord:
+                    data = tr("Recording one showing of this program");
+                    break;
                 case kTimeslotRecord:
                     data = tr("Recording every day when shown in this timeslot");
                     break;
@@ -1155,6 +1158,10 @@ int ProgFinder::checkRecordingStatus(int showNum)
             {
                 return curRecordings[j].type;
             }
+            if (curRecordings[j].type == kFindOneRecord)
+            {
+                return curRecordings[j].type;
+            }
         }
     }
     return 0;
@@ -1302,6 +1309,9 @@ void ProgFinder::selectShowData(QString progTitle)
             {
                 case kSingleRecord:
                     data = tr("Recording just this showing");
+                    break;
+                case kFindOneRecord:
+                    data = tr("Recording one showing of this program");
                     break;
                 case kTimeslotRecord:
                     data = tr("Recording every day when shown in this timeslot");

@@ -13,11 +13,16 @@
 // be compared to another.  Lower number means more specific.
 int RecTypePriority(RecordingType rectype)
 {
-    if (rectype == kChannelRecord ||
-        rectype == kAllRecord)
-        return rectype+3;
-    else
-        return rectype;
+    switch (rectype) {
+    case kNotRecording:   return 0; break;
+    case kSingleRecord:   return 1; break;
+    case kFindOneRecord:  return 2; break;
+    case kWeekslotRecord: return 3; break;
+    case kTimeslotRecord: return 4; break;
+    case kChannelRecord:  return 5; break;
+    case kAllRecord:      return 6; break;
+    default: return 7;
+    }
 }
 
 class SRSetting: public SimpleDBStorage {
@@ -54,14 +59,16 @@ public:
                      QString::number(kNotRecording));
         addSelection(QObject::tr("Record only this showing"),
                      QString::number(kSingleRecord));
+        addSelection(QObject::tr("Record one showing of this program"),
+                     QString::number(kFindOneRecord));
+        addSelection(QObject::tr("Record in this timeslot every week"),
+                     QString::number(kWeekslotRecord));
         addSelection(QObject::tr("Record in this timeslot every day"),
                      QString::number(kTimeslotRecord));
         addSelection(QObject::tr("Record at any time on this channel"),
                      QString::number(kChannelRecord));
         addSelection(QObject::tr("Record at any time on any channel"),
                      QString::number(kAllRecord));
-        addSelection(QObject::tr("Record in this timeslot every week"),
-                     QString::number(kWeekslotRecord));
     };
 };
 
@@ -305,19 +312,20 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
 "    AND program.description = recordoverride.description "
 "  ) "
 "WHERE "
-"((record.type = %1) " // allrecord
+"((record.type = %1 " // allrecord
+"OR record.type = %2) " // findonerecord
 " OR "
 " ((record.chanid = program.chanid) " // channel matches
 "  AND "
-"  ((record.type = %2) " // channelrecord
+"  ((record.type = %3) " // channelrecord
 "   OR"
 "   ((TIME_TO_SEC(record.starttime) = TIME_TO_SEC(program.starttime)) " // timeslot matches
 "    AND "
-"    ((record.type = %3) " // timeslotrecord
+"    ((record.type = %4) " // timeslotrecord
 "     OR"
 "     ((DAYOFWEEK(record.startdate) = DAYOFWEEK(program.starttime) "
 "      AND "
-"      ((record.type = %4) " // weekslotrecord
+"      ((record.type = %5) " // weekslotrecord
 "       OR"
 "       ((TO_DAYS(record.startdate) = TO_DAYS(program.starttime)) " // date matches
 "        AND "
@@ -334,6 +342,7 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
 " )"
 ");")
         .arg(kAllRecord)
+        .arg(kFindOneRecord)
         .arg(kChannelRecord)
         .arg(kTimeslotRecord)
         .arg(kWeekslotRecord);
@@ -521,19 +530,21 @@ bool ScheduledRecording::loadByProgram(QSqlDatabase* db,
 "WHERE "
 "record.title = \"%1\" "
 "AND "
-"((record.type = %2) " // allrecord
+"((record.type = %2 " // allrecord
+"OR record.type = %3) " // findonerecord
 " OR "
-" ((record.chanid = %3) " // channel matches
+" ((record.chanid = %4) " // channel matches
 "  AND "
-"  ((record.type = %4) " // channelrecord
+"  ((record.type = %5) " // channelrecord
 "   OR"
-"   (((TIME_TO_SEC(record.starttime) = TIME_TO_SEC('%5')) " // timeslot matches
+"   (((TIME_TO_SEC(record.starttime) = TIME_TO_SEC('%6')) " // timeslot matches
 "      AND "
-"     (TIME_TO_SEC(record.endtime) = TIME_TO_SEC('%6')) "
+"     (TIME_TO_SEC(record.endtime) = TIME_TO_SEC('%7')) "
 "    )"
 "    AND ")
         .arg(sqltitle.utf8())
         .arg(kAllRecord)
+        .arg(kFindOneRecord)
         .arg(chanid)
         .arg(kChannelRecord)
         .arg(proginfo->startts.time().toString(Qt::ISODate))
@@ -673,7 +684,8 @@ bool ScheduledRecording::hasChanged(QSqlDatabase* db) {
 void ScheduledRecording::doneRecording(QSqlDatabase* db, 
                                        const ProgramInfo& proginfo) 
 {
-    if (getRecordingType() == kSingleRecord)
+    if (getRecordingType() == kSingleRecord ||
+        getRecordingType() == kFindOneRecord)
         remove(db);
 
     QString sqltitle = proginfo.title;
@@ -809,6 +821,9 @@ void ScheduledRecording::fillSelections(QSqlDatabase* db, SelectSetting* setting
 
             switch (sr.getRecordingType()) {
             case kAllRecord:
+                label = QString("%1").arg(sr.title->getValue());
+                break;
+            case kFindOneRecord:
                 label = QString("%1").arg(sr.title->getValue());
                 break;
             case kChannelRecord:

@@ -686,6 +686,8 @@ int ProgramInfo::GetRecordingTypeRecPriority(RecordingType type)
             return gContext->GetNumSetting("ChannelRecordRecPriority", 0);
         case kAllRecord:
             return gContext->GetNumSetting("AllRecordRecPriority", 0);
+        case kFindOneRecord:
+            return gContext->GetNumSetting("FindOneRecordRecPriority", 0);
         default:
             return 0;
     }
@@ -739,6 +741,9 @@ void ProgramInfo::ToggleRecord(QSqlDatabase *db)
             ApplyRecordStateChange(db, kChannelRecord);
             break;
         case kChannelRecord:
+            ApplyRecordStateChange(db, kFindOneRecord);
+            break;
+        case kFindOneRecord:
             ApplyRecordStateChange(db, kAllRecord);
             break;
         case kAllRecord:
@@ -755,6 +760,8 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
         description.length() > 2 &&
         subtitle == other.subtitle &&
         description == other.description)
+        return true;
+    if (title == other.title && rectype == kFindOneRecord)
         return true;
     else
         return false;
@@ -1493,6 +1500,9 @@ QString ProgramInfo::RecTypeChar(void)
     case kAllRecord:
         recstring = QObject::tr("A");
         break;
+    case kFindOneRecord:
+        recstring = QObject::tr("F");
+        break;
     case kNotRecording:
     default:
         recstring = QObject::tr("");
@@ -1522,6 +1532,9 @@ QString ProgramInfo::RecTypeText(void)
         break;
     case kAllRecord:
         recstring = QObject::tr("All Recording");
+        break;
+    case kFindOneRecord:
+        recstring = QObject::tr("Find One Recording");
         break;
     default:
         recstring = QObject::tr("Not Recording");

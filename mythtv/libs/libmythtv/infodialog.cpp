@@ -111,6 +111,14 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent,
             selectItem = item;
     }
 
+    if (recordstatus == kFindOneRecord)
+    {
+        msg = tr("Record one showing of this program");
+        rt = kFindOneRecord;
+        item = new RecListItem(lview, msg, kFindOneRecord);
+        selectItem = item;
+    }
+
     item = new RecListItem(lview, tr("Record only this showing of the program"),
                            kSingleRecord);
     if (recordstatus == kSingleRecord)

@@ -14,7 +14,8 @@ enum RecordingType
     kTimeslotRecord,
     kChannelRecord,
     kAllRecord,
-    kWeekslotRecord
+    kWeekslotRecord,
+    kFindOneRecord
 };
 
 int RecTypePriority(RecordingType rectype);

@@ -1303,6 +1303,17 @@ public:
     };
 };
 
+class GRFindOneRecordRecPriority: public SpinBoxSetting, public BackendSetting {
+public:
+    GRFindOneRecordRecPriority():
+        SpinBoxSetting(-99, 99, 1), BackendSetting("FindOneRecordRecPriority") {
+        setLabel(QObject::tr("Find One Recordings Priority"));
+        setHelpText(QObject::tr("Find One Recording types will receive this "
+                    "additional recording priority value."));
+        setValue(0);
+    };
+};
+
 class DefaultTVChannel: public LineEditSetting, public GlobalSetting {
 public:
     DefaultTVChannel():
@@ -1688,6 +1699,7 @@ GeneralRecPrioritiesSettings::GeneralRecPrioritiesSettings()
     gr->addChild(new GRUseRecPriorities());
     gr->addChild(new GRRecPrioritiesFirst());
     gr->addChild(new GRSingleRecordRecPriority());
+    gr->addChild(new GRFindOneRecordRecPriority());
     gr->addChild(new GRWeekslotRecordRecPriority());
     gr->addChild(new GRTimeslotRecordRecPriority());
     gr->addChild(new GRChannelRecordRecPriority());

@@ -453,12 +453,13 @@ void ProgramRecPriority::edit(void)
                      cnt++, ++it);
                 progInfo = &(it.data());
            
-                int rtRecPriors[5];
+                int rtRecPriors[6];
                 rtRecPriors[0] = gContext->GetNumSetting("SingleRecordRecPrior", 0);
                 rtRecPriors[1] = gContext->GetNumSetting("TimeslotRecordRecPrior", 0);
                 rtRecPriors[2] = gContext->GetNumSetting("ChannelRecordRecPrior", 0);
                 rtRecPriors[3] = gContext->GetNumSetting("AllRecordRecPrior", 0);
                 rtRecPriors[4] = gContext->GetNumSetting("WeekslotRecordRecPrior", 0);
+                rtRecPriors[5] = gContext->GetNumSetting("FindOneRecordRecPrior", 0);
 
                 // set the recording priorities of that program 
                 progInfo->recpriority = recPriority;
@@ -569,6 +570,7 @@ void ProgramRecPriority::FillList(void)
     rtRecPriors[2] = gContext->GetNumSetting("ChannelRecordRecPriority", 0);
     rtRecPriors[3] = gContext->GetNumSetting("AllRecordRecPriority", 0);
     rtRecPriors[4] = gContext->GetNumSetting("WeekslotRecordRecPriority", 0);
+    rtRecPriors[5] = gContext->GetNumSetting("FindOneRecordRecPriority", 0);
     
     // get channel recording priorities and recording types associated with each
     // program from db
@@ -904,6 +906,9 @@ void ProgramRecPriority::updateInfo(QPainter *p)
                         break;
                     case kAllRecord:
                         text = tr("Recording all showings");
+                        break;
+                    case kFindOneRecord:
+                        text = tr("Recording one showing of this program");
                         break;
                     case kNotRecording:
                         text = tr("Not recording this showing");

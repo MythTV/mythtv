@@ -835,6 +835,9 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
                 case kWeekslotRecord:
                     recFlag = 5;
                     break;
+                case kFindOneRecord:
+                    recFlag = 6;
+                    break;
                 case kNotRecording:
                 default:
                     recFlag = 0;
