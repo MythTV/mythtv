@@ -36,7 +36,7 @@ class MainServer : public QObject
     bool isClientConnected();
     void ShutSlaveBackendsDown(QString &haltcmd);
 
-    void ProcessRequest(QSocket *sock); 
+    void ProcessRequest(RefSocket *sock); 
     void MarkUnused(ProcessRequestThread *prt);
 
   protected slots:
@@ -50,7 +50,7 @@ class MainServer : public QObject
 
   private:
     void HandleAnnounce(QStringList &slist, QStringList commands, 
-                        QSocket *socket);
+                        RefSocket *socket);
     void HandleDone(QSocket *socket);
 
     void HandleIsActiveBackendQuery(QStringList &slist, PlaybackSock *pbs);

@@ -6,11 +6,12 @@ using namespace std;
 
 #include "playbacksock.h"
 #include "programinfo.h"
+#include "server.h"
 
 #include "libmyth/mythcontext.h"
 #include "libmyth/util.h"
 
-PlaybackSock::PlaybackSock(QSocket *lsock, QString lhostname, bool wantevents)
+PlaybackSock::PlaybackSock(RefSocket *lsock, QString lhostname, bool wantevents)
 {
     QString localhostname = gContext->GetHostName();
 
@@ -35,6 +36,8 @@ PlaybackSock::~PlaybackSock()
 
 bool PlaybackSock::SendReceiveStringList(QStringList &strlist)
 {
+    sock->UpRef();
+
     sockLock.lock();
     expectingreply = true;
 
@@ -55,6 +58,8 @@ bool PlaybackSock::SendReceiveStringList(QStringList &strlist)
 
     expectingreply = false;
     sockLock.unlock();
+
+    sock->DownRef();
 
     return ok;
 }

@@ -109,9 +109,9 @@ macx {
 #DEFINES += USING_DIRECTX
 
 # OpenGL support for vertical retrace sync
-DEFINES += USING_OPENGL_VSYNC
-EXTRA_LIBS += -lGL -lGLU
-CONFIG += using_opengl
+#DEFINES += USING_OPENGL_VSYNC
+#EXTRA_LIBS += -lGL -lGLU
+#CONFIG += using_opengl
 
 # Allow use of XrandR to change display resolutions
 #CONFIG += using_xrandr

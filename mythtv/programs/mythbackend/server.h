@@ -10,7 +10,10 @@ class RefSocket : public QSocket
     RefSocket(QObject *parent = 0, const char *name = 0) 
            : QSocket(parent, name), refCount(0) { }
     void UpRef(void) { refCount++; }
-    void DownRef(void) { refCount--; if (refCount < 0) delete this; }
+    bool DownRef(void) { refCount--; 
+                         if (refCount < 0) { delete this; return true; }
+                         return false; 
+                       }
 
   private:
     int refCount;

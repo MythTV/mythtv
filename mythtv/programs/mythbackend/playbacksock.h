@@ -6,14 +6,15 @@
 #include <qmutex.h>
 
 class ProgramInfo;
+class RefSocket;
 
 class PlaybackSock
 {
   public:
-    PlaybackSock(QSocket *lsock, QString lhostname, bool wantevents);
+    PlaybackSock(RefSocket *lsock, QString lhostname, bool wantevents);
    ~PlaybackSock();
 
-    QSocket *getSocket(void) { return sock; }
+    RefSocket *getSocket(void) { return sock; }
     QString getHostname(void) { return hostname; }
 
     bool isLocal(void) { return local; }
@@ -45,7 +46,7 @@ class PlaybackSock
   private:
     bool SendReceiveStringList(QStringList &strlist);
 
-    QSocket *sock;
+    RefSocket *sock;
     QString hostname;
     QString ip;
 

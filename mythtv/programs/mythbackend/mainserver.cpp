@@ -182,7 +182,7 @@ void MainServer::readSocket(void)
     readReadyLock.unlock();
 }
 
-void MainServer::ProcessRequest(QSocket *sock)
+void MainServer::ProcessRequest(RefSocket *sock)
 {
     if (sock->bytesAvailable() <= 0)
         return;
@@ -464,19 +464,35 @@ void MainServer::customEvent(QCustomEvent *e)
             sendGlobal = true;
         }
 
+        QPtrList<PlaybackSock> sentSet;
+
         vector<PlaybackSock *>::iterator iter = playbackList.begin();
         for (; iter != playbackList.end(); iter++)
         {
             PlaybackSock *pbs = (*iter);
 
+            if (sentSet.containsRef(pbs))
+                continue;
+
+            sentSet.append(pbs);
+
+            RefSocket *sock = pbs->getSocket();
+            sock->UpRef();
+
             if (sendGlobal)
             {
                 if (pbs->isSlaveBackend())
-                    WriteStringList(pbs->getSocket(), broadcast);
+                    WriteStringList(sock, broadcast);
             }
             else if (pbs->wantsEvents())
             {
-                WriteStringList(pbs->getSocket(), broadcast);
+                WriteStringList(sock, broadcast);
+            }
+
+            if (sock->DownRef())
+            {
+                // was deleted elsewhere, so the iterator's invalid.
+                iter = playbackList.begin();
             }
         }
     }
@@ -501,7 +517,7 @@ void MainServer::HandleVersion(QSocket *socket,QString version)
 }
 
 void MainServer::HandleAnnounce(QStringList &slist, QStringList commands, 
-                                QSocket *socket)
+                                RefSocket *socket)
 {
     QStringList retlist = "OK";
 
@@ -2783,7 +2799,7 @@ void MainServer::masterServerDied(void)
 
 void MainServer::reconnectTimeout(void)
 {
-    QSocket *masterServerSock = new QSocket();
+    RefSocket *masterServerSock = new RefSocket();
 
     QString server = gContext->GetSetting("MasterServerIP", "localhost");
     int port = gContext->GetNumSetting("MasterServerPort", 6543);
