@@ -220,8 +220,8 @@ void WriteDefaults(QSqlDatabase* db) {
 
 int main(int argc, char **argv)
 {
-	QString lcd_host;
-	int		lcd_port;
+    QString lcd_host;
+    int lcd_port;
 
     QApplication a(argc, argv);
 
@@ -253,12 +253,12 @@ int main(int argc, char **argv)
 
     gContext->LoadQtConfig();
 
-	lcd_host = gContext->GetSetting("LCDHost");
-	lcd_port = gContext->GetNumSetting("LCDPort");
-	if(lcd_host.length() > 0 && lcd_port > 1024)
-	{
-		gContext->LCDconnectToHost(lcd_host, lcd_port);
-	}
+    lcd_host = gContext->GetSetting("LCDHost");
+    lcd_port = gContext->GetNumSetting("LCDPort");
+    if (lcd_host.length() > 0 && lcd_port > 1024)
+    {
+        gContext->LCDconnectToHost(lcd_host, lcd_port);
+    }
 
     qApp->unlock();
 

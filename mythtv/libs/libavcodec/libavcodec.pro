@@ -58,6 +58,10 @@ contains( TARGET_MMX, yes ) {
 #    }
 }
 
+#contains( CONFIG_PP, yes ) {
+#    SOURCES += libpostproc/postprocess.c
+#}
+
 contains( TARGET_ARCH_ARMV4L, yes ) {
     SOURCES += armv4l/jrevdct_arm.S armv4l/dsputil_arm.c
 }

@@ -16,8 +16,8 @@ extern "C" {
 
 #define LIBAVCODEC_VERSION_INT 0x000406
 #define LIBAVCODEC_VERSION     "0.4.6"
-#define LIBAVCODEC_BUILD       4655
-#define LIBAVCODEC_BUILD_STR   "4655"
+#define LIBAVCODEC_BUILD       4656
+#define LIBAVCODEC_BUILD_STR   "4656"
 
 enum CodecID {
     CODEC_ID_NONE, 
@@ -86,6 +86,7 @@ enum PixelFormat {
     PIX_FMT_GRAY8,
     PIX_FMT_MONOWHITE, /* 0 is white */
     PIX_FMT_MONOBLACK, /* 0 is black */
+    PIX_FMT_PAL8,      /* 8 bit with RGBA palette */
     PIX_FMT_NB,
 };
 
@@ -392,7 +393,7 @@ typedef struct AVCodecContext {
      * decoding: set by user.
      */
     void (*draw_horiz_band)(struct AVCodecContext *s,
-                            UINT8 **src_ptr, int linesize,
+                            uint8_t **src_ptr, int linesize,
                             int y, int width, int height);
 
     /* audio only */
@@ -949,26 +950,63 @@ typedef struct AVCodecContext {
     enum PixelFormat (*get_format)(struct AVCodecContext *s, enum PixelFormat * fmt);
 } AVCodecContext;
 
+//void avcodec_getopt(AVCodecContext* avctx, const char* str, avc_config_t** config);
+
+typedef struct AVOption {
+    /** options' name */
+    const char *name; /* if name is NULL, it indicates a link to next */
+    /** short English text help */
+    const char *help;
+    /** offset to context structure where the parsed value should be stored */
+    int offset;
+    /** options' type */
+    int type;
+#define FF_OPT_TYPE_BOOL 1     // boolean - true,1,on  (or simply presence)
+#define FF_OPT_TYPE_DOUBLE 2   // double
+#define FF_OPT_TYPE_INT 3      // integer
+#define FF_OPT_TYPE_STRING 4   // string (finished with \0)
+#define FF_OPT_TYPE_MASK 0x1f	// mask for types - upper bits are various flags
+//#define FF_OPT_TYPE_EXPERT 0x20 // flag for expert option
+#define FF_OPT_TYPE_FLAG (FF_OPT_TYPE_BOOL | 0x40)
+#define FF_OPT_TYPE_RCOVERRIDE (FF_OPT_TYPE_STRING | 0x80)
+    /** min value  (min == max   ->  no limits) */
+    double min;
+    /** maximum value for double/int */
+    double max;
+    /** default boo [0,1]l/double/int value */
+    double defval;
+    /**
+     * default string value (with optional semicolon delimited extra option-list
+     * i.e.   option1;option2;option3
+     * defval might select other then first argument as default
+     */
+    const char *defstr;
+    const struct AVOption *sub; /* used when name is NULL */
+    /* when it's NULL return to previous level (or finish reading) */
+#define FF_OPT_MAX_DEPTH 10
+} AVOption;
+
 typedef struct AVCodec {
     const char *name;
     int type;
     int id;
     int priv_data_size;
     int (*init)(AVCodecContext *);
-    int (*encode)(AVCodecContext *, UINT8 *buf, int buf_size, void *data);
+    int (*encode)(AVCodecContext *, uint8_t *buf, int buf_size, void *data);
     int (*close)(AVCodecContext *);
     int (*decode)(AVCodecContext *, void *outdata, int *outdata_size,
-                  UINT8 *buf, int buf_size);
+                  uint8_t *buf, int buf_size);
     int capabilities;
+    const AVOption *options;
     struct AVCodec *next;
 } AVCodec;
 
-/** 
+/**
  * four components are given, that's all.
  * the last component is alpha
  */
 typedef struct AVPicture {
-    UINT8 *data[4];
+    uint8_t *data[4];
     int linesize[4];
 } AVPicture;
 
@@ -1072,7 +1110,7 @@ void img_resample(ImgReSampleContext *s,
 
 void img_resample_close(ImgReSampleContext *s);
 
-int avpicture_fill(AVPicture *picture, UINT8 *ptr,
+int avpicture_fill(AVPicture *picture, uint8_t *ptr,
                    int pix_fmt, int width, int height);
 int avpicture_get_size(int pix_fmt, int width, int height);
 void avcodec_get_chroma_sub_sample(int pix_fmt, int *h_shift, int *v_shift);
@@ -1114,18 +1152,18 @@ int avcodec_default_get_buffer(AVCodecContext *s, AVFrame *pic);
 void avcodec_default_release_buffer(AVCodecContext *s, AVFrame *pic);
 
 int avcodec_open(AVCodecContext *avctx, AVCodec *codec);
-int avcodec_decode_audio(AVCodecContext *avctx, INT16 *samples, 
+int avcodec_decode_audio(AVCodecContext *avctx, int16_t *samples, 
                          int *frame_size_ptr,
-                         UINT8 *buf, int buf_size);
+                         uint8_t *buf, int buf_size);
 int avcodec_decode_video(AVCodecContext *avctx, AVFrame *picture, 
                          int *got_picture_ptr,
-                         UINT8 *buf, int buf_size);
-int avcodec_parse_frame(AVCodecContext *avctx, UINT8 **pdata, 
+                         uint8_t *buf, int buf_size);
+int avcodec_parse_frame(AVCodecContext *avctx, uint8_t **pdata, 
                         int *data_size_ptr,
-                        UINT8 *buf, int buf_size);
-int avcodec_encode_audio(AVCodecContext *avctx, UINT8 *buf, int buf_size, 
+                        uint8_t *buf, int buf_size);
+int avcodec_encode_audio(AVCodecContext *avctx, uint8_t *buf, int buf_size, 
                          const short *samples);
-int avcodec_encode_video(AVCodecContext *avctx, UINT8 *buf, int buf_size, 
+int avcodec_encode_video(AVCodecContext *avctx, uint8_t *buf, int buf_size, 
                          const AVFrame *pict);
 
 int avcodec_close(AVCodecContext *avctx);
@@ -1134,40 +1172,7 @@ void avcodec_register_all(void);
 
 void avcodec_flush_buffers(AVCodecContext *avctx);
 
-typedef struct {
-    /** options' name with default value*/
-    const char* name;
-    /** English text help */
-    const char* help;
-    /** type of variable */
-    int type;
-#define FF_CONF_TYPE_BOOL 1     // boolean - true,1,on  (or simply presence)
-#define FF_CONF_TYPE_DOUBLE 2   // double
-#define FF_CONF_TYPE_INT 3      // integer
-#define FF_CONF_TYPE_STRING 4   // string (finished with \0)
-#define FF_CONF_TYPE_MASK 0x1f	// mask for types - upper bits are various flags
-#define FF_CONF_TYPE_EXPERT 0x20 // flag for expert option
-#define FF_CONF_TYPE_FLAG (FF_CONF_TYPE_BOOL | 0x40)
-#define FF_CONF_TYPE_RCOVERIDE (FF_CONF_TYPE_STRING | 0x80)
-    /** where the parsed value should be stored */
-    void* val;
-    /** min value  (min == max   ->  no limits) */
-    double min;
-    /** maximum value for double/int */
-    double max;
-    /** default boo [0,1]l/double/int value */
-    double defval;
-    /**
-     * default string value (with optional semicolon delimited extra option-list
-     * i.e.   option1;option2;option3
-     * defval might select other then first argument as default
-     */
-    const char* defstr;
-    /** char* list of supported codecs (i.e. ",msmpeg4,h263," NULL - everything */
-    const char* supported;
-} avc_config_t;
 
-void avcodec_getopt(AVCodecContext* avctx, const char* str, avc_config_t** config);
 
 /**
  * Interface for 0.5.0 version
@@ -1253,7 +1258,7 @@ void av_free(void *ptr);
 char *av_strdup(const char *s);
 void __av_freep(void **ptr);
 #define av_freep(p) __av_freep((void **)(p))
-void *av_fast_realloc(void *ptr, int *size, int min_size);
+void *av_fast_realloc(void *ptr, unsigned int *size, unsigned int min_size);
 /* for static data only */
 /* call av_free_static to release all staticaly allocated tables */
 void av_free_static(void);

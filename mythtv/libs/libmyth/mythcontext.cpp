@@ -48,10 +48,6 @@ MythContext::MythContext(bool gui)
     serverSock = NULL;
     expectingReply = false;
 	
-	//
-	//	thor feb 7 2003
-	//
-	
     lcd_device = new LCD();
 }
 
@@ -59,7 +55,7 @@ MythContext::~MythContext()
 {
     imageCache.clear();
 
-;    if (m_settings)
+    if (m_settings)
         delete m_settings;
     if (m_qtThemeSettings)
         delete m_qtThemeSettings;
@@ -545,50 +541,44 @@ void MythContext::dispatch(MythEvent &e)
     }
 }
 
-//
-//	thor feb 7 2003
-//
-//	Straight wrapping of the LCD calls
-//	(this may get more complicated at some point)
-//
-
 void MythContext::LCDconnectToHost(QString hostname, unsigned int port)
 {
-	lcd_device->connectToHost(hostname, port);
+    lcd_device->connectToHost(hostname, port);
 }
 
 void MythContext::LCDswitchToTime()
 {
-	lcd_device->switchToTime();
+    lcd_device->switchToTime();
 }
 
 void MythContext::LCDswitchToMusic(QString artist, QString track)
 {
-	lcd_device->switchToMusic(artist, track);
+    lcd_device->switchToMusic(artist, track);
 }
 
 void MythContext::LCDsetLevels(int numb_levels, float *levels)
 {
-	lcd_device->setLevels(numb_levels, levels);
+    lcd_device->setLevels(numb_levels, levels);
 }
 
-void MythContext::LCDswitchToChannel(QString channum, QString title, QString subtitle)
+void MythContext::LCDswitchToChannel(QString channum, QString title, 
+                                     QString subtitle)
 {
-	lcd_device->switchToChannel(channum, title, subtitle);
+    lcd_device->switchToChannel(channum, title, subtitle);
 }
 
 void MythContext::LCDsetChannelProgress(float percentViewed)
 {
-	lcd_device->setChannelProgress(percentViewed);
+    lcd_device->setChannelProgress(percentViewed);
 }
 
 void MythContext::LCDswitchToNothing()
 {
-	lcd_device->switchToNothing();
+    lcd_device->switchToNothing();
 }
 
 void MythContext::LCDpopMenu(QString menu_choice, QString menu_title)
 {
-	lcd_device->popMenu(menu_choice, menu_title);
+    lcd_device->popMenu(menu_choice, menu_title);
 }
 

@@ -55,7 +55,6 @@ ThemedMenu::ThemedMenu(const char *cdir, const char *menufile,
     parseSettings(dir, "theme.xml");
 
     parseMenu(menufile);
-    
 }
 
 ThemedMenu::~ThemedMenu(void)
@@ -468,7 +467,6 @@ void ThemedMenu::parseTitle(QString dir, QDomElement &element)
                 QPixmap *tmppix = gContext->LoadScalePixmap(titlepath);
 
                 QString name = info.attribute("mode", "");
-                
                 if (name != "")
                 {
                     titleIcons[name] = *tmppix;
@@ -826,9 +824,9 @@ void ThemedMenu::parseMenu(QString menuname)
         drawTitle = false;
     }
 
-	titleText = "MYTH-";
-	titleText +=  menumode;
-	gContext->LCDpopMenu(activebutton->text, titleText);
+    titleText = "MYTH-";
+    titleText +=  menumode;
+    gContext->LCDpopMenu(activebutton->text, titleText);
 
     selection = "";
     update(menuRect());

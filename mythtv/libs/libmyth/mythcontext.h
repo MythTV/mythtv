@@ -93,29 +93,14 @@ class MythContext : public QObject
 
     QImage *CacheRemotePixmap(const QString &url, bool needevents = true);
 
-	//
-	//	thor feb 7 2003
-	//
-	//	LCD access methods
-	//
-	//  Perhaps I should have just made *lcd_device public
-	//	and then accessed things directly as in:
-	//
-	//			gContext->lcd_device->connectToHost()
-	//
-	//	maybe ... but we might eventually want to configure things
-	//	per lcd device from settings.txt within gContext, so I think 
-	//	this is better.
-	//
-	
-	void LCDconnectToHost(QString hostname, unsigned int port);
-	void LCDswitchToTime();
-	void LCDswitchToMusic(QString artist, QString track);
-	void LCDsetLevels(int numb_levels, float *levels);
-	void LCDswitchToChannel(QString channum, QString title, QString subtitle);
-	void LCDsetChannelProgress(float percentViewed);
-	void LCDswitchToNothing();
-	void LCDpopMenu(QString menu_choice, QString menu_title);
+    void LCDconnectToHost(QString hostname, unsigned int port);
+    void LCDswitchToTime();
+    void LCDswitchToMusic(QString artist, QString track);
+    void LCDsetLevels(int numb_levels, float *levels);
+    void LCDswitchToChannel(QString channum, QString title, QString subtitle);
+    void LCDsetChannelProgress(float percentViewed);
+    void LCDswitchToNothing();
+    void LCDpopMenu(QString menu_choice, QString menu_title);
 	
   private slots:
     void readSocket();
@@ -148,15 +133,7 @@ class MythContext : public QObject
 
     QMap<QString, QImage> imageCache;
 
-	//
-	//	thor feb 7 2003
-	//
-	//	One LCD device per MythContext?
-	//	(this may change)
-	//	    
-
     LCD *lcd_device;
-
 };
 
 extern MythContext *gContext;

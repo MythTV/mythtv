@@ -29,14 +29,14 @@
 
 typedef struct PixFmtInfo {
     const char *name;
-    UINT8 nb_components;     /* number of components in AVPicture array  */
-    UINT8 is_yuv : 1;    /* true if YUV instead of RGB color space */
-    UINT8 is_packed : 1; /* true if multiple components in same word */
-    UINT8 is_paletted : 1; /* true if paletted */
-    UINT8 is_alpha : 1;    /* true if alpha can be specified */
-    UINT8 is_gray : 1;     /* true if gray or monochrome format */
-    UINT8 x_chroma_shift; /* X chroma subsampling factor is 2 ^ shift */
-    UINT8 y_chroma_shift; /* Y chroma subsampling factor is 2 ^ shift */
+    uint8_t nb_components;     /* number of components in AVPicture array  */
+    uint8_t is_yuv : 1;    /* true if YUV instead of RGB color space */
+    uint8_t is_packed : 1; /* true if multiple components in same word */
+    uint8_t is_paletted : 1; /* true if paletted */
+    uint8_t is_alpha : 1;    /* true if alpha can be specified */
+    uint8_t is_gray : 1;     /* true if gray or monochrome format */
+    uint8_t x_chroma_shift; /* X chroma subsampling factor is 2 ^ shift */
+    uint8_t y_chroma_shift; /* Y chroma subsampling factor is 2 ^ shift */
 } PixFmtInfo;
 
 /* this table gives more information about formats */
@@ -108,6 +108,12 @@ static PixFmtInfo pix_fmt_info[PIX_FMT_NB] = {
         .name = "monob",
         .nb_components = 1, .is_packed = 1, .is_gray = 1,
     },
+
+    /* paletted formats */
+    [PIX_FMT_PAL8] = {
+        .name = "pal8",
+        .nb_components = 1, .is_packed = 1, .is_paletted = 1,
+    },
 };
 
 void avcodec_get_chroma_sub_sample(int pix_fmt, int *h_shift, int *v_shift)
@@ -130,7 +136,7 @@ const char *avcodec_get_pix_fmt_name(int pix_fmt)
 }
 
 /* Picture field are filled with 'ptr' addresses. Also return size */
-int avpicture_fill(AVPicture *picture, UINT8 *ptr,
+int avpicture_fill(AVPicture *picture, uint8_t *ptr,
                    int pix_fmt, int width, int height)
 {
     int size, w2, h2, size2;
@@ -188,10 +194,19 @@ int avpicture_fill(AVPicture *picture, UINT8 *ptr,
         picture->data[2] = NULL;
         picture->linesize[0] = (width + 7) >> 3;
         return picture->linesize[0] * height;
+    case PIX_FMT_PAL8:
+        size2 = (size + 3) & ~3;
+        picture->data[0] = ptr;
+        picture->data[1] = ptr + size2; /* palette is stored here as 256 32 bit words */
+        picture->data[2] = NULL;
+        picture->linesize[0] = width;
+        picture->linesize[1] = 4;
+        return size2 + 256 * 4;
     default:
         picture->data[0] = NULL;
         picture->data[1] = NULL;
         picture->data[2] = NULL;
+        picture->data[3] = NULL;
         return -1;
     }
 }
@@ -208,9 +223,9 @@ int avpicture_get_size(int pix_fmt, int width, int height)
 static void yuv422_to_yuv420p(AVPicture *dst, AVPicture *src,
                               int width, int height)
 {
-    UINT8 *lum, *cb, *cr;
+    uint8_t *lum, *cb, *cr;
     int x, y;
-    const UINT8 *p;
+    const uint8_t *p;
  
     lum = dst->data[0];
     cb = dst->data[1];
@@ -243,12 +258,12 @@ static void yuv422_to_yuv420p(AVPicture *dst, AVPicture *src,
 
 /* XXX: use generic filter ? */
 /* 1x2 -> 1x1 */
-static void shrink2(UINT8 *dst, int dst_wrap, 
-                    UINT8 *src, int src_wrap,
+static void shrink2(uint8_t *dst, int dst_wrap, 
+                    uint8_t *src, int src_wrap,
                     int width, int height)
 {
     int w;
-    UINT8 *s1, *s2, *d;
+    uint8_t *s1, *s2, *d;
 
     for(;height > 0; height--) {
         s1 = src;
@@ -275,12 +290,12 @@ static void shrink2(UINT8 *dst, int dst_wrap,
 }
 
 /* 2x2 -> 1x1 */
-static void shrink22(UINT8 *dst, int dst_wrap, 
-                     UINT8 *src, int src_wrap,
+static void shrink22(uint8_t *dst, int dst_wrap, 
+                     uint8_t *src, int src_wrap,
                      int width, int height)
 {
     int w;
-    UINT8 *s1, *s2, *d;
+    uint8_t *s1, *s2, *d;
 
     for(;height > 0; height--) {
         s1 = src;
@@ -307,12 +322,12 @@ static void shrink22(UINT8 *dst, int dst_wrap,
 }
 
 /* 1x1 -> 2x2 */
-static void grow22(UINT8 *dst, int dst_wrap,
-                     UINT8 *src, int src_wrap,
+static void grow22(uint8_t *dst, int dst_wrap,
+                     uint8_t *src, int src_wrap,
                      int width, int height)
 {
     int w;
-    UINT8 *s1, *d;
+    uint8_t *s1, *d;
 
     for(;height > 0; height--) {
         s1 = src;
@@ -335,12 +350,12 @@ static void grow22(UINT8 *dst, int dst_wrap,
 }
 
 /* 1x2 -> 2x1 */
-static void conv411(UINT8 *dst, int dst_wrap, 
-                    UINT8 *src, int src_wrap,
+static void conv411(uint8_t *dst, int dst_wrap, 
+                    uint8_t *src, int src_wrap,
                     int width, int height)
 {
     int w, c;
-    UINT8 *s1, *s2, *d;
+    uint8_t *s1, *s2, *d;
 
     for(;height > 0; height--) {
         s1 = src;
@@ -359,8 +374,8 @@ static void conv411(UINT8 *dst, int dst_wrap,
     }
 }
 
-static void img_copy(UINT8 *dst, int dst_wrap, 
-                     UINT8 *src, int src_wrap,
+static void img_copy(uint8_t *dst, int dst_wrap, 
+                     uint8_t *src, int src_wrap,
                      int width, int height)
 {
     for(;height > 0; height--) {
@@ -392,9 +407,9 @@ static void img_copy(UINT8 *dst, int dst_wrap,
 static void yuv420p_to_ ## rgb_name (AVPicture *dst, AVPicture *src,    \
                                      int width, int height)             \
 {                                                                       \
-    UINT8 *y1_ptr, *y2_ptr, *cb_ptr, *cr_ptr, *d, *d1, *d2;             \
+    uint8_t *y1_ptr, *y2_ptr, *cb_ptr, *cr_ptr, *d, *d1, *d2;             \
     int w, y, cb, cr, r_add, g_add, b_add, width2;                      \
-    UINT8 *cm = cropTbl + MAX_NEG_CROP;                                 \
+    uint8_t *cm = cropTbl + MAX_NEG_CROP;                                 \
     unsigned int r, g, b;                                               \
                                                                         \
     d = dst->data[0];                                                   \
@@ -506,9 +521,9 @@ static void yuv420p_to_ ## rgb_name (AVPicture *dst, AVPicture *src,    \
 static void yuv422p_to_ ## rgb_name (AVPicture *dst, AVPicture *src,    \
                                     int width, int height)              \
 {                                                                       \
-    UINT8 *y1_ptr, *cb_ptr, *cr_ptr, *d, *d1;                           \
+    uint8_t *y1_ptr, *cb_ptr, *cr_ptr, *d, *d1;                           \
     int w, y, cb, cr, r_add, g_add, b_add, width2;                      \
-    UINT8 *cm = cropTbl + MAX_NEG_CROP;                                 \
+    uint8_t *cm = cropTbl + MAX_NEG_CROP;                                 \
     unsigned int r, g, b;                                               \
                                                                         \
     d = dst->data[0];                                                   \
@@ -567,8 +582,8 @@ static void rgb_name ## _to_yuv420p(AVPicture *dst, AVPicture *src,     \
 {                                                                       \
     int wrap, wrap3, x, y;                                              \
     int r, g, b, r1, g1, b1;                                            \
-    UINT8 *lum, *cb, *cr;                                               \
-    const UINT8 *p;                                                     \
+    uint8_t *lum, *cb, *cr;                                               \
+    const uint8_t *p;                                                     \
                                                                         \
     lum = dst->data[0];                                                 \
     cb = dst->data[1];                                                  \
@@ -678,6 +693,38 @@ static void gray_to_ ## rgb_name(AVPicture *dst, AVPicture *src,        \
         p += src_wrap;                                                  \
         q += dst_wrap;                                                  \
     }                                                                   \
+}                                                                       \
+                                                                        \
+static void pal8_to_ ## rgb_name(AVPicture *dst, AVPicture *src,        \
+                                 int width, int height)                 \
+{                                                                       \
+    const unsigned char *p;                                             \
+    unsigned char *q;                                                   \
+    int r, g, b, dst_wrap, src_wrap;                                    \
+    int x, y;                                                           \
+    uint32_t v;\
+    const uint32_t *palette;\
+\
+    p = src->data[0];                                                   \
+    src_wrap = src->linesize[0] - width;                                \
+    palette = (uint32_t *)src->data[1];\
+                                                                        \
+    q = dst->data[0];                                                   \
+    dst_wrap = dst->linesize[0] - BPP * width;                          \
+                                                                        \
+    for(y=0;y<height;y++) {                                             \
+        for(x=0;x<width;x++) {                                          \
+            v = palette[p[0]];\
+            r = (v >> 16) & 0xff;\
+            g = (v >> 8) & 0xff;\
+            b = (v) & 0xff;\
+            RGB_OUT(q, r, g, b);                                        \
+            q += BPP;                                                   \
+            p ++;                                                       \
+        }                                                               \
+        p += src_wrap;                                                  \
+        q += dst_wrap;                                                  \
+    }                                                                   \
 }
 
 /* copy bit n to bits 0 ... n - 1 */
@@ -692,7 +739,7 @@ static inline unsigned int bitcopy_n(unsigned int a, int n)
 
 #define RGB_IN(r, g, b, s)\
 {\
-    unsigned int v = ((UINT16 *)(s))[0];\
+    unsigned int v = ((const uint16_t *)(s))[0];\
     r = bitcopy_n(v >> (10 - 3), 3);\
     g = bitcopy_n(v >> (5 - 3), 3);\
     b = bitcopy_n(v << 3, 3);\
@@ -700,7 +747,7 @@ static inline unsigned int bitcopy_n(unsigned int a, int n)
 
 #define RGB_OUT(d, r, g, b)\
 {\
-    ((UINT16 *)(d))[0] = ((r >> 3) << 10) | ((g >> 3) << 5) | (b >> 3) | 0x8000;\
+    ((uint16_t *)(d))[0] = ((r >> 3) << 10) | ((g >> 3) << 5) | (b >> 3) | 0x8000;\
 }
 
 #define BPP 2
@@ -715,7 +762,7 @@ RGB_FUNCTIONS(rgb555)
 
 #define RGB_IN(r, g, b, s)\
 {\
-    unsigned int v = ((UINT16 *)(s))[0];\
+    unsigned int v = ((const uint16_t *)(s))[0];\
     r = bitcopy_n(v >> (11 - 3), 3);\
     g = bitcopy_n(v >> (5 - 2), 2);\
     b = bitcopy_n(v << 3, 3);\
@@ -723,7 +770,7 @@ RGB_FUNCTIONS(rgb555)
 
 #define RGB_OUT(d, r, g, b)\
 {\
-    ((UINT16 *)(d))[0] = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);\
+    ((uint16_t *)(d))[0] = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);\
 }
 
 #define BPP 2
@@ -786,7 +833,7 @@ RGB_FUNCTIONS(rgb24)
 
 #define RGB_IN(r, g, b, s)\
 {\
-    unsigned int v = ((UINT32 *)(s))[0];\
+    unsigned int v = ((const uint32_t *)(s))[0];\
     r = (v >> 16) & 0xff;\
     g = (v >> 8) & 0xff;\
     b = v & 0xff;\
@@ -794,7 +841,7 @@ RGB_FUNCTIONS(rgb24)
 
 #define RGB_OUT(d, r, g, b)\
 {\
-    ((UINT32 *)(d))[0] = (0xff << 24) | (r << 16) | (g << 8) | b;\
+    ((uint32_t *)(d))[0] = (0xff << 24) | (r << 16) | (g << 8) | b;\
 }
 
 #define BPP 4
@@ -924,8 +971,8 @@ static void gray_to_mono(AVPicture *dst, AVPicture *src,
                          int width, int height, int xor_mask)
 {
     int n;
-    const UINT8 *s;
-    UINT8 *d;
+    const uint8_t *s;
+    uint8_t *d;
     int j, b, v, n1, src_wrap, dst_wrap, y;
 
     s = src->data[0];
@@ -977,6 +1024,58 @@ static void gray_to_monoblack(AVPicture *dst, AVPicture *src,
     gray_to_mono(dst, src, width, height, 0x00);
 }
 
+/* this is maybe slow, but allows for extensions */
+static inline unsigned char gif_clut_index(uint8_t r, uint8_t g, uint8_t b)
+{
+    return ((((r)/47)%6)*6*6+(((g)/47)%6)*6+(((b)/47)%6));
+}
+
+/* XXX: put jpeg quantize code instead */
+static void rgb24_to_pal8(AVPicture *dst, AVPicture *src,
+                          int width, int height)
+{
+    const unsigned char *p;
+    unsigned char *q;
+    int r, g, b, dst_wrap, src_wrap;
+    int x, y, i;
+    static const uint8_t pal_value[6] = { 0x00, 0x33, 0x66, 0x99, 0xcc, 0xff };
+    uint32_t *pal;
+
+    p = src->data[0];
+    src_wrap = src->linesize[0] - 3 * width;
+
+    q = dst->data[0];
+    dst_wrap = dst->linesize[0] - width;
+
+    for(y=0;y<height;y++) {
+        for(x=0;x<width;x++) {
+            r = p[0];
+            g = p[1];
+            b = p[2];
+
+            q[0] = gif_clut_index(r, g, b);
+            q++;
+            p += 3;
+        }
+        p += src_wrap;
+        q += dst_wrap;
+    }
+
+    /* build palette */
+    pal = (uint32_t *)dst->data[1];
+    i = 0;
+    for(r = 0; r < 6; r++) {
+        for(g = 0; g < 6; g++) {
+            for(b = 0; b < 6; b++) {
+                pal[i++] = (0xff << 24) | (pal_value[r] << 16) | 
+                    (pal_value[g] << 8) | pal_value[b];
+            }
+        }
+    }
+    while (i < 256)
+        pal[i++] = 0;
+}
+        
 typedef struct ConvertEntry {
     void (*convert)(AVPicture *dst, AVPicture *src, int width, int height);
 } ConvertEntry;
@@ -1038,6 +1137,9 @@ static ConvertEntry convert_table[PIX_FMT_NB][PIX_FMT_NB] = {
         },
         [PIX_FMT_GRAY8] = { 
             .convert = rgb24_to_gray
+        },
+        [PIX_FMT_PAL8] = { 
+            .convert = rgb24_to_pal8
         },
     },
     [PIX_FMT_RGBA32] = {
@@ -1105,12 +1207,29 @@ static ConvertEntry convert_table[PIX_FMT_NB][PIX_FMT_NB] = {
             .convert = monoblack_to_gray
         },
     },
+    [PIX_FMT_PAL8] = {
+        [PIX_FMT_RGB555] = { 
+            .convert = pal8_to_rgb555
+        },
+        [PIX_FMT_RGB565] = { 
+            .convert = pal8_to_rgb565
+        },
+        [PIX_FMT_BGR24] = { 
+            .convert = pal8_to_bgr24
+        },
+        [PIX_FMT_RGB24] = { 
+            .convert = pal8_to_rgb24
+        },
+        [PIX_FMT_RGBA32] = { 
+            .convert = pal8_to_rgba32
+        },
+    },
 };
 
 static int avpicture_alloc(AVPicture *picture,
                            int pix_fmt, int width, int height)
 {
-    int size;
+    unsigned int size;
     void *ptr;
 
     size = avpicture_get_size(pix_fmt, width, height);
@@ -1211,8 +1330,8 @@ int img_convert(AVPicture *dst, int dst_pix_fmt,
     /* YUV to YUV */
     if (dst_pix->is_yuv && src_pix->is_yuv) {
         int x_shift, y_shift, w, h;
-        void (*resize_func)(UINT8 *dst, int dst_wrap, 
-                            UINT8 *src, int src_wrap,
+        void (*resize_func)(uint8_t *dst, int dst_wrap, 
+                            uint8_t *src, int src_wrap,
                             int width, int height);
 
         /* compute chroma size of the smallest dimensions */
@@ -1328,11 +1447,11 @@ int img_convert(AVPicture *dst, int dst_pix_fmt,
 #endif
 
 /* filter parameters: [-1 4 2 4 -1] // 8 */
-static void deinterlace_line(UINT8 *dst, UINT8 *lum_m4, UINT8 *lum_m3, UINT8 *lum_m2, UINT8 *lum_m1, UINT8 *lum,
+static void deinterlace_line(uint8_t *dst, uint8_t *lum_m4, uint8_t *lum_m3, uint8_t *lum_m2, uint8_t *lum_m1, uint8_t *lum,
                                 int size)
 {
 #ifndef HAVE_MMX
-    UINT8 *cm = cropTbl + MAX_NEG_CROP;
+    uint8_t *cm = cropTbl + MAX_NEG_CROP;
     int sum;
 
     for(;size > 0;size--) {
@@ -1371,11 +1490,11 @@ static void deinterlace_line(UINT8 *dst, UINT8 *lum_m4, UINT8 *lum_m3, UINT8 *lu
     }
 #endif
 }
-static void deinterlace_line_inplace(UINT8 *lum_m4, UINT8 *lum_m3, UINT8 *lum_m2, UINT8 *lum_m1, UINT8 *lum,
+static void deinterlace_line_inplace(uint8_t *lum_m4, uint8_t *lum_m3, uint8_t *lum_m2, uint8_t *lum_m1, uint8_t *lum,
                              int size)
 {
 #ifndef HAVE_MMX
-    UINT8 *cm = cropTbl + MAX_NEG_CROP;
+    uint8_t *cm = cropTbl + MAX_NEG_CROP;
     int sum;
 
     for(;size > 0;size--) {
@@ -1417,11 +1536,11 @@ static void deinterlace_line_inplace(UINT8 *lum_m4, UINT8 *lum_m3, UINT8 *lum_m2
 /* deinterlacing : 2 temporal taps, 3 spatial taps linear filter. The
    top field is copied as is, but the bottom field is deinterlaced
    against the top field. */
-static void deinterlace_bottom_field(UINT8 *dst, int dst_wrap,
-                                    UINT8 *src1, int src_wrap,
+static void deinterlace_bottom_field(uint8_t *dst, int dst_wrap,
+                                    uint8_t *src1, int src_wrap,
                                     int width, int height)
 {
-    UINT8 *src_m2, *src_m1, *src_0, *src_p1, *src_p2;
+    uint8_t *src_m2, *src_m1, *src_0, *src_p1, *src_p2;
     int y;
 
     src_m2 = src1;
@@ -1446,13 +1565,13 @@ static void deinterlace_bottom_field(UINT8 *dst, int dst_wrap,
     deinterlace_line(dst,src_m2,src_m1,src_0,src_0,src_0,width);
 }
 
-static void deinterlace_bottom_field_inplace(UINT8 *src1, int src_wrap,
+static void deinterlace_bottom_field_inplace(uint8_t *src1, int src_wrap,
                                      int width, int height)
 {
-    UINT8 *src_m1, *src_0, *src_p1, *src_p2;
+    uint8_t *src_m1, *src_0, *src_p1, *src_p2;
     int y;
-    UINT8 *buf;
-    buf = (UINT8*)av_malloc(width);
+    uint8_t *buf;
+    buf = (uint8_t*)av_malloc(width);
 
     src_m1 = src1;
     memcpy(buf,src_m1,width);
