@@ -211,6 +211,16 @@ package export::ffmpeg;
                     $warnings .= $l;
                     die "\n\nffmpeg had critical errors:\n\n$warnings";
                 }
+            # Most likely a misconfigured command line
+                elsif ($l =~ /^Unable\s(?:to|for)\sfind/m) {
+                    $warnings .= $l;
+                    die "\n\nffmpeg had critical errors:\n\n$warnings";
+                }
+            # Another error?
+                elsif ($l =~ /^Error\swhile/m) {
+                    $warnings .= $l;
+                    die "\n\nffmpeg had critical errors:\n\n$warnings";
+                }
             }
         # Read from the mythtranscode handle?
             while (has_data($mythtrans_h) and $l = <$mythtrans_h>) {
