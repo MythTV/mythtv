@@ -215,8 +215,8 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
         long pagesize = sysconf(_SC_PAGE_SIZE);
         long pagemask = ~(pagesize-1);
         osdbuffer = new char[osdbufsize + pagesize];
-        osdbuf_aligned = (char *)((int)osdbuffer + (pagesize - 1));
-        osdbuf_aligned = (char *)((int)osdbuf_aligned & pagemask);
+        osdbuf_aligned = osdbuffer + (pagesize - 1);
+        osdbuf_aligned = (char *)((unsigned long)osdbuf_aligned & pagemask);
 
         memset(osdbuf_aligned, 0x00, osdbufsize);
 
