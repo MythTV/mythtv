@@ -1137,7 +1137,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
         else if (action == "RIGHT")
         {
             if (picAdjustment)
+            {
                 DoChangePictureAttribute(true);
+                break;
+            }
             handled = true;
         }
         else if (action == "SEEKFFWD")
@@ -1166,7 +1169,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
         else if (action == "LEFT")
         {
             if (picAdjustment)
+            {
                 DoChangePictureAttribute(false);
+                break;
+            }
             handled = true;
         }
         else if (action == "SEEKRWND")
