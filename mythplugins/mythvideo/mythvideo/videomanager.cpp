@@ -1352,19 +1352,27 @@ void VideoManager::videoMenu()
     popup->addLabel(tr("Select action:"));
     popup->addLabel("");
 
-    QButton *editButton = popup->addButton(tr("Edit Metadata"), this, SLOT(slotEditMeta()));
+    QButton *editButton = NULL;
+    if (curitem)
+    {
+        editButton = popup->addButton(tr("Edit Metadata"), this, SLOT(slotEditMeta()));
 
-    popup->addButton(tr("Search IMDB"), this, SLOT(slotAutoIMDB()));    
-    popup->addButton(tr("Manually Enter IMDB #"), this, SLOT(slotManualIMDB()));
-    popup->addButton(tr("Reset Metadata"), this, SLOT(slotResetMeta()));
-    popup->addButton(tr("Toggle Browseable"), this, SLOT(slotToggleBrowseable()));
-    popup->addButton(tr("Remove Video"), this, SLOT(slotRemoveVideo()));
-    popup->addButton(tr("Filter Display"), this, SLOT(slotDoFilter()));
+        popup->addButton(tr("Search IMDB"), this, SLOT(slotAutoIMDB()));    
+        popup->addButton(tr("Manually Enter IMDB #"), this, SLOT(slotManualIMDB()));
+        popup->addButton(tr("Reset Metadata"), this, SLOT(slotResetMeta()));
+        popup->addButton(tr("Toggle Browseable"), this, SLOT(slotToggleBrowseable()));
+        popup->addButton(tr("Remove Video"), this, SLOT(slotRemoveVideo()));
+    }
+
+    QButton *filterButton = popup->addButton(tr("Filter Display"), this, SLOT(slotDoFilter()));
     popup->addButton(tr("Cancel"), this, SLOT(slotDoCancel()));
 
     popup->ShowPopup(this, SLOT(slotDoCancel()));
     
-    editButton->setFocus();    
+    if (editButton)
+        editButton->setFocus();    
+    else 
+        filterButton->setFocus();
 }
 
 
@@ -1721,9 +1729,13 @@ void VideoManager::slotToggleBrowseable()
         return;
 
     cancelPopup();
-    
-    curitem->setBrowse(!curitem->Browse());
-    curitem->updateDatabase(db);
+   
+    if (curitem)
+    { 
+        curitem->setBrowse(!curitem->Browse());
+        curitem->updateDatabase(db);
+    }
+
     RefreshMovieList();
     update(infoRect);
 }
