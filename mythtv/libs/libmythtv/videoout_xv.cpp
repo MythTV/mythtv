@@ -847,19 +847,22 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType t)
             memcpy((unsigned char *)image->data + (width * height) * 5 / 4,
                    scratchspace, width * height / 4);
         }
-        int src_x=imgx, src_y=imgy, src_w=imgw, src_h=imgh;
+
+        int src_x = imgx, src_y = imgy, src_w = imgw, src_h = imgh;
+
         if (m_deinterlacing && t == kScan_Interlaced) 
         {
             // Show top field
-            src_y = imgy/2;
-            src_h = imgh/2;
+            src_y = imgy / 2;
+            src_h = imgh / 2;
         }
         else if (m_deinterlacing && t == kScan_Intr2ndField) 
         {
             // Show bottom field
-            src_y = (buffer->height + imgy)/2;
-            src_h = imgh/2;
+            src_y = (buffer->height + imgy) / 2;
+            src_h = imgh / 2;
         }
+
         XvShmPutImage(data->XJ_disp, xv_port, data->XJ_curwin, data->XJ_gc,
                       image, src_x, src_y, src_w, src_h, dispxoff, dispyoff,
                       dispwoff, disphoff, False);

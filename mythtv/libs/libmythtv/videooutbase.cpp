@@ -166,6 +166,7 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
 
     imgx = winx; imgy = winy;
     imgw = XJ_width; imgh = XJ_height;
+
     if (imgw == 1920 && imgh == 1088)
         imgh = 1080; // ATSC 1920x1080
 

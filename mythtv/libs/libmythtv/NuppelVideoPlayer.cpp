@@ -1218,8 +1218,13 @@ void NuppelVideoPlayer::AVSync(void)
     else if (!disablevideo) 
     {
         // if we get here, we're actually going to do video output
-        if (buffer) 
-            videoOutput->PrepareFrame(buffer, m_scan);
+        if (buffer)
+        {
+            if (m_double_framerate)
+                videoOutput->PrepareFrame(buffer, kScan_Interlaced);
+            else
+                videoOutput->PrepareFrame(buffer, kScan_Ignore);
+        }
  
         videosync->WaitForFrame(avsync_adjustment);
         avsync_adjustment = 0;
