@@ -354,6 +354,9 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write, bool usereadahead)
     normalfile = true;
     filename = (QString)lfilename;
 
+    if (filename.right(4) != ".nuv")
+        openAttempts = 1;
+
     if (write)
     {
         tfw = new ThreadedFileWriter(filename.ascii(),
