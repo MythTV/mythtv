@@ -91,7 +91,7 @@ int RingBuffer::Read(void *buf, int count)
     {
         while (totalreadpos + count >= totalwritepos)
 	{
-            usleep(1000);
+            usleep(50);
 	}
 
 	if (readpos + count > filesize)

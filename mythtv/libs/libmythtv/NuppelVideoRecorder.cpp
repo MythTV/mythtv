@@ -102,11 +102,11 @@ void NuppelVideoRecorder::Initialize(void)
     if (compressaudio)
     {
         gf = lame_init();
-        lame_set_out_samplerate(gf, audio_samplerate);
-        lame_set_in_samplerate(gf, audio_samplerate);
 	lame_set_bWriteVbrTag(gf, 0);
 	lame_set_quality(gf, mp3quality);
 	lame_set_compression_ratio(gf, 11);
+        lame_set_out_samplerate(gf, audio_samplerate);
+        lame_set_in_samplerate(gf, audio_samplerate);
 	lame_init_params(gf);
     }
 
@@ -984,7 +984,6 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
 
     if (lf == 0) 
     { // this will be triggered every new file
-        fnum = 0;
         lf = fnum-2;
         startnum = fnum;
 	lasttimecode = 0;

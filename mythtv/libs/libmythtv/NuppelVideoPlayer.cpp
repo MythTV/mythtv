@@ -538,6 +538,7 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
             bufstat[wpos]=1;
             wpos = (wpos+1) % MAXVBUFFER;
             vbuffer_numvalid++;
+            framesPlayed++;
             continue;
         }
 
@@ -677,8 +678,6 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     int timecode;
 
-    int fnum = 0;
-
     int videosize; 
    
     usepre = 8;
@@ -751,7 +750,6 @@ void NuppelVideoPlayer::StartPlaying(void)
 	if (fftime > 0)
 	{
             CalcMaxFFTime();
-
 	    fftime *= video_frame_rate;
             DoFastForward();
             fftime = 0;
@@ -773,7 +771,6 @@ void NuppelVideoPlayer::StartPlaying(void)
         osd->Display(X11videobuf);
 
         XJ_show(video_width, video_height);
-        framesPlayed++;
 
         // play audio
         if (audiodatalen != 0)
@@ -794,9 +791,7 @@ void NuppelVideoPlayer::StartPlaying(void)
             framesdisplayed = 0;
         }
         framesdisplayed++;
-	
         tf++;
-        fnum++;
     }
 
     playing = false;
@@ -811,6 +806,10 @@ bool NuppelVideoPlayer::DoRewind(void)
     int number = (int)rewindtime;
 
     long long desiredFrame = framesPlayed - number;
+
+    if (desiredFrame < 0)
+        desiredFrame = 0;
+
     while (lastKey > desiredFrame)
     {
         lastKey -= 30;
@@ -835,7 +834,7 @@ bool NuppelVideoPlayer::DoRewind(void)
     framesPlayed = lastKey;
 
     int fileend = 0;
-    
+
     while (normalframes > 0)
     {
         fileend = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader,
