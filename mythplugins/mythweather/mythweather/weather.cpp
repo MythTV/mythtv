@@ -47,7 +47,7 @@ Weather::Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent,
     stopProcessing = false;
 
     allowkeys = true;
-   
+    wantAnimated = gContext->GetNumSetting("WeatherGetAnimated", 1);   
     weatherTimeoutInt = gContext->GetNumSetting("WeatherTimeout", 20);
     weatherTimeoutInt *= 1000;
     
@@ -2131,13 +2131,35 @@ bool Weather::UpdateData()
         
         if(haveData == false)
         {
-            QString msg = QString("Myth was unable to retrieve your weather data within the "
-                                  "time allowed (%1 seconds).\nPress OK to try again with a larger "
-                                  "timeout value. Press Cancel to abort.")
-                                  .arg(weatherTimeoutInt / 1000);
+            QString msg;
+            if(wantAnimated)
+            {
+                
+                msg = QString("Myth was unable to retrieve your weather data within the "
+                              "time allowed (%1 seconds).\nPress OK to try again with a larger "
+                              "timeout value. Press Cancel to try again without animated radar maps.")
+                              .arg(weatherTimeoutInt / 1000);
+                
+                wantRetry = MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(),
+                                                            "Timeout Reached", msg, true);
+                if(!wantRetry)
+                {
+                    wantAnimated = 0;
+                    wantRetry = true;
+                }
+            }
+            else
+            {
+                msg = QString("Myth was unable to retrieve your weather data within the "
+                              "time allowed (%1 seconds).\nPress OK to try again with a larger "
+                              "timeout value. Press Cancel to try again without animated radar maps.")
+                               .arg(weatherTimeoutInt / 1000);
+                
+                wantRetry = MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(),
+                                                            "Timeout Reached", msg, true);
+            }
+            
 
-            wantRetry = MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(), 
-                                                        "Timeout Reached", msg, true);
             if(wantRetry)
                 weatherTimeoutInt += (weatherTimeoutInt / 2);
                                                         
@@ -2407,6 +2429,8 @@ float Weather::GetFloat(QString tag)
 
 bool Weather::GetWeatherData()
 {
+    
+    
     QUrl weatherDataURL("http://www.msnbc.com/m/chnk/d/weather_d_src.asp?acid=" + locale);
 
     INETComms *weatherData = new INETComms(weatherDataURL);
@@ -2447,7 +2471,7 @@ bool Weather::GetWeatherData()
     weatherData = NULL;
 
      // try to get some animated radar maps
-     if (GetAnimatedRadarMap())
+     if (wantAnimated && GetAnimatedRadarMap())
          return true;
 
      // could not get animated radar maps so try to find a static map instead

@@ -75,6 +75,7 @@ class Weather : public MythDialog
 
   private:
     int timeoutCounter;
+    int wantAnimated;
     bool stopProcessing;
     QString parseData(QString data, QString beg, QString end);
     void LoadWindow(QDomElement &);
