@@ -36,6 +36,8 @@ bool Channel::Open(void)
     videofd = open(device.ascii(), O_RDWR);
     if (videofd > 0)
         isopen = true;
+    else
+         perror(device.ascii());
     return isopen;
 }
 
