@@ -25,8 +25,8 @@ Goom::Goom(long int winid)
     buffer = NULL;
 
     static char SDL_windowhack[32];
-    sprintf(SDL_windowhack, "SDL_WINDOWID=%ld", winid);
-    putenv(SDL_windowhack);
+    sprintf(SDL_windowhack, "%ld", winid);
+    setenv("SDL_WINDOWID", SDL_windowhack, 1);
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE) < 0)
     {
@@ -56,6 +56,8 @@ Goom::~Goom()
 {
     goom_close();
     SDL_Quit();
+
+    unsetenv("SDL_WINDOWID");
 }
 
 void Goom::resize(const QSize &newsize)
