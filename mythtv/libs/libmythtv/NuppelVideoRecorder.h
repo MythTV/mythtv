@@ -36,7 +36,8 @@ class NuppelVideoRecorder
     void SetMotionLevels(int lM1, int lM2) { M1 = lM1; M2 = lM2; }
     void SetQuality(int quality) { Q = quality; }
     void SetResolution(int width, int height) { w = width; h = height; }
-    
+    void SetAudioSampleRate(int rate) { audio_samplerate = rate; }   
+ 
     void SetFilename(char *filename) { sfilename = filename; }
     void SetAudioDevice(char *device) { audiodevice = device; }
     void SetVideoDevice(char *device) { videodevice = device; }
@@ -97,7 +98,8 @@ class NuppelVideoRecorder
     int compression;
     int compressaudio;
     unsigned long long audiobytes;
-    int effectivedsp;
+    int audio_samplerate; // rate we request from sounddevice
+    int effectivedsp; // actual measured rate
 
     int ntsc;
     int quiet;

@@ -44,6 +44,8 @@ class NuppelVideoPlayer
     void SetDeinterlace(bool set) { deinterlace = set; }
     bool GetDeinterlace(void) { return deinterlace; }
 
+    void SetAudioSampleRate(int rate) { audio_samplerate = rate; }
+
     bool TogglePause(void) { return (paused = !paused); }
     void Pause(void) { paused = true; actuallypaused = false; }
     void Unpause(void) { paused = false; }
@@ -110,25 +112,31 @@ class NuppelVideoPlayer
     unsigned char *buf;
     unsigned char *buf2;
     char lastct;
-    int effdsp;
+    int effdsp; // from the recorded stream
+    int audio_samplerate; // rate to tell the output device
     int filesize;
     int startpos;
-    int audiodelay;
-    int usepre;
 
     int lastaudiolen;
     unsigned char *strm;
     struct rtframeheader frameheader;
-    int wpos;
-    int rpos;
-    int bufstat[MAXVBUFFER];
-    int timecodes[MAXVBUFFER];
-    unsigned char *vbuffer[MAXVBUFFER];
-    unsigned char audiobuffer[AUDBUFSIZE];
-    unsigned char tmpaudio[AUDBUFSIZE];
-    int audiolen;
-    int fafterseek;
-    int audiotimecode;
+
+    /* Video circular buffer */
+    int wpos;		/* next slot to write */
+    int rpos;		/* next slot to read */
+    int usepre;		/* number of slots to keep full */
+    int vbuffer_numvalid;	/* number of slots containing valid data */
+    int bufstat[MAXVBUFFER];	/* slot status. 0=unused, 1=valid data */
+    int timecodes[MAXVBUFFER];	/* timecode for each slot */
+    unsigned char *vbuffer[MAXVBUFFER];	/* decompressed video data */
+
+    /* Audio circular buffer */
+    unsigned char audiobuffer[AUDBUFSIZE];	/* buffer */
+    unsigned char tmpaudio[AUDBUFSIZE];		/* temporary space */
+    int audiolen;		/* number of valid bytes */
+    int raud, waud;		/* read and write positions */
+    int audiotimecode;		/* timecode of audio most recently placed into
+				   buffer */
 
     int weseeked;
 

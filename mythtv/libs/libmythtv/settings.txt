@@ -17,6 +17,8 @@ int Quality=170
 # Motion Levels (lower better, 0 being best)
 int LumaFilter=0
 int ChromaFilter=0
+# Audio Sample Rate: one of 32000, 44100, 48000
+int AudioSampleRate=44100
 # Quality level for the MP3 compression (0 best - 9 worst)
 int MP3Quality=7
 # V4L device

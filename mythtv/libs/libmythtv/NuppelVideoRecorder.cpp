@@ -59,6 +59,8 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     
     keyswritten = 0;
     keyframedist = KEYFRAMEDISTSTART;
+
+    audio_samplerate = 44100;
 }
 
 NuppelVideoRecorder::~NuppelVideoRecorder(void)
@@ -100,7 +102,8 @@ void NuppelVideoRecorder::Initialize(void)
     if (compressaudio)
     {
         gf = lame_init();
-        lame_set_out_samplerate(gf, 44100);
+        lame_set_out_samplerate(gf, audio_samplerate);
+        lame_set_in_samplerate(gf, audio_samplerate);
 	lame_set_bWriteVbrTag(gf, 0);
 	lame_set_quality(gf, mp3quality);
 	lame_set_compression_ratio(gf, 11);
@@ -170,8 +173,18 @@ int NuppelVideoRecorder::AudioInit(void)
     ioctl(afd, SNDCTL_DSP_CHANNELS, &channels);
 
     /* sample rate */
-    rate = 44100;
-    ioctl(afd, SNDCTL_DSP_SPEED, &rate);
+    rate = audio_samplerate;
+    if (ioctl(afd, SNDCTL_DSP_SPEED, &rate) < 0)
+    {
+        fprintf(stderr, "setting sample rate failed\n");
+        return 1;
+    }
+
+    if (rate != audio_samplerate)
+    {
+        fprintf(stderr, "setting sample rate failed\n");
+        return 1;
+    }
 
     if (-1 == ioctl(afd, SNDCTL_DSP_GETBLKSIZE, &blocksize)) 
     {
@@ -804,7 +817,7 @@ void NuppelVideoRecorder::doAudioThread(void)
     ioctl(afd, SNDCTL_DSP_CHANNELS, &channels);
 
     /* sample rate */
-    rate = 44100;
+    rate = audio_samplerate;
     ioctl(afd, SNDCTL_DSP_SPEED, &rate);
 
     if (-1 == ioctl(afd, SNDCTL_DSP_GETBLKSIZE,  &blocksize)) 
@@ -900,7 +913,7 @@ void NuppelVideoRecorder::doWriteThread(void)
         if (!videobuffer[act_video_encode]->freeToEncode && 
             !audiobuffer[act_audio_encode]->freeToEncode)
         {
-            usleep(5);
+            usleep(1000);
             continue;
         }
 

@@ -138,6 +138,7 @@ void TV::SetupRecorder(void)
     nvr->SetResolution(settings->GetNumSetting("Width"),
                      settings->GetNumSetting("Height"));
     nvr->SetMP3Quality(settings->GetNumSetting("MP3Quality"));
+    nvr->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
     nvr->Initialize();
 }
 
@@ -152,7 +153,7 @@ void TV::SetupPlayer(void)
     nvp->SetRecorder(nvr);
     nvp->SetDeinterlace((bool)settings->GetNumSetting("Deinterlace"));
     nvp->SetOSDFontName((char *)settings->GetSetting("OSDFont").c_str());
-
+    nvp->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
     osd_display_time = settings->GetNumSetting("OSDDisplayTime");
 }
 
@@ -206,7 +207,7 @@ void TV::RunTV(void)
     runMainLoop = true;
     while (runMainLoop)
     {
-        usleep(50);
+        usleep(1000);
 
         if ((keypressed = XJ_CheckEvents()))
         {
