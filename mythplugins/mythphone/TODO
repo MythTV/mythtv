@@ -1,0 +1,25 @@
+1. Get every state transition in SIP state instead of 2-sec snapshot
+
+2. Microphone volume
+
+3. VXML pages
+
+4. Individual VXML pages configured per calling/called number
+
+5. Allow dial by URL or dial by number
+
+6. Delay before sending video to ensure first frame gets through
+
+7. VXML pages don't work
+
+8. Tidy up config screens
+
+9. Video size using RTP information instead of negotiated values; allow changes to size of rx video stream mid-call.
+
+10. Adjust transmit size/frames to match tx speed
+
+11. Echo cancellation / suppression
+
+12. Low speed codec; G.726 is already in Myth
+
+13. Remove references to "volkaerts" in Registrar
