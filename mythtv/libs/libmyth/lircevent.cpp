@@ -24,7 +24,7 @@ void LircEventLock::lock()
     {
         events_locked = true;
         QApplication::postEvent((QObject *)mw,
-			new LircMuteEvent(events_locked));
+                                new LircMuteEvent(events_locked));
     }
 }
 
@@ -35,6 +35,6 @@ void LircEventLock::unlock()
     {
         events_locked = false;
         QApplication::postEvent((QObject *)mw,
-			new LircMuteEvent(events_locked));
+                                new LircMuteEvent(events_locked));
     }
 }

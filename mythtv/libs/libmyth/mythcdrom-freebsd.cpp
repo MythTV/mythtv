@@ -77,7 +77,7 @@ MediaError MythCDROMFreeBSD::unlock()
     if (isDeviceOpen() || openDevice()) 
     { 
         //cout <<  "Unlocking CDROM door" << endl;
-	ioctl(m_DeviceHandle, CDIOCALLOW);
+        ioctl(m_DeviceHandle, CDIOCALLOW);
     }
     else
     {

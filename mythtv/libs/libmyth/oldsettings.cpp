@@ -4,7 +4,7 @@
                              -------------------
     begin                : Tuesday, October 03, 2000
     copyright            : (C) 2000 by Relatable, LLC
-    written	by		     : Sean Ward
+    written by           : Sean Ward
     email                : sward@relatable.com
  ***************************************************************************/
 
@@ -29,8 +29,8 @@ Settings::Settings(QString strSettingsFile)
     if (strSettingsFile.length() == 0)
         strSettingsFile = "settings.txt";
     m_pSettings = new map<QString, QString>;
-	
-    ReadSettings(strSettingsFile);	
+
+    ReadSettings(strSettingsFile);
 }
 
 Settings::~Settings()
@@ -38,7 +38,7 @@ Settings::~Settings()
     if (m_pSettings != NULL)
         delete m_pSettings;
 }
-		
+
 // Setting retrieval functions
 /** Generic Setting Retrieval functions */
 QString Settings::GetSetting(QString strSetting, QString defaultvalue)
@@ -137,7 +137,7 @@ bool Settings::ReadSettings(QString pszFile)
 {
     fstream fin(pszFile.ascii(), ios::in);
     if (!fin.is_open()) return false;
-	
+
     string strLine;
     QString strKey;
     QString strVal;

@@ -106,7 +106,7 @@ void LircClient::SpawnApp(void)
     // Spawn app to thwap led (or what ever the user has picked if
     // anything) to give positive feedback that a key was received
     if (external_app == " &")
-	    return;
+        return;
 
     int status = myth_system(external_app);
 

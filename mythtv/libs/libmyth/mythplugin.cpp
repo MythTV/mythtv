@@ -25,7 +25,7 @@ int MythPlugin::init(const char *libversion)
 {
     typedef int (*PluginInitFunc)(const char *);
     PluginInitFunc ifunc = (PluginInitFunc)QLibrary::resolve("mythplugin_init");
-	
+
     if (ifunc)
         return ifunc(libversion);
 
@@ -35,9 +35,9 @@ int MythPlugin::init(const char *libversion)
 
 void MythPlugin::run(void)
 {
-    typedef int (*PluginRunFunc)();	
+    typedef int (*PluginRunFunc)();
     PluginRunFunc rfunc = (PluginRunFunc)QLibrary::resolve("mythplugin_run");
-	
+
     if (rfunc)
         rfunc();
 }

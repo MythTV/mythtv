@@ -29,7 +29,7 @@ void JoystickMenuEventLock::lock()
     {
         events_locked = true;
         QApplication::postEvent((QObject *)mw,
-			new JoystickMenuMuteEvent(events_locked));
+                                new JoystickMenuMuteEvent(events_locked));
     }
 }
 
@@ -40,6 +40,6 @@ void JoystickMenuEventLock::unlock()
     {
         events_locked = false;
         QApplication::postEvent((QObject *)mw,
-			new JoystickMenuMuteEvent(events_locked));
+                                new JoystickMenuMuteEvent(events_locked));
     }
 }
