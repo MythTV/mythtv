@@ -994,6 +994,8 @@ float AvFormatDecoder::GetMpegAspect(AVCodecContext *context,
 
 bool AvFormatDecoder::scanAudioTracks()
 {
+    audioStreams.clear();
+
     int trackNo = 0;
     for (int i = 0; i < ic->nb_streams; i++)
     {
