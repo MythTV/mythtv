@@ -12,6 +12,7 @@
 #include <qtimer.h>
 #include <qapplication.h>
 #include <qsqldatabase.h>
+#include <qstringlist.h> 
 #include <qcursor.h>
 #include <unistd.h>
 #include <time.h>
@@ -91,7 +92,7 @@ ProgFinder::ProgFinder(QWidget *parent, const char *name)
 
     inSearch = 0;
     pastInitial = false;
-    searchCount = 37;
+    searchCount = 36;
     recordingCount = 0;
 
     initData = new QString[(int)(searchCount*showsPerListing)];
@@ -103,14 +104,6 @@ ProgFinder::ProgFinder(QWidget *parent, const char *name)
     {
         if (charNum == 58)
         	charNum = 65;
-
-	if (curLabel == 30)
-	{
-		gotInitData[curLabel] = 0;
-		searchData[curLabel] = "The";
-    		curLabel++;
-		
-	}
 
 	gotInitData[curLabel] = 0; 
         searchData[curLabel] = (char)charNum;
@@ -995,24 +988,15 @@ void ProgFinder::selectSearchData()
     QString thequery;
     QString data;
 
-    if (searchData[curSearch] == "T")
-    {
     thequery = QString("SELECT DISTINCT title "
                        "FROM program "
-                       "WHERE title LIKE '%1%' AND title NOT LIKE 'The %' "
-                       "AND starttime > %2 "
+                       "WHERE title LIKE '%1%' OR title LIKE 'The %2%' OR title LIKE 'A %3%' "
+		       "AND starttime > %4 "
                        "ORDER BY title;")
-                        .arg(searchData[curSearch]).arg(progStart.toString("yyyyMMddhhmm50"));
-    }
-    else
-    {
-    thequery = QString("SELECT DISTINCT title "
-                       "FROM program "
-                       "WHERE title LIKE '%1%' "
-		       "AND starttime > %2 "
-                       "ORDER BY title;")
-                        .arg(searchData[curSearch]).arg(progStart.toString("yyyyMMddhhmm50"));
-    }
+                        .arg(searchData[curSearch])
+			.arg(searchData[curSearch])
+			.arg(searchData[curSearch])
+			.arg(progStart.toString("yyyyMMddhhmm50"));
 
     QSqlQuery query = m_db->exec(thequery);
  
@@ -1029,26 +1013,84 @@ void ProgFinder::selectSearchData()
 
     listCount = 0;
 
-    if (rows < showsPerListing)
-    {
-	progData = new QString[showsPerListing];
-	for (int i = 0; i < showsPerListing; i++)
-               progData[i] = "**!0";
-    }
-    else
-    	progData = new QString[(int)rows];
-
     if (query.isActive() && rows > 0)
     {
+	QStringList tempList;
+
         while (query.next())
         {
 		if (running == false)
 			return;
 		data = QString::fromUtf8(query.value(0).toString());
 
-		progData[listCount] = data;
+		if (searchData[curSearch] == "T" || searchData[curSearch] == "A")
+		{
 
-		listCount++;
+		    if (data.left(5) == "The T" && searchData[curSearch] == "T")
+		    {
+			data = data.mid(4) + ", The";
+			tempList.append(data);
+                	listCount++;
+		    }
+		    else if (data.left(5) == "The A" && searchData[curSearch] == "A")
+                    {
+                        data = data.mid(4) + ", The";
+                        tempList.append(data);
+                        listCount++;
+                    }
+		    else if (data.left(3) == "A T" && searchData[curSearch] == "T")
+		    {
+			data = data.mid(2) + ", A";
+                        tempList.append(data);
+                        listCount++;
+		    }
+		    else if (data.left(3) == "A A" && searchData[curSearch] == "A")
+                    {
+                        data = data.mid(2) + ", A";
+                        tempList.append(data);
+                        listCount++;
+                    }
+		   else if (data.left(4) != "The " && data.left(2) != "A ")
+		    {
+			tempList.append(data);
+                        listCount++;
+                    }
+
+		}	
+		else
+		{
+		    if (data.left(4) == "The ")
+                        data = data.mid(4) + ", The";
+		    if (data.left(2) == "A ")
+			data = data.mid(2) + ", A";
+
+		    tempList.append(data);
+                    listCount++;
+
+		}
+	}
+
+	if (listCount < showsPerListing)
+    	{
+       	 	progData = new QString[showsPerListing];
+       	 	for (int i = 0; i < showsPerListing; i++)
+               	progData[i] = "**!0";
+    	}
+    	else
+        	progData = new QString[(int)listCount];
+
+	tempList.sort();
+	int cnt = 0;
+
+	for ( QStringList::Iterator it = tempList.begin(); it != tempList.end(); ++it )
+	{
+		progData[cnt] = *it;
+		if (progData[cnt].right(5) == ", The")
+			progData[cnt] = "The " + progData[cnt].left(progData[cnt].length() - 5);
+		if (progData[cnt].right(3) == ", A")
+		        progData[cnt] = "A " + progData[cnt].left(progData[cnt].length() - 3);
+
+		cnt++;
 	}
     }
 
@@ -1334,9 +1376,6 @@ void ProgFinder::selectShowData(QString progTitle)
 void ProgFinder::getInitialProgramData()
 {
     getRecordingInfo();
-    clock_t tv1, tv2;
-    double time;
-    tv1 = clock();
 
     getSearchData(8);
     getSearchData(9);
@@ -1350,11 +1389,6 @@ void ProgFinder::getInitialProgramData()
 
 	getSearchData(charNum);
     }
-
-    tv2 = clock();
-    time = (tv2 - tv1)/(CLOCKS_PER_SEC / (double) 1000.0);
-
-    cout << "Time: " << time << endl;
 
 }
 
@@ -1371,10 +1405,13 @@ void ProgFinder::getSearchData(int charNum)
 
     thequery = QString("SELECT DISTINCT title "
                        "FROM program "
-                       "WHERE title LIKE '%1%' "
-		       "AND starttime > %3 "
-                       "ORDER BY title LIMIT %2;")
-			.arg(searchData[charNum]).arg((int)(showsPerListing / 2) + 1).arg(progStart.toString("yyyyMMddhhmm50"));
+                       "WHERE title LIKE '%1%' OR title LIKE 'The %2%' OR title LIKE 'A %3%' "
+		       "AND starttime > %4 "
+                       "ORDER BY title;")
+			.arg(searchData[charNum])
+			.arg(searchData[charNum])
+			.arg(searchData[charNum])
+			.arg(progStart.toString("yyyyMMddhhmm50"));
 
     QSqlQuery query = m_db->exec(thequery);
 
@@ -1392,48 +1429,94 @@ void ProgFinder::getSearchData(int charNum)
 
     if (query.isActive() && rows > 0)
     {
+	QStringList tempList;
+
         while (query.next())
         {
 		data = QString::fromUtf8(query.value(0).toString());
 		
-		cnts++;
-		initData[startPlace + dataNum] = data;
-		dataNum++;
+		if (charNum == 29 || charNum == 10)
+                {
+		   if (data.left(5) == "The T" && charNum == 29)
+                   {
+                        data = data.mid(4) + ", The";
+                        tempList.append(data);
+                        cnts++;
+                   }
+                   else if (data.left(5) == "The A" && charNum == 10)
+                   {
+                        data = data.mid(4) + ", The";
+                        tempList.append(data);
+                        cnts++;
+                   }
+                   else if (data.left(3) == "A T" && charNum == 29)
+                   {
+                        data = data.mid(2) + ", A";
+                        tempList.append(data);
+                        cnts++;
+                   }
+                   else if (data.left(3) == "A A" && charNum == 10)
+                   {
+                        data = data.mid(2) + ", A";
+                        tempList.append(data);
+                        cnts++;
+                   }
+                   else if (data.left(4) != "The " && data.left(2) != "A ")
+                   {
+                        tempList.append(data);
+                        cnts++;
+                   }
+		}
+		else
+                {
+                    if (data.left(4) == "The ")
+                        data = data.mid(4) + ", The";
+		    if (data.left(2) == "A ")
+			data = data.mid(2) + ", A";
+
+                    tempList.append(data);
+		    cnts++;
+
+                }
+
 		qApp->processEvents();
 	}
-    }
 
-    if (rows >= (int)(showsPerListing / 2))
-    {
+	tempList.sort();
+        int cnt = 0;
+	int dNum = 0;
 
-    thequery = QString("SELECT DISTINCT title "
-                       "FROM program "
-                       "WHERE title LIKE '%1%' "
-		       "AND starttime > %3 "
-                       "ORDER BY title DESC LIMIT %2;")
-                        .arg(searchData[charNum]).arg((int)(showsPerListing / 2)).arg(progStart.toString("yyyyMMddhhmm50"));
-
-    query = m_db->exec(thequery);
-
-    int rows = query.numRowsAffected();
-
-    startPlace = (int)(charNum*showsPerListing) + ((int)(showsPerListing / 2) - 1);
-    dataNum = 0;
-
-    if (query.isActive() && rows > 0)
-    {
-        while (query.next())
+        for ( QStringList::Iterator it = tempList.begin(); it != tempList.end(); ++it )
         {
-                data = QString::fromUtf8(query.value(0).toString());
+		if (cnt <= (int)(showsPerListing / 2))
+		{
+			data = *it;
+			if (data.right(5) == ", The")
+				data = "The " + data.left(data.length() - 5);
+			if (data.right(3) == ", A")
+                                data = "A " + data.left(data.length() - 3);
 
-		cnts++;
-                initData[startPlace + dataNum] = data;
-                dataNum--;
-                qApp->processEvents();
+			initData[startPlace + dataNum] = data;
+			dataNum++;
+		}	
+
+		if (cnt >= (cnts - (int)(showsPerListing / 2)) && rows >= showsPerListing)
+		{
+			data = *it;
+                        if (data.right(5) == ", The")
+                                data = "The " + data.left(data.length() - 5);
+			if (data.right(3) == ", A")
+                                data = "A " + data.left(data.length() - 3);
+
+                        initData[startPlace + dNum] = data;
+                        dNum++;
+		}
+
+                cnt++;
         }
-    }
 
     }
+
 
     if (cnts == 0)
          gotInitData[charNum] = 1;
