@@ -3553,13 +3553,10 @@ void TV::BuildOSDTreeMenu(void)
 
         item = new OSDGenericTree(treeMenu, tr("Previous Channel"),
                                   "PREVCHAN");
-
-        item = new OSDGenericTree(treeMenu, tr("Toggle CC"), "TOGGLECC");
     }
     else if (StateIsPlaying(internalState))
     {
         item = new OSDGenericTree(treeMenu, tr("Edit Recording"), "TOGGLEEDIT");
-        item = new OSDGenericTree(treeMenu, tr("Toggle CC"), "TOGGLECC");
     }
 
     if (vbimode == 1)
