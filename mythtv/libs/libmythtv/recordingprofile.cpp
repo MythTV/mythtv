@@ -601,7 +601,9 @@ public:
         if (tvFormat.lower() == "ntsc" || tvFormat.lower() == "ntsc-jp") {
             maxwidth = 720;
             maxheight = 480;
-
+        } else if (tvFormat.lower() == "atsc") {
+            maxwidth = 1920;
+            maxheight = 1088;
         } else {
             maxwidth = 768;
             maxheight = 576;
