@@ -40,6 +40,9 @@ class MainServer : public QObject
     void HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleQueryFreeSpace(PlaybackSock *pbs);
     void HandleQueryCheckFile(QString filename, PlaybackSock *pbs);
+    void HandleQueryBookmark(QString filename, PlaybackSock *pbs);
+    void HandleSetBookmark(QStringList &slist, QString filename,
+			      PlaybackSock *pbs);
     void HandleGetPendingRecordings(PlaybackSock *pbs);
     void HandleGetConflictingRecordings(QStringList &slist, QString purge, 
                                         PlaybackSock *pbs);

@@ -98,6 +98,20 @@ void MainServer::readSocket(void)
                 else
                     HandleQueryCheckFile(tokens[1], pbs);
             }
+            else if (command == "QUERY_BOOKMARK")
+            {
+                if (tokens.size() != 2)
+                    cerr << "Bad QUERY_BOOKMARK\n";
+                else
+                    HandleQueryBookmark(tokens[1], pbs);
+            }
+            else if (command == "SET_BOOKMARK")
+            {
+                if (tokens.size() != 2)
+                    cerr << "Bad SET_BOOKMARK\n";
+                else
+                    HandleSetBookmark(listline, tokens[1], pbs);
+            }
             else if (command == "DELETE_RECORDING")
             {
                 HandleDeleteRecording(listline, pbs);
@@ -455,6 +469,58 @@ void MainServer::HandleQueryCheckFile(QString filename, PlaybackSock *pbs)
     QStringList strlist;
 
     strlist << QString::number(exists);
+
+    WriteStringList(pbs->getSocket(), strlist);
+}
+
+void MainServer::HandleQueryBookmark(QString filename, PlaybackSock *pbs)
+{
+    long long pos = 0;
+
+    QUrl qurl(filename);
+    
+    QString bookmarkname = qurl.path();
+
+    FILE *bookmarkfile = fopen(bookmarkname.ascii(), "r");
+    if (bookmarkfile)
+    {
+	fscanf(bookmarkfile, "%lld", &pos);
+	fclose(bookmarkfile);
+    }
+
+    QStringList retlist;
+
+    encodeLongLong(retlist, pos);
+
+    WriteStringList(pbs->getSocket(), retlist);
+}
+
+void MainServer::HandleSetBookmark(QStringList &slist, QString filename,
+				      PlaybackSock *pbs)
+{
+    long long pos = decodeLongLong(slist, 1);
+    int written = 0;
+
+    QUrl qurl(filename);
+    
+    QString bookmarkname = qurl.path();
+
+    FILE *bookmarkfile = fopen(bookmarkname.ascii(), "w");
+    if (bookmarkfile)
+    {
+	fprintf(bookmarkfile, "%lld\n", pos);
+	fclose(bookmarkfile);
+	written = 1;
+    }
+    else
+    {
+        cerr << "Unable to open bookmark file: " << bookmarkname << endl;
+        written = 0;
+    }
+
+    QStringList strlist;
+
+    strlist << QString::number(written);
 
     WriteStringList(pbs->getSocket(), strlist);
 }

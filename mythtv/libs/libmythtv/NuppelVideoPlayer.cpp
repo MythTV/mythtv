@@ -20,6 +20,7 @@ using namespace std;
 #include "effects.h"
 #include "yuv2rgb.h"
 #include "osdtypes.h"
+#include "remoteutil.h"
 
 extern "C" {
 #include "../libavcodec/mythav.h"
@@ -662,16 +663,10 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
             deleteIter = deleteMap.begin();
         }
 
-        QString bookmarkname = ringBuffer->GetFilename();
-        bookmarkname += ".bookmark";
-        FILE *bookmarkfile = fopen(bookmarkname.ascii(), "r");
-        if (bookmarkfile)
-        {
-            long long pos = 0;
-            fscanf(bookmarkfile, "%lld", &pos);
-            fclose(bookmarkfile);
-            unlink(bookmarkname);
-            
+	long long pos = GetBookmark();
+
+	if (pos > 0)
+        {            
             bool seeks = exactseeks;
             exactseeks = false;
 
@@ -2026,19 +2021,54 @@ void NuppelVideoPlayer::SetBookmark(void)
     QString filename = ringBuffer->GetFilename();
     filename += ".bookmark";
 
-    FILE *bookmarkfile = fopen(filename.ascii(), "w");
-    if (!bookmarkfile)
+    if (filename.left(7) == "myth://")
     {
-        cerr << "Unable to open bookmark file: " << bookmarkfile << endl;
-        return;
+	if(RemoteSetBookmark(m_context, filename, framenum) == false)
+	{
+	    cerr << "Unable to open bookmark file: " << filename << endl;
+	    return;
+	}
     }
+    else
+    {
+	FILE *bookmarkfile = fopen(filename.ascii(), "w");
+	if (!bookmarkfile)
+	{
+	    cerr << "Unable to open bookmark file: " << bookmarkfile << endl;
+	    return;
+	}
 
-    fprintf(bookmarkfile, "%lld\n", framenum);
-    fclose(bookmarkfile);
+	fprintf(bookmarkfile, "%lld\n", framenum);
+	fclose(bookmarkfile);
+    }
 
     osd->ShowText("bookmark", "Position Saved", video_width * 1 / 8, 
                   video_height * 1 / 8, video_width * 7 / 8, video_height / 2, 
                   1);
+}
+
+long long NuppelVideoPlayer::GetBookmark(void)
+{
+    long long pos = 0;
+
+    QString bookmarkname = ringBuffer->GetFilename();
+    bookmarkname += ".bookmark";
+
+    if (bookmarkname.left(7) == "myth://")
+    {
+        pos = RemoteGetBookmark(m_context, bookmarkname);
+    }
+    else
+    {
+        FILE *bookmarkfile = fopen(bookmarkname.ascii(), "r");
+
+	if (bookmarkfile)
+	{
+            fscanf(bookmarkfile, "%lld", &pos);
+            fclose(bookmarkfile);
+	}
+    }
+    return pos;
 }
 
 bool NuppelVideoPlayer::DoRewind(void)
