@@ -52,7 +52,7 @@ VolumeControl::VolumeControl(bool setstartingvolume)
             perror("Setting PCM volume: ");
     }
 
-    GetCurrentVolume();
+    internal_volume = GetCurrentVolume();
 }
 
 VolumeControl::~VolumeControl()
@@ -64,12 +64,22 @@ VolumeControl::~VolumeControl()
 int VolumeControl::GetCurrentVolume(void)
 {
     int realvol;
-    int ret = ioctl(mixerfd, MIXER_READ(control), &realvol);
-    if (ret < 0)
-        perror("Reading PCM volume: ");
-
-    volume = realvol & 0xff; // just use the left channel
-
+    
+    if(mute)
+    {
+        return internal_volume;
+    }
+    else
+    {
+        int ret = ioctl(mixerfd, MIXER_READ(control), &realvol);
+        if (ret < 0)
+        {
+            perror("Reading PCM volume: ");
+        }
+        volume = realvol & 0xff; // just use the left channel
+        internal_volume = volume;
+    }
+    
     return volume;
 }
 
@@ -82,15 +92,19 @@ void VolumeControl::SetCurrentVolume(int value)
     if (volume < 0)
         volume = 0;
 
+    internal_volume = volume;
     if (mixerfd > 0)
     {
-        int realvol = (volume << 8) + volume;
-        int ret = ioctl(mixerfd, MIXER_WRITE(control), &realvol);
-        if (ret < 0)
-            perror("Setting volume: ");
+        if(!mute)
+        {
+            int realvol = (volume << 8) + volume;
+            int ret = ioctl(mixerfd, MIXER_WRITE(control), &realvol);
+            if (ret < 0)
+                perror("Setting volume: ");
+        }
     }
 
-    mute = false;
+    //mute = false;
 
     QString controlLabel = gContext->GetSetting("MixerControl", "PCM");
     controlLabel += "MixerVolume";
@@ -109,10 +123,13 @@ void VolumeControl::SetMute(bool on)
     int realvol;
 
     if (on)
+    {
         realvol = 0;
+    }
     else
-        realvol = (volume << 8) + volume;
-
+    {
+        realvol = internal_volume;
+    }
     if (mixerfd > 0)
     {
         int ret = ioctl(mixerfd, MIXER_WRITE(control), &realvol);

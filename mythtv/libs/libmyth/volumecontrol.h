@@ -18,7 +18,7 @@ class VolumeControl
   private:
     int mixerfd;
     int volume;
-
+    int internal_volume;
     int control;
 
     bool mute;
