@@ -149,6 +149,8 @@ class ThemedMenu : public MythDialog
 
     bool killable;
     int exitModifier;
+
+    bool spreadbuttons;
 };
 
 #endif

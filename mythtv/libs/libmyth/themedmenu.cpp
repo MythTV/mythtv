@@ -97,6 +97,8 @@ void ThemedMenu::parseBackground(QString dir, QDomElement &element)
 
     bool hasarea = false;
 
+    spreadbuttons = true;
+
     QString type = element.attribute("style", "");
     if (type == "tiled")
         tiledbackground = true;
@@ -120,6 +122,12 @@ void ThemedMenu::parseBackground(QString dir, QDomElement &element)
                 buttonArea.setWidth((int)(buttonArea.width() * wmult));
                 buttonArea.setHeight((int)(buttonArea.height() * hmult));
                 hasarea = true;
+            }
+            else if (info.tagName() == "buttonspread")
+            {
+                QString val = getFirstText(info);
+                if (val == "no")
+                    spreadbuttons = false;
             }
             else
             {
@@ -819,6 +827,9 @@ void ThemedMenu::layoutButtons(void)
 
     int yspacing = (buttonArea.height() - buttonnormal->height() * rows) /
                    (rows + 1);
+    if (!spreadbuttons)
+        yspacing = 0;
+
     int row = 1;
 
     activebutton = &(*(buttonList.begin()));
