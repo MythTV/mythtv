@@ -71,9 +71,11 @@ void AudioOutputALSA::Reconfigure(int audio_bits,
     err = SetParameters(new_pcm_handle, SND_PCM_ACCESS_MMAP_INTERLEAVED,
                         format, audio_channels, audio_samplerate, buffer_time,
                         period_time, &can_hw_pause);
-    if(err < 0)
+    if (err < 0) {
+        snd_pcm_close(new_pcm_handle);
         return;
-    
+    }    
+
     effdsp = audio_samplerate * 100;
     
     pcm_handle = new_pcm_handle;

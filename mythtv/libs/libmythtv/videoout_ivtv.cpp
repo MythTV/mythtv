@@ -43,6 +43,7 @@ VideoOutputIvtv::VideoOutputIvtv(void)
     videoDevice = "/dev/video16";
     last_speed = 1.0;
     last_normal = true;
+    osdbuffer = NULL;
 }
 
 VideoOutputIvtv::~VideoOutputIvtv()

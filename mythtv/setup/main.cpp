@@ -54,6 +54,8 @@ void clearCardDB(void)
 
     query.exec("DELETE FROM capturecard;");
     query.exec("DELETE FROM cardinput;");
+    query.exec("DELETE FROM dvb_sat;");
+    query.exec("DELETE FROM dvb_signal_quality;");
 }
 
 void clearAllDB(void)
@@ -65,6 +67,8 @@ void clearAllDB(void)
     query.exec("DELETE FROM videosource;");
     query.exec("DELETE FROM credits;");
     query.exec("DELETE FROM programrating;");
+    query.exec("DELETE FROM dvb_channel;");
+    query.exec("DELETE FROM dvb_pids;");
 }
 
 void SetupMenuCallback(void* data, QString& selection) {

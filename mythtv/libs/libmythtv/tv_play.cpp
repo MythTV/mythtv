@@ -128,6 +128,10 @@ void TV::InitKeys(void)
             "W");
     REG_KEY("TV Playback", "TOGGLECC", "Toggle Closed Captioning/Teletext",
             "T");
+    REG_KEY("TV Playback", "DISPCC1", "Display CC1", "");
+    REG_KEY("TV Playback", "DISPCC2", "Display CC2", "");
+    REG_KEY("TV Playback", "DISPCC3", "Display CC3", "");
+    REG_KEY("TV Playback", "DISPCC4", "Display CC4", "");
     REG_KEY("TV Playback", "QUEUETRANSCODE", "Queue the current recording for "
             "transcoding", "X");
     REG_KEY("TV Playback", "SPEEDINC", "Increase the playback speed", "U");
@@ -234,6 +238,14 @@ void TV::Init(bool createWindow)
     showBufferedWarnings = gContext->GetNumSetting("CCBufferWarnings", 0);
     bufferedChannelThreshold = gContext->GetNumSetting("CCWarnThresh", 10);
     MuteIndividualChannels = gContext->GetNumSetting("IndividualMuteControl",0);
+
+    QString vbiformat = gContext->GetSetting("VbiFormat");
+    if (vbiformat.lower() == "pal teletext")
+        vbimode = 1;
+    else if (vbiformat.lower().left(4) == "ntsc")
+        vbimode = 2;
+    else
+        vbimode = 0;
 
     recorder = piprecorder = activerecorder = NULL;
     nvp = pipnvp = activenvp = NULL;
@@ -800,7 +812,7 @@ void TV::SetupPlayer(void)
     osd_display_time = gContext->GetNumSetting("OSDDisplayTime");
 
     if (gContext->GetNumSetting("DefaultCCMode"))
-        nvp->ToggleCC();
+        nvp->ToggleCC(vbimode, 0);
 
     if (gContext->GetNumSetting("Deinterlace"))
     {
@@ -1331,7 +1343,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         handled = true;
 
         if (action == "TOGGLECC")
-            nvp->ToggleCC();
+            DoToggleCC(0);
         else if (action == "SKIPCOMMERCIAL")
             DoSkipCommercials(1);
         else if (action == "SKIPCOMMBACK")
@@ -2026,6 +2038,11 @@ void TV::DoQueueTranscode(void)
                 osd->SetSettingsText(tr("Transcoding"), 3);
         }
     }
+}
+
+void TV::DoToggleCC(int arg)
+{
+    nvp->ToggleCC(vbimode, arg);
 }
 
 void TV::DoSkipCommercials(int direction)
@@ -3446,7 +3463,11 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
 
     QString action = item->getAction();
 
-    if (internalState == kState_WatchingLiveTV)
+    if (action == "TOGGLECC")
+        DoToggleCC(0);
+    else if (action.left(6) == "DISPCC")
+        DoToggleCC(action.right(1).toInt());
+    else if (internalState == kState_WatchingLiveTV)
     {
         if (action == "GUIDE")
             LoadMenu();
@@ -3514,11 +3535,10 @@ void TV::BuildOSDTreeMenu(void)
         delete treeMenu;
 
     treeMenu = new OSDGenericTree(NULL, "treeMenu");
+    OSDGenericTree *item, *subitem;
 
     if (internalState == kState_WatchingLiveTV)
     {
-        OSDGenericTree *item, *subitem;
-
         item = new OSDGenericTree(treeMenu, tr("Program Guide"), "GUIDE");
 
         item = new OSDGenericTree(treeMenu, tr("Picture-in-Picture"));
@@ -3533,12 +3553,25 @@ void TV::BuildOSDTreeMenu(void)
 
         item = new OSDGenericTree(treeMenu, tr("Previous Channel"),
                                   "PREVCHAN");
+
+        item = new OSDGenericTree(treeMenu, tr("Toggle CC"), "TOGGLECC");
     }
     else if (StateIsPlaying(internalState))
     {
-        OSDGenericTree *item;
-
         item = new OSDGenericTree(treeMenu, tr("Edit Recording"), "TOGGLEEDIT");
+        item = new OSDGenericTree(treeMenu, tr("Toggle CC"), "TOGGLECC");
+    }
+
+    if (vbimode == 1)
+        item = new OSDGenericTree(treeMenu, tr("Toggle Teletext"),
+                                  "TOGGLECC");
+    else if (vbimode == 2)
+    {
+        item = new OSDGenericTree(treeMenu, tr("Closed Captioning"));
+        subitem = new OSDGenericTree(item, tr("Toggle CC"), "TOGGLECC");
+        for (int i = 1; i <= 4; i++)
+            subitem = new OSDGenericTree(item, QString(tr("CC%1")).arg(i),
+                                         QString("DISPCC%1").arg(i));
     }
 }
 

@@ -20,33 +20,37 @@ int VIA_field_start(MpegEncContext*s, AVCodecContext *avctx)
 
     int i,j;
 
+    for (i=0, j=0; j < 16; i += 4, j += 2)
+    {
+        VIAMPGSurface.dwQMatrix[0][j+1] =
+          (s->intra_matrix[ s->intra_scantable.permutated[i+0] ] >> 8) << 0 |
+          (s->intra_matrix[ s->intra_scantable.permutated[i+1] ] >> 8) << 8 |
+          (s->intra_matrix[ s->intra_scantable.permutated[i+2] ] >> 8) << 16 |
+          (s->intra_matrix[ s->intra_scantable.permutated[i+3] ] >> 8) << 24;
+
+        VIAMPGSurface.dwQMatrix[0][j+0] =
+          (s->intra_matrix[ s->intra_scantable.permutated[i+0] ] & 0xff) << 0 |
+          (s->intra_matrix[ s->intra_scantable.permutated[i+1] ] & 0xff) << 8 |
+          (s->intra_matrix[ s->intra_scantable.permutated[i+2] ] & 0xff) << 16 |
+          (s->intra_matrix[ s->intra_scantable.permutated[i+3] ] & 0xff) << 24;
+    }
+
+    for (i = 0, j = 0; j < 16; i += 4, j += 2)
+    {
+        VIAMPGSurface.dwQMatrix[1][j+1] =
+          (s->inter_matrix[ s->inter_scantable.permutated[i+0] ] >> 8) << 0 |
+          (s->inter_matrix[ s->inter_scantable.permutated[i+1] ] >> 8) << 8 |
+          (s->inter_matrix[ s->inter_scantable.permutated[i+2] ] >> 8) << 16 |
+          (s->inter_matrix[ s->inter_scantable.permutated[i+3] ] >> 8) << 24;
+
+        VIAMPGSurface.dwQMatrix[1][j+0] =
+          (s->inter_matrix[ s->inter_scantable.permutated[i+0] ] & 0xff) << 0 |
+          (s->inter_matrix[ s->inter_scantable.permutated[i+1] ] & 0xff) << 8 |
+          (s->inter_matrix[ s->inter_scantable.permutated[i+2] ] & 0xff) << 16 |
+          (s->inter_matrix[ s->inter_scantable.permutated[i+3] ] & 0xff) << 24;
+    }
+
     VIAMPGSurface.dwQMatrixChanged = 1;
-
-    for(i=0,j=0;i<64;i+=8,j+=2){
-        VIAMPGSurface.dwQMatrix[0][j] = (
-             ((s->intra_matrix[i] & 0xff) << 0) |
-             ((s->intra_matrix[i+4] & 0xff) << 8)|
-             ((s->intra_matrix[i+1] & 0xff) << 16)|
-             ((s->intra_matrix[i+5] & 0xff) << 24));
-        VIAMPGSurface.dwQMatrix[0][j+1] = (
-             ((s->intra_matrix[i+2] & 0xff) << 0) |
-             ((s->intra_matrix[i+6] & 0xff) << 8)|
-             ((s->intra_matrix[i+3] & 0xff) << 16)|
-             ((s->intra_matrix[i+7] & 0xff) << 24));
-    }
-
-    for(i=0,j=0;i<64;i+=8,j+=2){
-        VIAMPGSurface.dwQMatrix[1][j] = (
-             ((s->inter_matrix[i] & 0xff) << 0) |
-             ((s->inter_matrix[i+4] & 0xff) << 8)|
-             ((s->inter_matrix[i+1] & 0xff) << 16)|
-             ((s->inter_matrix[i+5] & 0xff) << 24));
-        VIAMPGSurface.dwQMatrix[1][j+1] = (
-             ((s->inter_matrix[i+2] & 0xff) << 0) |
-             ((s->inter_matrix[i+6] & 0xff) << 8)|
-             ((s->inter_matrix[i+3] & 0xff) << 16)|
-             ((s->inter_matrix[i+7] & 0xff) << 24));
-    }
 
     s->mb_width = (s->width + 15) / 16;
     s->mb_height = (s->codec_id == CODEC_ID_MPEG2VIDEO && 

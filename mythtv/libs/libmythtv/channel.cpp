@@ -378,11 +378,27 @@ bool Channel::SetChannelByString(const QString &chan)
 
     pthread_mutex_unlock(db_lock);
 
+    // Determine if freqid is id or frequency
+    //  freqid is a frequency if and only if it is a valid integer and 
+    //  larger than 50 MHz
+    bool ok;
+    int frequency = freqid.toInt(&ok);
+    bool isFrequency = ok && frequency > 50000;
+
     // Tune
     if (externalChanger[currentcapchannel].isEmpty())
     {
-        if (!TuneTo(freqid, finetune))
-            return false;
+        if (isFrequency)
+        {
+            frequency = frequency * 16 / 1000 + finetune;
+            if (!TuneToFrequency(frequency))
+                return false;
+        }
+        else
+        {
+            if (!TuneTo(freqid, finetune))
+                return false;
+        }
     }
     else if (!ChangeExternalChannel(freqid))
         return false;
@@ -460,9 +476,16 @@ bool Channel::TuneTo(const QString &channum, int finetune)
 
     int frequency = curList[i].freq * 16 / 1000 + finetune;
 
-    VERBOSE(VB_CHANNEL, QString("TuneTo(%1) curList[i].freq(%2) freq*16(%3)")
-                                .arg(channum).arg(curList[i].freq)
-                                .arg(frequency));
+    VERBOSE(VB_CHANNEL, QString("TuneTo(%1) curList[i].freq(%2)")
+                                .arg(channum).arg(curList[i].freq));
+
+    return TuneToFrequency(frequency);
+}
+
+bool Channel::TuneToFrequency(int frequency)
+{
+    VERBOSE(VB_CHANNEL, QString("TuneToFrequency(%1)").arg(frequency));
+
     if (usingv4l2)
     {
         struct v4l2_frequency vf;

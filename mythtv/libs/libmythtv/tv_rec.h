@@ -133,6 +133,8 @@ class TVRec
 
     bool isParsingCommercials(ProgramInfo *pginfo);
 
+    int GetCaptureCardNum(void) { return m_capturecardnum; }
+
  protected:
     void RunTV(void);
     static void *EventThread(void *param);

@@ -55,6 +55,7 @@ class Channel : public ChannelBase
     void SetFreqTable(const int index);
     int SetFreqTable(const QString &name);
     bool TuneTo(const QString &chan, int finetune);
+    bool TuneToFrequency(int frequency);
 
     QString device;
     bool isopen;  

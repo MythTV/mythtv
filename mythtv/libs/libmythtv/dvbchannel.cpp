@@ -219,8 +219,14 @@ bool DVBChannel::GetChannelOptions(QString channum)
     pthread_mutex_lock(db_lock);
     MythContext::KickDatabase(db_conn);
 
-    thequery = QString("SELECT chanid FROM channel WHERE channum='%1'")
-                       .arg(channum);
+    thequery = QString("SELECT channel.chanid "
+                       "FROM channel,cardinput,capturecard WHERE "
+                       "channel.channum='%1' AND "
+                       "cardinput.sourceid = channel.sourceid AND "
+                       "cardinput.cardid = '%2' AND "
+                       "capturecard.cardid = cardinput.cardid AND "
+                       "capturecard.cardtype = 'DVB'")
+                       .arg(channum).arg(pParent->GetCaptureCardNum());
     query = db_conn->exec(thequery);
 
     if (!query.isActive())

@@ -775,17 +775,42 @@ void NuppelVideoPlayer::StopEmbedding(void)
         videoOutput->StopEmbedding();
 }
 
-void NuppelVideoPlayer::ToggleCC(void)
+void NuppelVideoPlayer::ToggleCC(char mode, int arg)
 {
-    if (cc)
+    QString msg;
+
+    vbimode = mode;
+    if (cc && !arg)
     {
         cc = false;
-        osd->ClearAllCCText();
+        ResetCC();
+        if (mode == 1)
+            msg = QObject::tr("TXT off");
+        else
+            msg = QObject::tr("CC off");
     }
     else
     {
         cc = true;
+        if (mode == 1)
+        {
+            // TODO: teletext page select
+            //if (arg)
+            //    vbipagenr = (arg & 0xffff) << 16;
+            //msg = QString("%1%2").arg(QObject::tr("TXT pg")).arg(vbipagenr);
+            msg = QObject::tr("TXT on");
+        }
+        else if (mode == 2)
+        {
+            if (arg)
+                ccmode = arg;
+            ResetCC();
+            msg = QString("%1%2").arg(QObject::tr("CC")).arg(ccmode);
+        }
     }
+
+    if (osd)
+        osd->SetSettingsText(msg, 3);
 }
 
 void NuppelVideoPlayer::ShowText(void)

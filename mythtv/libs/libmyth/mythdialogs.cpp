@@ -11,6 +11,9 @@
 #include <qfocusdata.h>
 #include <qdict.h>
 #include <qsqldatabase.h>
+#ifdef QWS
+#include <qwindowsystem_qws.h>
+#endif
 
 #include <iostream>
 using namespace std;
@@ -206,9 +209,16 @@ void MythMainWindow::Init(void)
     setCursor(QCursor(Qt::BlankCursor));
     qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
 
+#ifdef QWS
+#if QT_VERSION >= 0x030300
+    QWSServer::setCursorVisible(false);
+#endif
+#endif
+
     gContext->ThemeWidget(this);
 
     Show();
+    move(d->xbase, d->ybase);
 }
 
 void MythMainWindow::Show(void)

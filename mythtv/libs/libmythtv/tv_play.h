@@ -149,6 +149,7 @@ class TV : public QObject
     float StopFFRew(void);
     void ChangeFFRew(int direction);
     void RepeatFFRew(void);
+    void DoToggleCC(int mode);
     void DoSkipCommercials(int direction);
     void DoEditMode(void);
 
@@ -310,6 +311,8 @@ class TV : public QObject
 
     int sleep_index;
     QTimer *sleepTimer;
+
+    char vbimode;
 };
 
 #endif

@@ -130,7 +130,7 @@ class NuppelVideoPlayer
     void ClearBookmark(void);
     long long GetBookmark(void);
 
-    void ToggleCC(void);
+    void ToggleCC(char mode, int arg);
 
     // edit mode stuff
     bool EnableEdit(void);
