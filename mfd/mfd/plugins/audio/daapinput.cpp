@@ -124,7 +124,7 @@ bool DaapInput::open(int)
                                 NULL, 
                                 my_path_and_query, 
                                 my_host,
-                                DAAP_SERVER_ITUNES,
+                                DAAP_SERVER_ITUNES4X,
                                 parent->getMfd()->getPluginManager()
                                );
     initial_request.addHeader("Connection: close");
@@ -329,7 +329,7 @@ bool DaapInput::at(unsigned long int an_offset)
                                 NULL, 
                                 my_path_and_query, 
                                 my_host,
-                                DAAP_SERVER_ITUNES,
+                                DAAP_SERVER_ITUNES4X,
                                 parent->getMfd()->getPluginManager()
                                );
     initial_request.addHeader("Connection: close");
