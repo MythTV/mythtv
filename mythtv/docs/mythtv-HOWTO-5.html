@@ -23,7 +23,9 @@ Control Center->System->Services</P>
 <H2><A NAME="ss5.2">5.2</A> <A HREF="mythtv-HOWTO.html#toc5.2">Red Hat Linux 8.0</A>
 </H2>
 
-<P>Please submit content.</P>
+<P>Make sure that mysql is running and started at boot. Click on GNOME 
+menu>Server Settings>Services and enter the root password when asked. 
+Check "mysqld" and then click Start. Click Save, then close the window.</P>
 <H2><A NAME="ss5.3">5.3</A> <A HREF="mythtv-HOWTO.html#toc5.3">Gentoo.</A>
 </H2>
 
@@ -54,6 +56,26 @@ Control Center->System->Services</P>
 <BLOCKQUOTE><CODE>
 <PRE>
 % mysql &lt; mc.sql
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<H3>Red Hat Linux 8.0</H3>
+
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+% mysql &lt; mc.sql
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>if this returns an error message try switching to root first.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+% su
+# mysql &lt; mc.sql
+# exit
+%
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>

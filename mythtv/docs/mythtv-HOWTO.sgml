@@ -4,6 +4,7 @@ v1.00, 2002-11-05.  Initial.
 v1.01, 2002-11-06.  Added section on lirc, spelling errors.
 v1.02, 2002-11-11.  Converted to docbook, added more to the remote control
 section, compiling on AMD and Via C3 processors, Debian packaging, ispell.
+v1.03, 2002-11-12.  Added text from Cedar McKay on Red Hat Linux 8.0
 -->
 <!-- 
 To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or 
@@ -14,7 +15,7 @@ To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-11-11, v1.02
+<date>2002-11-12, v1.03
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -27,14 +28,14 @@ necessary.
 
 <sect>Introduction. 
 <p>This HOWTO document will focus on mythtv in a North
-America environment using KDE.  Installation instructions
+America environment.  Installation instructions
 for other distributions and regions can be sent to the author for inclusion
 in other versions of this document.
 
 The document authors are:
 <itemize>
 <item>Overall structure and Mandrake 9.0: Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<item>Red Hat Linux 8.0: Cedar MacKay, <url url="mailto:xxx@mac.com">
+<item>Red Hat Linux 8.0: Cedar McKay, <url url="mailto:mythhowto.3.ohthetrees@spamgourmet.com">
 <item>Gentoo:
 </itemize>
 
@@ -74,6 +75,9 @@ codec using 512x480 capture resolution.  This does not allow for live TV
 watching, but does allow for encoding video and then watching it later.
 <item>The developer states that his AMD1800+ system can <bf>almost</bf>
 encode two MPEG4 video streams and watch one program simultaneously. 
+<item>A PIII/800Mhz system with 512MB RAM can encode one video 
+stream using the RTJPEG codec with 480x480 capture resolution and play it back 
+simultaneously, thereby allowing live TV watching.
 </itemize>
 
 <sect1>Software.
@@ -88,6 +92,7 @@ with mythtv, you're going to need the cdialog package in order to compile
 lircd.
 
 <sect2>Graphical installation tools.
+<sect3>Mandrake 9.0
 
 <p>On systems running KDE, a tool which will allow you to see what packages
 are available and if they're installed on your system can be accessed by
@@ -122,6 +127,26 @@ alsa-utils is needed for setting the volume.
 
 If you marked anything to install, click on Install Marked.  Click "Yes" or
 OK if you get a message about satisfying dependencies.
+
+<sect3>Red Hat Linux 8.0
+<p>Red Hat Linux 8.0 does not have the same KDE graphical package manager that some 
+other distros have. You will need to use Red Hat's package manager. 
+This is the same utility you saw upon installation from the Red Hat Linux 8.0 
+installation CD, you can select these packages upon install of Red Hat Linux 8.0 or 
+later. . You can get to this panel by selecting gnomemenu>System 
+Settings>Packages
+If you did a typical Desktop install of Red Hat Linux 8.0 make sure in addition you 
+have selected:
+<itemize>
+<item>KDE Desktop Environment
+<item>SQL Database Server -  you will have to click on "details" and make 
+sure "mysql-server" is checked.
+<item>Development Tools
+<item>X Software Development
+<item>KDE Software Development
+</itemize>
+
+Click Install to continue.
 
 <sect2>Command-line installation.
 <p> This section details the various methods for installing pre-requisites
@@ -253,6 +278,7 @@ change.
 % cd lame-3.92
 % ./configure
 % make
+% make test
 % su
 # make install
 </verb></tscreen>
@@ -272,9 +298,30 @@ libmp3lame.so.0.0.0*
 %
 </verb></tscreen>
 
-<sect1>Building XMLTV.
+<sect1>Building XMLTV. 
+<p><bf>NOTE</bf>: Red Hat Linux 8.0 users, you <em>must</em> download and
+install an updated version of libexpat.  The version that ships with Red Hat
+Linux 8.0 (version 1.95.4) is buggy, and will cause problems with XML::Twig. 
+All other distributions may skip the step and proceed with untar'ing the
+xmltv file.
 
-<p>Untar the xmltv file:
+Download version 1.95.5 from sourceforge.net:  <url
+url="http://sourceforge.net/projects/expat/"
+name="http://sourceforge.net/projects/expat/">
+
+Open a shell prompt:
+<tscreen><verb>
+% tar -xzf expat-1.95.5.tar.gz
+% cd expat-1.95.5
+% ./configure
+% make
+% su
+# make install
+# exit
+%
+</verb></tscreen>
+
+Untar the xmltv file:
 <tscreen><verb>
 % tar -xjf xmltv-0.5.2.tar.bz2
 % cd xmltv-0.5.2
@@ -332,7 +379,9 @@ Switch to superuser:
 Control Center->System->Services
 
 <sect1>Red Hat Linux 8.0
-<p>Please submit content.
+<p>Make sure that mysql is running and started at boot. Click on GNOME 
+menu>Server Settings>Services and enter the root password when asked. 
+Check "mysqld" and then click Start. Click Save, then close the window.
 <sect1>Gentoo.
 <p>Please submit content.
 
@@ -351,6 +400,20 @@ Control Center->System->Services
 <tscreen><verb>
 % mysql &lt; mc.sql
 </verb></tscreen>
+<sect2>Red Hat Linux 8.0
+<p>
+<tscreen><verb>
+% mysql < mc.sql
+</verb></tscreen>
+
+if this returns an error message try switching to root first.
+
+<tscreen><verb>
+% su
+# mysql < mc.sql
+# exit
+%
+</verb></tscreen>
 
 <sect>Setting up alsa and the mixer.
 
@@ -364,7 +427,7 @@ set it as the recording source.
 There are two ways to do this.  Graphically, and from the command line.
 
 <sect1>Graphically setting up the mixer.
-
+<sect2>Mandrake 9.0
 <p>Open Kmix by K->Multimedia->Sound->Kmix
 
 Click on Settings->Configure  Make sure that "Tick Marks" and "Show
@@ -378,6 +441,35 @@ dark green, meaning that it's "off".  You also want to click on the red LED
 so that it turns bright red, indicating that it's "ON"; this insures that
 the Line-in is used as the source.  Click OK, and make sure that you save
 the settings so that this is your default.
+
+<sect2>Red Hat Linux 8.0
+<p>There is some uncertainty (in my mind anyway) about ALSA sound and Red Hat. 
+Take everything here with a grain of salt. Here is what my impression of
+things is right now. The mythtv developer recommends ALSA sound drivers. 
+However, Red Hat Linux 8.0 ships with some other sound driver/managment
+package.  Installing ALSA looks like a real bear, and includes a kernel
+recompile. Then you have to figure out how to deactivate the Red Hat Linux
+8.0 built in sound package. I decided to give it whirl with the built in
+sound package. I <bf>was</bf> able to get satisfactory results on my
+machine using the rtjpeg video encoder and turning off MP3 sound
+compression. If I try to use the better MPEG4 video encoder and/or use MP3
+audio compression I get slight sound sync issues and a few skips. I think
+this is because my machine is too slow. However, it is possible that it is
+really because I'm using the wrong sound package. Since I didn't install
+ALSA myself you will need to evaluate the situation on your own. However, I
+will give instructions for how I got the default Red Hat Linux 8.0 sound
+package working with mythtv.
+
+Red Hat Linux 8.0 does not use some default KDE and Gnome control panels and 
+substitutes its own. Sound is one of these cases. To configure sound to 
+work with mythtv, select Gnome Menu> Sound & Video>Volume Control. This 
+will open up a mixer. Make sure your global volume (on the far left) is 
+up. Also make sure that the "line in" section has "mute" checked, and 
+"record" checked and the gain is turned up. You may have to experiment 
+with volume/gain levels to get the best sound.  If you experience 
+difficulty with sound try removing your sound jack from "line in" and 
+moving it to "mike in" Then go to the mixer and check "mute" and 
+"record" on the "mike in", and turn up the gain.
 
 <sect1>Setting the mixer from the command line.
 
@@ -591,14 +683,18 @@ to <tt>/var/video</tt>
 # mkdir /var/video
 # chmod a+rwx /var/video
 # exit
-</verb></tscreen>
-The <tt>settings.txt</tt> file is fairly self-explanatory.  
+</verb></tscreen> 
+
+The <tt>settings.txt</tt> file is fairly self-explanatory. 
+Currently, mythtv supports two different video encoders, MPEG4 and RTJPEG. 
+Take note that RTJPEG has lower CPU demands, but makes large files, and MPEG4
+has high CPU demands, but makes smaller files.
 
 <bf>NOTE</bf>: although the width and height can be changed to almost
-anything, if you start mythtv and don't see video, it is likely that the
-video4linux (v4l) subsystem did not like the height and width parameters
-specified.  It's best to leave the default as-is until you're sure that
-mythtv is operational.
+anything, if you start mythtv and don't see video or you get "segmentation
+fault" errors, it is likely that the video4linux (v4l) subsystem did not
+like the height and width parameters specified.  It's best to leave the
+default as-is until you're sure that mythtv is operational.
 
 Users in North America can now exit and save the file.  Users in other parts
 of the world need to modify the first line and modify the XMLTVGrabber
@@ -634,8 +730,22 @@ Open a shell, and switch to the setup directory:
 
 <tscreen><verb>
 % cd setup
+</verb></tscreen>
+
+<bf>NOTE</bf>:Red Hat Linux 8.0 uses an unusual character encoding scheme
+that some programs don't deal well with. As a result, whenever you run setup
+or mythfilldatabase you will have to set a variable to correct this problem.
+Failure to set this variable will result in a lot of UTF-8 errors.
+
+Red Hat 8.0 users, ensure that you do this:
+<tscreen><verb>
+% env LANG=C 
+</verb></tscreen>
+
+Before continuing to the next step.
+
+<tscreen><verb>
 % ./setup
-% cd
 </verb></tscreen>
 
 The setup program will ask you a few questions and then proceed to run the
@@ -645,13 +755,24 @@ XMLTV grabber program.
 <p>Now that the setup program has completed, run <bf>mythfilldatabase</bf> to
 get one week of data inserted into the database.
 
+Red Hat 8.0 users, ensure that you do this:
+<tscreen><verb>
+% env LANG=C 
+</verb></tscreen>
+
+Before continuing to the next step.
+
+<tscreen><verb>
+% mythfilldatabase
+</verb></tscreen>
+
 <bf>NOTE</bf>:  <bf>mythfilldatabase</bf> might take a while to complete,
 depending on any number of factors, most of which you can't control.  It's
 best to just let the program run to completion.
 
 <bf>mythfilldatabase --manual</bf> is another option; the manual option will
-allow you to fine tune channel frequencies  and specify which channels will be added to
-the database.
+allow you to fine tune channel frequencies and specify which channels will
+be added to the database.
 
 <!-- get more information on the manual setting -->
 
@@ -661,7 +782,7 @@ run once a day.
 
 There are two ways to accomplish this:  either as a user-based cron job, or
 as a system based cron.  If you use a user-based cron, you can select the
-time that the cron job will run at.  A system-based cron job will run at the
+time that the cron job will be run.  A system-based cron job will run at the
 same time as any other system cron jobs.
 
 If you are a Mandrake 9.0 user and wish to use a system cron job, you can

@@ -36,13 +36,16 @@ to <CODE>/var/video</CODE>
 # exit
 </PRE>
 </CODE></BLOCKQUOTE>
-
-The <CODE>settings.txt</CODE> file is fairly self-explanatory.  </P>
+ </P>
+<P>The <CODE>settings.txt</CODE> file is fairly self-explanatory. 
+Currently, mythtv supports two different video encoders, MPEG4 and RTJPEG. 
+Take note that RTJPEG has lower CPU demands, but makes large files, and MPEG4
+has high CPU demands, but makes smaller files.</P>
 <P><B>NOTE</B>: although the width and height can be changed to almost
-anything, if you start mythtv and don't see video, it is likely that the
-video4linux (v4l) subsystem did not like the height and width parameters
-specified.  It's best to leave the default as-is until you're sure that
-mythtv is operational.</P>
+anything, if you start mythtv and don't see video or you get "segmentation
+fault" errors, it is likely that the video4linux (v4l) subsystem did not
+like the height and width parameters specified.  It's best to leave the
+default as-is until you're sure that mythtv is operational.</P>
 <P>Users in North America can now exit and save the file.  Users in other parts
 of the world need to modify the first line and modify the XMLTVGrabber
 variable to the correct grabber for their region.  <B>tv_grab_uk</B> for the
@@ -78,8 +81,25 @@ setup program and perform the initial configuration.</P>
 <BLOCKQUOTE><CODE>
 <PRE>
 % cd setup
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><B>NOTE</B>:Red Hat Linux 8.0 uses an unusual character encoding scheme
+that some programs don't deal well with. As a result, whenever you run setup
+or mythfilldatabase you will have to set a variable to correct this problem.
+Failure to set this variable will result in a lot of UTF-8 errors.</P>
+<P>Red Hat 8.0 users, ensure that you do this:
+<BLOCKQUOTE><CODE>
+<PRE>
+% env LANG=C 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Before continuing to the next step.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
 % ./setup
-% cd
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -91,12 +111,27 @@ XMLTV grabber program.</P>
 
 <P>Now that the setup program has completed, run <B>mythfilldatabase</B> to
 get one week of data inserted into the database.</P>
+<P>Red Hat 8.0 users, ensure that you do this:
+<BLOCKQUOTE><CODE>
+<PRE>
+% env LANG=C 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Before continuing to the next step.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+% mythfilldatabase
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 <P><B>NOTE</B>:  <B>mythfilldatabase</B> might take a while to complete,
 depending on any number of factors, most of which you can't control.  It's
 best to just let the program run to completion.</P>
 <P><B>mythfilldatabase --manual</B> is another option; the manual option will
-allow you to fine tune channel frequencies  and specify which channels will be added to
-the database.</P>
+allow you to fine tune channel frequencies and specify which channels will
+be added to the database.</P>
 
 
 <H3>Setting <B>mythfilldatabase</B> to run from <B>cron</B></H3>
@@ -105,7 +140,7 @@ the database.</P>
 run once a day.</P>
 <P>There are two ways to accomplish this:  either as a user-based cron job, or
 as a system based cron.  If you use a user-based cron, you can select the
-time that the cron job will run at.  A system-based cron job will run at the
+time that the cron job will be run.  A system-based cron job will run at the
 same time as any other system cron jobs.</P>
 <P>If you are a Mandrake 9.0 user and wish to use a system cron job, you can
 perform the following steps:

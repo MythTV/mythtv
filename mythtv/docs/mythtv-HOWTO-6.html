@@ -24,6 +24,8 @@ set it as the recording source.</P>
 <H2><A NAME="ss6.1">6.1</A> <A HREF="mythtv-HOWTO.html#toc6.1">Graphically setting up the mixer.</A>
 </H2>
 
+<H3>Mandrake 9.0</H3>
+
 <P>Open Kmix by K->Multimedia->Sound->Kmix</P>
 <P>Click on Settings->Configure  Make sure that "Tick Marks" and "Show
 labels" have "X"'s in them.  This will make it easier to find the correct
@@ -35,6 +37,35 @@ dark green, meaning that it's "off".  You also want to click on the red LED
 so that it turns bright red, indicating that it's "ON"; this insures that
 the Line-in is used as the source.  Click OK, and make sure that you save
 the settings so that this is your default.</P>
+
+<H3>Red Hat Linux 8.0</H3>
+
+<P>There is some uncertainty (in my mind anyway) about ALSA sound and Red Hat. 
+Take everything here with a grain of salt. Here is what my impression of
+things is right now. The mythtv developer recommends ALSA sound drivers. 
+However, Red Hat Linux 8.0 ships with some other sound driver/managment
+package.  Installing ALSA looks like a real bear, and includes a kernel
+recompile. Then you have to figure out how to deactivate the Red Hat Linux
+8.0 built in sound package. I decided to give it whirl with the built in
+sound package. I <B>was</B> able to get satisfactory results on my
+machine using the rtjpeg video encoder and turning off MP3 sound
+compression. If I try to use the better MPEG4 video encoder and/or use MP3
+audio compression I get slight sound sync issues and a few skips. I think
+this is because my machine is too slow. However, it is possible that it is
+really because I'm using the wrong sound package. Since I didn't install
+ALSA myself you will need to evaluate the situation on your own. However, I
+will give instructions for how I got the default Red Hat Linux 8.0 sound
+package working with mythtv.</P>
+<P>Red Hat Linux 8.0 does not use some default KDE and Gnome control panels and 
+substitutes its own. Sound is one of these cases. To configure sound to 
+work with mythtv, select Gnome Menu> Sound &amp; Video>Volume Control. This 
+will open up a mixer. Make sure your global volume (on the far left) is 
+up. Also make sure that the "line in" section has "mute" checked, and 
+"record" checked and the gain is turned up. You may have to experiment 
+with volume/gain levels to get the best sound.  If you experience 
+difficulty with sound try removing your sound jack from "line in" and 
+moving it to "mike in" Then go to the mixer and check "mute" and 
+"record" on the "mike in", and turn up the gain.</P>
 
 <H2><A NAME="ss6.2">6.2</A> <A HREF="mythtv-HOWTO.html#toc6.2">Setting the mixer from the command line.</A>
 </H2>

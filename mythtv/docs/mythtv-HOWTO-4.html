@@ -53,6 +53,7 @@ change.</P>
 % cd lame-3.92
 % ./configure
 % make
+% make test
 % su
 # make install
 </PRE>
@@ -77,9 +78,30 @@ libmp3lame.so.0.0.0*
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss4.3">4.3</A> <A HREF="mythtv-HOWTO.html#toc4.3">Building XMLTV.</A>
+<H2><A NAME="ss4.3">4.3</A> <A HREF="mythtv-HOWTO.html#toc4.3">Building XMLTV. </A>
 </H2>
 
+<P><B>NOTE</B>: Red Hat Linux 8.0 users, you <EM>must</EM> download and
+install an updated version of libexpat.  The version that ships with Red Hat
+Linux 8.0 (version 1.95.4) is buggy, and will cause problems with XML::Twig. 
+All other distributions may skip the step and proceed with untar'ing the
+xmltv file.</P>
+<P>Download version 1.95.5 from sourceforge.net:  
+<A HREF="http://sourceforge.net/projects/expat/">http://sourceforge.net/projects/expat/</A></P>
+<P>Open a shell prompt:
+<BLOCKQUOTE><CODE>
+<PRE>
+% tar -xzf expat-1.95.5.tar.gz
+% cd expat-1.95.5
+% ./configure
+% make
+% su
+# make install
+# exit
+%
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 <P>Untar the xmltv file:
 <BLOCKQUOTE><CODE>
 <PRE>
