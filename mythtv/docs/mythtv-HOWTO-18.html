@@ -76,7 +76,6 @@ program to check and enable DMA.
 </CODE></BLOCKQUOTE>
  will tell you the DMA status for your hard drives.  If you run
 <B>hdparm</B> with the <CODE>-d1</CODE> parameter, it will turn DMA on.</P>
-
 <P>You may also setup your PC to do this at boot time, either by adding the
 command to your <CODE>/etc/rc.local</CODE> file, or by adding files to
 /etc/sysconfig.</P>
@@ -264,11 +263,8 @@ This GDB was configured as "i586-mandrake-linux-gnu"...
 <P><B>gdb</B> has a number of options, read the <CODE>man</CODE> page for more
 information.</P>
 <P>Once at the <CODE>(gdb)</CODE> prompt, type <CODE>run</CODE> to start program
-execution.  When the program segfaults or appears to lock-up, type <CODE>info
-threads</CODE> to get the listing of all running threads.  For each thread,
-type <CODE>thread 1</CODE>, press enter, then type <CODE>bt full</CODE>, <CODE>thread 2</CODE>,
-<CODE>bt full</CODE>, etc.  There may be a lot of threads, but you must iterate
-through all of them.</P>
+execution.  When the program segfaults or appears to lock-up (press CTRL-C),
+type <CODE>thread apply all bt full</CODE>.</P>
 <P>The backtrace information for all the threads should be posted to the
 mythtv-dev mailing list, along with the steps you followed to get the
 program to crash.</P>

@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-04-30, v2.26
+  2003-05-01, v2.27
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -243,10 +243,9 @@
 
   For more detail about actual configurations that others have used,
   Mark Cooper has setup a hardware database at
-  http://www.goldfish.org/~mcooper/pvrhw/
-  <http://www.goldfish.org/~mcooper/pvrhw/>. The website will let you
-  browse what other users have reported as their hardware configuration,
-  and how happy they are with the results.
+  http://pvrhw.goldfish.org/ <http://pvrhw.goldfish.org/>. The website
+  will let you browse what other users have reported as their hardware
+  configuration, and how happy they are with the results.
 
   If you have specific questions about the suitability of specific
   hardware choices, you can consult the archives of the mythtv-users
@@ -390,6 +389,7 @@
   +o  An Athlon 1Ghz can decode a 720x480 16Mbps MPEG-2 file using 30-50%
      CPU, can decode a 480x480 16Mbps MPEG-2 using 30% CPU and
      approximately 30% for Live TV at 416x480.
+
   +o  A P3-550 can decode a 480x480 16Mbps MPEG-2 file with 55% CPU.
 
   +o  A Celeron 450 (no SSE) can decode a 480x480 16Mbps MPEG-2 file with
@@ -2606,7 +2606,7 @@
   Q: How do I delete an item from a playlist?  A: Highlight the item in
   the selection tree and hit the "d" key.
 
-  Q: How do I rearrange the songs in my playlist?  A: Highlight a song
+  Q: How do I rearrange the songs in my playl69<9  A: Highlight a song
   and hit the "space" bar, the song will now have pair of red arrows in
   front of it.  Use the up and down arrow keys to move it around in the
   playlist.  When you have it where you want it, hit the "space" bar
@@ -2656,7 +2656,7 @@
                             be used a way to force a data update.
        "m" Key              Resets the location to the database default, then updates the data.
        "i"                  Enter / Save settings
-       ESC                  Exit the settings screen without saving / Exit the program
+       ESC                  Exit the settings scree#)00thout saving / Exit the program
 
   MythWeather also has an "Aggressiveness" setting.  This affects how
   long MythWeather waits for data from the msnbc.com website before
@@ -2787,7 +2787,6 @@
   is telling you that you don't have XFree86-devel installed, or that
   your distribution hasn't set it up ``correctly''.  This needs to be
   fixed before MythTV will compile.
-
   [1m18.7.  My screen goes blank, but comes back when I wiggle the mouse or[0m
   [1muse the keyboard.[0m
 
@@ -2827,23 +2826,23 @@
 
   Finally, check:
 
-  Section "Monitor"
-      Identifier "monitor1"
-      VendorName "Plug'n Play"
-      HorizSync 30-85
-      VertRefresh 50-160
+       Section "Monitor"
+           Identifier "monitor1"
+           VendorName "Plug'n Play"
+           HorizSync 30-85
+           VertRefresh 50-160
 
-      # Sony Vaio C1(X,XS,VE,VN)?
-      # 1024x480 @ 85.6 Hz, 48 kHz hsync
-      ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+           # Sony Vaio C1(X,XS,VE,VN)?
+           # 1024x480 @ 85.6 Hz, 48 kHz hsync
+           ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
 
-      # TV fullscreen mode or DVD fullscreen output.
-      # 768x576 @ 79 Hz, 50 kHz hsync
-      ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+           # TV fullscreen mode or DVD fullscreen output.
+           # 768x576 @ 79 Hz, 50 kHz hsync
+           ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
 
-      # 768x576 @ 100 Hz, 61.6 kHz hsync
-      ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
-  EndSection
+           # 768x576 @ 100 Hz, 61.6 kHz hsync
+           ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+       EndSection
 
   Ensure that there isn't an Option "DPMS" in the Monitor configuration.
 
@@ -2890,12 +2889,12 @@
   Now, you need to clear out the old versions of the software to ensure
   that you're running with the debugging code, then compile and install.
 
-       $ make clean distclean
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # exit
+  $ make clean distclean
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # exit
 
   At this point, you now have debug-enabled software ready.  Let's
   assume that the problem you're having is in the setup program.
@@ -2916,10 +2915,8 @@
   [1mgdb [22mhas a number of options, read the man page for more information.
 
   Once at the (gdb) prompt, type run to start program execution.  When
-  the program segfaults or appears to lock-up, type info threads to get
-  the listing of all running threads.  For each thread, type thread 1,
-  press enter, then type bt full, thread 2, bt full, etc.  There may be
-  a lot of threads, but you must iterate through all of them.
+  the program segfaults or appears to lock-up (press CTRL-C), type
+  thread apply all bt full.
 
   The backtrace information for all the threads should be posted to the
   mythtv-dev mailing list, along with the steps you followed to get the
@@ -3118,10 +3115,10 @@
 
   The following also works with blackbox:
 
-       $ cat > .xinitrc
-       irxevent &
-       mythfrontend &
-       blackbox
+  $ cat > .xinitrc
+  irxevent &
+  mythfrontend &
+  blackbox
 
   [1m19.4.  What capture resolution should I use?  How does video work?[0m
 
@@ -3296,7 +3293,6 @@
   [1mNOTE[22m:  Performing this step will remove the entire database.  You will
   lose all of your settings and will need to re-run the mc.sql script to
   setup the database structure before running the setup program.
-
        $ mysql -u root
        mysql> drop database mythconverg;
        mysql> quit
@@ -3389,12 +3385,12 @@
   Mandrake kernel level (ie, not 2.4.21-0.16mdk as in the example below,
   then alter the [1murpmi [22mcommand appropriately.)
 
-  $ uname -a
-  Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
-  unknown GNU/Linux
+       $ uname -a
+       Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
+       unknown GNU/Linux
 
-  $ su
-  # urpmi kernel-source
+       $ su
+       # urpmi kernel-source
 
   [1mNOTE[22m:  You do not need to recompile your kernel.
 
@@ -3406,7 +3402,6 @@
 
   This should create an ivtv directory.  Switch to it and perform the
   following commands:
-
        $ cd ivtv/ivtv/utils
        $ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_16_21062.exe
        $ su
@@ -3436,6 +3431,7 @@
 
   Next, copy the files that were compiled in the driver directory into
   the appropriate modules directory:
+
        $ su
        # cd /lib/modules/2.4.21-0.16mdk/kernel/drivers/media/video
        # cp ~/ivtv/ivtv/driver/msp3400.o .
@@ -3453,15 +3449,15 @@
 
   Check that the card is being recognized on the PCI bus:
 
-       $ lspci -v
-       <snip>
+  $ lspci -v
+  <snip>
 
-       00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
-       Encoder (rev 01)
-               Subsystem: Hauppauge computer works Inc.: Unknown device 4801
-               Flags: bus master, medium devsel, latency 32, IRQ 11
-               Memory at d0000000 (32-bit, prefetchable) [size=64M]
-               Capabilities: <available only to root>
+  00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
+  Encoder (rev 01)
+          Subsystem: Hauppauge computer works Inc.: Unknown device 4801
+          Flags: bus master, medium devsel, latency 32, IRQ 11
+          Memory at d0000000 (32-bit, prefetchable) [size=64M]
+          Capabilities: <available only to root>
 
   If you don't see your card on the PCI bus, make sure that it's been
   installed in a bus-master slot.  For some motherboards, only the PCI
@@ -3553,9 +3549,9 @@
 
   etc.sysconfig.mythbackend should be copied to /etc/sysconfig/:
 
-       $ cd contrib
-       $ su
-       # cp etc.sysconfig.mythbackend /etc/sysconfig/mythbackend
+  $ cd contrib
+  $ su
+  # cp etc.sysconfig.mythbackend /etc/sysconfig/mythbackend
 
   Edit /etc/sysconfig/mythbackend if you want to change the defaults
   (the userid that should start mythbackend, location of the logfile and
@@ -3584,14 +3580,14 @@
   Create the directory /var/log/mythtv and set its permissions as
   follows:
 
-  $ su
-  # mkdir /var/log/mythtv
-  # chown root:mythtv /var/log/mythtv
-  # chmod 0775 /var/log/mythtv
-  # exit
-  $ ls -ld /var/log/mythtv
-  drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
-  $
+       $ su
+       # mkdir /var/log/mythtv
+       # chown root:mythtv /var/log/mythtv
+       # chmod 0775 /var/log/mythtv
+       # exit
+       $ ls -ld /var/log/mythtv
+       drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
+       $
 
   [1m19.12.1.2.  Mandrake 9.x[0m
 
@@ -3603,12 +3599,12 @@
   to edit the /etc/security/msec/perm.local file to include the
   following:
 
-       # /etc/security/msec/perm.local
-       # Local overrides to the msec program
-       #
-       # Full file path                user.group              permissions
-       /var/log/mythtv/                root.mythtv             775
-       /var/log/mythtv/*               root.mythtv             664
+  # /etc/security/msec/perm.local
+  # Local overrides to the msec program
+  #
+  # Full file path                user.group              permissions
+  /var/log/mythtv/                root.mythtv             775
+  /var/log/mythtv/*               root.mythtv             664
 
   A copy of the above has been included in the contrib/ directory.  You
   may add it by typing:

@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-04-30, v2.26
+<date>2003-05-01, v2.27
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -82,10 +82,9 @@ guidance but stop short of offering specific recommendations.
 
 For more detail about actual configurations that others have used, Mark
 Cooper has setup a hardware database at <url
-url="http://www.goldfish.org/~mcooper/pvrhw/"
-name="http://www.goldfish.org/~mcooper/pvrhw/">. The website will let you
-browse what other users have reported as their hardware configuration, and
-how happy they are with the results.
+url="http://pvrhw.goldfish.org/" name="http://pvrhw.goldfish.org/">. The
+website will let you browse what other users have reported as their hardware
+configuration, and how happy they are with the results.
 
 If you have specific questions about the suitability of specific hardware
 choices, you can consult the archives of the mythtv-users mailing list or
@@ -435,9 +434,7 @@ install this package using the command line do
 
 <tscreen><verb>
 $ up2date --solvedeps qt-MySQL
-</verb></tscreen>
-
-<label id="RH_XFree86-devel">
+</verb></tscreen><label id="RH_XFree86-devel">
 <bf>NOTE</bf>:  ensure that the correct symlinks have been created for the
 XFree-86 development libraries:
 
@@ -2465,7 +2462,7 @@ Enter Key            Switch between Celsius and Fahrenheit. Can also
                      be used a way to force a data update.
 "m" Key              Resets the location to the database default, then updates the data.
 "i"                  Enter / Save settings
-ESC                  Exit the settings screen without saving / Exit the program
+ESC                  Exit the settings scree#)00thout saving / Exit the program
 </verb></tscreen>
 
 MythWeather also has an "Aggressiveness" setting.  This affects how long
@@ -2550,9 +2547,6 @@ program to check and enable DMA.
 # hdparm -d /dev/hd?
 </verb></tscreen> will tell you the DMA status for your hard drives.  If you run
 <bf>hdparm</bf> with the <tt>-d1</tt> parameter, it will turn DMA on.
-
-<!-- Next section adopted from a post by Dwaine Garden
-dwainegarden@rogers.com to the mailing list. -->
 
 You may also setup your PC to do this at boot time, either by adding the
 command to your <tt>/etc/rc.local</tt> file, or by adding files to
@@ -2719,11 +2713,8 @@ This GDB was configured as "i586-mandrake-linux-gnu"...
 information.
 
 Once at the <tt>(gdb)</tt> prompt, type <tt>run</tt> to start program
-execution.  When the program segfaults or appears to lock-up, type <tt>info
-threads</tt> to get the listing of all running threads.  For each thread,
-type <tt/thread 1/, press enter, then type <tt/bt full/, <tt/thread 2/,
-<tt/bt full/, etc.  There may be a lot of threads, but you must iterate
-through all of them.
+execution.  When the program segfaults or appears to lock-up (press CTRL-C),
+type <tt>thread apply all bt full</tt>.
 
 The backtrace information for all the threads should be posted to the
 mythtv-dev mailing list, along with the steps you followed to get the
@@ -3500,6 +3491,8 @@ v2.25, 2003-04-29.  Additional btaudio card.  Added instructions for gentoo
 mythbackend auto-start.
 v2.26, 2003-04-29.  Debugging info for threads.  Get rid of videodev2.h
 instructions; it's now in the Myth CVS.  Remove gist.com; they've shutdown. 
+v2.27, 2003-05-01.  New website for Mark Cooper's pvr hw database.  Better
+debug command for threads.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
