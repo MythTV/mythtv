@@ -4163,10 +4163,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Shows Program Guide when starting Live TV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>This starts the program guide immediately upon starting to watch Live TV.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4184,6 +4180,322 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Directed By</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Go Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Change</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not record this program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record only this showing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record one showing of this program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every week</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record at any time on this channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record at any time on any channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record this showing with normal options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record this showing with override options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not allow this showing to be recorded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start recording %1 minutes late</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start recording %1 minute late</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start recording on time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start recording %1 minute early</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start recording %1 minutes early</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>End recording %1 minutes early</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>End recording %1 minute early</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>End recording on time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>End recording %1 minute late</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>End recording %1 minutes late</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Look for duplicates in current and previous recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Look for duplicates in current recordings only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Look for duplicates in previous recordings only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[ Match duplicates with ]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record new episodes only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Match duplicates using subtitle &amp; description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Match duplicates using subtitle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Match duplicates using description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t match duplicates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[ Select recording Profile ]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow auto expire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t allow auto expire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete oldest if this would exceede the max episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t record if this would exceed the max episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No episode limit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep only one episode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep at most %1 episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reduce priority by %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normal recording priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Raise priority by %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>List upcoming episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show the program guide when starting Live TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Listings Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tuner Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVB Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log Entries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Acknowledge all log entries at this priority level or lower?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Setting priority level to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Listings Status shows the latest status information from mythfilldatabase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tuner Status shows the current information about the state of backend tuner cards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVB Status shows the quality statistics of all DVB cards, if present</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log Entries shows any unread log entries from the system if you have logging enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Acknowledge this log entry?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Myth version:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last mythfilldatabase guide update:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Started:   </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finished: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Result: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There&apos;s no guide data available!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Have you run mythfilldatabase?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is guide data until </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WARNING: is mythfilldatabase running?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DataDirect Status: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Details of DVB error statistics for last 48 hours:
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording period from %1 to %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Encoder %1 Min SNR: %2 Avg SNR: %3 Min BER %4 Avg BER %5 Cont Errs: %6 Overflows: %7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is no DVB signal quality data available to display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No items found at priority level %1 or lower.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use 1-8 to change priority level.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StatusBox</name>
+    <message>
+        <source>Tuner %1 </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>is watching live TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>is recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>is not recording</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -37,6 +37,7 @@
      <text>TV Settings</text>
      <text lang="DE">Fernsehen</text>
      <text lang="SV">TV</text>
+     <text lang="JA">TV設定</text>
      <action>MENU tv_settings.xml</action>
    </button>
 
@@ -45,6 +46,7 @@
      <text>Media Settings</text>
      <text lang="DE">Medien</text>
      <text lang="SV">Media</text>
+     <text lang="JA">メディア設定</text>
      <action>MENU media_settings.xml</action>
      <depends>mythvideo mythmusic mythgallery mythfm mythgame</depends>
    </button>
@@ -54,6 +56,7 @@
      <text>Info Center Settings</text>
      <text lang="DE">Informationszentrale</text>
      <text lang="SV">Informationscenter</text>
+     <text lang="JA">インフォセンター設定</text>
      <action>MENU info_settings.xml</action>
      <depends>mythnews mythweather mythbookmarkmanager mythrecipe</depends> 
    </button>

@@ -4194,7 +4194,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>Shows Program Guide when starting Live TV</source>
-        <translation>Visar programguiden när TV-läge startas</translation>
+        <translation type="obsolete">Visar programguiden när TV-läge startas</translation>
     </message>
     <message>
         <source>This starts the program guide immediately upon starting to watch Live TV.</source>
@@ -4350,7 +4350,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>Delete oldest if this recording exceedes the max episodes</source>
-        <translation>Radera äldsta om max antal avsnitt överskrids</translation>
+        <translation type="obsolete">Radera äldsta om max antal avsnitt överskrids</translation>
     </message>
     <message>
         <source>Don&apos;t record if this would exceed the max episodes</source>
@@ -4505,6 +4505,14 @@ som du startade detta programmet i.</translation>
     <message>
         <source>Use 1-8 to change priority level.</source>
         <translation>1-8 ändrar prioritet.</translation>
+    </message>
+    <message>
+        <source>Delete oldest if this would exceede the max episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show the program guide when starting Live TV</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

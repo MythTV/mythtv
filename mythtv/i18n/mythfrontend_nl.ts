@@ -122,11 +122,11 @@
     </message>
     <message>
         <source>To go to the advanced recordings screen, press &apos;i&apos;</source>
-        <translation>Om naar het geavanceer opnamemenu te gaan, druk &apos;i&apos;</translation>
+        <translation type="unfinished">Om naar het geavanceer opnamemenu te gaan, druk &apos;i&apos;</translation>
     </message>
     <message>
         <source>To see a list of all up-coming showings of this program, press &apos;5&apos;</source>
-        <translation>Voor een overzicht van alle uitzendingen van dit programma, duk &apos;5&apos;</translation>
+        <translation type="unfinished">Voor een overzicht van alle uitzendingen van dit programma, duk &apos;5&apos;</translation>
     </message>
     <message>
         <source>Record one showing of this program</source>
@@ -143,6 +143,26 @@
     <message>
         <source>Record this showing with normal options</source>
         <translation>Neem dit programma op met normale opties</translation>
+    </message>
+    <message>
+        <source>Program Info Menu</source>
+        <translation type="obsolete">Programma Info Menu</translation>
+    </message>
+    <message>
+        <source>Show Advanced Recordings Screen...</source>
+        <translation type="obsolete">Toon Geavanceerd Opnamemenu...</translation>
+    </message>
+    <message>
+        <source>Show Up-coming Episodes...</source>
+        <translation type="obsolete">Toon volgende Afleveringen...</translation>
+    </message>
+    <message>
+        <source>Show Program Details...</source>
+        <translation type="obsolete">Toon Programmadetails...</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="obsolete">Annuleer</translation>
     </message>
 </context>
 <context>
@@ -3677,7 +3697,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Duplicate detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Herkenning Dubbels</translation>
     </message>
     <message>
         <source>Scheduling Options</source>
@@ -3709,11 +3729,11 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Create a new recording group</source>
-        <translation>Maak een nieuwe opnamegroep</translation>
+        <translation>Maak nieuwe opnamegroep</translation>
     </message>
     <message>
         <source>Program details</source>
-        <translation>Programmadetails</translation>
+        <translation>Programma details</translation>
     </message>
     <message>
         <source>If specified, this command will be run to change the channel for inputs which have an external tuner device such as a cable box. The first argument will be the channel number.</source>
@@ -4157,7 +4177,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Save these settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewaar deze instellingen</translation>
     </message>
     <message>
         <source>Show group name instead of &quot;All Programs&quot;</source>
@@ -4165,10 +4185,6 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Show group summary</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Shows Program Guide when starting Live TV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4185,6 +4201,322 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Directed By</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Go Back</source>
+        <translation>Keer terug</translation>
+    </message>
+    <message>
+        <source>No Change</source>
+        <translation>Geen wijziging</translation>
+    </message>
+    <message>
+        <source>Do not record this program</source>
+        <translation>Niet opnemen</translation>
+    </message>
+    <message>
+        <source>Record only this showing</source>
+        <translation>Enkel deze uitzending opnemen</translation>
+    </message>
+    <message>
+        <source>Record one showing of this program</source>
+        <translation>Dit programma eenmalig opnemen.</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every week</source>
+        <translation>Neem elke week op in dit tijdstip</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every day</source>
+        <translation>Neem dagelijks op op dit tijdstip</translation>
+    </message>
+    <message>
+        <source>Record at any time on this channel</source>
+        <translation>Neem altijd op op deze zender</translation>
+    </message>
+    <message>
+        <source>Record at any time on any channel</source>
+        <translation>Neem altijd op op elke zender</translation>
+    </message>
+    <message>
+        <source>Record this showing with normal options</source>
+        <translation>Neem dit programma op met normale opties</translation>
+    </message>
+    <message>
+        <source>Record this showing with override options</source>
+        <translation>Neem dit programma op met aangepaste opties</translation>
+    </message>
+    <message>
+        <source>Do not allow this showing to be recorded</source>
+        <translation>Verhinder dat deze uitzending opgenomen wordt</translation>
+    </message>
+    <message>
+        <source>Start recording %1 minutes late</source>
+        <translation>Begin opname %1 minuten later</translation>
+    </message>
+    <message>
+        <source>Start recording %1 minute late</source>
+        <translation>Begin opname %1 minuut later</translation>
+    </message>
+    <message>
+        <source>Start recording on time</source>
+        <translation>Begin opname zoals vermeld in gids</translation>
+    </message>
+    <message>
+        <source>Start recording %1 minute early</source>
+        <translation>Begin opname %1 minuut vroeger</translation>
+    </message>
+    <message>
+        <source>Start recording %1 minutes early</source>
+        <translation>Begin opname %1 minuten vroeger</translation>
+    </message>
+    <message>
+        <source>End recording %1 minutes early</source>
+        <translation>Stop opname %1 minuten vroeger</translation>
+    </message>
+    <message>
+        <source>End recording %1 minute early</source>
+        <translation>Stop opname %1 minuut vroeger</translation>
+    </message>
+    <message>
+        <source>End recording on time</source>
+        <translation>Stop opname zoals vermeld in gids</translation>
+    </message>
+    <message>
+        <source>End recording %1 minute late</source>
+        <translation>Stop opname %1 minuut later</translation>
+    </message>
+    <message>
+        <source>End recording %1 minutes late</source>
+        <translation>Stop opname %1 minuten later</translation>
+    </message>
+    <message>
+        <source>Look for duplicates in current and previous recordings</source>
+        <translation>Zoek dubbels in huidige en al verwijderde opnames</translation>
+    </message>
+    <message>
+        <source>Look for duplicates in current recordings only</source>
+        <translation>Zoek dubbels enkel in huidige opnames</translation>
+    </message>
+    <message>
+        <source>Look for duplicates in previous recordings only</source>
+        <translation>Zoek voor dubbels enkel in al verwijderde opnames</translation>
+    </message>
+    <message>
+        <source>[ Match duplicates with ]</source>
+        <translation>[ Detecteer dubbels door te kijken naar ]</translation>
+    </message>
+    <message>
+        <source>Record new episodes only</source>
+        <translation>Neem enkel nieuwe afleveringen op</translation>
+    </message>
+    <message>
+        <source>Match duplicates using subtitle &amp; description</source>
+        <translation>Detecteer dubbel via beschrijving en subtitel</translation>
+    </message>
+    <message>
+        <source>Match duplicates using subtitle</source>
+        <translation>Detecteer dubbel via subtitel</translation>
+    </message>
+    <message>
+        <source>Match duplicates using description</source>
+        <translation>Detecteer dubbel via beschrijving</translation>
+    </message>
+    <message>
+        <source>Don&apos;t match duplicates</source>
+        <translation>Geen dubbels detecteren</translation>
+    </message>
+    <message>
+        <source>[ Select recording Profile ]</source>
+        <translation>[ Kies opnameprofiel ]</translation>
+    </message>
+    <message>
+        <source>Allow auto expire</source>
+        <translation>Automatisch laten vervallen</translation>
+    </message>
+    <message>
+        <source>Don&apos;t allow auto expire</source>
+        <translation>Niet automatisch laten vervallen</translation>
+    </message>
+    <message>
+        <source>Delete oldest if this would exceede the max episodes</source>
+        <translation>Wis oudste indien meer afleveringen dan max toegelaten</translation>
+    </message>
+    <message>
+        <source>Don&apos;t record if this would exceed the max episodes</source>
+        <translation>Niet opnamen indien meer afleveringen dan max toegelaten</translation>
+    </message>
+    <message>
+        <source>No episode limit</source>
+        <translation>Geen beperking op aantal afleveringen</translation>
+    </message>
+    <message>
+        <source>Keep only one episode.</source>
+        <translation>Bewaar enkel 1 aflevering</translation>
+    </message>
+    <message>
+        <source>Keep at most %1 episodes</source>
+        <translation>Bewaar maximaal %1 afleveringen</translation>
+    </message>
+    <message>
+        <source>Reduce priority by %1</source>
+        <translation>Verminder prioriteit met %1</translation>
+    </message>
+    <message>
+        <source>Normal recording priority</source>
+        <translation>Normale opnameprioriteit</translation>
+    </message>
+    <message>
+        <source>Raise priority by %1</source>
+        <translation>Verhoog prioriteit met %1</translation>
+    </message>
+    <message>
+        <source>List upcoming episodes</source>
+        <translation>Lijst volgende afleveringen</translation>
+    </message>
+    <message>
+        <source>Show the program guide when starting Live TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Listings Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tuner Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVB Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log Entries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Acknowledge all log entries at this priority level or lower?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Setting priority level to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Listings Status shows the latest status information from mythfilldatabase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tuner Status shows the current information about the state of backend tuner cards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVB Status shows the quality statistics of all DVB cards, if present</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log Entries shows any unread log entries from the system if you have logging enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Acknowledge this log entry?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Myth version:</source>
+        <translation>Versie</translation>
+    </message>
+    <message>
+        <source>Last mythfilldatabase guide update:</source>
+        <translation>Laatste update TVGIDS:</translation>
+    </message>
+    <message>
+        <source>Started:   </source>
+        <translation>Begonnen:   </translation>
+    </message>
+    <message>
+        <source>Finished: </source>
+        <translation>Geeindigd:  </translation>
+    </message>
+    <message>
+        <source>Result: </source>
+        <translation>Resultaat:  </translation>
+    </message>
+    <message>
+        <source>There&apos;s no guide data available!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Have you run mythfilldatabase?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is guide data until </source>
+        <translation>Er is TVGIDS data tot </translation>
+    </message>
+    <message>
+        <source>days</source>
+        <translation>dagen</translation>
+    </message>
+    <message>
+        <source>day</source>
+        <translation>dag</translation>
+    </message>
+    <message>
+        <source>WARNING: is mythfilldatabase running?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DataDirect Status: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Details of DVB error statistics for last 48 hours:
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording period from %1 to %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Encoder %1 Min SNR: %2 Avg SNR: %3 Min BER %4 Avg BER %5 Cont Errs: %6 Overflows: %7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is no DVB signal quality data available to display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No items found at priority level %1 or lower.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use 1-8 to change priority level.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StatusBox</name>
+    <message>
+        <source>Tuner %1 </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>is watching live TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>is recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>is not recording</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4216,11 +4548,11 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Save this position and go to the menu</source>
-        <translation>Bewaar deze positie en keer terug naar het menu</translation>
+        <translation>Bewaar deze positie en keer terug</translation>
     </message>
     <message>
         <source>Do not save, just exit to the menu</source>
-        <translation>Bewaar deze positie niet en keer terug naar het menu</translation>
+        <translation>Bewaar deze positie niet en keer terug</translation>
     </message>
     <message>
         <source>Keep watching</source>

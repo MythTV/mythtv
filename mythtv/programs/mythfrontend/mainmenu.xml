@@ -12,7 +12,7 @@
       <text lang="DK">Se TV</text>
       <text lang="PT">Ver TelevisÃ£o</text>
       <text lang="SV">Se på TV</text>
-      <text lang="JA">TVãè¦ã</text>
+      <text lang="JA">TV放送</text>
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -22,6 +22,7 @@
      <text lang="DE">Medienbibliothek</text>
      <text lang="NL">Media-Center</text>     
      <text lang="SV">Mediabibliotek</text>
+     <text lang="JA">メディアライブラリ</text>
      <action>MENU library.xml</action>
    </button>
    
@@ -47,6 +48,7 @@
      <text lang="DE">Informationszentrale</text>
      <text lang="NL">Informatiecentrale</text>
      <text lang="SV">Informationscenter</text>
+     <text lang="JA">インフォメーションセンター</text>
      <action>MENU info_menu.xml</action>
    </button>
 
@@ -56,6 +58,7 @@
      <text lang="DE">Optische Medien</text>
      <text lang="NL">DVD-CD media</text>
      <text lang="SV">Optiska diskar</text>
+     <text lang="JA">オプティカルディスク</text>
      <action>MENU optical_menu.xml</action>
      <depends>mythmusic mythdvd</depends>
    </button>
