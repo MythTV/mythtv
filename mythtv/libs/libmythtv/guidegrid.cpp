@@ -224,7 +224,14 @@ ProgramInfo *GuideGrid::getProgramInfo(unsigned int row, unsigned int col)
  
         return proginfo;
     }
-    return NULL;
+   
+    ProgramInfo *proginfo = new ProgramInfo;
+    proginfo->title = "Unknown"; 
+    proginfo->starttime = m_timeInfos[col]->sqltime;
+    proginfo->endtime = m_timeInfos[col]->sqltime;
+    proginfo->spread = 1;
+    proginfo->startCol = col;
+    return proginfo;
 }
 
 void GuideGrid::fillProgramInfos(void)
