@@ -3,7 +3,7 @@
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-12-18, v1.052
+<date>2002-12-20, v1.053
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1629,8 +1629,7 @@ then it shouldn't be a problem.
 If you get an error like <tt>/usr/bin/ld: cannot find -lXext</tt>, the
 compiler is telling you that you don't have XFree86-devel installed, and
 this needs to be fixed before mythtv will work correctly.
-<sect1>My screen goes blank, but comes back when I wiggle the mouse or use
-the keyboard.
+<sect1>My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.
 <p>This is due to DPMS, the Display Power Management System, which is used
 to save power by turning off your monitor when the system decides that it's
 not being used.  Since it's likely that watching TV will not generate
@@ -1663,6 +1662,34 @@ Using <tt>xset +DPMS</tt> will turn it back on.
 
 Finally, depending on your distribution, you may be able to turn it off from
 within the control panel.
+
+<sect>Miscellaneous.
+<sect1>I'd like to watch the files without using mythtv / I'd like to convert the files to some other format.
+<p>Matthew Zimmerman has created a patch for MPlayer / Mencoder
+<url url="http://www.mplayerhq.hu" name="http://www.mplayerhq.hu"> that allows
+you view the files created by mythtv.  Mythtv doesn't use standard
+Nupplevideo files, which is why you MPlayer complains if you try to view
+them.
+
+Download the patch to MPlayer from Matt's website. 
+<url url="http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/"
+name="http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/">.
+
+<tscreen><verb>
+$ wget http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/mplayer-0.90pre10+mythtv.patch
+</verb></tscreen>
+
+Download the source to MPlayer and patch:
+<tscreen><verb>
+$ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
+$ tar -xjf MPlayer-0.90rc1.tar.bz2
+$ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
+$ cd MPlayer-0.90rc1
+$ patch -p1 < mplayer-0.90pre10+mythtv.patch
+</verb></tscreen>
+
+At this point, you can read the MPlayer documentation and start the compile
+process.
 
 </article>
 <!-- Revision History
@@ -1723,6 +1750,7 @@ scripts.  Added XFree86-devel requirement.  Added compile warning text in
 Troubleshooting section.  Added screen blanking (DPMS) stuff.
 v1.052, 2002-12-18.  Modified section dealing with deinterlace and
 Celeron's.  (Newer Celeron's support SSE)
+v1.053, 2002-12-20.  Added a Miscellaneous section so that I could add text about MDZ's mplayer patch.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

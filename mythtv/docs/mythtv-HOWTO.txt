@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2002-12-18, v1.052
+  2002-12-20, v1.053
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -97,6 +97,9 @@
      15.5 I keep losing all of my settings every time I compile!
      15.6 Compile errors.
      15.7 My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.
+
+  16. Miscellaneous.
+     16.1 I'd like to watch the files without using mythtv / I'd like to convert the files to some other format.
 
   ______________________________________________________________________
 
@@ -318,8 +321,8 @@
   Open a shell, and execute the following.  You may get asked a number
   of questions regarding dependencies.  It's best to answer "YES".
 
-       $ urpmi mesa-common-devel libmng1-devel mysql-devel libunixodbc2-devel
-       $ urpmi postgresql-devel xfree86-static-libs
+  $ urpmi mesa-common-devel libmng1-devel mysql-devel libunixodbc2-devel
+  $ urpmi postgresql-devel xfree86-static-libs
 
   Once all of the pre-requisites have been installed, the next step is
   to obtain and compile the source RPM.
@@ -366,7 +369,7 @@
   [1mNOTE[22m: Mandrake 8.2 users, [4mdo[24m [4mnot[24m execute the following command.
   You've already manually installed the files in the previous section.
 
-       # urpmi libqt3-devel
+  # urpmi libqt3-devel
 
   However, you might get this when you execute the command above:
 
@@ -460,12 +463,12 @@
 
   Open a shell and switch to superuser mode.
 
-  $ su
-  # set
+       $ su
+       # set
 
-  [lots of text]
-  QTDIR=/usr/lib/qt3
-  PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
+       [lots of text]
+       QTDIR=/usr/lib/qt3
+       PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
 
   You should see QTDIR and the path changes you made.
 
@@ -559,14 +562,14 @@
 
   Open a shell prompt:
 
-       $ tar -xzf expat-1.95.5.tar.gz
-       $ cd expat-1.95.5
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # exit
-       $
+  $ tar -xzf expat-1.95.5.tar.gz
+  $ cd expat-1.95.5
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # exit
+  $
 
   [1mNOTE[22m:  Red Hat Linux 8.0 users, make sure that you set your LANG as
   described in ``Section 4''.
@@ -652,7 +655,7 @@
 
   emerge mythtv:
 
-       $ emerge /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0
+  $ emerge /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0
 
   It should download the source then complain about a missing digest.
   To fix this,
@@ -817,15 +820,15 @@
 
   Start with the alsa-driver package:
 
-  $ tar -xjf alsa-driver-0.9.x.tar.bz2
-  $ cd alsa-driver-0.9.x
-  $ ./configure --with-cards=XXX --with-sequencer=yes
-  $ make
-  $ su
-  # make install
-  # ./snddevices
-  # exit
-  $
+       $ tar -xjf alsa-driver-0.9.x.tar.bz2
+       $ cd alsa-driver-0.9.x
+       $ ./configure --with-cards=XXX --with-sequencer=yes
+       $ make
+       $ su
+       # make install
+       # ./snddevices
+       # exit
+       $
 
   This will compile and install the kernel modules and initialization
   scripts, as well as create device nodes in /dev.
@@ -854,18 +857,18 @@
   conflicts in the future.  You should end up with a /etc/modules.conf
   file that has this configuration:
 
-       alias char-major-116 snd
-       alias snd-card-0 snd-XXX
-       # module options should go here
-       # OSS/Free portion
-       alias char-major-14 soundcore
-       alias sound-slot-0 snd-card-0
-       # card #1
-       alias sound-service-0-0 snd-mixer-oss
-       alias sound-service-0-1 snd-seq-oss
-       alias sound-service-0-3 snd-pcm-oss
-       alias sound-service-0-8 snd-seq-oss
-       alias sound-service-0-12 snd-pcm-oss
+  alias char-major-116 snd
+  alias snd-card-0 snd-XXX
+  # module options should go here
+  # OSS/Free portion
+  alias char-major-14 soundcore
+  alias sound-slot-0 snd-card-0
+  # card #1
+  alias sound-service-0-0 snd-mixer-oss
+  alias sound-service-0-1 snd-seq-oss
+  alias sound-service-0-3 snd-pcm-oss
+  alias sound-service-0-8 snd-seq-oss
+  alias sound-service-0-12 snd-pcm-oss
 
   "XXX" should be the ALSA driver name for your sound card/chip. In some
   rare cases you need to supply extra options to the driver. These
@@ -950,15 +953,15 @@
 
   Next, open a shell and login as superuser.
 
-       $ su
-       # mkdir /usr/src
-       # mv linux-2.4.19.tar.bz2 /usr/src
-       # cd /usr/src
-       # tar -xjf linux-2.4.19.tar.bz2
-       # chown -R root.root linux-2.4.19
-       # ln -sf linux-2.4.19 linux
-       # exit
-       $
+  $ su
+  # mkdir /usr/src
+  # mv linux-2.4.19.tar.bz2 /usr/src
+  # cd /usr/src
+  # tar -xjf linux-2.4.19.tar.bz2
+  # chown -R root.root linux-2.4.19
+  # ln -sf linux-2.4.19 linux
+  # exit
+  $
 
   [1m8.2.  Obtaining and compiling lirc.[0m
 
@@ -998,13 +1001,13 @@
   Now, we're going to add the commands necessary for lircd to run each
   time we boot:
 
-       # cd /etc/rc.d
-       # cat >> rc.local
-       echo "Starting lircd"
-       /usr/local/sbin/lircd
-       ^D
-       # exit
-       $
+  # cd /etc/rc.d
+  # cat >> rc.local
+  echo "Starting lircd"
+  /usr/local/sbin/lircd
+  ^D
+  # exit
+  $
 
   This takes care of the lircd portion, which "listens" for the IR sig-
   nals. If everything went well, the install script for lircd put an
@@ -1020,7 +1023,7 @@
 
   or
 
-  $ cp lircrc.example.pinnaclestudiopctv ~/.lircrc
+       $ cp lircrc.example.pinnaclestudiopctv ~/.lircrc
 
   if you've got a Pinnacle Studio PCTV remote.
 
@@ -1197,44 +1200,44 @@
   /dev/device. Unlike bourne or bash, csh scripts automatically close
   parent file descriptors before they start.
 
-       $ cd /usr/local/bin
-       # su
-       # cat > change_channel.csh
-       #!/bin/csh
-       echo "changing to $1"
-       /usr/local/bin/channel.pl $1 &
-       ^D
-       # chmod a+x change_channel.csh
-       # exit
-       $ exit
+  $ cd /usr/local/bin
+  # su
+  # cat > change_channel.csh
+  #!/bin/csh
+  echo "changing to $1"
+  /usr/local/bin/channel.pl $1 &
+  ^D
+  # chmod a+x change_channel.csh
+  # exit
+  $ exit
 
   The following file should be saved as /usr/local/bin/channel.pl
 
-  #!/usr/bin/perl
+       #!/usr/bin/perl
 
-  # make sure to set this string to
-  # the corresponding remote in /etc/lircd.conf
-  $remote_name = "gi-motorola-dct2000";
+       # make sure to set this string to
+       # the corresponding remote in /etc/lircd.conf
+       $remote_name = "gi-motorola-dct2000";
 
-  sub change_channel {
-          my($channel_digit) = @_;
-          system ("rc SEND_ONCE $remote_name $channel_digit");
-          sleep 1;
-  }
+       sub change_channel {
+               my($channel_digit) = @_;
+               system ("rc SEND_ONCE $remote_name $channel_digit");
+               sleep 1;
+       }
 
-  $channel=$ARGV[0];
-  sleep 1;
-  if (length($channel) > 2) {
-          change_channel(substr($channel,0,1));
-          change_channel(substr($channel,1,1));
-          change_channel(substr($channel,2,1));
-  } elsif (length($channel) > 1) {
-          change_channel(substr($channel,0,1));
-          change_channel(substr($channel,1,1));
-  } else {
-          change_channel(substr($channel,0,1));
-  }
-  system ("rc SEND_ONCE $remote_name ENTER");
+       $channel=$ARGV[0];
+       sleep 1;
+       if (length($channel) > 2) {
+               change_channel(substr($channel,0,1));
+               change_channel(substr($channel,1,1));
+               change_channel(substr($channel,2,1));
+       } elsif (length($channel) > 1) {
+               change_channel(substr($channel,0,1));
+               change_channel(substr($channel,1,1));
+       } else {
+               change_channel(substr($channel,0,1));
+       }
+       system ("rc SEND_ONCE $remote_name ENTER");
 
   The last statement within the perl script is the lirc rc command. This
   is the command that transmits the code to your cable/dss box. Make
@@ -1354,25 +1357,26 @@
   If you want to know what time your job will run, you can do the
   following:
 
-       # cat /etc/crontab
-       SHELL=/bin/bash
-       PATH=/sbin:/bin:/usr/sbin:/usr/bin
-       MAILTO=root
-       HOME=/
+  # cat /etc/crontab
+  SHELL=/bin/bash
+  PATH=/sbin:/bin:/usr/sbin:/usr/bin
+  MAILTO=root
+  HOME=/
 
-       # run-parts
-       01 * * * * root nice -n 19 run-parts /etc/cron.hourly
-       02 4 * * * root nice -n 19 run-parts /etc/cron.daily
-       22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
-       42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
-       # exit
-       $
+  # run-parts
+  01 * * * * root nice -n 19 run-parts /etc/cron.hourly
+  02 4 * * * root nice -n 19 run-parts /etc/cron.daily
+  22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
+  42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
+  # exit
+  $
 
   We can see from the display that the cron.daily job will run at 0402
   every morning.
 
   If you wish to specify a custom time, then the user-based cron job is
   the better method.
+
   The default [1mconfigfiles/mythcrontab [22mfile will run the [1mmythfilldatabase[0m
   program every day at 0430.  If you want to change this, then open the
   configfiles/mythcrontab file in your favorite editor and modify it as
@@ -1515,7 +1519,6 @@
   mythgallery is a photo and slideshow application.  mythgallery is a
   separate application, but it's dependant on mythtv being installed and
   operational.
-
   [1m12.1.  Installation and pre-requisites.[0m
 
   Download mythgallery from http://www.mythtv.org/
@@ -1619,19 +1622,19 @@
   <http://www.xiph.org/paranoia/download/cdparanoia-III-
   alpha9.8.src.tgz>.
 
-       $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
-       $ cd cdparanoia-III-alpha9.8
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       <!-- see if the next step is a Mandrake only issue -->
-       # cp interface/cdda_interface.h /usr/local/include
-       # cd /usr/lib
-       # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
-       # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
-       # exit
-       $
+  $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
+  $ cd cdparanoia-III-alpha9.8
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  <!-- see if the next step is a Mandrake only issue -->
+  # cp interface/cdda_interface.h /usr/local/include
+  # cd /usr/lib
+  # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
+  # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
+  # exit
+  $
 
   [1m14.2.  Mandrake 9.0[0m
 
@@ -1762,4 +1765,31 @@
 
   Finally, depending on your distribution, you may be able to turn it
   off from within the control panel.
+
+  [1m16.  Miscellaneous.[0m
+
+  [1m16.1.  I'd like to watch the files without using mythtv / I'd like to[0m
+  [1mconvert the files to some other format.[0m
+
+  Matthew Zimmerman has created a patch for MPlayer / Mencoder
+  http://www.mplayerhq.hu <http://www.mplayerhq.hu> that allows you view
+  the files created by mythtv.  Mythtv doesn't use standard Nupplevideo
+  files, which is why you MPlayer complains if you try to view them.
+
+  Download the patch to MPlayer from Matt's website.
+  http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/
+  <http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/>.
+
+       $ wget http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/mplayer-0.90pre10+mythtv.patch
+
+  Download the source to MPlayer and patch:
+
+       $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
+       $ tar -xjf MPlayer-0.90rc1.tar.bz2
+       $ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
+       $ cd MPlayer-0.90rc1
+       $ patch -p1 < mplayer-0.90pre10+mythtv.patch
+
+  At this point, you can read the MPlayer documentation and start the
+  compile process.
 
