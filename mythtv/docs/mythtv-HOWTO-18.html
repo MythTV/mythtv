@@ -408,6 +408,13 @@ See the video4linux mailing list (
 <A HREF="https://listman.redhat.com/mailman/listinfo/video4linux-list">https://listman.redhat.com/mailman/listinfo/video4linux-list</A>) for
 more information.</P>
 
+<H2><A NAME="ss18.17">18.17</A> <A HREF="mythtv-HOWTO.html#toc18.17">Mythweb is showing a db_open error when I connect to it.</A>
+</H2>
+
+<P>Find your php.ini file. Make sure you've got a line in it like this:</P>
+<P><CODE>extension=mysql.so</CODE></P>
+<P>Restart apache for it to take effect.</P>
+
 <HR>
 <A HREF="mythtv-HOWTO-19.html">Next</A>
 <A HREF="mythtv-HOWTO-17.html">Previous</A>

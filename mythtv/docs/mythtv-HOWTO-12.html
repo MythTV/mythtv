@@ -36,6 +36,15 @@ command line (section
 <A HREF="mythtv-HOWTO-3.html#CLIinstalltools_">Command Line</A>), and
 you've ensured that the <B>apache</B> server will start at boot using the
 Mandrake Control Center.</P>
+<P><B>NOTE</B>: Mandrake 9.1 users, perform the following:
+<BLOCKQUOTE><CODE>
+<PRE>
+# urpmi apache apache2-mod_php php-mysql
+# chkconfig --level 345 httpd on
+# /etc/rc.d/init.d/httpd restart
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
 <H2><A NAME="ss12.2">12.2</A> <A HREF="mythtv-HOWTO.html#toc12.2">Completing the installation.</A>
 </H2>

@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-05-01, v2.27
+<date>2003-05-02, v2.28
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1820,6 +1820,7 @@ Valid options are:
 -l or --logfile filename       Writes STDERR and STDOUT messages to filename
 -p or --pidfile filename       Write PID of mythbackend to filename
 -d or --daemon                 Runs mythbackend as a daemon
+-v or --verbose                Prints more information
 </verb></tscreen>
 
 Running mythbackend as a daemon and using the logfile option will allow you
@@ -2105,6 +2106,13 @@ id="graphicinstalltools_" name="Graphic Install Tools">) or through the
 command line (section <ref id="CLIinstalltools_" name="Command Line">), and
 you've ensured that the <bf>apache</bf> server will start at boot using the
 Mandrake Control Center.
+
+<bf>NOTE</bf>: Mandrake 9.1 users, perform the following:
+<tscreen><verb>
+# urpmi apache apache2-mod_php php-mysql
+# chkconfig --level 345 httpd on
+# /etc/rc.d/init.d/httpd restart
+</verb></tscreen>
 
 <sect1>Completing the installation.
 <p>
@@ -2861,6 +2869,14 @@ url="https://listman.redhat.com/mailman/listinfo/video4linux-list"
 name="https://listman.redhat.com/mailman/listinfo/video4linux-list">) for
 more information.
 
+<sect1>Mythweb is showing a db_open error when I connect to it.
+<!-- Fix by Chris Ripp [chris@ripp.net] post to mailing list -->
+<p>Find your php.ini file. Make sure you've got a line in it like this:
+
+<tt>extension=mysql.so</tt>
+
+Restart apache for it to take effect.
+
 <sect>Miscellaneous. 
 <sect1>I'd like to watch the files without using MythTV / I'd like to convert the files to some other format. 
 <p>Matthew Zimmerman has created a patch for MPlayer / Mencoder <url
@@ -3190,7 +3206,7 @@ following commands:
 $ cd ivtv/ivtv/utils
 $ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_16_21062.exe
 $ su
-# ./ivtvfwextract pvr250_16_21062.exe
+# ./ivtvfwextract.pl pvr250_16_21062.exe
 # exit
 </verb></tscreen>
 
@@ -3498,6 +3514,8 @@ v2.26, 2003-04-29.  Debugging info for threads.  Get rid of videodev2.h
 instructions; it's now in the Myth CVS.  Remove gist.com; they've shutdown. 
 v2.27, 2003-05-01.  New website for Mark Cooper's pvr hw database.  Better
 debug command for threads.
+v2.28, 2003-05-02.  MythWeb update for Mandrake.  mythweb db_open error. 
+ivtvfwextract is a perl file.  Added "-v" to mythbackend as daemon example.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

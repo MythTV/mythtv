@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-05-01, v2.27
+  2003-05-02, v2.28
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -137,6 +137,7 @@
      18.14 My remote doesn't work / works sometimes and not others / "ghost" keypresses.
      18.15 My PVR-250 card doesn't show inputs in the setup screen.
      18.16 Where's my "canada-cable" entry gone to?
+     18.17 Mythweb is showing a db_open error when I connect to it.
 
   19. Miscellaneous.
      19.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
@@ -203,6 +204,7 @@
   environment.  If you have installation instructions for a different
   region or Linux distribution, please send them to the author so that
   it can be included in other versions of this document.
+
   Erik Arendse has setup a website that focuses on running MythTV in a
   non-North American environment.  See the website at
   http://www.home.zonnet.nl/erik_nospam.arendse/
@@ -1999,6 +2001,7 @@
        -l or --logfile filename       Writes STDERR and STDOUT messages to filename
        -p or --pidfile filename       Write PID of mythbackend to filename
        -d or --daemon                 Runs mythbackend as a daemon
+       -v or --verbose                Prints more information
 
   Running mythbackend as a daemon and using the logfile option will
   allow you to have mythbackend automatically start up during the boot
@@ -2293,6 +2296,12 @@
   ensured that the [1mapache [22mserver will start at boot using the Mandrake
   Control Center.
 
+  [1mNOTE[22m: Mandrake 9.1 users, perform the following:
+
+       # urpmi apache apache2-mod_php php-mysql
+       # chkconfig --level 345 httpd on
+       # /etc/rc.d/init.d/httpd restart
+
   [1m12.2.  Completing the installation.[0m
 
        $ tar -xjf mythweb-0.8.tar.bz2
@@ -2390,14 +2399,14 @@
   Download FLAC from http://flac.sourceforge.net
   <http://flac.sourceforge.net> and install:
 
-       $ tar -xzf flac-1.1.0.tar.gz
-       $ cd flac-1.1.0
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # exit
-       $
+  $ tar -xzf flac-1.1.0.tar.gz
+  $ cd flac-1.1.0
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # exit
+  $
 
   Download libcdaudio from libcdaudio.sourceforge.net
   <http://sourceforge.net/project/showfiles.php?group_id=27134> and
@@ -2546,7 +2555,6 @@
 
   Genre/Artist/Album/Title Artist/Genre/Album/Title Artist/Album/Title
   (with Genre left as Unknown)
-
   The track number is optional but can be specified with the title by
   using the TRACK_TITLE keyword instead of TITLE.  If TRACK_TITLE is
   used, then the filename can have a space, hyphen, or underscore
@@ -2556,6 +2564,7 @@
 
   The Ignore_ID3 option does not disable the code that determines the
   track length, just the portion that tries to read ID3 info.
+
   [1m15.6.  Using MythMusic.[0m
 
   MythMusic is fairly simple to use.  It is recommended that you insert
@@ -2611,7 +2620,6 @@
   front of it.  Use the up and down arrow keys to move it around in the
   playlist.  When you have it where you want it, hit the "space" bar
   again.
-
   Q: How do I delete a playlist?  A: Highlight the playlist in the
   selection tree and hit the "i" key then select "Delete this Playlist"
   from the popup.
@@ -2621,6 +2629,7 @@
   The MythWeather module will obtain the weather information for the
   location that you specify.  You must be running MythTV v0.8 in order
   to use MythWeather.
+
   ______________________________________________________________________
   NOTE for Red Hat Linux 8.0 users: Red Hat 8 users must make the following
   modification, or several weather icons will fail to be installed.
@@ -2732,11 +2741,11 @@
 
   First, you should check that your kernel has been enabled for DMA:
 
-  [mythtv@pvr mythtv]$ dmesg |grep DMA
-      ide0: BM-DMA at 0xd800-0xd807, BIOS settings: hda:DMA, hdb:DMA
-      ide1: BM-DMA at 0xd808-0xd80f, BIOS settings: hdc:DMA, hdd:pio
-  hda: 156301488 sectors (80026 MB) w/2048KiB Cache, CHS=9729/255/63, UDMA(33)
-  hdb: 80043264 sectors (40982 MB) w/2048KiB Cache, CHS=4982/255/63, UDMA(33)
+       [mythtv@pvr mythtv]$ dmesg |grep DMA
+           ide0: BM-DMA at 0xd800-0xd807, BIOS settings: hda:DMA, hdb:DMA
+           ide1: BM-DMA at 0xd808-0xd80f, BIOS settings: hdc:DMA, hdd:pio
+       hda: 156301488 sectors (80026 MB) w/2048KiB Cache, CHS=9729/255/63, UDMA(33)
+       hdb: 80043264 sectors (40982 MB) w/2048KiB Cache, CHS=4982/255/63, UDMA(33)
 
   From the listing above, you can see that hda, hdb and hdc are set for
   DMA, and hdd is set for pio.  If your kernel is not reporting DMA
@@ -2776,10 +2785,10 @@
   Some compile errors are worse than others.  If you get an error that
   doesn't abort the compilation, and says something like:
 
-       cc1plus: warning: changing search order for system directory
-       "/usr/local/include"
-       cc1plus: warning:   as it has already been specified as a non-system
-       directory
+  cc1plus: warning: changing search order for system directory
+  "/usr/local/include"
+  cc1plus: warning:   as it has already been specified as a non-system
+  directory
 
   then it shouldn't be a problem.
 
@@ -3066,6 +3075,14 @@
   (https://listman.redhat.com/mailman/listinfo/video4linux-list
   <https://listman.redhat.com/mailman/listinfo/video4linux-list>) for
   more information.
+
+  [1m18.17.  Mythweb is showing a db_open error when I connect to it.[0m
+
+  Find your php.ini file. Make sure you've got a line in it like this:
+
+  extension=mysql.so
+
+  Restart apache for it to take effect.
 
   [1m19.  Miscellaneous.[0m
 
@@ -3387,12 +3404,12 @@
   Mandrake kernel level (ie, not 2.4.21-0.16mdk as in the example below,
   then alter the [1murpmi [22mcommand appropriately.)
 
-  $ uname -a
-  Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
-  unknown GNU/Linux
+       $ uname -a
+       Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
+       unknown GNU/Linux
 
-  $ su
-  # urpmi kernel-source
+       $ su
+       # urpmi kernel-source
 
   [1mNOTE[22m:  You do not need to recompile your kernel.
 
@@ -3408,7 +3425,7 @@
        $ cd ivtv/ivtv/utils
        $ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_16_21062.exe
        $ su
-       # ./ivtvfwextract pvr250_16_21062.exe
+       # ./ivtvfwextract.pl pvr250_16_21062.exe
        # exit
 
   The [1mivtvfwextract [22mprogram extracts the firmware required for the card.
@@ -3434,6 +3451,7 @@
 
   Next, copy the files that were compiled in the driver directory into
   the appropriate modules directory:
+
        $ su
        # cd /lib/modules/2.4.21-0.16mdk/kernel/drivers/media/video
        # cp ~/ivtv/ivtv/driver/msp3400.o .
@@ -3476,7 +3494,6 @@
   Go into setup/setup on the machine hosting the hardware MPEG2 card.
   When you add a new capture card, ensure that you are using the video0
   device.
-
   [1mNOTE[22m:  As of 2003-04-25 the ivtv driver does not support VBI, so
   closed-captioning is not available.
 
@@ -3526,7 +3543,6 @@
   "/var/video".  The rsize and wsize options are used to increase the
   performance of NFS; soft mean that NFS will eventually timeout on an
   error, and the nfsvers is required for filesizes over 2GB.
-
   [1m19.12.  I'd like to automatically start mythbackend at system boot[0m
   [1mtime.[0m
 
@@ -3582,14 +3598,14 @@
   Create the directory /var/log/mythtv and set its permissions as
   follows:
 
-  $ su
-  # mkdir /var/log/mythtv
-  # chown root:mythtv /var/log/mythtv
-  # chmod 0775 /var/log/mythtv
-  # exit
-  $ ls -ld /var/log/mythtv
-  drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
-  $
+       $ su
+       # mkdir /var/log/mythtv
+       # chown root:mythtv /var/log/mythtv
+       # chmod 0775 /var/log/mythtv
+       # exit
+       $ ls -ld /var/log/mythtv
+       drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
+       $
 
   [1m19.12.1.2.  Mandrake 9.x[0m
 
