@@ -1541,7 +1541,7 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
     if ((types == EndOfRecording || types == DeleteRecording) &&
         (program->IsSameProgram(*program)))
     {
-        tmpmessage = tr("Yes, but record this episode again next time"); 
+        tmpmessage = tr("Yes, but allow future recordings of this episode"); 
         tmpslot = SLOT(doDeleteForgetHistory());
         popup->addButton(tmpmessage, this, tmpslot);
     }
