@@ -40,6 +40,17 @@ int mythplugin_run(void);
 int mythplugin_config(void);
 }
 
+void runNews(void);
+
+void setupKeys(void)
+{
+    REG_JUMP("MythNews", "RSS News feed reader", "", runNews);
+
+    REG_KEY("News", "RETRIEVENEWS", "Update news items", "I");
+    REG_KEY("News", "FORCERETRIEVE", "Force update news items", "M");
+    REG_KEY("News", "CANCEL", "Cancel news item updating", "C");
+}
+
 int mythplugin_init(const char *libversion)
 {
     if (!gContext->TestPopupVersion("mythnews",
@@ -50,9 +61,8 @@ int mythplugin_init(const char *libversion)
     return 0;
 }
 
-int mythplugin_run(void)
+void runNews(void)
 {
-
 //     QTranslator translator(0);
 //     translator.load(PREFIX + QString("/share/mythtv/i18n/mythwnews_") +
 //                     QString(gContext->GetSetting("Language").lower()) +
@@ -64,7 +74,11 @@ int mythplugin_run(void)
     news.exec();
 
 //     qApp->removeTranslator(&translator);
+}
 
+int mythplugin_run(void)
+{
+    runNews();
     return 0;
 }
 

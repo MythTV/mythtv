@@ -123,16 +123,21 @@ public:
 
     virtual void keyPressEvent(QKeyEvent* e) {
 
-        switch (e->key())
+        QStringList actions;
+        gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions);
+        
+        for (unsigned int i = 0; i < actions.size(); i++)
         {
-        case Key_Space:
-        case Key_Return:
-        case Key_Enter:
-            emit returnPressed(item(currentItem()));
-            break;
-        default:
-            MythListBox::keyPressEvent(e);
+            QString action = actions[i];
+
+            if (action == "SELECT")
+            {
+                emit returnPressed(item(currentItem()));
+                return;
+            }
         }
+
+        MythListBox::keyPressEvent(e);
     }
 
     virtual void focusInEvent(QFocusEvent *e) {

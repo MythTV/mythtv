@@ -469,48 +469,53 @@ void MythNews::keyPressEvent(QKeyEvent *e)
 {
     if (!e) return;
 
-    switch (e->key())
+    bool handled = false;
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions);
+   
+    for (unsigned int i = 0; i < actions.size(); i++)
     {
-    case Key_Left:
-    case Key_A:
-        cursorLeft();
-        break;
+         QString action = actions[i];
 
-    case Key_Right:
-    case Key_D:
-        cursorRight();
-        break;
-
-    case Key_Down:
-    case Key_S:
-        cursorDown();
-        break;
-
-    case Key_Up:
-    case Key_W:
-        cursorUp();
-        break;
-
-        //case Key_PageUp: case Key_3: pageUp(); break;
-        //case Key_PageDown: case Key_9: pageDown(); break;
-
-    case Key_U:
-        slotRetrieveNews();
-        break;
-
-    case Key_F: {
-        forceRetrieveNews();
-        break;
+        if (action == "UP")
+        {
+            cursorUp();
+            handled = true;
+        }
+        else if (action == "DOWN")
+        {
+            cursorDown();
+            handled = true;
+        }
+        else if (action == "LEFT")
+        {
+            cursorLeft();
+            handled = true;
+        }
+        else if (action == "RIGHT")
+        {
+            cursorRight();
+            handled = true;
+        }
+        else if (action == "RETRIEVENEWS")
+        {
+            slotRetrieveNews();
+            handled = true;
+        }
+        else if (action == "FORCERETRIEVE")
+        {
+            forceRetrieveNews();
+            handled = true;
+        }
+        else if (action == "CANCEL")
+        {
+            if (m_RetrievingNews)
+                cancelRetrieve();
+        }
     }
 
-    case Key_C:
-        if (m_RetrievingNews)
-            cancelRetrieve();
-        break;
-
-    default:
+    if (!handled)
         MythDialog::keyPressEvent(e);
-    }
 }
 
 void MythNews::cursorUp()
