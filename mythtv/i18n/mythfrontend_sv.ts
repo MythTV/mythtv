@@ -229,6 +229,14 @@
         <source>Only shows marked as HDTV</source>
         <translation>Endast visningar markerade som HDTV</translation>
     </message>
+    <message>
+        <source>SportsCenter Overnight (complete example - use FindDaily)</source>
+        <translation>SportsCenter på natten (komplett exempel - använder Hitta dagligen)</translation>
+    </message>
+    <message>
+        <source>Movie of the Week (complete example - use FindWeekly)</source>
+        <translation>Veckans film (komplett exempel - använder Hitta veckovis)</translation>
+    </message>
 </context>
 <context>
     <name>DataDirectLineupSelector</name>
@@ -1329,10 +1337,6 @@
     <message>
         <source>Automatically Skip Commercials</source>
         <translation>Hoppa över reklam automatiskt</translation>
-    </message>
-    <message>
-        <source>Automatically Flag Commercials</source>
-        <translation type="obsolete">Automatisk reklamdetektering</translation>
     </message>
     <message>
         <source>Strict Commercial Detection</source>
@@ -2688,14 +2692,6 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>Kortnamn</translation>
     </message>
     <message>
-        <source>Do NOT use DVB driver for filtering.</source>
-        <translation type="obsolete">Använd INTE DVB-drivrutinen för filtrering.</translation>
-    </message>
-    <message>
-        <source>(BROKEN) This option is used to get around filtering limitations on some DVB cards.</source>
-        <translation type="obsolete">(UR FUNKTION) Denna inställning används för att komma runt filterbegränsningar på en del DVB-kort.</translation>
-    </message>
-    <message>
         <source>Normally the dvb-recording will drop packets from the card untill a sequence start header is seen. This option turns off this feature.</source>
         <translation>Normalt börjar inte inspelning från DVB förrän en startrubrik hittas. Denna inställning avaktiverar detta.</translation>
     </message>
@@ -2990,14 +2986,6 @@ så du måste ställa in dessa manuellt.</translation>
     <message>
         <source>Find One Recordings Priority</source>
         <translation>Prioritet för &apos;hitta en visning&apos;</translation>
-    </message>
-    <message>
-        <source>Length of time to retain DVB signal data (in days)</source>
-        <translation type="obsolete">Antal dagar att behålla data om DVB-signal</translation>
-    </message>
-    <message>
-        <source>DVB Global Settings</source>
-        <translation type="obsolete">Globala DVB-inställningar</translation>
     </message>
     <message>
         <source>Pre Shutdown check-command</source>
@@ -4150,14 +4138,6 @@ som du startade detta programmet ifrån.</translation>
         <translation>Använd XvMC MPEG-hårdvaruavkodning</translation>
     </message>
     <message>
-        <source>Sample interval for DVB signal statistics (in seconds)</source>
-        <translation type="obsolete">Samplingsintervall för DVB signalstatistik (i sekunder)</translation>
-    </message>
-    <message>
-        <source>MythTV will monitor the DVB signal statistics using the specified interval.  Set to &quot;0&quot; to disable.</source>
-        <translation type="obsolete">MythTV kommer att bevaka DVB signalstatistiken med specificerat intervall. Sätt till &quot;0&quot; för att avaktivera.</translation>
-    </message>
-    <message>
         <source>Log MythTV events to database</source>
         <translation>Logga MythTV-händelser till databas</translation>
     </message>
@@ -4476,24 +4456,6 @@ som du startade detta programmet ifrån.</translation>
     <message>
         <source>DataDirect Status: </source>
         <translation>DataDirect-status:</translation>
-    </message>
-    <message>
-        <source>Details of DVB error statistics for last 48 hours:
-</source>
-        <translation type="obsolete">Detaljer för DVB-felstatistik de senaste 48 timmarna:
-</translation>
-    </message>
-    <message>
-        <source>Recording period from %1 to %2</source>
-        <translation type="obsolete">Inspelningsperiod från %1 till %2</translation>
-    </message>
-    <message>
-        <source>Encoder %1 Min SNR: %2 Avg SNR: %3 Min BER %4 Avg BER %5 Cont Errs: %6 Overflows: %7</source>
-        <translation type="obsolete">Kort %1 Min SNR: %2 Med SNR: %3 Min BER %4 Med BER %5 Antal fel: %6 Överfyllningar: %7</translation>
-    </message>
-    <message>
-        <source>There is no DVB signal quality data available to display.</source>
-        <translation type="obsolete">Det finns ingen tillgänglig DVB-signalkvalitetsdata att visa.</translation>
     </message>
     <message>
         <source>No items found at priority level %1 or lower.</source>
@@ -5214,10 +5176,6 @@ som du startade detta programmet ifrån.</translation>
         <translation>pcHDTV-kort (HD-2000, HD-3000)</translation>
     </message>
     <message>
-        <source>This is the default policy used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
-        <translation type="obsolete">Detta är den förvalda policyn för automatisk reklamdetektering när en ny schemalagd inspelning skapas.</translation>
-    </message>
-    <message>
         <source>4/3</source>
         <translation>4/3</translation>
     </message>
@@ -5684,7 +5642,7 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     </message>
     <message>
         <source>Point to Point</source>
-        <translation>Point to Point</translation>
+        <translation>Punkt-till-punkt</translation>
     </message>
     <message>
         <source>Broadcast</source>
@@ -5792,43 +5750,43 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     </message>
     <message>
         <source>Default Auto Commercial Flagging setting</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisk reklamdetektering som standard</translation>
     </message>
     <message>
         <source>This is the default value used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta är det förvalda värdet för inställningen Automatisk reklamdetektering när en ny schemalagd inspelning skapas.</translation>
     </message>
     <message>
         <source>Default &apos;Run User Job #1&apos; setting</source>
-        <translation type="unfinished"></translation>
+        <translation>Kör användarjobb #1 som standard</translation>
     </message>
     <message>
         <source>This is the default value used for the &apos;Run User Job #1&apos; setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta är det förvalda värdet för inställningen &apos;Kör användarjobb #1&apos; när en ny schemalagd inspelning skapas.</translation>
     </message>
     <message>
         <source>Default &apos;Run User Job #2&apos; setting</source>
-        <translation type="unfinished"></translation>
+        <translation>Kör användarjobb #2 som standard</translation>
     </message>
     <message>
         <source>This is the default value used for the &apos;Run User Job #2&apos; setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta är det förvalda värdet för inställningen &apos;Kör användarjobb #2&apos; när en ny schemalagd inspelning skapas.</translation>
     </message>
     <message>
         <source>Default &apos;Run User Job #3&apos; setting</source>
-        <translation type="unfinished"></translation>
+        <translation>Kör användarjobb #3 som standard</translation>
     </message>
     <message>
         <source>This is the default value used for the &apos;Run User Job #3&apos; setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta är det förvalda värdet för inställningen &apos;Kör användarjobb #3&apos; när en ny schemalagd inspelning skapas.</translation>
     </message>
     <message>
         <source>Default &apos;Run User Job #4&apos; setting</source>
-        <translation type="unfinished"></translation>
+        <translation>Kör användarjobb #4 som standard</translation>
     </message>
     <message>
         <source>This is the default value used for the &apos;Run User Job #4&apos; setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta är det förvalda värdet för inställningen &apos;Kör användarjobb #4&apos; när en ny schemalagd inspelning skapas.</translation>
     </message>
 </context>
 <context>
