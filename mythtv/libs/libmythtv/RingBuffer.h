@@ -9,7 +9,7 @@ class RingBuffer
 {
  public:
     RingBuffer(const char *lfilename, bool actasnormalfile, bool write);
-    RingBuffer(const char *lfilename, long long size);
+    RingBuffer(const char *lfilename, long long size, long long smudge);
     
    ~RingBuffer();
 
@@ -25,7 +25,9 @@ class RingBuffer
     long long GetWritePosition(void) { return writepos; }
     long long GetTotalWritePosition(void) { return totalwritepos; }
     long long GetFileSize(void) { return filesize; }
-    
+
+    long long GetFreeSpace(void);
+
  private:
     string filename;
     
@@ -41,6 +43,7 @@ class RingBuffer
     long long totalreadpos;
 
     long long filesize;
+    long long smudgeamount;
 
     long long wrapcount;
 };

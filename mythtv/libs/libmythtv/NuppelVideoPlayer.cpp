@@ -593,13 +593,20 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     playing = true;
     killplayer = false;
-   
+  
+    framesPlayed = 0;
+    
     while (!eof && !killplayer)
     {
         if (paused)
 	{
-            usleep(50);
-            continue;
+            if (livetv && ringBuffer->GetFreeSpace() < 0)
+                paused = false;
+	    else
+            {
+                usleep(50);
+                continue;
+            }
 	}
 
         videobuf = GetFrame(&timecode, audiofd <= 0, &audiodata, &audiodatalen);
@@ -665,6 +672,7 @@ void NuppelVideoPlayer::StartPlaying(void)
                    video_height / 4);
 
             XJ_show(video_width, video_height);
+	    framesPlayed++;
         }
 
         if (usecs > 0)
@@ -680,6 +688,11 @@ void NuppelVideoPlayer::StartPlaying(void)
     XJ_exit();
 }
 
+bool NuppelVideoPlayer::TogglePause(void)
+{
+    paused = !paused;
+    return paused;
+}
 void NuppelVideoPlayer::FastForward(float seconds)
 {
 }

@@ -36,9 +36,12 @@ class NuppelVideoPlayer
 
     void SetRingBuffer(RingBuffer *rbuf) { ringBuffer = rbuf; }
 
-    bool TogglePause(void) { return (paused = !paused); }
+    bool TogglePause(void);
     void FastForward(float seconds);
     void Rewind(float seconds);
+
+    float GetFrameRate(void) { return video_frame_rate; } 
+    long long GetFramesPlayed(void) { return framesPlayed; }
     
  private:
     void InitSound(void);
@@ -54,6 +57,8 @@ class NuppelVideoPlayer
     unsigned char *GetFrame(int *timecode, int onlyvideo, 
                             unsigned char **audiodata, int *alen);
     
+    long long CalcMaxPausePosition(void);
+
     int deinterlace;
     
     int audiofd;
@@ -99,8 +104,12 @@ class NuppelVideoPlayer
     bool playing;
 
     RingBuffer *ringBuffer;
-    bool weMadeBuffer;
+    bool weMadeBuffer; 
     bool killplayer;
+
+    long long framesPlayed;
+
+    bool livetv;
 };
 
 #endif

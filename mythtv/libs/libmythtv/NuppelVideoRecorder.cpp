@@ -133,7 +133,10 @@ void NuppelVideoRecorder::Initialize(void)
     {
         ringBuffer = new RingBuffer(sfilename.c_str(), true, true);
 	weMadeBuffer = true;
+	livetv = false;
     }
+    else
+        livetv = true;
 
     InitBuffers();
 }
@@ -513,11 +516,16 @@ int NuppelVideoRecorder::CreateNuppelFile(void)
 
     snprintf(realfname, 250, "%s", sfilename.c_str());
 
+    framesWritten = 0;
+
     if (!ringBuffer)
     {
         ringBuffer = new RingBuffer(sfilename.c_str(), true, true);
         weMadeBuffer = true;
+	livetv = false;
     }
+    else
+        livetv = true;
 
     if (!ringBuffer->IsOpen()) 
         return(-1);
@@ -539,14 +547,14 @@ int NuppelVideoRecorder::CreateNuppelFile(void)
     fileheader.textsblocks = 0;
     fileheader.keyframedist = KEYFRAMEDISTEND;
     ringBuffer->Write(&fileheader, FILEHEADERSIZE);
-
+    
     frameheader.frametype = 'D'; // compressor data
     frameheader.comptype  = 'R'; // compressor data for RTjpeg
     frameheader.packetlength = sizeof(tbls);
 
     // compression configuration header
     ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
-
+    
     // compression configuration data
     ringBuffer->Write(tbls, sizeof(tbls));
 
@@ -874,7 +882,8 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
     }
 
     frameofgop++;
-
+    framesWritten++;
+    
     // if we have lost frames we insert "copied" frames until we have the
     // exact count because of that we should have no problems with audio 
     // sync, as long as we don't loose audio samples :-/
@@ -891,6 +900,7 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
         // we don't calculate sizes for lost frames for compression computation
         dropped--;
         frameofgop++;
+	framesWritten++;
     }
 
     // now we reset the last frame number so that we can find out

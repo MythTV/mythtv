@@ -22,14 +22,18 @@ RingBuffer::RingBuffer(const char *lfilename, bool actasnormalfile, bool write)
         fd = open(lfilename, O_RDONLY|O_LARGEFILE);
         writemode = false;
     }
+
+    totalwritepos = writepos = 0;
+    totalreadpos = readpos = 0;
+    smudgeamount = 0;
 }
 
-RingBuffer::RingBuffer(const char *lfilename, long long size)
+RingBuffer::RingBuffer(const char *lfilename, long long size, long long smudge)
 {
     normalfile = false;
     filename = lfilename;
     filesize = size;
-    
+   
     fd = -1; fd2 = -1;
 
     fd = open(filename.c_str(), O_WRONLY|O_CREAT|O_LARGEFILE, 0644);
@@ -39,6 +43,7 @@ RingBuffer::RingBuffer(const char *lfilename, long long size)
     totalreadpos = readpos = 0;
 
     wrapcount = 0;
+    smudgeamount = smudge;
 }
 
 RingBuffer::~RingBuffer(void)
@@ -57,6 +62,7 @@ int RingBuffer::Read(void *buf, int count)
         if (!writemode)
         {
             ret = read(fd, buf, count);
+	    totalreadpos += ret;
         }
         else
         {
@@ -104,6 +110,7 @@ int RingBuffer::Write(const void *buf, int count)
         if (writemode)
         {
             ret = write(fd, buf, count);
+	    totalwritepos += ret;
         }
         else
         {
@@ -145,6 +152,10 @@ long long RingBuffer::Seek(long pos, int whence)
     if (normalfile)
     {
         ret = lseek(fd, pos, whence);
+	if (whence == SEEK_SET)
+            readpos = ret;
+	else if (whence == SEEK_CUR)
+            readpos += pos;
     }
     else
     {
@@ -156,4 +167,12 @@ long long RingBuffer::Seek(long pos, int whence)
             readpos += pos;
     }
     return ret;
+}
+
+long long RingBuffer::GetFreeSpace(void)
+{
+    if (!normalfile)
+        return (totalreadpos + filesize - totalwritepos);
+    else
+        return -1;
 }

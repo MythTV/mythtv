@@ -45,7 +45,9 @@ class NuppelVideoRecorder
     void StopRecording(void) { encoding = false; }
     
     bool IsRecording(void) { return encoding; }
-    
+   
+    long long GetFramesWritten(void) { return framesWritten; } 
+
  protected:
     static void *WriteThread(void *param);
     static void *AudioThread(void *param);
@@ -134,6 +136,11 @@ class NuppelVideoRecorder
 
     int keyswritten;
     int keyframedist;
+
+    long long framesWritten;
+    double video_frame_rate;
+
+    bool livetv;
 };
 
 #endif
