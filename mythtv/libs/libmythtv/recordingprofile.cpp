@@ -1,4 +1,5 @@
 #include "recordingprofile.h"
+#include "libmyth/mythcontext.h"
 #include <qsqldatabase.h>
 #include <qheader.h>
 #include <qcursor.h>
@@ -310,7 +311,7 @@ public:
             maxheight = 480;
 
         } else {
-            maxwidth = 704;
+            maxwidth = 768;
             maxheight = 576;
         }
 
@@ -329,7 +330,8 @@ RecordingProfile::RecordingProfile()
     profile->addChild(name = new Name(*this));
     addChild(profile);
 
-    addChild(new ImageSize(*this, "ntsc"));
+    QString tvFormat = gContext->GetSetting("TVFormat");
+    addChild(new ImageSize(*this, tvFormat));
 
     addChild(new VideoCompressionSettings(*this));
 
