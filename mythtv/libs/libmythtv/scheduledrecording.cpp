@@ -409,6 +409,9 @@ void ScheduledRecording::doneRecording(QSqlDatabase* db, const ProgramInfo& prog
     if (!result.isActive())
         MythContext::DBError("doneRecording", result);
 
+    // The addition of an entry to oldrecorded may affect near-future
+    // scheduling decisions, so recalculate
+    signalChange(db);
 }
 
 MythDialog* ScheduledRecording::dialogWidget(QWidget* parent, const char* name)
