@@ -1,6 +1,6 @@
 #include <qapplication.h>
 #include <qsqldatabase.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "libmyth/mythcontext.h"
 #include "libmyth/settings.h"

@@ -13,14 +13,15 @@
 #include <qsqlquery.h>
 #include <qurl.h>
 
+#include <unistd.h>
+#include <signal.h>
+
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
-#include <signal.h>
+#include <cstdlib>
+#include <cstdio>
+#include <ctime>
 
 #include "libmyth/mythcontext.h"
 #include "libmythtv/scheduledrecording.h"

@@ -13,6 +13,7 @@
 #include <map>
 #include <vector>
 #include <algorithm>
+#include <cassert>
 using namespace std;
 
 #include "proglist.h"
@@ -62,17 +63,10 @@ ProgLister::ProgLister(ProgListType pltype, const QString &view,
     LoadWindow(xmldata);
 
     LayerSet *container = theme->GetSet("selector");
-    if (container)
-    {
-        UIListType *ltype = (UIListType *)container->GetType("proglist");
-        if (ltype)
-            listsize = ltype->GetItems();
-    }
-    else
-    {
-        cerr << "MythFrontEnd: ProgLister - Failed to get selector object.\n";
-        exit(0);
-    }
+    assert(container);
+    UIListType *ltype = (UIListType *)container->GetType("proglist");
+    if (ltype)
+        listsize = ltype->GetItems();
 
     chooseListBox = NULL;
     chooseLineEdit = NULL;

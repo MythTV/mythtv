@@ -3,6 +3,12 @@
 #ifndef FORMAT_H
 #define FORMAT_H
 
+#ifdef __GNUC__
+#define MYTH_PACKED __attribute__((packed))
+#else
+#define MYTH_PACKED
+#endif
+
 typedef struct rtfileheader
 {
   char finfo[12];     // "NuppelVideo" + \0
@@ -75,7 +81,7 @@ typedef struct rtframeheader
    int  packetlength;   // V,A,T: length of following data in stream
    			// S:     length of packet correl. information [NI]
    			// R:     do not use here! (fixed 'RTjjjjjjjjjjjjjj')
-} rtframeheader;
+} MYTH_PACKED rtframeheader;
 
 // The fourcc's here are for the most part taken from libavcodec.
 // As to their correctness, I have no idea.  The audio ones are surely wrong,
@@ -110,19 +116,19 @@ typedef struct extendeddata
    // unused for later -- total size of 128 integers.
    // new fields must be added at the end, above this comment.
    int expansion[109];
-} extendeddata;
+} MYTH_PACKED extendeddata;
 
 typedef struct seektable_entry
 {
    long long file_offset;
    int keyframe_number; 
-} seektable_entry;
+} MYTH_PACKED seektable_entry;
 
 typedef struct kfatable_entry
 {
    int adjust;
    int keyframe_number;
-} kfatable_entry;
+} MYTH_PACKED kfatable_entry;
 
 #define FRAMEHEADERSIZE sizeof(rtframeheader)
 #define FILEHEADERSIZE  sizeof(rtfileheader)

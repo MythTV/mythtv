@@ -6,9 +6,9 @@
 #include "qfile.h"
 #include "qtextstream.h"
 
-#include <stdio.h>
+#include <cstdio>
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 #include <sys/param.h>
 
 using namespace std;

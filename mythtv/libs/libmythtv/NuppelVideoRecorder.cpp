@@ -1,5 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -7,8 +7,8 @@
 #include <sys/soundcard.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
-#include <errno.h>
-#include <math.h>
+#include <cerrno>
+#include <cmath>
 
 #include <qstringlist.h>
 

@@ -1,14 +1,14 @@
 #include <iostream>
 #include <pthread.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
-#include <time.h>
+#include <ctime>
 #include "videodev_myth.h"
 
 extern "C" {

@@ -4,10 +4,10 @@
 #include <sys/stat.h>
 
 // For testing
-#include <stdio.h>
+#include <cstdio>
 #include <iostream>
-#include <stdlib.h>
-#include <errno.h>
+#include <cstdlib>
+#include <cerrno>
 
 using namespace std;
 

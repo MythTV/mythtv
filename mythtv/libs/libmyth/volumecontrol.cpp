@@ -3,7 +3,7 @@
 #include <linux/soundcard.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
-#include <stdio.h>
+#include <cstdio>
 #include <unistd.h>
 
 #include <iostream>

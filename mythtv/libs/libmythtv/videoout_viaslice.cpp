@@ -1,6 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <signal.h>
 #include <fcntl.h>
 #include <sys/time.h>
@@ -8,8 +8,8 @@
 #include <sys/mman.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include <math.h>
-#include <time.h>
+#include <cmath>
+#include <ctime>
 
 #include <map>
 #include <iostream>

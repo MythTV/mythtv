@@ -6,7 +6,7 @@
 #include <qrect.h>
 #include <qpoint.h>
 #include <qvaluevector.h>
-#include <time.h>
+#include <ctime>
 #include <qmap.h>
 #include <qdom.h>
 #include <qmutex.h>

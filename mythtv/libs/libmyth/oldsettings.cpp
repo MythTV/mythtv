@@ -10,15 +10,15 @@
 
 
 #include "oldsettings.h"
-#include <fstream>
-#include <stdlib.h>
-#include <stdio.h>
 #include <qstring.h>
-#include <stdlib.h>
-#include <time.h>
+#include <fstream>
+#include <cstdlib>
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
+#include <string>
 #include <sys/time.h>
 
-#include <string>
 using namespace std;
 
 #include <qdir.h>

@@ -26,9 +26,9 @@ match they will be ignored.
 */
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <unistd.h>
 #include <pthread.h>
 #include <sys/types.h>

@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
 #include <qimage.h>
 #include <qpixmap.h>
 #include <qbitmap.h>
@@ -12,6 +11,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <cassert>
 using namespace std;
 
 #include "ttfont.h"
@@ -280,7 +280,7 @@ void OSD::parseFont(QDomElement &element)
     if (name.isNull() || name.isEmpty())
     {
         cerr << "Font needs a name\n";
-        exit(0);
+        return;
     }
 
     for (QDomNode child = element.firstChild(); !child.isNull();
@@ -323,7 +323,7 @@ void OSD::parseFont(QDomElement &element)
             else
             {
                 cerr << "Unknown tag " << info.tagName() << " in font\n";
-                exit(0);
+                continue;
             }
         }
     }
@@ -332,7 +332,7 @@ void OSD::parseFont(QDomElement &element)
     if (font)
     {
         cerr << "Error: already have a font called: " << name << endl;
-        exit(0);
+        return;
     }
 
     if (fontSizeType == "small")
@@ -346,17 +346,13 @@ void OSD::parseFont(QDomElement &element)
             size = sizeBig;
     }
     
-    if (size < 0) 
-    {
-        cerr << "Error: font size must be > 0\n";
-        exit(0); 
-    }
+    assert(size > 0);
 
     font = LoadFont(fontfile, size);
     if (!font)
     {
         cerr << "Couldn't load font: " << fontfile << endl;
-        exit(0);
+        return;
     }
 
     font->setColor(color);
@@ -372,7 +368,7 @@ void OSD::parseBox(OSDSet *container, QDomElement &element)
     if (name.isNull() || name.isEmpty())
     {
         cerr << "Box needs a name\n";
-        exit(0);
+        return;
     }
 
     QRect area(0, 0, 0, 0);
@@ -391,7 +387,7 @@ void OSD::parseBox(OSDSet *container, QDomElement &element)
             else
             {
                 cerr << "Unknown tag in box: " << info.tagName() << endl;
-                exit(0);
+                return;
             }
         }
     }
@@ -406,7 +402,7 @@ void OSD::parseImage(OSDSet *container, QDomElement &element)
     if (name.isNull() || name.isEmpty())
     {
         cerr << "Image needs a name\n";
-        exit(0);
+        return;
     }
     
     QString filename = "";
@@ -437,7 +433,7 @@ void OSD::parseImage(OSDSet *container, QDomElement &element)
             else
             {
                 cerr << "Unknown: " << info.tagName() << " in image\n";
-                exit(0);
+                return;
             }
         }
     }
@@ -466,7 +462,7 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
     if (name.isNull() || name.isEmpty())
     {
         cerr << "Text area needs a name\n";
-        exit(0);
+        return;
     }
 
     for (QDomNode child = element.firstChild(); !child.isNull();
@@ -522,7 +518,7 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
             else
             {
                 cerr << "Unknown tag in textarea: " << info.tagName() << endl;
-                exit(0);
+                return;
             }                   
         }
     }    
@@ -531,7 +527,7 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
     if (!ttffont)
     {
         cerr << "Unknown font: " << font << " in textarea: " << name << endl;
-        exit(0);
+        return;
     }
 
     OSDTypeText *text = new OSDTypeText(name, ttffont, "", area);
@@ -588,14 +584,14 @@ void OSD::parseSlider(OSDSet *container, QDomElement &element)
     if (name.isNull() || name.isEmpty())
     {
         cerr << "Slider needs a name\n";
-        exit(0);
+        return;
     }
 
     QString type = element.attribute("type", "");
     if (type.isNull() || type.isEmpty())
     {
         cerr << "Slider needs a type";
-        exit(0);
+        return;
     }
 
     for (QDomNode child = element.firstChild(); !child.isNull();
@@ -620,7 +616,7 @@ void OSD::parseSlider(OSDSet *container, QDomElement &element)
             else
             {
                 cerr << "Unknown: " << info.tagName() << " in image\n";
-                exit(0);
+                return;
             }
         }
     }
@@ -628,7 +624,7 @@ void OSD::parseSlider(OSDSet *container, QDomElement &element)
     if (filename == "")
     {
         cerr << "Slider needs a filename\n";
-        exit(0);
+        return;
     }
 
     filename = themepath + filename;
@@ -644,7 +640,7 @@ void OSD::parseSlider(OSDSet *container, QDomElement &element)
         if (altfilename == "")
         {
             cerr << "Edit slider needs an altfilename\n";
-            exit(0);
+            return;
         }
 
         altfilename = themepath + altfilename;
@@ -670,13 +666,13 @@ void OSD::parseEditArrow(OSDSet *container, QDomElement &element)
     if (name.isNull() || name.isEmpty())
     {
         cerr << "editarrow needs a name\n";
-        exit(0);
+        return;
     }
 
     if (name != "left" && name != "right")
     {
         cerr << "editarrow name needs to be either 'left' or 'right'\n";
-        exit(0);
+        return;
     }
 
     QRect area(0, 0, 0, 0);
@@ -700,7 +696,7 @@ void OSD::parseEditArrow(OSDSet *container, QDomElement &element)
             else
             {
                 cerr << "Unknown tag in editarrow: " << info.tagName() << endl;
-                exit(0);
+                return;
             }
         }
     }
@@ -708,7 +704,7 @@ void OSD::parseEditArrow(OSDSet *container, QDomElement &element)
     if (filename == "")
     {
         cerr << "editarrow needs a filename\n";
-        exit(0);
+        return;
     }
 
     editarrowRect = area;
@@ -732,7 +728,7 @@ void OSD::parsePositionRects(OSDSet *container, QDomElement &element)
     if (name.isNull() || name.isEmpty())
     {
         cerr << "positionsrects needs a name\n";
-        exit(0);
+        return;
     }
 
     OSDTypePositionRectangle *rects = new OSDTypePositionRectangle(name);
@@ -753,7 +749,7 @@ void OSD::parsePositionRects(OSDSet *container, QDomElement &element)
             else
             {
                 cerr << "Unknown tag in editarrow: " << info.tagName() << endl;
-                exit(0);
+                return;
             }
         }
     }
@@ -767,7 +763,7 @@ void OSD::parsePositionImage(OSDSet *container, QDomElement &element)
     if (name.isNull() || name.isEmpty())
     {
         cerr << "positionimage needs a name\n";
-        exit(0);
+        return;
     }
 
     QString filename = "";
@@ -800,7 +796,7 @@ void OSD::parsePositionImage(OSDSet *container, QDomElement &element)
             else
             {
                 cerr << "Unknown: " << info.tagName() << " in positionimage\n";
-                exit(0);
+                return;
             }
         }
     }
@@ -820,14 +816,14 @@ void OSD::parseContainer(QDomElement &element)
     if (name.isNull() || name.isEmpty())
     {
         cerr << "Container needs a name\n";
-        exit(0);
+        return;
     }
 
     OSDSet *container = GetSet(name);
     if (container) 
     {
         cerr << "Container: " << name << " already exists\n";
-        exit(0);
+        return;
     }
 
     container = new OSDSet(name, true, vid_width, vid_height, wmult, hmult,
@@ -886,7 +882,7 @@ void OSD::parseContainer(QDomElement &element)
             else
             {
                 cerr << "Unknown container child: " << info.tagName() << endl;
-                exit(0);
+                return;
             }
         }
     }
@@ -921,8 +917,8 @@ bool OSD::LoadTheme(void)
     f.close();
 
     QDomElement docElem = doc.documentElement();
-    QDomNode n = docElem.firstChild();
-    while (!n.isNull())
+    for (QDomNode n = docElem.firstChild(); !n.isNull();
+         n = n.nextSibling())
     {
         QDomElement e = n.toElement();
         if (!e.isNull())
@@ -946,10 +942,9 @@ bool OSD::LoadTheme(void)
             else
             {
                 cerr << "Unknown element: " << e.tagName() << endl;
-                exit(0);
+                continue;
             }
         }
-        n = n.nextSibling();
     }
 
     return true;
@@ -1308,7 +1303,7 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
         if (!text)
         {
             cerr << "Couldn't find: " << name << endl;
-            exit(0);
+            return;
         }
 
         text->SetText(options[i - 1]);
@@ -1320,7 +1315,7 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
     if (!opr)
     {
         cerr << "Need a positionindicator named 'selector' in the basedialog\n";
-        exit(0);
+        return;
     }
 
     opr->SetOffset(availoptions - numoptions);

@@ -1,12 +1,11 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <unistd.h>
 #include <fcntl.h>
-#include <assert.h>
-#include <errno.h>
+#include <cassert>
+#include <cerrno>
 #include <sys/time.h>
-#include <time.h>
-#include <math.h>
+#include <ctime>
 #include <qstringlist.h>
 #include <qsqldatabase.h>
 #include <qmap.h>

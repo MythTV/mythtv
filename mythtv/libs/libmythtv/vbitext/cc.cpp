@@ -20,14 +20,14 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstdarg>
 #include <unistd.h>
-#include <string.h>
-#include <ctype.h>
+#include <cstring>
+#include <cctype>
+#include <cerrno>
 #include <fcntl.h>
-#include <errno.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #ifdef HAVE_GETOPT_H

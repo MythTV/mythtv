@@ -9,7 +9,7 @@
 #include <qregexp.h>
 
 #include <unistd.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <fcntl.h>
 #include <linux/soundcard.h>
 #include <sys/ioctl.h>

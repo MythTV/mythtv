@@ -12,7 +12,7 @@
 using namespace std;
 
 #include <sys/poll.h>
-#include <errno.h>
+#include <cerrno>
 #include <unistd.h>
 
 #include <linux/dvb/version.h>

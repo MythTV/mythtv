@@ -1,12 +1,12 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <unistd.h>
 #include <fcntl.h>
-#include <assert.h>
-#include <errno.h>
+#include <cassert>
+#include <cerrno>
 #include <sys/time.h>
-#include <time.h>
-#include <math.h>
+#include <ctime>
+#include <cmath>
 #include <qstringlist.h>
 #include <qsqldatabase.h>
 #include <qmap.h>
@@ -342,11 +342,7 @@ void NuppelVideoPlayer::InitVideo(void)
         if (!widget)
         {
             MythMainWindow *window = gContext->GetMainWindow();
-            if (!window)
-            {
-                cerr << "No main window, aborting\n";
-                exit(0);
-            }
+            assert(window);
 
             QObject *playbackwin = window->child("tv playback");
         
@@ -356,11 +352,7 @@ void NuppelVideoPlayer::InitVideo(void)
             {
                 cerr << "Couldn't find 'tv playback' widget\n";
                 widget = window->currentWidget();
-                if (!widget)
-                {
-                    cerr << "No top level widget, aborting\n";
-                    exit(0);
-                }
+                assert(widget);
             }  
         }
 

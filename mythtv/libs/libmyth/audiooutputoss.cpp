@@ -1,13 +1,13 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
 #include <fcntl.h>
 #include <sys/time.h>
 #include <unistd.h>
 #include <time.h>
 #include <sys/soundcard.h>
 #include <sys/ioctl.h>
-#include <errno.h>
+#include <cerrno>
+#include <cstring>
 
 #include <iostream>
 #include <qdatetime.h>
@@ -90,7 +90,7 @@ void AudioOutputOSS::Reconfigure(int laudio_bits, int laudio_channels,
             {
                 cerr << "ERROR: something is currently using: " << audiodevice
                      << "\nFix this, then run mythfrontend again\n";
-                exit(0);
+                exit(1);
             }
             cerr << "Error opening audio device (" << audiodevice << "):\n";
             perror(audiodevice.ascii());

@@ -18,6 +18,7 @@
 #include <qregexp.h>
 #include <unistd.h>
 #include <time.h>
+#include <cassert>
 
 #include "progfind.h"
 #include "infodialog.h"
@@ -75,18 +76,12 @@ ProgFinder::ProgFinder(MythMainWindow *parent, const char *name)
     LoadWindow(xmldata);
 
     LayerSet *container = theme->GetSet("selector");
-    if (container)
+    assert(container);
+
+    UIListType *ltype = (UIListType *)container->GetType("alphabet");
+    if (ltype)
     {
-        UIListType *ltype = (UIListType *)container->GetType("alphabet");
-        if (ltype)
-        {
-            showsPerListing = ltype->GetItems();
-        }
-    }
-    else
-    {
-        cerr << "Failed to get selector object.\n";
-        exit(0);
+        showsPerListing = ltype->GetItems();
     }
 
     updateBackground();
@@ -426,7 +421,7 @@ void ProgFinder::LoadWindow(QDomElement &element)
             else
             {
                 cerr << "Unknown element: " << e.tagName() << endl;
-                exit(0);
+                continue;
             }
         }
     }

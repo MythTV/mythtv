@@ -1,9 +1,8 @@
 #include <qapplication.h>
 #include <qevent.h>
 #include <qkeysequence.h>
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
+#include <cstdio>
+#include <cerrno>
 
 #include <iostream>
 using namespace std;

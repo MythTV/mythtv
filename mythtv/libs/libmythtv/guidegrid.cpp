@@ -414,7 +414,7 @@ void GuideGrid::LoadWindow(QDomElement &element)
             else
             {
                 cerr << "Unknown element: " << e.tagName() << endl;
-                exit(0);
+                continue;
             }
         }
     }

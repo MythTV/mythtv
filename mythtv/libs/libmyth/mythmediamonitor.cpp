@@ -4,7 +4,7 @@
 #include <sys/file.h>
 #include <fcntl.h>
 #include <dirent.h>
-#include <stdio.h>
+#include <cstdio>
 #include <mntent.h>
 #include <iostream>
 #include <unistd.h>
@@ -13,8 +13,7 @@
 
 // For testing
 #if 0
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdlib>
 #endif
 
 #ifndef MNTTYPE_ISO9660

@@ -113,8 +113,8 @@ void MythContextPrivate::Init(bool gui, bool lcd)
         char localhostname[1024];
         if (gethostname(localhostname, 1024))
         {
-            cerr << "Error getting local hostname\n";
-            exit(0);
+            perror("gethostname");
+            exit(1);
         }
         m_localhostname = localhostname;
     }

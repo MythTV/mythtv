@@ -29,10 +29,10 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <cstdlib>
+#include <cstdio>
 using namespace std;
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <sys/poll.h>

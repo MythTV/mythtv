@@ -1,13 +1,13 @@
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <netinet/in.h>
-#include <assert.h>
-#include <stdarg.h>
-#include <string.h>
+#include <cassert>
+#include <cstdarg>
+#include <cstring>
 #include <getopt.h>
 
 #include <iostream>

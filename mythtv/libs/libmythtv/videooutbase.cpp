@@ -1,4 +1,4 @@
-#include <math.h>
+#include <cmath>
 
 #include "videooutbase.h"
 #include "osd.h"

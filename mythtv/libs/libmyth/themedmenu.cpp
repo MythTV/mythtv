@@ -12,6 +12,7 @@
 #include <qdom.h>
 
 #include <iostream>
+#include <cmath>
 using namespace std;
 
 #include "themedmenu.h"

@@ -7,9 +7,9 @@
 #include <qstringlist.h>
 
 #include <unistd.h>
-#include <stdio.h>
+#include <cstdio>
 #include <fcntl.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <sys/ioctl.h>
 #include <sys/types.h>
 

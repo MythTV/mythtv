@@ -9,10 +9,10 @@
 #include <fstream>
 #include <string>
 #include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
-#include <math.h>
+#include <cstdlib>
+#include <cstdio>
+#include <ctime>
+#include <cmath>
 
 #include "libmyth/mythcontext.h"
 #include "libmythtv/commercial_skip.h"

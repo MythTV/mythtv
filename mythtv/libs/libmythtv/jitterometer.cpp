@@ -1,9 +1,9 @@
 #include <sys/time.h>
 #include <unistd.h>
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstring>
+#include <cstdio>
+#include <cmath>
   
 #include "jitterometer.h"
 

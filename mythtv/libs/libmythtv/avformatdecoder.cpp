@@ -276,14 +276,14 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     if (err < 0)
     {
         cerr << "avformat error: " << err << endl;
-        exit(0);
+        exit(1);
     }
 
     int ret = av_find_stream_info(ic);
     if (ret < 0)
     {
         cerr << "could not find codec parameters: " << filename << endl;
-        exit(0);
+        exit(1);
     }
 
     fmt->flags &= ~AVFMT_NOFILE;
@@ -422,13 +422,13 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         if (!codec)
         {
             cerr << "Unknown codec: " << enc->codec_id << endl;
-            exit(0);
+            exit(1);
         }
 
         if (avcodec_open(enc, codec) < 0)
         {
             cerr << "Couldn't find lavc codec\n";
-            exit(0);
+            exit(1);
         }
     }
 
@@ -1157,7 +1157,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     if (ret < 0)
                     {
                         cerr << "decoding error\n";
-                        exit(0);
+                        exit(1);
                     }
 
                     if (!gotpicture)
@@ -1248,7 +1248,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                 default:
                     cerr << "error decoding - " << curstream->codec.codec_type 
                          << endl;
-                    exit(0);
+                    exit(1);
             }
 
             ptr += ret;

@@ -22,9 +22,9 @@
     
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include "RTjpegN.h"
 
 #ifdef MMX

@@ -23,9 +23,9 @@
 
 using namespace std;
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include "ttfont.h"
 
 #include "osdtypes.h"
