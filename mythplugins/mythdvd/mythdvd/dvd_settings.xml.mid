@@ -4,6 +4,7 @@
       <text>Rip Settings</text>
       <text lang="DK">Genkodnings indstillinger</text>
       <text lang="PT">Configurações de Cópia</text>
+      <text lang="DE">Rippen Einstellungen</text>
       <action>DVD_SETTINGS_RIP</action>
    </button>
 

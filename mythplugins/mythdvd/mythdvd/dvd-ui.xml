@@ -62,6 +62,7 @@
                 <value lang="SV">Kopiering/Omkodning</value>
                 <value lang="ES">Ripear/Trascodificar</value>
                 <value lang="CA">Volcar/Trascodificar</value>
+                <value lang="DE">Rippen/Umwandeln</value>
             </textarea>
             <image name="progress_background" draworder="0">
                 <filename>md_progress_background.png</filename>
@@ -112,6 +113,7 @@
                 <value lang="SV">Jobb 1 av 1</value>
                 <value lang="ES">Trabajo 1 de 1</value>
                 <value lang="CA">Tasca 1 de 1</value>
+                <value lang="DE">Auftrag 1 von 1</value>
             </textarea>
 
             <statusbar name="overall_status" draworder="1" whitespace="15">
@@ -221,6 +223,7 @@
                 <value lang="SV">Kopiering/Omkodning</value>
                 <value lang="ES">Ripear/Trascodificar</value>
                 <value lang="CA">Volcar/Trascodificar</value>
+                <value lang="DE">Rippen/Umwandeln</value>
             </textarea>
             <image name="progress_background" draworder="0">
                 <filename>md_progress_background.png</filename>
@@ -245,6 +248,7 @@
                 <value lang="SV">Längd:</value>
                 <value lang="ES">Duración:</value>
                 <value lang="CA">Duració:</value>
+                <value lang="DE">Länge:</value>
             </textarea>
 
             <textarea name="ripcheck_text" draworder="0" align="right">
@@ -256,6 +260,7 @@
                 <value lang="SV">Välj:</value>
                 <value lang="ES">Seleccione:</value>
                 <value lang="CA">Sel·leccionat:</value>
+                <value lang="DE">Wähle:</value>
             </textarea>
 
             <textarea name="ripname_text" draworder="0" align="right">
@@ -267,6 +272,7 @@
                 <value lang="SV">Namn:</value>
                 <value lang="ES">Nombre:</value>
                 <value lang="CA">Nom:</value>
+                <value lang="DE">Name:</value>
             </textarea>
 
             <textarea name="ripquality_text" draworder="0" align="right">
@@ -278,6 +284,7 @@
                 <value lang="SV">Kvalitet:</value>
                 <value lang="ES">Calidad:</value>
                 <value lang="CA">Qualitat:</value>
+                <value lang="DE">Qualität:</value>
             </textarea>
 
             <textarea name="ripaudio_text" draworder="0" align="right">
@@ -289,6 +296,7 @@
                 <value lang="SV">Ljudspår:</value>
                 <value lang="ES">Banda de audio:</value>
                 <value lang="CA">Pista d'àudio:</value>
+                <value lang="DE">Audiospur:</value>
             </textarea>
 
             <textarea name="ripacthree_text" draworder="0" align="right">
@@ -300,6 +308,7 @@
                 <value lang="SV">AC3-ljud:</value>
                 <value lang="ES">Audio AC3:</value>
                 <value lang="CA">Àudio AC3:</value>
+                <value lang="DE">AC3 Audio:</value>
             </textarea>
 
             <textarea name="subtitle_text" draworder="0" align="right">
@@ -311,6 +320,7 @@
                 <value lang="SV">Textning:</value>
                 <value lang="ES">Subtítulos:</value>
                 <value lang="CA">Subtítols:</value>
+                <value lang="DE">Untertitel:</value>
             </textarea>
 
             <textarea name="ripview_text" draworder="0" align="right">
@@ -322,6 +332,7 @@
                 <value lang="SV">Vy:</value>
                 <value lang="ES">Ver:</value>
                 <value lang="CA">Veure:</value>
+                <value lang="DE">Ansehen:</value>
             </textarea>
 
             <!--
@@ -397,6 +408,7 @@
                 <value lang="SV">Titel 1 av 1</value>
                 <value lang="ES">Título 1 de 1</value>
                 <value lang="CA">Títol 1 de 1</value>
+                <value lang="DE">Titel 1 von 1</value>
             </textarea>
 
             <pushbutton name="prev_title_button" draworder="0">

@@ -4,5 +4,6 @@
       <text>Rip DVD</text>
       <text lang="DK">Genkod DVD</text>
       <text lang="PT">Copiar DVD</text>
+      <text lang="DE">DVD rippen</text>
       <action>DVD_RIP</action>
    </button>

@@ -5,6 +5,7 @@
       <text>General Settings</text>
       <text lang="DK">Generelle indstillinger</text>
       <text lang="PT">Configurações Gerais</text>
+      <text lang="DE">Allgemeines</text>
       <action>DVD_SETTINGS_GENERAL</action>
    </button>
 
@@ -13,6 +14,7 @@
       <text>Play Settings</text>
       <text lang="DK">Afspilnings indstillinger</text>
       <text lang="PT">Configurações de Leitura</text>
+      <text lang="DE">Wiedergabe Einstellungen</text>
       <action>DVD_SETTINGS_PLAY</action>
    </button>
 

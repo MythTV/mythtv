@@ -3,51 +3,51 @@
     <name>DVDRipBox</name>
     <message>
         <source>Your connection to the Myth Transcoding Daemon has gone away. This is not a good thing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Verbindung zum Myth Transcoding Daemon wurde unterbrochen. Das ist nicht gut.</translation>
     </message>
     <message>
         <source>Cannot connect to your Myth Transcoding Daemon. You can try hitting any number key to start it. If you still see this message, then something is really wrong.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kann nicht zum Myth Transcoding Daemon verbinden. Drücken Sie eine Zifferntaste um ihn zu starten. Sollte diese Meldung wieder erscheinen, dann ist etwas wirklich nicht in Ordnung.</translation>
     </message>
     <message>
         <source>Attempting to connect to your mtd said host not found. This is unrecoverably bad. </source>
-        <translation type="unfinished"></translation>
+        <translation>Habe den Fehler &apos;Rechner nicht gefunden&apos; beim Verbinden zum MTD erhalten. Ich kann nicht weitermachen.</translation>
     </message>
     <message>
         <source>Socket communication errors. This is unrecoverably bad. </source>
-        <translation type="unfinished"></translation>
+        <translation>Socket Fehler. Ich kann nicht weitermachen.</translation>
     </message>
     <message>
         <source>Something is wrong, but I don&apos;t know what.</source>
-        <translation type="unfinished"></translation>
+        <translation>Etwas stimmt nicht, aber ich weiß nicht genau was.</translation>
     </message>
     <message>
         <source>Job %1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Auftrag %1 von %2</translation>
     </message>
     <message>
         <source>No jobs and nothing else to do. You could hit 0 to rip a DVD.</source>
-        <translation type="unfinished"></translation>
+        <translation>Es gibt nichts zu tun. Drücken Sie &apos;0&apos; um eine DVD zu rippen.</translation>
     </message>
     <message>
         <source>No Jobs. Checking and/or waiting for DVD.</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Aufträge. Warte bis eine DVD eingelegt wird.</translation>
     </message>
     <message>
         <source>No jobs and nothing else to do. You could hit 0 to rip a disc if you like.</source>
-        <translation type="unfinished"></translation>
+        <translation>Es gibt nichts zu tun. Drücken Sie &apos;0&apos; um eine DVD zu rippen.</translation>
     </message>
     <message>
         <source>Cancelling ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Breche ab...</translation>
     </message>
     <message>
         <source>0 New Rip</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;0&apos; Neuer Rip</translation>
     </message>
     <message>
         <source>9 Cancel Job</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;9&apos; Auftrag abbrechen</translation>
     </message>
 </context>
 <context>
@@ -56,236 +56,236 @@
         <source>
 
 You have no VCD Player command defined.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sie haben keinen VCD Abspielbefehl eingerichtet.</translation>
     </message>
     <message>
         <source>OK, I&apos;ll go run Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Gut, Ich werde Setup starten</translation>
     </message>
     <message>
         <source>
 
 You have no VCD Device defined.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sie haben kein VCD Gerät eingerichtet.</translation>
     </message>
     <message>
         <source>
 
 You have no DVD Player command defined.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sie haben keinen DVD Abspielbefehl eingerichtet.</translation>
     </message>
     <message>
         <source>
 
 You have no DVD Device defined.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sie haben kein DVD Gerät eingerichtet.</translation>
     </message>
     <message>
         <source>Location of VCD device</source>
-        <translation type="unfinished"></translation>
+        <translation>Pfad zum VCD Gerät</translation>
     </message>
     <message>
         <source>This device must exist, and the user running MythDVD needs to have read permission on the device.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dieses Gerät muß existieren und MythDVD die Leserechte dafür besitzen.</translation>
     </message>
     <message>
         <source>Location of DVD device</source>
-        <translation type="unfinished"></translation>
+        <translation>Pfad zum DVD Gerät</translation>
     </message>
     <message>
         <source>General Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Allgemeines</translation>
     </message>
     <message>
         <source>DVD Player Command</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD Spieler Befehlszeile</translation>
     </message>
     <message>
         <source>This can be any command to launch a DVD player (e.g. MPlayer, ogle, etc.). If present, %d will be substituted for the DVD device (e.g. /dev/dvd).</source>
-        <translation type="unfinished"></translation>
+        <translation>Dieser Befehl sollte den DVD Spieler starten (z.B. mplayer, ogle usw.). &apos;%d&apos; wird dabei durch das DVD-Gerät ersetzt (z.B. /dev/dvd).</translation>
     </message>
     <message>
         <source>VCD Player Command</source>
-        <translation type="unfinished"></translation>
+        <translation>VCD Spieler Befehlszeile</translation>
     </message>
     <message>
         <source>This can be any command to launch a VCD player (e.g. MPlayer, xine, etc.). If present, %d will be substituted for the VCD device (e.g. /dev/cdrom).</source>
-        <translation type="unfinished"></translation>
+        <translation>Dieser Befehl sollte den VCD Spieler starten (z.B. mplayer, xine usw.). &apos;%d&apos; wird dabei durch das VCD-Gerät ersetzt (z.B. /dev/cdrom).</translation>
     </message>
     <message>
         <source>DVD Player Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD Spieler Einstellungen</translation>
     </message>
     <message>
         <source>VCD Player Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>VCD Spieler Einstellungen</translation>
     </message>
     <message>
         <source>Directory to hold temporary files</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Temp. Verzeichnis</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythDVD needs to have write permission to the directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Verzeichnis für temporäre Dateien. Es muß bereits existieren und MythDVD Schreibrechte dafür besitzen.</translation>
     </message>
     <message>
         <source>Title Playing Command</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel Abspielbefehl</translation>
     </message>
     <message>
         <source>This is a command used to preview a given title on a DVD. If present %t will be set to the title, %d for device, %a for audio track, %c for audio channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dieser Befehl startet die Vorschau eines Titels einer DVD. &apos;%t&apos; wird durch den Titel, &apos;%d&apos; durch das Gerät, &apos;%a&apos; durch die Audiospur und &apos;%c&apos; durch die Anzahl der Audiokanäle ersetzt.</translation>
     </message>
     <message>
         <source>Subtitle arguments:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Argumente für Untertitel</translation>
     </message>
     <message>
         <source>If you choose any subtitles for ripping, this command is added to the end of the Title Play Command to allow previewing of subtitles. If  present %s will be set to the subtitle track. </source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn Sie einen Untertitel für die Umwandlung ausgewählt haben, wird dieser Befehl dem Titel-Abspielbefehl hinzugefügt, um die Vorschau von Untertiteln zu erlauben. &apos;%s&apos; wird durch die Untertitelspur ersetzt.</translation>
     </message>
     <message>
         <source>Base transcode command</source>
-        <translation type="unfinished"></translation>
+        <translation>Pfad zu &apos;transcode&apos;</translation>
     </message>
     <message>
         <source>This is the base (without arguments) command to run transcode on your system.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">vollständiger Pfad und Dateiname zu &apos;transcode&apos; (z.B. /usr/bin/transcode)</translation>
     </message>
     <message>
         <source>MTD port number</source>
-        <translation type="unfinished"></translation>
+        <translation>MTD Portnummer</translation>
     </message>
     <message>
         <source>The port number that should be used for communicating with the MTD (Myth Transcoding Daemon)</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Portnummer für die Kommunikation mit dem MTD (Myth Transcoding Daemon)</translation>
     </message>
     <message>
         <source>MTD logs to terminal window</source>
-        <translation type="unfinished"></translation>
+        <translation>Im Terminalfenster loggen</translation>
     </message>
     <message>
         <source>If set, the MTD (Myth Transcoding Daemon) will log to the window it is started from. Otherwise, it will write to a file called  mtd.log in the top level ripping directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, so protokolliert der MTD im Ursprungsfenster. Ansonsten werden alle Meldungen in die Datei &apos;mtd.log&apos; im obersten Rippingverzeichnis geschrieben.</translation>
     </message>
     <message>
         <source>Transcode AC3 Audio</source>
-        <translation type="unfinished"></translation>
+        <translation>AC3 Audio umwandeln</translation>
     </message>
     <message>
         <source>If set, the MTD (Myth Transcoding Daemon) will, by default, preserve AC3 (Dolby Digital) audio in transcoded files. </source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, bleibt AC3 Audio (Dolby Digital) in umgewandelten Dateien erhalten.</translation>
     </message>
     <message>
         <source>Use xvid rather than divx</source>
-        <translation type="unfinished"></translation>
+        <translation>Bevorzuge &apos;xvid&apos;</translation>
     </message>
     <message>
         <source>If set, mythdvd will use the (open, free) xvid codec rather than divx whenever possible.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, so wird der Opensource Kodierer &apos;xvid&apos; verwendet. Ansonsten der &apos;divx&apos; Kodierer.</translation>
     </message>
     <message>
         <source>Nice level for MTD</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;Nice&apos; Wert für den MTD</translation>
     </message>
     <message>
         <source>This determines the priority of the Myth Transcoding Daemon. Higher numbers mean lower priority (more CPU to other tasks).</source>
-        <translation type="unfinished"></translation>
+        <translation>Dies bestimmt die Priorität des MTD. Größere Werte bedeuten eine geringere Priorität (mehr Rechenzeit für andere Aufgaben).</translation>
     </message>
     <message>
         <source>Ripped video segments</source>
-        <translation type="unfinished"></translation>
+        <translation>max. Segmentgröße</translation>
     </message>
     <message>
         <source>If set to something other than 0, ripped video titles will be broken up into files of this size (in MB). Applies to both perfect quality recordings and intermediate files used for transcoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls ungleich Null, so werden gerippte Videotitel in mehrere Dateien dieser Größe (in MB) aufgeteilt. Gilt für Perfekte Qualität und für temporäre Dateien während der Umwandlung.</translation>
     </message>
     <message>
         <source>DVD Ripper Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD Ripper Einstellungen</translation>
     </message>
     <message>
         <source>MTD Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>MTD Einstellungen</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Unbekannt</translation>
     </message>
     <message>
         <source>Waiting For Access to DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Warte auf Zugriffserlaubnis auf die DVD</translation>
     </message>
     <message>
         <source>Ripping to file ~</source>
-        <translation type="unfinished"></translation>
+        <translation>Rippe in Datei ~</translation>
     </message>
     <message>
         <source>Perfect DVD Rip of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Perfekter DVD Rip von %1</translation>
     </message>
     <message>
         <source>Transcode of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Umwandlung von %1</translation>
     </message>
     <message>
         <source>Waiting for Permission to Start Transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Warte auf Freigabe um die Umwandlung zu starten</translation>
     </message>
     <message>
         <source>Transcoding Pass 1 of 2 ~</source>
-        <translation type="unfinished"></translation>
+        <translation>Umwandlung Durchlauf 1 von 2 ~</translation>
     </message>
     <message>
         <source>Transcoding Pass 2 of 2 ~</source>
-        <translation type="unfinished"></translation>
+        <translation>Umwandlung Durchlauf 2 von 2 ~</translation>
     </message>
     <message>
         <source>Transcoding ~</source>
-        <translation type="unfinished"></translation>
+        <translation>Umwandlung ~</translation>
     </message>
     <message>
         <source>Transcode is thinking </source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;transcode&apos; denkt nach</translation>
     </message>
     <message>
         <source>Simultaneous Transcode Jobs</source>
-        <translation type="unfinished"></translation>
+        <translation>Anzahl paralleler Aufträge</translation>
     </message>
     <message>
         <source>This determines the number of simultaneous transcode jobs. If set at 1 (the default), there will only be one active job at a time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestimmt die Anzahl paralleler Umwandlungsaufträge. Bei &apos;1&apos; (Vorgabe) wird jeweils nur ein Auftrag gestartet.</translation>
     </message>
 </context>
 <context>
     <name>TitleDialog</name>
     <message>
         <source>Unkown</source>
-        <translation type="unfinished"></translation>
+        <translation>Unbekannt</translation>
     </message>
     <message>
         <source>%1 - Title %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 - Titel %2</translation>
     </message>
     <message>
         <source>Perfect</source>
-        <translation type="unfinished"></translation>
+        <translation>Perfekt</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Nichts</translation>
     </message>
     <message>
         <source>Title %1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel %1 von %2</translation>
     </message>
     <message>
         <source>0 Process Selected Title</source>
-        <translation type="unfinished"></translation>
+        <translation>0 Verarbeite gewählten Titel</translation>
     </message>
     <message>
         <source>0 Process Selected Titles</source>
-        <translation type="unfinished"></translation>
+        <translation>0 Verarbeite gewählte Titel</translation>
     </message>
 </context>
 </TS>
