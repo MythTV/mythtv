@@ -15,6 +15,10 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <net/if.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+
 
 
 #include <qapplication.h>
@@ -80,53 +84,95 @@ void MFDService::setResolved(uint ip1, uint ip2, uint ip3, uint ip4, uint port_h
     port_number = (port_high * 256) + port_low;
     resolved = true;
 
-    //
-    //  Now, is this service on this host, on the local. network or (at some
-    //  point in the future) elsewhere
-    //
-    
-    char my_hostname[2049];
-    if(gethostname(my_hostname, 2048) < 0)
-    {
-        warning("could not call gethostname()");
-        return;
-    }
+    QString service_address_string = QString("%1.%2.%3.%4")
+                                             .arg(ip1)
+                                             .arg(ip2)
+                                             .arg(ip3)
+                                             .arg(ip4);
 
-    QString local_hostname = my_hostname;
-
-    QString ip_address_string = QString("%1.%2.%3.%4").arg(ip1).arg(ip2).arg(ip3).arg(ip4);
-
-    struct hostent* host_information;
-    struct in_addr  ip_address_number;
-    ip_address_number.s_addr = inet_addr(ip_address_string.ascii());
-    host_information = gethostbyaddr((char*)&(ip_address_number.s_addr), sizeof(ip_address_number), AF_INET);
-    QString service_hostname = "";
-    if(!host_information)
-    {
-        warning(QString("could not call gethostbyaddr() using ip address %1 (will assume lan/net)")
-                .arg(ip_address_string));
-    }
-    else
-    {
-        service_hostname = host_information->h_name;
-        service_hostname = service_hostname.section('.',0,0);
-    }
 
     //
-    //  Determine service location: local if hostname's are the same (i.e. 
-    //  even if different network interfaces) or no IP hostname lookup (i.e.
-    //  probably no functioning network), lan otherwise, but at somepoint
-    //  we'll want to add net (on the network, beyond the local lan).
+    //  Try and figure out if this service is local (running on this host)
+    //  or not. This got cut and pasted from a Google search, so it could be
+    //  dreadfully wrong.
     //
 
-    if(service_hostname == local_hostname)
+    struct ifconf ifc;
+    struct ifreq *req;
+    struct sockaddr_in *ipaddr;
+    char *buf,  *ptr;
+    int lastlen, len, sock;
+
+
+    sock = socket(PF_INET, SOCK_DGRAM, 0);
+    lastlen = 0;
+    len = 100 * sizeof(struct ifreq);
+
+    for(;;)
     {
-        service_location = SLOCATION_HOST;
+        buf = new char[len];
+        ifc.ifc_buf = buf;
+        ifc.ifc_len = len;
+
+        if(ioctl(sock, SIOCGIFCONF, &ifc) < 0)
+        {
+            if(errno != EINVAL || lastlen != 0)
+            {
+                delete [] buf;
+                warning("something dreadful happened while "
+                        "trying to find this host's ip "
+                        "addresses.");
+                service_location = SLOCATION_HOST;
+                return;
+            }
+        } 
+        else 
+        {
+
+            if(ifc.ifc_len == lastlen)
+            {
+                break;
+            }
+     
+            lastlen = ifc.ifc_len;
+        }
+
+        //
+        //  Increment the buffer
+        //
+
+        len += 10 * sizeof(struct ifreq);
+        delete [] buf;
     }
-    else
+
+    //
+    //  Unless we discover otherwise, say this service is not on this host
+    //
+
+    service_location = SLOCATION_LAN;
+
+    //
+    //  Look through the ip addresses of this host, if one matches then we
+    //  know the service is on this host
+    //
+
+    for(ptr = buf; ptr < buf + ifc.ifc_len; )
     {
-        service_location = SLOCATION_LAN;
+        req = (struct ifreq *)ptr;
+
+        ipaddr = (struct sockaddr_in *) &req->ifr_addr;
+        
+        QString this_host_address = QString(inet_ntoa(ipaddr->sin_addr));
+
+        if( this_host_address == service_address_string)
+        {
+            service_location = SLOCATION_HOST;
+        } 
+        ptr += sizeof(struct ifreq);
     }
+
+    delete [] buf;
+
 }
 
 const QString& MFDService::getLongDescription()
@@ -361,6 +407,7 @@ void ZeroConfigClient::handleServiceQueryCallback(mDNS *const m, ServiceInfoQuer
                                         query->info->port.b[0],                               
                                         query->info->port.b[1]
                                       );
+                
                 log(QString("resolved service \"%1\" to %2")
                     .arg(a_service->getName())
                     .arg(a_service->getLongDescription()),1);
