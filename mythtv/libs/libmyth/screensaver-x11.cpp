@@ -1,9 +1,6 @@
 #include "screensaver.h"
 
 #include <X11/Xlib.h>
-#include <iostream>
-
-using namespace std;
 
 class ScreenSaverPrivate {
     struct {
@@ -27,7 +24,6 @@ ScreenSaverControl::~ScreenSaverControl() {
 }
 
 void ScreenSaverControl::Disable(void) {
-    cerr << "Disabling screensaver\n";
     if (!d->state.saved)
     {
         XGetScreenSaver(qt_xdisplay(),
@@ -42,7 +38,6 @@ void ScreenSaverControl::Disable(void) {
 }
 
 void ScreenSaverControl::Restore(void) {
-    cerr << "Restoring screensaver\n";
     XResetScreenSaver(qt_xdisplay());
     XSetScreenSaver(qt_xdisplay(),
                     d->state.timeout, d->state.interval,
@@ -52,6 +47,5 @@ void ScreenSaverControl::Restore(void) {
 }
 
 void ScreenSaverControl::Reset(void) {
-    cerr << "Resetting screensaver\n";
     XResetScreenSaver(qt_xdisplay());
 }
