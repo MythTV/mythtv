@@ -132,7 +132,7 @@ While watching a recording:
   - 'C' and 'Q' clear all cut points in the cutlist.
 - X queues the current recording for transcoding.
 - O brings up menu to allow toggling settings such as Commercial Auto-Skip,
-    Auto-Expire, etc..
+    Auto-Expire, etc.
 
 EPG
 ---
