@@ -42,6 +42,10 @@ to your usr/local/include/ directory.
     Also required is openssl (for generating unique identifiers for content
 files). This should be included with just about any Linux distribution.
 
+    You'll also need libopendaap if you want to play iTunes content. Make
+_sure_ to get the right version. Some details are in the daapclient plugin
+README.
+
 INFORMATION FOR DEVELOPERS
 --------------------------
 
