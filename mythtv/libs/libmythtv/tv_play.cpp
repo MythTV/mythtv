@@ -178,6 +178,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "SUBCHANNELSEP", "Separator for HDTV subchannels", "_");
     
     REG_KEY("TV Editing", "CLEARMAP", "Clear editing cut points", "C,Q,Home");
+    REG_KEY("TV Editing", "INVERTMAP", "Invert Begin/End cut points", "I");
     REG_KEY("TV Editing", "LOADCOMMSKIP", "Load cut list from commercial skips",
             "Z,End");
     REG_KEY("TV Editing", "NEXTCUT", "Jump to the next cut point", "PgDown");

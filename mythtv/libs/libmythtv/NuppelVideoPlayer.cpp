@@ -2714,6 +2714,15 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
             deleteMap.clear();
             UpdateEditSlider();
         }
+        else if (action == "INVERTMAP")
+        {
+            QMap<long long, int>::Iterator it;
+            for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
+                ReverseMark(it.key());
+
+            UpdateEditSlider();
+            UpdateTimeDisplay();
+        }
         else if (action == "LOADCOMMSKIP")
         {
             if (hascommbreaktable)
@@ -2730,6 +2739,7 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
                     }
                 }
                 UpdateEditSlider();
+                UpdateTimeDisplay();
             }
         }
         else if (action == "PREVCUT")
@@ -2967,8 +2977,7 @@ void NuppelVideoPlayer::HandleResponse(void)
                 AddMark(framesPlayed, type);
                 break;
             case 3:
-                DeleteMark(deleteframe);
-                AddMark(deleteframe, 1 - type);
+                ReverseMark(deleteframe);
                 break;
             default:
                 break;
@@ -3007,6 +3016,18 @@ void NuppelVideoPlayer::DeleteMark(long long frames)
 {
     osd->HideEditArrow(frames, deleteMap[frames]);
     deleteMap.remove(frames);
+}
+
+void NuppelVideoPlayer::ReverseMark(long long frames)
+{
+    osd->HideEditArrow(frames, deleteMap[frames]);
+
+    if (deleteMap[frames] == 0)
+        deleteMap[frames] = 1;
+    else
+        deleteMap[frames] = 0;
+
+    osd->ShowEditArrow(frames, totalFrames, deleteMap[frames]);
 }
 
 void NuppelVideoPlayer::HandleArbSeek(bool right)

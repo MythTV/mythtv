@@ -263,6 +263,7 @@ class NuppelVideoPlayer
     void UpdateEditSlider(void);
     void AddMark(long long frames, int type);
     void DeleteMark(long long frames);
+    void ReverseMark(long long frames);
     void HandleSelect(void);
     void HandleResponse(void);
     void HandleArbSeek(bool right);
