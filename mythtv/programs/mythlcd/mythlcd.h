@@ -38,6 +38,7 @@ class MythLCD : public QWidget
 		void	doChannel();
 		void	doMusic();
 		void	doProgress();
+		void	doMenuPop();
 		
 		void	generateFakeMusicData();
 		void	generateFakeProgressData();

@@ -52,6 +52,11 @@ MythLCD::MythLCD(QWidget *parent, const char *name )
 	progressButton->move(10,130);
 	connect(progressButton, SIGNAL(clicked()), this, SLOT(doProgress()));
 	
+	QPushButton *menuButton= new QPushButton("Push Me", this);
+	menuButton->resize(180,30);
+	menuButton->move(10,170);
+	connect(menuButton, SIGNAL(clicked()), this, SLOT(doMenuPop()));
+	
 	
 	//
 	//	Add a timer for fake music data
@@ -118,6 +123,11 @@ void MythLCD::doChannel()
 	}
 	fakeProgress = 0.0;
 	fakeProgressTimer->start(800, FALSE);
+}
+
+void MythLCD::doMenuPop()
+{
+	gContext->LCDpopMenu("Choose Me", "--Title--");
 }
 
 void MythLCD::doMusic()
