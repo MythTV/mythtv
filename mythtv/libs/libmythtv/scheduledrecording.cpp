@@ -506,6 +506,12 @@ void ScheduledRecording::runProgList(void)
                                 QSqlDatabase::database(),
                                 gContext->GetMainWindow(), "proglist");
             break;
+        case kPowerSearch:
+            pl = new ProgLister(plPowerSearch, title->getValue()
+                                .remove(" (" + tr("Power Search") + ")", ""),
+                                QSqlDatabase::database(),
+                                gContext->GetMainWindow(), "proglist");
+            break;
         default:
             pl = new ProgLister(plTitle, title->getValue(),
                                 QSqlDatabase::database(),
@@ -514,10 +520,16 @@ void ScheduledRecording::runProgList(void)
         }
     }
     else
-        pl = new ProgLister(plTitle, title->getValue(),
-                            QSqlDatabase::database(),
-                            gContext->GetMainWindow(), "proglist");
-
+    {
+        if(search->intValue())
+            pl = new ProgLister(plTitle, m_pginfo->title,
+                                QSqlDatabase::database(),
+                                gContext->GetMainWindow(), "proglist");
+        else
+            pl = new ProgLister(plTitle, title->getValue(),
+                                QSqlDatabase::database(),
+                                gContext->GetMainWindow(), "proglist");
+    }
     pl->exec();
     delete pl;
     //proglistButton->setFocus();

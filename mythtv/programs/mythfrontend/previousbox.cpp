@@ -385,10 +385,10 @@ void PreviousBox::fillViewList(const QString &view)
     viewList << "reverse time";
     viewTextList << tr("Reverse Time");
 
-    curView = 0;
+    curView = viewList.findIndex(view);
 
-    if (curView >= (int)viewList.count())
-        curView = viewList.count() - 1;
+    if (curView < 0)
+        curView = 0;
 }
 
 void PreviousBox::fillItemList(void)

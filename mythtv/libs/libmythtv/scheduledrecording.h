@@ -149,8 +149,10 @@ public:
     
     QString ChannelText(QString format);
 
-protected slots:
+public slots:
     void runProgList();
+
+protected slots:
     void runShowDetails();
 
 protected:

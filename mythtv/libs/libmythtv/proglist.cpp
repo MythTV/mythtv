@@ -1160,7 +1160,26 @@ void ProgLister::fillViewList(const QString &view)
             }
         }
         if (view != "")
+        {
             curView = viewList.findIndex(view);
+
+            if (curView < 0)
+            {
+                QString qphrase = view.utf8();
+                qphrase.replace("\'", "\\\'");
+
+                querystr = QString("REPLACE INTO keyword (phrase, searchtype)"
+                                   "VALUES('%1','%2');")
+                                    .arg(qphrase).arg(searchtype);
+                QSqlQuery rquery;
+                rquery.exec(querystr);
+
+                viewList << qphrase;
+                viewTextList << qphrase;
+
+                curView = viewList.count() - 1;
+            }
+        }
         else
             curView = -1;
     }

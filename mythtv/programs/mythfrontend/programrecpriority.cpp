@@ -534,13 +534,10 @@ void ProgramRecPriority::upcoming(void)
     if (!curitem)
         return;
 
-    ProgramRecPriorityInfo *rec = curitem;
+    ScheduledRecording record;
 
-    ProgLister *pl = new ProgLister(plTitle, rec->title,
-                                   QSqlDatabase::database(),
-                                   gContext->GetMainWindow(), "proglist");
-    pl->exec();
-    delete pl;
+    record.loadByID(db, curitem->recordid);
+    record.runProgList();
 }
 
 void ProgramRecPriority::changeRecPriority(int howMuch) 
