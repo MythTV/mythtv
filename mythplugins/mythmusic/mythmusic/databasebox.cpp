@@ -68,7 +68,6 @@ DatabaseBox::DatabaseBox(QSqlDatabase *ldb, QString &paths,
 void DatabaseBox::Show()
 {
     showFullScreen();
-    setActiveWindow();
 }
 
 void DatabaseBox::fillCD(void)

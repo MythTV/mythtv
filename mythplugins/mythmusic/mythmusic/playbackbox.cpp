@@ -283,7 +283,6 @@ QPixmap PlaybackBox::scalePixmap(const char **xpmdata)
 void PlaybackBox::Show(void)
 {
     showFullScreen();
-    setActiveWindow();
 }
 
 void PlaybackBox::setupListView(void)

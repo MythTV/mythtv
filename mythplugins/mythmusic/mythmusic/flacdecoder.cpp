@@ -285,7 +285,7 @@ bool FlacDecoder::initialize()
     totalTime = totalTime < 0 ? 0 : totalTime;
 
     FLAC__seekable_stream_decoder_init(decoder);
-    FLAC__seekable_stream_decoder_process_metadata(decoder);
+    FLAC__seekable_stream_decoder_process_until_end_of_metadata(decoder);
 
     inited = TRUE;
     return TRUE;
@@ -348,7 +348,7 @@ void FlacDecoder::run()
             seekTime = -1.0;
         }
 
-        flacok = FLAC__seekable_stream_decoder_process_one_frame(decoder);
+        flacok = FLAC__seekable_stream_decoder_process_single(decoder);
         decoderstate = FLAC__seekable_stream_decoder_get_state(decoder);
 
         if (decoderstate == 0 || decoderstate == 1)
