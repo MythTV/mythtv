@@ -349,7 +349,7 @@ void Transcoder::TranscodePoll()
         transData = CheckTranscodeTable(true);
         CheckDoneTranscoders();
 
-        if (transData)
+        if (transData && Transcoders.isEmpty())
         {
             if (!transData->useCutlist || !isFileInUse(transData->pinfo))
             {
