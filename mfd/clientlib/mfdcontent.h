@@ -36,9 +36,11 @@ class MfdContentCollection
                                     int playlist_id, 
                                     int spot_counter
                                   );
-    void addItemToAudioArtistTree(AudioMetadata *item, GenericTree *starting_point);
-    void addItemToAudioGenreTree(AudioMetadata *item, GenericTree *starting_point);
+    void addItemToAudioArtistTree(AudioMetadata *item, GenericTree *starting_point, bool do_checks = false);
+    void addItemToAudioGenreTree(AudioMetadata *item, GenericTree *starting_point, bool do_checks = false);
     void addItemToAudioCollectionTree(AudioMetadata *item, const QString &collection_name);
+    void addItemToSelectableTrees(AudioMetadata *item);
+    void addPlaylistToSelectableTrees(ClientPlaylist *playlist);
 
     UIListGenericTree* getAudioArtistTree(){     return audio_artist_tree;     }
     UIListGenericTree* getAudioGenreTree(){      return audio_genre_tree;      }
@@ -47,8 +49,11 @@ class MfdContentCollection
     UIListGenericTree* getNewPlaylistTree(){     return new_playlist_tree;     }
     UIListGenericTree* getEditablePlaylistTree(){return editable_playlist_tree;}
     
-    AudioMetadata*  getAudioItem(int which_collection, int which_id);
-
+    AudioMetadata*     getAudioItem(int which_collection, int which_id);
+    ClientPlaylist*    getAudioPlaylist(int which_collection, int which_id);
+    UIListGenericTree* constructPlaylistTree(int which_collection, int which_playlist);
+    UIListGenericTree* constructContentTree(int which_collection, int which_playlist);
+    
     void sort();
     void setupPixmaps();
     
@@ -56,7 +61,8 @@ class MfdContentCollection
 
     int collection_id;
 
-    QIntDict<AudioMetadata> audio_item_dictionary;
+    QIntDict<AudioMetadata>  audio_item_dictionary;
+    QIntDict<ClientPlaylist> audio_playlist_dictionary;
 
     UIListGenericTree *audio_artist_tree;
     UIListGenericTree *audio_genre_tree;
@@ -64,7 +70,9 @@ class MfdContentCollection
     UIListGenericTree *audio_collection_tree;
     UIListGenericTree *new_playlist_tree;
     UIListGenericTree *editable_playlist_tree;
-    
+
+    QIntDict<UIListGenericTree> selectable_content_trees;
+
     int   client_width;
     int   client_height;
     float client_wmult;

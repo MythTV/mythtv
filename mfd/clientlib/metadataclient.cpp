@@ -1478,7 +1478,7 @@ void MetadataClient::buildTree()
 #endif    
 
     //
-    //  Hand control of this tree off to the main execution loop (and never,
+    //  Hand control of this collection off to the main execution loop (and never,
     //  _EVER_ touch it again)
     //
 

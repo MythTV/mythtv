@@ -21,7 +21,7 @@ HEADERS += mfdinterface.h   discoverythread.h   mfdinstance.h \
            ../mfdlib/httpheader.h \
            ../mfdlib/httpgetvar.h \
            mdcaprequest.h mdcapresponse.h metadatacollection.h ../mfdlib/metadata.h \
-           playlist.h playlistentry.h mfdcontent.h 
+           playlist.h playlistentry.h mfdcontent.h
 
 SOURCES += mfdinterface.cpp discoverythread.cpp mfdinstance.cpp \
            ./mdnsd/mdnsd.c ./mdnsd/1035.c discovered.cpp \
@@ -34,7 +34,7 @@ SOURCES += mfdinterface.cpp discoverythread.cpp mfdinstance.cpp \
            playlist.cpp playlistentry.cpp mfdcontent.cpp
 
 inc.path = $${PREFIX}/include/mfdclient/
-inc.files  = mfdinterface.h mfdcontent.h ../mfdlib/metadata.h
+inc.files  = mfdinterface.h mfdcontent.h ../mfdlib/metadata.h playlist.h playlistentry.h
 
 LIBS += -L../mdcaplib -lmdcap -Wl,--export-dynamic
 
