@@ -55,12 +55,14 @@ class GuideGrid : public QDialog
     void paintChannels(QPainter *p);
     void paintTimes(QPainter *p);
     void paintPrograms(QPainter *p);
+    void paintTitle(QPainter *p);
 
     QRect fullRect() const;
     QRect dateRect() const;
     QRect channelRect() const;
     QRect timeRect() const;
     QRect programRect() const;
+    QRect titleRect() const;
 
     void fillChannelInfos();
 
@@ -92,6 +94,7 @@ class GuideGrid : public QDialog
     int screenwidth, screenheight;
     float wmult, hmult;
 
+    bool showtitle;
     bool usetheme;
     QColor fgcolor;
     QColor bgcolor;

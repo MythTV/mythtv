@@ -524,7 +524,8 @@ void Scheduler::PruneList(void)
                     ProgramInfo *second = (*j);
                     if ((first->title == second->title) && 
                         (first->subtitle == second->subtitle) &&
-                        (first->description == second->description))
+                        (first->description == second->description) &&
+                        first->subtitle != "" && first->description != "")
                     {
                         if (second->conflicting && !first->conflicting)
                         {

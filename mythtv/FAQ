@@ -4,6 +4,10 @@
 - This is desired behavior.  The interface is meant for use with a remote 
   control, or a keyboard.
 
+) When I change windows in the UI, the windows start blinking and going crazy
+  and make it otherwise unuseable.
+- See if changing your window manager to 'Click to Focus' helps.
+
 ) What's this 'strange error flushing buffer' mean?
 - Nothing, really.  It's just lame (the mp3 encoder) complaining for some 
   obscure reason.
@@ -11,7 +15,8 @@
 ) The audio's _really_ out of sync, and it doesn't pause when I pause live TV?
 - You need to mute the line-in, and set the mixer to record from the line in.
   The audio you're hearing is from the audio pass-through, enabled by the
-  V4L driver, and not MythTV.
+  V4L driver, and not MythTV.  If you're using ALSA, make sure to have the 
+  'Capture' mixer enabled and non-muted and at a decent volume.
 
 ) I get an error when compiling about 'mkspecs'?
 - You need to set QTDIR.  On Debian, it should be /usr/share/qt

@@ -39,6 +39,7 @@ GuideGrid::GuideGrid(const QString &channel, QWidget *parent, const char *name)
     setCursor(QCursor(Qt::BlankCursor));
 
     usetheme = globalsettings->GetNumSetting("ThemeQt");
+    showtitle = globalsettings->GetNumSetting("EPGShowTitle");
 
     if (usetheme)
     {
@@ -252,9 +253,9 @@ ProgramInfo *GuideGrid::getProgramInfo(unsigned int row, unsigned int col)
     if (m_channelInfos[chanNum].chanstr == "" || !m_timeInfos[col])
         return NULL;
 
-    QString chanstr = QString("%1").arg(m_channelInfos[chanNum].chanid);
+    QString chanid = QString("%1").arg(m_channelInfos[chanNum].chanid);
 
-    ProgramInfo *pginfo = GetProgramAtDateTime(chanstr,
+    ProgramInfo *pginfo = GetProgramAtDateTime(chanid,
                                              m_timeInfos[col]->sqltime.ascii());
     if (pginfo)
     {
@@ -268,16 +269,47 @@ ProgramInfo *GuideGrid::getProgramInfo(unsigned int row, unsigned int col)
     QDateTime ts;
     ts.setDate(QDate(tinfo->year, tinfo->month, tinfo->day));
     ts.setTime(QTime(tinfo->hour, tinfo->min));
-    proginfo->startts = ts;
-    if (col < DISPLAY_TIMES - 1)
-    { 
-        tinfo = m_timeInfos[col + 1];
-        ts.setDate(QDate(tinfo->year, tinfo->month, tinfo->day));
-        ts.setTime(QTime(tinfo->hour, tinfo->min));
-    }
-    proginfo->endts = ts;
+
     proginfo->spread = 1;
     proginfo->startCol = col;
+    proginfo->startts = ts;
+    proginfo->endts = proginfo->startts.addSecs(5 * 60);
+
+    for (int newcol = col; newcol % 6; newcol--)
+    {
+        pginfo = GetProgramAtDateTime(chanid, 
+                                      m_timeInfos[newcol]->sqltime.ascii());
+
+        if (pginfo)
+        {
+            delete pginfo;
+            break;
+        }
+        else
+        {
+            proginfo->startts = proginfo->startts.addSecs(-5 * 60);
+            proginfo->startCol--;
+            proginfo->spread++;
+        }
+    }
+
+    for (int newcol = col; newcol % 6 < 5; newcol++)
+    {
+        pginfo = GetProgramAtDateTime(chanid,
+                                      m_timeInfos[newcol]->sqltime.ascii());
+
+        if (pginfo)
+        {
+            delete pginfo;
+            break;
+        }
+        else
+        {
+            proginfo->endts = proginfo->endts.addSecs(5 * 60);
+            proginfo->spread++;
+        }
+    }
+
     return proginfo;
 }
 
@@ -323,6 +355,8 @@ void GuideGrid::paintEvent(QPaintEvent *e)
             paintTimes(&p);
         if (r.intersects(programRect()))
             paintPrograms(&p);
+        if (showtitle && r.intersects(titleRect()))
+            paintTitle(&p);
     }
 }
 
@@ -351,8 +385,8 @@ void GuideGrid::paintDate(QPainter *p)
     tmp.drawText((dr.width() - datewidth) / 2,
                  (dr.height() - dateheight) / 2 + dateheight * 4 / 3, date);
 
-    tmp.drawLine(0, dr.bottom(), dr.right() + 1, dr.bottom());
-    tmp.drawLine(dr.right(), 0, dr.right(), dr.bottom() + 1);
+    tmp.drawLine(0, dr.height() - 1, dr.right(), dr.height() - 1);
+    tmp.drawLine(dr.width() - 1, 0, dr.width() - 1, dr.height());
 
     tmp.end();
 
@@ -370,13 +404,7 @@ void GuideGrid::paintChannels(QPainter *p)
     tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
     tmp.setFont(*m_font);
 
-    int ydifference = (int)(ceil(cr.height() * 1.0 / DISPLAY_CHANS));
-
-    for (unsigned int y = 1; y < DISPLAY_CHANS + 1; y++)
-    {
-        tmp.drawLine(0, ydifference * y, cr.right(), ydifference * y);
-    }
-    tmp.drawLine(cr.right(), 0, cr.right(), cr.bottom());
+    int ydifference = cr.height() / DISPLAY_CHANS;
 
     for (unsigned int y = 0; y < DISPLAY_CHANS; y++)
     {
@@ -399,12 +427,13 @@ void GuideGrid::paintChannels(QPainter *p)
                                ydifference * y + yoffset, *(chinfo->icon));
             }
         }
+
         tmp.setFont(*m_largerFont);
         QFontMetrics lfm(*m_largerFont);
         int width = lfm.width(chinfo->chanstr);
         int bheight = lfm.height();
-        
-        int yoffset = (int)(36 * hmult);
+       
+        int yoffset = (int)(36 * hmult); 
         tmp.drawText((cr.width() - width) / 2, 
                      ydifference * y + yoffset + bheight, chinfo->chanstr);
 
@@ -415,7 +444,12 @@ void GuideGrid::paintChannels(QPainter *p)
         tmp.drawText((cr.width() - width) / 2, 
                      ydifference * y + yoffset + bheight + height, 
                      chinfo->callsign);
+
+        tmp.drawLine(0, ydifference * (y + 1), cr.right(), 
+                     ydifference * (y + 1));
     }
+
+    tmp.drawLine(cr.right(), 0, cr.right(), DISPLAY_CHANS * ydifference);
 
     tmp.end();
     
@@ -434,14 +468,13 @@ void GuideGrid::paintTimes(QPainter *p)
     tmp.setFont(*m_largerFont);
 
     int xdifference = (int)(tr.width() / DISPLAY_TIMES); 
-    int xslop = (tr.width() % DISPLAY_TIMES) / (DISPLAY_TIMES / 6);
 
-    for (int x = 1; x < DISPLAY_TIMES + 1; x++)
+    for (int x = 0; x < DISPLAY_TIMES; x++)
     {
         if (m_timeInfos[x]->min % 30 == 0)
         {
-            tmp.drawLine(x * xdifference + (x / 6) * xslop, 0, 
-                         x * xdifference + (x / 6) * xslop, tr.bottom());
+            tmp.drawLine((x + 6) * xdifference, 0, (x + 6) * xdifference, 
+                         tr.bottom());
         }
     }
 
@@ -455,14 +488,13 @@ void GuideGrid::paintTimes(QPainter *p)
             int width = fm.width(tinfo->usertime);
             int height = fm.height();
 
-            int xpos = (x * xdifference + (x / 6) * xslop) + 
-                       ((xdifference * 6 - width) / 2);
+            int xpos = (x * xdifference) + (xdifference * 6 - width) / 2; 
             tmp.drawText(xpos, (tr.bottom() - height) / 2 + height, 
                          tinfo->usertime);
         }
     }
 
-    tmp.drawLine(0, tr.bottom(), tr.right(), tr.bottom());
+    tmp.drawLine(0, tr.height() - 1, tr.right(), tr.height() - 1);
 
     tmp.end();
 
@@ -498,17 +530,15 @@ void GuideGrid::paintPrograms(QPainter *p)
 
     tmp.setFont(*m_largerFont);
 
-    int ydifference = (int)ceil(pr.height() * 1.0 / DISPLAY_CHANS);
-    int xdifference = (int)(pr.width() / DISPLAY_TIMES);
-    int xslop = (pr.width() % DISPLAY_TIMES) / (DISPLAY_TIMES / 6);
- 
+    int ydifference = pr.height() / DISPLAY_CHANS;
+    int xdifference = pr.width() / DISPLAY_TIMES;
+
     for (int y = 1; y < DISPLAY_CHANS + 1; y++)
     {
         int ypos = ydifference * y;
         tmp.drawLine(0, ypos, pr.right(), ypos);
     }
-
-    tmp.drawLine(0, 0, 0, 0);
+ 
     for (int y = 0; y < DISPLAY_CHANS; y++)
     {
         unsigned int chanNum = y + m_currentStartChannel;
@@ -556,21 +586,18 @@ void GuideGrid::paintPrograms(QPainter *p)
 
                 QBrush br = getBGColor(pginfo->category);
 
-                int startx = (int)(x * xdifference + 1 * wmult + 
-                             (x / 6) * xslop);
-                int endx = (int)((x + spread) * xdifference - 2 * wmult +
-                            ((x + spread) / 6) * xslop);
+                int startx = (int)(x * xdifference + 1 * wmult); 
+                int endx = (int)((x + spread) * xdifference - 2 * wmult);
                 tmp.fillRect(startx, (int)(ydifference * y + 1 * hmult),
                              endx, (int)(ydifference - 2 * hmult), br);
 
-                int maxwidth = (int)(spread * xdifference - (10 * wmult) +
-                               (spread / 6) * xslop);
+                int maxwidth = (int)(spread * xdifference - (10 * wmult));
 
                 QString info = pginfo->title;
                 if (pginfo->category != "" && usetheme)
                     info += " (" + pginfo->category + ")";
                 
-                startx = (int)(x * xdifference + (x / 6) * xslop + 7 * wmult);
+                startx = (int)(x * xdifference + 7 * wmult);
                 tmp.drawText(startx,
                              (int)(height / 8 + y * ydifference + 1 * hmult), 
                              maxwidth, ydifference,
@@ -579,8 +606,7 @@ void GuideGrid::paintPrograms(QPainter *p)
 
                 tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
 
-                startx = (int)((x + spread) * xdifference + 
-                               ((x + spread) / 6) * xslop);
+                startx = (int)((x + spread) * xdifference); 
                 tmp.drawLine(startx, ydifference * y, startx, 
                              ydifference * (y + 1));
 
@@ -598,8 +624,7 @@ void GuideGrid::paintPrograms(QPainter *p)
 
                     int width = fm.width(text);
 
-                    startx = (int)((x + spread) * xdifference + 
-                                  ((x + spread) / 6 * xslop) - width * 1.5);
+                    startx = (int)((x + spread) * xdifference - width * 1.5); 
                     tmp.drawText(startx, (y + 1) * ydifference - height,
                                  (int)(width * 1.5), height, AlignLeft, text);
              
@@ -622,10 +647,8 @@ void GuideGrid::paintPrograms(QPainter *p)
 
                         int xstart = 1;
                         if (x != 0)
-                            xstart = (int)(x * xdifference + 2 * wmult +
-                                          (x / 6) * xslop);
-                        int xend = (int)(xdifference * spread - 4 * wmult +
-                                         ceil(spread / 6.0) * xslop);
+                            xstart = (int)(x * xdifference + 2 * wmult);
+                        int xend = (int)(xdifference * spread - 4 * wmult);
                         if (x == 0)
                             xend += (int)(1 * wmult);
 			
@@ -643,6 +666,34 @@ void GuideGrid::paintPrograms(QPainter *p)
     p->drawPixmap(pr.topLeft(), pix);
 }
 
+void GuideGrid::paintTitle(QPainter *p)
+{
+    QRect tr = titleRect();
+    QPixmap pix(tr.size());
+    pix.fill(this, tr.topLeft());
+
+    QPainter tmp(&pix);
+    tmp.setBrush(fgcolor);
+    tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
+    tmp.setFont(QFont("Arial", (int)(19 * hmult), QFont::Bold));
+
+    ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
+    QFontMetrics lfm(*m_largerFont);
+    int titleheight = lfm.height();
+
+    QString info = pginfo->title;
+    if (pginfo->category != "" && usetheme)
+       info += " (" + pginfo->category + ")";
+
+    tmp.drawText((tr.height() - titleheight) / 2 , 
+                 (tr.height() - titleheight) / 2 + titleheight,
+                 info);
+
+    tmp.end();
+    
+    p->drawPixmap(tr.topLeft(), pix);
+}
+
 QRect GuideGrid::fullRect() const
 {
     QRect r(0, 0, (int)(800 * wmult), (int)(600 * hmult));
@@ -651,26 +702,48 @@ QRect GuideGrid::fullRect() const
 
 QRect GuideGrid::dateRect() const
 {
-    QRect r(0, 0, (int)(74 * wmult), (int)(49 * hmult));
+    QRect r(0, 0, programRect().left(), programRect().top());
     return r;
 }
 
 QRect GuideGrid::channelRect() const
 {
-    QRect r(0, (int)(49 * hmult), (int)(74 * wmult), (int)((600 - 49) * hmult));
+    QRect r(0, dateRect().height(), dateRect().width(), programRect().height());
     return r;
 }
 
 QRect GuideGrid::timeRect() const
 {
-    QRect r((int)(74 * wmult), 0, (int)((800 - 74) * wmult), (int)(49 * hmult));
+    QRect r(dateRect().width(), 0, programRect().width(), dateRect().height());
     return r;
 }
 
 QRect GuideGrid::programRect() const
 {
-    QRect r((int)(74 * wmult), (int)(49 * hmult), (int)((800 - 74) * wmult), 
-            (int)((600 - 49) * hmult));
+    // Change only these numbers to adjust the size of the visible regions
+
+    unsigned int min_dateheight = 50;  // also min_timeheight
+    unsigned int min_datewidth = 74;   // also min_chanwidth
+    unsigned int titleheight = showtitle ? 40 : 0;
+
+    unsigned int programheight = (int)((600 - min_dateheight - titleheight) * 
+                                       wmult);
+    programheight = DISPLAY_CHANS * (int)(programheight / DISPLAY_CHANS);
+
+    unsigned int programwidth = (int)((800 - min_datewidth) * hmult);
+    programwidth = DISPLAY_TIMES * (int)(programwidth / DISPLAY_TIMES);
+
+    QRect r((int)(800 * wmult) - programwidth, 
+            (int)(600 * hmult) - programheight - titleheight,
+            programwidth, programheight);
+
+    return r;
+}
+
+QRect GuideGrid::titleRect() const
+{
+    QRect r(0, programRect().bottom() + 1, fullRect().width(), 
+            fullRect().height() - programRect().bottom());
     return r;
 }
 
@@ -684,14 +757,11 @@ void GuideGrid::cursorLeft()
     {
         m_currentCol = 0;
         emit scrollLeft();
-        emit scrollLeft();
-        emit scrollLeft();
-        emit scrollLeft();
-        emit scrollLeft();
-        emit scrollLeft();
     }
-    else
-        update(programRect());
+
+    update(programRect());
+    if (showtitle)
+        update(titleRect());
 }
 
 void GuideGrid::cursorRight()
@@ -705,14 +775,11 @@ void GuideGrid::cursorRight()
     {
         m_currentCol = DISPLAY_TIMES - 1;
         emit scrollRight();
-        emit scrollRight();
-        emit scrollRight();
-        emit scrollRight();
-        emit scrollRight();
-        emit scrollRight();
     }
-    else
-        update(programRect());
+
+    update(programRect());
+    if (showtitle)
+        update(titleRect());
 }
 
 void GuideGrid::cursorDown()
@@ -724,8 +791,10 @@ void GuideGrid::cursorDown()
         m_currentRow = DISPLAY_CHANS - 1;
         emit scrollDown();
     }
-    else
-        update(programRect());
+
+    update(programRect());
+    if (showtitle)
+        update(titleRect());
 }
 
 void GuideGrid::cursorUp()
@@ -737,17 +806,20 @@ void GuideGrid::cursorUp()
         m_currentRow = 0;
         emit scrollUp();
     }
-    else
-        update(programRect());
+
+    update(programRect());
+    if (showtitle)
+        update(titleRect());
 }
 
 void GuideGrid::scrollLeft()
 {
+    bool updatedate = false;
+
     QDateTime t = m_currentStartTime;
 
-    t = m_currentStartTime.addSecs(-5 * 60);
+    t = m_currentStartTime.addSecs(-30 * 60);
 
-    bool updatedate = false;
     if (t.date().day() != m_currentStartTime.date().day())
         updatedate = true;
 
@@ -755,42 +827,48 @@ void GuideGrid::scrollLeft()
 
     fillTimeInfos();
 
-    for (int y = 0; y < DISPLAY_CHANS; y++)
-    {
-        ProgramInfo *pginfo = m_programInfos[y][DISPLAY_TIMES - 1];
-        if (pginfo)
-            delete pginfo;
-        m_programInfos[y][DISPLAY_TIMES - 1] = NULL;
-    }
-
-    for (int x = DISPLAY_TIMES - 1; x > 0; x--)
+    for (int x = DISPLAY_TIMES - 6; x < DISPLAY_TIMES; x++)
     {
         for (int y = 0; y < DISPLAY_CHANS; y++)
         {
-            m_programInfos[y][x] = m_programInfos[y][x - 1];
+            ProgramInfo *pginfo = m_programInfos[y][x];
+            if (pginfo)
+                delete pginfo;
+            m_programInfos[y][x] = NULL;
+        }
+    }
+
+    for (int x = DISPLAY_TIMES - 1; x >= 6; x--)
+    {
+        for (int y = 0; y < DISPLAY_CHANS; y++)
+        {
+            m_programInfos[y][x] = m_programInfos[y][x - 6];
             m_programInfos[y][x]->spread = -1;
             m_programInfos[y][x]->startCol = x;
         }
     }
 
-    for (int y = 0; y < DISPLAY_CHANS; y++)
+    for (int x = 0; x < 6; x++)
     {
-        ProgramInfo *pginfo = getProgramInfo(y, 0);
-        m_programInfos[y][0] = pginfo;
+        for (int y = 0; y < DISPLAY_CHANS; y++)
+        {
+            ProgramInfo *pginfo = getProgramInfo(y, x);
+            m_programInfos[y][x] = pginfo;
+        }
     }
 
-    update(programRect().unite(timeRect()));
+    update(timeRect());
     if (updatedate) 
         update(dateRect());
 }
 
 void GuideGrid::scrollRight()
 {
-    QDateTime t = m_currentStartTime;
-
-    t = m_currentStartTime.addSecs(5 * 60);
-
     bool updatedate = false;
+
+    QDateTime t = m_currentStartTime;
+    t = m_currentStartTime.addSecs(30 * 60);
+
     if (t.date().day() != m_currentStartTime.date().day())
         updatedate = true;
 
@@ -798,31 +876,37 @@ void GuideGrid::scrollRight()
 
     fillTimeInfos();
 
-    for (int y = 0; y < DISPLAY_CHANS; y++)
-    {
-        ProgramInfo *pginfo = m_programInfos[y][0];
-        if (pginfo)
-            delete pginfo;
-        m_programInfos[y][0] = NULL;
-    }
-
-    for (int x = 0; x < DISPLAY_TIMES - 1; x++)
+    for (int x = 0; x < 6; x++)
     {
         for (int y = 0; y < DISPLAY_CHANS; y++)
         {
-            m_programInfos[y][x] = m_programInfos[y][x + 1];
+            ProgramInfo *pginfo = m_programInfos[y][x];
+            if (pginfo)
+                delete pginfo;
+            m_programInfos[y][x] = NULL;
+        }
+    }
+
+    for (int x = 0; x < DISPLAY_TIMES - 6; x++)
+    {
+        for (int y = 0; y < DISPLAY_CHANS; y++)
+        {
+            m_programInfos[y][x] = m_programInfos[y][x + 6];
             m_programInfos[y][x]->spread = -1;
             m_programInfos[y][x]->startCol = x;
         }
     }
 
-    for (int y = 0; y < DISPLAY_CHANS; y++)
+    for (int x = DISPLAY_TIMES - 6; x < DISPLAY_TIMES; x++)
     {
-        ProgramInfo *pginfo = getProgramInfo(y, DISPLAY_TIMES - 1);
-        m_programInfos[y][DISPLAY_TIMES - 1] = pginfo;
+        for (int y = 0; y < DISPLAY_CHANS; y++)
+        {
+            ProgramInfo *pginfo = getProgramInfo(y, x);
+            m_programInfos[y][x] = pginfo;
+        }
     }
 
-    update(programRect().unite(timeRect()));
+    update(timeRect());
     if (updatedate)
         update(dateRect());
 }
@@ -855,7 +939,7 @@ void GuideGrid::scrollDown()
         m_programInfos[DISPLAY_CHANS - 1][x] = pginfo;
     }
 
-    update(programRect().unite(channelRect()));
+    update(channelRect());
 }
 
 void GuideGrid::scrollUp()
@@ -887,7 +971,7 @@ void GuideGrid::scrollUp()
         m_programInfos[0][x] = pginfo;
     }
 
-    update(programRect().unite(channelRect()));
+    update(channelRect());
 }
 
 void GuideGrid::enter()
