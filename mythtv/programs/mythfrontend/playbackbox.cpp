@@ -450,13 +450,11 @@ void PlaybackBox::play(QListViewItem *lvitem)
 
     QFile checkFile(file);
 
-    if (checkFile.exists() == false)
+    if (checkFile.exists() == false && (rec->pathname.left(5) != "myth:"))
     {
          killPlayer();
          return;
     }
-    else
-    {
 
     ProgramInfo *tvrec = new ProgramInfo(*rec);
 
@@ -493,8 +491,6 @@ void PlaybackBox::play(QListViewItem *lvitem)
     ignoreevents = false;
 
     timer->start(1000 / 30);
-
-    }
 }
 
 void PlaybackBox::doRemove(QListViewItem *lvitem)
@@ -675,24 +671,23 @@ void PlaybackBox::timeout(void)
                 ProgramListItem *pgitem = (ProgramListItem *)curitem;
                 ProgramInfo *rec = pgitem->getProgramInfo();
 
-		QString file = rec->pathname;
+                QString file = rec->pathname;
 
-		QFile checkFile(file);
+                QFile checkFile(file);
 		
-		if (checkFile.exists() == false)
-		{
-			title->setText(title->text() + "      Error: File Missing!");
-			QPixmap temp((int)(160 * wmult), (int)(120 * hmult));
-        		temp.fill(black);
-        		pixlabel->setPixmap(temp);
+                if (checkFile.exists() == false &&
+                    rec->pathname.left(5) != "myth:")
+                {
+                    title->setText(title->text() + "     Error: File Missing!");
+                    QPixmap temp((int)(160 * wmult), (int)(120 * hmult));
+                    temp.fill(black);
+                    pixlabel->setPixmap(temp);
 
-			killPlayer();
-			return;
-		}
-		else
-		{
-			startPlayer(rec);
-		}
+                    killPlayer();
+                    return;
+                }
+
+                startPlayer(rec);
             }
         }
     }
