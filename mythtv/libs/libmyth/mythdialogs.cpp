@@ -580,6 +580,8 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
 
         if (keycode) 
         {
+            gContext->ResetScreensaver();
+
             int mod = keycode & MODIFIER_MASK;
             int k = keycode & ~MODIFIER_MASK; /* trim off the mod */
             int ascii = 0;

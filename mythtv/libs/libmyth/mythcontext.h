@@ -76,7 +76,7 @@ class MythEvent : public QCustomEvent
     QString extradata;
 };
 
-#define MYTH_BINARY_VERSION "0.15.20040225-1"
+#define MYTH_BINARY_VERSION "0.15.20040301-1"
 #define MYTH_PROTO_VERSION "4"
 
 extern int print_verbose_messages;
@@ -174,6 +174,9 @@ class MythContext : public QObject
     
     void DisableScreensaver(void);
     void RestoreScreensaver(void);
+    // Reset screensaver idle time, for input events that X doesn't see
+    // (e.g., lirc)
+    void ResetScreensaver(void);
     
   private slots:
     void EventSocketRead();

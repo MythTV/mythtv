@@ -1473,3 +1473,12 @@ void MythContext::RestoreScreensaver(void)
     d->m_screensaver.saved = false;
 }
 #endif
+
+#ifdef QWS
+void MythContext::ResetScreensaver(void) {}
+#else
+void MythContext::ResetScreensaver(void)
+{
+    XResetScreenSaver(qt_xdisplay());
+}
+#endif
