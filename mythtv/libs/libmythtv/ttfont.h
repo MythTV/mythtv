@@ -23,7 +23,8 @@ class TTFFont
 
      void DrawString(unsigned char *yuvptr, int x, int y, const QString &text,
                      int maxx, int maxy, int alphamod = 255, 
-                     int color = COL_WHITE, bool rightjustify = false); 
+                     int color = COL_WHITE, bool rightjustify = false,
+                     bool outline = false); 
      void CalcWidth(const QString &text, int *width_return);
 
      int SpaceWidth() { return spacewidth; }

@@ -361,7 +361,8 @@ void TTFFont::merge_text(unsigned char *yuv, Raster_Map * rmap, int offset_x,
 
 void TTFFont::DrawString(unsigned char *yuvptr, int x, int y, 
                          const QString &text, int maxx, int maxy, 
-                         int alphamod, int color, bool rightjustify)
+                         int alphamod, int color, bool rightjustify,
+                         bool outline)
 {
    int                  width, height, w, h, inx, iny, clipx, clipy;
    Raster_Map          *rmap, *rtmp;
@@ -430,6 +431,22 @@ void TTFFont::DrawString(unsigned char *yuvptr, int x, int y,
 
    if (rightjustify)
    {
+   }
+
+   if (outline)
+   {
+       int outlinecolor = COL_BLACK;
+       if (color == COL_BLACK)
+           outlinecolor = COL_WHITE;
+
+       merge_text(yuvptr, rmap, clipx, clipy, x - 1, y - 1, width, height,
+                  video_width, video_height, outlinecolor, alphamod);
+       merge_text(yuvptr, rmap, clipx, clipy, x + 1, y - 1, width, height,
+                  video_width, video_height, outlinecolor, alphamod);
+       merge_text(yuvptr, rmap, clipx, clipy, x - 1, y + 1, width, height,
+                  video_width, video_height, outlinecolor, alphamod);
+       merge_text(yuvptr, rmap, clipx, clipy, x + 1, y + 1, width, height,
+                  video_width, video_height, outlinecolor, alphamod);
    }
 
    merge_text(yuvptr, rmap, clipx, clipy, x, y, width, height, 

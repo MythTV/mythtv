@@ -289,23 +289,8 @@ void OSDTypeText::DrawString(unsigned char *screenptr, int vid_width,
     if (maxfade > 0 && fade >= 0)
         alphamod = (int)((((float)(fade) / maxfade) * 256.0) + 0.5);
 
-    if (m_outline)
-    {
-        m_font->DrawString(screenptr, x - 1, y - 1, text, maxx, maxy, alphamod, 
-                           COL_BLACK, false);
-
-        m_font->DrawString(screenptr, x + 1, y - 1, text, maxx, maxy, alphamod,
-                           COL_BLACK, false);
-
-        m_font->DrawString(screenptr, x - 1, y + 1, text, maxx, maxy, alphamod,
-                           COL_BLACK, false);
-
-        m_font->DrawString(screenptr, x + 1, y + 1, text, maxx, maxy, alphamod,
-                           COL_BLACK, false);
-    }
-
     m_font->DrawString(screenptr, x, y, text, maxx, maxy, alphamod, m_color,
-                       false);
+                       false, m_outline);
 } 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
