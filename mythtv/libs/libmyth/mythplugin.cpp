@@ -83,7 +83,7 @@ void MythPluginManager::run_plugin(const QString & plugname)
              << "': not initialized" << endl;
         return;
     }
-   
+
     m_dict[newname]->run();
 }
 

@@ -41,7 +41,7 @@
      <text lang="NL">Beelden</text>
      <text lang="FR">Images</text>
      <text lang="DE">Photos</text>
-     <action>EXEC mythgallery</action>
+     <action>PLUGIN mythgallery</action>
      <depends>mythgallery-settings.txt</depends>
    </button>
 

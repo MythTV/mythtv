@@ -1655,7 +1655,7 @@ void ThemedMenu::handleAction(QString &action)
  
         parseMenu(file, row, col);
     }
-    else if (action.left(7) == "PLUGIN")
+    else if (action.left(6) == "PLUGIN")
     {
         QString rest = action.right(action.length() - 7);
         MythPluginManager::run_plugin(rest.stripWhiteSpace());

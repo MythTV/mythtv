@@ -6,45 +6,33 @@ using namespace std;
 #include <qsqldatabase.h>
 
 #include "iconview.h"
-
-#include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdialogs.h>
+#include <mythtv/mythplugin.h>
 
-MythContext *gContext;
+extern "C" {
+int mythplugin_init(void);
+int mythplugin_run(void);
+int mythplugin_config(void);
+}
 
-int main(int argc, char *argv[])
+int mythplugin_init(void)
 {
-    QApplication a(argc, argv);
+    return 0;
+}
 
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-
-    QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
-    if (!db)
-    {
-        printf("Couldn't connect to database\n");
-        return -1;
-    }
-
-    if (!gContext->OpenDatabase(db))
-    {
-        printf("couldn't open db\n");
-        return -1;
-    }
-
-    gContext->LoadQtConfig();
-
-    MythMainWindow *mainWindow = new MythMainWindow();
-    mainWindow->Show();
-    gContext->SetMainWindow(mainWindow);
-
+int mythplugin_run(void)
+{
     QString startdir = gContext->GetSetting("GalleryDir");
-
-    IconView icv(db, startdir, mainWindow, "icon view");
-
+    IconView icv(QSqlDatabase::database(), startdir, 
+                 gContext->GetMainWindow(), "icon view");
     icv.exec();
 
-    delete gContext;
+    return 0;
+}
 
+int mythplugin_config(void)
+{
     return 0;
 }
 

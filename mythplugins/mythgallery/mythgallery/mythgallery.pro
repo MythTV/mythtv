@@ -4,13 +4,11 @@
 
 include ( ../settings.pro )
 
-TEMPLATE = app
-CONFIG += thread
+TEMPLATE = lib
+CONFIG += plugin thread
 TARGET = mythgallery
-target.path = $${PREFIX}/bin
+target.path = $${PREFIX}/lib/mythtv/plugins
 INSTALLS += target
-
-LIBS += -L$${PREFIX}/lib -lmyth-$$LIBVERSION -lXinerama
 
 # Input
 HEADERS += iconview.h singleview.h gallerysettings.h
