@@ -782,7 +782,13 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
             if (context->codec_id == CODEC_ID_MP2 ||
                 context->codec_id == CODEC_ID_MP3LAME)
             {
-                if (ptr[0] == 0xff && (ptr[1] & 0xf0) == 0xf0)
+                int header = (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) |
+                             ptr[3];
+
+                if (((header & 0xffe00000) == 0xffe00000) &&
+                    (((header >> 17) & 3) != 0) &&
+                    (((header >> 12) & 0xf) != 0xf) &&
+                    (((header >> 10) & 3) != 3))
                 {
                     int freq = avfmpa_freq[(ptr[2] & 0x0c) >> 2] * 100;
                     int mode = (ptr[3] >> 6) & 3;
