@@ -85,7 +85,7 @@ QSocket *RemoteFile::openSocket(bool control, bool events)
 
         usleep(50);
         num++;
-        if (num > 100)
+        if (num > 500)
         {
             cerr << "Connection timed out.\n";
             exit(0);
