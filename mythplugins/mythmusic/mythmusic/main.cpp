@@ -161,7 +161,10 @@ void startPlayback(QSqlDatabase *db, QValueList<Metadata> *playlist)
     PlaybackBox *pbb = new PlaybackBox(db, playlist);
     pbb->Show();
 
+    qApp->unlock();
     pbb->exec();
+    qApp->lock();
+
     pbb->stop();
 
     qApp->processEvents();
@@ -175,14 +178,18 @@ void startDatabaseTree(QSqlDatabase *db, QString &paths,
     DatabaseBox dbbox(db, paths, playlist);
     dbbox.Show();
 
+    qApp->unlock();
     dbbox.exec();
+    qApp->lock();
 }
 
 void startRipper(QSqlDatabase *db)
 {
     Ripper rip(db);
     rip.Show();
+    qApp->unlock();
     rip.exec();
+    qApp->lock();
 }
 
 struct MusicData
@@ -230,7 +237,7 @@ void runMenu(QString themedir, QSqlDatabase *db, QString paths,
 
     if (diag->foundTheme())
     {
-		gContext->LCDswitchToTime();
+        gContext->LCDswitchToTime();
         diag->Show();
         diag->exec();
     }

@@ -977,8 +977,11 @@ void PlaybackBox::increaseRating()
     QString rating;
     for (int i = 0; i < curMeta.Rating(); i++)
         rating.append("|");
-//    QListViewItem *curItem = listlist.at(playlistindex);
-//    curItem->setText(1, rating);
+    if (showrating)
+    {
+        QListViewItem *curItem = listlist.at(playlistindex);
+        curItem->setText(1, rating);
+    }
 }
 
 void PlaybackBox::decreaseRating()
@@ -988,8 +991,12 @@ void PlaybackBox::decreaseRating()
     QString rating;
     for (int i = 0; i < curMeta.Rating(); i++)
         rating.append("|");
-//    QListViewItem *curItem = listlist.at(playlistindex);
-//    curItem->setText(1, rating);
+
+    if (showrating)
+    {
+        QListViewItem *curItem = listlist.at(playlistindex);
+        curItem->setText(1, rating);
+    }
 }
 
 void PlaybackBox::toggleRepeat()
