@@ -360,7 +360,7 @@ void ScheduledRecording::save(QSqlDatabase* db)
     {
         ConfigurationGroup::save(db);
     }
-    signalChange(db);
+    signalChange(getRecordID());
 }
 
 void ScheduledRecording::remove(QSqlDatabase* db) {
@@ -375,24 +375,12 @@ void ScheduledRecording::remove(QSqlDatabase* db) {
                     .arg(getRecordID());
 }
 
-void ScheduledRecording::signalChange(QSqlDatabase* db) {
-    MythContext::KickDatabase(db);
-
-    QSqlQuery result = db->exec("SELECT NULL FROM settings WHERE value = \"RecordChanged\";");
-
-    QString query;
-    if (result.isActive() && result.numRowsAffected() > 0)
-    {
-        query = "UPDATE settings SET data = \"yes\" WHERE "
-                "value = \"RecordChanged\";";
-    }
-    else
-    {
-        query = "INSERT INTO settings (value,data) "
-                "VALUES(\"RecordChanged\", \"yes\");";
-    }
-    db->exec(query);
-
+void ScheduledRecording::signalChange(int recordid) {
+    QStringList slist;
+    slist << QString("RESCHEDULE_RECORDINGS %1").arg(recordid);
+    if (!gContext->SendReceiveStringList(slist))
+        cerr << "error resceduling id " << recordid << 
+            " in ScheduledRecording::signalChange" << endl;
 }
 
 bool ScheduledRecording::hasChanged(QSqlDatabase* db) {
@@ -471,7 +459,7 @@ void ScheduledRecording::addHistory(QSqlDatabase* db,
     {
         // The addition of an entry to oldrecorded may affect near-future
         // scheduling decisions, so recalculate
-        signalChange(db);
+        signalChange(0);
     }
 }
 
@@ -499,7 +487,7 @@ void ScheduledRecording::forgetHistory(QSqlDatabase* db,
     {
         // The removal of an entry from oldrecorded may affect near-future
         // scheduling decisions, so recalculate
-        signalChange(db);
+        signalChange(0);
     }
 }
 

@@ -122,11 +122,6 @@ void Scheduler::verifyCards(void)
     }
 }
 
-bool Scheduler::CheckForChanges(void)
-{
-    return ScheduledRecording::hasChanged(db);
-}
-
 static inline bool Recording(ProgramInfo *p)
 {
     return (p->recstatus == rsRecording || p->recstatus == rsWillRecord);
@@ -377,7 +372,7 @@ bool Scheduler::ReactivateRecording(ProgramInfo *pginfo)
                 p->recstatus != rsWillRecord)
             {
                 p->reactivate = 1;
-                ScheduledRecording::signalChange(db);
+                Reschedule(0);
             }
             return true;
         }
@@ -813,23 +808,33 @@ void Scheduler::RunScheduler(void)
     // wait for slaves to connect
     sleep(2);
 
+    Reschedule(-1);
+
     while (1)
     {
+        if (ScheduledRecording::hasChanged(db))
+            Reschedule(-1);
+
         curtime = QDateTime::currentDateTime();
         bool statuschanged = false;
 
         if ((startIter == reclist.end() ||
              curtime.secsTo((*startIter)->recstartts) > 30) &&
-            (CheckForChanges() ||
-             (lastupdate.date().day() != curtime.date().day())))
+            reschedQueue.count())
         {
-            VERBOSE(VB_GENERAL, "Found changes in the todo list.");
+            QString msg;
+            while (reschedQueue.count())
+            {
+                msg.sprintf("Reschedule requested for id %d.", 
+                            reschedQueue.front());
+                reschedQueue.pop_front();
+                VERBOSE(VB_GENERAL, msg);
+            }
             FillEncoderFreeSpaceCache();
             gettimeofday(&fillstart, NULL);
             FillRecordLists();
             gettimeofday(&fillend, NULL);
             PrintList();
-            QString msg;
             msg.sprintf("Scheduled %d items in %.1f seconds.", reclist.size(), 
                         ((fillend.tv_sec - fillstart.tv_sec ) * 1000000 +
                          (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0);

@@ -3359,7 +3359,7 @@ int main(int argc, char *argv[])
         else if (!quiet)
              cout << update_count << " replacements made.\n";
 
-        ScheduledRecording::signalChange(db);
+        ScheduledRecording::signalChange(-1);
 
         gContext->LogEntry("mythfilldatabase", LP_INFO,
                            "Listings Download Finished", "");

@@ -590,7 +590,7 @@ void ProgramRecPriority::deactivate(void)
 
                 if (uquery.isActive())
                 {
-                    ScheduledRecording::signalChange(db);
+                    ScheduledRecording::signalChange(0);
                     int cnt;
                     QMap<QString, ProgramRecPriorityInfo>::Iterator it;
                     ProgramRecPriorityInfo *progInfo;

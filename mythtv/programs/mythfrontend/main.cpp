@@ -438,7 +438,7 @@ void TVMenuCallback(void *data, QString &selection)
     {
         GeneralRecPrioritiesSettings settings;
         settings.exec(QSqlDatabase::database());
-        ScheduledRecording::signalChange(QSqlDatabase::database());
+        ScheduledRecording::signalChange(0);
     } 
     else if (sel == "settings channelrecpriorities") 
     {

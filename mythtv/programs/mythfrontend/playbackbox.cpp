@@ -1588,7 +1588,7 @@ void PlaybackBox::stop(ProgramInfo *rec)
 void PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory)
 {
     RemoteDeleteRecording(rec, forgetHistory);
-    ScheduledRecording::signalChange(QSqlDatabase::database());
+    ScheduledRecording::signalChange(0);
 
     connected = FillList();
 

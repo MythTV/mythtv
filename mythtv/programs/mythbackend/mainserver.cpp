@@ -283,6 +283,13 @@ void MainServer::ProcessRequest(RefSocket *sock)
     {
         HandleReactivateRecording(listline, pbs);
     }
+    else if (command == "RESCHEDULE_RECORDINGS")
+    {
+        if (tokens.size() != 2)
+            VERBOSE(VB_ALL, "Bad RESCHEDULE_RECORDINGS request");
+        else
+            HandleRescheduleRecordings(tokens[1].toInt(), pbs);
+    }
     else if (command == "FORGET_RECORDING")
     {
         HandleForgetRecording(listline, pbs);
@@ -561,9 +568,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                 elink->setSocket(pbs);
         }
 
-        dblock.lock();
-        ScheduledRecording::signalChange(m_db);
-        dblock.unlock();
+        if (m_sched)
+            m_sched->Reschedule(0);
 
         QString message = QString("LOCAL_SLAVE_BACKEND_ONLINE %2")
                                   .arg(commands[2]);
@@ -1459,6 +1465,25 @@ void MainServer::HandleReactivateRecording(QStringList &slist, PlaybackSock *pbs
     }
 }
 
+void MainServer::HandleRescheduleRecordings(int recordid, PlaybackSock *pbs)
+{
+    QStringList result;
+    if (m_sched)
+    {
+        m_sched->Reschedule(recordid);
+        result = QString::number(1);
+    }
+    else
+        result = QString::number(0);
+
+    if (pbs)
+    {
+        QSocket *pbssock = pbs->getSocket();
+        if (pbssock)
+            SendResponse(pbssock, result);
+    }
+}
+
 void MainServer::HandleForgetRecording(QStringList &slist, PlaybackSock *pbs)
 {
     ProgramInfo *pginfo = new ProgramInfo();
@@ -1727,9 +1752,7 @@ void MainServer::HandleLockTuner(PlaybackSock *pbs)
                         << query.value(1).toString()
                         << query.value(2).toString();
 
-                dblock.lock();
-                ScheduledRecording::signalChange(m_db);
-                dblock.unlock();
+                ScheduledRecording::signalChange(0);
 
                 SendResponse(pbssock, strlist);
                 return;
@@ -1774,9 +1797,7 @@ void MainServer::HandleFreeTuner(int cardid, PlaybackSock *pbs)
                               .arg(cardid).arg(pbs->getHostname());
         VERBOSE(VB_GENERAL, msg);
 
-        dblock.lock();
-        ScheduledRecording::signalChange(m_db);
-        dblock.unlock();
+        ScheduledRecording::signalChange(0);
         
         strlist << "OK";
     }
@@ -2698,9 +2719,8 @@ void MainServer::endConnection(RefSocket *socket)
                     if (elink->getSocket() == (*it))
                         elink->setSocket(NULL);
                 }
-                dblock.lock();
-                ScheduledRecording::signalChange(m_db);
-                dblock.unlock();
+                if (m_sched)
+                    m_sched->Reschedule(0);
 
                 QString message = QString("LOCAL_SLAVE_BACKEND_OFFLINE %2")
                                           .arg((*it)->getHostname());

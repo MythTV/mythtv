@@ -399,7 +399,7 @@ void ChannelRecPriority::saveRecPriority(void)
                                    QString::number(chanInfo->chanid), 
                                    chanInfo->recpriority);
     }
-    ScheduledRecording::signalChange(db);
+    ScheduledRecording::signalChange(0);
 }
 
 void ChannelRecPriority::FillList(void)

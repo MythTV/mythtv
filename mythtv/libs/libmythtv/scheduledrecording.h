@@ -115,7 +115,7 @@ public:
 
     static void fillSelections(QSqlDatabase* db, SelectSetting* setting);
 
-    static void signalChange(QSqlDatabase* db);
+    static void signalChange(int recordid);
     
     void setInactiveObj(SRInactive* val) {inactive = val;}
     void setRecTypeObj(SRRecordingType* val) {type = val;}

@@ -24,9 +24,9 @@ class Scheduler : public QObject
   public:
     Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList, 
               QSqlDatabase *ldb);
-   ~Scheduler();
+    ~Scheduler();
 
-    bool CheckForChanges(void);
+    void Reschedule(int recordid) { reschedQueue.append(recordid); }
     bool FillRecordLists(void);
     void FillRecordListFromMaster(void);
 
@@ -82,6 +82,7 @@ class Scheduler : public QObject
 
     QSqlDatabase *db;
 
+    QValueList<int> reschedQueue;
     RecList reclist;
     RecList retrylist;
     RecList schedlist;
