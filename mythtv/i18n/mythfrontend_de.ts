@@ -232,7 +232,7 @@
     </message>
     <message>
         <source>Stop</source>
-        <translation>Stop</translation>
+        <translation>Stopp</translation>
     </message>
 </context>
 <context>
@@ -531,34 +531,50 @@
     </message>
     <message>
         <source>^(The |A |An )</source>
-        <translation type="unfinished"></translation>
+        <translation>^(Der |Ein |Eine )</translation>
     </message>
 </context>
 <context>
     <name>PreviousBox</name>
     <message>
         <source>Previously Recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>Alte Aufnahmen</translation>
     </message>
     <message>
         <source>Select Sort Order</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortierung wählen</translation>
     </message>
     <message>
         <source>Sort by Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Nach Titel</translation>
     </message>
     <message>
         <source>Reverse Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Nach Titel absteigend</translation>
     </message>
     <message>
         <source>Sort by Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Nach Zeit</translation>
     </message>
     <message>
         <source>Reverse Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Nach Zeit absteigend</translation>
+    </message>
+    <message>
+        <source>NOTE: removing items from this list will not delete any recordings.</source>
+        <translation>Hinweis: Mit dem Entfernen von Einträgen aus dieser Liste werden keine Aufnahmen gelöscht.</translation>
+    </message>
+    <message>
+        <source>Keep this episode in the list</source>
+        <translation>Diese Folge in der Liste behalten</translation>
+    </message>
+    <message>
+        <source>Remove this episode from the list</source>
+        <translation>Diese Folge aus der Liste entfernen</translation>
+    </message>
+    <message>
+        <source>Remove all episodes for this title</source>
+        <translation>Alle Folgen dieser Sendung entfernen</translation>
     </message>
 </context>
 <context>
@@ -795,27 +811,27 @@
     </message>
     <message>
         <source>^(The |A |An )</source>
-        <translation type="unfinished"></translation>
+        <translation>^(Der |Ein |Eine )</translation>
     </message>
     <message>
         <source>Recording with override options</source>
-        <translation type="unfinished"></translation>
+        <translation>Nehme mit Übersteuerungsoptionen auf</translation>
     </message>
     <message>
         <source>Recording in this timeslot</source>
-        <translation type="unfinished"></translation>
+        <translation>Nehme zu dieser Zeit auf</translation>
     </message>
     <message>
         <source>Recording on this channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Nehme auf diesem Sender auf</translation>
     </message>
     <message>
         <source>Recording one showing</source>
-        <translation type="unfinished"></translation>
+        <translation>Nehme eine Ausstrahlung auf</translation>
     </message>
     <message>
         <source>Not allowed to record this showing</source>
-        <translation type="unfinished"></translation>
+        <translation>Darf diese Ausstrahlung nicht aufnehmen</translation>
     </message>
 </context>
 <context>
@@ -1142,7 +1158,7 @@
     </message>
     <message>
         <source>Number of seconds for OSD information</source>
-        <translation>Verweildauer des OSD (in Sek.)</translation>
+        <translation>Anzeigedauer des OSD (in Sek.)</translation>
     </message>
     <message>
         <source>How long the program information remains on the On Screen Display after a channel change.</source>
@@ -1959,7 +1975,7 @@
     </message>
     <message>
         <source>(Not available for all grabbers.)</source>
-        <translation>(nicht bei allen XMLTV Quellen verfügbar)</translation>
+        <translation>(Nicht bei allen XMLTV Quellen möglich)</translation>
     </message>
     <message>
         <source>Monitor CD/DVD</source>
@@ -2147,11 +2163,11 @@
     </message>
     <message>
         <source>Channel Name</source>
-        <translation>Sendername</translation>
+        <translation>Name</translation>
     </message>
     <message>
         <source>Channel Number</source>
-        <translation>Senderplatz</translation>
+        <translation>Platz</translation>
     </message>
     <message>
         <source>[Not Selected]</source>
@@ -2159,7 +2175,7 @@
     </message>
     <message>
         <source>Callsign</source>
-        <translation>Senderkürzel</translation>
+        <translation>Kurzname</translation>
     </message>
     <message>
         <source>TV Format</source>
@@ -2171,7 +2187,7 @@
     </message>
     <message>
         <source>Icon</source>
-        <translation>Symbol</translation>
+        <translation>Logo</translation>
     </message>
     <message>
         <source>Video filters</source>
@@ -2537,7 +2553,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Load &amp; Tune</source>
-        <translation type="unfinished">Laden &amp; Abstimmen</translation>
+        <translation>Laden &amp; Abstimmen</translation>
     </message>
     <message>
         <source>Will load the selected channel above into the previous screen, and try to tune it. If it fails to tune the channel, press back and check the settings.</source>
@@ -2581,7 +2597,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>XMLTV listings grabber</source>
-        <translation type="unfinished"></translation>
+        <translation>XMLTV Skript</translation>
     </message>
     <message>
         <source>Region</source>
@@ -3017,7 +3033,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Find One Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Finde Eine Aufnahme</translation>
     </message>
     <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
@@ -3029,11 +3045,11 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Find One Recordings Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;Finde Eine Aufnahme&apos; Priorität</translation>
     </message>
     <message>
         <source>Find One Recording types will receive this additional recording priority value.</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;Finde Eine Aufnahme&apos; Aufnahmen erhalten diesen zusätzlichen Aufnahmeprioritätswert.</translation>
     </message>
     <message>
         <source>Length of time to retain DVB signal data (in days)</source>
@@ -3193,11 +3209,11 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Input preference</source>
-        <translation type="unfinished"></translation>
+        <translation>Eingangspriorität</translation>
     </message>
     <message>
         <source>If the input preference is not equal for all inputs, the scheduler may choose to record a show at a later time so that it can record on an input with a higher value.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls die Eingangspriorität nicht für alle Eingänge gleich ist, könnte MythTV eine Aufnahme für einen späteren Zeitpunkt planen, damit ein Eingang höherer Priorität genutzt werden kann.</translation>
     </message>
     <message>
         <source>Independent Muting of Left and Right Audio Channels</source>
@@ -3209,7 +3225,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Reschedule Higher Priorities</source>
-        <translation type="unfinished"></translation>
+        <translation>Höhere Prioritäten neu planen</translation>
     </message>
     <message>
         <source>Use select to change the channel in the program guide</source>
@@ -3269,7 +3285,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Notice and Higher</source>
-        <translation type="unfinished">Notiz und höher</translation>
+        <translation>Notiz und höher</translation>
     </message>
     <message>
         <source>Warning and Higher</source>
@@ -3513,7 +3529,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback.</source>
-        <translation>Gibt das Seitenverhältnis für die Wiedergabe unabhängig von der Aufnahme vor. Es bewirkt das gleiche wie die Taste &quot;W&quot; während der Wiedergabe.</translation>
+        <translation>Gibt das Seitenverhältnis für die Wiedergabe unabhängig von der Aufnahme vor, genau wie die &quot;w&quot; Taste während der Wiedergabe.</translation>
     </message>
     <message>
         <source>GUI width (px)</source>
@@ -3541,7 +3557,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>number callsign</source>
-        <translation>Senderplatz Senderkürzel</translation>
+        <translation>Senderplatz Kurzname</translation>
     </message>
     <message>
         <source>number name</source>
@@ -3549,7 +3565,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>callsign</source>
-        <translation>Senderkürzel</translation>
+        <translation>Kurzname</translation>
     </message>
     <message>
         <source>name</source>
@@ -3758,7 +3774,7 @@ Myth wird nun beendet.</translation>
     <message>
         <source>X</source>
         <comment>RecStatusChar</comment>
-        <translation type="unfinished">X</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>P</source>
@@ -3914,7 +3930,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Using your keyboard or the numbers keys on your remote enter the group name</source>
-        <translation type="unfinished"></translation>
+        <translation>Geben Sie den Gruppennamen ein</translation>
     </message>
     <message>
         <source>Store in the &quot;%1&quot; recording group</source>
@@ -4174,7 +4190,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Horizontal size of the monitor or TV, is used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Horizontale Größe des Monitors oder Fernsehers. Damit wird das tatsächliche Seitenverhältnis berechnet und überstimmt die DisplaySize Einstellung des X Window Systems.</translation>
     </message>
     <message>
         <source>Display Size - Height</source>
@@ -4182,7 +4198,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Vertical size of the monitor or TV, is used to calculate the actual aspect ratio of the display. This will override the DisplaySize from the system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vertikale Größe des Monitors oder Fernsehers. Damit wird das tatsächliche Seitenverhältnis berechnet und überstimmt die DisplaySize Einstellung des X Window Systems.</translation>
     </message>
     <message>
         <source>If enabled, use the above size for TV, otherwise use full screen.</source>
@@ -4190,15 +4206,15 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Switch X Window video modes for TV. Requires &quot;xrandr&quot; support.</source>
-        <translation type="unfinished"></translation>
+        <translation>Schaltet die X Window Bildschirmauflösung für die TV Wiedergabe um. Benötigt die &apos;xrandr&apos; Unterstützung des X Window Systems.</translation>
     </message>
     <message>
         <source>Horizontal resolution for GUI video mode. This mode must be defined in your X configuration file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Horizontale Auflösung für die GUI. Diese Auflösung muß in Ihrer X Konfiguration definiert sein.</translation>
     </message>
     <message>
         <source>Vertical resolution for GUI video mode. This mode must be defined in your X configuration file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vertikale Auflösung für die GUI. Diese Auflösung muß in Ihrer X Konfiguration definiert sein.</translation>
     </message>
     <message>
         <source>X</source>
@@ -4206,7 +4222,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Horizontal resolution of video mode which needs a special output resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>Horizontale Auflösung des Videomodus der eine spezielle Auflösung für die Ausgabe benötigt.</translation>
     </message>
     <message>
         <source>Y</source>
@@ -4214,15 +4230,15 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Vertical resolution of video mode which needs a special output resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vertikale Auflösung des Videomodus der eine spezielle Auflösung für die Ausgabe benötigt.</translation>
     </message>
     <message>
         <source>Horizontal resolution for playback video mode. This mode must be defined in your X configuration file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Horizontale Auflösung für die Video Wiedergabe. Diese Auflösung muß in Ihrer X Konfiguration definiert sein.</translation>
     </message>
     <message>
         <source>Vertical resolution for playback video mode. This mode must be defined in your X configuration file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vertikale Auflösung für die Video Wiedergabe. Diese Auflösung muß in Ihrer X Konfiguration definiert sein.</translation>
     </message>
     <message>
         <source>Alt Aspect</source>
@@ -4230,7 +4246,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>If X&apos;s DisplaySize indicates 16:9, fudge vertical size into 4:3, and visa-versa</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls X&apos; DisplaySize 16:9 meldet, zwänge die vertikale Größe in 4:3 und umgekehrt.</translation>
     </message>
     <message>
         <source>GUI Size (px)</source>
@@ -4282,11 +4298,11 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Colorize program guide using genre colors. (Not available for all grabbers.)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategorien in der Programmübersicht farblich markieren. Dies ist nicht bei allen XMLTV Quellen möglich.</translation>
     </message>
     <message>
         <source>Only display &apos;favorite&apos; channels</source>
-        <translation>Zeige bevorzugte Sender</translation>
+        <translation>Nur bevorzugte Sender zeigen</translation>
     </message>
     <message>
         <source>If enabled, the EPG will initially display only the channels marked as favorites. Pressing &quot;4&quot; will toggle between displaying favorites and all channels.</source>
@@ -4366,7 +4382,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>This starts the program guide immediately upon starting to watch Live TV.</source>
-        <translation>Startet das EPG im LiveTV Modus wenn Fernsehen ausgewählt wird.</translation>
+        <translation>Zeigt die Programmübersicht im LiveTV Modus wenn Fernsehen ausgewählt wird.</translation>
     </message>
     <message>
         <source>LCD Backlight Always On</source>
@@ -4554,7 +4570,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Show the program guide when starting Live TV</source>
-        <translation type="unfinished"></translation>
+        <translation>EPG bei LiveTV anzeigen</translation>
     </message>
     <message>
         <source>Listings Status</source>
@@ -4586,19 +4602,19 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Listings Status shows the latest status information from mythfilldatabase</source>
-        <translation>&apos;EPG Daten&apos; zeigt die letzten Meldungen von mythfilldatabase</translation>
+        <translation>Zeigt die letzten Meldungen von mythfilldatabase</translation>
     </message>
     <message>
         <source>Tuner Status shows the current information about the state of backend tuner cards</source>
-        <translation>&apos;Tuner&apos; zeigt die aktuelle Belegung der Backend Tunerkarten</translation>
+        <translation>Zeigt die aktuelle Belegung der Backend TV-Karten</translation>
     </message>
     <message>
         <source>DVB Status shows the quality statistics of all DVB cards, if present</source>
-        <translation>&apos;DVB&apos; zeigt Informationen zur Signalqualität aller DVB Karten</translation>
+        <translation>Zeigt Informationen zur Signalqualität aller DVB Karten</translation>
     </message>
     <message>
         <source>Log Entries shows any unread log entries from the system if you have logging enabled</source>
-        <translation>&apos;Meldungen&apos; zeigt alle ungelesenen Systemmeldungen</translation>
+        <translation>Zeigt alle ungelesenen Systemmeldungen</translation>
     </message>
     <message>
         <source>Acknowledge this log entry?</source>
@@ -4736,7 +4752,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Job Queue shows any jobs currently in Myth&apos;s Job Queue such as a commercial flagging job.</source>
-        <translation>&apos;Auftragsliste&apos; zeigt alle noch zu bearbeitenden Aufnahmen, z.B. um sie auf Werbung zu untersuchen.</translation>
+        <translation>Zeigt alle noch zu bearbeitenden Aufnahmen, z.B. um sie auf Werbung zu untersuchen.</translation>
     </message>
     <message>
         <source>Job Queue is currently empty.</source>
@@ -4852,11 +4868,11 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Re-record programs which have been automatically expired</source>
-        <translation type="unfinished"></translation>
+        <translation>Autom. gelöschte Aufnahmen erneut aufnehmen lassen</translation>
     </message>
     <message>
         <source>If set, programs that are automatically deleted (expired) will be allowed to re-recorded if they are shown again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, werden Aufnahmen, die autom. gelöscht wurden, erneut aufgenommen.</translation>
     </message>
     <message>
         <source>Delete Job?</source>
@@ -4868,7 +4884,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Stop</source>
-        <translation>Stop</translation>
+        <translation>Stopp</translation>
     </message>
     <message>
         <source>Job Queue Actions:</source>
@@ -4880,161 +4896,161 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Requeue Job?</source>
-        <translation type="unfinished"></translation>
+        <translation>Auftrag wiederholen?</translation>
     </message>
     <message>
         <source>Follow Symlinks when deleting files</source>
-        <translation type="unfinished"></translation>
+        <translation>Folge symbolischen Links</translation>
     </message>
     <message>
         <source>This will cause Myth to follow symlinks when recordings and related files are deleted, instead of deleting the symlink and leaving the actual file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn Aufnahmen und andere Dateien gelöscht werden, wird Myth symbolischen Links folgen anstatt nur den symb. Link zu löschen und die eigentliche Datei zu hinterlassen.</translation>
     </message>
     <message>
         <source>Scale video as necessary</source>
-        <translation type="unfinished"></translation>
+        <translation>Video skalieren</translation>
     </message>
     <message>
         <source>If checked, video will be scaled to fit your window or screen. If unchecked, video will never be made larger than its actual pixel size.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, wird das Videobild passend zum Fenster bzw. Bildschirm skaliert. Ansonsten wird es nicht größer als in Originalgröße dargestellt.</translation>
     </message>
     <message>
         <source>Frames to skip in fullscreen mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Frames im Vollbildmodus auslassen</translation>
     </message>
     <message>
         <source>Video displayed in fullscreen or non-windowed mode will skip this many frames for each frame drawn. Set to 0 to show every frame. Only valid when either &quot;Use GUI size for TV playback&quot; or &quot;Run the frontend in a window&quot; is not checked.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wird das Videobild im Vollbild- oder Nicht-Fenstermodus angezeigt, so werden für jeden gezeigten Frame so viele Frames ausgelassen. Bei 0 werden alle Frames gezeigt. Nur gültig falls entweder &quot;GUI Größe für TV-Bild verwenden&quot; oder &quot;MythTV im Fenster starten&quot; nicht gesetzt sind.</translation>
     </message>
     <message>
         <source>Video in main window</source>
-        <translation type="unfinished"></translation>
+        <translation>Video im Hauptfenster</translation>
     </message>
     <message>
         <source>If checked, video will be displayed in the main GUI window. Disable this when you only want video on the desktop or in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, wird das Videobild im Hauptfenster der GUI angezeigt. Diese Option abwählen wenn Sie das Videobild nur auf dem Desktop oder in einem schwebenden Fenster möchten. Nur gültig falls &quot;GUI Größe für TV-Bild verwenden&quot; und &quot;MythTV im Fenster starten&quot; gesetzt sind.</translation>
     </message>
     <message>
         <source>Frames to skip</source>
-        <translation type="unfinished"></translation>
+        <translation>Frames auslassen</translation>
     </message>
     <message>
         <source>Video in the main window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wird das Videobild im Hauptfenster angezeigt, so werden für jeden gezeigten Frame so viele Frames ausgelassen. Bei 0 werden alle Frames gezeigt.</translation>
     </message>
     <message>
         <source>Opacity</source>
-        <translation type="unfinished"></translation>
+        <translation>Undurchsichtigkeit</translation>
     </message>
     <message>
         <source>The opacity of the main window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Undurchsichtigkeit des Hauptfensters. Für vollständige Undurchsichtigkeit auf 100, und auf 0 für vollständige Durchsichtigkeit setzen.</translation>
     </message>
     <message>
         <source>Video in floating window</source>
-        <translation type="unfinished"></translation>
+        <translation>Video in schwebendem Fenster</translation>
     </message>
     <message>
         <source>If checked, video will be displayed in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt wird das Videobild in einem schwebenden Fenster angezeigt. Nur gültig falls &quot;GUI Größe für TV-Bild verwenden&quot; und &quot;MythTV im Fenster starten&quot; gesetzt sind.</translation>
     </message>
     <message>
         <source>Video in the floating window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wird das Videobild in einem schwebenden Fenster angezeigt, so werden für jeden gezeigten Frame so viele Frames ausgelassen. Bei 0 werden alle Frames gezeigt.</translation>
     </message>
     <message>
         <source>The opacity of the floating window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Undurchsichtigkeit des schwebenden Fensters. Für vollständige Undurchsichtigkeit auf 100, und auf 0 für vollständige Durchsichtigkeit setzen.</translation>
     </message>
     <message>
         <source>Video in the dock</source>
-        <translation type="unfinished"></translation>
+        <translation>Video im Dock</translation>
     </message>
     <message>
         <source>If checked, video will be displayed in the application&apos;s dock icon. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt wird das Videobild im Dock-Icon der Anwendung angezeigt. Nur gültig falls &quot;GUI Größe für TV-Bild verwenden&quot; und &quot;MythTV im Fenster starten&quot; gesetzt sind.</translation>
     </message>
     <message>
         <source>Video in the dock icon will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wird das Videobild im Dock-Icon angezeigt, so werden für jeden gezeigten Frame so viele Frames ausgelassen. Bei 0 werden alle Frames gezeigt.</translation>
     </message>
     <message>
         <source>Video on the desktop</source>
-        <translation type="unfinished"></translation>
+        <translation>Video auf dem Desktop</translation>
     </message>
     <message>
         <source>If checked, video will be displayed on the desktop, behind the Finder icons. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt wird das Videobild auf dem Desktop, hinter den Finder Symbolen, angezeigt. Nur gültig falls &quot;GUI Größe für TV-Bild verwenden&quot; und &quot;MythTV im Fenster starten&quot; gesetzt sind.</translation>
     </message>
     <message>
         <source>Video on the desktop will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wird das Videobild auf dem Desktop angezeigt, so werden für jeden gezeigten Frame so viele Frames ausgelassen. Bei 0 werden alle Frames gezeigt.</translation>
     </message>
     <message>
         <source>Mac OS X video settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Mac OS X Video Einstellungen</translation>
     </message>
     <message>
         <source>(New Channel)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Neuer Sender)</translation>
     </message>
     <message>
         <source>star</source>
-        <translation type="unfinished"></translation>
+        <translation>Stern</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel</translation>
     </message>
     <message>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Inhalt</translation>
     </message>
     <message>
         <source>Part %1 of %2, </source>
-        <translation type="unfinished"></translation>
+        <translation>Teil %1 von %2,</translation>
     </message>
     <message>
         <source>HDTV</source>
-        <translation type="unfinished"></translation>
+        <translation>HDTV</translation>
     </message>
     <message>
         <source>CC</source>
         <comment>Close Captioned</comment>
-        <translation type="unfinished">CC</translation>
+        <translation>CC</translation>
     </message>
     <message>
         <source>Subtitled</source>
-        <translation type="unfinished"></translation>
+        <translation>mit Untertitel</translation>
     </message>
     <message>
         <source>Stereo</source>
-        <translation type="unfinished"></translation>
+        <translation>Stereo</translation>
     </message>
     <message>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategorie</translation>
     </message>
     <message>
         <source>Type</source>
         <comment>category_type</comment>
-        <translation type="unfinished">Typ</translation>
+        <translation>Typ</translation>
     </message>
     <message>
         <source>Episode Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Folge Nr.</translation>
     </message>
     <message>
         <source>Original Airdate</source>
-        <translation type="unfinished"></translation>
+        <translation>Erstausstrahlung</translation>
     </message>
     <message>
         <source>Program ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Progamm ID</translation>
     </message>
     <message>
         <source>Actors</source>
-        <translation type="unfinished"></translation>
+        <translation>Darsteller</translation>
     </message>
     <message>
         <source>Guest Star</source>
@@ -5042,151 +5058,155 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Director</source>
-        <translation type="unfinished"></translation>
+        <translation>Regisseur</translation>
     </message>
     <message>
         <source>Filesize</source>
-        <translation type="unfinished"></translation>
+        <translation>Dateigröße</translation>
     </message>
     <message>
         <source>Recording Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnahmegruppe</translation>
     </message>
     <message>
         <source>Stop recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnahme stoppen</translation>
     </message>
     <message>
         <source>Commercial Flag new recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Auf Werbung untersuchen</translation>
     </message>
     <message>
         <source>Do not Commercial Flag new recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicht auf Werbung untersuchen</translation>
     </message>
     <message>
         <source>Run &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Starte &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Do not run &apos;%1&apos; for new recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;%1&apos; nicht starten</translation>
     </message>
     <message>
         <source>Enables the use of viaXvMC HW Mpeg decoding for the Via Unichrome Chipset</source>
-        <translation type="unfinished"></translation>
+        <translation>Schaltet die Unterstützung für den Via XvMC Hardware MPEG Dekoder ein. Nur beim Via Unichrome Chipsatz verfügbar.</translation>
     </message>
     <message>
         <source>Keep this episode in the list</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Diese Folge in der Liste behalten</translation>
     </message>
     <message>
         <source>Remove this episode from the list</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Diese Folge aus der Liste entfernen</translation>
     </message>
     <message>
         <source>Remove all episodes for this title</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Alle Folgen entfernen</translation>
     </message>
     <message>
         <source>Machine Status</source>
-        <translation type="unfinished"></translation>
+        <translation>Rechner</translation>
     </message>
     <message>
         <source>Machine Status shows some operating system statistics of this machine</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeigt die Betriebsdaten dieses Rechners</translation>
     </message>
     <message>
         <source>and the MythTV server</source>
-        <translation type="unfinished"></translation>
+        <translation>und der MythTV Server</translation>
     </message>
     <message>
         <source>used</source>
-        <translation type="unfinished"></translation>
+        <translation>belegt</translation>
     </message>
     <message>
         <source>free</source>
-        <translation type="unfinished"></translation>
+        <translation>frei</translation>
     </message>
     <message>
         <source>Uptime</source>
-        <translation type="unfinished"></translation>
+        <translation>Betriebszeit</translation>
     </message>
     <message>
         <source>System</source>
-        <translation type="unfinished"></translation>
+        <translation>System</translation>
     </message>
     <message>
         <source>This machine</source>
-        <translation type="unfinished"></translation>
+        <translation>Dieser Rechner</translation>
     </message>
     <message>
         <source>Load</source>
-        <translation type="unfinished"></translation>
+        <translation>Last</translation>
     </message>
     <message>
         <source>unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>unbekannt</translation>
     </message>
     <message>
         <source>failed</source>
-        <translation type="unfinished"></translation>
+        <translation>fehlgeschlagen</translation>
     </message>
     <message>
         <source>RAM</source>
-        <translation type="unfinished"></translation>
+        <translation>RAM</translation>
     </message>
     <message>
         <source>Swap</source>
-        <translation type="unfinished"></translation>
+        <translation>Swap</translation>
     </message>
     <message>
         <source>MythTV server</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV Server</translation>
     </message>
     <message>
         <source>Disk space:</source>
-        <translation type="unfinished"></translation>
+        <translation>Speicherplatz:</translation>
     </message>
     <message>
         <source>Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnahmen</translation>
     </message>
     <message>
         <source>DB error - RecordFilePrefix unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Datenbankfehler - RecordFilePrefix unbekannt</translation>
     </message>
     <message>
         <source>TV buffer</source>
-        <translation type="unfinished"></translation>
+        <translation>TV Puffer</translation>
     </message>
     <message>
         <source>DB error - LiveBufferDir unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Datenbankfehler - LiveBufferDir unbekannt</translation>
     </message>
     <message>
         <source>Would you like to clear all capture card settings before starting configuration?</source>
-        <translation type="unfinished"></translation>
+        <translation>Möchten Sie alle Einstellungen der TV-Karten löschen bevor Sie mit der Konfiguration beginnen?</translation>
     </message>
     <message>
         <source>No, leave my card settings alone</source>
-        <translation type="unfinished"></translation>
+        <translation>Nein, nicht löschen</translation>
     </message>
     <message>
         <source>Yes, delete my card settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, meine Karteneinstellungen löschen</translation>
     </message>
     <message>
         <source>Would you like to clear all program and channel settings before starting configuration?</source>
-        <translation type="unfinished"></translation>
+        <translation>Möchten Sie alle Programm- und Sendereinstellungen löschen bevor Sie mit der Konfiguration beginnen?</translation>
     </message>
     <message>
         <source>No, leave my program settings alone</source>
-        <translation type="unfinished"></translation>
+        <translation>Nein, nicht löschen</translation>
     </message>
     <message>
         <source>Yes, delete my program settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, die Programmeinstellungen löschen</translation>
+    </message>
+    <message>
+        <source>%1% Completed @ %2 fps.</source>
+        <translation>%1% Fertig @ %2 fps.</translation>
     </message>
 </context>
 <context>
@@ -5221,11 +5241,11 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>System Status - Select a category to view the status</source>
-        <translation type="obsolete">Systemstatus - Bitte eine Kategorie wählen</translation>
+        <translation type="unfinished">Systemstatus - Bitte eine Kategorie wählen</translation>
     </message>
     <message>
         <source>This screen displays the status of various system components</source>
-        <translation type="obsolete">Zeigt den Status verschiedener Systemkomponenten</translation>
+        <translation type="unfinished">Zeigt den Status verschiedener Systemkomponenten</translation>
     </message>
 </context>
 <context>
@@ -5632,47 +5652,47 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Time Stretch %1X</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeitraffer %1x</translation>
     </message>
     <message>
         <source>Adjust Time Stretch</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeitraffer ändern</translation>
     </message>
     <message>
         <source>Adjust</source>
-        <translation type="unfinished"></translation>
+        <translation>Anpassen</translation>
     </message>
     <message>
         <source>0.5X</source>
-        <translation type="unfinished"></translation>
+        <translation>0,5x</translation>
     </message>
     <message>
         <source>0.9X</source>
-        <translation type="unfinished"></translation>
+        <translation>0,9x</translation>
     </message>
     <message>
         <source>1.0X</source>
-        <translation type="unfinished"></translation>
+        <translation>1,0x</translation>
     </message>
     <message>
         <source>1.1X</source>
-        <translation type="unfinished"></translation>
+        <translation>1,1x</translation>
     </message>
     <message>
         <source>1.5X</source>
-        <translation type="unfinished"></translation>
+        <translation>1,5x</translation>
     </message>
     <message>
         <source>2.0X</source>
-        <translation type="unfinished"></translation>
+        <translation>2,0x</translation>
     </message>
     <message>
         <source>Sleep</source>
-        <translation type="unfinished"></translation>
+        <translation>Schlaf</translation>
     </message>
     <message>
         <source>Sleep Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Schlaf aus</translation>
     </message>
 </context>
 <context>
@@ -5715,11 +5735,11 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Select a recording to permanently delete:</source>
-        <translation>Welche Aufnahme soll gelöscht werden:</translation>
+        <translation type="obsolete">Welche Aufnahme soll gelöscht werden:</translation>
     </message>
     <message>
         <source>Select a recording to watch:</source>
-        <translation type="obsolete">Welche Aufnahme möchten Sie sehen:</translation>
+        <translation type="unfinished">Welche Aufnahme möchten Sie sehen:</translation>
     </message>
     <message>
         <source>Sorry, No Recordings Available</source>
@@ -5739,7 +5759,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Pick the letter in which the show starts with, then press SELECT or the right arrow</source>
-        <translation type="obsolete">Wählen Sie den Anfangsbuchstaben der Sendung. Weiter mit &quot;SELECT&quot; oder Pfeil-Rechts.</translation>
+        <translation type="unfinished">Wählen Sie den Anfangsbuchstaben der Sendung. Weiter mit &quot;SELECT&quot; oder Pfeil-Rechts.</translation>
     </message>
     <message>
         <source>Select a program...</source>
@@ -5747,7 +5767,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
-        <translation type="obsolete">Wählen Sie den Titel der gesuchten Sendung. Beenden mit Pfeil-Links oder &quot;SELECT&quot; um eine Aufnahme zu planen.</translation>
+        <translation type="unfinished">Wählen Sie den Titel der gesuchten Sendung. Beenden mit Pfeil-Links oder &quot;SELECT&quot; um eine Aufnahme zu planen.</translation>
     </message>
     <message>
         <source>No Programs</source>
@@ -5803,22 +5823,26 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Airdate:</source>
-        <translation type="obsolete">Sendezeit:</translation>
+        <translation type="unfinished">Sendezeit:</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation type="obsolete">Lade...</translation>
+        <translation type="unfinished">Lade...</translation>
     </message>
     <message>
         <source>Select a recording to view:</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Welche Aufnahme möchten Sie sehen:</translation>
     </message>
     <message>
         <source>Pick the letter in which the show starts with, then hit ENTER or the right arrow</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Wählen Sie den Anfangsbuchstaben der Sendung. Weiter mit &quot;SELECT&quot; oder Pfeil-Rechts</translation>
     </message>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting &apos;info&apos; will allow you to setup recording options.</source>
+        <translation type="obsolete">Wählen Sie den Titel der gesuchten Sendung. Beenden mit Pfeil-Links oder &quot;SELECT&quot; um eine Aufnahme zu planen.</translation>
+    </message>
+    <message>
+        <source>Select a recording to permanently erase:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
