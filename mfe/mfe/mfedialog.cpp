@@ -336,6 +336,7 @@ void MfeDialog::mfdDiscovered(int which_mfd, QString name, QString host, bool fo
 
             MfdInfo *new_mfd = new MfdInfo(which_mfd, name, host);
             available_mfds.insert(which_mfd, new_mfd);
+            mfd_interface->askForStatus(which_mfd);
         
             if(current_mfd == NULL)
             {
@@ -409,6 +410,19 @@ void MfeDialog::changeMetadata(int which_mfd, MfdContentCollection *new_collecti
 
             menu->tryToSetCurrent(route_to_current);
             menu->refresh();
+    
+            //
+            //  If the mfd_info object doesn't know what's currently
+            //  playing, see if it can now find out given that new metadata
+            //  has just arrived
+            //
+            
+            if(!current_mfd->knowsWhatsPlaying())
+            {
+                current_mfd->setCurrentPlayingData();
+                now_playing_text->SetText(current_mfd->getPlayingString());
+                time_progress->SetUsed((int)(current_mfd->getPercentPlayed() * 1000));
+            }
     
         }
     }

@@ -45,7 +45,6 @@
             <textarea name="now_playing_text" draworder="0" align="center">
                 <font>now_playing_font</font>
                 <area>100,12,600,40</area>
-                <value>M for Menu ... should scroll</value>
             </textarea>
 
             <statusbar name="time_progress" draworder="0" whitespace="15">
@@ -65,8 +64,8 @@
 
             <listtreearea name="musictree" draworder="0">
             <area>0,0,760,400</area>
-            <listsize>0,0,375,380</listsize>
-            <leveloffset>10</leveloffset>
+            <listsize>0,0,376,380</listsize>
+            <leveloffset>8</leveloffset>
             <gradient type="unselected" start="#505050" end="#ffffff" alpha="100">
             </gradient>
             <!-- <gradient type="selected" start="#52CA38" end="#349838" alpha="255"> -->

@@ -38,6 +38,7 @@ class MfdInfo
     
     AudioMetadata*          getAudioMetadata(int collection_id, int item_id);
 
+    void                    setCurrentPlayingData();
     void                    setCurrentPlayingData(int which_container, int which_metadata, int numb_seconds);
     QString                 getPlayingString(){return playing_string;}
     void                    clearCurrentPlayingData(){playing_string = "";}
@@ -45,6 +46,8 @@ class MfdInfo
     
     void                    setPauseState(bool new_state){ pause_state = new_state; }
     bool                    getPauseState(){return pause_state;}
+
+    bool                    knowsWhatsPlaying(){return knows_whats_playing;}
     
   private:
   
@@ -52,6 +55,10 @@ class MfdInfo
     QString     name;
     QString     host;
     bool        showing_menu;
+    bool        knows_whats_playing;
+    int         current_container;
+    int         current_item;
+    int         current_elapsed;
 
     MfdContentCollection *mfd_content_collection;
     QStringList previous_tree_position;
