@@ -32,18 +32,21 @@ using namespace std;
 class ProcessRequestThread : public QThread
 {
   public:
-    ProcessRequestThread(MainServer *ms) { parent = ms; dostuff = false; }
+    ProcessRequestThread(MainServer *ms) { parent = ms; }
    
     void setup(QSocket *sock)
     {
+        lock.lock();
         socket = sock;
-        dostuff = true;
+        lock.unlock();
         waitCond.wakeOne();
     }
 
     void killit(void)
     {
+        lock.lock();
         threadlives = false;
+        lock.unlock();
         waitCond.wakeOne();
     }
 
@@ -51,18 +54,20 @@ class ProcessRequestThread : public QThread
     {
         threadlives = true;
 
-        while (threadlives)
-        {
-            if (!dostuff)
-                waitCond.wait();
+        lock.lock();
 
-            if (dostuff)
-            {
-                parent->ProcessRequest(socket);
-                dostuff = false;
-                parent->MarkUnused(this);
-            }
+        while (1)
+        {
+            waitCond.wait(&lock);
+
+            if (!threadlives)
+                break;
+
+            parent->ProcessRequest(socket);
+            parent->MarkUnused(this);
         }
+
+        lock.unlock();
     }
 
   private:
@@ -70,8 +75,8 @@ class ProcessRequestThread : public QThread
 
     QSocket *socket;
 
+    QMutex lock;
     QWaitCondition waitCond;
-    bool dostuff;
     bool threadlives;
 };
 

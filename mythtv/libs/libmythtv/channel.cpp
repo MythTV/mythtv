@@ -24,6 +24,7 @@ Channel::Channel(TVRec *parent, const QString &videodevice)
     isopen = false;
     videofd = -1;
     curList = 0;
+    defaultFreqTable = 1;
     totalChannels = 0;
     usingv4l2 = false;
     videomode = VIDEO_MODE_NTSC;
@@ -201,7 +202,19 @@ void Channel::SetFormat(const QString &format)
     pParent->RetrieveInputChannels(inputChannel, inputTuneTo, externalChanger);
 }
 
-void Channel::SetFreqTable(const QString &name)
+int Channel::SetDefaultFreqTable(const QString &name)
+{
+    defaultFreqTable = SetFreqTable(name);
+    return defaultFreqTable;
+}
+
+void Channel::SetFreqTable(const int index)
+{
+    curList = chanlists[index].list;
+    totalChannels = chanlists[index].count;
+}
+
+int Channel::SetFreqTable(const QString &name)
 {
     int i = 0;
     char *listname = (char *)chanlists[i].name;
@@ -211,19 +224,17 @@ void Channel::SetFreqTable(const QString &name)
     {
         if (name == listname)
         {
-            curList = chanlists[i].list;
-            totalChannels = chanlists[i].count;
-            break;
+            SetFreqTable(i);
+            return i;
         }
         i++;
         listname = (char *)chanlists[i].name;
     }
 
-    if (!curList)
-    {
-        curList = chanlists[1].list;
-        totalChannels = chanlists[1].count;
-    }
+    VERBOSE(VB_CHANNEL, QString("Invalid frequency table name %1, using %2.")
+                        .arg(name).arg((char *)chanlists[1].name));
+    SetFreqTable(1);
+    return 1;
 }
 
 int Channel::GetCurrentChannelNum(const QString &channame)
@@ -324,8 +335,10 @@ bool Channel::SetChannelByString(const QString &chan)
         return false;
 
     pthread_mutex_lock(&db_lock);
-    QString thequery = QString("SELECT finetune, freqid, tvformat "
-                               "FROM channel WHERE channum = \"%1\";")
+    QString thequery = QString("SELECT finetune, freqid, tvformat, freqtable "
+                               "FROM channel "
+                               "LEFT JOIN videosource USING (sourceid) "
+                               "WHERE channum = \"%1\";")
                                .arg(chan);
 
     QSqlQuery query = db_conn->exec(thequery);
@@ -341,6 +354,12 @@ bool Channel::SetChannelByString(const QString &chan)
     int finetune = query.value(0).toInt();
     QString freqid = query.value(1).toString();
     QString tvformat = query.value(2).toString();
+    QString freqtable = query.value(3).toString();
+
+    if (freqtable == "default" || freqtable.isNull() || freqtable.isEmpty())
+        SetFreqTable(defaultFreqTable);
+    else
+        SetFreqTable(freqtable);
 
     if (tvformat.isNull() || tvformat.isEmpty())
         tvformat = "Default";

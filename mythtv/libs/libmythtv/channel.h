@@ -21,7 +21,7 @@ class Channel : public ChannelBase
     void Close(void);
 
     void SetFormat(const QString &format);
-    void SetFreqTable(const QString &name);
+    int SetDefaultFreqTable(const QString &name);
 
     bool SetChannelByString(const QString &chan); 
     bool ChannelUp(void);
@@ -47,6 +47,8 @@ class Channel : public ChannelBase
   private:
     int GetCurrentChannelNum(const QString &channame);
 
+    void SetFreqTable(const int index);
+    int SetFreqTable(const QString &name);
     bool TuneTo(const QString &chan, int finetune);
 
     QString device;
@@ -60,6 +62,8 @@ class Channel : public ChannelBase
     bool usingv4l2;
 
     QString currentFormat;
+
+    int defaultFreqTable;
 };
 
 #endif

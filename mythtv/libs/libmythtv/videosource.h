@@ -72,6 +72,38 @@ protected:
     QString grabber;
 };
 
+class FreqTableSelector: public ComboBoxSetting, public VSSetting {
+    Q_OBJECT
+public:
+    FreqTableSelector(const VideoSource& parent) : VSSetting(parent, "freqtable")
+    {
+        setLabel("Channel frequency table");
+        addSelection("default");
+        addSelection("us-cable");
+        addSelection("us-bcast");
+        addSelection("us-cable-hrc");
+        addSelection("japan-bcast");
+        addSelection("japan-cable");
+        addSelection("europe-west");
+        addSelection("europe-east");
+        addSelection("italy");
+        addSelection("newzealand");
+        addSelection("australia");
+        addSelection("ireland");
+        addSelection("france");
+        addSelection("china-bcast");
+        addSelection("southafrica");
+        addSelection("argentina");
+        addSelection("australia-optus");
+        setHelpText("Use default unless this source uses a different "
+                    "frequency table than the system wide table "
+                    "defined in the General settings.");
+    }
+
+protected:
+    QString freq;
+};
+
 class XMLTV_na_config: public VerticalConfigurationGroup {
     Q_OBJECT
 public:
@@ -214,6 +246,7 @@ public:
         group->setLabel("Video source setup");
         group->addChild(name = new Name(*this));
         group->addChild(new XMLTVConfig(*this));
+        group->addChild(new FreqTableSelector(*this));
         addChild(group);
     };
         

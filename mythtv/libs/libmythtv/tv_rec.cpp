@@ -92,7 +92,7 @@ TVRec::TVRec(int capturecardnum)
         channel = achannel; // here for SetFormat()->RetrieveInputChannels()
         channel->Open();
         achannel->SetFormat(gContext->GetSetting("TVFormat"));
-        achannel->SetFreqTable(gContext->GetSetting("FreqTable"));
+        achannel->SetDefaultFreqTable(gContext->GetSetting("FreqTable"));
         if (inputname.isEmpty())
             channel->SetChannelByString(startchannel);
         else
