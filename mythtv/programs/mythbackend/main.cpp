@@ -492,8 +492,8 @@ int main(int argc, char **argv)
 
     if (ismaster)
     {
-        QString WOLslaveBackends;
-        WOLslaveBackends = gContext->GetSetting("WOLslaveBackendsCommand","");
+        QString WOLslaveBackends
+            = gContext->GetSetting("WOLslaveBackendsCommand","");
         if (!WOLslaveBackends.isEmpty())
         {
             VERBOSE(VB_ALL, "Waking slave Backends now.");

@@ -438,6 +438,20 @@ public:
     };
 };
 
+class startupCommand: public LineEditSetting, public BackendSetting {
+public:
+    startupCommand():
+        BackendSetting("startupCommand") {
+        setLabel("startup command");
+        setValue("");
+        setHelpText("This command is executed right after starting the BE. As a "
+                    "parameter \'$status\' is replaced by either \'auto\' if the "
+                    "machine was started automatically or \'user\' if a user "
+                    "switched it on.");
+    };
+};
+
+
 BackendSettings::BackendSettings() {
     VerticalConfigurationGroup* server = new VerticalConfigurationGroup(false);
     server->setLabel(QObject::tr("Host Address Backend Setup"));
@@ -468,6 +482,7 @@ BackendSettings::BackendSettings() {
 
     VerticalConfigurationGroup* group3 = new VerticalConfigurationGroup(false);
     group3->setLabel(QObject::tr("Shutdown/Wakeup Options"));
+    group3->addChild(new startupCommand());
     group3->addChild(new blockSDWUwithoutClient());
     group3->addChild(new idleTimeoutSecs());
     group3->addChild(new idleWaitForRecordingTime());

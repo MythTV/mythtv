@@ -71,8 +71,9 @@ class Scheduler : public QObject
     void MoveHigherRecords(void);
     void PruneRedundants(void);
 
+
     void findAllScheduledPrograms(list<ProgramInfo *> &proglist);
-    void CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
+    bool CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
                              bool &blockShutdown);
     void ShutdownServer(int prerollseconds);
 
@@ -97,6 +98,9 @@ class Scheduler : public QObject
     bool threadrunning;
 
     MainServer *m_mainServer;
+
+    bool m_isShuttingDown;
+
 };
 
 #endif

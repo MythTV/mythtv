@@ -30,6 +30,8 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
 
     m_mainServer = NULL;
 
+    m_isShuttingDown = false;
+
     verifyCards();
 
     threadrunning = runthread;
@@ -739,18 +741,41 @@ void Scheduler::RunScheduler(void)
             idleWaitForRecordingTime =
                        gContext->GetNumSetting("idleWaitForRecordingTime", 15);
 
-            // check once on startup, if a recording starts within the
-            // idleWaitForRecordingTime. If no, block the shutdown,
-            // because system seems to be waken up by the user and not by a
-            // wakeup call
-            if (firstRun && blockShutdown)
+
+            if (firstRun)
             {
-                if (startIter != reclist.end() &&
-                    curtime.secsTo((*startIter)->startts) - prerollseconds
-                    < idleWaitForRecordingTime * 60)
-                    blockShutdown = false;
+                //the parameter given to the startup_cmd. "user" means a user
+                // started the BE, 'auto' means it was started automatically
+                QString startupParam = "user";
+                
+                // check once on startup, if a recording starts within the
+                // idleWaitForRecordingTime. If no, block the shutdown,
+                // because system seems to be waken up by the user and not by a
+                // wakeup call
+                if (blockShutdown)
+                {
+                    // have we been started automatically?
+                    if (startIter != reclist.end() &&
+                        curtime.secsTo((*startIter)->startts) - prerollseconds
+                        < idleWaitForRecordingTime * 60)
+                    {
+                        VERBOSE(VB_ALL,
+                                "Recording starts soon, AUTO-Startup assumed");
+                        blockShutdown = false;
+                        startupParam = "auto";
+                    }
+                    else
+                        VERBOSE(VB_ALL, "Seem to be woken up by USER");
+                }
+                QString startupCommand = gContext->GetSetting("startupCommand",
+                                                              "");
+                if (!startupCommand.isEmpty())
+                {
+                    startupCommand.replace("$status", startupParam);
+                    system(startupCommand.ascii());
+                }
+                firstRun = false;
             }
-            firstRun = false;
         }
 
         for ( ; startIter != reclist.end(); startIter++)
@@ -916,10 +941,9 @@ void Scheduler::RunScheduler(void)
                 {
                     if (!idleSince.isValid())
                     {
-                        if ((recIter = reclist.begin()) != 
-                            reclist.end())
+                        if (startIter != reclist.end())
                         {
-                            if (curtime.secsTo((*recIter)->startts) - 
+                            if (curtime.secsTo((*startIter)->startts) - 
                                 prerollseconds > idleWaitForRecordingTime * 60)
                             {
                                 idleSince = curtime;
@@ -933,8 +957,13 @@ void Scheduler::RunScheduler(void)
                         // is the machine already ideling the timeout time?
                         if (idleSince.addSecs(idleTimeoutSecs) < curtime)
                         {
-                            CheckShutdownServer(prerollseconds, idleSince,
-                                                blockShutdown);
+                            if (!m_isShuttingDown &&
+                                CheckShutdownServer(prerollseconds, idleSince,
+                                                    blockShutdown))
+                            {
+                                ShutdownServer(prerollseconds);
+                            }
+
                         }
                         else
                         {
@@ -967,13 +996,14 @@ void Scheduler::RunScheduler(void)
     }
 } 
 
-void Scheduler::CheckShutdownServer(int prerollseconds, QDateTime &idleSince, 
+//returns true, if the shutdown is not blocked
+bool Scheduler::CheckShutdownServer(int prerollseconds, QDateTime &idleSince, 
                                     bool &blockShutdown)
 {
-    bool done = false;
+    bool retval = false;
     QString preSDWUCheckCommand = gContext->GetSetting("preSDWUCheckCommand", 
                                                        "");
-                 
+
     int state = 0;
     if (!preSDWUCheckCommand.isEmpty())
     {
@@ -981,11 +1011,11 @@ void Scheduler::CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
                       
         if (WIFEXITED(state) && state != -1)
         {
-            done = true;
+            retval = false;
             switch(WEXITSTATUS(state))
             {
                 case 0:
-                    ShutdownServer(prerollseconds);
+                    retval = true;
                     break;
                 case 1:
                     // just reset idle'ing on retval == 1
@@ -1005,17 +1035,17 @@ void Scheduler::CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
                 //    m_noAutoShutdown = true;
                 //    break;
                 default:
-                    done = false;
+                    break;
             }
         }
     }
-                            
-    if (!done)
-        ShutdownServer(prerollseconds);
+    return retval;
 }
 
 void Scheduler::ShutdownServer(int prerollseconds)
 {    
+    m_isShuttingDown = true;
+  
     RecIter recIter = reclist.begin();
 
     // set the wakeuptime if needed
