@@ -905,6 +905,8 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
  
 bool ProgramInfo::IsSameTimeslot(const ProgramInfo& other) const
 {
+    if (title != other.title)
+        return false;
     if (startts == other.startts && endts == other.endts &&
         (chanid == other.chanid || 
          (chansign != "" && chansign == other.chansign)))
@@ -915,6 +917,8 @@ bool ProgramInfo::IsSameTimeslot(const ProgramInfo& other) const
 
 bool ProgramInfo::IsSameProgramTimeslot(const ProgramInfo &other) const
 {
+    if (title != other.title)
+        return false;
     if ((chanid == other.chanid ||
          (chansign != "" && chansign == other.chansign)) &&
         startts < other.endts &&
@@ -2788,7 +2792,7 @@ bool ProgramList::FromProgram(QSqlDatabase *db, const QString sql,
 
     if (!sql.contains(" GROUP BY "))
         querystr += "GROUP BY program.starttime, channel.channum, "
-            "  channel.callsign ";
+            "  channel.callsign, program.title ";
     if (!sql.contains(" ORDER BY "))
         querystr += QString("ORDER BY program.starttime, %2 ")
             .arg(gContext->GetSetting("ChannelOrdering", "channum+0"));

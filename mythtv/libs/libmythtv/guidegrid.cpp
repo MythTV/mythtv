@@ -700,7 +700,7 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
 
     QString querystr = QString(
         "WHERE program.chanid = %1 AND program.endtime >= %2 "
-        "    AND program.starttime <= %3 ")
+        "    AND program.starttime <= %3 AND program.manualid = 0 ")
         .arg(m_channelInfos[chanNum].chanid)
         .arg(m_currentStartTime.toString("yyyyMMddhhmm00"))
         .arg(m_currentEndTime.toString("yyyyMMddhhmm00"));

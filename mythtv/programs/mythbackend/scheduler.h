@@ -62,6 +62,7 @@ class Scheduler : public QObject
 
     bool FillRecordList(void);
     void UpdateMatches(int recordid);
+    void UpdateManuals(int recordid);
     void PruneOldRecords(void);
     void AddNewRecords(void);
     void BuildNewRecordsQueries(int recordid, QStringList &from, QStringList &where);

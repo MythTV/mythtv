@@ -136,10 +136,14 @@ static bool comp_overlap(ProgramInfo *a, ProgramInfo *b)
         return a->endts < b->endts;
 
     // Note: the PruneOverlaps logic depends on the following
+    if (a->title != b->title)
+        return a->title < b->title;
     if (a->chanid != b->chanid)
         return a->chanid < b->chanid;
     if (a->inputid != b->inputid)
         return a->inputid < b->inputid;
+    if (a->findid != b->findid)
+        return a->findid > b->findid;
     return a->recordid < b->recordid;
 }
 
@@ -151,6 +155,8 @@ static bool comp_recstart(ProgramInfo *a, ProgramInfo *b)
         return a->recendts < b->recendts;
 
     // Note: the PruneRedundants logic depends on the following
+    if (a->title != b->title)
+        return a->title < b->title;
     if (a->recordid != b->recordid)
         return a->recordid < b->recordid;
     if (a->chansign != b->chansign)
@@ -274,7 +280,8 @@ void Scheduler::FillRecordListFromDB(void)
     MSqlQuery query(QString::null, db);
     query.prepare("CREATE TEMPORARY TABLE recordmatch "
                   "(recordid int unsigned, chanid int unsigned, "
-                  " starttime datetime, INDEX (recordid));");
+                  " starttime datetime, manualid int unsigned, "
+                  " INDEX (recordid));");
     query.exec();
     if (!query.isActive())
     {
@@ -1268,6 +1275,107 @@ void *Scheduler::SchedulerThread(void *param)
     return NULL;
 }
 
+void Scheduler::UpdateManuals(int recordid)
+{
+    MSqlQuery query(QString::null, db);
+
+    query.prepare("SELECT type,title,station,startdate,starttime, "
+                  " enddate,endtime "
+                  "FROM record WHERE recordid = :RECORDID");
+    query.bindValue(":RECORDID", recordid);
+    query.exec();
+    if (!query.isActive() || query.numRowsAffected() != 1)
+    {
+        MythContext::DBError("UpdateManuals", query);
+        return;
+    }
+
+    query.next();
+    RecordingType rectype = RecordingType(query.value(0).toInt());
+    QString title = query.value(1).toString();
+    QString station = query.value(2).toString() ;
+    QDateTime startdt = QDateTime(query.value(3).asDate(),
+                                  query.value(4).asTime());
+    int duration = startdt.secsTo(QDateTime(query.value(5).asDate(),
+                                            query.value(6).asTime())) / 60;
+
+    query.prepare("SELECT chanid from channel "
+                  "WHERE callsign = :STATION");
+    query.bindValue(":STATION", station);
+    query.exec();
+    if (!query.isActive())
+    {
+        MythContext::DBError("UpdateManuals", query);
+        return;
+    }
+
+    QValueList<int> chanidlist;
+    while (query.next())
+        chanidlist.append(query.value(0).toInt());
+
+    int progcount;
+    int skipdays;
+    bool weekday;
+
+    switch (rectype)
+    {
+    case kSingleRecord:
+    case kOverrideRecord:
+    case kDontRecord:
+        progcount = 1;
+        skipdays = 1;
+        weekday = false;
+        break;
+    case kTimeslotRecord:
+        progcount = 13;
+        skipdays = 1;
+        if (startdt.date().dayOfWeek() < 6)
+            weekday = true;
+        else
+            weekday = false;
+        startdt.setDate(QDate::currentDate());
+        break;
+    case kWeekslotRecord:
+        progcount = 2;
+        skipdays = 7;
+        weekday = false;
+        startdt.addDays(((startdt.date().daysTo(QDate::currentDate())
+                          + 6) % 7) * 7);
+        break;
+    default:
+        VERBOSE(VB_IMPORTANT, QString("Invalid rectype for manual "
+                                      "recordid %1").arg(recordid));
+        return;
+    }
+
+    while (progcount--)
+    {
+        for (int i = 0; i < (int)chanidlist.size(); i++)
+        {
+            if (weekday && startdt.date().dayOfWeek() >= 6)
+                continue;
+
+            query.prepare("INSERT INTO program (chanid,starttime,endtime,"
+                          " title,subtitle,manualid) "
+                          "VALUES (:CHANID,:STARTTIME,:ENDTIME,:TITLE,"
+                          " :SUBTITLE,:RECORDID)");
+            query.bindValue(":CHANID", chanidlist[i]);
+            query.bindValue(":STARTTIME", startdt);
+            query.bindValue(":ENDTIME", startdt.addSecs(duration * 60));
+            query.bindValue(":TITLE", title);
+            query.bindValue(":SUBTITLE", startdt.toString());
+            query.bindValue(":RECORDID", recordid);
+            query.exec();
+            if (!query.isActive())
+            {
+                MythContext::DBError("UpdateManuals", query);
+                return;
+            }
+        }
+        startdt = startdt.addDays(skipdays);
+    }
+}
+
 void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from, 
                                        QStringList &where)
 {
@@ -1292,24 +1400,28 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
         qphrase = result.value(3).toString();
         qphrase.replace("\'", "\\\'");
 
-        if (qphrase == "")
+        RecSearchType searchtype = RecSearchType(result.value(1).toInt());
+
+        if (qphrase == "" && searchtype != kManualSearch)
         {
             VERBOSE(VB_IMPORTANT, QString("Invalid search key in recordid %1")
                                          .arg(result.value(0).toString()));
             continue;
         }
 
-        switch (result.value(1).toInt())
+        switch (searchtype)
         {
         case kPowerSearch:
             from << result.value(2).toString();
-            where << QString("record.recordid = %1 %2")
+            where << QString("record.recordid = %1 AND "
+                             "program.manualid = 0 %2")
                 .arg(result.value(0).toString())
                 .arg(qphrase);
             break;
         case kTitleSearch:
             from << "";
             where << QString("record.recordid = %1 AND "
+                             "program.manualid = 0 AND "
                              "program.title LIKE '\%%2\%'")
                 .arg(result.value(0).toString())
                 .arg(qphrase);
@@ -1317,6 +1429,7 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
         case kKeywordSearch:
             from << "";
             where << QString("record.recordid = %1 AND "
+                             "program.manualid = 0 AND "
                              "(program.title LIKE '\%%2\%' OR "
                              " program.subtitle LIKE '\%%3\%' OR "
                              " program.description LIKE '\%%4\%')")
@@ -1326,6 +1439,7 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
         case kPeopleSearch:
             from << ", people, credits";
             where << QString("record.recordid = %1 AND "
+                             "program.manualid = 0 AND "
                              "people.name LIKE '\%%2\%' AND "
                              "credits.person = people.person AND "
                              "program.chanid = credits.chanid AND "
@@ -1333,8 +1447,15 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
                 .arg(result.value(0).toString())
                 .arg(qphrase);
             break;
+        case kManualSearch:
+            UpdateManuals(result.value(0).toInt());
+            from << "";
+            where << QString("record.recordid = %1 AND "
+                             "program.manualid = record.recordid ")
+                .arg(result.value(0).toString());
+            break;
         default:
-            VERBOSE(VB_SCHEDULE, QString("Unknown RecSearchType "
+            VERBOSE(VB_IMPORTANT, QString("Unknown RecSearchType "
                                          "(%1) for recordid %2")
                                          .arg(result.value(1).toInt())
                                          .arg(result.value(0).toString()));
@@ -1347,6 +1468,7 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
         from << "";
         where << QString("record.search = %1 AND "
                          "(record.recordid = %2 OR %3 = -1) AND "
+                         "program.manualid = 0 AND "
                          "program.title = record.title ")
             .arg(kNoSearch).arg(recordid).arg(recordid);
     }
@@ -1357,12 +1479,22 @@ void Scheduler::UpdateMatches(int recordid) {
 
     MythContext::KickDatabase(db);
     MSqlQuery query;
-    query.prepare("DELETE FROM recordmatch WHERE "
-                  "recordid = :RECORDID OR :RECORDID = -1;");
+
+    query.prepare("DELETE FROM recordmatch "
+                  "WHERE recordid = :RECORDID OR :RECORDID = -1;");
     query.bindValue(":RECORDID", recordid);
-
     query.exec();
+    if (!query.isActive())
+    {
+        MythContext::DBError("UpdateMatches", query);
+        return;
+    }
 
+    query.prepare("DELETE FROM program "
+                  "WHERE manualid = :RECORDID OR "
+                  " (manualid <> 0 AND :RECORDID = -1)");
+    query.bindValue(":RECORDID", recordid);
+    query.exec();
     if (!query.isActive())
     {
         MythContext::DBError("UpdateMatches", query);
@@ -1384,9 +1516,10 @@ void Scheduler::UpdateMatches(int recordid) {
     for (clause = 0; clause < fromclauses.count(); clause++)
     {
         QString query = QString(
-"INSERT INTO recordmatch (recordid, chanid, starttime) "
-"SELECT record.recordid, program.chanid, program.starttime "
-"FROM record, program ") + fromclauses[clause] + QString(
+"INSERT INTO recordmatch (recordid, chanid, starttime, manualid) "
+"SELECT record.recordid, program.chanid, program.starttime, "
+" IF(search = %1, recordid, 0) "
+"FROM record, program ").arg(kManualSearch) + fromclauses[clause] + QString(
 " INNER JOIN channel ON (channel.chanid = program.chanid) "
 "WHERE ") + whereclauses[clause] + QString(" AND "
 "((record.type = %1 " // allrecord
@@ -1553,7 +1686,8 @@ void Scheduler::AddNewRecords(void) {
 
 " INNER JOIN record ON (recordmatch.recordid = record.recordid) "
 " INNER JOIN program ON (recordmatch.chanid = program.chanid AND "
-"                        recordmatch.starttime = program.starttime) "
+"                        recordmatch.starttime = program.starttime AND "
+"                        recordmatch.manualid = program.manualid) "
 " INNER JOIN channel ON (channel.chanid = program.chanid) "
 " INNER JOIN cardinput ON (channel.sourceid = cardinput.sourceid) "
 " INNER JOIN capturecard ON (capturecard.cardid = cardinput.cardid) "

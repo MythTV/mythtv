@@ -68,6 +68,7 @@ public:
     RecordingType getRecordingType(void) const;
     void setRecordingType(RecordingType);
     RecSearchType getSearchType(void) const;
+    void setSearchType(RecSearchType);
 
     bool GetAutoExpire(void) const;
     void SetAutoExpire(bool expire);

@@ -84,7 +84,8 @@ void ScheduledRecording::load(QSqlDatabase *db)
             tmpType.toInt() == kDontRecord)
             type->addOverrideSelections();
         else
-            type->addNormalSelections(!station->getValue().isEmpty());
+            type->addNormalSelections(!station->getValue().isEmpty(),
+                                      search->intValue() == kManualSearch);
         
         type->setValue(tmpType);
         type->setUnchanged();
@@ -102,10 +103,9 @@ void ScheduledRecording::loadByProgram(QSqlDatabase* db, ProgramInfo* proginfo)
         loadByID(db, proginfo->recordid);
     else
         setDefault(db, true);
-        
 
-    
-    if (search->intValue() == kNoSearch)
+    if (search->intValue() == kNoSearch ||
+        search->intValue() == kManualSearch)
         setProgram(proginfo, db);
 }
 
@@ -202,7 +202,8 @@ void ScheduledRecording::ToMap(QMap<QString, QString>& progMap)
 {
     QString searchtitle = "";
 
-    if (m_pginfo && search->intValue() != kNoSearch)
+    if (m_pginfo && search->intValue() != kNoSearch &&
+                    search->intValue() != kManualSearch)
     {
         searchtitle = title->getValue();
         m_pginfo->ToMap(NULL, progMap);
@@ -314,6 +315,20 @@ void ScheduledRecording::setRecordingType(RecordingType newType) {
 
 RecSearchType ScheduledRecording::getSearchType(void) const {
     return (RecSearchType)(search->intValue());
+}
+
+void ScheduledRecording::setSearchType(RecSearchType newType) {
+    if (type->getValue().toInt() == kOverrideRecord ||
+        type->getValue().toInt() == kDontRecord)
+    {
+        VERBOSE(VB_IMPORTANT, "Attempt to set search type for "
+                "override recording");
+        return;
+    }
+    search->setValue(newType);
+    type->clearSelections();
+    type->addNormalSelections(!station->getValue().isEmpty(),
+                              search->intValue() == kManualSearch);
 }
 
 bool ScheduledRecording::GetAutoExpire(void) const {
@@ -677,7 +692,7 @@ void ScheduledRecording::setDefault(QSqlDatabase *db, bool haschannel)
     }
     
     type->clearSelections();
-    type->addNormalSelections(haschannel);
+    type->addNormalSelections(haschannel, search->intValue() == kManualSearch);
     type->setValue(kNotRecording);
     
     profile->fillSelections(db);
@@ -745,7 +760,10 @@ void ScheduledRecording::makeOverride(void)
     id->setValue(0);
     type->clearSelections();
     type->addOverrideSelections();
-    search->setValue(kNoSearch);
+    if (search->intValue() == kManualSearch)
+        search->setChanged();
+    else
+        search->setValue(kNoSearch);
 
     setProgram(m_pginfo);
 

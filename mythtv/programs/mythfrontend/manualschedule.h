@@ -30,17 +30,11 @@ class ManualSchedule : public MythDialog
     void dismissWindow();
 
   protected slots:
-    void textChanged(void);
+    void dateChanged(void);
     void hourChanged(void);
     void minuteChanged(void);
-    void channelChanged(void);
-    void durationChanged(void);
-    void dateChanged(void);
-    void saveClicked(void);
-    void exitClicked(void);
+    void recordClicked(void);
     void cancelClicked(void);
-    void saveScheduledRecording(void);
-
 
   private:
     int daysahead;
@@ -51,15 +45,12 @@ class ManualSchedule : public MythDialog
     MythRemoteLineEdit *m_title;
     MythComboBox *m_channel;
     QStringList m_chanids;
-    MythRemoteLineEdit *m_subtitle;
-    MythRemoteLineEdit *m_description;
-    MythSpinBox *m_duration;
-    MythPushButton *m_saveButton;
-    MythPushButton *m_exitButton;
+    MythComboBox *m_duration;
+    MythPushButton *m_recordButton;
     MythPushButton *m_cancelButton;
     MythComboBox *m_startdate;
-    MythSpinBox *m_starthour;
-    MythSpinBox *m_startminute;
+    MythComboBox *m_starthour;
+    MythComboBox *m_startminute;
 
     MythRemoteLineEdit *m_descString;
 
@@ -69,19 +60,9 @@ class ManualSchedule : public MythDialog
     QString m_startString;
     QString m_chanidString;
 
-    QString m_lastStarttime;
-    QString m_lastChanid;
-    QString m_lastDuration;
-
-    QString m_lastChannel;
-    QString m_lastSubtitle;
-
     QString dateformat;
     QString timeformat;
     QString shortdateformat;
-
-    
-    bool m_wasRecording;
 };
 
 #endif

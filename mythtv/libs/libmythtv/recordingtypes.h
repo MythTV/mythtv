@@ -42,7 +42,8 @@ enum RecSearchType
     kPowerSearch,
     kTitleSearch,
     kKeywordSearch,
-    kPeopleSearch
+    kPeopleSearch,
+    kManualSearch
 };
 
 #endif
