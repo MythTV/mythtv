@@ -316,6 +316,10 @@ void Scheduler::PruneList(void)
         {
             if (FindInOldRecordings(first))
             {
+                cout << "Pruning duplicate program:" << endl
+                     << first->title << endl
+                     << first->subtitle << endl
+                     << first->description << endl;
                 delete first;
                 deliter = i.base();
                 deliter--;
