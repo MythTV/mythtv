@@ -453,22 +453,24 @@ public:
 class GuiWidth: public SpinBoxSetting, public GlobalSetting {
 public:
     GuiWidth():
-        SpinBoxSetting(160, 1600, 8), GlobalSetting("GuiWidth") {
+        SpinBoxSetting(0, 1600, 8), GlobalSetting("GuiWidth") {
         setLabel("GUI width");
-        setValue(800);
+        setValue(0);
 	setHelpText("The width of the GUI.  Do not make the GUI "
-                    "wider than your actual screen resolution.");
+                    "wider than your actual screen resolution.  Set to 0 to "
+                    "automatically scale to fullscreen.");
     };
 };
 
 class GuiHeight: public SpinBoxSetting, public GlobalSetting {
 public:
     GuiHeight():
-        SpinBoxSetting(160, 1600, 8), GlobalSetting("GuiHeight") {
+        SpinBoxSetting(0, 1600, 8), GlobalSetting("GuiHeight") {
         setLabel("GUI height");
-        setValue(600);
+        setValue(0);
 	setHelpText("The height of the GUI.  Do not make the GUI "
-                    "taller than your actual screen resolution.");
+                    "taller than your actual screen resolution.  Set to 0 to "
+                    "automatically scale to fullscreen.");
 
     };
 };

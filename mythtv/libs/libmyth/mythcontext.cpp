@@ -157,6 +157,11 @@ void MythContext::GetScreenSettings(int &width, float &wmult,
     height = GetNumSetting("GuiHeight", m_height);
     width = GetNumSetting("GuiWidth", m_width);
 
+    if (height == 0)
+        height = m_height;
+    if (width == 0)
+        width = m_width;
+
     wmult = width / 800.0;
     hmult = height / 600.0;
 }
