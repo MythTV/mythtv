@@ -644,12 +644,6 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
     nvr->Initialize();
 }
 
-// Needed by DVBChannel to set the PIDs of DVBRecorder
-RecorderBase* TVRec::GetRecorder()
-{
-    return nvr;
-}
-
 void TVRec::TeardownRecorder(bool killFile)
 {
     QMap<long long, int> blank_frame_map;

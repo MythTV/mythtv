@@ -78,8 +78,6 @@ class TVRec
                                map<int, QString> &externalChanger);
     void StoreInputChannels(map<int, QString> &inputChannel);
 
-    RecorderBase *GetRecorder(void);
-
     bool IsBusy(void);
     bool IsReallyRecording(void);
 

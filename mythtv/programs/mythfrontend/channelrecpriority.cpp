@@ -273,6 +273,9 @@ void ChannelRecPriority::cursorDown(bool page)
         inData = dataCount - listsize;
     }
 
+    if (inData < 0) 
+        inData = 0;
+
     if (inList >= listCount)
         inList = listCount - 1;
 

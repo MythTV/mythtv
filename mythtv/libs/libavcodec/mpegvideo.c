@@ -267,6 +267,17 @@ static void copy_picture(Picture *dst, Picture *src){
     dst->type= FF_BUFFER_TYPE_COPY;
 }
 
+static void copy_picture_attributes(AVFrame *dst, AVFrame *src){
+    dst->pict_type              = src->pict_type;
+    dst->quality                = src->quality;
+    dst->coded_picture_number   = src->coded_picture_number;
+    dst->display_picture_number = src->display_picture_number;
+//    dst->reference              = src->reference;
+    dst->pts                    = src->pts;
+    dst->interlaced_frame       = src->interlaced_frame;
+    dst->top_field_first        = src->top_field_first;
+}
+
 /**
  * allocates a Picture
  * The pixels are allocated/set by calling get_buffer() if shared=0
@@ -326,7 +337,7 @@ static int alloc_picture(MpegEncContext *s, Picture *pic, int shared){
                 CHECKED_ALLOCZ(pic->ref_index[i] , b8_array_size * sizeof(uint8_t))
             }
             pic->motion_subsample_log2= 2;
-        }else if(s->out_format == FMT_H263 || s->encoding || (s->avctx->debug&(FF_DEBUG_VIS_MV|FF_DEBUG_MV))){
+        }else if(s->out_format == FMT_H263 || s->encoding || (s->avctx->debug&FF_DEBUG_MV) || (s->avctx->debug_mv)){
             for(i=0; i<2; i++){
                 CHECKED_ALLOCZ(pic->motion_val_base[i], 2 * (b8_array_size+1) * sizeof(uint16_t)*2) //FIXME
                 pic->motion_val[i]= pic->motion_val_base[i]+1;
@@ -416,6 +427,7 @@ int MPV_common_init(MpegEncContext *s)
     if (!s->encoding)
         s->progressive_sequence= 1;
     s->progressive_frame= 1;
+    s->coded_picture_number = 0;
 
     y_size = (2 * s->mb_width + 2) * (2 * s->mb_height + 2);
     c_size = (s->mb_width + 2) * (s->mb_height + 2);
@@ -552,6 +564,11 @@ int MPV_common_init(MpegEncContext *s)
     }
 
     s->parse_context.state= -1;
+    if((s->avctx->debug&(FF_DEBUG_VIS_QP|FF_DEBUG_VIS_MB_TYPE)) || (s->avctx->debug_mv)){
+       s->visualization_buffer[0] = av_malloc((s->mb_width*16 + 2*EDGE_WIDTH) * s->mb_height*16 + 2*EDGE_WIDTH);
+       s->visualization_buffer[1] = av_malloc((s->mb_width*8 + EDGE_WIDTH) * s->mb_height*8 + EDGE_WIDTH);
+       s->visualization_buffer[2] = av_malloc((s->mb_width*8 + EDGE_WIDTH) * s->mb_height*8 + EDGE_WIDTH);
+    }
 
     s->context_initialized = 1;
     return 0;
@@ -629,6 +646,9 @@ void MPV_common_end(MpegEncContext *s)
     s->last_picture_ptr=
     s->next_picture_ptr=
     s->current_picture_ptr= NULL;
+    for(i=0; i<3; i++)
+        if (s->visualization_buffer[i])
+            av_free(s->visualization_buffer[i]);
 }
 
 #ifdef CONFIG_ENCODERS
@@ -964,6 +984,7 @@ int MPV_encode_init(AVCodecContext *avctx)
         return -1;
 
     s->picture_number = 0;
+    s->input_picture_number = 0;
     s->picture_in_gop_number = 0;
     s->fake_picture_number = 0;
     /* motion detector init */
@@ -1142,8 +1163,7 @@ alloc:
 
         pic->reference= s->pict_type != B_TYPE ? 3 : 0;
 
-        if(s->current_picture_ptr) //FIXME broken, we need a coded_picture_number in MpegEncContext
-            pic->coded_picture_number= s->current_picture_ptr->coded_picture_number+1;
+        pic->coded_picture_number= s->coded_picture_number++;
         
         if( alloc_picture(s, (Picture*)pic, 0) < 0)
             return -1;
@@ -1349,13 +1369,22 @@ static void draw_arrow(uint8_t *buf, int sx, int sy, int ex, int ey, int w, int 
 /**
  * prints debuging info for the given picture.
  */
-void ff_print_debug_info(MpegEncContext *s, Picture *pict){
+void ff_print_debug_info(MpegEncContext *s, AVFrame *pict){
 
     if(!pict || !pict->mb_type) return;
 
     if(s->avctx->debug&(FF_DEBUG_SKIP | FF_DEBUG_QP | FF_DEBUG_MB_TYPE)){
         int x,y;
-
+        
+        av_log(s->avctx,AV_LOG_DEBUG,"New frame, type: ");
+        switch (pict->pict_type) {
+            case FF_I_TYPE: av_log(s->avctx,AV_LOG_DEBUG,"I\n"); break;
+            case FF_P_TYPE: av_log(s->avctx,AV_LOG_DEBUG,"P\n"); break;
+            case FF_B_TYPE: av_log(s->avctx,AV_LOG_DEBUG,"B\n"); break;
+            case FF_S_TYPE: av_log(s->avctx,AV_LOG_DEBUG,"S\n"); break;
+            case FF_SI_TYPE: av_log(s->avctx,AV_LOG_DEBUG,"SI\n"); break;
+            case FF_SP_TYPE: av_log(s->avctx,AV_LOG_DEBUG,"SP\n"); break;            
+        }
         for(y=0; y<s->mb_height; y++){
             for(x=0; x<s->mb_width; x++){
                 if(s->avctx->debug&FF_DEBUG_SKIP){
@@ -1368,7 +1397,6 @@ void ff_print_debug_info(MpegEncContext *s, Picture *pict){
                 }
                 if(s->avctx->debug&FF_DEBUG_MB_TYPE){
                     int mb_type= pict->mb_type[x + y*s->mb_stride];
-                    
                     //Type & MV direction
                     if(IS_PCM(mb_type))
                         av_log(s->avctx, AV_LOG_DEBUG, "P");
@@ -1421,45 +1449,71 @@ void ff_print_debug_info(MpegEncContext *s, Picture *pict){
         }
     }
 
-    if(s->avctx->debug&(FF_DEBUG_VIS_MV|FF_DEBUG_VIS_QP|FF_DEBUG_VIS_MB_TYPE)){
+    if((s->avctx->debug&(FF_DEBUG_VIS_QP|FF_DEBUG_VIS_MB_TYPE)) || (s->avctx->debug_mv)){
         const int shift= 1 + s->quarter_sample;
         int mb_y;
-        uint8_t *ptr= pict->data[0];
+        uint8_t *ptr;
         s->low_delay=0; //needed to see the vectors without trashing the buffers
+        int i;
+
+        for(i=0; i<3; i++){
+            memcpy(s->visualization_buffer[i], pict->data[i], (i==0) ? pict->linesize[i]*s->height:pict->linesize[i]*s->height/2);
+            pict->data[i]= s->visualization_buffer[i];
+        }
+        pict->type= FF_BUFFER_TYPE_COPY;
+        ptr= pict->data[0];
 
         for(mb_y=0; mb_y<s->mb_height; mb_y++){
             int mb_x;
             for(mb_x=0; mb_x<s->mb_width; mb_x++){
                 const int mb_index= mb_x + mb_y*s->mb_stride;
-                if((s->avctx->debug&FF_DEBUG_VIS_MV) && pict->motion_val){
-                  if(IS_8X8(pict->mb_type[mb_index])){
-                    int i;
-                    for(i=0; i<4; i++){
+                if((s->avctx->debug_mv) && pict->motion_val){
+                  int type;
+                  for(type=0; type<3; type++){
+                    int direction;
+                    switch (type) {
+                      case 0: if ((!(s->avctx->debug_mv&FF_DEBUG_VIS_MV_P_FOR)) || (pict->pict_type!=FF_P_TYPE))
+                                continue;
+                              direction = 0;
+                              break;
+                      case 1: if ((!(s->avctx->debug_mv&FF_DEBUG_VIS_MV_B_FOR)) || (pict->pict_type!=FF_B_TYPE))
+                                continue;
+                              direction = 0;
+                              break;
+                      case 2: if ((!(s->avctx->debug_mv&FF_DEBUG_VIS_MV_B_BACK)) || (pict->pict_type!=FF_B_TYPE))
+                                continue;
+                              direction = 1;
+                              break;
+                    }
+                    if(IS_8X8(pict->mb_type[mb_index])){
+                      int i;
+                      for(i=0; i<4; i++){
                         int sx= mb_x*16 + 4 + 8*(i&1);
                         int sy= mb_y*16 + 4 + 8*(i>>1);
                         int xy= 1 + mb_x*2 + (i&1) + (mb_y*2 + 1 + (i>>1))*(s->mb_width*2 + 2);
-                        int mx= (pict->motion_val[0][xy][0]>>shift) + sx;
-                        int my= (pict->motion_val[0][xy][1]>>shift) + sy;
+                        int mx= (pict->motion_val[direction][xy][0]>>shift) + sx;
+                        int my= (pict->motion_val[direction][xy][1]>>shift) + sy;
                         draw_arrow(ptr, sx, sy, mx, my, s->width, s->height, s->linesize, 100);
-                    }
-                  }else if(IS_16X8(pict->mb_type[mb_index])){
-                    int i;
-                    for(i=0; i<2; i++){
+                      }
+                    }else if(IS_16X8(pict->mb_type[mb_index])){
+                      int i;
+                      for(i=0; i<2; i++){
                         int sx=mb_x*16 + 8;
                         int sy=mb_y*16 + 4 + 8*i;
                         int xy=1 + mb_x*2 + (mb_y*2 + 1 + i)*(s->mb_width*2 + 2);
-                        int mx=(pict->motion_val[0][xy][0]>>shift) + sx;
-                        int my=(pict->motion_val[0][xy][1]>>shift) + sy;
+                        int mx=(pict->motion_val[direction][xy][0]>>shift) + sx;
+                        int my=(pict->motion_val[direction][xy][1]>>shift) + sy;
                         draw_arrow(ptr, sx, sy, mx, my, s->width, s->height, s->linesize, 100);
+                      }
+                    }else{
+                      int sx= mb_x*16 + 8;
+                      int sy= mb_y*16 + 8;
+                      int xy= 1 + mb_x*2 + (mb_y*2 + 1)*(s->mb_width*2 + 2);
+                      int mx= (pict->motion_val[direction][xy][0]>>shift) + sx;
+                      int my= (pict->motion_val[direction][xy][1]>>shift) + sy;
+                      draw_arrow(ptr, sx, sy, mx, my, s->width, s->height, s->linesize, 100);
                     }
-                  }else{
-                    int sx= mb_x*16 + 8;
-                    int sy= mb_y*16 + 8;
-                    int xy= 1 + mb_x*2 + (mb_y*2 + 1)*(s->mb_width*2 + 2);
-                    int mx= (pict->motion_val[0][xy][0]>>shift) + sx;
-                    int my= (pict->motion_val[0][xy][1]>>shift) + sy;
-                    draw_arrow(ptr, sx, sy, mx, my, s->width, s->height, s->linesize, 100);
-                  }
+                  }                  
                 }
                 if((s->avctx->debug&FF_DEBUG_VIS_QP) && pict->motion_val){
                     uint64_t c= (pict->qscale_table[mb_index]*128/31) * 0x0101010101010101ULL;
@@ -1631,15 +1685,9 @@ static int load_input_picture(MpegEncContext *s, AVFrame *pic_arg){
             }
         }
     }
-    pic->quality= pic_arg->quality;
-    pic->pict_type= pic_arg->pict_type;
-    pic->pts = pic_arg->pts;
-    pic->interlaced_frame = pic_arg->interlaced_frame;
-    pic->top_field_first = pic_arg->top_field_first;
-
-    if(s->input_picture[encoding_delay])
-        pic->display_picture_number= s->input_picture[encoding_delay]->display_picture_number + 1;
+    copy_picture_attributes(pic, pic_arg);
     
+    pic->display_picture_number= s->input_picture_number++;
   }
 
     /* shift buffer entries */
@@ -1653,10 +1701,6 @@ static int load_input_picture(MpegEncContext *s, AVFrame *pic_arg){
 
 static void select_input_picture(MpegEncContext *s){
     int i;
-    int coded_pic_num=0;    
-
-    if(s->reordered_input_picture[0])
-        coded_pic_num= s->reordered_input_picture[0]->coded_picture_number + 1;
 
     for(i=1; i<MAX_PICTURE_COUNT; i++)
         s->reordered_input_picture[i-1]= s->reordered_input_picture[i];
@@ -1667,7 +1711,7 @@ static void select_input_picture(MpegEncContext *s){
         if(/*s->picture_in_gop_number >= s->gop_size ||*/ s->next_picture_ptr==NULL || s->intra_only){
             s->reordered_input_picture[0]= s->input_picture[0];
             s->reordered_input_picture[0]->pict_type= I_TYPE;
-            s->reordered_input_picture[0]->coded_picture_number= coded_pic_num;
+            s->reordered_input_picture[0]->coded_picture_number= s->coded_picture_number++;
         }else{
             int b_frames;
             
@@ -1728,12 +1772,11 @@ static void select_input_picture(MpegEncContext *s){
                 s->reordered_input_picture[0]->pict_type= I_TYPE;
             else
                 s->reordered_input_picture[0]->pict_type= P_TYPE;
-            s->reordered_input_picture[0]->coded_picture_number= coded_pic_num;
+            s->reordered_input_picture[0]->coded_picture_number= s->coded_picture_number++;
             for(i=0; i<b_frames; i++){
-                coded_pic_num++;
                 s->reordered_input_picture[i+1]= s->input_picture[i];
                 s->reordered_input_picture[i+1]->pict_type= B_TYPE;
-                s->reordered_input_picture[i+1]->coded_picture_number= coded_pic_num;
+                s->reordered_input_picture[i+1]->coded_picture_number= s->coded_picture_number++;
             }
         }
     }
@@ -1754,12 +1797,8 @@ static void select_input_picture(MpegEncContext *s){
                 s->reordered_input_picture[0]->data[i]= NULL;
             s->reordered_input_picture[0]->type= 0;
             
-            //FIXME bad, copy * except
-            pic->pict_type = s->reordered_input_picture[0]->pict_type;
-            pic->quality   = s->reordered_input_picture[0]->quality;
-            pic->coded_picture_number = s->reordered_input_picture[0]->coded_picture_number;
-            pic->reference = s->reordered_input_picture[0]->reference;
-	    pic->pts = s->reordered_input_picture[0]->pts;
+            copy_picture_attributes((AVFrame*)pic, (AVFrame*)s->reordered_input_picture[0]);
+            pic->reference              = s->reordered_input_picture[0]->reference;
             
             alloc_picture(s, pic, 0);
 
@@ -1806,7 +1845,6 @@ int MPV_encode_picture(AVCodecContext *avctx,
     
     /* output? */
     if(s->new_picture.data[0]){
-
         s->pict_type= s->new_picture.pict_type;
 //emms_c();
 //printf("qs:%f %f %d\n", s->new_picture.quality, s->current_picture.quality, s->qscale);
@@ -1836,8 +1874,6 @@ int MPV_encode_picture(AVCodecContext *avctx,
             avctx->error[i] += s->current_picture_ptr->error[i];
         }
     }
-
-    s->input_picture_number++;
 
     flush_put_bits(&s->pb);
     s->frame_bits  = (pbBufPtr(&s->pb) - s->pb.buf) * 8;
@@ -1872,7 +1908,7 @@ int MPV_encode_picture(AVCodecContext *avctx,
 
         assert(s->repeat_first_field==0 && s->avctx->repeat_pic==0);
         
-        vbv_delay= lrint(90000 * s->rc_context.buffer_index / s->avctx->rc_max_rate);
+        vbv_delay= lrintf(90000 * s->rc_context.buffer_index / s->avctx->rc_max_rate);
         assert(vbv_delay < 0xFFFF);
 
         s->vbv_delay_ptr[0] &= 0xF8;

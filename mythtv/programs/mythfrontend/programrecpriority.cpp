@@ -786,8 +786,6 @@ void ProgramRecPriority::updateList(QPainter *p)
                     {
                         ProgramRecPriorityInfo *progInfo = &(it.data());
 
-                        QString key = progInfo->MakeUniqueKey(); 
-
                         int progRecPriority = progInfo->recpriority.toInt();
                         int finalRecPriority = progRecPriority + 
                                         progInfo->channelRecPriority +
