@@ -410,6 +410,7 @@ void MadDecoder::run()
                 else if (len < 0) 
                 {
                     derror = true;
+                    mutex()->unlock();
                     message("decoder error");
                     break;
                 }
@@ -481,6 +482,7 @@ void MadDecoder::run()
         }
     }
 
+    mutex()->unlock();
 
     if(finish)
     {
@@ -491,7 +493,6 @@ void MadDecoder::run()
         message("decoder stop");
     }
 
-    mutex()->unlock();
     deinit();
 }
 
