@@ -157,8 +157,6 @@ void DaapInstance::run()
     while(keep_going)
     {
     
-        a_socket = -1;
-        
         //
         //  Just keep checking the server socket to look for data
         //
@@ -178,7 +176,7 @@ void DaapInstance::run()
             if(a_socket > 0)
             {
                 FD_SET(a_socket, &readfds);
-                if(a_socket)
+                if(nfds <= a_socket)
                 {
                     nfds = a_socket + 1;
                 }
@@ -195,6 +193,7 @@ void DaapInstance::run()
                     keep_going = false;
                 keep_going_mutex.unlock();
                 a_socket = -1;
+                break;
             }
         }
         else
@@ -205,6 +204,7 @@ void DaapInstance::run()
                 keep_going = false;
             keep_going_mutex.unlock();
             a_socket = -1;
+            break;
         }
         
         //
@@ -218,22 +218,23 @@ void DaapInstance::run()
         }
     
 
-        if(a_socket > 0)
-        {
-            timeout.tv_sec = 10;
-            timeout.tv_usec = 0;
-        }
-        else
-        {
-            timeout.tv_sec = 0;
-            timeout.tv_usec = 0;
-        }
+        timeout.tv_sec = 10;
+        timeout.tv_usec = 0;
 
         int result = select(nfds, &readfds, NULL, NULL, &timeout);
+        
+        
         if(result < 0)
         {
             warning("got an error from select() "
-                    "... not sure what to do");
+                    "... not sure what to do ... "
+                    "guess I'll exit");
+            keep_going_mutex.lock();
+                keep_going = false;
+            keep_going_mutex.unlock();
+            a_socket = -1;
+            break;
+            
         }
         else
         {
@@ -242,7 +243,7 @@ void DaapInstance::run()
                 a_socket = client_socket_to_daap_server->socket();
                 if(a_socket > 0)
                 {
-                    if(FD_ISSET(client_socket_to_daap_server->socket(), &readfds))
+                    if(FD_ISSET(a_socket, &readfds))
                     {
                         //
                         //  Excellent ... the daap server is sending us some data.
@@ -253,15 +254,18 @@ void DaapInstance::run()
                 }
                 else
                 {
+
                     //
                     //  Our daap server disappeared on us
                     //
                     
                     log("daap server seems to have disappeared, this instance will exit", 6);
-                    
                     keep_going_mutex.lock();
                         keep_going = false;
                     keep_going_mutex.unlock();
+                    a_socket = -1;
+                    break;
+                    
                 }
             }
             else
@@ -271,6 +275,7 @@ void DaapInstance::run()
                     keep_going = false;
                 keep_going_mutex.unlock();
                 a_socket = -1;
+                break;
             }
             if(FD_ISSET(u_shaped_pipe[0], &readfds))
             {
@@ -377,6 +382,29 @@ void DaapInstance::handleIncoming()
     DaapResponse *new_response = NULL;
     
     length = client_socket_to_daap_server->readBlock(incoming, buffer_size);
+    
+    //
+    //  If we get nothing back check that the server is actually still there
+    //
+    
+    if(length == 0)
+    {
+        bool still_there = true;
+        if(client_socket_to_daap_server->waitForMore(30, &still_there) < 1)
+        {
+            if(!still_there)
+            {
+                //
+                //  Server has gone away. Well that sucks!
+                //
+    
+                delete client_socket_to_daap_server;
+                client_socket_to_daap_server = NULL;
+                return;
+            }
+        }
+    }
+    
     
     while(length > 0)
     {

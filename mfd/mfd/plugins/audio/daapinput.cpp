@@ -187,12 +187,26 @@ Q_LONG DaapInput::readBlock( char *data, long unsigned int maxlen )
     //  Otherwise, we need to send whatever we can pull from the server
     //
 
-    socket_to_daap_server->waitForMore (5000);  //  wait up to 5 seconds for data to arrive
-    Q_LONG length = socket_to_daap_server->readBlock(data, maxlen);
+    if(socket_to_daap_server->socket() > 0)
+    {
+        socket_to_daap_server->waitForMore (5000);  //  wait up to 5 seconds for data to arrive
+        Q_LONG length = socket_to_daap_server->readBlock(data, maxlen);
 
-    fake_seek_position += length;
-    payload_bytes_read += length;
-    return length;
+        if(length > 0)
+        {
+            fake_seek_position += length;
+            payload_bytes_read += length;
+            return length;
+        }
+        else
+        {
+            warning("problem reading from daapserver");
+            return -1;
+        }
+    }
+
+    warning("daap server seems to have gone away");
+    return -1;
 }
 
 

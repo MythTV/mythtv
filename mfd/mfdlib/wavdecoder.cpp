@@ -420,17 +420,12 @@ void WavDecoder::seek(double pos)
 
 void WavDecoder::deinit()
 {
-/*
-
-    ov_clear(&oggfile);
-
     inited = user_stop = done = finish = false;
     len = freq = bitrate = 0;
     stat = chan = 0;
     output_size = 0;
     setInput(0);
     setOutput(0);
-*/
 }
 
 void WavDecoder::run()
@@ -524,27 +519,24 @@ void WavDecoder::run()
 
             cerr << "WavDecoder: error from read" << endl;
             finish = TRUE;
+            //done = TRUE;
         }
 
         mutex()->unlock();
     }
 
     mutex()->lock();
-
     if (finish)
         stat = DecoderEvent::Finished;
     else if (user_stop)
         stat = DecoderEvent::Stopped;
-
     mutex()->unlock();
-
     {
         DecoderEvent e((DecoderEvent::Type) stat);
         dispatch(e);
     }
 
     deinit();
-
 }
 
 
