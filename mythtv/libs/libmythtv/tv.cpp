@@ -8,7 +8,6 @@
 #include "tv.h"
 #include "osd.h"
 
-
 // cheat and put the keycodes here
 #define wsUp            0x52 + 256
 #define wsDown          0x54 + 256

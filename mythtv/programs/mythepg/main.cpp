@@ -54,6 +54,6 @@ int main(int argc, char **argv)
     int chan = 0;
     
     if (chanstr != QString::null)
-        atoi(chanstr.ascii());
+        chan = atoi(chanstr.ascii());
     return chan;
 }
