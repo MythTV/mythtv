@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythcontext.h"
 
-const QString currentDatabaseVersion = "1067";
+const QString currentDatabaseVersion = "1068";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -1333,7 +1333,7 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "ALTER TABLE capturecard ADD COLUMN firewire_port INT UNSIGNED NOT NULL DEFAULT 0;",
 "ALTER TABLE capturecard ADD COLUMN firewire_node INT UNSIGNED NOT NULL DEFAULT 2;",
 "ALTER TABLE capturecard ADD COLUMN firewire_speed INT UNSIGNED NOT NULL DEFAULT 0;",
-"ALTER TABLE capturecard ADD COLUMN firewire_model varchar(32) default NULL;",
+"ALTER TABLE capturecard ADD COLUMN firewire_model varchar(32) NULL;",
 ""
 };
         if (!performActualUpdate(updates, "1066", dbver))
@@ -1347,6 +1347,23 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 ""
 };
         if (!performActualUpdate(updates, "1067", dbver))
+            return false;
+    }
+
+    if (dbver == "1067")
+    {
+        const QString updates[] = {
+"INSERT INTO dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',70,'force_guide_present','yes');",
+"INSERT INTO dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',70,'guide_ranges','80,80,96,96');",
+"INSERT INTO dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4112,'channel_numbers','131');",
+"INSERT INTO dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4115,'channel_numbers','131');",
+"INSERT INTO dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',4116,'channel_numbers','131');",
+"INSERT INTO dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',12802,'channel_numbers','131');",
+"INSERT INTO dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',12803,'channel_numbers','131');",
+"INSERT INTO dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',12829,'channel_numbers','131');",
+""
+};
+        if (!performActualUpdate(updates, "1068", dbver))
             return false;
     }
 

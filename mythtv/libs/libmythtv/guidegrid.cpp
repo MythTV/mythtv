@@ -939,6 +939,11 @@ void GuideGrid::paintEvent(QPaintEvent *e)
         (!jumpToChannelHasRect && r.intersects(dateRect)))
         paintJumpToChannel(&p);
 
+    if (r.intersects(videoRect) && m_player)
+    {
+        timeCheck->changeInterval((int)(200));
+    }
+
     qApp->unlock();
 }
 

@@ -822,7 +822,10 @@ void VideoOutputXvMC::DeleteXvMCBuffers()
 void VideoOutputXvMC::EmbedInWidget(WId wid, int x, int y, int w, int h)
 {
     if (embedding)
+    {
+        MoveResize();
         return;
+    }
 
     pthread_mutex_lock(&lock);
     data->XJ_curwin = wid;
