@@ -153,6 +153,11 @@ Set Program Rankings and Set Channel Rankings
 - I to edit recording options.
 - ESC commits changes and exits.
 
+Recording Profiles Setup Screen
+-------------------------------
+
+- D on a custom profile group displays a popup to delete the group.
+
 Remote Controls
 ---------------
 
