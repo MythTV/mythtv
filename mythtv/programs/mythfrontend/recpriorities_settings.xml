@@ -5,6 +5,7 @@
       <text>Set Recording Priorities</text>
       <text lang="DE">Aufnahmen</text>
       <text lang="SV">Inspelningsprioriteter</text>
+      <text lang="FI">Nauhoitusprioriteetit</text>
       <alttext>Recording Priorities</alttext>
       <alttext lang="DE">Aufnahmen</alttext>
       <alttext lang="SV">Inspelning</alttext>
@@ -18,7 +19,7 @@
       <text lang="SV">Kanalprioriteter</text>
       <text lang="FR">Fixer les priorités des chaînes</text>
       <text lang="JA">チャンネル録画優先順位設定</text>
-      <text lang="FI">Nauhoitusprioriteetit</text>
+      <text lang="FI">Kanavaprioriteetit</text>
       <text lang="NL">Prioriteit per kanaal</text>
       <text lang="ZH_TW">電視台錄影優先次序</text>
       <alttext>Channel Priorities</alttext>

@@ -69,7 +69,7 @@
       <text lang="ZH_TW">關鍵字</text>
       <alttext>Search</alttext>
       <alttext lang="FR">Texte</alttext>
-      <alttext lang="NL">Zoek</alttext>      
+      <alttext lang="NL">Zoek</alttext>
       <alttext lang="SV">Ord</alttext>
       <alttext lang="DE">Wörter</alttext>
       <action>MENU tv_search.xml</action>
@@ -88,7 +88,7 @@
       <alttext lang="DE">Listen</alttext>
       <alttext lang="SV">Listor</alttext>
       <alttext lang="FR">Listes</alttext>
-      <alttext lang="NL">Lijsten</alttext>      
+      <alttext lang="NL">Lijsten</alttext>
       <action>MENU tv_lists.xml</action>
    </button>
 
@@ -106,6 +106,7 @@
       <text lang="PT">Gravar Agora</text>
       <text lang="SV">Omedelbar inspelning</text>
       <text lang="JA">簡単録画</text>
+      <text lang="FI">Välitön Nauhoitus</text>
       <alttext>Instant Record</alttext>
       <alttext lang="FR">Enreg. manuel</alttext>
       <alttext lang="ES">Grab. inst.</alttext>
@@ -127,7 +128,8 @@
       <text lang="JA">カスタム録画</text>
       <text lang="FR">Enregistrement avancé</text>
       <text lang="DE">freie Planung</text>
-      <text lang="NL">Opname op maat</text>      
+      <text lang="NL">Opname op maat</text>
+      <text lang="FI">Edistyneet Valinnat</text>
       <action>TV_CUSTOM_RECORD</action>
    </button>
 
