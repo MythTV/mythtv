@@ -268,8 +268,8 @@ QString VideoManager::parseData(QString data, QString beg, QString end)
     {
         cout << "MythVideo: Parse HTML : Looking for: " << beg << ", ending with: " << end << endl;
     }
-    int start = data.find(beg) + beg.length();
-    int endint = data.find(end, start + 1);
+    int start = data.find(beg, 0, false) + beg.length();
+    int endint = data.find(end, start + 1, false);
     if (start != ((int)beg.length() - 1) && endint != -1)
     {
         ret = data.mid(start, endint - start);
@@ -323,7 +323,7 @@ QString VideoManager::parseDataAnchorEnd(QString data, QString beg, QString end)
 QMap<QString, QString> VideoManager::parseMovieList(QString data)
 {
     QMap<QString, QString> listing;
-    QString beg = "<A HREF=\"/Title?";
+    QString beg = "<A HREF=\"/Title";
     QString end = "</A>";
     QString ret = "";
 
@@ -338,21 +338,23 @@ QMap<QString, QString> VideoManager::parseMovieList(QString data)
         return listing;
     }
 
-    int start = data.find(beg) + beg.length();
-    int endint = data.find(end, start + 1);
+    int start = data.find(beg, 0, false) + beg.length();
+    int endint = data.find(end, start + 1, false);
 
     while (start != ((int)beg.length() - 1))
     {
         ret = data.mid(start, endint - start);
   
-        movieNumber = ret.left(ret.find("\">"));
+	int fnd = ret.find("title/tt") + 4; 
+        movieNumber = ret.mid(fnd, ret.find("/\">") - fnd);
+	
         movieTitle = ret.right(ret.length() - ret.find("\">") - 2);
 
         listing[movieNumber] = movieTitle;
   
         data = data.right(data.length() - endint);
-        start = data.find(beg) + beg.length();
-        endint = data.find(end, start + 1);
+        start = data.find(beg, 0, false) + beg.length();
+        endint = data.find(end, start + 1, false);
         count++;
         if (count == 10)
     	break;
@@ -544,6 +546,8 @@ void VideoManager::GetMovieData(QString movieNum)
 
     QString res;
     res = httpGrabber->getData();
+
+    //cout << "Outputting Movie Data Page\n" << res << endl;
 
     ParseMovieData(res);
 }
