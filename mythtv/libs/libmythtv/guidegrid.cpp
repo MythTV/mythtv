@@ -154,7 +154,7 @@ void GuideGrid::fillTimeInfos()
     QDateTime t = m_currentStartTime;
 
     char temp[512];
-    for (int x = 0; x < 5; x++)
+    for (int x = 0; x < 6; x++)
     {
         TimeInfo *timeinfo = new TimeInfo;
 
@@ -220,11 +220,25 @@ ProgramInfo *GuideGrid::getProgramInfo(unsigned int row, unsigned int col)
         pginfo->startCol = col;
         return pginfo;
     }
-   
+  
+    char temp[512];
+  
     ProgramInfo *proginfo = new ProgramInfo;
     proginfo->title = "Unknown"; 
-    proginfo->starttime = m_timeInfos[col]->sqltime;
-    proginfo->endtime = m_timeInfos[col]->sqltime;
+    
+    TimeInfo *tinfo = m_timeInfos[col];
+    sprintf(temp, "%4d%02d%02d%02d%02d50", tinfo->year, tinfo->month,
+            tinfo->day, tinfo->hour, tinfo->min); 
+    proginfo->starttime = temp;
+
+    if (col < 5)
+    { 
+        tinfo = m_timeInfos[col + 1];
+        sprintf(temp, "%4d%02d%02d%02d%02d50", tinfo->year, tinfo->month,
+                tinfo->day, tinfo->hour, tinfo->min);
+    }
+
+    proginfo->endtime = temp;
     proginfo->spread = 1;
     proginfo->startCol = col;
     return proginfo;
@@ -413,14 +427,14 @@ void GuideGrid::paintPrograms(QPainter *p)
                         m_programInfos[y][z]->startCol = x;
                     }
                 }
-               
-                QTime *ending = pginfo->getEndTime(); 
+              
+                //QTime *ending = pginfo->getEndTime(); 
                 int newxoffset = 0;
-                if (x + spread < 5)
-                    newxoffset = (ending->minute() - 
-                                  m_timeInfos[x + spread]->min) * 100 / 145;
+                //if (x + spread < 5)
+                //    newxoffset = (ending->minute() - 
+                //                  m_timeInfos[x + spread]->min) * 100 / 145;
 
-                delete ending;
+                //delete ending;
 
                 if (newxoffset < 10)
                     newxoffset = 0;
@@ -433,7 +447,7 @@ void GuideGrid::paintPrograms(QPainter *p)
                              pginfo->title);
 
                 tmp.setPen(QPen(black, 2));
-                if (x != 4)
+                //if (x != 4)
                     tmp.drawLine((x + spread) * 145 + newxoffset, 92 * y - 1, 
                                  (x + spread) * 145 + newxoffset, 
                                  92 * (y + 1) - 1);
@@ -584,7 +598,7 @@ void GuideGrid::scrollRight()
     QDateTime t = m_currentStartTime;
 
     t = m_currentStartTime.addSecs(1800);
-    
+
     m_currentStartTime = t;
 
     fillTimeInfos();

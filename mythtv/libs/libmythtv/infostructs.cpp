@@ -46,9 +46,17 @@ QTime *ProgramInfo::getStartTime(void)
 QTime *ProgramInfo::getEndTime(void)
 {
     QString hour, min;
-    
-    hour = endtime.mid(11, 2);
-    min = endtime.mid(14, 2);
+   
+    if (endtime[4] == '-')
+    { 
+        hour = endtime.mid(11, 2);
+        min = endtime.mid(14, 2);
+    }
+    else
+    {
+        hour = endtime.mid(8, 2);
+        min = endtime.mid(10, 2);
+    }
 
     QTime *ret = new QTime(hour.toInt(), min.toInt());
 
