@@ -931,7 +931,9 @@ void ProgFinder::selectSearchData()
                progData[i] = "**!0";
     }
     else
+    {
     	progData = new QString[(int)query.numRowsAffected()];
+    }
 
     if (query.isActive() && query.numRowsAffected() > 0)
     {
