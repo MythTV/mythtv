@@ -40,6 +40,8 @@ channels.  Added attribution information for Harondel J. Sibble for Mandrake
 8.2.  Modified Gentoo again.  Added text on one system running the master database.  Added
 "Advanced Functionality" section.  Altered text throughout, referencing
 master system needing mysql, remote systems not needing it.
+v1.047, 2002-12-02.  Removed reference to advanced functions; IJR says that
+it's going to be changing soon.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
@@ -50,7 +52,7 @@ To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-12-02, v1.046
+<date>2002-12-02, v1.047
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -134,6 +136,8 @@ encode two MPEG4 video streams and watch one program simultaneously.
 <item>A PIII/800Mhz system with 512MB RAM can encode one video
 stream using the RTJPEG codec with 480x480 capture resolution and play it back
 simultaneously, thereby allowing live TV watching.
+<item>A dual Celeron/450Mhz is able to view a 480x480 MPEG4/3300Kbps file
+created on a different system with 30% CPU usage.
 </itemize>
 
 <sect1>Software.
@@ -1536,73 +1540,5 @@ the <bf>hdparm</bf> program to check and enable DMA.<tscreen><verb>
 If you want to make sure that you don't lose your modifications, make a
 directory <tt>~/.mythtv</tt> and copy your settings.txt file to this
 location.
-<sect>Advanced Functionality.
-<p><bf>NOTE</bf>: The following are not guaranteed to work, and are not
-explicity supported.  If you have issues, please contact the maintainer and
-not Isaac Richards.
-<sect1>Multiple systems accessing a single database.
-<p>If you are going to have multiple systems accessing one database, you
-will need to modify the database to allow remote systems to read it.  By
-default, mythtv only allows access to the database from the localhost.  The
-following works on Mandrake 9.0:
-
-<tscreen><verb>
-$ mysql -u root
-mysql> use mythconverg;
-mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
-mysql> exit
-$
-</verb></tscreen>
-
-On the remote system, you would modify the
-<tt>/usr/local/share/mythtv/mysql.txt</tt> or <tt>~/.mythtv/mysql.txt</tt>
-file, changing the <tt>str DBHostName=localhost</tt> to <tt>str
-DBHostName=mastersystemname_or_ipaddress</tt>and restart <tt>mythfrontend</tt>.
-
-<sect1>Exporting and mounting filesystems with NFS.
-<p>If you are going to use NFS to share your video directory, the following
-instructions work on Mandrake 9.0.
-
-First, make sure that you installed NFS and that it's running.
-On the master system, edit the <tt>/etc/exports</tt> file and add your video
-directory.  On my system, the video directory is <tt>/var/video</tt>, so
-here is my <tt>/etc/exports</tt> file:
-
-<tscreen><verb>
-$ su
-# cat /etc/exports
-/var/video (rw)
-# 
-</verb></tscreen>
-
-Now, make sure that NFS makes the directory available:
-
-<tscreen><verb>
-$ su
-# exportfs -r
-# 
-</verb></tscreen>
-
-On the remote system, you would execute the following:
-<tscreen><verb>
-$ su
-# mount -t nfs mastersystemname_or_ipaddress:/var/video /mnt/video
-</verb></tscreen>
-
-or modify the <tt>/etc/fstab</tt> file and add:
-<tscreen><verb>
-mastersystemname_or_ipaddress::/var/video /mnt/video nfs soft,rsize=8192,wsize=8192,nosuid 0 0
-</verb></tscreen>
-
-and then mount the filesystem:
-<tscreen><verb>
-# mount -a
-</verb></tscreen>
-
-You can modify the <tt>/usr/local/share/mythtv/settings.txt</tt> or
-<tt>~/.mythtv/settings.txt</tt> file and use <tt>/mnt/video</tt> as the
-video directory.  If you use this in combination with the instructions on
-multiple systems accessing the same database, you can get preliminary
-multiple system support.
 
 </article>

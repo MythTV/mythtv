@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2002-12-02, v1.046
+  2002-12-02, v1.047
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -93,10 +93,6 @@
      15.4 Fast CPU, choppy or jittery video.
      15.5 I keep losing all of my settings every time I compile!
 
-  16. Advanced Functionality.
-     16.1 Multiple systems accessing a single database.
-     16.2 Exporting and mounting filesystems with NFS.
-
   ______________________________________________________________________
 
   [1m1.  How to obtain this document.[0m
@@ -187,6 +183,9 @@
   +o  A PIII/800Mhz system with 512MB RAM can encode one video stream
      using the RTJPEG codec with 480x480 capture resolution and play it
      back simultaneously, thereby allowing live TV watching.
+
+  +o  A dual Celeron/450Mhz is able to view a 480x480 MPEG4/3300Kbps file
+     created on a different system with 30% CPU usage.
 
   [1m3.2.  Software.[0m
 
@@ -1580,67 +1579,4 @@
   mythtv will overwrite any settings in /usr/local/share/mythtv.  If you
   want to make sure that you don't lose your modifications, make a
   directory ~/.mythtv and copy your settings.txt file to this location.
-
-  [1m16.  Advanced Functionality.[0m
-
-  [1mNOTE[22m: The following are not guaranteed to work, and are not explicity
-  supported.  If you have issues, please contact the maintainer and not
-  Isaac Richards.
-
-  [1m16.1.  Multiple systems accessing a single database.[0m
-
-  If you are going to have multiple systems accessing one database, you
-  will need to modify the database to allow remote systems to read it.
-  By default, mythtv only allows access to the database from the
-  localhost.  The following works on Mandrake 9.0:
-
-       $ mysql -u root
-       mysql> use mythconverg;
-       mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
-       mysql> exit
-       $
-
-  On the remote system, you would modify the
-  /usr/local/share/mythtv/mysql.txt or ~/.mythtv/mysql.txt file,
-  changing the str DBHostName=localhost to str
-  DBHostName=mastersystemname_or_ipaddressand restart mythfrontend.
-
-  [1m16.2.  Exporting and mounting filesystems with NFS.[0m
-
-  If you are going to use NFS to share your video directory, the
-  following instructions work on Mandrake 9.0.
-
-  First, make sure that you installed NFS and that it's running.  On the
-  master system, edit the /etc/exports file and add your video
-  directory.  On my system, the video directory is /var/video, so here
-  is my /etc/exports file:
-       $ su
-       # cat /etc/exports
-       /var/video (rw)
-       #
-
-  Now, make sure that NFS makes the directory available:
-
-       $ su
-       # exportfs -r
-       #
-
-  On the remote system, you would execute the following:
-
-       $ su
-       # mount -t nfs mastersystemname_or_ipaddress:/var/video /mnt/video
-
-  or modify the /etc/fstab file and add:
-
-       mastersystemname_or_ipaddress::/var/video /mnt/video nfs soft,rsize=8192,wsize=8192,nosuid 0 0
-
-  and then mount the filesystem:
-
-       # mount -a
-
-  You can modify the /usr/local/share/mythtv/settings.txt or
-  ~/.mythtv/settings.txt file and use /mnt/video as the video directory.
-  If you use this in combination with the instructions on multiple
-  systems accessing the same database, you can get preliminary multiple
-  system support.
 
