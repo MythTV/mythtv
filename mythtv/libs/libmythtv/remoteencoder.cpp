@@ -187,6 +187,9 @@ void RemoteEncoder::FillPositionMap(int start, int end,
     int listpos = 0;
     int listsize = strlist.size(); 
 
+    if (listsize < 4)
+        return;
+
     for(int i = start; listpos < listsize ; i++)
     {
         long long index = decodeLongLong(strlist, listpos);
