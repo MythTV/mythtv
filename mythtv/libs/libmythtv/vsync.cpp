@@ -429,14 +429,16 @@ bool OpenGLVideoSync::TryInit()
     }
 
     /* Look for GLX at all */
-    if (glXQueryExtension(m_display, NULL, NULL) == 0)
+    int ndummy;
+    if (glXQueryExtension(m_display, &ndummy, &ndummy) == 0)
     {
         VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: OpenGL extension not present.");
         return false;
     }
 
     /* Look for video sync extension */
-    const char *xt = glXQueryExtensionsString(m_display, 0);
+    const char *xt = glXQueryExtensionsString(m_display, DefaultScreen(m_display));
+    VERBOSE(VB_PLAYBACK, QString("OpenGLVideoSync: GLX extensions: %1").arg(xt));
     if (strstr(xt, "GLX_SGI_video_sync") == NULL)
     {
         VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: GLX Video Sync"
@@ -453,20 +455,20 @@ bool OpenGLVideoSync::TryInit()
     XSetWindowAttributes swa;
     Window w;
     
-    vis = glXChooseVisual(m_display, 0, attribList);
+    vis = glXChooseVisual(m_display, DefaultScreen(m_display), attribList);
     if (vis == NULL) 
     {
         VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: No appropriate visual found");
         return false;
     }
-    swa.colormap = XCreateColormap(m_display, RootWindow(m_display, 0),
+    swa.colormap = XCreateColormap(m_display, RootWindow(m_display, vis->screen),
                                    vis->visual, AllocNone);
     if (swa.colormap == 0)
     {
         VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: Failed to create colormap");
         return false;
     }
-    w = XCreateWindow(m_display, RootWindow(m_display, 0), 0, 0, 1, 1,
+    w = XCreateWindow(m_display, RootWindow(m_display, vis->screen), 0, 0, 1, 1,
                       0, vis->depth, InputOutput, vis->visual, 
                       CWColormap, &swa);
     if (w == 0)
@@ -474,7 +476,7 @@ bool OpenGLVideoSync::TryInit()
         VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: Failed to create dummy window");
         return false;
     }
-    m_context = glXCreateContext(m_display, vis, NULL, GL_TRUE);
+    m_context = glXCreateContext(m_display, vis, None, GL_TRUE);
     if (m_context == NULL)
     {
         VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: Failed to create GLX context");
