@@ -26,7 +26,8 @@ Contents
    MythBrowser is a full fledged web-browser (multiple tabs) to display webpages
 in full-screen mode. Simple page navigation is possible. Starting with version 0.31
 it also has full support for mouse driven navigation (right mouse opens and closes
-the popup menu).
+the popup menu). Version 0.32 now supports mouse emulation using the number keys
+on a remote or keyboard and definable keybindings.
 
    MythBrowser also contains a BookmarkManager to manage the website links in a
 simple mythplugin.
@@ -65,22 +66,35 @@ to a value according to how fast you want this mouse-scrolling to
 scroll.  Then exit setup.
 
   In the MythBrowser screen you can then select a webpage to display. If
-you select (SPACE/Enter) on a group the browser will be startet with all
+you select (SPACE/Enter) on a group the browser will be started with all
 the websites in that group in a different tab (you can switch between the
-tabs with the 'Pause' key).
+tabs with the 'P' key).
 
 
-Page Navigation:
+Default key bindings (use MythWeb to change them):
 
-  Cursor Left		Prev Link (eventually in the prev frame)
-  Cursor Right		Next Link (eventually in the next frame)
-  ESC       		Exit
-  Return		Return (i.e. follow the link)
-  Cursor Up/Down	Scrolling
-  PageUP/Down		Scrolling
-  Pause			Switch to new tab
-  PrintScreen		Popup Menu
+  Q                     Prev Link (eventually in the prev frame)
+  Z                     Next Link (eventually in the next frame)
+  ESC                   Exit
+  Space/Return          Follow selected link
+  R, Backspace          Go back to previous page
+  Cursor Up/Down        Scrolling
+  Cursor Left/Right     Scrolling
+  Page Up/Down          Scrolling
+  P                     Switch to next tab
+  I                     Show enter URL dialog
+  M                     Show popup menu
+  <                     Zoom out
+  >                     Zoom in
+  F1                    Toggle where keyboard input goes to   
+  2                     Move mouse pointer up
+  8                     Move mouse pointer down
+  4                     Move mouse pointer left
+  6                     Move mouse pointer right
+  5                     Left mouse button click  
 
+Mouse actions:
+  
   Right mouse button    Popup Menu
   
   MouseScroll + MidBut  Scroll Page/Background (depending on settings) 
@@ -88,7 +102,7 @@ Page Navigation:
   WheelScroll + MidBut  Zoom Page 
   WheelScroll + AltBut  Zoom Page 
 
-The popup menu (PrintScreen Button) allows to switch between tabs as well.
+The popup menu (M key) allows to switch between tabs as well.
 Furthermore it features a Back menu item, as well as a zoomin and zoomout
 menu. Last but not least you can store the current link in the bookmarks
 via the popup menu.
@@ -97,39 +111,27 @@ via the popup menu.
 4. Hints
 ========
 
-I recommend you reconfigure .lircrc so that the myth activation button
-issues a 'Return' rather than the 'Space' key-event.
-Add the 'Pause' key to your .lircrc in order to enable fast switching
-between different tabs. Alternatively you can also map the popup menu
-key to your remote. The popup menu allows to switch to the next/prev
-tab. Furthermore it enables you to go back in the link history and to
-store a link in the bookmarks.
+The F1 key selects where the keyboard input does to. If a web page requires
+some sort of input, like an edit control used to enter a search term, pressing
+F1 allows you to send all input to the web page. Pressing it again allows
+MythBrowser to again capture keyboard input.
 
-begin
-    prog = irxevent
-    button = Key_of_your_choice
-    config = Key Pause CurrentWindow
-    repeat = 3
-end
+The I key opens a dialog allowing you to enter a URL which will be opened in a new 
+tab without having to use the BookmarkManager. It is not neccessary to add 'http://'
+before a URL MythBrowser will automatically add it if it is missing.
 
-or
+You can get smoother mouse pointer movement by lowering the repeat count for
+the remote keys used for mouse emulation in your lircrc config file.
 
-begin
-    prog = irxevent
-    button = Key_of_your_choice
-    config = Key Print CurrentWindow
-end
-
-
-
+ 
 5. TODO
 =======
 
 - Add OSD message 'Loading... 45%'
 
-- Add to the popupmenu:
-   + Open Link in New Tab
-   + Mouse Emulation Mode
-
 - Make it themeable
+
+- Make it handle popup windows properly
+
+- Make it handle links to an anchor within a web page
 

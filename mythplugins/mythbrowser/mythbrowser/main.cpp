@@ -22,7 +22,7 @@
 #include "mythtv/langsettings.h"
 
 
-static const char *version = "v0.31";
+static const char *version = "v0.32";
 
 static KCmdLineOptions options[] = {
     { "zoom ",0,0},
@@ -33,6 +33,24 @@ static KCmdLineOptions options[] = {
     KCmdLineLastOption
 };
 
+void setupKeys(void)
+{
+    REG_KEY("Browser", "NEXTTAB", "Move to next browser tab", "P");
+    REG_KEY("Browser", "ZOOMIN", "Zoom in on browser window", ".,>");
+    REG_KEY("Browser", "ZOOMOUT", "Zoom out on browser window", ",,<");
+    REG_KEY("Browser", "TOGGLEINPUT", "Toggle where keyboard input goes to", "F1");
+    
+    REG_KEY("Browser", "MOUSEUP", "Move mouse pointer up", "2");
+    REG_KEY("Browser", "MOUSEDOWN", "Move mouse pointer down", "8");
+    REG_KEY("Browser", "MOUSELEFT", "Move mouse pointer left", "4");
+    REG_KEY("Browser", "MOUSERIGHT", "Move mouse pointer right", "6");
+    REG_KEY("Browser", "MOUSELEFTBUTTON", "Mouse Left button click", "5");
+    
+    REG_KEY("Browser", "NEXTLINK", "Move selection to next link", "Z");
+    REG_KEY("Browser", "PREVIOUSLINK", "Move selection to previous link", "Q");
+    REG_KEY("Browser", "FOLLOWLINK", "Follow selected link", "Return,Space,Enter");
+    REG_KEY("Browser", "BACK", "Go back to previous page", "R,Backspace");
+}
 
 int main(int argc, char **argv)
 {
@@ -42,7 +60,7 @@ int main(int argc, char **argv)
     char usage[] = "Usage: mythbrowser [-z n] [-w n] [-h n] -u URL [URL]";
     QStringList urls;
 
-    KCmdLineArgs::init(argc, argv, "mythbrowser", usage , version);
+    KCmdLineArgs::init(argc, argv, "mythbrowser", "mythbrowser", usage , version);
     KCmdLineArgs::addCmdLineOptions(options);
     KCmdLineArgs *args = KCmdLineArgs::parsedArgs();
     zoom = args->getOption("z").toInt();
@@ -75,7 +93,7 @@ int main(int argc, char **argv)
 
     gContext->SetSetting("Theme", "blue");
     gContext->LoadQtConfig();
-
+    
 //    MythMainWindow *mainWindow = new MythMainWindow();
 //    mainWindow->Show();
 //    gContext->SetMainWindow(mainWindow);
@@ -91,6 +109,8 @@ int main(int argc, char **argv)
     mainWindow->setGeometry(x, y, width, height);
     mainWindow->setFixedSize(QSize(width, height));
     mainWindow->Show();
-
+    
+    setupKeys();    
+    
     return a.exec();
 }

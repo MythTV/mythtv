@@ -38,10 +38,13 @@
 #include <khtmlview.h>
 #include <kio/jobclasses.h>
 
+
 using namespace std;
 
 WebPage::WebPage (const char *location, int zoom, int width, int height, WFlags flags) : QWidget(NULL,NULL,flags)
 {
+    setPaletteBackgroundColor(Qt::white);
+        
 //    progressBar=NULL;
     browser=new KHTMLPart(this);
 
@@ -79,8 +82,11 @@ WebPage::WebPage (const char *location, int zoom, int width, int height, WFlags 
         qApp->installEventFilter(this);
 }
 
-WebPage::WebPage (const char *location, const KParts::URLArgs &args, int zoom, int width, int height, WFlags flags) : QWidget(NULL,NULL,flags)
+WebPage::WebPage (const char *location, const KParts::URLArgs &args, int zoom, 
+                  int width, int height, WFlags flags) : QWidget(NULL,NULL,flags)
 {
+    setPaletteBackgroundColor(Qt::white);
+
 //    progressBar=NULL;
     browser=new KHTMLPart(this);
 
@@ -121,7 +127,7 @@ WebPage::WebPage (const char *location, const KParts::URLArgs &args, int zoom, i
 
 void WebPage::openURLRequest(const KURL &url, const KParts::URLArgs &args)
 {
-     emit newUrlRequested(url,args);
+    emit newUrlRequested(url,args);
 }
 
 void WebPage::zoomOut()
@@ -136,19 +142,6 @@ void WebPage::zoomIn()
     zoomFactor += 20;
     zoomFactor = zoomFactor>300 ? 300:zoomFactor;
     browser->setZoomFactor(zoomFactor);
-}
-
-void WebPage::click(QPoint p)
-{
-    if(DEBUG)
-        printf("send a mouse event 2\n");
-
-    this->setEnabled(true);
-    QMouseEvent me(QEvent::MouseButtonPress, p, Qt::LeftButton, 0 );
-//    QApplication::postEvent(this ,&me);
-//    this->khtmlMousePressEvent(me);
-//    QMouseEvent me2(QEvent::MouseButtonRelease, p, Qt::LeftButton, 0 );
-//    QApplication::postEvent(browser ,&me2);
 }
 
 bool WebPage::eventFilter(QObject* object, QEvent* event)

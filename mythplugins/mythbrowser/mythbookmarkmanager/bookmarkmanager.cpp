@@ -302,7 +302,6 @@ void BookmarksConfig::setupView()
     browser->setRW(true);
     browser->setHelpText("this is the help line");
     hbox2->addWidget(browser);
-    //    browser->setText(gContext->GetSetting("WebBrowserCommand", "/usr/local/bin/mythbrowser"));
     browser->setText(gContext->GetSetting("WebBrowserCommand", PREFIX "/bin/mythbrowser"));
 
     // Scroll Settings 
@@ -528,7 +527,6 @@ void Bookmarks::setupView()
 
 void Bookmarks::slotBookmarksViewExecuted(QListViewItem *item)
 {
-  //    QString cmd = gContext->GetSetting("WebBrowserCommand","/usr/local/bin/mythbrowser");
     QString cmd = gContext->GetSetting("WebBrowserCommand", PREFIX "/bin/mythbrowser");
     QString zoom = QString(" -z %1 ").arg(gContext->GetNumSetting("WebBrowserZoomLevel",200));
 
@@ -547,9 +545,9 @@ void Bookmarks::slotBookmarksViewExecuted(QListViewItem *item)
                 break;
             ++it;
         }
-        system(cmd);
+        myth_system(cmd);
     } else {
         cmd += zoom+viewItem->myBookmarkSite->url;
-        system(cmd);
+        myth_system(cmd);
     }
 }

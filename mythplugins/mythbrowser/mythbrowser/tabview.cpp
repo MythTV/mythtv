@@ -43,7 +43,8 @@ TabView::TabView(QStringList urls, int zoom, int width, int height,
                  WFlags flags)
 {
     menuIsOpen = false;
-
+    enterURL = NULL;
+    
     mytab = new QTabWidget(this);
     mytab->setGeometry(0,0,width,height);
     QRect rect = mytab->childrenRect();
@@ -57,6 +58,7 @@ TabView::TabView(QStringList urls, int zoom, int width, int height,
     // so we have to remember the last mousebutton press/release state
     lastButtonState = (ButtonState)0;
 
+    inputToggled = false;
     lastPosX = -1;
     lastPosY = -1;
     scrollSpeed = gContext->GetNumSetting("WebBrowserScrollSpeed", 4);
@@ -66,10 +68,10 @@ TabView::TabView(QStringList urls, int zoom, int width, int height,
        scrollSpeed *= -1;  // scroll page vs background
     }
 
-    for(QStringList::Iterator it = urls.begin(); it != urls.end(); ++it) {
+    for (QStringList::Iterator it = urls.begin(); it != urls.end(); ++it) {
         // is rect.height() really the height of the tab in pixels???
         WebPage *page = new WebPage(*it,z,w,h,f);
-	connect(page,SIGNAL( newUrlRequested(const KURL &,const KParts::URLArgs&)),
+        connect(page,SIGNAL( newUrlRequested(const KURL &,const KParts::URLArgs &)),
            this, SLOT( newUrlRequested(const KURL &,const KParts::URLArgs &)));
         mytab->addTab(page,*it);
 
@@ -82,17 +84,17 @@ TabView::TabView(QStringList urls, int zoom, int width, int height,
         }
 */
 
-	QPtrStack<QWidget> *currWidgetHistory = new QPtrStack<QWidget>;
-	widgetHistory.append(currWidgetHistory);
-	QValueStack<QString> *currUrlHistory = new QValueStack<QString>;
-	urlHistory.append(currUrlHistory);
+        QPtrStack<QWidget> *currWidgetHistory = new QPtrStack<QWidget>;
+        widgetHistory.append(currWidgetHistory);
+        QValueStack<QString> *currUrlHistory = new QValueStack<QString>;
+        urlHistory.append(currUrlHistory);
     }
 
     // Connect the context-menu
-    connect(this,SIGNAL(menuPressed()),this,SLOT(openMenu()));
-    connect(this,SIGNAL(closeMenu()),this,SLOT(cancelMenu()));
+    connect(this, SIGNAL(menuPressed()), this, SLOT(openMenu()));
+    connect(this, SIGNAL(closeMenu()), this, SLOT(cancelMenu()));
 
-    qApp->setOverrideCursor(QCursor(Qt::ArrowCursor));
+    qApp->restoreOverrideCursor();
     qApp->installEventFilter(this);
     mytab->show();
 }
@@ -124,8 +126,8 @@ void TabView::openMenu()
     menu->addButton(tr("       zoom In        "), this, SLOT(actionZoomIn()));
     temp->setFocus();
 
-    menu->ShowPopup(this,SLOT(cancelMenu()));
-    menuIsOpen=true;
+    menu->ShowPopup(this, SLOT(cancelMenu()));
+    menuIsOpen = true;
 }
 
 void TabView::cancelMenu()
@@ -135,9 +137,60 @@ void TabView::cancelMenu()
 //        delete menu;
 //        menu=NULL;
         menuIsOpen=false;
-	hadFocus->setFocus();
+        hadFocus->setFocus();
+    }
+}
+
+void TabView::handleMouseAction(QString action)
+{
+    int step = 5;
+
+    // speed up mouse movement if the same key is held down
+    if (action == lastMouseAction && 
+           lastMouseActionTime.msecsTo(QTime::currentTime()) < 500) {
+        lastMouseActionTime = QTime::currentTime();
+        mouseKeyCount++;
+        if (mouseKeyCount > 5)
+            step = 25;
+    }
+    else {    
+        lastMouseAction = action;
+        lastMouseActionTime = QTime::currentTime();
+        mouseKeyCount = 1;
     }
     
+    if (action == "MOUSEUP") {    
+        QPoint curPos = QCursor::pos();
+        QCursor::setPos(curPos.x(), curPos.y() - step);
+    }  
+    else if (action == "MOUSELEFT") {    
+        QPoint curPos = QCursor::pos();
+        QCursor::setPos(curPos.x() - step, curPos.y());
+    }
+    else if (action == "MOUSERIGHT") {    
+        QPoint curPos = QCursor::pos();
+        QCursor::setPos(curPos.x() + step, curPos.y());
+    }
+    else if (action == "MOUSEDOWN") {    
+        QPoint curPos = QCursor::pos();
+        QCursor::setPos(curPos.x(), curPos.y() + step);
+    }
+    else if (action == "MOUSELEFTBUTTON") {    
+        QPoint curPos = mouse->pos();
+        QWidget *widget = QApplication::widgetAt(curPos, TRUE);
+        
+        if (widget) {
+            curPos = widget->mapFromGlobal(curPos);
+        
+            QMouseEvent *me = new QMouseEvent(QEvent::MouseButtonPress, curPos, 
+                                Qt::LeftButton, Qt::LeftButton);
+            QApplication::postEvent(widget, me);                        
+                        
+            me = new QMouseEvent(QEvent::MouseButtonRelease, curPos, 
+                                Qt::LeftButton, Qt::NoButton);
+            QApplication::postEvent(widget, me); 
+        }
+    }
 }
 
 void TabView::actionMouseEmulation()
@@ -157,7 +210,7 @@ void TabView::actionNextTab()
 {
     cancelMenu();
 
-    int nextpage =  mytab->currentPageIndex()+1;
+    int nextpage =  mytab->currentPageIndex() + 1;
     if(nextpage >= mytab->count())
         nextpage = 0;
     mytab->setCurrentPage(nextpage);
@@ -168,9 +221,9 @@ void TabView::actionPrevTab()
 {
     cancelMenu();
 
-    int nextpage =  mytab->currentPageIndex()-1;
+    int nextpage =  mytab->currentPageIndex() - 1;
     if(nextpage < 0)
-        nextpage = mytab->count()-1;
+        nextpage = mytab->count() - 1;
     mytab->setCurrentPage(nextpage);
 }
 
@@ -193,18 +246,11 @@ void TabView::actionZoomIn()
     ((WebPage*)mytab->currentPage())->zoomIn();
 }
 
-//void TabView::actionDoLeftClick()
-//{
-//    QPoint p=mouse->pos(); // current position
-//
-//    ((WebPage*)mytab->currentPage())->click(p);
-//}
-
 void TabView::actionAddBookmark()
 {
     cancelMenu();
     PopupBox *popupBox = new PopupBox(this,
-	    ((WebPage*)mytab->currentPage())->browser->baseURL().htmlURL());
+        ((WebPage*)mytab->currentPage())->browser->baseURL().htmlURL());
     connect(popupBox, SIGNAL(finished(const char*,const char*,const char*)),
             this, SLOT(finishAddBookmark(const char*,const char*,const char*)));
     qApp->removeEventFilter(this);
@@ -218,7 +264,7 @@ void TabView::finishAddBookmark(const char* group, const char* desc, const char*
     QString descStr = QString(desc);
     QString urlStr = QString(url);
     urlStr.stripWhiteSpace();
-    if( urlStr.find("http://")==-1 )
+    if( urlStr.find("http://") == -1 )
         urlStr.prepend("http://");
 
     if(groupStr.isEmpty() || urlStr.isEmpty())
@@ -245,12 +291,71 @@ void TabView::actionBack()
 
         QWidget *curr = mytab->currentPage();
         mytab->insertTab(curWidgetHistory->pop(),curUrlHistory->pop(),index);
-	mytab->removePage(curr);
-	mytab->setCurrentPage(index);
+        mytab->removePage(curr);
+        mytab->setCurrentPage(index);
 
-	// disconnect(curr,...);
-	delete curr;
+        // disconnect(curr,...);
+        delete curr;
     }
+}
+
+void TabView::showEnterURLDialog()
+{
+    QButton *button;
+     
+    hadFocus = qApp->focusWidget();
+
+    enterURL = new MyMythPopupBox(this, "showURL");
+    enterURL->addLabel(tr("Enter URL"));
+
+    URLeditor = new MythRemoteLineEdit(enterURL);
+    enterURL->addWidget(URLeditor);
+    URLeditor->setFocus(); 
+    
+    button = enterURL->addButton(tr("OK"), this, SLOT(enterURLOkPressed()));
+    button = enterURL->addButton(tr("Cancel"), this, SLOT(closeEnterURLDialog()));
+
+    enterURL->ShowPopup(this, SLOT(closeEnterURLDialog()));
+}
+
+void TabView::enterURLOkPressed()
+{
+    QString sURL = URLeditor->text();
+    if (!sURL.startsWith("http://"))
+      sURL = "http://" + sURL;
+    
+    newPage(sURL);
+    
+    closeEnterURLDialog();    
+}
+
+void TabView::closeEnterURLDialog()
+{
+    if (!enterURL)
+      return;
+      
+    enterURL->hide();
+    delete enterURL;
+    enterURL = NULL;
+    hadFocus->setFocus();
+}
+    
+void TabView::newPage(QString sURL)
+{
+    int index = mytab->currentPageIndex();
+    
+    WebPage *page = new WebPage(sURL,z,w,h,f);
+    connect(page,SIGNAL( newUrlRequested(const KURL &,const KParts::URLArgs&)),
+        this, SLOT( newUrlRequested(const KURL &,const KParts::URLArgs &)));
+
+    mytab->insertTab(page, sURL, index);
+    mytab->setCurrentPage(index);
+
+    QPtrStack<QWidget> *currWidgetHistory = new QPtrStack<QWidget>;
+    widgetHistory.append(currWidgetHistory);
+    QValueStack<QString> *currUrlHistory = new QValueStack<QString>;
+    urlHistory.append(currUrlHistory);
+    hadFocus = page;
 }
 
 void TabView::newUrlRequested(const KURL &url, const KParts::URLArgs &args)
@@ -269,7 +374,7 @@ void TabView::newUrlRequested(const KURL &url, const KParts::URLArgs &args)
     mytab->setCurrentPage(index);
 
     connect(page,SIGNAL( newUrlRequested(const KURL &,const KParts::URLArgs&)),
-	    this, SLOT( newUrlRequested(const KURL &,const KParts::URLArgs &)));
+            this, SLOT( newUrlRequested(const KURL &,const KParts::URLArgs &)));
 }
 
 bool TabView::eventFilter(QObject* object, QEvent* event)
@@ -280,8 +385,8 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
         QMouseEvent* me = (QMouseEvent*)event;
 
         lastButtonState = me->stateAfter(); 
-        if(me->button() == Qt::RightButton) {
-            if(menuIsOpen)
+        if (me->button() == Qt::RightButton) {
+            if (menuIsOpen)
                 emit closeMenu();
             else
                 emit menuPressed();
@@ -352,34 +457,97 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
         }
     }
 
-    if(menuIsOpen)
+    if (menuIsOpen)
         return false;
-
+    
     if (event->type() == QEvent::KeyPress) {
         QKeyEvent* ke = (QKeyEvent*)event;
 
         QKeyEvent tabKey(ke->type(), Key_Tab, '\t', ke->state(),QString::null, ke->isAutoRepeat(), ke->count());
         QKeyEvent shiftTabKey(ke->type(), Key_Tab, '\t', ke->state()|Qt::ShiftButton,QString::null, ke->isAutoRepeat(), ke->count());
+        QKeyEvent returnKey(ke->type(), Key_Return, '\r', ke->state(),QString::null, ke->isAutoRepeat(), ke->count());
 
-        switch(ke->key()) {
-            case Qt::Key_Print:
-                emit menuPressed();
+        QStringList actions;
+        gContext->GetMainWindow()->TranslateKeyPress("Browser", ke, actions);
+   
+        bool handled = false;
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        {
+            QString action = actions[i];
+            handled = true;
+            
+            if (enterURL) {
+                if (action == "FOLLOWLINK") {
+                    if (URLeditor->hasFocus()) {
+                        enterURLOkPressed();
+                        return true;
+                    }    
+                }
+                else
+                    return false;    
+            } 
+            
+            if (action == "TOGGLEINPUT") {
+                inputToggled = !inputToggled;
                 return true;
-                break;
-            case Qt::Key_Escape:
-                qApp->restoreOverrideCursor();
-                exit(0);
-                break;
-            case Qt::Key_Pause:
+            }    
+            
+            // if input is toggled all input goes to the web page
+            if (inputToggled)
+                return false;
+            
+            if (action == "NEXTTAB") {
                 actionNextTab();
                 return true;
-                break;
-            case Qt::Key_Left:
+            }    
+            else if (action == "BACK") {
+    
+                int index = mytab->currentPageIndex();
+                QPtrStack<QWidget> *curWidgetHistory = widgetHistory.at(index);
+                if (!curWidgetHistory->isEmpty()) {
+                    QValueStack<QString> *curUrlHistory = urlHistory.at(index);
+
+                    QWidget *curr = mytab->currentPage();
+                    mytab->insertTab(curWidgetHistory->pop(),curUrlHistory->pop(),index);
+                    mytab->removePage(curr);
+                    mytab->setCurrentPage(index);
+
+                    // disconnect(curr,...);
+                    delete curr;
+                    return true;
+                }
+            }
+            else if (action == "FOLLOWLINK") {
+                *ke = returnKey;
+            }
+            else if (action == "ZOOMIN") {
+                actionZoomIn();
+                return true;
+            }    
+            else if (action == "ZOOMOUT") {
+                actionZoomOut();
+                return true;
+            }    
+            else if (action == "MOUSEUP" || action == "MOUSEDOWN" || 
+                     action == "MOUSELEFT" || action == "MOUSERIGHT" ||
+                     action == "MOUSELEFTBUTTON") {    
+                handleMouseAction(action);         
+                return true;
+            }
+            else if (action == "PREVIOUSLINK")
                 *ke = shiftTabKey;
-                break;
-            case Qt::Key_Right:
+            else if (action == "NEXTLINK")
                 *ke = tabKey;
-                break;
+            else if (action == "ESCAPE")
+                exit(0);
+            else if (action == "INFO") {
+                showEnterURLDialog();
+                return true;
+            }    
+            else if(action == "MENU") {
+                emit menuPressed();
+                return true;
+            }    
         }
     }
     return false; // continue processing the event with QObject::event()
@@ -408,15 +576,15 @@ PopupBox::PopupBox(QWidget *parent, QString deflt)
 
     QLabel *groupLabel = new QLabel(tr("Group:"), vbox);
     groupLabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    group = new QLineEdit(vbox);
+    group = new MythRemoteLineEdit(vbox);
 
     QLabel *descLabel = new QLabel(tr("Description:"), vbox);
     descLabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    desc = new QLineEdit(vbox);
+    desc = new MythRemoteLineEdit(vbox);
 
     QLabel *urlLabel =new QLabel(tr("URL:"), vbox);
     urlLabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    url = new QLineEdit(vbox);
+    url = new MythRemoteLineEdit(vbox);
     url->setText(deflt);
 
     QHBoxLayout *hbox = new QHBoxLayout(lay);

@@ -9,8 +9,11 @@
 #include <qptrstack.h>
 #include <qptrlist.h>
 #include <qvaluestack.h>
+#include <qdatetime.h>
 
 #include "mythtv/mythdialogs.h"
+
+using namespace std;
 
 typedef QPtrStack<QWidget> WIDGET_HISTORY;
 typedef QValueStack<QString> URL_HISTORY;
@@ -21,7 +24,6 @@ class MyMythPopupBox : public MythPopupBox
 
 public:
     MyMythPopupBox(MythMainWindow *parent, const char *name = 0);
-//    ~MyMythPopupBox();
 };
 
 class TabView : public MythMainWindow
@@ -42,20 +44,26 @@ signals:
 public slots:
 //  void openURLRequested(KURL url,KParts::URLArgs args);
     void newUrlRequested(const KURL &url, const KParts::URLArgs &args);
-
+    void newPage(QString URL);
+    
 private slots:
     void openMenu();
     void actionBack();
     void actionNextTab();
     void actionPrevTab();
     void actionMouseEmulation();
-//  void actionDoLeftClick();
     void actionSTOP();
     void actionZoomOut();
     void actionZoomIn();
     void cancelMenu();
     void actionAddBookmark();
     void finishAddBookmark(const char* group, const char* desc, const char* url);
+    void handleMouseAction(QString action);
+    
+    // new URL dialog
+    void showEnterURLDialog();
+    void closeEnterURLDialog();
+    void enterURLOkPressed();
 
 private:
     int z,w,h;
@@ -70,7 +78,10 @@ private:
 
     bool menuIsOpen;
     MyMythPopupBox *menu;
-
+    
+    MyMythPopupBox *enterURL;
+    MythRemoteLineEdit *URLeditor;
+    
     QWidget *hadFocus;
 
     QPtrList<WIDGET_HISTORY> widgetHistory;
@@ -82,14 +93,16 @@ private:
     int scrollSpeed;
     int scrollPage;
     int hideScrollbars;
+    bool inputToggled;
+    
+    QString lastMouseAction;
+    int     mouseKeyCount;
+    QTime   lastMouseActionTime;
 };
 
 class PopupBox : public QDialog
 {
     Q_OBJECT
-
-protected:
-//  virtual bool eventFilter(QObject* object, QEvent* event);
 
 public:
     PopupBox(QWidget *parent, QString defltUrl);
@@ -103,9 +116,9 @@ private slots:
     void slotOkClicked();
 
 private:
-    QLineEdit* group;
-    QLineEdit* desc;
-    QLineEdit* url;
+    MythRemoteLineEdit* group;
+    MythRemoteLineEdit* desc;
+    MythRemoteLineEdit* url;
 };
 
 #endif // TABVIEW_H

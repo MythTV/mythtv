@@ -33,3 +33,9 @@ V0.32   - Zoom In and Zoom Out added to the Popup Menu
 2004.02.15
         - i18n patch by Anthony Fok
 
+2005.03.20
+        - Add keybindings
+        - Fix default web page background color
+        - Add mouse emulation using remote keys
+        - Add URL input dialog
+        - Change edit controls to MythRemoteLineEdits

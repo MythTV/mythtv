@@ -33,11 +33,10 @@ public slots:
   void openURLRequest(const KURL &url, const KParts::URLArgs &args);
   void zoomIn();
   void zoomOut();
-  void click(QPoint p);
 
 signals:
   void newUrlRequested(const KURL &url, const KParts::URLArgs &args);
-
+ 
 //  void started(KIO::Job *); // Started to download the requested URL
 //  void completed();            // Requested URL download completed
 //  void percent(KIO::Job *, unsigned long);
