@@ -188,7 +188,8 @@ class PlaybackBox : public MythDialog
     void updateInfo(QPainter *);
     void updateUsage(QPainter *);
     void updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix);
-    void updateGroupInfo(QPainter *p, QRect& pr, QPixmap& pix);
+    void updateCurGroup(QPainter *p);
+    void updateGroupInfo(QPainter *p, QRect& pr, QPixmap& pix, QString cont_name = "group_info");
     
     QString showDateFormat;
     QString showTimeFormat;
@@ -206,6 +207,7 @@ class PlaybackBox : public MythDialog
     QRect infoRect;
     QRect usageRect;
     QRect videoRect;
+    QRect curGroupRect;
 
     int listsize;
 

@@ -110,6 +110,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     infoRect = QRect(0, 0, 0, 0);
     usageRect = QRect(0, 0, 0, 0);
     videoRect = QRect(0, 0, 0, 0);
+    curGroupRect = QRect(0, 0, 0, 0);
 
     showDateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
     showTimeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
@@ -158,7 +159,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     else
         haveGroupInfoSet = false;
 
-
+    
     connected = FillList();
 
     playbackPreview = gContext->GetNumSetting("PlaybackPreview");
@@ -276,6 +277,9 @@ void PlaybackBox::parseContainer(QDomElement &element)
         videoRect = area;
     if (name.lower() == "usage")
         usageRect = area;
+    if (name.lower() == "cur_group")
+        curGroupRect = area;        
+    
 }
 
 void PlaybackBox::parsePopup(QDomElement &element)
@@ -361,14 +365,22 @@ void PlaybackBox::paintEvent(QPaintEvent *e)
     {
         updateShowTitles(&p);
     }
+    
     if (r.intersects(infoRect) && skipUpdate == false)
     {
         updateInfo(&p);
     }
+    
+    if (r.intersects(curGroupRect) && skipUpdate == false)
+    {
+        updateCurGroup(&p);
+    }
+    
     if (r.intersects(usageRect) && skipUpdate == false)
     {
         updateUsage(&p);
     }
+    
     if (r.intersects(videoRect))
     {
         updateVideo(&p);
@@ -395,12 +407,36 @@ void PlaybackBox::grayOut(QPainter *tmp)
                         (int)(600*hmult));
 */
 }
-
-void PlaybackBox::updateGroupInfo(QPainter *p, QRect& pr, QPixmap& pix)
+void PlaybackBox::updateCurGroup(QPainter *p)
 {
-    if (haveGroupInfoSet)
+    QRect pr = curGroupRect;
+    QPixmap pix(pr.size());
+    pix.fill(this, pr.topLeft());
+    if( recGroup != "Default")
+        updateGroupInfo(p, pr, pix, "cur_group");
+    else
     {
-        LayerSet *container = theme->GetSet("group_info");
+        LayerSet *container = theme->GetSet("cur_group");
+        if (container)
+        {
+            QPainter tmp(&pix);
+            
+            container->ClearAllText();
+            container->Draw(&tmp, 6, 1);
+
+            tmp.end();
+            p->drawPixmap(pr.topLeft(), pix);
+        }
+    
+    }
+}
+
+
+void PlaybackBox::updateGroupInfo(QPainter *p, QRect& pr, QPixmap& pix, QString cont_name)
+{
+    LayerSet *container = theme->GetSet(cont_name);
+    if( container)
+    {    
         container->ClearAllText();
         QPainter tmp(&pix);
         QMap<QString, QString> infoMap;
@@ -429,7 +465,9 @@ void PlaybackBox::updateGroupInfo(QPainter *p, QRect& pr, QPixmap& pix)
         else
             infoMap["description"] = QString(tr("There are no recordings in "
                                                 "this display group"));
-        container->ClearAllText();
+        
+        infoMap["rec_count"] = QString("%1").arg(countInGroup);
+                                                
         container->SetText(infoMap);
 
         if (type != Delete)
@@ -441,8 +479,10 @@ void PlaybackBox::updateGroupInfo(QPainter *p, QRect& pr, QPixmap& pix)
         p->drawPixmap(pr.topLeft(), pix);
     }
     else
-        updateProgramInfo(p, pr, pix);
-
+    {
+        if (cont_name == "group_info")
+            updateProgramInfo(p, pr, pix);
+    }
 }
 
 
