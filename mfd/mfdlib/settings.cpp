@@ -30,7 +30,7 @@
 Settings::Settings()
 {
 #ifdef MYTHLIB_SUPPORT 
-    gContext = new MythContext(MYTH_BINARY_VERSION, false, false);
+    gContext = new MythContext(MYTH_BINARY_VERSION, false);
 #endif
 }
 
