@@ -1601,7 +1601,7 @@ void PlaybackBox::timeout(void)
 
 void PlaybackBox::keyPressEvent(QKeyEvent *e)
 {
-    if (ignoreevents)
+    if (ignoreevents || noUpdate)
         return;
 
     bool handled = false;
