@@ -66,6 +66,7 @@
     <button>
       <type>PHONE</type>
       <text>Phone</text>
+      <text lang="DE">Telephon</text>
       <action>PLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>
@@ -77,12 +78,13 @@
      <text lang="ES">Configurar</text>
      <text lang="CA">Configurar</text>
      <text lang="FR">Configuration</text>
-     <text lang="DE">Konfiguration</text>
+     <text lang="DE">Zubehör/Konfiguration</text>
      <text lang="DK">Konfiguration</text>
      <text lang="NL">Instellingen</text>
      <text lang="PT">Configurações</text>
      <text lang="SV">Verktyg/Inställningar</text>
      <text lang="JA">設定</text>
+     <alttext lang="DE">Verschiedenes</alttext>
      <action>MENU util_menu.xml</action>
    </button>
 
@@ -91,6 +93,7 @@
      <text>Shutdown</text>
      <text lang="SV">Avstängning</text>
      <text lang="NL">Uitschakelen</text>
+     <text lang="DE">Beenden</text>
      <action>SHUTDOWN</action>
    </button> -->
 

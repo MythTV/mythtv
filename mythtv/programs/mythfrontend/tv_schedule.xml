@@ -8,7 +8,7 @@
       <text lang="CA">Guia de programes</text>
       <text lang="NL">Programma Gids</text>
       <text lang="FR">Grille Horaire</text>
-      <text lang="DE">Programm- übersicht</text>
+      <text lang="DE">Programmübersicht</text>
       <text lang="DK">Program Guide</text>
       <text lang="PT">Guia de Programação</text>
       <text lang="SV">Programguide</text>
@@ -17,7 +17,7 @@
       <alttext lang="FR">Grille</alttext>
       <alttext lang="ES">Parilla</alttext>
       <alttext lang="CA">Guia</alttext>
-      <alttext lang="DE">Programm</alttext>
+      <alttext lang="DE">EPG</alttext>
       <alttext lang="DK">Guide</alttext>
       <alttext lang="NL">Gids</alttext>
       <alttext lang="NL">Guia</alttext>
@@ -55,12 +55,13 @@
    <button>
       <type>TV_SEARCH_WORDS</type>
       <text>Search Words</text>
-      <text lang="DE">Suche</text>
+      <text lang="DE">Wortsuche</text>
       <text lang="SV">Sök ord</text>
       <text lang="NL">Zoek Woorden</text>
       <text lang="JA">リスト検索</text>
       <alttext>Search</alttext>
       <alttext lang="SV">Sök</alttext>
+      <alttext lang="DE">Wörter</alttext>
       <action>MENU tv_search.xml</action>
    </button>
 
@@ -69,7 +70,9 @@
       <text>Search Lists</text>
       <text lang="SV">Sök listor</text>
       <text lang="NL">Overzichtslijsten</text>
+      <text lang="DE">Listensuche</text>
       <alttext>Lists</alttext>
+      <alttext lang="DE">Listen</alttext>
       <alttext lang="SV">Listor</alttext>
       <action>MENU tv_lists.xml</action>
    </button>

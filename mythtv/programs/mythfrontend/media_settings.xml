@@ -10,6 +10,7 @@
      <text lang="PT">Configurar Música</text>
      <text lang="SV">Musikinställningar</text>
      <text lang="JA">ミュージック設定</text>
+     <alttext lang="DE">Musik</alttext>
      <action>CONFIGPLUGIN mythmusic</action>
      <depends>mythmusic</depends>
    </button>
@@ -25,6 +26,7 @@
        <text lang="PT">Configurar Filmes</text>
        <text lang="SV">Videoinställningar</text>
        <text lang="JA">ビデオ設定</text>
+       <alttext lang="DE">Videos</alttext>
        <action>CONFIGPLUGIN mythvideo</action>
        <depends>mythvideo</depends>
    </button>
@@ -39,6 +41,7 @@
      <text lang="NL">DVD Instellingen</text>
      <text lang="SV">DVD-inställningar</text>
      <text lang="JA">DVD設定</text>
+     <alttext lang="DE">DVD</alttext>
      <action>CONFIGPLUGIN mythdvd</action>
      <depends>mythdvd</depends>
    </button>
@@ -48,12 +51,13 @@
       <text>Images Settings</text>
       <text lang="ES">Configurar Fotos</text>
       <text lang="CA">Configurar Imatges</text>
-      <text lang="DE">Bilder Einstellungen</text>
+      <text lang="DE">Photos Einstellungen</text>
       <text lang="DK">Billed indstillinger</text>
       <text lang="NL">Beelden Instellingen</text>
       <text lang="PT">Configurar Fotos</text>
       <text lang="SV">Galleriinställningar</text>
       <text lang="JA">イメージ設定</text>
+      <alttext lang="DE">Photos</alttext>
       <action>CONFIGPLUGIN mythgallery</action>
       <depends>mythgallery</depends>
    </button>
@@ -69,6 +73,7 @@
      <text lang="PT">Configurar Jogos</text>
      <text lang="SV">Spelinställningar</text>
      <text lang="JA">ゲーム設定</text>
+     <alttext lang="DE">Spiele</alttext>
      <action>CONFIGPLUGIN mythgame</action>
      <depends>mythgame</depends>
    </button>
@@ -77,6 +82,8 @@
      <type>SETTINGS_FM</type>
      <text>Radio Settings</text>
      <text lang="SV">Radioinställningar</text>
+     <text lang="DE">Radio Einstellungen</text>
+     <alttext lang="DE">Radio</alttext>
      <action>CONFIGPLUGIN mythfm</action>
      <depends>mythfm</depends>
    </button>

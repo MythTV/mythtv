@@ -54,6 +54,7 @@
      <text>Listen to the radio</text>
      <text lang="SV">Lyssna pÃ¥ radio</text>
      <text lang="NL">Radio Luisteren</text>
+     <text lang="DE">Radio hören</text>
      <action>PLUGIN mythFM</action>
      <depends>mythFM mythfm</depends>
    </button>

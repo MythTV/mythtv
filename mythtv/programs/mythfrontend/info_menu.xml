@@ -45,6 +45,7 @@
      <text>Recipes</text>
      <text lang="SV">Recept</text>
      <text lang="NL">Recepten</text>
+     <text lang="DE">Rezepte</text>
      <action>PLUGIN mythRecipe</action>
      <depends>mythrecipe</depends>
    </button>

@@ -24,12 +24,14 @@
       <type>TV_SEARCH_PEOPLE</type>
       <text>People</text>
       <text lang="SV">Person</text>
+      <text lang="DE">Personen</text>
       <action>TV_SEARCH_PEOPLE</action>
    </button>
    
    <button>
       <type>TV_SEARCH_POWER</type>
       <text>Advanced</text>
+      <text lang="DE">Erweitert</text>
       <action>TV_SEARCH_POWER</action>
    </button>
 
