@@ -107,6 +107,7 @@ class UIListTreeType : public UIType
     void setActive(bool x);
     bool isActive(){ return list_tree_active; } 
     void enter();
+    void moveAwayFrom(UIListGenericTree *node);
 
   signals:
     

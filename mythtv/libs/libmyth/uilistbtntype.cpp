@@ -721,6 +721,45 @@ void UIListTreeType::enter()
     }
 }
 
+void UIListTreeType::moveAwayFrom(UIListGenericTree *node)
+{
+    if (!currentpos || !node)
+    {
+        return;
+    }
+
+    //
+    //  Something that is programatically altering the tree that this list
+    //  displays may want to delete an item. That item might be the
+    //  currentpos highlight item. This method allows client code to get the
+    //  UIListTreeType to check if a given node is currentpos, and, if so,
+    //  to do something about it. This is preferable to just segfaulting :-)
+    //
+
+    if (currentpos == node)
+    {
+        GenericTree *sibling = node->prevSibling(1);
+        if (sibling)
+        {
+            if (UIListGenericTree *ui_sibling = dynamic_cast<UIListGenericTree*>(sibling) )
+            {
+                currentpos = ui_sibling;
+                return;
+            }
+        }
+        sibling = node->nextSibling(1);
+        if (sibling)
+        {
+            if (UIListGenericTree *ui_sibling = dynamic_cast<UIListGenericTree*>(sibling) )
+            {
+                currentpos = ui_sibling;
+                return;
+            }
+        }
+        currentpos = NULL;        
+    }
+}
+
 
 //////////////////////////////////////////////////////////////////////////////
 
