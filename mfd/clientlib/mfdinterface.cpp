@@ -244,6 +244,37 @@ void MfdInterface::prevAudio(int which_mfd)
     }
 }
 
+void MfdInterface::askForStatus(int which_mfd)
+{
+    //
+    //  Find the instance, hand it a status command
+    //  
+
+    bool found_it = false;
+    for(
+        MfdInstance *an_mfd = mfd_instances->first();
+        an_mfd;
+        an_mfd = mfd_instances->next()
+       )
+    {
+        if(an_mfd->getId() == which_mfd)
+        {
+            an_mfd->addPendingCommand(
+                                        QStringList::split(" ", QString("audio status"))
+                                     );
+
+            found_it = true;
+            break;
+        }
+    }
+    
+    if(!found_it)
+    {
+        cerr << "mfdinterface.o: could not find an mfd "
+             << "for an askForStatus() request"
+             << endl;
+    }
+}
 
 void MfdInterface::customEvent(QCustomEvent *ce)
 {
@@ -297,6 +328,7 @@ void MfdInterface::customEvent(QCustomEvent *ce)
                                     new_mfd->getHostname(),
                                     true
                                  );
+            
             }
                                                
         }

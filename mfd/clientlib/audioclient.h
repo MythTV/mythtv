@@ -37,6 +37,7 @@ class AudioClient : public ServiceClient
     void handleIncoming();
     void parseFromAudio(QStringList &tokens);
     void executeCommand(QStringList new_command);
+    void askForStatus();
     ~AudioClient();
 
 };

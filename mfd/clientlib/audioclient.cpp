@@ -56,7 +56,6 @@ void AudioClient::playList(int container, int id, int index)
 void AudioClient::stopAudio()
 {
     QString command = QString("stop\n");
-
     client_socket_to_service->writeBlock(command.ascii(), command.length());
 }
 
@@ -359,7 +358,14 @@ void AudioClient::executeCommand(QStringList new_command)
         
         prevAudio();
     }    
-        
+    else if(new_command[0] == "status")
+    {
+        //
+        //  Send status
+        //
+
+        askForStatus();
+    }        
     else
     {
         cerr << "audioclient.o: I don't understand this "
@@ -369,6 +375,12 @@ void AudioClient::executeCommand(QStringList new_command)
              << endl;
     }
     
+}
+
+void AudioClient::askForStatus()
+{
+    QString command = QString("status\n");
+    client_socket_to_service->writeBlock(command.ascii(), command.length());
 }
 
 AudioClient::~AudioClient()

@@ -41,6 +41,7 @@ class MfdInterface : public QObject
     void seekAudio(int which_mfd, int how_much);
     void nextAudio(int which_mfd);
     void prevAudio(int which_mfd);
+    void askForStatus(int which_mfd);
     
     
   signals:
