@@ -1,6 +1,6 @@
-UPGRADING FROM RELEASE 0.11
+UPGRADING FROM RELEASE 0.12
 ---------------------------
-Nothing to do.
+Update your database with the videodb/0.11-to-0.12.sql script.
 
 UPGRADING FROM RELEASE 0.10
 ---------------------------
