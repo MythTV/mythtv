@@ -49,9 +49,9 @@ void ChannelInfo::LoadIcon(int size)
 
 QString ChannelInfo::Text(QString format)
 {
-    format.replace("<num>", chanstr)
-        .replace("<sign>", callsign)
-        .replace("<name>", channame);
+    format.replace("<num>", chanstr);
+    format.replace("<sign>", callsign);
+    format.replace("<name>", channame);
 
     return format;
 }
