@@ -763,16 +763,15 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
                  * more generic aproach shortly */
                 tmp = general_prefs.xmame_minor;
 
-                if (!strcmp(tmp, "37 BETA 4")) {
-                        fullscreen = " -nocabview";
-                } else {
-                        fullscreen = " -fullview";
-                }
-                if (!strcmp(tmp, "37 BETA 5")) {
-                        fullscreen = " -nocabview";
-                } else {
-                        fullscreen = " -fullview";
-                }
+                if (tmp == "37 BETA 4")
+                    fullscreen = " -nocabview";
+                else if (tmp == "37 BETA 5")
+                    fullscreen = " -fullview";
+                else if (tmp.toInt() >= 77)
+                    fullscreen = " -fullscreen";
+                else
+                    fullscreen = " -fullview";
+
                 windowed = " -cabview";
                 winkeys = " -winkeys";
                 nowinkeys = " -nowinkeys";
@@ -874,9 +873,12 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
             *exec+= general_prefs.show_gameinfo ?" -noskip_gameinfo" : " -skip_gameinfo";
         }
         /* the nocursor option doesn't apply to SDL builds of xmame */
-        if ( strcmp(general_prefs.xmame_display_target, "SDL")) {
-          *exec+= game_settings.fullscreen ? (" -nocursor" + fullscreen) : 
-                  windowed;
+        if (strcmp(general_prefs.xmame_display_target, "SDL")) {
+            if (general_prefs.xmame_minor.toInt() >= 77)
+                *exec += game_settings.fullscreen ? (fullscreen) : windowed;
+            else
+                *exec+= game_settings.fullscreen ? 
+                                     (" -nocursor" + fullscreen) : windowed;
         }
         else
           *exec+= game_settings.fullscreen ? fullscreen : windowed;
