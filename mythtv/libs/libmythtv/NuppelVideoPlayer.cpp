@@ -27,6 +27,7 @@ using namespace std;
 #include "decoderbase.h"
 #include "nuppeldecoder.h"
 #include "avformatdecoder.h"
+#include "ivtvdecoder.h"
 
 extern "C" {
 #include "../libvbitext/vbi.h"
@@ -36,6 +37,7 @@ extern "C" {
 #include "remoteencoder.h"
 
 #include "videoout_null.h"
+#include "videoout_ivtv.h"
 
 NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
                                      ProgramInfo *info)
@@ -402,7 +404,13 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     if (decoder)
         delete decoder;
 
-    if (NuppelDecoder::CanHandle(testbuf))
+    if (!disablevideo && IvtvDecoder::CanHandle(testbuf, 
+                                                ringBuffer->GetFilename()))
+    {
+        decoder = new IvtvDecoder(this, m_db, m_playbackinfo);
+        disableaudio = true; // no audio with ivtv.
+    }
+    else if (NuppelDecoder::CanHandle(testbuf))
         decoder = new NuppelDecoder(this, m_db, m_playbackinfo);
     else if (AvFormatDecoder::CanHandle(testbuf, ringBuffer->GetFilename()))
         decoder = new AvFormatDecoder(this, m_db, m_playbackinfo);
@@ -542,6 +550,12 @@ void NuppelVideoPlayer::AddTextData(char *buffer, int len,
 
 void NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
 {
+    if (forceVideoOutput == kVideoOutput_IVTV)
+    {
+        decoder->GetFrame(onlyvideo);
+        return;
+    }
+
     while (!videoOutput->EnoughFreeFrames() && !unsafe)
     {
         //cout << "waiting for video buffer to drain.\n";
@@ -1234,9 +1248,70 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         ShutdownExAVSync();
 }
 
+void NuppelVideoPlayer::IvtvVideoLoop(void)
+{
+    refreshrate = frame_interval;
+
+    VideoOutputIvtv *vidout = (VideoOutputIvtv *)videoOutput;
+
+    vidout->SetFPS(GetFrameRate());
+
+    bool previously_paused = false;
+
+    while (!eof && !killvideo)
+    {
+        if (pausevideo)
+        {
+            vidout->Pause();
+
+            if (!video_actually_paused)
+                videoOutput->UpdatePauseFrame();
+
+            if (resetvideo)
+            {
+                videoOutput->UpdatePauseFrame();
+                resetvideo = false;
+            }
+
+            video_actually_paused = true;
+
+            videoOutput->ProcessFrame(NULL, osd, videoFilters, pipplayer);
+
+            previously_paused = true;
+
+            //printf("video waiting for unpause\n");
+            usleep(frame_interval * 2);
+            continue;
+        }
+
+        if (previously_paused)
+            vidout->Play();
+
+        video_actually_paused = false;
+        resetvideo = false;
+
+        if (cc)
+            ShowText();
+
+        videoOutput->ProcessFrame(NULL, osd, videoFilters, NULL);
+
+        unsigned long frame = vidout->FrameSync();
+        decoder->UpdateFrameNumber(frame); 
+        SetFramesPlayed(frame);
+    }
+
+    delete videoOutput;
+    videoOutput = NULL;
+}
+
 void *NuppelVideoPlayer::kickoffOutputVideoLoop(void *player)
 {
-    ((NuppelVideoPlayer *)player)->OutputVideoLoop();
+    NuppelVideoPlayer *nvp = (NuppelVideoPlayer *)player;
+
+    if (nvp->forceVideoOutput == kVideoOutput_IVTV)
+        nvp->IvtvVideoLoop();
+    else
+        nvp->OutputVideoLoop();
     return NULL;
 }
 
@@ -1465,7 +1540,8 @@ void NuppelVideoPlayer::StartPlaying(void)
         }
     }
 
-    delete audioOutput;
+    if (audioOutput)
+        delete audioOutput;
     audioOutput = NULL;
 
     killvideo = true;

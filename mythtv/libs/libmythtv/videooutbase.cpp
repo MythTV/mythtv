@@ -8,6 +8,7 @@
 #include "../libmyth/mythcontext.h"
 
 #include "videoout_xv.h"
+#include "videoout_ivtv.h"
 
 #ifdef USING_XVMC
 #include "videoout_xvmc.h"
@@ -159,6 +160,9 @@ static const unsigned char DM[128][128] =
 VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type)
 {
     (void)type;
+
+    if (type == kVideoOutput_IVTV)
+        return new VideoOutputIvtv();
 
 #ifdef USING_XVMC
     if (type == kVideoOutput_XvMC)

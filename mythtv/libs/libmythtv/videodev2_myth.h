@@ -13,6 +13,8 @@
  *		Justin Schoeman
  *		et al.
  */
+/* #include <linux/time.h>  */ /* need struct timeval */
+/* #include <asm/types.h>   */
 
 /*
  *	M I S C E L L A N E O U S
@@ -742,10 +744,10 @@ struct v4l2_format
 	enum v4l2_buf_type type;
 	union
 	{
-		struct v4l2_pix_format	pix;  // V4L2_BUF_TYPE_VIDEO_CAPTURE
-		struct v4l2_window	win;  // V4L2_BUF_TYPE_VIDEO_OVERLAY
-		struct v4l2_vbi_format	vbi;  // V4L2_BUF_TYPE_VBI_CAPTURE
-		__u8	raw_data[200];        // user-defined
+		struct v4l2_pix_format	pix;  /* V4L2_BUF_TYPE_VIDEO_CAPTURE */
+		struct v4l2_window	win;  /* V4L2_BUF_TYPE_VIDEO_OVERLAY */
+		struct v4l2_vbi_format	vbi;  /* V4L2_BUF_TYPE_VBI_CAPTURE */
+		__u8	raw_data[200];        /* user-defined */
 	} fmt;
 };
 

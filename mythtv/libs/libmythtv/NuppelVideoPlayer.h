@@ -157,6 +157,8 @@ class NuppelVideoPlayer
     int GetEof(void) { return eof; }
     void SetFramesPlayed(long long played) { framesPlayed = played; }
 
+    VideoOutput *getVideoOutput(void) { return videoOutput; }
+
     int calcSliderPos(float offset, QString &desc);
 
     bool GetLimitKeyRepeat(void) { return limitKeyRepeat; }
@@ -171,9 +173,12 @@ class NuppelVideoPlayer
 
  protected:
     void OutputVideoLoop(void);
+    void IvtvVideoLoop(void);
 
     static void *kickoffOutputVideoLoop(void *player);
-    
+   
+    VideoOutputType forceVideoOutput;
+ 
  private:
     void InitVideo(void);
 
@@ -402,8 +407,6 @@ class NuppelVideoPlayer
     bool experimentalsync;
 
     bool limitKeyRepeat;
-
-    VideoOutputType forceVideoOutput;
 };
 
 #endif
