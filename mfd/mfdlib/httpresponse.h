@@ -47,6 +47,8 @@ class HttpResponse
                     int skip, 
                     FileSendTransformation transform = FILE_TRANSFORM_NONE
                  );
+    void log(const QString &warn_text, int verbosity);
+    void warning(const QString &warn_text);
 
 
     //

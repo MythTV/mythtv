@@ -76,6 +76,7 @@ class MetadataContainer
 
     QValueList<int>*    getMetadataAdditions(){return &metadata_additions;}
     QValueList<int>*    getMetadataDeletions(){return &metadata_deletions;}
+    QValueList<int>*    getPlaylistDeletions(){return &playlist_deletions;}
 
     void                dataSwap(   
                                     QIntDict<Metadata>* new_metadata, 
@@ -112,8 +113,8 @@ class MetadataContainer
     QValueList<int>      metadata_deletions;
 
     QIntDict<Playlist>   *current_playlists;
-    QDeepCopy< QValueList<int> >      playlist_additions;
-    QDeepCopy< QValueList<int> >      playlist_deletions;
+    QValueList<int>       playlist_additions;
+    QValueList<int>       playlist_deletions;
     
     QString my_name;
 };

@@ -81,6 +81,9 @@ class MetadataServer : public MFDServicePlugin
                                                     QValueList<int> playlist_deletions
                                                  );
 
+    int                         getLastDestroyedCollection();
+    QValueList<int>*            getLastDestroyedMetadataList(){return &last_destroyed_metadata;}
+    QValueList<int>*            getLastDestroyedPlaylistList(){return &last_destroyed_playlists;}
 
 
   private:
@@ -107,6 +110,11 @@ class MetadataServer : public MFDServicePlugin
     
     int                         local_audio_playlist_count;
     QMutex                      local_audio_playlist_count_mutex;
+
+    QMutex                      last_destroyed_mutex;
+    int                         last_destroyed_container;
+    QValueList<int>             last_destroyed_metadata;
+    QValueList<int>             last_destroyed_playlists;
 };
 
 

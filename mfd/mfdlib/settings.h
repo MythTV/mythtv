@@ -11,6 +11,7 @@
 */
 
 #include <qstring.h>
+#include <qstringlist.h>
 #include <qsqldatabase.h>
 
 #include "../config.h"
@@ -33,6 +34,9 @@ class Settings
 
     int     GetNumSetting(const QString &key, int defaultval = 0);
     int     getNumSetting(const QString &key, int defaultval = 0);
+
+    QStringList GetListSetting(const QString &key, const QStringList &defaultval = QStringList());
+    QStringList getListSetting(const QString &key, const QStringList &defaultval = QStringList());
 
     QString GetHostName();
     QString getHostName();

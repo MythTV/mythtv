@@ -16,5 +16,5 @@ offers). This is quite powerful.
     This code is really an interface into mDNS code released by Apple. The
 more or less unchanged Apple code is in ./apple/. Since what's in this
 directory is clearly a derived work, it is covered by the Apple Public
-License, which is available in ./apple/APPLE_LICENSE.
+License Version 2, which is available in ./apple/APPLE_LICENSE.
 

@@ -64,12 +64,25 @@ int Settings::GetNumSetting(const QString &key, int defaultval)
 #ifdef MYTHLIB_SUPPORT
     return gContext->GetNumSetting(key, defaultval);
 #endif
-    return 3;
+    return defaultval;
 }
 
 int Settings::getNumSetting(const QString &key, int defaultval)
 {
     return GetNumSetting(key, defaultval);
+}
+
+
+QStringList Settings::GetListSetting(const QString &key, const QStringList &defaultval)
+{
+    if(key){;}
+    
+    return defaultval;
+}
+
+QStringList Settings::getListSetting(const QString &key, const QStringList &defaultval)
+{
+    return GetListSetting(key, defaultval);
 }
 
 

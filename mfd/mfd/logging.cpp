@@ -113,7 +113,7 @@ void MFDLogger::writeStampedString(int verbosity_level, const QString &log_entry
     {
         QString stamped_log_entry = log_entry;
         stamped_log_entry.prepend(": ");
-        stamped_log_entry.prepend(QTime(QTime::currentTime()).toString());
+        stamped_log_entry.prepend(QDateTime(QDateTime::currentDateTime()).toString("dd/MMM/yyyy-hh:mm:ss"));
         writeString(stamped_log_entry);
     }
 }

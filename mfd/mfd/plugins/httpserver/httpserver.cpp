@@ -240,6 +240,14 @@ void ClientHttpServer::run()
                 read(u_shaped_pipe[0], read_back, 2048);
             u_shaped_pipe_mutex.unlock();
         }
+        
+        //
+        //  Clean out (and ignore) anything the audio server is sending back
+        //  to us
+        //
+        
+        char read_back[2049];
+        client_socket_to_audio->readBlock(read_back, 2048);
     
         //
         //  Handle anything incoming on the socket
@@ -610,8 +618,8 @@ void ClientHttpServer::showCurrentSection(HttpRequest *http_request, const QStri
             http_request->getResponse()->addToPayload("<td colspan=\"3\" align=\"center\">");
 
             http_request->getResponse()->addToPayload(" <a href=\"/audio/playlists?stopcommand=prev\">PREV</a> ");
-            http_request->getResponse()->addToPayload(" <a href=\"/audio/playlists?stopcommand=stop\">STOP</a> ");
-            http_request->getResponse()->addToPayload(" <a href=\"/audio/playlists?stopcommand=next\">NEXT</a> ");
+            http_request->getResponse()->addToPayload(" &nbsp; &nbsp; <a href=\"/audio/playlists?stopcommand=stop\">STOP</a> ");
+            http_request->getResponse()->addToPayload(" &nbsp; &nbsp; <a href=\"/audio/playlists?stopcommand=next\">NEXT</a> ");
 
             http_request->getResponse()->addToPayload("</td>");
 
@@ -673,6 +681,8 @@ void ClientHttpServer::showPlaylists(HttpRequest *http_request)
     //  Iterate over the metadata containers, and send out all the playlists
     //
     
+    
+    int counter = 0;
     MetadataContainer *a_container = NULL;
     for(   
         a_container = metadata_containers->first(); 
@@ -691,7 +701,15 @@ void ClientHttpServer::showPlaylists(HttpRequest *http_request)
                 while ( (a_playlist = it.current()) != 0 )
                 {
                     ++it;
-                    http_request->getResponse()->addToPayload("<tr>");
+                    if(counter % 2 == 0)
+                    {
+                        http_request->getResponse()->addToPayload("<tr bgcolor=\"ccccee\">");
+                    }
+                    else
+                    {
+                        http_request->getResponse()->addToPayload("<tr>");
+                    }
+                    ++counter;
 
                     http_request->getResponse()->addToPayload("<td>");
                     http_request->getResponse()->addToPayload(a_playlist->getName());
@@ -739,6 +757,7 @@ void ClientHttpServer::showTracks(HttpRequest *http_request)
     //  Iterate over the metadata containers, and send out all the playlists
     //
     
+    int counter = 0;
     MetadataContainer *a_container = NULL;
     for(   
         a_container = metadata_containers->first(); 
@@ -760,7 +779,16 @@ void ClientHttpServer::showTracks(HttpRequest *http_request)
                     {
                         AudioMetadata *which_item = (AudioMetadata*)iterator.current();
                     
-                        http_request->getResponse()->addToPayload("<tr>");
+                        if(counter % 2 == 0)
+                        {
+                            http_request->getResponse()->addToPayload("<tr bgcolor=\"ccccee\">");
+                        }
+                        else
+                        {
+                            http_request->getResponse()->addToPayload("<tr>");
+                        }
+                        ++counter;
+
 
                         http_request->getResponse()->addToPayload("<td>");
                         http_request->getResponse()->addToPayload(which_item->getArtist());

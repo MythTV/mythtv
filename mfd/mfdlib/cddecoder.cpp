@@ -1,13 +1,13 @@
 /*
-	cddecoder.cpp
+    cddecoder.cpp
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
-	Part of the mythTV project
-	
-	cd decoder
-	
-	Very closely based on work by Brad Hughes
-	Copyright (c) 2000-2001 Brad Hughes <bhughes@trolltech.com>
+    (c) 2003 Thor Sigvaldason and Isaac Richards
+    Part of the mythTV project
+    
+    cd decoder
+    
+    Very closely based on work by Brad Hughes
+    Copyright (c) 2000-2001 Brad Hughes <bhughes@trolltech.com>
 
 */
 
@@ -21,6 +21,7 @@
 #include <qobject.h>
 #include <qiodevice.h>
 #include <qfile.h>
+#include <qfileinfo.h>
 using namespace std;
 
 #include "cddecoder.h"
@@ -33,11 +34,10 @@ using namespace std;
 
 #include "settings.h"
 
-CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i, 
+CdDecoder::CdDecoder(const QString &url_path, DecoderFactory *d, QIODevice *i, 
                      Output *o) 
          : Decoder(d, i, o)
 {
-    filename = file;
     inited = FALSE;
     user_stop = FALSE;
     stat = 0;
@@ -60,9 +60,14 @@ CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
 
     settracknum = -1;
 
-    devicename = "/dev/cdrom";
 
-    devicename = mfdContext->GetSetting("CDDevice");
+    //
+    //  Decompose the url path into a device name and a track number
+    //
+
+    QFileInfo file_info(url_path);
+    filename = file_info.fileName();
+    devicename = file_info.dirPath(true);
 }
 
 CdDecoder::~CdDecoder(void)
@@ -135,8 +140,14 @@ bool CdDecoder::initialize()
     seekTime = -1.0;
     totalTime = 0.0;
 
-    filename = ((QFile *)input())->name();
-    tracknum = atoi(filename.ascii());
+    //
+    //  Set the device and track number
+    //
+
+    QFileInfo file_info(((QFile *)input())->name());
+    filename = file_info.fileName();
+    devicename = file_info.dirPath(true);
+    tracknum = atoi(filename.section('.', 0, 0).ascii());
    
     if (!output_buf)
         output_buf = new char[globalBufferSize];
@@ -237,9 +248,9 @@ void CdDecoder::run()
         {
             cdbuffer = paranoia_read(paranoia, paranoia_cb);
 
-	        memcpy((char *)(output_buf + output_at), (char *)cdbuffer, 
+            memcpy((char *)(output_buf + output_at), (char *)cdbuffer, 
                    CD_FRAMESIZE_RAW);
-	        output_at += CD_FRAMESIZE_RAW;
+            output_at += CD_FRAMESIZE_RAW;
             output_bytes += CD_FRAMESIZE_RAW;
 
             if (output())
@@ -351,51 +362,19 @@ int CdDecoder::getNumCDAudioTracks(void)
     return retval;
 }
 
-/*
-Metadata* CdDecoder::getMetadata(QSqlDatabase *x, int track)
-{
-    x = x;
-    settracknum = track;
-    return getMetadata();
-}
-*/
-
 AudioMetadata* CdDecoder::getMetadata()
 {
-    return NULL;
-/*
-    x = x ;
-    return getMetadata();
-*/
-}
-
-/*
-Metadata *CdDecoder::getMetadata(int track)
-{
-    settracknum = track;
-    return getMetadata();
-}
-
-Metadata *CdDecoder::getLastMetadata()
-{
-    Metadata *return_me;
-    for(int i = getNumTracks(); i > 0; --i)
-    {
-        settracknum = i;
-        return_me = getMetadata();
-        if(return_me)
-        {
-            return return_me;
-        }            
-    }
+    warning("can't return metadata for a whole CD, just a track");
     return NULL;
 }
 
-Metadata *CdDecoder::getMetadata()
+AudioMetadata* CdDecoder::getMetadata(int track)
 {
 
     QString artist = "", album = "", title = "", genre = "";
-    int year = 0, tracknum = 0, length = 0;
+    int year = 0, length = 0;
+    
+    tracknum = track;
 
     int cd = cd_init_device((char *)devicename.ascii());
 
@@ -414,16 +393,6 @@ Metadata *CdDecoder::getMetadata()
         return NULL;
     }
  
-    if (settracknum == -1)
-        tracknum = atoi(filename.ascii());
-    else
-    {
-        tracknum = settracknum;
-        filename = QString("%1.cda").arg(tracknum);
-    }
-
-    settracknum = -1;
-
     if (tracknum > discinfo.disc_total_tracks)
     {
         warning("no such track on CD");
@@ -447,7 +416,7 @@ Metadata *CdDecoder::getMetadata()
     if (ret < 0)
     {
         cd_finish(cd);
-        cout << "cddecoder.o: bad lookup :(\n";
+        warning("cddecoder.o: bad lookup :(");
         return NULL;
     }
 
@@ -466,9 +435,13 @@ Metadata *CdDecoder::getMetadata()
     QString trackartist = discdata.data_track[tracknum - 1].track_artist;
 
     if (trackartist.length() > 0)
+    {
         title = trackartist + " / " + temptitle;
+    }
     else
+    {
         title = temptitle;
+    }
 
     cddb_write_data(cd, &discdata);
 
@@ -482,68 +455,26 @@ Metadata *CdDecoder::getMetadata()
         artist = QObject::tr("Various Artists");
     }
 
-    Metadata *retdata = new Metadata(filename, artist, album, title, genre,
-                                     year, tracknum, length);
+    //
+    //  Munge the filename into a URL that will let us find this track again
+    //
+    
+    QString url = QString("cd://localhost%1/%2.cda").arg(devicename).arg(tracknum);
+
+    AudioMetadata *retdata = new AudioMetadata(
+                                                url, 
+                                                artist, 
+                                                album, 
+                                                title, 
+                                                genre,
+                                                year, 
+                                                tracknum, 
+                                                length
+                                              );
 
     cd_finish(cd);
     return retdata;
 }    
-
-void CdDecoder::commitMetadata(Metadata *mdata)
-{
-    int cd = cd_init_device((char *)devicename.ascii());
-
-    struct disc_info discinfo;
-    if (cd_stat(cd, &discinfo) != 0)
-    {
-        warning("couldn't stat CD");
-        cd_finish(cd);
-        return;
-    }
-
-    if (!discinfo.disc_present)
-    {
-        warning("no disc present");
-        cd_finish(cd);
-        return;
-    }
-
-    tracknum = mdata->Track();
-
-    if (tracknum > discinfo.disc_total_tracks)
-    {
-        warning("no such track on CD");
-        cd_finish(cd);
-        return;
-    }
-
-
-    struct disc_data discdata;
-    int ret = cddb_read_disc_data(cd, &discdata);
-
-    if (ret < 0)
-    {
-        cd_finish(cd);
-        cout << "cddecoder.o: bad lookup :(\n";
-        return;
-    }
-  
-    if (mdata->Artist() != discdata.data_artist)
-        strncpy(discdata.data_artist, mdata->Artist().ascii(), 256);
-    if (mdata->Album() != discdata.data_title)
-        strncpy(discdata.data_title, mdata->Album().ascii(), 256);
-    if (mdata->Title() != discdata.data_track[tracknum - 1].track_name)
-    {
-        strncpy(discdata.data_track[tracknum - 1].track_name, mdata->Title(),
-                256);
-        strncpy(discdata.data_track[tracknum - 1].track_artist, "", 256);
-    }
-
-    cddb_write_data(cd, &discdata);
-
-    cd_finish(cd);
-}
-*/
 
 
 bool CdDecoderFactory::supports(const QString &source) const

@@ -715,9 +715,9 @@ void DaapServer::addItemToResponse(DaapRequest *daap_request, TagOutput &respons
     if(meta_codes & DAAP_META_SONGFORMAT)
     {
         //
-        //  If the client is another Myth box, tell them the truth about our
-        //  file formats. If it's something else (e.g. iTunes) then trick
-        //  them.
+        //  If the client is another Myth box, tell them the truth about
+        //  most of our file formats (except wma and cda). If it's something
+        //  else (e.g. iTunes) then trick them.
         //
         
         if(daap_request->getClientType() == DAAP_CLIENT_MFDDAAPCLIENT)
@@ -725,10 +725,13 @@ void DaapServer::addItemToResponse(DaapRequest *daap_request, TagOutput &respons
             //
             //  If the file is a wma, stream it as a wav (because the audio
             //  plugin does not know how to handle non-file based wma
-            //  content)
+            //  content).
             //
             
-            if(which_item->getUrl().fileName().section('.', -1,-1) == "wma")
+            if(
+                which_item->getUrl().fileName().section('.', -1,-1) == "wma" ||
+                which_item->getUrl().fileName().section('.', -1,-1) == "cda"
+              )
             {
                 response << Tag('asfm') << "wav" << end;
             }
@@ -876,39 +879,71 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
         int which_collection_id = metadata_collection_last_changed;
     metadata_changed_mutex.unlock();
 
-    MetadataContainer *last_changed_collection = metadata_server->getMetadataContainer(which_collection_id);
+    bool do_delta = false;
+    MetadataContainer *last_changed_collection = NULL;
+    if(which_collection_id == metadata_server->getLastDestroyedCollection())
+    {
+        do_delta = true;
+    }
+    else
+    {
+        last_changed_collection = metadata_server->getMetadataContainer(which_collection_id);
+        if(last_changed_collection)
+        {
+            if(last_changed_collection->isAudio() && last_changed_collection->isLocal())
+            {
+                do_delta = true;
+            }
+        }
+    }
 
     u64 meta_codes = daap_request->getParsedMetaContentCodes();
     uint audio_count = metadata_server->getAllLocalAudioMetadataCount();
 
-    if(last_changed_collection != NULL              &&
-       last_changed_collection->isAudio()           &&
-       last_changed_collection->isLocal()           &&
+    if(
+       do_delta                                     &&
        client_db_delta  != 0                        &&
        client_db_generation == audio_generation     &&
        client_db_generation == client_db_delta + 1
       )
     {
+        log(": sending a partial metadata update", 8);
 
         //
         //  The client is only off by one, so we can be slightly efficient here and only send the deltas
         //
         
-        QValueList<int> *additions = last_changed_collection->getMetadataAdditions();
-        QValueList<int> *deletions = last_changed_collection->getMetadataDeletions();
+        QValueList<int> *additions = NULL;
+        QValueList<int> *deletions = NULL;
+
+        if(which_collection_id == metadata_server->getLastDestroyedCollection())
+        {
+            deletions = metadata_server->getLastDestroyedMetadataList();
+        }
+        else
+        {
+            additions = last_changed_collection->getMetadataAdditions();
+            deletions = last_changed_collection->getMetadataDeletions();
+        }
+
+        int additions_count = 0;
+        if(additions)
+        {
+            additions_count = additions->count();
+        }
 
         TagOutput response;
         response    << Tag( 'adbs' )
                          << Tag('mstt') << (u32) DAAP_OK << end
                          << Tag('muty') << (u8) 0 << end
                          << Tag('mtco') << (u32) audio_count << end
-                         << Tag('mrco') << (u32) additions->count() << end;
+                         << Tag('mrco') << (u32) additions_count << end;
 
         //
         //  Send new items (delta +)
         //
         
-        if(additions->count() > 0)
+        if(additions_count > 0)
         {
              response << Tag('mlcl') ;
              for(uint i = 0; i < additions->count(); i++)
@@ -947,11 +982,11 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
         //
         
         response << end;
-
         sendTag( http_request, response.data() );
     }
     else
     {    
+        log(": sending a full metadata update", 8);
         TagOutput response;
         response << Tag( 'adbs' )
                     << Tag('mstt') << (u32) DAAP_OK << end 
@@ -1058,10 +1093,13 @@ void DaapServer::sendDatabaseItem(HttpRequest *http_request, u32 song_id, DaapRe
             if(daap_request->getClientType() == DAAP_CLIENT_MFDDAAPCLIENT)
             {
                 //
-                //  Only translate wma's
+                //  Only translate wma's and cda's
                 //
                 
-                if(file_path.section('.', -1,-1) == "wma")
+                if(
+                    file_path.section('.', -1,-1) == "wma" ||
+                    file_path.section('.', -1,-1) == "cda"
+                  )
                 {
                     http_request->getResponse()->sendFile(file_path, skip, FILE_TRANSFORM_TOWAV);
                 }
@@ -1179,9 +1217,59 @@ void DaapServer::sendContainers(HttpRequest *http_request, DaapRequest *daap_req
                         }
                     }
                 }
+                response << end;
+                
+                //
+                //  Send any deletions (playlists gone away) if we have any
+                //
+
+                bool do_deletions = false;
+
+                metadata_changed_mutex.lock();
+                    int which_collection_id = metadata_collection_last_changed;
+                metadata_changed_mutex.unlock();
+                MetadataContainer *last_changed_collection = NULL;
+                if(which_collection_id == metadata_server->getLastDestroyedCollection())
+                {
+                    do_deletions = true;
+                }
+                else
+                {
+                    last_changed_collection = metadata_server->getMetadataContainer(which_collection_id);
+                    if(last_changed_collection)
+                    {
+                        if(last_changed_collection->isAudio() && last_changed_collection->isLocal())
+                        {
+                            do_deletions = true;
+                            which_collection_id = last_changed_collection->getIdentifier();
+                        }
+                    }
+                }
+
+                if(do_deletions)
+                {
+                    QValueList<int> *deletions = NULL;
+                    if(last_changed_collection)
+                    {
+                        deletions = last_changed_collection->getPlaylistDeletions();
+                    }
+                    else
+                    {
+                        deletions = metadata_server->getLastDestroyedPlaylistList();
+                    }
+
+                    response << Tag('mudl');
+                    for(uint i = 0; i < deletions->count(); i++)
+                    {
+                        int deletion_value = *deletions->at(i);
+                        deletion_value = (which_collection_id * METADATA_UNIVERSAL_ID_DIVIDER) + deletion_value;
+                        response << Tag('miid') << (u32) deletion_value << end;
+                    }
+                    response << end;
+                }
+                
              
-            response << end
-        << end;
+        response << end;
     sendTag( http_request, response.data() );
 }
 
@@ -1305,16 +1393,25 @@ void DaapServer::handleMetadataChange(int which_collection)
     {
         metadata_server->lockMetadata();
             MetadataContainer *which_one = metadata_server->getMetadataContainer(which_collection);
-            if(which_one->isAudio() && which_one->isLocal())
+            if(which_one)
+            {
+                if(which_one->isAudio() && which_one->isLocal())
+                {
+                    take_action = true;
+                }
+                audio_generation = metadata_server->getMetadataLocalAudioGeneration();
+            }
+            else
             {
                 take_action = true;
-            }
-            audio_generation = metadata_server->getMetadataLocalAudioGeneration();
+                audio_generation = metadata_server->getMetadataLocalAudioGeneration();
+            } 
         metadata_server->unlockMetadata();
     }
     else
     {
         take_action = true;
+        audio_generation = metadata_server->getMetadataLocalAudioGeneration();
     }
 
     if(take_action)

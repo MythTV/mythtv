@@ -19,10 +19,19 @@
 using namespace std;
 #include <fcntl.h>
 #include <unistd.h>
+#include <math.h>
 
 #include <qdatetime.h>
-
+#include <qfileinfo.h>
 #include <vorbis/vorbisfile.h>
+
+#include <cdaudio.h>
+extern "C" {
+#include <cdda_interface.h>
+#include <cdda_paranoia.h>
+}
+
+
 
 #include "httpresponse.h"
 #include "mfd_plugin.h"
@@ -303,16 +312,13 @@ void HttpResponse::createHeaderBlock(
                 addText(header_block, file_range_header);
                 if((range_end - range_begin) + 1 != payload_size)
                 {
-                    if(parent)
-                    {
-                        parent->warning(QString("httpresponse is sending a range from "
-                                                "%1 to %2 (size of %3), but "
-                                                "the payload size is set to %4")
-                                                .arg(range_begin)
-                                                .arg(range_end)
-                                                .arg((range_end - range_begin) + 1)
-                                                .arg(payload_size));
-                    }
+                        warning(QString("httpresponse is sending a range from "
+                                        "%1 to %2 (size of %3), but "
+                                        "the payload size is set to %4")
+                                        .arg(range_begin)
+                                        .arg(range_end)
+                                        .arg((range_end - range_begin) + 1)
+                                        .arg(payload_size));
                 }
             }
         }
@@ -397,11 +403,9 @@ void HttpResponse::send(MFDServiceClientSocket *which_client)
             //  Should not happen
             //
             
-            if(parent)
-            {
-                parent->warning("httpresponse got an invalid conversion value");
-            }
+            warning("httpresponse got an invalid conversion value");
         }
+        
         
         file_to_send->close();
         delete file_to_send;
@@ -455,8 +459,8 @@ bool HttpResponse::sendBlock(MFDServiceClientSocket *which_client, std::vector<c
                 //  still tried to send an empty payload
                 //
 
-                parent->warning("httpresponse asked to sendBlock(), "
-                                "but given block of zero size");
+                warning("httpresponse asked to sendBlock(), "
+                        "but given block of zero size");
             }
         }
         keep_going = false;
@@ -473,7 +477,8 @@ bool HttpResponse::sendBlock(MFDServiceClientSocket *which_client, std::vector<c
                 //  We are shutting down or something terrible has happened
                 //
 
-                parent->log("httpresponse aborted sending some socket data because it thinks its time to shut down", 6);
+                log("httpresponse aborted sending some socket data because "
+                    "it thinks its time to shut down", 6);
 
                 return false;
             }
@@ -507,11 +512,8 @@ bool HttpResponse::sendBlock(MFDServiceClientSocket *which_client, std::vector<c
         int result = select(nfds, NULL, &writefds, NULL, &timeout);
         if(result < 0)
         {
-            if(parent)
-            {
-                parent->warning("httpresponse got an error from "
-                                "select() ... not sure what to do");
-            }
+            warning("httpresponse got an error from "
+                    "select() ... not sure what to do");
         }
         else
         {
@@ -617,14 +619,18 @@ void HttpResponse::sendFile(QString file_path, int skip, FileSendTransformation 
     //
     
     file_to_send = new QFile(file_path.local8Bit());
+    QFileInfo file_info(file_path.local8Bit());
+    if(file_info.extension(false) == "cda")
+    {
+        range_begin = skip;
+        return;
+    }
+
     if(!file_to_send->exists())
     {
-        if(parent)
-        {
-            parent->warning(QString("httpresponse was asked to send "
-                                    "a file that does not exist: %1")
-                                    .arg(file_path.local8Bit()));
-        }
+        warning(QString("httpresponse was asked to send "
+                        "a file that does not exist: %1")
+                        .arg(file_path.local8Bit()));
         setError(404);
         delete file_to_send;
         file_to_send = NULL;
@@ -655,12 +661,9 @@ void HttpResponse::sendFile(QString file_path, int skip, FileSendTransformation 
 
     if(!file_to_send->open(IO_ReadOnly | IO_Raw))
     {
-        if(parent)
-        {
-            parent->warning(QString("httpresponse could not open (permissions?) a "
-                                    "file it was asked to send: %1")
-                                    .arg(file_path.local8Bit()));
-        }
+        warning(QString("httpresponse could not open (permissions?) a "
+                        "file it was asked to send: %1")
+                       .arg(file_path.local8Bit()));
         setError(404);
         delete file_to_send;
         file_to_send = NULL;
@@ -686,12 +689,8 @@ void HttpResponse::streamFile(MFDServiceClientSocket *which_client)
 
     if(!file_to_send->at(range_begin))
     {
-        if(parent)
-        {
-            parent->warning("httpresponse could not seek in a "
-                            "file it was asked to send. This is bad.");
-        }
-            
+        warning("httpresponse could not seek in a "
+                "file it was asked to send. This is bad.");
         setError(404);
         createHeaderBlock(&header_block, 0);
         sendBlock(which_client, header_block);
@@ -701,13 +700,8 @@ void HttpResponse::streamFile(MFDServiceClientSocket *which_client)
     createHeaderBlock(&header_block, (range_end - range_begin) + 1);
     if(!sendBlock(which_client, header_block))
     {
-        if(parent)
-        {
-            parent->warning("httpresponse could not send header block to client");
-        }
-
+        warning("httpresponse could not send header block to client");
         return;
-            
     }
 
     int  len;
@@ -724,12 +718,8 @@ void HttpResponse::streamFile(MFDServiceClientSocket *which_client)
             //  Stop sending 
             //
                 
-            if(parent)
-            {
-                parent->log("httpresponse failed to send block "
-                            "while streaming file (client gone?)", 9);
-            }
-
+            log("httpresponse failed to send block "
+                "while streaming file (client gone?)", 9);
             return;
         }
         else
@@ -749,9 +739,9 @@ void HttpResponse::streamFile(MFDServiceClientSocket *which_client)
                 //  Oh crap, we're shutting down
                 //
 
-                parent->log(QString("httpresponse aborted reading a file "
-                                    "to send because it thinks its time "
-                                    "to shut down"), 6);
+                log(QString("httpresponse aborted reading a file "
+                            "to send because it thinks its time "
+                            "to shut down"), 6);
                 return;
             }
         }
@@ -821,8 +811,8 @@ FLAC__StreamDecoderWriteStatus HttpResponse::flacWrite(
     {
         if(!parent->keepGoing())
         {
-            parent->warning("httpresponse interrupted \"flac as wav\" "
-                            "streaming as it is time to shut down ");
+            warning("httpresponse interrupted \"flac as wav\" "
+                    "streaming as it is time to shut down ");
             return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
         }
         
@@ -834,12 +824,9 @@ FLAC__StreamDecoderWriteStatus HttpResponse::flacWrite(
     
     if(!flac_client)
     {
-        if(parent)
-        {
-            parent->warning("httpresponse could send flac PCM data as "
-                            "it has no pointer to a client");
-            return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
-        }
+        warning("httpresponse could send flac PCM data as "
+                "it has no pointer to a client");
+        return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
     }
     
     
@@ -901,11 +888,8 @@ FLAC__StreamDecoderWriteStatus HttpResponse::flacWrite(
     payload.insert(payload.begin(), out_buffer, out_buffer + buffer_length);
     if(!sendBlock(flac_client, payload))
     {
-        if(parent)
-        {
-            parent->log("httpresponse failed to send block while streaming "
-                        "flac file (client gone?)", 9);
-        }
+        log("httpresponse failed to send block while streaming "
+            "flac file (client gone?)", 9);
         delete [] out_buffer;
         return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
     }
@@ -926,11 +910,8 @@ void HttpResponse::flacError(FLAC__StreamDecoderErrorStatus status)
 {
     status = status;
     
-    if(parent)
-    {
-        parent->log("httpresponse got an error during flac "
-                    "decoding, but will try to continue", 3);
-    }
+    log("httpresponse got an error during flac "
+        "decoding, but will try to continue", 3);
 }
 
 
@@ -951,13 +932,10 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
         FILE *input_file = fopen(file_to_send->name().local8Bit(), "rb");
         if(!input_file)
         {
-            if(parent)
-            {
-                parent->warning(QString("while trying to convert ogg to wav "
-                                        "and stream it, httpresponse could "
-                                        "not open file: %1")
-                                        .arg(file_to_send->name().local8Bit()));
-            }
+            warning(QString("while trying to convert ogg to wav "
+                            "and stream it, httpresponse could "
+                            "not open file: %1")
+                            .arg(file_to_send->name().local8Bit()));
             streamEmptyWav(which_client);
             return;
         }
@@ -968,12 +946,9 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
             //  Crap, this is not really an ogg file.
             //
 
-            if(parent)
-            {
-                parent->warning(QString("httpresponse does not really think "
-                                        "this file is an ogg: %1 ")
-                                        .arg(file_to_send->name().local8Bit()));
-            }
+            warning(QString("httpresponse does not really think "
+                            "this file is an ogg: %1 ")
+                            .arg(file_to_send->name().local8Bit()));
             fclose(input_file);
             streamEmptyWav(which_client);
             return;
@@ -1010,12 +985,9 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
         total_possible_range = final_file_size;
         if(range_begin > 0 && range_begin < 44)
         {
-            if(parent)
-            {
-                parent->warning("client asked to seek in an ogg "
-                                "stream to somewhere inside the "
-                                "header");
-            }
+            warning("client asked to seek in an ogg "
+                    "stream to somewhere inside the "
+                    "header");
             range_begin = 44;
         }
         
@@ -1027,11 +999,8 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
         createHeaderBlock(&header_block, ((int) (range_end - range_begin) + 1));
         if(!sendBlock(which_client, header_block))
         {
-            if(parent)
-            {
-                parent->warning("httpresponse was not able to send "
-                                "an http header for an ogg stream");
-            }
+            warning("httpresponse was not able to send "
+                    "an http header for an ogg stream");
             ov_clear(&ov_file);
             return;
         }
@@ -1070,11 +1039,8 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
             payload.insert(payload.begin(), headbuf, headbuf + 44);
             if(!sendBlock(which_client, payload))
             {
-                if(parent)
-                {
-                    parent->warning("httpresponse was not able to send "
-                                    "a wav header for an ogg");
-                }
+                warning("httpresponse was not able to send "
+                        "a wav header for an ogg");
                 ov_clear(&ov_file);
                 return;
             }
@@ -1103,11 +1069,8 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
     
             if(seek_result != 0)
             {
-                    if(parent)
-                    {
-                        parent->warning("httpresponse was not able to seek "
-                                        "in an ogg file");
-                    }
+                    warning("httpresponse was not able to seek "
+                            "in an ogg file");
                     ov_clear(&ov_file);
                     return;
             }
@@ -1134,11 +1097,8 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
                 //  Stop sending 
                 //
                 
-                if(parent)
-                {
-                    parent->log("httpresponse failed to send block "
-                                "while streaming ogg file (client gone?)", 9);
-                }
+                log("httpresponse failed to send block "
+                    "while streaming ogg file (client gone?)", 9);
 
                 len = 0;
             }
@@ -1159,43 +1119,37 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
                     //  Oh crap, we're shutting down
                     //
 
-                    parent->log(QString("httpresponse aborted reading a file "
-                                        "to send because it thinks its time "
-                                        "to shut down"), 6);
+                    log(QString("httpresponse aborted reading a file "
+                                "to send because it thinks its time "
+                                "to shut down"), 6);
                     len = 0;
                 }
             }
             if(section != 0)
             {
-                if(parent)
-                {
-                    parent->warning(QString("httpresponse encountered multiple "
-                                            "sections in an ogg file and doesn't "
-                                            "really know what it should do ..."));
-                }
+                warning(QString("httpresponse encountered multiple "
+                                "sections in an ogg file and doesn't "
+                                "really know what it should do ..."));
                 len = 0;
             }
             if(len < 0)
             {
-                if(parent)
+                warning(QString("httpresponse found a hole in an "
+                                "ogg file, will try to keep going"));
+                //
+                //  Try up to 3 (?) times
+                //
+                int numb_tries = 0;
+                while(numb_tries < 3)
                 {
-                    parent->warning(QString("httpresponse found a hole in an "
-                                            "ogg file, will try to keep going"));
-                    //
-                    //  Try up to 3 (?) times
-                    //
-                    int numb_tries = 0;
-                    while(numb_tries < 3)
+                    len = ov_read(&ov_file, buf, buflen, 0, bits/8, 1, &section);
+                    if(len > 0)
                     {
-                        len = ov_read(&ov_file, buf, buflen, 0, bits/8, 1, &section);
-                        if(len > 0)
-                        {
-                            numb_tries = 4;
-                        }
-                        else
-                        {
-                            len = 0;
-                        }
+                        numb_tries = 4;
+                    }
+                    else
+                    {
+                        len = 0;
                     }
                 }
             }
@@ -1222,10 +1176,7 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
 
         if(!FLAC__file_decoder_set_md5_checking(flac_decoder, false))
         {
-            if(parent)
-            {
-                parent->warning("httpresponse failed to turn of md5 checking on a flac file");
-            }
+            warning("httpresponse failed to turn of md5 checking on a flac file");
             FLAC__file_decoder_delete(flac_decoder);
             streamEmptyWav(which_client);
             return;
@@ -1233,10 +1184,7 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
 
         if(!FLAC__file_decoder_set_filename(flac_decoder, file_to_send->name().local8Bit()))
         {
-            if(parent)
-            {
-               parent->warning("httpresponse failed to set a filename for a flac decode");
-            }
+            warning("httpresponse failed to set a filename for a flac decode");
             FLAC__file_decoder_delete(flac_decoder);
             streamEmptyWav(which_client);
             return;
@@ -1244,10 +1192,7 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
 
         if(!FLAC__file_decoder_set_write_callback(flac_decoder, flacWriteCallback))
         {
-            if(parent)
-            {
-               parent->warning("httpresponse failed to set a flac write callback");
-            }
+            warning("httpresponse failed to set a flac write callback");
             FLAC__file_decoder_delete(flac_decoder);
             streamEmptyWav(which_client);
             return;
@@ -1255,10 +1200,7 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
         
         if(!FLAC__file_decoder_set_metadata_callback(flac_decoder, flacMetadataCallback))
         {
-            if(parent)
-            {
-               parent->warning("httpresponse failed to set a flac metadata callback");
-            }
+            warning("httpresponse failed to set a flac metadata callback");
             FLAC__file_decoder_delete(flac_decoder);
             streamEmptyWav(which_client);
             return;
@@ -1266,10 +1208,7 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
 
         if(!FLAC__file_decoder_set_error_callback(flac_decoder, flacErrorCallback))
         {
-            if(parent)
-            {
-               parent->warning("httpresponse failed to set a flac error callback");
-            }
+            warning("httpresponse failed to set a flac error callback");
             FLAC__file_decoder_delete(flac_decoder);
             streamEmptyWav(which_client);
             return;
@@ -1277,10 +1216,7 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
 
         if(!FLAC__file_decoder_set_client_data(flac_decoder, this))
         {
-            if(parent)
-            {
-               parent->warning("httpresponse failed to set flac client data");
-            }
+            warning("httpresponse failed to set flac client data");
             FLAC__file_decoder_delete(flac_decoder);
             streamEmptyWav(which_client);
             return;
@@ -1288,10 +1224,7 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
 
         if(FLAC__file_decoder_init(flac_decoder) != FLAC__FILE_DECODER_OK)
         {
-            if(parent)
-            {
-               parent->warning("httpresponse failed to init flac decoder");
-            }
+            warning("httpresponse failed to init flac decoder");
             FLAC__file_decoder_delete(flac_decoder);
             streamEmptyWav(which_client);
             return;
@@ -1307,10 +1240,7 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
 
         if(!FLAC__file_decoder_process_until_end_of_metadata(flac_decoder))
         {
-            if(parent)
-            {
-               parent->warning("httpresponse failed to extract flac metadata");
-            }
+            warning("httpresponse failed to extract flac metadata");
             FLAC__file_decoder_finish (flac_decoder);
             FLAC__file_decoder_delete(flac_decoder);
             streamEmptyWav(which_client);
@@ -1328,10 +1258,7 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
             flac_totalsamples == 0
           )
         {
-            if(parent)
-            {
-               parent->warning("httpresponse did not get sensible flac metadata");
-            }
+            warning("httpresponse did not get sensible flac metadata");
             FLAC__file_decoder_finish (flac_decoder);
             FLAC__file_decoder_delete(flac_decoder);
             streamEmptyWav(which_client);
@@ -1373,12 +1300,9 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
 
         if(range_begin > 0 && range_begin < 44)
         {
-            if(parent)
-            {
-                parent->warning("client asked to seek in a flac "
-                                "stream to somewhere inside the "
-                                "header");
-            }
+            warning("client asked to seek in a flac "
+                    "stream to somewhere inside the "
+                    "header");
             range_begin = 44;
         }
         
@@ -1390,11 +1314,8 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
         createHeaderBlock(&header_block, ((int) (range_end - range_begin) + 1));
         if(!sendBlock(which_client, header_block))
         {
-            if(parent)
-            {
-                parent->warning("httpresponse was not able to send "
-                                "an http header for a flac stream");
-            }
+            warning("httpresponse was not able to send "
+                    "an http header for a flac stream");
             FLAC__file_decoder_finish (flac_decoder);
             FLAC__file_decoder_delete(flac_decoder);
             return;
@@ -1415,11 +1336,8 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
             
             if(!FLAC__file_decoder_seek_absolute(flac_decoder, seek_position))
             {
-                if(parent)
-                {
-                    parent->warning("httpresponse could not seek in a flac "
-                                    "file it was trying to stream");
-                }
+                warning("httpresponse could not seek in a flac "
+                        "file it was trying to stream");
                 FLAC__file_decoder_finish (flac_decoder);
                 FLAC__file_decoder_delete(flac_decoder);
                 
@@ -1462,11 +1380,8 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
             payload.insert(payload.begin(), headbuf, headbuf + 44);
             if(!sendBlock(which_client, payload))
             {
-                if(parent)
-                {
-                    parent->warning("httpresponse was not able to send "
-                                    "a wav header for a flac");
-                }
+                warning("httpresponse was not able to send "
+                        "a wav header for a flac");
                 FLAC__file_decoder_finish (flac_decoder);
                 FLAC__file_decoder_delete(flac_decoder);
                 return;
@@ -1516,11 +1431,8 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
                                 format_parameters
                               ) < 0)
         {
-            if(parent)
-            {
-                parent->warning(QString("httpresponse had problem opening \"%1\"")
-                                .arg(file_to_send->name().local8Bit()));
-            }
+            warning(QString("httpresponse had problem opening \"%1\"")
+                            .arg(file_to_send->name().local8Bit()));
             streamEmptyWav(which_client);
             return;
         }
@@ -1531,12 +1443,9 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
 
         if (av_find_stream_info(format_context) < 0)
         {
-            if(parent)
-            {
-                parent->warning(QString("httpresponse could not find "
-                                "stream info in \"%1\"")
-                                .arg(file_to_send->name().local8Bit()));
-            }
+            warning(QString("httpresponse could not find "
+                            "stream info in \"%1\"")
+                            .arg(file_to_send->name().local8Bit()));
             av_close_input_file(format_context);
             streamEmptyWav(which_client);
             return;
@@ -1587,12 +1496,9 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
 
         if(range_begin > 0 && range_begin < 44)
         {
-            if(parent)
-            {
-                parent->warning("client asked to seek in a wma "
-                                "stream to somewhere inside the "
-                                "header");
-            }
+            warning("client asked to seek in a wma "
+                    "stream to somewhere inside the "
+                    "header");
             range_begin = 44;
         }
         
@@ -1600,11 +1506,8 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
         createHeaderBlock(&header_block, ((int) (range_end - range_begin) + 1));
         if(!sendBlock(which_client, header_block))
         {
-            if(parent)
-            {
-                parent->warning("httpresponse was not able to send "
-                                "an http header for a wma stream");
-            }
+            warning("httpresponse was not able to send "
+                    "an http header for a wma stream");
             av_close_input_file(format_context);
             return;
         }
@@ -1629,12 +1532,9 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
 
         if(!output_format)
         {
-            if(parent)
-            {
-                parent->warning(QString("httpresponse could not get "
-                                "an output format for \"%1\"")
-                                .arg(file_to_send->name().local8Bit()));
-            }
+            warning(QString("httpresponse could not get "
+                            "an output format for \"%1\"")
+                            .arg(file_to_send->name().local8Bit()));
             av_close_input_file(format_context);
             streamEmptyWav(which_client);
             return;
@@ -1648,11 +1548,8 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
         AVFormatContext *output_context = (AVFormatContext *)av_mallocz(sizeof(AVFormatContext));
         if(!output_context)
         {
-            if(parent)
-            {
-                parent->warning("httpresponse could not av_mallocz() "
-                                "an output context (memory low?)");
-            }
+            warning("httpresponse could not av_mallocz() "
+                    "an output context (memory low?)");
             av_close_input_file(format_context);
             streamEmptyWav(which_client);
             return;
@@ -1676,12 +1573,9 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
         AVCodec *decoding_codec = avcodec_find_decoder(audio_decoder_context->codec_id);
         if(!decoding_codec)
         {
-            if(parent)
-            {
-                parent->warning(QString("httpresponse could not get "
-                                        "a decoding codec for \"%1\"")
-                                        .arg(file_to_send->name().local8Bit()));
-            }
+            warning(QString("httpresponse could not get "
+                            "a decoding codec for \"%1\"")
+                            .arg(file_to_send->name().local8Bit()));
             av_free(output_context);
             av_close_input_file(format_context);
             streamEmptyWav(which_client);
@@ -1694,12 +1588,9 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
 
         if(avcodec_open(audio_decoder_context, decoding_codec) < 0)
         {
-            if(parent)
-            {
-                parent->warning(QString("httpresponse could not open "
-                                        "a decoding codec for \"%1\"")
-                                        .arg(file_to_send->name().local8Bit()));
-            }
+            warning(QString("httpresponse could not open "
+                            "a decoding codec for \"%1\"")
+                            .arg(file_to_send->name().local8Bit()));
             av_free(output_context);
             av_close_input_file(format_context);
             streamEmptyWav(which_client);
@@ -1743,11 +1634,8 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
             payload.insert(payload.begin(), headbuf, headbuf + 44);
             if(!sendBlock(which_client, payload))
             {
-                if(parent)
-                {
-                    parent->warning("httpresponse was not able to send "
-                                    "a wav header for a wma");
-                }
+                warning("httpresponse was not able to send "
+                        "a wav header for a wma");
                 av_close_input_file(format_context);
                 return;
             }
@@ -1770,14 +1658,11 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
                                         * exact_time_in_micro_seconds);
             if(av_seek_frame(format_context, 0, starting_time_in_micro_seconds) < 0)
             {
-                if(parent)
-                {
-                    parent->warning("failed to seek in wma file, http headers "
-                                    "(already sent) have wrong Content-Length "
-                                    "... giving up (WMA Sucks!!!)");
-                    av_close_input_file(format_context);
-                    return;
-                }
+                warning("failed to seek in wma file, http headers "
+                        "(already sent) have wrong Content-Length "
+                        "... giving up (WMA Sucks!!!)");
+                av_close_input_file(format_context);
+                return;
             }
         }
         
@@ -1878,6 +1763,228 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
         av_close_input_file(format_context);
     }
 #endif
+    else if(file_to_send->name().section(".", -1, -1) == "cda")
+    {
+        //
+        //  Decode and send an cd audio track as a wave
+        //
+        
+        QFileInfo file_info(file_to_send->name());
+    
+        QString filename = file_info.fileName();
+        QString devicename = file_info.dirPath(true);
+        int tracknum = atoi(filename.section('.', 0, 0).ascii());
+
+        
+        cdrom_drive *device = cdda_identify(devicename.ascii(), 0, NULL);
+        if(!device)
+        {
+            warning(QString("could not get a device at \"%1\"")
+                            .arg(devicename.ascii()));
+            streamEmptyWav(which_client);
+            return;
+        }
+        
+        if(cdda_open(device))
+        {
+            cdda_close(device);
+            warning(QString("could not open device \"%1\"")
+                            .arg(devicename.ascii()));
+            streamEmptyWav(which_client);
+            return;
+        }
+
+        cdda_verbose_set(device, CDDA_MESSAGE_FORGETIT, CDDA_MESSAGE_FORGETIT);
+        long int start = cdda_track_firstsector(device, tracknum);
+        long int end = cdda_track_lastsector(device, tracknum);
+
+        if (start > end || end == start)
+        {
+            cdda_close(device);
+            warning("cd track says end sector <= start sector");
+            streamEmptyWav(which_client);
+            return;
+        }
+
+        long total_numb_samples  = ((end - start + 1) * CD_FRAMESAMPLES);
+
+        //
+        //  If we multiple the total number of samples x 2 (channels) and by
+        //  2 again (16 bits per sample), we get the total number of bytes
+        //  the wav file would be.
+        //
+        
+        int64_t final_file_size = 44 + (total_numb_samples * 2 * 2);
+
+
+        //
+        //  Do some calculations to deal with range requests. 
+        //
+
+        range_begin = stored_skip;
+        range_end = final_file_size - 1;
+        if(range_end < 0)
+        {
+            range_end = 0;
+        }
+        if(range_begin > range_end)
+        {
+            range_begin = 0;
+        }
+
+        total_possible_range = final_file_size;
+
+
+        if(range_begin > 0 && range_begin < 44)
+        {
+            warning("client asked to seek in an ogg "
+                    "stream to somewhere inside the "
+                    "header");
+            range_begin = 44;
+        }
+        
+        //
+        //  Now that we know the size, we can make and send the header block
+        //
+        
+        header_block.clear();
+        createHeaderBlock(&header_block, ((int) (range_end - range_begin) + 1));
+        if(!sendBlock(which_client, header_block))
+        {
+            warning("httpresponse was not able to send "
+                    "an http header for a cda stream");
+            cdda_close(device);
+            return;
+        }
+
+        int bits = 16;
+        if(range_begin == 0)
+        {
+            //
+            //  Build the wav header, but only if the client hasn't already
+            //  asked to seek to a point beyond it
+            //
+        
+            unsigned char headbuf[44];
+
+            int channels = 2;
+            int samplerate = 44100;
+            int bytespersec = channels*samplerate*bits/8;
+            int align = channels*bits/8;
+            int samplesize = bits;
+                   
+            memcpy(headbuf, "RIFF", 4);
+            WRITE_U32(headbuf+4, final_file_size-8);
+            memcpy(headbuf+8, "WAVE", 4);
+            memcpy(headbuf+12, "fmt ", 4);
+            WRITE_U32(headbuf+16, 16);
+            WRITE_U16(headbuf+20, 1); 
+            WRITE_U16(headbuf+22, channels);
+            WRITE_U32(headbuf+24, samplerate);
+            WRITE_U32(headbuf+28, bytespersec);
+            WRITE_U16(headbuf+32, align);
+            WRITE_U16(headbuf+34, samplesize);
+            memcpy(headbuf+36, "data", 4);
+            WRITE_U32(headbuf+40, final_file_size - 44);
+
+            payload.clear();
+            payload.insert(payload.begin(), headbuf, headbuf + 44);
+            if(!sendBlock(which_client, payload))
+            {
+                if(parent)
+                {
+                    parent->warning("httpresponse was not able to send "
+                                    "a wav header for a cda");
+                }
+                cdda_close(device);
+                return;
+            }
+        }
+        
+        //
+        //  Initialize the paranoia stuff
+        //
+
+        cdrom_paranoia *paranoia = paranoia_init(device);
+        paranoia_modeset(paranoia, PARANOIA_MODE_OVERLAP);
+
+        paranoia_seek(paranoia, start, SEEK_SET);
+
+        long int curpos = start;
+
+        //
+        //  Seek to where we need to be
+        //
+
+        if(range_begin >= 44)
+        {
+            double some_value = (((((range_begin - 44) / 4.0) / (CD_FRAMESAMPLES + 0.0)) - 1.0) + start);
+            curpos = lrint(some_value);
+        }
+    
+        paranoia_seek(paranoia, curpos, SEEK_SET);
+
+        //
+        //  Decode and stream it out
+        //
+        
+
+        int16_t *cdbuffer;
+
+        bool  keep_decoding = true;
+        while(keep_decoding)
+        {
+            curpos++;
+            if(curpos <= end)
+            {
+                cdbuffer = paranoia_read(paranoia, NULL);
+                payload.clear();
+                payload.insert(payload.begin(), (char *)cdbuffer, (char *)cdbuffer + CD_FRAMESIZE_RAW);
+                if(!sendBlock(which_client, payload))
+                {
+                    //
+                    //  Stop sending 
+                    //
+                
+                    log("httpresponse failed to send block "
+                        "while streaming cda file (client gone?)", 9);
+
+                    keep_decoding = false;
+                }
+            }
+            else
+            {
+                //
+                //  we're done
+                //
+
+                keep_decoding = false;
+            }
+
+            if(parent)
+            {
+                //
+                //  Check to see if our parent is trying to stop 
+                //
+            
+                if(!parent->keepGoing())
+                {
+                    //
+                    //  Oh crap, we're shutting down
+                    //
+
+                    log(QString("httpresponse aborted reading a file "
+                                "to send because it thinks its time "
+                                "to shut down"), 6);
+                    keep_decoding = false;
+                }
+            }
+        }
+
+        paranoia_free(paranoia);
+        cdda_close(device);        
+
+    }
     else
     {
         if(parent)
@@ -1946,18 +2053,39 @@ void HttpResponse::streamEmptyWav(MFDServiceClientSocket *which_client)
         payload.insert(payload.begin(), headbuf, headbuf + file_size);
         if(!sendBlock(which_client, payload))
         {
-            if(parent)
-            {
-                parent->log("failed to sendBlock() while sending empty wav", 9);
-            }
+            log("failed to sendBlock() while sending empty wav", 9);
         }
     }
     
 }
 
 
+void HttpResponse::log(const QString &log_text, int verbosity)
+{
+    if(parent)
+    {
+        parent->log(log_text, verbosity);
+    }
+}
+
+void HttpResponse::warning(const QString &warn_text)
+{
+    if(parent)
+    {
+        parent->warning(warn_text);
+    }
+    else
+    {
+        cerr << warn_text << endl;
+    }
+}
+
 HttpResponse::~HttpResponse()
 {
+    if(file_to_send)
+    {
+        delete file_to_send;
+    }
     headers.clear();
     payload.clear();
 }

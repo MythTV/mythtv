@@ -32,6 +32,7 @@ MetadataServer::MetadataServer(MFD* owner, int port)
     local_audio_metadata_count = 0;
     local_audio_playlist_count = 0;
     metadata_container_count = 0;
+    last_destroyed_container = -1;
 }
 
 void MetadataServer::run()
@@ -382,6 +383,24 @@ void MetadataServer::deleteContainer(int container_id)
         MetadataCollectionLocationType ex_location = target->getLocationType();
         
         //
+        //  Adjust counts
+        //
+        
+        local_audio_metadata_count_mutex.lock();
+        local_audio_playlist_count_mutex.lock();
+            
+        if(target->isLocal() && target->isAudio())
+        {
+            local_audio_metadata_count = local_audio_metadata_count 
+                                       - target->getMetadataCount();
+            local_audio_playlist_count = local_audio_playlist_count 
+                                       - target->getPlaylistCount();
+        }
+        
+        local_audio_playlist_count_mutex.unlock();
+        local_audio_metadata_count_mutex.unlock();
+        
+        //
         //  Remove other references to this container
         //
         
@@ -391,6 +410,32 @@ void MetadataServer::deleteContainer(int container_id)
         }
         
 
+        //
+        //  Build a set of deltas (all negatives, of course)
+        //
+
+        last_destroyed_mutex.lock();
+
+        last_destroyed_container = target->getIdentifier();
+
+        last_destroyed_metadata.clear();
+        QIntDictIterator<Metadata> iter(*(target->getMetadata()));
+        for (; iter.current(); ++iter)
+        {
+            int an_integer = iter.currentKey();
+            last_destroyed_metadata.push_back(an_integer);
+        }
+            
+        last_destroyed_playlists.clear();
+        QIntDictIterator<Playlist> oiter(*(target->getPlaylists()));
+        for (; oiter.current(); ++oiter)
+        {
+            int an_integer = oiter.currentKey();
+            last_destroyed_playlists.push_back(an_integer);
+        }
+
+        last_destroyed_mutex.unlock();
+            
         //
         //  Take it off our master list, which automatically destructs it
         //
@@ -405,20 +450,17 @@ void MetadataServer::deleteContainer(int container_id)
             .arg(container_id), 4);
 
         //
-        //  Finally we bump the relevant generation twice (so no plugin will
-        //  ask for deltas, cause deltas only last for one change in
-        //  generation)
+        //  Finally we bump the relevant generation
         //
         
         if(ex_type == MCCT_audio && ex_location == MCLT_host)
         {
             metadata_local_audio_generation_mutex.lock();
                 ++metadata_local_audio_generation;
-                ++metadata_local_audio_generation;
             metadata_local_audio_generation_mutex.unlock();
         }
 
-        MetadataChangeEvent *mce = new MetadataChangeEvent(-1);
+        MetadataChangeEvent *mce = new MetadataChangeEvent(last_destroyed_container);
         QApplication::postEvent(parent, mce);    
     }
     else
@@ -505,7 +547,7 @@ void MetadataServer::doAtomicDataSwap(
                                 "%5 containers/playlists (+%6/-%7)")
                                 .arg(target->getIdentifier())
 
-                                .arg(new_metadata->count())
+                                .arg(target->getMetadataCount())
                                 .arg(metadata_additions.count())
                                 .arg(metadata_deletions.count())
                                 
@@ -661,7 +703,14 @@ MetadataContainer* MetadataServer::getMetadataContainer(int which_one)
     return target;        
 }
 
-
+int MetadataServer::getLastDestroyedCollection()
+{
+    int return_value;
+    last_destroyed_mutex.lock();
+        return_value = last_destroyed_container;
+    last_destroyed_mutex.unlock();
+    return return_value;
+}
 
 MetadataServer::~MetadataServer()
 {

@@ -17,6 +17,7 @@ httpserver="yes"
 mmusic="yes"
 wmasupport="yes"
 aacsupport="no"
+discwatchersupport="yes"
 
 for opt do
   case "$opt" in
@@ -56,6 +57,10 @@ for opt do
   ;;
   --disable-aacsupport) aacsupport="no"
   ;;
+  --enable-discwatcher) discwatchersupport="yes"
+  ;;
+  --disable-discwatcher) discwatchersupport="no"
+  ;;
   --enable-all)
       zeroconfig="yes"
       audio="yes"
@@ -66,6 +71,7 @@ for opt do
       mmusic="yes"
       wmasupport="yes"
       aacsupport="yes"
+      discwatchersupport="yes"
   ;;
   --disable-all)
       zeroconfig="no"
@@ -77,6 +83,7 @@ for opt do
       mmusic="no"
       wmasupport="no"
       aacsupport="no"
+      discwatchersupport="no"
   ;;
   esac
 done
@@ -113,6 +120,7 @@ Standard options:
   --enable-daapclient  enable consuming audio via daap         [default=yes]
   --enable-httpserver  enable basic client interface via http  [default=yes]
   --enable-mythmusic   enable serving mythmusic audio content  [default=yes]
+  --enable-discwatcher monitor optical drives for content      [default=yes]
 
 All options can be turned off with --disable-foo
 Some options will be automatically turned off if they make no sense 
@@ -323,6 +331,23 @@ fi
 
 if test "$mmusic" = "no" ; then
     echo "                  mythmusic support: no"
+fi
+
+
+#
+#   Disc Watcher
+#
+
+if test "$discwatchersupport" = "yes" ; then
+    echo "               disc watcher support: yes"        
+    echo "#    Build disc watching plugin " >> ./config.pro
+    echo " " >> ./config.pro
+    echo "SUBDIRS += ./mfd/plugins/discwatcher " >> ./config.pro
+    echo " " >> ./config.pro
+fi
+
+if test "$discwatchersupport" = "no" ; then
+    echo "               disc watcher support: no"
 fi
 
 

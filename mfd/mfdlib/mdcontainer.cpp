@@ -127,16 +127,27 @@ void MetadataContainer::dataSwap(
 {
     if(current_metadata)
     {
+        current_metadata->setAutoDelete(true);
         delete current_metadata;
+        current_metadata = NULL;
     }
     
     if(current_playlists)
     {
+        current_playlists->setAutoDelete(true);
         delete current_playlists;
+        current_metadata = NULL;
     }
 
     current_metadata = new_metadata;
     current_playlists = new_playlists;
+    
+    //
+    //  Dereference the pointers that were passed
+    //
+
+    new_metadata = NULL;
+    new_playlists = NULL;
 
     //
     //  NB: these are QDeepCopy variables, so this object now has its own

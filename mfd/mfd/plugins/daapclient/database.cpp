@@ -83,7 +83,7 @@ Database::Database(
 
 int Database::getFirstPlaylistWithoutList()
 {
-    int return_value = -23;
+    int return_value = -1;
 
     QIntDictIterator<Playlist> it( *new_playlists ); 
     for ( ; it.current(); ++it )
@@ -1317,6 +1317,8 @@ void Database::doTheMetadataSwap()
                                             playlist_additions,
                                             playlist_deletions
                                          );
+        new_metadata = NULL;
+        new_playlists = NULL;
 
 
     }
@@ -1398,6 +1400,8 @@ void Database::doTheMetadataSwap()
                                             playlist_additions,
                                             playlist_deletions
                                          );
+        new_metadata = NULL;
+        new_playlists = NULL;
 
 
     }

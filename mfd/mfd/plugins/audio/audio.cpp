@@ -307,10 +307,13 @@ bool AudioPlugin::playUrl(QUrl url)
             return false;
         }
     }
-    else if(url.protocol() == "daap")
+    else if(
+            url.protocol() == "daap" ||
+            url.protocol() == "cd"
+           )
     {
         //
-        //  Some way to check that this still exists?
+        //  Some way to check that this resource still exists?
         //
     }
     
@@ -351,22 +354,9 @@ bool AudioPlugin::playUrl(QUrl url)
         //  Choose the QIODevice (derived) to serve as input
         // 
     
-        QString url_path = url.path();
-    
-        if(url.protocol() == "file")
+        if(url.protocol() == "file" || url.protocol() == "cd")
         {
-        
-            //
-            //  Correct Qt *always* wanting a "/" in a url path.
-            //
-
-            QFileInfo fi( url_path );
-            if( fi.extension() == "cda")
-            {
-                url_path = url_path.section('/', -1, -1);
-            }        
-
-            input = new QFile(url_path);
+            input = new QFile(url.path());
         }
         else if(url.protocol() == "daap")
         {
@@ -383,7 +373,7 @@ bool AudioPlugin::playUrl(QUrl url)
             return false;
         }
 
-        if(decoder && !decoder->factory()->supports(url_path))
+        if(decoder && !decoder->factory()->supports(url.path()))
         {
             decoder = 0;
         }
@@ -391,7 +381,7 @@ bool AudioPlugin::playUrl(QUrl url)
         if(!decoder)
         {
         
-            decoder = Decoder::create(url_path, input, output);
+            decoder = Decoder::create(url.path(), input, output);
 
             if(!decoder)
             {
