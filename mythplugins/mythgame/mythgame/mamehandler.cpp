@@ -793,11 +793,16 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
 
         volume.sprintf("%d", game_settings.volume);
         joytype.sprintf("%d", game_settings.joytype);
-
         if (!strcmp(general_prefs.xmame_display_target, "x11")) {
-                fullscreen = (game_settings.fullscreen == 1) ? " -x11-mode 1" :
-                             " -fullscreen";
-                windowed = " -x11-mode 3";
+                if(general_prefs.xmame_major <= 0 && general_prefs.xmame_minor < 88){
+                    fullscreen = (game_settings.fullscreen == 1) ? " -x11-mode 1" :
+                                 " -fullscreen";
+                    windowed = " -x11-mode 3";
+                }
+                else {
+                    fullscreen = " -video-mode 1 -fullscreen";
+                    windowed = " -video-mode 0";
+                }
                 winkeys = " -winkeys";
                 nowinkeys = " -nowinkeys";
                 grabmouse = " -grabmouse";
@@ -898,7 +903,20 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
         else
           *exec+= game_settings.fullscreen ? fullscreen : windowed;
 
-        *exec+= game_settings.scanlines ? " -scanlines" : " -noscanlines";
+        if(general_prefs.xmame_major <= 0 && general_prefs.xmame_minor < 87){
+          *exec+= game_settings.mouse ? " -mouse" : " -nomouse";
+          *exec+= game_settings.sound ? " -sound" : " -nosound";
+          *exec+= game_settings.fake_sound ? " -fakesound" : "";
+        }
+        else 
+          *exec+= game_settings.sound ? "" : " -audiodevice /dev/null";
+
+        if(general_prefs.xmame_major <= 0 && general_prefs.xmame_minor < 88){
+          *exec+= game_settings.scanlines ? " -scanlines" : " -noscanlines";
+        }
+        else 
+          *exec+= game_settings.scanlines ? " -effect 9" : "";
+          
         *exec+= game_settings.extra_artwork ? " -artwork" : " -noartwork";
         *exec+= game_settings.autoframeskip ? " -autoframeskip" : " -noautoframeskip";
         *exec+= game_settings.auto_colordepth ? " -bpp 0" : " ";
@@ -913,14 +931,11 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
         *exec+= vectoropts;
         *exec+= vectorres;
         *exec+= game_settings.analog_joy ? " -analogstick" : " -noanalogstick";
-        *exec+= game_settings.mouse ? " -mouse" : " -nomouse";
         *exec+= game_settings.winkeys ? winkeys : nowinkeys;
         *exec+= game_settings.grab_mouse ? grabmouse : nograbmouse;
         *exec+= " -joytype ";
         *exec+= joytype;
-        *exec+= game_settings.sound ? " -sound" : " -nosound";
         *exec+= game_settings.samples ? " -samples" : " -nosamples";
-        *exec+= game_settings.fake_sound ? " -fakesound" : "";
         *exec+= " -volume ";
         *exec+= volume;
         *exec+=  " ";
