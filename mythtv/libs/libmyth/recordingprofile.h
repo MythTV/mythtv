@@ -365,21 +365,22 @@ public:
     RecordingProfile() {
         id = -1;
         ConfigurationGroup* profile = new VerticalConfigurationGroup();
-        name = new Name(*this);
-
-        profile->addChild(name);
-        addChild(profile, "Profile");
+        profile->setLabel("Profile");
+        profile->addChild(name = new Name(*this));
+        addChild(profile);
 
         ConfigurationGroup* videoquality = new VerticalConfigurationGroup();
+        videoquality->setLabel("Video Quality");
 
         videoquality->addChild(new ImageSize(*this,"ntsc")); // xxx
         videoquality->addChild(new VideoCompressionSettings(*this));
-        addChild(videoquality, "Video Quality");
+        addChild(videoquality);
 
         ConfigurationGroup* audioquality = new VerticalConfigurationGroup();
+        audioquality->setLabel("Audio Quality");
         audioquality->addChild(new SampleRate(*this));
         audioquality->addChild(new AudioCompressionSettings(*this));
-        addChild(audioquality, "Audio Quality");
+        addChild(audioquality);
     };
 
     virtual void loadByID(QSqlDatabase* db, int id);
@@ -427,22 +428,17 @@ public:
                     this, SLOT(open(int)));
     };
 
-    ~RecordingProfileEditor() {
-        for(unsigned i = 0; i < modified.size() ; ++i) {
-            modified[i]->save(db);
-            delete modified[i];
-        };
-    };
 protected slots:
     void open(int id) {
         RecordingProfile* profile = new RecordingProfile();
-        if (profile != 0)
+
+        if (id != 0)
             profile->loadByID(db,id);
-        modified.push_back(profile);
-        profile->configWidget(this)->show();
+
+        if (profile->dialogWidget(this)->exec() == QDialog::Accepted)
+            profile->save(db);
+        delete profile;
     };
-private:
-    vector<RecordingProfile*> modified;
 };
 
 #endif

@@ -11,6 +11,7 @@ using namespace std;
 
 class QSqlDatabase;
 class QWidget;
+class QDialog;
 
 class Configurable: virtual public QObject {
     Q_OBJECT
@@ -120,9 +121,6 @@ public:
             (*i)->purge(db);
     };
 
-    virtual QWidget* configWidget(QWidget* parent,
-                                  const char* widgetName = 0) = 0;
-
 protected:
     typedef vector<Configurable*> childList;
     childList children;
@@ -151,18 +149,21 @@ protected:
     unsigned top;
 };
 
-// A wizard with one child per page
-class ConfigurationWizard: virtual public ConfigurationGroup {
+// Displays configWidget in a modal dialog, and returns a status
+class ConfigurationDialog: virtual public Configurable {
 public:
-    void addChild(Configurable* child, QString pageTitle) {
-        pageTitles.push_back(pageTitle);
-        ConfigurationGroup::addChild(child);
-    };
-        
+    virtual QDialog* dialogWidget(QWidget* parent,
+                                  const char* widgetName = 0) = 0;
     virtual QWidget* configWidget(QWidget* parent,
+                                  const char* widgetName = 0);
+};
+
+// A wizard is a group with one child per page
+class ConfigurationWizard: virtual public ConfigurationDialog,
+                           virtual public ConfigurationGroup {
+public:
+    virtual QDialog* dialogWidget(QWidget* parent,
                                   const char* widgetName=0);
-protected:
-    vector<QString> pageTitles;
 };
 
 class LineEditSetting: virtual public Setting {

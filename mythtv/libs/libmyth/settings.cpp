@@ -16,6 +16,7 @@
 #include <qradiobutton.h>
 #include <qcheckbox.h>
 #include <qwidgetstack.h>
+#include <qdialog.h>
 
 QWidget* VerticalConfigurationGroup::configWidget(QWidget* parent,
                                                   const char* widgetName) {
@@ -161,24 +162,27 @@ QWidget* CheckBoxSetting::configWidget(QWidget* parent,
     return widget;
 }
 
-
-QWidget* ConfigurationWizard::configWidget(QWidget* parent,
+QWidget* ConfigurationDialog::configWidget(QWidget* parent,
                                            const char* widgetName) {
-    QWizard* wizard = new QWizard(parent, widgetName, FALSE, 0);
+  return dialogWidget(parent, widgetName);
+}
+
+QDialog* ConfigurationWizard::dialogWidget(QWidget* parent,
+                                           const char* widgetName) {
+    QWizard* wizard = new QWizard(parent, widgetName, TRUE, 0);
 
     wizard->resize(600, 480); // xxx
 
     unsigned i;
     for(i = 0 ; i < children.size() ; ++i) {
         QWidget* child = children[i]->configWidget(parent);
-        wizard->addPage(child, pageTitles[i]);
+        wizard->addPage(child, children[i]->getLabel());
         if (i == children.size()-1)
             // Last page always has finish enabled for now
             // stuff should have sane defaults anyway
             wizard->setFinishEnabled(child, true);
     }
 
-    wizard->showPage(wizard->page(0));
     return wizard;
 }
 

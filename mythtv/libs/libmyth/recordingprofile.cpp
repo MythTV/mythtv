@@ -2,6 +2,7 @@
 #include <qsqldatabase.h>
 #include <qcursor.h>
 #include <qlayout.h>
+#include <iostream>
 
 QString RecordingProfileParam::whereClause(void) {
   return QString("id = %1").arg(parentProfile.getProfileNum());
