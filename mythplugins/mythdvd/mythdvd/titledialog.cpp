@@ -411,8 +411,13 @@ void TitleDialog::ripTitles()
             //
             //  we need to ask mythvideo stuff where it lives
             //
-            
-            QString destination_directory = gContext->GetSetting("VideoStartupDir");
+           
+            QString destination_directory = gContext->GetSetting("mythdvd.LocalRipDirectory");
+
+            if (!destination_directory.length()) {
+                destination_directory = gContext->GetSetting("VideoStartupDir");
+            }
+ 
             if(destination_directory.length() < 1)
             {
                 cerr << "titledialog.o: I can't rip, as I have nowhere to put finished files. MythVideo installed?" << endl;
