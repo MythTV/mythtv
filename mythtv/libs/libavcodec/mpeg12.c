@@ -2269,7 +2269,7 @@ static int mpeg_decode_slice(Mpeg1Context *s1, int mb_y,
 
 #ifdef HAVE_VIASLICE
     if (s->avctx->via_hwslice){
-        int used = VIA_decode_slice(s, start_code + 1, *buf, buf_size);
+        int used = VIA_decode_slice(s, mb_y, *buf, buf_size);
         *buf += used - 1;
         return 0;
     }
