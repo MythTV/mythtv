@@ -24,7 +24,7 @@ Watching TV or a recording
 - P to pause / play.
 - C to change inputs on TV Tuner card
 - ESC quits
-- I puts the Onscreen Display up again.
+- I puts the On-screen Display up again.
     During playback, 'I' toggles between position and show description info.
     If a jump amount is entered, jump to that position.
 - M brings up the electronic program guide (Grid) -- see the EPG section.
@@ -172,7 +172,7 @@ Set Program Recording Priorities and Set Channel Recording Priorities
 - I to edit recording options.
 - ESC commits changes and exits.
 
-Viewing Schedulded Recordings/Resolving Conflicts
+Viewing Scheduled Recordings/Resolving Conflicts
 -------------------------------------------------
 
 - 1 to show all recordings.
