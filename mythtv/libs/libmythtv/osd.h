@@ -41,8 +41,7 @@ class OSD : public QObject
 {
     Q_OBJECT
  public:
-    OSD(int width, int height, int framerate, const QString &font, 
-        const QString &ccfont, const QString &prefix, const QString &osdtheme,
+    OSD(int width, int height, int framerate,
         int dispx, int dispy, int dispw, int disph);
    ~OSD(void);
 
@@ -148,15 +147,10 @@ class OSD : public QObject
     void parsePositionImage(OSDSet *container, QDomElement &element);
     void parseListTree(OSDSet *container, QDomElement &element);
 
-    QString fontname;
-    QString ccfontname;
-    QString fontSizeType;
-
     int vid_width;
     int vid_height;
     int frameint;
 
-    QString fontprefix;
     QString themepath;
 
     float hmult, wmult;

@@ -26,8 +26,7 @@ using namespace std;
 
 #include "osdlistbtntype.h"
 
-OSD::OSD(int width, int height, int frint, const QString &font, 
-         const QString &ccfont, const QString &prefix, const QString &osdtheme,
+OSD::OSD(int width, int height, int frint,
          int dispx, int dispy, int dispw, int disph)
    : QObject()
 {
@@ -48,9 +47,6 @@ OSD::OSD(int width, int height, int frint, const QString &font,
 
     timeType = 0; 
     totalfadetime = 0;
-    fontname = font;
-    ccfontname = ccfont;
-    fontprefix = prefix;
 
     m_setsvisible = false;
     setList = NULL;
@@ -58,9 +54,8 @@ OSD::OSD(int width, int height, int frint, const QString &font,
     runningTreeMenu = NULL;
 
     setList = new vector<OSDSet *>;
-
-    fontSizeType = gContext->GetSetting("OSDThemeFontSizeType", "default");
     
+    QString osdtheme = gContext->GetSetting("OSDTheme");
     themepath = FindTheme(osdtheme);
 
     if (themepath == "")
@@ -130,7 +125,7 @@ void OSD::SetDefaults(void)
         QString name = "cc_font";
         int fontsize = 480 / 27;
 
-        ccfont = LoadFont(ccfontname, fontsize);
+        ccfont = LoadFont(gContext->GetSetting("OSDCCFont"), fontsize);
 
         if (ccfont)
             fontMap[name] = ccfont;
@@ -181,7 +176,7 @@ void OSD::SetDefaults(void)
 
         if (!actfont)
         {
-            actfont = LoadFont(fontname, 16);
+            actfont = LoadFont(gContext->GetSetting("OSDFont"), 16);
 
             if (actfont)
                 fontMap["treemenulistfont"] = actfont;
@@ -252,7 +247,7 @@ QString OSD::FindTheme(QString name)
     if (dir.exists())
         return testdir;
 
-    testdir = fontprefix + "/share/mythtv/themes/" + name;
+    testdir = gContext->GetShareDir() + "themes/" + name;
     dir.setPath(testdir);
     if (dir.exists())
         return testdir;
@@ -275,7 +270,7 @@ TTFFont *OSD::LoadFont(QString name, int size)
         return font;
 
     delete font;
-    fullname = fontprefix + "/share/mythtv/" + name;
+    fullname = gContext->GetShareDir() + name;
 
     font = new TTFFont((char *)fullname.ascii(), size, vid_width,
                        vid_height, hmult);
@@ -324,7 +319,7 @@ QString OSD::getFirstText(QDomElement &element)
 void OSD::parseFont(QDomElement &element)
 {
     QString name;
-    QString fontfile = fontname;
+    QString fontfile = gContext->GetSetting("OSDFont");
     int size = -1;
     int sizeSmall = -1;
     int sizeBig = -1;    
@@ -401,6 +396,8 @@ void OSD::parseFont(QDomElement &element)
         return;
     }
 
+    QString fontSizeType = gContext->GetSetting("OSDThemeFontSizeType",
+                                                "default");
     if (fontSizeType == "small")
     {
         if (sizeSmall > 0)

@@ -102,11 +102,6 @@ class NuppelVideoPlayer
 
     OSD *GetOSD(void) { return osd; }
 
-    void SetOSDFontName(QString filename, QString osdccfont, QString prefix)
-    { osdfontname = filename; osdccfontname = osdccfont; osdprefix = prefix; }
-
-    void SetOSDThemeName(QString themename) { osdtheme = themename; }
-
     // don't use this on something you're playing
     char *GetScreenGrab(int secondsin, int &buflen, int &vw, int &vh);
 
@@ -359,10 +354,6 @@ class NuppelVideoPlayer
     int totalLength;
     long long totalFrames;
 
-    QString osdfontname;
-    QString osdccfontname;
-    QString osdprefix;
-    QString osdtheme;
     OSD *osd;
 
     bool disablevideo;

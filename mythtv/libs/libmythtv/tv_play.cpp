@@ -881,10 +881,6 @@ void TV::SetupPlayer(void)
     nvp->SetParentWidget(myWindow);
     nvp->SetRingBuffer(prbuffer);
     nvp->SetRecorder(recorder);
-    nvp->SetOSDFontName(gContext->GetSetting("OSDFont"),
-                        gContext->GetSetting("OSDCCFont"),
-                        gContext->GetInstallPrefix()); 
-    nvp->SetOSDThemeName(gContext->GetSetting("OSDTheme"));
     nvp->SetAudioSampleRate(gContext->GetNumSetting("AudioSampleRate"));
     nvp->SetAudioDevice(gContext->GetSetting("AudioOutputDevice"));
     nvp->SetLength(playbackLen);
@@ -967,10 +963,6 @@ void TV::SetupPipPlayer(void)
     pipnvp->SetAsPIP();
     pipnvp->SetRingBuffer(piprbuffer);
     pipnvp->SetRecorder(piprecorder);
-    pipnvp->SetOSDFontName(gContext->GetSetting("OSDFont"),
-                           gContext->GetSetting("OSDCCFont"),
-                           gContext->GetInstallPrefix());
-    pipnvp->SetOSDThemeName(gContext->GetSetting("OSDTheme"));
     pipnvp->SetAudioSampleRate(gContext->GetNumSetting("AudioSampleRate"));
     pipnvp->SetAudioDevice(gContext->GetSetting("AudioOutputDevice"));
     pipnvp->SetExactSeeks(gContext->GetNumSetting("ExactSeeking"));

@@ -1366,9 +1366,6 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
         nvp = new NuppelVideoPlayer();
         nvp->SetRingBuffer(rbuffer);
         nvp->SetAsPIP();
-        nvp->SetOSDFontName(gContext->GetSetting("OSDFont"),
-                            gContext->GetSetting("OSDCCFont"),
-                            gContext->GetInstallPrefix());
         QString filters = "";
         nvp->SetVideoFilters(filters);
 

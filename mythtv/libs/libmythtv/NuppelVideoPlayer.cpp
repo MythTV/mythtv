@@ -153,8 +153,6 @@ NuppelVideoPlayer::NuppelVideoPlayer(ProgramInfo *info)
     next_normal_speed = true;
     videobuf_retries = 0;
 
-    osdtheme = "none";
-
     disablevideo = disableaudio = false;
 
     setpipplayer = pipplayer = NULL;
@@ -1816,7 +1814,6 @@ void NuppelVideoPlayer::StartPlaying(void)
         int dispx = 0, dispy = 0, dispw = video_width, disph = video_height;
         videoOutput->GetVisibleSize(dispx, dispy, dispw, disph);
         osd = new OSD(video_width, video_height, frame_interval,
-                      osdfontname, osdccfontname, osdprefix, osdtheme,
                       dispx, dispy, dispw, disph);
 
         if (forceVideoOutput != kVideoOutput_Default &&
