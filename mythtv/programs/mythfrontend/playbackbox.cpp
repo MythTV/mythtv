@@ -1307,13 +1307,13 @@ void PlaybackBox::stop(ProgramInfo *rec)
     noUpdate = false;
 }
 
-void PlaybackBox::doRemove(ProgramInfo *rec)
+void PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory)
 {
     if (noUpdate)
         return;
 
     noUpdate = true;
-    RemoteDeleteRecording(rec);
+    RemoteDeleteRecording(rec, forgetHistory);
     noUpdate = false;
 
     if (titleitems == 1)
@@ -1443,6 +1443,14 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, int types)
 
     QString tmpmessage;
     const char *tmpslot;
+
+    if (types == 1 || types == 2)
+    {
+
+        tmpmessage = tr("Yes; allow re-recording"); 
+        tmpslot = SLOT(doDeleteForgetHistory());
+        popup->addButton(tmpmessage, this, tmpslot);
+    }
 
     switch (types)
     {
@@ -1674,7 +1682,22 @@ void PlaybackBox::doDelete(void)
 
     cancelPopup();
 
-    doRemove(delitem);
+    doRemove(delitem, false);
+
+    delete delitem;
+    delitem = NULL;
+
+    timer->start(500);
+}
+
+void PlaybackBox::doDeleteForgetHistory(void)
+{
+    if (!expectingPopup)
+        return;
+
+    cancelPopup();
+
+    doRemove(delitem, true);
 
     delete delitem;
     delitem = NULL;

@@ -247,6 +247,10 @@ void MainServer::ProcessRequest(QSocket *sock)
     {
         HandleDeleteRecording(listline, pbs);
     }
+    else if (command == "FORGET_RECORDING")
+    {
+        HandleForgetRecording(listline, pbs);
+    }
     else if (command == "QUERY_GETALLPENDING")
     {
         HandleGetPendingRecordings(pbs);
@@ -1128,6 +1132,27 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
     }
 
     delete pginfo;
+}
+
+void MainServer::HandleForgetRecording(QStringList &slist, PlaybackSock *pbs)
+{
+    ProgramInfo *pginfo = new ProgramInfo();
+    pginfo->FromStringList(slist, 1);
+
+    QSocket *pbssock = NULL;
+    if (pbs)
+        pbssock = pbs->getSocket();
+
+    pginfo->DeleteHistory(m_db);
+
+    if (pbssock)
+    {
+        QStringList outputlist = QString::number(0);
+        SendResponse(pbssock, outputlist);
+    }
+
+    delete pginfo;
+
 }
 
 void MainServer::getFreeSpace(int &totalspace, int &usedspace)

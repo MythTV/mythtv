@@ -59,6 +59,7 @@ class MainServer : public QObject
     void DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs);
     void HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs);
     void DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs);
+    void HandleForgetRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleQueryFreeSpace(PlaybackSock *pbs);
     void HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs);
     void HandleGetPendingRecordings(PlaybackSock *pbs);

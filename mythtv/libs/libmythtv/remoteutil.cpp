@@ -83,12 +83,21 @@ void RemoteStopRecording(ProgramInfo *pginfo)
     gContext->SendReceiveStringList(strlist);
 }
 
-void RemoteDeleteRecording(ProgramInfo *pginfo)
+void RemoteDeleteRecording(ProgramInfo *pginfo, bool forgetHistory)
 {
-    QStringList strlist = QString("DELETE_RECORDING");
+    QStringList strlist;
+    strlist = QString("DELETE_RECORDING");
     pginfo->ToStringList(strlist);
 
     gContext->SendReceiveStringList(strlist);
+
+    if (forgetHistory)
+    {
+        strlist = QString("FORGET_RECORDING");
+        pginfo->ToStringList(strlist);
+
+        gContext->SendReceiveStringList(strlist);
+    }
 }
 
 bool RemoteGetAllPendingRecordings(vector<ProgramInfo *> &recordinglist)

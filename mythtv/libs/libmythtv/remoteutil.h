@@ -12,7 +12,7 @@ void RemoteGetFreeSpace(int &totalspace, int &usedspace);
 bool RemoteCheckFile(ProgramInfo *pginfo);
 void RemoteQueueTranscode(ProgramInfo *pginfo, int state);
 void RemoteStopRecording(ProgramInfo *pginfo);
-void RemoteDeleteRecording(ProgramInfo *pginfo);
+void RemoteDeleteRecording(ProgramInfo *pginfo, bool forgetHistory);
 bool RemoteGetAllPendingRecordings(vector<ProgramInfo *> &recordinglist);
 void RemoteGetAllScheduledRecordings(vector<ProgramInfo *> &scheduledlist);
 vector<ProgramInfo *> *RemoteGetConflictList(ProgramInfo *pginfo,

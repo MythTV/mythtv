@@ -55,6 +55,7 @@ class PlaybackBox : public MythDialog
 
     void askDelete();
     void doDelete();
+    void doDeleteForgetHistory();
     void noDelete();
 
     void doAutoExpire();
@@ -113,7 +114,7 @@ class PlaybackBox : public MythDialog
     void killPlayer(void);
     void startPlayer(ProgramInfo *rec);
 
-    void doRemove(ProgramInfo *);
+    void doRemove(ProgramInfo *, bool forgetHistory);
     void promptEndOfRecording(ProgramInfo *);
     void showDeletePopup(ProgramInfo *, int);
     void showActionPopup(ProgramInfo *program);

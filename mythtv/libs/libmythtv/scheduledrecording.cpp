@@ -700,11 +700,15 @@ void ScheduledRecording::doneRecording(QSqlDatabase* db,
 
     QSqlQuery result = db->exec(query);
     if (!result.isActive())
+    {
         MythContext::DBError("doneRecording", result);
-
-    // The addition of an entry to oldrecorded may affect near-future
-    // scheduling decisions, so recalculate
-    signalChange(db);
+    }
+    else
+    {
+        // The addition of an entry to oldrecorded may affect near-future
+        // scheduling decisions, so recalculate
+        signalChange(db);
+    }
 }
 
 void ScheduledRecording::forgetHistory(QSqlDatabase* db,
@@ -723,7 +727,15 @@ void ScheduledRecording::forgetHistory(QSqlDatabase* db,
         .arg(sqldescription.utf8());
     QSqlQuery result = db->exec(query);
     if (!result.isActive())
+    {
         MythContext::DBError("forgetHistory", result);
+    }
+    else
+    {
+        // The removal of an entry from oldrecorded may affect near-future
+        // scheduling decisions, so recalculate
+        signalChange(db);
+    }
 }
 
 MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent, 
