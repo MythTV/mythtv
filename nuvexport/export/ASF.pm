@@ -1,11 +1,10 @@
-#!/usr/bin/perl -w
-#Last Updated: 2004.09.27 (xris)
+#Last Updated: 2004.11.22 (xris)
 #
-#  export::WMV
+#  export::ASF
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
 #
 
-package export::WMV;
+package export::ASF;
     use base 'export::ffmpeg';
 
 # Load the myth and nuv utilities, and make sure we're connected to the database
@@ -23,15 +22,15 @@ package export::WMV;
     sub new {
         my $class = shift;
         my $self  = {
-                     'cli'             => qr/\bwmv\b/i,
-                     'name'            => 'Export to WMV',
+                     'cli'             => qr/\basf\b/i,
+                     'name'            => 'Export to ASF',
                      'enabled'         => 1,
                      'errors'          => [],
                     # ffmpeg-related settings
                      'noise_reduction' => 1,
                      'deinterlace'     => 1,
                      'crop'            => 1,
-                    # WMV-specific settings
+                    # ASF-specific settings
                      'a_bitrate'       => 64,
                      'v_bitrate'       => 256,
                      'width'           => 320,
@@ -108,7 +107,7 @@ package export::WMV;
                                . " -s "  . $self->{'width'} . "x" . $self->{'height'}
                                . " -f asf";
     # Execute the parent method
-        $self->SUPER::export($episode, ".wmv");
+        $self->SUPER::export($episode, ".asf");
     }
 
 1;  #return true

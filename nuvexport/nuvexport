@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# Last Updated: 2004.09.26 (xris)
+# Last Updated: 2004.11.22 (xris)
 
 # Autoflush buffers
     $|++;
@@ -42,8 +42,11 @@
         push @Exporters, export::DVCD->new;
     use export::DVD;
         push @Exporters, export::DVD->new;
-    use export::WMV;
-        push @Exporters, export::WMV->new;
+# This is disabled until someone shows me how to get transcode to export divx
+#    use export::DivX;
+#        push @Exporters, export::DivX->new;
+    use export::ASF;
+        push @Exporters, export::ASF->new;
     use export::MP3;
         push @Exporters, export::MP3->new;
     use export::MPEG2_cut;
