@@ -164,8 +164,12 @@ void getSources(void)
              << " --configure\n\n";
         sleep(1);
 
-        QString command = xmltv_grabber + " --configure --config-file " + 
-                          filename;
+        QString command;
+
+        if (xmltv_grabber == "tv_grab_de")
+            command = xmltv_grabber + "--configure";
+        else
+            command = xmltv_grabber + " --configure --config-file " + filename;
 
         cout << "--------------- Start of XMLTV output ---------------" << endl;
 

@@ -80,6 +80,7 @@ class TV
 
     void ToggleInputs(void); 
 
+    void DoPosition(void);
     void DoPause(void);
     void DoFF(void);
     void DoRew(void);

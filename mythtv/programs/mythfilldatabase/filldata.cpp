@@ -645,14 +645,19 @@ void grabData(Source source, QString xmltv_grabber, int offset)
                                                        .arg(source.name);
     QString command;
 
-    if (offset >= 0)
-        command.sprintf("nice -19 %s --days 1 --offset %d --config-file %s "
-                        "--output %s", xmltv_grabber.ascii(),
-                        offset, configfile.ascii(), filename.ascii());
-    else
+    if (xmltv_grabber == "tv_grab_uk")
         command.sprintf("nice -19 %s --days 7 --config-file %s --output %s",
                         xmltv_grabber.ascii(), configfile.ascii(), 
                         filename.ascii());
+    else if (xmltv_grabber == "tv_grab_de")
+        command.sprintf("nice -19 %s --days 7 --output %s",
+                        xmltv_grabber.ascii(),
+                        filename.ascii());
+    else
+        command.sprintf("nice -19 %s --days 1 --offset %d --config-file %s "
+                        "--output %s", xmltv_grabber.ascii(),
+                        offset, configfile.ascii(), filename.ascii());
+
 
     cout << "----------------- Start of XMLTV output -----------------" << endl;
  
@@ -683,9 +688,10 @@ void fillData(QValueList<Source> &sourcelist)
     QValueList<Source>::Iterator it;
     QString xmltv_grabber = globalsettings->GetSetting("XMLTVGrab");
 
-    if (xmltv_grabber == "tv_grab_uk")
+    if (xmltv_grabber == "tv_grab_uk" || xmltv_grabber == "tv_grab_de")
     {
-        // tv_grab_uk doesn't support the --offset option, so just grab a week.
+        // tv_grab_uk|de doesn't support the --offset option, so just grab a 
+        // week.
         for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
              grabData(*it, xmltv_grabber, -1);
     }

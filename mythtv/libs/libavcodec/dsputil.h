@@ -219,8 +219,55 @@ void get_psnr(UINT8 *orig_image[3], UINT8 *coded_image[3],
               int orig_linesize[3], int coded_linesize,
               AVCodecContext *avctx);
 
-#include "mpegvideo.h"
+/* FFT computation */
 
+/* NOTE: soon integer code will be added, so you must use the
+   FFTSample type */
+typedef float FFTSample;
+
+typedef struct FFTComplex {
+    FFTSample re, im;
+} FFTComplex;
+
+typedef struct FFTContext {
+    int nbits;
+    int inverse;
+    uint16_t *revtab;
+    FFTComplex *exptab;
+    FFTComplex *exptab1; /* only used by SSE code */
+    void (*fft_calc)(struct FFTContext *s, FFTComplex *z);
+} FFTContext;
+
+int fft_init(FFTContext *s, int nbits, int inverse);
+void fft_permute(FFTContext *s, FFTComplex *z);
+void fft_calc_c(FFTContext *s, FFTComplex *z);
+void fft_calc_sse(FFTContext *s, FFTComplex *z);
+static inline void fft_calc(FFTContext *s, FFTComplex *z)
+{
+    s->fft_calc(s, z);
+}
+void fft_end(FFTContext *s);
+
+/* MDCT computation */
+
+typedef struct MDCTContext {
+    int n;  /* size of MDCT (i.e. number of input data * 2) */
+    int nbits; /* n = 2^nbits */
+    /* pre/post rotation tables */
+    FFTSample *tcos;
+    FFTSample *tsin;
+    FFTContext fft;
+} MDCTContext;
+
+int mdct_init(MDCTContext *s, int nbits, int inverse);
+void imdct_calc(MDCTContext *s, FFTSample *output, 
+                const FFTSample *input, FFTSample *tmp);
+void mdct_calc(MDCTContext *s, FFTSample *out, 
+               const FFTSample *input, FFTSample *tmp);
+void mdct_end(MDCTContext *s);
+
+#include "mpegvideo.h"
+ 
 void fdct_ifast(MpegEncContext *s, DCTELEM *data);
 void ff_jpeg_fdct_islow (MpegEncContext *s, DCTELEM *data);
 void ff_fdct_mmx(MpegEncContext *s, DCTELEM *block);

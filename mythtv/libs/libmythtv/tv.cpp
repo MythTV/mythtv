@@ -837,7 +837,11 @@ void TV::TeardownPlayer(void)
         pthread_join(decode, NULL);
         delete nvp;
     }
+
     paused = false;
+    doing_ff = false;
+    doing_rew = false;
+
     nvp = NULL;
     osd = NULL;
     
@@ -1133,6 +1137,15 @@ void TV::ProcessKeypress(int keypressed)
             default: break;
         }
     }
+    else if (StateIsPlaying(internalState))
+    {
+        switch (keypressed)
+        {
+            case 'i': case 'I': DoPosition(); break;
+
+            default: break;
+        }
+    }
 }
 
 void TV::TogglePIPView(void)
@@ -1313,6 +1326,16 @@ void TV::DoPause(void)
     }
     else
         osd->EndPause();
+}
+
+void TV::DoPosition(void)
+{
+    if (activenvp != nvp)
+        return;
+
+    QString desc = "";
+    int pos = calcSliderPos(0, desc);
+    osd->StartPause(pos, false, "Position", desc, osd_display_time);
 }
 
 void TV::DoFF(void)
