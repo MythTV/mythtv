@@ -3617,7 +3617,9 @@ void TV::BuildOSDTreeMenu(void)
 
     if (internalState == kState_WatchingLiveTV)
     {
-        int freeRecorders = RemoteGetFreeRecorderCount();
+        bool freeRecorders = (pipnvp != NULL);
+        if (!freeRecorders)
+            freeRecorders = RemoteGetFreeRecorderCount();
 
         item = new OSDGenericTree(treeMenu, tr("Program Guide"), "GUIDE");
 

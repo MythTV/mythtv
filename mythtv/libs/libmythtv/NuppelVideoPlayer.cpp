@@ -910,7 +910,7 @@ void NuppelVideoPlayer::ShowText(void)
     VideoFrame *last = videoOutput->GetLastShownFrame();
 
     // check if subtitles need to be updated on the OSD
-    if (tbuffer_numvalid() && txtbuffers[rtxt].timecode && 
+    if (osd && tbuffer_numvalid() && txtbuffers[rtxt].timecode && 
         (last && txtbuffers[rtxt].timecode <= last->timecode))
     {
         if (txtbuffers[rtxt].type == 'T')
@@ -1118,7 +1118,9 @@ void NuppelVideoPlayer::UpdateCC(unsigned char *inpos)
             }
         }
 
-        osd->UpdateCCText(ccbuf, replace, scroll, scroll_prsv, scroll_yoff, scroll_ymax);
+        if (osd)
+            osd->UpdateCCText(ccbuf, replace, scroll, 
+                              scroll_prsv, scroll_yoff, scroll_ymax);
         delete ccbuf;
     }
 }
@@ -2302,7 +2304,7 @@ void NuppelVideoPlayer::SetBookmark(void)
 {
     if (livetv)
         return;
-    if (!m_db || !m_playbackinfo)
+    if (!m_db || !m_playbackinfo || !osd)
         return;
 
     QMutexLocker lockit(m_db->mutex());
@@ -2315,7 +2317,7 @@ void NuppelVideoPlayer::ClearBookmark(void)
 {
     if (livetv)
         return;
-    if (!m_db || !m_playbackinfo)
+    if (!m_db || !m_playbackinfo || !osd)
         return;
 
     QMutexLocker lockit(m_db->mutex());
@@ -2554,7 +2556,7 @@ bool NuppelVideoPlayer::EnableEdit(void)
 {
     editmode = false;
 
-    if (!hasFullPositionMap || !m_playbackinfo || !m_db)
+    if (!hasFullPositionMap || !m_playbackinfo || !m_db || !osd)
         return false;
 
     bool alreadyediting = false;
@@ -3599,7 +3601,7 @@ int NuppelVideoPlayer::calcSliderPos(QString &desc)
         if (hours > 0)
         {
             text1.sprintf("%d:%02d:%02d", hours, mins, secs);
-            if (osd->getTimeType() == 0)
+            if (osd && osd->getTimeType() == 0)
             {
                 text2.sprintf("%.2f%%", (1000 - ret) / 10);
                 desc = QObject::tr("%1 behind  --  %2 full")
@@ -3613,7 +3615,7 @@ int NuppelVideoPlayer::calcSliderPos(QString &desc)
         else
         {
             text1.sprintf("%d:%02d", mins, secs);
-            if (osd->getTimeType() == 0)
+            if (osd && osd->getTimeType() == 0)
             {
                 text2.sprintf("%.2f%%", (1000 - ret) / 10);
                 desc = QObject::tr("%1 behind  --  %2 full")
@@ -3941,7 +3943,8 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
         QString desc = "";
         int pos = calcSliderPos(desc);
         QString mesg = QObject::tr("Not Flagged");
-        osd->StartPause(pos, false, mesg, desc, 2);
+        if (osd)
+            osd->StartPause(pos, false, mesg, desc, 2);
         return false;
     }
 
@@ -3955,7 +3958,8 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
             QString comm_msg = QString(QObject::tr("Start of program."));
             QString desc;
             int spos = calcSliderPos(desc);
-            osd->StartPause(spos, false, comm_msg, desc, 2);
+            if (osd)
+                osd->StartPause(spos, false, comm_msg, desc, 2);
 
             JumpToFrame(0);
             return true;
@@ -3967,7 +3971,8 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
             QString comm_msg = QString(QObject::tr("At End, can not Skip."));
             QString desc;
             int spos = calcSliderPos(desc);
-            osd->StartPause(spos, false, comm_msg, desc, 2);
+            if (osd)
+                osd->StartPause(spos, false, comm_msg, desc, 2);
             return false;
         }
 
@@ -3988,7 +3993,8 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
                     skipped_seconds = (int)((0 -
                                              framesPlayed) / video_frame_rate);
                     int spos = calcSliderPos(desc);
-                    osd->StartPause(spos, false, comm_msg, desc, 2);
+                    if (osd)
+                        osd->StartPause(spos, false, comm_msg, desc, 2);
 
                     JumpToFrame(0);
                     return true;
@@ -4013,7 +4019,8 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
                                 QString(QObject::tr("At End, can not Skip."));
                     QString desc;
                     int spos = calcSliderPos(desc);
-                    osd->StartPause(spos, false, comm_msg, desc, 2);
+                    if (osd)
+                        osd->StartPause(spos, false, comm_msg, desc, 2);
                     return false;
                 }
             }
