@@ -112,8 +112,8 @@ void ThemedMenu::parseBackground(QString dir, QDomElement &element)
             else if (info.tagName() == "buttonarea")
             {
                 buttonArea = parseRect(getFirstText(info));
-                buttonArea.setX((int)(buttonArea.x() * wmult));
-                buttonArea.setY((int)(buttonArea.y() * hmult));
+                buttonArea.moveTopLeft(QPoint((int)(buttonArea.x() * wmult),
+                                              (int)(buttonArea.y() * hmult)));
                 buttonArea.setWidth((int)(buttonArea.width() * wmult));
                 buttonArea.setHeight((int)(buttonArea.height() * hmult));
                 hasarea = true;
@@ -272,8 +272,8 @@ void ThemedMenu::parseText(QDomElement &element)
             {
                 hasarea = true;
                 textRect = parseRect(getFirstText(info));
-                textRect.setX((int)(textRect.x() * wmult));
-                textRect.setY((int)(textRect.y() * hmult));
+                textRect.moveTopLeft(QPoint((int)(textRect.x() * wmult),
+                                            (int)(textRect.y() * hmult)));
                 textRect.setWidth((int)(textRect.width() * wmult));
                 textRect.setHeight((int)(textRect.height() * hmult));
                 textRect = QRect(textRect.x(), textRect.y(),
