@@ -552,21 +552,6 @@ $ rm ~/.kde/Autostart/Autorun.desktop
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<H2><A NAME="ss20.31">20.31</A> <A HREF="mythtv-HOWTO.html#toc20.31">I'm trying to use an analog capture card with NTSC and MythTV keeps switching to PAL.</A>
-</H2>
-
-<H2><A NAME="ss20.32">20.32</A> <A HREF="mythtv-HOWTO.html#toc20.32">My analog capture card has bad colors, large portions of screen green, etc.</A>
-</H2>
-
-<P>MythTV v0.13 has a bug in it.  There are three ways to fix this
-issue:
-<UL>
-<LI>Run CVS rather than the 0.13 release.</LI>
-<LI>Execute the following in MySQL: UPDATE channel SET tvformat='Default' WHERE tvformat='';</LI>
-<LI>Apply the patch located at 
-<A HREF="http://www.mythtv.org/mc/tvformat.fix.0.13.diff">http://www.mythtv.org/mc/tvformat.fix.0.13.diff</A></LI>
-</UL>
-</P>
 <HR>
 <A HREF="mythtv-HOWTO-21.html">Next</A>
 <A HREF="mythtv-HOWTO-19.html">Previous</A>

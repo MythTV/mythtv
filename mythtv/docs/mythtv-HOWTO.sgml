@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2004-01-30, v0.13.16
+<date>2004-01-31, v0.14.00
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -31,7 +31,7 @@ Searchable archives for the lists are available at <url
 url="http://www.gossamer-threads.com/archive/MythTV_C2/"
 name="http://www.gossamer-threads.com/archive/MythTV_C2/">.
 
-This HOWTO is for MythTV v0.13.
+This HOWTO is for MythTV v0.14.
 
 <sect>Introduction.
 <p>This HOWTO document will focus on manually building MythTV in a North
@@ -232,7 +232,7 @@ encoding. Using either a G200 MJPEG encoder card, or a MPEG-2 encoder card
 supported by the IvyTV project <url url="http://ivtv.sourceforge.net/"
 name="http://ivtv.sourceforge.net/"> such as the Hauppauge PVR-250, PVR-350,
 Avermedia M179, Hauppauge "Freestyle" or Yuan M600 cards will allow you to
-use dedicated hardware encoders rather than your CPU. Release 0.13 of MythTV
+use dedicated hardware encoders rather than your CPU. Release 0.14 of MythTV
 is able to use these MPEG-2 encoders as an input device for live TV and for
 scheduled recordings.  (The PVR-350 can simultaneously be used as an output
 device.) Using the on-board MPEG-2 encoder drastically reduces the CPU
@@ -1117,8 +1117,8 @@ $ su
 <sect1>Manually building MythTV.
 <p>Unpack MythTV
 <tscreen><verb>
-$ tar -xjf mythtv-0.13.tar.bz2
-$ cd mythtv-0.13
+$ tar -xjf mythtv-0.14.tar.bz2
+$ cd mythtv-0.14
 $ ./configure
 </verb></tscreen>
 
@@ -1130,16 +1130,29 @@ $ make
 
 If you want to build MythTV on a multi-CPU machine (or with distcc), you may
 run into issues with the standard build in MythTV. The easiest solution is
-to build the libraries first.  In the following example, we will have 4
+to build the libraries first.  In the following example, we will have two
 concurrent jobs executing.  Do not set the number of jobs too high, or your
 compile will actually take longer to complete than it would if you did a
 "normal" build.
 <tscreen><verb>
 $ qmake mythtv.pro
 $ make qmake
-$ make -C libs -j4
-$ make -j4
+$ make -C libs -j2
+$ make -j2
 </verb></tscreen>
+
+If you are using distcc, and you had two other host machines (red, blue)
+running distcc, you would do something like:
+<tscreen><verb>
+$ export DISTCC_HOSTS='localhost red blue'
+$ qmake mythtv.pro
+$ make qmake
+$ make -C libs -j3 CC=distcc
+$ make -j3 CC=distcc
+</verb></tscreen>
+
+The actual speed-up, if any, is dependant on a number of factors, such as
+number of CPUs / hosts, etc.
 
 Switch to superuser:
 <tscreen><verb>
@@ -1807,7 +1820,7 @@ to control MythTV.  MythTV now includes native support for lirc and can
 interact directly with 
 
 <tscreen><verb>
-$ cd ~/mythtv-0.13/configfiles
+$ cd ~/mythtv-0.14/configfiles
 $ cp lircrc.example ~/.lircrc
 </verb></tscreen> 
 or
@@ -2771,8 +2784,8 @@ Mandrake Control Center.
 <sect1>Completing the installation.
 <p>
 <tscreen><verb>
-$ tar -xjf mythweb-0.13.tar.bz2
-$ cd mythweb-0.13
+$ tar -xjf mythweb-0.14.tar.bz2
+$ cd mythweb-0.14
 $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
@@ -2819,8 +2832,8 @@ would perform the following command:
 Once you have satisfied the prerequisites for your distribution, download
 and install the application:
 <tscreen><verb>
-$ tar -xjf mythgallery-0.13.tar.bz2
-$ cd mythgallery-0.13
+$ tar -xjf mythgallery-0.14.tar.bz2
+$ cd mythgallery-0.14
 $ ./configure --enable-opengl
 $ qmake mythgallery.pro
 $ make
@@ -3790,15 +3803,6 @@ In KDE, you may want to perform the following:
 <tscreen><verb>
 $ rm ~/.kde/Autostart/Autorun.desktop
 </verb></tscreen>
-<sect1>I'm trying to use an analog capture card with NTSC and MythTV keeps switching to PAL.
-<sect1>My analog capture card has bad colors, large portions of screen green, etc.
-<p>MythTV v0.13 has a bug in it.  There are three ways to fix this
-issue:
-<itemize>
-<item>Run CVS rather than the 0.13 release.
-<item>Execute the following in MySQL: UPDATE channel SET tvformat='Default' WHERE tvformat='';
-<item>Apply the patch located at <url url="http://www.mythtv.org/mc/tvformat.fix.0.13.diff" name="http://www.mythtv.org/mc/tvformat.fix.0.13.diff">
-</itemize>
 <sect>Miscellaneous. 
 <sect1>I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.  
 <p>MythTV comes with a utility called <bf>mythtranscode</bf> which can
@@ -3834,13 +3838,13 @@ $ mythtranscode --chanid 1036 --starttime 2003-10-20T15:30:00 --profile \
 autodetect --fifodir . &
 </verb></tscreen>
 
-When <bf>mythtranscode</bf> begins executing, it will create two FIFO
+When <bf>mythtranscode</bf> begins executing, it will create two FIFOs
 ("audout" and "vidout") in the directory specified (in this case ".",
 meaning the current directory) and will print out information about the
 video stream.
 
 The next step is to start the processing application.  The following assumes
-that the stream is NTSC 640x480 with 32kbps audio.
+that the stream is NTSC 640x480 with 32Kbps audio.
 
 To use <bf>mencoder</bf> you would enter a command like:
 <tscreen><verb>
@@ -5121,51 +5125,8 @@ You can check on your filesystem using the <bf>dumpe2fs</bf> program.  See
 the <bf>man</bf> page for details.
 </article>
 <!-- Revision History
-v0.13.00, 2003-12-10.  Initial version for MythTV v0.13.  Rename docs
-version to match.  Add troubleshooting step for the MySQL "skip networking"
-issue.  Add -c to mysqldump to explicitly state insert parameters.  Add
-XMLTV as a Mandrake package.  Add troubleshooting step: "Look at the shell
-for error messages".  Add a warning for Mandrake 8.2: docs are going to get
-dumped unless a maintainer comes forward.  Look out, Redhat 8.0.  You're
-next.
-v0.13.01, 2003-12-13.  Add step for alsa compile for Red Hat. Mike Smith,
-easygreenus at yahoo.com
-v0.13.02, 2003-12-14.  MythTV .debs are now available.
-v0.13.03, 2003-12-17.  Add "jittery" troubleshooting step for PVR users.
-v0.13.04, 2003-12-22.  Fix LVM example.
-v0.13.05, 2003-12-22.  Add more information to the LVM example.  And a
-warning which is sure to be ignored.
-v0.13.06, 2004-01-01.  Remove the hang comment from xmltv setup; there's now
-a status window.  Update Jarod's website info.
-v0.13.07, 2004-01-05.  Fix typo.  Edit URL for i2c stuff.
-v0.13.08, 2004-01-07.  Change ivtv to CVS-LATEST tarball instead of cvs because
-sourceforge sucks.  Update some other stuff in the PVR-250 example section. 
-Update XMLTV version.
-v0.13.09, 2004-01-11.  Get rid of "Contributors" section.  People come and
-go.  Hans Kruse's website for non-US MythTV people is a temporary holder? 
-Change ivtv section again; tmk is now doing releases on sf, so use that.
-v0.13.10, 2004-01-13.  Add instructions on changing hostname.  Add link to DVB
-docs.  Break some hearts in the video capture card section.
-v0.13.11, 2004-01-17.  Fix typo.  Update ivtv version.  Pointer to DVB
-cardlist.  Fix some wording.
-v0.13.12, 2004-01-21.  Add xmltv-grabbers to Mandrake section.  Add tiff-devel
-for mythgallery.  Add 24bpp for NVidia XvMC.  Add section for auto-running
-media players.  Add note on artsd support in CVS.  Remove Mandrake 8.2.
-v0.13.13, 2004-01-21.  Remove incorrect keybindings from MythGallery; point
-at README instead.  Add pointer to PVR-250 compile about new i2c.  Make some
-path changes since the ivtv tarball doesn't have a double-nested ivtv
-directory like CVS used to.
-v0.13.14, 2004-01-24.  Add pointer to main mythtv page for PAL problems with
-release 0.13.  Add a little verbiage to the changing hostname instructions. 
-Explicit instructions on removing msp3400 during the ivtv compile.
-v0.13.15, 2004-01-29.  Add Bruce Markey's filter docs.  Add dedicated
-section on running MythTV on TiVo / ReplayTV.  If anyone wants to add text
-about tivoweb or dvarchive for the ReplayTV to be more accurater, send it.
-v0.13.16, 2004-01-30.  Add blurb that deinterlace playback checkbox is
-linearblend and to uncheck if you don't want it at the head.  Remove
-references to metadata SQL stuff in other modules.  Standardize some
-spellings.  Add Kenneth Aafloy's multi-CPU/distcc build instructions.  Get
-rid of most of the Red Hat 8.0 stuff.
+v0.14.00, 2004-01-31.  Initial version for MythTV v0.14.  Rename docs
+version to match.
 -->
 
 <!--

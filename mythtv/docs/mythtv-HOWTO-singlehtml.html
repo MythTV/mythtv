@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-01-30, v0.13.16
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-01-31, v0.14.00
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -182,8 +182,6 @@ necessary.</EM>
 <LI><A NAME="toc20.28">20.28</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.28">My screen goes black when I try to play something.</A>
 <LI><A NAME="toc20.29">20.29</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.29">Poor performance with NVidia cards and XVMC.</A>
 <LI><A NAME="toc20.30">20.30</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.30">My computer is loading a media player application when I insert a CD or DVD.</A>
-<LI><A NAME="toc20.31">20.31</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.31">I'm trying to use an analog capture card with NTSC and MythTV keeps switching to PAL.</A>
-<LI><A NAME="toc20.32">20.32</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.32">My analog capture card has bad colors, large portions of screen green, etc.</A>
 </UL>
 <P>
 <H2><A NAME="toc21">21.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s21">Miscellaneous. </A></H2>
@@ -232,7 +230,7 @@ at
 <A HREF="http://www.mythtv.org/mailman/listinfo/mythtv-users">http://www.mythtv.org/mailman/listinfo/mythtv-users</A>.</P>
 <P>Searchable archives for the lists are available at 
 <A HREF="http://www.gossamer-threads.com/archive/MythTV_C2/">http://www.gossamer-threads.com/archive/MythTV_C2/</A>.</P>
-<P>This HOWTO is for MythTV v0.13.</P>
+<P>This HOWTO is for MythTV v0.14.</P>
 
 <H2><A NAME="s2">2.</A> <A HREF="#toc2">Introduction.</A></H2>
 
@@ -428,7 +426,7 @@ encoding. Using either a G200 MJPEG encoder card, or a MPEG-2 encoder card
 supported by the IvyTV project 
 <A HREF="http://ivtv.sourceforge.net/">http://ivtv.sourceforge.net/</A> such as the Hauppauge PVR-250, PVR-350,
 Avermedia M179, Hauppauge "Freestyle" or Yuan M600 cards will allow you to
-use dedicated hardware encoders rather than your CPU. Release 0.13 of MythTV
+use dedicated hardware encoders rather than your CPU. Release 0.14 of MythTV
 is able to use these MPEG-2 encoders as an input device for live TV and for
 scheduled recordings.  (The PVR-350 can simultaneously be used as an output
 device.) Using the on-board MPEG-2 encoder drastically reduces the CPU
@@ -1382,8 +1380,8 @@ $ su
 <P>Unpack MythTV
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythtv-0.13.tar.bz2
-$ cd mythtv-0.13
+$ tar -xjf mythtv-0.14.tar.bz2
+$ cd mythtv-0.14
 $ ./configure
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -1398,7 +1396,7 @@ $ make
 </P>
 <P>If you want to build MythTV on a multi-CPU machine (or with distcc), you may
 run into issues with the standard build in MythTV. The easiest solution is
-to build the libraries first.  In the following example, we will have 4
+to build the libraries first.  In the following example, we will have two
 concurrent jobs executing.  Do not set the number of jobs too high, or your
 compile will actually take longer to complete than it would if you did a
 "normal" build.
@@ -1406,11 +1404,25 @@ compile will actually take longer to complete than it would if you did a
 <PRE>
 $ qmake mythtv.pro
 $ make qmake
-$ make -C libs -j4
-$ make -j4
+$ make -C libs -j2
+$ make -j2
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P>If you are using distcc, and you had two other host machines (red, blue)
+running distcc, you would do something like:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ export DISTCC_HOSTS='localhost red blue'
+$ qmake mythtv.pro
+$ make qmake
+$ make -C libs -j3 CC=distcc
+$ make -j3 CC=distcc
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The actual speed-up, if any, is dependant on a number of factors, such as
+number of CPUs / hosts, etc.</P>
 <P>Switch to superuser:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -2181,7 +2193,7 @@ interact directly with </P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythtv-0.13/configfiles
+$ cd ~/mythtv-0.14/configfiles
 $ cp lircrc.example ~/.lircrc
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -3171,8 +3183,8 @@ Mandrake Control Center.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythweb-0.13.tar.bz2
-$ cd mythweb-0.13
+$ tar -xjf mythweb-0.14.tar.bz2
+$ cd mythweb-0.14
 $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
@@ -3225,8 +3237,8 @@ Once you have satisfied the prerequisites for your distribution, download
 and install the application:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythgallery-0.13.tar.bz2
-$ cd mythgallery-0.13
+$ tar -xjf mythgallery-0.14.tar.bz2
+$ cd mythgallery-0.14
 $ ./configure --enable-opengl
 $ qmake mythgallery.pro
 $ make
@@ -4300,21 +4312,6 @@ $ rm ~/.kde/Autostart/Autorun.desktop
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<H2><A NAME="ss20.31">20.31</A> <A HREF="#toc20.31">I'm trying to use an analog capture card with NTSC and MythTV keeps switching to PAL.</A>
-</H2>
-
-<H2><A NAME="ss20.32">20.32</A> <A HREF="#toc20.32">My analog capture card has bad colors, large portions of screen green, etc.</A>
-</H2>
-
-<P>MythTV v0.13 has a bug in it.  There are three ways to fix this
-issue:
-<UL>
-<LI>Run CVS rather than the 0.13 release.</LI>
-<LI>Execute the following in MySQL: UPDATE channel SET tvformat='Default' WHERE tvformat='';</LI>
-<LI>Apply the patch located at 
-<A HREF="http://www.mythtv.org/mc/tvformat.fix.0.13.diff">http://www.mythtv.org/mc/tvformat.fix.0.13.diff</A></LI>
-</UL>
-</P>
 <H2><A NAME="s21">21.</A> <A HREF="#toc21">Miscellaneous. </A></H2>
 
 <H2><A NAME="ss21.1">21.1</A> <A HREF="#toc21.1">I'd like to watch the files without using MythTV / I'd like to convert the files to some other format. </A>
@@ -4354,12 +4351,12 @@ autodetect --fifodir . &amp;
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>When <B>mythtranscode</B> begins executing, it will create two FIFO
+<P>When <B>mythtranscode</B> begins executing, it will create two FIFOs
 ("audout" and "vidout") in the directory specified (in this case ".",
 meaning the current directory) and will print out information about the
 video stream.</P>
 <P>The next step is to start the processing application.  The following assumes
-that the stream is NTSC 640x480 with 32kbps audio.</P>
+that the stream is NTSC 640x480 with 32Kbps audio.</P>
 <P>To use <B>mencoder</B> you would enter a command like:
 <BLOCKQUOTE><CODE>
 <PRE>

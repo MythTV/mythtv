@@ -246,8 +246,8 @@ $ su
 <P>Unpack MythTV
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythtv-0.13.tar.bz2
-$ cd mythtv-0.13
+$ tar -xjf mythtv-0.14.tar.bz2
+$ cd mythtv-0.14
 $ ./configure
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -262,7 +262,7 @@ $ make
 </P>
 <P>If you want to build MythTV on a multi-CPU machine (or with distcc), you may
 run into issues with the standard build in MythTV. The easiest solution is
-to build the libraries first.  In the following example, we will have 4
+to build the libraries first.  In the following example, we will have two
 concurrent jobs executing.  Do not set the number of jobs too high, or your
 compile will actually take longer to complete than it would if you did a
 "normal" build.
@@ -270,11 +270,25 @@ compile will actually take longer to complete than it would if you did a
 <PRE>
 $ qmake mythtv.pro
 $ make qmake
-$ make -C libs -j4
-$ make -j4
+$ make -C libs -j2
+$ make -j2
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P>If you are using distcc, and you had two other host machines (red, blue)
+running distcc, you would do something like:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ export DISTCC_HOSTS='localhost red blue'
+$ qmake mythtv.pro
+$ make qmake
+$ make -C libs -j3 CC=distcc
+$ make -j3 CC=distcc
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The actual speed-up, if any, is dependant on a number of factors, such as
+number of CPUs / hosts, etc.</P>
 <P>Switch to superuser:
 <BLOCKQUOTE><CODE>
 <PRE>
