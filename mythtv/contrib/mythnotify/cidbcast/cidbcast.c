@@ -777,6 +777,7 @@ int main(int argc, char *argv[])
 	{
 	  printf("Sent UDP/XML packet to IP %s port %d\n", bcast_addr, udp_port);
 	}
+	close (fd);
       }
       else
 	{
