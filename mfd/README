@@ -33,10 +33,9 @@ need:
         FAAD2 library
         http://www.audiocoding.com/
 
-    __NB__: As of February 2, 2004, you must the CVS version of libfaad2.
-Version 2.0 release candidate 3 will not work. In addition, you have to
-manually copy mp4ff_int_types.h from faad2/common/mp4ff/ to your
-/usr/local/include/ directory.
+    __NB__: As of March 5, 2004, you can build and install FAAD2 v2.0
+final, but you must manually copy mp4ff_int_types.h from faad2/common/mp4ff/
+to your usr/local/include/ directory.
 
     This is fairly annoying, but not insurmountable.            
 
