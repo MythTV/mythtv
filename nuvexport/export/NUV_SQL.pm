@@ -21,7 +21,7 @@ package export::NUV_SQL;
     sub new {
         my $class = shift;
         my $self  = {
-                     'cli'             => qr/\bnuv[\-_]sql\b/i,
+                     'cli'             => qr/\bnuv[\-_]?sql\b/i,
                      'name'            => 'Export to .nuv and .sql',
                      'enabled'         => 1,
                      'errors'          => [],
