@@ -241,6 +241,11 @@ void GuideGrid::fillChannelInfos()
             m_channelInfos.push_back(val);
         }
     }
+    else
+    {
+        cerr << "You don't have any channels defined in the database\n";
+        cerr << "This isn't going to work.\n";
+    }
 }
 
 void GuideGrid::fillTimeInfos()
@@ -298,9 +303,16 @@ void GuideGrid::fillTimeInfos()
 
 ProgramInfo *GuideGrid::getProgramInfo(unsigned int row, unsigned int col)
 {
-    unsigned int chanNum = row + m_currentStartChannel;
-    if (chanNum >= m_channelInfos.size())
-        chanNum -= m_channelInfos.size();
+    int chanNum = row + m_currentStartChannel;
+
+    if (m_channelInfos.size() == 0)
+        return NULL;
+
+    while (chanNum >= (int)m_channelInfos.size())
+        chanNum -= (int)m_channelInfos.size();
+
+    if (chanNum < 0)
+        chanNum = 0;
 
     if (m_channelInfos[chanNum].chanstr == "" || !m_timeInfos[col])
         return NULL;

@@ -781,7 +781,13 @@ int main(int argc, char *argv[])
             
             sourcelist.append(newsource);
         }   
-    }   
+    }
+    else
+    {
+        cerr << "There are no channel sources defined, did you run the setup "
+             << "program?\n";
+        exit(-1);
+    }
     
     fillData(sourcelist);
 
