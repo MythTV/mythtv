@@ -57,6 +57,7 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel, TV *player,
          : MythDialog(context, parent, name)
 {
     DISPLAY_CHANS = 6;
+    DISPLAY_TIMES = 30;
     int maxchannel = 0;
 
     m_player = player;

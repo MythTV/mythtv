@@ -4,6 +4,9 @@
 #include "libmyth/settings.h"
 #include <qdatetime.h>
 
+#include <list>
+using namespace std;
+
 class ProgramInfo;
 class ScheduledRecording: public ConfigurationGroup, public ConfigurationDialog {
 public:
