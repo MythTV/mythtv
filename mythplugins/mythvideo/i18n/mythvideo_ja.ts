@@ -152,7 +152,7 @@
     </message>
     <message>
         <source>NR</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Unknown Rating</source>
@@ -176,7 +176,7 @@
     </message>
     <message>
         <source>New category</source>
-        <translation type="unfinished"></translation>
+        <translation>新カテゴリー</translation>
     </message>
     <message>
         <source>This PIN is used to control the current Parental Level. If you want to use this feature, then setting the value to all numbers will make your life much easier.</source>
@@ -192,7 +192,7 @@
     </message>
     <message>
         <source>Command to search for movie posters</source>
-        <translation type="unfinished"></translation>
+        <translation>映画ポスターを探すコマンド</translation>
     </message>
     <message>
         <source>Command to extract data for movies</source>
@@ -200,24 +200,25 @@
     </message>
     <message>
         <source>Directory that holds movie posters</source>
-        <translation type="unfinished"></translation>
+        <translation>映画ポスターを保存するディレクトリ</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythVideo needs to have read/write permission to the directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>このディレクトリは必ず存在しなければなりません.そしてMythVideoを実行するユーザーに書き込み権限が必要です.</translation>
     </message>
     <message>
         <source>Video Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオマネージャ</translation>
     </message>
     <message>
         <source>Could not retrieve poster</source>
-        <translation type="unfinished"></translation>
+        <translation>ポスターを検索できませんでした</translation>
     </message>
     <message>
         <source>A movie poster exists for this movie but Myth could not retrieve it within a reasonable amount of time.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>この映画のポスターは存在しますがMythTVは時間内に検索できませんでした。
+</translation>
     </message>
 </context>
 <context>
@@ -248,7 +249,7 @@
     </message>
     <message>
         <source>Plot:</source>
-        <translation>脚本:</translation>
+        <translation>荒筋:</translation>
     </message>
     <message>
         <source>Filename:</source>
@@ -308,7 +309,7 @@
     </message>
     <message>
         <source>Player:</source>
-        <translation>俳優:</translation>
+        <translation>プレイヤー:</translation>
     </message>
     <message>
         <source>MythVideo File Associations</source>
@@ -360,7 +361,7 @@
     </message>
     <message>
         <source>1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>PL </source>
@@ -372,43 +373,43 @@
     </message>
     <message>
         <source>Category:</source>
-        <translation type="unfinished"></translation>
+        <translation>カテゴリー:</translation>
     </message>
     <message>
         <source>Filters video list</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオリスト絞りこみ</translation>
     </message>
     <message>
         <source>Category :</source>
-        <translation type="unfinished"></translation>
+        <translation>カテゴリー:</translation>
     </message>
     <message>
         <source>Genre :</source>
-        <translation type="unfinished"></translation>
+        <translation>ジャンル:</translation>
     </message>
     <message>
         <source>Country :</source>
-        <translation type="unfinished"></translation>
+        <translation>国:</translation>
     </message>
     <message>
         <source>Year :</source>
-        <translation type="unfinished"></translation>
+        <translation>年:</translation>
     </message>
     <message>
         <source>Runtime :</source>
-        <translation type="unfinished"></translation>
+        <translation>所用時間:</translation>
     </message>
     <message>
         <source>User Rating :</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー格付け:</translation>
     </message>
     <message>
         <source>Browse :</source>
-        <translation type="unfinished"></translation>
+        <translation>表示:</translation>
     </message>
     <message>
         <source>Sort by :</source>
-        <translation type="unfinished"></translation>
+        <translation>並び換え:</translation>
     </message>
     <message>
         <source>Aucune video</source>
@@ -416,7 +417,7 @@
     </message>
     <message>
         <source>SELECT: Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>選択: 編集</translation>
     </message>
     <message>
         <source></source>
@@ -424,35 +425,35 @@
     </message>
     <message>
         <source>MENU: Options</source>
-        <translation type="unfinished"></translation>
+        <translation>メニュー: オプション</translation>
     </message>
     <message>
         <source>Up/Down, Page Up/Down - Browse</source>
-        <translation type="unfinished"></translation>
+        <translation>Up/Down, Page Up/Down - 表示</translation>
     </message>
     <message>
         <source>Menu - Options</source>
-        <translation type="unfinished"></translation>
+        <translation>メニュー - オプション</translation>
     </message>
     <message>
         <source>Parental</source>
-        <translation type="unfinished"></translation>
+        <translation>再生制限</translation>
     </message>
     <message>
         <source>Level</source>
-        <translation type="unfinished"></translation>
+        <translation>レベル</translation>
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>年</translation>
     </message>
     <message>
         <source>Runtime</source>
-        <translation type="unfinished"></translation>
+        <translation>所用時間</translation>
     </message>
     <message>
         <source>User Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー格付け</translation>
     </message>
 </context>
 <context>
@@ -479,27 +480,27 @@
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Select action</source>
-        <translation type="unfinished"></translation>
+        <translation>動作選択</translation>
     </message>
     <message>
         <source>Watch This Video</source>
-        <translation type="unfinished"></translation>
+        <translation>このビデオを見る</translation>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation type="unfinished"></translation>
+        <translation>全ての粗筋を表示する</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished"></translation>
+        <translation>表示絞りこみ</translation>
     </message>
     <message>
         <source>Switch to Video Listings</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオリストに切替える</translation>
     </message>
 </context>
 <context>
@@ -510,7 +511,7 @@
     </message>
     <message>
         <source>Manually Enter IMDB #</source>
-        <translation type="unfinished">IMDB番号を入力する</translation>
+        <translation>IMDB番号を入力する</translation>
     </message>
     <message>
         <source>Reset Entry</source>
@@ -518,7 +519,7 @@
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">キャンセル</translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <source>minutes</source>
@@ -546,43 +547,43 @@
     </message>
     <message>
         <source>NR</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>delete failed</source>
-        <translation type="unfinished"></translation>
+        <translation>削除失敗</translation>
     </message>
     <message>
         <source>Select action:</source>
-        <translation type="unfinished"></translation>
+        <translation>動作選択:</translation>
     </message>
     <message>
         <source>Edit Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>メタデータ編集</translation>
     </message>
     <message>
         <source>Search IMDB</source>
-        <translation type="unfinished"></translation>
+        <translation>IMDB検索</translation>
     </message>
     <message>
         <source>Reset Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>メタデータリセット</translation>
     </message>
     <message>
         <source>Toggle Browseable</source>
-        <translation type="unfinished"></translation>
+        <translation>表示切替え</translation>
     </message>
     <message>
         <source>Remove Video</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオ削除</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished"></translation>
+        <translation>表示絞りこみ</translation>
     </message>
     <message>
         <source>Delete this file?</source>
-        <translation type="unfinished"></translation>
+        <translation>このファイルを削除しますか?</translation>
     </message>
 </context>
 <context>
