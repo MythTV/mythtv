@@ -429,7 +429,7 @@
     </message>
     <message>
         <source>Yes, but allow future recordings of this episode</source>
-        <translation type="unfinished"></translation>
+        <translation>はい、しかしこれからのこの番組は録画します</translation>
     </message>
 </context>
 <context>
@@ -586,7 +586,7 @@
     </message>
     <message>
         <source>Any</source>
-        <translation type="unfinished"></translation>
+        <translation>どれか</translation>
     </message>
 </context>
 <context>
@@ -3455,288 +3455,289 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Skip %1</source>
-        <translation type="unfinished"></translation>
+        <translation>スキップ %1</translation>
     </message>
     <message>
         <source>Commercial: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>コマーシャル: %1</translation>
     </message>
     <message>
         <source>Logo Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>ロゴ検知</translation>
     </message>
     <message>
         <source>Unable to create AudioOutput.</source>
-        <translation type="unfinished"></translation>
+        <translation>オーディオ出力を作成できませんでした。</translation>
     </message>
     <message>
         <source>Continue WITHOUT AUDIO!</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;音声出力無し&quot;で続行します!</translation>
     </message>
     <message>
         <source>Return to menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>メニューに戻る。</translation>
     </message>
     <message>
         <source>S</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Earlier Showing</source>
-        <translation type="unfinished"></translation>
+        <translation>前録画</translation>
     </message>
     <message>
         <source>Later Showing</source>
-        <translation type="unfinished"></translation>
+        <translation>後録画</translation>
     </message>
     <message>
         <source>this episode will be recorded at an earlier time instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>この番組は以前の番組の代わりに録画されます。</translation>
     </message>
     <message>
         <source>another program with a higher priority will be recorded instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>他の優先順位の高い番組が代わりに録画されます。</translation>
     </message>
     <message>
         <source>this episode will be recorded at a later time instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>この番組は後に有る番組の代わりに録画されます。</translation>
     </message>
     <message>
         <source>Clear Override</source>
-        <translation type="unfinished"></translation>
+        <translation>クリアオーバーライド</translation>
     </message>
     <message>
         <source>The following programs will be recorded instead:
 </source>
-        <translation type="unfinished"></translation>
+        <translation>以下の番組は代わりに録画されます:
+</translation>
     </message>
     <message>
         <source>30m</source>
-        <translation type="unfinished"></translation>
+        <translation>30分</translation>
     </message>
     <message>
         <source>1h</source>
-        <translation type="unfinished"></translation>
+        <translation>1時間</translation>
     </message>
     <message>
         <source>1h30m</source>
-        <translation type="unfinished"></translation>
+        <translation>1時間30分</translation>
     </message>
     <message>
         <source>2h</source>
-        <translation type="unfinished"></translation>
+        <translation>2時間</translation>
     </message>
     <message>
         <source>Input preference</source>
-        <translation type="unfinished"></translation>
+        <translation>入力優先権</translation>
     </message>
     <message>
         <source>If the input preference is not equal for all inputs, the scheduler may choose to record a show at a later time so that it can record on an input with a higher value.</source>
-        <translation type="unfinished"></translation>
+        <translation>もし入力優先権が全て同じでない時、スケージューラーはより高い入力で録画できるように後の時間の番組を選ぶ事が有ります。</translation>
     </message>
     <message>
         <source>Independent Muting of Left and Right Audio Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>左と右のオーディオ・チャンネルの別々に消音します</translation>
     </message>
     <message>
         <source>Enable muting of just the left or right channel.  Useful if your broadcaster puts the original language on one channel, and a dubbed version of the program on the other one.  This modifies the behavior of the Mute key.</source>
-        <translation type="unfinished"></translation>
+        <translation>左右どちらかの消音を可能にします。二か国語放送の時に便利です。消音キーの動作を変更します。</translation>
     </message>
     <message>
         <source>This determines the method used by MythTV to detect when commercials start and end.  You must have &apos;Automatically Flag Commercials&apos; turned on to use anything other than &apos;Blank Frame&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>これはMythTVがコマーシャルの開始と終了を決定する方法を指定します。&apos;自動CMマーク&apos;を選択した時は&apos;ブランクフレーム&apos;以外を選択しなければなりません。</translation>
     </message>
     <message>
         <source>Display &apos;favorite&apos; channels</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;お気に入り&apos;チャンネルを表示する</translation>
     </message>
     <message>
         <source>If set, the EPG will initally display only the channels marked as favorites. &quot;4&quot; will toggle between favorites and all channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>これをセットすると、EPGの初期画面でお気に入りにマークされたチャンネルのみ表示されます。&quot;4&quot;キーでお気に入りと全チャンネルを切替えます。</translation>
     </message>
     <message>
         <source>Reschedule Higher Priorities</source>
-        <translation type="unfinished"></translation>
+        <translation>高優先順位を再スケジュール</translation>
     </message>
     <message>
         <source>Move higher priority programs to other cards and showings when resolving conflicts.  This can be used to record lower priority programs that would not otherwise be recorded, but risks missing a higher priority program if the schedule changes.</source>
-        <translation type="unfinished"></translation>
+        <translation>衝突解消の時に高優先順位の番組を別のカードに移動します。これはそうでなければ録画されない低優先順位の番組を録画するのに使用する事ができます。しかし、スケジュール変更の時高優先順位の番組が録画されないリスクが有ります。</translation>
     </message>
     <message>
         <source>Use select to change the channel in the program guide</source>
-        <translation type="unfinished"></translation>
+        <translation>選択で変更を番組ガイドで使用する</translation>
     </message>
     <message>
         <source>If checked the select key will change the channel while using the program guide during live TV.  If unchecked the select key will bring up the recording options screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>これを選択するとテレビ視聴時の番組ガイドで選択キーで変更できます。選択しないと録画オプション画面が表示されます。</translation>
     </message>
     <message>
         <source>Visible</source>
-        <translation type="unfinished"></translation>
+        <translation>可視</translation>
     </message>
     <message>
         <source>If set, the channel will be visible in the EPG.</source>
-        <translation type="unfinished"></translation>
+        <translation>セットすると、チャンネルがEPGで表示されます。</translation>
     </message>
     <message>
         <source>DB Logging Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>DBロギング有効</translation>
     </message>
     <message>
         <source>If checked, the Myth modules will send event details to the database, where they can be viewed with MythLog or emailed out periodically.</source>
-        <translation type="unfinished"></translation>
+        <translation>これをセットするとMyth モジュールはイベントログをデータベースに送信できます。MythLogかEメイルで見る事ができます。</translation>
     </message>
     <message>
         <source>Max. Number of Entries per Module</source>
-        <translation type="unfinished"></translation>
+        <translation>モジュール毎の最大数</translation>
     </message>
     <message>
         <source>If there are more than this number of entries for a module, the oldest log entries will be deleted to reduce the count to this number.  Set to 0 to disable.</source>
-        <translation type="unfinished"></translation>
+        <translation>この数字より大きくなると古いログから削除されこの数字まで縮小されます。0にセットすると無効になります。</translation>
     </message>
     <message>
         <source>Automatic Log Cleaning Enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>自動ログクリーニング有効</translation>
     </message>
     <message>
         <source>This enables the periodic cleanup of the events stored in the Myth database (see &apos;DB Logging Enabled&apos; on the previous page).</source>
-        <translation type="unfinished"></translation>
+        <translation>定期的なイベントログのクリーンナップを有効にします。(前ページの&apos;DBロギング有効&apos;参照).</translation>
     </message>
     <message>
         <source>Log Cleanup Frequency (Days)</source>
-        <translation type="unfinished"></translation>
+        <translation>ログクリーンナップ周期(日数)</translation>
     </message>
     <message>
         <source>The number of days between log cleanup runs</source>
-        <translation type="unfinished"></translation>
+        <translation>ログクリーンナップを実行する日数の間隔</translation>
     </message>
     <message>
         <source>Number of days to keep acknowledged log entries</source>
-        <translation type="unfinished"></translation>
+        <translation>認可ログの保存期間</translation>
     </message>
     <message>
         <source>The number of days before a log entry that has been acknowledged will be deleted by the log cleanup process.</source>
-        <translation type="unfinished"></translation>
+        <translation>この日数を経過した認可ログはクリーンナップで削除されます。</translation>
     </message>
     <message>
         <source>Number of days to keep unacknowledged log entries</source>
-        <translation type="unfinished"></translation>
+        <translation>不認可ログエントリーの保存日数</translation>
     </message>
     <message>
         <source>The number of days before a log entry that has NOT been acknowledged will be deleted by the log cleanup process.</source>
-        <translation type="unfinished"></translation>
+        <translation>この日数を経過した不認可ログはクリーンナップで削除されます。</translation>
     </message>
     <message>
         <source>Log Print Threshold</source>
-        <translation type="unfinished"></translation>
+        <translation>ログ出力閾値</translation>
     </message>
     <message>
         <source>All Messages</source>
-        <translation type="unfinished"></translation>
+        <translation>全メッセージ</translation>
     </message>
     <message>
         <source>Debug and Higher</source>
-        <translation type="unfinished"></translation>
+        <translation>Debug以上</translation>
     </message>
     <message>
         <source>Info and Higher</source>
-        <translation type="unfinished"></translation>
+        <translation>Info以上</translation>
     </message>
     <message>
         <source>Notice and Higher</source>
-        <translation type="unfinished"></translation>
+        <translation>Notice以上</translation>
     </message>
     <message>
         <source>Warning and Higher</source>
-        <translation type="unfinished"></translation>
+        <translation>Warning以上</translation>
     </message>
     <message>
         <source>Error and Higher</source>
-        <translation type="unfinished"></translation>
+        <translation>Error以上</translation>
     </message>
     <message>
         <source>Critical and Higher</source>
-        <translation type="unfinished"></translation>
+        <translation>Critical以上</translation>
     </message>
     <message>
         <source>Alert and Higher</source>
-        <translation type="unfinished"></translation>
+        <translation>Alert以上</translation>
     </message>
     <message>
         <source>Emergency Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Emergencyのみ</translation>
     </message>
     <message>
         <source>Disable Printed Output</source>
-        <translation type="unfinished"></translation>
+        <translation>出力無効</translation>
     </message>
     <message>
         <source>This controls what messages will be printed out as well as being logged to the database.</source>
-        <translation type="unfinished"></translation>
+        <translation>ログに出力をコントロールします。</translation>
     </message>
     <message>
         <source>Automatically run mythfilldatabase</source>
-        <translation type="unfinished"></translation>
+        <translation>mythfilldatabase自動実行</translation>
     </message>
     <message>
         <source>This enables the automatic execution of mythfilldatabase.</source>
-        <translation type="unfinished"></translation>
+        <translation>これを有効にするとmythfilldatabaseを自動で実行します。</translation>
     </message>
     <message>
         <source>mythfilldatabase Run Frequency (Days)</source>
-        <translation type="unfinished"></translation>
+        <translation>mythfilldatabase実行周期(日数)</translation>
     </message>
     <message>
         <source>The number of days between mythfilldatabase runs</source>
-        <translation type="unfinished"></translation>
+        <translation>mythfilldatabase実行間隔日数</translation>
     </message>
     <message>
         <source>mythfilldatabase Execution Start</source>
-        <translation type="unfinished"></translation>
+        <translation>mythfilldatabase実行開始</translation>
     </message>
     <message>
         <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  Ex. setting Min to 11 and Max to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
-        <translation type="unfinished"></translation>
+        <translation>この設定はmythfilldatabaseを実行する場合に実行する時間を定義します。例. 最小 11、最大 13は午前11から午後1時の間に実行します。</translation>
     </message>
     <message>
         <source>mythfilldatabase Execution End</source>
-        <translation type="unfinished"></translation>
+        <translation>mythfilldatabase実行終了</translation>
     </message>
     <message>
         <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  Ex. setting Min to 11 and Max to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
-        <translation type="unfinished"></translation>
+        <translation>この設定はmythfilldatabaseを実行する場合に実行する時間を定義します。例. 最小 11、最大 13は午前11から午後1時の間に実行します。</translation>
     </message>
     <message>
         <source>mythfilldatabase Path</source>
-        <translation type="unfinished"></translation>
+        <translation>mythfilldatabaseパス</translation>
     </message>
     <message>
         <source>Path (including executable) of the mythfilldatabase program.</source>
-        <translation type="unfinished"></translation>
+        <translation>mythfilldatabaseプログラムのパス(実行ファイルを含む)。</translation>
     </message>
     <message>
         <source>mythfilldatabase Arguments</source>
-        <translation type="unfinished"></translation>
+        <translation>mythfilldatabase引数</translation>
     </message>
     <message>
         <source>Any arguments you want passed to the mythfilldatabase program.</source>
-        <translation type="unfinished"></translation>
+        <translation>mythfilldatabaseに渡す引数。</translation>
     </message>
     <message>
         <source>mythfilldatabase Log Path</source>
-        <translation type="unfinished"></translation>
+        <translation>mythfilldatabaseログパス</translation>
     </message>
     <message>
         <source>Path to use for logging output from mythfilldatabase program.  Leave blank to disable logging.</source>
-        <translation type="unfinished"></translation>
+        <translation>mythfilldatabaseプログラムが使用するログパス。空白はログを無効にします。</translation>
     </message>
     <message>
         <source>Myth Database Logging</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth データベースロギング</translation>
     </message>
     <message>
         <source>Mythfilldatabase</source>
-        <translation type="unfinished"></translation>
+        <translation>Mythfilldatabase</translation>
     </message>
 </context>
 <context>
@@ -3747,15 +3748,15 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>List upcoming episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>これからの番組一覧</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="unfinished">&amp;キャンセル</translation>
+        <translation>キャンセル(&amp;C)</translation>
     </message>
     <message>
         <source>&amp;Finish</source>
-        <translation type="unfinished">&amp;完了</translation>
+        <translation>完了(&amp;F)</translation>
     </message>
 </context>
 <context>
@@ -4046,51 +4047,51 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Left Channel Muted</source>
-        <translation type="unfinished"></translation>
+        <translation>左チャンネル消音</translation>
     </message>
     <message>
         <source>Right Channel Muted</source>
-        <translation type="unfinished"></translation>
+        <translation>右チャンネル消音</translation>
     </message>
     <message>
         <source>Sleep </source>
-        <translation type="unfinished"></translation>
+        <translation>スリープ </translation>
     </message>
     <message>
         <source>16:9 Stretch</source>
-        <translation type="unfinished"></translation>
+        <translation>16:9 伸張</translation>
     </message>
     <message>
         <source>Program Guide</source>
-        <translation type="unfinished">番組ガイド</translation>
+        <translation>番組ガイド</translation>
     </message>
     <message>
         <source>Picture-in-Picture</source>
-        <translation type="unfinished"></translation>
+        <translation>ピクチャーインピクチャー</translation>
     </message>
     <message>
         <source>Enable/Disable</source>
-        <translation type="unfinished"></translation>
+        <translation>有効/無効</translation>
     </message>
     <message>
         <source>Swap Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル交換</translation>
     </message>
     <message>
         <source>Change Active Window</source>
-        <translation type="unfinished"></translation>
+        <translation>アクティブウィンドウ切替</translation>
     </message>
     <message>
         <source>Enable Browse Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>ブラウズモード有効</translation>
     </message>
     <message>
         <source>Previous Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>以前のチャンネル</translation>
     </message>
     <message>
         <source>Edit Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>録画編集</translation>
     </message>
 </context>
 <context>
