@@ -815,9 +815,9 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
                 long long totframes = index * keyframedist;
                 int length = (int)((totframes * 1.0) / fps);
 
-                //VERBOSE(VB_PLAYBACK, QString("Setting(2) length to: %1,  total frames %2")
-                //                     .arg(length).arg(totframes));
-                VERBOSE(VB_PLAYBACK, QString("Setting(2) length to: %1").arg(length));
+                VERBOSE(VB_PLAYBACK, QString("Setting(2) length to: %1, "
+                                             "total frames %2")
+                                             .arg(length).arg((int)totframes));
                 m_parent->SetFileLength(length, totframes);
             }
         }
