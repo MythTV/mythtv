@@ -85,6 +85,7 @@ bool setupTVs(bool ismaster)
     else
     {
         cerr << "ERROR: no capture cards are defined in the database.\n";
+        cerr << "Perhaps you should read the installation instructions?\n";
         return false;
     }
 
