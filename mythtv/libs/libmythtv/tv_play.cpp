@@ -2692,6 +2692,12 @@ void TV::ToggleRecord(void)
                                                                       chanid,
                                                                       startts);
         program_info->ToggleRecord(m_db);
+
+        QString msg = QString("%1 \"%2\"").arg(tr("Record")).arg(title);
+
+        if (activenvp == nvp)
+            osd->SetSettingsText(msg, 3);
+
         delete program_info;
         return;
     }
@@ -2708,6 +2714,9 @@ void TV::ToggleRecord(void)
 
     osd->ClearAllText("browse_info");
     osd->SetTextByRegexp("browse_info", regexpMap, -1);
+
+    if (activenvp == nvp)
+        osd->SetSettingsText(tr("Record"), 3);
 
     delete program_info;
 }
