@@ -509,7 +509,7 @@
         <value>Conflicting recordings are highlighted in</value>
         <value lang="IT">Le registrazioni in conflitto sono evidenziate in</value>
         <value lang="ES">Las grabaciones en conflicto están resaltadas en</value>
-        <value lang="CA">Les gravacions en conflicte só�n les de color</value>
+        <value lang="CA">Les gravacions en conflicte són les de color</value>
         <value lang="NL">Conflicterende opnames zijn gekleurd in</value>
         <value lang="DE">Überschneidungen sind markiert in</value>
         <value lang="DK">Optagelser med konflikter er markeret med</value>
@@ -531,7 +531,7 @@
         <value>Deactivated recordings are highlighted in</value>
         <value lang="IT">Le registrazioni disattivate sono evidenziate in</value>
         <value lang="ES">Las grabaciones desactivadas se resaltan en</value>
-        <value lang="CA">Les gravacions desactivades só�n de color</value>
+        <value lang="CA">Les gravacions desactivades són de color</value>
         <value lang="NL">Gedesactiveerde opnames zijn gekleurd in</value>
         <value lang="DE">Blockierte Aufnahmen sind markiert in</value>
         <value lang="DK">Deaktiverede optagelser er markeret med</value>
@@ -596,8 +596,8 @@
         <font>info</font>
         <value>Airdate:</value>
         <value lang="IT">Trasmissione del:</value>
-        <value lang="ES">Fecha de emisió�n:</value>
-        <value lang="CA">Data d'emisió�:</value>
+        <value lang="ES">Fecha de emisión:</value>
+        <value lang="CA">Data d'emisió:</value>
         <value lang="NL">Uitzenddatum:</value>
         <value lang="DE">Sendezeit:</value>
         <value lang="DK">Sendt:</value>
@@ -626,8 +626,8 @@
         <font>info</font>
         <value>Description:</value>
         <value lang="IT">Descrizione:</value>
-        <value lang="ES">Descripció�n:</value>
-        <value lang="CA">Descripció�:</value>
+        <value lang="ES">Descripción:</value>
+        <value lang="CA">Descripció:</value>
         <value lang="NL">Beschrijving:</value>
         <value lang="DE">Inhalt:</value>
         <value lang="DK">Beskrivelse:</value>
@@ -646,8 +646,8 @@
          <font>info</font>
          <value>You Haven't Scheduled Any Programs To Be Recorded</value>
          <value lang="IT">Non hai programmato nessuna registrazione</value>
-         <value lang="ES">No tiene programada ninguna grabació�n</value>
-         <value lang="CA">No hi ha prevista cap gravació�</value>
+         <value lang="ES">No tiene programada ninguna grabación</value>
+         <value lang="CA">No hi ha prevista cap gravació</value>
          <value lang="NL">Er zijn geen geplande opnames</value>
          <value lang="DE">Sie haben noch keine Aufnahmen geplant</value>
          <value lang="DK">Du har ikke optaget nogen udsendelser</value>
@@ -661,8 +661,8 @@
          <font>info</font>
          <value>To schedule a recording, exit this screen and</value>
          <value lang="IT">Per programmare una registrazione,</value>
-         <value lang="ES">Para programar una grabació�n salga y</value>
-         <value lang="CA">Per programar una gravació� surti i</value>
+         <value lang="ES">Para programar una grabación salga y</value>
+         <value lang="CA">Per programar una gravació surti i</value>
          <value lang="NL">Om een opname te plannen, verlaat dit scherm en</value>
          <value lang="DE">Um eine Aufnahme zu planen wählen Sie</value>
          <value lang="DK">For at optage en udsendelse, forlad denne skærm og</value>
@@ -799,8 +799,8 @@
          <font>info</font>
          <value>You Haven't Scheduled Any Programs To Be Recorded</value>
          <value lang="IT">Non hai programmato nessuna registrazione</value>
-         <value lang="ES">No tiene programada ninguna grabació�n</value>
-         <value lang="CA">No hi ha prevista cap gravació�</value>
+         <value lang="ES">No tiene programada ninguna grabación</value>
+         <value lang="CA">No hi ha prevista cap gravació</value>
          <value lang="NL">Er zijn geen geplande opnames</value>
          <value lang="DE">Sie haben noch keine Aufnahmen geplant</value>
          <value lang="DK">Du har ikke optaget nogen udsendelser</value>
@@ -814,8 +814,8 @@
          <font>info</font>
          <value>To schedule a recording, exit this screen and</value>
          <value lang="IT">Per programmare una registrazione,</value>
-         <value lang="ES">Para programar una grabació�n salga y</value>
-         <value lang="CA">Per programar una gravació� surti i</value>
+         <value lang="ES">Para programar una grabación salga y</value>
+         <value lang="CA">Per programar una gravació surti i</value>
          <value lang="NL">Om een opname te plannen, verlaat dit scherm en</value>
          <value lang="DE">Um eine Aufnahme zu planen, verlassen Sie dieses Menü und</value>
          <value lang="DK">For at optage en udsendelse, forlad denne skærm og</value>
@@ -1064,8 +1064,8 @@
          <font>info</font>
          <value>You Haven't Scheduled Any Programs To Be Recorded</value>
          <value lang="IT">Non hai programmato nessuna registrazione</value>
-         <value lang="ES">No tiene programada ninguna grabació�n</value>
-         <value lang="CA">No hi ha prevista cap gravació�</value>
+         <value lang="ES">No tiene programada ninguna grabación</value>
+         <value lang="CA">No hi ha prevista cap gravació</value>
          <value lang="NL">Er zijn geen geplande opnames</value>
          <value lang="DE">Sie haben noch keine Aufnahmen geplant</value>
          <value lang="DK">Du har ikke optaget nogen udsendelser</value>
@@ -1079,8 +1079,8 @@
          <font>info</font>
          <value>To schedule a recording, exit this screen and</value>
          <value lang="IT">Per programmare una registrazione,</value>
-         <value lang="ES">Para programar una grabació�n salga y</value>
-         <value lang="CA">Per programar una gravació� surti i</value>
+         <value lang="ES">Para programar una grabación salga y</value>
+         <value lang="CA">Per programar una gravació surti i</value>
          <value lang="NL">Om een opname te plannen, verlaat dit scherm en</value>
          <value lang="DE">Um eine Aufnahme zu planen, verlassen Sie dieses Menü und</value>
          <value lang="DK">For at optage en udsendelse, forlad denne skærm og</value>
@@ -1158,8 +1158,8 @@
         <font>message</font>
         <value>Select a recording to permanently delete:</value>
         <value lang="IT">Seleziona una registrazione da cancellare:</value>
-        <value lang="ES">Seleccione una grabació�n a borrar:</value>
-        <value lang="CA">Esculli una gravació� a esborrar:</value>
+        <value lang="ES">Seleccione una grabación a borrar:</value>
+        <value lang="CA">Esculli una gravació a esborrar:</value>
         <value lang="NL">Kies een opname om te verwijderen:</value>
 	<value lang="DE">Welche Aufnahme soll gelöscht werden:</value>
         <value lang="DK">Vælg en optagelse du vil slette permanent:</value>
@@ -1170,8 +1170,8 @@
         <font>message</font>
         <value>Select a recording to view:</value>
         <value lang="IT">Seleziona una registrazione da vedere:</value>
-        <value lang="ES">Seleccione una grabació�n a ver:</value>
-        <value lang="CA">Esculli la gravació� que vol veure:</value>
+        <value lang="ES">Seleccione una grabación a ver:</value>
+        <value lang="CA">Esculli la gravació que vol veure:</value>
         <value lang="NL">Kies een opname om te bekijken:</value>
         <value lang="DE">Welche Aufnahme möchten Sie sehen:</value>
         <value lang="DK">Vælg den optagelse du ønsker at se:</value>
@@ -1241,8 +1241,8 @@
         <font>info</font>
         <value>Airdate:</value>
         <value lang="IT">Trasmissione del:</value>
-        <value lang="ES">Fecha de emisió�n:</value>
-        <value lang="CA">Data d'emisió�:</value>
+        <value lang="ES">Fecha de emisión:</value>
+        <value lang="CA">Data d'emisió:</value>
         <value lang="NL">Uitzenddatum:</value>
         <value lang="DE">Sendezeit:</value>
         <value lang="DK">Sendt:</value>
@@ -1271,8 +1271,8 @@
         <font>info</font>
         <value>Description:</value>
         <value lang="IT">Descrizione:</value>
-        <value lang="ES">Descripció�n:</value>
-        <value lang="CA">Descripció�:</value>
+        <value lang="ES">Descripción:</value>
+        <value lang="CA">Descripció:</value>
         <value lang="NL">Beschrijving:</value>
         <value lang="DE">Inhalt:</value>
         <value lang="DK">Beskrivelse:</value>
@@ -1324,8 +1324,8 @@ END sample status images -->
         <font>info</font>
         <value>Airdate:</value>
         <value lang="IT">Trasmissione del:</value>
-        <value lang="ES">Fecha de emisió�n:</value>
-        <value lang="CA">Data d'emisió�:</value>
+        <value lang="ES">Fecha de emisión:</value>
+        <value lang="CA">Data d'emisió:</value>
         <value lang="NL">Uitzenddatum:</value>
         <value lang="DE">Sendezeit:</value>
         <value lang="DK">Sendt:</value>
@@ -1354,8 +1354,8 @@ END sample status images -->
         <font>info</font>
         <value>Description:</value>
         <value lang="IT">Descrizione:</value>
-        <value lang="ES">Descripció�n:</value>
-        <value lang="CA">Descripció�:</value>
+        <value lang="ES">Descripción:</value>
+        <value lang="CA">Descripció:</value>
         <value lang="NL">Beschrijving:</value>
         <value lang="DE">Inhalt:</value>
         <value lang="DK">Beskrivelse:</value>
@@ -1396,8 +1396,8 @@ END sample status images -->
          <font>info</font>
          <value>Sorry, No Recordings Available</value>
          <value lang="IT">Spiacente, nessuna registrazione disponibile</value>
-         <value lang="ES">Lo siento, no hay ninguna grabació�n disponible</value>
-         <value lang="CA">Ho sento, no hi ha cap gravació� disponible</value>
+         <value lang="ES">Lo siento, no hay ninguna grabación disponible</value>
+         <value lang="CA">Ho sento, no hi ha cap gravació disponible</value>
          <value lang="NL">Sorry, geen opnames aanwezig</value>
          <value lang="DE">Keine Aufnahmen verfügbar</value>
          <value lang="DK">Beklager, ingen optagelser fundet</value>
@@ -1410,8 +1410,8 @@ END sample status images -->
          <font>info</font>
          <value>To schedule a recording, exit this screen and</value>
          <value lang="IT">Per programmare una registrazione,</value>
-         <value lang="ES">Para programar una grabació�n, salga y</value>
-         <value lang="CA">Per a programar una gravació�, surti i</value>
+         <value lang="ES">Para programar una grabación, salga y</value>
+         <value lang="CA">Per a programar una gravació, surti i</value>
          <value lang="NL">Om een opname te plannen, verlaat dit scherm en</value>
          <value lang="DE">Um eine Aufnahme zu planen wählen Sie</value>
          <value lang="DK">For at optage en udsendelse, forlad denne skærm og</value>
@@ -1629,7 +1629,7 @@ END sample status images -->
         <font>info</font>
         <value>No Programs</value>
         <value lang="IT">Nessun programma</value>
-        <value lang="ES">Ningú�n progrma</value>
+        <value lang="ES">Ningún progrma</value>
         <value lang="CA">Cap programa</value>
         <value lang="NL">Geen programma's</value>
         <value lang="DE">Keine Sendungen</value>
