@@ -213,7 +213,8 @@ static int mpegts_push_data(AVFormatContext *s, MpegTSStream *tss,
             if (len > tss->payload_size)
                 len = tss->payload_size;
             if (len > 0) {
-                if (tss->st && av_new_packet(pkt, buf_size) == 0) {
+                // XXX
+                if (tss->st && av_new_packet(pkt, buf_size, 0) == 0) {
                     memcpy(pkt->data, p, buf_size);
                     pkt->stream_index = tss->st->index;
                     return 1;

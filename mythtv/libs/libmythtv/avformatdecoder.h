@@ -2,6 +2,7 @@
 #define AVFORMATDECODER_H_
 
 #include <qstring.h>
+#include <qmap.h>
 
 #include "decoderbase.h"
 
@@ -29,7 +30,7 @@ class AvFormatDecoder : public DecoderBase
     char *GetScreenGrab(int secondsin);
 
     bool isLastFrameKey(void) { return false; }
-    void WriteStoredData(RingBuffer *rb) { }
+    void WriteStoredData(RingBuffer *rb) { (void)rb; }
     void SetRawFrameState(bool state) { (void)state; }
     bool GetRawFrameState(void) { return false; }
 
@@ -63,6 +64,7 @@ class AvFormatDecoder : public DecoderBase
     bool directrendering;
     bool drawband;
     long long framesPlayed;
+    long long framesRead;
 
     int audio_sample_size;
     int audio_sampling_rate;
@@ -71,6 +73,16 @@ class AvFormatDecoder : public DecoderBase
     long long lastvpts;
 
     bool hasbframes;
+
+    bool haspositionmap;
+    QMap<long long, long long> positionMap;
+
+    long long lastvideostart;
+    long long lastKey;
+
+    int keyframedist;
+
+    bool exitafterdecoded;
 };
 
 #endif

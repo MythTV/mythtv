@@ -34,7 +34,7 @@ Channel::Channel(TVRec *parent, const QString &videodevice)
     usingv4l2 = false;
     videomode = VIDEO_MODE_NTSC;
     capchannels = 0;
-    currentcapchannel = 0;
+    currentcapchannel = -1;
     
     channelorder = "channum + 0";
 }

@@ -15,8 +15,8 @@ extern "C" {
 
 #define LIBAVCODEC_VERSION_INT 0x000406
 #define LIBAVCODEC_VERSION     "0.4.6"
-#define LIBAVCODEC_BUILD       4664
-#define LIBAVCODEC_BUILD_STR   "4664"
+#define LIBAVCODEC_BUILD       4666
+#define LIBAVCODEC_BUILD_STR   "4666"
 
 #define LIBAVCODEC_IDENT	"FFmpeg" LIBAVCODEC_VERSION "b" LIBAVCODEC_BUILD_STR
 
@@ -93,6 +93,9 @@ enum PixelFormat {
     PIX_FMT_MONOWHITE, ///< 0 is white 
     PIX_FMT_MONOBLACK, ///< 0 is black 
     PIX_FMT_PAL8,      ///< 8 bit with RGBA palette 
+    PIX_FMT_YUVJ420P,  ///< YUV full scale (jpeg)
+    PIX_FMT_YUVJ422P,  ///< YUV full scale (jpeg)
+    PIX_FMT_YUVJ444P,  ///< YUV full scale (jpeg)
     PIX_FMT_NB,
 };
 
@@ -1077,7 +1080,26 @@ typedef struct AVCodecContext {
      * - decoding: unused
      */
     int inter_quant_bias;
+
+    /**
+     * color table ID.
+     * - encoding: unused.
+     * - decoding: which clrtable should be used for 8bit RGB images
+     *             table have to be stored somewhere FIXME
+     */
+    int color_table_id;
     
+    /**
+     * internal_buffer count. 
+     * Dont touch, used by lavc default_get_buffer()
+     */
+    int internal_buffer_count;
+    
+    /**
+     * internal_buffers. 
+     * Dont touch, used by lavc default_get_buffer()
+     */
+    void *internal_buffer;
 } AVCodecContext;
 
 
@@ -1130,7 +1152,7 @@ int avoption_parse(void* strct, const AVOption* list, const char* opts);
  */
 typedef struct AVCodec {
     const char *name;
-    int type;
+    enum CodecType type;
     int id;
     int priv_data_size;
     int (*init)(AVCodecContext *);
@@ -1261,6 +1283,22 @@ int avpicture_get_size(int pix_fmt, int width, int height);
 void avcodec_get_chroma_sub_sample(int pix_fmt, int *h_shift, int *v_shift);
 const char *avcodec_get_pix_fmt_name(int pix_fmt);
 
+#define FF_LOSS_RESOLUTION  0x0001 /* loss due to resolution change */
+#define FF_LOSS_DEPTH       0x0002 /* loss due to color depth change */
+#define FF_LOSS_COLORSPACE  0x0004 /* loss due to color space conversion */
+#define FF_LOSS_ALPHA       0x0008 /* loss of alpha bits */
+#define FF_LOSS_COLORQUANT  0x0010 /* loss due to color quantization */
+#define FF_LOSS_CHROMA      0x0020 /* loss of chroma (e.g. rgb to gray conversion) */
+
+int avcodec_get_pix_fmt_loss(int dst_pix_fmt, int src_pix_fmt,
+                             int has_alpha);
+int avcodec_find_best_pix_fmt(int pix_fmt_mask, int src_pix_fmt,
+                              int has_alpha, int *loss_ptr);
+
+#define FF_ALPHA_TRANSP       0x0001 /* image has some totally transparent pixels */
+#define FF_ALPHA_SEMI_TRANSP  0x0002 /* image has some transparent pixels */
+int img_get_alpha_info(AVPicture *src, int pix_fmt, int width, int height);
+
 /* convert among pixel formats */
 int img_convert(AVPicture *dst, int dst_pix_fmt,
                 AVPicture *src, int pix_fmt, 
@@ -1293,6 +1331,7 @@ AVFrame *avcodec_alloc_frame(void);
 
 int avcodec_default_get_buffer(AVCodecContext *s, AVFrame *pic);
 void avcodec_default_release_buffer(AVCodecContext *s, AVFrame *pic);
+void avcodec_default_free_buffers(AVCodecContext *s);
 
 int avcodec_open(AVCodecContext *avctx, AVCodec *codec);
 int avcodec_decode_audio(AVCodecContext *avctx, int16_t *samples, 

@@ -7,7 +7,7 @@ extern "C" {
 
 #define LIBAVFORMAT_VERSION_INT 0x000406  
 #define LIBAVFORMAT_VERSION     "0.4.6"
-#define LIBAVFORMAT_BUILD       4603
+#define LIBAVFORMAT_BUILD       4605
 
 #define CONFIG_RISKY 1
 
@@ -26,6 +26,7 @@ typedef struct AVPacket {
     int   stream_index;
     int   flags;
     int   duration;
+    int64_t startpos;
     void  (*destruct)(struct AVPacket *);
     void  *priv;
 } AVPacket; 
@@ -36,9 +37,10 @@ static inline void av_init_packet(AVPacket *pkt)
     pkt->pts   = AV_NOPTS_VALUE;
     pkt->flags = 0;
     pkt->stream_index = 0;
+    pkt->startpos = 0;
 }
 
-int av_new_packet(AVPacket *pkt, int size);
+int av_new_packet(AVPacket *pkt, int size, int64_t startpos);
 
 /**
  * Free a packet
@@ -213,6 +215,63 @@ typedef struct AVPacketList {
 extern AVInputFormat *first_iformat;
 extern AVOutputFormat *first_oformat;
 
+/* still image support */
+struct AVInputImageContext;
+typedef struct AVInputImageContext AVInputImageContext;
+
+typedef struct AVImageInfo {
+    enum PixelFormat pix_fmt; /* requested pixel format */
+    int width; /* requested width */
+    int height; /* requested height */
+    int interleaved; /* image is interleaved (e.g. interleaved GIF) */
+    AVPicture pict; /* returned allocated image */
+} AVImageInfo;
+
+/* AVImageFormat.flags field constants */
+#define AVIMAGE_INTERLEAVED 0x0001 /* image format support interleaved output */
+
+typedef struct AVImageFormat {
+    const char *name;
+    const char *extensions;
+    /* tell if a given file has a chance of being parsing by this format */
+    int (*img_probe)(AVProbeData *);
+    /* read a whole image. 'alloc_cb' is called when the image size is
+       known so that the caller can allocate the image. If 'allo_cb'
+       returns non zero, then the parsing is aborted. Return '0' if
+       OK. */
+    int (*img_read)(ByteIOContext *, 
+                    int (*alloc_cb)(void *, AVImageInfo *info), void *);
+    /* write the image */
+    int supported_pixel_formats; /* mask of supported formats for output */
+    int (*img_write)(ByteIOContext *, AVImageInfo *);
+    int flags;
+    struct AVImageFormat *next;
+} AVImageFormat;
+
+void av_register_image_format(AVImageFormat *img_fmt);
+AVImageFormat *av_probe_image_format(AVProbeData *pd);
+AVImageFormat *guess_image_format(const char *filename);
+int av_read_image(ByteIOContext *pb, const char *filename,
+                  AVImageFormat *fmt,
+                  int (*alloc_cb)(void *, AVImageInfo *info), void *opaque);
+int av_write_image(ByteIOContext *pb, AVImageFormat *fmt, AVImageInfo *img);
+
+extern AVImageFormat *first_image_format;
+
+extern AVImageFormat pnm_image_format;
+extern AVImageFormat pbm_image_format;
+extern AVImageFormat pgm_image_format;
+extern AVImageFormat ppm_image_format;
+extern AVImageFormat pam_image_format;
+extern AVImageFormat pgmyuv_image_format;
+extern AVImageFormat yuv_image_format;
+#ifdef CONFIG_ZLIB
+extern AVImageFormat png_image_format;
+#endif
+extern AVImageFormat jpeg_image_format;
+extern AVImageFormat gif_image_format;
+
+/* XXX: use automatic init with either ELF sections or C file parser */
 /* modules */
 
 /* mpeg.c */
@@ -225,6 +284,12 @@ int mpegts_init(void);
 /* rm.c */
 int rm_init(void);
 
+/* crc.c */
+int crc_init(void);
+
+/* img.c */
+int img_init(void);
+
 /* asf.c */
 int asf_init(void);
 
@@ -234,11 +299,42 @@ int avienc_init(void);
 /* avidec.c */
 int avidec_init(void);
 
+/* swf.c */
+int swf_init(void);
+
 /* mov.c */
 int mov_init(void);
 
+/* jpeg.c */
+int jpeg_init(void);
+
+/* gif.c */
+int gif_init(void);
+
+/* au.c */
+int au_init(void);
+
+/* wav.c */
+int wav_init(void);
+
+/* raw.c */
+int raw_init(void);
+
+/* ogg.c */
+int ogg_init(void);
+
 /* dv.c */
 int dv_init(void);
+
+/* ffm.c */
+int ffm_init(void);
+
+/* rtsp.c */
+extern AVInputFormat redir_demux;
+int redir_open(AVFormatContext **ic_ptr, ByteIOContext *f);
+
+/* yuv4mpeg.c */
+extern AVOutputFormat yuv4mpegpipe_oformat;
 
 /* utils.c */
 void av_register_input_format(AVInputFormat *format);
@@ -297,9 +393,12 @@ void dump_format(AVFormatContext *ic,
                  const char *url,
                  int is_output);
 int parse_image_size(int *width_ptr, int *height_ptr, const char *str);
+int64_t parse_date(const char *datestr, int duration);
 
 int64_t av_gettime(void);
 
+/* ffm specific for ffserver */
+#define FFM_PACKET_SIZE 4096
 offset_t ffm_read_write_index(int fd);
 void ffm_write_write_index(int fd, offset_t pos);
 void ffm_set_write_index(AVFormatContext *s, offset_t pos, offset_t file_size);
@@ -309,6 +408,13 @@ int find_info_tag(char *arg, int arg_size, const char *tag1, const char *info);
 int get_frame_filename(char *buf, int buf_size,
                        const char *path, int number);
 int filename_number_test(const char *filename);
+
+/* grab specific */
+int video_grab_init(void);
+int audio_init(void);
+
+/* DV1394 */
+int dv1394_init(void);
 
 #ifdef HAVE_AV_CONFIG_H
 int strstart(const char *str, const char *val, const char **ptr);

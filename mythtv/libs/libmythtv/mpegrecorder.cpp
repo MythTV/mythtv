@@ -172,7 +172,7 @@ void MpegRecorder::StartRecording(void)
         }
         else if (ret > 0)
             ringBuffer->Write(buffer, ret);
-
+  
         gettimeofday(&now, NULL);
     }
 

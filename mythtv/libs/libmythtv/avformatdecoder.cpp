@@ -15,11 +15,19 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent)
     pkt = NULL;
     lastapts = lastvpts = 0;
     framesPlayed = 0;
+    framesRead = 0;
 
     audio_sample_size = 4;
     audio_sampling_rate = 48000;
 
     hasbframes = false;
+
+    haspositionmap = false;
+    lastvideostart = -1;
+
+    keyframedist = 30;
+
+    exitafterdecoded = false;
 }
 
 AvFormatDecoder::~AvFormatDecoder()
@@ -44,7 +52,7 @@ void AvFormatDecoder::Reset(void)
         av_free(pktl);
     }
 
-    ic->pb.pos = 0;
+    ic->pb.pos = ringBuffer->GetTotalReadPosition();
     ic->pb.buf_ptr = ic->pb.buffer;
     ic->pb.buf_end = ic->pb.buffer;
 
@@ -53,6 +61,8 @@ void AvFormatDecoder::Reset(void)
         AVCodecContext *enc = &ic->streams[i]->codec;
         avcodec_flush_buffers(enc);
     }
+
+    lastvideostart = -1;
 }
 
 bool AvFormatDecoder::CanHandle(char testbuf[2048], const QString &filename)
@@ -162,6 +172,7 @@ void AvFormatDecoder::InitByteContext(void)
 int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                               char testbuf[2048])
 {
+    (void)novideo;
     ringBuffer = rbuffer;
 
     AVInputFormat *fmt = NULL;
@@ -218,8 +229,9 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 bitrate += enc->bit_rate;
 
                 double fps = (double)enc->frame_rate / enc->frame_rate_base;
-                m_parent->SetVideoParams(enc->width, enc->height, fps, 30);
-              
+                m_parent->SetVideoParams(enc->width, enc->height, fps, 
+                                         keyframedist);
+             
                 enc->error_resilience = 2;
                 enc->workaround_bugs = FF_BUG_AUTODETECT;
                 enc->error_concealment = 3;
@@ -315,7 +327,14 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
 void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
 {
     (void)c;
-    //assert(pic->type == FF_BUFFER_TYPE_USER);
+
+    if (pic->type == FF_BUFFER_TYPE_INTERNAL)
+    {
+        avcodec_default_release_buffer(c, pic);
+        return;
+    }
+
+    assert(pic->type == FF_BUFFER_TYPE_USER);
 
     int i;
     for (i = 0; i < 4; i++)
@@ -402,6 +421,9 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                 }
                 case CODEC_TYPE_VIDEO:
                 {
+                    if (lastvideostart < 0)
+                        lastvideostart = pkt.startpos;
+
                     AVCodecContext *context = &(curstream->codec);
                     AVFrame mpa_pic;
 
@@ -418,6 +440,22 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     {
                         cerr << "decoding error\n";
                         exit(0);
+                    }
+
+                    if (ret == 0)
+                    {
+                        if (framesRead % keyframedist == 0)
+                        {
+                            long long keyframenum = framesRead;
+                            lastKey = keyframenum;
+                            if (!haspositionmap)
+                                positionMap[lastKey / keyframedist] = lastvideostart;
+                        }
+                        framesRead++;
+                        lastvideostart = pkt.startpos;
+
+                        if (exitafterdecoded)
+                            gotvideo = 1;
                     }
 
                     if (!gotpicture)
@@ -480,12 +518,179 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
 
 bool AvFormatDecoder::DoRewind(long long desiredFrame)
 {
-    return false;
+    lastKey = (framesPlayed / keyframedist) * keyframedist;
+    long long storelastKey = lastKey;
+    while (lastKey > desiredFrame)
+    {
+        lastKey -= keyframedist;
+    }
+
+    if (lastKey < 1)
+        lastKey = 1;
+
+    int normalframes = desiredFrame - lastKey;
+    long long keyPos = positionMap[lastKey / keyframedist];
+    long long curPosition = ringBuffer->GetTotalReadPosition();
+    long long diff = keyPos - curPosition;
+
+    while (ringBuffer->GetFreeSpaceWithReadChange(diff) < 0)
+    {
+        lastKey += keyframedist;
+        keyPos = positionMap[lastKey / keyframedist];
+        if (keyPos == 0)
+            continue;
+        diff = keyPos - curPosition;
+        normalframes = 0;
+        if (lastKey > storelastKey)
+        {
+            lastKey = storelastKey;
+            diff = 0;
+            normalframes = 0;
+            return false;
+        }
+    }
+
+    if (keyPos == 0)
+    {
+        cout << "unknown position: " << lastKey << endl;
+        return false;
+    }
+
+    ringBuffer->Seek(diff, SEEK_CUR);
+
+    framesPlayed = lastKey - 1;
+    framesRead = lastKey;
+
+    normalframes = desiredFrame - framesPlayed;
+
+    if (!exactseeks)
+        normalframes = 0;
+
+    Reset();
+
+    while (normalframes > 0)
+    {
+        GetFrame(0);
+        normalframes--;
+    }
+
+    m_parent->SetFramesPlayed(framesPlayed);
+    return true;
 }
 
 bool AvFormatDecoder::DoFastForward(long long desiredFrame)
 {
-    return false;
+    lastKey = (framesPlayed / keyframedist) * keyframedist;
+    long long number = desiredFrame - framesPlayed;
+    long long desiredKey = lastKey;
+
+    while (desiredKey <= desiredFrame)
+    {
+        desiredKey += keyframedist;
+    }
+    desiredKey -= keyframedist;
+   
+    int normalframes = desiredFrame - desiredKey;
+
+    if (desiredKey == lastKey)
+        normalframes = number;
+
+    long long keyPos = -1;
+
+    if (desiredKey != lastKey)
+    {
+        if (positionMap.find(desiredKey / keyframedist) != positionMap.end())
+        {
+            keyPos = positionMap[desiredKey / keyframedist];
+        }
+#if 0
+        else if (livetv || (watchingrecording && nvr_enc &&
+                            nvr_enc->IsValidRecorder()))
+        {
+            for (int i = lastKey / keyframedist; i <= desiredKey / keyframedist;
+                 i++)
+            {
+                if (positionMap.find(i) == positionMap.end())
+                    positionMap[i] = nvr_enc->GetKeyframePosition(i);
+            }
+            keyPos = positionMap[desiredKey / keyframedist];
+        }
+#endif
+    }
+
+    bool needflush = false;
+
+    if (keyPos != -1)
+    {
+        lastKey = desiredKey;
+        long long diff = keyPos - ringBuffer->GetTotalReadPosition();
+
+        ringBuffer->Seek(diff, SEEK_CUR);
+        needflush = true;
+    }
+    else
+    {
+        AVCodecContext *videoenc = NULL;
+
+        for (int i = 0; i < ic->nb_streams; i++)
+        {
+            AVCodecContext *enc = &ic->streams[i]->codec;
+            if (enc->codec_type == CODEC_TYPE_VIDEO)
+            {
+                videoenc = enc;
+                break;
+            }
+        }            
+
+        if (!videoenc)
+        {
+            cerr << "Couldn't find video decoder\n";
+            return false;
+        }
+ 
+        videoenc->hurry_up = 5;
+
+        while (framesRead < desiredKey + 1)
+        {
+            needflush = true;
+
+            exitafterdecoded = true;
+            GetFrame(1);
+            exitafterdecoded = false;
+        }
+
+        videoenc->hurry_up = 0;
+
+        if (needflush)
+        {
+            lastKey = desiredKey;
+            keyPos = positionMap[desiredKey / keyframedist];
+            long long diff = keyPos - ringBuffer->GetTotalReadPosition();
+
+            ringBuffer->Seek(diff, SEEK_CUR);
+            framesPlayed = lastKey - 1;
+        }
+    }
+
+    framesPlayed = lastKey - 1;
+    framesRead = lastKey;
+
+    normalframes = desiredFrame - framesPlayed;
+
+    if (!exactseeks)
+        normalframes = 0;
+
+    if (needflush)
+        Reset();
+
+    while (normalframes > 0)
+    {
+        GetFrame(0);
+        normalframes--;
+    }
+
+    m_parent->SetFramesPlayed(framesPlayed);
+    return true;
 }
 
 char *AvFormatDecoder::GetScreenGrab(int secondsin)

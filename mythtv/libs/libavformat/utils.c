@@ -154,7 +154,7 @@ static void av_destruct_packet(AVPacket *pkt)
  * @param size wanted payload size
  * @return 0 if OK. AVERROR_xxx otherwise.
  */
-int av_new_packet(AVPacket *pkt, int size)
+int av_new_packet(AVPacket *pkt, int size, int64_t startpos)
 {
     void *data = av_malloc(size + FF_INPUT_BUFFER_PADDING_SIZE);
     if (!data)
@@ -164,6 +164,7 @@ int av_new_packet(AVPacket *pkt, int size)
     av_init_packet(pkt);
     pkt->data = data; 
     pkt->size = size;
+    pkt->startpos = startpos;
     pkt->destruct = av_destruct_packet;
     return 0;
 }

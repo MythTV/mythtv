@@ -896,19 +896,11 @@ double ff_eval(char *s, double *const_value, const char **const_name,
                double (**func2)(void *, double, double), char **func2_name,
                void *opaque);
 
-/* compressed picture size */
-#define PICTURE_BUFFER_SIZE 100000
 
 typedef struct Mpeg1Context {
     MpegEncContext mpeg_enc_ctx;
-    uint32_t header_state;
-    int start_code; /* current start code */
-    uint8_t buffer[PICTURE_BUFFER_SIZE];
-    uint8_t *buf_ptr;
-    int buffer_size;
     int mpeg_enc_ctx_allocated; /* true if decoding context allocated */
     int repeat_field; /* true if we must repeat the field */
 } Mpeg1Context;
-
 
 #endif /* AVCODEC_MPEGVIDEO_H */

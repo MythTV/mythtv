@@ -888,7 +888,7 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
 		st->codec.height = get_le32(pb);
                 /* not available for asf */
                 get_le16(pb); /* panes */
-                get_le16(pb); /* depth */
+		st->codec.bits_per_sample = get_le16(pb); /* depth */
                 tag1 = get_le32(pb);
 		url_fskip(pb, 20);
 		if (size > 40) {
@@ -1153,8 +1153,8 @@ static int asf_read_packet(AVFormatContext *s, AVPacket *pkt)
 	    //printf("COMPRESS size  %d  %d  %d   ms:%d\n", asf->packet_obj_size, asf->packet_frag_timestamp, asf->packet_size_left, asf->packet_multi_size);
 	}
 	if (asf_st->frag_offset == 0) {
-	    /* new packet */
-	    av_new_packet(&asf_st->pkt, asf->packet_obj_size);
+	    /* new packet XXX */
+	    av_new_packet(&asf_st->pkt, asf->packet_obj_size, 0);
 	    asf_st->seq = asf->packet_seq;
 	    asf_st->pkt.pts = asf->packet_frag_timestamp - asf->hdr.preroll;
 	    asf_st->pkt.stream_index = asf->stream_index;

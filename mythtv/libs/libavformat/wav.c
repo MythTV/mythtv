@@ -293,7 +293,8 @@ static int wav_read_packet(AVFormatContext *s,
 
     if (url_feof(&s->pb))
         return -EIO;
-    if (av_new_packet(pkt, MAX_SIZE))
+    // XXX
+    if (av_new_packet(pkt, MAX_SIZE, 0))
         return -EIO;
     pkt->stream_index = 0;
 

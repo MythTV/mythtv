@@ -501,6 +501,7 @@ static int mpegps_read_packet(AVFormatContext *s,
     AVStream *st;
     int len, size, startcode, i, c, flags, header_len, type, codec_id;
     int64_t pts, dts;
+    int64_t startpos;
 
     /* next start code (should be immediately after) */
  redo:
@@ -526,6 +527,8 @@ static int mpegps_read_packet(AVFormatContext *s,
           (startcode >= 0x1e0 && startcode <= 0x1ef) ||
           (startcode == 0x1bd)))
         goto redo;
+
+    startpos = url_fseek(&s->pb, 0, SEEK_CUR) - 4;
 
     len = get_be16(&s->pb);
     pts = AV_NOPTS_VALUE;
@@ -638,7 +641,7 @@ static int mpegps_read_packet(AVFormatContext *s,
         st->codec.channels = 1 + (b1 & 7);
         st->codec.bit_rate = st->codec.channels * st->codec.sample_rate * 2;
     }
-    av_new_packet(pkt, len);
+    av_new_packet(pkt, len, startpos);
     //printf("\nRead Packet ID: %x PTS: %f Size: %d", startcode,
     //       (float)pts/90000, len);
     get_buffer(&s->pb, pkt->data, pkt->size);

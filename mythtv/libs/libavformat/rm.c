@@ -710,7 +710,8 @@ static int rm_read_packet(AVFormatContext *s, AVPacket *pkt)
         st->codec.slice_offset[0]= 0;
     }
 
-    av_new_packet(pkt, len);
+    // XXX
+    av_new_packet(pkt, len, 0);
     pkt->stream_index = i;
     get_buffer(pb, pkt->data, len);
 
