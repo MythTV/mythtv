@@ -1803,7 +1803,7 @@
     </container>
 
     <container name="program_info">
-      <area>20,20,760,265</area>
+      <area>20,20,760,275</area>
       <textarea name="title" draworder="6">
         <area>0,0,760,45</area>
         <font>title</font>
@@ -1836,7 +1836,7 @@
         <value>Description:</value>
       </textarea>
       <textarea name="description" draworder="6">
-        <area>160,145,600,120</area>
+        <area>160,145,600,130</area>
         <font>info</font>
         <multiline>yes</multiline>
       </textarea>
