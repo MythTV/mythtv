@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-08-20, v2.63
+<date>2003-08-21, v2.64
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2927,7 +2927,44 @@ $ mysql -u mythtv -p < metadata.sql
 See MythVideo's <tt>README</tt> file for additional information.
 
 <sect>MythDVD.
+<p>MythDVD is an application which rips DVDs and makes them available for
+use with MythVideo.  You may also transcode the DVD content from MPEG-2 to
+other formats which should greatly reduce the amount of space the DVD
+material takes up on your hard drive.
+
+MythDVD has a number of prerequisites to enable transcoding functionality. 
+If you only wish to play DVDs rather than convert them to something like
+MPEG-4 or xvid you may skip the prerequisite installation step.
+
+<sect1>Manual Compilation of Prerequisites.
 <p>
+<sect1>Pre-compiled binaries.
+<p>Mandrake users may install the prerequisites this way:
+<tscreen><verb>
+# urpmi libdvdread3 libdvdread3-devel a52dec liba52dec-devel 
+# urpmi mplayer ogle xine
+</verb></tscreen>
+Assuming that you've added a PLF mirror, you may also load the rest of the
+prerequsites using the following command:
+<tscreen><verb>
+# urpmi xvid xvid-devel fame libfame0.9-devel transcode libdvdcss
+</verb></tscreen>
+
+Next comes the configuration and compilation.  If you don't want to
+transcode, then the first command in the next example can simply be
+<tt>./configure</tt>
+<tscreen><verb>
+$ ./configure --enable-transcode
+$ make
+$ su
+# make install
+</verb></tscreen>
+Once that's done, ensure that you've added the appropriate table structures
+to the database:
+<tscreen><verb>
+$ cd dvddb
+$ mysql -u root < metadata.sql
+</verb></tscreen>
 
 <sect>Troubleshooting.
 <sect1>Illegal Instruction.
@@ -4385,6 +4422,7 @@ from mythtv-dev list by Geoffrey Hausheer ou401cru02*sneakemail.com.
 htaccess file has more than just authentication, so don't tell people to
 delete it if they want to.
 v2.63, 2003-08-20.  Updated and expanded Debian-specific information.
+v2.64, 2003-08-21.  MythDVD instructions.  Work in progress.
 -->
 
 <!--

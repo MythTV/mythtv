@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-08-20, v2.63
+  2003-08-21, v2.64
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -148,6 +148,9 @@
   16. MythWeather.
   17. MythVideo.
   18. MythDVD.
+     18.1 Manual Compilation of Prerequisites.
+     18.2 Pre-compiled binaries.
+
   19. Troubleshooting.
      19.1 Illegal Instruction.
      19.2 mythfilldatabase failing.
@@ -207,8 +210,6 @@
 
 
   ______________________________________________________________________
-
-
 
   [1m1.  How to obtain this document.[0m
 
@@ -3710,6 +3711,58 @@
 
   [1m18.  MythDVD.[0m
 
+  MythDVD is an application which rips DVDs and makes them available for
+  use with MythVideo.  You may also transcode the DVD content from
+  MPEG-2 to other formats which should greatly reduce the amount of
+  space the DVD material takes up on your hard drive.
+
+  MythDVD has a number of prerequisites to enable transcoding
+  functionality.  If you only wish to play DVDs rather than convert them
+  to something like MPEG-4 or xvid you may skip the prerequisite
+  installation step.
+
+
+  [1m18.1.  Manual Compilation of Prerequisites.[0m
+
+
+  [1m18.2.  Pre-compiled binaries.[0m
+
+  Mandrake users may install the prerequisites this way:
+
+
+
+  # urpmi libdvdread3 libdvdread3-devel a52dec liba52dec-devel
+  # urpmi mplayer ogle xine
+
+
+
+  Assuming that you've added a PLF mirror, you may also load the rest of
+  the prerequsites using the following command:
+
+
+       # urpmi xvid xvid-devel fame libfame0.9-devel transcode libdvdcss
+
+
+
+  Next comes the configuration and compilation.  If you don't want to
+  transcode, then the first command in the next example can simply be
+  ./configure
+
+
+       $ ./configure --enable-transcode
+       $ make
+       $ su
+       # make install
+
+
+
+  Once that's done, ensure that you've added the appropriate table
+  structures to the database:
+
+
+       $ cd dvddb
+       $ mysql -u root < metadata.sql
+
 
 
   [1m19.  Troubleshooting.[0m
@@ -3728,8 +3781,6 @@
      support SSE instructions for deinterlace support.  You may check
      this by doing a $ cat /proc/cpuinfo and looking for "sse" in the
      processor flags section.
-
-
 
   [1m19.2.  mythfilldatabase failing.[0m
 
@@ -3794,7 +3845,6 @@
   your setting will be preserved.
 
 
-
   [1m19.5.  I keep losing all of my settings every time I compile![0m
 
   MythTV will overwrite any settings in /usr/local/share/mythtv.  If you
@@ -3807,10 +3857,10 @@
   doesn't abort the compilation, and says something like:
 
 
-       cc1plus: warning: changing search order for system directory
-       "/usr/local/include"
-       cc1plus: warning:   as it has already been specified as a non-system
-       directory
+  cc1plus: warning: changing search order for system directory
+  "/usr/local/include"
+  cc1plus: warning:   as it has already been specified as a non-system
+  directory
 
 
 
@@ -3859,6 +3909,8 @@
            Option "DPMS"
        EndSection
 
+
+
   In this case, you would need to either delete the Option "DPMS" line,
   or change it to # Option "DPMS" to comment it out.  The next time you
   start XFree this change will take effect.
@@ -3866,23 +3918,24 @@
   Finally, check:
 
 
-       Section "Monitor"
-           Identifier "monitor1"
-           VendorName "Plug'n Play"
-           HorizSync 30-85
-           VertRefresh 50-160
 
-           # Sony Vaio C1(X,XS,VE,VN)?
-           # 1024x480 @ 85.6 Hz, 48 kHz hsync
-           ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+  Section "Monitor"
+      Identifier "monitor1"
+      VendorName "Plug'n Play"
+      HorizSync 30-85
+      VertRefresh 50-160
 
-           # TV fullscreen mode or DVD fullscreen output.
-           # 768x576 @ 79 Hz, 50 kHz hsync
-           ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+      # Sony Vaio C1(X,XS,VE,VN)?
+      # 1024x480 @ 85.6 Hz, 48 kHz hsync
+      ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
 
-           # 768x576 @ 100 Hz, 61.6 kHz hsync
-           ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
-       EndSection
+      # TV fullscreen mode or DVD fullscreen output.
+      # 768x576 @ 79 Hz, 50 kHz hsync
+      ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+
+      # 768x576 @ 100 Hz, 61.6 kHz hsync
+      ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+  EndSection
 
 
 
@@ -3924,6 +3977,7 @@
   new server and path, delete your old tree, and re-do the checkout.
   See Section 1, ``How to Obtain this document'' for the full name and
   path.
+
 
 
   [1m19.9.  I get segfaults / MythTV isn't doing anything.[0m
@@ -3984,7 +4038,7 @@
   the program segfaults or appears to lock-up (press CTRL-C), type
 
 
-  (gdb) thread apply all bt full
+       (gdb) thread apply all bt full
 
 
 
@@ -4048,14 +4102,12 @@
   signal. This analog signal should then be sent to your speakers. Here
   is what is needed in alsamixer:
 
-
   CAPTUR source - the analog source to be sent to the DSP. This should
   be set to the input source from the tuner card to the sound card. In
   most cases this is Line but this could also be Aux, CD, Mic, etc.,
   depending on how you connect the input cable. This source should be
   muted to prevent patching through the analog sound. The volume of this
   source will not affect the record level.
-
   Capture mixer - this sets the level for the analog to digital
   recording.  While a volume of 100% is recommended for testing,
   distortion may occur.  Lowering this level to 75% to 85% may result in
@@ -4118,6 +4170,7 @@
   will need to get btaudio ``operational''.
 
 
+
   [1m19.14.  My remote doesn't work / works sometimes and not others /[0m
   [1m"ghost" keypresses.[0m
 
@@ -4177,14 +4230,12 @@
   Restart apache for it to take effect.
 
 
-
   [1m19.19.  error: can't find a register in class 'BREG' while reloading[0m
   [1m'asm'[0m
 
   This is due to the broken Qt that is being distributed by Suse.  To
   work around this, edit libs/libavcodec/Makefile and remove any "-fPIC"
   you find there and then recompile.
-
 
   [1m19.20.  make: *** No rule to make target[0m
   [1m/usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.[0m
@@ -4243,12 +4294,13 @@
 
   If you are using the binary nVidia drivers, make sure you're using at
   least version 1.0-2960.
+
+
   [1m19.26.  When trying to run setup, I get an error like this: "./setup:[0m
   [1merror while loading shared libraries:"[0m
 
   You didn't add /usr/local/lib to /etc/ld.so.conf.  See the section on
   modifying ``/etc/ld.so.conf''.
-
 
   [1m19.27.  What is this transcoder thing, and how do I use it?[0m
 
@@ -4316,7 +4368,6 @@
   you don't need to convert - the files are actually standard MPEG2 with
   a .nuv extension.  Change it to .mpg and the files should display
   properly in other media players.
-
   Download the patch to MPlayer from Matt's website.
   http://dijkstra.csh.rit.edu/~mdz/mythtv/
   <http://dijkstra.csh.rit.edu/~mdz/mythtv/>.
@@ -4368,20 +4419,19 @@
   The following also works with blackbox:
 
 
-
-  $ cat > .xinitrc
-  xset -dpms s off &
-  irxevent &
-  mythfrontend &
-  blackbox
+       $ cat > .xinitrc
+       xset -dpms s off &
+       irxevent &
+       mythfrontend &
+       blackbox
 
 
 
   Make sure that your .blackboxrc file has:
 
 
-       session.screen0.focusNewWindows:        True
-       session.screen0.focusModel:     SloppyFocus
+  session.screen0.focusNewWindows:        True
+  session.screen0.focusModel:     SloppyFocus
 
 
 
@@ -4434,6 +4484,7 @@
   720x240 is possible, but isn't a good tradeoff relative to the number
   of vertical lines lost.  In a PAL country, the you would use values
   like 720x576 or x288.
+
   The higher resolutions will be more CPU intensive. If the CPU is
   overtaxed, frames will be dropped causing uneven motion. You will
   likely see the best results at resolutions which average at least 10%
@@ -4510,6 +4561,7 @@
   resolutions'' used.
 
 
+
   [1m20.5.3.  Overscan Dimensions[0m
 
   Because picture edges can be ragged and screen edges aren't straight,
@@ -4574,8 +4626,6 @@
   [1mNOTE[22m:  Performing this step will remove the entire database.  You will
   lose all of your settings and will need to re-run the mc.sql script to
   setup the database structure before running the setup program.
-
-
        $ mysql -u root
        mysql> drop database mythconverg;
        mysql> quit
@@ -4627,6 +4677,7 @@
 
   Once btaudio loads, it should register additional /dev/dsp and
   /dev/mixer devices.  Typing $ dmesg will let you know what's going on.
+
 
   [1m20.9.  Removing unwanted channels.[0m
 
@@ -4749,10 +4800,9 @@
   the appropriate modules directory:
 
 
-
-  $ su
-  # make install
-  # depmod -a
+       $ su
+       # make install
+       # depmod -a
 
 
 
@@ -4811,7 +4861,6 @@
   source if you have not already done so, and assign the video source to
   a video card input on the Input Connections screen.
 
-
   Some people report issues with the ivtv module not being loaded when
   required by MythTV.  To get around this, you can [1mmodprobe [22mthe ivtv
   driver before using it.  The simplest technique is to add the [1mmodprobe[0m
@@ -4827,7 +4876,8 @@
   parameters, add something like the following to your rc.local:
 
 
-       /path/to/ivtv/utils/test_ioctl -c bitrate=4500000,bitrate_peak=6000000
+
+  /path/to/ivtv/utils/test_ioctl -c bitrate=4500000,bitrate_peak=6000000
 
 
 
@@ -4934,11 +4984,10 @@
   runlevels 3, 4 or 5:
 
 
-
-  $ su
-  # chkconfig --level 345 mythbackend on
-  # exit
-  $
+       $ su
+       # chkconfig --level 345 mythbackend on
+       # exit
+       $
 
 
 
@@ -4993,11 +5042,10 @@
   may add it by typing:
 
 
-
-  $ cd contrib
-  $ su
-  # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
-  # exit
+       $ cd contrib
+       $ su
+       # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
+       # exit
 
 
 
@@ -5119,7 +5167,8 @@
   You may also modify some aspects of a filesystem such as the reserved
   block percentage after it has been created using the [1mtune2fs [22mprogram:
 
-  # tune2fs -m 0 /dev/hdb1
+
+       # tune2fs -m 0 /dev/hdb1
 
 
 
@@ -5136,6 +5185,7 @@
   There's lots more that can be done with LVM, so check the LVM HOWTO
   http://tldp.org/HOWTO/lvm-HOWTO/ <http://tldp.org/HOWTO/lvm-HOWTO/>
   document for details.
+
 
   Make sure your kernel configuration includes LVM support or that it's
   available as a module. Today, most vendors include this by default.
@@ -5183,7 +5233,7 @@
   "VGforMyth" that is allocated in chunks that are a multiple of 64MB
 
 
-  # vgcreate --name VGforMyth -s 64m /dev/hda5
+       # vgcreate --name VGforMyth -s 64m /dev/hda5
 
 
 
@@ -5200,9 +5250,9 @@
   Now create a 5GB volume for mythmusic files if you like:
 
 
-       # lvcreate --name music --size 5G VGforMyth
-       # mkreiserfs /dev/VGforMyth/music
-       # mount /dev/VGforMyth/music /var/music
+  # lvcreate --name music --size 5G VGforMyth
+  # mkreiserfs /dev/VGforMyth/music
+  # mount /dev/VGforMyth/music /var/music
 
 
 
@@ -5244,10 +5294,9 @@
   need to unmount and remount the ReiserFS.
 
 
-
-  # umount /var/video
-  # resize_reiserfs /dev/VGforMyth/video
-  # mount /dev/VGforMyth/video /var/video
+       # umount /var/video
+       # resize_reiserfs /dev/VGforMyth/video
+       # mount /dev/VGforMyth/video /var/video
 
 
 
