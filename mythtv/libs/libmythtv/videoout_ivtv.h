@@ -43,7 +43,10 @@ class VideoOutputIvtv: public VideoOutput
 
   private:
     int videofd;
-    int writefd;
+    int fbfd;
+
+    int storedglobalalpha;
+    bool initglobalalpha;
 
     float fps;
     QString videoDevice;
@@ -51,6 +54,13 @@ class VideoOutputIvtv: public VideoOutput
     QMutex lock;
 
     long long startframenum;
+
+    int mapped_offset;
+    int mapped_memlen;
+    char *mapped_mem;
+    char *pixels;
+
+    int width, height, stride;
 };
 
 #endif

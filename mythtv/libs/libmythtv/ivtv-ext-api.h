@@ -23,6 +23,7 @@
 #define IVTV_IOC_S_START_DECODE 0xFFEE7786
 #define IVTV_IOC_S_STOP_DECODE  0xFFEE7787
 #define IVTV_IOC_S_OSD          0xFFEE7788
+#define IVTV_IOC_GET_FB         0xFFEE7789
 
 /* ioctl for MSP_SET_MATRIX will have to be registered */
 #define MSP_SET_MATRIX     _IOW('m',17,struct msp_matrix)
@@ -120,6 +121,13 @@ struct ivtvfb_ioctl_dma_host_to_ivtv_args {
   int count;
 };
 
+struct ivtvfb_ioctl_get_frame_buffer {
+  void* mem;
+  int   size;
+  int   sizex;
+  int   sizey;
+};
+
 struct ivtv_osd_coords {
   unsigned long offset;
   unsigned long max_offset;
@@ -142,6 +150,7 @@ struct rectangle {
 #define IVTVFB_IOCTL_BLT_COPY           _IOW('@', 4, sizeof(struct ivtvfb_ioctl_blt_copy_args))
 #define IVTVFB_IOCTL_GET_ACTIVE_BUFFER  _IOR('@', 5, sizeof(struct ivtv_osd_coords))
 #define IVTVFB_IOCTL_SET_ACTIVE_BUFFER  _IOW('@', 6, sizeof(struct ivtv_osd_coords))
+#define IVTVFB_IOCTL_GET_FRAME_BUFFER   _IOR('@', 7, sizeof(struct ivtvfb_ioctl_get_frame_buffer))
 
 #define IVTVFB_STATUS_ENABLED           (1 << 0)
 #define IVTVFB_STATUS_GLOBAL_ALPHA      (1 << 1)

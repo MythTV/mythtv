@@ -658,6 +658,13 @@ int VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd, int stride)
                         BlendSurfaceToI44(surface, ia44ptr, false, stride);
                     break;
                 }
+                case FMT_ARGB32:
+                {
+                    unsigned char *argbptr = frame->buf;
+                    if (surface->Changed())
+                        BlendSurfaceToARGB(surface, argbptr, stride);
+                    break;
+                }
                 default:
                     break;
             }
@@ -810,3 +817,9 @@ blendimagei44end:
         }
     }
 }
+
+void VideoOutput::BlendSurfaceToARGB(OSDSurface *surface, 
+                                     unsigned char *argbptr, int stride)
+{
+}
+

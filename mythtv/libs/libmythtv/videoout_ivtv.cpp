@@ -11,6 +11,9 @@
 #include <time.h>
 #include <errno.h>
 #include <sys/ioctl.h>
+#include <sys/mman.h>
+#include <sys/user.h>
+#include <linux/fb.h>
 
 #include <map>
 #include <iostream>
@@ -25,6 +28,9 @@ extern "C" {
 VideoOutputIvtv::VideoOutputIvtv(void)
 {
     videofd = -1;
+    fbfd = -1;
+    mapped_mem = NULL;
+    pixels = NULL;
     videoDevice = "/dev/video16";
 }
 
@@ -41,6 +47,38 @@ VideoOutputIvtv::~VideoOutputIvtv()
         close(videofd);
     }
     videofd = -1;
+
+    if (fbfd)
+    {
+        struct ivtvfb_ioctl_state_info fbstate;
+        memset(&fbstate, 0, sizeof(fbstate));
+
+        if (ioctl(fbfd, IVTVFB_IOCTL_GET_STATE, &fbstate) < 0)
+        {
+            perror("IVTVFB_IOCTL_GET_STATE");
+            return;
+        }
+
+        initglobalalpha = fbstate.status & IVTVFB_STATUS_GLOBAL_ALPHA;
+        storedglobalalpha = fbstate.alpha;
+
+        if (initglobalalpha)
+            fbstate.status |= IVTVFB_STATUS_GLOBAL_ALPHA;
+        else
+            fbstate.status &= ~IVTVFB_STATUS_GLOBAL_ALPHA;
+
+        fbstate.alpha = storedglobalalpha;
+
+        if (ioctl(fbfd, IVTVFB_IOCTL_SET_STATE, &fbstate) < 0)
+        {
+            perror("IVTVFB_IOCTL_SET_STATE");
+            return;
+        }
+
+        if (mapped_mem)
+            munmap(mapped_mem, mapped_memlen);
+        close(fbfd);
+    }
 }
 
 void VideoOutputIvtv::InputChanged(int width, int height, float aspect)
@@ -84,7 +122,10 @@ void VideoOutputIvtv::Reopen(int skipframes, int newstartframe)
     videofd = -1;
 
     if ((videofd = open(videoDevice.ascii(), O_WRONLY | O_LARGEFILE, 0555)) < 0)
+    {
         perror("Cannot open ivtv video out device");
+        return;
+    }
     else
     {
         ivtv_cfg_start_decode startd;
@@ -104,6 +145,95 @@ void VideoOutputIvtv::Reopen(int skipframes, int newstartframe)
     }
 
     startframenum = newstartframe;
+
+    if (fbfd == -1)
+    {
+        int fbno = 0;
+        
+        if (ioctl(videofd, IVTV_IOC_GET_FB, &fbno) < 0)
+        {
+            perror("IVTV_IOC_GET_FB");
+            return;
+        }
+
+        if (fbno < 0)
+        {
+            cerr << "invalid fb, are you using the ivtv-fb module?\n";
+            return;
+        }
+
+        QString fbdev = QString("/dev/fb%1").arg(fbno);
+        fbfd = open(fbdev.ascii(), O_RDWR);
+        if (fbfd < 0)
+        {
+            cerr << "Unable to open the ivtv framebuffer\n";
+            return;
+        }
+
+        struct ivtvfb_ioctl_state_info fbstate;
+        memset(&fbstate, 0, sizeof(fbstate));
+
+        if (ioctl(fbfd, IVTVFB_IOCTL_GET_STATE, &fbstate) < 0)
+        {
+            perror("IVTVFB_IOCTL_GET_STATE");
+            return;
+        }
+
+        initglobalalpha = fbstate.status & IVTVFB_STATUS_GLOBAL_ALPHA;
+        storedglobalalpha = fbstate.alpha;
+
+        fbstate.status &= ~IVTVFB_STATUS_GLOBAL_ALPHA;
+        fbstate.status |= IVTVFB_STATUS_LOCAL_ALPHA;
+        fbstate.alpha = 0;
+
+        if (ioctl(fbfd, IVTVFB_IOCTL_SET_STATE, &fbstate) < 0)
+        {
+            perror("IVTVFB_IOCTL_SET_STATE");
+            return;
+        }
+
+        struct ivtvfb_ioctl_get_frame_buffer igfb;
+        memset(&igfb, 0, sizeof(igfb));
+
+        ioctl(fbfd, IVTVFB_IOCTL_GET_FRAME_BUFFER, &igfb);
+
+        struct ivtv_osd_coords osdcoords;
+        memset(&osdcoords, 0, sizeof(osdcoords));
+
+        ioctl(fbfd, IVTVFB_IOCTL_GET_ACTIVE_BUFFER, &osdcoords);
+
+        mapped_offset = osdcoords.offset;
+        mapped_memlen = osdcoords.max_offset;
+
+        mapped_mem = (char *)mmap(0, mapped_memlen, PROT_READ|PROT_WRITE,
+                                  MAP_SHARED, fbfd, 0);
+        if (mapped_mem == (char *)-1)
+        {
+            perror("Unable to mmap ivtv-fb buffer");
+            mapped_mem = NULL;
+            return;
+        }
+
+        pixels = mapped_mem;
+        width = igfb.sizex;
+        height = igfb.sizey;
+        stride = igfb.sizex * 4;
+
+        unsigned char *dest = (unsigned char *)pixels;
+
+        memset(dest, 0xff, 720 * 480);
+
+        for (int y = 0; y < 120; y++)
+        {
+            for (int x = 0; x < 720; x++)
+            {
+                *dest++ = 0xff;
+                *dest++ = 0xff;
+                *dest++ = 0xff;
+                *dest++ = 0xff;
+            }
+        }
+    }
 }
 
 void VideoOutputIvtv::EmbedInWidget(unsigned long wid, int x, int y, int w, 
@@ -147,6 +277,15 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
     (void)filterList;
     (void)frame;
     (void)pipPlayer;
+
+    if (mapped_mem && osd)
+    {
+        VideoFrame tmpframe;
+        tmpframe.codec = FMT_ARGB32;
+        tmpframe.buf = (unsigned char *)pixels;
+
+        int ret = DisplayOSD(&tmpframe, osd, stride);
+    }
 }
 
 void VideoOutputIvtv::Play()

@@ -100,6 +100,8 @@ class VideoOutput
                             int stride = -1);
     void BlendSurfaceToI44(OSDSurface *surface, unsigned char *yuvptr,
                            bool alphafirst, int stride = -1);   
+    void BlendSurfaceToARGB(OSDSurface *surface, unsigned char *argbptr,
+                            int stride = -1);
  
     int XJ_width, XJ_height;
     float XJ_aspect;

@@ -10,7 +10,8 @@ typedef enum FrameType_
     FMT_XVMC_MOCO_MPEG2,
     FMT_VIA_HWSLICE,
     FMT_IA44,
-    FMT_AI44
+    FMT_AI44,
+    FMT_ARGB32
 } VideoFrameType;
 
 typedef struct VideoFrame_
