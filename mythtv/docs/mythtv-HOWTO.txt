@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-04-16, v2.14
+  2003-04-22, v2.15
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -15,6 +15,12 @@
   2. Introduction.
   3. Checking prerequisites.
      3.1 Hardware.
+        3.1.1 CPU Type and Speed
+        3.1.2 Memory
+        3.1.3 Hard Disk(s)
+        3.1.4 Video Capture Device
+        3.1.5 Sound card
+        3.1.6 Video Display Card
      3.2 Software.
         3.2.1 Graphical installation tools.
            3.2.1.1 Mandrake 9.0
@@ -143,6 +149,7 @@
      19.7 I'd like to delete the mysql database.
      19.8 btaudio
      19.9 Removing unwanted channels.
+
   ______________________________________________________________________
 
   [1m1.  How to obtain this document.[0m
@@ -204,6 +211,7 @@
 
   +o  Overall structure of HOWTO and Mandrake 9.x documentation: Robert
      Kulagowski,  <mailto:rkulagow@rocketmail.com>
+
   +o  Red Hat Linux 8.0 documentation: Cedar McKay,
      <mailto:mythhowto.3.ohthetrees@spamgourmet.com>
 
@@ -219,34 +227,41 @@
 
   [1m3.1.  Hardware.[0m
 
-  MythTV has two modes of operation.  It can function as a software
-  video encoder, which means that it uses a fairly generic "dumb" video
-  capture card to get frames of video, encodes them using the CPU on
-  your motherboard and writes them to disk.  High-end video capture
-  cards and devices like the Tivo and RePlay have dedicated encoder
-  chips which use specialized hardware to convert the video stream to
-  the MPEG-2 format without using the motherboard CPU.  The main CPU has
-  the responsibility of running the Operating System and reading and
-  writing the encoded frames to the disk.  These tasks have fairly low
-  CPU requirements compared to encoding video, which is why a device
-  like a Series 1 Tivo can run with only 16MB of RAM and a 54Mhz CPU.
+  Hardware selection is a complex topic, one this HOWTO will only
+  discuss briefly and in general terms. The following subsections offer
+  some general guidance but stop short of offering specific
+  recommendations.
 
-  Using either a G200 MJPEG encoder card, or a WinTV PVR-250 or 350 from
-  Hauppauge and the driver from the IvyTV project
-  http://ivtv.sourceforge.net/ <http://ivtv.sourceforge.net/> will allow
-  you to use dedicated hardware encoders rather than your CPU. As of
-  2003-04-15, the CVS version MythTV is now able to use the PVR-250/350
-  cards as an input device for live TV and for scheduled recordings.
-  Seek support is still being written.  Using the onboard MPEG-2 encoder
-  drastically reduces the CPU requirements for encoding.  Here are some
-  data points:
+  For more detail about actual configurations that others have used,
+  Mark Cooper has setup a hardware database at
+  http://www.goldfish.org/~mcooper/pvrhw/
+  <http://www.goldfish.org/~mcooper/pvrhw/>. The website will let you
+  browse what other users have reported as their hardware configuration,
+  and how happy they are with the results.
 
-  +o  An Athlon 1800XP can decode a 720x480 8Mbps MPEG-2 file using 10%
-     CPU
+  If you have specific questions about the suitability of specific
+  hardware choices, you can consult the archives of the mythtv-users
+  mailing list or post a question to the list.
 
-  +o  An Athlon 1Ghz can decode a 720x480 16Mbps MPEG-2 file using 30-50%
-     CPU, can decode a 480x480 16Mbps MPEG-2 using 30% CPU and
-     approximately 30% for Live TV at 416x480.
+  [1m3.1.1.  CPU Type and Speed[0m
+
+  Selection of CPU type and speed is one of the trickiest elements of
+  hardware selection, mainly because there are so many tradeoffs which
+  can be made.  For example, if you have plenty of CPU, you can use
+  higher bitrates or capture sizes, etc.
+
+  MythTV has two modes of operation.  First, it can function as a
+  software video encoder, which means that it uses a fairly generic
+  "dumb" video capture card to get frames of video, encodes them using
+  the CPU on your motherboard and writes them to disk.  High-end video
+  capture cards and devices like the Tivo and RePlay have dedicated
+  encoder chips which use specialized hardware to convert the video
+  stream to the MPEG-2 format without using the motherboard CPU.  The
+  main CPU has the responsibility of running the Operating System and
+  reading and writing the encoded frames to the disk.  These tasks have
+  fairly low CPU requirements compared to encoding video, which is why a
+  device like a Series 1 Tivo can run with only 16MB of RAM and a 54Mhz
+  CPU.
 
   There are many variables that go into the question: "How fast a CPU do
   I need to run MythTV"?  Obviously, the faster your CPU, the better
@@ -256,12 +271,8 @@
   Fast Forward and Rewind functions for live TV requires more CPU then
   just encoding or decoding.  MythTV also supports multiple encoder
   cards in a single PC, thereby increasing the CPU requirements if you
-  plan on simultaneously encoding multiple programs.
-
-  ______________________________________________________________________
-  NOTE:  As of 2003-04-15 the current IVTV driver does not support multiple
-  hardware encoder cards in the same chassis.
-  ______________________________________________________________________
+  plan on simultaneously encoding multiple programs.  As a general
+  guideline, plan on 1Ghz per encoder.
 
   Here are a few data points:
 
@@ -283,16 +294,149 @@
   +o  A P4 2.4Ghz machine can encode two 3300Kbps 480x480 MPEG4 files and
      simultaneously serve content to a remote frontend.
 
+  The second mode of operation is where MythTV is paired with a
+  hardware-based video encoder, such as a Matrox G200 or a Hauppauge
+  WinTV PVR-250/350.  In this mode, because the video encoding is being
+  done externally, the CPU requirements are quite low.  See the ``Video
+  Capture Device'' section for details.
+
+  [1m3.1.2.  Memory[0m
+
+  A MythTV host that is both a backend and a frontend and using software
+  encoding with a single capture card should run adequately in 256MB of
+  RAM.  Additional RAM above 256MB will not necessarily increase
+  performance, but may be useful if you are running multiple encoders.
+
+  [1m3.1.3.  Hard Disk(s)[0m
+
+  Encoded video takes up a lot of hard disk space. The exact amount
+  depends on the encoding scheme, the size of the raw images, and the
+  frames per second, but a typical value for MythTV is 1 gigabyte/hour
+  if using MPEG-4.
+
   [1mNOTE[22m:  You [4mmust[24m use DMA for hard drive access to prevent choppy or
   jittery video.  Red Hat Linux 8.0 apparently does not enable DMA at
   boot time.  See the Troubleshooting Section for ``instructions'' on
   how to do this.
 
-  Mark Cooper has setup a hardware database at
-  http://www.goldfish.org/~mcooper/pvrhw/
-  <http://www.goldfish.org/~mcooper/pvrhw/>.  The website will let you
-  browse what other users have reported as their hardware configuration,
-  and how happy they are with the results.
+  Writing video to disk is sensitive to timing issues; RTJPEG requires
+  less CPU with the tradeoff being larger files and needing to write to
+  the disk faster.  MPEG-4 requires more CPU, but the files are smaller.
+  At the default resolution, MPEG-2 creates the largest files of all
+  with almost no CPU impact.
+
+  See the Troubleshooting ``section'' for more information.
+
+  [1m3.1.4.  Video Capture Device[0m
+
+  In order to watch live TV, MythTV will need one or more video capture
+  devices with Linux drivers.  For a list of video capture cards known
+  to work with Linux, please see
+  /usr/src/linux/Documentation/video4linux/bttv for a partial listing;
+  even if your specific card is not listed, it may be that the vendor is
+  actually using a standard reference design and placing their own name
+  on it.  See the video4linux mailing list
+  (https://listman.redhat.com/mailman/listinfo/video4linux-list
+  <https://listman.redhat.com/mailman/listinfo/video4linux-list>) for
+  more information and for specific hardware questions.
+
+  The most common inexpensive cards available use the Bt848 or Bt878
+  video capture chip; examples are the "Hauppauge WinTV Go" card and the
+  "AverTV Desktop PVR" card, both of which use the bttv kernel module.
+
+  Newer cards may use the CX23881 series of chips; a driver is available
+  at http://bytesex.org/cx88/ <http://bytesex.org/cx88/>.
+
+  After you have installed a suitable capture device, you can check that
+  the kernel sees it with lspci. Look for an entry labeled "Multimedia
+  video controller". To get more detailed information about the card,
+  use lspci -v or lspci -vv.  Ensure that your system is loading the
+  bttv modules by typing:
+
+       # lsmod |grep bttv
+
+  You want to see the bttv module listed.
+
+  While inexpensive video-capture cards just capture raw frames, leaving
+  encoding to software, some higher-end cards incorporate hardware-level
+  encoding. Using either a G200 MJPEG encoder card, or a WinTV PVR-250
+  or 350 from Hauppauge and the driver from the IvyTV project
+  http://ivtv.sourceforge.net/ <http://ivtv.sourceforge.net/> will allow
+  you to use dedicated hardware encoders rather than your CPU. As of
+  2003-04-15, the CVS version MythTV is now able to use the PVR-250/350
+  cards as an input device for live TV and for scheduled recordings. As
+  of 2003-04-23, seek support is still being written. Using the onboard
+  MPEG-2 encoder drastically reduces the CPU requirements for encoding.
+  Here are some data points:
+
+  +o  An Athlon 1800XP can decode a 720x480 8Mbps MPEG-2 file using 10%
+     CPU
+
+  +o  An Athlon 1Ghz can decode a 720x480 16Mbps MPEG-2 file using 30-50%
+     CPU, can decode a 480x480 16Mbps MPEG-2 using 30% CPU and
+     approximately 30% for Live TV at 416x480.
+
+  ______________________________________________________________________
+  NOTE:  As of 2003-04-15 the current IVTV driver does not support multiple
+  hardware encoder cards in the same chassis.
+
+  NOTE:  The MPEG-2 decoder on the PVR-350 is not yet supported.
+  ______________________________________________________________________
+
+  [1m3.1.5.  Sound card[0m
+
+  The system needs a sound card or an onboard equivalent on the
+  motherboard to play back and in most cases, to record sound. Any sound
+  card that can be operated by the ALSA (Advanced Linux Sound
+  Architecture) kernel modules will work with MythTV.
+
+  The usual practice for capturing the audio associated with the video
+  is to run a jumper cable from an audio output on the video capture
+  card to the Line input on the sound card. Some video capture cards use
+  internal audio tuners that work with the kernel btaudio module,
+  thereby eliminating the patch cable. This is useful if you will be
+  using multiple capture cards in a single chassis, since each capture
+  card will not need its own sound card.  See the ``btaudio'' section
+  for more information.
+
+  [1mNOTE[22m:  The PVR-250/350 does not require a sound card for audio
+  capture.
+
+  [1m3.1.6.  Video Display Card[0m
+
+  MythTV will work with just about any video card.  However, it is
+  highly recommended that you use a card which supports XVideo (XV)
+  extensions. If your card does not support XV, color conversion and
+  scaling will be performed by your CPU rather than the video card.
+  This is very CPU intensive.  Check the XFree86 documentation for
+  details if you are uncertain about your preferred card.  You may also
+  run xvinfo; look for your video card to be listed as one of the
+  adapters.
+
+  Most people, though, want to view television on a television set. For
+  this, you need either (a) one of the relatively small number of cards
+  with TV-out outputs that are supported by Linux and XFree86, or (b) an
+  external VGA-to-TV converter.
+
+  For (a), recent nVidia cards are reported to work with the nvtv
+  drivers, available at http://sourceforge.net/projects/nv-tv-out/
+  <http://sourceforge.net/projects/nv-tv-out/>.  See the forums at
+  http://sourceforge.net/forum/forum.php?forum_id=105850
+  <http://sourceforge.net/forum/forum.php?forum_id=105850> for more
+  infomation on which cards work with the driver. Recent Matrox cards
+  (the G450 and G550) are reported to work with kernel patches (for
+  Linux 2.4.19) available at http://www.bglug.ca/matrox_tvout/
+  <http://www.bglug.ca/matrox_tvout/>.
+
+  Cards made by ATI have no official support for TV out under Linux and
+  XFree86, though some people report making them work with the
+  experimental version of the GATOS drivers, available at
+  http://gatos.sourceforge.net/watching_tv.php
+  <http://gatos.sourceforge.net/watching_tv.php>.
+
+  For choice (b), VGA-to-TV converters work well; many people have
+  stated they are satisfied with the output of the AITech Web Cable Plus
+  on their NTSC televisions.
 
   [1m3.2.  Software.[0m
 
@@ -313,11 +457,11 @@
   MySQL must run on one of the MythTV boxes.
 
   In order to compile MythTV, we need to make sure that the software it
-  needs is installed.  As of 2003-03-15, this list includes [1mperl [22m(for
-  XMLTV), [1mmysql[22m, [1mgcc[22m, [1mfreetype2-devel[22m, [1mXFree86-devel[22m, [1mqt-devel [22mand [1mlame[22m.
-  If you're going to use a remote control with MythTV, you're going to
-  need the [1mcdialog [22mpackage in order to compile [1mlircd [22mif your
-  distribution doesn't have a pre-packaged [1mlirc[22m.
+  needs is installed.  As of 2003-03-15, this list includes [1mmysql[22m, [1mgcc[22m,
+  [1mfreetype2-devel[22m, [1mXFree86-devel[22m, [1mqt-devel [22mand [1mlame[22m.  If you're going to
+  use a remote control with MythTV, you're going to need the [1mcdialog[0m
+  package in order to compile [1mlircd [22mif your distribution doesn't have a
+  pre-packaged [1mlirc[22m.
 
   ______________________________________________________________________
   NOTE:  QT v3.1 is recommended, but not required.
@@ -325,10 +469,14 @@
   NOTE:  If you are going to be using RPMs to install various
   components, you should be aware that not all packages include the necessary
   headers for compiling packages.  If you're having trouble compiling, ensure
-  that you've installed the -devel version of a prerequisite.
+  that you've installed the -devel version of a pre-requisite.
 
   NOTE:  Other than where noted, Mandrake 9.1 users may follow the
   Mandrake 9.0 instructions.
+
+  NOTE:  Perl is required for XMLTV.  MythTV supports directly obtaining
+  program data from gist.com, so if you use gist.com as a data source you do
+  not need to install Perl or XMLTV but you will need wget.
   ______________________________________________________________________
 
   There appears to be issues with ALSA and simultaneously recording and
@@ -347,7 +495,8 @@
   accessed by clicking K->Configuration->Packaging->KPackage
 
   While the graphical tools are nice, the command line tool is actually
-  easier to use.  It's recommended that you use the command line tool.
+  easier to use.  It's strongly recommended that you use the command
+  line tool.
 
   There are many inter-related modules, so make sure that you've got the
   main package for each one, and not a sub package for an unrelated
@@ -356,10 +505,12 @@
   perl distribution.  In each case, we're looking to make sure that the
   primary module is getting installed.
 
-  Click the magnifying glass or press [1mCTRL-F [22mand enter "perl" as your
-  search term.  You should find it under the "Perl" folder.  You need at
-  least the perl 5.80 base package installed.  If not, click on the
-  "Mark" button.
+  If you're going to be using XMLTV rather than obtaining program
+  listings directly from gist.com, you'll need to install perl.  Click
+  the magnifying glass or press [1mCTRL-F [22mand enter "perl" as your search
+  term.  You should find it under the "Perl" folder.  You need at least
+  the perl 5.80 base package installed.  If not, click on the "Mark"
+  button.
 
   If you are going to be installing mysql on this system, search for
   mysql - it should be under "Databases".  Make sure that mysql and
@@ -376,8 +527,8 @@
   and Qt") and libqt3 ("Libraries").
 
   ______________________________________________________________________
-  NOTE for Mandrake 9.1 users:  Mandrake 9.1 has removed the MySQL modules from the default
-  installation.  Ensure that you install libqt3-mysql.
+  NOTE for Mandrake 9.1 users:  Mandrake 9.1 has removed the MySQL modules
+  from the default installation.  Ensure that you install libqt3-mysql.
   ______________________________________________________________________
 
   Make sure that cdialog is installed if you want to use MythTV with a
@@ -464,7 +615,6 @@
 
   Once all of the pre-requisites have been installed, the next step is
   to obtain and compile the source RPM.
-
   Go to http://www.rpmfind.net <http://www.rpmfind.net> and search for
   qt3.  There will be a number of different versions available.  As of
   2002-12-02, the latest version for Mandrake is called
@@ -485,8 +635,8 @@
   "qt3-devel".  The full filenames will vary, so one you know the file-
   name, you can install them with
 
-  # rpm -Uvh [filename1]
-  # rpm -Uvh [filename2]
+       # rpm -Uvh [filename1]
+       # rpm -Uvh [filename2]
 
   Once this has completed (it can take a while, so please be patient),
   continue by following the Mandrake 9.0 instructions.
@@ -501,7 +651,7 @@
   answer "YES".
 
        $ su
-       # urpmi perl mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
+       # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
        # urpmi XFree86-devel
 
   ______________________________________________________________________
@@ -518,9 +668,14 @@
   # urpmi libqt3-mysql
   ______________________________________________________________________
 
+  If you are going to be using XMLTV rather than directly obtaining
+  program listings from gist.com, you must install [1mperl[22m:
+
+       # urpmi perl
+
   However, you might get this when you execute the command above:
 
-       [root@pvr root]# urpmi perl mysql gcc gcc-c++ freetype2-devel libqt3-devel alsa-utils XFree86-devel
+       [root@pvr root]# urpmi mysql gcc gcc-c++ freetype2-devel libqt3-devel alsa-utils XFree86-devel
        everything already installed
 
   In that case, you're ready to move to the next ``section''.
@@ -549,7 +704,6 @@
        $ emerge qt
 
   Install MySQL if this is the master system:
-
        $ emerge mysql
 
   All the necessary files will be downloaded and built. This will take a
@@ -572,6 +726,7 @@
   The following instructions work for Mandrake 9.0 and 9.1 using bash as
   the shell, and may be applicable for a distribution which uses
   /etc/profile.d.
+
   As root, create the following file in /etc/profile.d  The example
   filename is "mythtv.sh".  Use what you feel is appropriate.
 
@@ -659,6 +814,15 @@
   Get MythTV from the mythtv.org <http://www.mythtv.org> web site.  Save
   the tarball to a directory you can find.
 
+  [1mNOTE[22m: If you are in North America, you should decide whether you will
+  be using XMLTV for your guide data or whether you will subscribe to
+  www.gist.com <www.gist.com>.  gist.com listings require a subscription
+  fee; see the website for details.  The gist.com listings appear to be
+  more complete than those obtained using XMLTV from the zap2it website.
+  If you subscribe to gist.com, you will not need to install XMLTV and
+  can ``skip'' the installation procedure - mythfilldatabase can obtain
+  the guide data directly from the gist.com website.
+
   Get XMLTV from http://xmltv.sourceforge.net
   <http://xmltv.sourceforge.net>.  Download version 0.5.9
 
@@ -677,6 +841,7 @@
 
   If you've got a system with an AMD K6-2 or a VIA C3 processor, make
   the following change in the settings.pro file.
+
   Look for
 
   -march=pentiumpro
@@ -728,10 +893,10 @@
   If you get errors installing XML::Twig or other XMLTV prerequisites,
   try deleting the old versions of libexpat
 
-  $ su
-  # rm -f /usr/lib/libexpat*
-  # /sbin/ldconfig
-  # exit
+       $ su
+       # rm -f /usr/lib/libexpat*
+       # /sbin/ldconfig
+       # exit
 
   Download version 1.95.5 from sourceforge.net:
   http://sourceforge.net/projects/expat/
@@ -760,6 +925,15 @@
        $ cd xmltv-0.5.9
 
   Install the xmltv prerequisites:
+
+  ______________________________________________________________________
+  NOTE for Mandrake Users: you may install the XMLTV pre-requisites if you
+  have added a cooker mirror by typing:
+
+  # urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
+
+  and skipping to the compile step.
+  ______________________________________________________________________
 
        $ su
        # perl -MCPAN -e shell
@@ -797,19 +971,23 @@
        $ ./configure
        $ make
 
-  [1mNOTE for Red Hat 8 users only[22m: You must manually modify a Makefile
-  within the themes directory, otherwise your on screen display (OSD)
-  will be "generic" rather than themed.  The solution is to edit the
-  Makefile within the themes directory and comment out (using a # symbol
-  before each line) every line that starts with the word "strip". Make
-  sure you switch back to the MythTV build directory before executing
-  the next step.
+  ______________________________________________________________________
+  NOTE for Red Hat 8 users: You must manually modify a Makefile
+  within the themes directory, otherwise your on screen display (OSD) will be
+  "generic" rather than themed.  The solution is to edit the Makefile within
+  the themes directory and comment out (using a # symbol before each line)
+  every line that starts with the word "strip". Make sure you switch back to
+  the MythTV build directory before executing the next step.
+  ______________________________________________________________________
 
   Switch to superuser:
 
        $ su
        # make install
        # exit
+
+  [1mNOTE[22m:  subsequent configuration steps assume that you are within the
+  MythTV directory that you cd'd to above.
 
   [1m5.5.  Gentoo.[0m
 
@@ -822,11 +1000,11 @@
 
   Once you have downloaded the portage file, installation is simple.
 
-  $ su -
-  # emerge rsync # make sure portage is up to date.
-  # cd /usr/local
-  # tar xvfjp Path_To/mythtv-gentoo-portage.tar.bz2
-  # vi /etc/make.conf
+       $ su -
+       # emerge rsync # make sure portage is up to date.
+       # cd /usr/local
+       # tar xvfjp Path_To/mythtv-gentoo-portage.tar.bz2
+       # vi /etc/make.conf
 
   Add mysql to your USE variable.  ie USE="mysql ...."
 
@@ -885,7 +1063,6 @@
   This step is only required on the system maintaining the database,
   which may or may not be one of your MythTV boxes.  If the database is
   on a non-MythTV machine, then copy the database/mc.sql file to it.
-
   To setup the initial mysql databases:
 
        $ cd database
@@ -912,6 +1089,7 @@
   update the schema, use the -f flag to force [1mmysql [22mto continue setting
   up the tables even if they already exist.  By default, [1mmysql [22mwill stop
   at the first error.
+
   [1m6.4.5.  Modifying access to the MySQL database for multiple systems[0m
 
   If you're going to have multiple systems accessing a master database,
@@ -947,7 +1125,11 @@
   If your video doesn't appear to be in-sync with your audio, it could
   be because you are listening to the real-time audio from your video
   card rather than after it's been processed and synchronized to the
-  video by MythTV.
+  video by MythTV.  Because MythTV is a personal video recorder, "Live
+  TV" isn't really live - to let you pause live TV, MythTV is actually
+  encoding the video, saving to disk, and then playing it back.  This
+  procedure puts your MythTV "live" TV about 2 seconds behind real-time,
+  so it's important that you're not listening to the live audio.
 
   What you need to do is to mute the "line-in" of your sound card and
   also set it as the recording source.
@@ -1029,15 +1211,15 @@
 
   Start with the alsa-driver package:
 
-       $ tar -xjf alsa-driver-0.9.x.tar.bz2
-       $ cd alsa-driver-0.9.x
-       $ ./configure --with-cards=XXX --with-sequencer=yes
-       $ make
-       $ su
-       # make install
-       # ./snddevices
-       # exit
-       $
+  $ tar -xjf alsa-driver-0.9.x.tar.bz2
+  $ cd alsa-driver-0.9.x
+  $ ./configure --with-cards=XXX --with-sequencer=yes
+  $ make
+  $ su
+  # make install
+  # ./snddevices
+  # exit
+  $
 
   This will compile and install the kernel modules and initialization
   scripts, as well as create device nodes in /dev.
@@ -1122,18 +1304,20 @@
   required on a frontend machine, because it will prepare your machine
   for playing sound.  The "Line" and "Capture" controls are required for
   your sound card to actually capture audio from the external Line-in.
+  Not all sound cards have a "Capture" control, but if yours does and
+  you don't set it then MythTV will not capture audio.
 
   ______________________________________________________________________
   Note the spelling in the following commands.
   ______________________________________________________________________
 
-       $ amixer set Master,0 100%,100% unmute
-       $ amixer set Line,0 75%,75% mute captur
-       $ amixer set Capture,0 100%,100% mute captur
-       $ su
-       # alsactl store
-       # exit
-       $
+  $ amixer set Master,0 100%,100% unmute
+  $ amixer set Line,0 75%,75% mute captur
+  $ amixer set Capture,0 100%,100% mute captur
+  $ su
+  # alsactl store
+  # exit
+  $
 
   If you have multiple sound cards, then use the -c parameter to specify
   which card to adjust.  Note that the first card will be "0", the
@@ -2477,8 +2661,22 @@
 
   [1m18.4.  Fast CPU, choppy or jittery video.[0m
 
-  This is most likely because your hard drive isn't setup to use DMA.
-  Use the [1mhdparm [22mprogram to check and enable DMA.
+  First, you should check that your kernel has been enabled for DMA:
+
+       [mythtv@pvr mythtv]$ dmesg |grep DMA
+           ide0: BM-DMA at 0xd800-0xd807, BIOS settings: hda:DMA, hdb:DMA
+           ide1: BM-DMA at 0xd808-0xd80f, BIOS settings: hdc:DMA, hdd:pio
+       hda: 156301488 sectors (80026 MB) w/2048KiB Cache, CHS=9729/255/63, UDMA(33)
+       hdb: 80043264 sectors (40982 MB) w/2048KiB Cache, CHS=4982/255/63, UDMA(33)
+
+  From the listing above, you can see that hda, hdb and hdc are set for
+  DMA, and hdd is set for pio.  If your kernel is not reporting DMA
+  being enabled, you may need to recompile your kernel. Check your
+  motherboard's chipset (look in the "ATA/IDE/MFM/RLL support" section
+  in "make menuconfig") for more information.
+
+  Next, check that the hard drive has DMA enabled.  Use the [1mhdparm[0m
+  program to check and enable DMA.
 
        # hdparm -d /dev/hd?
 
@@ -2489,7 +2687,7 @@
   the command to your /etc/rc.local file, or by adding files to
   /etc/sysconfig.
 
-  On Mandrake and other distributions, if you install hdparm from an RPM
+  On Mandrake and other distributions, if you install [1mhdparm [22mfrom an RPM
   you will most likely get a /etc/sysconfig/harddisks file installed.
   This file will be parsed by the /etc/rc.sysinit script.  If you use
   the default harddisks file, your changes will affect all IDE devices
@@ -2509,10 +2707,10 @@
   Some compile errors are worse than others.  If you get an error that
   doesn't abort the compilation, and says something like:
 
-  cc1plus: warning: changing search order for system directory
-  "/usr/local/include"
-  cc1plus: warning:   as it has already been specified as a non-system
-  directory
+       cc1plus: warning: changing search order for system directory
+       "/usr/local/include"
+       cc1plus: warning:   as it has already been specified as a non-system
+       directory
 
   then it shouldn't be a problem.
 
@@ -2546,13 +2744,13 @@
 
   Also, look for:
 
-       Section "Device"
-           Identifier "device1"
-           VendorName "nVidia Corporation"
-           BoardName "NVIDIA GeForce 256 (generic)"
-           Driver "nv"
-           Option "DPMS"
-       EndSection
+  Section "Device"
+      Identifier "device1"
+      VendorName "nVidia Corporation"
+      BoardName "NVIDIA GeForce 256 (generic)"
+      Driver "nv"
+      Option "DPMS"
+  EndSection
 
   In this case, you would need to either delete the Option "DPMS" line,
   or change it to # Option "DPMS" to comment it out.  The next time you
@@ -2560,23 +2758,23 @@
 
   Finally, check:
 
-  Section "Monitor"
-      Identifier "monitor1"
-      VendorName "Plug'n Play"
-      HorizSync 30-85
-      VertRefresh 50-160
+       Section "Monitor"
+           Identifier "monitor1"
+           VendorName "Plug'n Play"
+           HorizSync 30-85
+           VertRefresh 50-160
 
-      # Sony Vaio C1(X,XS,VE,VN)?
-      # 1024x480 @ 85.6 Hz, 48 kHz hsync
-      ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+           # Sony Vaio C1(X,XS,VE,VN)?
+           # 1024x480 @ 85.6 Hz, 48 kHz hsync
+           ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
 
-      # TV fullscreen mode or DVD fullscreen output.
-      # 768x576 @ 79 Hz, 50 kHz hsync
-      ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+           # TV fullscreen mode or DVD fullscreen output.
+           # 768x576 @ 79 Hz, 50 kHz hsync
+           ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
 
-      # 768x576 @ 100 Hz, 61.6 kHz hsync
-      ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
-  EndSection
+           # 768x576 @ 100 Hz, 61.6 kHz hsync
+           ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+       EndSection
 
   Ensure that there isn't an Option "DPMS" in the Monitor configuration.
 
@@ -2710,14 +2908,13 @@
 
   Master mixer - sets the level for the analog signal sent to line-out
   or the speakers.
-
   You may also want to ensure that /dev/dsp hasn't already been grabbed
   by another process, like [1mesd [22mor [1martsd[22m.  If /dev/dsp isn't available,
   then MythTV won't work.  Check your windowmanager documentation for
   instructions on disabling the sound manager.  If you wish to see what
   application is grabbing a resource, you can use the fuser command:
 
-  # fuser -v /dev/dsp
+       # fuser -v /dev/dsp
 
   To disable aRts in KDE, go to KDE->Control Center->Sound->Sound System
   and uncheck the "Start aRts soundserver on KDE startup" box.  Run #
@@ -2813,14 +3010,14 @@
   Here's an example submitted to the mythtv-dev list by Pat Pflaum
   mailto:pat@netburp.com <mailto:pat@netburp.com> using fvwm:
 
-       $ cat > .xinitrc
-       fvwm &
-       mythfrontend
-       ^D
-       $ cat > .fvwmrc
-       Style "myth*"      NoTitle, NoHandles, Sticky, WindowListSkip, BorderWidth 0
-       ^D
-       $
+  $ cat > .xinitrc
+  fvwm &
+  mythfrontend
+  ^D
+  $ cat > .fvwmrc
+  Style "myth*"      NoTitle, NoHandles, Sticky, WindowListSkip, BorderWidth 0
+  ^D
+  $
 
   [1m19.4.  What capture resolution should I use?  How does video work?[0m
 

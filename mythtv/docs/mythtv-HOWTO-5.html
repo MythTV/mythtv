@@ -17,6 +17,15 @@
 <P>Get MythTV from the 
 <A HREF="http://www.mythtv.org">mythtv.org</A>
 web site.  Save the tarball to a directory you can find.</P>
+<P><B>NOTE</B>: If you are in North America, you should decide whether you
+will be using XMLTV for your guide data or whether you will subscribe to
+<A HREF="www.gist.com">www.gist.com</A>.  gist.com listings require a
+subscription fee; see the website for details.  The gist.com listings appear
+to be more complete than those obtained using XMLTV from the zap2it website. 
+If you subscribe to gist.com, you will not need to install XMLTV and can
+<A HREF="#manually_building_mythtv">skip</A> the installation procedure -
+mythfilldatabase can obtain the guide data directly from the gist.com
+website.</P>
 <P>Get XMLTV from 
 <A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download version 0.5.9</P>
 <P>
@@ -138,7 +147,20 @@ $ cd xmltv-0.5.9
 </PRE>
 </CODE></BLOCKQUOTE>
 
-Install the xmltv prerequisites:
+Install the xmltv prerequisites:</P>
+<P>
+<HR>
+<PRE>
+NOTE for Mandrake Users: you may install the XMLTV pre-requisites if you
+have added a cooker mirror by typing:
+
+# urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
+
+and skipping to the compile step.
+</PRE>
+<HR>
+</P>
+<P>
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
@@ -175,7 +197,8 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-
+<P>
+<A NAME="manually_building_mythtv"></A> </P>
 <H2><A NAME="ss5.4">5.4</A> <A HREF="mythtv-HOWTO.html#toc5.4">Manually building MythTV.</A>
 </H2>
 
@@ -191,12 +214,17 @@ $ make
 </P>
 <P>
 <A NAME="RH80_OSD_Strip"></A> 
-<B>NOTE for Red Hat 8 users only</B>: You must manually modify a Makefile
+<HR>
+<PRE>
+NOTE for Red Hat 8 users: You must manually modify a Makefile
 within the themes directory, otherwise your on screen display (OSD) will be
 "generic" rather than themed.  The solution is to edit the Makefile within
 the themes directory and comment out (using a # symbol before each line)
 every line that starts with the word "strip". Make sure you switch back to
-the MythTV build directory before executing the next step.</P>
+the MythTV build directory before executing the next step.
+</PRE>
+<HR>
+</P>
 <P>Switch to superuser:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -206,6 +234,8 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P><B>NOTE</B>:  subsequent configuration steps assume that you are within
+the MythTV directory that you <CODE>cd</CODE>'d to above.</P>
 
 <H2><A NAME="Gentoo_build"></A> <A NAME="ss5.5">5.5</A> <A HREF="mythtv-HOWTO.html#toc5.5">Gentoo. </A>
 </H2>

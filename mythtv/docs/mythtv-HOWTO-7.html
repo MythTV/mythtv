@@ -16,7 +16,12 @@
 
 <P>If your video doesn't appear to be in-sync with your audio, it could be
 because you are listening to the real-time audio from your video card rather
-than after it's been processed and synchronized to the video by MythTV.</P>
+than after it's been processed and synchronized to the video by MythTV. 
+Because MythTV is a personal video recorder, "Live TV" isn't really live -
+to let you pause live TV, MythTV is actually encoding the video, saving to
+disk, and then playing it back.  This procedure puts your MythTV "live" TV
+about 2 seconds behind real-time, so it's important that you're not
+listening to the live audio.</P>
 <P>What you need to do is to mute the "line-in" of your sound card and also
 set it as the recording source.</P>
 <P>There are two ways to do this.  Graphically, and from the command line.</P>
@@ -195,7 +200,9 @@ $ aplay /usr/share/sounds/info.wav
 program can be used to setup the mixer.  The "Master" volume setting is only
 required on a frontend machine, because it will prepare your machine for
 playing sound.  The "Line" and "Capture" controls are required for your
-sound card to actually capture audio from the external Line-in.</P>
+sound card to actually capture audio from the external Line-in.  Not all
+sound cards have a "Capture" control, but if yours does and you don't set it
+then MythTV will not capture audio.</P>
 <P>
 <HR>
 <PRE>
