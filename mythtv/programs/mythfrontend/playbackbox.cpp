@@ -11,6 +11,8 @@
 #include <qimage.h>
 #include <qpainter.h>
 #include <qheader.h>
+#include <qfile.h>
+
 
 #include <unistd.h>
 
@@ -444,6 +446,18 @@ void PlaybackBox::play(QListViewItem *lvitem)
     ProgramListItem *pgitem = (ProgramListItem *)lvitem;
     ProgramInfo *rec = pgitem->getProgramInfo();
 
+    QString file = rec->pathname;
+
+    QFile checkFile(file);
+
+    if (checkFile.exists() == false)
+    {
+         killPlayer();
+         return;
+    }
+    else
+    {
+
     ProgramInfo *tvrec = new ProgramInfo(*rec);
 
     TV *tv = new TV(m_context);
@@ -479,6 +493,8 @@ void PlaybackBox::play(QListViewItem *lvitem)
     ignoreevents = false;
 
     timer->start(1000 / 30);
+
+    }
 }
 
 void PlaybackBox::doRemove(QListViewItem *lvitem)
@@ -659,7 +675,24 @@ void PlaybackBox::timeout(void)
                 ProgramListItem *pgitem = (ProgramListItem *)curitem;
                 ProgramInfo *rec = pgitem->getProgramInfo();
 
-                startPlayer(rec);
+		QString file = rec->pathname;
+
+		QFile checkFile(file);
+		
+		if (checkFile.exists() == false)
+		{
+			title->setText(title->text() + "      Error: File Missing!");
+			QPixmap temp((int)(160 * wmult), (int)(120 * hmult));
+        		temp.fill(black);
+        		pixlabel->setPixmap(temp);
+
+			killPlayer();
+			return;
+		}
+		else
+		{
+			startPlayer(rec);
+		}
             }
         }
     }
