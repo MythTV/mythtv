@@ -70,13 +70,6 @@ public:
     };
 };
 
-class PostalCode: public LineEditSetting, public TransientStorage {
-public:
-    PostalCode() {
-        setLabel(QObject::tr("ZIP/postal code"));
-    };
-};
-
 FreqTableSelector::FreqTableSelector(const VideoSource& parent) 
                  : VSSetting(parent, "freqtable")
 {
@@ -263,78 +256,6 @@ void ProviderSelector::fillSelections(const QString& location) {
     fclose(fp);
 }
 
-XMLTV_na_config::XMLTV_na_config(const VideoSource& _parent)
-               : parent(_parent) 
-{
-    setUseLabel(false);
-    setUseFrame(false);
-
-//    setLabel(QObject::tr("tv_grab_na configuration"));
-    postalcode = new PostalCode();
-    addChild(postalcode);
-
-    provider = new ProviderSelector("tv_grab_na");
-    addChild(provider);
-
-    connect(postalcode, SIGNAL(valueChanged(const QString&)),
-            this, SLOT(fillProviderSelections(const QString&)));
-}
-
-void XMLTV_na_config::save(QSqlDatabase* db) {
-    (void)db;
-
-    QString waitMsg(QObject::tr("Please wait while MythTV retrieves the "
-                                "list of available channels.\nYou "
-                                "may wish to check the output as it\n"
-                                "runs by switching to the terminal from "
-                                "which you started\nthis program."));
-    MythProgressDialog pdlg( waitMsg, 2 );
-    VERBOSE(VB_GENERAL, QString("Please wait while MythTV retrieves the "
-                                "list of available channels"));
-    pdlg.show(); 
-
-    QString filename = QString("%1/.mythtv/%2.xmltv")
-        .arg(QDir::homeDirPath()).arg(parent.getSourceName());
-    QString command = QString("tv_grab_na --config-file '%1' --configure --retry-limit %2 --retry-delay %3 --postalcode %4 --provider %5 --auto-new-channels add")
-        .arg(filename)
-        .arg(2)
-        .arg(30)
-        .arg(postalcode->getValue().replace(QRegExp(" "), ""))
-        .arg(provider->getValue());
-
-    pdlg.setProgress(1);
-
-    int ret = system(command);
-
-    if (ret != 0)
-    {
-        VERBOSE(VB_GENERAL, command);
-        VERBOSE(VB_GENERAL, QString("exited with status %1").arg(ret));
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
-                                  QObject::tr("Failed to retrieve channel "
-                                              "information."),
-                                  QObject::tr("MythTV was unable to retrieve "
-                                              "channel information for your "
-                                              "provider.\nPlease check the "
-                                              "terminal window for more "
-                                              "information"));
-    }
-
-    pdlg.setProgress( 2 );
-    pdlg.Close();
-}
-
-void XMLTV_na_config::fillProviderSelections(const QString& maybePostalCode) 
-{
-    if (QRegExp("\\d{5}").exactMatch(maybePostalCode) ||
-        QRegExp("[a-z]\\d[a-z]\\s?\\d[a-z]\\d", false).exactMatch(maybePostalCode))
-    {
-        QString mpc = maybePostalCode;
-        mpc = mpc.replace(QRegExp(" "), "");
-        provider->fillSelections(mpc);
-    }
-}
-
 XMLTV_uk_config::XMLTV_uk_config(const VideoSource& _parent)
                : VerticalConfigurationGroup(false, false), parent(_parent) 
 {
@@ -476,9 +397,6 @@ XMLTVConfig::XMLTVConfig(const VideoSource& parent)
 
     // only save settings for the selected grabber
     setSaveAll(false);
-
-    addTarget("tv_grab_na", new XMLTV_na_config(parent));
-    grabber->addSelection("North America (xmltv)", "tv_grab_na");
 
     addTarget("datadirect", new DataDirect_config(parent));
     grabber->addSelection("North America (DataDirect)", "datadirect");
@@ -970,6 +888,7 @@ public:
         SpinBoxSetting(-99,99,1),
         CISetting(parent, "preference") {
         setLabel(QObject::tr("Input preference"));
+        setValue(0);
         setHelpText(QObject::tr("If the input preference is not equal for "
                     "all inputs, the scheduler may choose to record a show "
                     "at a later time so that it can record on an input with "

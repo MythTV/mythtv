@@ -2479,7 +2479,7 @@ bool fillData(QValueList<Source> &sourcelist)
             grabData(*it, 0, &qCurrentDate);
         }
         else if (xmltv_grabber == "datadirect" ||
-                 xmltv_grabber == "tv_grab_na" || 
+                 //xmltv_grabber == "tv_grab_na" || 
                  xmltv_grabber == "tv_grab_uk_rt" ||
                  xmltv_grabber == "tv_grab_sn")
         {

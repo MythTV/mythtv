@@ -62,14 +62,14 @@ bool HouseKeeper::wantToRun(const QString &dbTag, int period, int minhour,
         {
             result.next();
             lastrun = result.value(0).toDateTime();
-        }
-    }
 
-    if ((now.toTime_t() - lastrun.toTime_t()) > period * oneday)
-    {
-        int hour = now.toString(QString("h")).toInt();
-        if ((hour >= minhour) && (hour <= maxhour))
-            runOK = true;       
+            if ((now.toTime_t() - lastrun.toTime_t()) > period * oneday)
+            {
+                int hour = now.toString(QString("h")).toInt();
+                if ((hour >= minhour) && (hour <= maxhour))
+                    runOK = true;
+            }
+        }
     }
 
     return runOK;

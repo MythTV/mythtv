@@ -107,24 +107,6 @@ protected:
     QString lastloadedpassword;
 };
 
-class PostalCode;
-
-class XMLTV_na_config: public VerticalConfigurationGroup {
-    Q_OBJECT
-public:
-    XMLTV_na_config(const VideoSource& _parent);
-
-    virtual void save(QSqlDatabase* db);
-
-protected slots:
-     void fillProviderSelections(const QString& maybePostalCode);
-
-protected:
-    const VideoSource& parent;
-    PostalCode* postalcode;
-    ProviderSelector* provider;
-};
-
 class XMLTV_uk_config: public VerticalConfigurationGroup {
 public:
     XMLTV_uk_config(const VideoSource& _parent);
