@@ -11,6 +11,7 @@
 #include "jitterometer.h"
 #include "recordingprofile.h"
 #include "commercial_skip.h"
+#include "videooutbase.h"
 
 extern "C" {
 #include "filter.h"
@@ -132,6 +133,8 @@ class NuppelVideoPlayer
     void StopEmbedding(void);
 
     // decoder stuff..
+    void ForceVideoOutputType(VideoOutputType type);
+
     void SetVideoParams(int width, int height, double fps, 
                         int keyframedistance, float aspect = 1.33333);
     void SetAudioParams(int bps, int channels, int samplerate);
@@ -397,6 +400,8 @@ class NuppelVideoPlayer
     bool experimentalsync;
 
     bool limitKeyRepeat;
+
+    VideoOutputType forceVideoOutput;
 };
 
 #endif

@@ -35,17 +35,7 @@ extern "C" {
 
 #include "remoteencoder.h"
 
-#include "videoout_xv.h"
 #include "videoout_null.h"
-
-#ifdef USING_XVMC
-#include "videoout_xvmc.h"
-#endif
-
-#ifdef USING_VIASLICE
-#include "videoout_viaslice.h"
-#endif
-
 
 NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
                                      ProgramInfo *info)
@@ -74,6 +64,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
     text_size = 0;
     video_aspect = 1.33333;
 
+    forceVideoOutput = kVideoOutput_Default;
     decoder = NULL;
 
     bookmarkseek = 0;
@@ -281,6 +272,11 @@ void NuppelVideoPlayer::setPrebuffering(bool prebuffer)
     }
 }
 
+void NuppelVideoPlayer::ForceVideoOutputType(VideoOutputType type)
+{
+    forceVideoOutput = type;
+}
+
 void NuppelVideoPlayer::InitVideo(void)
 {
     if (disablevideo)
@@ -305,15 +301,7 @@ void NuppelVideoPlayer::InitVideo(void)
             exit(0);
         }
 
-#ifdef USING_XVMC
-        videoOutput = new VideoOutputXvMC();
-        decoder->setLowBuffers();
-#elif defined(USING_VIASLICE)
-        videoOutput = new VideoOutputVIA();
-        decoder->setLowBuffers();
-#else
-        videoOutput = new VideoOutputXv();
-#endif
+        videoOutput = VideoOutput::InitVideoOut(forceVideoOutput);
 
         if (gContext->GetNumSetting("DecodeExtraAudio", 0))
             decoder->setLowBuffers();

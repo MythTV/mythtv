@@ -16,9 +16,18 @@ using namespace std;
 class NuppelVideoPlayer;
 class OSD;
 
+enum VideoOutputType
+{
+    kVideoOutput_Default = 0,
+    kVideoOutput_XvMC,
+    kVideoOutput_VIA
+};
+
 class VideoOutput
 {
   public:
+    static VideoOutput *InitVideoOut(VideoOutputType type);
+
     VideoOutput();
     virtual ~VideoOutput();
 

@@ -63,7 +63,7 @@ struct XvData
 #define GUID_I420_PLANAR 0x30323449
 #define GUID_YV12_PLANAR 0x32315659
 
-int XJ_error_catcher(Display * d, XErrorEvent * xeev)
+static int XJ_error_catcher(Display * d, XErrorEvent * xeev)
 {
   d = d; 
   xeev = xeev;

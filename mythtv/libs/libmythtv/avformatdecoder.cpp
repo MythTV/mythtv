@@ -10,11 +10,11 @@ using namespace std;
 #include "programinfo.h"
 #include "mythcontext.h"
 
-#ifdef USING_XVMC
 extern "C" {
+#ifdef USING_XVMC
 #include "../libavcodec/xvmc_render.h"
-}
 #endif
+}
 
 extern pthread_mutex_t avcodeclock;
 
@@ -224,7 +224,6 @@ void AvFormatDecoder::InitByteContext(void)
 int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                               char testbuf[2048])
 {
-    (void)novideo;
     ringBuffer = rbuffer;
 
     AVInputFormat *fmt = NULL;
@@ -304,8 +303,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 enc->debug = 0;
                 enc->rate_emu = 0;
 
-                if (enc->codec_id == CODEC_ID_MPEG1VIDEO || 
-                    enc->codec_id == CODEC_ID_MPEG2VIDEO)
+                if (!novideo && (enc->codec_id == CODEC_ID_MPEG1VIDEO || 
+                    enc->codec_id == CODEC_ID_MPEG2VIDEO))
                 {
 #ifdef USING_XVMC
                     enc->codec_id = CODEC_ID_MPEG2VIDEO_XVMC;
@@ -330,6 +329,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                     directrendering = true;
                     enc->slice_flags = SLICE_FLAG_CODED_ORDER |
                                        SLICE_FLAG_ALLOW_FIELD;
+                    setLowBuffers();
+                    m_parent->ForceVideoOutputType(kVideoOutput_XvMC);
                 }
 		else if (codec && codec->id == CODEC_ID_MPEG2VIDEO_VIA)
                 {
@@ -341,6 +342,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                     directrendering = true;
                     enc->slice_flags = SLICE_FLAG_CODED_ORDER |
                                        SLICE_FLAG_ALLOW_FIELD;
+                    setLowBuffers();
+                    m_parent->ForceVideoOutputType(kVideoOutput_VIA);
                 }
                 else if (codec && codec->capabilities & CODEC_CAP_DR1 && 
                     !(enc->width % 16))

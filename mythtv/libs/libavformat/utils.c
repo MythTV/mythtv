@@ -470,7 +470,7 @@ int av_find_stream_info(AVFormatContext *ic)
            in a file */
         min_read_size = 3000000;
     } else {
-        min_read_size = 125000;
+        min_read_size = 250000;
     }
     /* max read size is 2 seconds of video max */
     max_read_size = min_read_size * 5;
@@ -584,7 +584,8 @@ int av_find_stream_info(AVFormatContext *ic)
                        examining this stream */
                     /* XXX: add a codec info so that we can decide if
                        the codec can repeat frames */
-                    if (st->codec.codec_id == CODEC_ID_MPEG1VIDEO && 
+                    if ((st->codec.codec_id == CODEC_ID_MPEG1VIDEO ||
+                         st->codec.codec_id == CODEC_ID_MPEG2VIDEO) &&
                         ic->iformat != &mpegts_demux &&
                         st->codec.sub_id == 2) {
                         /* for mpeg2 video, we want to know the real

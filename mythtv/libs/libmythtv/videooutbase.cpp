@@ -6,6 +6,33 @@
 
 #include "../libmyth/mythcontext.h"
 
+#include "videoout_xv.h"
+
+#ifdef USING_XVMC
+#include "videoout_xvmc.h"
+#endif
+
+#ifdef USING_VIASLICE
+#include "videoout_viaslice.h"
+#endif
+
+VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type)
+{
+    (void)type;
+
+#ifdef USING_XVMC
+    if (type == kVideoOutput_XvMC)
+        return new VideoOutputXvMC();
+#endif
+
+#ifdef USING_VIASLICE
+    if (type == kVideoOutput_VIA)
+        return new VideoOutputVIA();
+#endif
+
+    return new VideoOutputXv();
+}
+
 VideoOutput::VideoOutput()
 {
     letterbox = false;

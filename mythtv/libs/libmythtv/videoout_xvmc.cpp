@@ -58,7 +58,7 @@ struct XvMCData
     int mode_id;
 };
 
-int XJ_error_catcher(Display * d, XErrorEvent * xeev)
+static int XJ_error_catcher(Display * d, XErrorEvent * xeev)
 {
   d = d; 
   xeev = xeev;
