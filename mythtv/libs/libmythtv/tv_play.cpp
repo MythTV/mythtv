@@ -108,6 +108,9 @@ TV::TV(QSqlDatabase *db)
 
     keyrepeatTimer = new QTimer(this);
     connect(keyrepeatTimer, SIGNAL(timeout()), SLOT(KeyRepeatOK()));
+
+    browseTimer = new QTimer(this);
+    connect(browseTimer, SIGNAL(timeout()), SLOT(BrowseEndTimer()));
 }
 
 void TV::Init(bool createWindow)
@@ -406,6 +409,9 @@ void TV::HandleStateChange(void)
 
         tmpInternalState = nextState;
         changed = true;
+
+        persistentbrowsemode =
+            gContext->GetNumSetting("PersistentBrowseMode", 0);
 
         recorder->SpawnLiveTV();
 
@@ -1046,8 +1052,18 @@ void TV::ProcessKeypress(int keypressed)
         {
             case Key_I: ToggleOSD(); break;
 
-            case Key_Up: ChangeChannel(CHANNEL_DIRECTION_UP); break;
-            case Key_Down: ChangeChannel(CHANNEL_DIRECTION_DOWN); break;
+            case Key_Up:
+                     if (persistentbrowsemode)
+                         BrowseDispInfo(BROWSE_UP);
+                     else
+                         ChangeChannel(CHANNEL_DIRECTION_UP);
+                     break;
+            case Key_Down:
+                     if (persistentbrowsemode)
+                         BrowseDispInfo(BROWSE_DOWN);
+                     else
+                         ChangeChannel(CHANNEL_DIRECTION_DOWN);
+                     break;
             case Key_Slash: ChangeChannel(CHANNEL_DIRECTION_FAVORITE); break;
 
             case Key_Question: ToggleChannelFavorite(); break;
@@ -2242,10 +2258,17 @@ void TV::BrowseStart(void)
     browsestarttime = starttime;
 
     BrowseDispInfo(BROWSE_SAME);
+
+    browseTimer->start(30000, true);
 }
 
 void TV::BrowseEnd(bool change)
 {
+    if (!browsemode)
+        return;
+
+    browseTimer->stop();
+
     osd->HideSet("browse_info");
 
     if (change)
@@ -2258,6 +2281,9 @@ void TV::BrowseEnd(bool change)
 
 void TV::BrowseDispInfo(int direction)
 {
+    if (!browsemode)
+        BrowseStart();
+
     QDateTime curtime = QDateTime::currentDateTime();
     QDateTime maxtime = curtime.addSecs(60 * 60 * 4);
     QDateTime lastprogtime =
@@ -2266,6 +2292,8 @@ void TV::BrowseDispInfo(int direction)
 
     if (paused)
         return;
+
+    browseTimer->changeInterval(30000);
 
     if (lastprogtime < curtime)
         browsestarttime = curtime.toString("yyyyMMddhhmm") + "00";
@@ -2302,6 +2330,9 @@ void TV::BrowseDispInfo(int direction)
 
 void TV::BrowseToggleRecord(void)
 {
+    if (!browsemode)
+        return;
+
     QMap<QString, QString> regexpMap;
     QDateTime startts = QDateTime::fromString(browsestarttime, Qt::ISODate);
 

@@ -496,6 +496,18 @@ public:
     };
 };
 
+class PersistentBrowseMode: public CheckBoxSetting, public GlobalSetting {
+public:
+    PersistentBrowseMode():
+        GlobalSetting("PersistentBrowseMode") {
+        setLabel("Always use Browse mode when changing channels in LiveTV");
+        setValue(false);
+        setHelpText("If this is set, Browse mode will automatically be "
+                   "activated whenever you use Channel UP/DOWN when "
+                   "watching Live TV.");
+    };
+};
+
 class AggressiveBuffer: public CheckBoxSetting, public GlobalSetting {
 public:
     AggressiveBuffer():
@@ -1116,6 +1128,7 @@ PlaybackSettings::PlaybackSettings()
     osd->addChild(new OSDFont());
     osd->addChild(new OSDCCFont());
     osd->addChild(new DefaultCCMode());
+    osd->addChild(new PersistentBrowseMode());
     addChild(osd);
 }
 

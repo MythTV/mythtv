@@ -1110,7 +1110,7 @@ void MainServer::HandleLockTuner(PlaybackSock *pbs)
 
         if (retval != -1)
         {
-            QString msg = QString("Cardid %1 LOCKed for external use by '%2'.")
+            QString msg = QString("Cardid %1 LOCKed for external use on %2.")
                                   .arg(retval).arg(pbshost);
             VERBOSE(msg);
 
@@ -1175,7 +1175,7 @@ void MainServer::HandleFreeTuner(int cardid, PlaybackSock *pbs)
         encoder = iter.data();
         encoder->FreeTuner();
         
-        QString msg = QString("Cardid %1 FREED from external use by '%2'.")
+        QString msg = QString("Cardid %1 FREED from external use on %2.")
                               .arg(cardid).arg(pbs->getHostname());
         VERBOSE(msg);
 

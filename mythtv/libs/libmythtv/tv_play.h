@@ -84,6 +84,7 @@ class TV : public QObject
     void SetPreviousChannel(void);
     void UnMute(void);
     void KeyRepeatOK(void);
+    void BrowseEndTimer(void) { BrowseEnd(false); }
 
   protected:
     void doLoadMenu(void);
@@ -207,7 +208,9 @@ class TV : public QObject
     bool endOfRecording;
     bool queuedTranscode;
 
+    QTimer *browseTimer;
     bool browsemode;
+    bool persistentbrowsemode;
     QString browsechannum;
     QString browsechanid;
     QString browsestarttime;
