@@ -2896,9 +2896,17 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
         if ((showPercentage) &&
             ((framesPlayed % 100) == 0))
         {
-            percentage = framesPlayed * 100 / totalFrames;
-            printf( "\b\b\b\b" );
-            printf( "%3d%%", percentage );
+            if (totalFrames)
+            {
+                percentage = framesPlayed * 100 / totalFrames;
+                printf( "\b\b\b\b" );
+                printf( "%3d%%", percentage );
+            }
+            else
+            {
+                printf( "\b\b\b\b\b\b" );
+                printf( "%6lld", framesPlayed );
+            }
             fflush( stdout );
         }
 
@@ -2908,7 +2916,11 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
     }
 
     if (showPercentage)
+    {
+        if (totalFrames)
+            printf( "\b\b" );
         printf( "\b\b\b\b      \b\b\b\b\b\b" );
+    }
 
     if (commercialskipmethod & 0x01)
     {
