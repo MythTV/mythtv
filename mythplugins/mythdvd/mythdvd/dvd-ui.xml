@@ -59,6 +59,7 @@
                 <value>Rip/Transcode</value>
                 <value lang="DK">Rip/Genkod</value>
                 <value lang="PT">Cópia/Recodificação</value>
+                <value lang="SV">Kopiering/Omkodning</value>
             </textarea>
             <image name="progress_background" draworder="0">
                 <filename>md_progress_background.png</filename>
@@ -106,6 +107,7 @@
                 <value>Job 1 of 1</value>
                 <value lang="DK">Job 1 af 1</value>
                 <value lang="PT">Processo 1 de 1</value>
+                <value lang="SV">Jobb 1 av 1</value>
             </textarea>
 
             <statusbar name="overall_status" draworder="1" whitespace="15">
@@ -212,6 +214,7 @@
                 <value>Rip/Transcode</value>
                 <value lang="DK">Rip/Genkod</value>
                 <value lang="PT">Cópia/Recodificação</value>
+                <value lang="SV">Kopiering/Omkodning</value>
             </textarea>
             <image name="progress_background" draworder="0">
                 <filename>md_progress_background.png</filename>
@@ -233,6 +236,7 @@
                 <value>Length:</value>
                 <value lang="DK">Længde:</value>
                 <value lang="PT">Tamanho:</value>
+                <value lang="SV">Längd:</value>
             </textarea>
 
             <textarea name="ripcheck_text" draworder="0" align="right">
@@ -241,6 +245,7 @@
                 <value>Select:</value>
                 <value lang="DK">Vælg:</value>
                 <value lang="PT">Copiar:</value>
+                <value lang="SV">Välj:</value>
             </textarea>
 
             <textarea name="ripname_text" draworder="0" align="right">
@@ -249,6 +254,7 @@
                 <value>Name:</value>
                 <value lang="DK">Navn:</value>
                 <value lang="PT">Nome:</value>
+                <value lang="SV">Namn:</value>
             </textarea>
 
             <textarea name="ripquality_text" draworder="0" align="right">
@@ -257,6 +263,7 @@
                 <value>Quality:</value>
                 <value lang="DK">Kvalitet:</value>
                 <value lang="PT">Qualidade:</value>
+                <value lang="SV">Kvalitet:</value>
             </textarea>
 
             <textarea name="ripaudio_text" draworder="0" align="right">
@@ -264,7 +271,8 @@
                 <area>50,180,250,30</area>
                 <value>Audio Track:</value>
                 <value lang="DK">Lydspor:</value>
-                <value lang="PT">Pista de �~Audio:</value>
+                <value lang="PT">Pista de Áudio:</value>
+                <value lang="SV">Ljudspår:</value>
             </textarea>
 
             <textarea name="ripacthree_text" draworder="0" align="right">
@@ -272,7 +280,8 @@
                 <area>50,215,250,30</area>
                 <value>AC3 Audio:</value>
                 <value lang="DK">AC3 lyd:</value>
-                <value lang="PT">�~Audio AC3:</value>
+                <value lang="PT">Áudio AC3:</value>
+                <value lang="SV">AC3-ljud:</value>
             </textarea>
 
             <textarea name="subtitle_text" draworder="0" align="right">
@@ -281,6 +290,7 @@
                 <value>Subtitles:</value>
                 <value lang="DK">Undertekster:</value>
                 <value lang="PT">Legendas:</value>
+                <value lang="SV">Textning:</value>
             </textarea>
 
             <textarea name="ripview_text" draworder="0" align="right">
@@ -288,7 +298,8 @@
                 <area>50,285,250,30</area>
                 <value>View:</value>
                 <value lang="DK">Se:</value>
-                <value lang="PT">�~Bngulo:</value>
+                <value lang="PT">Ângulo:</value>
+                <value lang="SV">Vy:</value>
             </textarea>
 
             <!--
@@ -361,6 +372,7 @@
                 <value>Title 1 of 1</value>
                 <value lang="DK">Titel 1 af 1</value>
                 <value lang="PT">Título 1 de 1:</value>
+                <value lang="SV">Titel 1 av 1</value>
             </textarea>
 
             <pushbutton name="prev_title_button" draworder="0">

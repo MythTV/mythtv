@@ -238,11 +238,11 @@ public:
     MTDConcurrentTranscodes():
         SpinBoxSetting(1, 99, 1),
         GlobalSetting("MTDConcurrentTranscodes") {
-        setLabel("Simultaneous Transcode Jobs");
+        setLabel(QObject::tr("Simultaneous Transcode Jobs"));
         setValue(1);
-        setHelpText("This determines the number of simultaneous "
+        setHelpText(QObject::tr("This determines the number of simultaneous "
                     "transcode jobs. If set at 1 (the default), "
-                    "there will only be one active job at a time.");
+                    "there will only be one active job at a time."));
     };
 };
 

@@ -252,6 +252,14 @@ You have no DVD Device defined.</source>
         <source>Transcode is thinking </source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Simultaneous Transcode Jobs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This determines the number of simultaneous transcode jobs. If set at 1 (the default), there will only be one active job at a time.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TitleDialog</name>

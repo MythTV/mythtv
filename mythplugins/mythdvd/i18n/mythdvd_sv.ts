@@ -3,51 +3,51 @@
     <name>DVDRipBox</name>
     <message>
         <source>Your connection to the Myth Transcoding Daemon has gone away. This is not a good thing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Förbindelsen till Myth omkodningsdemon har brutits. Inte bra.</translation>
     </message>
     <message>
         <source>Cannot connect to your Myth Transcoding Daemon. You can try hitting any number key to start it. If you still see this message, then something is really wrong.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan ej ansluta till Myth omkodningsdemon. Du kan försöka att trycka på godtycklig siffertangent för att starta den. Om du ser detta meddelande är något fel.</translation>
     </message>
     <message>
         <source>Attempting to connect to your mtd said host not found. This is unrecoverably bad. </source>
-        <translation type="unfinished"></translation>
+        <translation>Kunde ej slå upp datornamnet för din omkodningsserver. Inte bra.</translation>
     </message>
     <message>
         <source>Socket communication errors. This is unrecoverably bad. </source>
-        <translation type="unfinished"></translation>
+        <translation>Kommunikationsfel (eng: Socket communication errors). Inte bra.</translation>
     </message>
     <message>
         <source>Something is wrong, but I don&apos;t know what.</source>
-        <translation type="unfinished"></translation>
+        <translation>Något är fel men jag vet inte riktigt vad.</translation>
     </message>
     <message>
         <source>Job %1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Jobb %1 av %2</translation>
     </message>
     <message>
         <source>No jobs and nothing else to do. You could hit 0 to rip a DVD.</source>
-        <translation type="unfinished"></translation>
+        <translation>Inga jobb och inget annat att göra. Du kan trycka 0 för att kopiera en DVD.</translation>
     </message>
     <message>
         <source>No Jobs. Checking and/or waiting for DVD.</source>
-        <translation type="unfinished"></translation>
+        <translation>Inga jobb. Kontrollerar/väntar på DVDn.</translation>
     </message>
     <message>
         <source>No jobs and nothing else to do. You could hit 0 to rip a disc if you like.</source>
-        <translation type="unfinished"></translation>
+        <translation>Inga jobb och inget annat att göra. Du kan trycka 0 för att kopiera en DVD.</translation>
     </message>
     <message>
         <source>Cancelling ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Avbryter ...</translation>
     </message>
     <message>
         <source>0 New Rip</source>
-        <translation type="unfinished"></translation>
+        <translation>0 Ny kopiering</translation>
     </message>
     <message>
         <source>9 Cancel Job</source>
-        <translation type="unfinished"></translation>
+        <translation>9 Avbryt jobb</translation>
     </message>
 </context>
 <context>
@@ -56,181 +56,189 @@
         <source>
 
 You have no VCD Player command defined.</source>
-        <translation type="unfinished"></translation>
+        <translation>
+
+Du har inget VCD-uppspelningskommando definierat.</translation>
     </message>
     <message>
         <source>OK, I&apos;ll go run Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>OK, kör Inställningar</translation>
     </message>
     <message>
         <source>
 
 You have no VCD Device defined.</source>
-        <translation type="unfinished"></translation>
+        <translation>
+
+Du har ingen VCD-enhet definierad.</translation>
     </message>
     <message>
         <source>
 
 You have no DVD Player command defined.</source>
-        <translation type="unfinished"></translation>
+        <translation>
+
+Du har inget DVD-avspelningskommando definierat.</translation>
     </message>
     <message>
         <source>
 
 You have no DVD Device defined.</source>
-        <translation type="unfinished"></translation>
+        <translation>
+
+Du har ingen DVD-enhet definierad.</translation>
     </message>
     <message>
         <source>Location of VCD device</source>
-        <translation type="unfinished"></translation>
+        <translation>VCD-enhet</translation>
     </message>
     <message>
         <source>This device must exist, and the user running MythDVD needs to have read permission on the device.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denna enhet måste existera och användaren som kör MythDVD måste ha läsrättigheter på den.</translation>
     </message>
     <message>
         <source>Location of DVD device</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD-enhet</translation>
     </message>
     <message>
         <source>General Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Generella inställningar</translation>
     </message>
     <message>
         <source>DVD Player Command</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando för DVD-avspelning</translation>
     </message>
     <message>
         <source>This can be any command to launch a DVD player (e.g. MPlayer, ogle, etc.). If present, %d will be substituted for the DVD device (e.g. /dev/dvd).</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta är ett godtyckligt kommando för att starta en DVD-spelare (t ex MPlayer, ogle etc). Om tecknen &apos;%d&apos; ingår i kommandot kommer detta att ersättas med den konfigurerade DVD-enheten (t ex /dev/dvd).</translation>
     </message>
     <message>
         <source>VCD Player Command</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando för VCD-avspelning</translation>
     </message>
     <message>
         <source>This can be any command to launch a VCD player (e.g. MPlayer, xine, etc.). If present, %d will be substituted for the VCD device (e.g. /dev/cdrom).</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta är ett godtyckligt kommando för att starta en VCD-spelare (t ex MPlayer, xine etc). Om tecknen &apos;%d&apos; ingår i kommandot kommer detta att ersättas med den konfigurerade VCD-enheten (t ex /dev/cdrom).</translation>
     </message>
     <message>
         <source>DVD Player Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Inställningar för DVD-avspelning</translation>
     </message>
     <message>
         <source>VCD Player Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Inställningar för VCD-avspelning</translation>
     </message>
     <message>
         <source>Directory to hold temporary files</source>
-        <translation type="unfinished"></translation>
+        <translation>Bibliotek för temporära filer</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythDVD needs to have write permission to the directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta bibliotek måste existera och användaren som kör MythDVD måste ha skrivrättigheter till det.</translation>
     </message>
     <message>
         <source>Title Playing Command</source>
-        <translation type="unfinished"></translation>
+        <translation>Titelavspeningskommando</translation>
     </message>
     <message>
         <source>This is a command used to preview a given title on a DVD. If present %t will be set to the title, %d for device, %a for audio track, %c for audio channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta kommando används för att spela upp en förhandsvisning för en given DVD-titel. Följande teckensekvenser, som ersätts i det slutliga kommandot, kan användas: %d för enhet, %a för ljudspår, %c för ljudkanaler.</translation>
     </message>
     <message>
         <source>Subtitle arguments:</source>
-        <translation type="unfinished"></translation>
+        <translation>Textningsargument:</translation>
     </message>
     <message>
         <source>If you choose any subtitles for ripping, this command is added to the end of the Title Play Command to allow previewing of subtitles. If  present %s will be set to the subtitle track. </source>
-        <translation type="unfinished"></translation>
+        <translation>Om du väljer textning vid kopiering kommer dessa kommandoradsargument att läggas till på slutet av Titelabspelningskommandot. Om teckensekvensen %s anges kommer detta att ersättas med textningsspåret i det slutliga kommandot.</translation>
     </message>
     <message>
         <source>Base transcode command</source>
-        <translation type="unfinished"></translation>
+        <translation>Baskommando för omkodning</translation>
     </message>
     <message>
         <source>This is the base (without arguments) command to run transcode on your system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta är baskommandot (utan kommandoradsargument) för att köra omkodning på ditt system.</translation>
     </message>
     <message>
         <source>MTD port number</source>
-        <translation type="unfinished"></translation>
+        <translation>Portnummer för omkodningsdemon</translation>
     </message>
     <message>
         <source>The port number that should be used for communicating with the MTD (Myth Transcoding Daemon)</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta är TCP-portnumret som skall användas för att kommunicera med omkodningsdemonen</translation>
     </message>
     <message>
         <source>MTD logs to terminal window</source>
-        <translation type="unfinished"></translation>
+        <translation>Omkodningsdemonen loggar till terminalfönstret</translation>
     </message>
     <message>
         <source>If set, the MTD (Myth Transcoding Daemon) will log to the window it is started from. Otherwise, it will write to a file called  mtd.log in the top level ripping directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om denna funktion aktiveras kommer omkodningsdemonen (eng: Myth Transconding Daemon) att logga till det teminalfönster den startades från. Om funktionen inte är aktiverad kommer loggningen att ske till filen mtd.log.</translation>
     </message>
     <message>
         <source>Transcode AC3 Audio</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd AC3-ljud</translation>
     </message>
     <message>
         <source>If set, the MTD (Myth Transcoding Daemon) will, by default, preserve AC3 (Dolby Digital) audio in transcoded files. </source>
-        <translation type="unfinished"></translation>
+        <translation>Om denna funktion är aktiverad kommer omkodningsdemonen (eng: Myth Transcoding Daemon) att bevara AC3-ljud (Dolby Digital) i omkodade filer.</translation>
     </message>
     <message>
         <source>Use xvid rather than divx</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd xvid i stället för divx</translation>
     </message>
     <message>
         <source>If set, mythdvd will use the (open, free) xvid codec rather than divx whenever possible.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om funktionen är aktiverad kommer MythDVD att använda den fria kodnings/dekodnings-mjukvaran xvid i stället för divx närhelst det är möjligt.</translation>
     </message>
     <message>
         <source>Nice level for MTD</source>
-        <translation type="unfinished"></translation>
+        <translation>Prioritet för omkodning</translation>
     </message>
     <message>
         <source>This determines the priority of the Myth Transcoding Daemon. Higher numbers mean lower priority (more CPU to other tasks).</source>
-        <translation type="unfinished"></translation>
+        <translation>Denna inställning justerar prioriteten för omkodningsdemonen (eng: Myth Transcoding Daemon). Värdet kan sägas vara en omvänd prioritet där högre värden (max 20) ger lägre prioritet och lägre värden (min -20) ger högre prioritet. Ett värde större än 0 är ofta bra för att inte störa andra processer.</translation>
     </message>
     <message>
         <source>Ripped video segments</source>
-        <translation type="unfinished"></translation>
+        <translation>Segmentstorlek för kopierad video</translation>
     </message>
     <message>
         <source>If set to something other than 0, ripped video titles will be broken up into files of this size (in MB). Applies to both perfect quality recordings and intermediate files used for transcoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om detta värde är satt till något annat än 0 kommer kopierade videospår att delas upp i filer med motsvarande storlek (i MB). Inställningen gäller för både inspelningar av perfekt kvalitet och mellanfiler som används vid omkodning.</translation>
     </message>
     <message>
         <source>DVD Ripper Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD-kopieringsinställningar</translation>
     </message>
     <message>
         <source>MTD Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Inställningar för omkodningsdemon</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Okänd</translation>
     </message>
     <message>
         <source>Waiting For Access to DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Väntar på tillgång till DVD</translation>
     </message>
     <message>
         <source>Ripping to file ~</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopierar till fil ~</translation>
     </message>
     <message>
         <source>Perfect DVD Rip of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Perfekt DVD-kopiering av %1</translation>
     </message>
     <message>
         <source>Transcode of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Omkodning av %1</translation>
     </message>
     <message>
         <source>Waiting for Permission to Start Transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Väntar på tillstånd att börja omkodning</translation>
     </message>
     <message>
         <source>EMT: </source>
@@ -238,19 +246,19 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>Transcoding Pass 1 of 2 ~</source>
-        <translation type="unfinished"></translation>
+        <translation>Omkodar pass 1 av 2 ~</translation>
     </message>
     <message>
         <source>Transcoding Pass 2 of 2 ~</source>
-        <translation type="unfinished"></translation>
+        <translation>Omkodar pass 2 av 2 ~</translation>
     </message>
     <message>
         <source>Transcoding ~</source>
-        <translation type="unfinished"></translation>
+        <translation>Omkodar ~</translation>
     </message>
     <message>
         <source>Transcode is thinking </source>
-        <translation type="unfinished"></translation>
+        <translation>Omkodningsprocessen tänker</translation>
     </message>
     <message>
         <source>Simultaneous Transcode Jobs</source>
@@ -265,23 +273,23 @@ You have no DVD Device defined.</source>
     <name>TitleDialog</name>
     <message>
         <source>Unkown</source>
-        <translation type="unfinished"></translation>
+        <translation>Okänd</translation>
     </message>
     <message>
         <source>%1 - Title %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 - Titel %2</translation>
     </message>
     <message>
         <source>Perfect</source>
-        <translation type="unfinished"></translation>
+        <translation>Perfekt</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen</translation>
     </message>
     <message>
         <source>Title %1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel %1 av %2</translation>
     </message>
     <message>
         <source>0 Process Selected Title</source>

@@ -144,11 +144,11 @@
     </message>
     <message>
         <source>Attempting to connect to your mtd said host not found. This is unrecoverably bad. </source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível ligar ao servidor de recodificação (MTD). O servidor não foi encontrado. Verifique o nome do servidor e tente novamente.</translation>
     </message>
     <message>
         <source>Socket communication errors. This is unrecoverably bad. </source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível ligar ao servidor de recodificação (MTD). Erro na comunicação.</translation>
     </message>
 </context>
 <context>
@@ -357,47 +357,55 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Desconhecido</translation>
     </message>
     <message>
         <source>Waiting For Access to DVD</source>
-        <translation type="unfinished">À espera do DVD</translation>
+        <translation>À espera do DVD</translation>
     </message>
     <message>
         <source>Ripping to file ~</source>
-        <translation type="unfinished">A copiar para o ficheiro ~ </translation>
+        <translation>A copiar para o ficheiro ~ </translation>
     </message>
     <message>
         <source>Perfect DVD Rip of %1</source>
-        <translation type="unfinished">Cópia Perfeita do DVD: %1</translation>
+        <translation>Cópia Perfeita do DVD: %1</translation>
     </message>
     <message>
         <source>Transcode of %1</source>
-        <translation type="unfinished">Recodificação de %1</translation>
+        <translation>Recodificação de %1</translation>
     </message>
     <message>
         <source>Waiting for Permission to Start Transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>À espera de permissão para começar a codificar</translation>
     </message>
     <message>
         <source>EMT: </source>
-        <translation type="unfinished"></translation>
+        <translation>Tempo:</translation>
     </message>
     <message>
         <source>Transcoding Pass 1 of 2 ~</source>
-        <translation type="unfinished">Passo de Codificação 1 de 2 ~ </translation>
+        <translation>Passo de Codificação 1 de 2 ~ </translation>
     </message>
     <message>
         <source>Transcoding Pass 2 of 2 ~</source>
-        <translation type="unfinished">Passo de Codificação 2 de 2 ~ </translation>
+        <translation>Passo de Codificação 2 de 2 ~ </translation>
     </message>
     <message>
         <source>Transcoding ~</source>
-        <translation type="unfinished">Codificação ~</translation>
+        <translation>Codificação ~</translation>
     </message>
     <message>
         <source>Transcode is thinking </source>
-        <translation type="unfinished">A Codificar</translation>
+        <translation>A Codificar</translation>
+    </message>
+    <message>
+        <source>Simultaneous Transcode Jobs</source>
+        <translation>Processos Simultâneos de Codificação</translation>
+    </message>
+    <message>
+        <source>This determines the number of simultaneous transcode jobs. If set at 1 (the default), there will only be one active job at a time.</source>
+        <translation>Esta opção define o número de processos simultâneos de codificação. Se for 1 (valor por omissão), haverá apenas um processo de cada vez.</translation>
     </message>
 </context>
 <context>
