@@ -715,7 +715,7 @@ void LCD::switchToMusic(QString artist, QString track)
 	startMusic(artist, track);
 }
 
-void LCD::switchToChannel(QString channum = "", QString title = "", QString subtitle = "")
+void LCD::switchToChannel(QString channum, QString title, QString subtitle)
 {
 	stopAll();
 	startChannel(channum, title, subtitle);
