@@ -1115,8 +1115,8 @@ QGridLayout* ProgramInfo::DisplayWidget(ScheduledRecording* rec,
     airDateField->setBackgroundOrigin(QWidget::WindowOrigin);
 
     QString recDateText = "";
-    QLabel *recDateLabel;
-    QLabel *recDateField;
+    QLabel *recDateLabel = NULL;
+    QLabel *recDateField = NULL;
     if (rec)
     {
         switch (rec->getRecordingType()) {

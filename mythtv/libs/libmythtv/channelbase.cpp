@@ -97,6 +97,8 @@ void ChannelBase::SwitchToInput(const QString &inputname)
 
     if (input >= 0)
         SwitchToInput(input, true);
+    else
+        cerr << "Couldn't find input: " << inputname << " on card\n";
 }
 
 void ChannelBase::SwitchToInput(const QString &inputname, const QString &chan)
@@ -108,6 +110,8 @@ void ChannelBase::SwitchToInput(const QString &inputname, const QString &chan)
         SwitchToInput(input, false);
         SetChannelByString(chan);
     }
+    else
+        cerr << "Couldn't find input: " << inputname << " on card\n";
 }
 
 bool ChannelBase::ChangeExternalChannel(const QString &channum)

@@ -287,10 +287,10 @@ bool Channel::ChannelDown(void)
 bool Channel::SetChannelByString(const QString &chan)
 {
     if (!Open())
+    {
+        cerr << "channel object wasn't open, can't change channels\n";
         return false;
-
-    if (curchannelname == chan)
-        return true;
+    }
 
     QSqlDatabase *db_conn;
     pthread_mutex_t db_lock;
