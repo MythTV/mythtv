@@ -11,6 +11,8 @@
 #include <qfont.h>
 #include <qpixmap.h>
 #include <qpainter.h>
+#include "mythwidgets.h"
+#include "util.h"
 using namespace std;
 
 class UIType;
@@ -83,18 +85,98 @@ class UIType : public QObject
     LayerSet *m_parent;
 };
 
-class UIFontPairType
+class UIBarType : public UIType
 {
   public:
-    UIFontPairType(fontProp *, fontProp *);
-    ~UIFontPairType();
- 
-    fontProp *getActive() { return m_activeFont; }
-    fontProp *getInactive() { return m_inactiveFont; }
+    UIBarType(const QString &name, QString, int, QRect);
+    ~UIBarType();
+
+    void SetText(int, QString);
+    void SetIcon(int, QPixmap);
+
+    void Draw(QPainter *, int, int);
+
+    void SetJustification(int jst) { m_justification = jst; }
+    void SetSize(int size) { m_size = size; LoadImage(); }
+    void SetScreen(double w, double h) { m_wmult = w; m_hmult = h; }
+    void SetFont(fontProp *font) { m_font = font; }
+    void SetOrientation(int ori) { m_orientation = ori; }
+    void SetTextOffset(QPoint to) { m_textoffset = to; }
+    void SetIconOffset(QPoint ic) { m_iconoffset = ic; }
 
   private:
-    fontProp *m_activeFont;
-    fontProp *m_inactiveFont;
+    void LoadImage();
+    QRect m_displaysize;
+    QPoint m_textoffset;
+    QPoint m_iconoffset;
+    int m_justification;
+    int m_orientation;
+    int m_size;
+    fontProp *m_font;
+    QString m_filename;
+    QPixmap m_image;
+    QMap<int, QString> textData;
+    QMap<int, QPixmap> iconData;
+
+};
+
+class UIGuideType : public UIType
+{
+  public:
+    UIGuideType(const QString &name, int);
+    ~UIGuideType();
+
+    void Draw(QPainter *, int, int);
+
+    void SetJustification(int jst) { m_justification = jst; }
+    void SetCutDown(bool cut) { m_cutdown = cut; }
+    void SetFont(fontProp *font) { m_font = font; }
+    void SetFillType(int type) { m_filltype = type; }
+
+    void SetWindow(MythDialog *win) { m_window = win; }
+    void SetRecordingColor(QString col) { m_reccolor = col; }
+    void SetSelectorColor(QString col) { m_selcolor = col; }
+    void SetSelectorType(int type) { m_seltype = type; }
+    void SetSolidColor(QString col) { m_solidcolor = col; }
+    void SetCategoryColors(QMap<QString, QString> catC)
+                          { categoryColors = catC; }
+    void SetProgramInfo(unsigned int, int, QRect, QString, QString, int);
+    void SetCurrentArea(QRect myArea) { curArea = myArea; }
+    void ResetData() { drawArea.clear(); dataMap.clear(); m_count = 0;
+                       categoryMap.clear(); recStatus.clear();
+                       countMap.clear(); }
+    void ResetRow(unsigned int);
+    void SetArea(QRect area) { m_area = area; }
+    void SetScreenLocation(QPoint sl) { m_screenloc = sl; }
+    void SetTextOffset(QPoint to) { m_textoffset = to; }
+
+  private:
+    QRect m_area;
+    QPoint m_textoffset;
+    QPoint m_screenloc;
+    MythDialog *m_window;
+    void drawCurrent(QPainter *);
+    void drawBox(QPainter *, int, QString);
+    void drawBackground(QPainter *, int); 
+    void drawText(QPainter *, int);
+    void Blender(QPainter *, QRect, int, QString force = "");
+    QString cutDown(QString, QFont *, int, int);
+    int m_justification;
+    fontProp *m_font;
+    QString m_solidcolor;
+    QString m_selcolor;
+    int m_seltype;
+    QString m_reccolor;
+    int m_filltype;
+    bool m_cutdown;
+    QRect curArea;
+    unsigned int m_count;
+    QMap<unsigned int, int> countMap;
+    QMap<QString, QString> categoryColors;
+    QMap<int, QRect> drawArea;
+    QMap<int, QString> dataMap;
+    QMap<int, QString> categoryMap;
+    QMap<int, int> recStatus;
 };
 
 class UIListType : public UIType
@@ -162,7 +244,6 @@ class UIListType : public UIType
     QPoint m_selection_loc;
     QPoint m_downarrow_loc;
     QPoint m_uparrow_loc;
-    QString m_name;
     QRect m_area;
     QMap<QString, QString> m_fonts;
     QMap<QString, fontProp> m_fontfcns;
@@ -217,21 +298,21 @@ class UITextType : public UIType
 
     void SetJustification(int jst) { m_justification = jst; }
     int GetJustification() { return m_justification; }
+    void SetCutDown(bool cut) { m_cutdown = cut; }
 
     QRect DisplayArea() { return m_displaysize; }
 
     void Draw(QPainter *, int, int);
 
   private:
-    QString cutDown(QString, QFont *, int);
+    QString cutDown(QString, QFont *, int, int);
     int m_justification;
     QRect m_displaysize;
     QString m_message;
 
     fontProp *m_font;
 
-    bool m_centered;
-    bool m_right;
+    bool m_cutdown;
 
 };
 
@@ -265,7 +346,7 @@ class UIStatusBarType : public UIType
 class GenericTree
 {
     //
-    //  This is used by the UIType below 
+    //  This is used by the UIType below
     //  (UIManagedTreeListType) to fill it
     //  with arbitrary simple data types and
     //  allow that object to fire SIGNALS
@@ -274,12 +355,12 @@ class GenericTree
     //
 
   public:
-  
+
     GenericTree();
     GenericTree(const QString a_string);
     GenericTree(int an_int);
     ~GenericTree();
-    
+
     GenericTree* addNode(QString a_string);
     GenericTree* addNode(QString a_string, int an_int);
     void         init();
@@ -288,7 +369,7 @@ class GenericTree
     QString      getString(){return my_string;}
 
   private:
-  
+
     QString                my_string;
     QStringList            my_stringlist;
     int                    my_int;
@@ -299,7 +380,7 @@ class GenericTree
 class UIManagedTreeListType : public UIType
 {
     Q_OBJECT
-    
+
     //
     //  The idea here is a generalized notion of a list that
     //  shows underlying tree data with theme-ui configurable
@@ -311,32 +392,30 @@ class UIManagedTreeListType : public UIType
     //
     typedef QMap <int, QRect> CornerMap;
 
-    
-
   public:
 
     UIManagedTreeListType(const QString &name);
     ~UIManagedTreeListType();
 
-    void setArea(QRect an_area){area = an_area;}
-    void setBins(int l_bins){bins = l_bins;}
-    void setBinAreas(CornerMap some_bin_corners){bin_corners = some_bin_corners;}
+    void setArea(QRect an_area) { area = an_area; }
+    void setBins(int l_bins) { bins = l_bins; }
+    void setBinAreas(CornerMap some_bin_corners) { bin_corners = some_bin_corners; }
     void Draw(QPainter *, int drawlayer, int context);
     void assignTreeData(GenericTree *a_tree);
 
   public slots:
-  
+
     void sayHelloWorld(); // debugging;
 
   signals:
-  
+
     void leafNodeSelected(QString node_string, int node_int);
 
   private:
-    
+
     QRect area;
     int   bins;
-    
+
     CornerMap   bin_corners;
     GenericTree *my_tree_data;
 };

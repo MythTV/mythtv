@@ -63,7 +63,6 @@ void LayerSet::Draw(QPainter *dr, int drawlayer, int context)
 // **************************************************************
 
 UIType::UIType(const QString &name)
-      : QObject(NULL, name)
 {
     m_name = name;
     m_debug = false;
@@ -94,17 +93,590 @@ QString UIType::Name()
 
 // **************************************************************
 
-UIFontPairType::UIFontPairType(fontProp *activeFont, fontProp *inactiveFont)
+UIBarType::UIBarType(const QString &name, QString imgfile,
+                     int dorder, QRect displayrect)
+         : UIType(name)
 {
-    m_activeFont = activeFont;
-    m_inactiveFont = inactiveFont;
+    m_name = name;
+
+    m_filename = imgfile;
+
+    m_displaysize = displayrect;
+    m_order = dorder;
+    m_justification = (Qt::AlignLeft | Qt::AlignVCenter);
+  
+    m_textoffset = QPoint(0, 0);
+    m_iconoffset = QPoint(0, 0);
+
 }
 
-UIFontPairType::~UIFontPairType()
+UIBarType::~UIBarType()
+{
+} 
+
+void UIBarType::SetText(int num, QString myText)
+{
+    textData[num] = myText;
+}
+
+void UIBarType::SetIcon(int num, QPixmap myIcon)
+{
+    iconData[num] = myIcon;
+}
+
+void UIBarType::LoadImage()
+{
+    if (m_size == 0)
+    {
+        cerr << "uitypes.cpp:UIBarType:LoadImage:m_size == 0";
+        return;
+    }
+    QString file;
+
+    QString baseDir = gContext->GetInstallPrefix();
+    QString themeDir = gContext->FindThemeDir("");
+    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
+    baseDir = baseDir + "/share/mythtv/themes/default/";
+
+    QFile checkFile(themeDir + m_filename);
+
+    if (checkFile.exists())
+        file = themeDir + m_filename;
+    else
+        file = baseDir + m_filename;
+    checkFile.setName(file);
+    if (!checkFile.exists())
+        file = "/tmp/" + m_filename;
+
+    checkFile.setName(file);
+    if (!checkFile.exists())
+        file = "~/.mythtv/" + m_filename;
+
+    if (m_debug == true)
+        cerr << "     -Filename: " << file << endl;
+
+    QImage *sourceImg = new QImage();
+    if (sourceImg->load(file))
+    {
+        QImage scalerImg;
+        int doX = 0;
+        int doY = 0;
+        if (m_orientation == 1)
+        {
+            doX = (int)(m_displaysize.width() / m_size);
+            doY = m_displaysize.height();
+        }
+        else if (m_orientation == 2)
+        {
+            doX = m_displaysize.width();
+            doY = (int)(m_displaysize.height() / m_size);
+        }
+
+        scalerImg = sourceImg->smoothScale((int)(doX * m_wmult),
+                                               (int)(doY * m_hmult));
+        m_image.convertFromImage(scalerImg);
+        if (m_debug == true)
+            cerr << "     -Image: " << file << " loaded.\n";
+    }
+    else
+      if (m_debug == true)
+          cerr << "     -Image: " << file << " failed to load.\n";
+
+    delete sourceImg;
+
+}
+
+void UIBarType::Draw(QPainter *dr, int drawlayer, int context)
+{
+  if (m_context == context || m_context == -1)
+  {
+    if (drawlayer == m_order)
+    {
+      if (m_debug == true)
+         cerr << "    +UIBarType::Size is " << m_size << endl;
+
+      if (m_size < 0)
+         cerr << "uitypes.cpp:UIBarType:Size is < 0!\n";
+ 
+      int xdrop = 0;
+      int ydrop = 0;
+      int drawx = 0;
+      int drawy = 0;
+
+      if (m_orientation == 1)
+      {
+         xdrop = (int)(m_displaysize.width() / m_size);
+         ydrop = m_displaysize.height();
+      }
+      else
+      {
+         xdrop = m_displaysize.width();
+         ydrop = (int)(m_displaysize.height() / m_size);
+      }
+
+      for (int i = 0; i < m_size; i++)
+      {
+        if (m_debug == true) 
+            cerr << "    +UIBarType::Drawing Item # " << i << endl;
+        QPoint fontdrop = m_font->shadowOffset;
+        QString msg = textData[i];
+
+        if (m_orientation == 1)
+        {
+            drawx = m_displaysize.left() + (int)(i * xdrop);
+            drawy = m_displaysize.top();
+        }
+        else
+        {
+            drawx = m_displaysize.left();
+            drawy = m_displaysize.top() + (int)(i * ydrop);
+        }
+        dr->drawPixmap(drawx, drawy, m_image);
+
+        dr->setFont(m_font->face);
+        if (fontdrop.x() != 0 || fontdrop.y() != 0)
+        {
+            dr->setBrush(m_font->dropColor);
+            dr->setPen(QPen(m_font->dropColor, (int)(2 * m_wmult)));
+            if (m_orientation == 1)
+            {
+                drawx = m_displaysize.left() + fontdrop.x() + (int)(i * xdrop);
+                drawy = m_displaysize.top();
+            }
+            else
+            {
+                drawx = m_displaysize.left();
+                drawy = m_displaysize.top() + fontdrop.y() + (int)(i * ydrop);
+            }
+            if (m_debug == true)
+                cerr << "    +UIBarType::Drawing Shadow @ (" << drawx 
+                     << ", " << drawy << ")" << endl;
+            dr->drawText(drawx + m_textoffset.x(), drawy + m_textoffset.y(),
+                           xdrop - (int)(2*m_textoffset.x()), ydrop - (int)(2 * m_textoffset.y()),
+                           m_justification, msg);
+        }
+
+        dr->setBrush(m_font->color);
+        dr->setPen(QPen(m_font->color, (int)(2 * m_wmult)));
+        if (m_orientation == 1)
+        {
+            drawx = m_displaysize.left() + (int)(i * xdrop);
+            drawy = m_displaysize.top();
+        }
+        else
+        {
+            drawx = m_displaysize.left();
+            drawy = m_displaysize.top() + (int)(i * ydrop);
+        }
+        if (m_debug == true) 
+        {
+            cerr << "    +UIBarType::Drawing @ (" << drawx << ", " << drawy << ")" << endl;
+            cerr << "     +UIBarType::Data = " << msg << endl;
+        }
+        dr->drawText(drawx + m_textoffset.x(), drawy + m_textoffset.y(),
+                     xdrop - (int)(2*m_textoffset.x()), ydrop - (int)(2 * m_textoffset.y()),
+                     m_justification, msg);
+
+        if (m_debug == true)
+            cerr << "   +UIBarType::Draw() <- inside Layer\n";
+      }
+    }
+    else
+        if (m_debug == true)
+        {
+             cerr << "   +UIBarType::Draw() <- outside (layer = " << drawlayer
+                  << ", widget layer = " << m_order << "\n";
+        }      
+  }
+}
+
+// **************************************************************
+
+UIGuideType::UIGuideType(const QString &name, int order)
+           : UIType(name)
+{
+    m_name = name;
+    m_order = order;
+
+    m_cutdown = true;
+    m_count = 0;
+    m_justification = (Qt::AlignLeft | Qt::AlignTop);
+    m_textoffset = QPoint(0, 0);
+
+
+    m_area = QRect(0, 0, 0, 0);
+    m_screenloc = QPoint(0, 0);
+    m_window = NULL;
+    m_font = NULL;
+    m_solidcolor = "";
+    m_selcolor = "";
+    m_seltype = 1;
+    m_reccolor = "";
+    m_filltype = 6;
+    curArea = QRect(0, 0, 0, 0);
+    m_count = 0;
+    countMap.clear();
+    categoryColors.clear();
+    drawArea.clear();
+    dataMap.clear();
+    categoryMap.clear();
+    recStatus.clear();
+}
+
+UIGuideType::~UIGuideType()
 {
 }
 
-// ***************************************************************
+void UIGuideType::Draw(QPainter *dr, int drawlayer, int context)
+{
+  if (m_context == context || m_context == -1)
+  {
+    if (drawlayer == m_order)
+    {
+        if (m_count == 0)
+        {
+            cout << "uitypes.cpp:UIGuideType:m_count == 0\n";
+            return;
+        }
+        if (m_debug)
+            cerr << "UIGuideType::Draw\n";
+ 
+        typedef QMap<int, QString> DataMap;
+        QString msg = "";
+        DataMap::Iterator it;
+        DataMap::Iterator start;
+        DataMap::Iterator end;
+        int i = -1;
+ 
+        start = dataMap.begin();
+        end = dataMap.end();
+        for (it = start; it != end; ++it)
+        {
+            i = it.key();
+
+            if (recStatus[i] == 0)
+                drawBackground(dr, i);
+            else
+                drawBox(dr, i, m_reccolor);
+
+            drawText(dr, i);
+        }
+        drawCurrent(dr);
+    }
+  }
+}
+
+QString UIGuideType::cutDown(QString info, QFont *testFont, int maxwidth, int maxheight)
+{
+    QFontMetrics fm(*testFont);
+    QRect curFontSize;
+
+    curFontSize = fm.boundingRect(0, 0, maxwidth, maxheight, m_justification, info);
+
+    if (curFontSize.height() > maxheight)
+    {
+        QString testInfo = info;
+        curFontSize = fm.boundingRect(0, 0, maxwidth, maxheight, m_justification, testInfo);
+        int count = info.length();
+
+        while (curFontSize.height() >= maxheight)
+        {
+            testInfo = info.left(count);
+            curFontSize = fm.boundingRect(0, 0, maxwidth, maxheight, m_justification, testInfo);
+            count = count--;
+            if (count < 0)
+                break;
+        }
+        testInfo = testInfo + "...";
+        info = testInfo;
+    }
+    else if (curFontSize.width() > maxwidth)
+    {
+        int curFontWidth = fm.width(info);
+        if (curFontWidth > maxwidth)
+        {
+            QString testInfo = "";
+            curFontWidth = fm.width(testInfo);
+            int tmaxwidth = maxwidth - fm.width("LLL");
+            int count = 0;
+
+            while (curFontWidth < tmaxwidth)
+            {
+                testInfo = info.left(count);
+                curFontWidth = fm.width(testInfo);
+                count = count + 1;
+            }
+            testInfo = testInfo + "...";
+            info = testInfo;
+        }
+    }
+    return info;
+
+}
+
+void UIGuideType::drawCurrent(QPainter *dr)
+{
+    int num = 0;
+    int breakin = 1;
+    QRect area = curArea;
+    area.setTop(area.top() + breakin);
+    area.setLeft(area.left() + breakin);
+    area.setHeight(area.height() - (int)(2*breakin));
+    area.setWidth(area.width() - (int)(2*breakin));
+
+  if (m_seltype == 2)
+  {
+    if (m_filltype == 1)
+    {
+        dr->setBrush( QBrush( QColor(m_selcolor), Qt::Dense4Pattern) );
+        dr->setPen(QPen(QColor(m_selcolor), (int)(2 * m_wmult)));
+        dr->drawRoundRect(area);
+    }
+    else if (m_filltype == 2)
+    {
+        dr->setBrush(QColor(m_selcolor));
+        dr->setPen(QPen(QColor(m_selcolor), (int)(2 * m_wmult)));
+        dr->drawRoundRect(area);
+    }
+    else if (m_filltype == 3)
+    {
+        dr->setBrush( QBrush( QColor(m_selcolor), Qt::Dense4Pattern) );
+        dr->setPen(QPen(QColor(m_selcolor), (int)(2 * m_wmult)));
+        dr->fillRect(area, QBrush( QColor(m_selcolor), Qt::Dense4Pattern));
+    }
+    else if (m_filltype == 4)
+    {
+        dr->setBrush( QBrush(QColor(m_selcolor)) );
+        dr->setPen(QPen(QColor(m_selcolor), (int)(2 * m_wmult)));
+        dr->fillRect(area, QBrush(QColor(m_selcolor)));
+    }
+    else if (m_filltype == 5)
+    {
+        dr->setBrush(QBrush(m_selcolor));
+        dr->setPen(QPen(QColor(m_selcolor), (int)(2 * m_wmult)));
+        dr->fillRect(area, QBrush(m_selcolor));
+    }
+    else if (m_filltype == 6)
+        Blender(dr, area, num, m_selcolor);
+  }
+  else
+  {
+    dr->setBrush(QBrush(m_selcolor));
+    dr->setPen(QPen(QColor(m_selcolor), (int)(10 * m_wmult)));
+    dr->drawLine(area.left(), area.top(), area.right(), area.top());
+    dr->drawLine(area.left(), area.top(), area.left(), area.bottom());
+    dr->drawLine(area.left(), area.bottom(), area.right(), area.bottom());
+    dr->drawLine(area.right(), area.top(), area.right(), area.bottom());
+
+    dr->drawLine(area.left(), area.top() + 1, area.right(), area.top() + 1);
+    dr->drawLine(area.left() + 1, area.top(), area.left() + 1, area.bottom());
+    dr->drawLine(area.left(), area.bottom() - 1, area.right(), area.bottom() - 1);
+    dr->drawLine(area.right() - 1, area.top(), area.right() - 1, area.bottom());
+  }
+ }
+
+void UIGuideType::drawBox(QPainter *dr, int num, QString color)
+{
+    int breakin = 1;
+    QRect area = drawArea[num];
+    area.setTop(area.top() + breakin);
+    area.setLeft(area.left() + breakin);
+    area.setHeight(area.height() - (int)(2*breakin));
+    area.setWidth(area.width() - (int)(2*breakin));
+
+    if (m_filltype == 1)
+    {
+        dr->setBrush( QBrush( QColor(color), Qt::Dense4Pattern) );
+        dr->setPen(QPen(QColor(color), (int)(2 * m_wmult)));
+        dr->drawRoundRect(area);
+    }
+    else if (m_filltype == 2)
+    {
+        dr->setBrush(QColor(color));
+        dr->setPen(QPen(QColor(color), (int)(2 * m_wmult)));
+        dr->drawRoundRect(area);
+    }
+    else if (m_filltype == 3)
+    {
+        dr->setBrush( QBrush( QColor(color), Qt::Dense4Pattern) );
+        dr->setPen(QPen(QColor(color), (int)(2 * m_wmult)));
+        dr->fillRect(area, QBrush( QColor(color), Qt::Dense4Pattern));
+    }
+    else if (m_filltype == 4)
+    {
+        dr->setBrush( QBrush(QColor(color)) );
+        dr->setPen(QPen(QColor(color), (int)(2 * m_wmult)));
+        dr->fillRect(area, QBrush(QColor(color)));
+    }
+    else if (m_filltype == 5)
+    {
+        dr->setBrush(QBrush(color));
+        dr->setPen(QPen(QColor(color), (int)(2 * m_wmult)));
+        dr->fillRect(area, QBrush(color));
+    }
+    else if (m_filltype == 6)
+        Blender(dr, area, num, color);
+ }
+
+void UIGuideType::drawBackground(QPainter *dr, int num)
+{
+    int breakin = 1;
+    QRect area = drawArea[num];
+    area.setTop(area.top() + breakin);
+    area.setLeft(area.left() + breakin);
+    area.setHeight(area.height() - (int)(2*breakin));
+    area.setWidth(area.width() - (int)(2*breakin));
+
+    if (m_filltype == 1)
+    {
+        dr->setBrush( QBrush( QColor(m_solidcolor), Qt::Dense4Pattern) );
+        dr->setPen(QPen(QColor(m_solidcolor), (int)(2 * m_wmult)));
+        dr->drawRoundRect(area);
+    }
+    else if (m_filltype == 2)
+    {
+        dr->setBrush(QColor(m_solidcolor));
+        dr->setPen(QPen(QColor(m_solidcolor), (int)(2 * m_wmult)));
+        dr->drawRoundRect(area);
+    }
+    else if (m_filltype == 3)
+    {
+        dr->setBrush( QBrush( QColor(m_solidcolor), Qt::Dense4Pattern) );
+        dr->setPen(QPen(QColor(m_solidcolor), (int)(2 * m_wmult)));
+        dr->fillRect(area, QBrush( QColor(m_solidcolor), Qt::Dense4Pattern));
+    }
+    else if (m_filltype == 4)
+    {
+        dr->setBrush( QBrush(QColor(m_solidcolor)) );
+        dr->setPen(QPen(QColor(m_solidcolor), (int)(2 * m_wmult)));
+        dr->fillRect(area, QBrush(QColor(m_solidcolor)));
+    }
+    else if (m_filltype == 5)
+    {
+        dr->setBrush(QBrush(categoryColors[categoryMap[num]]));
+        dr->setPen(QPen(QColor(categoryColors[categoryMap[num]]), (int)(2 * m_wmult)));
+        dr->fillRect(area, QBrush(categoryColors[categoryMap[num]]));
+    }
+    else if (m_filltype == 6 && categoryMap[num] != "Other")
+         Blender(dr, area, num);
+}
+
+void UIGuideType::Blender(QPainter *dr, QRect area, int num, QString force)
+{
+    if (!m_window)
+    {
+        cout << "UIGuideType:Blender:Error! m_window undefined, set with SetWindow(MythDialog *)\n";
+        return;
+    }
+    QString color = categoryColors[categoryMap[num]];
+    if (force.length() > 0)
+        color = force;
+    int alpha = 96;
+    unsigned int *data = NULL;
+
+    QBrush br = QBrush(color);
+    QRgb blendcolor = br.color().rgb();
+    blendcolor = qRgba(qRed(blendcolor), qGreen(blendcolor),
+                 qBlue(blendcolor), alpha);
+ 
+    QPixmap orig(area.width() + 1, area.height() + 1);
+    orig.fill(m_window, m_screenloc.x() + area.left(), 
+                        m_screenloc.y() + area.top());
+
+    QImage bgimage = orig.convertToImage();
+
+    for (int tmpy = 0; tmpy <= area.height(); tmpy++)
+    {
+         data = (unsigned int *)bgimage.scanLine(tmpy);
+         for (int tmpx = 0; tmpx <= area.width(); tmpx++)
+         {
+              QRgb pixelcolor = data[tmpx];
+              data[tmpx] = blendColors(pixelcolor, blendcolor,
+                           alpha);
+         }
+    }
+
+    dr->drawImage(area.left(), area.top(), bgimage);
+}
+
+void UIGuideType::drawText(QPainter *dr, int num)
+{
+    QRect area = drawArea[num];
+    QString msg = dataMap[num];
+    QPoint fontdrop = m_font->shadowOffset;
+
+    area.setLeft(area.left() + m_textoffset.x());
+    area.setTop(area.top() + m_textoffset.y());
+
+    if (m_cutdown == true)
+        msg = cutDown(msg, &(m_font->face), area.width(), area.height());
+    if (m_cutdown == true && m_debug == true)
+        cerr << "    +UIGuideType::CutDown Called.\n";
+
+    dr->setFont(m_font->face);
+    if (fontdrop.x() != 0 || fontdrop.y() != 0)
+    {
+        if (m_debug == true)
+        cerr << "    +UIGuideType::Drawing shadow @ (" 
+             << area.left() + fontdrop.x() << ", "
+             << area.top() + fontdrop.y() << ")\n";
+        dr->setBrush(m_font->dropColor);
+        dr->setPen(QPen(m_font->dropColor, (int)(2 * m_wmult)));
+        dr->drawText(area.left() + fontdrop.x(),
+                     area.top() + fontdrop.y(),
+                     area.width(),
+                     area.height(), m_justification, msg);
+    }
+
+    dr->setBrush(m_font->color);
+    dr->setPen(QPen(m_font->color, (int)(2 * m_wmult)));
+    if (m_debug == true)
+        cerr << "    +UIGuideType::Drawing @ ("
+             << area.left() << ", " << area.top()
+             << ")" << endl;
+
+ 
+    if (m_debug == true)
+        cerr << "    +UIGuideType::Data = " << msg << endl;
+
+    dr->drawText(area.left(), area.top(), area.width(), area.height(),
+                 m_justification, msg);
+ 
+}
+
+void UIGuideType::ResetRow(unsigned int row)
+{
+    if (!countMap.contains(row))
+        return;
+
+    countMap[row] = -1;
+    for (unsigned int i = (unsigned int)(row * 100); 
+         i < (unsigned int)((unsigned int)(row * 100) + 99); i++)
+    {
+        if (!dataMap.contains(i))
+            return;
+        dataMap.remove(i);
+        recStatus.remove(i);
+        drawArea.remove(i);
+        categoryMap.remove(i);
+    }
+}
+
+void UIGuideType::SetProgramInfo(unsigned int row, int num, QRect area, 
+                                 QString title, QString genre, int recFlag)
+{
+    if (num > countMap[row])
+        countMap[row] = num;
+    dataMap[(int)(row * 100) + num] = title;
+    recStatus[(int)(row * 100) + num] = recFlag;
+    drawArea[(int)(row * 100) + num] = area;
+    categoryMap[(int)(row * 100) + num] = genre;
+    if (row > m_count)
+        m_count = row;
+}
+
+// **************************************************************
+
 
 UIListType::UIListType(const QString &name, QRect area, int dorder)
           : UIType(name)
@@ -374,6 +946,10 @@ void UIImageType::LoadImage()
     if (!checkFile.exists())
         file = "/tmp/" + m_filename;
 
+    checkFile.setName(file);
+    if (!checkFile.exists())
+        file = "~/.mythtv/" + m_filename;
+
     if (m_debug == true)
         cerr << "     -Filename: " << file << endl;
 
@@ -446,10 +1022,9 @@ UITextType::UITextType(const QString &name, fontProp *font,
     m_font = font;
 
     m_displaysize = displayrect;
-    m_centered = false;
-    m_right = false;
+    m_cutdown = true;
     m_order = dorder;
-    m_justification = Qt::AlignLeft;
+    m_justification = (Qt::AlignLeft | Qt::AlignTop);
 }
 
 UITextType::~UITextType()
@@ -468,25 +1043,38 @@ void UITextType::Draw(QPainter *dr, int drawlayer, int context)
     {
         QPoint fontdrop = m_font->shadowOffset;
         QString msg = m_message;
-        msg = cutDown(msg, &(m_font->face), m_displaysize.width());
-
         dr->setFont(m_font->face);
+        if (m_cutdown == true)
+            msg = cutDown(msg, &(m_font->face), m_displaysize.width(), m_displaysize.height());
+        if (m_cutdown == true && m_debug == true)
+            cerr << "    +UITextType::CutDown Called.\n";
+
         if (fontdrop.x() != 0 || fontdrop.y() != 0)
         {
+            if (m_debug == true)
+                cerr << "    +UITextType::Drawing shadow @ (" 
+                     << (int)(m_displaysize.left() + fontdrop.x()) << ", "
+                     << (int)(m_displaysize.top() + fontdrop.y()) << ")" << endl;
             dr->setBrush(m_font->dropColor);
             dr->setPen(QPen(m_font->dropColor, (int)(2 * m_wmult)));
             dr->drawText((int)(m_displaysize.left() + fontdrop.x()),
                            (int)(m_displaysize.top() + fontdrop.y()),
-                         m_displaysize.width(), m_displaysize.height(), m_justification, m_message);
+                           m_displaysize.width(), 
+                           m_displaysize.height(), m_justification, msg);
         }
+
         dr->setBrush(m_font->color);
         dr->setPen(QPen(m_font->color, (int)(2 * m_wmult)));
+        if (m_debug == true)
+                cerr << "    +UITextType::Drawing @ (" 
+                     << (int)(m_displaysize.left()) << ", " << (int)(m_displaysize.top()) 
+                     << ")" << endl;
         dr->drawText(m_displaysize.left(), m_displaysize.top(), 
-                      m_displaysize.width(), m_displaysize.height(), m_justification, m_message);
+                      m_displaysize.width(), m_displaysize.height(), m_justification, msg);
         if (m_debug == true)
         {
             cerr << "   +UITextType::Draw() <- inside Layer\n";
-            cerr << "       -Message: " << m_message << endl;
+            cerr << "       -Message: " << m_message << " (cut: " << msg << ")" <<  endl;
         }
     }
     else
@@ -497,26 +1085,49 @@ void UITextType::Draw(QPainter *dr, int drawlayer, int context)
         }
 }
 
-QString UITextType::cutDown(QString info, QFont *testFont, int maxwidth)
+QString UITextType::cutDown(QString info, QFont *testFont, int maxwidth, int maxheight)
 {
     QFontMetrics fm(*testFont);
+    QRect curFontSize;
 
-    int curFontWidth = fm.width(info);
-    if (curFontWidth > maxwidth)
+    curFontSize = fm.boundingRect(0, 0, maxwidth, maxheight, m_justification, info);
+
+    if (curFontSize.height() > (int)(1.5 * maxheight))
     {
-        QString testInfo = "";
-        curFontWidth = fm.width(testInfo);
-        int tmaxwidth = maxwidth - fm.width("LLL");
-        int count = 0;
+        QString testInfo = info;
+        curFontSize = fm.boundingRect(0, 0, maxwidth, maxheight, m_justification, testInfo);
+        int count = info.length();
 
-        while (curFontWidth < tmaxwidth)
+        while (curFontSize.height() >= maxheight)
         {
             testInfo = info.left(count);
-            curFontWidth = fm.width(testInfo);
-            count = count + 1;
+            curFontSize = fm.boundingRect(0, 0, maxwidth, maxheight, m_justification, testInfo);
+            count = count--;
+            if (count < 0)
+                break;
         }
         testInfo = testInfo + "...";
         info = testInfo;
+    }
+    else if (curFontSize.width() > maxwidth)
+    {
+        int curFontWidth = fm.width(info);
+        if (curFontWidth > maxwidth)
+        {
+            QString testInfo = "";
+            curFontWidth = fm.width(testInfo);
+            int tmaxwidth = maxwidth - fm.width("LLL");
+            int count = 0;
+
+            while (curFontWidth < tmaxwidth)
+            {
+                testInfo = info.left(count);
+                curFontWidth = fm.width(testInfo);
+                count = count + 1;
+            }
+            testInfo = testInfo + "...";
+            info = testInfo;
+        }
     }
     return info;
 
@@ -554,7 +1165,7 @@ void UIStatusBarType::Draw(QPainter *dr, int drawlayer, int context)
     }
 }
 
-// ***************************************************************
+// *********************************************************************
 
 GenericTree::GenericTree()
 {
@@ -588,7 +1199,7 @@ GenericTree* GenericTree::addNode(QString a_string)
     GenericTree *new_node = new GenericTree(a_string);
     new_node->setParent(this);
     my_subnodes.append(new_node);
-    
+
     return new_node;
 }
 
@@ -598,7 +1209,7 @@ GenericTree* GenericTree::addNode(QString a_string, int an_int)
     new_node->setInt(an_int);
     new_node->setParent(this);
     my_subnodes.append(new_node);
-    
+
     return new_node;
 }
 
@@ -606,8 +1217,7 @@ GenericTree::~GenericTree()
 {
 }
 
-
-// ***************************************************************
+// ********************************************************************
 
 UIManagedTreeListType::UIManagedTreeListType(const QString & name)
                      : UIType(name)
@@ -628,7 +1238,7 @@ UIManagedTreeListType::~UIManagedTreeListType()
 
 void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
 {
-    
+
     //
     //  This (obviously) doesn't do much yet.
     //  The idea is to use the data in my_tree_data
@@ -652,4 +1262,5 @@ void UIManagedTreeListType::sayHelloWorld()
 {
     cout << "From a UIManagedTreeListType Object: Hello World" << endl ;
 }
+
 

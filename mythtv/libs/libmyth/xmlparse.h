@@ -29,10 +29,12 @@ class XMLParse
     void parsePopup(QDomElement &);
     void parseContainer(QDomElement &, QString &, int &, QRect &);
     void parseListArea(LayerSet *, QDomElement &);
+    void parseBar(LayerSet *, QDomElement &);
+    void parseGuideGrid(LayerSet *, QDomElement &);
+    void parseManagedTreeList(LayerSet *, QDomElement &);
     void parseTextArea(LayerSet *, QDomElement &);
     void parseStatusBar(LayerSet *, QDomElement &);
     void parseImage(LayerSet *, QDomElement &);
-    void parseManagedTreeList(LayerSet *, QDomElement &);
     void resizeImage(QPixmap *, QString);
   
   private:

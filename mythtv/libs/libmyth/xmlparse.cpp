@@ -282,6 +282,266 @@ void XMLParse::parseImage(LayerSet *container, QDomElement &element)
     container->AddType(image);
 }
 
+void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
+{
+    int context = -1;
+    QString align = "";
+    QString font = "";
+    QString color = "";
+    QString seltype = "";
+    QString selcolor = "";
+    QString reccolor = "";
+    QRect area;
+    QPoint textoff = QPoint(0, 0);
+    bool cutdown = true;
+    bool multiline = false;
+    QMap<QString, QString> catColors;
+
+    QString name = element.attribute("name", "");
+    if (name.isNull() || name.isEmpty())
+    {
+        cerr << "Guide needs a name\n";
+        exit(0);
+    }
+
+    QString order = element.attribute("draworder", "");
+    if (name.isNull() || name.isEmpty())
+    {
+        cerr << "Guide needs an order\n";
+        exit(0);
+    }
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "context")
+            {
+                context = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "font")
+            {
+                font = getFirstText(info);
+            }
+            else if (info.tagName() == "solidcolor")
+            {
+                color = getFirstText(info);
+            }
+            else if (info.tagName() == "area")
+            {
+                area = parseRect(getFirstText(info));
+                normalizeRect(area);
+            }
+            else if (info.tagName() == "align")
+            {
+                align = getFirstText(info);
+            }
+            else if (info.tagName() == "cutdown")
+            {
+                if (getFirstText(info).lower() == "no")
+                   cutdown = false;
+            }
+            else if (info.tagName() == "textoffset")
+            {
+                textoff = parsePoint(getFirstText(info));
+                textoff.setX((int)(textoff.x() * wmult));
+                textoff.setY((int)(textoff.y() * hmult));
+            }
+            else if (info.tagName() == "recordingcolor")
+            {
+                reccolor = getFirstText(info);
+            }
+            else if (info.tagName() == "multiline")
+            {
+                if (getFirstText(info).lower() == "yes")
+                   multiline = true;
+            }
+            else if (info.tagName() == "selector")
+            {
+                QString typ = "";
+                QString col = "";
+                typ = info.attribute("type");
+                col = info.attribute("color");
+
+                selcolor = col;
+                seltype = typ;
+            }
+            else if (info.tagName() == "catcolor")
+            {
+                QString cat = "";
+                QString col = "";
+                cat = info.attribute("category");
+                col = info.attribute("color");
+
+                catColors[cat] = col;
+            }
+            else
+            {
+                cerr << "Unknown: " << info.tagName() << " in bar\n";
+                exit(0);
+            }
+        }
+    }
+    fontProp *testfont = GetFont(font);
+    if (!testfont)
+    {
+        cerr << "Unknown font: " << font << " in guidegrid: " << name << endl;
+        exit(0);
+    }
+
+    UIGuideType *guide = new UIGuideType(name, order.toInt());
+    guide->SetFont(testfont);
+    guide->SetSolidColor(color);
+    guide->SetCutDown(cutdown);
+    guide->SetArea(area);
+    guide->SetCategoryColors(catColors);
+    guide->SetTextOffset(textoff);
+    guide->SetRecordingColor(reccolor);
+    guide->SetSelectorColor(selcolor);
+    if (seltype.lower() == "box")
+        guide->SetSelectorType(1);
+    else
+        guide->SetSelectorType(2); // solid
+
+    if (!align.isNull() && !align.isEmpty())
+    {
+        int jst = 0;
+        if (multiline == true)
+           jst = Qt::WordBreak;
+        if (align.lower() == "center")
+            guide->SetJustification(Qt::AlignCenter | jst);
+        else if (align.lower() == "right")
+            guide->SetJustification(Qt::AlignRight | jst);
+        else if (align.lower() == "allcenter")
+            guide->SetJustification(Qt::AlignHCenter | Qt::AlignVCenter | jst);
+        else if (align.lower() == "vcenter")
+            guide->SetJustification(Qt::AlignVCenter | jst);
+    }
+    align = "";
+
+    if (context != -1)
+    {
+        guide->SetContext(context);
+    }
+    container->AddType(guide);
+}
+
+void XMLParse::parseBar(LayerSet *container, QDomElement &element)
+{
+    int context = -1;
+    QString align = "";
+    QString orientation = "horizontal";
+    QString filename = "";
+    QString font = "";
+    QPoint textoff = QPoint(0, 0);
+    QPoint iconoff = QPoint(0, 0);
+    QRect area;
+
+    QString name = element.attribute("name", "");
+    if (name.isNull() || name.isEmpty())
+    {
+        cerr << "Bar needs a name\n";
+        exit(0);
+    }
+
+    QString order = element.attribute("draworder", "");
+    if (name.isNull() || name.isEmpty())
+    {
+        cerr << "Bar needs an order\n";
+        exit(0);
+    }
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "context")
+            {
+                context = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "orientation")
+            {
+                orientation = getFirstText(info);
+            }
+            else if (info.tagName() == "area")
+            {
+                area = parseRect(getFirstText(info));
+                normalizeRect(area);
+            }
+            else if (info.tagName() == "imagefile")
+            {
+                filename = getFirstText(info);
+            }
+            else if (info.tagName() == "font")
+            {
+                font = getFirstText(info);
+            }
+            else if (info.tagName() == "align")
+            {
+                align = getFirstText(info);
+            }
+            else if (info.tagName() == "textoffset")
+            {
+                textoff = parsePoint(getFirstText(info));
+                textoff.setX((int)(textoff.x() * wmult));
+                textoff.setY((int)(textoff.y() * hmult));
+            }
+            else if (info.tagName() == "iconoffset")
+            {
+                iconoff = parsePoint(getFirstText(info));
+                iconoff.setX((int)(iconoff.x() * wmult));
+                iconoff.setY((int)(iconoff.y() * hmult));
+            }
+            else
+            {
+                cerr << "Unknown: " << info.tagName() << " in bar\n";
+                exit(0);
+            }
+        }
+    }
+    fontProp *testfont = GetFont(font);
+    if (!testfont)
+    {
+        cerr << "Unknown font: " << font << " in bar: " << name << endl;
+        exit(0);
+    }
+
+    UIBarType *bar = new UIBarType(name, filename, order.toInt(), area);
+    bar->SetScreen(wmult, hmult);
+    bar->SetFont(testfont);
+    bar->SetTextOffset(textoff);
+    bar->SetIconOffset(iconoff);
+    if (orientation == "horizontal") 
+       bar->SetOrientation(1);
+    else if (orientation == "vertical")
+       bar->SetOrientation(2);
+
+    if (!align.isNull() && !align.isEmpty())
+    {
+        if (align.lower() == "center")
+            bar->SetJustification(Qt::AlignCenter);
+        else if (align.lower() == "right")
+            bar->SetJustification(Qt::AlignRight);
+        else if (align.lower() == "allcenter")
+            bar->SetJustification(Qt::AlignHCenter | Qt::AlignVCenter);
+        else if (align.lower() == "vcenter")
+            bar->SetJustification(Qt::AlignVCenter);
+    }
+    align = "";
+
+    if (context != -1)
+    {
+        bar->SetContext(context);
+    }
+    container->AddType(bar);
+}
+
+
+
 fontProp *XMLParse::GetFont(const QString &text)
 {
     fontProp *ret;
@@ -385,6 +645,14 @@ void XMLParse::parseContainer(QDomElement &element, QString &newname, int &conte
                 area = parseRect(getFirstText(info));
                 normalizeRect(area);
             }
+            else if (info.tagName() == "bar")
+            {
+                parseBar(container, info);
+            }
+            else if (info.tagName() == "guidegrid")
+            {
+                parseGuideGrid(container, info);
+            }
             else
             {
                 cerr << "Unknown container child: " << info.tagName() << endl;
@@ -405,6 +673,7 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
     QRect area = QRect(0, 0, 0, 0);
     QPoint shadowOffset = QPoint(0, 0);
     QString font = "";
+    QString cutdown = "";
     QString value = "";
     QString statictext = "";
     QString multiline = "";
@@ -448,6 +717,10 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
             {
                 value = getFirstText(info);
             }
+            else if (info.tagName() == "cutdown")
+            {
+                cutdown = getFirstText(info);
+            }
             else if (info.tagName() == "multiline")
             {
                 multiline = getFirstText(info);
@@ -483,25 +756,29 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
         text->SetJustification(Qt::WordBreak);
     if (!value.isNull() && !value.isEmpty())
         text->SetText(value);
-    container->AddType(text);
+    if (cutdown.lower() == "no")
+        text->SetCutDown(false);
 
     QString align = element.attribute("align", "");
     if (!align.isNull() && !align.isEmpty())
     {
-        int jst = text->GetJustification();
+        int jst = (Qt::AlignTop | Qt::AlignLeft);
+        if (multiline.lower() == "yes")
+        {
+            jst = Qt::WordBreak;
+        }
         if (align.lower() == "center")
-        {
             text->SetJustification(jst | Qt::AlignCenter);
-        }
         else if (align.lower() == "right")
-        {
             text->SetJustification(jst | Qt::AlignRight);
-        }
-        if (align.lower() == "allcenter")
-        {
+        else if (align.lower() == "allcenter")
             text->SetJustification(jst | Qt::AlignHCenter | Qt::AlignVCenter);
-        }
+        else if (align.lower() == "vcenter")
+            text->SetJustification(jst | Qt::AlignVCenter);
     }
+    align = "";
+
+    container->AddType(text);
 }
 
 void XMLParse::parseListArea(LayerSet *container, QDomElement &element)
@@ -908,12 +1185,12 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
 {
     QRect area;
     QRect binarea;
-    int bins = 1; 
-    
+    int bins = 1;
+
     typedef QMap<int, QRect> CornerMap;
     CornerMap bin_corners;
     bin_corners.clear();
-    
+
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
@@ -957,7 +1234,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                 }
                 if(whichbin > bins + 1)
                 {
-                    cerr << "xmlparse.o: Attempt to set binarea with a bin reference larger than number of bins" << endl ;
+                    cerr << "xmlparse.o: Attempt to set binarea with a bin reference larger than number of bins" << endl;
                     exit(0);
                 }
                 binarea = parseRect(getFirstText(info));
@@ -979,4 +1256,3 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     mtl->setBinAreas(bin_corners);
     container->AddType(mtl);
 }
-
