@@ -527,6 +527,33 @@
     </message>
 </context>
 <context>
+    <name>PreviousBox</name>
+    <message>
+        <source>Previously Recorded</source>
+        <translation>Tidigare inspelat</translation>
+    </message>
+    <message>
+        <source>Select Sort Order</source>
+        <translation>Välj sorteringsordning</translation>
+    </message>
+    <message>
+        <source>Sort by Title</source>
+        <translation>Sortera på titel</translation>
+    </message>
+    <message>
+        <source>Reverse Title</source>
+        <translation>Omvänd titel</translation>
+    </message>
+    <message>
+        <source>Sort by Time</source>
+        <translation>Sortera på tid</translation>
+    </message>
+    <message>
+        <source>Reverse Time</source>
+        <translation>Omvänd tid</translation>
+    </message>
+</context>
+<context>
     <name>ProgFinder</name>
     <message>
         <source>No Programs</source>
@@ -4916,6 +4943,18 @@ som du startade detta programmet i.</translation>
     <message>
         <source>star</source>
         <translation>stjärna</translation>
+    </message>
+    <message>
+        <source>Keep this episode in the list</source>
+        <translation>Behåll detta avsnitt i listan</translation>
+    </message>
+    <message>
+        <source>Remove this episode from the list</source>
+        <translation>Ta bort detta avsnitt från listan</translation>
+    </message>
+    <message>
+        <source>Remove all episodes for this title</source>
+        <translation>Ta bort alla avsnitt för denna titel</translation>
     </message>
 </context>
 <context>

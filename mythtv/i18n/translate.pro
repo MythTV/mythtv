@@ -33,6 +33,7 @@ SOURCES += ../programs/mythfrontend/main.cpp
 SOURCES += ../programs/mythfrontend/manualbox.cpp
 SOURCES += ../programs/mythfrontend/manualschedule.cpp
 SOURCES += ../programs/mythfrontend/playbackbox.cpp
+SOURCES += ../programs/mythfrontend/previousbox.cpp
 SOURCES += ../programs/mythfrontend/programrecpriority.cpp
 SOURCES += ../programs/mythfrontend/statusbox.cpp
 SOURCES += ../programs/mythfrontend/viewscheduled.cpp
