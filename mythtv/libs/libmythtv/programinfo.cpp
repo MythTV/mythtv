@@ -1541,7 +1541,7 @@ QString ProgramInfo::RecTypeChar(void)
     switch (rectype)
     {
     case kSingleRecord:
-        recstring = QObject::tr("R");
+        recstring = QObject::tr("S");
         break;
     case kTimeslotRecord:
         recstring = QObject::tr("T");
