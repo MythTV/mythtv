@@ -23,6 +23,8 @@ AudioOutputBase::AudioOutputBase(QString audiodevice)
     audio_channels = -1;
     audio_samplerate = -1;    
 
+    src_ctx = NULL;
+
     // You need to call the next line from your concrete class.
     // Virtuals cause problems in the base class constructors
     // Reconfigure(laudio_bits, laudio_channels, laudio_samplerate);
