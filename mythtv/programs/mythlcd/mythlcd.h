@@ -2,7 +2,7 @@
 	
 	mythlcd.h
 	
-    (c) 2002 Thor Sigvaldason and Isaac Richards
+    (c) 2002, 2003 Thor Sigvaldason and Isaac Richards
 	
 	Part of the mythTV project
 	
@@ -22,6 +22,7 @@
 #include <qtimer.h>
 
 #include "libmyth/lcddevice.h"
+#include "libmyth/mythcontext.h"
 
 class MythLCD : public QWidget
 {
@@ -30,7 +31,6 @@ class MythLCD : public QWidget
 	public:
 	
 		MythLCD(QWidget *parent=0, const char *name=0);
-		~MythLCD();
 
 	public slots:
 	
@@ -44,14 +44,12 @@ class MythLCD : public QWidget
 		
 	private:
 	
-		LCD		*LCDdisplay;
-		
-		QTimer	*fakeMusicTimer;
-		QTimer	*fakeProgressTimer;
+		QTimer		*fakeMusicTimer;
+		QTimer		*fakeProgressTimer;
 
-		float	fakeValues[10];
-		float	fakeProgress;
-		int		valuesStep;
+		float		fakeValues[10];
+		float		fakeProgress;
+		int			valuesStep;
 	
 };
 

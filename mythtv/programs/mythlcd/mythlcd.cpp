@@ -2,14 +2,16 @@
 	
 	mythlcd.cpp
 	
-    (c) 2002 Thor Sigvaldason and Isaac Richards
+    (c) 2002, 2003 Thor Sigvaldason and Isaac Richards
 	
 	Part of the mythTV project
 	
 */
 
+using namespace std;
 
 #include "mythlcd.h"
+#include "libmyth/mythcontext.h"
 
 MythLCD::MythLCD(QWidget *parent, const char *name )
 	: QWidget(parent,name)
@@ -19,9 +21,6 @@ MythLCD::MythLCD(QWidget *parent, const char *name )
 	//	Create the LCD device
 	//
 	
-	LCDdisplay = new LCD();
-	LCDdisplay->connectToHost("localhost", 13666);
-
 	resize(200, 210);
 
 	//
@@ -88,7 +87,7 @@ void MythLCD::doTime()
 {
 	fakeMusicTimer->stop();
 	fakeProgressTimer->stop();
-	LCDdisplay->switchToTime();
+	gContext->LCDswitchToTime();
 
 }
 
@@ -98,23 +97,23 @@ void MythLCD::doChannel()
 	switch(rand() % 5)
 	{
 		case 0 :	
-				LCDdisplay->switchToChannel("2", "Seinfeld", "");
+				gContext->LCDswitchToChannel("2", "Seinfeld", "");
 				break;
 
 		case 1 :	
-				LCDdisplay->switchToChannel("3", "Star Trek", "Q Who?");
+				gContext->LCDswitchToChannel("3", "Star Trek", "Q Who?");
 				break;
 
 		case 2 :	
-				LCDdisplay->switchToChannel("172", "Uzbekistan Today", "");
+				gContext->LCDswitchToChannel("172", "Uzbekistan Today", "");
 				break;
 
 		case 3 :	
-				LCDdisplay->switchToChannel("TELESAT", "Feiken Gehrman", "Zis ees Wooonky");
+				gContext->LCDswitchToChannel("TELESAT", "Feiken Gehrman", "Zis ees Wooonky");
 				break;
 
 		case 4 :	
-				LCDdisplay->switchToChannel("59 (Cartoon)", "Bugs and Daffy", "");
+				gContext->LCDswitchToChannel("59 (Cartoon)", "Bugs and Daffy", "");
 				break;
 	}
 	fakeProgress = 0.0;
@@ -126,20 +125,20 @@ void MythLCD::doMusic()
 	switch(rand() % 5)
 	{
 		case 0 :
-					LCDdisplay->switchToMusic("2U", "1-1/4");
+					gContext->LCDswitchToMusic("2U", "1-1/4");
 					break;
 					
 		case 1 :
-					LCDdisplay->switchToMusic("Bernie", "Concrete Ducky");
+					gContext->LCDswitchToMusic("Bernie", "Concrete Ducky");
 					break;
 		case 2 :
-					LCDdisplay->switchToMusic("Vid Sicous", "Their Way");
+					gContext->LCDswitchToMusic("Vid Sicous", "Their Way");
 					break;
 		case 3 :
-					LCDdisplay->switchToMusic("Idle Eric", "Edward the Quarter Bee");
+					gContext->LCDswitchToMusic("Idle Eric", "Edward the Quarter Bee");
 					break;
 		case 4 :
-					LCDdisplay->switchToMusic("Dave Brebuck", "Take Half a Dozen");
+					gContext->LCDswitchToMusic("Dave Brebuck", "Take Half a Dozen");
 					break;
 	}
 	
@@ -158,23 +157,23 @@ void MythLCD::doProgress()
 	switch(rand() % 5)
 	{
 		case 0 :	
-				LCDdisplay->switchToChannel("Pause Buffer", "", "");
+				gContext->LCDswitchToChannel("Pause Buffer", "", "");
 				break;
 
 		case 1 :	
-				LCDdisplay->switchToChannel("Percent of CD Ripped", "", "");
+				gContext->LCDswitchToChannel("Percent of CD Ripped", "", "");
 				break;
 
 		case 2 :	
-				LCDdisplay->switchToChannel("Updating Program Data", "", "");
+				gContext->LCDswitchToChannel("Updating Program Data", "", "");
 				break;
 
 		case 3 :	
-				LCDdisplay->switchToChannel("Game Level Completed", "", "");
+				gContext->LCDswitchToChannel("Game Level Completed", "", "");
 				break;
 
 		case 4 :	
-				LCDdisplay->switchToChannel("This MythTV will self destruct in ...", "", "");
+				gContext->LCDswitchToChannel("This MythTV will self destruct in ...", "", "");
 				break;
 	}
 	fakeProgress = 0.0;
@@ -201,23 +200,19 @@ void MythLCD::generateFakeMusicData()
 	{
 		valuesStep = 0;
 	}
-	LCDdisplay->setLevels(10, tempValues);
+	gContext->LCDsetLevels(10, tempValues);
 }
 
 void MythLCD::generateFakeProgressData()
 {
 
 	fakeProgress = fakeProgress + 0.01;
-	LCDdisplay->setChannelProgress(fakeProgress);
+	gContext->LCDsetChannelProgress(fakeProgress);
 	if(fakeProgress >= 1.0)
 	{
 		fakeProgress = 0.0;
 	}
 }
 
-MythLCD::~MythLCD()
-{
-	// bye bye
-	delete LCDdisplay;
-}
+
 

@@ -7,12 +7,6 @@ CXX      = g++
 
 CXXFLAGS = -Wall -I$(QTDIR)/include -I../../libs
 
-#
-# debug:
-#
-
-#CXXFLAGS = -Wall -DLCD_DEVICE_DEBUG -I$(QTDIR)/include -I../../libs
-
 
 LINK	 = -Wl,-rpath,$(QTDIR)/lib  -L../../libs/libmyth -L../../libs/libmythtv -L$(QTDIR)/lib  -L/usr/X11R6/lib  -L/usr/X11R6/lib -lqt-mt -lpthread -lXmu -lICE -lXext -lX11 -lm -lmyth-0.8
 MOC	 = $(QTDIR)/bin/moc
