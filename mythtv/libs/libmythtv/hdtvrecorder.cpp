@@ -23,10 +23,10 @@
      assume that it's safe to treat a picture start as a GOP.
 
    Oct. 30, 2003 by Jason Hoos:
-   * added code to rewrite PIDs in the MPEG PAT and PMT tables.  fixes 
-     a problem with stations (particularly, WGN in Chicago) that list their 
-     programs in reverse order in the PAT, which was confusing ffmpeg 
-     (ffmpeg was looking for program 5, but only program 2 was left in 
+   * added code to rewrite PIDs in the MPEG PAT and PMT tables.  fixes
+     a problem with stations (particularly, WGN in Chicago) that list their
+     programs in reverse order in the PAT, which was confusing ffmpeg
+     (ffmpeg was looking for program 5, but only program 2 was left in
      the stream, so it choked).
 
    Nov. 3, 2003 by Doug Larrick:
@@ -44,11 +44,10 @@
    * added decoding of most ATSC Tables
    * added multiple audio support
 
-
-   References / example code: 
-     ATSC standards a.54, a.69 (www.atsc.org)
-     ts2pes from mpegutils from dvb (www.linuxtv.org)
-     bbinfo from Brent Beyeler, beyeler@home.com
+   References / example code:
+   ATSC standards a.54, a.69 (www.atsc.org)
+   ts2pes from mpegutils from dvb (www.linuxtv.org)
+   bbinfo from Brent Beyeler, beyeler@home.com
 */
 
 #include <iostream>
@@ -80,24 +79,21 @@ extern "C" {
 #include "../libavformat/mpegts.h"
 }
 
-#ifndef L2_CACHE_SIZE_KB
-#define L2_CACHE_SIZE_KB 512
-#endif
 #define DEFAULT_SUBCHANNEL 1
 
 #define WHACK_A_BUG_VIDEO 0
 #define WHACK_A_BUG_AUDIO 0
 
 #if FAKE_VIDEO
-    static int fake_video_index = 0;
+static int fake_video_index = 0;
 #define FAKE_VIDEO_NUM 4
-    static const char* FAKE_VIDEO_FILES[FAKE_VIDEO_NUM] =
-        {
-            "/video/abc.ts",
-            "/video/wb.ts",
-            "/video/abc2.ts",
-            "/video/nbc.ts",
-        };
+static const char* FAKE_VIDEO_FILES[FAKE_VIDEO_NUM] =
+{
+    "/video/abc.ts",
+    "/video/wb.ts",
+    "/video/abc2.ts",
+    "/video/nbc.ts",
+};
 #endif
 
 HDTVRecorder::HDTVRecorder()
@@ -105,8 +101,7 @@ HDTVRecorder::HDTVRecorder()
 {
     _atsc_stream_data = new ATSCStreamData(DEFAULT_SUBCHANNEL);
 
-    //_buffer_size = max((L2_CACHE_SIZE_KB*1024)/2-(16*1024), 8*1024);
-    _buffer_size = 2 * 1024 * 1024;
+    _buffer_size = TSPacket::SIZE * 128;
     if ((_buffer = new unsigned char[_buffer_size])) {
         // make valgrind happy, initialize buffer memory
         memset(_buffer, 0xFF, _buffer_size);
@@ -121,8 +116,9 @@ HDTVRecorder::~HDTVRecorder()
         close(_stream_fd);
     if (_atsc_stream_data)
         delete _atsc_stream_data;
-    if (_buffer)
-        delete[] _buffer;
+
+    // Make SURE that the ringbuffer thread is cleaned up
+    StopRecording();
 }
 
 void HDTVRecorder::SetOptionsFromProfile(RecordingProfile *profile,
@@ -142,7 +138,7 @@ void HDTVRecorder::SetOptionsFromProfile(RecordingProfile *profile,
 
 bool HDTVRecorder::Open()
 {
-    if (!_atsc_stream_data || !_buffer) 
+    if (!_atsc_stream_data && !ringbuf.buffer)
         return false;
 
 #if FAKE_VIDEO
@@ -179,7 +175,7 @@ bool readchan(int chanfd, unsigned char* buffer, int dlen) {
         }
         else if (len == 0)
             VERBOSE(VB_IMPORTANT, QString("HD2 end of file found in packet"));
-        else 
+        else
             VERBOSE(VB_IMPORTANT, QString("HD3 partial read. This shouldn't happen!"));
     }
     return (dlen == len);
@@ -221,6 +217,10 @@ bool syncchan(int chanfd, int dlen, int keepsync) {
 
 void HDTVRecorder::StartRecording(void)
 {
+    bool            pause;
+    bool            dev_error, dev_eof;
+    int             len;
+
     const int unsyncpackets = 50; // unsynced packets to look at before giving up
     const int syncpackets   = 10; // synced packets to require before starting recording
 
@@ -228,69 +228,117 @@ void HDTVRecorder::StartRecording(void)
 
     if (!Open())
     {
-        _error = true;        
+        _error = true;
         return;
     }
 
     _request_recording = true;
     _recording = true;
 
-    // sync device stream so it starts with a valid ts packet
-    if (!syncchan(_stream_fd, TSPacket::SIZE*unsyncpackets, syncpackets))
+    // Setup device ringbuffer
+    delete[] ringbuf.buffer;
+
+    ringbuf.size = 50 * 1024 * TSPacket::SIZE;
+    if ((ringbuf.buffer =
+         new unsigned char[ringbuf.size + TSPacket::SIZE]) == NULL)
     {
+        VERBOSE(VB_IMPORTANT, "Failed to allocate HDTVRecorder ring buffer.");
         _error = true;
         return;
     }
+
+    memset(ringbuf.buffer, 0xFF, ringbuf.size + TSPacket::SIZE);
+    ringbuf.endPtr = ringbuf.buffer + ringbuf.size;
+    ringbuf.readPtr = ringbuf.writePtr = ringbuf.buffer;
+    ringbuf.dev_read_size = TSPacket::SIZE * 48;
+    ringbuf.min_read = TSPacket::SIZE * 4;
+    ringbuf.used = 0;
+    ringbuf.max_used = 0;
+    ringbuf.avg_used = 0;
+    ringbuf.avg_cnt = 0;
+    ringbuf.request_pause = false;
+    ringbuf.paused = false;
+    ringbuf.run = true;
+    ringbuf.error = false;
+    ringbuf.eof = false;
+    pthread_mutex_init(&ringbuf.lock, NULL);
+    pthread_mutex_init(&ringbuf.lock_stats, NULL);
+
+    VERBOSE(VB_RECORD, QString("HD ring buffer size %1 KB")
+            .arg(ringbuf.size/1024));
+
+    // sync device stream so it starts with a valid ts packet
+    if (!syncchan(_stream_fd, TSPacket::SIZE*unsyncpackets, syncpackets))
+    {
+        pthread_exit(reinterpret_cast<void *>(-2));
+    }
+
+    // create thread to fill the ringbuffer
+    pthread_create(&ringbuf.thread, NULL, boot_ringbuffer,
+                   reinterpret_cast<void *>(this));
+
     int remainder = 0;
     // TRANSFER DATA
-    while (_request_recording) 
+    while (_request_recording)
     {
+        pthread_mutex_lock(&ringbuf.lock);
+        dev_error = ringbuf.error;
+        dev_eof = ringbuf.eof;
+        pause = ringbuf.paused;
+        pthread_mutex_unlock(&ringbuf.lock);
+
         if (_request_pause)
         {
-            _paused = true;
-            pauseWait.wakeAll();
+            pthread_mutex_lock(&ringbuf.lock);
+            ringbuf.request_pause = true;
+            pthread_mutex_unlock(&ringbuf.lock);
 
-            usleep(50);
+            usleep(1000);
+            continue;
+        }
+        else if (pause)
+        {
+            pthread_mutex_lock(&ringbuf.lock);
+            ringbuf.request_pause = false;
+            pthread_mutex_unlock(&ringbuf.lock);
+
+            usleep(1500);
             continue;
         }
 
-        int len = read(_stream_fd, &(_buffer[remainder]),
-                       _buffer_size - remainder);
-
-        if (len < 0)
+        if (dev_error)
         {
-            VERBOSE(VB_IMPORTANT, QString("HD7 error reading from: %1").
-                    arg(videodevice));
-            perror("read");
-            continue;
-        }
-        else if (len > 0)
-        {
-            len += remainder;
-            remainder = ProcessData(_buffer, len);
-            if (remainder > 0) // leftover bytes
-                memmove(&(_buffer[0]), &(_buffer[_buffer_size - remainder]), remainder);
-        }
-        else
-        {
-            VERBOSE(VB_IMPORTANT, QString("HD8 end of file found in packet"));
+            _error = true;
             break;
         }
+
+        if (dev_eof)
+            break;
+
+        len = ringbuf_read(&(_buffer[remainder]), _buffer_size - remainder);
+
+        if (len == 0)
+            continue;
+
+        len += remainder;
+        remainder = ProcessData(_buffer, len);
+        if (remainder > 0) // leftover bytes
+            memmove(_buffer, &(_buffer[_buffer_size - remainder]),
+                    remainder);
     }
 
     FinishRecording();
-
     _recording = false;
 }
 
 int HDTVRecorder::ResyncStream(unsigned char *buffer, int curr_pos, int len)
 {
-    // Search for two sync bytes 188 bytes apart, 
+    // Search for two sync bytes 188 bytes apart,
     int pos = curr_pos;
     int nextpos = pos + TSPacket::SIZE;
     if (nextpos >= len)
         return -1; // not enough bytes; caller should try again
-    
+
     while (buffer[pos] != SYNC_BYTE || buffer[nextpos] != SYNC_BYTE) {
         pos++;
         nextpos++;
@@ -439,7 +487,7 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
         if (buffer[pos] != SYNC_BYTE)
         {
             _resync_count++;
-            if (25 == _resync_count) 
+            if (25 == _resync_count)
                 VERBOSE(VB_RECORD, QString("Resyncing many of times, suppressing error messages"));
             else if (25 > _resync_count)
                 VERBOSE(VB_RECORD, QString("Resyncing"));
@@ -480,10 +528,12 @@ void HDTVRecorder::Reset(void)
         pthread_mutex_unlock(db_lock);
     }
 
-    if (_stream_fd >= 0) 
+    if (_stream_fd >= 0)
     {
+        Pause(true);
+        WaitForPause();
         int ret = close(_stream_fd);
-        if (ret < 0) 
+        if (ret < 0)
         {
             perror("close");
             return;
@@ -503,6 +553,15 @@ void HDTVRecorder::Reset(void)
             perror("open video");
             return;
         }
+        else
+        {
+            pthread_mutex_lock(&ringbuf.lock);
+            ringbuf.used = 0;
+            ringbuf.max_used = 0;
+            ringbuf.readPtr = ringbuf.writePtr = ringbuf.buffer;
+            pthread_mutex_unlock(&ringbuf.lock);
+        }
+        Unpause();
     }
 
     StreamData()->Reset();
@@ -510,7 +569,7 @@ void HDTVRecorder::Reset(void)
 
 void HDTVRecorder::ChannelNameChanged(const QString& new_chan)
 {
-    if (!_atsc_stream_data && !_buffer) 
+    if (!_atsc_stream_data && !_buffer)
         return;
 
     _wait_for_keyframe = _wait_for_keyframe_option;
@@ -525,7 +584,7 @@ void HDTVRecorder::ChannelNameChanged(const QString& new_chan)
     pthread_mutex_lock(db_lock);
     QString thequery = QString("SELECT freqid "
                                "FROM channel WHERE channum = \"%1\";")
-        .arg(curChannelName);
+                       .arg(curChannelName);
     QSqlQuery query = db_conn->exec(thequery);
     if (!query.isActive())
         MythContext::DBError("fetchtuningparamschanid", query);
@@ -541,7 +600,7 @@ void HDTVRecorder::ChannelNameChanged(const QString& new_chan)
 
     int desired_subchannel = DEFAULT_SUBCHANNEL;
     int pos = freqid.find('-');
-    if (pos != -1) 
+    if (pos != -1)
         desired_subchannel = atoi(freqid.mid(pos+1).ascii());
     else
         VERBOSE(VB_IMPORTANT,

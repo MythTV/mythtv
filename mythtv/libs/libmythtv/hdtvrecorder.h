@@ -1,8 +1,9 @@
 // -*- Mode: c++ -*-
 /**
- *  DTVRecorder -- base class for DVBRecorder and HDTVRecorder
- *  Copyright (c) 2003-2004 by Brandon Beattie, Doug Larrick, 
+ *  HDTVRecorder
+ *  Copyright (c) 2003-2004 by Brandon Beattie, Doug Larrick,
  *    Jason Hoos, and Daniel Thor Kristjansson
+ *  Device ringbuffer added by John Poet
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
@@ -18,11 +19,11 @@ class ATSCStreamData;
 
 class HDTVRecorder : public DTVRecorder
 {
-  friend class ATSCStreamData;
-  friend class TSPacketProcessor;
+    friend class ATSCStreamData;
+    friend class TSPacketProcessor;
   public:
     HDTVRecorder();
-   ~HDTVRecorder();
+    ~HDTVRecorder();
 
     void SetOptionsFromProfile(RecordingProfile *profile,
                                const QString &videodev,

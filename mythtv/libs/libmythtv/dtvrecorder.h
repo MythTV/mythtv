@@ -1,8 +1,9 @@
 // -*- Mode: c++ -*-
 /**
  *  DTVRecorder -- base class for DVBRecorder and HDTVRecorder
- *  Copyright (c) 2003-2004 by Brandon Beattie, Doug Larrick, 
+ *  Copyright (c) 2003-2004 by Brandon Beattie, Doug Larrick,
  *    Jason Hoos, and Daniel Thor Kristjansson
+ *  Device ringbuffer added by John Poet
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
@@ -16,15 +17,10 @@ class TSPacket;
 class DTVRecorder: public RecorderBase
 {
   public:
-    DTVRecorder::DTVRecorder() : 
-        _first_keyframe(0), _position_within_gop_header(0),
-        _scanning_pes_header_for_gop(0), _keyframe_seen(false),
-        _last_keyframe_seen(0), _last_gop_seen(0), _last_seq_seen(0),
-        _stream_fd(-1), _error(false),
-        _request_recording(false), _request_pause(false), _wait_for_keyframe_option(true),
-        _recording(false), _paused(false), _wait_for_keyframe(true),
-        _buffer(0), _buffer_size(0),
-        _frames_seen_count(0), _frames_written_count(0) {;}
+    enum {report_loops = 20000};
+
+    DTVRecorder(void);
+    ~DTVRecorder(void);
 
     void SetOption(const QString &opt, const QString &value)
     {
@@ -32,17 +28,13 @@ class DTVRecorder: public RecorderBase
     }
     void SetOption(const QString &name, int value);
 
-    void StopRecording(void) { _request_recording = false; }
+    void StopRecording(void);
     bool IsRecording(void) { return _recording; }
     bool IsErrored(void) { return _error; }
 
-    void Pause(bool /*clear*/)
-    {
-        _paused = false;
-        _request_pause = true;
-    }
+    void Pause(bool /*clear*/);
     void Unpause(void) { _request_pause = false; }
-    bool GetPause(void) { return _paused; }
+    bool GetPause(void);
     void WaitForPause(void);
 
     long long GetKeyframePosition(long long desired);
@@ -58,6 +50,12 @@ class DTVRecorder: public RecorderBase
     void FinishRecording(void);
     void FindKeyframes(const TSPacket* tspacket);
     void HandleKeyframe();
+
+    static void *boot_ringbuffer(void *);
+    void fill_ringbuffer(void);
+    int ringbuf_read(unsigned char *buffer, size_t count);
+
+    size_t loop;
 
     // used for scanning pes header for group of pictures header
     int _first_keyframe;
@@ -92,6 +90,30 @@ class DTVRecorder: public RecorderBase
     // position maps for seeking
     QMap<long long, long long> _position_map;
     QMap<long long, long long> _position_map_delta;
+
+    // Data for managing the device ringbuffer
+    struct {
+        pthread_t        thread;
+        pthread_mutex_t  lock;
+        pthread_mutex_t  lock_stats;
+        bool             run;
+        bool             eof;
+        bool             error;
+        bool             request_pause;
+        bool             paused;
+        size_t           size;
+        size_t           used;
+        size_t           max_used;
+        size_t           avg_used;
+        size_t           avg_cnt;
+        size_t           dev_read_size;
+        size_t           min_read;
+        unsigned char  * buffer;
+        unsigned char  * readPtr;
+        unsigned char  * writePtr;
+        unsigned char  * endPtr;
+    } ringbuf;
+
 };
 
 #endif // DTVRECORDER_H
