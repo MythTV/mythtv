@@ -145,6 +145,7 @@ int main(int argc, char *argv[])
 
     SetupMenu();
 
+    cout << "If this is the master backend server:\n";
     cout << "Now, please run 'mythfilldatabase' to populate the database\n";
     cout << "with channel information.\n";
     cout << endl;
