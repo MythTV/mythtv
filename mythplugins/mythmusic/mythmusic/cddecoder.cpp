@@ -356,6 +356,7 @@ Metadata *CdDecoder::getMetadata(QSqlDatabase *db)
 
     if (ret < 0)
     {
+        cd_finish(cd);
         cout << "bad lookup :(\n";
         return NULL;
     }
@@ -385,6 +386,7 @@ Metadata *CdDecoder::getMetadata(QSqlDatabase *db)
     Metadata *retdata = new Metadata(filename, artist, album, title, genre,
                                      year, tracknum, length);
 
+    cd_finish(cd);
     return retdata;
 }    
 
@@ -422,10 +424,10 @@ void CdDecoder::commitMetadata(Metadata *mdata)
 
     if (ret < 0)
     {
+        cd_finish(cd);
         cout << "bad lookup :(\n";
         return;
     }
-
   
     if (mdata->Artist() != discdata.data_artist)
         strncpy(discdata.data_artist, mdata->Artist().ascii(), 256);
@@ -439,13 +441,14 @@ void CdDecoder::commitMetadata(Metadata *mdata)
     }
 
     cddb_write_data(cd, &discdata);
+
+    cd_finish(cd);
 }
 
 bool CdDecoderFactory::supports(const QString &source) const
 {
     return (source.right(extension().length()).lower() == extension());
 }
-
 
 const QString &CdDecoderFactory::extension() const
 {
