@@ -68,7 +68,7 @@ void AutoExpire::RunExpirer(void)
             QString msg = QString("Running AutoExpire: Want %1 Gigs free but "
                                   "only have %2.")
                                   .arg(minFree).arg(freespace);
-            VERBOSE(VB_GENERAL, msg);
+            VERBOSE(VB_FILE, msg);
 
             FillExpireList();
 
@@ -82,7 +82,7 @@ void AutoExpire::RunExpirer(void)
                                       .arg(pginfo->title)
                                       .arg(pginfo->startts.toString())
                                       .arg((int)(pginfo->filesize/1024/1024));
-                VERBOSE(VB_GENERAL, msg.local8Bit());
+                VERBOSE(VB_FILE, msg.local8Bit());
                 gContext->LogEntry("autoexpire", LP_NOTICE, "Expired Program", msg);
 
                 QString message =
@@ -114,14 +114,14 @@ void AutoExpire::RunExpirer(void)
                               .arg(freespace);
             }
 
-            VERBOSE(VB_GENERAL, msg);
+            VERBOSE(VB_FILE, msg);
         }
         else if ((minFree) && (freespace == -1))
         {
             QString msg = QString("WARNING: AutoExpire Failed.   Want %1 Gigs "
                                   "free but unable to calculate actual free.")
                                   .arg(minFree);
-            VERBOSE(VB_GENERAL, msg);
+            VERBOSE(VB_FILE, msg);
         }
 
         sleep(gContext->GetNumSetting("AutoExpireFrequency", 10) * 60);
@@ -150,10 +150,10 @@ void AutoExpire::ExpireEpisodesOverMax(void)
 
     if (query.isActive() && query.numRowsAffected() > 0)
     {
-        VERBOSE(VB_GENERAL, QString("Found %1 record profiles using max episode expiration")
+        VERBOSE(VB_FILE, QString("Found %1 record profiles using max episode expiration")
                                     .arg(query.numRowsAffected()));
         while (query.next()) {
-            VERBOSE(VB_GENERAL, QString(" - %1").arg(query.value(2).toString()));
+            VERBOSE(VB_FILE, QString(" - %1").arg(query.value(2).toString()));
             maxEpisodes[query.value(0).toString()] = query.value(1).toInt();
         }
     }
@@ -167,7 +167,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
 
         query = db->exec(querystr);
 
-        VERBOSE(VB_GENERAL, QString("Found %1 episodes in recording profile %2 using max expiration")
+        VERBOSE(VB_FILE, QString("Found %1 episodes in recording profile %2 using max expiration")
                                     .arg(query.numRowsAffected())
                                     .arg(maxIter.key()));
         if (query.isActive() && query.numRowsAffected() > 0)
@@ -182,7 +182,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                                           "too many episodes.")
                                           .arg(query.value(2).toString())
                                           .arg(query.value(1).toString());
-                    VERBOSE(VB_GENERAL, msg);
+                    VERBOSE(VB_FILE, msg);
                     gContext->LogEntry("autoexpire", LP_NOTICE, "Expired program", msg);
 
                     QString message = QString("AUTO_EXPIRE %1 %2")
