@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-08-31, v2.68
+<date>2003-09-06, v2.69
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -25,32 +25,6 @@ name="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html"> or as a PDF
 at <url url="http://www.mythtv.org/docs/mythtv-HOWTO.pdf"
 name="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">.
 
-The latest version of this document can be found in CVS,
-accessible either through the <url
-url="http://cvs.mythtv.org/cgi-bin/viewcvs.cgi/" name="ViewCVS"> web
-interface, or directly from the CVS repository.  You may download the latest
-copy of MythTV and the documentation from CVS this way:
-<label id="cvs">
-<tscreen><verb>
-$ mkdir mythtv
-$ cd mythtv
-$ cvs -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs login
-Logging in to :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs
-CVS password: mythtv
-$ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs checkout mythtv
-</verb></tscreen>
-This documentation will be in the <tt>docs/</tt> subdirectory.
-
-The other MythTV modules may be downloaded from CVS the same way; replace
-"mythtv" with "mythweather", "mythgallery", "mythmusic", etc.
-
-<bf>NOTE</bf>: If you are going to use CVS to compile MythTV rather than
-using the distribution tarball, it is <bf>strongly</bf> recommended that you
-join the <url url="http://www.snowman.net/mailman/listinfo/mythtv-commits/"
-name="http://www.snowman.net/mailman/listinfo/mythtv-commits/"> and <url
-url="http://www.snowman.net/mailman/listinfo/mythtv-dev/"
-name="http://www.snowman.net/mailman/listinfo/mythtv-dev/"> mailing lists.
-
 It's recommended that you join the user list at <url
 url="http://www.snowman.net/mailman/listinfo/mythtv-users"
 name="http://www.snowman.net/mailman/listinfo/mythtv-users">.
@@ -71,6 +45,22 @@ Hans Kruse has setup a website that focuses on running MythTV in a non-North
 American environment.  See the website at <url
 url="http://mythtv.nicenemo.net" name="http://mythtv.nicenemo.net">.
 
+Pre-compiled binaries are available for a number of distributions.  See
+section <ref id="precompiled" name="Software::Pre-compiled packages"> for
+more information.
+
+Custom mini-distributions are also available to make it easier to install
+MythTV.  A mini-distribution removes many of the "general purpose"
+workstation / server software packages that may be installed by default if
+you use one of the big-name OS packages.
+
+See <url url="http://linpvr.org/" name="http://linpvr.org/"> if you'd like
+to install MythTV onto a VIA Epia M machine.
+
+See <url url="http://knoppmyth.geekweb.net/"
+name="http://knoppmyth.geekweb.net/"> if you'd like to install a custom
+version of Knoppix optimized for MythTV.
+
 The contributors to MythTV are:<label id="contributors">
 <itemize>
 <item>Lead developer:  Isaac Richards, <url url="mailto:ijr@po.cwru.edu">
@@ -85,6 +75,9 @@ The contributors to MythTV are:<label id="contributors">
 <item>Mandrake 8.2 documentation: Harondel J. Sibble, <url url="mailto:help@pdscc.com">
 <item>Mandrake 9.0 and 9.1 packages: Thac, <url url="mailto:thac@nyvalls.se">
 <item>Red Hat Linux 9 packages: Axel Thimm, <url url="mailto:Axel.Thimm@physik.fu-berlin.de">
+<item>Alternate setup program for MythTV and listings grabber for Germany: Ben Bucksch, 
+<url url="http://www.bucksch.com/1/projects/various/mythtv/"
+name="http://www.bucksch.com/1/projects/various/mythtv/">
 </itemize>
 
 <sect>Checking prerequisites. 
@@ -429,7 +422,7 @@ satisfying any prerequisites.
 system to store the master database.  This does not necessarily mean that
 MySQL must run on one of the MythTV boxes.
 
-<sect2>Pre-compiled packages.
+<sect2>Pre-compiled packages. <label id="precompiled">
 <p>A number of people have created pre-compiled packages for MythTV that may
 make your installation easier.
 
@@ -522,7 +515,6 @@ it is installed.  If you are running unstable, this is the default
 behavior.
 
 <p>
-
 The Debian packages are configured such that MythTV programs should be
 run as the <tt>mythtv</tt> user, which is automatically created during
 installation.  This user has access to write new recordings to disk in
@@ -530,7 +522,6 @@ the default directory, read and write the database, access the audio
 and video devices, and everything else that MythTV needs to do.
 
 <p>
-
 See <tt>/usr/share/doc/<it>packagename</it>/README.Debian</tt> for
 more information, including copies of the MythTV documentation.  The
 <tt>mythtv-doc</tt> package contains a copy of this HOWTO in
@@ -894,9 +885,33 @@ Date::Manip at the XMLTV site fixing this and other XMLTV related bugs.
 
 <sect>Downloading and compiling.
 <p>Get MythTV from the <url url="http://www.mythtv.org" name="mythtv.org">
-web site.  Save the tarball to a directory you can find.  If you would like
-to run the CVS version of MythTV, follow the instructions located in the
-<ref id="cvs" name="first section">.
+web site.  There are two installation methods you may choose from.  The
+first is to download the latest release in tarball format and compile.  The
+tarball release of MythTV should work on a wide variety of systems and
+should be the preferred method for new users.  If you wish to use the CVS
+version of MythTV you may obtain it from CVS this way:
+<label id="cvs">
+<tscreen><verb>
+$ mkdir mythtv
+$ cd mythtv
+$ cvs -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs login
+Logging in to :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs
+CVS password: mythtv
+$ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs checkout mythtv
+</verb></tscreen>
+
+The other MythTV modules may be downloaded from CVS the same way; replace
+"mythtv" with "mythweather", "mythgallery", "mythmusic", etc.
+
+If you wish to stay up-to-date with CVS, you may replace "checkout mythtv"
+with <tt>update mythtv</tt> after you've done your initial download.
+
+<bf>NOTE</bf>: If you are going to use CVS to compile MythTV rather than
+using the distribution tarball, it is <bf>strongly</bf> recommended that you
+join the <url url="http://www.snowman.net/mailman/listinfo/mythtv-commits/"
+name="http://www.snowman.net/mailman/listinfo/mythtv-commits/"> and <url
+url="http://www.snowman.net/mailman/listinfo/mythtv-dev/"
+name="http://www.snowman.net/mailman/listinfo/mythtv-dev/"> mailing lists.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
 name="http://xmltv.sourceforge.net">.  Download version 0.5.17 if you're in
@@ -915,7 +930,7 @@ After downloading, be sure to install both:
 # rpm -Uvh lame*
 
 </code>
-~
+
 Get lame from <url url="http://www.mp3dev.org/mp3"
 name="http://www.mp3dev.org/mp3">.  Download the source code to v3.93.1 by
 following the links to sourceforge.net
@@ -4473,6 +4488,8 @@ v2.67, 2003-08-31.  Update XMLTV version.  Jarod Wilson's update.  New
 Hauppauge firmware version.
 v2.68, 2003-08-31.  Explicit instructions on woody vs. unstable Debian
 packages, minor typo fix
+v2.69, 2003-09-06.  Incorporate some suggestions from -users about CVS.  Add
+pointer to custom distributions.
 -->
 
 <!--

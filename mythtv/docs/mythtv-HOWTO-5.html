@@ -16,9 +16,32 @@
 
 <P>Get MythTV from the 
 <A HREF="http://www.mythtv.org">mythtv.org</A>
-web site.  Save the tarball to a directory you can find.  If you would like
-to run the CVS version of MythTV, follow the instructions located in the
-<A HREF="mythtv-HOWTO-1.html#cvs">first section</A>.</P>
+web site.  There are two installation methods you may choose from.  The
+first is to download the latest release in tarball format and compile.  The
+tarball release of MythTV should work on a wide variety of systems and
+should be the preferred method for new users.  If you wish to use the CVS
+version of MythTV you may obtain it from CVS this way:
+<A NAME="cvs"></A> 
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mkdir mythtv
+$ cd mythtv
+$ cvs -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs login
+Logging in to :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs
+CVS password: mythtv
+$ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs checkout mythtv
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The other MythTV modules may be downloaded from CVS the same way; replace
+"mythtv" with "mythweather", "mythgallery", "mythmusic", etc.</P>
+<P>If you wish to stay up-to-date with CVS, you may replace "checkout mythtv"
+with <CODE>update mythtv</CODE> after you've done your initial download.</P>
+<P><B>NOTE</B>: If you are going to use CVS to compile MythTV rather than
+using the distribution tarball, it is <B>strongly</B> recommended that you
+join the 
+<A HREF="http://www.snowman.net/mailman/listinfo/mythtv-commits/">http://www.snowman.net/mailman/listinfo/mythtv-commits/</A> and 
+<A HREF="http://www.snowman.net/mailman/listinfo/mythtv-dev/">http://www.snowman.net/mailman/listinfo/mythtv-dev/</A> mailing lists.</P>
 <P>Get XMLTV from 
 <A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download version 0.5.17 if you're in
 North America.</P>
@@ -37,9 +60,8 @@ After downloading, be sure to install both:
 # rpm -Uvh lame*
 </PRE>
 <HR>
-
-&nbsp;
-Get lame from 
+</P>
+<P>Get lame from 
 <A HREF="http://www.mp3dev.org/mp3">http://www.mp3dev.org/mp3</A>.  Download the source code to v3.93.1 by
 following the links to sourceforge.net</P>
 
