@@ -576,6 +576,26 @@ public:
     };
 };
 
+class altEPGChanDisplay: public SpinBoxSetting, public GlobalSetting {
+public:
+    altEPGChanDisplay():
+        SpinBoxSetting(3, 9, 1), GlobalSetting("chanPerPage") {
+        setLabel("Channels to Display (in Alternate EPG)");
+	setValue(8);
+	
+    };
+};
+
+class altEPGTimeDisplay: public SpinBoxSetting, public GlobalSetting {
+public:
+    altEPGTimeDisplay():
+        SpinBoxSetting(1, 5, 1), GlobalSetting("timePerPage") {
+        setLabel("Time Blocks (30 mins) to Display (in Alternate EPG)");
+        setValue(5);
+
+    };
+};
+
 class EPGCurrentTimeColor: public LineEditSetting, public GlobalSetting {
 public:
     EPGCurrentTimeColor():
@@ -690,6 +710,8 @@ EPGSettings::EPGSettings()
     epg->addChild(new EPGShowCurrentTime());
     epg->addChild(new EPGCurrentTimeColor());
     epg->addChild(new EPGType());
+    epg->addChild(new altEPGChanDisplay());
+    epg->addChild(new altEPGTimeDisplay());
     addChild(epg);
 
     VerticalConfigurationGroup* fonts = new VerticalConfigurationGroup(false);

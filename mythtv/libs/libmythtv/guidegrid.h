@@ -23,7 +23,7 @@ class QSqlDatabase;
 class TV;
 
 #define MAX_DISPLAY_CHANS 8
-#define DISPLAY_TIMES 30
+#define MAX_DISPLAY_TIMES 30
 
 
 // Use this function to instantiate a guidegrid instance.
@@ -122,9 +122,9 @@ class GuideGrid : public MythDialog
     QFont *m_titleFont;
 
     vector<ChannelInfo> m_channelInfos;
-    TimeInfo *m_timeInfos[DISPLAY_TIMES];
+    TimeInfo *m_timeInfos[MAX_DISPLAY_TIMES];
     QPtrList<ProgramInfo> *m_programs[MAX_DISPLAY_CHANS];
-    ProgramInfo *m_programInfos[MAX_DISPLAY_CHANS][DISPLAY_TIMES];
+    ProgramInfo *m_programInfos[MAX_DISPLAY_CHANS][MAX_DISPLAY_TIMES];
 
     QDateTime m_originalStartTime;
     QDateTime m_currentStartTime;
@@ -149,6 +149,7 @@ class GuideGrid : public MythDialog
     int startChannel;
     int programGuideType;
     int DISPLAY_CHANS;
+    int DISPLAY_TIMES;
 
     QDateTime firstTime;
     QDateTime lastTime;

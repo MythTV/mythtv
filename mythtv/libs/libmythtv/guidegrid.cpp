@@ -91,6 +91,29 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel, TV *player,
 	else
         	DISPLAY_CHANS = 8;
 
+	dNum = m_context->GetNumSetting("timePerPage");
+	switch (dNum)
+	{
+		case 5:
+                        DISPLAY_TIMES = 30; // 2.5 hours
+                        break;
+                case 4:
+                        DISPLAY_TIMES = 24; // 2 hours
+                        break;
+                case 3:
+                        DISPLAY_TIMES = 18; // 1.5 hours
+                        break;
+                case 2:
+                        DISPLAY_TIMES = 12; // 1 hour
+                        break;
+                case 1:
+                        DISPLAY_TIMES = 6; // 30 mins
+                        break;
+                default:
+                        DISPLAY_TIMES = 30;
+                        break;
+	}
+
         setupColorScheme();
     }
 
@@ -409,6 +432,7 @@ void GuideGrid::createProgramLabel(int titlefontsize, int progfontsize)
     date = new QLabel("", this);
     date->setMaximumHeight((int)(30*hmult));
     date->setBackgroundOrigin(WindowOrigin);
+    date->setMaximumWidth((int)(440 * wmult));
     QVBoxLayout *holdCG = new QVBoxLayout(0, 0, 0);
 
     holdC->addLayout(titleHold, 0);
@@ -418,6 +442,7 @@ void GuideGrid::createProgramLabel(int titlefontsize, int progfontsize)
     QGridLayout *holdCGA = new QGridLayout(0, 3, 2, 0, -1, "");
     descriptionfield = new QLabel("", this);
     descriptionfield->setBackgroundOrigin(WindowOrigin);
+    descriptionfield->setMaximumWidth((int)(440 * wmult));
     descriptionfield->setAlignment(Qt::WordBreak | Qt::AlignLeft |
                                    Qt::AlignTop);
 
@@ -442,6 +467,8 @@ void GuideGrid::createProgramLabel(int titlefontsize, int progfontsize)
 
     recordingfield = new QLabel("", this);
     recordingfield->setBackgroundOrigin(WindowOrigin);
+    recordingfield->setMaximumWidth((int)(440 * wmult) -
+				   recordinglabel->width() - (int)(50*wmult));
     QLabel *blankfield = new QLabel("", this);
     blankfield->setBackgroundOrigin(WindowOrigin);
 
