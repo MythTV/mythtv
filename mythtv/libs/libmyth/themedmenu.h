@@ -20,6 +20,7 @@ struct ButtonIcon
     QString name;
     QImage *icon;
     QImage *activeicon;
+    QImage *watermark;
     QPoint offset;
 };
 
@@ -119,6 +120,7 @@ class ThemedMenu : public MythDialog
 
     void paintLogo(QPainter *p);
     void paintTitle(QPainter *p);
+    void paintWatermark(QPainter *p);
     void paintButton(unsigned int button, QPainter *p, bool erased,
                      bool drawinactive = false);
 
@@ -193,6 +195,9 @@ class ThemedMenu : public MythDialog
     QRect uparrowRect;
     QPixmap *downarrow;
     QRect downarrowRect;
+
+    QPoint watermarkPos;
+    QRect watermarkRect;
 };
 
 #endif

@@ -16,12 +16,12 @@ extern "C" {
 }
 using namespace std;
 
-#define MAXVBUFFER 21
+#define MAXVBUFFER 31
 #define MAXTBUFFER 11
 
-#define REENCODE_OK             1
+#define REENCODE_OK              1
 #define REENCODE_CUTLIST_CHANGE -1
-#define REENCODE_ERROR          0
+#define REENCODE_ERROR           0
 
 class XvVideoOutput;
 class OSDSet;

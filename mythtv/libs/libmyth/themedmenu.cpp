@@ -69,6 +69,8 @@ ThemedMenu::~ThemedMenu(void)
             delete it.data().icon;
         if (it.data().activeicon)
             delete it.data().activeicon;
+        if (it.data().watermark)
+            delete it.data().watermark;
     }
 }
 
@@ -396,6 +398,10 @@ void ThemedMenu::parseButtonDefinition(QString dir, QDomElement &element)
                 }
                 parseText(info);
             }
+            else if (info.tagName() == "watermarkposition")
+            {
+                watermarkPos = parsePoint(getFirstText(info));
+            }
             else
             {
                 cerr << "Unknown tag " << info.tagName() 
@@ -415,6 +421,11 @@ void ThemedMenu::parseButtonDefinition(QString dir, QDomElement &element)
         cerr << "No active button image defined\n";
         exit(0);
     }
+
+    watermarkPos.setX((int)(watermarkPos.x() * wmult));
+    watermarkPos.setY((int)(watermarkPos.y() * hmult));
+
+    watermarkRect = QRect(watermarkPos, QSize(0, 0));
 }
 
 void ThemedMenu::parseLogo(QString dir, QDomElement &element)
@@ -599,6 +610,7 @@ void ThemedMenu::parseButton(QString dir, QDomElement &element)
     QString name = "";
     QImage *image = NULL;
     QImage *activeimage = NULL;
+    QImage *watermark = NULL;
     QPoint offset;
 
     name = element.attribute("name", "");
@@ -629,6 +641,11 @@ void ThemedMenu::parseButton(QString dir, QDomElement &element)
                 offset.setY((int)(offset.y() * hmult));
                 hasoffset = true;
             }
+            else if (info.tagName() == "watermarkimage")
+            {
+                QString imagepath = dir + getFirstText(info);
+                watermark = gContext->LoadScaleImage(imagepath);
+            }    
             else
             {
                 cerr << "Unknown tag " << info.tagName() << " in buttondef\n";
@@ -661,6 +678,16 @@ void ThemedMenu::parseButton(QString dir, QDomElement &element)
     newbutton.icon = image;
     newbutton.offset = offset;
     newbutton.activeicon = activeimage;
+    newbutton.watermark = watermark;
+
+    if (watermark)
+    {
+        if (watermark->width() > watermarkRect.width())
+            watermarkRect.setWidth(watermark->width());
+
+        if (watermark->height() > watermarkRect.height())
+            watermarkRect.setHeight(watermark->height());
+    }
 
     allButtonIcons[name] = newbutton;
 }
@@ -679,6 +706,8 @@ void ThemedMenu::setDefaults(void)
     drawTitle = false;
     uparrow = NULL;
     downarrow = NULL;
+    watermarkPos = QPoint(0, 0);
+    watermarkRect = QRect(0, 0, 0, 0);
 }
 
 void ThemedMenu::parseSettings(QString dir, QString menuname)
@@ -1267,6 +1296,9 @@ void ThemedMenu::paintEvent(QPaintEvent *e)
     if (drawTitle && r.intersects(titleRect))
         paintTitle(&p);
 
+    if (r.intersects(watermarkRect))
+        paintWatermark(&p);
+
     for (unsigned int i = 0; i < buttonList.size(); i++)
     {
         if (r.intersects(buttonList[i].posRect))
@@ -1284,6 +1316,15 @@ void ThemedMenu::paintTitle(QPainter *p)
 {
     if (curTitle)
         p->drawPixmap(titleRect.topLeft(), *curTitle);
+}
+
+void ThemedMenu::paintWatermark(QPainter *p)
+{
+    erase(watermarkRect);
+    if (activebutton && activebutton->buttonicon->watermark)
+    {
+        p->drawImage(watermarkPos, *(activebutton->buttonicon->watermark));
+    }
 }
 
 void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased,
@@ -1472,6 +1513,8 @@ void ThemedMenu::ReloadTheme(void)
             delete it.data().icon;
         if (it.data().activeicon)
             delete it.data().activeicon;
+        if (it.data().watermark)
+            delete it.data().watermark;
     }
     allButtonIcons.clear();
 
@@ -1605,6 +1648,7 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
 
         activebutton = buttonRows[currentrow].buttons[currentcolumn];
         gContext->LCDpopMenu(activebutton->text, titleText);
+        update(watermarkRect);
         update(lastbutton->posRect);
         update(activebutton->posRect);
     }
