@@ -1360,6 +1360,13 @@ void UIImageType::LoadImage()
         file = "/tmp/" + m_filename;
         bFound = QFile::exists(file);
     }
+
+    // Given a full path?
+    if (!bFound)
+    {
+        file = m_filename;
+        bFound = QFile::exists(file);
+    }
     
     if (!bFound)
     {
