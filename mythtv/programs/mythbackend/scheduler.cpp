@@ -164,7 +164,7 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
 
     thequery = "SELECT channel.chanid,sourceid,starttime,endtime,title,"
                "subtitle,description,channel.channum,channel.callsign,"
-               "channel.name FROM singlerecord,channel "
+               "channel.name,profile FROM singlerecord,channel "
                "WHERE channel.chanid = singlerecord.chanid;";
 
     query = db->exec(thequery);
@@ -185,6 +185,7 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
             proginfo->chanstr = query.value(7).toString();
             proginfo->chansign = query.value(8).toString();
             proginfo->channame = query.value(9).toString();
+            proginfo->recordingprofileid = query.value(10).toInt();
             proginfo->recordtype = kSingleRecord;
 
             if (proginfo->title == QString::null)
@@ -201,8 +202,8 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
         }
     }
 
-    thequery = "SELECT channel.chanid,sourceid,starttime,endtime,title FROM "
-               "timeslotrecord,channel WHERE "
+    thequery = "SELECT channel.chanid,sourceid,starttime,endtime,title,profile"
+               " FROM timeslotrecord,channel WHERE "
                "channel.chanid = timeslotrecord.chanid;";
 
     query = db->exec(thequery);
@@ -215,6 +216,7 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
             QString starttime = query.value(2).toString();
             QString endtime = query.value(3).toString();
             QString title = query.value(4).toString();
+            int profile = query.value(5).toInt();
 
             if (title == QString::null)
                 continue;
@@ -277,6 +279,7 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
                         proginfo->chanstr = subquery.value(6).toString();
                         proginfo->chansign = subquery.value(7).toString();
                         proginfo->channame = subquery.value(8).toString();
+                        proginfo->recordingprofileid = profile;
                         proginfo->recordtype = kTimeslotRecord;
 
                         if (proginfo->title == QString::null)
@@ -293,7 +296,7 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
         }
     }
 
-    thequery = "SELECT title,chanid FROM allrecord;";
+    thequery = "SELECT title,chanid,profile FROM allrecord;";
     query = db->exec(thequery);
 
     if (query.isActive() && query.numRowsAffected() > 0)
@@ -302,6 +305,7 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
         {
             QString title = query.value(0).toString();
             int chanid = query.value(1).toInt();   
+            int profile = query.value(2).toInt();
 
             if (title == QString::null)
                 continue;
@@ -353,6 +357,7 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
                     proginfo->chanstr = subquery.value(7).toString();
                     proginfo->chansign = subquery.value(8).toString();
                     proginfo->channame = subquery.value(9).toString();
+                    proginfo->recordingprofileid = profile;
 
                     if (chanid > 0)
                         proginfo->recordtype = kChannelRecord;
