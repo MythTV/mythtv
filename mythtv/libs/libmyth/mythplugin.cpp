@@ -6,6 +6,7 @@
 #include <dlfcn.h>
 
 #include "mythcontext.h"
+#include "langsettings.h"
 
 using namespace std;
 
@@ -137,6 +138,8 @@ bool MythPluginManager::init_plugin(const QString &plugname)
         cerr << "Unable to initialize plugin '" << plugname << "'." << endl;
         return false;
     }
+    
+    LanguageSettings::load(plugname);
 
     switch (m_dict[newname]->type())
     {
