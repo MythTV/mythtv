@@ -496,17 +496,6 @@ public:
     };
 };
 
-class FixedAspectRatio: public CheckBoxSetting, public GlobalSetting {
-public:
-    FixedAspectRatio():
-       GlobalSetting("FixedAspectRatio") {
-       setLabel("Fixed aspect ratio");
-       setValue(false);
-       setHelpText("If this is set, the TV picture will be shaped to fit a "
-                   "4x3 aspect ratio when not in fullscreen mode.");
-    };
-};
-
 class ClearSavedPosition: public CheckBoxSetting, public GlobalSetting {
 public:
     ClearSavedPosition():
@@ -1064,7 +1053,6 @@ PlaybackSettings::PlaybackSettings()
     general->addChild(new ExperimentalSync());
     general->addChild(new PlaybackExitPrompt());
     general->addChild(new EndOfRecordingExitPrompt());
-    general->addChild(new FixedAspectRatio());
     general->addChild(new ClearSavedPosition());
     addChild(general);
 
