@@ -1306,23 +1306,23 @@
 -->
 
       <image name="autoexpire" draworder="6">
-        <filename>type/autoexpire.png</filename>
+        <filename>autoexpire.png</filename>
         <position>20,195</position>
       </image>
       <image name="bookmark" draworder="6">
-        <filename>type/bookmark.png</filename>
+        <filename>bookmark.png</filename>
         <position>55,195</position>
       </image>
       <image name="commflagged" draworder="6">
-        <filename>type/commflagged.png</filename>
+        <filename>commflagged.png</filename>
         <position>90,195</position>
       </image>
       <image name="cutlist" draworder="6">
-        <filename>type/cutlist.png</filename>
+        <filename>cutlist.png</filename>
         <position>125,195</position>
       </image>
       <image name="processing" draworder="6">
-        <filename>type/processing.png</filename>
+        <filename>processing.png</filename>
         <position>160,195</position>
       </image>
 
