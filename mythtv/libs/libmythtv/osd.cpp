@@ -94,6 +94,18 @@ void OSD::Display(unsigned char *yuvptr)
 
     if (show_channum)
     {
+	EFont_draw_string(yuvptr, channum_x_start - 1, channum_y_start - 1, 
+                          channumtext, channum_font, channum_x_end, 
+                          channum_y_end, vid_width, false);
+        EFont_draw_string(yuvptr, channum_x_start + 1, channum_y_start + 1,
+                          channumtext, channum_font, channum_x_end,
+                          channum_y_end, vid_width, false); 
+        EFont_draw_string(yuvptr, channum_x_start + 1, channum_y_start - 1,
+                          channumtext, channum_font, channum_x_end,
+                          channum_y_end, vid_width, false);
+        EFont_draw_string(yuvptr, channum_x_start - 1, channum_y_start + 1,
+                          channumtext, channum_font, channum_x_end,
+                          channum_y_end, vid_width, false);
         EFont_draw_string(yuvptr, channum_x_start, channum_y_start, channumtext,
                           channum_font, channum_x_end, channum_y_end, 
                           vid_width);

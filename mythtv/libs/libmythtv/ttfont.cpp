@@ -288,7 +288,7 @@ render_text(TT_Raster_Map *rmap, TT_Raster_Map *rchr, Efont *f, char *text,
 static void
 merge_text(unsigned char *yuv, TT_Raster_Map * rmap, int offset_x, int offset_y,
 	   int xstart, int ystart, int width, int height, int video_width, 
-	   unsigned long col)
+	   bool white)
 {
    int                 x, y;
    unsigned char      *ptr, *src;
@@ -303,8 +303,16 @@ merge_text(unsigned char *yuv, TT_Raster_Map * rmap, int offset_x, int offset_y,
 	     if ((a = alpha_lut[*ptr]) > 0)
 	       {
 		  src = yuv + (y + ystart) * video_width + (x + xstart);
-		  if (*src < a)
-                      *src = a;
+		  if (white)
+                  {
+		      if (*src < a)
+                          *src = a;
+                  }
+		  else
+                  {
+                      if (*src > 255 - a)
+                          *src = 255 - a;
+                  }
 	       }
 	     ptr++;
 	  }
@@ -313,11 +321,11 @@ merge_text(unsigned char *yuv, TT_Raster_Map * rmap, int offset_x, int offset_y,
 
 void
 EFont_draw_string(unsigned char *yuvptr, int x, int y, char *text,
-		  Efont * font, int maxx, int maxy, int video_width)
+		  Efont * font, int maxx, int maxy, int video_width,
+                  bool white)
 {
    int                  width, height, w, h, inx, iny, clipx, clipy;
    TT_Raster_Map       *rmap, *rtmp;
-   unsigned long        col = 0;
    char                 is_pixmap = 0;
 
    inx = 0;
@@ -377,7 +385,7 @@ EFont_draw_string(unsigned char *yuvptr, int x, int y, char *text,
      }
 
    merge_text(yuvptr, rmap, clipx, clipy, x, y, width, height, 
-              video_width, col);
+              video_width, white);
 
    destroy_font_raster(rmap);
    destroy_font_raster(rtmp);

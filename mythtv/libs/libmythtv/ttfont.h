@@ -44,7 +44,8 @@ typedef struct _efont
 Efont;
 
 void EFont_draw_string(unsigned char *yuvptr, int x, int y, char *text,
-                       Efont *font, int maxx, int maxy, int video_width);
+                       Efont *font, int maxx, int maxy, int video_width,
+                       bool white = true);
 void Efont_free(Efont * f);
 Efont *Efont_load(char *file, int size);
 void Efont_extents(Efont * f, char *text, int *font_ascent_return,

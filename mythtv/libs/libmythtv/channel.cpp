@@ -128,6 +128,9 @@ bool Channel::SetChannel(int i)
         if (ioctl(videofd, VIDIOCSFREQ, &frequency) == -1)
             perror("channel set:");
 
+	curchannel = i;
+	return true;
+	
 	/*
 	struct video_tuner tuner;
 
@@ -142,7 +145,6 @@ bool Channel::SetChannel(int i)
 	    printf("%d has signal\n", i + 1);
             return true;
 	}*/
-	return true;
     }
     return false;
 }
