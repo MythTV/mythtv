@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-01-16, v1.078
+<date>2003-01-17, v1.079
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1867,9 +1867,21 @@ this needs to be fixed before MythTV will work correctly.
 to save power by turning off your monitor when the system decides that it's
 not being used.  Since it's likely that watching TV will not generate
 keyboard or mouse events for a time, you need to turn off DPMS.  There are a
-few ways to do this.
+few ways to do this.  You may also need to check your BIOS for power saving
+modes and disable screen blanking there as well.
 
-You can edit your <tt>/etc/X11/XF86Config-4</tt> file, and look for:
+Edit your <tt>/etc/X11/XF86Config-4</tt> file, and look for:
+<tscreen><verb>
+Section "ServerFlags"
+    #DontZap # disable <Crtl><Alt><BS> (server abort)
+    #DontZoom # disable <Crtl><Alt><KP_+>/<KP_-> (resolution switching)
+    AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
+EndSection
+</verb></tscreen>
+
+Add <tt>Option "NoPM" "true"</tt> and <tt>Option "BlankTime" "0"</tt>to the ServerFlags section.
+
+Also, look for:
 <tscreen><verb>
 Section "Device"
     Identifier "device1"
@@ -1883,6 +1895,30 @@ EndSection
 In this case, you would need to either delete the <tt>Option "DPMS"</tt>
 line, or change it to <tt># Option "DPMS"</tt> to comment it out.  The next
 time you start XFree this change will take effect.
+
+Finally, check:
+<tscreen><verb>
+Section "Monitor"
+    Identifier "monitor1"
+    VendorName "Plug'n Play"
+    HorizSync 30-85
+    VertRefresh 50-160
+
+    # Sony Vaio C1(X,XS,VE,VN)?
+    # 1024x480 @ 85.6 Hz, 48 kHz hsync
+    ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+
+    # TV fullscreen mode or DVD fullscreen output.
+    # 768x576 @ 79 Hz, 50 kHz hsync
+    ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+
+    # 768x576 @ 100 Hz, 61.6 kHz hsync
+    ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+EndSection
+</verb></tscreen>
+
+Ensure that there isn't an <tt>Option "DPMS"</tt> in the Monitor
+configuration.
 
 You can also turn off DPMS from the Command Line, but this will not survive
 a reboot.
@@ -2303,6 +2339,8 @@ v1.077, 2003-01-16.  Added "Can't see OSD" to troubleshooting with pointer
 back to RH80 strip instructions.
 v1.078, 2003-01-16.  Added initial mythvideo instructions.  Added
 instruction not to mess with port setting in backend for mythtv-0.8.
+v1.079, 2003-01-17.  More stuff on disabling DPMS in the XF86Config file. (Who new it was so
+difficult?)
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

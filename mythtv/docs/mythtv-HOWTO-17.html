@@ -92,8 +92,21 @@ this needs to be fixed before MythTV will work correctly.</P>
 to save power by turning off your monitor when the system decides that it's
 not being used.  Since it's likely that watching TV will not generate
 keyboard or mouse events for a time, you need to turn off DPMS.  There are a
-few ways to do this.</P>
-<P>You can edit your <CODE>/etc/X11/XF86Config-4</CODE> file, and look for:
+few ways to do this.  You may also need to check your BIOS for power saving
+modes and disable screen blanking there as well.</P>
+<P>Edit your <CODE>/etc/X11/XF86Config-4</CODE> file, and look for:
+<BLOCKQUOTE><CODE>
+<PRE>
+Section "ServerFlags"
+    #DontZap # disable &lt;Crtl>&lt;Alt>&lt;BS> (server abort)
+    #DontZoom # disable &lt;Crtl>&lt;Alt>&lt;KP_+>/&lt;KP_-> (resolution switching)
+    AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
+EndSection
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Add <CODE>Option "NoPM" "true"</CODE> and <CODE>Option "BlankTime" "0"</CODE>to the ServerFlags section.</P>
+<P>Also, look for:
 <BLOCKQUOTE><CODE>
 <PRE>
 Section "Device"
@@ -109,6 +122,31 @@ EndSection
 <P>In this case, you would need to either delete the <CODE>Option "DPMS"</CODE>
 line, or change it to <CODE># Option "DPMS"</CODE> to comment it out.  The next
 time you start XFree this change will take effect.</P>
+<P>Finally, check:
+<BLOCKQUOTE><CODE>
+<PRE>
+Section "Monitor"
+    Identifier "monitor1"
+    VendorName "Plug'n Play"
+    HorizSync 30-85
+    VertRefresh 50-160
+
+    # Sony Vaio C1(X,XS,VE,VN)?
+    # 1024x480 @ 85.6 Hz, 48 kHz hsync
+    ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+
+    # TV fullscreen mode or DVD fullscreen output.
+    # 768x576 @ 79 Hz, 50 kHz hsync
+    ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+
+    # 768x576 @ 100 Hz, 61.6 kHz hsync
+    ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+EndSection
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Ensure that there isn't an <CODE>Option "DPMS"</CODE> in the Monitor
+configuration.</P>
 <P>You can also turn off DPMS from the Command Line, but this will not survive
 a reboot.</P>
 <P>

@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-01-16, v1.078
+  2003-01-17, v1.079
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -1984,9 +1984,22 @@
   used to save power by turning off your monitor when the system decides
   that it's not being used.  Since it's likely that watching TV will not
   generate keyboard or mouse events for a time, you need to turn off
-  DPMS.  There are a few ways to do this.
+  DPMS.  There are a few ways to do this.  You may also need to check
+  your BIOS for power saving modes and disable screen blanking there as
+  well.
 
-  You can edit your /etc/X11/XF86Config-4 file, and look for:
+  Edit your /etc/X11/XF86Config-4 file, and look for:
+
+       Section "ServerFlags"
+           #DontZap # disable <Crtl><Alt><BS> (server abort)
+           #DontZoom # disable <Crtl><Alt><KP_+>/<KP_-> (resolution switching)
+           AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
+       EndSection
+
+  Add Option "NoPM" "true" and Option "BlankTime" "0"to the ServerFlags
+  section.
+
+  Also, look for:
 
        Section "Device"
            Identifier "device1"
@@ -2000,10 +2013,32 @@
   or change it to # Option "DPMS" to comment it out.  The next time you
   start XFree this change will take effect.
 
+  Finally, check:
+
+       Section "Monitor"
+           Identifier "monitor1"
+           VendorName "Plug'n Play"
+           HorizSync 30-85
+           VertRefresh 50-160
+
+           # Sony Vaio C1(X,XS,VE,VN)?
+           # 1024x480 @ 85.6 Hz, 48 kHz hsync
+           ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+
+           # TV fullscreen mode or DVD fullscreen output.
+           # 768x576 @ 79 Hz, 50 kHz hsync
+           ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+
+           # 768x576 @ 100 Hz, 61.6 kHz hsync
+           ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+       EndSection
+
+  Ensure that there isn't an Option "DPMS" in the Monitor configuration.
+
   You can also turn off DPMS from the Command Line, but this will not
   survive a reboot.
 
-       $ xset -dpms
+  $ xset -dpms
 
   Using xset +dpms will turn it back on.
 
@@ -2035,28 +2070,28 @@
   Now, you need to clear out the old versions of the software to ensure
   that you're running with the debugging code, then compile and install.
 
-  $ make clean distclean
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
+       $ make clean distclean
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
 
   At this point, you now have debug-enabled software ready.  Let's
   assume that the problem you're having is in the setup program.
 
-       $ cd setup
-       $ gdb ./setup
+  $ cd setup
+  $ gdb ./setup
 
-       GNU gdb 5.2.1-2mdk (Mandrake Linux)
-       Copyright 2002 Free Software Foundation, Inc.
-       GDB is free software, covered by the GNU General Public License, and you are
-       welcome to change it and/or distribute copies of it under certain
-       conditions.
-       Type "show copying" to see the conditions.
-       There is absolutely no warranty for GDB.  Type "show warranty" for details.
-       This GDB was configured as "i586-mandrake-linux-gnu"...
-       (gdb)
+  GNU gdb 5.2.1-2mdk (Mandrake Linux)
+  Copyright 2002 Free Software Foundation, Inc.
+  GDB is free software, covered by the GNU General Public License, and you are
+  welcome to change it and/or distribute copies of it under certain
+  conditions.
+  Type "show copying" to see the conditions.
+  There is absolutely no warranty for GDB.  Type "show warranty" for details.
+  This GDB was configured as "i586-mandrake-linux-gnu"...
+  (gdb)
 
   [1mgdb [22mhas a number of options, read the man page for more information.
 
@@ -2160,11 +2195,11 @@
 
   Download the source to MPlayer and patch:
 
-       $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
-       $ tar -xjf MPlayer-0.90rc1.tar.bz2
-       $ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
-       $ cd MPlayer-0.90rc1
-       $ patch -p1 < mplayer-0.90pre10+mythtv.patch
+  $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
+  $ tar -xjf MPlayer-0.90rc1.tar.bz2
+  $ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
+  $ cd MPlayer-0.90rc1
+  $ patch -p1 < mplayer-0.90pre10+mythtv.patch
 
   At this point, you can read the MPlayer documentation and start the
   compile process.
@@ -2209,7 +2244,6 @@
 
   [1mTHERE IS NO GUARANTEE THAT THESE INSTRUCTIONS WILL WORK.  USE AT YOUR[0m
   [1mOWN RISK.[0m
-
   Here are some of the features in version 0.8:
 
   +o  A front-end and back-end system.  The back-end is responsible for
