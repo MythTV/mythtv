@@ -110,9 +110,9 @@ class NuppelVideoPlayer
     void SetAudioOutput (AudioOutput *ao) { audioOutput = ao; }
     void FlushTxtBuffers(void) { rtxt = wtxt; }
     bool WriteStoredData(RingBuffer *outRingBuffer, bool writevideo);
-    void UpdateFrameNumber(long curFrameNum);
+    long UpdateStoredFrameNum(long curFrameNum);
     void InitForTranscode(bool copyaudio, bool copyvideo);
-    bool TranscodeGetNextFrame(QMap<long long, int>::Iterator *dm_iter,
+    bool TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm_iter,
                                int *did_ff, bool *is_key, bool honorCutList);
     void TranscodeWriteText(void (*func)(void *, unsigned char *, int, int, int), void *ptr);
 

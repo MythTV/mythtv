@@ -40,7 +40,7 @@ class DecoderBase
     virtual void SetRawVideoState(bool state) = 0;
     virtual bool GetRawVideoState() = 0;
 
-    virtual void UpdateFrameNumber(long frame) = 0;
+    virtual long UpdateStoredFrameNum(long frame) = 0;
 
     virtual void SetPositionMap() = 0;
 

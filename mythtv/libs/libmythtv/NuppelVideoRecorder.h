@@ -75,7 +75,7 @@ class NuppelVideoRecorder : public RecorderBase
     void WriteHeader(void);
     void WriteSeekTable(void);
     void WriteKeyFrameAdjustTable(QPtrList<struct kfatable_entry> *kfa_table);
-    void UpdateSeekTable(int frame_num, bool update_db);
+    void UpdateSeekTable(int frame_num, bool update_db, long offset = 0);
 
     bool SetupAVCodec(void);
     void SetupRTjpeg(void);

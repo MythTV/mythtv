@@ -59,7 +59,7 @@ class NuppelDecoder : public DecoderBase
     void SetRawVideoState(bool state) { getrawvideo = state; }
     bool GetRawVideoState(void) { return getrawvideo; }
 
-    void UpdateFrameNumber(long framenumber);
+    long UpdateStoredFrameNum(long framenumber);
 
     void SetPositionMap(void);
 

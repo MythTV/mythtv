@@ -1600,9 +1600,9 @@ void NuppelVideoRecorder::WriteKeyFrameAdjustTable(
     delete [] kfa_buf;
 }
 
-void NuppelVideoRecorder::UpdateSeekTable(int frame_num, bool use_db)
+void NuppelVideoRecorder::UpdateSeekTable(int frame_num, bool use_db, long offset)
 {
-    long long position = ringBuffer->GetFileWritePosition();
+    long long position = ringBuffer->GetFileWritePosition() + offset;
     struct seektable_entry ste;
     ste.file_offset = position;
     ste.keyframe_number = frame_num;

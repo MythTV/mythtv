@@ -44,7 +44,7 @@ class AvFormatDecoder : public DecoderBase
 
     void setWatchingRecording(bool mode);
 
-    void UpdateFrameNumber(long frame) { (void)frame;}
+    long UpdateStoredFrameNum(long frame) { (void)frame; return 0;}
 
     void SetPositionMap(void);
     

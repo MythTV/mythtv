@@ -3043,11 +3043,11 @@ void NuppelVideoPlayer::InitForTranscode(bool copyaudio, bool copyvideo)
     decoder->setExactSeeks(true);
 }
 
-bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator *dm_iter,
+bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm_iter,
                                               int *did_ff, bool *is_key, bool honorCutList)
 {
-    if (*dm_iter == NULL && honorCutList)
-        *dm_iter = deleteMap.begin();
+    if (dm_iter == NULL && honorCutList)
+        dm_iter = deleteMap.begin();
 
     decoder->GetFrame(0);
     if (eof)
@@ -3055,22 +3055,21 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator *dm
 
     if (honorCutList && (!deleteMap.isEmpty()))
     {
-        if (framesPlayed >= dm_iter->key())
+        if (framesPlayed >= dm_iter.key())
         {
-            while((dm_iter->data() == 1) && (*dm_iter != deleteMap.end()))
+            while((dm_iter.data() == 1) && (dm_iter != deleteMap.end()))
             {
                 QString msg = QString("Fast-Forwarding from %1")
-                              .arg((int)dm_iter->key());
-                msg += QString(" to %1").arg((int)dm_iter->key());
+                              .arg((int)dm_iter.key());
+                dm_iter++;
+                msg += QString(" to %1").arg((int)dm_iter.key());
                 VERBOSE(VB_GENERAL, msg);
-                decoder->DoFastForward(dm_iter->key());
-                if(*dm_iter != deleteMap.begin())
-                    *did_ff = 1;
-                *dm_iter++;
+                decoder->DoFastForward(dm_iter.key());
+                *did_ff = 1;
             }
-            while((dm_iter->data() == 0) && (*dm_iter != deleteMap.end()))
+            while((dm_iter.data() == 0) && (dm_iter != deleteMap.end()))
             {
-                *dm_iter++;
+                dm_iter++;
             }
         }
     }
@@ -3080,9 +3079,9 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator *dm
     return true;
 }
 
-void NuppelVideoPlayer::UpdateFrameNumber(long curFrameNum)
+long NuppelVideoPlayer::UpdateStoredFrameNum(long curFrameNum)
 {
-    decoder->UpdateFrameNumber(curFrameNum);
+    return decoder->UpdateStoredFrameNum(curFrameNum);
 }
 bool NuppelVideoPlayer::WriteStoredData(RingBuffer *outRingBuffer, bool writevideo)
 {

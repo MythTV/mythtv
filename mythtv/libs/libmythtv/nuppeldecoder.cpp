@@ -296,7 +296,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     }
 
     if (usingextradata && extradata.keyframeadjust_offset > 0 &&
-        hasFullPositionMap && !disablevideo)
+        hasFullPositionMap)
     {
         long long currentpos = ringBuffer->GetTotalReadPosition();
         struct rtframeheader kfa_frameheader;
@@ -793,16 +793,23 @@ void NuppelDecoder::StoreRawData(unsigned char *newstrm)
     StoredData.append(new RawDataList(frameheader, strmcpy));
 }
 
-void NuppelDecoder::UpdateFrameNumber(long framenum)
+// The return value is the number of bytes in StoredData before the 'SV' frame
+long NuppelDecoder::UpdateStoredFrameNum(long framenum)
 {
+    long sync_offset = 0;
     for (RawDataList *data = StoredData.first(); data; data = StoredData.next())
     {
         if (data->frameheader.frametype == 'S' &&
             data->frameheader.comptype == 'V')
         {
             data->frameheader.timecode = framenum;
+            return sync_offset;
         }
+        sync_offset += FRAMEHEADERSIZE;
+        if (data->packet)
+            sync_offset += data->frameheader.packetlength;
     }
+    return 0;
 }
 
 void NuppelDecoder::WriteStoredData(RingBuffer *rb, bool storevid)
@@ -1024,25 +1031,19 @@ int NuppelDecoder::GetKeyIndex(int keyFrame)
 {
     if (hasKeyFrameAdjustMap)
     {
-        int index = 0;
-        int curFrame = 0;
-        QMap <long long, int>::Iterator keyiter = NULL;
-        keyiter = (*keyFrameAdjustMap).begin();
-        while (curFrame < keyFrame)
+        int accum = 0;
+        QMap <long long, int>::Iterator ki;
+        for (ki = (*keyFrameAdjustMap).begin();
+             ki != (*keyFrameAdjustMap).end(); ki++)
         {
-            curFrame += keyframedist;
-            index++;
-            if (keyiter.key() == curFrame)
-            {
-                 curFrame -= keyiter.data();
-                 if (keyiter != (*keyFrameAdjustMap).end())
-                     keyiter++;
-            }
+            if (keyFrame < (ki.key() * keyframedist - ki.data() - accum))
+                break;
+            accum += ki.data();
         }
-        return (index);
+        return ((keyFrame + accum) / keyframedist);
     }
     else
-       return (lastKey / keyframedist);
+       return (keyFrame / keyframedist);
 }
 
 bool NuppelDecoder::DoRewind(long long desiredFrame)

@@ -42,7 +42,7 @@ class IvtvDecoder : public DecoderBase
     void SetRawVideoState(bool state) { (void)state; }
     bool GetRawVideoState(void) { return false; }
 
-    void UpdateFrameNumber(long frame) { framesPlayed = frame; }
+    long UpdateStoredFrameNum(long frame) { (void)frame; return 0; }
 
     void SetPositionMap(void);
 

@@ -400,7 +400,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     VideoOutput *videoOutput = nvp->getVideoOutput();
     bool is_key = 0;
     bool first_loop = true;
-    while (nvp->TranscodeGetNextFrame(&dm_iter, &did_ff, &is_key, honorCutList))
+    while (nvp->TranscodeGetNextFrame(dm_iter, &did_ff, &is_key, honorCutList))
     {
         if (first_loop)
         {
@@ -516,8 +516,8 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
 
                     //need to correct the frame# and timecode here
                     // Question:  Is it necessary to change the timecodes?
-                    nvp->UpdateFrameNumber(curFrameNum);
-                    nvr->UpdateSeekTable(num_keyframes, false);
+                    long sync_offset = nvp->UpdateStoredFrameNum(curFrameNum);
+                    nvr->UpdateSeekTable(num_keyframes, false, sync_offset);
                     ReencoderAddKFA(curFrameNum, lastKeyFrame, num_keyframes);
                     num_keyframes++;
                     lastKeyFrame = curFrameNum;
@@ -527,7 +527,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                 }
             }
 
-            if (nvp->WriteStoredData(outRingBuffer, (did_ff == 0)))
+            if (! nvp->WriteStoredData(outRingBuffer, (did_ff == 0)))
             {
                 if (did_ff == 1)
                 {
