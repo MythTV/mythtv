@@ -274,6 +274,8 @@ class NuppelVideoPlayer
 
     /* Video circular buffer */
     bool prebuffering;	/* don't play until done prebuffering */ 
+    QMutex prebuffering_lock;
+    QWaitCondition prebuffering_wait;
 
     /* Text circular buffer */
     int wtxt;          /* next slot to write */

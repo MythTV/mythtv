@@ -160,13 +160,11 @@ void RemoteFile::Close(void)
 
 void RemoteFile::Reset(void)
 {
-    int avail;
-    char *trash;
-
-    usleep(10000);
-
     while (sock->bytesAvailable() > 0)
     {
+        int avail;
+        char *trash;
+
         lock.lock();
         avail = sock->bytesAvailable();
         trash = new char[avail + 1];

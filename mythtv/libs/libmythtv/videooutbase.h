@@ -7,6 +7,7 @@
 #include <qmutex.h>
 #include <qmap.h>
 #include <qptrqueue.h>
+#include <qwaitcondition.h>
 #include <qptrlist.h>
 
 using namespace std;
@@ -84,6 +85,9 @@ class VideoOutput
     int FreeVideoFrames(void);
 
     bool EnoughFreeFrames(void);
+    QWaitCondition *availableVideoBuffersWait(void) 
+                    { return &availableVideoBuffers_wait; }
+
     bool EnoughDecodedFrames(void);
     bool EnoughPrebufferedFrames(void);
     
@@ -172,6 +176,8 @@ class VideoOutput
     int keepprebufferframes;
 
     bool needrepaint;
+
+    QWaitCondition availableVideoBuffers_wait;
 };
 
 #endif

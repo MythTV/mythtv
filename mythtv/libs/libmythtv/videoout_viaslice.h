@@ -26,6 +26,8 @@ class VideoOutputVIA : public VideoOutput
 
     int GetRefreshRate(void);
 
+    float GetDisplayAspect(void);
+
     void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
 
     void DrawUnusedRects(void);

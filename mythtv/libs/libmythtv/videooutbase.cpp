@@ -7,7 +7,10 @@
 
 #include "../libmyth/mythcontext.h"
 
+#ifdef USING_XV
 #include "videoout_xv.h"
+#endif
+
 #include "videoout_ivtv.h"
 
 #ifdef USING_XVMC
@@ -186,7 +189,12 @@ VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type)
     return new VideoOutputDirectfb();
 #endif
 
+#ifdef USING_XV
     return new VideoOutputXv();
+#endif
+
+    VERBOSE(VB_ALL, "Not compiled with any useable video output method.");
+    exit(-1);
 }
 
 VideoOutput::VideoOutput()
@@ -302,6 +310,8 @@ void VideoOutput::InputChanged(int width, int height, float aspect)
 
     usedVideoBuffers.clear();
     busyVideoBuffers.clear();
+
+    availableVideoBuffers_wait.wakeAll();
 
     video_buflock.unlock();
 }
@@ -594,6 +604,8 @@ VideoFrame *VideoOutput::GetNextFreeFrame(void)
     {
         next = usedVideoBuffers.dequeue();
         busyVideoBuffers.removeRef(next);
+        if (EnoughFreeFrames())
+            availableVideoBuffers_wait.wakeAll();
     }
 
     video_buflock.unlock();
@@ -615,6 +627,8 @@ void VideoOutput::DiscardFrame(VideoFrame *frame)
 {
     video_buflock.lock();
     availableVideoBuffers.enqueue(frame);
+    if (EnoughFreeFrames())
+        availableVideoBuffers_wait.wakeAll();
     video_buflock.unlock();
 }
 
@@ -642,6 +656,8 @@ void VideoOutput::DoneDisplayingFrame(void)
     {
         availableVideoBuffers.enqueue(buf);
         busyVideoBuffers.removeRef(buf);
+        if (EnoughFreeFrames())
+            availableVideoBuffers_wait.wakeAll();
     }
 
     video_buflock.unlock();
@@ -721,6 +737,7 @@ void VideoOutput::InitBuffers(int numdecode, bool extra_for_pause,
         vbuffers[i].bpp = vbuffers[i].size = 0;
         vbuffers[i].buf = NULL;
         vbuffers[i].timecode = 0;
+        vbuffers[i].frameNumber = 0;
         vbuffers[i].qscale_table = NULL;
         vbuffers[i].qstride = 0;
     }
@@ -729,6 +746,8 @@ void VideoOutput::InitBuffers(int numdecode, bool extra_for_pause,
     needfreeframes = need_free;
     needprebufferframes = needprebuffer;
     keepprebufferframes = keepprebuffer;
+
+    availableVideoBuffers_wait.wakeAll();
 }
 
 void VideoOutput::ClearAfterSeek(void)
@@ -755,6 +774,9 @@ void VideoOutput::ClearAfterSeek(void)
     {
         vpos = rpos = 0;
     }
+
+    if (EnoughFreeFrames())
+        availableVideoBuffers_wait.wakeAll();
 
     busyVideoBuffers.clear();
 

@@ -18,7 +18,11 @@ release {
         QMAKE_CFLAGS_RELEASE = $${QMAKE_CXXFLAGS_RELEASE}
 }
 
-EXTRA_LIBS = -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm -lfreetype
+EXTRA_LIBS = -lfreetype
+
+# Default Xv support
+CONFIG += using_xv
+EXTRA_LIBS += -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm
 
 # LCDProc support
 #DEFINES += LCD_DEVICE
@@ -46,6 +50,6 @@ EXTRA_LIBS = -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm -lfreetype
 
 # DirectFB support
 #CONFIG += using_directfb
-#EXTRA_LIBS = `directfb-config --libs` -lfreetype
+#EXTRA_LIBS = `directfb-config --libs`
 #QMAKE_CXXFLAGS += `directfb-config --cflags`
 

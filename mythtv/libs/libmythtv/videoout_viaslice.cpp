@@ -32,6 +32,10 @@ extern "C" {
 #define XMD_H 1
 #include <X11/extensions/xf86vmode.h>
 
+extern "C" {
+#include <X11/extensions/Xinerama.h>
+}
+
 const int kNumBuffers = 4;
 const int kPrebufferFrames = 1;
 const int kNeedFreeFrames = 2;
@@ -45,6 +49,7 @@ struct ViaData
     GC XJ_gc;
     Screen *XJ_screen;
     Display *XJ_disp;
+    float display_aspect;
 
     via_slice_state_t decode_buffers[4];
     via_slice_state_t overlay_buffer;
@@ -139,6 +144,10 @@ bool VideoOutputVIA::Init(int width, int height, float aspect,
                           unsigned int winid, int winx, int winy, int winw, 
                           int winh, unsigned int embedid)
 {
+    int w_mm, h_mm;
+    bool usingXinerama;
+    int event_base, error_base;
+
     pthread_mutex_init(&lock, NULL);
 
     VideoOutput::InitBuffers(kNumBuffers, false, kNeedFreeFrames,
@@ -155,6 +164,18 @@ bool VideoOutputVIA::Init(int width, int height, float aspect,
  
     data->XJ_screen = DefaultScreenOfDisplay(data->XJ_disp);
     XJ_screen_num = DefaultScreen(data->XJ_disp);
+
+    w_mm = DisplayWidthMM(data->XJ_disp, XJ_screen_num);
+    h_mm = DisplayHeightMM(data->XJ_disp, XJ_screen_num);
+
+    usingXinerama = (XineramaQueryExtension(data->XJ_disp, &event_base, 
+                                            &error_base) &&
+                     XineramaIsActive(data->XJ_disp));
+
+    if (w_mm == 0 || h_mm == 0 || usingXinerama )
+        data->display_aspect = XJ_aspect;
+    else
+        data->display_aspect = (float)w_mm / h_mm;
 
     XJ_white = XWhitePixel(data->XJ_disp, XJ_screen_num);
     XJ_black = XBlackPixel(data->XJ_disp, XJ_screen_num);
@@ -262,6 +283,8 @@ bool VideoOutputVIA::CreateViaBuffers(void)
          data->decode_buffers[i].image_number = i;
 	 data->decode_buffers[i].slice_data = NULL;
 	 data->decode_buffers[i].slice_datalen = 0;
+         data->decode_buffers[i].lastcode = 0;
+         data->decode_buffers[i].slicecount = 1;
 
 	 vbuffers[i].buf = (unsigned char *)&(data->decode_buffers[i]);
 	 vbuffers[i].height = XJ_height;
@@ -367,6 +390,13 @@ void VideoOutputVIA::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
 
     via_slice_state_t *curdata = (via_slice_state_t *)frame->buf;
 
+    if (curdata->lastcode > curdata->code )
+    {
+        //Slice must be in next frame so flush last buffer first.
+        VIASliceReceiveData(curdata->slicecount, data->buffer);
+        curdata->slicecount = 1;
+    }
+
     if (curdata->slicecount == 1)
         data->current = data->buffer;
 
@@ -413,7 +443,14 @@ void VideoOutputVIA::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
     if (curdata->code == curdata->maxcode)
     {
         VIASliceReceiveData(curdata->slicecount, data->buffer);
+        curdata->slicecount = 1;
+        curdata->lastcode = 0;
     } 
+    else
+    {
+        curdata->slicecount++;
+        curdata->lastcode = curdata->code;
+    }
 }
 
 void VideoOutputVIA::DrawUnusedRects(void)
@@ -444,6 +481,11 @@ void VideoOutputVIA::DrawUnusedRects(void)
     VIADriverProc(UPDATEOVERLAY, &data->ddUpdateOverlay);
 
     XSync(data->XJ_disp, false);
+}
+
+float VideoOutputVIA::GetDisplayAspect(void)
+{
+    return data->display_aspect;
 }
 
 void VideoOutputVIA::UpdatePauseFrame(void)

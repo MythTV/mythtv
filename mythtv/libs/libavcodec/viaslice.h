@@ -10,6 +10,7 @@ typedef struct {
     int code;
     int maxcode;
     int slicecount;
+    int lastcode;
 } via_slice_state_t;
 
 #endif

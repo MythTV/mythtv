@@ -28,7 +28,7 @@ HEADERS += RTjpegN.h ttfont.h tv_play.h tv_rec.h videosource.h yuv2rgb.h
 HEADERS += progfind.h decoderbase.h nuppeldecoder.h avformatdecoder.h
 HEADERS += recorderbase.h mpegrecorder.h channelbase.h
 HEADERS += vsync.h proglist.h hdtvrecorder.h fifowriter.h filtermanager.h
-HEADERS += videooutbase.h videoout_xv.h videoout_null.h xbox.h
+HEADERS += videooutbase.h videoout_null.h xbox.h
 HEADERS += ivtvdecoder.h videoout_ivtv.h dbcheck.h udpnotify.h
 
 SOURCES += channel.cpp commercial_skip.cpp frequencies.c guidegrid.cpp
@@ -40,9 +40,15 @@ SOURCES += ttfont.cpp tv_play.cpp tv_rec.cpp videosource.cpp yuv2rgb.cpp
 SOURCES += progfind.cpp nuppeldecoder.cpp avformatdecoder.cpp recorderbase.cpp
 SOURCES += mpegrecorder.cpp channelbase.cpp filtermanager.cpp
 SOURCES += vsync.c proglist.cpp hdtvrecorder.cpp videooutbase.cpp 
-SOURCES += videoout_xv.cpp fifowriter.cpp videoout_null.cpp xbox.cpp
+SOURCES += fifowriter.cpp videoout_null.cpp xbox.cpp
 SOURCES += ivtvdecoder.cpp videoout_ivtv.cpp dbcheck.cpp profilegroup.cpp
 SOURCES += udpnotify.cpp
+
+using_xv {
+    SOURCES += videoout_xv.cpp
+    SOURCES += videoout_xv.h
+    DEFINES += USING_XV
+}
 
 using_xvmc {
     SOURCES += videoout_xvmc.cpp

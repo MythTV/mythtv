@@ -128,11 +128,6 @@ int VIA_decode_slice(MpegEncContext *s, int start_code, uint8_t *buffer,
     slicestate->code = start_code;
     slicestate->maxcode = s->mb_height;
 
-    if (s->first_slice)
-        slicestate->slicecount = 1;
-    else
-        slicestate->slicecount++;
-
     if (start_code == s->mb_height)
         slicestate->slice_datalen += 4;
 

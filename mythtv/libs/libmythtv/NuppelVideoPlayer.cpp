@@ -56,7 +56,11 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
     playing = false;
     decoder_thread_alive = true;
     filename = "output.nuv";
+
+    prebuffering_lock.lock();
     prebuffering = false;
+    prebuffering_wait.wakeAll();
+    prebuffering_lock.unlock();
 
     vbimode = ' ';
     QString mypage = gContext->GetSetting("VBIpageNr", "888");
@@ -280,12 +284,19 @@ void NuppelVideoPlayer::SetPlaySpeed(float speed, bool normal)
 
 void NuppelVideoPlayer::setPrebuffering(bool prebuffer)
 {
+    prebuffering_lock.lock();
+
     if (prebuffer != prebuffering)
     {
         prebuffering = prebuffer;
         if (audioOutput && !paused)
             audioOutput->Pause(prebuffering);
     }
+
+    if (!prebuffering)
+        prebuffering_wait.wakeAll();
+
+    prebuffering_lock.unlock();
 }
 
 void NuppelVideoPlayer::ForceVideoOutputType(VideoOutputType type)
@@ -596,7 +607,8 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
     {
         //cout << "waiting for video buffer to drain.\n";
         setPrebuffering(false);
-        usleep(2000);
+        if (!videoOutput->availableVideoBuffersWait()->wait(2000))
+            cerr << "waiting for free video buffers timed out\n";
     }
 
     decoder->GetFrame(onlyvideo);
@@ -1471,13 +1483,18 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         video_actually_paused = false;
         resetvideo = false;
 
+        prebuffering_lock.lock();
         if (prebuffering)
         {
             VERBOSE(VB_PLAYBACK, "waiting for prebuffer...");
-            usleep(frame_interval * 4);
+            if (!prebuffering_wait.wait(&prebuffering_lock, 
+                                        frame_interval * 4 / 1000))
+                VERBOSE(VB_PLAYBACK, "prebuffer wait timed out..");
+            prebuffering_lock.unlock();
             ResetNexttrigger(&nexttrigger);
             continue;
         }
+        prebuffering_lock.unlock();
 
         if (!videoOutput->EnoughPrebufferedFrames())
         {
