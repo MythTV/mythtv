@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-12-18, v0.13.03
+  2003-12-22, v0.13.05
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -5829,6 +5829,13 @@
   http://tldp.org/HOWTO/lvm-HOWTO/ <http://tldp.org/HOWTO/lvm-HOWTO/>
   document for details.
 
+  If you don't understand how to partition a drive, or how to change the
+  partition type you should stop and look at documentation on how to
+  perform these steps.
+
+  [1mBIG FAT WARNING[22m:  Using an incorrect parameter can make your files
+  inaccessible, prevent your computer from booting, etc.  Be careful!
+
   Make sure your kernel configuration includes LVM support or that it's
   available as a module. Today, most vendors include this by default.
   You'll also want to ensure that you have a copy of the LVM utilities;
@@ -5847,6 +5854,7 @@
 
   +o  VG (Volume Group).  The aggregation of all the PVs make a VG.
 
+
   +o  LV (Logical Volume).  Subdivision of the pool of space available in
      the VG into individual chunks, like /usr, /var/video, etc.
 
@@ -5860,14 +5868,59 @@
   (0x8e). If you're using an entire disk, create one big partition
   rather than using the device itself. e.g. use /dev/hdb1 not /dev/hdb.
 
-  # fdisk /dev/hda .... create partition 5, save partition table and
-  reboot if you have to
+  In the following example, you have a 15GB disk.  The first 6GB are set
+  as your boot partition.  /dev/hda2 was added as an extended partition,
+  and within that partition you created the /dev/hda5 linux (ext2)
+  partition.
+
+
+
+       # fdisk /dev/hda
+
+       The number of cylinders for this disk is set to 1823.
+       There is nothing wrong with that, but this is larger than 1024,
+       and could in certain setups cause problems with:
+       1) software that runs at boot time (e.g., old versions of LILO)
+       2) booting and partitioning software from other OSs
+          (e.g., DOS FDISK, OS/2 FDISK)
+
+       Command (m for help): p
+
+       Disk /dev/hda: 15.0 GB, 15000330240 bytes
+       255 heads, 63 sectors/track, 1823 cylinders
+       Units = cylinders of 16065 * 512 = 8225280 bytes
+
+          Device Boot    Start       End    Blocks   Id  System
+       /dev/hda1   *         1       764   6136798+  83  Linux
+       /dev/hda2           765      1823   8506417+   5  Extended
+       /dev/hda5           765      1823   8506417   83  Linux
+
+       Command (m for help): t
+       Partition number (1-6): 5
+       Hex code (type L to list codes): 8e
+
+       Command (m for help): p
+
+       Disk /dev/hda: 15.0 GB, 15000330240 bytes
+       255 heads, 63 sectors/track, 1823 cylinders
+       Units = cylinders of 16065 * 512 = 8225280 bytes
+
+          Device Boot    Start       End    Blocks   Id  System
+       /dev/hda1   *         1       764   6136798+  83  Linux
+       /dev/hda2           765      1823   8506417+   5  Extended
+       /dev/hda5           765      1823   8506417   8e  Linux LVM
+
+       Command (m for help): w
+
+       #
+
+
 
   Create the LVM physical volume from the partitions (repeat if you have
   multiple partitions to use):
 
 
-       # pvcreate /dev/hda5
+  # pvcreate /dev/hda5
 
 
 
@@ -5875,24 +5928,24 @@
   "VGforMyth" that is allocated in chunks that are a multiple of 64MB
 
 
-       # vgcreate --name VGforMyth -s 64m /dev/hda5
+       # vgcreate VGforMyth -s 64m /dev/hda5
 
 
 
-  Create a logical volume of 20GB called "video" and then create the
+  Create a logical volume of 5GB called "video" and then create the
   reiserfs filesystem and mount it:
 
 
-       # lvcreate --name video --size 20G VGforMyth
+       # lvcreate --name video --size 5G VGforMyth
        # mkreiserfs /dev/VGforMyth/video
        # mount /dev/VGforMyth/video /var/video
 
 
 
-  Now create a 5GB volume for mythmusic files if you like:
+  Now create a 3GB volume for mythmusic files if you like:
 
 
-       # lvcreate --name music --size 5G VGforMyth
+       # lvcreate --name music --size 3G VGforMyth
        # mkreiserfs /dev/VGforMyth/music
        # mount /dev/VGforMyth/music /var/music
 
@@ -5924,6 +5977,7 @@
 
   Once you've completed one of the following two procedures, use [1mdf [22mto
   check that you've got more space.
+
 
 
   [1m22.3.1.  ReiserFS[0m
@@ -5987,8 +6041,7 @@
   You may also modify some aspects of a filesystem such as the reserved
   block percentage after it has been created using the [1mtune2fs [22mprogram:
 
-
-       # tune2fs -m 0 /dev/hdb1
+  # tune2fs -m 0 /dev/hdb1
 
 
 

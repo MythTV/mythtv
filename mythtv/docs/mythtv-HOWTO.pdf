@@ -1,6 +1,6 @@
 %PDF-1.3
 %âãÏÓ
-1 0 obj<</Producer(htmldoc 1.8.23 Copyright 1997-2002 Easy Software Products, All Rights Reserved.)/CreationDate(D:20031218103314+0600)/Title(Installing and using MythTV)/Creator(LinuxDoc-Tools 0.9.21)>>endobj
+1 0 obj<</Producer(htmldoc 1.8.23 Copyright 1997-2002 Easy Software Products, All Rights Reserved.)/CreationDate(D:20031222151957+0600)/Title(Installing and using MythTV)/Creator(LinuxDoc-Tools 0.9.21)>>endobj
 2 0 obj<</Type/Encoding/Differences[ 32/space/exclam/quotedbl/numbersign/dollar/percent/ampersand/quotesingle/parenleft/parenright/asterisk/plus/comma/minus/period/slash/zero/one/two/three/four/five/six/seven/eight/nine/colon/semicolon/less/equal/greater/question/at/A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W/X/Y/Z/bracketleft/backslash/bracketright/asciicircum/underscore/grave/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x/y/z/braceleft/bar/braceright/asciitilde 128/Euro 130/quotesinglbase/florin/quotedblbase/ellipsis/dagger/daggerdbl/circumflex/perthousand/Scaron/guilsinglleft/OE 145/quoteleft/quoteright/quotedblleft/quotedblright/bullet/endash/emdash/tilde/trademark/scaron/guilsinglright/oe 159/Ydieresis/space/exclamdown/cent/sterling/currency/yen/brokenbar/section/dieresis/copyright/ordfeminine/guillemotleft/logicalnot/hyphen/registered/macron/degree/plusminus/twosuperior/threesuperior/acute/mu/paragraph/periodcentered/cedilla/onesuperior/ordmasculine/guillemotright/onequarter/onehalf/threequarters/questiondown/Agrave/Aacute/Acircumflex/Atilde/Adieresis/Aring/AE/Ccedilla/Egrave/Eacute/Ecircumflex/Edieresis/Igrave/Iacute/Icircumflex/Idieresis/Eth/Ntilde/Ograve/Oacute/Ocircumflex/Otilde/Odieresis/multiply/Oslash/Ugrave/Uacute/Ucircumflex/Udieresis/Yacute/Thorn/germandbls/agrave/aacute/acircumflex/atilde/adieresis/aring/ae/ccedilla/egrave/eacute/ecircumflex/edieresis/igrave/iacute/icircumflex/idieresis/eth/ntilde/ograve/oacute/ocircumflex/otilde/odieresis/divide/oslash/ugrave/uacute/ucircumflex/udieresis/yacute/thorn/ydieresis]>>endobj
 3 0 obj<</Type/Font/Subtype/Type1/BaseFont/Courier/Encoding 2 0 R>>endobj
 4 0 obj<</Type/Font/Subtype/Type1/BaseFont/Courier-Oblique/Encoding 2 0 R>>endobj
@@ -419,10 +419,10 @@
 229 0 obj<</Subtype/Link/Rect[108.0 393.6 378.2 406.6]/Border[0 0 0]/Dest[1344 0 R/XYZ 0 634 0]>>endobj
 230 0 obj<</Subtype/Link/Rect[108.0 380.4 425.1 393.4]/Border[0 0 0]/Dest[1350 0 R/XYZ 0 734 0]>>endobj
 231 0 obj<</Subtype/Link/Rect[108.0 367.2 283.7 380.2]/Border[0 0 0]/Dest[1356 0 R/XYZ 0 481 0]>>endobj
-232 0 obj<</Subtype/Link/Rect[126.0 354.0 166.3 367.0]/Border[0 0 0]/Dest[1358 0 R/XYZ 0 132 0]>>endobj
-233 0 obj<</Subtype/Link/Rect[126.0 340.8 178.5 353.8]/Border[0 0 0]/Dest[1360 0 R/XYZ 0 648 0]>>endobj
-234 0 obj<</Subtype/Link/Rect[108.0 327.6 272.4 340.6]/Border[0 0 0]/Dest[1360 0 R/XYZ 0 520 0]>>endobj
-235 0 obj<</Subtype/Link/Rect[126.0 314.4 146.8 327.4]/Border[0 0 0]/Dest[1360 0 R/XYZ 0 447 0]>>endobj
+232 0 obj<</Subtype/Link/Rect[126.0 354.0 166.3 367.0]/Border[0 0 0]/Dest[1360 0 R/XYZ 0 273 0]>>endobj
+233 0 obj<</Subtype/Link/Rect[126.0 340.8 178.5 353.8]/Border[0 0 0]/Dest[1362 0 R/XYZ 0 734 0]>>endobj
+234 0 obj<</Subtype/Link/Rect[108.0 327.6 272.4 340.6]/Border[0 0 0]/Dest[1362 0 R/XYZ 0 605 0]>>endobj
+235 0 obj<</Subtype/Link/Rect[126.0 314.4 146.8 327.4]/Border[0 0 0]/Dest[1362 0 R/XYZ 0 532 0]>>endobj
 236 0 obj[207 0 R
 208 0 R
 209 0 R
@@ -666,7 +666,7 @@
 359 0 obj<</Subtype/Link/Rect[127.2 310.6 375.5 323.6]/Border[0 0 0]/Dest[1344 0 R/XYZ 0 634 0]>>endobj
 360 0 obj<</Subtype/Link/Rect[127.2 297.4 422.3 310.4]/Border[0 0 0]/Dest[1350 0 R/XYZ 0 734 0]>>endobj
 361 0 obj<</Subtype/Link/Rect[127.2 284.2 280.9 297.2]/Border[0 0 0]/Dest[1356 0 R/XYZ 0 481 0]>>endobj
-362 0 obj<</Subtype/Link/Rect[127.2 271.0 269.6 284.0]/Border[0 0 0]/Dest[1360 0 R/XYZ 0 520 0]>>endobj
+362 0 obj<</Subtype/Link/Rect[127.2 271.0 269.6 284.0]/Border[0 0 0]/Dest[1362 0 R/XYZ 0 605 0]>>endobj
 363 0 obj<</Subtype/Link/Rect[86.2 236.6 328.9 255.6]/Border[0 0 0]/Dest[1196 0 R/XYZ 0 566 0]>>endobj
 364 0 obj<</S/URI/URI(http://www.mythtv.org)>>endobj
 365 0 obj<</Subtype/Link/Rect[388.2 209.0 492.4 222.0]/Border[0 0 0]/A 364 0 R>>endobj
@@ -784,7 +784,7 @@
 420 0 obj<</Subtype/Link/Rect[437.7 463.0 491.8 476.0]/Border[0 0 0]/Dest[1310 0 R/XYZ 0 734 0]>>endobj
 421 0 obj<</Subtype/Link/Rect[179.5 370.6 213.5 383.6]/Border[0 0 0]/Dest[1310 0 R/XYZ 0 734 0]>>endobj
 422 0 obj<</Subtype/Link/Rect[472.5 261.4 499.7 274.4]/Border[0 0 0]/Dest[1356 0 R/XYZ 0 481 0]>>endobj
-423 0 obj<</Subtype/Link/Rect[72.0 248.2 208.9 261.2]/Border[0 0 0]/Dest[1360 0 R/XYZ 0 520 0]>>endobj
+423 0 obj<</Subtype/Link/Rect[72.0 248.2 208.9 261.2]/Border[0 0 0]/Dest[1362 0 R/XYZ 0 605 0]>>endobj
 424 0 obj<</S/URI/URI(https://listman.redhat.com/mailman/listinfo/video4linux-list)>>endobj
 425 0 obj<</Subtype/Link/Rect[270.3 125.8 539.0 138.8]/Border[0 0 0]/A 424 0 R>>endobj
 426 0 obj[419 0 R
@@ -1030,7 +1030,7 @@
 598 0 obj[597 0 R]endobj
 599 0 obj<</Subtype/Link/Rect[86.2 571.0 258.1 590.0]/Border[0 0 0]/Dest[1198 0 R/XYZ 0 521 0]>>endobj
 600 0 obj<</Subtype/Link/Rect[95.6 497.8 429.1 516.8]/Border[0 0 0]/Dest[1198 0 R/XYZ 0 487 0]>>endobj
-601 0 obj<</Subtype/Link/Rect[232.7 417.4 372.3 430.4]/Border[0 0 0]/Dest[1360 0 R/XYZ 0 520 0]>>endobj
+601 0 obj<</Subtype/Link/Rect[232.7 417.4 372.3 430.4]/Border[0 0 0]/Dest[1362 0 R/XYZ 0 605 0]>>endobj
 602 0 obj<</Subtype/Link/Rect[487.8 202.6 556.8 215.6]/Border[0 0 0]/Dest[1276 0 R/XYZ 0 214 0]>>endobj
 603 0 obj<</Subtype/Link/Rect[87.9 163.0 245.2 176.0]/Border[0 0 0]/Dest[1340 0 R/XYZ 0 321 0]>>endobj
 604 0 obj[599 0 R
@@ -1390,12 +1390,12 @@
 833 0 obj<</S/URI/URI(http://tldp.org/HOWTO/lvm-HOWTO/)>>endobj
 834 0 obj<</Subtype/Link/Rect[140.1 395.8 318.0 408.8]/Border[0 0 0]/A 833 0 R>>endobj
 835 0 obj<</S/URI/URI(http://www.sistina.com/products_lvm.htm)>>endobj
-836 0 obj<</Subtype/Link/Rect[282.2 343.0 471.1 356.0]/Border[0 0 0]/A 835 0 R>>endobj
+836 0 obj<</Subtype/Link/Rect[282.2 263.8 471.1 276.8]/Border[0 0 0]/A 835 0 R>>endobj
 837 0 obj[832 0 R
 834 0 R
 836 0 R]endobj
-838 0 obj<</Subtype/Link/Rect[105.1 501.4 363.0 520.4]/Border[0 0 0]/Dest[1202 0 R/XYZ 0 283 0]>>endobj
-839 0 obj<</Subtype/Link/Rect[147.5 460.6 174.7 473.6]/Border[0 0 0]/Dest[1356 0 R/XYZ 0 481 0]>>endobj
+838 0 obj<</Subtype/Link/Rect[105.1 586.6 363.0 605.6]/Border[0 0 0]/Dest[1202 0 R/XYZ 0 283 0]>>endobj
+839 0 obj<</Subtype/Link/Rect[147.5 545.8 174.7 558.8]/Border[0 0 0]/Dest[1356 0 R/XYZ 0 481 0]>>endobj
 840 0 obj[838 0 R
 839 0 R]endobj
 841 0 obj<</Dests 842 0 R>>endobj
@@ -1411,9 +1411,9 @@
 851 0 obj<</D[1338 0 R/XYZ 0 494 0]>>endobj
 852 0 obj<</D[1338 0 R/XYZ 0 245 0]>>endobj
 853 0 obj<</D[1340 0 R/XYZ 0 528 0]>>endobj
-854 0 obj<</D[1358 0 R/XYZ 0 132 0]>>endobj
-855 0 obj<</D[1360 0 R/XYZ 0 648 0]>>endobj
-856 0 obj<</D[1360 0 R/XYZ 0 447 0]>>endobj
+854 0 obj<</D[1360 0 R/XYZ 0 273 0]>>endobj
+855 0 obj<</D[1362 0 R/XYZ 0 734 0]>>endobj
+856 0 obj<</D[1362 0 R/XYZ 0 532 0]>>endobj
 857 0 obj<</D[1206 0 R/XYZ 0 588 0]>>endobj
 858 0 obj<</D[1214 0 R/XYZ 0 549 0]>>endobj
 859 0 obj<</D[1214 0 R/XYZ 0 268 0]>>endobj
@@ -1468,7 +1468,7 @@
 908 0 obj<</D[1298 0 R/XYZ 0 662 0]>>endobj
 909 0 obj<</D[1302 0 R/XYZ 0 185 0]>>endobj
 910 0 obj<</D[1340 0 R/XYZ 0 321 0]>>endobj
-911 0 obj<</D[1360 0 R/XYZ 0 520 0]>>endobj
+911 0 obj<</D[1362 0 R/XYZ 0 605 0]>>endobj
 912 0 obj<</D[1218 0 R/XYZ 0 519 0]>>endobj
 913 0 obj<</D[1332 0 R/XYZ 0 329 0]>>endobj
 914 0 obj<</D[1328 0 R/XYZ 0 636 0]>>endobj
@@ -1590,7 +1590,7 @@
 1030 0 obj<</D[1344 0 R/XYZ 0 634 0]>>endobj
 1031 0 obj<</D[1350 0 R/XYZ 0 734 0]>>endobj
 1032 0 obj<</D[1356 0 R/XYZ 0 481 0]>>endobj
-1033 0 obj<</D[1360 0 R/XYZ 0 520 0]>>endobj
+1033 0 obj<</D[1362 0 R/XYZ 0 605 0]>>endobj
 1034 0 obj<</D[1204 0 R/XYZ 0 112 0]>>endobj
 1035 0 obj<</D[1216 0 R/XYZ 0 204 0]>>endobj
 1036 0 obj<</D[1228 0 R/XYZ 0 394 0]>>endobj
@@ -1740,7 +1740,7 @@
 1180 0 obj<</D[1348 0 R/XYZ 0 472 0]>>endobj
 1181 0 obj<</D[1240 0 R/XYZ 0 544 0]>>endobj
 1182 0 obj<</D[1208 0 R/XYZ 0 234 0]>>endobj
-1183 0 obj<</Type/Pages/Count 89/Kids[1184 0 R
+1183 0 obj<</Type/Pages/Count 90/Kids[1184 0 R
 1186 0 R
 1188 0 R
 1190 0 R
@@ -1829,6 +1829,7 @@
 1356 0 R
 1358 0 R
 1360 0 R
+1362 0 R
 ]>>endobj
 1184 0 obj<</Type/Page/Parent 1183 0 R/Contents 1185 0 R/MediaBox[0 0 595 792]/Resources<</ProcSet[/PDF/Text]/Font<</F8 8 0 R/F9 9 0 R>>/XObject<<>>>>>>endobj
 1185 0 obj<</Filter/FlateDecode/Length 95        >>stream
@@ -1912,33 +1913,27 @@ S~¾vÚÜ,BÒí¹§d×A–Ñ¾øâõ#tö÷Ğîåôjw{“LÃbæ„™È3T](ìº],ğ oÿ>=îwO×««§?Ê§›×ûû~¹
 ÿæ±şó£ßOÈï%‚NõµøğÊ–üêÿÆCv1ŸµòÓ…Õ/"¯_>úÇ£ÿá(9¨endstream
 endobj
 1194 0 obj<</Type/Page/Parent 1183 0 R/Contents 1195 0 R/MediaBox[0 0 595 792]/Resources<</ProcSet[/PDF/Text]/Font<</F4 5 0 R/F5 6 0 R/F8 8 0 R/F9 9 0 R>>/XObject<<>>>>/Annots 236 0 R>>endobj
-1195 0 obj<</Filter/FlateDecode/Length 2812      >>stream
-xÍZÛrÜÆ}çWàÍrUÂ`p}JÉ¶(©JrŠQòàŠ-ô.–”òõ9İ=—Í(”¸bbWI:8˜™î¾Lö÷#“døß$uØ*9²4Ã“ğÇÉz’TE‹?‡¤(ÒÊuòîHÁ!©ÊÔ(NÁ!ió´Uœ‚Cbl5›´,hA[¦4¦Áß‚hEÁ–s3ahc¾!)Ë4w€F*Y[’•_$NÁ!iš´Pœ‚Ğ£MkÅ)H¢Ö³I5[Ø9«0Øj¾¨ÆC’gl¡ ®Æ`KŞ¡ÀŠ²ZÀY„!B(Ê›8IÖ4“¸Ù(²
-ƒm›´Ô¬Â¤LA¾Æj6¯i×"«0©jfëj¶.R«Ç*<$633©4kílX—X¶„q$ x’çğJ™DNA2"¹g$5kk(£X…ÁüE±
-ƒm(Ø«0aìl]¨²±Â•ù°ëGH×°`$e ¢ƒBAMĞ@IÚšV¤,Ém1°¤x`„çÅÀ@Šİì¼Á%ƒhwÇqÈFNAÁ‘ãè"8rÁ3ˆ¡L-¨1Dµ–,ÄÑ,B Ò¬Â`a|ìu«09}EF¬ÁfÊùD#8N´œ‚Ş#¸q¢uà„¨yƒH(©1X¤|!²
-ƒEÄÁ‘U˜Ü²5ñ*'ª’«I‰J öŒİ9p2.£‡>6Dó8Îğße 5&U(E*Va°X¡Æò¢E›ÅÒ" ,ê9Ş„È)èö$r¼'~oBä„0Ğİ$‘Ô˜ÉaŠÈŠ¨5eT:Š¯‚‰ª Âï
-Ej¶Êá€q¨Æä³ÅlbÁ¢|—j¬Æ`Qí´Pƒm)DÖ‰ÚPN¬([+¢ƒ¨¬ãœrÔ8(YQŞ%å°h`5&e)&«°(;å=&e32TœYaR¶„¿E–Ój"HSSÅ@Ê*ˆˆÉhcùEâ„ª†²\$5[RTDV–Di¢`“5Ä%‡xÁ¸ÀÉ8Ø+@Cj0`q"$q¨”ER*ôvP47Ûâ8AU¹²°œ â¤IÉí#©1é˜cIÅ*Œ-É-¤¬,ŠKFg³xQ^ÆqÏÈ)ˆ¡hŒœ‚$lEâ„I5ß€8‘U,Êp­Y…¡
-[.Õ,
-š^Wc°%5Va°¥Å&(Va°5åIÅ*'Mm10|‹\I«2 +#š5p
-’™X™@Ê¤¨*Ü
-P5±hR®5Éú¼‡Ô,Ò65²
-C“<CäGVc°hf¬Ât¥DÇŠÀEÉ~/2ˆ;Î	H!pY“CDVa°°,Y…!0¿0p`5‹™à.‘U,BY…)‘±Vc°p=³˜ÂRùqË šÂq-;Rà„ªxŒüHi_çC5†2ˆ1ŒåœdÑQ
-À*ğ,µ«6“vµ¦>W q
-"—Q•ˆœ‚Î ayÈÈËÁ{xÎ`ˆE¡7‰ÔÓ"f3Í*LÛMU"e-óZGØ§A y:=zzÜbHrzÁ5"C‡WÉé’/ğøüÉiw¶î“ñ"ùyÜLıfÚıxúOŒ*b4jA¥Ã9{òj³›ºõzµù@¯ÑMB^ã*LÒm–ôÁU4¹{¶ß¹7Ñ6¦uOß|.OßË:…_Ç6i›7XRæğÒ´í6»óqÙÓ»È uÕ¸)úOİpµæç˜[·`úøÿU	·0¹‰²ç&Íé)Ü-/Ä¯~`óP“×Z÷l½úÈ*è÷¦‘GšÔf^ÙıNŞB52~ènøalUÓ}mÁ8]ö[§¶ô+ß¬6Ëñ†ÃT(=îå¡ÛtúmJDÃ›qËŞ„UMk,8>áI~‡°©ei½H¿ì&~€¸ª+'çyw5í·²Õ8täŞÛ~7®÷ÓjÜ°UZ{…w—ã~ÍÖF.Èï ¯è=M‚a×?ËúiŞú·^Š©pì1¶p",ÇÃfF_¯–=ï|;ZõfÜ~”IÑUN¢o1©7|(6+Hfí21°Áá^ü†ÌQ9£¸á¨‚rÿàéPúƒgü²Ú]­»Ïô)-º×»Õ¿úûZ6sô-Ê}Å˜ª!9†Tn`‘Ñ–Şq~YıfWàmBaj|ğ|ÅJßéU§ npà aã!(½ãşAøÏ´q’Ã/‚Ø¹î·»óNBWs¸~–ÔóÑsã¢ç ‚|ÃŞmĞ6i³#|ÊÛáó€Ì¼ë®%ë 9ã0srÕ4º†¢ßø„=p¡“şš,»©;ëv½äåy\,ü6¸çª•kpy¬<¦âÒ¦3ÍLµì×ı$ÆÂÂ›‹÷ÍTÈ?Ãçİïkzšãd[øà¸m˜¶xÆ¡{èTº¸¨å>Mİ~¹âz€[_Šî¹ğšÓƒú
-¥Ôàôª÷ø¤ÆkÀCn
-õs¿¹épDäÂŠ {x~Ùm6ıZJîCmûİ}V[¬ÎÄq}K7vl­Ûü÷®CØ¯Çï¤BçæqÊ¡V|şoo|©™ï°aûà@ã½2y¶ŸÆ¡›Vç8ÊsBË?NøÛÉ9€òå„Nä[îØpÙOrpCW®æù¼›úöWñ4{6rÈCnóU:™PÀÅ”˜Ô<Ø”µa—ÈÑ÷ßr	ÃÌaŒqÖì¥ë-bN;˜-Ğ
-=¼³ñ¶@§mq"Œ;ê­‹ñ—Nr}<|æÚ:Tƒ ßà¹í¤w¡O	¥;“ÏòQÓ	bv~=rw:Síbµ–3<¥ƒÚu¢"áı©¹a\Ø:ªqËÊeëÛ‘6ıDîÛ™â‘á÷ÑÁiP¶Qƒ¸O¥&Rùd'»ÏTöNÍıç÷•*eRq7¼èìüéãÙòºÛœ»â‡ÛEøH~ŠI€º/ë/9pr±ú°ß"Í¢-áÜ†ûÔÖ¸>ó;ªè”2(ÜáÀB*I¯­ÊÀíöŠ[($òØ8O—î!òB8…»>íâ;wé»]œéP=şD.Š¯’¸wÙå®æóÒuÛ:»,åÄÆzuWçÎ oDV÷İ8ğ7ğÁÃùZÍı6î¿È¢AsŞRÜe„ªú<ŞIÁšpÿr·'4{HRşVs„+º½
-áZ<•Úè´/»ıÕU·ÿÀt|li‚Ï¿}²ÀXÚ’ô;’ÌßŸ\vÛåM'½Î‚•şæíó*œ3ãé7t¿'·PaèßWò~ı?†9>ãŞÒPÂÚ/ş_5$'£/(…ê-ÇÒÅàLóå{éğàp"ßÉü¤×6¢¿	÷0¯_üÌ1ƒ«Òp.ÚaÆíÄ¾†¯t•w¶¯±I-7(üö–9$%xs nÒ‘„À½O¼@|{6¹mœ] ¢>Ñ"Ûş¼ã·'¯ß¿ùíG‘ÒÆ/(ŞÈ¡ÏĞoÆ”'ıj×oß±Z|:\nø‚4÷§vÊ¼_ŸÏúO?Ç]]¼çºãjïñ.â\ó¿K)w*Û°\|9×zQáŒZçÿXZßR.xÑZ„âs<nÑ¿P“Â^†ä”Wî{§(~è4£ŸÕhO{î¶Ÿ@ş;d‘üéqã>»ü¾®(,¾äÓ7×Ùú “ğœD]VâËUYâ`Q#áõkŠªç§G=ú7®õpendstream
+1195 0 obj<</Filter/FlateDecode/Length 2811      >>stream
+xÍZÛrÜÆ}çWàÍrUÂ`p}JÉ¶(©JrŠQòàp7Z,è],)åësº{.šQ(‘bbWI:8˜™î¾Lö÷#“døß$uØ*YGYšáIøãä=Iª¢ÅŸCRiåÀ&yw¤àTej§à´yÚ*NÁ!1¶šMZ´ -ÓÓàoA´¢Æ`Ë9‹™04Ï1ß”eš;@#„¬-ÉÊ/§à4MZ(NAèÑ¦µâ$QëÙ¤ƒ-ìœUl5_Tã!É3¶PWc°%ïP`ÅY-`„†,Â€!åÍœ‚¤kHIÜŠlY…Á¶MZjVaR¦ _c5›×´k‘U˜T5³u5[©Õc›™™Tƒµ†v6¬ËF,Û
+Â8O<Ésx¥L"§ ‘Ü3’ƒµ5”Q¬Â`‹ş¢X…Á6lŠU†0v¶.GTÙXáÊÀüØõ#$kX0’2ÑA¡ˆ …¦h ‚$mM+R–ä¶XÒ@<0B„ób` Åîˆv^Šà’A´»ã8d#§ ‹àÈqt9`ÏÄP¦Ô¢ZK–âh!PiVa°0>ö:U˜œ¾"#VŒ`3å|¢'ZNAo„À‰Ü8Ñ:p
+BÔ¼A$”Ô,R>ŒY…Á"â`„È*LnYÏÆŠšxH•…UÉ€Õ¤D%{Æî8—ÑC›¢ygøï2“*”"«0X,ŠPcyÑ¢ÍbiõoBät{9Ş?7!r
+Bèn’HjLŠä0EdEÔš²*ÅWÁ€DUáw…"5[åpÀ8TcòÙb6±Æ`Q¾K5Vc°¨vZ(Á¶†”"kŒDm('GV”­
+ÑATÖqN¹@j”¬(ïÆ’rX4°“²ŠUX”…ò“²*Î¬0)[Âß"Ëiµ@¤ˆ©©b	 eDÄd´±ü"q
+BUCY.’ƒ-)*"+K¢4Q°Éâ’C¼`\àdìÆ !5°8’8TÊ")z;(È›mqœ ª\YXN q
+Ò¤äö‘Ô˜tÌ±¤bÆ–äÒFVE%£³‡Y¼(/ã¸†ŠgäÄ†P4FNA¶"qÂ¤ƒ…o@œÈ*e¸Ö¬ÂP…-ÇjM¯«1Ø‚Š’«0ØÒb«0Øšò¤b‹“¦6†¾E.†$ŒU„Í8ÉL¬L eRTn¨šX4)×d}ŞÃ@ji›Y…¡I!ò#«1X´@3Va:R"‹cEà¢d¿	Dç¤Æ¸¬É!"«0XØ–ˆ¬ÂÇ_8°ƒÅLp—È*¡Š‹¬Â”ÈØ‰«1X8YLa©ü¸ƒeMá¸–)p
+BU<F~¤Æ´¯ó¡CÄŒÆrN²h‰(`xˆÚU›I»ZSŸ+€8‘Ë¨JDNAˆg€°<däˆåà½‚<g0Ä¢ŠĞ›DjŒi³™f¦í¦*Ç²–y-#ìÓ 	Ğ¼?==n1$9=ç‘¡Ã«‹ätÅ—x¼|rÚmúd<O~·S¿ö?ş£J„ZPiÁ°ENÃ¼Úî§n³Yo?Ğkt“×¸Š “tÛ=CpMîöîM4„iİÓ7Ÿ§‹Ó÷²Ná×±MÚæÖ£…ù¼4íºí~9®zz´®7Eÿ©.7üsëLÿ¿ª"á&7QöÜ¤9=…»å¥“øÕljòZëmÖYıŞ4òH“ÚÌ+{ØË[¨FÆİ?Ì‘­jº¢-§‹~GÃñÔ–~åëõv5^Óc˜
+¥Ç½<tÛîC¿K‰(px3n¹‡7aUÓOx’ßaljYZ/Òß/º‰ ®êÊÉ¹ì.§ÃN¶‡Ü[`×ïÇÍaZ[Ö Jk¯ğşb<lØÚÈYãô½‡£I°!ìúgY?Í[ÿÖK1=ÆN„ÕØsX ÓlÃè«õªç½‚oG«^»2)²ÊIô-&õFCâ‚£ÁfÉ¬]&Æö18Ü‹¿±Â9*çb7UPî<JğŒ_ÖûËM÷™#¥E÷z·şW¿gAÒfnƒ¾E¹¯S5$ÒÊ,2ÚÒÂ;Î/ë¡ßîá
+¼M(L¯Xé;½êÀ4ìcÜ3¥wÜ?¨qÿy mœäğ‹ ö_®úİ~ÙIÈáj×Ï’zş zn\ô<€ ß0…w´MÚìŸòføÜ#3ï»+ÉÂ:ÈFNÁ8ŒÄ\\5.‡¡è7>adè$‚¿&«nêÎº}/y9Gƒî8¤j%Â\+…©¸´éLsS­úM?‰±p ğÅ&AÅâı@3òÏğyÿû†æ8Ù>8n¦-ÃÁ‚qè:„•..j¹Ï@gSwX­¹àÅ—¢;îÀ#¼æô ¾Bé58½ê=>é‡ñÊğ›Bı<l¯;¹°¢'(Ã./ºí¶ßHiÀ}¨m¿»Ïj‹Õ™ø/®£oèÆ­u»‡ÿŞvûõø”CèÜ<N9ÔŠÏÿíÍ€/5ó6lh¼W&ÏÓ8tÓz‰£<g ô¸±üã„¿›œ(_NèD~¾ã.} —mñ!7tåjÏû©hopeO³gã(‡<ä6_¥“	\L‰IÍ½MYv‰}ÿ—0Ì<Œ1ÎºåÇ^ºØ"æ´³Z¡ûw6Şèã´-N$qG]£u‘"şÒI®‡Ï\[‡jôœ#wô.ô)¡tgò¹C>
+rÚá#AÌÎ¯GîNgª¯7r†§tP»NôQ$¼Û"57Œ[G5nX¹l};Ò¦ŸÈ½q;S<Ò!ü.:8Ê6jğ÷	£ÔD*Ÿìdw™êÑŞ©¹ÿ\à¾R¥L*î†·?}<[]uÛ¥+~¸]ô‡ä§˜¨û²ş’×)çë‡Ò,ÚÎm¸Omë3¿£ŠN)ƒÂ,¤’ôÚªÜÚn¯¹…B"ótá"/„ãX¸›áÓ.¾s—¾ÛÅ™ÕãOä¢ø*‰{q—]nk>/\·­³ËJn@l¬W·uîúFd=qß|8_«¹ßÆı9C4hÎ[Š»ŒPUŸÇ;)xBî_n÷„æqIÊßjî€pcE·—A!\‹§Rı‘öew¸¼ìø€-Mğù·ïOøËS[òÑ‚~G’ùû“‹n·ºî¤×ÁY°òÏß¼}şbÁQ…³cfü"ı–î÷äÊ"ıûJŞ¯ÿ§Ó0ÇgÜJXûÅÿ«†ädô¥ğQ½ÃáXºœi¾|¯"şNä;™Ÿc‹”àÚFô7áæõ«“Ÿ9fpUÎE{lÁ¸›Ø×ğ•®òÎö56©å…¿ÁŞ0‡¤oÔM:’¸÷‰ˆïqÏ&·³DÔ'º@dÁßƒwüöäõû7¿ı(2ãBúA£ñŠ7rè3ô›1¥çI¿Ş÷»ãw¬Ÿ.7|Aš»SïÂŞ¯Ïgı§‰wuñë–«¼Çãq®ùß¥”[•m$qâË¹Ö‹ò¡uş¥õ-õ!á‚­E(>Çãı5)ìeHNyå±·ŠòÀfô³íiÏİVàÈÿãa‡Œ ’?=nÜgƒß×…Å—|úæ:ûÀCtş€“¨ËJ|¹*K,j¤3¼~EQõüôè¯Gÿ´;õtendstream
 endobj
 1196 0 obj<</Type/Page/Parent 1183 0 R/Contents 1197 0 R/MediaBox[0 0 595 792]/Resources<</ProcSet[/PDF/Text]/Font<</F4 5 0 R/F6 7 0 R/F8 8 0 R/F9 9 0 R/Fc 10 0 R>>/XObject<<>>>>/Annots 260 0 R>>endobj
 1197 0 obj<</Filter/FlateDecode/Length 1376      >>stream
-x¥WËRÜFİówéT1ŠZoe•ØqlW U†)WÙh¤¦ƒX&ü}Î½=’'ÌÑÑ=÷İÒ|=SäãGQP˜PÙœù+ËŸ«g*Î¼”’(ğ2j(
-cOPM×|?%~ìEe)>øí5í…ˆcßK*òŠ••‹#¨ZÀjl(a¼rlH…ÊÒÅ`“dñÁ².n(ˆ/wm9 (Íñ¦f‘˜
-q(å’§ æU¥8×…ŒrÖQêÃŒ9lh9ŸsQŸ"‹Ã0PQ” Ç?˜s "…ûØ!]ÜP¨B¸\M]6RˆËaŒ"[YîqsgJG$`É$"‰6PB˜s ¢…	åNIÓÁÜ0®“Ã:˜K£Ù+ëbÛNdº(KqCtcn'b$nÑŞÃm–`˜ÖÁöe]‘;¬¸Ğh®’òs‰[ƒ2¸uXs¶\é•u1Ø E_ÖÁ`Q·Ìae×‚ÄN¯
-ø¿E¶+æğ®:¬ƒ!ŒMÖfÚlÓ5°®1İŠ±p„Ë0gÑ…t1Ø8ä:¬¬ƒm¸©Ë"ÜƒÍ£Ç¶æ
-'üº˜kø8dÛ½B…—¨l!0|²Ê¼U .’!BB£àBZC94P%^ {‚°¡p
-³Äg ¸	1ÑB4Œ0I+éb°è„ËZÙ,–ÍÀi`°¬L
-/)ç‘ñ’X°†ƒéáÊSÖ á¬åĞYIëPæg™Ï¢ØĞp˜aJVÎ,š>"Eå@#Pòy‰ñQ…¨š|ffE’@´2Hç„æğ#›ÍIOaİıÕÌ°Ã=äÛíÙ÷¿`è}ÚîñpMÒŒ¶•<Sq¥|ó©Æ¢®M{CE[Ñ4ğ§Ë‡ñ°ıòİöO1U©5İ ½Œß\u;İôëT7İq¸5çÔ¦»ú[{íÇ¾+oõÈW½²k¬R„â”ä˜€RàûáF•Ó½ï¡a~hoÆ4,7ó°áæO­b}8'c£.FÓµÔíOÓ u3Pmn5t˜n4ÅpëÑö ñPà·îÆ*}§ÛJ·¥ÑÃ¹d~_ô¦›öîÓ‘Hª•ÆŞì&v4ˆ>UMCÑÀÃ+V™ı>Ú‘ÅÃÀÍ€ÛÊ©‘k¦®©GİÜlcî5İèV÷Eı(—'Ş9Í~*Å9¢è¨Yh€MYO•u¼¸îtiö¦ÍÙ’}«K=EÿàÙcÂç¾F¼|(°òècwä »İX˜–s[³;”&äG9÷Î£OíØw•ğ)zôî Ë[ò®Gm¾Nf0£NşçiÀ‹Şf‡Ëü±è«#Zuº­<ÍÁ&õ2~=„ã?‚$%›Ä,"äÒ4îİu·Ÿ-3×bƒW•#E~;€§È£ë‡m£w]»77So'îŠ“é5÷v }×ƒnî/Ñ©oÜEšcuæór/ªOT±9VõÑB¾¤"¼¸×TµÚ\˜]) äàÆú2!½oïMßµ2ô¼PÅ®Ö¯ñô­ÆÄıÜÛº+d	øäZŠõóÅ_~ë0ƒ„cc1`PĞ`}4ãÚ®İ`¶uÉíxmº~Û—T†Uo'SK¬?]¾Åló»çï—Û/¯Òˆè²h'>Ki7fûÿ*Ù˜>`%ºîY"ßêmâaÜ¯?_œDşmmø=	T}“>÷|{¼¤5üÍìJW8uFº0íô×k¤ÂSú¯ÑˆèZ#šÓ<dŒ}êQUŒÅ®w.fó©y:ĞğMBÎìÿyÚG™ïeYdYÅi¼ß}>û~ÍÃendstream
+x¥WËRÜFİówéT1ŠŞ¬;í
+¤Ê0åÊ"ÔÃtÔX&ü}Î½=’'ÌÑÑ=÷İÒ|=ÈÇO@YHQJU{æ{>®,®>œIîe”Æ¡—SKq”xÁ	5tÍ÷Sê'^Lqásˆß^Ñ^ˆ$ñ½ô)Ä^HI`å’ª°š[Ê¯œ[
+¢À‹ÒÅ`ÓtñÁ².n)LR¯pm9 8+ğ¦!f‘˜
+s(-’§ æÕ à\2.X'ÈQæÌ	`CËùœ»ˆúXFYˆŠ¢şYÀœ)Ü'éâ–¢ ‚ËÕÔÅ`ã q9¬ƒÑã0Gd+Ë=îlKiÀ	X2‰ÂX¢-B”ĞæˆhaC¹SÒt07Œëä°æÒ&höÊºØ¶™.ÊRÜİ˜Û‰˜‰[´wÆp›§f‡u0„ı ƒ¿².‹…(VÜ†h4W)ğ‰[ƒs¸uXs¶\é•u1Ø0C_ÖÁ`Q·Üae×ÂÔNoò‹l-VÌ-à]uXC›9¬Í6²Ùf9j
+`]bº.ÄÂ9.£‚EÒÅ`“ˆë°²¶áf.‹pg¶ˆÛ:˜+œ>òëb®áã]l÷
+^¢²…ÀğÉ*óV…¸Hv†	B€iåĞ@•xì	Â†Â˜%>ÀeHˆˆ®¢QŒIZIƒE'\ÖÊæ‰lNëÀ€eeRxI9œ—Ä‚5LoT‘±¦ 	g…p(‡ÎJZ‡2Ï8Ë|À†„ÃS²rdÑì)¢(‡ƒ’ÏKœÈˆê<BÕä33+’â•A:'4‡¿ÙlNzÖİ_Í;ÜãH¾İ}ÿ†Ş§í×4Ëi[Ë3Wª7Ÿºa,›Fw7Tv5Mº|Û/ßmÿÓ ³¦´7„ñ›+³SıH¿NMycÃ­>§¶ÔÍh~èoíµ{Sİª‘¯z•i­RŒâ”ä˜€RèûÑ&7axN÷¾‡†ù‰½Ó°ÜÌÃ†›?uzÔˆõáœ´ºµéÈìOÓ T;P£o•t˜nåpëÑö ğPâ·1ãÀµºS]­ºJ«á\2¿/{m¦½û´A$’j­‡±×»‰¢O£¡ÚĞxP4”-<¸bµŞïá£éX>ìQ¸­šZ¹¦›†ÊqTíİÈö7ú^ÑêT_6ryâÓì§Jœ#ÊŠ…ØTÍT[Çk€›áNUz¯+Ñœé(ÙwªRÃPö-0&|îkÌË‡}4GĞìÆRwœÛš…Ø¡4?Ê¹w}êÆŞÔ6À§täÑ»ƒªn9È»µù:éAj8ùŸ§/z›y",óÇ²¯hÕé¶ê4›ÌËùõÿÓŒl³ˆKÓ¸w×f?>[f®Å¯Aùí b®´Ş™n¯o¦ŞNÜ'Ó+îí@{Óƒnï4/Ñ©¡oÜEšcuæór/ªOT±9VõÑB¾¤"¼¸×TµŞ\è]) äàÆú2½ïîuo:z^¨r×¨×xúVc~6Ç®1¥,Ÿ\K±şc¾øËÂo3H86%¶ÑG=¨3İ³­L®áµ1ı<¶/©?ªŞNº‘X/~º|ÿŠÙæwÏß//¶_^¥ÓeÙM|–ÒnÌöÿU²	}ÀJó,‘oõ6õ0î×Ÿ/N"ÿ¶6üŒê¾ÄI_x¾=^Òşfv¥jœ:#]ènúë5RÑ)ı×hÄt­Æ‘ÍéN2Ú>õ¨.ÇrWÏ;óùÔ<hø&!göÿ<íãÜ÷ò<¶ÇlÀi¼ß}>ûgãÃendstream
 endobj
 1198 0 obj<</Type/Page/Parent 1183 0 R/Contents 1199 0 R/MediaBox[0 0 595 792]/Resources<</ProcSet[/PDF/Text]/Font<</F4 5 0 R/F8 8 0 R/F9 9 0 R/Fc 10 0 R>>/XObject<<>>>>/Annots 294 0 R>>endobj
 1199 0 obj<</Filter/FlateDecode/Length 1641      >>stream
@@ -2764,251 +2759,260 @@ a\¡{ƒ!I&EşµÿÇÃ_B|¯¶_% C¾ÏM„Ú8îÑp0®'”
 ù¬CqŒAr;ùÿøá¼Âf¼eYz€dêıQ?ÇÕ(8öÃüëéŞO{ÿß*endstream
 endobj
 1356 0 obj<</Type/Page/Parent 1183 0 R/Contents 1357 0 R/MediaBox[0 0 595 792]/Resources<</ProcSet[/PDF/Text]/Font<</F0 3 0 R/F4 5 0 R/F5 6 0 R/F6 7 0 R/F8 8 0 R/F9 9 0 R/Fc 10 0 R>>/XObject<<>>>>/Annots 837 0 R>>endobj
-1357 0 obj<</Filter/FlateDecode/Length 1859      >>stream
-x¥WkoÛ6ı_qÑ¨Ä’©P +Ö®@ºu­—¡@€‚–(‰‹$j$eÇ_öÛw.)Ù–b†¢%‘÷yÎ¹ä_Sšàß”–3š/(©.&Ño>¾½˜Ï£)]ÍVÑ„*Z/£y÷PÒ§‹³ÇŠ¦‹yôüìãùsE³ùêh‡·?ãëú*Zí]ğâùb­àtvµ€óğä·N'â„æë5¯õOüõÇÍEüæŠ¦SÚdÈm±ZÒ&õ)Mh“ŒŞetĞíS#©ÖZ«êœjáÔNÒõ»¯É¶M£»$YÛ«\!şHÚ¶Îék+iÃÛDW’Ú†öÊÏ6ÂíóÎíˆ”Ù‡W}$#ª„K
-oJ×0¡j^0¡ñtl6éˆ„=èˆ~•Ê$&ZÊT)±Ÿ1Tp©22qÚ"úE».jåS%ñß¹~«ë³hCœÆca¨S*„%AO¢'„ì"SÆ:J
-aDâ¤‰ºÌÑà“ªI{ÉÍùjc|µáôıÁ››KJts`ã+wh¢ëLå®îŠ6—ãPØqè<?|¥ÆN‡ôšEÜ»]<Üuìƒ/@"Ê’”{¸÷,´G»Ñ;×•Î–*/\y@{³LY;Ê´5íšÀ íu[¦(@Z¾ÇâPÂàû—÷rCƒÀ#zUZÍ”ØáÏg*GêÔê‡ùôµX<AÒ—"ÕÒ†‹Üìm¸©àaÀz0SJæœKüfBkæ5Äj<»
-°ù’0ø¦.ÓßqßºÇŠ?övÆWiêıƒäÀ k*µ/½R¤r§€×Ô@;Ä['L—Ó©äì(&ú\™$*5`3Xş"<?š¼mù#7‹Õ‘G2)4=©tÚ½•Ä|Q³ä	½|I±tI7)ÿ9úzd{ÜZû±İª:öi|³‰ûö½ş•ö3 kÙZïuôü	~Èô®ÿkšBÏYØÇóYèÿl†™t­s…ºÑ.[èá{Q‹\º]ß¼¿}ÖmîcÁæÙ2òmÆgÊÌ2È~Y/ï«RŞ«­*•;x’ù0J Aä<5¼úZˆ.<B:#Rå”®HS¬¨$üKÛë]/ø›¤²Ğmì@²Ğ
-ôk§RI–5}k”Ì<%-aAR5Ìr?9ZğµÁ6p„@„ÈØ†äB÷›=HºaÓY@9ş÷A§ÊŞQ°ÓÓ¯u˜‚m
-HÊS
-8K•îcÂRL4ß.íáCäerÇøåĞşõÍ¯T8×¼ˆcW¦M¤Mû·q¹«ÆáŒ&heĞ<J¥ª<–°ïÅ
-ÀsÚwãNšZ–´c…C[Ë6EØw7Ş	Uò“]9$%v°-¶ª~b8mÉ9ëT.‘­õœftÕƒ‚¦œïLÃ:¹…NËL´¥‹Š~
-Õ½@h×ùÑÜ‹0ÀtÆµò¶1§¤ı!qP@Ÿ'úäŒÂ‰ù]r.¹‡”€ÀˆeAÂ'K™ÑU_éı~YlTµˆ j1À–¶‰³_Pó¨p•W°m«0JK5ğØ·g‡Ä}^w§$Şt~Úå	o{öæ¹Ï”­d*™¶&ğ°o´B½ÒÖ9¶Õ8©YùW+ù|0öÁx9•À+ƒpÿÕ‘k­ï<9á g™³oÇ8‡Ë€rX±‰ÃYHˆÆcùREø>RçÅÈB…|8•ÀI…+0ºÁË(ŠnŸ=¬+Swb´‚ì|„Êä1Èäcètê	æe¢\„	ìÛJĞŸ5§Î}¯ÂHRùá±|è•)h%Ô‘ÙM8’¡Át”+ÖÆ$NkirŞ\ü&éøx­øş€‘s;[,»Jõ]ö„¹yÇ6¿5ºm^s¨oˆ
-ğ‰~¸Ê„Rİ¼ı~¯9á‡³=j·©Ú)æuÔk´.ùwP¿“"t:ˆ K?¼1åJ%E[ßÙËAó=txv^R¼&ö2ŒÛ„KM£W”G*8ÆkºÆœ[‡QÅMÊtYê=ÃNŞ‹ªñŠe¡’İ„±ÑËM7„•SW½"@u8øS¾È2Æy&.Rñ|˜Q8Š ^Yi2ˆ
-Ï”ƒu2HF¥ÛÚÉ”ñrÊØK ±¨bÂC%ğŞA9=³Î­@9y1™Õ¬|J/úğ¶¾Šg4ùŒ”k	÷§%)1Ç"
-’z–=´Rœfs hD¿Ûîşp:µeìö!9G¬´^3±ÓFaö-â–©<b4t+(³;4¾LëÛÑä~%ˆ§ÛhWåcÂá2ç³Æí&ŒxNd«ò“;ÂlÃDF%1€ıÖA L¢î€ªœ•e‘ŒòÈºNo§ş
-Ü?uğ\uì.ŸGë«9-şnö®†¨”¥ï:¢w0ö<î——ĞÓ}ë©ìj‰›ÿbtd5ec?m.~»øıOendstream
+1357 0 obj<</Filter/FlateDecode/Length 1883      >>stream
+x¥WkoÛFıî_q7»@À"õp$+HŠkÀI³‰ê¢@€bÄŠ³&9ìÌP²¾ìoßsgHIæ:h€"ˆ!>æ¾Î¹ç^şq1¥	şMi9£ù‚²êb’LpçøçóÍÅ|LéjvL¨¢Õ2™w%}¹8»¬hº˜'¯Ï_W4›_íğÑók<]]%Ë³³~y¾˜$×p:»ZÀy¼
+G§“dF3„ÄOç«ŞWüôİú"}EÓ)­sä¶¸^ÒZ†”&´ÎF·9LûÒ*ª§ÖézKµğz§èîöóäÚ¦1Ö_’ª]‹·|!<ş(Ú´Ş›ïVÊÅ»™©µíµ/^­ÿ·¯;·#Òvoõ‘Œ¨>+‚)SÃ„®ù…	§sd³–#vÏ ‘ı()µÍl6´”ëRá<'b©à(¤¶*óÆúh|µ©’øó\¿×õY´1Nã¹0HÔ’
+áHĞ‹äá»Èµu²BX‘ye“® ³ErÅø¢ëLÑ^18ß&TN?|±¾¿¤Ì46ş´rgf¦Îõ–Ãui!€®h·j;ÈóÅ7jìMLï©ùQRÁ½ß¥ÃSGB2Q–¤ıÓ³g¡=‹nB·¾++õ¶ğåğæ¹²ªö”1ÿjÚ35ÁÚ›¶”(H!ßãåXÂèûœ—jCƒÀz[:Ã-¹ÃÏÕô	ê§ùôµX<Q2”Båâ‹Üìmx¨èÃÈ`9S*î¹@–ôı„VÜ×«ñì*Òæ”5 Áw¡LÿM{è+ş8Ø]0ßJü£É+6To¥j§ÁWi¡Lã¶ËéTrv$‡‰~ƒW6KJÚ^¯ŸMŞµüÁbµDä'•†^TF6Ölq ¿ëYö‚~øRå³n$ÿ9úzæxÚ:›†R·ÑuÒøn=í{ı;+ío ¬+gk³×ù3ü´Ó;üW4…³°ç³ˆÿl†™tg¶u£{S¶ĞÃ¢[eéëèîşÃ×Wİá>-“ 3ÓÖ*Á]ùÁ/äbUªG½Ñ¥ö‡Ğd!Ll[A}DbCz+¤öÚÔ¤).DÔ€á¦ëõ®üu¦rĞmœ@²Ğ
+àµÓR‘cMßX­òĞ’ğBR5Üå4~r´è×>×Ğ#cC’İcnö$é†MgM€åøß-µ{ h§o¿Öc
+&´. )/ZÀ;ªL?3È&1Ñ\Ú%Â‡È«ìhà—Cÿéç_×?Sá}ó&M})›ÄØmî¦å®Ç_0šÊ¨y$•º<–°qš³ÿ—æµD#znÄ.½cí¡)¡O/	åébÕ9E§÷ü¡Qî (nZ»4æaÔ· :¡Ô(ËJÍ ^Î«&†~Z˜ƒİÜ{w{Cïß®é×·Ÿ?Ş~¼a/§fô†~	K
+*‚Ëƒ†&b†#P‰‡´íàÖµÈ2åœŞ”ê¤
+ŠX1È âÖ´l%·¦¢1ÄÆêã³„Ş)Ø¶*oË¿u§úx?°»°…xP¶Ve§À­¥@¨e+A=¼Û©¸öaÒL; *!oœ’mÉD3R.qé‚²0u”ÅØ’BÛ™†)´ÏÃQå¢-}BĞ•—h"Á“l/@ôÈù‡h£Øˆ¸5˜œñ	¶]+÷ÏÈÜABho5Ö@@x´Uq3,Ñ…Økx
+à‘‹Åìè½ßï‡ƒ€$AµSt¸l3ï~Ñ“ÂW[›Vc~#–jàZÓb‡8ôÊÑ#ğc×]q5åC'bh·u`E¼ÛKŞˆµeÒğ ß(Ö/ÛÖAk£Q/ÙÚ£°1 N´Š—²q 3ıTòÂı?DîĞ4A‘€/øÈBÙùæ±;>poAZ4hÅ&Ş×à˜ÇÅ“"Š2ğ}ÔÛ]˜ ÒÂ©ÖC&¬À¾1L’äë«§µ9kEf+–	™«=s:S©Ó)ä.è"l”¼B«s“³Ğ×Û€UÜ#â|útX>õã (Œ$–TÂ€ÏôÂœÄŠ,£bséû¬ÛšÆËäš?Ú0ç¿ÎË®R=Êáá±aîoà¸ˆ7Ö´ÍÑë#oÛiVÎÅN?İCÚc©îoş‚ß;Nøé@fÏ_ÚÔ;Í=B]ë5Æ”ü;œ“"tÃ	€–ø äJeE[?¸Ëø:¼°\Rº6³/êX„úiùzEy¦‚c|UNWX.Vq?`rS–fÏ´S¢j‚b9Œ¦î3¹ÑËM7’E•ÓT	ò
+ÕáàOù"ËKdZHñz˜Qüş ¼v˜%äL’(•ik¯$œSÆA‰åÈB3Ş$X=”3tÖ¹('O~n¦X£ëbÓåëdu5§År?Lokp»,Ã«0C‹ß_|rÜ/'XÎåãß·‘]-ñÕ¿¸t¾²±­/ş}ñ?‰•5endstream
 endobj
-1358 0 obj<</Type/Page/Parent 1183 0 R/Contents 1359 0 R/MediaBox[0 0 595 792]/Resources<</ProcSet[/PDF/Text]/Font<</F0 3 0 R/F4 5 0 R/F5 6 0 R/F8 8 0 R/F9 9 0 R>>/XObject<<>>>>>>endobj
-1359 0 obj<</Filter/FlateDecode/Length 1066      >>stream
-xVÛnã6}÷W’‡zQëbÇ×¼5ífQ`³‹¶F€ûBK#‰µ$ª$%¯÷ë;$%YÖ¦AÚy/3çÌ™3ü{2‡~sØ,ànQ1yØO‚Gú2‡}B+ëíö1„~†°¦·Ä\!ˆ±	²˜½ÛÿEû—íş)øô‘D¦*&5×\”°šbÍğ‹f‡•1H<¡'p5df›æÚ¼ÅÚ_RøéÏîB!||~‚*;+±‘×B"Ef±¨àËTbEi\]\Ô¹ælÔj…_Şİ;(!ìr"Ã[,]ô[¨šR{uÛ³Û×ƒT™M´Í/•¢®@ÔDByrõ“c7Ï!ŸÎ:»¡}&y´""¢3^B”ÕåQÙµ–¢ù¿0q™$:¡HÖË§‡W05i‹ÉóJF$ö¡ÁSt¶èKü¬¹H‡õ à‹ğÃt¨£¸±Õ¦*ŠK9%r…2QğÕYi,ì¾BÔ%Á×¯U%ïªÒ"°aÀóÿ†&¤«Ğß®n¡8ömI{ğ½äûı6—¶BĞ0y9ué…&>‰S‡™ÁŠˆét+$Tì¢&9;:¹æüˆÿ»»¢Å¾úĞíoƒîÂYèı©¡ÿÂU•³³íÎ«nPšéZİC§Pg8Tš&%ƒ±g¼Æ-vî20bt9jª®*¡ĞšÇ‰‘f¨ŸYS/¬3&c°EßEtSÅ+µ®Á`ev¹½äJm“)-$KÑoIêìé‘K¥g—+^¦C“éZé0‡H4(iÙærÊm³Ù',Ømğs…~İ"“ÙJ¾(/Õ¨M	cNIÙŒ†¾İ[çÈ°×”ş‹a“]#‘@y´Æ}mÔDbgõ6Ã.ñô’i÷âî&Í ã±İæ×Y„ğ•Ú”ÕD…¶âCÙ½µIñ«FªCo—º¹ø«~,öÉ~ú¼Üôş¤AVèS"¥’\œè´Æ/8iÔˆß‰À~Gãİô_Š1:Ø0ÛaI“Á(Û³Z6q‰Šn||6d¯:ušÙêK²{™†ı>Ói¾_ªÂˆ'®]ÇtÒø!¦ØË¡oÍ‘Œ>È„ÒÁ¡Vf’òºPG#–LVÓãVú\F¶— g@$
-šÕfò‰İè¤Y/h,	'¢KŠãZ¢š™)îbtešBœŒ£Æ(Ãèè˜ Î2Rz‚
- *¹îw0§·‡yy‹{ün‡Õã×—šæ‘4}2ıkÄ8‡”Xl‹àÔ§)Ê×”˜7­[?ÿ‘œÉi±—æpâl[YÎ7+·¼ƒõfçÛ·È¯%	-ÏY¦›˜×ÅşÙ@ğºŞ&¤GO<â[n–şf½%ø´°]˜ıï÷“ß&ÿ ø8%-endstream
+1358 0 obj<</Type/Page/Parent 1183 0 R/Contents 1359 0 R/MediaBox[0 0 595 792]/Resources<</ProcSet[/PDF/Text]/Font<</F0 3 0 R/F4 5 0 R/F5 6 0 R/F8 8 0 R>>/XObject<<>>>>>>endobj
+1359 0 obj<</Filter/FlateDecode/Length 1163      >>stream
+xíV]o£F}÷¯¸Ú}(ÙÚ°Á$R_¼Iv­:J«x#UòËÆ6]`\ìøß÷Üá#	­ÛçJ%fî×¹gî½\rğçÒÌ£I@Q6˜¯ãû)¹.­¶X	Â­brlÇqhY¹<Qœ”ßohËãxoì«Õï‡F^`O±ÕúMU”K“VRhIBS*E©Iå’–Ït…Nt¢rÚª‚öç2‰DJG•V™´é[)YíøŞo<±hËfë­{Aú¬ª‚¶â¨Š¦:ÍWîÄöØ+'›áS)5é½$}>à¦Œ?kËy	åúÊ¦Å–şPHªÊ$ß‘ÈIæ:Á;›¶q ›d÷j
+¥0°‡„í9À&XIJt)Ó­MÒŞÙØ+;(]Ê•îŞúÀ.rã÷V¥©:±oòEd‡TÙcÚ‹#€&×ÿ27®Ú´‚ÅmR ö ßBàĞEY#¶Q0Õ¡eS,¨`o5ÙŞ{Ä‘çÑ4‰8F¢ù0½h™ók§tˆÏ1½OØu° [2.×ì Qàèóş{ó¥I^½ĞÚ‚5o}Å«o\êÔèÆ÷]3‹Aì‘7­Ùù±æQ²h4x®0M³¼Ê6È¤ÚRt†¹X¥¡)Â(´„_Ã"EnèMÚ<¹6:€5ö ™ˆ|G§Bñ8†´©˜‚ØÿT»–7®ãM‡mL6†0RU@Œd¡~a½:”	fÏ¡P›Tf¥±pÓw×WTª­>qşMŠ*G¾4è$“Œ&˜8$#GD‹sYrøËÅòñãÆ nDëÃñ&Ûü¡³´-TF‘=>•=Ÿˆ:“·Ot»xúyˆ}c¯~îl¶Yù¬²ŒqX[™ÉÄ^¦‡õÕzÙ»Åí2{ƒ³`;ôe>Äª×dtÚœµì;äù>í¥ˆË!€¡T”c]ˆ'SüÊ„^(ßrfúéuqs'ğéù®‡¥Ğó|/|o¸HÜÖ5aÎÇ×“Fiä\w×<UÑ÷¼>K-³íau±é‹˜‹ßøšSÜwÌ®Ã‰Â	Ñ’Ñ-‘ªo3b.ƒd}'˜º3h!,Ü5Gş‚¢FÔÈ_P„µ¾;-6—’®{Ö~ézIsp×–;
+˜¦xpyh¨ûU¾à(ÅLxSü—\şÓ’¿–,š¶Ãİ¬)—¼øŸzu±ûoSO6'‡€†Vÿ–øSoßG~˜F¦Ù˜^ò¹~¸»™™çıŒC¦Dòb×µJ³ŒL”˜1¤nêY•ê}şíF¥Œ­­ÿm£;›ñ«ÍQ¯™şÕUa­g0Úª:B«BI3İª7¥¡ı¤)úı‡ç/˜âÎzÿ¡î0èjXQF¿ºkí«Œ»O^;CpSÔCÁôaş1wMLM•Êº²ß6ƒŒ;¹¶¯§
+¿îğ‹¼Ôğ®m_õ”ÇÎ¯ÙîÈùF`4s0<Äy=¡¥Ú™ùôÙÌ§ô rÁ]{m!³Yr:›Ú³ ÄÌ©ĞÌMw«Á¯ƒ?:v=endstream
 endobj
-1360 0 obj<</Type/Page/Parent 1183 0 R/Contents 1361 0 R/MediaBox[0 0 595 792]/Resources<</ProcSet[/PDF/Text]/Font<</F0 3 0 R/F4 5 0 R/F5 6 0 R/F6 7 0 R/F8 8 0 R/F9 9 0 R>>/XObject<<>>>>/Annots 840 0 R>>endobj
-1361 0 obj<</Filter/FlateDecode/Length 1171      >>stream
-xµVkoÛFü®_±PQDA%J¢^V¿5@dh€4VPœÈ£x1É“ïr”_ßÙ;êi¹HQìğqû˜™åckHüiÓhJIÙDÜ9üúxÛ¢!§ÓhL%‡óÃUAw­Ók<ÇÑ¬y×?=¹.)£ÁÉÓÙ$šĞ8DS<ğGı}³lõcä£e†
-§73Z¦¾°-“Î§ªÔuåºd¤Uß%‰*Åı=r¹¤LÒî¬“eDK™ä•JDQìº´Ó5¥ºzå¨’2%§©¡.C¼^~m¨7E12w>Je¥YÜE|¿¿Ğœf½xdğÆOT‡üı­0ı­J¥ŞÇD7áPí_ÆË,õS¹íßßfÚ¼ß¹ü…CMÔ+¯ÒyªşbNCÔ’QÏ†ÓüæbÒ†ğwj?¢Ú‹ÕÎï÷ï)Ñ¥´ô¤\N‚6F¯(‰1“i85ifÑ!gV¤åy°€ÅLıW:›X<=ä+kë.’ÑJîç†!¦µQÕsW–KO$nÈÿ6¨¦Gêõ<½~™nÿaşfX#Ï²8x¿¥[Q¡	ú ŒSNéŠÚ”Â9tÙ´u6C€3ƒ–÷”)FY³nt 	 àÍ>šRÂ±¥Ê:£VµÏb¥³Totô:)Å*íl½qª„ĞR~ÈÃ8‘ÆY¦O–GÁŒRHU}­«Ä÷ÔòÒÔE¡ŸüÀ¼0kT›ˆŠÓ<ÖÊa²VfuÑtº§4Sk¨õöe*fós¯tC+µ^Këh-Pèá;çÊ„ES¸aÁyï+n‘‹­d‡xÊÑVšÍ5ğ\ÂpÀ— —ÆdÑ¾ª¸Ëæ¸|ÔSf“‡K~3ôN<ÀØBN ïK1uEàCYNõÖj-V; vHm/Uø9—Ü°‡ÓßöÕàé~ğ€’(T%Éæº.Rnd%“†¡«üùTfù™U@T~å¦ğMpBX[³¡x¼CsX3ŞÌ;Şôòt5¼l:–Dş¦;$EáË)º<ƒÜ½Ä-¢wğ•a5LìÒÀ¨¯.[±pFX_(äZ¬+~\^Á_XåCf#¶fê-ƒdys©Wbé½ T0w¯yÖuûìdÛKÙû€Æ,U¥SÌCÄ—46¸B›3µéKç»4ºëåŞÖyûËk¦‰@ç8ä}¡!îéŒÃb‚ŠìF°_a»I³A†µ%pÜˆŞì¨¡“´Á¿ÉÏ]zÊU’3£Å%§S£ >¼Æ
-pĞ*’ıÌ'¿äıŸXó<MQXM¥NU¶#$	»‘	lÎkÿø•@¶FàäzUèäqKdåìTdŒÜ€©Ê½(êŒ°+°å¨uWW¼ZÂí½‰wö÷×pÿêÇEsòG™Á °©&¹D ª0'ŸE<®”˜ÖåæjŒèNÂŠ·ëxÖcÆv™J'TÜ©¿¸iœ`ˆ/ÀùxD“Ù0¬°w•uøä`­±‡½Æ¡{û½Ùàê·Íx6fÓHûğÆî¼]¶şhıá¯Iendstream
+1360 0 obj<</Type/Page/Parent 1183 0 R/Contents 1361 0 R/MediaBox[0 0 595 792]/Resources<</ProcSet[/PDF/Text]/Font<</F0 3 0 R/F4 5 0 R/F5 6 0 R/F8 8 0 R/F9 9 0 R>>/XObject<<>>>>>>endobj
+1361 0 obj<</Filter/FlateDecode/Length 1005      >>stream
+xµVÛÛ6}÷W’‡¸¨u³½¾ì[ÓfƒÙMœòTĞÒHb-‰*IÉq¿¾CR”×´ºÆ†DÎœ9sÎŒÿœ$Ó'õ+HëÉëİ$zXB’À.§7«ÍvÄaÇ°K§?KdA%
+²
+zQu5‚Èáîík 'fğ¢çŠÀšt‰¤î}‰\¡Ìä¼BuRk{®]£ëûv„¶
+æËpI ¦/¡ê‡@AĞ0ÊjÓ@(şR~xz›ùxÒ¥‰CÄáÆİ¬cŞ(Ã>OF6Æ·ç-š[G!ê™<ß:“X¬+“ï½8ú’,ˆ—%B5Á«;ÅSG ğN¢ƒŠğß”îB¥/ş[é6Æ?+İ¥³¥·n–şWmÅN¦í¾êBŠ®¥™îÔ=øö:…QSû"î½{y–_0_¹Ş£3¨P+P]Û
+…–´##Éh,ËH’«˜˜.™Ì€ÌsÂKLA™í­ÒH£"5*¾3H¹Ü¹Â"œ›F*-$+0Hòh¸Tzvn±âMQ!´Lj®¹hÀ
+‡ò%Š%½¶X¥ c±FÍh“ŸZ„øëtAGIòÌ7h€„'P‘q‰7êÈÔKÈmá’Ò)„ôç‘€g H ôõdp‚'q/YÒ¤ØIYÎKóZ‹+F†¹`oğï¡-O¤òqDŒâ¾¸õ¾ö “KÔdeOıOÔjŸå*ƒïø`6+»ïeíüª‘
+‡Á¹o.ÿİ·ô¾ÿ°{s	nz_ÈÀ5‰¾ QJ!0¢³ä
+ZÁI£FüNö9Jb˜şqÍ]ì¯Øtb¦)ÛŞ³Z8O%¼{šö4]u)º¢´İ944zìEÈYj0<OH¤1MQ-¦<wv½¦“›ÈèŠ}&4ŸŞöŠæ|T
+¥£}§"Í$1U]¡N¯X2¨j¦¯­ô¡I­—_‘ªRQ·äqB&»RL£sAv=ZD—)fD5#³à|›¦å×Y©Æ´Ä”Æa‚œe$ëZPTËRçîèa	­³ô‚ùÖMvW=|ºj˜­8}4ş5¯–!ËlÜ~Úó¢@ù=%Vı ÄaÿH“Éiq”æ­óÌŸ»?gdZ»İNµ,Ë6„¦ecœYfV4™h^iò­“DçB#`a8 „¾ûšqİX×»|¹0MŒq-;´¿ÿo»y38YlÃír+ú-aüÚ%«ÊÈÊPåæ®ùå°{2…ÉúÎ^Ö1–M}¹æår½×«	…^læÑ›İä·Éß›ÂŞ´endstream
 endobj
-1362 0 obj<</Count 2/First 1363 0 R/Last 1364 0 R>>endobj
-1363 0 obj<</Parent 1362 0 R/Title(Table of Contents)/Dest[1186 0 R/XYZ 0 756 0]/Next 1364 0 R>>endobj
-1364 0 obj<</Parent 1362 0 R/Count -141/First 1365 0 R/Last 1575 0 R/Title(Installing and using MythTV)/Dest[1196 0 R/XYZ 0 786 0]/Prev 1363 0 R>>endobj
-1365 0 obj<</Parent 1364 0 R/Title(Robert Kulagowski, mailto:rkulagow@rocketmail.com)/Dest[1196 0 R/XYZ 0 762 0]/Next 1366 0 R>>endobj
-1366 0 obj<</Parent 1364 0 R/Title(1. How to obtain this document.)/Dest[1196 0 R/XYZ 0 632 0]/Prev 1365 0 R/Next 1367 0 R>>endobj
-1367 0 obj<</Parent 1364 0 R/Title(2. Introduction.)/Dest[1196 0 R/XYZ 0 599 0]/Prev 1366 0 R/Next 1368 0 R>>endobj
-1368 0 obj<</Parent 1364 0 R/Title(3. Checking prerequisites.)/Dest[1196 0 R/XYZ 0 565 0]/Prev 1367 0 R/Next 1369 0 R>>endobj
-1369 0 obj<</Parent 1364 0 R/Title(4. System Configuration Requirements for Compiling MythTV)/Dest[1196 0 R/XYZ 0 492 0]/Prev 1368 0 R/Next 1370 0 R>>endobj
-1370 0 obj<</Parent 1364 0 R/Title(5. Downloading and compiling.)/Dest[1196 0 R/XYZ 0 385 0]/Prev 1369 0 R/Next 1371 0 R>>endobj
-1371 0 obj<</Parent 1364 0 R/Title(6. MySQL.)/Dest[1196 0 R/XYZ 0 272 0]/Prev 1370 0 R/Next 1372 0 R>>endobj
-1372 0 obj<</Parent 1364 0 R/Title(7. Setting up ALSA and the mixer.)/Dest[1198 0 R/XYZ 0 786 0]/Prev 1371 0 R/Next 1373 0 R>>endobj
-1373 0 obj<</Parent 1364 0 R/Title(8. Setting up a remote control.)/Dest[1198 0 R/XYZ 0 726 0]/Prev 1372 0 R/Next 1374 0 R>>endobj
-1374 0 obj<</Parent 1364 0 R/Title(9. Configuring MythTV.)/Dest[1198 0 R/XYZ 0 587 0]/Prev 1373 0 R/Next 1375 0 R>>endobj
-1375 0 obj<</Parent 1364 0 R/Title(10. Configuring mythfrontend.)/Dest[1198 0 R/XYZ 0 487 0]/Prev 1374 0 R/Next 1376 0 R>>endobj
-1376 0 obj<</Parent 1364 0 R/Title(11. Using MythTV.)/Dest[1198 0 R/XYZ 0 361 0]/Prev 1375 0 R/Next 1377 0 R>>endobj
-1377 0 obj<</Parent 1364 0 R/Title(12. MythWeb.)/Dest[1198 0 R/XYZ 0 275 0]/Prev 1376 0 R/Next 1378 0 R>>endobj
-1378 0 obj<</Parent 1364 0 R/Title(13. MythGallery.)/Dest[1198 0 R/XYZ 0 202 0]/Prev 1377 0 R/Next 1379 0 R>>endobj
-1379 0 obj<</Parent 1364 0 R/Title(14. MythGame.)/Dest[1200 0 R/XYZ 0 786 0]/Prev 1378 0 R/Next 1380 0 R>>endobj
-1380 0 obj<</Parent 1364 0 R/Title(15. MythMusic.)/Dest[1200 0 R/XYZ 0 766 0]/Prev 1379 0 R/Next 1381 0 R>>endobj
-1381 0 obj<</Parent 1364 0 R/Title(16. MythWeather.)/Dest[1200 0 R/XYZ 0 627 0]/Prev 1380 0 R/Next 1382 0 R>>endobj
-1382 0 obj<</Parent 1364 0 R/Title(17. MythVideo.)/Dest[1200 0 R/XYZ 0 593 0]/Prev 1381 0 R/Next 1383 0 R>>endobj
-1383 0 obj<</Parent 1364 0 R/Title(18. MythDVD.)/Dest[1200 0 R/XYZ 0 559 0]/Prev 1382 0 R/Next 1384 0 R>>endobj
-1384 0 obj<</Parent 1364 0 R/Title(19. MythNews.)/Dest[1200 0 R/XYZ 0 486 0]/Prev 1383 0 R/Next 1385 0 R>>endobj
-1385 0 obj<</Parent 1364 0 R/Title(20. Troubleshooting.)/Dest[1200 0 R/XYZ 0 453 0]/Prev 1384 0 R/Next 1386 0 R>>endobj
-1386 0 obj<</Parent 1364 0 R/Title(21. Miscellaneous.)/Dest[1202 0 R/XYZ 0 654 0]/Prev 1385 0 R/Next 1387 0 R>>endobj
-1387 0 obj<</Parent 1364 0 R/Title(22. Example Configurations.)/Dest[1202 0 R/XYZ 0 423 0]/Prev 1386 0 R/Next 1388 0 R>>endobj
-1388 0 obj<</Parent 1364 0 R/Title( 1. How to obtain this document.)/Dest[1202 0 R/XYZ 0 308 0]/Prev 1387 0 R/Next 1389 0 R>>endobj
-1389 0 obj<</Parent 1364 0 R/Title(2. Introduction.)/Dest[1204 0 R/XYZ 0 773 0]/Prev 1388 0 R/Next 1390 0 R>>endobj
-1390 0 obj<</Parent 1364 0 R/Title(3. Checking prerequisites.)/Dest[1204 0 R/XYZ 0 277 0]/Prev 1389 0 R/Next 1391 0 R>>endobj
-1391 0 obj<</Parent 1364 0 R/Count -15/First 1392 0 R/Last 1406 0 R/Title(3.1 Hardware.)/Dest[1204 0 R/XYZ 0 178 0]/Prev 1390 0 R/Next 1407 0 R>>endobj
-1392 0 obj<</Parent 1391 0 R/Title(CPU Type and Speed)/Dest[1206 0 R/XYZ 0 654 0]/Next 1393 0 R>>endobj
-1393 0 obj<</Parent 1391 0 R/Title(Memory)/Dest[1208 0 R/XYZ 0 720 0]/Prev 1392 0 R/Next 1394 0 R>>endobj
-1394 0 obj<</Parent 1391 0 R/Title(Hard Disk\(s\))/Dest[1208 0 R/XYZ 0 637 0]/Prev 1393 0 R/Next 1395 0 R>>endobj
-1395 0 obj<</Parent 1391 0 R/Title(Filesystems)/Dest[1208 0 R/XYZ 0 423 0]/Prev 1394 0 R/Next 1396 0 R>>endobj
-1396 0 obj<</Parent 1391 0 R/Title(Video Capture Device)/Dest[1208 0 R/XYZ 0 287 0]/Prev 1395 0 R/Next 1397 0 R>>endobj
-1397 0 obj<</Parent 1391 0 R/Title(Sound card)/Dest[1210 0 R/XYZ 0 222 0]/Prev 1396 0 R/Next 1398 0 R>>endobj
-1398 0 obj<</Parent 1391 0 R/Title(Video Display Card)/Dest[1212 0 R/XYZ 0 588 0]/Prev 1397 0 R/Next 1399 0 R>>endobj
-1399 0 obj<</Parent 1391 0 R/Title(Cards with TV out)/Dest[1212 0 R/XYZ 0 360 0]/Prev 1398 0 R/Next 1400 0 R>>endobj
-1400 0 obj<</Parent 1391 0 R/Title(ATI)/Dest[1212 0 R/XYZ 0 211 0]/Prev 1399 0 R/Next 1401 0 R>>endobj
-1401 0 obj<</Parent 1391 0 R/Title(Matrox)/Dest[1214 0 R/XYZ 0 615 0]/Prev 1400 0 R/Next 1402 0 R>>endobj
-1402 0 obj<</Parent 1391 0 R/Title(nVidia)/Dest[1214 0 R/XYZ 0 334 0]/Prev 1401 0 R/Next 1403 0 R>>endobj
-1403 0 obj<</Parent 1391 0 R/Title(Savage)/Dest[1216 0 R/XYZ 0 773 0]/Prev 1402 0 R/Next 1404 0 R>>endobj
-1404 0 obj<</Parent 1391 0 R/Title(Hauppauge PVR-350)/Dest[1216 0 R/XYZ 0 624 0]/Prev 1403 0 R/Next 1405 0 R>>endobj
-1405 0 obj<</Parent 1391 0 R/Title(Other Options)/Dest[1216 0 R/XYZ 0 568 0]/Prev 1404 0 R/Next 1406 0 R>>endobj
-1406 0 obj<</Parent 1391 0 R/Title(External Adapters)/Dest[1216 0 R/XYZ 0 485 0]/Prev 1405 0 R>>endobj
-1407 0 obj<</Parent 1364 0 R/Count -13/First 1408 0 R/Last 1420 0 R/Title(3.2 Software.)/Dest[1216 0 R/XYZ 0 270 0]/Prev 1391 0 R/Next 1421 0 R>>endobj
-1408 0 obj<</Parent 1407 0 R/Title( Pre-compiled packages.)/Dest[1218 0 R/XYZ 0 760 0]/Next 1409 0 R>>endobj
-1409 0 obj<</Parent 1407 0 R/Title( Red Hat Linux)/Dest[1218 0 R/XYZ 0 585 0]/Prev 1408 0 R/Next 1410 0 R>>endobj
-1410 0 obj<</Parent 1407 0 R/Title(Mandrake)/Dest[1220 0 R/XYZ 0 786 0]/Prev 1409 0 R/Next 1411 0 R>>endobj
-1411 0 obj<</Parent 1407 0 R/Title(Debian)/Dest[1220 0 R/XYZ 0 730 0]/Prev 1410 0 R/Next 1412 0 R>>endobj
-1412 0 obj<</Parent 1407 0 R/Title(Manual installation)/Dest[1220 0 R/XYZ 0 449 0]/Prev 1411 0 R/Next 1413 0 R>>endobj
-1413 0 obj<</Parent 1407 0 R/Title( Graphical installation tools.)/Dest[1222 0 R/XYZ 0 786 0]/Prev 1412 0 R/Next 1414 0 R>>endobj
-1414 0 obj<</Parent 1407 0 R/Title(Mandrake 9.0)/Dest[1222 0 R/XYZ 0 770 0]/Prev 1413 0 R/Next 1415 0 R>>endobj
-1415 0 obj<</Parent 1407 0 R/Title(Red Hat Linux 8.0)/Dest[1222 0 R/XYZ 0 239 0]/Prev 1414 0 R/Next 1416 0 R>>endobj
-1416 0 obj<</Parent 1407 0 R/Title( Command-line installation.)/Dest[1224 0 R/XYZ 0 516 0]/Prev 1415 0 R/Next 1417 0 R>>endobj
-1417 0 obj<</Parent 1407 0 R/Title(Mandrake)/Dest[1224 0 R/XYZ 0 460 0]/Prev 1416 0 R/Next 1418 0 R>>endobj
-1418 0 obj<</Parent 1407 0 R/Title(Special instructions for Mandrake 8.2)/Dest[1224 0 R/XYZ 0 351 0]/Prev 1417 0 R/Next 1419 0 R>>endobj
-1419 0 obj<</Parent 1407 0 R/Title(Mandrake 8.2 and 9.0)/Dest[1226 0 R/XYZ 0 528 0]/Prev 1418 0 R/Next 1420 0 R>>endobj
-1420 0 obj<</Parent 1407 0 R/Title(Gentoo.)/Dest[1226 0 R/XYZ 0 225 0]/Prev 1419 0 R>>endobj
-1421 0 obj<</Parent 1364 0 R/Title( 4. System Configuration Requirements for Compiling MythTV)/Dest[1228 0 R/XYZ 0 619 0]/Prev 1407 0 R/Next 1422 0 R>>endobj
-1422 0 obj<</Parent 1364 0 R/Count -2/First 1423 0 R/Last 1424 0 R/Title(4.1 Software requirements for compiling MythTV)/Dest[1228 0 R/XYZ 0 460 0]/Prev 1421 0 R/Next 1425 0 R>>endobj
-1423 0 obj<</Parent 1422 0 R/Title(General requirements)/Dest[1228 0 R/XYZ 0 426 0]/Next 1424 0 R>>endobj
-1424 0 obj<</Parent 1422 0 R/Title(Distribution-Specific Notes)/Dest[1228 0 R/XYZ 0 264 0]/Prev 1423 0 R>>endobj
-1425 0 obj<</Parent 1364 0 R/Count -3/First 1426 0 R/Last 1428 0 R/Title(4.2 Shared-Library Requirements for MythTV)/Dest[1228 0 R/XYZ 0 208 0]/Prev 1422 0 R/Next 1429 0 R>>endobj
-1426 0 obj<</Parent 1425 0 R/Title( Modifying /etc/ld.so.conf)/Dest[1230 0 R/XYZ 0 786 0]/Next 1427 0 R>>endobj
-1427 0 obj<</Parent 1425 0 R/Title(Distribution-Specific Notes)/Dest[1230 0 R/XYZ 0 610 0]/Prev 1426 0 R/Next 1428 0 R>>endobj
-1428 0 obj<</Parent 1425 0 R/Title(Red Hat)/Dest[1230 0 R/XYZ 0 580 0]/Prev 1427 0 R>>endobj
-1429 0 obj<</Parent 1364 0 R/Count -6/First 1430 0 R/Last 1435 0 R/Title(4.3 Environment variable Requirements for MythTV)/Dest[1230 0 R/XYZ 0 497 0]/Prev 1425 0 R/Next 1436 0 R>>endobj
-1430 0 obj<</Parent 1429 0 R/Title(General requirements)/Dest[1230 0 R/XYZ 0 463 0]/Next 1431 0 R>>endobj
-1431 0 obj<</Parent 1429 0 R/Title(QT libraries and binaries)/Dest[1230 0 R/XYZ 0 433 0]/Prev 1430 0 R/Next 1432 0 R>>endobj
-1432 0 obj<</Parent 1429 0 R/Title(Distribution-Specific Notes)/Dest[1232 0 R/XYZ 0 786 0]/Prev 1431 0 R/Next 1433 0 R>>endobj
-1433 0 obj<</Parent 1429 0 R/Title(Mandrake)/Dest[1232 0 R/XYZ 0 770 0]/Prev 1432 0 R/Next 1434 0 R>>endobj
-1434 0 obj<</Parent 1429 0 R/Title(Red Hat Linux 9/8.0)/Dest[1232 0 R/XYZ 0 473 0]/Prev 1433 0 R/Next 1435 0 R>>endobj
-1435 0 obj<</Parent 1429 0 R/Title(Debian)/Dest[1232 0 R/XYZ 0 377 0]/Prev 1434 0 R>>endobj
-1436 0 obj<</Parent 1364 0 R/Title(5. Downloading and compiling.)/Dest[1234 0 R/XYZ 0 377 0]/Prev 1429 0 R/Next 1437 0 R>>endobj
-1437 0 obj<</Parent 1364 0 R/Title( 5.1 Notes on compiling on a system with non-Intel processors.)/Dest[1236 0 R/XYZ 0 556 0]/Prev 1436 0 R/Next 1438 0 R>>endobj
-1438 0 obj<</Parent 1364 0 R/Title(5.2 Building LAME.)/Dest[1236 0 R/XYZ 0 308 0]/Prev 1437 0 R/Next 1439 0 R>>endobj
-1439 0 obj<</Parent 1364 0 R/Count -3/First 1440 0 R/Last 1442 0 R/Title(5.3 XMLTV.)/Dest[1238 0 R/XYZ 0 668 0]/Prev 1438 0 R/Next 1443 0 R>>endobj
-1440 0 obj<</Parent 1439 0 R/Title(Red Hat Linux 9:)/Dest[1238 0 R/XYZ 0 634 0]/Next 1441 0 R>>endobj
-1441 0 obj<</Parent 1439 0 R/Title(Mandrake)/Dest[1238 0 R/XYZ 0 501 0]/Prev 1440 0 R/Next 1442 0 R>>endobj
-1442 0 obj<</Parent 1439 0 R/Title(Other distributions and manual installation.)/Dest[1238 0 R/XYZ 0 317 0]/Prev 1441 0 R>>endobj
-1443 0 obj<</Parent 1364 0 R/Count -1/First 1444 0 R/Last 1444 0 R/Title(5.4 Manually building MythTV.)/Dest[1240 0 R/XYZ 0 213 0]/Prev 1439 0 R/Next 1445 0 R>>endobj
-1444 0 obj<</Parent 1443 0 R/Title( Frontend-only configuration)/Dest[1242 0 R/XYZ 0 547 0]>>endobj
-1445 0 obj<</Parent 1364 0 R/Title( 5.5 Gentoo.)/Dest[1242 0 R/XYZ 0 227 0]/Prev 1443 0 R/Next 1446 0 R>>endobj
-1446 0 obj<</Parent 1364 0 R/Title( 6. MySQL.)/Dest[1244 0 R/XYZ 0 725 0]/Prev 1445 0 R/Next 1447 0 R>>endobj
-1447 0 obj<</Parent 1364 0 R/Title(6.1 Mandrake 9.0)/Dest[1244 0 R/XYZ 0 691 0]/Prev 1446 0 R/Next 1448 0 R>>endobj
-1448 0 obj<</Parent 1364 0 R/Title(6.2 Red Hat Linux)/Dest[1244 0 R/XYZ 0 522 0]/Prev 1447 0 R/Next 1449 0 R>>endobj
-1449 0 obj<</Parent 1364 0 R/Title(6.3 Gentoo)/Dest[1244 0 R/XYZ 0 375 0]/Prev 1448 0 R/Next 1450 0 R>>endobj
-1450 0 obj<</Parent 1364 0 R/Count -4/First 1451 0 R/Last 1454 0 R/Title(6.4 Setting up the initial database.)/Dest[1244 0 R/XYZ 0 315 0]/Prev 1449 0 R/Next 1455 0 R>>endobj
-1451 0 obj<</Parent 1450 0 R/Title(Mandrake 9.0 and Red Hat Linux)/Dest[1244 0 R/XYZ 0 178 0]/Next 1452 0 R>>endobj
-1452 0 obj<</Parent 1450 0 R/Title(Debian 3.0)/Dest[1246 0 R/XYZ 0 786 0]/Prev 1451 0 R/Next 1453 0 R>>endobj
-1453 0 obj<</Parent 1450 0 R/Title(Gentoo)/Dest[1246 0 R/XYZ 0 746 0]/Prev 1452 0 R/Next 1454 0 R>>endobj
-1454 0 obj<</Parent 1450 0 R/Title( Modifying access to the MySQL database for multiple systems)/Dest[1246 0 R/XYZ 0 641 0]/Prev 1453 0 R>>endobj
-1455 0 obj<</Parent 1364 0 R/Title(7. Setting up ALSA and the mixer.)/Dest[1246 0 R/XYZ 0 309 0]/Prev 1450 0 R/Next 1456 0 R>>endobj
-1456 0 obj<</Parent 1364 0 R/Count -3/First 1457 0 R/Last 1459 0 R/Title(7.1 Graphically setting up the mixer.)/Dest[1248 0 R/XYZ 0 747 0]/Prev 1455 0 R/Next 1460 0 R>>endobj
-1457 0 obj<</Parent 1456 0 R/Title(Mandrake 9.0 and Red Hat Linux)/Dest[1248 0 R/XYZ 0 713 0]/Next 1458 0 R>>endobj
-1458 0 obj<</Parent 1456 0 R/Title(Using OSS drivers.)/Dest[1248 0 R/XYZ 0 487 0]/Prev 1457 0 R/Next 1459 0 R>>endobj
-1459 0 obj<</Parent 1456 0 R/Title(Using ALSA drivers.)/Dest[1248 0 R/XYZ 0 225 0]/Prev 1458 0 R>>endobj
-1460 0 obj<</Parent 1364 0 R/Title(7.2 Setting the mixer from the command line.)/Dest[1252 0 R/XYZ 0 297 0]/Prev 1456 0 R/Next 1461 0 R>>endobj
-1461 0 obj<</Parent 1364 0 R/Title(8. Setting up a remote control.)/Dest[1254 0 R/XYZ 0 532 0]/Prev 1460 0 R/Next 1462 0 R>>endobj
-1462 0 obj<</Parent 1364 0 R/Title(8.1 Gentoo)/Dest[1254 0 R/XYZ 0 274 0]/Prev 1461 0 R/Next 1463 0 R>>endobj
-1463 0 obj<</Parent 1364 0 R/Count -1/First 1464 0 R/Last 1464 0 R/Title(8.2 Mandrake 9.0)/Dest[1254 0 R/XYZ 0 190 0]/Prev 1462 0 R/Next 1465 0 R>>endobj
-1464 0 obj<</Parent 1463 0 R/Title(Obtaining the kernel.)/Dest[1256 0 R/XYZ 0 760 0]>>endobj
-1465 0 obj<</Parent 1364 0 R/Title(8.3 Red Hat Linux)/Dest[1256 0 R/XYZ 0 669 0]/Prev 1463 0 R/Next 1466 0 R>>endobj
-1466 0 obj<</Parent 1364 0 R/Count -1/First 1467 0 R/Last 1467 0 R/Title(8.4 Obtaining and compiling lirc.)/Dest[1256 0 R/XYZ 0 539 0]/Prev 1465 0 R/Next 1468 0 R>>endobj
-1467 0 obj<</Parent 1466 0 R/Title(Recompiling your kernel on Red Hat Linux)/Dest[1258 0 R/XYZ 0 219 0]>>endobj
-1468 0 obj<</Parent 1364 0 R/Title( 8.5 Completing the lirc install.)/Dest[1260 0 R/XYZ 0 316 0]/Prev 1466 0 R/Next 1469 0 R>>endobj
-1469 0 obj<</Parent 1364 0 R/Title(8.6 Additional information for lirc.)/Dest[1264 0 R/XYZ 0 503 0]/Prev 1468 0 R/Next 1470 0 R>>endobj
-1470 0 obj<</Parent 1364 0 R/Title(8.7 Configuring lirc for use with an IR blaster.)/Dest[1266 0 R/XYZ 0 507 0]/Prev 1469 0 R/Next 1471 0 R>>endobj
-1471 0 obj<</Parent 1364 0 R/Title( 9. Configuring MythTV.)/Dest[1270 0 R/XYZ 0 656 0]/Prev 1470 0 R/Next 1472 0 R>>endobj
-1472 0 obj<</Parent 1364 0 R/Count -4/First 1473 0 R/Last 1476 0 R/Title(9.1 Configuring the master backend system.)/Dest[1270 0 R/XYZ 0 582 0]/Prev 1471 0 R/Next 1477 0 R>>endobj
-1473 0 obj<</Parent 1472 0 R/Title(General)/Dest[1272 0 R/XYZ 0 400 0]/Next 1474 0 R>>endobj
-1474 0 obj<</Parent 1472 0 R/Title(Capture Cards)/Dest[1274 0 R/XYZ 0 760 0]/Prev 1473 0 R/Next 1475 0 R>>endobj
-1475 0 obj<</Parent 1472 0 R/Title(Video Sources)/Dest[1274 0 R/XYZ 0 624 0]/Prev 1474 0 R/Next 1476 0 R>>endobj
-1476 0 obj<</Parent 1472 0 R/Title(Input Connections)/Dest[1274 0 R/XYZ 0 330 0]/Prev 1475 0 R>>endobj
-1477 0 obj<</Parent 1364 0 R/Title(9.2 Post-configuration.)/Dest[1276 0 R/XYZ 0 667 0]/Prev 1472 0 R/Next 1478 0 R>>endobj
-1478 0 obj<</Parent 1364 0 R/Title( 9.3 Configuring a non-master backend.)/Dest[1276 0 R/XYZ 0 280 0]/Prev 1477 0 R/Next 1479 0 R>>endobj
-1479 0 obj<</Parent 1364 0 R/Count -1/First 1480 0 R/Last 1480 0 R/Title(9.4 Configuring and running mythfilldatabase.)/Dest[1278 0 R/XYZ 0 720 0]/Prev 1478 0 R/Next 1481 0 R>>endobj
-1480 0 obj<</Parent 1479 0 R/Title(Setting mythfilldatabase to run from cron)/Dest[1278 0 R/XYZ 0 515 0]>>endobj
-1481 0 obj<</Parent 1364 0 R/Title(10. Configuring mythfrontend.)/Dest[1280 0 R/XYZ 0 312 0]/Prev 1479 0 R/Next 1482 0 R>>endobj
-1482 0 obj<</Parent 1364 0 R/Title(10.1 General)/Dest[1280 0 R/XYZ 0 186 0]/Prev 1481 0 R/Next 1483 0 R>>endobj
-1483 0 obj<</Parent 1364 0 R/Title(10.2 Appearance)/Dest[1282 0 R/XYZ 0 641 0]/Prev 1482 0 R/Next 1484 0 R>>endobj
-1484 0 obj<</Parent 1364 0 R/Title(10.3 Program Guide)/Dest[1282 0 R/XYZ 0 568 0]/Prev 1483 0 R/Next 1485 0 R>>endobj
-1485 0 obj<</Parent 1364 0 R/Title( 10.4 Playback)/Dest[1282 0 R/XYZ 0 481 0]/Prev 1484 0 R/Next 1486 0 R>>endobj
-1486 0 obj<</Parent 1364 0 R/Title(10.5 Recording)/Dest[1282 0 R/XYZ 0 193 0]/Prev 1485 0 R/Next 1487 0 R>>endobj
-1487 0 obj<</Parent 1364 0 R/Title(10.6 Xbox Frontends)/Dest[1286 0 R/XYZ 0 733 0]/Prev 1486 0 R/Next 1488 0 R>>endobj
-1488 0 obj<</Parent 1364 0 R/Title(11. Using MythTV.)/Dest[1286 0 R/XYZ 0 335 0]/Prev 1487 0 R/Next 1489 0 R>>endobj
-1489 0 obj<</Parent 1364 0 R/Title(11.1 Using themes with MythTV.)/Dest[1286 0 R/XYZ 0 196 0]/Prev 1488 0 R/Next 1490 0 R>>endobj
-1490 0 obj<</Parent 1364 0 R/Title(11.2 Adding DirecTV information to the database.)/Dest[1288 0 R/XYZ 0 627 0]/Prev 1489 0 R/Next 1491 0 R>>endobj
-1491 0 obj<</Parent 1364 0 R/Title(11.3 Adding support for an external tuner.)/Dest[1288 0 R/XYZ 0 540 0]/Prev 1490 0 R/Next 1492 0 R>>endobj
-1492 0 obj<</Parent 1364 0 R/Title(12. MythWeb.)/Dest[1288 0 R/XYZ 0 322 0]/Prev 1491 0 R/Next 1493 0 R>>endobj
-1493 0 obj<</Parent 1364 0 R/Count -1/First 1494 0 R/Last 1494 0 R/Title(12.1 Installation and prerequisites.)/Dest[1288 0 R/XYZ 0 249 0]/Prev 1492 0 R/Next 1495 0 R>>endobj
-1494 0 obj<</Parent 1493 0 R/Title(Mandrake 9.0)/Dest[1290 0 R/XYZ 0 786 0]>>endobj
-1495 0 obj<</Parent 1364 0 R/Title(12.2 Completing the installation.)/Dest[1290 0 R/XYZ 0 631 0]/Prev 1493 0 R/Next 1496 0 R>>endobj
-1496 0 obj<</Parent 1364 0 R/Title(13. MythGallery.)/Dest[1290 0 R/XYZ 0 244 0]/Prev 1495 0 R/Next 1497 0 R>>endobj
-1497 0 obj<</Parent 1364 0 R/Title(13.1 Installation and prerequisites.)/Dest[1292 0 R/XYZ 0 786 0]/Prev 1496 0 R/Next 1498 0 R>>endobj
-1498 0 obj<</Parent 1364 0 R/Title(13.2 Importing Pictures)/Dest[1292 0 R/XYZ 0 442 0]/Prev 1497 0 R/Next 1499 0 R>>endobj
-1499 0 obj<</Parent 1364 0 R/Title(14. MythGame.)/Dest[1294 0 R/XYZ 0 592 0]/Prev 1498 0 R/Next 1500 0 R>>endobj
-1500 0 obj<</Parent 1364 0 R/Title(15. MythMusic.)/Dest[1294 0 R/XYZ 0 558 0]/Prev 1499 0 R/Next 1501 0 R>>endobj
-1501 0 obj<</Parent 1364 0 R/Title(15.1 Manual installation of prerequisites.)/Dest[1294 0 R/XYZ 0 340 0]/Prev 1500 0 R/Next 1502 0 R>>endobj
-1502 0 obj<</Parent 1364 0 R/Count -1/First 1503 0 R/Last 1503 0 R/Title(15.2 Mandrake 9.0)/Dest[1296 0 R/XYZ 0 290 0]/Prev 1501 0 R/Next 1504 0 R>>endobj
-1503 0 obj<</Parent 1502 0 R/Title(Additional options with MythMusic)/Dest[1298 0 R/XYZ 0 728 0]>>endobj
-1504 0 obj<</Parent 1364 0 R/Title(15.3 Red Hat Linux 9/8.0)/Dest[1298 0 R/XYZ 0 441 0]/Prev 1502 0 R/Next 1505 0 R>>endobj
-1505 0 obj<</Parent 1364 0 R/Title(15.4 Compiling MythMusic.)/Dest[1298 0 R/XYZ 0 198 0]/Prev 1504 0 R/Next 1506 0 R>>endobj
-1506 0 obj<</Parent 1364 0 R/Title(15.5 Configuring MythMusic.)/Dest[1300 0 R/XYZ 0 572 0]/Prev 1505 0 R/Next 1507 0 R>>endobj
-1507 0 obj<</Parent 1364 0 R/Title(15.6 Using MythMusic.)/Dest[1300 0 R/XYZ 0 196 0]/Prev 1506 0 R/Next 1508 0 R>>endobj
-1508 0 obj<</Parent 1364 0 R/Count -1/First 1509 0 R/Last 1509 0 R/Title(15.7 Troubleshooting MythMusic.)/Dest[1302 0 R/XYZ 0 311 0]/Prev 1507 0 R/Next 1510 0 R>>endobj
-1509 0 obj<</Parent 1508 0 R/Title(When I run MythMusic and try and look up a CD, I get an error message)/Dest[1302 0 R/XYZ 0 251 0]>>endobj
-1510 0 obj<</Parent 1364 0 R/Title(16. MythWeather.)/Dest[1304 0 R/XYZ 0 646 0]/Prev 1508 0 R/Next 1511 0 R>>endobj
-1511 0 obj<</Parent 1364 0 R/Title(17. MythVideo.)/Dest[1306 0 R/XYZ 0 667 0]/Prev 1510 0 R/Next 1512 0 R>>endobj
-1512 0 obj<</Parent 1364 0 R/Title(18. MythDVD.)/Dest[1306 0 R/XYZ 0 402 0]/Prev 1511 0 R/Next 1513 0 R>>endobj
-1513 0 obj<</Parent 1364 0 R/Title(18.1 Manual Compilation of Prerequisites.)/Dest[1306 0 R/XYZ 0 276 0]/Prev 1512 0 R/Next 1514 0 R>>endobj
-1514 0 obj<</Parent 1364 0 R/Title(18.2 Pre-compiled binaries.)/Dest[1306 0 R/XYZ 0 243 0]/Prev 1513 0 R/Next 1515 0 R>>endobj
-1515 0 obj<</Parent 1364 0 R/Title(19. MythNews.)/Dest[1308 0 R/XYZ 0 581 0]/Prev 1514 0 R/Next 1516 0 R>>endobj
-1516 0 obj<</Parent 1364 0 R/Title(20. Troubleshooting.)/Dest[1308 0 R/XYZ 0 547 0]/Prev 1515 0 R/Next 1517 0 R>>endobj
-1517 0 obj<</Parent 1364 0 R/Title(20.1 Illegal Instruction.)/Dest[1308 0 R/XYZ 0 514 0]/Prev 1516 0 R/Next 1518 0 R>>endobj
-1518 0 obj<</Parent 1364 0 R/Title(20.2 mythfilldatabase failing.)/Dest[1308 0 R/XYZ 0 361 0]/Prev 1517 0 R/Next 1519 0 R>>endobj
-1519 0 obj<</Parent 1364 0 R/Title(20.3 MythTV seems to disappear; can't see video.)/Dest[1308 0 R/XYZ 0 235 0]/Prev 1518 0 R/Next 1520 0 R>>endobj
-1520 0 obj<</Parent 1364 0 R/Title( 20.4 Fast CPU, choppy or jittery video.)/Dest[1310 0 R/XYZ 0 786 0]/Prev 1519 0 R/Next 1521 0 R>>endobj
-1521 0 obj<</Parent 1364 0 R/Title(20.5 I have a MPEG-2 encoder card and my video appears "jittery".)/Dest[1310 0 R/XYZ 0 397 0]/Prev 1520 0 R/Next 1522 0 R>>endobj
-1522 0 obj<</Parent 1364 0 R/Title(20.6 I have a MPEG-2 encoder card and my video is jumping up and down.)/Dest[1310 0 R/XYZ 0 343 0]/Prev 1521 0 R/Next 1523 0 R>>endobj
-1523 0 obj<</Parent 1364 0 R/Title(20.7 I keep losing all of my settings every time I compile!)/Dest[1310 0 R/XYZ 0 210 0]/Prev 1522 0 R/Next 1524 0 R>>endobj
-1524 0 obj<</Parent 1364 0 R/Title(20.8 Compile errors.)/Dest[1312 0 R/XYZ 0 786 0]/Prev 1523 0 R/Next 1525 0 R>>endobj
-1525 0 obj<</Parent 1364 0 R/Title(20.9 My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.)/Dest[1312 0 R/XYZ 0 591 0]/Prev 1524 0 R/Next 1526 0 R>>endobj
-1526 0 obj<</Parent 1364 0 R/Title(20.10 I get segfaults / MythTV isn't doing anything.)/Dest[1314 0 R/XYZ 0 405 0]/Prev 1525 0 R/Next 1527 0 R>>endobj
-1527 0 obj<</Parent 1364 0 R/Title(20.11 Debugging with GDB.)/Dest[1314 0 R/XYZ 0 371 0]/Prev 1526 0 R/Next 1528 0 R>>endobj
-1528 0 obj<</Parent 1364 0 R/Title(20.12 MythTV makes my system crash.)/Dest[1316 0 R/XYZ 0 312 0]/Prev 1527 0 R/Next 1529 0 R>>endobj
-1529 0 obj<</Parent 1364 0 R/Title( 20.13 Troubleshooting audio.)/Dest[1316 0 R/XYZ 0 213 0]/Prev 1528 0 R/Next 1530 0 R>>endobj
-1530 0 obj<</Parent 1364 0 R/Title(20.14 I can't see parts of the On Screen Display.)/Dest[1318 0 R/XYZ 0 195 0]/Prev 1529 0 R/Next 1531 0 R>>endobj
-1531 0 obj<</Parent 1364 0 R/Title(20.15 The mythbackend program told me to look at this section.)/Dest[1320 0 R/XYZ 0 786 0]/Prev 1530 0 R/Next 1532 0 R>>endobj
-1532 0 obj<</Parent 1364 0 R/Title(20.16 My remote doesn't work / works sometimes and not others / "ghost" keypresses.)/Dest[1320 0 R/XYZ 0 574 0]/Prev 1531 0 R/Next 1533 0 R>>endobj
-1533 0 obj<</Parent 1364 0 R/Title(20.17 My PVR-250 card doesn't show inputs in the setup screen.)/Dest[1320 0 R/XYZ 0 322 0]/Prev 1532 0 R/Next 1534 0 R>>endobj
-1534 0 obj<</Parent 1364 0 R/Title(20.18 Where's my "canada-cable" entry gone to?)/Dest[1320 0 R/XYZ 0 241 0]/Prev 1533 0 R/Next 1535 0 R>>endobj
-1535 0 obj<</Parent 1364 0 R/Title(20.19 My channels are off by one.)/Dest[1320 0 R/XYZ 0 208 0]/Prev 1534 0 R/Next 1536 0 R>>endobj
-1536 0 obj<</Parent 1364 0 R/Title(20.20 Mythweb is showing a db_open error when I connect to it.)/Dest[1322 0 R/XYZ 0 747 0]/Prev 1535 0 R/Next 1537 0 R>>endobj
-1537 0 obj<</Parent 1364 0 R/Title(20.21 error: can't find a register in class 'BREG' while reloading 'asm')/Dest[1322 0 R/XYZ 0 613 0]/Prev 1536 0 R/Next 1538 0 R>>endobj
-1538 0 obj<</Parent 1364 0 R/Title( 20.22 make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'. Stop.)/Dest[1322 0 R/XYZ 0 520 0]/Prev 1537 0 R/Next 1539 0 R>>endobj
-1539 0 obj<</Parent 1364 0 R/Title(20.23 make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'. Stop.)/Dest[1322 0 R/XYZ 0 228 0]/Prev 1538 0 R/Next 1540 0 R>>endobj
-1540 0 obj<</Parent 1364 0 R/Title(20.24 My mouse pointer disappears when placed over the MythTV windows.)/Dest[1324 0 R/XYZ 0 786 0]/Prev 1539 0 R/Next 1541 0 R>>endobj
-1541 0 obj<</Parent 1364 0 R/Title(20.25 What does "strange error flushing buffer" mean on my console?)/Dest[1324 0 R/XYZ 0 719 0]/Prev 1540 0 R/Next 1542 0 R>>endobj
-1542 0 obj<</Parent 1364 0 R/Title(20.26 I can't change the channel when watching Live TV.)/Dest[1324 0 R/XYZ 0 625 0]/Prev 1541 0 R/Next 1543 0 R>>endobj
-1543 0 obj<</Parent 1364 0 R/Title(20.27 When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:")/Dest[1324 0 R/XYZ 0 565 0]/Prev 1542 0 R/Next 1544 0 R>>endobj
-1544 0 obj<</Parent 1364 0 R/Title(20.28 Troubleshooting the Hauppauge PVR-250 IR remote)/Dest[1324 0 R/XYZ 0 485 0]/Prev 1543 0 R/Next 1545 0 R>>endobj
-1545 0 obj<</Parent 1364 0 R/Title(20.29 MySQL not connecting correctly.)/Dest[1324 0 R/XYZ 0 399 0]/Prev 1544 0 R/Next 1546 0 R>>endobj
-1546 0 obj<</Parent 1364 0 R/Title(20.30 My screen goes black when I try to play something.)/Dest[1324 0 R/XYZ 0 325 0]/Prev 1545 0 R/Next 1547 0 R>>endobj
-1547 0 obj<</Parent 1364 0 R/Title(21. Miscellaneous.)/Dest[1324 0 R/XYZ 0 239 0]/Prev 1546 0 R/Next 1548 0 R>>endobj
-1548 0 obj<</Parent 1364 0 R/Count -1/First 1549 0 R/Last 1549 0 R/Title(21.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.)/Dest[1324 0 R/XYZ 0 205 0]/Prev 1547 0 R/Next 1550 0 R>>endobj
-1549 0 obj<</Parent 1548 0 R/Title(mythtranscode example)/Dest[1326 0 R/XYZ 0 601 0]>>endobj
-1550 0 obj<</Parent 1364 0 R/Title(21.2 I'd like to use some other window manager.)/Dest[1328 0 R/XYZ 0 776 0]/Prev 1548 0 R/Next 1551 0 R>>endobj
-1551 0 obj<</Parent 1364 0 R/Title( 21.3 What capture resolution should I use? How does video work?)/Dest[1328 0 R/XYZ 0 702 0]/Prev 1550 0 R/Next 1552 0 R>>endobj
-1552 0 obj<</Parent 1364 0 R/Count -3/First 1553 0 R/Last 1555 0 R/Title(21.4 MythTV GUI and X Display Sizes.)/Dest[1330 0 R/XYZ 0 786 0]/Prev 1551 0 R/Next 1556 0 R>>endobj
-1553 0 obj<</Parent 1552 0 R/Title(X Dimensions)/Dest[1330 0 R/XYZ 0 726 0]/Next 1554 0 R>>endobj
-1554 0 obj<</Parent 1552 0 R/Title(MythTV Dimensions)/Dest[1330 0 R/XYZ 0 551 0]/Prev 1553 0 R/Next 1555 0 R>>endobj
-1555 0 obj<</Parent 1552 0 R/Title(Overscan Dimensions)/Dest[1330 0 R/XYZ 0 257 0]/Prev 1554 0 R>>endobj
-1556 0 obj<</Parent 1364 0 R/Title(21.5 I'd like to save or restore my database.)/Dest[1332 0 R/XYZ 0 720 0]/Prev 1552 0 R/Next 1557 0 R>>endobj
-1557 0 obj<</Parent 1364 0 R/Title(21.6 I'd like to delete the mysql database.)/Dest[1332 0 R/XYZ 0 514 0]/Prev 1556 0 R/Next 1558 0 R>>endobj
-1558 0 obj<</Parent 1364 0 R/Title( 21.7 btaudio)/Dest[1332 0 R/XYZ 0 395 0]/Prev 1557 0 R/Next 1559 0 R>>endobj
-1559 0 obj<</Parent 1364 0 R/Title(21.8 Removing unwanted channels.)/Dest[1334 0 R/XYZ 0 628 0]/Prev 1558 0 R/Next 1560 0 R>>endobj
-1560 0 obj<</Parent 1364 0 R/Title(21.9 I'd like to use NFS.)/Dest[1334 0 R/XYZ 0 327 0]/Prev 1559 0 R/Next 1561 0 R>>endobj
-1561 0 obj<</Parent 1364 0 R/Title(21.10 Automatically starting mythfrontend at system boot time.)/Dest[1336 0 R/XYZ 0 707 0]/Prev 1560 0 R/Next 1562 0 R>>endobj
-1562 0 obj<</Parent 1364 0 R/Count -4/First 1563 0 R/Last 1566 0 R/Title(21.11 Automatically starting mythbackend at system boot time.)/Dest[1336 0 R/XYZ 0 333 0]/Prev 1561 0 R/Next 1567 0 R>>endobj
-1563 0 obj<</Parent 1562 0 R/Title(Red Hat And Mandrake)/Dest[1336 0 R/XYZ 0 279 0]/Next 1564 0 R>>endobj
-1564 0 obj<</Parent 1562 0 R/Title(Log files)/Dest[1338 0 R/XYZ 0 560 0]/Prev 1563 0 R/Next 1565 0 R>>endobj
-1565 0 obj<</Parent 1562 0 R/Title(Mandrake 9.x)/Dest[1338 0 R/XYZ 0 311 0]/Prev 1564 0 R/Next 1566 0 R>>endobj
-1566 0 obj<</Parent 1562 0 R/Title(Gentoo)/Dest[1340 0 R/XYZ 0 594 0]/Prev 1565 0 R>>endobj
-1567 0 obj<</Parent 1364 0 R/Title( 21.12 Advanced Backend Configurations.)/Dest[1340 0 R/XYZ 0 387 0]/Prev 1562 0 R/Next 1568 0 R>>endobj
-1568 0 obj<</Parent 1364 0 R/Title(21.13 What is this transcoder thing, and how do I use it?)/Dest[1342 0 R/XYZ 0 615 0]/Prev 1567 0 R/Next 1569 0 R>>endobj
-1569 0 obj<</Parent 1364 0 R/Title(22. Example Configurations.)/Dest[1344 0 R/XYZ 0 760 0]/Prev 1568 0 R/Next 1570 0 R>>endobj
-1570 0 obj<</Parent 1364 0 R/Title( 22.1 Hauppauge PVR-250/350 hardware MPEG-2 encoder.)/Dest[1344 0 R/XYZ 0 700 0]/Prev 1569 0 R/Next 1571 0 R>>endobj
-1571 0 obj<</Parent 1364 0 R/Title( 22.2 Hauppauge PVR-250 remote and MythTV's native LIRC support.)/Dest[1350 0 R/XYZ 0 786 0]/Prev 1570 0 R/Next 1572 0 R>>endobj
-1572 0 obj<</Parent 1364 0 R/Count -2/First 1573 0 R/Last 1574 0 R/Title( 22.3 Logical Volume Manager \(LVM\).)/Dest[1356 0 R/XYZ 0 547 0]/Prev 1571 0 R/Next 1575 0 R>>endobj
-1573 0 obj<</Parent 1572 0 R/Title(ReiserFS)/Dest[1358 0 R/XYZ 0 198 0]/Next 1574 0 R>>endobj
-1574 0 obj<</Parent 1572 0 R/Title(ext2 or ext3)/Dest[1360 0 R/XYZ 0 714 0]/Prev 1573 0 R>>endobj
-1575 0 obj<</Parent 1364 0 R/Count -1/First 1576 0 R/Last 1576 0 R/Title( 22.4 Advanced Partition Formatting.)/Dest[1360 0 R/XYZ 0 586 0]/Prev 1572 0 R>>endobj
-1576 0 obj<</Parent 1575 0 R/Title(Ext3)/Dest[1360 0 R/XYZ 0 513 0]>>endobj
-1577 0 obj<</Type/Catalog/Pages 1183 0 R/PageLayout/SinglePage/Outlines 1362 0 R/OpenAction[1196 0 R/XYZ null null 0]/PageMode/UseOutlines/PageLabels<</Nums[0<</P(title)>>1<</S/r>>6<</S/D/St 1/P()>>]>>>>endobj
+1362 0 obj<</Type/Page/Parent 1183 0 R/Contents 1363 0 R/MediaBox[0 0 595 792]/Resources<</ProcSet[/PDF/Text]/Font<</F0 3 0 R/F4 5 0 R/F5 6 0 R/F6 7 0 R/F8 8 0 R/F9 9 0 R>>/XObject<<>>>>/Annots 840 0 R>>endobj
+1363 0 obj<</Filter/FlateDecode/Length 1112      >>stream
+xVÛnÛ8}÷W\,êb-Y’åÛ¾m&(°º[7E¾Ğ"e±‘H‡¤œº_¿3¤|S’¢HX"‡sæÌ™C?RHğ'…EÓ9Í ‰|súóßí`:S˜ÍÒx¤éêôTÃ§Áå3®®²xÑíõ«Ïd«4N.V³x³4‰—tpâCı…¾]&7+HsX—ˆp¾ÄÜK`]ŒÄ—6€ÿ§oÖßqoØÂŞ([àŞÑ?w Ğ°ğ(]vFok `u-xˆšuQ#Yio®Åôœ@”Íc0ú¬İ*7#¬ü)€)ı;p•€RÖÂ¬Më«çpğü”¯i­ë%ƒ€6$xk¤Úâ©ÒôBàáñLnXQ­Ø²(Ë²WĞ“=3“½äBwØ=§ˆıÕ±Fˆ"şÏYr.ö“»ÛR›W½ØüÌV¸Nç{†ô—¸iF¤eBü›ï™Â"à#3N:©ÜhÓ0ç°Ê®¬«¢Ş0–@­ï 0‚9leÍÌ¶c9¼;f‘)æà [\Zgä¦õY¬pÚ`…´
+;€ÒÈÖ;'l#§Å#[ÓØƒ¾ÊôÙR+HQR¡¨Ô÷Vşp/-ßx]×úÑ7L•’-¢-˜¢4­tØY+Ê¶î*=+;ÊV¡ï^–ò0­C}¹İ
+ë`ËÊÃWNÈ˜Å¢JÔza˜EÍ{un4VK•s­^;¨Ø^€ÓğÈ¤ƒ½0¨5×ÑÓ§áÄ/…`-Øáˆ*“ôƒ–ÏóTÚâ¾¯o¢Ş±{›Ù÷PL« õĞ´µ“ÑVnÙæ€„RÛş~©„"Àz(ıy·Gƒ«Ç~ 4DD-• [é¶æTÈF8'Q§|<%Ãü¤*dTü`Í®öEáô§&˜µ-Šç;‡æémgäç¨â›´_tÅ,°õË˜-sÊå	m¨İ>o1¼/©¯©¨Sâ~ ±¾é—bÑÑZ°ñµÄ†<wÖ3¦p¶ÙàŒ/8Qs_Ú˜¬¢uYòÅ¢­ü¢¼_d~æÉ8‡W‘C?ª(‘£hì¥Tšcß±‰94"ˆÆWR¦!|ıFı¸u5üö†dÂ°rò¾Ğ	÷²ÇÁëpŠì‘_¡Ó³†f	'Îáí:ÙèP6ø;ûc•,*R4ëkš‰Ó‡ÛhÎ*‘ı”Ì'ïëşkg_¬¶Íey j$0»ÚœŸıó¶E¨?ÓÑ›Z÷Ä[!”ch§¬$>ĞHª$Ñ¨+ÁÒYA-çYw­¢ë3¼>šøèxáşŞ?{gu‘¿«"€Lµ¨–€ãT˜‹K·g ò¶ÙıcŸZÑÓÒĞ:”Eœ‘]rá˜¬ƒ;Mn–¤ø½f•O!_vßŞ+ëğ+ÍùP˜àp¯ÑÑÑ1 Z$x«ó'ßmòE/æK\\æón=øwğ?k`ê6endstream
+endobj
+1364 0 obj<</Count 2/First 1365 0 R/Last 1366 0 R>>endobj
+1365 0 obj<</Parent 1364 0 R/Title(Table of Contents)/Dest[1186 0 R/XYZ 0 756 0]/Next 1366 0 R>>endobj
+1366 0 obj<</Parent 1364 0 R/Count -141/First 1367 0 R/Last 1577 0 R/Title(Installing and using MythTV)/Dest[1196 0 R/XYZ 0 786 0]/Prev 1365 0 R>>endobj
+1367 0 obj<</Parent 1366 0 R/Title(Robert Kulagowski, mailto:rkulagow@rocketmail.com)/Dest[1196 0 R/XYZ 0 762 0]/Next 1368 0 R>>endobj
+1368 0 obj<</Parent 1366 0 R/Title(1. How to obtain this document.)/Dest[1196 0 R/XYZ 0 632 0]/Prev 1367 0 R/Next 1369 0 R>>endobj
+1369 0 obj<</Parent 1366 0 R/Title(2. Introduction.)/Dest[1196 0 R/XYZ 0 599 0]/Prev 1368 0 R/Next 1370 0 R>>endobj
+1370 0 obj<</Parent 1366 0 R/Title(3. Checking prerequisites.)/Dest[1196 0 R/XYZ 0 565 0]/Prev 1369 0 R/Next 1371 0 R>>endobj
+1371 0 obj<</Parent 1366 0 R/Title(4. System Configuration Requirements for Compiling MythTV)/Dest[1196 0 R/XYZ 0 492 0]/Prev 1370 0 R/Next 1372 0 R>>endobj
+1372 0 obj<</Parent 1366 0 R/Title(5. Downloading and compiling.)/Dest[1196 0 R/XYZ 0 385 0]/Prev 1371 0 R/Next 1373 0 R>>endobj
+1373 0 obj<</Parent 1366 0 R/Title(6. MySQL.)/Dest[1196 0 R/XYZ 0 272 0]/Prev 1372 0 R/Next 1374 0 R>>endobj
+1374 0 obj<</Parent 1366 0 R/Title(7. Setting up ALSA and the mixer.)/Dest[1198 0 R/XYZ 0 786 0]/Prev 1373 0 R/Next 1375 0 R>>endobj
+1375 0 obj<</Parent 1366 0 R/Title(8. Setting up a remote control.)/Dest[1198 0 R/XYZ 0 726 0]/Prev 1374 0 R/Next 1376 0 R>>endobj
+1376 0 obj<</Parent 1366 0 R/Title(9. Configuring MythTV.)/Dest[1198 0 R/XYZ 0 587 0]/Prev 1375 0 R/Next 1377 0 R>>endobj
+1377 0 obj<</Parent 1366 0 R/Title(10. Configuring mythfrontend.)/Dest[1198 0 R/XYZ 0 487 0]/Prev 1376 0 R/Next 1378 0 R>>endobj
+1378 0 obj<</Parent 1366 0 R/Title(11. Using MythTV.)/Dest[1198 0 R/XYZ 0 361 0]/Prev 1377 0 R/Next 1379 0 R>>endobj
+1379 0 obj<</Parent 1366 0 R/Title(12. MythWeb.)/Dest[1198 0 R/XYZ 0 275 0]/Prev 1378 0 R/Next 1380 0 R>>endobj
+1380 0 obj<</Parent 1366 0 R/Title(13. MythGallery.)/Dest[1198 0 R/XYZ 0 202 0]/Prev 1379 0 R/Next 1381 0 R>>endobj
+1381 0 obj<</Parent 1366 0 R/Title(14. MythGame.)/Dest[1200 0 R/XYZ 0 786 0]/Prev 1380 0 R/Next 1382 0 R>>endobj
+1382 0 obj<</Parent 1366 0 R/Title(15. MythMusic.)/Dest[1200 0 R/XYZ 0 766 0]/Prev 1381 0 R/Next 1383 0 R>>endobj
+1383 0 obj<</Parent 1366 0 R/Title(16. MythWeather.)/Dest[1200 0 R/XYZ 0 627 0]/Prev 1382 0 R/Next 1384 0 R>>endobj
+1384 0 obj<</Parent 1366 0 R/Title(17. MythVideo.)/Dest[1200 0 R/XYZ 0 593 0]/Prev 1383 0 R/Next 1385 0 R>>endobj
+1385 0 obj<</Parent 1366 0 R/Title(18. MythDVD.)/Dest[1200 0 R/XYZ 0 559 0]/Prev 1384 0 R/Next 1386 0 R>>endobj
+1386 0 obj<</Parent 1366 0 R/Title(19. MythNews.)/Dest[1200 0 R/XYZ 0 486 0]/Prev 1385 0 R/Next 1387 0 R>>endobj
+1387 0 obj<</Parent 1366 0 R/Title(20. Troubleshooting.)/Dest[1200 0 R/XYZ 0 453 0]/Prev 1386 0 R/Next 1388 0 R>>endobj
+1388 0 obj<</Parent 1366 0 R/Title(21. Miscellaneous.)/Dest[1202 0 R/XYZ 0 654 0]/Prev 1387 0 R/Next 1389 0 R>>endobj
+1389 0 obj<</Parent 1366 0 R/Title(22. Example Configurations.)/Dest[1202 0 R/XYZ 0 423 0]/Prev 1388 0 R/Next 1390 0 R>>endobj
+1390 0 obj<</Parent 1366 0 R/Title( 1. How to obtain this document.)/Dest[1202 0 R/XYZ 0 308 0]/Prev 1389 0 R/Next 1391 0 R>>endobj
+1391 0 obj<</Parent 1366 0 R/Title(2. Introduction.)/Dest[1204 0 R/XYZ 0 773 0]/Prev 1390 0 R/Next 1392 0 R>>endobj
+1392 0 obj<</Parent 1366 0 R/Title(3. Checking prerequisites.)/Dest[1204 0 R/XYZ 0 277 0]/Prev 1391 0 R/Next 1393 0 R>>endobj
+1393 0 obj<</Parent 1366 0 R/Count -15/First 1394 0 R/Last 1408 0 R/Title(3.1 Hardware.)/Dest[1204 0 R/XYZ 0 178 0]/Prev 1392 0 R/Next 1409 0 R>>endobj
+1394 0 obj<</Parent 1393 0 R/Title(CPU Type and Speed)/Dest[1206 0 R/XYZ 0 654 0]/Next 1395 0 R>>endobj
+1395 0 obj<</Parent 1393 0 R/Title(Memory)/Dest[1208 0 R/XYZ 0 720 0]/Prev 1394 0 R/Next 1396 0 R>>endobj
+1396 0 obj<</Parent 1393 0 R/Title(Hard Disk\(s\))/Dest[1208 0 R/XYZ 0 637 0]/Prev 1395 0 R/Next 1397 0 R>>endobj
+1397 0 obj<</Parent 1393 0 R/Title(Filesystems)/Dest[1208 0 R/XYZ 0 423 0]/Prev 1396 0 R/Next 1398 0 R>>endobj
+1398 0 obj<</Parent 1393 0 R/Title(Video Capture Device)/Dest[1208 0 R/XYZ 0 287 0]/Prev 1397 0 R/Next 1399 0 R>>endobj
+1399 0 obj<</Parent 1393 0 R/Title(Sound card)/Dest[1210 0 R/XYZ 0 222 0]/Prev 1398 0 R/Next 1400 0 R>>endobj
+1400 0 obj<</Parent 1393 0 R/Title(Video Display Card)/Dest[1212 0 R/XYZ 0 588 0]/Prev 1399 0 R/Next 1401 0 R>>endobj
+1401 0 obj<</Parent 1393 0 R/Title(Cards with TV out)/Dest[1212 0 R/XYZ 0 360 0]/Prev 1400 0 R/Next 1402 0 R>>endobj
+1402 0 obj<</Parent 1393 0 R/Title(ATI)/Dest[1212 0 R/XYZ 0 211 0]/Prev 1401 0 R/Next 1403 0 R>>endobj
+1403 0 obj<</Parent 1393 0 R/Title(Matrox)/Dest[1214 0 R/XYZ 0 615 0]/Prev 1402 0 R/Next 1404 0 R>>endobj
+1404 0 obj<</Parent 1393 0 R/Title(nVidia)/Dest[1214 0 R/XYZ 0 334 0]/Prev 1403 0 R/Next 1405 0 R>>endobj
+1405 0 obj<</Parent 1393 0 R/Title(Savage)/Dest[1216 0 R/XYZ 0 773 0]/Prev 1404 0 R/Next 1406 0 R>>endobj
+1406 0 obj<</Parent 1393 0 R/Title(Hauppauge PVR-350)/Dest[1216 0 R/XYZ 0 624 0]/Prev 1405 0 R/Next 1407 0 R>>endobj
+1407 0 obj<</Parent 1393 0 R/Title(Other Options)/Dest[1216 0 R/XYZ 0 568 0]/Prev 1406 0 R/Next 1408 0 R>>endobj
+1408 0 obj<</Parent 1393 0 R/Title(External Adapters)/Dest[1216 0 R/XYZ 0 485 0]/Prev 1407 0 R>>endobj
+1409 0 obj<</Parent 1366 0 R/Count -13/First 1410 0 R/Last 1422 0 R/Title(3.2 Software.)/Dest[1216 0 R/XYZ 0 270 0]/Prev 1393 0 R/Next 1423 0 R>>endobj
+1410 0 obj<</Parent 1409 0 R/Title( Pre-compiled packages.)/Dest[1218 0 R/XYZ 0 760 0]/Next 1411 0 R>>endobj
+1411 0 obj<</Parent 1409 0 R/Title( Red Hat Linux)/Dest[1218 0 R/XYZ 0 585 0]/Prev 1410 0 R/Next 1412 0 R>>endobj
+1412 0 obj<</Parent 1409 0 R/Title(Mandrake)/Dest[1220 0 R/XYZ 0 786 0]/Prev 1411 0 R/Next 1413 0 R>>endobj
+1413 0 obj<</Parent 1409 0 R/Title(Debian)/Dest[1220 0 R/XYZ 0 730 0]/Prev 1412 0 R/Next 1414 0 R>>endobj
+1414 0 obj<</Parent 1409 0 R/Title(Manual installation)/Dest[1220 0 R/XYZ 0 449 0]/Prev 1413 0 R/Next 1415 0 R>>endobj
+1415 0 obj<</Parent 1409 0 R/Title( Graphical installation tools.)/Dest[1222 0 R/XYZ 0 786 0]/Prev 1414 0 R/Next 1416 0 R>>endobj
+1416 0 obj<</Parent 1409 0 R/Title(Mandrake 9.0)/Dest[1222 0 R/XYZ 0 770 0]/Prev 1415 0 R/Next 1417 0 R>>endobj
+1417 0 obj<</Parent 1409 0 R/Title(Red Hat Linux 8.0)/Dest[1222 0 R/XYZ 0 239 0]/Prev 1416 0 R/Next 1418 0 R>>endobj
+1418 0 obj<</Parent 1409 0 R/Title( Command-line installation.)/Dest[1224 0 R/XYZ 0 516 0]/Prev 1417 0 R/Next 1419 0 R>>endobj
+1419 0 obj<</Parent 1409 0 R/Title(Mandrake)/Dest[1224 0 R/XYZ 0 460 0]/Prev 1418 0 R/Next 1420 0 R>>endobj
+1420 0 obj<</Parent 1409 0 R/Title(Special instructions for Mandrake 8.2)/Dest[1224 0 R/XYZ 0 351 0]/Prev 1419 0 R/Next 1421 0 R>>endobj
+1421 0 obj<</Parent 1409 0 R/Title(Mandrake 8.2 and 9.0)/Dest[1226 0 R/XYZ 0 528 0]/Prev 1420 0 R/Next 1422 0 R>>endobj
+1422 0 obj<</Parent 1409 0 R/Title(Gentoo.)/Dest[1226 0 R/XYZ 0 225 0]/Prev 1421 0 R>>endobj
+1423 0 obj<</Parent 1366 0 R/Title( 4. System Configuration Requirements for Compiling MythTV)/Dest[1228 0 R/XYZ 0 619 0]/Prev 1409 0 R/Next 1424 0 R>>endobj
+1424 0 obj<</Parent 1366 0 R/Count -2/First 1425 0 R/Last 1426 0 R/Title(4.1 Software requirements for compiling MythTV)/Dest[1228 0 R/XYZ 0 460 0]/Prev 1423 0 R/Next 1427 0 R>>endobj
+1425 0 obj<</Parent 1424 0 R/Title(General requirements)/Dest[1228 0 R/XYZ 0 426 0]/Next 1426 0 R>>endobj
+1426 0 obj<</Parent 1424 0 R/Title(Distribution-Specific Notes)/Dest[1228 0 R/XYZ 0 264 0]/Prev 1425 0 R>>endobj
+1427 0 obj<</Parent 1366 0 R/Count -3/First 1428 0 R/Last 1430 0 R/Title(4.2 Shared-Library Requirements for MythTV)/Dest[1228 0 R/XYZ 0 208 0]/Prev 1424 0 R/Next 1431 0 R>>endobj
+1428 0 obj<</Parent 1427 0 R/Title( Modifying /etc/ld.so.conf)/Dest[1230 0 R/XYZ 0 786 0]/Next 1429 0 R>>endobj
+1429 0 obj<</Parent 1427 0 R/Title(Distribution-Specific Notes)/Dest[1230 0 R/XYZ 0 610 0]/Prev 1428 0 R/Next 1430 0 R>>endobj
+1430 0 obj<</Parent 1427 0 R/Title(Red Hat)/Dest[1230 0 R/XYZ 0 580 0]/Prev 1429 0 R>>endobj
+1431 0 obj<</Parent 1366 0 R/Count -6/First 1432 0 R/Last 1437 0 R/Title(4.3 Environment variable Requirements for MythTV)/Dest[1230 0 R/XYZ 0 497 0]/Prev 1427 0 R/Next 1438 0 R>>endobj
+1432 0 obj<</Parent 1431 0 R/Title(General requirements)/Dest[1230 0 R/XYZ 0 463 0]/Next 1433 0 R>>endobj
+1433 0 obj<</Parent 1431 0 R/Title(QT libraries and binaries)/Dest[1230 0 R/XYZ 0 433 0]/Prev 1432 0 R/Next 1434 0 R>>endobj
+1434 0 obj<</Parent 1431 0 R/Title(Distribution-Specific Notes)/Dest[1232 0 R/XYZ 0 786 0]/Prev 1433 0 R/Next 1435 0 R>>endobj
+1435 0 obj<</Parent 1431 0 R/Title(Mandrake)/Dest[1232 0 R/XYZ 0 770 0]/Prev 1434 0 R/Next 1436 0 R>>endobj
+1436 0 obj<</Parent 1431 0 R/Title(Red Hat Linux 9/8.0)/Dest[1232 0 R/XYZ 0 473 0]/Prev 1435 0 R/Next 1437 0 R>>endobj
+1437 0 obj<</Parent 1431 0 R/Title(Debian)/Dest[1232 0 R/XYZ 0 377 0]/Prev 1436 0 R>>endobj
+1438 0 obj<</Parent 1366 0 R/Title(5. Downloading and compiling.)/Dest[1234 0 R/XYZ 0 377 0]/Prev 1431 0 R/Next 1439 0 R>>endobj
+1439 0 obj<</Parent 1366 0 R/Title( 5.1 Notes on compiling on a system with non-Intel processors.)/Dest[1236 0 R/XYZ 0 556 0]/Prev 1438 0 R/Next 1440 0 R>>endobj
+1440 0 obj<</Parent 1366 0 R/Title(5.2 Building LAME.)/Dest[1236 0 R/XYZ 0 308 0]/Prev 1439 0 R/Next 1441 0 R>>endobj
+1441 0 obj<</Parent 1366 0 R/Count -3/First 1442 0 R/Last 1444 0 R/Title(5.3 XMLTV.)/Dest[1238 0 R/XYZ 0 668 0]/Prev 1440 0 R/Next 1445 0 R>>endobj
+1442 0 obj<</Parent 1441 0 R/Title(Red Hat Linux 9:)/Dest[1238 0 R/XYZ 0 634 0]/Next 1443 0 R>>endobj
+1443 0 obj<</Parent 1441 0 R/Title(Mandrake)/Dest[1238 0 R/XYZ 0 501 0]/Prev 1442 0 R/Next 1444 0 R>>endobj
+1444 0 obj<</Parent 1441 0 R/Title(Other distributions and manual installation.)/Dest[1238 0 R/XYZ 0 317 0]/Prev 1443 0 R>>endobj
+1445 0 obj<</Parent 1366 0 R/Count -1/First 1446 0 R/Last 1446 0 R/Title(5.4 Manually building MythTV.)/Dest[1240 0 R/XYZ 0 213 0]/Prev 1441 0 R/Next 1447 0 R>>endobj
+1446 0 obj<</Parent 1445 0 R/Title( Frontend-only configuration)/Dest[1242 0 R/XYZ 0 547 0]>>endobj
+1447 0 obj<</Parent 1366 0 R/Title( 5.5 Gentoo.)/Dest[1242 0 R/XYZ 0 227 0]/Prev 1445 0 R/Next 1448 0 R>>endobj
+1448 0 obj<</Parent 1366 0 R/Title( 6. MySQL.)/Dest[1244 0 R/XYZ 0 725 0]/Prev 1447 0 R/Next 1449 0 R>>endobj
+1449 0 obj<</Parent 1366 0 R/Title(6.1 Mandrake 9.0)/Dest[1244 0 R/XYZ 0 691 0]/Prev 1448 0 R/Next 1450 0 R>>endobj
+1450 0 obj<</Parent 1366 0 R/Title(6.2 Red Hat Linux)/Dest[1244 0 R/XYZ 0 522 0]/Prev 1449 0 R/Next 1451 0 R>>endobj
+1451 0 obj<</Parent 1366 0 R/Title(6.3 Gentoo)/Dest[1244 0 R/XYZ 0 375 0]/Prev 1450 0 R/Next 1452 0 R>>endobj
+1452 0 obj<</Parent 1366 0 R/Count -4/First 1453 0 R/Last 1456 0 R/Title(6.4 Setting up the initial database.)/Dest[1244 0 R/XYZ 0 315 0]/Prev 1451 0 R/Next 1457 0 R>>endobj
+1453 0 obj<</Parent 1452 0 R/Title(Mandrake 9.0 and Red Hat Linux)/Dest[1244 0 R/XYZ 0 178 0]/Next 1454 0 R>>endobj
+1454 0 obj<</Parent 1452 0 R/Title(Debian 3.0)/Dest[1246 0 R/XYZ 0 786 0]/Prev 1453 0 R/Next 1455 0 R>>endobj
+1455 0 obj<</Parent 1452 0 R/Title(Gentoo)/Dest[1246 0 R/XYZ 0 746 0]/Prev 1454 0 R/Next 1456 0 R>>endobj
+1456 0 obj<</Parent 1452 0 R/Title( Modifying access to the MySQL database for multiple systems)/Dest[1246 0 R/XYZ 0 641 0]/Prev 1455 0 R>>endobj
+1457 0 obj<</Parent 1366 0 R/Title(7. Setting up ALSA and the mixer.)/Dest[1246 0 R/XYZ 0 309 0]/Prev 1452 0 R/Next 1458 0 R>>endobj
+1458 0 obj<</Parent 1366 0 R/Count -3/First 1459 0 R/Last 1461 0 R/Title(7.1 Graphically setting up the mixer.)/Dest[1248 0 R/XYZ 0 747 0]/Prev 1457 0 R/Next 1462 0 R>>endobj
+1459 0 obj<</Parent 1458 0 R/Title(Mandrake 9.0 and Red Hat Linux)/Dest[1248 0 R/XYZ 0 713 0]/Next 1460 0 R>>endobj
+1460 0 obj<</Parent 1458 0 R/Title(Using OSS drivers.)/Dest[1248 0 R/XYZ 0 487 0]/Prev 1459 0 R/Next 1461 0 R>>endobj
+1461 0 obj<</Parent 1458 0 R/Title(Using ALSA drivers.)/Dest[1248 0 R/XYZ 0 225 0]/Prev 1460 0 R>>endobj
+1462 0 obj<</Parent 1366 0 R/Title(7.2 Setting the mixer from the command line.)/Dest[1252 0 R/XYZ 0 297 0]/Prev 1458 0 R/Next 1463 0 R>>endobj
+1463 0 obj<</Parent 1366 0 R/Title(8. Setting up a remote control.)/Dest[1254 0 R/XYZ 0 532 0]/Prev 1462 0 R/Next 1464 0 R>>endobj
+1464 0 obj<</Parent 1366 0 R/Title(8.1 Gentoo)/Dest[1254 0 R/XYZ 0 274 0]/Prev 1463 0 R/Next 1465 0 R>>endobj
+1465 0 obj<</Parent 1366 0 R/Count -1/First 1466 0 R/Last 1466 0 R/Title(8.2 Mandrake 9.0)/Dest[1254 0 R/XYZ 0 190 0]/Prev 1464 0 R/Next 1467 0 R>>endobj
+1466 0 obj<</Parent 1465 0 R/Title(Obtaining the kernel.)/Dest[1256 0 R/XYZ 0 760 0]>>endobj
+1467 0 obj<</Parent 1366 0 R/Title(8.3 Red Hat Linux)/Dest[1256 0 R/XYZ 0 669 0]/Prev 1465 0 R/Next 1468 0 R>>endobj
+1468 0 obj<</Parent 1366 0 R/Count -1/First 1469 0 R/Last 1469 0 R/Title(8.4 Obtaining and compiling lirc.)/Dest[1256 0 R/XYZ 0 539 0]/Prev 1467 0 R/Next 1470 0 R>>endobj
+1469 0 obj<</Parent 1468 0 R/Title(Recompiling your kernel on Red Hat Linux)/Dest[1258 0 R/XYZ 0 219 0]>>endobj
+1470 0 obj<</Parent 1366 0 R/Title( 8.5 Completing the lirc install.)/Dest[1260 0 R/XYZ 0 316 0]/Prev 1468 0 R/Next 1471 0 R>>endobj
+1471 0 obj<</Parent 1366 0 R/Title(8.6 Additional information for lirc.)/Dest[1264 0 R/XYZ 0 503 0]/Prev 1470 0 R/Next 1472 0 R>>endobj
+1472 0 obj<</Parent 1366 0 R/Title(8.7 Configuring lirc for use with an IR blaster.)/Dest[1266 0 R/XYZ 0 507 0]/Prev 1471 0 R/Next 1473 0 R>>endobj
+1473 0 obj<</Parent 1366 0 R/Title( 9. Configuring MythTV.)/Dest[1270 0 R/XYZ 0 656 0]/Prev 1472 0 R/Next 1474 0 R>>endobj
+1474 0 obj<</Parent 1366 0 R/Count -4/First 1475 0 R/Last 1478 0 R/Title(9.1 Configuring the master backend system.)/Dest[1270 0 R/XYZ 0 582 0]/Prev 1473 0 R/Next 1479 0 R>>endobj
+1475 0 obj<</Parent 1474 0 R/Title(General)/Dest[1272 0 R/XYZ 0 400 0]/Next 1476 0 R>>endobj
+1476 0 obj<</Parent 1474 0 R/Title(Capture Cards)/Dest[1274 0 R/XYZ 0 760 0]/Prev 1475 0 R/Next 1477 0 R>>endobj
+1477 0 obj<</Parent 1474 0 R/Title(Video Sources)/Dest[1274 0 R/XYZ 0 624 0]/Prev 1476 0 R/Next 1478 0 R>>endobj
+1478 0 obj<</Parent 1474 0 R/Title(Input Connections)/Dest[1274 0 R/XYZ 0 330 0]/Prev 1477 0 R>>endobj
+1479 0 obj<</Parent 1366 0 R/Title(9.2 Post-configuration.)/Dest[1276 0 R/XYZ 0 667 0]/Prev 1474 0 R/Next 1480 0 R>>endobj
+1480 0 obj<</Parent 1366 0 R/Title( 9.3 Configuring a non-master backend.)/Dest[1276 0 R/XYZ 0 280 0]/Prev 1479 0 R/Next 1481 0 R>>endobj
+1481 0 obj<</Parent 1366 0 R/Count -1/First 1482 0 R/Last 1482 0 R/Title(9.4 Configuring and running mythfilldatabase.)/Dest[1278 0 R/XYZ 0 720 0]/Prev 1480 0 R/Next 1483 0 R>>endobj
+1482 0 obj<</Parent 1481 0 R/Title(Setting mythfilldatabase to run from cron)/Dest[1278 0 R/XYZ 0 515 0]>>endobj
+1483 0 obj<</Parent 1366 0 R/Title(10. Configuring mythfrontend.)/Dest[1280 0 R/XYZ 0 312 0]/Prev 1481 0 R/Next 1484 0 R>>endobj
+1484 0 obj<</Parent 1366 0 R/Title(10.1 General)/Dest[1280 0 R/XYZ 0 186 0]/Prev 1483 0 R/Next 1485 0 R>>endobj
+1485 0 obj<</Parent 1366 0 R/Title(10.2 Appearance)/Dest[1282 0 R/XYZ 0 641 0]/Prev 1484 0 R/Next 1486 0 R>>endobj
+1486 0 obj<</Parent 1366 0 R/Title(10.3 Program Guide)/Dest[1282 0 R/XYZ 0 568 0]/Prev 1485 0 R/Next 1487 0 R>>endobj
+1487 0 obj<</Parent 1366 0 R/Title( 10.4 Playback)/Dest[1282 0 R/XYZ 0 481 0]/Prev 1486 0 R/Next 1488 0 R>>endobj
+1488 0 obj<</Parent 1366 0 R/Title(10.5 Recording)/Dest[1282 0 R/XYZ 0 193 0]/Prev 1487 0 R/Next 1489 0 R>>endobj
+1489 0 obj<</Parent 1366 0 R/Title(10.6 Xbox Frontends)/Dest[1286 0 R/XYZ 0 733 0]/Prev 1488 0 R/Next 1490 0 R>>endobj
+1490 0 obj<</Parent 1366 0 R/Title(11. Using MythTV.)/Dest[1286 0 R/XYZ 0 335 0]/Prev 1489 0 R/Next 1491 0 R>>endobj
+1491 0 obj<</Parent 1366 0 R/Title(11.1 Using themes with MythTV.)/Dest[1286 0 R/XYZ 0 196 0]/Prev 1490 0 R/Next 1492 0 R>>endobj
+1492 0 obj<</Parent 1366 0 R/Title(11.2 Adding DirecTV information to the database.)/Dest[1288 0 R/XYZ 0 627 0]/Prev 1491 0 R/Next 1493 0 R>>endobj
+1493 0 obj<</Parent 1366 0 R/Title(11.3 Adding support for an external tuner.)/Dest[1288 0 R/XYZ 0 540 0]/Prev 1492 0 R/Next 1494 0 R>>endobj
+1494 0 obj<</Parent 1366 0 R/Title(12. MythWeb.)/Dest[1288 0 R/XYZ 0 322 0]/Prev 1493 0 R/Next 1495 0 R>>endobj
+1495 0 obj<</Parent 1366 0 R/Count -1/First 1496 0 R/Last 1496 0 R/Title(12.1 Installation and prerequisites.)/Dest[1288 0 R/XYZ 0 249 0]/Prev 1494 0 R/Next 1497 0 R>>endobj
+1496 0 obj<</Parent 1495 0 R/Title(Mandrake 9.0)/Dest[1290 0 R/XYZ 0 786 0]>>endobj
+1497 0 obj<</Parent 1366 0 R/Title(12.2 Completing the installation.)/Dest[1290 0 R/XYZ 0 631 0]/Prev 1495 0 R/Next 1498 0 R>>endobj
+1498 0 obj<</Parent 1366 0 R/Title(13. MythGallery.)/Dest[1290 0 R/XYZ 0 244 0]/Prev 1497 0 R/Next 1499 0 R>>endobj
+1499 0 obj<</Parent 1366 0 R/Title(13.1 Installation and prerequisites.)/Dest[1292 0 R/XYZ 0 786 0]/Prev 1498 0 R/Next 1500 0 R>>endobj
+1500 0 obj<</Parent 1366 0 R/Title(13.2 Importing Pictures)/Dest[1292 0 R/XYZ 0 442 0]/Prev 1499 0 R/Next 1501 0 R>>endobj
+1501 0 obj<</Parent 1366 0 R/Title(14. MythGame.)/Dest[1294 0 R/XYZ 0 592 0]/Prev 1500 0 R/Next 1502 0 R>>endobj
+1502 0 obj<</Parent 1366 0 R/Title(15. MythMusic.)/Dest[1294 0 R/XYZ 0 558 0]/Prev 1501 0 R/Next 1503 0 R>>endobj
+1503 0 obj<</Parent 1366 0 R/Title(15.1 Manual installation of prerequisites.)/Dest[1294 0 R/XYZ 0 340 0]/Prev 1502 0 R/Next 1504 0 R>>endobj
+1504 0 obj<</Parent 1366 0 R/Count -1/First 1505 0 R/Last 1505 0 R/Title(15.2 Mandrake 9.0)/Dest[1296 0 R/XYZ 0 290 0]/Prev 1503 0 R/Next 1506 0 R>>endobj
+1505 0 obj<</Parent 1504 0 R/Title(Additional options with MythMusic)/Dest[1298 0 R/XYZ 0 728 0]>>endobj
+1506 0 obj<</Parent 1366 0 R/Title(15.3 Red Hat Linux 9/8.0)/Dest[1298 0 R/XYZ 0 441 0]/Prev 1504 0 R/Next 1507 0 R>>endobj
+1507 0 obj<</Parent 1366 0 R/Title(15.4 Compiling MythMusic.)/Dest[1298 0 R/XYZ 0 198 0]/Prev 1506 0 R/Next 1508 0 R>>endobj
+1508 0 obj<</Parent 1366 0 R/Title(15.5 Configuring MythMusic.)/Dest[1300 0 R/XYZ 0 572 0]/Prev 1507 0 R/Next 1509 0 R>>endobj
+1509 0 obj<</Parent 1366 0 R/Title(15.6 Using MythMusic.)/Dest[1300 0 R/XYZ 0 196 0]/Prev 1508 0 R/Next 1510 0 R>>endobj
+1510 0 obj<</Parent 1366 0 R/Count -1/First 1511 0 R/Last 1511 0 R/Title(15.7 Troubleshooting MythMusic.)/Dest[1302 0 R/XYZ 0 311 0]/Prev 1509 0 R/Next 1512 0 R>>endobj
+1511 0 obj<</Parent 1510 0 R/Title(When I run MythMusic and try and look up a CD, I get an error message)/Dest[1302 0 R/XYZ 0 251 0]>>endobj
+1512 0 obj<</Parent 1366 0 R/Title(16. MythWeather.)/Dest[1304 0 R/XYZ 0 646 0]/Prev 1510 0 R/Next 1513 0 R>>endobj
+1513 0 obj<</Parent 1366 0 R/Title(17. MythVideo.)/Dest[1306 0 R/XYZ 0 667 0]/Prev 1512 0 R/Next 1514 0 R>>endobj
+1514 0 obj<</Parent 1366 0 R/Title(18. MythDVD.)/Dest[1306 0 R/XYZ 0 402 0]/Prev 1513 0 R/Next 1515 0 R>>endobj
+1515 0 obj<</Parent 1366 0 R/Title(18.1 Manual Compilation of Prerequisites.)/Dest[1306 0 R/XYZ 0 276 0]/Prev 1514 0 R/Next 1516 0 R>>endobj
+1516 0 obj<</Parent 1366 0 R/Title(18.2 Pre-compiled binaries.)/Dest[1306 0 R/XYZ 0 243 0]/Prev 1515 0 R/Next 1517 0 R>>endobj
+1517 0 obj<</Parent 1366 0 R/Title(19. MythNews.)/Dest[1308 0 R/XYZ 0 581 0]/Prev 1516 0 R/Next 1518 0 R>>endobj
+1518 0 obj<</Parent 1366 0 R/Title(20. Troubleshooting.)/Dest[1308 0 R/XYZ 0 547 0]/Prev 1517 0 R/Next 1519 0 R>>endobj
+1519 0 obj<</Parent 1366 0 R/Title(20.1 Illegal Instruction.)/Dest[1308 0 R/XYZ 0 514 0]/Prev 1518 0 R/Next 1520 0 R>>endobj
+1520 0 obj<</Parent 1366 0 R/Title(20.2 mythfilldatabase failing.)/Dest[1308 0 R/XYZ 0 361 0]/Prev 1519 0 R/Next 1521 0 R>>endobj
+1521 0 obj<</Parent 1366 0 R/Title(20.3 MythTV seems to disappear; can't see video.)/Dest[1308 0 R/XYZ 0 235 0]/Prev 1520 0 R/Next 1522 0 R>>endobj
+1522 0 obj<</Parent 1366 0 R/Title( 20.4 Fast CPU, choppy or jittery video.)/Dest[1310 0 R/XYZ 0 786 0]/Prev 1521 0 R/Next 1523 0 R>>endobj
+1523 0 obj<</Parent 1366 0 R/Title(20.5 I have a MPEG-2 encoder card and my video appears "jittery".)/Dest[1310 0 R/XYZ 0 397 0]/Prev 1522 0 R/Next 1524 0 R>>endobj
+1524 0 obj<</Parent 1366 0 R/Title(20.6 I have a MPEG-2 encoder card and my video is jumping up and down.)/Dest[1310 0 R/XYZ 0 343 0]/Prev 1523 0 R/Next 1525 0 R>>endobj
+1525 0 obj<</Parent 1366 0 R/Title(20.7 I keep losing all of my settings every time I compile!)/Dest[1310 0 R/XYZ 0 210 0]/Prev 1524 0 R/Next 1526 0 R>>endobj
+1526 0 obj<</Parent 1366 0 R/Title(20.8 Compile errors.)/Dest[1312 0 R/XYZ 0 786 0]/Prev 1525 0 R/Next 1527 0 R>>endobj
+1527 0 obj<</Parent 1366 0 R/Title(20.9 My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.)/Dest[1312 0 R/XYZ 0 591 0]/Prev 1526 0 R/Next 1528 0 R>>endobj
+1528 0 obj<</Parent 1366 0 R/Title(20.10 I get segfaults / MythTV isn't doing anything.)/Dest[1314 0 R/XYZ 0 405 0]/Prev 1527 0 R/Next 1529 0 R>>endobj
+1529 0 obj<</Parent 1366 0 R/Title(20.11 Debugging with GDB.)/Dest[1314 0 R/XYZ 0 371 0]/Prev 1528 0 R/Next 1530 0 R>>endobj
+1530 0 obj<</Parent 1366 0 R/Title(20.12 MythTV makes my system crash.)/Dest[1316 0 R/XYZ 0 312 0]/Prev 1529 0 R/Next 1531 0 R>>endobj
+1531 0 obj<</Parent 1366 0 R/Title( 20.13 Troubleshooting audio.)/Dest[1316 0 R/XYZ 0 213 0]/Prev 1530 0 R/Next 1532 0 R>>endobj
+1532 0 obj<</Parent 1366 0 R/Title(20.14 I can't see parts of the On Screen Display.)/Dest[1318 0 R/XYZ 0 195 0]/Prev 1531 0 R/Next 1533 0 R>>endobj
+1533 0 obj<</Parent 1366 0 R/Title(20.15 The mythbackend program told me to look at this section.)/Dest[1320 0 R/XYZ 0 786 0]/Prev 1532 0 R/Next 1534 0 R>>endobj
+1534 0 obj<</Parent 1366 0 R/Title(20.16 My remote doesn't work / works sometimes and not others / "ghost" keypresses.)/Dest[1320 0 R/XYZ 0 574 0]/Prev 1533 0 R/Next 1535 0 R>>endobj
+1535 0 obj<</Parent 1366 0 R/Title(20.17 My PVR-250 card doesn't show inputs in the setup screen.)/Dest[1320 0 R/XYZ 0 322 0]/Prev 1534 0 R/Next 1536 0 R>>endobj
+1536 0 obj<</Parent 1366 0 R/Title(20.18 Where's my "canada-cable" entry gone to?)/Dest[1320 0 R/XYZ 0 241 0]/Prev 1535 0 R/Next 1537 0 R>>endobj
+1537 0 obj<</Parent 1366 0 R/Title(20.19 My channels are off by one.)/Dest[1320 0 R/XYZ 0 208 0]/Prev 1536 0 R/Next 1538 0 R>>endobj
+1538 0 obj<</Parent 1366 0 R/Title(20.20 Mythweb is showing a db_open error when I connect to it.)/Dest[1322 0 R/XYZ 0 747 0]/Prev 1537 0 R/Next 1539 0 R>>endobj
+1539 0 obj<</Parent 1366 0 R/Title(20.21 error: can't find a register in class 'BREG' while reloading 'asm')/Dest[1322 0 R/XYZ 0 613 0]/Prev 1538 0 R/Next 1540 0 R>>endobj
+1540 0 obj<</Parent 1366 0 R/Title( 20.22 make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'. Stop.)/Dest[1322 0 R/XYZ 0 520 0]/Prev 1539 0 R/Next 1541 0 R>>endobj
+1541 0 obj<</Parent 1366 0 R/Title(20.23 make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'. Stop.)/Dest[1322 0 R/XYZ 0 228 0]/Prev 1540 0 R/Next 1542 0 R>>endobj
+1542 0 obj<</Parent 1366 0 R/Title(20.24 My mouse pointer disappears when placed over the MythTV windows.)/Dest[1324 0 R/XYZ 0 786 0]/Prev 1541 0 R/Next 1543 0 R>>endobj
+1543 0 obj<</Parent 1366 0 R/Title(20.25 What does "strange error flushing buffer" mean on my console?)/Dest[1324 0 R/XYZ 0 719 0]/Prev 1542 0 R/Next 1544 0 R>>endobj
+1544 0 obj<</Parent 1366 0 R/Title(20.26 I can't change the channel when watching Live TV.)/Dest[1324 0 R/XYZ 0 625 0]/Prev 1543 0 R/Next 1545 0 R>>endobj
+1545 0 obj<</Parent 1366 0 R/Title(20.27 When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:")/Dest[1324 0 R/XYZ 0 565 0]/Prev 1544 0 R/Next 1546 0 R>>endobj
+1546 0 obj<</Parent 1366 0 R/Title(20.28 Troubleshooting the Hauppauge PVR-250 IR remote)/Dest[1324 0 R/XYZ 0 485 0]/Prev 1545 0 R/Next 1547 0 R>>endobj
+1547 0 obj<</Parent 1366 0 R/Title(20.29 MySQL not connecting correctly.)/Dest[1324 0 R/XYZ 0 399 0]/Prev 1546 0 R/Next 1548 0 R>>endobj
+1548 0 obj<</Parent 1366 0 R/Title(20.30 My screen goes black when I try to play something.)/Dest[1324 0 R/XYZ 0 325 0]/Prev 1547 0 R/Next 1549 0 R>>endobj
+1549 0 obj<</Parent 1366 0 R/Title(21. Miscellaneous.)/Dest[1324 0 R/XYZ 0 239 0]/Prev 1548 0 R/Next 1550 0 R>>endobj
+1550 0 obj<</Parent 1366 0 R/Count -1/First 1551 0 R/Last 1551 0 R/Title(21.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.)/Dest[1324 0 R/XYZ 0 205 0]/Prev 1549 0 R/Next 1552 0 R>>endobj
+1551 0 obj<</Parent 1550 0 R/Title(mythtranscode example)/Dest[1326 0 R/XYZ 0 601 0]>>endobj
+1552 0 obj<</Parent 1366 0 R/Title(21.2 I'd like to use some other window manager.)/Dest[1328 0 R/XYZ 0 776 0]/Prev 1550 0 R/Next 1553 0 R>>endobj
+1553 0 obj<</Parent 1366 0 R/Title( 21.3 What capture resolution should I use? How does video work?)/Dest[1328 0 R/XYZ 0 702 0]/Prev 1552 0 R/Next 1554 0 R>>endobj
+1554 0 obj<</Parent 1366 0 R/Count -3/First 1555 0 R/Last 1557 0 R/Title(21.4 MythTV GUI and X Display Sizes.)/Dest[1330 0 R/XYZ 0 786 0]/Prev 1553 0 R/Next 1558 0 R>>endobj
+1555 0 obj<</Parent 1554 0 R/Title(X Dimensions)/Dest[1330 0 R/XYZ 0 726 0]/Next 1556 0 R>>endobj
+1556 0 obj<</Parent 1554 0 R/Title(MythTV Dimensions)/Dest[1330 0 R/XYZ 0 551 0]/Prev 1555 0 R/Next 1557 0 R>>endobj
+1557 0 obj<</Parent 1554 0 R/Title(Overscan Dimensions)/Dest[1330 0 R/XYZ 0 257 0]/Prev 1556 0 R>>endobj
+1558 0 obj<</Parent 1366 0 R/Title(21.5 I'd like to save or restore my database.)/Dest[1332 0 R/XYZ 0 720 0]/Prev 1554 0 R/Next 1559 0 R>>endobj
+1559 0 obj<</Parent 1366 0 R/Title(21.6 I'd like to delete the mysql database.)/Dest[1332 0 R/XYZ 0 514 0]/Prev 1558 0 R/Next 1560 0 R>>endobj
+1560 0 obj<</Parent 1366 0 R/Title( 21.7 btaudio)/Dest[1332 0 R/XYZ 0 395 0]/Prev 1559 0 R/Next 1561 0 R>>endobj
+1561 0 obj<</Parent 1366 0 R/Title(21.8 Removing unwanted channels.)/Dest[1334 0 R/XYZ 0 628 0]/Prev 1560 0 R/Next 1562 0 R>>endobj
+1562 0 obj<</Parent 1366 0 R/Title(21.9 I'd like to use NFS.)/Dest[1334 0 R/XYZ 0 327 0]/Prev 1561 0 R/Next 1563 0 R>>endobj
+1563 0 obj<</Parent 1366 0 R/Title(21.10 Automatically starting mythfrontend at system boot time.)/Dest[1336 0 R/XYZ 0 707 0]/Prev 1562 0 R/Next 1564 0 R>>endobj
+1564 0 obj<</Parent 1366 0 R/Count -4/First 1565 0 R/Last 1568 0 R/Title(21.11 Automatically starting mythbackend at system boot time.)/Dest[1336 0 R/XYZ 0 333 0]/Prev 1563 0 R/Next 1569 0 R>>endobj
+1565 0 obj<</Parent 1564 0 R/Title(Red Hat And Mandrake)/Dest[1336 0 R/XYZ 0 279 0]/Next 1566 0 R>>endobj
+1566 0 obj<</Parent 1564 0 R/Title(Log files)/Dest[1338 0 R/XYZ 0 560 0]/Prev 1565 0 R/Next 1567 0 R>>endobj
+1567 0 obj<</Parent 1564 0 R/Title(Mandrake 9.x)/Dest[1338 0 R/XYZ 0 311 0]/Prev 1566 0 R/Next 1568 0 R>>endobj
+1568 0 obj<</Parent 1564 0 R/Title(Gentoo)/Dest[1340 0 R/XYZ 0 594 0]/Prev 1567 0 R>>endobj
+1569 0 obj<</Parent 1366 0 R/Title( 21.12 Advanced Backend Configurations.)/Dest[1340 0 R/XYZ 0 387 0]/Prev 1564 0 R/Next 1570 0 R>>endobj
+1570 0 obj<</Parent 1366 0 R/Title(21.13 What is this transcoder thing, and how do I use it?)/Dest[1342 0 R/XYZ 0 615 0]/Prev 1569 0 R/Next 1571 0 R>>endobj
+1571 0 obj<</Parent 1366 0 R/Title(22. Example Configurations.)/Dest[1344 0 R/XYZ 0 760 0]/Prev 1570 0 R/Next 1572 0 R>>endobj
+1572 0 obj<</Parent 1366 0 R/Title( 22.1 Hauppauge PVR-250/350 hardware MPEG-2 encoder.)/Dest[1344 0 R/XYZ 0 700 0]/Prev 1571 0 R/Next 1573 0 R>>endobj
+1573 0 obj<</Parent 1366 0 R/Title( 22.2 Hauppauge PVR-250 remote and MythTV's native LIRC support.)/Dest[1350 0 R/XYZ 0 786 0]/Prev 1572 0 R/Next 1574 0 R>>endobj
+1574 0 obj<</Parent 1366 0 R/Count -2/First 1575 0 R/Last 1576 0 R/Title( 22.3 Logical Volume Manager \(LVM\).)/Dest[1356 0 R/XYZ 0 547 0]/Prev 1573 0 R/Next 1577 0 R>>endobj
+1575 0 obj<</Parent 1574 0 R/Title(ReiserFS)/Dest[1360 0 R/XYZ 0 339 0]/Next 1576 0 R>>endobj
+1576 0 obj<</Parent 1574 0 R/Title(ext2 or ext3)/Dest[1362 0 R/XYZ 0 786 0]/Prev 1575 0 R>>endobj
+1577 0 obj<</Parent 1366 0 R/Count -1/First 1578 0 R/Last 1578 0 R/Title( 22.4 Advanced Partition Formatting.)/Dest[1362 0 R/XYZ 0 671 0]/Prev 1574 0 R>>endobj
+1578 0 obj<</Parent 1577 0 R/Title(Ext3)/Dest[1362 0 R/XYZ 0 598 0]>>endobj
+1579 0 obj<</Type/Catalog/Pages 1183 0 R/PageLayout/SinglePage/Outlines 1364 0 R/OpenAction[1196 0 R/XYZ null null 0]/PageMode/UseOutlines/PageLabels<</Nums[0<</P(title)>>1<</S/r>>6<</S/D/St 1/P()>>]>>>>endobj
 xref
-0 1578 
+0 1580 
 0000000000 65535 f 
 0000000015 00000 n 
 0000000225 00000 n 
@@ -4193,402 +4197,404 @@ xref
 0000101518 00000 n 
 0000101563 00000 n 
 0000101608 00000 n 
-0000102457 00000 n 
-0000102616 00000 n 
-0000102786 00000 n 
-0000102977 00000 n 
-0000105825 00000 n 
-0000106017 00000 n 
-0000109435 00000 n 
-0000109627 00000 n 
-0000113185 00000 n 
-0000113377 00000 n 
-0000119271 00000 n 
-0000119463 00000 n 
-0000122350 00000 n 
-0000122552 00000 n 
-0000124003 00000 n 
-0000124196 00000 n 
-0000125912 00000 n 
-0000126105 00000 n 
-0000128791 00000 n 
-0000128993 00000 n 
-0000132357 00000 n 
-0000132559 00000 n 
-0000134451 00000 n 
-0000134653 00000 n 
-0000136719 00000 n 
-0000136929 00000 n 
-0000138795 00000 n 
-0000139015 00000 n 
-0000140962 00000 n 
-0000141163 00000 n 
-0000143061 00000 n 
-0000143272 00000 n 
-0000144973 00000 n 
-0000145175 00000 n 
-0000146754 00000 n 
-0000146974 00000 n 
-0000148721 00000 n 
-0000148931 00000 n 
-0000150934 00000 n 
-0000151120 00000 n 
-0000152713 00000 n 
-0000152924 00000 n 
-0000154472 00000 n 
-0000154673 00000 n 
-0000156061 00000 n 
-0000156253 00000 n 
-0000157701 00000 n 
-0000157902 00000 n 
-0000159449 00000 n 
-0000159650 00000 n 
-0000161223 00000 n 
-0000161415 00000 n 
-0000162979 00000 n 
-0000163180 00000 n 
-0000164542 00000 n 
-0000164752 00000 n 
-0000165982 00000 n 
-0000166174 00000 n 
-0000167089 00000 n 
-0000167309 00000 n 
-0000168841 00000 n 
-0000169042 00000 n 
-0000170212 00000 n 
-0000170422 00000 n 
-0000172118 00000 n 
-0000172310 00000 n 
-0000173970 00000 n 
-0000174172 00000 n 
-0000175303 00000 n 
-0000175504 00000 n 
-0000177150 00000 n 
-0000177351 00000 n 
-0000179294 00000 n 
-0000179495 00000 n 
-0000180913 00000 n 
-0000181123 00000 n 
-0000183004 00000 n 
-0000183205 00000 n 
-0000184959 00000 n 
-0000185142 00000 n 
-0000186450 00000 n 
-0000186651 00000 n 
-0000187975 00000 n 
-0000188176 00000 n 
-0000189940 00000 n 
-0000190132 00000 n 
-0000191581 00000 n 
-0000191782 00000 n 
-0000193619 00000 n 
-0000193814 00000 n 
-0000195364 00000 n 
-0000195541 00000 n 
-0000197343 00000 n 
-0000197544 00000 n 
-0000199269 00000 n 
-0000199470 00000 n 
-0000201040 00000 n 
-0000201241 00000 n 
-0000203002 00000 n 
-0000203203 00000 n 
-0000204871 00000 n 
-0000205073 00000 n 
-0000206924 00000 n 
-0000207125 00000 n 
-0000209160 00000 n 
-0000209361 00000 n 
-0000210980 00000 n 
-0000211181 00000 n 
-0000212506 00000 n 
-0000212717 00000 n 
-0000214395 00000 n 
-0000214597 00000 n 
-0000215779 00000 n 
-0000215980 00000 n 
-0000217133 00000 n 
-0000217344 00000 n 
-0000218865 00000 n 
-0000219057 00000 n 
-0000220607 00000 n 
-0000220790 00000 n 
-0000222713 00000 n 
-0000222905 00000 n 
-0000224550 00000 n 
-0000224742 00000 n 
-0000226128 00000 n 
-0000226339 00000 n 
-0000227914 00000 n 
-0000228115 00000 n 
-0000230224 00000 n 
-0000230416 00000 n 
-0000232040 00000 n 
-0000232241 00000 n 
-0000233584 00000 n 
-0000233794 00000 n 
-0000235651 00000 n 
-0000235852 00000 n 
-0000237861 00000 n 
-0000238063 00000 n 
-0000240272 00000 n 
-0000240473 00000 n 
-0000242097 00000 n 
-0000242307 00000 n 
-0000244519 00000 n 
-0000244729 00000 n 
-0000246410 00000 n 
-0000246612 00000 n 
-0000248382 00000 n 
-0000248583 00000 n 
-0000250508 00000 n 
-0000250719 00000 n 
-0000252411 00000 n 
-0000252622 00000 n 
-0000254242 00000 n 
-0000254434 00000 n 
-0000255768 00000 n 
-0000255963 00000 n 
-0000257241 00000 n 
-0000257451 00000 n 
-0000258804 00000 n 
-0000258997 00000 n 
-0000260926 00000 n 
-0000261127 00000 n 
-0000262591 00000 n 
-0000262768 00000 n 
-0000264099 00000 n 
-0000264276 00000 n 
-0000266127 00000 n 
-0000266328 00000 n 
-0000267630 00000 n 
-0000267822 00000 n 
-0000269244 00000 n 
-0000269431 00000 n 
-0000270920 00000 n 
-0000271140 00000 n 
-0000273074 00000 n 
-0000273260 00000 n 
-0000274401 00000 n 
-0000274611 00000 n 
-0000275857 00000 n 
-0000275915 00000 n 
-0000276018 00000 n 
-0000276171 00000 n 
-0000276306 00000 n 
-0000276437 00000 n 
-0000276553 00000 n 
-0000276679 00000 n 
-0000276836 00000 n 
-0000276965 00000 n 
-0000277074 00000 n 
-0000277207 00000 n 
-0000277338 00000 n 
-0000277460 00000 n 
-0000277589 00000 n 
-0000277706 00000 n 
-0000277818 00000 n 
-0000277934 00000 n 
-0000278047 00000 n 
-0000278161 00000 n 
-0000278277 00000 n 
-0000278391 00000 n 
-0000278503 00000 n 
-0000278616 00000 n 
-0000278736 00000 n 
-0000278854 00000 n 
-0000278981 00000 n 
-0000279113 00000 n 
-0000279229 00000 n 
-0000279355 00000 n 
-0000279507 00000 n 
-0000279611 00000 n 
-0000279717 00000 n 
-0000279831 00000 n 
-0000279942 00000 n 
-0000280062 00000 n 
-0000280172 00000 n 
-0000280290 00000 n 
-0000280407 00000 n 
-0000280510 00000 n 
-0000280616 00000 n 
-0000280722 00000 n 
-0000280828 00000 n 
-0000280945 00000 n 
-0000281058 00000 n 
-0000281161 00000 n 
-0000281313 00000 n 
-0000281422 00000 n 
-0000281536 00000 n 
-0000281644 00000 n 
-0000281750 00000 n 
-0000281869 00000 n 
-0000281999 00000 n 
-0000282111 00000 n 
-0000282228 00000 n 
-0000282355 00000 n 
-0000282463 00000 n 
-0000282600 00000 n 
-0000282720 00000 n 
-0000282813 00000 n 
+0000102466 00000 n 
+0000102625 00000 n 
+0000102795 00000 n 
+0000102986 00000 n 
+0000105834 00000 n 
+0000106026 00000 n 
+0000109444 00000 n 
+0000109636 00000 n 
+0000113194 00000 n 
+0000113386 00000 n 
+0000119280 00000 n 
+0000119472 00000 n 
+0000122358 00000 n 
+0000122560 00000 n 
+0000124011 00000 n 
+0000124204 00000 n 
+0000125920 00000 n 
+0000126113 00000 n 
+0000128799 00000 n 
+0000129001 00000 n 
+0000132365 00000 n 
+0000132567 00000 n 
+0000134459 00000 n 
+0000134661 00000 n 
+0000136727 00000 n 
+0000136937 00000 n 
+0000138803 00000 n 
+0000139023 00000 n 
+0000140970 00000 n 
+0000141171 00000 n 
+0000143069 00000 n 
+0000143280 00000 n 
+0000144981 00000 n 
+0000145183 00000 n 
+0000146762 00000 n 
+0000146982 00000 n 
+0000148729 00000 n 
+0000148939 00000 n 
+0000150942 00000 n 
+0000151128 00000 n 
+0000152721 00000 n 
+0000152932 00000 n 
+0000154480 00000 n 
+0000154681 00000 n 
+0000156069 00000 n 
+0000156261 00000 n 
+0000157709 00000 n 
+0000157910 00000 n 
+0000159457 00000 n 
+0000159658 00000 n 
+0000161231 00000 n 
+0000161423 00000 n 
+0000162987 00000 n 
+0000163188 00000 n 
+0000164550 00000 n 
+0000164760 00000 n 
+0000165990 00000 n 
+0000166182 00000 n 
+0000167097 00000 n 
+0000167317 00000 n 
+0000168849 00000 n 
+0000169050 00000 n 
+0000170220 00000 n 
+0000170430 00000 n 
+0000172126 00000 n 
+0000172318 00000 n 
+0000173978 00000 n 
+0000174180 00000 n 
+0000175311 00000 n 
+0000175512 00000 n 
+0000177158 00000 n 
+0000177359 00000 n 
+0000179302 00000 n 
+0000179503 00000 n 
+0000180921 00000 n 
+0000181131 00000 n 
+0000183012 00000 n 
+0000183213 00000 n 
+0000184967 00000 n 
+0000185150 00000 n 
+0000186458 00000 n 
+0000186659 00000 n 
+0000187983 00000 n 
+0000188184 00000 n 
+0000189948 00000 n 
+0000190140 00000 n 
+0000191589 00000 n 
+0000191790 00000 n 
+0000193627 00000 n 
+0000193822 00000 n 
+0000195372 00000 n 
+0000195549 00000 n 
+0000197351 00000 n 
+0000197552 00000 n 
+0000199277 00000 n 
+0000199478 00000 n 
+0000201048 00000 n 
+0000201249 00000 n 
+0000203010 00000 n 
+0000203211 00000 n 
+0000204879 00000 n 
+0000205081 00000 n 
+0000206932 00000 n 
+0000207133 00000 n 
+0000209168 00000 n 
+0000209369 00000 n 
+0000210988 00000 n 
+0000211189 00000 n 
+0000212514 00000 n 
+0000212725 00000 n 
+0000214403 00000 n 
+0000214605 00000 n 
+0000215787 00000 n 
+0000215988 00000 n 
+0000217141 00000 n 
+0000217352 00000 n 
+0000218873 00000 n 
+0000219065 00000 n 
+0000220615 00000 n 
+0000220798 00000 n 
+0000222721 00000 n 
+0000222913 00000 n 
+0000224558 00000 n 
+0000224750 00000 n 
+0000226136 00000 n 
+0000226347 00000 n 
+0000227922 00000 n 
+0000228123 00000 n 
+0000230232 00000 n 
+0000230424 00000 n 
+0000232048 00000 n 
+0000232249 00000 n 
+0000233592 00000 n 
+0000233802 00000 n 
+0000235659 00000 n 
+0000235860 00000 n 
+0000237869 00000 n 
+0000238071 00000 n 
+0000240280 00000 n 
+0000240481 00000 n 
+0000242105 00000 n 
+0000242315 00000 n 
+0000244527 00000 n 
+0000244737 00000 n 
+0000246418 00000 n 
+0000246620 00000 n 
+0000248390 00000 n 
+0000248591 00000 n 
+0000250516 00000 n 
+0000250727 00000 n 
+0000252419 00000 n 
+0000252630 00000 n 
+0000254250 00000 n 
+0000254442 00000 n 
+0000255776 00000 n 
+0000255971 00000 n 
+0000257249 00000 n 
+0000257459 00000 n 
+0000258812 00000 n 
+0000259005 00000 n 
+0000260934 00000 n 
+0000261135 00000 n 
+0000262599 00000 n 
+0000262776 00000 n 
+0000264107 00000 n 
+0000264284 00000 n 
+0000266135 00000 n 
+0000266336 00000 n 
+0000267638 00000 n 
+0000267830 00000 n 
+0000269252 00000 n 
+0000269439 00000 n 
+0000270928 00000 n 
+0000271148 00000 n 
+0000273106 00000 n 
+0000273283 00000 n 
+0000274521 00000 n 
+0000274707 00000 n 
+0000275787 00000 n 
+0000275997 00000 n 
+0000277184 00000 n 
+0000277242 00000 n 
+0000277345 00000 n 
+0000277498 00000 n 
+0000277633 00000 n 
+0000277764 00000 n 
+0000277880 00000 n 
+0000278006 00000 n 
+0000278163 00000 n 
+0000278292 00000 n 
+0000278401 00000 n 
+0000278534 00000 n 
+0000278665 00000 n 
+0000278787 00000 n 
+0000278916 00000 n 
+0000279033 00000 n 
+0000279145 00000 n 
+0000279261 00000 n 
+0000279374 00000 n 
+0000279488 00000 n 
+0000279604 00000 n 
+0000279718 00000 n 
+0000279830 00000 n 
+0000279943 00000 n 
+0000280063 00000 n 
+0000280181 00000 n 
+0000280308 00000 n 
+0000280440 00000 n 
+0000280556 00000 n 
+0000280682 00000 n 
+0000280834 00000 n 
+0000280938 00000 n 
+0000281044 00000 n 
+0000281158 00000 n 
+0000281269 00000 n 
+0000281389 00000 n 
+0000281499 00000 n 
+0000281617 00000 n 
+0000281734 00000 n 
+0000281837 00000 n 
+0000281943 00000 n 
+0000282049 00000 n 
+0000282155 00000 n 
+0000282272 00000 n 
+0000282385 00000 n 
+0000282488 00000 n 
+0000282640 00000 n 
+0000282749 00000 n 
+0000282863 00000 n 
 0000282971 00000 n 
-0000283155 00000 n 
-0000283261 00000 n 
-0000283374 00000 n 
-0000283554 00000 n 
-0000283666 00000 n 
-0000283793 00000 n 
-0000283886 00000 n 
-0000284072 00000 n 
-0000284178 00000 n 
-0000284303 00000 n 
-0000284430 00000 n 
-0000284538 00000 n 
-0000284657 00000 n 
-0000284749 00000 n 
-0000284878 00000 n 
-0000285040 00000 n 
-0000285158 00000 n 
-0000285306 00000 n 
-0000285408 00000 n 
-0000285516 00000 n 
-0000285646 00000 n 
-0000285813 00000 n 
-0000285913 00000 n 
-0000286025 00000 n 
-0000286135 00000 n 
-0000286251 00000 n 
-0000286368 00000 n 
-0000286478 00000 n 
-0000286652 00000 n 
-0000286768 00000 n 
-0000286878 00000 n 
-0000286984 00000 n 
-0000287130 00000 n 
-0000287263 00000 n 
-0000287438 00000 n 
-0000287554 00000 n 
-0000287672 00000 n 
-0000287777 00000 n 
-0000287921 00000 n 
-0000288052 00000 n 
-0000288162 00000 n 
-0000288316 00000 n 
-0000288409 00000 n 
-0000288526 00000 n 
-0000288697 00000 n 
-0000288809 00000 n 
-0000288942 00000 n 
-0000289078 00000 n 
-0000289226 00000 n 
-0000289349 00000 n 
-0000289529 00000 n 
-0000289622 00000 n 
-0000289735 00000 n 
-0000289848 00000 n 
-0000289951 00000 n 
-0000290074 00000 n 
-0000290212 00000 n 
-0000290395 00000 n 
-0000290508 00000 n 
-0000290637 00000 n 
-0000290749 00000 n 
-0000290864 00000 n 
-0000290982 00000 n 
-0000291096 00000 n 
-0000291210 00000 n 
-0000291329 00000 n 
-0000291446 00000 n 
-0000291576 00000 n 
-0000291724 00000 n 
-0000291866 00000 n 
-0000291978 00000 n 
-0000292152 00000 n 
-0000292236 00000 n 
-0000292369 00000 n 
-0000292485 00000 n 
-0000292621 00000 n 
-0000292744 00000 n 
-0000292857 00000 n 
-0000292971 00000 n 
-0000293113 00000 n 
-0000293268 00000 n 
-0000293373 00000 n 
-0000293497 00000 n 
-0000293622 00000 n 
-0000293749 00000 n 
-0000293870 00000 n 
-0000294039 00000 n 
-0000294180 00000 n 
-0000294296 00000 n 
-0000294410 00000 n 
-0000294522 00000 n 
-0000294663 00000 n 
-0000294790 00000 n 
-0000294903 00000 n 
-0000295023 00000 n 
-0000295148 00000 n 
-0000295278 00000 n 
-0000295426 00000 n 
-0000295566 00000 n 
-0000295731 00000 n 
-0000295901 00000 n 
-0000296060 00000 n 
-0000296180 00000 n 
-0000296366 00000 n 
-0000296518 00000 n 
-0000296643 00000 n 
-0000296778 00000 n 
-0000296907 00000 n 
-0000297056 00000 n 
-0000297218 00000 n 
-0000297401 00000 n 
-0000297563 00000 n 
-0000297709 00000 n 
-0000297842 00000 n 
-0000298004 00000 n 
-0000298176 00000 n 
-0000298384 00000 n 
-0000298579 00000 n 
-0000298749 00000 n 
-0000298916 00000 n 
-0000299071 00000 n 
-0000299277 00000 n 
-0000299430 00000 n 
-0000299567 00000 n 
-0000299723 00000 n 
-0000299841 00000 n 
-0000300086 00000 n 
-0000300179 00000 n 
-0000300326 00000 n 
-0000300490 00000 n 
-0000300664 00000 n 
-0000300762 00000 n 
-0000300879 00000 n 
-0000300984 00000 n 
-0000301129 00000 n 
-0000301272 00000 n 
-0000301385 00000 n 
-0000301517 00000 n 
-0000301642 00000 n 
-0000301804 00000 n 
-0000302003 00000 n 
-0000302109 00000 n 
-0000302218 00000 n 
-0000302330 00000 n 
-0000302422 00000 n 
-0000302561 00000 n 
-0000302718 00000 n 
-0000302845 00000 n 
-0000302997 00000 n 
-0000303161 00000 n 
-0000303336 00000 n 
-0000303430 00000 n 
-0000303528 00000 n 
-0000303688 00000 n 
-0000303764 00000 n 
+0000283077 00000 n 
+0000283196 00000 n 
+0000283326 00000 n 
+0000283438 00000 n 
+0000283555 00000 n 
+0000283682 00000 n 
+0000283790 00000 n 
+0000283927 00000 n 
+0000284047 00000 n 
+0000284140 00000 n 
+0000284298 00000 n 
+0000284482 00000 n 
+0000284588 00000 n 
+0000284701 00000 n 
+0000284881 00000 n 
+0000284993 00000 n 
+0000285120 00000 n 
+0000285213 00000 n 
+0000285399 00000 n 
+0000285505 00000 n 
+0000285630 00000 n 
+0000285757 00000 n 
+0000285865 00000 n 
+0000285984 00000 n 
+0000286076 00000 n 
+0000286205 00000 n 
+0000286367 00000 n 
+0000286485 00000 n 
+0000286633 00000 n 
+0000286735 00000 n 
+0000286843 00000 n 
+0000286973 00000 n 
+0000287140 00000 n 
+0000287240 00000 n 
+0000287352 00000 n 
+0000287462 00000 n 
+0000287578 00000 n 
+0000287695 00000 n 
+0000287805 00000 n 
+0000287979 00000 n 
+0000288095 00000 n 
+0000288205 00000 n 
+0000288311 00000 n 
+0000288457 00000 n 
+0000288590 00000 n 
+0000288765 00000 n 
+0000288881 00000 n 
+0000288999 00000 n 
+0000289104 00000 n 
+0000289248 00000 n 
+0000289379 00000 n 
+0000289489 00000 n 
+0000289643 00000 n 
+0000289736 00000 n 
+0000289853 00000 n 
+0000290024 00000 n 
+0000290136 00000 n 
+0000290269 00000 n 
+0000290405 00000 n 
+0000290553 00000 n 
+0000290676 00000 n 
+0000290856 00000 n 
+0000290949 00000 n 
+0000291062 00000 n 
+0000291175 00000 n 
+0000291278 00000 n 
+0000291401 00000 n 
+0000291539 00000 n 
+0000291722 00000 n 
+0000291835 00000 n 
+0000291964 00000 n 
+0000292076 00000 n 
+0000292191 00000 n 
+0000292309 00000 n 
+0000292423 00000 n 
+0000292537 00000 n 
+0000292656 00000 n 
+0000292773 00000 n 
+0000292903 00000 n 
+0000293051 00000 n 
+0000293193 00000 n 
+0000293305 00000 n 
+0000293479 00000 n 
+0000293563 00000 n 
+0000293696 00000 n 
+0000293812 00000 n 
+0000293948 00000 n 
+0000294071 00000 n 
+0000294184 00000 n 
+0000294298 00000 n 
+0000294440 00000 n 
+0000294595 00000 n 
+0000294700 00000 n 
+0000294824 00000 n 
+0000294949 00000 n 
+0000295076 00000 n 
+0000295197 00000 n 
+0000295366 00000 n 
+0000295507 00000 n 
+0000295623 00000 n 
+0000295737 00000 n 
+0000295849 00000 n 
+0000295990 00000 n 
+0000296117 00000 n 
+0000296230 00000 n 
+0000296350 00000 n 
+0000296475 00000 n 
+0000296605 00000 n 
+0000296753 00000 n 
+0000296893 00000 n 
+0000297058 00000 n 
+0000297228 00000 n 
+0000297387 00000 n 
+0000297507 00000 n 
+0000297693 00000 n 
+0000297845 00000 n 
+0000297970 00000 n 
+0000298105 00000 n 
+0000298234 00000 n 
+0000298383 00000 n 
+0000298545 00000 n 
+0000298728 00000 n 
+0000298890 00000 n 
+0000299036 00000 n 
+0000299169 00000 n 
+0000299331 00000 n 
+0000299503 00000 n 
+0000299711 00000 n 
+0000299906 00000 n 
+0000300076 00000 n 
+0000300243 00000 n 
+0000300398 00000 n 
+0000300604 00000 n 
+0000300757 00000 n 
+0000300894 00000 n 
+0000301050 00000 n 
+0000301168 00000 n 
+0000301413 00000 n 
+0000301506 00000 n 
+0000301653 00000 n 
+0000301817 00000 n 
+0000301991 00000 n 
+0000302089 00000 n 
+0000302206 00000 n 
+0000302311 00000 n 
+0000302456 00000 n 
+0000302599 00000 n 
+0000302712 00000 n 
+0000302844 00000 n 
+0000302969 00000 n 
+0000303131 00000 n 
+0000303330 00000 n 
+0000303436 00000 n 
+0000303545 00000 n 
+0000303657 00000 n 
+0000303749 00000 n 
+0000303888 00000 n 
+0000304045 00000 n 
+0000304172 00000 n 
+0000304324 00000 n 
+0000304488 00000 n 
+0000304663 00000 n 
+0000304757 00000 n 
+0000304855 00000 n 
+0000305015 00000 n 
+0000305091 00000 n 
 trailer
-<</Size 1578/Root 1577 0 R/Info 1 0 R/ID[<edf4007a067c3469a10b62536d88b4cc><edf4007a067c3469a10b62536d88b4cc>]>>
+<</Size 1580/Root 1579 0 R/Info 1 0 R/ID[<c0bbf3aa9d244f092bab2ba1e04567cf><c0bbf3aa9d244f092bab2ba1e04567cf>]>>
 startxref
-303974
+305301
 %%EOF

@@ -470,6 +470,11 @@ notes on how to use LVM to create storage space for your video files and how
 to add additional disk space in the future. There's lots more that can be
 done with LVM, so check the LVM HOWTO 
 <A HREF="http://tldp.org/HOWTO/lvm-HOWTO/">http://tldp.org/HOWTO/lvm-HOWTO/</A> document for details.</P>
+<P>If you don't understand how to partition a drive, or how to change the
+partition type you should stop and look at documentation on how to perform
+these steps.</P>
+<P><B>BIG FAT WARNING</B>:  Using an incorrect parameter can make your files
+inaccessible, prevent your computer from booting, etc.  Be careful!</P>
 <P>Make sure your kernel configuration includes LVM support or that it's
 available as a module. Today, most vendors include this by default. You'll
 also want to ensure that you have a copy of the LVM utilities; check your
@@ -494,9 +499,55 @@ chunk of space in /dev/hda5, using a reiserfs filesystem and mounted on
 <P>You need to create at least one LVM partition for a physical volume. Use
 <B>fdisk</B> or your favorite partition editor to set the type to LVM
 (0x8e). If you're using an entire disk, create one big partition rather than
-using the device itself. e.g. use /dev/hdb1 not /dev/hdb.</P>
-<P><CODE># fdisk /dev/hda</CODE>
-.... create partition 5, save partition table and reboot if you have to</P>
+using the device itself. e.g. use /dev/hdb1 not /dev/hdb.  </P>
+<P>In the following example, you have a 15GB disk.  The first 6GB are set as
+your boot partition.  <CODE>/dev/hda2</CODE> was added as an extended partition,
+and within that partition you created the <CODE>/dev/hda5</CODE> linux (ext2)
+partition.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+# fdisk /dev/hda
+
+The number of cylinders for this disk is set to 1823.
+There is nothing wrong with that, but this is larger than 1024,
+and could in certain setups cause problems with:
+1) software that runs at boot time (e.g., old versions of LILO)
+2) booting and partitioning software from other OSs
+   (e.g., DOS FDISK, OS/2 FDISK)
+
+Command (m for help): p
+
+Disk /dev/hda: 15.0 GB, 15000330240 bytes
+255 heads, 63 sectors/track, 1823 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+
+   Device Boot    Start       End    Blocks   Id  System
+/dev/hda1   *         1       764   6136798+  83  Linux
+/dev/hda2           765      1823   8506417+   5  Extended
+/dev/hda5           765      1823   8506417   83  Linux
+
+Command (m for help): t
+Partition number (1-6): 5
+Hex code (type L to list codes): 8e
+
+Command (m for help): p
+
+Disk /dev/hda: 15.0 GB, 15000330240 bytes
+255 heads, 63 sectors/track, 1823 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+
+   Device Boot    Start       End    Blocks   Id  System
+/dev/hda1   *         1       764   6136798+  83  Linux
+/dev/hda2           765      1823   8506417+   5  Extended
+/dev/hda5           765      1823   8506417   8e  Linux LVM
+
+Command (m for help): w
+
+#
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 <P>Create the LVM physical volume from the partitions (repeat if you have
 multiple partitions to use):
 <BLOCKQUOTE><CODE>
@@ -509,24 +560,24 @@ Create a LVM volume group out of this physical volume called "VGforMyth" that is
 allocated in chunks that are a multiple of 64MB
 <BLOCKQUOTE><CODE>
 <PRE>
-# vgcreate --name VGforMyth -s 64m /dev/hda5
+# vgcreate VGforMyth -s 64m /dev/hda5
 </PRE>
 </CODE></BLOCKQUOTE>
 
-Create a logical volume of 20GB called "video" and then create the reiserfs
+Create a logical volume of 5GB called "video" and then create the reiserfs
 filesystem and mount it:
 <BLOCKQUOTE><CODE>
 <PRE>
-# lvcreate --name video --size 20G VGforMyth
+# lvcreate --name video --size 5G VGforMyth
 # mkreiserfs /dev/VGforMyth/video
 # mount /dev/VGforMyth/video /var/video
 </PRE>
 </CODE></BLOCKQUOTE>
 
-Now create a 5GB volume for mythmusic files if you like:
+Now create a 3GB volume for mythmusic files if you like:
 <BLOCKQUOTE><CODE>
 <PRE>
-# lvcreate --name music --size 5G VGforMyth
+# lvcreate --name music --size 3G VGforMyth
 # mkreiserfs /dev/VGforMyth/music
 # mount /dev/VGforMyth/music /var/music
 </PRE>
