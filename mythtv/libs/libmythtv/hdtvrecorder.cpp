@@ -484,7 +484,10 @@ void HDTVRecorder::StartRecording(void)
     // Setup device ringbuffer
     delete[] ringbuf.buffer;
 
-    ringbuf.size = 60 * 1024 * TSPacket::SIZE;
+//    ringbuf.size = 60 * 1024 * TSPacket::SIZE;
+    ringbuf.size = gContext->GetNumSetting("HDRingbufferSize", 50*188);
+    ringbuf.size *= 1024;
+
     if ((ringbuf.buffer =
          new unsigned char[ringbuf.size + TSPacket::SIZE]) == NULL)
     {

@@ -1601,6 +1601,21 @@ static BackendSpinBox *ATSCCheckSignalThreshold()
     return bs;
 }
 
+static BackendSpinBox *HDRingbufferSize()
+{
+    BackendSpinBox *bs = new BackendSpinBox("HDRingbufferSize",
+					    25*188, 512*188, 25*188);
+    bs->setLabel(QObject::tr("HD Ringbuffer size (KB)"));
+    bs->setHelpText(QObject::tr("The HD device ringbuffer allows the "
+				"backend to weather moments of stress. "
+				"The larger the ringbuffer, the longer "
+				"the moments of stress can be. However, "
+				"setting the size too large can cause "
+				"swapping, which is detrimental."));
+    bs->setValue(50*188);
+    return bs;
+}
+
 static GenericCheckBox *SmartChannelChange()
 {
     GenericCheckBox *gc = new GenericCheckBox("SmartChannelChange");
@@ -2804,6 +2819,7 @@ GeneralSettings::GeneralSettings()
     gen2->addChild(LongChannelFormat());
     gen2->addChild(ATSCCheckSignalWait());
     gen2->addChild(ATSCCheckSignalThreshold());
+    gen2->addChild(HDRingbufferSize());
     addChild(gen2);
 
     VerticalConfigurationGroup* autoexp = new VerticalConfigurationGroup(false);
