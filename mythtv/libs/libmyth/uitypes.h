@@ -475,7 +475,8 @@ class GenericTree
     void          addYourselfIfSelectable(QPtrList<GenericTree> *flat_list);
     void          buildFlatListOfSubnodes(int ordering_index, bool scrambled_parents);
     GenericTree*  nextPrevFromFlatList(bool forward_or_back, bool wrap_around, GenericTree *active);
-    
+    GenericTree*  getChildByName(QString a_name);
+
   private:
 
     QString               my_string;

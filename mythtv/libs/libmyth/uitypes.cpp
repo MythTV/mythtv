@@ -2169,6 +2169,24 @@ GenericTree* GenericTree::nextPrevFromFlatList(bool forward_or_backward, bool wr
     return my_flatened_subnodes.at(i);
 }
 
+GenericTree* GenericTree::getChildByName(QString a_name)
+{
+    GenericTree *oops;
+    oops = NULL;
+
+    QPtrListIterator<GenericTree> it( my_subnodes );
+    GenericTree *my_kids;
+    while( (my_kids = it.current()) != 0)
+    {
+        if(my_kids->getString() == a_name)
+        {
+            return my_kids;
+        }
+        ++it;
+    }
+    return oops;
+}
+
 GenericTree::~GenericTree()
 {
 }
