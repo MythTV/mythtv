@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-08-21, v2.64
+<date>2003-08-21, v2.65
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1378,11 +1378,11 @@ If it works, you're done installing ALSA!
 <sect1>Setting the mixer from the command line.
 <p>If you have installed the alsa-utils package, then the <bf>amixer</bf>
 program can be used to setup the mixer.  The "Master" volume setting is only
-required on a frontend machine, because it will prepare your machine for
-playing sound.  The "Line" and "Capture" controls are required for your
-sound card to actually capture audio from the external Line-in.  Not all
-sound cards have a "Capture" control, but if yours does and you don't set it
-then MythTV will not capture audio.
+required on a frontend machine to ensure that the sound channels are unmuted
+and configured for outputting sound.  The "Line" and "Capture" controls are
+required for your sound card to actually capture audio from the external
+Line-in.  Not all sound cards have a "Capture" control, but if yours does
+and you don't set it then MythTV will not capture audio.
 
 <code>
 Note the spelling in the following commands.
@@ -1402,7 +1402,11 @@ specify which card to adjust.  Note that the first card will be "0", the
 second will be "1", etc.
 
 That takes care of setting the volume correctly, and the ALSA startup script
-will restore the volume after a reboot.
+will restore the volume after a reboot.  If you find that your sound is
+distorted, it's possible that the levels in the above examples are too high
+for your particular hardware combination.  Try reducing the percentages by
+5-10% and checking again.  Once you're satisfied, re-run the <tt>alsactl
+store</tt> command.
 
 You may also use the <bf>alsamixer</bf> program to set the volume.  First,
 start <bf>alsamixer</bf> from the command line.  You should start out on the
@@ -2547,6 +2551,7 @@ instructions for manually compiling and installing the software.
 The prerequisites for MythMusic are:
 <itemize>
 <item>MAD
+<item>id3tag
 <item>libvorbis-devel
 <item>FLAC
 <item>libcdaudio
@@ -2570,6 +2575,22 @@ $ su
 # exit
 $ 
 </verb></tscreen>
+
+Download libid3tag from <url url="http://www.underbit.com/products/mad/"
+name="http://www.underbit.com/products/mad/"> Save it to a directory you can
+find later.
+
+<tscreen><verb>
+$ tar -xzf libid3tag-0.15.0b.tar.gz
+$ cd libid3tag-0.15.0b
+$ ./configure
+$ make
+$ su
+# make install
+# exit
+$ 
+</verb></tscreen>
+
 
 Download FLAC from <url url="http://flac.sourceforge.net"
 name="http://flac.sourceforge.net"> and install:
@@ -2636,7 +2657,7 @@ dependencies, say "Yes".
 <tscreen><verb>
 # urpmi libmad0 libmad0-devel libflac4 libflac4-devel libcdaudio1 cdparanoia
 # urpmi libcdda0 libcdda0-devel libvorbis0 libvorbis0-devel
-# urpmi libcdaudio1-devel
+# urpmi libcdaudio1-devel libid3tag0 libid3tag0-devel
 </verb></tscreen>
 
 <sect2>Additional options with MythMusic
@@ -3832,7 +3853,7 @@ alias char-major-81-0   ivtv
 options ivtv debug=1
 options tuner type=2
 options msp3400 once=1 simple=1
-add below ivtv msp3400 saa7115 tuner
+add above ivtv msp3400 saa7115 tuner
 </verb></tscreen>
 
 <bf>NOTE</bf>:  You must specify the tuner type manually.  See
@@ -4423,6 +4444,9 @@ htaccess file has more than just authentication, so don't tell people to
 delete it if they want to.
 v2.63, 2003-08-20.  Updated and expanded Debian-specific information.
 v2.64, 2003-08-21.  MythDVD instructions.  Work in progress.
+v2.65, 2003-08-21.  Change "add below" to "above" in PVR section.  Guess
+they flip-flopped at some point. Add some advice about mixer levels.  Add
+libid3tag to MythMusic section.
 -->
 
 <!--

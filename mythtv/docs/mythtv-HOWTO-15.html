@@ -22,6 +22,7 @@ instructions for manually compiling and installing the software.</P>
 <P>The prerequisites for MythMusic are:
 <UL>
 <LI>MAD</LI>
+<LI>id3tag</LI>
 <LI>libvorbis-devel</LI>
 <LI>FLAC</LI>
 <LI>libcdaudio</LI>
@@ -50,6 +51,24 @@ $
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P>Download libid3tag from 
+<A HREF="http://www.underbit.com/products/mad/">http://www.underbit.com/products/mad/</A> Save it to a directory you can
+find later.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ tar -xzf libid3tag-0.15.0b.tar.gz
+$ cd libid3tag-0.15.0b
+$ ./configure
+$ make
+$ su
+# make install
+# exit
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
 <P>Download FLAC from 
 <A HREF="http://flac.sourceforge.net">http://flac.sourceforge.net</A> and install:
 <BLOCKQUOTE><CODE>
@@ -124,7 +143,7 @@ dependencies, say "Yes".</P>
 <PRE>
 # urpmi libmad0 libmad0-devel libflac4 libflac4-devel libcdaudio1 cdparanoia
 # urpmi libcdda0 libcdda0-devel libvorbis0 libvorbis0-devel
-# urpmi libcdaudio1-devel
+# urpmi libcdaudio1-devel libid3tag0 libid3tag0-devel
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>

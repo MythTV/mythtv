@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-08-21, v2.64
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-08-21, v2.65
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1723,11 +1723,11 @@ $ aplay /usr/share/sounds/info.wav
 
 <P>If you have installed the alsa-utils package, then the <B>amixer</B>
 program can be used to setup the mixer.  The "Master" volume setting is only
-required on a frontend machine, because it will prepare your machine for
-playing sound.  The "Line" and "Capture" controls are required for your
-sound card to actually capture audio from the external Line-in.  Not all
-sound cards have a "Capture" control, but if yours does and you don't set it
-then MythTV will not capture audio.</P>
+required on a frontend machine to ensure that the sound channels are unmuted
+and configured for outputting sound.  The "Line" and "Capture" controls are
+required for your sound card to actually capture audio from the external
+Line-in.  Not all sound cards have a "Capture" control, but if yours does
+and you don't set it then MythTV will not capture audio.</P>
 <P>
 <HR>
 <PRE>
@@ -1751,7 +1751,11 @@ $
 specify which card to adjust.  Note that the first card will be "0", the
 second will be "1", etc.</P>
 <P>That takes care of setting the volume correctly, and the ALSA startup script
-will restore the volume after a reboot.</P>
+will restore the volume after a reboot.  If you find that your sound is
+distorted, it's possible that the levels in the above examples are too high
+for your particular hardware combination.  Try reducing the percentages by
+5-10% and checking again.  Once you're satisfied, re-run the <CODE>alsactl
+store</CODE> command.</P>
 <P>You may also use the <B>alsamixer</B> program to set the volume.  First,
 start <B>alsamixer</B> from the command line.  You should start out on the
 "Master" volume control slider.  Use the up and down cursor to set the
@@ -2988,6 +2992,7 @@ instructions for manually compiling and installing the software.</P>
 <P>The prerequisites for MythMusic are:
 <UL>
 <LI>MAD</LI>
+<LI>id3tag</LI>
 <LI>libvorbis-devel</LI>
 <LI>FLAC</LI>
 <LI>libcdaudio</LI>
@@ -3016,6 +3021,24 @@ $
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P>Download libid3tag from 
+<A HREF="http://www.underbit.com/products/mad/">http://www.underbit.com/products/mad/</A> Save it to a directory you can
+find later.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ tar -xzf libid3tag-0.15.0b.tar.gz
+$ cd libid3tag-0.15.0b
+$ ./configure
+$ make
+$ su
+# make install
+# exit
+$ 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
 <P>Download FLAC from 
 <A HREF="http://flac.sourceforge.net">http://flac.sourceforge.net</A> and install:
 <BLOCKQUOTE><CODE>
@@ -3090,7 +3113,7 @@ dependencies, say "Yes".</P>
 <PRE>
 # urpmi libmad0 libmad0-devel libflac4 libflac4-devel libcdaudio1 cdparanoia
 # urpmi libcdda0 libcdda0-devel libvorbis0 libvorbis0-devel
-# urpmi libcdaudio1-devel
+# urpmi libcdaudio1-devel libid3tag0 libid3tag0-devel
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -4388,7 +4411,7 @@ alias char-major-81-0   ivtv
 options ivtv debug=1
 options tuner type=2
 options msp3400 once=1 simple=1
-add below ivtv msp3400 saa7115 tuner
+add above ivtv msp3400 saa7115 tuner
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>

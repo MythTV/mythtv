@@ -205,11 +205,11 @@ $ aplay /usr/share/sounds/info.wav
 
 <P>If you have installed the alsa-utils package, then the <B>amixer</B>
 program can be used to setup the mixer.  The "Master" volume setting is only
-required on a frontend machine, because it will prepare your machine for
-playing sound.  The "Line" and "Capture" controls are required for your
-sound card to actually capture audio from the external Line-in.  Not all
-sound cards have a "Capture" control, but if yours does and you don't set it
-then MythTV will not capture audio.</P>
+required on a frontend machine to ensure that the sound channels are unmuted
+and configured for outputting sound.  The "Line" and "Capture" controls are
+required for your sound card to actually capture audio from the external
+Line-in.  Not all sound cards have a "Capture" control, but if yours does
+and you don't set it then MythTV will not capture audio.</P>
 <P>
 <HR>
 <PRE>
@@ -233,7 +233,11 @@ $
 specify which card to adjust.  Note that the first card will be "0", the
 second will be "1", etc.</P>
 <P>That takes care of setting the volume correctly, and the ALSA startup script
-will restore the volume after a reboot.</P>
+will restore the volume after a reboot.  If you find that your sound is
+distorted, it's possible that the levels in the above examples are too high
+for your particular hardware combination.  Try reducing the percentages by
+5-10% and checking again.  Once you're satisfied, re-run the <CODE>alsactl
+store</CODE> command.</P>
 <P>You may also use the <B>alsamixer</B> program to set the volume.  First,
 start <B>alsamixer</B> from the command line.  You should start out on the
 "Master" volume control slider.  Use the up and down cursor to set the
