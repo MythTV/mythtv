@@ -71,5 +71,8 @@ AudioOutput *AudioOutput::OpenAudio(QString audiodevice, int audio_bits,
                                  audio_channels, audio_samplerate, source, set_initial_vol);
 #endif
 
+    printf("No useable audio output driver found.\n");
+    printf("Don't disable OSS support unless you're not running on Linux.\n");
+
     return NULL;
 }
