@@ -1713,18 +1713,19 @@ void TV::SwapPIP(void)
 
 void TV::DoPlay(void)
 {
-    speed_index = 0;
     float time = 0.0;
 
     if (doing_ff_rew)
     {
         time = StopFFRew();
         activenvp->Play(1.0, true);
+    	speed_index = 0;
     }
     else if (paused || (speed_index != 0))
     {
         activenvp->Play(1.0, true);
         paused = false;
+    	speed_index = 0;
     }
 
 
