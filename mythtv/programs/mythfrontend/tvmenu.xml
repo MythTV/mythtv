@@ -33,7 +33,7 @@
    <button>
       <type>SETUP</type>
       <text>Setup</text>
-      <action>TV_SETUP</action>
+      <action>MENU tv_settings.xml</action>
    </button>
 
 </mythmenu>

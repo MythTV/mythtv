@@ -11,12 +11,14 @@ using namespace std;
 #include "scheduler.h"
 #include "playbackbox.h"
 #include "viewscheduled.h"
+#include "themesetup.h"
 
 #include "libmyth/themedmenu.h"
 #include "libmyth/programinfo.h"
 #include "libmyth/mythcontext.h"
 
 QMap<int, TV *> tvList;
+ThemedMenu *menu;
 
 QString startGuide(MythContext *context)
 {
@@ -174,6 +176,17 @@ void *runScheduler(void *dummy)
     return NULL;
 }
 
+void themesSettings(MythContext *context)
+{ 
+    QSqlDatabase *db = QSqlDatabase::database();
+    ThemeSetup ts(context, db);
+    ts.Show();
+
+    ts.exec();
+
+    menu->ReloadTheme();
+}
+
 void TVMenuCallback(void *data, QString &selection)
 {
     MythContext *context = (MythContext *)data;
@@ -190,21 +203,19 @@ void TVMenuCallback(void *data, QString &selection)
         startDelete(context);
     else if (sel == "tv_fix_conflicts")
         startManaged(context);
-    else if (sel == "tv_setup")
-        ;
+    else if (sel == "settings themes")
+        themesSettings(context);
 }
 
 bool RunMenu(QString themedir, MythContext *context)
 {
-    ThemedMenu *diag = new ThemedMenu(context, themedir.ascii(), 
-                                      "mainmenu.xml");
-
-    diag->setCallback(TVMenuCallback, context);
+    menu = new ThemedMenu(context, themedir.ascii(), "mainmenu.xml");
+    menu->setCallback(TVMenuCallback, context);
     
-    if (diag->foundTheme())
+    if (menu->foundTheme())
     {
-        diag->Show();
-        diag->exec();
+        menu->Show();
+        menu->exec();
     }
     else
     {

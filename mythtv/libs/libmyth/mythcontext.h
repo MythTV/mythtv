@@ -18,6 +18,7 @@ class MythContext
     QString GetFilePrefix();
 
     void LoadSettingsFiles(const QString &filename);
+    void LoadSettingsDatabase(QSqlDatabase *db);
     void LoadQtConfig();
 
     void GetScreenSettings(int &width, float &wmult, int &height, float &hmult);
@@ -32,6 +33,8 @@ class MythContext
 
     QString GetSetting(const QString &key, const QString &defaultval = "");
     int GetNumSetting(const QString &key, int defaultval = 0);
+
+    void SetSetting(const QString &key, const QString &newValue);
 
     int GetBigFontSize() { return qtfontbig; }
     int GetMediumFontSize() { return qtfontmed; }
@@ -48,6 +51,8 @@ class MythContext
     int qtfontbig, qtfontmed, qtfontsmall;
 
     Settings *m_settings;
+    Settings *m_qtThemeSettings;
+
     QString m_installprefix;
 
     bool m_themeloaded;

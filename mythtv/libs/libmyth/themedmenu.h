@@ -63,6 +63,8 @@ class ThemedMenu : public QDialog
 
     QString getSelection() { return selection; }
 
+    void ReloadTheme(void);
+
   protected:
     void paintEvent(QPaintEvent *e);
     void keyPressEvent(QKeyEvent *e);

@@ -5,5 +5,5 @@ moc_menubox.cpp
 moc_playbackbox.cpp
 moc_programlistitem.cpp
 moc_viewscheduled.cpp
-moc_themedmenu.cpp
+moc_themesetup.cpp
 mythfrontend

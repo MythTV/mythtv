@@ -11,7 +11,7 @@ target.path = $${PREFIX}/bin
 INSTALLS = target
 
 setting.path = $${PREFIX}/share/mythtv/
-setting.files += theme.txt mysql.txt mainmenu.xml tvmenu.xml
+setting.files += theme.txt mysql.txt mainmenu.xml tvmenu.xml tv_settings.xml
 setting.extra = -ldconfig
 
 INSTALLS += setting
@@ -29,6 +29,7 @@ TARGETDEPS += ../../libs/libavcodec/libavcodec.a
 
 # Input
 HEADERS += scheduler.h playbackbox.h programlistitem.h viewscheduled.h
+HEADERS += themesetup.h
 
 SOURCES += main.cpp scheduler.cpp playbackbox.cpp programlistitem.cpp
-SOURCES += viewscheduled.cpp
+SOURCES += viewscheduled.cpp themesetup.cpp

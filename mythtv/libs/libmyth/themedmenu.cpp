@@ -146,6 +146,7 @@ void ThemedMenu::parseBackground(QString dir, QDomElement &element)
         tmp.end();
 
         setPaletteBackgroundPixmap(background);
+        erase(menuRect());
 
         delete bground;
     }
@@ -888,7 +889,19 @@ void ThemedMenu::paintEvent(QPaintEvent *e)
 void ThemedMenu::paintLogo(QPainter *p)
 {
     if (logo)
-        p->drawPixmap(logoRect, *logo);
+    {
+        QPixmap pix(logoRect.size());
+        pix.fill(this, logoRect.topLeft());
+
+        QPainter tmp;
+        tmp.begin(&pix, this);
+
+        tmp.drawPixmap(0, 0, *logo);
+
+        tmp.end();
+
+        p->drawPixmap(logoRect.topLeft(), pix);
+    }
 }
 
 void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased)
@@ -1038,6 +1051,45 @@ void ThemedMenu::drawText(QPainter *p, QRect &rect, int textflags, QString text)
         p->setPen(QPen(textColor, 1));
         p->drawText(rect, textflags, text);
     }
+}
+
+void ThemedMenu::ReloadTheme(void)
+{
+    buttonList.clear();
+    buttonRows.clear();
+  
+    QMap<QString, ButtonIcon>::Iterator it;
+    for (it = allButtonIcons.begin(); it != allButtonIcons.end(); ++it)
+    {
+        if (it.data().icon)
+            delete it.data().icon;
+    }
+    allButtonIcons.clear();
+
+    if (logo)
+        delete logo;
+    logo = NULL;
+
+    if (buttonnormal)
+        delete buttonnormal;
+    buttonnormal = NULL;
+
+    if (buttonactive)
+        delete buttonactive;
+    buttonactive = NULL;
+
+    QString theme = m_context->GetSetting("Theme");
+    QString themedir = m_context->FindThemeDir(theme);
+ 
+    erase(menuRect());
+
+    parseSettings(themedir + "/", "theme.xml");
+
+    QString file = menufiles.back();
+    menufiles.pop_back();
+    menulevel--;
+
+    parseMenu(file);
 }
 
 void ThemedMenu::keyPressEvent(QKeyEvent *e)

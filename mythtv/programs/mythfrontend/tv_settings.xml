@@ -1,0 +1,32 @@
+<mythmenu>
+   <button>
+      <type>SETUP</type>
+      <text>Themes</text>
+      <action>SETTINGS THEMES</action>
+   </button>
+
+   <button>
+      <type>TV</type>
+      <text>Channel Setup</text>
+      <action>SETTINGS TUNER</action>
+   </button>
+
+   <button>
+      <type>TV_SCHEDULE</type>
+      <text>Program Guide</text>
+      <action>SETTINGS SCHEDULE</action>
+   </button>
+
+   <button>
+      <type>TV_PLAYBACK</type>
+      <text>Playback</text>
+      <action>SETTINGS PLAYBACK</action>
+   </button>
+
+   <button>
+      <type>TV_SCHEDULE</type>
+      <text>Recording</text>
+      <action>SETTINGS RECORDING</action>
+   </button>
+</mythmenu>
+
