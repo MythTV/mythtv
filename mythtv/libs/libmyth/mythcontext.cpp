@@ -320,32 +320,6 @@ int MythContext::GetNumSetting(const QString &key, int defaultval)
     return m_settings->GetNumSetting(key, defaultval); 
 }
 
-bool MythContext::GetBooleanSetting(const QString& key, bool defaultval)
-{
-    bool found = false;
-    bool value;
-    pthread_mutex_lock(&dbLock);
-    if (m_db->isOpen()) {
-
-        KickDatabase(m_db);
-
-        QString query = QString("SELECT data FROM settings WHERE value = '%1'").arg(key);
-        QSqlQuery result = m_db->exec(query);
-
-        if (result.isActive() && result.numRowsAffected() > 0) {
-            result.next();
-            value = result.value(0).toString() != QString::null;
-            found = true;
-        }
-    }
-    pthread_mutex_unlock(&dbLock);
-
-    if (found)
-        return value;
-
-    return m_settings->GetNumSetting(key, defaultval); 
-}
-
 void MythContext::SetPalette(QWidget *widget)
 {
     QPalette pal = widget->palette();
