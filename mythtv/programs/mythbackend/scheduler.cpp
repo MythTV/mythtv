@@ -1491,7 +1491,8 @@ void Scheduler::RunScheduler(void)
 
                 QMutexLocker lockit(recordingList_lock);
 
-                if (nexttv->StartRecording(nextRecording))
+                int retval = nexttv->StartRecording(nextRecording);
+                if (retval > 0)
                 {
                     msg = "Started recording";
                     nextRecording->conflicting = false;
@@ -1502,7 +1503,10 @@ void Scheduler::RunScheduler(void)
                     msg = "Canceled recording"; 
                     nextRecording->conflicting = false;
                     nextRecording->recording = false;
-                    nextRecording->recstatus = rsCancelled;
+                    if (retval < 0)
+                        nextRecording->recstatus = rsTunerBusy;
+                    else
+                        nextRecording->recstatus = rsCancelled;
                 }
 
                 msg += QString(" \"%1\" on channel: %2 on cardid: %3, "

@@ -180,7 +180,8 @@ void TVRec::RecordPending(ProgramInfo *rcinfo, int secsleft)
 
 int TVRec::StartRecording(ProgramInfo *rcinfo)
 {
-    int retval = 0; //0 = recording canceled, 1 = recording started
+    int retval = 0; //  0 = recording canceled, 1 = recording started
+                    // -1 = other state/already recording
 
     recordPending = false;
     askAllowRecording = false;
