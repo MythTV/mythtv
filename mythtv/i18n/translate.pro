@@ -43,4 +43,4 @@ SOURCES += ../themes/themestrings.h
 TRANSLATIONS  = mythfrontend_it.ts mythfrontend_es.ts mythfrontend_ca.ts
 TRANSLATIONS += mythfrontend_nl.ts mythfrontend_fr.ts mythfrontend_de.ts
 TRANSLATIONS += mythfrontend_dk.ts mythfrontend_pt.ts mythfrontend_sv.ts
-TRANSLATIONS += mythfrontend_ja.ts
+TRANSLATIONS += mythfrontend_ja.ts mythfrontend_si.ts
