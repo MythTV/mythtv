@@ -71,6 +71,8 @@ class RTjpeg
     int Compress(int8_t *sp, uint8_t **planes);
     void Decompress(int8_t *sp, uint8_t **planes);
 
+    void SetNextKey(void);
+
 private:
     int b2s(int16_t *data, int8_t *strm, uint8_t bt8);
     int s2b(int16_t *data, int8_t *strm, uint8_t bt8, int32_t *qtbla);

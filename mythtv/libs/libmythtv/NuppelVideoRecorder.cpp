@@ -1383,7 +1383,11 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
     else
     {
         if (!raw) 
+        {
+            if (wantkeyframe)
+                rtjc->SetNextKey();
             tmp = rtjc->Compress(strm, planes);
+        }
         else 
             tmp = video_buffer_size;
 

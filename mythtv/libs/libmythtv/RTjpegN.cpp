@@ -3321,6 +3321,11 @@ inline int RTjpeg::mcompress8(int8_t *sp, uint8_t **planes)
  return (sp-sb);
 }
 
+void RTjpeg::SetNextKey(void)
+{
+    key_count = 0;
+}
+
 int RTjpeg::Compress(int8_t *sp, uint8_t **planes)
 {
  RTjpeg_frameheader * fh = (RTjpeg_frameheader *)sp;
