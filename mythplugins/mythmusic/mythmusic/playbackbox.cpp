@@ -189,37 +189,47 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
 
     resetTimer();
 
-    switch (e->key())
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("Music", e, actions);
+
+    for (unsigned int i = 0; i < actions.size(); i++)
     {
-        case Key_PageDown:
+        QString action = actions[i];
+
+        if (action == "NEXTTRACK")
+        {
             if (next_button)
                 next_button->push();
             else
                 next();
             handled = true;
-            break;
-        case Key_PageUp:
+        }
+        else if (action == "PREVTRACK")
+        {
             if (prev_button)
                 prev_button->push();
             else
                 previous();
             handled = true;
-            break;
-        case Key_F:
+        }
+        else if (action == "FFWD")
+        { 
             if (ff_button)
                 ff_button->push();
             else
                 seekforward();
             handled = true;
-            break;
-        case Key_R:
+        }
+        else if (action == "RWND")
+        { 
             if (rew_button)
                 rew_button->push();
             else
                 seekback();
             handled = true;
-            break;
-        case Key_P:
+        }
+        else if (action == "PAUSE")
+        { 
             if (isplaying)
             {
                 if (pause_button)
@@ -235,171 +245,187 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                     play();
             }
             handled = true;
-            break;
-        case Key_S:
+        }
+        else if (action == "STOP")
+        { 
             if (stop_button)
                 stop_button->push();
             else
                 stop();
             handled = true;
-            break;
-        case Key_Z:
+        }
+        else if (action == "THMBUP")
+        {
             increaseRating();
             handled = true;
-            break;
-        case Key_Q:
+        }
+        else if (action == "THMBDOWN")
+        { 
             decreaseRating();
             handled = true;
-            break;
-        case Key_1:
+        }
+        else if (action == "1")
+        {
             if (shuffle_button)
                 shuffle_button->push();
             else
                 toggleShuffle();
             handled = true;
-            break;
-        case Key_2:
+        }
+        else if (action == "2")
+        {
             if (repeat_button)
                 repeat_button->push();
             else
                 toggleRepeat();
             handled = true;
-            break;
-        case Key_3:
+        }
+        else if (action == "3")
+        {
             if (pledit_button)
                 pledit_button->push();
             else
                 editPlaylist();
             handled = true;
-            break;
-        case Key_6:
+        }
+        else if (action == "CYCLEVIS")
+        {
             CycleVisualizer();
             handled = true;
-            break;
-        case Key_7:
+        }
+        else if (action == "BLANKSCR")
+        {   
             toggleFullBlankVisualizer();
             handled = true;
-            break;
-        case '[':
-        case Key_F10:
+        }
+        else if (action == "VOLUMEDOWN") 
+        {
             changeVolume(false);
             handled = true;
-            break;
-        case ']':
-        case Key_F11:
+        }
+        else if (action == "VOLUMEUP")
+        {
             changeVolume(true);
             handled = true;
-            break;
-        case '|':
-        case Key_F9:
+        }
+        else if (action == "MUTE")
+        {
             toggleMute();
             handled = true;
-            break;
+        }
     }
 
     if (visualizer_status == 2)
     {
-        if (e->key() == Key_Escape || e->key() == Key_4)
+        for (unsigned int i = 0; i < actions.size(); i++)
         {
-            visualizer_status = 1;
-            QString visual_workaround = mainvisual->getCurrentVisual();
-
-            //
-            //  We may have gotten to full screen by pushing 7
-            //  (full screen blank). Or it may be blank because
-            //  the user likes "Blank". Figure out what to do ...
-            //
-            
-            if(visual_workaround == "Blank" &&
-               visual_mode != "Blank")
+            QString action = actions[i];
+            if (action == "ESCAPE" || action == "4")
             {
-                visual_workaround = visual_mode;
-            }
+                visualizer_status = 1;
+                QString visual_workaround = mainvisual->getCurrentVisual();
+ 
+                // We may have gotten to full screen by pushing 7
+                // (full screen blank). Or it may be blank because
+                // the user likes "Blank". Figure out what to do ...
+            
+                if (visual_workaround == "Blank" && visual_mode != "Blank")
+                    visual_workaround = visual_mode;
 
-            mainvisual->setVisual("Blank");
-            if(visual_blackhole)
-                mainvisual->setGeometry(visual_blackhole->getScreenArea());
-            else
-                mainvisual->setGeometry(screenwidth + 10, screenheight + 10, 
-                                        160, 160);
-            setUpdatesEnabled(true);
-            mainvisual->setVisual(visual_workaround);
-            handled = true;
+                mainvisual->setVisual("Blank");
+                if (visual_blackhole)
+                    mainvisual->setGeometry(visual_blackhole->getScreenArea());
+                else
+                    mainvisual->setGeometry(screenwidth + 10, 
+                                            screenheight + 10, 
+                                            160, 160);
+                setUpdatesEnabled(true);
+                mainvisual->setVisual(visual_workaround);
+                handled = true;
+            }
+        }
+    }
+    else if (keyboard_accelerators)
+    {
+        for (unsigned int i = 0; i < actions.size(); i++)
+        {
+            QString action = actions[i];
+
+            if (!handled)
+            {
+                if (action == "UP")
+                {
+                    music_tree_list->moveUp();
+                    handled = true;
+                }
+                else if (action == "DOWN")
+                {
+                    music_tree_list->moveDown();
+                    handled = true;
+                }
+                else if (action == "LEFT")
+                {
+                    music_tree_list->popUp();
+                    handled = true;
+                }
+                else if (action == "RIGHT")
+                {
+                    music_tree_list->pushDown();
+                    handled = true;
+                }
+            }
+            if (action == "4")
+            {
+                if (vis_button)
+                    vis_button->push();
+                else
+                    visEnable();
+                handled = true;
+            }
+            else if (action == "SELECT")
+            {
+                music_tree_list->select();
+                handled = true;
+            }
+            else if (action == "REFRESH") 
+            {
+                music_tree_list->syncCurrentWithActive();
+                music_tree_list->forceLastBin();
+                music_tree_list->refresh();
+                handled = true;
+            }
         }
     }
     else
     {
-        if (keyboard_accelerators)
+        for (unsigned int i = 0; i < actions.size(); i++)
         {
-            switch (e->key())
+            QString action = actions[i];
+
+            if (!handled)
             {
-                case Key_Up:
-                    music_tree_list->moveUp();
-                    handled = true;
-                    break;
-                case Key_Down:
-                    music_tree_list->moveDown();
-                    handled = true;
-                    break;
-                case Key_Left:
-                    music_tree_list->popUp();
-                    handled = true;
-                    break;
-                case Key_Right:
-                    music_tree_list->pushDown();
-                    handled = true;
-                    break;
-                case Key_0:
-                case Key_Home:
-                    music_tree_list->syncCurrentWithActive();
-                    music_tree_list->forceLastBin();
-                    music_tree_list->refresh();
-                    handled = true;
-                    break;
-                case Key_4:
-                    if (vis_button)
-                        vis_button->push();
-                    else
-                        visEnable();
-                    handled = true;
-                    break;
-                case Key_Space:
-                case Key_Return:
-                case Key_Enter:
-                    music_tree_list->select();
-                    handled = true;
-                    break;
-            }
-        }
-        else
-        {
-            switch (e->key())
-            {
-                case Key_Up:
-                case Key_Left:
+                if (action == "UP" || action == "LEFT")
+                {
                     nextPrevWidgetFocus(false);
                     handled = true;
-                    break;
-                case Key_Down:
-                case Key_Right:
+                }
+                else if (action == "DOWN" || action == "RIGHT")
+                {
                     nextPrevWidgetFocus(true);
                     handled = true;
-                    break;
-                case Key_Space:
-                case Key_Return:
-                case Key_Enter:
-                    activateCurrent();
-                    music_tree_list->syncCurrentWithActive();
-                    handled = true;
-                    break;
+                }
+            }
+            if (action == "SELECT")
+            {
+                activateCurrent();
+                music_tree_list->syncCurrentWithActive();
+                handled = true;
             }
         }
     }
 
-    if(!handled)
-    {
+    if (!handled)
         MythThemedDialog::keyPressEvent(e);
-    }
 }
 
 void PlaybackBox::checkForPlaylists()

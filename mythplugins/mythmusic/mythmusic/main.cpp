@@ -361,6 +361,20 @@ void setupKeys(void)
     REG_JUMP("Rip CD", "", "", runRipCD);
 
     REG_KEY("Music", "DELETE", "Delete track from playlist", "D");
+    REG_KEY("Music", "NEXTTRACK", "Move to the next track", ">,.,Z,End");
+    REG_KEY("Music", "PREVTRACK", "Move to the previous track", ",,<,Q,Home");
+    REG_KEY("Music", "FFWD", "Fast forward", "PgDown");
+    REG_KEY("Music", "RWND", "Rewind", "PgUp");
+    REG_KEY("Music", "PAUSE", "Pause/Start playback", "P");
+    REG_KEY("Music", "STOP", "Stop playback", "O");
+    REG_KEY("Music", "VOLUMEDOWN", "Volume down", "[,{,F10");
+    REG_KEY("Music", "VOLUMEUP", "Volume up", "],},F11");
+    REG_KEY("Music", "MUTE", "Mute", "|,\\,F9");
+    REG_KEY("Music", "CYCLEVIS", "Cycle visualizer mode", "6");
+    REG_KEY("Music", "BLANKSCR", "Blank screen", "5");
+    REG_KEY("Music", "THMBUP", "Increase rating", "9");
+    REG_KEY("Music", "THMBDOWN", "Decrease rating", "7");
+    REG_KEY("Music", "REFRESH", "Refresh music tree", "8");
 }
 
 int mythplugin_init(const char *libversion)
