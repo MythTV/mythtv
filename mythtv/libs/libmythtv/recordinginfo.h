@@ -14,7 +14,7 @@ class RecordingInfo
                   const string &sdescription);
    ~RecordingInfo();
 
-    void GetRecordFilename(string &filename);
+    void GetRecordFilename(const string &prefix, string &filename);
     time_t GetStartTime(void);
     time_t GetEndTime(void);
 

@@ -9,9 +9,18 @@ QDate *ProgramInfo::getStartDate(void)
 {
     QString year, month, day;
 
-    year = starttime.mid(0, 4);
-    month = starttime.mid(5, 2);
-    day = starttime.mid(8, 2);
+    if (starttime[4] == '-')
+    {
+        year = starttime.mid(0, 4);
+        month = starttime.mid(5, 2);
+        day = starttime.mid(8, 2);
+    }
+    else
+    {
+        year = starttime.mid(0, 4);
+        month = starttime.mid(4, 2);
+        day = starttime.mid(6, 2);
+    }
     
     QDate *ret = new QDate(year.toInt(), month.toInt(), day.toInt());
 
@@ -21,11 +30,20 @@ QDate *ProgramInfo::getStartDate(void)
 QDate *ProgramInfo::getEndDate(void)
 {
     QString year, month, day;
-    
-    year = endtime.mid(0, 4);
-    month = endtime.mid(5, 2);
-    day = endtime.mid(8, 2);
 
+    if (starttime[4] == '-')
+    {
+        year = endtime.mid(0, 4);
+        month = endtime.mid(5, 2);
+        day = endtime.mid(8, 2);
+    }
+    else
+    {
+        year = endtime.mid(0, 4);
+        month = endtime.mid(4, 2);
+        day = endtime.mid(6, 2);
+    }
+    
     QDate *ret = new QDate(year.toInt(), month.toInt(), day.toInt());
 
     return ret;
@@ -35,8 +53,16 @@ QTime *ProgramInfo::getStartTime(void)
 {
     QString hour, min;
 
-    hour = starttime.mid(11, 2);
-    min = starttime.mid(14, 2);
+    if (starttime[4] == '-')
+    {
+        hour = starttime.mid(11, 2);
+        min = starttime.mid(14, 2);
+    }
+    else
+    {
+        hour = starttime.mid(8, 2);
+        min = starttime.mid(10, 2);
+    }
 
     QTime *ret = new QTime(hour.toInt(), min.toInt());
 
@@ -172,7 +198,7 @@ int GetProgramRecordingStatus(ProgramInfo *pginfo)
     mins = starttime->minute();
 
     char sqlstarttime[512];
-    sprintf(sqlstarttime, "%d%02d%02d%02d%02d50", year, month, day, hour, mins);
+    sprintf(sqlstarttime, "%d%02d%02d%02d%02d00", year, month, day, hour, mins);
 
     year = enddate->year();
     month = enddate->month();
@@ -181,7 +207,7 @@ int GetProgramRecordingStatus(ProgramInfo *pginfo)
     mins = endtime->minute();
 
     char sqlendtime[512];
-    sprintf(sqlendtime, "%d%02d%02d%02d%02d50", year, month, day, hour, mins);
+    sprintf(sqlendtime, "%d%02d%02d%02d%02d00", year, month, day, hour, mins);
 
     delete startdate;
     delete enddate;
@@ -257,7 +283,7 @@ void ApplyRecordStateChange(ProgramInfo *pginfo, int newstate)
     mins = starttime->minute();
 
     char sqlstarttime[512];
-    sprintf(sqlstarttime, "%d%02d%02d%02d%02d50", year, month, day, hour, mins);
+    sprintf(sqlstarttime, "%d%02d%02d%02d%02d00", year, month, day, hour, mins);
 
     year = enddate->year();
     month = enddate->month();
@@ -266,7 +292,7 @@ void ApplyRecordStateChange(ProgramInfo *pginfo, int newstate)
     mins = endtime->minute();
 
     char sqlendtime[512];
-    sprintf(sqlendtime, "%d%02d%02d%02d%02d50", year, month, day, hour, mins);
+    sprintf(sqlendtime, "%d%02d%02d%02d%02d00", year, month, day, hour, mins);
 
     delete startdate;
     delete enddate;
@@ -282,7 +308,6 @@ void ApplyRecordStateChange(ProgramInfo *pginfo, int newstate)
                           "channum = %d AND starttime = %s AND "
                           "endtime = %s;", pginfo->channum.toInt(), 
                           sqlstarttime, sqlendtime);
-        printf("%s\n", thequery);
         query.exec(thequery);
     }
     else if (pginfo->recordtype == 2)
@@ -341,6 +366,25 @@ void ApplyRecordStateChange(ProgramInfo *pginfo, int newstate)
     {
         sprintf(thequery, "INSERT INTO allrecord (title) VALUES(\"%s\");",
                           pginfo->title.ascii());
+        query.exec(thequery);
+    }
+ 
+    if (newstate != pginfo->recordtype)
+    {
+        sprintf(thequery, "SELECT * FROM settings WHERE value = "
+                          "\"RecordChanged\";");
+        query.exec(thequery);
+
+        if (query.isActive() && query.numRowsAffected() > 0)
+        {
+            sprintf(thequery, "UPDATE settings SET data = \"yes\" WHERE "
+                              "value = \"RecordChanged\";");
+        }
+        else
+        {
+            sprintf(thequery, "INSERT settings (value,data) "
+                              "VALUES(\"RecordChanged\", \"yes\");");
+        }
         query.exec(thequery);
     }
 }

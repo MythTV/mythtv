@@ -60,6 +60,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     keyswritten = 0;
     keyframedist = KEYFRAMEDISTSTART;
 
+    audiobytes = 0;
     audio_samplerate = 44100;
 }
 
@@ -142,6 +143,7 @@ void NuppelVideoRecorder::Initialize(void)
     else
         livetv = true;
 
+    audiobytes = 0;
     InitBuffers();
 }
 
@@ -157,7 +159,7 @@ int NuppelVideoRecorder::AudioInit(void)
         return(1);
     }
   
-    ioctl(afd, SNDCTL_DSP_RESET, 0);
+    //ioctl(afd, SNDCTL_DSP_RESET, 0);
    
     frag=(8<<16)|(10);//8 buffers, 1024 bytes each
     ioctl(afd, SNDCTL_DSP_SETFRAGMENT, &frag);
@@ -556,7 +558,6 @@ again:
         }
     }
 
-    printf("closing encoder\n");
     munmap(buf, vm.size);
 #endif
     KillChildren();
@@ -595,8 +596,6 @@ void NuppelVideoRecorder::KillChildren(void)
 {
     childrenLive = false;
    
-    printf("KillChildren\n"); 
-
 #ifndef V4L2
     if (ioctl(fd, VIDIOCSAUDIO, &origaudio) < 0)
         perror("VIDIOCSAUDIO");
@@ -803,7 +802,7 @@ void NuppelVideoRecorder::doAudioThread(void)
         return;
     }
 
-    ioctl(afd, SNDCTL_DSP_RESET, 0);
+    //ioctl(afd, SNDCTL_DSP_RESET, 0);
 
     frag = (8 << 16) | (10); //8 buffers, 1024 bytes each
     ioctl(afd, SNDCTL_DSP_SETFRAGMENT, &frag);
@@ -1167,7 +1166,7 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
     }
     frameheader.timecode = timecode;
 
-    if (firsttc==-1) 
+    if (firsttc == -1) 
     {
         firsttc = timecode;
         //fprintf(stderr, "first timecode=%d\n", firsttc);
@@ -1246,7 +1245,7 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
         frameheader.packetlength = 0;
         ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
         audiobytes += audio_buffer_size;
-        audio_behind --;
+        audio_behind--;
     }
 
     last_block = fnum;

@@ -60,6 +60,8 @@ TV::TV(const string &startchannel)
 
     while (!runMainLoop)
         usleep(50);
+
+    curRecording = NULL;
 }
 
 TV::~TV(void)
@@ -92,6 +94,9 @@ void TV::LiveTV(void)
 
         int result = system(cmdline);
 
+        if (result > 0)
+            result -= 255;
+
         if (result == 0)
         {
             nextState = kState_WatchingLiveTV;
@@ -113,10 +118,12 @@ void TV::LiveTV(void)
 
 void TV::StartRecording(RecordingInfo *rcinfo)
 {  
+    string recprefix = settings->GetSetting("RecordFilePrefix");
+
     if (internalState == kState_None || 
         internalState == kState_WatchingPreRecorded)
     {
-        rcinfo->GetRecordFilename(outputFilename);
+        rcinfo->GetRecordFilename(recprefix, outputFilename);
         recordEndTime = rcinfo->GetEndTime();
         curRecording = rcinfo;
 
@@ -138,6 +145,9 @@ void TV::StartRecording(RecordingInfo *rcinfo)
  
             int result = system(cmdline);
 
+            if (result > 0)
+                result -= 255;
+
             if (result == 2)
             {
             }
@@ -149,7 +159,7 @@ void TV::StartRecording(RecordingInfo *rcinfo)
                 while (GetState() != kState_None)
                     usleep(50);
 
-                rcinfo->GetRecordFilename(outputFilename);
+                rcinfo->GetRecordFilename(recprefix, outputFilename);
                 recordEndTime = rcinfo->GetEndTime();
                 curRecording = rcinfo;
 
@@ -158,7 +168,7 @@ void TV::StartRecording(RecordingInfo *rcinfo)
             }
             else 
             {
-                rcinfo->GetRecordFilename(outputFilename);
+                rcinfo->GetRecordFilename(recprefix, outputFilename);
                 recordEndTime = rcinfo->GetEndTime();
                 curRecording = rcinfo;
 
@@ -168,7 +178,7 @@ void TV::StartRecording(RecordingInfo *rcinfo)
         }
         else
         {
-            rcinfo->GetRecordFilename(outputFilename);
+            rcinfo->GetRecordFilename(recprefix, outputFilename);
             recordEndTime = rcinfo->GetEndTime();
             curRecording = rcinfo;
 
@@ -264,7 +274,7 @@ TVState TV::RemovePlaying(TVState state)
 
 void TV::WriteRecordedRecord(void)
 {
-    if (curRecording)
+    if (!curRecording)
         return;
 
     curRecording->WriteToDB(db_conn);

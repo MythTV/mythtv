@@ -832,7 +832,7 @@ void NuppelVideoPlayer::OutputAudioLoop(void)
         }
         pthread_mutex_unlock(&audio_buflock); // end critical section
     }
-    ioctl(audiofd, SNDCTL_DSP_RESET, NULL);
+    //ioctl(audiofd, SNDCTL_DSP_RESET, NULL);
 }
 
 void *NuppelVideoPlayer::kickoffOutputAudioLoop(void *player)
@@ -1192,8 +1192,8 @@ void NuppelVideoPlayer::ClearAfterSeek(void)
     gettimeofday(&audiotime_updated, NULL);
     prebuffering = true;
 
-    if (audiofd)
-        ioctl(audiofd, SNDCTL_DSP_RESET, NULL);
+    //if (audiofd)
+    //    ioctl(audiofd, SNDCTL_DSP_RESET, NULL);
 
     pthread_mutex_unlock(&avsync_lock);
     pthread_mutex_unlock(&video_buflock);

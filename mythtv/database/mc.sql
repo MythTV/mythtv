@@ -55,4 +55,10 @@ CREATE TABLE recorded
     PRIMARY KEY (channum, starttime),
     INDEX (endtime)
 );
+CREATE TABLE settings
+(
+    value VARCHAR(128) NOT NULL,
+    data TEXT NULL,
+    PRIMARY KEY(value)
+);
      

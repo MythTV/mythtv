@@ -1,4 +1,10 @@
 USE mythconverg;
+CREATE TABLE settings
+(
+    value VARCHAR(128) NOT NULL,
+    data TEXT NULL,
+    PRIMARY KEY(value)
+);
 CREATE TABLE singlerecord
 (
     channum INT UNSIGNED NOT NULL,

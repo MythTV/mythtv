@@ -7,7 +7,7 @@ RecordingInfo::RecordingInfo(const string &chan, const string &start,
                              const string &sdescription)
 {
     channel = chan;
-    starttime = starttime;
+    starttime = start;
     endtime = end;
     title = stitle;
     subtitle = ssubtitle;
@@ -18,19 +18,18 @@ RecordingInfo::~RecordingInfo(void)
 {
 }
 
-void RecordingInfo::GetRecordFilename(string &filename)
+void RecordingInfo::GetRecordFilename(const string &prefix, string &filename)
 {
     char tempstr[1024];
 
-    sprintf(tempstr, "%s_%s_%s.nuv", channel.c_str(), starttime.c_str(), 
-                                     endtime.c_str());
+    sprintf(tempstr, "%s/%s_%s_%s.nuv", prefix.c_str(), channel.c_str(), 
+            starttime.c_str(), endtime.c_str());
     filename = tempstr;
 }
 
 time_t RecordingInfo::GetStartTime(void)
 {
     struct tm *convtime = GetStructTM(starttime);
-
     time_t ret = mktime(convtime);
     free(convtime);
     return ret;
@@ -39,7 +38,6 @@ time_t RecordingInfo::GetStartTime(void)
 time_t RecordingInfo::GetEndTime(void)
 {
     struct tm *convtime = GetStructTM(endtime);
-
     time_t ret = mktime(convtime);
     free(convtime);
     return ret;
@@ -61,8 +59,8 @@ struct tm *RecordingInfo::GetStructTM(string &timestamp)
     rettm->tm_min = atoi(min.c_str());
     rettm->tm_hour = atoi(hour.c_str());
     rettm->tm_mday = atoi(day.c_str());
-    rettm->tm_mon = atoi(month.c_str());
-    rettm->tm_year = atoi(year.c_str());
+    rettm->tm_mon = atoi(month.c_str()) - 1;
+    rettm->tm_year = atoi(year.c_str()) - 1900;
 
     return rettm;
 }
@@ -75,7 +73,7 @@ void RecordingInfo::WriteToDB(MYSQL *conn)
     char query[4096];
     sprintf(query, "INSERT INTO recorded (channum,starttime,endtime,title,"
                    "subtitle,description) "
-                   "VALUES(%s,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\")",
+                   "VALUES(%s,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\");",
                    channel.c_str(), starttime.c_str(), endtime.c_str(), 
                    title.c_str(), subtitle.c_str(), description.c_str());
 
