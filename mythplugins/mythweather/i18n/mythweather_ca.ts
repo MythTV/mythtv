@@ -533,6 +533,109 @@
     </message>
 </context>
 <context>
+    <name>ThemeUI</name>
+    <message>
+        <source>loading...</source>
+        <translation>Carregant...</translation>
+    </message>
+    <message>
+        <source>[ retrieving weather data ... ]</source>
+        <translation>[ recuperant dades meteorològiques ... ]</translation>
+    </message>
+    <message>
+        <source>current conditions</source>
+        <translation>dades actuals</translation>
+    </message>
+    <message>
+        <source>Humidity</source>
+        <translation>Humitat</translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation>Pressió</translation>
+    </message>
+    <message>
+        <source>Wind</source>
+        <translation>Vent</translation>
+    </message>
+    <message>
+        <source>Visibility</source>
+        <translation>Visibilitat</translation>
+    </message>
+    <message>
+        <source>Wind Chill</source>
+        <translation>Sensació</translation>
+    </message>
+    <message>
+        <source>UV Index</source>
+        <translation>Radiació solar (UV)</translation>
+    </message>
+    <message>
+        <source>extended forecast</source>
+        <translation>propers dies</translation>
+    </message>
+    <message>
+        <source>LO</source>
+        <translation>MIN</translation>
+    </message>
+    <message>
+        <source>HI</source>
+        <translation>MAX</translation>
+    </message>
+    <message>
+        <source>today&apos;s forecast</source>
+        <translation>previsió per a avui</translation>
+    </message>
+    <message>
+        <source>tomorrow&apos;s outlook</source>
+        <translation>previsió per demà</translation>
+    </message>
+    <message>
+        <source>doppler radar</source>
+        <translation>Imatge del radar</translation>
+    </message>
+    <message>
+        <source>Map Unavailable</source>
+        <translation>Mapa no disponible</translation>
+    </message>
+    <message>
+        <source>RAIN</source>
+        <translation>PLUJA</translation>
+    </message>
+    <message>
+        <source>MIX/ICE</source>
+        <translation>GELADA</translation>
+    </message>
+    <message>
+        <source>SNOW</source>
+        <translation>NEU</translation>
+    </message>
+    <message>
+        <source>LIGHT</source>
+        <translation>SUAU</translation>
+    </message>
+    <message>
+        <source>HEAVY</source>
+        <translation>FORTA</translation>
+    </message>
+    <message>
+        <source>Enter Zip Code</source>
+        <translation>Còdi Postal</translation>
+    </message>
+    <message>
+        <source>weather setup</source>
+        <translation>Configuració de &quot;El Temps&quot;</translation>
+    </message>
+    <message>
+        <source>To save, press &apos;i&apos; - to cancel, hit escape</source>
+        <translation>Per a guardar, premi &apos;i&apos; - per cancel-lar, surti</translation>
+    </message>
+    <message>
+        <source>Forecast for</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Weather</name>
     <message>
         <source> is invalid)</source>

@@ -533,6 +533,109 @@
     </message>
 </context>
 <context>
+    <name>ThemeUI</name>
+    <message>
+        <source>loading...</source>
+        <translation>Indlæser...</translation>
+    </message>
+    <message>
+        <source>[ retrieving weather data ... ]</source>
+        <translation>[ henter vejr data ... ]</translation>
+    </message>
+    <message>
+        <source>current conditions</source>
+        <translation>Nuværende forhold</translation>
+    </message>
+    <message>
+        <source>Humidity</source>
+        <translation>Luftfugtighed</translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation>Lufttryk</translation>
+    </message>
+    <message>
+        <source>Wind</source>
+        <translation>Vind</translation>
+    </message>
+    <message>
+        <source>Visibility</source>
+        <translation>Sigtbarhed</translation>
+    </message>
+    <message>
+        <source>Wind Chill</source>
+        <translation>Vindafkølet luft</translation>
+    </message>
+    <message>
+        <source>UV Index</source>
+        <translation>UV Stråling</translation>
+    </message>
+    <message>
+        <source>extended forecast</source>
+        <translation>De kommende dage</translation>
+    </message>
+    <message>
+        <source>LO</source>
+        <translation>MIN</translation>
+    </message>
+    <message>
+        <source>HI</source>
+        <translation>MAX</translation>
+    </message>
+    <message>
+        <source>today&apos;s forecast</source>
+        <translation>Dagens vejrudsigt</translation>
+    </message>
+    <message>
+        <source>tomorrow&apos;s outlook</source>
+        <translation>Smugkig på i morgen</translation>
+    </message>
+    <message>
+        <source>Forecast for</source>
+        <translation>Vejrudsigt for</translation>
+    </message>
+    <message>
+        <source>doppler radar</source>
+        <translation>Doppler Radar</translation>
+    </message>
+    <message>
+        <source>Map Unavailable</source>
+        <translation>Kortet er ikke tilgængeligt</translation>
+    </message>
+    <message>
+        <source>Enter Zip Code</source>
+        <translation>Indtast postkode</translation>
+    </message>
+    <message>
+        <source>weather setup</source>
+        <translation>Vejr opsætning&quot;</translation>
+    </message>
+    <message>
+        <source>To save, press &apos;i&apos; - to cancel, hit escape</source>
+        <translation>Gem med &apos;i&apos; - afbryd med escape</translation>
+    </message>
+    <message>
+        <source>RAIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MIX/ICE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SNOW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LIGHT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HEAVY</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Weather</name>
     <message>
         <source> is invalid)</source>

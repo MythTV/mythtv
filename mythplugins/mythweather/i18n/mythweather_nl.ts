@@ -533,6 +533,109 @@
     </message>
 </context>
 <context>
+    <name>ThemeUI</name>
+    <message>
+        <source>loading...</source>
+        <translation>Bezig laden...</translation>
+    </message>
+    <message>
+        <source>[ retrieving weather data ... ]</source>
+        <translation>[ bezig ophalen weerbericht ... ]</translation>
+    </message>
+    <message>
+        <source>current conditions</source>
+        <translation>vandaag</translation>
+    </message>
+    <message>
+        <source>Humidity</source>
+        <translation>Vochtigheid</translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation>Luchtdruk</translation>
+    </message>
+    <message>
+        <source>Wind</source>
+        <translation>Wind</translation>
+    </message>
+    <message>
+        <source>Visibility</source>
+        <translation>Zichtbaarheid</translation>
+    </message>
+    <message>
+        <source>Wind Chill</source>
+        <translation>Lucht Koelte</translation>
+    </message>
+    <message>
+        <source>UV Index</source>
+        <translation>UV Index</translation>
+    </message>
+    <message>
+        <source>extended forecast</source>
+        <translation>komende dagen</translation>
+    </message>
+    <message>
+        <source>LO</source>
+        <translation>MIN</translation>
+    </message>
+    <message>
+        <source>HI</source>
+        <translation>MAX</translation>
+    </message>
+    <message>
+        <source>today&apos;s forecast</source>
+        <translation>vandaag</translation>
+    </message>
+    <message>
+        <source>tomorrow&apos;s outlook</source>
+        <translation>morgen</translation>
+    </message>
+    <message>
+        <source>Forecast for</source>
+        <translation>Verwachtingen voor</translation>
+    </message>
+    <message>
+        <source>doppler radar</source>
+        <translation>Doppler Radar</translation>
+    </message>
+    <message>
+        <source>Map Unavailable</source>
+        <translation>Weerkaart niet beschikbaar</translation>
+    </message>
+    <message>
+        <source>weather setup</source>
+        <translation>Configuratie &quot;Het Weer&quot;</translation>
+    </message>
+    <message>
+        <source>To save, press &apos;i&apos; - to cancel, hit escape</source>
+        <translation>Druk &apos;i&apos; om op te slaan - druk escape om te annuleren</translation>
+    </message>
+    <message>
+        <source>RAIN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MIX/ICE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SNOW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LIGHT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HEAVY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter Zip Code</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Weather</name>
     <message>
         <source> is invalid)</source>

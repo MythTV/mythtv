@@ -549,6 +549,109 @@
     </message>
 </context>
 <context>
+    <name>ThemeUI</name>
+    <message>
+        <source>loading...</source>
+        <translation>Laddar...</translation>
+    </message>
+    <message>
+        <source>[ retrieving weather data ... ]</source>
+        <translation>[ hämtar väderdata ... ]</translation>
+    </message>
+    <message>
+        <source>current conditions</source>
+        <translation>Nuvarande förhållanden</translation>
+    </message>
+    <message>
+        <source>Humidity</source>
+        <translation>Luftfuktighet</translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation>Lufttryck</translation>
+    </message>
+    <message>
+        <source>Wind</source>
+        <translation>Vind</translation>
+    </message>
+    <message>
+        <source>Visibility</source>
+        <translation>Sikt</translation>
+    </message>
+    <message>
+        <source>Wind Chill</source>
+        <translation>Vindkyleffekt</translation>
+    </message>
+    <message>
+        <source>UV Index</source>
+        <translation>UV Strålning</translation>
+    </message>
+    <message>
+        <source>extended forecast</source>
+        <translation>De kommande dagarna</translation>
+    </message>
+    <message>
+        <source>LO</source>
+        <translation>Min</translation>
+    </message>
+    <message>
+        <source>HI</source>
+        <translation>Max</translation>
+    </message>
+    <message>
+        <source>today&apos;s forecast</source>
+        <translation>Dagens prognos</translation>
+    </message>
+    <message>
+        <source>tomorrow&apos;s outlook</source>
+        <translation>Morgondagens prognos</translation>
+    </message>
+    <message>
+        <source>Forecast for</source>
+        <translation>Prognos för</translation>
+    </message>
+    <message>
+        <source>doppler radar</source>
+        <translation>Dopplerradar</translation>
+    </message>
+    <message>
+        <source>Map Unavailable</source>
+        <translation>Karta ej tillgänglig</translation>
+    </message>
+    <message>
+        <source>RAIN</source>
+        <translation>REGN</translation>
+    </message>
+    <message>
+        <source>MIX/ICE</source>
+        <translation>MIX/IS</translation>
+    </message>
+    <message>
+        <source>SNOW</source>
+        <translation>SNÖ</translation>
+    </message>
+    <message>
+        <source>LIGHT</source>
+        <translation>LÄTT</translation>
+    </message>
+    <message>
+        <source>HEAVY</source>
+        <translation>KRAFTIGT</translation>
+    </message>
+    <message>
+        <source>Enter Zip Code</source>
+        <translation>Mata in postnummer</translation>
+    </message>
+    <message>
+        <source>weather setup</source>
+        <translation>Inställningar för Vädervisaren</translation>
+    </message>
+    <message>
+        <source>To save, press &apos;i&apos; - to cancel, hit escape</source>
+        <translation>För att spara, tryck &apos;i&apos;. För att avbryta tryck ESCAPE</translation>
+    </message>
+</context>
+<context>
     <name>Weather</name>
     <message>
         <source> is invalid)</source>

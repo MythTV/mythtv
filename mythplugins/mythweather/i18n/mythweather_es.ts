@@ -533,6 +533,109 @@
     </message>
 </context>
 <context>
+    <name>ThemeUI</name>
+    <message>
+        <source>loading...</source>
+        <translation>Cargando...</translation>
+    </message>
+    <message>
+        <source>[ retrieving weather data ... ]</source>
+        <translation>[ obteniendo datos meteorológicos ... ]</translation>
+    </message>
+    <message>
+        <source>current conditions</source>
+        <translation>el tiempo ahora</translation>
+    </message>
+    <message>
+        <source>Humidity</source>
+        <translation>Humedad</translation>
+    </message>
+    <message>
+        <source>Pressure</source>
+        <translation>Presión</translation>
+    </message>
+    <message>
+        <source>Wind</source>
+        <translation>Viento</translation>
+    </message>
+    <message>
+        <source>Visibility</source>
+        <translation>Visibilidat</translation>
+    </message>
+    <message>
+        <source>Wind Chill</source>
+        <translation>Sensación</translation>
+    </message>
+    <message>
+        <source>UV Index</source>
+        <translation>Radiación solar (UV)</translation>
+    </message>
+    <message>
+        <source>extended forecast</source>
+        <translation>próximos días</translation>
+    </message>
+    <message>
+        <source>LO</source>
+        <translation>MIN</translation>
+    </message>
+    <message>
+        <source>HI</source>
+        <translation>MAX</translation>
+    </message>
+    <message>
+        <source>today&apos;s forecast</source>
+        <translation>previsión para hoy</translation>
+    </message>
+    <message>
+        <source>tomorrow&apos;s outlook</source>
+        <translation>previsión para mañana</translation>
+    </message>
+    <message>
+        <source>Forecast for</source>
+        <translation>Previsió per al</translation>
+    </message>
+    <message>
+        <source>doppler radar</source>
+        <translation>Imagen del radar</translation>
+    </message>
+    <message>
+        <source>Map Unavailable</source>
+        <translation>Mapa no disponible</translation>
+    </message>
+    <message>
+        <source>RAIN</source>
+        <translation>LLUVIA</translation>
+    </message>
+    <message>
+        <source>MIX/ICE</source>
+        <translation>HELADA</translation>
+    </message>
+    <message>
+        <source>SNOW</source>
+        <translation>NIEVE</translation>
+    </message>
+    <message>
+        <source>LIGHT</source>
+        <translation>LIGERA</translation>
+    </message>
+    <message>
+        <source>HEAVY</source>
+        <translation>FUERTE</translation>
+    </message>
+    <message>
+        <source>Enter Zip Code</source>
+        <translation>Código Postal</translation>
+    </message>
+    <message>
+        <source>weather setup</source>
+        <translation>Configuración de &quot;El Tiempo&quot;</translation>
+    </message>
+    <message>
+        <source>To save, press &apos;i&apos; - to cancel, hit escape</source>
+        <translation>Para guardar, pulse &apos;i&apos; - para cancelar, para cancelar salga</translation>
+    </message>
+</context>
+<context>
     <name>Weather</name>
     <message>
         <source> is invalid)</source>

@@ -1,0 +1,35 @@
+void strings_null() {
+    ThemeUI::tr("loading...");
+    ThemeUI::tr("[ retrieving weather data ... ]");
+    ThemeUI::tr("current conditions");
+    ThemeUI::tr("Humidity");
+    ThemeUI::tr("Pressure");
+    ThemeUI::tr("Wind");
+    ThemeUI::tr("Visibility");
+    ThemeUI::tr("Wind Chill");
+    ThemeUI::tr("UV Index");
+    ThemeUI::tr("extended forecast");
+    ThemeUI::tr("LO");
+    ThemeUI::tr("HI");
+    ThemeUI::tr("LO");
+    ThemeUI::tr("HI");
+    ThemeUI::tr("LO");
+    ThemeUI::tr("HI");
+    ThemeUI::tr("today's forecast");
+    ThemeUI::tr("tomorrow's outlook");
+    ThemeUI::tr("Forecast for");
+    ThemeUI::tr("doppler radar");
+    ThemeUI::tr("Map Unavailable");
+    ThemeUI::tr("RAIN");
+    ThemeUI::tr("MIX/ICE");
+    ThemeUI::tr("SNOW");
+    ThemeUI::tr("LIGHT");
+    ThemeUI::tr("LIGHT");
+    ThemeUI::tr("LIGHT");
+    ThemeUI::tr("HEAVY");
+    ThemeUI::tr("HEAVY");
+    ThemeUI::tr("HEAVY");
+    ThemeUI::tr("Enter Zip Code");
+    ThemeUI::tr("weather setup");
+    ThemeUI::tr("To save, press 'i' - to cancel, hit escape");
+}
