@@ -227,7 +227,6 @@ public:
     WeatherLocale():
         GlobalSetting("locale") {
         setLabel("Your location");
-        setValue("44106");
         setHelpText("Insert your zip code (in North America), an Airport "
                     "Code or your ACCID.  See the documentation for "
                     "instructions on how to obtain your ACCID.");
