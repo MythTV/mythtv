@@ -1900,8 +1900,6 @@ void mpeg4_encode_picture_header(MpegEncContext * s, int picture_number)
 
      s->y_dc_scale_table= ff_mpeg4_y_dc_scale_table; //FIXME add short header support 
      s->c_dc_scale_table= ff_mpeg4_c_dc_scale_table;
-     s->h_edge_pos= s->width;
-     s->v_edge_pos= s->height;
 }
 
 #endif //CONFIG_ENCODERS
@@ -4955,7 +4953,7 @@ static int decode_vop_header(MpegEncContext *s, GetBitContext *gb){
      s->y_dc_scale_table= ff_mpeg4_y_dc_scale_table; //FIXME add short header support 
      s->c_dc_scale_table= ff_mpeg4_c_dc_scale_table;
 
-     if(!(s->workaround_bugs&FF_BUG_EDGE)){
+     if(s->workaround_bugs&FF_BUG_EDGE){
          s->h_edge_pos= s->width;
          s->v_edge_pos= s->height;
      }
@@ -5174,13 +5172,18 @@ int flv_h263_decode_picture_header(MpegEncContext *s)
     s->h263_plus = 0;
 
     s->unrestricted_mv = 1;
-    s->h263_long_vectors = s->unrestricted_mv;
+    s->h263_long_vectors = 0;
 
     /* PEI */
     while (get_bits1(&s->gb) != 0) {
         skip_bits(&s->gb, 8);
     }
     s->f_code = 1;
+
+    if(s->avctx->debug & FF_DEBUG_PICT_INFO){
+        printf("%c esc_type:%d, qp:%d num:%d\n",
+               av_get_pict_type_char(s->pict_type), s->h263_flv-1, s->qscale, s->picture_number);
+    }
 
     s->y_dc_scale_table=
     s->c_dc_scale_table= ff_mpeg1_dc_scale_table;
