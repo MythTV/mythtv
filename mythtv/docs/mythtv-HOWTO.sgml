@@ -3,7 +3,7 @@
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-12-20, v1.053
+<date>2002-12-20, v1.054
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -24,10 +24,10 @@ documentation from CVS this way:
 <tscreen><verb>
 $ mkdir mythtv
 $ cd mythtv
-$ cvs -d :pserver:mythtv@mythtv.org:/var/lib/cvs login
-Logging in to :pserver:mythtv@mythtv.org:/var/lib/cvs
+$ cvs -d :pserver:mythtv@cvs.mythtv.org:/var/lib/cvs login
+Logging in to :pserver:mythtv@cvs.mythtv.org:/var/lib/cvs
 CVS password: mythtv
-$ cvs -z3 -d :pserver:mythtv@mythtv.org:/var/lib/cvs checkout MC
+$ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/cvs checkout MC
 </verb></tscreen>
 This documentation will be in the <tt>docs/</tt> subdirectory.
 
@@ -1663,6 +1663,12 @@ Using <tt>xset +DPMS</tt> will turn it back on.
 Finally, depending on your distribution, you may be able to turn it off from
 within the control panel.
 
+<sect1>I can't checkout using CVS anymore!
+<p>Isaac has changed some things around.  The CVS repository is now known as
+<tt>cvs.mythtv.org</tt>, rather than <tt>www.mythtv.org</tt> or
+<tt>mythtv.org</tt>.  Make sure you change your <tt>CVSROOT</tt> to point to
+the new server, delete your old tree, and re-do the checkout.
+
 <sect>Miscellaneous.
 <sect1>I'd like to watch the files without using mythtv / I'd like to convert the files to some other format.
 <p>Matthew Zimmerman has created a patch for MPlayer / Mencoder
@@ -1751,6 +1757,8 @@ Troubleshooting section.  Added screen blanking (DPMS) stuff.
 v1.052, 2002-12-18.  Modified section dealing with deinterlace and
 Celeron's.  (Newer Celeron's support SSE)
 v1.053, 2002-12-20.  Added a Miscellaneous section so that I could add text about MDZ's mplayer patch.
+v1.054, 2002-12-20.  Changed name of CVS box; added troubleshooting hint on
+CVS checkouts.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
