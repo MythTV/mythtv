@@ -805,6 +805,11 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
             if (tmpdata)
             {
                 QString a_string = QString(QObject::tr("%1 ~ %2")).arg(tmpdata->Artist()).arg(tmpdata->Title());
+                if(tmpdata->Artist().length() < 1 ||
+                   tmpdata-> Title().length() < 1)
+                {
+                    a_string = QString("%1 ~ Unknown").arg(tmpdata->Track());
+                }
                 GenericTree *added_node = tree_to_write_to->addNode(a_string, it->getValue() * -1, true);
                 ++a_counter;
                 added_node->setAttribute(0, 1);
