@@ -373,13 +373,16 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     mpa_ctx->prediction_method = FF_PRED_LEFT;
     if (codec.lower() == "huffyuv")
         mpa_ctx->strict_std_compliance = -1;
- 
+
+    pthread_mutex_lock(&avcodeclock); 
     if (avcodec_open(mpa_ctx, mpa_codec) < 0)
     {
+        pthread_mutex_unlock(&avcodeclock);
         cerr << "Unable to open FFMPEG/" <<  codec << " codec\n" << endl;
         return false;
     }
 
+    pthread_mutex_unlock(&avcodeclock);
     return true;
 }
 
