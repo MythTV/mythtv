@@ -87,6 +87,7 @@ void VideoInputSelector::fillSelections(QSqlDatabase* db) {
 
 void VideoInputSelector::probeInputs(const QString& videoDevice, QString cardID) {
     int videofd = open(videoDevice.ascii(), O_RDWR);
+
     if (videofd <= 0) {
         cout << "Couldn't open " << videoDevice << " to probe its inputs.\n";
         return;
@@ -97,15 +98,21 @@ void VideoInputSelector::probeInputs(const QString& videoDevice, QString cardID)
 
     struct video_capability vidcap;
     memset(&vidcap, 0, sizeof(vidcap));
-    // xxx should check return value
-    ioctl(videofd, VIDIOCGCAP, &vidcap);
+    if (ioctl(videofd, VIDIOCGCAP, &vidcap) != 0) {
+        perror("ioctl");
+        return;
+    }
     
     for (int i = 0; i < vidcap.channels; i++) {
         struct video_channel test;
         memset(&test, 0, sizeof(test));
         test.channel = i;
-        // xxx should check return value
-        ioctl(videofd, VIDIOCGCHAN, &test);
+
+        if (ioctl(videofd, VIDIOCGCHAN, &test) != 0) {
+            perror("ioctl");
+            continue;
+        }
+
         name->addSelection(test.name);
     }
 }
