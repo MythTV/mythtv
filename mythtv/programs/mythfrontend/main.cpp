@@ -421,6 +421,11 @@ int main(int argc, char **argv)
 
     QString pluginname = "";
 
+    QString binname = basename(a.argv()[0]);
+
+    if (binname != "mythfrontend")
+        pluginname = binname;
+
     for(int argpos = 1; argpos < a.argc(); ++argpos)
     {
         if (!strcmp(a.argv()[argpos],"-l") ||
