@@ -61,9 +61,9 @@ package export::VCD;
     # Load nuv info
         load_finfo($episode);
     # PAL or NTSC?
-        my $size = ($episode->{'finfo'}{'fps'} =~ /^2(?:5|4\.9)/) ? '352x288' : '352x240';
+        my $res = ($episode->{'finfo'}{'fps'} =~ /^2(?:5|4\.9)/) ? '352x288' : '352x240';
     # Build the transcode string
-        $self->{'transcode_xtra'} = " -y mpeg2enc,mp2enc -Z $size"
+        $self->{'transcode_xtra'} = " -y mpeg2enc,mp2enc -Z $res"
                                    .' -F 1 -E 44100 -b 224';
     # Add the temporary files that will need to be deleted
         push @tmpfiles, $self->get_outfile($episode, ".$$.m1v"), $self->get_outfile($episode, ".$$.mpa");

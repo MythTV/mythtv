@@ -122,9 +122,9 @@ package export::SVCD;
     # Load nuv info
         load_finfo($episode);
     # PAL or NTSC?
-        my $size = ($episode->{'finfo'}{'fps'} =~ /^2(?:5|4\.9)/) ? '480x576' : '480x480';
+        my $res = ($episode->{'finfo'}{'fps'} =~ /^2(?:5|4\.9)/) ? '480x576' : '480x480';
     # Build the transcode string
-        $self->{'transcode_xtra'} = " -y mpeg2enc,mp2enc -Z $size"
+        $self->{'transcode_xtra'} = " -y mpeg2enc,mp2enc -Z $res"
                                    .' -F 5,"-q '.$self->{'quantisation'}.'"'    # could add "-M $num_cpus" for multi-cpu here, but it actually seems to slow things down
                                    .' -w '.$self->{'v_bitrate'}
                                    .' -E 44100 -b '.$self->{'a_bitrate'};
