@@ -19,7 +19,7 @@
 #include "libmyth/settings.h"
 
 Settings *globalsettings;
-char installprefix[] = "/usr/local";
+char installprefix[] = PREFIX;
 
 using namespace std;
 

@@ -27,7 +27,7 @@
 #define wsEnter         0x8d + 256
 #define wsReturn        0x0d + 256
 
-char theprefix[] = "/usr/local";
+char theprefix[] = PREFIX;
 
 void *SpawnEncode(void *param)
 {

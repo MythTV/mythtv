@@ -7,7 +7,7 @@
 #include "libmyth/themedmenu.h"
 
 Settings *globalsettings;
-char installprefix[] = "/usr/local";
+char installprefix[] = PREFIX;
 
 int main(int argc, char **argv)
 {

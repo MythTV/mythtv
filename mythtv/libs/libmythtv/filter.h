@@ -7,7 +7,7 @@
 
 #include "frame.h"
 
-#define MYTHTV_FILTER_PATH "/usr/local/lib/mythtv/filters"
+#define MYTHTV_FILTER_PATH PREFIX"/lib/mythtv/filters"
 
 typedef struct  VideoFilter_
 {

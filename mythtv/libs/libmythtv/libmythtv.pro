@@ -11,7 +11,7 @@ include ( ../../settings.pro )
 INCLUDEPATH += ../libNuppelVideo ../
 TARGETDEPS = ../libNuppelVideo/libNuppelVideo.a 
 
-installfiles.path = /usr/local/share/mythtv
+installfiles.path = $${PREFIX}/share/mythtv
 installfiles.files = helr.ttf
 installfiles.files += settings.txt
 

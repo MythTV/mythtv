@@ -18,7 +18,7 @@ using namespace std;
 #include "libmyth/themedmenu.h"
 #include "libmyth/programinfo.h"
 
-char installprefix[] = "/usr/local";
+char installprefix[] = PREFIX;
 
 QString prefix;
 QMap<int, TV *> tvList;

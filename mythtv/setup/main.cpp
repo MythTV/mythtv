@@ -21,7 +21,7 @@
 using namespace std;
 
 Settings *globalsettings;
-char installprefix[] = "/usr/local";
+char installprefix[] = PREFIX;
 
 
 QString getResponse(const QString &query, const QString &def)
