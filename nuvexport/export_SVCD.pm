@@ -29,14 +29,10 @@ package export_SVCD;
 					 @_		#allows user-specified attributes to override the defaults
 					};
 		bless($self, $class);
-	# Make sure that we have an mp2 encoder
-		$Prog{mp2_encoder} = find_program('toolame');
 	# Make sure that we have an mplexer
 		$Prog{mplexer} = find_program('tcmplex', 'mplex');
 		push @{$self->{errors}}, 'You need tcmplex or mplex to export an svcd.' unless ($Prog{mplexer});
 	# Make sure that we have the other necessary programs
-		find_program('mpeg2enc')
-			or push @{$self->{errors}}, 'You need mpeg2enc to export an svcd.';
 		find_program('yuvscaler')
 			or push @{$self->{errors}}, 'You need yuvscaler to export an svcd.';
 	# Do we have yuvdenoise?
@@ -178,22 +174,9 @@ package export_SVCD;
 			}
 		}
 	# Now we fork off a process to encode the audio
-		if ($Prog{mp2_encoder} =~ /\btoolame$/) {
-		# Resample audio?
-			if ($nuv_info{audio_sample_rate} != 44100) {
-				$command = "nice -n 19 sox -t raw -r $nuv_info{audio_sample_rate} -s -w -c 2 $self->{fifodir}/audout -t raw -r 44100 -s -w -c 2 - resample"
-						  ." | nice -n 19 toolame -s 44.1 -m j -b $self->{a_bitrate} - $self->{tmp_a}";
-			}
-		# Audio is the proper sample rate
-			else {
-				$command = "nice -n 19 toolame -s 44.1 -m j -b $self->{a_bitrate} $self->{fifodir}/audout $self->{tmp_a}";
-			}
-		}
-		else {
-			$command = "nice -n 19 ffmpeg -f s16le -ar $nuv_info{audio_sample_rate} -ac 2 -i $self->{fifodir}/audout -ar 44100 -ab $self->{a_bitrate} -vn -f mp2 $self->{tmp_a}";
-		}
+		$command = "nice -n 19 ffmpeg -f s16le -ar $nuv_info{audio_sample_rate} -ac 2 -i $self->{fifodir}/audout -ar 44100 -ab $self->{a_bitrate} -vn -f mp2 $self->{tmp_a}";
 		if ($DEBUG) {
-			print "\ntoolame command:\n\n$command\n";
+			print "\naudio command:\n\n$command\n";
 		}
 		else {
 			push @{$self->{children}}, fork_command($command);
@@ -208,7 +191,7 @@ package export_SVCD;
 		$command = "nice -n 19 ffmpeg -f rawvideo -s $nuv_info{width}x$nuv_info{height} -r $nuv_info{fps} -i $self->{fifodir}/vidout -f yuv4mpegpipe -";
 	# Certain options for PAL
 		if ($nuv_info{fps} =~ /^2(?:5|4\.9)/) {
-			$command .= " | nice -n 19 yuvdenoise -r 16" if ($self->{noise_reduction});
+			$command .= " | nice -n 19 yuvdenoise -F -r 16" if ($self->{noise_reduction});
 			$command .= " | nice -n 19 yuvscaler -v 0 -n p -M BICUBIC -O SVCD";
 			$framerate = 3;
 		}
@@ -216,7 +199,7 @@ package export_SVCD;
 		else {
 			# SOMEDAY I'd like to be able to get 3:2 pulldown working properly....
 			#$command .= " | yuvkineco -F 1" if ($pulldown);
-			$command .= " | nice -n 19 yuvdenoise -r 16" if ($self->{noise_reduction});
+			$command .= " | nice -n 19 yuvdenoise -F -r 16" if ($self->{noise_reduction});
 			$command .= " | nice -n 19 yuvscaler -v 0 -n n -M BICUBIC -O SVCD";
 			$framerate = 4;
 		}
@@ -224,9 +207,11 @@ package export_SVCD;
 		$command .= " | nice -n 19 mpeg2enc --format 5 --quantisation $self->{quantisation} --quantisation-reduction 2"
 					." --video-bitrate $self->{v_bitrate} --aspect 2 --frame-rate $framerate"
 					#.($pulldown ? ' --frame-rate 1 --3-2-pulldown' : " --frame-rate $framerate")
-					." --interlace-mode 1 --motion-search-radius 24 --video-buffer 230"
+					#." --interlace-mode 1 --motion-search-radius 24 --video-buffer 230"
+					." --interlace-mode 0 --video-buffer 230"
 					." --nonvideo-bitrate $self->{a_bitrate} --sequence-length 795"
-					." --reduction-4x4 1 --reduction-2x2 1 --keep-hf"
+					#." --reduction-4x4 1 --reduction-2x2 1 --keep-hf"
+					." --reduction-4x4 2 --reduction-2x2 1"
 					.($cpus > 1 ? " --multi-thread $cpus" : '')
 					." -o $self->{tmp_v}";
 		if ($DEBUG) {
