@@ -23,7 +23,7 @@ public:
 
 class VideoDefaultParentalLevel: public ComboBoxSetting, public GlobalSetting {
 public:
-    VideoDefaultParentalLevel() : ComboBoxSetting(true),
+    VideoDefaultParentalLevel() :
       GlobalSetting("VideoDefaultParentalLevel") {
         setLabel(QObject::tr("Starting Parental Level"));
         addSelection(QObject::tr("4 - Highest"), "4");
