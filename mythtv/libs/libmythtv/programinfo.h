@@ -90,6 +90,8 @@ class ProgramInfo
 
     ProgramInfo& operator=(const ProgramInfo &other);
     ProgramInfo& clone(const ProgramInfo &other);
+
+    bool IsFindApplicable(void) const;
     
     // returns 0 for one-time, 1 for weekdaily, 2 for weekly
     int IsProgramRecurring(void);

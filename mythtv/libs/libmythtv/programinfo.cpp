@@ -636,6 +636,13 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
 }
 
 
+bool ProgramInfo::IsFindApplicable(void) const
+{
+    return rectype == kFindDailyRecord ||
+           rectype == kFindWeeklyRecord;
+}
+
+
 // -1 for no data, 0 for no, 1 for weekdaily, 2 for weekly.
 int ProgramInfo::IsProgramRecurring(void)
 {
@@ -2490,10 +2497,11 @@ void ProgramInfo::handleRecording()
                 addov = button++;
             }
             if (rectype != kFindOneRecord &&
-                !(findid == 0 && catType == "series" &&
+                !((findid == 0 || !IsFindApplicable()) &&
+                  catType == "series" &&
                   programid.contains(QRegExp("0000$"))) &&
                 ((!(dupmethod & kDupCheckNone) && programid != "" && 
-                  findid != 0) ||
+                  (findid != 0 || !IsFindApplicable())) ||
                  ((dupmethod & kDupCheckSub) && subtitle != "") ||
                  ((dupmethod & kDupCheckDesc) && description != "")))
             {
@@ -2600,7 +2608,7 @@ void ProgramInfo::handleNotRecording()
 
     DialogBox diag(gContext->GetMainWindow(), message);
     int button = 1, ok = -1, react = -1, addov = -1, clearov = -1,
-        ednorm = -1, edcust = -1, forget = -1;
+        ednorm = -1, edcust = -1, forget = -1, addov1 = -1, forget1 = -1;
 
     diag.AddButton(QObject::tr("OK"));
     ok = button++;
@@ -2638,6 +2646,29 @@ void ProgramInfo::handleNotRecording()
 
         if (rectype != kOverrideRecord && rectype != kDontRecord)
         {
+            if (rectype != kSingleRecord &&
+                recstatus != rsPreviousRecording &&
+                recstatus != rsCurrentRecording)
+            {
+                if (recstartts > now)
+                {
+                    diag.AddButton(QObject::tr("Absolutely don't record"));
+                    addov1 = button++;
+                }
+                if (rectype != kFindOneRecord &&
+                    !((findid == 0 || !IsFindApplicable()) &&
+                      catType == "series" &&
+                      programid.contains(QRegExp("0000$"))) &&
+                    ((!(dupmethod & kDupCheckNone) && programid != "" && 
+                      (findid != 0 || !IsFindApplicable())) ||
+                     ((dupmethod & kDupCheckSub) && subtitle != "") ||
+                     ((dupmethod & kDupCheckDesc) && description != "")))
+                {
+                    diag.AddButton(QObject::tr("Never record"));
+                    forget1 = button++;
+                }
+            }
+
             diag.AddButton(QObject::tr("Edit Options"));
             ednorm = button++;
 
@@ -2672,6 +2703,13 @@ void ProgramInfo::handleNotRecording()
     {
         GetProgramRecordingStatus();
         record->forgetHistory(*this);
+    }
+    else if (ret == addov1)
+        ApplyRecordStateChange(kDontRecord);
+    else if (ret == forget1)
+    {
+        GetProgramRecordingStatus();
+        record->addHistory(*this);
     }
     else if (ret == clearov)
         ApplyRecordStateChange(kNotRecording);
