@@ -163,8 +163,10 @@ bool MediaMonitor::addDevice(struct fstab * mep)
           }
      }
 
-     if (strstr(mep->fs_mntops, MNTTYPE_ISO9660) || 
-         strstr(mep->fs_vfstype, MNTTYPE_ISO9660)) 
+     if (strstr(mep->fs_mntops, MNTTYPE_ISO9660)  || 
+         strstr(mep->fs_vfstype, MNTTYPE_ISO9660) || 
+         strstr(mep->fs_vfstype, MNTTYPE_UDF)     || 
+         strstr(mep->fs_vfstype, MNTTYPE_AUTO)) 
      {
          is_cdrom = true;
          //cout << "Device is a CDROM" << endl;
