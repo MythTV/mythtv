@@ -286,7 +286,11 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
 
     if (xv_port == -1)
     {
-        printf("Couldn't find Xv support, falling back to non-Xv mode\n");
+        printf("Couldn't find Xv support, falling back to non-Xv mode.\n");
+        printf("* MythTV performance will be much slower since color\n");
+        printf("* conversion and scaling will be done in software.\n");
+        printf("* Consider upgrading your video card or X server if\n");
+        printf("* you would like better performance.\n");
     }
 
     int formats;
