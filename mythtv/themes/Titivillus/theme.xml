@@ -16,6 +16,8 @@
     <image mode="SCHEDULE">title/title_schedule.png</image>
     <image mode="SEARCH">title/title_search.png</image>
     <image mode="SETUP">title/title_setup.png</image>
+    <image mode="MEDIA_SETUP">title/title_setup.png</image>
+    <image mode="INFO_SETUP">title/title_setup.png</image>
     <image mode="TVSETUP">title/title_tv_settings.png</image>
     <image mode="DVD">title/title_dvd.png</image>
     <image mode="DVD_SETTINGS">title/title_dvd_setup.png</image>
