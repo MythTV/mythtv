@@ -1020,14 +1020,20 @@ void NuppelVideoRecorder::StartRecording(void)
         //if (!quiet) 
         //    fprintf(stderr, "%s\n", "unmuting tv-audio");
         // audio hack, to enable audio from tvcard, in case we use a tuner
-        va.audio = 0; // use audio channel 0
+
         if (ioctl(fd, VIDIOCGAUDIO, &va)<0) 
             perror("VIDIOCGAUDIO"); 
         memcpy(origaudio, &va, sizeof(struct video_audio));
         setorigaudio = true;
         //if (!quiet) 
         //    fprintf(stderr, "audio volume was '%d'\n", va.volume);
-        va.audio = 0;
+
+        // I don't know why this was here, but it causes me to get
+        // audio from the wrong input (but only in certain situations).  This took a
+        // VERY LONG TIME to track down.
+        // -mdz
+        //va.audio = 0;
+
         va.flags &= ~VIDEO_AUDIO_MUTE; // now this really has to work
 
         if ((volume == -1 && va.volume < 32768) || volume != -1) 
