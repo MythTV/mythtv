@@ -276,6 +276,10 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
             CycleVisualizer();
             handled = true;
             break;
+        case Key_7:
+            toggleFullBlankVisualizer();
+            handled = true;
+            break;
         case '[':
             changeVolume(false);
             handled = true;
@@ -296,6 +300,19 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
         {
             visualizer_status = 1;
             QString visual_workaround = mainvisual->getCurrentVisual();
+
+            //
+            //  We may have gotten to full screen by pushing 7
+            //  (full screen blank). Or it may be blank because
+            //  the user likes "Blank". Figure out what to do ...
+            //
+            
+            if(visual_workaround == "Blank" &&
+               visual_mode != "Blank")
+            {
+                visual_workaround = visual_mode;
+            }
+
             mainvisual->setVisual("Blank");
             if(visual_blackhole)
                 mainvisual->setGeometry(visual_blackhole->getScreenArea());
@@ -1134,7 +1151,10 @@ void PlaybackBox::customEvent(QCustomEvent *event)
                 if (info_text)
                     info_text->SetText(info_string);
                 if (current_visualization_text)
+                {
                     current_visualization_text->SetText(mainvisual->getCurrentVisual());
+                    current_visualization_text->refresh();
+                }
             }
 
             break;
@@ -1252,7 +1272,22 @@ void PlaybackBox::handleTreeListSignals(int node_int, IntVector *attributes)
                 ratings_image->setRepeat(curMeta->Rating());
         }
 
-        play();
+        if(isplaying)
+        {
+            play();
+        }
+        else
+        {
+            stop();
+            if(play_button)
+            {
+                play_button->push();
+            }
+            else
+            {
+                play();
+            }
+        }
         
     }
     else
@@ -1262,6 +1297,48 @@ void PlaybackBox::handleTreeListSignals(int node_int, IntVector *attributes)
     }
 }
 
+
+void PlaybackBox::toggleFullBlankVisualizer()
+{
+    if( mainvisual->getCurrentVisual() == "Blank" &&
+        visualizer_status == 2)
+    {
+        //
+        //  If we are already full screen and 
+        //  blank, go back to regular dialog
+        //
+
+        if(visual_blackhole)
+            mainvisual->setGeometry(visual_blackhole->getScreenArea());
+        else
+            mainvisual->setGeometry(screenwidth + 10, screenheight + 10, 
+                                    160, 160);
+        mainvisual->setVisual(visual_mode);
+        visualizer_status = 1;
+        if(visual_mode_delay > 0)
+        {
+            visual_mode_timer->start(visual_mode_delay * 1000);
+        }
+        if (current_visualization_text)
+        {
+            current_visualization_text->SetText(mainvisual->getCurrentVisual());
+            current_visualization_text->refresh();
+        }
+        setUpdatesEnabled(true);
+    }
+    else
+    {
+        //
+        //  Otherwise, go full screen blank
+        //
+
+        mainvisual->setVisual("Blank");
+        mainvisual->setGeometry(0, 0, screenwidth, screenheight);
+        visualizer_status = 2;
+        visual_mode_timer->stop();
+        setUpdatesEnabled(false);
+    }
+}
 
 void PlaybackBox::wireUpTheme()
 {

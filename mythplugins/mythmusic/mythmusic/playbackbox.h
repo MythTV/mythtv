@@ -68,6 +68,7 @@ class PlaybackBox : public MythThemedDialog
     void hideVolume(){showVolume(false);}
     void showVolume(bool on_or_off);
     void wipeTrackInfo();
+    void toggleFullBlankVisualizer();
     
   signals:
   
