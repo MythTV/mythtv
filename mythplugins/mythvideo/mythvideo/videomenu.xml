@@ -1,0 +1,17 @@
+<mythmenu>
+
+   <button>
+     <type>TV</type>
+     <text>TV Shows</text>
+     <action>EXEC mythexplorer /mnt/movies movies</action>
+   </button>
+
+  <button>
+     <type>Videos</type>
+     <text>Movies</text>
+     <action>EXEC mythexplorer /mnt/tvshows movies</action>
+   </button>
+
+
+</mythmenu>
+
