@@ -12,7 +12,7 @@
 #include <mythtv/mythcontext.h>
 
 SingleView::SingleView(QSqlDatabase *db, vector<Thumbnail> *imagelist, int pos,
-                       QWidget *parent, const char *name)
+                       MythMainWindow *parent, const char *name)
 	  : MythDialog(parent, name)
 {
     m_db = db;
@@ -37,10 +37,7 @@ SingleView::SingleView(QSqlDatabase *db, vector<Thumbnail> *imagelist, int pos,
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), SLOT(advanceFrame()));    
 
-    WFlags flags = getWFlags();
-    setWFlags(flags | Qt::WRepaintNoErase);
-
-    showFullScreen();
+    setNoErase();
 }
 
 SingleView::~SingleView()
@@ -143,9 +140,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
         case Key_Left:
         case Key_Up:
         {
-            imagepos--;
-            if (imagepos < 0)
-                imagepos = images->size() - 1;
+            retreatFrame(false);
             handled = true;
             rotateAngle = 0;
             break;
@@ -156,9 +151,7 @@ void SingleView::keyPressEvent(QKeyEvent *e)
         case Key_Enter:
         case Key_Return:
         {
-            imagepos++;
-            if (imagepos == (int)images->size())
-                imagepos = 0;
+            advanceFrame(false);
             handled = true;
             rotateAngle = 0;
             break;
@@ -182,15 +175,39 @@ void SingleView::keyPressEvent(QKeyEvent *e)
     else
     {
         imagepos = oldpos;
-        QDialog::keyPressEvent(e);
+        MythDialog::keyPressEvent(e);
     }
 }
 
-void SingleView::advanceFrame(void)
+void SingleView::retreatFrame(bool doUpdate)
+{
+    imagepos--;
+    if (imagepos < 0)
+        imagepos = images->size() - 1;
+
+    if ((*images)[imagepos].isdir)
+        retreatFrame(doUpdate);
+
+    if (doUpdate)
+        update();
+}
+
+void SingleView::advanceFrame(bool doUpdate)
 {
     imagepos++;
     if (imagepos == (int)images->size())
         imagepos = 0;
 
-    update();
+    if ((*images)[imagepos].isdir)
+        advanceFrame(doUpdate);
+
+    if (doUpdate)
+        update();
 }
+
+void SingleView::startShow(void)
+{
+    timerrunning = true;
+    timer->start(timersecs * 1000);
+}
+

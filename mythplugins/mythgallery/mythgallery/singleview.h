@@ -17,11 +17,14 @@ class SingleView : public MythDialog
     Q_OBJECT
   public:
     SingleView(QSqlDatabase *db, vector<Thumbnail> *imagelist, int pos, 
-               QWidget *parent = 0, const char *name = 0);
+               MythMainWindow *parent, const char *name = 0);
    ~SingleView();
 
+    void startShow(void);
+
   protected slots:
-    void advanceFrame(void);
+    void advanceFrame(bool doUpdate = true);
+    void retreatFrame(bool doUpdate = true);
 
   protected:
     void paintEvent(QPaintEvent *e);

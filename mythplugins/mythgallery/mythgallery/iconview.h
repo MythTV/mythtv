@@ -36,8 +36,8 @@ class IconView : public MythDialog
 {
     Q_OBJECT
   public:
-    IconView(QSqlDatabase *db, const QString &startdir, QWidget *parent = 0,
-             const char *name = 0);
+    IconView(QSqlDatabase *db, const QString &startdir, 
+             MythMainWindow *parent, const char *name = 0);
    ~IconView();
 
   protected:

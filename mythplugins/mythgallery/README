@@ -30,19 +30,21 @@ Follow this by a 'make install'.  It'll put a 'mythgallery' binary in your
 /usr/local/bin directory, and stuff mythgallery-settings.txt in your
 existing /usr/local/share/mythtv/ directory.
 
-You'll probably want to edit the mythgallery-settings.txt file to set where
-your images are stored.
-
 MythGallery will also read the mysql.txt settings files used by
 MythTV, so any changes you made to those will be carried over into this.
 
 You need to insert database/gallery.sql into your existing database setup
 from MythTV.
 
+The first time you run mythgallery, you will need to hit 'm' or 'i' and
+tell it where your images are located.
+
 This should be really simple to use -- just browse around with the arrow keys
 and select images/directories to view with the space/enter keys.  Escape backs 
-out a level, and hitting 'p' or 'P' while viewing a single image will start a
-slideshow playback of all images in that directory.
+out a level, and hitting 'p' while viewing a single image or while
+an image icon is highlighted will start a slideshow playback of all images 
+in that directory.  Hitting 'm' or 'i' while viewing icons brings up the
+settings dialog.
 
 Feel free to subscribe to the development mailing list at:
 http://www.snowman.net/mailman/listinfo/mythtv-dev

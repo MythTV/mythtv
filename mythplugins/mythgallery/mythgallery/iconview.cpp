@@ -8,6 +8,7 @@
 
 #include "iconview.h"
 #include "singleview.h"
+#include "gallerysettings.h"
 
 #include "mythtv/mythcontext.h"
 
@@ -16,7 +17,7 @@
 QPixmap *IconView::foldericon = NULL;
 
 IconView::IconView(QSqlDatabase *db, const QString &startdir, 
-                   QWidget *parent, const char *name)
+                   MythMainWindow *parent, const char *name)
         : MythDialog(parent, name)
 {
     m_db = db;
@@ -49,10 +50,7 @@ IconView::IconView(QSqlDatabase *db, const QString &startdir,
         foldericon->convertFromImage(tmp2);
     }
 
-    WFlags flags = getWFlags();
-    setWFlags(flags | Qt::WRepaintNoErase);
-
-    showFullScreen();
+    setNoErase();
 }
 
 IconView::~IconView()
@@ -244,13 +242,15 @@ bool IconView::moveLeft()
     if (curcol < 0)
     {
         currow--;
+        curcol = THUMBS_W - 1;
         if (currow < 0)
         {
             if (screenposition > 0)
                 screenposition -= 3;
+            else
+                curcol = 0;
             currow = 0;
         }
-        curcol = THUMBS_W - 1;
     }
     return true;
 }
@@ -309,19 +309,24 @@ void IconView::keyPressEvent(QKeyEvent *e)
         case Key_Space:
         case Key_Enter:
         case Key_Return:
+        case Key_P:
         {
             int pos = screenposition + currow * THUMBS_W + curcol;
 
             if (thumbs[pos].isdir)
             {
-                IconView iv(m_db, thumbs[pos].filename); 
+                IconView iv(m_db, thumbs[pos].filename, 
+                            gContext->GetMainWindow()); 
                 iv.exec();
             }
             else
             {
-                SingleView sv(m_db, &thumbs, pos);
+                SingleView sv(m_db, &thumbs, pos, gContext->GetMainWindow());
+                if (e->key() == Key_P)
+                    sv.startShow();
                 sv.exec();
             }
+
             handled = true;
             break;
         }
@@ -356,6 +361,12 @@ void IconView::keyPressEvent(QKeyEvent *e)
             handled = true;
             break;
         }
+        case Key_M: case Key_I:
+        {
+            GallerySettings settings;
+            settings.exec(QSqlDatabase::database());
+            break;
+        }
         default: break;
     }
 
@@ -368,7 +379,7 @@ void IconView::keyPressEvent(QKeyEvent *e)
         screenposition = oldpos;
         currow = oldrow;
         curcol = oldcol;
-        QDialog::keyPressEvent(e);
+        MythDialog::keyPressEvent(e);
     }
 }
 

@@ -10,13 +10,8 @@ TARGET = mythgallery
 target.path = $${PREFIX}/bin
 INSTALLS += target
 
-installfiles.path = $${PREFIX}/share/mythtv
-installfiles.files = mythgallery-settings.txt
-
-INSTALLS += installfiles
-
 LIBS += -L$${PREFIX}/lib -lmyth-$$LIBVERSION -lXinerama
 
 # Input
-HEADERS += embdata.h iconview.h singleview.h
-SOURCES += iconview.cpp main.cpp singleview.cpp
+HEADERS += embdata.h iconview.h singleview.h gallerysettings.h
+SOURCES += iconview.cpp main.cpp singleview.cpp gallerysettings.cpp

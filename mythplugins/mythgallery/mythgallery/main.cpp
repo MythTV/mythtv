@@ -31,13 +31,15 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    gContext->LoadSettingsFiles("mythgallery-settings.txt");
-
     gContext->LoadQtConfig();
+
+    MythMainWindow *mainWindow = new MythMainWindow();
+    mainWindow->Show();
+    gContext->SetMainWindow(mainWindow);
 
     QString startdir = gContext->GetSetting("GalleryDir");
 
-    IconView icv(db, startdir);
+    IconView icv(db, startdir, mainWindow, "icon view");
 
     icv.exec();
 
