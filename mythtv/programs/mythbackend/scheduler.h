@@ -9,9 +9,10 @@ class MythContext;
 #include <qmap.h> 
 #include <list>
 #include <vector>
+#include <qobject.h>
 using namespace std;
 
-class Scheduler
+class Scheduler : public QObject
 {
   public:
     Scheduler(MythContext *context, QMap<int, EncoderLink *> *tvList,
@@ -21,7 +22,9 @@ class Scheduler
     bool CheckForChanges(void);
     bool FillRecordLists(bool doautoconflicts = true);
 
-    void RemoveFirstRecording(void ); 
+    void RemoveRecording(ProgramInfo *pginfo);
+
+    void RemoveFirstRecording(void); 
     ProgramInfo *GetNextRecording(void);
 
     list<ProgramInfo *> *getAllPending(void) { return &recordingList; }
@@ -31,6 +34,8 @@ class Scheduler
                                         list<ProgramInfo *> *uselist = NULL);
 
     void PrintList(void);
+
+    void customEvent(QCustomEvent *e);
 
   protected:
     void RunScheduler(void);
@@ -79,6 +84,9 @@ class Scheduler
     QMap<int, EncoderLink *> *m_tvList;   
 
     QMap<QString, bool> askedList;
+    QMap<QString, bool> responseList;
+
+    pthread_mutex_t schedulerLock;
 };
 
 #endif

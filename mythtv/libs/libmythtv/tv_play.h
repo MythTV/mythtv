@@ -28,6 +28,7 @@ class TV : public QObject
     void Init(void);
 
     TVState LiveTV(void);
+    void StopLiveTV(void) { exitPlayer = true; }
 
     int AllowRecording(const QString &message, int timeuntil);
 

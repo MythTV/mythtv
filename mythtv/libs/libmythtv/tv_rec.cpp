@@ -144,8 +144,6 @@ void TVRec::StartRecording(ProgramInfo *rcinfo)
 
         nextState = kState_RecordingOnly;
         changeState = true;
-
-        WriteRecordedRecord();
     }
     else if (internalState == kState_WatchingLiveTV)
     {
@@ -153,10 +151,10 @@ void TVRec::StartRecording(ProgramInfo *rcinfo)
         recordEndTime = rcinfo->endts;
         curRecording = new ProgramInfo(*rcinfo);
 
-        nextState = kState_WatchingRecording;
-        changeState = true;
+        QString message = QString("LIVE_TV_READY %1").arg(m_capturecardnum);
+        MythEvent me(message);
 
-        WriteRecordedRecord();
+        context->dispatch(me);
     }  
 }
 
@@ -289,6 +287,8 @@ void TVRec::HandleStateChange(void)
         SetChannel(true);  
         rbuffer = new RingBuffer(context, outputFilename, true);
 
+        WriteRecordedRecord();
+
         internalState = nextState;
         nextState = kState_None;
         changed = true;
@@ -307,6 +307,57 @@ void TVRec::HandleStateChange(void)
 
         watchingLiveTV = false;
     }
+    else if (internalState == kState_WatchingLiveTV &&
+             nextState == kState_WatchingRecording)
+    {
+        nvr->Pause();
+        while (!nvr->GetPause())
+            usleep(5);
+
+        rbuffer->Reset();
+        SetChannel(false);
+
+        nvr->Reset();
+        nvr->TransitionToFile(outputFilename);
+
+        nvr->Unpause();
+
+        WriteRecordedRecord();
+
+        internalState = nextState;
+        changed = true;
+    }
+    else if (internalState == kState_WatchingRecording &&
+             nextState == kState_WatchingLiveTV)
+    {
+        nvr->Pause();
+        while (!nvr->GetPause())
+            usleep(5);
+
+        nvr->TransitionToRing();
+
+        nvr->Unpause();
+
+        int filelen = (int)(((float)nvr->GetFramesWritten() / frameRate));
+
+        QString message = QString("DONE_RECORDING %1 %2").arg(m_capturecardnum)
+                                                         .arg(filelen);
+        MythEvent me(message);
+        context->dispatch(me);
+
+        delete curRecording;
+        curRecording = NULL;
+
+        MythEvent me2("RECORDING_LIST_CHANGE");
+        context->dispatch(me2);
+
+        outputFilename = context->GetSetting("LiveBufferDir") + 
+                         QString("/ringbuf%1.nuv").arg(m_capturecardnum);
+
+        inoverrecord = false;
+        internalState = nextState;
+        changed = true;
+    }
     else if (internalState == kState_None && 
              nextState == kState_None)
     {
@@ -315,8 +366,8 @@ void TVRec::HandleStateChange(void)
 
     if (!changed)
     {
-        printf("Unknown state transition: %d to %d\n", internalState,
-                                                       nextState);
+        printf("Unknown state transition: %s to %s\n", origname.ascii(),
+                                                       statename.ascii());
     }
     else
     {
@@ -362,7 +413,8 @@ void TVRec::HandleStateChange(void)
     changeState = false;
 }
 
-void TVRec::SetupRecorder(RecordingProfile& profile) {
+void TVRec::SetupRecorder(RecordingProfile& profile) 
+{
     nvr = new NuppelVideoRecorder();
     nvr->SetRingBuffer(rbuffer);
     nvr->SetVideoDevice(videodev);
@@ -964,6 +1016,18 @@ long long TVRec::GetFreeSpace(long long totalreadpos)
                rbuffer->GetTotalWritePosition() - rbuffer->GetSmudgeSize();
 
     return -1;
+}
+
+void TVRec::TriggerRecordingTransition(void)
+{
+    if (!curRecording)
+        return;
+
+    if (internalState != kState_WatchingLiveTV)
+        return;
+
+    nextState = kState_WatchingRecording;
+    changeState = true;
 }
 
 void TVRec::SetupRingBuffer(QString &path, long long &filesize, 

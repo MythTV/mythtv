@@ -1246,6 +1246,11 @@ void NuppelVideoRecorder::Reset(void)
     audiobytes = 0;
     effectivedsp = 0;
 
+    if (useavcodec)
+    {
+        SetupAVCodec();
+    }
+
     seektable->clear();
 }
 

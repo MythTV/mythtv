@@ -125,6 +125,10 @@ void MainServer::readSocket(void)
                 else
                     HandleFileTransferQuery(listline, tokens, pbs);
             }
+            else if (command == "MESSAGE")
+            {
+                HandleMessage(listline, pbs);
+            }
             else
             {
                cout << "unknown command: " << command << endl;
@@ -172,9 +176,10 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
     if (commands[1] == "Playback")
     {
-        bool wantevents = commands[3];
+        bool wantevents = commands[3].toInt();
 
-        cout << "adding: " << commands[2] << " as a player\n";
+        cout << "adding: " << commands[2] << " as a player " << wantevents
+             << "\n";
         PlaybackSock *pbs = new PlaybackSock(socket, commands[2], wantevents);
         playbackList.push_back(pbs);
     }
@@ -587,6 +592,11 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         encodeLongLong(retlist, filesize);
         encodeLongLong(retlist, fillamount);
     }
+    else if (command == "TRIGGER_RECORDING_TRANSITION")
+    {
+        enc->TriggerRecordingTransition();
+        retlist << "ok";
+    }
     else if (command == "SPAWN_LIVETV")
     {
         enc->SpawnLiveTV();
@@ -821,6 +831,18 @@ void MainServer::HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs)
     retlist << m_context->GetSetting("ServerPort");
 
     WriteStringList(pbs->getSocket(), retlist);    
+}
+
+void MainServer::HandleMessage(QStringList &slist, PlaybackSock *pbs)
+{
+    QString message = slist[1];
+
+    MythEvent me(message);
+    m_context->dispatch(me);
+
+    QStringList retlist = "OK";
+
+    WriteStringList(pbs->getSocket(), retlist);
 }
 
 void MainServer::endConnection(QSocket *socket)

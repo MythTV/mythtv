@@ -22,6 +22,8 @@ vector<ProgramInfo *> *RemoteGetConflictList(MythContext *context,
                                              ProgramInfo *pginfo,
                                              bool removenonplaying);
 
+void RemoteSendMessage(MythContext *context, const QString &message);
+
 RemoteEncoder *RemoteRequestRecorder(MythContext *context);
 RemoteEncoder *RemoteGetExistingRecorder(MythContext *context,
                                          ProgramInfo *pginfo);

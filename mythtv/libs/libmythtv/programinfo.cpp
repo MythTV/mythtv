@@ -24,6 +24,8 @@ ProgramInfo::ProgramInfo(void)
     sourceid = -1;
     inputid = -1;
     cardid = -1;
+    schedulerid = "";
+
     record = NULL;
 }   
         
@@ -51,6 +53,8 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
     sourceid = other.sourceid;
     inputid = other.inputid;
     cardid = other.cardid;
+    schedulerid = other.schedulerid;
+
     record = NULL;
 }
 

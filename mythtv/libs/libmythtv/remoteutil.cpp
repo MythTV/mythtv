@@ -131,3 +131,10 @@ RemoteEncoder *RemoteGetExistingRecorder(MythContext *context,
     return new RemoteEncoder(num, hostname, port);
 }
 
+void RemoteSendMessage(MythContext *context, const QString &message)
+{
+    QStringList strlist = "MESSAGE";
+    strlist << message;
+
+    context->SendReceiveStringList(strlist);
+}

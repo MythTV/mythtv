@@ -310,26 +310,20 @@ void RingBuffer::Start(void)
         remotefile->Start();
 }
 
+// guaranteed to be paused, so don't need to lock this
 void RingBuffer::TransitionToFile(const QString &lfilename)
 {
-    pthread_rwlock_wrlock(&rwlock);
-
     dumpfw = new ThreadedFileWriter(lfilename.ascii(), 
                   O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE, 0644);
     dumpwritepos = 0;
-
-    pthread_rwlock_unlock(&rwlock);
 }
 
+// guaranteed to be paused, so don't need to lock this
 void RingBuffer::TransitionToRing(void)
 {
-    pthread_rwlock_wrlock(&rwlock);
- 
     delete dumpfw;
     dumpfw = NULL;
     dumpwritepos = 0;
-
-    pthread_rwlock_unlock(&rwlock);
 }
 
 void RingBuffer::Reset(void)

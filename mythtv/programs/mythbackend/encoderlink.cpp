@@ -149,6 +149,12 @@ long long EncoderLink::GetKeyframePosition(long long desired)
     return -1;
 }
 
+void EncoderLink::TriggerRecordingTransition(void)
+{
+    if (local)
+        tv->TriggerRecordingTransition();
+}
+
 void EncoderLink::SetupRingBuffer(QString &path, long long &filesize,
                                   long long &fillamount, bool pip)
 {

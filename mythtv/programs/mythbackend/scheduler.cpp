@@ -23,6 +23,8 @@ Scheduler::Scheduler(MythContext *context, QMap<int, EncoderLink *> *tvList,
     m_context = context;
     m_tvList = tvList;
 
+    pthread_mutex_init(&schedulerLock, NULL);
+
     setupCards();
 
     if (tvList)
@@ -30,6 +32,8 @@ Scheduler::Scheduler(MythContext *context, QMap<int, EncoderLink *> *tvList,
         pthread_t scthread;
         pthread_create(&scthread, NULL, SchedulerThread, this);
     }
+
+    context->addListener(this);
 }
 
 Scheduler::~Scheduler()
@@ -40,6 +44,8 @@ Scheduler::~Scheduler()
         delete pginfo;
         recordingList.pop_back();
     }
+
+    m_context->removeListener(this);
 }
 
 void Scheduler::setupCards(void)
@@ -54,6 +60,9 @@ void Scheduler::setupCards(void)
     numcards = -1;
     numinputs = -1;
     numsources = -1;
+    numInputsPerSource.clear();
+    sourceToInput.clear();
+    inputToCard.clear();
 
     if (query.isActive())
         numcards = query.numRowsAffected();
@@ -154,11 +163,11 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
     for (; iter != recordingList.end(); iter++)
     {
         ProgramInfo *pginfo = (*iter);
-        QString id = pginfo->startts.toString() + "_" + pginfo->chanid;
+        pginfo->schedulerid = pginfo->startts.toString() + "_" + pginfo->chanid;
 
-        foundlist[id] = true;
-        if (!askedList.contains(id))
-            askedList[id] = false;
+        foundlist[pginfo->schedulerid] = true;
+        if (!askedList.contains(pginfo->schedulerid))
+            askedList[pginfo->schedulerid] = false;
     }
 
     QMap<QString, bool>::Iterator askIter = askedList.begin();
@@ -222,12 +231,30 @@ ProgramInfo *Scheduler::GetNextRecording(void)
     return NULL;
 }
 
+void Scheduler::RemoveRecording(ProgramInfo *pginfo)
+{
+    askedList.remove(pginfo->schedulerid);
+
+    list<ProgramInfo *>::iterator i = recordingList.begin();
+    for (; i != recordingList.end(); i++)
+    {
+        ProgramInfo *rec = (*i);
+        if (rec == pginfo)
+        {
+            recordingList.erase(i);
+            break;
+        }
+    }
+}
+
 void Scheduler::RemoveFirstRecording(void)
 {
     if (recordingList.size() == 0)
         return;
 
     ProgramInfo *rec = recordingList.front();
+
+    askedList.remove(rec->schedulerid);
 
     delete rec;
     recordingList.pop_front();
@@ -852,6 +879,8 @@ void Scheduler::RunScheduler(void)
     {
         curtime = QDateTime::currentDateTime();
 
+        pthread_mutex_lock(&schedulerLock);
+
         if (CheckForChanges() ||
             (lastupdate.date().day() != curtime.date().day()))
         {
@@ -868,8 +897,8 @@ void Scheduler::RunScheduler(void)
             nextrectime = nextRecording->startts;
             secsleft = curtime.secsTo(nextrectime);
 
-            cout << secsleft << " seconds until " << nextRecording->title
-                 << endl;
+            //cout << secsleft << " seconds until " << nextRecording->title
+            //     << endl;
 
             if (secsleft > 35)
                 break;
@@ -881,32 +910,39 @@ void Scheduler::RunScheduler(void)
             }
             nexttv = (*m_tvList)[nextRecording->cardid];
 
-/*
             if (nexttv->GetState() == kState_WatchingLiveTV &&
-                secsleft <= 30 && !asked)
+                secsleft <= 30 && secsleft > 0)
             {
-                asked = true;
-                int result = nexttv->AllowRecording(nextRecording, secsleft);
-
-                if (result == 3)
+                QString id = nextRecording->schedulerid; 
+                if (askedList.contains(id) && askedList[id] == false)
                 {
-                    //cout << "Skipping " << nextRecording->title << endl;
-                    RemoveFirstRecording();
-                    nextRecording = NULL;
-                    continue;
+                    nexttv->AllowRecording(nextRecording, secsleft);
+                    askedList[id] = true;
+                    responseList[id] = false;
                 }
             }
-*/
 
             if (secsleft <= -2)
             {
-                nexttv->StartRecording(nextRecording);
-                //cout << "Started recording " << nextRecording->title << endl;
-                RemoveFirstRecording();
-                nextRecording = NULL;
-                recIter = recordingList.begin();
+                if (responseList.contains(nextRecording->schedulerid) &&
+                    responseList[nextRecording->schedulerid] == false)
+                {
+                    //cout << "Waiting for \"" << nextRecording->title 
+                    //     << "\" to be approved\n";
+                }
+                else
+                {
+                    nexttv->StartRecording(nextRecording);
+                    //cout << "Started recording " << nextRecording->title 
+                    //     << endl;
+                    RemoveRecording(nextRecording);
+                    nextRecording = NULL;
+                    recIter = recordingList.begin();
+                }
             }
         }
+
+        pthread_mutex_unlock(&schedulerLock);
 
         sleep(1);
     }
@@ -918,4 +954,61 @@ void *Scheduler::SchedulerThread(void *param)
     sched->RunScheduler();
  
     return NULL;
+}
+
+void Scheduler::customEvent(QCustomEvent *e)
+{
+    if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
+    {
+        MythEvent *me = (MythEvent *)e;
+        QString message = me->Message();
+
+        if (message.left(22) == "ASK_RECORDING_RESPONSE")
+        {
+            message = message.simplifyWhiteSpace();
+            QStringList tokens = QStringList::split(" ", message);
+            int cardnum = tokens[1].toInt();
+            int response = tokens[2].toInt();
+
+            pthread_mutex_lock(&schedulerLock);
+
+            ProgramInfo *nextRecording = NULL;
+            EncoderLink *nexttv;
+            int secsleft;
+            list<ProgramInfo *>::iterator recIter;
+
+            QDateTime curtime = QDateTime::currentDateTime();
+
+            recIter = recordingList.begin();
+            for (; recIter != recordingList.end(); recIter++)
+            {
+                nextRecording = (*recIter);
+                secsleft = curtime.secsTo(nextRecording->startts);
+
+                if (secsleft > 35)
+                    break;
+
+                if (nextRecording->cardid == cardnum)
+                {
+                    responseList[nextRecording->schedulerid] = true;
+                    nexttv = (*m_tvList)[nextRecording->cardid];
+
+                    if (response == 1)
+                    {
+                    }
+                    else if (response == 2)
+                    {
+                        askedList[nextRecording->schedulerid] = false;
+                    }
+                    else
+                    {
+                        RemoveRecording(nextRecording);
+                    }
+                    break;
+                }
+            }
+
+            pthread_mutex_unlock(&schedulerLock);
+        }
+    }
 } 

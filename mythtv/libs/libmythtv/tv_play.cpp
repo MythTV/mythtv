@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <qsqldatabase.h>
+#include <qapplication.h>
 
 #include <iostream>
 using namespace std;
@@ -54,6 +55,7 @@ TV::TV(MythContext *lcontext)
     editmode = false;
     prbuffer = NULL;
     nvp = NULL;
+    osd = NULL;
     requestDelete = false;
     endOfRecording = false;
 
@@ -154,14 +156,31 @@ int TV::AllowRecording(const QString &message, int timeuntil)
     QString option3 = "Don't let it record, I want to watch TV";
 
     dialogname = "allowrecordingbox";
+
+    while (!osd)
+    {
+        qApp->unlock();
+        qApp->processEvents();
+        usleep(1000);
+        qApp->lock();
+    }
+
     osd->NewDialogBox(dialogname, message, option1, option2, option3, 
                       "", timeuntil);
 
     while (osd->DialogShowing(dialogname))
-        usleep(500);
+    {
+        qApp->unlock();
+        qApp->processEvents();
+        usleep(1000);
+        qApp->lock();
+    }
 
     int result = osd->GetDialogResponse(dialogname);
     dialogname = "";
+
+    if (result == 2)
+        StopLiveTV();
 
     return result;
 }
@@ -291,8 +310,6 @@ void TV::HandleStateChange(void)
         internalState = nextState;
         changed = true;
 
-        recorder->StopLiveTV();
-
         watchingLiveTV = false;
     }
     else if (internalState == kState_WatchingRecording &&
@@ -345,7 +362,6 @@ void TV::HandleStateChange(void)
 
         watchingLiveTV = false;
     }
-/*
     else if (internalState == kState_WatchingLiveTV &&  
              nextState == kState_WatchingRecording)
     {
@@ -357,16 +373,9 @@ void TV::HandleStateChange(void)
         while (!nvp->GetPause())
             usleep(5);
 
-        m_context->PauseRecording(recorder_num);
+        recorder->TriggerRecordingTransition();
 
         prbuffer->Reset();
-        m_context->ResetRecordingBuffer(recorder_num);
-
-        //SetChannel(); FIXME
-
-        //nvr->TransitionToFile(outputFilename);
-
-        m_context->UnpauseRecording(recorder_num);
 
         nvp->ResetPlaying();
         while (!nvp->ResetYet())
@@ -375,33 +384,16 @@ void TV::HandleStateChange(void)
         usleep(300000);
 
         nvp->Unpause();
+
         internalState = nextState;
         changed = true;
     }
-    else if ((internalState == kState_WatchingRecording &&
-              nextState == kState_WatchingLiveTV) ||
-             (internalState == kState_WatchingPreRecorded &&
-              nextState == kState_WatchingLiveTV))
+    else if (internalState == kState_WatchingRecording &&
+             nextState == kState_WatchingLiveTV)
     {
-        if (paused)
-            osd->EndPause();
-        paused = false;
-
-        nvp->Pause();
-        while (!nvp->GetPause())
-            usleep(50);
-
-        //nvr->TransitionToRing(); FIXME
-
-        nvp->Unpause();
- 
-        // WriteRecordedRecord(); FIXME
-
-        //inoverrecord = false; 
         internalState = nextState;
         changed = true;
     }
-*/
     else if (internalState == kState_None && 
              nextState == kState_None)
     {
@@ -1446,14 +1438,19 @@ void TV::customEvent(QCustomEvent *e)
 
             if (cardnum == recorder->GetRecorderNumber())
             {
-                nvp->SetWatchingRecording(false);
-                nvp->SetLength(filelen);
-                nextState = kState_WatchingPreRecorded;
+                if (!watchingLiveTV)
+                {
+                    nvp->SetWatchingRecording(false);
+                    nvp->SetLength(filelen);
+                    nextState = kState_WatchingPreRecorded;
+                }
+                else
+                    nextState = kState_WatchingLiveTV;
                 changeState = true;
             }
         }
         else if (internalState == kState_WatchingLiveTV && 
-                 message.left(13) == "ASK_RECORDING")
+                 message.left(14) == "ASK_RECORDING ")
         {
             message = message.simplifyWhiteSpace();
             QStringList tokens = QStringList::split(" ", message);
@@ -1467,8 +1464,20 @@ void TV::customEvent(QCustomEvent *e)
                 QString resp = QString("ASK_RECORDING_RESPONSE %1 %2")
                                     .arg(cardnum)
                                     .arg(retval);
-                MythEvent newevent(resp);
-                m_context->dispatch(newevent);
+                RemoteSendMessage(m_context, resp);
+            }
+        }
+        else if (internalState == kState_WatchingLiveTV &&
+                 message.left(13) == "LIVE_TV_READY")
+        {
+            message = message.simplifyWhiteSpace();
+            QStringList tokens = QStringList::split(" ", message);
+            int cardnum = tokens[1].toInt();
+
+            if (cardnum == recorder->GetRecorderNumber())
+            {
+                nextState = kState_WatchingRecording;
+                changeState = true;
             }
         }
     }

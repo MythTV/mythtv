@@ -49,6 +49,7 @@ class MainServer : public QVBox
     void HandleFileTransferQuery(QStringList &slist, QStringList &commands,
                                  PlaybackSock *pbs); 
     void HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs);
+    void HandleMessage(QStringList &slist, PlaybackSock *pbs);
 
     PlaybackSock *getPlaybackBySock(QSocket *socket);
     FileTransfer *getFileTransferByID(int id);

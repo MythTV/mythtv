@@ -167,6 +167,14 @@ long long RemoteEncoder::GetKeyframePosition(long long desired)
     return retval;
 }
 
+void RemoteEncoder::TriggerRecordingTransition(void)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    strlist << "TRIGGER_RECORDING_TRANSITION";
+
+    SendReceiveStringList(strlist);
+}
+
 void RemoteEncoder::SetupRingBuffer(QString &path, long long &filesize,
                                     long long &fillamount, bool pip)
 {
