@@ -380,7 +380,7 @@ void UpgradeTVDatabaseSchema(void)
     if (dbver == "1014")
     {
         const QString updates[] = {
-"ALTER TABLE dvb_sat CHANGE lnb_log_switch lnb_lof_switch INTEGER DEFAULT 11700000;",
+"ALTER TABLE dvb_sat CHANGE lnb_lof_switch lnb_lof_switch INTEGER DEFAULT 11700000;",
 "UPDATE settings SET value='RecPriorityOrder' WHERE value='RecPriorityingOrder';",
 ""
 };
