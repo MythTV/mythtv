@@ -194,7 +194,7 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
             if (proginfo->description == QString::null)
                 proginfo->description = "";
 
-            if (proginfo->startts < curDateTime)
+            if (proginfo->endts < curDateTime)
                 delete proginfo;
             else 
                 recordingList.push_back(proginfo);

@@ -19,9 +19,9 @@ Misc changes:
     Grant Taylor <gtaylor at picante.com>
 Colorize the EPG:
     skrpub <skrpub at earthlink.net>
-Random bugfixes, EPG updates, more UK friendly database filling:
+Bugfixes, EPG updates, more UK friendly database filling, lots of other things:
     Andrew M. Bishop <amb at gedanken.demon.co.uk>
 Non-integer channel fixes, customizable date displays:
     Jens Lohmann-Hansen <JensLH at adslhome.dk>
-Modifyable install prefix:
+Modifyable install prefix, recording/scheduler improvements:
     Jim Radford <jim at blackbean.org>

@@ -94,21 +94,6 @@ void startTV(void)
     }
 }
 
-void startRecording(TV *tv, ProgramInfo *rec)
-{
-    ProgramInfo *tvrec = new ProgramInfo(*rec);
-    tv->StartRecording(tvrec);
-}
-
-int askRecording(TV *tv, ProgramInfo *rec, int timeuntil)
-{
-    ProgramInfo *tvrec = new ProgramInfo(*rec);
-    int retval = tv->AllowRecording(tvrec, timeuntil);
-
-    delete tvrec;
-    return retval;
-}
-
 void *runScheduler(void *dummy)
 {
     dummy = dummy;
@@ -128,8 +113,6 @@ void *runScheduler(void *dummy)
 
     while (1)
     {
-        sleep(1);
-
         curtime = QDateTime::currentDateTime();
 
         if (sched->CheckForChanges() || 
@@ -170,26 +153,28 @@ void *runScheduler(void *dummy)
                 secsleft <= 30 && !asked)
             {
                 asked = true;
-                int result = askRecording(nexttv, nextRecording, secsleft);
+                int result = nexttv->AllowRecording(nextRecording, secsleft);
 
                 if (result == 3)
                 {
                     //cout << "Skipping " << nextRecording->title << endl;
                     sched->RemoveFirstRecording();
                     nextRecording = NULL;
+                    continue;
                 }
             }
 
             if (secsleft <= -2)
             {
-                // don't record stuff that's already started..
-                if (secsleft > -30)
-                    startRecording(nexttv, nextRecording);
-
+                nexttv->StartRecording(nextRecording);
+                //cout << "Started recording " << nextRecording->title << endl;
                 sched->RemoveFirstRecording();
                 nextRecording = NULL;
+                continue;
             }
         }
+       
+        sleep(1);
     }
     
     return NULL;

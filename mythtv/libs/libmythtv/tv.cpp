@@ -251,7 +251,7 @@ void TV::StartRecording(ProgramInfo *rcinfo)
     {
         outputFilename = rcinfo->GetRecordFilename(recprefix);
         recordEndTime = rcinfo->endts;
-        curRecording = rcinfo;
+        curRecording = new ProgramInfo(*rcinfo);
 
         if (internalState == kState_None)
             nextState = kState_RecordingOnly;
@@ -271,7 +271,7 @@ void TV::StartRecording(ProgramInfo *rcinfo)
 
             outputFilename = rcinfo->GetRecordFilename(recprefix);
             recordEndTime = rcinfo->endts;
-            curRecording = rcinfo;
+            curRecording = new ProgramInfo(*rcinfo);
 
             nextState = kState_RecordingOnly;
             changeState = true;
@@ -280,7 +280,7 @@ void TV::StartRecording(ProgramInfo *rcinfo)
         {
             outputFilename = rcinfo->GetRecordFilename(recprefix);
             recordEndTime = rcinfo->endts;
-            curRecording = rcinfo;
+            curRecording = new ProgramInfo(*rcinfo);
 
             nextState = kState_WatchingRecording;
             changeState = true;
