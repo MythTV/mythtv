@@ -693,4 +693,11 @@ MythMusic Tabellen fehlen in der Datenbank.</translation>
         <translation>Kodiere...</translation>
     </message>
 </context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Please Wait...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 </TS>

@@ -772,4 +772,11 @@ You have no MythMusic tables in your database.</source>
         <translation>Compression...</translation>
     </message>
 </context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Please Wait...</source>
+        <translation>Patientez, svp ...</translation>
+    </message>
+</context>
 </TS>

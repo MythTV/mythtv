@@ -675,4 +675,11 @@
         <translation type="unfinished"></translation>
     </message>
 </context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Please Wait...</source>
+        <translation>Gelieve te wachten...</translation>
+    </message>
+</context>
 </TS>

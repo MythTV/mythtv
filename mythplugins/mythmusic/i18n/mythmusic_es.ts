@@ -772,4 +772,11 @@ You have no MythMusic tables in your database.</source>
         <translation>Ripeando...</translation>
     </message>
 </context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Please Wait...</source>
+        <translation>Aguarde un momento...</translation>
+    </message>
+</context>
 </TS>

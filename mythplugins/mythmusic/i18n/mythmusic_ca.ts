@@ -774,4 +774,11 @@ No disposa de les taules de MythMusic en la seva Base de Dades.</translation>
         <translation>Volcant...</translation>
     </message>
 </context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Please Wait...</source>
+        <translation>Esperi uns moments...</translation>
+    </message>
+</context>
 </TS>

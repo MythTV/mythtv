@@ -746,4 +746,11 @@
         <translation type="unfinished"></translation>
     </message>
 </context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Please Wait...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 </TS>

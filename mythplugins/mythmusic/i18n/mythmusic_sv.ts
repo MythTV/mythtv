@@ -697,4 +697,11 @@ Du har inga tabeller för Musikspelaren (MythMusic) i din databas.</translation>
 </translation>
     </message>
 </context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Please Wait...</source>
+        <translation>Vänta...</translation>
+    </message>
+</context>
 </TS>

@@ -766,4 +766,11 @@ You have no MythMusic tables in your database.</source>
         <translation type="unfinished">リッピング...</translation>
     </message>
 </context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Please Wait...</source>
+        <translation>お待ちください ...</translation>
+    </message>
+</context>
 </TS>

@@ -1020,6 +1020,13 @@ Não existem dados do MythMusic na base de dados.</translation>
     </message>
 </context>
 <context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Please Wait...</source>
+        <translation>Aguarde um Momento...</translation>
+    </message>
+</context>
+<context>
     <name>VisualizationMode</name>
     <message>
         <source>Random</source>
