@@ -34,7 +34,6 @@ static KCmdLineOptions options[] = {
 };
 
 
-MythContext *gContext;
 QSqlDatabase* db;
 
 int main(int argc, char **argv)

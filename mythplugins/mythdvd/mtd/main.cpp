@@ -23,10 +23,6 @@ using namespace std;
 #include "../mythdvd/dbcheck.h"
 #include "mtd.h"
 
-MythContext *gContext;
-
-
-
 int main(int argc, char **argv)
 {
 #if TRANSCODE_SUPPORT
