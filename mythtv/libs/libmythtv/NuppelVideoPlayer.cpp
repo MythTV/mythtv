@@ -3405,7 +3405,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
     disablevideo = true;
 
     if (OpenFile() < 0)
-        return(0);
+        return(254);
 
     m_db->lock();
     m_playbackinfo->SetCommFlagged(COMM_FLAG_PROCESSING, m_db->db());
@@ -3431,7 +3431,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
         m_db->lock();
         m_playbackinfo->SetCommFlagged(COMM_FLAG_NOT_FLAGGED, m_db->db());
         m_db->unlock();
-        return 0;
+        return(254);
     }
 
     for (int i = 0; i < MAXTBUFFER; i++)
@@ -3491,7 +3491,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
                 m_playbackinfo->SetCommFlagged(COMM_FLAG_NOT_FLAGGED, m_db->db());
                 m_db->unlock();
 
-                return(-1);
+                return(255);
             }
             else if (curCmd == JOB_PAUSE)
             {

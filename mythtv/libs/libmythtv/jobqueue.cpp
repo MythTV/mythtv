@@ -1571,7 +1571,18 @@ void JobQueue::DoFlagCommercialsThread(void)
     breaksFound = myth_system(cmd.ascii());
 
     controlFlagsLock.lock();
-    if (breaksFound == -1)
+    if (breaksFound == 127)
+    {
+        msg = QString("Commercial Flagging ERRORED for %1, unable to find mythcommflag, check your PATH.")
+                      .arg(logDesc);
+
+        gContext->LogEntry("commflag", LP_WARNING,
+                           "Commercial Flagging Errored", msg);
+
+        ChangeJobStatus(commthread_db->db(), jobID, JOB_ERRORED,
+                        "ERROR: Unable to find mythcommflag.");
+    }
+    else if (breaksFound == 254)
     {
         msg = QString("Commercial Flagging ERRORED for %1.")
                       .arg(logDesc);
@@ -1582,7 +1593,8 @@ void JobQueue::DoFlagCommercialsThread(void)
         ChangeJobStatus(commthread_db->db(), jobID, JOB_ERRORED,
                         "Job aborted with Error.");
     }
-    else if (*(jobControlFlags[key]) == JOB_STOP)
+    else if ((*(jobControlFlags[key]) == JOB_STOP) ||
+             (breaksFound == 255))
     {
         msg = QString("ABORTED Commercial Flagging for %1.")
                       .arg(logDesc);
@@ -1596,7 +1608,7 @@ void JobQueue::DoFlagCommercialsThread(void)
     else
     {
         msg = QString("Finished Commercial Flagging for %1. "
-                      "Found %4 commercial break(s).")
+                      "Found %2 commercial break(s).")
                       .arg(logDesc)
                       .arg(breaksFound);
 
