@@ -1,0 +1,50 @@
+                                  MythGallery
+			          Release 0.7
+
+
+There'll be more information here later, but for now:
+
+BUILD/CONFIGURATION INSTRUCTIONS
+--------------------------------
+
+First, you need MythTV to be installed.  At the very least, you need MythTV's
+database stuff setup properly.  If you don't have that done, don't even bother
+with this, as it won't work.
+
+You don't need any other software installed.  MythGallery uses Qt's internal
+image handling routines for basically everything.
+
+Ok, on to compiling. Just type 'make' in the main distribution directory.
+
+Compiling note:  If you get an error on building this, that says something
+                 about 'mkspecs', then you don't have the QTDIR environment
+                 variable set.  On debian, this should be set to /usr/share/qt.
+                 I hear on mandrake, it's /usr/lib/qt3.  You'll need to figure
+                 out what it should be on your system, set the variable,
+                 and attempt to compile again.
+
+If you get any errors about missing references, etc, you most likely don't have
+one of the required pieces of software installed.
+
+Follow this by a 'make install'.  It'll put a 'mythgallery' binary in your
+/usr/local/bin directory, and stuff mythgallery-settings.txt in your
+existing /usr/local/share/mythtv/ directory.
+
+You'll probably want to edit the mythgallery-settings.txt file to set where
+your images are stored.
+
+MythGallery will also read the theme.txt and mysql.txt settings files used by
+MythTV, so any changes you made to those will be carried over into this.
+
+This should be really simple to use -- just browse around with the arrow keys
+and select images/directories to view with the space/enter keys.  Escape backs 
+out a level, and hitting 'p' or 'P' while viewing a single image will start a
+slideshow playback of all images in that directory.
+
+Feel free to subscribe to the development mailing list at:
+http://www.snowman.net/mailman/listinfo/mythtv-dev
+
+A list that's restricted to the CVS commit messages is available at:
+http://www.snowman.net/mailman/listinfo/mythtv-commits
+
+or, just email me directly:  Isaac Richards <ijr@po.cwru.edu>
