@@ -48,6 +48,13 @@
       <action>TV_PROGFIND</action>
    </button>
 
+   <button>
+      <type>TV_PROGFIND</type>
+      <text>Search Listings</text>
+      <alttext>Search</alttext>
+      <action>TV_SEARCH</action>
+   </button>
+
 <!--
    <button>
       <type>TV_SCHEDULE</type>
