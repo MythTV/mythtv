@@ -308,7 +308,7 @@ void XvVideoOutput::ToggleFullScreen(void)
     VertScanFactor = settings->GetNumSetting("VertScanPercentage",5) / 100.0;
     xScanDisp = settings->GetNumSetting("xScanDisplacement", 0);
     yScanDisp = settings->GetNumSetting("yScanDisplacement",0);
-  
+ 
     if (XJ_fullscreen)
     {
         XJ_fullscreen = 0; 
@@ -335,7 +335,7 @@ void XvVideoOutput::ToggleFullScreen(void)
             }
 
             cury = yScanDisp - (int)ceil(XJ_screenheight * VertScanFactor);
-            curh = (int)ceil(XJ_screenheight * (1 + 2 * VertScanFactor));
+            curh = (int)ceil(XJ_screenheight * (1 + 2 * (VertScanFactor + 0.01)));
         }
         else
         {
@@ -357,6 +357,14 @@ void XvVideoOutput::ToggleFullScreen(void)
         hide_cursor();
         decorate(0);
     }
+
+    curx = ((curx - 1) / 2) * 2;
+    cury = ((cury - 1) / 2) * 2;
+
+    int hclamp = XJ_height / 4;
+
+    curh = ((curh) / hclamp) * hclamp + 4;
+    curw = ((curw) / 2) * 2 - 4;
 
     delete settings;
 
