@@ -617,6 +617,10 @@ You have no MythMusic tables in your database.</source>
         <source>Did you run configure?</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>and</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Ripper</name>

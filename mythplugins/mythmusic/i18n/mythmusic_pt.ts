@@ -914,6 +914,10 @@ Não existem dados do MythMusic na base de dados.</translation>
         <source>Did you run configure?</source>
         <translation>Executou o configure?</translation>
     </message>
+    <message>
+        <source>and</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Ripper</name>

@@ -375,7 +375,7 @@ public:
                     QObject::tr("BumpScope") + ", " + 
                     QObject::tr("Goom") + ", " + 
                     QObject::tr("Synaesthesia") + ", " + 
-                    QObject::tr("Gears") + ", and " + 
+                    QObject::tr("Gears") + ", " + QObject::tr("and") + " " + 
                     QObject::tr("Blank"));
     };
 };
