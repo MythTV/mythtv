@@ -16,6 +16,11 @@
 
 #define FIREWIRE_TIMEOUT 15
 
+#define FIREWIRE_CONNECTION_P2P		0
+#define FIREWIRE_CONNECTION_BROADCAST	1
+
+#define FIREWIRE_CHANNEL_BROADCAST	63
+
 class FirewireRecorder : public DTVRecorder
 {
   public:
@@ -36,7 +41,8 @@ class FirewireRecorder : public DTVRecorder
     QString FirewireSpeedString(int speed);
 
   private:
-    int fwport, fwchannel, fwspeed, fwbandwidth, fwfd;
+    int fwport, fwchannel, fwspeed, fwbandwidth, fwfd, fwconnection;
+    int fwoplug, fwiplug;
     QString fwmodel;
     nodeid_t fwnode;
     raw1394handle_t fwhandle;

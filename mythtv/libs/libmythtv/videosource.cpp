@@ -864,6 +864,16 @@ class FirewireModel: public ComboBoxSetting, public CCSetting {
         }
 };
 
+class FirewireConnection: public ComboBoxSetting, public CCSetting {
+    public:
+       FirewireConnection(const CaptureCard& parent):
+       CCSetting(parent, "firewire_connection") {
+            setLabel(QObject::tr("Firewire Connection Type"));
+            addSelection(QObject::tr("Point to Point"),"0");
+            addSelection(QObject::tr("Broadcast"),"1");
+        }
+};
+
 class FirewirePort: public LineEditSetting, public CCSetting {
     public:
 	FirewirePort(const CaptureCard& parent):
@@ -911,6 +921,7 @@ public:
         parent(a_parent) {
         setUseLabel(false);
         addChild(new FirewireModel(parent));
+        addChild(new FirewireConnection(parent));
         addChild(new FirewirePort(parent));
         addChild(new FirewireNode(parent));
         addChild(new FirewireSpeed(parent));

@@ -82,11 +82,18 @@ TVRec::TVRec(int capturecardnum)
 
     audiosamplerate = -1;
     skip_btaudio = false;
+    errored = false;
+}
 
+bool TVRec::Init(void)
+{
+    QString chanorder = gContext->GetSetting("ChannelOrdering", "channum + 0");
     QString inputname, startchannel;
 
-    GetDevices(capturecardnum, videodev, vbidev, audiodev, audiosamplerate,
-               inputname, startchannel, cardtype, dvb_options, firewire_options, skip_btaudio);
+    GetDevices(m_capturecardnum, videodev, vbidev, 
+               audiodev, audiosamplerate,
+               inputname, startchannel, cardtype, dvb_options,
+               firewire_options, skip_btaudio);
 
     if (cardtype == "DVB")
     {
@@ -106,11 +113,14 @@ TVRec::TVRec(int capturecardnum)
         if (dvb_options.dvb_on_demand) 
             ((DVBChannel *)channel)->CloseDVB();
 #else
-        VERBOSE(VB_IMPORTANT, "ERROR: DVB Card configured, "
-                              "but no DVB support compiled in!");
-        VERBOSE(VB_IMPORTANT, "Remove the card from configuration, "
-                              "or recompile MythTV.");
-        exit(-20);
+        QString msg = QString(
+            "ERROR: DVB Card configured on %1, but MythTV was not compiled\n"
+            "with DVB support. Please, recompile MythTV with DVB support\n"
+            "or remove the card from configuration and restart MythTV.")
+            .arg(videodev);
+        VERBOSE(VB_IMPORTANT, msg);
+        errored = true;
+        return false;
 #endif
     }
     else if (cardtype == "FIREWIRE")
@@ -124,11 +134,13 @@ TVRec::TVRec(int capturecardnum)
             channel->SwitchToInput(inputname, startchannel);
         channel->SetChannelOrdering(chanorder);
 #else
-        VERBOSE(VB_IMPORTANT, "ERROR: FireWire Input configured, "
-                              "but no FireWire support compiled in!");
-        VERBOSE(VB_IMPORTANT, "Remove the card from configuration, "
-                              "or recompile MythTV.");
-        exit(-20);
+        QString msg = QString(
+            "ERROR: FireWire Input configured, but MythTV was not compiled\n"
+            "with FireWire support. Recompile MythTV with FireWire supprt\n"
+            "or remove the card from configuration and restart MythTV.");
+        VERBOSE(VB_IMPORTANT, msg);
+        errored = true;
+        return false;
 #endif
     }
     else if ((cardtype == "MPEG") && (videodev.lower().left(5) == "file:"))
@@ -149,10 +161,7 @@ TVRec::TVRec(int capturecardnum)
         channel->SetChannelOrdering(chanorder);
         channel->Close();
     }
-}
 
-void TVRec::Init(void)
-{
     inoverrecord = false;
     overrecordseconds = gContext->GetNumSetting("RecordOverTime");
 
@@ -177,6 +186,8 @@ void TVRec::Init(void)
     curRecording = NULL;
     prevRecording = NULL;
     pendingRecording = NULL;
+
+    return true;
 }
 
 TVRec::~TVRec(void)
@@ -429,8 +440,10 @@ void TVRec::HandleStateChange(void)
 
     if (nextState == kState_Error)
     {
-        VERBOSE(VB_IMPORTANT, "TVRec: Attempting to set to an error state, exiting");
-        exit(-21);
+        VERBOSE(VB_IMPORTANT, "TVRec::HandleStateChange() Error, "
+                "attempting to set to an error state.");
+        errored = true;
+        return;
     }
 
     if (tmpInternalState == kState_None && nextState == kState_WatchingLiveTV)
@@ -538,6 +551,7 @@ void TVRec::HandleStateChange(void)
             if (success)
             {
                 success = channel->CheckSignalFull();
+                success = true;
                 if (!success)
                 {
                     VERBOSE(VB_IMPORTANT, "Signal level too low?");
@@ -653,6 +667,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
         nvr->SetOption("node", firewire_options.node);
         nvr->SetOption("speed", firewire_options.speed);
         nvr->SetOption("model", firewire_options.model);
+        nvr->SetOption("connection", firewire_options.connection);
         nvr->Initialize();
 #endif
         return;
@@ -875,6 +890,13 @@ void TVRec::RunTV(void)
     {
         if (changeState)
             HandleStateChange();
+        if (IsErrored())
+        {
+            VERBOSE(VB_IMPORTANT, "TVRec: RunTV encountered "
+                    "fatal error, exiting event thread.");
+            runMainLoop = false;
+            return;
+        }
 
         usleep(1000);
 
@@ -1073,7 +1095,7 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
                   "dvb_wait_for_seqstart,dvb_dmx_buf_size,"
                   "dvb_pkt_buf_size, skipbtaudio, dvb_on_demand,"
                   "firewire_port, firewire_node, firewire_speed,"
-                  "firewire_model "
+                  "firewire_model, firewire_connection "
                   "FROM capturecard WHERE cardid = :CARDID ;");
     query.bindValue(":CARDID", cardnum);
 
@@ -1121,6 +1143,7 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
         test = query.value(16).toString();
         if (test != QString::null)
             firewire_opts.model = QString::fromUtf8(test);
+	firewire_opts.connection = query.value(17).toInt();
     }
 
     query.prepare("SELECT if(startchan!='', startchan, '3') "

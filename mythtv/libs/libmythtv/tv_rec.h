@@ -45,6 +45,7 @@ typedef struct _firewire_options_t
     int port;
     int node;
     int speed;
+    int connection;
     QString model;
 } firewire_options_t;
 
@@ -54,7 +55,7 @@ class TVRec
     TVRec(int capturecardnum);
    ~TVRec(void);
 
-    void Init(void);
+    bool Init(void); // returns true if init is successful
 
     void RecordPending(ProgramInfo *rcinfo, int secsleft);
     int StartRecording(ProgramInfo *rcinfo);
@@ -147,6 +148,7 @@ class TVRec
 
     int GetCaptureCardNum(void) { return m_capturecardnum; }
 
+    bool IsErrored() { return errored; }
  protected:
     void RunTV(void);
     static void *EventThread(void *param);
@@ -235,6 +237,8 @@ class TVRec
 
     dvb_options_t dvb_options;
     firewire_options_t firewire_options;
+
+    bool errored;
 
     char requestBuffer[256001];
 
