@@ -394,8 +394,8 @@ void DVDTitle::determineInputID()
                               .arg(letterbox)
                               .arg(video_format);
 
-    MSqlQuery a_query;
-    q_query.exec(q_string);
+    MSqlQuery a_query(MSqlQuery::InitCon());
+    a_query.exec(q_string);
     
     if(a_query.isActive() && a_query.numRowsAffected() > 0)
     {
