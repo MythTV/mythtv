@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <qdir.h>
 #include <qtextcodec.h>
+#include <signal.h>
 
 #include <iostream>
 using namespace std;
@@ -292,6 +293,9 @@ int main(int argc, char **argv)
 
     QApplication a(argc, argv);
     QTranslator translator( 0 );
+
+    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
+        cerr << "Unable to ignore SIGPIPE\n";
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
 

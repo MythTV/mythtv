@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <signal.h>
 
 #include <iostream>
 #include <fstream>
@@ -170,6 +171,9 @@ int main(int argc, char **argv)
     }
 
     close(0);
+
+    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
+        cerr << "Unable to ignore SIGPIPE\n";
 
     if (daemonize)
         if (daemon(0, 1) < 0) {
