@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2002-12-24, v1.056
+  2002-12-25, v1.057
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -102,6 +102,9 @@
 
   16. Miscellaneous.
      16.1 I'd like to watch the files without using mythtv / I'd like to convert the files to some other format.
+     16.2 I'd like to use some other window manager.
+     16.3 I'd like mythtv to automatically startup.
+     16.4 I'd like to start using the development version of mythtv.
 
   ______________________________________________________________________
 
@@ -1800,4 +1803,88 @@
 
   At this point, you can read the MPlayer documentation and start the
   compile process.
+
+  [1m16.2.  I'd like to use some other window manager.[0m
+
+  mythtv is not dependent on any particular window manager.  If you wish
+  to run a lightweight window manager, the configfiles/ directory has an
+  example of a .twmrc file you may use.
+
+  [1m16.3.  I'd like mythtv to automatically startup.[0m
+
+  Here's an example submitted to the mythtv-dev list by Pat Pflaum
+  mailto:pat@netburp.com <mailto:pat@netburp.com> using fvwm:
+
+       $ cat > .xinitrc
+       fvwm &
+       mythfrontend
+       ^D
+       $ cat > .fvwmrc
+       Style "myth*"      NoTitle, NoHandles, Sticky, WindowListSkip, BorderWidth 0
+       ^D
+       $
+
+  [1m16.4.  I'd like to start using the development version of mythtv.[0m
+
+  [Content under development]
+
+  [1mNOTE[22m:It should be clear that using the development version of mythtv
+  may cause loss of data on your system.  There is no guarantee that the
+  development version of mythtv will work for you.
+
+  Here are some of the features in version 0.8:
+
+  +o  A front-end and back-end system.  The back-end is responsible for
+     maintaining the database and capturing and encoding the video.  The
+     front-end is responsible for displaying the video.  This allows you
+     to put a lightweight, quiet, diskless and fanless machine in "the
+     living room", with a large server-type machine in "the basement".
+     The front-end and back-end communicate over TCP on a specified
+     port.
+
+  +o  GUI-based configuration.  Much of the configuration of mythtv can
+     now be done using a GUI-based setup, avoiding the necessity to edit
+     the settings.txt file.
+
+  +o  Themes.  mythtv now has more themes for the user to choose from.
+
+  +o  Recording profiles.  You may now setup various encoder profiles
+     from the GUI, giving you the flexibility to record programs using
+     various quality levels.
+
+  +o  Increased hardware encoder support.  mythtv can now use the MJPEG
+     encoder/decoder found on Matrox G200 series cards.  This greatly
+     reduces the CPU utilization.
+
+  [1mNOTE[22m:  Problem reports for version 0.8 posted to the mailing list
+  should have accompanying solutions.
+
+  Before you begin, shutdown all running instances of 0.7.
+
+  Next, determine if you are going to upgrade an existing 0.7 system, or
+  if you are going to start from scratch.  If you are upgrading an
+  existing system, you must run the database/0-7-to-0-8.sql script.
+  This will add additional tables to the mythconverg database.
+
+  Compile the system as you would a 0.7 system by following the
+  instructions found in this HOWTO.  If you are upgrading an existing
+  system, skip the step where you create the database since you've just
+  done that in the previous step.
+
+  Next, you must edit the /usr/local/share/mythtv/backend_settings.txt
+  file on each client.  Specify the IP address of the back-end server
+  and port.
+
+  To run the new version of mythtv, you must first start the back-end
+  server:
+
+       $ mythbackend &
+
+  and then run the front-end client:
+
+       $ mythfrontend
+
+  You should see the connection established between the front-end and
+  back-end systems by examining the mythbackend window; it will display
+  the client connection attempts.
 
