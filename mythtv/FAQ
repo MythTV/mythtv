@@ -85,3 +85,9 @@
 - Do you have deinterlace=1 in settings.txt?  Try disabling it, and if that
   corrects the problem, read and follow the instructions at the top of
   filters/linearblend/filter_linearblend.c and rebuild mythtv.
+
+) All of my channels seem to be off by one, and the picture quality is poor
+- The bttv driver is not autodetecting your tuner type correctly, or
+  you are specifying the wrong tuner type.  Find out which one your
+  card uses, and read Documentation/video4linux/bttv/CARDLIST to find out
+  how to specify it.
