@@ -424,12 +424,11 @@ void NuppelVideoRecorder::Initialize(void)
         codec = "mjpeg";
         hardware_encode = true;
 
-        switch (hmjpg_hdecimation)
-        {
-            case 2: w = 352; break;
-            case 4: w = 176; break;
-            default: w = hmjpg_maxw; break;
-        }
+        if (MJPEGInit() != 0)
+            cerr << "Could not detect max width for hardware MJPEG card, "
+                    "falling back to default: " << hmjpg_maxw << endl;
+ 
+        w = hmjpg_maxw / hmjpg_hdecimation;
 
         if (ntsc)
         {
@@ -562,6 +561,48 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
     }
     mp3buf_size = (int)(1.25 * 16384 + 7200);
     mp3buf = new char[mp3buf_size];
+
+    return 0; 
+}
+
+int NuppelVideoRecorder::MJPEGInit(void)
+{
+    fd = open(videodevice.ascii(), O_RDWR);
+    if (fd <= 0)
+    {
+        cerr << "Can't open video device: " << videodevice << endl;
+        perror("open video:");
+        return 1;
+    }
+
+    struct video_capability vc;
+
+    memset(&vc, 0, sizeof(vc));
+
+    if (ioctl(fd, VIDIOCGCAP, &vc) < 0)
+    {
+        perror("VIDIOCGCAP:");
+        close(fd);
+        return 1;
+    }
+
+    close(fd);
+
+    if (vc.type & VID_TYPE_MJPEG_ENCODER)
+    {
+        if (vc.maxwidth >= 768)
+            hmjpg_maxw = 768;
+        else if (vc.maxwidth >= 704)
+            hmjpg_maxw = 704;
+        else
+            hmjpg_maxw = 640;
+    }
+    else
+    {
+        cerr << "Video device " << videodevice << " does not appear to have "
+                "hardware MJPEG capture capabilities." << endl;
+        return 1;
+    }
 
     return 0; 
 }
@@ -765,13 +806,6 @@ void NuppelVideoRecorder::StartRecording(void)
 
     if ((vc.type & VID_TYPE_MJPEG_ENCODER) && hardware_encode)
     {
-        if (vc.maxwidth >= 768)
-            hmjpg_maxw = 768;
-        else if (vc.maxwidth >= 704)
-            hmjpg_maxw = 704;
-        else
-            hmjpg_maxw = 640;
-
         DoMJPEG();
         return;
     }
