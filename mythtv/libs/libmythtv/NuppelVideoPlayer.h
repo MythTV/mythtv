@@ -44,6 +44,8 @@ class NuppelVideoPlayer
     void SetAudioDevice(QString device) { audiodevice = device; }
     void SetFileName(QString lfilename) { filename = lfilename; }
 
+    void SetExactSeeks(bool exact) { exactseeks = exact; }
+
     void StartPlaying(void);
     void StopPlaying(void) { killplayer = true; }
     
@@ -263,7 +265,14 @@ class NuppelVideoPlayer
     struct extendeddata extradata;
     bool usingextradata;
 
+    bool haspositionmap;
+    int keyframedist;
+
+    bool exactseeks;
+
     XvVideoOutput *videoOutput;
+    pthread_mutex_t eventLock;
+    bool eventvalid;
 };
 
 #endif

@@ -35,6 +35,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
     rtjd = NULL;
     positionMap = NULL; 
 
+    keyframedist = 30;
+
     lastaudiolen = 0;
     strm = NULL;
     wpos = rpos = 0;
@@ -78,6 +80,13 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
 
     videoOutput = NULL;
     watchingrecording = false;
+
+    haspositionmap = false;
+
+    exactseeks = false;
+
+    eventvalid = false;
+    pthread_mutex_init(&eventLock, NULL);
 }
 
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
@@ -261,7 +270,8 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
         return -1;
     }
 
-    while (QString(fileheader.finfo) != "NuppelVideo")
+    while ((QString(fileheader.finfo) != "NuppelVideo") && 
+           (QString(fileheader.finfo) != "MythTVVideo"))
     {
         ringBuffer->Seek(startpos, SEEK_SET);
         char dummychar;
@@ -289,6 +299,8 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
         video_frame_rate = fileheader.fps;
         eof = 0;
     }
+
+    keyframedist = fileheader.keyframedist;
 
     space = new char[video_width * video_height * 3 / 2];
 
@@ -334,10 +346,50 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
         }
         else
         {
-            ringBuffer->Read(&extradata, EXTENDEDSIZE);
+            ringBuffer->Read(&extradata, frameheader.packetlength);
             usingextradata = true;
             ringBuffer->Read(&frameheader, FRAMEHEADERSIZE);    
         }
+    }
+
+    if (usingextradata && extradata.seektable_offset > 0 && !disablevideo)
+    {
+        long long currentpos = ringBuffer->Seek(0, SEEK_CUR);
+
+        ringBuffer->Seek(extradata.seektable_offset, SEEK_SET);
+
+        ringBuffer->Read(&frameheader, FRAMEHEADERSIZE);
+    
+        if (frameheader.frametype != 'Q')
+        {
+            cerr << "Invalid seektable\n";
+        }
+        else
+        {
+            if (frameheader.packetlength > 0)
+            {
+                char *seekbuf = new char[frameheader.packetlength];
+                ringBuffer->Read(seekbuf, frameheader.packetlength);
+
+                int numentries = frameheader.packetlength / 
+                                 sizeof(struct seektable_entry);
+                struct seektable_entry ste;
+                int offset = 0;
+
+                for (int z = 0; z < numentries; z++)
+                {
+                    memcpy(&ste, seekbuf + offset, 
+                           sizeof(struct seektable_entry));
+                    offset += sizeof(struct seektable_entry);
+
+                    (*positionMap)[ste.keyframe_number] = ste.file_offset;
+                }
+                haspositionmap = true;
+            }
+        }
+
+        ringBuffer->Seek(currentpos, SEEK_SET);
+        ringBuffer->Read(&frameheader, FRAMEHEADERSIZE);
     }
 
     while (frameheader.frametype != 'A' && frameheader.frametype != 'V' &&
@@ -792,7 +844,8 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
 	    }
 	    else if (frameheader.comptype == 'V')
             {
-		(*positionMap)[framesPlayed / 30] = currentposition;
+                if (!haspositionmap)
+		    (*positionMap)[framesPlayed/keyframedist] = currentposition;
 		lastKey = framesPlayed;
 	    }
         }
@@ -1004,9 +1057,14 @@ void NuppelVideoPlayer::ShowPip(unsigned char *xvidbuf)
 
 int NuppelVideoPlayer::CheckEvents(void)
 {
-    if (videoOutput)
-        return videoOutput->CheckEvents();
-    return 0;
+    int ret = 0;
+    if (videoOutput && eventvalid)
+    {
+        pthread_mutex_lock(&eventLock);
+        ret = videoOutput->CheckEvents();
+        pthread_mutex_unlock(&eventLock);
+    } 
+    return ret;
 }
 
 void NuppelVideoPlayer::OutputVideoLoop(void)
@@ -1029,6 +1087,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     {
         videoOutput = new XvVideoOutput();
         X11videobuf = videoOutput->Init(video_width, video_height, name, name);
+        eventvalid = true;
     }
 
     int pause_rpos = 0;
@@ -1111,7 +1170,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         delay = (nexttrigger.tv_sec - now.tv_sec) * 1000000 +
                 (nexttrigger.tv_usec - now.tv_usec); // uSecs
 
-        if (delay > 1000000)
+        if (delay > 100000)
         {
             cout << "Delaying to next trigger: " << delay << endl;
             delay = 100000;
@@ -1169,8 +1228,11 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
     if (!disablevideo)
     {
+        pthread_mutex_lock(&eventLock);
         delete videoOutput;
         videoOutput = NULL;
+        eventvalid = false;
+        pthread_mutex_unlock(&eventLock);
     }
 }
 
@@ -1425,20 +1487,20 @@ bool NuppelVideoPlayer::DoRewind(void)
     long long storelastKey = lastKey;
     while (lastKey > desiredFrame)
     {
-        lastKey -= 30;
+        lastKey -= keyframedist;
     }
     if (lastKey < 1)
         lastKey = 1;
 
     int normalframes = desiredFrame - lastKey;
-    long long keyPos = (*positionMap)[lastKey / 30];
+    long long keyPos = (*positionMap)[lastKey / keyframedist];
     long long curPosition = ringBuffer->GetReadPosition();
     long long diff = keyPos - curPosition;
 
     while (ringBuffer->GetFreeSpaceWithReadChange(diff) < 0)
     {
-        lastKey += 30;
-        keyPos = (*positionMap)[lastKey / 30];
+        lastKey += keyframedist;
+        keyPos = (*positionMap)[lastKey / keyframedist];
         if (keyPos == 0)
             continue;
         diff = keyPos - curPosition;
@@ -1459,6 +1521,9 @@ bool NuppelVideoPlayer::DoRewind(void)
     framesPlayed = lastKey;
 
     int fileend = 0;
+
+    if (!exactseeks)
+        normalframes = 0;
 
     while (normalframes > 0)
     {
@@ -1531,17 +1596,17 @@ bool NuppelVideoPlayer::DoFastForward(void)
 
     while (desiredKey < desiredFrame)
     {
-        desiredKey += 30;
+        desiredKey += keyframedist;
     }
-    desiredKey -= 30;
+    desiredKey -= keyframedist;
 
     int normalframes = desiredFrame - desiredKey;
     int fileend = 0;
 
-    if (positionMap->find(desiredKey / 30) != positionMap->end())
+    if (positionMap->find(desiredKey / keyframedist) != positionMap->end())
     {
         lastKey = desiredKey;
-        long long keyPos = (*positionMap)[lastKey / 30];
+        long long keyPos = (*positionMap)[lastKey / keyframedist];
         long long diff = keyPos - ringBuffer->GetReadPosition();
 
         ringBuffer->Seek(diff, SEEK_CUR);
@@ -1558,7 +1623,8 @@ bool NuppelVideoPlayer::DoFastForward(void)
             {
                 if (frameheader.comptype == 'V')
                 {
-                    (*positionMap)[framesPlayed / 30] = 
+                    if (!haspositionmap)
+                        (*positionMap)[framesPlayed / keyframedist] = 
                                                  ringBuffer->GetReadPosition();
                     lastKey = framesPlayed;
                 }
@@ -1580,6 +1646,9 @@ bool NuppelVideoPlayer::DoFastForward(void)
             }
         }
     } 
+
+    if (!exactseeks)
+        normalframes = 0;
 
     while (normalframes > 0 && !fileend)
     {
@@ -1659,9 +1728,9 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
 
     while (desiredKey < desiredFrame)
     {
-        desiredKey += 30;
+        desiredKey += keyframedist;
     }
-    desiredKey -= 30;
+    desiredKey -= keyframedist;
 
     int normalframes = number - desiredKey;
 
@@ -1686,7 +1755,7 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
         {
             if (frameheader.comptype == 'V')
             {
-                (*positionMap)[framesPlayed / 30] =
+                (*positionMap)[framesPlayed / keyframedist] =
                                              ringBuffer->GetReadPosition();
                 lastKey = framesPlayed;
             }
@@ -1808,7 +1877,7 @@ void NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname)
     mpa_ctx.b_quant_factor = 2.0;
     mpa_ctx.rc_strategy = 2;
     mpa_ctx.b_frame_strategy = 0;
-    mpa_ctx.gop_size = 30;
+    mpa_ctx.gop_size = 30; 
     mpa_ctx.flags = CODEC_FLAG_HQ; // | CODEC_FLAG_TYPE; 
     mpa_ctx.me_method = 5;
     mpa_ctx.key_frame = -1; 

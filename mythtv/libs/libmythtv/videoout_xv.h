@@ -6,7 +6,6 @@
 #include <X11/extensions/XShm.h>
 #include <X11/extensions/Xv.h>
 #include <X11/extensions/Xvlib.h>
-#include <pthread.h>
 
 class XvVideoOutput
 {
@@ -54,8 +53,6 @@ class XvVideoOutput
     int colorid;
 
     unsigned char *scratchspace;
-
-    pthread_mutex_t eventlock;
 };
 
 #endif

@@ -65,8 +65,6 @@ unsigned char *XvVideoOutput::Init(int width, int height, char *window_name,
   unsigned int p_version, p_release, p_request_base, p_event_base, p_error_base;
   int p_num_adaptors;
 
-  pthread_mutex_init(&eventlock, NULL);
-
   XvAdaptorInfo *ai;
 
   XJ_width=width;
@@ -230,7 +228,6 @@ void XvVideoOutput::Exit(void)
 {
   if(XJ_started) {
     XJ_started = false;
-    pthread_mutex_lock(&eventlock);
 
     //if (XJ_image)
     //  XvDestroyImage(XJ_image);
@@ -334,11 +331,6 @@ int XvVideoOutput::CheckEvents(void)
   static XComposeStatus stat;
   int key = 0;
  
-  if (!pthread_mutex_trylock(&eventlock))
-  {
-    return key;
-  }
- 
   while (XPending(XJ_disp))
   {
     XNextEvent(XJ_disp, &Event);
@@ -349,13 +341,11 @@ int XvVideoOutput::CheckEvents(void)
       {
 	 XLookupString(&Event.xkey, buf, sizeof(buf), &keySym, &stat);
 	 key = ((keySym&0xff00) != 0?((keySym&0x00ff) + 256):(keySym));
-         pthread_mutex_unlock(&eventlock);
 	 return key;
       } break;
       default: break;
     }
   }
 
-  pthread_mutex_unlock(&eventlock);
   return key;
 }

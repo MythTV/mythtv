@@ -16,8 +16,7 @@ using namespace std;
 
 #include "NuppelVideoRecorder.h"
 
-#define KEYFRAMEDISTEND   30
-#define KEYFRAMEDISTSTART 30
+#define KEYFRAMEDIST   30
 
 pthread_mutex_t NuppelVideoRecorder::avcodeclock = PTHREAD_MUTEX_INITIALIZER;
 int NuppelVideoRecorder::numencoders = 0;
@@ -64,9 +63,9 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     ringBuffer = NULL;
     weMadeBuffer = false;
     paused = false;
-    
-    keyswritten = 0;
-    keyframedist = KEYFRAMEDISTSTART;
+    pausewritethread = false;   
+ 
+    keyframedist = KEYFRAMEDIST;
 
     audiobytes = 0;
     audio_samplerate = 44100;
@@ -92,6 +91,9 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     lasttimecode = 0;
     audio_behind = 0;
 
+    extendeddataOffset = 0;
+    seektable = new vector<struct seektable_entry>;
+
     pip = false;
     numencoders++;
 
@@ -112,7 +114,12 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         delete [] strm;
     if (fd > 0)
         close(fd);
-    
+    if (seektable)
+    {
+        seektable->clear();
+        delete seektable;  
+    }  
+
     while (videobuffer.size() > 0)
     {
         struct vidbuffertype *vb = videobuffer.back();
@@ -718,8 +725,30 @@ again:
     munmap(buf, vm.size);
 #endif
     KillChildren();
+
+    if (!livetv)
+        WriteSeekTable(false);
+
     recording = false;
     close(fd);
+}
+
+void NuppelVideoRecorder::TransitionToFile(const QString &lfilename)
+{
+    ringBuffer->TransitionToFile(lfilename);
+    WriteHeader(true);
+}
+
+void NuppelVideoRecorder::TransitionToRing(void)
+{
+    pausewritethread = true;
+    while (!actuallypaused)
+        usleep(50);
+
+    WriteSeekTable(true);
+    ringBuffer->TransitionToRing();
+
+    pausewritethread = false;
 }
 
 int NuppelVideoRecorder::SpawnChildren(void)
@@ -829,8 +858,8 @@ void NuppelVideoRecorder::WriteHeader(bool todumpfile)
     struct rtfileheader fileheader;
     struct rtframeheader frameheader;
     static unsigned long int tbls[128];
-    static const char finfo[12] = "NuppelVideo";
-    static const char vers[5]   = "0.06";
+    static const char finfo[12] = "MythTVVideo";
+    static const char vers[5]   = "0.07";
     
     memset(&fileheader, 0, sizeof(fileheader));
     memcpy(fileheader.finfo, finfo, sizeof(fileheader.finfo));
@@ -849,7 +878,7 @@ void NuppelVideoRecorder::WriteHeader(bool todumpfile)
     fileheader.videoblocks = -1;
     fileheader.audioblocks = -1;
     fileheader.textsblocks = 0;
-    fileheader.keyframedist = KEYFRAMEDISTEND;
+    fileheader.keyframedist = KEYFRAMEDIST;
 
     if (todumpfile)
         ringBuffer->WriteToDumpFile(&fileheader, FILEHEADERSIZE);
@@ -933,6 +962,8 @@ void NuppelVideoRecorder::WriteHeader(bool todumpfile)
     moredata.audio_channels = 2;
     moredata.audio_bits_per_sample = 16;
 
+    extendeddataOffset = ringBuffer->GetFileWritePosition();
+
     if (todumpfile)
         ringBuffer->WriteToDumpFile(&moredata, sizeof(moredata));
     else
@@ -943,25 +974,63 @@ void NuppelVideoRecorder::WriteHeader(bool todumpfile)
             // continues parts works too
 }
 
+void NuppelVideoRecorder::WriteSeekTable(bool todumpfile)
+{
+    int numentries = seektable->size();
+
+    struct rtframeheader frameheader;
+    memset(&frameheader, 0, sizeof(frameheader));
+    frameheader.frametype = 'Q'; // SeekTable
+    frameheader.packetlength = sizeof(struct seektable_entry) * numentries;
+
+    long long currentpos = ringBuffer->GetFileWritePosition();
+
+    if (todumpfile)
+        ringBuffer->WriteToDumpFile(&frameheader, sizeof(frameheader));
+    else
+        ringBuffer->Write(&frameheader, sizeof(frameheader));    
+
+    char *seekbuf = new char[frameheader.packetlength];
+    int offset = 0;
+
+    vector<struct seektable_entry>::iterator i = seektable->begin();
+    for (; i != seektable->end(); i++)
+    {
+        memcpy(seekbuf + offset, i, sizeof(struct seektable_entry));
+        offset += sizeof(struct seektable_entry);
+    }
+
+    if (todumpfile)
+        ringBuffer->WriteToDumpFile(seekbuf, frameheader.packetlength);
+    else
+        ringBuffer->Write(seekbuf, frameheader.packetlength);
+
+    ringBuffer->WriterSeek(extendeddataOffset + 
+                           offsetof(struct extendeddata, seektable_offset),
+                           SEEK_SET);
+
+    if (todumpfile)
+        ringBuffer->WriteToDumpFile(&currentpos, sizeof(long long));
+    else
+        ringBuffer->Write(&currentpos, sizeof(long long));
+}
+
 int NuppelVideoRecorder::CreateNuppelFile(void)
 {
     framesWritten = 0;
     
     if (!ringBuffer)
     {
-        ringBuffer = new RingBuffer(sfilename, true);
-        weMadeBuffer = true;
-	livetv = false;
+        cerr << "Error: no ringbuffer, recorder wasn't initialized.\n";
+        return -1;
     }
-    else
-        livetv = true;
 
     if (!ringBuffer->IsOpen()) 
-        return(-1);
+        return -1;
 
     WriteHeader();
 
-    return(0);
+    return 0;
 }
 
 void NuppelVideoRecorder::Reset(void)
@@ -1134,9 +1203,10 @@ void NuppelVideoRecorder::doWriteThread(void)
 {
     int videofirst;
 
+    actuallypaused = false;
     while (childrenLive)
     {
-	if (paused)
+	if (pausewritethread)
 	{
             actuallypaused = true;
             usleep(50);
@@ -1253,6 +1323,14 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
         frameheader.keyframe=0;
         frameofgop=0;
         ringBuffer->Write("RTjjjjjjjjjjjjjjjjjjjjjjjj", FRAMEHEADERSIZE);
+
+        long long position = ringBuffer->GetFileWritePosition();
+        struct seektable_entry ste;
+        ste.file_offset = position;
+        ste.keyframe_number = ((fnum - startnum) >> 1) / keyframedist;
+
+        seektable->push_back(ste);
+
         frameheader.frametype    = 'S';           // sync frame
         frameheader.comptype     = 'V';           // video sync information
         frameheader.filters      = 0;             // no filters applied
@@ -1268,13 +1346,6 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
         // write audio sync info
         ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
 
-	if (keyswritten < 7)
-	{
-            keyswritten++;
-	    if (keyswritten > 6)
-                keyframedist = KEYFRAMEDISTEND;
-	} 
-   
         wantkeyframe = true;
         sync();   
     }

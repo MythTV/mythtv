@@ -128,12 +128,10 @@ extern int mm_flags;
 
 int mm_support(void);
 
-#ifndef emms
 static inline void emms(void)
 {
     __asm __volatile ("emms;":::"memory");
 }
-#endif
 
 #define emms_c() \
 {\
@@ -266,10 +264,15 @@ void mdct_calc(MDCTContext *s, FFTSample *out,
                const FFTSample *input, FFTSample *tmp);
 void mdct_end(MDCTContext *s);
 
-#include "mpegvideo.h"
- 
-void fdct_ifast(MpegEncContext *s, DCTELEM *data);
-void ff_jpeg_fdct_islow (MpegEncContext *s, DCTELEM *data);
-void ff_fdct_mmx(MpegEncContext *s, DCTELEM *block);
+/* FDCT */
+
+typedef struct FDCTContext {
+    INT16 __align8 dct_quantize_temp_block[64];
+    INT16 __align8 fdct_mmx_block_tmp[64];
+} FDCTContext;
+
+void fdct_ifast(FDCTContext *s, DCTELEM *data);
+void ff_jpeg_fdct_islow(FDCTContext *s, DCTELEM *data);
+void ff_fdct_mmx(FDCTContext *s, DCTELEM *block);
 
 #endif

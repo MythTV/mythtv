@@ -493,6 +493,9 @@ typedef struct MpegEncContext {
     
     DCTELEM (*block)[64]; /* points to one of the following blocks */
     DCTELEM blocks[2][6][64] __align8; // for HQ mode we need to keep the best block
+
+    FDCTContext fdct_ctx;
+
     int (*decode_mb)(struct MpegEncContext *s, DCTELEM block[6][64]); // used by some codecs to avoid a switch()
 #define SLICE_OK         0
 #define SLICE_ERROR     -1
@@ -508,9 +511,7 @@ typedef struct MpegEncContext {
     void (*dct_unquantize)(struct MpegEncContext *s, // unquantizer to use (mpeg4 can use both)
                            DCTELEM *block, int n, int qscale);
     int (*dct_quantize)(struct MpegEncContext *s, DCTELEM *block, int n, int qscale, int *overflow);
-    void (*fdct)(struct MpegEncContext *s, DCTELEM *block/* align 16*/);
-    INT16 __align8 dct_quantize_temp_block[64];
-    INT16 __align8 fdct_mmx_block_tmp[64];
+    void (*fdct)(FDCTContext *s, DCTELEM *block/* align 16*/);
     void (*idct_put)(UINT8 *dest/*align 8*/, int line_size, DCTELEM *block/*align 16*/);
     void (*idct_add)(UINT8 *dest/*align 8*/, int line_size, DCTELEM *block/*align 16*/);
 } MpegEncContext;

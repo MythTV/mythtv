@@ -59,9 +59,9 @@ class NuppelVideoRecorder
     void StartRecording(void);
     void StopRecording(void) { encoding = false; } 
     
-    void Pause(void) { paused = true; 
+    void Pause(void) { paused = true; pausewritethread = true;
                        actuallypaused = audiopaused = mainpaused = false; }
-    void Unpause(void) { paused = false; }
+    void Unpause(void) { paused = false; pausewritethread = false; }
     bool GetPause(void) { return (audiopaused && mainpaused && 
                                   actuallypaused); }
     
@@ -80,6 +80,9 @@ class NuppelVideoRecorder
     void WriteHeader(bool todumpfile = false);
 
     void SetVideoFilters(QString &filters) { videoFilterList = filters; }
+
+    void TransitionToFile(const QString &lfilename);
+    void TransitionToRing(void);
 
  protected:
     static void *WriteThread(void *param);
@@ -104,6 +107,8 @@ class NuppelVideoRecorder
     void WriteAudio(unsigned char *buf, int fnum, int timecode);
 
     bool SetupAVCodec(void);
+
+    void WriteSeekTable(bool todumpfile);
 
     QString sfilename;
     bool encoding;
@@ -173,14 +178,17 @@ class NuppelVideoRecorder
     RingBuffer *ringBuffer;
     bool weMadeBuffer;
 
-    int keyswritten;
     int keyframedist;
+    vector<struct seektable_entry> *seektable;
+
+    long long extendeddataOffset;
 
     long long framesWritten;
     double video_frame_rate;
 
     bool livetv;
     bool paused;
+    bool pausewritethread;
     bool actuallypaused;
     bool audiopaused;
     bool mainpaused;

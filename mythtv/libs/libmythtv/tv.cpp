@@ -548,8 +548,7 @@ void TV::HandleStateChange(void)
 
         SetChannel();
 
-        rbuffer->TransitionToFile(outputFilename);
-        nvr->WriteHeader(true);
+        nvr->TransitionToFile(outputFilename);
         nvr->Reset();
         nvr->Unpause();
 
@@ -576,7 +575,7 @@ void TV::HandleStateChange(void)
         while (!nvp->GetPause())
             usleep(50);
 
-        rbuffer->TransitionToRing();
+        nvr->TransitionToRing();
 
         nvp->Unpause();
  
@@ -783,6 +782,8 @@ void TV::SetupPlayer(void)
     nvp->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
     nvp->SetAudioDevice(settings->GetSetting("AudioDevice"));
     nvp->SetLength(playbackLen);
+    nvp->SetExactSeeks(settings->GetNumSetting("ExactSeeking"));
+
     osd_display_time = settings->GetNumSetting("OSDDisplayTime");
 
     if (settings->GetNumSetting("Deinterlace"))

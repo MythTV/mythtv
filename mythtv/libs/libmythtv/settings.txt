@@ -74,6 +74,8 @@ int Deinterlace=1
 int FastForwardAmount=30
 # How long to skip backwards on a rewind?
 int RewindAmount=5
+# Are seeks exact, down to the video frame?
+int ExactSeeking=0
 # Are the fast forward and rewind keys sticky (auto-repeat after letting go)?
 # (set FastForwardAmount and RewindAmount to 1 for good behavior if this is on)
 int StickyKeys=0

@@ -268,7 +268,7 @@ static inline void fdct_row(const int16_t *in, int16_t *out, const int16_t *tabl
     movq_r2m(mm6, *(out + 4));
 }
 
-void ff_fdct_mmx(MpegEncContext *s, int16_t *block)
+void ff_fdct_mmx(FDCTContext *s, int16_t *block)
 {
     int16_t *block1, *out;
     const int16_t *table;

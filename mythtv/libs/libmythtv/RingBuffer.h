@@ -24,6 +24,7 @@ class RingBuffer
     void TransitionToRing(void);
 
     long long Seek(long long pos, int whence);
+    long long WriterSeek(long long pos, int whence);
 
     long long GetReadPosition(void) { return readpos; }
     long long GetTotalReadPosition(void) { return totalreadpos; }
@@ -31,6 +32,8 @@ class RingBuffer
     long long GetTotalWritePosition(void) { return totalwritepos; }
     long long GetFileSize(void) { return filesize; }
     long long GetSmudgeSize(void) { return smudgeamount; }
+
+    long long GetFileWritePosition(void);
     
     long long GetFreeSpace(void);
 
@@ -54,6 +57,7 @@ class RingBuffer
     
     long long writepos;
     long long totalwritepos;
+    long long dumpwritepos;
 
     long long readpos;
     long long totalreadpos;

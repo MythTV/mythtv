@@ -29,6 +29,7 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write)
 
     stopreads = false;
     dumpfd = -1;
+    dumpwritepos = 0;
 
     pthread_rwlock_init(&rwlock, NULL);
 }
@@ -53,6 +54,7 @@ RingBuffer::RingBuffer(const QString &lfilename, long long size,
 
     stopreads = false;
     dumpfd = -1;
+    dumpwritepos = 0;
 
     pthread_rwlock_init(&rwlock, NULL);
 }
@@ -73,6 +75,7 @@ void RingBuffer::TransitionToFile(const QString &lfilename)
 
     dumpfd = open(lfilename.ascii(), 
                   O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE, 0644);
+    dumpwritepos = 0;
 
     pthread_rwlock_unlock(&rwlock);
 }
@@ -83,6 +86,7 @@ void RingBuffer::TransitionToRing(void)
  
     close(dumpfd);
     dumpfd = -1;
+    dumpwritepos = 0;
 
     pthread_rwlock_unlock(&rwlock);
 }
@@ -168,6 +172,7 @@ int RingBuffer::Read(void *buf, int count)
 int RingBuffer::WriteToDumpFile(const void *buf, int count)
 {
     int ret = write(dumpfd, buf, count);
+    dumpwritepos += ret;
     return ret;
 }
 
@@ -217,11 +222,23 @@ int RingBuffer::Write(const void *buf, int count)
 
         if (dumpfd > 0)
         {
-            write(dumpfd, buf, count);
+            int ret2 = write(dumpfd, buf, count);
+            dumpwritepos += ret2;
         }
     }
 
     pthread_rwlock_unlock(&rwlock);
+
+    return ret;
+}
+
+long long RingBuffer::GetFileWritePosition(void)
+{
+    long long ret = -1;
+    if (dumpfd > 0)
+        ret = dumpwritepos;
+    else
+        ret = totalwritepos;
 
     return ret;
 }
@@ -255,6 +272,19 @@ long long RingBuffer::Seek(long long pos, int whence)
 	}
     }
     pthread_rwlock_unlock(&rwlock);
+
+    return ret;
+}
+
+long long RingBuffer::WriterSeek(long long pos, int whence)
+{
+    long long ret = -1;
+    int usefd = fd;
+
+    if (dumpfd > 0)
+        usefd = dumpfd;
+
+    ret = lseek(usefd, pos, whence);
 
     return ret;
 }

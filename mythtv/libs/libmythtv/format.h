@@ -28,7 +28,7 @@ typedef struct rtframeheader
    			// R .. Seekpoint: String RTjjjjjjjj (use full packet)
 			// D .. Addition Data for Compressors
    			//      ct: R .. RTjpeg Tables
-                        // X .. eXtended data
+                        // X .. eXtended data, Q .. SeekTable
    
    char comptype;	// V: 0 .. raw YUV420
 			//    1 .. RTJpeg
@@ -100,10 +100,18 @@ typedef struct extendeddata
    int lavc_qmin;
    int lavc_qmax;
    int lavc_maxqdiff;
+   // seek table offset
+   long long seektable_offset;
    // unused for later -- total size of 128 integers.
    // new fields must be added at the end, above this comment.
-   int expansion[113];
+   int expansion[111];
 } extendeddata;
+
+typedef struct seektable_entry
+{
+   long long file_offset;
+   int keyframe_number; 
+} seektable_entry;
 
 #define FRAMEHEADERSIZE sizeof(rtframeheader)
 #define FILEHEADERSIZE  sizeof(rtfileheader)
