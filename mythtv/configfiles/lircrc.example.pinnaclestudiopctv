@@ -1,5 +1,5 @@
 # lircrc.example.pinnaclestudiopctv
-# 2002-11-11, Robert Kulagowski
+# 2003-01-17, Robert Kulagowski
 # mailto:rkulagow@rocketmail.com
 
 # These are standard definitions which should exist on any remote control
@@ -66,8 +66,8 @@ end
 
 begin
     prog = irxevent
-    button = 0
-    config = Key KP_0 CurrentWindow
+    button = 0/AV
+    config = Key 0 CurrentWindow
 end
 
 
@@ -199,17 +199,17 @@ end
 #    config = Key  CurrentWindow
 # end
 
-# begin
-#    prog = irxevent
-#    button = undo
+begin
+   prog = irxevent
+   button = undo
 # This is the arced left arrow
-# Not used for anything yet
-#    config = Key U CurrentWindow
-# end
+# Jump Backward
+    config = Key Page_Down CurrentWindow
+ end
 
 # begin
-#    prog = irxevent
-#    button = Record
+#   prog = irxevent
+#   button = Record
 # Not used for anything yet
 #    config = Key  CurrentWindow
 #end
@@ -220,13 +220,13 @@ begin
     config = Key P CurrentWindow
 end
 
-# begin
-#    prog = irxevent
-#    button = redo
+begin
+   prog = irxevent
+   button = redo
 # This is the arced right arrow
-# Not used for anything yet
-#    config = Key  CurrentWindow
-# end
+# Jump Forward
+   config = Key Page_Up CurrentWindow
+end
 
 begin
     prog = irxevent
