@@ -269,8 +269,8 @@ class MythCheckBox: public QCheckBox
 
   protected:
     virtual void keyPressEvent(QKeyEvent* e);
-    virtual void focusInEvent(QFocusEvent *e) { emit changeHelpText(helptext); 
-                                                QCheckBox::focusInEvent(e); }
+    virtual void focusInEvent(QFocusEvent *e);
+    virtual void focusOutEvent(QFocusEvent *e);
 
   private:
     QString helptext;

@@ -55,6 +55,19 @@ void MythCheckBox::keyPressEvent(QKeyEvent* e)
     }
 }
 
+void MythCheckBox::focusInEvent(QFocusEvent *e)
+{
+     emit changeHelpText(helptext);
+     this->setPaletteBackgroundColor(QColor(0,0,0));
+     QCheckBox::focusInEvent(e);
+}
+
+void MythCheckBox::focusOutEvent(QFocusEvent *e)
+{
+     this->unsetPalette();
+     QCheckBox::focusOutEvent(e);
+}
+
 bool MythSpinBox::eventFilter(QObject* o, QEvent* e)
 {
     (void)o;
