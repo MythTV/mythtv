@@ -86,9 +86,9 @@ void av_register_all(void)
 //#ifdef CONFIG_VIDEO4LINUX
 //    video_grab_init();
 //#endif
-//#if defined(CONFIG_AUDIO_OSS) || defined(CONFIG_AUDIO_BEOS)
-//    audio_init();
-//#endif
+#if defined(CONFIG_AUDIO_OSS) || defined(CONFIG_AUDIO_BEOS)
+    audio_init();
+#endif
 
 //#ifdef CONFIG_DV1394
 //    dv1394_init();

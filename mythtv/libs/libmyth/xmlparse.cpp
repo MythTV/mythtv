@@ -1415,6 +1415,7 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
     }
 
     UIStatusBarType *sb = new UIStatusBarType(name, pos, order.toInt());
+    sb->SetScreen(wmult, hmult);
     sb->SetFiller(imgFillSpace);
     if (imgContainer)
     {
@@ -1632,6 +1633,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
 
 
     UIManagedTreeListType *mtl = new UIManagedTreeListType(name);
+    mtl->SetScreen(wmult, hmult);
     mtl->setArea(area);
     mtl->setBins(bins);
     mtl->setBinAreas(bin_corners);
@@ -1787,6 +1789,7 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
     delete image_off;
     delete image_pushed;
 
+    pbt->SetScreen(wmult, hmult);
     pbt->setPosition(pos);
     pbt->SetOrder(order.toInt());
     if (context != -1)
@@ -1915,6 +1918,7 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
     delete image_off;
     delete image_pushed;
 
+    tbt->SetScreen(wmult, hmult);
     tbt->setPosition(pos);
     tbt->setFont(testfont);
     tbt->SetOrder(order.toInt());
@@ -2044,6 +2048,7 @@ void XMLParse::parseCheckBox(LayerSet *container, QDomElement &element)
     delete image_checked_high;
     delete image_unchecked_high;
 
+    cbt->SetScreen(wmult, hmult);
     cbt->setPosition(pos);
     cbt->SetOrder(order.toInt());
     if (context != -1)
@@ -2171,6 +2176,7 @@ void XMLParse::parseSelector(LayerSet *container, QDomElement &element)
     delete image_off;
     delete image_pushed;
 
+    st->SetScreen(wmult, hmult);
     st->setPosition(area.topLeft());
     st->setFont(testfont);
     st->SetOrder(order.toInt());
@@ -2216,6 +2222,7 @@ void XMLParse::parseBlackHole(LayerSet *container, QDomElement &element)
 
 
     UIBlackHoleType *bh = new UIBlackHoleType(name);
+    bh->SetScreen(wmult, hmult);
     bh->setArea(area);
     bh->SetParent(container);
     bh->calculateScreenArea();

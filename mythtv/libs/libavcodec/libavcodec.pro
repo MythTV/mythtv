@@ -36,6 +36,11 @@ SOURCES += 8bps.c parser.c smc.c flicvideo.c truemotion1.c
 
 #SOURCES += libpostproc/postprocess.c
 
+inc.path = $${PREFIX}/include/mythtv/ffmpeg/
+inc.files = avcodec.h rational.h common.h
+
+INSTALLS += inc
+
 contains( CONFIG_AC3, yes ) {
     SOURCES += a52dec.c
     !contains( CONFIG_A52BIN, yes ) {

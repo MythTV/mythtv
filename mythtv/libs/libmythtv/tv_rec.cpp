@@ -610,8 +610,19 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
         SetOption(profile, "hardwaremjpeghdecimation");
         SetOption(profile, "hardwaremjpegvdecimation");
     }
-    else 
-        cerr << "Unknown video codec: " << setting << endl;
+    else
+    {
+        cerr << "Unknown video codec\n";
+        cerr << "Please go into the TV Settings, Recording Profiles and\n";
+        cerr << "setup the four 'Software Encoders' profiles.\n";
+        cerr << "Assuming RTjpeg for now.\n";
+
+        nvr->SetOption("codec", "rtjpeg");
+
+        SetOption(profile, "rtjpegquality");
+        SetOption(profile, "rtjpegchromafilter");
+        SetOption(profile, "rtjpeglumafilter");
+    }
 
     setting = profile.byName("audiocodec")->getValue();
     if (setting == "MP3") 
@@ -623,7 +634,10 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
     else if (setting == "Uncompressed") 
         nvr->SetOption("audiocompression", 0);
     else 
-        cerr << "Unknown audio codec: " << setting << endl;
+    {
+        cerr << "Unknown audio codec\n";
+        nvr->SetOption("audiocompression", 0);
+    }
 
     SetOption(profile, "width");
     SetOption(profile, "height");

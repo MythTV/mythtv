@@ -536,6 +536,7 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
 #define AVERROR_NOTSUPP     (-7)  /* operation not supported */
  
 int av_find_stream_info(AVFormatContext *ic);
+void av_estimate_timings(AVFormatContext *ic);
 int av_read_packet(AVFormatContext *s, AVPacket *pkt);
 int av_read_frame(AVFormatContext *s, AVPacket *pkt);
 void av_read_frame_flush(AVFormatContext *s);

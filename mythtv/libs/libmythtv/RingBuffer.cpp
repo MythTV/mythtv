@@ -575,7 +575,6 @@ void RingBuffer::ResetReadAhead(long long newinternal)
 
 void RingBuffer::StartupReadAheadThread(void)
 {
-cout << "starting read ahead\n";
     readaheadrunning = false;
 
     pthread_create(&reader, NULL, startReader, this);
