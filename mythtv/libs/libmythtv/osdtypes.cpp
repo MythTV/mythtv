@@ -1459,11 +1459,11 @@ void OSDTypeCC::Draw(unsigned char *screenptr, int vid_width, int vid_height,
                 maxy = vid_height;
 
             QRect rect = QRect(0, 0, textlength + 4, 
-                               (m_font->Size() * 3 / 2) + 4);
+                               (m_font->Size() * 3 / 2) + 3);
             m_box->SetRect(rect);
             m_box->Draw(screenptr, vid_width, vid_height, 0, 0, x - 2, y - 2);
 
-            m_font->DrawString(screenptr, x, y, cc->text, maxx, maxy, 255); 
+            m_font->DrawString(screenptr, x, y + 2, cc->text, maxx, maxy, 255); 
         }
     }
 }

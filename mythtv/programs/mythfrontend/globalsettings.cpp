@@ -388,6 +388,17 @@ public:
     };
 };
 
+class DefaultCCMode: public CheckBoxSetting, public GlobalSetting {
+public:
+    DefaultCCMode():
+        GlobalSetting("DefaultCCMode") {
+        setLabel("Default setting for Closed Captioning");
+        setValue(false);
+        setHelpText("If this is set, captions will be on by default when"
+                   "playing back recordings or watching live TV.");
+    };
+};
+
 class AggressiveBuffer: public CheckBoxSetting, public GlobalSetting {
 public:
     AggressiveBuffer():
@@ -899,6 +910,7 @@ PlaybackSettings::PlaybackSettings()
     osd->addChild(new OSDDisplayTime());
     osd->addChild(new OSDFont());
     osd->addChild(new OSDCCFont());
+    osd->addChild(new DefaultCCMode());
     addChild(osd);
 }
 

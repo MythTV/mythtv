@@ -82,6 +82,7 @@ private:
     class SRStartDate* startDate;
     class SREndTime* endTime;
     class SREndDate* endDate;
+    class SRCategory* category;
 
     ProgramInfo* m_pginfo;
 };

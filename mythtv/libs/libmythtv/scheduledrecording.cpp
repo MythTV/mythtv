@@ -134,6 +134,14 @@ public:
     };
 };
 
+class SRCategory: public LineEditSetting, public SRSetting {
+public:
+    SRCategory(const ScheduledRecording& parent):
+        SRSetting(parent, "category") {
+        setVisible(false);
+    };
+};
+
 ScheduledRecording::ScheduledRecording() {
     addChild(id = new ID());
     addChild(type = new SRRecordingType(*this));
@@ -146,6 +154,7 @@ ScheduledRecording::ScheduledRecording() {
     addChild(endTime = new SREndTime(*this));
     addChild(startDate = new SRStartDate(*this));
     addChild(endDate = new SREndDate(*this));
+    addChild(category = new SRCategory(*this));
 
     m_pginfo = NULL;
 }
@@ -160,6 +169,7 @@ void ScheduledRecording::fromProgramInfo(ProgramInfo* proginfo)
     startDate->setValue(proginfo->startts.date());
     endTime->setValue(proginfo->endts.time());
     endDate->setValue(proginfo->endts.date());
+    category->setValue(proginfo->category);
 }
 
 void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
@@ -169,7 +179,7 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
 "program.starttime, program.endtime, "
 "program.title, program.subtitle, program.description, "
 "channel.channum, channel.callsign, channel.name, "
-"oldrecorded.starttime IS NOT NULL AS duplicate "
+"oldrecorded.starttime IS NOT NULL AS duplicate, program.category "
 "FROM record "
 " INNER JOIN channel ON (channel.chanid = program.chanid) "
 " INNER JOIN program ON (program.title = record.title) "
@@ -232,6 +242,7 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
              proginfo->chansign = result.value(8).toString();
              proginfo->channame = result.value(9).toString();
              proginfo->duplicate = result.value(10).toInt();
+             proginfo->category = QString::fromUtf8(result.value(11).toString());
 
              // would save many queries to create and populate a
              // ScheduledRecording and put it in the proginfo at the
@@ -244,6 +255,8 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
                  proginfo->subtitle = "";
              if (proginfo->description == QString::null)
                  proginfo->description = "";
+             if (proginfo->category == QString::null)
+                 proginfo->category = "";
 
              if (proginfo->endts < now)
                  delete proginfo;
@@ -415,20 +428,24 @@ void ScheduledRecording::doneRecording(QSqlDatabase* db, const ProgramInfo& prog
     QString sqltitle = proginfo.title;
     QString sqlsubtitle = proginfo.subtitle;
     QString sqldescription = proginfo.description;
+    QString sqlcategory = proginfo.category;
 
     sqltitle.replace(QRegExp("\""), QString("\\\""));
     sqlsubtitle.replace(QRegExp("\""), QString("\\\""));
     sqldescription.replace(QRegExp("\""), QString("\\\""));
+    sqlcategory.replace(QRegExp("\""), QString("\\\""));
 
     QString query = QString("INSERT INTO oldrecorded (chanid,starttime,endtime,title,"
-                            "subtitle,description) "
-                            "VALUES(%1,\"%2\",\"%3\",\"%4\",\"%5\",\"%6\");")
+                            "subtitle,description,category) "
+                            "VALUES(%1,\"%2\",\"%3\",\"%4\",\"%5\",\"%6\","
+                            "\"%7\");")
         .arg(proginfo.chanid)
         .arg(proginfo.startts.toString(Qt::ISODate))
         .arg(proginfo.endts.toString(Qt::ISODate))
         .arg(sqltitle.utf8()) 
         .arg(sqlsubtitle.utf8())
-        .arg(sqldescription.utf8());
+        .arg(sqldescription.utf8())
+        .arg(sqlcategory.utf8());
 
     QSqlQuery result = db->exec(query);
     if (!result.isActive())

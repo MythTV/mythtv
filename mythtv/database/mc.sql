@@ -86,6 +86,7 @@ CREATE TABLE IF NOT EXISTS record
     title VARCHAR(128) NULL,
     subtitle VARCHAR(128) NULL,
     description TEXT NULL,
+    category VARCHAR(64) NULL,
     profile INT UNSIGNED NOT NULL DEFAULT 0,
     INDEX (chanid, starttime),
     INDEX (title)
@@ -98,6 +99,7 @@ CREATE TABLE IF NOT EXISTS recorded
     title VARCHAR(128) NULL,
     subtitle VARCHAR(128) NULL,
     description TEXT NULL,
+    category VARCHAR(64) NULL,
     hostname VARCHAR(255),
     bookmark VARCHAR(128) NULL,
     editing INT UNSIGNED NOT NULL DEFAULT 0,
@@ -146,6 +148,7 @@ CREATE TABLE IF NOT EXISTS oldrecorded
     title VARCHAR(128) NULL,
     subtitle VARCHAR(128) NULL,
     description TEXT NULL,
+    category VARCHAR(64) NULL,
     PRIMARY KEY (chanid, starttime),
     INDEX (endtime),
     INDEX (title)
@@ -233,7 +236,7 @@ CREATE TABLE IF NOT EXISTS transcoding (
     hostname VARCHAR(255)
 );
 
-INSERT INTO settings VALUES ('DBSchemaVer', 901, NULL);
+INSERT INTO settings VALUES ('DBSchemaVer', 902, NULL);
 
 INSERT INTO recordingprofiles (name) VALUES ('Default');
 INSERT INTO recordingprofiles (name) VALUES ('Live TV');

@@ -594,18 +594,21 @@ void ProgramInfo::StartedRecording(QSqlDatabase *db)
     QString sqltitle = title;
     QString sqlsubtitle = subtitle;
     QString sqldescription = description;
+    QString sqlcategory = category;
 
     sqltitle.replace(QRegExp("\""), QString("\\\""));
     sqlsubtitle.replace(QRegExp("\""), QString("\\\""));
     sqldescription.replace(QRegExp("\""), QString("\\\""));
+    sqlcategory.replace(QRegExp("\""), QString("\\\""));
 
     QString query;
     query = QString("INSERT INTO recorded (chanid,starttime,endtime,title,"
-                    "subtitle,description,hostname) "
-                    "VALUES(%1,\"%2\",\"%3\",\"%4\",\"%5\",\"%6\",\"%7\");")
+                    "subtitle,description,hostname,category) "
+                    "VALUES(%1,\"%2\",\"%3\",\"%4\",\"%5\",\"%6\",\"%7\","
+                    "\"%8\");")
                     .arg(chanid).arg(starts).arg(ends).arg(sqltitle.utf8()) 
                     .arg(sqlsubtitle.utf8()).arg(sqldescription.utf8())
-                    .arg(gContext->GetHostName());
+                    .arg(gContext->GetHostName()).arg(sqlcategory.utf8());
 
     QSqlQuery qquery = db->exec(query);
     if (!qquery.isActive())

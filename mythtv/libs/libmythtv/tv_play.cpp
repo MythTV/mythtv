@@ -585,6 +585,9 @@ void TV::SetupPlayer(void)
 
     osd_display_time = gContext->GetNumSetting("OSDDisplayTime");
 
+    if (gContext->GetNumSetting("DefaultCCMode"))
+        nvp->ToggleCC();
+
     if (gContext->GetNumSetting("Deinterlace"))
     {
         if (filters.length() > 1)
