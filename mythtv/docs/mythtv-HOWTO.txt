@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-04-23, v2.16
+  2003-04-25, v2.17
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -149,6 +149,7 @@
      19.7 I'd like to delete the mysql database.
      19.8 btaudio
      19.9 Removing unwanted channels.
+     19.10 I'd like to use a hardware MPEG2 encoder.
 
   ______________________________________________________________________
 
@@ -457,6 +458,8 @@
      outputs; pan, brightness, overscan/underscan controls; supports up
      to 1024x768 outputs; and supports PAL and NTSC.
 
+  +o  ADS TV Elite XGA
+
   [1m3.2.  Software.[0m
 
   There are a few ways of installing programs on Linux systems; you can
@@ -569,6 +572,7 @@
   Red Hat Linux 8.0 installation CD, and it allows you to select
   packages at installation time, or once the system is up and running.
   You can access this program by selecting
+
   RedHatMenu>System Settings>Packages
 
   If you did a typical Desktop install of Red Hat Linux 8.0 make sure
@@ -709,7 +713,7 @@
   locate the "USE" variable. If the line is commented out, remove the
   comment. The line should have at least:
 
-  USE="mysql qt alsa"
+       USE="mysql qt alsa"
 
   Next you need to build KDE. If you don't plan on using the ebuilds as
   described in the Gentoo section then you also need to install lame.
@@ -812,11 +816,8 @@
 
   Switch to /etc and execute the following:
 
-       # cd /etc
-       # cat >> ld.so.conf
-       /usr/local/lib
-       ^D
-
+       $ su -
+       # echo /usr/local/lib >> /etc/ld.so.conf
        # /sbin/ldconfig
        # exit
        $
@@ -861,7 +862,6 @@
 
   If you've got a system with an AMD K6-2 or a VIA C3 processor, make
   the following change in the settings.pro file.
-
   Look for
 
   -march=pentiumpro
@@ -913,10 +913,10 @@
   If you get errors installing XML::Twig or other XMLTV prerequisites,
   try deleting the old versions of libexpat
 
-       $ su
-       # rm -f /usr/lib/libexpat*
-       # /sbin/ldconfig
-       # exit
+  $ su
+  # rm -f /usr/lib/libexpat*
+  # /sbin/ldconfig
+  # exit
 
   Download version 1.95.5 from sourceforge.net:
   http://sourceforge.net/projects/expat/
@@ -3281,4 +3281,126 @@
 
        $ mysql -u root mythconverg
        mysql> delete from program where chanid = '1015';
+
+  [1m19.10.  I'd like to use a hardware MPEG2 encoder.[0m
+
+  [1mNOTE[22m:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS NOT
+  GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR IVTV DRIVER
+  ASSISTANCE, SEE THE IVTV MAILING LIST.
+  https://lists.sourceforge.net/lists/listinfo/ivtv-devel
+  <https://lists.sourceforge.net/lists/listinfo/ivtv-devel>
+
+  These instructions work for Mandrake 9.1 on a backend machine which is
+  hosting a single PVR250 capture card.
+
+  Install the Mandrake kernel source.  If you are using a different
+  Mandrake kernel level (ie, not 2.4.21-0.16mdk as in the example below,
+  then alter the [1murpmi [22mcommand appropriately.)
+
+       $ uname -a
+       Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
+       unknown GNU/Linux
+
+       $ su
+       # urpmi kernel-source
+
+  Download the IVTV driver from CVS:
+
+       $ cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/ivtv login
+       <enter> as password
+       $ cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/ivtv co ivtv
+
+  This should create an ivtv directory.  Switch to it and perform the
+  following commands:
+
+       $ cd ivtv/ivtv/utils
+       $ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_16_21062.exe
+       $ su
+       # ./ivtvfwextract pvr250_16_21062.exe
+       # exit
+
+  The [1mivtvfwextract [22mprogram extracts the firmware required for the card.
+  You may want to go to the website and downloaded the latest Windows
+  driver if the [1mwget [22mcommand fails.
+
+  Place a copy of the videodev2.h file in the ivtv driver subdirectory.
+  This is the only reason that we installed the kernel-source above.  In
+  the future, the ivtv driver may include the videodev2.h file in the
+  distribution.
+
+       $ cp /usr/src/linux/include/linux/videodev2.h ~/ivtv/ivtv/driver/
+       $ cd ~/ivtv/ivtv/driver
+       $ make
+
+  Add the following to /etc/modules.conf:
+
+       alias char-major-81     videodev
+       alias char-major-81-0   ivtv
+       options ivtv
+       options tuner type=2
+       options msp3400 once=1 simple=1
+       add below ivtv msp3400 saa7115 tuner
+
+  [1mNOTE[22m:  You must specify the tuner type manually.  See
+  ~/ivtv/ivtv/driver/tuner.h for a listing of tuners.  In the above
+  example, tuner type=2 is a Phillips NTSC.  Use an appropriate tuner
+  type for your system and video standard.
+
+  Next, copy the files that were compiled in the driver directory into
+  the appropriate modules directory:
+
+       $ su
+       # cd /lib/modules/2.4.21-0.16mdk/kernel/drivers/media/video
+       # cp ~/ivtv/ivtv/driver/msp3400.o .
+       # cp ~/ivtv/ivtv/driver/saa7115.o .
+       # cp ~/ivtv/ivtv/driver/ivtv.o .
+       # depmod -a
+
+  [1mNOTE[22m:  depmod may give errors at this point, but it doesn't seem to
+  impact functionality.
+
+  Finally, load the ivtv driver:
+
+       # modprobe ivtv
+       # exit
+
+  Check that the card is being recognized on the PCI bus:
+
+       $ lspci -v
+       <snip>
+
+       00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
+       Encoder (rev 01)
+               Subsystem: Hauppauge computer works Inc.: Unknown device 4801
+               Flags: bus master, medium devsel, latency 32, IRQ 11
+               Memory at d0000000 (32-bit, prefetchable) [size=64M]
+               Capabilities: <available only to root>
+
+  If you don't see your card on the PCI bus, make sure that it's been
+  installed in a bus-master slot.  For some motherboards, only the PCI
+  slots closest to the AGP slot are bus-mastering.
+
+  Check that the ivtv driver has created a new video device:
+
+       $ ls -l /dev/v4l/vi*
+       crw-------    1 mythtv   sys       81,   0 Dec 31  1969 /dev/v4l/video0
+       crw-------    1 mythtv   root      81,  32 Dec 31  1969 /dev/v4l/video32
+
+  In this case, the ivtv device is video0.
+
+  Go into setup/setup on the machine hosting the hardware MPEG2 card.
+  When you add a new capture card, ensure that you are using the video0
+  device.
+
+  [1mNOTE[22m:  As of 2003-04-25 the ivtv driver does not support VBI, so
+  closed-captioning is not available.
+
+  Leave the VBI device, audio device and audio sampling rate limit at
+  the default values.  Change the default input to an appropriate
+  setting for your configuration.  Change the card type to "Hardware
+  MPEG Encoder Card" and press ENTER.
+
+  The remaining setup is just like a standard V4L card; define a video
+  source if you have not already done so, and assign the video source to
+  a video card input on the Input Connections screen.
 

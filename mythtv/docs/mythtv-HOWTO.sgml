@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-04-23, v2.16
+<date>2003-04-25, v2.17
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -296,6 +296,7 @@ composite and SVideo, provides position adjustment.
 <item>Averkey lite, powered by a USB port, has Composite, SVideo, YPbPr
 outputs; pan, brightness, overscan/underscan controls; supports up to
 1024x768 outputs; and supports PAL and NTSC.
+<item>ADS TV Elite XGA
 </itemize>
 
 <sect1>Software.
@@ -650,11 +651,8 @@ found when we need them.
 <sect1>Modifying <tt>/etc/ld.so.conf</tt>
 <p>Switch to /etc and execute the following:
 <tscreen><verb>
-# cd /etc
-# cat >> ld.so.conf
-/usr/local/lib
-^D
-
+$ su -
+# echo /usr/local/lib >> /etc/ld.so.conf
 # /sbin/ldconfig
 # exit
 $ 
@@ -3130,6 +3128,142 @@ $ mysql -u root mythconverg
 mysql> delete from program where chanid = '1015';
 </verb></tscreen>
 
+<sect1>I'd like to use a hardware MPEG2 encoder.
+<p><bf>NOTE</bf>:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS
+NOT GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR IVTV DRIVER ASSISTANCE,
+SEE THE IVTV MAILING LIST.  <url
+url="https://lists.sourceforge.net/lists/listinfo/ivtv-devel"
+name="https://lists.sourceforge.net/lists/listinfo/ivtv-devel">
+
+These instructions work for Mandrake 9.1 on a backend machine which is
+hosting a single PVR250 capture card.
+
+Install the Mandrake kernel source.  If you are using a different Mandrake
+kernel level (ie, not 2.4.21-0.16mdk as in the example below, then alter the
+<bf>urpmi</bf> command appropriately.)
+
+<tscreen><verb>
+$ uname -a
+Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
+unknown GNU/Linux
+
+$ su
+# urpmi kernel-source
+</verb></tscreen>
+
+Download the IVTV driver from CVS:
+<tscreen><verb>
+$ cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/ivtv login
+<enter> as password
+$ cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/ivtv co ivtv
+</verb></tscreen>
+
+This should create an ivtv directory.  Switch to it and perform the
+following commands:
+
+<tscreen><verb>
+$ cd ivtv/ivtv/utils
+$ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_16_21062.exe
+$ su
+# ./ivtvfwextract pvr250_16_21062.exe
+# exit
+</verb></tscreen>
+
+The <bf>ivtvfwextract</bf> program extracts the firmware required for the
+card.  You may want to go to the website and downloaded the latest Windows
+driver if the <bf>wget</bf> command fails.
+
+Place a copy of the <tt>videodev2.h</tt> file in the ivtv driver
+subdirectory.  This is the only reason that we installed the kernel-source
+above.  In the future, the ivtv driver may include the <tt>videodev2.h</tt>
+file in the distribution.
+
+<tscreen><verb>
+$ cp /usr/src/linux/include/linux/videodev2.h ~/ivtv/ivtv/driver/
+$ cd ~/ivtv/ivtv/driver
+$ make
+</verb></tscreen>
+
+Add the following to <tt>/etc/modules.conf</tt>:
+<tscreen><verb>
+alias char-major-81     videodev
+alias char-major-81-0   ivtv
+options ivtv
+options tuner type=2
+options msp3400 once=1 simple=1
+add below ivtv msp3400 saa7115 tuner
+</verb></tscreen>
+
+<bf>NOTE</bf>:  You must specify the tuner type manually.  See
+<tt>~/ivtv/ivtv/driver/tuner.h</tt> for a listing of tuners.  In the above
+example, <tt>tuner type=2</tt> is a Phillips NTSC.  Use an appropriate tuner
+type for your system and video standard.
+
+Next, copy the files that were compiled in the driver directory into the
+appropriate modules directory:
+
+<tscreen><verb>
+$ su
+# cd /lib/modules/2.4.21-0.16mdk/kernel/drivers/media/video
+# cp ~/ivtv/ivtv/driver/msp3400.o .
+# cp ~/ivtv/ivtv/driver/saa7115.o .
+# cp ~/ivtv/ivtv/driver/ivtv.o .
+# depmod -a
+</verb></tscreen>
+
+<bf>NOTE</bf>:  <tt>depmod</tt> may give errors at this point, but it doesn't
+seem to impact functionality.
+
+Finally, load the ivtv driver:
+<tscreen><verb>
+# modprobe ivtv
+# exit
+</verb></tscreen>
+
+Check that the card is being recognized on the PCI bus:
+
+<tscreen><verb>
+$ lspci -v
+<snip>
+
+00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
+Encoder (rev 01)
+        Subsystem: Hauppauge computer works Inc.: Unknown device 4801
+        Flags: bus master, medium devsel, latency 32, IRQ 11
+        Memory at d0000000 (32-bit, prefetchable) [size=64M]
+        Capabilities: <available only to root>
+</verb></tscreen>
+
+If you don't see your card on the PCI bus, make sure that it's been
+installed in a bus-master slot.  For some motherboards, only the PCI slots
+closest to the AGP slot are bus-mastering.
+
+Check that the ivtv driver has created a new video device:
+
+<tscreen><verb>
+$ ls -l /dev/v4l/vi*
+crw-------    1 mythtv   sys       81,   0 Dec 31  1969 /dev/v4l/video0
+crw-------    1 mythtv   root      81,  32 Dec 31  1969 /dev/v4l/video32
+</verb></tscreen>
+
+In this case, the ivtv device is <tt>video0</tt>.
+
+Go into <tt>setup/setup</tt> on the machine hosting the hardware MPEG2 card.
+When you add a new capture card, ensure that you are using the
+<tt>video0</tt> device.  
+
+<bf>NOTE</bf>:  As of 2003-04-25 the ivtv driver does not support VBI, so
+closed-captioning is not available.
+
+Leave the VBI device, audio device and audio sampling rate limit at the
+default values.  Change the default input to an appropriate setting for your
+configuration.  Change the card type to "Hardware MPEG Encoder Card" and
+press ENTER.
+
+The remaining setup is just like a standard V4L card; define a video source
+if you have not already done so, and assign the video source to a video card
+input on the Input Connections screen.
+
 </article>
 <!-- Revision History
 v2.00, 2003-03-14.  Initial release for 0.8.  Added xset command for
@@ -3163,6 +3297,8 @@ mythtv-0.8 directory.  Added urpmi for Mandrake Cooker for XMLTV
 pre-requisites.  Added gist.com instructions.  Incorporated pre-requisite
 text from Ray Olszewski [ray@comarre.com] with edits.
 v2.16, 2003-04-23.  Additional stuff in the hardware pre-req section.
+v2.17, 2003-04-24.  John Crombe's suggestion WRT ld.so.conf.  Another scan
+converter.  PVR250 initial docs.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

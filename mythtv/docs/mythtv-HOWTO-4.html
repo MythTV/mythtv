@@ -102,11 +102,8 @@ found when we need them.</P>
 <P>Switch to /etc and execute the following:
 <BLOCKQUOTE><CODE>
 <PRE>
-# cd /etc
-# cat >> ld.so.conf
-/usr/local/lib
-^D
-
+$ su -
+# echo /usr/local/lib >> /etc/ld.so.conf
 # /sbin/ldconfig
 # exit
 $ 
