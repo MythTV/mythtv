@@ -159,6 +159,7 @@ class NuppelVideoPlayer
     void AddMark(long long frames, int type);
     void DeleteMark(long long frames);
     void HandleSelect(void);
+    void HandleResponse(void);
 
     int audiofd;
 
@@ -297,6 +298,8 @@ class NuppelVideoPlayer
     OSDSet *timedisplay;
 
     QMap<long long, int> deleteMap;
+    QString dialogname;
+    int dialogtype;
 };
 
 #endif

@@ -544,6 +544,7 @@ bool OSD::LoadTheme(void)
         name = "editslider";
         OSDSet *set = new OSDSet(name, true, vid_width, vid_height, wmult, 
                                  hmult);
+        set->SetPriority(2);
         AddSet(set, name);
 
         QString bluename = settings->GetSetting("EditSliderNormal");
@@ -818,7 +819,10 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
     opr->SetPosition(0);
     dialogResponseList[name] = 0;
 
-    container->DisplayFor(length * fps);
+    if (length > 0)
+        container->DisplayFor(length * fps);
+    else
+        container->Display();
     m_setsvisible = true;
 
     pthread_mutex_unlock(&osdlock);
@@ -889,15 +893,47 @@ int OSD::GetDialogResponse(const QString &name)
     return -1;
 }
 
-void OSD::ShowEditArrow(long long number, int type)
+void OSD::ShowEditArrow(long long number, long long totalframes, int type)
 {
+    if (!editarrowleft || !editarrowright)
+        return;
+
+    char name[128];
+    sprintf(name, "%lld", number);
+
+    int xpos = (int)((editarrowRect.width() * 1.0 / totalframes) * number);
+    xpos = editarrowRect.left() + xpos;
+    int ypos = editarrowRect.top();
+
     pthread_mutex_lock(&osdlock);
+
+    OSDSet *set = new OSDSet(name, false, vid_width, vid_height, wmult, hmult);
+    AddSet(set, name, false);
+
+    OSDTypeImage *image;
+    if (type == 0)
+    {
+        image = new OSDTypeImage(*editarrowleft);
+        xpos -= image->ImageSize().width();
+    }
+    else
+    {
+        image = new OSDTypeImage(*editarrowright);
+    }
+
+    image->SetPosition(QPoint(xpos, ypos));
+
+    set->AddType(image);
+    set->Display();
 
     pthread_mutex_unlock(&osdlock);
 }
 
 void OSD::HideEditArrow(long long number)
 {
+    char name[128];
+    sprintf(name, "%lld", number);
+
     pthread_mutex_lock(&osdlock);
 
     pthread_mutex_unlock(&osdlock);

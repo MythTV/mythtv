@@ -425,7 +425,7 @@ void OSDTypeImage::Draw(unsigned char *screenptr, int vid_width, int vid_height,
     ystart += yoff;
 
     ystart = (ystart / 2) * 2;
-    xstart = (xstart / 2) * 2;
+    xstart = ((xstart + 1) / 2) * 2;
 
     if (height + ystart > vid_height)
         height = vid_height - ystart - 1;

@@ -52,7 +52,7 @@ class OSD
     OSDSet *ShowText(const QString &name, const QString &message, int xpos,
                      int ypos, int width, int height, int secs);
 
-    void ShowEditArrow(long long number, int type);
+    void ShowEditArrow(long long number, long long totalframes, int type);
     void HideEditArrow(long long number);
 
     void AddSet(OSDSet *set, QString name, bool withlock = true);

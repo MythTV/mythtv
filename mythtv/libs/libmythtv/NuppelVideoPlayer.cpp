@@ -114,6 +114,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
     seekamount = 30;
     seekamountpos = 2;
 
+    dialogname = "";
+
     pthread_mutex_init(&eventLock, NULL);
 }
 
@@ -1850,21 +1852,41 @@ bool NuppelVideoPlayer::EnableEdit(void)
         seekamount = keyframedist;
         seekamountpos = 2;
 
+        dialogname = "";
         deleteMap.clear();
-
-        AddMark(1000, 0);
-        AddMark(20000, 1);
-        AddMark(30000, 0);
+        UpdateEditSlider();
     }
     return editmode;   
 }
 
 void NuppelVideoPlayer::DoKeypress(int keypress)
 {
+    if (dialogname != "")
+    {
+        switch(keypress)
+        {
+            case wsUp: osd->DialogUp(dialogname); break;
+            case wsDown: osd->DialogDown(dialogname); break;
+            case ' ': case wsEnter: case wsReturn: 
+            {
+                osd->TurnDialogOff(dialogname); 
+                HandleResponse();
+                break;
+            }
+            default: break;
+        }
+        return;
+    }
+
     bool exactstore = exactseeks;
     exactseeks = true;
     switch (keypress)
     {
+        case ' ': case wsEnter: case wsReturn:
+        {
+            HandleSelect();
+            break;
+        }
         case wsLeft: case 'a': case 'A': 
         {
             rewindtime = seekamount;
@@ -1979,6 +2001,40 @@ void NuppelVideoPlayer::UpdateTimeDisplay(void)
 
 void NuppelVideoPlayer::HandleSelect(void)
 {
+    if (0)
+    {
+
+    }
+    else
+    {
+        QString message = "Insert a new cut point?";
+        QString option1 = "Delete before this frame";
+        QString option2 = "Delete after this frame";
+        QString option3 = "Cancel";
+
+        dialogname = "addmark";
+        dialogtype = 1;
+        osd->NewDialogBox(dialogname, message, option1, option2, option3,
+                          -1);
+    }
+}
+
+void NuppelVideoPlayer::HandleResponse(void)
+{
+    int result = osd->GetDialogResponse(dialogname);
+    dialogname = "";
+
+    if (dialogtype == 0)
+    {
+
+    }
+    else if (dialogtype == 1)
+    {
+        if (result == 1)
+            AddMark(framesPlayed, 0);
+        else if (result == 2)
+            AddMark(framesPlayed, 1);
+    }
 }
 
 void NuppelVideoPlayer::UpdateEditSlider(void)
@@ -1989,6 +2045,7 @@ void NuppelVideoPlayer::UpdateEditSlider(void)
 void NuppelVideoPlayer::AddMark(long long frames, int type)
 {
     deleteMap[frames] = type;
+    osd->ShowEditArrow(frames, totalFrames, type);
     UpdateEditSlider();
 }
 
