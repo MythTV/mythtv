@@ -49,7 +49,7 @@ MainVisual::MainVisual( QWidget *parent, const char *name )
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
-    setFont(QFont("Arial", 18 * hmult, QFont::Bold));
+    setFont(QFont("Arial", (int)(18 * hmult), QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
     timer = new QTimer(this);
@@ -379,8 +379,8 @@ void StereoScope::draw( QPainter *p, const QColor &back )
 	    b = 0;
 
 	p->setPen( QColor( int(r), int(g), int(b) ) );
-	p->drawLine( i - 1, ( size.height() / 4 ) + magnitudesp[ i - 1 ],
-		     i, ( size.height() / 4 ) + magnitudesp[ i ] );
+	p->drawLine( i - 1, (int)((size.height() / 4) + magnitudesp[i - 1]),
+		     i, (int)((size.height() / 4) + magnitudesp[i]));
 
 	// right
 	per = double( magnitudesp[ i + size.width() ] * 2 ) /
@@ -415,9 +415,10 @@ void StereoScope::draw( QPainter *p, const QColor &back )
 	    b = 0;
 
 	p->setPen( QColor( int(r), int(g), int(b) ) );
-	p->drawLine( i - 1, ( size.height() * 3 / 4 ) +
-		     magnitudesp[ i + size.width() - 1 ],
-		     i, ( size.height() * 3 / 4 ) + magnitudesp[ i + size.width() ] );
+	p->drawLine( i - 1, (int)((size.height() * 3 / 4) +
+		     magnitudesp[i + size.width() - 1]),
+		     i, (int)((size.height() * 3 / 4) + 
+                     magnitudesp[i + size.width()]));
     }
 }
 
@@ -535,7 +536,7 @@ void MonoScope::draw( QPainter *p, const QColor &back )
             b = 0;
 
         p->setPen(QColor(int(r), int(g), int(b)));
-        p->drawLine( i - 1, size.height() / 2 + magnitudesp[ i - 1 ],
-                     i, size.height() / 2 + magnitudesp[ i ] );
+        p->drawLine( i - 1, (int)(size.height() / 2 + magnitudesp[ i - 1 ]),
+                     i, (int)(size.height() / 2 + magnitudesp[ i ] ));
     }
 }

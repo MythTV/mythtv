@@ -98,8 +98,8 @@ QPixmap *TreeCheckItem::scalePixmap(const char **xpmdata, float wmult,
                                     float hmult)
 {
     QImage tmpimage(xpmdata);
-    QImage tmp2 = tmpimage.smoothScale(tmpimage.width() * wmult, 
-                                       tmpimage.height() * hmult);
+    QImage tmp2 = tmpimage.smoothScale((int)(tmpimage.width() * wmult), 
+                                       (int)(tmpimage.height() * hmult));
     QPixmap *ret = new QPixmap();
     ret->convertFromImage(tmp2);
 

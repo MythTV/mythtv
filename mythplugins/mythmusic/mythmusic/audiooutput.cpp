@@ -14,7 +14,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <iostream.h>
+#include <iostream>
+
+using namespace std;
 
 extern Q_EXPORT QApplication* qApp;
 

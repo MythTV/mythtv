@@ -37,10 +37,10 @@ DatabaseBox::DatabaseBox(QSqlDatabase *ldb, QString &paths,
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
-    setFont(QFont("Arial", 16 * hmult, QFont::Bold));
+    setFont(QFont("Arial", (int)(16 * hmult), QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
-    QVBoxLayout *vbox = new QVBoxLayout(this, 20 * wmult);
+    QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
     QListView *listview = new QListView(this);
     listview->addColumn("Select music to be played:");
@@ -48,7 +48,7 @@ DatabaseBox::DatabaseBox(QSqlDatabase *ldb, QString &paths,
     listview->setSorting(-1);
     listview->setRootIsDecorated(true);
     listview->setAllColumnsShowFocus(true);
-    listview->setColumnWidth(0, 730 * wmult);
+    listview->setColumnWidth(0, (int)(730 * wmult));
     listview->setColumnWidthMode(0, QListView::Manual);
 
     connect(listview, SIGNAL(returnPressed(QListViewItem *)), this,

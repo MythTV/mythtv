@@ -99,14 +99,14 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
-    setFont(QFont("Arial", 18 * hmult, QFont::Bold));
+    setFont(QFont("Arial", (int)(18 * hmult), QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
-    QVBoxLayout *vbox = new QVBoxLayout(this, 20 * wmult);
+    QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
     mainvisual = new MainVisual();
     
-    QVBoxLayout *vbox2 = new QVBoxLayout(vbox, 2 * wmult);
+    QVBoxLayout *vbox2 = new QVBoxLayout(vbox, (int)(2 * wmult));
 
     QGroupBox *topdisplay = new QGroupBox(this);
     vbox2->addWidget(topdisplay);
@@ -117,7 +117,7 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     topdisplay->setFrameShadow(QFrame::Sunken);
     topdisplay->setPaletteBackgroundColor(QColor("grey"));
 
-    QVBoxLayout *framebox = new QVBoxLayout(topdisplay, 10 * wmult);
+    QVBoxLayout *framebox = new QVBoxLayout(topdisplay, (int)(10 * wmult));
 
     titlelabel = new ScrollLabel(topdisplay);
     titlelabel->setText("  ");
@@ -139,7 +139,7 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
 
     vbox2->addWidget(seekbar);
 
-    QHBoxLayout *controlbox = new QHBoxLayout(vbox2, 2 * wmult);
+    QHBoxLayout *controlbox = new QHBoxLayout(vbox2, (int)(2 * wmult));
 
     MyButton *prevfileb = new MyButton(this);
     prevfileb->setAutoRaise(true);
@@ -184,33 +184,33 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     controlbox->addWidget(nextb);
     controlbox->addWidget(nextfileb);
 
-    QHBoxLayout *secondcontrol = new QHBoxLayout(vbox2, 2 * wmult);
+    QHBoxLayout *secondcontrol = new QHBoxLayout(vbox2, (int)(2 * wmult));
 
     randomize = new MyButton(this);
     randomize->setAutoRaise(true);
     randomize->setText("Shuffle: Normal");
-    randomize->setFont(QFont("Arial", 14 * hmult, QFont::Bold));
+    randomize->setFont(QFont("Arial", (int)(14 * hmult), QFont::Bold));
     secondcontrol->addWidget(randomize);
     connect(randomize, SIGNAL(clicked()), this, SLOT(toggleShuffle()));
 
     repeat = new MyButton(this);
     repeat->setAutoRaise(true);
     repeat->setText("Repeat: Playlist");
-    repeat->setFont(QFont("Arial", 14 * hmult, QFont::Bold));
+    repeat->setFont(QFont("Arial", (int)(14 * hmult), QFont::Bold));
     secondcontrol->addWidget(repeat);
     connect(repeat, SIGNAL(clicked()), this, SLOT(toggleRepeat()));
 
     MyButton *pledit = new MyButton(this);
     pledit->setAutoRaise(true);
     pledit->setText("Edit Playlist");
-    pledit->setFont(QFont("Arial", 14 * hmult, QFont::Bold));
+    pledit->setFont(QFont("Arial", (int)(14 * hmult), QFont::Bold));
     secondcontrol->addWidget(pledit);
     connect(pledit, SIGNAL(clicked()), this, SLOT(editPlaylist()));
 
     MyButton *vis = new MyButton(this);
     vis->setAutoRaise(true);
     vis->setText("Visualize");
-    vis->setFont(QFont("Arial", 14 * hmult, QFont::Bold));
+    vis->setFont(QFont("Arial", (int)(14 * hmult), QFont::Bold));
     secondcontrol->addWidget(vis);
     connect(vis, SIGNAL(clicked()), this, SLOT(visEnable()));
 
@@ -219,14 +219,14 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     playview->addColumn("Artist");  
     playview->addColumn("Title");
     playview->addColumn("Length");
-    playview->setFont(QFont("Arial", 14 * hmult, QFont::Bold));
+    playview->setFont(QFont("Arial", (int)(14 * hmult), QFont::Bold));
 
     playview->setFocusPolicy(NoFocus);
 
-    playview->setColumnWidth(0, 50 * wmult);
-    playview->setColumnWidth(1, 210 * wmult);
-    playview->setColumnWidth(2, 400 * wmult);
-    playview->setColumnWidth(3, 80 * wmult);
+    playview->setColumnWidth(0, (int)(50 * wmult));
+    playview->setColumnWidth(1, (int)(210 * wmult));
+    playview->setColumnWidth(2, (int)(400 * wmult));
+    playview->setColumnWidth(3, (int)(80 * wmult));
     playview->setColumnWidthMode(0, QListView::Manual);
     playview->setColumnWidthMode(1, QListView::Manual);
     playview->setColumnWidthMode(2, QListView::Manual);
@@ -272,8 +272,8 @@ PlaybackBox::~PlaybackBox(void)
 QPixmap PlaybackBox::scalePixmap(const char **xpmdata)
 {
     QImage tmpimage(xpmdata);
-    QImage tmp2 = tmpimage.smoothScale(tmpimage.width() * wmult,
-                                       tmpimage.height() * hmult);
+    QImage tmp2 = tmpimage.smoothScale((int)(tmpimage.width() * wmult),
+                                       (int)(tmpimage.height() * hmult));
     QPixmap ret;
     ret.convertFromImage(tmp2);
 

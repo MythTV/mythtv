@@ -159,7 +159,7 @@ Ripper::Ripper(QSqlDatabase *ldb, QWidget *parent, const char *name)
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
-    setFont(QFont("Arial", 16 * hmult, QFont::Bold));
+    setFont(QFont("Arial", (int)(16 * hmult), QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
@@ -170,7 +170,7 @@ Ripper::Ripper(QSqlDatabase *ldb, QWidget *parent, const char *name)
     firstdiag = new QFrame(this);
     bigvb->addWidget(firstdiag, 1);
 
-    QVBoxLayout *vbox = new QVBoxLayout(firstdiag, 24 * wmult);
+    QVBoxLayout *vbox = new QVBoxLayout(firstdiag, (int)(24 * wmult));
 
     QLabel *inst = new QLabel("Please select a quality level and check the album information below:", firstdiag);
     vbox->addWidget(inst);
@@ -250,7 +250,7 @@ Ripper::Ripper(QSqlDatabase *ldb, QWidget *parent, const char *name)
 
         table->setNumRows(tracknum);
 
-        table->setRowHeight(row, 30 * hmult);
+        table->setRowHeight(row, (int)(30 * hmult));
 
         label.sprintf("%d", tracknum);
         table->setText(row, 0, label);
@@ -378,7 +378,7 @@ void Ripper::ripthedisc(void)
     newdiag->setGeometry(0, 0, screenwidth, screenheight);
     newdiag->setFixedSize(QSize(screenwidth, screenheight));
     
-    newdiag->setFont(QFont("Arial", 20 * hmult, QFont::Bold));
+    newdiag->setFont(QFont("Arial", (int)(20 * hmult), QFont::Bold));
     newdiag->setCursor(QCursor(Qt::BlankCursor));
 
     QVBoxLayout *vb = new QVBoxLayout(newdiag, 20);
