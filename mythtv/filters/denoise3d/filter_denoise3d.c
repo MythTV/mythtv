@@ -243,7 +243,7 @@ denoiseMMX (uint8_t * Frame,
             int W, int H,
             uint8_t * Spatial, uint8_t * Temporal)
 {
-    int X;
+    int X, i;
     uint8_t *LineCur = Frame;
     uint8_t *LinePrev = FramePrev;
     uint8_t *End = Frame + W * H;
@@ -287,22 +287,8 @@ denoiseMMX (uint8_t * Frame,
         movq_m2r (Line[X], mm4);
         movq_m2r (Line[X+8], mm6);
         
-        cbuf[0] = Temporal[wbuf[0]];
-        cbuf[1] = Temporal[wbuf[1]];
-        cbuf[2] = Temporal[wbuf[2]];
-        cbuf[3] = Temporal[wbuf[3]];
-        cbuf[4] = Temporal[wbuf[4]];
-        cbuf[5] = Temporal[wbuf[5]];
-        cbuf[6] = Temporal[wbuf[6]];
-        cbuf[7] = Temporal[wbuf[7]];
-        cbuf[8] = Temporal[wbuf[8]];
-        cbuf[9] = Temporal[wbuf[9]];
-        cbuf[10] = Temporal[wbuf[10]];
-        cbuf[11] = Temporal[wbuf[11]];
-        cbuf[12] = Temporal[wbuf[12]];
-        cbuf[13] = Temporal[wbuf[13]];
-        cbuf[14] = Temporal[wbuf[14]];
-        cbuf[15] = Temporal[wbuf[15]];
+        for (i = 0; i < 16; i++)
+            cbuf[i] = Temporal[wbuf[i]];
 
         paddb_m2r (cbuf[0], mm4);
         paddb_m2r (cbuf[8], mm6);
@@ -355,22 +341,8 @@ denoiseMMX (uint8_t * Frame,
             movq_m2r (LineCur[X], mm4);
             movq_m2r (LineCur[X+8], mm6);
 
-            cbuf[0] = Spatial[wbuf[0]];
-            cbuf[1] = Spatial[wbuf[1]];
-            cbuf[2] = Spatial[wbuf[2]];
-            cbuf[3] = Spatial[wbuf[3]];
-            cbuf[4] = Spatial[wbuf[4]];
-            cbuf[5] = Spatial[wbuf[5]];
-            cbuf[6] = Spatial[wbuf[6]];
-            cbuf[7] = Spatial[wbuf[7]];
-            cbuf[8] = Spatial[wbuf[8]];
-            cbuf[9] = Spatial[wbuf[9]];
-            cbuf[10] = Spatial[wbuf[10]];
-            cbuf[11] = Spatial[wbuf[11]];
-            cbuf[12] = Spatial[wbuf[12]];
-            cbuf[13] = Spatial[wbuf[13]];
-            cbuf[14] = Spatial[wbuf[14]];
-            cbuf[15] = Spatial[wbuf[15]];
+            for (i = 0; i < 16; i++)
+                cbuf[i] = Spatial[wbuf[i]];
 
             movq_m2r (LinePrev[X], mm0);
             movq_m2r (LinePrev[X+8], mm2);
@@ -406,22 +378,8 @@ denoiseMMX (uint8_t * Frame,
             movq_m2r (Line[X], mm4);
             movq_m2r (Line[X+8], mm6);
 
-            cbuf[0] = Temporal[wbuf[0]];
-            cbuf[1] = Temporal[wbuf[1]];
-            cbuf[2] = Temporal[wbuf[2]];
-            cbuf[3] = Temporal[wbuf[3]];
-            cbuf[4] = Temporal[wbuf[4]];
-            cbuf[5] = Temporal[wbuf[5]];
-            cbuf[6] = Temporal[wbuf[6]];
-            cbuf[7] = Temporal[wbuf[7]];
-            cbuf[8] = Temporal[wbuf[8]];
-            cbuf[9] = Temporal[wbuf[9]];
-            cbuf[10] = Temporal[wbuf[10]];
-            cbuf[11] = Temporal[wbuf[11]];
-            cbuf[12] = Temporal[wbuf[12]];
-            cbuf[13] = Temporal[wbuf[13]];
-            cbuf[14] = Temporal[wbuf[14]];
-            cbuf[15] = Temporal[wbuf[15]];
+            for (i = 0; i < 16; i++)
+                cbuf[i] = Temporal[wbuf[i]];
 
             paddb_m2r (cbuf[0], mm4);
             paddb_m2r (cbuf[8], mm6);
