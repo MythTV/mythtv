@@ -1,14 +1,11 @@
 /**
  *  DTVRecorder -- base class for DVBRecorder and HDTVRecorder
- *  Copyright 2003-2004 by Brandon Beattie, Doug Larrick,
+ *  Copyright 2003-2004 by Brandon Beattie, Doug Larrick, 
  *    Jason Hoos, and Daniel Thor Kristjansson
- *  Device ringbuffer added by John Poet
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
 #include <cassert>
-#include <cerrno>
-#include <unistd.h>
 
 using namespace std;
 
@@ -16,67 +13,6 @@ using namespace std;
 #include "programinfo.h"
 #include "tspacket.h"
 #include "dtvrecorder.h"
-
-//#define REPORT_RING_STATS 1
-
-DTVRecorder::DTVRecorder(void) :
-    _first_keyframe(0), _position_within_gop_header(0),
-    _scanning_pes_header_for_gop(0), _keyframe_seen(false),
-    _last_keyframe_seen(0), _last_gop_seen(0), _last_seq_seen(0),
-    _stream_fd(-1), _error(false),
-    _request_recording(false), _request_pause(false),
-    _wait_for_keyframe_option(true),
-    _recording(false), _paused(false), _wait_for_keyframe(true),
-    _buffer(0), _buffer_size(0),
-    _frames_seen_count(0), _frames_written_count(0)
-{
-    ringbuf.run = false;
-    ringbuf.buffer = 0;
-    pthread_mutex_destroy(&ringbuf.lock);
-    pthread_mutex_destroy(&ringbuf.lock_stats);
-    loop = random() % (report_loops / 2);
-}
-
-DTVRecorder::~DTVRecorder(void)
-{
-    pthread_mutex_destroy(&ringbuf.lock);
-    pthread_mutex_destroy(&ringbuf.lock_stats);
-}
-
-void DTVRecorder::StopRecording(void)
-{
-    bool            run;
-    int             idx;
-
-    _request_pause = true;
-    for (idx = 0; idx < 400; ++idx)
-    {
-        if (GetPause())
-            break;
-        pauseWait.wait(500);
-    }
-
-    _request_recording = false;
-
-    pthread_mutex_lock(&ringbuf.lock);
-    run = ringbuf.run;
-    ringbuf.run = false;
-    pthread_mutex_unlock(&ringbuf.lock);
-
-    if (run)
-        pthread_join(ringbuf.thread, NULL);
-
-    if (idx == 400)
-    {
-        // Better to have a memory leak, then a segfault?
-        VERBOSE(VB_IMPORTANT, "DTV ringbuffer not cleaned up!\n");
-    }
-    else
-    {
-        delete[] ringbuf.buffer;
-        ringbuf.buffer = 0;
-    }
-}
 
 void DTVRecorder::SetOption(const QString &name, int value)
 {
@@ -104,10 +40,9 @@ void DTVRecorder::SetOption(const QString &name, int value)
 
 void DTVRecorder::WaitForPause(void)
 {
-    if (!GetPause())
+    if (!_paused)
         if (!pauseWait.wait(1000))
-            VERBOSE(VB_IMPORTANT,
-                    QString("Waited too long for recorder to pause"));
+            VERBOSE(VB_IMPORTANT, QString("Waited too long for recorder to pause"));
 }
 
 void DTVRecorder::FinishRecording(void)
@@ -129,25 +64,6 @@ void DTVRecorder::FinishRecording(void)
 
         pthread_mutex_unlock(db_lock);
     }
-}
-
-void DTVRecorder::Pause(bool /*clear*/)
-{
-    pthread_mutex_lock(&ringbuf.lock);
-    ringbuf.paused = false;
-    pthread_mutex_unlock(&ringbuf.lock);
-    _request_pause = true;
-}
-
-bool DTVRecorder::GetPause(void)
-{
-    bool paused;
-
-    pthread_mutex_lock(&ringbuf.lock);
-    paused = ringbuf.paused;
-    pthread_mutex_unlock(&ringbuf.lock);
-
-    return paused;
 }
 
 long long DTVRecorder::GetKeyframePosition(long long desired)
@@ -214,7 +130,7 @@ void DTVRecorder::FindKeyframes(const TSPacket* tspacket)
             _position_within_gop_header = (k == 0x00) ? 1 : 0;
         else if (1 == _position_within_gop_header)
             _position_within_gop_header = (k == 0x00) ? 2 : 0;
-        else
+        else 
         {
             assert(2 == _position_within_gop_header);
             if (0x01 != k)
@@ -281,7 +197,7 @@ void DTVRecorder::HandleKeyframe() {
             _first_keyframe = (frameNum > 0) ? frameNum : 1;
     }
 
-    long long startpos =
+    long long startpos = 
         ringBuffer->GetFileWritePosition();
 
     if (!_position_map.contains(frameNum))
@@ -289,240 +205,16 @@ void DTVRecorder::HandleKeyframe() {
         _position_map_delta[frameNum] = startpos;
         _position_map[frameNum] = startpos;
 
-        if (curRecording && db_lock && db_conn &&
-            (_position_map_delta.size() == 30))
+        if (curRecording && db_lock && db_conn)
         {
             pthread_mutex_lock(db_lock);
             MythContext::KickDatabase(db_conn);
-            curRecording->SetPositionMapDelta(_position_map_delta,
+            curRecording->SetPositionMapDelta(_position_map_delta, 
                                               MARK_GOP_BYFRAME, db_conn);
-            curRecording->SetFilesize(startpos, db_conn);
+            if (_position_map.size() % 30 == 0)
+                curRecording->SetFilesize(startpos, db_conn);
             pthread_mutex_unlock(db_lock);
             _position_map_delta.clear();
         }
     }
-}
-
-void * DTVRecorder::boot_ringbuffer(void * arg)
-{
-    DTVRecorder *dtv = (DTVRecorder *)arg;
-    dtv->fill_ringbuffer();
-    return NULL;
-}
-
-void DTVRecorder::fill_ringbuffer(void)
-{
-    int       errcnt = 0;
-    int       len;
-    size_t    unused, used;
-    size_t    contiguous;
-    size_t    read_size;
-    bool      run, request_pause, paused;
-
-    for (;;)
-    {
-        pthread_mutex_lock(&ringbuf.lock);
-        run = ringbuf.run;
-        unused = ringbuf.size - ringbuf.used;
-        request_pause = ringbuf.request_pause;
-        paused = ringbuf.paused;
-        pthread_mutex_unlock(&ringbuf.lock);
-
-        if (!run)
-            break;
-
-        if (request_pause)
-        {
-            pthread_mutex_lock(&ringbuf.lock);
-            ringbuf.paused = true;
-            pthread_mutex_unlock(&ringbuf.lock);
-
-            pauseWait.wakeAll();
-
-            usleep(1000);
-            continue;
-        }
-        else if (paused)
-        {
-            pthread_mutex_lock(&ringbuf.lock);
-            ringbuf.writePtr = ringbuf.readPtr = ringbuf.buffer;
-            ringbuf.used = 0;
-            ringbuf.paused = false;
-            pthread_mutex_unlock(&ringbuf.lock);
-        }
-
-        contiguous = ringbuf.endPtr - ringbuf.writePtr;
-
-        while (unused < TSPacket::SIZE && contiguous > TSPacket::SIZE)
-        {
-            usleep(500);
-
-            pthread_mutex_lock(&ringbuf.lock);
-            unused = ringbuf.size - ringbuf.used;
-            request_pause = ringbuf.request_pause;
-            pthread_mutex_unlock(&ringbuf.lock);
-
-            if (request_pause)
-                break;
-        }
-        if (request_pause)
-            continue;
-
-        read_size = unused > contiguous ? contiguous : unused;
-        if (read_size > ringbuf.dev_read_size)
-            read_size = ringbuf.dev_read_size;
-
-        len = read(_stream_fd, ringbuf.writePtr, read_size);
-
-        if (len < 0)
-        {
-            if (errno == EINTR)
-                continue;
-
-            VERBOSE(VB_IMPORTANT, QString("HD7 error reading from %1")
-                    .arg(videodevice));
-            perror("read");
-            if (++errcnt > 10)
-            {
-                pthread_mutex_lock(&ringbuf.lock);
-                ringbuf.error = true;
-                pthread_mutex_unlock(&ringbuf.lock);
-
-                break;
-            }
-
-            usleep(500);
-            continue;
-        }
-        else if (len == 0)
-        {
-            if (++errcnt > 20)
-            {
-                VERBOSE(VB_IMPORTANT, QString("HD8 %1 end of file found.")
-                        .arg(videodevice));
-
-                pthread_mutex_lock(&ringbuf.lock);
-                ringbuf.eof = true;
-                pthread_mutex_unlock(&ringbuf.lock);
-
-                break;
-            }
-            usleep(500);
-            continue;
-        }
-
-        errcnt = 0;
-
-        pthread_mutex_lock(&ringbuf.lock);
-        ringbuf.used += len;
-        used = ringbuf.used;
-        ringbuf.writePtr += len;
-        pthread_mutex_unlock(&ringbuf.lock);
-
-#ifdef REPORT_RING_STATS
-        pthread_mutex_lock(&ringbuf.lock_stats);
-
-        if (ringbuf.max_used < used)
-            ringbuf.max_used = used;
-
-        ringbuf.avg_used = ((ringbuf.avg_used * ringbuf.avg_cnt) + used)
-                           / ++ringbuf.avg_cnt;
-        pthread_mutex_unlock(&ringbuf.lock_stats);
-#endif
-
-        if (ringbuf.writePtr == ringbuf.endPtr)
-            ringbuf.writePtr = ringbuf.buffer;
-    }
-
-    pthread_exit(reinterpret_cast<void *>(0));
-}
-
-/* read count bytes from ring into buffer */
-int DTVRecorder::ringbuf_read(unsigned char *buffer, size_t count)
-{
-    size_t          avail;
-    size_t          cnt = count;
-    size_t          min_read;
-    unsigned char  *cPtr = buffer;
-
-    pthread_mutex_lock(&ringbuf.lock);
-    avail = ringbuf.used;
-    pthread_mutex_unlock(&ringbuf.lock);
-
-    min_read = cnt < ringbuf.min_read ? cnt : ringbuf.min_read;
-
-    while (min_read > avail)
-    {
-        usleep(100000);
-
-        if (_request_pause)
-            return 0;
-
-        pthread_mutex_lock(&ringbuf.lock);
-        avail = ringbuf.used;
-        pthread_mutex_unlock(&ringbuf.lock);
-    }
-    if (cnt > avail)
-        cnt = avail;
-
-    if (ringbuf.readPtr + cnt > ringbuf.endPtr)
-    {
-        size_t      len;
-
-        // Process as two pieces
-        len = ringbuf.endPtr - ringbuf.readPtr;
-        memcpy(cPtr, ringbuf.readPtr, len);
-        cPtr += len;
-        len = cnt - len;
-
-        // Wrap arround to begining of buffer
-        ringbuf.readPtr = ringbuf.buffer;
-        memcpy(cPtr, ringbuf.readPtr, len);
-        ringbuf.readPtr += len;
-    }
-    else
-    {
-// !
-        memcpy(cPtr, ringbuf.readPtr, cnt);
-        ringbuf.readPtr += cnt;
-    }
-
-    pthread_mutex_lock(&ringbuf.lock);
-    ringbuf.used -= cnt;
-    pthread_mutex_unlock(&ringbuf.lock);
-
-    if (ringbuf.readPtr == ringbuf.endPtr)
-        ringbuf.readPtr = ringbuf.buffer;
-    else
-    {
-#ifdef REPORT_RING_STATS
-        size_t samples, avg, max;
-
-        if (++loop == report_loops)
-        {
-            loop = 0;
-            pthread_mutex_lock(&ringbuf.lock_stats);
-            avg = ringbuf.avg_used;
-            samples = ringbuf.avg_cnt;
-            max = ringbuf.max_used;
-            ringbuf.avg_used = 0;
-            ringbuf.avg_cnt = 0;
-            ringbuf.max_used = 0;
-            pthread_mutex_unlock(&ringbuf.lock_stats);
-
-            VERBOSE(VB_IMPORTANT, QString("%1 ringbuf avg %2% max %3%"
-                                          " samples %4")
-                    .arg(videodevice)
-                    .arg((static_cast<double>(avg)
-                          / ringbuf.size) * 100.0)
-                    .arg((static_cast<double>(max)
-                          / ringbuf.size) * 100.0)
-                    .arg(samples));
-        }
-        else
-#endif
-            usleep(25);
-    }
-
-    return cnt;
 }
