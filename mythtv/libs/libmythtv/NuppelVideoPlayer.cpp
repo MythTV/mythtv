@@ -1214,7 +1214,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         if (prebuffering)
         {
             VERBOSE(VB_GENERAL, "prebuffering...");
-            usleep(frame_interval * 10);
+            usleep(frame_interval * 4);
             ResetNexttrigger(&nexttrigger);
             continue;
         }
