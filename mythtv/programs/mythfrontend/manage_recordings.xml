@@ -55,15 +55,6 @@
       <text lang="SV">Radera inspelningar</text>
       <text lang="JA">録画削除</text>
       <action>TV_DELETE</action>
-   </button> 
-
-   <button>
-      <type>TV_STATUS</type>
-      <text>Guide Status</text>
-      <text lang="DE">Systemstatus</text>
-      <text lang="SV">Systemstatus</text>
-      <text lang="JA">システムステータス</text>
-      <action>TV_STATUS</action>
    </button>
 
 </mythmenu>

@@ -48,4 +48,13 @@
      <depends>mythrecipe</depends>
    </button>
 
+   <button>
+      <type>TV_STATUS</type>
+      <text>System Status</text>
+      <text lang="DE">Systemstatus</text>
+      <text lang="SV">Systemstatus</text>
+      <text lang="JA">システムステータス</text>
+      <action>TV_STATUS</action>
+   </button>
+
 </mythmenu>
