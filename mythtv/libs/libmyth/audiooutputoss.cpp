@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <qdatetime.h>
+#include "config.h"
 
 using namespace std;
 

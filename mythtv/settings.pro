@@ -118,12 +118,6 @@ macx {
     TARGET_ALTIVEC=yes
 }
 
-contains( TARGET_ARCH_POWERPC, yes ) {
-    # Source that has endian-specific code should include config.h,
-    # but until this happens, we define it here:
-    DEFINES += WORDS_BIGENDIAN
-}
-
 contains( TARGET_ALTIVEC, yes ) {
     # Altivec support
     CONFIG  += using_altivec

@@ -5,6 +5,8 @@
 
 #include <iostream>
 #include <pthread.h>
+#include "config.h"
+
 using namespace std;
 
 #include "nuppeldecoder.h"

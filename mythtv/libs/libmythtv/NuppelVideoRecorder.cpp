@@ -13,6 +13,8 @@
 #include <qstringlist.h>
 
 #include <iostream>
+#include "config.h"
+
 using namespace std;
 
 #include "mythcontext.h"
