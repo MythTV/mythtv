@@ -679,32 +679,32 @@ void TV::SetupRecorder(int profileid)
     RecordingProfile profile;
     profile.loadByID(db_conn, profileid);
 
-    QString setting = profile.byName("videocodec");
+    QString setting = profile.byName("videocodec")->getValue();
     if (setting == "MPEG-4") {
       nvr->SetCodec("mpeg4");
-      nvr->SetMP4TargetBitrate(profile.byName("mpeg4bitrate").toInt());
-      nvr->SetMP4ScaleBitrate(profile.byName("mpeg4scalebitrate").isNull() ?
+      nvr->SetMP4TargetBitrate(profile.byName("mpeg4bitrate")->getValue().toInt());
+      nvr->SetMP4ScaleBitrate(profile.byName("mpeg4scalebitrate")->getValue().isNull() ?
                               0 : 1);
-      nvr->SetMP4Quality(profile.byName("mpeg4maxquality").toInt(),
-                         profile.byName("mpeg4minquality").toInt(),
-                         profile.byName("mpeg4qualdiff").toInt());
+      nvr->SetMP4Quality(profile.byName("mpeg4maxquality")->getValue().toInt(),
+                         profile.byName("mpeg4minquality")->getValue().toInt(),
+                         profile.byName("mpeg4qualdiff")->getValue().toInt());
     } else if (setting == "RTjpeg") {
       nvr->SetCodec("rtjpeg");
-      nvr->SetRTJpegQuality(profile.byName("rtjpegquality").toInt());
-      nvr->SetRTJpegMotionLevels(profile.byName("rtjpegchromafilter").toInt(),
-                                 profile.byName("rtjpeglumafilter").toInt());
+      nvr->SetRTJpegQuality(profile.byName("rtjpegquality")->getValue().toInt());
+      nvr->SetRTJpegMotionLevels(profile.byName("rtjpegchromafilter")->getValue().toInt(),
+                                 profile.byName("rtjpeglumafilter")->getValue().toInt());
     } else if (setting == "Hardware MJPEG") {
-      nvr->SetHMJPGQuality(profile.byName("hardwaremjpegquality").toInt());
-      nvr->SetHMJPGDecimation(profile.byName("hardwaremjpegdecimation").toInt());
+      nvr->SetHMJPGQuality(profile.byName("hardwaremjpegquality")->getValue().toInt());
+      nvr->SetHMJPGDecimation(profile.byName("hardwaremjpegdecimation")->getValue().toInt());
     } else {
       cerr << "Unknown video codec: " << setting << endl;
     }
 
-    setting = profile.byName("audiocodec");
+    setting = profile.byName("audiocodec")->getValue();
     if (setting == "MP3") {
       nvr->SetAudioCompression(1);
-      nvr->SetMP3Quality(profile.byName("mp3quality").toInt());
-      nvr->SetAudioSampleRate(profile.byName("samplerate").toInt());
+      nvr->SetMP3Quality(profile.byName("mp3quality")->getValue().toInt());
+      nvr->SetAudioSampleRate(profile.byName("samplerate")->getValue().toInt());
     } else if (setting == "Uncompressed") {
       nvr->SetAudioCompression(0);
     } else {
@@ -712,8 +712,8 @@ void TV::SetupRecorder(int profileid)
     }
       
 
-    nvr->SetResolution(profile.byName("width").toInt(),
-                       profile.byName("height").toInt());
+    nvr->SetResolution(profile.byName("width")->getValue().toInt(),
+                       profile.byName("height")->getValue().toInt());
 
     nvr->SetTVFormat(context->GetSetting("TVFormat"));
 
