@@ -360,10 +360,13 @@ void Scheduler::BuildListMaps(void)
     for ( ; i != reclist.end(); i++)
     {
         ProgramInfo *p = *i;
-        if (p->recstatus == rsRecording || p->recstatus == rsUnknown)
+        if (p->recstatus == rsRecording || 
+            p->recstatus == rsWillRecord ||
+            p->recstatus == rsUnknown)
+        {
             cardlistmap[p->cardid].push_back(p);
-        if (p->recstatus == rsUnknown)
             titlelistmap[p->title].push_back(p);
+        }
     }
 }
 
@@ -405,7 +408,11 @@ void Scheduler::MarkOtherShowings(RecList &titlelist, ProgramInfo *p)
     for ( ; i != titlelist.end(); i++)
     {
         ProgramInfo *q = *i;
-        if (q->recstatus != rsUnknown && q->recstatus != rsEarlierShowing &&
+        if (q == p)
+            continue;
+        if (q->recstatus != rsUnknown && 
+            q->recstatus != rsWillRecord &&
+            q->recstatus != rsEarlierShowing &&
             q->recstatus != rsLaterShowing)
             continue;
         if (q->IsSameTimeslot(*p))
@@ -494,7 +501,8 @@ void Scheduler::SchedNewRecords(void)
     for ( ; i != reclist.end(); i++)
     {
         ProgramInfo *p = *i;
-        if (p->recstatus == rsRecording)
+        if (p->recstatus == rsRecording ||
+            p->recstatus == rsWillRecord)
         {
             RecList &titlelist = titlelistmap[p->title];
             MarkOtherShowings(titlelist, p);
