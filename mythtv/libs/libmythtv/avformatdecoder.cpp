@@ -411,7 +411,9 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         m_playbackinfo->GetPositionMap(positionMap, MARK_GOP_START, m_db);
         if (positionMap.size() && !livetv && !watchingrecording)
         {
-            long long totframes = positionMap.size() * keyframedist;
+            QMap<long long,long long>::const_iterator it = positionMap.end();
+            it--;
+            long long totframes = it.key() * keyframedist;
             int length = (int)((totframes * 1.0) / fps);
             m_parent->SetFileLength(length, totframes);            
             hasFullPositionMap = true;
@@ -738,7 +740,71 @@ void AvFormatDecoder::MpegPreProcessPkt(AVCodecContext *context, AVPacket *pkt)
 
                 case GOP_START:
                 {
-                    int tempKeyFrameDist = framesRead - 1 - prevgoppos;
+                    int tempKeyFrameDist = keyframedist;
+                    if (hasFullPositionMap) 
+                    {
+                        int low_keyframenum = 0;
+                        int hi_keyframenum = 0;
+                        if (keyframedist != 0) 
+                            low_keyframenum = hi_keyframenum = 
+                                (framesRead-1)/tempKeyFrameDist;
+                        // We think we should be at #'keyframenum' keyframe
+                        // in the stream.  If we are not, find where we are
+                        // and adjust keyframedist accordingly.
+                        
+                        if (low_keyframenum == 0)
+                            low_keyframenum = 1;
+                        int map_pos = positionMap[low_keyframenum];
+                        // try to skip 1 missing keyframe
+                        if (map_pos == 0)
+                        {
+                            low_keyframenum++;
+                            map_pos = positionMap[low_keyframenum];
+                        }
+                        while (map_pos < pkt->startpos && map_pos != 0) 
+                        {
+                            low_keyframenum++;
+                            // try to skip 1 missing keyframe
+                            if (positionMap[low_keyframenum] == 0)
+                                low_keyframenum++;
+                            map_pos = positionMap[low_keyframenum];
+                        }
+                        if (low_keyframenum > hi_keyframenum)
+                            hi_keyframenum = low_keyframenum;
+
+                        map_pos = positionMap[hi_keyframenum];
+                        // try to skip 1 missing keyframe
+                        if (map_pos == 0 && hi_keyframenum > 0)
+                        {
+                            hi_keyframenum--;
+                            map_pos = positionMap[hi_keyframenum];
+                        }
+                        while (map_pos > pkt->startpos && map_pos != 0)
+                        {
+                            hi_keyframenum--;
+                            // try to skip 1 missing keyframe
+                            if (positionMap[hi_keyframenum] == 0 &&
+                                hi_keyframenum > 0)
+                                hi_keyframenum--;
+                            map_pos = positionMap[hi_keyframenum];
+                        }
+                        // if either is spot on, take it
+                        if (positionMap[low_keyframenum] == pkt->startpos)
+                            hi_keyframenum = low_keyframenum;
+                        if (positionMap[hi_keyframenum] == pkt->startpos)
+                            low_keyframenum = hi_keyframenum;
+                        
+                        // use the lower of the two
+                        int keyframenum = (low_keyframenum < hi_keyframenum) ?
+                            low_keyframenum : hi_keyframenum;
+                        
+                        if (keyframenum > 0 && positionMap[keyframenum] != 0) 
+                            tempKeyFrameDist = (framesRead)/(keyframenum);
+                    }
+                    else 
+                    {
+                        tempKeyFrameDist = framesRead - 1 - prevgoppos;
+                    }
 
                     if (!gopset)
                     {
@@ -758,6 +824,13 @@ void AvFormatDecoder::MpegPreProcessPkt(AVCodecContext *context, AVPacket *pkt)
                             //     << tempKeyFrameDist << "." << endl;
                             keyframedist = tempKeyFrameDist;
                             m_parent->SetVideoParams(-1, -1, -1, keyframedist);
+                            // also reset length
+                            QMap<long long,long long>::const_iterator it = 
+                                positionMap.end();
+                            it--;
+                            long long totframes = it.key() * keyframedist;
+                            int length = (int)((totframes * 1.0) / fps);
+                            m_parent->SetFileLength(length, totframes);
                         }
                     }
 

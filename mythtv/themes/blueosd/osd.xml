@@ -3,6 +3,12 @@
   <timeformat>h:mm ap</timeformat>
   <fadeaway>30</fadeaway>
 
+  <font name="notifyfont">
+    <color>255</color>
+    <size>12</size>
+    <outline>yes</outline>
+  </font>
+
   <font name="infofont">
     <color>255</color>
     <size>16</size>
@@ -124,6 +130,40 @@
     <textarea name="slidertext">
       <area>410,55,200,45</area>
       <font>infofont</font>
+      <multiline>yes</multiline>
+    </textarea>
+  </container>
+
+  <container name="notify_cid_info" priority="10" fademovement="0,6">
+    <image name="background">
+      <filename>osd-callerid.png</filename>
+      <position>0,200</position>
+    </image>
+    <textarea name="notify_cid_name">
+      <area>410,210,200,30</area>
+      <font>notifyfont</font>
+      <multiline>no</multiline>
+    </textarea>
+    <textarea name="notify_cid_num">
+      <area>410,240,200,30</area>
+      <font>notifyfont</font>
+      <multiline>no</multiline>
+    </textarea>
+    <textarea name="notify_cid_dt">
+      <area>410,270,200,30</area>
+      <font>notifyfont</font>
+      <multiline>no</multiline>
+    </textarea>
+  </container>
+
+  <container name="notify_alert_text" priority="10" fademovement="0,6">
+    <image name="background">
+      <filename>osd-alert.png</filename>
+      <position>15,15</position>
+    </image>
+    <textarea name="notify_text">
+      <area>15,15,600,130</area>
+      <font>notifyfont</font>
       <multiline>yes</multiline>
     </textarea>
   </container>

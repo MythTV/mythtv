@@ -619,6 +619,19 @@ public:
     };
 };
 
+class UDPNotifyPort: public LineEditSetting, public GlobalSetting {
+public:
+    UDPNotifyPort():
+        GlobalSetting("UDPNotifyPort") {
+        setLabel(QObject::tr("UDP Notify Port"));
+        setValue("6948");
+        setHelpText(QObject::tr("If this is set to a port number, MythTV will "
+                    "listen during playback for connections from the "
+                    "'mythtvosd' or 'mythudprelay' for events.  See the "
+                    "README in contrib/mythnotify/ for more details."));
+    };
+};
+
 class PlaybackExitPrompt: public ComboBoxSetting, public GlobalSetting {
 public:
     PlaybackExitPrompt():
@@ -1343,6 +1356,7 @@ PlaybackSettings::PlaybackSettings()
     gen2->addChild(new ClearSavedPosition());
     gen2->addChild(new AltClearSavedPosition());
     gen2->addChild(new UsePicControls());
+    gen2->addChild(new UDPNotifyPort());
     addChild(gen2);
 
     addChild(new PVR350Settings());

@@ -29,6 +29,7 @@ class OSDTypeImage;
 class OSDTypePositionIndicator;
 class OSDSurface;
 class TV;
+class UDPNotifyOSDSet;
 
 class OSD : public QObject
 {
@@ -100,6 +101,9 @@ class OSD : public QObject
                 int dispw, int disph);
 
     void SetFrameInterval(int frint);
+
+    void StartNotify(UDPNotifyOSDSet *notifySet);
+    void ClearNotify(UDPNotifyOSDSet *notifySet);
 
  private:
     void SetDefaults();

@@ -296,7 +296,7 @@ void NuppelVideoPlayer::InitVideo(void)
     if (disablevideo)
     {
         videoOutput = new VideoOutputNull();
-        videoOutput->Init(postfilt_width, postfilt_height, video_aspect,
+        videoOutput->Init(video_width, video_height, video_aspect,
                           0, 0, 0, 0, 0, 0);
     }
     else
@@ -333,7 +333,7 @@ void NuppelVideoPlayer::InitVideo(void)
         if (gContext->GetNumSetting("DecodeExtraAudio", 0))
             decoder->setLowBuffers();
 
-        videoOutput->Init(postfilt_width, postfilt_height, video_aspect,
+        videoOutput->Init(video_width, video_height, video_aspect,
                           widget->winId(), 0, 0, widget->width(), 
                           widget->height(), 0);
     }
@@ -347,11 +347,12 @@ void NuppelVideoPlayer::InitVideo(void)
 void NuppelVideoPlayer::ReinitVideo(void)
 {
     InitFilters();
-    videoOutput->InputChanged(postfilt_width, postfilt_height, video_aspect);
+    videoOutput->InputChanged(video_width, video_height, video_aspect);
 
     if (osd)
     {
-        int dispx = 0, dispy = 0, dispw = video_width, disph = video_height;
+        int dispx = 0, dispy = 0;
+        int dispw = video_width, disph = video_height;
 
         videoOutput->GetDrawSize(dispx, dispy, dispw, disph);
 

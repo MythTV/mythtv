@@ -120,6 +120,11 @@
     <offset>20,10</offset>
   </buttondef>
 
+  <buttondef name="MUSIC_SCAN">
+    <image>setup.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
   <buttondef name="WEATHER">
     <image>weather.png</image>
     <offset>20,20</offset>

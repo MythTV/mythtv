@@ -262,6 +262,8 @@ void NuppelVideoRecorder::SetOption(const QString &opt, int value)
         audio_buffer_size = value;
     else if (opt == "pip_mode")
         pip_mode = value;
+    else if (opt == "inpixfmt")
+        inpixfmt = (VideoFrameType)value;
     else
         RecorderBase::SetOption(opt, value);
 }
@@ -420,9 +422,6 @@ void NuppelVideoRecorder::SetupRTjpeg(void)
 
 void NuppelVideoRecorder::Initialize(void)
 {
-    int videomegs;
-    int audiomegs = 2;
-
     if (AudioInit() != 0)   
     {
         cerr << "Could not detect audio blocksize\n";
@@ -458,26 +457,6 @@ void NuppelVideoRecorder::Initialize(void)
             }
         }
     }
-
-    if (picture_format == PIX_FMT_YUV422P)
-        video_buffer_size = w * h * 2;
-    else
-        video_buffer_size = w * h * 3 / 2;
-
-    if (w >= 480 || h > 288) 
-        videomegs = 20;
-    else
-        videomegs = 12;
-
-    video_buffer_count = (videomegs * 1000 * 1000) / video_buffer_size;
-
-    if (audio_buffer_size != 0)
-        audio_buffer_count = (audiomegs * 1000 * 1000) / audio_buffer_size;
-    else
-        audio_buffer_count = 0;
-
-    text_buffer_size = 8 * (sizeof(teletextsubtitle) + VT_WIDTH);
-    text_buffer_count = video_buffer_count;
 
     if (!ringBuffer)
     {
@@ -634,6 +613,29 @@ void NuppelVideoRecorder::InitFilters(void)
 
 void NuppelVideoRecorder::InitBuffers(void)
 {
+    int videomegs;
+    int audiomegs = 2;
+
+    if (picture_format == PIX_FMT_YUV422P)
+        video_buffer_size = w_out * h_out * 2;
+    else
+        video_buffer_size = w_out * h_out * 3 / 2;
+
+    if (w >= 480 || h > 288)
+        videomegs = 20;
+    else
+        videomegs = 12;
+
+    video_buffer_count = (videomegs * 1000 * 1000) / video_buffer_size;
+
+    if (audio_buffer_size != 0)
+        audio_buffer_count = (audiomegs * 1000 * 1000) / audio_buffer_size;
+    else
+        audio_buffer_count = 0;
+
+    text_buffer_size = 8 * (sizeof(teletextsubtitle) + VT_WIDTH);
+    text_buffer_count = video_buffer_count;
+
     for (int i = 0; i < video_buffer_count; i++)
     {
         vidbuffertype *vidbuf = new vidbuffertype;
@@ -686,7 +688,7 @@ void NuppelVideoRecorder::StartRecording(void)
         return;
     }
 
-    inpixfmt = FMT_NONE;
+    inpixfmt = FMT_YV12;
     InitFilters();
     StreamAllocate();
     positionMap.clear();
@@ -975,6 +977,8 @@ void NuppelVideoRecorder::DoV4L2(void)
     memset(&vfmt, 0, sizeof(vfmt));
     memset(&vbuf, 0, sizeof(vbuf));
     memset(&vrbuf, 0, sizeof(vrbuf));
+
+    vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
     if (inpixfmt == FMT_YUV422P)
         vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUV422P;

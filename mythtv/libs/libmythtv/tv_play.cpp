@@ -23,6 +23,7 @@ using namespace std;
 #include "volumecontrol.h"
 #include "NuppelVideoPlayer.h"
 #include "programinfo.h"
+#include "udpnotify.h"
 
 struct SeekSpeedInfo {
     QString   dispString;
@@ -86,6 +87,7 @@ TV::TV(QSqlDatabase *db)
     wantsToQuit = true;
 
     myWindow = NULL;
+    udpnotify = NULL;
 
     gContext->addListener(this);
 
@@ -614,6 +616,12 @@ void TV::SetupPlayer(void)
         nvp->SetWatchingRecording(true);
 
     osd = NULL;
+
+    int udp_port = gContext->GetNumSetting("UDPNotifyPort");
+    if (udp_port > 0)
+        udpnotify = new UDPNotify(this, udp_port);
+    else
+        udpnotify = NULL;
 }
 
 void TV::SetupPipPlayer(void)
@@ -646,6 +654,9 @@ void TV::TeardownPlayer(void)
         pthread_join(decode, NULL);
         delete nvp;
     }
+
+    if (udpnotify)
+        delete udpnotify;
 
     paused = false;
     doing_ff_rew = 0;
@@ -2574,4 +2585,9 @@ void TV::DoChangePictureAttribute(bool up)
             ChangeHue(up, false);
             break;
     }
+}
+
+OSD *TV::GetOSD(void)
+{
+    return nvp->GetOSD();
 }

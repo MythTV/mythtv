@@ -18,7 +18,7 @@ class FilterChain : public QPtrList<VideoFilter>
 
     virtual ~FilterChain() { clear(); }
 
-    void ProcessFrame (VideoFrame * Frame)
+    void ProcessFrame(VideoFrame * Frame)
     {
         if (!Frame)
             return;

@@ -22,6 +22,7 @@ class NuppelVideoPlayer;
 class RingBuffer;
 class ProgramInfo;
 class MythDialog;
+class UDPNotify;
 
 class TV : public QObject
 {
@@ -79,6 +80,8 @@ class TV : public QObject
 
     void AddPreviousChannel(void);
     void PreviousChannel(void);
+
+    OSD *GetOSD(void);
 
   public slots:
     void HandleOSDClosed(int osdType);
@@ -261,6 +264,8 @@ class TV : public QObject
 
     bool smartForward;
     bool doSmartForward;
+
+    UDPNotify *udpnotify;
 };
 
 #endif

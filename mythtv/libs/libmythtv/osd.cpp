@@ -20,6 +20,7 @@ using namespace std;
 #include "osdsurface.h"
 #include "mythcontext.h"
 #include "libmyth/oldsettings.h"
+#include "udpnotify.h"
 
 OSD::OSD(int width, int height, int frint, const QString &font, 
          const QString &ccfont, const QString &prefix, const QString &osdtheme,
@@ -1751,5 +1752,64 @@ void OSD::RemoveSet(OSDSet *set)
         setList->erase(i);
 
     delete set;
+}
+
+/* Ken Bass additions for notify_info container */
+void OSD::StartNotify(UDPNotifyOSDSet *notifySet)
+{
+    if (!notifySet)
+        return;
+
+    int displaytime = 5;
+    vector<UDPNotifyOSDTypeText *> *textList;
+
+    osdlock.lock();
+
+    OSDSet *container = GetSet(notifySet->GetName());
+    if (container)
+    {    
+        textList = notifySet->GetTypeList();
+    
+        vector<UDPNotifyOSDTypeText *>::iterator j = textList->begin();
+        for (; j != textList->end(); j++)
+        {
+            UDPNotifyOSDTypeText *type = (*j);
+            if (type)
+            {
+                OSDTypeText *osdtype = (OSDTypeText *)container->GetType(type->GetName());
+                if (osdtype)
+                    osdtype->SetText(type->GetText());
+            }
+        }
+      
+        if (displaytime > 0)
+            container->DisplayFor(displaytime * 1000000);
+        else
+            container->Display();
+  
+        m_setsvisible = true;
+        changed = true;
+    }
+
+    osdlock.unlock();
+}
+
+void OSD::ClearNotify(UDPNotifyOSDSet *notifySet)
+{
+    if (!notifySet)
+        return;
+
+    osdlock.lock();
+
+    OSDSet *container = GetSet(notifySet->GetName());
+    if (container)
+    {
+        container->ClearAllText();
+        container->Hide();
+        m_setsvisible = true;
+        changed = true;
+    }
+
+    osdlock.unlock();
 }
 
