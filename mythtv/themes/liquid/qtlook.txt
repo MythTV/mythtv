@@ -49,4 +49,4 @@ str curRecProg_bgColor=#E4C08C
 str curProg_dsColor=#8CC2E4
 str curProg_fgColor=#eefb92
 str misChanIcon_bgColor=#000000
-
+str misChanIcon_fgColor=#ffffff
