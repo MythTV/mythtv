@@ -287,6 +287,10 @@ void MainServer::ProcessRequest(QSocket *sock)
     {
         HandleGenPreviewPixmap(listline, pbs);
     }
+    else if (command == "QUERY_ISRECORDING") 
+    {
+        HandleIsRecording(listline, pbs);
+    }
     else if (command == "MESSAGE")
     {
         HandleMessage(listline, pbs);
@@ -1786,6 +1790,25 @@ void MainServer::HandleMessage(QStringList &slist, PlaybackSock *pbs)
     SendResponse(pbssock, retlist);
 }
 
+void MainServer::HandleIsRecording(QStringList &slist, PlaybackSock *pbs)
+{
+    (void)slist;
+
+    QSocket *pbssock = pbs->getSocket();
+    int RecordingsInProgress = 0;
+    QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
+    for (; iter != encoderList->end(); ++iter)
+    {
+        EncoderLink *elink = iter.data();
+        if (elink->IsBusyRecording())
+            RecordingsInProgress++;
+    }
+
+    QStringList retlist = QString::number(RecordingsInProgress);
+
+    SendResponse(pbssock, retlist);
+}
+
 void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 {
     QSocket *pbssock = pbs->getSocket();
@@ -2144,16 +2167,21 @@ void MainServer::PrintStatus(QSocket *socket)
 
         if (elink->isLocal())
         {
-            os << "Encoder: " << elink->getCardId() << " is local.\r\n";
+            os << "Encoder: " << elink->getCardId() << " is local and ";
         }
         else
         {
             os << "Encoder: " << elink->getCardId() << " is remote and ";
             if (elink->isConnected())
-                os << "is connected\r\n";
+                os << "is connected ";
             else
-                os << "is not connected\r\n";
+                os << "is not connected ";
         }
+
+        if (elink->IsBusyRecording())
+            os << "is recording.\r\n";
+        else
+            os << "is not recording.\r\n";
 
         os << "<br>\r\n";
     }

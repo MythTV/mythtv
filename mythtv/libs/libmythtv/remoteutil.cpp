@@ -211,3 +211,11 @@ void RemoteFillProginfo(ProgramInfo *pginfo, const QString &playbackhostname)
     pginfo->FromStringList(strlist, 0);
 }
 
+int RemoteIsRecording(void)
+{
+    QStringList strlist = "QUERY_ISRECORDING";
+    gContext->SendReceiveStringList(strlist);
+    return strlist[0].toInt();
+}
+
+

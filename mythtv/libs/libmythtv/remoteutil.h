@@ -22,5 +22,6 @@ RemoteEncoder *RemoteGetExistingRecorder(ProgramInfo *pginfo);
 RemoteEncoder *RemoteGetExistingRecorder(int recordernum);
 void RemoteGeneratePreviewPixmap(ProgramInfo *pginfo);
 void RemoteFillProginfo(ProgramInfo *pginfo, const QString &playbackhostname);
+int RemoteIsRecording(void);
 
 #endif
