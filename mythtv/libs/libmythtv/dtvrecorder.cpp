@@ -7,6 +7,7 @@
  */
 
 #include <cassert>
+#include <cerrno>
 
 using namespace std;
 
@@ -68,6 +69,9 @@ void DTVRecorder::StopRecording(void)
     {
         // Better to have a memory leak, then a segfault?
         VERBOSE(VB_IMPORTANT, "DTV ringbuffer not cleaned up!\n");
+    }
+    else
+    {
         delete[] ringbuf.buffer;
         ringbuf.buffer = 0;
     }
