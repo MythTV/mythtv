@@ -321,7 +321,7 @@
 
             <textarea name="numb_titles_text" draworder="0" align="center">
                 <font>display</font>
-                <area>275,330,150,30</area>
+                <area>265,330,170,30</area>
                 <value>Title 1 of 1</value>
             </textarea>
 
