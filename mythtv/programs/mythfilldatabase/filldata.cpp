@@ -17,14 +17,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "libmyth/settings.h"
-
-Settings *globalsettings;
-char installprefix[] = PREFIX;
+#include "libmyth/mythcontext.h"
 
 using namespace std;
 
 bool interactive = false;
+MythContext *context;
 
 class ChanInfo
 {
@@ -686,7 +684,7 @@ void clearOldDBEntries(void)
 void fillData(QValueList<Source> &sourcelist)
 {
     QValueList<Source>::Iterator it;
-    QString xmltv_grabber = globalsettings->GetSetting("XMLTVGrab");
+    QString xmltv_grabber = context->GetSetting("XMLTVGrab");
 
     if (xmltv_grabber == "tv_grab_uk" || xmltv_grabber == "tv_grab_de")
     {
@@ -695,7 +693,7 @@ void fillData(QValueList<Source> &sourcelist)
         for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
              grabData(*it, xmltv_grabber, -1);
     }
-    else if (xmltv_grabber == "tv_grab_na")
+    else if (xmltv_grabber == "tv_grab_na" || xmltv_grabber == "tv_grab_aus")
     {
         for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
             grabData(*it, xmltv_grabber, 1);
@@ -747,17 +745,10 @@ int main(int argc, char *argv[])
         }
     }
 
-    globalsettings = new Settings;
-    globalsettings->LoadSettingsFiles("mysql.txt", installprefix);
-    globalsettings->LoadSettingsFiles("settings.txt", installprefix);
+    context = new MythContext;
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
-    db->setDatabaseName(globalsettings->GetSetting("DBName"));
-    db->setUserName(globalsettings->GetSetting("DBUserName"));
-    db->setPassword(globalsettings->GetSetting("DBPassword"));
-    db->setHostName(globalsettings->GetSetting("DBHostName"));
-
-    if (!db->open())
+    if (!context->OpenDatabase(db))
     {
         printf("couldn't open db\n");
         return -1;
@@ -790,6 +781,8 @@ int main(int argc, char *argv[])
     }
     
     fillData(sourcelist);
+
+    delete context;
 
     return 0;
 }

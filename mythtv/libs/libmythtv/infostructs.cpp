@@ -6,24 +6,16 @@
 #include <qapplication.h>
 
 #include "infostructs.h"
-#include "settings.h"
+#include "mythcontext.h"
 
-extern Settings *globalsettings;
-
-void ChannelInfo::LoadIcon(void)
+void ChannelInfo::LoadIcon(MythContext *context)
 {
     QImage *tempimage = new QImage();
 
-    int screenheight = QApplication::desktop()->height();
-    int screenwidth = QApplication::desktop()->width();
+    int screenheight = 0, screenwidth = 0;
+    float wmult = 0, hmult = 0;
 
-    if (globalsettings->GetNumSetting("GuiWidth") > 0)
-        screenwidth = globalsettings->GetNumSetting("GuiWidth");
-    if (globalsettings->GetNumSetting("GuiHeight") > 0)
-        screenheight = globalsettings->GetNumSetting("GuiHeight");
-
-    float wmult = screenwidth / 800.0;
-    float hmult = screenheight / 600.0;
+    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     icon = new QPixmap();
 

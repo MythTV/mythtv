@@ -14,12 +14,13 @@ VERSION = 0.7.0
 
 # Input
 HEADERS += dialogbox.h guidegrid.h infodialog.h infostructs.h lcddevice.h 
-HEADERS += programinfo.h settings.h themedmenu.h 
+HEADERS += programinfo.h settings.h themedmenu.h mythcontext.h
 
 SOURCES += dialogbox.cpp guidegrid.cpp infodialog.cpp infostructs.cpp 
 SOURCES += lcddevice.cpp programinfo.cpp settings.cpp themedmenu.cpp
+SOURCES += mythcontext.cpp
 
 inc.path = $${PREFIX}/include/mythtv/
-inc.files = $$HEADERS
+inc.files = dialogbox.h lcddevice.h programinfo.h themedmenu.h mythcontext.h
 
 INSTALLS += inc

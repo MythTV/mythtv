@@ -16,13 +16,11 @@
 
 #include <iostream>
 
-#include "libmyth/settings.h"
+#include "libmyth/mythcontext.h"
 
 using namespace std;
 
-Settings *globalsettings;
-char installprefix[] = PREFIX;
-
+MythContext *context;
 
 QString getResponse(const QString &query, const QString &def)
 {
@@ -157,7 +155,7 @@ void getSources(void)
             file.remove();
         }
 
-        QString xmltv_grabber = globalsettings->GetSetting("XMLTVGrab");
+        QString xmltv_grabber = context->GetSetting("XMLTVGrab");
 
         cout << "\n\nConfiguring channel source #" << i+1 << endl;
         cout << "mythsetup will now run " << xmltv_grabber 
@@ -335,17 +333,10 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv, false);
 
-    globalsettings = new Settings;
-    globalsettings->LoadSettingsFiles("mysql.txt", installprefix);
-    globalsettings->LoadSettingsFiles("settings.txt", installprefix);
+    context = new MythContext();
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
-    db->setDatabaseName(globalsettings->GetSetting("DBName"));
-    db->setUserName(globalsettings->GetSetting("DBUserName"));
-    db->setPassword(globalsettings->GetSetting("DBPassword"));
-    db->setHostName(globalsettings->GetSetting("DBHostName"));
-
-    if (!db->open())
+    if (!context->OpenDatabase(db))
     {
         printf("couldn't open db\n");
         return -1;
@@ -375,7 +366,7 @@ int main(int argc, char *argv[])
             "info.\n";
     cout << endl;
     cout << "If your xmltv grabber doesn't provide channel numbers "
-            "(like tv_grab_uk),\n";
+            "(like tv_grab_uk and tv_grab_de),\n";
     cout << "or you want more options on how channels are inserted into the "
          << "database, please\n";
     cout << "run 'mythfilldatabase --manual' instead.\n";

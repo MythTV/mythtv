@@ -15,35 +15,29 @@
 #include "scheduler.h"
 
 #include "libmyth/dialogbox.h"
-#include "libmyth/settings.h"
+#include "libmyth/mythcontext.h"
     
-extern Settings *globalsettings; 
-
-ViewScheduled::ViewScheduled(QString prefix, TV *ltv, QSqlDatabase *ldb, 
+ViewScheduled::ViewScheduled(MythContext *context, TV *ltv, QSqlDatabase *ldb, 
                              QWidget *parent, const char *name)
              : QDialog(parent, name)
 {
     tv = ltv;
     db = ldb;
-    fileprefix = prefix;
+    fileprefix = context->GetFilePrefix();
+    m_context = context;
 
     title = NULL;
 
-    int screenheight = QApplication::desktop()->height();
-    int screenwidth = QApplication::desktop()->width();
+    int screenwidth = 0, screenheight = 0;
+    float wmult = 0, hmult = 0;
 
-    if (globalsettings->GetNumSetting("GuiWidth") > 0)
-        screenwidth = globalsettings->GetNumSetting("GuiWidth");
-    if (globalsettings->GetNumSetting("GuiHeight") > 0)
-        screenheight = globalsettings->GetNumSetting("GuiHeight");
-
-    float wmult = screenwidth / 800.0;
-    float hmult = screenheight / 600.0;
+    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
-    setFont(QFont("Arial", (int)(16 * hmult), QFont::Bold));
+    setFont(QFont("Arial", (int)(m_context->GetMediumFontSize() * hmult), 
+            QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(10 * wmult));
@@ -79,8 +73,12 @@ ViewScheduled::ViewScheduled(QString prefix, TV *ltv, QSqlDatabase *ldb,
 
     listview->setFixedHeight((int)(250 * hmult));
 
-    QLabel *key = new QLabel("Conflicting recordings are highlighted in <font color=\"red\">red</font>.<br>Deactivated recordings are highlighted in <font color=\"gray\">gray</font>.", this);
-    key->setFont(QFont("Arial", (int)(12 * hmult), QFont::Bold));
+    QLabel *key = new QLabel("Conflicting recordings are highlighted in "
+                             "<font color=\"red\">red</font>.<br>Deactivated "
+                             "recordings are highlighted in <font "
+                             "color=\"gray\">gray</font>.", this);
+    key->setFont(QFont("Arial", (int)(m_context->GetSmallFontSize() * hmult), 
+                 QFont::Bold));
     vbox->addWidget(key);
 
     QFrame *f = new QFrame(this);
@@ -91,7 +89,8 @@ ViewScheduled::ViewScheduled(QString prefix, TV *ltv, QSqlDatabase *ldb,
     QGridLayout *grid = new QGridLayout(vbox, 5, 2, 1);
     
     title = new QLabel(" ", this);
-    title->setFont(QFont("Arial", (int)(20 * hmult), QFont::Bold));
+    title->setFont(QFont("Arial", (int)(m_context->GetBigFontSize() * hmult), 
+                   QFont::Bold));
 
     QLabel *datelabel = new QLabel("Airdate: ", this);
     date = new QLabel(" ", this);
@@ -138,7 +137,8 @@ void ViewScheduled::FillList(void)
         ProgramInfo *originfo = (*pgiter);
         ProgramInfo *proginfo = new ProgramInfo(*originfo);
 
-        item = new ProgramListItem(listview, proginfo, 2, tv, fileprefix);
+        item = new ProgramListItem(m_context, listview, proginfo, 2, tv, 
+                                   fileprefix);
     }
 
     if (conflicts)
@@ -169,10 +169,10 @@ void ViewScheduled::changed(QListViewItem *lvitem)
     QDateTime startts = rec->startts;
     QDateTime endts = rec->endts;
 
-    QString dateformat = globalsettings->GetSetting("DateFormat");
+    QString dateformat = m_context->GetSetting("DateFormat");
     if (dateformat == "")
         dateformat = "ddd MMMM d";
-    QString timeformat = globalsettings->GetSetting("TimeFormat");
+    QString timeformat = m_context->GetSetting("TimeFormat");
     if (timeformat == "")
         timeformat = "h:mm AP";
         
@@ -183,7 +183,7 @@ void ViewScheduled::changed(QListViewItem *lvitem)
     date->setText(timedate);
 
     QString chantext;
-    if (globalsettings->GetNumSetting("DisplayChanNum") == 0)
+    if (m_context->GetNumSetting("DisplayChanNum") == 0)
         chantext = rec->channame + " [" + rec->chansign + "]";
     else
         chantext = rec->chanstr;
@@ -221,7 +221,7 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
                       "conflicts with another scheduled recording.  Do you "
                       "want to re-enable this recording?";
 
-    DialogBox diag(message);
+    DialogBox diag(m_context, message);
 
     QString button = "Yes, I want to record it.";
     diag.AddButton(button);
@@ -280,23 +280,23 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
 {
     list<ProgramInfo *> *conflictlist = sched->getConflicting(rec, true);
 
-    QString dateformat = globalsettings->GetSetting("DateFormat");
+    QString dateformat = m_context->GetSetting("DateFormat");
     if (dateformat == "")
         dateformat = "ddd MMMM d";
-    QString timeformat = globalsettings->GetSetting("TimeFormat");
+    QString timeformat = m_context->GetSetting("TimeFormat");
     if (timeformat == "")
         timeformat = "h:mm AP";
 
     QString message = "The follow scheduled recordings conflict with each "
                       "other.  Which would you like to record?";
 
-    DialogBox diag(message, "Remember this choice and use it automatically in "
-                            "the future");
+    DialogBox diag(m_context, message, "Remember this choice and use it "
+                   "automatically in the future");
  
     QString button; 
     button = rec->title + QString("\n");
     button += rec->startts.toString(dateformat + " " + timeformat);
-    if (globalsettings->GetNumSetting("DisplayChanNum") == 0)
+    if (m_context->GetNumSetting("DisplayChanNum") == 0)
         button += " on " + rec->channame + " [" + rec->chansign + "]";
     else
         button += QString(" on channel ") + rec->chanstr;
@@ -310,7 +310,7 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
 
         button = info->title + QString("\n");
         button += info->startts.toString(dateformat + " " + timeformat);
-        if (globalsettings->GetNumSetting("DisplayChanNum") == 0)
+        if (m_context->GetNumSetting("DisplayChanNum") == 0)
             button += " on " + rec->channame + " [" + rec->chansign + "]";
         else
             button += QString(" on channel ") + rec->chanstr;

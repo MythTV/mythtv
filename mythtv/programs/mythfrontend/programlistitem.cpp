@@ -10,9 +10,7 @@
 #include "tv.h"
 #include "programlistitem.h"
 
-#include "libmyth/settings.h"
-
-extern Settings *globalsettings;
+#include "libmyth/mythcontext.h"
 
 void MyListView::keyPressEvent(QKeyEvent *e)
 {
@@ -31,19 +29,21 @@ void MyListView::keyPressEvent(QKeyEvent *e)
     QListView::keyPressEvent(e);
 }
 
-ProgramListItem::ProgramListItem(QListView *parent, ProgramInfo *lpginfo,
-                                 int type, TV *ltv, QString lprefix)
+ProgramListItem::ProgramListItem(MythContext *context, QListView *parent, 
+                                 ProgramInfo *lpginfo, int type, TV *ltv, 
+                                 QString lprefix)
                : QListViewItem(parent)
 {
     prefix = lprefix;
     tv = ltv;
     pginfo = lpginfo;
     pixmap = NULL;
+    m_context = context;
   
-    QString dateformat = globalsettings->GetSetting("DateFormat");
+    QString dateformat = context->GetSetting("DateFormat");
     if (dateformat == "")
         dateformat = "ddd MMMM d";
-    QString timeformat = globalsettings->GetSetting("TimeFormat");
+    QString timeformat = context->GetSetting("TimeFormat");
     if (timeformat == "")
         timeformat = "h:mm AP";
  
@@ -69,7 +69,7 @@ ProgramListItem::ProgramListItem(QListView *parent, ProgramInfo *lpginfo,
     }
     else
     {
-        if (globalsettings->GetNumSetting("DisplayChanNum") == 0)
+        if (context->GetNumSetting("DisplayChanNum") == 0)
             setText(0, pginfo->chansign);
         else
             setText(0, pginfo->chanstr);
@@ -80,7 +80,7 @@ ProgramListItem::ProgramListItem(QListView *parent, ProgramInfo *lpginfo,
 
 QPixmap *ProgramListItem::getPixmap(void)
 {
-    if (globalsettings->GetNumSetting("GeneratePreviewPixmaps") != 1)
+    if (m_context->GetNumSetting("GeneratePreviewPixmaps") != 1)
         return NULL;
 
     if (pixmap)
@@ -89,16 +89,10 @@ QPixmap *ProgramListItem::getPixmap(void)
     QString filename = pginfo->GetRecordFilename(prefix);
     filename += ".png";
 
-    int screenheight = QApplication::desktop()->height();
-    int screenwidth = QApplication::desktop()->width();
+    int screenheight = 0, screenwidth = 0;
+    float wmult = 0, hmult = 0;
 
-    if (globalsettings->GetNumSetting("GuiWidth") > 0)
-        screenwidth = globalsettings->GetNumSetting("GuiWidth");
-    if (globalsettings->GetNumSetting("GuiHeight") > 0)
-        screenheight = globalsettings->GetNumSetting("GuiHeight");
- 
-    float wmult = screenwidth / 800.0;
-    float hmult = screenheight / 600.0;
+    m_context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     QImage tmpimage;
 

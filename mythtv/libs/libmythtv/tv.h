@@ -10,7 +10,6 @@
 
 #include "channel.h"
 
-#include "libmyth/settings.h"
 #include "libmyth/programinfo.h"
 
 typedef enum 
@@ -26,13 +25,14 @@ typedef enum
 
 class QSqlDatabase;
 class QDateTime;
-
+class MythContext;
 class OSD;
 
 class TV
 {
  public:
-    TV(const QString &startchannel, int capturecardnum, int pipcardnum);
+    TV(MythContext *lcontext, const QString &startchannel, int capturecardnum, 
+       int pipcardnum);
    ~TV(void);
 
     TVState LiveTV(void);
@@ -58,9 +58,6 @@ class TV
     bool CheckChannel(const QString &channum, int &finetuning); 
     bool ChangeExternalChannel(const QString &channum);
     QString GetNextChannel(bool direction);
-
-    QString GetFilePrefix() { return settings->GetSetting("RecordFilePrefix"); }
-    QString GetInstallPrefix();
 
  protected:
     void doLoadMenu(void);
@@ -123,14 +120,14 @@ class TV
     void TogglePIPView(void);
     void ToggleActiveWindow(void);
     void SwapPIP(void);
+
+    MythContext *context;
     
     NuppelVideoRecorder *nvr;
     NuppelVideoPlayer *nvp;
 
     RingBuffer *rbuffer, *prbuffer;
     Channel *channel;
-
-    Settings *settings;
 
     int osd_display_time;
 

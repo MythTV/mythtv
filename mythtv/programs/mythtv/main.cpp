@@ -4,23 +4,19 @@
 #include <unistd.h>
 #include "tv.h"
 
-Settings *globalsettings;
-char installprefix[] = PREFIX;
+#include "libmyth/mythcontext.h"
 
 int main(int argc, char *argv[])
 {
-    globalsettings = new Settings;
+    MythContext *context = new MythContext();
 
-    globalsettings->LoadSettingsFiles("theme.txt", installprefix);
-    globalsettings->LoadSettingsFiles("mysql.txt", installprefix);
-		
     QApplication a(argc, argv);
 
-    QString startChannel = globalsettings->GetSetting("DefaultTVChannel");
+    QString startChannel = context->GetSetting("DefaultTVChannel");
     if (startChannel == "")
         startChannel = "3";
 
-    TV *tv = new TV(startChannel, 1, 2);
+    TV *tv = new TV(context, startChannel, 1, 2);
     tv->LiveTV();
 
     while (tv->GetState() == kState_None)

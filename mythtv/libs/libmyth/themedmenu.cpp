@@ -13,24 +13,16 @@
 #include <qdom.h>
 
 #include "themedmenu.h"
-#include "settings.h"
+#include "mythcontext.h"
 
-extern Settings *globalsettings;
-
-ThemedMenu::ThemedMenu(const char *cdir, const char *cprefix, 
-                       const char *menufile, QWidget *parent, const char *name)
+ThemedMenu::ThemedMenu(MythContext *context, const char *cdir, 
+                       const char *menufile, 
+                       QWidget *parent, const char *name)
           : QDialog(parent, name)
 {
-    screenheight = QApplication::desktop()->height();
-    screenwidth = QApplication::desktop()->width();
-
-    if (globalsettings->GetNumSetting("GuiWidth") > 0)
-        screenwidth = globalsettings->GetNumSetting("GuiWidth");
-    if (globalsettings->GetNumSetting("GuiHeight") > 0)
-        screenheight = globalsettings->GetNumSetting("GuiHeight");
-
-    wmult = screenwidth / 800.0;
-    hmult = screenheight / 600.0;
+    m_context = context;
+  
+    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedWidth(screenwidth);
@@ -51,7 +43,7 @@ ThemedMenu::ThemedMenu(const char *cdir, const char *cprefix,
         return;
     }
 
-    prefix = cprefix;
+    prefix = context->GetInstallPrefix();
     menulevel = 0;
 
     callback = NULL;
@@ -1159,29 +1151,6 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
     else
         QDialog::keyPressEvent(e);
 } 
-
-QString findThemeDir(QString themename, QString prefix)
-{
-    char *home = getenv("HOME");
-    QString testdir = QString(home) + "/.mythtv/themes/" + themename;
-
-    QDir dir(testdir);
-    if (dir.exists())
-        return testdir;
-
-    testdir = prefix + "/share/mythtv/themes/" + themename;
-    dir.setPath(testdir);
-    if (dir.exists())
-        return testdir;
-
-    testdir = "../menutest/" + themename;
-    dir.setPath(testdir);
-    if (dir.exists())
-        return testdir;
-
-    cerr << "Could not find theme: " << themename << endl;
-    return "";
-}
 
 QString ThemedMenu::findMenuFile(QString menuname)
 {

@@ -18,37 +18,28 @@
 #include "NuppelVideoPlayer.h"
 #include "yuv2rgb.h"
 
-#include "libmyth/settings.h"
+#include "libmyth/mythcontext.h"
 #include "libmyth/programinfo.h"
 
-extern Settings *globalsettings;
-extern char installprefix[];
-
-PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb, 
+PlaybackBox::PlaybackBox(MythContext *context, TV *ltv, QSqlDatabase *ldb, 
                          QWidget *parent, const char *name)
            : QDialog(parent, name)
 {
     tv = ltv;
     db = ldb;
-    fileprefix = prefix;
+    fileprefix = context->GetFilePrefix();
+    m_context = context;
 
     title = NULL;
 
-    int screenheight = QApplication::desktop()->height();
-    int screenwidth = QApplication::desktop()->width();
-
-    if (globalsettings->GetNumSetting("GuiWidth") > 0)
-        screenwidth = globalsettings->GetNumSetting("GuiWidth");
-    if (globalsettings->GetNumSetting("GuiHeight") > 0)
-        screenheight = globalsettings->GetNumSetting("GuiHeight");
-
-    wmult = screenwidth / 800.0;
-    hmult = screenheight / 600.0;
+    int screenheight = 0, screenwidth = 0;
+    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
-    setFont(QFont("Arial", (int)(16 * hmult), QFont::Bold));
+    setFont(QFont("Arial", (int)(context->GetMediumFontSize() * hmult), 
+            QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
@@ -132,7 +123,8 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
                 proginfo->chansign = "#" + proginfo->chanid;
             }
 
-            item = new ProgramListItem(listview, proginfo, 0, tv, fileprefix);
+            item = new ProgramListItem(context, listview, proginfo, 0, tv, 
+                                       fileprefix);
         }
     }
     else
@@ -147,7 +139,8 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     QGridLayout *grid = new QGridLayout(hbox, 5, 2, 1);
  
     title = new QLabel(" ", this);
-    title->setFont(QFont("Arial", (int)(25 * hmult), QFont::Bold));
+    title->setFont(QFont("Arial", (int)(context->GetBigFontSize() * hmult), 
+                   QFont::Bold));
 
     QLabel *datelabel = new QLabel("Airdate: ", this);
     date = new QLabel(" ", this);
@@ -175,8 +168,8 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     grid->setColStretch(1, 1);
     grid->setRowStretch(4, 1);
 
-    if (globalsettings->GetNumSetting("GeneratePreviewPixmap") == 1 ||
-        globalsettings->GetNumSetting("PlaybackPreview") == 1)
+    if (m_context->GetNumSetting("GeneratePreviewPixmap") == 1 ||
+        m_context->GetNumSetting("PlaybackPreview") == 1)
     {
         QPixmap temp((int)(160 * wmult), (int)(120 * hmult));
 
@@ -246,8 +239,8 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
     nvp = new NuppelVideoPlayer();
     nvp->SetRingBuffer(rbuffer);
     nvp->SetAsPIP();
-    nvp->SetOSDFontName(globalsettings->GetSetting("OSDFont"), 
-                        installprefix);
+    nvp->SetOSDFontName(m_context->GetSetting("OSDFont"), 
+                        m_context->GetInstallPrefix());
     QString filters = "";
     nvp->SetVideoFilters(filters);
  
@@ -276,16 +269,16 @@ void PlaybackBox::changed(QListViewItem *lvitem)
 
     ProgramInfo *rec = pgitem->getProgramInfo();
 
-    if (globalsettings->GetNumSetting("PlaybackPreview") == 1)
+    if (m_context->GetNumSetting("PlaybackPreview") == 1)
         startPlayer(rec);
 
     QDateTime startts = rec->startts;
     QDateTime endts = rec->endts;
        
-    QString dateformat = globalsettings->GetSetting("DateFormat");
+    QString dateformat = m_context->GetSetting("DateFormat");
     if (dateformat == "")
         dateformat = "ddd MMMM d";
-    QString timeformat = globalsettings->GetSetting("TimeFormat");
+    QString timeformat = m_context->GetSetting("TimeFormat");
     if (timeformat == "")
         timeformat = "h:mm AP";
 
@@ -296,7 +289,7 @@ void PlaybackBox::changed(QListViewItem *lvitem)
     date->setText(timedate);
 
     QString chantext;
-    if (globalsettings->GetNumSetting("DisplayChanNum") == 0)
+    if (m_context->GetNumSetting("DisplayChanNum") == 0)
         chantext = rec->channame + " [" + rec->chansign + "]";
     else
         chantext = rec->chanstr;

@@ -12,56 +12,52 @@
 #include <iostream>
 using namespace std;
 
+#include "mythcontext.h"
 #include "guidegrid.h"
 #include "infodialog.h"
 #include "infostructs.h"
 #include "programinfo.h"
 #include "settings.h"
 
-extern Settings *globalsettings;
+using namespace libmyth;
 
-GuideGrid::GuideGrid(const QString &channel, QWidget *parent, const char *name)
+GuideGrid::GuideGrid(MythContext *context, const QString &channel, 
+                     QWidget *parent, const char *name)
          : QDialog(parent, name)
 {
-    screenheight = QApplication::desktop()->height();
-    screenwidth = QApplication::desktop()->width();
+    m_context = context;
+    m_settings = context->settings();
 
-    if (globalsettings->GetNumSetting("GuiWidth") > 0)
-        screenwidth = globalsettings->GetNumSetting("GuiWidth");
-    if (globalsettings->GetNumSetting("GuiHeight") > 0)
-        screenheight = globalsettings->GetNumSetting("GuiHeight");
-
-    wmult = screenwidth / 800.0;
-    hmult = screenheight / 600.0;
+    m_context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
     setCursor(QCursor(Qt::BlankCursor));
 
-    usetheme = globalsettings->GetNumSetting("ThemeQt");
-    showtitle = globalsettings->GetNumSetting("EPGShowTitle");
+    usetheme = m_settings->GetNumSetting("ThemeQt");
+    showtitle = m_settings->GetNumSetting("EPGShowTitle");
 
     if (usetheme)
     {
-        bgcolor = QColor(globalsettings->GetSetting("BackgroundColor"));
-        fgcolor = QColor(globalsettings->GetSetting("ForegroundColor"));
+        bgcolor = QColor(m_settings->GetSetting("BackgroundColor"));
+        fgcolor = QColor(m_settings->GetSetting("ForegroundColor"));
 
         QPixmap *bgpixmap = NULL;
 
-        if (globalsettings->GetSetting("BackgroundPixmap") != "")
+        if (m_settings->GetSetting("BackgroundPixmap") != "")
         {
-            QString pmapname = globalsettings->GetSetting("ThemePathName") +
-                               globalsettings->GetSetting("BackgroundPixmap");
+            QString pmapname = m_settings->GetSetting("ThemePathName") +
+                               m_settings->GetSetting("BackgroundPixmap");
             
             bgpixmap = loadScalePixmap(pmapname, screenwidth, screenheight,
                                        wmult, hmult);
             setPaletteBackgroundPixmap(*bgpixmap);
         }
-        else if (globalsettings->GetSetting("TiledBackgroundPixmap") != "")
+        else if (m_settings->GetSetting("TiledBackgroundPixmap") != "")
         {
-            QString pmapname = globalsettings->GetSetting("ThemePathName") +
-                          globalsettings->GetSetting("TiledBackgroundPixmap");
+            QString pmapname = m_settings->GetSetting("ThemePathName") +
+                               m_settings->GetSetting("TiledBackgroundPixmap");
 
             bgpixmap = loadScalePixmap(pmapname, screenwidth, screenheight,
                                        wmult, hmult);
@@ -86,22 +82,22 @@ GuideGrid::GuideGrid(const QString &channel, QWidget *parent, const char *name)
         setPalette(QPalette(bgcolor));
     }
 
-    int timefontsize = globalsettings->GetNumSetting("EPGTimeFontSize");
+    int timefontsize = m_settings->GetNumSetting("EPGTimeFontSize");
     if (timefontsize == 0) 
         timefontsize = 13;
     m_timeFont = new QFont("Arial", (int)(timefontsize * hmult), QFont::Bold);
 
-    int chanfontsize = globalsettings->GetNumSetting("EPGChanFontSize");
+    int chanfontsize = m_settings->GetNumSetting("EPGChanFontSize");
     if (chanfontsize == 0) 
         chanfontsize = 13;
     m_chanFont = new QFont("Arial", (int)(chanfontsize * hmult), QFont::Bold);
 
-    int progfontsize = globalsettings->GetNumSetting("EPGProgFontSize");
+    int progfontsize = m_settings->GetNumSetting("EPGProgFontSize");
     if (progfontsize == 0) 
         progfontsize = 11;
     m_progFont = new QFont("Arial", (int)(progfontsize * hmult), QFont::Bold);
 
-    int titlefontsize = globalsettings->GetNumSetting("EPGTitleFontSize");
+    int titlefontsize = m_settings->GetNumSetting("EPGTitleFontSize");
     if (titlefontsize == 0) 
         titlefontsize = 19;
     m_titleFont = new QFont("Arial", (int)(titlefontsize * hmult), QFont::Bold);
@@ -205,7 +201,7 @@ void GuideGrid::fillChannelInfos()
     QString thequery;
     QSqlQuery query;
 
-    QString ordering = globalsettings->GetSetting("ChannelSorting");
+    QString ordering = m_settings->GetSetting("ChannelSorting");
     if (ordering == "")
         ordering = "channum + 0";
     
@@ -286,7 +282,7 @@ void GuideGrid::fillTimeInfos()
         timeinfo->hour = hour;
         timeinfo->min = mins;
 
-        QString timeformat = globalsettings->GetSetting("TimeFormat");
+        QString timeformat = m_settings->GetSetting("TimeFormat");
         if (timeformat == "")
             timeformat = "h:mm AP";
 
@@ -483,7 +479,7 @@ void GuideGrid::paintChannels(QPainter *p)
         if (chinfo->iconpath != "none" && chinfo->iconpath != "")
         {
             if (!chinfo->icon)
-                chinfo->LoadIcon();
+                chinfo->LoadIcon(m_context);
             if (chinfo->icon)
             {
                 int yoffset = (int)(4 * hmult);
@@ -574,7 +570,7 @@ QBrush GuideGrid::getBGColor(const QString &category)
 
     QString cat = "Cat_" + category;
 
-    QString color = globalsettings->GetSetting(cat);
+    QString color = m_settings->GetSetting(cat);
     if (color != "")
     {
         br = QBrush(color);
@@ -1127,7 +1123,7 @@ void GuideGrid::displayInfo()
 
     if (pginfo)
     {
-        InfoDialog diag(pginfo, this, "Program Info");
+        InfoDialog diag(m_context, pginfo, this, "Program Info");
         diag.setCaption("BLAH!!!");
         diag.exec();
     }

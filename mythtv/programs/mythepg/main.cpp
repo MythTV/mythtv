@@ -2,36 +2,24 @@
 #include <qsqldatabase.h>
 #include <stdlib.h>
 
-#include "libmyth/guidegrid.h"
+#include "libmyth/mythcontext.h"
 #include "libmyth/settings.h"
-#include "libmyth/themedmenu.h"
-
-Settings *globalsettings;
-char installprefix[] = PREFIX;
 
 int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
 
-    globalsettings = new Settings;
+    MythContext *context = new MythContext();
 
-    globalsettings->LoadSettingsFiles("theme.txt", installprefix);
-    globalsettings->LoadSettingsFiles("mysql.txt", installprefix);
-    globalsettings->LoadSettingsFiles("settings.txt", installprefix);
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
-    db->setDatabaseName(globalsettings->GetSetting("DBName"));
-    db->setUserName(globalsettings->GetSetting("DBUserName"));
-    db->setPassword(globalsettings->GetSetting("DBPassword"));
-    db->setHostName(globalsettings->GetSetting("DBHostName"));
-
-    if (!db->open())
+    if (!context->OpenDatabase(db))
     {
         printf("couldn't open db\n");
         return -1;
     }
 
-    QString startchannel = globalsettings->GetSetting("DefaultTVChannel");
+    QString startchannel = context->GetSetting("DefaultTVChannel");
     if (startchannel == "")
         startchannel = "3";
 
@@ -40,22 +28,16 @@ int main(int argc, char **argv)
         startchannel = a.argv()[1];
     }
 
-    QString themename = globalsettings->GetSetting("Theme");
-    QString themedir = findThemeDir(themename, installprefix);
+    context->LoadQtConfig();
+    
+    QString chanstr = context->RunProgramGuide(startchannel);
 
-    globalsettings->SetSetting("ThemePathName", themedir + "/");
-  
-    themedir += "/qtlook.txt";
-    globalsettings->ReadSettings(themedir);
-
-    GuideGrid gg(startchannel);
-
-    gg.exec();
-
-    QString chanstr = gg.getLastChannel();
     int chan = 0;
     
     if (chanstr != QString::null)
         chan = atoi(chanstr.ascii());
+
+    delete context;
+
     return chan;
 }

@@ -11,34 +11,35 @@
 #include "infostructs.h"
 #include "programinfo.h"
 #include "settings.h"
+#include "mythcontext.h"
 
-extern Settings *globalsettings;
+using namespace libmyth;
 
-InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
+InfoDialog::InfoDialog(MythContext *context, ProgramInfo *pginfo, 
+                       QWidget *parent, const char *name)
           : QDialog(parent, name)
 {
-    int screenheight = QApplication::desktop()->height();
-    int screenwidth = QApplication::desktop()->width();
+    m_context = context;
 
-    if (globalsettings->GetNumSetting("GuiWidth") > 0)
-        screenwidth = globalsettings->GetNumSetting("GuiWidth");
-    if (globalsettings->GetNumSetting("GuiHeight") > 0)
-        screenheight = globalsettings->GetNumSetting("GuiHeight");
+    int screenheight = 0, screenwidth = 0;
+    float wmult = 0, hmult = 0;
 
-    float wmult = screenwidth / 800.0;
-    float hmult = screenheight / 600.0;
+    m_context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+
+    int bigfont = m_context->GetBigFontSize();
+    int mediumfont = m_context->GetMediumFontSize();
 
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
-    setFont(QFont("Arial", (int)(16 * hmult), QFont::Bold));
+    setFont(QFont("Arial", (int)(mediumfont * hmult), QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
     QPushButton *ok = new QPushButton("OK", this, "close");
-    ok->setFont(QFont("Arial", (int)(20 * hmult), QFont::Bold));
+    ok->setFont(QFont("Arial", (int)(bigfont * hmult), QFont::Bold));
 
     QPushButton *cancel = new QPushButton("Cancel", this, "cancel");
-    cancel->setFont(QFont("Arial", (int)(20 * hmult), QFont::Bold));
+    cancel->setFont(QFont("Arial", (int)(bigfont * hmult), QFont::Bold));
 
     connect(ok, SIGNAL(clicked()), this, SLOT(okPressed()));
     connect(cancel, SIGNAL(clicked()), this, SLOT(reject()));
@@ -48,7 +49,7 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
     QGridLayout *grid = new QGridLayout(vbox, 4, 2, (int)(10 * wmult));
     
     QLabel *titlefield = new QLabel(pginfo->title, this);
-    titlefield->setFont(QFont("Arial", (int)(25 * hmult), QFont::Bold));
+    titlefield->setFont(QFont("Arial", (int)(bigfont * hmult), QFont::Bold));
 
     QLabel *date = getDateLabel(pginfo);
 
@@ -156,10 +157,10 @@ QLabel *InfoDialog::getDateLabel(ProgramInfo *pginfo)
     QDateTime startts = pginfo->startts;
     QDateTime endts = pginfo->endts;
 
-    QString dateformat = globalsettings->GetSetting("DateFormat");
+    QString dateformat = m_context->settings()->GetSetting("DateFormat");
     if (dateformat == "")
         dateformat = "ddd MMMM d";
-    QString timeformat = globalsettings->GetSetting("TimeFormat");
+    QString timeformat = m_context->settings()->GetSetting("TimeFormat");
     if (timeformat == "")
         timeformat = "h:mm AP";
 

@@ -11,12 +11,13 @@ class QLabel;
 class TV;
 class Scheduler;
 class ProgramInfo;
+class MythContext;
 
 class ViewScheduled : public QDialog
 {
     Q_OBJECT
   public:
-    ViewScheduled(QString prefix, TV *ltv, QSqlDatabase *ldb, 
+    ViewScheduled(MythContext *context, TV *ltv, QSqlDatabase *ldb, 
                   QWidget *parent = 0, const char *name = 0);
 
     void Show();
@@ -46,6 +47,8 @@ class ViewScheduled : public QDialog
     Scheduler *sched;
 
     MyListView *listview;
+
+    MythContext *m_context;
 };
 
 #endif

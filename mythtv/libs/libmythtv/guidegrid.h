@@ -8,12 +8,17 @@
 #include <qdatetime.h>
 #include <vector>
 
+using namespace std;
+
 class QFont;
 class ProgramInfo;
 class TimeInfo;
 class ChannelInfo;
+class MythContext;
+class Settings;
 
-using namespace std;
+namespace libmyth 
+{
 
 #define DISPLAY_CHANS 6
 #define DISPLAY_TIMES 30
@@ -22,8 +27,8 @@ class GuideGrid : public QDialog
 {
     Q_OBJECT
   public:
-    GuideGrid(const QString &channel, QWidget *parent = 0, 
-              const char *name = 0);
+    GuideGrid(MythContext *context, const QString &channel, 
+              QWidget *parent = 0, const char *name = 0);
    ~GuideGrid();
 
     QString getLastChannel(void);
@@ -100,7 +105,10 @@ class GuideGrid : public QDialog
     bool usetheme;
     QColor fgcolor;
     QColor bgcolor;
+
+    MythContext *m_context;
+    Settings *m_settings;
 };
 
-#define CHANNUM_MAX  128
+}
 #endif

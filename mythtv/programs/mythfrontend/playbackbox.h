@@ -14,12 +14,13 @@ class NuppelVideoPlayer;
 class RingBuffer;
 class QTimer;
 class ProgramInfo;
+class MythContext;
 
 class PlaybackBox : public QDialog
 {
     Q_OBJECT
   public:
-    PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb, 
+    PlaybackBox(MythContext *context, TV *ltv, QSqlDatabase *ldb, 
                 QWidget *parent = 0, const char *name = 0);
    ~PlaybackBox(void);
     
@@ -52,6 +53,8 @@ class PlaybackBox : public QDialog
     NuppelVideoPlayer *nvp;
     RingBuffer *rbuffer;
     pthread_t decoder;
+
+    MythContext *m_context;
 };
 
 #endif

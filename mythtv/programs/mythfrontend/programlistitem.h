@@ -18,8 +18,8 @@ class MyListView : public QListView
 class ProgramListItem : public QListViewItem
 {   
   public:
-    ProgramListItem(QListView *parent, ProgramInfo *lpginfo,
-                    int type, TV *ltv, QString lprefix);
+    ProgramListItem(MythContext *context, QListView *parent, 
+                    ProgramInfo *lpginfo, int type, TV *ltv, QString lprefix);
    ~ProgramListItem() { delete pginfo; if (pixmap) delete pixmap; }
 
     virtual void paintCell(QPainter *p, const QColorGroup &cg,
@@ -35,6 +35,8 @@ class ProgramListItem : public QListViewItem
 
     QString prefix;
     TV *tv;
+
+    MythContext *m_context;
 };  
 
 #endif

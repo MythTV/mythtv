@@ -25,6 +25,10 @@ str TimeFormat=h:mm AP
 # Display channel names or just the channel number when showing things to the
 # user.
 int DisplayChanNum=1
+# Some font size configurations
+int QtFontBig=25
+int QtFontMedium=16
+int QtFontSmall=12
 
 # Program Guide Grid specific options
 #

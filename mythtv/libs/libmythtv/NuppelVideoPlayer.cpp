@@ -1190,6 +1190,9 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         //output_jmeter->RecordCycleTime();
 
         /* compute new value of nexttrigger */
+        /* doing the gettimeofday here helps resync faster when it's somehow 
+           got a huge delay */
+        gettimeofday(&nexttrigger, NULL);
         nexttrigger.tv_usec += (int)(1000000 / video_frame_rate);
 
         /* Apply just a little feedback. The ComputeAudiotime() function is
@@ -1301,7 +1304,7 @@ void NuppelVideoPlayer::OutputAudioLoop(void)
 
         // re-check audiolen() in case things changed.
         // for example, ClearAfterSeek() might have run
-        if (bytesperframe <= audiolen(false))
+        if (bytesperframe < audiolen(false))
         {
             int bdiff = AUDBUFSIZE - raud;
             if (bytesperframe > bdiff)

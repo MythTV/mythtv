@@ -126,12 +126,18 @@ OSD::OSD(int width, int height, const QString &filename, const QString &prefix,
 
     if (themepath == "")
     {
+        cerr << "Couldn't find osdtheme: " << osdtheme << endl;
         usingtheme = false;
     }
     else
     {
         themepath += "/";
         usingtheme = LoadTheme();
+        if (!usingtheme)
+        {
+            cerr << "Couldn't load osdtheme: " << osdtheme << " at " 
+                 << themepath << endl;
+        }
     }
 
     if (vid_height < 400)

@@ -16,13 +16,14 @@ class NuppelVideoPlayer;
 class RingBuffer;
 class QTimer;
 class ProgramInfo;
+class MythContext;
 
 class DeleteBox : public QDialog
 {
     Q_OBJECT
   public:
-    DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb, QWidget *parent = 0, 
-              const char *name = 0);
+    DeleteBox(MythContext *context, TV *ltv, QSqlDatabase *ldb, 
+              QWidget *parent = 0, const char *name = 0);
    ~DeleteBox(void);
     
     void Show();
@@ -62,6 +63,8 @@ class DeleteBox : public QDialog
     NuppelVideoPlayer *nvp;
     RingBuffer *rbuffer;
     pthread_t decoder;
+ 
+    MythContext *m_context;
 };
 
 #endif

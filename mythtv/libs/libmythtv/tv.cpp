@@ -7,6 +7,7 @@
 
 #include "tv.h"
 #include "osd.h"
+#include "libmyth/mythcontext.h"
 
 // cheat and put the keycodes here
 #define wsUp            0x52 + 256
@@ -27,8 +28,6 @@
 #define wsEnter         0x8d + 256
 #define wsReturn        0x0d + 256
 
-char theprefix[] = PREFIX;
-
 void *SpawnEncode(void *param)
 {
     NuppelVideoRecorder *nvr = (NuppelVideoRecorder *)param;
@@ -43,18 +42,14 @@ void *SpawnDecode(void *param)
     return NULL;
 }
 
-TV::TV(const QString &startchannel, int capturecardnum, int pipcardnum)
+TV::TV(MythContext *lcontext, const QString &startchannel, int capturecardnum, 
+       int pipcardnum)
 {
-    settings = new Settings();
-
-    settings->LoadSettingsFiles("settings.txt", theprefix);
-    settings->LoadSettingsFiles("mysql.txt", theprefix);
-    settings->LoadSettingsFiles("theme.txt", theprefix);
-
+    context = lcontext;
     db_conn = NULL;
     ConnectDB(capturecardnum);
  
-    QString chanorder = settings->GetSetting("ChannelOrdering");
+    QString chanorder = context->GetSetting("ChannelOrdering");
     if (chanorder == "")
         chanorder = "channum + 0";
  
@@ -70,8 +65,8 @@ TV::TV(const QString &startchannel, int capturecardnum, int pipcardnum)
 
     channel = new Channel(this, videodev);
     channel->Open();
-    channel->SetFormat(settings->GetSetting("TVFormat"));
-    channel->SetFreqTable(settings->GetSetting("FreqTable"));
+    channel->SetFormat(context->GetSetting("TVFormat"));
+    channel->SetFreqTable(context->GetSetting("FreqTable"));
     channel->SetChannelByString(startchannel);
     channel->SetChannelOrdering(chanorder);
     channel->Close();  
@@ -79,23 +74,23 @@ TV::TV(const QString &startchannel, int capturecardnum, int pipcardnum)
     pipchannel = new Channel(this, pipvideodev);
     if (pipchannel->Open())
     {
-        pipchannel->SetFormat(settings->GetSetting("TVFormat"));
-        pipchannel->SetFreqTable(settings->GetSetting("FreqTable"));
+        pipchannel->SetFormat(context->GetSetting("TVFormat"));
+        pipchannel->SetFreqTable(context->GetSetting("FreqTable"));
         pipchannel->SetChannelByString(startchannel);
         pipchannel->SetChannelOrdering(chanorder);
         pipchannel->Close();
     }
 
-    fftime = settings->GetNumSetting("FastForwardAmount");
+    fftime = context->GetNumSetting("FastForwardAmount");
     if (fftime <= 0)
         fftime = 5;
 
-    rewtime = settings->GetNumSetting("RewindAmount");
+    rewtime = context->GetNumSetting("RewindAmount");
     if (rewtime <= 0)
         rewtime = 5;
 
     inoverrecord = false;
-    overrecordseconds = settings->GetNumSetting("RecordOverTime");
+    overrecordseconds = context->GetNumSetting("RecordOverTime");
 
     nvr = pipnvr = activenvr = NULL;
     nvp = pipnvp = activenvp = NULL;
@@ -128,8 +123,6 @@ TV::~TV(void)
 
     if (channel)
         delete channel;
-    if (settings)
-        delete settings;
     if (rbuffer)
         delete rbuffer;
     if (prbuffer && prbuffer != rbuffer)
@@ -142,11 +135,6 @@ TV::~TV(void)
         DisconnectDB();
 }
 
-QString TV::GetInstallPrefix(void)
-{
-    return QString(theprefix); 
-}
-
 TVState TV::LiveTV(void)
 {
     if (internalState == kState_RecordingOnly)
@@ -154,7 +142,7 @@ TVState TV::LiveTV(void)
         QString cmdline = QString("mythdialog \"MythTV is already recording "
                                   "'%1' on ").arg(curRecording->title);
 
-        if (settings->GetNumSetting("DisplayChanNum") == 0)
+        if (context->GetNumSetting("DisplayChanNum") == 0)
             cmdline += QString("%1 [%2].").arg(curRecording->channame)
                                           .arg(curRecording->chansign);
         else
@@ -211,7 +199,7 @@ int TV::AllowRecording(ProgramInfo *rcinfo, int timeuntil)
     }
 
     QString message = QString("MythTV wants to record \"") + rcinfo->title;
-    if (settings->GetNumSetting("DisplayChanNum") == 0)
+    if (context->GetNumSetting("DisplayChanNum") == 0)
         message += QString("\" on ") + rcinfo->channame + " [" +
                    rcinfo->chansign + "]";
     else
@@ -236,7 +224,7 @@ int TV::AllowRecording(ProgramInfo *rcinfo, int timeuntil)
 
 void TV::StartRecording(ProgramInfo *rcinfo)
 {  
-    QString recprefix = settings->GetSetting("RecordFilePrefix");
+    QString recprefix = context->GetSetting("RecordFilePrefix");
 
     if (inoverrecord)
     {
@@ -302,7 +290,7 @@ void TV::Playback(ProgramInfo *rcinfo)
 {
     if (internalState == kState_None || internalState == kState_RecordingOnly)
     {
-        QString recprefix = settings->GetSetting("RecordFilePrefix");
+        QString recprefix = context->GetFilePrefix();
         inputFilename = rcinfo->GetRecordFilename(recprefix);
         playbackLen = rcinfo->CalculateLength();
 
@@ -417,12 +405,12 @@ void TV::HandleStateChange(void)
 
     if (internalState == kState_None && nextState == kState_WatchingLiveTV)
     {
-        long long filesize = settings->GetNumSetting("BufferSize");
+        long long filesize = context->GetNumSetting("BufferSize");
         filesize = filesize * 1024 * 1024 * 1024;
-        long long smudge = settings->GetNumSetting("MaxBufferFill");
+        long long smudge = context->GetNumSetting("MaxBufferFill");
         smudge = smudge * 1024 * 1024; 
 
-        rbuffer = new RingBuffer(settings->GetSetting("BufferName"), filesize, 
+        rbuffer = new RingBuffer(context->GetSetting("BufferName"), filesize, 
                                  smudge);
         prbuffer = rbuffer;
 
@@ -512,12 +500,12 @@ void TV::HandleStateChange(void)
       
         inoverrecord = false;
  
-        long long filesize = settings->GetNumSetting("BufferSize");
+        long long filesize = context->GetNumSetting("BufferSize");
         filesize = filesize * 1024 * 1024 * 1024;
-        long long smudge = settings->GetNumSetting("MaxBufferFill");
+        long long smudge = context->GetNumSetting("MaxBufferFill");
         smudge = smudge * 1024 * 1024;
 
-        rbuffer = new RingBuffer(settings->GetSetting("BufferName"), filesize,
+        rbuffer = new RingBuffer(context->GetSetting("BufferName"), filesize,
                                  smudge);
         prbuffer = rbuffer;
 
@@ -663,30 +651,30 @@ void TV::SetupRecorder(void)
     nvr = new NuppelVideoRecorder();
     nvr->SetRingBuffer(rbuffer);
     nvr->SetVideoDevice(videodev);
-    nvr->SetResolution(settings->GetNumSetting("Width"),
-                       settings->GetNumSetting("Height"));
-    nvr->SetTVFormat(settings->GetSetting("TVFormat"));
-    nvr->SetCodec(settings->GetSetting("Codec"));
+    nvr->SetResolution(context->GetNumSetting("Width"),
+                       context->GetNumSetting("Height"));
+    nvr->SetTVFormat(context->GetSetting("TVFormat"));
+    nvr->SetCodec(context->GetSetting("Codec"));
     
-    nvr->SetRTJpegMotionLevels(settings->GetNumSetting("LumaFilter"),
-                               settings->GetNumSetting("ChromaFilter"));
-    nvr->SetRTJpegQuality(settings->GetNumSetting("Quality"));
+    nvr->SetRTJpegMotionLevels(context->GetNumSetting("LumaFilter"),
+                               context->GetNumSetting("ChromaFilter"));
+    nvr->SetRTJpegQuality(context->GetNumSetting("Quality"));
 
-    nvr->SetMP4TargetBitrate(settings->GetNumSetting("TargetBitrate"));
-    nvr->SetMP4ScaleBitrate(settings->GetNumSetting("ScaleBitrate"));
-    nvr->SetMP4Quality(settings->GetNumSetting("MaxQuality"),
-                       settings->GetNumSetting("MinQuality"),
-                       settings->GetNumSetting("QualDiff"));
+    nvr->SetMP4TargetBitrate(context->GetNumSetting("TargetBitrate"));
+    nvr->SetMP4ScaleBitrate(context->GetNumSetting("ScaleBitrate"));
+    nvr->SetMP4Quality(context->GetNumSetting("MaxQuality"),
+                       context->GetNumSetting("MinQuality"),
+                       context->GetNumSetting("QualDiff"));
     
-    nvr->SetMP3Quality(settings->GetNumSetting("MP3Quality"));
+    nvr->SetMP3Quality(context->GetNumSetting("MP3Quality"));
 
     if (audiosamplerate > 0)
         nvr->SetAudioSampleRate(audiosamplerate);
     else
-        nvr->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
+        nvr->SetAudioSampleRate(context->GetNumSetting("AudioSampleRate"));
 
     nvr->SetAudioDevice(audiodev);
-    nvr->SetAudioCompression(!settings->GetNumSetting("DontCompressAudio"));
+    nvr->SetAudioCompression(!context->GetNumSetting("DontCompressAudio"));
 
     nvr->Initialize();
 }
@@ -704,7 +692,7 @@ void TV::SetupPipRecorder(void)
     pipnvr->SetAsPIP();
     pipnvr->SetVideoDevice(pipvideodev);
     pipnvr->SetResolution(160, 128);
-    pipnvr->SetTVFormat(settings->GetSetting("TVFormat"));
+    pipnvr->SetTVFormat(context->GetSetting("TVFormat"));
 
     pipnvr->SetCodec("rtjpeg");
     pipnvr->SetRTJpegMotionLevels(0, 0);
@@ -715,7 +703,7 @@ void TV::SetupPipRecorder(void)
     if (pipaudiosamplerate > 0)
         pipnvr->SetAudioSampleRate(pipaudiosamplerate);
     else
-        pipnvr->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
+        pipnvr->SetAudioSampleRate(context->GetNumSetting("AudioSampleRate"));
 
     pipnvr->SetAudioDevice(pipaudiodev);
     pipnvr->SetAudioCompression(false);
@@ -777,16 +765,17 @@ void TV::SetupPlayer(void)
     nvp = new NuppelVideoPlayer();
     nvp->SetRingBuffer(prbuffer);
     nvp->SetRecorder(nvr);
-    nvp->SetOSDFontName(settings->GetSetting("OSDFont"), theprefix);
-    nvp->SetOSDThemeName(settings->GetSetting("OSDTheme"));
-    nvp->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
-    nvp->SetAudioDevice(settings->GetSetting("AudioDevice"));
+    nvp->SetOSDFontName(context->GetSetting("OSDFont"), 
+                        context->GetInstallPrefix()); 
+    nvp->SetOSDThemeName(context->GetSetting("OSDTheme"));
+    nvp->SetAudioSampleRate(context->GetNumSetting("AudioSampleRate"));
+    nvp->SetAudioDevice(context->GetSetting("AudioDevice"));
     nvp->SetLength(playbackLen);
-    nvp->SetExactSeeks(settings->GetNumSetting("ExactSeeking"));
+    nvp->SetExactSeeks(context->GetNumSetting("ExactSeeking"));
 
-    osd_display_time = settings->GetNumSetting("OSDDisplayTime");
+    osd_display_time = context->GetNumSetting("OSDDisplayTime");
 
-    if (settings->GetNumSetting("Deinterlace"))
+    if (context->GetNumSetting("Deinterlace"))
     {
         if (filters.length() > 1)
             filters += ",";
@@ -805,7 +794,7 @@ void TV::SetupPipPlayer(void)
 {
     if (pipnvp)
     {
-        printf("Attempting to setup a player, but it already exists.\n");
+        printf("Attempting to setup a pip player, but it already exists.\n");
         return;
     }
 
@@ -815,13 +804,14 @@ void TV::SetupPipPlayer(void)
     pipnvp->SetAsPIP();
     pipnvp->SetRingBuffer(piprbuffer);
     pipnvp->SetRecorder(pipnvr);
-    pipnvp->SetOSDFontName(settings->GetSetting("OSDFont"), theprefix);
-    pipnvp->SetOSDThemeName(settings->GetSetting("OSDTheme"));
-    pipnvp->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
-    pipnvp->SetAudioDevice(settings->GetSetting("AudioDevice"));
+    pipnvp->SetOSDFontName(context->GetSetting("OSDFont"),
+                           context->GetInstallPrefix());
+    pipnvp->SetOSDThemeName(context->GetSetting("OSDTheme"));
+    pipnvp->SetAudioSampleRate(context->GetNumSetting("AudioSampleRate"));
+    pipnvp->SetAudioDevice(context->GetSetting("AudioDevice"));
     pipnvp->SetLength(playbackLen);
 
-    if (settings->GetNumSetting("Deinterlace"))
+    if (context->GetNumSetting("Deinterlace"))
     {
         if (filters.length() > 1)
             filters += ",";
@@ -884,14 +874,14 @@ void TV::TeardownPipPlayer(void)
 char *TV::GetScreenGrab(ProgramInfo *rcinfo, int secondsin, int &bufferlen,
                         int &video_width, int &video_height)
 {
-    QString recprefix = settings->GetSetting("RecordFilePrefix");
+    QString recprefix = context->GetFilePrefix(); 
     QString filename = rcinfo->GetRecordFilename(recprefix);
 
     RingBuffer *tmprbuf = new RingBuffer(filename, false);
 
     NuppelVideoPlayer *nupvidplay = new NuppelVideoPlayer();
     nupvidplay->SetRingBuffer(tmprbuf);
-    nupvidplay->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
+    nupvidplay->SetAudioSampleRate(context->GetNumSetting("AudioSampleRate"));
     char *retbuf = nupvidplay->GetScreenGrab(secondsin, bufferlen, video_width,
                                              video_height);
 
@@ -949,7 +939,7 @@ void TV::RunTV(void)
     paused = false;
     int keypressed;
 
-    stickykeys = settings->GetNumSetting("StickyKeys");
+    stickykeys = context->GetNumSetting("StickyKeys");
     doing_ff = false;
     doing_rew = false;
 
@@ -1158,12 +1148,12 @@ void TV::TogglePIPView(void)
 
         pipchannel->Close();
 
-        long long filesize = settings->GetNumSetting("PIPBufferSize");
+        long long filesize = context->GetNumSetting("PIPBufferSize");
         filesize = filesize * 1024 * 1024 * 1024;
-        long long smudge = settings->GetNumSetting("PIPMaxBufferFill");
+        long long smudge = context->GetNumSetting("PIPMaxBufferFill");
         smudge = smudge * 1024 * 1024;
 
-        piprbuffer = new RingBuffer(settings->GetSetting("PIPBufferName"),
+        piprbuffer = new RingBuffer(context->GetSetting("PIPBufferName"),
                                     filesize, smudge);
 
         SetupPipRecorder();
@@ -1646,12 +1636,7 @@ void TV::ConnectDB(int cardnum)
         printf("Couldn't initialize mysql connection\n");
         return;
     }
-    db_conn->setDatabaseName(settings->GetSetting("DBName"));
-    db_conn->setUserName(settings->GetSetting("DBUserName"));
-    db_conn->setPassword(settings->GetSetting("DBPassword"));
-    db_conn->setHostName(settings->GetSetting("DBHostName"));
-
-    if (!db_conn->open())
+    if (!context->OpenDatabase(db_conn))
     {
         printf("Couldn't open database\n");
     }
@@ -1834,7 +1819,7 @@ QString TV::GetNextChannel(bool direction)
 
 bool TV::ChangeExternalChannel(const QString &channum)
 {
-    QString command = settings->GetSetting("ExternalChannelCommand");
+    QString command = context->GetSetting("ExternalChannelCommand");
 
     command += QString(" ") + QString(channum);
 

@@ -12,35 +12,25 @@ using namespace std;
 #include "deletebox.h"
 #include "viewscheduled.h"
 
-#include "libmyth/infostructs.h"
-#include "libmyth/guidegrid.h"
-#include "libmyth/settings.h"
 #include "libmyth/themedmenu.h"
 #include "libmyth/programinfo.h"
+#include "libmyth/mythcontext.h"
 
-char installprefix[] = PREFIX;
-
-QString prefix;
 QMap<int, TV *> tvList;
-Settings *globalsettings;
 
-QString startGuide(void)
+QString startGuide(MythContext *context)
 {
-    QString startchannel = globalsettings->GetSetting("DefaultTVChannel");
+    QString startchannel = context->GetSetting("DefaultTVChannel");
     if (startchannel == "")
         startchannel = "3";
 
-    GuideGrid gg(startchannel);
-
-    gg.exec();
-
-    return gg.getLastChannel();
+    return context->RunProgramGuide(startchannel);
 }
 
-int startManaged(void)
+int startManaged(MythContext *context)
 {
     QSqlDatabase *db = QSqlDatabase::database();
-    ViewScheduled vsb(prefix, tvList.begin().data(), db);
+    ViewScheduled vsb(context, tvList.begin().data(), db);
 
     vsb.Show();
     vsb.exec();
@@ -48,10 +38,10 @@ int startManaged(void)
     return 0;
 }
 
-int startPlayback(void)
+int startPlayback(MythContext *context)
 {
     QSqlDatabase *db = QSqlDatabase::database();  
-    PlaybackBox pbb(prefix, tvList.begin().data(), db);
+    PlaybackBox pbb(context, tvList.begin().data(), db);
 
     pbb.Show();
 
@@ -60,10 +50,10 @@ int startPlayback(void)
     return 0;
 }
 
-int startDelete(void)
+int startDelete(MythContext *context)
 {
     QSqlDatabase *db = QSqlDatabase::database();
-    DeleteBox delbox(prefix, tvList.begin().data(), db);
+    DeleteBox delbox(context, tvList.begin().data(), db);
    
     delbox.Show();
     
@@ -97,6 +87,7 @@ void startTV(void)
 void *runScheduler(void *dummy)
 {
     dummy = dummy;
+    //MythContext *context = (MythContext *)dummy;
 
     QSqlDatabase *db = QSqlDatabase::database("SUBDB");
 
@@ -182,30 +173,30 @@ void *runScheduler(void *dummy)
 
 void TVMenuCallback(void *data, QString &selection)
 {
-    data = data;
+    MythContext *context = (MythContext *)data;
 
     QString sel = selection.lower();
 
     if (sel == "tv_watch_live")
         startTV();
     else if (sel == "tv_watch_recording")
-        startPlayback();
+        startPlayback(context);
     else if (sel == "tv_schedule")
-        startGuide();
+        startGuide(context);
     else if (sel == "tv_delete")
-        startDelete();
+        startDelete(context);
     else if (sel == "tv_fix_conflicts")
-        startManaged();
+        startManaged(context);
     else if (sel == "tv_setup")
         ;
 }
 
-bool RunMenu(QString themedir)
+bool RunMenu(QString themedir, MythContext *context)
 {
-    ThemedMenu *diag = new ThemedMenu(themedir.ascii(), installprefix, 
+    ThemedMenu *diag = new ThemedMenu(context, themedir.ascii(), 
                                       "mainmenu.xml");
 
-    diag->setCallback(TVMenuCallback, NULL);
+    diag->setCallback(TVMenuCallback, context);
     
     if (diag->foundTheme())
     {
@@ -220,9 +211,9 @@ bool RunMenu(QString themedir)
     return true;
 }   
 
-void setupTVs(void)
+void setupTVs(MythContext *context)
 {
-    QString startchannel = globalsettings->GetSetting("DefaultTVChannel");
+    QString startchannel = context->GetSetting("DefaultTVChannel");
     if (startchannel == "")
         startchannel = "3";
 
@@ -237,7 +228,7 @@ void setupTVs(void)
             int cardid = query.value(0).toInt();
 
             // not correct, but it'll do for now
-            TV *tv = new TV(startchannel, cardid, cardid + 1);
+            TV *tv = new TV(context, startchannel, cardid, cardid + 1);
             tvList[cardid] = tv;
         }
     }
@@ -252,11 +243,7 @@ int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
 
-    globalsettings = new Settings;
-
-    globalsettings->LoadSettingsFiles("settings.txt", installprefix);
-    globalsettings->LoadSettingsFiles("theme.txt", installprefix);
-    globalsettings->LoadSettingsFiles("mysql.txt", installprefix);
+    MythContext *context = new MythContext;
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
@@ -264,10 +251,6 @@ int main(int argc, char **argv)
         printf("Couldn't connect to database\n");
         return -1;
     }
-    db->setDatabaseName(globalsettings->GetSetting("DBName"));
-    db->setUserName(globalsettings->GetSetting("DBUserName"));
-    db->setPassword(globalsettings->GetSetting("DBPassword"));
-    db->setHostName(globalsettings->GetSetting("DBHostName"));
 
     QSqlDatabase *subthread = QSqlDatabase::addDatabase("QMYSQL3", "SUBDB");
     if (!subthread)
@@ -275,42 +258,31 @@ int main(int argc, char **argv)
         printf("Couldn't connect to database\n");
         return -1;
     }
-    subthread->setDatabaseName(globalsettings->GetSetting("DBName"));
-    subthread->setUserName(globalsettings->GetSetting("DBUserName"));
-    subthread->setPassword(globalsettings->GetSetting("DBPassword"));
-    subthread->setHostName(globalsettings->GetSetting("DBHostName"));    
 
-    if (!db->open() || !subthread->open())
+    if (!context->OpenDatabase(db) || !context->OpenDatabase(subthread))
     {
         printf("couldn't open db\n");
         return -1;
     }
 
-    setupTVs();
+    setupTVs(context);
 
-    prefix = (tvList.begin().data())->GetFilePrefix();
-    QString theprefix = (tvList.begin().data())->GetInstallPrefix();
-
-    QString themename = globalsettings->GetSetting("Theme");
-
-    QString themedir = findThemeDir(themename, theprefix);
+    QString themename = context->GetSetting("Theme");
+    QString themedir = context->FindThemeDir(themename);
     if (themedir == "")
     {
         cerr << "Couldn't find theme " << themename << endl;
         exit(0);
     }
 
-    globalsettings->SetSetting("ThemePathName", themedir + "/");
+    context->LoadQtConfig();
 
-    QString qttheme = themedir + "/qtlook.txt";
-    globalsettings->ReadSettings(qttheme);
- 
     pthread_t scthread;
-    pthread_create(&scthread, NULL, runScheduler, NULL);
+    pthread_create(&scthread, NULL, runScheduler, context);
 
-    RunMenu(themedir);
+    RunMenu(themedir, context);
 
-    delete globalsettings;
+    delete context;
 
     return 0;
 }

@@ -8,12 +8,17 @@
 
 class QLabel;
 class QCheckBox;
+class MythContext;
+
+namespace libmyth
+{
 
 class InfoDialog : public QDialog
 {
     Q_OBJECT
   public:
-    InfoDialog(ProgramInfo *pginfo, QWidget *parent = 0, const char *name = 0);
+    InfoDialog(MythContext *context, ProgramInfo *pginfo, 
+               QWidget *parent = 0, const char *name = 0);
 
   protected slots:
     void norecPressed(void);
@@ -35,6 +40,10 @@ class InfoDialog : public QDialog
     int programtype;
     RecordingType recordstatus;
     ProgramInfo *myinfo;
+
+    MythContext *m_context;
 };
+
+}
 
 #endif

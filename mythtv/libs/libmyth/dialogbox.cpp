@@ -6,29 +6,23 @@
 #include <qapplication.h>
 
 #include "dialogbox.h"
-#include "settings.h"
+#include "mythcontext.h"
 
-extern Settings *globalsettings;
-
-DialogBox::DialogBox(const QString &text, const char *checkboxtext,
+DialogBox::DialogBox(MythContext *context, const QString &text, 
+                     const char *checkboxtext,
                      QWidget *parent, const char *name)
          : QDialog(parent, name)
 {
-    int screenheight = QApplication::desktop()->height();
-    int screenwidth = QApplication::desktop()->width();
+    int screenheight = 0, screenwidth = 0;
+    float wmult = 0, hmult = 0;
 
-    if (globalsettings->GetNumSetting("GuiWidth") > 0)
-        screenwidth = globalsettings->GetNumSetting("GuiWidth");
-    if (globalsettings->GetNumSetting("GuiHeight") > 0)
-        screenheight = globalsettings->GetNumSetting("GuiHeight");
-
-    float wmult = screenwidth / 800.0;
-    float hmult = screenheight / 600.0;
+    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
-    setFont(QFont("Arial", (int)(16 * hmult), QFont::Bold));
+    setFont(QFont("Arial", (int)(context->GetBigFontSize() * hmult), 
+            QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
     QLabel *maintext = new QLabel(text, this);

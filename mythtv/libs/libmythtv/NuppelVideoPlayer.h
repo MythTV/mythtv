@@ -80,7 +80,7 @@ class NuppelVideoPlayer
 
     OSD *GetOSD(void) { return osd; }
 
-    void SetOSDFontName(QString filename, char *prefix) 
+    void SetOSDFontName(QString filename, QString prefix) 
                       { osdfilename = filename; osdprefix = prefix; }
     void SetOSDThemeName(QString themename) { osdtheme = themename; }
 

@@ -41,12 +41,14 @@ struct MenuRow
     vector<ThemedButton *> buttons;
 };
 
+class MythContext;
+
 class ThemedMenu : public QDialog
 {
     Q_OBJECT
   public:
-    ThemedMenu(const char *cdir, const char *cprefix, const char *menufile, 
-            QWidget *parent = 0, const char *name = 0);
+    ThemedMenu(MythContext *context, const char *cdir, const char *menufile, 
+               QWidget *parent = 0, const char *name = 0);
    ~ThemedMenu();
 
     bool foundTheme() { return foundtheme; }
@@ -149,8 +151,8 @@ class ThemedMenu : public QDialog
     void *callbackdata;
 
     bool killable;
+   
+    MythContext *m_context;
 };
-
-QString findThemeDir(QString themename, QString prefix);
 
 #endif
