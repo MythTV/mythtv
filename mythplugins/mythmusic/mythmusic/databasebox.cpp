@@ -208,10 +208,10 @@ void DatabaseBox::copyNewPlaylist()
 
     if(the_playlists->nameIsUnique(active_pl_edit->text(), 0))
     {
-        closeActivePopup();
         the_playlists->copyNewPlaylist(active_pl_edit->text());
         the_playlists->showRelevantPlaylists(alllists);
         checkTree();
+        closeActivePopup();
     }
     else
     {
