@@ -249,7 +249,6 @@ void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
             break;
         skipFrames--;
     }
-
 }
 
 void AvFormatDecoder::Reset(void)

@@ -24,6 +24,7 @@
 #include <errno.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 
 #if defined(CONFIG_VIDEO4LINUX)
 #include "videodev_myth.h"

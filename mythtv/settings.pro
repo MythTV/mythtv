@@ -14,12 +14,17 @@ DEFINES += _FILE_OFFSET_BITS=64
 DEFINES += PREFIX=\"$${PREFIX}\"
 
 release {
-    contains( TARGET_ARCH_X86, yes ) {
+    contains(TARGET_ARCH_X86, yes) {
+        DEFINES += MMX
+        QMAKE_CXXFLAGS_RELEASE = -O3 -march=pentiumpro -fomit-frame-pointer
+    }
+    # probably should change this...
+    contains(TARGET_ARCH_X86_64, yes) {
         DEFINES += MMX
         QMAKE_CXXFLAGS_RELEASE = -O3 -march=pentiumpro -fomit-frame-pointer
     }
     contains( TARGET_ARCH_POWERPC, yes ) {
-        # Don't use -O3, it causes some Qt moc methods to go missing
+        # Do not use -O3, it causes some Qt moc methods to go missing
         QMAKE_CXXFLAGS_RELEASE = -O2
     }
     QMAKE_CFLAGS_RELEASE = $${QMAKE_CXXFLAGS_RELEASE}

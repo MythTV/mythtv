@@ -613,6 +613,7 @@ void AudioOutputBase::_AddSamples(void *buffer, bool interleaved, int samples,
             else
             {
                 org_waud += nSamples * audio_bytes_per_sample;
+                nSamplesToEnd -= nSamples;
             }
 
             newLen += nSamples * audio_bytes_per_sample;
