@@ -1072,20 +1072,20 @@ void PlaybackBox::killPlayer(void)
 
     if (nvp)
     {
-        QTime curtime = QTime::currentTime();
+        QDateTime curtime = QDateTime::currentDateTime();
         curtime = curtime.addSecs(2);
 
         ignoreevents = true;
         while (!nvp->IsPlaying())
         {
-            if (QTime::currentTime() > curtime)
+            if (QDateTime::currentDateTime() > curtime)
                 break;
             usleep(50);
             qApp->unlock();
             qApp->processEvents();
             qApp->lock();
         }
-        curtime = QTime::currentTime();
+        curtime = QDateTime::currentDateTime();
         curtime = curtime.addSecs(2);
 
         rbuffer->Pause();
@@ -1101,7 +1101,7 @@ void PlaybackBox::killPlayer(void)
 
         while (nvp->IsPlaying())
         {
-            if (QTime::currentTime() > curtime)
+            if (QDateTime::currentDateTime() > curtime)
                 break;
             usleep(50);
             qApp->unlock();
@@ -1147,14 +1147,14 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
  
         pthread_create(&decoder, NULL, SpawnDecoder, nvp);
 
-        QTime curtime = QTime::currentTime();
+        QDateTime curtime = QDateTime::currentDateTime();
         curtime = curtime.addSecs(2);
  
         ignoreevents = true;
 
         while (nvp && !nvp->IsPlaying())
         {
-            if (QTime::currentTime() > curtime)
+            if (QDateTime::currentDateTime() > curtime)
                 break;
             usleep(50);
             qApp->unlock();

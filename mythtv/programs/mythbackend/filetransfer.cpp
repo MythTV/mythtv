@@ -73,10 +73,10 @@ bool FileTransfer::RequestBlock(int size)
         size = 256000;
 
     bool locked = false;
-    QTime curtime = QTime::currentTime();
+    QDateTime curtime = QDateTime::currentDateTime();
     curtime = curtime.addSecs(15);
 
-    while (QTime::currentTime() < curtime)
+    while (QDateTime::currentDateTime() < curtime)
     {
         locked = pthread_mutex_trylock(&readthreadLock);
         if (locked)
@@ -94,14 +94,14 @@ bool FileTransfer::RequestBlock(int size)
     readrequest = size;
     pthread_mutex_unlock(&readthreadLock);
 
-    curtime = QTime::currentTime();
+    curtime = QDateTime::currentDateTime();
     curtime = curtime.addSecs(15);
 
     while (readrequest > 0 && readthreadlive && !ateof)
     {
         usleep(100);
 
-        if (QTime::currentTime() > curtime)
+        if (QDateTime::currentDateTime() > curtime)
         {
             cerr << "Backend stuffed up in RequestBlock\n";
             rbuffer->StopReads();

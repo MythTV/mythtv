@@ -2617,7 +2617,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
     int audioframesize;
     int audioFrame = 0;
 
-    QTime curtime = QTime::currentTime();
+    QDateTime curtime = QDateTime::currentDateTime();
     if (honorCutList && m_playbackinfo)
     {
         if (m_playbackinfo->IsEditing(m_db) ||
@@ -2835,7 +2835,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
             nvr->WriteVideo(&frame, true, writekeyframe);
         }
 
-        if (honorCutList && QTime::currentTime() > curtime) 
+        if (honorCutList && QDateTime::currentDateTime() > curtime) 
         {
             if (m_playbackinfo->CheckMarkupFlag(MARK_UPDATED_CUT, m_db)) 
             {
@@ -2844,7 +2844,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
                 unlink(outputname);
                 return REENCODE_CUTLIST_CHANGE;
             }
-            curtime = QTime::currentTime();
+            curtime = QDateTime::currentDateTime();
             curtime = curtime.addSecs(60);
         }
     

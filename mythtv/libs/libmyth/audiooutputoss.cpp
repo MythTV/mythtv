@@ -68,12 +68,12 @@ void AudioOutputOSS::Reconfigure(int audio_bits, int audio_channels,
     numbadioctls = 0;
     numlowbuffer = 0;
 
-    QTime curtime = QTime::currentTime();
+    QDateTime curtime = QDateTime::currentDateTime();
     curtime = curtime.addSecs(2);
     
     printf("Opening OSS audio device '%s'.\n", audiodevice.ascii());
     
-    while (QTime::currentTime() < curtime && audiofd == -1)
+    while (QDateTime::currentDateTime() < curtime && audiofd == -1)
     {
         audiofd = open(audiodevice.ascii(), O_WRONLY | O_NONBLOCK);
         if (audiofd < 0 && errno != EAGAIN && errno != EINTR)
