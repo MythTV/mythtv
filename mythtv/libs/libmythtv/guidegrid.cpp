@@ -350,11 +350,16 @@ void GuideGrid::keyPressEvent(QKeyEvent *e)
             else if (action == "6")
                 showProgFinder();
             else if (action == "MENU")
-                enter();
+                enter();                
             else if (action == "ESCAPE")
                 escape();
             else if (action == "SELECT")
-                editRecording();
+            {                         
+                if( m_player && gContext->GetNumSetting("SelectChangesChannel", 0) )
+                    enter();
+                else
+                    editRecording();
+            }
             else if (action == "INFO")
                 editScheduled();
             else if (action == "TOGGLERECORD")

@@ -1415,6 +1415,19 @@ public:
     };
 };
 
+class SelectChangesChannel: public CheckBoxSetting, public GlobalSetting {
+public:
+    SelectChangesChannel():
+        GlobalSetting("SelectChangesChannel") {
+        setLabel(QObject::tr("Use select to change the channel in the program guide"));
+        setValue(false);
+        setHelpText(QObject::tr("If checked the select key will change the channel "
+                    "while using the program guide during live TV.  If unchecked the select "
+                    "key will bring up the recording options screen."));
+    };
+};
+
+
 class AudioSettings: public VerticalConfigurationGroup,
                       public TriggeredConfigurationGroup {
 public:
@@ -1800,6 +1813,7 @@ EPGSettings::EPGSettings()
     gen->addChild(new UnknownTitle());
     gen->addChild(new UnknownCategory());
     gen->addChild(new DefaultTVChannel());
+    gen->addChild(new SelectChangesChannel());
     addChild(gen);
 }
 
