@@ -1629,6 +1629,8 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
     QPoint pos = QPoint(0, 0);
     QPixmap image_on, image_off, image_pushed;
 
+    QPixmap *tmppix = NULL;
+
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
@@ -1676,62 +1678,56 @@ void XMLParse::parsePushButton(LayerSet *container, QDomElement &element)
 
                 if (imgname.lower() == "on")
                 {
-                    QString baseDir = gContext->GetInstallPrefix();
                     QString themeDir = gContext->FindThemeDir("");
                     themeDir = themeDir + gContext->GetSetting("Theme") + "/";
-                    baseDir = baseDir + "/share/mythtv/themes/default/";
-                    QFile checkFile(themeDir + file);
-                    if (checkFile.exists())
+
+                    tmppix = gContext->LoadScalePixmap(themeDir + file);
+
+                    if (!tmppix)
                     {
-                        file = themeDir + file;
+                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
                     else
                     {
-                        file = baseDir + file;
-                    }
-                    if(!image_on.load(file))
-                    {
-                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                        image_on = *tmppix;
+                        delete tmppix;
+                        tmppix = NULL;
                     }
                 }
                 if (imgname.lower() == "off")
                 {
-                    QString baseDir = gContext->GetInstallPrefix();
                     QString themeDir = gContext->FindThemeDir("");
                     themeDir = themeDir + gContext->GetSetting("Theme") + "/";
-                    baseDir = baseDir + "/share/mythtv/themes/default/";
-                    QFile checkFile(themeDir + file);
-                    if (checkFile.exists())
+
+                    tmppix = gContext->LoadScalePixmap(themeDir + file);
+
+                    if(!tmppix)
                     {
-                        file = themeDir + file;
+                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
                     else
                     {
-                        file = baseDir + file;
-                    }
-                    if(!image_off.load(file))
-                    {
-                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                        image_off = *tmppix;
+                        delete tmppix;
+                        tmppix = NULL;
                     }
                 }
                 if (imgname.lower() == "pushed")
                 {
-                    QString baseDir = gContext->GetInstallPrefix();
                     QString themeDir = gContext->FindThemeDir("");
                     themeDir = themeDir + gContext->GetSetting("Theme") + "/";
-                    baseDir = baseDir + "/share/mythtv/themes/default/";
-                    QFile checkFile(themeDir + file);
-                    if (checkFile.exists())
+
+                    tmppix = gContext->LoadScalePixmap(themeDir + file);
+
+                    if(!tmppix)
                     {
-                        file = themeDir + file;
+                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
                     else
                     {
-                        file = baseDir + file;
-                    }
-                    if(!image_pushed.load(file))
-                    {
-                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                        image_pushed = *tmppix;
+                        delete tmppix;
+                        tmppix = NULL;
                     }
                 }
             }
@@ -1757,6 +1753,7 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
     QString font = "";
     QPoint pos = QPoint(0, 0);
     QPixmap image_on, image_off, image_pushed;
+    QPixmap *tmppix;
 
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
@@ -1809,62 +1806,56 @@ void XMLParse::parseTextButton(LayerSet *container, QDomElement &element)
 
                 if (imgname.lower() == "on")
                 {
-                    QString baseDir = gContext->GetInstallPrefix();
                     QString themeDir = gContext->FindThemeDir("");
                     themeDir = themeDir + gContext->GetSetting("Theme") + "/";
-                    baseDir = baseDir + "/share/mythtv/themes/default/";
-                    QFile checkFile(themeDir + file);
-                    if (checkFile.exists())
+
+                    tmppix = gContext->LoadScalePixmap(themeDir + file);
+
+                    if(!tmppix)
                     {
-                        file = themeDir + file;
+                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
                     else
                     {
-                        file = baseDir + file;
-                    }
-                    if(!image_on.load(file))
-                    {
-                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                        image_on = *tmppix;
+                        delete tmppix;
+                        tmppix = NULL;
                     }
                 }
                 if (imgname.lower() == "off")
                 {
-                    QString baseDir = gContext->GetInstallPrefix();
                     QString themeDir = gContext->FindThemeDir("");
                     themeDir = themeDir + gContext->GetSetting("Theme") + "/";
-                    baseDir = baseDir + "/share/mythtv/themes/default/";
-                    QFile checkFile(themeDir + file);
-                    if (checkFile.exists())
+
+                    tmppix = gContext->LoadScalePixmap(themeDir + file);
+
+                    if(!tmppix)
                     {
-                        file = themeDir + file;
+                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
                     else
                     {
-                        file = baseDir + file;
-                    }
-                    if(!image_off.load(file))
-                    {
-                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                        image_off = *tmppix;
+                        delete tmppix;
+                        tmppix = NULL;
                     }
                 }
                 if (imgname.lower() == "pushed")
                 {
-                    QString baseDir = gContext->GetInstallPrefix();
                     QString themeDir = gContext->FindThemeDir("");
                     themeDir = themeDir + gContext->GetSetting("Theme") + "/";
-                    baseDir = baseDir + "/share/mythtv/themes/default/";
-                    QFile checkFile(themeDir + file);
-                    if (checkFile.exists())
+
+                    tmppix = gContext->LoadScalePixmap(themeDir + file);
+
+                    if(!tmppix)
                     {
-                        file = themeDir + file;
+                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
                     }
                     else
                     {
-                        file = baseDir + file;
-                    }
-                    if(!image_pushed.load(file))
-                    {
-                        cerr << "xmparse.o: I can't find a file called " << file << endl ;
+                        image_pushed = *tmppix;
+                        delete tmppix;
+                        tmppix = NULL;
                     }
                 }
             }
