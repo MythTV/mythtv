@@ -176,7 +176,7 @@ bool DVBDiSEqC::SendDiSEqCMessage(dvb_tuning_t& tuning, dvb_diseqc_master_cmd &c
 
     usleep(DISEQC_SHORT_WAIT);
 
-    GENERAL(QString("DiSEqC Sending 1.0 Command: %1 %2 %3 %4").
+    GENERAL(QString("DiSEqC Sending 1.0 Command: %1 %2 %3 %4")
                    .arg(cmd.msg[0], 2, 16)
                    .arg(cmd.msg[1], 2, 16)
                    .arg(cmd.msg[2], 2, 16)
