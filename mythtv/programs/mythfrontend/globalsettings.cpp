@@ -1117,7 +1117,7 @@ public:
 class GuiOffsetX: public SpinBoxSetting, public GlobalSetting {
 public:
     GuiOffsetX():
-        SpinBoxSetting(-1600, 1600, 1), GlobalSetting("GuiOffsetX") {
+        SpinBoxSetting(-1600, 1600, 8, true), GlobalSetting("GuiOffsetX") {
         setLabel(QObject::tr("GUI X offset"));
         setValue(0);
         setHelpText(QObject::tr("The horizontal offset the GUI will be "
@@ -1128,7 +1128,7 @@ public:
 class GuiOffsetY: public SpinBoxSetting, public GlobalSetting {
 public:
     GuiOffsetY():
-        SpinBoxSetting(-1600, 1600, 1), GlobalSetting("GuiOffsetY") {
+        SpinBoxSetting(-1600, 1600, 8, true), GlobalSetting("GuiOffsetY") {
         setLabel(QObject::tr("GUI Y offset"));
         setValue(0);
         setHelpText(QObject::tr("The vertical offset the GUI will be "
