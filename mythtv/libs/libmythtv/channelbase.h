@@ -54,6 +54,8 @@ class ChannelBase
     virtual QString GetCurrentName(void);
     virtual QString GetCurrentInput(void);
 
+    virtual int GetCurrentInputNum(void);
+
     virtual void SetFd(int fd) { (void)fd; }
 
     virtual QString GetOrdering() { return channelorder; }

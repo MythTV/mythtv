@@ -378,9 +378,6 @@ bool Channel::TuneTo(const QString &channum, int finetune)
 
 void Channel::SwitchToInput(int newcapchannel, bool setstarting)
 {
-    if (newcapchannel == currentcapchannel)
-        return;
-
     if (usingv4l2)
     {
         if (ioctl(videofd, VIDIOC_S_INPUT, &newcapchannel) < 0)

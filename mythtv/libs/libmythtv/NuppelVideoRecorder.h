@@ -35,11 +35,12 @@ struct VBIData;
 struct cc;
 class RTjpeg;
 class RingBuffer;
+class ChannelBase;
 
 class NuppelVideoRecorder : public RecorderBase
 {
  public:
-    NuppelVideoRecorder();
+    NuppelVideoRecorder(ChannelBase *channel);
    ~NuppelVideoRecorder();
 
     void SetOption(const QString &name, int value);
@@ -242,6 +243,8 @@ class NuppelVideoRecorder : public RecorderBase
 
     long long prev_bframe_save_pos;
     long long prev_keyframe_save_pos;
+
+    ChannelBase *channelObj;
 };
 
 #endif

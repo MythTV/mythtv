@@ -64,6 +64,11 @@ QString ChannelBase::GetCurrentInput(void)
     return channelnames[currentcapchannel];
 }
 
+int ChannelBase::GetCurrentInputNum(void)
+{
+    return currentcapchannel;
+}
+
 void ChannelBase::ToggleInputs(void)
 {
     int newcapchannel = currentcapchannel;

@@ -19,6 +19,7 @@ using namespace std;
 #include "NuppelVideoRecorder.h"
 #include "commercial_skip.h"
 #include "../libvbitext/cc.h"
+#include "channelbase.h"
 
 extern "C" {
 #include "../libvbitext/vbi.h"
@@ -39,9 +40,11 @@ extern "C" {
 
 pthread_mutex_t avcodeclock = PTHREAD_MUTEX_INITIALIZER;
 
-NuppelVideoRecorder::NuppelVideoRecorder(void)
+NuppelVideoRecorder::NuppelVideoRecorder(ChannelBase *channel)
                    : RecorderBase()
 {
+    channelObj = channel;
+
     encoding = false;
     fd = 0;
     channelfd = 0;
@@ -800,6 +803,13 @@ void NuppelVideoRecorder::StartRecording(void)
     }
 
     int volume = -1;
+
+    int channelinput = 0;
+ 
+    if (channelObj)
+        channelinput = channelObj->GetCurrentInputNum();
+
+    vchan.channel = channelinput;
 
     if (ioctl(fd, VIDIOCGCHAN, &vchan) < 0) 
         perror("VIDIOCGCHAN");

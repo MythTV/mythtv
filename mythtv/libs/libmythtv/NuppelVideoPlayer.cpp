@@ -2774,7 +2774,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
     }
 
     // Input setup
-    nvr = new NuppelVideoRecorder;
+    nvr = new NuppelVideoRecorder(NULL);
     ringBuffer = new RingBuffer(filename, false, false);
 
     if (OpenFile(false) < 0)

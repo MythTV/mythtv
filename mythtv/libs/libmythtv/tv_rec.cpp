@@ -534,7 +534,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
 
     // V4L from here on
 
-    nvr = new NuppelVideoRecorder();
+    nvr = new NuppelVideoRecorder(channel);
 
     nvr->SetRingBuffer(rbuffer);
 

@@ -50,10 +50,9 @@ struct XvMCData
     xvmc_render_state_t *surface_render;
     xvmc_render_state_t *p_render_surface_to_show;
     xvmc_render_state_t *p_render_surface_visible;
-};
 
-#define GUID_I420_PLANAR 0x30323449
-#define GUID_YV12_PLANAR 0x32315659
+    int mode_id;
+};
 
 int XJ_error_catcher(Display * d, XErrorEvent * xeev)
 {
@@ -176,8 +175,6 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect, int num_buffers,
     int mc_surf_num = 0;
     XvMCSurfaceInfo *mc_surf_list;
 
-    int mode_id = 0;
-
     if (ret != Success) 
     {
         printf("XvQueryAdaptors failed.\n");
@@ -213,7 +210,7 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect, int num_buffers,
                         xv_port = p;
                         memcpy(&data->surface_info, &mc_surf_list[s],
                                sizeof(XvMCSurfaceInfo));
-                        mode_id = mc_surf_list[s].surface_type_id;
+                        data->mode_id = mc_surf_list[s].surface_type_id;
                         break;
                     }
 
@@ -241,39 +238,6 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect, int num_buffers,
     {
         cerr << "Bad winid given to output\n";
         return false;
-    }
-
-    ret = XvMCCreateContext(data->XJ_disp, xv_port, mode_id, width, height,
-                            XVMC_DIRECT, &(data->ctx));
-
-    if (ret != Success)
-    {
-        cerr << "Unable to create XvMC Context\n";
-        return false;
-    }
-
-    int numblocks = ((width + 15) / 16) * ((height + 15) / 16);
-    int blocks_per_macroblock = 6;
-  
-    for (int i = 0; i < 8; i++)
-    { 
-        ret = XvMCCreateBlocks(data->XJ_disp, &data->ctx, 
-                               numblocks * blocks_per_macroblock, 
-                               &(data->data_blocks[i]));
-        if (ret != Success)
-        {
-            cerr << "Unable to create XvMC Blocks\n";
-            XvMCDestroyContext(data->XJ_disp, &data->ctx);
-            return false;
-        }
-
-        ret = XvMCCreateMacroBlocks(data->XJ_disp, &data->ctx, numblocks,
-                                    &(data->mv_blocks[i]));
-        if (ret != Success)
-        {
-            cerr << "Unable to create XvMC Macro Blocks\n";
-            XvMCDestroyContext(data->XJ_disp, &data->ctx);
-        }  
     }
 
     data->XJ_curwin = data->XJ_win = winid;
@@ -350,8 +314,38 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect, int num_buffers,
 
 bool VideoOutputXvMC::CreateXvMCBuffers(void)
 {
+    int ret = XvMCCreateContext(data->XJ_disp, xv_port, data->mode_id, 
+                                XJ_width, XJ_height, XVMC_DIRECT, &(data->ctx));
+
+    if (ret != Success)
+    {
+        cerr << "Unable to create XvMC Context\n";
+        return false;
+    }
+
     int numblocks = ((XJ_width + 15) / 16) * ((XJ_height + 15) / 16);
     int blocks_per_macroblock = 6;
+
+    for (int i = 0; i < 8; i++)
+    {
+        ret = XvMCCreateBlocks(data->XJ_disp, &data->ctx,
+                               numblocks * blocks_per_macroblock,
+                               &(data->data_blocks[i]));
+        if (ret != Success)
+        {
+            cerr << "Unable to create XvMC Blocks\n";
+            XvMCDestroyContext(data->XJ_disp, &data->ctx);
+            return false;
+        }
+
+        ret = XvMCCreateMacroBlocks(data->XJ_disp, &data->ctx, numblocks,
+                                    &(data->mv_blocks[i]));
+        if (ret != Success)
+        {
+            cerr << "Unable to create XvMC Macro Blocks\n";
+            XvMCDestroyContext(data->XJ_disp, &data->ctx);
+        }
+    }
 
     int rez = 0;
     for (int i = 0; i < numbuffers; i++)
