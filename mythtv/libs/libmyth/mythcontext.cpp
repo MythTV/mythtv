@@ -27,19 +27,22 @@ MythContext::MythContext(bool gui)
 
     m_themeloaded = false;
 
+    pthread_mutex_init(&dbLock, NULL);
+    m_db = QSqlDatabase::addDatabase("QMYSQL3", "MythContext");
+
     LoadSettingsFiles("settings.txt");
     LoadSettingsFiles("mysql.txt");
     LoadSettingsFiles("theme.txt");
 
-    qtfontbig = m_settings->GetNumSetting("QtFontBig");
+    qtfontbig = GetNumSetting("QtFontBig");
     if (qtfontbig <= 0)
         qtfontbig = 25;
 
-    qtfontmed = m_settings->GetNumSetting("QtFontMedium");
+    qtfontmed = GetNumSetting("QtFontMedium");
     if (qtfontmed <= 0)
         qtfontmed = 25;
 
-    qtfontsmall = m_settings->GetNumSetting("QtFontSmall");
+    qtfontsmall = GetNumSetting("QtFontSmall");
     if (qtfontsmall <= 0)
         qtfontsmall = 25;
 
@@ -53,10 +56,10 @@ MythContext::MythContext(bool gui)
         m_height = m_width = 0;
     }
 
-    if (m_settings->GetNumSetting("GuiWidth") > 0)
-        m_width = m_settings->GetNumSetting("GuiWidth");
-    if (m_settings->GetNumSetting("GuiHeight") > 0)
-        m_height = m_settings->GetNumSetting("GuiHeight");
+    if (GetNumSetting("GuiWidth") > 0)
+        m_width = GetNumSetting("GuiWidth");
+    if (GetNumSetting("GuiHeight") > 0)
+        m_height = GetNumSetting("GuiHeight");
 
     m_wmult = m_width / 800.0;
     m_hmult = m_height / 600.0;
@@ -126,7 +129,7 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
 
 QString MythContext::GetFilePrefix(void)
 {
-    return m_settings->GetSetting("RecordFilePrefix");
+    return GetSetting("RecordFilePrefix");
 }
 
 void MythContext::LoadSettingsFiles(const QString &filename)
@@ -162,7 +165,7 @@ void MythContext::LoadQtConfig(void)
 
     m_qtThemeSettings = new Settings;
 
-    QString themename = m_settings->GetSetting("Theme");
+    QString themename = GetSetting("Theme");
     QString themedir = FindThemeDir(themename);
     
     m_settings->SetSetting("ThemePathName", themedir + "/");
@@ -235,10 +238,20 @@ QString MythContext::RunProgramGuide(QString startchannel, bool thread,
 
 int MythContext::OpenDatabase(QSqlDatabase *db)
 {
-    db->setDatabaseName(m_settings->GetSetting("DBName"));
-    db->setUserName(m_settings->GetSetting("DBUserName"));
-    db->setPassword(m_settings->GetSetting("DBPassword"));
-    db->setHostName(m_settings->GetSetting("DBHostName"));
+    pthread_mutex_lock(&dbLock);
+    if (!m_db->isOpen()) {
+        m_db->setDatabaseName(m_settings->GetSetting("DBName"));
+        m_db->setUserName(m_settings->GetSetting("DBUserName"));
+        m_db->setPassword(m_settings->GetSetting("DBPassword"));
+        m_db->setHostName(m_settings->GetSetting("DBHostName"));
+        m_db->open();
+    }
+    pthread_mutex_unlock(&dbLock);
+        
+    db->setDatabaseName(GetSetting("DBName"));
+    db->setUserName(GetSetting("DBUserName"));
+    db->setPassword(GetSetting("DBPassword"));
+    db->setHostName(GetSetting("DBHostName"));
  
     return db->open();
 }
@@ -255,13 +268,81 @@ void MythContext::KickDatabase(QSqlDatabase *db)
                  << result.lastError().databaseText() << endl;
     }
 }
+
 QString MythContext::GetSetting(const QString &key, const QString &defaultval) 
 {
+    bool found = false;
+    QString value;
+    pthread_mutex_lock(&dbLock);
+    if (m_db->isOpen()) {
+
+        KickDatabase(m_db);
+
+        QString query = QString("SELECT data FROM settings WHERE value = '%1'").arg(key);
+        QSqlQuery result = m_db->exec(query);
+
+        if (result.isActive() && result.numRowsAffected() > 0) {
+            result.next();
+            value = result.value(0).toString();
+            found = true;
+        }
+    }
+    pthread_mutex_unlock(&dbLock);
+
+    if (found)
+        return value;
     return m_settings->GetSetting(key, defaultval); 
 }
 
 int MythContext::GetNumSetting(const QString &key, int defaultval)
-{ 
+{
+    bool found = false;
+    int value;
+    pthread_mutex_lock(&dbLock);
+    if (m_db->isOpen()) {
+
+        KickDatabase(m_db);
+
+        QString query = QString("SELECT data FROM settings WHERE value = '%1'").arg(key);
+        QSqlQuery result = m_db->exec(query);
+
+        if (result.isActive() && result.numRowsAffected() > 0) {
+            result.next();
+            value = result.value(0).toInt();
+            found = true;
+        }
+    }
+    pthread_mutex_unlock(&dbLock);
+
+    if (found)
+        return value;
+
+    return m_settings->GetNumSetting(key, defaultval); 
+}
+
+bool MythContext::GetBooleanSetting(const QString& key, bool defaultval)
+{
+    bool found = false;
+    bool value;
+    pthread_mutex_lock(&dbLock);
+    if (m_db->isOpen()) {
+
+        KickDatabase(m_db);
+
+        QString query = QString("SELECT data FROM settings WHERE value = '%1'").arg(key);
+        QSqlQuery result = m_db->exec(query);
+
+        if (result.isActive() && result.numRowsAffected() > 0) {
+            result.next();
+            value = result.value(0).toString() != QString::null;
+            found = true;
+        }
+    }
+    pthread_mutex_unlock(&dbLock);
+
+    if (found)
+        return value;
+
     return m_settings->GetNumSetting(key, defaultval); 
 }
 
@@ -310,7 +391,7 @@ void MythContext::SetPalette(QWidget *widget)
 
 void MythContext::ThemeWidget(QWidget *widget)
 {
-    bool usetheme = m_settings->GetNumSetting("ThemeQt");
+    bool usetheme = GetNumSetting("ThemeQt");
     QColor bgcolor, fgcolor;
 
     if (usetheme)

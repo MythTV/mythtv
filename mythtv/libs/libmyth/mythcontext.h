@@ -68,6 +68,7 @@ class MythContext : public QObject
 
     QString GetSetting(const QString &key, const QString &defaultval = "");
     int GetNumSetting(const QString &key, int defaultval = 0);
+    int GetBooleanSetting(const QString &key, int defaultval = 0);
 
     void SetSetting(const QString &key, const QString &newValue);
 
@@ -148,6 +149,9 @@ class MythContext : public QObject
     bool expectingReply;
 
     QPtrList<QObject> listeners;
+
+    QSqlDatabase* m_db;
+    pthread_mutex_t dbLock;
 };
 
 #endif
