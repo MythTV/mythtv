@@ -31,7 +31,7 @@
      <type>VIDEO</type>
      <text>Videos</text>
      <action>EXEC mythvideo</action>
-     <depends>mythexplorer-settings.txt</depends>
+     <depends>mythvideo-settings.txt</depends>
    </button>
 
    <button>
