@@ -5,10 +5,7 @@ isEmpty( PREFIX ) {
     PREFIX = /usr/local
 }
 
-MYTHLIBDIR = ../../mythtv/libs/
-
 INCLUDEPATH += $${PREFIX}/include
-INCLUDEPATH += $${MYTHLIBDIR}
 
 DEFINES += _GNU_SOURCE
 DEFINES += PREFIX=\"$${PREFIX}\"

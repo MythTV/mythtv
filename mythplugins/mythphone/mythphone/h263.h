@@ -24,7 +24,7 @@
 
 extern "C" {
 #ifdef WIN32
-#include "libavcodec/avcodec.h"
+#include "mythtv/ffmpeg/avcodec.h"
 #else
 #include "mythtv/ffmpeg/avcodec.h"
 #endif
