@@ -4,9 +4,11 @@
 #include <qsqldatabase.h>
 #include <qsqlquery.h>
 #include <qaccel.h>
+#include <math.h>
 
 #include "guidegrid.h"
 #include "infodialog.h"
+#include "infostructs.h"
 
 GuideGrid::GuideGrid(int channel, QWidget *parent, const char *name)
          : QWidget(parent, name)
@@ -15,7 +17,8 @@ GuideGrid::GuideGrid(int channel, QWidget *parent, const char *name)
     m_font = new QFont("Arial", 11, QFont::Bold);
     m_largerFont = new QFont("Arial", 13, QFont::Bold);
 
-    m_originalStartTime = m_currentStartTime = QDateTime::currentDateTime();
+    m_originalStartTime = QDateTime::currentDateTime();
+    m_currentStartTime = m_originalStartTime;
     m_currentStartChannel = channel;
 
     m_currentRow = 0;
@@ -159,17 +162,20 @@ void GuideGrid::fillTimeInfos()
         int month = t.date().month();
         int day = t.date().day();
 
-        QTime midnight(0, 0, 0);
+        int hour = t.time().hour();
+        int mins = t.time().minute();
 
-        int secs = midnight.secsTo(t.time());
-
-        int hour = secs / 60 / 60;
-        int mins = secs / 60 - hour * 60;
-
+        int sqlmins;        
         if (mins > 30)
+        {
             mins = 30;
+            sqlmins = 45;
+        }
         else
+        {
+            sqlmins = 15;
             mins = 0;
+        }
 
         bool am = true;
         if (hour >= 12)
@@ -185,9 +191,15 @@ void GuideGrid::fillTimeInfos()
                 sprintf(temp, "%02d:%02d ", hour, mins);
             strcat(temp, (am ? "AM" : "PM"));
         }
+        timeinfo->year = year;
+        timeinfo->month = month;
+        timeinfo->day = day;
+        timeinfo->hour = hour;
+        timeinfo->min = mins;
+
         timeinfo->usertime = temp;
 
-        sprintf(temp, "%4d%02d%02d%02d%02d50", year, month, day, hour, mins);
+        sprintf(temp, "%4d%02d%02d%02d%02d50", year, month, day, hour, sqlmins);
         timeinfo->sqltime = temp;
 
         m_timeInfos[x] = timeinfo;
@@ -198,36 +210,15 @@ void GuideGrid::fillTimeInfos()
 
 ProgramInfo *GuideGrid::getProgramInfo(unsigned int row, unsigned int col)
 {
-    char thequery[512];
-    QSqlQuery query;
-
     if (!m_channelInfos[row] || !m_timeInfos[col])
         return NULL;
 
-    sprintf(thequery, "SELECT * FROM program WHERE channum = %d AND "
-                      "starttime < %s AND endtime > %s;", 
-                      m_channelInfos[row]->channum, 
-                      m_timeInfos[col]->sqltime.ascii(),
-                      m_timeInfos[col]->sqltime.ascii());
-
-    query.exec(thequery);
-    
-    if (query.isActive() && query.numRowsAffected() > 0)
+    ProgramInfo *pginfo = GetProgramAtDateTime(m_channelInfos[row]->channum,
+                                        m_timeInfos[col]->sqltime.ascii());
+    if (pginfo)
     {
-        query.next();
-
-        ProgramInfo *proginfo = new ProgramInfo;
-        proginfo->title = query.value(3).toString();
-        proginfo->subtitle = query.value(4).toString();
-        proginfo->description = query.value(5).toString();
-        proginfo->category = query.value(6).toString();
-        proginfo->starttime = query.value(1).toString();
-        proginfo->endtime = query.value(2).toString();
-        proginfo->channum = query.value(0).toString();
-        proginfo->spread = -1;
-        proginfo->startCol = col;
- 
-        return proginfo;
+        pginfo->startCol = col;
+        return pginfo;
     }
    
     ProgramInfo *proginfo = new ProgramInfo;
@@ -390,6 +381,7 @@ void GuideGrid::paintPrograms(QPainter *p)
             break;
 
         QString lastprog;
+        int lastxoffset = 0;
         for (int x = 0; x < 5; x++)
         {
             ProgramInfo *pginfo = m_programInfos[y][x];
@@ -421,33 +413,49 @@ void GuideGrid::paintPrograms(QPainter *p)
                         m_programInfos[y][z]->startCol = x;
                     }
                 }
-                
-                int maxwidth = spread * 145 - 15;
+               
+                QTime *ending = pginfo->getEndTime(); 
+                int newxoffset = 0;
+                if (x + spread < 5)
+                    newxoffset = (ending->minute() - 
+                                  m_timeInfos[x + spread]->min) * 100 / 145;
 
-                tmp.drawText(10 + x * 145, 
+                delete ending;
+
+                if (newxoffset < 10)
+                    newxoffset = 0;
+
+                int maxwidth = spread * 145 - 15 - lastxoffset + newxoffset;
+
+                tmp.drawText(10 + x * 145 + lastxoffset, 
                              height / 8 + 92 * y, maxwidth, 92,
                              AlignLeft | WordBreak,
                              pginfo->title);
 
                 tmp.setPen(QPen(black, 2));
                 if (x != 4)
-                    tmp.drawLine((x + spread) * 145, 92 * y - 1, 
-                                 (x + spread) * 145, 92 * (y + 1) - 1);
+                    tmp.drawLine((x + spread) * 145 + newxoffset, 92 * y - 1, 
+                                 (x + spread) * 145 + newxoffset, 
+                                 92 * (y + 1) - 1);
+
+                if (m_currentRow == (int)y)
+                {
+                    if ((m_currentCol >= x) && (m_currentCol < (x + spread)))
+                    {
+                        tmp.setPen(QPen(red, 2));
+                   
+                        tmp.drawRect(x * 145 + 2 + lastxoffset,
+                                     y * 92 + 1, 142 + 145 * (spread - 1) +
+                                     newxoffset, 92 -3);
+                        tmp.setPen(QPen(black, 2));
+                    }
+                }
+                lastxoffset = newxoffset;
             }
             lastprog = pginfo->starttime;
         }
     }
 
-    if (m_currentRow != -1 && m_currentCol != -1)
-    {
-        tmp.setPen(QPen(red, 2));
-
-        int startCol = m_programInfos[m_currentRow][m_currentCol]->startCol;
-        int spread = m_programInfos[m_currentRow][m_currentCol]->spread;
-
-        tmp.drawRect(startCol * 145 + 2, m_currentRow * 92 + 1,
-                     142 + 145 * (spread - 1), 92 - 3);
-    }
     tmp.end();
 
     p->drawPixmap(cr.topLeft(), pix);

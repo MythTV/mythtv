@@ -7,44 +7,9 @@
 #include <qdatetime.h>
 
 class QFont;
-
-class ChannelInfo 
-{
- public:
-    ChannelInfo() { icon = NULL; }
-   ~ChannelInfo() { if (icon) delete icon; }
-
-    void LoadIcon() { icon = new QPixmap(iconpath); }
-
-    QString callsign;
-    QString iconpath;
-    QString chanstr;
-
-    QPixmap *icon;
-    int channum;
-};
-
-class TimeInfo
-{
-  public:
-    QString usertime;
-    QString sqltime;
-};
-
-class ProgramInfo
-{
-  public:
-    QString title;
-    QString subtitle;
-    QString description;
-    QString category;
-    QString starttime;
-    QString endtime;
-    QString channum;
-
-    int spread;
-    int startCol;
-};
+class ProgramInfo;
+class TimeInfo;
+class ChannelInfo;
 
 class GuideGrid : public QWidget
 {

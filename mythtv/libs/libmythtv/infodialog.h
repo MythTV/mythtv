@@ -6,6 +6,7 @@
 
 class ProgramInfo;
 class QLabel;
+class QCheckBox;
 
 class InfoDialog : public QDialog
 {
@@ -13,8 +14,24 @@ class InfoDialog : public QDialog
   public:
     InfoDialog(ProgramInfo *pginfo, QWidget *parent = 0, const char *name = 0);
 
+  protected slots:
+    void norecPressed(void);
+    void reconePressed(void);
+    void rectimeslotPressed(void);
+    void receveryPressed(void);
+    void okPressed(void);
+
   private:
     QLabel *getDateLabel(ProgramInfo *pginfo);
+  
+    QCheckBox *norec;
+    QCheckBox *recone;
+    QCheckBox *rectimeslot;
+    QCheckBox *recevery;
+
+    int programtype;
+    int recordstatus;
+    ProgramInfo *myinfo;
 };
 
 #endif

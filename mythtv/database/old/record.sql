@@ -22,7 +22,6 @@ CREATE TABLE timeslotrecord
 CREATE TABLE allrecord
 (
     title VARCHAR(128) NULL
-    INDEX (title)
 );
 CREATE TABLE recorded
 (

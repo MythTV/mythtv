@@ -15,7 +15,7 @@ system("./grabdata 1");
 # Yes, this looks weird -- the 0 and 1 cases will normally never be used.
 # Basically, it just checks to see if today has data (in the case of this
 # being the first ever run)
-for ($offset = 0; $offset < 8; $offset++)
+for ($offset = 0; $offset < 9; $offset++)
 {
     my $nextoffset = $offset + 1;
     my $sth = $dbh->prepare("SELECT * FROM program WHERE starttime >= DATE_ADD(CURRENT_DATE, INTERVAL $offset DAY) AND starttime < DATE_ADD(CURRENT_DATE, INTERVAL $nextoffset DAY);");

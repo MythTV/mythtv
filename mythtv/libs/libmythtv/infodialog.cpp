@@ -3,9 +3,11 @@
 #include <qlabel.h>
 #include <qdatetime.h>
 #include <qcursor.h>
+#include <qcheckbox.h>
+#include <qvgroupbox.h>
 
 #include "infodialog.h"
-#include "guidegrid.h"
+#include "infostructs.h"
 
 InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
           : QDialog(parent, name)
@@ -17,13 +19,13 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
     setFont(QFont("Arial", 14, QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
-    QPushButton *ok = new QPushButton("Close", this, "close");
+    QPushButton *ok = new QPushButton("OK", this, "close");
     ok->setFont(QFont("Arial", 20, QFont::Bold));
 
     QPushButton *cancel = new QPushButton("Cancel", this, "cancel");
     cancel->setFont(QFont("Arial", 20, QFont::Bold));
 
-    connect(ok, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(ok, SIGNAL(clicked()), this, SLOT(okPressed()));
     connect(cancel, SIGNAL(clicked()), this, SLOT(reject()));
 
     QVBoxLayout *vbox = new QVBoxLayout(this, 20);
@@ -54,6 +56,47 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
 
     //vbox->addStretch(1);
 
+    QFrame *f = new QFrame(this);
+    f->setFrameStyle(QFrame::HLine | QFrame::Plain);
+    f->setLineWidth(4);
+    vbox->addWidget(f);    
+
+    QVBoxLayout *middleBox = new QVBoxLayout(vbox);
+
+    norec = new QCheckBox("Don't record this program", this);
+    middleBox->addWidget(norec);
+    connect(norec, SIGNAL(clicked()), this, SLOT(norecPressed()));
+
+    recone = new QCheckBox("Record only this showing of the program", this);
+    middleBox->addWidget(recone);
+    connect(recone, SIGNAL(clicked()), this, SLOT(reconePressed()));
+
+    programtype = IsProgramRecurring(pginfo);
+
+    QString msg = "Shouldn't show up.";
+    if (programtype == 1)
+        msg = "Record this program in this timeslot every day";
+    else if (programtype == 2)
+        msg = "Record this program in this timeslot every week";
+    rectimeslot = new QCheckBox(msg, this);
+    if (programtype != 0)
+    {
+        middleBox->addWidget(rectimeslot);
+        connect(rectimeslot, SIGNAL(clicked()), this, 
+                SLOT(rectimeslotPressed()));
+    }
+    else
+        rectimeslot->hide();
+
+    recevery = new QCheckBox("Record this program whenever it's shown", this);
+    middleBox->addWidget(recevery);
+    connect(recevery, SIGNAL(clicked()), this, SLOT(receveryPressed()));
+
+    f = new QFrame(this);
+    f->setFrameStyle(QFrame::HLine | QFrame::Plain);
+    f->setLineWidth(4);
+    vbox->addWidget(f);   
+
     QHBoxLayout *bottomBox = new QHBoxLayout(vbox);
 
     bottomBox->addWidget(ok, 1, Qt::AlignCenter);
@@ -61,34 +104,122 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
 
     vbox->activate();
 
+    recordstatus = GetProgramRecordingStatus(pginfo);
+
+    if (recordstatus == 2 && programtype == 0)
+    {
+        printf("error, somehow set to record timeslot and it doesn't seem to have one\n");
+        recordstatus = 1;
+    }
+
+    if (recordstatus == 1)
+        recone->setChecked(true);
+    else if (recordstatus == 2)
+        rectimeslot->setChecked(true);
+    else if (recordstatus == 3)
+        recevery->setChecked(true);
+    else
+        norec->setChecked(true);
+    
+    myinfo = pginfo;
+     
     showFullScreen();
 }
 
 QLabel *InfoDialog::getDateLabel(ProgramInfo *pginfo)
 {
-    QString hour, min;
-    hour = pginfo->starttime.mid(11, 2);
-    min = pginfo->starttime.mid(14, 2);
-
-    QTime start(hour.toInt(), min.toInt());
-
-    hour = pginfo->endtime.mid(11, 2);
-    min = pginfo->endtime.mid(14, 2);
-
-    QTime end(hour.toInt(), min.toInt());
-
-    QString year, month, day;
-
-    year = pginfo->endtime.mid(0, 4);
-    month = pginfo->endtime.mid(5, 2);
-    day = pginfo->endtime.mid(8, 2);
-
-    QDate thedate(year.toInt(), month.toInt(), day.toInt());
+    QTime *start = pginfo->getStartTime();
+    QTime *end = pginfo->getEndTime();
+    QDate *thedate = pginfo->getEndDate();
     
-    QString timedate = thedate.toString("ddd MMMM d") + QString(", ") +
-                       start.toString("h:mm AP") + QString(" - ") +
-                       end.toString("h:mm AP");
+    QString timedate = thedate->toString("ddd MMMM d") + QString(", ") +
+                       start->toString("h:mm AP") + QString(" - ") +
+                       end->toString("h:mm AP");
     QLabel *date = new QLabel(timedate, this);
 
+    delete start;
+    delete end;
+    delete thedate;
+
     return date;
+}
+
+void InfoDialog::norecPressed(void)
+{
+    if (!norec->isChecked())
+        norec->setChecked(true);
+
+    if (recone->isChecked())
+        recone->setChecked(false);
+    if (rectimeslot->isChecked())
+        rectimeslot->setChecked(false);
+    if (recevery->isChecked())
+        recevery->setChecked(false);
+}
+
+void InfoDialog::reconePressed(void)
+{
+    if (!recone->isChecked())
+    {
+        norec->setChecked(true);
+    }
+    else
+    {
+        if (norec->isChecked())
+            norec->setChecked(false);
+        if (rectimeslot->isChecked())
+            rectimeslot->setChecked(false);
+        if (recevery->isChecked())
+            recevery->setChecked(false);
+    }
+}
+
+void InfoDialog::rectimeslotPressed(void)
+{
+    if (!rectimeslot->isChecked())
+    {
+        norec->setChecked(true);
+    }
+    else
+    {
+        if (norec->isChecked())
+            norec->setChecked(false);
+        if (recone->isChecked())
+            recone->setChecked(false);
+        if (recevery->isChecked())
+            recevery->setChecked(false);
+    }
+}
+
+void InfoDialog::receveryPressed(void)
+{
+    if (!recevery->isChecked())
+    {
+        norec->setChecked(true);
+    }
+    else 
+    {
+        if (norec->isChecked())
+            norec->setChecked(false);
+        if (recone->isChecked())
+            recone->setChecked(false);
+        if (rectimeslot->isChecked())
+            rectimeslot->setChecked(false);
+    }
+}
+
+void InfoDialog::okPressed(void)
+{
+    int currentSelected = 0;
+    if (recone->isChecked())
+        currentSelected = 1;
+    else if (rectimeslot->isChecked())
+        currentSelected = 2;
+    else if (recevery->isChecked())
+        currentSelected = 3;
+
+    if (currentSelected != recordstatus)
+        ApplyRecordStateChange(myinfo, currentSelected);   
+
+    accept();
 }
