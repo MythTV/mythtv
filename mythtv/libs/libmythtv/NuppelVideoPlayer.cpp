@@ -2888,6 +2888,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
     for (int i = 0; i < MAXTBUFFER; i++)
         txtbuffers[i].buffer = new unsigned char[text_size];
 
+    framesPlayed = 0;
     ClearAfterSeek();
 
     VideoFrame frame;
@@ -2964,6 +2965,7 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
     long lastKeyFrame = 0;
     long totalAudio = 0;
     int dropvideo = 0;
+    long long lasttimecode = 0;
     float rateTimeConv = audio_samplerate * audio_bits * audio_channels / 
                          8000.0;
     float vidFrameTime = 1000.0 / video_frame_rate;
@@ -2998,6 +3000,10 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
                 }
             }
         }
+
+        if (frame.timecode < lasttimecode)
+            frame.timecode = lasttimecode + vidFrameTime;
+        lasttimecode = frame.timecode;
 
         if (eof)
             break;
