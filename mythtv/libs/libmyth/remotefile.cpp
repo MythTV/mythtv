@@ -127,8 +127,6 @@ void RemoteFile::Close(void)
         cerr << "Remote file timeout.\n";
     }
     
-    lock.unlock();
-
     if (sock)
     {
         delete sock;
@@ -138,7 +136,9 @@ void RemoteFile::Close(void)
     {
         delete controlSock;
         controlSock = NULL;
-    }    
+    } 
+
+    lock.unlock();   
 }
 
 void RemoteFile::Reset(void)

@@ -40,10 +40,11 @@ class ProcessRequestThread : public QThread
   public:
     ProcessRequestThread(MainServer *ms) { parent = ms; }
    
-    void setup(QSocket *sock)
+    void setup(RefSocket *sock)
     {
         lock.lock();
         socket = sock;
+        socket->UpRef();
         lock.unlock();
         waitCond.wakeOne();
     }
@@ -71,6 +72,8 @@ class ProcessRequestThread : public QThread
 
             parent->ProcessRequest(socket);
             parent->MarkUnused(this);
+            socket->DownRef();
+            socket = NULL;
         }
 
         lock.unlock();
@@ -79,7 +82,7 @@ class ProcessRequestThread : public QThread
   private:
     MainServer *parent;
 
-    QSocket *socket;
+    RefSocket *socket;
 
     QMutex lock;
     QWaitCondition waitCond;
@@ -110,10 +113,10 @@ MainServer::MainServer(bool master, int port, int statusport,
     masterBackendOverride = gContext->GetSetting("MasterBackendOverride", 0);
 
     mythserver = new MythServer(port);
-    connect(mythserver, SIGNAL(newConnect(QSocket *)), 
-            SLOT(newConnection(QSocket *)));
-    connect(mythserver, SIGNAL(endConnect(QSocket *)), 
-            SLOT(endConnection(QSocket *)));
+    connect(mythserver, SIGNAL(newConnect(RefSocket *)), 
+            SLOT(newConnection(RefSocket *)));
+    connect(mythserver, SIGNAL(endConnect(RefSocket *)), 
+            SLOT(endConnection(RefSocket *)));
 
     statusserver = new HttpStatus(this, statusport);    
 
@@ -141,14 +144,14 @@ MainServer::~MainServer()
         delete masterServerReconnect;
 }
 
-void MainServer::newConnection(QSocket *socket)
+void MainServer::newConnection(RefSocket *socket)
 {
     connect(socket, SIGNAL(readyRead()), this, SLOT(readSocket()));
 }
 
 void MainServer::readSocket(void)
 {
-    QSocket *socket = (QSocket *)sender();
+    RefSocket *socket = (RefSocket *)sender();
 
     PlaybackSock *testsock = getPlaybackBySock(socket);
     if (testsock && testsock->isExpectingReply())
@@ -2567,7 +2570,7 @@ void MainServer::HandleBackendRefresh(QSocket *socket)
     SendResponse(socket, retlist);    
 }
 
-void MainServer::endConnection(QSocket *socket)
+void MainServer::endConnection(RefSocket *socket)
 {
     vector<PlaybackSock *>::iterator it = playbackList.begin();
     for (; it != playbackList.end(); ++it)
@@ -2596,7 +2599,7 @@ void MainServer::endConnection(QSocket *socket)
                 MythEvent me(message);
                 gContext->dispatch(me);
             }
-            delete (*it);
+            socket->DownRef();
             playbackList.erase(it);
             return;
         }
@@ -2608,7 +2611,7 @@ void MainServer::endConnection(QSocket *socket)
         QSocket *sock = (*ft)->getSocket();
         if (sock == socket)
         {
-            delete (*ft);
+            socket->DownRef();
             fileTransferList.erase(ft);
             return;
         }
@@ -2643,7 +2646,7 @@ void MainServer::endConnection(QSocket *socket)
                 }
             }
 
-            delete (*rt);
+            socket->DownRef();
             ringBufList.erase(rt);
             return;
         }

@@ -4,6 +4,18 @@
 #include <qsocket.h>
 #include <qserversocket.h>
 
+class RefSocket : public QSocket
+{
+  public:
+    RefSocket(QObject *parent = 0, const char *name = 0) 
+           : QSocket(parent, name), refCount(0) { }
+    void UpRef(void) { refCount++; }
+    void DownRef(void) { refCount--; if (refCount < 0) delete this; }
+
+  private:
+    int refCount;
+};
+
 class MythServer : public QServerSocket
 {
     Q_OBJECT
@@ -13,8 +25,8 @@ class MythServer : public QServerSocket
     void newConnection(int socket);
 
   signals:
-    void newConnect(QSocket *);
-    void endConnect(QSocket *);
+    void newConnect(RefSocket *);
+    void endConnect(RefSocket *);
 
   private slots:
     void discardClient();

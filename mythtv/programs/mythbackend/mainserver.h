@@ -44,8 +44,8 @@ class MainServer : public QObject
     void masterServerDied(void);
 
   private slots:
-    void newConnection(QSocket *);
-    void endConnection(QSocket *);
+    void newConnection(RefSocket *);
+    void endConnection(RefSocket *);
     void readSocket();
 
   private:

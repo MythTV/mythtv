@@ -16,7 +16,7 @@ MythServer::MythServer(int port, QObject *parent)
 
 void MythServer::newConnection(int socket)
 {
-    QSocket *s = new QSocket(this);
+    RefSocket *s = new RefSocket(this);
     connect(s, SIGNAL(delayedCloseFinished()), this, SLOT(discardClient()));
     connect(s, SIGNAL(connectionClosed()), this, SLOT(discardClient()));
     s->setSocket(socket);
@@ -26,7 +26,7 @@ void MythServer::newConnection(int socket)
 
 void MythServer::discardClient(void)
 {
-    QSocket *socket = (QSocket *)sender();
+    RefSocket *socket = (RefSocket *)sender();
     if (socket)
     {
         emit(endConnect(socket));
