@@ -508,6 +508,33 @@ public:
     };
 };
 
+class PIPBufferSize: public SpinBoxSetting, public GlobalSetting {
+public:
+    PIPBufferSize():
+        SpinBoxSetting(1, 1024, 1), GlobalSetting("PIPBufferSize") {
+        setLabel("Buffer size");
+        setValue(1);
+    };
+};
+
+class PIPMaxBufferFill: public SpinBoxSetting, public GlobalSetting {
+public:
+    PIPMaxBufferFill():
+        SpinBoxSetting(1, 100, 1), GlobalSetting("PIPMaxBufferFill") {
+        setLabel("Max buffer fill (%)");
+        setValue(50);
+    };
+};
+
+class PIPBufferName: public LineEditSetting, public GlobalSetting {
+public:
+    PIPBufferName():
+        GlobalSetting("PIPBufferName") {
+        setLabel("Buffer size");
+        setValue("/mnt/store/ringbuf2.nuv");
+    };
+};
+
 class PlaybackSettings: virtual public ConfigurationWizard {
 public:
     PlaybackSettings(MythContext *context) : ConfigurationWizard(context),
@@ -538,9 +565,14 @@ public:
         liveTV->addChild(new BufferName());
         liveTV->addChild(new BufferSize());
         liveTV->addChild(new MaxBufferFill());
-        // xxx add PIP stuff here
         addChild(liveTV);
 
+        VerticalConfigurationGroup* PIP = new VerticalConfigurationGroup();
+        PIP->setLabel("Picture-in-picture");
+        PIP->addChild(new PIPBufferSize());
+        PIP->addChild(new PIPMaxBufferFill());
+        PIP->addChild(new PIPBufferName());
+        addChild(PIP);
     };
 };
 
