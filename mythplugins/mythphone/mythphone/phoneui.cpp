@@ -61,7 +61,7 @@ PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
     if (reg)
         phoneUIStatusBar->DisplayNotification(QString("Registered to " + regTo + " as " + regAs), 5);
     else
-        phoneUIStatusBar->DisplayNotification("Not Registered; please check the configuration", 20);
+        phoneUIStatusBar->DisplayNotification("Not Registered", 5);
   
     // Set please wait on the LCD
     QPtrList<LCDTextItem> textItems;
