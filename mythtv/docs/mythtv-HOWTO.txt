@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2004-01-31, v0.14.00
+  2004-02-01, v0.14.01
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -869,33 +869,25 @@
 
   [1m3.2.1.2.  Mandrake[0m
 
-  Thac has created RPMs for MythTV for Mandrake 9.0 and 9.1 which may be
-  obtained from http://rpm.nyvalls.se/ <http://rpm.nyvalls.se/> If you
-  have problems with the RPMs, please send him email directly at
+  Thac has created RPMs for MythTV for Mandrake 9.0, 9.1 and 9.2 which
+  may be obtained from http://rpm.nyvalls.se/ <http://rpm.nyvalls.se/>
+  If you have problems with the RPMs, please send him email directly at
   thac@nyvalls.se <thac@nyvalls.se>.
 
 
   [1m3.2.1.3.  Debian[0m
 
   Debian packages for MythTV and most of its add-on modules are
-  maintained by Matt Zimmerman  <mailto:mdz@debian.org> and are
-  available at
-  http://dijkstra.csh.rit.edu/~mdz/debian/dists/woody/mythtv/
-  <http://dijkstra.csh.rit.edu/~mdz/debian/dists/woody/mythtv/> (for
-  Debian 3.0/woody) and
+  maintained by Matt Zimmerman mailto:mdz@debian.org
+  <mailto:mdz@debian.org> and are available at
   http://dijkstra.csh.rit.edu/~mdz/debian/dists/unstable/mythtv/
-  <http://dijkstra.csh.rit.edu/~mdz/debian/dists/unstable/mythtv/> (for
-  unstable).  Be sure to use the appropriate packages for your system;
-  the woody packages cannot be installed on unstable, nor vice versa.
-  Installation instructions can be found on those pages as well.  All of
+  <http://dijkstra.csh.rit.edu/~mdz/debian/dists/unstable/mythtv/>.
+  Installation instructions can be found on those pages as well. All of
   the prerequisites for MythTV are available as Debian packages, most of
   them from the official Debian archive.
 
-
-  If you are running woody, be sure to follow the instructions on the
-  above page to ensure that the MySQL server starts up immediately after
-  it is installed.  If you are running unstable, this is the default
-  behavior.
+  [1mNOTE[22m:  Due to the requirement for Qt 3.1, there are no packages for
+  Debian woody/stable.
 
 
   The Debian packages are configured such that MythTV programs should be
@@ -923,7 +915,6 @@
   package in order to compile [1mlircd [22mif your distribution doesn't have a
   pre-packaged [1mlirc[22m.  If you are using [1mXMLTV [22mas a grabber, you will need
   [1mperl[22m.
-
 
 
   ______________________________________________________________________
@@ -992,6 +983,8 @@
   from the default installation.  Ensure that you install libqt3-mysql.
   ______________________________________________________________________
 
+
+
   Make sure that cdialog is installed if you want to use MythTV with a
   remote control if you need to compile [1mlirc [22mfrom source.
 
@@ -1002,6 +995,7 @@
 
   If you marked anything to install, click on Install Marked.  Click
   "Yes" or OK if you get a message about satisfying dependencies.
+
 
 
   [1m3.2.4.  Command-line installation.[0m
@@ -1065,7 +1059,6 @@
 
 
        USE="mysql alsa"
-
 
 
   Next you need to build Qt. If you don't plan on using the ebuilds as
@@ -1196,7 +1189,6 @@
 
   As root, create the following file in /etc/profile.d The example
   filename is "mythtv.sh". Use what you feel is appropriate.
-
   Open a shell, and switch to superuser mode.  [1mNOTE[22m: ^D means press CTRL
   and d at the same time.
 
@@ -1291,9 +1283,8 @@
 
 
   If building from CVS instead of the source package, then the QTDIR
-  environment variable must be set when building.  On Debian woody,
-  QTDIR should be set to /usr/share/qt.  On Debian unstable, QTDIR
-  should be set to /usr/share/qt3.
+  environment variable must be set when building.  On Debian unstable,
+  QTDIR should be set to /usr/share/qt3.
 
 
   [1m5.  Downloading and compiling.[0m
@@ -1365,6 +1356,7 @@
 
 
   and replace it with
+
 
   -march=i586
 
@@ -3429,6 +3421,8 @@
   [1m11.1.  Keyboard commands.[0m
 
   The keys.txt file describes what the various keyboard commands are.
+  If you have loaded mythweb, you may change the default keys to your
+  liking.
 
   [1m11.2.  Using themes with MythTV.[0m
 
@@ -3485,8 +3479,6 @@
   be helpful: http://www.snapstream.com/products/irblaster/sonydss.htm
   <http://www.snapstream.com/products/irblaster/sonydss.htm> for cable
   pinouts for RCA DSS receivers.
-
-
 
   [1m12.  MythWeb.[0m
 

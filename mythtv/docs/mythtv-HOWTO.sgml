@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2004-01-31, v0.14.00
+<date>2004-02-01, v0.14.01
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -560,32 +560,23 @@ like 3rd-party packages, any 3rd-party documentation problems should be
 brought up with the maintainer.
 
 <sect3>Mandrake
-<p>Thac has created RPMs for MythTV for Mandrake 9.0 and 9.1 which may be
-obtained from <url url="http://rpm.nyvalls.se/"
+<p>Thac has created RPMs for MythTV for Mandrake 9.0, 9.1 and 9.2 which may
+be obtained from <url url="http://rpm.nyvalls.se/"
 name="http://rpm.nyvalls.se/"> If you have problems with the RPMs, please
-send him email directly at <url url="thac@nyvalls.se"
-name="thac@nyvalls.se">.
+send him email directly at <url url="thac@nyvalls.se" name="thac@nyvalls.se">.
 
 <sect3>Debian
-<p>Debian packages for MythTV and most of its add-on
-modules are maintained by Matt Zimmerman <url
-url="mailto:mdz@debian.org"> and are available at <url
-url="http://dijkstra.csh.rit.edu/~mdz/debian/dists/woody/mythtv/"
-name="http://dijkstra.csh.rit.edu/~mdz/debian/dists/woody/mythtv/">
-(for Debian 3.0/woody) and <url
+<p>Debian packages for MythTV and most of its add-on modules are maintained
+by Matt Zimmerman <url url="mailto:mdz@debian.org"
+name="mailto:mdz@debian.org"> and are available at <url
 url="http://dijkstra.csh.rit.edu/~mdz/debian/dists/unstable/mythtv/"
-name="http://dijkstra.csh.rit.edu/~mdz/debian/dists/unstable/mythtv/">
-(for unstable).  Be sure to use the appropriate packages for your
-system; the woody packages cannot be installed on unstable, nor vice
-versa.  Installation instructions can be found on those pages as well.
-All of the prerequisites for MythTV are available as Debian packages,
-most of them from the official Debian archive.
+name="http://dijkstra.csh.rit.edu/~mdz/debian/dists/unstable/mythtv/">. 
+Installation instructions can be found on those pages as well. All of the
+prerequisites for MythTV are available as Debian packages, most of them from
+the official Debian archive.
 
-<p>
-If you are running woody, be sure to follow the instructions on the
-above page to ensure that the MySQL server starts up immediately after
-it is installed.  If you are running unstable, this is the default
-behavior.
+<bf>NOTE</bf>:  Due to the requirement for Qt 3.1, there are no packages for
+Debian woody/stable.
 
 <p>
 The Debian packages are configured such that MythTV programs should be
@@ -918,9 +909,8 @@ sh-2.05b# ls -l ../*.deb
 </verb></tscreen>
 
 <p>If building from CVS instead of the source package, then the QTDIR
-environment variable must be set when building.  On Debian woody,
-QTDIR should be set to <tt>/usr/share/qt</tt>.  On Debian unstable,
-QTDIR should be set to <tt>/usr/share/qt3</tt>.
+environment variable must be set when building.  On Debian unstable, QTDIR
+should be set to <tt>/usr/share/qt3</tt>.
 
 <sect>Downloading and compiling.
 <p>Get MythTV from the <url url="http://www.mythtv.org" name="mythtv.org">
@@ -2705,7 +2695,8 @@ will need to switch to KDE by selecting RedHatMenu>Extras>System
 Settings>Desktop Switching Tool and choose "KDE".
 
 <sect1>Keyboard commands.
-<p>The <tt>keys.txt</tt> file describes what the various keyboard commands are.
+<p>The <tt>keys.txt</tt> file describes what the various keyboard commands are. 
+If you have loaded mythweb, you may change the default keys to your liking.
 <sect1>Using themes with MythTV.
 <p>MythTV is "themeable", meaning that the visual appearance of the program
 can be modified by the user without re-compiling or altering the program
@@ -5130,6 +5121,9 @@ v0.14.00, 2004-01-31.  Initial version for MythTV v0.14.  Rename docs
 version to match.  Standardize spelling of RTjpeg.  Add section on Channel
 Editor in setup.  Remove duplicate note in 10.5.  Make keys.txt its own
 subsection.
+v0.14.01, 2004-02-01.  Add blurb on changing default keys with mythweb. 
+Changed wording on Debian woody; no debs because of Qt3.1.  Added Mandrake
+9.2 to thac's list.
 -->
 
 <!--
