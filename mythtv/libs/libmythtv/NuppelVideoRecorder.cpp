@@ -152,7 +152,8 @@ int NuppelVideoRecorder::AudioInit(void)
 
     if (-1 == (afd = open(audiodevice.c_str(), O_RDONLY)))
     {
-        fprintf(stderr, "\n%s\n", "Cannot open DSP, exiting");
+        fprintf(stderr, "\n%s\n", "Cannot open DSP, audio record thread "
+                                  "exiting");
         return(1);
     }
   
@@ -911,7 +912,8 @@ void NuppelVideoRecorder::doWriteThread(void)
 	}
 	
         if (!videobuffer[act_video_encode]->freeToEncode && 
-            !audiobuffer[act_audio_encode]->freeToEncode)
+            (!audio_buffer_count || 
+             !audiobuffer[act_audio_encode]->freeToEncode))
         {
             usleep(1000);
             continue;
@@ -919,7 +921,8 @@ void NuppelVideoRecorder::doWriteThread(void)
 
         if (videobuffer[act_video_encode]->freeToEncode)
         {
-            if (audiobuffer[act_audio_encode]->freeToEncode) 
+            if (audio_buffer_count && 
+                audiobuffer[act_audio_encode]->freeToEncode) 
             {
                 videofirst = (videobuffer[act_video_encode]->timecode <=
                               audiobuffer[act_audio_encode]->timecode);
@@ -947,7 +950,8 @@ void NuppelVideoRecorder::doWriteThread(void)
         }
         else
         {
-            if (audiobuffer[act_audio_encode]->freeToEncode)
+            if (audio_buffer_count && 
+                audiobuffer[act_audio_encode]->freeToEncode)
             {
                 WriteAudio(audiobuffer[act_audio_encode]->buffer,
                            audiobuffer[act_audio_encode]->sample,
@@ -1112,7 +1116,6 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
   
     while (dropped > 0) 
     {
-        printf("dropped frames\n");
         frameheader.timecode = lasttimecode + timeperframe;
         lasttimecode = frameheader.timecode;
         frameheader.keyframe  = frameofgop;             // no keyframe defaulted

@@ -33,7 +33,6 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
     lastaudiolen = 0;
     strm = NULL;
     wpos = rpos = 0;
-    audiolen = 0;
     waud = raud = 0;
 
     paused = 0;
@@ -328,74 +327,121 @@ unsigned char *NuppelVideoPlayer::DecodeFrame(struct rtframeheader *frameheader,
     return(buf);
 }
 
-int NuppelVideoPlayer::ComputeByteShift(void)
+int NuppelVideoPlayer::audiolen(bool use_lock)
 {
-    int tcshift;
-    int byteshift;
-    int audio_delay;
+    /* Thread safe, returns the number of valid bytes in the audio buffer */
+    int ret;
+    
+    if (use_lock) 
+        pthread_mutex_lock(&audio_buflock);
 
-    /* We want to calculate 'tcshift'.  The audio is playing 'tcshift'
-       milliseconds ahead of the video.  Negative tcshift means the video 
-       is ahead of the audio.
+    if (waud >= raud)
+        ret = waud - raud;
+    else
+        ret = AUDBUFSIZE - (raud - waud);
+
+    if (use_lock)
+        pthread_mutex_unlock(&audio_buflock);
+
+    return ret;
+}
+
+int NuppelVideoPlayer::audiofree(bool use_lock)
+{
+    return AUDBUFSIZE - audiolen(use_lock) - 1;
+    /* There is one wasted byte in the buffer. The case where waud = raud is
+       interpreted as an empty buffer, so the fullest the buffer can ever
+       be is AUDBUFSIZE - 1. */
+}
+
+int NuppelVideoPlayer::vbuffer_numvalid(void)
+{
+    /* thread safe, returns number of valid slots in the video buffer */
+    int ret;
+    pthread_mutex_lock(&video_buflock);
+
+    if (wpos >= rpos)
+        ret = wpos - rpos;
+    else
+        ret = MAXVBUFFER - (rpos - wpos);
+
+    pthread_mutex_unlock(&video_buflock);
+    return ret;
+}
+
+int NuppelVideoPlayer::vbuffer_numfree(void)
+{
+    return MAXVBUFFER - vbuffer_numvalid() - 1;
+    /* There's one wasted slot, because the case when rpos = wpos is 
+       interpreted as an empty buffer. So the fullest the buffer can be is
+       MAXVBUFFER - 1. */
+}
+
+int NuppelVideoPlayer::GetAudiotime(void)
+{
+    /* Returns the current timecode of audio leaving the soundcard, based
+       on the 'audiotime' computed earlier, and the delay since it was computed.
+
+       This is a little roundabout...
+
+       The reason is that computing 'audiotime' requires acquiring the audio 
+       lock, which the video thread should not do. So, we call 'SetAudioTime()'
+       from the audio thread, and then call this from the video thread. */
+    int ret;
+    struct timeval now;
+    gettimeofday(&now, NULL);
+
+    pthread_mutex_lock(&avsync_lock);
+
+    ret = audiotime;
+ 
+    audiotime += (now.tv_sec - audiotime_updated.tv_sec) * 1000;
+    audiotime += (now.tv_usec - audiotime_updated.tv_usec) / 1000;
+
+    pthread_mutex_unlock(&avsync_lock);
+    return ret;
+}
+
+void NuppelVideoPlayer::SetAudiotime(void)
+{
+    int soundcard_buffer;
+    int totalbuffer;
+
+    /* We want to calculate 'audiotime', which is the timestamp of the audio
+       which is leaving the sound card at this instant.
 
        We use these variables:
 
        'effdsp' is samples/sec, multiplied by 100.
        Bytes per sample is assumed to be 4.
 
-       'audiotimecode' is the timecode of the audio that has just 
-       been written into the buffer.
+       'audiotimecode' is the timecode of the audio that has just been 
+       written into the buffer.
 
-       'audiolen' is the # of bytes stored in the audio buffer
-
-       'timecodes[rpos]' is the timecode of video about to be read 
-       out of the buffer, ideally the timecode of audio about to be read
-       out of the buffer will match this...
-
-       Begin algebra:
- 
-       tcshift = <timecode of audio about to be read from buffer> - 
-                 <timecode of video about to be read from buffer>
-
-       tcshift = (audiotimecode - (audiolen * (ms/byte))) -
-                 timecodes[rpos]
+       'totalbuffer' is the total # of bytes in our audio buffer, and the
+       sound card's buffer.
 
        'ms/byte' is given by '25000/effdsp'...
-
-       tcshift = (audiotimecode - (audiolen * 25000 / effdsp)) -
-                 timecodes[rpos]
-    */
-
-    tcshift = (int)((double)audiotimecode - 
-              (double)audiolen * 25000.0 / (double)effdsp -
-              (double)timecodes[rpos]);
-
-    /* The tcshift computed above describes the time shift between audio and
-       video output from GetFrame().  Now adjust this to account for the delay
-       in the sound card's output buffer.
-    */
-
-    ioctl(audiofd, SNDCTL_DSP_GETODELAY, &audio_delay); // bytes
-    // convert bytes to ms :
-    audio_delay = (int)((double)audio_delay * 25000.0 / (double)effdsp);
+     */
  
-    tcshift -= audio_delay;
+    pthread_mutex_lock(&audio_buflock);
+    pthread_mutex_lock(&avsync_lock);
+ 
+    ioctl(audiofd, SNDCTL_DSP_GETODELAY, &soundcard_buffer); // bytes
+    totalbuffer = audiolen(false) + soundcard_buffer;
+               
+    audiotime = audbuf_timecode - (int)((double)totalbuffer * 25000.0 /
+                                        (double)effdsp);
+ 
+    gettimeofday(&audiotime_updated, NULL);
 
-    byteshift = 4 * (int)(tcshift * (double)effdsp / (100000.0));
-
-    return byteshift;
+    pthread_mutex_unlock(&avsync_lock);
+    pthread_mutex_unlock(&audio_buflock);
 }
 
-unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
-                                           unsigned char **audiodata, int *alen)
+void NuppelVideoPlayer::GetFrame(int onlyvideo)
 {
-    unsigned char *ret;
     int gotvideo = 0;
-    int gotaudio = 0;
-    int bytesperframe;
-
-    int shiftcorrected = 0;
-    int i;
     int seeked = 0;
 
     if (weseeked)
@@ -404,101 +450,13 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
         weseeked = 0;
     }
 
-    if (buf==NULL) {
-        buf = new unsigned char[video_width *video_height * 3 / 2];
-        strm = new unsigned char[video_width * video_height * 2];
-
-        // initialize and purge buffers
-        for (i = 0; i < MAXVBUFFER; i++) {
-            vbuffer[i] = new unsigned char[video_width * video_height * 3 / 2];
-            bufstat[i] = 0;
-            timecodes[i] = 0;
-        }
-        vbuffer_numvalid = 0;
-        wpos = 0;
-        rpos = 0;
-        audiolen = 0;
-        raud = waud = 0;
-        audiotimecode = 0;
-        seeked = 1;
-    }
-
-    bytesperframe = 4 * (int)((1.0/video_frame_rate) * 
-                    ((double)effdsp/100.0)+0.5);
-
-    gotvideo = 0;
-    if (onlyvideo)
-        gotaudio = 1;
-    else
-        gotaudio = 0;
-
-    while (!gotvideo || !gotaudio)
+    while (!gotvideo)
     {
-        if (!gotvideo && vbuffer_numvalid >= usepre)
-            gotvideo = 1;
- 
-        if (!gotaudio && (audiolen >= bytesperframe))
-            gotaudio = 1;
-    
-        if (gotvideo && gotaudio)
-        {
-            if (shiftcorrected || onlyvideo)
-                continue;
-
-            if (!seeked) 
-            {
-                bytesperframe -= (ComputeByteShift() >> 5) << 2; // div by 8
-                // which corrects 1/8 of the shift on each frame.
-                // Also rounds to multiple of 4.
-                
-                if (bytesperframe < 0) 
-                    bytesperframe = 0;
-                if (bytesperframe > audiolen)
-                    bytesperframe = audiolen;
-            } 
-            else
-            {
-                // Typically, after a seek, the calculated 'byteshift' becomes
-                // very large.  We'd like to get back to steady state ASAP,
-                // to avoid pops in the sound, or jerky video...
-                int byteshift = ComputeByteShift();
-
-                if (byteshift > 0)
-                {
-                    int bdiff;
-
-                    /* write byteshift bytes of silence */
-                    if (AUDBUFSIZE - audiolen < byteshift)
-                        byteshift = AUDBUFSIZE - audiolen;
-
-                    bdiff = AUDBUFSIZE - waud;
-                    if (bdiff < byteshift)
-                    {
-                        memset(audiobuffer + waud, 0, bdiff);
-                        memset(audiobuffer, 0, byteshift - bdiff);
-                        waud = byteshift - bdiff;
-                    }
-                    else
-                    {
-                        memset(audiobuffer + waud, 0, byteshift);
-                        waud += byteshift;
-                    }
-                    audiolen += byteshift;
-                }
-            }
-            shiftcorrected = 1;  
-            if (audiolen >= bytesperframe) 
-                continue;
-            else
-                gotaudio = 0;
-        }
-
 	long long currentposition = ringBuffer->GetReadPosition();
-
         if (ringBuffer->Read(&frameheader, FRAMEHEADERSIZE) != FRAMEHEADERSIZE)
         {
             eof = 1;
-            return (buf);
+            return;
         }
 
         if (frameheader.frametype == 'R') 
@@ -525,19 +483,34 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
                 frameheader.packetlength) 
             {
                 eof = 1;
-                return (buf);
+                return;
             }
         }
 
         if (frameheader.frametype=='V') 
         {
-            ret = DecodeFrame(&frameheader, strm);
+            unsigned char *ret = DecodeFrame(&frameheader, strm);
 
+            while (vbuffer_numfree() == 0)
+            {
+                //printf("waiting for video buffer to drain.\n");
+                prebuffering = false;
+                usleep(2000);
+            }
+
+            pthread_mutex_lock(&video_buflock);
             memcpy(vbuffer[wpos], ret, (int)(video_width*video_height * 1.5));
             timecodes[wpos] = frameheader.timecode;
-            bufstat[wpos]=1;
+            if (deinterlace)
+                linearBlendYUV420(vbuffer[wpos], video_width, video_height);
+
             wpos = (wpos+1) % MAXVBUFFER;
-            vbuffer_numvalid++;
+            //printf("wpos now '%d'\n", wpos);
+            pthread_mutex_unlock(&video_buflock);
+
+            if (vbuffer_numvalid() >= usepre)
+                prebuffering = false;
+            gotvideo = 1;
             framesPlayed++;
             continue;
         }
@@ -551,9 +524,12 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
             else if (frameheader.comptype=='3') 
             {
                 int lameret = 0;
+                int len = 0;
                 short pcmlbuffer[audio_samplerate]; 
                 short pcmrbuffer[audio_samplerate];
                 int packetlen = frameheader.packetlength;
+
+                pthread_mutex_lock(&audio_buflock); // begin critical section
 
                 do 
                 {
@@ -563,10 +539,11 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
                     if (lameret > 0) 
                     {
                         int itemp = 0;
+                        int afree = audiofree(false);
 
-                        if (lameret * 4 > AUDBUFSIZE - audiolen)
+                        if (lameret * 4 > afree)
                         {
-                            lameret = (AUDBUFSIZE - audiolen) / 4;
+                            lameret = afree / 4;
                             printf("Audio buffer overflow, audio data lost!\n");
                         }
 
@@ -579,10 +556,10 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
                                    &pcmrbuffer[itemp], sizeof(short int));
                             
                             waud += 4;
+                            len += 4;
                             if (waud >= AUDBUFSIZE)
                                 waud -= AUDBUFSIZE;
                         }
-                        audiolen += lameret * 4;
                     }
                     else if (lameret < 0)
                     {
@@ -592,116 +569,281 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
                     packetlen = 0;
                 } while (lameret > 0);
 
-                audiotimecode = frameheader.timecode;
-                lastaudiolen = audiolen;
+                audbuf_timecode = frameheader.timecode + (int)((double)len *
+                                  25000.0 / (double)effdsp); // time at end 
+                lastaudiolen = audiolen(false);
+               
+                pthread_mutex_unlock(&audio_buflock); // end critical section
             } 
             else 
             {
-                if (audiolen + frameheader.packetlength < AUDBUFSIZE)
-                {
-                    int bdiff, len = frameheader.packetlength;
+                int bdiff, len = frameheader.packetlength;
+                int afree = audiofree(true);
                   
-                    if (len > AUDBUFSIZE - audiolen)
-                    {
-                        printf("Audio buffer overflow, audio data lost!\n");
-                        len = AUDBUFSIZE - audiolen;
-                    }
-
-                    bdiff = AUDBUFSIZE - waud;
-                    if (bdiff < len)
-                    {
-                        memcpy(audiobuffer + waud, strm, bdiff);
-                        memcpy(audiobuffer, strm + bdiff, len - bdiff);
-                        waud = len - bdiff;
-                    }
-                    else
-                    {
-                        memcpy(audiobuffer + waud, strm, len);
-                        waud += len;
-                    }
-                    audiolen += len;
-                    lastaudiolen = audiolen;
-
-                    audiotimecode = frameheader.timecode;
+                if (len > afree)
+                {
+                    printf("Audio buffer overflow, audio data lost!\n");
+                    len = afree;
                 }
+
+                pthread_mutex_lock(&audio_buflock); // begin critical section
+                bdiff = AUDBUFSIZE - waud;
+                if (bdiff < len)
+                {
+                    memcpy(audiobuffer + waud, strm, bdiff);
+                    memcpy(audiobuffer, strm + bdiff, len - bdiff);
+                    waud = len - bdiff;
+                }
+                else
+                {
+                    memcpy(audiobuffer + waud, strm, len);
+                    waud += len;
+                }
+                lastaudiolen = audiolen(false);
+                audbuf_timecode = frameheader.timecode + (int)((double)len *
+                                  25000.0 / (double)effdsp); // time at end
+
+                pthread_mutex_unlock(&audio_buflock); // end critical section
             }
         }
     }
+}
 
-    if (onlyvideo) 
-        *alen = 0;
-    else 
+void NuppelVideoPlayer::OutputVideoLoop(void)
+{
+    struct timeval startt, nowt;
+    int framesdisplayed = 0;
+    unsigned char *X11videobuf;
+    int videosize;
+    int audiotime;
+    int delay, avsync_delay;
+
+    struct timeval lasttrigger, now; 
+
+    gettimeofday(&lasttrigger, NULL);
+  
+    Jitterometer *output_jmeter = new Jitterometer("video_output", 100);
+
+    videosize = video_width * video_height * 3 / 2;
+ 
+    X11videobuf = XJ_init(video_width, video_height, "Mythical Convergence",
+                          "MythTV");
+
+    while (!eof && !killplayer)
     {
-        int bdiff;
-
-        *alen = bytesperframe;
-        
-        if (bytesperframe > audiolen)
+        if (paused)
         {
-            printf("not enough audio in audio buffer, should never happen.\n");
-            exit(-1);
+            video_actually_paused = true;
+            if (livetv && ringBuffer->GetFreeSpace() < -1000)
+            {
+                paused = false;
+                printf("forced unpause\n");
+            }
+            else
+            {
+                //printf("video waiting for unpause\n");
+                usleep(50);
+                continue;
+            }
         }
 
-        bdiff = AUDBUFSIZE - raud;
-        if (bdiff < bytesperframe)
+        if (prebuffering)
         {
-            memcpy(tmpaudio, audiobuffer + raud, bdiff);
-            memcpy(tmpaudio + bdiff, audiobuffer, bytesperframe - bdiff);
-            raud = bytesperframe - bdiff;
+            //printf("prebuffering...\n");
+            usleep(2000);
+            continue;
         }
-        else
+
+        if (vbuffer_numvalid() == 0)
         {
-            memcpy(tmpaudio, audiobuffer + raud, bytesperframe);
-            raud += bytesperframe;
+           prebuffering = true;
+           continue;
         }
-        audiolen -= bytesperframe;
+
+        /* do video output */
+  
+        /* first calculate an open-loop value of 'delay', that is how long we
+           will sleep before waking up and kicking out the next frame. Open 
+           loop means we don't have any sort of feedback for A/V sync */
+        gettimeofday(&now, NULL);
+
+        delay = (int)(1000000.0 / video_frame_rate); // uSecs
+        delay -= (now.tv_sec - lasttrigger.tv_sec) * 1000000 +
+                  now.tv_usec - lasttrigger.tv_usec; // uSecs
+
+        /* second, apply just a little feedback. The ComputeAudioTime()
+           function is jittery, so if we try to correct our entire A/V drift
+           on each frame, video output is jerky. Instead, correct 1/12 of the
+           computed drift on each frame. This value was arrived at through 
+           trial and error, it's a tradeoff between a/v sync and video jitter */
+        if (audiofd > 0)
+        {
+            audiotime = GetAudiotime(); // milliseconds, same scale as timecodes
+            while (audiotime == 0)
+            {
+                usleep(100);
+                audiotime = GetAudiotime();
+            }
+            avsync_delay = (timecodes[rpos] - audiotime) * 1000; // uSecs
+
+            delay += (avsync_delay - delay) / 12;
+
+            delay -= (int)((100000.0 / video_frame_rate) * usepre);
+        }
+
+        /* trigger */
+        if (delay > 0)
+            usleep(delay);
+        gettimeofday(&lasttrigger, NULL);
+
+        memcpy(X11videobuf, vbuffer[rpos], videosize);
+        // this memcpy is the most expensive thing this thread does...
+
+        osd->Display(X11videobuf);
+ 
+        XJ_show(video_width, video_height);
+
+        output_jmeter->RecordCycleTime();
+
+        /* update rpos */
+        pthread_mutex_lock(&video_buflock);
+        if (rpos != wpos) // if a seek occurred, rpos == wpos, in this case do
+                          // nothing
+        rpos = (rpos + 1) % MAXVBUFFER;
+        pthread_mutex_unlock(&video_buflock);
+
+        if (framesdisplayed == 60)
+        {
+            gettimeofday(&nowt, NULL);
+       
+            //double timedif = (nowt.tv_sec - startt.tv_sec) * 1000000 +
+            //                 (nowt.tv_usec - startt.tv_usec);
+            
+            //printf("FPS played: %f\n", 60000000.0 / timediff);
+            
+            startt.tv_sec = nowt.tv_sec;
+            startt.tv_usec = nowt.tv_usec;
+
+            framesdisplayed = 0;
+        }
+        framesdisplayed++;
     }
 
-    *audiodata = tmpaudio;
+    XJ_exit();             
+}
 
-    ret = vbuffer[rpos];
-    bufstat[rpos] = 0; // clear flag
-    rpos = (rpos+1) % MAXVBUFFER;
-    vbuffer_numvalid--;
+void NuppelVideoPlayer::OutputAudioLoop(void)
+{
+    int bytesperframe;
+    int space_on_soundcard;
 
-    return (ret);
+    while (!eof && !killplayer)
+    {
+        if (paused)
+        {
+            audio_actually_paused = true;
+
+            //printf("audio waiting for unpause\n");
+            usleep(50);
+            continue;
+        }    
+
+        if (prebuffering)
+        {
+            //printf("audio thread waiting for prebuffer\n");
+            usleep(2000);
+            continue;
+        }
+
+        if (audiofd <= 0) 
+            break;
+
+        SetAudiotime(); // once per loop, calculate stuff for a/v sync
+
+        /* do audio output */
+ 
+        /* approximate # of audio bytes for each frame. */
+        bytesperframe = 4 * (int)((1.0/video_frame_rate) *
+                                  ((double)effdsp/100.0) + 0.5);
+
+        // wait for the buffer to fill with enough to play
+        if (bytesperframe > audiolen(true))
+        { 
+            //printf("audio thread waiting for buffer to fill\n");
+            usleep(2000);
+            continue;
+        }
+
+        // wait for there to be free space on the sound card so we can write
+        // without blocking.  We don't want to block while holding audio_buflock
+
+        audio_buf_info info;
+        ioctl(audiofd, SNDCTL_DSP_GETOSPACE, &info);
+        space_on_soundcard = info.bytes;
+
+        if (bytesperframe > space_on_soundcard)
+        {
+            //printf("waiting for space on soundcard\n");
+            usleep(2000);
+            continue;
+        }
+
+        pthread_mutex_lock(&audio_buflock); // begin critical section
+
+        // re-check audiolen() in case things changed.
+        // for example, ClearAfterSeek() might have run
+        if (bytesperframe <= audiolen(false))
+        {
+            int bdiff = AUDBUFSIZE - raud;
+            if (bytesperframe > bdiff)
+            {
+                WriteAudio(audiobuffer + raud, bdiff);
+                WriteAudio(audiobuffer, bytesperframe - bdiff);
+            }
+            else
+            {
+                WriteAudio(audiobuffer + raud, bytesperframe);
+            }
+
+            /* update raud */
+            raud = (raud + bytesperframe) % AUDBUFSIZE;
+        }
+        pthread_mutex_unlock(&audio_buflock); // end critical section
+    }
+}
+
+void *NuppelVideoPlayer::kickoffOutputAudioLoop(void *player)
+{
+    ((NuppelVideoPlayer *)player)->OutputAudioLoop();
+    return NULL;
+}
+
+void *NuppelVideoPlayer::kickoffOutputVideoLoop(void *player)
+{
+    ((NuppelVideoPlayer *)player)->OutputVideoLoop();
+    return NULL;
 }
 
 void NuppelVideoPlayer::StartPlaying(void)
 {
-    unsigned char *X11videobuf;
-    unsigned char *videobuf;
+    usepre = 2;
 
-    long tf;
-    unsigned char *audiodata;
-    int audiodatalen;
-
-    int timecode;
-
-    int videosize; 
-   
-    usepre = 8;
- 
     InitSubs();
     OpenFile();
-
-    videosize = video_width * video_height * 3 / 2;
 
     if (fileheader.audioblocks != 0)
         InitSound();
   
-    X11videobuf = XJ_init(video_width, video_height, "Mythical Convergence", 
-                          "MC-TV");
-    
     osd = new OSD(video_width, video_height, osdfilename);
 
     playing = true;
     killplayer = false;
   
     framesPlayed = 0;
-    framesSkipped = 0;
 
-    audiotimecode = 0;
+    audbuf_timecode = 0;
+    audiotime = 0;
+    gettimeofday(&audiotime_updated, NULL);
 
     weseeked = 0;
     rewindtime = 0;
@@ -709,15 +851,40 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     resetplaying = false;
     
-    struct timeval startt, nowt;
-    int framesdisplayed = 0;
+    if (buf == NULL)
+    {
+        int i;
+        buf = new unsigned char[video_width * video_height * 3 / 2];
+        strm = new unsigned char[video_width * video_height * 2];
+ 
+        pthread_mutex_init(&audio_buflock, NULL);
+        pthread_mutex_init(&video_buflock, NULL);
+        pthread_mutex_init(&avsync_lock, NULL);
+
+        // initialize and purge buffers
+        for (i = 0; i < MAXVBUFFER; i++)
+        {
+            vbuffer[i] = new unsigned char[video_width * video_height * 3 / 2];
+        }
+        ClearAfterSeek();
+    }
+
+    /* This thread will fill the video and audio buffers, it does all CPU
+       intensive operations. We fork two other threads which do nothing but
+       write to the audio and video output devices.  These should use a 
+       minimum of CPU. */
+    pthread_t output_audio, output_video;
+    pthread_create(&output_audio, NULL, kickoffOutputAudioLoop, this);
+    pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);
 
     while (!eof && !killplayer)
     {
 	if (resetplaying)
 	{
             ClearAfterSeek();
+
 	    framesPlayed = 0;
+
 	    //OpenFile(true);
 	    delete positionMap;
 	    positionMap = new map<long long, long long>;
@@ -736,6 +903,7 @@ void NuppelVideoPlayer::StartPlaying(void)
 	    }
 	    else
             {
+                //printf("startplaying waiting for unpause\n");
                 usleep(50);
                 continue;
             }
@@ -744,58 +912,32 @@ void NuppelVideoPlayer::StartPlaying(void)
 	if (rewindtime > 0)
 	{
 	    rewindtime *= video_frame_rate;
+
             DoRewind();
+
             rewindtime = 0;
 	}
 	if (fftime > 0)
 	{
             CalcMaxFFTime();
 	    fftime *= video_frame_rate;
+
             DoFastForward();
+
             fftime = 0;
 	}
 
-        videobuf = GetFrame(&timecode, audiofd <= 0, &audiodata, &audiodatalen);
-        // GetFrame has used SNDCTL_DSP_GETODELAY to figure out the latency
-        // through the sound output system.  All we do here is display the video
-        // frame first, and then play the audio.  We play the audio second
-        // because it might block.
-
-	if (eof)
-            continue;
-
-        if (deinterlace)
-            linearBlendYUV420(videobuf, video_width, video_height);
-  
-        memcpy(X11videobuf, videobuf, videosize); 
-        osd->Display(X11videobuf);
-
-        XJ_show(video_width, video_height);
-
-        // play audio
-        if (audiodatalen != 0)
-            WriteAudio(audiodata, audiodatalen);
-
-        if (framesdisplayed == 60)
-        {
-            gettimeofday(&nowt, NULL);
-
-            //double timediff = (nowt.tv_sec - startt.tv_sec) * 1000000 +
-            //                 (nowt.tv_usec - startt.tv_usec);
-
-            //printf("FPS played: %f\n", 60000000.0 / timediff);
-
-            startt.tv_sec = nowt.tv_sec;
-            startt.tv_usec = nowt.tv_usec;
-
-            framesdisplayed = 0;
-        }
-        framesdisplayed++;
-        tf++;
+        GetFrame(audiofd <= 0); // reads next compressed video frame from the
+                                // ringbuffer, decompresses it, and stores it
+                                // in our local buffer. Also reads and
+                                // decompresses any audio frames it encounters
     }
 
+    // these threads will also exit when killplayer or eof is true
+    pthread_join(output_video, NULL);
+    pthread_join(output_audio, NULL);
+
     playing = false;
-    XJ_exit();
 }
 
 bool NuppelVideoPlayer::DoRewind(void)
@@ -869,8 +1011,8 @@ bool NuppelVideoPlayer::DoRewind(void)
             DecodeFrame(&frameheader, strm);
         }
     }
-    ClearAfterSeek();
 
+    ClearAfterSeek();
     return true;
 }
 
@@ -881,7 +1023,7 @@ void NuppelVideoPlayer::CalcMaxFFTime(void)
     {
         float behind = (float)(nvr->GetFramesWritten() - framesPlayed) / 
                        video_frame_rate;
-	if (behind < 1.0)
+	if (behind < 1.0) // if we're close, do nothing
 	    fftime = 0.0;
 	else if (behind - fftime <= 1.0)
 	{
@@ -987,26 +1129,34 @@ bool NuppelVideoPlayer::DoFastForward(void)
     }
 
     ClearAfterSeek();
-
     return true;
 }
 
 void NuppelVideoPlayer::ClearAfterSeek(void)
 {
-    int i;
-    for (i = 0; i < MAXVBUFFER; i++)
+    /* caller to this function should not hold any locks, we acquire all three
+       right here */
+
+    pthread_mutex_lock(&audio_buflock);
+    pthread_mutex_lock(&video_buflock);
+    pthread_mutex_lock(&avsync_lock);
+
+    for (int i = 0; i < MAXVBUFFER; i++)
     {
-        bufstat[i] = 0;
         timecodes[i] = 0;
     }
-
-    vbuffer_numvalid = 0;
     wpos = 0;
     rpos = 0;
-    audiolen = 0;
     raud = waud = 0;
     weseeked = 1;
-    audiotimecode = 0;
+    audbuf_timecode = 0;
+    audiotime = 0;
+    gettimeofday(&audiotime_updated, NULL);
+    prebuffering = true;
+
+    pthread_mutex_unlock(&avsync_lock);
+    pthread_mutex_unlock(&video_buflock);
+    pthread_mutex_unlock(&audio_buflock);
 }
 
 void NuppelVideoPlayer::SetInfoText(const string &text, const string &subtitle,

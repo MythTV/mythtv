@@ -16,7 +16,7 @@ CXXLINK = $(CXX) $(CXXFLAGS) -o $@
 all: libNuppelVideo.a nuppelvideo-config
 
 NUVOBJ  = XJ.o minilzo.o RTjpegN.o effects.o NuppelVideoPlayer.o 
-NUVOBJ += NuppelVideoRecorder.o RingBuffer.o ttfont.o osd.o
+NUVOBJ += NuppelVideoRecorder.o RingBuffer.o ttfont.o osd.o jitterometer.o
 NUVLDF = -L/usr/X11R6/lib -lmp3lame -lX11 -lXext -lXv -lttf -lm -lpthread
 
 libNuppelVideo.a: $(NUVOBJ)
