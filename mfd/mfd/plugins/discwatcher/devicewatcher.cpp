@@ -345,10 +345,12 @@ void DeviceWatcher::updateAudioCDMetadata()
     //  allocate us a container.
     //
     
-    current_metadata_container = metadata_server->createContainer(MCCT_audio, MCLT_host);
+    current_metadata_container = 
+        metadata_server->createContainer(playlist_name, MCCT_audio, MCLT_host);
 
     //
-    //  Set the right collection id (now that we have a collection id) for the tracks
+    //  Set the right collection id (now that we have a collection id) for
+    //  the tracks
     //
     
     QIntDictIterator<Metadata> it( *new_metadata ); 

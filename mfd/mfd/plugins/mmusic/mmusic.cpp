@@ -140,7 +140,7 @@ void MMusicWatcher::initialize()
     //
     
     metadata_container = 
-        metadata_server->createContainer(MCCT_audio, MCLT_host);
+        metadata_server->createContainer("Local Audio Content", MCCT_audio, MCLT_host);
     container_id = metadata_container->getIdentifier();
     
     //

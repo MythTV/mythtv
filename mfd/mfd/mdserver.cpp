@@ -446,13 +446,20 @@ Playlist* MetadataServer::getPlaylistByContainerAndId(int container_id, int play
 
 
 MetadataContainer* MetadataServer::createContainer(
+                                                    const QString &a_name,
                                                     MetadataCollectionContentType content_type,
                                                     MetadataCollectionLocationType location_type
                                                   )
 {
     MetadataContainer *return_value;
     lockMetadata();
-        return_value = new MetadataContainer(parent, bumpContainerId(), content_type, location_type);
+        return_value = new MetadataContainer(
+                                                a_name, 
+                                                parent, 
+                                                bumpContainerId(), 
+                                                content_type, 
+                                                location_type
+                                            );
         metadata_containers->append(return_value);
         
         //

@@ -61,6 +61,7 @@ class MetadataServer : public MFDHttpPlugin
 
 
     MetadataContainer*           createContainer(
+                                                    const QString &a_name,
                                                     MetadataCollectionContentType content_type, 
                                                     MetadataCollectionLocationType location_type
                                                 );

@@ -21,12 +21,14 @@ using namespace std;
 #include "mfd_events.h"
 
 MetadataContainer::MetadataContainer(
+                                        QString a_name,
                                         MFD *l_parent, 
                                         int l_unique_identifier,
                                         MetadataCollectionContentType  l_content_type,
                                         MetadataCollectionLocationType l_location_type
                                     )
 {
+    my_name = a_name;
     parent = l_parent;
     unique_identifier = l_unique_identifier;
     content_type = l_content_type;

@@ -60,7 +60,7 @@ Database::Database(
 
     the_mfd = my_mfd;
     metadata_server = the_mfd->getMetadataServer();
-    metadata_container = metadata_server->createContainer(MCCT_audio, MCLT_lan);
+    metadata_container = metadata_server->createContainer(name, MCCT_audio, MCLT_lan);
     container_id = metadata_container->getIdentifier();
 
     //

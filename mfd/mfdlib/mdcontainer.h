@@ -49,6 +49,7 @@ class MetadataContainer
   public:
   
     MetadataContainer(
+                        QString a_name,
                         MFD *l_parent,
                         int l_unique_identifier,
                         MetadataCollectionContentType  l_content_type,
