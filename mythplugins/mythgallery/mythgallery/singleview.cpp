@@ -28,6 +28,8 @@
 #include <mythtv/mythcontext.h>
 
 #include "singleview.h"
+#include "constants.h"
+#include "galleryutil.h"
 
 SingleView::SingleView(QSqlDatabase *db, ThumbList itemList,
                        int pos, bool slideShow,
@@ -88,6 +90,7 @@ SingleView::SingleView(QSqlDatabase *db, ThumbList itemList,
 
     // --------------------------------------------------------------------
 
+    m_movieState  = 0;
     m_pixmap      = 0;
     m_rotateAngle = 0;
     m_zoom        = 1;
@@ -142,7 +145,22 @@ SingleView::~SingleView()
 
 void SingleView::paintEvent(QPaintEvent *)
 {
-    if (!m_effectRunning) {
+    if (m_movieState > 0)
+    {
+        if (m_movieState == 1)
+        {
+            m_movieState = 2;
+            ThumbItem* item = m_itemList.at(m_pos);
+            QString cmd = gContext->GetSetting("GalleryMoviePlayerCmd");
+            cmd.replace("%s", item->path);
+            myth_system(cmd);
+            if (!m_running)
+            {
+                reject();
+            }
+        }
+    }
+    else if (!m_effectRunning) {
         
         QPixmap pix(screenwidth, screenheight);
         pix.fill(this, 0, 0);
@@ -407,6 +425,7 @@ void SingleView::retreatFrame()
 
 void SingleView::loadImage()
 {
+    m_movieState = 0;
     if (m_pixmap) {
         delete m_pixmap;
         m_pixmap = 0;
@@ -414,34 +433,41 @@ void SingleView::loadImage()
     
     ThumbItem *item = m_itemList.at(m_pos);
     if (item) {
-
+      if (GalleryUtil::isMovie(item->path)) {
+        m_movieState = 1;
+      }
+      else {
         m_image.load(item->path);
-
+        
         if (!m_image.isNull()) {
-
-            QString queryStr = "SELECT angle FROM gallerymetadata WHERE "
-                               "image=\"" + item->path + "\";";
-            QSqlQuery query = m_db->exec(queryStr);
-			
-            if (query.isActive()  && query.numRowsAffected() > 0) 
-            {
-                query.next();
-                m_rotateAngle = query.value(0).toInt();
-                if (m_rotateAngle != 0) {
-                    QWMatrix matrix;
-                    matrix.rotate(m_rotateAngle);
-                    m_image = m_image.xForm(matrix);
-                }
-            }
-
-            m_pixmap = new QPixmap(m_image.smoothScale(screenwidth, screenheight,
-                                                       QImage::ScaleMin));
-
+          
+          QString queryStr = "SELECT angle FROM gallerymetadata WHERE "
+            "image=\"" + item->path + "\";";
+          QSqlQuery query = m_db->exec(queryStr);
+          
+          if (query.isActive()  && query.numRowsAffected() > 0) {
+            query.next();
+            m_rotateAngle = query.value(0).toInt();
+          }
+          else {
+            m_rotateAngle = GalleryUtil::getNaturalRotation(item->path);
+          }
+          
+          if (m_rotateAngle != 0) {
+            QWMatrix matrix;
+            matrix.rotate(m_rotateAngle);
+            m_image = m_image.xForm(matrix);
+          }
+        
+          m_pixmap = new QPixmap(m_image.smoothScale(screenwidth, screenheight,
+                                 QImage::ScaleMin));
+          
         }
-        else 
-            std::cerr << "SingleView: Failed to load image "
-                      << item->path << std::endl;
-    
+      }
+    }
+    else {
+      std::cerr << "SingleView: Failed to load image "
+        << item->path << std::endl;
     }
 }
 
@@ -1156,13 +1182,22 @@ void SingleView::slotTimeOut()
                 m_effectMethod = getRandomEffect();
 
             advanceFrame();
+            bool wasMovie = m_movieState > 0;
             loadImage();
-            createEffectPix();
-
-            m_tmout = 10;
-            m_effectRunning = true;
-            m_i = 0;
-        }
+            bool isMovie = m_movieState > 0;
+            // If transitioning to/from a movie, don't do an effect,
+            // and shorten timeout
+            if (wasMovie || isMovie)
+            {
+                m_tmout = 1;
+            }
+            else {
+                createEffectPix();
+                m_effectRunning = true;
+                m_tmout = 10;
+                m_i = 0;
+            }
+       }   
     }
 
     update();

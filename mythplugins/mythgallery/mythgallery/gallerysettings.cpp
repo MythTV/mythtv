@@ -22,6 +22,17 @@ public:
     };
 };
 
+class MythGalleryMoviePlayerCmd: public LineEditSetting, public GlobalSetting {
+public:
+    MythGalleryMoviePlayerCmd():
+        GlobalSetting("GalleryMoviePlayerCmd") {
+        setLabel(QObject::tr("Command run to display movie files"));
+        setValue("mplayer -fs %s");
+        setHelpText(QObject::tr("This command is executed whenever a movie "
+				"file is selected"));
+    };
+};
+
 class MythGalleryImportDirs: public LineEditSetting, public GlobalSetting {
 public:
     MythGalleryImportDirs():
@@ -133,6 +144,7 @@ public:
 
         addChild(new MythGalleryDir());
         addChild(new MythGalleryImportDirs());
+        addChild(new MythGalleryMoviePlayerCmd());
 
 #ifdef OPENGL_SUPPORT
         

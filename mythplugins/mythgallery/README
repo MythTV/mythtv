@@ -29,6 +29,14 @@ and enabled if you choose this option. You can check this under X11
 using xdpyinfo or glxinfo. Also ensure that QT has been built with
 OpenGL support)
 
+You can also enable EXIF support using
+./configure --enable-exif 
+This requires you have the libexif headers/libraries installed and in your
+include/lib path when compiling.  An install of the libexif/libexif-devel
+packages from your favorite package repository usually provides this.
+Current, EXIF support only consists of auto-rotating images if the camera
+sets the orientation tag (My Canon S400 does)
+
 2) Next type 'qmake mythgallery.pro' then 'make' in the 
 main distribution directory.
 

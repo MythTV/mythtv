@@ -83,6 +83,7 @@ private:
     int           m_pos;
     ThumbList     m_itemList;
 
+    int           m_movieState;
     int           screenwidth, screenheight;
     float         wmult, hmult;
     int           m_w, m_h;

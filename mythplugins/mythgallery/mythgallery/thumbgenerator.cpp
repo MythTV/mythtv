@@ -25,7 +25,11 @@
 #include <qfileinfo.h>
 #include <qdir.h>
 
+#include "mythtv/mythcontext.h"
+
 #include "thumbgenerator.h"
+#include "constants.h"
+#include "galleryutil.h"
 
 ThumbGenerator::ThumbGenerator(QObject *parent, int w, int h)
 {
@@ -230,5 +234,44 @@ void ThumbGenerator::loadDir(QImage& image, const QFileInfo& fi)
 
 void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
 {
-    image.load(fi.absFilePath());
+  if (GalleryUtil::isMovie(fi.filePath()))
+  {
+      bool thumbnailCreated = false;
+      QDir tmpDir("/tmp/mythgallery");
+      if (! tmpDir.exists())
+      {
+        if (! tmpDir.mkdir(tmpDir.absPath()))
+        {
+          std::cerr << "Unable to create temp dir for movie thumbnail creation: "
+                     << tmpDir.absPath() << endl;
+        }
+      }
+      if (tmpDir.exists())
+      {
+          QString cmd = "cd " + tmpDir.absPath()
+            + "; mplayer -nosound -frames 1 -vo png " + fi.absFilePath();
+          if (! system(cmd))
+          {
+              QFileInfo thumb(tmpDir.filePath("00000001.png"));
+              if (thumb.exists())
+              {
+                QImage img(thumb.absFilePath());
+                image = img;
+                thumbnailCreated = true;
+              }
+          }
+      }
+      if (! thumbnailCreated)
+      {
+        QImage *img = gContext->LoadScaleImage("gallery-moviethumb.png");
+        if (img)
+        {
+          image = *img;
+        }
+      }
+  }
+  else
+  {
+      image.load(fi.absFilePath());
+  }
 }

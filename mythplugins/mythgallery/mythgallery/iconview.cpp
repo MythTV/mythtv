@@ -32,16 +32,19 @@ extern "C" {
 #include <mythtv/xmlparse.h>
 #include <mythtv/dialogbox.h>
 
+#include "galleryutil.h"
 #include "gallerysettings.h"
 #include "thumbgenerator.h"
 #include "singleview.h"
 #include "iconview.h"
 
 #include "config.h"
+#include "constants.h"
 
 #ifdef OPENGL_SUPPORT
 #include "glsingleview.h"
 #endif
+
 
 IconView::IconView(QSqlDatabase *db, const QString& galleryDir,
                    MythMainWindow* parent, const char* name )
@@ -307,13 +310,14 @@ void IconView::keyPressEvent(QKeyEvent *e)
                     std::cerr << "The impossible happened" << std::endl;
                     break;
                 }
-
+        
+                QFileInfo fi(item->path);
                 if (item->isDir) {
                     loadDirectory(item->path);
                     handled = true;
                 }
                 else {
-
+          
                     handled = true;
                     
                     bool slideShow = (action == "PLAY");
@@ -407,6 +411,10 @@ void IconView::customEvent(QCustomEvent *e)
         {
             query.next();
             rotateAngle = query.value(0).toInt();
+        }
+        else
+        {
+            rotateAngle = GalleryUtil::getNaturalRotation(item->path);
         }
 
         if (rotateAngle)
@@ -585,8 +593,7 @@ void IconView::loadDirectory(const QString& dir)
     if (!cdir.exists())
         d.mkdir(".thumbcache");
 
-    d.setNameFilter("*.jpg *.JPG *.jpeg *.JPEG *.png *.PNG *.tiff *.TIFF "
-                    "*.tif *.TIF *.bmp *.BMP *.gif *.GIF *.ppm *.PPM");
+    d.setNameFilter(MEDIA_FILENAMES);
     d.setSorting(QDir::Name | QDir::DirsFirst | QDir::IgnoreCase);
 
     d.setMatchAllDirs(true);
@@ -684,11 +691,18 @@ void IconView::loadThumbnail(ThumbItem *item)
             query.next();
             rotateAngle = query.value(0).toInt();
         }
+        else
+        {
+            rotateAngle = GalleryUtil::getNaturalRotation(item->path);
+        }
 
-        QWMatrix matrix;
-        matrix.rotate(rotateAngle);
-        image = image.xForm(matrix);
-        
+        if (rotateAngle != 0)
+        {
+            QWMatrix matrix;
+            matrix.rotate(rotateAngle);
+            image = image.xForm(matrix);
+        }
+
         item->pixmap = new QPixmap(image);
     }
 }
@@ -774,11 +788,15 @@ void IconView::actionRotateCW()
     QString queryStr = "SELECT angle FROM gallerymetadata WHERE "
                        "image=\"" + item->path + "\";";
     QSqlQuery query = m_db->exec(queryStr);
-			
+            
     if (query.isActive()  && query.numRowsAffected() > 0) 
     {
         query.next();
         rotAngle = query.value(0).toInt();
+    }
+    else
+    {
+        rotAngle = GalleryUtil::getNaturalRotation(item->path);
     }
 
     rotAngle += 90;
@@ -810,11 +828,15 @@ void IconView::actionRotateCCW()
     QString queryStr = "SELECT angle FROM gallerymetadata WHERE "
                        "image=\"" + item->path + "\";";
     QSqlQuery query = m_db->exec(queryStr);
-			
+            
     if (query.isActive()  && query.numRowsAffected() > 0) 
     {
         query.next();
         rotAngle = query.value(0).toInt();
+    }
+    else
+    {
+        rotAngle = GalleryUtil::getNaturalRotation(item->path);
     }
 
     rotAngle -= 90;
@@ -886,8 +908,9 @@ void IconView::actionImport()
     QStringList paths = QStringList::split(":",
                                            gContext->GetSetting("GalleryImportDirs"));
 
+    // Makes import directory samba/windows friendly (no colon)
     QString idirname(m_currDir + "/" +
-                     (QDateTime::currentDateTime()).toString(Qt::ISODate));
+                     (QDateTime::currentDateTime()).toString("yyyy-MM-dd_hh-mm-ss"));
     importdir.mkdir(idirname);
     importdir.setPath(idirname);
 
@@ -945,8 +968,7 @@ void IconView::importFromDir(const QString &fromDir, const QString &toDir)
     if (!d.exists())
         return;
 
-    d.setNameFilter("*.jpg *.JPG *.jpeg *.JPEG *.png *.PNG *.tiff *.TIFF "
-                    "*.bmp *.BMP *.gif *.GIF");
+    d.setNameFilter(MEDIA_FILENAMES);
     d.setSorting(QDir::Name | QDir::DirsFirst | QDir::IgnoreCase);
     d.setFilter(QDir::Files | QDir::Dirs | QDir::NoSymLinks  | QDir::Readable);
     d.setMatchAllDirs(true);

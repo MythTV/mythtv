@@ -6,10 +6,13 @@
 
 # default parameters
 opengl="no"
+exif="no"
 
 for opt do
   case "$opt" in
   --enable-opengl) opengl="yes"
+  ;;
+  --enable-exif) exif="yes"
   ;;
   esac
 done
@@ -23,6 +26,7 @@ Options: [defaults in brackets after descriptions]
 Standard options:
   --help                   print this message
   --enable-opengl          enable OpenGL visualizers [default=no]
+  --enable-exif            enable reading of EXIF headers [default=no]
 EOF
 exit 1
 fi
@@ -51,6 +55,16 @@ fi
 
 if test "$opengl" = "no" ; then
   echo "        OpenGL support will not be included"
+fi
+
+if test "$exif" = "yes" ; then
+  echo "        EXIF support will be included"
+  echo "#define EXIF_SUPPORT 1" >> ./mythgallery/config.h
+  echo "LIBS += -lexif" >> ./mythgallery/config.pro
+fi
+
+if test "$exif" = "no" ; then
+  echo "        EXIF support will not be included"
 fi
 
 

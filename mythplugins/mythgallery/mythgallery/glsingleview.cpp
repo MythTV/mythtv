@@ -33,6 +33,7 @@
 #include <mythtv/mythcontext.h>
 
 #include "glsingleview.h"
+#include "galleryutil.h"
 
 GLSDialog::GLSDialog(QSqlDatabase *db, const ThumbList& itemList,
                      int pos, bool slideShow, MythMainWindow *parent,
@@ -63,6 +64,7 @@ GLSingleView::GLSingleView(QSqlDatabase *db, ThumbList itemList,
     m_db       = db;
     m_pos      = pos;
     m_itemList = itemList;
+    m_movieState  = 0;
 
     // --------------------------------------------------------------------
 
@@ -194,6 +196,23 @@ void GLSingleView::resizeGL( int w, int h )
 
 void GLSingleView::paintGL()
 {
+    if (m_movieState > 0)
+    {
+        if (m_movieState == 1)
+        {
+            m_movieState = 2;
+            ThumbItem* item = m_itemList.at(m_pos);
+            QString cmd = gContext->GetSetting("GalleryMoviePlayerCmd");
+            cmd.replace("%s", item->path);
+            myth_system(cmd);
+            if (!m_running)
+            {
+                close();
+            }
+        }
+        return;
+    }
+ 
     glDisable(GL_DEPTH_TEST);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -475,10 +494,16 @@ void GLSingleView::retreatFrame()
 
 void GLSingleView::loadImage()
 {
+    m_movieState = 0;
     ThumbItem *item = m_itemList.at(m_pos);
     if (!item) {
         std::cerr << "GLSingleView: The impossible happened. No item at "
                   << m_pos << std::endl;
+        return;
+    }
+
+    if (GalleryUtil::isMovie(item->path)) {
+        m_movieState = 1;
         return;
     }
 
@@ -499,6 +524,10 @@ void GLSingleView::loadImage()
         {
             query.next();
             t.angle = query.value(0).toInt(); 
+        }
+        else
+        {
+            t.angle = GalleryUtil::getNaturalRotation(item->path);
         }
 
         t.width  = image.width();
@@ -1320,11 +1349,21 @@ void GLSingleView::slotTimeOut()
                 m_effectMethod = getRandomEffect();
 
             advanceFrame();
+            bool wasMovie = m_movieState > 0;
             loadImage();
-
-            m_tmout = 10;
-            m_effectRunning = true;
-            m_i = 0;
+            bool isMovie = m_movieState > 0;
+            // If transitioning to/from a movie, don't do an effect,
+            // and shorten timeout
+            if (wasMovie || isMovie)
+            {
+                m_tmout = 1;
+            }
+            else
+            {
+                m_tmout = 10;
+                m_effectRunning = true;
+                m_i = 0;
+            }
         }
     }
 

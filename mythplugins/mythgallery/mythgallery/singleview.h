@@ -47,6 +47,7 @@ private:
     ThumbList     m_itemList;
     int           m_pos;
     
+    int           m_movieState;
     QPixmap      *m_pixmap;
     QImage        m_image;
                  
