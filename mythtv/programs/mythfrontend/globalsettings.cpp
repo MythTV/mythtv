@@ -2035,7 +2035,7 @@ static GenericCheckBox *UseXvMcVld()
     gc->setLabel(QObject::tr("Use HW XVMC VLD Decoding (Via only)"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("Enables the use of viaXvMC HW Mpeg decoding "
-                    "for the Via Unichome Chipset"));
+                    "for the Via Unichrome Chipset"));
     return gc;
 };
 #endif
