@@ -1340,10 +1340,10 @@ AudioMetadata* MMusicWatcher::getMetadataFromFile(QString file_path)
     AudioMetadata *return_value = NULL;
 
     Decoder *decoder = Decoder::create(file_path, NULL, NULL, true);
-    decoder->setParent(this);
     
     if(decoder)
     {
+        decoder->setParent(this);
         return_value = decoder->getMetadata();
         if(return_value)
         {
