@@ -702,7 +702,7 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "ALTER TABLE recordoverride ADD COLUMN station VARCHAR(20) NOT NULL DEFAULT '';",
 "UPDATE recordoverride,channel SET recordoverride.station=channel.callsign, "
 "   recordoverride.starttime=recordoverride.starttime, "
-"   recordoverride.endtime=recordoverride.endtime, "
+"   recordoverride.endtime=recordoverride.endtime "
     "WHERE recordoverride.chanid=channel.chanid;",
 ""
 };
