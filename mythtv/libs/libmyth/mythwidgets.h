@@ -353,6 +353,8 @@ class MythPopupBox : public QFrame
 
     void addWidget(QWidget *widget, bool setAppearance = true);
 
+    virtual void closeEvent(QCloseEvent *e);
+
   private:
     QVBoxLayout *vbox;
 };

@@ -1589,7 +1589,7 @@ void TV::ChangeBrightness(bool up)
     QString text = QString("Brightness %1 %").arg(brightness);
 
     if (osd)
-        osd->StartPause(brightness * 10, true, "", text, 5);
+        osd->StartPause(brightness * 10, true, "Adjust Picture", text, 5);
 }
 
 void TV::ChangeContrast(bool up)
@@ -1599,7 +1599,7 @@ void TV::ChangeContrast(bool up)
     QString text = QString("Contrast %1 %").arg(contrast);
 
     if (osd)
-        osd->StartPause(contrast * 10, true, "", text, 5);
+        osd->StartPause(contrast * 10, true, "Adjust Picture", text, 5);
 }
 
 void TV::ChangeColour(bool up)
@@ -1609,7 +1609,7 @@ void TV::ChangeColour(bool up)
     QString text = QString("Colour %1 %").arg(colour);
 
     if (osd)
-        osd->StartPause(colour * 10, true, "", text, 5);
+        osd->StartPause(colour * 10, true, "Adjust Picture", text, 5);
 }
 
 void TV::ChangeDeinterlacer()
@@ -1625,7 +1625,7 @@ void TV::ChangeDeinterlacer()
     text = QString("Deint %1").arg(deinterlacer_names[deinterlace_mode]);
 
     if (activenvp == nvp)
-        osd->SetSettingsText(text, text.length() );
+        osd->SetSettingsText(text, text.length());
 }
 
 void TV::ChangeVolume(bool up)
@@ -1642,7 +1642,7 @@ void TV::ChangeVolume(bool up)
     QString text = QString("Volume %1 %").arg(curvol);
 
     if (osd)
-        osd->StartPause(curvol * 10, true, "", text, 5);
+        osd->StartPause(curvol * 10, true, "Adjust Volume", text, 5);
 }
 
 void TV::ToggleMute(void)
