@@ -106,7 +106,11 @@ void DatabaseBox::fillList(MythListView *listview,
         mdata->setFilename(filename);
         mdata->setGenre((*it).Genre());
         if (0 == (*it).Title().compare("title"))
-            title = filename.section('/',-1).section('.',0,-2);
+        {
+            title = filename.section('/', -1);
+            if (!gContext->GetNumSetting("ShowFileExtensions"))
+                title = title.section('.',0,-2);
+        }
         else
             title = (*it).Title();
         mdata->setTitle(title);

@@ -1,6 +1,7 @@
 default_helper=/usr/local/bin/mplayer %s
 StartDir=/mnt/store
 LoadProfile=profile_movies
+ShowFileExtensions=0
 
 wav_helper=/usr/local/bin/mplayer -fs -vm -zoom -quiet %s
 avi_helper=/usr/local/bin/mplayer -fs -vm -zoom -quiet %s
