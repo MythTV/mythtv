@@ -187,7 +187,7 @@ public:
         SpinBoxSetting(1024, 65535, 1),
         GlobalSetting("MTDPort") {
         setLabel(QObject::tr("MTD port number"));
-        setValue(2342);
+        setValue(2442);
         setHelpText(QObject::tr("The port number that should be used for "
                     "communicating with the MTD (Myth Transcoding "
                     "Daemon)"));

@@ -264,7 +264,7 @@ void DVDRipBox::connectToMtd(bool try_to_run_mtd)
         tried_mtd = true;
     }
 
-    int a_port = gContext->GetNumSetting("MTDPort", 2342);
+    int a_port = gContext->GetNumSetting("MTDPort", 2442);
     if(a_port > 0 && a_port < 65536)
     {
         client_socket->connectToHost("localhost", a_port);
