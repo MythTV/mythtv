@@ -39,7 +39,7 @@ GuideGrid::GuideGrid(int channel, QWidget *parent, const char *name)
     fillProgramInfos();
     int fillprogs = clock.elapsed();
 
-    //cout << filltime << " " << fillchannels << " " << fillprogs << endl;
+    cout << filltime << " " << fillchannels << " " << fillprogs << endl;
 
     QAccel *accel = new QAccel(this);
     accel->connectItem(accel->insertItem(Key_Left), this, SLOT(cursorLeft()));
@@ -200,7 +200,7 @@ ProgramInfo *GuideGrid::getProgramInfo(unsigned int row, unsigned int col)
         return NULL;
 
     sprintf(thequery, "SELECT * FROM program WHERE channum = %d AND "
-                      "endtime > %s AND starttime < %s;", 
+                      "starttime < %s AND endtime > %s;", 
                       m_channelInfos[row]->channum, 
                       m_timeInfos[col]->sqltime.ascii(),
                       m_timeInfos[col]->sqltime.ascii());

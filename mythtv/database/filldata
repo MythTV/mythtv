@@ -17,7 +17,8 @@ system("./grabdata 1");
 # being the first ever run)
 for ($offset = 0; $offset < 8; $offset++)
 {
-    my $sth = $dbh->prepare("SELECT * FROM program WHERE starttime = DATE_ADD(CURRENT_DATE, INTERVAL $offset DAY);");
+    my $nextoffset = $offset + 1;
+    my $sth = $dbh->prepare("SELECT * FROM program WHERE starttime >= DATE_ADD(CURRENT_DATE, INTERVAL $offset DAY) AND starttime < DATE_ADD(CURRENT_DATE, INTERVAL $nextoffset DAY);");
     $sth->execute() or die $sth->errstr;
 
     if ($sth->rows == 0)
@@ -26,5 +27,5 @@ for ($offset = 0; $offset < 8; $offset++)
     }
 }
 
-$dbh->do("DELETE FROM program WHERE starttime < DATE_SUB(CURRENT_DATE, INTERVAL 1 DAY)")
+$dbh->do("DELETE FROM program WHERE starttime <= DATE_SUB(CURRENT_DATE, INTERVAL 1 DAY)")
    or die $dbh->errstr;

@@ -2,6 +2,8 @@
 # Size of the buffer for watching live tv, in GB
 int BufferSize=5
 # The amount of space to fill the buffer up before forcing an unpause, in MB
+# Basically, the minimum amount of free space that the buffer will allow before
+# forcing an unpause.
 int MaxBufferFill=50
 # The desired path + name of the live tv buffer
 str BufferName=/mnt/store/ringbuf.nuv
@@ -22,11 +24,12 @@ str V4LDevice=/dev/video
 
 # Playback options
 # Deinterlace playback (1 for on, 0 for no) -- adds to CPU usage
-int Deinterlace=0
+int Deinterlace=1
 # How long should the OSD stay up for in seconds?
 int OSDDisplayTime=3
 # Path to the TTF 
-str OSDFont=/usr/share/fonts/truetype/Arial.ttf
+str OSDFont=helr.ttf
+#str OSDFont=/usr/share/fonts/truetype/Arial.ttf
 
 # TV options
 str TVFormat=NTSC

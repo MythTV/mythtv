@@ -773,7 +773,7 @@ void NuppelVideoPlayer::StartPlaying(void)
             double timediff = (nowt.tv_sec - startt.tv_sec) * 1000000 +
                              (nowt.tv_usec - startt.tv_usec);
 
-            printf("FPS played: %f\n", 60000000.0 / timediff);
+            //printf("FPS played: %f\n", 60000000.0 / timediff);
 
             startt.tv_sec = nowt.tv_sec;
             startt.tv_usec = nowt.tv_usec;
