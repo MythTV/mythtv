@@ -49,6 +49,9 @@ int EPGShowCurrentTime=0
 # What color line to draw the current time in
 str EPGCurrentTimeColor=red
 #
+# Uncomment this to use the alternative EPG layout
+#int EPGType=1
+#
 # Display order of channels.  Meaningful values are chanid, callsign, and 
 # "channum + 0".
 str ChannelSorting=channum + 0

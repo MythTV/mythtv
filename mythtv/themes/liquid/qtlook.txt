@@ -27,3 +27,26 @@ str Cat_Drama=rosybrown3
 str Cat_Classic=grey62
 str Cat_Crime=MediumVioletRed
 str Cat_Talk=MediumTurquoise
+
+str curTimeChan_bgColor=#669933
+str curTimeChan_fgColor=#ffffff
+str date_bgColor=#999900
+str date_dsColor=#000000
+str date_fgColor=#ffffff
+str chan_bgColor=#336600
+str chan_dsColor=#000000
+str chan_fgColor=#ffffff
+str time_bgColor=#999900
+str time_dsColor=#000000
+str time_fgColor=#ffffff
+str prog_bgColor=#669933
+str prog_fgColor=#ffffff
+str progLine_Color=#003300
+str progArrow_Color=#ffffff
+int progArrow_Type=2
+str curProg_bgColor=#006633
+str curRecProg_bgColor=#3300cc
+str curProg_dsColor=#006633
+str curProg_fgColor=#ffffff
+str misChanIcon_bgColor=#000000
+

@@ -8,6 +8,11 @@
 #include <qcursor.h>
 #include <qapplication.h>
 #include <qimage.h>
+#include <qlayout.h>
+#include <qlabel.h>
+#include <qdatetime.h>
+#include <qvgroupbox.h>
+#include <qheader.h>
 
 #include <iostream>
 using namespace std;
@@ -25,6 +30,8 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel,
                      QWidget *parent, const char *name)
          : QDialog(parent, name)
 {
+    DISPLAY_CHANS = 6;
+
     m_context = context;
     m_settings = context->settings();
 
@@ -43,6 +50,13 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel,
 
     bgcolor = paletteBackgroundColor();
     fgcolor = paletteForegroundColor();
+
+    programGuideType = m_settings->GetNumSetting("EPGType");
+    if (programGuideType == 1)
+    {
+        DISPLAY_CHANS = 8;
+        setupColorScheme();
+    }
 
     int timefontsize = m_settings->GetNumSetting("EPGTimeFontSize");
     if (timefontsize == 0) 
@@ -104,6 +118,9 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel,
 
     //cout << filltime << " " << fillchannels << " " << fillprogs << endl;
 
+    if (programGuideType == 1)
+        createProgramLabel(titlefontsize, progfontsize);
+
     QAccel *accel = new QAccel(this);
     accel->connectItem(accel->insertItem(Key_Left), this, SLOT(cursorLeft()));
     accel->connectItem(accel->insertItem(Key_Right), this, SLOT(cursorRight()));
@@ -143,6 +160,14 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel,
 
     connect(this, SIGNAL(killTheApp()), this, SLOT(accept()));
 
+    if (programGuideType == 1)
+    {
+        // One second timer for clock
+        QTimer *timeCheck = new QTimer(this);
+        connect(timeCheck, SIGNAL(timeout()), SLOT(timeout()) );
+        timeCheck->start(1000);
+    }
+
     selectState = false;
     showInfo = false;
 
@@ -179,6 +204,245 @@ GuideGrid::~GuideGrid()
     delete m_titleFont;
 }
 
+void GuideGrid::setupColorScheme()
+{
+
+    Settings *themed = m_context->qtconfig();
+    QString curColor = "";
+    curColor = themed->GetSetting("curTimeChan_bgColor");
+    if (curColor != "")
+        curTimeChan_bgColor = QColor(curColor);
+
+    curColor = themed->GetSetting("curTimeChan_fgColor");
+    if (curColor != "")
+        curTimeChan_fgColor = QColor(curColor);
+
+    curColor = themed->GetSetting("date_bgColor");
+    if (curColor != "")
+        date_bgColor = QColor(curColor);
+
+    curColor = themed->GetSetting("date_dsColor");
+    if (curColor != "")
+        date_dsColor = QColor(curColor);
+
+    curColor = themed->GetSetting("date_fgColor");
+    if (curColor != "")
+        date_fgColor = QColor(curColor);
+
+    curColor = themed->GetSetting("chan_bgColor");
+    if (curColor != "")
+        chan_bgColor = QColor(curColor);
+
+    curColor = themed->GetSetting("chan_dsColor");
+    if (curColor != "")
+        chan_dsColor = QColor(curColor);
+
+    curColor = themed->GetSetting("chan_fgColor");
+    if (curColor != "")
+        chan_fgColor = QColor(curColor);
+
+    curColor = themed->GetSetting("time_bgColor");
+    if (curColor != "")
+        time_bgColor = QColor(curColor);
+
+    curColor = themed->GetSetting("time_dsColor");
+    if (curColor != "")
+        time_dsColor = QColor(curColor);
+
+    curColor = themed->GetSetting("time_fgColor");
+    if (curColor != "")
+        time_fgColor = QColor(curColor);
+
+        curColor = themed->GetSetting("prog_bgColor");
+    if (curColor != "")
+        prog_bgColor = QColor(curColor);
+
+    curColor = themed->GetSetting("prog_fgColor");
+    if (curColor != "")
+        prog_fgColor = QColor(curColor);
+
+    curColor = themed->GetSetting("progLine_Color");
+    if (curColor != "")
+        progLine_Color = QColor(curColor);
+
+    curColor = themed->GetSetting("progArrow_Color");
+    if (curColor != "")
+        progArrow_Color = QColor(curColor);
+
+    curColor = themed->GetSetting("curProg_bgColor");
+    if (curColor != "")
+        curProg_bgColor = QColor(curColor);
+
+    curColor = themed->GetSetting("curRecProg_bgColor");
+    if (curColor != "")
+        curRecProg_bgColor = QColor(curColor);
+
+    curColor = themed->GetSetting("curProg_dsColor");
+    if (curColor != "")
+        curProg_dsColor = QColor(curColor);
+
+    curColor = themed->GetSetting("curProg_fgColor");
+    if (curColor != "")
+        curProg_fgColor = QColor(curColor);
+
+    curColor = themed->GetSetting("misChanIcon_bgColor");
+    if (curColor != "")
+        misChanIcon_bgColor = QColor(curColor);
+
+    curColor = themed->GetSetting("misChanIcon_fgColor");
+    if (curColor != "")
+        misChanIcon_fgColor = QColor(curColor);
+
+    progArrow_Type = themed->GetNumSetting("progArrow_Type");
+}
+
+void GuideGrid::createProgramLabel(int titlefontsize, int progfontsize)
+{
+    QBoxLayout *mainHold = new QVBoxLayout( this );
+    mainHold->setResizeMode(QLayout::Minimum);
+    mainHold->addStrut((int)(800*wmult));
+
+    QHBoxLayout *holdA = new QHBoxLayout(0, 0, 0);
+    QHBoxLayout *holdB = new QHBoxLayout(0, 0, 0);
+
+    holdA->addStrut((int)(300*hmult));
+    mainHold->addLayout(holdA, 0);
+    mainHold->addLayout(holdB, 0);
+
+    QVBoxLayout *holdC = new QVBoxLayout(0, (int)(10 * wmult), -1);
+    QVBoxLayout *holdD = new QVBoxLayout(0, 0, 0);
+
+    holdA->addLayout(holdC, 0);
+    holdA->addLayout(holdD, 0);
+
+    QHBoxLayout *titleHold = new QHBoxLayout(0, 0, 0);
+
+    channelimage = new QLabel("    ", this);
+    channelimage->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    channelimage->setMaximumWidth((int)(50*wmult));
+    channelimage->setMinimumWidth((int)(30*wmult));
+    channelimage->setMinimumHeight((int)(30*hmult));
+    channelimage->setPaletteForegroundColor(misChanIcon_fgColor);
+    titlefield = new QLabel("", this);
+    titlefield->setMaximumWidth((int)(440 * wmult) - (int)(75*wmult));
+    titlefield->setMinimumWidth((int)(440 * wmult) - (int)(75*wmult));
+    titlefield->setMaximumHeight((int)(75*hmult));
+    titlefield->setBackgroundOrigin(WindowOrigin);
+    titlefield->setFont(QFont("Arial", (int)(titlefontsize * hmult), 
+                        QFont::Bold));
+    titleHold->addWidget(channelimage, 0, Qt::AlignHCenter | Qt::AlignVCenter );
+    titleHold->addWidget(titlefield, 0, 0);
+
+    setFont(QFont("Arial", (int)(progfontsize * hmult), QFont::Bold));
+
+    QPixmap temp((int)(360 * wmult), (int)(267 * hmult));
+    temp.fill(black);
+
+    QLabel *forvideo = new QLabel("", this);
+    forvideo->setMinimumHeight((int)(267*hmult));
+    forvideo->setMaximumHeight((int)(267*hmult));
+    forvideo->setMinimumWidth((int)(360*wmult));
+    forvideo->setMaximumWidth((int)(360*wmult));
+    forvideo->setPixmap(temp);
+    QHBoxLayout *curInfo = new QHBoxLayout(0, 0, 0);
+
+    QLabel *filler = new QLabel("", this);
+    filler->setMinimumHeight((int)(3*hmult));
+    filler->setMaximumHeight((int)(3*hmult));
+    filler->setBackgroundOrigin(WindowOrigin);
+
+    holdD->addWidget(forvideo, 0, 0);
+    holdD->addLayout(curInfo, 0);
+    holdD->addWidget(filler, 0, 0);
+
+    currentTime = new QLabel("", this);
+    currentTime->setMaximumHeight((int)(30*hmult));
+    currentTime->setMinimumWidth((int)(180*wmult));
+    // CURRENT TIME AND CHANNEL BACKGROUND COLOR
+    currentTime->setPaletteBackgroundColor(curTimeChan_bgColor);
+    // CURRENT TIME AND CHANNEL FOREGROUND COLOR
+    currentTime->setPaletteForegroundColor(curTimeChan_fgColor);
+
+    ChannelInfo *chinfo = &(m_channelInfos[m_currentRow]);
+    currentChan = new QLabel(chinfo->chanstr + "*" + chinfo->callsign, this);
+    currentChan->setMinimumWidth((int)(180*wmult));
+    currentChan->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    // CURRENT TIME AND CHANNEL BACKGROUND COLOR
+    currentChan->setPaletteBackgroundColor(curTimeChan_bgColor);
+    // CURRENT TIME AND CHANNEL FOREGROUND COLOR
+    currentChan->setPaletteForegroundColor(curTimeChan_fgColor);
+
+    curInfo->addWidget(currentTime, 0, 0);
+    curInfo->addWidget(currentChan, 0, 0);
+
+    date = new QLabel("", this);
+    date->setMaximumHeight((int)(30*hmult));
+    date->setBackgroundOrigin(WindowOrigin);
+    QVBoxLayout *holdCG = new QVBoxLayout(0, 0, 0);
+
+    holdC->addLayout(titleHold, 0);
+    holdC->addWidget(date, 0, 0);
+    holdC->addLayout(holdCG, 0);
+
+    QGridLayout *holdCGA = new QGridLayout(0, 3, 2, 0, -1, "");
+    descriptionfield = new QLabel("", this);
+    descriptionfield->setBackgroundOrigin(WindowOrigin);
+    descriptionfield->setAlignment(Qt::WordBreak | Qt::AlignLeft |
+                                   Qt::AlignTop);
+
+    holdCG->addLayout(holdCGA, 0);
+    holdCG->addWidget(descriptionfield, 0, 0);
+
+    QLabel *subtitlelabel = new QLabel("Episode:", this);
+    QLabel *recordinglabel = new QLabel("Recording:", this);
+    QLabel *descriptionlabel = new QLabel("Description:", this);
+    descriptionlabel->setMaximumWidth((int)(125*wmult));
+    descriptionlabel->setMaximumHeight((int)(20*hmult));
+    descriptionlabel->setBackgroundOrigin(WindowOrigin);
+    subtitlelabel->setBackgroundOrigin(WindowOrigin);
+    subtitlelabel->setMaximumHeight((int)(20*hmult));
+    subtitlefield = new QLabel("", this);
+    subtitlefield->setBackgroundOrigin(WindowOrigin);
+    subtitlefield->setMaximumWidth((int)(440 * wmult) -
+                                   subtitlelabel->width() - (int)(50*wmult));
+    recordinglabel->setMaximumHeight((int)(20*hmult));
+    recordinglabel->setBackgroundOrigin(WindowOrigin);
+
+
+    recordingfield = new QLabel("", this);
+    recordingfield->setBackgroundOrigin(WindowOrigin);
+    QLabel *blankfield = new QLabel("", this);
+    blankfield->setBackgroundOrigin(WindowOrigin);
+
+    holdCGA->addWidget(subtitlelabel, 0, 0, 0);
+    holdCGA->addWidget(subtitlefield, 0, 1, 0);
+    holdCGA->addWidget(recordinglabel, 1, 0, 0);
+    holdCGA->addWidget(recordingfield, 1, 1, 0);
+    holdCGA->addWidget(descriptionlabel, 2, 0, 0);
+    holdCGA->addWidget(blankfield, 2, 1, 0);
+
+    timeout();
+}
+
+QString GuideGrid::getDateLabel(ProgramInfo *pginfo)
+{
+    QDateTime startts = pginfo->startts;
+    QDateTime endts = pginfo->endts;
+
+    QString dateformat = m_context->settings()->GetSetting("DateFormat");
+    if (dateformat == "")
+        dateformat = "ddd MMMM d";
+    QString timeformat = m_context->settings()->GetSetting("TimeFormat");
+    if (timeformat == "")
+        timeformat = "h:mm AP";
+
+    QString timedate = endts.date().toString(dateformat) + QString(", ") +
+                       startts.time().toString(timeformat) + QString(" - ") +
+                       endts.time().toString(timeformat);
+
+    return timedate;
+}
+
 QString GuideGrid::getLastChannel(void)
 {
     unsigned int chanNum = m_currentRow + m_currentStartChannel;
@@ -188,6 +452,14 @@ QString GuideGrid::getLastChannel(void)
     if (selectState)
         return m_channelInfos[chanNum].chanstr;
     return 0;
+}
+
+void GuideGrid::timeout()
+{
+    QTime new_time = QTime::currentTime();
+    QString curTime = new_time.toString("h:mm:ss ap");
+    currentTime->setText("  " + curTime);
+
 }
 
 void GuideGrid::fillChannelInfos()
@@ -406,6 +678,8 @@ void GuideGrid::paintEvent(QPaintEvent *e)
     }
     else
     {
+        if (r.intersects(infoRect()) && programGuideType == 1)
+            updateTopInfo();
         if (r.intersects(dateRect()))
             paintDate(&p);
         if (r.intersects(channelRect()))
@@ -414,7 +688,7 @@ void GuideGrid::paintEvent(QPaintEvent *e)
             paintTimes(&p);
         if (r.intersects(programRect()))
             paintPrograms(&p);
-        if (showtitle && r.intersects(titleRect()))
+        if (showtitle && r.intersects(titleRect()) && programGuideType != 1)
             paintTitle(&p);
     }
 }
@@ -435,17 +709,42 @@ void GuideGrid::paintDate(QPainter *p)
     int datewidth = lfm.width(date);
     int dateheight = lfm.height();
 
-    tmp.drawText((dr.width() - datewidth) / 2,
-                 (dr.height() - dateheight) / 2 + dateheight / 3, date);
+    if (programGuideType != 1)
+    {
+        tmp.drawText((dr.width() - datewidth) / 2,
+                     (dr.height() - dateheight) / 2 + dateheight / 3, date);
 
-    date = m_currentStartTime.toString("MMM d");
-    datewidth = lfm.width(date);
+        date = m_currentStartTime.toString("MMM d");
+        datewidth = lfm.width(date);
 
-    tmp.drawText((dr.width() - datewidth) / 2,
-                 (dr.height() - dateheight) / 2 + dateheight * 4 / 3, date);
+        tmp.drawText((dr.width() - datewidth) / 2,
+                     (dr.height() - dateheight) / 2 + dateheight * 4 / 3, date);
 
-    tmp.drawLine(0, dr.height() - 1, dr.right(), dr.height() - 1);
-    tmp.drawLine(dr.width() - 1, 0, dr.width() - 1, dr.height());
+        tmp.drawLine(0, dr.height() - 1, dr.right(), dr.height() - 1);
+        tmp.drawLine(dr.width() - 1, 0, dr.width() - 1, dr.height());
+    }
+    else
+    {
+        date = m_currentStartTime.toString("MMM d");
+        datewidth = lfm.width(date);
+
+        // DATE BACKGROUND COLOR
+        tmp.fillRect(0, 0, (int)(dr.width() - 2*wmult), 
+                     (int)(dr.height() - 1*hmult),
+                     QBrush(date_bgColor, SolidPattern));
+
+        // DATE DROPSHADOW COLOR
+        tmp.setPen(QPen(date_dsColor, (int)(2 * wmult)));
+        tmp.drawText((int)((dr.width() - datewidth) / 2 + 2*wmult),
+                     (int)((dr.height() - dateheight) / 2 + dateheight - 
+                     2*hmult), date);
+
+        // DATE FOREGROUND COLOR
+        tmp.setPen(QPen(date_fgColor, (int)(2 * wmult)));
+        tmp.drawText((dr.width() - datewidth) / 2,
+                     (dr.height() - dateheight) / 2 + dateheight - 4, date);
+    }
+
 
     tmp.end();
 
@@ -465,7 +764,7 @@ void GuideGrid::paintChannels(QPainter *p)
 
     int ydifference = cr.height() / DISPLAY_CHANS;
 
-    for (unsigned int y = 0; y < DISPLAY_CHANS; y++)
+    for (unsigned int y = 0; y < (unsigned int)DISPLAY_CHANS; y++)
     {
         unsigned int chanNumber = y + m_currentStartChannel;
         if (chanNumber >= m_channelInfos.size())
@@ -475,42 +774,69 @@ void GuideGrid::paintChannels(QPainter *p)
             break;
 
         ChannelInfo *chinfo = &(m_channelInfos[chanNumber]);
-        if (chinfo->iconpath != "none" && chinfo->iconpath != "" && showIcon)
-        {
-            if (!chinfo->icon)
-                chinfo->LoadIcon(m_context);
-            if (chinfo->icon)
-            {
-                int yoffset = (int)(4 * hmult);
-                tmp.drawPixmap((cr.width() - chinfo->icon->width()) / 2, 
-                               ydifference * y + yoffset, *(chinfo->icon));
-            }
-        }
-
         tmp.setFont(*m_chanFont);
         QFontMetrics lfm(*m_chanFont);
-        int width = lfm.width(chinfo->chanstr);
         int bheight = lfm.height();
+
+        if (programGuideType != 1)
+        {
+            if (chinfo->iconpath != "none" && chinfo->iconpath != "" && 
+                showIcon)
+            {
+                if (!chinfo->icon)
+                    chinfo->LoadIcon(m_context);
+                if (chinfo->icon)
+                {
+                    int yoffset = (int)(4 * hmult);
+                    tmp.drawPixmap((cr.width() - chinfo->icon->width()) / 2, 
+                                   ydifference * y + yoffset, *(chinfo->icon));
+                }
+            }
+         
+            int width = lfm.width(chinfo->chanstr);
        
-        int yoffset = 0;
-        if (showIcon)
-            yoffset = (int)(43 * hmult); 
-        tmp.drawText((cr.width() - width) / 2, 
-                     ydifference * y + yoffset + bheight, chinfo->chanstr);
+            int yoffset = 0;
+            if (showIcon)
+                yoffset = (int)(43 * hmult); 
+            tmp.drawText((cr.width() - width) / 2, 
+                         ydifference * y + yoffset + bheight, chinfo->chanstr);
 
-        tmp.setFont(*m_chanCallsignFont);
-        QFontMetrics fm(*m_chanCallsignFont);
-        width = fm.width(chinfo->callsign);
-        int height = fm.height();
-        tmp.drawText((cr.width() - width) / 2, 
-                     ydifference * y + yoffset + bheight + height, 
-                     chinfo->callsign);
+            tmp.setFont(*m_chanCallsignFont);
+            QFontMetrics fm(*m_chanCallsignFont);
+            width = fm.width(chinfo->callsign);
+            int height = fm.height();
+            tmp.drawText((cr.width() - width) / 2, 
+                         ydifference * y + yoffset + bheight + height, 
+                         chinfo->callsign);
 
-        tmp.drawLine(0, ydifference * (y + 1), cr.right(), 
-                     ydifference * (y + 1));
+            tmp.drawLine(0, ydifference * (y + 1), cr.right(), 
+                         ydifference * (y + 1));
+        }
+        else
+        {
+            QString chData = chinfo->chanstr + " " + chinfo->callsign;
+            int width = lfm.width(chData);
+
+            // CHANNEL BACKGROUND COLOR
+            tmp.fillRect(0, (int)(ydifference * y + 1*hmult), 
+                         (int)(cr.width() - 2*wmult), 
+                         (int)(ydifference - 2*hmult),
+                         QBrush(chan_bgColor, SolidPattern));
+
+            // CHANNEL DROPSHADOW COLOR
+            tmp.setPen(QPen(chan_dsColor, (int)(2 * wmult)));
+            tmp.drawText((int)((cr.width() - width) / 2 + 2*wmult),
+                         (int)(ydifference * y + bheight + 2*hmult), chData);
+
+            // CHANNEL FOREGROUND COLOR
+            tmp.setPen(QPen(chan_fgColor, (int)(2 * wmult)));
+            tmp.drawText((cr.width() - width) / 2,
+                         ydifference * y + bheight, chData);
+        }
     }
 
-    tmp.drawLine(cr.right(), 0, cr.right(), DISPLAY_CHANS * ydifference);
+    if (programGuideType != 1)
+        tmp.drawLine(cr.right(), 0, cr.right(), DISPLAY_CHANS * ydifference);
 
     tmp.end();
     
@@ -536,8 +862,17 @@ void GuideGrid::paintTimes(QPainter *p)
     {
         if (m_timeInfos[x])
         {
-            tmp.drawLine((x + 6) * xdifference, 0, (x + 6) * xdifference, 
-                         tr.bottom());
+            if (programGuideType != 1)
+            {
+                tmp.drawLine((x + 6) * xdifference, 0, (x + 6) * xdifference, 
+                             tr.bottom());
+            }
+            else
+            {
+                tmp.fillRect((int)((x + 6) * xdifference - 4*wmult), 0,
+                             -(int)(xdifference*6 - 2*wmult), tr.height(),
+                             QBrush(time_bgColor, SolidPattern));
+            }
         }
     }
 
@@ -552,8 +887,36 @@ void GuideGrid::paintTimes(QPainter *p)
             int height = fm.height();
 
             int xpos = (x * xdifference) + (xdifference * 6 - width) / 2; 
-            tmp.drawText(xpos, (tr.bottom() - height) / 2 + height, 
-                         tinfo->usertime);
+            if (programGuideType != 1)
+            {
+                tmp.drawText(xpos, (tr.bottom() - height) / 2 + height, 
+                             tinfo->usertime);
+            }
+            else
+            {
+                if (x == 0)
+                    firstTime = m_currentStartTime;
+                if (x == (DISPLAY_TIMES - 6))
+                {
+                    lastTime = QDateTime(m_currentStartTime.date(), 
+                                         QTime(tinfo->hour, tinfo->min, 0));
+                }
+
+                int xpos = (x * xdifference) + (xdifference * 6 - width) / 2;
+
+                // TIME DROPSHADOW COLOR
+                tmp.setPen(QPen(time_dsColor, (int)(2 * wmult)));
+                tmp.drawText((int)(xpos + 2*wmult), 
+                             (int)((tr.bottom() - tr.top()) / 2 + 
+                             (height / 2) - 1*hmult), tinfo->usertime);
+
+                // TIME FOREGROUND COLOR
+                tmp.setPen(QPen(time_fgColor, (int)(2 * wmult)));
+                tmp.drawText(xpos, (int)((tr.bottom() - tr.top()) / 2 + 
+                             (height / 2) - 3*hmult),
+                             tinfo->usertime);
+
+            }
 
             int t = now.secsTo(QDateTime(m_currentStartTime.date(),
                                          QTime(tinfo->hour, tinfo->min)));
@@ -562,7 +925,8 @@ void GuideGrid::paintTimes(QPainter *p)
         }
     }
 
-    tmp.drawLine(0, tr.height() - 1, tr.right(), tr.height() - 1);
+    if (programGuideType != 1)
+        tmp.drawLine(0, tr.height() - 1, tr.right(), tr.height() - 1);
 
     if (m_settings->GetNumSetting("EPGShowCurrentTime"))
     {
@@ -606,13 +970,13 @@ void GuideGrid::paintTimes(QPainter *p)
 QBrush GuideGrid::getBGColor(const QString &category)
 {
     QBrush br = QBrush(bgcolor);
-   
+  
     if (!usetheme)
         return br;
 
     QString cat = "Cat_" + category;
 
-    QString color = m_settings->GetSetting(cat);
+    QString color = m_context->qtconfig()->GetSetting(cat);
     if (color != "")
     {
         br = QBrush(color);
@@ -659,10 +1023,13 @@ void GuideGrid::paintPrograms(QPainter *p)
     int ydifference = pr.height() / DISPLAY_CHANS;
     int xdifference = pr.width() / DISPLAY_TIMES;
 
-    for (int y = 1; y < DISPLAY_CHANS + 1; y++)
+    if (programGuideType != 1)
     {
-        int ypos = ydifference * y;
-        tmp.drawLine(0, ypos, pr.right(), ypos);
+        for (int y = 1; y < DISPLAY_CHANS + 1; y++)
+        {
+            int ypos = ydifference * y;
+            tmp.drawLine(0, ypos, pr.right(), ypos);
+        }
     }
 
     float tmpwmult = wmult;
@@ -764,66 +1131,369 @@ void GuideGrid::paintPrograms(QPainter *p)
                 QString info = pginfo->title;
                 if (pginfo->category != "" && pginfo->title != "" && usetheme)
                     info += " (" + pginfo->category + ")";
+
+                if (programGuideType == 1)
+                {
+                    if (pginfo->startts < firstTime.addSecs(-300))
+                    {
+                        info = "  " + info;
+                    }
+                    if (pginfo->endts > lastTime.addSecs(2100))
+                    {
+                        info = info + "    ";
+                    }
+                }
                 
                 int startx = (int)(x * xdifference + 7 * wmult);
-                tmp.drawText(startx,
-                             (int)(height / 8 + y * ydifference + 1 * hmult), 
-                             maxwidth, ydifference - height / 8,
-                             AlignLeft | WordBreak,
-                             info);
+                int kstartx = startx;
+
+                if (programGuideType != 1)
+                {
+                    tmp.drawText(startx,
+                                (int)(height / 8 + y * ydifference + 1 * hmult),
+                                 maxwidth, ydifference - height / 8,
+                                 AlignLeft | WordBreak,
+                                 info);
+                }
 
                 tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
 
                 startx = (int)((x + spread) * xdifference); 
-                tmp.drawLine(startx, ydifference * y, startx, 
-                             ydifference * (y + 1));
 
-                if (pginfo->recordtype > kNotRecording)
+                int ystart = 1;
+                int rectheight = (int)(ydifference - 3 * tmphmult);
+                if (y != 0)
                 {
-                    tmp.setPen(QPen(red, (int)(2 * wmult)));
-                    QString text;
-
-                    if (pginfo->recordtype == kSingleRecord)
-                        text = "R";
-                    else if (pginfo->recordtype == kTimeslotRecord)
-                        text = "T";
-                    else if (pginfo->recordtype == kChannelRecord)
-                        text = "C";
-                    else if (pginfo->recordtype == kAllRecord) 
-                        text = "A";
-
-                    int width = fm.width(text);
-
-                    startx = (int)((x + spread) * xdifference - width * 1.5); 
-                    tmp.drawText(startx, (y + 1) * ydifference - height,
-                                 (int)(width * 1.5), height, AlignLeft, text);
-            
-                    tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
+                    ystart = (int)(ydifference * y + 2 * tmphmult);
+                    rectheight = (int)(ydifference - 4 * tmphmult);
                 }
 
-                if (m_currentRow == (int)y)
+                int xstart = 1;
+                if (x != 0)
+                    xstart = (int)(x * xdifference + 2 * tmpwmult);
+                int xend = (int)(xdifference * spread - 4 * tmpwmult);
+                if (x == 0)
+                    xend += (int)(1 * tmpwmult);
+
+                if (programGuideType != 1)
                 {
-                    if ((m_currentCol >= x) && (m_currentCol < (x + spread)))
+                    tmp.drawLine(startx, ydifference * y, startx,
+                                 ydifference * (y + 1));
+
+                    if (pginfo->recordtype > kNotRecording)
                     {
-                        tmp.setPen(QPen(red, (int)(3.75 * wmult)));
+                        tmp.setPen(QPen(red, (int)(2 * wmult)));
+                        QString text;
 
-                        int ystart = 1;
-                        int rectheight = (int)(ydifference - 3 * tmphmult);
-                        if (y != 0)
-                        {
-                            ystart = (int)(ydifference * y + 2 * tmphmult);
-                            rectheight = (int)(ydifference - 4 * tmphmult);
-                        }
+                        if (pginfo->recordtype == kSingleRecord)
+                            text = "R";
+                        else if (pginfo->recordtype == kTimeslotRecord)
+                            text = "T";
+                        else if (pginfo->recordtype == kChannelRecord)
+                            text = "C";
+                        else if (pginfo->recordtype == kAllRecord)
+                            text = "A";
 
-                        int xstart = 1;
-                        if (x != 0)
-                            xstart = (int)(x * xdifference + 2 * tmpwmult);
-                        int xend = (int)(xdifference * spread - 4 * tmpwmult);
-                        if (x == 0)
-                            xend += (int)(1 * tmpwmult);
-			
-                        tmp.drawRect(xstart, ystart, xend, rectheight);
+                        int width = fm.width(text);
+
+                        startx = (int)((x + spread) * xdifference - 
+                                       width * 1.5);
+                        tmp.drawText(startx, (y + 1) * ydifference - height,
+                                     (int)(width * 1.5), height, AlignLeft, 
+                                     text);
+
                         tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
+                    }
+
+                    if (m_currentRow == (int)y)
+                    {
+                        if ((m_currentCol >= x) && 
+                            (m_currentCol < (x + spread)))
+                        {
+                            tmp.setPen(QPen(red, (int)(3.75 * wmult)));
+
+                            int ystart = 1;
+                            int rectheight = (int)(ydifference - 3 * tmphmult);
+                            if (y != 0)
+                            {
+                                ystart = (int)(ydifference * y + 2 * tmphmult);
+                                rectheight = (int)(ydifference - 4 * tmphmult);
+                            }
+
+                            int xstart = 1;
+                            if (x != 0)
+                                xstart = (int)(x * xdifference + 2 * tmpwmult);
+                            int xend = (int)(xdifference * spread - 4 * 
+                                             tmpwmult);
+                            if (x == 0)
+                                xend += (int)(1 * tmpwmult);
+	
+                            tmp.drawRect(xstart, ystart, xend, rectheight);
+                            tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
+                         }
+                    }
+                }
+                else
+                {
+                    int rrOffset = 5;
+                    int rRound = 12;
+
+                    // PROGRAM BACKGROUND COLOR
+                    tmp.fillRect(xstart - (rrOffset / 2), 
+                                 ystart - (rrOffset / 2),
+                                 xend + (rrOffset / 2), 
+                                 rectheight + (rrOffset / 2),
+                                 QBrush(prog_bgColor, SolidPattern));
+
+                    // PROGRAM LINE COLOR
+                    tmp.setPen(QPen(progLine_Color, (int)(.5 * wmult)));
+                    tmp.drawRoundRect(xstart - rrOffset, ystart - rrOffset,
+                                      xend + rrOffset, rectheight + rrOffset, 
+                                      rRound, rRound);
+
+                    bool isCurrent = false;
+
+                    if (m_currentRow == (int)y)
+                    {
+                        if ((m_currentCol >= x) && 
+                            (m_currentCol < (x + spread)))
+                        {
+                            isCurrent = true;
+                            tmp.setPen(QPen(red, (int)(3.75 * wmult)));
+
+                            int ystart = 1;
+                            int rectheight = (int)(ydifference - 3 * tmphmult);
+                            if (y != 0)
+                            {
+                                ystart = (int)(ydifference * y + 2 * tmphmult);
+                                rectheight = (int)(ydifference - 4 * tmphmult);
+                            }
+
+                            int xstart = 1;
+                            if (x != 0)
+                                xstart = (int)(x * xdifference + 2 * tmpwmult);
+                            int xend = (int)(xdifference * spread - 4 * 
+                                             tmpwmult);
+                            if (x == 0)
+                                xend += (int)(1 * tmpwmult);
+
+                            if (pginfo->recordtype == kNotRecording)
+                            {
+                                // CURRENT PROGRAM HIGHLIGHT COLOR
+                                tmp.fillRect(xstart - (rrOffset / 2), 
+                                             ystart - (rrOffset / 2),
+                                             xend + (rrOffset / 2), 
+                                             rectheight + (rrOffset / 2),
+                                             QBrush(curProg_bgColor, 
+                                             SolidPattern));
+                            }
+                            else
+                            {
+                                // CURRENT PROGRAM BEING RECORDED HIGHLIGHT COLOR
+                                tmp.fillRect(xstart - (rrOffset / 2), 
+                                             ystart - (rrOffset / 2),
+                                             xend + (rrOffset / 2), 
+                                             rectheight + (rrOffset / 2),
+                                             QBrush(curRecProg_bgColor, 
+                                             SolidPattern));
+                            }
+                            // PROGRAM LINE COLOR
+                            tmp.setPen(QPen(progLine_Color, 
+                                            (int)(1.5 * wmult)));
+                            tmp.drawRoundRect(xstart - rrOffset, 
+                                              ystart - rrOffset,
+                                              xend + rrOffset, 
+                                              rectheight + rrOffset, rRound, 
+                                              rRound);
+                        }
+                    }
+
+                    if (pginfo->recordtype > kNotRecording)
+                    {
+                        tmp.setPen(QPen(yellow, (int)(2 * wmult)));
+                        QString text;
+
+                        if (pginfo->recordtype == kSingleRecord)
+                            text = "R";
+                        else if (pginfo->recordtype == kTimeslotRecord)
+                            text = "T";
+                        else if (pginfo->recordtype == kChannelRecord)
+                            text = "C";
+                        else if (pginfo->recordtype == kAllRecord)
+                            text = "A";
+
+                        int width = fm.width(text);
+
+                        startx = (int)((x + spread) * xdifference - 
+                                       width * 1.5);
+                        tmp.drawText(startx, (y + 1) * ydifference - height,
+                                     (int)(width * 1.5), height, AlignLeft, 
+                                     text);
+
+                        tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
+                    }
+                    /*
+                        the following code adds the ... to program names
+                        that are too long for the program box
+                     */
+                    int curFontWidth = fm.width(info);
+                    if (curFontWidth > maxwidth)
+                    {
+                        QString testInfo = "";
+                        curFontWidth = fm.width(testInfo);
+                        int tmaxwidth = maxwidth - fm.width("LLL");
+                        int count = 0;
+
+                        while (curFontWidth < tmaxwidth)
+                        {
+                            testInfo = info.left(count);
+                            curFontWidth = fm.width(testInfo);
+                            count = count + 1;
+                        }
+                        testInfo = testInfo + "...";
+                        info = testInfo;
+                    }
+
+                    if (isCurrent == true)
+                    {
+                        // CURRENT PROGRAM DROPSHADOW COLOR
+                        tmp.setPen(QPen(curProg_dsColor, (int)(1.5 * wmult)));
+                        tmp.drawText((int)(kstartx + 1*wmult),
+                                     (int)(height / 8 + y * ydifference + 
+                                     1 * hmult + 1*hmult),
+                                     maxwidth, (ydifference - height / 8),
+                                     AlignLeft,
+                                     info);
+                        // CURRENT PROGRAM FOREGROUND COLOR
+                        tmp.setPen(QPen(curProg_fgColor, (int)(1.5 * wmult)));
+                    }
+                    else
+                    {
+                        // PROGRAM FOREGROUND COLOR
+                        tmp.setPen(QPen(prog_fgColor, (int)(2 * wmult)));
+                    }
+
+                    tmp.drawText(kstartx,
+                                 (int)(height / 8 + y * ydifference + 
+                                 1 * hmult),
+                                 maxwidth, ydifference - height / 8, AlignLeft,
+                                 info);
+
+                    if (pginfo->startts < firstTime.addSecs(-300))
+                    {
+                        // PROGRAM ARROW TYPE
+                        if (progArrow_Type == 0)
+                        {
+                            // PROGRAM ARROW COLOR
+                            tmp.setPen(QPen(progArrow_Color, 
+                                            (int)(4.25 * wmult)));
+                            tmp.drawLine((int)(xstart + 8*wmult), 
+                                         (int)(ystart + (int)(rectheight / 2) - 
+                                         3 * hmult),
+                                         (int)(xstart + 8*wmult), 
+                                         (int)(ystart + (int)(rectheight / 2) + 
+                                         3 * hmult));
+                            tmp.drawLine((int)(xstart + 10*wmult), ystart,
+                                         (int)(xstart + 10*wmult), 
+                                         (int)(ystart + rectheight - 2*hmult));
+                            tmp.drawLine((int)(xstart + 10*wmult), ystart,
+                                         (int)(xstart + 4*wmult), 
+                                         (int)(ystart + (int)(rectheight / 2) - 
+                                         1*hmult));
+                            tmp.drawLine((int)(xstart + 10*wmult), 
+                                         (int)(ystart + rectheight - 2*hmult),
+                                         (int)(xstart + 4*wmult), 
+                                         (int)(ystart + (int)(rectheight / 2) - 
+                                         1*hmult));
+                        }
+                        if (progArrow_Type == 1)
+                        {
+                            tmp.setPen(QPen(progArrow_Color, (int)(2 * wmult)));
+                            tmp.drawLine((int)(xstart + 10*wmult), ystart,
+                                         (int)(xstart + 4*wmult), 
+                                         (int)(ystart + (int)(rectheight / 2) - 
+                                         1*hmult));
+                            tmp.drawLine((int)(xstart + 10*wmult), 
+                                         (int)(ystart + rectheight - 2*hmult),
+                                         (int)(xstart + 4*wmult), 
+                                         (int)(ystart + (int)(rectheight / 2) - 
+                                         1*hmult));
+                        }
+                        if (progArrow_Type == 2)
+                        {
+                            tmp.setPen(QPen(progArrow_Color, 
+                                            (int)(1.25 * wmult)));
+                            tmp.drawLine((int)(xstart + 8*wmult), 
+                                         ystart + (int)(rectheight / 4),
+                                         (int)(xstart + 4*wmult), 
+                                         (int)(ystart + (int)(rectheight / 2) - 
+                                         1*hmult));
+                            tmp.drawLine((int)(xstart + 8*wmult),
+                                         (int)(ystart + rectheight - 2*hmult - 
+                                         (int)(rectheight / 4)),
+                                         (int)(xstart + 4*wmult), ystart + 
+                                         (int)((rectheight / 2) - 1*hmult));
+                        }
+                    }
+                    if (pginfo->endts > lastTime.addSecs(2100))
+                    {
+                        // PROGRAM ARROW TYPE
+                        if (progArrow_Type == 0)
+                        {
+                            // PROGRAM ARROW COLOR
+                            tmp.setPen(QPen(progArrow_Color, 
+                                            (int)(4.25 * wmult)));
+                            tmp.drawLine((int)(xstart + xend - 8*wmult), 
+                                         (int)(ystart + (int)(rectheight / 2) - 
+                                         6*hmult),
+                                         (int)(xstart + xend - 8*wmult),
+                                         (int)(ystart + (int)(rectheight / 2) + 
+                                         6*hmult));
+                            tmp.drawLine((int)(xstart + xend - 10*wmult), 
+                                         ystart,
+                                         (int)(xstart + xend - 10*wmult), 
+                                         (int)(ystart + rectheight - 2*hmult));
+                            tmp.drawLine((int)(xstart + xend - 10*wmult), 
+                                         ystart,
+                                         (int)(xstart + xend - 4*wmult),
+                                         (int)(ystart + (int)(rectheight / 2) - 
+                                         1*hmult));
+                            tmp.drawLine((int)(xstart + xend - 10*wmult), 
+                                         (int)(ystart + rectheight - 2*hmult),
+                                         (int)(xstart + xend - 4*wmult),
+                                         (int)(ystart + (int)(rectheight / 2) - 
+                                         1*hmult));
+                        }
+                        if (progArrow_Type == 1)
+                        {
+                            tmp.setPen(QPen(progArrow_Color, (int)(2 * wmult)));
+                            tmp.drawLine((int)(xstart + xend - 10*wmult), 
+                                         ystart,
+                                         (int)(xstart + xend - 4*wmult),
+                                         (int)(ystart + (int)(rectheight / 2) - 
+                                         1*hmult));
+                            tmp.drawLine((int)(xstart + xend - 10*wmult), 
+                                         (int)(ystart + rectheight - 2*hmult),
+                                         (int)(xstart + xend - 4*wmult),
+                                         (int)(ystart + (int)(rectheight / 2) - 
+                                         1*hmult));
+                        }
+                        if (progArrow_Type == 2)
+                        {
+                            tmp.setPen(QPen(progArrow_Color, 
+                                            (int)(1.25 * wmult)));
+                            tmp.drawLine((int)(xstart + xend - 10*wmult), 
+                                         (int)(ystart + (int)(rectheight / 4)),
+                                         (int)(xstart + xend - 4*wmult),
+                                         (int)(ystart + (int)(rectheight / 2) - 
+                                         1*hmult));
+                            tmp.drawLine((int)(xstart + xend - 10*wmult),
+                                         (int)(ystart + rectheight - 2*hmult - 
+                                         (int)(rectheight / 4)),
+                                         (int)(xstart + xend - 4*wmult),
+                                         (int)(ystart + (int)(rectheight / 2) - 
+                                         1*hmult));
+                        }
                     }
                 }
             }
@@ -834,6 +1504,56 @@ void GuideGrid::paintPrograms(QPainter *p)
     tmp.end();
 
     p->drawPixmap(pr.topLeft(), pix);
+}
+
+void GuideGrid::updateTopInfo()
+{
+    ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
+    
+  
+    titlefield->setText(" " + pginfo->title);
+    date->setText(getDateLabel(pginfo));
+    subtitlefield->setText(pginfo->subtitle);
+    descriptionfield->setText(pginfo->description);
+
+    if (pginfo->recordtype == kNotRecording)
+        recordingfield->setText("Not Recording");
+    else if (pginfo->recordtype == kSingleRecord)
+        recordingfield->setText("Recording Once");
+    else if (pginfo->recordtype == kTimeslotRecord)
+        recordingfield->setText("Timeslot Recording");
+    else if (pginfo->recordtype == kChannelRecord)
+        recordingfield->setText("Channel Recording");
+    else if (pginfo->recordtype == kAllRecord)
+        recordingfield->setText("All Recording");
+
+    int chanNum = m_currentRow + m_currentStartChannel;
+    if (chanNum >= (int)m_channelInfos.size())
+        chanNum -= (int)m_channelInfos.size();
+    if (chanNum < 0)
+        chanNum = 0;
+
+    ChannelInfo *chinfo = &(m_channelInfos[chanNum]);
+
+    if (chinfo->iconpath != "none" && chinfo->iconpath != "" && showIcon)
+    {
+        if (!chinfo->icon)
+            chinfo->LoadIcon(m_context);
+        if (chinfo->icon)
+        {
+            channelimage->setText("");
+            channelimage->setMinimumWidth(chinfo->icon->width());
+            channelimage->setMaximumWidth(chinfo->icon->width());
+            channelimage->setMinimumHeight(chinfo->icon->height());
+            channelimage->setPaletteBackgroundPixmap(*(chinfo->icon));
+        }
+    }
+    else
+    {
+        // MISSING CHANNEL ICON BACKGROUND COLOR
+        channelimage->setPaletteBackgroundColor(misChanIcon_bgColor);
+        channelimage->setText(pginfo->chansign);
+    }
 }
 
 void GuideGrid::paintTitle(QPainter *p)
@@ -872,41 +1592,89 @@ QRect GuideGrid::fullRect() const
 
 QRect GuideGrid::dateRect() const
 {
-    QRect r(0, 0, programRect().left(), programRect().top());
+    QRect r;
+    if (programGuideType != 1)
+        r = QRect(0, 0, programRect().left(), programRect().top());
+    else
+        r = QRect(0, (int)(300 * wmult), programRect().left(), 
+                  (int)(26 * wmult));
+
     return r;
 }
 
 QRect GuideGrid::channelRect() const
 {
-    QRect r(0, dateRect().height(), dateRect().width(), programRect().height());
+    QRect r;
+    if (programGuideType != 1)
+        r = QRect(0, dateRect().height(), dateRect().width(), 
+                  programRect().height());
+    else
+        r = QRect(0, programRect().top(), dateRect().width(), 
+                  programRect().height());
+
     return r;
 }
 
 QRect GuideGrid::timeRect() const
 {
-    QRect r(dateRect().width(), 0, programRect().width(), dateRect().height());
+    QRect r;
+    if (programGuideType != 1)
+        r = QRect(dateRect().width(), 0, programRect().width(), 
+                  dateRect().height());
+    else
+        r = QRect(dateRect().width(), dateRect().top(), programRect().width(), 
+                  (int)(dateRect().height() - 1*hmult));
+
     return r;
 }
 
 QRect GuideGrid::programRect() const
 {
-    // Change only these numbers to adjust the size of the visible regions
+    QRect r;
+    if (programGuideType != 1)
+    {
+        // Change only these numbers to adjust the size of the visible regions
 
-    unsigned int min_dateheight = 50;  // also min_timeheight
-    unsigned int min_datewidth = 74;   // also min_chanwidth
-    unsigned int titleheight = showtitle ? 40 : 0;
+        unsigned int min_dateheight = 50;  // also min_timeheight
+        unsigned int min_datewidth = 74;   // also min_chanwidth
+        unsigned int titleheight = showtitle ? 40 : 0;
 
-    unsigned int programheight = (int)((600 - min_dateheight - titleheight) * 
-                                       wmult);
-    programheight = DISPLAY_CHANS * (int)(programheight / DISPLAY_CHANS);
+        unsigned int programheight = (int)((600 - min_dateheight - 
+                                           titleheight) * wmult);
+        programheight = DISPLAY_CHANS * (int)(programheight / DISPLAY_CHANS);
 
-    unsigned int programwidth = (int)((800 - min_datewidth) * hmult);
-    programwidth = DISPLAY_TIMES * (int)(programwidth / DISPLAY_TIMES);
+        unsigned int programwidth = (int)((800 - min_datewidth) * hmult);
+        programwidth = DISPLAY_TIMES * (int)(programwidth / DISPLAY_TIMES);
 
-    QRect r((int)(800 * wmult) - programwidth, 
-            (int)(600 * hmult) - programheight - titleheight,
-            programwidth, programheight);
+        r = QRect((int)(800 * wmult) - programwidth, 
+                  (int)(600 * hmult) - programheight - titleheight,
+                  programwidth, programheight);
+    }
+    else
+    {
+        // Change only these numbers to adjust the size of the visible regions
+        unsigned int min_dateheight = 25;  // also min_timeheight
+        unsigned int min_datewidth = 100;   // also min_chanwidth
 
+        unsigned int programheight = (int)((300 - min_dateheight + 1) *
+                                           wmult);
+
+        programheight = DISPLAY_CHANS * (int)(programheight / DISPLAY_CHANS);
+
+        unsigned int programwidth = (int)((800 - min_datewidth) * hmult);
+        programwidth = DISPLAY_TIMES * (int)(programwidth / DISPLAY_TIMES);
+
+        r = QRect((int)(800 * wmult) - programwidth,
+                  (int)(600 * hmult) - programheight,
+                  programwidth, programheight);
+    }
+
+    return r;
+}
+
+QRect GuideGrid::infoRect() const
+{
+    QRect r(0, 0, (int)(400 * wmult), (int)(300 * hmult));
     return r;
 }
 
@@ -933,6 +1701,8 @@ void GuideGrid::cursorLeft()
         update(programRect());
         if (showtitle)
             update(titleRect());
+        if (programGuideType == 1)
+            update(infoRect());
     }
 }
 
@@ -953,6 +1723,8 @@ void GuideGrid::cursorRight()
         update(programRect());
         if (showtitle)
             update(titleRect());
+        if (programGuideType == 1)
+            update(infoRect());
     }
 }
 
@@ -970,6 +1742,8 @@ void GuideGrid::cursorDown()
         update(programRect());
         if (showtitle)
             update(titleRect());
+        if (programGuideType == 1)
+            update(infoRect());
     }
 }
 
@@ -987,6 +1761,8 @@ void GuideGrid::cursorUp()
         update(programRect());
         if (showtitle)
             update(titleRect());
+        if (programGuideType == 1)
+            update(infoRect());
     }
 }
 
@@ -1012,6 +1788,8 @@ void GuideGrid::scrollLeft()
     update(programRect());
     if (showtitle)
         update(titleRect());
+    if (programGuideType == 1)
+        update(infoRect());
 }
 
 void GuideGrid::scrollRight()
@@ -1035,6 +1813,8 @@ void GuideGrid::scrollRight()
     update(programRect());
     if (showtitle)
         update(titleRect());
+    if (programGuideType == 1)
+        update(infoRect());
 }
 
 void GuideGrid::setStartChannel(int newStartChannel)
@@ -1067,6 +1847,8 @@ void GuideGrid::scrollDown()
     update(programRect());
     if (showtitle)
         update(titleRect());
+    if (programGuideType == 1)
+        update(infoRect());
 }
 
 void GuideGrid::scrollUp()
@@ -1089,6 +1871,8 @@ void GuideGrid::scrollUp()
     update(programRect());
     if (showtitle)
         update(titleRect());
+    if (programGuideType == 1)
+        update(infoRect());
 }
 
 void GuideGrid::dayLeft()
@@ -1103,6 +1887,8 @@ void GuideGrid::dayLeft()
     update(programRect());
     if (showtitle)
         update(titleRect());
+    if (programGuideType == 1)
+        update(infoRect());
 }
 
 void GuideGrid::dayRight()
@@ -1117,6 +1903,8 @@ void GuideGrid::dayRight()
     update(programRect());
     if (showtitle)
         update(titleRect());
+    if (programGuideType == 1)
+        update(infoRect());
 }
 
 void GuideGrid::pageLeft()
@@ -1141,6 +1929,8 @@ void GuideGrid::pageLeft()
     update(programRect());
     if (showtitle)
         update(titleRect());
+    if (programGuideType == 1)
+        update(infoRect());
 }
 
 void GuideGrid::pageRight()
@@ -1165,6 +1955,8 @@ void GuideGrid::pageRight()
     update(programRect());
     if (showtitle)
         update(titleRect());
+    if (programGuideType == 1)
+        update(infoRect());
 }
 
 void GuideGrid::pageDown()
@@ -1177,6 +1969,8 @@ void GuideGrid::pageDown()
     update(programRect());
     if (showtitle)
         update(titleRect());
+    if (programGuideType == 1)
+        update(infoRect());
 }
 
 void GuideGrid::pageUp()
@@ -1189,6 +1983,8 @@ void GuideGrid::pageUp()
     update(programRect());
     if (showtitle)
         update(titleRect());
+    if (programGuideType == 1)
+        update(infoRect());
 }
 
 void GuideGrid::enter()

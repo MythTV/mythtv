@@ -73,3 +73,26 @@ str DisabledShadow=#000000
 str DisabledHighlight=#000080
 str DisabledHighlightedText=#ffffff
 
+str curTimeChan_bgColor=#8f2813
+str curTimeChan_fgColor=#ffffff
+str date_bgColor=#0f2e8f
+str date_dsColor=#000000
+str date_fgColor=#ffffff
+str chan_bgColor=#0f2f5a
+str chan_dsColor=#000000
+str chan_fgColor=#ffffff
+str time_bgColor=#0f2e8f
+str time_dsColor=#000000
+str time_fgColor=#ffffff
+str prog_bgColor=#2d587b
+str prog_fgColor=#ffffff
+str progLine_Color=#104064
+str progArrow_Color=#ffffff
+int progArrow_Type=0
+str curProg_bgColor=#85a5bc
+str curRecProg_bgColor=#bc4c32
+str curProg_dsColor=#000000
+str curProg_fgColor=#eefb92
+str misChanIcon_bgColor=#000000
+str misChanIcon_fgColor=#ffffff
+

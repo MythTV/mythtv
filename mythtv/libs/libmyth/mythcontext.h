@@ -37,6 +37,7 @@ class MythContext
     int OpenDatabase(QSqlDatabase *db);
 
     Settings *settings() { return m_settings; }
+    Settings *qtconfig() { return m_qtThemeSettings; }
 
     QString GetSetting(const QString &key, const QString &defaultval = "");
     int GetNumSetting(const QString &key, int defaultval = 0);
