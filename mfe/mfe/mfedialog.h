@@ -42,6 +42,7 @@ class MfeDialog : public MythThemedDialog
 
     void handleTreeSignals(UIListGenericTree *node);
     void mfdDiscovered(int which_mfd, QString name, QString host, bool found);
+    void audioPluginDiscovered(int which_mfd);
     void paused(int which_mfd, bool paused); 
     void stopped(int which_mfd);
     void playing(int, int, int, int, int, int, int, int, int);

@@ -307,6 +307,9 @@ void MfeDialog::connectUpMfd()
     connect(mfd_interface, SIGNAL(mfdDiscovery(int, QString, QString, bool)),
             this, SLOT(mfdDiscovered(int, QString, QString, bool)));
 
+    connect(mfd_interface, SIGNAL(audioPluginDiscovery(int)),
+            this, SLOT(audioPluginDiscovered(int)));
+
     connect(mfd_interface, SIGNAL(audioPaused(int, bool)),
             this, SLOT(paused(int, bool)));
 
@@ -336,7 +339,6 @@ void MfeDialog::mfdDiscovered(int which_mfd, QString name, QString host, bool fo
 
             MfdInfo *new_mfd = new MfdInfo(which_mfd, name, host);
             available_mfds.insert(which_mfd, new_mfd);
-            mfd_interface->askForStatus(which_mfd);
         
             if(current_mfd == NULL)
             {
@@ -371,6 +373,12 @@ void MfeDialog::mfdDiscovered(int which_mfd, QString name, QString host, bool fo
         }
     }
     updateConnectionList();
+}
+
+void MfeDialog::audioPluginDiscovered(int which_mfd)
+{
+    mfd_interface->askForStatus(which_mfd);
+    //cout << "ok, mfd number " << which_mfd << "has an audio plugin" << endl;
 }
 
 void MfeDialog::changeMetadata(int which_mfd, MfdContentCollection *new_collection)
@@ -422,8 +430,7 @@ void MfeDialog::changeMetadata(int which_mfd, MfdContentCollection *new_collecti
                 current_mfd->setCurrentPlayingData();
                 now_playing_text->SetText(current_mfd->getPlayingString());
                 time_progress->SetUsed((int)(current_mfd->getPercentPlayed() * 1000));
-            }
-    
+            }    
         }
     }
     else
@@ -650,6 +657,10 @@ void MfeDialog::syncToCurrentMfd()
         //  Update the now playing text
         //
         
+        if(!current_mfd->knowsWhatsPlaying())
+        {
+            current_mfd->setCurrentPlayingData();
+        }
         now_playing_text->SetText(current_mfd->getPlayingString());
         time_progress->SetUsed((int)(current_mfd->getPercentPlayed() * 1000));
     }
