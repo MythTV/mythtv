@@ -607,7 +607,7 @@ public:
         QDir themes(PREFIX"/share/mythtv/themes");
         themes.setFilter(QDir::Dirs);
         themes.setSorting(QDir::Name | QDir::IgnoreCase);
-        addSelection(tr("Default"));
+        addSelection(QObject::tr("Default"));
         const QFileInfoList *fil = themes.entryInfoList(QDir::Dirs);
         if (!fil)
             return;

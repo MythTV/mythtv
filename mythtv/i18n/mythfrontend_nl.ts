@@ -88,6 +88,13 @@
     </message>
 </context>
 <context>
+    <name>DataDirectLineupSelector</name>
+    <message>
+        <source>Fetching lineups from DataDirect service...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>InfoDialog</name>
     <message>
         <source>Record this program whenever it&apos;s shown anywhere</source>
@@ -215,6 +222,9 @@
         <source>Manual recording</source>
         <translation>Manuele opname</translation>
     </message>
+</context>
+<context>
+    <name>MenuTheme</name>
 </context>
 <context>
     <name>MythContext</name>
@@ -430,6 +440,18 @@
     <message>
         <source>Yes, but allow future recordings of this episode</source>
         <translation>Ja, maar neem deze aflevering opnieuw op in de toekomst.</translation>
+    </message>
+    <message>
+        <source>There are %1 recordings in this display group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is one recording in this display group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are no recordings in this display group</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1268,15 +1290,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>GUI width</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The width of the GUI.  Do not make the GUI wider than your actual screen resolution.  Set to 0 to automatically scale to fullscreen.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>GUI height</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1345,10 +1359,6 @@
     </message>
     <message>
         <source>Problem reading theme preview image </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Display channel names instead of numbers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2738,10 +2748,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>tv_grab_na configuration</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>tv_grab_uk configuration</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2919,10 +2925,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>External channel change command</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If specified, this command will be run to change the channel for inputs which do not have a tuner.  The first argument will be the channel number.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3196,10 +3198,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Record one showing of this program</source>
         <translation type="unfinished">Dit programma eenmalig opnemen.</translation>
-    </message>
-    <message>
-        <source>Do not adjust BT audio volume.</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
@@ -3777,6 +3775,173 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>LCD device display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not adjust volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Capture Card Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If specified, this command will be run to change the channel for inputs which do not have a tuner. The first argument will be the channel number.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Data Direct Lineup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Retrieve Lineups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show group name instead of &quot;All Programs&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use the name of the display group currently being show in place of the term &quot;All Programs&quot; in theplayback screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start in title section.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, focus will initially be on the show titles otherwise focus will be on the recordings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show group summary.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>While selecting a group, show a group summary instead of showing info about the first episode in that group.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aspect Override</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>16/9 Anamorphic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4/3 Normal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>16/9 Zoom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4/3 Zoom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GUI width (px)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GUI height (px)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Qt Style</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Desktop Style</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>number callsign</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>number name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>callsign</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your preferred channel format.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Long Channel format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your preferred long channel format.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default size is 25.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default size is 16.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record Threshold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If the option to use select to change the channel is on, pressing select on a show that is at least this many minutes into the future will schedule a recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View Recordings (Recording Groups)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to get selector object</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Myth could not locate the selector object within your theme.
+Please make that your ui.xml is valid.
+
+Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
