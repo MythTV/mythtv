@@ -124,8 +124,6 @@ class GuideGrid : public MythDialog
 
     void createProgramLabel(int, int);
 
-    QString getDateLabel(ProgramInfo *pginfo);
-
     vector<ChannelInfo> m_channelInfos;
     TimeInfo *m_timeInfos[MAX_DISPLAY_TIMES];
     QPtrList<ProgramInfo> *m_programs[MAX_DISPLAY_CHANS];

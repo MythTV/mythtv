@@ -198,9 +198,10 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
     QString dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
     QString shortDateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
 
+    QDateTime timeNow = QDateTime::currentDateTime();
+
     QString length;
     int hours, minutes, seconds;
-    RecordingType recordtype;
 
     progMap["title"] = title;
 
@@ -236,40 +237,23 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
     length.sprintf("%d:%02d", hours, minutes);
     progMap["lentime"] = length;
 
-    recordtype = GetProgramRecordingStatus(db);
-    progMap["rec_str"] = "";
-    progMap["rec_type"] = "";
-    switch (recordtype) {
-        case kNotRecording:
-            progMap["rec_str"] = QObject::tr("Not Recording");
-            progMap["rec_type"] = "";
-            break;
-        case kSingleRecord:
-            progMap["rec_str"] = QObject::tr("Recording Once");
-            progMap["rec_type"] = "R";
-            break;
-        case kTimeslotRecord:
-            progMap["rec_str"] = QObject::tr("Timeslot Recording");
-            progMap["rec_type"] = "T";
-            break;
-        case kWeekslotRecord:
-            progMap["rec_str"] = QObject::tr("Weekslot Recording");
-            progMap["rec_type"] = "W";
-            break;
-        case kChannelRecord:
-            progMap["rec_str"] = QObject::tr("Channel Recording");
-            progMap["rec_type"] = "C";
-            break;
-        case kAllRecord:
-            progMap["rec_str"] = QObject::tr("All Recording");
-            progMap["rec_type"] = "A";
-            break;
-    }
+    progMap["rec_type"] = RecordingChar();
+    progMap["rec_str"] = RecordingText();
+    progMap["recordingstatus"] = progMap["rec_str"];
+    progMap["type"] = progMap["rec_str"];
+
     progMap["recpriority"] = recpriority;
 
     progMap["timedate"] = recstartts.date().toString(dateFormat) + ", " +
                           recstartts.time().toString(timeFormat) + " - " +
                           recendts.time().toString(timeFormat);
+
+    progMap["shorttimedate"] =
+                          recstartts.date().toString(shortDateFormat) + ", " +
+                          recstartts.time().toString(timeFormat) + " - " +
+                          recendts.time().toString(timeFormat);
+
+    progMap["time"] = timeNow.time().toString(timeFormat);
 
     if (gContext->GetNumSetting("DisplayChanNum") != 0)
         progMap["channel"] = channame + " [" + chansign + "]";
@@ -1426,6 +1410,36 @@ QString ProgramInfo::NoRecordChar(void)
     default:
         return "-";
     }
+}
+
+QString ProgramInfo::RecordingChar(void)
+{
+    QString recstring = "";
+
+    switch (rectype)
+    {
+    case kSingleRecord:
+        recstring = QObject::tr("R");
+        break;
+    case kTimeslotRecord:
+        recstring = QObject::tr("T");
+        break;
+    case kWeekslotRecord:
+        recstring = QObject::tr("W");
+        break;
+    case kChannelRecord:
+        recstring = QObject::tr("C");
+        break;
+    case kAllRecord:
+        recstring = QObject::tr("A");
+        break;
+    case kNotRecording:
+    default:
+        recstring = QObject::tr("");
+        break;
+    }
+
+    return recstring;
 }
 
 QString ProgramInfo::RecordingText(void)

@@ -142,6 +142,7 @@ class ProgramInfo
     void DeleteHistory(QSqlDatabase *db);
     QString NoRecordText(void);
     QString NoRecordChar(void);
+    QString RecordingChar(void);
     QString RecordingText(void);
     void FillInRecordInfo(vector<ProgramInfo *> &reclist);
     void EditScheduled(QSqlDatabase *db);

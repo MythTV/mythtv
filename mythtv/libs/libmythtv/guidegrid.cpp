@@ -402,18 +402,6 @@ void GuideGrid::parseContainer(QDomElement &element)
         videoRect = area;
 }
 
-QString GuideGrid::getDateLabel(ProgramInfo *pginfo)
-{
-    QDateTime startts = pginfo->startts;
-    QDateTime endts = pginfo->endts;
-
-    QString timedate = startts.date().toString(dateformat) + QString(", ") +
-                       startts.time().toString(timeformat) + QString(" - ") +
-                       endts.time().toString(timeformat);
-
-    return timedate;
-}
-
 QString GuideGrid::getLastChannel(void)
 {
     unsigned int chanNum = m_currentRow + m_currentStartChannel;
@@ -1080,6 +1068,7 @@ void GuideGrid::paintInfo(QPainter *p)
     if (!pginfo)
         return;
 
+    QMap<QString, QString> regexpMap;
     QRect pr = infoRect;
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
@@ -1093,38 +1082,20 @@ void GuideGrid::paintInfo(QPainter *p)
 
     ChannelInfo *chinfo = &(m_channelInfos[chanNum]);
 
+    pginfo->ToMap(m_db, regexpMap);
+
     LayerSet *container = theme->GetSet("program_info");
     if (container)
     {
-        UITextType *type = (UITextType *)container->GetType("title");
-        if (type)
-            type->SetText(pginfo->title);
+        container->ClearAllText();
+        container->SetTextByRegexp(regexpMap);
+
+        UITextType *type;
+
         type = (UITextType *)container->GetType("misicon");
         if (type)
             type->SetText(chinfo->callsign);
 
-        if ((pginfo->subtitle).stripWhiteSpace().length() != 0)
-        {
-           type = (UITextType *)container->GetType("subtitle");
-           if (type)
-               type->SetText("\"" + pginfo->subtitle + "\"");
-        }  
-        else
-        {
-           type = (UITextType *)container->GetType("subtitle");
-           if (type)
-               type->SetText("");
-    
-        }
-        type = (UITextType *)container->GetType("timedate");
-        if (type)
-            type->SetText(getDateLabel(pginfo));
-        type = (UITextType *)container->GetType("description");
-        if (type)
-            type->SetText(pginfo->description);
-        type = (UITextType *)container->GetType("recordingstatus");
-        if (type)
-            type->SetText(pginfo->RecordingText());
         UIImageType *itype = (UIImageType *)container->GetType("icon");
         if (itype)
         {

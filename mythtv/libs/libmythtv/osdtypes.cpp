@@ -246,7 +246,7 @@ void OSDSet::SetTextByRegexp(QMap<QString, QString> &regexpMap)
             {
                 new_text = regexpMap[item->Name()];
             }
-            else
+            else if (new_text.contains(QRegExp("%.*%")))
                 for (; riter != regexpMap.end(); riter++)
                 {
                    full_regex = "%" + riter.key().upper() + 

@@ -227,6 +227,7 @@
       <textarea name="subtitle" draworder="6">
         <area>4,62,376,30</area>
         <font>info</font>
+        <value>%SUBTITLE|"|"%</value>
       </textarea>
       <textarea name="description" draworder="6">
         <area>4,96,690,60</area>

@@ -446,6 +446,7 @@ void ProgLister::updateInfo(QPainter *p)
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
     RecordingType rectype; 
+    QMap<QString, QString> regexpMap;
 
     if (dataCount > 0)
     {  
@@ -456,31 +457,18 @@ void ProgLister::updateInfo(QPainter *p)
         totalrecpriority = progrecpriority + rectyperecpriority + 
                            chanrecpriority;
         LayerSet *container;
-	ProgramInfo *pi = progList.at(curProg);
+        ProgramInfo *pi = progList.at(curProg);
+
+        QSqlDatabase *m_db = QSqlDatabase::database();
+
+        pi->ToMap(m_db, regexpMap);
 
         container = theme->GetSet("program_info");
         if (container)
         {
-            UITextType *type = (UITextType *)container->GetType("title");
-            if (type)
-                type->SetText(title);
- 
-            type = (UITextType *)container->GetType("subtitle");
-            if (type)
-                type->SetText(pi->subtitle);
+            container->ClearAllText();
+            container->SetTextByRegexp(regexpMap);
 
-            type = (UITextType *)container->GetType("type");
-            if (type)
-                type->SetText(pi->RecordingText());
-
-            type = (UITextType *)container->GetType("description");
-            if (type) {
-                type->SetText(pi->description);
-            }
-        }
-       
-        if (container)
-        {
             container->Draw(&tmp, 4, 0);
             container->Draw(&tmp, 5, 0);
             container->Draw(&tmp, 6, 0);
