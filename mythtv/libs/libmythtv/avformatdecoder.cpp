@@ -15,6 +15,9 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent)
     pkt = NULL;
     lastapts = lastvpts = 0;
     framesPlayed = 0;
+
+    audio_sample_size = 4;
+    audio_sampling_rate = 48000;
 }
 
 AvFormatDecoder::~AvFormatDecoder()
@@ -32,7 +35,7 @@ void AvFormatDecoder::Reset(void)
     lastvpts = 0;
 
     AVPacketList *pktl = NULL;
-    while (pktl = ic->packet_buffer)
+    while ((pktl = ic->packet_buffer))
     {
         *pkt = pktl->pkt;
         ic->packet_buffer = pktl->next;
@@ -241,6 +244,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             {
                 m_parent->SetEffDsp(enc->sample_rate * 100);
                 m_parent->SetAudioParams(16, enc->channels, enc->sample_rate);
+                audio_sample_size = enc->channels * 2;
+                audio_sampling_rate = enc->sample_rate;
                 break;
             }
             default:
@@ -366,8 +371,9 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     }
                     else
                     {
-                        lastapts += data_size * 90 / audio_sample_size / 
-                                    audio_sampling_rate;
+                        lastapts += (long long)((double)((data_size * 90.0) / 
+                                    audio_sample_size / audio_sampling_rate)
+                                    * 1000);
                     }
                     m_parent->AddAudioData((char *)samples, data_size, 
                                            lastapts / 90);
