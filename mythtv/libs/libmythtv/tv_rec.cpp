@@ -1868,7 +1868,7 @@ void TVRec::DoReadThread(void)
         pthread_mutex_lock(&readthreadLock);
 
         int ret = rbuffer->Read(buffer, readrequest);
-        if (!rbuffer->GetStopReads())
+        if (!rbuffer->GetStopReads() && ret > 0)
             WriteBlock(readthreadSock, buffer, ret);
 
         readrequest -= ret;

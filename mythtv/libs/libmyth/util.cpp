@@ -128,7 +128,7 @@ void WriteBlock(QSocket *socket, void *data, int len)
     }
 
     qApp->lock();
-    while (socket->bytesToWrite() > 0)
+    if (socket->bytesToWrite() > 0)
         socket->flush();
     qApp->unlock();
 }
