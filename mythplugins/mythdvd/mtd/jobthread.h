@@ -171,7 +171,7 @@ class DVDTranscodeThread : public DVDThread
     bool transcodeSlotUsed(){return used_transcode_slot;}
     
     bool    makeWorkingDirectory();
-    bool    buildTranscodeCommandLine();
+    bool    buildTranscodeCommandLine(int which_run);
     bool    runTranscode(int run);
     void    cleanUp();
     void    wipeClean();

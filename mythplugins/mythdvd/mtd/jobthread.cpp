@@ -653,7 +653,7 @@ void DVDTranscodeThread::run()
 
     if(keepGoing())
     {
-        if(!buildTranscodeCommandLine())
+        if(!buildTranscodeCommandLine(1))
         {
             cleanUp();
             return;
@@ -777,7 +777,7 @@ bool DVDTranscodeThread::makeWorkingDirectory()
     return true;
 }
 
-bool DVDTranscodeThread::buildTranscodeCommandLine()
+bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
 {
     //
     //  If our destination file already exists, bail out
@@ -986,7 +986,11 @@ bool DVDTranscodeThread::buildTranscodeCommandLine()
     }
     
     tc_arguments.append("-y");
-    tc_arguments.append(codec);
+    // in two pass, the audio from first pass is garbage
+    if (two_pass && which_run == 1)
+        tc_arguments.append(QString("%1,null").arg(codec));
+    else
+        tc_arguments.append(codec);
 
     if(codec_param.length() > 0)
     {
@@ -1027,7 +1031,11 @@ bool DVDTranscodeThread::buildTranscodeCommandLine()
     }
 
     tc_arguments.append("-o");
-    tc_arguments.append(QString("%1.avi").arg(destination_file_string));
+    // in two pass, the video from the first run is garbage
+    if (two_pass && which_run == 1)
+        tc_arguments.append(QString("/dev/null"));
+    else
+        tc_arguments.append(QString("%1.avi").arg(destination_file_string));
 
     tc_arguments.append("--print_status");
     tc_arguments.append("20");
@@ -1038,7 +1046,7 @@ bool DVDTranscodeThread::buildTranscodeCommandLine()
     if(two_pass)
     {
         tc_arguments.append("-R");
-        tc_arguments.append("1,twopass.log");
+        tc_arguments.append(QString("%1,twopass.log").arg(which_run));
     }    
     
 
@@ -1076,18 +1084,12 @@ bool DVDTranscodeThread::runTranscode(int which_run)
             delete tc_process;
             tc_process = NULL;
         }
-        
-        QString first_pass_string = tc_arguments.last();
-        if(first_pass_string != "1,twopass.log")
+
+        if (!buildTranscodeCommandLine(which_run))        
         {
-            problem("Tried to setup seconds pass, but somehow first pass wasn't done properly");
+            problem( "Problem building second pass command line." );
             return false;
         }
-        tc_arguments.remove(tc_arguments.last());
-        tc_arguments.append("2,twopass.log");
-        tc_process = new QProcess(tc_arguments);
-        tc_process->setWorkingDirectory(*working_directory);
-        
     }
 
     //  Debugging
