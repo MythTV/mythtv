@@ -2812,6 +2812,8 @@ void SIParser::EITFixUp(Event& event)
                    break;
         case 3:    EITFixUpStyle3(event);
                    break;
+        case 4:    EITFixUpStyle4(event);
+                   break;
         default:
                    break; 
     }
@@ -2937,3 +2939,70 @@ void SIParser::EITFixUpStyle3(Event& event)
     }
 }
 
+void SIParser::EITFixUpStyle4(Event& event)
+{
+    // Used for swedish dvb cable provider ComHem
+
+    // the format of the subtitle is:
+    // country. category. year.
+    // the year is optional and if the subtitle is empty the same information is
+    // in the Description instead.
+    if (event.Event_Subtitle.length() == 0 && event.Description.length() > 0)
+    {
+        event.Event_Subtitle = event.Description;
+        event.Description = "";
+    }
+
+    // try to find country category and year
+    QRegExp rx("^(.+)\\.\\s(.+)\\.\\s(?:([0-9]{2,4})\\.\\s*)?");
+    int pos = rx.search(event.Event_Subtitle);
+    if (pos != -1)
+    {
+        QStringList list = rx.capturedTexts();
+
+        // sometimes the category is empty, in that case use the category from
+        // the one from subtitle. this category is in swedish and all others 
+        // are in english
+        if (event.ContentDescription.length() == 0)
+        {
+            event.ContentDescription = list[2].stripWhiteSpace();
+        }
+
+        if (list[3].length() > 0)
+        {
+            event.Year = list[3].stripWhiteSpace();
+        }
+
+        // not 100% sure about this one.
+        event.Event_Subtitle="";
+    }
+
+    if (event.Description.length() > 0)
+    {
+        // everything up to the first 3 spaces is duplicated from title and
+        // subtitle so remove it
+        int pos = event.Description.find("   ");
+        if (pos != -1)
+        {
+            event.Description = event.Description.mid(pos + 3).stripWhiteSpace();
+            //fprintf(stdout,"SIParser::EITFixUpStyle4: New: %s\n",event.Description.mid(pos+3).stripWhiteSpace().ascii());
+        }
+
+        // in the description at this point everything up to the first 4 spaces
+        // in a row is a list of director(s) and actors.
+        // different lists are separated by 3 spaces in a row
+        // end of all lists is when there is 4 spaces in a row
+
+        /*
+        a regexp like this coud be used to get the episode number, shoud be at
+        the begining of the description
+        "^(?:[dD]el|[eE]pisode)\\s([0-9]+)(?:(?:\\s|/)av\\s([0-9]+))?\\."
+        */
+
+        /*
+        we coud also tell if this show is a rerun and when it was last shown
+        by looking for "Repris från day/month."
+        and future showings by looking for "Även day/month."
+        */
+    }
+}

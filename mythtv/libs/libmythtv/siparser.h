@@ -280,6 +280,8 @@ private:
     void EITFixUpStyle1(Event& event);
     void EITFixUpStyle2(Event& event);
     void EITFixUpStyle3(Event& event);
+    void EITFixUpStyle4(Event& event);
+
 
     //DVB category descriptions
     typedef struct 
