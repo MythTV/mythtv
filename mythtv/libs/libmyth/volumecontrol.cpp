@@ -1,7 +1,7 @@
 #include "volumecontrol.h"
 
 #ifndef _WIN32
-#include <linux/soundcard.h>
+#include <sys/soundcard.h>
 #endif
 
 #include <sys/ioctl.h>
