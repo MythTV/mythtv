@@ -247,7 +247,7 @@ void MythMainWindow::detach(QWidget *child)
 {
     if (d->widgetList.back() != child)
     {
-        cerr << "Not removing top most widget, error\n";
+        cerr << "Not removing top-most widget\n";
         return;
     }
 

@@ -18,11 +18,11 @@
     <name>CaptureCardEditor</name>
     <message>
         <source>Capture cards</source>
-        <translation>Capture Karten</translation>
+        <translation>TV-Karten</translation>
     </message>
     <message>
         <source>Capture Card Menu</source>
-        <translation>Capture Karte Menü</translation>
+        <translation>TV-Kartenmenü</translation>
     </message>
     <message>
         <source>Edit..</source>
@@ -34,7 +34,7 @@
     </message>
     <message>
         <source>Are you sure you want to delete this capture card?</source>
-        <translation>Soll diese Capture Karte wirklich gelöscht werden?</translation>
+        <translation>Soll diese TV-Karte wirklich gelöscht werden?</translation>
     </message>
     <message>
         <source>Yes, delete capture card</source>
@@ -91,7 +91,7 @@
     <name>DataDirectLineupSelector</name>
     <message>
         <source>Fetching lineups from DataDirect service...</source>
-        <translation type="unfinished"></translation>
+        <translation>Hole Aufstellung von DataDirect...</translation>
     </message>
 </context>
 <context>
@@ -134,7 +134,7 @@
     </message>
     <message>
         <source>Don&apos;t record this showing</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese Ausstrahlung nicht aufnehmen</translation>
     </message>
     <message>
         <source>Record this showing with override options</source>
@@ -142,7 +142,7 @@
     </message>
     <message>
         <source>Record this showing with normal options</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese Ausstrahlung mit normalen Optionen aufnehmen</translation>
     </message>
 </context>
 <context>
@@ -456,11 +456,11 @@
     </message>
     <message>
         <source>Stop Transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Umwandlung stoppen</translation>
     </message>
     <message>
         <source>Begin Transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Umwandlung starten</translation>
     </message>
 </context>
 <context>
@@ -511,11 +511,11 @@
     </message>
     <message>
         <source>Recording this showing with override options</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Manually not recording this showing</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -625,11 +625,11 @@
     </message>
     <message>
         <source>Recording this showing with override options</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Manually not recording this showing</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -856,11 +856,11 @@
     </message>
     <message>
         <source>Extra audio buffering</source>
-        <translation>Großer Audiopuffer</translation>
+        <translation>Großer Audiodatenpuffer</translation>
     </message>
     <message>
         <source>This attempts to keep extra audio data in the internal buffers.  Try setting this if you&apos;re getting crackly audio. (Not used for software encoded video.)</source>
-        <translation>Versucht mehr Audiodaten im internen Puffer zu halten. Testen Sie diese Einstellung bei Audioproblemen. (wird nicht bei Software kodiertem Video verwendet)</translation>
+        <translation>Versucht mehr Audiodaten im internen Datenpuffer zu halten. Testen Sie diese Einstellung bei Audioproblemen. (wird nicht bei Software kodiertem Video verwendet)</translation>
     </message>
     <message>
         <source>Jump amount (in minutes)</source>
@@ -1020,7 +1020,7 @@
     </message>
     <message>
         <source>Reposition after fast forward/rewind</source>
-        <translation type="unfinished"></translation>
+        <translation>Neu positionieren nach Sprung</translation>
     </message>
     <message>
         <source>Number of seconds for OSD information</source>
@@ -1040,7 +1040,7 @@
     </message>
     <message>
         <source>Closed Caption font</source>
-        <translation>Teletext Zeichensatz</translation>
+        <translation>Untertitel Zeichensatz</translation>
     </message>
     <message>
         <source>Channel ordering</source>
@@ -1124,11 +1124,11 @@
     </message>
     <message>
         <source>Aggressive Soundcard Buffering</source>
-        <translation>Aggressiver Audiopuffer</translation>
+        <translation>Aggressiver Audiodatenpuffer</translation>
     </message>
     <message>
         <source>If this is set, MythTV will pretend to have a smaller soundcard buffer than is really present.  This may speed up seeking, but can also cause playback problems.</source>
-        <translation>Falls gesetzt, wird MythTV annehmen, einen kleineren Audiopuffer zu haben. Dies kann das Positionieren beschleunigen, aber auch Probleme bei der Wiedergabe verursachen.</translation>
+        <translation>Falls gesetzt, wird MythTV annehmen, einen kleineren Audiodatenpuffer zu haben. Dies kann das Positionieren beschleunigen, aber auch Probleme bei der Wiedergabe verursachen.</translation>
     </message>
     <message>
         <source>Clear Saved Position on playback</source>
@@ -1741,7 +1741,8 @@
     <message>
         <source>Advanced Filter configuration, format:
 [[&lt;filter&gt;=&lt;options&gt;,]...]</source>
-        <translation>Erweiterte Filterkonfiguration. Format: [[&lt;filter&gt;=&lt;Optionen&gt;,]...]</translation>
+        <translation>Erweiterte Filterkonfiguration. Diese werden global für alle Sender verwendet.
+Format: [[&lt;filter&gt;=&lt;Optionen&gt;,]...]</translation>
     </message>
     <message>
         <source>Font size</source>
@@ -2005,7 +2006,7 @@
     </message>
     <message>
         <source>If this is set, captions will be on by default when playing back recordings or watching live TV.  Closed Captioning can be turned on or off by pressing &apos;T&apos; during playback.</source>
-        <translation>Falls gesetzt, werden Untertitel beim Fernsehen sowie bei der Wiedergabe von Aufnahmen eingeblendet. Mit der Taste T können Untertitel während der Wiedergabe ein- und ausgeblendet werden.</translation>
+        <translation>Falls gesetzt, werden Untertitel (engl. closed caption, CC) beim Fernsehen sowie bei der Wiedergabe von Aufnahmen eingeblendet. Mit der Taste T können Untertitel während der Wiedergabe ein- und ausgeblendet werden.</translation>
     </message>
     <message>
         <source>No Prompt on Exit</source>
@@ -2053,7 +2054,7 @@
     </message>
     <message>
         <source>This enables support for monitoring your CD/DVD drives for new disks and launching the proper plugin to handle them.</source>
-        <translation>Dies aktiviert die Unterstützung zur Überwachung Ihrer CD/DVD Laufwerke für neue Medien und den Start passender Plugins für deren Handhabung.</translation>
+        <translation>Aktiviert die Unterstützung zur Überwachung Ihrer CD/DVD Laufwerke für neue Medien und den Start passender Plugins für deren Handhabung.</translation>
     </message>
     <message>
         <source>Use HW XVMC MPEG Decoding</source>
@@ -2233,7 +2234,7 @@
     </message>
     <message>
         <source>Sort Mode</source>
-        <translation>Sortierreihenfolge</translation>
+        <translation>Sortierung</translation>
     </message>
     <message>
         <source>Hide channels without channel number.</source>
@@ -2467,11 +2468,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Teletext</source>
-        <translation type="unfinished"></translation>
+        <translation>Teletext</translation>
     </message>
     <message>
         <source>Subtitle</source>
-        <translation type="unfinished"></translation>
+        <translation>Untertitel</translation>
     </message>
     <message>
         <source>Pcr</source>
@@ -2527,7 +2528,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Failed to retrieve provider list</source>
-        <translation type="unfinished"></translation>
+        <translation>Konnte keine Anbieterliste finden</translation>
     </message>
     <message>
         <source>You probably need to update XMLTV.</source>
@@ -2538,18 +2539,18 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
 You may wish to check the output as it
 runs by switching to the terminal from which you started
 this program.</source>
-        <translation>Bitte warten während MythTV eine Liste der verfügbaren Sender einliest.
-Bitte beobachten Sie die Meldungen, die Sie im Terminal vorfinden
-in dem Sie dieses Programm gestartet haben.</translation>
+        <translation>Bitte warten Sie während MythTV eine Liste der verfügbaren Sender einliest.
+Weitere Meldungen finden Sie im Terminal-Fenster von dem aus Sie das Programm gestartet haben.</translation>
     </message>
     <message>
         <source>Failed to retrieve channel information.</source>
-        <translation>Konnte keine Senderinformationen einlesen.</translation>
+        <translation>Konnte keine Senderinformationen finden.</translation>
     </message>
     <message>
         <source>MythTV was unable to retrieve channel information for your provider.
 Please check the terminal window for more information</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV konnte keine Senderinformationen für Ihren Anbieter finden.
+Bitte sehen Sie im Terminal-Fenster für weitere Informationen nach</translation>
     </message>
     <message>
         <source>Please wait while MythTV retrieves the list of available channels
@@ -2587,7 +2588,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Change the cardtype to the appropriate type for the capture card you are configuring.</source>
-        <translation>Ändern Sie den Kartentyp entsprechend Ihrer Capture Karte die Sie einrichten.</translation>
+        <translation>Ändern Sie den Kartentyp entsprechend Ihrer TV-Karte die Sie einrichten.</translation>
     </message>
     <message>
         <source>Standard V4L capture card</source>
@@ -2595,7 +2596,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>MJPEG capture card (Matrox G200, DC10)</source>
-        <translation>MJPEG Capture Karte (Matrox G200, DC10)</translation>
+        <translation>MJPEG Enkoderkarte (Matrox G200, DC10)</translation>
     </message>
     <message>
         <source>MPEG-2 Encoder card (PVR-250, PVR-350)</source>
@@ -2603,7 +2604,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>pcHDTV ATSC capture card</source>
-        <translation>pcHDTV ATSC Capture Karte</translation>
+        <translation>pcHDTV ATSC Fernsehkarte</translation>
     </message>
     <message>
         <source>Digital Video Broadcast card (DVB)</source>
@@ -2611,7 +2612,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>(New capture card)</source>
-        <translation>(Neue Capture Karte)</translation>
+        <translation>(Neue TV-Karte)</translation>
     </message>
     <message>
         <source>(New video source)</source>
@@ -2687,7 +2688,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>ZIP/postal code</source>
-        <translation type="unfinished"></translation>
+        <translation>PLZ</translation>
     </message>
     <message>
         <source>Region</source>
@@ -2695,7 +2696,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Provider</source>
-        <translation type="unfinished"></translation>
+        <translation>Anbieter</translation>
     </message>
     <message>
         <source>Channel frequency table</source>
@@ -2703,7 +2704,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Use default unless this source uses a different frequency table than the system wide table defined in the General settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ändern Sie diese Einstellung nur, falls diese Quelle eine von der Grundeinstellung abweichende Frequenztabelle verwendet.</translation>
     </message>
     <message>
         <source>tv_grab_uk configuration</source>
@@ -2711,39 +2712,39 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Configuration will run in the terminal window</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Konfiguration läuft in einem Terminalfenster</translation>
     </message>
     <message>
         <source>Video source setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Videoquelle einrichten</translation>
     </message>
     <message>
         <source>Video source name</source>
-        <translation type="unfinished"></translation>
+        <translation>Name</translation>
     </message>
     <message>
         <source>Video device</source>
-        <translation type="unfinished"></translation>
+        <translation>Videogerät</translation>
     </message>
     <message>
         <source>VBI device</source>
-        <translation type="unfinished"></translation>
+        <translation>VBI Gerät</translation>
     </message>
     <message>
         <source>Audio device</source>
-        <translation type="unfinished"></translation>
+        <translation>Audiogerät</translation>
     </message>
     <message>
         <source>(None)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Nichts)</translation>
     </message>
     <message>
         <source>Audio sampling rate limit</source>
-        <translation type="unfinished"></translation>
+        <translation>max. Audioabtastrate</translation>
     </message>
     <message>
         <source>Default input</source>
-        <translation type="unfinished"></translation>
+        <translation>Standardeingang</translation>
     </message>
     <message>
         <source>DVB Card Number</source>
@@ -2879,11 +2880,11 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Eingang</translation>
     </message>
     <message>
         <source>External channel change command</source>
-        <translation type="unfinished"></translation>
+        <translation>Externes Programm zum Sender umschalten</translation>
     </message>
     <message>
         <source>Preset tuner to channel</source>
@@ -2907,59 +2908,59 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Input connections</source>
-        <translation type="unfinished"></translation>
+        <translation>Eingangsverknüpfungen</translation>
     </message>
     <message>
         <source>IP address for</source>
-        <translation type="unfinished"></translation>
+        <translation>IP Adresse für</translation>
     </message>
     <message>
         <source>Enter the IP address of this machine.  Use an externally accessible address (ie, not 127.0.0.1) if you are going to be running a frontend on a different machine than this one.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die IP Adresse dieses Rechners. Geben Sie seine öffentliche Adresse (also nicht 127.0.0.1) an, falls Sie ein Frontend auf einem zweiten Rechner nutzen wollen.</translation>
     </message>
     <message>
         <source>Port the server runs on</source>
-        <translation type="unfinished"></translation>
+        <translation>Server Port</translation>
     </message>
     <message>
         <source>Unless you&apos;ve got good reason to, don&apos;t change this.</source>
-        <translation type="unfinished"></translation>
+        <translation>Verändern Sie diese Einstellung bitte nicht ohne einen gewichtigen Grund.</translation>
     </message>
     <message>
         <source>Port the server shows status on</source>
-        <translation type="unfinished"></translation>
+        <translation>Statusport des Servers</translation>
     </message>
     <message>
         <source>Port which the server will listen to for HTTP requests.  Currently, it shows a little status information.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Port auf dem der Server auf HTTP Verbindungen wartet. Darüber sind einige Informationen über den aktuellen Zustand des Servers verfügbar.</translation>
     </message>
     <message>
         <source>Master Server IP address</source>
-        <translation type="unfinished"></translation>
+        <translation>Master Server IP Adresse</translation>
     </message>
     <message>
         <source>The IP address of the master backend server. All frontend and non-master backend machines will connect to this server.  If you only have one backend, this should be the same IP address as above.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die IP Adresse des Master Backend Servers. Alle Frontends und Nicht-Master Backends verbinden zu diesem Server. Geben Sie hier die gleiche IP Adresse wie zuvor an, falls Sie nur ein Backend verwenden.</translation>
     </message>
     <message>
         <source>Port the master server runs on</source>
-        <translation type="unfinished"></translation>
+        <translation>Master Server Port</translation>
     </message>
     <message>
         <source>Directory to hold recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Verzeichnis für Aufnahmen</translation>
     </message>
     <message>
         <source>All recordings get stored in this directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Aufnahmen werden in diesem Verzeichnis abgespeichert.</translation>
     </message>
     <message>
         <source>Directory to hold the Live-TV buffers</source>
-        <translation type="unfinished"></translation>
+        <translation>Verzeichnis für die TV Datenpuffer</translation>
     </message>
     <message>
         <source>All Live-TV buffers will get stored in this directory. These buffers are used to allow you to pause, fast forward and rewind through live TV.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die TV Datenpuffer werden in diesem Verzeichnis angelegt. Diese ermöglichen Ihnen, während des Fernsehens zu pausieren oder zum Anfang einer Sendung zurück zu springen.</translation>
     </message>
     <message>
         <source>TV format</source>
@@ -2967,7 +2968,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>The TV standard to use for viewing TV.</source>
-        <translation>Die Fernsehnorm in Ihrer Umgebung.</translation>
+        <translation>Die Fernsehnorm an Ihrem Standort.</translation>
     </message>
     <message>
         <source>VBI format</source>
@@ -2979,19 +2980,19 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Select the appropriate frequency table for your system.  If you have an antenna, use a &quot;-bcast&quot; frequency.</source>
-        <translation>Wählen Sie die entsprechende Frequenztabelle für Ihr System. Wenn Sie eine Antenne nutzen, wählen Sie eine &apos;-bcast&apos; Option.</translation>
+        <translation>Wählen Sie die entsprechende Frequenztabelle für Ihren Standort. Wenn Sie eine Antenne nutzen, wählen Sie eine &apos;-bcast&apos; Option.</translation>
     </message>
     <message>
         <source>Live TV buffer (GB)</source>
-        <translation type="unfinished"></translation>
+        <translation>Live TV Puffer (GB)</translation>
     </message>
     <message>
         <source>How large the live TV buffer is allowed to grow.</source>
-        <translation>Die maximale Größe des TV Buffers.</translation>
+        <translation>Die maximale Größe des TV Datenpuffers.</translation>
     </message>
     <message>
         <source>Minimum free Live TV buffer (MB)</source>
-        <translation>Minimal freier Live TV Buffer (MB)</translation>
+        <translation>Minimal freier Live TV Datenpuffer (MB)</translation>
     </message>
     <message>
         <source>How full the live TV buffer is allowed to grow before forcing an unpause.</source>
@@ -3095,27 +3096,27 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Host Address Backend Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Server, IP Adressen, Backend Einstellungen</translation>
     </message>
     <message>
         <source>Host-specific Backend Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Rechnerspezifische Backend Einstellungen</translation>
     </message>
     <message>
         <source>Global Backend Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Globale Backend Einstellungen</translation>
     </message>
     <message>
         <source>Shutdown/Wakeup Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Abschalten/Aufwecken</translation>
     </message>
     <message>
         <source>WakeOnLan settings</source>
-        <translation type="unfinished"></translation>
+        <translation>WakeOnLan</translation>
     </message>
     <message>
         <source>MasterBackend</source>
-        <translation type="unfinished"></translation>
+        <translation>MasterBackend</translation>
     </message>
     <message>
         <source>Start Early (minutes)</source>
@@ -3135,7 +3136,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>If set, MythTV will warn you whenever you change the channel but are not caught up to live TV.</source>
-        <translation>Falls gesetzt, wird MythTV Sie vor dem Senderwechsel auf den Verlust des Live TV Buffers hinweisen.</translation>
+        <translation>Falls gesetzt, wird MythTV Sie vor dem Senderwechsel auf den Verlust des Live TV Datenpuffers hinweisen.</translation>
     </message>
     <message>
         <source>F</source>
@@ -3147,7 +3148,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Record one showing of this program</source>
-        <translation type="unfinished">Diese Ausstrahlung aufnehmen</translation>
+        <translation>Diese Ausstrahlung aufnehmen</translation>
     </message>
     <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
@@ -3179,7 +3180,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>DVB Global Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>DVB Globale Einstellungen</translation>
     </message>
     <message>
         <source>Pre Shutdown check-command</source>
@@ -3195,19 +3196,19 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>(All)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Alle)</translation>
     </message>
     <message>
         <source>If set automatic commercial flagging will be skipped for this channel.  Useful for premium channels like HBO.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, werden Aufnahmen von diesem Sender nicht auf Werbung untersucht. Nützlich z.B. bei Premiere oder  Öffentlich-Rechtlichen Sendern.</translation>
     </message>
     <message>
         <source>Position Saved</source>
-        <translation type="unfinished"></translation>
+        <translation>Position gespeichert</translation>
     </message>
     <message>
         <source>Position Cleared</source>
-        <translation type="unfinished"></translation>
+        <translation>Position gelöscht</translation>
     </message>
     <message>
         <source>Duplicate Location</source>
@@ -3235,7 +3236,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Inhalt</translation>
     </message>
     <message>
         <source>Max episodes</source>
@@ -3247,7 +3248,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Recording Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnahmegruppe</translation>
     </message>
     <message>
         <source>Open DVB card on demand</source>
@@ -3437,11 +3438,11 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Visible</source>
-        <translation type="unfinished"></translation>
+        <translation>Sichtbar</translation>
     </message>
     <message>
         <source>If set, the channel will be visible in the EPG.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, wird dieser Sender im EPG angezeigt.</translation>
     </message>
     <message>
         <source>DB Logging Enabled</source>
@@ -3545,7 +3546,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>This enables the automatic execution of mythfilldatabase.</source>
-        <translation>Dies aktiviert die automatische Ausführung von mythfilldatabase.</translation>
+        <translation>Aktiviert die automatische Ausführung von mythfilldatabase.</translation>
     </message>
     <message>
         <source>mythfilldatabase Run Frequency (Days)</source>
@@ -3569,59 +3570,59 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>mythfilldatabase Path</source>
-        <translation type="unfinished"></translation>
+        <translation>mythfilldatabase Pfad</translation>
     </message>
     <message>
         <source>Path (including executable) of the mythfilldatabase program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pfad (einschließlich Programmname) des mythfilldatabase Programms.</translation>
     </message>
     <message>
         <source>mythfilldatabase Arguments</source>
-        <translation type="unfinished"></translation>
+        <translation>mythfilldatabase Argumente</translation>
     </message>
     <message>
         <source>Any arguments you want passed to the mythfilldatabase program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Optionen die an mythfilldatabase übergeben werden sollen.</translation>
     </message>
     <message>
         <source>mythfilldatabase Log Path</source>
-        <translation type="unfinished"></translation>
+        <translation>mythfilldatabase Log Pfad</translation>
     </message>
     <message>
         <source>Myth Database Logging</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth Datenbankprotokollierung</translation>
     </message>
     <message>
         <source>Mythfilldatabase</source>
-        <translation type="unfinished"></translation>
+        <translation>Mythfilldatabase</translation>
     </message>
     <message>
         <source>TXT off</source>
-        <translation type="unfinished"></translation>
+        <translation>TXT aus</translation>
     </message>
     <message>
         <source>CC off</source>
-        <translation type="unfinished"></translation>
+        <translation>CC aus</translation>
     </message>
     <message>
         <source>TXT on</source>
-        <translation type="unfinished"></translation>
+        <translation>TXT ein</translation>
     </message>
     <message>
         <source>CC</source>
-        <translation type="unfinished"></translation>
+        <translation>CC</translation>
     </message>
     <message>
         <source>TXT</source>
-        <translation type="unfinished"></translation>
+        <translation>TXT</translation>
     </message>
     <message>
         <source>CC/TXT disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>CC/TXT deaktiviert</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished">Minuten</translation>
+        <translation>Minuten</translation>
     </message>
     <message>
         <source>MythTV wants to record &quot;%1&quot; on %2 in %3 seconds. Do you want to:</source>
@@ -3629,7 +3630,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Recording volume of the capture card</source>
-        <translation>Aufnahmelautstärke der Capturekarte</translation>
+        <translation>Aufnahmelautstärke der TV-Karte</translation>
     </message>
     <message>
         <source>Enable interlaced DCT encoding</source>
@@ -3649,83 +3650,83 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Keypress Application</source>
-        <translation>Lirc Skript</translation>
+        <translation>LIRC Skript</translation>
     </message>
     <message>
         <source>LCD Displays Time</source>
-        <translation type="unfinished"></translation>
+        <translation>LCD - Zeitanzeige</translation>
     </message>
     <message>
         <source>Display current time on idle LCD display. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeigt die aktuelle Uhrzeit in der LCD Anzeige an. mythfrontend muß nach einer Änderung dieser Einstellung neu gestartet werden.</translation>
     </message>
     <message>
         <source>LCD Displays Menus</source>
-        <translation type="unfinished"></translation>
+        <translation>LCD - Menüanzeige</translation>
     </message>
     <message>
         <source>Display selected menu on LCD display. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeigt das gewählte Menü auf der LCD Anzeige an. mythfrontend muß nach einer Änderung dieser Einstellung neu gestartet werden.</translation>
     </message>
     <message>
         <source>LCD Displays Music Artist and Title</source>
-        <translation type="unfinished"></translation>
+        <translation>LCD - Künstler/Titel</translation>
     </message>
     <message>
         <source>Display playing artist and song title in MythMusic. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeigt den aktuellen Künstler und Liedtitel in MythMusic an. mythfrontend muß nach einer Änderung dieser Einstellung neu gestartet werden.</translation>
     </message>
     <message>
         <source>LCD Displays Channel Information</source>
-        <translation type="unfinished"></translation>
+        <translation>LCD - Senderinformationen</translation>
     </message>
     <message>
         <source>Display tuned channel information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeigt Informationen zum aktuellen Sender an. mythfrontend muß nach einer Änderung dieser Einstellung neu gestartet werden.</translation>
     </message>
     <message>
         <source>LCD Displays Volume Information</source>
-        <translation type="unfinished"></translation>
+        <translation>LCD - Lautstärke</translation>
     </message>
     <message>
         <source>Display volume level information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeigt die momentane Lautstärke an. mythfrontend muß nach einer Änderung dieser Einstellung neu gestartet werden.</translation>
     </message>
     <message>
         <source>LCD Displays Generic Information</source>
-        <translation type="unfinished"></translation>
+        <translation>LCD - Allgemeines</translation>
     </message>
     <message>
         <source>Display generic information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeigt allgemeine Informationen an. mythfrontend muß nach einer Änderung dieser Einstellung neu gestartet werden.</translation>
     </message>
     <message>
         <source>LCD device display</source>
-        <translation type="unfinished"></translation>
+        <translation>LCD Gerät</translation>
     </message>
     <message>
         <source>Default</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard</translation>
     </message>
     <message>
         <source>User ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Benutzer ID</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Passwort</translation>
     </message>
     <message>
         <source>Do not adjust volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Lautstärke nicht anpassen</translation>
     </message>
     <message>
         <source>Capture Card Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>TV-Karte einrichten</translation>
     </message>
     <message>
         <source>If specified, this command will be run to change the channel for inputs which do not have a tuner. The first argument will be the channel number.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls angegeben wird für Eingänge ohne Tuner dieses Programm gestartet um den Sender umzuschalten. Als erstes Argument wird der Senderplatz übergeben.</translation>
     </message>
     <message>
         <source>Data Direct Lineup</source>
@@ -3737,11 +3738,11 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Show group name instead of &quot;All Programs&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeige Gruppennamen anstatt &quot;Alle Sendungen&quot;.</translation>
     </message>
     <message>
         <source>Use the name of the display group currently being show in place of the term &quot;All Programs&quot; in theplayback screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeigt den Namen der aktuell gewählten Anzeigegruppe statt dem allgemeineren &quot;Alle Sendungen&quot; im Wiedergabemenü.</translation>
     </message>
     <message>
         <source>Start in title section.</source>
@@ -3753,7 +3754,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Show group summary.</source>
-        <translation type="unfinished">Gruppenzusammenfassung zeigen.</translation>
+        <translation>Gruppenzusammenfassung zeigen.</translation>
     </message>
     <message>
         <source>While selecting a group, show a group summary instead of showing info about the first episode in that group.</source>
@@ -3765,7 +3766,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Aspect Override</source>
-        <translation type="unfinished"></translation>
+        <translation>Seitenverhältnis</translation>
     </message>
     <message>
         <source>16/9 Anamorphic</source>
@@ -3785,7 +3786,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>Gibt das Seitenverhältnis für die Wiedergabe unabhängig von der Aufnahme vor. Es bewirkt das gleiche wie die Taste &apos;W&apos; während der Wiedergabe.</translation>
     </message>
     <message>
         <source>GUI width (px)</source>
@@ -3875,15 +3876,15 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Filters to be used when recording from this channel.  Not used with hardware encoding cards.</source>
-        <translation type="unfinished"></translation>
+        <translation>Eine Liste von Filtern die für Aufnahmen auf diesem Sender verwendet werden. Wird bei Tunerkarten mit integriertem Kodierer (Hauppauge PVR250 u.a.) ignoriert.</translation>
     </message>
     <message>
         <source>Playback filters</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiedergabefilter</translation>
     </message>
     <message>
         <source>Filters to be used when recordings from this channel are viewed.  Start with a plus to append to the global playback filters.</source>
-        <translation type="unfinished"></translation>
+        <translation>Eine Liste von Filtern die bei der Wiedergabe von Aufnahmen von diesem Sender verwendet werden. Ein &apos;+&apos; am Anfang fügt sie der Liste der globalen Wiedergabefilter hinzu.</translation>
     </message>
     <message>
         <source>O</source>
@@ -3895,7 +3896,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Don&apos;t Record</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nicht aufnehmen</translation>
     </message>
     <message>
         <source>Reactivate</source>
@@ -3903,11 +3904,11 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Don&apos;t record</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nicht aufnehmen</translation>
     </message>
     <message>
         <source>Never record</source>
-        <translation type="unfinished"></translation>
+        <translation>Niemals aufnehmen</translation>
     </message>
     <message>
         <source>Edit Options</source>
@@ -3923,7 +3924,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Record anyway</source>
-        <translation type="unfinished"></translation>
+        <translation>Dennoch aufnehmen</translation>
     </message>
     <message>
         <source>Record this showing with normal options</source>
@@ -3935,59 +3936,59 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Do not record this showing</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Diese Ausstrahlung nicht aufnehmen</translation>
     </message>
     <message>
         <source>External application or script to run when a keypress is received by LIRC.</source>
-        <translation type="unfinished"></translation>
+        <translation>Externes Programm daß nach dem Empfang eines Tastencodes über LIRC gestartet wird.</translation>
     </message>
     <message>
         <source>This PIN is used to control access to the setup menus. If you want to use this feature, then setting the value to all numbers will make your life much easier.  Set it to blank to disable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dieser PIN Code gewährt Zugang zu den Konfigurationsmenüs. Für eine einfachere Handhabung verwenden Sie für diesen Code bitte nur Ziffern. Freilassen schaltet die PIN Abfrage aus.</translation>
     </message>
     <message>
         <source>Separate video modes for GUI and TV playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Getrennte Bildschirmeinstellungen für GUI und TV Wiedergabe</translation>
     </message>
     <message>
         <source>Switch X Window video modes for TV. Requires &apos;xrandr&apos; support.</source>
-        <translation type="unfinished"></translation>
+        <translation>Schaltet die X Window Bildschirmauflösung für die TV Wiedergabe um. Benötigt die &apos;xrandr&apos; Unterstützung im X Window System.</translation>
     </message>
     <message>
         <source>GUI X size (px)</source>
-        <translation type="unfinished"></translation>
+        <translation>GUI X Größe (px)</translation>
     </message>
     <message>
         <source>Horizontal resolution for GUI video mode. This mode must be already configured in XF86Config.</source>
-        <translation type="unfinished"></translation>
+        <translation>Horizontale Auflösung für die GUI. Dieser Modus muß in der X Server Konfiguration verfügbar sein.</translation>
     </message>
     <message>
         <source>GUI Y size (px)</source>
-        <translation type="unfinished"></translation>
+        <translation>GUI Y Größe (px)</translation>
     </message>
     <message>
         <source>Vertical resolution for GUI video mode. This mode must be already configured in XF86Config.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vertikale Auflösung für die GUI. Dieser Modus muß in der X Server Konfiguration verfügbar sein.</translation>
     </message>
     <message>
         <source>TV X size (px)</source>
-        <translation type="unfinished"></translation>
+        <translation>TV X Größe (px)</translation>
     </message>
     <message>
         <source>Horizontal resolution for playback video mode. This mode must be already configured in XF86Config.</source>
-        <translation type="unfinished"></translation>
+        <translation>Horizontale Auflösung für die TV Wiedergabe. Dieser Modus muß in der X Server Konfiguration verfügbar sein.</translation>
     </message>
     <message>
         <source>TV Y size (px)</source>
-        <translation type="unfinished"></translation>
+        <translation>TV Y Größe (px)</translation>
     </message>
     <message>
         <source>Vertical resolution for playback video mode. This mode must be already configured in XF86Config.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vertikale Auflösung für die TV Wiedergabe. Dieser Modus muß in der X Server Konfiguration verfügbar sein.</translation>
     </message>
     <message>
         <source>Video Mode Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Bildschirmeinstellungen (2)</translation>
     </message>
     <message>
         <source>Override Recordings Priority</source>
@@ -4007,7 +4008,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>DataDirect Status: </source>
-        <translation type="unfinished"></translation>
+        <translation>DataDirect Status:</translation>
     </message>
     <message>
         <source>If enabled, the master backend will stream and delete files if it finds them in the video directory. Useful if you are using a central storage location, like a NFS share, and your slave backend isn&apos;t running.</source>
@@ -4015,11 +4016,11 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Make the video look normal on a progressive display (i.e. monitor).  Deinterlace requires that your CPU supports SSE instructions.  Enabling this without proper CPU support will cause the program to segfault. </source>
-        <translation type="unfinished"></translation>
+        <translation>Bildkorrektur für die Wiedergabe über einen Monitor u.ä. Diese Option nutzt die SSE Funktionen des Prozessors und führt zum Programmabsturz falls diese fehlen sollten. Sehen Sie in der Dokumentation für weitere Informationen nach.</translation>
     </message>
     <message>
         <source>When exiting sticky keys fast forward/rewind mode, reposition before resuming normal playback. This compensates for the reaction time between seeing where to resume playback and actually exiting seeking.</source>
-        <translation type="unfinished"></translation>
+        <translation>Beim Beenden des schnellen Vor-/Rücklaufs im &quot;Klebrige Tasten&quot; Modus wird erst neu positioniert bevor die Wiedergabe einsetzt. Dies gleicht die Verzögerung beim Beenden des schnellen Vor-/Rücklaufs aus.</translation>
     </message>
     <message>
         <source>If set, pressing the sticky rewind key in fast forward mode switches to rewind mode, and vice versa. If not set, it will decrease the current speed or switch to play mode if the speed can&apos;t be decreased further.</source>
@@ -4043,11 +4044,11 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>General (page 2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Allgemeines (2)</translation>
     </message>
     <message>
         <source>If your local timezone does not match the timezone returned by XMLTV, use this setting to have mythfilldatabase adjust the program start and end times.None disables this feature, Auto automatically detects your local timezone</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls Ihre lokale Zeitzone nicht mit der von XMLTV benutzten übereinstimmt, können Sie damit mythfilldatabase anweisen die Sendezeiten anzupassen. Bei &apos;Auto&apos; wird die lokale Zeitzone automatisch bestimmt. &apos;None&apos; schaltet diese Option ab</translation>
     </message>
     <message>
         <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for frontend</source>
@@ -4305,7 +4306,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Change the channel anyway</source>
-        <translation>Trotzdem umschalten</translation>
+        <translation>Dennoch umschalten</translation>
     </message>
     <message>
         <source>Zoom Mode OFF</source>
@@ -4373,15 +4374,15 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Toggle CC</source>
-        <translation type="unfinished"></translation>
+        <translation>Untertitel ein/aus</translation>
     </message>
     <message>
         <source>Toggle Teletext</source>
-        <translation type="unfinished"></translation>
+        <translation>Teletext ein/aus</translation>
     </message>
     <message>
         <source>Closed Captioning</source>
-        <translation type="unfinished"></translation>
+        <translation>Untertitel</translation>
     </message>
     <message>
         <source>Commercial Auto-Skip</source>
@@ -4409,19 +4410,19 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>CC</source>
-        <translation type="unfinished"></translation>
+        <translation>CC</translation>
     </message>
     <message>
         <source>TXT</source>
-        <translation type="unfinished"></translation>
+        <translation>TXT</translation>
     </message>
     <message>
         <source>Stop Transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Umwandlung stoppen</translation>
     </message>
     <message>
         <source>Begin Transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Umwandlung starten</translation>
     </message>
 </context>
 <context>

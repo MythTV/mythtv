@@ -91,7 +91,7 @@
     <name>DataDirectLineupSelector</name>
     <message>
         <source>Fetching lineups from DataDirect service...</source>
-        <translation type="unfinished"></translation>
+        <translation>DataDirectサービスからラインナップを取得中...</translation>
     </message>
 </context>
 <context>
@@ -134,15 +134,15 @@
     </message>
     <message>
         <source>Don&apos;t record this showing</source>
-        <translation type="unfinished"></translation>
+        <translation>この番組を録画しない</translation>
     </message>
     <message>
         <source>Record this showing with override options</source>
-        <translation type="unfinished"></translation>
+        <translation>個別設定オプションでこの番組を録画します</translation>
     </message>
     <message>
         <source>Record this showing with normal options</source>
-        <translation type="unfinished"></translation>
+        <translation>ノーマルオプションでこの番組を録画します</translation>
     </message>
 </context>
 <context>
@@ -444,23 +444,23 @@
     </message>
     <message>
         <source>There are %1 recordings in this display group</source>
-        <translation type="unfinished"></translation>
+        <translation>このグループには%1個の録画が有ります</translation>
     </message>
     <message>
         <source>There is one recording in this display group</source>
-        <translation type="unfinished"></translation>
+        <translation>このグループには1個の録画が有ります</translation>
     </message>
     <message>
         <source>There are no recordings in this display group</source>
-        <translation type="unfinished"></translation>
+        <translation>このグループには録画が有りません</translation>
     </message>
     <message>
         <source>Stop Transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>トランスコード停止</translation>
     </message>
     <message>
         <source>Begin Transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>トランスコード開始</translation>
     </message>
 </context>
 <context>
@@ -511,11 +511,11 @@
     </message>
     <message>
         <source>Recording this showing with override options</source>
-        <translation type="unfinished"></translation>
+        <translation>個別設定オプションでこの番組を録画する</translation>
     </message>
     <message>
         <source>Manually not recording this showing</source>
-        <translation type="unfinished"></translation>
+        <translation>手動でこの番組を録画しない</translation>
     </message>
 </context>
 <context>
@@ -625,11 +625,11 @@
     </message>
     <message>
         <source>Recording this showing with override options</source>
-        <translation type="unfinished"></translation>
+        <translation>個別設定オプションでこの番組を録画する</translation>
     </message>
     <message>
         <source>Manually not recording this showing</source>
-        <translation type="unfinished"></translation>
+        <translation>手動でこの番組を録画しない</translation>
     </message>
 </context>
 <context>
@@ -3162,7 +3162,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Default</source>
-        <translation type="unfinished">既定値</translation>
+        <translation>既定値</translation>
     </message>
     <message>
         <source>F</source>
@@ -3386,7 +3386,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Clear Override</source>
-        <translation>クリアオーバーライド</translation>
+        <translation>個別設定クリア</translation>
     </message>
     <message>
         <source>The following programs will be recorded instead:
@@ -3720,147 +3720,147 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>User ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザーID</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワード</translation>
     </message>
     <message>
         <source>Do not adjust volume</source>
-        <translation type="unfinished"></translation>
+        <translation>ボリュームを調整しないでください</translation>
     </message>
     <message>
         <source>Capture Card Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>キャプチャーカード設定</translation>
     </message>
     <message>
         <source>If specified, this command will be run to change the channel for inputs which do not have a tuner. The first argument will be the channel number.</source>
-        <translation type="unfinished"></translation>
+        <translation>これをセットすると、チューナーを持たない場合にチャンネルを変更するコマンドを指定します。最初の引数はチャンネル番号です。</translation>
     </message>
     <message>
         <source>Data Direct Lineup</source>
-        <translation type="unfinished"></translation>
+        <translation>Data Direct ラインナップ</translation>
     </message>
     <message>
         <source>Retrieve Lineups</source>
-        <translation type="unfinished"></translation>
+        <translation>ラインナップ取得中</translation>
     </message>
     <message>
         <source>Show group name instead of &quot;All Programs&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;全番組&quot;の代わりにグループ名を表示する。</translation>
     </message>
     <message>
         <source>Use the name of the display group currently being show in place of the term &quot;All Programs&quot; in theplayback screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>再生画面において&quot;全番組&quot;の代わりに表示グループの名称を使用します。</translation>
     </message>
     <message>
         <source>Start in title section.</source>
-        <translation type="unfinished"></translation>
+        <translation>開始時にタイトル選択。</translation>
     </message>
     <message>
         <source>If set, focus will initially be on the show titles otherwise focus will be on the recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>これをセットすると、最初のフォーカスが録画のタイトルにセットされます。</translation>
     </message>
     <message>
         <source>Show group summary.</source>
-        <translation type="unfinished"></translation>
+        <translation>グループ集計を表示する。</translation>
     </message>
     <message>
         <source>While selecting a group, show a group summary instead of showing info about the first episode in that group.</source>
-        <translation type="unfinished"></translation>
+        <translation>グループを選択した時にグループの最初の番組を表示する代わりにグループの集計を表示します。</translation>
     </message>
     <message>
         <source>Menu theme</source>
-        <translation type="unfinished"></translation>
+        <translation>メニューテーマ</translation>
     </message>
     <message>
         <source>Aspect Override</source>
-        <translation type="unfinished"></translation>
+        <translation>代謝アスペクト</translation>
     </message>
     <message>
         <source>16/9 Anamorphic</source>
-        <translation type="unfinished"></translation>
+        <translation>16/9 アナモルフィック</translation>
     </message>
     <message>
         <source>4/3 Normal</source>
-        <translation type="unfinished"></translation>
+        <translation>4/3 ノーマル</translation>
     </message>
     <message>
         <source>16/9 Zoom</source>
-        <translation type="unfinished">16/9ズーム</translation>
+        <translation>16/9 ズーム</translation>
     </message>
     <message>
         <source>4/3 Zoom</source>
-        <translation type="unfinished">4/3ズーム</translation>
+        <translation>4/3 ズーム</translation>
     </message>
     <message>
         <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>これは録画再生時に使用されます。再生時にWキーを押すのと同じです。</translation>
     </message>
     <message>
         <source>GUI width (px)</source>
-        <translation type="unfinished"></translation>
+        <translation>GUI 幅(px)</translation>
     </message>
     <message>
         <source>GUI height (px)</source>
-        <translation type="unfinished"></translation>
+        <translation>GUI 高さ(px)</translation>
     </message>
     <message>
         <source>Qt Style</source>
-        <translation type="unfinished"></translation>
+        <translation>Qt スタイル</translation>
     </message>
     <message>
         <source>Desktop Style</source>
-        <translation type="unfinished"></translation>
+        <translation>デスクトップスタイル</translation>
     </message>
     <message>
         <source>Channel format</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネルフォーマット</translation>
     </message>
     <message>
         <source>number</source>
-        <translation type="unfinished"></translation>
+        <translation>番号</translation>
     </message>
     <message>
         <source>number callsign</source>
-        <translation type="unfinished"></translation>
+        <translation>番号 コールサイン</translation>
     </message>
     <message>
         <source>number name</source>
-        <translation type="unfinished"></translation>
+        <translation>番号 名前</translation>
     </message>
     <message>
         <source>callsign</source>
-        <translation type="unfinished"></translation>
+        <translation>コールサイン</translation>
     </message>
     <message>
         <source>name</source>
-        <translation type="unfinished"></translation>
+        <translation>名前</translation>
     </message>
     <message>
         <source>Your preferred channel format.</source>
-        <translation type="unfinished"></translation>
+        <translation>優先させるチャンネルフォーマット.</translation>
     </message>
     <message>
         <source>Long Channel format</source>
-        <translation type="unfinished"></translation>
+        <translation>長いチャンネルフォーマット</translation>
     </message>
     <message>
         <source>Your preferred long channel format.</source>
-        <translation type="unfinished"></translation>
+        <translation>優先させる長いチャンネルフォーマット.</translation>
     </message>
     <message>
         <source>Default size is 25.</source>
-        <translation type="unfinished"></translation>
+        <translation>規定のサイズは25です。</translation>
     </message>
     <message>
         <source>Default size is 16.</source>
-        <translation type="unfinished"></translation>
+        <translation>規定のサイズは16です。</translation>
     </message>
     <message>
         <source>Record Threshold</source>
-        <translation type="unfinished"></translation>
+        <translation>録画しきい値</translation>
     </message>
     <message>
         <source>If the option to use select to change the channel is on, pressing select on a show that is at least this many minutes into the future will schedule a recording.</source>
@@ -3868,198 +3868,201 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>View Recordings (Recording Groups)</source>
-        <translation type="unfinished"></translation>
+        <translation>録画表示(録画グループ)</translation>
     </message>
     <message>
         <source>Failed to get selector object</source>
-        <translation type="unfinished"></translation>
+        <translation>セレクターオブジェクトを取得できませんでした</translation>
     </message>
     <message>
         <source>Myth could not locate the selector object within your theme.
 Please make that your ui.xml is valid.
 
 Myth will now exit.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTVはあなたの選択したテーマでセレクターオブジェクトを配置できませんでした。
+あなたのui.xmlを有効に作成してください。
+
+MythTVは終了します。</translation>
     </message>
     <message>
         <source>Filters to be used when recording from this channel.  Not used with hardware encoding cards.</source>
-        <translation type="unfinished"></translation>
+        <translation>このチャンネルの録画にフィルターが使用されます。ハードウェアエンコーディングカードでは使用されません。</translation>
     </message>
     <message>
         <source>Playback filters</source>
-        <translation type="unfinished"></translation>
+        <translation>再生フィルター</translation>
     </message>
     <message>
         <source>Filters to be used when recordings from this channel are viewed.  Start with a plus to append to the global playback filters.</source>
-        <translation type="unfinished"></translation>
+        <translation>このチャンネルの録画を見る時にフィルターが使用されます。開始時にグローバル再生フィルターに追加されます。</translation>
     </message>
     <message>
         <source>O</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Override Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>個別設定録画</translation>
     </message>
     <message>
         <source>Don&apos;t Record</source>
-        <translation type="unfinished"></translation>
+        <translation>録画しない</translation>
     </message>
     <message>
         <source>Reactivate</source>
-        <translation type="unfinished"></translation>
+        <translation>有効にする</translation>
     </message>
     <message>
         <source>Don&apos;t record</source>
-        <translation type="unfinished"></translation>
+        <translation>録画しない</translation>
     </message>
     <message>
         <source>Never record</source>
-        <translation type="unfinished"></translation>
+        <translation>もう録画しない</translation>
     </message>
     <message>
         <source>Edit Options</source>
-        <translation type="unfinished"></translation>
+        <translation>オプション編集</translation>
     </message>
     <message>
         <source>Add Override</source>
-        <translation type="unfinished"></translation>
+        <translation>個別設定追加</translation>
     </message>
     <message>
         <source>Edit Override</source>
-        <translation type="unfinished"></translation>
+        <translation>個別設定編集</translation>
     </message>
     <message>
         <source>Record anyway</source>
-        <translation type="unfinished"></translation>
+        <translation>とにかく録画</translation>
     </message>
     <message>
         <source>Record this showing with normal options</source>
-        <translation type="unfinished"></translation>
+        <translation>ノーマルオプションでこの番組を録画します</translation>
     </message>
     <message>
         <source>Record this showing with override options</source>
-        <translation type="unfinished"></translation>
+        <translation>個別設定オプションでこの番組を録画します</translation>
     </message>
     <message>
         <source>Do not record this showing</source>
-        <translation type="unfinished"></translation>
+        <translation>この番組を録画しない</translation>
     </message>
     <message>
         <source>External application or script to run when a keypress is received by LIRC.</source>
-        <translation type="unfinished"></translation>
+        <translation>LIRCからキーが押された時に外部アプリケーションかスクリプトを起動します。</translation>
     </message>
     <message>
         <source>This PIN is used to control access to the setup menus. If you want to use this feature, then setting the value to all numbers will make your life much easier.  Set it to blank to disable.</source>
-        <translation type="unfinished"></translation>
+        <translation>このピンはセットアップメニューのアクセスをコントロールします。この機能を使用したい時は値をセットしてください。ブランクにすれば無効になります。</translation>
     </message>
     <message>
         <source>Separate video modes for GUI and TV playback</source>
-        <translation type="unfinished"></translation>
+        <translation>GUIとTV再生でビデオモードを別ける</translation>
     </message>
     <message>
         <source>Switch X Window video modes for TV. Requires &apos;xrandr&apos; support.</source>
-        <translation type="unfinished"></translation>
+        <translation>TV用にX Windowビデオモードを切替える。&apos;xrandr&apos;のサポートが必要です。</translation>
     </message>
     <message>
         <source>GUI X size (px)</source>
-        <translation type="unfinished"></translation>
+        <translation>GUI Xサイズ (px)</translation>
     </message>
     <message>
         <source>Horizontal resolution for GUI video mode. This mode must be already configured in XF86Config.</source>
-        <translation type="unfinished"></translation>
+        <translation>GUIビデオモードの横解像度。このモードはXF86Configで設定済みでなければなりません。</translation>
     </message>
     <message>
         <source>GUI Y size (px)</source>
-        <translation type="unfinished"></translation>
+        <translation>GUI Yサイズ (px)</translation>
     </message>
     <message>
         <source>Vertical resolution for GUI video mode. This mode must be already configured in XF86Config.</source>
-        <translation type="unfinished"></translation>
+        <translation>GUIビデオモードの縦解像度。このモードはXF86Configで設定済みでなければなりません。</translation>
     </message>
     <message>
         <source>TV X size (px)</source>
-        <translation type="unfinished"></translation>
+        <translation>TV Xサイズ (px)</translation>
     </message>
     <message>
         <source>Horizontal resolution for playback video mode. This mode must be already configured in XF86Config.</source>
-        <translation type="unfinished"></translation>
+        <translation>TV再生時の横解像度。このモードはXF86Configで設定済みでなければなりません。</translation>
     </message>
     <message>
         <source>TV Y size (px)</source>
-        <translation type="unfinished"></translation>
+        <translation>TV Yサイズ (px)</translation>
     </message>
     <message>
         <source>Vertical resolution for playback video mode. This mode must be already configured in XF86Config.</source>
-        <translation type="unfinished"></translation>
+        <translation>TV再生時の縦解像度。このモードはXF86Configで設定済みでなければなりません。</translation>
     </message>
     <message>
         <source>Video Mode Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオモード設定</translation>
     </message>
     <message>
         <source>Override Recordings Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>個別設定録画優先順位</translation>
     </message>
     <message>
         <source>Override Recordings will receive this additional recording priority value.</source>
-        <translation type="unfinished"></translation>
+        <translation>個別設定録画にはこの録画優先順位の値が加算されます.</translation>
     </message>
     <message>
         <source>The number of days between mythfilldatabase runs.</source>
-        <translation type="unfinished"></translation>
+        <translation>mythfilldatabaseの実行間隔日数。</translation>
     </message>
     <message>
         <source>Path to use for logging output from the mythfilldatabase program.  Leave blank to disable logging.</source>
-        <translation type="unfinished"></translation>
+        <translation>mythfilldatabaseのログ出力パス。ブランクにするとログ出力されなくなります。</translation>
     </message>
     <message>
         <source>DataDirect Status: </source>
-        <translation type="unfinished"></translation>
+        <translation>DataDirectステータス:</translation>
     </message>
     <message>
         <source>If enabled, the master backend will stream and delete files if it finds them in the video directory. Useful if you are using a central storage location, like a NFS share, and your slave backend isn&apos;t running.</source>
-        <translation type="unfinished"></translation>
+        <translation>これを有効にすると、マスターバックエンドがストリームとファイルをビデオディレクトリで見付けた時に削除できるようになります。NFS共有の様な中央保存場所を使用している時に便利です。</translation>
     </message>
     <message>
         <source>Make the video look normal on a progressive display (i.e. monitor).  Deinterlace requires that your CPU supports SSE instructions.  Enabling this without proper CPU support will cause the program to segfault. </source>
-        <translation type="unfinished"></translation>
+        <translation>映像をプログレッシブディスプレイで(例：モニタ)で正常に表示します。デインターレースはあなたのCPUがSSEをサポートしてなければなりません。これもサポートしていないCPUで有効にするとプログラムは異常終了します。</translation>
     </message>
     <message>
         <source>When exiting sticky keys fast forward/rewind mode, reposition before resuming normal playback. This compensates for the reaction time between seeing where to resume playback and actually exiting seeking.</source>
-        <translation type="unfinished"></translation>
+        <translation>スティッキーキーが有るとの早送りと巻き戻しは、通常の再生に入る前に場所を修正します。実際に再生する場所を決める時のリアクションタイムを補います。</translation>
     </message>
     <message>
         <source>If set, pressing the sticky rewind key in fast forward mode switches to rewind mode, and vice versa. If not set, it will decrease the current speed or switch to play mode if the speed can&apos;t be decreased further.</source>
-        <translation type="unfinished"></translation>
+        <translation>これをセットすると、スティッキー巻き戻しキーを早送りの時に押すと巻き戻しに変わります。これをセットしない時は再生スピードが遅くなり再生モードになります。</translation>
     </message>
     <message>
         <source>Wait for ATSC signal lock (msec)</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC信号ロック待ち時間(ミリ秒 )</translation>
     </message>
     <message>
         <source>MythTV can check the signal strength When you tune into a HDTV or other over-the-air digital station. This value is the number of milliseconds to allow before we give up trying to get an acceptible signal.</source>
-        <translation type="unfinished"></translation>
+        <translation>HDTVかその他のデジタル放送局のチャンネル調整の時にMytvTVは信号強度をチェックできます｡この値はミリ秒で設定し受け入れられる信号をこの時間内に判定します｡ </translation>
     </message>
     <message>
         <source>ATSC Signal Threshold</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC信号閾値</translation>
     </message>
     <message>
         <source>Threshold for a signal to be considered acceptible. If you set this too low Myth may crash, if you set it too low you may not be able to tune to channels on which reception is good.</source>
-        <translation type="unfinished"></translation>
+        <translation>シグナルが受け入れられる閾値です｡この値を低く設定するとMythTVはクラッシュするでしょう｡この値を低く設定すると上手くチャンネル調整が出来なくなります｡ </translation>
     </message>
     <message>
         <source>General (page 2)</source>
-        <translation type="unfinished"></translation>
+        <translation>全般(ページ2)</translation>
     </message>
     <message>
         <source>If your local timezone does not match the timezone returned by XMLTV, use this setting to have mythfilldatabase adjust the program start and end times.None disables this feature, Auto automatically detects your local timezone</source>
-        <translation type="unfinished"></translation>
+        <translation>XMLTVが返すタイムゾーンとあなたのローカルのタイムゾーンが合わないときmythfilldatabaseがこの値を使って番組の開始時間と終了時間を調整します｡何も設定しないと無効になります｡自動は自動的にあなたのシステムのタイムゾーンを検出します。</translation>
     </message>
     <message>
         <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for frontend</source>
-        <translation type="unfinished"></translation>
+        <translation>バックエンドが終了する前に実行するコマンド。戻り値でバックエンドをシャットダウンするか決定します｡0 - はい, 1 - アイドル再開, 2 - リセットしてフロントエンドの接続待ち</translation>
     </message>
 </context>
 <context>
@@ -4425,11 +4428,11 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Stop Transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>トランスコード停止</translation>
     </message>
     <message>
         <source>Begin Transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>トランスコード開始</translation>
     </message>
 </context>
 <context>

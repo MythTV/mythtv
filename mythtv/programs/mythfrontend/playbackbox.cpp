@@ -201,7 +201,7 @@ void PlaybackBox::killPlayerSafe(void)
     /* if the user keeps selecting new recordings we will never stop playing */
     setEnabled(false);
 
-    if (state != kKilled && playbackPreview != 0 && killState != kDone )
+    if (state != kKilled && state != kStopped && playbackPreview != 0)
     {
         while (state != kKilled)
         {
@@ -552,9 +552,8 @@ void PlaybackBox::updateInfo(QPainter *p)
 void PlaybackBox::updateVideo(QPainter *p)
 {
     // If we're displaying group info don't update the video.
-    if(inTitle && haveGroupInfoSet)
+    if (inTitle && haveGroupInfoSet)
         return;
-
 
     /* show a still frame if the user doesn't want a video preview or nvp 
      * hasn't started playing the video preview yet */
