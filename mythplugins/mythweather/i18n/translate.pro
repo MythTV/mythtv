@@ -1,4 +1,3 @@
 SOURCES += ../mythweather/weather.cpp 
 
-TRANSLATIONS = mythweather_es.ts \
-	       mythweather_ca.ts
+TRANSLATIONS = mythweather_es.ts mythweather_ca.ts mythweather_nl.ts

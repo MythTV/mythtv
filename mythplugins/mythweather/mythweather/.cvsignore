@@ -1,4 +1,5 @@
 Makefile
+mythweather
 moc_databasebox.cpp
 moc_weather.cpp
 moc_weathercomms.cpp
