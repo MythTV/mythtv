@@ -903,7 +903,7 @@ bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
     if(subtitle_track > -1)
     {
     
-        QString subtitle_arguments = QString("extsub:track=%1")
+        QString subtitle_arguments = QString("extsub=track=%1")
                                             .arg(subtitle_track);
         if(cliptbottom > 0)
         {

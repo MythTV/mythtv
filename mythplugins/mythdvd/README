@@ -65,7 +65,7 @@ software packages installed for *transcoding* to work:
                 even if you plan to use xvid (see below).  Developers
                 currently using 0.6.12, but you can probably use an earlier
                 version (unless you're using subtitles, in which case you'll
-                almost certainly want 0.6.11 or later).
+                almost certainly _need_ 0.6.12 or later).
                 http://www.theorie.physik.uni-goettingen.de/
                 ~ostreich/transcode/
 
