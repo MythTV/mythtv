@@ -13,6 +13,7 @@
 #include <qhostaddress.h>
 
 #include <cmath>
+#include <queue>
 
 #include "mythcontext.h"
 #include "oldsettings.h"
@@ -94,6 +95,11 @@ class MythContextPrivate
     QMap<QString,QString> lastLogStrings;
 
     bool screensaverEnabled;
+
+    DisplayRes *display_res;
+
+    QMutex *m_priv_mutex;
+    queue<MythPrivRequest> m_priv_requests;
 };
 
 MythContextPrivate::MythContextPrivate(MythContext *lparent)
@@ -172,6 +178,10 @@ void MythContextPrivate::Init(bool gui, bool lcd)
         lcd_device = NULL;
 
     disablelibrarypopup = false;
+
+    display_res = NULL;
+
+    m_priv_mutex = new QMutex(true);
 }
 
 MythContextPrivate::~MythContextPrivate()
@@ -188,6 +198,8 @@ MythContextPrivate::~MythContextPrivate()
         delete eventSock;
     if (lcd_device)
         delete lcd_device;
+    if (m_priv_mutex)
+        delete m_priv_mutex;
 }
 
 void MythContextPrivate::LoadLogSettings(void)
@@ -222,8 +234,6 @@ MythContext::MythContext(const QString &binversion, bool gui, bool lcd)
             this, SLOT(EventSocketRead()));
     connect(d->eventSock, SIGNAL(connectionClosed()), 
             this, SLOT(EventSocketClosed()));
-
-    display_res = 0;
 }
 
 MythContext::~MythContext()
@@ -378,16 +388,16 @@ void MythContext::LoadQtConfig(void)
     d->m_width = GetNumSetting("GuiWidth", 0);
     d->m_height = GetNumSetting("GuiHeight", 0);
 
-    if ((display_res = DisplayRes::getDisplayRes()))
+    if ((d->display_res = DisplayRes::getDisplayRes()))
     {
         // Make sure DisplayRes has current context info
-        display_res->Initialize();
+        d->display_res->Initialize();
 
         // Switch to desired GUI resolution
-        display_res->switchToGUI();
+        d->display_res->switchToGUI();
 
-        d->m_width = display_res->Width();
-        d->m_height = display_res->Height();
+        d->m_width = d->display_res->Width();
+        d->m_height = d->display_res->Height();
     }
     else if (d->m_width <= 0 || d->m_height <= 0)
     {
@@ -660,11 +670,11 @@ void MythContext::InitializeScreenSettings()
     int height = GetNumSetting("GuiHeight", d->m_height);
     int width = GetNumSetting("GuiWidth", d->m_width);
 
-    if (width == 0 && height == 0 && display_res)
+    if (width == 0 && height == 0 && d->display_res)
     {
         // If using custom, full-screen resolution, note the size
-        height = display_res->Height();
-        width  = display_res->Width();
+        height = d->display_res->Height();
+        width  = d->display_res->Width();
     }
     else
     {
@@ -1628,9 +1638,30 @@ void MythContext::LogEntry(const QString &module, int priority,
     
         d->dbLock.unlock();
 
-	if (priority <= d->m_logprintlevel)
+        if (priority <= d->m_logprintlevel)
             VERBOSE(VB_ALL, module + ": " + message);
     }
 }
 
+void MythContext::addPrivRequest(MythPrivRequest::Type t, void *data)
+{
+    QMutexLocker lockit(d->m_priv_mutex);
+    d->m_priv_requests.push(MythPrivRequest(t, data));
+}
 
+bool MythContext::hasPrivRequest() const
+{
+    QMutexLocker lockit(d->m_priv_mutex);
+    return !d->m_priv_requests.empty();
+}
+
+MythPrivRequest MythContext::popPrivRequest()
+{
+    QMutexLocker lockit(d->m_priv_mutex);
+    MythPrivRequest ret_val(MythPrivRequest::PrivEnd, NULL);
+    if (!d->m_priv_requests.empty()) {
+        ret_val = d->m_priv_requests.front();
+        d->m_priv_requests.pop();
+    }
+    return ret_val;
+}

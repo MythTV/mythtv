@@ -1678,6 +1678,10 @@ void NuppelVideoPlayer::StartPlaying(void)
     pthread_t output_video;
     pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);
 
+    // Request that the video output thread run with realtime priority.
+    // If mythyv/mythfrontend was installed SUID root, this will work.
+    gContext->addPrivRequest(MythPrivRequest::MythRealtime, &output_video);
+
     int pausecheck = 0;
 
     if (bookmarkseek > 30)

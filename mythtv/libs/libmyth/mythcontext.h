@@ -16,7 +16,6 @@
 #include <iostream>
 #include <vector>
 
-
 using namespace std;
 
 #if (QT_VERSION < 0x030100)
@@ -99,7 +98,19 @@ class MythEvent : public QCustomEvent
     QStringList extradata;
 };
 
-#define MYTH_BINARY_VERSION "0.15.20040528-1"
+class MythPrivRequest 
+{
+ public:
+    typedef enum { MythRealtime, MythExit, PrivEnd } Type;
+    MythPrivRequest(Type t, void *data) : m_type(t), m_data(data) {}
+    Type getType() const { return m_type; }
+    void *getData() const { return m_data; }
+ private:
+    Type m_type;
+    void *m_data;
+};
+
+#define MYTH_BINARY_VERSION "0.16.20040906-1"
 #define MYTH_PROTO_VERSION "13"
 
 extern int print_verbose_messages;
@@ -217,6 +228,10 @@ class MythContext : public QObject
     // get the current status
     bool GetScreensaverEnabled(void);
 
+    void addPrivRequest(MythPrivRequest::Type t, void *data);
+    bool hasPrivRequest() const;
+    MythPrivRequest popPrivRequest();
+
   private slots:
     void EventSocketRead();
     void EventSocketConnected();
@@ -231,8 +246,6 @@ class MythContext : public QObject
     void CacheThemeImagesDirectory(const QString &dirname, 
                                    const QString &subdirname = "");
     void RemoveCacheDir(const QString &dirname);
-
-    DisplayRes * display_res;
 
     MythContextPrivate *d;
 };

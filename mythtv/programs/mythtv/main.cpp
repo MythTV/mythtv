@@ -13,11 +13,59 @@ using namespace std;
 
 MythContext *gContext;
 
+static void *run_priv_thread(void *data)
+{
+    (void)data;
+    while (true) 
+    {
+        if (gContext->hasPrivRequest()) 
+        {
+            MythPrivRequest req = gContext->popPrivRequest();
+            switch (req.getType()) 
+            {
+            case MythPrivRequest::MythRealtime:
+                {
+                    pthread_t *target_thread = (pthread_t *)(req.getData());
+                    // Raise the given thread to realtime priority
+                    struct sched_param sp = {1};
+                    int status = pthread_setschedparam(
+                        *target_thread, SCHED_FIFO, &sp);
+                    if (status) {
+                        perror("pthread_setschedparam");
+                        VERBOSE(VB_GENERAL, "Running as SUID root would allow "
+                                "some threads to run with realtime priority, "
+                                "improving video smoothness.");
+                    }
+                }
+                break;
+            case MythPrivRequest::MythExit:
+                pthread_exit(NULL);
+                break;
+            case MythPrivRequest::PrivEnd:
+                break;
+            }
+        }
+        sleep(1);
+    }
+    return NULL; // will never happen
+}
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
     gContext = new MythContext(MYTH_BINARY_VERSION);
+
+    // Create priveleged thread, then drop privs
+    pthread_t priv_thread;
+
+    int status = pthread_create(&priv_thread, NULL, run_priv_thread, NULL);
+    if (status) 
+    {
+        perror("pthread_create");
+        priv_thread = 0;
+    }
+    setuid(getuid());
 
     QString themename = gContext->GetSetting("Theme");
     QString themedir = gContext->FindThemeDir(themename);
@@ -81,6 +129,12 @@ int main(int argc, char *argv[])
 
     sleep(1);
     delete tv;
+    if (priv_thread != 0) 
+    {
+        void *value;
+        gContext->addPrivRequest(MythPrivRequest::MythExit, NULL);
+        pthread_join(priv_thread, &value);
+    }
     delete gContext;
 
     return 0; // exit(0)
