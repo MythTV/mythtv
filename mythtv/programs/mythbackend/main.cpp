@@ -30,7 +30,7 @@ Transcoder *trans = NULL;
 QString pidfile;
 QString lockfile_location;
 
-void setupTVs(bool ismaster)
+bool setupTVs(bool ismaster)
 {
     QString localhostname = gContext->GetHostName();
 
@@ -83,8 +83,10 @@ void setupTVs(bool ismaster)
     else
     {
         cerr << "ERROR: no capture cards are defined in the database.\n";
-        exit(0);
+        return false;
     }
+
+    return true;
 }
 
 void cleanup(void) 
@@ -101,7 +103,6 @@ void cleanup(void)
         unlink(pidfile.ascii());
 
     unlink(lockfile_location.ascii());
-
 }
     
 int main(int argc, char **argv)
@@ -294,9 +295,9 @@ int main(int argc, char **argv)
         cerr << "Running as a slave backend.\n";
     }
  
-    setupTVs(ismaster);
+    bool runsched = setupTVs(ismaster);
 
-    if (ismaster)
+    if (ismaster && runsched)
     {
         QSqlDatabase *scdb = QSqlDatabase::database("SUBDB");
         sched = new Scheduler(true, &tvList, scdb);

@@ -615,7 +615,7 @@ static const float avfmpeg2_aspect[16]={
     0,    1.0,    -3.0/4.0,    -9.0/16.0,    -1.0/2.21,
 };
 
-uint32_t     avfmpa_freq[4] = {441, 480, 320, 0};
+uint32_t avfmpa_freq_tab[3] = { 44100, 48000, 32000 };
 
 float AvFormatDecoder::GetMpegAspect(AVCodecContext *context,
                                      int aspect_ratio_info,
@@ -790,13 +790,20 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     (((header >> 12) & 0xf) != 0xf) &&
                     (((header >> 10) & 3) != 3))
                 {
-                    int freq = avfmpa_freq[(ptr[2] & 0x0c) >> 2] * 100;
-                    int mode = (ptr[3] >> 6) & 3;
-                    int channels;
+                    int freqindex = (header >> 10) & 3;
+                    int lsf = 1, mpeg25 = 1;
+                    if (header & (1 << 20))
+                    {
+                        lsf = (header & (1 << 19)) ? 0 : 1;
+                        mpeg25 = 0;
+                    }
+
+                    int freq = avfmpa_freq_tab[freqindex] >> (lsf + mpeg25);
+                    int mode = (header >> 6) & 3;
+                    int channels = 2;
+
                     if (mode == 3)
                         channels = 1;
-                    else
-                        channels = 2;
 
                     if (CheckAudioParams(freq, channels))
                     {
