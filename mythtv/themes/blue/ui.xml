@@ -1765,7 +1765,7 @@
     <font name="subtitle" face="Arial">
       <color>#ffffff</color>
       <dropcolor>#000000</dropcolor>
-      <size>24</size>
+      <size>20</size>
       <size:small>14</size:small>
       <shadow>3,3</shadow>
       <bold>yes</bold>
@@ -1773,14 +1773,14 @@
 
     <font name="info" face="Arial">
       <color>#ffffff</color>
-      <size>22</size>
+      <size>18</size>
       <size:small>10</size:small>
       <shadow>2,2</shadow>
     </font>
 
     <font name="infob" face="Arial">
       <color>#ffffff</color>
-      <size>20</size>
+      <size>18</size>
       <size:small>10</size:small>
 	<shadow>2,2</shadow>
       <bold>yes</bold>
@@ -1788,7 +1788,7 @@
 
     <font name="message" face="Arial">
       <color>#ffffff</color>
-      <size>22</size>
+      <size>20</size>
       <size:small>12</size:small>
       <shadow>2,2</shadow>
       <bold>yes</bold>
@@ -1824,40 +1824,40 @@
     </container>
 
     <container name="program_info">
-      <area>0,20,800,210</area>
+      <area>0,20,800,265</area>
       <textarea name="title" draworder="6">
-        <area>20,0,800,40</area>
+        <area>20,0,800,45</area>
         <font>title</font>
       </textarea>
       <textarea name="subtitle" draworder="6">
-        <area>20,34,579,30</area>
+        <area>20,45,579,40</area>
         <font>subtitle</font>
       </textarea>
       <textarea name="infotime" draworder="6" align="right">
-        <area>20,66,150,30</area>
+        <area>20,85,150,30</area>
         <font>infob</font>
         <value>Airdate:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
-        <area>180,66,600,30</area>
+        <area>180,85,600,30</area>
         <font>info</font>
       </textarea>
       <textarea name="infochan" draworder="6" align="right">
-        <area>20,95,150,30</area>
+        <area>20,115,150,30</area>
         <font>infob</font>
         <value>Channel:</value>
       </textarea>
       <textarea name="channel" draworder="6">
-        <area>180,95,400,30</area>
+        <area>180,115,400,30</area>
         <font>info</font>
       </textarea>
       <textarea name="infodesc" draworder="6" align="right">
-        <area>20,125,150,30</area>
+        <area>20,145,150,30</area>
         <font>infob</font>
         <value>Description:</value>
       </textarea>
       <textarea name="description" draworder="6">
-        <area>180,125,600,120</area>
+        <area>180,145,600,120</area>
         <font>info</font>
         <multiline>yes</multiline>
       </textarea>
