@@ -1281,6 +1281,15 @@ you compile with one of:
                                 with MMX, 3dNOW!, enhanced 3dNOW!, SSE and SSE2. (pentium4 compatible)
 </itemize>
 
+<figure loc="here">
+<eps file="stop.eps" height="1cm">
+<img src="stop.png">
+<caption>
+<bf>NOTE</bf>:  If you wish to compile with the <tt>-march=k8</tt> flag you
+must use gcc v3.4 or higher.
+</caption>
+</figure>
+
 If you have a Via processor change the following in the
 <tt>settings.pro</tt> file. Replace <verb>-march=pentiumpro</verb> before
 you compile with one of:
@@ -2226,11 +2235,11 @@ the key.  The actual <bf>repeat =</bf> number will vary from system to
 system, so experiment and see which value works best for you.
 
 <sect1>Configuring lirc for use with an IR blaster
-<p>By Carlos Talbot, <url url="mailto:carlos@talbot.net">
-
+<p>
+<!-- By Carlos Talbot, <url url="mailto:carlos@talbot.net"> -->
 Lirc has support for various IR transmitters. A popular model is the Actisys
-IR-200L <url url="http://store.yahoo.com/snapstreammedia/irblasbun.html"
-name="http://store.yahoo.com/snapstreammedia/irblasbun.html">. It was
+IR-200L <url url="http://store.snapstreamstore.com/accessories.html"
+name="http://store.snapstreamstore.com/accessories.html">. It was
 originally designed for IRDA communication, but can be used to transmit A/V remote
 control codes. By using the lirc SIR driver, this device can easily be
 integrated with MythTV. I have tested this device with an AT&amp;T DCT2000
@@ -7350,7 +7359,11 @@ Shutdown your machine, install the card and restart.  Ensure that you're
 using your newly compiled kernel.
 
 Once you've rebooted, confirm that the card is detected.
+<sect>Glossary.
+<p>Here are a few terms used throughout the documentation.
 
+<bf>EPG</bf>- Electronic Program Guide.
+<bf>OSD</bf>- On Screen Display.
 </article>
 <!-- Revision History
 
@@ -7364,8 +7377,10 @@ in LVM section about boot-time messages.  (Wendy Seltzer).  Add caveat about
 IP addresses on general setup page. (James Casbon).  Update "mythtv is
 crashing my system".  Add + key for audio streams.
 v0.17.01, 2005-02-11.  Add upgrade instructions at the top.  Add section on
-running commercial flagging on host other than it was recorded on.  Add stuff
-to HDTV QAM section.
+running commercial flagging on host other than it was recorded on.  Add
+stuff to HDTV QAM section.  Add note for march=k8 needing gcc 3.4.  Add
+Glossary section - drop it if there's no use for it.  Update link to
+snapstream's store.
 
 -->
 
