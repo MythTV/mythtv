@@ -200,10 +200,32 @@ void ThumbGenerator::loadDir(QImage& image, const QFileInfo& fi)
         ++it;
     }
 
-    if (!found)
+    if (found) {
+        image.load(f->absFilePath());
         return;
+    }
+    else {
+        // if we didn't find the image yet
+        // go into subdirs and keep looking
 
-    image.load(f->absFilePath());
+        dir.setFilter(QDir::Dirs);
+        const QFileInfoList *dirList = dir.entryInfoList();
+        if (!dirList)
+            return;
+
+        QFileInfoListIterator it( *dirList );
+        QFileInfo *f;
+
+        while ( ((f = it.current()) != 0) && image.isNull() ) {
+
+            ++it;
+
+            if (f->fileName() == "." || f->fileName() == "..")
+                continue;
+            
+            loadDir(image, *f);
+        }
+    }
 }
 
 void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
