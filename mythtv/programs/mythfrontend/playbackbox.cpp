@@ -2034,11 +2034,9 @@ void PlaybackBox::customEvent(QCustomEvent *e)
  
         if (message == "RECORDING_LIST_CHANGE")
         {
-            if (QDateTime::currentDateTime() > lastUpdateTime.addSecs(1))
-            {
-                connected = FillList();      
-                update(fullRect);
-            }
+            connected = FillList();      
+            skipUpdate = false;
+            update(fullRect);
             if (type == Delete)
                 UpdateProgressBar();
         }
