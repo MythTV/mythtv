@@ -22,7 +22,7 @@ SOURCES += oldsettings.cpp remotefile.cpp settings.cpp themedmenu.cpp
 SOURCES += util.cpp mythwizard.cpp uitypes.cpp xmlparse.cpp
 SOURCES += mythplugin.cpp mythdialogs.cpp audiooutput.cpp inetcomms.cpp 
 SOURCES += httpcomms.cpp mythmedia.cpp uilistbtntype.cpp uiphoneentry.cpp
-SOURCES += generictree.cpp managedlist.cpp DisplayRes.cpp DisplayResX.cpp
+SOURCES += generictree.cpp managedlist.cpp DisplayRes.cpp
 SOURCES += volumecontrol.cpp volumebase.cpp audiooutputbase.cpp
 SOURCES += dbsettings.cpp screensaver.cpp screensaver-null.cpp
 
@@ -58,13 +58,15 @@ macx {
     # OS X specific audio layer
     SOURCES        += audiooutputca.cpp
     HEADERS        += audiooutputca.h
-    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/CoreAudio.framework
+    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/CoreAudio.framework/Frameworks
     LIBS           += -framework CoreAudio
-    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/AudioUnit.framework
+    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/AudioUnit.framework/Frameworks
     LIBS           += -framework AudioUnit
 
-    HEADERS        += screensaver-osx.h
-    SOURCES        += screensaver-osx.cpp
+    HEADERS        += screensaver-osx.h   DisplayResOSX.h
+    SOURCES        += screensaver-osx.cpp DisplayResOSX.cpp
+    QMAKE_CXXFLAGS += -F/System/Library/Frameworks/ApplicationServices.framework/Frameworks
+    LIBS           += -framework ApplicationServices
 
     # We use HIToolbox from Carbon to hide the menu bar
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/Carbon.framework/Frameworks
@@ -126,4 +128,9 @@ using_x11 {
     HEADERS += screensaver-x11.h
     SOURCES += screensaver-x11.cpp
     LIBS += -L/usr/X11R6/lib -lXinerama
+}
+
+using_xrandr {
+    HEADERS += DisplayResX.h
+    SOURCES += DisplayResX.cpp
 }

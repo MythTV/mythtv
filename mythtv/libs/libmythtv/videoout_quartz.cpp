@@ -42,6 +42,7 @@ using namespace std;
 #include <qptrlist.h>
 #include <qmutex.h>
 
+#include "DisplayRes.h"
 #include "yuv2rgb.h"
 #include "uitypes.h"
 #include "mythcontext.h"
@@ -90,7 +91,6 @@ struct QuartzData
     // Global preferences:
     bool               drawInWindow;      // Fullscreen or in GUI view?
     bool               windowedMode;      // GUI runs in window?
-    bool               changeResolution;  // Switch resolution for fullscreen?
     bool               scaleUpVideo;      // Enlarge video as needed?
     bool               correctGamma;      // Video gamma correction
     yuv2vuy_fun        yuvConverter;      // 420 -> 2vuy conversion function
@@ -111,24 +111,24 @@ struct QuartzData
  * These utility functions are used for querying parameters
  * from a CFDictionary.
  */
-static int32_t getCFint32(CFDictionaryRef dict, CFStringRef key)
-{
-    CFNumberRef  ref = (CFNumberRef) CFDictionaryGetValue(dict, key);
-
-    if (ref)
-    {
-        int32_t  val;
-
-        if ( CFNumberGetValue(ref, kCFNumberSInt32Type, &val) )
-            return val;
-        else
-            puts("getCFint32() - Failed to get 32bit int from value");
-    }
-    else
-        puts("getCFint32() - Failed to get value");
-
-    return 0;
-}
+// static int32_t getCFint32(CFDictionaryRef dict, CFStringRef key)
+// {
+//     CFNumberRef  ref = (CFNumberRef) CFDictionaryGetValue(dict, key);
+// 
+//     if (ref)
+//     {
+//         int32_t  val;
+// 
+//         if ( CFNumberGetValue(ref, kCFNumberSInt32Type, &val) )
+//             return val;
+//         else
+//             puts("getCFint32() - Failed to get 32bit int from value");
+//     }
+//     else
+//         puts("getCFint32() - Failed to get value");
+// 
+//     return 0;
+// }
 
 static double getCFdouble(CFDictionaryRef dict, CFStringRef key)
 {
@@ -774,8 +774,6 @@ class VoqvFullscreen : public VideoOutputQuartzView
 
   protected:
     CGDirectDisplayID d;
-    CFDictionaryRef originalMode,
-                    newMode;
 
     bool BeginPort(void)
     {
@@ -788,32 +786,11 @@ class VoqvFullscreen : public VideoOutputQuartzView
             viewLock.unlock();
             return false;
         }
-
-        // get screen mode information
-        originalMode = CGDisplayCurrentMode(d);
-        newMode = NULL;
-        if (parentData->changeResolution)
-        {
-            // find mode that most closely matches the source
-            newMode = CGDisplayBestModeForParameters(
-                          d,
-                          24,
-                          (int)(parentData->srcHeight * parentData->srcAspect),
-                          parentData->srcHeight,
-                          NULL);
-            VERBOSE(VB_PLAYBACK,
-                    QString("Set display to %1 x %2, %3bpp @ %4Hz")
-                           .arg(getCFint32(newMode, kCGDisplayWidth))
-                           .arg(getCFint32(newMode, kCGDisplayHeight))
-                           .arg(getCFint32(newMode, kCGDisplayBitsPerPixel))
-                           .arg(getCFdouble(newMode, kCGDisplayRefreshRate)));
-
-            if (CGDisplaySwitchToMode(d, newMode) != CGDisplayNoErr)
-            {
-                VERBOSE(VB_PLAYBACK, QString("Could not change screen mode"));
-                newMode = NULL;
-            }
-        }
+        
+        // switch screen resolution if desired
+        DisplayRes *disp = DisplayRes::getDisplayRes();
+        if (disp)
+            disp->switchToVid(parentData->srcWidth, parentData->srcHeight);
 
         CGDisplayHideCursor(d);
 
@@ -837,12 +814,12 @@ class VoqvFullscreen : public VideoOutputQuartzView
             DisposePort(thePort);
             thePort = NULL;
         }
-        if (newMode)
-        {
-            // return screen resolution to normal
-            CGDisplaySwitchToMode(d, originalMode);
-            newMode = NULL;
-        }
+        
+        // return screen resolution to normal
+        DisplayRes *disp = DisplayRes::getDisplayRes();
+        if (disp)
+            disp->switchToGUI();
+
         if (d)
         {
             CGDisplayShowCursor(d);
@@ -1389,8 +1366,6 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     data->drawInWindow = gContext->GetNumSetting("GuiSizeForTV", 0);
     data->windowedMode = gContext->GetNumSetting("RunFrontendInWindow", 0);
     data->correctGamma = gContext->GetNumSetting("MacGammaCorrect", 0);
-    // From tv_play.cpp:
-    data->changeResolution = gContext->GetNumSetting("UseVideoModes", 0);
     
     if (gContext->GetNumSetting("MacYuvConversion", 1))
         data->yuvConverter = yuv2vuy_init_altivec();

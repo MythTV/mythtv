@@ -1182,7 +1182,7 @@ static GenericCheckBox *GuiSizeForTV()
     return gc;
 }
 
-#ifdef USING_XRANDR
+#if defined(USING_XRANDR) || defined(CONFIG_DARWIN)
 static GenericCheckBox *UseVideoModes()
 {
     GenericCheckBox *gc = new GenericCheckBox("UseVideoModes");
@@ -2885,7 +2885,7 @@ AppearanceSettings::AppearanceSettings()
     screen->addChild(RunInWindow());
     addChild(screen);
 
-#ifdef USING_XRANDR
+#if defined(USING_XRANDR) || defined(CONFIG_DARWIN)
     addChild(new VideoModeSettings());
 #endif
 

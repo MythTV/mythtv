@@ -2,17 +2,25 @@
 #include "DisplayRes.h"
 #include "mythcontext.h"
 
-DisplayRes * DisplayRes::instance = 0;
+#ifdef USING_XRANDR
+#include "DisplayResX.h"
+#endif
+#ifdef CONFIG_DARWIN
+#include "DisplayResOSX.h"
+#endif
+
+DisplayRes * DisplayRes::instance = NULL;
 
 DisplayRes * DisplayRes::getDisplayRes(void)
 {
-#ifdef USING_XRANDR
-    if (instance == 0)
+    if (!instance && gContext->GetNumSetting("UseVideoModes", 0))
     {
-        if (gContext->GetNumSetting("UseVideoModes", 0))
-            instance = new DisplayRes();
-    }
+#ifdef USING_XRANDR
+        instance = new DisplayResX();
+#elif defined(CONFIG_DARWIN)
+        instance = new DisplayResOSX();
 #endif
+    }
     return instance;
 }
 
@@ -21,14 +29,8 @@ DisplayRes::dim_t::dim_t(void)
     vid_width = vid_height = width = height = width_mm = height_mm = 0;
 }
 
-DisplayRes::DisplayRes(void)
-{
-    Initialize();
-}
-
 bool DisplayRes::Initialize(void)
 {
-#ifdef USING_XRANDR
     int   myth_dsw, myth_dsh;
     dim_t dim;
 
@@ -94,9 +96,6 @@ bool DisplayRes::Initialize(void)
     }
 
     return true;
-#else // ! USING_XRANDR
-    return false;
-#endif
 }
 
 bool DisplayRes::getScreenSize(int vid_width, int vid_height,

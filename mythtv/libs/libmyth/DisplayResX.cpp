@@ -2,20 +2,26 @@
 #include <string.h>
 #include <cstdlib>
 
-#ifdef USING_XRANDR
 #include <X11/Xlib.h>
 #include <X11/Xlibint.h>
 #include <X11/Xproto.h>
 #include <X11/extensions/Xrandr.h>
-#endif
 
 #include <iostream>
 
-#include "DisplayRes.h"
+#include "DisplayResX.h"
 
-bool DisplayRes::get_display_size(int & width_mm, int & height_mm)
+DisplayResX::DisplayResX(void)
 {
-#ifdef USING_XRANDR
+    Initialize();
+}
+
+DisplayResX::~DisplayResX(void)
+{
+}
+
+bool DisplayResX::get_display_size(int & width_mm, int & height_mm)
+{
     Display         *display;
     int              screen_num;
 
@@ -30,14 +36,10 @@ bool DisplayRes::get_display_size(int & width_mm, int & height_mm)
 
     XCloseDisplay(display);
     return true;
-#else
-    return false;
-#endif
 }
 
-bool DisplayRes::switch_res(int width, int height)
+bool DisplayResX::switch_res(int width, int height)
 {
-#ifdef USING_XRANDR
     Display         *display;
     XRRScreenSize   *sizes;
     SizeID           current_size;
@@ -95,8 +97,5 @@ bool DisplayRes::switch_res(int width, int height)
     XRRFreeScreenConfigInfo(screen_config);
     XCloseDisplay(display);
     return true;
-#else // USING_XRANDR
-    return false;
-#endif
 }
 

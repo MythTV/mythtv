@@ -48,15 +48,16 @@ class DisplayRes {
 
     static DisplayRes * instance;
 
-    bool get_display_size(int & width_mm, int & height_mm);
-    bool switch_res(int width, int height);
-
     DisplayRes(const DisplayRes & rhs)
         { abort(); }
 
   protected:
-    DisplayRes(void);
-    ~DisplayRes(void) {;}
+    DisplayRes(void) {;}
+    virtual ~DisplayRes(void) {;}
+    
+    // These methods are implemented by the subclasses
+    virtual bool get_display_size(int & width_mm, int & height_mm) = 0;
+    virtual bool switch_res(int width, int height) = 0;
 
   public:
     static DisplayRes * getDisplayRes(void);
