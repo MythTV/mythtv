@@ -1,3 +1,7 @@
+UPGRADING FROM RELEASE 0.9
+--------------------------
+Update your database with the 0.9-to-0.10.sql script.
+
 UPGRADING FROM RELEASE 0.8
 --------------------------
 Update your database with the 0-8-to-0-9.sql script.
