@@ -586,7 +586,7 @@
 
         <container name="videoselector">
             <area>0,10,800,315</area>
-            <managedtreelist name="videotreelist" draworder="1" bins="2">
+            <managedtreelist name="videotreelist" draworder="4" bins="2">
                 <area>40,10,720,270</area>
                 <image function="selectionbar" filename="mv_selectionbar.png" location="150,-5"> </image>
                 <image function="uparrow" filename="mv_up_arrow.png"></image>
@@ -609,7 +609,7 @@
                 </bin>
             </managedtreelist>
 
-            <image name="showinglines" draworder="2" fleximage="yes">
+            <image name="showinglines" draworder="5" fleximage="yes">
                 <filename>showings.png</filename>
                 <position>0,0</position>
             </image>
@@ -618,7 +618,7 @@
 
         <container name="videoinfo">
             <area>0,310,800,300</area>
-            <textarea name="video_title" draworder="0">
+            <textarea name="video_title" draworder="4">
                 <area>30,10,530,60</area>
                 <font>leadfnt</font>
             </textarea>
@@ -629,34 +629,34 @@
 	        <multiline>yes</multiline>
 	    </textarea>
 
-            <textarea name="file_label" draworder="0" align="right">
+            <textarea name="file_label" draworder="4" align="right">
                 <area>30,140,90,40</area>
                 <font>labelfont</font>
                 <value>File:</value>
             </textarea>
-            <textarea name="player_label" draworder="0" align="right">
+            <textarea name="player_label" draworder="4" align="right">
                 <area>30,185,90,40</area>
                 <font>labelfont</font>
                 <value>Player:</value>
             </textarea>
-            <textarea name="video_file" draworder="0">
+            <textarea name="video_file" draworder="4">
                 <area>130,140,380,40</area>
                 <font>moviedata</font>
             </textarea>
-            <textarea name="video_player" draworder="0">
+            <textarea name="video_player" draworder="4">
                 <area>130,185,380,40</area>
                 <font>moviedata</font>
             </textarea>
-            <image name="video_poster" draworder="1" fleximage="no">
+            <image name="video_poster" draworder="4" fleximage="no">
                 <position>551,5</position>
                 <staticsize>166,260</staticsize>
             </image>
-            <textarea name="pl_label" draworder="0" align="right">
+            <textarea name="pl_label" draworder="4" align="right">
                 <area>700,255,60,40</area>
                 <font>labelfont</font>
                 <value>PL </value>
             </textarea>
-            <textarea name="pl_value" draworder="0">
+            <textarea name="pl_value" draworder="4">
                 <area>760,255,20,40</area>
                 <font>labelfont</font>
                 <value>1</value>
