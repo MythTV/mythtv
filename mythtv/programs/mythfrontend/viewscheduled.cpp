@@ -48,6 +48,7 @@ ViewScheduled::ViewScheduled(QSqlDatabase *ldb, MythMainWindow *parent,
     conflictRect = QRect(0, 0, 0, 0);
 
     allowselect = true;
+    allowKeys = true;
 
     theme = new XMLParse();
     theme->SetWMult(wmult);
@@ -93,6 +94,9 @@ ViewScheduled::~ViewScheduled()
 
 void ViewScheduled::keyPressEvent(QKeyEvent *e)
 {
+    if (!allowKeys)
+        return;
+
     if (allowselect)
     {
         switch (e->key())
@@ -253,7 +257,7 @@ void ViewScheduled::updateBackground(void)
 
 void ViewScheduled::paintEvent(QPaintEvent *e)
 {
-    if (doingSel)
+    if (doingSel || !allowKeys)
         return;
 
     QRect r = e->rect();
@@ -398,7 +402,9 @@ void ViewScheduled::FillList(void)
     vector<ProgramInfo *> recordinglist;
     QString cntStr = "";
 
+    allowKeys = false;
     conflicts = RemoteGetAllPendingRecordings(recordinglist);
+    allowKeys = true;
 
     vector<ProgramInfo *>::reverse_iterator pgiter = recordinglist.rbegin();
 
@@ -777,7 +783,9 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
         cerr << thequery << endl;
     }
 
+    allowKeys = false;
     vector<ProgramInfo *> *conflictlist = RemoteGetConflictList(rec, false);
+    allowKeys = true;
 
     QString dstart, dend;
     vector<ProgramInfo *>::iterator i;
@@ -842,7 +850,9 @@ void ViewScheduled::handleDuplicate(ProgramInfo *rec)
 
 void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
 {
+    allowKeys = false;
     vector<ProgramInfo *> *conflictlist = RemoteGetConflictList(rec, true);
+    allowKeys = true;
 
     QString message = tr("The follow scheduled recordings conflict with each "
                          "other.  Which would you like to record?");

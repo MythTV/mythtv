@@ -89,6 +89,7 @@ class ViewScheduled : public MythDialog
     QColor popupHighlight;
 
     bool doingSel;
+    bool allowKeys;
 };
 
 #endif
