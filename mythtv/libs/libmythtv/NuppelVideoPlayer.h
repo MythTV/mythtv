@@ -144,7 +144,8 @@ class NuppelVideoPlayer
     void ForceVideoOutputType(VideoOutputType type);
 
     void SetVideoParams(int width, int height, double fps, 
-                        int keyframedistance, float aspect = 1.33333);
+                        int keyframedistance, float aspect = 1.33333,
+                        FrameScanType scan = kScan_Ignore);
     void SetAudioParams(int bps, int channels, int samplerate);
     void SetEffDsp(int dsprate);
     void SetFileLength(int total, int frames);
@@ -256,6 +257,9 @@ class NuppelVideoPlayer
 
     float WarpFactor(void);
 
+    FrameScanType detectInterlace(FrameScanType newScan, FrameScanType scan,
+                                  float fps, int video_height);
+
     QString filename;
     
     /* rtjpeg_plugin stuff */
@@ -267,6 +271,7 @@ class NuppelVideoPlayer
     int video_size;
     double video_frame_rate;
     float video_aspect;
+    FrameScanType m_scan;
 
     int filesize;
     int startpos;

@@ -329,7 +329,7 @@ void VideoOutputDX::PrepareFrame(VideoFrame *buffer)
         VERBOSE(VB_ALL, "Could not lock surface!");    
 }
 
-void VideoOutputDX::Show()
+void VideoOutputDX::Show(FrameScanType )
 {
     HRESULT dxresult;
 

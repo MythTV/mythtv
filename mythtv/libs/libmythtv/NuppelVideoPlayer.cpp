@@ -87,6 +87,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(MythSqlDatabase *ldb,
     video_size = 0;
     text_size = 0;
     video_aspect = 1.33333;
+    m_scan = kScan_Detect;
 
     forceVideoOutput = kVideoOutput_Default;
     decoder = NULL;
@@ -418,8 +419,34 @@ void NuppelVideoPlayer::ReinitAudio(void)
         audioOutput->Reconfigure(audio_bits, audio_channels, audio_samplerate);
 }
 
+FrameScanType NuppelVideoPlayer::detectInterlace(FrameScanType newScan, 
+                                                 FrameScanType scan,
+                                                 float fps, int video_height) 
+{
+    if (kScan_Ignore != newScan || kScan_Detect == scan) 
+    {
+        // The scanning mode should be decoded from the stream, but if it
+        // isn't, we have to guess.
+
+        scan = kScan_Interlaced; // default to interlaced
+        if (720 == video_height) // ATSC 720p
+            scan = kScan_Progressive;
+        else if (fps > 45) // software deinterlacing
+            scan = kScan_Progressive;
+        else if (video_height <= 640) // HACK, 320x240 looks bad...
+            scan = kScan_Progressive;
+
+        if (kScan_Detect != newScan)
+            scan = newScan;
+    }
+
+    return scan;
+}
+
+
 void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps, 
-                                       int keyframedistance, float aspect)
+                                       int keyframedistance, float aspect,
+                                       FrameScanType scan)
 {
     if (width > 0)
         video_width = width; 
@@ -434,7 +461,13 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
     video_size = video_height * video_width * 3 / 2;
     keyframedist = keyframedistance;
 
-    video_aspect = aspect;
+    if (aspect > 0.0f)
+        video_aspect = aspect;
+
+    m_scan = detectInterlace(scan, m_scan, video_frame_rate, video_height);
+    VERBOSE(VB_PLAYBACK, QString("Interlaced: %1  video_height: %2  fps: %3")
+                                .arg(scan).arg(video_height).arg(fps));
+
 }
 
 void NuppelVideoPlayer::SetFileLength(int total, int frames)
@@ -1256,7 +1289,7 @@ void NuppelVideoPlayer::VTAVSync(void)
         gettimeofday(&nexttrigger, NULL);
         
         // Display the frame
-        videoOutput->Show();
+        videoOutput->Show(m_scan);
     }
     
     if (output_jmeter && output_jmeter->RecordCycleTime()) 
@@ -1408,7 +1441,7 @@ void NuppelVideoPlayer::ExAVSync(void)
                 delay = UpdateDelay(&nexttrigger);
             }
 
-            videoOutput->Show();
+            videoOutput->Show(m_scan);
 
             // reset the clock if delay and refresh are too close
             if (delay > -1000 && !lastsync)
@@ -1445,7 +1478,7 @@ void NuppelVideoPlayer::ExAVSync(void)
                     usleep(delay);
             }
 
-            videoOutput->Show();
+            videoOutput->Show(m_scan);
         }
     }
 
@@ -1582,7 +1615,7 @@ void NuppelVideoPlayer::OldAVSync(void)
     if (!disablevideo)
     {
         videoOutput->PrepareFrame(buffer);
-        videoOutput->Show();
+        videoOutput->Show(m_scan);
     }
     /* a/v sync assumes that when 'Show' returns, that is the instant
        the frame has become visible on screen */
@@ -1682,7 +1715,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
             videoOutput->ProcessFrame(NULL, osd, videoFilters, pipplayer);
             videoOutput->PrepareFrame(NULL); 
-            videoOutput->Show();
+            videoOutput->Show(m_scan);
             ResetNexttrigger(&nexttrigger);
 
             //printf("video waiting for unpause\n");

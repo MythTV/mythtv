@@ -301,7 +301,7 @@ void VideoOutputIvtv::PrepareFrame(VideoFrame *buffer)
     (void)buffer;
 }
 
-void VideoOutputIvtv::Show()
+void VideoOutputIvtv::Show(FrameScanType )
 {
 }
 

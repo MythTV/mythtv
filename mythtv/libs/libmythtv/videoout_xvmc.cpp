@@ -721,8 +721,10 @@ void VideoOutputXvMC::PrepareFrame(VideoFrame *buffer)
     pthread_mutex_unlock(&lock);
 }
 
-void VideoOutputXvMC::Show()
+void VideoOutputXvMC::Show(FrameScanType scan)
 {
+    int field = (kScan_Interlaced == scan) ? 1 : 3;
+
     xvmc_render_state_t *render = data->p_render_surface_to_show;
 
     if (render == NULL)
@@ -743,7 +745,7 @@ void VideoOutputXvMC::Show()
         data->p_render_surface_visible->state &= ~MP_XVMC_STATE_DISPLAY_PENDING;
 
     XvMCPutSurface(data->XJ_disp, surf, data->XJ_curwin, imgx, imgy, imgw, 
-                   imgh, dispxoff, dispyoff, dispwoff, disphoff, 3);
+                   imgh, dispxoff, dispyoff, dispwoff, disphoff, field);
 
     if (data->p_render_surface_visible && 
         (data->p_render_surface_visible != showingsurface))

@@ -393,7 +393,7 @@ void VideoOutputVIA::PrepareFrame(VideoFrame *buffer)
     }
 }
 
-void VideoOutputVIA::Show()
+void VideoOutputVIA::Show(FrameScanType )
 {
     data->VIAMPGSurface.dwTaskType = VIA_TASK_DISPLAY;
     data->VIAMPGSurface.dwDisplayPictStruct = VIA_PICT_STRUCT_FRAME;

@@ -71,6 +71,13 @@ enum letterboxModes
     kLetterbox_END
 };
 
+enum FrameScanType {
+    kScan_Ignore      = -1,
+    kScan_Progressive =  0,
+    kScan_Interlaced  =  1,
+    kScan_Detect      =  2
+};
+
 class VideoOutput
 {
   public:
@@ -87,7 +94,7 @@ class VideoOutput
                       int winh, WId embedid = 0);
 
     virtual void PrepareFrame(VideoFrame *buffer) = 0;
-    virtual void Show(void) = 0;
+    virtual void Show(FrameScanType) = 0;
 
     virtual void InputChanged(int width, int height, float aspect);
     virtual void AspectChanged(float aspect);

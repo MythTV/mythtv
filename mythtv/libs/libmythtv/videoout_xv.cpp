@@ -806,7 +806,7 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer)
     }
 }
 
-void VideoOutputXv::Show()
+void VideoOutputXv::Show(FrameScanType )
 {
     pthread_mutex_lock(&lock);
     XSync(data->XJ_disp, False);

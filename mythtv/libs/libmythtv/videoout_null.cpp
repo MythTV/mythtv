@@ -147,7 +147,7 @@ void VideoOutputNull::PrepareFrame(VideoFrame *buffer)
     (void)buffer;
 }
 
-void VideoOutputNull::Show()
+void VideoOutputNull::Show(FrameScanType )
 {
 }
 

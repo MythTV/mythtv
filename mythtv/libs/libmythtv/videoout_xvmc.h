@@ -14,7 +14,7 @@ class VideoOutputXvMC : public VideoOutput
     bool Init(int width, int height, float aspect, WId winid,
               int winx, int winy, int winw, int winh, WId embedid = 0);
     void PrepareFrame(VideoFrame *buffer);
-    void Show(void);
+    void Show(FrameScanType scan);
 
     void InputChanged(int width, int height, float aspect);
     void Zoom(int direction);
