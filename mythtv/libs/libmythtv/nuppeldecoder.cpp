@@ -28,7 +28,7 @@ NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
     usingextradata = false;
     memset(&extradata, 0, sizeof(extendeddata));
 
-    haspositionmap = false;
+    hasFullPositionMap = false;
     positionMap = new QMap<long long, long long>;
 
     totalLength = 0;
@@ -254,7 +254,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
                     (*positionMap)[ste.keyframe_number] = ste.file_offset;
                 }
-                haspositionmap = true;
+                hasFullPositionMap = true;
                 totalLength = (int)((ste.keyframe_number * keyframedist * 1.0) /
                                      video_frame_rate);
                 totalFrames = (long long)ste.keyframe_number * keyframedist;
@@ -367,17 +367,14 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     buf = new unsigned char[video_size];
     strm = new unsigned char[video_size * 2];
 
-    if (haspositionmap)
+    if (hasFullPositionMap)
         return 1;
 
     if (m_playbackinfo && m_db && positionMap)
     {
         m_playbackinfo->GetPositionMap(*positionMap, MARK_KEYFRAME, m_db);
-        if (positionMap->size())
+        if (positionMap->size() && !livetv && !watchingrecording)
         {
-            cout << "Position map not found in file, retrieved from database\n";
-            haspositionmap = true;
-
             QMap<long long, long long>::Iterator it;
             long long max_keyframe = -1;
             for (it = positionMap->begin(); it != positionMap->end(); ++it)
@@ -391,6 +388,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 totalFrames = (long long)max_keyframe * keyframedist;
                 m_parent->SetFileLength(totalLength, totalFrames);
             }
+            hasFullPositionMap = true;
             return 1;
         }
     }
@@ -754,7 +752,7 @@ void NuppelDecoder::GetFrame(int onlyvideo)
             {
                 lastKey = frameheader.timecode;
                 framesPlayed = frameheader.timecode - 1;
-                if (!haspositionmap)
+                if (!hasFullPositionMap)
                     (*positionMap)[lastKey / keyframedist] = currentposition;
             }
             if (getrawframes)
@@ -1007,7 +1005,7 @@ bool NuppelDecoder::DoFastForward(long long desiredFrame)
                 if (frameheader.comptype == 'V')
                 {
                     lastKey = frameheader.timecode;
-                    if (!haspositionmap)
+                    if (!hasFullPositionMap)
                         (*positionMap)[lastKey / keyframedist] =
                                              ringBuffer->GetTotalReadPosition();
                     framesPlayed = lastKey - 1;

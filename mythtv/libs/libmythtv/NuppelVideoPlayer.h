@@ -365,7 +365,7 @@ class NuppelVideoPlayer
     bool hasdeletetable;
     bool hasblanktable;
     bool hascommbreaktable;
-    bool haspositionmap;
+    bool hasFullPositionMap;
 
     bool own_vidbufs;
 

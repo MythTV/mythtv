@@ -91,7 +91,7 @@ class NuppelDecoder : public DecoderBase
 
     bool disablevideo;
 
-    bool haspositionmap;
+    bool hasFullPositionMap;
     QMap<long long, long long> *positionMap;
 
     int totalLength;

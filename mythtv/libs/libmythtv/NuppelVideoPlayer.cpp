@@ -113,7 +113,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
     editmode = false;
     resetvideo = false;
 
-    haspositionmap = false;
+    hasFullPositionMap = false;
 
     totalLength = 0;
     totalFrames = 0;
@@ -520,7 +520,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 
     if (ret > 0)
     {
-        haspositionmap = true;
+        hasFullPositionMap = true;
 
         LoadCutList();
     
@@ -2070,7 +2070,7 @@ bool NuppelVideoPlayer::EnableEdit(void)
 {
     editmode = false;
 
-    if (!haspositionmap || !m_playbackinfo || !m_db)
+    if (!hasFullPositionMap || !m_playbackinfo || !m_db)
         return false;
 
     bool alreadyediting = false;
@@ -2981,7 +2981,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
 
     db_lock.lock();
 
-    if (!haspositionmap)
+    if (!hasFullPositionMap)
         decoder->SetPositionMap();
 
     m_playbackinfo->SetMarkupFlag(MARK_PROCESSING, false, m_db);

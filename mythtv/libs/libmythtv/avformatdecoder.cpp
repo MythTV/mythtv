@@ -29,7 +29,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
 
     hasbframes = false;
 
-    haspositionmap = false;
+    hasFullPositionMap = false;
 
     keyframedist = 15;
 
@@ -318,17 +318,17 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     if (m_playbackinfo && m_db)
     {
         m_playbackinfo->GetPositionMap(positionMap, MARK_GOP_START, m_db);
-        if (positionMap.size() > 1)
+        if (positionMap.size() && !livetv && !watchingrecording)
         {
-            haspositionmap = true;
             long long totframes = positionMap.size() * keyframedist;
             int length = (int)((totframes * 1.0) / fps);
             m_parent->SetFileLength(length, totframes);            
+            hasFullPositionMap = true;
             gopset = true;
         }
     }
 
-    if (!haspositionmap)
+    if (!hasFullPositionMap)
     {
         // the pvr-250 seems to overreport the bitrate by * 2
         float bytespersec = (float)bitrate / 8 / 2;
@@ -338,10 +338,10 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     }
 
     dump_format(ic, 0, filename, 0);
-    if (haspositionmap)
+    if (hasFullPositionMap)
         cout << "Position map found\n";
 
-    return haspositionmap;
+    return hasFullPositionMap;
 }
 
 int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
@@ -473,7 +473,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     }
 
                     lastKey = frameNum;
-                    if (!haspositionmap)
+                    if (!hasFullPositionMap)
                         positionMap[lastKey / keyframedist] = pkt.startpos;
                 }
             }

@@ -82,7 +82,7 @@ class AvFormatDecoder : public DecoderBase
 
     bool hasbframes;
 
-    bool haspositionmap;
+    bool hasFullPositionMap;
     QMap<long long, long long> positionMap;
 
     long long lastKey;
