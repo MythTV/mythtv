@@ -29,14 +29,15 @@
      <action>MENU tv_settings.xml</action>
    </button>
 
-<!--
+
    <button>
      <type>MUSIC</type>
      <text>Music Settings</text>
-     <action>EXEC mythmusic -c</action>
+     <action>EXEC mythmusic --configure</action>
      <depends>musicmenu.xml</depends>
    </button>
 
+<!--
    <button>
      <type>WEATHER</type>
      <text>Weather Settings</text>
