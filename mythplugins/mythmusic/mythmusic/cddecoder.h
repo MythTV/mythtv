@@ -20,7 +20,7 @@ class CdDecoder : public Decoder
 
     Metadata *getMetadata(QSqlDatabase *db, int track);
     Metadata *getMetadata(QSqlDatabase *db);
-    void commitMetadata(QSqlDatabase *db, Metadata *mdata);
+    void commitMetadata(Metadata *mdata);
 
   private:
     void run();

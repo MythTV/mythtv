@@ -361,6 +361,10 @@ Metadata *VorbisDecoder::getMetadata(QSqlDatabase *db)
     return retdata;
 }    
 
+void VorbisDecoder::commitMetadata(Metadata *mdata)
+{
+}
+
 QString VorbisDecoder::getComment(vorbis_comment *vc, const char *label)
 {
     char *tag;

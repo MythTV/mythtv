@@ -13,12 +13,13 @@ LIBS += -lcdda_paranoia -lcdda_interface
 
 # Input
 HEADERS += audiooutput.h buffer.h cddecoder.h cdrip.h constants.h databasebox.h 
-HEADERS += decoder.h flacdecoder.h maddecoder.h menubox.h metadata.h 
-HEADERS += playbackbox.h output.h recycler.h settings.h scrolllabel.h 
-HEADERS += streaminput.h treecheckitem.h vorbisdecoder.h vorbisencoder.h
+HEADERS += decoder.h flacdecoder.h flacencoder.h maddecoder.h menubox.h 
+HEADERS += metadata.h playbackbox.h output.h recycler.h settings.h 
+HEADERS += scrolllabel.h streaminput.h treecheckitem.h vorbisdecoder.h 
+HEADERS += vorbisencoder.h
 
 SOURCES += audiooutput.cpp cddecoder.cpp cdrip.cpp databasebox.cpp decoder.cpp 
-SOURCES += flacdecoder.cpp maddecoder.cpp main.cpp menubox.cpp metadata.cpp 
-SOURCES += playbackbox.cpp output.cpp recycler.cpp settings.cpp scrolllabel.cpp 
-SOURCES += streaminput.cpp treecheckitem.cpp vorbisdecoder.cpp 
+SOURCES += flacdecoder.cpp flacencoder.cpp maddecoder.cpp main.cpp menubox.cpp 
+SOURCES += metadata.cpp playbackbox.cpp output.cpp recycler.cpp settings.cpp 
+SOURCES += scrolllabel.cpp streaminput.cpp treecheckitem.cpp vorbisdecoder.cpp 
 SOURCES += vorbisencoder.cpp

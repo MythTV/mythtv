@@ -25,6 +25,7 @@ class MadDecoder : public Decoder
     static const int initialFrameSize;
 
     Metadata *getMetadata(QSqlDatabase *db);
+    void commitMetadata(Metadata *mdata);
 
 private:
     void run();

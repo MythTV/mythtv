@@ -667,6 +667,10 @@ Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
     return retdata;
 }
 
+void MadDecoder::commitMetadata(Metadata *mdata)
+{
+}
+
 bool MadDecoderFactory::supports(const QString &source) const
 {
     return (source.right(extension().length()).lower() == extension());

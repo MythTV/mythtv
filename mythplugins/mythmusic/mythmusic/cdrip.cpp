@@ -26,6 +26,7 @@ extern "C" {
 #include "cdrip.h"
 #include "cddecoder.h"
 #include "vorbisencoder.h"
+#include "flacencoder.h"
 #include "settings.h"
 
 extern Settings *settings;
@@ -186,9 +187,9 @@ Ripper::Ripper(QSqlDatabase *ldb, QWidget *parent, const char *name)
     qualbox->addWidget(highvorb);
     qualitygroup->insert(highvorb);
 
-    //QRadioButton *perfectflac = new QRadioButton("Perfect", firstdiag);
-    //qualbox->addWidget(perfectflac);
-    //qualitygroup->insert(perfectflac);
+    QRadioButton *perfectflac = new QRadioButton("Perfect", firstdiag);
+    qualbox->addWidget(perfectflac);
+    qualitygroup->insert(perfectflac);
 
     qualitygroup->setRadioButtonExclusive(true);
     qualitygroup->setButton(1);
@@ -299,7 +300,9 @@ void Ripper::artistChanged(const QString &newartist)
     Metadata *data = decoder->getMetadata(db, 1);
     
     data->setArtist(newartist);
-    decoder->commitMetadata(db, data);
+    decoder->commitMetadata(data);
+
+    artistname = newartist;
 
     delete data;
     delete decoder;
@@ -311,7 +314,9 @@ void Ripper::albumChanged(const QString &newalbum)
     Metadata *data = decoder->getMetadata(db, 1);
 
     data->setAlbum(newalbum);
-    decoder->commitMetadata(db, data);
+    decoder->commitMetadata(data);
+
+    albumname = newalbum;
 
     delete data;
     delete decoder;
@@ -323,7 +328,7 @@ void Ripper::tableChanged(int row, int col)
     Metadata *data = decoder->getMetadata(db, row + 1 );
 
     data->setTitle(table->text(row, col));
-    decoder->commitMetadata(db, data);
+    decoder->commitMetadata(data);
 
     delete data;
     delete decoder;
@@ -435,6 +440,12 @@ void Ripper::ripthedisc(void)
             strcat(outfile, ".ogg");
             VorbisEncode(tempfile, outfile, encodequal, track, totalbytes,
                          current);
+        }
+        else
+        {
+            strcat(outfile, ".flac");
+            FlacEncode(tempfile, outfile, encodequal, track, totalbytes, 
+                       current);
         }
 
         unlink(tempfile);

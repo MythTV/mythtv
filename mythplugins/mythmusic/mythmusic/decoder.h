@@ -79,6 +79,7 @@ class Decoder : public QThread
                            Output *, bool = FALSE);
 
     virtual Metadata *getMetadata(QSqlDatabase *db) = 0;
+    virtual void commitMetadata(Metadata *mdata) = 0;
 
   protected:
     Decoder(DecoderFactory *, QIODevice *, Output *);

@@ -134,7 +134,8 @@ void FlacDecoder::setFlacMetadata(const FLAC__StreamMetadata *metadata)
     bitspersample = metadata->data.stream_info.bits_per_sample;
     chan = metadata->data.stream_info.channels;
     freq = metadata->data.stream_info.sample_rate;
-
+    totalsamples = metadata->data.stream_info.total_samples;
+    
     if (output())
         output()->configure(freq, chan, bitspersample, 0);
 }
@@ -333,19 +334,24 @@ void FlacDecoder::run()
     }
 
     bool flacok = true;
+    FLAC__SeekableStreamDecoderState decoderstate;
 
     while (! done && ! finish) {
         mutex()->lock();
         // decode
 
         if (seekTime >= 0.0) {
-            FLAC__seekable_stream_decoder_seek_absolute(decoder, (int)seekTime);
+            FLAC__uint64 sample = (FLAC__uint64)(seekTime * 44100.0);
+            if (sample > totalsamples - 50)
+                sample = totalsamples - 50;
+            FLAC__seekable_stream_decoder_seek_absolute(decoder, sample);
             seekTime = -1.0;
         }
 
         flacok = FLAC__seekable_stream_decoder_process_one_frame(decoder);
+        decoderstate = FLAC__seekable_stream_decoder_get_state(decoder);
 
-        if (flacok) 
+        if (decoderstate == 0 || decoderstate == 1)
         {
             if (output())
                 flush();
@@ -476,6 +482,78 @@ Metadata *FlacDecoder::getMetadata(QSqlDatabase *db)
     return retdata;
 }    
 
+void FlacDecoder::commitMetadata(Metadata *mdata)
+{
+    FILE *input = fopen(filename.ascii(), "r");
+
+    if (!input)
+        return;
+
+    FLAC__Metadata_Chain *chain = FLAC__metadata_chain_new();
+    if (!FLAC__metadata_chain_read(chain, filename.ascii()))
+    {
+        FLAC__metadata_chain_delete(chain);
+        return;
+    }
+
+    bool found_vc_block = false;
+    FLAC__StreamMetadata *block = 0;
+    FLAC__Metadata_Iterator *iterator = FLAC__metadata_iterator_new();
+
+    FLAC__metadata_iterator_init(iterator, chain);
+
+    do {
+        block = FLAC__metadata_iterator_get_block(iterator);
+        if (block->type == FLAC__METADATA_TYPE_VORBIS_COMMENT)
+            found_vc_block = true;
+    } while (!found_vc_block && FLAC__metadata_iterator_next(iterator));
+
+    if (!found_vc_block)
+    {
+        block = FLAC__metadata_object_new(FLAC__METADATA_TYPE_VORBIS_COMMENT);
+
+        while (FLAC__metadata_iterator_next(iterator))
+            ;
+
+        if (!FLAC__metadata_iterator_insert_block_after(iterator, block))
+        {
+            FLAC__metadata_chain_delete(chain);
+            FLAC__metadata_iterator_delete(iterator);
+            return;
+        }
+
+        FLAC__ASSERT(FLAC__metadata_iterator_get_block(iterator) == block);
+    }
+
+    FLAC__ASSERT(0 != block);
+    FLAC__ASSERT(block->type == FLAC__METADATA_TYPE_VORBIS_COMMENT);
+
+    if (block->data.vorbis_comment.comments > 0)
+        FLAC__metadata_object_vorbiscomment_resize_comments(block, 0);
+
+    setComment(block, "artist", mdata->Artist());
+    setComment(block, "album", mdata->Album());
+    setComment(block, "title", mdata->Title());
+    setComment(block, "genre", mdata->Genre());
+
+    char text[128];
+    if (mdata->Track() != 0)
+    {
+        sprintf(text, "%d", mdata->Track());
+        setComment(block, "tracknumber", text);
+    }
+
+    if (mdata->Year() != 0)
+    {
+        sprintf(text, "%d", mdata->Year());
+        setComment(block, "date", text);
+    }
+
+    FLAC__metadata_chain_write(chain, false, false);
+
+    FLAC__metadata_chain_delete(chain);
+    FLAC__metadata_iterator_delete(iterator);
+}
 
 QString FlacDecoder::getComment(FLAC__StreamMetadata *block, const char *label)
 {
@@ -495,13 +573,32 @@ QString FlacDecoder::getComment(FLAC__StreamMetadata *block, const char *label)
         if ((loc = entrytext.find("=")) && 
             entrytext.lower().left(qlabel.length()) == qlabel.lower())
         {
-            retstr = entrytext.right(entrytext.length() - loc - 1);
+            retstr = QString::fromUtf8(entrytext.right(entrytext.length() - loc - 1));
         }
     }
 
     return retstr;
 }
 
+void FlacDecoder::setComment(FLAC__StreamMetadata *block, const char *label,
+                             const QString &data)
+{
+    if (data.length() < 1)
+        return;
+
+    QString test = getComment(block, label);
+
+    QString thenewentry = QString(label).upper() + "=" + data;
+    QCString utf8str = thenewentry.utf8();
+    int thenewentrylen = utf8str.length();
+
+    FLAC__StreamMetadata_VorbisComment_Entry entry;
+
+    entry.length = thenewentrylen;
+    entry.entry = (unsigned char *)utf8str.data();
+
+    FLAC__metadata_object_vorbiscomment_insert_comment(block, block->data.vorbis_comment.num_comments, entry, true);
+}
 
 bool FlacDecoderFactory::supports(const QString &source) const
 {

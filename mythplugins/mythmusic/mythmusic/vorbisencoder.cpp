@@ -4,7 +4,7 @@
 #include <qprogressbar.h>
 
 #include "metadata.h"
-//#include "vorbisencoder.h"
+#include "vorbisencoder.h"
 
 #include <vorbis/vorbisfile.h>
 #include <vorbis/vorbisenc.h>
@@ -198,6 +198,7 @@ cleanup:
     ogg_stream_clear(&os);
     vorbis_block_clear(&vb);
     vorbis_dsp_clear(&vd);
+    vorbis_comment_clear(&vc);
     vorbis_info_clear(&vi);
 
     fclose(in);

@@ -276,10 +276,8 @@ Metadata *CdDecoder::getMetadata(QSqlDatabase *db)
     return retdata;
 }    
 
-void CdDecoder::commitMetadata(QSqlDatabase *db, Metadata *mdata)
+void CdDecoder::commitMetadata(Metadata *mdata)
 {
-    db = db;
-
     int cd = cd_init_device((char *)devicename.ascii());
 
     struct disc_info discinfo;

@@ -22,6 +22,7 @@ class FlacDecoder : public Decoder
     void setFlacMetadata(const FLAC__StreamMetadata *metadata);
 
     Metadata *getMetadata(QSqlDatabase *db);
+    void commitMetadata(Metadata *mdata);
 
   private:
     void run();
@@ -43,8 +44,11 @@ class FlacDecoder : public Decoder
     int bitspersample;
     unsigned long output_size;
     double totalTime, seekTime;
+    unsigned long totalsamples;
 
     QString getComment(FLAC__StreamMetadata *block, const char *label);
+    void setComment(FLAC__StreamMetadata *block, const char *label,
+                    const QString &data);
 };
 
 #endif
