@@ -717,14 +717,17 @@ double PlaybackBox::computeIntelligentWeight(Metadata *mdata,
 
 void PlaybackBox::sortListAsShuffled(void)
 {
-    int max = playlistorder.size();
+    if (plist->count())
+    {
+        int max = playlistorder.size();
 
-    for(int x = 0; x < max; x++)
-        listlist.at(playlistorder[x])->setText(0, QString::number(x));
+        for(int x = 0; x < max; x++)
+            listlist.at(playlistorder[x])->setText(0, QString::number(x));
 
-    playview->setSorting(0);
-    playview->sort();
-    jumpToItem(listlist.at(playlistorder[shuffleindex]));
+        playview->setSorting(0);
+        playview->sort();
+        jumpToItem(listlist.at(playlistorder[shuffleindex]));
+    }
 }
 
 void PlaybackBox::setupPlaylist(void)
