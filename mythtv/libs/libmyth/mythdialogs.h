@@ -138,6 +138,7 @@ class MythThemedDialog : public MythDialog
     UIStatusBarType*        getUIStatusBarType(const QString &name);
 
     void setContext(int a_context) { context = a_context; }
+    int  getContext(){return context;}
 
   public slots:
 

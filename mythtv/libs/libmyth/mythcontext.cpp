@@ -667,8 +667,6 @@ void MythContext::SetPalette(QWidget *widget)
 
 void MythContext::ThemeWidget(QWidget *widget)
 {
-    QColor bgcolor, fgcolor;
-
     if (m_themeloaded)
     {
         widget->setPalette(m_palette);
