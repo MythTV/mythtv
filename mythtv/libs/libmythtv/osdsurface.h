@@ -15,63 +15,14 @@ static inline unsigned char blendColorsAlpha(int src, int dest, int alpha)
 class OSDSurface
 {
   public:
-    OSDSurface(int w, int h)
-    {
-        yuvbuffer = new unsigned char[w * h * 3 / 2];
-        y = yuvbuffer;
-        u = yuvbuffer + w * h;
-        v = u + w * h / 4;
-        alpha = new unsigned char[w * h];
+    OSDSurface(int w, int h);
+   ~OSDSurface();
 
-        width = w;
-        height = h;
+    void Clear(void);
+    void ClearUsed(void);
 
-        size = width * height;
-
-        for (int i = 0; i < 256; i++)
-        {
-            for (int j = 0; j < 256; j++)
-            {
-                int divisor = (i + (j * (255 - i)) / 255);
-                if (divisor > 0)
-                    pow_lut[i][j] = (i * 255) / divisor;
-                else
-                    pow_lut[i][j] = 0;
-            }
-        }
-
-        Clear();
-    }
-
-   ~OSDSurface()
-    {
-        delete [] yuvbuffer;
-        delete [] alpha;
-    }
-
-    void Clear(void)
-    {
-        memset(y, 0, size);
-        memset(u, 127, size / 4);
-        memset(v, 127, size / 4);
-        memset(alpha, 0, size);
-        usedRegions = QRegion();
-    }
-
-    bool IntersectsDrawn(QRect &newrect)
-    {
-        QMemArray<QRect> rects = usedRegions.rects();
-        QMemArray<QRect>::Iterator it = rects.begin();
-        for (; it != rects.end(); ++it)
-            if (newrect.intersects(*it))
-                return true;
-        return false;
-    }
-
-    void AddRect(QRect &newrect)
-    {
-        usedRegions = usedRegions.unite(newrect);
-    }
+    bool IntersectsDrawn(QRect &newrect);
+    void AddRect(QRect &newrect);
 
     bool Changed(void) { return changed; }
     void SetChanged(bool change) { changed = change; }
@@ -94,6 +45,64 @@ class OSDSurface
     unsigned char pow_lut[256][256];
 
     bool changed;
+
+    bool usemmx;
+
+#define MAX_NEG_CROP 384
+    unsigned char cropTbl[256 + 2 * MAX_NEG_CROP];
+    unsigned char *cm;
 };
 
+typedef void (*blendtoyv12_8_fun)(unsigned char *src, unsigned char *dest,
+                                  unsigned char *alpha, bool uvplane);
+
+blendtoyv12_8_fun blendtoyv12_8_init(OSDSurface *surface);
+
+typedef void (*blendtoargb_8_fun)(OSDSurface *surf, unsigned char *src, 
+                                  unsigned char *usrc, unsigned char *vsrc, 
+                                  unsigned char *alpha, unsigned char *dest);
+
+blendtoargb_8_fun blendtoargb_8_init(OSDSurface *surface);
+           
+
+struct dither8_context;
+
+typedef void (*dithertoia44_8_fun)(unsigned char *src, unsigned char *dest,
+                                   unsigned char *alpha, 
+                                   const unsigned char *dmp, int xpos,
+                                   dither8_context *context);
+
+dithertoia44_8_fun dithertoia44_8_init(OSDSurface *surface);
+dither8_context *init_dithertoia44_8_context(bool first);
+void delete_dithertoia44_8_context(dither8_context *context);
+
+#define SCALEBITS 10
+#define ONE_HALF  (1 << (SCALEBITS - 1))
+#define FIX(x)    ((int) ((x) * (1<<SCALEBITS) + 0.5))
+
+#define YUV_TO_RGB1(cb1, cr1)\
+{\
+    cb = ((int)cb1) - 128;\
+    cr = ((int)cr1) - 128;\
+    r_add = FIX(1.40200) * cr + ONE_HALF;\
+    g_add = - FIX(0.34414) * cb - FIX(0.71414) * cr + ONE_HALF;\
+    b_add = FIX(1.77200) * cb + ONE_HALF;\
+}
+
+#define YUV_TO_RGB2(r, g, b, y1)\
+{\
+    y0 = ((int)y1) << SCALEBITS;\
+    r = cm[(y0 + r_add) >> SCALEBITS];\
+    g = cm[(y0 + g_add) >> SCALEBITS];\
+    b = cm[(y0 + b_add) >> SCALEBITS];\
+}
+
+#define RGBA_OUT(d, r, g, b, a)\
+{\
+    ((unsigned int *)(d))[0] =  ((a) << 24) | \
+                                ((r) << 16) | \
+                                ((g) << 8) | \
+                                (b);\
+}
+                       
 #endif

@@ -1162,10 +1162,6 @@ void OSD::UpdatePause(int position, QString slidertext)
                 changed = true;
             }
         }
-
-        //test w/ this later.
-        //m_setsvisible = true; 
-        //changed = true;
     }
     osdlock.unlock();
 }
@@ -1688,7 +1684,7 @@ OSDSurface *OSD::Display(void)
     if (actuallydraw)
     {
         drawSurface->SetChanged(true);
-        drawSurface->Clear();
+        drawSurface->ClearUsed();
     }
 
     vector<OSDSet *> removeList;

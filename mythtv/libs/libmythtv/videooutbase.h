@@ -191,10 +191,6 @@ class VideoOutput
 
     QWaitCondition availableVideoBuffers_wait;
 
-#define MAX_NEG_CROP 384
-    unsigned char cropTbl[256 + 2 * MAX_NEG_CROP];
-    unsigned char *cm;
-
     int desired_piph;
     int desired_pipw;
 

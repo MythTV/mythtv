@@ -81,16 +81,6 @@ VideoOutput::VideoOutput()
 
     needrepaint = false;
 
-    for (int i = 0; i < 256; i++) 
-        cropTbl[i + MAX_NEG_CROP] = i;
-    for (int i = 0; i < MAX_NEG_CROP; i++) 
-    {
-        cropTbl[i] = 0;
-        cropTbl[i + MAX_NEG_CROP + 256] = 255;
-    }
-
-    cm = cropTbl + MAX_NEG_CROP;
-
     piptmpbuf = NULL;
     pipscontext = NULL;
 
@@ -803,9 +793,17 @@ int VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd, int stride)
 {
     int retval = -1;
 
+    //struct timeval one, two, three, four;
+    //struct timeval done = {0, 0}, dtwo = {0, 0};
+
     if (osd)
     {
+        //gettimeofday(&one, NULL);
         OSDSurface *surface = osd->Display();
+        //gettimeofday(&two, NULL);
+        //timersub(&two, &one, &done);
+
+        //gettimeofday(&three, NULL);
         if (surface)
         {
             switch (frame->codec)
@@ -842,14 +840,20 @@ int VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd, int stride)
             }
             retval = surface->Changed() ? 1 : 0;
         }
+        //gettimeofday(&four, NULL);
+        //timersub(&four, &three, &dtwo);
     }
+
+    //cout << done.tv_usec << " " << dtwo.tv_usec << endl;
 
     return retval;
 }
- 
+
 void VideoOutput::BlendSurfaceToYV12(OSDSurface *surface, unsigned char *yuvptr,
                                      int stride)
 {
+    blendtoyv12_8_fun blender = blendtoyv12_8_init(surface);
+
     unsigned char *uptrdest = yuvptr + surface->width * surface->height;
     unsigned char *vptrdest = uptrdest + surface->width * surface->height / 4;
 
@@ -881,36 +885,64 @@ void VideoOutput::BlendSurfaceToYV12(OSDSurface *surface, unsigned char *yuvptr,
             dest = yuvptr + yoffset + startcol;
             alpha = surface->alpha + yoffset + startcol;
 
-            usrc = surface->u + yoffset / 4 + startcol / 2;
-            udest = uptrdest + yoffset / 4 + startcol / 2;
-
-            vsrc = surface->v + yoffset / 4 + startcol / 2;
-            vdest = vptrdest + yoffset / 4 + startcol / 2;
-
             for (int x = startcol; x <= endcol; x++)
             {
-                if (*alpha == 0)
-                    goto blendimageyv12end;
-
-                *dest = blendColorsAlpha(*src, *dest, *alpha);
-
-                if ((y % 2 == 0) && (x % 2 == 0))
+                if (x + 8 >= endcol)
                 {
-                    *udest = blendColorsAlpha(*usrc, *udest, *alpha);
-                    *vdest = blendColorsAlpha(*vsrc, *vdest, *alpha);
+                    if (*alpha != 0)
+                        *dest = blendColorsAlpha(*src, *dest, *alpha);
+                    src++;
+                    dest++;
+                    alpha++;
                 }
-
-blendimageyv12end:
-                if ((y % 2 == 0) && (x % 2 == 0))
+                else
                 {
-                    usrc++;
-                    udest++;
-                    vsrc++;
-                    vdest++;
+                    blender(src, dest, alpha, false);
+                    src += 8;
+                    dest += 8;
+                    alpha += 8;
+                    x += 7;
                 }
-                src++;
-                dest++;
-                alpha++;
+            }
+
+            alpha = surface->alpha + yoffset + startcol;
+
+            if (y % 2 == 0)
+            {
+                usrc = surface->u + yoffset / 4 + startcol / 2;
+                udest = uptrdest + yoffset / 4 + startcol / 2;
+
+                vsrc = surface->v + yoffset / 4 + startcol / 2;
+                vdest = vptrdest + yoffset / 4 + startcol / 2;
+
+                for (int x = startcol; x <= endcol; x += 2)
+                {
+                    alpha = surface->alpha + yoffset + x;
+
+                    if (x + 16 >= endcol)
+                    {
+                        if (*alpha != 0)
+                        {
+                            *udest = blendColorsAlpha(*usrc, *udest, *alpha);
+                            *vdest = blendColorsAlpha(*vsrc, *vdest, *alpha);
+                        }
+
+                        usrc++;
+                        udest++;
+                        vsrc++;
+                        vdest++;
+                    }
+                    else
+                    {
+                        blender(usrc, udest, alpha, true);
+                        blender(vsrc, vdest, alpha, true);
+                        usrc += 8;
+                        udest += 8;
+                        vsrc += 8;
+                        vdest += 8;
+                        x += 14;
+                    }
+                }
             }
         }
     }
@@ -927,6 +959,9 @@ void VideoOutput::BlendSurfaceToI44(OSDSurface *surface, unsigned char *yuvptr,
 
     if (stride < 0)
         stride = XJ_width;
+
+    dithertoia44_8_fun ditherer = dithertoia44_8_init(surface);
+    dither8_context *dcontext = init_dithertoia44_8_context(ifirst);
 
     memset(yuvptr, 0x0, stride * XJ_height);
 
@@ -966,57 +1001,36 @@ void VideoOutput::BlendSurfaceToI44(OSDSurface *surface, unsigned char *yuvptr,
 
             for (int x = startcol; x <= endcol; x++)
             {
-                if (*alpha == 0)
+                if (x + 8 >= endcol)
                 {
-                    *dest = 0;
-                    goto blendimagei44end;
+                    if (*alpha != 0)
+                    {
+                        grey = *src + ((dmp[(x & (DM_WIDTH - 1))] << 2) >> 4);
+                        grey = (grey - (grey >> 4)) >> 4;
+
+                        *dest = (((*alpha >> 4) << ashift) & amask) |
+                                (((grey) << ishift) & imask);
+                    }
+                    else
+                        *dest = 0;
+
+                    src++;
+                    dest++;
+                    alpha++;
                 }
-
-#if 0
-                grey = *src >> 4; 
-#endif
-                grey = *src + ((dmp[(x & (DM_WIDTH - 1))] << 2) >> 4);
-                grey = (grey - (grey >> 4)) >> 4;
-
-                *dest = (((*alpha >> 4) << ashift) & amask) |
-                        (((grey) << ishift) & imask);
-
-blendimagei44end:
-                src++;
-                dest++;
-                alpha++;
+                else
+                {
+                    ditherer(src, dest, alpha, dmp, x, dcontext);
+                    src += 8;
+                    dest += 8;
+                    alpha += 8;
+                    x += 7;
+                }
             }
         }
     }
-}
 
-#define SCALEBITS 10
-#define ONE_HALF  (1 << (SCALEBITS - 1))
-#define FIX(x)    ((int) ((x) * (1<<SCALEBITS) + 0.5))
-
-#define YUV_TO_RGB1(cb1, cr1)\
-{\
-    cb = ((int)cb1) - 128;\
-    cr = ((int)cr1) - 128;\
-    r_add = FIX(1.40200) * cr + ONE_HALF;\
-    g_add = - FIX(0.34414) * cb - FIX(0.71414) * cr + ONE_HALF;\
-    b_add = FIX(1.77200) * cb + ONE_HALF;\
-}
-
-#define YUV_TO_RGB2(r, g, b, y1)\
-{\
-    y0 = ((int)y1) << SCALEBITS;\
-    r = cm[(y0 + r_add) >> SCALEBITS];\
-    g = cm[(y0 + g_add) >> SCALEBITS];\
-    b = cm[(y0 + b_add) >> SCALEBITS];\
-}
-
-#define RGBA_OUT(d, r, g, b, a)\
-{\
-    ((unsigned int *)(d))[0] =  ((a) << 24) | \
-                                ((r) << 16) | \
-                                ((g) << 8) | \
-                                (b);\
+    delete_dithertoia44_8_context(dcontext);
 }
 
 void VideoOutput::BlendSurfaceToARGB(OSDSurface *surface, 
@@ -1024,6 +1038,9 @@ void VideoOutput::BlendSurfaceToARGB(OSDSurface *surface,
 {
     if (stride < 0)
         stride = XJ_width;
+
+    blendtoargb_8_fun blender = blendtoargb_8_init(surface);
+    unsigned char *cm = surface->cm;
 
     memset(argbptr, 0x0, stride * XJ_height);
 
@@ -1039,7 +1056,7 @@ void VideoOutput::BlendSurfaceToARGB(OSDSurface *surface,
         endcol = drawRect.right();
         endline = drawRect.bottom();
 
-        unsigned char *src, *usrc, *vsrc;
+        unsigned char *src, *usrcbase, *vsrcbase, *usrc, *vsrc;
         unsigned char *dest;
         unsigned char *alpha;
 
@@ -1058,27 +1075,34 @@ void VideoOutput::BlendSurfaceToARGB(OSDSurface *surface,
             dest = argbptr + destyoffset + startcol * 4;
             alpha = surface->alpha + yoffset + startcol;
 
-            usrc = surface->u + yoffset / 4 + startcol / 2;
-            vsrc = surface->v + yoffset / 4 + startcol / 2;
+            usrcbase = surface->u + yoffset / 4;
+            vsrcbase = surface->v + yoffset / 4;
 
             for (int x = startcol; x <= endcol; x++)
             {
-                if (*alpha == 0)
-                    goto blendimageargbend;
+                usrc = usrcbase + x / 2;
+                vsrc = vsrcbase + x / 2;
 
-                YUV_TO_RGB1(*usrc, *vsrc);
-                YUV_TO_RGB2(r, g, b, *src);
-                RGBA_OUT(dest, r, g, b, *alpha);
-
-blendimageargbend:
-                src++;
-                alpha++;
-                dest += 4;
-
-                if ((y % 2 == 0) && (x % 2 == 0))
+                if (x + 8 >= endcol)
                 {
-                    usrc++;
-                    vsrc++;
+                    if (*alpha != 0)
+                    {
+                        YUV_TO_RGB1(*usrc, *vsrc);
+                        YUV_TO_RGB2(r, g, b, *src);
+                        RGBA_OUT(dest, r, g, b, *alpha);
+                    }
+                    src++;
+                    alpha++;
+                    dest += 4;
+                    alpha++;
+                }
+                else
+                {
+                    blender(surface, src, usrc, vsrc, alpha, dest);
+                    src += 8;
+                    dest += 32;
+                    alpha += 8;
+                    x += 7;
                 }
             }
         }

@@ -57,6 +57,7 @@ SOURCES += yuv2rgb.cpp progfind.cpp nuppeldecoder.cpp avformatdecoder.cpp
 SOURCES += recorderbase.cpp filtermanager.cpp proglist.cpp videooutbase.cpp 
 SOURCES += videoout_null.cpp xbox.cpp dbcheck.cpp profilegroup.cpp
 SOURCES += udpnotify.cpp channeleditor.cpp channelsettings.cpp
+SOURCES += osdsurface.cpp
 
 !win32 {
     HEADERS += channel.h
