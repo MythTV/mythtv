@@ -29,7 +29,10 @@ TV::TV(void)
 {
     settings = new Settings("settings.txt");
 
-    channel = new Channel(settings->GetSetting("V4LDevice"));
+    db_conn = NULL;
+    ConnectDB();
+    
+    channel = new Channel(this, settings->GetSetting("V4LDevice"));
 
     channel->Open();
 
@@ -40,12 +43,9 @@ TV::TV(void)
 
     channel->Close();  
 
-    db_conn = NULL;
     nvr = NULL;
     nvp = NULL;
     rbuffer = NULL;
-
-    ConnectDB();
 }
 
 TV::~TV(void)
@@ -140,12 +140,12 @@ void TV::LiveTV(void)
         }
         if (paused)
         {
-            fprintf(stderr, "\r Paused: %f seconds behind realtime (%f%% buffer left)", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate, (float)rbuffer->GetFreeSpace() / (float)rbuffer->GetFileSize() * 100.0);
+//            fprintf(stderr, "\r Paused: %f seconds behind realtime (%f%% buffer left)", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate, (float)rbuffer->GetFreeSpace() / (float)rbuffer->GetFileSize() * 100.0);
         }
         else
         {
-            fprintf(stderr, "\r                                                                      ");
-            fprintf(stderr, "\r Playing: %f seconds behind realtime (%lld skipped frames)", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate, nvp->GetFramesSkipped());
+//            fprintf(stderr, "\r                                                                      ");
+//            fprintf(stderr, "\r Playing: %f seconds behind realtime (%lld skipped frames)", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate, nvp->GetFramesSkipped());
         }
         if (channelqueued && !nvp->OSDVisible())
         {
@@ -243,6 +243,9 @@ void TV::ChannelCommit(void)
 
 void TV::ChangeChannel(char *name)
 {
+    if (!CheckChannel(atoi(name)))
+        return;
+
     nvp->Pause();
     while (!nvp->GetPause())
         usleep(5);
@@ -254,7 +257,10 @@ void TV::ChangeChannel(char *name)
     rbuffer->Reset();
 
     int channum = atoi(name) - 1;
-    channel->SetChannel(channum);
+    int prevchannel = channel->GetCurrent() - 1;
+    
+    if (!channel->SetChannel(channum))
+        channel->SetChannel(prevchannel);
 
     nvr->Reset();
     nvr->Unpause();
@@ -360,4 +366,31 @@ void TV::DisconnectDB(void)
 {
     if (db_conn)
         mysql_close(db_conn);
+}
+
+bool TV::CheckChannel(int channum)
+{
+    bool ret = false;
+    char query[1024];
+    sprintf(query, "SELECT * FROM channel WHERE channum = %d", channum);
+
+    MYSQL_RES *res_set;
+
+    if (mysql_query(db_conn, query) == 0)
+    {
+        res_set = mysql_store_result(db_conn);
+
+        MYSQL_ROW row;
+
+        row = mysql_fetch_row(res_set);
+
+        if (row != NULL)
+        {
+            ret = true;
+        }
+            
+        mysql_free_result(res_set);
+    }
+
+    return ret;
 }

@@ -6,10 +6,12 @@
 
 using namespace std;
 
+class TV;
+
 class Channel
 {
  public:
-    Channel(const string &videodevice);
+    Channel(TV *parent, const string &videodevice);
    ~Channel(void);
 
     void Open(void);
@@ -36,6 +38,8 @@ class Channel
 
     struct CHANLIST *curList;  
     int totalChannels;
+
+    TV *pParent;
 };
 
 #endif

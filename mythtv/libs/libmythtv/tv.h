@@ -18,6 +18,8 @@ class TV
 
     void LiveTV(void);
 
+    bool CheckChannel(int channum);
+
  private:
     void ChangeChannel(bool up);
     void ChangeChannel(char *name);

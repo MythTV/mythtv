@@ -8,13 +8,16 @@
 #include <linux/videodev.h>
 #include "channel.h"
 #include "frequencies.h"
+#include "tv.h"
 
-Channel::Channel(const string &videodevice)
+Channel::Channel(TV *parent, const string &videodevice)
 {
     device = videodevice;
     isopen = false;
     videofd = -1;
     curchannel = -1;
+
+    pParent = parent;
 }
 
 Channel::~Channel(void)
@@ -119,33 +122,63 @@ bool Channel::SetChannelByString(const string &chan)
    
 bool Channel::SetChannel(int i)
 {
-    int frequency = curList[i].freq * 16 / 1000;
-    if (ioctl(videofd, VIDIOCSFREQ, &frequency) == -1)
-        perror("channel set:");
+    if (pParent->CheckChannel(i+1))
+    {
+        int frequency = curList[i].freq * 16 / 1000;
+        if (ioctl(videofd, VIDIOCSFREQ, &frequency) == -1)
+            perror("channel set:");
 
-    curchannel = i;
-    
-    return true;
+	/*
+	struct video_tuner tuner;
+
+	usleep(200000);
+
+	if (-1 == ioctl(videofd, VIDIOCGTUNER, &tuner))
+            return false;
+	
+	if (tuner.signal)
+        {
+            curchannel = i;
+	    printf("%d has signal\n", i + 1);
+            return true;
+	}*/
+	return true;
+    }
+    return false;
 }
 
 bool Channel::ChannelUp(void)
 {
-    curchannel++;
+    bool finished = false;
 
-    if (curchannel == totalChannels)
-        curchannel = 0;
+    while (!finished)
+    {
+        curchannel++;
 
-    return SetChannel(curchannel);
+        if (curchannel == totalChannels)
+            curchannel = 0;
+
+        finished = SetChannel(curchannel);
+    }
+
+    return finished;
 }
 
 bool Channel::ChannelDown(void)
 {
-    curchannel--;
+    bool finished = false;
 
-    if (curchannel < 0)
-        curchannel = totalChannels - 1;
+    while (!finished)
+    {
+        curchannel--;
 
-    return SetChannel(curchannel);
+        if (curchannel < 0)
+            curchannel = totalChannels - 1;
+
+        finished = SetChannel(curchannel);
+    }
+
+    return finished;
 }
 
 char *Channel::GetCurrentName(void)
