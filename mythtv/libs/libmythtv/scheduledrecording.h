@@ -77,6 +77,10 @@ public:
     // recorded
     void doneRecording(QSqlDatabase* db, const ProgramInfo& proginfo);
 
+    // Remember a program has been reccorded before (means it won't
+    // be recorded again)
+    void addHistory(QSqlDatabase* db, const ProgramInfo& proginfo);
+
     // Forget whether a program has been recorded before (allows it to
     // be recorded again)
     void forgetHistory(QSqlDatabase* db, const ProgramInfo& proginfo);

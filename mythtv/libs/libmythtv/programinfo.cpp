@@ -2042,7 +2042,14 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
             record = new ScheduledRecording();
             record->loadByProgram(db, this);
         }
-        record->doneRecording(db, *this);
+        // endtime is checked in the scheduler so set it to some time
+        // in the past.  make it fixed so we can easily identify it as
+        // manually added.  starttime isn't checked anywhere so use it
+        // to record when this was done.
+        ProgramInfo dummypi = *this;
+        dummypi.recstartts = QDateTime::currentDateTime();
+        dummypi.recendts = QDateTime(QDate(1970, 1, 1));
+        record->addHistory(db, dummypi);
     }
     if (ret == clearov)
         setOverride(db, 0);

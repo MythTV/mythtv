@@ -507,6 +507,12 @@ void ScheduledRecording::doneRecording(QSqlDatabase* db,
         getRecordingType() == kFindOneRecord)
         remove(db);
 
+    addHistory(db, proginfo);
+}
+
+void ScheduledRecording::addHistory(QSqlDatabase* db, 
+                                    const ProgramInfo& proginfo) 
+{
     QString sqltitle = proginfo.title;
     QString sqlsubtitle = proginfo.subtitle;
     QString sqldescription = proginfo.description;
@@ -532,7 +538,7 @@ void ScheduledRecording::doneRecording(QSqlDatabase* db,
     QSqlQuery result = db->exec(query);
     if (!result.isActive())
     {
-        MythContext::DBError("doneRecording", result);
+        MythContext::DBError("addHistory", result);
     }
     else
     {
