@@ -263,6 +263,8 @@ int myth_system(const QString &command, int flags)
 {
 #ifdef USE_LIRC
     LircEventLock lirc_lock(!(flags & MYTH_SYSTEM_DONT_BLOCK_LIRC));
+#else
+    (void)flags;
 #endif
 
     return system(command);
