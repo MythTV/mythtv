@@ -758,8 +758,9 @@ void handlePrograms(int id, int offset, QMap<QString,
             querystr.sprintf("INSERT INTO program (chanid,starttime,endtime,"
                              "title,subtitle,description,category) VALUES(%d,"
                              " %s, %s, \"%s\", \"%s\", \"%s\", \"%s\");", 
-                             chanid, (*i).start.toString().ascii(), 
-                             (*i).end.toString().ascii(), 
+                             chanid, 
+                             (*i).start.toString("yyyyMMddhhmmss").ascii(), 
+                             (*i).end.toString("yyyyMMddhhmmss").ascii(), 
                              (*i).title.utf8().data(), 
                              (*i).subtitle.utf8().data(), 
                              (*i).desc.utf8().data(), 
