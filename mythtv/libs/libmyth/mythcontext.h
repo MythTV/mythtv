@@ -15,6 +15,10 @@
 
 #include <iostream>
 #include <vector>
+
+#include <mythtv/mythmediamonitor.h>
+#include <mythtv/mythmedia.h>
+
 using namespace std;
 
 #if (QT_VERSION < 0x030100)
@@ -160,6 +164,9 @@ class MythContext : public QObject
                             int defaultval = 0);
 
     void SetSetting(const QString &key, const QString &newValue);
+
+    void SetMediaMonitor(MediaMonitor * lmediamonitor);
+    QValueList <MythMediaDevice*> GetMedias(MediaType mediatype);
 
     QFont GetBigFont();
     QFont GetMediumFont();

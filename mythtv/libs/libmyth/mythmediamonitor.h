@@ -55,6 +55,7 @@ class MediaMonitor : public QObject
     void checkDevices(void);
     void startMonitoring(void);
     void stopMonitoring(void);
+    QValueList <MythMediaDevice*> getMedias(MediaType mediatype);
 
   public slots:
     void mediaStatusChanged( MediaStatus oldStatus, MythMediaDevice* pMedia);

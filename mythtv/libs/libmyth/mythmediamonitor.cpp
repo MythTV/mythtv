@@ -286,6 +286,23 @@ void MediaMonitor::stopMonitoring()
     m_Thread.wait();
 }
 
+// Ask for available media
+QValueList <MythMediaDevice*> MediaMonitor::getMedias(MediaType mediatype)
+{
+    QValueList <MythMediaDevice*> medias;
+    QValueList <MythMediaDevice*>::Iterator itr = m_Devices.begin();
+    MythMediaDevice* pDev;
+    while (itr!=m_Devices.end())
+    {
+        pDev = *itr;
+        if ((pDev->getMediaType()==mediatype) &&
+            ((pDev->getStatus()==MEDIASTAT_USEABLE) ||
+            (pDev->getStatus()==MEDIASTAT_MOUNTED)))
+            medias.push_back(pDev);
+        itr++;
+    }
+    return medias;
+}
 // Signal handler.
 void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus, 
                                       MythMediaDevice* pMedia)

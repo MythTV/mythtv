@@ -1000,6 +1000,7 @@ int main(int argc, char **argv)
         mon->addFSTab();
         VERBOSE(VB_ALL, QString("Starting media monitor."));
         mon->startMonitoring();
+        gContext->SetMediaMonitor(mon);
     }
 #endif
 

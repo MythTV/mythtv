@@ -43,7 +43,7 @@ bool MythMediaDevice::openDevice()
     if (isDeviceOpen())
         return true;
  
-    m_DeviceHandle = open(m_DevicePath, O_RDONLY | O_NONBLOCK | O_EXCL);
+    m_DeviceHandle = open(m_DevicePath, O_RDONLY | O_NONBLOCK);
     
     return isDeviceOpen();
 }
@@ -192,6 +192,7 @@ MediaStatus MythMediaDevice::setStatus( MediaStatus NewStatus, bool CloseIt )
         {
             // the disk is not / should not be mounted.
             case MEDIASTAT_ERROR:
+            case MEDIASTAT_OPEN:
                 if (MEDIASTAT_MOUNTED == OldStatus)
                     unmount();
                 break;
@@ -204,7 +205,6 @@ MediaStatus MythMediaDevice::setStatus( MediaStatus NewStatus, bool CloseIt )
                 mount();
                 break;
             case MEDIASTAT_UNKNOWN:
-            case MEDIASTAT_OPEN:
             case MEDIASTAT_USEABLE:
             case MEDIASTAT_MOUNTED:
                 // get rid of the compiler warning...

@@ -91,6 +91,8 @@ class MythContextPrivate
     int m_logenable, m_logmaxcount, m_logprintlevel;
     QMap<QString,int> lastLogCounts;
     QMap<QString,QString> lastLogStrings;
+
+    MediaMonitor * media_monitor;
 };
 
 MythContextPrivate::MythContextPrivate(MythContext *lparent)
@@ -114,6 +116,8 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
 
     m_db = QSqlDatabase::addDatabase("QMYSQL3", "MythContext");
     screensaver = new ScreenSaverControl();
+
+    media_monitor = NULL;
 }
 
 void MythContextPrivate::Init(bool gui, bool lcd)
@@ -1224,6 +1228,19 @@ QImage *MythContext::CacheRemotePixmap(const QString &url)
 void MythContext::SetSetting(const QString &key, const QString &newValue)
 {
     d->m_settings->SetSetting(key, newValue);
+}
+
+void MythContext::SetMediaMonitor(MediaMonitor * lmediamonitor)
+{
+    d->media_monitor = lmediamonitor;
+}
+
+QValueList <MythMediaDevice*> MythContext::GetMedias(MediaType mediatype)
+{
+    QValueList <MythMediaDevice*> medias;
+    if (d->media_monitor != NULL)
+        medias = d->media_monitor->getMedias(mediatype);
+    return medias;
 }
 
 bool MythContext::SendReceiveStringList(QStringList &strlist, bool quickTimeout)
