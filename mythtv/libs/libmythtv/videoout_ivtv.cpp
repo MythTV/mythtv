@@ -296,9 +296,10 @@ void VideoOutputIvtv::StopEmbedding(void)
     VideoOutput::StopEmbedding();
 }
 
-void VideoOutputIvtv::PrepareFrame(VideoFrame *buffer)
+void VideoOutputIvtv::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 {
     (void)buffer;
+    (void)t;
 }
 
 void VideoOutputIvtv::Show(FrameScanType )

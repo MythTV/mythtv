@@ -216,9 +216,6 @@ TV::TV(void)
     myWindow = NULL;
     udpnotify = NULL;
     
-    if (gContext->GetNumSetting("Deinterlace"))
-        baseFilters += "linearblend,";
-
     baseFilters += gContext->GetSetting("CustomFilters");
 
     gContext->addListener(this);
@@ -239,9 +236,6 @@ TV::TV(void)
 
     sleepTimer = new QTimer(this);
     connect(sleepTimer, SIGNAL(timeout()), SLOT(SleepEndTimer()));
-
-    lcdTimer = new QTimer(this);
-    connect(lcdTimer, SIGNAL(timeout()), SLOT(UpdateLCD()));
 }
 
 void TV::Init(bool createWindow)
@@ -285,32 +279,22 @@ void TV::Init(bool createWindow)
     {
         MythMainWindow *mainWindow = gContext->GetMainWindow();
         bool fullscreen = !gContext->GetNumSetting("GuiSizeForTV", 0);
-        int screenwidth = QApplication::desktop()->width();
-        int screenheight = QApplication::desktop()->height();
-        bool switchMode = gContext->GetNumSetting("UseVideoModes", 0);
-        if (switchMode) 
+        if (fullscreen) 
         {
-            // xrandr to video size
-            char buf[128];
-            screenwidth = gContext->GetNumSetting("TVVidModeWidth",
-                                                  screenwidth);
-            screenheight = gContext->GetNumSetting("TVVidModeHeight",
-                                                   screenheight);
-            sprintf(buf, "xrandr -s %dx%d", screenwidth, screenheight);
-            system(buf);
-        }
-        if (fullscreen || switchMode) 
-        {
-            mainWindow->setGeometry(0, 0, screenwidth, screenheight);
-            mainWindow->setFixedSize(QSize(screenwidth, screenheight));
+            mainWindow->setGeometry(0, 0, QApplication::desktop()->width(),
+                                    QApplication::desktop()->height());
+            mainWindow->setFixedSize(QSize(QApplication::desktop()->width(),
+                                           QApplication::desktop()->height()));
         }
         myWindow = new MythDialog(mainWindow, "video playback window");
         myWindow->installEventFilter(this);
         myWindow->setNoErase();
-        if (fullscreen || switchMode) 
+        if (fullscreen) 
         {
-            myWindow->setGeometry(0, 0, screenwidth, screenheight);
-            myWindow->setFixedSize(QSize(screenwidth, screenheight));
+            myWindow->setGeometry(0, 0, QApplication::desktop()->width(),
+                                  QApplication::desktop()->height());
+            myWindow->setFixedSize(QSize(QApplication::desktop()->width(),
+                                         QApplication::desktop()->height()));
         }
         myWindow->show();
         myWindow->setBackgroundColor(Qt::black);
@@ -343,17 +327,7 @@ TV::~TV(void)
     {
         delete myWindow;
         bool fullscreen = !gContext->GetNumSetting("GuiSizeForTV", 0);
-        bool switchMode = gContext->GetNumSetting("UseVideoModes", 0);
-        if (switchMode) 
-        {
-            // xrandr to gui size
-            char buf[128];
-            int screenwidth = gContext->GetNumSetting("GuiVidModeWidth", 0);
-            int screenheight = gContext->GetNumSetting("GuiVidModeHeight", 0);
-            sprintf(buf, "xrandr -s %dx%d", screenwidth, screenheight);
-            system(buf);
-        }
-        if (fullscreen || switchMode) 
+        if (fullscreen) 
         {
             int xbase, width, ybase, height;
             float wmult, hmult;
@@ -374,11 +348,6 @@ TV::~TV(void)
         delete m_db;
 
     gContext->GetLCDDevice()->switchToTime();
-    if (lcdTimer)
-    {
-        lcdTimer->stop();
-        delete lcdTimer;
-    }
 }
 
 TVState TV::GetState(void)
@@ -514,7 +483,6 @@ int TV::Playback(ProgramInfo *rcinfo)
     changeState = true;
 
     gContext->GetLCDDevice()->switchToChannel(rcinfo->chansign, rcinfo->title, rcinfo->subtitle);
-    lcdTimer->start(kLCDTimeout, false);
 
     return 1;
 }
@@ -1040,6 +1008,9 @@ void TV::RunTV(void)
     int updatecheck = 0;
     update_osd_pos = false;
 
+    lastLcdUpdate = QDateTime::currentDateTime();
+    UpdateLCD();
+    
     ChannelClear();
 
     switchingCards = false;
@@ -1141,6 +1112,23 @@ void TV::RunTV(void)
                     ChannelClear();
             }
         }
+        
+        if (lastLcdUpdate.secsTo(QDateTime::currentDateTime()) > 60) 
+        {
+            if (internalState == kState_WatchingLiveTV)
+                ShowLCDChannelInfo();
+
+            lastLcdUpdate = QDateTime::currentDateTime();
+        }
+        
+        float progress = 0.0;
+        if (activenvp)
+        {
+            QString dummy;
+            int pos = activenvp->calcSliderPos(dummy);
+            progress = (float)pos / 1000;
+        }
+        gContext->GetLCDDevice()->setChannelProgress(progress);
     }
   
     nextState = kState_None;
@@ -2655,31 +2643,24 @@ void TV::UpdateOSDInput(void)
 
 void TV::UpdateLCD(void)
 {
-/*
-    if (internalState == kState_WatchingLiveTV)
-    {
-        QString title, subtitle, callsign, dummy;
-        GetChannelInfo(recorder, title, subtitle, dummy, dummy, dummy, dummy, callsign, dummy, dummy, dummy, dummy, dummy, dummy);
-        if ((callsign != lcdCallsign) || (title != lcdTitle) || (subtitle != lcdSubtitle))
-        {
-            gContext->GetLCDDevice()->switchToChannel(callsign, title, subtitle);
-            lcdCallsign = callsign;
-            lcdTitle = title;
-            lcdSubtitle = subtitle;
-        }
-    }
+    // Make sure the LCD information gets updated shortly
+    lastLcdUpdate = lastLcdUpdate.addSecs(-120);
+}
 
-    float progress = 0.0;
-    if (activenvp)
-    {
-        QString dummy;
-        int pos = activenvp->calcSliderPos(dummy);
-        progress = (float)pos / 1000;
-    }
-    gContext->GetLCDDevice()->setChannelProgress(progress);
+void TV::ShowLCDChannelInfo(void)
+{
+    QString title, subtitle, callsign, dummy;
+    GetChannelInfo(recorder, title, subtitle, dummy, dummy, dummy, dummy, 
+                   callsign, dummy, dummy, dummy, dummy, dummy, dummy);
 
-    lcdTimer->start(kLCDTimeout, true);
-*/
+    if ((callsign != lcdCallsign) || (title != lcdTitle) || 
+        (subtitle != lcdSubtitle))
+    {
+        gContext->GetLCDDevice()->switchToChannel(callsign, title, subtitle);
+        lcdCallsign = callsign;
+        lcdTitle = title;
+        lcdSubtitle = subtitle;
+    }
 }
 
 void TV::GetNextProgram(RemoteEncoder *enc, int direction,

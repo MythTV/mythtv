@@ -101,7 +101,6 @@ class TV : public QObject
     void SleepEndTimer(void);
     void TreeMenuEntered(OSDListTreeType *tree, OSDGenericTree *item);
     void TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item);
-    void UpdateLCD(void);
 
   protected:
     void doLoadMenu(void);
@@ -198,6 +197,9 @@ class TV : public QObject
 
     void BuildOSDTreeMenu(void);
     void ShowOSDTreeMenu(void);
+
+    void UpdateLCD(void);
+    void ShowLCDChannelInfo(void);
 
     int osd_display_time;
 
@@ -322,7 +324,7 @@ class TV : public QObject
 
     char vbimode;
 
-    QTimer *lcdTimer;
+    QDateTime lastLcdUpdate;
     QString lcdTitle, lcdSubtitle, lcdCallsign;
     
     QString baseFilters;

@@ -142,9 +142,10 @@ void VideoOutputNull::StopEmbedding(void)
     VideoOutput::StopEmbedding();
 }
 
-void VideoOutputNull::PrepareFrame(VideoFrame *buffer)
+void VideoOutputNull::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 {
     (void)buffer;
+    (void)t;
 }
 
 void VideoOutputNull::Show(FrameScanType )

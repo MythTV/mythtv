@@ -493,7 +493,7 @@ int handleExit(void)
     QStringList strlist = "";
     strlist << "QUERY_IS_ACTIVE_BACKEND";
     strlist << gContext->GetHostName();
-                
+
     gContext->SendReceiveStringList(strlist);
 
     if (QString(strlist[0]) == "FALSE")
@@ -831,14 +831,14 @@ int main(int argc, char **argv)
     if (logfile != "")
     {
         logfd = open(logfile.ascii(), O_WRONLY|O_CREAT|O_APPEND, 0664);
-         
+ 
         if (logfd < 0)
         {
             perror("open(logfile)");
             return -1;
         }
     }
-    
+
     if (logfd != -1)
     {
         // Send stdout and stderr to the logfile
@@ -889,7 +889,7 @@ int main(int argc, char **argv)
                     ++acttry;
                 }
             }
-            
+
             if (WOLsqlCommand.isEmpty() || (acttry > retries))
             {
                 printf("Sorry, couldn't open db\nExiting.\n");
@@ -928,17 +928,6 @@ int main(int argc, char **argv)
     }
 
     gContext->LoadQtConfig();
-
-    bool switchMode = gContext->GetNumSetting("UseVideoModes", 0);
-    if (switchMode) 
-    {
-        // xrandr to gui size
-        char buf[128];
-        int screenwidth = gContext->GetNumSetting("GuiVidModeWidth", 0);
-        int screenheight = gContext->GetNumSetting("GuiVidModeHeight", 0);
-        sprintf(buf, "xrandr -s %dx%d", screenwidth, screenheight);
-        system(buf);
-    }
 
     MythMainWindow *mainWindow = new MythMainWindow();
     mainWindow->Show();
@@ -986,7 +975,7 @@ int main(int argc, char **argv)
             if (pmanager->run_plugin(pluginname))
                 return 0;
         }
-    }            
+    }
 
     qApp->lock();
     qApp->unlock();

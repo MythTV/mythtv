@@ -1,5 +1,5 @@
 /* Based on xqcam.c by Paul Chinn <loomer@svpal.org> */
- 
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -41,9 +41,9 @@ extern "C" {
 extern "C" {
 #include <X11/extensions/Xinerama.h>
 
-extern int      XShmQueryExtension(Display*);
-extern int      XShmGetEventBase(Display*);
-extern XvImage  *XvShmCreateImage(Display*, XvPortID, int, char*, int, int, XShmSegmentInfo*);
+    extern int      XShmQueryExtension(Display*);
+    extern int      XShmGetEventBase(Display*);
+    extern XvImage  *XvShmCreateImage(Display*, XvPortID, int, char*, int, int, XShmSegmentInfo*);
 }
 
 const int kNumBuffers = 31;
@@ -75,9 +75,9 @@ struct XvData
 
 static int XJ_error_catcher(Display * d, XErrorEvent * xeev)
 {
-  d = d; 
-  xeev = xeev;
-  return 0;
+    d = d; 
+    xeev = xeev;
+    return 0;
 }
 
 VideoOutputXv::VideoOutputXv(void)
@@ -95,6 +95,10 @@ VideoOutputXv::VideoOutputXv(void)
     framesShown = 0;
     showFrame = 1;
     fps = 0;
+
+    // If using custom display resolutions, display_res will point
+    // to a singleton instance of the DisplayRes class
+    display_res = DisplayRes::getDisplayRes();
 }
 
 VideoOutputXv::~VideoOutputXv()
@@ -110,6 +114,10 @@ VideoOutputXv::~VideoOutputXv()
 
     Exit();
     delete data;
+
+    if (display_res)
+        // Switch back to desired resolution for GUI
+        display_res->switchToGUI();
 }
 
 void VideoOutputXv::AspectChanged(float aspect)
@@ -153,6 +161,24 @@ void VideoOutputXv::InputChanged(int width, int height, float aspect)
     {
         DeleteXBuffers();
         CreateXBuffers();
+    }
+
+    if (display_res && display_res->switchToVid(width, height))
+    {
+        // Switching to custom display resolution succeeded
+        // Make a note of the new size
+        dispx = dispy = 0;
+        dispw = display_res->Width();
+        disph = display_res->Height();
+        w_mm =  display_res->Width_mm();
+        h_mm =  display_res->Height_mm();
+
+        data->display_aspect = static_cast<float>(w_mm/h_mm);
+
+        // Resize X window to fill new resolution
+        XMoveResizeWindow(data->XJ_disp, data->XJ_win, 0, 0,
+                          display_res->Width(),
+                          display_res->Height());
     }
 
     MoveResize();
@@ -202,7 +228,7 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
     int (*old_handler)(Display *, XErrorEvent *);
     int i, ret;
     XJ_caught_error = 0;
-  
+
     unsigned int p_version, p_release, p_request_base, p_event_base, 
                  p_error_base;
     int p_num_adaptors;
@@ -222,19 +248,42 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
         printf("open display failed\n"); 
         return false;
     }
- 
+
     data->XJ_screen = DefaultScreenOfDisplay(data->XJ_disp);
     XJ_screen_num = DefaultScreen(data->XJ_disp);
 
-    if (myth_dsw != 0)
-        w_mm = myth_dsw;
-    else
-        w_mm = DisplayWidthMM(data->XJ_disp, XJ_screen_num);
+    if (winid <= 0)
+    {
+        cerr << "Bad winid given to output\n";
+        return false;
+    }
 
-    if (myth_dsh != 0)
-        h_mm = myth_dsh;
+    data->XJ_curwin = data->XJ_win = winid;
+
+    if (display_res && display_res->switchToVid(width, height))
+    {
+        // Switching to custom display resolution succeeded
+        // Make a note of the new size
+        dispw = display_res->Width();
+        disph = display_res->Height();
+        w_mm = display_res->Width_mm();
+        h_mm = display_res->Height_mm();
+
+        // Resize X window to fill new resolution
+        XMoveResizeWindow(data->XJ_disp, winid, 0, 0, dispw, disph);
+    }
     else
-        h_mm = DisplayHeightMM(data->XJ_disp, XJ_screen_num);
+    {
+        if (myth_dsw != 0)
+            w_mm = myth_dsw;
+        else
+            w_mm = DisplayWidthMM(data->XJ_disp, XJ_screen_num);
+
+        if (myth_dsh != 0)
+            h_mm = myth_dsh;
+        else
+            h_mm = DisplayHeightMM(data->XJ_disp, XJ_screen_num);
+    }
 
     usingXinerama = 
         (XineramaQueryExtension(data->XJ_disp, &event_base, &error_base) &&
@@ -252,9 +301,9 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
         int gui_w = gContext->GetNumSetting("GuiWidth", w);
         int gui_h = gContext->GetNumSetting("GuiHeight", h);
 
-		if (gui_w)
+        if (gui_w)
             w_mm = w_mm * gui_w / w;
-		if (gui_h)
+        if (gui_h)
             h_mm = h_mm * gui_h / h;
 
         data->display_aspect = (float)w_mm/h_mm;
@@ -264,7 +313,7 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
 
     XJ_white = XWhitePixel(data->XJ_disp, XJ_screen_num);
     XJ_black = XBlackPixel(data->XJ_disp, XJ_screen_num);
-  
+
     data->XJ_root = DefaultRootWindow(data->XJ_disp);
 
     ret = XvQueryExtension(data->XJ_disp, &p_version, &p_release, 
@@ -291,11 +340,11 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
             if ((ai[i].type & XvInputMask) &&
                 (ai[i].type & XvImageMask))
             {
-                for(unsigned int p = ai[i].base_id;
-                        p < (ai[i].base_id + ai[i].num_ports);
-                        p++)
+                for (unsigned int p = ai[i].base_id;
+                    p < (ai[i].base_id + ai[i].num_ports);
+                    p++)
                 {
-                    if(XvGrabPort(data->XJ_disp, p, CurrentTime) == Success)
+                    if (XvGrabPort(data->XJ_disp, p, CurrentTime) == Success)
                     {
                         xv_port = p;
                         VERBOSE(VB_GENERAL,
@@ -305,7 +354,7 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
                 }
             }
         }
- 
+
         if (p_num_adaptors > 0)
             XvFreeAdaptorInfo(ai);
     }
@@ -328,20 +377,22 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
         use_shm = 0;
     }
 
+    if (display_res)
+    {
+        // Using custom, full-screen display resolution
+        XJ_screenx = XJ_screeny = 0;
+        XJ_screenwidth = display_res->Width();
+        XJ_screenheight = display_res->Height();
+    }
 #ifndef QWS
-    GetMythTVGeometry(data->XJ_disp, XJ_screen_num,
-                      &XJ_screenx, &XJ_screeny, 
-                      &XJ_screenwidth, &XJ_screenheight);
+    else
+    {
+        GetMythTVGeometry(data->XJ_disp, XJ_screen_num,
+                          &XJ_screenx, &XJ_screeny, 
+                          &XJ_screenwidth, &XJ_screenheight);
+    }
 #endif
 
-    if (winid <= 0)
-    {
-        cerr << "Bad winid given to output\n";
-        return false;
-    }
-
-    data->XJ_curwin = data->XJ_win = winid;
-    
     old_handler = XSetErrorHandler(XJ_error_catcher);
     XSync(data->XJ_disp, 0);
 
@@ -358,7 +409,7 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
         {
             printf("***\n" );
             printf("* No XShm support found, MythTV may be very slow and "
-                    "consume lots of cpu.\n");
+                   "consume lots of cpu.\n");
         }
     }
 
@@ -480,7 +531,7 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
     }
 
     MoveResize();
- 
+
     if (gContext->GetNumSetting("UseOutputPictureControls", 0))
     {
         ChangePictureAttribute(kPictureAttribute_Brightness, brightness);
@@ -493,7 +544,12 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
 
     return true;
 }
-
+bool VideoOutputXv::ApproveDeintFilter(const QString& filtername) const
+{
+    if (filtername == "bobdeint")
+        return (xv_port != -1); // FIXME, implement split-frame bob for non-Xv
+    return true;
+}
 bool VideoOutputXv::CreateXvBuffers(void)
 {
     data->XJ_SHMInfo = new XShmSegmentInfo[numbuffers + 1];
@@ -514,7 +570,7 @@ bool VideoOutputXv::CreateXvBuffers(void)
         }
 
         image->data = (data->XJ_SHMInfo)[i].shmaddr =
-                               (char *)shmat((data->XJ_SHMInfo)[i].shmid, 0, 0);
+                      (char *)shmat((data->XJ_SHMInfo)[i].shmid, 0, 0);
 
         data->buffers[(unsigned char *)image->data] = image;
 
@@ -567,7 +623,7 @@ bool VideoOutputXv::CreateShmBuffers(void)
     }
 
     image->data = (data->XJ_SHMInfo)[0].shmaddr =
-                              (char *)shmat((data->XJ_SHMInfo)[0].shmid, 0, 0);
+                  (char *)shmat((data->XJ_SHMInfo)[0].shmid, 0, 0);
 
     // mark for delete immediately - it won't be removed until detach
     shmctl((data->XJ_SHMInfo)[0].shmid, IPC_RMID, 0);
@@ -651,7 +707,7 @@ void VideoOutputXv::DeleteXvBuffers()
 {
     map<unsigned char *, XvImage *>::iterator iter = data->buffers.begin();
 
-    for(int i=0; iter != data->buffers.end(); ++iter, ++i)
+    for (int i=0; iter != data->buffers.end(); ++iter, ++i)
     {
         XShmDetach(data->XJ_disp, &(data->XJ_SHMInfo)[i]);
 
@@ -730,23 +786,38 @@ void VideoOutputXv::EmbedInWidget(WId wid, int x, int y, int w, int h)
 
     VideoOutput::EmbedInWidget(wid, x, y, w, h);
 
+    if (display_res)
+    {
+        // Switch to resolution of widget
+        XWindowAttributes   attr;
+
+        XGetWindowAttributes(data->XJ_disp, wid, &attr);
+        display_res->switchToCustom(attr.width, attr.height);
+    }
+
     pthread_mutex_unlock(&lock);
 }
- 
+
 void VideoOutputXv::StopEmbedding(void)
 {
     if (!embedding)
         return;
 
     pthread_mutex_lock(&lock);
-
     data->XJ_curwin = data->XJ_win;
     VideoOutput::StopEmbedding();
+
+    if (display_res)
+    {
+        // Switch back to resolution for full screen video
+        display_res->switchToVid(display_res->vidWidth(),
+                                 display_res->vidHeight());
+    }
 
     pthread_mutex_unlock(&lock);
 }
 
-void VideoOutputXv::PrepareFrame(VideoFrame *buffer)
+void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 {
     if (!buffer)
         buffer = scratchFrame;
@@ -776,9 +847,21 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer)
             memcpy((unsigned char *)image->data + (width * height) * 5 / 4,
                    scratchspace, width * height / 4);
         }
-
+        int src_x=imgx, src_y=imgy, src_w=imgw, src_h=imgh;
+        if (m_deinterlacing && t == kScan_Interlaced) 
+        {
+            // Show top field
+            src_y = imgy/2;
+            src_h = imgh/2;
+        }
+        else if (m_deinterlacing && t == kScan_Intr2ndField) 
+        {
+            // Show bottom field
+            src_y = (buffer->height + imgy)/2;
+            src_h = imgh/2;
+        }
         XvShmPutImage(data->XJ_disp, xv_port, data->XJ_curwin, data->XJ_gc,
-                      image, imgx, imgy, imgw, imgh, dispxoff, dispyoff,
+                      image, src_x, src_y, src_w, src_h, dispxoff, dispyoff,
                       dispwoff, disphoff, False);
 
         pthread_mutex_unlock(&lock);
@@ -926,10 +1009,12 @@ void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
 {
     pthread_mutex_lock(&lock);
 
+    bool pauseframe = false;
     if (!frame)
     {
         frame = scratchFrame;
         CopyFrame(scratchFrame, &pauseFrame);
+        pauseframe = true;
     }
 
     if (filterList)
@@ -937,6 +1022,9 @@ void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
 
     ShowPip(frame, pipPlayer);
     DisplayOSD(frame, osd);
+
+    if (m_deinterlacing && m_deintFilter != NULL && !pauseframe)
+        m_deintFilter->ProcessFrame(frame);
 
     pthread_mutex_unlock(&lock);
 }
@@ -984,7 +1072,7 @@ int VideoOutputXv::ChangePictureAttribute(int attributeType, int newValue)
     }
 
     for (i = 0; i < howmany; i++) {
-        if(!strcmp(attrName, attributes[i].name)) {
+        if (!strcmp(attrName, attributes[i].name)) {
             port_min = attributes[i].min_value;
             port_max = attributes[i].max_value;
             range = port_max - port_min;
@@ -1000,6 +1088,6 @@ int VideoOutputXv::ChangePictureAttribute(int attributeType, int newValue)
     }
 
     pthread_mutex_unlock(&lock);
-    
+
     return -1;
 }

@@ -152,10 +152,42 @@ public:
         setLabel(QObject::tr("Deinterlace playback"));
         setValue(false);
         setHelpText(QObject::tr("Make the video look normal on a progressive "
-                    "display (i.e. monitor).  Deinterlacing requires that your "
-                    "CPU supports SSE instructions.  Enabling this without "
-                    "proper CPU support will cause MythTV to segfault. "));
+                    "display (i.e. monitor)."));
     };
+};
+
+class DeinterlaceFilter: public ComboBoxSetting, public GlobalSetting {
+public:
+    DeinterlaceFilter():
+        ComboBoxSetting(false),
+        GlobalSetting("DeinterlaceFilter") {
+        setLabel(QObject::tr("Algorithm"));
+        addSelection(QObject::tr("Linear blend"), "linearblend");
+        addSelection(QObject::tr("Kernel (less motion blur)"), "kerneldeint");
+        addSelection(QObject::tr("Bob (2x framerate)"), "bobdeint");
+        addSelection(QObject::tr("One field"), "onefield");
+        setHelpText(QObject::tr("Deinterlace algorithm.  'Linear blend' and "
+                                "'Kernel' require SSE. 'Bob' requires "
+                                "Xv or XvMC video out."));
+    }
+};
+
+class DeinterlaceSettings: public HorizontalConfigurationGroup,
+                           public TriggeredConfigurationGroup {
+public:
+    DeinterlaceSettings(): 
+        HorizontalConfigurationGroup(false, false), 
+        TriggeredConfigurationGroup(false) {
+        setLabel(QObject::tr("Deinterlace settings"));
+        setUseLabel(false);
+        Setting *deinterlace = new Deinterlace();
+        addChild(deinterlace);
+        setTrigger(deinterlace);
+        
+        Setting *filter = new DeinterlaceFilter();
+        addTarget("1", filter);
+        addTarget("0", new HorizontalConfigurationGroup(false, false));
+    }
 };
 
 class CustomFilters: public LineEditSetting, public GlobalSetting {
@@ -1225,94 +1257,206 @@ public:
 };
 
 class UseVideoModes: public CheckBoxSetting, public GlobalSetting {
-public:
+  public:
     UseVideoModes() :
         GlobalSetting("UseVideoModes") {
         setLabel(QObject::tr("Separate video modes for GUI and TV playback"));
         setValue(false);
         setHelpText(QObject::tr("Switch X Window video modes for TV. "
-                    "Requires \"xrandr\" support."));
+                                "Requires \"xrandr\" support."));
     };
 };
 
 class GuiVidModeWidth: public SpinBoxSetting, public GlobalSetting {
-public:
+  public:
     GuiVidModeWidth():
         SpinBoxSetting(0, 1920, 8), GlobalSetting("GuiVidModeWidth") {
-        setLabel(QObject::tr("GUI X size (px)"));
+        setLabelAboveWidget(true);
+        setLabel(QObject::tr("Width"));
         setValue(0);
         setHelpText(QObject::tr("Horizontal resolution for GUI video mode. "
-                    "This mode must be defined in your X configuration "
-                    "file."));
+                                "This mode must be defined in your X "
+                                "configuration file."));
     };
 };
 
 class GuiVidModeHeight: public SpinBoxSetting, public GlobalSetting {
-public:
+  public:
     GuiVidModeHeight():
         SpinBoxSetting(0, 1200, 4), GlobalSetting("GuiVidModeHeight") {
-        setLabel(QObject::tr("GUI Y size (px)"));
+        setLabelAboveWidget(true);
+        setLabel(QObject::tr("Height"));
         setValue(0);
         setHelpText(QObject::tr("Vertical resolution for GUI video mode. "
-                    "This mode must be defined in your X configuration "
-                    "file."));
+                                "This mode must be defined in your X "
+                                "configuration file."));
+    };
+};
+
+class VidModeWidth: public SpinBoxSetting, public GlobalSetting {
+  public:
+    VidModeWidth(int idx):
+        SpinBoxSetting(0, 1920, 8),
+        GlobalSetting(QString("VidModeWidth%1").arg(idx)) {
+        
+        setLabel(QObject::tr("X"));
+        setValue(0);
+        setHelpText(QObject::tr("Horizontal resolution of video mode "
+                                "which needs a special output resolution."));
+    };
+};
+
+class VidModeHeight: public SpinBoxSetting, public GlobalSetting {
+  public:
+    VidModeHeight(int idx):
+        SpinBoxSetting(0, 1200, 4),
+        GlobalSetting(QString("VidModeHeight%1").arg(idx)) {
+        
+        setLabel(QObject::tr("Y"));
+        setValue(0);
+        setHelpText(QObject::tr("Vertical resolution of video mode "
+                                "which needs a special output resolution."));
     };
 };
 
 class TVVidModeWidth: public SpinBoxSetting, public GlobalSetting {
-public:
+  public:
     TVVidModeWidth():
         SpinBoxSetting(0, 1920, 8), GlobalSetting("TVVidModeWidth") {
-        setLabel(QObject::tr("TV X size (px)"));
+        
+        setLabelAboveWidget(true);
+        setLabel(QObject::tr("Width"));
         setValue(0);
         setHelpText(QObject::tr("Horizontal resolution for playback video "
-                    "mode. "
-                    "This mode must be defined in your X configuration "
-                    "file."));
+                                "mode. "
+                                "This mode must be defined in your X "
+                                "configuration file."));
+    };
+    TVVidModeWidth(int idx):
+        SpinBoxSetting(0, 1920, 8),
+        GlobalSetting(QString("TVVidModeWidth%1").arg(idx)) {
+
+        setLabel(QObject::tr("X"));
+        setValue(0);
+        setHelpText(QObject::tr("Horizontal resolution for playback video "
+                                "mode. "
+                                "This mode must be defined in your X "
+                                "configuration file."));
     };
 };
 
 class TVVidModeHeight: public SpinBoxSetting, public GlobalSetting {
-public:
+  public:
     TVVidModeHeight():
         SpinBoxSetting(0, 1200, 4), GlobalSetting("TVVidModeHeight") {
-        setLabel(QObject::tr("TV Y size (px)"));
+        setLabelAboveWidget(true);
+        setLabel(QObject::tr("Height"));
         setValue(0);
         setHelpText(QObject::tr("Vertical resolution for playback video mode. "
-                    "This mode must be defined in your X configuration "
-                    "file."));
+                                "This mode must be defined in your X "
+                                "configuration file."));
+    };
+    TVVidModeHeight(int idx):
+        SpinBoxSetting(0, 1200, 4),
+        GlobalSetting(QString("TVVidModeHeight%1").arg(idx)) {
+        
+        setLabel(QObject::tr("Y"));
+        setValue(0);
+        setHelpText(QObject::tr("Vertical resolution for playback video mode. "
+                                "This mode must be defined in your X "
+                                "configuration file."));
+    };
+};
+
+class TVVidModeAltAspect: public CheckBoxSetting, public GlobalSetting {
+  public:
+    TVVidModeAltAspect():
+        GlobalSetting("TVVidModeAltAspect") {
+        setLabelAboveWidget(true);
+        setLabel(QObject::tr("Alt Aspect"));
+        setValue(false);
+        setHelpText(QObject::tr("If X's DisplaySize indicates 16:9, "
+                                "fudge vertical size into 4:3, "
+                                "and visa-versa"));
+    };
+    TVVidModeAltAspect(int idx):
+        GlobalSetting(QString("TVVidModeAltAspect%1").arg(idx)) {
+        
+        setLabelAboveWidget(true);
+        setLabel(QObject::tr("Alt Aspect"));
+        
+        setValue(false);
+        setHelpText(QObject::tr("If X's DisplaySize indicates 16:9, "
+                                "fudge vertical size into 4:3, "
+                                "and visa-versa"));
     };
 };
 
 class VideoModeSettings: public VerticalConfigurationGroup,
                          public TriggeredConfigurationGroup {
-public:
+  public:
     VideoModeSettings():
         VerticalConfigurationGroup(false),
         TriggeredConfigurationGroup(false) {
         setLabel(QObject::tr("Video Mode Settings"));
         setUseLabel(false);
-
+        
         Setting *videomode = new UseVideoModes();
         addChild(videomode);
         setTrigger(videomode);
-
+        
         ConfigurationGroup* settings = 
-            new HorizontalConfigurationGroup(false);
+            new VerticalConfigurationGroup(false);
+        ConfigurationGroup* defaultsettings = 
+            new HorizontalConfigurationGroup(false, false);
         ConfigurationGroup *xres = 
-            new VerticalConfigurationGroup(false, false);
+            new HorizontalConfigurationGroup(true, false);
         ConfigurationGroup *yres = 
-            new VerticalConfigurationGroup(false, false);
+            new HorizontalConfigurationGroup(true, false);
+        ConfigurationGroup *zres = 
+            new HorizontalConfigurationGroup(true, false);
+        
+        xres->setLabel(QObject::tr("GUI Size (px)"));
         xres->addChild(new GuiVidModeWidth());
-        yres->addChild(new GuiVidModeHeight());
-        xres->addChild(new TVVidModeWidth());
+        xres->addChild(new GuiVidModeHeight());
+        
+        yres->setLabel(QObject::tr("Default Display (px)"));
+        yres->addChild(new TVVidModeWidth());
         yres->addChild(new TVVidModeHeight());
-        settings->addChild(xres);
-        settings->addChild(yres);
+        
+        zres->setLabel(QObject::tr("Physical Size"));
+        zres->addChild(new TVVidModeAltAspect());
+        
+        defaultsettings->addChild(xres);
+        defaultsettings->addChild(yres);
+        defaultsettings->addChild(zres);
+        
+        settings->addChild(defaultsettings);
+        
+        for (int idx = 0; idx < 2; ++idx) {
+            
+            ConfigurationGroup *xres = 
+                new HorizontalConfigurationGroup(true, false);
+
+            xres->addChild(new VidModeWidth(idx));
+            xres->addChild(new VidModeHeight(idx));
+            
+            xres->addChild(new TVVidModeWidth(idx));
+            xres->addChild(new TVVidModeHeight(idx));
+            
+            xres->addChild(new TVVidModeAltAspect(idx));
+
+            xres->setLabel(QString("Video Size ---> Display Size  "
+                                   "(Override %1)").arg(idx + 1));
+
+            settings->addChild(xres);
+        }
+
         addTarget("1", settings);
         addTarget("0", new VerticalConfigurationGroup(true));
     }
 };
+
 
 class RunInWindow: public CheckBoxSetting, public GlobalSetting {
 public:
@@ -2412,7 +2556,7 @@ PlaybackSettings::PlaybackSettings()
 {
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
     general->setLabel(QObject::tr("General playback"));
-    general->addChild(new Deinterlace());
+    general->addChild(new DeinterlaceSettings());
     general->addChild(new CustomFilters());
     general->addChild(new UseVideoTimebase());
     general->addChild(new DecodeExtraAudio());
@@ -2606,7 +2750,9 @@ AppearanceSettings::AppearanceSettings()
     screen->addChild(new RunInWindow());
     addChild(screen);
 
+#ifdef USING_XRANDR
     addChild(new VideoModeSettings());
+#endif
 
     VerticalConfigurationGroup* dates = new VerticalConfigurationGroup(false);
     dates->setLabel(QObject::tr("Localization"));    

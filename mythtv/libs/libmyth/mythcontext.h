@@ -12,6 +12,7 @@
 #include <qsocketdevice.h>
 #include <qstringlist.h>
 #include <qnetwork.h> 
+#include <DisplayRes.h>
 
 #include <iostream>
 #include <vector>
@@ -33,7 +34,6 @@ class MythMainWindow;
 class MythPluginManager;
 class MediaMonitor;
 class MythMediaDevice;
-
 
 enum VerboseMask {
     VB_IMPORTANT = 0x0001,
@@ -228,6 +228,8 @@ class MythContext : public QObject
     void CacheThemeImagesDirectory(const QString &dirname, 
                                    const QString &subdirname = "");
     void RemoveCacheDir(const QString &dirname);
+
+    DisplayRes * display_res;
 
     MythContextPrivate *d;
 };

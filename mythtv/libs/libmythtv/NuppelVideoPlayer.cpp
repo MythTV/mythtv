@@ -88,7 +88,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(MythSqlDatabase *ldb,
     text_size = 0;
     video_aspect = 1.33333;
     m_scan = kScan_Detect;
-    m_deinterlace = false;
+    m_double_framerate = false;
 
     forceVideoOutput = kVideoOutput_Default;
     decoder = NULL;
@@ -269,7 +269,7 @@ void NuppelVideoPlayer::Pause(bool waitvideo)
     if (osd && forceVideoOutput != kVideoOutput_IVTV)
         osd->SetFrameInterval(frame_interval);
     if (videosync != NULL)
-        videosync->SetFrameInterval(frame_interval, m_deinterlace);
+        videosync->SetFrameInterval(frame_interval, m_double_framerate);
 }
 
 bool NuppelVideoPlayer::Play(float speed, bool normal, bool unpauseaudio)
@@ -283,7 +283,7 @@ bool NuppelVideoPlayer::Play(float speed, bool normal, bool unpauseaudio)
     if (osd && forceVideoOutput != kVideoOutput_IVTV)
         osd->SetFrameInterval(frame_interval);
     if (videosync != NULL)
-        videosync->SetFrameInterval(frame_interval, m_deinterlace);
+        videosync->SetFrameInterval(frame_interval, m_double_framerate);
 
     if (!paused)
     {
@@ -471,10 +471,6 @@ FrameScanType NuppelVideoPlayer::detectInterlace(FrameScanType newScan,
             scan = kScan_Progressive;
         else if (fps > 45) // software deinterlacing
             scan = kScan_Progressive;
-        else if (video_height <= 640) // HACK, 320x240 looks bad...
-            scan = kScan_Progressive;
-        else if (video_height >= 1080) // ATSC 1080i
-            scan = kScan_Interlaced;
 
         if (kScan_Detect != newScan)
             scan = newScan;
@@ -510,17 +506,26 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
     m_scan = detectInterlace(scan, m_scan, video_frame_rate, video_height);
     VERBOSE(VB_PLAYBACK, QString("Interlaced: %1  video_height: %2  fps: %3")
                                 .arg(toQString(m_scan)).arg(video_height).arg(fps));
-    // For XvMC displaying interlaced video, use double frame rate
-    // showing fields alternately
-    m_deinterlace = false;
-#ifdef USING_XVMC
+    // Set up deinterlacing in the video output method
+    m_double_framerate = false;
     if (m_scan == kScan_Interlaced &&
-        forceVideoOutput == kVideoOutput_XvMC &&
-        gContext->GetNumSetting("Deinterlace"))
-        m_deinterlace = true;
-#endif
-    if (videosync != NULL)
-        videosync->SetFrameInterval(frame_interval, m_deinterlace);
+        gContext->GetNumSetting("Deinterlace")) {
+        if (videoOutput && videoOutput->SetupDeinterlace(true)) {
+            if (videoOutput->NeedsDoubleFramerate())
+                m_double_framerate = true;
+        }
+    }
+    // Make sure video sync can do it
+    if (videosync != NULL && m_double_framerate) 
+    {
+        videosync->SetFrameInterval(frame_interval, m_double_framerate);
+        if (!videosync->isInterlaced()) {
+            m_scan = kScan_Ignore;
+            m_double_framerate = false;
+            if (videoOutput)
+                videoOutput->SetupDeinterlace(false);
+        }
+    }
 
 }
 
@@ -1214,16 +1219,22 @@ void NuppelVideoPlayer::AVSync(void)
     {
         // if we get here, we're actually going to do video output
         if (buffer) 
-            videoOutput->PrepareFrame(buffer);
+            videoOutput->PrepareFrame(buffer, m_scan);
  
         videosync->WaitForFrame(avsync_adjustment);
         avsync_adjustment = 0;
  
         // Display the frame
         videoOutput->Show(m_scan);
-#ifdef USING_XVMC
-        if (m_deinterlace) 
+
+        if (m_double_framerate) 
         {
+            if (forceVideoOutput != kVideoOutput_XvMC)
+            {
+                // XvMC does not need the frame again
+                if (buffer)
+                    videoOutput->PrepareFrame(buffer, kScan_Intr2ndField);
+            }
             // Display the second field
             videosync->WaitForFrame(avsync_adjustment);
             avsync_adjustment = 0;
@@ -1231,7 +1242,6 @@ void NuppelVideoPlayer::AVSync(void)
             // Display the frame
             videoOutput->Show(kScan_Intr2ndField);
         }
-#endif  
     }
     else
     {
@@ -1344,17 +1354,28 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     }
     else
     {
-        // For XvMC displaying interlaced video, use double frame rate
-        // showing fields alternately
-        m_deinterlace = false;
-#ifdef USING_XVMC
+        // Set up deinterlacing in the video output method
+        m_double_framerate = false;
         if (m_scan == kScan_Interlaced &&
-            forceVideoOutput == kVideoOutput_XvMC &&
-            gContext->GetNumSetting("Deinterlace"))
-            m_deinterlace = true;
-#endif
+            gContext->GetNumSetting("Deinterlace")) {
+            if (videoOutput && videoOutput->SetupDeinterlace(true)) {
+                if (videoOutput->NeedsDoubleFramerate())
+                    m_double_framerate = true;
+            }
+        }
         videosync = VideoSync::BestMethod(
-            fr_int, videoOutput->GetRefreshRate(), m_deinterlace);
+            fr_int, videoOutput->GetRefreshRate(), m_double_framerate);
+        // Make sure video sync can do it
+        if (videosync != NULL && m_double_framerate) 
+        {
+            videosync->SetFrameInterval(frame_interval, m_double_framerate);
+            if (!videosync->isInterlaced()) {
+                m_scan = kScan_Ignore;
+                m_double_framerate = false;
+                if (videoOutput)
+                    videoOutput->SetupDeinterlace(false);
+            }
+        }
     }
 
     InitAVSync();
@@ -1387,7 +1408,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             videoOutput->ProcessFrame(NULL, osd, videoFilters, pipplayer);
             videofiltersLock.unlock();
 
-            videoOutput->PrepareFrame(NULL); 
+            videoOutput->PrepareFrame(NULL, kScan_Ignore); 
             videoOutput->Show(m_scan);
             videosync->Start();
 

@@ -44,16 +44,6 @@ QString RunProgramGuide(QString startchannel, bool thread, TV *player,
     GuideGrid *gg = new GuideGrid(gContext->GetMainWindow(), startchannel, 
                                   player, allowsecondaryepg, "guidegrid");
 
-    bool switchMode = gContext->GetNumSetting("UseVideoModes", 0);
-    if (switchMode) 
-    {
-        // xrandr to gui size
-        char buf[128];
-        int screenwidth = gContext->GetNumSetting("GuiVidModeWidth", 0);
-        int screenheight = gContext->GetNumSetting("GuiVidModeHeight", 0);
-        sprintf(buf, "xrandr -s %dx%d", screenwidth, screenheight);
-        system(buf);
-    }
     gg->Show();
 
     if (thread)
@@ -1506,16 +1496,6 @@ void GuideGrid::enter()
 
     unsetCursor();
     selectState = 1;
-    bool switchMode = gContext->GetNumSetting("UseVideoModes", 0);
-    if (m_player && switchMode) 
-    {
-        // xrandr back to video size
-        char buf[128];
-        int screenwidth = gContext->GetNumSetting("TVVidModeWidth", 0);
-        int screenheight = gContext->GetNumSetting("TVVidModeHeight", 0);
-        sprintf(buf, "xrandr -s %dx%d", screenwidth, screenheight);
-        system(buf);
-    }
     accept();
 }
 
@@ -1529,16 +1509,6 @@ void GuideGrid::escape()
     }
 
     unsetCursor();
-    bool switchMode = gContext->GetNumSetting("UseVideoModes", 0);
-    if (m_player && switchMode) 
-    {
-        // xrandr back to video size
-        char buf[128];
-        int screenwidth = gContext->GetNumSetting("TVVidModeWidth", 0);
-        int screenheight = gContext->GetNumSetting("TVVidModeHeight", 0);
-        sprintf(buf, "xrandr -s %dx%d", screenwidth, screenheight);
-        system(buf);
-    }
     accept();
 }
 

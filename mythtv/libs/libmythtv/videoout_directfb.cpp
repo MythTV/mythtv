@@ -22,73 +22,73 @@ using namespace std;
 {\
     DFBResult err = dfbcommand;\
 \
-	if (err != DFB_OK)\
-	{\
-		fprintf( stderr, "%s <%d>:\n\t", __FILE__, __LINE__ );\
-		DirectFBError( #dfbcommand, err );\
-		return returnstmt;\
-	}\
+        if (err != DFB_OK)\
+        {\
+                fprintf( stderr, "%s <%d>:\n\t", __FILE__, __LINE__ );\
+                DirectFBError( #dfbcommand, err );\
+                return returnstmt;\
+        }\
 }
 
 #define DFBCHECK(x...)\
 {\
     DFBResult err = x;\
 \
-	if (err != DFB_OK)\
-	{\
-		fprintf( stderr, "%s <%d>:\n\t", __FILE__, __LINE__ );\
-		DirectFBError( #x, err );\
-	}\
+        if (err != DFB_OK)\
+        {\
+                fprintf( stderr, "%s <%d>:\n\t", __FILE__, __LINE__ );\
+                DirectFBError( #x, err );\
+        }\
 }
 #define DFB_KBID_OFFSET 62976
 
 #define INCREMENT(x, step, min, max)\
 {\
-	int __n;\
-	__n = x + step;\
-	x = ( __n < min )	? min : ( ( __n > max ) ? max : __n );\
+        int __n;\
+        __n = x + step;\
+        x = ( __n < min )       ? min : ( ( __n > max ) ? max : __n );\
 }
 
 static const unsigned int QT_KEYS[DIKI_NUMBER_OF_KEYS][2] =
     {
         {0xffff,0 }, // unknown key
-        {0x41,	0x61},	// a...z
-        {0x42,	0x62},
-        {0x43,	0x63},
-        {0x44,	0x64},
-        {0x45,	0x65},
-        {0x46,	0x66},
-        {0x47,	0x67},
-        {0x48,	0x68},
-        {0x49,	0x69},
-        {0x4a,	0x6a},
-        {0x4b,	0x8b},
-        {0x4c,	0x6c},
-        {0x4d,	0x6d},
-        {0x4e,	0x6e},
-        {0x4f,	0x6f},
-        {0x50,	0x70},
-        {0x51,	0x71},
-        {0x52,	0x72},
-        {0x53,	0x73},
-        {0x54,	0x74},
-        {0x55,	0x75},
-        {0x56,	0x76},
-        {0x57,	0x77},
-        {0x58,	0x78},
-        {0x59,	0x79},
-        {0x5a,	0x7a},
-        {0x30,	0x30},	// 0-9
-        {0x31,	0x31},
-        {0x32,	0x32},
-        {0x33,	0x33},
-        {0x34,	0x34},
-        {0x35,	0x35},
-        {0x36,	0x36},
-        {0x37,	0x37},
-        {0x38,	0x38},
-        {0x39,	0x39},
-        {0x1030,0x00},	// function keys F1 - F12
+        {0x41,  0x61},  // a...z
+        {0x42,  0x62},
+        {0x43,  0x63},
+        {0x44,  0x64},
+        {0x45,  0x65},
+        {0x46,  0x66},
+        {0x47,  0x67},
+        {0x48,  0x68},
+        {0x49,  0x69},
+        {0x4a,  0x6a},
+        {0x4b,  0x8b},
+        {0x4c,  0x6c},
+        {0x4d,  0x6d},
+        {0x4e,  0x6e},
+        {0x4f,  0x6f},
+        {0x50,  0x70},
+        {0x51,  0x71},
+        {0x52,  0x72},
+        {0x53,  0x73},
+        {0x54,  0x74},
+        {0x55,  0x75},
+        {0x56,  0x76},
+        {0x57,  0x77},
+        {0x58,  0x78},
+        {0x59,  0x79},
+        {0x5a,  0x7a},
+        {0x30,  0x30},  // 0-9
+        {0x31,  0x31},
+        {0x32,  0x32},
+        {0x33,  0x33},
+        {0x34,  0x34},
+        {0x35,  0x35},
+        {0x36,  0x36},
+        {0x37,  0x37},
+        {0x38,  0x38},
+        {0x39,  0x39},
+        {0x1030,0x00},  // function keys F1 - F12
         {0x1031,0x00},
         {0x1032,0x00},
         {0x1033,0x00},
@@ -100,51 +100,51 @@ static const unsigned int QT_KEYS[DIKI_NUMBER_OF_KEYS][2] =
         {0x1039,0x00},
         {0x103a,0x00},
         {0x103b,0x00},
-        {0x1020,0x00},	// Shift Left
-        {0x1020,0x00},	// Shift Right
+        {0x1020,0x00},  // Shift Left
+        {0x1020,0x00},  // Shift Right
         {0x1021,0x00}, // Control Left
-        {0x1021,0x00},	// Control Right
-        {0x1023,0x00},	// ALT Left
-        {0x1023,0x00},	// ALT Right
+        {0x1021,0x00},  // Control Right
+        {0x1023,0x00},  // ALT Left
+        {0x1023,0x00},  // ALT Right
         {0xffff,0x00}, // DIKS_ALTGR  not sure what QT Key is
-        {0x1022,0x00},	// META Left
-        {0x1022,0x00},	// META Right
+        {0x1022,0x00},  // META Left
+        {0x1022,0x00},  // META Right
         {0x1053,0x00}, // Super Left
-        {0x1054,0x00},	// Super Right
-        {0x1056,0x00},	// Hyper Left
-        {0x1057,0x00},	// Hyper Right
-        {0x1024,0x00},	// CAPS Lock
-        {0x1025,0x00},	// NUM Locka
-        {0x1026,0x00},	// Scroll Lock
-        {0x1000,0x1b},	// Escape
-        {0x1012,0x00},	// Left
-        {0x1014,0x00},	// Right
-        {0x1013,0x00},	// Up
-        {0x1015,0x00},	// Down
-        {0x1001,0x09},	// Tab
-        {0x1004,0x0d},	// Enter
-        {0x20,	0x20},	// 7 bit printable ASCII
-        {0x1003,0x00},	// Backspace
-        {0x1006,0x00},	// Insert
-        {0x1007,0x7f},	// Delete
-        {0x1010,0x00},	// Home
-        {0x1011,0x00},	// End
-        {0x1016,0x00},	// Page Up
-        {0x1017,0x00},	// Page Down
-        {0x1009,0x00},	// Print
-        {0x1008,0x00},	// Pause
-        {0x60,	0x27},	// Quote Left
-        {0x2d,	0x2d},	// Minus
-        {0x3d,	0x3d},	// Equals
-        {0x5b,	0x5b},	// Bracket Left
-        {0x5d,	0x5d},	// Bracket Right
-        {0x5c,	0x5c},	// Back Slash
-        {0x3b,	0x3b},	// Semicolon
+        {0x1054,0x00},  // Super Right
+        {0x1056,0x00},  // Hyper Left
+        {0x1057,0x00},  // Hyper Right
+        {0x1024,0x00},  // CAPS Lock
+        {0x1025,0x00},  // NUM Locka
+        {0x1026,0x00},  // Scroll Lock
+        {0x1000,0x1b},  // Escape
+        {0x1012,0x00},  // Left
+        {0x1014,0x00},  // Right
+        {0x1013,0x00},  // Up
+        {0x1015,0x00},  // Down
+        {0x1001,0x09},  // Tab
+        {0x1004,0x0d},  // Enter
+        {0x20,  0x20},  // 7 bit printable ASCII
+        {0x1003,0x00},  // Backspace
+        {0x1006,0x00},  // Insert
+        {0x1007,0x7f},  // Delete
+        {0x1010,0x00},  // Home
+        {0x1011,0x00},  // End
+        {0x1016,0x00},  // Page Up
+        {0x1017,0x00},  // Page Down
+        {0x1009,0x00},  // Print
+        {0x1008,0x00},  // Pause
+        {0x60,  0x27},  // Quote Left
+        {0x2d,  0x2d},  // Minus
+        {0x3d,  0x3d},  // Equals
+        {0x5b,  0x5b},  // Bracket Left
+        {0x5d,  0x5d},  // Bracket Right
+        {0x5c,  0x5c},  // Back Slash
+        {0x3b,  0x3b},  // Semicolon
         {0xffff,0x00},  // DIKS_QUOTE_RIGHT not sure what QT Key is...
-        {0x2c,	0x2c},	// Comma
-        {0x2e,	0x2e},	// Period
-        {0x2f,	0x2f},	// Slash
-        {0x3c,	0x3c},	// Less Than
+        {0x2c,  0x2c},  // Comma
+        {0x2e,  0x2e},  // Period
+        {0x2f,  0x2f},  // Slash
+        {0x3c,  0x3c},  // Less Than
 
         // keypad keys.
         // from what i can tell QT doiesnt have a seperate key code for them.
@@ -493,7 +493,7 @@ float VideoOutputDirectfb::GetDisplayAspect(void)
     return (float)data->screen_width / (float)data->screen_height;
 }
 
-void VideoOutputDirectfb::PrepareFrame(VideoFrame *buffer)
+void VideoOutputDirectfb::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 {
     if (!buffer)
         buffer=scratchFrame;
@@ -605,6 +605,8 @@ void VideoOutputDirectfb::ProcessFrame(VideoFrame *frame, OSD *osd,
         CopyFrame(scratchFrame, &pauseFrame);
     }
 
+    if (m_deinterlacing && m_deintFilter != NULL)
+	m_deintFilter->ProcessFrame(frame);
     if (filterList)
         filterList->ProcessFrame(frame);
 

@@ -21,15 +21,15 @@ class VideoOutputDirectfb: public VideoOutput
 
     bool Init(int width, int height, float aspect, WId winid,
               int winx, int winy, int winw, int winh, WId embedid = 0);
-    void PrepareFrame(VideoFrame *buffer);
+    void PrepareFrame(VideoFrame *buffer, FrameScanType);
     void Show(FrameScanType);
 
     void InputChanged(int width, int height, float aspect);
-	void AspectChanged(float aspect);
+        void AspectChanged(float aspect);
     void Zoom(int direction);
 
-	float GetDisplayAspect(void);
-	void VideoOutputDirectfb::MoveResize();
+        float GetDisplayAspect(void);
+        void VideoOutputDirectfb::MoveResize();
 
     //void EmbedInWidget(unsigned long wid, int x, int y, int w, int h);
     //void StopEmbedding(void);
@@ -47,7 +47,7 @@ class VideoOutputDirectfb: public VideoOutput
 
   private:
 
-	QObject *widget;
+        QObject *widget;
 
     DirectfbData *data;
 

@@ -19,6 +19,7 @@ class NuppelVideoPlayer;
 class OSD;
 class OSDSurface;
 class FilterChain;
+class FilterManager;
 
 extern "C" {
 struct ImgReSampleContext;
@@ -98,7 +99,11 @@ class VideoOutput
                       WId winid, int winx, int winy, int winw, 
                       int winh, WId embedid = 0);
 
-    virtual void PrepareFrame(VideoFrame *buffer) = 0;
+    virtual bool SetupDeinterlace(bool i);
+    virtual bool NeedsDoubleFramerate() const;
+    virtual bool ApproveDeintFilter(const QString& filtername) const;
+
+    virtual void PrepareFrame(VideoFrame *buffer, FrameScanType) = 0;
     virtual void Show(FrameScanType) = 0;
 
     virtual void InputChanged(int width, int height, float aspect);
@@ -250,6 +255,11 @@ class VideoOutput
     ImgReSampleContext *pipscontext;
 
     bool allowpreviewepg;
+
+    bool m_deinterlacing;
+    QString m_deintfiltername;
+    FilterManager *m_deintFiltMan;
+    FilterChain *m_deintFilter;
 };
 
 #endif

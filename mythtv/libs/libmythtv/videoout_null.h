@@ -11,7 +11,7 @@ class VideoOutputNull : public VideoOutput
 
     bool Init(int width, int height, float aspect, WId winid,
               int winx, int winy, int winw, int winh, WId embedid = 0);
-    void PrepareFrame(VideoFrame *buffer);
+    void PrepareFrame(VideoFrame *buffer, FrameScanType);
     void Show(FrameScanType );
 
     void InputChanged(int width, int height, float aspect);

@@ -112,3 +112,7 @@ macx {
 #DEFINES += USING_OPENGL_VSYNC
 #EXTRA_LIBS += -lGL -lGLU
 
+# Allow use of XrandR to change display resolutions
+#CONFIG += using_xrandr
+#DEFINES += USING_XRANDR
+

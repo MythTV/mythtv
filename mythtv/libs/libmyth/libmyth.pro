@@ -13,14 +13,15 @@ HEADERS += dialogbox.h lcddevice.h mythcontext.h mythwidgets.h oldsettings.h
 HEADERS += remotefile.h settings.h themedmenu.h util.h mythwizard.h
 HEADERS += volumecontrol.h uitypes.h xmlparse.h mythplugin.h mythdbcon.h
 HEADERS += mythdialogs.h audiooutput.h inetcomms.h httpcomms.h mythmedia.h 
-HEADERS += uilistbtntype.h uiphoneentry.h generictree.h screensaver.h managedlist.h
+HEADERS += uilistbtntype.h uiphoneentry.h generictree.h screensaver.h
+HEADERS += managedlist.h DisplayRes.h
 
 SOURCES += dialogbox.cpp lcddevice.cpp mythcontext.cpp mythwidgets.cpp 
 SOURCES += oldsettings.cpp remotefile.cpp settings.cpp themedmenu.cpp
 SOURCES += util.cpp mythwizard.cpp volumecontrol.h uitypes.cpp xmlparse.cpp
 SOURCES += mythplugin.cpp mythdialogs.cpp audiooutput.cpp inetcomms.cpp 
 SOURCES += httpcomms.cpp mythmedia.cpp uilistbtntype.cpp uiphoneentry.cpp
-SOURCES += generictree.cpp managedlist.cpp
+SOURCES += generictree.cpp managedlist.cpp DisplayRes.cpp DisplayResX.cpp
 
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = dialogbox.h lcddevice.h themedmenu.h mythcontext.h mythdbcon.h

@@ -258,7 +258,7 @@ void VideoOutputDX::StopEmbedding(void)
     VideoOutput::StopEmbedding();
 }
 
-void VideoOutputDX::PrepareFrame(VideoFrame *buffer)
+void VideoOutputDX::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 {
     unsigned char *picbuf;
     int stride;
@@ -440,6 +440,8 @@ void VideoOutputDX::ProcessFrame(VideoFrame *frame, OSD *osd,
         CopyFrame(scratchFrame, &pauseFrame);
     }
 
+    if (m_deinterlacing && m_deintFilter != NULL)
+	m_deintFilter->ProcessFrame(frame);
     if (filterList)
         filterList->ProcessFrame(frame);
 

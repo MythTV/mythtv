@@ -35,12 +35,41 @@ extern "C" {
 #define XMD_H 1
 #include <X11/extensions/xf86vmode.h>
 
+/**********************************************************
+ *  The DisplayRes module allows for the display resolution to be
+ *  changed "on the fly", based on the video resolution.
+ *
+ *  I first implemented this in libs/libmythtv/NuppelVideoPlayer,
+ *  where it worked very well, but was messy.
+ *
+ *  Moving the display resolution switching calls to the videoout_*
+ *  routines has *really* cleaned up the code.  However, this has
+ *   resulted in it not working as well for XvMC.
+ *
+ *  With this new implementation, the order of events is different, and
+ *  that seems to confuse XvMC's rendering of the video sometimes.  For
+ *  example, when bringing up the EPG while watching live tv, the
+ *  "Preview" window just says "Loading Preview Video...", and never
+ *  actually display the video.
+ *
+ *  Also, OSD can look really bad.  If the GUI display resolution is
+ *  much lower than the video display resolution, the OSD fonts look
+ *  like they are being very poorly scaled up.
+ *
+ *  I hope that someone with much better knowledge of XvMC can
+ *  suggest a fix for these issues.
+ *
+ *  John Patrick Poet
+ *
+ *  02 Auguest 2004
+ **********************************************************/
+
 extern "C" {
 #include <X11/extensions/Xinerama.h>
 
-extern int      XShmQueryExtension(Display*);
-extern int      XShmGetEventBase(Display*);
-extern XvImage  *XvShmCreateImage(Display*, XvPortID, int, char*, int, int, XShmSegmentInfo*);
+    extern int      XShmQueryExtension(Display*);
+    extern int      XShmGetEventBase(Display*);
+    extern XvImage  *XvShmCreateImage(Display*, XvPortID, int, char*, int, int, XShmSegmentInfo*);
 }
 
 const int kNumBuffers = 7;
@@ -111,12 +140,20 @@ VideoOutputXvMC::VideoOutputXvMC(void)
 
     data = new XvMCData();
     memset(data, 0, sizeof(XvMCData));
+
+    // If using custom display resolutions, display_res will point
+    // to a singleton instance of the DisplayRes class
+    display_res = DisplayRes::getDisplayRes();
 }
 
 VideoOutputXvMC::~VideoOutputXvMC()
 {
     Exit();
     delete data;
+
+    if (display_res)
+        // Switch back to desired resolution for GUI
+        display_res->switchToGUI();
 }
 
 void VideoOutputXvMC::AspectChanged(float aspect)
@@ -144,8 +181,26 @@ void VideoOutputXvMC::InputChanged(int width, int height, float aspect)
     pthread_mutex_lock(&lock);
 
     VideoOutput::InputChanged(width, height, aspect);
-
     DeleteXvMCBuffers();
+
+    if (display_res && display_res->switchToVid(width, height))
+    {
+        // Switching to custom display resolution succeeded
+        // Make a note of the new size
+        dispx = dispy = 0;
+        dispw = display_res->Width();
+        disph = display_res->Height();
+        w_mm =  display_res->Width_mm();
+        h_mm =  display_res->Height_mm();
+
+        data->display_aspect = static_cast<float>(w_mm/h_mm);
+
+        // Resize X window to fill new resolution
+        XMoveResizeWindow(data->XJ_disp, data->XJ_win, 0, 0,
+                          display_res->Width(),
+                          display_res->Height());
+    }
+
     CreateXvMCBuffers();
     XFlush(data->XJ_disp);
 
@@ -182,7 +237,7 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
     int (*old_handler)(Display *, XErrorEvent *);
     int i, ret;
     XJ_caught_error = 0;
-  
+
     unsigned int p_version, p_release, p_request_base, p_event_base, 
                  p_error_base;
     int p_num_adaptors;
@@ -202,19 +257,42 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
         printf("open display failed\n"); 
         return false;
     }
- 
+
     data->XJ_screen = DefaultScreenOfDisplay(data->XJ_disp);
     XJ_screen_num = DefaultScreen(data->XJ_disp);
 
-    if (myth_dsw != 0)
-        w_mm = myth_dsw;
-    else
-        w_mm = DisplayWidthMM(data->XJ_disp, XJ_screen_num);
+    if (winid <= 0)
+    {
+        cerr << "Bad winid given to output\n";
+        return false;
+    }
 
-    if (myth_dsh != 0)
-        h_mm = myth_dsh;
+    data->XJ_curwin = data->XJ_win = winid;
+
+    if (display_res && display_res->switchToVid(width, height))
+    {
+        // Switching to custom display resolution succeeded
+        // Make a note of the new size
+        dispw = display_res->Width();
+        disph = display_res->Height();
+        w_mm = display_res->Width_mm();
+        h_mm = display_res->Height_mm();
+
+        // Resize X window to fill new resolution
+       XMoveResizeWindow(data->XJ_disp, winid, 0, 0, dispw, disph);
+    }
     else
-        h_mm = DisplayHeightMM(data->XJ_disp, XJ_screen_num);
+    {
+        if (myth_dsw != 0)
+            w_mm = myth_dsw;
+        else
+            w_mm = DisplayWidthMM(data->XJ_disp, XJ_screen_num);
+
+        if (myth_dsh != 0)
+            h_mm = myth_dsh;
+        else
+            h_mm = DisplayHeightMM(data->XJ_disp, XJ_screen_num);
+    }
 
     usingXinerama = 
         (XineramaQueryExtension(data->XJ_disp, &event_base, &error_base) &&
@@ -232,9 +310,9 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
         int gui_w = gContext->GetNumSetting("GuiWidth", w);
         int gui_h = gContext->GetNumSetting("GuiHeight", h);
 
-		if (gui_w)
+        if (gui_w)
             w_mm = w_mm * gui_w / w;
-		if (gui_h)
+        if (gui_h)
             h_mm = h_mm * gui_h / h;
 
         data->display_aspect = (float)w_mm/h_mm;
@@ -244,9 +322,9 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
 
     XJ_white = XWhitePixel(data->XJ_disp, XJ_screen_num);
     XJ_black = XBlackPixel(data->XJ_disp, XJ_screen_num);
-  
+
     XJ_fullscreen = 0;
-  
+
     data->XJ_root = DefaultRootWindow(data->XJ_disp);
 
     ret = XvQueryExtension(data->XJ_disp, &p_version, &p_release, 
@@ -327,20 +405,22 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
         return false;
     }
 
-#ifndef QWS
-    GetMythTVGeometry(data->XJ_disp, XJ_screen_num,
-                      &XJ_screenx, &XJ_screeny, 
-                      &XJ_screenwidth, &XJ_screenheight);
-#endif
-
-    if (winid <= 0)
+    if (display_res)
     {
-        cerr << "Bad winid given to output\n";
-        return false;
+        // Using custom, full-screen display resolution
+        XJ_screenx = XJ_screeny = 0;
+        XJ_screenwidth = display_res->Width();
+        XJ_screenheight = display_res->Height();
     }
+#ifndef QWS
+    else
+    {
+        GetMythTVGeometry(data->XJ_disp, XJ_screen_num,
+                          &XJ_screenx, &XJ_screeny, 
+                          &XJ_screenwidth, &XJ_screenheight);
+    }
+#endif // QWS
 
-    data->XJ_curwin = data->XJ_win = winid;
-    
     if (embedid > 0)
         data->XJ_curwin = data->XJ_win = embedid;
 
@@ -391,7 +471,7 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
         data->subpicture_mode = BACKEND_SUBPICTURE;
 
     if (!CreateXvMCBuffers())
-            return false;
+        return false;
 
     XSetErrorHandler(old_handler);
 
@@ -451,6 +531,18 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
     return true;
 }
 
+bool VideoOutputXvMC::NeedsDoubleFramerate() const
+{
+    return m_deinterlacing; // always doing bob deint
+}
+
+bool VideoOutputXvMC::ApproveDeintFilter(const QString& filtername) const
+{
+    (void)filtername;
+    VERBOSE(VB_PLAYBACK, "XvMC will use bob deinterlacing");
+    return true; // yeah, sure, whatever.. we'll do bob deint ourselves, thanks
+}
+
 bool VideoOutputXvMC::CreateXvMCBuffers(void)
 {
     int ret = XvMCCreateContext(data->XJ_disp, xv_port, data->mode_id, 
@@ -508,7 +600,7 @@ bool VideoOutputXvMC::CreateXvMCBuffers(void)
             cerr << "unable to create: " << i << " buffer\n";
             break;
         }
-                                
+
         xvmc_render_state_t *render = new xvmc_render_state_t;
         memset(render, 0, sizeof(xvmc_render_state_t));
 
@@ -667,21 +759,35 @@ void VideoOutputXvMC::EmbedInWidget(WId wid, int x, int y, int w, int h)
 
     pthread_mutex_lock(&lock);
     data->XJ_curwin = wid;
-
     VideoOutput::EmbedInWidget(wid, x, y, w, h);
+
+    if (display_res)
+    {
+        // Switch to resolution of widget
+        XWindowAttributes   attr;
+
+        XGetWindowAttributes(data->XJ_disp, wid, &attr);
+        display_res->switchToCustom(attr.width, attr.height);
+    }
 
     pthread_mutex_unlock(&lock);
 }
- 
+
 void VideoOutputXvMC::StopEmbedding(void)
 {
     if (!embedding)
         return;
 
     pthread_mutex_lock(&lock);
-
     data->XJ_curwin = data->XJ_win;
     VideoOutput::StopEmbedding();
+
+    if (display_res)
+    {
+        // Switch back to resolution for full screen video
+        display_res->switchToVid(display_res->vidWidth(),
+                                          display_res->vidHeight());
+    }
 
     pthread_mutex_unlock(&lock);
 }
@@ -698,8 +804,9 @@ static void SyncSurface(Display *disp, XvMCSurface *surf)
         XvMCSyncSurface(disp, surf);
 }
 
-void VideoOutputXvMC::PrepareFrame(VideoFrame *buffer)
+void VideoOutputXvMC::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 {
+    (void)t;
     if (!buffer)
         buffer = data->lastframe;
     if (!buffer)
@@ -738,15 +845,15 @@ void VideoOutputXvMC::Show(FrameScanType scan)
     int field;
     switch (scan) 
     {
-    case kScan_Interlaced:
-	field = 1;
-	break;
-    case kScan_Intr2ndField:
-	field = 2;
-	break;
-    default:
-	field = 3;
-	break;
+        case kScan_Interlaced:
+            field = 1;
+            break;
+        case kScan_Intr2ndField:
+            field = 2;
+            break;
+        default:
+            field = 3;
+            break;
     }
 
     xvmc_render_state_t *render = data->p_render_surface_to_show;
@@ -799,7 +906,7 @@ void VideoOutputXvMC::Show(FrameScanType scan)
         data->curosd = osdframe;
         render->p_osd_target_surface_render = NULL;
     }
-   
+
     pthread_mutex_unlock(&lock);
 }
 
@@ -903,7 +1010,7 @@ void VideoOutputXvMC::ProcessFrame(VideoFrame *frame, OSD *osd,
 
             int ret = DisplayOSD(&tmpframe, osd);
             if (ret < 0)
-                return;                
+                return;
 
             pthread_mutex_lock(&lock);
 
@@ -935,7 +1042,7 @@ void VideoOutputXvMC::ProcessFrame(VideoFrame *frame, OSD *osd,
                                     &data->subpicture, 0, 0, XJ_width,
                                     XJ_height, 0, 0, XJ_width, XJ_height);
             }
-            
+
             pthread_mutex_unlock(&lock);
         }
     }
@@ -984,7 +1091,7 @@ int VideoOutputXvMC::ChangePictureAttribute(int attributeType, int newValue)
     }
 
     for (i = 0; i < howmany; i++) {
-        if(!strcmp(attrName, attributes[i].name)) {
+        if (!strcmp(attrName, attributes[i].name)) {
             port_min = attributes[i].min_value;
             port_max = attributes[i].max_value;
             range = port_max - port_min;
@@ -1000,7 +1107,7 @@ int VideoOutputXvMC::ChangePictureAttribute(int attributeType, int newValue)
     }
 
     pthread_mutex_unlock(&lock);
-    
+
     return -1;
 }
 

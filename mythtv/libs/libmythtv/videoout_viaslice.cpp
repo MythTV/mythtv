@@ -200,9 +200,9 @@ bool VideoOutputVIA::Init(int width, int height, float aspect,
         int gui_w = gContext->GetNumSetting("GuiWidth", w);
         int gui_h = gContext->GetNumSetting("GuiHeight", h);
 
-		if (gui_w)
+                if (gui_w)
             w_mm = w_mm * gui_w / w;
-		if (gui_h)
+                if (gui_h)
             h_mm = h_mm * gui_h / h;
 
         data->display_aspect = (float)w_mm/h_mm;
@@ -242,8 +242,8 @@ bool VideoOutputVIA::Init(int width, int height, float aspect,
     if (VIADriverProc(CREATEDRIVER, NULL))
     {
         cerr << "Unable to initialize VIA CLE266 HW Driver, "
-		"please check your installation.\n";
-	exit(1);
+                "please check your installation.\n";
+        exit(1);
     }
 
     if (!CreateViaBuffers())
@@ -347,7 +347,7 @@ void VideoOutputVIA::Exit(void)
         DeleteViaBuffers();
 
         VIADriverProc(DESTROYDRIVER, NULL);
-	
+        
         XFreeGC(data->XJ_disp, data->XJ_gc);
         XCloseDisplay(data->XJ_disp);
 
@@ -394,7 +394,7 @@ void VideoOutputVIA::StopEmbedding(void)
     pthread_mutex_unlock(&lock);
 }
 
-void VideoOutputVIA::PrepareFrame(VideoFrame *buffer)
+void VideoOutputVIA::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 {
     // pause update
     if (!buffer)
@@ -517,7 +517,7 @@ void VideoOutputVIA::DrawUnusedRects(void)
 
     // Clear all background, so that the guide also get's nice video.
     XFillRectangle(data->XJ_disp, data->XJ_curwin, data->XJ_gc,
-		   dispx, dispy, dispw, disph);
+                   dispx, dispy, dispw, disph);
 
     data->ddUpdateOverlay.rDest.left = dispxoff;
     data->ddUpdateOverlay.rDest.top = dispyoff;

@@ -3,6 +3,7 @@
 
 struct XvData;
 
+#include <DisplayRes.h>
 #include "videooutbase.h"
 
 class NuppelVideoPlayer;
@@ -15,7 +16,8 @@ class VideoOutputXv : public VideoOutput
 
     bool Init(int width, int height, float aspect, WId winid,
               int winx, int winy, int winw, int winh, WId embedid = 0);
-    void PrepareFrame(VideoFrame *buffer);
+    bool ApproveDeintFilter(const QString& filtername) const;
+    void PrepareFrame(VideoFrame *buffer, FrameScanType);
     void Show(FrameScanType );
 
     void InputChanged(int width, int height, float aspect);
@@ -46,6 +48,8 @@ class VideoOutputXv : public VideoOutput
     void DeleteXvBuffers(void);
     void DeleteShmBuffers(void);
     void DeleteXBuffers(void);
+
+    DisplayRes * display_res;
 
     XvData *data;
 

@@ -246,6 +246,7 @@ void AvFormatDecoder::InitByteContext(void)
 
 static QMap<void*, enum PixelFormat> _PixelFormatsMap;
 
+/*
 static enum PixelFormat getFormat(struct AVCodecContext *cc,
                                   const enum PixelFormat *pixfmts) 
 {
@@ -257,6 +258,7 @@ static enum PixelFormat getFormat(struct AVCodecContext *cc,
     VERBOSE(VB_IMPORTANT, "Pixel format not set, returning pixfmts[0]");
     return pixfmts[0];
 }
+*/
 
 void AvFormatDecoder::SetPixelFormat(const int pixFormat) 
 {

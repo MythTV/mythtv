@@ -218,6 +218,8 @@ MythContext::MythContext(const QString &binversion, bool gui, bool lcd)
             this, SLOT(EventSocketRead()));
     connect(d->eventSock, SIGNAL(connectionClosed()), 
             this, SLOT(EventSocketClosed()));
+
+    display_res = 0;
 }
 
 MythContext::~MythContext()
@@ -372,7 +374,18 @@ void MythContext::LoadQtConfig(void)
     d->m_width = GetNumSetting("GuiWidth", 0);
     d->m_height = GetNumSetting("GuiHeight", 0);
 
-    if (d->m_width <= 0 || d->m_height <= 0)
+    if ((display_res = DisplayRes::getDisplayRes()))
+    {
+        // Make sure DisplayRes has current context info
+        display_res->Initialize();
+
+        // Switch to desired GUI resolution
+        display_res->switchToGUI();
+
+        d->m_width = display_res->Width();
+        d->m_height = display_res->Height();
+    }
+    else if (d->m_width <= 0 || d->m_height <= 0)
     {
         d->m_height = QApplication::desktop()->height();
         d->m_width = QApplication::desktop()->width();
@@ -643,18 +656,31 @@ void MythContext::InitializeScreenSettings()
     int height = GetNumSetting("GuiHeight", d->m_height);
     int width = GetNumSetting("GuiWidth", d->m_width);
 
-    if (w != 0 && h != 0 && height == 0 && width == 0)
+    if (display_res)
     {
-        width = w;
-        height = h;
+        // If using custom, full-screen resolution, note the size
+        height = display_res->Height();
+        width  = display_res->Width();
     }
     else
     {
-        if (height == 0)
-            height = d->m_height;
-        if (width == 0)
-            width = d->m_width;
+        height = GetNumSetting("GuiHeight", d->m_height);
+        width  = GetNumSetting("GuiWidth", d->m_width);
+
+        if (w != 0 && h != 0 && height == 0 && width == 0)
+        {
+            width = w;
+            height = h;
+        }
+        else
+        {
+            if (height == 0)
+                height = d->m_height;
+            if (width == 0)
+                width = d->m_width;
+        }
     }
+
     
     if (height < 160 || width < 160)
     {

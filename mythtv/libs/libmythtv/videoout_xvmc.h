@@ -3,6 +3,7 @@
 
 struct XvMCData;
 
+#include <DisplayRes.h>
 #include "videooutbase.h"
 
 class VideoOutputXvMC : public VideoOutput
@@ -13,7 +14,9 @@ class VideoOutputXvMC : public VideoOutput
 
     bool Init(int width, int height, float aspect, WId winid,
               int winx, int winy, int winw, int winh, WId embedid = 0);
-    void PrepareFrame(VideoFrame *buffer);
+    bool NeedsDoubleFramerate() const;
+    bool ApproveDeintFilter(const QString& filtername) const;
+    void PrepareFrame(VideoFrame *buffer, FrameScanType);
     void Show(FrameScanType scan);
 
     void InputChanged(int width, int height, float aspect);
@@ -44,6 +47,8 @@ class VideoOutputXvMC : public VideoOutput
     void Exit(void);
     bool CreateXvMCBuffers(void);
     void DeleteXvMCBuffers(void);
+
+    DisplayRes * display_res;
 
     XvMCData *data;
 

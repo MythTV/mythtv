@@ -73,8 +73,6 @@ DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
 
 DVBChannel::~DVBChannel()
 {
-    if (diseqc)
-        delete diseqc;
 
     CloseDVB();
 }
@@ -89,8 +87,13 @@ void DVBChannel::CloseDVB()
         fd_frontend = -1;
         if (dvbcam)
             delete dvbcam;
+        dvbcam = NULL;
         if (dvbsct)
             delete dvbsct;
+        dvbsct = NULL;
+        if (diseqc)
+            delete diseqc;
+        diseqc = NULL;
         isOpen = false;
     }
 }

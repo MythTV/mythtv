@@ -35,6 +35,8 @@
 
 #include "../libavcodec/avcodec.h"
 
+#include "filtermanager.h"
+
 VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type)
 {
     (void)type;
@@ -101,6 +103,10 @@ VideoOutput::VideoOutput()
 
     myth_dsw = gContext->GetNumSetting("DisplaySizeWidth", 0);
     myth_dsh = gContext->GetNumSetting("DisplaySizeHeight", 0);
+
+    m_deinterlacing = false;
+    m_deintFiltMan = NULL;
+    m_deintFilter = NULL;
 }
 
 VideoOutput::~VideoOutput()
@@ -114,6 +120,10 @@ VideoOutput::~VideoOutput()
 
     if (vbuffers)
         delete [] vbuffers;
+    if (m_deintFilter)
+        delete m_deintFilter;
+    if (m_deintFiltMan)
+        delete m_deintFiltMan;
 }
 
 bool VideoOutput::Init(int width, int height, float aspect, WId winid,
@@ -178,6 +188,62 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
     return true;
 }
 
+bool VideoOutput::SetupDeinterlace(bool interlaced)
+{
+    if (m_deinterlacing == interlaced)
+        return m_deinterlacing;
+    m_deinterlacing = interlaced;
+    if (m_deinterlacing) 
+    {
+        VideoFrameType itmp = FMT_YV12;
+        VideoFrameType otmp = FMT_YV12;
+        int btmp;
+        
+        m_deintfiltername = gContext->GetSetting("DeinterlaceFilter", 
+                                                 "linearblend");
+        m_deintFiltMan = new FilterManager;
+        m_deintFilter = NULL;
+        if (ApproveDeintFilter(m_deintfiltername))
+        {
+            m_deintFilter = m_deintFiltMan->LoadFilters(
+                m_deintfiltername, itmp, otmp, XJ_width, XJ_height, btmp);
+        }
+        if (m_deintFilter == NULL) {
+            VERBOSE(VB_IMPORTANT,QString("Couldn't load deinterlace filter %1")
+                    .arg(m_deintfiltername));
+            m_deinterlacing = false;
+            m_deintfiltername = "";
+        }
+        VERBOSE(VB_PLAYBACK, QString("Using deinterlace method %1")
+                .arg(m_deintfiltername));
+    }
+    else 
+    {
+        if (m_deintFiltMan)
+        {
+            delete m_deintFiltMan;
+            m_deintFiltMan = NULL;
+        }
+        if (m_deintFilter)
+        {
+            delete m_deintFilter;
+            m_deintFilter = NULL;
+        }
+    }
+    return m_deinterlacing;
+}
+
+bool VideoOutput::NeedsDoubleFramerate() const
+{
+    // Bob deinterlace requires doubling framerate
+    return (m_deintfiltername == "bobdeint" && m_deinterlacing);
+}
+
+bool VideoOutput::ApproveDeintFilter(const QString& filtername) const
+{
+    // Default to not supporting bob deinterlace
+    return (filtername != "bobdeint");
+}
 void VideoOutput::AspectOverride(int override)
 {
     switch(override)
