@@ -380,7 +380,8 @@ void LCD::veryBadThings(int anError)
 	{
 		cerr << "Why? There was an error reading from the socket." << endl ;  
 	}
-	delete socket;
+	socket->clearPendingData();
+	socket->close();
 	
 }
 
