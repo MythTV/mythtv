@@ -1,5 +1,5 @@
 #include <qlayout.h>
-#include <qlistview.h>
+#include "extendedlistview.h"
 #include <qapplication.h>
 #include <qsqldatabase.h>
 #include <qcursor.h>
@@ -42,7 +42,7 @@ DatabaseBox::DatabaseBox(QSqlDatabase *ldb, QString &paths,
 
     QVBoxLayout *vbox = new QVBoxLayout(this, 20 * wmult);
 
-    QListView *listview = new QListView(this);
+    ExtendedListView *listview = new ExtendedListView(this);
     listview->addColumn("Select game to play");
 
     listview->setSorting(-1);
@@ -55,6 +55,8 @@ DatabaseBox::DatabaseBox(QSqlDatabase *ldb, QString &paths,
             SLOT(selected(QListViewItem *)));
     connect(listview, SIGNAL(spacePressed(QListViewItem *)), this,
             SLOT(selected(QListViewItem *)));
+    connect(listview, SIGNAL(RightKeyPressed(QListViewItem *)), this,
+            SLOT(editSettings(QListViewItem *)));
 
     fillList(listview, paths);
 
@@ -148,15 +150,18 @@ void DatabaseBox::fillNextLevel(QString level, int num, QString querystr,
                                 current + "\"";
 
             RomInfo *parentinfo = parent->getRomInfo();
-            RomInfo *rinfo = new RomInfo(*parentinfo);
-
-            rinfo->setField(level, current);
-
-            if (isleaf)
+            RomInfo *rinfo;
+            if(isleaf)
             {
+                rinfo = GameHandler::CreateRomInfo(parentinfo);
+                rinfo->setField(level, current);
                 rinfo->fillData(db);
             }
-
+            else
+            {
+                rinfo = new RomInfo(*parentinfo);
+                rinfo->setField(level, current);
+            }
 
             TreeItem *item = new TreeItem(parent, current, level,
                                                     rinfo);
@@ -178,6 +183,16 @@ void DatabaseBox::selected(QListViewItem *item)
     if (item->parent())
     {
         checkParent(item->parent());
+    }
+}
+
+void DatabaseBox::editSettings(QListViewItem *item)
+{
+    TreeItem *tcitem = (TreeItem *)item;
+
+    if (tcitem->childCount() <= 0)
+    {
+        GameHandler::EditSettings(this,tcitem->getRomInfo());
     }
 }
 

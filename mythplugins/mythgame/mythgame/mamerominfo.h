@@ -49,6 +49,9 @@ class MameRomInfo : public RomInfo
                 favourite = lhs.favourite;
                 timesplayed = lhs.timesplayed;
             }
+    MameRomInfo(const RomInfo &lhs) :
+                RomInfo(lhs) {}
+
     virtual ~MameRomInfo() {}
 
     QString Manu() const { return manu; }
@@ -116,8 +119,6 @@ class MameRomInfo : public RomInfo
 
     int Timesplayed() const { return timesplayed; }
     void setTimesplayed(int ltimesplayed) { timesplayed = ltimesplayed; }
-
-    virtual void setField(QString field, QString data);
     virtual void fillData(QSqlDatabase *db);
 
   protected:

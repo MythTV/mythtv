@@ -25,6 +25,7 @@ class DatabaseBox : public QDialog
 
   protected slots:
     void selected(QListViewItem *);
+    void editSettings(QListViewItem *);
 
   private:
     void doSelected(QListViewItem *);

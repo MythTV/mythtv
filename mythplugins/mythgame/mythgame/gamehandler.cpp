@@ -34,19 +34,40 @@ void GameHandler::processAllGames()
     }
 }
 
-void GameHandler::Launchgame(RomInfo *romdata)
+GameHandler* GameHandler::GetHandler(RomInfo *rominfo)
 {
     checkHandlers();
     GameHandler *handler = handlers->first();
     while(handler)
     {
-        if(romdata->System() == handler->Systemname())
+        if(rominfo->System() == handler->Systemname())
         {
-            handler->start_game(romdata);
-            return;
+            return handler;
         }
-        handler = handlers->next();
     }
+    return handler;
+}
+
+void GameHandler::Launchgame(RomInfo *romdata)
+{
+    GameHandler *handler;
+    if((handler = GetHandler(romdata)))
+        handler->start_game(romdata);
+}
+
+void GameHandler::EditSettings(QWidget *parent,RomInfo *romdata)
+{
+    GameHandler *handler;
+    if((handler = GetHandler(romdata)))
+        handler->edit_settings(parent,romdata);
+}
+
+RomInfo* GameHandler::CreateRomInfo(RomInfo* parent)
+{
+    GameHandler *handler = handlers->first();
+    if((handler = GetHandler(parent)))
+        return handler->create_rominfo(parent);
+    return NULL;
 }
 
 void GameHandler::registerHandler(GameHandler *handler)

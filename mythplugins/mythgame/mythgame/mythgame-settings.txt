@@ -1,7 +1,30 @@
-# Directory where mame roms are located.
-str MameRomLocation=/mnt/mame/roms/
-
 # Order in which to sort the game roms - this is for all systems
 str TreeLevels=system gamename
+
+### Mame specific settings ###
+
+# Path and name of xmame binary
+str XMameBinary=/usr/bin/xmame
+
+# Directory where mame roms are located.
+str MameRomLocation=/roms
+
+# Directory where screenshots are kept
+#str MameScreensLocation=
+
+# Directory where high scores are kept
+#str MameScoresLocation=
+
+# Directory where flyers are kept
+#str MameFlyersLocation=
+
+# Directory where cabinets are kept
+#str MameCabinetsLocation=
+
+# Directory where history files are kept
+#str MameHistoryLocation=
+
+# Direstory where cheat files are kept
+#str MameCheatLocation=
 
 

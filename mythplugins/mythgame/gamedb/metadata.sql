@@ -35,18 +35,19 @@ CREATE TABLE mamemetadata
 
 CREATE TABLE mamesettings
 (
+    romname VARCHAR(128) NOT NULL,
     usedefault BOOL NOT NULL,
     fullscreen BOOL NOT NULL,
     scanlines BOOL NOT NULL,
     extra_artwork BOOL NOT NULL,
     autoframeskip BOOL NOT NULL,
-    autocolordpeth BOOL NOT NULL,
+    autocolordepth BOOL NOT NULL,
     rotleft BOOL NOT NULL,
     rotright BOOL NOT NULL,
     flipx BOOL NOT NULL,
     flipy BOOL NOT NULL,
     scale TINYINT UNSIGNED NOT NULL,
-    anitalias BOOL NOT NULL,
+    antialias BOOL NOT NULL,
     translucency BOOL NOT NULL,
     beam FLOAT NOT NULL,
     flicker FLOAT NOT NULL,
@@ -63,3 +64,12 @@ CREATE TABLE mamesettings
     cheat BOOL NOT NULL,
     extraoption VARCHAR(128) NOT NULL
 );
+
+INSERT INTO mamesettings (romname,usedefault,fullscreen,scanlines,extra_artwork,
+autoframeskip,autocolordepth,rotleft,rotright,
+flipx,flipy,scale,antialias,translucency,beam,
+flicker,vectorres,analogjoy,mouse,winkeys,
+grabmouse,joytype,sound,samples,fakesound,
+volume,cheat,extraoption) VALUES 
+("default",1,1,0,0,0,0,0,0,0,0,1,0,0,1,0.0,0.0,0,0,0,0,4,
+1,1,0,-16,0,"");

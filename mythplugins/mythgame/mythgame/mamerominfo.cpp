@@ -1,11 +1,6 @@
 #include <qsqldatabase.h>
 #include "mamerominfo.h"
 
-void MameRomInfo::setField(QString field, QString data)
-{
-    RomInfo::setField(field, data);
-}
-
 void MameRomInfo::fillData(QSqlDatabase *db)
 {
     if (gamename == "")

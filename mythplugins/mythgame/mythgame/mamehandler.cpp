@@ -1,6 +1,7 @@
 #include <iostream.h>
 #include "mamehandler.h"
 #include "mamerominfo.h"
+#include "mamesettingsdlg.h"
 #include "settings.h"
 
 #include <qobject.h>
@@ -59,8 +60,6 @@ void MameHandler::processGames()
         int done_roms = 0;
         float done;
 
-        SetGeneralPrefs();
-
         for (tmp_counter = 0; tmp_counter < 16; tmp_counter++) {
                 chip[tmp_counter] = "";
         }
@@ -107,7 +106,6 @@ void MameHandler::processGames()
         xmame_drv = popen(drvcmd, "r");
 
         while (fgets(line, 500, xmame_info)) {
-                line[strlen(line) - 1] = 0;
                 if (!strcmp(line, "game (")) {
                         romname = "Unknown";
                         gamename = "Unknown";
@@ -173,7 +171,10 @@ void MameHandler::processGames()
                         /* Get romstatus */
                         while (TRUE) {
                                 if (!fgets(line, 500, xmame_vrfy))
+                                {
+                                        cout << "breaking\n";
                                         break;
+                                }
                                 if (strstr(line, "romset")) {
                                         verifyname = line + 7;
                                         p = verifyname;
@@ -256,7 +257,6 @@ void MameHandler::processGames()
                         rom->setRomof(romof);
                         rom->setDriver(driver);
 
-
                         tmp_counter = 0;
                         while ((chip[tmp_counter] != "")
                                && (tmp_counter < 16)) {
@@ -301,8 +301,6 @@ void MameHandler::processGames()
                         }
 
                         tmp_array.clear();
-
-
                         tmp_array = QStringList::split(" ", input);
                         tmp_counter = 0;
                         while ((tmp_array[tmp_counter + 1] != NULL)) {
@@ -328,7 +326,6 @@ void MameHandler::processGames()
                                 rom->setWorking(FALSE);
                         }
                         tmp_array.clear();
-
                         if (!strcmp(status, "correct\n"))
                         {
                             rom->setStatus(CORRECT);
@@ -352,7 +349,6 @@ void MameHandler::processGames()
                                               rom->Num_players(), rom->Num_buttons());
                             db->exec(thequery);
                         }
-                        //roms.prepend(rom);
                         done_roms++;
                         done = (float) ((float) (done_roms) /
                                          (float) (supported_games));
@@ -374,15 +370,30 @@ void MameHandler::start_game(RomInfo * romdata)
 {
         FILE *command;
         QString exec;
-
         check_xmame_exe();
-
         makecmd_line(romdata->Romname(), &exec, static_cast<MameRomInfo*>(romdata));
-
         command = popen(exec, "w");
         /* Send a newline to *command in case xmame wants the user to "press any key" */
         fprintf(command, "\n");
         pclose(command);
+}
+
+void MameHandler::edit_settings(QWidget *parent,RomInfo * romdata)
+{
+    GameSettings game_settings;
+    MameRomInfo *mamedata = dynamic_cast<MameRomInfo*>(romdata);
+    SetGameSettings(game_settings, mamedata);
+
+    MameSettingsDlg settingsdlg(parent, "gamesettings", true);
+    QString ImageFile;
+    if(FindImage(general_prefs.screenshot_dir, mamedata->Romname().latin1(), mamedata->Cloneof().latin1(), &ImageFile))
+        settingsdlg.SetScreenshot(ImageFile);
+    if(FindImage(general_prefs.flyer_dir, mamedata->Romname().latin1(), mamedata->Cloneof().latin1(), &ImageFile))
+        settingsdlg.SetFlyer(ImageFile);
+    if(FindImage(general_prefs.cabinet_dir, mamedata->Romname().latin1(), mamedata->Cloneof().latin1(), &ImageFile))
+        settingsdlg.SetCabinet(ImageFile);
+    if(settingsdlg.Show(&game_settings, mamedata->Vector()))
+        SaveGameSettings(game_settings, mamedata);
 }
 
 bool MameHandler::check_xmame_exe()
@@ -444,11 +455,6 @@ bool MameHandler::check_xmame_exe()
                         /* Set the xmame display_target in the general_prefs struct */
                         if (xmame_version_string) {
                                 general_prefs.xmame_display_target = xmame_version_string;
-                                //if (global_settings.fullscreen &&
-                                //    (int) getuid() &&
-                                //    !strcmp
-                                //    (general_prefs.xmame_display_target,
-                                //     "ggi")) {}
 
                         }
 
@@ -489,23 +495,10 @@ bool MameHandler::check_xmame_exe()
                                         /* This is just for debuging */
                                         if (general_prefs.xmame_major !=
                                             major)  {}
-                                                //grustibus_debug
-                                                //    ("xmame major version changed (%i -> %i)",
-                                                //     general_prefs.
-                                                //     xmame_major, major);
                                         if (!general_prefs.xmame_minor
                                             || strcmp(general_prefs.xmame_minor, minor)) {}
-                                                //grustibus_debug
-                                                //    ("xmame minor version changed(%s -> %s)",
-                                                //     general_prefs.
-                                                //     xmame_minor, minor);
                                         if (general_prefs.xmame_release !=
                                             release) {}
-                                                //grustibus_debug
-                                                //    ("xmame version release changed(%i -> %i)",
-                                                //     general_prefs.
-                                                //     xmame_release,
-                                                //     release);
 
                                 }
                                 if (general_prefs.xmame_minor.length()) general_prefs.xmame_minor = "";
@@ -539,8 +532,6 @@ bool MameHandler::check_xmame_exe()
                 /* There is a problem with the installed xmame */
                 if (!xmame_version_ok) {
                         if (xmame_version_string.length()) {
-                                //grustibus_warning(_
-                                //                  ("You need a newer xmame version."));
                         } else {
                                 /* If the version was not defined before, something has changed */
                                 if (general_prefs.xmame_major ||
@@ -548,8 +539,6 @@ bool MameHandler::check_xmame_exe()
                                     general_prefs.xmame_release ||
                                     general_prefs.xmame_display_target.length()) {
                                         changed = TRUE;
-                                        //grustibus_debug
-                                        //    ("too old xmame executable is now installed (the previous check reported not installed or pre 0.36b15)");
                                 }
                                 general_prefs.xmame_major = 0;
                                 if (general_prefs.xmame_minor.length())
@@ -559,8 +548,6 @@ bool MameHandler::check_xmame_exe()
                                 if (general_prefs.xmame_display_target.length())
                                         general_prefs.xmame_display_target = "";
                                 general_prefs.xmame_display_target = "";
-                                //grustibus_warning(_
-                                //                  ("Could not check xmame version. This means either\nthat your xmame is way too old, way to new (check for\na new gRustibus version) or that it could not be run."));
                         }
                 }
         }
@@ -710,10 +697,16 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
         *exec+= general_prefs.cheat_file;
         *exec+= " -historyfile ";
         *exec+= general_prefs.game_history_file;
-        *exec+= " -screenshotdir ";
-        *exec+= screenshotdir;
-        *exec+= " -spooldir ";
-        *exec+= general_prefs.highscore_dir;
+        if (!screenshotdir.isEmpty())
+        {
+          *exec+= " -screenshotdir ";
+          *exec+= screenshotdir;
+        }
+        if (!general_prefs.highscore_dir.isEmpty())
+        {
+          *exec+= " -spooldir ";
+          *exec+= general_prefs.highscore_dir;
+        }
         *exec+= game_settings.fullscreen ? fullscreen : windowed;
         *exec+= game_settings.scanlines ? " -scanlines" : " -noscanlines";
         *exec+= game_settings.extra_artwork ? " -artwork" : " -noartwork";
@@ -749,42 +742,210 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
 
 void MameHandler::SetGeneralPrefs()
 {
-    general_prefs.xmame_exe = "/usr/local/bin/xmame.x11";
-    general_prefs.rom_dir = "/mnt/mame/roms";
-    general_prefs.screenshot_dir = "/usr/games/screenshots";
-    general_prefs.highscore_dir = "/usr/games/highscores";
-    general_prefs.flyer_dir = "/usr/games/flyers";
-    general_prefs.cabinet_dir = "/usr/games/cabinets";
-    general_prefs.game_history_file = "";
-    general_prefs.cheat_file = "";
+    general_prefs.xmame_exe = globalsettings->GetSetting("XMameBinary");
+    general_prefs.rom_dir = globalsettings->GetSetting("MameRomLocation");
+    general_prefs.screenshot_dir = globalsettings->GetSetting("MameScreensLocation");
+    general_prefs.highscore_dir = globalsettings->GetSetting("MameScoresLocation");
+    general_prefs.flyer_dir = globalsettings->GetSetting("MameFlyersLocation");
+    general_prefs.cabinet_dir = globalsettings->GetSetting("MameCabinetsLocation");
+    general_prefs.game_history_file = globalsettings->GetSetting("MameHistoryLocation");
+    general_prefs.cheat_file = globalsettings->GetSetting("MameCheatLocation");
 
 }
 
 void MameHandler::SetGameSettings(GameSettings &game_settings, MameRomInfo *rominfo)
 {
-    game_settings.fullscreen = TRUE;
-    game_settings.scanlines = FALSE;
-    game_settings.extra_artwork = FALSE;
-    game_settings.autoframeskip = FALSE;
-    game_settings.auto_colordepth = FALSE;
-    game_settings.rot_left = FALSE;
-    game_settings.rot_right = FALSE;
-    game_settings.flipx = FALSE;
-    game_settings.flipy = FALSE;
-    game_settings.scale = 1;
-    game_settings.antialias = FALSE;
-    game_settings.translucency = FALSE;
-    game_settings.analog_joy = FALSE;
-    game_settings.mouse = FALSE;
-    game_settings.winkeys = FALSE;
-    game_settings.grab_mouse = FALSE;
-    game_settings.joytype = 4;
-    game_settings.sound = TRUE;
-    game_settings.samples = TRUE;
-    game_settings.fake_sound = FALSE;
-    game_settings.volume = -16;
-    game_settings.cheat = FALSE;
-    game_settings.extra_options = NULL;
+    game_settings = defaultSettings;
+    if(rominfo)
+    {
+        QSqlDatabase *db = QSqlDatabase::database();
+        char thequery[128];
+        sprintf(thequery, "SELECT * FROM mamesettings WHERE romname = \"%s\";",rominfo->Romname().latin1());
+        QSqlQuery query = db->exec(thequery);
+        if (query.isActive() && query.numRowsAffected() > 0)
+        {
+            query.next();
+            if (!query.value(1).toBool())
+            {
+                game_settings.default_options = false;
+                game_settings.fullscreen = query.value(2).toBool();
+                game_settings.scanlines = query.value(3).toBool();
+                game_settings.extra_artwork = query.value(4).toBool();
+                game_settings.autoframeskip = query.value(5).toBool();
+                game_settings.auto_colordepth = query.value(6).toBool();
+                game_settings.rot_left = query.value(7).toBool();
+                game_settings.rot_right = query.value(8).toBool();
+                game_settings.flipx = query.value(9).toBool();
+                game_settings.flipy = query.value(10).toBool();
+                game_settings.scale = query.value(11).toInt();
+                game_settings.antialias = query.value(12).toBool();
+                game_settings.translucency = query.value(13).toBool();
+                game_settings.beam = query.value(14).toDouble();
+                game_settings.flicker = query.value(15).toDouble();
+                game_settings.vectorres = query.value(16).toInt();
+                game_settings.analog_joy = query.value(17).toBool();
+                game_settings.mouse = query.value(18).toBool();
+                game_settings.winkeys = query.value(19).toBool();
+                game_settings.grab_mouse = query.value(20).toBool();
+                game_settings.joytype = query.value(21).toInt();
+                game_settings.sound = query.value(22).toBool();
+                game_settings.samples = query.value(23).toBool();
+                game_settings.fake_sound = query.value(24).toBool();
+                game_settings.volume = query.value(25).toInt();
+                game_settings.cheat = query.value(26).toBool();
+                game_settings.extra_options = query.value(27).toString();
+            }
+        }
+    }
+}
+
+void MameHandler::SaveGameSettings(GameSettings &game_settings, MameRomInfo *rominfo)
+{
+    QSqlDatabase *db = QSqlDatabase::database();
+    char thequery[1024];
+    bool exists = false;
+    sprintf(thequery,"SELECT romname FROM mamesettings WHERE romname = \"%s\";", rominfo->Romname().latin1());
+    QSqlQuery query = db->exec(thequery);
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        sprintf(thequery, "UPDATE mamesettings SET usedefault = %d, fullscreen = %d, "
+                          "scanlines = %d, extra_artwork = %d, autoframeskip = %d, "
+                          "autocolordepth = %d, rotleft = %d, rotright = %d, flipx = %d, "
+                          "flipy = %d, scale = %d, antialias = %d, translucency = %d, "
+                          "beam = %f, flicker = %f, vectorres = %d, analogjoy = %d, "
+                          "mouse = %d, winkeys = %d, grabmouse = %d, joytype = %d, "
+                          "sound = %d, samples = %d, fakesound = %d, volume = %d, "
+                          "cheat = %d, extraoption = \"%s\" WHERE romname = \"%s\";",
+                          game_settings.default_options, game_settings.fullscreen,
+                          game_settings.scanlines, game_settings.extra_artwork,
+                          game_settings.autoframeskip, game_settings.auto_colordepth,
+                          game_settings.rot_left, game_settings.rot_right,
+                          game_settings.flipx, game_settings.flipy, game_settings.scale,
+                          game_settings.antialias, game_settings.translucency,
+                          game_settings.beam, game_settings.flicker, game_settings.vectorres,
+                          game_settings.analog_joy, game_settings.mouse,
+                          game_settings.winkeys, game_settings.grab_mouse,
+                          game_settings.joytype, game_settings.sound, game_settings.samples,
+                          game_settings.fake_sound, game_settings.volume,
+                          game_settings.cheat, game_settings.extra_options.latin1(),
+                          rominfo->Romname().latin1());
+    }
+    else
+    {
+        sprintf(thequery, "INSERT INTO mamesettings (romname,usedefault,fullscreen,scanlines,"
+                          "extra_artwork,autoframeskip,autocolordepth,rotleft,rotright,"
+                          "flipx,flipy,scale,antialias,translucency,beam,flicker,"
+                          "vectorres,analogjoy,mouse,winkeys,grabmouse,joytype,"
+                          "sound,samples,fakesound,volume,cheat,extraoption) VALUES "
+                          "(\"%s\",%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%f,%f,%d,"
+                          "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,\"%s\");",rominfo->Romname().latin1(),
+                          game_settings.default_options, game_settings.fullscreen,
+                          game_settings.scanlines, game_settings.extra_artwork,
+                          game_settings.autoframeskip, game_settings.auto_colordepth,
+                          game_settings.rot_left, game_settings.rot_right,
+                          game_settings.flipx, game_settings.flipy, game_settings.scale,
+                          game_settings.antialias, game_settings.translucency,
+                          game_settings.beam, game_settings.flicker, game_settings.vectorres,
+                          game_settings.analog_joy, game_settings.mouse,
+                          game_settings.winkeys, game_settings.grab_mouse,
+                          game_settings.joytype, game_settings.sound, game_settings.samples,
+                          game_settings.fake_sound, game_settings.volume,
+                          game_settings.cheat, game_settings.extra_options.latin1());
+    }
+    query = db->exec(thequery);
+}
+
+void MameHandler::SetDefaultSettings()
+{
+    QSqlDatabase *db = QSqlDatabase::database();
+    QSqlQuery query = db->exec("SELECT * FROM mamesettings WHERE romname = \"default\";");
+
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+        defaultSettings.default_options = query.value(1).toBool();
+        defaultSettings.fullscreen = query.value(2).toBool();
+        defaultSettings.scanlines = query.value(3).toBool();
+        defaultSettings.extra_artwork = query.value(4).toBool();
+        defaultSettings.autoframeskip = query.value(5).toBool();
+        defaultSettings.auto_colordepth = query.value(6).toBool();
+        defaultSettings.rot_left = query.value(7).toBool();
+        defaultSettings.rot_right = query.value(8).toBool();
+        defaultSettings.flipx = query.value(9).toBool();
+        defaultSettings.flipy = query.value(10).toBool();
+        defaultSettings.scale = query.value(11).toInt();
+        defaultSettings.antialias = query.value(12).toBool();
+        defaultSettings.translucency = query.value(13).toBool();
+        defaultSettings.beam = query.value(14).toDouble();
+        defaultSettings.flicker = query.value(15).toDouble();
+        defaultSettings.vectorres = query.value(16).toInt();
+        defaultSettings.analog_joy = query.value(17).toBool();
+        defaultSettings.mouse = query.value(18).toBool();
+        defaultSettings.winkeys = query.value(19).toBool();
+        defaultSettings.grab_mouse = query.value(20).toBool();
+        defaultSettings.joytype = query.value(21).toInt();
+        defaultSettings.sound = query.value(22).toBool();
+        defaultSettings.samples = query.value(23).toBool();
+        defaultSettings.fake_sound = query.value(24).toBool();
+        defaultSettings.volume = query.value(25).toInt();
+        defaultSettings.cheat = query.value(26).toBool();
+        defaultSettings.extra_options = query.value(27).toString();
+    }
+}
+
+
+bool MameHandler::FindImage(QString directories, QString game, QString cloneof, QString *result)
+{
+        QStringList graphic_formats;
+        graphic_formats.append("png");
+        graphic_formats.append("gif");
+        graphic_formats.append("jpg");
+        graphic_formats.append("jpeg");
+        graphic_formats.append("xpm");
+        graphic_formats.append("bmp");
+        graphic_formats.append("pnm");
+        graphic_formats.append("tif");
+        graphic_formats.append("tiff");
+        int i;
+        QStringList dirs;
+        QString imagename;
+        QString games[3];
+        FILE *imagefile;
+
+        *result = "";
+        games[0] = game;
+        if (cloneof == "-") {
+                games[1] = "";
+        } else {
+                games[1] = cloneof;
+                games[2] = "";
+        }
+
+        if (directories != "")
+                dirs = QStringList::split(":",directories);
+        if ((dirs.isEmpty()) && (directories != ""))
+                dirs.append(directories);
+
+        for (i = 0; (games[i] != ""); i++) {
+                for (QStringList::Iterator j = graphic_formats.begin(); j != graphic_formats.end(); j++) {
+                        for (QStringList::Iterator k = dirs.begin(); k != dirs.end(); k++) {
+                                imagename = *k + "/" + games[i] + "." + *j;
+                                if ((imagefile = fopen(imagename, "r"))) {
+                                        *result = imagename;
+                                        fclose(imagefile);
+                                }
+                                if (*result != "")
+                                        break;
+                        }
+                        /* NOTE: This requires that png is the first format in the list */
+                        if (*result != "")
+                                break;
+                }
+                if (*result != "")
+                        break;
+        }
+
+        return (*result != "");
 }
 
 MameHandler* MameHandler::pInstance = 0;
@@ -797,3 +958,9 @@ MameHandler* MameHandler::getHandler()
     }
     return pInstance;
 }
+
+RomInfo* MameHandler::create_rominfo(RomInfo *parent)
+{
+    return new MameRomInfo(*parent);
+}
+

@@ -20,8 +20,10 @@ HEADERS += constants.h databasebox.h
 HEADERS += menubox.h gamehandler.h mamehandler.h rominfo.h 
 HEADERS += settings.h mamerominfo.h
 HEADERS += themedmenu.h treeitem.h
+HEADERS += mamesettingsdlg.h extendedlistview.h
 
 SOURCES += databasebox.cpp 
 SOURCES += main.cpp menubox.cpp 
 SOURCES += settings.cpp gamehandler.cpp mamehandler.cpp rominfo.cpp
 SOURCES += themedmenu.cpp treeitem.cpp mamerominfo.cpp
+SOURCES += mamesettingsdlg.cpp extendedlistview.cpp
