@@ -236,9 +236,11 @@ public:
         addSelection("/dev/video0");
         addSelection("/dev/video1");
         addSelection("/dev/video2");
+        addSelection("/dev/video3");
         addSelection("/dev/v4l/video0");
         addSelection("/dev/v4l/video1");
         addSelection("/dev/v4l/video2");
+        addSelection("/dev/v4l/video3");
     };
 };
 
@@ -252,9 +254,11 @@ public:
         addSelection("/dev/vbi0");
         addSelection("/dev/vbi1");
         addSelection("/dev/vbi2");
+        addSelection("/dev/vbi3");
         addSelection("/dev/v4l/vbi0");
         addSelection("/dev/v4l/vbi1");
         addSelection("/dev/v4l/vbi2");
+        addSelection("/dev/v4l/vbi3");
     };
 };
 
@@ -265,13 +269,19 @@ public:
         CCSetting(parent, "audiodevice") {
         setLabel("Audio device");
         addSelection("/dev/dsp");
+        addSelection("/dev/dsp0");
         addSelection("/dev/dsp1");
         addSelection("/dev/dsp2");
         addSelection("/dev/dsp3");
+        addSelection("/dev/dsp4");
+        addSelection("/dev/dsp5");
         addSelection("/dev/sound/dsp");
+        addSelection("/dev/sound/dsp0");
         addSelection("/dev/sound/dsp1");
         addSelection("/dev/sound/dsp2");
         addSelection("/dev/sound/dsp3");
+        addSelection("/dev/sound/dsp4");
+        addSelection("/dev/sound/dsp5");
     };
 };
 
