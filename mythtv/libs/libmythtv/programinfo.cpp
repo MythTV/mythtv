@@ -1069,7 +1069,7 @@ void ProgramInfo::SetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
         else
             mark_type = i.data();
 
-        querystr = QString("INSERT recordedmarkup (chanid, starttime, "
+        querystr = QString("INSERT INTO recordedmarkup (chanid, starttime, "
                            "mark, type) values ( '%1', '%2', %3, %4);")
                            .arg(chanid).arg(starts)
                            .arg(frame_str).arg(mark_type);
@@ -1213,7 +1213,7 @@ void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
        
         QString offset_str = tempc;
 
-        querystr = QString("INSERT recordedmarkup (chanid, starttime, "
+        querystr = QString("INSERT INTO recordedmarkup (chanid, starttime, "
                            "mark, type, offset) values "
                            "( '%1', '%2', %3, %4, \"%5\");")
                            .arg(chanid).arg(starts)

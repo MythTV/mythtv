@@ -541,7 +541,7 @@ void ScheduledRecording::signalChange(QSqlDatabase* db) {
     }
     else
     {
-        query = "INSERT settings (value,data) "
+        query = "INSERT INTO settings (value,data) "
             "VALUES(\"RecordChanged\", \"yes\");";
     }
     db->exec(query);

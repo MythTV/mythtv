@@ -387,7 +387,7 @@ void CommDetect::BuildMasterCommList(void)
 
                 allTrue = true;
 
-                while ((f < it_b.key()) && (allTrue))
+                while ((f < framesProcessed) && (f < it_b.key()) && (allTrue))
                     allTrue = FrameIsInCommBreak(f++, sceneChangeCommMap);
             }
 
