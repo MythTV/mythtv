@@ -1,5 +1,5 @@
                                   MythGallery
-			          Release 0.7
+			          Release 0.8
 
 
 There'll be more information here later, but for now:
@@ -33,8 +33,11 @@ existing /usr/local/share/mythtv/ directory.
 You'll probably want to edit the mythgallery-settings.txt file to set where
 your images are stored.
 
-MythGallery will also read the theme.txt and mysql.txt settings files used by
+MythGallery will also read the mysql.txt settings files used by
 MythTV, so any changes you made to those will be carried over into this.
+
+You need to insert database/gallery.sql into your existing database setup
+from MythTV.
 
 This should be really simple to use -- just browse around with the arrow keys
 and select images/directories to view with the space/enter keys.  Escape backs 

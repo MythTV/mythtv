@@ -1,0 +1,3 @@
+UPGRADING FROM RELEASE 0.7
+--------------------------
+You need to insert database/gallery.sql into your existing MythTV database.
