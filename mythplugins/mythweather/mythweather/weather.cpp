@@ -200,67 +200,40 @@ void Weather::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Weather", e, actions);
 
-    for (unsigned int i = 0; i < actions.size(); i++)
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
+        handled = true;
+
         if (action == "LEFT")
-        {
-            handled = true;
             cursorLeft();
-        }
         else if (action == "RIGHT")
-        {
-            handled = true;
             cursorRight();
-        }
         else if (action == "UP")
-        {
-            handled = true;
             upKey();
-        }
         else if (action == "DOWN")
-        {
-            handled = true;
             dnKey();
-        }
         else if (action == "PAGEUP")
-        {
-            handled = true;
             pgupKey();
-        }
         else if (action == "PAGEDOWN")
-        {
-            handled = true;
             pgdnKey();
-        }
         else if (action == "SELECT")
-        {
-            handled = true;
             resetLocale();
-        }
         else if (action == "PAUSE")
-        {
-            handled = true;
             holdPage();
-        }
         else if (action == "MENU")
-        {
-            handled = true;
             setupPage();
-        }
         else if (action == "INFO")
-        {
-            handled = true;
             convertFlip();
-        }
         else if (action == "0" || action == "1" || action == "2" ||
                  action == "3" || action == "4" || action == "5" ||
                  action == "6" || action == "7" || action == "8" ||
                  action == "9")
         {
-            handled = true;
             newLocaleX(action.toInt());
         }
+        else
+            handled = false;
     }
 
     if (!handled)
