@@ -66,13 +66,74 @@ void DaapClient::run()
     while(keep_going)
     {
 
+        int nfds = 0;
+        fd_set readfds;
+
+        FD_ZERO(&readfds);
+
+
+        //
+        //  Add the socket to the mfd (where we find out about new services,
+        //  services going away, etc.)
+        //
+
+        if(client_socket_to_mfd->socket() > 0)
+        {
+            FD_SET(client_socket_to_mfd->socket(), &readfds);
+            if(nfds <= client_socket_to_mfd->socket())
+            {
+                nfds = client_socket_to_mfd->socket() + 1;
+            }
+        }
+
+        //
+        //  Add the control pipe
+        //
+            
+        FD_SET(u_shaped_pipe[0], &readfds);
+        if(nfds <= u_shaped_pipe[0])
+        {
+            nfds = u_shaped_pipe[0] + 1;
+        }
+    
+        timeout_mutex.lock();
+            timeout.tv_sec = 30;
+            timeout.tv_usec = 0;
+        timeout_mutex.unlock();
+
+        //
+        //  Sit in select() until data arrives
+        //
+    
+        int result = select(nfds, &readfds, NULL, NULL, &timeout);
+        if(result < 0)
+        {
+            warning("got an error on select()");
+        }
+    
+        //
+        //  In case data came in on out u_shaped_pipe, clean it out
+        //
+
+        if(FD_ISSET(u_shaped_pipe[0], &readfds))
+        {
+            u_shaped_pipe_mutex.lock();
+                char read_back[2049];
+                read(u_shaped_pipe[0], read_back, 2048);
+            u_shaped_pipe_mutex.unlock();
+        }
+    
         //
         //  Handle anything incoming on the socket
         //
 
-        readSocket();
-
-        sleep(3);
+        if(client_socket_to_mfd->socket() > 0)
+        {
+            if(FD_ISSET(client_socket_to_mfd->socket(), &readfds))
+            {
+                readSocket();
+            }
+        }
     }
     
     //
