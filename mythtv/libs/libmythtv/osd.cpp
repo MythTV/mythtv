@@ -126,6 +126,40 @@ void OSD::SetDefaults(void)
     }
 }
 
+void OSD::Reinit(int width, int height, int fps, int dispx, int dispy, 
+                 int dispw, int disph)
+{
+    vid_width = width;
+    vid_height = height;
+    if (fps != -1)
+       this->fps = fps;
+
+    wmult = dispw / 640.0;
+    hmult = disph / 480.0;
+
+    xoffset = dispx;
+    yoffset = dispy;
+    displaywidth = dispw;
+    displayheight = disph;
+
+    QMap<QString, TTFFont *>::iterator fonts = fontMap.begin();
+    for (; fonts != fontMap.end(); ++fonts)
+    {
+        TTFFont *font = (*fonts);
+        if (font)
+            font->Reinit(vid_width, vid_height);
+    }
+
+    QMap<QString, OSDSet *>::iterator sets = setMap.begin();
+    for (; sets != setMap.end(); ++sets)
+    {
+        OSDSet *set = (*sets);
+        if (set)
+            set->Reinit(vid_width, vid_height, dispx, dispy, dispw, disph, 
+                        wmult, hmult);
+    }
+}
+
 QString OSD::FindTheme(QString name)
 {
     char *home = getenv("HOME");

@@ -148,6 +148,8 @@ class NuppelVideoPlayer
 
     bool GetLimitKeyRepeat(void) { return limitKeyRepeat; }
 
+    void Reinit(void);
+
  protected:
     void OutputVideoLoop(void);
 

@@ -292,6 +292,33 @@ void NuppelVideoPlayer::InitVideo(void)
     }
 }
 
+void NuppelVideoPlayer::Reinit(void)
+{
+    pthread_mutex_lock(&video_buflock);
+
+    videoOutput->InputChanged(video_width, video_height, video_aspect,
+                              MAXVBUFFER+1, vbuffer);
+
+    availableVideoBuffers.clear();
+    vbufferMap.clear();
+    for (int i = 0; i < MAXVBUFFER; i++)
+    {
+        availableVideoBuffers.enqueue(vbuffer[i]);
+        vbufferMap[vbuffer[i]] = i;
+    }
+    usedVideoBuffers.clear();
+
+    int dispx = 0, dispy = 0, dispw = video_width, disph = video_height;
+
+    videoOutput->GetDrawSize(dispx, dispy, dispw, disph);
+    osd->Reinit(video_width, video_height, (int)ceil(video_frame_rate),
+                dispx, dispy, dispw, disph);
+
+    pthread_mutex_unlock(&video_buflock);
+
+    ClearAfterSeek();
+}
+
 void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps, 
                                        int keyframedistance, float aspect)
 {
@@ -1176,6 +1203,15 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
     while (!eof && !killvideo)
     {
+        if (frame.width  != video_width || frame.height != video_height)
+        {
+            frame.width  = video_width;
+            frame.height = video_height;
+            video_size = video_height * video_width * 3 / 2;
+            delete pause_buf;
+            pause_buf = new unsigned char[video_size];
+        }
+
         if (needsetpipplayer)
         {
             pipplayer = setpipplayer;
@@ -1217,7 +1253,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
                     ShowPip(vbuffer[MAXVBUFFER]);
                 osd->Display(vbuffer[MAXVBUFFER]);
                 videoOutput->PrepareFrame(vbuffer[MAXVBUFFER], video_width, 
-                                  video_height);
+                                          video_height);
                 videoOutput->Show();
                 ResetNexttrigger(&nexttrigger);
             }

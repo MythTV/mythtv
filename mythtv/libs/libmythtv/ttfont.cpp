@@ -477,19 +477,22 @@ void TTFFont::DrawString(unsigned char *yuvptr, int x, int y,
 
 TTFFont::~TTFFont()
 {
-   int                 i;
-
    if (!valid)
        return;
 
+   KillFace();
+}
+
+void TTFFont::KillFace(void)
+{
    FT_Done_Face(face);
-   for (i = 0; i < num_glyph; i++)
-     {
+   for (int i = 0; i < num_glyph; i++)
+   {
 	if (glyphs_cached[i])
 	   destroy_font_raster(glyphs_cached[i]);
 	if (FT_VALID(glyphs[i]))
 	   FT_Done_Glyph(glyphs[i]);
-     }
+   }
    if (glyphs)
       free(glyphs);
    if (glyphs_cached)
@@ -499,10 +502,6 @@ TTFFont::~TTFFont()
 TTFFont::TTFFont(char *file, int size, int video_width, int video_height)
 {
    FT_Error            error;
-   FT_CharMap          char_map;
-   FT_BBox             bbox;
-   int                 xdpi = 96, ydpi = 96;
-   unsigned short      i, n, code;
 
    valid = false;
    m_size = size;
@@ -524,22 +523,35 @@ TTFFont::TTFFont(char *file, int size, int video_width, int video_height)
 
    fontsize = size;
    library = the_library;
-   error = FT_New_Face(library, file, 0, &face);
+
+   vid_width = video_width;
+   vid_height = video_height;
+   m_file = file;
+
+   Init();
+}
+
+void TTFFont::Init(void)
+{
+   FT_Error            error;
+   FT_CharMap          char_map;
+   FT_BBox             bbox;
+   int                 xdpi = 96, ydpi = 96;
+   unsigned short      i, n, code;
+
+   error = FT_New_Face(library, m_file, 0, &face);
    if (error)
    {
 	return;
    }
 
-   if (video_width != video_height * 4 / 3)
+   if (vid_width != vid_height * 4 / 3)
    {
        xdpi = (int)(xdpi * 
-              (float)(video_width / (float)(video_height * 4 / 3)));
+              (float)(vid_width / (float)(vid_height * 4 / 3)));
    }
 
-   vid_width = video_width;
-   vid_height = video_height;
-
-   FT_Set_Char_Size(face, 0, size * 64, xdpi, ydpi);
+   FT_Set_Char_Size(face, 0, fontsize * 64, xdpi, ydpi);
 
    n = face->num_charmaps;
 
@@ -593,6 +605,15 @@ TTFFont::TTFFont(char *file, int size, int video_width, int video_height)
    CalcWidth("M", &mwidth);
 
    spacewidth = twidth - (mwidth * 2);
+}
+
+void TTFFont::Reinit(int width, int height)
+{
+    vid_width = width;
+    vid_height = height;
+
+    KillFace();
+    Init();
 }
 
 void TTFFont::CalcWidth(const QString &text, int *width_return)

@@ -53,6 +53,9 @@ class OSDSet
     void ClearAllText(void);
     void SetTextByRegexp(QMap<QString, QString> &regexpMap);
 
+    void Reinit(int screenwidth, int screenheight, int xoff, int yoff, 
+                int displaywidth, int displayheight, float wmult, float hmult);
+
   private:
     int m_screenwidth;
     int m_screenheight;
@@ -112,6 +115,8 @@ class OSDTypeText : public OSDType
     OSDTypeText(const OSDTypeText &text);
    ~OSDTypeText();
 
+    void Reinit(float wchange, float hchange);
+
     void SetAltFont(TTFFont *font);
     void SetUseAlt(bool usealt) { m_usingalt = usealt; }
 
@@ -164,6 +169,8 @@ class OSDTypeImage : public OSDType
     OSDTypeImage(const QString &name);    
     virtual ~OSDTypeImage();
 
+    void Reinit(float wmult, float hmult);
+
     void LoadImage(const QString &filename, float wmult, float hmult, 
                    int scalew = -1, int scaleh = -1);
 
@@ -194,6 +201,7 @@ class OSDTypeImage : public OSDType
     unsigned char *m_alpha;
 
     int m_scalew, m_scaleh;
+    float m_wmult, m_hmult;
 };
 
 class OSDTypePosSlider : public OSDTypeImage
@@ -203,6 +211,8 @@ class OSDTypePosSlider : public OSDTypeImage
                       QRect displayrect, float wmult, float hmult,
                       int scalew = -1, int scaleh = -1);
    ~OSDTypePosSlider();
+
+    void Reinit(float wchange, float hchange, float wmult, float hmult);
 
     void SetRectangle(QRect rect) { m_displayrect = rect; }
     QRect ImageSize() { return m_imagesize; }
@@ -223,6 +233,8 @@ class OSDTypeFillSlider : public OSDTypeImage
                       QRect displayrect, float wmult, float hmult, 
                       int scalew = -1, int scaleh = -1);
    ~OSDTypeFillSlider();
+
+    void Reinit(float wchange, float hchange, float wmult, float hmult);
 
     void SetRectangle(QRect rect) { m_displayrect = rect; }
     QRect ImageSize() { return m_imagesize; }
@@ -249,6 +261,8 @@ class OSDTypeEditSlider : public OSDTypeImage
                       int scalew = -1, int scaleh = -1);
    ~OSDTypeEditSlider();
 
+    void Reinit(float wchange, float hchange, float wmult, float hmult);
+
     void SetRectangle(QRect rect) { m_displayrect = rect; }
     QRect ImageSize() { return m_imagesize; }
 
@@ -273,6 +287,9 @@ class OSDTypeEditSlider : public OSDTypeImage
     unsigned char *m_rvbuffer;
     unsigned char *m_ralpha;
     QRect m_rimagesize;
+
+    QString m_redname;
+    QString m_bluename;
 };
 
 
@@ -283,6 +300,7 @@ class OSDTypeBox : public OSDType
     OSDTypeBox(const OSDTypeBox &other);
    ~OSDTypeBox();
 
+    void Reinit(float wchange, float hchange);
     void SetRect(QRect newrect) { size = newrect; }
 
     void Draw(unsigned char *screenptr, int vid_width, int vid_height, 
@@ -324,6 +342,8 @@ class OSDTypePositionRectangle : public OSDType,
 
     void AddPosition(QRect rect);
 
+    void Reinit(float wchange, float hchange);
+
     void Draw(unsigned char *screenptr, int vid_width, int vid_height,
               int fade, int maxfade, int xoff, int yoff);
 
@@ -338,6 +358,8 @@ class OSDTypePositionImage : public virtual OSDTypeImage,
     OSDTypePositionImage(const QString &name);
     OSDTypePositionImage(const OSDTypePositionImage &other);
    ~OSDTypePositionImage();
+
+    void Reinit(float wchange, float hchange, float wmult, float hmult);
 
     void AddPosition(QPoint pos);
 
@@ -364,6 +386,8 @@ class OSDTypeCC : public OSDType
     OSDTypeCC(const QString &name, TTFFont *font, int xoff, int yoff,
               int dispw, int disph);
    ~OSDTypeCC();
+
+    void Reinit(int xoff, int yoff, int dispw, int disph);
 
     void AddCCText(const QString &text, int x, int y, int color, 
                    bool teletextmode = false);

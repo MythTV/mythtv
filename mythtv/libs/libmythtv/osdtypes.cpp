@@ -127,6 +127,70 @@ void OSDSet::AddType(OSDType *type)
     type->SetParent(this);
 }
 
+void OSDSet::Reinit(int screenwidth, int screenheight, int xoff, int yoff,
+                    int displaywidth, int displayheight, 
+                    float wmult, float hmult)
+{
+    float wchange = wmult / m_wmult;
+    float hchange = hmult / m_hmult;
+
+    m_screenwidth = screenwidth;
+    m_screenheight = screenheight;
+    m_wmult = wmult;
+    m_hmult = hmult;
+
+    vector<OSDType *>::iterator iter = allTypes->begin();
+    for (;iter != allTypes->end(); iter++)
+    {
+        OSDType *type = (*iter);
+        if (OSDTypeText *item = dynamic_cast<OSDTypeText*>(type))
+        {
+            item->Reinit(wchange, hchange);
+        }
+        else if (OSDTypePositionImage *item =
+                 dynamic_cast<OSDTypePositionImage*>(type))
+        {
+            item->Reinit(wchange, hchange, wmult, hmult);
+        }
+        else if (OSDTypePosSlider *item = dynamic_cast<OSDTypePosSlider*>(type))
+        {
+            item->Reinit(wchange, hchange, wmult, hmult);
+        }
+        else if (OSDTypeFillSlider *item = 
+                 dynamic_cast<OSDTypeFillSlider*>(type))
+        {
+            item->Reinit(wchange, hchange, wmult, hmult);
+        }
+        else if (OSDTypeEditSlider *item =
+                 dynamic_cast<OSDTypeEditSlider*>(type))
+        {
+            item->Reinit(wchange, hchange, wmult, hmult);
+        }
+        else if (OSDTypeImage *item = dynamic_cast<OSDTypeImage*>(type))
+        {
+            item->Reinit(wmult, hmult);
+        }
+        else if (OSDTypeBox *item = dynamic_cast<OSDTypeBox*>(type))
+        {
+            item->Reinit(wchange, hchange);
+        }
+        else if (OSDTypePositionRectangle *item =
+                  dynamic_cast<OSDTypePositionRectangle*>(type))
+        {
+            item->Reinit(wchange, hchange);
+        }
+        else if (OSDTypeCC *item = dynamic_cast<OSDTypeCC*>(type))
+        {
+            item->Reinit(xoff, yoff, displaywidth, displayheight);
+        }
+        else
+        {
+            cerr << "Unknown conversion\n";
+        }
+    }
+
+}
+
 OSDType *OSDSet::GetType(const QString &name)
 {
     OSDType *ret = NULL;
@@ -317,6 +381,16 @@ void OSDTypeText::SetDefaultText(const QString &text)
     m_default_msg = text;
 }
 
+void OSDTypeText::Reinit(float wchange, float hchange)
+{
+    int width = (int)(m_displaysize.width() * wchange);
+    int height = (int)(m_displaysize.height() * hchange);
+    int x = (int)(m_displaysize.x() * wchange);
+    int y = (int)(m_displaysize.y() * hchange);
+
+    m_displaysize = QRect(x, y, width, height);
+}
+
 void OSDTypeText::Draw(unsigned char *screenptr, int vid_width, int vid_height,
                        int fade, int maxfade, int xoff, int yoff)
 {
@@ -466,6 +540,8 @@ OSDTypeImage::OSDTypeImage(const QString &name, const QString &filename,
 
     m_scalew = scalew;
     m_scaleh = scaleh;
+    m_wmult = wmult;
+    m_hmult = hmult;
 
     LoadImage(filename, wmult, hmult, scalew, scaleh);
 }
@@ -518,6 +594,20 @@ OSDTypeImage::~OSDTypeImage()
         delete [] m_yuv;
     if (m_alpha)
         delete [] m_alpha;
+}
+
+void OSDTypeImage::Reinit(float wmult, float hmult)
+{
+    int x = (int)(m_displaypos.x() * wmult / m_wmult);
+    int y = (int)(m_displaypos.y() * hmult / m_hmult);
+
+    m_displaypos.setX(x);
+    m_displaypos.setY(y);
+
+    m_wmult = wmult;
+    m_hmult = hmult;
+
+    LoadImage(m_filename, m_wmult, m_hmult, m_scalew, m_scaleh);
 }
 
 void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
@@ -724,6 +814,19 @@ OSDTypePosSlider::~OSDTypePosSlider()
 {
 }
 
+void OSDTypePosSlider::Reinit(float wchange, float hchange, float wmult,
+                              float hmult)
+{
+    int width = (int)(m_displayrect.width() * wchange);
+    int height = (int)(m_displayrect.height() * hchange);
+    int x = (int)(m_displayrect.x() * wchange);
+    int y = (int)(m_displayrect.y() * hchange);
+
+    m_displayrect = QRect(x, y, width, height);
+
+    OSDTypeImage::Reinit(wmult, hmult);
+}
+
 void OSDTypePosSlider::SetPosition(int pos)
 {
     m_curval = pos;
@@ -757,6 +860,19 @@ OSDTypeFillSlider::OSDTypeFillSlider(const QString &name,
 
 OSDTypeFillSlider::~OSDTypeFillSlider()
 {
+}
+
+void OSDTypeFillSlider::Reinit(float wchange, float hchange, float wmult,
+                               float hmult)
+{
+    int width = (int)(m_displayrect.width() * wchange);
+    int height = (int)(m_displayrect.height() * hchange);
+    int x = (int)(m_displayrect.x() * wchange);
+    int y = (int)(m_displayrect.y() * hchange);
+
+    m_displayrect = QRect(x, y, width, height);
+
+    OSDTypeImage::Reinit(wmult, hmult);
 }
 
 void OSDTypeFillSlider::SetPosition(int pos)
@@ -915,7 +1031,10 @@ OSDTypeEditSlider::OSDTypeEditSlider(const QString &name,
     m_ryuv = m_ralpha = NULL;
     m_risvalid = false;
 
-    LoadImage(redfilename, wmult, hmult, scalew, scaleh);
+    m_redname = redfilename;
+    m_bluename = bluefilename;
+
+    LoadImage(m_redname, wmult, hmult, scalew, scaleh);
     if (m_isvalid)
     {
         m_risvalid = m_isvalid;
@@ -930,7 +1049,7 @@ OSDTypeEditSlider::OSDTypeEditSlider(const QString &name,
         m_alpha = m_yuv = NULL;
     }
 
-    LoadImage(bluefilename, wmult, hmult, scalew, scaleh);
+    LoadImage(m_bluename, wmult, hmult, scalew, scaleh);
 }
 
 OSDTypeEditSlider::~OSDTypeEditSlider()
@@ -941,6 +1060,51 @@ OSDTypeEditSlider::~OSDTypeEditSlider()
         delete [] m_ryuv;
     if (m_ralpha)
         delete [] m_ralpha;
+}
+
+void OSDTypeEditSlider::Reinit(float wchange, float hchange, float wmult,
+                               float hmult)
+{
+    int width = (int)(m_displayrect.width() * wchange);
+    int height = (int)(m_displayrect.height() * hchange);
+    int x = (int)(m_displayrect.x() * wchange);
+    int y = (int)(m_displayrect.y() * hchange);
+
+    m_displayrect = QRect(x, y, width, height);
+    m_drawwidth = m_displayrect.width();
+
+    delete [] m_drawMap;
+    
+    m_drawMap = new int[m_drawwidth + 1];
+    for (int i = 0; i < m_drawwidth; i++)
+         m_drawMap[i] = 0;
+
+    m_displaypos = m_displayrect.topLeft();
+
+    if (m_ryuv)
+        delete [] m_ryuv;
+    if (m_ralpha)
+        delete [] m_ralpha;
+
+    m_wmult = wmult;
+    m_hmult = hmult;
+
+    LoadImage(m_redname, wmult, hmult, m_scalew, m_scaleh);
+    if (m_isvalid)
+    {
+        m_risvalid = m_isvalid;
+        m_ralpha = m_alpha;
+        m_ryuv = m_yuv;
+        m_rimagesize = m_imagesize;
+        m_rybuffer = m_ybuffer;
+        m_rubuffer = m_ubuffer;
+        m_rvbuffer = m_vbuffer;
+
+        m_isvalid = false;
+        m_alpha = m_yuv = NULL;
+    }
+
+    LoadImage(m_bluename, wmult, hmult, m_scalew, m_scaleh);
 }
 
 void OSDTypeEditSlider::ClearAll(void)
@@ -1144,6 +1308,16 @@ OSDTypeBox::~OSDTypeBox()
 {
 }
 
+void OSDTypeBox::Reinit(float wchange, float hchange)
+{
+    int width = (int)(size.width() * wchange);
+    int height = (int)(size.height() * hchange);
+    int x = (int)(size.x() * wchange);
+    int y = (int)(size.y() * hchange);
+
+    size = QRect(x, y, width, height);
+}
+
 void OSDTypeBox::Draw(unsigned char *screenptr, int vid_width, int vid_height,
                       int fade, int maxfade, int xoff, int yoff)
 {
@@ -1250,6 +1424,24 @@ OSDTypePositionRectangle::~OSDTypePositionRectangle()
 {
 }
 
+void OSDTypePositionRectangle::Reinit(float wchange, float hchange)
+{
+    for (int i = 0; i < m_numpositions; i++)
+    {
+        QRect tmp = positions[i];
+
+        int width = (int)(tmp.width() * wchange);
+        int height = (int)(tmp.height() * hchange);
+        int x = (int)(tmp.x() * wchange);
+        int y = (int)(tmp.y() * hchange);
+
+        positions[i].setX(x);
+        positions[i].setY(y);
+        positions[i].setWidth(width);
+        positions[i].setHeight(height);
+    }
+}
+
 void OSDTypePositionRectangle::AddPosition(QRect rect)
 {
     positions.push_back(rect);
@@ -1341,6 +1533,23 @@ OSDTypePositionImage::~OSDTypePositionImage()
 {
 }
 
+void OSDTypePositionImage::Reinit(float wchange, float hchange, float wmult, 
+                                  float hmult)
+{
+    OSDTypeImage::Reinit(wmult, hmult);
+
+    for (int i = 0; i < m_numpositions; i++)
+    {
+        QPoint tmp = positions[i];
+
+        int x = (int)(tmp.x() * wchange);
+        int y = (int)(tmp.y() * hchange);
+
+        positions[i].setX(x);
+        positions[i].setY(y);
+    }
+}
+
 void OSDTypePositionImage::AddPosition(QPoint pos)
 {
     positions.push_back(pos);
@@ -1382,6 +1591,14 @@ OSDTypeCC::~OSDTypeCC()
 {
     ClearAllCCText();
     delete m_box;
+}
+
+void OSDTypeCC::Reinit(int x, int y, int dispw, int disph)
+{
+    xoffset = x;
+    yoffset = y;
+    displaywidth = dispw;
+    displayheight = disph;
 }
 
 void OSDTypeCC::AddCCText(const QString &text, int x, int y, int color, 

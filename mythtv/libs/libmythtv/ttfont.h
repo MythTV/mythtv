@@ -30,7 +30,12 @@ class TTFFont
      int SpaceWidth() { return spacewidth; }
      int Size() { return m_size; }
 
+     void Reinit(int width, int height);
+
   private:
+     void KillFace(void);
+     void Init(void);
+
      Raster_Map *create_font_raster(int width, int height);
      Raster_Map *duplicate_raster(FT_BitmapGlyph bmap);
      void clear_raster(Raster_Map *rmap);
@@ -63,6 +68,8 @@ class TTFFont
      int m_shadowxoff;
      int m_shadowyoff;
      int m_color;
+
+     QString m_file;
 };
 
 #endif

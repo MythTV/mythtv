@@ -274,6 +274,10 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 if (aspect_ratio <= 0.0)
                     aspect_ratio = (float)enc->width / (float)enc->height;
 
+                current_width = enc->width;
+                current_height = enc->height;
+                current_aspect = aspect_ratio;
+
                 m_parent->SetVideoParams(enc->width, enc->height, fps, 
                                          keyframedist, aspect_ratio);
              
@@ -366,6 +370,33 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     return hasFullPositionMap;
 }
 
+bool AvFormatDecoder::CheckVideoParams(int width, int height)
+{
+    if (width == current_width && height == current_height)
+        return false;
+
+    cerr << "Video has changed: " << width << " " << height << endl;
+
+    for (int i = 0; i < ic->nb_streams; i++)
+    {
+        AVCodecContext *enc = &ic->streams[i]->codec;
+        switch (enc->codec_type)
+        {
+            case CODEC_TYPE_VIDEO:
+            {
+                AVCodec *codec = enc->codec;
+                avcodec_close(enc);
+                avcodec_open(enc, codec);
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    return true;
+}
+
 int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
@@ -408,13 +439,14 @@ void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
         pic->data[i] = NULL;
 }
 
-#define GOP_START     0x000001B8
+#define SEQ_START     0x000001b3
+#define GOP_START     0x000001b8
 #define PICTURE_START 0x00000100
 #define SLICE_MIN     0x00000101
 #define SLICE_MAX     0x000001af
 
-bool AvFormatDecoder::PacketHasHeader(unsigned char *buf, int len,
-                                      unsigned int startcode)
+int AvFormatDecoder::PacketHasHeader(unsigned char *buf, int len,
+                                     unsigned int startcode)
 {
     unsigned char *bufptr;
     unsigned int state = 0xFFFFFFFF, v;
@@ -428,14 +460,14 @@ bool AvFormatDecoder::PacketHasHeader(unsigned char *buf, int len,
         {
             state = ((state << 8) | v) & 0xFFFFFF;
             if (state >= SLICE_MIN && state <= SLICE_MAX)
-                return false;
+                return 0;
             if (state == startcode)
-                return true;
+                return (bufptr - buf);
         }
         state = ((state << 8) | v) & 0xFFFFFF;
     }
 
-    return false;
+    return 0;
 }
 
 void AvFormatDecoder::GetFrame(int onlyvideo)
@@ -478,6 +510,23 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
             AVCodecContext *context = &(curstream->codec);
             if (context->codec_id == CODEC_ID_MPEG1VIDEO)
             {
+                int startpos = 0;
+                if ((startpos = PacketHasHeader(pkt.data, pkt.size, SEQ_START)))
+                {
+                    unsigned char *test = pkt.data + startpos;
+                    int width = (test[0] << 4) | (test[1] >> 4);
+                    int height = ((test[1] & 0xff) << 8) | test[2];
+
+                    if (CheckVideoParams(width, height))
+                    {
+                        m_parent->SetVideoParams(width, height, fps,
+                                                 keyframedist, current_aspect);
+                        m_parent->Reinit();
+                        current_width = width;
+                        current_height = height;
+                    }
+                }
+                 
                 if (PacketHasHeader(pkt.data, pkt.size, PICTURE_START))
                 {
                     framesRead++;

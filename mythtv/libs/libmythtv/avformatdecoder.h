@@ -61,9 +61,11 @@ class AvFormatDecoder : public DecoderBase
     friend int close_avf(URLContext *h);
 
     void InitByteContext(void);
-    bool PacketHasHeader(unsigned char *buf, int len, unsigned int startcode);
+    int PacketHasHeader(unsigned char *buf, int len, unsigned int startcode);
 
     void SeekReset(void);
+
+    bool CheckVideoParams(int width, int height);
 
     RingBuffer *ringBuffer;
 
@@ -110,6 +112,10 @@ class AvFormatDecoder : public DecoderBase
     double ptsmultiplier;
 
     QPtrList<unsigned char> inUseBuffers;
+
+    int current_width;
+    int current_height;
+    float current_aspect;
 };
 
 #endif

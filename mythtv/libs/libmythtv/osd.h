@@ -77,6 +77,9 @@ class OSD
                       long long totalFrames);
 
     int getTimeType(void) { return timeType; }
+
+    void Reinit(int width, int height, int fps, int dispx, int dispy, 
+                int dispw, int disph);
  
  private:
     void SetDefaults();
