@@ -454,6 +454,9 @@ void TV::HandleStateChange(void)
     {
         closeRecorder = true;
 
+        if (internalState == kState_WatchingRecording)
+            nvp->SetWatchingRecording(false);
+
         internalState = nextState;
         changed = true;
 
@@ -771,6 +774,9 @@ void TV::SetupPlayer(void)
     }
 
     nvp->SetVideoFilters(filters);
+
+    if (internalState == kState_WatchingRecording)
+        nvp->SetWatchingRecording(true);
 
     osd = NULL;
 }
@@ -1197,7 +1203,15 @@ int TV::calcSliderPos(int offset, QString &desc)
         return (int)(1000 - ret);
     }
 
+    if (internalState == kState_WatchingRecording)
+        playbackLen = ((float)nvr->GetFramesWritten() / frameRate);
+
     float secsplayed = ((float)nvp->GetFramesPlayed() / frameRate) + offset;
+    if (secsplayed < 0)
+        secsplayed = 0;
+    if (secsplayed > playbackLen)
+        secsplayed = playbackLen;
+
     ret = secsplayed / (float)playbackLen;
     ret *= 1000.0;
 

@@ -99,6 +99,8 @@ class NuppelVideoPlayer
 
     int CheckEvents(void); 
 
+    void SetWatchingRecording(bool mode) { watchingrecording = mode; }
+
  protected:
     void OutputAudioLoop(void);
     void OutputVideoLoop(void);
@@ -219,6 +221,7 @@ class NuppelVideoPlayer
     long long framesPlayed;
     
     bool livetv;
+    bool watchingrecording;
     bool editmode;
     bool advancevideo;
     bool resetvideo;

@@ -76,6 +76,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
     memset(&extradata, 0, sizeof(extendeddata));
 
     videoOutput = NULL;
+    watchingrecording = false;
 }
 
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
@@ -1084,7 +1085,11 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
                 (nexttrigger.tv_usec - now.tv_usec); // uSecs
 
         if (delay > 1000000)
+        {
             cout << delay << endl;
+            delay = 100000;
+        }
+
         /* trigger */
         if (delay > 0)
             usleep(delay);
@@ -1468,15 +1473,19 @@ bool NuppelVideoPlayer::DoRewind(void)
 
 void NuppelVideoPlayer::CalcMaxFFTime(void)
 {
-    if (livetv)
+    float maxtime = 1.0;
+    if (watchingrecording && nvr)
+        maxtime = 3.0;
+    
+    if (livetv || (watchingrecording && nvr))
     {
         float behind = (float)(nvr->GetFramesWritten() - framesPlayed) / 
                        video_frame_rate;
-	if (behind < 1.0) // if we're close, do nothing
+	if (behind < maxtime) // if we're close, do nothing
 	    fftime = 0.0;
-	else if (behind - fftime <= 1.0)
+	else if (behind - fftime <= maxtime)
 	{
-            fftime = behind - 1.0;
+            fftime = behind - maxtime;
 	}
     }
     else

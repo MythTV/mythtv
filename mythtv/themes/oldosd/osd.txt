@@ -28,7 +28,7 @@ str SeekPosition=0,-1
 str SeekStatusRect=10,15,150,45
 # Location of the slider bar to draw.  If this exists, the next setting must
 # also
-str SeekSliderRect=175,12,450,45
+str SeekSliderRect=175,12,445,45
 # Image to use for the fill slider bar.  Only the first column is used.
 str SeekSliderNormal=slider-normal.png
 # Image used to show position on the slider bar.
