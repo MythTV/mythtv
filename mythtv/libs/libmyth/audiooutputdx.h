@@ -11,7 +11,7 @@ using namespace std;
 //#include <mmsystem.h>
 #include <dsound.h>
 
-class AudioOutputDX : public AudioOutput
+class AudioOutputDX : public AudioOutputBase
 {
 public:
     AudioOutputDX(QString audiodevice, int audio_bits, 

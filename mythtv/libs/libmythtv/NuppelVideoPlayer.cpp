@@ -1686,14 +1686,15 @@ void NuppelVideoPlayer::StartPlaying(void)
     if (OpenFile() < 0)
         return;
 
-    if (!disableaudio)
+    if (!disableaudio || nvp->forceVideoOutput == kVideoOutput_IVTV)
     {
         bool setVolume = gContext->GetNumSetting("MythControlsVolume", 1);
         audioOutput = AudioOutput::OpenAudio(audiodevice, audio_bits,
-                                             audio_channels, audio_samplerate, AUDIOOUTPUT_VIDEO,
-                                             setVolume );
+                                             audio_channels, audio_samplerate, 
+                                             AUDIOOUTPUT_VIDEO,
+                                             setVolume);
 
-        DialogBox *dialog = NULL ;
+        DialogBox *dialog = NULL;
         if (audioOutput == NULL)
         {
             qApp->lock();
