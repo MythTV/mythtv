@@ -101,16 +101,18 @@
         <font>header</font>
         <area>30,170,400,50</area>
         <value>loading...</value>
+        <value lang="DE">Lade...</value>
+        <value lang="DK">Indlæser...</value>
         <value lang="ES">Cargando...</value>
         <value lang="CA">Carregant³...</value>
         <value lang="NL">Bezig laden...</value>
-        <value lang="DK">Indlæser...</value>
         <value lang="PT">Aguarde um momento...</value>
       </textarea>
       <textarea name="retrieve" draworder="3" align="center">
         <font>timedate</font>
         <area>0,480,800,42</area>
         <value>[ retrieving weather data ... ]</value>
+        <value lang="DE">[ hole Wetterdaten ... ]</value>
         <value lang="ES">[ obteniendo datos meteorológicos ... ]</value>
         <value lang="CA">[ recuperant dades meteorològiques ... ]</value>
         <value lang="NL">[ bezig ophalen weerbericht ... ]</value>
@@ -172,6 +174,7 @@
         <area>0,18,800,45</area>
         <font>header</font>
         <value>current conditions</value>
+        <value lang="DE">Aktuelles Wetter</value>
         <value lang="ES">el tiempo ahora</value>
         <value lang="CA">dades actuals</value>
         <value lang="NL">vandaag</value>
@@ -183,6 +186,7 @@
         <area>40,240,245,32</area>
         <font>weatherdata</font>
         <value>Humidity</value>
+        <value lang="DE">Luftfeuchtigkeit</value>
         <value lang="ES">Humedad</value>
         <value lang="CA">Humitat</value>
         <value lang="NL">Vochtigheid</value>
@@ -199,6 +203,7 @@
         <area>40,288,245,32</area>
         <font>weatherdata</font>
         <value>Pressure</value>
+        <value lang="DE">Druck</value>
         <value lang="ES">Presión</value>
         <value lang="CA">Pressió</value>
         <value lang="NL">Luchtdruk</value>
@@ -215,6 +220,7 @@
         <area>40,336,245,32</area>
         <font>weatherdata</font>
         <value>Wind</value>
+        <value lang="DE">Windgeschwindigkeit</value>
         <value lang="ES">Viento</value>
         <value lang="CA">Vent</value>
         <value lang="NL">Wind</value>
@@ -231,6 +237,7 @@
         <area>40,384,245,32</area>
         <font>weatherdata</font>
         <value>Visibility</value>
+        <value lang="DE">Sichtweite</value>
         <value lang="ES">Visibilidat</value>
         <value lang="CA">Visibilitat</value>
         <value lang="DK">Sigtbarhed</value>
@@ -247,6 +254,7 @@
         <area>40,432,245,32</area>
         <font>weatherdata</font>
         <value>Wind Chill</value>
+        <value lang="DE">Gefühlte Temperatur</value>
         <value lang="ES">Sensación</value>
         <value lang="CA">Sensació</value>
         <value lang="NL">Lucht Koelte</value>
@@ -263,6 +271,7 @@
         <area>40,480,245,32</area>
         <font>weatherdata</font>
         <value>UV Index</value>
+        <value lang="DE">UV Strahlung</value>
         <value lang="ES">Radiación solar (UV)</value>
         <value lang="CA">Radiació solar (UV)</value>
         <value lang="NL">UV Index</value>
@@ -315,6 +324,7 @@
         <area>0,18,800,45</area>
         <font>header</font>
         <value>extended forecast</value>
+        <value lang="DE">Erweiterte Vorhersage</value>
         <value lang="ES">próximos días</value>
         <value lang="CA">propers dies</value>
         <value lang="NL">komende dagen</value>
@@ -342,6 +352,7 @@
         <area>31,458,122,32</area>
         <font>lohifont</font>
         <value>LO</value>
+        <value lang="DE">Min</value>
         <value lang="ES">MIN</value>
         <value lang="CA">MIN</value>
         <value lang="NL">MIN</value>
@@ -353,6 +364,7 @@
         <area>152,458,122,32</area>
         <font>lohifont</font>
         <value>HI</value>
+        <value lang="DE">Max</value>
         <value lang="CA">MAX</value>
         <value lang="ES">MAX</value>
         <value lang="NL">MAX</value>
@@ -392,6 +404,7 @@
         <area>276,458,122,32</area>
         <font>lohifont</font>
         <value>LO</value>
+        <value lang="DE">Min</value>
         <value lang="ES">MIN</value>
         <value lang="CA">MIN</value>
         <value lang="NL">MIN</value>
@@ -403,6 +416,7 @@
         <area>379,458,122,32</area>
         <font>lohifont</font>
         <value>HI</value>
+        <value lang="DE">Max</value>
         <value lang="ES">MAX</value>
         <value lang="CA">MAX</value>
         <value lang="NL">MAX</value>
@@ -442,6 +456,7 @@
         <area>524,458,122,32</area>
         <font>lohifont</font>
         <value>LO</value>
+        <value lang="DE">Min</value>
         <value lang="ES">MIN</value>
         <value lang="CA">MIN</value>
         <value lang="NL">MIN</value>
@@ -453,6 +468,7 @@
         <area>624,458,122,32</area>
         <font>lohifont</font>
         <value>HI</value>
+        <value lang="DE">Max</value>
         <value lang="ES">MAX</value>
         <value lang="CA">MAX</value>
         <value lang="NL">MAX</value>
@@ -489,6 +505,7 @@
         <area>0,18,800,45</area>
         <font>header</font>
         <value>today's forecast</value>
+        <value lang="DE">Vorhersage für heute</value>
         <value lang="ES">previsión para hoy</value>
         <value lang="CA">previsió per a avui</value>
         <value lang="NL">vandaag</value>
@@ -525,6 +542,7 @@
         <area>0,18,800,45</area>
         <font>header</font>
         <value>tomorrow's outlook</value>
+        <value lang="DE">Vorhersage für Morgen</value>
         <value lang="ES">previsión para mañana</value>
         <value lang="CA">previsió per demà</value>
         <value lang="NL">morgen</value>
@@ -581,6 +599,7 @@
         <area>0,18,800,45</area>
         <font>header</font> 
         <value>doppler radar</value>
+        <value lang="DE">Dopplerradar</value>
         <value lang="ES">Imagen del radar</value>
         <value lang="CA">Imatge del radar</value>
         <value lang="NL">Doppler Radar</value>
@@ -692,6 +711,8 @@
       <textarea name="msg" draworder="7" align="center">
         <font>timedate</font>
         <value>Enter Zip Code</value>
+        <value lang="DE">Postleitzahl eingeben</value>
+        <value lang="DK">Indtast postkode</value>
         <value lang="PT">Código Postal</value>
         <area>0,215,800,25</area>
       </textarea>
@@ -731,6 +752,7 @@
       <textarea name="savemsg" draworder="5" align="allcenter">
         <font>footer</font>
         <value>To save, press 'i' - to cancel, hit escape</value>
+        <value lang="DE">Mit 'i' speichern; ESCAPE um abzubrechen</value>
         <value lang="ES">Para guardar, pulse 'i' - para cancelar, para cancelar salga</value>
         <value lang="CA">Per a guardar, premi 'i' - per cancel-lar, surti</value>
         <value lang="NL">Druk 'i' om op te slaan - druk escape om te annuleren</value>

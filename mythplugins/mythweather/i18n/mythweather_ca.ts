@@ -798,5 +798,9 @@
         <source>Unknown</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source> - PAUSED -</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

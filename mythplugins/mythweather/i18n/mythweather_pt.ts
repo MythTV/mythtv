@@ -197,7 +197,7 @@
     </message>
     <message>
         <source>Scattered Flurries</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuvens Dispersas</translation>
     </message>
     <message>
         <source>AM Clouds/PM Sun</source>
@@ -209,7 +209,7 @@
     </message>
     <message>
         <source>Scattered Thunderstorms</source>
-        <translation type="unfinished"></translation>
+        <translation>Trovoadas Dispersas</translation>
     </message>
     <message>
         <source>PM Showers</source>
@@ -221,11 +221,11 @@
     </message>
     <message>
         <source>Rain/Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuviscos Chuva/Neve</translation>
     </message>
     <message>
         <source>Few Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Alguma Neve</translation>
     </message>
     <message>
         <source>Cloudy/Wind</source>
@@ -233,11 +233,11 @@
     </message>
     <message>
         <source>Flurries/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuvens/Vento</translation>
     </message>
     <message>
         <source>Mostly Cloudy/Windy</source>
-        <translation type="unfinished"></translation>
+        <translation>Nublado/Vento</translation>
     </message>
     <message>
         <source>Rain/Thunder</source>
@@ -245,15 +245,15 @@
     </message>
     <message>
         <source>Partly Cloudy/Windy</source>
-        <translation type="unfinished"></translation>
+        <translation>Pouco Nublado/Vento</translation>
     </message>
     <message>
         <source>AM Rain/Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuviscos Chuva/Neve Manhã</translation>
     </message>
     <message>
         <source>Light Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva Ligeira/Vento</translation>
     </message>
     <message>
         <source>Showers/Wind</source>
@@ -261,11 +261,11 @@
     </message>
     <message>
         <source>Mostly Sunny/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Muito Sol/Vento</translation>
     </message>
     <message>
         <source>Flurries</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuvens</translation>
     </message>
     <message>
         <source>Rain/Wind</source>
@@ -273,15 +273,15 @@
     </message>
     <message>
         <source>Sct Flurries/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Algumas Nuvens/Vento</translation>
     </message>
     <message>
         <source>Sct Strong Storms</source>
-        <translation type="unfinished"></translation>
+        <translation>Alguma Trovoada</translation>
     </message>
     <message>
         <source>PM T-Storms</source>
-        <translation type="unfinished"></translation>
+        <translation>Trovoada Tarde</translation>
     </message>
     <message>
         <source>Thunderstorms</source>
@@ -289,11 +289,11 @@
     </message>
     <message>
         <source>Sunny/Windy</source>
-        <translation type="unfinished"></translation>
+        <translation>Sol/Vento</translation>
     </message>
     <message>
         <source>AM Thunderstorms</source>
-        <translation type="unfinished"></translation>
+        <translation>Trovoada Manhã</translation>
     </message>
     <message>
         <source>AM Rain</source>
@@ -301,7 +301,7 @@
     </message>
     <message>
         <source>Iso T-Storms/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Trovoada/Vento</translation>
     </message>
     <message>
         <source>Rain/Snow</source>
@@ -309,31 +309,31 @@
     </message>
     <message>
         <source>Sct T-Storms/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Alguma Trovoada/Vento</translation>
     </message>
     <message>
         <source>AM Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuviscos/Vento</translation>
     </message>
     <message>
         <source>Sct Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Alguma Neve</translation>
     </message>
     <message>
         <source>Snow to Ice/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Neve e Gelo/Vento</translation>
     </message>
     <message>
         <source>Snow to Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Neve e Gelo</translation>
     </message>
     <message>
         <source>AM Light Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva Ligeira Manhã</translation>
     </message>
     <message>
         <source>PM Light Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva Ligeira Tarde</translation>
     </message>
     <message>
         <source>PM Rain</source>
@@ -341,19 +341,19 @@
     </message>
     <message>
         <source>Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Alguma Neve</translation>
     </message>
     <message>
         <source>Rain to Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva e Neve</translation>
     </message>
     <message>
         <source>PM Rain/Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva/Neve Tarde</translation>
     </message>
     <message>
         <source>Few Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Alguma Chuva/Vento</translation>
     </message>
     <message>
         <source>Snow/Wind</source>
@@ -361,19 +361,19 @@
     </message>
     <message>
         <source>PM Rain/Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Alguma Chuva/Neve Tarde</translation>
     </message>
     <message>
         <source>PM Rain/Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva/Neve/Vento Tarde</translation>
     </message>
     <message>
         <source>Rain/Snow Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva/Alguma Neve/Vento</translation>
     </message>
     <message>
         <source>Rain/Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva/Neve/Vento</translation>
     </message>
     <message>
         <source>Light Snow</source>
@@ -385,67 +385,67 @@
     </message>
     <message>
         <source>Few Snow Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Alguna Neve/Vento</translation>
     </message>
     <message>
         <source>Light Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Neve Ligeira/vento</translation>
     </message>
     <message>
         <source>Wintry Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>Mistura &quot;Wintry&quot;</translation>
     </message>
     <message>
         <source>AM Wintry Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>Mistura &quot;Wintry&quot; Manhã</translation>
     </message>
     <message>
         <source>Hvy Rain/Freezing Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva Intensa/Chuva Gelada</translation>
     </message>
     <message>
         <source>AM Light Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Alguma Neve Manhã</translation>
     </message>
     <message>
         <source>Rain/Freezing Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva/Chuva Gelada</translation>
     </message>
     <message>
         <source>T-Storms/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Trovoada/Vento</translation>
     </message>
     <message>
         <source>Sprinkles</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;Sprinkles&quot;</translation>
     </message>
     <message>
         <source>AM Snow Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Alguma Neve Manhã</translation>
     </message>
     <message>
         <source>AM Clouds/PM Sun/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuvens Manhã/Sol/Vento Tarde</translation>
     </message>
     <message>
         <source>AM Rain/Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva/Neve/Vento Manhã</translation>
     </message>
     <message>
         <source>Rain to Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva a Neve/Vento</translation>
     </message>
     <message>
         <source>Snow to Wintry Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>Neve a Mistura &quot;Wintry&quot;</translation>
     </message>
     <message>
         <source>PM Snow Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Alguma Neve/Vento Tarde</translation>
     </message>
     <message>
         <source>Snow and Ice to Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Neve e Gelo a Chuva</translation>
     </message>
     <message>
         <source>Heavy Rain</source>
@@ -453,27 +453,27 @@
     </message>
     <message>
         <source>AM Rain/Ice</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva/Gelo Manhã</translation>
     </message>
     <message>
         <source>AM Snow Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Alguma Neve/Vento Manhã</translation>
     </message>
     <message>
         <source>AM Light Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Neve Ligeira/Vento Manhã</translation>
     </message>
     <message>
         <source>PM Light Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva Ligeira/Vento Tarde</translation>
     </message>
     <message>
         <source>AM Light Wintry Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>Mistura &quot;Wintry&quot; Ligeira Manhã</translation>
     </message>
     <message>
         <source>PM Light Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Neve Ligeira/Vento Tarde</translation>
     </message>
     <message>
         <source>Heavy Rain/Wind</source>
@@ -481,15 +481,15 @@
     </message>
     <message>
         <source>PM Snow Shower</source>
-        <translation type="unfinished"></translation>
+        <translation>Neve Tarde</translation>
     </message>
     <message>
         <source>Snow to Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Neve a Chuva/Vento</translation>
     </message>
     <message>
         <source>PM Light Rain/Ice</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva Ligeira/Gelo Tarde</translation>
     </message>
     <message>
         <source>AM Snow</source>
@@ -497,79 +497,79 @@
     </message>
     <message>
         <source>Snow to Ice</source>
-        <translation type="unfinished"></translation>
+        <translation>Neve a Gelo</translation>
     </message>
     <message>
         <source>Wintry Mix/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Mistura &quot;Wintry&quot;/Vento</translation>
     </message>
     <message>
         <source>PM Light Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Neve Ligeira/Tarde</translation>
     </message>
     <message>
         <source>AM Drizzle</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;Drizzle&quot; Manhã</translation>
     </message>
     <message>
         <source>Strong Storms/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Trovoada Pesada/Vento</translation>
     </message>
     <message>
         <source>PM Drizzle</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;Drizzle&quot; Tarde</translation>
     </message>
     <message>
         <source>Drizzle</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;Drizzle&quot;</translation>
     </message>
     <message>
         <source>AM Light Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva Ligeira/Vento Manhã</translation>
     </message>
     <message>
         <source>AM Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva/Vento Manhã</translation>
     </message>
     <message>
         <source>Wintry Mix to Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Mistura &quot;Wintry&quot; a Neve</translation>
     </message>
     <message>
         <source>Snow Showers/Windy</source>
-        <translation type="unfinished"></translation>
+        <translation>Neve/Vento</translation>
     </message>
     <message>
         <source>Light Rain Shower</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuviscos Chuva Ligeira</translation>
     </message>
     <message>
         <source>Light Rain with Thunder</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva Ligeira com Trovoada</translation>
     </message>
     <message>
         <source>Light Drizzle</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;Drizzle&quot; Ligeiro</translation>
     </message>
     <message>
         <source>Mist</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;Mist&quot;</translation>
     </message>
     <message>
         <source>Smoke</source>
-        <translation type="unfinished"></translation>
+        <translation>Fumo</translation>
     </message>
     <message>
         <source>Haze</source>
-        <translation type="unfinished"></translation>
+        <translation>Nevoeiro</translation>
     </message>
     <message>
         <source>Light Snow Shower</source>
-        <translation type="unfinished"></translation>
+        <translation>Neve Ligeira</translation>
     </message>
     <message>
         <source>Light Snow Shower/ Windy</source>
-        <translation type="unfinished"></translation>
+        <translation>Neve Ligeira/Vento</translation>
     </message>
     <message>
         <source>Clear</source>
@@ -581,7 +581,7 @@
     </message>
     <message>
         <source>Fair</source>
-        <translation type="unfinished"></translation>
+        <translation>Bom</translation>
     </message>
 </context>
 <context>
@@ -904,6 +904,10 @@
     <message>
         <source> C</source>
         <translation>°C</translation>
+    </message>
+    <message>
+        <source> - PAUSED -</source>
+        <translation>- PARADO -</translation>
     </message>
 </context>
 </TS>

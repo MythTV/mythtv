@@ -942,7 +942,7 @@ void Weather::holdPage()
             if (type)
             {
                 QString cur = type->GetText();
-                SetText(container, "location", cur + " - PAUSED -");
+                SetText(container, "location", cur + tr(" - PAUSED -"));
             }
         }
    }
