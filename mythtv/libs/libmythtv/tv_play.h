@@ -149,6 +149,7 @@ class TV : public QObject
     void DoArbSeek(int dir);
     void NormalSpeed(void);
     void ChangeSpeed(int direction);
+    void ChangeTimeStretch(int dir);
     float StopFFRew(void);
     void ChangeFFRew(int direction);
     void SetFFRew(int index);
@@ -201,6 +202,8 @@ class TV : public QObject
     void UpdateLCD(void);
     void ShowLCDChannelInfo(void);
 
+    QString PlayMesg(void);
+
     int osd_display_time;
 
     bool arrowAccel;
@@ -239,6 +242,8 @@ class TV : public QObject
     int doing_ff_rew;
     int ff_rew_index;
     int speed_index;
+    float normal_speed;
+    bool stretchAdjustment;
 
     OSD *osd;
     bool update_osd_pos;

@@ -1026,19 +1026,26 @@ int main(int argc, char **argv)
     if (gContext->GetNumSetting("idleTimeoutSecs",0) > 0)
         gContext->ConnectToMasterServer();
 
+    qApp->lock();
+
     if (pluginname != "")
     {
         if (pmanager->run_plugin(pluginname))
+        {
+            qApp->unlock();
             return 0;
+        }
         else
         {
             pluginname = "myth" + pluginname;
             if (pmanager->run_plugin(pluginname))
+            {
+                qApp->unlock();
                 return 0;
+            }
         }
     }
 
-    qApp->lock();
     qApp->unlock();
 
 #ifndef _WIN32

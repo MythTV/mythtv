@@ -29,6 +29,11 @@ LIBS += -lmythsamplerate-$${LIBVERSION}
 
 INCLUDEPATH += ../libmythsamplerate
 
+LIBS += -L../libmythsoundtouch
+LIBS += -lmythsoundtouch-$${LIBVERSION}
+
+INCLUDEPATH += ../libmythsoundtouch
+
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = dialogbox.h lcddevice.h themedmenu.h mythcontext.h mythdbcon.h
 inc.files += mythwidgets.h remotefile.h util.h oldsettings.h volumecontrol.h

@@ -124,6 +124,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(MythSqlDatabase *ldb,
     audio_channels = 2;
     audio_samplerate = 44100;
 
+    audio_stretchfactor = 1.0;
+
     editmode = false;
     resetvideo = false;
 
@@ -269,9 +271,9 @@ void NuppelVideoPlayer::Pause(bool waitvideo)
     if (ringBuffer)
         ringBuffer->Pause();
 
-    play_speed = 1.0;
+    play_speed = audio_stretchfactor;
     normal_speed = false;
-    frame_interval = (int)(1000000.0 / video_frame_rate / 1.0);
+    frame_interval = (int)(1000000.0 / video_frame_rate / play_speed);
     if (osd && forceVideoOutput != kVideoOutput_IVTV)
         osd->SetFrameInterval(frame_interval);
     if (videosync != NULL)
@@ -302,6 +304,12 @@ bool NuppelVideoPlayer::Play(float speed, bool normal, bool unpauseaudio)
         osd->SetFrameInterval(frame_interval);
     if (videosync != NULL)
         videosync->SetFrameInterval(frame_interval, m_double_framerate);
+
+    if (normal && (speed != audio_stretchfactor))
+    {
+        audio_stretchfactor = speed;
+        audioOutput->SetStretchFactor(speed);
+    }
 
     if (!paused)
     {
@@ -458,7 +466,10 @@ void NuppelVideoPlayer::ReinitVideo(void)
 void NuppelVideoPlayer::ReinitAudio(void)
 {
     if (audioOutput)
+    {
         audioOutput->Reconfigure(audio_bits, audio_channels, audio_samplerate);
+        audioOutput->SetStretchFactor(audio_stretchfactor);
+    }
 }
 
 static inline QString toQString(FrameScanType scan) {
@@ -1842,7 +1853,7 @@ void NuppelVideoPlayer::StartPlaying(void)
                 DoRewind();
 
                 if (!GetFrame(audioOutput == NULL || !normal_speed))
-		    pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);	    
+                    pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);	    
                 resetvideo = true;
                 while (resetvideo)
                     usleep(50);
@@ -1855,8 +1866,8 @@ void NuppelVideoPlayer::StartPlaying(void)
                 fftime = CalcMaxFFTime(fftime);
                 DoFastForward();
 
-		if (!GetFrame(audioOutput == NULL || !normal_speed))
-		    pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);	    
+                if (!GetFrame(audioOutput == NULL || !normal_speed))
+                    pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this);	    
                 resetvideo = true;
                 while (resetvideo)
                     usleep(50);

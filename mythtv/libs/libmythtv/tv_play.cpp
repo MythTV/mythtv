@@ -164,6 +164,7 @@ void TV::InitKeys(void)
             "transcoding", "X");
     REG_KEY("TV Playback", "SPEEDINC", "Increase the playback speed", "U");
     REG_KEY("TV Playback", "SPEEDDEC", "Decrease the playback speed", "J");
+    REG_KEY("TV Playback", "TOGGLESTRETCH", "Turn on time stretch control", "A");
     REG_KEY("TV Playback", "TOGGLEPICCONTROLS", "Turn on the playback picture "
             "adjustment controls", "F");
     REG_KEY("TV Playback", "TOGGLERECCONTROLS", "Turn on the recording picture "
@@ -232,6 +233,7 @@ TV::TV(void)
     last_channel = "";
     picAdjustment = kPictureAttribute_None;
     recAdjustment = kPictureAttribute_None;
+    stretchAdjustment = false;
     doSmartForward = false;
 
     getRecorderPlaybackInfo = false;
@@ -241,6 +243,8 @@ TV::TV(void)
 
     myWindow = NULL;
     udpnotify = NULL;
+
+    normal_speed = 1.0;
     
     baseFilters += gContext->GetSetting("CustomFilters");
 
@@ -996,6 +1000,7 @@ void TV::TeardownPlayer(void)
     ff_rew_index = SSPEED_NORMAL;
     speed_index = 0;
     sleep_index = 0;
+    normal_speed = 1.0;
 
     nvp = activenvp = NULL;
     osd = NULL;
@@ -1074,6 +1079,7 @@ void TV::RunTV(void)
     doing_ff_rew = 0;
     ff_rew_index = SSPEED_NORMAL;
     speed_index = 0;
+    normal_speed = 1.0;
     sleep_index = 0;
 
     int updatecheck = 0;
@@ -1127,6 +1133,12 @@ void TV::RunTV(void)
                 ProcessKeypress(keypressed);
                 delete keypressed;
             }
+        }
+
+        if (recorder && recorder->GetErrorStatus())
+        {
+            exitPlayer = true;
+            wantsToQuit = true;
         }
 
         if (StateIsPlaying(internalState))
@@ -1318,6 +1330,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else if (action == "TOGGLERECORD")
                 ToggleRecord();
             else if (action == "VOLUMEDOWN" || action == "VOLUMEUP" ||
+                     action == "STRETCHINC" || action == "STRETCHDEC" ||
                      action == "MUTE" || action == "TOGGLEASPECT")
             {
                 passThru = 1;
@@ -1367,6 +1380,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else if (action == "JUMPRWND")
                 nvp->Zoom(kZoomOut);
             else if (action == "VOLUMEDOWN" || action == "VOLUMEUP" ||
+                     action == "STRETCHINC" || action == "STRETCHDEC" ||
                      action == "MUTE" || action == "PAUSE")
             {
                 passThru = 1;
@@ -1465,14 +1479,14 @@ void TV::ProcessKeypress(QKeyEvent *e)
                     if (osd->GetDialogResponse(dialogname) == 1)
                         ChangeChannel(lastCCDir, true);
                     else if (!paused)
-                        activenvp->Play(1.0, true);
+                        activenvp->Play(normal_speed, true);
                 }     
                 else if (dialogname == "ccwarningstring")
                 {
                     if (osd->GetDialogResponse(dialogname) == 1)
                         ChangeChannelByString(lastCC, true);
                     else if (!paused)
-                        activenvp->Play(1.0, true);
+                        activenvp->Play(normal_speed, true);
                 }
                 else if (dialogname == "allowrecordingbox")
                 {
@@ -1524,6 +1538,22 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 DoChangePictureAttribute(recAdjustment, false, true);
             else if (action == "RIGHT")
                 DoChangePictureAttribute(recAdjustment, true, true);
+            else
+                handled = false;
+        }
+    }
+   
+    if (stretchAdjustment)
+    {
+        for (unsigned int i = 0; i < actions.size(); i++)
+        {
+            action = actions[i];
+            handled = true;
+
+            if (action == "LEFT")
+                ChangeTimeStretch(-1);
+            else if (action == "RIGHT")
+                ChangeTimeStretch(1);
             else
                 handled = false;
         }
@@ -1584,6 +1614,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
             ChangeSpeed(1);
         else if (action == "SPEEDDEC")
             ChangeSpeed(-1);
+        else if (action == "TOGGLESTRETCH")
+        {
+            ChangeTimeStretch(0);   // just display
+        }
         else if (action == "TOGGLEPICCONTROLS")
         {
             if (usePicControls)
@@ -1711,6 +1745,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
             ChangeVolume(true);
         else if (action == "MUTE")
             ToggleMute();
+        else if (action == "STRETCHINC")
+            ChangeTimeStretch(1);
+        else if (action == "STRETCHDEC")
+            ChangeTimeStretch(-1);
         else if (action == "TOGGLEASPECT")
             ToggleLetterbox();
         else if (action == "MENU")
@@ -1739,7 +1777,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             if (!handled)
             {
                 float time = StopFFRew();
-                UpdatePosOSD(time, tr("Play"));
+                UpdatePosOSD(time, PlayMesg());
                 handled = true;
             }
         }
@@ -1747,7 +1785,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         if (speed_index)
         {
             NormalSpeed();
-            UpdatePosOSD(0.0, tr("Play"));
+            UpdatePosOSD(0.0, PlayMesg());
             handled = true;
         }
     }
@@ -1995,12 +2033,12 @@ void TV::DoPlay(void)
     if (doing_ff_rew)
     {
         time = StopFFRew();
-        activenvp->Play(1.0, true);
+        activenvp->Play(normal_speed, true);
         speed_index = 0;
     }
     else if (paused || (speed_index != 0))
     {
-        activenvp->Play(1.0, true);
+        activenvp->Play(normal_speed, true);
         paused = false;
         speed_index = 0;
     }
@@ -2009,7 +2047,18 @@ void TV::DoPlay(void)
     if (activenvp != nvp)
         return;
 
-    UpdatePosOSD(time, tr("Play"));    
+    UpdatePosOSD(time, PlayMesg());
+}
+
+QString TV::PlayMesg()
+{
+    QString mesg = QString(tr("Play"));
+    if (normal_speed != 1.0)
+    {
+        mesg += " %1X";
+        mesg = mesg.arg(normal_speed);
+    }
+    return mesg;
 }
 
 void TV::DoPause(void)
@@ -2018,13 +2067,13 @@ void TV::DoPause(void)
     float time = 0.0;
 
     if (paused)
-        activenvp->Play(1.0, true);
+        activenvp->Play(normal_speed, true);
     else 
     {
         if (doing_ff_rew)
         {
             time = StopFFRew();
-            activenvp->Play(1.0, true);
+            activenvp->Play(normal_speed, true);
             usleep(1000);
         }
         
@@ -2044,7 +2093,7 @@ void TV::DoPause(void)
     }
     else
     {
-        UpdatePosOSD(time, tr("Play"));
+        UpdatePosOSD(time, PlayMesg());
         gContext->DisableScreensaver();
     }
 }
@@ -2159,7 +2208,7 @@ void TV::NormalSpeed(void)
         return;
 
     speed_index = 0;
-    activenvp->Play(1.0, true);
+    activenvp->Play(normal_speed, true);
 }
 
 void TV::ChangeSpeed(int direction)
@@ -2215,7 +2264,7 @@ float TV::StopFFRew(void)
     doing_ff_rew = 0;
     ff_rew_index = SSPEED_NORMAL;
 
-    activenvp->Play(1.0, true);
+    activenvp->Play(normal_speed, true);
 
     return time;
 }
@@ -2231,7 +2280,7 @@ void TV::ChangeFFRew(int direction)
         else
         {
             float time = StopFFRew();
-            UpdatePosOSD(time, tr("Play"));
+            UpdatePosOSD(time, PlayMesg());
         }
     }
     else
@@ -2383,7 +2432,7 @@ void TV::ToggleInputs(void)
     activerecorder->ToggleInputs();
 
     activenvp->ResetPlaying();
-    activenvp->Play(1.0, true, false);
+    activenvp->Play(normal_speed, true, false);
 
     if (activenvp == nvp)
     {
@@ -2462,7 +2511,7 @@ void TV::ChangeChannel(int direction, bool force)
     QString filters = getFiltersForChannel();
     activenvp->SetVideoFilters(filters);
     
-    activenvp->Play(1.0, true, false);
+    activenvp->Play(normal_speed, true, false);
 
     if (activenvp == nvp)
     {
@@ -2662,7 +2711,7 @@ void TV::ChangeChannelByString(QString &name, bool force)
     QString filters = getFiltersForChannel();
     activenvp->SetVideoFilters(filters);
     
-    activenvp->Play(1.0, true, false);
+    activenvp->Play(normal_speed, true, false);
 
     if (activenvp == nvp)
     {
@@ -3229,6 +3278,29 @@ void TV::ChangeVolume(bool up)
     }
 }
 
+void TV::ChangeTimeStretch(int dir)
+{
+    float new_normal_speed = normal_speed + 0.05*dir;
+    stretchAdjustment = true;
+    if (new_normal_speed > 2.0 || new_normal_speed < 0.48)
+        return;
+
+    normal_speed = new_normal_speed;
+
+    activenvp->Play(normal_speed, true);
+
+    QString text = QString("Time Stretch %1X").arg(normal_speed);
+
+    //if (osd && !browsemode)
+    if (osd)
+    {
+        int val = (int)(normal_speed*500);
+        osd->StartPause(val, false, tr("Adjust Time Stretch"), tr(text), 10, 
+                        kOSDFunctionalType_TimeStretchAdjust);
+        update_osd_pos = false;
+    }
+}
+
 void TV::ToggleMute(void)
 {
     kMuteState mute_status;
@@ -3584,6 +3656,9 @@ void TV::HandleOSDClosed(int osdType)
         case kOSDFunctionalType_SmartForward:
             doSmartForward = false;
             break;
+        case kOSDFunctionalType_TimeStretchAdjust:
+            stretchAdjustment = false;
+            break;
         case kOSDFunctionalType_Default:
             break;
     }
@@ -3755,6 +3830,10 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         DoToggleCC(action.right(1).toInt() + 4);
     else if (action == "TOGGLEMANUALZOOM")
         SetManualZoom(true);
+    else if (action.left(13) == "TOGGLESTRETCH")
+    {
+        ChangeTimeStretch(0);   // just display
+    }
     else if (action.left(17) == "TOGGLEPICCONTROLS")
     {
         picAdjustment = action.right(1).toInt();
@@ -3952,6 +4031,9 @@ void TV::BuildOSDTreeMenu(void)
 
     item = new OSDGenericTree(treeMenu, tr("Manual Zoom Mode"), 
                              "TOGGLEMANUALZOOM");
+
+    item = new OSDGenericTree(treeMenu, tr("Adjust Time Stretch"), "TOGGLESTRETCH");
+
 }
 
 void TV::ToggleAutoExpire(void)

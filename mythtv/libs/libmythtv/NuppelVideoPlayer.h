@@ -74,6 +74,8 @@ class NuppelVideoPlayer
 
     void SetAudioSampleRate(int rate) { audio_samplerate = rate; }
 
+    void SetAudioStretchFactor(float factor) { audio_stretchfactor = factor; }
+
     void Pause(bool waitvideo = true);
     bool Play(float speed = 1.0, bool normal = true,
               bool unpauseaudio = true);
@@ -313,6 +315,7 @@ class NuppelVideoPlayer
     int audio_channels;
     int audio_bits;
     int audio_samplerate;
+    float audio_stretchfactor;
 
     AudioOutput *audioOutput;
 

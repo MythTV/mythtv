@@ -76,3 +76,9 @@ AudioOutput *AudioOutput::OpenAudio(QString audiodevice, int audio_bits,
 
     return NULL;
 }
+
+void AudioOutput::SetStretchFactor(float /*factor*/)
+{
+}
+
+

@@ -27,6 +27,8 @@ class AudioOutput : public VolumeBase
     virtual void Reconfigure(int audio_bits, 
                              int audio_channels, int audio_samplerate) = 0;
     
+    virtual void SetStretchFactor(float factor);
+
     // do AddSamples calls block?
     virtual void SetBlocking(bool blocking) = 0;
     

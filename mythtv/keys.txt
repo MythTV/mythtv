@@ -50,6 +50,7 @@ Watching TV or a recording
 - ? to mark/unmark the current channel as a "favorite"
 - U to increase the play speed
 - J to decrease the play speed
+- A to adjust time stretch (speed up or slow down normal play audio and video)
 - W to cycle through 4:3 aspect ratio, 16:9, 4:3 Zoom (like Pan and Scan),
   16:9 Zoom, and 16:9 Stretch (eliminates black sidebars in TV signal)
 - Left (if a jump amount is entered) to jump back that amount.

@@ -9,6 +9,7 @@ using namespace std;
 
 #include "audiooutput.h"
 #include "samplerate.h"
+#include "SoundTouch.h"
 
 #define AUDBUFSIZE 512000
 
@@ -29,6 +30,8 @@ class AudioOutputBase : public AudioOutput
     
     // dsprate is in 100 * samples/second
     virtual void SetEffDsp(int dsprate);
+
+    virtual void SetStretchFactor(float factor);
 
     virtual void Reset(void);
 
@@ -67,6 +70,7 @@ class AudioOutputBase : public AudioOutput
     void OutputAudioLoop(void);
     static void *kickoffOutputAudioLoop(void *player);
     void SetAudiotime(void);
+    int WaitForFreeSpace(int len);
 
     int audiolen(bool use_lock); // number of valid bytes in audio buffer
     int audiofree(bool use_lock); // number of free bytes in audio buffer
@@ -74,6 +78,7 @@ class AudioOutputBase : public AudioOutput
     void UpdateVolume(void);
     
     int effdsp; // from the recorded stream
+    int effdspstretched; // from the recorded stream
 
     // Basic details about the audio stream
     int audio_channels;
@@ -84,6 +89,8 @@ class AudioOutputBase : public AudioOutput
     int fragment_size;
     long soundcard_buffer_size;
     QString audiodevice;
+
+    float audio_stretchfactor;
     AudioOutputSource source;
 
     bool killaudio;
@@ -101,6 +108,8 @@ class AudioOutputBase : public AudioOutput
     float src_in[16384], src_out[16384*6];
     short tmp_buff[16384*6];
 
+    // timestretch
+    soundtouch::SoundTouch * pSoundStretch;
 
     bool blocking; // do AddSamples calls block?
 
