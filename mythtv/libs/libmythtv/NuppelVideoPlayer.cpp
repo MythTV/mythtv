@@ -2275,7 +2275,7 @@ void NuppelVideoPlayer::DoPause(void)
         videoOutput->SetPrebuffering(ffrew_skip == 1);
 
         decoder->setExactSeeks(exactseeks && ffrew_skip == 1);
-        decoder->DoRewind(framesPlayed);
+        decoder->DoFastForward(framesPlayed + ffrew_skip);
         ClearAfterSeek();
     }
 
