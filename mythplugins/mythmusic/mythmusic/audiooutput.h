@@ -33,6 +33,7 @@ public:
     long latency();
     void seek(long);
     void resetTime();
+    bool isPaused() { return paus; }
 
 private:
     // thread run function

@@ -99,8 +99,9 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     prevb->setIconSet(scalePixmap((const char **)prev_pix));
     connect(prevb, SIGNAL(clicked()), this, SLOT(seekback()));
 
-    MythToolButton *pauseb = new MythToolButton(this);
+    pauseb = new MythToolButton(this);
     pauseb->setAutoRaise(true);
+    pauseb->setToggleButton(true);
     pauseb->setIconSet(scalePixmap((const char **)pause_pix));
     connect(pauseb, SIGNAL(clicked()), this, SLOT(pause()));
 
@@ -151,14 +152,14 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     secondcontrol->addWidget(repeat);
     connect(repeat, SIGNAL(clicked()), this, SLOT(toggleRepeat()));
 
-    MythToolButton *pledit = new MythToolButton(this);
+    pledit = new MythToolButton(this);
     pledit->setAutoRaise(true);
     pledit->setText("Edit Playlist");
     pledit->setFont(buttonfont);
     secondcontrol->addWidget(pledit);
     connect(pledit, SIGNAL(clicked()), this, SLOT(editPlaylist()));
 
-    MythToolButton *vis = new MythToolButton(this);
+    vis = new MythToolButton(this);
     vis->setAutoRaise(true);
     vis->setText("Visualize");
     vis->setFont(buttonfont);
@@ -241,13 +242,14 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     curMeta = ((*plist)[playlistindex]);
 
     QString playmode = gContext->GetSetting("PlayMode");
-    if (playmode == "random")
-    {
+    if (playmode.lower() == "random")
         toggleShuffle();
-        curMeta = ((*plist)[shuffleindex]);
-    }
+    else
+        setupPlaylist();
 
-    setupPlaylist();
+    // this is a hack to fix the playlist's refusal to update w/o a SIG
+    playlist_timer = new QTimer();
+    connect(playlist_timer, SIGNAL(timeout()), this, SLOT(jumpToItem()));
 
     isplaying = false;
  
@@ -353,26 +355,32 @@ void PlaybackBox::setupListView(void)
         it--; count--;
     }
 
-    QListViewItem *curItem = listlist.at(playlistindex);
+    jumpToItem(listlist.at(playlistindex));
+}
 
+void PlaybackBox::jumpToItem(void)
+{
+    if (playlist_timer->isActive())
+        playlist_timer->stop();
+    jumpToItem(listlist.at(playlistindex));
+}
+
+void PlaybackBox::jumpToItem(QListViewItem *curItem)
+{
     if (curItem)
     {
-        playview->setCurrentItem(curItem);
-        playview->setSelected(curItem, true);
-
         if (curItem->itemBelow())
             playview->ensureItemVisible(curItem->itemBelow());
         if (curItem->itemAbove())
             playview->ensureItemVisible(curItem->itemAbove());
+        playview->setCurrentItem(curItem);
+        playview->setSelected(curItem, true);
         playview->ensureItemVisible(curItem);
     }
 }
 
-void PlaybackBox::setupPlaylist(bool toggle)
+void PlaybackBox::setupPlaylist(void)
 {
-    if (toggle)
-        shufflemode = !shufflemode;
-
     if (playlistorder.size() > 0)
         playlistorder.clear();
 
@@ -391,7 +399,7 @@ void PlaybackBox::setupPlaylist(bool toggle)
         {
             playlistorder.push_back(i);
             if (curMeta == (*plist)[i])
-                playlistindex = i;
+                shuffleindex = playlistindex = i;
         } 
     }
     else
@@ -404,32 +412,32 @@ void PlaybackBox::setupPlaylist(bool toggle)
         for (i = 0; i < max; i++)
             usedList[i] = false;
 
-        bool used = true;
         int index = 0; 
         int lastindex = 0;
 
         for (i = 0; i < max; i++)
         {
-            while (used)
+            while (1)
             {
                 index = (int)((double)rand() / (RAND_MAX + 1.0) * max);
-                if (usedList[index] == false)
-                    used = false;
                 if (max - i > 50 && abs(index - lastindex) < 10)
-                    used = true;
+                    continue;
+                if (usedList[index] == false)
+                    break;
             }
             usedList[index] = true;
             playlistorder.push_back(index);
-            used = true;
             lastindex = index;
 
             if (curMeta == (*plist)[i])
                 playlistindex = i;
+            if (curMeta == (*plist)[index])
+                shuffleindex = i;
         }
     }
 
+    playlistindex = playlistorder[shuffleindex];
     curMeta = (*plist)[playlistindex];
-    shuffleindex = playlistorder.findIndex(playlistindex);
 }
 
 void PlaybackBox::play()
@@ -462,7 +470,13 @@ void PlaybackBox::play()
         if (!output->initialize())
             return;
     }
-
+   
+    if (output->isPaused())
+    {
+        pause();
+        return;
+    }
+ 
     if (!sourceurl.isLocalFile()) {
         StreamInput streaminput(sourceurl);
         streaminput.setup();
@@ -493,15 +507,7 @@ void PlaybackBox::play()
                    "  ~   " + curMeta.Title();
     titlelabel->setText(disp);
 
-    QListViewItem *curItem = listlist.at(playlistindex);
-    playview->setCurrentItem(curItem);
-    playview->setSelected(curItem, true);
-
-    if (curItem->itemBelow())
-        playview->ensureItemVisible(curItem->itemBelow());
-    if (curItem->itemAbove())
-        playview->ensureItemVisible(curItem->itemAbove());
-    playview->ensureItemVisible(curItem);
+    jumpToItem(listlist.at(playlistindex));
 
     currentTime = 0;
     maxTime = curMeta.Length() / 1000;
@@ -530,14 +536,16 @@ void PlaybackBox::play()
         decoder->start();
 
         isplaying = true;
-        
+       
+        playlist_timer->start(1, true);
+ 
         gContext->LCDswitchToChannel(curMeta.Artist(), curMeta.Title(), "");
     }
 }
 
 void PlaybackBox::visEnable()
 {
-    if (!visualizer_is_active)
+    if (!visualizer_is_active && isplaying)
     {
         visual_mode_timer->stop();
         mainvisual->setVisual("Blank");
@@ -552,6 +560,8 @@ void PlaybackBox::pause(void)
     if (output) {
         output->mutex()->lock();
         output->pause();
+        isplaying = !isplaying;
+        pauseb->setOn(!isplaying);
         output->mutex()->unlock();
     }
 
@@ -652,8 +662,6 @@ void PlaybackBox::stopAll()
 
 void PlaybackBox::previous()
 {
-    stop();
-
     listlock.lock();
 
     shuffleindex--;
@@ -671,8 +679,6 @@ void PlaybackBox::previous()
 
 void PlaybackBox::next()
 {
-//    stop();
-
     listlock.lock();
 
     shuffleindex++;
@@ -749,19 +755,20 @@ void PlaybackBox::seek(int pos)
     }
 }
 
-void PlaybackBox::changeSong()
-{
-    stop();
-    play();
-}
-
 void PlaybackBox::toggleShuffle()
 {
-    setupPlaylist(true);
+    shufflemode = !shufflemode;
+
+    setupPlaylist();
+
     if (shufflemode)
         randomize->setText("Shuffle: Random");
     else
         randomize->setText("Shuffle: Normal"); 
+
+    QString accelerator_flag = gContext->GetSetting("KeyboardAccelerators");
+    if (accelerator_flag.lower() == "true")
+        randomize->setAccel(Key_1);
 }
 
 void PlaybackBox::toggleRepeat()
@@ -772,6 +779,10 @@ void PlaybackBox::toggleRepeat()
         repeat->setText("Repeat: Track");
     else
         repeat->setText("Repeat: Playlist");
+
+    QString accelerator_flag = gContext->GetSetting("KeyboardAccelerators");
+    if (accelerator_flag.lower() == "true")
+        repeat->setAccel(Key_2);
 }
 
 void PlaybackBox::editPlaylist()

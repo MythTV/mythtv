@@ -306,7 +306,7 @@ VisualBase *MainVisual::randomVis(MainVisual *parent, long int winid)
 
 StereoScope::StereoScope()
 {
-    fps = 30;
+    fps = 45;
     rubberband = false;
     falloff = 1.0;
 

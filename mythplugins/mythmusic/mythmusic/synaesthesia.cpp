@@ -19,7 +19,7 @@ using namespace std;
 
 Synaesthesia::Synaesthesia(long int winid)
 {
-    fps = 20;
+    fps = 29;
     fadeMode = Stars;
     pointsAreDiamonds = true;
 

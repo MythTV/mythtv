@@ -98,7 +98,7 @@ public:
     virtual long latency() = 0;
     virtual void seek(long) = 0;
     virtual void resetTime() = 0;
-
+    virtual bool isPaused() = 0;
 
 protected:
     void dispatch(OutputEvent &e);

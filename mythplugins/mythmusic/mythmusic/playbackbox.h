@@ -50,7 +50,6 @@ class PlaybackBox : public MythDialog
     void seekforward();
     void seekback();
     void seek(int);
-    void changeSong();
     void stopAll();
     void toggleShuffle();
     void toggleRepeat();
@@ -59,7 +58,9 @@ class PlaybackBox : public MythDialog
     void visEnable();
     void resetTimer();
     void restartTimer();
-    
+    void jumpToItem(QListViewItem *curItem);
+    void jumpToItem();   
+ 
   private slots:
     void startseek();
     void doneseek();
@@ -67,7 +68,7 @@ class PlaybackBox : public MythDialog
   private:
     void setupListView(void);
 
-    void setupPlaylist(bool toggle = false);
+    void setupPlaylist(void);
 
     QPixmap scalePixmap(const char **xpmdata);
 
@@ -102,6 +103,9 @@ class PlaybackBox : public MythDialog
 
     MythToolButton *randomize;
     MythToolButton *repeat;
+    MythToolButton *pledit;
+    MythToolButton *vis;
+    MythToolButton *pauseb;
 
     bool shufflemode;
     bool repeatmode;
@@ -114,6 +118,7 @@ class PlaybackBox : public MythDialog
     int	visual_mode_delay;
     QTimer *visual_mode_timer;
     QTimer *lcd_update_timer;
+    QTimer *playlist_timer;
     bool visualizer_is_active;
 };
 
