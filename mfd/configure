@@ -18,6 +18,7 @@ wmasupport="yes"
 aacsupport="no"
 discwatchersupport="yes"
 mfdclient="yes"
+rtsp="yes"
 
 for opt do
   case "$opt" in
@@ -61,6 +62,10 @@ for opt do
   ;;
   --disable-mfdclient) mfdclient="no"
   ;;
+  --enable-rtsp) rtsp="yes"
+  ;;
+  --disable-rtsp) rtsp="no"
+  ;;
   --enable-all)
       zeroconfig="yes"
       audio="yes"
@@ -72,6 +77,7 @@ for opt do
       aacsupport="yes"
       discwatchersupport="yes"
       mfdclient="yes"
+      rtsp="yes"
   ;;
   --disable-all)
       zeroconfig="no"
@@ -84,6 +90,7 @@ for opt do
       aacsupport="no"
       discwatchersupport="no"
       mfdclient="no"
+      rtsp="no"
   ;;
   esac
 done
@@ -115,6 +122,7 @@ Standard options:
   --enable-mythmusic   enable serving mythmusic audio content  [default=yes]
   --enable-discwatcher monitor optical drives for content      [default=yes]
   --enable-mfdclient   build libmfdclient                      [default=yes]
+  --enable-rtsp        rtsp support (HIGHLY recommended)       [default=no]
 
 All options can be turned off with --disable-foo
 Some options will be automatically turned off if they make no sense 
@@ -344,6 +352,28 @@ fi
 
 if test "$mfdclient" = "no" ; then
     echo "                 build libmfdclient: no"
+fi
+
+
+#
+#   rtsp
+#
+
+if test "$rtsp" = "yes" ; then
+    echo "                       rtsp support: yes"        
+#    echo "#    Build rtsp " >> ./config.pro
+#    echo " " >> ./config.pro
+#    echo "SUBDIRS += ./plugins/rtspserver " >> ./config.pro
+#    echo " " >> ./config.pro
+    echo "//  Include rtsp support " >> ./config.h
+    echo " " >> ./config.h
+    echo "#define MFD_RTSP_SUPPORT 1" >> ./config.h
+    echo " " >> ./config.h
+    echo "MFD_RTSP_SUPPORT = 1 " >> ./options.pro
+fi
+
+if test "$rtsp" = "no" ; then
+    echo "                       rtsp support: no"
 fi
 
 

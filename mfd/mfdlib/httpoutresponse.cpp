@@ -52,7 +52,7 @@ extern "C" {
 
 
 
-HttpOutResponse::HttpOutResponse(MFDHttpPlugin *owner, HttpInRequest *requestor)
+HttpOutResponse::HttpOutResponse(MFDBasePlugin *owner, HttpInRequest *requestor)
 {
     parent = owner;
     my_request = requestor;

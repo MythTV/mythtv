@@ -34,7 +34,7 @@ class HttpOutResponse
 
   public:
 
-    HttpOutResponse(MFDHttpPlugin *owner, HttpInRequest *requestor);
+    HttpOutResponse(MFDBasePlugin *owner, HttpInRequest *requestor);
     ~HttpOutResponse();
     
     void setError(int error_number);
@@ -78,9 +78,9 @@ class HttpOutResponse
 
     std::vector<char> payload;
 
-    QDict<HttpHeader> headers;
+    QDict<HttpHeader>   headers;
     HttpInRequest       *my_request;
-    MFDHttpPlugin     *parent; 
+    MFDBasePlugin       *parent; 
     
     
     int     range_begin;

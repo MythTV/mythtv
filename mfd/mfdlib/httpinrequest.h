@@ -21,6 +21,7 @@ class MFDHttpPlugin;
 
 #include "httpheader.h"
 #include "httpgetvar.h"
+#include "inrequest.h"
 
 //
 //  Some defines ... probably want to get rid of these at some point
@@ -30,7 +31,7 @@ class MFDHttpPlugin;
 #define MAX_CLIENT_OUTGOING 12000000    // FIX
 
 
-class HttpInRequest
+class HttpInRequest : public InRequest
 {
     //
     //  Class that handles _IN_ coming Http requests
@@ -38,11 +39,11 @@ class HttpInRequest
 
   public:
 
-    HttpInRequest(MFDHttpPlugin *owner, char *raw_incoming, int incoming_length);
+    HttpInRequest(MFDHttpPlugin *owner, MFDServiceClientSocket *a_client, bool dbo = false);
     ~HttpInRequest();
     
+    bool                parseRequestLine();
     HttpOutResponse*    getResponse(){return my_response;}
-    bool                allIsWell(){return all_is_well;}
     const QString&      getUrl(){return url;} 
     QString             getRequest();
     QString             getHeader(const QString &field_label);
@@ -52,28 +53,16 @@ class HttpInRequest
     void                printRequest();     //  Debugging
     void                printHeaders();     //  Debugging
     void                printGetVariables();//  Debugging
-    MFDHttpPlugin*      getParent(){return parent;}
+    MFDBasePlugin*      getParent(){return parent;}
     std::vector<char>*  getPayload(){return &payload;}
 
   private:
 
-    MFDHttpPlugin       *parent; 
-    int                 readLine(int *index, char* parsing_buffer);
-    char                *raw_request;
-    int                 raw_length;
-    QString             top_line;
-    QString             raw_request_line;
     QString             url;
-    bool                all_is_well;
     HttpOutResponse     *my_response;
     bool                send_response;
 
-    QDict<HttpHeader>      headers;
     QDict<HttpGetVariable> get_variables;
-
-    int                     expected_payload_size;
-    std::vector<char>       payload;
-    
 };
 
 #endif

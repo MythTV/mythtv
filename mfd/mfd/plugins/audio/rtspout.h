@@ -1,5 +1,10 @@
 #ifndef RTSPOUT_H_
 #define RTSPOUT_H_
+
+#include "../../../config.h"
+
+#ifdef MFD_RTSP_SUPPORT
+
 /*
 	rtspout.h
 
@@ -22,19 +27,7 @@ class RtspOut: public MFDRtspPlugin
     RtspOut(MFD *owner, int identity);
     ~RtspOut();
 
-    //
-    //  Implement the RTSP requests we can deal with
-    //
-    
-    void handleOptionsRequest(RtspInRequest *in_request, int client_id);
-    void handleDescribeRequest(RtspInRequest *in_request, int client_id);
-
-    void run();
-
-  private:
-  
-    QString my_ip_address;
-
 };
 
+#endif  // MFD_RTSP_SUPPORT
 #endif  // rtspout_h_

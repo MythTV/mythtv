@@ -30,21 +30,39 @@ DEPENDENCIES
 and (probably by the time you read this) MythDVD. In addition, you will also
 need:
 
-        FAAD2 library
-        http://www.audiocoding.com/
+LiveMedia Library
+http://www.live.com/liveMedia/
 
-    __NB__: As of March 5, 2004, you can build and install FAAD2 v2.0
-final, but you must manually copy mp4ff_int_types.h from faad2/common/mp4ff/
-to your usr/local/include/ directory.
+    Any reasonably recent version should be fine. There's a debian package
+    called liblivemedia-dev, and almost certainly packages for other
+    distributions as well. Note that this is not _strictly_ required (you
+    can turn it off with ./configure --disable-rtsp), but is very, very
+    highly recommended.
+
+FAAD2 library
+http://www.audiocoding.com/
+
+    __NB__: As of March 5, 2004, you can build and install FAAD2 v2.0 final,
+    but you must manually copy mp4ff_int_types.h from faad2/common/mp4ff/ to
+    your usr/local/include/ directory.
 
     This is fairly annoying, but not insurmountable.            
 
+
+OpenSLL
+
     Also required is openssl (for generating unique identifiers for content
-files). This should be included with just about any Linux distribution.
+    files). This should be included with just about any Linux distribution.
+
+
+OpenDAAP Library
 
     You'll also need libopendaap if you want to play iTunes content. Make
-_sure_ to get the right version. Also, make _sure_ you read the daapclient
-plugin README for further details (./mfd/plugins/daapclient/README).
+    _sure_ to get the right version. Also, make _sure_ you read the
+    daapclient plugin README for further details
+    (./mfd/plugins/daapclient/README).
+
+
 
 INFORMATION FOR DEVELOPERS
 --------------------------

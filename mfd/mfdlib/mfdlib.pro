@@ -24,8 +24,8 @@ SOURCES += httpinrequest.cpp httpoutrequest.cpp httpoutresponse.cpp httpinrespon
 HEADERS += httpheader.h   httpgetvar.h   httpserver.h   
 SOURCES += httpheader.cpp httpgetvar.cpp httpserver.cpp
 
-HEADERS += rtspserver.h   rtspinrequest.h   rtspoutresponse.h
-SOURCES += rtspserver.cpp rtspinrequest.cpp rtspoutresponse.cpp
+HEADERS += rtspserver.h   inrequest.h
+SOURCES += rtspserver.cpp inrequest.cpp
 
 HEADERS += decoder.h   decoder_event.h   visual.h constants.h 
 SOURCES += decoder.cpp decoder_event.cpp 

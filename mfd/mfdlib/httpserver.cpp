@@ -49,32 +49,17 @@ void MFDHttpPlugin::processRequest(MFDServiceClientSocket *a_client)
         return;
     }
 
-    char incoming[MAX_CLIENT_INCOMING];    // FIX
-    int length = 0;
+
     int client_id = a_client->getIdentifier();
-
-    //
-    //  Copy out the whole block out so we can release the lock straight away.
-    //
-
-
     a_client->lockReadMutex();
-        length = a_client->readBlock(incoming, MAX_CLIENT_INCOMING - 1);
+        HttpInRequest *new_request = new HttpInRequest(this, a_client);
+    bool status = new_request->parseIncomingBytes();
     a_client->unlockReadMutex();
     a_client->setReading(false);
-    
-    
-    if(length > 0)
-    {
-        if(length >= MAX_CLIENT_INCOMING)
-        {
-            // oh crap
-            warning("client http socket is getting too much data");
-            length = MAX_CLIENT_INCOMING;
-        }
 
-        HttpInRequest *new_request = new HttpInRequest(this, incoming, length);
-        if(new_request->allIsWell())
+    if(new_request->allIsWell() && status)
+    {
+        if(new_request->parseRequestLine())
         {
             //
             //  Pass it to handleIncoming() which should be re-implemented
@@ -87,8 +72,8 @@ void MFDHttpPlugin::processRequest(MFDServiceClientSocket *a_client)
                 sendResponse(client_id, new_request->getResponse());
             }
         }
-        delete new_request;
     }
+    delete new_request;
 }
 
 

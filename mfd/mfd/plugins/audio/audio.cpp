@@ -7,6 +7,8 @@
 
 */
 
+
+#include "../../../config.h"
 #include <qapplication.h>
 #include <qfileinfo.h>
 
@@ -31,8 +33,10 @@ AudioPlugin::AudioPlugin(MFD *owner, int identity)
     state_of_play_mutex = new QMutex(true);    
     metadata_server = parent->getMetadataServer();
     stopPlaylistMode();
+#ifdef MFD_RTSP_SUPPORT
     rtsp_out = new RtspOut(owner, -1);
     rtsp_out->start();
+#endif
     audio_listener = new AudioListener(this);
 }
 
@@ -1122,6 +1126,7 @@ AudioPlugin::~AudioPlugin()
         state_of_play_mutex = NULL;
     }
     
+#ifdef MFD_RTSP_SUPPORT
     if(rtsp_out)
     {
         rtsp_out->stop();
@@ -1131,7 +1136,8 @@ AudioPlugin::~AudioPlugin()
         delete rtsp_out;
         rtsp_out = NULL;
     }
-    
+#endif 
+   
     if (audio_listener)
     {
         delete audio_listener;

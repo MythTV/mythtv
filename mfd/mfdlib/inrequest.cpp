@@ -1,37 +1,41 @@
 /*
-	rtspinrequest.cpp
+	inrequest.cpp
 
 	(c) 2005 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
-	Headers for an object to hold and parse incoming rtsp requests
+	Methods for a generic (and generally inherited) object to handle
+	http-like incoming requests.
+
 
 */
 
-#include "rtspinrequest.h"
-#include "rtspserver.h"
+#include "inrequest.h"
+#include "mfd_plugin.h"
+#include "clientsocket.h"
 
 #define MAX_WAIT_ATTEMPTS 120    //  max number of 1/2 second attempts to wait
                                  //  for more client data to arrive
 
-RtspInRequest::RtspInRequest(
-                                MFDRtspPlugin *owner, 
-                                MFDServiceClientSocket *a_client,
-                                bool dbo
-                            )
+InRequest::InRequest(
+                        MFDBasePlugin *owner, 
+                        MFDServiceClientSocket *a_client,
+                        bool dbo
+                    )
 {
+
     parent = owner;
     client_socket = a_client;
     all_is_well = true;
     timeout_count = 0;
     headers.setAutoDelete(true);
     payload_size = 0;
-    request = RRT_UNKNOWN;
-    command_sequence = -1;
     debug_on = dbo;
+
 }
 
-bool RtspInRequest::parseIncomingBytes()
+
+bool InRequest::parseIncomingBytes()
 {
     //
     //  We need to read the bytes coming in from the socket and parse them
@@ -83,21 +87,10 @@ bool RtspInRequest::parseIncomingBytes()
 
     }
 
-    parseRequestLine();
-    if(!all_is_well)
-    {
-        return false;
-    }
-
-    if(request == RRT_UNKNOWN)
-    {
-        return false;
-    }
-
     return true;
 }
 
-bool RtspInRequest::eatOneByte()
+bool InRequest::eatOneByte()
 {
     //
     //  Read off the socket returning true until we get a blank line or some
@@ -201,7 +194,7 @@ bool RtspInRequest::eatOneByte()
     return false;
 }
 
-bool RtspInRequest::checkMessageHeadersEnd()
+bool InRequest::checkMessageHeadersEnd()
 {
     //
     //  Are the message headers over?
@@ -297,7 +290,10 @@ bool RtspInRequest::checkMessageHeadersEnd()
     return false;
 }
 
-void RtspInRequest::parseMessageHeaderBlock()
+
+
+
+void InRequest::parseMessageHeaderBlock()
 {
 
     QString current_line;
@@ -321,7 +317,7 @@ void RtspInRequest::parseMessageHeaderBlock()
                     }
                     else
                     {
-                        warning(QString("RtspInRequest::parseMessage"
+                        warning(QString("InRequest::parseMessage"
                                         "HeaderBlock() could not parse this "
                                         "into a header: \"%1\"")
                                        .arg(current_line));
@@ -338,12 +334,12 @@ void RtspInRequest::parseMessageHeaderBlock()
     } 
 }
 
-void RtspInRequest::parseHeaders()
+
+void InRequest::parseHeaders()
 {
     //
     //  Check for a Content-Length header so we can tell if there's a
-    //  payload to read off the client socket. Also, check for a CSeq
-    //  header, as the RFC says there MUST be one.
+    //  payload to read off the client socket. 
     //
     
     HttpHeader *content_length_header = headers.find("Content-Length");
@@ -357,34 +353,13 @@ void RtspInRequest::parseHeaders()
         }
         else
         {
-            warning("RtspInRequest::parseHeaders() could not "
+            warning("InRequest::parseHeaders() could not "
                     "figure out Content-Length header. Bad.");
         }
     }    
-
-    HttpHeader *cseq_header = headers.find("CSeq");
-    if(cseq_header)
-    {
-        bool ok = true;
-        int cseq_number = cseq_header->getValue().toInt(&ok);
-        if(ok)
-        {
-            command_sequence = cseq_number;
-        }
-        else
-        {
-            warning("RtspInRequest::parseHeaders() could not "
-                    "figure out CSeq header.");
-        }
-    }   
-    else
-    {
-        warning("RtspInRequest::parseHeaders() could not find "
-                "a CSeq header (violates the spec)");
-    } 
 }
 
-void RtspInRequest::consumePayload()
+void InRequest::consumePayload()
 {
     if (payload_size < 1)
     {
@@ -420,7 +395,7 @@ void RtspInRequest::consumePayload()
             //  Socket closed?
             //
     
-            warning("RtspInRequest::consumePayload() got socket "
+            warning("InRequest::consumePayload() got socket "
                     "slammed shut on it");
             all_is_well = false;
             keep_going = false;
@@ -443,7 +418,7 @@ void RtspInRequest::consumePayload()
                 ++timeout_count;
                 if(timeout_count > MAX_WAIT_ATTEMPTS)
                 {
-                    log(QString("RtspInRequest::consumePayload() waited 0.5 "
+                    log(QString("InRequest::consumePayload() waited 0.5 "
                                 "seconds x %1 times for client to complete "
                                 "request. Giving up.")
                                 .arg(MAX_WAIT_ATTEMPTS), 2);
@@ -464,12 +439,14 @@ void RtspInRequest::consumePayload()
         }
         else if (length > 1)
         {
-            warning("RtspInRequest::eatOneByte() asked for 1 byte and got more");
+            warning("InRequest::eatOneByte() asked for 1 byte and got more");
             all_is_well = false;
             keep_going = false;
         }
     }    
 }
+
+/*
 
 void RtspInRequest::parseRequestLine()
 {
@@ -563,8 +540,9 @@ QString RtspInRequest::getHeaderValue(const QString &header_field)
     return response;
 }
 
+*/
 
-void RtspInRequest::log(const QString &log_message, int verbosity)
+void InRequest::log(const QString &log_message, int verbosity)
 {
     if (parent)
     {
@@ -572,13 +550,13 @@ void RtspInRequest::log(const QString &log_message, int verbosity)
     }
     else
     {
-        cout << "RtspInRequest parent'less log: "
+        cout << "InRequest parent'less log: "
              << log_message
              << endl;
     }
 }
 
-void RtspInRequest::warning(const QString &warning_message)
+void InRequest::warning(const QString &warning_message)
 {
     if (parent)
     {
@@ -586,13 +564,15 @@ void RtspInRequest::warning(const QString &warning_message)
     }
     else
     {
-        cout << "RtspInRequest parent'less log: WARNING: "
+        cout << "InRequest parent'less log: WARNING: "
              << warning_message
              << endl;
     }
 }
 
-void RtspInRequest::printYourself()
+
+
+void InRequest::printYourself()
 {
     cout << "C->S " << request_line << endl;
     if(headers.count() > 0)
@@ -610,9 +590,11 @@ void RtspInRequest::printYourself()
     
 }
 
-RtspInRequest::~RtspInRequest()
+
+
+InRequest::~InRequest()
 {
-    headers.clear();
+    //headers.clear();
 }
 
 
