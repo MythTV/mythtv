@@ -350,10 +350,15 @@ void ProgFinder::setupColorScheme()
     curColor = themed->GetSetting("misChanIcon_bgColor");
     if (curColor != "")
 	misChanIcon_bgColor = QColor(curColor);
+    else
+        misChanIcon_bgColor = QColor(0, 0, 0);
 
     curColor = themed->GetSetting("misChanIcon_fgColor");
     if (curColor != "")
         misChanIcon_fgColor = QColor(curColor);
+    else
+        misChanIcon_fgColor = QColor(255, 255, 255);
+ 
 
 }
 
