@@ -419,10 +419,17 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         foundit = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader,
                                                        FRAMEHEADERSIZE));
 
+        bool framesearch = false;
+
         while (frameheader.frametype != 'A' && frameheader.frametype != 'V' &&
                frameheader.frametype != 'S' && frameheader.frametype != 'T' &&
                frameheader.frametype != 'R' && frameheader.frametype != 'X')
         {
+            if (!framesearch)
+                VERBOSE(VB_IMPORTANT, "Searching for frame header.");
+
+            framesearch = true;
+
             ringBuffer->Seek(startpos2, SEEK_SET);
 
             char dummychar;
@@ -812,8 +819,15 @@ void NuppelDecoder::GetFrame(int avignore)
             return;
         }
 
+        bool framesearch = false;
+
         while (!isValidFrametype(frameheader.frametype))
         {
+            if (!framesearch)
+                VERBOSE(VB_IMPORTANT, "Searching for frame header.");
+
+            framesearch = true;
+
             ringBuffer->Seek((long long)seeklen-FRAMEHEADERSIZE, SEEK_CUR);
 
             if (ringBuffer->Read(&frameheader, FRAMEHEADERSIZE)
@@ -1185,6 +1199,11 @@ bool NuppelDecoder::DoFastForward(long long desiredFrame)
     }
     else if (!livetv && !watchingrecording)
     {
+        VERBOSE(VB_IMPORTANT, "Did not find keyframe position.");
+
+        VERBOSE(VB_PLAYBACK, QString("lastKey: %1 desiredKey: %2")
+                .arg((int)lastKey).arg((int)desiredKey));
+
         while (lastKey < desiredKey && !fileend)
         {
             GetFrame(-1);
