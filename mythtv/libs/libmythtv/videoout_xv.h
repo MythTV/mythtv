@@ -10,7 +10,7 @@
 class XvVideoOutput
 {
   public:
-    XvVideoOutput() { XJ_started = 0; xv_port = -1; }
+    XvVideoOutput() { XJ_started = 0; xv_port = -1; scratchspace = NULL; }
    ~XvVideoOutput() { Exit(); }
 
     unsigned char *Init(int width, int height, char *window_name, 
@@ -50,6 +50,9 @@ class XvVideoOutput
     XSizeHints hints;
 
     int xv_port;
+    int colorid;
+
+    unsigned char *scratchspace;
 };
 
 #endif
