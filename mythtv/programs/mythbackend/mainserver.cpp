@@ -1002,20 +1002,6 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     QString name = QString("deleteThread%1%2").arg(getpid()).arg(rand());
     QFile checkFile(ds->filename);
 
-    if (!checkFile.exists())
-    {
-        VERBOSE(VB_ALL, QString("ERROR when trying to delete file: %1. File "
-                                "doesn't exist.  Database metadata"
-                                "will not be removed.")
-                                .arg(ds->filename));
-        gContext->LogEntry("mythbackend", LP_WARNING, "Delete Recording",
-                           QString("File %1 does not exist for %2 when trying "
-                                   "to delete recording.")
-                                   .arg(ds->filename).arg(logInfo));
-        deletelock.unlock();
-        return;
-    }
-
     MythSqlDatabase *delete_db = new MythSqlDatabase(name);
 
     if (!delete_db || !delete_db->isOpen() || !delete_db->db())
@@ -1040,6 +1026,43 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     pginfo = ProgramInfo::GetProgramFromRecorded(delete_db->db(),
                                                  ds->chanid,
                                                  ds->recstartts);
+    if (pginfo == NULL)
+    {
+        QString msg = QString("ERROR retrieving program info when trying to "
+                              "delete program for chanid %1 recorded at %2. "
+							  "Recording will NOT be deleted.")
+                              .arg(ds->chanid).arg(ds->recstartts.toString());
+        VERBOSE(VB_GENERAL, msg);
+        gContext->LogEntry("mythbackend", LP_ERROR, "Delete Recording",
+                           QString("Unable to retrieve program info for %1. "
+                                   "Program will NOT be deleted.")
+                                   .arg(logInfo));
+        if (delete_db)
+            delete delete_db;
+
+        deletelock.unlock();
+        return;
+    }
+
+    // allow deleting files where the recording failed (ie, filesize == 0)
+    if ((!checkFile.exists()) &&
+        (pginfo->filesize > 0))
+    {
+        VERBOSE(VB_ALL, QString("ERROR when trying to delete file: %1. File "
+                                "doesn't exist.  Database metadata"
+                                "will not be removed.")
+                                .arg(ds->filename));
+        gContext->LogEntry("mythbackend", LP_WARNING, "Delete Recording",
+                           QString("File %1 does not exist for %2 when trying "
+                                   "to delete recording.")
+                                   .arg(ds->filename).arg(logInfo));
+        deletelock.unlock();
+
+        pginfo->SetDeleteFlag(false, delete_db->db());
+        delete pginfo;
+        return;
+    }
+
     JobQueue::DeleteAllJobs(delete_db->db(), ds->chanid, ds->recstartts);
 
     QString filename;
@@ -1064,11 +1087,9 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
         gContext->LogEntry("mythbackend", LP_WARNING, "Delete Recording",
                            QString("File %1 for %2 could not be deleted.")
                                    .arg(ds->filename).arg(logInfo));
-        if (pginfo)
-        {
-            pginfo->SetDeleteFlag(false, delete_db->db());
-            delete pginfo;
-        }
+
+        pginfo->SetDeleteFlag(false, delete_db->db());
+        delete pginfo;
 
         if (delete_db)
             delete delete_db;
@@ -1127,11 +1148,8 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
 
     ScheduledRecording::signalChange(0);
 
-    if (pginfo)
-        delete pginfo;
-
-    if (delete_db)
-        delete delete_db;
+    delete pginfo;
+    delete delete_db;
 
     deletelock.unlock();
 }
@@ -1440,7 +1458,8 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
     QFile checkFile(filename);
     bool fileExists = checkFile.exists();
 
-    if (fileExists)
+    // allow deleting of files where the recording failed meaning size == 0
+    if ((fileExists) || (pginfo->filesize == 0))
     {
         DeleteStruct *ds = new DeleteStruct;
         ds->ms = this;
