@@ -23,8 +23,8 @@
     <image mode="INFO">news.png</image>
     <image mode="OPTICAL_DISK">cd.png</image>
     <image mode="UTIL">title/title_util.jpg</image>
-    <image mode="TV_SEARCH_WORDS">SEARCH_WORDS.png</image>
-    <image mode="TV_SEARCH_LISTS">SEARCH_LISTS.png</image>
+    <image mode="WORDS">SEARCH_WORDS.png</image>
+    <image mode="LISTS">SEARCH_LISTS.png</image>
   </titles>
 
 
@@ -399,7 +399,7 @@
 
   <buttondef name="TV_SEARCH_WORDS">
     <image>SEARCH_WORDS.png</image>
-    <offset>40,10</offset>
+    <offset>20,10</offset>
   </buttondef>
   
   <buttondef name="TV_SEARCH_LISTS">
