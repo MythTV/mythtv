@@ -353,6 +353,16 @@ void DaapServer::parsePath(HttpInRequest *http_request, DaapRequest *daap_reques
 
         QString sub_version_string = user_agent.section(" ",0,0);
         sub_version_string = sub_version_string.section("/4.",1,1);
+        if ( sub_version_string.contains('.') )
+        {
+            //
+            //  For the time being, ignore the sub-sub version if there is
+            //  one
+            //
+
+            sub_version_string = sub_version_string.section(".", 0, 0);
+        }
+        
         bool ok = true;
         int itunes_sub_version = sub_version_string.toInt(&ok);
         if(ok)

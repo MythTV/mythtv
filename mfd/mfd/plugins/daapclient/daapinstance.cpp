@@ -513,6 +513,17 @@ bool DaapInstance::checkServerType(const QString &server_description)
         {
             QString sub_version_string = server_description.section(" ", 0, 0);
             sub_version_string = sub_version_string.section("/4.", 1, 1);
+
+            if(sub_version_string.contains('.'))
+            {
+                //
+                //  Ignore sub-sub version, if it is present
+                //
+                
+                sub_version_string = sub_version_string.section(".", 0, 0);
+            }
+            
+            
             bool ok = true;
             int itunes_sub_version = sub_version_string.toInt(&ok);
             if(itunes_sub_version == 1)
@@ -596,6 +607,16 @@ bool DaapInstance::checkServerType(const QString &server_description)
             daap_server_type = DAAP_SERVER_ITUNES4X;
             QString sub_version_string = server_description.section(" ", 0, 0);
             sub_version_string = sub_version_string.section("/4.", 1, 1);
+            
+            if(sub_version_string.contains('.'))
+            {
+                //
+                //  Ignore sub-sub version, if it is present
+                //
+                
+                sub_version_string = sub_version_string.section(".", 0, 0);
+            }
+            
             bool ok = true;
             int itunes_sub_version = sub_version_string.toInt(&ok);
             if(!ok)
