@@ -22,6 +22,10 @@ using namespace std;
 
 #define TFW_BUF_SIZE (2*1024*1024)
 
+#ifndef O_STREAMING
+#define O_STREAMING 0
+#endif
+
 class ThreadedFileWriter
 {
 public:
@@ -302,7 +306,7 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write, bool needevents)
             is_local = true;
 
         if (is_local)
-            fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE);
+            fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE|O_STREAMING);
         else
             remotefile = new RemoteFile(filename, needevents);
         writemode = false;
@@ -331,7 +335,7 @@ RingBuffer::RingBuffer(const QString &lfilename, long long size,
         tfw = new ThreadedFileWriter(filename.ascii(), 
                                      O_WRONLY|O_CREAT|O_TRUNC|O_LARGEFILE, 
                                      0644);
-        fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE);
+        fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE|O_STREAMING);
     }
     else
     {
