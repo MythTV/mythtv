@@ -544,9 +544,9 @@ mythbackend at startup.</P>
 </H2>
 
 <P>MythTV is flexible in the way that you define multiple backend tuner
-configurations.  The only hard-and-fast rule is that the Master Backend
+configurations.  The only hard-and-fast rule is that the Master backend
 <EM>must</EM> have a capture device defined, but shouldn't imply that the
-capture device in the MBE must be the first capture card defined in the
+capture device in the Master backend must be the first capture card defined in the
 database.</P>
 <P>One example of an advanced configuration is the round-robin scheme.  Rather
 than defining all of the cards on the master, you could first go into setup
@@ -653,10 +653,18 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>2.  Change the hostname.
-For most distributions, edit the <CODE>/etc/sysconfig/network</CODE> file.  Look
-for <CODE>HOSTNAME=frontend1</CODE> and change this to
-<CODE>HOSTNAME=kidsroom</CODE> or whatever you'll be using.  To alter the
+<P>2.  Change the hostname.</P>
+<P>For Red Hat and derived distributions, edit the
+<CODE>/etc/sysconfig/network</CODE> file.  Look for
+<CODE>HOSTNAME=frontend1</CODE> and change this to
+<CODE>HOSTNAME=kidsroom</CODE> or whatever you'll be using.  For other
+distributions, refer to the documentation, such as the
+<PRE>
+hostname(1)
+</PRE>
+ man page.</P>
+
+<P>To alter the
 hostname in the current session, run:
 <BLOCKQUOTE><CODE>
 <PRE>

@@ -51,9 +51,10 @@ information about the locations and contents of shared libraries from
 information in <CODE>/etc/ld.so.conf</CODE>.  Because MythTV installs some
 shared libraries in <CODE>/usr/local/lib</CODE>, that directory needs to be
 added to the list of directories for <B>ld.so</B> to search when doing
-runtime linking of programs. You do this, as root, by editing
-<CODE>/etc/ld.so.conf</CODE>, then running <B>ldconfig</B>. There are many
-ways to do this; one that works is to enter this series of commands:</P>
+runtime linking of programs, if it is not already there.
+You do this, as root, by editing <CODE>/etc/ld.so.conf</CODE>, then
+running <B>ldconfig</B>. There are many ways to do this; one that
+works is to enter this series of commands:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -67,6 +68,7 @@ $
 </P>
 <H3>Distribution-Specific Notes</H3>
 
+<P>None.</P>
 <H2><A NAME="ss4.3">4.3</A> <A HREF="mythtv-HOWTO.html#toc4.3">Environment variable Requirements for MythTV</A>
 </H2>
 
@@ -74,11 +76,11 @@ $
 
 <H3>QT libraries and binaries</H3>
 
-<P>The compiler needs to be able to locate QT binaries and libraries in order 
-to compile MythTV. QTDIR needs to be set and <CODE>/usr/lib/qt3/bin</CODE> must be 
-added to your path. Your distribution may already be making these changes 
-as a part of the installation of the software prerequisites detailed
-earlier.</P>
+<P>The compiler needs to be able to locate QT binaries and libraries in
+order to compile MythTV. QTDIR needs to be set and the directory holding the
+QT binaries needs to be added to your PATH.  Your distribution may already
+be making these changes as a part of the installation of the software
+prerequisites detailed earlier.</P>
 <P>One way to do this is as follows: 
 <A NAME="Checking_that_it_worked"></A> </P>
 <P>Open a shell and execute the following:
@@ -88,18 +90,20 @@ $ echo $PATH
 /usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
 $ echo $QTDIR
 /usr/lib/qt3
+$ which qmake
+/usr/lib/qt3/bin/qmake
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>You should see a value like <CODE>/usr/lib/qt3</CODE> for <CODE>QTDIR</CODE>
-and <CODE>/usr/lib/qt3/bin</CODE> should be in $PATH.</P>
+<P>For Mandrake, you should see a value like <CODE>/usr/lib/qt3</CODE> for
+<CODE>QTDIR</CODE> and <CODE>/usr/lib/qt3/bin</CODE> should be in $PATH.</P>
 <P>If you don't, do not proceed past this step until you have resolved this
 error. You may need to manually specify the QTDIR and PATH at the shell
 prompt before compiling.</P>
 <P>Also, check that there has been a link created in
-<CODE>/usr/lib/qt3/mkspecs</CODE> called <CODE>default</CODE>. If not, you'll get
-errors during the compile. See the Troubleshooting Section for more
-information.</P>
+<CODE>/usr/lib/qt3/mkspecs</CODE> (<CODE>/usr/share/qt3/mkspecs</CODE> for Debian)
+called <CODE>default</CODE>. If not, you'll get errors during the compile. See
+the Troubleshooting Section for more information.</P>
 <H3>Distribution-Specific Notes</H3>
 
 <H3>Mandrake</H3>
@@ -203,7 +207,19 @@ sh-2.05b# ls -l ../*.deb
 
 <P>If building from CVS instead of the source package, then the QTDIR
 environment variable must be set when building.  On Debian unstable, QTDIR
-should be set to <CODE>/usr/share/qt3</CODE>.</P>
+should be set to <CODE>/usr/share/qt3</CODE>.  Edit the <CODE>/etc/profile</CODE>
+file using your favorite text editor and add something like:
+<BLOCKQUOTE><CODE>
+<PRE>
+PATH="/usr/local/bin:/usr/bin:/bin:/usr/bin/X11:/usr/games"
+QTDIR="/usr/share/qt3"
+.
+.
+.
+export PATH QTDIR
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-5.html">Next</A>

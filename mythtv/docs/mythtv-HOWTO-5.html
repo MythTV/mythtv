@@ -33,6 +33,8 @@ $ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs checkout mythtv
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P><B>NOTE</B>:  You may get an error about cvs not finding a
+<CODE>.cvspass</CODE> file the very first time you run it.  This is normal.</P>
 <P>The other MythTV modules may be downloaded from CVS the same way; replace
 "mythtv" with "mythweather", "mythgallery", "mythmusic", etc.</P>
 <P>If you wish to stay up-to-date with CVS, you may replace "checkout mythtv"
@@ -43,7 +45,7 @@ join the
 <A HREF="http://www.mythtv.org/mailman/listinfo/mythtv-commits/">http://www.mythtv.org/mailman/listinfo/mythtv-commits/</A> and 
 <A HREF="http://www.mythtv.org/mailman/listinfo/mythtv-dev/">http://www.mythtv.org/mailman/listinfo/mythtv-dev/</A> mailing lists.</P>
 <P>Get XMLTV from 
-<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download version 0.5.27 if you're in
+<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download version 0.5.28 if you're in
 North America.</P>
 <P>
 <HR>
@@ -196,7 +198,7 @@ $
 <A NAME="untarring_xmltv"></A> Untar the xmltv file:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf xmltv-0.5.27.tar.bz2
+$ tar -xjf xmltv-0.5.28.tar.bz2
 </PRE>
 </CODE></BLOCKQUOTE>
 
@@ -218,7 +220,7 @@ cpan> exit
 <P>Change to the XMLTV directory and compile it:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd xmltv-0.5.27
+$ cd xmltv-0.5.28
 $ perl Makefile.PL
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -260,36 +262,60 @@ $ make
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>If you want to build MythTV on a multi-CPU machine (or with distcc), you may
-run into issues with the standard build in MythTV. The easiest solution is
-to build the libraries first.  In the following example, we will have two
-concurrent jobs executing.  Do not set the number of jobs too high, or your
-compile will actually take longer to complete than it would if you did a
-"normal" build.
+<P>If you want to build MythTV on a multi-CPU machine (or with
+<B>distcc</B>), you may run into issues with the standard build in MythTV.
+The easiest solution is to build the libraries first.  In the following
+example, we will have two concurrent jobs executing.  Do not set the number
+of jobs too high, or your compile will actually take longer to complete than
+it would if you did a "normal" build.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ qmake mythtv.pro
 $ make qmake
+$ make -C libs/libavcodec -j2
+$ make -C libs/libavformat -j2
+$ make -C libs/libmyth -j2 
+$ make -C libs/libmythtv -j2
 $ make -C libs -j2
 $ make -j2
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>If you are using distcc, and you had two other host machines (red, blue)
-running distcc, you would do something like:
+<P>If you are using <B>distcc</B>, and you had two other host machines (red, blue)
+participating, you would do something like:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ export DISTCC_HOSTS='localhost red blue'
 $ qmake mythtv.pro
 $ make qmake
-$ make -C libs -j3 CC=distcc
-$ make -j3 CC=distcc
+$ make -C libs/libavcodec -j6 CC=distcc
+$ make -C libs/libavformat -j6 CC=distcc
+$ make -C libs/libmyth -j6 CXX=distcc
+$ make -C libs/libmythtv -j6 CXX=distcc
+$ make -C libs -j6 CXX=distcc
+$ make -j6 CXX=distcc
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P>Explicitly specifying the directories ensures that <B>make</B> has all
+dependencies satisfied before proceeding.  For example, <CODE>libmyth</CODE> may
+fail to compile if <CODE>libavformat</CODE> hasn't finished yet.</P>
 <P>The actual speed-up, if any, is dependant on a number of factors, such as
-number of CPUs / hosts, etc.</P>
-<P>Switch to superuser:
+number of CPUs / hosts, etc.  The <B>distcc</B> documentation recommends
+using a <CODE>-j</CODE> value of twice the number of CPUs available to keep all
+of them busy.</P>
+<P>Some timing information.  The following should only be used for
+illustration; your actual results may vary.  The test involves a complete
+<CODE>make distclean</CODE> to the final binary.
+<UL>
+<LI>Celeron 2.4Ghz and PIII/733 running distcc, -j4:  17m:57s</LI>
+<LI>Celeron 2.4Ghz, -j4:  26m:57s</LI>
+<LI>Celeron 2.4Ghz, "regular" make:  26m:55s</LI>
+</UL>
+</P>
+<P>In the above example, we see that with a single CPU, a multi-stage
+<B>make</B> does not decrease compile time.</P>
+<P>Once the compile is done, switch to superuser:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su

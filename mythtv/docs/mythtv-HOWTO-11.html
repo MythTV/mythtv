@@ -79,6 +79,214 @@ helpful:
 <A HREF="http://www.snapstream.com/products/irblaster/sonydss.htm">http://www.snapstream.com/products/irblaster/sonydss.htm</A> for cable
 pinouts for RCA DSS receivers.</P>
 
+<H2><A NAME="ss11.5">11.5</A> <A HREF="mythtv-HOWTO.html#toc11.5">Using Shutdown/Wakeup</A>
+</H2>
+
+<P>What does the MythTV Shutdown/Wakeup function do? The scheduler on the
+Master backend (MBE) keeps track of the idle status of the entire MythTV
+system, including the Slave backends (SBE). If it considers the system to be
+idle, and thus ready to shutdown, it sets the wakeuptime to the time of the
+next recording and then proceeds to shut down all Slave backends and then
+itself. Once it is time to begin recording, the Master backend and the Slave
+Backends are automatically woken up.  This system allows MythTV to record
+like a normal VCR, thereby conserving power when not in active use.</P>
+<P>In order to use the Shutdown/Wakeup function there must be some method of
+waking up the Master backend.  There are any number of solutions, but we
+will discuss in detail two possibilities:</P>
+<P>
+<UL>
+<LI>Use another server that runs 24/7 and have it send a WakeOnLAN (WOL)
+packet to wake the Master backend.  This assumes that you have the WOL tools
+installed, and that your Master backend motherboard supports WOL.</LI>
+<LI>Use your motherboard's BIOS wakeup capability.  You'll need a motherboard
+that supports BIOS wakeup, and some tools.  Two that work are: 
+<A HREF="http://sourceforge.net/projects/nvram-wakeup">http://sourceforge.net/projects/nvram-wakeup</A> and 
+<A HREF="http://www.malloc.de/tools/wakeup_clock.html">http://www.malloc.de/tools/wakeup_clock.html</A></LI>
+</UL>
+</P>
+
+<H3>A deeper look into the operation</H3>
+
+<P>The scheduler keeps track of the idle status of the MythTV system. To
+determine whether or not the MythTV system is idle, the following conditions
+must be met for a a period of time defined in the "Idle timeout (secs)"
+parameter.
+<UL>
+<LI>no client is connected to the server</LI>
+<LI>no recording (neither LiveTV nor a regular recording) is currently taking place</LI>
+<LI>no recording starts within a definable amount of time ("Max. wait for recording (min)")</LI>
+<LI>the "pre Shutdown check-command" returns 0 </LI>
+</UL>
+</P>
+<P>If we get to this idle state the Master backend will set the wakeuptime using the "Set
+wakeuptime command", which is the same for WOL and BIOS wakeup. The Master backend will
+then shut down the Slave backends and itself using the "Server halt command".</P>
+<P>One caveat is that the scheduler tries to guess if the Master backend was started by a
+wakeup call or by the user. If it thinks it was woken up by a user, it
+blocks shutdown until a client connects to the Master backend, after which it will
+behave as described above. To disable this feature, unset "Block shutdown
+before client connected" in the mythfrontend Setup->Setup->General screen.</P>
+<P>Once it is time to startup the system, the Master backend is woken up first and will
+wakeup the Slave backends using the "Wake command for slaves". At this time, there is
+no support for starting only the required Slave backend, so all Slave backends will startup.</P>
+
+<H3>Setting up the MythTV side of this extension.</H3>
+
+<P>There are a number of options that are used to control the Shutdown /
+Wakeup feature.</P>
+<P>Shutdown/Wakeup Options:
+<UL>
+<LI>"Idle timeout (secs)" is the time the server waits while idle until a
+shutdown occurs.</LI>
+<LI>"Max. wait for recording (min)" is the time the Master backend waits for a recording
+without shutting down. For example, this would be used to prevent a 10
+minute system shutdown if a recording is set to start 15 minutes from now.</LI>
+<LI>"Startup before rec. (secs)" Sets how long before a programmed
+recording the MythTV system will be woken up.  This should be roughly be the
+time your systems need to bootup, and if you have Slave backends, you'll
+need to ensure this value is long enough for all your machines to perform
+their bootup cycle.</LI>
+<LI>"Wakeup time format" is the format of the wakeup time that is given in
+the "Set wakeuptime command" as a parameter "$time". You need to set this
+according to your wakeup mechanism. If you need secondss since the epoch
+(1970-01-01) set the "Wakeup time format" to "time_t".</LI>
+<LI>"Set wakeuptime command" is the command executed to set the new wakeuptime. </LI>
+<LI>"Server Halt Command" is the command executed to shutdown the Master
+backend and the Slave backends.</LI>
+<LI>"pre Shutdown check-command" is an optional command used to give a
+"Go/NO-GO" decision from a non-MythTV source.  This command is executed
+immediately before the shutdown would occur. The return value is use to make
+the following choices:
+<UL>
+<LI>If it returns a "0" the shutdown will occur as scheduled.</LI>
+<LI>If it returns a "1" the "idle timeout" will be reset and the system
+waits again for the timeout.</LI>
+<LI>If it returns a "2" the entire shutdown sequence is reset.  This means
+that a new client connect is needed before a shutdown occurs, unless you have
+the "Wait for client connect" setting disabled, in which case this is the same as
+returning "1".  An example of a use for this return value is to prevent the shutdown
+if a user is currently logged in, or if a specific program (ie. transcode,
+automatic updates, etc.) is currently running. If you don't need it, leave
+the field blank.</LI>
+</UL>
+</LI>
+</UL>
+</P>
+<P>The "WakeOnLan settings":
+These settings have nothing to do with using BIOS or WOL wakeup, they are
+the same for both.
+<UL>
+<LI>"Master backend" This setting defines timings for the frontends to
+wakeup the Master backend using WOL. Useful if your frontend can emit a WOL
+packet so you don't need to physically go to the Master backend if you're
+trying to watch TV.</LI>
+<LI>"Reconnect wait time (secs)" is the time the frontend waits after
+executing the "Wake command" before attempting to retry the connection. This
+should be roughly the amount of time your Master backend needs for bootup.
+Set to "0" to disable. The frontends will retry to connect for "Count of
+reconnect tries" times before giving up.</LI>
+<LI>"Wake command for slaves" is the <EM>one</EM> command executed to wake
+your Slave backends. This should be a script that contains the calls to
+wakeup all Slave backend systems.</LI>
+</UL>
+</P>
+
+<H3>Using WOL to wake your Master backend. </H3>
+
+<P>To use WOL to wake your Master backend you will need a WOL capable Master
+backend, a machine that runs 24/7 which can execute an at-job and nc (netcat)
+on the Master backend. I use some little bash scripts to make my DSL router
+wakeup my mythbox if required.</P>
+<P>Replace $SERVER and $PORT with your own settings!
+On my Master backend I have a script that gets called as 'setwakeuptime command' which
+looks like the following:
+<BLOCKQUOTE><CODE>
+<PRE>
+#! /bin/sh
+echo $@ | nc $SERVER $PORT
+</PRE>
+</CODE></BLOCKQUOTE>
+
+This simply cats the parameters (that is $time) to my 24/7 server. On my
+$SERVER I have (x)inetd listening on $PORT starting a little script which
+cares about setting the at-job. The following additions are necessary on the
+$SERVER:</P>
+<P>If you use <B>inetd</B>:</P>
+<P>In <CODE>/etc/inetd.conf</CODE> add:
+<BLOCKQUOTE><CODE>
+<PRE>
+mythwake stream tcp nowait mythtv /usr/sbin/tcpd /usr/local/bin/mythwake
+</PRE>
+</CODE></BLOCKQUOTE>
+
+If you use <B>xinetd</B>, save the following as <B>mythwake</B> in your
+<CODE>/etc/xinet.d/</CODE> directory:
+<BLOCKQUOTE><CODE>
+<PRE>
+service mythwake
+  {    
+        socket_type     = stream
+        wait            = no
+        user            = mythtv        
+        protocol        = tcp
+        id              = mythwake
+        server          = /usr/local/bin/mythwake
+  }
+</PRE>
+</CODE></BLOCKQUOTE>
+
+and add the following to <CODE>/etc/services</CODE>:
+<BLOCKQUOTE><CODE>
+<PRE>
+mythwake        $PORT/tcp
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Finally, <CODE>/usr/local/bin/mythwake</CODE> looks like:
+<BLOCKQUOTE><CODE>
+<PRE>
+#! /bin/bash
+#this should be a command to wake your server
+WAKECMD="#!/bin/sh\n /usr/local/bin/wakeMBE"
+#first we need to delete all wake jobs in queue
+for JOB in atq | cut -f 1 ; do
+    atrm $JOB;
+done
+#now we read the date from 'nc'
+read date;
+#now set the atjob
+echo -e "$WAKECMD" | at $date ;
+</PRE>
+</CODE></BLOCKQUOTE>
+
+<B>SECURITY WARNING</B>:
+Be sure to secure $SERVER:$PORT from untrusted networks, because this
+allows 3rd parties to run arbitrary code on your server!</P>
+
+<H3>Using BIOS wakeup to wake your Master backend.</H3>
+
+<P>Since I don't use this, I cannot say much about this. If your motherboard
+supports any wakeup tool you have to call that tool as "Set wakeuptime
+command" with the "Wakeup time format" suitable for that tool.</P>
+<H3>Wakeup the MySQL server using WOL.</H3>
+
+<P>If your MySQL server and your Master backend are not on the same machine,
+you can have the Master backend wake your MySQL server using WOL. You will
+find the settings for this in mysql.txt. The meanings are the same as
+discussed in "The WakeOnLan settings" above.</P>
+
+<H3>Tips/Tricks:</H3>
+
+<P>If, for example, one of the Slave backends is also your desktop computer,
+you could simply use a little script as 'server halt command' which first
+calls <CODE>/sbin/shutdown -t TIMEOUT</CODE> where TIMEOUT is a value sufficient
+for you to react.  You could then popup a window using *dialog, asking for
+permission to shutdown. If you cancel the shutdown, simply call
+<CODE>/sbin/shutdown -c</CODE>.</P>
+<P>If you get "nvram-wakeup: /dev/rtc: Device or resource busy" your
+set-wakeuptime-script should stop the program that uses <CODE>/dev/rtc</CODE> before
+setting the wakeuptime.</P>
+
 <HR>
 <A HREF="mythtv-HOWTO-12.html">Next</A>
 <A HREF="mythtv-HOWTO-10.html">Previous</A>

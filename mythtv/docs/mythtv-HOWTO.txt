@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2004-02-01, v0.14.01
+  2004-02-06, v0.14.02
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -133,12 +133,18 @@
      11.2 Using themes with MythTV.
      11.3 Adding DirecTV information to the database.
      11.4 Adding support for an external tuner.
+     11.5 Using Shutdown/Wakeup
+        11.5.1 A deeper look into the operation
+        11.5.2 Setting up the MythTV side of this extension.
+           11.5.2.1 Using WOL to wake your Master backend.
+           11.5.2.2 Using BIOS wakeup to wake your Master backend.
+        11.5.3 Wakeup the MySQL server using WOL.
+        11.5.4 Tips/Tricks:
 
   12. MythWeb.
      12.1 Installation and prerequisites.
         12.1.1 Mandrake 9.0
      12.2 Completing the installation.
-
   13. MythGallery.
      13.1 Installation and prerequisites.
      13.2 Importing Pictures
@@ -271,12 +277,13 @@
   install MythTV.  A mini-distribution removes many of the "general
   purpose" workstation / server software packages that may be installed
   by default if you use one of the big-name OS packages.
-
   See http://linpvr.org/ <http://linpvr.org/> if you'd like to install
   MythTV onto a VIA Epia M machine.
 
   See http://mysettopbox.tv <http://mysettopbox.tv> if you'd like to
   install a custom version of Knoppix optimized for MythTV.
+
+
   [1m3.  Checking prerequisites.[0m
 
   You must ensure that any firewalls (either hardware, or a software
@@ -399,6 +406,7 @@
   See the Troubleshooting ``section'' for more information.
 
 
+
   [1m3.1.4.  Filesystems[0m
 
   MythTV creates large files, many in excess of 2GB.  You [4mmust[24m use a
@@ -465,8 +473,6 @@
 
        # lsmod |grep bttv
 
-
-
   You want to see the bttv module listed.
 
   [1m3.1.5.2.  Hardware MPEG-2 encoders.[0m
@@ -532,13 +538,13 @@
   devices which will allow you to capture the HDTV output from a set-top
   box commonly found with digital cable systems or satellite systems.
 
+
   [1m3.1.6.  Hardware known NOT to work and other issues.[0m
 
 
   +o  Hauppauge WinTV-D or -HD (no driver)
 
   +o  Hauppauge WinTV-USB series
-
 
   +o  Hauppauge WinTV-PVR-usb, usb2 or PCI cards (no driver - this is not
      the PVR-250/350 series of cards supported by the IvyTV driver)
@@ -599,13 +605,13 @@
   card.  You may also run xvinfo; look for your video card to be listed
   as one of the adapters.
 
-
   If you want to use MythTV with a standard television, you will need a
   physical connection from your video card to your TV set, which can
   either be a TV-out port on the card itself or an external adapter that
   converts the VGA signal to an appropriate video signal. "Appropriate"
   depends on a number of factors, such as video standard (NTSC vs PAL)
   type of input connection (Composite vs SVideo), etc.
+
   Note that with some video cards and X drivers, XVideo extensions are
   only supported on the VGA output, and not on the TV output.
 
@@ -737,7 +743,6 @@
   driver.
 
 
-
   [1m3.1.9.6.  Other Options[0m
 
   Some devices with on-board TV-out capability, such as XBoxes converted
@@ -803,7 +808,6 @@
   commonly found in that distribution.  Any issues with MythTV installed
   via a pre-compiled package [1mMUST [22mbe raised with the packager.
 
-
   If you use any of the pre-compiled packages you may not need to
   perform any additional configuration steps in this HOWTO.  The next
   logical step is ``configuring MySQL'', which you may or may not have
@@ -864,7 +868,6 @@
   Instructions for Fedora may be found at http://wilsonet.com/mythtv/
   <http://wilsonet.com/mythtv/> Just like 3rd-party packages, any 3rd-
   party documentation problems should be brought up with the maintainer.
-
 
 
   [1m3.2.1.2.  Mandrake[0m
@@ -928,8 +931,6 @@
   NOTE:  Other than where noted, Mandrake 9.1 users may follow the
   Mandrake 9.0 instructions.
   ______________________________________________________________________
-
-
 
   There appears to be issues with ALSA and simultaneously recording and
   playing sound, which is a core requirement for MythTV.  If you are not
@@ -995,7 +996,6 @@
 
   If you marked anything to install, click on Install Marked.  Click
   "Yes" or OK if you get a message about satisfying dependencies.
-
 
 
   [1m3.2.4.  Command-line installation.[0m
@@ -1128,9 +1128,9 @@
   /etc/ld.so.conf.  Because MythTV installs some shared libraries in
   /usr/local/lib, that directory needs to be added to the list of
   directories for [1mld.so [22mto search when doing runtime linking of
-  programs. You do this, as root, by editing /etc/ld.so.conf, then
-  running [1mldconfig[22m. There are many ways to do this; one that works is to
-  enter this series of commands:
+  programs, if it is not already there.  You do this, as root, by
+  editing /etc/ld.so.conf, then running [1mldconfig[22m. There are many ways to
+  do this; one that works is to enter this series of commands:
 
 
 
@@ -1144,6 +1144,8 @@
 
   [1m4.2.2.  Distribution-Specific Notes[0m
 
+  None.
+
   [1m4.3.  Environment variable Requirements for MythTV[0m
 
   [1m4.3.1.  General requirements[0m
@@ -1151,10 +1153,10 @@
   [1m4.3.1.1.  QT libraries and binaries[0m
 
   The compiler needs to be able to locate QT binaries and libraries in
-  order to compile MythTV. QTDIR needs to be set and /usr/lib/qt3/bin
-  must be added to your path. Your distribution may already be making
-  these changes as a part of the installation of the software
-  prerequisites detailed earlier.
+  order to compile MythTV. QTDIR needs to be set and the directory
+  holding the QT binaries needs to be added to your PATH.  Your
+  distribution may already be making these changes as a part of the
+  installation of the software prerequisites detailed earlier.
 
   One way to do this is as follows:
 
@@ -1165,10 +1167,12 @@
        /usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
        $ echo $QTDIR
        /usr/lib/qt3
+       $ which qmake
+       /usr/lib/qt3/bin/qmake
 
 
 
-  You should see a value like /usr/lib/qt3 for QTDIR and
+  For Mandrake, you should see a value like /usr/lib/qt3 for QTDIR and
   /usr/lib/qt3/bin should be in $PATH.
 
   If you don't, do not proceed past this step until you have resolved
@@ -1176,10 +1180,13 @@
   shell prompt before compiling.
 
   Also, check that there has been a link created in /usr/lib/qt3/mkspecs
-  called default. If not, you'll get errors during the compile. See the
-  Troubleshooting Section for more information.
+  (/usr/share/qt3/mkspecs for Debian) called default. If not, you'll get
+  errors during the compile. See the Troubleshooting Section for more
+  information.
 
   [1m4.3.2.  Distribution-Specific Notes[0m
+
+
 
   [1m4.3.2.1.  Mandrake[0m
 
@@ -1189,6 +1196,7 @@
 
   As root, create the following file in /etc/profile.d The example
   filename is "mythtv.sh". Use what you feel is appropriate.
+
   Open a shell, and switch to superuser mode.  [1mNOTE[22m: ^D means press CTRL
   and d at the same time.
 
@@ -1284,7 +1292,18 @@
 
   If building from CVS instead of the source package, then the QTDIR
   environment variable must be set when building.  On Debian unstable,
-  QTDIR should be set to /usr/share/qt3.
+  QTDIR should be set to /usr/share/qt3.  Edit the /etc/profile file
+  using your favorite text editor and add something like:
+
+
+
+  PATH="/usr/local/bin:/usr/bin:/bin:/usr/bin/X11:/usr/games"
+  QTDIR="/usr/share/qt3"
+  .
+  .
+  .
+  export PATH QTDIR
+
 
 
   [1m5.  Downloading and compiling.[0m
@@ -1307,6 +1326,9 @@
 
 
 
+  [1mNOTE[22m:  You may get an error about cvs not finding a .cvspass file the
+  very first time you run it.  This is normal.
+
   The other MythTV modules may be downloaded from CVS the same way;
   replace "mythtv" with "mythweather", "mythgallery", "mythmusic", etc.
 
@@ -1321,7 +1343,7 @@
   <http://www.mythtv.org/mailman/listinfo/mythtv-dev/> mailing lists.
 
   Get XMLTV from http://xmltv.sourceforge.net
-  <http://xmltv.sourceforge.net>.  Download version 0.5.27 if you're in
+  <http://xmltv.sourceforge.net>.  Download version 0.5.28 if you're in
   North America.
 
 
@@ -1337,8 +1359,6 @@
   After downloading, be sure to install both:
   # rpm -Uvh lame*
   ______________________________________________________________________
-
-
 
   Get lame from http://www.mp3dev.org/mp3 <http://www.mp3dev.org/mp3>.
   Download the source code to v3.93.1 by following the links to
@@ -1356,7 +1376,6 @@
 
 
   and replace it with
-
 
   -march=i586
 
@@ -1402,6 +1421,8 @@
 
   [1m5.3.  XMLTV.[0m
 
+
+
   [1m5.3.1.  Red Hat Linux 9:[0m
 
   RPMs for [1mXMLTV [22mand all of its dependencies can be obtained from
@@ -1416,8 +1437,6 @@
 
   If you install from this location you may skip to ``Manually building
   MythTV''.
-
-
 
   [1m5.3.2.  Mandrake[0m
 
@@ -1466,25 +1485,24 @@
   Open a shell prompt:
 
 
-       $ tar -xzf expat-1.95.5.tar.gz
-       $ cd expat-1.95.5
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # /sbin/ldconfig
-       # exit
-       $
+  $ tar -xzf expat-1.95.5.tar.gz
+  $ cd expat-1.95.5
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # /sbin/ldconfig
+  # exit
+  $
 
 
 
   Continuing on:
 
-
   Untar the xmltv file:
 
 
-       $ tar -xjf xmltv-0.5.27.tar.bz2
+       $ tar -xjf xmltv-0.5.28.tar.bz2
 
 
 
@@ -1506,7 +1524,7 @@
   Change to the XMLTV directory and compile it:
 
 
-       $ cd xmltv-0.5.27
+       $ cd xmltv-0.5.28
        $ perl Makefile.PL
 
 
@@ -1541,42 +1559,70 @@
   On a single cpu machine, you would type the following to compile
   MythTV:
 
-  $ qmake mythtv.pro
-  $ make
+
+       $ qmake mythtv.pro
+       $ make
 
 
 
-  If you want to build MythTV on a multi-CPU machine (or with distcc),
-  you may run into issues with the standard build in MythTV. The easiest
-  solution is to build the libraries first.  In the following example,
-  we will have two concurrent jobs executing.  Do not set the number of
-  jobs too high, or your compile will actually take longer to complete
-  than it would if you did a "normal" build.
+  If you want to build MythTV on a multi-CPU machine (or with [1mdistcc[22m),
+  you may run into issues with the standard build in MythTV.  The
+  easiest solution is to build the libraries first.  In the following
+  example, we will have two concurrent jobs executing.  Do not set the
+  number of jobs too high, or your compile will actually take longer to
+  complete than it would if you did a "normal" build.
 
 
        $ qmake mythtv.pro
        $ make qmake
+       $ make -C libs/libavcodec -j2
+       $ make -C libs/libavformat -j2
+       $ make -C libs/libmyth -j2
+       $ make -C libs/libmythtv -j2
        $ make -C libs -j2
        $ make -j2
 
 
 
-  If you are using distcc, and you had two other host machines (red,
-  blue) running distcc, you would do something like:
+  If you are using [1mdistcc[22m, and you had two other host machines (red,
+  blue) participating, you would do something like:
 
 
        $ export DISTCC_HOSTS='localhost red blue'
        $ qmake mythtv.pro
        $ make qmake
-       $ make -C libs -j3 CC=distcc
-       $ make -j3 CC=distcc
+       $ make -C libs/libavcodec -j6 CC=distcc
+       $ make -C libs/libavformat -j6 CC=distcc
+       $ make -C libs/libmyth -j6 CXX=distcc
+       $ make -C libs/libmythtv -j6 CXX=distcc
+       $ make -C libs -j6 CXX=distcc
+       $ make -j6 CXX=distcc
 
 
+
+  Explicitly specifying the directories ensures that [1mmake [22mhas all
+  dependencies satisfied before proceeding.  For example, libmyth may
+  fail to compile if libavformat hasn't finished yet.
 
   The actual speed-up, if any, is dependant on a number of factors, such
-  as number of CPUs / hosts, etc.
+  as number of CPUs / hosts, etc.  The [1mdistcc [22mdocumentation recommends
+  using a -j value of twice the number of CPUs available to keep all of
+  them busy.
 
-  Switch to superuser:
+  Some timing information.  The following should only be used for
+  illustration; your actual results may vary.  The test involves a
+  complete make distclean to the final binary.
+
+  +o  Celeron 2.4Ghz and PIII/733 running distcc, -j4:  17m:57s
+
+  +o  Celeron 2.4Ghz, -j4:  26m:57s
+
+  +o  Celeron 2.4Ghz, "regular" make:  26m:55s
+
+  In the above example, we see that with a single CPU, a multi-stage
+  [1mmake [22mdoes not decrease compile time.
+
+  Once the compile is done, switch to superuser:
 
 
        $ su
@@ -1683,6 +1729,7 @@
   mysql_install_db as root.
 
 
+
   [1m6.4.  Setting up the initial database.[0m
 
   This step is only required on the system maintaining the database,
@@ -1744,8 +1791,9 @@
   This example has no security at all, and allows access from any host.
 
 
-       $ mysql -u root mythconverg
-       mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
+
+  $ mysql -u root mythconverg
+  mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
 
 
 
@@ -1784,6 +1832,7 @@
   versions (0.9).  See the ``Troubleshooting Audio'' section for more
   information if you're having issues with sound.  Also, ensure that no
   other programs are grabbing the audio output, like [1marts [22mor [1mesd[22m.
+
   What you need to do is to mute the "line-in" of your sound card and
   also set it as the recording source.
 
@@ -1871,8 +1920,6 @@
        $ cd alsa-driver-0.9.x
        $ ./configure --with-cards=XXX --with-sequencer=yes
 
-
-
   [1mNOTE[22m: Red Hat users, you may need to perform the following step to
   allow the compile to continue:
 
@@ -1900,22 +1947,21 @@
   Install the rest of the packages:
 
 
-
-  $ cd ~
-  $ tar -xjf alsa-lib-0.9.x.tar.bz2
-  $ cd alsa-lib-0.9.x
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
-  $ cd ..
-  $ tar -xjf alsa-utils-0.9.x.tar.bz2
-  $ cd alsa-utils-0.9.x
-  $ ./configure
-  $ make
-  $ su
-  # make install
+       $ cd ~
+       $ tar -xjf alsa-lib-0.9.x.tar.bz2
+       $ cd alsa-lib-0.9.x
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
+       $ cd ..
+       $ tar -xjf alsa-utils-0.9.x.tar.bz2
+       $ cd alsa-utils-0.9.x
+       $ ./configure
+       $ make
+       $ su
+       # make install
 
 
 
@@ -1926,18 +1972,19 @@
   file that has this configuration:
 
 
-       alias char-major-116 snd
-       alias snd-card-0 snd-XXX
-       # module options should go here
-       # OSS/Free portion
-       alias char-major-14 soundcore
-       alias sound-slot-0 snd-card-0
-       # card #1
-       alias sound-service-0-0 snd-mixer-oss
-       alias sound-service-0-1 snd-seq-oss
-       alias sound-service-0-3 snd-pcm-oss
-       alias sound-service-0-8 snd-seq-oss
-       alias sound-service-0-12 snd-pcm-oss
+
+  alias char-major-116 snd
+  alias snd-card-0 snd-XXX
+  # module options should go here
+  # OSS/Free portion
+  alias char-major-14 soundcore
+  alias sound-slot-0 snd-card-0
+  # card #1
+  alias sound-service-0-0 snd-mixer-oss
+  alias sound-service-0-1 snd-seq-oss
+  alias sound-service-0-3 snd-pcm-oss
+  alias sound-service-0-8 snd-seq-oss
+  alias sound-service-0-12 snd-pcm-oss
 
 
 
@@ -1964,7 +2011,7 @@
   you can do as root with:
 
 
-  # alsactl -f /etc/asound.state store
+       # alsactl -f /etc/asound.state store
 
 
 
@@ -1985,6 +2032,7 @@
 
 
   If it works, you're done installing ALSA!
+
 
 
   [1m7.2.  Setting the mixer from the command line.[0m
@@ -2088,9 +2136,8 @@
   Install using urpmi.
 
 
-
-  $ su
-  # urpmi kernel-source
+       $ su
+       # urpmi kernel-source
 
 
 
@@ -2146,11 +2193,10 @@
   Once the configuration step is complete:
 
 
-
-  $ make
-  $ su
-  # make install
-  # chmod 666 /dev/lircd
+       $ make
+       $ su
+       # make install
+       # chmod 666 /dev/lircd
 
 
 
@@ -2393,6 +2439,9 @@
   The next step is to convert those signals into something that can be
   used to control MythTV.  MythTV now includes native support for lirc
   and can interact directly with
+
+
+
        $ cd ~/mythtv-0.14/configfiles
        $ cp lircrc.example ~/.lircrc
 
@@ -2416,6 +2465,7 @@
   button as it is defined in your /etc/lircd.conf. If you don't see any-
   thing at this point, you need to troubleshoot further by going back to
   the lirc home page and investigating from there.
+
 
   If it is working, then press [1mCTRL-C [22mto abort the program.  Once you
   know that your remote is working, you can either recompile MythTV with
@@ -2445,18 +2495,17 @@
   The lircrc.example file has this:
 
 
+       begin
+           prog = irxevent
+           button = ChannelUp
+           config = Key Up CurrentWindow
+       end
 
-  begin
-      prog = irxevent
-      button = ChannelUp
-      config = Key Up CurrentWindow
-  end
-
-  begin
-      prog = irxevent
-      button = ChannelDown
-      config = Key Down CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = ChannelDown
+           config = Key Down CurrentWindow
+       end
 
 
 
@@ -2473,19 +2522,20 @@
   my /home/[yourusername]/.lircrc file:
 
 
-       begin
-           prog = irxevent
-           button = channel+
-           repeat = 3
-           config = Key Up CurrentWindow
-       end
 
-       begin
-           prog = irxevent
-           button = channel-
-           repeat = 3
-           config = Key Down CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = channel+
+      repeat = 3
+      config = Key Up CurrentWindow
+  end
+
+  begin
+      prog = irxevent
+      button = channel-
+      repeat = 3
+      config = Key Down CurrentWindow
+  end
 
 
 
@@ -2505,7 +2555,6 @@
   one keypress to the application, even if you're holding down the key.
   The actual [1mrepeat = [22mnumber will vary from system to system, so
   experiment and see which value works best for you.
-
 
 
   [1m8.7.  Configuring lirc for use with an IR blaster.[0m
@@ -2538,19 +2587,19 @@
   kernel module you might see the following message during make:
 
 
-       lirc_sir.c:56:2: warning: #warning
-       "******************************************"
+  lirc_sir.c:56:2: warning: #warning
+  "******************************************"
 
-       lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
+  lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
 
-       lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
+  lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
 
-       lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
+  lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
 
-       lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
+  lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
 
-       lirc_sir.c:61:2: warning: #warning
-       "******************************************"
+  lirc_sir.c:61:2: warning: #warning
+  "******************************************"
 
 
 
@@ -2571,15 +2620,16 @@
   sending and receiving IR versus just receiving.
 
 
-  # cd /etc/rc.d
-  # cat >> rc.local
-  echo "Starting lircd"
-  setserial /dev/ttySx uart none        # (if required)
-  modprobe lirc_sir
-  /usr/local/sbin/lircd
-  ^D
-  # exit
-  $
+
+       # cd /etc/rc.d
+       # cat >> rc.local
+       echo "Starting lircd"
+       setserial /dev/ttySx uart none        # (if required)
+       modprobe lirc_sir
+       /usr/local/sbin/lircd
+       ^D
+       # exit
+       $
 
 
 
@@ -2599,8 +2649,6 @@
        0000000000007ff0 00 1 gi-motorola-dct2000
        000000000000bff8 00 2 gi-motorola-dct2000
        000000000000f7f0 00 ENTER gi-motorola-dct2000
-
-
 
   Once you've verified lirc is working you can press [1mCTRL-C [22mto exit [1mirw[0m
   and configure the channel changing script.
@@ -2632,7 +2680,6 @@
 
   See contrib/channel.pl for the actual file.  Copy it to
   /usr/local/bin/
-
 
   The last statement within the perl script is the lirc rc command. This
   is the command that transmits the code to your cable/DSS box. Make
@@ -2666,7 +2713,6 @@
        # mkdir /var/video
        # chmod a+rwx /var/video
        # exit
-
 
 
   The first thing to configure is the master backend system.  If you are
@@ -2865,7 +2911,7 @@
   continuing.
 
 
-       $ mythbackend
+  $ mythbackend
 
 
 
@@ -2959,6 +3005,8 @@
        $ su
        # cp mythfilldatabasecron /etc/cron.daily
 
+
+
   If you want to know what time your job will run, you can do the
   following:
 
@@ -3023,6 +3071,8 @@
 
        $ crontab -e
 
+
+
   The [1mcrontab -e [22mcommand will allow you to edit the existing crontab.
   [1mNOTE[22m:  By default, the crontab will use [1mvi [22mas your editor.  If you
   don't like to use [1mvi[22m, make sure that you've set VISUAL to something
@@ -3051,7 +3101,6 @@
   When you start mythfrontend, you should have a number of choices.
   Before doing anything, go to TV, then to Setup and configure the
   frontend client.
-
 
   [1m10.1.  General[0m
 
@@ -3088,6 +3137,8 @@
   not use the same font settings as defined in Appearance, so if the EPG
   is unreadable this is where you make the adjustments to fonts, number
   of elements displayed, etc.
+
+
   [1m10.4.  Playback[0m
 
   The one configuration item which may cause problems on your system is
@@ -3312,11 +3363,12 @@
   types of cards you have installed you may see:
 
 
-       (Create new profile group)
-       Software Encoders
-       Hardware MPEG Encoders
-       Hardware MJPEG Encoders
-       Transcoders
+
+  (Create new profile group)
+  Software Encoders
+  Hardware MPEG Encoders
+  Hardware MJPEG Encoders
+  Transcoders
 
 
 
@@ -3480,6 +3532,249 @@
   <http://www.snapstream.com/products/irblaster/sonydss.htm> for cable
   pinouts for RCA DSS receivers.
 
+
+  [1m11.5.  Using Shutdown/Wakeup[0m
+
+  What does the MythTV Shutdown/Wakeup function do? The scheduler on the
+  Master backend (MBE) keeps track of the idle status of the entire
+  MythTV system, including the Slave backends (SBE). If it considers the
+  system to be idle, and thus ready to shutdown, it sets the wakeuptime
+  to the time of the next recording and then proceeds to shut down all
+  Slave backends and then itself. Once it is time to begin recording,
+  the Master backend and the Slave Backends are automatically woken up.
+  This system allows MythTV to record like a normal VCR, thereby
+  conserving power when not in active use.
+
+  In order to use the Shutdown/Wakeup function there must be some method
+  of waking up the Master backend.  There are any number of solutions,
+  but we will discuss in detail two possibilities:
+
+
+  +o  Use another server that runs 24/7 and have it send a WakeOnLAN
+     (WOL) packet to wake the Master backend.  This assumes that you
+     have the WOL tools installed, and that your Master backend
+     motherboard supports WOL.
+
+  +o  Use your motherboard's BIOS wakeup capability.  You'll need a
+     motherboard that supports BIOS wakeup, and some tools.  Two that
+     work are: http://sourceforge.net/projects/nvram-wakeup
+     <http://sourceforge.net/projects/nvram-wakeup> and
+     http://www.malloc.de/tools/wakeup_clock.html
+     <http://www.malloc.de/tools/wakeup_clock.html>
+
+
+  [1m11.5.1.  A deeper look into the operation[0m
+
+  The scheduler keeps track of the idle status of the MythTV system. To
+  determine whether or not the MythTV system is idle, the following
+  conditions must be met for a a period of time defined in the "Idle
+  timeout (secs)" parameter.
+
+  +o  no client is connected to the server
+
+  +o  no recording (neither LiveTV nor a regular recording) is currently
+     taking place
+
+  +o  no recording starts within a definable amount of time ("Max. wait
+     for recording (min)")
+
+  +o  the "pre Shutdown check-command" returns 0
+
+  If we get to this idle state the Master backend will set the
+  wakeuptime using the "Set wakeuptime command", which is the same for
+  WOL and BIOS wakeup. The Master backend will then shut down the Slave
+  backends and itself using the "Server halt command".
+
+  One caveat is that the scheduler tries to guess if the Master backend
+  was started by a wakeup call or by the user. If it thinks it was woken
+  up by a user, it blocks shutdown until a client connects to the Master
+  backend, after which it will behave as described above. To disable
+  this feature, unset "Block shutdown before client connected" in the
+  mythfrontend Setup->Setup->General screen.
+
+  Once it is time to startup the system, the Master backend is woken up
+  first and will wakeup the Slave backends using the "Wake command for
+  slaves". At this time, there is no support for starting only the
+  required Slave backend, so all Slave backends will startup.
+
+
+  [1m11.5.2.  Setting up the MythTV side of this extension.[0m
+
+  There are a number of options that are used to control the Shutdown /
+  Wakeup feature.
+
+  Shutdown/Wakeup Options:
+
+  +o  "Idle timeout (secs)" is the time the server waits while idle until
+     a shutdown occurs.
+
+  +o  "Max. wait for recording (min)" is the time the Master backend
+     waits for a recording without shutting down. For example, this
+     would be used to prevent a 10 minute system shutdown if a recording
+     is set to start 15 minutes from now.
+
+  +o  "Startup before rec. (secs)" Sets how long before a programmed
+     recording the MythTV system will be woken up.  This should be
+     roughly be the time your systems need to bootup, and if you have
+     Slave backends, you'll need to ensure this value is long enough for
+     all your machines to perform their bootup cycle.
+
+  +o  "Wakeup time format" is the format of the wakeup time that is given
+     in the "Set wakeuptime command" as a parameter "$time". You need to
+     set this according to your wakeup mechanism. If you need secondss
+     since the epoch (1970-01-01) set the "Wakeup time format" to
+     "time_t".
+
+
+  +o  "Set wakeuptime command" is the command executed to set the new
+     wakeuptime.
+
+  +o  "Server Halt Command" is the command executed to shutdown the
+     Master backend and the Slave backends.
+
+  +o  "pre Shutdown check-command" is an optional command used to give a
+     "Go/NO-GO" decision from a non-MythTV source.  This command is
+     executed immediately before the shutdown would occur. The return
+     value is use to make the following choices:
+
+     +o  If it returns a "0" the shutdown will occur as scheduled.
+
+     +o  If it returns a "1" the "idle timeout" will be reset and the
+        system waits again for the timeout.
+
+     +o  If it returns a "2" the entire shutdown sequence is reset.  This
+        means that a new client connect is needed before a shutdown
+        occurs, unless you have the "Wait for client connect" setting
+        disabled, in which case this is the same as returning "1".  An
+        example of a use for this return value is to prevent the
+        shutdown if a user is currently logged in, or if a specific
+        program (ie. transcode, automatic updates, etc.) is currently
+        running. If you don't need it, leave the field blank.
+
+  The "WakeOnLan settings": These settings have nothing to do with using
+  BIOS or WOL wakeup, they are the same for both.
+
+  +o  "Master backend" This setting defines timings for the frontends to
+     wakeup the Master backend using WOL. Useful if your frontend can
+     emit a WOL packet so you don't need to physically go to the Master
+     backend if you're trying to watch TV.
+
+  +o  "Reconnect wait time (secs)" is the time the frontend waits after
+     executing the "Wake command" before attempting to retry the
+     connection. This should be roughly the amount of time your Master
+     backend needs for bootup.  Set to "0" to disable. The frontends
+     will retry to connect for "Count of reconnect tries" times before
+     giving up.
+
+  +o  "Wake command for slaves" is the [4mone[24m command executed to wake your
+     Slave backends. This should be a script that contains the calls to
+     wakeup all Slave backend systems.
+
+
+  [1m11.5.2.1.  Using WOL to wake your Master backend.[0m
+
+  To use WOL to wake your Master backend you will need a WOL capable
+  Master backend, a machine that runs 24/7 which can execute an at-job
+  and nc (netcat) on the Master backend. I use some little bash scripts
+  to make my DSL router wakeup my mythbox if required.
+
+  Replace $SERVER and $PORT with your own settings!  On my Master
+  backend I have a script that gets called as 'setwakeuptime command'
+  which looks like the following:
+
+
+       #! /bin/sh
+       echo $@ | nc $SERVER $PORT
+
+
+
+  This simply cats the parameters (that is $time) to my 24/7 server. On
+  my $SERVER I have (x)inetd listening on $PORT starting a little script
+  which cares about setting the at-job. The following additions are
+  necessary on the $SERVER:
+
+  If you use [1minetd[22m:
+
+  In /etc/inetd.conf add:
+
+
+       mythwake stream tcp nowait mythtv /usr/sbin/tcpd /usr/local/bin/mythwake
+
+
+
+  If you use [1mxinetd[22m, save the following as [1mmythwake [22min your
+  /etc/xinet.d/ directory:
+
+
+       service mythwake
+         {
+               socket_type     = stream
+               wait            = no
+               user            = mythtv
+               protocol        = tcp
+               id              = mythwake
+               server          = /usr/local/bin/mythwake
+         }
+
+
+
+  and add the following to /etc/services:
+
+
+       mythwake        $PORT/tcp
+
+
+
+  Finally, /usr/local/bin/mythwake looks like:
+
+
+       #! /bin/bash
+       #this should be a command to wake your server
+       WAKECMD="#!/bin/sh\n /usr/local/bin/wakeMBE"
+       #first we need to delete all wake jobs in queue
+       for JOB in atq | cut -f 1 ; do
+           atrm $JOB;
+       done
+       #now we read the date from 'nc'
+       read date;
+       #now set the atjob
+       echo -e "$WAKECMD" | at $date ;
+
+
+
+  [1mSECURITY WARNING[22m: Be sure to secure $SERVER:$PORT from untrusted net-
+  works, because this allows 3rd parties to run arbitrary code on your
+  server!
+
+
+  [1m11.5.2.2.  Using BIOS wakeup to wake your Master backend.[0m
+
+  Since I don't use this, I cannot say much about this. If your
+  motherboard supports any wakeup tool you have to call that tool as
+  "Set wakeuptime command" with the "Wakeup time format" suitable for
+  that tool.
+  [1m11.5.3.  Wakeup the MySQL server using WOL.[0m
+
+  If your MySQL server and your Master backend are not on the same
+  machine, you can have the Master backend wake your MySQL server using
+  WOL. You will find the settings for this in mysql.txt. The meanings
+  are the same as discussed in "The WakeOnLan settings" above.
+
+
+  [1m11.5.4.  Tips/Tricks:[0m
+
+  If, for example, one of the Slave backends is also your desktop
+  computer, you could simply use a little script as 'server halt
+  command' which first calls /sbin/shutdown -t TIMEOUT where TIMEOUT is
+  a value sufficient for you to react.  You could then popup a window
+  using *dialog, asking for permission to shutdown. If you cancel the
+  shutdown, simply call /sbin/shutdown -c.
+
+  If you get "nvram-wakeup: /dev/rtc: Device or resource busy" your set-
+  wakeuptime-script should stop the program that uses /dev/rtc before
+  setting the wakeuptime.
+
+
   [1m12.  MythWeb.[0m
 
   The MythWeb allows you to use a web page to control various aspects of
@@ -3517,13 +3812,13 @@
 
 
 
-       $ tar -xjf mythweb-0.14.tar.bz2
-       $ cd mythweb-0.14
-       $ su
-       # mkdir /var/www/html/mythweb
-       # cp -r . /var/www/html/mythweb
-       # exit
-       $
+  $ tar -xjf mythweb-0.14.tar.bz2
+  $ cd mythweb-0.14
+  $ su
+  # mkdir /var/www/html/mythweb
+  # cp -r . /var/www/html/mythweb
+  # exit
+  $
 
 
 
@@ -3541,6 +3836,7 @@
        New password:
        Re-type new password:
        Adding password for user mythtv
+
 
 
   See the man page for [1mhtpasswd [22mfor more examples.
@@ -3575,15 +3871,16 @@
   load and install the application:
 
 
-       $ tar -xjf mythgallery-0.14.tar.bz2
-       $ cd mythgallery-0.14
-       $ ./configure --enable-opengl
-       $ qmake mythgallery.pro
-       $ make
-       # su
-       # make install
-       # exit
-       $
+
+  $ tar -xjf mythgallery-0.14.tar.bz2
+  $ cd mythgallery-0.14
+  $ ./configure --enable-opengl
+  $ qmake mythgallery.pro
+  $ make
+  # su
+  # make install
+  # exit
+  $
 
 
 
@@ -3607,6 +3904,7 @@
   removable device, it might be a good idea to use autofs.  See the
   automount howto at www.linuxdoc.org <www.linuxdoc.org> for info on how
   to get it working.
+
   If the item in the import path is an executable file, MythGallery will
   attempt to execute it with the destination directory as its sole
   argument.  Be careful when using executable scripts that the script
@@ -3618,32 +3916,33 @@
   Here is an example script that a user may want to run on import:
 
 
-       #!/bin/csh
 
-       if ($#argv == 0) then
-               echo "Usage: $0 dest_dir"
-               exit
-       endif
+  #!/bin/csh
 
-       cd $argv[1]
+  if ($#argv == 0) then
+          echo "Usage: $0 dest_dir"
+          exit
+  endif
 
-       # get stuff over the network
-       wget http://www.somesite.dom/dir/file1.jpg
-       wget http://www.somesite.dom/dir/file2.jpg
-       wget http://www.somesite.dom/dir/file3.jpg
+  cd $argv[1]
 
-       # stuff that requires manual module loading and/or fs mounting
-       modprobe camera_module
-       mount /dev/camera /mnt/camera
-       cp /mnt/camera/* $argv[1]
-       umount /mnt/camera
-       rmmod camera_module
+  # get stuff over the network
+  wget http://www.somesite.dom/dir/file1.jpg
+  wget http://www.somesite.dom/dir/file2.jpg
+  wget http://www.somesite.dom/dir/file3.jpg
 
-       # perform some processing
-       foreach pname (`ls *.jpg`)
-               jpegtran -flip vertical $pname > $pname.new
-               mv $pname.new $pname
-       end
+  # stuff that requires manual module loading and/or fs mounting
+  modprobe camera_module
+  mount /dev/camera /mnt/camera
+  cp /mnt/camera/* $argv[1]
+  umount /mnt/camera
+  rmmod camera_module
+
+  # perform some processing
+  foreach pname (`ls *.jpg`)
+          jpegtran -flip vertical $pname > $pname.new
+          mv $pname.new $pname
+  end
 
 
 
@@ -3670,7 +3969,6 @@
 
   +o  libcdaudio
 
-
   +o  CDParanoia
 
 
@@ -3683,15 +3981,14 @@
   <http://www.mars.org/home/rob/proj/mpeg/>  Save it to a directory you
   can find later.
 
-
-       $ tar -xzf mad-0.14.2b.tar.gz
-       $ cd mad-0.14.2b
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # exit
-       $
+  $ tar -xzf mad-0.14.2b.tar.gz
+  $ cd mad-0.14.2b
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # exit
+  $
 
 
 
@@ -3732,23 +4029,20 @@
   install:
 
 
-
-  $ tar -xzf libcdaudio-0.99.9.tar.gz
-  $ cd libcdaudio-0.99.9
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
-  $
+       $ tar -xzf libcdaudio-0.99.9.tar.gz
+       $ cd libcdaudio-0.99.9
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
+       $
 
 
 
   Download cdparanoia from http://www.xiph.org/paranoia/down.html
   <http://www.xiph.org/paranoia/download/cdparanoia-III-
   alpha9.8.src.tgz>.
-
-
        $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
        $ cd cdparanoia-III-alpha9.8
        $ ./configure
@@ -3811,8 +4105,6 @@
 
        # urpmi libfftw2 libfftw2-devel
 
-
-
   OpenGL should be installed on practically all distributions.  However,
   you will need the devel module.  In Mandrake 9.1 it may be installed
   by typing:
@@ -3865,6 +4157,7 @@
   prerequisites.  Run ./configure --help for help.
 
 
+
   ______________________________________________________________________
   NOTE for Red Hat users: Before compiling, make the following modification
   to settings.pro, otherwise the compile will fail:
@@ -3915,7 +4208,6 @@
   Genre/Artist/Album/Title Artist/Genre/Album/Title Artist/Album/Title
   (with Genre left as Unknown)
 
-
   The track number is optional but can be specified with the title by
   using the TRACK_TITLE keyword instead of TITLE.  If TRACK_TITLE is
   used, then the filename can have a space, hyphen, or underscore
@@ -3925,6 +4217,7 @@
 
   The Ignore_ID3 option does not disable the code that determines the
   track length, just the portion that tries to read ID3 info.
+
 
 
   [1m15.6.  Using MythMusic.[0m
@@ -4049,17 +4342,18 @@
   These are the keyboard commands for MythWeather:
 
 
-       Left Key             Goes back one page, and extends the time spent
-                            on the page you are on.
-       Right Key            Goes forward one page, see above.
-       Space                Pause, wait on the current page until space is hit
-                            again.
-       Numeric Keys         You can check other weather by keying in other ZIP codes.
-       Enter Key            Switch between Celsius and Fahrenheit. Can also
-                            be used a way to force a data update.
-       "m" Key              Resets the location to the database default, then updates the data.
-       "i"                  Enter / Save settings
-       ESC                  Exit the settings screen without saving / Exit the program
+
+  Left Key             Goes back one page, and extends the time spent
+                       on the page you are on.
+  Right Key            Goes forward one page, see above.
+  Space                Pause, wait on the current page until space is hit
+                       again.
+  Numeric Keys         You can check other weather by keying in other ZIP codes.
+  Enter Key            Switch between Celsius and Fahrenheit. Can also
+                       be used a way to force a data update.
+  "m" Key              Resets the location to the database default, then updates the data.
+  "i"                  Enter / Save settings
+  ESC                  Exit the settings screen without saving / Exit the program
 
 
 
@@ -4109,13 +4403,10 @@
   MPEG-2 to other formats which should greatly reduce the amount of
   space the DVD material takes up on your hard drive.
 
-
   MythDVD has a number of prerequisites to enable transcoding
   functionality.  If you only wish to play DVDs rather than convert them
   to something like MPEG-4 or xvid you may skip the prerequisite
   installation step.
-
-
   [1m18.1.  Manual Compilation of Prerequisites.[0m
 
 
@@ -4170,8 +4461,6 @@
      support SSE instructions for deinterlace support.  You may check
      this by doing a $ cat /proc/cpuinfo and looking for "sse" in the
      processor flags section.
-
-
 
   [1m20.2.  mythfilldatabase failing.[0m
 
@@ -4245,6 +4534,7 @@
   [1mLive TV [22moptions to 480 or 576 from their defaults.
 
 
+
   [1m20.6.  I keep losing all of my settings every time I compile![0m
 
   MythTV will overwrite any settings in /usr/local/share/mythtv.  If you
@@ -4301,16 +4591,13 @@
   Also, look for:
 
 
-
-  Section "Device"
-      Identifier "device1"
-      VendorName "nVidia Corporation"
-      BoardName "NVIDIA GeForce 256 (generic)"
-      Driver "nv"
-      Option "DPMS"
-  EndSection
-
-
+       Section "Device"
+           Identifier "device1"
+           VendorName "nVidia Corporation"
+           BoardName "NVIDIA GeForce 256 (generic)"
+           Driver "nv"
+           Option "DPMS"
+       EndSection
 
   In this case, you would need to either delete the Option "DPMS" line,
   or change it to # Option "DPMS" to comment it out.  The next time you
@@ -4364,11 +4651,14 @@
        $ xset -dpms s off
 
 
+
   Finally, depending on your distribution, you may be able to turn it
   off from within the control panel.
 
 
   [1m20.9.  I get segfaults / MythTV isn't doing anything.[0m
+
+
 
   [1m20.10.  Debugging with GDB.[0m
 
@@ -4427,7 +4717,8 @@
   Once at the (gdb) prompt, type run to start program execution.  When
   the program segfaults or appears to lock-up (press CTRL-C), type
 
-  (gdb) thread apply all bt full
+
+       (gdb) thread apply all bt full
 
 
 
@@ -4491,14 +4782,12 @@
   signal. This analog signal should then be sent to your speakers. Here
   is what is needed in alsamixer:
 
-
   CAPTUR source - the analog source to be sent to the DSP. This should
   be set to the input source from the tuner card to the sound card. In
   most cases this is Line but this could also be Aux, CD, Mic, etc.,
   depending on how you connect the input cable. This source should be
   muted to prevent patching through the analog sound. The volume of this
   source will not affect the record level.
-
   Capture mixer - this sets the level for the analog to digital
   recording.  While a volume of 100% is recommended for testing,
   distortion may occur.  Lowering this level to 75% to 85% may result in
@@ -4562,6 +4851,7 @@
   sound card, or will need to get btaudio ``operational''.
 
 
+
   [1m20.14.  My remote doesn't work / works sometimes and not others /[0m
   [1m"ghost" keypresses.[0m
 
@@ -4618,7 +4908,6 @@
   extension=mysql.so
 
   Restart apache for it to take effect.
-
 
 
   [1m20.19.  error: can't find a register in class 'BREG' while reloading[0m
@@ -4684,7 +4973,6 @@
 
   [1m20.25.  When trying to run setup, I get an error like this: "./setup:[0m
   [1merror while loading shared libraries:"[0m
-
 
   You didn't add /usr/local/lib to /etc/ld.so.conf.  See the section on
   modifying ``/etc/ld.so.conf''.
@@ -4822,8 +5110,6 @@
        $ cat audout > audio.raw &
        $ cat vidout > video.yuv
 
-
-
   [1m21.2.  I'd like to use some other window manager.[0m
 
   MythTV is not dependent on any particular window manager.  If you wish
@@ -4955,6 +5241,7 @@
   image inside the screen. Underscan is useful for computer monitors so
   that toolbars and scrollbars at the edges can be seen.
 
+
   For best results, match the X display area as close as possible to the
   edges of the physical screen. This can only be adjusted by your tv-out
   device or by the settings for the television set. Many sets have these
@@ -5072,8 +5359,8 @@
   channel 15:
 
 
-  $ mysql -u root mythconverg
-  mysql> delete from channel where chanid = '1015';
+       $ mysql -u root mythconverg
+       mysql> delete from channel where chanid = '1015';
 
 
 
@@ -5082,8 +5369,8 @@
   the channel that has been removed:
 
 
-       $ mysql -u root mythconverg
-       mysql> delete from program where chanid = '1015';
+  $ mysql -u root mythconverg
+  mysql> delete from program where chanid = '1015';
 
 
 
@@ -5133,14 +5420,17 @@
        ^D
        $
 
+
+
   The following also works with blackbox:
 
 
-       $ cat > .xinitrc
-       xset -dpms s off &
-       irxevent &
-       mythfrontend &
-       blackbox
+
+  $ cat > .xinitrc
+  xset -dpms s off &
+  irxevent &
+  mythfrontend &
+  blackbox
 
 
 
@@ -5194,6 +5484,7 @@
 
   Use [1mchkconfig [22mto make sure the script is called when entering
   runlevels 3, 4 or 5:
+
 
 
   $ su
@@ -5306,9 +5597,9 @@
 
   MythTV is flexible in the way that you define multiple backend tuner
   configurations.  The only hard-and-fast rule is that the Master
-  Backend [4mmust[24m have a capture device defined, but shouldn't imply that
-  the capture device in the MBE must be the first capture card defined
-  in the database.
+  backend [4mmust[24m have a capture device defined, but shouldn't imply that
+  the capture device in the Master backend must be the first capture
+  card defined in the database.
 
   One example of an advanced configuration is the round-robin scheme.
   Rather than defining all of the cards on the master, you could first
@@ -5427,10 +5718,18 @@
 
 
 
-  2.  Change the hostname.  For most distributions, edit the
-  /etc/sysconfig/network file.  Look for HOSTNAME=frontend1 and change
-  this to HOSTNAME=kidsroom or whatever you'll be using.  To alter the
-  hostname in the current session, run:
+  2.  Change the hostname.
+
+  For Red Hat and derived distributions, edit the /etc/sysconfig/network
+  file.  Look for HOSTNAME=frontend1 and change this to
+  HOSTNAME=kidsroom or whatever you'll be using.  For other
+  distributions, refer to the documentation, such as the
+
+  hostname(1)
+
+
+
+  To alter the hostname in the current session, run:
 
 
        # hostname kidsroom
@@ -5497,13 +5796,11 @@
   8.  Quit and restart all frontends.  Delete the mythtv_backup.sql and
   mythtv_restore.sql files.
 
-
   [1m21.15.  Can I run MythTV on my TiVo?[0m
 
   [1m21.16.  Can I run MythTV on my ReplayTV?[0m
 
   No.
-
 
   While it is true that the TiVo runs the Linux kernel, and TiVo has
   released their changes to the kernel under the GPL, the TiVo is [4mnot[24m a
@@ -5560,12 +5857,13 @@
   following commands:
 
 
-       $ cd ivtv/utils
-       $ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_17_21288.exe
-       $ su
-       # ./ivtvfwextract.pl pvr250_17_21288.exe
-       # exit
-       $ cd ../driver
+
+  $ cd ivtv/utils
+  $ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_17_21288.exe
+  $ su
+  # ./ivtvfwextract.pl pvr250_17_21288.exe
+  # exit
+  $ cd ../driver
 
 
 
@@ -5629,7 +5927,6 @@
   'inc_use' specified in initializer then you didn't uncomment CFLAGS as
   specified ``above''.
 
-
   Add the following to /etc/modules.conf: [1mNOTE[22m:  You do not need to add
   the last line "add above..." if you will not be using the IR remote
   that came with the card.
@@ -5684,20 +5981,18 @@
        # exit
 
 
-
   Check that the card is being recognized on the PCI bus:
 
 
+       $ lspci -v
+       <snip>
 
-  $ lspci -v
-  <snip>
-
-  00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
-  Encoder (rev 01)
-          Subsystem: Hauppauge computer works Inc.: Unknown device 4801
-          Flags: bus master, medium devsel, latency 32, IRQ 11
-          Memory at d0000000 (32-bit, prefetchable) [size=64M]
-          Capabilities: <available only to root>
+       00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
+       Encoder (rev 01)
+               Subsystem: Hauppauge computer works Inc.: Unknown device 4801
+               Flags: bus master, medium devsel, latency 32, IRQ 11
+               Memory at d0000000 (32-bit, prefetchable) [size=64M]
+               Capabilities: <available only to root>
 
 
 
@@ -5808,12 +6103,14 @@
 
 
 
-       $ su
-       # uname -a
-       Linux frontend 2.4.22-9mdk #1 sam sep 13 06:54:11 CEST 2003 i686 unknown
-       unknown GNU/Linux
-       # rpm -qa|grep kernel-source
-       kernel-source-2.4.22-9mdk
+  $ su
+  # uname -a
+  Linux frontend 2.4.22-9mdk #1 sam sep 13 06:54:11 CEST 2003 i686 unknown
+  unknown GNU/Linux
+  # rpm -qa|grep kernel-source
+  kernel-source-2.4.22-9mdk
+
+
 
   If you've already installed LIRC from the Mandrake packages, it's
   going to be version 0.6.6, and that won't work.  Uninstall it:
@@ -5879,6 +6176,7 @@
        # rm -rf /usr/bin/irw /usr/local/bin/irw
 
 
+
   Download the lirc-0.7.0pre2 tarball:
 
 
@@ -5929,8 +6227,6 @@
 
   As a part of the make install process, LIRC will create the
   appropriate device for you in /dev.  Check to make sure:
-
-
        $ ls -l /dev/lirc*
        crw-r--r--    1 root     root      61,   0 Sep 18 15:36 /dev/lirc
        srw-rw-rw-    1 root     root            0 Sep 18 15:38 /dev/lircd=
@@ -5994,6 +6290,7 @@
      running modprobe -r lirc_i2c as root first, then modprobe lirc_i2c
      and try again.
 
+
   +o  What path does modinfo lirc_i2c and modinfo lirc_dev show?  It
      should be in /lib/modules/{your kernel version}/misc/
 
@@ -6005,9 +6302,10 @@
   settings.pro file and recompile.  Your settings.pro should look like
   this:
 
-  # Native lirc support
-  CONFIG += using_lirc
-  EXTRA_LIBS += -llirc_client
+
+       # Native lirc support
+       CONFIG += using_lirc
+       LIRC_LIBS = -llirc_client
 
 
 
@@ -6052,6 +6350,7 @@
   You should now have native LIRC support within MythTV.
 
 
+
   [1m22.3.  Logical Volume Manager (LVM).[0m
 
   LVM greatly increases the flexibility you have in managing your
@@ -6065,7 +6364,6 @@
   If you don't understand how to partition a drive, or how to change the
   partition type you should stop and look at documentation on how to
   perform these steps.
-
 
   [1mBIG FAT WARNING[22m:  Using an incorrect parameter can make your files
   inaccessible, prevent your computer from booting, etc.  Be careful!
