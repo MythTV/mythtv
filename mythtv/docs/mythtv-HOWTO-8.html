@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
- <TITLE>Installing and using mythtv: Setting up a remote control.</TITLE>
+ <TITLE>Installing and using MythTV: Setting up a remote control.</TITLE>
  <LINK HREF="mythtv-HOWTO-9.html" REL=next>
  <LINK HREF="mythtv-HOWTO-7.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc8" REL=contents>
@@ -14,10 +14,10 @@
 <HR>
 <H2><A NAME="s8">8.</A> <A HREF="mythtv-HOWTO.html#toc8">Setting up a remote control.</A></H2>
 
-<P>mythtv does not have native remote control receiver and decoder software
+<P>MythTV does not have native remote control receiver and decoder software
 built-in.  Instead, remote control functions are implemented by cooperating
 with <B>lirc</B>, the Linux Infra Red Control program.  <B>lirc</B>
-handles the IR hardware and passes keystrokes to mythtv, which then acts as
+handles the IR hardware and passes keystrokes to MythTV, which then acts as
 if the user had pressed the keys on the keyboard.</P>
 <P>Some IR devices require a kernel recompile, and some don't. However, all at
 least require having the kernel source available as a resource for the lirc
@@ -268,7 +268,7 @@ appropriate configuration file for your remote into <CODE>/etc/lircd.conf</CODE>
 file maps the buttons on the remote control to the IR pulses coming from the
 receiver.</P>
 <P>The next step is to convert those signals into something that can be used
-to control mythtv.
+to control MythTV.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cd ~/mythtv-0.7/configfiles
@@ -297,7 +297,7 @@ to troubleshoot further by going back to the lirc home page and investigating
 from there.</P>
 <P>If it is working, then press <B>CTRL-C</B> to abort the program.  Once you
 know that your remote is working, you need to run the <B>irxevent</B>
-program, which takes the key presses and sends them to mythtv. 
+program, which takes the key presses and sends them to MythTV. 
 <B>irxevent</B>
 isn't a daemon, so if you know that your remote is working you need to
 invoke it like this: 
@@ -307,9 +307,9 @@ $ irxevent &amp;
 </PRE>
 </CODE></BLOCKQUOTE>
 
-If <B>irxevent</B> isn't running, then mythtv will not respond to your remote
+If <B>irxevent</B> isn't running, then MythTV will not respond to your remote
 control.</P>
-<P>Currently, mythtv doesn't have native support for controlling the mixer
+<P>Currently, MythTV doesn't have native support for controlling the mixer
 volume and mute settings.  A workaround at this time is to invoke the
 <B>amixer</B> program.  If you wish to define keys to control the mixer,
 the <B>irexec</B> program can accomplish this fairly easily.  The
@@ -322,7 +322,7 @@ an external program from a remote control button.</P>
 <P>Take a look at the lircrc.example files in the <CODE>configfiles/</CODE>
 directory.  In my case, (Pinnacle Studio card) the channel up and down functions
 weren't working, due to the fact that the button names were different than
-the default <CODE>lircrc.example</CODE> file that came with mythtv.</P>
+the default <CODE>lircrc.example</CODE> file that came with MythTV.</P>
 <P>The <CODE>lircrc.example</CODE> file has this:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -376,7 +376,7 @@ remote defines the button names.</P>
 <P>By examining the button names defined in <CODE>/etc/lircd.conf</CODE> and using
 the <B>irw</B> program to make sure that your remote is working, you can
 create the appropriate mappings in <CODE>.lircrc</CODE> to get excellent remote
-functionality with mythtv.</P>
+functionality with MythTV.</P>
 
 <H2><A NAME="ss8.7">8.7</A> <A HREF="mythtv-HOWTO.html#toc8.7">Configuring lirc for use with an IR blaster.</A>
 </H2>
@@ -388,7 +388,7 @@ IR-200L
 <A HREF="http://store.yahoo.com/snapstreammedia/irblasbun.html">http://store.yahoo.com/snapstreammedia/irblasbun.html</A>. It was
 originally designed for IRDA communication, but can be used to transmit A/V remote
 control codes. By using the lirc SIR driver, this device can easily be
-integrated with mythtv. I have tested this device with an AT&amp;T DCT2000
+integrated with MythTV. I have tested this device with an AT&amp;T DCT2000
 digital cable box but the instructions can be used to configure other IRDA
 devices and A/V remotes.</P>
 <P>Follow the steps in the previous section.  When you run setup.sh, select
@@ -485,11 +485,11 @@ str ExternalChannelCommand=/usr/local/bin/change_channel
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>This csh script will be called each time mythtv needs to change the channel.
+<P>This csh script will be called each time MythTV needs to change the channel.
 Below is a copy of the script followed by the corresponding perl script.
 Make sure both are in your path. Also make sure you leave the #!/bin/csh
 setting and not change it to bourne or bash. This will create a frustrating
-symptom to diagnose where mythtv cannot open /dev/device. Unlike bourne or
+symptom to diagnose where MythTV cannot open /dev/device. Unlike bourne or
 bash, csh scripts automatically close parent file descriptors before they
 start.</P>
 <P>

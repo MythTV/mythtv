@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
- <TITLE>Installing and using mythtv: Configuring mythtv. </TITLE>
+ <TITLE>Installing and using MythTV: Configuring MythTV. </TITLE>
  <LINK HREF="mythtv-HOWTO-10.html" REL=next>
  <LINK HREF="mythtv-HOWTO-8.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc9" REL=contents>
@@ -12,11 +12,11 @@
 <A HREF="mythtv-HOWTO-8.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc9">Contents</A>
 <HR>
-<H2><A NAME="Configuring_mythtv"></A> <A NAME="s9">9.</A> <A HREF="mythtv-HOWTO.html#toc9">Configuring mythtv. </A></H2>
+<H2><A NAME="Configuring_mythtv"></A> <A NAME="s9">9.</A> <A HREF="mythtv-HOWTO.html#toc9">Configuring MythTV. </A></H2>
 
 <P>By this point, all of the prerequisites have been installed,
 <B>mysql</B> is running and has had its initial database setup.  It's now
-time to configure mythtv.</P>
+time to configure MythTV.</P>
 
 <H2><A NAME="ss9.1">9.1</A> <A HREF="mythtv-HOWTO.html#toc9.1">Editing the settings.txt file.</A>
 </H2>
@@ -38,14 +38,14 @@ $ su
 </CODE></BLOCKQUOTE>
 </P>
 <P>The <CODE>settings.txt</CODE> file is fairly self-explanatory. 
-Currently, mythtv supports two different video encoders, MPEG4 and RTJPEG. 
+Currently, MythTV supports two different video encoders, MPEG4 and RTJPEG. 
 Take note that RTJPEG has lower CPU demands, but makes large files, and MPEG4
 has high CPU demands, but makes smaller files.</P>
 <P><B>NOTE</B>: although the width and height can be changed to almost
-anything, if you start mythtv and don't see video or you get "segmentation
+anything, if you start MythTV and don't see video or you get "segmentation
 fault" errors, it is likely that the video4linux (v4l) subsystem did not
 like the height and width parameters specified.  It's best to leave the
-default as-is until you're sure that mythtv is operational.</P>
+default as-is until you're sure that MythTV is operational.</P>
 <P>
 <A NAME="deinterlace_"></A> <B>NOTE</B>: the <CODE>int Deinterlace=1</CODE>
 variable controls the deinterlacer.  Support for deinterlacing requires that
@@ -114,7 +114,7 @@ for your country, but you <B>do</B> have an XML formatted listings file
 created by some other program.</P>
 <P><B>mythfilldatabase --xawchannels</B> is an option if you have used
 <B>xawtv</B> to fine-tune your channels and would like to import the fine
-tuning offsets into mythtv.</P>
+tuning offsets into MythTV.</P>
 
 
 <H3>Setting <B>mythfilldatabase</B> to run from <B>cron</B></H3>

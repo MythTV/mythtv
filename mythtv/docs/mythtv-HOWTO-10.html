@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
- <TITLE>Installing and using mythtv: Using mythtv.</TITLE>
+ <TITLE>Installing and using MythTV: Using MythTV.</TITLE>
  <LINK HREF="mythtv-HOWTO-11.html" REL=next>
  <LINK HREF="mythtv-HOWTO-9.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc10" REL=contents>
@@ -12,23 +12,23 @@
 <A HREF="mythtv-HOWTO-9.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc10">Contents</A>
 <HR>
-<H2><A NAME="s10">10.</A> <A HREF="mythtv-HOWTO.html#toc10">Using mythtv.</A></H2>
+<H2><A NAME="s10">10.</A> <A HREF="mythtv-HOWTO.html#toc10">Using MythTV.</A></H2>
 
-<P><B>mythfrontend</B> is the main interface to the mythtv program.  This
+<P><B>mythfrontend</B> is the main interface to the MythTV program.  This
 program allows you to choose which of the other modules you'd like to run
 and ensures that programs that you've scheduled for recording actually get
 recorded, so it's important that this program is always running.</P>
 
 
-<H2><A NAME="ss10.1">10.1</A> <A HREF="mythtv-HOWTO.html#toc10.1">Using themes with mythtv.</A>
+<H2><A NAME="ss10.1">10.1</A> <A HREF="mythtv-HOWTO.html#toc10.1">Using themes with MythTV.</A>
 </H2>
 
-<P>mythtv is "themeable", meaning that the visual appearance of the program
+<P>MythTV is "themeable", meaning that the visual appearance of the program
 can be modified by the user without re-compiling or altering the program
 functionality.
 <CODE>/usr/local/share/mythtv/theme.txt</CODE> allows you to alter the theme
-for mythtv.  The default theme is called "blue".  Other themes that ship
-with mythtv can be found in the <CODE>/usr/local/share/mythtv/themes</CODE>
+for MythTV.  The default theme is called "blue".  Other themes that ship
+with MythTV can be found in the <CODE>/usr/local/share/mythtv/themes</CODE>
 directory.  Change the first variable in the <CODE>theme.txt</CODE> file and
 exit and restart <B>mythfrontend</B> for it to take effect.</P>
 <P><B>NOTE</B>: Exiting <B>mythfrontend</B> will stop any recordings you
@@ -49,7 +49,7 @@ the author.</P>
 <H2><A NAME="ss10.3">10.3</A> <A HREF="mythtv-HOWTO.html#toc10.3">Adding support for an external tuner.</A>
 </H2>
 
-<P>mythtv supports changing the channel on an external tuner.  If you have
+<P>MythTV supports changing the channel on an external tuner.  If you have
 an external tuner, such as a DirecTV or digital cable set top box, the
 following command should be added to your settings.txt file:
 <BLOCKQUOTE><CODE>
@@ -58,8 +58,8 @@ str ExternalChannelCommand=/usr/local/bin/changechannel
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>The <B>changechannel</B> program is not supplied with mythtv, so this is
-going to be dependant on what sort of external tuner you have.  Example
+<P>The <B>changechannel</B> program is not supplied with MythTV, so this is
+going to be dependent on what sort of external tuner you have.  Example
 scripts for Sony and RCA receivers can be obtained from 
 <A HREF="http://tarek.2y.net/myth/">http://tarek.2y.net/myth/</A>.  This is currently an external
 user-supplied program, so if you have issues with the script, please contact

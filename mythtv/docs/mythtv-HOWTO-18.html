@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
- <TITLE>Installing and using mythtv: Miscellaneous.</TITLE>
+ <TITLE>Installing and using MythTV: Miscellaneous.</TITLE>
  <LINK HREF="mythtv-HOWTO-17.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc18" REL=contents>
 </HEAD>
@@ -13,12 +13,12 @@ Next
 <HR>
 <H2><A NAME="s18">18.</A> <A HREF="mythtv-HOWTO.html#toc18">Miscellaneous.</A></H2>
 
-<H2><A NAME="ss18.1">18.1</A> <A HREF="mythtv-HOWTO.html#toc18.1">I'd like to watch the files without using mythtv / I'd like to convert the files to some other format.</A>
+<H2><A NAME="ss18.1">18.1</A> <A HREF="mythtv-HOWTO.html#toc18.1">I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.</A>
 </H2>
 
 <P>Matthew Zimmerman has created a patch for MPlayer / Mencoder
 <A HREF="http://www.mplayerhq.hu">http://www.mplayerhq.hu</A> that allows
-you view the files created by mythtv.  Mythtv doesn't use standard
+you view the files created by MythTV.  MythTV doesn't use standard
 Nupplevideo files, which is why you MPlayer complains if you try to view
 them.</P>
 <P>Download the patch to MPlayer from Matt's website. 
@@ -47,11 +47,11 @@ process.</P>
 <H2><A NAME="ss18.2">18.2</A> <A HREF="mythtv-HOWTO.html#toc18.2">I'd like to use some other window manager.</A>
 </H2>
 
-<P>mythtv is not dependent on any particular window manager.  If you wish to
+<P>MythTV is not dependent on any particular window manager.  If you wish to
 run a lightweight window manager, the <CODE>configfiles/</CODE> directory has an
 example of a <CODE>.twmrc</CODE> file you may use.</P>
 
-<H2><A NAME="ss18.3">18.3</A> <A HREF="mythtv-HOWTO.html#toc18.3">I'd like mythtv to automatically startup.</A>
+<H2><A NAME="ss18.3">18.3</A> <A HREF="mythtv-HOWTO.html#toc18.3">I'd like MythTV to automatically startup.</A>
 </H2>
 
 <P>Here's an example submitted to the mythtv-dev list by Pat Pflaum
@@ -87,13 +87,13 @@ mysql> quit
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss18.5">18.5</A> <A HREF="mythtv-HOWTO.html#toc18.5">I'd like to start using the development version of mythtv.</A>
+<H2><A NAME="ss18.5">18.5</A> <A HREF="mythtv-HOWTO.html#toc18.5">I'd like to start using the development version of MythTV.</A>
 </H2>
 
 <P>[Content under development]</P>
 <P><B>NOTE</B>:It should be clear that using the development version of
-mythtv may cause loss of data on your system.  There is no guarantee that the development
-version of mythtv will work for you.</P>
+MythTV may cause loss of data on your system.  There is no guarantee that the development
+version of MythTV will work for you.</P>
 <P><B>THERE IS NO GUARANTEE THAT THESE INSTRUCTIONS WILL WORK.  USE AT YOUR
 OWN RISK.</B></P>
 <P>Here are some of the features in version 0.8:
@@ -104,14 +104,14 @@ front-end is responsible for displaying the video.  This allows you to put a
 lightweight, quiet, diskless and fanless machine in "the living room", with a large server-type
 machine in "the basement".  The front-end and back-end communicate over TCP
 on a specified port.</LI>
-<LI>GUI-based configuration.  Much of the configuration of mythtv can now
+<LI>GUI-based configuration.  Much of the configuration of MythTV can now
 be done using a GUI-based setup, avoiding the necessity to edit the
 <CODE>settings.txt</CODE> file.</LI>
-<LI>Themes.  mythtv now has more themes for the user to choose from.</LI>
+<LI>Themes.  MythTV now has more themes for the user to choose from.</LI>
 <LI>Recording profiles.  You may now setup various encoder profiles from
 the GUI, giving you the flexibility to record programs using various quality
 levels.</LI>
-<LI>Increased hardware encoder support.  mythtv can now use the MJPEG
+<LI>Increased hardware encoder support.  MythTV can now use the MJPEG
 encoder/decoder found on Matrox G200 series cards.  This greatly reduces the
 CPU utilization.</LI>
 </UL>
@@ -120,8 +120,8 @@ CPU utilization.</LI>
 should have accompanying solutions.</P>
 <P>Before you begin, shutdown all running instances of 0.7.  You should perform
 a <CODE>make clean distclean</CODE> before starting the compile process.</P>
-<P>Compile and install the system as you would mythtv 0.7 by following the
-instructions found in this HOWTO.  If you are installing mythtv on a new
+<P>Compile and install the system as you would MythTV 0.7 by following the
+instructions found in this HOWTO.  If you are installing MythTV on a new
 machine, install the database by running the <CODE>database/mc.sql</CODE>
 script as detailed in earlier sections of this document.</P>
 <P>However, if you are upgrading an existing 0.7 system, you <EM>must</EM> run the
@@ -142,7 +142,7 @@ $ ./setup
 </P>
 <P>This will open the setup wizard which will allow you to graphically
 configure your system.</P>
-<P>Once the setup wizard is done: to run the new version of mythtv, you must
+<P>Once the setup wizard is done: to run the new version of MythTV, you must
 first start the back-end server:</P>
 <P>
 <BLOCKQUOTE><CODE>
@@ -161,15 +161,15 @@ $ mythfrontend
 <P>You should see the connection established between the front-end and back-end
 systems by examining the mythbackend window; it will display the client
 connection attempts.</P>
-<P>The cvs version of mythtv now supports pressing the ESC key to exit the
-application.  If you wish to configure mythtv to exit on ESC, go to
-the mythfrontend setup screen (not the setup program used to initially
-configure mythtv) and enter the General configuration screen.  Move through
-the setup until you get to the System Shutdown parameter.  By default, this
-is set to "No", which means there is no defined exit key for mythtv.  If you
-set it to "No Modifier", this will mean that the ESC key is used to exit
-mythtv.  Control, Meta and ALT modifiers mean that the Modifier + ESC key
-must be pressed to activate the exit from mythtv.</P>
+<P>The cvs version of MythTV now supports pressing the ESC key to exit the
+application.  If you wish to configure MythTV to exit on ESC, go to the
+mythfrontend setup screen (not the setup program used to initially configure
+MythTV) and enter the General configuration screen.  Move through the setup
+until you get to the System Shutdown parameter.  By default, this is set to
+"No exit key", which means there is no defined exit key for MythTV.  If you
+set it to "ESC", this will mean that the ESC key is used to exit
+MythTV.  Control, Meta and ALT modifiers mean that the Modifier + ESC key
+must be pressed to activate the exit from MythTV function.</P>
 
 <HR>
 Next

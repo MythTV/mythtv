@@ -1,11 +1,11 @@
 <!doctype linuxdoc system>
 <article>
 
-<title>Installing and using mythtv
+<title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
 <date>2003-01-13, v1.073
 <abstract>
-Initially, installation of mythtv seems like a huge task.  There are lots
+Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
 different ways.  This document will attempt to give general installation
 instructions, as well as including distribution-specific instructions where
@@ -15,11 +15,11 @@ necessary.
 <toc>
 
 <sect>How to obtain this document.
-<p>This HOWTO document is maintained at the primary mythtv website:  <url url="
+<p>This HOWTO document is maintained at the primary MythTV website:  <url url="
 http://www.mythtv.org" name="http://www.mythtv.org">.  The latest version of
 this document can be found in CVS, accessible either through the <url
 url="http://www.mythtv.org/cgi-bin/viewcvs.cgi/" name="ViewCVS"> web interface, or directly from the
-CVS repository.  You may download the latest copy of mythtv and the 
+CVS repository.  You may download the latest copy of MythTV and the 
 documentation from CVS this way:
 <tscreen><verb>
 $ mkdir mythtv
@@ -31,15 +31,15 @@ $ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/cvs checkout MC
 </verb></tscreen>
 This documentation will be in the <tt>docs/</tt> subdirectory.
 
-<bf>NOTE</bf>: If you are going to use CVS to compile mythtv rather than using
+<bf>NOTE</bf>: If you are going to use CVS to compile MythTV rather than using
 the distribution tarballs, it is <bf>strongly</bf> recommended that you <url
 url="http://www.snowman.net/mailman/listinfo/mythtv-commits/" name="join">
 the mythtv-dev mailing list.
 
-This HOWTO is for mythtv v0.7.
+This HOWTO is for MythTV v0.7.
 
 <sect>Introduction.
-<p>This HOWTO document will focus on mythtv in a North American environment.
+<p>This HOWTO document will focus on MythTV in a North American environment.
 If you have installation instructions for a different region or Linux
 distribution, please send them to the author so that it can be included in other
 versions of this document.
@@ -55,7 +55,7 @@ The contributors for this document are:
 
 <sect>Checking prerequisites. 
 <sect1>Hardware. 
-<p>mythtv is a software video encoder, which means that it uses a fairly
+<p>MythTV is a software video encoder, which means that it uses a fairly
 generic "dumb" video capture card to get frames of video, encodes them using
 the CPU on your motherboard and writes them to disk.  High-end video capture
 cards and devices like the Tivo and RePlay have dedicated encoder chips
@@ -67,15 +67,15 @@ compared to encoding video, which is why a device like a Series 1 Tivo can
 run with only 16MB of RAM and a 54Mhz CPU.
 
 Currently, there are no known MPEG-2 encoder cards that have video4linux
-drivers which would be suitable for use with mythtv.  Once the drivers are
+drivers which would be suitable for use with MythTV.  Once the drivers are
 written, support for hardware MPEG-2 encoders can be integrated.
 
 There are many variables that go into the question: "How fast a CPU do I
-need to run mythtv"?  Obviously, the faster your CPU, the better your
-experience will be with mythtv.  Performing the "Watch TV" function, where
+need to run MythTV"?  Obviously, the faster your CPU, the better your
+experience will be with MythTV.  Performing the "Watch TV" function, where
 the CPU is both encoding and decoding video simultaneously to allow Pause,
 Fast Forward and Rewind functions for live TV requires more CPU then just
-encoding or decoding.  mythtv also supports multiple encoder cards in a
+encoding or decoding.  MythTV also supports multiple encoder cards in a
 single PC, thereby increasing the CPU requirements if you plan on
 simultaneously encoding multiple programs.
 
@@ -110,19 +110,19 @@ use the graphical tools that come with your distribution, or you can use
 command-line utilities.  Either system will get the job done, and it all
 depends on your comfort level with Linux.
 
-<bf>NOTE</bf>: If you are using mythtv on multiple systems, at least one of
+<bf>NOTE</bf>: If you are using MythTV on multiple systems, at least one of
 them will maintain the master database and will need mysql installed.  
 
-In order to compile mythtv, we need to make sure that the software it needs
+In order to compile MythTV, we need to make sure that the software it needs
 is installed.  As of 2002-12-17, this list includes <bf>perl</bf>,
 <bf>mysql</bf>, <bf>gcc</bf>, <bf>freetype2-devel</bf>,
 <bf>XFree86-devel</bf> and <bf>qt-devel</bf>.  If you're going to use a
-remote control with mythtv, you're going to need the <bf>cdialog</bf>
+remote control with MythTV, you're going to need the <bf>cdialog</bf>
 package in order to compile <bf>lircd</bf>.
 
 There appears to be issues with ALSA and simultaneously recording and playing 
-sound, which is a core requirement for mythtv.  If you are not running 
-ALSA 0.9.0rc6 and experience lock-ups of your system when trying to use mythtv, 
+sound, which is a core requirement for MythTV.  If you are not running 
+ALSA 0.9.0rc6 and experience lock-ups of your system when trying to use MythTV, 
 then please check the main ALSA website and upgrade to the latest version,
 or see if your distribution has already packaged the latest ALSA drivers.
 
@@ -157,7 +157,7 @@ Search for XFree86-devel.
 Finally, check for qt.  You'll need libqt3-devel (under folder "KDE and
 Qt") and libqt3 ("Libraries").
 
-Make sure that cdialog is installed if you want to use mythtv with a remote
+Make sure that cdialog is installed if you want to use MythTV with a remote
 control.
 
 alsa-utils is needed for setting the volume.
@@ -312,7 +312,7 @@ of time, even on a fast machine if you have to do a full KDE build.
 <sect>Setting up paths, ldconfig and other shell variables. <label
 id="Setting_up_paths">
 <p>There are some paths that need to be modified before starting the main
-compile of mythtv, otherwise you will get errors.
+compile of MythTV, otherwise you will get errors.
 
 <sect1>Distribution-specific information. <label
 id="Distribution-specific_information">
@@ -396,7 +396,7 @@ run it if you get an unexpected error about not finding libraries.
 
 <sect>Downloading and compiling.
 
-<p>Get mythtv from the <url url="http://www.mythtv.org" name="mythtv.org">
+<p>Get MythTV from the <url url="http://www.mythtv.org" name="mythtv.org">
 web site.  Save the tarball to a directory you can find.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
@@ -522,8 +522,8 @@ $ su
 # exit
 </verb></tscreen>
 
-<sect1>Manually building mythtv.
-<p>Unpack mythtv
+<sect1>Manually building MythTV.
+<p>Unpack MythTV
 <tscreen><verb>
 $ tar -xjf mythtv-0.7.tar.bz2
 $ cd mythtv-0.7
@@ -536,7 +536,7 @@ within the themes directory, otherwise your on screen display (OSD) will be
 "generic" rather than themed.  The solution is to edit the Makefile within
 the themes directory and comment out (using a # symbol before each line)
 every line that starts with the word "strip". Make sure you switch back to
-the mythtv build directory before executing the next step.
+the MythTV build directory before executing the next step.
 
 Switch to superuser:
 <tscreen><verb>
@@ -546,7 +546,7 @@ $ su
 </verb></tscreen>
 
 <sect1>Gentoo. <label id="Gentoo_build">
-<p>Installation of mythtv on Gentoo consists of making a local portage
+<p>Installation of MythTV on Gentoo consists of making a local portage
 directory with the necessary ebuild and digest files.  Tony Clark <url
 url="mailto:tclark@telia.net"> has
 created a portage file which can be downloaded from
@@ -602,7 +602,7 @@ mysql_install_db as root.
 
 <sect1>Setting up the initial database.
 <p>This step is only required for systems that will be maintaining a
-database of listings.  If you are running multiple mythtv systems you can
+database of listings.  If you are running multiple MythTV systems you can
 either have one master database read by all the other systems, or you can
 have each system maintaining its own.  To setup the initial mysql databases:
 <tscreen><verb>
@@ -635,7 +635,7 @@ $ su
 
 <p>If your video doesn't appear to be in-sync with your audio, it could be
 because you are listening to the real-time audio from your video card rather
-than after it's been processed and synchronized to the video by mythtv.
+than after it's been processed and synchronized to the video by MythTV.
 
 What you need to do is to mute the "line-in" of your sound card and also
 set it as the recording source.
@@ -662,7 +662,7 @@ the settings so that this is your default.
 <sect3>Using OSS drivers.
 
 <p>Red Hat Linux 8.0 ships with OSS sound drivers rather than the ALSA
-drivers recommended by the mythtv team. The OSS drivers do work for some
+drivers recommended by the MythTV team. The OSS drivers do work for some
 people, and for some cards, but others report problems (sync and jitter)
 with OSS. In addition, OSS does not support full duplex on some cards, which
 is required if you want to record and play sound using just one sound card.
@@ -671,7 +671,7 @@ ALSA has good full duplex support, and also has drivers for some built-in
 than you might think, so we encourgage you to go that route. For those of
 you who do not wish to install ALSA you must do this:
 
-To configure sound to work with mythtv, select 
+To configure sound to work with MythTV, select 
 <verb>RedHat Menu>Sound & Video>Volume Control</verb>
 to open up a mixer. Make sure your global volume (on the far left)
 is up. Also make sure that the "line in" section has "mute" and "record"
@@ -822,10 +822,10 @@ to mute it.  You can now press ESC to exit out of the <bf>alsamixer</bf>
 program.
  
 <sect>Setting up a remote control.
-<p>mythtv does not have native remote control receiver and decoder software
+<p>MythTV does not have native remote control receiver and decoder software
 built-in.  Instead, remote control functions are implemented by cooperating
 with <bf>lirc</bf>, the Linux Infra Red Control program.  <bf>lirc</bf>
-handles the IR hardware and passes keystrokes to mythtv, which then acts as
+handles the IR hardware and passes keystrokes to MythTV, which then acts as
 if the user had pressed the keys on the keyboard.
 
 Some IR devices require a kernel recompile, and some don't. However, all at
@@ -1039,7 +1039,7 @@ file maps the buttons on the remote control to the IR pulses coming from the
 receiver.
 
 The next step is to convert those signals into something that can be used
-to control mythtv.
+to control MythTV.
 <tscreen><verb>
 $ cd ~/mythtv-0.7/configfiles
 $ cp lircrc.example ~/.lircrc
@@ -1060,17 +1060,17 @@ from there.
 
 If it is working, then press <bf>CTRL-C</bf> to abort the program.  Once you
 know that your remote is working, you need to run the <bf>irxevent</bf>
-program, which takes the key presses and sends them to mythtv. 
+program, which takes the key presses and sends them to MythTV. 
 <bf>irxevent</bf>
 isn't a daemon, so if you know that your remote is working you need to
 invoke it like this: 
 <tscreen><verb>
 $ irxevent &
 </verb></tscreen>
-If <bf>irxevent</bf> isn't running, then mythtv will not respond to your remote
+If <bf>irxevent</bf> isn't running, then MythTV will not respond to your remote
 control.
 
-Currently, mythtv doesn't have native support for controlling the mixer
+Currently, MythTV doesn't have native support for controlling the mixer
 volume and mute settings.  A workaround at this time is to invoke the
 <bf>amixer</bf> program.  If you wish to define keys to control the mixer,
 the <bf>irexec</bf> program can accomplish this fairly easily.  The
@@ -1082,7 +1082,7 @@ an external program from a remote control button.
 <p>Take a look at the lircrc.example files in the <tt>configfiles/</tt>
 directory.  In my case, (Pinnacle Studio card) the channel up and down functions
 weren't working, due to the fact that the button names were different than
-the default <tt>lircrc.example</tt> file that came with mythtv.
+the default <tt>lircrc.example</tt> file that came with MythTV.
 
 The <tt>lircrc.example</tt> file has this:
 <tscreen><verb>
@@ -1129,7 +1129,7 @@ remote defines the button names.
 By examining the button names defined in <tt>/etc/lircd.conf</tt> and using
 the <bf>irw</bf> program to make sure that your remote is working, you can
 create the appropriate mappings in <tt>.lircrc</tt> to get excellent remote
-functionality with mythtv.
+functionality with MythTV.
 
 <sect1>Configuring lirc for use with an IR blaster.
 <p>By Carlos Talbot, <url url="mailto:carlos@talbot.net">
@@ -1139,7 +1139,7 @@ IR-200L <url url="http://store.yahoo.com/snapstreammedia/irblasbun.html"
 name="http://store.yahoo.com/snapstreammedia/irblasbun.html">. It was
 originally designed for IRDA communication, but can be used to transmit A/V remote
 control codes. By using the lirc SIR driver, this device can easily be
-integrated with mythtv. I have tested this device with an AT&amp;T DCT2000
+integrated with MythTV. I have tested this device with an AT&amp;T DCT2000
 digital cable box but the instructions can be used to configure other IRDA
 devices and A/V remotes.
 
@@ -1228,11 +1228,11 @@ need to add the following line:
 str ExternalChannelCommand=/usr/local/bin/change_channel
 </verb></tscreen>
  
-This csh script will be called each time mythtv needs to change the channel.
+This csh script will be called each time MythTV needs to change the channel.
 Below is a copy of the script followed by the corresponding perl script.
 Make sure both are in your path. Also make sure you leave the #!/bin/csh
 setting and not change it to bourne or bash. This will create a frustrating
-symptom to diagnose where mythtv cannot open /dev/device. Unlike bourne or
+symptom to diagnose where MythTV cannot open /dev/device. Unlike bourne or
 bash, csh scripts automatically close parent file descriptors before they
 start.
  
@@ -1282,10 +1282,10 @@ The last statement within the perl script is the lirc rc command. This is
 the command that transmits the code to your cable/dss box. Make sure to have
 the IRDA device within a few feet of the box.
 
-<sect>Configuring mythtv. <label id="Configuring_mythtv">
+<sect>Configuring MythTV. <label id="Configuring_mythtv">
 <p>By this point, all of the prerequisites have been installed,
 <bf>mysql</bf> is running and has had its initial database setup.  It's now
-time to configure mythtv.
+time to configure MythTV.
 
 <sect1>Editing the settings.txt file.
 <p>Open a shell and switch to the <tt>/usr/local/share/mythtv</tt> directory. 
@@ -1303,15 +1303,15 @@ $ su
 </verb></tscreen>
 
 The <tt>settings.txt</tt> file is fairly self-explanatory. 
-Currently, mythtv supports two different video encoders, MPEG4 and RTJPEG. 
+Currently, MythTV supports two different video encoders, MPEG4 and RTJPEG. 
 Take note that RTJPEG has lower CPU demands, but makes large files, and MPEG4
 has high CPU demands, but makes smaller files.
 
 <bf>NOTE</bf>: although the width and height can be changed to almost
-anything, if you start mythtv and don't see video or you get "segmentation
+anything, if you start MythTV and don't see video or you get "segmentation
 fault" errors, it is likely that the video4linux (v4l) subsystem did not
 like the height and width parameters specified.  It's best to leave the
-default as-is until you're sure that mythtv is operational.
+default as-is until you're sure that MythTV is operational.
 
 <label id="deinterlace_"><bf>NOTE</bf>: the <tt>int Deinterlace=1</tt>
 variable controls the deinterlacer.  Support for deinterlacing requires that
@@ -1376,7 +1376,7 @@ created by some other program.
 
 <bf>mythfilldatabase --xawchannels</bf> is an option if you have used
 <bf>xawtv</bf> to fine-tune your channels and would like to import the fine
-tuning offsets into mythtv.
+tuning offsets into MythTV.
 
 <!-- get more information on the manual setting -->
 
@@ -1473,21 +1473,21 @@ that the database has been filled.  The cursor keys will move you around the
 grid, the "I" key will give you more information on a program and ESC will
 exit out back to the shell.
 
-<sect>Using mythtv.
-<p><bf>mythfrontend</bf> is the main interface to the mythtv program.  This
+<sect>Using MythTV.
+<p><bf>mythfrontend</bf> is the main interface to the MythTV program.  This
 program allows you to choose which of the other modules you'd like to run
 and ensures that programs that you've scheduled for recording actually get
 recorded, so it's important that this program is always running.
 
 <!-- insert stuff on getting around, key sequences, etc -->
 
-<sect1>Using themes with mythtv.
-<p>mythtv is "themeable", meaning that the visual appearance of the program
+<sect1>Using themes with MythTV.
+<p>MythTV is "themeable", meaning that the visual appearance of the program
 can be modified by the user without re-compiling or altering the program
 functionality.
 <tt>/usr/local/share/mythtv/theme.txt</tt> allows you to alter the theme
-for mythtv.  The default theme is called "blue".  Other themes that ship
-with mythtv can be found in the <tt>/usr/local/share/mythtv/themes</tt>
+for MythTV.  The default theme is called "blue".  Other themes that ship
+with MythTV can be found in the <tt>/usr/local/share/mythtv/themes</tt>
 directory.  Change the first variable in the <tt>theme.txt</tt> file and
 exit and restart <bf>mythfrontend</bf> for it to take effect.
 
@@ -1505,15 +1505,15 @@ the author.
 
 <sect1>Adding support for an external tuner.
 <!-- Make this better -->
-<p>mythtv supports changing the channel on an external tuner.  If you have
+<p>MythTV supports changing the channel on an external tuner.  If you have
 an external tuner, such as a DirecTV or digital cable set top box, the
 following command should be added to your settings.txt file:
 <tscreen><verb>
 str ExternalChannelCommand=/usr/local/bin/changechannel
 </verb></tscreen>
 
-The <bf>changechannel</bf> program is not supplied with mythtv, so this is
-going to be dependant on what sort of external tuner you have.  Example
+The <bf>changechannel</bf> program is not supplied with MythTV, so this is
+going to be dependent on what sort of external tuner you have.  Example
 scripts for Sony and RCA receivers can be obtained from <url url="http://tarek.2y.net/myth/"
 name="http://tarek.2y.net/myth/">.  This is currently an external
 user-supplied program, so if you have issues with the script, please contact
@@ -1527,10 +1527,10 @@ helpful: <url url="http://www.snapstream.com/products/irblaster/sonydss.htm"
 name="http://www.snapstream.com/products/irblaster/sonydss.htm"> for cable
 pinouts for RCA DSS receivers.
 
-<sect>mythweb.
-<p>mythweb allows you to use a web page to control various aspects of your
-mythtv system.  mythweb is a separate application, but it's dependant on
-mythtv being installed and operational.
+<sect>MythWeb.
+<p>MythWeb allows you to use a web page to control various aspects of your
+MythTV system.  MythWeb is a separate application, but it's dependent on
+MythTV being installed and operational.
 
 <sect1>Installation and pre-requisites.
 <p>Download mythweb from <url url="http://www.mythtv.org/"
@@ -1564,12 +1564,12 @@ address]/mythweb/</bf>
 <bf>NOTE</bf>: Make sure that you have a trailing slash on the URL,
 otherwise you will get a <tt>404 Page not Found</tt> error.
 
-<sect>mythgallery.
-<p>mythgallery is a photo and slideshow application.  mythgallery is a
-separate application, but it's dependant on mythtv being installed and
+<sect>MythGallery.
+<p>MythGallery is a photo and slideshow application.  MythGallery is a
+separate application, but it's dependent on MythTV being installed and
 operational.
 <sect1>Installation and pre-requisites.
-<p>Download mythgallery from <url url="http://www.mythtv.org/"
+<p>Download MythGallery from <url url="http://www.mythtv.org/"
 name="http://www.mythtv.org/"> and save it to a location where you can find
 it.
 <tscreen><verb>
@@ -1581,7 +1581,7 @@ $ make
 # exit
 $ 
 </verb></tscreen>
-The configuration file for mythgallery is located in
+The configuration file for MythGallery is located in
 <tt>/usr/local/share/mythtv</tt>.  This file needs to be edited:  ensure
 that your GalleryDir variable is set to the directory where your pictures are
 stored.
@@ -1597,17 +1597,17 @@ directory.  "Play" or "Pause" on your remote may also work.
 you're at the first level.
 </itemize>
 
-<sect>mythgame.
+<sect>MythGame.
 
-<sect>mythmusic.  
+<sect>MythMusic.  
 <p>[Documentation still being developed.]
-<p>mythmusic has a number of pre-requisites that must be satisfied before it
+<p>MythMusic has a number of pre-requisites that must be satisfied before it
 is operational.  Depending on your distribution, some of these prerequisites can
 be satisfied through the various package managers.  If your distribution doesn't
 offer pre-compiled versions of the software below, then follow the generic
 instructions for manually compiling and installing the software.
 
-The pre-requisites for mythmusic are:
+The pre-requisites for MythMusic are:
 <itemize>
 <item>MAD
 <item>libvorbis-devel
@@ -1618,7 +1618,7 @@ The pre-requisites for mythmusic are:
 
 <sect1>Manual installation of pre-requisites
 <p>These instructions are for distributions which don't have pre-compiled
-versions of the software necessary to run mythtv.
+versions of the software necessary to run MythTV.
 
 Download MAD from <url url="http://www.mars.org/home/rob/proj/mpeg/"
 name="http://www.mars.org/home/rob/proj/mpeg/">  Save it to a directory you
@@ -1699,9 +1699,9 @@ Once you have done that, you can proceed.
 # urpmi mad flac libcdaudio cdparanoia libvorbis-devel libcdda0-devel
 </verb></tscreen>
 
-<sect1>Compiling mythmusic.
+<sect1>Compiling MythMusic.
 <p>Once all the pre-requisites have been installed, you can proceed with
-getting mythmusic going.
+getting MythMusic going.
 <tscreen><verb>
 $ make
 $ su
@@ -1714,11 +1714,11 @@ $ mysql -u root < metadata.sql
 Edit the <tt>/usr/local/share/mythtv/mythmusic-settings.txt</tt> file for
 your particular system.
 
-<sect>mythweather
-<p>The mythweather module will obtain the weather information for the
+<sect>MythWeather
+<p>The MythWeather module will obtain the weather information for the
 location that you specify.
 
-Change into the mythweather directory, then make and make install:
+Change into the MythWeather directory, then make and make install:
 <tscreen><verb>
 $ cd mythweather
 $ make
@@ -1727,7 +1727,7 @@ $ su
 # exit
 </verb></tscreen>
 
-mythweather uses MSNBC.com as its source for weather data.  You may specify a
+MythWeather uses MSNBC.com as its source for weather data.  You may specify a
 number of identifiers in order to obtain your local weather.
 <itemize>
 <item>Your zip code.
@@ -1743,7 +1743,7 @@ there, fill in your location.  After the MSNBC server completes your request,
 check the URL in the address bar for "accid=XXXXX".  The "XXXXX" portion
 is the area id you will need for the next configuration step.
 
-For now, you must manually configure mythweather:
+For now, you must manually configure MythWeather:
 
 <tscreen><verb>
 $ mysql -u root
@@ -1777,7 +1777,7 @@ mysql> insert into settings (value, data) VALUES ('SIUnits', 'Yes');
 mysql>
 </verb></tscreen>
 
-These are the keyboard commands for mythweather:
+These are the keyboard commands for MythWeather:
 <tscreen><verb>
 Left Key             Goes back one page, and extends the time spent
                      on the page you are on.
@@ -1790,7 +1790,7 @@ Enter Key            Switch between celsius and fahrenheit. Can also
 "m" Key              Resets the location to the database default, then updates the data.
 </verb></tscreen>
 
-<sect>mythvideo
+<sect>MythVideo
 
 <sect>Troubleshooting.
 <sect1>Illegal Instruction.
@@ -1806,13 +1806,13 @@ deinterlace support.  You may check this by doing a <tt>$ cat
 /proc/cpuinfo</tt> and looking for "sse" in the processor flags section.
 </itemize>
 <sect1>mythfilldatabase failing.
-<p>If mythtvfilldatabase suddenly appears to be failing, check to see what version of
+<p>If mythfilldatabase suddenly appears to be failing, check to see what version of
 XMLTV you're running.  Versions prior to 0.5.4 need to have the following
 change made: edit the
 <tt>/usr/lib/perl5/site_perl/5.8.0/XMLTV/ZapListings.pm</tt> file and
 perform a global search and replace, searching for "tvlistings2" and
 replacing it with "tvlistings".
-<sect1>mythtv seems to disappear; can't see video
+<sect1>MythTV seems to disappear; can't see video
 <p>If you're using Gnome as your window manager, try switching to KDE.  For
 Red Hat Linux 8.0 users, edit <tt>/etc/sysconfig/desktop</tt> and
 change "GNOME" to "KDE".
@@ -1823,7 +1823,7 @@ the <bf>hdparm</bf> program to check and enable DMA.<tscreen><verb>
 </verb></tscreen> will tell you the DMA status for your hard drives.  If you run
 <bf>hdparm</bf> with the <tt>-d1</tt> parameter, it will turn DMA on.
 <sect1>I keep losing all of my settings every time I compile!
-<p>mythtv will overwrite any settings in <tt>/usr/local/share/mythtv</tt>.
+<p>MythTV will overwrite any settings in <tt>/usr/local/share/mythtv</tt>.
 If you want to make sure that you don't lose your modifications, make a
 directory <tt>~/.mythtv</tt> and copy your settings.txt file to this
 location.
@@ -1840,7 +1840,7 @@ then it shouldn't be a problem.
 
 If you get an error like <tt>/usr/bin/ld: cannot find -lXext</tt>, the
 compiler is telling you that you don't have XFree86-devel installed, and
-this needs to be fixed before mythtv will work correctly.
+this needs to be fixed before MythTV will work correctly.
 <sect1>My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.
 <p>This is due to DPMS, the Display Power Management System, which is used
 to save power by turning off your monitor when the system decides that it's
@@ -1881,11 +1881,11 @@ within the control panel.
 <tt>mythtv.org</tt>.  Make sure you change your <tt>CVSROOT</tt> to point to
 the new server, delete your old tree, and re-do the checkout.
 
-<sect1>I get segfaults / mythtv isn't doing anything.
+<sect1>I get segfaults / MythTV isn't doing anything.
 <p>Without details, the developers will not be able to determine if you have
 discovered a genuine code-bug,  or it the problem is with your system.  In
-order to determine what's going on, you must recompile mythtv with debugging
-support and run mythtv within <bf>gdb</bf>, the GNU debugger.
+order to determine what's going on, you must recompile MythTV with debugging
+support and run MythTV within <bf>gdb</bf>, the GNU debugger.
 
 Edit the settings.pro file.  Make sure that the top of the file looks like this:
 <tscreen><verb>
@@ -1954,9 +1954,9 @@ $
 </verb></tscreen>
 -->
 
-<sect1>Mythtv makes my system crash. 
-<p>mythtv <em>can not</em> crash your system - it is a user-level program. 
-If your system is crashing when you run mythtv, then you have some
+<sect1>MythTV makes my system crash. 
+<p>MythTV <em>can not</em> crash your system - it is a user-level program. 
+If your system is crashing when you run MythTV, then you have some
 issue with the drivers for your capture card or other hardware, or the CPU
 fan has fallen off/broken and your system is overheating when asked to
 perform a CPU intensive task like encoding video.
@@ -1966,7 +1966,7 @@ perform a CPU intensive task like encoding video.
 name="mailto:bjm@lvcm.com">
 
 Audio appears to be one of the bigger issues that users run into on the
-mailing list.  If the audio isn't configured correctly, then mythtv will
+mailing list.  If the audio isn't configured correctly, then MythTV will
 often appear to hang, when in fact it is trying to manipulate the audio
 subsystem and failing.  You may or may not receive error messages indicating
 that the source of the error is the audio subsystem.
@@ -2009,18 +2009,22 @@ speakers.
 
 You may also want to ensure that <tt>/dev/dsp</tt> hasn't already been
 grabbed by another process, like <bf>esd</bf> or <bf>artsd</bf>.  If
-<tt>/dev/dsp</tt> isn't available, then mythtv won't work.  Check your
+<tt>/dev/dsp</tt> isn't available, then MythTV won't work.  Check your
 windowmanager documentation for instructions on disabling the sound manager.
 
 If you're using multiple sound cards and multiple tuners, use <tt>alsamixer
 -c 1</tt> to work with the second sound card.  The first card is #0, the
 second card is #1, etc.
 
+<sect1>MythWeather is showing me the weather in the Bahamas!
+<p>You didn't read the documentation.  Ensure that you set your locale
+correctly.
+
 <sect>Miscellaneous.
-<sect1>I'd like to watch the files without using mythtv / I'd like to convert the files to some other format.
+<sect1>I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
 <p>Matthew Zimmerman has created a patch for MPlayer / Mencoder
 <url url="http://www.mplayerhq.hu" name="http://www.mplayerhq.hu"> that allows
-you view the files created by mythtv.  Mythtv doesn't use standard
+you view the files created by MythTV.  MythTV doesn't use standard
 Nupplevideo files, which is why you MPlayer complains if you try to view
 them.
 
@@ -2045,11 +2049,11 @@ At this point, you can read the MPlayer documentation and start the compile
 process.
 
 <sect1>I'd like to use some other window manager.
-<p>mythtv is not dependent on any particular window manager.  If you wish to
+<p>MythTV is not dependent on any particular window manager.  If you wish to
 run a lightweight window manager, the <tt>configfiles/</tt> directory has an
 example of a <tt>.twmrc</tt> file you may use.
 
-<sect1>I'd like mythtv to automatically startup.
+<sect1>I'd like MythTV to automatically startup.
 <p>Here's an example submitted to the mythtv-dev list by Pat Pflaum
 <url url="mailto:pat@netburp.com" name="mailto:pat@netburp.com"> using fvwm:
 
@@ -2075,11 +2079,11 @@ mysql> drop database mythconverg;
 mysql> quit
 </verb></tscreen>
 
-<sect1>I'd like to start using the development version of mythtv.
+<sect1>I'd like to start using the development version of MythTV.
 <p>[Content under development]
 <p><bf>NOTE</bf>:It should be clear that using the development version of
-mythtv may cause loss of data on your system.  There is no guarantee that the development
-version of mythtv will work for you.
+MythTV may cause loss of data on your system.  There is no guarantee that the development
+version of MythTV will work for you.
 
 <bf>THERE IS NO GUARANTEE THAT THESE INSTRUCTIONS WILL WORK.  USE AT YOUR
 OWN RISK.</bf>
@@ -2092,14 +2096,14 @@ front-end is responsible for displaying the video.  This allows you to put a
 lightweight, quiet, diskless and fanless machine in "the living room", with a large server-type
 machine in "the basement".  The front-end and back-end communicate over TCP
 on a specified port.
-<item>GUI-based configuration.  Much of the configuration of mythtv can now
+<item>GUI-based configuration.  Much of the configuration of MythTV can now
 be done using a GUI-based setup, avoiding the necessity to edit the
 <tt>settings.txt</tt> file.
-<item>Themes.  mythtv now has more themes for the user to choose from.
+<item>Themes.  MythTV now has more themes for the user to choose from.
 <item>Recording profiles.  You may now setup various encoder profiles from
 the GUI, giving you the flexibility to record programs using various quality
 levels.
-<item>Increased hardware encoder support.  mythtv can now use the MJPEG
+<item>Increased hardware encoder support.  MythTV can now use the MJPEG
 encoder/decoder found on Matrox G200 series cards.  This greatly reduces the
 CPU utilization.
 </itemize>
@@ -2110,8 +2114,8 @@ should have accompanying solutions.
 Before you begin, shutdown all running instances of 0.7.  You should perform
 a <tt>make clean distclean</tt> before starting the compile process.
 
-Compile and install the system as you would mythtv 0.7 by following the
-instructions found in this HOWTO.  If you are installing mythtv on a new
+Compile and install the system as you would MythTV 0.7 by following the
+instructions found in this HOWTO.  If you are installing MythTV on a new
 machine, install the database by running the <tt>database/mc.sql</tt>
 script as detailed in earlier sections of this document.
 
@@ -2134,7 +2138,7 @@ $ ./setup
 This will open the setup wizard which will allow you to graphically
 configure your system.
 
-Once the setup wizard is done: to run the new version of mythtv, you must
+Once the setup wizard is done: to run the new version of MythTV, you must
 first start the back-end server:
 
 <tscreen><verb>
@@ -2150,15 +2154,15 @@ You should see the connection established between the front-end and back-end
 systems by examining the mythbackend window; it will display the client
 connection attempts.
 
-The cvs version of mythtv now supports pressing the ESC key to exit the
-application.  If you wish to configure mythtv to exit on ESC, go to
-the mythfrontend setup screen (not the setup program used to initially
-configure mythtv) and enter the General configuration screen.  Move through
-the setup until you get to the System Shutdown parameter.  By default, this
-is set to "No", which means there is no defined exit key for mythtv.  If you
-set it to "No Modifier", this will mean that the ESC key is used to exit
-mythtv.  Control, Meta and ALT modifiers mean that the Modifier + ESC key
-must be pressed to activate the exit from mythtv.
+The cvs version of MythTV now supports pressing the ESC key to exit the
+application.  If you wish to configure MythTV to exit on ESC, go to the
+mythfrontend setup screen (not the setup program used to initially configure
+MythTV) and enter the General configuration screen.  Move through the setup
+until you get to the System Shutdown parameter.  By default, this is set to
+"No exit key", which means there is no defined exit key for MythTV.  If you
+set it to "ESC", this will mean that the ESC key is used to exit
+MythTV.  Control, Meta and ALT modifiers mean that the Modifier + ESC key
+must be pressed to activate the exit from MythTV function.
 
 </article>
 <!-- Revision History
@@ -2168,18 +2172,18 @@ v1.02, 2002-11-11.  Converted to docbook, added more to the remote control
 section, compiling on AMD and Via C3 processors, Debian packaging, ispell.
 v1.03, 2002-11-12.  Added text from Cedar McKay on Red Hat Linux 8.0
 v1.031, 2002-11-19.  Added text on the ALSA 0.9.0rc5/rc6 hanging bug, started
-development on mythmusic instructions, added text on obtaining document and
+development on MythMusic instructions, added text on obtaining document and
 using CVS.  Merged some more RH 8.0 documentation from Cedar McKay.  Applied
 Debian information patch from Matt Zimmerman.
 v1.032, 2002-11-22.  Added stuff on modifying xmltv, changed CVS
 documentation so that it's not dependent on CVSROOT being set, pointer to
 Tarek's DirecTV and external channel changing script, moved text around so
-that external tuner / DirecTV are located under "using mythtv".  Added
+that external tuner / DirecTV are located under "using MythTV".  Added
 troubleshooting information about KDE vs. Gnome on RH 8.0
 v1.033, 2002-11-23.  Fixed the XMLTV/mythfilldatabase instruction to point
 to the correct file.  Slight wording changes to the DirecTV stuff.  Moved
 some CVS parameters around.  Added "DMA" to troubleshooting section.
-v1.034, 2002-11-24.  Added information on setting up mythmusic database.
+v1.034, 2002-11-24.  Added information on setting up MythMusic database.
 v1.035, 2002-11-25.  Added information on Gentoo.
 v1.036, 2002-11-27.  Added information on using an IR Blaster.
 v1.037, 2002-11-28.  Added information on RH 8.0 environment setting by Mike
@@ -2193,10 +2197,10 @@ v1.041, 2002-11-29.  Added some explanatory text about hdparm.
 v1.042, 2002-11-29.  Cleaned up the text that talks about Tivo and hardware
 based encoders.
 v1.043, 2002-11-29.  More RH 8.0 LANG stuff.
-v1.044, 2002-11-29.  Working on the mythmusic install instructions.  Added
+v1.044, 2002-11-29.  Working on the MythMusic install instructions.  Added
 information about creating your own ~/.mythtv to maintain settings.
 v1.045, 2002-12-02.  Started working on the urpmi instructions for
-mythmusic.  Made changes to Mandrake docs to accomodate MDK 8.2.
+MythMusic.  Made changes to Mandrake docs to accomodate MDK 8.2.
 v1.046, 2002-12-02.  Added information on mythfilldatabase and xawtv
 channels.  Added attribution information for Harondel J. Sibble for Mandrake
 8.2.  Modified Gentoo again.  Added text on one system running the master database.  Added
@@ -2210,7 +2214,7 @@ v1.049, 2002-12-16.  Added Pentium 2 to list of boxes that don't support
 MMX2 (but really known as SSE).  (Needed for deinterlacer.)  Changed RH8.2 instructions per Harondel
 Sipple.
 v1.050, 2002-12-17.  Moved revision history to end of document.  Added
-version information that the HOWTO was created for.  Currently, mythtv v0.7.
+version information that the HOWTO was created for.  Currently, MythTV v0.7.
 Added text mode instructions for setting alsamixer.
 v1.051, 2002-12-17.  Added instruction to run ldconfig twice for RH8.0.  Why
 does it have to be done?  No idea...  Modified section on changechannel
@@ -2223,7 +2227,7 @@ v1.053, 2002-12-20.  Added a Miscellaneous section so that I could add text abou
 v1.054, 2002-12-20.  Changed name of CVS box; added troubleshooting hint on
 CVS checkouts.
 v1.055, 2002-12-23.  James Wiggins (wigginjs@mailbox.sc.edu) Remove the
-"./configure" step from mythmusic - doesn't belong there.  Add
+"./configure" step from MythMusic - doesn't belong there.  Add
 libcdda0-devel.
 v1.056, 2002-12-24.  Updated Gentoo mysql instruction.
 v1.057, 2002-12-25.  Added pointer to other window managers.  Added section
@@ -2261,6 +2265,8 @@ v1.071, 2003-01-11.  Added Gentoo lirc instructions.  Fixed xset command.
 v1.072, 2003-01-12.  Added alsamixer commands for multiple sound cards.
 v1.073, 2003-01-13.  Added text on configuring ESC to exit in CVS version of
 myth.
+v1.074, 2003-01-13.  Set standard names for "Myth".  "MythTV", "MythMusic",
+etc.  Adjusted exit instructions.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

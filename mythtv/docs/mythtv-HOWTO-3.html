@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
- <TITLE>Installing and using mythtv: Checking prerequisites. </TITLE>
+ <TITLE>Installing and using MythTV: Checking prerequisites. </TITLE>
  <LINK HREF="mythtv-HOWTO-4.html" REL=next>
  <LINK HREF="mythtv-HOWTO-2.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc3" REL=contents>
@@ -17,7 +17,7 @@
 <H2><A NAME="ss3.1">3.1</A> <A HREF="mythtv-HOWTO.html#toc3.1">Hardware. </A>
 </H2>
 
-<P>mythtv is a software video encoder, which means that it uses a fairly
+<P>MythTV is a software video encoder, which means that it uses a fairly
 generic "dumb" video capture card to get frames of video, encodes them using
 the CPU on your motherboard and writes them to disk.  High-end video capture
 cards and devices like the Tivo and RePlay have dedicated encoder chips
@@ -28,14 +28,14 @@ encoded frames to the disk.  These tasks have fairly low CPU requirements
 compared to encoding video, which is why a device like a Series 1 Tivo can
 run with only 16MB of RAM and a 54Mhz CPU.</P>
 <P>Currently, there are no known MPEG-2 encoder cards that have video4linux
-drivers which would be suitable for use with mythtv.  Once the drivers are
+drivers which would be suitable for use with MythTV.  Once the drivers are
 written, support for hardware MPEG-2 encoders can be integrated.</P>
 <P>There are many variables that go into the question: "How fast a CPU do I
-need to run mythtv"?  Obviously, the faster your CPU, the better your
-experience will be with mythtv.  Performing the "Watch TV" function, where
+need to run MythTV"?  Obviously, the faster your CPU, the better your
+experience will be with MythTV.  Performing the "Watch TV" function, where
 the CPU is both encoding and decoding video simultaneously to allow Pause,
 Fast Forward and Rewind functions for live TV requires more CPU then just
-encoding or decoding.  mythtv also supports multiple encoder cards in a
+encoding or decoding.  MythTV also supports multiple encoder cards in a
 single PC, thereby increasing the CPU requirements if you plan on
 simultaneously encoding multiple programs.</P>
 <P>Here are a few data points:
@@ -68,17 +68,17 @@ how happy they are with the results.</P>
 use the graphical tools that come with your distribution, or you can use
 command-line utilities.  Either system will get the job done, and it all
 depends on your comfort level with Linux.</P>
-<P><B>NOTE</B>: If you are using mythtv on multiple systems, at least one of
+<P><B>NOTE</B>: If you are using MythTV on multiple systems, at least one of
 them will maintain the master database and will need mysql installed.  </P>
-<P>In order to compile mythtv, we need to make sure that the software it needs
+<P>In order to compile MythTV, we need to make sure that the software it needs
 is installed.  As of 2002-12-17, this list includes <B>perl</B>,
 <B>mysql</B>, <B>gcc</B>, <B>freetype2-devel</B>,
 <B>XFree86-devel</B> and <B>qt-devel</B>.  If you're going to use a
-remote control with mythtv, you're going to need the <B>cdialog</B>
+remote control with MythTV, you're going to need the <B>cdialog</B>
 package in order to compile <B>lircd</B>.</P>
 <P>There appears to be issues with ALSA and simultaneously recording and playing 
-sound, which is a core requirement for mythtv.  If you are not running 
-ALSA 0.9.0rc6 and experience lock-ups of your system when trying to use mythtv, 
+sound, which is a core requirement for MythTV.  If you are not running 
+ALSA 0.9.0rc6 and experience lock-ups of your system when trying to use MythTV, 
 then please check the main ALSA website and upgrade to the latest version,
 or see if your distribution has already packaged the latest ALSA drivers.</P>
 
@@ -107,7 +107,7 @@ freetype2-devel installed.</P>
 <P>Search for XFree86-devel.</P>
 <P>Finally, check for qt.  You'll need libqt3-devel (under folder "KDE and
 Qt") and libqt3 ("Libraries").</P>
-<P>Make sure that cdialog is installed if you want to use mythtv with a remote
+<P>Make sure that cdialog is installed if you want to use MythTV with a remote
 control.</P>
 <P>alsa-utils is needed for setting the volume.</P>
 <P>If you marked anything to install, click on Install Marked.  Click "Yes" or
