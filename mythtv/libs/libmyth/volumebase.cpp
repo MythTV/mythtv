@@ -32,7 +32,7 @@ void VolumeBase::SetCurrentVolume(int value)
 
     QString controlLabel = gContext->GetSetting("MixerControl", "PCM");
     controlLabel += "MixerVolume";
-    gContext->SaveSetting(controlLabel, volume);	    
+    gContext->SaveSetting(controlLabel, volume);    
 }
 
 void VolumeBase::AdjustCurrentVolume(int change)

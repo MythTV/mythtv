@@ -283,7 +283,7 @@ QString ThemedMenuPrivate::getFirstText(QDomElement &element)
     }
     return "";
 }
-	
+
 void ThemedMenuPrivate::parseBackground(const QString &dir, 
                                         QDomElement &element)
 {
@@ -295,7 +295,7 @@ void ThemedMenuPrivate::parseBackground(const QString &dir,
 
     spreadbuttons = true;
     maxColumns = 20;        // Arbitrary number
-    visiblerowlimit = 6;	// the old default
+    visiblerowlimit = 6;    // the old default
 
     QString type = element.attribute("style", "");
     if (type == "tiled")
@@ -949,8 +949,8 @@ void ThemedMenuPrivate::parseLogo(const QString &dir, QDomElement &element)
             else if (info.tagName() == "position")
             {
                 logopos = parsePoint(getFirstText(info));
-		hasposition = true;
-	    }
+                hasposition = true;
+            }
             else
             {
                 VERBOSE(VB_GENERAL, QString("ThemedMenuPrivate: Unknown tag %1 "
