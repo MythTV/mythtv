@@ -99,9 +99,12 @@ void VolumeControl::SetMute(bool on)
     else
         realvol = (volume << 8) + volume;
 
-    int ret = ioctl(mixerfd, MIXER_WRITE(SOUND_MIXER_PCM), &realvol);
-    if (ret < 0)
-        perror("Setting PCM volume: ");
+    if (mixerfd > 0)
+    {
+        int ret = ioctl(mixerfd, MIXER_WRITE(SOUND_MIXER_PCM), &realvol);
+        if (ret < 0)
+            perror("Setting PCM volume: ");
+    }
 
     mute = on;
 }
