@@ -1109,10 +1109,11 @@ void VideoManager::pageDown()
             inData = (int)(listsize / 2) + inList;
             inList = (int)(listsize / 2);
         }
+      }  
        // otherwise just go to the end of the list
         else
             inList = listsize - 1;
-      }
+      
       
     } break;
     
