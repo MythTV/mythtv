@@ -1518,7 +1518,7 @@ void SmartPLResultViewer::setSQL(QString sql)
     listView->clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec();
+    query.exec(sql);
     
     QListViewItem *item;
     if (query.last())
