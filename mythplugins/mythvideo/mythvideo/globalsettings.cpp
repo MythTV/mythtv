@@ -109,7 +109,7 @@ public:
     SearchListingsCommand():
         GlobalSetting("MovieListCommandLine") {
         setLabel(QObject::tr("Command to search for movie listings"));
-        setValue(PREFIX "/share/mythtv/mythvideo/scripts/imdb.pl -M tv=no;video=no");
+        setValue(gContext->GetShareDir() + "mythvideo/scripts/imdb.pl -M tv=no;video=no");
         setHelpText(QObject::tr("This command must be "
                     "executable by the user running MythVideo."));
     };
@@ -121,7 +121,7 @@ public:
     GetPostersCommand():
         GlobalSetting("MoviePosterCommandLine") {
         setLabel(QObject::tr("Command to search for movie posters"));
-        setValue(PREFIX "/share/mythtv/mythvideo/scripts/imdb.pl -P");
+        setValue(gContext->GetShareDir() + "mythvideo/scripts/imdb.pl -P");
         setHelpText(QObject::tr("This command must be "
                     "executable by the user running MythVideo."));
     };
@@ -133,7 +133,7 @@ public:
     GetDataCommand():
         GlobalSetting("MovieDataCommandLine") {
         setLabel(QObject::tr("Command to extract data for movies"));
-        setValue(PREFIX "/share/mythtv/mythvideo/scripts/imdb.pl -D");
+        setValue(gContext->GetShareDir() + "mythvideo/scripts/imdb.pl -D");
         setHelpText(QObject::tr("This command must be "
                     "executable by the user running MythVideo."));
     };
