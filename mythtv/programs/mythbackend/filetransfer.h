@@ -26,6 +26,8 @@ class FileTransfer
 
     long long Seek(long long curpos, long long pos, int whence);
 
+    long long GetFileSize(void);
+
   protected:
     void DoFTReadThread(void);
     static void *FTReadThread(void *param);

@@ -10,11 +10,12 @@ using namespace std;
 #include "remotefile.h"
 #include "util.h"
 
-RemoteFile::RemoteFile(QString &url, bool needevents, int lrecordernum)
+RemoteFile::RemoteFile(const QString &url, bool needevents, int lrecordernum)
 {
     type = 0;
     path = url;
     readposition = 0;
+    filesize = -1;
     pthread_mutex_init(&lock, NULL);
 
     if (lrecordernum > 0)
@@ -53,16 +54,16 @@ RemoteFile::~RemoteFile()
         delete sock;
 }
 
-void RemoteFile::Start(void)
+void RemoteFile::Start(bool events)
 {
     if (!controlSock)
     {
-        controlSock = openSocket(true);
-        sock = openSocket(false);
+        controlSock = openSocket(true, events);
+        sock = openSocket(false, events);
     }
 }
 
-QSocket *RemoteFile::openSocket(bool control)
+QSocket *RemoteFile::openSocket(bool control, bool events)
 {
     QUrl qurl(path);
 
@@ -78,6 +79,9 @@ QSocket *RemoteFile::openSocket(bool control)
     while (sock->state() == QSocket::HostLookup ||
            sock->state() == QSocket::Connecting)
     {
+        if (events)
+            qApp->processEvents();
+
         usleep(50);
         num++;
         if (num > 100)
@@ -119,6 +123,7 @@ QSocket *RemoteFile::openSocket(bool control)
             ReadStringList(sock, strlist);
 
             recordernum = strlist[1].toInt();
+            filesize = decodeLongLong(strlist, 2);
         }
         else
         {
@@ -231,7 +236,7 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
     return retval;
 }
 
-int RemoteFile::Read(void *data, int size)
+int RemoteFile::Read(void *data, int size, bool singlefile)
 {
     int ret;
     unsigned tot = 0;
@@ -240,6 +245,9 @@ int RemoteFile::Read(void *data, int size)
     while (sock->bytesAvailable() < (unsigned)size)
     {
         int reqsize = 128000;
+        if (singlefile && size - sock->bytesAvailable() < 128000)
+            reqsize = size - sock->bytesAvailable();
+
         RequestBlock(reqsize);
 
         zerocnt++;
@@ -248,7 +256,7 @@ int RemoteFile::Read(void *data, int size)
             printf("EOF %u\n", size);
             break;
         }
-        usleep(1000);
+        usleep(50);
     }
 
     if (sock->bytesAvailable() >= (unsigned)size)
@@ -261,3 +269,15 @@ int RemoteFile::Read(void *data, int size)
     return tot;
 }
 
+bool RemoteFile::SaveAs(QByteArray &data, bool events)
+{
+    Start(true);
+
+    if (filesize < 0)
+        return false;
+
+    data.resize(filesize);
+    Read(data.data(), filesize, events);
+
+    return true;
+} 

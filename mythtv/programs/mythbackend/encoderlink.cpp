@@ -289,3 +289,13 @@ long long EncoderLink::SeekRingBuffer(long long curpos, long long pos,
         return tv->SeekRingBuffer(curpos, pos, whence);
     return -1;
 }
+
+char *EncoderLink::GetScreenGrab(QString filename, int secondsin, 
+                                 int &bufferlen, int &video_width, 
+                                 int &video_height)
+{
+    if (local)
+        return tv->GetScreenGrab(filename, secondsin, bufferlen, video_width,
+                                 video_height);
+    return NULL;
+}

@@ -1,5 +1,7 @@
 #include <unistd.h>
 #include <iostream>
+#include <sys/types.h>
+#include <sys/stat.h>
 using namespace std;
 
 #include "filetransfer.h"
@@ -74,7 +76,7 @@ bool FileTransfer::RequestBlock(int size)
     pthread_mutex_unlock(&readthreadLock);
 
     while (readrequest > 0 && readthreadlive && !ateof)
-        usleep(500);
+        usleep(100);
 
     return ateof;
 }
@@ -141,3 +143,15 @@ void *FileTransfer::FTReadThread(void *param)
     return NULL;
 }
 
+long long FileTransfer::GetFileSize(void)
+{
+    QString filename = rbuffer->GetFilename();
+
+    struct stat64 st;
+    long long size = 0;
+
+    if (stat64(filename.ascii(), &st) == 0)
+        size = st.st_size;
+
+    return size;
+}

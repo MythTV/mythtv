@@ -13,6 +13,7 @@
 #include "oldsettings.h"
 #include "themedmenu.h"
 #include "util.h"
+#include "remotefile.h"
 
 MythContext::MythContext(bool gui)
            : QObject()
@@ -49,6 +50,8 @@ MythContext::MythContext(bool gui)
 
 MythContext::~MythContext()
 {
+    imageCache.clear();
+
     if (m_settings)
         delete m_settings;
     if (m_qtThemeSettings)
@@ -104,6 +107,16 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
     connect(serverSock, SIGNAL(readyRead()), this, SLOT(readSocket()));
 
     return true;
+}
+
+QString MythContext::GetMasterHostPrefix(void)
+{
+    if (!serverSock)
+        return "";
+
+    QString ret = QString("myth://%1:%2/").arg(serverSock->peerName())
+                                          .arg(serverSock->peerPort());
+    return ret;
 }
 
 QString MythContext::GetFilePrefix(void)
@@ -393,7 +406,10 @@ void MythContext::ThemeWidget(QWidget *widget)
 }
 
 QPixmap *MythContext::LoadScalePixmap(QString filename) 
-{               
+{ 
+    if (filename.left(5) == "myth:")
+        return NULL;
+              
     QPixmap *ret = new QPixmap();
 
     int width, height;
@@ -426,6 +442,33 @@ QPixmap *MythContext::LoadScalePixmap(QString filename)
     }
 
     return ret;
+}
+
+QImage *MythContext::CacheRemotePixmap(const QString &url, bool needevents)
+{
+    QUrl qurl = url;
+    if (qurl.host() == "")
+        return NULL;
+
+    if (imageCache.contains(url))
+    {
+        return &(imageCache[url]);
+    }
+
+    RemoteFile *rf = new RemoteFile(url, true);
+
+    QByteArray data;
+    if (rf->SaveAs(data, needevents))
+    {
+        QImage image(data);
+        if (image.width() > 0)
+        {
+            imageCache[url] = image;
+            return &(imageCache[url]);
+        }
+    }
+    
+    return NULL;
 }
 
 void MythContext::SetSetting(const QString &key, const QString &newValue)

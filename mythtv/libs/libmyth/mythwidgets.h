@@ -223,6 +223,7 @@ class MythListView : public QListView
     MythListView(QWidget *parent);
 
     void SetAllowKeypress(bool allow) { allowkeypress = allow; }
+    bool GetAllowKeypress(void) { return allowkeypress; }
     void DontFixSpaceBar(void) { fixspace = false; }
 
   protected:

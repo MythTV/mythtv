@@ -21,7 +21,7 @@ class ProgramListItem : public QListViewItem
     
     ProgramInfo *getProgramInfo(void) { return pginfo; }
 
-    QPixmap *getPixmap(void); 
+    QPixmap getPixmap(void); 
 
   protected:
     ProgramInfo *pginfo;

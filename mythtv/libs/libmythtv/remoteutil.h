@@ -30,4 +30,6 @@ RemoteEncoder *RemoteRequestRecorder(MythContext *context);
 RemoteEncoder *RemoteGetExistingRecorder(MythContext *context,
                                          ProgramInfo *pginfo);
 
+void RemoteGeneratePreviewPixmap(MythContext *context, ProgramInfo *pginfo);
+
 #endif

@@ -10,8 +10,6 @@
 
 void ChannelInfo::LoadIcon(MythContext *context)
 {
-    QImage *tempimage = new QImage();
-
     int screenheight = 0, screenwidth = 0;
     float wmult = 0, hmult = 0;
 
@@ -19,19 +17,30 @@ void ChannelInfo::LoadIcon(MythContext *context)
 
     icon = new QPixmap();
 
-    if (tempimage->load(iconpath))
+    QImage tempimage(iconpath);
+
+    if (tempimage.width() == 0)
+    {
+        QString url = context->GetMasterHostPrefix();
+        if (url.length() < 1)
+            return;
+
+        url += iconpath;
+
+        tempimage = *(context->CacheRemotePixmap(url));
+    }
+
+    if (tempimage.width() > 0)
     {
         if (screenwidth != 800 || screenheight != 600 || 
-            tempimage->width() != 40 || tempimage->height() != 40)
+            tempimage.width() != 40 || tempimage.height() != 40)
         {
             QImage tmp2;
-            tmp2 = tempimage->smoothScale((int)(40 * wmult), 
-                                          (int)(40 * hmult));
+            tmp2 = tempimage.smoothScale((int)(40 * wmult), 
+                                         (int)(40 * hmult));
             icon->convertFromImage(tmp2);
         }
         else
-            icon->convertFromImage(*tempimage);
+            icon->convertFromImage(tempimage);
     }
-
-    delete tempimage;
 }

@@ -135,6 +135,10 @@ void MainServer::readSocket(void)
                 else
                     HandleFileTransferQuery(listline, tokens, pbs);
             }
+            else if (command == "QUERY_GENPIXMAP")
+            {
+                HandleGenPreviewPixmap(listline, pbs);
+            }
             else if (command == "MESSAGE")
             {
                 HandleMessage(listline, pbs);
@@ -220,6 +224,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         fileTransferList.push_back(ft);
 
         retlist << QString::number(socket->socket());
+        encodeLongLong(retlist, ft->GetFileSize());
     }
 
     WriteStringList(socket, retlist);
@@ -861,6 +866,44 @@ void MainServer::HandleMessage(QStringList &slist, PlaybackSock *pbs)
     QStringList retlist = "OK";
 
     WriteStringList(pbs->getSocket(), retlist);
+}
+
+void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
+{
+    ProgramInfo *pginfo = new ProgramInfo();
+    pginfo->FromStringList(slist, 1);
+
+    QString urlname = pginfo->pathname;
+
+    QUrl qurl = urlname;
+
+    QString filename = qurl.path();
+
+    int len = 0;
+    int width = 0, height = 0;
+
+    EncoderLink *elink = encoderList->begin().data();
+
+    unsigned char *data = (unsigned char *)elink->GetScreenGrab(filename, 64,
+                                                                len, width,
+                                                                height);
+
+    if (data)
+    {
+        QImage img(data, width, height, 32, NULL, 65536 * 65536,
+                   QImage::LittleEndian);
+        img = img.smoothScale(160, 120);
+
+        filename += ".png";
+        img.save(filename.ascii(), "PNG");
+
+        delete [] data;
+    }
+
+    QStringList retlist = "OK";
+    WriteStringList(pbs->getSocket(), retlist);    
+
+    delete pginfo;
 }
 
 void MainServer::endConnection(QSocket *socket)

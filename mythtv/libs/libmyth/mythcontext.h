@@ -50,6 +50,7 @@ class MythContext : public QObject
     MythContext(bool gui = true);
     virtual ~MythContext();
 
+    QString GetMasterHostPrefix(void);
     bool ConnectServer(const QString &hostname, int port);
 
     QString GetInstallPrefix() { return m_installprefix; }
@@ -89,6 +90,8 @@ class MythContext : public QObject
 
     void SendReceiveStringList(QStringList &strlist);
 
+    QImage *CacheRemotePixmap(const QString &url, bool needevents = true);
+
   private slots:
     void readSocket();
 
@@ -117,6 +120,8 @@ class MythContext : public QObject
 
     QSqlDatabase* m_db;
     pthread_mutex_t dbLock;
+
+    QMap<QString, QImage> imageCache;
 };
 
 #endif

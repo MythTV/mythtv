@@ -78,28 +78,28 @@ void startTV(MythContext *context)
     tv->Init();
     TVState nextstate = tv->LiveTV();
 
+    qApp->unlock();
+
     if (nextstate == kState_WatchingLiveTV ||
            nextstate == kState_WatchingRecording)
     {
         while (tv->ChangingState())
         {
             usleep(50);
-            qApp->unlock();
             qApp->processEvents();
-            qApp->lock();
         }
 
         while (nextstate == kState_WatchingLiveTV ||
                nextstate == kState_WatchingRecording ||
                nextstate == kState_WatchingPreRecorded) 
         {
-            usleep(500);
-            qApp->unlock();
+            usleep(100);
             qApp->processEvents();
-            qApp->lock();
             nextstate = tv->GetState();
         }
     }
+
+    qApp->lock();
 }
 
 void TVMenuCallback(void *data, QString &selection)

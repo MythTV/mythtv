@@ -413,9 +413,16 @@ void PlaybackBox::changed(QListViewItem *lvitem)
 
     if (pixlabel)
     {
-        QPixmap *pix = pgitem->getPixmap();
-        if (pix)
-            pixlabel->setPixmap(*pix);
+        bool disallow = listview->GetAllowKeypress();
+
+        if (disallow)
+            listview->SetAllowKeypress(false);
+        QPixmap pix = pgitem->getPixmap();
+        if (disallow)
+            listview->SetAllowKeypress(true);
+
+        if (pix.width() > 0)
+            pixlabel->setPixmap(pix);
     }
 
     ignoreevents = false;

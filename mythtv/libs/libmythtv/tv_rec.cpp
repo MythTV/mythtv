@@ -535,17 +535,15 @@ void TVRec::TeardownRecorder(bool killFile)
     }
 }    
 
-char *TVRec::GetScreenGrab(ProgramInfo *rcinfo, int secondsin, int &bufferlen,
+char *TVRec::GetScreenGrab(QString filename, int secondsin, int &bufferlen,
                            int &video_width, int &video_height)
 {
-    QString recprefix = context->GetFilePrefix(); 
-    QString filename = rcinfo->pathname;
-
     RingBuffer *tmprbuf = new RingBuffer(context, filename, false);
 
     NuppelVideoPlayer *nupvidplay = new NuppelVideoPlayer(context);
     nupvidplay->SetRingBuffer(tmprbuf);
     nupvidplay->SetAudioSampleRate(context->GetNumSetting("AudioSampleRate"));
+
     char *retbuf = nupvidplay->GetScreenGrab(secondsin, bufferlen, video_width,
                                              video_height);
 

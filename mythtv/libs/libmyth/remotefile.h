@@ -2,6 +2,7 @@
 #define REMOTEFILE_H_
 
 #include <qstring.h>
+#include <qcstring.h>
 #include <pthread.h>
 
 class MythContext;
@@ -10,24 +11,27 @@ class QSocket;
 class RemoteFile
 {
   public:
-    RemoteFile(QString &url, bool needevents = false, int recordernum = -1);
+    RemoteFile(const QString &url, bool needevents = false, 
+               int recordernum = -1);
    ~RemoteFile();
 
     QSocket *getSocket();
     bool isOpen(void);
 
-    void Start(void);
+    void Start(bool events = false);
 
     void Close(void);
     bool RequestBlock(int size);
 
     long long Seek(long long pos, int whence, long long curpos = -1);
 
-    int Read(void *data, int size);
+    int Read(void *data, int size, bool singlefile = false);
     void Reset(void);
 
+    bool SaveAs(QByteArray &data, bool events = true);
+
   private:
-    QSocket *openSocket(bool control);
+    QSocket *openSocket(bool control, bool events = false);
 
     QString path;
 
@@ -42,6 +46,8 @@ class RemoteFile
     QString append;
 
     pthread_mutex_t lock;
+
+    long long filesize;
 };
 
 #endif

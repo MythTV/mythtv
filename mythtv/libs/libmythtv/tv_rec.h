@@ -33,7 +33,7 @@ class TVRec
 
     ProgramInfo *GetRecording(void) { return curRecording; }
 
-    char *GetScreenGrab(ProgramInfo *rcinfo, int secondsin, int &bufferlen,
+    char *GetScreenGrab(QString filename, int secondsin, int &bufferlen,
                         int &video_width, int &video_height);
 
     bool IsRunning(void) { return runMainLoop; }

@@ -2924,7 +2924,8 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
                                        int &vh)
 {
     InitSubs();
-    OpenFile(false);
+    if (OpenFile() < 0)
+        return NULL;
 
     int number = (int)(secondsin * video_frame_rate);
 
@@ -2947,45 +2948,79 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
     buf = new unsigned char[video_size];
     strm = new unsigned char[video_width * video_height * 2];
 
+    pthread_mutex_init(&audio_buflock, NULL);
+    pthread_mutex_init(&video_buflock, NULL);
+    pthread_mutex_init(&avsync_lock, NULL);
+
+    own_vidbufs = true;
+
+    for (int i = 0; i < MAXVBUFFER; i++)
+        vbuffer[i] = new unsigned char[video_size];
+
+    for (int i = 0; i < MAXTBUFFER; i++)
+        tbuffer[i] = new unsigned char[text_size];
+
+    ClearAfterSeek();
+
     long long int maxRead = 200000000;
 
     bool frame = false;
 
-    while (lastKey < desiredKey && !fileend)
+    long long keyPos = -1;
+
+    if (positionMap->find(desiredKey / keyframedist) != positionMap->end())
+        keyPos = (*positionMap)[desiredKey / keyframedist];
+
+    GetFrame(1);
+
+    if (mpa_codec)
+        avcodec_flush_buffers(mpa_ctx);
+
+    if (keyPos != -1)
     {
-        fileend = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader,
-                                                   FRAMEHEADERSIZE));
-
-        if (frameheader.frametype == 'S')
+        long long diff = keyPos - ringBuffer->GetTotalReadPosition();
+  
+        ringBuffer->Seek(diff, SEEK_CUR);
+        framesPlayed = lastKey;
+    }
+    else
+    {
+        while (lastKey < desiredKey && !fileend)
         {
-            if (frameheader.comptype == 'V')
+            fileend = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader,
+                                                           FRAMEHEADERSIZE));
+
+            if (frameheader.frametype == 'S')
             {
-                (*positionMap)[framesPlayed / keyframedist] =
-                                             ringBuffer->GetTotalReadPosition();
-                lastKey = framesPlayed;
-            }
-            if (frameheader.comptype == 'A')
-                if (frameheader.timecode > 0)
+                if (frameheader.comptype == 'V')
                 {
-                    effdsp = frameheader.timecode;
+                    (*positionMap)[framesPlayed / keyframedist] =
+                                             ringBuffer->GetTotalReadPosition();
+                    lastKey = framesPlayed;
                 }
-        }
-        else if (frameheader.frametype == 'V')
-        {
-            framesPlayed++;
-        }
+                if (frameheader.comptype == 'A')
+                    if (frameheader.timecode > 0)
+                    {
+                        effdsp = frameheader.timecode;
+                    }
+            }
+            else if (frameheader.frametype == 'V')
+            {
+                framesPlayed++;
+            }
 
-        if (frameheader.frametype != 'R' && frameheader.packetlength > 0)
-        {
-            fileend = (ringBuffer->Read(strm, frameheader.packetlength) !=
-                       frameheader.packetlength);
-        }
+            if (frameheader.frametype != 'R' && frameheader.packetlength > 0)
+            {
+                fileend = (ringBuffer->Read(strm, frameheader.packetlength) !=
+                           frameheader.packetlength);
+            }
 
-        if (ringBuffer->GetTotalReadPosition() > maxRead)
-            break;
+            if (ringBuffer->GetTotalReadPosition() > maxRead)
+                break;
+        }
     }
 
-    int decodedframes = 0;
+    normalframes = 1;
     while (normalframes > 0 && !fileend)
     {
         fileend = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader,
@@ -3014,11 +3049,9 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
         {
             framesPlayed++;
             normalframes--;
-            decodedframes++;
             frame = DecodeFrame(&frameheader, strm, buf);
 
-            if (ringBuffer->GetTotalReadPosition() > maxRead && 
-                decodedframes > 2)
+            if (ringBuffer->GetTotalReadPosition() > maxRead)
                 break;
         }
     }
@@ -3030,16 +3063,20 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
         return NULL;
     }
 
-    linearBlendYUV420(buf, video_width, video_height);
+    AVPicture orig, retbuf;
+    avpicture_fill(&orig, buf, PIX_FMT_YUV420P, video_width, video_height);
+ 
+    avpicture_deinterlace(&orig, &orig, PIX_FMT_YUV420P, video_width,
+                          video_height);
 
     bufflen = video_width * video_height * 4;
     unsigned char *outputbuf = new unsigned char[bufflen];
 
-    yuv2rgb_fun convert = yuv2rgb_init_mmx(32, MODE_RGB);
-    
-    convert(outputbuf, buf, buf + (video_width * video_height), 
-            buf + (video_width * video_height * 5 / 4), video_width,
-            video_height);
+    avpicture_fill(&retbuf, outputbuf, PIX_FMT_RGBA32, video_width,
+                   video_height);
+
+    img_convert(&retbuf, PIX_FMT_RGBA32, &orig, PIX_FMT_YUV420P,
+                video_width, video_height);
 
     vw = video_width;
     vh = video_height;

@@ -8,6 +8,7 @@
 #include <stdio.h>
 
 #include "tv.h"
+#include "remoteutil.h"
 #include "programlistitem.h"
 
 #include "libmyth/mythcontext.h"
@@ -58,14 +59,13 @@ ProgramListItem::ProgramListItem(MythContext *context, QListView *parent,
     }
 }
 
-QPixmap *ProgramListItem::getPixmap(void)
+QPixmap ProgramListItem::getPixmap(void)
 {
-/*
     if (m_context->GetNumSetting("GeneratePreviewPixmaps") != 1)
-        return NULL;
+        return QPixmap();
 
     if (pixmap)
-        return pixmap;
+        return *pixmap;
 
     QString filename = pginfo->pathname;
     filename += ".png";
@@ -77,32 +77,41 @@ QPixmap *ProgramListItem::getPixmap(void)
 
     pixmap = m_context->LoadScalePixmap(filename);
     if (pixmap)
-        return pixmap;
+        return *pixmap;
 
-    int len = 0;
-    int video_width, video_height;
-    TV *tv = new TV(m_context);
-    unsigned char *data = (unsigned char *)tv->GetScreenGrab(pginfo, 65, len,
-                                                             video_width,
-                                                             video_height);
-    delete tv;
+    QImage *image = m_context->CacheRemotePixmap(filename);
 
-    if (data)
+    if (!image)
     {
-        QImage img(data, video_width, video_height, 32, NULL, 65536 * 65536, 
-                   QImage::LittleEndian);
-        img = img.smoothScale(160, 120);
+        RemoteGeneratePreviewPixmap(m_context, pginfo);
 
-        img.save(filename.ascii(), "PNG");
-
-        delete [] data;
- 
-        pixmap = m_context->LoadScalePixmap(filename);
-        if (pixmap)
-            return pixmap;
+        image = m_context->CacheRemotePixmap(filename);
     }
-*/
-    return NULL;
+
+    if (image)
+    {
+        pixmap = new QPixmap();
+ 
+        if (screenwidth != 800 || screenheight != 600)
+        {
+            QImage tmp2 = image->smoothScale((int)(image->width() * wmult),
+                                             (int)(image->height() * hmult));
+            pixmap->convertFromImage(tmp2);
+        }
+        else
+        {
+            pixmap->convertFromImage(*image);
+        }
+    }
+
+    if (!pixmap)
+    {
+        QPixmap tmp((int)(160 * wmult), (int)(120 * hmult));
+        tmp.fill(black);
+        return tmp;
+    }
+ 
+    return *pixmap;
 }
 
 void ProgramListItem::paintCell(QPainter *p, const QColorGroup &cg,

@@ -149,3 +149,11 @@ void RemoteSendMessage(MythContext *context, const QString &message)
 
     context->SendReceiveStringList(strlist);
 }
+
+void RemoteGeneratePreviewPixmap(MythContext *context, ProgramInfo *pginfo)
+{
+    QStringList strlist = "QUERY_GENPIXMAP";
+    pginfo->ToStringList(strlist);
+
+    context->SendReceiveStringList(strlist);
+}

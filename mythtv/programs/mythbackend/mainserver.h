@@ -50,6 +50,7 @@ class MainServer : public QObject
                                  PlaybackSock *pbs); 
     void HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs);
     void HandleMessage(QStringList &slist, PlaybackSock *pbs);
+    void HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs);
 
     PlaybackSock *getPlaybackBySock(QSocket *socket);
     FileTransfer *getFileTransferByID(int id);

@@ -29,34 +29,34 @@ using namespace std;
 QString RunProgramGuide(MythContext *context, QString startchannel, bool thread,
                         TV *player)
 {
-   QString chanstr;
-   {
-        if (thread)
-                qApp->lock();
+    QString chanstr;
+   
+    if (thread)
+        qApp->lock();
 
-	if (startchannel == QString::null)
-		startchannel = "";
+    if (startchannel == QString::null)
+        startchannel = "";
 
-        GuideGrid gg(context, startchannel, player);
+    GuideGrid gg(context, startchannel, player);
 
-        if (thread)
-        {
-                gg.show();
-               qApp->unlock();
+    if (thread)
+    {
+        gg.show();
+        qApp->unlock();
 
-               while (gg.isVisible())
-                    usleep(50);
-        }
-        else
-               gg.exec();
-
-        chanstr = gg.getLastChannel();
-        if (thread)
-                qApp->lock();
+        while (gg.isVisible())
+            usleep(50);
     }
+    else
+        gg.exec();
+
+    chanstr = gg.getLastChannel();
+    if (thread)
+        qApp->lock();
 
     if (thread)
         qApp->unlock();
+
     if (chanstr == QString::null)
         chanstr = "";
 
