@@ -6,7 +6,8 @@ TARGETS = mythtv-HOWTO.txt mythtv-HOWTO.html mythtv-HOWTO-singlehtml.html mythtv
 
 all: $(TARGETS)
 clean:
-	rm -f $(TARGETS)
+	rm -f $(TARGETS) $(patsubst %.html,%-[0-9]*.html,$(filter %.html,$(TARGETS)))
+distclean: clean
 
 validate: mythtv-HOWTO.sgml
 	linuxdoc -B check $<
