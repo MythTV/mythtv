@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-02-01, v1.088
+  2003-02-10, v1.090
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -1947,6 +1947,25 @@
                             be used a way to force a data update.
        "m" Key              Resets the location to the database default, then updates the data.
 
+  MythWeather also has an "Aggressiveness" setting.  This affects how
+  long MythWeather waits for data from the msnbc.com website before
+  timing out.  If you are on a slow connection, or have a slow DNS, or
+  MythWeather just doesn't seem to be working and you've already tried
+  everything else, then try increasing the aggressiveness level
+  parameter.  This parameter is inverse; a higher number actually means
+  that MythWeather will be less aggressive, and will therefore wait
+  longer before timing out.
+
+  MythWeather will print debugging information on the terminal.  If you
+  wish to see additional debugging information while MythWeather is
+  running, you'll need to modify the source and recompile.
+
+  Open file weather.cpp and go to line 40.  You should see debug =
+  false.  Change this to true, go back to the main mythweather directory
+  and run make clean distclean; make then switch to superuser and run
+  make install.  MythWeather will now print additional data to the
+  terminal to allow you to troubleshoot MythWeather issues.
+
   [1m16.  MythVideo[0m
 
   The MythVideo application will allow you to use an external program to
@@ -2039,6 +2058,7 @@
        directory
 
   then it shouldn't be a problem.
+
   If you get an error like /usr/bin/ld: cannot find -lXext, the compiler
   is telling you that you don't have XFree86-devel installed, and this
   needs to be fixed before MythTV will work correctly.
@@ -2081,23 +2101,23 @@
 
   Finally, check:
 
-  Section "Monitor"
-      Identifier "monitor1"
-      VendorName "Plug'n Play"
-      HorizSync 30-85
-      VertRefresh 50-160
+       Section "Monitor"
+           Identifier "monitor1"
+           VendorName "Plug'n Play"
+           HorizSync 30-85
+           VertRefresh 50-160
 
-      # Sony Vaio C1(X,XS,VE,VN)?
-      # 1024x480 @ 85.6 Hz, 48 kHz hsync
-      ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+           # Sony Vaio C1(X,XS,VE,VN)?
+           # 1024x480 @ 85.6 Hz, 48 kHz hsync
+           ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
 
-      # TV fullscreen mode or DVD fullscreen output.
-      # 768x576 @ 79 Hz, 50 kHz hsync
-      ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+           # TV fullscreen mode or DVD fullscreen output.
+           # 768x576 @ 79 Hz, 50 kHz hsync
+           ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
 
-      # 768x576 @ 100 Hz, 61.6 kHz hsync
-      ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
-  EndSection
+           # 768x576 @ 100 Hz, 61.6 kHz hsync
+           ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+       EndSection
 
   Ensure that there isn't an Option "DPMS" in the Monitor configuration.
 

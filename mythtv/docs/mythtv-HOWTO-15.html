@@ -98,6 +98,21 @@ Enter Key            Switch between celsius and fahrenheit. Can also
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P>MythWeather also has an "Aggressiveness" setting.  This affects how long
+MythWeather waits for data from the msnbc.com website before timing out.  If
+you are on a slow connection, or have a slow DNS, or MythWeather just
+doesn't seem to be working and you've already tried everything else, then
+try increasing the aggressiveness level parameter.  This parameter is
+inverse; a higher number actually means that MythWeather will be less
+aggressive, and will therefore wait longer before timing out.</P>
+<P>MythWeather will print debugging information on the terminal.  If you wish
+to see additional debugging information while MythWeather is running, you'll
+need to modify the source and recompile.</P>
+<P>Open file <CODE>weather.cpp</CODE> and go to line 40.  You should see <CODE>debug =
+false</CODE>.  Change this to true, go back to the main mythweather directory
+and run <CODE>make clean distclean; make</CODE> then switch to superuser and run
+<CODE>make install</CODE>.  MythWeather will now print additional data to the
+terminal to allow you to troubleshoot MythWeather issues.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-16.html">Next</A>

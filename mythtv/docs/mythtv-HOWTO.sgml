@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-02-01, v1.088
+<date>2003-02-10, v1.090
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1847,6 +1847,24 @@ Enter Key            Switch between celsius and fahrenheit. Can also
 "m" Key              Resets the location to the database default, then updates the data.
 </verb></tscreen>
 
+MythWeather also has an "Aggressiveness" setting.  This affects how long
+MythWeather waits for data from the msnbc.com website before timing out.  If
+you are on a slow connection, or have a slow DNS, or MythWeather just
+doesn't seem to be working and you've already tried everything else, then
+try increasing the aggressiveness level parameter.  This parameter is
+inverse; a higher number actually means that MythWeather will be less
+aggressive, and will therefore wait longer before timing out.
+
+MythWeather will print debugging information on the terminal.  If you wish
+to see additional debugging information while MythWeather is running, you'll
+need to modify the source and recompile.
+
+Open file <tt>weather.cpp</tt> and go to line 40.  You should see <tt>debug =
+false</tt>.  Change this to true, go back to the main mythweather directory
+and run <tt>make clean distclean; make</tt> then switch to superuser and run
+<tt>make install</tt>.  MythWeather will now print additional data to the
+terminal to allow you to troubleshoot MythWeather issues.
+
 <sect>MythVideo
 <p>The MythVideo application will allow you to use an external program to
 watch media files that are not directly supported by MythTV.
@@ -2497,6 +2515,7 @@ v1.086, 2003-01-29.  More on resolution hints.
 v1.087, 2003-01-30.  Pointer to VCDHelp's webpage on resolution.
 v1.088, 2003-02-01.  Added a section to check on the symlink in lirc.
 v1.089, 2003-02-03.  Added RH80 remote database instructions for v0.8
+v1.090, 2003-02-10.  Added stuff on MythWeather aggressiveness setting.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
