@@ -40,6 +40,9 @@ class EncoderLink
     void ToggleInputs(void);
     void ChangeChannel(bool direction);
     void SetChannel(QString name);
+    void ChangeContrast(bool direction);
+    void ChangeBrightness(bool direction);
+    void ChangeColour(bool direction);
     bool CheckChannel(QString name);
     void GetChannelInfo(QString &title, QString &subtitle, QString &desc,
                         QString &category, QString &starttime,

@@ -970,6 +970,21 @@ void TVRec::ChangeChannel(bool direction)
     UnpauseRingBuffer();
 }
 
+void TVRec::ChangeContrast(bool direction)
+{
+    channel->ChangeContrast(direction);
+}
+
+void TVRec::ChangeBrightness(bool direction)
+{
+    channel->ChangeBrightness(direction);
+}
+
+void TVRec::ChangeColour(bool direction)
+{
+    channel->ChangeColour(direction);
+}
+
 void TVRec::SetChannel(QString name)
 {
     rbuffer->Reset();

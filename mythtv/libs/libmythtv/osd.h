@@ -31,6 +31,7 @@ class OSD
                      const QString &callsign, const QString &iconpath,
                      int length);
     void SetChannumText(const QString &text, int length);
+    void SetSettingsText(const QString &text, int length);
 
     void NewDialogBox(const QString &name, const QString &message, 
                       const QString &optionone, const QString &optiontwo, 

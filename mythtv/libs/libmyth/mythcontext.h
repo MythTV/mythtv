@@ -77,6 +77,9 @@ class MythContext
     void StopLiveTVRecording(int recorder);
     void PauseRecorder(int recorder);
     void ToggleRecorderInputs(int recorder);
+    void RecorderChangeContrast(int recorder, bool direction);
+    void RecorderChangeBrightness(int recorder, bool direction);
+    void RecorderChangeColour(int recorder, bool direction);
     void RecorderChangeChannel(int recorder, bool direction);
     void RecorderSetChannel(int recorder, QString channel);
     bool CheckChannel(int recorder, QString channel);

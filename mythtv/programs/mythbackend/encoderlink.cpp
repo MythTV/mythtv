@@ -161,6 +161,24 @@ void EncoderLink::SetChannel(QString name)
         tv->SetChannel(name);
 }
 
+void EncoderLink::ChangeContrast(bool direction)
+{
+    if (local)
+        tv->ChangeContrast(direction);
+}
+
+void EncoderLink::ChangeBrightness(bool direction)
+{
+    if (local)
+        tv->ChangeBrightness(direction);
+}
+
+void EncoderLink::ChangeColour(bool direction)
+{
+    if (local)
+        tv->ChangeColour(direction);
+}
+
 bool EncoderLink::CheckChannel(QString name)
 {
     if (local)

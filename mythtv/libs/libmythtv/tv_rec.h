@@ -62,6 +62,9 @@ class TVRec
     void ToggleInputs(void);
     void ChangeChannel(bool direction);
     void SetChannel(QString name);
+    void ChangeColour(bool direction);
+    void ChangeContrast(bool direction);
+    void ChangeBrightness(bool direction);
     bool CheckChannel(QString name);
     void GetChannelInfo(QString &title, QString &subtitle, QString &desc,
                         QString &category, QString &starttime, 

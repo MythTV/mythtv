@@ -26,6 +26,10 @@ class Channel
     bool SetChannelByString(const QString &chan); 
     bool ChannelUp(void);
     bool ChannelDown(void);
+
+    int ChangeColour(bool up);
+    int ChangeBrightness(bool up);
+    int ChangeContrast(bool up);
  
     void ToggleInputs(void); 
     void SwitchToInput(const QString &input);

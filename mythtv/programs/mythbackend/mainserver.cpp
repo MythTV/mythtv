@@ -527,6 +527,24 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         enc->SetChannel(name);
         retlist << "ok";
     }
+    else if (command == "CHANGE_COLOUR")
+    {
+        bool up = slist[2].toInt(); 
+        enc->ChangeColour(up);
+        retlist << "ok";
+    }
+    else if (command == "CHANGE_CONTRAST")
+    {
+        bool up = slist[2].toInt(); 
+        enc->ChangeContrast(up);
+        retlist << "ok";
+    }
+    else if (command == "CHANGE_BRIGHTNESS")
+    {
+        bool up = slist[2].toInt(); 
+        enc->ChangeBrightness(up);
+        retlist << "ok";
+    }
     else if (command == "CHECK_CHANNEL")
     {
         QString name = slist[2];

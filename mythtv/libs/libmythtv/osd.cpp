@@ -536,6 +536,37 @@ bool OSD::LoadTheme(void)
         channelnumber->AddType(chantext);
     }
 
+    if (settings->GetSetting("SettingsRect") != "")
+    {
+        QString settingsrect = settings->GetSetting("SettingsRect");
+
+        QRect settingsRect = parseRect(settingsrect);
+        normalizeRect(&settingsRect);
+        settingsRect.moveBy((int)(vid_width * 0.045), 
+                           (int)(vid_height * 0.05));
+
+        int settingsfontsize = settings->GetNumSetting("SettingsFontSize");
+        if (!settingsfontsize)
+            settingsfontsize = 40;
+
+        if (vid_height < 400)
+            settingsfontsize /= 2;
+
+        name = "settings_font";
+        TTFFont *settingsfont = LoadFont(fontname, settingsfontsize);
+
+        fontMap[name] = settingsfont;
+
+        name = "settings";
+        OSDSet *settings = new OSDSet(name, true, vid_width, vid_height,
+                                           wmult, hmult);
+        AddSet(settings, name);
+
+        OSDTypeText *settingstext = new OSDTypeText(name, settingsfont, "", 
+                                                    settingsRect);
+        settings->AddType(settingstext);
+    }
+
     if (settings->GetSetting("EditSliderRect") != "")
     {
         QString esect = settings->GetSetting("EditSliderRect");
@@ -734,6 +765,23 @@ void OSD::SetChannumText(const QString &text, int length)
     if (container)
     {
         OSDTypeText *type = (OSDTypeText *)container->GetType("channel_number");
+        if (type)
+            type->SetText(text);
+
+        container->DisplayFor(length * fps);
+        m_setsvisible = true;
+    }
+
+    pthread_mutex_unlock(&osdlock);
+}
+
+void OSD::SetSettingsText(const QString &text, int length)
+{
+    pthread_mutex_lock(&osdlock);
+    OSDSet *container = GetSet("settings");
+    if (container)
+    {
+        OSDTypeText *type = (OSDTypeText *)container->GetType("settings");
         if (type)
             type->SetText(text);
 

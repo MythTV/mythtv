@@ -299,3 +299,111 @@ void Channel::SwitchToInput(const QString &input)
         perror("VIDIOCSCHAN: ");
     }
 }
+
+int Channel::ChangeColour(bool up)
+{
+    struct video_picture vid_pic;
+    memset(&vid_pic, 0, sizeof(vid_pic));
+
+    int newcolour;    // The int should have ample space to avoid overflow
+                      // in the case that we're just over or under 65535
+
+    if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
+    {
+        perror("VIDIOCGPICT: ");
+        return -1;
+    }
+
+    if (up)
+    {
+        newcolour = vid_pic.colour + 655;
+        newcolour = (newcolour > 65535)?(65535):(newcolour);
+    }
+    else
+    {
+        newcolour = vid_pic.colour - 655;
+        newcolour = (newcolour < 0)?(0):(newcolour);
+    }
+
+    vid_pic.colour = newcolour;
+
+    if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
+    {
+        perror("VIDIOCSPICT: ");
+        return -1;
+    }
+
+    return vid_pic.colour;
+}
+
+int Channel::ChangeBrightness(bool up)
+{
+    struct video_picture vid_pic;
+    memset(&vid_pic, 0, sizeof(vid_pic));
+
+    int newbrightness;    // The int should have ample space to avoid overflow
+                          // in the case that we're just over or under 65535
+
+    if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
+    {
+        perror("VIDIOCGPICT: ");
+        return -1;
+    }
+
+    if (up)
+    {
+        newbrightness = vid_pic.brightness + 655;
+        newbrightness = (newbrightness > 65535)?(65535):(newbrightness);
+    }
+    else
+    {
+        newbrightness = vid_pic.brightness - 655;
+        newbrightness = (newbrightness < 0)?(0):(newbrightness);
+    }
+
+    vid_pic.brightness = newbrightness;
+
+    if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
+    {
+        perror("VIDIOCSPICT: ");
+        return -1;
+    }
+
+    return vid_pic.brightness;
+}
+
+int Channel::ChangeContrast(bool up)
+{
+    struct video_picture vid_pic;
+    memset(&vid_pic, 0, sizeof(vid_pic));
+
+    int newcontrast;    // The int should have ample space to avoid overflow
+                        // in the case that we're just over or under 65535
+
+    if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
+    {
+        perror("VIDIOCGPICT: ");
+        return -1;
+    }
+
+    if (up)
+    {
+        newcontrast = vid_pic.contrast + 655;
+        newcontrast = (newcontrast > 65535)?(65535):(newcontrast);
+    }
+    else
+    {
+        newcontrast = vid_pic.contrast - 655;
+        newcontrast = (newcontrast < 0)?(0):(newcontrast);
+    }
+
+    vid_pic.contrast = newcontrast;
+
+    if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
+    {
+        perror("VIDIOCSPICT: ");
+        return -1;
+    }
+
+    return vid_pic.contrast;
+}

@@ -62,3 +62,7 @@ int EditSliderYOffset=-9
 str EditSliderLeftArrow=cut-end.png
 str EditSliderRightArrow=cut-start.png
 
+# Location to draw the settings text into
+str SettingsRect=168,24,350,32
+# Size of the settings font
+int SettingsFontSize=24

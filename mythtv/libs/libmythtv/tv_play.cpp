@@ -797,6 +797,14 @@ void TV::ProcessKeypress(int keypressed)
             //case 'B': case 'b': ToggleActiveWindow(); break;
             //case 'N': case 'n': SwapPIP(); break;
 
+            // Contrast, brightness, colour of the input source
+            case 'j': ChangeContrast(false); break;
+            case 'J': ChangeContrast(true); break;
+            case 'k': ChangeBrightness(false); break;
+            case 'K': ChangeBrightness(true); break;
+            case 'l': ChangeColour(false); break;
+            case 'L': ChangeColour(true); break;
+
             default: break;
         }
     }
@@ -1298,4 +1306,49 @@ void TV::LoadMenu(void)
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
     pthread_create(&tid, &attr, TV::MenuHandler, this);
+}
+
+void TV::ChangeBrightness(bool up)
+{
+    QString text;
+
+    if (up)
+        text = "Brightness +";
+    else
+        text = "Brightness -";
+
+    m_context->RecorderChangeBrightness(activerecorder_num, up);
+
+    if (activenvp == nvp)
+        osd->SetSettingsText(text, text.length() );
+}
+
+void TV::ChangeContrast(bool up)
+{
+    QString text;
+
+    if (up)
+        text = "Contrast +";
+    else
+        text = "Contrast -";
+
+    m_context->RecorderChangeContrast(activerecorder_num, up);
+
+    if (activenvp == nvp)
+        osd->SetSettingsText(text, text.length() );
+}
+
+void TV::ChangeColour(bool up)
+{
+    QString text;
+
+    if (up)
+        text = "Color +";
+    else
+        text = "Color -";
+
+    m_context->RecorderChangeColour(activerecorder_num, up);
+
+    if (activenvp == nvp)
+        osd->SetSettingsText(text, text.length() );
 }

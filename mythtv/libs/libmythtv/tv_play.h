@@ -55,6 +55,10 @@ class TV
 
     void ChangeChannel(bool up);
     void ChangeChannelByString(QString &name);
+
+    void ChangeContrast(bool up);
+    void ChangeBrightness(bool up);
+    void ChangeColour(bool up);
     
     void ChannelKey(int key);
     void ChannelCommit(void);

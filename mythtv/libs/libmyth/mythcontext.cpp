@@ -696,6 +696,42 @@ void MythContext::RecorderSetChannel(int recorder, QString channel)
     pthread_mutex_unlock(&serverSockLock);
 }
 
+void MythContext::RecorderChangeContrast(int recorder, bool direction)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
+    strlist << "CHANGE_CONTRAST";
+    strlist << QString::number((int)direction);    
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+}
+
+void MythContext::RecorderChangeBrightness(int recorder, bool direction)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
+    strlist << "CHANGE_BRIGHTNESS";
+    strlist << QString::number((int)direction);    
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+}
+
+void MythContext::RecorderChangeColour(int recorder, bool direction)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
+    strlist << "CHANGE_COLOUR";
+    strlist << QString::number((int)direction);    
+
+    pthread_mutex_lock(&serverSockLock);
+    WriteStringList(serverSock, strlist);
+    ReadStringList(serverSock, strlist);
+    pthread_mutex_unlock(&serverSockLock);
+}
+
 bool MythContext::CheckChannel(int recorder, QString channel)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recorder);
