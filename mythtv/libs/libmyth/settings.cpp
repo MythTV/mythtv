@@ -505,8 +505,9 @@ QWidget* ComboBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     else
         connect(widget, SIGNAL(highlighted(int)),
                 this, SLOT(setValue(int)));
-    connect(this, SIGNAL(selectionAdded(const QString&,QString)),
-            widget, SLOT(insertItem(const QString&)));
+
+    connect(widget, SIGNAL(destroyed()),
+            this, SLOT(widgetDestroyed()));
     connect(this, SIGNAL(selectionsCleared()),
             widget, SLOT(clear()));
 
