@@ -104,6 +104,7 @@ void UpgradeTVDatabaseSchema(void)
 "INSERT INTO recordingprofiles SET name = \"Low Quality\", profilegroup = 5;",
 "INSERT INTO recordingprofiles SET name = \"RTjpeg/MPEG4\", profilegroup = 6;",
 "INSERT INTO recordingprofiles SET name = \"MPEG2\", profilegroup = 6;",
+"DELETE FROM codecparams;",
 "",
 };
 
