@@ -23,8 +23,6 @@ SingleView::SingleView(QSqlDatabase *db, vector<Thumbnail> *imagelist, int pos,
     imageRotateAngle = 0;
     zoomfactor = newzoom = 0;
 
-    m_font = gContext->GetMediumFont();
-
     images = imagelist;
     imagepos = pos;
     displaypos = -1;
@@ -53,8 +51,6 @@ SingleView::~SingleView()
             usleep(50);
         delete timer;
     }
-
-    delete m_font;
 }
 
 void SingleView::paintEvent(QPaintEvent *e)

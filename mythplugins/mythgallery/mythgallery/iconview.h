@@ -57,7 +57,7 @@ class IconView : public MythDialog
     void importPics();
     void importFromDir(const QString &fromDir, const QString &toDir);
 
-    QFont *m_font;
+    QFont m_font;
 
     QColor fgcolor;
     QColor highlightcolor;

@@ -61,7 +61,6 @@ IconView::~IconView()
         thumbs.pop_back();
     }
 
-    delete m_font;
     if (foldericon)
         delete foldericon;
 }
@@ -89,7 +88,7 @@ void IconView::paintEvent(QPaintEvent *e)
     QPainter tmp;
     tmp.begin(&pix, this);
 
-    tmp.setFont(*m_font);
+    tmp.setFont(m_font);
     tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
 
     unsigned int curpos = screenposition;

@@ -34,8 +34,6 @@ class SingleView : public MythDialog
 
     QImage *image;
 
-    QFont *m_font;
-
     vector<Thumbnail> *images;
     int imagepos;
     int displaypos;
