@@ -34,7 +34,7 @@ DecoderBase::DecoderBase(NuppelVideoPlayer *parent, MythSqlDatabase *db,
 
 void DecoderBase::Reset(void)
 {
-    SeekReset();
+    SeekReset(0, 0, true);
 
     m_positionMap.clear();
     framesPlayed = 0;
