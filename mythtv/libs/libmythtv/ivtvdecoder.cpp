@@ -118,7 +118,7 @@ bool IvtvDecoder::CanHandle(char testbuf[2048], const QString &filename)
         perror("VIDIOC_G_STD");
     else
     {
-        if (std & V4L2_STD_PAL)
+        if (std & V4L2_STD_625_50)
             ntsc = false;
     }    
 
