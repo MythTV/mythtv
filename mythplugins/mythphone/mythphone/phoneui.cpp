@@ -414,7 +414,6 @@ void PhoneUIBox::PlaceorAnswerCall(QString url, QString name, QString Mode, bool
     switch (State)
     {
     case SIP_IDLE:
-cout << "Place Call\n";
         sipStack->PlaceNewCall(Mode, url, name, onLocalLan);
 
         // Add an entry into the Placed Calls dir
@@ -423,7 +422,6 @@ cout << "Place Call\n";
         currentCallEntry = new CallRecord(name, url, false, (QDateTime::currentDateTime()).toString());
         phoneUIStatusBar->updateMidCallCaller(((name != 0) && (name.length() > 0)) ? name : url);
         EscapeHangsUp = true;
-cout << "Placed\n";
         break;
 
     case SIP_ICONNECTING:
