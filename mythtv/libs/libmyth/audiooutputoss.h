@@ -15,7 +15,7 @@ class AudioOutputOSS : public AudioOutputBase
 public:
     AudioOutputOSS(QString audiodevice, int laudio_bits, 
                    int laudio_channels, int laudio_samplerate,
-		   AudioOutputSource source, bool set_initial_vol);
+                   AudioOutputSource source, bool set_initial_vol);
     virtual ~AudioOutputOSS();
 
     // Volume control

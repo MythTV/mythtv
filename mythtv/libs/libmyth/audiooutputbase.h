@@ -17,8 +17,8 @@ class AudioOutputBase : public AudioOutput
 {
  public:
     AudioOutputBase(QString audiodevice, int laudio_bits,
-                   int laudio_channels, int laudio_samplerate,
-		   AudioOutputSource source, bool set_initial_vol);    
+                    int laudio_channels, int laudio_samplerate,
+                    AudioOutputSource source, bool set_initial_vol);    
     virtual ~AudioOutputBase();
 
     // reconfigure sound out for new params
@@ -73,7 +73,7 @@ class AudioOutputBase : public AudioOutput
     int GetAudioData(unsigned char *buffer, int buf_size, bool fill_buffer);
 
     void _AddSamples(void *buffer, bool interleaved, int samples, long long timecode);
-	 
+ 
     void KillAudio();
     void OutputAudioLoop(void);
     static void *kickoffOutputAudioLoop(void *player);
