@@ -1376,7 +1376,7 @@ void PlaybackBox::play(ProgramInfo *rec)
         {
             qApp->unlock();
             qApp->processEvents();
-            usleep(50);
+            usleep(10000);
             qApp->lock();
         }
     }
