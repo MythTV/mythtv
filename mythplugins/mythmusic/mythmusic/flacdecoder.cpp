@@ -492,6 +492,8 @@ Metadata *FlacDecoder::getMetadata(QSqlDatabase *db)
 
     retdata->dumpToDatabase(db);
 
+    fclose(input);
+
     return retdata;
 }    
 
@@ -566,6 +568,8 @@ void FlacDecoder::commitMetadata(Metadata *mdata)
 
     FLAC__metadata_chain_delete(chain);
     FLAC__metadata_iterator_delete(iterator);
+
+    fclose(input);
 }
 
 QString FlacDecoder::getComment(FLAC__StreamMetadata *block, const char *label)
