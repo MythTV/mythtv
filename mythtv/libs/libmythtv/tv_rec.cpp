@@ -977,7 +977,7 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
             rate = -1;
     }
 
-    thequery = QString("SELECT if(startchan, startchan, '3') "
+    thequery = QString("SELECT if(startchan!='', startchan, '3') "
                        "FROM capturecard,cardinput WHERE inputname = \"%1\" "
                        "AND capturecard.cardid = %2 "
                        "AND capturecard.cardid = cardinput.cardid;")
@@ -1244,6 +1244,16 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
     pthread_mutex_lock(&db_lock);
 
     MythContext::KickDatabase(db_conn);
+
+    if (channum[0].isLetter() && channelorder == "channum + 0")
+    {
+        cerr << "Your channel ordering method \"channel number (numeric)\"\n"
+             << "will not work with channels like: " << channum << endl;
+        cerr << "Consider switching to order by \"database order\" or \n"
+             << "\"channel number (alpha)\" in the general settings section\n"
+             << "of the frontend setup\n";
+        channelorder = "channum";
+    }
 
     QString thequery = QString("SELECT %1 FROM "
                                "channel,capturecard,cardinput "
