@@ -223,15 +223,16 @@ void DataDirectStationUpdate(Source source)
 
     ddprocessor.updateStationViewTable();
 
-    querystr = "SELECT dd_v_station.stationid,dd_v_station.callsign,"
+    QSqlQuery query1;
+    query1.prepare("SELECT dd_v_station.stationid,dd_v_station.callsign,"
                "dd_v_station.stationname,dd_v_station.channel "
                "FROM dd_v_station LEFT JOIN channel ON "
                "dd_v_station.stationid = channel.xmltvid "
-               "WHERE channel.chanid IS NULL;";
+               "AND channel.sourceid = :SOURCEID "
+               "WHERE channel.chanid IS NULL;");
+    query1.bindValue(":SOURCEID", source.id);
 
-    QSqlQuery query1;
-
-    if (!query1.exec(querystr))
+    if (!query1.exec())
         MythContext::DBError("Selecting new channels", query1);
 
     if (query1.isActive() && query1.numRowsAffected() > 0)
