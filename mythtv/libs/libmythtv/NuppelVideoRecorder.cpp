@@ -879,9 +879,9 @@ void NuppelVideoRecorder::StartRecording(void)
         if (ioctl(fd, VIDIOCSYNC, &frame)<0) 
         {
             syncerrors++;
-            if (syncerrors > 10)
+            if (syncerrors == 10)
                 cerr << "Multiple bttv errors, further messages supressed\n";
-            else if (syncerrors == 10)
+            else if (syncerrors < 10)
                 perror("VIDIOCSYNC");
         }
         else 
