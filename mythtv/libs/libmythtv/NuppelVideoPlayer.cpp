@@ -3206,6 +3206,8 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
             fflush( stdout );
         }
 
+        GetFrame(1,true);
+
         while(counter < loops && loop < maxLoops && !eof) 
         {
             JumpToFrame(seekFrame);
