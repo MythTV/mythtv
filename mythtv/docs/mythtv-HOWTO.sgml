@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-03-18, v2.01
+<date>2003-03-21, v2.02
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -139,7 +139,8 @@ is installed.  As of 2003-03-15, this list includes <bf>perl</bf> (for
 XMLTV), <bf>mysql</bf>, <bf>gcc</bf>, <bf>freetype2-devel</bf>,
 <bf>XFree86-devel</bf>, <bf>qt-devel</bf> and <bf>lame</bf>.  If you're going to use a
 remote control with MythTV, you're going to need the <bf>cdialog</bf>
-package in order to compile <bf>lircd</bf>.
+package in order to compile <bf>lircd</bf> if your distribution doesn't have
+a pre-packaged <bf>lirc</bf>.
 
 <bf>NOTE</bf>:  QT v3.1 is recommended, but not required.
 
@@ -163,6 +164,9 @@ latest ALSA drivers.
 <p>On systems running KDE, a tool which will allow you to see what packages
 are available and if they're installed on your system can be accessed by
 clicking K->Configuration->Packaging->KPackage
+
+While the graphical tools are nice, the command line tool is actually easier
+to use.  It's recommended that you use the command line tool.
 
 There are many inter-related modules, so make sure that you've got the
 main package for each one, and not a sub package for an unrelated item.  For
@@ -188,11 +192,14 @@ Search for XFree86-devel.
 
 Finally, check for qt.  You'll need libqt3-devel (under folder "KDE and
 Qt") and libqt3 ("Libraries").
-<bf>NOTE</bf>:  Mandrake 9.1 has removed the MySQL modules from the default
-installation.  Ensure that you install <tt>libqt3-mysql</tt>.
+
+<code>
+NOTE for Mandrake 9.1 users:  Mandrake 9.1 has removed the MySQL modules from the default
+installation.  Ensure that you install libqt3-mysql.
+</code>
 
 Make sure that cdialog is installed if you want to use MythTV with a remote
-control.
+control if you need to compile <bf>lirc</bf> from source.
 
 alsa-utils is needed for setting the volume.  MythTV now has native volume
 support, but you may have a special configuration that necessitates an
@@ -232,10 +239,11 @@ install this package using the command line do
 $ up2date --solvedeps qt-MySQL
 </verb></tscreen>
 
-<label id="RH_XFree86-devel"><bf>NOTE</bf>:  Red Hat Linux users, ensure that the correct symlinks have
-been created for the XFree-86 development libraries:
+<label id="RH_XFree86-devel">
+<bf>NOTE</bf>:  ensure that the correct symlinks have been created for the
+XFree-86 development libraries:
 
-<tscreen><verb>
+<tscreen<verb>
 # ln -s /usr/X11R6/lib/libXext.so.6 /usr/X11R6/lib/libXext.so
 # ln -s /usr/X11R6/lib/libX11.so.6 /usr/X11R6/lib/libX11.so
 </verb></tscreen>
@@ -250,14 +258,15 @@ command line.  The difficult part is the configuration aspect.  The
 following website <url url="http://plf.zarb.org/~nanardon/urpmiweb.php"
 name="http://plf.zarb.org/~nanardon/urpmiweb.php"> will allow you to choose
 a mirror site and then present the command-line configuration text for that
-mirror.  You will most likely need to add a "Contrib" mirror to your setup.
+mirror.  You will most likely need to add a "Contrib" mirror to your setup. 
+If you add a site from the "Penguin Liberation Front", you will be able to
+load the <tt>lame</tt> library without compiling from source.
 
-<sect4>Special instructions for Mandrake 8.2
-<p>Mandrake 8.2 does not have a pre-packaged libqt3-devel, so you must compile and
-install this manually.  The following command will install the
-pre-requisites for qt3, so don't skip this step.  
-The simplest tool for installing packages from the command line is
-<bf>urpmi</bf>.
+<sect4>Special instructions for Mandrake 8.2  
+<p>Mandrake 8.2 does not have a pre-packaged libqt3-devel, so you must compile
+and install this manually.  The following command will install the
+pre-requisites for qt3, so don't skip this step.  The simplest tool for
+installing packages from the command line is urpmi.
 
 Open a shell, and execute the following.  You may get asked a number of
 questions regarding dependencies.  It's best to answer "YES".
@@ -309,21 +318,25 @@ $ su
 # urpmi XFree86-devel
 </verb></tscreen>
 
-<bf>NOTE</bf>: Mandrake 8.2 users, <em>do not</em> execute the following
+<code>
+NOTE for Mandrake 8.2 users: do not execute the following
 command.  You've already manually installed the files in the previous
 section.
+</code>
+
 <tscreen><verb>
 # urpmi libqt3-devel
 </verb></tscreen>
-<bf>NOTE</bf>: Mandrake 9.1 users, execute the following
-command.
-<tscreen><verb>
+
+<code>
+NOTE for Mandrake 9.1 users: execute the following command.
+
 # urpmi libqt3-mysql
-</verb></tscreen>
+</code>
 
 However, you might get this when you execute the command above:
 <tscreen><verb>
-[root@pvr root]# urpmi perl mysql gcc gcc-c++ freetype2-devel libqt3-devel cdialog alsa-utils XFree86-devel
+[root@pvr root]# urpmi perl mysql gcc gcc-c++ freetype2-devel libqt3-devel alsa-utils XFree86-devel
 everything already installed
 </verb></tscreen>
 
@@ -371,7 +384,7 @@ installation of the software pre-requisites detailed earlier.
 <sect1>Distribution-specific information. <label
 id="Distribution-specific_information">
 <sect2>Mandrake 9.0
-<p>The following instructions work for Mandrake 9.0 using <tt>bash</tt> as the
+<p>The following instructions work for Mandrake 9.0 and 9.1 using <tt>bash</tt> as the
 shell, and may be applicable for a distribution which uses
 <tt>/etc/profile.d</tt>.
 
@@ -450,11 +463,13 @@ found when we need them.
 $ 
 </verb></tscreen>
 
-<bf>NOTE</bf>:  It appears that Red Hat Linux 8.0 requires that the
-<bf>ldconfig</bf> command needs to be run twice. Red Hat will also
+<code>
+NOTE for Red Hat Linux 8.0 users:  It appears that Red Hat Linux 8.0
+requires that the ldconfig command needs to be run twice. Red Hat will also
 frequently "forget" about the path. It's recommended to run
-<bf>/sbin/ldconfig</bf> after installing every package. Failing that, always
+/sbin/ldconfig after installing every package. Failing that, always
 run it if you get an unexpected error about not finding libraries.
+</code>
 
 <sect>Downloading and compiling.
 
@@ -463,6 +478,13 @@ web site.  Save the tarball to a directory you can find.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
 name="http://xmltv.sourceforge.net">.  Download version 0.5.8
+
+<code>
+NOTE for Mandrake users:  If you have added a "PLF" mirror, you may skip the
+next step and type:
+
+# urpmi libmp3lame0 libmp3lame0-devel
+</code>
 
 Get lame from <url url="http://www.mp3dev.org/mp3"
 name="http://www.mp3dev.org/mp3">.  Download the source code to v3.93.1 by
@@ -670,8 +692,6 @@ $ su
 running and started at boot. Click on Redhat menu>Server Settings>Services
 and enter the root password when asked. Check "mysqld" and then click Start.
 Click Save, then close the window.
-
-
 
 <sect1>Gentoo.
 <p>After installing mysql you need to initialise the database by running
@@ -971,21 +991,11 @@ url="http://www.kernel.org/pub/linux/kernel/v2.4/"
 name="http://www.kernel.org/pub/linux/kernel/v2.4/">.
 
 <sect2>Obtaining the kernel.
-<p>An easy way is to use the wget command:
+<p>Install using urpmi.
+
 <tscreen><verb>
-$ wget http://www.kernel.org/pub/linux/kernel/v2.4/linux-2.4.19.tar.bz2
-</verb></tscreen>
-Next, open a shell and login as superuser.
-<tscreen><verb>
-$ su 
-# mkdir /usr/src
-# mv linux-2.4.19.tar.bz2 /usr/src
-# cd /usr/src
-# tar -xjf linux-2.4.19.tar.bz2
-# chown -R root.root linux-2.4.19
-# ln -sf linux-2.4.19 linux
-# exit
-$ 
+$ su
+# urpmi kernel-source
 </verb></tscreen>
 
 <sect1>Red Hat Linux 8.0
@@ -1122,10 +1132,10 @@ kernel modules (alsa, etc) you will have to recompile/reinstall those.
 <sect1>Completing the lirc install. <label id="completing_lirc_install">
 <p><bf>NOTE to Mandrake 9.1 users</bf>: skip to the manual start paragraph
 below.
-<p>If configure did not mention anything about a kernel module, then you  
-are finished. If it did mention a kernel module, you must edit  
-the <tt>/etc/modules.conf</tt> file. Add this line as the first thing in the file.  
-It must come first, or it may not work.
+<p>If the lirc configure program / compile did not mention anything about a
+kernel module, then you are finished. If it did mention a kernel module, you
+must edit the <tt>/etc/modules.conf</tt> file. Add this line as the first
+thing in the file.  It must come first, or it may not work.
 <tscreen><verb>
 alias char-major-61 XXX
 </verb></tscreen>
@@ -1149,10 +1159,10 @@ If this fails, complaining of a missing <tt>lircd.conf</tt> file, then you
 must find or make one. First look for a premade configuration file at <url
 url="http://lirc.sourceforge.net/remotes/"
 name="http://lirc.sourceforge.net/remotes/">.  Mandrake 9.1 users, look in
-<tt>/usr/share/lirc-remotes</tt>. If you find one your remote
-there, download the file, name it <tt>lircd.conf</tt> and put it in your
-<tt>/etc</tt> directory. If you couldn't find your remote, you must make
-your own <tt>lircd.conf</tt> file.
+<tt>/usr/share/lirc-remotes</tt>. If you find one your remotes either on the
+website or in <tt>/usr/share</tt>, download or copy the file, name it
+<tt>lircd.conf</tt> and put it in your <tt>/etc</tt> directory. If you
+couldn't find your remote, you must make your own <tt>lircd.conf</tt> file.
 
 To make your own <tt>lircd.conf</tt> file
 <tscreen><verb>
@@ -1794,11 +1804,20 @@ Settings>Desktop Switching Tool and choose "KDE".
 <sect1>Using themes with MythTV.
 <p>MythTV is "themeable", meaning that the visual appearance of the program
 can be modified by the user without re-compiling or altering the program
-functionality.
-<tt>/usr/local/share/mythtv/theme.txt</tt> allows you to alter the theme
-for MythTV.  The default theme is called "blue".  Other themes that ship
-with MythTV can be found in the <tt>/usr/local/share/mythtv/themes</tt>
-directory.  
+functionality.  The MythTV website has a Themes section; pick a theme you'd
+like to use and download it to your system.
+
+Once it's on your machine, you must move the file and untar it:
+
+<tscreen><verb>
+$ su
+# cp funhouse.tar.gz /usr/local/share/mythtv/themes
+# cd /usr/local/share/mythtv/themes
+# tar -xjf funhouse.tar.gz
+# exit
+</verb></tscreen>
+
+The theme will now be available in the mythfrontend Appearance section.
 
 <sect1>Adding DirecTV information to the database.
 <p>A script for adding DirecTV information into the database has been
@@ -1980,6 +1999,7 @@ $ su
 # exit
 $ 
 </verb></tscreen>
+
 <sect1>Mandrake 9.0
 <p>Mandrake 9.0 has a number of the pre-requisites available on the
 installation CD.  Some of the software you're going to need will have to be
@@ -2022,12 +2042,42 @@ install <tt># urpmi libMesaGLU1-devel</tt>.
 url="http://www.libsdl.org" name="http://www.libsdl.org">.  On Mandrake 9.1,
 you may install it by executing: <tt># urpmi libsdl1.2 libsdl1.2-devel</tt>
 
-<sect1>Compiling MythMusic. 
-<p>Once all the pre-requisites have been
-installed, you can proceed with getting MythMusic going. Make sure that you
-run <tt>./configure</tt> first.  If you wish to use the new visualizations,
-make sure you install the prerequisites.  Run <tt>./configure --help</tt>
-for help.
+<sect1>Red Hat Linux 8.0
+<p>Red Hat provides packages for several of the pre-requisites, making 
+installation very simple. Of the prerequisites, Red Hat provides 
+packages for Vorbis, cdparanoia, SDL, and OpenGL (which you probably 
+already have installed). To install these all at once, simply type (all on
+the same line):
+
+<tscreen><verb>
+$ up2date --solvedeps libvorbis libvorbis-devel vorbis-tools cdparanoia-devel cdparanoia-libs cdparanoia SDL-devel SDL
+</verb></tscreen>
+
+If you get the following message: "None of the packages you requested 
+were found, or they are already updated" it probably means you already 
+have all of those packages installed.
+
+You must install the remaining packages, (MAD, FLAC, libcdaudio and
+optionally fftw) manually following the installation directions above. When
+installing fftw do not use the rpm package offered on the website because it
+will cause an error, so use the source package instead.
+
+<sect1>Compiling MythMusic.  
+<p>Once all the pre-requisites have been installed, you can proceed with
+getting MythMusic going. Make sure that you run <tt>./configure</tt> first. 
+If you wish to use the new visualizations, make sure you install the
+prerequisites.  Run <tt>./configure --help</tt> for help.
+
+<bf>NOTE for Red Hat users</bf>: Before compiling, make the following modification 
+to settings.pro, otherwise the compile will fail:
+
+Find the following text:
+<tt>INCLUDEPATH *= /usr/local/include</tt>
+
+immediately below that add
+<tt>INCLUDEPATH *= /usr/include/cdda</tt>
+
+save and close settings.pro and proceed with compiling MythMusic.
 
 <tscreen><verb>
 $ make
@@ -2078,8 +2128,20 @@ MythMusic will hang attempting to encode the non-audio data.
 
 <sect>MythWeather
 <p>The MythWeather module will obtain the weather information for the
-location that you specify.  You must be running the CVS version of MythTV
-in order to use MythWeather.
+location that you specify.  You must be running MythTV v0.8 in order to use
+MythWeather.
+
+<bf>NOTE for Red Hat Linux 8.0 users</bf>: Red Hat 8 users must make the
+following modification, or several weather icons will fail to be installed.
+
+From the mythweather build directory move to the mythweather sub-directory
+and edit the Makefile there.
+
+Find and comment out (using a '#' symbol) the following line:
+
+<tt>strip "$(INSTALL_ROOT)/usr/local/share/mythtv/mythweather/images/"</tt>
+
+Continuing:
 
 Change into the MythWeather directory, then make and make install:
 <tscreen><verb>
@@ -2283,6 +2345,11 @@ Using <tt>xset +dpms</tt> will turn it back on.
 Another technique to try, which will turn off the screensaver:
 <tscreen><verb>
 $ xset s off
+</verb></tscreen>
+
+You may also combine the command to turn off DPMS and the screensaver:
+<tscreen><verb>
+$ xset -dpms s off
 </verb></tscreen>
 
 Finally, depending on your distribution, you may be able to turn it off from
@@ -2635,6 +2702,10 @@ mysql> quit
 v2.00, 2003-03-14.  Initial release for 0.8.  Added xset command for
 screensaver. Added lirc for Mandrake 9.1
 v2.01, 2003-03-18.  Fixed some typos.
+v2.02, 2003-03-21.  RH8 pre-reqs for MythMusic.  plf for Mandrake liblame. 
+Changes throughout for Mandrake 9.1.  Started using "code" to seperate out
+special notes for certain distros.  Changed Mandrake instructions for
+getting the kernel-source.  More on DPMS / screensaver
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

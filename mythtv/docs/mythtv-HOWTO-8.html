@@ -52,25 +52,12 @@ the full 2.4.19 tar file from
 
 <H3>Obtaining the kernel.</H3>
 
-<P>An easy way is to use the wget command:
+<P>Install using urpmi.</P>
+<P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ wget http://www.kernel.org/pub/linux/kernel/v2.4/linux-2.4.19.tar.bz2
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Next, open a shell and login as superuser.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su 
-# mkdir /usr/src
-# mv linux-2.4.19.tar.bz2 /usr/src
-# cd /usr/src
-# tar -xjf linux-2.4.19.tar.bz2
-# chown -R root.root linux-2.4.19
-# ln -sf linux-2.4.19 linux
-# exit
-$ 
+$ su
+# urpmi kernel-source
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -225,10 +212,10 @@ kernel modules (alsa, etc) you will have to recompile/reinstall those.</P>
 
 <P><B>NOTE to Mandrake 9.1 users</B>: skip to the manual start paragraph
 below.</P>
-<P>If configure did not mention anything about a kernel module, then you  
-are finished. If it did mention a kernel module, you must edit  
-the <CODE>/etc/modules.conf</CODE> file. Add this line as the first thing in the file.  
-It must come first, or it may not work.
+<P>If the lirc configure program / compile did not mention anything about a
+kernel module, then you are finished. If it did mention a kernel module, you
+must edit the <CODE>/etc/modules.conf</CODE> file. Add this line as the first
+thing in the file.  It must come first, or it may not work.
 <BLOCKQUOTE><CODE>
 <PRE>
 alias char-major-61 XXX
@@ -257,10 +244,10 @@ users, type: <CODE># /etc/rc.d/init.d/lircd start</CODE> instead of:
 <P>If this fails, complaining of a missing <CODE>lircd.conf</CODE> file, then you
 must find or make one. First look for a premade configuration file at 
 <A HREF="http://lirc.sourceforge.net/remotes/">http://lirc.sourceforge.net/remotes/</A>.  Mandrake 9.1 users, look in
-<CODE>/usr/share/lirc-remotes</CODE>. If you find one your remote
-there, download the file, name it <CODE>lircd.conf</CODE> and put it in your
-<CODE>/etc</CODE> directory. If you couldn't find your remote, you must make
-your own <CODE>lircd.conf</CODE> file.</P>
+<CODE>/usr/share/lirc-remotes</CODE>. If you find one your remotes either on the
+website or in <CODE>/usr/share</CODE>, download or copy the file, name it
+<CODE>lircd.conf</CODE> and put it in your <CODE>/etc</CODE> directory. If you
+couldn't find your remote, you must make your own <CODE>lircd.conf</CODE> file.</P>
 <P>To make your own <CODE>lircd.conf</CODE> file
 <BLOCKQUOTE><CODE>
 <PRE>

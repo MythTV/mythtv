@@ -27,11 +27,21 @@ Settings>Desktop Switching Tool and choose "KDE".</P>
 
 <P>MythTV is "themeable", meaning that the visual appearance of the program
 can be modified by the user without re-compiling or altering the program
-functionality.
-<CODE>/usr/local/share/mythtv/theme.txt</CODE> allows you to alter the theme
-for MythTV.  The default theme is called "blue".  Other themes that ship
-with MythTV can be found in the <CODE>/usr/local/share/mythtv/themes</CODE>
-directory.  </P>
+functionality.  The MythTV website has a Themes section; pick a theme you'd
+like to use and download it to your system.</P>
+<P>Once it's on your machine, you must move the file and untar it:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# cp funhouse.tar.gz /usr/local/share/mythtv/themes
+# cd /usr/local/share/mythtv/themes
+# tar -xjf funhouse.tar.gz
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The theme will now be available in the mythfrontend Appearance section.</P>
 
 <H2><A NAME="ss11.2">11.2</A> <A HREF="mythtv-HOWTO.html#toc11.2">Adding DirecTV information to the database.</A>
 </H2>

@@ -15,8 +15,15 @@
 <H2><A NAME="s16">16.</A> <A HREF="mythtv-HOWTO.html#toc16">MythWeather</A></H2>
 
 <P>The MythWeather module will obtain the weather information for the
-location that you specify.  You must be running the CVS version of MythTV
-in order to use MythWeather.</P>
+location that you specify.  You must be running MythTV v0.8 in order to use
+MythWeather.</P>
+<P><B>NOTE for Red Hat Linux 8.0 users</B>: Red Hat 8 users must make the
+following modification, or several weather icons will fail to be installed.</P>
+<P>From the mythweather build directory move to the mythweather sub-directory
+and edit the Makefile there.</P>
+<P>Find and comment out (using a '#' symbol) the following line:</P>
+<P><CODE>strip "$(INSTALL_ROOT)/usr/local/share/mythtv/mythweather/images/"</CODE></P>
+<P>Continuing:</P>
 <P>Change into the MythWeather directory, then make and make install:
 <BLOCKQUOTE><CODE>
 <PRE>

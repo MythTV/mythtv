@@ -25,7 +25,7 @@ installation of the software pre-requisites detailed earlier.</P>
 
 <H3>Mandrake 9.0</H3>
 
-<P>The following instructions work for Mandrake 9.0 using <CODE>bash</CODE> as the
+<P>The following instructions work for Mandrake 9.0 and 9.1 using <CODE>bash</CODE> as the
 shell, and may be applicable for a distribution which uses
 <CODE>/etc/profile.d</CODE>.</P>
 <P>As root, create the following file in <CODE>/etc/profile.d</CODE>  The example
@@ -113,11 +113,17 @@ $
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P><B>NOTE</B>:  It appears that Red Hat Linux 8.0 requires that the
-<B>ldconfig</B> command needs to be run twice. Red Hat will also
+<P>
+<HR>
+<PRE>
+NOTE for Red Hat Linux 8.0 users:  It appears that Red Hat Linux 8.0
+requires that the ldconfig command needs to be run twice. Red Hat will also
 frequently "forget" about the path. It's recommended to run
-<B>/sbin/ldconfig</B> after installing every package. Failing that, always
-run it if you get an unexpected error about not finding libraries.</P>
+/sbin/ldconfig after installing every package. Failing that, always
+run it if you get an unexpected error about not finding libraries.
+</PRE>
+<HR>
+</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-5.html">Next</A>

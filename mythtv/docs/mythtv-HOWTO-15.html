@@ -102,6 +102,7 @@ $
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+
 <H2><A NAME="ss15.2">15.2</A> <A HREF="mythtv-HOWTO.html#toc15.2">Mandrake 9.0</A>
 </H2>
 
@@ -148,14 +149,43 @@ install <CODE># urpmi libMesaGLU1-devel</CODE>.</P>
 <A HREF="http://www.libsdl.org">http://www.libsdl.org</A>.  On Mandrake 9.1,
 you may install it by executing: <CODE># urpmi libsdl1.2 libsdl1.2-devel</CODE></P>
 
-<H2><A NAME="ss15.3">15.3</A> <A HREF="mythtv-HOWTO.html#toc15.3">Compiling MythMusic. </A>
+<H2><A NAME="ss15.3">15.3</A> <A HREF="mythtv-HOWTO.html#toc15.3">Red Hat Linux 8.0</A>
 </H2>
 
-<P>Once all the pre-requisites have been
-installed, you can proceed with getting MythMusic going. Make sure that you
-run <CODE>./configure</CODE> first.  If you wish to use the new visualizations,
-make sure you install the prerequisites.  Run <CODE>./configure --help</CODE>
-for help.</P>
+<P>Red Hat provides packages for several of the pre-requisites, making 
+installation very simple. Of the prerequisites, Red Hat provides 
+packages for Vorbis, cdparanoia, SDL, and OpenGL (which you probably 
+already have installed). To install these all at once, simply type (all on
+the same line):</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ up2date --solvedeps libvorbis libvorbis-devel vorbis-tools cdparanoia-devel cdparanoia-libs cdparanoia SDL-devel SDL
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If you get the following message: "None of the packages you requested 
+were found, or they are already updated" it probably means you already 
+have all of those packages installed.</P>
+<P>You must install the remaining packages, (MAD, FLAC, libcdaudio and
+optionally fftw) manually following the installation directions above. When
+installing fftw do not use the rpm package offered on the website because it
+will cause an error, so use the source package instead.</P>
+
+<H2><A NAME="ss15.4">15.4</A> <A HREF="mythtv-HOWTO.html#toc15.4">Compiling MythMusic. </A>
+</H2>
+
+<P>Once all the pre-requisites have been installed, you can proceed with
+getting MythMusic going. Make sure that you run <CODE>./configure</CODE> first. 
+If you wish to use the new visualizations, make sure you install the
+prerequisites.  Run <CODE>./configure --help</CODE> for help.</P>
+<P><B>NOTE for Red Hat users</B>: Before compiling, make the following modification 
+to settings.pro, otherwise the compile will fail:</P>
+<P>Find the following text:
+<CODE>INCLUDEPATH *= /usr/local/include</CODE></P>
+<P>immediately below that add
+<CODE>INCLUDEPATH *= /usr/include/cdda</CODE></P>
+<P>save and close settings.pro and proceed with compiling MythMusic.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -191,7 +221,7 @@ you specify GENRE it's the same as Genre in the format field.</P>
 <P>The Ignore_ID3 option does not disable the code that determines the track
 length, just the portion that tries to read ID3 info.</P>
 
-<H2><A NAME="ss15.4">15.4</A> <A HREF="mythtv-HOWTO.html#toc15.4">Using MythMusic. </A>
+<H2><A NAME="ss15.5">15.5</A> <A HREF="mythtv-HOWTO.html#toc15.5">Using MythMusic. </A>
 </H2>
 
 <P>MythMusic is fairly simple to use.  It is recommended that you insert the
