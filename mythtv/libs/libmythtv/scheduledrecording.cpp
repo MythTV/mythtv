@@ -199,16 +199,14 @@ QString ScheduledRecording::ChannelText(QString format)
 void ScheduledRecording::ToMap(QMap<QString, QString>& progMap)
 {
     QString searchtitle = "";
-/*
-    if(m_pginfo)
-    {
-        if (search->intValue() != kNoSearch)
-            searchtitle = title->getValue();
 
+    if (m_pginfo && search->intValue() != kNoSearch)
+    {
+        searchtitle = title->getValue();
         m_pginfo->ToMap(NULL, progMap);
     }
     else
-    {*/
+    {
         progMap["title"] = title->getValue();
         progMap["subtitle"] = subtitle->getValue();
         progMap["description"] = description->getValue();
@@ -237,11 +235,6 @@ void ScheduledRecording::ToMap(QMap<QString, QString>& progMap)
         progMap["chanid"] = channel->getValue();
         progMap["channel"] = station->getValue();
         
-        
-        
-        
-        
-        
         QDateTime startts(startDate->dateValue(), startTime->timeValue());
         QDateTime endts(endDate->dateValue(), endTime->timeValue());
         
@@ -264,7 +257,7 @@ void ScheduledRecording::ToMap(QMap<QString, QString>& progMap)
         progMap["shorttimedate"] = startts.date().toString(shortDateFormat) + ", " +
                                    startts.time().toString(timeFormat) + " - " +
                                    endts.time().toString(timeFormat);
-    //}
+    }
 
     progMap["searchtype"] = searchType;
     progMap["searchforwhat"] = searchForWhat;
