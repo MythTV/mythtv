@@ -465,8 +465,9 @@ static BackendCheckBox *AutoCommercialFlag()
     BackendCheckBox *bc = new BackendCheckBox("AutoCommercialFlag");
     bc->setLabel(QObject::tr("Automatically Flag Commercials"));
     bc->setValue(true);
-    bc->setHelpText(QObject::tr("Automatically flag commercials after a "
-                    "recording completes."));
+    bc->setHelpText(QObject::tr("This is the default policy used for the Auto-"
+                    "Commercial Flagging setting when a new scheduled "
+                    "recording is created."));
     return bc;
 }
 

@@ -231,11 +231,14 @@ void CommDetect::ProcessNextFrame(VideoFrame *frame, long long frame_number)
 
 bool CommDetect::CheckFrameIsBlank(void)
 {
+    int MaxDiff = 25;
+    int MaxBrightness = 70;
+    int DimBrightness = 110;
+    int DimAVG = 35;
     bool abort = false;
     int max = 0;
     int min = 255;
     int avg = 0;
-    int maxDiff = 25;
     unsigned char pixel;
     int pixelsChecked = 0;
     long long totBrightness = 0;
@@ -279,7 +282,10 @@ bool CommDetect::CheckFrameIsBlank(void)
 
     totalMinBrightness += min;
 
-    if (((max - min) <= maxDiff) || (maxDiff > avg))
+    if (((max - min) <= MaxDiff) ||
+        (max < MaxBrightness) ||
+        (avg < MaxDiff) ||
+        ((max < DimBrightness) && (avg < DimAVG)))
         return(true);
 
     return(false);
@@ -454,6 +460,12 @@ bool CommDetect::CheckRatingSymbol(void)
     unsigned char *vPtr = &frame_ptr[width * height * 5 / 4];
 
     memset(tmpBuf, ' ', width * height);
+
+    if (min_x < border)
+        min_x = border;
+
+    if (min_y < border)
+        min_y = border;
 
     for(int y = min_y; y <= max_y; y++)
     {
