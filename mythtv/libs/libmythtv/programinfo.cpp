@@ -139,19 +139,20 @@ void ProgramInfo::ToStringList(QStringList &list)
 
 void ProgramInfo::FromStringList(QStringList &list, int offset)
 {
-    if (offset + NUMPROGRAMLINES > (int)list.size())
-    {
-        cerr << "offset is: " << offset << " but size is " << list.size() 
-             << endl;
-        return;
-    }
-
     QStringList::iterator it = list.at(offset);
     FromStringList(list, it);
 }
 
 void ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
 {
+    QStringList::iterator checkit = it;
+    checkit += (NUMPROGRAMLINES - 1);
+    if (checkit == list.end())
+    {
+        cerr << "Not enough items in list for ProgramInfo object" << endl;
+        return;
+    }
+
     title = *(it++);
     subtitle = *(it++);
     description = *(it++);
