@@ -63,12 +63,20 @@ void MythComboBox::focusInEvent(QFocusEvent *e)
     QColor highlight = colorGroup().highlight();
 
     this->setPaletteBackgroundColor(highlight);
+
+    if (lineEdit())
+        lineEdit()->setPaletteBackgroundColor(highlight);
+
     QComboBox::focusInEvent(e);
 }
 
 void MythComboBox::focusOutEvent(QFocusEvent *e)
 {
     this->unsetPalette();
+
+    if (lineEdit())
+        lineEdit()->unsetPalette();
+
     QComboBox::focusOutEvent(e);
 }
 
