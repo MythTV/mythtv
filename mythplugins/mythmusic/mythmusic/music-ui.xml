@@ -221,6 +221,12 @@
                 <orientation>LeftToRight</orientation>
             </repeatedimage>
 
+            <textarea name="current_visualization_text" draworder="1" align="left">
+                <font>currentartist</font>
+                <area>470,100,200,25</area>
+                <cutdown>no</cutdown>
+            </textarea>
+
             <textarea name="info_text" draworder="1" align="left">
                 <font>infotext</font>
                 <area>270,129,250,25</area>

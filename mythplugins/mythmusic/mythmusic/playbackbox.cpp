@@ -879,7 +879,7 @@ void PlaybackBox::increaseRating()
     }
 
     //
-    //  Rational here is that if you can't get 
+    //  Rationale here is that if you can't get 
     //  visual feedback on ratings adjustments,
     //  you probably should not be changing them
     //
@@ -1104,11 +1104,7 @@ void PlaybackBox::customEvent(QCustomEvent *event)
             {
                 time_text->SetText(time_string);
                 info_text->SetText(info_string);
-                
-                //
-                //  This would also work
-                //
-                // info_text->SetText(mainvisual->getCurrentVisual());
+                current_visualization_text->SetText(mainvisual->getCurrentVisual());
             }
 
             break;
@@ -1165,6 +1161,7 @@ void PlaybackBox::wipeTrackInfo()
         time_text->SetText("");
         info_text->SetText("");
         ratings_image->setRepeat(0);
+        current_visualization_text->SetText("");
 }
 
 void PlaybackBox::handleTreeListSignals(int node_int, IntVector *attributes)
@@ -1292,6 +1289,16 @@ void PlaybackBox::wireUpTheme()
     if(!ratings_image)
     {
         cerr << "playbackbox.o: Couldn't find a repeated image called ratings_image in your theme" << endl;
+        exit(0);
+    }
+
+    //
+    //  Current visualization
+    //
+    current_visualization_text = getUITextType("current_visualization_text");
+    if(!current_visualization_text)
+    {
+        cerr << "playbackbox.o: Couldn't find a text area called current_visualization in your theme" << endl;
         exit(0);
     }
 

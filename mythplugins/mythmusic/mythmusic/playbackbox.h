@@ -147,6 +147,7 @@ class PlaybackBox : public MythThemedDialog
     UITextType            *album_text;
     UITextType            *time_text;
     UITextType            *info_text;
+    UITextType            *current_visualization_text;
     
     UIRepeatedImageType   *ratings_image;
     UIBlackHoleType       *visual_blackhole;
