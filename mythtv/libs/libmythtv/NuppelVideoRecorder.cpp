@@ -1483,7 +1483,7 @@ void NuppelVideoRecorder::doAudioThread(void)
     buffer = new unsigned char[audio_buffer_size];
 
     /* trigger record */
-    trigger = ~PCM_ENABLE_INPUT;
+    trigger = 0;
     ioctl(afd,SNDCTL_DSP_SETTRIGGER,&trigger);
 
     trigger = PCM_ENABLE_INPUT;
