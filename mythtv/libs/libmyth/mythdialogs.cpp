@@ -603,18 +603,32 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
 
         if (pDev) 
         {
-            while (itr != d->mediaHandlerMap.end())
+            QWidget * activewidget = qApp->focusWidget();
+            MythDialog * activedialog = NULL;
+            bool iscatched = false;
+            while (activewidget && !activedialog)
             {
-                if ((itr.data().MediaType & (int)pDev->getMediaType()))
+                activedialog = dynamic_cast<MythDialog*>(activewidget);
+                if (!activedialog)
+                       activewidget = activewidget->parentWidget();
+            }
+            if (activedialog)
+                iscatched = activedialog->onMediaEvent(pDev);
+            if (!iscatched)
+            {
+                while (itr != d->mediaHandlerMap.end())
                 {
-                    VERBOSE(VB_ALL, "Found a handler");
-                    d->exitingtomain = true;
-                    d->exitmenumediadevicecallback = itr.data().callback;
-                    d->mediadeviceforcallback = pDev;
-                    QApplication::postEvent(this, new ExitToMainMenuEvent());
-                    break;
+                   if ((itr.data().MediaType & (int)pDev->getMediaType()))
+                   {
+                       VERBOSE(VB_ALL, "Found a handler");
+                       d->exitingtomain = true;
+                       d->exitmenumediadevicecallback = itr.data().callback;
+                       d->mediadeviceforcallback = pDev;
+                       QApplication::postEvent(this, new ExitToMainMenuEvent());
+                       break;
+                   }
+                   itr++;
                 }
-                itr++;
             }
         }
     }
@@ -762,6 +776,13 @@ void MythDialog::setNoErase(void)
 #endif
     setWFlags(flags);
 }
+
+bool MythDialog::onMediaEvent(MythMediaDevice*)
+{
+    return false;
+}
+
+
 
 void MythDialog::Show(void)
 {

@@ -131,7 +131,8 @@ class MythDialog : public QFrame
     void hide(void);
 
     void setNoErase(void);
-    
+   
+    virtual bool onMediaEvent(MythMediaDevice * mediadevice); 
     
   signals:
     void menuButtonPressed();
