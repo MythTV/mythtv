@@ -31,7 +31,7 @@ using namespace std;
 #include "settings.h"
 #include "dvdripbox.h"
 #include "dbcheck.h"
-
+#include "lcddevice.h"
 //
 //  Transcode stuff only if we were ./configure'd for it
 //
@@ -62,8 +62,6 @@ void playVCD()
     //
     QString command_string = gContext->GetSetting("VCDPlayerCommand");
 
-    if (gContext->GetMainWindow()->HandleMedia( command_string, "DVD://"))
-        return;
 
     if(command_string.length() < 1)
     {
@@ -120,8 +118,6 @@ void playDVD(void)
     
     QString command_string = gContext->GetSetting("DVDPlayerCommand");
 
-    if (gContext->GetMainWindow()->HandleMedia( command_string, "DVD://"))
-        return;
 
     if(command_string.length() < 1)
     {
@@ -222,7 +218,10 @@ void runMenu(QString which_menu)
 
     if (diag->foundTheme())
     {
-        gContext->GetLCDDevice()->switchToTime();
+        if (class LCD * lcd = LCD::Get())
+        {
+            lcd->switchToTime();
+        }
         diag->exec();
     }
     else
