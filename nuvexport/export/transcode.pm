@@ -158,6 +158,17 @@ package export::transcode;
             $transcode .= ' -o /dev/null';
         }
         else {
+        # Make sure we don't have a duplicate filename
+            if (-e $self->{'path'}.'/'.$episode->{'outfile'}.$suffix) {
+                my $count = 1;
+                my $out   = $episode->{'outfile'};
+                while (-e $self->{'path'}.'/'.$out.$suffix) {
+                    $count++;
+                    $out = $episode->{'outfile'}.".$count";
+                }
+                $episode->{'outfile'} = $out;
+            }
+        # Add the output command
             $transcode .= ' -o '.shell_escape($self->{'path'}.'/'.$episode->{'outfile'}.$suffix);
         }
     # Transcode pids
