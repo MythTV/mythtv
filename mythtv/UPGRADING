@@ -1,3 +1,7 @@
+UPGRADING FROM RELEASE 0.11
+---------------------------
+Database updates are now done automatically.
+
 UPGRADING FROM RELEASE 0.10
 ---------------------------
 Update your database with the 0.10-to-0.11.sql script.
