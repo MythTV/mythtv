@@ -11,7 +11,7 @@ TangoBlue theme:
     Forrest Walter - www.forrestwalter.com
 LiquidTV theme:
     jer warren <>
-Selectable GUI sizes:
+Selectable GUI sizes, few other things:
     thor at lamedomainname.com
 Video Filters:
     Richard Jones <richard at earthmen.com>
@@ -62,3 +62,5 @@ Dynamic MMX/3DNow in linearblend filter, genericbutton UI extensions:
     Simon Kenyon <simon@koala.ie>
 DVB Code rewrite, fixes for MPEG2 playback, Channel Editor
     Kenneth Aafloy <ke-aa at frisurf.no>
+G.A.N.T. theme, re-design of backend status page, Swedish translation
+    Oscar Carlsson <oscar.carlsson at home.se>
