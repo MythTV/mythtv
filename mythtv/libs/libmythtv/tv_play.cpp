@@ -3448,6 +3448,8 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
             ToggleAutoExpire();
         else if (action.left(14) == "TOGGLECOMMSKIP")
             SetAutoCommercialSkip(action.right(1).toInt());
+        else if (action == "QUEUETRANSCODE")
+            DoQueueTranscode();
         else
         {
             cout << "unknown menu action selected: " << action << endl;
@@ -3476,14 +3478,11 @@ void TV::ShowOSDTreeMenu(void)
         OSDListTreeType *tree = osd->ShowTreeMenu("menu", treeMenu);
         if (tree)
         {
-            connect(tree, SIGNAL(itemSelected(OSDListTreeType *, 
-                                 OSDGenericTree *)), 
-                    this, SLOT(TreeMenuSelected(OSDListTreeType *,
-                               OSDGenericTree *)));
-            connect(tree, SIGNAL(itemEntered(OSDListTreeType *,
-                                 OSDGenericTree *)),
-                    this, SLOT(TreeMenuEntered(OSDListTreeType *,
-                               OSDGenericTree *)));
+            connect(tree, SIGNAL(itemSelected(OSDListTreeType *,OSDGenericTree *)), 
+                    this, SLOT(TreeMenuSelected(OSDListTreeType *, OSDGenericTree *)));
+
+            connect(tree, SIGNAL(itemEntered(OSDListTreeType *, OSDGenericTree *)),
+                    this, SLOT(TreeMenuEntered(OSDListTreeType *, OSDGenericTree *)));
         }
     }
 }
@@ -3516,6 +3515,20 @@ void TV::BuildOSDTreeMenu(void)
     else if (StateIsPlaying(internalState))
     {
         item = new OSDGenericTree(treeMenu, tr("Edit Recording"), "TOGGLEEDIT");
+
+        QString query = QString("SELECT * FROM transcoding WHERE "
+                                "chanid = '%1' AND starttime = '%2';")
+                               .arg(playbackinfo->chanid)
+                               .arg(playbackinfo->startts.toString("yyyyMMddhhmmss"));
+        m_db->lock();
+        MythContext::KickDatabase(m_db->db());
+        QSqlQuery result = m_db->db()->exec(query);
+        if (result.isActive() && result.numRowsAffected() > 0)
+            item = new OSDGenericTree(treeMenu, tr("Stop Transcoding"), "QUEUETRANSCODE");
+        else
+            item = new OSDGenericTree(treeMenu, tr("Begin Transcoding"), "QUEUETRANSCODE");
+
+        m_db->unlock();
 
         item = new OSDGenericTree(treeMenu, tr("Commercial Auto-Skip"));
         if (autoCommercialSkip != 0)

@@ -1760,6 +1760,22 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
 
     popup->addButton(tr("Edit Recording Schedule"), this,
                      SLOT(doEditScheduled()));
+
+    QString query = QString("SELECT * FROM transcoding WHERE "
+                            "chanid = '%1' AND starttime = '%2';")
+                           .arg(curitem->chanid)
+                           .arg(curitem->startts.toString("yyyyMMddhhmmss"));
+
+    MythContext::KickDatabase(db);
+    QSqlQuery result = db->exec(query);
+
+    if (result.isActive() && result.numRowsAffected() > 0)
+	popup->addButton(tr("Stop Transcoding"), this,
+		     SLOT(doBeginTranscoding()));
+    else
+	popup->addButton(tr("Begin Transcoding"), this,
+		     SLOT(doBeginTranscoding()));
+
     popup->addButton(tr("Delete"), this, SLOT(askDelete()));
     popup->addButton(tr("Cancel"), this, SLOT(doCancel()));
 
@@ -1898,6 +1914,32 @@ void PlaybackBox::doEditScheduled()
     connected = FillList();
     update(fullRect);
 }    
+
+void PlaybackBox::doBeginTranscoding()
+{
+    if (!expectingPopup)
+        return;
+
+    cancelPopup();
+
+    QSqlDatabase *db = QSqlDatabase::database();
+
+    QString query = QString("SELECT * FROM transcoding WHERE "
+                            "chanid = '%1' AND starttime = '%2';")
+                           .arg(curitem->chanid)
+                           .arg(curitem->startts.toString("yyyyMMddhhmmss"));
+
+    MythContext::KickDatabase(db);
+
+    QSqlQuery result = db->exec(query);
+
+    if(result.isActive() && result.numRowsAffected() > 0)
+        RemoteQueueTranscode(curitem, TRANSCODE_STOP);
+    else
+        RemoteQueueTranscode(curitem, TRANSCODE_QUEUED |
+                                      TRANSCODE_USE_CUTLIST);
+
+}
 
 void PlaybackBox::askDelete(void)
 {

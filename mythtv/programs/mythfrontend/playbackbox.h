@@ -79,7 +79,7 @@ class PlaybackBox : public MythDialog
     void changeSetRecGroup(void);
     void changeRecGroupPassword();
     void changeOldPasswordChanged(const QString &newText);
-
+    void doBeginTranscoding();
   protected:
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
