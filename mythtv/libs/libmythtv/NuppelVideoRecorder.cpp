@@ -13,7 +13,6 @@
 
 #define KEYFRAMEDISTEND   30
 #define KEYFRAMEDISTSTART 5
-#define BTTV_FIELDNR	_IOR('v' , BASE_VIDIOCPRIVATE+2, unsigned int)
 
 NuppelVideoRecorder::NuppelVideoRecorder(void)
 {
@@ -173,8 +172,6 @@ int NuppelVideoRecorder::AudioInit(void)
     /* sample rate */
     rate = 44100;
     ioctl(afd, SNDCTL_DSP_SPEED, &rate);
-
-    printf("Reading audio at %dHz\n", rate);
 
     if (-1 == ioctl(afd, SNDCTL_DSP_GETBLKSIZE, &blocksize)) 
     {
@@ -612,26 +609,7 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf)
    
     tcres = (now.tv_sec-stm.tv_sec)*1000 + now.tv_usec/1000 - stm.tv_usec/1000;
 
-#ifndef V4L2
-    if (usebttv) {
-        if (ioctl(fd, BTTV_FIELDNR, &tf)) 
-        {
-            perror("BTTV_FIELDNR");
-            usebttv = 0;
-            fprintf(stderr, "\nbttv_fieldnr not supported by bttv-driver"
-                            "\nuse insmod/modprobe bttv card=YOURCARD field_nr=1 to activate f.n."
-                            "\nfalling back to timecode routine to determine lost frames\n");
-         }
-         if (tf==0) 
-         {
-             usebttv = 0;
-             fprintf(stderr, "\nbttv_fieldnr not supported by bttv-driver"
-                             "\nuse insmod/modprobe bttv card=YOURCARD field_nr=1 to activate f.n."
-                             "\nfalling back to timecode routine to determine lost frames\n");
-         }
-    }
-#endif
-
+    usebttv = 0;
     // here is the non preferable timecode - drop algorithm - fallback
     if (!usebttv) 
     {

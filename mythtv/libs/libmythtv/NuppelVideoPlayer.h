@@ -21,6 +21,7 @@
 using namespace std;
 
 #define MAXVBUFFER 20
+#define AUDBUFSIZE 512000
 
 class NuppelVideoRecorder;
 
@@ -89,8 +90,8 @@ class NuppelVideoPlayer
     long long CalcMaxPausePosition(void);
     void CalcMaxFFTime();
    
-    void DoFastForward();
-    void DoRewind();
+    bool DoFastForward();
+    bool DoRewind();
    
     void ClearAfterSeek();
     
@@ -123,8 +124,8 @@ class NuppelVideoPlayer
     int bufstat[MAXVBUFFER];
     int timecodes[MAXVBUFFER];
     unsigned char *vbuffer[MAXVBUFFER];
-    unsigned char audiobuffer[512000];
-    unsigned char tmpaudio[512000];
+    unsigned char audiobuffer[AUDBUFSIZE];
+    unsigned char tmpaudio[AUDBUFSIZE];
     int audiolen;
     int fafterseek;
     int audiotimecode;

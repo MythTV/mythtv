@@ -16,7 +16,10 @@ int main(int argc, char **argv)
     db->setHostName("localhost");
 
     if (!db->open())
+    {
         printf("couldn't open db\n");
+        return -1;
+    }
 
     int startchannel = 0;
 

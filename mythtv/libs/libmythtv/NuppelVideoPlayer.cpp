@@ -94,7 +94,6 @@ void NuppelVideoPlayer::InitSound(void)
         audiofd = -1;
         return;
     }
-    printf("Writing audio at %dHz\n", speed);
 }
 
 void NuppelVideoPlayer::WriteAudio(unsigned char *aubuf, int size)
@@ -330,7 +329,7 @@ unsigned char *NuppelVideoPlayer::DecodeFrame(struct rtframeheader *frameheader,
 
 int NuppelVideoPlayer::ComputeByteShift(void)
 {
-    double tcshift;
+    int tcshift;
     int byteshift;
     int audio_delay, video_delay;
 
@@ -366,9 +365,9 @@ int NuppelVideoPlayer::ComputeByteShift(void)
                  timecodes[rpos]
     */
 
-    tcshift = (double)audiotimecode - 
+    tcshift = (int)((double)audiotimecode - 
               (double)audiolen * 25000.0 / (double)effdsp -
-              (double)timecodes[rpos];
+              (double)timecodes[rpos]);
 
     /* The tcshift computed above describes the time shift between audio and
        video output from GetFrame().  Now we adjust this to find the time shift
@@ -380,25 +379,19 @@ int NuppelVideoPlayer::ComputeByteShift(void)
     ioctl(audiofd, SNDCTL_DSP_GETODELAY, &audio_delay); // bytes
     // convert bytes to ms :
     audio_delay = (int)((double)audio_delay * 25000.0 / (double)effdsp);
-
     video_delay = usepre * 1000 / (int)video_frame_rate; // ms stuck in prebuf
  
     tcshift -= audio_delay;
     tcshift += video_delay;
 
-    if (tcshift > 100)
-    {
-        printf("ACK, audio more than 100ms ahead of video...\n");
-        tcshift = 100;
-    }
-    else if (tcshift < -100)
-    {
-        printf("ACK, audio more than 100ms behind video...\n");
-        tcshift = -100;
-    }
+    byteshift = 4 * (int)(tcshift * (double)effdsp / (100000.0));
 
-    // The '8.0' means we correct 1/8 of the shift on each frame
-    byteshift = 4 * (int)(tcshift * (double)effdsp / (8.0 * 100000.0));
+    if (0)
+    {
+        printf("audio_delay = '%d' video_delay = '%d' tcshift = '%d' "
+               "byteshift = '%d'\n", audio_delay, video_delay, tcshift,
+               byteshift);
+    }
 
     return byteshift;
 }
@@ -412,7 +405,6 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
     int bytesperframe;
 
     int shiftcorrected = 0;
-    int ashift;
     int i;
     int seeked = 0;
 
@@ -434,7 +426,7 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
         }
         wpos = 0;
         rpos = 0;
-        audiolen=0;
+        audiolen = 0;
         audiotimecode = 0;
         seeked = 1;
     }
@@ -462,48 +454,33 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
                 continue;
             if (!seeked) 
             {
-                bytesperframe -= ComputeByteShift();
-                if (bytesperframe < 100) 
-                    bytesperframe = 100;
+                bytesperframe -= (ComputeByteShift() >> 5) << 2; // div by 8
+                // which corrects 1/8 of the shift on each frame.
+                // Also rounds to multiple of 4.
+                
+                if (bytesperframe < 0) 
+                    bytesperframe = 0;
                 if (bytesperframe > audiolen)
                     bytesperframe = audiolen;
+
+                //printf("bytesperframe = '%d' effdsp = '%d'\n", 
+                //       bytesperframe, effdsp);
             } 
             else
             {
-                if (timecodes[rpos] > audiotimecode) 
-                {
-                    ashift = (int)(((double)(audiotimecode - 
-                             timecodes[rpos]) * (double)effdsp) / 
-                             100000)*4;
-                    if (ashift > audiolen)
-                        audiolen = 0;
-                    else 
-                    {
-                        memcpy(tmpaudio, audiobuffer, audiolen);
-                        memcpy(audiobuffer, tmpaudio + ashift, audiolen);
-                        audiolen -= ashift;
-                    }
-                }
+                // Typically, after a seek, the calculated 'byteshift' becomes
+                // very large.  We'd like to get back to steady state ASAP,
+                // to avoid pops in the sound, or jerky video...
+                int byteshift = ComputeByteShift();
 
-                if (timecodes[rpos] < audiotimecode) 
+                if (byteshift > 0)
                 {
-                    ashift = (int)(((double)(audiotimecode - 
-                             timecodes[rpos]) * (double)effdsp) / 
-                             100000) * 4;
-                    if (ashift > (30 * bytesperframe)) 
-                    {
-                        //fprintf(stderr, "Warning: should never happen, "
-                        //        "huge timecode gap gap=%d atc=%d "
-                        //        "vtc=%d\n",
-                        //        ashift, audiotimecode, timecodes[rpos]);
-                    } 
-                    else 
-                    {
-                        memcpy(tmpaudio, audiobuffer, audiolen);
-                        bzero(audiobuffer, ashift); // silence!
-                        memcpy(audiobuffer + ashift, tmpaudio, audiolen);
-                        audiolen += ashift;
-                    }
+                    audiolen += byteshift;
+                    if (audiolen > AUDBUFSIZE)
+                        audiolen = AUDBUFSIZE;
+                    memset(audiobuffer, 0, audiolen);
+
+                    //printf("Inserting silence\n");
                 }
             }
             shiftcorrected=1;  
@@ -590,7 +567,8 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
                     {
                         int itemp = 0;
 
-                        for (itemp = 0; itemp < lameret; itemp++)
+                        for (itemp = 0; itemp < lameret && 
+                             audiobufferpos < AUDBUFSIZE; itemp++)
                         {
                             memcpy(&audiobuffer[audiobufferpos], 
                                    &pcmlbuffer[itemp], sizeof(short int));
@@ -613,15 +591,21 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
                 audiotimecode = frameheader.timecode + audiodelay; // untested
 
                 audiolen += sampleswritten * 4;
+                if (audiolen > AUDBUFSIZE)
+                    audiolen = AUDBUFSIZE;
                 lastaudiolen = audiolen;
             } 
             else 
             {
-                memcpy(audiobuffer+audiolen, strm, frameheader.packetlength);
-                audiotimecode = frameheader.timecode + audiodelay;
+                if (audiolen + frameheader.packetlength < AUDBUFSIZE)
+                {
+                    memcpy(audiobuffer+audiolen, strm, 
+                           frameheader.packetlength);
+                    audiotimecode = frameheader.timecode + audiodelay;
 
-                audiolen += frameheader.packetlength;
-                lastaudiolen = audiolen;
+                    audiolen += frameheader.packetlength;
+                    lastaudiolen = audiolen;
+                }
             }
         }
     }
@@ -632,8 +616,8 @@ unsigned char *NuppelVideoPlayer::GetFrame(int *timecode, int onlyvideo,
     {
         *alen = bytesperframe;
         memcpy(tmpaudio, audiobuffer, audiolen);
-        memcpy(audiobuffer, tmpaudio+bytesperframe, audiolen);
         audiolen -= bytesperframe;
+        memcpy(audiobuffer, tmpaudio+bytesperframe, audiolen);
     }
 
     *audiodata = tmpaudio;
@@ -653,11 +637,7 @@ void NuppelVideoPlayer::StartPlaying(void)
     unsigned char *X11videobuf;
     unsigned char *videobuf, *videobuf3;
 
-    struct timeval now, last;
-    struct timezone tzone;
-
     long tf;
-    long usecs;
     unsigned char *audiodata;
     int audiodatalen;
 
@@ -673,8 +653,6 @@ void NuppelVideoPlayer::StartPlaying(void)
    
     usepre = 8;
  
-    now.tv_sec = 0;
-
     InitSubs();
     OpenFile();
 
@@ -703,9 +681,6 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     resetplaying = false;
     
-    //if (getuid() == 0)
-    //    nice(-10);
-
     struct timeval startt, nowt;
     int framesdisplayed = 0;
 
@@ -716,7 +691,6 @@ void NuppelVideoPlayer::StartPlaying(void)
             ClearAfterSeek();
             prebuffered = 0;
             actpre = 0;
-            now.tv_sec = 0;
 	    framesPlayed = 0;
 	    //OpenFile(true);
 	    delete positionMap;
@@ -744,28 +718,28 @@ void NuppelVideoPlayer::StartPlaying(void)
 	if (rewindtime > 0)
 	{
 	    rewindtime *= video_frame_rate;
-	    DoRewind();
-
-	    rewindtime = 0;
-            prebuffered = 0;
-            actpre = 0;
-            now.tv_sec = 0;
+            if (DoRewind())
+            {
+                prebuffered = 0;
+                actpre = 0;
+            }
+            rewindtime = 0;
 	}
 	if (fftime > 0)
 	{
             CalcMaxFFTime();
 
 	    fftime *= video_frame_rate;
-	    DoFastForward();
-
-	    fftime = 0;
-            prebuffered = 0;
-            actpre = 0;
-            now.tv_sec = 0;
+            if (DoFastForward())
+            {
+                prebuffered = 0;
+                actpre = 0;
+            }
+            fftime = 0;
 	}
 
         videobuf = GetFrame(&timecode, audiofd <= 0, &audiodata, &audiodatalen);
-        // GetFrmae has used SNDCTL_DSP_GETODELAY to figure out the latency
+        // GetFrame has used SNDCTL_DSP_GETODELAY to figure out the latency
         // through the sound output system, and it also considered whether we
         // are prebuffering.  All we do here is display the video frame first,
         // and then play the audio.  We play the audio second because it might
@@ -799,43 +773,14 @@ void NuppelVideoPlayer::StartPlaying(void)
             memcpy(videobuf3, videobuf, videosize);
         }
 
-        if (now.tv_sec == 0)
-        {
-            gettimeofday(&now, &tzone);
-            last.tv_sec = now.tv_sec;
-            last.tv_usec = now.tv_usec;
-            usecs = (int)(1000000.0/video_frame_rate)/2;
-            if (usecs>0) 
-                usleep(usecs);
-        } 
-        else 
-        {
-            gettimeofday(&now, &tzone);
-            usecs = (long int)(1000000.0/video_frame_rate -
-                 ((now.tv_sec-last.tv_sec)*1000000 + now.tv_usec-last.tv_usec));
-            last.tv_sec = now.tv_sec;
-            last.tv_usec = now.tv_usec;
-            if (usecs > (1000000/video_frame_rate)/2) 
-                usecs = (long int)((1000000/video_frame_rate)/2);
-        }
+        if (deinterlace)
+            linearBlendYUV420(videobuf3, video_width, video_height);
+  
+        memcpy(X11videobuf, videobuf3, videosize); 
+        osd->Display(X11videobuf);
 
-        // play video
-        if (1 || usecs > -1000000/video_frame_rate) 
-        {
-            if (deinterlace)
-                linearBlendYUV420(videobuf3, video_width, video_height);
-	   
-            memcpy(X11videobuf, videobuf3, videosize); 
-	    osd->Display(X11videobuf);
-
-            XJ_show(video_width, video_height);
-	    framesPlayed++;
-        }
-	else
-	{
-	    framesPlayed++;
-	    framesSkipped++;
-	}
+        XJ_show(video_width, video_height);
+        framesPlayed++;
 
         // play audio
         if (audiodatalen != 0)
@@ -857,11 +802,6 @@ void NuppelVideoPlayer::StartPlaying(void)
         }
         framesdisplayed++;
 	
-        if (usecs > 0)
-        {
-            //usleep(usecs);
-        }
-
         tf++;
         fnum++;
     }
@@ -870,10 +810,10 @@ void NuppelVideoPlayer::StartPlaying(void)
     XJ_exit();
 }
 
-void NuppelVideoPlayer::DoRewind(void)
+bool NuppelVideoPlayer::DoRewind(void)
 {
     if (rewindtime < 5)
-        return;
+        return false;
 
     int number = (int)rewindtime;
 
@@ -938,6 +878,8 @@ void NuppelVideoPlayer::DoRewind(void)
         }
     }
     ClearAfterSeek();
+
+    return true;
 }
 
 
@@ -959,10 +901,10 @@ void NuppelVideoPlayer::CalcMaxFFTime(void)
     }
 }
 
-void NuppelVideoPlayer::DoFastForward(void)
+bool NuppelVideoPlayer::DoFastForward(void)
 {
     if (fftime < 5)
-        return;
+        return false;
 
     int number = (int)fftime;
 
@@ -1053,6 +995,8 @@ void NuppelVideoPlayer::DoFastForward(void)
     }
 
     ClearAfterSeek();
+
+    return true;
 }
 
 void NuppelVideoPlayer::ClearAfterSeek(void)
