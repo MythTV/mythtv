@@ -771,26 +771,30 @@ public:
     };
 };
 
-class VolumeSettings: public VerticalConfigurationGroup,
+class AudioSettings: public VerticalConfigurationGroup,
                       public TriggeredConfigurationGroup {
 public:
-     VolumeSettings():
-          VerticalConfigurationGroup(true),
-          TriggeredConfigurationGroup(true) {
-         setLabel("Volume control");
+     AudioSettings():
+         VerticalConfigurationGroup(false),
+         TriggeredConfigurationGroup(false) {
+         setLabel("Audio");
+         setUseLabel(false);
+
+         addChild(new AudioOutputDevice());
+         addChild(new AggressiveBuffer());
 
          Setting* volumeControl = new MythControlsVolume();
          addChild(volumeControl);
          setTrigger(volumeControl);
 
-         ConfigurationGroup* settings = new VerticalConfigurationGroup();
+         ConfigurationGroup* settings = new VerticalConfigurationGroup(true);
          settings->addChild(new MixerDevice());
          settings->addChild(new MixerVolume());
          settings->addChild(new PCMVolume());
          addTarget("1", settings);
          
          // show nothing if volumeControl is off
-         addTarget("0", new VerticalConfigurationGroup());
+         addTarget("0", new VerticalConfigurationGroup(true));
      };
 };
 
@@ -805,12 +809,7 @@ PlaybackSettings::PlaybackSettings()
     general->addChild(new FixedAspectRatio());
     addChild(general);
 
-    VerticalConfigurationGroup *audio = new VerticalConfigurationGroup(false);
-    audio->setLabel("Audio");
-    audio->addChild(new AudioOutputDevice());
-    audio->addChild(new MythControlsVolume());
-    audio->addChild(new AggressiveBuffer());
-    audio->addChild(new VolumeSettings());
+    AudioSettings *audio = new AudioSettings();
     addChild(audio);
 
     VerticalConfigurationGroup* seek = new VerticalConfigurationGroup(false);
