@@ -235,7 +235,8 @@ Since it's likely that watching TV will not generate keyboard or mouse
 events for a time, you need to turn off DPMS and the screensaver.  There are
 a few ways to do this.  You may also need to check your BIOS for power
 saving modes and disable screen blanking there as well.</P>
-<P>Edit your <CODE>/etc/X11/XF86Config-4</CODE> file, and look for:
+<P>Edit your <CODE>/etc/X11/XF86Config-4</CODE> or <CODE>/etc/X11/xorg.conf</CODE>
+file, and look for:
 <BLOCKQUOTE><CODE>
 <PRE>
 Section "ServerFlags"
@@ -311,8 +312,20 @@ You may also combine the command to turn off DPMS and the screensaver:
 $ xset -dpms s off
 </PRE>
 </CODE></BLOCKQUOTE>
-
-Finally, depending on your distribution, you may be able to turn it off from
+</P>
+<P>There's also:
+<BLOCKQUOTE><CODE>
+<PRE>
+Section "ServerFlags"
+       Option "blank time" "0"
+       Option "standby time" "0"
+       Option "suspend time" "0"
+       Option "off time" "0"
+EndSection 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Finally, depending on your distribution, you may be able to turn it off from
 within the control panel.</P>
 <H2><A NAME="ss20.5">20.5</A> <A HREF="mythtv-HOWTO.html#toc20.5">Miscellaneous</A>
 </H2>

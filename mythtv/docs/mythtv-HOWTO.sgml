@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2005-03-27, v0.17.03
+<date>2005-03-27, v0.17.04
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -444,7 +444,7 @@ unencrypted Free-To-Air satellite channels.
 
 <sect3>HDTV.
 <p>Currently there are two HDTV card with Linux drivers which are known to
-operate in the United States - the HD-2000 and HD-3000 cards available from
+operate in the United States - the HD-2000/HD-3000 cards available from
 <url url="http://www.pchdtv.com/" name="http://www.pchdtv.com/"> or <url
 url="http://mythic.tv/" name="http://mythic.tv/"> and the Air2PC-ATSC-PCI
 available from <url
@@ -486,7 +486,7 @@ Plextor to capture hardware encoded MPEG-4, so the host CPU requirements are low
 <p><itemize>
 <item>Hauppauge WinTV-D or -HD (no driver)
 <item>Hauppauge WinTV-USB series
-<item>Hauppauge WinTV-PVR-usb, or PCI cards (no driver - this is not the PVR-250/350
+<item>Hauppauge WinTV-PVR-usb (model 602), or WinTV-PVR-PCI (model 880) cards (no driver - this is not the PVR-250/350
 series of cards supported by the IvyTV driver)
 <item>Hauppauge WinTV-PVR-USB2 (driver available at http://justiceforall.free.fr/pvrusb2.html, no MythTV support)
 <item>ATI All-in-Wonder series
@@ -931,8 +931,8 @@ from the command line.
 <sect3>Mandrake
 <p><bf>urpmi</bf> is the simplest tool for installation of packages from the
 command line, but properly configuring it can be difficult.  The
-following website <url url="http://plf.zarb.org/~nanardon/urpmiweb.php"
-name="http://plf.zarb.org/~nanardon/urpmiweb.php"> will allow you to choose
+following website <url url="http://addmedia.linuxfornewbies.org/"
+name="http://addmedia.linuxfornewbies.org/"> will allow you to choose
 a mirror site and then present the command-line configuration text for that
 mirror.  You will most likely need to add a "Contrib" mirror to your setup. 
 If you add a site from the "Penguin Liberation Front", you will be able to
@@ -2765,21 +2765,25 @@ today (in case of late-breaking changes to the schedule).
 <sect2>Periodically running <bf>mythfilldatabase</bf>
 <p>In order to keep your database filled, <bf>mythfilldatabase</bf> should be
 run once a day.
-
+<!-- get rid of everything other than built-in in 0.18.
 There are three ways to accomplish this:  use the built-in capability of
 MythTV to run the <bf>mythfilldatabase</bf> program, as a user-based cron
 job, or as a system based cron.  If you use a user-based cron, you can
 select the time that the cron job will be run.  A system-based cron job will
 run at the same time as any other system cron jobs.
 
+<bf>NOTE</bf>:  You are <em>strongly</em> encouraged to use the built-in method.
+
 <sect3>Using the built-in method.
-<p>To use MythTV's built-in capability, you'll need to run the
+<p>
+-->
+To use MythTV's built-in capability, you'll need to run the
 <bf>mythfrontend</bf> Setup option.  From the MythFrontend, enter the
 Setup>General screen and advance to "Mythfilldatabase", the fourth screen.
 Select the checkbox, then complete the options as you see fit.  The
 <bf>mythbackend</bf> program will now run <bf>mythfilldatabase</bf> at the
 times you specify.
-
+<!--
 <bf>NOTE</bf>:  Don't use the built-in and cron methods at the same time. 
 If you switch to the native method, ensure that you've removed any user or
 system cron jobs that you may have been using.
@@ -2871,6 +2875,7 @@ uses the Wordstar command sequence.  You may use <bf>emacs</bf>, or any
 other editor that you're comfortable with.  You may also add the
 <tt>EXPORT</tt> command to your <tt>.bashrc</tt> or to the
 <tt>/etc/profile.d/mythtv.sh</tt> file.
+-->
 <sect1>Grabbing channel icons for DataDirect users
 <p>While the DataDirect TV listings service has several advantages, it does
 not support grabbing logo icons for the stations you receive. However, there
@@ -3638,13 +3643,19 @@ The theme will now be available in the mythfrontend Appearance section.
 <tt>tar -xjf</tt> rather than <tt>tar -xzf</tt>.
 </caption>
 </figure>
+<!-- REMOVE ME START -->
 <sect1>Adding DirecTV information to the database
-<p>A script for adding DirecTV information into the database has been
+<p>A script used to exist for adding DirecTV pay-per-view information into
+the database.  As of 2005-04-01 this script no longer appears to work, and
+this section will be removed from the HOWTO with the release of 0.19.
+
+A script for adding DirecTV information into the database has been
 written by tarek Lubani <url url="mailto:tarek@tarek.2y.net"> and is
 available at <url url="http://tarek.2y.net/myth/ppv.pl"
 name="http://tarek.2y.net/myth/ppv.pl">.  This is currently an external
 user-supplied program, so if you have issues with the script, please contact
 the author.
+<!-- REMOVE ME END -->
 
 <sect1>Adding support for an external tuner
 <p>MythTV supports changing the channel on an external tuner.  If you have
@@ -4468,8 +4479,8 @@ cooker and release-level software.
 <p><bf>urpmi</bf> is the simplest tool for installation of packages from the
 command line.  The difficult part is the configuration, but this has been
 made easier at the following website: <url
-url="http://plf.zarb.org/~nanardon/urpmiweb.php"
-name="http://plf.zarb.org/~nanardon/urpmiweb.php"> The website will allow
+url="http://addmedia.linuxfornewbies.org/"
+name="http://addmedia.linuxfornewbies.org/"> The website will allow
 you to choose a mirror site and then present the command-line configuration
 text for that mirror.  You will most likely need to add a "Contrib" mirror
 to your setup.  Once you have done that, you can proceed.  If <bf>urpmi</bf>
@@ -5010,7 +5021,8 @@ events for a time, you need to turn off DPMS and the screensaver.  There are
 a few ways to do this.  You may also need to check your BIOS for power
 saving modes and disable screen blanking there as well.
 
-Edit your <tt>/etc/X11/XF86Config-4</tt> file, and look for:
+Edit your <tt>/etc/X11/XF86Config-4</tt> or <tt>/etc/X11/xorg.conf</tt>
+file, and look for:
 <tscreen><verb>
 Section "ServerFlags"
     #DontZap # disable <Crtl><Alt><BS> (server abort)
@@ -5077,6 +5089,17 @@ You may also combine the command to turn off DPMS and the screensaver:
 <tscreen><verb>
 $ xset -dpms s off
 </verb></tscreen>
+
+There's also:
+<tscreen><verb>
+Section "ServerFlags"
+       Option "blank time" "0"
+       Option "standby time" "0"
+       Option "suspend time" "0"
+       Option "off time" "0"
+EndSection 
+</verb></tscreen>
+
 Finally, depending on your distribution, you may be able to turn it off from
 within the control panel.
 <sect1>Miscellaneous
@@ -5500,13 +5523,13 @@ better. However, you may find that you prefer the picture quality at one of
 the lower resolutions. Everything in MythTV is scalable and should 'fit'
 regardless of the resolution you choose.
 
-Edit your X configuration file, usually "XF86Config-4", so that the
-resolution you want to use is listed first in the lists under "Screen". If
-this resolution is higher than the resolutions supported by your output
-device, you will see a 'panning' effect where moving the mouse to the edge
-will scroll around a desktop area which is larger than the display size. If
-this happens, edit your X configuration file to match the display size then
-restart X.
+Edit your X configuration file, usually <tt>/etc/X11/XF86Config-4</tt> for
+XFree, or <tt>/etc/X11/xorg.conf</tt> for Xorg, so that the resolution you
+want to use is listed first in the lists under "Screen". If this resolution
+is higher than the resolutions supported by your output device, you will see
+a 'panning' effect where moving the mouse to the edge will scroll around a
+desktop area which is larger than the display size. If this happens, edit
+your X configuration file to match the display size then restart X.
 
 <sect2>MythTV Dimensions
 <p>In 0.10 and later, from "mythfrontend" go to Setup->Appearance.
@@ -7535,12 +7558,17 @@ link to snapstream's store.  Update description on Pentium-M.
 v0.17.02, 2005-03-17.  mythic.tv now sells the HD-3000 as well.  Don't press
 CTRL-C too quickly during azap channel scan.  Update mythbackend -h.  Add reset
 theme to MythWeb.
-
 v0.17.03, 2005-03-27.  Add Plextor ConvertX to supported hardware.  Add in some
 wording on hardware - don't try to turn a crappy system into something
 wonderful; just won't happen.  "run fstab -a to remount" - what the hell was
 I thinking?  Add a comment to the processor flags section that CVS uses
 something different / better.
+
+v0.17.04, 2005-03-  Add xorg.conf.  Add more stuff for screen blanking - who
+knew that it was so hard to turn off DPMS?!?  Comment out all the stuff that
+talks about setting up cron for mythfilldatabase; using the internal method
+is better. Updated urpmi website for Mandrake.  Add note that DirecTV PPV
+script no longer works, and section will be removed in 0.19.
 
 
 -->

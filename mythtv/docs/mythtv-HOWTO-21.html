@@ -173,13 +173,13 @@ some rare devices support 1024x768. Generally, higher resolutions are
 better. However, you may find that you prefer the picture quality at one of
 the lower resolutions. Everything in MythTV is scalable and should 'fit'
 regardless of the resolution you choose.</P>
-<P>Edit your X configuration file, usually "XF86Config-4", so that the
-resolution you want to use is listed first in the lists under "Screen". If
-this resolution is higher than the resolutions supported by your output
-device, you will see a 'panning' effect where moving the mouse to the edge
-will scroll around a desktop area which is larger than the display size. If
-this happens, edit your X configuration file to match the display size then
-restart X.</P>
+<P>Edit your X configuration file, usually <CODE>/etc/X11/XF86Config-4</CODE> for
+XFree, or <CODE>/etc/X11/xorg.conf</CODE> for Xorg, so that the resolution you
+want to use is listed first in the lists under "Screen". If this resolution
+is higher than the resolutions supported by your output device, you will see
+a 'panning' effect where moving the mouse to the edge will scroll around a
+desktop area which is larger than the display size. If this happens, edit
+your X configuration file to match the display size then restart X.</P>
 
 <H3>MythTV Dimensions</H3>
 

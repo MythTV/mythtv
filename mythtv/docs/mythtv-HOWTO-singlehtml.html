@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-03-27, v0.17.03
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-03-27, v0.17.04
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -655,7 +655,7 @@ unencrypted Free-To-Air satellite channels.</P>
 <H3>HDTV.</H3>
 
 <P>Currently there are two HDTV card with Linux drivers which are known to
-operate in the United States - the HD-2000 and HD-3000 cards available from
+operate in the United States - the HD-2000/HD-3000 cards available from
 <A HREF="http://www.pchdtv.com/">http://www.pchdtv.com/</A> or 
 <A HREF="http://mythic.tv/">http://mythic.tv/</A> and the Air2PC-ATSC-PCI
 available from 
@@ -694,7 +694,7 @@ Plextor to capture hardware encoded MPEG-4, so the host CPU requirements are low
 <UL>
 <LI>Hauppauge WinTV-D or -HD (no driver)</LI>
 <LI>Hauppauge WinTV-USB series</LI>
-<LI>Hauppauge WinTV-PVR-usb, or PCI cards (no driver - this is not the PVR-250/350
+<LI>Hauppauge WinTV-PVR-usb (model 602), or WinTV-PVR-PCI (model 880) cards (no driver - this is not the PVR-250/350
 series of cards supported by the IvyTV driver)</LI>
 <LI>Hauppauge WinTV-PVR-USB2 (driver available at http://justiceforall.free.fr/pvrusb2.html, no MythTV support)</LI>
 <LI>ATI All-in-Wonder series</LI>
@@ -1144,7 +1144,7 @@ from the command line.</P>
 <P><B>urpmi</B> is the simplest tool for installation of packages from the
 command line, but properly configuring it can be difficult.  The
 following website 
-<A HREF="http://plf.zarb.org/~nanardon/urpmiweb.php">http://plf.zarb.org/~nanardon/urpmiweb.php</A> will allow you to choose
+<A HREF="http://addmedia.linuxfornewbies.org/">http://addmedia.linuxfornewbies.org/</A> will allow you to choose
 a mirror site and then present the command-line configuration text for that
 mirror.  You will most likely need to add a "Contrib" mirror to your setup. 
 If you add a site from the "Penguin Liberation Front", you will be able to
@@ -3196,121 +3196,13 @@ today (in case of late-breaking changes to the schedule).</P>
 <H3>Periodically running <B>mythfilldatabase</B></H3>
 
 <P>In order to keep your database filled, <B>mythfilldatabase</B> should be
-run once a day.</P>
-<P>There are three ways to accomplish this:  use the built-in capability of
-MythTV to run the <B>mythfilldatabase</B> program, as a user-based cron
-job, or as a system based cron.  If you use a user-based cron, you can
-select the time that the cron job will be run.  A system-based cron job will
-run at the same time as any other system cron jobs.</P>
-
-<H3>Using the built-in method.</H3>
-
-<P>To use MythTV's built-in capability, you'll need to run the
+run once a day.
+To use MythTV's built-in capability, you'll need to run the
 <B>mythfrontend</B> Setup option.  From the MythFrontend, enter the
 Setup>General screen and advance to "Mythfilldatabase", the fourth screen.
 Select the checkbox, then complete the options as you see fit.  The
 <B>mythbackend</B> program will now run <B>mythfilldatabase</B> at the
 times you specify.</P>
-<P><B>NOTE</B>:  Don't use the built-in and cron methods at the same time. 
-If you switch to the native method, ensure that you've removed any user or
-system cron jobs that you may have been using.</P>
-<H3>Using the cron method.</H3>
-
-<P>If you are a Mandrake 9.0 user and wish to use a system cron job, you can
-perform the following steps:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cd configfiles
-$ su
-# cp mythfilldatabasecron /etc/cron.daily
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>If you want to know what time your job will run, you can do the following:
-<BLOCKQUOTE><CODE>
-<PRE>
-# cat /etc/crontab
-SHELL=/bin/bash
-PATH=/sbin:/bin:/usr/sbin:/usr/bin
-MAILTO=root
-HOME=/
-
-# run-parts
-01 * * * * root nice -n 19 run-parts /etc/cron.hourly
-02 4 * * * root nice -n 19 run-parts /etc/cron.daily
-22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
-42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
-# exit
-$ 
-</PRE>
-</CODE></BLOCKQUOTE>
-
-We can see from the display that the cron.daily job will run at 0402 every
-morning.</P>
-<P>If you wish to specify a custom time, then the user-based cron job is the
-better method.</P>
-<P>The default <B>configfiles/mythcrontab</B> file will run the
-<B>mythfilldatabase</B> program every day at 0430.  Placing a copy of the
-default <B>configfiles/mythcrontab</B> into your <CODE>~/.mythtv</CODE>
-directory will allow you to edit your copy and maintain the original if you
-get into trouble. To change the time used to start the
-<B>mythfilldatabase</B> process, open the <CODE>~/.mythtv/mythcrontab</CODE>
-file in your favorite editor and modify it as you like.  Once you're
-satisfied with the time that <B>mythfilldatabase</B> will run, save and
-exit, and return to the shell prompt.</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cp ~/mythtv/configfiles/mythfilldatabasecron ~/.mythtv
-$ cp ~/mythtv/configfiles/mythcrontab ~/.mythtv
-$ cd ~/.mythtv
-$ crontab mythcrontab
-$ crontab -l  NOTE: this is a lowercase L.
-# The following will run the mythfilldatabase shell script at 0430
-# every day.  Format is
-# minutes hour day_of_month month day_of_week
-# man 5 crontab for more information
-# Need to use a shell script because the QTDIR environment variable isn't
-# being honored by crontab?
-# The next text should be all on the same line.
-30 04 * * * /bin/bash $HOME/.mythtv/mythfilldatabasecron
-$ 
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>As you can see, <B>mythfilldatabase</B> will now be run at 0430
-every day.</P>
-<P>If you decide to alter the time that the <B>mythfilldatabase</B> runs,
-you can use the crontab command to open your existing job and edit it in
-place.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ crontab -e
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>The <B>crontab -e</B> command will allow you to edit the existing crontab.</P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  By default, the crontab will use <B>vi</B> as your
-editor.  If you don't like to use <B>vi</B>, make sure that you've set
-<CODE>VISUAL</CODE> to something other than <B>vi</B>.</CAPTION>
-</FIGURE>
-
-<BLOCKQUOTE><CODE>
-<PRE>
-$ export VISUAL=/usr/bin/joe
-$ crontab -e
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>This will cause <B>crontab</B> to use <B>joe</B>, a visual editor that
-uses the Wordstar command sequence.  You may use <B>emacs</B>, or any
-other editor that you're comfortable with.  You may also add the
-<CODE>EXPORT</CODE> command to your <CODE>.bashrc</CODE> or to the
-<CODE>/etc/profile.d/mythtv.sh</CODE> file.</P>
 <H2><A NAME="ss9.5">9.5</A> <A HREF="#toc9.5">Grabbing channel icons for DataDirect users</A>
 </H2>
 
@@ -4047,6 +3939,9 @@ $ su
 <H2><A NAME="ss11.3">11.3</A> <A HREF="#toc11.3">Adding DirecTV information to the database</A>
 </H2>
 
+<P>A script used to exist for adding DirecTV pay-per-view information into
+the database.  As of 2005-04-01 this script no longer appears to work, and
+this section will be removed from the HOWTO with the release of 0.19.</P>
 <P>A script for adding DirecTV information into the database has been
 written by tarek Lubani 
 <A HREF="mailto:tarek@tarek.2y.net">mailto:tarek@tarek.2y.net</A> and is
@@ -4929,7 +4824,7 @@ cooker and release-level software.</P>
 <P><B>urpmi</B> is the simplest tool for installation of packages from the
 command line.  The difficult part is the configuration, but this has been
 made easier at the following website: 
-<A HREF="http://plf.zarb.org/~nanardon/urpmiweb.php">http://plf.zarb.org/~nanardon/urpmiweb.php</A> The website will allow
+<A HREF="http://addmedia.linuxfornewbies.org/">http://addmedia.linuxfornewbies.org/</A> The website will allow
 you to choose a mirror site and then present the command-line configuration
 text for that mirror.  You will most likely need to add a "Contrib" mirror
 to your setup.  Once you have done that, you can proceed.  If <B>urpmi</B>
@@ -5535,7 +5430,8 @@ Since it's likely that watching TV will not generate keyboard or mouse
 events for a time, you need to turn off DPMS and the screensaver.  There are
 a few ways to do this.  You may also need to check your BIOS for power
 saving modes and disable screen blanking there as well.</P>
-<P>Edit your <CODE>/etc/X11/XF86Config-4</CODE> file, and look for:
+<P>Edit your <CODE>/etc/X11/XF86Config-4</CODE> or <CODE>/etc/X11/xorg.conf</CODE>
+file, and look for:
 <BLOCKQUOTE><CODE>
 <PRE>
 Section "ServerFlags"
@@ -5611,8 +5507,20 @@ You may also combine the command to turn off DPMS and the screensaver:
 $ xset -dpms s off
 </PRE>
 </CODE></BLOCKQUOTE>
-
-Finally, depending on your distribution, you may be able to turn it off from
+</P>
+<P>There's also:
+<BLOCKQUOTE><CODE>
+<PRE>
+Section "ServerFlags"
+       Option "blank time" "0"
+       Option "standby time" "0"
+       Option "suspend time" "0"
+       Option "off time" "0"
+EndSection 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Finally, depending on your distribution, you may be able to turn it off from
 within the control panel.</P>
 <H2><A NAME="ss20.5">20.5</A> <A HREF="#toc20.5">Miscellaneous</A>
 </H2>
@@ -6047,13 +5955,13 @@ some rare devices support 1024x768. Generally, higher resolutions are
 better. However, you may find that you prefer the picture quality at one of
 the lower resolutions. Everything in MythTV is scalable and should 'fit'
 regardless of the resolution you choose.</P>
-<P>Edit your X configuration file, usually "XF86Config-4", so that the
-resolution you want to use is listed first in the lists under "Screen". If
-this resolution is higher than the resolutions supported by your output
-device, you will see a 'panning' effect where moving the mouse to the edge
-will scroll around a desktop area which is larger than the display size. If
-this happens, edit your X configuration file to match the display size then
-restart X.</P>
+<P>Edit your X configuration file, usually <CODE>/etc/X11/XF86Config-4</CODE> for
+XFree, or <CODE>/etc/X11/xorg.conf</CODE> for Xorg, so that the resolution you
+want to use is listed first in the lists under "Screen". If this resolution
+is higher than the resolutions supported by your output device, you will see
+a 'panning' effect where moving the mouse to the edge will scroll around a
+desktop area which is larger than the display size. If this happens, edit
+your X configuration file to match the display size then restart X.</P>
 
 <H3>MythTV Dimensions</H3>
 
