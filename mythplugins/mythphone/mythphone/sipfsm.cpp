@@ -2098,6 +2098,7 @@ int SipRegistration::FSM(int Event, SipMsg *sipMsg, void *Value)
             (parent->Timer())->Start(this, (Expires-30)*1000, SIP_REG_TREGEXP); // Assume 30secs max to reregister
             break;
         case 401:
+        case 407:
             cseq++;
             SendRegister(sipMsg);
             regRetryCount = REG_RETRY_MAXCOUNT;
@@ -2175,7 +2176,10 @@ void SipRegistration::SendRegister(SipMsg *authMsg)
 
     if (authMsg && (authMsg->getAuthMethod() == "Digest"))
     {
-        Register.addAuthorization(authMsg->getAuthMethod(), MyUrl->getUser(), MyPassword, authMsg->getAuthRealm(), authMsg->getAuthNonce(), "sip:" + ProxyUrl->getHost());
+        if (authMsg->getStatusCode() == 407)
+            Register.addProxyAuthorization(authMsg->getAuthMethod(), MyUrl->getUser(), MyPassword, authMsg->getAuthRealm(), authMsg->getAuthNonce(), "sip:" + ProxyUrl->getHost());
+        else
+            Register.addAuthorization(authMsg->getAuthMethod(), MyUrl->getUser(), MyPassword, authMsg->getAuthRealm(), authMsg->getAuthNonce(), "sip:" + ProxyUrl->getHost());
     }
 
     Register.addUserAgent();
