@@ -48,8 +48,8 @@ package export::generic;
         my $suffix  = ($self->{'suffix'} or shift);
     # Build a clean filename
         my $outfile;
-        if ($episode->{'outfile'}) {
-            $outfile = $episode->{'outfile'};
+        if ($episode->{'outfile'}{$suffix}) {
+            $outfile = $episode->{'outfile'}{$suffix};
         }
         else {
             if ($episode->{'show_name'} ne 'Untitled' and $episode ne 'Untitled') {
@@ -66,18 +66,18 @@ package export::generic;
             }
             $outfile =~ s/(?:[\/\\\:\*\?\<\>\|\-]+\s*)+(?=[^\s\/\\\:\*\?\<\>\|\-])/- /sg;
             $outfile =~ tr/"/'/s;
+        # Make sure we don't have a duplicate filename
+            if (-e $self->{'path'}.'/'.$outfile.$suffix) {
+                my $count = 1;
+                my $out   = $outfile;
+                while (-e $self->{'path'}.'/'.$out.$suffix) {
+                    $count++;
+                    $out = "$outfile.$count";
+                }
+                $outfile = $out;
+           }
         # Store it so we don't have to recalculate this next time
-            $episode->{'outfile'} = $outfile;
-        }
-    # Make sure we don't have a duplicate filename
-        if (-e $self->{'path'}.'/'.$outfile.$suffix) {
-            my $count = 1;
-            my $out   = $outfile;
-            while (-e $self->{'path'}.'/'.$out.$suffix) {
-                $count++;
-                $out = "$outfile.$count";
-            }
-            $outfile = $out;
+            $episode->{'outfile'}{$suffix} = $outfile;
         }
     # return
         return $self->{'path'}.'/'.$outfile.$suffix;
