@@ -334,7 +334,7 @@ void BookmarksConfig::slotBookmarksViewExecuted(QListViewItem *item)
     if (!viewItem) { // This is a upper level item, i.e. a "group name"
         // item->setOpen(!(item->isOpen()));
     } else {
-        QSqlQuery query(myDb);
+        QSqlQuery query(QString::null, myDb);
         query.prepare("DELETE FROM websites WHERE url=:URL");
         query.bindValue(":URL",viewItem->myBookmarkSite->url);
         if (!query.exec()) {
@@ -365,7 +365,7 @@ void BookmarksConfig::slotWebSiteAdded(const char* group, const char* desc, cons
     if(groupStr->isEmpty() || urlStr->isEmpty())
         return;
 
-    QSqlQuery query(myDb);
+    QSqlQuery query(QString::null, myDb);
     query.prepare("INSERT INTO websites (grp, dsc, url) VALUES(:GROUP, :DESC, :URL);");
     query.bindValue(":GROUP",groupStr->utf8());
     query.bindValue(":DESC",descStr->utf8());

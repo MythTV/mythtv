@@ -201,7 +201,7 @@ void TabView::finishAddBookmark(const char* group, const char* desc, const char*
     if(groupStr.isEmpty() || urlStr.isEmpty())
         return;
 
-    QSqlQuery query(myDb);
+    QSqlQuery query(QString::null, myDb);
     query.prepare("INSERT INTO websites (grp, dsc, url) VALUES(:GROUP, :DESC, :URL);");
     query.bindValue(":GROUP",groupStr.utf8());
     query.bindValue(":DESC",descStr.utf8());
