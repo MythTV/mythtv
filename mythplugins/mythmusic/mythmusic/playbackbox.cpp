@@ -192,9 +192,10 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Music", e, actions);
 
-    for (unsigned int i = 0; i < actions.size(); i++)
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
+        handled = true;
 
         if (action == "NEXTTRACK")
         {
@@ -202,7 +203,6 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                 next_button->push();
             else
                 next();
-            handled = true;
         }
         else if (action == "PREVTRACK")
         {
@@ -210,7 +210,6 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                 prev_button->push();
             else
                 previous();
-            handled = true;
         }
         else if (action == "FFWD")
         { 
@@ -218,7 +217,6 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                 ff_button->push();
             else
                 seekforward();
-            handled = true;
         }
         else if (action == "RWND")
         { 
@@ -226,7 +224,6 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                 rew_button->push();
             else
                 seekback();
-            handled = true;
         }
         else if (action == "PAUSE")
         { 
@@ -244,7 +241,6 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                 else
                     play();
             }
-            handled = true;
         }
         else if (action == "STOP")
         { 
@@ -252,25 +248,17 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                 stop_button->push();
             else
                 stop();
-            handled = true;
         }
         else if (action == "THMBUP")
-        {
             increaseRating();
-            handled = true;
-        }
         else if (action == "THMBDOWN")
-        { 
             decreaseRating();
-            handled = true;
-        }
         else if (action == "1")
         {
             if (shuffle_button)
                 shuffle_button->push();
             else
                 toggleShuffle();
-            handled = true;
         }
         else if (action == "2")
         {
@@ -278,7 +266,6 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                 repeat_button->push();
             else
                 toggleRepeat();
-            handled = true;
         }
         else if (action == "3")
         {
@@ -286,38 +273,27 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                 pledit_button->push();
             else
                 editPlaylist();
-            handled = true;
         }
         else if (action == "CYCLEVIS")
-        {
             CycleVisualizer();
-            handled = true;
-        }
         else if (action == "BLANKSCR")
-        {   
             toggleFullBlankVisualizer();
-            handled = true;
-        }
         else if (action == "VOLUMEDOWN") 
-        {
             changeVolume(false);
-            handled = true;
-        }
         else if (action == "VOLUMEUP")
-        {
             changeVolume(true);
-            handled = true;
-        }
         else if (action == "MUTE")
-        {
             toggleMute();
-            handled = true;
-        }
+        else
+            handled = false;
     }
+
+    if (handled)
+        return;
 
     if (visualizer_status == 2)
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
             if (action == "ESCAPE" || action == "4")
@@ -347,80 +323,56 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
     }
     else if (keyboard_accelerators)
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
+            handled = true;
 
-            if (!handled)
-            {
-                if (action == "UP")
-                {
-                    music_tree_list->moveUp();
-                    handled = true;
-                }
-                else if (action == "DOWN")
-                {
-                    music_tree_list->moveDown();
-                    handled = true;
-                }
-                else if (action == "LEFT")
-                {
-                    music_tree_list->popUp();
-                    handled = true;
-                }
-                else if (action == "RIGHT")
-                {
+            if (action == "UP")
+                music_tree_list->moveUp();
+            else if (action == "DOWN")
+                music_tree_list->moveDown();
+            else if (action == "LEFT")
+                music_tree_list->popUp();
+            else if (action == "RIGHT")
                     music_tree_list->pushDown();
-                    handled = true;
-                }
-            }
-            if (action == "4")
+            else if (action == "4")
             {
                 if (vis_button)
                     vis_button->push();
                 else
                     visEnable();
-                handled = true;
             }
             else if (action == "SELECT")
-            {
                 music_tree_list->select();
-                handled = true;
-            }
             else if (action == "REFRESH") 
             {
                 music_tree_list->syncCurrentWithActive();
                 music_tree_list->forceLastBin();
                 music_tree_list->refresh();
-                handled = true;
             }
+            else
+                handled = false;
         }
     }
     else
     {
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
+            handled = true;
 
-            if (!handled)
-            {
-                if (action == "UP" || action == "LEFT")
-                {
-                    nextPrevWidgetFocus(false);
-                    handled = true;
-                }
-                else if (action == "DOWN" || action == "RIGHT")
-                {
-                    nextPrevWidgetFocus(true);
-                    handled = true;
-                }
-            }
-            if (action == "SELECT")
+            if (action == "UP" || action == "LEFT")
+                nextPrevWidgetFocus(false);
+            else if (action == "DOWN" || action == "RIGHT")
+                nextPrevWidgetFocus(true);
+            else if (action == "SELECT")
             {
                 activateCurrent();
                 music_tree_list->syncCurrentWithActive();
-                handled = true;
             }
+            else
+                handled = false;
         }
     }
 

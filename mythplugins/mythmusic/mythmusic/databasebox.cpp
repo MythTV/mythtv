@@ -141,32 +141,26 @@ bool DatabaseBox::eventFilter(QObject *o, QEvent *e)
     QStringList actions;
     gContext->GetMainWindow()->TranslateKeyPress("Music", ke, actions);
 
-    for (unsigned int i = 0; i < actions.size(); i++)
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
+        handled = true;
+
         if (action == "DELETE")
-        {
-            handled = true;
             deleteTrack(listview->currentItem());
-        }
         else if (action == "MENU" || action == "INFO")
-        {
-            handled = true;
             doMenus(listview->currentItem());
-        }
         else if (action == "SELECT")
-        {
-            handled = true;
             selected(listview->currentItem());
-        }
         else if (action == "0" || action == "1" || action == "2" ||
                  action == "3" || action == "4" || action == "5" ||
                  action == "6" || action == "7" || action == "8" ||
                  action == "9")
         {
-            handled = true;
             alternateDoMenus(listview->currentItem(), action.toInt());
         }
+        else
+            handled = false;
     }
 
     if (handled)
@@ -824,11 +818,14 @@ void DatabaseBox::keyPressEvent(QKeyEvent *e)
 
     if (holding_track)
     {
+        bool handled = false;
         QStringList actions;
         gContext->GetMainWindow()->TranslateKeyPress("Qt", e, actions);
-        for (unsigned int i = 0; i < actions.size(); i++)
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             QString action = actions[i];
+            handled = true;
+
             if (action == "SELECT" || action == "ESCAPE")
             {
                 //  Done holding this track
@@ -837,15 +834,11 @@ void DatabaseBox::keyPressEvent(QKeyEvent *e)
                 releaseKeyboard();
             }
             else if (action == "UP")
-            {
-                //  move track up
                 moveHeldUpDown(true);
-            }
             else if (action == "DOWN")
-            {
-                //  move track down
                 moveHeldUpDown(false);
-            }
+            else
+                handled = false;
         }
     }
     else
