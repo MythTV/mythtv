@@ -352,7 +352,7 @@ void RingBuffer::Init(void)
     fill_min = -1;
 
     readblocksize = 128000;
-    requestedblocks = 0;
+    requestedbytes = 0;
 
     recorder_num = 0;
     remoteencoder = NULL;
@@ -483,17 +483,18 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
 
     do 
     {
-        if (requestedblocks > 3)
+        if (requestedbytes > reqsize * 3)
             break;
 
         if (rf->RequestBlock(reqsize))
         {
             hiteof = true;
+            VERBOSE(VB_PLAYBACK, "RequestBlock extends beyond EOF.");
             break;
         }
-        requestedblocks++;
+        requestedbytes += reqsize;
     }
-    while (requestedblocks < 2);
+    while (requestedbytes < reqsize * 2);
  
     qApp->lock();
     unsigned int available = sock->bytesAvailable();
@@ -536,12 +537,15 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
         tot += ret;
     }
 
-    requestedblocks--;
+    requestedbytes -= tot;
+
+    VERBOSE(VB_FILE, QString ("sz: %1 return: %2 pending: %3 avail: %4")
+            .arg(sz).arg(tot).arg(requestedbytes).arg(available));
 
     return tot;
 }
 
-#define READ_AHEAD_SIZE (10 * 1024 * 1024)
+#define READ_AHEAD_SIZE (2 * 1024 * 1024)
 
 void RingBuffer::CalcReadAheadThresh(int estbitrate)
 {
@@ -618,7 +622,7 @@ void RingBuffer::ResetReadAhead(long long newinternal)
     internalreadpos = newinternal;
     ateof = false;
     readsallowed = false;
-    requestedblocks = 0;
+    requestedbytes = 0;
     readAheadLock.unlock();
 }
 

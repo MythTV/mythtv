@@ -1213,8 +1213,8 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
         if (prebuffering)
         {
-            VERBOSE(VB_PLAYBACK, "prebuffering...");
-            usleep(frame_interval);
+            VERBOSE(VB_GENERAL, "prebuffering...");
+            usleep(frame_interval * 10);
             ResetNexttrigger(&nexttrigger);
             continue;
         }

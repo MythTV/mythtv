@@ -127,7 +127,7 @@ class RingBuffer
     int fill_min;
 
     int readblocksize;
-    int requestedblocks;
+    int requestedbytes;
 
     QWaitCondition pauseWait;
 
