@@ -7,42 +7,42 @@
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen</translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen cover</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>KLaar</translation>
     </message>
 </context>
 <context>
     <name>FileAssocDialog</name>
     <message>
         <source>Please enter the new extension:</source>
-        <translation type="unfinished"></translation>
+        <translation>Geef nieuwe extentie:</translation>
     </message>
     <message>
         <source>Create new extension</source>
-        <translation type="unfinished"></translation>
+        <translation>Maak nieuwe extentie</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Anuleer</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Klaar</translation>
     </message>
     <message>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieuw</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Wis</translation>
     </message>
 </context>
 <context>
@@ -84,10 +84,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Aggresive Parental Control</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>If set, you will not be able to return to this screen and reset the Parental PIN without first entering the current PIN. You have been warned.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -121,23 +117,23 @@
     </message>
     <message>
         <source>Searching for video files</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoek naar videobestanden</translation>
     </message>
     <message>
         <source>Updating video database</source>
-        <translation type="unfinished"></translation>
+        <translation>Bezig met bijwerken video-databank</translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen Cover</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Onbekend</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen</translation>
     </message>
     <message>
         <source>NR</source>
@@ -145,11 +141,11 @@
     </message>
     <message>
         <source>Unknown Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Onbekende Rating</translation>
     </message>
     <message>
         <source>Default Player</source>
-        <translation type="unfinished"></translation>
+        <translation>Standaard afspeelprogramma</translation>
     </message>
     <message>
         <source>Newly scanned files are browsable by default</source>
@@ -157,10 +153,6 @@
     </message>
     <message>
         <source>If set, newly scanned files in the Video Manager will be marked as browsable and will appear in the &apos;Browse&apos; menu.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos; or &apos;MythXine&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -201,11 +193,67 @@
     </message>
     <message>
         <source>Could not retrieve poster</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan cover niet downloaden</translation>
     </message>
     <message>
         <source>A movie poster exists for this movie but Myth could not retrieve it within a reasonable amount of time.
 </source>
+        <translation>Er bestaat een cover voor deze film maar die kan momenteel niet gedownload worden</translation>
+    </message>
+    <message>
+        <source>Default View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gallery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Browser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Listings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The defualt view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aggressive Parental Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rows to display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Columns to display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show title below thumbnails</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the additional text will make the thumbnails smaller.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maintain aspect ratio of thumbnails</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the scaled thumbnails will maintain their original aspect ratio. If not set, they are scaled to match the size of the background icon.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Gallery</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -213,15 +261,15 @@
     <name>ThemeUI</name>
     <message>
         <source>Director:</source>
-        <translation type="unfinished"></translation>
+        <translation>Regisseur:</translation>
     </message>
     <message>
         <source>Year:</source>
-        <translation type="unfinished"></translation>
+        <translation>Jaar:</translation>
     </message>
     <message>
         <source>Rated:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rating:</translation>
     </message>
     <message>
         <source>Parental Level:</source>
@@ -229,23 +277,23 @@
     </message>
     <message>
         <source>Browsable:</source>
-        <translation type="unfinished"></translation>
+        <translation>Komt in lijst:</translation>
     </message>
     <message>
         <source>Runtime:</source>
-        <translation type="unfinished"></translation>
+        <translation>Speelduur:</translation>
     </message>
     <message>
         <source>Plot:</source>
-        <translation type="unfinished"></translation>
+        <translation>Inhoud:</translation>
     </message>
     <message>
         <source>Filename:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestandsnaam:</translation>
     </message>
     <message>
         <source>Cover File:</source>
-        <translation type="unfinished"></translation>
+        <translation>Cover bestand:</translation>
     </message>
     <message>
         <source>IMDB Num.:</source>
@@ -253,23 +301,23 @@
     </message>
     <message>
         <source>retrieving data...</source>
-        <translation type="unfinished"></translation>
+        <translation>downloaden gegevens...</translation>
     </message>
     <message>
         <source>[ looking for ]</source>
-        <translation type="unfinished"></translation>
+        <translation>[ zoeken naar ]</translation>
     </message>
     <message>
         <source>Enter IMDB #</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen IMDB nr.</translation>
     </message>
     <message>
         <source>loading...</source>
-        <translation type="unfinished"></translation>
+        <translation>inlezen...</translation>
     </message>
     <message>
         <source>No Videos Found</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen films gevonden</translation>
     </message>
     <message>
         <source>1</source>
@@ -277,11 +325,11 @@
     </message>
     <message>
         <source>Directed by</source>
-        <translation type="unfinished"></translation>
+        <translation>Gemaakt door</translation>
     </message>
     <message>
         <source>File:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestand:</translation>
     </message>
     <message>
         <source>Player:</source>
@@ -293,31 +341,31 @@
     </message>
     <message>
         <source>MythVideo File Associations</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestandstype koppelingen</translation>
     </message>
     <message>
         <source>Extension:</source>
-        <translation type="unfinished"></translation>
+        <translation>Extentie:</translation>
     </message>
     <message>
         <source>Command:</source>
-        <translation type="unfinished"></translation>
+        <translation>Commando:</translation>
     </message>
     <message>
         <source>Use default player:</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruik standaard afspeelprogramma:</translation>
     </message>
     <message>
         <source>Ignore:</source>
-        <translation type="unfinished"></translation>
+        <translation>Negeer:</translation>
     </message>
     <message>
         <source>Edit Video Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewerk video gegevens:</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Naam:</translation>
     </message>
     <message>
         <source>Parental Control:</source>
@@ -325,11 +373,11 @@
     </message>
     <message>
         <source>File to Always Play Next:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bestand dat hier dient afgespeeld:</translation>
     </message>
     <message>
         <source>Include while Browsing:</source>
-        <translation type="unfinished"></translation>
+        <translation>Weergeven in lijst:</translation>
     </message>
     <message>
         <source>Cover Art:</source>
@@ -345,15 +393,15 @@
     </message>
     <message>
         <source>Category:</source>
-        <translation type="unfinished"></translation>
+        <translation>Categorie</translation>
     </message>
     <message>
         <source>Filters video list</source>
-        <translation type="unfinished"></translation>
+        <translation>Filter op video-overzicht</translation>
     </message>
     <message>
         <source>Category :</source>
-        <translation type="unfinished"></translation>
+        <translation>Categorie :</translation>
     </message>
     <message>
         <source>Genre :</source>
@@ -361,15 +409,15 @@
     </message>
     <message>
         <source>Country :</source>
-        <translation type="unfinished"></translation>
+        <translation>Land :</translation>
     </message>
     <message>
         <source>Year :</source>
-        <translation type="unfinished"></translation>
+        <translation>Jaar :</translation>
     </message>
     <message>
         <source>Runtime :</source>
-        <translation type="unfinished"></translation>
+        <translation>Speeltijd :</translation>
     </message>
     <message>
         <source>User Rating :</source>
@@ -377,19 +425,19 @@
     </message>
     <message>
         <source>Browse :</source>
-        <translation type="unfinished"></translation>
+        <translation>Bladeren :</translation>
     </message>
     <message>
         <source>Sort by :</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorteren op :</translation>
     </message>
     <message>
         <source>Aucune video</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen video</translation>
     </message>
     <message>
         <source>SELECT: Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>SELECTEER: Bewerk</translation>
     </message>
     <message>
         <source></source>
@@ -397,15 +445,15 @@
     </message>
     <message>
         <source>MENU: Options</source>
-        <translation type="unfinished"></translation>
+        <translation>MENU: Opties</translation>
     </message>
     <message>
         <source>Up/Down, Page Up/Down - Browse</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruik navigatietoetsen op te bladeren</translation>
     </message>
     <message>
         <source>Menu - Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Menu - Opties</translation>
     </message>
     <message>
         <source>Parental</source>
@@ -417,11 +465,11 @@
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Jaar</translation>
     </message>
     <message>
         <source>Runtime</source>
-        <translation type="unfinished"></translation>
+        <translation>Speeltijd</translation>
     </message>
     <message>
         <source>User Rating</source>
@@ -431,16 +479,12 @@
 <context>
     <name>VideoBrowser</name>
     <message>
-        <source>Parental Pin:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>%1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 van %2</translation>
     </message>
     <message>
         <source>No Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen Films</translation>
     </message>
     <message>
         <source>No rating available.</source>
@@ -448,58 +492,62 @@
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>minuten</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Ok</translation>
     </message>
     <message>
         <source>Select action</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Kies bewerking</translation>
     </message>
     <message>
         <source>Watch This Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Bekijk deze Film</translation>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Beschrijving Inhoud</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished"></translation>
+        <translation>Filter weergave</translation>
     </message>
     <message>
         <source>Switch to Video Listings</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Ga naar lijstweergave</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Anuleer</translation>
     </message>
 </context>
 <context>
     <name>VideoManager</name>
     <message>
         <source>minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>minuten</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished"></translation>
+        <translation>Neen</translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen Cover</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Onbekend</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen</translation>
     </message>
     <message>
         <source>NR</source>
@@ -507,47 +555,47 @@
     </message>
     <message>
         <source>delete failed</source>
-        <translation type="unfinished"></translation>
+        <translation>wissen mislukt</translation>
     </message>
     <message>
         <source>Select action:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kies bewerking:</translation>
     </message>
     <message>
         <source>Edit Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewerk videogegevens</translation>
     </message>
     <message>
         <source>Search IMDB</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoek op internet</translation>
     </message>
     <message>
         <source>Manually Enter IMDB #</source>
-        <translation type="unfinished"></translation>
+        <translation>Geef manueel IMDB nr.</translation>
     </message>
     <message>
         <source>Reset Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Wis gegevens</translation>
     </message>
     <message>
         <source>Toggle Browseable</source>
-        <translation type="unfinished"></translation>
+        <translation>In lijst ja/neen</translation>
     </message>
     <message>
         <source>Remove Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Wis video</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished"></translation>
+        <translation>Filter weergave</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Anuleer</translation>
     </message>
     <message>
         <source>Delete this file?</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit bestand wissen?</translation>
     </message>
 </context>
 <context>
@@ -558,7 +606,39 @@
     </message>
     <message>
         <source>No files found</source>
+        <translation>Geen bestanden gevonden</translation>
+    </message>
+    <message>
+        <source>Select action</source>
+        <translation type="unfinished">Kies bewerking</translation>
+    </message>
+    <message>
+        <source>Watch This Video</source>
+        <translation type="unfinished">Bekijk deze Film</translation>
+    </message>
+    <message>
+        <source>View Full Plot</source>
+        <translation type="unfinished">Beschrijving Inhoud</translation>
+    </message>
+    <message>
+        <source>Filter Display</source>
+        <translation type="unfinished">Filter weergave</translation>
+    </message>
+    <message>
+        <source>Switch to Browse View</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to Gallery View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Anuleer</translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished">Ok</translation>
     </message>
 </context>
 </TS>

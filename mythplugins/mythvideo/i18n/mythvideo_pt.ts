@@ -120,7 +120,7 @@
     </message>
     <message>
         <source>Aggresive Parental Control</source>
-        <translation>Controlo de Acesso Agressivo</translation>
+        <translation type="obsolete">Controlo de Acesso Agressivo</translation>
     </message>
     <message>
         <source>If set, you will not be able to return to this screen and reset the Parental PIN without first entering the current PIN. You have been warned.</source>
@@ -203,10 +203,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos; or &apos;MythXine&apos;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>New category</source>
         <translation type="unfinished"></translation>
     </message>
@@ -249,6 +245,62 @@
     <message>
         <source>A movie poster exists for this movie but Myth could not retrieve it within a reasonable amount of time.
 </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gallery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Browser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Listings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The defualt view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aggressive Parental Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rows to display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Columns to display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show title below thumbnails</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the additional text will make the thumbnails smaller.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maintain aspect ratio of thumbnails</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the scaled thumbnails will maintain their original aspect ratio. If not set, they are scaled to match the size of the background icon.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Gallery</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -491,7 +543,7 @@
     <name>VideoBrowser</name>
     <message>
         <source>Parental Pin:</source>
-        <translation>Código de Acesso:</translation>
+        <translation type="obsolete">Código de Acesso:</translation>
     </message>
     <message>
         <source>The law of the exluded middle is officially OVER!</source>
@@ -514,14 +566,6 @@
         <translation type="unfinished">minutos</translation>
     </message>
     <message>
-        <source>Ok</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select action</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Watch This Video</source>
         <translation type="unfinished"></translation>
     </message>
@@ -534,8 +578,8 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Switch to Video Listings</source>
-        <translation type="unfinished"></translation>
+        <source>Cancel</source>
+        <translation type="unfinished">Cancelar</translation>
     </message>
 </context>
 <context>
@@ -634,6 +678,38 @@
     <message>
         <source>No files found</source>
         <translation>Não foi encontrado nenhum ficheiro</translation>
+    </message>
+    <message>
+        <source>Select action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch This Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View Full Plot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter Display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to Browse View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to Gallery View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Cancelar</translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

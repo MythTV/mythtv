@@ -89,7 +89,7 @@
     </message>
     <message>
         <source>Aggresive Parental Control</source>
-        <translation>Aggressive Kindersicherung</translation>
+        <translation type="obsolete">Aggressive Kindersicherung</translation>
     </message>
     <message>
         <source>If set, you will not be able to return to this screen and reset the Parental PIN without first entering the current PIN. You have been warned.</source>
@@ -169,7 +169,7 @@
     </message>
     <message>
         <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos; or &apos;MythXine&apos;.</source>
-        <translation>Dieser Befehl wird für alle Dateien verwendet für deren Erweiterung nichts anderes definiert wurde. Sie können auch den Namen eines MythTV Moduls wie z.B. &apos;Internal&apos; oder &apos;MythXine&apos; angeben.</translation>
+        <translation type="obsolete">Dieser Befehl wird für alle Dateien verwendet für deren Erweiterung nichts anderes definiert wurde. Sie können auch den Namen eines MythTV Moduls wie z.B. &apos;Internal&apos; oder &apos;MythXine&apos; angeben.</translation>
     </message>
     <message>
         <source>New category</source>
@@ -216,6 +216,62 @@
 </source>
         <translation>Für diesen Film existiert ein Titelbild aber MythVideo konnte es nicht in einer angemessenen Zeitspanne laden.
 </translation>
+    </message>
+    <message>
+        <source>Default View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gallery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Browser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Listings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The defualt view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aggressive Parental Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rows to display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Columns to display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show title below thumbnails</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the additional text will make the thumbnails smaller.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maintain aspect ratio of thumbnails</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the scaled thumbnails will maintain their original aspect ratio. If not set, they are scaled to match the size of the background icon.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Gallery</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -453,7 +509,7 @@
     <name>VideoBrowser</name>
     <message>
         <source>Parental Pin:</source>
-        <translation>Kindersicherungs-PIN:</translation>
+        <translation type="obsolete">Kindersicherungs-PIN:</translation>
     </message>
     <message>
         <source>%1 of %2</source>
@@ -473,11 +529,11 @@
     </message>
     <message>
         <source>Ok</source>
-        <translation>Ok</translation>
+        <translation type="obsolete">Ok</translation>
     </message>
     <message>
         <source>Select action</source>
-        <translation>Aktion wählen</translation>
+        <translation type="obsolete">Aktion wählen</translation>
     </message>
     <message>
         <source>Watch This Video</source>
@@ -493,7 +549,11 @@
     </message>
     <message>
         <source>Switch to Video Listings</source>
-        <translation>Zur Videoliste wechseln</translation>
+        <translation type="obsolete">Zur Videoliste wechseln</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Abbrechen</translation>
     </message>
 </context>
 <context>
@@ -588,6 +648,38 @@
     <message>
         <source>No files found</source>
         <translation>Keine Dateien gefunden</translation>
+    </message>
+    <message>
+        <source>Select action</source>
+        <translation type="unfinished">Aktion wählen</translation>
+    </message>
+    <message>
+        <source>Watch This Video</source>
+        <translation type="unfinished">Film ansehen</translation>
+    </message>
+    <message>
+        <source>View Full Plot</source>
+        <translation type="unfinished">Kompl. Beschreibung ansehen</translation>
+    </message>
+    <message>
+        <source>Filter Display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to Browse View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to Gallery View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Abbrechen</translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished">Ok</translation>
     </message>
 </context>
 </TS>

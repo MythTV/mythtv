@@ -92,7 +92,7 @@
     </message>
     <message>
         <source>Aggresive Parental Control</source>
-        <translation>積極的な再生制限制御</translation>
+        <translation type="obsolete">積極的な再生制限制御</translation>
     </message>
     <message>
         <source>If set, you will not be able to return to this screen and reset the Parental PIN without first entering the current PIN. You have been warned.</source>
@@ -171,10 +171,6 @@
         <translation>新しく検索されたファイルをビデオマネージャーで表示可能のマークをつける。</translation>
     </message>
     <message>
-        <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos; or &apos;MythXine&apos;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>New category</source>
         <translation>新カテゴリー</translation>
     </message>
@@ -219,6 +215,62 @@
 </source>
         <translation>この映画のポスターは存在しますがMythTVは時間内に検索できませんでした。
 </translation>
+    </message>
+    <message>
+        <source>Default View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gallery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Browser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Listings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The defualt view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aggressive Parental Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rows to display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Columns to display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show title below thumbnails</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the additional text will make the thumbnails smaller.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maintain aspect ratio of thumbnails</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the scaled thumbnails will maintain their original aspect ratio. If not set, they are scaled to match the size of the background icon.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Gallery</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -460,7 +512,7 @@
     <name>VideoBrowser</name>
     <message>
         <source>Parental Pin:</source>
-        <translation>再生制限ピン:</translation>
+        <translation type="obsolete">再生制限ピン:</translation>
     </message>
     <message>
         <source>%1 of %2</source>
@@ -479,12 +531,8 @@
         <translation>分</translation>
     </message>
     <message>
-        <source>Ok</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Select action</source>
-        <translation>動作選択</translation>
+        <translation type="obsolete">動作選択</translation>
     </message>
     <message>
         <source>Watch This Video</source>
@@ -500,7 +548,11 @@
     </message>
     <message>
         <source>Switch to Video Listings</source>
-        <translation>ビデオリストに切替える</translation>
+        <translation type="obsolete">ビデオリストに切替える</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">キャンセル</translation>
     </message>
 </context>
 <context>
@@ -595,6 +647,38 @@
     <message>
         <source>No files found</source>
         <translation>ファイルを見つけられませんでした</translation>
+    </message>
+    <message>
+        <source>Select action</source>
+        <translation type="unfinished">動作選択</translation>
+    </message>
+    <message>
+        <source>Watch This Video</source>
+        <translation type="unfinished">このビデオを見る</translation>
+    </message>
+    <message>
+        <source>View Full Plot</source>
+        <translation type="unfinished">全ての粗筋を表示する</translation>
+    </message>
+    <message>
+        <source>Filter Display</source>
+        <translation type="unfinished">表示絞りこみ</translation>
+    </message>
+    <message>
+        <source>Switch to Browse View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to Gallery View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">キャンセル</translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
