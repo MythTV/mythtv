@@ -591,6 +591,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     {
         decoder = new IvtvDecoder(this, m_db, m_playbackinfo);
         disableaudio = true; // no audio with ivtv.
+        audio_bits = 16;
     }
 #endif
     else if (AvFormatDecoder::CanHandle(testbuf, ringBuffer->GetFilename()))
