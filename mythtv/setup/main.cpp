@@ -46,17 +46,21 @@ QString getResponse(const QString &query, const QString &def)
     return qresponse;
 }
 
-void clearDB(void)
+void clearCardDB(void)
+{
+    QSqlQuery query;
+
+    query.exec("DELETE FROM capturecard;");
+    query.exec("DELETE FROM cardinput;");
+}
+
+void clearAllDB(void)
 {
     QSqlQuery query;
 
     query.exec("DELETE FROM channel;");
     query.exec("DELETE FROM program;");
-    query.exec("DELETE FROM singlerecord;");
-    query.exec("DELETE FROM timeslotrecord;");
-    query.exec("DELETE FROM capturecard;");
     query.exec("DELETE FROM videosource;");
-    query.exec("DELETE FROM cardinput;");
 }
 
 void SetupMenuCallback(void* data, QString& selection) {
@@ -125,10 +129,19 @@ int main(int argc, char *argv[])
     if (!dir.exists())
         dir.mkdir(fileprefix);
 
-    QString response = getResponse("Would you like to clear all program/channel/recording/card\n"
-                                   "settings before starting configuration?", "n");
-    if (response == "y")
-        clearDB();
+    QString response = getResponse("Would you like to clear all capture card\n"
+                                   "settings before starting configuration?", 
+                                   "no");
+
+    if (response.left(1).lower() == "y")
+        clearCardDB();
+
+    response = getResponse("Would you like to clear all program/channel\n"
+                           "settings before starting configuration?",
+                           "no");
+
+    if (response.left(1).lower() == "y")
+        clearAllDB();
 
     SetupMenu();
 
