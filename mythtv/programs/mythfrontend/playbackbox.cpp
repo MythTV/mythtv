@@ -1736,9 +1736,10 @@ void PlaybackBox::showPlayFromPopup()
 
     initPopup(popup, delitem, "", "");
 
-    QButton *playButton = popup->addButton(tr("Play from beginning"), this, SLOT(doPlayFromBeg()));
-    popup->addButton(tr("Play from bookmark"), this, SLOT(doPlay()));
-    
+    QButton *playButton = popup->addButton(tr("Play from bookmark"), this,
+            SLOT(doPlay()));
+    popup->addButton(tr("Play from beginning"), this, SLOT(doPlayFromBeg()));
+     
     popup->ShowPopup(this, SLOT(doCancel()));
     playButton->setFocus();
     
