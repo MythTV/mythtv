@@ -605,7 +605,7 @@ int main(int argc, char **argv)
             cerr << "Unable to open lockfile!\n"
                  << "Be sure that \'" << gContext->GetSetting("RecordFilePrefix")
                  << "\' exists and that both \nthe directory and that "
-                 << "file are writeble by this user.\n";
+                 << "file are writeable by this user.\n";
             return -1;
         }
     }
