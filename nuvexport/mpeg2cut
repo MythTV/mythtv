@@ -1,19 +1,66 @@
 #! /bin/sh
 #
+# vim:ts=4:sw=4:ai:et:si:sts=4
+#
 # Cut MPEG2 files to remove cutlists...
 # Written by Gavin Hurlbut <gjhurlbu@beirdo.ca>
 #
 # Prerequisites:
-#   avidemux2	- http://fixounet.free.fr/avidemux/
-#   transcode	- http://zebra.fh-weingarten.de/~transcode/
-#   lvemux      - http://lvempeg.sourceforge.net/
-#   gdk2-cursed - http://zemljanka.sourceforge.net/cursed/
+#    avidemux2   - http://fixounet.free.fr/avidemux/
+#    transcode   - http://zebra.fh-weingarten.de/~transcode/
+#    lvemux      - http://lvempeg.sourceforge.net/
+#    gdk2-cursed - http://zemljanka.sourceforge.net/cursed/
+# or Xvfb	 - http://www.xfree86.org/
 #
 # Usage: mpeg2cut inputfile outputfile segmentList
 #	where segmentList is a space separated list of frame regions to keep
 #		(i.e.  -1999 3000-5000 6000-)
 
-export LD_PRELOAD=libgdk-cursed-2.0.so:libgtk-cursed-2.0.so
+LOCAL_PRELOAD=
+
+# Use Xvfb if it's installed
+XVFB=`which Xvfb`
+if [ .${XVFB}. != .. ]
+then
+    # We have Xvfb, we will be using a X at :13.0
+    export DISPLAY=:13.0
+    MODE=Xvfb
+else
+    # No Xvfb, try cursed next
+    for i in /lib /usr/lib /usr/local/lib
+    do
+        if [ -f $i/libgdk-cursed-2.0.so -a -f $i/libgtk-cursed-2.0.so ]
+        then
+            LOCAL_PRELOAD=libgdk-cursed-2.0.so:libgtk-cursed-2.0.so
+            break
+        fi
+    done
+
+    if [ .${LOCAL_PRELOAD}. != .. ]
+    then
+	# we have gdk-cursed, use it
+        export LD_PRELOAD=${LOCAL_PRELOAD}
+        MODE=gdk-cursed
+    else
+        if [ .${DISPLAY}. != .. ]
+        then
+            MODE=X
+        else
+            # Don't even have a display, we can't run avidemux2, give up!
+            cat << EOF
+
+To run mpeg2cut, you need to use avidemux2, which requires gdk support.  To
+fill this dependancy, you will need one of (in order of preference):
+
+	Xvfb		(virtual framebuffer X server)
+	gdk-cursed	(GDK for curses)
+	run under X	(have a DISPLAY= environment variable)
+
+EOF
+            exit 1
+        fi
+    fi
+fi
 
 FILENAME=$1
 BASENAME=`basename ${FILENAME} .nuv`
@@ -23,6 +70,7 @@ LASTGOP=$3
 # get the largest numbered mark of type 6 * (15 NTSC or 12 PAL), that's the
 # last GOP frame
 
+echo Using mode ${MODE}
 echo Filename \"${FILENAME}\"
 echo OutFile \"${OUTFILE}\"
 
@@ -34,30 +82,37 @@ echo Cutlist \"${CUTLIST}\"
 
 echo -n Finding the AV Offset to use with lvemux:
 OFFSET=`(tcprobe -i ${FILENAME} 2> /dev/null) | grep av_fine_ms | \
-	sed -e 's/^.*av_fine_ms //' | cut -d " " -f 1`
+    sed -e 's/^.*av_fine_ms //' | cut -d " " -f 1`
 OFFSET=$((-1 * ${OFFSET}))
 echo ${OFFSET}
 
 echo -n Finding framerate:
 FRAMERATE=`(tcprobe -i ${FILENAME} 2> /dev/null) | grep "frame rate" | \
-	sed -e 's/^.*-f //' | cut -d " " -f 1`
+    sed -e 's/^.*-f //' | cut -d " " -f 1`
 echo ${FRAMERATE}
 
 if [ .${FRAMERATE}. = .25.000. ]
 then
-	GOPSPACE=12
+    GOPSPACE=12
 else
-	GOPSPACE=15
+    GOPSPACE=15
 fi
 
 LASTFRAME=$(( ${LASTGOP} * ${GOPSPACE} ))
 echo Last Frame ${LASTFRAME}
 
+if [ .${MODE}. = .Xvfb. ]
+then
+    # Let's start up the Xvfb server
+    ${XVFB} :13 -screen 0 640x480x8 2> /dev/null > /dev/null &
+    XVFB_PID=$!
+fi
+
 if [ ! -f ${FILENAME}.idx ]
 then
-	echo Indexing the file with avidemux2
-	nice -n 19 avidemux2 --index-mpeg ${FILENAME} ${FILENAME}.idx C0 \
-		--audio-codec MP2 --quit 2> /dev/null > /dev/null
+    echo Indexing the file with avidemux2
+    nice -n 19 avidemux2 --index-mpeg ${FILENAME} ${FILENAME}.idx C0 \
+        --audio-codec MP2 --quit 2> /dev/null > /dev/null
 fi
 
 
@@ -72,31 +127,31 @@ cat /dev/null > ${BASENAME}.cut2
 count=0
 for i in ${CUTLIST}
 do
-	START=`echo $i | cut -d '-' -f 1`
-	END=`echo $i | cut -d '-' -f 2`
+    START=`echo $i | cut -d '-' -f 1`
+    END=`echo $i | cut -d '-' -f 2`
 
-	if [ .${START}. = .. ]
-	then
-		START=0
-	fi
+    if [ .${START}. = .. ]
+    then
+        START=0
+    fi
 
-	if [ ${START} -ge ${LASTFRAME} ]
-	then
-		continue
-	fi
+    if [ ${START} -ge ${LASTFRAME} ]
+    then
+        continue
+    fi
 
-	if [ .${END}. = .. ]
-	then
-		END=${LASTFRAME}
-	fi
-	LENGTH=$((${END} - ${START} + 1))
+    if [ .${END}. = .. ]
+    then
+        END=${LASTFRAME}
+    fi
+    LENGTH=$((${END} - ${START} + 1))
 
-	cat >> ${BASENAME}.cut2 << EOF
+    cat >> ${BASENAME}.cut2 << EOF
 Start : ${START}
 Size : ${LENGTH}
 Ref :   0
 EOF
-	count=$((${count} + 1))
+    count=$((${count} + 1))
 done
 echo ${count} segments >> ${BASENAME}.cut
 
@@ -110,8 +165,14 @@ EOF
 
 echo Cutting out commercials with avidemux2
 nice -n 19 avidemux2 --load-workbench ${BASENAME}.cut \
-	--audio-codec MP2 --save-raw-video ${BASENAME}.m2v \
-	--save-raw-audio ${BASENAME}.mp2 --quit 2> /dev/null > /dev/null
+    --audio-codec MP2 --save-raw-video ${BASENAME}.m2v \
+    --save-raw-audio ${BASENAME}.mp2 --quit 2> /dev/null > /dev/null
+
+# Shut down Xvfb if we used it
+if [ .${MODE}. = .Xvfb. ]
+then
+    kill ${XVFB_PID}
+fi
 
 echo Remultiplexing video
 nice -n 19 lvemux -r -1 -v ${BASENAME}.m2v -a ${BASENAME}.mp2 -o "${OUTFILE}"
