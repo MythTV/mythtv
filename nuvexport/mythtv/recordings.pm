@@ -100,7 +100,7 @@ package mythtv::recordings;
 		elsif($episode ne 'Untitled') {
 			$outfile = $episode;
 		}
-        $outfile =~ s/(?:[:\?&]+\s*?)+\s?/-/sg;
+        $outfile =~ s/(?:[:\?&\/]+\s*?)+\s?/-/sg;
     #$description =~ s/(?:''|``)/"/sg;
         push @{$Shows{$show}}, {'filename'       => "$video_dir/$file",
                                 'channel'        => $channel,
