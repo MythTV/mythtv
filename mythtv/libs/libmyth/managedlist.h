@@ -253,6 +253,10 @@ class ManagedListGroup : public ManagedListItem
                         
     public slots:        
         virtual void doGoBack();
+
+    signals:
+        void goingBack();
+        void wentBack();
     
     protected:
         QPtrList<ManagedListItem> itemList;
