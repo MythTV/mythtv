@@ -130,9 +130,13 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
         exit(0);
     }
 
-    if(theme->GetSet("group_info"))
+    if(theme->GetSet("group_info") && gContext->GetNumSetting("ShowGroupInfo", 0) == 1)
+    {
+        cerr << "got it" << endl;
         haveGroupInfoSet = true;
-
+    }
+    else
+        haveGroupInfoSet = false;
 
     connected = FillList();
 
@@ -368,10 +372,9 @@ void PlaybackBox::grayOut(QPainter *tmp)
 
 void PlaybackBox::updateGroupInfo(QPainter *p, QRect& pr, QPixmap& pix)
 {
-    LayerSet *container = theme->GetSet("group_info");
-
-    if (container)
+    if (haveGroupInfoSet)
     {
+        LayerSet *container = theme->GetSet("group_info");
         QPainter tmp(&pix);
         QMap<QString, QString> infoMap;
         if(titleData[curTitle] == groupDisplayName)
