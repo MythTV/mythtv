@@ -144,7 +144,7 @@
     </message>
     <message>
         <source>Default Player</source>
-        <translation type="obsolete">Comando Padrão</translation>
+        <translation>Comando Padrão</translation>
     </message>
     <message>
         <source>/usr/bin/mplayer -fs -zoom -quiet -vo xv %s</source>
@@ -193,10 +193,6 @@
     <message>
         <source>Unknown Rating</source>
         <translation>Classificação Desconhecida</translation>
-    </message>
-    <message>
-        <source>VideoDefaultPlayer</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

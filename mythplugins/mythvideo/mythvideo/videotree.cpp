@@ -367,7 +367,7 @@ void VideoTree::buildVideoList()
         }
         else
         {
-            video_tree_data->addNode("No files found", -1, false);
+            video_tree_data->addNode(tr("No files found"), -1, false);
         }
     }
     

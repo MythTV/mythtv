@@ -17,10 +17,7 @@ installfiles.files = videomenu.xml video_settings.xml
 installimages.path = $${PREFIX}/share/mythtv/themes/default
 installimages.files = images/*.png
 
-trans.path = $${PREFIX}/share/mythtv/i18n/
-trans.files = mythvideo_it.qm
-
-INSTALLS += installfiles trans uifiles installimages
+INSTALLS += installfiles uifiles installimages
 
 # Input
 
@@ -29,5 +26,3 @@ HEADERS += globalsettings.h videotree.h fileassoc.h editmetadata.h
 
 SOURCES += main.cpp metadata.cpp videomanager.cpp videobrowser.cpp
 SOURCES += globalsettings.cpp videotree.cpp fileassoc.cpp editmetadata.cpp
-
-TRANSLATIONS = mythvideo_it.ts
