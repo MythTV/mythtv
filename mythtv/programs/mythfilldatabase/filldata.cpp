@@ -2169,7 +2169,7 @@ bool fillData(QValueList<Source> &sourcelist)
         if (GuideDataAfter == GuideDataBefore)
             status = "mythfilldatabase ran, but did not insert "
                      "any new data into the Guide.  This can indicate a "
-                     "potential xmltv failure."; 
+                     "potential grabber failure."; 
         else
             status = "Successful.";
 
