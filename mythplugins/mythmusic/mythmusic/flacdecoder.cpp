@@ -465,8 +465,11 @@ Metadata *FlacDecoder::getMetadata(QSqlDatabase *db)
     FLAC__ASSERT(0 != block);
     FLAC__ASSERT(block->type == FLAC__METADATA_TYPE_VORBIS_COMMENT);
 
+    title = getComment(block, "title");
+
     if (ignore_id3 || title.isEmpty())
     {
+        title = "";
         getMetadataFromFilename(filename, QString(".flac$"), artist, album, 
                                 title, genre, tracknum);
     }
@@ -474,7 +477,6 @@ Metadata *FlacDecoder::getMetadata(QSqlDatabase *db)
     {
         artist = getComment(block, "artist");
         album = getComment(block, "album");
-        title = getComment(block, "title");
         genre = getComment(block, "genre");
         tracknum = getComment(block, "tracknumber").toInt(); 
         year = getComment(block, "date").toInt();
