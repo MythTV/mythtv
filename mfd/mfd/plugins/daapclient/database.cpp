@@ -1463,7 +1463,7 @@ void Database::doTheMetadataSwap(int new_generation)
     new_metadata = new QIntDict<Metadata>;
     new_metadata->setAutoDelete(true);
     new_playlists = new QIntDict<Playlist>;
-    new_metadata->setAutoDelete(true);
+    new_playlists->setAutoDelete(true);
     
     generation_delta = new_generation;
 }
@@ -1479,6 +1479,17 @@ void Database::beIgnorant()
     have_items = false;
     have_playlist_list = false;
     have_playlists = false;
+    
+    //
+    //  We also need to delete all out playlists, as they are probably stale
+    //
+    
+    if(new_playlists)
+    {
+        new_playlists->setAutoDelete(true);
+        delete new_playlists;
+        new_playlists = NULL;
+    }
 }
 
 void Database::log(const QString &log_message, int verbosity)
