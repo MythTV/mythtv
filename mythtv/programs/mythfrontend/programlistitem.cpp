@@ -94,23 +94,11 @@ QPixmap *ProgramListItem::getPixmap(void)
 
     m_context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
-    QImage tmpimage;
+    pixmap = m_context->LoadScalePixmap(filename, screenwidth, screenheight,
+                                        wmult, hmult);
 
-    if (tmpimage.load(filename.ascii()))
-    {
-        pixmap = new QPixmap();
-
-        if (screenwidth != 800 || screenheight != 600)
-        {
-            QImage tmp2 = tmpimage.smoothScale((int)(tmpimage.width() * wmult), 
-                                              (int)(tmpimage.height() * hmult));
-            pixmap->convertFromImage(tmp2);
-        }
-        else
-            pixmap->convertFromImage(tmpimage);
-
+    if (pixmap)
         return pixmap;
-    }
 
     int len = 0;
     int video_width, video_height;
@@ -127,23 +115,12 @@ QPixmap *ProgramListItem::getPixmap(void)
         img.save(filename.ascii(), "PNG");
 
         delete [] data;
+ 
+        pixmap = m_context->LoadScalePixmap(filename, screenwidth, screenheight,
+                                            wmult, hmult);
 
-        if (tmpimage.load(filename.ascii()))
-        {
-            pixmap = new QPixmap();
-
-            if (screenwidth != 800 || screenheight != 600)
-            {
-                QImage tmp2;
-                tmp2 = tmpimage.smoothScale((int)(tmpimage.width() * wmult), 
-                                            (int)(tmpimage.height() * hmult));
-                pixmap->convertFromImage(tmp2);
-            }
-            else
-                pixmap->convertFromImage(tmpimage);
-
+        if (pixmap)
             return pixmap;
-        }
     }
 
     return NULL;

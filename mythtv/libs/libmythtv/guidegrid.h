@@ -80,6 +80,7 @@ class GuideGrid : public QDialog
     
     QFont *m_timeFont;
     QFont *m_chanFont;
+    QFont *m_chanCallsignFont;
     QFont *m_progFont;
     QFont *m_titleFont;
 

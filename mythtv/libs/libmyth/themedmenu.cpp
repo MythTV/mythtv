@@ -104,7 +104,9 @@ void ThemedMenu::parseBackground(QString dir, QDomElement &element)
             if (info.tagName() == "image")
             {
                 path = dir + getFirstText(info);
-                bground = scalePixmap(path);
+                bground = m_context->LoadScalePixmap(path, screenwidth, 
+                                                     screenheight, wmult, 
+                                                     hmult);
             }
             else if (info.tagName() == "buttonarea")
             {
@@ -348,13 +350,17 @@ void ThemedMenu::parseButtonDefinition(QString dir, QDomElement &element)
             if (info.tagName() == "normal")
             {
                 setting = dir + getFirstText(info);
-                buttonnormal = scalePixmap(setting);
+                buttonnormal = m_context->LoadScalePixmap(setting, screenwidth,
+                                                          screenheight, wmult,
+                                                          hmult);
                 hasnormal = true;
             }
             else if (info.tagName() == "active")
             {
                 setting = dir + getFirstText(info);
-                buttonactive = scalePixmap(setting);
+                buttonactive = m_context->LoadScalePixmap(setting, screenwidth,
+                                                          screenheight, wmult,
+                                                          hmult);
                 hasactive = true;
             }
             else if (info.tagName() == "text")
@@ -402,7 +408,8 @@ void ThemedMenu::parseLogo(QString dir, QDomElement &element)
             if (info.tagName() == "image")
             {
                 QString logopath = dir + getFirstText(info);
-                logo = scalePixmap(logopath);
+                logo = m_context->LoadScalePixmap(logopath, screenwidth, 
+                                                  screenheight, wmult, hmult);
                 hasimage = true;
             }
             else if (info.tagName() == "position")
@@ -459,7 +466,8 @@ void ThemedMenu::parseButton(QString dir, QDomElement &element)
             if (info.tagName() == "image")
             {
                 QString imagepath = dir + getFirstText(info); 
-                image = scalePixmap(imagepath);
+                image = m_context->LoadScalePixmap(imagepath, screenwidth,
+                                                   screenheight, wmult, hmult);
                 hasicon = true;
             }
             else if (info.tagName() == "offset")
@@ -698,23 +706,6 @@ void ThemedMenu::parseMenu(QString menuname)
 
     selection = "";
     update(menuRect());
-}
-
-QPixmap *ThemedMenu::scalePixmap(QString filename)
-{
-    QPixmap *ret = new QPixmap();
-
-    if (screenwidth != 800 || screenheight != 600)
-    {
-        QImage tmpimage(filename);
-        QImage tmp2 = tmpimage.smoothScale((int)(tmpimage.width() * wmult), 
-                                           (int)(tmpimage.height() * hmult));
-        ret->convertFromImage(tmp2);
-    }
-    else
-        ret->load(filename);
-
-    return ret;
 }
 
 void ThemedMenu::Show()

@@ -62,8 +62,4 @@ private: // Private attributes
 
 void LoadSettingsFile(Settings *settings, QString filename);
 
-// this doesn't belong here, but it'll do for now.
-QPixmap *loadScalePixmap(QString filename, int screenwidth, int screenheight,
-                         float wmult, float hmult);
-
 #endif

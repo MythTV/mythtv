@@ -35,6 +35,12 @@ class MythContext
     int GetMediumFontSize() { return qtfontmed; }
     int GetSmallFontSize() { return qtfontsmall; }
 
+    void ThemeWidget(QWidget *widget, int screenwidth, int screenheight,
+                     float wmult, float hmult);
+
+    QPixmap *LoadScalePixmap(QString filename, int screenwidth, 
+                             int screenheight, float wmult, float hmult);
+
   private:
     // font sizes
     int qtfontbig, qtfontmed, qtfontsmall;

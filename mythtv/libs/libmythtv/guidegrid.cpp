@@ -38,49 +38,10 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel,
     usetheme = m_settings->GetNumSetting("ThemeQt");
     showtitle = m_settings->GetNumSetting("EPGShowTitle");
 
-    if (usetheme)
-    {
-        bgcolor = QColor(m_settings->GetSetting("BackgroundColor"));
-        fgcolor = QColor(m_settings->GetSetting("ForegroundColor"));
+    m_context->ThemeWidget(this, screenwidth, screenheight, wmult, hmult);
 
-        QPixmap *bgpixmap = NULL;
-
-        if (m_settings->GetSetting("BackgroundPixmap") != "")
-        {
-            QString pmapname = m_settings->GetSetting("ThemePathName") +
-                               m_settings->GetSetting("BackgroundPixmap");
-            
-            bgpixmap = loadScalePixmap(pmapname, screenwidth, screenheight,
-                                       wmult, hmult);
-            setPaletteBackgroundPixmap(*bgpixmap);
-        }
-        else if (m_settings->GetSetting("TiledBackgroundPixmap") != "")
-        {
-            QString pmapname = m_settings->GetSetting("ThemePathName") +
-                               m_settings->GetSetting("TiledBackgroundPixmap");
-
-            bgpixmap = loadScalePixmap(pmapname, screenwidth, screenheight,
-                                       wmult, hmult);
-
-            QPixmap background(screenwidth, screenheight);
-            QPainter tmp(&background);
-
-            tmp.drawTiledPixmap(0, 0, screenwidth, screenheight, *bgpixmap);
-            tmp.end();
-            setPaletteBackgroundPixmap(background);
-        }
-        else
-            setPalette(QPalette(bgcolor));
-
-        if (bgpixmap)
-            delete bgpixmap;
-    }
-    else
-    {
-        bgcolor = QColor("white");
-        fgcolor = QColor("black");
-        setPalette(QPalette(bgcolor));
-    }
+    bgcolor = paletteBackgroundColor();
+    fgcolor = paletteForegroundColor();
 
     int timefontsize = m_settings->GetNumSetting("EPGTimeFontSize");
     if (timefontsize == 0) 
@@ -92,9 +53,15 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel,
         chanfontsize = 13;
     m_chanFont = new QFont("Arial", (int)(chanfontsize * hmult), QFont::Bold);
 
+    chanfontsize = m_settings->GetNumSetting("EPGChanCallsignFontSize");
+    if (chanfontsize == 0)
+        chanfontsize = 11;
+    m_chanCallsignFont = new QFont("Arial", (int)(chanfontsize * hmult), 
+                                   QFont::Bold);
+
     int progfontsize = m_settings->GetNumSetting("EPGProgFontSize");
     if (progfontsize == 0) 
-        progfontsize = 11;
+        progfontsize = 13;
     m_progFont = new QFont("Arial", (int)(progfontsize * hmult), QFont::Bold);
 
     int titlefontsize = m_settings->GetNumSetting("EPGTitleFontSize");
@@ -181,6 +148,12 @@ GuideGrid::~GuideGrid()
     }
 
     m_channelInfos.clear();
+
+    delete m_timeFont;
+    delete m_chanFont;
+    delete m_chanCallsignFont;
+    delete m_progFont;
+    delete m_titleFont;
 }
 
 QString GuideGrid::getLastChannel(void)
@@ -497,8 +470,8 @@ void GuideGrid::paintChannels(QPainter *p)
         tmp.drawText((cr.width() - width) / 2, 
                      ydifference * y + yoffset + bheight, chinfo->chanstr);
 
-        tmp.setFont(*m_progFont);
-        QFontMetrics fm(*m_progFont);
+        tmp.setFont(*m_chanCallsignFont);
+        QFontMetrics fm(*m_chanCallsignFont);
         width = fm.width(chinfo->callsign);
         int height = fm.height();
         tmp.drawText((cr.width() - width) / 2, 

@@ -39,7 +39,8 @@ int EPGShowTitle=1
 # Sizes of the fonts for the EPG
 int EPGTimeFontSize=13
 int EPGChanFontSize=13
-int EPGProgFontSize=11
+int EPGChanCallsignFontSize=11
+int EPGProgFontSize=13
 int EPGTitleFontSize=19
 #
 # Display order of channels.  Meaningful values are chanid, callsign, and 
