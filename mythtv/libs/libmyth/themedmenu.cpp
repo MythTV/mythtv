@@ -1707,7 +1707,10 @@ void ThemedMenu::keyPressEvent(QKeyEvent *e)
         }
         else if (action == "SELECT")
         {
-            handleAction(activebutton->action);
+            lastbutton = activebutton;
+            activebutton = NULL;
+            repaint(lastbutton->posRect);
+            handleAction(lastbutton->action);
             lastbutton = NULL;
         }
         else if (action == "ESCAPE")

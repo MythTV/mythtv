@@ -165,7 +165,7 @@ class TV : public QObject
     void BrowseStart(void);
     void BrowseEnd(bool change);
     void BrowseDispInfo(int direction);
-    void BrowseToggleRecord(void);
+    void ToggleRecord(void);
     void BrowseChannel(QString &chan);
 
     void DoTogglePictureAttribute(void);

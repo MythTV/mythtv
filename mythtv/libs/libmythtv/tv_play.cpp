@@ -1035,7 +1035,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 BrowseEnd(true);
             }
             else if (action == "TOGGLERECORD")
-                BrowseToggleRecord();
+                ToggleRecord();
             else if (action == "VOLUMEDOWN" || action == "VOLUMEUP" ||
                      action == "MUTE" || action == "TOGGLEASPECT")
             {
@@ -1332,6 +1332,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 else
                     ChangeChannel(CHANNEL_DIRECTION_DOWN);
             }
+            else if (action == "TOGGLERECORD")
+                ToggleRecord();
             else if (action == "NEXTFAV")
                 ChangeChannel(CHANNEL_DIRECTION_FAVORITE);
             else if (action == "TOGGLEFAV")
@@ -2674,10 +2676,25 @@ void TV::BrowseDispInfo(int direction)
     delete program_info;
 }
 
-void TV::BrowseToggleRecord(void)
+void TV::ToggleRecord(void)
 {
     if (!browsemode)
+    {
+        QString title, subtitle, desc, category, starttime, endtime;
+        QString callsign, iconpath, channum, chanid;
+
+        GetChannelInfo(activerecorder, title, subtitle, desc, category, 
+                       starttime, endtime, callsign, iconpath, channum, chanid);
+
+        QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
+
+        ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(m_db,
+                                                                      chanid,
+                                                                      startts);
+        program_info->ToggleRecord(m_db);
+        delete program_info;
         return;
+    }
 
     QMap<QString, QString> regexpMap;
     QDateTime startts = QDateTime::fromString(browsestarttime, Qt::ISODate);
