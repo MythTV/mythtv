@@ -1026,7 +1026,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
     AVPacket *pkt = NULL;
     int len, ret = 0;
     unsigned char *ptr;
-    short samples[AVCODEC_MAX_AUDIO_FRAME_SIZE / 2];
+    short *samples = new short[AVCODEC_MAX_AUDIO_FRAME_SIZE / 2];
     int data_size = 0;
     long long pts;
     bool firstloop = false;
@@ -1074,6 +1074,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
             {
                 ateof = true;
                 m_parent->SetEof();
+                delete[] samples;
                 return;
             }
         }
@@ -1315,6 +1316,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
         delete pkt;
 
     m_parent->SetFramesPlayed(framesPlayed);
+    delete[] samples;
 }
 
 bool AvFormatDecoder::DoRewind(long long desiredFrame)
