@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-02-18, v1.097
+  2003-02-18, v1.098
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -93,7 +93,9 @@
   14. MythMusic.
      14.1 Manual installation of pre-requisites
      14.2 Mandrake 9.0
+        14.2.1 Additional options with CVS MythMusic
      14.3 Compiling MythMusic.
+     14.4 Using MythMusic.
 
   15. MythWeather
   16. MythVideo
@@ -146,7 +148,7 @@
   This documentation will be in the docs/ subdirectory.
 
   [1mNOTE[22m: If you are going to use CVS to compile MythTV rather than using
-  the distribution tarballs, it is [1mstrongly [22mrecommended that you join
+  the distribution tarball, it is [1mstrongly [22mrecommended that you join
   <http://www.snowman.net/mailman/listinfo/mythtv-commits/> the mythtv-
   dev mailing list.
 
@@ -159,11 +161,18 @@
   region or Linux distribution, please send them to the author so that
   it can be included in other versions of this document.
 
+  Erik Arendse has setup a website that focuses on running MythTV in a
+  non-North American environment.  See the website at
+  http://www.home.zonnet.nl/erik_nospam.arendse/
+  <http://www.home.zonnet.nl/erik_nospam.arendse/>.
+
   The contributors to MythTV are:
 
   +o  Lead developer:  Isaac Richardson,  <mailto:ijr@po.cwru.edu>
 
   +o  Developer:  Matthew Zimmerman,  <mailto:mdz@debian.org>
+
+  +o  Developer:  John Danner,  <mailto:jdanner@untzuntz.com>
 
   +o  Overall structure of HOWTO and Mandrake 9.0 documentation: Robert
      Kulagowski,  <mailto:rkulagow@rocketmail.com>
@@ -262,8 +271,8 @@
 
   There appears to be issues with ALSA and simultaneously recording and
   playing sound, which is a core requirement for MythTV.  If you are not
-  running ALSA 0.9.0rc6 and experience lock-ups of your system when
-  trying to use MythTV, then please check the main ALSA website and
+  running ALSA 0.9.0rc6 or higher and experience lock-ups of your system
+  when trying to use MythTV, then please check the main ALSA website and
   upgrade to the latest version, or see if your distribution has already
   packaged the latest ALSA drivers.
 
@@ -299,7 +308,9 @@
   Search for XFree86-devel.
 
   Finally, check for qt.  You'll need libqt3-devel (under folder "KDE
-  and Qt") and libqt3 ("Libraries").
+  and Qt") and libqt3 ("Libraries").  [1mNOTE[22m:  Mandrake 9.1 has removed
+  the MySQL modules from the default installation.  Ensure that you
+  install libqt3-mysql.
 
   Make sure that cdialog is installed if you want to use MythTV with a
   remote control.
@@ -423,7 +434,11 @@
   [1mNOTE[22m: Mandrake 8.2 users, [4mdo[24m [4mnot[24m execute the following command.
   You've already manually installed the files in the previous section.
 
-  # urpmi libqt3-devel
+       # urpmi libqt3-devel
+
+  [1mNOTE[22m: Mandrake 9.1 users, execute the following command.
+
+       # urpmi libqt3-mysql
 
   However, you might get this when you execute the command above:
 
@@ -453,7 +468,7 @@
   support are not built. To enable SQL support, add "mysql qt" to your
   USE variable in /etc/make.conf and rebuild QT by running
 
-       $ emerge qt
+  $ emerge qt
 
   Install MySQL if this is the master system:
 
@@ -516,10 +531,10 @@
   LANG="en_US".  If you want the change to only affect a single user,
   you could create a file called ~/.i18n:
 
-  $ cat > ~/.i18n
-  LANG="en_US"
-  ^D
-  $ exit
+       $ cat > ~/.i18n
+       LANG="en_US"
+       ^D
+       $ exit
 
   [1m4.2.  Checking QTDIR and the PATH.[0m
 
@@ -604,18 +619,18 @@
 
   Check that it worked:
 
-       # ls -l /usr/local/lib
-       -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
-       -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
-       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
-       libmp3lame.so.0.0.0*
-       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
-       libmp3lame.so.0.0.0*
-       -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
-       libmp3lame.so.0.0.0*
+  # ls -l /usr/local/lib
+  -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
+  -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
+  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
+  libmp3lame.so.0.0.0*
+  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
+  libmp3lame.so.0.0.0*
+  -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
+  libmp3lame.so.0.0.0*
 
-       # exit
-       $
+  # exit
+  $
 
   [1m5.3.  Building XMLTV.[0m
 
@@ -656,8 +671,8 @@
 
   Untar the xmltv file:
 
-       $ tar -xjf xmltv-0.5.8.tar.bz2
-       $ cd xmltv-0.5.8
+  $ tar -xjf xmltv-0.5.8.tar.bz2
+  $ cd xmltv-0.5.8
 
   Install the xmltv prerequisites:
 
@@ -907,21 +922,21 @@
 
   Install the rest of the packages:
 
-       $ cd ~
-       $ tar -xjf alsa-lib-0.9.x.tar.bz2
-       $ cd alsa-lib-0.9.x
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # exit
-       $ cd ..
-       $ tar -xjf alsa-utils-0.9.x.tar.bz2
-       $ cd alsa-utils-0.9.x
-       $ ./configure
-       $ make
-       $ su
-       # make install
+  $ cd ~
+  $ tar -xjf alsa-lib-0.9.x.tar.bz2
+  $ cd alsa-lib-0.9.x
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # exit
+  $ cd ..
+  $ tar -xjf alsa-utils-0.9.x.tar.bz2
+  $ cd alsa-utils-0.9.x
+  $ ./configure
+  $ make
+  $ su
+  # make install
 
   Next, you must edit /etc/modules.conf so that the ALSA modules are
   loaded automatically. The first step is to remove your old OSS
@@ -960,7 +975,6 @@
   the mixer settings won't get restored the next time you boot unless
   you ran the shutdown script or you've explicitly saved the state which
   you can do as root with:
-
        # alsactl -f /etc/asound.state store
 
   Reboot your machine.  Login and adjust the sound levels using
@@ -974,7 +988,7 @@
 
   Test the driver by playing a simple file:
 
-  $ aplay /usr/share/sounds/info.wav
+       $ aplay /usr/share/sounds/info.wav
 
   If it works, you're done installing ALSA!
 
@@ -1013,7 +1027,6 @@
   Some IR devices require a kernel recompile, and some don't. However,
   all at least require having the kernel source available as a resource
   for the lirc build process.
-
   [1m8.1.  Gentoo[0m
 
   To install lirc on Gentoo, all you need to do is:
@@ -1021,6 +1034,10 @@
        $ emerge lirc
 
   [1m8.2.  Mandrake[0m
+
+  [1mNOTE[22m:If you are running Mandrake 9.1, you may install [1mlirc [22mby
+  executing: # urpmi lirc and bypass the manual compilation step
+  described below.
 
   lircd has two prerequisites:  [1mdialog[22m, available in Mandrake through
   the "cdialog" RPM, and the kernel source.  Mandrake 9.0 is using the
@@ -1111,7 +1128,6 @@
   as root.  If it still doesn't work, then you must create the link
   manually.  In this example, the IR device is connected to ttyS0.  If
   it were connected to "COM2", then use ttyS1, etc.
-
        $ su
        # cd /dev
        # ln -sf ttyS0 lirc
@@ -1171,6 +1187,7 @@
   <http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/
   s1-custom-kernel-bootloader.html> Remember, if you have any custom
   kernel modules (alsa, etc) you will have to recompile/reinstall those.
+
   [1m8.5.  Completing the lirc install.[0m
 
   If configure did not mention anything about a kernel module, then you
@@ -1207,12 +1224,12 @@
   If your remote ends up working well, you should consider submitting
   your lircd.conf file back to the lirc developers. Once finished:
 
-       $ su
-       # cp myremote /etc/lircd.conf
+  $ su
+  # cp myremote /etc/lircd.conf
 
   now try to start lircd again:
 
-  # /usr/local/sbin/lircd
+       # /usr/local/sbin/lircd
 
   Now, we're going to add the commands necessary for lircd to run each
   time we boot:
@@ -1298,17 +1315,17 @@
   rather than "ChannelUp" and "ChannelDown".  I added the following to
   my /home/[yourusername]/.lircrc file:
 
-       begin
-           prog = irxevent
-           button = channel+
-           config = Key Up CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = channel+
+      config = Key Up CurrentWindow
+  end
 
-       begin
-           prog = irxevent
-           button = channel-
-           config = Key Down CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = channel-
+      config = Key Down CurrentWindow
+  end
 
   which took care of basic functionality.  Because the PCTV Studio
   remote has additional buttons, look at the configfiles/lircrc.exam-
@@ -1347,19 +1364,19 @@
   Depending on whether you have your serial port driver configured as a
   kernel module you might see the following message during make:
 
-       lirc_sir.c:56:2: warning: #warning
-       "******************************************"
+  lirc_sir.c:56:2: warning: #warning
+  "******************************************"
 
-       lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
+  lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
 
-       lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
+  lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
 
-       lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
+  lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
 
-       lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
+  lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
 
-       lirc_sir.c:61:2: warning: #warning
-       "******************************************"
+  lirc_sir.c:61:2: warning: #warning
+  "******************************************"
 
   If you do receive this statement make sure to run the [1msetserial[0m
   command before you load the lirc_sir module. Follow this with the
@@ -1395,10 +1412,10 @@
   being received. If everything is configured correctly you should see
   something similar to the following:
 
-       $ irw
-       0000000000007ff0 00 1 gi-motorola-dct2000
-       000000000000bff8 00 2 gi-motorola-dct2000
-       000000000000f7f0 00 ENTER gi-motorola-dct2000
+  $ irw
+  0000000000007ff0 00 1 gi-motorola-dct2000
+  000000000000bff8 00 2 gi-motorola-dct2000
+  000000000000f7f0 00 ENTER gi-motorola-dct2000
 
   Once you've verified lirc is working you can press [1mCTRL-C [22mto exit [1mirw[0m
   and configure the channel changing script.
@@ -1429,31 +1446,31 @@
 
   The following file should be saved as /usr/local/bin/channel.pl
 
-       #!/usr/bin/perl
+  #!/usr/bin/perl
 
-       # make sure to set this string to
-       # the corresponding remote in /etc/lircd.conf
-       $remote_name = "gi-motorola-dct2000";
+  # make sure to set this string to
+  # the corresponding remote in /etc/lircd.conf
+  $remote_name = "gi-motorola-dct2000";
 
-       sub change_channel {
-               my($channel_digit) = @_;
-               system ("rc SEND_ONCE $remote_name $channel_digit");
-               sleep 1;
-       }
+  sub change_channel {
+          my($channel_digit) = @_;
+          system ("rc SEND_ONCE $remote_name $channel_digit");
+          sleep 1;
+  }
 
-       $channel=$ARGV[0];
-       sleep 1;
-       if (length($channel) > 2) {
-               change_channel(substr($channel,0,1));
-               change_channel(substr($channel,1,1));
-               change_channel(substr($channel,2,1));
-       } elsif (length($channel) > 1) {
-               change_channel(substr($channel,0,1));
-               change_channel(substr($channel,1,1));
-       } else {
-               change_channel(substr($channel,0,1));
-       }
-       system ("rc SEND_ONCE $remote_name ENTER");
+  $channel=$ARGV[0];
+  sleep 1;
+  if (length($channel) > 2) {
+          change_channel(substr($channel,0,1));
+          change_channel(substr($channel,1,1));
+          change_channel(substr($channel,2,1));
+  } elsif (length($channel) > 1) {
+          change_channel(substr($channel,0,1));
+          change_channel(substr($channel,1,1));
+  } else {
+          change_channel(substr($channel,0,1));
+  }
+  system ("rc SEND_ONCE $remote_name ENTER");
 
   The last statement within the perl script is the lirc rc command. This
   is the command that transmits the code to your cable/dss box. Make
@@ -1592,7 +1609,6 @@
 
   If you wish to specify a custom time, then the user-based cron job is
   the better method.
-
   The default [1mconfigfiles/mythcrontab [22mfile will run the [1mmythfilldatabase[0m
   program every day at 0430.  If you want to change this, then open the
   configfiles/mythcrontab file in your favorite editor and modify it as
@@ -1750,13 +1766,13 @@
   <http://www.mythtv.org/> and save it to a location where you can find
   it.
 
-       $ tar -xjf mythgallery-0.7.tar.bz2
-       $ cd mythgallery-0.7
-       $ make
-       # su
-       # make install
-       # exit
-       $
+  $ tar -xjf mythgallery-0.7.tar.bz2
+  $ cd mythgallery-0.7
+  $ make
+  # su
+  # make install
+  # exit
+  $
 
   The configuration file for MythGallery is located in
   /usr/local/share/mythtv.  This file needs to be edited:  ensure that
@@ -1853,8 +1869,6 @@
        $ make
        $ su
        # make install
-       <!-- see if the next step is a Mandrake only issue -->
-       # cp interface/cdda_interface.h /usr/local/include
        # cd /usr/lib
        # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
        # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
@@ -1877,22 +1891,62 @@
   that mirror.  You will most likely need to add a "Contrib" mirror to
   your setup.  Once you have done that, you can proceed.
 
-       # urpmi mad flac libcdaudio cdparanoia libvorbis-devel libcdda0-devel
+       # urpmi libmad0 libmad0-devel libflac4 libflac4-devel libcdaudio cdparanoia libcdda0-devel libvorbis-devel
+
+  [1m14.2.1.  Additional options with CVS MythMusic[0m
+
+  Additional visualizations have been added to MythMusic.  If you wish
+  to use these, there are some prerequisites you must install prior to
+  compiling.
+
+  +o  fftw
+
+  +o  OpenGL
+
+  +o  SDL
+
+  fftw may be obtained from http://www.fftw.org/ <http://www.fftw.org/>.
+  It may also be installed in Mandrake 9.1 with # urpmi libfftw2
+  libfftw2-devel
+
+  OpenGL should be installed on practically all distributions.  However,
+  you will need the devel module.  On Mandrake 9.1, you would need to
+  install # urpmi libMesaGLU1-devel.
+
+  SDL may be obtained from http://www.libsdl.org
+  <http://www.libsdl.org>.  On Mandrake 9.1, you may install it by
+  executing: # urpmi libsdl1.2 libsdl1.2-devel
 
   [1m14.3.  Compiling MythMusic.[0m
 
   Once all the pre-requisites have been installed, you can proceed with
-  getting MythMusic going.
+  getting MythMusic going.  [1mNOTE[22m:  If you are running the CVS version of
+  MythMusic, make sure that you run ./configure first.  If you wish to
+  use the new visualizations, make sure you install the prerequisites.
+  Run ./configure --help for help.
 
-       $ make
-       $ su
-       # make install
-       # exit
-       $ cd musicdb
-       $ mysql -u root < metadata.sql
+  $ make
+  $ su
+  # make install
+  # exit
+  $ cd musicdb
+  $ mysql -u root < metadata.sql
 
   Edit the /usr/local/share/mythtv/mythmusic-settings.txt file for your
   particular system.
+
+  [1m14.4.  Using MythMusic.[0m
+
+  MythMusic is fairly simple to use.  It is recommended that you insert
+  the CD before selecting "Import CD".  You should also ensure that your
+  system doesn't try to automount the CD and begin playing it
+  automatically.
+
+  Another item to consider:  there are some CD's that contain computer
+  data that runs as a "CD Extra".  After the CD information lookup,
+  ensure that the "(Data for CD Extra)" track is not selected for
+  encoding, otherwise MythMusic will hang attempting to encode the non-
+  audio data.
 
   [1m15.  MythWeather[0m
 
@@ -1944,11 +1998,11 @@
 
   An example for Paris, France:
 
-  $ mysql -u root
-  mysql> use mythconverg;
-  mysql> insert into settings (value, data) VALUES ('locale','FRXX0076');
-  mysql> exit
-  $
+       $ mysql -u root
+       mysql> use mythconverg;
+       mysql> insert into settings (value, data) VALUES ('locale','FRXX0076');
+       mysql> exit
+       $
 
   If you wish to use Celsius as the default:
 
@@ -1975,7 +2029,6 @@
   parameter.  This parameter is inverse; a higher number actually means
   that MythWeather will be less aggressive, and will therefore wait
   longer before timing out.
-
   MythWeather will print debugging information on the terminal.  If you
   wish to see additional debugging information while MythWeather is
   running, you'll need to modify the source and recompile.
@@ -1993,11 +2046,11 @@
 
   Change into the MythVideo directory, then make and make install:
 
-  $ cd mythvideo
-  $ make
-  $ su
-  # make install
-  # exit
+       $ cd mythvideo
+       $ make
+       $ su
+       # make install
+       # exit
 
   The next step is to edit the /usr/local/share/mythvideo/mythexplorer-
   settings.txt file.  Change the StartDir to a valid mount point on your
@@ -2108,13 +2161,13 @@
 
   Also, look for:
 
-  Section "Device"
-      Identifier "device1"
-      VendorName "nVidia Corporation"
-      BoardName "NVIDIA GeForce 256 (generic)"
-      Driver "nv"
-      Option "DPMS"
-  EndSection
+       Section "Device"
+           Identifier "device1"
+           VendorName "nVidia Corporation"
+           BoardName "NVIDIA GeForce 256 (generic)"
+           Driver "nv"
+           Option "DPMS"
+       EndSection
 
   In this case, you would need to either delete the Option "DPMS" line,
   or change it to # Option "DPMS" to comment it out.  The next time you
@@ -2145,7 +2198,7 @@
   You can also turn off DPMS from the Command Line, but this will not
   survive a reboot.
 
-       $ xset -dpms
+  $ xset -dpms
 
   Using xset +dpms will turn it back on.
 
@@ -2187,18 +2240,18 @@
   At this point, you now have debug-enabled software ready.  Let's
   assume that the problem you're having is in the setup program.
 
-       $ cd setup
-       $ gdb ./setup
+  $ cd setup
+  $ gdb ./setup
 
-       GNU gdb 5.2.1-2mdk (Mandrake Linux)
-       Copyright 2002 Free Software Foundation, Inc.
-       GDB is free software, covered by the GNU General Public License, and you are
-       welcome to change it and/or distribute copies of it under certain
-       conditions.
-       Type "show copying" to see the conditions.
-       There is absolutely no warranty for GDB.  Type "show warranty" for details.
-       This GDB was configured as "i586-mandrake-linux-gnu"...
-       (gdb)
+  GNU gdb 5.3-1mdk (Mandrake Linux)
+  Copyright 2002 Free Software Foundation, Inc.
+  GDB is free software, covered by the GNU General Public License, and you are
+  welcome to change it and/or distribute copies of it under certain
+  conditions.
+  Type "show copying" to see the conditions.
+  There is absolutely no warranty for GDB.  Type "show warranty" for details.
+  This GDB was configured as "i586-mandrake-linux-gnu"...
+  (gdb)
 
   [1mgdb [22mhas a number of options, read the man page for more information.
 
@@ -2270,7 +2323,7 @@
   instructions on disabling the sound manager.  If you wish to see what
   application is grabbing a resource, you can use the fuser command:
 
-  # fuser -v /dev/dsp
+       # fuser -v /dev/dsp
 
   To disable aRts in KDE, go to KDE->Control Center->Sound->Sound System
   and uncheck the "Start aRts soundserver on KDE startup" box.
@@ -2304,7 +2357,7 @@
   http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/
   <http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/>.
 
-       $ wget http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/mplayer-0.90pre10+mythtv.patch
+  $ wget http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/mplayer-0.90pre10+mythtv.patch
 
   Download the source to MPlayer and patch:
 
@@ -2419,7 +2472,6 @@
   The MythTV full screen mode uses the X display size dimensions
   regardless of the other two and is anchored to the upper left corner
   of the X display.
-
   [1m18.5.1.  X Dimensions[0m
 
   For output to a Television, common resolutions are 640x480, 800x600,
@@ -2494,9 +2546,9 @@
   lose all of your settings and will need to re-run the mc.sql script to
   setup the database structure before running the setup program.
 
-  $ mysql -u root
-  mysql> drop database mythconverg;
-  mysql> quit
+       $ mysql -u root
+       mysql> drop database mythconverg;
+       mysql> quit
 
   [1m18.7.  I'd like to start using the development version of MythTV.[0m
 
@@ -2594,7 +2646,6 @@
   not yet a supported configuration.  The following instructions may or
   may not work.  Add the following to /etc/my.cnf on the backend
   machine.
-
        skip-innodb
        set-variable=thread_stack=256k
 

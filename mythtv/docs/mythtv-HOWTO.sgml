@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-02-18, v1.097
+<date>2003-02-18, v1.098
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -32,7 +32,7 @@ $ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/cvs checkout MC
 This documentation will be in the <tt>docs/</tt> subdirectory.
 
 <bf>NOTE</bf>: If you are going to use CVS to compile MythTV rather than using
-the distribution tarballs, it is <bf>strongly</bf> recommended that you <url
+the distribution tarball, it is <bf>strongly</bf> recommended that you <url
 url="http://www.snowman.net/mailman/listinfo/mythtv-commits/" name="join">
 the mythtv-dev mailing list.
 
@@ -44,10 +44,16 @@ If you have installation instructions for a different region or Linux
 distribution, please send them to the author so that it can be included in other
 versions of this document.
 
+Erik Arendse has setup a website that focuses on running MythTV in a
+non-North American environment.  See the website at <url
+url="http://www.home.zonnet.nl/erik_nospam.arendse/"
+name="http://www.home.zonnet.nl/erik_nospam.arendse/">.
+
 The contributors to MythTV are:
 <itemize>
 <item>Lead developer:  Isaac Richardson, <url url="mailto:ijr@po.cwru.edu">
 <item>Developer:  Matthew Zimmerman, <url url="mailto:mdz@debian.org">
+<item>Developer:  John Danner, <url url="mailto:jdanner@untzuntz.com">
 <item>Overall structure of HOWTO and Mandrake 9.0 documentation: Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
 <item>Red Hat Linux 8.0 documentation: Cedar McKay, <url url="mailto:mythhowto.3.ohthetrees@spamgourmet.com">
 <item>Gentoo documentation and package: Tony Clark, <url url="mailto:tclark@telia.com">
@@ -127,11 +133,12 @@ components, you should be aware that not all packages include the necessary
 headers for compiling packages.  If you're having trouble compiling, ensure
 that you've installed the <tt>-devel</tt> version of a prerequisite.
 
-There appears to be issues with ALSA and simultaneously recording and playing 
-sound, which is a core requirement for MythTV.  If you are not running 
-ALSA 0.9.0rc6 and experience lock-ups of your system when trying to use MythTV, 
-then please check the main ALSA website and upgrade to the latest version,
-or see if your distribution has already packaged the latest ALSA drivers.
+There appears to be issues with ALSA and simultaneously recording and
+playing sound, which is a core requirement for MythTV.  If you are not
+running ALSA 0.9.0rc6 or higher and experience lock-ups of your system when
+trying to use MythTV, then please check the main ALSA website and upgrade to
+the latest version, or see if your distribution has already packaged the
+latest ALSA drivers.
 
 <sect2>Graphical installation tools. <label id="graphicinstalltools_">
 <sect3>Mandrake 9.0
@@ -163,6 +170,8 @@ Search for XFree86-devel.
 
 Finally, check for qt.  You'll need libqt3-devel (under folder "KDE and
 Qt") and libqt3 ("Libraries").
+<bf>NOTE</bf>:  Mandrake 9.1 has removed the MySQL modules from the default
+installation.  Ensure that you install <tt>libqt3-mysql</tt>.
 
 Make sure that cdialog is installed if you want to use MythTV with a remote
 control.
@@ -284,6 +293,11 @@ command.  You've already manually installed the files in the previous
 section.
 <tscreen><verb>
 # urpmi libqt3-devel
+</verb></tscreen>
+<bf>NOTE</bf>: Mandrake 9.1 users, execute the following
+command.
+<tscreen><verb>
+# urpmi libqt3-mysql
 </verb></tscreen>
 
 However, you might get this when you execute the command above:
@@ -877,7 +891,11 @@ $ emerge lirc
 </verb></tscreen>
 
 <sect1>Mandrake
-<p>lircd has two prerequisites:  <bf>dialog</bf>, available in Mandrake through the
+<p><bf>NOTE</bf>:If you are running Mandrake 9.1, you may install <bf>lirc</bf> by
+executing: <tt># urpmi lirc</tt> and bypass the manual compilation step
+described below.
+
+lircd has two prerequisites:  <bf>dialog</bf>, available in Mandrake through the
 "cdialog" RPM, and the kernel source.  Mandrake 9.0 is using the 2.4.19
 kernel, so the easiest thing is to go to <url url="http://www.kernel.org"
 name="http://www.kernel.org"> and download
@@ -1742,8 +1760,6 @@ $ ./configure
 $ make
 $ su
 # make install
-<!-- see if the next step is a Mandrake only issue -->
-# cp interface/cdda_interface.h /usr/local/include
 # cd /usr/lib
 # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
 # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
@@ -1766,12 +1782,39 @@ mirror.  You will most likely need to add a "Contrib" mirror to your setup.
 Once you have done that, you can proceed.
 
 <tscreen><verb>
-# urpmi mad flac libcdaudio cdparanoia libvorbis-devel libcdda0-devel
+# urpmi libmad0 libmad0-devel libflac4 libflac4-devel libcdaudio cdparanoia libcdda0-devel libvorbis-devel 
 </verb></tscreen>
+
+<sect2>Additional options with CVS MythMusic
+<p>Additional visualizations have been added to MythMusic.  If you wish to
+use these, there are some prerequisites you must install prior to compiling.
+
+<itemize>
+<item>fftw
+<item>OpenGL
+<item>SDL
+</itemize>
+
+<tt>fftw</tt> may be obtained from <url url="http://www.fftw.org/"
+name="http://www.fftw.org/">.  It may also be installed in Mandrake 9.1 with
+<tt># urpmi libfftw2 libfftw2-devel</tt>
+
+<tt>OpenGL</tt> should be installed on practically all distributions. 
+However, you will need the devel module.  On Mandrake 9.1, you would need to
+install <tt># urpmi libMesaGLU1-devel</tt>.
+
+<tt>SDL</tt> may be obtained from <url
+url="http://www.libsdl.org" name="http://www.libsdl.org">.  On Mandrake 9.1,
+you may install it by executing: <tt># urpmi libsdl1.2 libsdl1.2-devel</tt>
 
 <sect1>Compiling MythMusic.
 <p>Once all the pre-requisites have been installed, you can proceed with
 getting MythMusic going.
+<bf>NOTE</bf>:  If you are running the CVS version of MythMusic, make sure
+that you run <tt>./configure</tt> first.  If you wish to use the new
+visualizations, make sure you install the prerequisites.  Run
+<tt>./configure --help</tt> for help.
+
 <tscreen><verb>
 $ make
 $ su
@@ -1783,6 +1826,17 @@ $ mysql -u root < metadata.sql
 
 Edit the <tt>/usr/local/share/mythtv/mythmusic-settings.txt</tt> file for
 your particular system.
+
+<sect1>Using MythMusic.  
+<p>MythMusic is fairly simple to use.  It is
+recommended that you insert the CD before selecting "Import CD".  You should
+also ensure that your system doesn't try to automount the CD and begin
+playing it automatically.
+
+Another item to consider:  there are some CD's that contain computer data
+that runs as a "CD Extra".  After the CD information lookup, ensure that the
+"(Data for CD Extra)" track is not selected for encoding, otherwise
+MythMusic will hang attempting to encode the non-audio data.
 
 <sect>MythWeather
 <p>The MythWeather module will obtain the weather information for the
@@ -2074,7 +2128,7 @@ the problem you're having is in the <tt>setup</tt> program.
 $ cd setup
 $ gdb ./setup
 
-GNU gdb 5.2.1-2mdk (Mandrake Linux)
+GNU gdb 5.3-1mdk (Mandrake Linux)
 Copyright 2002 Free Software Foundation, Inc.
 GDB is free software, covered by the GNU General Public License, and you are
 welcome to change it and/or distribute copies of it under certain
@@ -2092,27 +2146,6 @@ Once at the <tt>(gdb)</tt> prompt, type <tt>run</tt> to start program
 execution.  When the program segfaults, type <tt>bt</tt> to get the
 backtrace.  The backtrace should be posted to the mythtv-dev mailing list,
 along with the steps you followed to get the program to crash.
-
-<!--
-If you <bf>gdb</bf> keeps pausing during the debug, printing things like
-"SIG32", you need to type in:
-<tscreen><verb>
-(gdb) handle SIG32 nostop noprint
-(gdb) handle SIG33 nostop noprint
-</verb</tscreen> so that the program will continue to execute rather than
-stopping.
-
-You may also put these commands into the <tt>.gdbinit</tt> file so that they
-always take effect.
-
-<tscreen><verb>
-$ cat > .gdbinit
-handle SIG32 nostop noprint
-handle SIG33 nostop noprint
-^D
-$
-</verb></tscreen>
--->
 
 <sect1>MythTV makes my system crash. 
 <p>MythTV <em>can not</em> crash your system - it is a user-level program. 
@@ -2628,6 +2661,12 @@ v0.5.8 fixes UK problems.
 v1.096, 2003-02-17.  Added text to MythWeather that it only works with
 MythTV v0.8.
 v1.097, 2003-02-18.  Explicit instructions on disabling arts in KDE.
+v1.098, 2003-02-18.  More on MythMusic.  Added Mandrake 9.1 note for
+pre-requisites.  (libqt3-mysql is now a seperate module).  Updated
+requisistes for MythMusic.  Added note for MythMusic configure.  Added note
+for Mandrake 9.1 lirc install.  Added Erik Arendse's European MythTV website
+link.  Added a little to the MythMusic usage instructions.  Added some more
+developers.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

@@ -94,8 +94,6 @@ $ ./configure
 $ make
 $ su
 # make install
-&lt;!-- see if the next step is a Mandrake only issue -->
-# cp interface/cdda_interface.h /usr/local/include
 # cd /usr/lib
 # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
 # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
@@ -123,16 +121,42 @@ Once you have done that, you can proceed.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-# urpmi mad flac libcdaudio cdparanoia libvorbis-devel libcdda0-devel
+# urpmi libmad0 libmad0-devel libflac4 libflac4-devel libcdaudio cdparanoia libcdda0-devel libvorbis-devel 
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+
+<H3>Additional options with CVS MythMusic</H3>
+
+<P>Additional visualizations have been added to MythMusic.  If you wish to
+use these, there are some prerequisites you must install prior to compiling.</P>
+<P>
+<UL>
+<LI>fftw</LI>
+<LI>OpenGL</LI>
+<LI>SDL</LI>
+</UL>
+</P>
+<P><CODE>fftw</CODE> may be obtained from 
+<A HREF="http://www.fftw.org/">http://www.fftw.org/</A>.  It may also be installed in Mandrake 9.1 with
+<CODE># urpmi libfftw2 libfftw2-devel</CODE></P>
+<P><CODE>OpenGL</CODE> should be installed on practically all distributions. 
+However, you will need the devel module.  On Mandrake 9.1, you would need to
+install <CODE># urpmi libMesaGLU1-devel</CODE>.</P>
+<P><CODE>SDL</CODE> may be obtained from 
+<A HREF="http://www.libsdl.org">http://www.libsdl.org</A>.  On Mandrake 9.1,
+you may install it by executing: <CODE># urpmi libsdl1.2 libsdl1.2-devel</CODE></P>
 
 <H2><A NAME="ss14.3">14.3</A> <A HREF="mythtv-HOWTO.html#toc14.3">Compiling MythMusic.</A>
 </H2>
 
 <P>Once all the pre-requisites have been installed, you can proceed with
 getting MythMusic going.
+<B>NOTE</B>:  If you are running the CVS version of MythMusic, make sure
+that you run <CODE>./configure</CODE> first.  If you wish to use the new
+visualizations, make sure you install the prerequisites.  Run
+<CODE>./configure --help</CODE> for help.</P>
+<P>
 <BLOCKQUOTE><CODE>
 <PRE>
 $ make
@@ -146,6 +170,18 @@ $ mysql -u root &lt; metadata.sql
 </P>
 <P>Edit the <CODE>/usr/local/share/mythtv/mythmusic-settings.txt</CODE> file for
 your particular system.</P>
+
+<H2><A NAME="ss14.4">14.4</A> <A HREF="mythtv-HOWTO.html#toc14.4">Using MythMusic. </A>
+</H2>
+
+<P>MythMusic is fairly simple to use.  It is
+recommended that you insert the CD before selecting "Import CD".  You should
+also ensure that your system doesn't try to automount the CD and begin
+playing it automatically.</P>
+<P>Another item to consider:  there are some CD's that contain computer data
+that runs as a "CD Extra".  After the CD information lookup, ensure that the
+"(Data for CD Extra)" track is not selected for encoding, otherwise
+MythMusic will hang attempting to encode the non-audio data.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-15.html">Next</A>

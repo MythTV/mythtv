@@ -80,11 +80,12 @@ package in order to compile <B>lircd</B>.</P>
 components, you should be aware that not all packages include the necessary
 headers for compiling packages.  If you're having trouble compiling, ensure
 that you've installed the <CODE>-devel</CODE> version of a prerequisite.</P>
-<P>There appears to be issues with ALSA and simultaneously recording and playing 
-sound, which is a core requirement for MythTV.  If you are not running 
-ALSA 0.9.0rc6 and experience lock-ups of your system when trying to use MythTV, 
-then please check the main ALSA website and upgrade to the latest version,
-or see if your distribution has already packaged the latest ALSA drivers.</P>
+<P>There appears to be issues with ALSA and simultaneously recording and
+playing sound, which is a core requirement for MythTV.  If you are not
+running ALSA 0.9.0rc6 or higher and experience lock-ups of your system when
+trying to use MythTV, then please check the main ALSA website and upgrade to
+the latest version, or see if your distribution has already packaged the
+latest ALSA drivers.</P>
 
 <H3><A NAME="graphicinstalltools_"></A> Graphical installation tools. </H3>
 
@@ -110,7 +111,9 @@ installed.  If not, click on "Mark".</P>
 freetype2-devel installed.</P>
 <P>Search for XFree86-devel.</P>
 <P>Finally, check for qt.  You'll need libqt3-devel (under folder "KDE and
-Qt") and libqt3 ("Libraries").</P>
+Qt") and libqt3 ("Libraries").
+<B>NOTE</B>:  Mandrake 9.1 has removed the MySQL modules from the default
+installation.  Ensure that you install <CODE>libqt3-mysql</CODE>.</P>
 <P>Make sure that cdialog is installed if you want to use MythTV with a remote
 control.</P>
 <P>alsa-utils is needed for setting the volume.</P>
@@ -251,6 +254,14 @@ section.
 <BLOCKQUOTE><CODE>
 <PRE>
 # urpmi libqt3-devel
+</PRE>
+</CODE></BLOCKQUOTE>
+
+<B>NOTE</B>: Mandrake 9.1 users, execute the following
+command.
+<BLOCKQUOTE><CODE>
+<PRE>
+# urpmi libqt3-mysql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
