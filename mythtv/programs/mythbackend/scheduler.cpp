@@ -18,6 +18,7 @@ using namespace std;
 #include "libmythtv/scheduledrecording.h"
 #include "encoderlink.h"
 #include "libmyth/mythcontext.h"
+#include "remoteutil.h"
 
 Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList, 
                      QSqlDatabase *ldb)
@@ -215,6 +216,23 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
         PrintList();
 
     return hasconflicts;
+}
+
+void Scheduler::FillRecordListFromMaster(void)
+{
+    vector<ProgramInfo *> reclist;
+
+    RemoteGetAllPendingRecordings(reclist);
+
+    vector<ProgramInfo *>::iterator pgiter = reclist.begin();
+
+    for (; pgiter != reclist.end(); pgiter++)
+    {
+        ProgramInfo *pginfo = (*pgiter);
+        pginfo->schedulerid = pginfo->startts.toString() + "_" + pginfo->chanid;
+
+        recordingList.push_back(*pgiter);
+    }
 }
 
 void Scheduler::PrintList(void)
@@ -902,7 +920,10 @@ list<ProgramInfo *> *Scheduler::CopyList(list<ProgramInfo *> *sourcelist)
 
                 if (!m_tvList->contains(second->cardid))
                 {
-                    cerr << "missing: " << second->cardid << " in tvList\n";
+                    if (m_tvList->size())
+                    {
+                        cerr << "Missing: " << second->cardid << " in tvList\n";
+                    }
                     continue;
                 }
 
@@ -1010,7 +1031,11 @@ void Scheduler::DoMultiCard(void)
 
                     if (!m_tvList->contains(lower->cardid))
                     {
-                        cerr << "Missing: " << lower->cardid << " in tvList\n";
+                        if (m_tvList->size())
+                        {
+                            cerr << "Missing: " << lower->cardid <<
+                                    " in tvList\n";
+                        }
                         continue;
                     }
 
@@ -1060,7 +1085,11 @@ void Scheduler::DoMultiCard(void)
 
                     if (!m_tvList->contains(higher->cardid))
                     {
-                        cerr << "Missing: " << higher->cardid << " in tvList\n";
+                        if (m_tvList->size())
+                        {
+                            cerr << "Missing: " << higher->cardid <<
+                                    " in tvList\n";
+                        }
                         continue;
                     }
 

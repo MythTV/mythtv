@@ -23,6 +23,7 @@ class Scheduler : public QObject
 
     bool CheckForChanges(void);
     bool FillRecordLists(bool doautoconflicts = true);
+    void FillRecordListFromMaster(void);
 
     void FillEncoderFreeSpaceCache();
 

@@ -18,6 +18,7 @@ using namespace std;
 #include "transcoder.h"
 #include "mainserver.h"
 #include "encoderlink.h"
+#include "remoteutil.h"
 
 #include "libmythtv/programinfo.h"
 #include "libmyth/mythcontext.h"
@@ -226,7 +227,7 @@ int main(int argc, char **argv)
                         else
                         {
                             cerr << "Unknown argument for -v/--verbose: "
-				 << *it << endl;;
+                                 << *it << endl;;
                         }
                     }
                 }
@@ -361,7 +362,19 @@ int main(int argc, char **argv)
     if (printsched)
     {
         sched = new Scheduler(false, &tvList, db);
-        sched->FillRecordLists(false);
+        if (gContext->ConnectToMasterServer())
+        {
+            cout << "Retrieving Schedule from Master backend.\n";
+            sched->FillRecordListFromMaster();
+        }
+        else
+        {
+            cout << "Calculating Schedule from database.\n" <<
+                    "Inputs, Card IDs, and Conflict info may be invalid "
+                    "if you have multiple tuners.\n";
+            sched->FillRecordLists(false);
+        }
+
         sched->PrintList();
         cleanup();
         exit(0);

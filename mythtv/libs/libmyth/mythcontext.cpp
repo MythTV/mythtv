@@ -135,12 +135,16 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
             cerr << "Connection timed out.\n";
             cerr << "You probably should modify the Master Server settings\n";
             cerr << "in the setup program and set the proper IP address.\n";
-            MythPopupBox::showOkPopup(mainWindow, "connection failure",
-                                      tr("Connection to the master backend "
-                                         "server timed out.  You probably "
-                                         "should modify the Mater Server "
-                                         "setting in the setup program and set "
-                                         "the proper IP address there."));
+            if (m_height && m_width)
+            {
+                MythPopupBox::showOkPopup(mainWindow, "connection failure",
+                                          tr("Connection to the master backend "
+                                             "server timed out.  You probably "
+                                             "should modify the Mater Server "
+                                             "setting in the setup program and "
+                                             "set the proper IP address "
+                                             "there."));
+            }
             serverSock->close();
             delete serverSock;
             serverSock = NULL;
@@ -151,11 +155,14 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
     if (serverSock->state() != QSocket::Connected)
     {
         cout << "Could not connect to backend server\n";
-        MythPopupBox::showOkPopup(mainWindow, "connection failure",
-                                  tr("Could not connect to the master backend "
-                                     "server -- is it running?  Is the IP "
-                                     "address set for it in the setup "
-                                     "program correct?"));
+        if (m_height && m_width)
+        {
+            MythPopupBox::showOkPopup(mainWindow, "connection failure",
+                                      tr("Could not connect to the master "
+                                         "backend server -- is it running?  Is "
+                                         "the IP address set for it in the "
+                                         "setup program correct?"));
+        }
         serverSock->close();
         delete serverSock;
         serverSock = NULL;

@@ -24,11 +24,14 @@ AudioOutputDevice::AudioOutputDevice():
     dev.setNameFilter("adsp*");
     fillSelectionsFromDir(dev);
 
-    dev.setNameFilter("dsp*");
     dev.setPath("/dev/sound");
-    fillSelectionsFromDir(dev);
-    dev.setNameFilter("adsp*");
-    fillSelectionsFromDir(dev);
+    if (dev.exists())
+    {
+        dev.setNameFilter("dsp*");
+        fillSelectionsFromDir(dev);
+        dev.setNameFilter("adsp*");
+        fillSelectionsFromDir(dev);
+    }
 }
 
 class MythControlsVolume: public CheckBoxSetting, public GlobalSetting {
@@ -59,7 +62,10 @@ MixerDevice::MixerDevice():
     fillSelectionsFromDir(dev);
 
     dev.setPath("/dev/sound");
-    fillSelectionsFromDir(dev);
+    if (dev.exists())
+    {
+        fillSelectionsFromDir(dev);
+    }
 }
 
 class MixerControl: public ComboBoxSetting, public GlobalSetting {

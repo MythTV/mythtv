@@ -3,6 +3,7 @@
 #include <qregexp.h>
 #include <qsqldatabase.h>
 #include <qsqlquery.h>
+#include <qdir.h>
 
 #include <iostream>
 #include <fstream>
@@ -262,6 +263,18 @@ int main(int argc, char *argv[])
             
             starttime += a.argv()[++argpos];
         }
+        else if (!strcmp(a.argv()[argpos], "--file"))
+        {
+            QDir fullfile(a.argv()[++argpos]);
+
+            chanid = fullfile.dirName();
+            chanid.replace(QRegExp("_[^_]*$"), "");
+            chanid.replace(QRegExp("_[^_]*$"), "");
+
+            starttime = fullfile.dirName();
+            starttime.replace(QRegExp("_[^_]*$"), "");
+            starttime.replace(QRegExp("^[^_]*_"), "");
+        }
         else if (!strcmp(a.argv()[argpos], "--blanks"))
         {
             if (!quiet)
@@ -313,6 +326,9 @@ int main(int argc, char *argv[])
             cout << "--starttime <starttime>\n";
             cout << "   Run Commercial Flagging routine only for recordings\n";
             cout << "   starting at starttime.\n";
+            cout << "\n";
+            cout << "--file <filename>\n";
+            cout << "   Run Commercial Flagging for specified file.\n";
             cout << "\n";
             cout << "--sleep\n";
             cout << "   Give up some cpu time after processing each frame.\n";
