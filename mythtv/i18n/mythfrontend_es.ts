@@ -240,8 +240,48 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No, Do Not AutoExpire</source>
+        <source>Are you sure you want to stop:</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, stop recording it</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, do not AutoExpire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, continue recording it</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select action:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t Auto Expire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Expire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Abandonar</translation>
     </message>
 </context>
 <context>
@@ -598,14 +638,6 @@
     </message>
     <message>
         <source>Mixer Device</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>PCM</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Master</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1109,6 +1141,18 @@
     </message>
     <message>
         <source>4:3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This program is currently being edited</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Continue Editing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not edit</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
