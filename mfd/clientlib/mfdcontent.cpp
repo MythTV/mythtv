@@ -25,8 +25,10 @@ using namespace std;
 //  album, etc.)
 //
 
+#include "pixmaps/container_pix.xpm"
 #include "pixmaps/playlist_pix.xpm"
 #include "pixmaps/artist_pix.xpm"
+#include "pixmaps/genre_pix.xpm"
 #include "pixmaps/album_pix.xpm"
 #include "pixmaps/track_pix.xpm"
 
@@ -34,8 +36,11 @@ using namespace std;
 //  Statis QPixmap's to hold each of the pixmaps included above.
 //
 
+static bool pixmaps_are_setup = false;
+static QPixmap *pixcontainer = NULL;
 static QPixmap *pixplaylist = NULL;
 static QPixmap *pixartist = NULL;
+static QPixmap *pixgenre = NULL;
 static QPixmap *pixalbum = NULL;
 static QPixmap *pixtrack = NULL;
 
@@ -84,9 +89,11 @@ MfdContentCollection::MfdContentCollection(
     audio_artist_tree = new UIListGenericTree(NULL, "All by Artist");
     audio_artist_tree->setPixmap(pixartist);
     audio_genre_tree = new UIListGenericTree(NULL, "All by Genre");
+    audio_genre_tree->setPixmap(pixgenre);
     audio_playlist_tree = new UIListGenericTree(NULL, "All Playlists");
     audio_playlist_tree->setPixmap(pixplaylist);
     audio_collection_tree =  new UIListGenericTree(NULL, "Grouped by Collection");
+    audio_collection_tree->setPixmap(pixcontainer);
 
     //
     //  Set some core attributes
@@ -201,6 +208,7 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, MetadataCol
     if(!collection_node)
     {
         collection_node = new UIListGenericTree(audio_collection_tree, collection_name);
+        collection_node->setPixmap(pixcontainer);
         
         //
         //  We just made the node for this collection, it needs Playlist node
@@ -379,10 +387,12 @@ void MfdContentCollection::addItemToAudioGenreTree(AudioMetadata *item, GenericT
     // The Genre --> Artist --> Album --> Track   branch
     //
 
-    GenericTree *genre_node = starting_point->getChildByName(genre);
+    UIListGenericTree *genre_node = NULL;
+    genre_node = (UIListGenericTree *)starting_point->getChildByName(genre);
     if(!genre_node)
     {
         genre_node = new UIListGenericTree((UIListGenericTree *)starting_point, genre);
+        genre_node->setPixmap(pixgenre);
         genre_node->setAttribute(0, 0);
         genre_node->setAttribute(1, 1);
         genre_node->setAttribute(2, 0);
@@ -405,7 +415,7 @@ void MfdContentCollection::addItemToAudioGenreTree(AudioMetadata *item, GenericT
     if(!album_node)
     {
         album_node = new UIListGenericTree(artist_node, album);
-        album_node->setPixmap(pixartist);
+        album_node->setPixmap(pixalbum);
         album_node->setAttribute(0, 0);
         album_node->setAttribute(1, 1);
         album_node->setAttribute(2, 0);
@@ -436,10 +446,11 @@ void MfdContentCollection::addItemToAudioCollectionTree(AudioMetadata *item, con
     // By Collection --> Genre/Artist, etc.
     //
     
-    GenericTree *collection_node = audio_collection_tree->getChildByName(collection_name);
+    UIListGenericTree *collection_node = (UIListGenericTree *)audio_collection_tree->getChildByName(collection_name);
     if(!collection_node)
     {
         collection_node = new UIListGenericTree(audio_collection_tree, collection_name);
+        collection_node->setPixmap(pixcontainer);
         
         //
         //  We just made the node for this collection, it needs Artist and Genre subnodes
@@ -449,6 +460,7 @@ void MfdContentCollection::addItemToAudioCollectionTree(AudioMetadata *item, con
         by_artist_node->setPixmap(pixartist);
         by_artist_node->setAttribute(1, 1);
         by_genre_node = new UIListGenericTree((UIListGenericTree *)collection_node, "By Genre");
+        by_genre_node->setPixmap(pixgenre);
         by_genre_node->setAttribute(1, 1);
     }
     else
@@ -510,19 +522,27 @@ void MfdContentCollection::sort()
 
 void MfdContentCollection::setupPixmaps()
 {
-    if (client_height != 600 || client_width != 800)
+    if(!pixmaps_are_setup)
     {
-        pixplaylist = scalePixmap((const char **)playlist_pix, client_wmult, client_hmult);
-        pixartist = scalePixmap((const char **)artist_pix, client_wmult, client_hmult);
-        pixalbum = scalePixmap((const char **)album_pix, client_wmult, client_hmult);
-        pixtrack = scalePixmap((const char **)track_pix, client_wmult, client_hmult);
-    }
-    else
-    {
-        pixplaylist = new QPixmap((const char **)playlist_pix);
-        pixartist = new QPixmap((const char **)artist_pix);
-        pixalbum = new QPixmap((const char **)album_pix);
-        pixtrack = new QPixmap((const char **)track_pix);
+        if (client_height != 600 || client_width != 800)
+        {
+            pixcontainer = scalePixmap((const char **)container_pix_xpm, client_wmult, client_hmult);
+            pixplaylist = scalePixmap((const char **)playlist_pix_xpm, client_wmult, client_hmult);
+            pixartist = scalePixmap((const char **)artist_pix_xpm, client_wmult, client_hmult);
+            pixgenre = scalePixmap((const char **)genre_pix_xpm, client_wmult, client_hmult);
+            pixalbum = scalePixmap((const char **)album_pix_xpm, client_wmult, client_hmult);
+            pixtrack = scalePixmap((const char **)track_pix_xpm, client_wmult, client_hmult);
+        }
+        else
+        {
+            pixcontainer = new QPixmap((const char **)container_pix_xpm);
+            pixplaylist = new QPixmap((const char **)playlist_pix_xpm);
+            pixartist = new QPixmap((const char **)artist_pix_xpm);
+            pixgenre = new QPixmap((const char **)genre_pix_xpm);
+            pixalbum = new QPixmap((const char **)album_pix_xpm);
+            pixtrack = new QPixmap((const char **)track_pix_xpm);
+        }
+        pixmaps_are_setup = true;
     }
 }
 
