@@ -26,8 +26,8 @@ Compiling note:  If you get an error on building this, that says something
 If you get any errors about missing references, etc, you most likely don't have
 one of the required pieces of software installed.
 
-Follow this by a 'make install'.  It'll put a 'mythgallery' binary in your
-/usr/local/bin directory.
+Follow this by a 'make install'.  It'll put a 'libmythgallery.so' plugin in your
+/usr/local/lib/mythtv/plugins directory.
 
 MythGallery will also read the mysql.txt settings files used by
 MythTV, so any changes you made to those will be carried over into this.
