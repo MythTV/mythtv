@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-07-21, v2.54
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-07-29, v2.55
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -152,7 +152,7 @@ necessary.</EM>
 <LI><A NAME="toc18.8">18.8</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss18.8">I can't checkout using CVS anymore! </A>
 <LI><A NAME="toc18.9">18.9</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss18.9">I get segfaults / MythTV isn't doing anything.</A>
 <LI><A NAME="toc18.10">18.10</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss18.10">MythTV makes my system crash. </A>
-<LI><A NAME="toc18.11">18.11</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss18.11">Troubleshooting audio.</A>
+<LI><A NAME="toc18.11">18.11</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss18.11">Troubleshooting audio. </A>
 <LI><A NAME="toc18.12">18.12</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss18.12">I can't see parts of the On Screen Display.</A>
 <LI><A NAME="toc18.13">18.13</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss18.13">The mythbackend program told me to look at this section.</A>
 <LI><A NAME="toc18.14">18.14</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss18.14">My remote doesn't work / works sometimes and not others / "ghost"</A>
@@ -542,7 +542,7 @@ available by nVidia. See
 nVidia X driver.</LI>
 <LI>GeForce2 GTS 64 MB DDR 4x AGP. Has SVideo port. Works using the nVidia X 
 driver. Reportedly works using the nv driver plus nvtv.</LI>
-<LI>GeForce4 MX420 PCI (BFG Asylum). Has SVideo port. No tests reported.</LI>
+<LI>GeForce4 MX420 PCI (BFG Asylum). Has SVideo port.</LI>
 </UL>
 </P>
 
@@ -1521,7 +1521,10 @@ listening to the live audio.  However, if you're having an issue where the
 audio and video aren't synchronized by small but varying amount, it's most
 likely because the sound driver that you're using doesn't have the
 DSP_CAP_REALTIME capability.  This was the case with ALSA (0.5), but not
-with newer versions (0.9).</P>
+with newer versions (0.9).  See the 
+<A HREF="#Troubleshooting_Audio">Troubleshooting Audio</A> section for more information if you're having
+issues with sound.  Also, ensure that no other programs are grabbing the
+audio output, like <B>arts</B> or <B>esd</B>.</P>
 <P>What you need to do is to mute the "line-in" of your sound card and also
 set it as the recording source.</P>
 <P>There are two ways to do this.  Graphically, and from the command line.</P>
@@ -1846,8 +1849,8 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>At this point, if you're using a serial receiver, check that the link has
-been correctly made in <CODE>/dev</CODE>:
+<P>At this point, if you're using a serial receiver, check that there's a
+<CODE>lirc</CODE> device in <CODE>/dev</CODE>:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ ls -l /dev/li*
@@ -1857,11 +1860,26 @@ prw-r--r--    1 root     root            0 Jan 27 09:00 /dev/lircm|
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>As you can see, there's a link from /dev/lirc to ttyS0, aka "COM1".</P>
-<P>If the link was not created, ensure that you ran the <CODE>make install</CODE>
-step as root.  If it still doesn't work, then you must create the link
-manually.  In this example, the IR device is connected to ttyS0.  If it were
-connected to "COM2", then use ttyS1, etc.
+<P>As you can see, there's a link from /dev/lirc to ttyS0, aka "COM1", which is
+appropriate for the Pinnacle Systems PCTV Pro.  However, you may notice
+something like this:
+<BLOCKQUOTE><CODE>
+<PRE>
+crw-------    1 root     root      61,   0 Dec 31  1969 lirc
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Some IR receivers (including some homebrew's) use a character device as
+their data interface as opposed to a link to a serial port.  If the <CODE>make
+install</CODE> step has created a character device for you, don't replace it
+with a link to a COM port.</P>
+<P>So, if the link or character device was not created (but should have been),
+ensure that you ran the <CODE>make install</CODE> step as root.  If it still
+doesn't work, then there are three options.  The first option is to re-read
+the <B>lirc</B> documentation to determine whether your IR receiver is a
+character device or should be a link to a serial port and to create the
+link/character device manually.  In this example, the IR device is connected
+to ttyS0.  If it were connected to "COM2", then use ttyS1, etc.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
@@ -1885,6 +1903,16 @@ necessary to replace the link created above with a a character pipe:
 <P>See the lirc documentation for additional information.  The lirc
 installation <EM>should</EM> create this for you, so manually creating it
 indicates that your lirc installation may have other issues.</P>
+<P>The second option is to post your issue to the <EM>lirc</EM> list, not the
+mythtv-users list.  The lirc programmers will be the ones that can assist
+you best.</P>
+<P>The third option is to dispense with lirc altogether by purchasing an IR
+keyboard (various options exist, although Chicony appears to work for some
+people) and a learning remote control.  The IR keyboard receiver plugs into
+the PS/2 keyboard port on your PC and you would train your learning remote
+to emulate the various keystrokes from <CODE>keys.txt</CODE> of your IR
+keyboard.  Using this method removes lirc entirely from the picture - your
+remote will be sending keypresses that your PC "sees" on the keyboard port.</P>
 
 <H3>Recompiling your kernel on Red Hat Linux</H3>
 
@@ -2446,6 +2474,10 @@ move to the next setting, all of which should be self-explanatory.</P>
 <P>Once you're done, press RETURN to go back to the Input Connections screen. 
 You would then finish associating the video sources to any other hardware
 devices you have available.</P>
+<P><B>NOTE</B>:  Don't add a video source to a hardware input if you don't
+actually have anything connected there.  For example, adding "Cable" to the
+Tuner and to the Composite inputs without having something connected to
+Composite will lead to blank recordings.</P>
 <P>Press ESC to return to the main menu, and press ESC again if you have no
 further items to configure, thereby returning you to the command line.</P>
 
@@ -3611,7 +3643,7 @@ issue with the drivers for your capture card or other hardware, or the CPU
 fan has fallen off/broken and your system is overheating when asked to
 perform a CPU intensive task like encoding video.</P>
 
-<H2><A NAME="ss18.11">18.11</A> <A HREF="#toc18.11">Troubleshooting audio.</A>
+<H2><A NAME="Troubleshooting_Audio"></A> <A NAME="ss18.11">18.11</A> <A HREF="#toc18.11">Troubleshooting audio. </A>
 </H2>
 
 <P>By Bruce Markey, 

@@ -120,8 +120,8 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>At this point, if you're using a serial receiver, check that the link has
-been correctly made in <CODE>/dev</CODE>:
+<P>At this point, if you're using a serial receiver, check that there's a
+<CODE>lirc</CODE> device in <CODE>/dev</CODE>:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ ls -l /dev/li*
@@ -131,11 +131,26 @@ prw-r--r--    1 root     root            0 Jan 27 09:00 /dev/lircm|
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>As you can see, there's a link from /dev/lirc to ttyS0, aka "COM1".</P>
-<P>If the link was not created, ensure that you ran the <CODE>make install</CODE>
-step as root.  If it still doesn't work, then you must create the link
-manually.  In this example, the IR device is connected to ttyS0.  If it were
-connected to "COM2", then use ttyS1, etc.
+<P>As you can see, there's a link from /dev/lirc to ttyS0, aka "COM1", which is
+appropriate for the Pinnacle Systems PCTV Pro.  However, you may notice
+something like this:
+<BLOCKQUOTE><CODE>
+<PRE>
+crw-------    1 root     root      61,   0 Dec 31  1969 lirc
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Some IR receivers (including some homebrew's) use a character device as
+their data interface as opposed to a link to a serial port.  If the <CODE>make
+install</CODE> step has created a character device for you, don't replace it
+with a link to a COM port.</P>
+<P>So, if the link or character device was not created (but should have been),
+ensure that you ran the <CODE>make install</CODE> step as root.  If it still
+doesn't work, then there are three options.  The first option is to re-read
+the <B>lirc</B> documentation to determine whether your IR receiver is a
+character device or should be a link to a serial port and to create the
+link/character device manually.  In this example, the IR device is connected
+to ttyS0.  If it were connected to "COM2", then use ttyS1, etc.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
@@ -159,6 +174,16 @@ necessary to replace the link created above with a a character pipe:
 <P>See the lirc documentation for additional information.  The lirc
 installation <EM>should</EM> create this for you, so manually creating it
 indicates that your lirc installation may have other issues.</P>
+<P>The second option is to post your issue to the <EM>lirc</EM> list, not the
+mythtv-users list.  The lirc programmers will be the ones that can assist
+you best.</P>
+<P>The third option is to dispense with lirc altogether by purchasing an IR
+keyboard (various options exist, although Chicony appears to work for some
+people) and a learning remote control.  The IR keyboard receiver plugs into
+the PS/2 keyboard port on your PC and you would train your learning remote
+to emulate the various keystrokes from <CODE>keys.txt</CODE> of your IR
+keyboard.  Using this method removes lirc entirely from the picture - your
+remote will be sending keypresses that your PC "sees" on the keyboard port.</P>
 
 <H3>Recompiling your kernel on Red Hat Linux</H3>
 

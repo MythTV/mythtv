@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-07-21, v2.54
+<date>2003-07-29, v2.55
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -368,7 +368,7 @@ Specific cards:
 nVidia X driver.
 <item>GeForce2 GTS 64 MB DDR 4x AGP. Has SVideo port. Works using the nVidia X 
 driver. Reportedly works using the nv driver plus nvtv.
-<item>GeForce4 MX420 PCI (BFG Asylum). Has SVideo port. No tests reported.
+<item>GeForce4 MX420 PCI (BFG Asylum). Has SVideo port.
 </itemize>
 
 <sect3>Savage
@@ -1197,7 +1197,10 @@ listening to the live audio.  However, if you're having an issue where the
 audio and video aren't synchronized by small but varying amount, it's most
 likely because the sound driver that you're using doesn't have the
 DSP_CAP_REALTIME capability.  This was the case with ALSA (0.5), but not
-with newer versions (0.9).
+with newer versions (0.9).  See the <ref id="Troubleshooting_Audio"
+name="Troubleshooting Audio"> section for more information if you're having
+issues with sound.  Also, ensure that no other programs are grabbing the
+audio output, like <bf>arts</bf> or <bf>esd</bf>.
 
 What you need to do is to mute the "line-in" of your sound card and also
 set it as the recording source.
@@ -1488,8 +1491,8 @@ $ su
 # chmod 666 /dev/lircd
 </verb></tscreen>
 
-At this point, if you're using a serial receiver, check that the link has
-been correctly made in <tt>/dev</tt>:
+At this point, if you're using a serial receiver, check that there's a
+<tt>lirc</tt> device in <tt>/dev</tt>:
 <tscreen><verb>
 $ ls -l /dev/li*
 lr-xr-xr-x    1 root     root            5 Jan 27 09:00 /dev/lirc -> ttyS0
@@ -1497,12 +1500,24 @@ srw-rw-rw-    1 root     root            0 Jan 27 15:01 /dev/lircd=
 prw-r--r--    1 root     root            0 Jan 27 09:00 /dev/lircm|
 </verb></tscreen>
 
-As you can see, there's a link from /dev/lirc to ttyS0, aka "COM1".
+As you can see, there's a link from /dev/lirc to ttyS0, aka "COM1", which is
+appropriate for the Pinnacle Systems PCTV Pro.  However, you may notice
+something like this:
+<tscreen><verb>
+crw-------    1 root     root      61,   0 Dec 31  1969 lirc
+</verb></tscreen>
+Some IR receivers (including some homebrew's) use a character device as
+their data interface as opposed to a link to a serial port.  If the <tt>make
+install</tt> step has created a character device for you, don't replace it
+with a link to a COM port.
 
-If the link was not created, ensure that you ran the <tt>make install</tt>
-step as root.  If it still doesn't work, then you must create the link
-manually.  In this example, the IR device is connected to ttyS0.  If it were
-connected to "COM2", then use ttyS1, etc.
+So, if the link or character device was not created (but should have been),
+ensure that you ran the <tt>make install</tt> step as root.  If it still
+doesn't work, then there are three options.  The first option is to re-read
+the <bf>lirc</bf> documentation to determine whether your IR receiver is a
+character device or should be a link to a serial port and to create the
+link/character device manually.  In this example, the IR device is connected
+to ttyS0.  If it were connected to "COM2", then use ttyS1, etc.
 <tscreen><verb>
 $ su
 # cd /dev
@@ -1522,6 +1537,18 @@ necessary to replace the link created above with a a character pipe:
 See the lirc documentation for additional information.  The lirc
 installation <em>should</em> create this for you, so manually creating it
 indicates that your lirc installation may have other issues.
+
+The second option is to post your issue to the <em>lirc</em> list, not the
+mythtv-users list.  The lirc programmers will be the ones that can assist
+you best.
+
+The third option is to dispense with lirc altogether by purchasing an IR
+keyboard (various options exist, although Chicony appears to work for some
+people) and a learning remote control.  The IR keyboard receiver plugs into
+the PS/2 keyboard port on your PC and you would train your learning remote
+to emulate the various keystrokes from <tt>keys.txt</tt> of your IR
+keyboard.  Using this method removes lirc entirely from the picture - your
+remote will be sending keypresses that your PC "sees" on the keyboard port.
 
 <sect2>Recompiling your kernel on Red Hat Linux
 <p>Don't Panic! Red Hat makes a kernel recompile very easy. They provide  
@@ -2047,6 +2074,11 @@ move to the next setting, all of which should be self-explanatory.
 Once you're done, press RETURN to go back to the Input Connections screen. 
 You would then finish associating the video sources to any other hardware
 devices you have available.
+
+<bf>NOTE</bf>:  Don't add a video source to a hardware input if you don't
+actually have anything connected there.  For example, adding "Cable" to the
+Tuner and to the Composite inputs without having something connected to
+Composite will lead to blank recordings.
 
 Press ESC to return to the main menu, and press ESC again if you have no
 further items to configure, thereby returning you to the command line.
@@ -3111,7 +3143,7 @@ issue with the drivers for your capture card or other hardware, or the CPU
 fan has fallen off/broken and your system is overheating when asked to
 perform a CPU intensive task like encoding video.
 
-<sect1>Troubleshooting audio.
+<sect1>Troubleshooting audio. <label id="Troubleshooting_Audio">
 <p>By Bruce Markey, <url url="mailto:bjm@lvcm.com"
 name="mailto:bjm@lvcm.com">
 <bf>NOTE</bf>:  the following instructions do not apply to PVR-250/350
@@ -4233,6 +4265,11 @@ PVR-250/350.  Added example for LVM/ext2 and ext3.  Added note to not run
 XMLTV 0.5.15 if you're not running CVS.  Add link in first section to single
 page and PDF version of docs.
 v2.54, 2003-07-21.  Fix grammar in LVM section.  Axel Thimm's updates.
+v2.55, 2003-07-29.  Added GeForce MX420 PCI as working.  Don't add multiple
+sources to inputs unless there's something actually on them.  Add link to
+troubleshooting audio in Alsa section.  Modify lirc section so people don't
+get confused about the example vs. _their_ setup.  Add IR keyboard/learning
+remote option to lirc section.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
