@@ -2,6 +2,7 @@
 #define TVPLAY_H
 
 #include <qstring.h>
+#include <qdatetime.h>
 #include <pthread.h>
 #include <qvaluevector.h>
 
@@ -44,6 +45,11 @@ class TV : public QObject
     bool IsPlaying(void) { return StateIsPlaying(internalState); }
     bool IsRecording(void) { return StateIsRecording(internalState); }
 
+    void GetNextProgram(RemoteEncoder *enc, int direction,
+                        QString &title, QString &subtitle,
+                        QString &desc, QString &category, QString &starttime,
+                        QString &endtime, QString &callsign, QString &iconpath,
+                        QString &channelname, QString &chanid);
     void GetChannelInfo(RemoteEncoder *enc, QString &title, QString &subtitle,
                         QString &desc, QString &category, QString &starttime,
                         QString &endtime, QString &callsign, QString &iconpath,
@@ -92,7 +98,7 @@ class TV : public QObject
 
     void ToggleInputs(void); 
 
-    void DoPosition(void);
+    void DoInfo(void);
     void DoPause(void);
     void DoFF(void);
     void DoRew(void);
@@ -122,6 +128,10 @@ class TV : public QObject
     void TogglePIPView(void);
     void ToggleActiveWindow(void);
     void SwapPIP(void);
+
+    void BrowseStart(void);
+    void BrowseEnd(bool change);
+    void BrowseDispInfo(int direction);
 
     int osd_display_time;
 
@@ -175,6 +185,11 @@ class TV : public QObject
     bool editmode;
     bool requestDelete;
     bool endOfRecording;
+
+    bool browsemode;
+    QString browsechannum;
+    QString browsechanid;
+    QString browsestarttime;
 
     ProgramInfo *playbackinfo;
 

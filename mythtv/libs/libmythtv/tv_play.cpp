@@ -14,6 +14,7 @@ using namespace std;
 
 #include "tv.h"
 #include "osd.h"
+#include "osdtypes.h"
 #include "mythcontext.h"
 #include "dialogbox.h"
 #include "remoteencoder.h"
@@ -113,6 +114,7 @@ TV::TV(QSqlDatabase *db)
     dialogname = "";
     playbackinfo = NULL;
     editmode = false;
+    browsemode = false;
     prbuffer = NULL;
     nvp = NULL;
     osd = NULL;
@@ -809,6 +811,20 @@ void TV::ProcessKeypress(int keypressed)
         return;
     }
 
+    if (browsemode)
+    {
+        switch (keypressed)
+        {
+            case wsUp: BrowseDispInfo(BROWSE_UP); break;
+            case wsDown: BrowseDispInfo(BROWSE_DOWN); break;
+            case wsLeft: BrowseDispInfo(BROWSE_LEFT); break;
+            case wsRight: BrowseDispInfo(BROWSE_RIGHT); break;
+            case wsEscape: BrowseEnd(false); break;
+            case ' ': case wsEnter: case wsReturn: BrowseEnd(true); break;
+        }
+        return;
+    }
+
     if (nvp->GetOSD() && osd->DialogShowing(dialogname))
     {
         switch (keypressed)
@@ -1026,6 +1042,7 @@ void TV::ProcessKeypress(int keypressed)
             case 'L': ChangeColour(true); break;
 
             case 'x': ChangeDeinterlacer(); break;
+            case 'o': case 'O': BrowseStart(); break;
 
             case 'H': case 'h': PreviousChannel(); break;
 
@@ -1036,7 +1053,7 @@ void TV::ProcessKeypress(int keypressed)
     {
         switch (keypressed)
         {
-            case 'i': case 'I': DoPosition(); break;
+            case 'i': case 'I': DoInfo(); break;
             case ' ': case wsEnter: case wsReturn: 
             {
                 if (!was_doing_ff_rew)
@@ -1257,14 +1274,39 @@ void TV::DoPause(void)
         osd->EndPause();
 }
 
-void TV::DoPosition(void)
+void TV::DoInfo(void)
 {
-    if (activenvp != nvp)
+    QString title, subtitle, description, category, starttime, endtime;
+    QString callsign, iconpath;
+    OSDSet *oset;
+
+    if (paused)
         return;
 
-    QString desc = "";
-    int pos = calcSliderPos(0, desc);
-    osd->StartPause(pos, false, "Position", desc, osd_display_time);
+    oset = osd->GetSet("status");
+    if ((oset) && (oset->Displaying()))
+    {
+        osd->HideSet("status");
+
+        title = playbackinfo->title;
+        subtitle = playbackinfo->subtitle;
+        description = playbackinfo->description;
+        category = playbackinfo->category;
+        starttime = playbackinfo->startts.toString("yyyyMMddhhmm") + "00";
+        endtime = playbackinfo->endts.toString("yyyyMMddhhmm") + "00";
+        callsign = playbackinfo->chansign;
+        iconpath = "";
+        osd->SetInfoText(title, subtitle, description, category, starttime,
+            endtime, callsign, iconpath, osd_display_time);
+    }
+    else
+    {
+        osd->HideSet("program_info");
+
+        QString desc = "";
+        int pos = calcSliderPos(0, desc);
+        osd->StartPause(pos, false, "Position", desc, osd_display_time);
+    }
 }
 
 void TV::DoFF(void)
@@ -1641,6 +1683,20 @@ void TV::UpdateOSDInput(void)
                      osd_display_time);
 }
 
+void TV::GetNextProgram(RemoteEncoder *enc, int direction,
+                        QString &title, QString &subtitle, 
+                        QString &desc, QString &category, QString &starttime, 
+                        QString &endtime, QString &callsign, QString &iconpath,
+                        QString &channelname, QString &chanid)
+{
+    if (!enc)
+        enc = activerecorder;
+
+    enc->GetNextProgram(direction,
+                        title, subtitle, desc, category, starttime, endtime, 
+                        callsign, iconpath, channelname, chanid);
+}
+
 void TV::GetChannelInfo(RemoteEncoder *enc, QString &title, QString &subtitle, 
                         QString &desc, QString &category, QString &starttime, 
                         QString &endtime, QString &callsign, QString &iconpath,
@@ -1868,5 +1924,86 @@ void TV::customEvent(QCustomEvent *e)
             }
         }
     }
+}
+
+void TV::BrowseStart(void)
+{
+    if (activenvp != nvp)
+        return;
+
+    if (paused)
+        return;
+
+    browsemode = true;
+
+    QString title, subtitle, desc, category, starttime, endtime;
+    QString callsign, iconpath, channelname, chanid;
+
+    GetChannelInfo(activerecorder, title, subtitle, desc, category, 
+                   starttime, endtime, callsign, iconpath, channelname, chanid);
+
+    browsechannum = channelname;
+    browsechanid = chanid;
+    browsestarttime = starttime;
+
+    BrowseDispInfo(BROWSE_SAME);
+}
+
+void TV::BrowseEnd(bool change)
+{
+    osd->HideSet("program_info");
+
+    if (change)
+    {
+        ChangeChannelByString(browsechannum);
+    }
+
+    browsemode = false;
+}
+
+void TV::BrowseDispInfo(int direction)
+{
+    QString title, subtitle, desc, category, starttime, endtime;
+    QString callsign, iconpath, channelname, chanid;
+    QDateTime curtime = QDateTime::currentDateTime();
+    QDateTime maxtime = curtime.addSecs(60 * 60 * 4);
+    QDateTime lastprogtime =
+                  QDateTime::fromString(browsestarttime, Qt::ISODate);
+    OSDSet *oset;
+
+    if (paused)
+        return;
+
+    if (lastprogtime < curtime)
+        browsestarttime = curtime.toString("yyyyMMddhhmm") + "00";
+
+    if ((lastprogtime > maxtime) &&
+        (direction == BROWSE_RIGHT))
+        return;
+
+    channelname = browsechannum;
+    starttime = browsestarttime;
+    chanid = browsechanid;
+
+    if (direction != BROWSE_SAME)
+        GetNextProgram(activerecorder, direction,
+                       title, subtitle, desc, category,
+                       starttime, endtime, callsign, iconpath,
+                       channelname, chanid);
+    else
+        GetChannelInfo(activerecorder, title, subtitle, desc, category, 
+                       starttime, endtime, callsign, iconpath,
+                       channelname, chanid);
+
+    browsechannum = channelname;
+    browsechanid = chanid;
+    browsestarttime = starttime;
+
+    osd->SetInfoText(title, subtitle, desc, category, starttime, endtime,
+                     callsign, iconpath, osd_display_time);
+
+    oset = osd->GetSet("program_info");
+    if (oset)
+        osd->SetVisible(oset, 0);
 }
 

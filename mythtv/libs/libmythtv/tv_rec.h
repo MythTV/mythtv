@@ -20,6 +20,16 @@ class RingBuffer;
 class NuppelVideoRecorder;
 class RecorderBase;
 
+typedef enum
+{
+    BROWSE_SAME,
+    BROWSE_UP,
+    BROWSE_DOWN,
+    BROWSE_LEFT,
+    BROWSE_RIGHT
+} BrowseDirections;
+
+
 class TVRec
 {
  public:
@@ -52,6 +62,10 @@ class TVRec
                         const QString &channum);
     bool SetVideoFiltersForChannel(Channel *chan, const QString &channum);
     QString GetNextChannel(Channel *chan, int channeldirection);
+    QString GetNextRelativeChanID(QString channum, int channeldirection);
+    void DoGetNextChannel(QString &channum, QString channelinput,
+                                QString device, QString channelorder,
+                                int channeldirection, QString &chanid);
 
     void RetrieveInputChannels(map<int, QString> &inputChannel,
                                map<int, QString> &inputTuneTo,
@@ -80,6 +94,11 @@ class TVRec
     int ChangeBrightness(bool direction);
     void ChangeDeinterlacer(int deinterlace_mode);
     bool CheckChannel(QString name);
+    void GetNextProgram(int direction,
+                        QString &title, QString &subtitle, QString &desc,
+                        QString &category, QString &starttime, 
+                        QString &endtime, QString &callsign, QString &iconpath,
+                        QString &channelname, QString &chanid);
     void GetChannelInfo(QString &title, QString &subtitle, QString &desc,
                         QString &category, QString &starttime, 
                         QString &endtime, QString &callsign, QString &iconpath,
@@ -101,7 +120,10 @@ class TVRec
  protected:
     void RunTV(void);
     static void *EventThread(void *param);
+
+    void DoFlagCommercialsThread(void);
     static void *FlagCommercialsThread(void *param);
+    void FlagCommercials(void);
 
     void DoReadThread(void);
     static void *ReadThread(void *param);
@@ -130,8 +152,6 @@ class TVRec
     bool StateIsPlaying(TVState state);
     TVState RemovePlaying(TVState state);
     TVState RemoveRecording(TVState state);
-
-    void FlagCommercials(void);
 
     void WriteRecordedRecord(void);
 

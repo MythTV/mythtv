@@ -41,6 +41,11 @@ class RemoteEncoder
     void ToggleChannelFavorite(void);
     void SetChannel(QString channel);
     bool CheckChannel(QString channel);
+    void GetNextProgram(int direction,
+                        QString &title, QString &subtitle, QString &desc, 
+                        QString &category, QString &starttime, QString &endtime,
+                        QString &callsign, QString &iconpath,
+                        QString &channelname, QString &chanid);
     void GetChannelInfo(QString &title, QString &subtitle, QString &desc, 
                         QString &category, QString &starttime, QString &endtime,
                         QString &callsign, QString &iconpath,

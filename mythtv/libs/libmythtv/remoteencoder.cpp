@@ -317,6 +317,34 @@ bool RemoteEncoder::CheckChannel(QString channel)
     return retval;
 }
 
+void RemoteEncoder::GetNextProgram(int direction,
+                                   QString &title, QString &subtitle,
+                                   QString &desc, QString &category,
+                                   QString &starttime, QString &endtime,
+                                   QString &callsign, QString &iconpath,
+                                   QString &channelname, QString &chanid)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    strlist << "GET_NEXT_PROGRAM_INFO";
+    strlist << channelname;
+    strlist << chanid;
+    strlist << QString::number((int)direction);
+    strlist << starttime;
+
+    SendReceiveStringList(strlist);
+
+    title = strlist[0];
+    subtitle = strlist[1];
+    desc = strlist[2];
+    category = strlist[3];
+    starttime = strlist[4];
+    endtime = strlist[5];
+    callsign = strlist[6];
+    iconpath = strlist[7];
+    channelname = strlist[8];
+    chanid = strlist[9];
+}
+
 void RemoteEncoder::GetChannelInfo(QString &title, QString &subtitle,
                                    QString &desc, QString &category,
                                    QString &starttime, QString &endtime,

@@ -328,9 +328,19 @@ void TVRec::HandleStateChange(void)
     else if (internalState == kState_WatchingRecording &&
              nextState == kState_WatchingLiveTV)
     {
+        QMap<long long, int> blank_frame_map;
+
         nvr->Pause(false);
         while (!nvr->GetPause())
             usleep(5);
+
+        if (curRecording)
+            prevRecording = new ProgramInfo(*curRecording);
+        else
+            prevRecording = NULL;
+
+        if (prevRecording)
+            nvr->GetBlankFrameMap(blank_frame_map);
 
         nvr->TransitionToRing();
 
@@ -355,6 +365,21 @@ void TVRec::HandleStateChange(void)
         inoverrecord = false;
         internalState = nextState;
         changed = true;
+
+        if (prevRecording)
+        {
+            prevRecording->SetBlankFrameList(blank_frame_map, db_conn);
+
+            if ((!prematurelystopped) &&
+                (gContext->GetNumSetting("AutoCommercialFlag", 0)))
+                FlagCommercials();
+        }
+
+        if (prevRecording)
+        {
+            delete prevRecording;
+            prevRecording = NULL;
+        }
     }
     else if (internalState == kState_WatchingRecording &&
              nextState == kState_RecordingOnly)
@@ -535,7 +560,6 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
 void TVRec::TeardownRecorder(bool killFile)
 {
     QMap<long long, int> blank_frame_map;
-    QMap<long long, int> comm_breaks;
 
     int filelen = -1;
 
@@ -600,18 +624,7 @@ void TVRec::TeardownRecorder(bool killFile)
         if (!prematurelystopped)
         {
             if (gContext->GetNumSetting("AutoCommercialFlag", 0))
-            {
-                flagthreadstarted = false;
-
-                pthread_attr_t attr;
-                pthread_attr_init(&attr);
-                pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-                pthread_create(&commercials, &attr, FlagCommercialsThread, 
-                               this);
-
-                while (!flagthreadstarted)
-                    usleep(50);
-            }
+                FlagCommercials();
 
             QString message = QString("LOCAL_READY_TO_TRANSCODE %1 %2")
                        .arg(prevRecording->chanid)
@@ -691,14 +704,6 @@ void *TVRec::EventThread(void *param)
 {
     TVRec *thetv = (TVRec *)param;
     thetv->RunTV();
-
-    return NULL;
-}
-
-void *TVRec::FlagCommercialsThread(void *param)
-{
-    TVRec *thetv = (TVRec *)param;
-    thetv->FlagCommercials();
 
     return NULL;
 }
@@ -1207,12 +1212,38 @@ QString TVRec::GetNextChannel(Channel *chan, int channeldirection)
     QString channum = chan->GetCurrentName();
     QString channelinput = chan->GetCurrentInput();
     QString device = chan->GetDevice();
+    QString channelorder = chan->GetOrdering();
+    QString chanid = "";
 
+    DoGetNextChannel(channum, channelinput, device, channelorder,
+                             channeldirection, chanid);
+
+    return(channum);
+}
+
+QString TVRec::GetNextRelativeChanID(QString channum, int channeldirection)
+{
+
+    // Get info on the current channel we're on
+    QString channum_out = channum;
+    QString channelinput = channel->GetCurrentInput();
+    QString device = channel->GetDevice();
+    QString channelorder = channel->GetOrdering();
+    QString chanid = "";
+
+    DoGetNextChannel(channum_out, channelinput, device, channelorder,
+                             channeldirection, chanid);
+
+    return(chanid);
+}
+
+void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
+                                QString device, QString channelorder,
+                                int channeldirection, QString &chanid)
+{
     pthread_mutex_lock(&db_lock);
 
     MythContext::KickDatabase(db_conn);
-
-    QString channelorder = chan->GetOrdering();
 
     QString thequery = QString("SELECT %1 FROM "
                                "channel,capturecard,cardinput "
@@ -1266,7 +1297,9 @@ QString TVRec::GetNextChannel(Channel *chan, int channeldirection)
         pthread_mutex_unlock(&db_lock);
         cerr << "Couldn't find any channels in the database, please make sure "
              << "\nyour inputs are associated properly with your cards.\n";
-        return ret;
+        channum = "";
+        chanid = "";
+        return;
     }
 
     // Now let's try finding the next channel in the desired direction
@@ -1294,7 +1327,8 @@ QString TVRec::GetNextChannel(Channel *chan, int channeldirection)
                                 .arg(channelinput).arg(device)
                                 .arg(gContext->GetHostName());
 
-    thequery = QString("SELECT channel.channum FROM channel,capturecard,"
+    thequery = QString("SELECT channel.channum, channel.chanid "
+                       "FROM channel,capturecard,"
                        "cardinput%1 WHERE "
                        "channel.%2 %3 \"%4\" %5 AND %6 "
                        "ORDER BY channel.%7 %8 LIMIT 1;")
@@ -1310,7 +1344,8 @@ QString TVRec::GetNextChannel(Channel *chan, int channeldirection)
     {
         query.next();
 
-        ret = query.value(0).toString();
+        channum = query.value(0).toString();
+        chanid = query.value(1).toString();
     }
     else
     {
@@ -1321,7 +1356,8 @@ QString TVRec::GetNextChannel(Channel *chan, int channeldirection)
             comp = ">";
 
         // again, %9 is the limit for this
-        thequery = QString("SELECT channel.channum FROM channel,capturecard,"
+        thequery = QString("SELECT channel.channum, channel.chanid "
+                           "FROM channel,capturecard,"
                            "cardinput%1 WHERE "
                            "channel.%2 %3 \"%4\" %5 AND %6 "
                            "ORDER BY channel.%7 %8 LIMIT 1;")
@@ -1337,13 +1373,14 @@ QString TVRec::GetNextChannel(Channel *chan, int channeldirection)
         { 
             query.next();
 
-            ret = query.value(0).toString();
+            channum = query.value(0).toString();
+            chanid = query.value(1).toString();
         }
     }
 
     pthread_mutex_unlock(&db_lock);
 
-    return ret;
+    return;
 }
 
 bool TVRec::IsReallyRecording(void)
@@ -1604,6 +1641,87 @@ bool TVRec::CheckChannel(QString name)
     return CheckChannel(channel, name, finetune);
 }
 
+void TVRec::GetNextProgram(int direction,
+                        QString &title, QString &subtitle, QString &desc,
+                        QString &category, QString &starttime,
+                        QString &endtime, QString &callsign, QString &iconpath,
+                        QString &channelname, QString &chanid)
+{
+    QSqlQuery sqlquery;
+    QString querystr;
+    QString nextchannum = channelname;
+    QString compare = "<";
+    QString sortorder = "";
+
+    querystr = QString( "SELECT title, subtitle, description, category, "
+                            "starttime, endtime, callsign, icon, channum, "
+                            "program.chanid "
+                        "FROM program, channel "
+                        "WHERE program.chanid = channel.chanid ");
+
+    switch (direction)
+    {
+        case BROWSE_UP:
+                chanid = GetNextRelativeChanID(channelname,
+                                               CHANNEL_DIRECTION_UP);
+                compare = "<=";
+                sortorder = "desc";
+                break;
+        case BROWSE_DOWN:
+                chanid = GetNextRelativeChanID(channelname,
+                                               CHANNEL_DIRECTION_DOWN);
+                compare = "<=";
+                sortorder = "desc";
+                break;
+        case BROWSE_LEFT:
+                compare = "<";
+                sortorder = "desc";
+                break;
+        case BROWSE_RIGHT:
+                compare = ">";
+                sortorder = "asc";
+                break;
+    }
+
+    querystr += QString( "and channel.chanid = '%1' "
+                         "and starttime %3 '%2' "
+                     "order by starttime %4 limit 1;")
+                     .arg(chanid).arg(starttime).arg(compare).arg(sortorder);
+
+    pthread_mutex_lock(&db_lock);
+
+    sqlquery.exec(querystr);
+
+    if ((sqlquery.isActive()) && (sqlquery.numRowsAffected() > 0))
+    {
+        if (sqlquery.next())
+        {
+            QString test;
+
+            test = sqlquery.value(0).toString();
+            if (test != QString::null)
+                title = QString::fromUtf8(test);
+            test = sqlquery.value(1).toString();
+            if (test != QString::null)
+                subtitle = QString::fromUtf8(test);
+            test = sqlquery.value(2).toString();
+            if (test != QString::null)
+                desc = QString::fromUtf8(test);
+            test = sqlquery.value(3).toString();
+            if (test != QString::null)
+                category = QString::fromUtf8(test);
+            starttime =  sqlquery.value(4).toString();
+            endtime = sqlquery.value(5).toString();
+            callsign = sqlquery.value(6).toString();
+            iconpath = sqlquery.value(7).toString();
+            channelname = sqlquery.value(8).toString();
+            chanid = sqlquery.value(9).toString();
+        }
+    }
+
+    pthread_mutex_unlock(&db_lock);
+}
+
 void TVRec::GetChannelInfo(QString &title, QString &subtitle, QString &desc,
                         QString &category, QString &starttime,
                         QString &endtime, QString &callsign, QString &iconpath,
@@ -1769,7 +1887,7 @@ void *TVRec::ReadThread(void *param)
     return NULL;
 }
 
-void TVRec::FlagCommercials(void)
+void TVRec::DoFlagCommercialsThread(void)
 {
     ProgramInfo *program_info = new ProgramInfo(*prevRecording);
 
@@ -1798,6 +1916,27 @@ void TVRec::FlagCommercials(void)
     delete nvp;
     delete tmprbuf;
     delete program_info;
+}
+
+void *TVRec::FlagCommercialsThread(void *param)
+{
+    TVRec *thetv = (TVRec *)param;
+    thetv->DoFlagCommercialsThread();
+
+    return NULL;
+}
+
+void TVRec::FlagCommercials(void)
+{
+    flagthreadstarted = false;
+
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    pthread_create(&commercials, &attr, FlagCommercialsThread, this);
+
+    while (!flagthreadstarted)
+        usleep(50);
 }
 
 void TVRec::RetrieveInputChannels(map<int, QString> &inputChannel,

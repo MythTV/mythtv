@@ -108,8 +108,17 @@ void BuildCommListFromBlanks(QMap<long long, int> &blanks, double fps,
         }
     }
 
+    i = 0;
+
+    // don't allow single commercial at head
+    // of show unless followed by another
+    if ((commercials > 1) &&
+        (c_end[0] < (33 * fps)) &&
+        (c_start[1] > (c_end[0] + 40 * fps)))
+        i = 1;
+
     // eliminate any blank frames at end of commercials
-    for(i = 0; i < (commercials-1); i++ )
+    for(; i < (commercials-1); i++)
     {
         long long int r = c_start[i];
 

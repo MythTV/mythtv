@@ -19,6 +19,7 @@ Watching TV or a recording
 - C to change inputs on TV Tuner card
 - ESC quits
 - I puts the Onscreen Display up again.
+    During playback, 'I' toggles between position and show description info.
 - M brings up the electronic program guide (Grid) -- see the EPG section.
 - F toggles fullscreen mode
 - Page Up to jump ahead the configured number of minutes.  (default is 10)
@@ -53,6 +54,16 @@ Watching TV only:
 - J/j increase/decrease contrast
 - K/k increase/decrease brightness
 - L/l increase/decrease color
+- O   Turns on 'Browse' mode, allowing user to browse channels and program
+      info while watching current show FullScreen.
+
+LiveTV Browse Mode:
+- Left          browse program prior to current listed program.
+- Right         browse program following current listed program.
+- Up            browse program on channel above current listed channel/program.
+- Down          browse program on channel below current listed channel/program.
+- Enter/Space   change channel to channel of current listed program.
+- ESC           Exit Browse mode.
 
 If you have two tuner cards:
 
