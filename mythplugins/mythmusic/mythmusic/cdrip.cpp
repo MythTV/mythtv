@@ -15,6 +15,9 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/ioctl.h>
+#include <linux/cdrom.h>
+#include <fcntl.h>
 
 extern "C" {
 #include <cdda_interface.h>
@@ -330,6 +333,14 @@ void Ripper::ripthedisc(void)
 
     delete newdiag;
 
+    bool EjectCD = gContext->GetNumSetting("EjectCDAfterRipping",1);
+    if (EjectCD) {
+        int cdrom_fd;
+        if ((cdrom_fd = open(cddevice,O_RDONLY)) >= 0)
+           if (ioctl(cdrom_fd, CDROMEJECT, 0)<0)
+              perror("Failed on eject IOCTL");
+         else perror("Could not open cdrom_fd");
+    }
     hide();
 }
 
