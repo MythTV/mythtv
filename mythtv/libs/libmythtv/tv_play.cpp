@@ -91,6 +91,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "RWNDSTICKY", "Rewind (Sticky) or Rewind one frame "
             "while paused", ",,<");
     REG_KEY("TV Playback", "TOGGLEINPUTS", "Toggle Inputs", "C");
+    REG_KEY("TV Playback", "SWITCHCARDS", "Switch Capture Cards", "Y");
     REG_KEY("TV Playback", "SKIPCOMMERCIAL", "Skip Commercial", "Z,End");
     REG_KEY("TV Playback", "SKIPCOMMBACK", "Skip Commercial (Reverse)",
             "Q,Home");
@@ -147,6 +148,7 @@ TV::TV(QSqlDatabase *db)
 {
     m_db = db;
 
+    switchingCards = false;
     dialogname = "";
     playbackinfo = NULL;
     editmode = false;
@@ -291,7 +293,7 @@ int TV::LiveTV(bool showDialogs)
 {
     if (internalState == kState_None)
     {
-        RemoteEncoder *testrec = RemoteRequestRecorder();
+        RemoteEncoder *testrec = RemoteRequestNextFreeRecorder(lastRecorderNum);
 
         if (!testrec)
             return 0;
@@ -322,6 +324,7 @@ int TV::LiveTV(bool showDialogs)
         lastRecorderNum = recorder->GetRecorderNumber();
         nextState = kState_WatchingLiveTV;
         changeState = true;
+        switchingCards = false;
     }
 
     return 1;
@@ -844,6 +847,7 @@ void TV::RunTV(void)
 
     ChannelClear();
 
+    switchingCards = false;
     runMainLoop = true;
     exitPlayer = false;
 
@@ -903,7 +907,7 @@ void TV::RunTV(void)
 
         if (exitPlayer)
         {
-            while(osd->DialogShowing(dialogname))
+            while (osd->DialogShowing(dialogname))
             {
                 osd->DialogAbort(dialogname);
                 usleep(500);
@@ -1390,6 +1394,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 ToggleChannelFavorite();
             else if (action == "TOGGLEINPUTS")
                 ToggleInputs();
+            else if (action == "SWITCHCARDS")
+                SwitchCards();
             else if (action == "SELECT")
                 ChannelCommit();
             else if (action == "MENU")
@@ -1886,6 +1892,15 @@ void TV::DoSkipCommercials(int direction)
 
     if (muted) 
         muteTimer->start(kMuteTimeout, true);
+}
+
+void TV::SwitchCards(void)
+{
+    if (internalState == kState_WatchingLiveTV)
+    {
+        switchingCards = true;
+        exitPlayer = true;
+    }
 }
 
 void TV::ToggleInputs(void)

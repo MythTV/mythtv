@@ -199,6 +199,21 @@ vector<ProgramInfo *> *RemoteGetConflictList(ProgramInfo *pginfo,
     return retlist;
 }
 
+RemoteEncoder *RemoteRequestNextFreeRecorder(int curr)
+{
+    QStringList strlist = "GET_NEXT_FREE_RECORDER";
+    strlist << QString("%1").arg(curr);
+
+    if (!gContext->SendReceiveStringList(strlist, true))
+        return NULL;
+
+    int num = strlist[0].toInt();
+    QString hostname = strlist[1];
+    int port = strlist[2].toInt();
+
+    return new RemoteEncoder(num, hostname, port);
+}
+
 RemoteEncoder *RemoteRequestRecorder(void)
 {
     QStringList strlist = "GET_FREE_RECORDER";

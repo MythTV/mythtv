@@ -280,6 +280,10 @@ void MainServer::ProcessRequest(QSocket *sock)
     {
         HandleGetFreeRecorder(pbs);
     }
+    else if (command == "GET_NEXT_FREE_RECORDER")
+    {
+        HandleGetNextFreeRecorder(listline, pbs);
+    }
     else if (command == "QUERY_RECORDER")
     {
         if (tokens.size() != 2)
@@ -1496,6 +1500,101 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
             retval = iter.key();
         }
     }
+
+    strlist << QString::number(retval);
+        
+    if (encoder)
+    {
+        if (encoder->isLocal())
+        {
+            strlist << gContext->GetSetting("BackendServerIP");
+            strlist << gContext->GetSetting("BackendServerPort");
+        }
+        else
+        {
+            strlist << gContext->GetSettingOnHost("BackendServerIP", 
+                                                  encoder->getHostname(),
+                                                  "nohostname");
+            strlist << gContext->GetSettingOnHost("BackendServerPort", 
+                                                  encoder->getHostname(), "-1");
+        }
+    }
+    else
+    {
+        strlist << "nohost";
+        strlist << "-1";
+    }
+
+    SendResponse(pbssock, strlist);
+}
+
+void MainServer::HandleGetNextFreeRecorder(QStringList &slist, 
+                                           PlaybackSock *pbs)
+{
+    QSocket *pbssock = pbs->getSocket();
+    QString pbshost = pbs->getHostname();
+
+    QStringList strlist;
+    int retval = -1;
+    int currrec = slist[1].toInt();
+
+    EncoderLink *encoder = NULL;
+    QString enchost;
+
+    VERBOSE(VB_ALL, QString("Getting next free recorder : %1").arg(currrec));
+
+    // find current recorder
+    QMap<int, EncoderLink *>::Iterator iter, curr = encoderList->find(currrec);
+
+    if (curr != encoderList->end())
+    {
+        // cycle through all recorders
+        for (iter = curr;;)
+        {
+            EncoderLink *elink;
+
+            // last item? go back
+            if (++iter == encoderList->end())
+            {
+                iter = encoderList->begin();
+            }
+
+            elink = iter.data();
+
+            if (elink->isLocal())
+                enchost = gContext->GetHostName();
+            else
+                enchost = elink->getHostname();
+
+            if ((enchost == pbshost) &&
+                (elink->isConnected()) &&
+                (!elink->IsBusy()) &&
+                (!elink->isTunerLocked()))
+            {
+                encoder = elink;
+                retval = iter.key(); 
+                break;
+            }
+            if ((retval == -1) &&
+                (elink->isConnected()) &&
+                (!elink->IsBusy()) &&
+                (!elink->isTunerLocked()))
+            {
+                encoder = elink;
+                retval = iter.key();
+            }
+
+            // cycled right through? no more available recorders
+            if (iter == curr) 
+                break;
+        }
+    } 
+    else 
+    {
+        HandleGetFreeRecorder(pbs);
+        return;
+    }
+
 
     strlist << QString::number(retval);
         

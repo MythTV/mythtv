@@ -54,6 +54,7 @@ class TV : public QObject
     bool IsPlaying(void) { return StateIsPlaying(GetState()); }
     bool IsRecording(void) { return StateIsRecording(GetState()); }
     bool IsMenuRunning(void) { return menurunning; }
+    bool IsSwitchingCards(void) { return switchingCards; }
 
     void GetNextProgram(RemoteEncoder *enc, int direction,
                         QMap<QString, QString> &infoMap);
@@ -127,6 +128,8 @@ class TV : public QObject
     void ChannelCommit(void);
 
     void ToggleInputs(void); 
+
+    void SwitchCards(void);
 
     void DoInfo(void);
     void DoPause(void);
@@ -284,6 +287,8 @@ class TV : public QObject
     int lastCCDir;
     bool showBufferedWarnings;
     int bufferedChannelThreshold;
+
+    bool switchingCards;
 };
 
 #endif

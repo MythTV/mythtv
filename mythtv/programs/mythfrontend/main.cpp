@@ -261,12 +261,20 @@ void startTV(void)
             qApp->lock();
         }
 
-        if (tv->WantsToQuit())
+        if (tv->WantsToQuit() && !tv->IsSwitchingCards())
             quitAll = true;
         else
         {
-            tryRecorder = true;
-            tryTV = false;
+            if (tv->IsSwitchingCards())
+            {
+                tryRecorder = false;
+                tryTV = true;
+            }
+            else
+            {
+                tryRecorder = true;
+                tryTV = false;
+            }
         }
     }
 
