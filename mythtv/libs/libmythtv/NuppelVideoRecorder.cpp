@@ -1225,10 +1225,20 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
     // compr ends here
     if (useavcodec)
     {
-        frameheader.comptype = '3' + (int)(mpa_codec->id);
-        frameheader.packetlength = tmp;
-        ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
-        ringBuffer->Write(strm, tmp);
+        if (mpa_codec->id == CODEC_ID_RAWVIDEO)
+        {
+            frameheader.comptype = '0';
+            frameheader.packetlength = video_buffer_size;
+            ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+            ringBuffer->Write(buf, video_buffer_size);
+        }
+        else
+        {
+            frameheader.comptype = '3' + (int)(mpa_codec->id);
+            frameheader.packetlength = tmp;
+            ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+            ringBuffer->Write(strm, tmp);
+        }
     }
     else if (compressthis == 0 || (tmp < out_len)) 
     {
