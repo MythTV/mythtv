@@ -43,7 +43,7 @@ setting to 5.
 
 The first time you run MythGame, it'll search out and insert all games that it
 finds into its database, so it may seem to take awhile.  Later runs should be
-fairly quick.  In the normal text-only selection interface, just navagate around
+fairly quick.  In the normal text-only selection interface, just navigate around
 with the arrow keys, and use space/enter to start a game.  Hitting 'e' on the
 game name will take you to a settings dialog, and hitting 'e' on the system
 name (ie, MAME), will take you to a system setup menu.  In the screenshot-based
