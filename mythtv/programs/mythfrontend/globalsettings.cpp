@@ -917,6 +917,17 @@ public:
     };
 };
 
+class GuiSizeForTV: public CheckBoxSetting, public GlobalSetting {
+public:
+    GuiSizeForTV() :
+        GlobalSetting("GuiSizeForTV") {
+        setLabel(QObject::tr("Use GUI size for TV playback"));
+        setValue(true);
+        setHelpText(QObject::tr("If checked, use the above size for TV. "
+                                "If unchecked, use full screen."));
+    };
+};
+
 class RunInWindow: public CheckBoxSetting, public GlobalSetting {
 public:
     RunInWindow():
@@ -1572,6 +1583,7 @@ AppearanceSettings::AppearanceSettings()
     screen->addChild(new GuiHeight());
     screen->addChild(new GuiOffsetX());
     screen->addChild(new GuiOffsetY());
+    screen->addChild(new GuiSizeForTV());
     screen->addChild(new RunInWindow());
     addChild(screen);
 

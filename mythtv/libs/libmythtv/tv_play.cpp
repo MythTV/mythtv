@@ -213,10 +213,25 @@ void TV::Init(bool createWindow)
 
     if (createWindow)
     {
-        myWindow = new MythDialog(gContext->GetMainWindow(), 
-                                  "video playback window");
+        MythMainWindow *mainWindow = gContext->GetMainWindow();
+        bool fullscreen = !gContext->GetNumSetting("GuiSizeForTV", 0);
+        if (fullscreen) 
+        {
+            mainWindow->setGeometry(0, 0, QApplication::desktop()->width(),
+                                    QApplication::desktop()->height());
+            mainWindow->setFixedSize(QSize(QApplication::desktop()->width(),
+                                           QApplication::desktop()->height()));
+        }
+        myWindow = new MythDialog(mainWindow, "video playback window");
         myWindow->installEventFilter(this);
         myWindow->setNoErase();
+        if (fullscreen) 
+        {
+            myWindow->setGeometry(0, 0, QApplication::desktop()->width(),
+                                  QApplication::desktop()->height());
+            myWindow->setFixedSize(QSize(QApplication::desktop()->width(),
+                                         QApplication::desktop()->height()));
+        }
         myWindow->show();
         myWindow->setBackgroundColor(Qt::black);
         qApp->processEvents();
@@ -245,7 +260,20 @@ TV::~TV(void)
     if (volumeControl)
         delete volumeControl;
     if (myWindow)
+    {
         delete myWindow;
+        bool fullscreen = !gContext->GetNumSetting("GuiSizeForTV", 0);
+        if (fullscreen) 
+        {
+            int xbase, width, ybase, height;
+            float wmult, hmult;
+            gContext->GetScreenSettings(xbase, width, wmult,
+                                        ybase, height, hmult);
+            MythMainWindow *mainWindow = gContext->GetMainWindow();
+            mainWindow->setGeometry(xbase, ybase, width, height);
+            mainWindow->setFixedSize(QSize(width, height));
+        }
+    }
     if (recorderPlaybackInfo)
         delete recorderPlaybackInfo;
 }
