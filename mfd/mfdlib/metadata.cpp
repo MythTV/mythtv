@@ -190,6 +190,7 @@ Playlist::Playlist(int l_collection_id, QString new_name, QString raw_songlist, 
     id = new_id;
     name = new_name;
 
+    raw_song_list = raw_songlist;
     QStringList list = QStringList::split(",",raw_songlist);
     QStringList::iterator it = list.begin();
     for (; it != list.end(); it++)
@@ -204,6 +205,7 @@ Playlist::Playlist(int l_collection_id, QString new_name, QString raw_songlist, 
     }
 
     internal_change = false;
+    waiting_for_list = false;
 }
 
 void Playlist::mapDatabaseToId(QIntDict<Metadata> *the_metadata)
@@ -216,7 +218,7 @@ void Playlist::mapDatabaseToId(QIntDict<Metadata> *the_metadata)
         QIntDictIterator<Metadata> md_it( *the_metadata );
         for ( ; md_it.current(); ++md_it )
         {
-            if((uint) md_it.current()->getId() == (*iter))
+            if((uint) md_it.current()->getDbId() == (*iter))
             {
                 which_one = md_it.current();
                 break;

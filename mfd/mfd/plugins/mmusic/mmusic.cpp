@@ -113,16 +113,13 @@ void MMusicWatcher::initialize()
     new_metadata->resize(9973);  // big prime
     metadata_additions.clear();
     metadata_deletions.clear();
-    previous_metadata.clear();
 
     new_playlists = new QIntDict<Playlist>;
-    previous_playlists.clear();
     playlist_additions.clear();
     playlist_deletions.clear();
-    internal_playlists = new QIntDict<Playlist>;
-    internal_playlists->setAutoDelete(true);
+    current_metadata_id = 1;
     
-    
+
     master_list.clear();
     latest_sweep.clear();
     files_to_ignore.clear();
@@ -134,7 +131,12 @@ void MMusicWatcher::initialize()
     metadata_container = 
         metadata_server->createContainer(MCCT_audio, MCLT_host);
     container_id = metadata_container->getIdentifier();
-    current_metadata_id = 0;
+    
+    //
+    //  load the playlists (only once, whenever we initialize)
+    //
+
+    loadPlaylists();
     
     //
     //  Fill our container with an empty set of metadata and an empty set of
@@ -148,7 +150,8 @@ void MMusicWatcher::initialize()
                                         metadata_deletions,
                                         new_playlists,
                                         playlist_additions,
-                                        playlist_deletions
+                                        playlist_deletions,
+                                        true
                                      );
                                      
     //
@@ -232,7 +235,8 @@ void MMusicWatcher::run()
                                                     metadata_deletions,
                                                     new_playlists,
                                                     playlist_additions,
-                                                    playlist_deletions
+                                                    playlist_deletions,
+                                                    true
                                                   );
                 
                 //
@@ -379,7 +383,7 @@ bool MMusicWatcher::sweepMetadata()
         build_file_list_timer.start();
         buildFileList(startdir, latest_sweep);
 
-        if(latest_sweep.count() < 1)
+        if(latest_sweep.count() < 1 && keep_going)
         {
             warning(QString("not updating music files as none were "
                             "found in \"%1\"")
@@ -399,7 +403,10 @@ bool MMusicWatcher::sweepMetadata()
         //  is not now in this new fast/complete sweep, it should go
         //
         
-        checkForDeletions(latest_sweep, startdir);
+        if(keep_going)
+        {
+            checkForDeletions(latest_sweep, startdir);
+        }
     }
    
 
@@ -407,7 +414,10 @@ bool MMusicWatcher::sweepMetadata()
     //  Now, we need to check our master list against the latest sweep
     //
     
-    compareToMasterList(latest_sweep, startdir);
+    if(keep_going)
+    {
+        compareToMasterList(latest_sweep, startdir);
+    }
 
 
     //
@@ -415,14 +425,15 @@ bool MMusicWatcher::sweepMetadata()
     //  with all the correct fields
     //
 
-    checkDatabaseAgainstMaster(startdir);
+    if(keep_going)
+    {
+        checkDatabaseAgainstMaster(startdir);
+    }
 
 
     //
-    //  We have some state of metadata now, before we go, update the playlists
+    //  If anything changed, return true and log it
     //
-    
-    updatePlaylists();
 
     if(
         metadata_additions.count() > 0 ||
@@ -618,8 +629,6 @@ void MMusicWatcher::removeAllMetadata()
     master_list.clear();
     latest_sweep.clear();
     files_to_ignore.clear();
-    internal_playlists->clear();
-    
     
 }
 
@@ -646,7 +655,7 @@ void MMusicWatcher::buildFileList(const QString &directory, MusicFileMap &music_
     QFileInfoListIterator it(*list);
     QFileInfo *fi;
 
-    while ((fi = it.current()) != 0)
+    while ((fi = it.current()) != 0 && keep_going)
     {
         ++it;
         if (fi->fileName() == "." || fi->fileName() == "..")
@@ -1352,16 +1361,10 @@ AudioMetadata* MMusicWatcher::getMetadataFromFile(QString file_path)
             return_value->setFormat(file_info.extension(false));
             return_value->setDateModified(QDateTime::currentDateTime());
         }
-        else
-        {
-            cout << "got decoder, but no metadata back" << endl;
-        }
+
         delete decoder;   
     }
-    else
-    {
-        cout << "got no decoder" << endl;
-    }
+
     return return_value;
 }
 
@@ -1390,88 +1393,57 @@ int MMusicWatcher::bumpMetadataId()
     return return_value;
 }
 
-void MMusicWatcher::updatePlaylists()
+
+void MMusicWatcher::loadPlaylists()
 {
+    //
+    //  This gets run only once at startup/initialization. It loads the
+    //  playlists. After that, it's the responsibility of the metadata
+    //  server and the container to handle changes to the playlist(s), and
+    //  deal with frontend/user interaction for changes to playlist(s).
+    //
 
-    //
-    //  If we have none, try and load some
-    //
-    
-    if(internal_playlists->count() < 1)
+
+    QSqlQuery query(NULL, db);
+    query.prepare("SELECT name, songlist, playlistid FROM musicplaylist "
+                  "WHERE name != ? "
+                  "AND name != ? "
+                  "AND hostname = ? ;");
+        
+    query.bindValue(0, "backup_playlist_storage");
+    query.bindValue(1, "default_playlist_storage");
+    query.bindValue(2, mfdContext->getHostName());
+        
+    query.exec();
+
+    if(query.isActive())
     {
-        QSqlQuery query(NULL, db);
-        query.prepare("SELECT name, songlist, playlistid FROM musicplaylist "
-                      "WHERE name != ? "
-                      "AND name != ? "
-                      "AND hostname = ? ;");
-        
-        query.bindValue(0, "backup_playlist_storage");
-        query.bindValue(1, "default_playlist_storage");
-        query.bindValue(2, mfdContext->getHostName());
-        
-        query.exec();
-
-
-        if(query.isActive())
+        if(query.numRowsAffected() > 0)
         {
-            if(query.numRowsAffected() > 0)
+            while(query.next())
             {
-                while(query.next())
-                {
-                    Playlist *new_playlist = new Playlist(
-                                                        -1,
+                Playlist *new_playlist = new Playlist(
+                                                        container_id,
                                                         query.value(0).toString(), 
                                                         query.value(1).toString(),
-                                                        query.value(2).toUInt()
-                                                         );
-                    new_playlist->internalChange(true);
-                    internal_playlists->insert(query.value(2).toUInt(), new_playlist);
-                }
-                log(QString("loaded %1 playlists from the database")
-                    .arg(internal_playlists->count()), 4);
+                                                        0
+                                                     );
+                new_playlist->setDbId(query.value(2).toUInt());
+                new_playlists->insert(query.value(2).toUInt(), new_playlist);
             }
+            log(QString("loaded %1 playlists from the database")
+                .arg(new_playlists->count()), 4);
         }
         else
         {
-            warning("fairly certain your playlist table is hosed ... not good");
-            return;
+            log("found no playlists (not a problem, db seems ok)", 5);
         }
     }
-
-    //
-    //  If we _still_ have no playlists, then there's nothing to do
-    //
-
-    if(internal_playlists->count() < 1)
+    else
     {
-        return;
+        warning("fairly certain your playlist table is hosed ... not good");
     }
-
-    
-    //
-    //  Get the playlists to refer to as much as they can, given that not
-    //  all the metadata may be loaded yet
-    //
-
-
-
-    //
-    //  Prepare data that will get swapped up to the metadata server
-    //
-
-    QIntDictIterator<Playlist> pl_it( *internal_playlists ); 
-    for ( ; pl_it.current(); ++pl_it )
-    {
-        if(pl_it.current()->internalChange())
-        {
-            pl_it.current()->internalChange(false);
-            
-        }
-    }
-    
-
 }
-
 
 MMusicWatcher::~MMusicWatcher()
 {
@@ -1486,10 +1458,4 @@ MMusicWatcher::~MMusicWatcher()
         delete new_playlists;
         new_playlists = NULL;
     }
-    if(internal_playlists)
-    {
-        delete internal_playlists;
-        internal_playlists = NULL;
-    }
-
 }

@@ -69,7 +69,8 @@ class MetadataServer : public MFDServicePlugin
                                                     QValueList<int> metadata_deletions,
                                                     QIntDict<Playlist>* new_playlists,
                                                     QValueList<int> playlist_additions,
-                                                    QValueList<int> playlist_deletions
+                                                    QValueList<int> playlist_deletions,
+                                                    bool rewrite_playlists = false
                                                  );
 
 
@@ -80,7 +81,8 @@ class MetadataServer : public MFDServicePlugin
                                                     QValueList<int> metadata_deletions,
                                                     QIntDict<Playlist>* new_playlists,
                                                     QValueList<int> playlist_additions,
-                                                    QValueList<int> playlist_deletions
+                                                    QValueList<int> playlist_deletions,
+                                                    bool rewrite_playlists = false
                                                  );
 
     int                         getLastDestroyedCollection();

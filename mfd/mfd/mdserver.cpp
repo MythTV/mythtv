@@ -560,7 +560,8 @@ void MetadataServer::doAtomicDataSwap(
                                         QValueList<int> metadata_deletions,
                                         QIntDict<Playlist>* new_playlists,
                                         QValueList<int> playlist_additions,
-                                        QValueList<int> playlist_deletions
+                                        QValueList<int> playlist_deletions,
+                                        bool rewrite_playlists
                                      )
 {
 
@@ -621,7 +622,8 @@ void MetadataServer::doAtomicDataSwap(
                                     metadata_deletions,
                                     new_playlists,
                                     playlist_additions,
-                                    playlist_deletions
+                                    playlist_deletions,
+                                    rewrite_playlists
                                     );
                            
                     new_metadata = NULL;
@@ -638,10 +640,10 @@ void MetadataServer::doAtomicDataSwap(
                                 .arg(metadata_deletions.count())
                                 
                                 .arg(target->getPlaylistCount())
-                                .arg(playlist_additions.count())
-                                .arg(playlist_deletions.count())
+                                .arg(target->getPlaylistAdditions().count())
+                                .arg(target->getPlaylistDeletions().count())
                                 ,4);
-
+                                
                     if(target->isLocal() && target->isAudio())
                     {
                         local_audio_metadata_count = 
@@ -673,7 +675,8 @@ void MetadataServer::doAtomicDataDelta(
                                         QValueList<int> metadata_deletions,
                                         QIntDict<Playlist>* new_playlists,
                                         QValueList<int> playlist_additions,
-                                        QValueList<int> playlist_deletions
+                                        QValueList<int> playlist_deletions,
+                                        bool rewrite_playlists
                                      )
 {
 
@@ -738,7 +741,8 @@ void MetadataServer::doAtomicDataDelta(
                                     metadata_deletions,
                                     new_playlists,
                                     playlist_additions,
-                                    playlist_deletions
+                                    playlist_deletions,
+                                    rewrite_playlists
                                     );
                                    
                     new_metadata = NULL;
@@ -754,8 +758,8 @@ void MetadataServer::doAtomicDataDelta(
                                 .arg(metadata_deletions.count())
                                 
                                 .arg(target->getPlaylistCount())
-                                .arg(playlist_additions.count())
-                                .arg(playlist_deletions.count())
+                                .arg(target->getPlaylistAdditions().count())
+                                .arg(target->getPlaylistDeletions().count())
                                 ,4);
 
                     if(target->isLocal() && target->isAudio())

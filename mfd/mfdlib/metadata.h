@@ -253,8 +253,12 @@ class Playlist
     ~Playlist();
 
     uint             getId(){return id;}
+    uint             getDbId(){return db_id;}
+    void             setId(int an_int){id = an_int;}
+    void             setDbId(int an_int){db_id = an_int;}
     uint             getUniversalId();
     QString          getName(){return name;}
+    QString          getRawSongList(){return raw_song_list;}
     uint             getCount(){return song_references.count();}
     QValueList<uint> getList(){return song_references;}
     void             addToList(int an_id);
@@ -271,9 +275,11 @@ class Playlist
     QValueList<uint> song_references;
     QValueList<uint> db_references;
     uint             id;
+    uint             db_id;
     uint             collection_id;
     bool             internal_change;
     bool             waiting_for_list;
+    QString          raw_song_list;
 };
 
 #endif

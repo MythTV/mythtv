@@ -1321,13 +1321,14 @@ void DaapServer::sendContainer(HttpRequest *http_request, u32 container_id, int 
                 << Tag('mrco') << (u32) how_many << end 
 
                 << Tag('mlcl');
-             
+                
                     //
                     //  For everthing inside this container
                     //
 
                     if(container_id != 1)
                     {
+                    
                         QValueList<uint> songs_in_list = the_playlist->getList();
                         QValueList<uint>::iterator iter;
                         for ( iter = songs_in_list.begin(); iter != songs_in_list.end(); ++iter )

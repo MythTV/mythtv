@@ -484,7 +484,7 @@ AudioMetadata* CdDecoder::getMetadata(int track)
     }
     retdata->setComment("Served by a Myth Box");
     retdata->setSampleRate(44100);
-    retdata->setBitrate((176400 * 8.0) / 1024);
+    retdata->setBitrate((176400 * 8) / 1024);
     retdata->setSize(size);
 
     cd_finish(cd);

@@ -76,7 +76,7 @@ class MMusicWatcher: public MFDServicePlugin
     bool            updateMetadata(AudioMetadata* an_item);
     AudioMetadata*  getMetadataFromFile(QString file_path);
     void            persistMetadata(AudioMetadata* an_item);
-    void            updatePlaylists();
+    void            loadPlaylists();
 
   private:
 
@@ -89,7 +89,6 @@ class MMusicWatcher: public MFDServicePlugin
 
     QIntDict<Metadata>  *new_metadata;
     QIntDict<Playlist>  *new_playlists;
-    QIntDict<Playlist>  *internal_playlists;
     
     MetadataServer      *metadata_server;
     MetadataContainer   *metadata_container;
@@ -102,9 +101,6 @@ class MMusicWatcher: public MFDServicePlugin
     
     QValueList<int>     playlist_additions;
     QValueList<int>     playlist_deletions;
-
-    QValueList<int>     previous_metadata;
-    QValueList<int>     previous_playlists;
 
     bool    sent_directory_warning;
     bool    sent_dir_is_not_dir_warning;
@@ -121,6 +117,7 @@ class MMusicWatcher: public MFDServicePlugin
 
     QMutex  current_metadata_id_mutex;
     int     current_metadata_id;
+    
 };
 
 

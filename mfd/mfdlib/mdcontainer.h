@@ -76,6 +76,7 @@ class MetadataContainer
 
     QValueList<int>     getMetadataAdditions(){return metadata_additions;}
     QValueList<int>     getMetadataDeletions(){return metadata_deletions;}
+    QValueList<int>     getPlaylistAdditions(){return playlist_additions;}
     QValueList<int>     getPlaylistDeletions(){return playlist_deletions;}
 
     void                dataSwap(   
@@ -84,7 +85,9 @@ class MetadataContainer
                                     QValueList<int> metadata_out,
                                     QIntDict<Playlist>* new_playlists,
                                     QValueList<int> playlist_in,
-                                    QValueList<int> playlist_out
+                                    QValueList<int> playlist_out,
+                                    bool rewrite_playlists = false
+                                    
                                 );
 
     void                dataDelta(   
@@ -93,7 +96,8 @@ class MetadataContainer
                                     QValueList<int> metadata_out,
                                     QIntDict<Playlist>* new_playlists,
                                     QValueList<int> playlist_in,
-                                    QValueList<int> playlist_out
+                                    QValueList<int> playlist_out,
+                                    bool rewrite_playlists = false
                                 );
 
     MetadataCollectionContentType  getContentType(){ return content_type;}
@@ -101,6 +105,14 @@ class MetadataContainer
 
  
   protected:
+
+    void    mapPlaylists(
+                            QIntDict<Playlist>* new_playlists, 
+                            QValueList<int> playlist_in,
+                            QValueList<int> playlist_out,
+                            bool delta
+                        );
+    int     bumpPlaylistId(){current_playlist_id++; return current_playlist_id;}
   
     MFD *parent;
     int unique_identifier;
@@ -117,6 +129,8 @@ class MetadataContainer
     QDeepCopy<QValueList<int> > playlist_deletions;
     
     QString my_name;
+    
+    int                         current_playlist_id;
 };
 
 #endif
