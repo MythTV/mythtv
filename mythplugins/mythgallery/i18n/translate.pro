@@ -2,7 +2,7 @@ SOURCES += ../mythgallery/gallerysettings.cpp
 SOURCES += ../mythgallery/iconview.cpp
 SOURCES += ../mythgallery/iconview.h
 SOURCES += ../mythgallery/main.cpp
-SOURCES += ../mythgallery/mythgallery.pro
+#SOURCES += ../mythgallery/mythgallery.pro
 SOURCES += ../mythgallery/singleview.cpp
 SOURCES += ../mythgallery/singleview.h
 

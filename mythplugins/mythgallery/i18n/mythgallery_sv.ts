@@ -1,11 +1,6 @@
 <!DOCTYPE TS><TS>
-<defaultcodec>iso8859-1</defaultcodec>
 <context>
     <name>IconView</name>
-    <message>
-        <source>Caching thumbnails...</source>
-        <translation type="obsolete">Skapar bilder för förhandsvisning...</translation>
-    </message>
     <message>
         <source>Import pictures?</source>
         <translation>Importera bilder?</translation>
@@ -90,10 +85,6 @@
         <translation>Detta sätter bakgrunden som används för varje bild vid visning av enstaka bilder.</translation>
     </message>
     <message>
-        <source>SlideshowDelay</source>
-        <translation type="obsolete">Visningstid vid bildspel</translation>
-    </message>
-    <message>
         <source>This is the number of seconds to display each picture.</source>
         <translation>Detta är antalet sekunder som varje bild visas i ett bildspel.</translation>
     </message>
@@ -133,10 +124,6 @@
 <context>
     <name>SingleView</name>
     <message>
-        <source>Filename: </source>
-        <translation type="obsolete">Filnamn:</translation>
-    </message>
-    <message>
         <source>Created: </source>
         <translation>Skapad:</translation>
     </message>
@@ -175,10 +162,6 @@
     <message>
         <source>degrees</source>
         <translation>grader</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
     </message>
     <message>
         <source>Folder: </source>

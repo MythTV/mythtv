@@ -2,10 +2,6 @@
 <context>
     <name>IconView</name>
     <message>
-        <source>Caching thumbnails...</source>
-        <translation type="obsolete">Inladen miniaturen</translation>
-    </message>
-    <message>
         <source>Import pictures?</source>
         <translation>Foto&apos;s importeren?</translation>
     </message>
@@ -27,31 +23,31 @@
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Fout</translation>
     </message>
     <message>
         <source>Sorry: OpenGL support not available</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen OpenGL ondersteuning aanwezig</translation>
     </message>
     <message>
         <source>SlideShow</source>
-        <translation type="unfinished"></translation>
+        <translation>Diashow</translation>
     </message>
     <message>
         <source>Rotate CW</source>
-        <translation type="unfinished"></translation>
+        <translation>Draai WZ</translation>
     </message>
     <message>
         <source>Rotate CCW</source>
-        <translation type="unfinished"></translation>
+        <translation>Draai TWZ</translation>
     </message>
     <message>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Importeren</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Instellingen</translation>
     </message>
 </context>
 <context>
@@ -86,43 +82,43 @@
     </message>
     <message>
         <source>This is a colon separated list of paths. If the path in the list is a directory, its contents will be copied. If it is an executable, it will be run.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geef hier de lijst van mappen vanwaar u wil importeren. Als je hier een script ingeeft wordt dit uitgevoerd.</translation>
     </message>
     <message>
         <source>This is the type of transition used between pictures in slideshow mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit is het overganstype dat gebruikt wordt in diashow mode.</translation>
     </message>
     <message>
         <source>This is the type of background for each picture in single view mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit is het type achtergrond voor elke foto.</translation>
     </message>
     <message>
         <source>Slideshow Delay</source>
-        <translation type="unfinished"></translation>
+        <translation>Diashow pausetijd</translation>
     </message>
     <message>
         <source>Use OpenGL transitions</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruik OpenGL overgang</translation>
     </message>
     <message>
         <source>Check this to enable OpenGL based slideshow transitions</source>
-        <translation type="unfinished"></translation>
+        <translation>Vink dit aan om de OpenGL overgangen te kunnen gebruiken</translation>
     </message>
     <message>
         <source>Type of OpenGL transition</source>
-        <translation type="unfinished"></translation>
+        <translation>Type OpenGL overgang</translation>
     </message>
     <message>
         <source>This is the type of OpenGL transition used between pictures in slideshow mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit is het type OpenGL overgang die gebruikt wordt in diashow mode.</translation>
     </message>
     <message>
         <source>Gallery Directory does not exist or is unreadable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fotomap bestaat niet of is onleesbaar.</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -148,10 +144,6 @@
         <translation>Draaihoek</translation>
     </message>
     <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
         <source>pixels</source>
         <translation>punten</translation>
     </message>
@@ -164,10 +156,6 @@
         <translation>graden</translation>
     </message>
     <message>
-        <source>Filename: </source>
-        <translation type="obsolete">Bestandsnaam: </translation>
-    </message>
-    <message>
         <source>Created: </source>
         <translation>Gemaakt: </translation>
     </message>
@@ -177,7 +165,7 @@
     </message>
     <message>
         <source>Folder: </source>
-        <translation type="unfinished"></translation>
+        <translation>Map: </translation>
     </message>
 </context>
 </TS>

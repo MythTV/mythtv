@@ -2,10 +2,6 @@
 <context>
     <name>IconView</name>
     <message>
-        <source>Caching thumbnails...</source>
-        <translation type="obsolete">Preparando previsualizaciones...</translation>
-    </message>
-    <message>
         <source>Import pictures?</source>
         <translation>¿Importar imágenes?</translation>
     </message>
@@ -97,10 +93,6 @@
         <translation>Tipo de fondo a emplear para cada imagen en modo individual.</translation>
     </message>
     <message>
-        <source>SlideshowDelay</source>
-        <translation type="obsolete">Pausa en presentación</translation>
-    </message>
-    <message>
         <source>Slideshow Delay</source>
         <translation>Tiempo de espera</translation>
     </message>
@@ -162,10 +154,6 @@
     <message>
         <source>degrees</source>
         <translation>grados</translation>
-    </message>
-    <message>
-        <source>Filename: </source>
-        <translation type="obsolete">Fichero:</translation>
     </message>
     <message>
         <source>Created: </source>

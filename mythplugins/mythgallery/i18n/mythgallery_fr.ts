@@ -2,10 +2,6 @@
 <context>
     <name>IconView</name>
     <message>
-        <source>Caching thumbnails...</source>
-        <translation type="obsolete">Mise en cache des miniatures</translation>
-    </message>
-    <message>
         <source>Import pictures?</source>
         <translation>Importer des images ?</translation>
     </message>
@@ -148,10 +144,6 @@
         <translation>Angle de rotation</translation>
     </message>
     <message>
-        <source>OK</source>
-        <translation type="obsolete">Ok</translation>
-    </message>
-    <message>
         <source>pixels</source>
         <translation type="unfinished"></translation>
     </message>
@@ -162,10 +154,6 @@
     <message>
         <source>degrees</source>
         <translation>degrées</translation>
-    </message>
-    <message>
-        <source>Filename: </source>
-        <translation type="obsolete">Nom de fichier:</translation>
     </message>
     <message>
         <source>Created: </source>

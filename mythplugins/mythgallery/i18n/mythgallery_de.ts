@@ -2,10 +2,6 @@
 <context>
     <name>IconView</name>
     <message>
-        <source>Caching thumbnails...</source>
-        <translation type="obsolete">Cache Vorschaubilder...</translation>
-    </message>
-    <message>
         <source>Import pictures?</source>
         <translation>Bilder importieren?</translation>
     </message>
@@ -148,10 +144,6 @@
         <translation>Drehwinkel</translation>
     </message>
     <message>
-        <source>OK</source>
-        <translation type="obsolete">Ok</translation>
-    </message>
-    <message>
         <source>pixels</source>
         <translation>pixel</translation>
     </message>
@@ -162,10 +154,6 @@
     <message>
         <source>degrees</source>
         <translation>Grad</translation>
-    </message>
-    <message>
-        <source>Filename: </source>
-        <translation type="obsolete">Dateiname:</translation>
     </message>
     <message>
         <source>Created: </source>

@@ -2,10 +2,6 @@
 <context>
     <name>IconView</name>
     <message>
-        <source>Caching thumbnails...</source>
-        <translation type="obsolete">Preparant previsualitzacions...</translation>
-    </message>
-    <message>
         <source>Import pictures?</source>
         <translation>Importar imatges?</translation>
     </message>
@@ -97,10 +93,6 @@
         <translation>És el tipus de fons per a cada imatge en el mode de una sola imatge.</translation>
     </message>
     <message>
-        <source>SlideshowDelay</source>
-        <translation type="obsolete">Espera en Presentació</translation>
-    </message>
-    <message>
         <source>Slideshow Delay</source>
         <translation>Temps d&apos;espera</translation>
     </message>
@@ -162,10 +154,6 @@
     <message>
         <source>degrees</source>
         <translation>graus</translation>
-    </message>
-    <message>
-        <source>Filename: </source>
-        <translation type="obsolete">Nom d&apos;arxiu:</translation>
     </message>
     <message>
         <source>Created: </source>
