@@ -1388,7 +1388,15 @@ void TV::ChannelCommit(void)
     if (!channelqueued)
         return;
 
-    QString chan = channelKeys;
+    for (int i = 0; i < channelkeysstored; i++)
+    {
+        if (channelKeys[i] == '0')
+            channelKeys[i] = ' ';
+        else
+            break;
+    }
+
+    QString chan = QString(channelKeys).stripWhiteSpace();
     ChangeChannelByString(chan);
 
     channelqueued = false;
