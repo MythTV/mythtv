@@ -432,7 +432,6 @@ void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs)
     if (statfs(recordfileprefix.ascii(), &statbuf) == 0) {
         totalspace = statbuf.f_blocks / (1024*1024/statbuf.f_bsize);
         usedspace = (statbuf.f_blocks - statbuf.f_bfree) / (1024*1024/statbuf.f_bsize);
-        cout << "totalspace: " << totalspace << " usedspace: " << usedspace << endl;
     }
 
     QStringList strlist;
