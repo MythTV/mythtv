@@ -18,6 +18,18 @@ void RomInfo::setField(QString field, QString data)
         genre = data;
     else if (field == "year")
         year = data.toInt();
+    else if (field == "favorite")
+        favorite = data.toInt();
+}
+
+void RomInfo::setFavorite(QSqlDatabase *db)
+{
+    favorite = 1 - favorite;
+
+    QString thequery = QString("UPDATE gamemetadata SET favorite=\"%1\" WHERE "
+                               "romname=\"%2\";").arg(favorite).arg(romname);
+
+    db->exec(thequery);
 }
 
 void RomInfo::fillData(QSqlDatabase *db)
@@ -27,7 +39,7 @@ void RomInfo::fillData(QSqlDatabase *db)
         return;
     }
 
-    QString thequery = "SELECT system,gamename,genre,year,romname"
+    QString thequery = "SELECT system,gamename,genre,year,romname,favorite"
                        " FROM gamemetadata WHERE gamename=\"" + gamename + "\"";
 
     if (system != "")
@@ -46,6 +58,7 @@ void RomInfo::fillData(QSqlDatabase *db)
         genre = query.value(2).toString();
         year = query.value(3).toInt();
         romname = query.value(4).toString();
+        favorite = query.value(5).toInt();
     }
 }
 

@@ -82,6 +82,7 @@ class GameTree : public MythThemedDialog
     void goRight(void);
     void FillListFrom(GameTreeItem *item);
     void edit(void);
+    void toggleFavorite(void);
 
     QString getClause(QString field, GameTreeItem *item);
 
@@ -97,11 +98,13 @@ class GameTree : public MythThemedDialog
 
     QString m_paths;
     QStringList m_pathlist;
+    QString showfavs;
 
     UITextType  *game_title;
     UITextType  *game_system;
     UITextType  *game_year;
     UITextType  *game_genre;
+    UITextType  *game_favorite;
     UIImageType *game_shot;
 };
 

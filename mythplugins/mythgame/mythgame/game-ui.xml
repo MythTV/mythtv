@@ -127,6 +127,19 @@
         <font>infofont</font>
       </textarea>
 
+      <textarea name="favorite" draworder="6">
+        <area>13,170,150,35</area>
+        <font>infofont</font>
+        <value>Favorite:</value>
+        <value lang="PT">Género:</value>
+        <value lang="SV">Genre:</value>
+      </textarea>
+
+      <textarea name="showfavorite" draworder="6">
+        <area>153,170,500,35</area>
+        <font>infofont</font>
+      </textarea>
+
       <image name="gameimage" draworder="6" fleximage="no">
           <position>535,25</position>
           <staticsize>180,150</staticsize>

@@ -19,6 +19,7 @@ GameTree::GameTree(MythMainWindow *parent, QSqlDatabase *ldb,
     db = ldb;
     m_paths = paths;
     m_pathlist = QStringList::split(" ", m_paths);
+    showfavs = gContext->GetSetting("GameShowFavorites");
 
     wireUpTheme();
 
@@ -44,6 +45,7 @@ void GameTree::keyPressEvent(QKeyEvent *e)
             game_tree_list->select(); break;
 
         case Key_E: edit(); break;
+        case Key_Question: case Key_Slash: toggleFavorite(); break;
 
         case Key_Up: game_tree_list->moveUp(); break;
         case Key_Down: game_tree_list->moveDown(); break;
@@ -51,7 +53,7 @@ void GameTree::keyPressEvent(QKeyEvent *e)
         case Key_Right: goRight(); break;
         case Key_PageUp: game_tree_list->pageUp(); break;
         case Key_PageDown: game_tree_list->pageDown(); break;
-          
+
         default: MythThemedDialog::keyPressEvent(e); break;
     }
 }
@@ -106,6 +108,7 @@ void GameTree::handleTreeListEntry(int node_int, IntVector *)
     game_system->SetText("");
     game_year->SetText("");
     game_genre->SetText("");
+    game_favorite->SetText("");
 
     if (node_int > 0)
     {
@@ -137,8 +140,14 @@ void GameTree::handleTreeListEntry(int node_int, IntVector *)
             else if (*field == "genre")
                 game_genre->SetText(curitem->rominfo->Genre());
             else if (*field == "gamename")
+            {
                 game_title->SetText(curitem->rominfo->Gamename());
-        } 
+                if (curitem->rominfo->Favorite())
+                    game_favorite->SetText("Yes");
+                else
+                    game_favorite->SetText("No");
+            }
+        }
     }
     else
         curitem = NULL;
@@ -183,6 +192,21 @@ void GameTree::edit(void)
         GameHandler::EditSettings(curitem->rominfo);
 }
 
+void GameTree::toggleFavorite(void)
+{
+    if (!curitem)
+        return;
+
+    if (curitem->level == "gamename" && curitem->isleaf)
+    {
+        curitem->rominfo->setFavorite(db);
+        if (curitem->rominfo->Favorite())
+            game_favorite->SetText("Yes");
+        else
+            game_favorite->SetText("No");
+    }
+}
+
 void GameTree::FillListFrom(GameTreeItem *item)
 {
     QString whereClause;
@@ -202,6 +226,9 @@ void GameTree::FillListFrom(GameTreeItem *item)
             break;
         }
     }
+    
+    if (showfavs == "1")
+      whereClause += " AND favorite=1";
 
     QString thequery = QString("SELECT DISTINCT %1 FROM gamemetadata "
                                "WHERE %2 ORDER BY %3;")
@@ -314,9 +341,15 @@ void GameTree::wireUpTheme(void)
     }
 
     game_genre = getUITextType("genrename");
-    if (!game_title)
+    if (!game_genre)
     {
         cerr << "gametree.o: Couldn't find a text area genrename\n";
+    }
+
+    game_favorite = getUITextType("showfavorite");
+    if (!game_favorite)
+    {
+        cerr << "gametree.o: Couldn't find a text area showfavorite\n";
     }
 
     game_shot = getUIImageType("gameimage");

@@ -9,13 +9,14 @@ class RomInfo
 {
   public:
     RomInfo(QString lromname = "", QString lsystem = "", QString lgamename ="",
-            QString lgenre = "", int lyear = 0)
+            QString lgenre = "", int lyear = 0, bool lfavorite = FALSE)
             {
                 romname = lromname;
                 system = lsystem;
                 gamename = lgamename;
                 genre = lgenre;
                 year = lyear;
+                favorite = lfavorite;
             }
     RomInfo(const RomInfo &lhs)
             {
@@ -24,6 +25,7 @@ class RomInfo
                 gamename = lhs.gamename;
                 genre = lhs.genre;
                 year = lhs.year;
+                favorite = lhs.favorite;
             }
     virtual ~RomInfo() {}
 
@@ -42,6 +44,9 @@ class RomInfo
     int Year() { return year; }
     void setYear(int lyear) { year = lyear; }
 
+    int Favorite() { return favorite; }
+    virtual void setFavorite(QSqlDatabase *db);
+
     virtual void setField(QString field, QString data);
     virtual void fillData(QSqlDatabase *db);
 
@@ -55,6 +60,7 @@ class RomInfo
     QString gamename;
     QString genre;
     int year;
+    bool favorite;
 };
 
 bool operator==(const RomInfo& a, const RomInfo& b);

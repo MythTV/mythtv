@@ -20,6 +20,17 @@ public:
     };
 };
 
+class GameShowFavorites: public CheckBoxSetting, public GlobalSetting {
+public:
+    GameShowFavorites():
+        GlobalSetting("GameShowFavorites") {
+        setLabel(QObject::tr("Show Only Favorites"));
+        setValue(false);
+        setHelpText(QObject::tr("Limit games listed to only those tagged "
+                    "as \"favorite\""));
+    };
+};
+
 class MameBinary: public LineEditSetting, public GlobalSetting {
 public:
     MameBinary():
@@ -232,6 +243,7 @@ MythGameSettings::MythGameSettings()
     VerticalConfigurationGroup *general = new VerticalConfigurationGroup(false);
     general->setLabel(QObject::tr("MythGame Settings -- General"));
     general->addChild(new GameTreeLevels());
+    general->addChild(new GameShowFavorites());
     addChild(general);
 
     VerticalConfigurationGroup *mame = new VerticalConfigurationGroup(false);
