@@ -93,6 +93,14 @@
 -->
 
    <button>
+      <type>TV_CUSTOM_RECORD</type>
+      <text>Custom Record</text>
+      <text lang="SV">Avancerad</text>
+      <text lang="JA">カスタム録画</text>
+      <action>TV_CUSTOM_RECORD</action>
+   </button>
+
+   <button>
       <type>TV_MANUAL_SCHEDULE</type>
       <text>Manual Schedule</text>
       <text lang="ES">Programar Grabaciones</text>
