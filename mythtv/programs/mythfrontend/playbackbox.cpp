@@ -39,6 +39,8 @@ PlaybackBox::PlaybackBox(TV *ltv, QSqlDatabase *ldb, QWidget *parent,
     tv = ltv;
     db = ldb;
 
+    title = NULL;
+
     setGeometry(0, 0, 800, 600);
     setFixedWidth(800);
     setFixedHeight(600);
@@ -69,6 +71,8 @@ PlaybackBox::PlaybackBox(TV *ltv, QSqlDatabase *ldb, QWidget *parent,
             SLOT(selected(QListViewItem *)));
     connect(listview, SIGNAL(spacePressed(QListViewItem *)), this,
             SLOT(selected(QListViewItem *))); 
+    connect(listview, SIGNAL(selectionChanged(QListViewItem *)), this,
+            SLOT(changed(QListViewItem *)));
 
     vbox->addWidget(listview, 1);
 
@@ -102,6 +106,33 @@ PlaybackBox::PlaybackBox(TV *ltv, QSqlDatabase *ldb, QWidget *parent,
     {
         // TODO: no recordings
     }
+   
+    listview->setFixedHeight(300);
+
+    QGridLayout *grid = new QGridLayout(vbox, 4, 2, 1);
+    
+    title = new QLabel(" ", this);
+    title->setFont(QFont("Arial", 25, QFont::Bold));
+
+    QLabel *datelabel = new QLabel("Airdate: ", this);
+    date = new QLabel(" ", this);
+
+    QLabel *sublabel = new QLabel("Episode: ", this);
+    subtitle = new QLabel(" ", this);
+    QLabel *desclabel = new QLabel("Description: ", this);
+    description = new QLabel(" ", this);
+    description->setAlignment(Qt::WordBreak | Qt::AlignLeft | Qt::AlignTop);
+ 
+    grid->addMultiCellWidget(title, 0, 0, 0, 1, Qt::AlignLeft);
+    grid->addWidget(datelabel, 1, 0, Qt::AlignLeft);
+    grid->addWidget(date, 1, 1, Qt::AlignLeft);
+    grid->addWidget(sublabel, 2, 0, Qt::AlignLeft | Qt::AlignTop);
+    grid->addWidget(subtitle, 2, 1, Qt::AlignLeft | Qt::AlignTop);
+    grid->addWidget(desclabel, 3, 0, Qt::AlignLeft | Qt::AlignTop);
+    grid->addWidget(description, 3, 1, Qt::AlignLeft | Qt::AlignTop);
+    
+    grid->setColStretch(1, 1);
+    grid->setRowStretch(3, 1);
 
     listview->setCurrentItem(listview->firstChild());
 }
@@ -109,6 +140,37 @@ PlaybackBox::PlaybackBox(TV *ltv, QSqlDatabase *ldb, QWidget *parent,
 void PlaybackBox::Show()
 {
     showFullScreen();
+}
+
+void PlaybackBox::changed(QListViewItem *lvitem)
+{
+    ProgramListItem *pgitem = (ProgramListItem *)lvitem;
+    if (!pgitem)
+        return;
+   
+    if (!title)
+        return;
+
+    ProgramInfo *rec = pgitem->getProgramInfo();
+
+    QDateTime startts = rec->startts;
+    QDateTime endts = rec->endts;
+        
+    QString timedate = endts.date().toString("ddd MMMM d") + QString(", ") +
+                       startts.time().toString("h:mm AP") + QString(" - ") +
+                       endts.time().toString("h:mm AP");
+        
+    date->setText(timedate);
+
+    title->setText(rec->title);
+    if (rec->subtitle != "(null)")
+        subtitle->setText(rec->subtitle);
+    else
+        subtitle->setText("");
+    if (rec->description != "(null)")
+        description->setText(rec->description);
+    else
+        description->setText("");
 }
 
 void PlaybackBox::selected(QListViewItem *lvitem)

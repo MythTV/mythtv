@@ -4,10 +4,9 @@
 #include <qwidget.h>
 #include <qdialog.h>
 
-class QVBoxLayout;
-class QButtonGroup;
 class QSqlDatabase;
 class QListViewItem;
+class QLabel;
 class TV;
 
 class PlaybackBox : public QDialog
@@ -21,10 +20,16 @@ class PlaybackBox : public QDialog
   
   protected slots:
     void selected(QListViewItem *);
+    void changed(QListViewItem *);
 
   private:
     QSqlDatabase *db;
     TV *tv;
+
+    QLabel *title;
+    QLabel *subtitle;
+    QLabel *description;
+    QLabel *date;
 };
 
 #endif
