@@ -10,6 +10,9 @@
 
 */
 
+#include <iostream>
+using namespace std;
+
 #include <qobject.h>
 #include <qsqldatabase.h>
 #include <qstringlist.h>
@@ -32,6 +35,10 @@ class MFD : public QObject
   
     MFD(QSqlDatabase *db, int port, bool log_stdout, int logging_verbosity);
     ~MFD();
+    
+    void shallowPrintHello(){cout << "This is a shallow hello from the mfd" << endl;}
+    void deepPrintHello();
+    
     
   public slots:
   

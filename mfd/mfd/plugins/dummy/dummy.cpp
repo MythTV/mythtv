@@ -28,6 +28,18 @@ Dummy::Dummy(MFD *owner, int identity)
 
     log("a dummy plugin is being created", 10);
 
+    //
+    //  Chutt?
+    //
+    //  Uncomment the first, all is ok.
+    //  Uncomment the second, all hell breaks out
+    //
+   
+    // owner->shallowPrintHello();
+    // owner->deepPrintHello();
+   
+    
+
 }
 
 void Dummy::doSomething(const QStringList &tokens, int socket_identifier)

@@ -18,6 +18,12 @@
 #include "events.h"
 
 
+void MFD::deepPrintHello()
+{
+    cout << "This is a deep hello from the mfd " << endl;
+}
+
+
 MFD::MFD(QSqlDatabase *ldb, int port, bool log_stdout, int logging_verbosity)
     :QObject()
 {
