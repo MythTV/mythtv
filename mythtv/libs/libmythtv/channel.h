@@ -27,6 +27,7 @@ class Channel : public ChannelBase
     bool ChannelUp(void);
     bool ChannelDown(void);
 
+    bool CheckSignalFull(void);
     bool CheckSignal(int msecWait = 5000, 
                      int requiredSignalPercentage = 65,
                      int input = 0);

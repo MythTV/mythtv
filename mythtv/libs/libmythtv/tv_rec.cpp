@@ -46,6 +46,7 @@ TVRec::TVRec(int capturecardnum)
     db_conn = NULL;
     channel = NULL;
     rbuffer = NULL;
+    encode = static_cast<pthread_t>(0);
     nvr = NULL;
     readthreadSock = NULL;
     readthreadlive = false;
@@ -496,7 +497,7 @@ void TVRec::HandleStateChange(void)
             bool success = channel->Open();
             if (success)
             {
-                success = channel->SetChannelByString(channel->GetCurrentName());
+                success = channel->CheckSignalFull();
                 if (!success)
                 {
                     VERBOSE(VB_IMPORTANT, "Signal level too low?");
@@ -655,7 +656,9 @@ void TVRec::TeardownRecorder(bool killFile)
         if (prevRecording && !killFile)
             nvr->GetBlankFrameMap(blank_frame_map);
 
-        pthread_join(encode, NULL);
+        if (encode)
+            pthread_join(encode, NULL);
+        encode = static_cast<pthread_t>(0);
         delete nvr;
     }
     nvr = NULL;

@@ -524,6 +524,21 @@ bool Channel::TuneTo(const QString &channum, int finetune)
     return TuneToFrequency(frequency);
 }
 
+bool Channel::CheckSignalFull(void)
+{
+    int signalThresholdWait = 5000;
+    int signalThreshold = 65;
+    if (usingstrength)
+    {
+        signalThresholdWait = gContext->GetNumSetting("ATSCCheckSignalWait",
+                                                      5000);
+        signalThreshold = gContext->GetNumSetting("ATSCCheckSignalThreshold",
+                                                  65);
+    }
+
+    return CheckSignal(signalThresholdWait, signalThreshold, currentcapchannel);
+}
+
 bool Channel::TuneToFrequency(int frequency)
 {
     VERBOSE(VB_CHANNEL, QString("TuneToFrequency(%1)").arg(frequency));

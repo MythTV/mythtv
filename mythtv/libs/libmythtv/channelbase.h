@@ -31,6 +31,7 @@ class ChannelBase
     virtual bool ChannelUp(void);
     virtual bool ChannelDown(void);
     virtual bool NextFavorite(void);
+    virtual bool CheckSignalFull(void) { return true; }
     virtual bool CheckSignal(int /*msecWait = 5000*/, 
                              int /*requiredSignalPercentage = 70*/,
                              int /*input = 0*/) { return true; }
