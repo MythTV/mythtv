@@ -128,7 +128,7 @@ void VolumeControl::SetMute(bool on)
     }
     else
     {
-        realvol = internal_volume;
+        realvol = (internal_volume << 8) + internal_volume;
     }
     if (mixerfd > 0)
     {
