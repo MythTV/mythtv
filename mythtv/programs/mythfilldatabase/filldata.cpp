@@ -2700,7 +2700,8 @@ void clearOldDBEntries(void)
 
     querystr.sprintf("REPLACE INTO oldprogram (oldtitle,airdate) "
                      "SELECT title,starttime FROM program "
-                     "WHERE starttime < NOW() group by title;");
+                     "WHERE starttime < NOW() AND manualid = 0 "
+                     "GROUP BY title;");
     query.exec(querystr);
 
     querystr.sprintf("DELETE FROM program WHERE starttime <= "

@@ -491,12 +491,15 @@ void ChannelRecPriority::SortList()
 
     switch(sortType) 
     {
-        case byChannel : sort(sortedList.begin(), sortedList.end(), 
-                              channelSort());
-                         break;
-        case byRecPriority : sort(sortedList.begin(), sortedList.end(), 
-                           channelRecPrioritySort());
-                      break;
+        case byRecPriority:
+            sort(sortedList.begin(), sortedList.end(), 
+            channelRecPrioritySort());
+            break;
+        case byChannel:
+        default:
+            sort(sortedList.begin(), sortedList.end(), 
+            channelSort());
+            break;
     }
 
     channelData.clear();

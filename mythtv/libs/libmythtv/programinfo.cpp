@@ -2402,10 +2402,8 @@ void ProgramInfo::showDetails(QSqlDatabase *db)
     {
         query.prepare("SELECT role,people.name from credits"
                       " LEFT JOIN people ON credits.person = people.person"
-                      " LEFT JOIN program ON credits.chanid = program.chanid"
-                      " AND credits.starttime = program.starttime"
-                      " WHERE program.chanid = :CHANID"
-                      " AND program.starttime = :STARTTIME ORDER BY role;");
+                      " WHERE credits.chanid = :CHANID"
+                      " AND credits.starttime = :STARTTIME ORDER BY role;");
         query.bindValue(":CHANID", chanid);
         query.bindValue(":STARTTIME", startts.toString(Qt::ISODate));
 

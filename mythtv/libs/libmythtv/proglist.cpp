@@ -1290,7 +1290,8 @@ void ProgLister::fillItemList(void)
                         "  oldprogram.oldtitle = program.title "
                         "WHERE channel.visible = 1 "
                         "  AND program.endtime > %1 "
-                        "  AND oldprogram.oldtitle IS NULL ")
+                        "  AND oldprogram.oldtitle IS NULL "
+                        "  AND program.manualid = 0 ")
                         .arg(startstr);
 
         if (qphrase == "movies")
