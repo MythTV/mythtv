@@ -583,9 +583,28 @@ void SipMsg::decodeXpidf(QString content)
         QDomElement e = n.toElement();
         if (!e.isNull())
         {
-            cout << "XPIDF tag " << e.tagName() << endl;
+            if (e.tagName() == "address")
+            {
+                QString uri = e.attribute("uri");
+                cout << "Tag: address = " << uri << endl;
+            }
+            if (e.tagName() == "status")
+            {
+                QString status = e.attribute("status");
+                cout << "Tag: status = " << status << endl;
+            }
+            if (e.tagName() == "msnsubstatus")
+            {
+                QString substatus = e.attribute("substatus");
+                cout << "Tag: substatus = " << substatus << endl;
+            }
         }
-        n = n.nextSibling();
+        QDomNode nextNode = n.firstChild();
+        if (nextNode.isNull())
+            nextNode = n.nextSibling();
+        if (nextNode.isNull())
+            nextNode = n.parentNode().nextSibling();
+        n = nextNode;
     }
 }
 
@@ -762,7 +781,7 @@ SipCallId::~SipCallId()
 void SipCallId::Generate(QString ip)
 {
     QString now = (QDateTime::currentDateTime()).toString("hhmmsszzz-ddMMyyyy");
-    thisCallid = QString::number(callIdEnumerator,16) + "-" + now + "@" + ip;
+    thisCallid = QString::number(callIdEnumerator++,16) + "-" + now + "@" + ip;
 }
 
 bool SipCallId::operator== (SipCallId &rhs) 
