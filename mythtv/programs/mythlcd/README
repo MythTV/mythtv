@@ -1,0 +1,73 @@
+This is the README file for the MythLCD package.
+September 19, 2002
+
+Version: 0.1
+(c) 2002 Thor Sigvaldason (mythtv@lamedomainname.com) 
+and Isaac Richards (ijr@po.cwru.edu)
+
+
+MythLCD is distributed under the GNU GENERAL PUBLIC LICENSE version 2 (see
+http://www.gnu.org)
+
+
+
+Contents
+========
+
+
+1.0	About
+2.0	Installation
+3.0	FAQs
+4.0	Plans/TODO
+
+
+
+1.0 About
+=========
+
+	MythLCD is essentially a single C++ object which can act as an
+LCDproc client for MythTV applications. That means that data from a running
+MythTV thread (channel information, music data, etc.) can be displayed on an
+LCD screen on your MythTV box (or, since LCDproc is client/server based,
+just about anywhere else instead).
+
+	Note that at this very early stage, MythLCD is not actually
+integrated into ANY of the MythTV/mythMusic/etc. code. It comes in
+a standalone directory, with a little toy application (called mythlcd) that
+just shows off how it could work. See TODO for when this might change.
+
+
+2.0 Installation
+================
+
+	First place to start is with a working copy of the LCDproc package,
+which you can find at or around:
+
+		http://www.lcdproc.org	
+
+	There are links from that URL to sites where you can order LCD
+hardware that works with LCDproc. Note that even if you don't have hardware,
+you can easily build a curses version of LCDproc that will let you
+use/debug/play with mythLCD code.
+
+	Once LCDproc is up and running, go into the mythlcd subdirectory and
+type make. You may want to remove -DLCD_DEVICE_DEBUG from the CXXFLAGS line
+in the Makefile, as it generates a lot of output. Note that the Makefile is
+hand assembled and has nothing to do with higher level MythTV Makefiles.
+This will change as the code is integrated into the rest of MythTV (see
+TODO).
+
+
+3.0 FAQs
+========
+
+	First release, so no questions (and nothing frequent).
+
+
+4.0 Plans/TODO
+=============	
+	
+	Debug code and extend features
+	Integrate into MythTV code tree
+	Integrate into MythMusic code tree
+
