@@ -88,6 +88,7 @@ Watching TV only:
 - H Channel history. Each repeat steps back through the previous channels.
 - O Turns on 'Browse' mode, allowing user to browse channels and program
     info while watching current show FullScreen.
+- Y Switch Capture Cards
 
 LiveTV Browse Mode:
 - Left          browse program prior to current listed program.
