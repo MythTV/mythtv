@@ -60,6 +60,7 @@ class HDTVRecorder : public RecorderBase
     bool cleartimeonpause;
 
     long long framesWritten;
+    long long framesSeen;
 
     int width, height;
 

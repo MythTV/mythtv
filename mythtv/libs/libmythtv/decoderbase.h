@@ -23,7 +23,7 @@ class DecoderBase
 
     void setExactSeeks(bool exact) { exactseeks = exact; }
     void setLiveTVMode(bool live) { livetv = live; }
-    void setWatchingRecording(bool mode) { watchingrecording = mode; }
+    virtual void setWatchingRecording(bool mode) { watchingrecording = mode; }
     void setRecorder(RemoteEncoder *recorder) { nvr_enc = recorder; }
 
     void setLowBuffers(void) { lowbuffers = true; }

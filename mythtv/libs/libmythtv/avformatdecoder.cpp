@@ -42,8 +42,11 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
     hasbframes = false;
 
     hasFullPositionMap = false;
+    recordingHasPositionMap = false;
+    positionMapByFrame = false;
+    posmapStarted = false;
 
-    keyframedist = 15;
+    keyframedist = -1;
 
     exitafterdecoded = false;
     ateof = false;
@@ -123,7 +126,7 @@ void AvFormatDecoder::Reset(void)
 {
     SeekReset();
 
-    positionMap.clear();
+    m_positionMap.clear();
     framesPlayed = 0;
     framesRead = 0;
 }
@@ -295,9 +298,6 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
                 fps = (double)enc->frame_rate / enc->frame_rate_base;
 
-                if (fps < 26 && fps > 24)
-                    keyframedist = 12;
-
                 float aspect_ratio;
                 if (enc->sample_aspect_ratio.num == 0)
                     aspect_ratio = 0;
@@ -428,35 +428,39 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     ringBuffer->CalcReadAheadThresh(bitrate);
 
-    if (m_playbackinfo && m_db)
+    if ((m_playbackinfo && m_db) || livetv || watchingrecording)
     {
-        m_playbackinfo->GetPositionMap(positionMap, MARK_GOP_START, m_db);
-        if (positionMap.size() && !livetv && !watchingrecording)
+        recordingHasPositionMap = SyncPositionMap();
+        if (recordingHasPositionMap && !livetv && !watchingrecording) 
         {
-            QMap<long long,long long>::const_iterator it = positionMap.end();
-            it--;
-            long long totframes = it.key() * keyframedist;
-            int length = (int)((totframes * 1.0) / fps);
-            m_parent->SetFileLength(length, totframes);            
             hasFullPositionMap = true;
             gopset = true;
         }
     }
 
-    if (!hasFullPositionMap)
+    if (!recordingHasPositionMap)
     {
         // the pvr-250 seems to overreport the bitrate by * 2
         float bytespersec = (float)bitrate / 8 / 2;
         float secs = ringBuffer->GetRealFileSize() * 1.0 / bytespersec;
-
         m_parent->SetFileLength((int)(secs), (int)(secs * fps));
+
+        // we will not see a position map from db or remote encoder,
+        // so might as well use index by frames
+        keyframedist = 1;
     }
 
     dump_format(ic, 0, filename, 0);
     if (hasFullPositionMap)
+    {
         VERBOSE(VB_PLAYBACK, "Position map found");
+    }
+    else if (recordingHasPositionMap)
+    {
+        VERBOSE(VB_PLAYBACK, "Partial position map found");
+    }
 
-    return hasFullPositionMap;
+    return recordingHasPositionMap;
 }
 
 bool AvFormatDecoder::CheckVideoParams(int width, int height)
@@ -543,6 +547,65 @@ bool AvFormatDecoder::CheckAudioParams(int freq, int channels)
     }
 
     return true;
+}
+
+// returns true iff found exactly
+// searches position if search_pos, index otherwise
+bool AvFormatDecoder::FindPosition(long long desired_value, bool search_pos,
+                                   int &lower_bound, int &upper_bound)
+{
+    // Binary search
+    int upper = m_positionMap.size(), lower = -1;
+    if (!search_pos && keyframedist > 0)
+        desired_value /= keyframedist;
+
+    while (upper - 1 > lower) 
+    {
+        int i = (upper + lower) / 2;
+        long long value;
+        if (search_pos)
+            value = m_positionMap[i].pos;
+        else
+            value = m_positionMap[i].index;
+        if (value == desired_value) 
+        {
+            // found it
+            upper_bound = i;
+            lower_bound = i;
+            return true;
+        }
+        else if (value > desired_value)
+            upper = i;
+        else
+            lower = i;
+    }
+    // Did not find it exactly -- return bounds
+
+    if (search_pos) 
+    {
+        while (lower >= 0 && m_positionMap[lower].pos > desired_value)
+            lower--;
+        while (upper < (int)m_positionMap.size() &&
+               m_positionMap[upper].pos > desired_value)
+            upper++;
+    }
+    else
+    {
+        while (lower >= 0 &&m_positionMap[lower].index > desired_value)
+            lower--;
+        while (upper < (int)m_positionMap.size() && 
+               m_positionMap[upper].index < desired_value)
+            upper++;
+    }
+    // keep in bounds
+    if (lower < 0)
+        lower = 0;
+    if (upper >= (int)m_positionMap.size())
+        upper = (int)m_positionMap.size() - 1;
+
+    upper_bound = upper;
+    lower_bound = lower;
+    return false;
 }
 
 int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
@@ -703,6 +766,80 @@ void render_slice_via(struct AVCodecContext *s, const AVFrame *src,
     nd->m_parent->DrawSlice(frame, 0, y, width, height);
 }
 
+void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
+{
+    if (prevgoppos != 0 && keyframedist != 1)
+    {
+        int tempKeyFrameDist = framesRead - 1 - prevgoppos;
+
+        if (!gopset) // gopset: we've seen 2 keyframes
+        {
+            //cerr << "!gopset, syncing posmap" << endl;
+            SyncPositionMap();
+            if (tempKeyFrameDist > 0)
+            {
+                gopset = true;
+                keyframedist = tempKeyFrameDist;
+                //cerr << "Stream initial keyframedist: " << keyframedist << endl;
+                m_parent->SetVideoParams(-1, -1, -1, keyframedist, 
+                                         current_aspect);
+            }
+        }
+        else
+        {
+            if (keyframedist != tempKeyFrameDist && tempKeyFrameDist > 0)
+            {
+                //cerr << "KeyFrameDistance has changed to "
+                //     << tempKeyFrameDist << " from " << keyframedist << endl;
+                keyframedist = tempKeyFrameDist;
+                m_parent->SetVideoParams(-1, -1, -1, keyframedist, 
+                                         current_aspect);
+                // also reset length
+                long long index = m_positionMap[m_positionMap.size() - 1].index;
+                long long totframes = index * keyframedist;
+                int length = (int)((totframes * 1.0) / fps);
+                cerr << "Setting(2) length to " << length
+                     << " " << totframes << endl;
+                m_parent->SetFileLength(length, totframes);
+            }
+        }
+    }
+
+    lastKey = prevgoppos = framesRead - 1;
+
+    if (!hasFullPositionMap)
+    {
+        long long last_frame = 0;
+        if (!m_positionMap.empty())
+            last_frame = m_positionMap[m_positionMap.size() - 1].index;
+        if (keyframedist > 1)
+            last_frame *= keyframedist;
+        // if we don't have an entry, fill it in with what we've just parsed
+        if (framesRead > last_frame && keyframedist > 0)
+        {
+            long long startpos = pkt->startpos;
+
+            // cerr << "positionMap[" << prevgoppos / keyframedist <<
+            //         "] = " << startpos << "." << endl;
+            // Grow positionMap vector several entries at a time
+            if (m_positionMap.capacity() == m_positionMap.size())
+                m_positionMap.reserve(m_positionMap.size() + 60);
+            PosMapEntry entry = {prevgoppos / keyframedist, startpos};
+            m_positionMap.push_back(entry);
+        }
+
+        // If we are > 150 frames in and saw no positionmap at all, reset 
+        // length based on the actual bitrate seen so far
+        if (framesRead > 150 && !recordingHasPositionMap && !livetv)
+        {
+            bitrate = (int)((pkt->startpos * 8 * fps) / (framesRead - 1));
+            float bytespersec = (float)bitrate / 8;
+            float secs = ringBuffer->GetRealFileSize() * 1.0 / bytespersec;
+            m_parent->SetFileLength((int)(secs), (int)(secs * fps));
+        }
+    }
+}
+
 #define SEQ_START     0x000001b3
 #define GOP_START     0x000001b8
 #define PICTURE_START 0x00000100
@@ -763,111 +900,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
                 case GOP_START:
                 {
-                    int tempKeyFrameDist = keyframedist;
-                    if (hasFullPositionMap) 
-                    {
-                        int low_keyframenum = 0;
-                        int hi_keyframenum = 0;
-                        if (keyframedist != 0) 
-                            low_keyframenum = hi_keyframenum = 
-                                (framesRead-1)/tempKeyFrameDist;
-                        // We think we should be at #'keyframenum' keyframe
-                        // in the stream.  If we are not, find where we are
-                        // and adjust keyframedist accordingly.
-                        
-                        if (low_keyframenum == 0)
-                            low_keyframenum = 1;
-                        int map_pos = positionMap[low_keyframenum];
-                        // try to skip 1 missing keyframe
-                        if (map_pos == 0)
-                        {
-                            low_keyframenum++;
-                            map_pos = positionMap[low_keyframenum];
-                        }
-                        while (map_pos < pkt->startpos && map_pos != 0) 
-                        {
-                            low_keyframenum++;
-                            // try to skip 1 missing keyframe
-                            if (positionMap[low_keyframenum] == 0)
-                                low_keyframenum++;
-                            map_pos = positionMap[low_keyframenum];
-                        }
-                        if (low_keyframenum > hi_keyframenum)
-                            hi_keyframenum = low_keyframenum;
-
-                        map_pos = positionMap[hi_keyframenum];
-                        // try to skip 1 missing keyframe
-                        if (map_pos == 0 && hi_keyframenum > 0)
-                        {
-                            hi_keyframenum--;
-                            map_pos = positionMap[hi_keyframenum];
-                        }
-                        while (map_pos > pkt->startpos && map_pos != 0)
-                        {
-                            hi_keyframenum--;
-                            // try to skip 1 missing keyframe
-                            if (positionMap[hi_keyframenum] == 0 &&
-                                hi_keyframenum > 0)
-                                hi_keyframenum--;
-                            map_pos = positionMap[hi_keyframenum];
-                        }
-                        // if either is spot on, take it
-                        if (positionMap[low_keyframenum] == pkt->startpos)
-                            hi_keyframenum = low_keyframenum;
-                        if (positionMap[hi_keyframenum] == pkt->startpos)
-                            low_keyframenum = hi_keyframenum;
-                        
-                        // use the lower of the two
-                        int keyframenum = (low_keyframenum < hi_keyframenum) ?
-                            low_keyframenum : hi_keyframenum;
-                        
-                        if (keyframenum > 0 && positionMap[keyframenum] != 0) 
-                            tempKeyFrameDist = (framesRead)/(keyframenum);
-                    }
-                    else 
-                    {
-                        tempKeyFrameDist = framesRead - 1 - prevgoppos;
-                    }
-
-                    if (!gopset)
-                    {
-                        if (prevgoppos > 0 && tempKeyFrameDist > 0)
-                        {
-                            gopset = true;
-                            keyframedist = tempKeyFrameDist;
-                            m_parent->SetVideoParams(-1, -1, -1, keyframedist);
-                        }
-                    }
-                    else
-                    {
-                        if (keyframedist != tempKeyFrameDist && 
-                            tempKeyFrameDist > 0)
-                        {
-                            //cerr << "KeyFrameDistance has changed to "
-                            //     << tempKeyFrameDist << "." << endl;
-                            keyframedist = tempKeyFrameDist;
-                            m_parent->SetVideoParams(-1, -1, -1, keyframedist);
-                            // also reset length
-                            QMap<long long,long long>::const_iterator it = 
-                                positionMap.end();
-                            it--;
-                            long long totframes = it.key() * keyframedist;
-                            int length = (int)((totframes * 1.0) / fps);
-                            m_parent->SetFileLength(length, totframes);
-                        }
-                    }
-
-                    lastKey = prevgoppos = framesRead - 1;
-
-                    if (!hasFullPositionMap)
-                    {
-                        long long startpos = pkt->startpos;
-
-//cout << prevgoppos << " " << startpos << " " << pkt->dts << endl;
-                        //cerr << "positionMap[" << prevgoppos / keyframedist <<
-                        //        "] = " << pkt->startpos << "." << endl;
-                        positionMap[prevgoppos / keyframedist] = startpos;
-                    }
+                    HandleGopStart(pkt);
                 }
                 break;
             }
@@ -875,7 +908,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
         }
         state = ((state << 8) | v) & 0xFFFFFF;
     }
-
+    
     memcpy(prvpkt, pkt->data + pkt->size - 3, 3);
 }
 
@@ -989,7 +1022,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
         len = pkt->size;
         ptr = pkt->data;
         pts = 0;
-        if (pkt->pts != AV_NOPTS_VALUE)
+        if (pkt->pts != (unsigned int)AV_NOPTS_VALUE)
             pts = pkt->pts / (AV_TIME_BASE / 1000);
 
         AVStream *curstream = ic->streams[pkt->stream_index];
@@ -1035,7 +1068,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
             {
                 case CODEC_TYPE_AUDIO:
                 {
-                    if (firstloop && pkt->pts != AV_NOPTS_VALUE)
+                    if (firstloop && pkt->pts != (unsigned int)AV_NOPTS_VALUE)
                         lastapts = pkt->pts / (AV_TIME_BASE / 1000);
 
                     if (onlyvideo != 0)
@@ -1220,71 +1253,41 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
 
 bool AvFormatDecoder::DoRewind(long long desiredFrame)
 {
-    lastKey = (framesPlayed / keyframedist) * keyframedist;
-    long long storelastKey = lastKey;
-    while (lastKey > desiredFrame)
-    {
-        lastKey -= keyframedist;
-    }
+    if (m_positionMap.empty())
+        return false;
+    // Find keyframe <= desiredFrame, store in lastKey (frames)
+    int pos_idx1, pos_idx2;
 
-    if (lastKey < 0)
-        lastKey = 0;
+    FindPosition(desiredFrame, false, pos_idx1, pos_idx2);
 
-    int normalframes = desiredFrame - lastKey;
-    long long keyPos = positionMap[lastKey / keyframedist];
+    int pos_idx = pos_idx1 < pos_idx2 ? pos_idx1 : pos_idx2;
+
+    lastKey = m_positionMap[pos_idx].index * keyframedist;
+
+    long long keyPos = m_positionMap[pos_idx].pos;
     long long curPosition = ringBuffer->GetTotalReadPosition();
+    int normalframes = desiredFrame - lastKey;
     long long diff = keyPos - curPosition;
 
+    // Don't rewind further than we have space to store video
     while (ringBuffer->GetFreeSpaceWithReadChange(diff) < 0)
     {
-        lastKey += keyframedist;
-        keyPos = positionMap[lastKey / keyframedist];
-        if (keyPos == 0)
-            continue;
-        diff = keyPos - curPosition;
-        normalframes = 0;
-        if (lastKey > storelastKey)
+        pos_idx++;
+        if (pos_idx >= (int)m_positionMap.size())
         {
-            lastKey = storelastKey;
             diff = 0;
             normalframes = 0;
             return false;
         }
-    }
+        lastKey = m_positionMap[pos_idx].index * keyframedist;
+        keyPos = m_positionMap[pos_idx].pos;
 
-    int iter = 0;
-
-    while (keyPos == 0 && lastKey > 1 && iter < 4)
-    {
-        VERBOSE(VB_PLAYBACK, QString("No keyframe in position map for %1")
-                                     .arg((int)lastKey));
-
-        lastKey -= keyframedist;
-        keyPos = positionMap[lastKey / keyframedist];
         diff = keyPos - curPosition;
-        normalframes += keyframedist;
-
-        if (keyPos != 0)
-           VERBOSE(VB_PLAYBACK, QString("Using seek position: %1")
-                                       .arg((int)lastKey));
-
-        iter++;
-    }
-
-    if (keyPos == 0)
-    {
-        VERBOSE(VB_GENERAL, QString("Unknown seek position: %1")
-                                    .arg((int)lastKey));
-
-        lastKey = storelastKey;
-        diff = 0;
         normalframes = 0;
-
-        return false;
     }
 
     ringBuffer->Seek(diff, SEEK_CUR);
-
+    
     framesPlayed = lastKey;
     framesRead = lastKey;
 
@@ -1307,100 +1310,87 @@ bool AvFormatDecoder::DoRewind(long long desiredFrame)
 
 bool AvFormatDecoder::DoFastForward(long long desiredFrame)
 {
-    lastKey = (framesPlayed / keyframedist) * keyframedist;
+    //cerr << "FF to " << desiredFrame << endl;
+    // if the positionmap does not cover the desired frame, try to
+    // refill.
+    long long last_frame = 0;
+    if (!m_positionMap.empty())
+        last_frame = m_positionMap[m_positionMap.size()-1].index * keyframedist;
+
+    if (desiredFrame > last_frame) 
+    {
+        //cerr << "FF syncing position map" << endl;
+        SyncPositionMap();
+    }
+
+    //cerr << "Last frame: " << last_frame << endl;
+    bool needflush = false;
+    // if we still don't cover, parse forward in the stream one frame
+    // at a time until we do
+
+    if (!m_positionMap.empty())
+        last_frame = m_positionMap[m_positionMap.size()-1].index * keyframedist;
+
+    if (desiredFrame > last_frame) 
+    //cerr << "Map still doesn't cover" << endl;
+
+    while (desiredFrame > last_frame)
+    {
+        needflush = true;
+        
+        exitafterdecoded = true;
+        GetFrame(-1);
+        exitafterdecoded = false;
+
+        if (!m_positionMap.empty())
+            last_frame = m_positionMap[m_positionMap.size()-1].index * 
+                                                                  keyframedist; 
+        //cerr << "FF seeking by 1 frame, now have " << last_frame << endl;
+        
+        if (ateof)
+            return false;
+    }
+
+    if (m_positionMap.empty())
+        return false;
+
+    // Find keyframe >= desiredFrame, store in lastKey
+    // if exactseeks, use keyframe <= desiredFrame
+    int pos_idx1, pos_idx2;
+    FindPosition(desiredFrame, false, pos_idx1, pos_idx2);
+    if (pos_idx1 > pos_idx2) 
+    {
+        int tmp = pos_idx1;
+        pos_idx1 = pos_idx2;
+        pos_idx2 = tmp;
+    }
+
+    int pos_idx = exactseeks ? pos_idx1 : pos_idx2;
+    lastKey = m_positionMap[pos_idx].index * keyframedist;
+    long long keyPos = m_positionMap[pos_idx].pos;
+    
     long long number = desiredFrame - framesPlayed;
     long long desiredKey = lastKey;
 
-    while (desiredKey <= desiredFrame)
-    {
-        desiredKey += keyframedist;
-    }
-    desiredKey -= keyframedist;
-   
     int normalframes = desiredFrame - desiredKey;
 
     if (desiredKey == lastKey)
         normalframes = number;
 
-    long long keyPos = -1;
-
-    long long tmpKey = desiredKey;
-    int tmpIndex = tmpKey / keyframedist;
-
-    while (keyPos == -1 && tmpKey > lastKey)
+    if (framesPlayed < lastKey)
     {
-        if (positionMap.find(tmpIndex) != positionMap.end())
-        {
-            keyPos = positionMap[tmpIndex];
-        }
-        else if (livetv || (watchingrecording && nvr_enc &&
-                            nvr_enc->IsValidRecorder()))
-        {
-            for (int i = lastKey / keyframedist; i <= tmpIndex; i++)
-            {
-                if (positionMap.find(i) == positionMap.end())
-                    nvr_enc->FillPositionMap(i, tmpIndex, positionMap);
-            }
-            keyPos = positionMap[tmpIndex];
-        }
-        if (keyPos == -1)
-        {
-            VERBOSE(VB_PLAYBACK, QString("No keyframe in position map for %1")
-                    .arg((int)tmpKey));
-
-            tmpKey -= keyframedist;
-            tmpIndex--;
-        }
-        else
-        {
-            desiredKey = tmpKey;
-        }
-    }
-
-    bool needflush = false;
-
-    if (keyPos != -1)
-    {
-        lastKey = desiredKey;
         long long diff = keyPos - ringBuffer->GetTotalReadPosition();
 
         ringBuffer->Seek(diff, SEEK_CUR);
         needflush = true;
-
+    
         framesPlayed = lastKey;
         framesRead = lastKey;
     }
-    else if (desiredKey != lastKey && !livetv && !watchingrecording)
+    else
     {
-        VERBOSE(VB_IMPORTANT, "Did not find keyframe position.");
-
-        VERBOSE(VB_PLAYBACK, QString("lastKey: %1 desiredKey: %2")
-                .arg((int)lastKey).arg((int)desiredKey));
-
-        while (framesRead < desiredKey + 1 || 
-               !positionMap.contains(desiredKey / keyframedist))
-        {
-            needflush = true;
-
-            exitafterdecoded = true;
-            GetFrame(-1);
-            exitafterdecoded = false;
-
-            if (ateof)
-                return false;
-        }
-
-        if (needflush)
-        {
-            lastKey = desiredKey;
-            keyPos = positionMap[desiredKey / keyframedist];
-            long long diff = keyPos - ringBuffer->GetTotalReadPosition();
-
-            ringBuffer->Seek(diff, SEEK_CUR);
-        }
-
-        framesPlayed = lastKey;
-        framesRead = lastKey;
+        //cerr << "Already at proper keyframe, framesplayed: " << framesPlayed
+        //     << " pos1: " << pos_idx1 << " pos2: " << pos_idx2 << endl;
     }
 
     normalframes = desiredFrame - framesPlayed;
@@ -1425,8 +1415,188 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame)
 
 void AvFormatDecoder::SetPositionMap(void)
 {
-    if (m_playbackinfo && m_db)
-        m_playbackinfo->SetPositionMap(positionMap, MARK_GOP_START, m_db);
+    QMap<long long, long long> posMap;
+    for (unsigned int i=0; i < m_positionMap.size(); i++) 
+        posMap[m_positionMap[i].index] = m_positionMap[i].pos;
+    
+    if (m_playbackinfo && m_db) 
+    {
+        if (positionMapByFrame)
+            m_playbackinfo->SetPositionMap(posMap, MARK_GOP_BYFRAME, m_db);
+        else
+            m_playbackinfo->SetPositionMap(posMap, MARK_GOP_START, m_db);
+    }
+}
+
+bool AvFormatDecoder::PosMapFromDb()
+{
+    // Overwrites current positionmap with entire contents of database
+    QMap<long long, long long> posMap;
+    m_playbackinfo->GetPositionMap(posMap, MARK_GOP_BYFRAME, m_db);
+    if (!posMap.empty())
+    {
+        positionMapByFrame = true;
+        if (keyframedist == -1) 
+        {
+            //cerr << "keyframedist to 1 due to BYFRAME" << endl;
+            keyframedist = 1;
+        }
+    }
+    else
+    {
+        // Fall back to map by keyframe number, which assumes an
+        // even cadence of keyframes
+        m_playbackinfo->GetPositionMap(posMap, MARK_GOP_START, m_db);
+    }
+
+    if (posMap.empty())
+        return false; // no position map in recording
+
+    if (keyframedist == -1)
+    {
+        //cerr << "keyframedist to 15/12 due to GOP_START" << endl;
+        keyframedist = 15;
+        if (fps < 26 && fps > 24)
+            keyframedist = 12;
+    }
+
+    m_positionMap.clear();
+    m_positionMap.reserve(posMap.size());
+
+    for (QMap<long long,long long>::const_iterator it = posMap.begin();
+         it != posMap.end(); it++) 
+    {
+        PosMapEntry e = {it.key(), it.data()};
+        m_positionMap.push_back(e);
+    }
+
+    return true;
+}
+
+bool AvFormatDecoder::PosMapFromEnc()
+{
+    // Reads only new positionmap entries from encoder
+    if (!(livetv || (nvr_enc && nvr_enc->IsValidRecorder())))
+        return false;
+
+    QMap<long long, long long> posMap;
+    
+    int start = 0;
+    unsigned int size = m_positionMap.size();
+    if (size > 0)
+        start = m_positionMap[size-1].index + 1;
+
+    int end = nvr_enc->GetFramesWritten();
+    if (size > 0 && keyframedist > 0) 
+        end /= keyframedist;
+
+    nvr_enc->FillPositionMap(start, end, posMap);
+    if (keyframedist == -1 && posMap.size() > 1)
+    {
+        // If the indices are sequential, index is by keyframe num
+        // else it is by frame num
+        QMap<long long,long long>::const_iterator i1 = posMap.begin();
+        QMap<long long,long long>::const_iterator i2 = i1;
+        i2++;
+        if (i1.key() + 1 == i2.key()) 
+        {
+            //cerr << "keyframedist to 15/12 due to encoder" << endl;
+            keyframedist = 15;
+            if (fps < 26 && fps > 24)
+                keyframedist = 12;
+        }
+        else
+        {
+            //cerr << "keyframedist to 1 due to encoder" << endl;
+            keyframedist = 1;
+        }
+    }
+
+    // append this new position map to class's
+    m_positionMap.reserve(m_positionMap.size() + posMap.size());
+    for (QMap<long long,long long>::const_iterator it = posMap.begin();
+         it != posMap.end(); it++) 
+    {
+        PosMapEntry e = {it.key(), it.data()};
+        m_positionMap.push_back(e);
+    }
+    return true;
+}
+
+bool AvFormatDecoder::SyncPositionMap()
+{
+    // positionmap sources:
+    // live tv:
+    // 1. remote encoder
+    // 2. stream parsing (in MpegPreProcessPkt)
+    // decide keyframedist based on samples from remote encoder
+    //
+    // watching recording:
+    // 1. initial fill from db
+    // 2. incremental from remote encoder, until it finishes recording
+    // 3. then db again (which should be the final time)
+    // 4. stream parsing (in MpegPreProcessPkt)
+    // decide keyframedist based on which table in db
+    //
+    // watching prerecorded:
+    // 1. initial fill from db is all that's needed
+
+    //cerr << "Resyncing position map" << endl;
+    unsigned int old_posmap_size = m_positionMap.size();
+    
+    if (livetv)
+    {
+        PosMapFromEnc();
+        //cerr << "Live TV: from encoder: " << m_positionMap.size() 
+        //<< " entries" << endl;
+    }
+    else if (watchingrecording)
+    {
+        //cerr << "Watching & recording..." << endl;
+        if (!posmapStarted) 
+        {
+            // starting up -- try first from database
+            PosMapFromDb();
+            //cerr << "from db: " << m_positionMap.size() << " entries" << endl;
+        }
+        // always try to get more from encoder
+        if (!PosMapFromEnc()) 
+        {
+            //cerr << "...none from encoder" << endl;
+            PosMapFromDb(); // try again from db
+        }
+        //cerr << "..." << m_positionMap.size() << " total" << endl;
+    }
+    else
+    {
+        // watching prerecorded ... just get from db
+        if (!posmapStarted)
+        {
+            PosMapFromDb();
+            //cerr << "Prerecorded... from db: " << m_positionMap.size() 
+            //<< " (posmapStarted: " << posmapStarted << ")" << endl;
+        }
+    }
+
+    bool ret_val = m_positionMap.size() > old_posmap_size;
+    if (ret_val && keyframedist > 0)
+    {
+        long long totframes = 
+            m_positionMap[m_positionMap.size()-1].index * keyframedist;
+        int length = (int)((totframes * 1.0) / fps);
+        m_parent->SetFileLength(length, totframes);
+        m_parent->SetVideoParams(-1, -1, -1, keyframedist, current_aspect);
+        posmapStarted = true;
+    }
+    return ret_val;
+}
+
+void AvFormatDecoder::setWatchingRecording(bool mode)
+{
+    // When we switch from WatchingRecording to WatchingPreRecorded,
+    // re-get the positionmap
+    posmapStarted = false;
+    DecoderBase::setWatchingRecording(mode);
 }
 
 int AvFormatDecoder::EncodeAC3Frame(unsigned char *data, int len,

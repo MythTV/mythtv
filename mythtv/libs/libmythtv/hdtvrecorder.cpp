@@ -69,6 +69,7 @@ extern "C" {
 #include "../libavformat/mpegts.h"
 }
 
+// n.b. at 19 Mbits/sec, default buffer size is approx. 1/10 sec.
 #define PACKETS (HD_BUFFER_SIZE / 188)
 
 #define SYNC_BYTE 0x47
@@ -86,6 +87,7 @@ HDTVRecorder::HDTVRecorder()
     recording = false;
 
     framesWritten = 0;
+    framesSeen = 0;
 
     chanfd = -1; 
 
@@ -259,7 +261,7 @@ void HDTVRecorder::FinishRecording(void)
     {
         pthread_mutex_lock(db_lock);
         MythContext::KickDatabase(db_conn);
-        curRecording->SetPositionMap(positionMap, MARK_GOP_START, db_conn);
+        curRecording->SetPositionMap(positionMap, MARK_GOP_BYFRAME, db_conn);
         pthread_mutex_unlock(db_lock);
     }
 }
@@ -313,7 +315,7 @@ void HDTVRecorder::FindKeyframes(const unsigned char *buffer,
             //   (there are others that we don't care about)
             int sync = 0;
             payload_size = packet_end_pos - pkt_start;
-            for (int i=pos; i < payload_size+pos; i++)
+            for (int i=pkt_start; i < packet_end_pos; i++)
             {
                 char k = buffer[i];
                 switch (sync)
@@ -338,8 +340,10 @@ void HDTVRecorder::FindKeyframes(const unsigned char *buffer,
                     {
                         if (buffer[i+1] == 0x00) // picture_start
                         {
-                            framesWritten++;
-                            if (framesWritten >= 30 && firstgoppos <= 0)
+                            if (gopset || firstgoppos > 0)
+                                framesWritten++;
+                            framesSeen++;
+                            if (framesSeen >= 30 && firstgoppos <= 0)
                             {
                                 // seen 30 frames with no GOP; assume that
                                 // each GOP only contains one I-frame, and
@@ -349,12 +353,13 @@ void HDTVRecorder::FindKeyframes(const unsigned char *buffer,
                             }
                         }
                         if (buffer[i+1] == 0xB8 || 
-                            (pict_start_is_gop && buffer[i+1] == 0x00))
+                            (pict_start_is_gop && buffer[i+1] == 0x00 &&
+                             (framesSeen) % 15 == 0))
                         {
                             // group_of_pictures
                             int frameNum = framesWritten - 1;
                             
-                            if (!gopset && frameNum > 0)
+                            if (!gopset && framesSeen > 0)
                             {
                                 if (firstgoppos > 0)
                                 {
@@ -366,15 +371,14 @@ void HDTVRecorder::FindKeyframes(const unsigned char *buffer,
                                     gopset = true;
                                 }
                                 else
-                                    firstgoppos = frameNum;
+                                    firstgoppos = (frameNum > 0) ? 
+                                        frameNum : 1;
                             }
                             
                             long long startpos = 
                                 ringBuffer->GetFileWritePosition();
 
-                            long long keyCount = frameNum/keyframedist;
-                            
-                            positionMap[keyCount] = startpos;
+                            positionMap[frameNum] = startpos;
                             
                             if (curRecording && db_lock && db_conn &&
                                 ((positionMap.size() % 30) == 0))
@@ -382,11 +386,11 @@ void HDTVRecorder::FindKeyframes(const unsigned char *buffer,
                                 pthread_mutex_lock(db_lock);
                                 MythContext::KickDatabase(db_conn);
                                 curRecording->SetPositionMap(
-                                    positionMap, MARK_GOP_START,
+                                    positionMap, MARK_GOP_BYFRAME,
                                     db_conn, prev_gop_save_pos, 
-                                    keyCount);
+                                    frameNum);
                                 pthread_mutex_unlock(db_lock);
-                                prev_gop_save_pos = keyCount + 1;
+                                prev_gop_save_pos = frameNum + 1;
                             }
                             
                         }
@@ -653,7 +657,7 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
               5 bits unused flags
             */
             unsigned char adaptation_length;
-            adaptation_length = buffer[pos];
+            adaptation_length = buffer[pos++];
             pos += adaptation_length;
         }
 
@@ -782,6 +786,7 @@ void HDTVRecorder::StopRecording(void)
 void HDTVRecorder::Reset(void)
 {
     framesWritten = 0;
+    framesSeen = 0;
     gopset = false;
     firstgoppos = 0;
     ts_packets = 0;

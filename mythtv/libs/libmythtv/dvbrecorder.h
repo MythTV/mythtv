@@ -83,7 +83,6 @@ private:
     bool cleartimeonpause;
 
     long long framesWritten;
-    long long keyCount;
     int keyframedist;
     unsigned char prvpkt[3];
 

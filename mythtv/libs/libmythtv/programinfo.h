@@ -21,7 +21,8 @@ enum MarkTypes {
     MARK_COMM_END = 5,
     MARK_GOP_START = 6,
     MARK_KEYFRAME = 7,
-    MARK_SCENE_CHANGE = 8
+    MARK_SCENE_CHANGE = 8,
+    MARK_GOP_BYFRAME = 9
 };
 
 enum TranscoderStatus {

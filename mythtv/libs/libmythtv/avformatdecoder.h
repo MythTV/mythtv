@@ -42,9 +42,15 @@ class AvFormatDecoder : public DecoderBase
     void SetRawVideoState(bool state) { (void)state; }
     bool GetRawVideoState(void) { return false; }
 
+    void setWatchingRecording(bool mode);
+
     void UpdateFrameNumber(long frame) { (void)frame;}
 
     void SetPositionMap(void);
+    
+    bool SyncPositionMap();
+    bool PosMapFromDb();
+    bool PosMapFromEnc();
 
     QString GetEncodingType(void) { return QString("MPEG-2"); }
 
@@ -52,6 +58,12 @@ class AvFormatDecoder : public DecoderBase
     RingBuffer *getRingBuf(void) { return ringBuffer; }
 
   private:
+    typedef struct posmapentry 
+    {
+        long long index; // frame or keyframe number
+        long long pos; // position in stream
+    } PosMapEntry;
+
     friend int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
     friend void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
 
@@ -64,7 +76,7 @@ class AvFormatDecoder : public DecoderBase
     friend void release_avf_buffer_via(struct AVCodecContext *c, AVFrame *pic);
     friend void render_slice_via(struct AVCodecContext *c, const AVFrame *src,
                                  int offset[4], int y, int type, int height);
-	
+        
     friend int open_avf(URLContext *h, const char *filename, int flags);
     friend int read_avf(URLContext *h, uint8_t *buf, int buf_size);
     friend int write_avf(URLContext *h, uint8_t *buf, int buf_size);
@@ -82,7 +94,11 @@ class AvFormatDecoder : public DecoderBase
     bool CheckAudioParams(int freq, int channels);
 
     int EncodeAC3Frame(unsigned char* data, int len, short *samples,
-		       int &samples_size);
+                       int &samples_size);
+    bool FindPosition(long long desired_value, bool search_pos,
+                      int &lower_bound, int &upper_bound);
+
+    void HandleGopStart(AVPacket *pkt);
 
     RingBuffer *ringBuffer;
 
@@ -109,7 +125,11 @@ class AvFormatDecoder : public DecoderBase
     bool hasbframes;
 
     bool hasFullPositionMap;
-    QMap<long long, long long> positionMap;
+    bool recordingHasPositionMap;
+    bool positionMapByFrame;
+    bool posmapStarted;
+    
+    QValueVector<PosMapEntry> m_positionMap;
 
     long long lastKey;
 

@@ -465,6 +465,8 @@ long long decodeLongLong(QStringList &list, int offset)
 
 long long decodeLongLong(QStringList &list, QStringList::iterator &it)
 {
+    (void)list;
+
     long long retval = 0;
 
     int l1 = (*(it++)).toInt();

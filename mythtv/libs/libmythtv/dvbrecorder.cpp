@@ -108,7 +108,6 @@ void DVBRecorder::ChannelChanged(dvb_channel_t& chan)
 
     framesWritten = 0;
     keyframedist = 0;
-    keyCount = 0;
     gopset = false;
     prev_gop_save_pos = -1;
     memset(prvpkt, 0, 3);
@@ -448,7 +447,7 @@ void DVBRecorder::FinishRecording()
     {
         pthread_mutex_lock(db_lock);
         MythContext::KickDatabase(db_conn);
-        curRecording->SetPositionMap(positionMap, MARK_GOP_START, db_conn);
+        curRecording->SetPositionMap(positionMap, MARK_GOP_BYFRAME, db_conn);
         pthread_mutex_unlock(db_lock);
     }
 }
@@ -522,12 +521,7 @@ void DVBRecorder::LocalProcessData(unsigned char *buffer, int len)
                             gopset = true;
                         }                          
 
-                        if (!gopset)
-                            keyCount = 1;
-                        else
-                            keyCount++;
-
-                        positionMap[keyCount] = startpos;
+                        positionMap[framesWritten] = startpos;
 
                         if (curRecording && db_lock && db_conn &&
                             ((positionMap.size() % 30) == 0))
@@ -535,11 +529,11 @@ void DVBRecorder::LocalProcessData(unsigned char *buffer, int len)
                             pthread_mutex_lock(db_lock);
                             MythContext::KickDatabase(db_conn);
                             curRecording->SetPositionMap(
-                                            positionMap, MARK_GOP_START,
+                                            positionMap, MARK_GOP_BYFRAME,
                                             db_conn, prev_gop_save_pos,
-                                            keyCount);
+                                            framesWritten);
                             pthread_mutex_unlock(db_lock);
-                            prev_gop_save_pos = keyCount + 1;
+                            prev_gop_save_pos = framesWritten + 1;
                         }
                     }
                     break;

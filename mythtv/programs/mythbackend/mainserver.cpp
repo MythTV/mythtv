@@ -1535,7 +1535,11 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         for (int keynum = start; keynum <= end; keynum++)
         {
             long long value = enc->GetKeyframePosition(keynum);
-            encodeLongLong(retlist, value);
+            if (value != -1) 
+            {
+                encodeLongLong(retlist, keynum);
+                encodeLongLong(retlist, value);
+            }
         }
     }
     else if (command == "SETUP_RING_BUFFER")

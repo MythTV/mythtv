@@ -170,7 +170,7 @@ long long RemoteEncoder::GetKeyframePosition(long long desired)
 }
 
 void RemoteEncoder::FillPositionMap(int start, int end,
-			            QMap<long long, long long> &positionMap)
+                                    QMap<long long, long long> &positionMap)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
     strlist << "FILL_POSITION_MAP";
@@ -184,8 +184,9 @@ void RemoteEncoder::FillPositionMap(int start, int end,
 
     for(int i = start; listpos < listsize ; i++)
     {
-        positionMap[i] = decodeLongLong(strlist, listpos);
-        listpos += 2;
+        long long index = decodeLongLong(strlist, listpos);
+        positionMap[index] = decodeLongLong(strlist, listpos+2);
+        listpos += 4;
     }
 }
 
