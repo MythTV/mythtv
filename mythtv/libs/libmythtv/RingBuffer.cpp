@@ -36,7 +36,7 @@ using namespace std;
 #define HAVE_FDATASYNC
 #endif
 
-#define READ_TEST_SIZE 2048
+#define READ_TEST_SIZE 204
 #define OPEN_READ_ATTEMPTS 5
 
 
@@ -259,6 +259,7 @@ void ThreadedFileWriter::SetWriteBufferMinWriteSize(int newMinSize)
 void ThreadedFileWriter::DiskLoop()
 {
     int size;
+    int written = 0;
     QTime timer;
     timer.start();
 
@@ -268,7 +269,7 @@ void ThreadedFileWriter::DiskLoop()
 
         if ((!in_dtor) &&
             (!flush) &&
-            ((unsigned)size < tfw_min_write_size))
+            (((unsigned)size < tfw_min_write_size) && (written >= tfw_min_write_size)))
         {
             usleep(500);
             continue;
@@ -299,7 +300,12 @@ void ThreadedFileWriter::DiskLoop()
         {
             size = safe_write(fd, buf+rpos, size);
         }
-
+        
+        if (written < tfw_min_write_size)
+        {
+            written += size;
+        }
+        
         pthread_mutex_lock(&buflock);
         rpos = (rpos + size) % tfw_buf_size;
         pthread_mutex_unlock(&buflock);
@@ -403,6 +409,7 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write, bool usereadahead)
                                                        .arg(filename).arg(openAttempts));
                         close(fd2);
                         usleep(500000);
+                        fd2 = 0;
                     }
                     else
                     {
@@ -911,22 +918,36 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
         return 0;
 
     bool readone = false;
-
+    int readErr = 0;
+    
     if (readaheadpaused && stopreads)
     {
         readone = true;
         Unpause();
     }
     else
+    {
         while (!readsallowed && !stopreads)
         {
             if (!readsAllowedWait.wait(5000))
+            {
                  VERBOSE(VB_IMPORTANT, "taking too long to be allowed to read..");
+                 readErr++;
+                 if (readErr > 2)
+                 {
+                     VERBOSE(VB_IMPORTANT, "Took more than 10 seconds to be allowed to read, "
+                                           "aborting.");
+                     wanttoread = 0;
+                     stopreads = true;
+                     return 0;
+                 }
+            }
         }
-
+    }
+    
     int avail = ReadBufAvail();
-
-    int readErr = 0;
+    readErr = 0;
+    
 
     while (avail < count && !stopreads)
     {
