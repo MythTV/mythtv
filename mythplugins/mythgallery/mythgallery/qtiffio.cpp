@@ -51,7 +51,7 @@ static toff_t tiff_seek(thandle_t handle, toff_t offset, int whence) {
   else if(whence==SEEK_END)
     iod->at(iod->size()+offset);
   else
-    return -1;
+    return ( toff_t )-1;
   
   return iod->at();
 }
