@@ -3,14 +3,15 @@
 # vim:ts=4:sw=4:ai:et:si:sts=4
 #
 # Cut MPEG2 files to remove cutlists...
-# Written by Gavin Hurlbut <gjhurlbu@beirdo.ca>
+# Written by Gavin Hurlbut <gjhurlbu@gmail.com>
+# $Rev$
 #
 # Prerequisites:
 #    avidemux2   - http://fixounet.free.fr/avidemux/
 #    transcode   - http://zebra.fh-weingarten.de/~transcode/
 #    lvemux      - http://lvempeg.sourceforge.net/
-#    gdk2-cursed - http://zemljanka.sourceforge.net/cursed/
-# or Xvfb	 - http://www.xfree86.org/
+#    Xvfb	 - http://www.xfree86.org/
+# or gdk2-cursed - http://zemljanka.sourceforge.net/cursed/
 #
 # Usage: mpeg2cut inputfile outputfile segmentList
 #	where segmentList is a space separated list of frame regions to keep
@@ -66,10 +67,9 @@ FILENAME=$1
 BASENAME=`basename ${FILENAME} .nuv`
 OUTFILE=$2
 LASTGOP=$3
+VERSION=`echo '$Rev$' | sed -e 's/\$Rev\(\: \)*\([^ $]*\).*\$/\2/'`
 
-# get the largest numbered mark of type 6 * (15 NTSC or 12 PAL), that's the
-# last GOP frame
-
+echo mpeg2cut v${VERSION}
 echo Using mode ${MODE}
 echo Filename \"${FILENAME}\"
 echo OutFile \"${OUTFILE}\"
@@ -80,13 +80,19 @@ CUTLIST=$*
 echo Last GOP index ${LASTGOP}
 echo Cutlist \"${CUTLIST}\"
 
-echo -n Finding the AV Offset to use with lvemux:
+echo -n "Finding the AV Offset to use with lvemux: "
 OFFSET=`(tcprobe -i ${FILENAME} 2> /dev/null) | grep av_fine_ms | \
     sed -e 's/^.*av_fine_ms //' | cut -d " " -f 1`
-OFFSET=$((-1 * ${OFFSET}))
-echo ${OFFSET}
+if [ .${OFFSET}. = .. ]
+then
+    echo "0 (not detected)"
+    OFFSET=0
+else
+    OFFSET=$((-1 * ${OFFSET}))
+    echo ${OFFSET}
+fi
 
-echo -n Finding framerate:
+echo -n "Finding framerate: "
 FRAMERATE=`(tcprobe -i ${FILENAME} 2> /dev/null) | grep "frame rate" | \
     sed -e 's/^.*-f //' | cut -d " " -f 1`
 echo ${FRAMERATE}
@@ -97,6 +103,9 @@ then
 else
     GOPSPACE=15
 fi
+
+# get the largest numbered mark of type 6 * (15 NTSC or 12 PAL), that's the
+# last GOP frame
 
 LASTFRAME=$(( ${LASTGOP} * ${GOPSPACE} ))
 echo Last Frame ${LASTFRAME}

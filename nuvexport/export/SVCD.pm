@@ -39,9 +39,6 @@ package export::SVCD;
 
     # Initialize and check for transcode
         $self->init_transcode();
-    # Make sure that we have an mplexer
-        $Prog{'mplexer'} = find_program('tcmplex', 'mplex');
-        push @{$self->{'errors'}}, 'You need tcmplex or mplex to export an svcd.' unless ($Prog{'mplexer'});
 
     # Any errors?  disable this function
         $self->{'enabled'} = 0 if ($self->{'errors'} && @{$self->{'errors'}} > 0);
@@ -131,7 +128,7 @@ package export::SVCD;
         $self->SUPER::export($episode);
     # Multiplex the streams
         my $safe_outfile = shell_escape($self->{'path'}.'/'.$episode->{'outfile'});
-        $command = "nice -n $Args{'nice'} mplex -f 5 $safe_outfile.m2v $safe_outfile.mpa -o $safe_outfile.mpg";
+        $command = "nice -n $Args{'nice'} tcmplex -m s -i $safe_outfile.m2v -p $safe_outfile.mpa -o $safe_outfile.mpg";
         system($command);
     }
 
