@@ -82,7 +82,8 @@ QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg,
     if (uselabel)
     {
         layout = new QVBoxLayout(widget, 10);
-        widget->setInsideMargin(20);
+        // This makes weird and bad things happen in qt -mdz 2002/12/28
+        //widget->setInsideMargin(20);
         widget->setTitle(getLabel());
     }
     else
@@ -113,7 +114,8 @@ QWidget* HorizontalConfigurationGroup::configWidget(ConfigurationGroup *cg,
     if (uselabel)
     {
         layout = new QHBoxLayout(widget, 10);
-        widget->setInsideMargin(20);
+        // This makes weird and bad things happen in qt -mdz 2002/12/28
+        //widget->setInsideMargin(20);
         widget->setTitle(getLabel());
     }
     else
