@@ -1,14 +1,14 @@
                                    MythVideo
-                                  Version 0.11
+                                  Version 0.12
 
 BUILD/CONFIGURATION INSTRUCTIONS
 --------------------------------
 
 Requirements:
-	MythTV 0.11 installed and working
+	MythTV 0.12 installed and working
 
-If you have met the requirements above, simply type 'make' in the main
-directory to begin compiling.
+If you have met the requirements above, simply type 'qmake' then 'make' in the 
+main directory to begin compiling.
 
 Compiling note:  If you get an error on building this, that says something
                  about 'mkspecs', then you don't have the QTDIR environment
