@@ -56,6 +56,7 @@ class Weather : public MythDialog
     void update_timeout();
     void showtime_timeout();
     void nextpage_timeout();
+    void weatherTimeout();
     void cursorLeft();
     void cursorRight();
     void upKey();
@@ -77,7 +78,6 @@ class Weather : public MythDialog
     void newLocale8();
     void newLocale9();
     void radarImgDone(QNetworkOperation *);
-    void weatherTimeout();
 
   protected:
     void paintEvent(QPaintEvent *);
@@ -87,7 +87,6 @@ class Weather : public MythDialog
     int timeoutCounter;
     bool stopProcessing;
     QString parseData(QString data, QString beg, QString end);
-    QTimer *urlTimer;
     void LoadWindow(QDomElement &);
     void parseContainer(QDomElement &);
     XMLParse *theme;
@@ -139,6 +138,7 @@ class Weather : public MythDialog
     int con_attempt;
     QTimer *nextpage_Timer;
     QTimer *update_Timer;
+    QTimer *urlTimer;
 
     void saveConfig();
     QString findAccidbyName(QString);
