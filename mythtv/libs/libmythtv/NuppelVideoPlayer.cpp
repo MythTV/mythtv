@@ -58,6 +58,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
     avcodec_register_all();
 
     mpa_codec = 0;
+    osdtheme = "none";
 }
 
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
@@ -1001,7 +1002,7 @@ void NuppelVideoPlayer::StartPlaying(void)
     if (fileheader.audioblocks != 0)
         InitSound();
 
-    osd = new OSD(video_width, video_height, osdfilename, osdprefix);
+    osd = new OSD(video_width, video_height, osdfilename, osdprefix, osdtheme);
 
     playing = true;
     killplayer = false;

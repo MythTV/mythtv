@@ -11,6 +11,9 @@
 #include <sys/shm.h>
 #include <math.h>
 
+#include <iostream>
+using namespace std;
+
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>

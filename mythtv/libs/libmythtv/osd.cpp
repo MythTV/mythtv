@@ -84,7 +84,8 @@ OSDImage::~OSDImage()
         delete [] alpha;
 }
 
-OSD::OSD(int width, int height, const QString &filename, const QString &prefix)
+OSD::OSD(int width, int height, const QString &filename, const QString &prefix,
+         const QString &osdtheme)
 {
     vid_width = width;
     vid_height = height;
@@ -111,7 +112,7 @@ OSD::OSD(int width, int height, const QString &filename, const QString &prefix)
     
     SetNoThemeDefaults();
 
-    themepath = FindTheme("defaultosd");
+    themepath = FindTheme(osdtheme);
 
     if (themepath == "")
     {
@@ -273,15 +274,14 @@ bool OSD::LoadTheme(void)
         x += (int)(vid_width * 0.045);
         if (y == -1)
             y = (int)(vid_height * 0.95 - infobackground->height);
-        y = (int)(y * hmult);
-	
+
         infobackground->position.setX(x);
         infobackground->position.setY(y);
 
         coords = settings->GetSetting("InfoTextBox");
         infoRect = parseRect(coords);
+        normalizeRect(&infoRect);
         infoRect.moveBy(x, y);
-	normalizeRect(&infoRect);
 	
         int fontsize = settings->GetNumSetting("InfoTextFontSize");
         if (fontsize > 0)
@@ -292,8 +292,8 @@ bool OSD::LoadTheme(void)
         if (coords.length() > 1)
         {
             infoiconpos = parsePoint(coords);
-            infoiconpos.setX((x + infoiconpos.x()) * wmult);
-            infoiconpos.setY((y + infoiconpos.y()) * hmult);
+            infoiconpos.setX(x + infoiconpos.x() * wmult);
+            infoiconpos.setY(y + infoiconpos.y() * hmult);
             useinfoicon = true;
         }
 
@@ -302,8 +302,8 @@ bool OSD::LoadTheme(void)
         if (coords.length() > 1) 
         {
             callsignRect = parseRect(coords);
-            callsignRect.moveBy(x, y);
             normalizeRect(&callsignRect);
+            callsignRect.moveBy(x, y);
         }
     }
 
@@ -324,7 +324,6 @@ bool OSD::LoadTheme(void)
         x += (int)(vid_width * 0.045);
         if (y == -1)
             y = (int)(vid_height * 0.95 - pausebackground->height);
-        y = (int)(y * hmult);
 
         pausebackground->position.setX(x);
         pausebackground->position.setY(y);
@@ -334,8 +333,8 @@ bool OSD::LoadTheme(void)
         if (coords.length() > 1)
         {
             pausestatusRect = parseRect(coords);
-            pausestatusRect.moveBy(x, y);
             normalizeRect(&pausestatusRect);
+            pausestatusRect.moveBy(x, y);
         }
 
         bgname = settings->GetSetting("SeekSliderNormal");
@@ -345,8 +344,8 @@ bool OSD::LoadTheme(void)
             pausesliderfill = new OSDImage(bgname, hmult, wmult, true);
  
             pausesliderRect = parseRect(settings->GetSetting("SeekSliderRect"));
-            pausesliderRect.moveBy(x, y);
             normalizeRect(&pausesliderRect);
+            pausesliderRect.moveBy(x, y);
         }
     }
  
@@ -355,11 +354,9 @@ bool OSD::LoadTheme(void)
 
 void OSD::normalizeRect(QRect *rect)
 {
-    rect->setWidth(rect->width() * 0.91);
-    rect->setLeft(rect->left() * wmult);
-    rect->setRight(rect->right() * wmult);
-    rect->setTop(rect->top() * hmult);
-    rect->setBottom(rect->bottom() * hmult);
+    rect->setWidth(rect->width() * 0.91 * wmult);
+    rect->setHeight(rect->height() * hmult);
+    rect->moveTopLeft(QPoint(rect->left() * wmult, rect->top() * hmult));
 }
 
 QPoint OSD::parsePoint(QString text)

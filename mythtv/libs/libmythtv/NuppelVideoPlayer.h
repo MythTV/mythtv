@@ -78,7 +78,8 @@ class NuppelVideoPlayer
 
     void SetOSDFontName(QString filename, char *prefix) 
                       { osdfilename = filename; osdprefix = prefix; }
-    
+    void SetOSDThemeName(QString themename) { osdtheme = themename; }
+
     // don't use this on something you're playing
     char *GetScreenGrab(int secondsin, int &buflen, int &vw, int &vh);
 
@@ -223,6 +224,7 @@ class NuppelVideoPlayer
 
     QString osdfilename;
     QString osdprefix;
+    QString osdtheme;
     OSD *osd;
 
     bool InitAVCodec(int codectype);

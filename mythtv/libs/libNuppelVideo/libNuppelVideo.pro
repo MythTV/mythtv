@@ -8,6 +8,11 @@ CONFIG += thread staticlib
 
 include ( ../settings.pro )
 
+themes.path = /usr/local/share/mythtv/themes/
+themes.files = defaultosd
+
+INSTALLS += themes
+
 # Input
 HEADERS += effects.h \
            format.h \

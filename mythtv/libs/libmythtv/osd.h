@@ -13,7 +13,8 @@ class OSDImage;
 class OSD
 {
  public:
-    OSD(int width, int height, const QString &filename, const QString &prefix);
+    OSD(int width, int height, const QString &filename, const QString &prefix,
+        const QString &osdtheme);
    ~OSD(void);
 
     void Display(unsigned char *yuvptr);

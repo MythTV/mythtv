@@ -65,7 +65,10 @@ int MP3Quality=7
 int Deinterlace=1
 # How long should the OSD stay up for in seconds?
 int OSDDisplayTime=3
-# Path to the TTF 
+# Theme to use for the OSD, if 'none' or otherwise doesn't exist, the normal
+# ugly OSD will be used instead.
+str OSDTheme=defaultosd
+# Path to the TTF used in the OSD. 
 str OSDFont=helr.ttf
 #str OSDFont=/usr/share/fonts/truetype/Arial.ttf
 

@@ -632,6 +632,7 @@ void TV::SetupPlayer(void)
     nvp->SetRecorder(nvr);
     nvp->SetDeinterlace((bool)settings->GetNumSetting("Deinterlace"));
     nvp->SetOSDFontName(settings->GetSetting("OSDFont"), theprefix);
+    nvp->SetOSDThemeName(settings->GetSetting("OSDTheme"));
     nvp->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
     nvp->SetAudioDevice(settings->GetSetting("AudioDevice"));
     nvp->SetLength(playbackLen);
