@@ -683,13 +683,16 @@ void Webcam::ProcessFrame(unsigned char *frame, int fSize)
         {
             // Get a buffer for the frame. If no "free" buffers try and reused an old one
             unsigned char *buffer = it->BufferList.first();
-            if (buffer == 0)
-                buffer = it->FullBufferList.first();
-
             if (buffer != 0)
             {
                 it->BufferList.remove(buffer);
                 it->FullBufferList.append(buffer);
+            }
+            else
+                buffer = it->FullBufferList.first();
+
+            if (buffer != 0)
+            {
                 it->framesDelivered++;
 
                 // Format conversion
