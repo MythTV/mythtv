@@ -1225,7 +1225,7 @@ void ProgFinder::selectShowData(QString progTitle)
                        "FROM program,channel "
                        "WHERE program.title = \"%1\" AND program.chanid = channel.chanid "
 		       "AND program.starttime > %2 "
-                       "ORDER BY program.subtitle;")
+                       "ORDER BY program.starttime;")
                         .arg(progTitle.utf8()).arg(progStart.toString("yyyyMMddhhmm50"));
 
     QSqlQuery query = m_db->exec(thequery);
