@@ -15,9 +15,8 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <sys/ioctl.h>
-#include <linux/cdrom.h>
 #include <fcntl.h>
+#include <cdaudio.h>
 
 extern "C" {
 #include <cdda_interface.h>
@@ -32,6 +31,8 @@ extern "C" {
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythwidgets.h>
+
+using namespace std;
 
 Ripper::Ripper(QSqlDatabase *ldb, QWidget *parent, const char *name)
       : MythDialog(parent, name)
@@ -331,16 +332,20 @@ void Ripper::ripthedisc(void)
         delete track;
     }
 
+    bool EjectCD = gContext->GetNumSetting("EjectCDAfterRipping",1);
+    if (EjectCD) 
+    {
+        int cdrom_fd;
+        cdrom_fd = cd_init_device((char*)cddevice.ascii());
+        if (cdrom_fd != -1)
+        {
+            if (cd_eject(cdrom_fd) == -1) perror("Failed on cd_eject");
+            cd_finish(cdrom_fd);              
+        } else perror("Failed on cd_init_device");
+    }
+
     delete newdiag;
 
-    bool EjectCD = gContext->GetNumSetting("EjectCDAfterRipping",1);
-    if (EjectCD) {
-        int cdrom_fd;
-        if ((cdrom_fd = open(cddevice,O_RDONLY)) >= 0)
-           if (ioctl(cdrom_fd, CDROMEJECT, 0)<0)
-              perror("Failed on eject IOCTL");
-         else perror("Could not open cdrom_fd");
-    }
     hide();
 }
 
