@@ -389,7 +389,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
         
             startpos2 = ringBuffer->Seek(0, SEEK_CUR);
         
-            foundid = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader, 
+            foundit = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader, 
                                                            FRAMEHEADERSIZE));
 
             if (foundit)
