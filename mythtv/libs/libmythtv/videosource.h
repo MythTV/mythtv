@@ -433,6 +433,7 @@ public:
     };
 
     void fillSelections(QSqlDatabase* db) {
+        clearSelections();
         VideoSource::fillSelections(db, this);
     };
 };
