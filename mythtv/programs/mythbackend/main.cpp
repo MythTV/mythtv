@@ -390,8 +390,6 @@ int main(int argc, char **argv)
         }
     }
 
-    close(0);
-
     if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
         cerr << "Unable to ignore SIGPIPE\n";
 
@@ -464,15 +462,18 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    if (!gContext->OpenDatabase(db) || !gContext->OpenDatabase(subthread) ||
-        !gContext->OpenDatabase(expthread) ||
-        !gContext->OpenDatabase(hkthread) ||
-        !gContext->OpenDatabase(jobthread) ||
-        !gContext->OpenDatabase(msdb))
+    if (!gContext->OpenDatabase(db, !daemonize && (logfile == "")) ||
+        !gContext->OpenDatabase(subthread, false) ||
+        !gContext->OpenDatabase(expthread, false) ||
+        !gContext->OpenDatabase(hkthread, false) ||
+        !gContext->OpenDatabase(jobthread, false) ||
+        !gContext->OpenDatabase(msdb, false))
     {
         cerr << "Couldn't open database\n";
         return -1;
     }
+
+    close(0);
 
     UpgradeTVDatabaseSchema();
 
