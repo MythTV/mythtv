@@ -19,7 +19,7 @@ make="make"
 strip="strip"
 cpu=`uname -m`
 cpu_raw="$cpu"
-processor=`uname -p`
+processor=`uname -p 2>/dev/null`
 processor_flags=""
 tune="generic"
 powerpc_perf="no"
@@ -33,7 +33,7 @@ audio_jack="default"
 ivtv="yes"
 ivtv_header="no"
 dvb="no"
-dvb_path=""
+dvb_path="/usr/src/linux/include"
 dvb_eit="no"
 lirc="yes"
 joystick_menu="yes"
@@ -49,6 +49,11 @@ direct_x="no"
 CONFIG_INCLUDEPATH=""
 CONFIG_DEFINES=""
 PROFILEFLAGS=""
+
+KERNEL_RELEASE=`uname -r 2>/dev/null`
+if test x"$KERNEL_RELEASE" != x"" ; then
+    dvb_path="/usr/src/linux-$KERNEL_RELEASE/include"
+fi
 
 if test x"$1" = x"-h" -o x"$1" = x"--help" ; then
 cat << EOF
@@ -122,11 +127,7 @@ echo "  --disable-ivtv           disable ivtv support (PVR-250, PVR-350)"
 echo "  --enable-dvb             enable DVB support (must supply header directory)"
 echo "  --dvb-path=HDRLOC        location of directory containing"
 echo "                           'linux/dvb/frontend.h', not the"
-echo "                           directory with frontend.h"
-echo "                           Note: This MUST NOT be your linux kernel"
-echo "                           source includes. Copy the DVB includes"
-echo "                           into a separate directory for now."
-echo "                           [$dvb-path]"
+echo "                           directory with frontend.h [$dvb-path]"
 echo "  --enable-dvb-eit         enable DVB EIT support (--enable-dvb is required)"
 echo "  --disable-x11            disable X11 support"
 echo "  --disable-xrandr         disable X11 resolution switching"
@@ -1395,10 +1396,9 @@ if test x"$dvb" = x"yes" ; then
     dvb="no"
     if test -f "$dvb_path"/linux/dvb/frontend.h ; then
         if test -f "$dvb_path"/linux/timer.h ; then
-            echo "Error, DVB location points into kernel [$dvb_path]"
-        else
-            dvb="yes"
+            echo "Warning: DVB location points into kernel (ok if kernel >= 2.6.11)"
         fi
+        dvb="yes"
     else
         echo "DVB location does not contain linux/dvb/frontend.h [$dvb_path]"
     fi
