@@ -115,7 +115,8 @@ contains( TARGET_ARCH_POWERPC, yes ) {
     SOURCES += ppc/dsputil_ppc.c ppc/mpegvideo_ppc.c
 }
 
-contains( TARGET_ARCH_ALTIVEC, yes ) {
+contains( TARGET_ALTIVEC, yes ) {
     SOURCES += ppc/dsputil_altivec.c ppc/mpegvideo_altivec.c ppc/idct_altivec.c
-    QMAKE_CFLAGS_RELEASE += -faltivec
+    SOURCES += ppc/gmc_altivec.c ppc/fdct_altivec.c ppc/fft_altivec.c
+    QMAKE_CFLAGS_RELEASE += -maltivec -mabi=altivec
 }
