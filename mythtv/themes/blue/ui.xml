@@ -1813,7 +1813,7 @@
         <columnpadding>1</columnpadding>
         <column number="1" width="745" context="-1"></column>
         <items>8</items>
-        <image function="selectionbar" filename="rk-selectbar.png" location="-6,-2"></image>
+        <image function="selectionbar" filename="rk-selectbar.png" location="-8,3"></image>
         <image function="uparrow" filename="uparrow.png" location="755,15"></image>
         <image function="downarrow" filename="downarrow.png" location="755,235"></image>
       </listarea>
@@ -1824,40 +1824,40 @@
     </container>
 
     <container name="program_info">
-      <area>0,20,800,265</area>
+      <area>20,20,760,265</area>
       <textarea name="title" draworder="6">
-        <area>20,0,800,45</area>
+        <area>0,0,760,45</area>
         <font>title</font>
       </textarea>
       <textarea name="subtitle" draworder="6">
-        <area>20,45,579,40</area>
+        <area>0,45,760,40</area>
         <font>subtitle</font>
       </textarea>
       <textarea name="infotime" draworder="6" align="right">
-        <area>20,85,150,30</area>
+        <area>0,85,150,30</area>
         <font>infob</font>
         <value>Airdate:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
-        <area>180,85,600,30</area>
+        <area>160,85,600,30</area>
         <font>info</font>
       </textarea>
       <textarea name="infochan" draworder="6" align="right">
-        <area>20,115,150,30</area>
+        <area>0,115,150,30</area>
         <font>infob</font>
         <value>Channel:</value>
       </textarea>
       <textarea name="channel" draworder="6">
-        <area>180,115,400,30</area>
+        <area>160,115,600,30</area>
         <font>info</font>
       </textarea>
       <textarea name="infodesc" draworder="6" align="right">
-        <area>20,145,150,30</area>
+        <area>0,145,150,30</area>
         <font>infob</font>
         <value>Description:</value>
       </textarea>
       <textarea name="description" draworder="6">
-        <area>180,145,600,120</area>
+        <area>160,145,600,120</area>
         <font>info</font>
         <multiline>yes</multiline>
       </textarea>
