@@ -386,8 +386,27 @@ MythDialog* ScheduledRecording::dialogWidget(MythContext* context, QWidget* pare
     titlefield->setBackgroundOrigin(QWidget::WindowOrigin);
     titlefield->setFont(QFont("Arial", (int)(bigfont * hmult), QFont::Bold));
 
-    //QLabel *date = getDateLabel(pginfo);
-    QLabel* date = new QLabel("Date goes here", dialog);
+    // xxx, use DateFormat etc.
+    
+    QString dateText = "Date: ";
+    switch (getRecordingType()) {
+    case SingleRecord:
+        dateText += QDateTime(startDate->dateValue(),
+                             startTime->timeValue()).toString();
+        break;
+    case TimeslotRecord:
+        dateText += QString("%1 - %2")
+            .arg(startTime->timeValue().toString())
+            .arg(endTime->timeValue().toString());
+        break;
+    case ChannelRecord:
+    case AllRecord:
+    case NotRecording:
+        dateText += "(any)";
+        break;
+    }
+
+    QLabel* date = new QLabel(dateText,dialog);
     date->setBackgroundOrigin(QWidget::WindowOrigin);
 
     QLabel *subtitlelabel = new QLabel("Episode:", dialog);
@@ -450,10 +469,34 @@ void ScheduledRecording::fillSelections(QSqlDatabase* db, SelectSetting* setting
 
             QString label;
 
-            if (sr.getRecordingType() == AllRecord)
-                label = "All " + sr.title->getValue();
-            else
-                label = "XXX";
+            switch (sr.getRecordingType()) {
+            case AllRecord:
+                label = QString("%1").arg(sr.title->getValue());
+                break;
+            case ChannelRecord:
+                label = QString("%1 on channel %2")
+                    .arg(sr.title->getValue())
+                    .arg(sr.channel->getSelectionLabel());
+                break;
+            case TimeslotRecord:
+                label = QString("%1 on channel %2 (%3 - %4)")
+                    .arg(sr.title->getValue())
+                    .arg(sr.channel->getSelectionLabel())
+                    .arg(sr.startTime->timeValue().toString())
+                    .arg(sr.endTime->timeValue().toString());
+                break;
+            case SingleRecord:
+                label = QString("%1 on channel %2 (%3 %4 - %5)")
+                    .arg(sr.title->getValue())
+                    .arg(sr.channel->getSelectionLabel())
+                    .arg(sr.startDate->dateValue().toString())
+                    .arg(sr.startTime->timeValue().toString())
+                    .arg(sr.endTime->timeValue().toString());
+                break;
+            default:
+                label = "You should not see this";
+            }
+
             setting->addSelection(label, QString::number(id));
         }
 }
