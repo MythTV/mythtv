@@ -109,6 +109,8 @@ class UIType : public QObject
                     int overload_width = -1, int overload_height = -1);
     QString getName(){return m_name;}
 
+    bool    isShown(){return !hidden;}
+    bool    isHidden(){return hidden;}
     
   public slots:
   
@@ -116,6 +118,10 @@ class UIType : public QObject
     virtual void looseFocus();
     virtual void activate(){}
     virtual void refresh();
+    virtual void show();
+    virtual void hide();
+    virtual bool toggleShow();
+    
 
   signals:
   
@@ -142,6 +148,7 @@ class UIType : public QObject
     bool     takes_focus;
     QRect    screen_area;   // The area, in real screen coordinates
     bool     drawFontShadow;
+    bool     hidden;        // Is this "widget" seen or hidden ?
 };
 
 class UIBarType : public UIType

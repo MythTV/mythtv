@@ -276,6 +276,10 @@ UIListGenericTree *UIListTreeType::GetCurrentPosition(void)
 
 void UIListTreeType::Draw(QPainter *p, int order, int blah)
 {
+    if(hidden)
+    {
+        return;
+    }
     QPtrListIterator<UIListBtnType> it(listLevels);
     UIListBtnType *child;
 
@@ -499,6 +503,15 @@ void UIListTreeType::MoveRight(void)
 
         Redraw();
     }
+}
+
+void UIListTreeType::calculateScreenArea()
+{
+    QRect r = m_totalarea; 
+    r.moveBy(m_parent->GetAreaRect().left(),
+             m_parent->GetAreaRect().top());
+    screen_area = r;
+
 }
 
 //////////////////////////////////////////////////////////////////////////////

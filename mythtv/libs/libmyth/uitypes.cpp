@@ -169,6 +169,7 @@ UIType::UIType(const QString &name)
     takes_focus = false;
     screen_area = QRect(0,0,0,0);
     drawFontShadow = true;
+    hidden = false;
 }
 
 void UIType::SetOrder(int order)
@@ -237,6 +238,38 @@ void UIType::calculateScreenArea()
 void UIType::refresh()
 {
     emit requestUpdate(screen_area);
+}
+
+void UIType::show()
+{
+    //
+    //  In this base class, this is pretty simple. The method is virtual
+    //  though, and inherited fancy classes like UIListBttn can/will/should
+    //  set a timer and fade things on a show()
+    //
+    
+    hidden = false;
+    refresh();
+}
+
+void UIType::hide()
+{
+    hidden = true;
+    refresh();
+}
+
+bool UIType::toggleShow()
+{
+    if(hidden)
+    {
+        show();
+    }
+    else
+    {
+        hide();
+    }
+    
+    return !hidden;
 }
 
 QString UIType::cutDown(const QString &data, QFont *testFont, bool multiline, 

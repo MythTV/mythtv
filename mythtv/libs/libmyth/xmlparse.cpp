@@ -2380,6 +2380,7 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
     l->SetItemSelColor(grSelectedBeg, grSelectedEnd, grSelectedAlpha);
     l->SetSpacing((int)(spacing*hmult));
     l->SetMargin((int)(margin*wmult));
+    l->SetParent(container);
 
     container->AddType(l);
     container->bumpUpLayers(0);
@@ -2535,7 +2536,9 @@ void XMLParse::parseListTreeArea(LayerSet *container, QDomElement &element)
     l->SetItemSelColor(grSelectedBeg, grSelectedEnd, grSelectedAlpha);
     l->SetSpacing((int)(spacing*hmult));
     l->SetMargin((int)(margin*wmult));
-
+    l->SetParent(container);
+    l->calculateScreenArea();
+    
     container->AddType(l);
     container->bumpUpLayers(0);
 }

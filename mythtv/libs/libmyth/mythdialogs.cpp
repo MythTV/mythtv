@@ -1472,22 +1472,34 @@ void MythThemedDialog::updateForeground()
 
 void MythThemedDialog::updateForeground(const QRect &r)
 {
+    QRect rect_to_update = r;
+    if(r.width() == 0 || r.height() == 0)
+    {
+        cerr << "MythThemedDialog.o: something is requesting a screen update of zero size. "
+             << "A widget probably has not done a calculateScreeArea(). Will redraw "
+             << "the whole screen (inefficient!)." 
+             << endl;
+             
+        rect_to_update = this->geometry();
+    }
+
+
+
     //
     //  Debugging
     //
 
-    /*
+    /*    
     cout << "I am updating the foreground from "
-         << r.left()
+         << rect_to_update.left()
          << ","
-         << r.top()
+         << rect_to_update.top()
          << " to "
-         << r.left() + r.width()
+         << rect_to_update.left() + rect_to_update.width()
          << ","
-         << r.top() + r.height()
+         << rect_to_update.top() + rect_to_update.height()
          << endl;
     */
-
     //
     //  We paint offscreen onto a pixmap
     //  and then BitBlt it over
@@ -1509,7 +1521,7 @@ void MythThemedDialog::updateForeground(const QRect &r)
         //
 
         if (container_area.isValid() &&
-            r.intersects(container_area) &&
+            rect_to_update.intersects(container_area) &&
             looper->GetName().lower() != "background")
         {
             //
@@ -1562,7 +1574,7 @@ void MythThemedDialog::updateForeground(const QRect &r)
         whole_dialog_painter.end();
     }
 
-    update(r);
+    update(rect_to_update);
 }
 
 void MythThemedDialog::updateForegroundRegion(const QRect &r)

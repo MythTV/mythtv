@@ -97,6 +97,7 @@ class UIListTreeType : public UIType
     void MoveUp(MovementUnit unit = MoveItem);
     void MoveLeft(void);
     void MoveRight(void);
+    void calculateScreenArea();
 
   signals:
     void itemSelected(UIListTreeType *parent, UIListGenericTree *item);
