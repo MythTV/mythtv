@@ -1,3 +1,11 @@
 #!/bin/sh
 
-nice -19 tv_grab_na --days 1 | nice -19 tv_sort | nice -19 ./to_mysql
+if [ $# -ne "1" ]
+then
+   echo "Needs a offset arg."
+   exit 2;
+fi
+
+dayoffset=$1;
+
+nice -19 tv_grab_na --days 1 --offset $dayoffset | nice -19 tv_sort | nice -19 ./to_mysql $dayoffset

@@ -16,6 +16,8 @@ CREATE TABLE program
     title VARCHAR(128) NULL,
     subtitle VARCHAR(128) NULL,
     description TEXT NULL,
-    category VARCHAR(64) NULL
+    category VARCHAR(64) NULL,
+    PRIMARY KEY (channum, starttime),
+    INDEX (endtime)
 );
      

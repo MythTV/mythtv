@@ -1,0 +1,30 @@
+#!/usr/bin/perl -w
+    
+use strict;
+
+use DBI;
+
+my $dbh = DBI->connect("DBI:mysql:database=mythconverg:host=localhost",
+                       "mythtv", "mythtv", { PrintError => 0 } )
+   or die DBI->errstr;
+
+my $offset;
+
+system("./grabdata 1");
+
+# Yes, this looks weird -- the 0 and 1 cases will normally never be used.
+# Basically, it just checks to see if today has data (in the case of this
+# being the first ever run)
+for ($offset = 0; $offset < 8; $offset++)
+{
+    my $sth = $dbh->prepare("SELECT * FROM program WHERE starttime = DATE_ADD(CURRENT_DATE, INTERVAL $offset DAY);");
+    $sth->execute() or die $sth->errstr;
+
+    if ($sth->rows == 0)
+    {
+        system("./grabdata $offset");
+    }
+}
+
+$dbh->do("DELETE FROM program WHERE starttime < DATE_SUB(CURRENT_DATE, INTERVAL 1 DAY)")
+   or die $dbh->errstr;

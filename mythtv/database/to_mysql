@@ -26,15 +26,18 @@ else {
 # Prototype declarations
 sub usage( ;$ );
 
+my $offset = 0;
 my ($opt_help, $opt_output);
 GetOptions('help' => \$opt_help, 'output=s' => \$opt_output);
 usage(1) if $opt_help;
 my $filename;
 if (@ARGV == 0) {
     $filename = '-';
+    $offset = 0;
 }
 elsif (@ARGV == 1) {
-    $filename = $ARGV[0];
+    $filename = '-';
+    $offset = $ARGV[0];
 }
 elsif (@ARGV >= 2) {
     usage();
@@ -65,11 +68,11 @@ foreach my $id (keys %channels) {
            my $localpath = $sharepath . $name;
            $src = $localpath;
            if (-e $localpath) {
-               printf "$localpath exists\n";
+               #printf "$localpath exists\n";
            }
            else {
                my $command = "wget $url";
-               printf "$localpath not found\n";
+               #printf "$localpath not found\n";
                system $command;
            }
        }
@@ -85,6 +88,10 @@ foreach my $id (keys %channels) {
         print "ADDED channel: $id , $callsign, $src\n";
     }
 }
+my $nextoffset = $offset + 1;
+
+$dbh->do("DELETE FROM program WHERE starttime >= DATE_ADD(CURRENT_DATE, INTERVAL $offset DAY) AND starttime < DATE_ADD(CURRENT_DATE, INTERVAL $nextoffset DAY);")
+ or die $dbh->errstr;
 
 foreach (@progs) {
     my %h = %$_;
