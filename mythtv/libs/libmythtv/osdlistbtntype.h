@@ -26,25 +26,73 @@
 #include "ttfont.h"
 #include <qcolor.h>
 #include <qptrlist.h>
+#include <qevent.h>
+#include "generictree.h"
 
 class OSDListBtnTypeItem;
 class OSDListBtnType;
 
+class OSDGenericTree : public GenericTree
+{
+  public:
+    // This class will _not_ delete the image it's given, if any.
+    OSDGenericTree(const QString &name, const QString &action = "",
+                   int check = -1, OSDTypeImage *image = NULL);
+
+    OSDTypeImage *getImage(void) { return m_image; }
+    QString getAction(void) { return m_action; }
+    int getCheckable(void) { return m_checkable; }
+
+  private:
+    OSDTypeImage *m_image;
+    QString m_action;
+    int m_checkable;
+};
+
+// Will _not_ delete the GenericTree that it's given.
 class OSDListTreeType : public OSDType
 {
     Q_OBJECT
   public:
-    OSDListTreeType(const QString &name, const QRect &area,
+    OSDListTreeType(const QString &name, const QRect &area, 
+                    const QRect &levelsize, int levelspacing,
                     float wmult, float hmult);
 
-    OSDListBtnType *GetLevelAt(unsigned int index);
-    
+    void SetFontActive(TTFFont *font);
+    void SetFontInactive(TTFFont *font);
+    void SetSpacing(int spacing);
+    void SetMargin(int margin);
+    void SetItemRegColor(const QColor& beg, const QColor& end, uint alpha);
+    void SetItemSelColor(const QColor& beg, const QColor& end, uint alpha);
+
+    void SetAsTree(OSDGenericTree *toplevel);
+
+    OSDGenericTree *GetCurrentPosition(void);
+ 
+    bool HandleKeypress(QKeyEvent *e);
+
+    void Draw(OSDSurface *surface, int fade, int maxfade, int xoff, int yoff);
+
+    bool IsVisible(void) { return m_visible; }
+    void SetVisible(bool visible) { m_visible = visible; }
+ 
   private:
+    void FillLevelFromTree(OSDGenericTree *item, OSDListBtnType *list);
+    OSDListBtnType *GetLevel(int levelnum);
+    void SetCurrentPosition(void);
+
     int levels;
     int curlevel;
 
-    TTFFont *active;
-    TTFFont *inactive;
+    OSDGenericTree *treetop;
+    OSDGenericTree *currentpos;
+
+    QPtrList<OSDListBtnType> listLevels;
+
+    OSDListBtnType *currentlevel;
+
+    TTFFont *m_active;
+    TTFFont *m_inactive;
 
     QColor    m_itemRegBeg;
     QColor    m_itemRegEnd;
@@ -53,19 +101,26 @@ class OSDListTreeType : public OSDType
     uint      m_itemRegAlpha;
     uint      m_itemSelAlpha;
    
-    int spacing;
-    int margin;
+    int m_spacing;
+    int m_margin;
+
+    QRect m_totalarea;
+    QRect m_levelsize;
+    int m_levelspacing;
+
+    float m_wmult;
+    float m_hmult;
+
+    bool m_visible;
 };
  
 class OSDListBtnType : public OSDType
 {
     Q_OBJECT
-
   public:
-
     OSDListBtnType(const QString &name, const QRect& area,
                    float wmult, float hmult,
-                   bool showArrow = true, bool showScrollArrows = false);
+                   bool showScrollArrows = false);
     ~OSDListBtnType();
 
     void  SetFontActive(TTFFont *font);
@@ -92,8 +147,8 @@ class OSDListBtnType : public OSDType
     void  MoveDown();
     void  MoveUp();
 
-    bool  isVisible() { return m_visible; }
-    void  setVisible(bool vis) { m_visible = vis; }
+    bool  IsVisible() { return m_visible; }
+    void  SetVisible(bool vis) { m_visible = vis; }
 
   private:
 
@@ -118,7 +173,6 @@ class OSDListBtnType : public OSDType
 
     bool  m_active;
     bool  m_showScrollArrows;
-    bool  m_showArrow;
     bool  m_showUpArrow;
     bool  m_showDnArrow;
 
@@ -173,14 +227,14 @@ class OSDListBtnTypeItem
 
     OSDListBtnTypeItem(OSDListBtnType* lbtype, const QString& text,
                        OSDTypeImage *pixmap = 0, bool checkable = false,
-                       CheckState state = NotChecked);
+                       bool showArrow = false, CheckState state = NotChecked);
     ~OSDListBtnTypeItem();
 
     OSDListBtnType*   parent() const;
-    QString          text() const;
+    QString           text() const;
     const OSDTypeImage*   pixmap() const;
-    bool             checkable() const;
-    CheckState       state() const;
+    bool              checkable() const;
+    CheckState        state() const;
 
     void  setChecked(CheckState state);
     void  setData(void *data);
@@ -202,7 +256,9 @@ class OSDListBtnTypeItem
     QRect          m_pixmapRect;
     QRect          m_textRect;
     QRect          m_arrowRect;
-    
+
+    bool           m_showArrow;    
+
     friend class OSDListBtnType;
 };
 

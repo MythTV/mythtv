@@ -89,11 +89,16 @@ GenericTree* GenericTree::addNode(const QString &a_string, int an_int,
     GenericTree *new_node = new GenericTree(a_string.stripWhiteSpace(),
                                             an_int, selectable_flag);
 
-    new_node->setParent(this);
-    m_subnodes->append(new_node);
-    m_ordered_subnodes->append(new_node);
+    return addNode(new_node);
+}
 
-    return new_node;
+GenericTree *GenericTree::addNode(GenericTree *child)
+{
+    child->setParent(this);
+    m_subnodes->append(child);
+    m_ordered_subnodes->append(child);
+
+    return child;
 }
 
 int GenericTree::calculateDepth(int start)
@@ -236,6 +241,14 @@ int GenericTree::siblingCount(void)
     if (m_parent)
         return m_parent->childCount();
     return 1;
+}
+
+QPtrList<GenericTree> *GenericTree::getAllChildren(int ordering_index)
+{
+    if (ordering_index == -1)
+        return m_subnodes;
+
+    return m_ordered_subnodes;
 }
 
 GenericTree* GenericTree::getChildAt(uint reference, int ordering_index)

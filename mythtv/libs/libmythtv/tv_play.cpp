@@ -1004,6 +1004,12 @@ void TV::ProcessKeypress(QKeyEvent *e)
         return;
     }
 
+    if (nvp->GetOSD() && osd->IsRunningTreeMenu())
+    {
+        osd->TreeMenuHandleKeypress(e);
+        return;
+    }
+
     QStringList actions;
     QString action;
     if (!gContext->GetMainWindow()->TranslateKeyPress("TV Playback", e, 

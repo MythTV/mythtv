@@ -21,6 +21,7 @@ class GenericTree
 
     GenericTree *addNode(const QString &a_string, int an_int = 0, 
                          bool selectable_flag = false);
+    GenericTree *addNode(GenericTree *child);
 
     GenericTree *findLeaf(int ordering_index = -1);
 
@@ -28,12 +29,14 @@ class GenericTree
     GenericTree* recursiveNodeFinder(QValueList<int> route_of_branches);
     bool checkNode(QValueList<int> route_of_branches);
 
-    GenericTree *nextSibling(int number_down, int ordering_index);
+    GenericTree *nextSibling(int number_down, int ordering_index = -1);
     GenericTree *prevSibling(int number_up, int ordering_index = -1);
 
     GenericTree *getSelectedChild(int ordering_index);
     GenericTree *getChildAt(uint reference, int ordering_index = -1);
     GenericTree *getChildByName(const QString &a_name);
+
+    QPtrList<GenericTree> *getAllChildren(int ordering_index = -1);
 
     int getChildPosition(GenericTree *child, int ordering_index = -1);
     int getPosition(void);

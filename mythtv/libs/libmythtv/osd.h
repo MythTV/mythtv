@@ -31,6 +31,8 @@ class OSDTypePositionIndicator;
 class OSDSurface;
 class TV;
 class UDPNotifyOSDSet;
+class OSDListTreeType;
+class QKeyEvent;
 
 class OSD : public QObject
 {
@@ -106,6 +108,10 @@ class OSD : public QObject
     void StartNotify(UDPNotifyOSDSet *notifySet, int displaytime = 5);
     void ClearNotify(UDPNotifyOSDSet *notifySet);
 
+    bool IsRunningTreeMenu(void);
+    bool TreeMenuHandleKeypress(QKeyEvent *e);
+    void ShowTreeMenu(const QString &name);
+
  private:
     void SetDefaults();
     TTFFont *LoadFont(QString name, int size); 
@@ -168,6 +174,9 @@ class OSD : public QObject
 
     OSDSurface *drawSurface;
     bool changed;
+
+    OSDListTreeType *runningTreeMenu;
+    QString treeMenuContainer;
 };
     
 #endif

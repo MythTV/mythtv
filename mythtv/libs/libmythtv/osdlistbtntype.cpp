@@ -27,13 +27,300 @@
 #include <qcolor.h>
 
 #include "mythcontext.h"
+#include "mythdialogs.h"
 
 #include "osdlistbtntype.h"
 
 
-OSDListBtnType::OSDListBtnType(const QString& name, const QRect& area,
+OSDGenericTree::OSDGenericTree(const QString &name, const QString &action,
+                               int check, OSDTypeImage *image)
+                      : GenericTree(name)
+{
+    m_checkable = check;
+    m_action = action;
+    m_image = image;
+
+    if (!action.isEmpty() && !action.isNull())
+        setSelectable(true);
+}
+
+////////////////////////////////////////////////////////////////////////////
+
+OSDListTreeType::OSDListTreeType(const QString &name, const QRect &area,
+                                 const QRect &levelsize, int levelspacing,
+                                 float wmult, float hmult)
+               : OSDType(name)
+{
+    m_wmult = wmult;
+    m_hmult = hmult;
+
+    m_totalarea = area;
+    m_levelsize = levelsize;
+    m_levelspacing = levelspacing;
+
+    levels = 0;
+    curlevel = -1;
+
+    treetop = NULL;
+    currentpos = NULL;
+
+    currentlevel = NULL;
+
+    listLevels.setAutoDelete(true);
+
+    m_active = NULL;
+    m_inactive = NULL;
+
+    SetItemRegColor(Qt::black,QColor(80,80,80),100);
+    SetItemSelColor(QColor(82,202,56),QColor(52,152,56),255);
+
+    m_spacing = 0;
+    m_margin = 0;
+}
+
+void OSDListTreeType::SetItemRegColor(const QColor& beg, const QColor& end,
+                                      uint alpha)
+{
+    m_itemRegBeg   = beg;
+    m_itemRegEnd   = end;
+    m_itemRegAlpha = alpha;
+}
+
+void OSDListTreeType::SetItemSelColor(const QColor& beg, const QColor& end,
+                                      uint alpha)
+{
+    m_itemSelBeg   = beg;
+    m_itemSelEnd   = end;
+    m_itemSelAlpha = alpha;
+}
+
+void OSDListTreeType::SetFontActive(TTFFont *font)
+{
+    m_active = font;
+}
+
+void OSDListTreeType::SetFontInactive(TTFFont *font)
+{
+    m_inactive = font;
+}
+
+void OSDListTreeType::SetSpacing(int spacing)
+{
+    m_spacing = spacing;
+}
+
+void OSDListTreeType::SetMargin(int margin)
+{
+    m_margin = margin;
+}
+
+void OSDListTreeType::SetAsTree(OSDGenericTree *toplevel)
+{
+    if (treetop)
+    {
+        cerr << "Unable to set new top level tree\n";
+        return;
+    }
+
+    levels = toplevel->calculateDepth(0) - 1;
+
+    if (levels <= 0)
+    {
+        cerr << "Need at least one level\n";
+        return;
+    }
+
+    currentpos = (OSDGenericTree *)toplevel->getChildAt(0);
+
+    if (!currentpos)
+    {
+        cerr << "No top-level children?\n";
+        return;
+    }
+
+    treetop = toplevel;
+
+    // just for now, remove later
+    if (levels > 3)
+        levels = 3;
+
+    for (int i = 0; i < levels; i++)
+    {
+        QString levelname = QString("level%1").arg(i + 1);
+
+        QRect curlevelarea = m_levelsize;
+        curlevelarea.moveBy((m_levelsize.width() + m_levelspacing) * i, 0);
+
+        OSDListBtnType *newlevel = new OSDListBtnType(levelname, curlevelarea,
+                                                      m_wmult, m_hmult, true);
+
+        newlevel->SetFontActive(m_active);
+        newlevel->SetFontInactive(m_inactive);
+        newlevel->SetItemRegColor(m_itemRegBeg, m_itemRegEnd, m_itemRegAlpha);
+        newlevel->SetItemSelColor(m_itemSelBeg, m_itemSelEnd, m_itemSelAlpha);
+        newlevel->SetSpacing(m_spacing);
+        newlevel->SetMargin(m_margin);
+
+        listLevels.append(newlevel);
+    }
+
+    currentlevel = GetLevel(0);
+
+    if (!currentlevel)
+    {
+        cerr << "Something is seriously wrong (currentlevel = NULL)\n";
+        return;
+    }
+
+    FillLevelFromTree(toplevel, currentlevel);
+
+    currentlevel->SetVisible(true);
+    currentlevel->SetActive(true);
+
+    currentpos = (OSDGenericTree *)(currentlevel->GetItemFirst()->getData());
+    curlevel = 0;
+}
+
+OSDGenericTree *OSDListTreeType::GetCurrentPosition(void)
+{
+    return currentpos;
+}
+
+bool OSDListTreeType::HandleKeypress(QKeyEvent *e)
+{
+    if (!currentlevel)
+        return false;
+
+    bool handled = false;
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    {
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        {
+            QString action = actions[i];
+            handled = true;
+
+            if (action == "UP")
+            {
+                currentlevel->MoveUp();
+                SetCurrentPosition();
+            }
+            else if (action == "DOWN")
+            {
+                currentlevel->MoveDown();
+                SetCurrentPosition();
+            }
+            else if (action == "LEFT")
+            {
+                if (curlevel > 0)
+                {
+                    currentlevel->Reset();
+                    currentlevel->SetVisible(false);
+
+                    curlevel--;
+
+                    currentlevel = GetLevel(curlevel);
+                    currentlevel->SetActive(true);
+                    SetCurrentPosition();
+                }   
+            }
+            else if (action == "RIGHT")
+            {
+                // FIXME: create new levels if needed..
+                if (curlevel + 1 < levels && currentpos->childCount() > 0)
+                {
+                    currentlevel->SetActive(false);
+
+                    curlevel++;
+
+                    currentlevel = GetLevel(curlevel);
+
+                    FillLevelFromTree(currentpos, currentlevel);
+
+                    currentlevel->SetVisible(true);
+                    currentlevel->SetActive(true);
+                    SetCurrentPosition();
+                }
+            }
+            else if (action == "ESCAPE")
+                m_visible = false;
+            else
+                handled = false;
+        }
+    }
+
+    return handled;
+}
+
+void OSDListTreeType::Draw(OSDSurface *surface, int fade, int maxfade, 
+                           int xoff, int yoff)
+{
+    QPtrListIterator<OSDListBtnType> it(listLevels);
+    OSDListBtnType *child;
+
+    while ((child = it.current()) != 0)
+    {
+        child->Draw(surface, fade, maxfade, xoff, yoff);
+        ++it;
+    }
+}
+
+void OSDListTreeType::FillLevelFromTree(OSDGenericTree *item, 
+                                        OSDListBtnType *list)
+{
+    list->Reset();
+
+    QPtrList<GenericTree> *itemlist = item->getAllChildren();
+
+    QPtrListIterator<GenericTree> it(*itemlist);
+    GenericTree *child;
+
+    while ((child = it.current()) != 0)
+    {
+        OSDGenericTree *osdchild = (OSDGenericTree *)child;
+
+        OSDListBtnTypeItem *newitem;
+        newitem = new OSDListBtnTypeItem(list, child->getString(),
+                                         osdchild->getImage(), 
+                                         (osdchild->getCheckable() >= 0),
+                                         (child->childCount() > 0));
+        if (osdchild->getCheckable() == 1)
+            newitem->setChecked(OSDListBtnTypeItem::FullChecked);
+        newitem->setData(osdchild);
+
+        ++it;
+    }
+}
+
+OSDListBtnType *OSDListTreeType::GetLevel(int levelnum)
+{
+    if ((uint)levelnum > listLevels.count())
+    {
+        cerr << "OOB GetLevel call\n";
+        return NULL;
+    }
+
+    return listLevels.at(levelnum);
+}
+
+void OSDListTreeType::SetCurrentPosition(void)
+{
+    if (!currentlevel)
+        return;
+
+    OSDListBtnTypeItem *lbt = currentlevel->GetItemCurrent();
+
+    if (!lbt)
+        return;
+
+    currentpos = (OSDGenericTree *)(lbt->getData());
+}
+ 
+//////////////////////////////////////////////////////////////////////////
+
+OSDListBtnType::OSDListBtnType(const QString &name, const QRect &area,
                                float wmult, float hmult,
-                               bool showArrow, bool showScrollArrows)
+                               bool showScrollArrows)
               : OSDType(name)
 {
     m_rect             = area;
@@ -41,7 +328,6 @@ OSDListBtnType::OSDListBtnType(const QString& name, const QRect& area,
     m_wmult            = wmult;
     m_hmult            = hmult;
 
-    m_showArrow        = showArrow;
     m_showScrollArrows = showScrollArrows;
 
     m_active           = false;
@@ -72,8 +358,7 @@ OSDListBtnType::~OSDListBtnType()
     Reset();
 }
 
-void OSDListBtnType::SetItemRegColor(const QColor& beg, 
-                                     const QColor& end,
+void OSDListBtnType::SetItemRegColor(const QColor& beg, const QColor& end, 
                                      uint alpha)
 {
     m_itemRegBeg   = beg;
@@ -81,8 +366,7 @@ void OSDListBtnType::SetItemRegColor(const QColor& beg,
     m_itemRegAlpha = alpha;
 }
 
-void OSDListBtnType::SetItemSelColor(const QColor& beg,
-                                     const QColor& end,
+void OSDListBtnType::SetItemSelColor(const QColor& beg, const QColor& end,
                                      uint alpha)
 {
     m_itemSelBeg   = beg;
@@ -372,11 +656,7 @@ void OSDListBtnType::Init()
     LoadPixmap(m_checkNonePix, "check-empty");
     LoadPixmap(m_checkHalfPix, "check-half");
     LoadPixmap(m_checkFullPix, "check-full");
-    
-    if (m_showArrow) 
-    {
-        LoadPixmap(m_arrowPix, "arrow");
-    }
+    LoadPixmap(m_arrowPix, "arrow");
 
     QImage img(m_rect.width(), m_itemHeight, 32);
     img.setAlphaBuffer(true);
@@ -495,19 +775,20 @@ void OSDListBtnType::Init()
 
 void OSDListBtnType::LoadPixmap(OSDTypeImage& pix, const QString& fileName)
 {
-    QString file = "/usr/local/share/mythtv/themes/default/lb-" + fileName + ".png";
+    QString file = "/usr/local/share/mythtv/themes/default/lb-" + fileName + 
+                   ".png";
     
     pix.LoadImage(file, m_wmult, m_hmult);
 }
 
+/////////////////////////////////////////////////////////////////////////////
 OSDListBtnTypeItem::OSDListBtnTypeItem(OSDListBtnType* lbtype, 
                                        const QString& text,
                                        OSDTypeImage *pixmap, bool checkable,
-                                       OSDListBtnTypeItem::CheckState state)
+                                       bool showArrow, CheckState state)
 {
     if (!lbtype) {
-        std::cerr << "OSDListBtnTypeItem: trying to creating item without parent"
-                  << std::endl;
+        cerr << "OSDListBtnTypeItem: trying to creating item without parent\n";
         exit(-1);
     }
     
@@ -516,6 +797,7 @@ OSDListBtnTypeItem::OSDListBtnTypeItem(OSDListBtnType* lbtype,
     m_pixmap    = pixmap;
     m_checkable = checkable;
     m_state     = state;
+    m_showArrow = showArrow;
     m_data      = 0;
 
     if (!m_parent->m_initialized)
@@ -524,7 +806,6 @@ OSDListBtnTypeItem::OSDListBtnTypeItem(OSDListBtnType* lbtype,
     int  margin    = m_parent->m_itemMargin;
     int  width     = m_parent->m_rect.width();
     int  height    = m_parent->m_itemHeight;
-    bool showArrow = m_parent->m_showArrow;
 
     OSDTypeImage& checkPix = m_parent->m_checkNonePix;
     OSDTypeImage& arrowPix = m_parent->m_arrowPix;
@@ -598,7 +879,7 @@ OSDListBtnType* OSDListBtnTypeItem::parent() const
     return m_parent;
 }
 
-void OSDListBtnTypeItem::setChecked(OSDListBtnTypeItem::CheckState state)
+void OSDListBtnTypeItem::setChecked(CheckState state)
 {
     if (!m_checkable)
         return;
@@ -625,7 +906,7 @@ void OSDListBtnTypeItem::paint(OSDSurface *surface, TTFFont *font,
         else
             m_parent->m_itemSelInactPix.Draw(surface, fade, maxfade, x, y);
 
-        if (m_parent->m_showArrow)
+        if (m_showArrow)
         {
             QRect ar(m_arrowRect);
             ar.moveBy(x, y);

@@ -53,6 +53,8 @@ OSD::OSD(int width, int height, int frint, const QString &font,
     m_setsvisible = false;
     setList = NULL;
 
+    runningTreeMenu = NULL;
+
     setList = new vector<OSDSet *>;
 
     fontSizeType = gContext->GetSetting("OSDThemeFontSizeType", "default");
@@ -815,6 +817,8 @@ void OSD::parsePositionImage(OSDSet *container, QDomElement &element)
 void OSD::parseListTree(OSDSet *container, QDomElement &element)
 {
     QRect   area = QRect(0,0,0,0);
+    QRect   listsize = QRect(0,0,0,0);
+    int     leveloffset = 0;
     QString fontActive;
     QString fontInactive;
     bool    showArrow = true;
@@ -846,6 +850,16 @@ void OSD::parseListTree(OSDSet *container, QDomElement &element)
                 area = parseRect(getFirstText(info));
                 normalizeRect(area);
             }
+            else if (info.tagName() == "listsize")
+            {
+                listsize = parseRect(getFirstText(info));
+                normalizeRect(listsize);
+                listsize.moveBy(-xoffset, -yoffset);
+            }
+            else if (info.tagName() == "leveloffset")
+            {
+                leveloffset = getFirstText(info).toInt();
+            }
             else if (info.tagName() == "fcnfont")
             {
                 QString fontName = info.attribute("name", "");
@@ -854,7 +868,7 @@ void OSD::parseListTree(OSDSet *container, QDomElement &element)
                 if (fontFcn.lower() == "active")
                     fontActive = fontName;
                 else if (fontFcn.lower() == "inactive")
-                    fontInactive = fontFcn;
+                    fontInactive = fontName;
                 else 
                 {
                     cerr << "Unknown font function for listtree area: "
@@ -933,8 +947,8 @@ void OSD::parseListTree(OSDSet *container, QDomElement &element)
         return;
     }
 
-    OSDListBtnType *lb = new OSDListBtnType(name, area, wmult, hmult, true, 
-                                            true);
+    OSDListTreeType *lb = new OSDListTreeType(name, area, listsize, leveloffset,
+                                              wmult, hmult);
     lb->SetFontActive(fpActive);
     lb->SetFontInactive(fpInactive);
     lb->SetItemRegColor(grUnselectedBeg, grUnselectedEnd, grUnselectedAlpha);
@@ -943,6 +957,63 @@ void OSD::parseListTree(OSDSet *container, QDomElement &element)
     lb->SetMargin((int)(margin * wmult));
 
     container->AddType(lb);
+
+#if 0
+    OSDGenericTree *testtree = new OSDGenericTree("top_level_menu");
+
+    OSDGenericTree *item, *level;
+
+    level = item = new OSDGenericTree("level1");
+    testtree->addNode(item);
+    item = new OSDGenericTree("level1");
+    testtree->addNode(item);
+    item = new OSDGenericTree("level1");
+    testtree->addNode(item);
+    item = new OSDGenericTree("level1");
+    testtree->addNode(item);
+    item = new OSDGenericTree("level1");
+    testtree->addNode(item);
+    item = new OSDGenericTree("level1");
+    testtree->addNode(item);
+    item = new OSDGenericTree("level1");
+    testtree->addNode(item);
+    item = new OSDGenericTree("level1");
+    testtree->addNode(item);
+    item = new OSDGenericTree("level1");
+    testtree->addNode(item);
+    item = new OSDGenericTree("level2");
+    level->addNode(item);
+    item = new OSDGenericTree("level2");
+    level->addNode(item);
+    item = new OSDGenericTree("level2");
+    level->addNode(item);
+    item = new OSDGenericTree("level2");
+    level->addNode(item);
+    level = item;
+    item = new OSDGenericTree("level3");
+    level->addNode(item);
+    item = new OSDGenericTree("level3");
+    level->addNode(item);
+    item = new OSDGenericTree("level3");
+    level->addNode(item);
+    item = new OSDGenericTree("level3");
+    level->addNode(item);
+    item = new OSDGenericTree("level3");
+    level->addNode(item);
+    level = item;
+    item = new OSDGenericTree("level4");
+    level->addNode(item);
+    item = new OSDGenericTree("level3");
+    level->addNode(item);
+    item = new OSDGenericTree("level3");
+    level->addNode(item);
+    item = new OSDGenericTree("level3");
+    level->addNode(item);
+    item = new OSDGenericTree("level3");
+    level->addNode(item);
+
+    lb->SetAsTree(testtree);
+#endif
 }
 
 void OSD::parseContainer(QDomElement &element)
@@ -1998,5 +2069,61 @@ void OSD::ClearNotify(UDPNotifyOSDSet *notifySet)
     }
 
     osdlock.unlock();
+}
+
+void OSD::ShowTreeMenu(const QString &name)
+{
+    if (runningTreeMenu)
+        return;
+
+    osdlock.lock();
+
+    OSDSet *container = GetSet(name);
+    if (container)
+    {
+        OSDListTreeType *tree = (OSDListTreeType *)container->GetType("menu");
+        if (tree)
+        {
+            runningTreeMenu = tree;
+            treeMenuContainer = name;
+            container->Display();
+            m_setsvisible = true;
+            changed = true;
+        }
+    }
+
+    osdlock.unlock();
+}
+
+bool OSD::IsRunningTreeMenu(void)
+{
+    if (runningTreeMenu)
+        return true;
+    return false;
+}
+
+bool OSD::TreeMenuHandleKeypress(QKeyEvent *e)
+{
+    if (!runningTreeMenu)
+        return false;
+
+    osdlock.lock();
+    
+    bool ret = runningTreeMenu->HandleKeypress(e);
+
+    if (!runningTreeMenu->IsVisible())
+    {
+        OSDSet *container = GetSet(treeMenuContainer);
+        if (container)
+            container->Hide();
+
+        runningTreeMenu = NULL;
+    }
+
+    changed = true;
+
+    osdlock.unlock();
+
+    return ret;
 }
 

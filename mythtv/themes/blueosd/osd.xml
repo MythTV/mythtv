@@ -258,4 +258,19 @@
     </textarea>
   </container>
 
+  <container name="menu">
+    <listtreemenu name="menu">
+      <area>20,20,440,300</area>
+      <listsize>20,20,130,300</listsize>
+      <leveloffset>25</leveloffset>
+      <gradient type="unselected" start="#505050" end="#000000" alpha="100">
+      </gradient>
+      <gradient type="selected" start="#52CA38" end="#349838" alpha="255">
+      </gradient>
+      <fcnfont name="infofont" function="active"></fcnfont>
+      <fcnfont name="infofontgray" function="inactive"></fcnfont>
+    </listtreemenu>
+  </container>
+    
+
 </mythosdtheme>
