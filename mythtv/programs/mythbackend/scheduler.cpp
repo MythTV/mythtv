@@ -9,9 +9,17 @@
 #include <algorithm>
 using namespace std;
 
-#include <sys/stat.h>
+#ifdef linux
 #include <sys/vfs.h>
+#else
+#include <sys/param.h>
+#include <sys/mount.h>
+#endif
+
+#include <sys/stat.h>
 #include <sys/time.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #include "scheduler.h"
 
