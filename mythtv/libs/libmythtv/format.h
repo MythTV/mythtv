@@ -41,6 +41,7 @@ typedef struct rtframeheader
 			//    1 .. RTJpeg
 			//    2 .. RTJpeg with lzo afterwards
 			//    3 .. raw YUV420 with lzo afterwards
+                        //    4 .. avcodec (fourcc in the extendeddata)
 			//    N .. black frame
 			//    L .. simply copy last frame (if lost frames)
     			// A: 0 .. Uncompressed (44100/sec 16bit 2ch)

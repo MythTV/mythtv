@@ -173,4 +173,3 @@ void VideoOutputNull::ProcessFrame(VideoFrame *frame, OSD *osd,
     (void)filterList;
     (void)pipPlayer;
 }
-

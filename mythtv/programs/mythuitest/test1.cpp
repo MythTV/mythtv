@@ -70,7 +70,7 @@ bool TestScreen1::keyPressEvent(QKeyEvent *e)
 
 void TestScreen1::customEvent(QCustomEvent *e)
 {
-    if (e->type() == kDialogBoxCompletionEventType)
+    if (e->type() == kMythDialogBoxCompletionEventType)
     {
         DialogCompletionEvent *dce;
         dce = reinterpret_cast<DialogCompletionEvent *>(e);
@@ -162,7 +162,7 @@ void TestScreen1::Launch1(void)
 {
     QString diagText = "Hi!\nThis is a test of the new rendering backend for "
                        "MythTV.\nHave fun or something.";
-    DialogBox *diag = new DialogBox(diagText, m_ScreenStack, "startdialog");
+    MythDialogBox *diag = new MythDialogBox(diagText, m_ScreenStack, "startdialog");
     diag->SetReturnEvent(this, "FIRST_DIALOG");
     diag->AddButton("Ok, let's continue this insanity");
     diag->AddButton("Let's see the menu (no return)");
@@ -176,7 +176,7 @@ void TestScreen1::Launch2(void)
     QString diagText = "In this new rendering backend, multiple drawing "
                        "methods can be implemented.  For instance, OpenGL and "
                        "Qt (Xlib / XRENDER) paint engines have been written. ";
-    DialogBox *diag = new DialogBox(diagText, m_ScreenStack, "2dialog");
+    MythDialogBox *diag = new MythDialogBox(diagText, m_ScreenStack, "2dialog");
     diag->SetReturnEvent(this, "SECOND_DIALOG");
     diag->AddButton("Ok, but what can it do?");
 
@@ -191,7 +191,7 @@ void TestScreen1::Launch3(void)
                        "the new one fades in.  The MythTV logo in the "
                        "lower left is also continually changing its "
                        "transparency.";
-    DialogBox *diag = new DialogBox(diagText, m_ScreenStack, "3dialog");
+    MythDialogBox *diag = new MythDialogBox(diagText, m_ScreenStack, "3dialog");
     diag->SetReturnEvent(this, "THIRD_DIALOG");
     diag->AddButton("Neat, but what else?");
 
@@ -201,7 +201,7 @@ void TestScreen1::Launch3(void)
 void TestScreen1::Launch4(void)
 {
     QString diagText = "Well, how about movement?";
-    DialogBox *diag = new DialogBox(diagText, m_ScreenStack, "4dialog");
+    MythDialogBox *diag = new MythDialogBox(diagText, m_ScreenStack, "4dialog");
     diag->SetReturnEvent(this, "FOURTH_DIALOG");
     diag->AddButton("Anything else?");
 
@@ -214,7 +214,7 @@ void TestScreen1::Launch4(void)
 void TestScreen1::Launch5(void)
 {
     QString diagText = "Animation is also supported.. (when using OpenGL)";
-    DialogBox *diag = new DialogBox(diagText, m_ScreenStack, "5dialog");
+    MythDialogBox *diag = new MythDialogBox(diagText, m_ScreenStack, "5dialog");
     diag->SetReturnEvent(this, "FIFTH_DIALOG");
     diag->AddButton("Sweet.");
 
@@ -232,7 +232,7 @@ void TestScreen1::Launch6(void)
     QString diagText = "All eye candy can be disabled to handle "
                        "slower systems and drawing methods, and all effects "
                        "can be combined easily. ";
-    DialogBox *diag = new DialogBox(diagText, m_ScreenStack, "6dialog");
+    MythDialogBox *diag = new MythDialogBox(diagText, m_ScreenStack, "6dialog");
     diag->SetReturnEvent(this, "SIXTH_DIALOG");
     diag->AddButton("Ok, sounds great.");
 
@@ -245,7 +245,7 @@ void TestScreen1::Launch7(void)
                        "overwhelm the user with too much eyecandy, "
                        "but to enable subtle effects that add to the "
                        "overall user experience.";
-    DialogBox *diag = new DialogBox(diagText, m_ScreenStack, "7dialog");
+    MythDialogBox *diag = new MythDialogBox(diagText, m_ScreenStack, "7dialog");
     diag->SetReturnEvent(this, "SEVENTH_DIALOG");
     diag->AddButton("Ok.");
 
@@ -256,7 +256,7 @@ void TestScreen1::Launch8(void)
 {
     QString diagText = "That concludes this short tour of the new MythTV "
                        "UI backend.";
-    DialogBox *diag = new DialogBox(diagText, m_ScreenStack, "8dialog");
+    MythDialogBox *diag = new MythDialogBox(diagText, m_ScreenStack, "8dialog");
     diag->SetReturnEvent(this, "FINAL_DIALOG");
     diag->AddButton("Good-bye");
 

@@ -24,8 +24,9 @@ protected:
     ScreenSaverEventType sset;
 };
 
-class ScreenSaverControl {
-public:
+class ScreenSaverControl 
+{
+  public:
     ScreenSaverControl();
     ~ScreenSaverControl();
 
@@ -33,7 +34,7 @@ public:
     void Restore(void);
     void Reset(void);
 
-protected:
+  protected:
     class ScreenSaverPrivate *d;
 };
 

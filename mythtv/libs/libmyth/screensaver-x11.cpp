@@ -2,8 +2,10 @@
 
 #include <X11/Xlib.h>
 
-class ScreenSaverPrivate {
-    struct {
+class ScreenSaverPrivate 
+{
+    struct 
+    {
         bool saved;
         int timeout;
         int interval;
@@ -11,19 +13,22 @@ class ScreenSaverPrivate {
         int allowexposure;
     } state;
 
-     friend class ScreenSaverControl;
+    friend class ScreenSaverControl;
 };
 
-ScreenSaverControl::ScreenSaverControl() {
-     d = new ScreenSaverPrivate();
+ScreenSaverControl::ScreenSaverControl() 
+{
+    d = new ScreenSaverPrivate();
 }
 
-ScreenSaverControl::~ScreenSaverControl() {
-     if (d)
-          delete d;
+ScreenSaverControl::~ScreenSaverControl() 
+{
+    if (d)
+        delete d;
 }
 
-void ScreenSaverControl::Disable(void) {
+void ScreenSaverControl::Disable(void) 
+{
     if (!d->state.saved)
     {
         XGetScreenSaver(qt_xdisplay(),
@@ -37,7 +42,8 @@ void ScreenSaverControl::Disable(void) {
     XSetScreenSaver(qt_xdisplay(), 0, 0, 0, 0);
 }
 
-void ScreenSaverControl::Restore(void) {
+void ScreenSaverControl::Restore(void) 
+{
     XResetScreenSaver(qt_xdisplay());
     XSetScreenSaver(qt_xdisplay(),
                     d->state.timeout, d->state.interval,
@@ -46,6 +52,8 @@ void ScreenSaverControl::Restore(void) {
     d->state.saved = false;
 }
 
-void ScreenSaverControl::Reset(void) {
+void ScreenSaverControl::Reset(void) 
+{
     XResetScreenSaver(qt_xdisplay());
 }
+

@@ -1968,6 +1968,7 @@ void TV::DoPause(void)
 
     if (paused)
     {
+        activerbuffer->WaitForPause();
         UpdatePosOSD(time, tr("Paused"));
         gContext->RestoreScreensaver();
     }

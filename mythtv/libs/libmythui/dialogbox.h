@@ -1,5 +1,5 @@
-#ifndef DIALOGBOX_H_
-#define DIALOGBOX_H_
+#ifndef MYTHDIALOGBOX_H_
+#define MYTHDIALOGBOX_H_
 
 #include "qevent.h"
 
@@ -25,12 +25,12 @@ class DialogCompletionEvent : public QCustomEvent
 };
 
 // Sends out an event with 'resultid' as the id when done.
-class DialogBox : public MythScreenType
+class MythDialogBox : public MythScreenType
 {
     Q_OBJECT
   public:
-    DialogBox(const QString &text,
-              MythScreenStack *parent, const char *name);
+    MythDialogBox(const QString &text,
+                  MythScreenStack *parent, const char *name);
 
     void SetReturnEvent(MythScreenType *retscreen, const QString &resultid);
 

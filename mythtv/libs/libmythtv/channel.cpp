@@ -355,7 +355,6 @@ bool Channel::SetChannelByString(const QString &chan)
     // and return, since the act of changing inputs will change the channel as well.
     if (!inputName.isEmpty())
     {
-cout << "switch to input\n";
         ChannelBase::SwitchToInput(inputName, chan);
         return true;
     }
@@ -408,7 +407,6 @@ cout << "switch to input\n";
     curchannelname = chan;
 
     pParent->SetVideoFiltersForChannel(this, chan);
-cout << "setting contrast\n";
     SetContrast();
     SetColour();
     SetBrightness();
@@ -585,7 +583,6 @@ bool Channel::TuneToFrequency(int frequency)
 
 void Channel::SwitchToInput(int newcapchannel, bool setstarting)
 {
-cout << "switching to input: " << newcapchannel << endl;
     if (usingv4l2)
     {
         if (ioctl(videofd, VIDIOC_S_INPUT, &newcapchannel) < 0)

@@ -4,7 +4,7 @@
 #include "mythlistbutton.h"
 #include "mythmainwindow.h"
 
-DialogBox::DialogBox(const QString &text,
+MythDialogBox::MythDialogBox(const QString &text,
                      MythScreenStack *parent, const char *name) 
          : MythScreenType(parent, name)
 {
@@ -40,19 +40,19 @@ DialogBox::DialogBox(const QString &text,
     buttonList->SetActive(true);
 }
 
-void DialogBox::SetReturnEvent(MythScreenType *retscreen, 
+void MythDialogBox::SetReturnEvent(MythScreenType *retscreen, 
                                const QString &resultid)
 {
     m_retScreen = retscreen;
     m_id = resultid;
 }
 
-void DialogBox::AddButton(const QString &title)
+void MythDialogBox::AddButton(const QString &title)
 {
     new MythListButtonItem(buttonList, title);
 }
 
-bool DialogBox::keyPressEvent(QKeyEvent *e)
+bool MythDialogBox::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
@@ -86,7 +86,7 @@ bool DialogBox::keyPressEvent(QKeyEvent *e)
     return handled;
 }
 
-void DialogBox::SendEvent(int res)
+void MythDialogBox::SendEvent(int res)
 {
     if (!m_retScreen)
         return;

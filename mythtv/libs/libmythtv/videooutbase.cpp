@@ -35,6 +35,8 @@
 #include "videoout_quartz.h"
 #endif
 
+#include "videoout_null.h"
+
 #include "dithertable.h"
 
 #include "../libavcodec/avcodec.h"
@@ -200,6 +202,13 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
 
 bool VideoOutput::SetupDeinterlace(bool interlaced)
 {
+    if (VideoOutputNull *null = dynamic_cast<VideoOutputNull *>(this))
+    {
+        (void)null;
+        // null vidout doesn't deinterlace
+        return false;
+    }
+
     if (m_deinterlacing == interlaced)
         return m_deinterlacing;
 
@@ -217,17 +226,21 @@ bool VideoOutput::SetupDeinterlace(bool interlaced)
                                                  "linearblend");
         m_deintFiltMan = new FilterManager;
         m_deintFilter = NULL;
+
         if (ApproveDeintFilter(m_deintfiltername))
         {
             m_deintFilter = m_deintFiltMan->LoadFilters(
                 m_deintfiltername, itmp, otmp, XJ_width, XJ_height, btmp);
         }
-        if (m_deintFilter == NULL) {
+
+        if (m_deintFilter == NULL) 
+        {
             VERBOSE(VB_IMPORTANT,QString("Couldn't load deinterlace filter %1")
                     .arg(m_deintfiltername));
             m_deinterlacing = false;
             m_deintfiltername = "";
         }
+
         VERBOSE(VB_PLAYBACK, QString("Using deinterlace method %1")
                 .arg(m_deintfiltername));
 
@@ -247,6 +260,7 @@ bool VideoOutput::SetupDeinterlace(bool interlaced)
             m_deintFilter = NULL;
         }
     }
+
     return m_deinterlacing;
 }
 
@@ -261,6 +275,7 @@ bool VideoOutput::ApproveDeintFilter(const QString& filtername) const
     // Default to not supporting bob deinterlace
     return (filtername != "bobdeint");
 }
+
 void VideoOutput::AspectOverride(int override)
 {
     switch(override)
