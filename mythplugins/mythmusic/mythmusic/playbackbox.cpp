@@ -226,10 +226,6 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
             pledit_button->push();
             handled = true;
             break;
-        case Key_4:
-            vis_button->push();
-            handled = true;
-            break;
         case Key_6:
             CycleVisualizer();
             handled = true;
@@ -238,7 +234,7 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
 
     if (visualizer_status == 2)
     {
-        if (e->key() == Key_Escape)
+        if (e->key() == Key_Escape || e->key() == Key_4)
         {
             visualizer_status = 1;
             mainvisual->setGeometry(visual_blackhole->getScreenArea());
@@ -265,6 +261,15 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                     break;
                 case Key_Right:
                     music_tree_list->pushDown();
+                    handled = true;
+                    break;
+                case Key_0:
+                case Key_Home:
+                    music_tree_list->syncCurrentWithActive();
+                    handled = true;
+                    break;
+                case Key_4:
+                    vis_button->push();
                     handled = true;
                     break;
                 case Key_Space:

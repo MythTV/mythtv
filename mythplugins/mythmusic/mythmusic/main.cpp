@@ -318,10 +318,11 @@ void MusicCallback(void *data, QString &selection)
 
 void runMenu(QString themedir, QSqlDatabase *db, QString paths,
              QString startdir,
-             PlaylistsContainer *all_playlists, AllMusic *all_music)
+             PlaylistsContainer *all_playlists, AllMusic *all_music,
+             QString which_menu)
 {
     ThemedMenu *diag = new ThemedMenu(themedir.ascii(),
-                                      "musicmenu.xml");
+                                      which_menu);
 
     MusicData data;
 
@@ -357,6 +358,8 @@ int main(int argc, char *argv[])
     
     bool configure_general = false;
     bool configure_player = false;
+    bool configure = false;
+    
     for(int argpos = 1; argpos < a.argc(); ++argpos)
     {
         if(!strcmp(a.argv()[argpos], "--configure-general"))
@@ -366,6 +369,10 @@ int main(int argc, char *argv[])
         if(!strcmp(a.argv()[argpos], "--configure-player"))
         {
             configure_player = true;
+        }
+        if(!strcmp(a.argv()[argpos], "--configure"))
+        {
+            configure = true;
         }
     }
 
@@ -453,7 +460,14 @@ int main(int argc, char *argv[])
         PlaylistsContainer *all_playlists = new PlaylistsContainer(db, all_music);
         all_playlists->setHost(gContext->GetHostName());
         //  And away we go ...
-        runMenu(themedir, db, paths, startdir, all_playlists, all_music);
+        if(configure)
+        {
+            runMenu(themedir, db, paths, startdir, all_playlists, all_music, "music_settings.xml");
+        }
+        else
+        {
+            runMenu(themedir, db, paths, startdir, all_playlists, all_music, "musicmenu.xml");
+        }
 
         //  Automagically save all playlists and metadata (ratings) that have changed
         if( all_music->cleanOutThreads() &&
