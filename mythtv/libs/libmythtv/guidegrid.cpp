@@ -162,7 +162,11 @@ void GuideGrid::fillChannelInfos()
             if (val.callsign == QString::null)
                 val.callsign = "";
             val.iconpath = query.value(2).toString();
+            if (val.iconpath == QString::null)
+                val.iconpath = "";
             val.chanstr = query.value(0).toString();
+            if (val.chanstr == QString::null)
+                val.chanstr = "";
             val.icon = NULL;
         
             if (val.chanstr == m_startChanStr && !set)
@@ -367,13 +371,16 @@ void GuideGrid::paintChannels(QPainter *p)
             break;
 
         ChannelInfo *chinfo = &(m_channelInfos[chanNumber]);
-        if (chinfo->iconpath != "none")
+        if (chinfo->iconpath != "none" && chinfo->iconpath != "")
         {
             if (!chinfo->icon)
                 chinfo->LoadIcon();
-            yoffset = (int)(55 * hmult);
-            tmp.drawPixmap((cr.width() - chinfo->icon->width()) / 2, 
-                           ydifference * i + yoffset, *(chinfo->icon));
+            if (chinfo->icon)
+            {
+                yoffset = (int)(55 * hmult);
+                tmp.drawPixmap((cr.width() - chinfo->icon->width()) / 2, 
+                               ydifference * i + yoffset, *(chinfo->icon));
+            }
         }
         tmp.setFont(*m_largerFont);
         QFontMetrics lfm(*m_largerFont);
