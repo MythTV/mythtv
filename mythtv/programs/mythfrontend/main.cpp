@@ -261,7 +261,7 @@ void startTV(void)
             bool showDialogs = false;
             if (tv->LiveTV(showDialogs) == 1) //1 == livetv ok
                 tryTV = false;
-            else if (timer.restart() > 2000)
+            else if (timer.elapsed() > 2000)
             {
                 tryTV = false;
                 quitAll = true;
