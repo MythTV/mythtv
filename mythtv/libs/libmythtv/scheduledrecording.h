@@ -4,6 +4,7 @@
 #include "settings.h"
 #include <qdatetime.h>
 #include "managedlist.h"
+#include <qguardedptr.h>
 #include <list>
 
 
@@ -226,8 +227,8 @@ protected:
     class SRProgramid* programid;
     
     ProgramInfo* m_pginfo;
-    RootSRGroup* rootGroup;
-    RecOptDialog* m_dialog;
+    QGuardedPtr<RootSRGroup> rootGroup;
+    QGuardedPtr<RecOptDialog> m_dialog;
     QString chanstr;
     QString chansign;
     QString channame;
@@ -239,6 +240,7 @@ protected:
     QString timeFormat;
     QString dateFormat;
     QString shortDateFormat;
+    
 };
 
 

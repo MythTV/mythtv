@@ -26,7 +26,7 @@ class RecOptDialog : public MythDialog
         ProgramInfo *program;
         ScheduledRecording* schedRec;
 
-        XMLParse *theme;
+        XMLParse* theme;
         QDomElement xmldata;
 
         QRect infoRect;
@@ -41,7 +41,7 @@ class RecOptDialog : public MythDialog
         bool refillAll;
     
         ManagedList listMenu;
-        RootSRGroup* rootGroup;
+        QGuardedPtr<RootSRGroup> rootGroup;
         void updateInfo(QPainter *p);
         void updateBackground(void);
         void LoadWindow(QDomElement &);
