@@ -454,6 +454,8 @@ void VideoOutputVIA::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
 
     if (curdata->lastcode > curdata->code )
     {
+#if 0  // Crashes the decoder?
+
         //Slice must be in next frame so flush last buffer first.
         VIASliceReceiveData(curdata->slicecount - 1, data->buffer);
 
@@ -461,7 +463,7 @@ void VideoOutputVIA::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
         data->VIAMPGSurface.dwDisplayPictStruct = VIA_PICT_STRUCT_FRAME;
         data->VIAMPGSurface.dwDisplayBuffIndex = curdata->image_number;
         VIADisplayControl(DEV_MPEG, &data->VIAMPGSurface);
-
+#endif
         curdata->slicecount = 1;
     }
 
