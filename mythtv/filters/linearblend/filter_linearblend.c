@@ -3,6 +3,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// By default, these routines use MMX instructions.  If your CPU does not
+// support these, uncomment the following line
+//#undef MMX
+
 #ifdef MMX
 #include "mmx.h"
 #define PAVGB(a,b)  "pavgb " #a ", " #b " \n\t"
