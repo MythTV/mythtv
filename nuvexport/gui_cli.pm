@@ -82,7 +82,7 @@ package gui_cli;
 	# Notify the user
 		print "Encode lasted: $timestr";
 	# Quit gracefully
-		Quit();
+		main::Quit();
 	}
 
 	sub query_filename {

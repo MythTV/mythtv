@@ -283,7 +283,8 @@ package export_SVCD;
 	sub cleanup {
 		my $self = shift;
 	# Remove any temporary files
-		foreach my $file ("$self->{fifodir}/audout", "$self->{fifodir}/vidout", $self->{tmp_a}, $self->{tmp_v}) {
+		#foreach my $file ("$self->{fifodir}/audout", "$self->{fifodir}/vidout", $self->{tmp_a}, $self->{tmp_v}) {
+		foreach my $file ("$self->{fifodir}/audout", "$self->{fifodir}/vidout") {
 			unlink $file if (-e $file);
 		}
 		rmdir $self->{fifodir} if (-d $self->{fifodir});
