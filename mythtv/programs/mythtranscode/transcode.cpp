@@ -189,6 +189,10 @@ class AudioReencodeBuffer : public AudioOutput
         return MUTE_OFF;
     }
 
+    //  These are pure virtual in AudioOutput, but we don't need them here
+    virtual void bufferOutputData(bool){ return; }
+    virtual int readOutputData(unsigned char*, int ){ return 0; }
+
     int bufsize;
     unsigned char *audiobuffer;
     int audiobuffer_len, channels, bits, bytes_per_sample, eff_audiorate;
