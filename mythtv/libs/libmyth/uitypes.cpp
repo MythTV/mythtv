@@ -1797,6 +1797,8 @@ GenericTree::GenericTree(QString a_string, int an_int, bool selectable_flag)
 
 void GenericTree::init()
 {
+    my_subnodes.setAutoDelete(true);
+
     my_parent = NULL;
     my_string = "";
     my_stringlist.clear();
@@ -2380,6 +2382,7 @@ GenericTree* GenericTree::getChildByName(QString a_name)
 
 GenericTree::~GenericTree()
 {
+    delete my_attributes;
 }
 
 // ********************************************************************
@@ -2391,6 +2394,7 @@ UIManagedTreeListType::UIManagedTreeListType(const QString & name)
     bin_corners.clear();
     screen_corners.clear();
     route_to_active.clear();
+    resized_highlight_images.setAutoDelete(true);
     my_tree_data = NULL;
     current_node = NULL;
     active_node = NULL;

@@ -120,6 +120,7 @@ class MythThemedDialog : public MythDialog
   public:
     MythThemedDialog(MythMainWindow *parent, QString window_name,
                      QString theme_filename = "", const char *name = 0);
+   ~MythThemedDialog();
 
     virtual void loadWindow(QDomElement &);
     virtual void parseContainer(QDomElement &);

@@ -399,6 +399,11 @@ MythThemedDialog::MythThemedDialog(MythMainWindow *parent, QString window_name,
     initForeground();
 }
 
+MythThemedDialog::~MythThemedDialog()
+{
+    delete theme;
+}
+
 void MythThemedDialog::loadWindow(QDomElement &element)
 {
     //
