@@ -25,6 +25,8 @@ int main(int argc, char *argv[])
 
     icv.exec();
 
+    delete context;
+
     return 0;
 }
 
