@@ -79,7 +79,7 @@ void ScheduledRecording::load(QSqlDatabase *db)
     if (getRecordID())
     {
         ConfigurationGroup::load(db);
-        m_pginfo = NULL;
+        
         QString tmpType = type->getValue();
         type->clearSelections();
         if (tmpType.toInt() == kOverrideRecord ||
@@ -98,6 +98,8 @@ void ScheduledRecording::load(QSqlDatabase *db)
 
 void ScheduledRecording::loadByProgram(QSqlDatabase* db, ProgramInfo* proginfo) 
 {
+    m_pginfo = proginfo;
+    
     if (proginfo->recordid)
         loadByID(db, proginfo->recordid);
     else
@@ -576,6 +578,7 @@ QString ScheduledRecording::getProfileName(void) const {
 
 MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent, const char *name)
 {
+
     MythDialog* dlg = new RecOptDialog(this, parent, name);
     rootGroup->setDialog(dlg);
     return dlg;
@@ -636,8 +639,6 @@ void ScheduledRecording::setProgram(ProgramInfo *proginfo)
 {
     m_pginfo = proginfo;
     
-    if(proginfo)
-    {
         title->setValue(proginfo->title);
         subtitle->setValue(proginfo->subtitle);
         description->setValue(proginfo->description);
@@ -650,7 +651,7 @@ void ScheduledRecording::setProgram(ProgramInfo *proginfo)
         seriesid->setValue(proginfo->seriesid);
         programid->setValue(proginfo->programid);
         category->setValue(proginfo->category);
-    }
+
 }
 
 void ScheduledRecording::makeOverride(void)
