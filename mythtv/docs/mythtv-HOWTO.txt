@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2005-01-04, v0.16.05
+  2005-01-12, v0.16.06
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -3969,13 +3969,15 @@
      <http://mjpeg.sourceforge.net>
 
   +o  MPEG-2 - iTVC15 based cards (Hauppauge PVR-250/PVR-350); see
-     http://ivtv.sourceforge.net <http://ivtv.sourceforge.net>
+     http://ivtv.sourceforge.net <http://ivtv.sourceforge.net> and the
+     Air2PC-ATSC-PCI see
+     http://www.cyberestore.com/product_info.php?cPath=28&products_id=103
+     <http://www.cyberestore.com/product_info.php?cPath=28&products_id=103>.
 
   +o  HDTV - pcHDTV cards; see http://pchdtv.com <http://pchdtv.com>
 
   +o  DVB - cards supporting DVB; see http://linuxtv.org
      <http://linuxtv.org>
-
      For cards without hardware encoding capabilities (all cards
      supported by V4L not listed above), Myth includes two methods for
      software encoding: RTjpeg and MPEG-4.  RTjpeg has significantly
@@ -4044,6 +4046,10 @@
   It's best to leave the default as-is until you're sure that MythTV is
   operational.
 
+  See the ``What capture resolution should I use? How does video work?''
+  section for more information.
+
+
   [1m10.6.  Xbox Frontends[0m
 
   MythTV is able to control the LED on the Xbox to indicate backend
@@ -4098,8 +4104,6 @@
   to have any such issues. Therefore you will need to switch to KDE by
   selecting RedHatMenu>Extras>System Settings>Desktop Switching Tool and
   choose "KDE".
-
-
 
   [1m11.1.  Keyboard commands[0m
 
@@ -4645,27 +4649,27 @@
 
   The MythTV master backend is responsible for managing the schedule for
   all TV tuner cards on the master and any slave. It's job is to search
-  the TV listing for the shows you have requested and assign recording
+  the TV listing for the shows you have requested and assign recordings
   to the TV tuner cards. If none of the shows that you've chosen
   overlap, it simply records all of the shows. However, if there are
   shows where the beginning and end times overlap, the scheduler follows
   rules that you've specified or makes logical decisions about what
   would be best if you haven't express your preference. Further, the
-  "Fix Conflicts" page allows you make specific decisions about what you
-  really do and don't want to record.
+  "Upcoming Recordings" page allows you make specific decisions about
+  what you really do and don't want to record.
 
 
   [1m11.6.1.  Record Types[0m
 
   When you choose a show that you would like to record from the Options
-  Page, there are six different types of rules to help the scheduler
+  Page, there are eight different types of rules to help the scheduler
   find which showings you would like to record.
 
 
-  +o  Single -- record only this title at this specific time. This is the
-     best way to be sure that a certain showing is recorded. However, if
-     the TV listings change and the show is not broadcast at that time,
-     the show will not be recorded.
+  +o  Single Record -- record only this title at this specific time. This
+     is the best way to be sure that a certain showing is recorded.
+     However, if the TV listings change and the show is not broadcast at
+     that time, the show will not be recorded.
 
   +o  Find One -- this will record a title once from any of the times
      that appear in the TV listings. This is useful for recording a
@@ -4673,36 +4677,76 @@
      scheduler to choose one that doesn't conflict. It is not a good
      choice for recording a single episode of a series because it
      records the first available showing of the title without regard to
-     the episode information or duplicate matching.
+     the episode information.
 
-  +o  Week Slot -- this records a show whenever the title is listed on
-     the same channel, weekday and time. Note that if the TV station
+  +o  Record Weekly -- this records a show whenever the title is listed
+     on the same channel, weekday and time. Note that if the TV station
      changes the schedule for a special episode, it would not be
      recorded. However, you can add a Single record for the special
      episode.
 
-  +o  Time Slot -- this records a show whenever the title is listed for
-     the time and channel on any day of the week. Here again, a show
+  +o  Find Weekly -- this will record a title once per week from any of
+     the times that appear in the TV listings beginning from the time of
+     the showing that was selected when the rule was set. This is useful
+     for news, current events or other programs where the same episode
+     is shown several times each week but the listings may not include
+     descriptive information. This is not a good choice if there are
+     different episodes shown during the week.
+
+  +o  Record Daily -- this records a show whenever the title is listed
+     for the time and channel on any day of the week. Here again, a show
      will not be recorded if the time was altered by the station.
 
-  +o  Channel -- records a show anytime the title is listed on this
-     channel.  This is perhaps the most common rule to use for most
+  +o  Find Daily -- this will record a title once per day from any of the
+     times that appear in the TV listings beginning from the time of the
+     showing that was selected when the rule was set. This is useful for
+     news, current events or other programs where the same episode is
+     shown several times each day but the listings may not include
+     descriptive information. This is not a good choice if there are
+     different episodes shown during the day.
+
+  +o  Channel Record -- records a show anytime the title is listed on
+     this channel.  This is perhaps the most common rule to use for most
      shows.
 
-  +o  All -- record this title on any channel at any time. This can be
-     useful if a station has sister stations where shows are rebroadcast
-     allowing the scheduler to record rebroadcasts on the other station
-     when the original airing cannot be recorded.
+  +o  Record All -- record this title on any channel at any time. This
+     can be useful if a station has sister stations where shows are
+     rebroadcast allowing the scheduler to record rebroadcasts on the
+     other station when the original airing cannot be recorded.
 
 
   [1m11.6.2.  Duplicates[0m
 
-  Single and Find One will record without regard to duplicate matching.
-  However, the scheduler uses the duplicate matching information for all
-  other types to determine which showings should and should not record.
-  Further, if an episode has multiple showings, the scheduler may be
-  able to use this information to find ways to record episodes that
-  might not otherwise be recorded.
+  Singles will record without regard to duplicate matching.
+
+
+  The standard recurring methods of All, Channel, Weekly and Daily use
+  the descriptive information in the TV listings to try to record only
+  one showing of each unique episode. However, This goal is sometimes
+  complicated by the fact that the stations may not include a
+  description for a specific episode but use a generic description for
+  the series instead. When there is a generic description, the default
+  behavior is to assume that it may be an episode that you have not seen
+  and to record it for you.  One of the duplicate matching options is
+  "Record new episodes only".  If this is selected, listing that have an
+  original air date of more than 14 days earlier are considered repeats
+  and are not eligible to record. Generally, generic episodes will be
+  marked as repeats also.
+
+
+  Because of generic episodes and other situations, MythTV offers an
+  alternative approach where shows may be recorded by choosing from
+  multiple showings even when the descriptive information is not
+  reliable.  All of the "Find" record types look for matching titles in
+  the listings. If there is a showing with specific episode information
+  and that episode has recorded before, that showing is marked as
+  previously or currently recorded. The scheduler will then choose to
+  record the earliest non-conflicting showing from any of other
+  remaining showings regardless of the descriptive information.
+  Generally, Find One is most useful for movies or specials and the Find
+  Daily and Find Weekly rules are best for news or current events shows
+  that are repeated. However, these may be useful in other situations
+  where the standard recording rules may not work correctly.
 
 
   [1m11.6.3.  Conflicts[0m
@@ -4716,7 +4760,6 @@
   not "stuck" with the scheduler's choice. You can still tell the
   scheduler exactly which shows you do want to record and/or don't want
   to record in any situation.
-
 
 
   [1m11.6.4.  Priority[0m
@@ -4755,7 +4798,7 @@
   allows you to add to the priority based on the type. It may make sense
   to increase the value for "Single" so that by default they have an
   extra advantage over other shows. You may want to decrease the value
-  for Find One so that they will be less likely to interfere with
+  for Find rules so that they will be less likely to interfere with
   regular shows and will be more likely to record in a non-conflicting
   time instead.
 
@@ -4778,7 +4821,6 @@
   input preference by 1 to tell the scheduler that you want to record
   from the digital station whenever possible but the station on the
   analog input could still be used when the digital input is busy.
-
   For any single showing of any show you've chosen to record, these
   factors are added together to find the "total priority". This is the
   priority that the scheduler uses to decide which shows are given the
@@ -4802,20 +4844,19 @@
   +o  Future start time beats passed start time -- If there is an episode
      in progress and also a later showing of the same episode, it is
      better to record the complete episode. If there isn't another
-     showing, start recording now to record the remaining portion. Note:
-     this should only happen if you add a new rule while the show is in
-     progress or if the is started after the starttime of a scheduled
-     show.
+     showing, start recording now to record the remaining portion.  This
+     should only happen if you add a new rule while the show is in
+     progress or if the master backend is started after the start time
+     of a scheduled show.
 
   +o  More specific record type beats less specific record type -- If two
      shows are on at the same time and have the same total priority but
-     different types they will be sorted by Single then Find One, Week
-     Slot, Time Slot, Channel and finally All. This only applies if the
-     priorities are the same.
+     different types they will be sorted by Single then Find One, Record
+     Weekly, Find Weekly, Record Daily, Find Daily, Channel and finally
+     All. This only applies if the priorities are the same.
 
   +o  If both start times have passed, later start time beats earlier
      start time -- This attempts to miss the least amount of time.
-
 
   +o  If neither start time has passed, earlier start time beats later
      start time -- This rule help assure that the earliest showing of an
@@ -4968,13 +5009,13 @@
 
 
 
-       $ tar -xjf mythweb-0.16.tar.bz2
-       $ cd mythweb-0.16
-       $ su
-       # mkdir /var/www/html/mythweb
-       # cp -r . /var/www/html/mythweb
-       # exit
-       $
+  $ tar -xjf mythweb-0.16.tar.bz2
+  $ cd mythweb-0.16
+  $ su
+  # mkdir /var/www/html/mythweb
+  # cp -r . /var/www/html/mythweb
+  # exit
+  $
 
 
 
@@ -5067,7 +5108,6 @@
   writable, these thumbnails will be cached thus speeding up future
   access.  On the left is a greyed-out menu of options.
 
-
   Use the arrow keys to select a folder or picture to open/view with the
   Select key, or use the Menu key to toggle access the menu on the left.
   The menu options are as follows:
@@ -5113,33 +5153,32 @@
   Here is an example script that a user may want to run on import:
 
 
+       #!/bin/csh
 
-  #!/bin/csh
+       if ($#argv == 0) then
+               echo "Usage: $0 dest_dir"
+               exit
+       endif
 
-  if ($#argv == 0) then
-          echo "Usage: $0 dest_dir"
-          exit
-  endif
+       cd $argv[1]
 
-  cd $argv[1]
+       # get stuff over the network
+       wget http://www.somesite.dom/dir/file1.jpg
+       wget http://www.somesite.dom/dir/file2.jpg
+       wget http://www.somesite.dom/dir/file3.jpg
 
-  # get stuff over the network
-  wget http://www.somesite.dom/dir/file1.jpg
-  wget http://www.somesite.dom/dir/file2.jpg
-  wget http://www.somesite.dom/dir/file3.jpg
+       # stuff that requires manual module loading and/or fs mounting
+       modprobe camera_module
+       mount /dev/camera /mnt/camera
+       cp /mnt/camera/* $argv[1]
+       umount /mnt/camera
+       rmmod camera_module
 
-  # stuff that requires manual module loading and/or fs mounting
-  modprobe camera_module
-  mount /dev/camera /mnt/camera
-  cp /mnt/camera/* $argv[1]
-  umount /mnt/camera
-  rmmod camera_module
-
-  # perform some processing
-  foreach pname (`ls *.jpg`)
-          jpegtran -flip vertical $pname > $pname.new
-          mv $pname.new $pname
-  end
+       # perform some processing
+       foreach pname (`ls *.jpg`)
+               jpegtran -flip vertical $pname > $pname.new
+               mv $pname.new $pname
+       end
 
 
 
@@ -5178,14 +5217,15 @@
   <http://www.mars.org/home/rob/proj/mpeg/>  Save it to a directory you
   can find later.
 
-  $ tar -xzf mad-0.14.2b.tar.gz
-  $ cd mad-0.14.2b
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
-  $
+
+       $ tar -xzf mad-0.14.2b.tar.gz
+       $ cd mad-0.14.2b
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
+       $
 
 
 
@@ -5240,6 +5280,8 @@
   Download cdparanoia from http://www.xiph.org/paranoia/down.html
   <http://www.xiph.org/paranoia/download/cdparanoia-III-
   alpha9.8.src.tgz>.
+
+
        $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
        $ cd cdparanoia-III-alpha9.8
        $ ./configure
@@ -5282,7 +5324,6 @@
        # urpmi libcdaudio1-devel libid3tag0 libid3tag0-devel
 
 
-
   [1m15.2.1.  Additional options with MythMusic[0m
 
   Additional visualizations have been added to MythMusic.  If you wish
@@ -5301,6 +5342,8 @@
 
 
        # urpmi libfftw2 libfftw2-devel
+
+
 
   OpenGL should be installed on practically all distributions.  However,
   you will need the devel module.  In Mandrake 9.1 it may be installed
@@ -5342,8 +5385,6 @@
   When installing fftw do not use the rpm package offered on the website
   because it will cause an error, so use the source package instead.
 
-
-
   [1mNOTE[22m: you can use the instructions given at the ``automated
         installation section'' to install all of MythMusic in one
   step.
@@ -5354,7 +5395,6 @@
   getting MythMusic going. Make sure that you run ./configure first.  If
   you wish to use the new visualizations, make sure you install the
   prerequisites.  Run ./configure --help for help.
-
 
 
   ______________________________________________________________________
@@ -5417,7 +5457,6 @@
 
   The Ignore_ID3 option does not disable the code that determines the
   track length, just the portion that tries to read ID3 info.
-
 
 
   [1m15.6.  Using MythMusic[0m
@@ -5542,18 +5581,17 @@
   These are the keyboard commands for MythWeather:
 
 
-
-  Left Key             Goes back one page, and extends the time spent
-                       on the page you are on.
-  Right Key            Goes forward one page, see above.
-  Space                Pause, wait on the current page until space is hit
-                       again.
-  Numeric Keys         You can check other weather by keying in other ZIP codes.
-  Enter Key            Switch between Celsius and Fahrenheit. Can also
-                       be used a way to force a data update.
-  "m" Key              Resets the location to the database default, then updates the data.
-  "i"                  Enter / Save settings
-  ESC                  Exit the settings screen without saving / Exit the program
+       Left Key             Goes back one page, and extends the time spent
+                            on the page you are on.
+       Right Key            Goes forward one page, see above.
+       Space                Pause, wait on the current page until space is hit
+                            again.
+       Numeric Keys         You can check other weather by keying in other ZIP codes.
+       Enter Key            Switch between Celsius and Fahrenheit. Can also
+                            be used a way to force a data update.
+       "m" Key              Resets the location to the database default, then updates the data.
+       "i"                  Enter / Save settings
+       ESC                  Exit the settings screen without saving / Exit the program
 
 
 
@@ -5603,10 +5641,13 @@
   MPEG-2 to other formats which should greatly reduce the amount of
   space the DVD material takes up on your hard drive.
 
+
   MythDVD has a number of prerequisites to enable transcoding
   functionality.  If you only wish to play DVDs rather than convert them
   to something like MPEG-4 or xvid you may skip the prerequisite
   installation step.
+
+
   [1m18.1.  Manual Compilation of Prerequisites[0m
 
 
@@ -5662,8 +5703,6 @@
   This indicates that mtd is ready for use.  Once you've successfully
   tested mtd in the foreground, type [1mCTRL-C [22mto stop mtd.  You may then
   start it as a background (daemon) process.
-
-
        $ mtd -d
 
 
@@ -5731,7 +5770,6 @@
 
   or
 
-
   2.  Run [1mqmake mythtv.pro [22min the mythtv directory.  Rerunning [1mqmake[0m
   will create a new Makefile for you, however this still doesn't fix the
   root cause of the issue, which is that your distribution didn't create
@@ -5792,23 +5830,20 @@
 
   At this point, you now have debug-enabled software ready.  Let's
   assume that the problem you're having is in the setup program.
+       $ cd setup
+       $ gdb ./setup
 
-
-
-  $ cd setup
-  $ gdb ./setup
-
-  GNU gdb 5.3-1mdk (Mandrake Linux)
-  Copyright 2002 Free Software Foundation, Inc.
-  GDB is free software, covered by the GNU General Public License, and you are
-  welcome to change it and/or distribute copies of it under certain
-  conditions.
-  Type "show copying" to see the conditions.
-  There is absolutely no warranty for GDB.  Type "show warranty" for details.
-  This GDB was configured as "i586-mandrake-linux-gnu"...
-  (gdb) handle SIGPIPE nostop
-  Signal        Stop      Print   Pass to program Description
-  SIGPIPE       No        Yes     Yes             Broken pipe
+       GNU gdb 5.3-1mdk (Mandrake Linux)
+       Copyright 2002 Free Software Foundation, Inc.
+       GDB is free software, covered by the GNU General Public License, and you are
+       welcome to change it and/or distribute copies of it under certain
+       conditions.
+       Type "show copying" to see the conditions.
+       There is absolutely no warranty for GDB.  Type "show warranty" for details.
+       This GDB was configured as "i586-mandrake-linux-gnu"...
+       (gdb) handle SIGPIPE nostop
+       Signal        Stop      Print   Pass to program Description
+       SIGPIPE       No        Yes     Yes             Broken pipe
 
 
 

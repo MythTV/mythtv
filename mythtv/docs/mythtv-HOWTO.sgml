@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2005-01-04, v0.16.05
+<date>2005-01-12, v0.16.06
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -3225,7 +3225,11 @@ For stations with poor signal quality: "kerneldeint,denoise3d=12"
 The following types of hardware encoding cards are supported:
 <itemize>
 <item>MJPEG - Zoran-based cards; see <url url="http://mjpeg.sourceforge.net" name="http://mjpeg.sourceforge.net">
-<item>MPEG-2 - iTVC15 based cards (Hauppauge PVR-250/PVR-350); see <url url="http://ivtv.sourceforge.net" name="http://ivtv.sourceforge.net">
+<item>MPEG-2 - iTVC15 based cards (Hauppauge PVR-250/PVR-350); see <url
+url="http://ivtv.sourceforge.net" name="http://ivtv.sourceforge.net"> and
+the Air2PC-ATSC-PCI see <url
+url="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103"
+name="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103">.
 <item>HDTV - pcHDTV cards; see <url url="http://pchdtv.com" name="http://pchdtv.com">
 <item>DVB - cards supporting DVB; see <url url="http://linuxtv.org" name="http://linuxtv.org">
 </itemize>
@@ -3291,6 +3295,10 @@ like the height and width parameters specified.  It's best to leave the
 default as-is until you're sure that MythTV is operational.
 </caption>
 </figure>
+
+See the <ref id="capture_resolution_" name="What capture resolution should I
+use? How does video work?"> section for more information.
+
 <sect1>Xbox Frontends
 <p>MythTV is able to control the LED on the Xbox to indicate backend
 recording status.  
@@ -7322,6 +7330,9 @@ v0.16.05, 2005-01-04.  Update to HDTV card list.  Daniel Thor Kristjannson's
 alteration of "compiling for non-intel CPUs" section.  Add in a few
 sentences that people shouldn't email me to ask for tech support, not that
 anyone will read that part.
+v0.16.06, 2005-01-12.  Add a link from "Recording" to Misc letting user know
+about "Good" HxV values are.
+
 -->
 
 <!--

@@ -570,26 +570,26 @@ setting the wakeuptime.</P>
 <P>The MythTV master backend is responsible for managing the schedule
 for all TV tuner cards on the master and any slave. It's job is to
 search the TV listing for the shows you have requested and assign
-recording to the TV tuner cards. If none of the shows that you've
+recordings to the TV tuner cards. If none of the shows that you've
 chosen overlap, it simply records all of the shows. However, if
 there are shows where the beginning and end times overlap, the
 scheduler follows rules that you've specified or makes logical
 decisions about what would be best if you haven't express your
-preference. Further, the "Fix Conflicts" page allows you make
+preference. Further, the "Upcoming Recordings" page allows you make
 specific decisions about what you really do and don't want to
 record.</P>
 
 <H3>Record Types</H3>
 
 <P>When you choose a show that you would like to record from the
-Options Page, there are six different types of rules to help the
+Options Page, there are eight different types of rules to help the
 scheduler find which showings you would like to record.</P>
 <P>
 <UL>
-<LI>Single -- record only this title at this specific time. This is
-the best way to be sure that a certain showing is recorded. However,
-if the TV listings change and the show is not broadcast at that time,
-the show will not be recorded.
+<LI>Single Record -- record only this title at this specific
+time. This is the best way to be sure that a certain showing is
+recorded. However, if the TV listings change and the show is not
+broadcast at that time, the show will not be recorded.
 </LI>
 <LI>Find One -- this will record a title once from any of the times
 that appear in the TV listings. This is useful for recording a movie
@@ -597,37 +597,74 @@ or special that has multiple showings because it allows the scheduler
 to choose one that doesn't conflict. It is not a good choice for
 recording a single episode of a series because it records the first
 available showing of the title without regard to the episode
-information or duplicate matching.
+information.
 </LI>
-<LI>Week Slot -- this records a show whenever the title is listed on
-the same channel, weekday and time. Note that if the TV station
+<LI>Record Weekly -- this records a show whenever the title is listed
+on the same channel, weekday and time. Note that if the TV station
 changes the schedule for a special episode, it would not be
 recorded. However, you can add a Single record for the special
 episode.
 </LI>
-<LI>Time Slot -- this records a show whenever the title is listed
+<LI>Find Weekly -- this will record a title once per week from any
+of the times that appear in the TV listings beginning from the time of
+the showing that was selected when the rule was set. This is useful
+for news, current events or other programs where the same episode is
+shown several times each week but the listings may not include
+descriptive information. This is not a good choice if there are
+different episodes shown during the week.
+</LI>
+<LI>Record Daily -- this records a show whenever the title is listed
 for the time and channel on any day of the week. Here again, a show
 will not be recorded if the time was altered by the station.
 </LI>
-<LI>Channel -- records a show anytime the title is listed on this
-channel.  This is perhaps the most common rule to use for most
+<LI>Find Daily -- this will record a title once per day from any
+of the times that appear in the TV listings beginning from the time of
+the showing that was selected when the rule was set. This is useful
+for news, current events or other programs where the same episode is
+shown several times each day but the listings may not include
+descriptive information. This is not a good choice if there are
+different episodes shown during the day.
+</LI>
+<LI>Channel Record -- records a show anytime the title is listed on
+this channel.  This is perhaps the most common rule to use for most
 shows.
 </LI>
-<LI>All -- record this title on any channel at any time. This can be
-useful if a station has sister stations where shows are rebroadcast
-allowing the scheduler to record rebroadcasts on the other station
-when the original airing cannot be recorded.</LI>
+<LI>Record All -- record this title on any channel at any time. This
+can be useful if a station has sister stations where shows are
+rebroadcast allowing the scheduler to record rebroadcasts on the other
+station when the original airing cannot be recorded.</LI>
 </UL>
 </P>
 
 <H3>Duplicates</H3>
 
-<P>Single and Find One will record without regard to duplicate
-matching.  However, the scheduler uses the duplicate matching
-information for all other types to determine which showings should
-and should not record. Further, if an episode has multiple showings,
-the scheduler may be able to use this information to find ways to
-record episodes that might not otherwise be recorded.</P>
+<P>Singles will record without regard to duplicate matching.</P>
+
+<P>The standard recurring methods of All, Channel, Weekly and Daily use
+the descriptive information in the TV listings to try to record only one
+showing of each unique episode. However, This goal is sometimes
+complicated by the fact that the stations may not include a description
+for a specific episode but use a generic description for the series
+instead. When there is a generic description, the default behavior is to
+assume that it may be an episode that you have not seen and to record it
+for you.  One of the duplicate matching options is "Record new episodes
+only".  If this is selected, listing that have an original air date of
+more than 14 days earlier are considered repeats and are not eligible to
+record. Generally, generic episodes will be marked as repeats also.</P>
+
+<P>Because of generic episodes and other situations, MythTV offers an
+alternative approach where shows may be recorded by choosing from
+multiple showings even when the descriptive information is not reliable.
+All of the "Find" record types look for matching titles in the
+listings. If there is a showing with specific episode information and
+that episode has recorded before, that showing is marked as previously
+or currently recorded. The scheduler will then choose to record the
+earliest non-conflicting showing from any of other remaining showings
+regardless of the descriptive information. Generally, Find One is most
+useful for movies or specials and the Find Daily and Find Weekly rules
+are best for news or current events shows that are repeated. However,
+these may be useful in other situations where the standard recording
+rules may not work correctly.</P>
 
 <H3>Conflicts</H3>
 
@@ -640,7 +677,6 @@ information you have given. If you see an unexpected situation you
 are not "stuck" with the scheduler's choice. You can still tell the
 scheduler exactly which shows you do want to record and/or don't
 want to record in any situation.</P>
-
 
 <H3>Priority</H3>
 
@@ -675,7 +711,7 @@ simplicity and clarity.</P>
 allows you to add to the priority based on the type. It may make
 sense to increase the value for "Single" so that by default they
 have an extra advantage over other shows. You may want to decrease
-the value for Find One so that they will be less likely to interfere
+the value for Find rules so that they will be less likely to interfere
 with regular shows and will be more likely to record in a
 non-conflicting time instead.</P>
 <P>Per channel -- Setup->TV Settings->Recording Priorities->Channel
@@ -717,15 +753,16 @@ on the first available card then the next highest priority and so on.
 <LI>Future start time beats passed start time -- If there is an
 episode in progress and also a later showing of the same episode, it
 is better to record the complete episode. If there isn't another
-showing, start recording now to record the remaining portion. Note:
-this should only happen if you add a new rule while the show is in
-progress or if the is started after the starttime of a scheduled show.
+showing, start recording now to record the remaining portion.
+This should only happen if you add a new rule while the show is in
+progress or if the master backend is started after the start time of
+a scheduled show.
 </LI>
 <LI>More specific record type beats less specific record type -- If
 two shows are on at the same time and have the same total priority but
-different types they will be sorted by Single then Find One, Week
-Slot, Time Slot, Channel and finally All. This only applies if the
-priorities are the same.
+different types they will be sorted by Single then Find One, Record
+Weekly, Find Weekly, Record Daily, Find Daily, Channel and finally
+All. This only applies if the priorities are the same.
 </LI>
 <LI>If both start times have passed, later start time beats earlier
 start time -- This attempts to miss the least amount of time.
