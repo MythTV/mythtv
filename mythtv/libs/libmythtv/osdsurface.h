@@ -73,6 +73,8 @@ class OSDSurface
         usedRegions = usedRegions.unite(newrect);
     }
 
+    bool Changed(void) { return changed; }
+    void SetChanged(bool change) { changed = change; }
 
     unsigned char *yuvbuffer;
 
@@ -90,6 +92,8 @@ class OSDSurface
     QRegion usedRegions;
 
     unsigned char pow_lut[256][256];
+
+    bool changed;
 };
 
 #endif

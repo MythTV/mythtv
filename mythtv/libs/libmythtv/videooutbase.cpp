@@ -475,11 +475,13 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
     }
 }
 
-void VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
+bool VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
 {
+    bool retval = false;
+
     if (osd)
     {
-        OSDSurface *surface = osd->Display(frame);
+        OSDSurface *surface = osd->Display();
         if (surface)
         {
             switch (frame->codec)
@@ -488,6 +490,21 @@ void VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
                 {
                     unsigned char *yuvptr = frame->buf;
                     BlendSurfaceToYV12(surface, yuvptr);
+                    retval = surface->Changed();
+                    break;
+                }
+                case FMT_AI44:
+                {
+                    unsigned char *ai44ptr = frame->buf;
+                    BlendSurfaceToI44(surface, ai44ptr, true);
+                    retval = true;
+                    break;
+                }
+                case FMT_IA44:
+                {
+                    unsigned char *ia44ptr = frame->buf;
+                    BlendSurfaceToI44(surface, ia44ptr, false);
+                    retval = true;
                     break;
                 }
                 default:
@@ -495,6 +512,8 @@ void VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
             }
         }
     }
+
+    return retval;
 }
  
 void VideoOutput::BlendSurfaceToYV12(OSDSurface *surface, unsigned char *yuvptr)
@@ -563,3 +582,59 @@ blendimageyv12end:
     }
 }
 
+void VideoOutput::BlendSurfaceToI44(OSDSurface *surface, unsigned char *yuvptr,
+                                    bool ifirst)
+{
+    int ashift = ifirst ? 0 : 4;
+    int amask = ifirst ? 0x0f : 0xf0;
+
+    int ishift = ifirst ? 4 : 0;
+    int imask = ifirst ? 0xf0 : 0x0f; 
+
+    memset(yuvptr, 0x0, XJ_width * XJ_height);
+
+    QMemArray<QRect> rects = surface->usedRegions.rects();
+    QMemArray<QRect>::Iterator it = rects.begin();
+    for (; it != rects.end(); ++it)
+    {
+        QRect drawRect = *it;
+
+        int startcol, startline, endcol, endline;
+        startcol = drawRect.left();
+        startline = drawRect.top();
+        endcol = drawRect.right();
+        endline = drawRect.bottom();
+
+        unsigned char *src, *usrc, *vsrc;
+        unsigned char *dest;
+        unsigned char *alpha;
+
+        int yoffset;
+
+        for (int y = startline; y <= endline; y++)
+        {
+            yoffset = y * surface->width;
+
+            src = surface->y + yoffset + startcol;
+            dest = yuvptr + yoffset + startcol;
+            alpha = surface->alpha + yoffset + startcol;
+
+            for (int x = startcol; x <= endcol; x++)
+            {
+                if (*alpha == 0)
+                {
+                    *dest = 0;
+                    goto blendimagei44end;
+                }
+
+                *dest = (((*alpha >> 4) << ashift) & amask) |
+                        (((*src >> 4) << ishift) & imask);
+
+blendimagei44end:
+                src++;
+                dest++;
+                alpha++;
+            }
+        }
+    }
+}

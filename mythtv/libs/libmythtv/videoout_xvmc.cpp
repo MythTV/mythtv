@@ -32,9 +32,23 @@ extern "C" {
 #define XMD_H 1
 #include <X11/extensions/xf86vmode.h>
 
+extern "C" {
+extern int      XShmQueryExtension(Display*);
+extern int      XShmGetEventBase(Display*);
+extern XvImage  *XvShmCreateImage(Display*, XvPortID, int, char*, int, int, XShmSegmentInfo*);
+}
+
 const int kNumBuffers = 7;
 const int kPrebufferFrames = 4;
 const int kNeedFreeFrames = 2;
+
+#define NO_SUBPICTURE 0
+#define OVERLAY_SUBPICTURE 1
+#define BLEND_SUBPICTURE 2
+#define BACKEND_SUBPICTURE 3
+
+#define GUID_IA44  0x34344941
+#define GUID_AI44  0x34344149
 
 struct XvMCData
 {
@@ -54,15 +68,30 @@ struct XvMCData
     xvmc_render_state_t *surface_render;
     xvmc_render_state_t *p_render_surface_to_show;
     xvmc_render_state_t *p_render_surface_visible;
+    VideoFrame *curosd;
+    VideoFrame *lastframe;
 
     int mode_id;
+
+    int subpicture_mode;
+    bool subpicture_alloc;
+
+    XvMCSubpicture subpicture;
+    XvImageFormatValues subpicture_info;
+    int subpicture_clear_color;
+
+    bool ia44;
+
+    XShmSegmentInfo shminfo;
+    XvImage *xvimage;
+    unsigned char *palette;
 };
 
 static int XJ_error_catcher(Display * d, XErrorEvent * xeev)
 {
-  d = d; 
-  xeev = xeev;
-  return 0;
+    d = d; 
+    xeev = xeev;
+    return 0;
 }
 
 VideoOutputXvMC::VideoOutputXvMC(void)
@@ -270,6 +299,41 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
     data->XJ_gc = XCreateGC(data->XJ_disp, data->XJ_win, 0, 0);
     XJ_depth = DefaultDepthOfScreen(data->XJ_screen);
 
+    XvImageFormatValues *xvfmv;
+    int num_subpic;
+    xvfmv = XvMCListSubpictureTypes(data->XJ_disp, xv_port, 
+                                    data->surface_info.surface_type_id,
+                                    &num_subpic);
+
+    data->subpicture_mode = NO_SUBPICTURE;
+
+    if (num_subpic != 0 && xvfmv != NULL)
+    {
+        for (int i = 0; i < num_subpic; i++)
+        {
+            if (xvfmv[i].id == GUID_IA44)
+            {
+                data->ia44 = true;
+                data->subpicture_info = xvfmv[i];
+                data->subpicture_mode = BLEND_SUBPICTURE;
+                break;
+            }
+            else if (xvfmv[i].id == GUID_AI44)
+            {
+                data->ia44 = false;
+                data->subpicture_info = xvfmv[i];
+                data->subpicture_mode = BLEND_SUBPICTURE;
+                break;
+            }
+        }
+
+        XFree(xvfmv);
+    }
+
+    if ((data->subpicture_mode == BLEND_SUBPICTURE) &&
+        (data->surface_info.flags & XVMC_BACKEND_SUBPICTURE))
+        data->subpicture_mode = BACKEND_SUBPICTURE;
+
     if (!CreateXvMCBuffers())
             return false;
 
@@ -397,6 +461,62 @@ bool VideoOutputXvMC::CreateXvMCBuffers(void)
         vbuffers[i].codec = FMT_XVMC_IDCT_MPEG2;
     }
 
+    data->subpicture_clear_color = 0;
+
+    rez = XvMCCreateSubpicture(data->XJ_disp, &data->ctx, &data->subpicture,
+                               XJ_width, XJ_height, data->subpicture_info.id);
+
+    if (rez == Success)
+    {
+        XvMCClearSubpicture(data->XJ_disp, &data->subpicture, 0, 0, XJ_width,
+                            XJ_height, data->subpicture_clear_color);
+
+        data->xvimage = XvShmCreateImage(data->XJ_disp, xv_port,
+                                         data->subpicture_info.id, NULL,
+                                         XJ_width, XJ_height, &data->shminfo);
+
+        data->shminfo.shmid = shmget(IPC_PRIVATE, data->xvimage->data_size,
+                                     IPC_CREAT | 0777);
+        data->shminfo.shmaddr = (char *)shmat(data->shminfo.shmid, 0, 0);
+        data->shminfo.readOnly = False;
+
+        data->xvimage->data = data->shminfo.shmaddr;
+
+        shmctl(data->shminfo.shmid, IPC_RMID, 0);
+
+        XShmAttach(data->XJ_disp, &data->shminfo);
+
+        if (data->subpicture.num_palette_entries > 0)
+        {
+            int snum = data->subpicture.num_palette_entries;
+            int seb = data->subpicture.entry_bytes;
+
+            data->palette = new unsigned char[snum * seb];
+
+            for (int i = 0; i < snum; i++)
+            {
+                int Y = i * (1 << data->subpicture_info.y_sample_bits) / snum;
+                int U = 1 << (data->subpicture_info.u_sample_bits - 1);
+                int V = 1 << (data->subpicture_info.v_sample_bits - 1);
+                for (int j = 0; j < seb; j++)
+                {
+                    switch (data->subpicture.component_order[j]) 
+                    {
+                        case 'U': data->palette[i * seb + j] = U; break;
+                        case 'V': data->palette[i * seb + j] = V; break;
+                        case 'Y': default:
+                                  data->palette[i * seb + j] = Y; break;
+                    }
+                }
+            }
+
+            XvMCSetSubpicturePalette(data->XJ_disp, &data->subpicture, 
+                                     data->palette);
+        }
+    }
+    else
+        data->subpicture_mode = NO_SUBPICTURE;
+
     XSync(data->XJ_disp, 0);
 
     data->p_render_surface_to_show = NULL;
@@ -441,6 +561,20 @@ void VideoOutputXvMC::DeleteXvMCBuffers()
         vbuffers[i].buf = NULL;
     }
 
+    if (data->subpicture_alloc)
+    {
+        XvMCDestroySubpicture(data->XJ_disp, &data->subpicture);
+
+        XShmDetach(data->XJ_disp, &data->shminfo);
+        shmdt(data->shminfo.shmaddr);
+
+        data->subpicture_alloc = false;
+        XFree(data->xvimage);
+
+        if (data->palette)
+            delete [] data->palette;
+    }
+
     XvMCDestroyContext(data->XJ_disp, &data->ctx);
 }
 
@@ -482,7 +616,8 @@ static void SyncSurface(Display *disp, XvMCSurface *surf)
 
 void VideoOutputXvMC::PrepareFrame(VideoFrame *buffer)
 {
-    // pause update
+    if (!buffer)
+        buffer = data->lastframe;
     if (!buffer)
         return;
 
@@ -492,18 +627,36 @@ void VideoOutputXvMC::PrepareFrame(VideoFrame *buffer)
 
     SyncSurface(data->XJ_disp, render->p_surface);
 
+    VideoFrame *osdframe = (VideoFrame *)render->p_osd_target_surface_render;
+
+    if (osdframe)
+    {
+        xvmc_render_state_t *osdren = (xvmc_render_state_t *)osdframe->buf;
+        SyncSurface(data->XJ_disp, osdren->p_surface);
+    }
+
     render->state |= MP_XVMC_STATE_DISPLAY_PENDING;
     data->p_render_surface_to_show = render;
 
+    data->lastframe = buffer;
     pthread_mutex_unlock(&lock);
 }
 
 void VideoOutputXvMC::Show()
 {
-    if (data->p_render_surface_to_show == NULL)
+    xvmc_render_state_t *render = data->p_render_surface_to_show;
+
+    if (render == NULL)
         return;
 
-    XvMCSurface *surf = data->p_render_surface_to_show->p_surface;
+    xvmc_render_state_t *osdren = NULL;
+
+    VideoFrame *osdframe = (VideoFrame *)render->p_osd_target_surface_render;
+    if (osdframe)
+        osdren = (xvmc_render_state_t *)osdframe->buf;
+
+    xvmc_render_state_t *showingsurface = (osdren) ? osdren : render;
+    XvMCSurface *surf = showingsurface->p_surface;
 
     pthread_mutex_lock(&lock);
 
@@ -514,24 +667,34 @@ void VideoOutputXvMC::Show()
                    imgh, dispxoff, dispyoff, dispwoff, disphoff, 3);
 
     if (data->p_render_surface_visible && 
-        (data->p_render_surface_visible != data->p_render_surface_to_show))
+        (data->p_render_surface_visible != showingsurface))
     {
         surf = data->p_render_surface_visible->p_surface;
 
         int status = XVMC_DISPLAYING;
 
+        XvMCGetSurfaceStatus(data->XJ_disp, surf, &status);
         while (status & XVMC_DISPLAYING)
         {
+            pthread_mutex_unlock(&lock);
+            usleep(1000);
+            pthread_mutex_lock(&lock);
             XvMCGetSurfaceStatus(data->XJ_disp, surf, &status);
-            //pthread_mutex_unlock(&lock);
-            //usleep(1000);
-            //pthread_mutex_lock(&lock);
         }
     }
 
     data->p_render_surface_visible = data->p_render_surface_to_show;
     data->p_render_surface_to_show = NULL;
 
+    if (osdframe)
+    {
+        data->p_render_surface_visible = osdren;
+        if (data->curosd)
+            DiscardFrame(data->curosd);
+        data->curosd = osdframe;
+        render->p_osd_target_surface_render = NULL;
+    }
+   
     pthread_mutex_unlock(&lock);
 }
 
@@ -594,5 +757,59 @@ void VideoOutputXvMC::ProcessFrame(VideoFrame *frame, OSD *osd,
                                    vector<VideoFilter *> &filterList,
                                    NuppelVideoPlayer *pipPlayer)
 {
+    if (!frame)
+        frame = data->lastframe;
+    if (!frame)
+        return;
+
+    xvmc_render_state_t *render = (xvmc_render_state_t *)frame->buf;
+    render->p_osd_target_surface_render = NULL;
+
+    if (osd)
+    {
+        if (data->subpicture_mode == BLEND_SUBPICTURE ||
+            data->subpicture_mode == BACKEND_SUBPICTURE)
+        {
+            VideoFrame tmpframe;
+            if (data->ia44)
+                tmpframe.codec = FMT_IA44;
+            else
+                tmpframe.codec = FMT_AI44;
+            tmpframe.buf = (unsigned char *)(data->xvimage->data);
+
+            if (!DisplayOSD(&tmpframe, osd))
+                return;                
+
+            pthread_mutex_lock(&lock);
+
+            XvMCCompositeSubpicture(data->XJ_disp, &data->subpicture, 
+                                    data->xvimage, 0, 0, XJ_width, XJ_height, 
+                                    0, 0);
+            XvMCSyncSubpicture(data->XJ_disp, &data->subpicture);
+
+            if (data->subpicture_mode == BLEND_SUBPICTURE)
+            {
+                VideoFrame *newframe = GetNextFreeFrame();
+
+                xvmc_render_state_t *osdren;
+                osdren = (xvmc_render_state_t *)newframe->buf;
+
+                XvMCBlendSubpicture2(data->XJ_disp, render->p_surface,
+                                     osdren->p_surface, &data->subpicture,
+                                     0, 0, XJ_width, XJ_height,
+                                     0, 0, XJ_width, XJ_height);
+
+                render->p_osd_target_surface_render = newframe;
+            }
+            else if (data->subpicture_mode == BACKEND_SUBPICTURE)
+            {
+                XvMCBlendSubpicture(data->XJ_disp, render->p_surface,
+                                    &data->subpicture, 0, 0, XJ_width,
+                                    XJ_height, 0, 0, XJ_width, XJ_height);
+            }
+            
+            pthread_mutex_unlock(&lock);
+        }
+    }
 }
 

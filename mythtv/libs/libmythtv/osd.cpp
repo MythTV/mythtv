@@ -17,6 +17,7 @@ using namespace std;
 #include "ttfont.h"
 #include "osd.h"
 #include "osdtypes.h"
+#include "osdsurface.h"
 #include "mythcontext.h"
 #include "libmyth/oldsettings.h"
 
@@ -1540,7 +1541,7 @@ void OSD::SetVisible(OSDSet *set, int length)
     osdlock.unlock();
 }
 
-OSDSurface *OSD::Display(VideoFrame *frame)
+OSDSurface *OSD::Display(void)
 {
     bool anytodisplay = false;
     if (!setList)
@@ -1554,8 +1555,13 @@ OSDSurface *OSD::Display(VideoFrame *frame)
         changed = false; 
     }
 
+    drawSurface->SetChanged(false);
+
     if (actuallydraw)
+    {
+        drawSurface->SetChanged(true);
         drawSurface->Clear();
+    }
 
     vector<OSDSet *> removeList;
 
