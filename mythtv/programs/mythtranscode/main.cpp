@@ -257,10 +257,19 @@ int main(int argc, char *argv[])
             return -1;
         }
 
-        QString fileprefix = gContext->GetFilePrefix();
-        infile = pginfo->GetRecordFilename(fileprefix);
+        infile = pginfo->GetPlaybackURL();
     }
-    QString tmpfile = infile + ".tmp";
+
+    QString tmpfile;
+    if (infile.left(7) == "myth://") {
+        VERBOSE(VB_IMPORTANT, QString("Attempted to transcode %1. "
+               "Mythtranscode is currently unable to transcode remote "
+               "files.")
+               .arg(infile));
+        exit(0);
+    }
+
+    tmpfile = infile + ".tmp";
 
     int jobID = -1;
     if (use_db)

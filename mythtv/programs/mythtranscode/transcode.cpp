@@ -309,7 +309,11 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                                    m_proginfo->startts);
 
         if (jobID < 0)
+        {
+            VERBOSE(VB_IMPORTANT, "ERROR, Transcode called from JobQueue but "
+                                  "no jobID found!");
             return REENCODE_ERROR;
+        }
 
         JobQueue::ChangeJobComment(m_db, jobID,
                                    "0% " + QObject::tr("Completed"));
@@ -323,7 +327,10 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     if (honorCutList && m_proginfo)
     {
         if (m_proginfo->IsEditing(m_db) || m_proginfo->IsCommProcessing(m_db))
+        {
+            VERBOSE(VB_IMPORTANT, "Transcoding aborted, cutlist changed");
             return REENCODE_CUTLIST_CHANGE;
+        }
         m_proginfo->SetMarkupFlag(MARK_UPDATED_CUT, false, m_db);
         curtime = curtime.addSecs(60);
     }
@@ -342,7 +349,10 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     nvp->SetAudioOutput(audioOutput);
 
     if (nvp->OpenFile(false) < 0)
+    {
+        VERBOSE(VB_IMPORTANT, "Transcoding aborted, error opening file.");
         return REENCODE_ERROR;
+    }
 
     nvp->ReinitAudio();
     QString encodingType = nvp->GetEncodingType();
@@ -363,11 +373,15 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     if (fifodir == NULL)
     {
         if (!GetProfile(profileName, encodingType)) {
+            VERBOSE(VB_IMPORTANT, "Transcoding aborted, no profile found.");
             return REENCODE_ERROR;
         }
         vidsetting = profile.byName("videocodec")->getValue();
         if (vidsetting == "MPEG-2")
+        {
+            VERBOSE(VB_IMPORTANT, "Transcoding aborted, need MPEG-2.");
             return REENCODE_MPEG2TRANS;
+        }
         // Recorder setup
         nvr->SetFrameRate(video_frame_rate);
 
@@ -621,6 +635,8 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                 // The Raw state changed during decode.  This is not good
                 unlink(outputname);
                 delete newFrame;
+                VERBOSE(VB_IMPORTANT, "Transcoding aborted, NuppelVideoPlayer "
+                                      "is not in raw audio mode.");
                 return REENCODE_ERROR;
             }
 
@@ -746,6 +762,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             {
                 unlink(outputname);
                 delete newFrame;
+                VERBOSE(VB_IMPORTANT, "Transcoding aborted, cutlist updated");
                 return REENCODE_CUTLIST_CHANGE;
             }
 
@@ -755,6 +772,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                 {
                     unlink(outputname);
                     delete newFrame;
+                    VERBOSE(VB_IMPORTANT, "Transcoding STOPped by JobQueue");
                     return REENCODE_STOPPED;
                 }
                 int percentage = curFrameNum * 100 / total_frame_count;
