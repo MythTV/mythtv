@@ -17,6 +17,8 @@ using namespace std;
 #include "mdcaprequest.h"
 #include "mdcapresponse.h"
 
+#include "../mdcaplib/markupcodes.h"
+
 MetadataClient::MetadataClient(
                             MfdInterface *the_mfd,
                             int an_mfd,
@@ -135,7 +137,7 @@ void MetadataClient::handleIncoming()
             //  Well, something is borked.
             //
             
-            cout << "there is something seriously wrong with this metdata server" << endl;
+            cerr << "there is something seriously wrong with this metdata server" << endl;
             
         }
     }
@@ -145,10 +147,100 @@ void MetadataClient::processResponse(MdcapResponse *mdcap_response)
 {
 
     //
-    //  Check the type of server
+    //  First a sanity check to make sure we are getting x-mdcap tagged
+    //  responses
+    //
+
+    if(
+        mdcap_response->getHeader("Content-Type") != 
+        "application/x-mdcap-tagged"
+      )
+    {
+        cerr << "metadataclient.o: getting responses from metadata server "
+             << "that are not x-mdcap-tagged, which is pretty much a disaster."
+             << " Giving up."
+             << endl;
+        return;
+    }
+    
+
+    //
+    //  Create an mdcap input object with the payload from the response
     //
     
-    mdcap_response->printHeaders();
+    MdcapInput mdcap_input(mdcap_response->getPayload());
+    
+    char first_tag = mdcap_input.peekAtNextCode();
+    
+    if(first_tag == MarkupCodes::server_info_group)
+    {
+        parseServerInfo(mdcap_input);
+    }
+    //else if
+    //{
+    //}
+    else
+    {
+        cerr << "metadataclient.o: did not understand first markup code "
+             << "in a mdcap payload "
+             << endl;
+    }
+}
+
+void MetadataClient::parseServerInfo(MdcapInput &mdcap_input)
+{
+    QValueVector<char> *group_contents = new QValueVector<char>;
+    
+    char group_code = mdcap_input.popGroup(group_contents);
+    
+    if(group_code != MarkupCodes::server_info_group)
+    {
+        cerr << "metadataclient.o: asked to parseServerInfo(), but "
+             << "group code was not server_info_group "
+             << endl;
+        delete group_contents;
+        return;
+    }
+    
+
+    MdcapInput rebuilt_internals(group_contents);
+    
+    while(rebuilt_internals.size() > 0)
+    {
+        char content_code = rebuilt_internals.peekAtNextCode();
+        
+        //
+        //  Depending on what the code is, we set various things
+        //
+        
+        if(content_code == MarkupCodes::name)
+        {
+            QString service_name = rebuilt_internals.popName();
+            cout << "I see the service name as " << service_name << endl;
+        }
+        else if(content_code == MarkupCodes::status_code)
+        {
+            int response_status = rebuilt_internals.popStatus();
+            cout << "I see the server's status as " << response_status << endl;
+        }
+        else if(content_code == MarkupCodes::protocol_version)
+        {
+            int protocol_minor = 0;
+            int protocol_major = 0;
+            rebuilt_internals.popProtocol(&protocol_major, &protocol_minor);
+            cout << "I see the protcol version as " << protocol_major << "." << protocol_minor << endl;
+        }
+        else
+        {
+            cerr << "metadataclient.o getting content codes I don't understand "
+                 << "while doing parseServerInfo(). Code I got was "
+                 << (int) content_code
+                 << endl;
+            break;
+        }
+    }
+    
+    delete group_contents;
 }
 
 MetadataClient::~MetadataClient()

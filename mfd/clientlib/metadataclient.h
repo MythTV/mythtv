@@ -11,6 +11,7 @@
 */
 
 #include "serviceclient.h"
+#include "../mdcaplib/mdcapinput.h"
 
 class MdcapResponse;
 
@@ -31,6 +32,11 @@ class MetadataClient : public ServiceClient
     void processResponse(MdcapResponse *mdcap_response);
     void sendFirstRequest();
 
+    //
+    //  Methods for handling different responses from the server
+    //
+    
+    void parseServerInfo(MdcapInput &mdcap_input);
 };
 
 #endif

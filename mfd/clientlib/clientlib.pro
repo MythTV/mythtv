@@ -34,7 +34,7 @@ SOURCES += mfdinterface.cpp discoverythread.cpp mfdinstance.cpp \
 inc.path = $${PREFIX}/include/mfdclient/
 inc.files  = mfdinterface.h mfdinstance.h
 
-LIBS += -Wl,--export-dynamic
+LIBS += -L../mdcaplib -lmdcap -Wl,--export-dynamic
 
 INSTALLS += inc
 
