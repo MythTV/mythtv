@@ -40,6 +40,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
     deinterlace = 0;
 
     audiodevice = "/dev/dsp";
+    audiodelay = 0;
 
     ringBuffer = NULL;
     weMadeBuffer = false;
@@ -93,6 +94,7 @@ void NuppelVideoPlayer::InitSound(void)
         audiofd = -1;
         return;
     }
+    printf("Writing audio at %dHz\n", speed);
 }
 
 void NuppelVideoPlayer::WriteAudio(unsigned char *aubuf, int size)

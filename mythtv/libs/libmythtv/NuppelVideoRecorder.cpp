@@ -174,6 +174,8 @@ int NuppelVideoRecorder::AudioInit(void)
     rate = 44100;
     ioctl(afd, SNDCTL_DSP_SPEED, &rate);
 
+    printf("Reading audio at %dHz\n", rate);
+
     if (-1 == ioctl(afd, SNDCTL_DSP_GETBLKSIZE, &blocksize)) 
     {
         fprintf(stderr, "\n%s\n", "Can't get DSP blocksize, exiting");
