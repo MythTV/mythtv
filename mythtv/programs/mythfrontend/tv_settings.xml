@@ -1,6 +1,12 @@
 <mythmenu>
    <button>
       <type>SETUP</type>
+      <text>General</text>
+      <action>SETTINGS GENERAL</action>
+   </button>
+
+   <button>
+      <type>SETUP</type>
       <text>Themes</text>
       <action>SETTINGS THEMES</action>
    </button>

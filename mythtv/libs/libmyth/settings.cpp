@@ -158,13 +158,23 @@ QWidget* CheckBoxSetting::configWidget(QWidget* parent,
     
     QCheckBox* widget = new QCheckBox(parent, widgetName);
     widget->setText(getLabel());
+    widget->setChecked(boolValue());
+
+    connect(widget, SIGNAL(toggled(bool)),
+            this, SLOT(setValue(bool)));
+    connect(this, SIGNAL(valueChanged(bool)),
+            widget, SLOT(setChecked(bool)));
 
     return widget;
 }
 
-QWidget* ConfigurationDialog::configWidget(QWidget* parent,
-                                           const char* widgetName) {
-  return dialogWidget(parent, widgetName);
+QDialog* ConfigurationDialog::dialogWidget(QWidget* parent,
+                                           const char* widgetName = 0) {
+    QDialog* dialog = new QDialog(parent, widgetName, TRUE);
+    QVBoxLayout* layout = new QVBoxLayout(dialog);
+    layout->addWidget(configWidget(dialog));
+
+    return dialog;
 }
 
 QDialog* ConfigurationWizard::dialogWidget(QWidget* parent,
@@ -186,6 +196,10 @@ QDialog* ConfigurationWizard::dialogWidget(QWidget* parent,
     return wizard;
 }
 
+QWidget* ConfigurationWizard::configWidget(QWidget* parent,
+                                           const char* widgetName=0) {
+    return dialogWidget(parent, widgetName);
+}
 
 void SimpleDBStorage::load(QSqlDatabase* db) {
     QString querystr = QString("SELECT %1 FROM %2 WHERE %3")

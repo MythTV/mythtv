@@ -153,9 +153,9 @@ protected:
 class ConfigurationDialog: virtual public Configurable {
 public:
     virtual QDialog* dialogWidget(QWidget* parent,
-                                  const char* widgetName = 0) = 0;
-    virtual QWidget* configWidget(QWidget* parent,
                                   const char* widgetName = 0);
+//     virtual QWidget* configWidget(QWidget* parent,
+//                                   const char* widgetName = 0);
 };
 
 // A wizard is a group with one child per page
@@ -163,6 +163,8 @@ class ConfigurationWizard: virtual public ConfigurationDialog,
                            virtual public ConfigurationGroup {
 public:
     virtual QDialog* dialogWidget(QWidget* parent,
+                                  const char* widgetName=0);
+    virtual QWidget* configWidget(QWidget* parent,
                                   const char* widgetName=0);
 };
 
@@ -290,17 +292,21 @@ public:
 };
 
 class BooleanSetting: virtual public Setting {
+    Q_OBJECT
 public:
-    virtual void setValue(const QString& newValue) {
-        Setting::setValue(newValue);
+    bool boolValue(void) {
+        return getValue() == "true";
     };
-
+public slots:
     virtual void setValue(bool check) {
         if (check)
-            settingValue = "true";
+            Setting::setValue("true");
         else
-            settingValue = QString::null;
+            Setting::setValue(QString::null);
+        emit valueChanged(check);
     };
+signals:
+    void valueChanged(bool);
 };
 
 class CheckBoxSetting: public BooleanSetting {

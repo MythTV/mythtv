@@ -17,6 +17,7 @@ using namespace std;
 #include "libmyth/programinfo.h"
 #include "libmyth/mythcontext.h"
 #include "libmyth/recordingprofile.h"
+#include "libmyth/globalsettings.h"
 
 QMap<int, TV *> tvList;
 ThemedMenu *menu;
@@ -196,6 +197,13 @@ void recordingSettings(MythContext* context)
     editor.exec();
 }
 
+void generalSettings(MythContext* context)
+{
+    GlobalSettings settings;
+
+    settings.exec(QSqlDatabase::database());
+}
+
 void TVMenuCallback(void *data, QString &selection)
 {
     MythContext *context = (MythContext *)data;
@@ -216,6 +224,8 @@ void TVMenuCallback(void *data, QString &selection)
         themesSettings(context);
     else if (sel == "settings recording")
       recordingSettings(context);
+    else if (sel == "settings general")
+      generalSettings(context);
 }
 
 bool RunMenu(QString themedir, MythContext *context)
