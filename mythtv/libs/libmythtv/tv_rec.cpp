@@ -1451,12 +1451,11 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
                                "channel,capturecard,cardinput "
                                "WHERE channel.channum = \"%2\" AND "
                                "channel.sourceid = cardinput.sourceid AND "
-                               "cardinput.inputname = \"%3\" AND "
                                "cardinput.cardid = capturecard.cardid AND "
-                               "capturecard.cardid = \"%4\" AND "
-                               "capturecard.hostname = \"%5\";")
+                               "capturecard.cardid = \"%3\" AND "
+                               "capturecard.hostname = \"%4\";")
                                .arg(channelorder).arg(channum)
-                               .arg(channelinput).arg(cardid)
+                               .arg(cardid)
                                .arg(gContext->GetHostName());
 
     QSqlQuery query = db_conn->exec(thequery);
@@ -1478,11 +1477,10 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
 
         thequery = QString("SELECT %1 FROM channel,capturecard,cardinput "
                            "WHERE channel.sourceid = cardinput.sourceid AND "
-                           "cardinput.inputname = \"%2\" AND "
                            "cardinput.cardid = capturecard.cardid AND "
-                           "capturecard.cardid = \"%3\" AND "
-                           "capturecard.hostname = \"%4\" ORDER BY %5 "
-                           "LIMIT 1;").arg(channelorder).arg(channelinput)
+                           "capturecard.cardid = \"%2\" AND "
+                           "capturecard.hostname = \"%3\" ORDER BY %4 "
+                           "LIMIT 1;").arg(channelorder)
                            .arg(cardid).arg(gContext->GetHostName())
                            .arg(channelorder);
        
@@ -1525,12 +1523,10 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
         comp = "=";
     }
 
-    QString wherepart = QString("channel.sourceid = cardinput.sourceid AND "
-                                "cardinput.inputname = \"%1\" AND "
-                                "cardinput.cardid = capturecard.cardid AND "
-                                "capturecard.cardid = \"%2\" AND "
-                                "capturecard.hostname = \"%3\" ")
-                                .arg(channelinput).arg(cardid)
+    QString wherepart = QString("cardinput.cardid = capturecard.cardid AND "
+                                "capturecard.cardid = \"%1\" AND "
+                                "capturecard.hostname = \"%2\" ")
+                                .arg(cardid)
                                 .arg(gContext->GetHostName());
 
     thequery = QString("SELECT channel.channum, channel.chanid "
