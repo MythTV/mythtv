@@ -276,7 +276,6 @@ void Playlist::mapDatabaseToId(
             QIntDictIterator<Playlist> pl_it( *the_playlists );
             for ( ; pl_it.current(); ++pl_it )
             {
-                cout << "checking " << pl_it.current()->getDbId() << " against " << (*iter) * -1 << endl;
                 if(pl_it.current()->getDbId() == (*iter) * -1)
                 {
                     which_one = pl_it.current();
