@@ -13,6 +13,17 @@ DEFINES += _GNU_SOURCE
 DEFINES += _FILE_OFFSET_BITS=64
 DEFINES += PREFIX=\"$${PREFIX}\"
 
+# Die on the (common) case where OS X users inadvertently use Fink's
+# Qt/X11 install instead of Qt/Mac.
+contains(CONFIG_DARWIN, yes) {
+    !macx {
+        message(You are building with Qt/X11 on the Mac platform.)
+        message(Myth must be built with Qt/Mac instead.)
+        message((Fink users cannot use Fink's Qt, it's the wrong one.))
+        error(Unsupported configuration)
+    }
+}
+
 release {
     contains(TARGET_ARCH_X86, yes) {
         DEFINES += MMX
