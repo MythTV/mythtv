@@ -21,6 +21,10 @@ using namespace std;
 #define PATHTO_VCD_DETECT "/vcd"
 #endif
 
+#ifndef PATHTO_SVCD_DETECT
+#define PATHTO_SVCD_DETECT "/svcd"
+#endif
+
 MythCDROM* MythCDROM::get(QObject* par, const char* devicePath, bool SuperMount,
                                  bool AllowEject) {
 #ifdef linux
@@ -54,7 +58,7 @@ bool MythCDROM::openDevice()
 
 void MythCDROM::onDeviceMounted()
 {
-    QString DetectPath;
+    QString DetectPath, DetectPath2;
     DetectPath.sprintf("%s%s", (const char*)m_MountPath, PATHTO_DVD_DETECT);
     VERBOSE(VB_ALL, QString("Looking for: '%1'").arg(DetectPath));
 
@@ -71,11 +75,14 @@ void MythCDROM::onDeviceMounted()
     DetectPath.sprintf("%s%s", (const char*)m_MountPath, PATHTO_VCD_DETECT);
     VERBOSE(VB_ALL, QString("Looking for: '%1'").arg(DetectPath));
 
-    if (stat(DetectPath, &sbuf) == 0)
+    DetectPath2.sprintf("%s%s", (const char*)m_MountPath, PATHTO_SVCD_DETECT);
+    VERBOSE(VB_ALL, QString("Looking for: '%1'").arg(DetectPath2));
+
+    if (stat(DetectPath, &sbuf) == 0 || stat(DetectPath2, &sbuf) == 0)
     {
-        VERBOSE(VB_GENERAL, "Probable VCD detected.");
+        VERBOSE(VB_GENERAL, "Probable VCD/SVCD detected.");
         m_MediaType = MEDIATYPE_VCD;
-        // HACK make it possible to eject a VCD by unmounting it
+        // HACK make it possible to eject a VCD/SVCD by unmounting it
         performMountCmd(false);
         m_Status = MEDIASTAT_USEABLE; 
     }
