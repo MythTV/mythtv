@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-01-13, v1.073
+<date>2003-01-14, v1.075
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -44,13 +44,15 @@ If you have installation instructions for a different region or Linux
 distribution, please send them to the author so that it can be included in other
 versions of this document.
 
-The contributors for this document are:
+The contributors to MythTV are:
 <itemize>
-<item>Overall structure and Mandrake 9.0: Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<item>Red Hat Linux 8.0: Cedar McKay, <url url="mailto:mythhowto.3.ohthetrees@spamgourmet.com">
-<item>Gentoo: Tony Clark, <url url="mailto:tclark@telia.com">
-<item>Debian: Matthew Zimmerman, <url url="mailto:mdz@debian.org">
-<item>Mandrake 8.2: Harondel J. Sibble, <url url="mailto:help@pdscc.com">
+<item>Lead developer:  Isaac Richardson, <url url="mailto:ijr@po.cwru.edu">
+<item>Developer:  Matthew Zimmerman, <url url="mailto:mdz@debian.org">
+<item>Overall structure and Mandrake 9.0 documentation: Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
+<item>Red Hat Linux 8.0 documentation: Cedar McKay, <url url="mailto:mythhowto.3.ohthetrees@spamgourmet.com">
+<item>Gentoo documentation and package: Tony Clark, <url url="mailto:tclark@telia.com">
+<item>Debian package: Matthew Zimmerman, <url url="mailto:mdz@debian.org">
+<item>Mandrake 8.2 documentation: Harondel J. Sibble, <url url="mailto:help@pdscc.com">
 </itemize>
 
 <sect>Checking prerequisites. 
@@ -400,7 +402,7 @@ run it if you get an unexpected error about not finding libraries.
 web site.  Save the tarball to a directory you can find.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
-name="http://xmltv.sourceforge.net">.  Download version 0.5.4
+name="http://xmltv.sourceforge.net">.  Download version 0.5.6
 
 Get lame from <url url="http://www.mp3dev.org/mp3"
 name="http://www.mp3dev.org/mp3">.  Download the source code to v3.93.1 by
@@ -488,7 +490,7 @@ Continuing on:
 
 <label id="untarring_xmltv">Untar the xmltv file:
 <tscreen><verb>
-$ tar -xjf xmltv-0.5.4.tar.bz2
+$ tar -xjf xmltv-0.5.6.tar.bz2
 $ cd xmltv-0.5.4
 </verb></tscreen>
 Install the xmltv prerequisites:
@@ -505,7 +507,7 @@ cpan> exit
 
 Change to the XMLTV directory and compile it:
 <tscreen><verb>
-$ cd xmltv-0.5.4
+$ cd xmltv-0.5.6
 $ perl Makefile.PL
 </verb></tscreen>
 You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
@@ -1812,6 +1814,9 @@ change made: edit the
 <tt>/usr/lib/perl5/site_perl/5.8.0/XMLTV/ZapListings.pm</tt> file and
 perform a global search and replace, searching for "tvlistings2" and
 replacing it with "tvlistings".
+<bf>NOTE</bf>:  It is highly recommended to run the latest version of XMLTV
+available.  In North America, zap2it, the listings provider, has been
+making numerous changes to their website which negatively impact XMLTV.
 <sect1>MythTV seems to disappear; can't see video
 <p>If you're using Gnome as your window manager, try switching to KDE.  For
 Red Hat Linux 8.0 users, edit <tt>/etc/sysconfig/desktop</tt> and
@@ -2267,6 +2272,10 @@ v1.073, 2003-01-13.  Added text on configuring ESC to exit in CVS version of
 myth.
 v1.074, 2003-01-13.  Set standard names for "Myth".  "MythTV", "MythMusic",
 etc.  Adjusted exit instructions.
+v1.075, 2003-01-14.  Make it clear the Kulagowski is document author, _not_
+developer of MythTV.  Modified version of XMLTV to get; added instruction
+that latest version of XMLTV is usually best because of back-end changes at
+zap2it.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-01-13, v1.073
+  2003-01-14, v1.075
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -152,19 +152,25 @@
   region or Linux distribution, please send them to the author so that
   it can be included in other versions of this document.
 
-  The contributors for this document are:
+  The contributors to MythTV are:
 
-  +o  Overall structure and Mandrake 9.0: Robert Kulagowski,
-     <mailto:rkulagow@rocketmail.com>
+  +o  Lead developer:  Isaac Richardson,  <mailto:ijr@po.cwru.edu>
 
-  +o  Red Hat Linux 8.0: Cedar McKay,
+  +o  Developer:  Matthew Zimmerman,  <mailto:mdz@debian.org>
+
+  +o  Overall structure and Mandrake 9.0 documentation: Robert
+     Kulagowski,  <mailto:rkulagow@rocketmail.com>
+
+  +o  Red Hat Linux 8.0 documentation: Cedar McKay,
      <mailto:mythhowto.3.ohthetrees@spamgourmet.com>
 
-  +o  Gentoo: Tony Clark,  <mailto:tclark@telia.com>
+  +o  Gentoo documentation and package: Tony Clark,
+     <mailto:tclark@telia.com>
 
-  +o  Debian: Matthew Zimmerman,  <mailto:mdz@debian.org>
+  +o  Debian package: Matthew Zimmerman,  <mailto:mdz@debian.org>
 
-  +o  Mandrake 8.2: Harondel J. Sibble,  <mailto:help@pdscc.com>
+  +o  Mandrake 8.2 documentation: Harondel J. Sibble,
+     <mailto:help@pdscc.com>
 
   [1m3.  Checking prerequisites.[0m
 
@@ -196,7 +202,6 @@
   supports multiple encoder cards in a single PC, thereby increasing the
   CPU requirements if you plan on simultaneously encoding multiple
   programs.
-
   Here are a few data points:
 
   +o  A PIII/733Mhz system can encode one video stream using the RTJPEG
@@ -373,8 +378,8 @@
 
   The "ls -l" command will show you a directory listing.  There should
   be two files, one will be named "qt3" and the other will be
-  "qt3-devel".  The full filenames will vary, so one you know the file-
-  name, you can install them with
+  "qt3-devel".  The full filenames will vary, so one you know the
+  filename, you can install them with
 
        # rpm -Uvh [filename1]
        # rpm -Uvh [filename2]
@@ -466,7 +471,6 @@
 
   The last two commands are to exit out of the shell.  This way, when
   you next open a shell your new commands will take effect.
-
   [1m4.1.2.  Red Hat Linux 8.0[0m
 
   Red Hat Linux 8.0 uses an unusual character encoding scheme which
@@ -474,6 +478,7 @@
   you run setup or mythfilldatabase you will have to set a variable to
   correct this problem.  Failure to set this variable will result in a
   lot of UTF-8 errors.
+
   There are two modifications that you can make to your system to avoid
   this problem. The first is a system wide solution, the second will
   only apply to your current user.
@@ -528,7 +533,7 @@
   the tarball to a directory you can find.
 
   Get XMLTV from http://xmltv.sourceforge.net
-  <http://xmltv.sourceforge.net>.  Download version 0.5.4
+  <http://xmltv.sourceforge.net>.  Download version 0.5.6
 
   Get lame from http://www.mp3dev.org/mp3 <http://www.mp3dev.org/mp3>.
   Download the source code to v3.93.1 by following the links to
@@ -566,18 +571,18 @@
 
   Check that it worked:
 
-       # ls -l /usr/local/lib
-       -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
-       -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
-       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
-       libmp3lame.so.0.0.0*
-       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
-       libmp3lame.so.0.0.0*
-       -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
-       libmp3lame.so.0.0.0*
+  # ls -l /usr/local/lib
+  -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
+  -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
+  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
+  libmp3lame.so.0.0.0*
+  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
+  libmp3lame.so.0.0.0*
+  -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
+  libmp3lame.so.0.0.0*
 
-       # exit
-       $
+  # exit
+  $
 
   [1m5.3.  Building XMLTV.[0m
 
@@ -617,8 +622,8 @@
 
   Untar the xmltv file:
 
-       $ tar -xjf xmltv-0.5.4.tar.bz2
-       $ cd xmltv-0.5.4
+  $ tar -xjf xmltv-0.5.6.tar.bz2
+  $ cd xmltv-0.5.4
 
   Install the xmltv prerequisites:
 
@@ -633,7 +638,7 @@
 
   Change to the XMLTV directory and compile it:
 
-       $ cd xmltv-0.5.4
+       $ cd xmltv-0.5.6
        $ perl Makefile.PL
 
   You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes"
@@ -837,6 +842,7 @@
   Download the development release (0.9.x) from the ALSA web site
   http://www.alsa-project.org <http://www.alsa-project.org>.  You need
   at least three files:
+
   +o  alsa-driver-0.9.x.tar.bz2
 
   +o  alsa-lib-0.9.x.tar.bz2
@@ -860,21 +866,21 @@
 
   Install the rest of the packages:
 
-       $ cd ~
-       $ tar -xjf alsa-lib-0.9.x.tar.bz2
-       $ cd alsa-lib-0.9.x
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # exit
-       $ cd ..
-       $ tar -xjf alsa-utils-0.9.x.tar.bz2
-       $ cd alsa-utils-0.9.x
-       $ ./configure
-       $ make
-       $ su
-       # make install
+  $ cd ~
+  $ tar -xjf alsa-lib-0.9.x.tar.bz2
+  $ cd alsa-lib-0.9.x
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # exit
+  $ cd ..
+  $ tar -xjf alsa-utils-0.9.x.tar.bz2
+  $ cd alsa-utils-0.9.x
+  $ ./configure
+  $ make
+  $ su
+  # make install
 
   Next, you must edit /etc/modules.conf so that the ALSA modules are
   loaded automatically. The first step is to remove your old OSS
@@ -882,18 +888,18 @@
   conflicts in the future.  You should end up with a /etc/modules.conf
   file that has this configuration:
 
-  alias char-major-116 snd
-  alias snd-card-0 snd-XXX
-  # module options should go here
-  # OSS/Free portion
-  alias char-major-14 soundcore
-  alias sound-slot-0 snd-card-0
-  # card #1
-  alias sound-service-0-0 snd-mixer-oss
-  alias sound-service-0-1 snd-seq-oss
-  alias sound-service-0-3 snd-pcm-oss
-  alias sound-service-0-8 snd-seq-oss
-  alias sound-service-0-12 snd-pcm-oss
+       alias char-major-116 snd
+       alias snd-card-0 snd-XXX
+       # module options should go here
+       # OSS/Free portion
+       alias char-major-14 soundcore
+       alias sound-slot-0 snd-card-0
+       # card #1
+       alias sound-service-0-0 snd-mixer-oss
+       alias sound-service-0-1 snd-seq-oss
+       alias sound-service-0-3 snd-pcm-oss
+       alias sound-service-0-8 snd-seq-oss
+       alias sound-service-0-12 snd-pcm-oss
 
   "XXX" should be the ALSA driver name for your sound card/chip. In some
   rare cases you need to supply extra options to the driver. These
@@ -913,7 +919,6 @@
   the mixer settings won't get restored the next time you boot unless
   you ran the shutdown script or you've explicitly saved the state which
   you can do as root with:
-
        # alsactl -f /etc/asound.state store
 
   Reboot your machine.  Login and adjust the sound levels using
@@ -966,7 +971,6 @@
   Some IR devices require a kernel recompile, and some don't. However,
   all at least require having the kernel source available as a resource
   for the lirc build process.
-
   [1m8.1.  Gentoo[0m
 
   To install lirc on Gentoo, all you need to do is:
@@ -1065,11 +1069,11 @@
   For the impatient: Make sure you have an emergency floppy boot disk
   available!
 
-       $ cd /usr/src/linux
-       $ su
-       # make mrproper
-       # cd configs
-       # ls
+  $ cd /usr/src/linux
+  $ su
+  # make mrproper
+  # cd configs
+  # ls
 
   at this point you must look at the file names and determine which
   config file is right for you. For instance if you have an Athlon XP
@@ -1150,13 +1154,13 @@
   Now, we're going to add the commands necessary for lircd to run each
   time we boot:
 
-       # cd /etc/rc.d
-       # cat >> rc.local
-       echo "Starting lircd"
-       /usr/local/sbin/lircd
-       ^D
-       # exit
-       $
+  # cd /etc/rc.d
+  # cat >> rc.local
+  echo "Starting lircd"
+  /usr/local/sbin/lircd
+  ^D
+  # exit
+  $
 
   This takes care of the lircd portion, which "listens" for the IR sig-
   nals. If everything went well, the install script for lircd put an
@@ -1172,7 +1176,7 @@
 
   or
 
-  $ cp lircrc.example.pinnaclestudiopctv ~/.lircrc
+       $ cp lircrc.example.pinnaclestudiopctv ~/.lircrc
 
   if you've got a Pinnacle Studio PCTV remote.
 
@@ -1349,44 +1353,44 @@
   /dev/device. Unlike bourne or bash, csh scripts automatically close
   parent file descriptors before they start.
 
-       $ cd /usr/local/bin
-       # su
-       # cat > change_channel.csh
-       #!/bin/csh
-       echo "changing to $1"
-       /usr/local/bin/channel.pl $1 &
-       ^D
-       # chmod a+x change_channel.csh
-       # exit
-       $ exit
+  $ cd /usr/local/bin
+  # su
+  # cat > change_channel.csh
+  #!/bin/csh
+  echo "changing to $1"
+  /usr/local/bin/channel.pl $1 &
+  ^D
+  # chmod a+x change_channel.csh
+  # exit
+  $ exit
 
   The following file should be saved as /usr/local/bin/channel.pl
 
-  #!/usr/bin/perl
+       #!/usr/bin/perl
 
-  # make sure to set this string to
-  # the corresponding remote in /etc/lircd.conf
-  $remote_name = "gi-motorola-dct2000";
+       # make sure to set this string to
+       # the corresponding remote in /etc/lircd.conf
+       $remote_name = "gi-motorola-dct2000";
 
-  sub change_channel {
-          my($channel_digit) = @_;
-          system ("rc SEND_ONCE $remote_name $channel_digit");
-          sleep 1;
-  }
+       sub change_channel {
+               my($channel_digit) = @_;
+               system ("rc SEND_ONCE $remote_name $channel_digit");
+               sleep 1;
+       }
 
-  $channel=$ARGV[0];
-  sleep 1;
-  if (length($channel) > 2) {
-          change_channel(substr($channel,0,1));
-          change_channel(substr($channel,1,1));
-          change_channel(substr($channel,2,1));
-  } elsif (length($channel) > 1) {
-          change_channel(substr($channel,0,1));
-          change_channel(substr($channel,1,1));
-  } else {
-          change_channel(substr($channel,0,1));
-  }
-  system ("rc SEND_ONCE $remote_name ENTER");
+       $channel=$ARGV[0];
+       sleep 1;
+       if (length($channel) > 2) {
+               change_channel(substr($channel,0,1));
+               change_channel(substr($channel,1,1));
+               change_channel(substr($channel,2,1));
+       } elsif (length($channel) > 1) {
+               change_channel(substr($channel,0,1));
+               change_channel(substr($channel,1,1));
+       } else {
+               change_channel(substr($channel,0,1));
+       }
+       system ("rc SEND_ONCE $remote_name ENTER");
 
   The last statement within the perl script is the lirc rc command. This
   is the command that transmits the code to your cable/dss box. Make
@@ -1506,25 +1510,26 @@
   If you want to know what time your job will run, you can do the
   following:
 
-       # cat /etc/crontab
-       SHELL=/bin/bash
-       PATH=/sbin:/bin:/usr/sbin:/usr/bin
-       MAILTO=root
-       HOME=/
+  # cat /etc/crontab
+  SHELL=/bin/bash
+  PATH=/sbin:/bin:/usr/sbin:/usr/bin
+  MAILTO=root
+  HOME=/
 
-       # run-parts
-       01 * * * * root nice -n 19 run-parts /etc/cron.hourly
-       02 4 * * * root nice -n 19 run-parts /etc/cron.daily
-       22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
-       42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
-       # exit
-       $
+  # run-parts
+  01 * * * * root nice -n 19 run-parts /etc/cron.hourly
+  02 4 * * * root nice -n 19 run-parts /etc/cron.daily
+  22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
+  42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
+  # exit
+  $
 
   We can see from the display that the cron.daily job will run at 0402
   every morning.
 
   If you wish to specify a custom time, then the user-based cron job is
   the better method.
+
   The default [1mconfigfiles/mythcrontab [22mfile will run the [1mmythfilldatabase[0m
   program every day at 0430.  If you want to change this, then open the
   configfiles/mythcrontab file in your favorite editor and modify it as
@@ -1667,7 +1672,6 @@
   MythGallery is a photo and slideshow application.  MythGallery is a
   separate application, but it's dependent on MythTV being installed and
   operational.
-
   [1m12.1.  Installation and pre-requisites.[0m
 
   Download MythGallery from http://www.mythtv.org/
@@ -1771,19 +1775,19 @@
   <http://www.xiph.org/paranoia/download/cdparanoia-III-
   alpha9.8.src.tgz>.
 
-       $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
-       $ cd cdparanoia-III-alpha9.8
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       <!-- see if the next step is a Mandrake only issue -->
-       # cp interface/cdda_interface.h /usr/local/include
-       # cd /usr/lib
-       # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
-       # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
-       # exit
-       $
+  $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
+  $ cd cdparanoia-III-alpha9.8
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  <!-- see if the next step is a Mandrake only issue -->
+  # cp interface/cdda_interface.h /usr/local/include
+  # cd /usr/lib
+  # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
+  # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
+  # exit
+  $
 
   [1m14.2.  Mandrake 9.0[0m
 
@@ -1822,7 +1826,6 @@
 
   The MythWeather module will obtain the weather information for the
   location that you specify.
-
   Change into the MythWeather directory, then make and make install:
 
        $ cd mythweather
@@ -1916,7 +1919,10 @@
   the following change made: edit the
   /usr/lib/perl5/site_perl/5.8.0/XMLTV/ZapListings.pm file and perform a
   global search and replace, searching for "tvlistings2" and replacing
-  it with "tvlistings".
+  it with "tvlistings".  [1mNOTE[22m:  It is highly recommended to run the
+  latest version of XMLTV available.  In North America, zap2it, the
+  listings provider, has been making numerous changes to their website
+  which negatively impact XMLTV.
 
   [1m17.3.  MythTV seems to disappear; can't see video[0m
 
@@ -2025,18 +2031,18 @@
   At this point, you now have debug-enabled software ready.  Let's
   assume that the problem you're having is in the setup program.
 
-       $ cd setup
-       $ gdb ./setup
+  $ cd setup
+  $ gdb ./setup
 
-       GNU gdb 5.2.1-2mdk (Mandrake Linux)
-       Copyright 2002 Free Software Foundation, Inc.
-       GDB is free software, covered by the GNU General Public License, and you are
-       welcome to change it and/or distribute copies of it under certain
-       conditions.
-       Type "show copying" to see the conditions.
-       There is absolutely no warranty for GDB.  Type "show warranty" for details.
-       This GDB was configured as "i586-mandrake-linux-gnu"...
-       (gdb)
+  GNU gdb 5.2.1-2mdk (Mandrake Linux)
+  Copyright 2002 Free Software Foundation, Inc.
+  GDB is free software, covered by the GNU General Public License, and you are
+  welcome to change it and/or distribute copies of it under certain
+  conditions.
+  Type "show copying" to see the conditions.
+  There is absolutely no warranty for GDB.  Type "show warranty" for details.
+  This GDB was configured as "i586-mandrake-linux-gnu"...
+  (gdb)
 
   [1mgdb [22mhas a number of options, read the man page for more information.
 
