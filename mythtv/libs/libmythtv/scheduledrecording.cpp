@@ -295,6 +295,7 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
      QDateTime now = QDateTime::currentDateTime();
 
      if (result.isActive() && result.numRowsAffected() > 0)
+     {
          while (result.next()) {
              ProgramInfo *proginfo = new ProgramInfo;
              proginfo->chanid = result.value(0).toString();
@@ -341,6 +342,9 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
                  proglist.push_back(proginfo);
              
          }
+    }
+    else if (!result.isActive())
+        MythContext::DBError("findAllProgramsToRecord", result);
 }
 
 void ScheduledRecording::findAllScheduledPrograms(QSqlDatabase* db,
