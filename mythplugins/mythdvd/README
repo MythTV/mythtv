@@ -112,6 +112,7 @@ For just DVD playback, you can do:
 
 Next:
 
+                qmake
                 make
                 make install
 
