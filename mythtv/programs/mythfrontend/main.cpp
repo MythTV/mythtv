@@ -643,6 +643,8 @@ static void *run_priv_thread(void *data)
                                     "some threads to run with realtime priority, "
                                     "improving video smoothness.");
                         }
+                        else
+                            VERBOSE(VB_GENERAL, "Using realtime priority.");
                     }
                     else
                     {
