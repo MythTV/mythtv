@@ -729,11 +729,10 @@ void ScheduledRecording::setDefault(bool haschannel)
 
     autotranscode->setValue(0);
     autocommflag->setValue(gContext->GetNumSetting("AutoCommercialFlag", 1));
-
-    autouserjob1->setValue(0);
-    autouserjob2->setValue(0);
-    autouserjob3->setValue(0);
-    autouserjob4->setValue(0);
+    autouserjob1->setValue(gContext->GetNumSetting("AutoRunUserJob1", 0));
+    autouserjob2->setValue(gContext->GetNumSetting("AutoRunUserJob2", 0));
+    autouserjob3->setValue(gContext->GetNumSetting("AutoRunUserJob3", 0));
+    autouserjob4->setValue(gContext->GetNumSetting("AutoRunUserJob4", 0));
 
     recgroup->fillSelections();    
     recgroup->setValue("Default");

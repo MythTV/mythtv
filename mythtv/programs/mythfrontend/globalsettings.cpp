@@ -395,10 +395,54 @@ static HostCheckBox *TryUnflaggedSkip()
 static GlobalCheckBox *AutoCommercialFlag()
 {
     GlobalCheckBox *bc = new GlobalCheckBox("AutoCommercialFlag");
-    bc->setLabel(QObject::tr("Automatically Flag Commercials"));
+    bc->setLabel(QObject::tr("Default Auto Commercial Flagging setting"));
     bc->setValue(true);
-    bc->setHelpText(QObject::tr("This is the default policy used for the Auto-"
+    bc->setHelpText(QObject::tr("This is the default value used for the Auto-"
                     "Commercial Flagging setting when a new scheduled "
+                    "recording is created."));
+    return bc;
+}
+
+static GlobalCheckBox *AutoRunUserJob1()
+{
+    GlobalCheckBox *bc = new GlobalCheckBox("AutoRunUserJob1");
+    bc->setLabel(QObject::tr("Default 'Run User Job #1' setting"));
+    bc->setValue(false);
+    bc->setHelpText(QObject::tr("This is the default value used for the "
+                    "'Run User Job #1' setting when a new scheduled "
+                    "recording is created."));
+    return bc;
+}
+
+static GlobalCheckBox *AutoRunUserJob2()
+{
+    GlobalCheckBox *bc = new GlobalCheckBox("AutoRunUserJob2");
+    bc->setLabel(QObject::tr("Default 'Run User Job #2' setting"));
+    bc->setValue(false);
+    bc->setHelpText(QObject::tr("This is the default value used for the "
+                    "'Run User Job #2' setting when a new scheduled "
+                    "recording is created."));
+    return bc;
+}
+
+static GlobalCheckBox *AutoRunUserJob3()
+{
+    GlobalCheckBox *bc = new GlobalCheckBox("AutoRunUserJob3");
+    bc->setLabel(QObject::tr("Default 'Run User Job #3' setting"));
+    bc->setValue(false);
+    bc->setHelpText(QObject::tr("This is the default value used for the "
+                    "'Run User Job #3' setting when a new scheduled "
+                    "recording is created."));
+    return bc;
+}
+
+static GlobalCheckBox *AutoRunUserJob4()
+{
+    GlobalCheckBox *bc = new GlobalCheckBox("AutoRunUserJob4");
+    bc->setLabel(QObject::tr("Default 'Run User Job #4' setting"));
+    bc->setValue(false);
+    bc->setHelpText(QObject::tr("This is the default value used for the "
+                    "'Run User Job #4' setting when a new scheduled "
                     "recording is created."));
     return bc;
 }
@@ -2789,13 +2833,10 @@ PlaybackSettings::PlaybackSettings()
 
     VerticalConfigurationGroup* comms = new VerticalConfigurationGroup(false);
     comms->setLabel(QObject::tr("Commercial Skip"));
-    comms->addChild(AutoCommercialFlag());
-    comms->addChild(CommercialSkipMethod());
-    comms->addChild(AggressiveCommDetect());
-    comms->addChild(CommSkipAllBlanks());
+    comms->addChild(AutoCommercialSkip());
     comms->addChild(CommRewindAmount());
     comms->addChild(CommNotifyAmount());
-    comms->addChild(AutoCommercialSkip());
+    comms->addChild(CommSkipAllBlanks());
     comms->addChild(TryUnflaggedSkip());
     addChild(comms);
 
@@ -2867,6 +2908,17 @@ GeneralSettings::GeneralSettings()
     autoexp->addChild(AutoExpireDefault());
     autoexp->addChild(RerecordAutoExpired());
     addChild(autoexp);
+
+    VerticalConfigurationGroup* jobs = new VerticalConfigurationGroup(false);
+    jobs->setLabel(QObject::tr("Job Queue"));
+    jobs->addChild(AutoCommercialFlag());
+    jobs->addChild(CommercialSkipMethod());
+    jobs->addChild(AggressiveCommDetect());
+    jobs->addChild(AutoRunUserJob1());
+    jobs->addChild(AutoRunUserJob2());
+    jobs->addChild(AutoRunUserJob3());
+    jobs->addChild(AutoRunUserJob4());
+    addChild(jobs);
 }
 
 EPGSettings::EPGSettings()
