@@ -111,6 +111,9 @@ void Settings::LoadSettingsFiles(QString filename, QString prefix)
     QString setname = prefix + "/share/mythtv/" + filename;
     ReadSettings(setname);
 
+    setname = prefix + "/etc/mythtv/" + filename;
+    ReadSettings(setname);
+
     char *home = getenv("HOME");
     setname = QString(home) + "/.mythtv/" + filename;
 
