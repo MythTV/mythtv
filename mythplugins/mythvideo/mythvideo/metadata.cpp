@@ -33,7 +33,13 @@ void Metadata::setField(QString field, QString data)
     else if (field == "year")
         year = data.toInt();
     else if (field == "userrating")
+    {
         userrating = data.toFloat();
+        if (isnan(userrating)) 
+            userrating = 0.0;
+        if (userrating < -10.0 || userrating >= 10.0)
+            userrating = 0.0;
+    }
     else if (field == "length")
         length = data.toInt();
     else if (field == "showlevel")
@@ -197,6 +203,10 @@ bool Metadata::fillData(QSqlDatabase *db)
         rating = QString::fromUtf8(query.value(3).toString());
         year = query.value(4).toInt();
         userrating = (float)query.value(5).toDouble();
+        if (isnan(userrating)) 
+            userrating = 0.0;
+        if (userrating < -10.0 || userrating >= 10.0)
+            userrating = 0.0;
         length = query.value(6).toInt();
         filename = QString::fromUtf8(query.value(7).toString());
         showlevel = query.value(8).toInt();
@@ -240,6 +250,10 @@ bool Metadata::fillDataFromID(QSqlDatabase *db)
         rating = query.value(3).toString();
         year = query.value(4).toInt();
         userrating = (float)query.value(5).toDouble();
+        if (isnan(userrating)) 
+            userrating = 0.0;
+        if (userrating < -10.0 || userrating >= 10.0)
+            userrating = 0.0;
         length = query.value(6).toInt();
         filename = QString::fromUtf8(query.value(7).toString());
         showlevel = query.value(8).toInt();
@@ -292,6 +306,10 @@ bool Metadata::fillDataFromFilename(QSqlDatabase *db)
         rating = query.value(4).toString();
         year = query.value(5).toInt();
         userrating = (float)query.value(6).toDouble();
+        if (isnan(userrating)) 
+            userrating = 0.0;
+        if (userrating < -10.0 || userrating >= 10.0)
+            userrating = 0.0;
         length = query.value(7).toInt();
         showlevel = query.value(8).toInt();
         coverfile = QString::fromUtf8(query.value(9).toString());
