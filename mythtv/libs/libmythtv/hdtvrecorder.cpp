@@ -95,10 +95,11 @@ HDTVRecorder::HDTVRecorder()
 
     firstgoppos = 0;
 
-    desired_program = 0;
+    desired_program = 1; // default to program #1
     pat_pid = 0;
     psip_pid = 0x1ffb;
-    base_pid = 0; // will be filled in when we find it
+    audio_pid = video_pid = -1;
+    pmt_pid = -1;
     output_base_pid = 0;
     ts_packets = 0; // cumulative packet count
 
@@ -481,8 +482,7 @@ bool HDTVRecorder::RewritePAT(unsigned char *buffer, int pid, int pkt_len)
     return true;
 }
 
-bool HDTVRecorder::RewritePMT(unsigned char *buffer, int old_pid, int new_pid,
-                              int pkt_len)
+bool HDTVRecorder::RewritePMT(unsigned char *buffer, int new_pid, int pkt_len)
 {
     // TODO: if it's possible for a PMT to span packets, then this function
     // doesn't know how to deal with anything after the first packet.  On the
@@ -500,20 +500,6 @@ bool HDTVRecorder::RewritePMT(unsigned char *buffer, int old_pid, int new_pid,
     // rewrite program number to 1
     buffer[3] = 0x00;
     buffer[4] = 0x01;
-
-    // rewrite pcr_pid
-    pid = ((buffer[pos] << 8) | buffer[pos+1]) & 0x1fff;
-    if (pid == VIDEO_PID(old_pid)) {
-        pid = VIDEO_PID(new_pid);
-    } 
-    else if (pid == AUDIO_PID(old_pid)) {
-        pid = AUDIO_PID(new_pid);
-    }
-    else {
-        return false;  // don't know how to rewrite
-    }
-    buffer[pos] = ((pid & 0x1f00) >> 8) | 0xe0;
-    buffer[pos+1] = pid & 0x00ff;
     pos += 2;
 
     // skip program info
@@ -521,17 +507,21 @@ bool HDTVRecorder::RewritePMT(unsigned char *buffer, int old_pid, int new_pid,
         return false;  // premature end of packet
     pos += 2 + (((buffer[pos] << 8) | buffer[pos+1]) & 0x0fff);
 
+    video_pid = audio_pid = -1;
     // rewrite other pids
     while (pos < sec_len - 4) {
         if (buffer[pos] == 0xff)
             break;  // hit end of packet, ok here
+        int stream_type = (int)buffer[pos];
         pos++;
 
         pid = ((buffer[pos] << 8) | buffer[pos+1]) & 0x1fff;
-        if (pid == VIDEO_PID(old_pid)) {
+        if (stream_type == 0x02) {
+            video_pid = pid;
             pid = VIDEO_PID(new_pid);
         } 
-        else if (pid == AUDIO_PID(old_pid)) {
+        else if ((stream_type == 0x81 | stream_type == 0x04) && (audio_pid < 0)) {
+            audio_pid = pid;
             pid = AUDIO_PID(new_pid);
         }
 
@@ -544,6 +534,20 @@ bool HDTVRecorder::RewritePMT(unsigned char *buffer, int old_pid, int new_pid,
         // bounds checked at top of while loop
         pos += 2 + (((buffer[pos] << 8) | buffer[pos+1]) & 0x0fff);
     }
+
+    // rewrite pcr_pid
+    pid = ((buffer[8] << 8) | buffer[9]) & 0x1fff;
+    if (pid == video_pid) {
+        pid = VIDEO_PID(new_pid);
+    }
+    else if (pid == audio_pid) {
+        pid = AUDIO_PID(new_pid);
+    }
+    else {
+        return false;  // don't know how to rewrite
+    }
+    buffer[8] = ((pid & 0x1f00) >> 8) | 0xe0;
+    buffer[9] = pid & 0x00ff;
 
     // fix the checksum
     unsigned int crc = mpegts_crc32(buffer, sec_len - 4);
@@ -675,22 +679,39 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
             // PIDs we are looking for, and can thus "tune" the
             // subprogram more quickly.
 
-            // For now we're using the dirty hack below instead.
-            
-            // We should rewrite the PAT to describe just the one
+            // We rewrite the PAT to describe just the one
             // stream we are recording.  Always use the same set of
             // PIDs so the decoder has an easier time following
             // channel changes.
-            if (base_pid) {
-                // sec_start should pretty much always be pos + 1, but
-                // just in case...
-                int sec_start = pos + buffer[pos] + 1;
+            //
+            // Basically, the output PMT is pid 0x10, video is 0x11 and
+            // audio is 0x14.
+            //
+            // sec_start should pretty much always be pos + 1, but
+            // just in case...
+            int sec_start = pos + buffer[pos] + 1;
+            int sec_len = (buffer[sec_start + 1] & 0x0f) << 8 | buffer[sec_start + 2];
+            int i;
+            pmt_pid = -1;
 
-                // write to ringbuffer if pids gets rewritten successfully.
-                if (RewritePAT(&buffer[sec_start], output_base_pid,
-                               packet_end_pos - sec_start))
-                    ringBuffer->Write(&buffer[packet_start_pos], 188);
+            for (i = sec_start + 8; i < sec_start + 3 + sec_len - 4; i += 4) {
+                int prog_num = (buffer[i] << 8) | buffer[i + 1];
+                int prog_pid = (buffer[i + 2] & 0x0e) << 8 | buffer[i + 3];
+                if (prog_num == desired_program) {
+                    pmt_pid = prog_pid;
+                    break;
+                }
             }
+            if (pmt_pid == -1) {
+                pmt_pid = (buffer[sec_start + 8 + 2] & 0x0e) << 8 |
+                                buffer[sec_start + 8 + 3];
+            }
+            output_base_pid = 16;
+
+            // write to ringbuffer if pids gets rewritten successfully.
+            if (RewritePAT(&buffer[sec_start], output_base_pid,
+                           packet_end_pos - sec_start))
+                ringBuffer->Write(&buffer[packet_start_pos], 188);
         }
         else if (pid == psip_pid)
         {
@@ -704,7 +725,7 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
             // downloaded XMLTV data.
 
         }
-        else if (pid == VIDEO_PID(base_pid))
+        else if (pid == video_pid)
         {
             FindKeyframes(buffer, packet_start_pos, pos, 
                     adaptation_field_control, payload_unit_start_indicator);
@@ -717,7 +738,7 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
                 ringBuffer->Write(&buffer[packet_start_pos], 188);
             }
         }
-        else if (pid == AUDIO_PID(base_pid))
+        else if (pid == audio_pid)
         {
             // decoder needs audio, of course (just this PID)
             if (gopset || firstgoppos) 
@@ -727,7 +748,7 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
                 ringBuffer->Write(&buffer[packet_start_pos], 188);
             }
         }
-        else if (pid == base_pid)
+        else if (pid == pmt_pid)
         {
             // decoder needs base PID
             int sec_start = pos + buffer[pos] + 1;
@@ -735,7 +756,7 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
 
             // if it's a PMT table, rewrite the PIDs contained in it too
             if (buffer[sec_start] == 0x02) {
-                if (RewritePMT(&(buffer[sec_start]), base_pid, output_base_pid,
+                if (RewritePMT(&(buffer[sec_start]), output_base_pid,
                                packet_end_pos - sec_start))
                 {
                     ringBuffer->Write(&buffer[packet_start_pos], 188);
@@ -744,39 +765,6 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
             else {
                 // some other kind of packet?  possible?  do we care?
                 ringBuffer->Write(&buffer[packet_start_pos], 188);
-            }
-        }
-        else 
-        {
-            // Not a PID we're watching
-            
-            // As a hack until we start decoding PAT, find the lowest
-            // video PID in the first 50 packets and record only that
-            // stream
-            if ((pid & 0xff0f) == 0x0001 && !base_pid) 
-            {
-                // Look for our desired subprogram here to ensure we're
-                // actually seeing packets from it... if not, we'll
-                // fall back on the 1st one.
-                int program_num = (pid & 0x00f0) >> 4;
-                if (program_num == desired_program && desired_program != 0) 
-                {
-                    base_pid = pid - 1;
-                    if (output_base_pid == 0)
-                        output_base_pid = 16;
-                }
-                else 
-                {
-                    if (pid < lowest_video_pid)
-                        lowest_video_pid = pid;
-                    video_pid_packets++;
-                    if (video_pid_packets >= 50) 
-                    {
-                        base_pid = lowest_video_pid - 1;
-                        if (output_base_pid == 0)
-                            output_base_pid = 0x10;
-                    }
-                }
             }
         }
         // Advance to next TS packet
@@ -796,8 +784,9 @@ void HDTVRecorder::Reset(void)
     framesWritten = 0;
     gopset = false;
     firstgoppos = 0;
-    base_pid = 0;
     ts_packets = 0;
+    pmt_pid = -1;
+    video_pid = audio_pid = -1;
     lowest_video_pid = 0x1fff;
     video_pid_packets = 0;
     
@@ -876,8 +865,6 @@ void HDTVRecorder::GetBlankFrameMap(QMap<long long, int> &blank_frame_map)
 void HDTVRecorder::ChannelNameChanged(const QString& new_chan)
 {
     RecorderBase::ChannelNameChanged(new_chan);
-
-    desired_program = 0;
     // look up freqid
     pthread_mutex_lock(db_lock);
     QString thequery = QString("SELECT freqid "
@@ -896,7 +883,7 @@ void HDTVRecorder::ChannelNameChanged(const QString& new_chan)
     pthread_mutex_unlock(db_lock);
     int pos = freqid.find('-');
     if (pos != -1) 
-    {
         desired_program = atoi(freqid.mid(pos+1).ascii());
-    }
+    else
+        desired_program = 1; // default to program #1
 }
