@@ -384,14 +384,17 @@ void Ripper::ripthedisc(void)
 
         Metadata *track = decoder->getMetadata(db, i + 1);
 
-        // cddb_genre from cdda structure is just an enum that
-        // gets mapped to a string -- kind of useless for custom
-        // genres.  Override the value here with the value from
-        // the Genre combo box.
-        track->setGenre(genreedit->currentText());
-
         if (track)
         {
+            //
+            // cddb_genre from cdda structure is just an enum that
+            // gets mapped to a string -- kind of useless for custom
+            // genres.  Override the value here with the value from
+            // the Genre combo box.
+            //
+            
+            track->setGenre(genreedit->currentText());
+
             textstatus = tr("Copying from CD:\n") + track->Title();       
             statusline->setText(textstatus);
 
