@@ -478,15 +478,13 @@ void UpgradeTVDatabaseSchema(void)
         QSqlQuery query;
         QDateTime recstartts;
 
-        thequery = QString("SELECT recorded.chanid, recorded.starttime "
+        thequery = QString("SELECT distinct recorded.chanid, "
+                           "recorded.starttime "
                            "FROM recorded, recordedmarkup "
                            "WHERE recorded.chanid = recordedmarkup.chanid AND "
                            "recorded.starttime = recordedmarkup.starttime AND "
-                           "(type = 4 OR type = 5) "
-                           "GROUP BY chanid, starttime");
+                           "(type = 4 OR type = 5) ");
         query = db->exec(thequery);
-
-        vector<QString*> cfList;
 
         if (query.isActive() && query.numRowsAffected() > 0)
         {
@@ -497,25 +495,13 @@ void UpgradeTVDatabaseSchema(void)
                 startts = recstartts.toString("yyyyMMddhhmm");
                 startts += "00";
 
-                QString *tmp = new QString[2];
-                tmp[0] = chanid;
-                tmp[1] = startts;
-                cfList.push_back(tmp);
-            }
-        }
+                thequery = QString("UPDATE recorded SET commflagged = 1, "
+                                   "starttime = %2 WHERE chanid = '%1' AND "
+                                   "starttime = '%3';").arg(chanid).arg(startts)
+                                                       .arg(startts);
 
-        for (unsigned int i = 0; i < cfList.size(); i++)
-        {
-            chanid = cfList[i][0];
-            startts = cfList[i][1];
-
-            thequery = QString("UPDATE recorded SET commflagged = 1, "
-                               "starttime = %2 WHERE chanid = '%1' AND "
-                               "starttime = '%3';").arg(chanid).arg(startts)
-                                                   .arg(startts);
-
-            db->exec(thequery);
-            delete cfList[i];
+                db->exec(thequery);
+            }  
         }
     }
 
