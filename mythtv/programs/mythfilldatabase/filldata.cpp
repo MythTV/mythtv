@@ -1031,10 +1031,10 @@ void clearDBAtOffset(int offset, int chanid, QDate *qCurrentDate)
 
     QDateTime from, to;
     from.setDate(*qCurrentDate);
-    from.addDays(offset);
+    from = from.addDays(offset);
     from.addSecs(listing_wrap_offset);
     to = from;
-    to.addDays(nextoffset);
+    to = to.addDays(nextoffset);
 
     QSqlQuery query;
     QString querystr;
@@ -1574,18 +1574,24 @@ bool fillData(QValueList<Source> &sourcelist)
 
             if (refresh_today)
             {
+                if (!quiet)
+                    cout << "Refreshing Today's data" << endl;
                 if (!grabData(*it, 0, &qCurrentDate))
                     ++failures;
             }
 
             if (refresh_tomorrow)
             {
+                if (!quiet)
+                    cout << "Refreshing Tomorrow's data" << endl;
                 if (!grabData(*it, 1, &qCurrentDate))
                     ++failures;
             }
 
             if (refresh_second)
             {
+                if (!quiet)
+                    cout << "Refreshing data for 2 days from today" << endl;
                 if (!grabData(*it, 2, &qCurrentDate))
                     ++failures;
             }
