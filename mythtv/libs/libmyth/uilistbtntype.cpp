@@ -486,7 +486,7 @@ void UIListTreeType::MoveLeft(bool do_refresh)
     }
 }
 
-void UIListTreeType::MoveRight(void)
+void UIListTreeType::MoveRight(bool do_refresh)
 {
     if (currentpos->childCount() > 0)
     {
@@ -504,7 +504,10 @@ void UIListTreeType::MoveRight(void)
         currentlevel->SetActive(true);
         SetCurrentPosition();
 
-        Redraw();
+        if(do_refresh)
+        {
+            Redraw();
+        }
     }
 }
 
@@ -588,64 +591,106 @@ QStringList UIListTreeType::getRouteToCurrent()
 void UIListTreeType::tryToSetCurrent(QStringList route)
 {
 
-    //
-    //  Chutt, please fix this
-    //
 
     //
-    //  Given a set of node strings/titles, try and follow them all the way
-    //  into the current tree and then set the current node. If we don't
-    //  make it all the way, go as far as we can, then set the current node.
+    //  NB: this method is extremely inefficient. We move all the way left
+    //  (up the tree), then parse our way right (down the tree). Dumb, dumb,
+    //  dumb. Someone who actually undersands how this class works is more
+    //  than welcome to improve on this.
     //
-    
+
 
     //
-    //  Start with the top, if that doesn't match, this is hopeless
+    //  Move the current node all the way to the "left" (root)
     //
     
+    while(curlevel > 0)
+    {
+        MoveLeft(false); // false --> don't redraw the screen
+    }
+
+    //
+    //  If the route is empty, we are done
+    //
+
     if(route.count() < 2)
     {
         return;
     }
     
-    if(route[0] != treetop->getString())
+    //
+    //  If we have no currentpos (no active node), we are done
+    //
+    
+    if(!currentpos)
     {
         return;
     }
+
+    //
+    //  Make sure the absolute root node name/string matches
+    //
     
+    if(currentpos->getParent()->getString() != route[0])
+    {
+        return;
+    }
+
+    //
+    //  Make the current position correct
+    //
     
-    currentpos = treetop;
-    curlevel = -1;
+    GenericTree *first_child = currentpos->getParent()->getChildByName(route[1]);
+    if(!first_child)
+    {
+        return;
+    } 
+    else
+    {
+        currentpos = (UIListGenericTree *)first_child;
+    }
+
+
+    //
+    //  Go as far down the rest of the route as possible
+    //
+
     bool keep_going = true;
     QStringList::Iterator it = route.begin();
+    ++it;
     ++it;
     while(keep_going &&  it != route.end())
     {
         GenericTree *next_child = currentpos->getChildByName(*it);
         if(next_child)
         {
+            MoveRight(false);      
             currentpos = (UIListGenericTree *)next_child;
-            curlevel++;
-            cout << "made it as far as " << *it << endl;
+            if(!currentlevel->MoveToNamedPosition(currentpos->getString()))
+            {
+                cerr << "uilistbtntype.o: had problem finding "
+                     << "something it knows is there"
+                     << endl;
+                keep_going = false;
+            }
         }
         else
         {
             keep_going = false;
-            cout << "gave up on child descending with " << *it << endl;
         }
         ++it;
     }
 
-
-    CreateLevel(curlevel);
-    currentlevel = GetLevel(curlevel);
+    //
+    //  We need to make the buttons actually use currentpos, rather than
+    //  first child of the current level
+    //
     
-    FillLevelFromTree(currentpos, currentlevel);
-
-    currentlevel->SetVisible(true);
-    currentlevel->SetActive(true);
-    SetCurrentPosition();
-    emit requestUpdate();
+//    if(!currentlevel->MoveToNamedPosition(currentpos->getString()))
+//    {
+//        cerr << "uilistbtntype.o: had a problem setting the current item" << endl;
+//    }
+    
 }
 
 
@@ -1053,6 +1098,60 @@ void UIListBtnType::MoveDown(MovementUnit unit)
         m_showDnArrow = false;
     
     emit itemSelected(m_selItem);
+}
+
+bool UIListBtnType::MoveToNamedPosition(const QString &position_name)
+{
+    if(m_selPosition < 0)
+    {
+        return false;
+    }
+
+    if(!m_selIterator->toFirst())
+    {
+        return false;
+    }
+    m_selPosition = 0;
+    
+    bool found_it = false;
+    while(m_selIterator->current())
+    {
+        if(m_selIterator->current()->text() == position_name)
+        {
+            found_it = true;
+            break;
+        }
+        ++(*m_selIterator);
+        ++m_selPosition;
+    }
+
+    if(!found_it)
+    {
+        m_selPosition = -1;
+        return false;
+    }
+
+    m_selItem = m_selIterator->current();
+
+    while (m_topPosition + (int)m_itemsVisible < m_selPosition + 1) 
+    {
+        ++(*m_topIterator);
+        ++m_topPosition;
+    }
+   
+    m_topItem = m_topIterator->current();
+
+    if (m_topItem != m_itemList.first())
+        m_showUpArrow = true;
+    else
+        m_showUpArrow = false;
+
+    if (m_topPosition + (int)m_itemsVisible < m_itemCount)
+        m_showDnArrow = true;
+    else
+        m_showDnArrow = false;
+
+    return true;
 }
 
 bool UIListBtnType::MoveItemUpDown(UIListBtnTypeItem *item, bool flag)
