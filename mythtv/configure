@@ -911,6 +911,8 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
        ARCHFLAGS="-march=pentium4"
    elif expr "$processor" : ".*Intel(R) Pentium(R) M" > /dev/null ; then
        ARCHFLAGS="-march=pentium4"
+   elif expr "$processor" : ".*Intel(R) Celeron(R) CPU" > /dev/null ; then
+       ARCHFLAGS="-march=pentium2"
    elif expr "$processor" : ".*AMD Sempron(tm)" > /dev/null ; then
        ARCHFLAGS="-march=pentiumpro -mmmx"
    elif expr "$processor" : ".*AMD Athlon(tm) 64" > /dev/null ; then
