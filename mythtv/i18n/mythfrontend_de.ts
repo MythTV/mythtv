@@ -3,11 +3,11 @@
     <name>CaptureCardEditor</name>
     <message>
         <source>Capture cards</source>
-        <translation type="unfinished"></translation>
+        <translation>Capture Karten</translation>
     </message>
     <message>
         <source>Capture Card Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Capture Karte Menü</translation>
     </message>
     <message>
         <source>Edit..</source>
@@ -397,7 +397,7 @@
     </message>
     <message>
         <source>Status Icons</source>
-        <translation type="unfinished"></translation>
+        <translation>Statusbilder</translation>
     </message>
     <message>
         <source>Commercials are flagged</source>
@@ -559,11 +559,11 @@
     </message>
     <message>
         <source>Select Phrase</source>
-        <translation type="unfinished"></translation>
+        <translation>Suchtext wählen</translation>
     </message>
     <message>
         <source>&lt;New Phrase&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Neuer Suchtext&gt;</translation>
     </message>
 </context>
 <context>
@@ -1269,11 +1269,11 @@
     </message>
     <message>
         <source>Always use Browse mode when changing channels in LiveTV</source>
-        <translation>Browse Modus immer während des Fernsehens verwenden</translation>
+        <translation>Browse Modus nach dem Umschalten</translation>
     </message>
     <message>
         <source>If this is set, Browse mode will automatically be activated whenever you use Channel UP/DOWN when watching Live TV.</source>
-        <translation>Falls gesetzt, wird während des Fernsehens nach dem Umschalten der Browse Modus aktiviert.</translation>
+        <translation>Falls gesetzt, wird nach dem Senderwechsel der Browse Modus aktiviert.</translation>
     </message>
     <message>
         <source>Aggressive Soundcard Buffering</source>
@@ -1329,7 +1329,7 @@
     </message>
     <message>
         <source>Generate thumbnail preview images for recordings</source>
-        <translation>Vorschaubild von Aufnahmen anlegen</translation>
+        <translation>Vorschaubild von Aufnahmen</translation>
     </message>
     <message>
         <source>If set, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>
@@ -1529,7 +1529,7 @@
     </message>
     <message>
         <source>Guide Shading Method</source>
-        <translation type="unfinished"></translation>
+        <translation>EPG Zeichenmethode</translation>
     </message>
     <message>
         <source>Display the channel icon</source>
@@ -1689,7 +1689,7 @@
     </message>
     <message>
         <source>Program Guide</source>
-        <translation>Programmübersicht</translation>
+        <translation>Programmübersicht (EPG)</translation>
     </message>
     <message>
         <source>General Ranking Settings</source>
@@ -1701,7 +1701,7 @@
     </message>
     <message>
         <source>Localization</source>
-        <translation>Internationalisierung</translation>
+        <translation>Lokalisierung</translation>
     </message>
     <message>
         <source>(Create new profile group)</source>
@@ -1913,7 +1913,7 @@
     </message>
     <message>
         <source>If enabled, then immediately after rewinding, only skip forward the same amount as skipping backwards.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, wird direkt nach dem zurück springen nur genausoweit vorwärts gesprungen.</translation>
     </message>
     <message>
         <source>Use Xv picture controls</source>
@@ -2334,19 +2334,19 @@
     </message>
     <message>
         <source>Alpha - Transparent (CPU Usage - High)</source>
-        <translation type="unfinished"></translation>
+        <translation>Alpha - Transparent (hohe CPU Belastung)</translation>
     </message>
     <message>
         <source>Blender - Transparent (CPU Usage - Middle)</source>
-        <translation type="unfinished"></translation>
+        <translation>Überblenden - Transparent (mittlere CPU Belastung)</translation>
     </message>
     <message>
         <source>Eco - Transparent (CPU Usage - Low)</source>
-        <translation type="unfinished"></translation>
+        <translation>Eco - Transparent (geringe CPU Belastung)</translation>
     </message>
     <message>
         <source>Solid (CPU Usage - Middle)</source>
-        <translation type="unfinished"></translation>
+        <translation>Solid (mittlere CPU Belastung)</translation>
     </message>
     <message>
         <source>Display Genre Colors</source>
@@ -2458,7 +2458,7 @@
     </message>
     <message>
         <source>This showing will not be recorded because </source>
-        <translation>Diese Sendung wird nicht aufgenommen weil</translation>
+        <translation>Diese Sendung wird nicht aufgenommen weil </translation>
     </message>
     <message>
         <source>This showing was not recorded because </source>
@@ -2522,7 +2522,7 @@
     </message>
     <message>
         <source>Transcoders</source>
-        <translation type="unfinished"></translation>
+        <translation>Umwandler</translation>
     </message>
     <message>
         <source>New Profile Group Name</source>
@@ -2550,15 +2550,15 @@
     </message>
     <message>
         <source>This global setting is ignored in case of conflicts with other scheduled programs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese globale Einstellung wird bei Konflikten mit anderen geplanten Aufnahmen ignoriert.</translation>
     </message>
     <message>
         <source>Program Guide Alpha</source>
-        <translation type="unfinished"></translation>
+        <translation>EPG alpha</translation>
     </message>
     <message>
         <source>How much to blend the program guide over the live TV image.  Higher numbers mean more guide and less TV.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wie deutlich das EPG in das Fernsehbild eingeblendet wird. Bei größeren Zahlen überwiegt das EPG Bild.</translation>
     </message>
     <message>
         <source>QT</source>
@@ -2582,7 +2582,7 @@
     </message>
     <message>
         <source>Hide channels without channel number.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sender ohne Senderplatz ausfiltern.</translation>
     </message>
     <message>
         <source>Channel Name</source>
@@ -2594,7 +2594,7 @@
     </message>
     <message>
         <source>[Not Selected]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Nicht ausgewählt]</translation>
     </message>
     <message>
         <source>Callsign</source>
@@ -2610,7 +2610,7 @@
     </message>
     <message>
         <source>Icon</source>
-        <translation type="unfinished"></translation>
+        <translation>Symbol</translation>
     </message>
     <message>
         <source>Video filters</source>
@@ -2901,14 +2901,18 @@ Please check the terminal window for more information</source>
 .  You might want to check the output as it
 runs by switching to the terminal from which you started
 this program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitte warten während MythTV eine Liste der verfügbaren Sender einliest.
+Bitte beobachten Sie die Meldungen, die Sie im Terminal vorfinden
+in dem Sie dieses Programm gestartet haben.</translation>
     </message>
     <message>
         <source>Please wait while MythTV retrieves the list of available channels.
 You might want to check the output as it
 runs by switching to the terminal from which you started
 this program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitte warten während MythTV eine Liste der verfügbaren Sender einliest.
+Bitte beobachten Sie die Meldungen, die Sie im Terminal vorfinden
+in dem Sie dieses Programm gestartet haben.</translation>
     </message>
     <message>
         <source>Warning.</source>
@@ -2918,7 +2922,9 @@ this program.</source>
         <source>You MUST run &apos;mythfilldatabase --manual the first time,
  instead of just &apos;mythfilldatabase&apos;.
 Your grabber does not provide channel numbers, so you have to set them manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sie müssen das erste Mal &apos;mythfilldatabase --manual&apos; anstatt
+nur &apos;mythfilldatabase&apos; aufrufen.
+Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell eingeben.</translation>
     </message>
     <message>
         <source>Card type</source>
@@ -2926,31 +2932,31 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Change the cardtype to the appropriate type for the capture card you are configuring.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ändern Sie den Kartentyp entsprechend Ihrer Capture Karte die Sie einrichten.</translation>
     </message>
     <message>
         <source>Standard V4L capture card</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard V4L Fernsehkarte</translation>
     </message>
     <message>
         <source>MJPEG capture card (Matrox G200, DC10)</source>
-        <translation type="unfinished"></translation>
+        <translation>MJPEG Capture Karte (Matrox G200, DC10)</translation>
     </message>
     <message>
         <source>MPEG-2 Encoder card (PVR-250, PVR-350)</source>
-        <translation type="unfinished"></translation>
+        <translation>MPEG-2 Enkoderkarte (PVR 250/350)</translation>
     </message>
     <message>
         <source>pcHDTV ATSC capture card</source>
-        <translation type="unfinished"></translation>
+        <translation>pcHDTV ATSC Capture Karte</translation>
     </message>
     <message>
         <source>Digital Video Broadcast card (DVB)</source>
-        <translation type="unfinished"></translation>
+        <translation>Digital Video Broadcast Karte (DVB)</translation>
     </message>
     <message>
         <source>(New capture card)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Neue Capture Karte)</translation>
     </message>
     <message>
         <source>(New video source)</source>
@@ -3310,7 +3316,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>TV format</source>
-        <translation type="unfinished">TV Norm</translation>
+        <translation>TV Norm</translation>
     </message>
     <message>
         <source>The TV standard to use for viewing TV.</source>
@@ -3326,7 +3332,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Select the appropriate frequency table for your system.  If you have an antenna, use a &quot;-bcast&quot; frequency.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wählen Sie die entsprechende Frequenztabelle für Ihr System. Wenn Sie eine Antenne nutzen, wählen Sie eine &apos;-bcast&apos; Option.</translation>
     </message>
     <message>
         <source>Live TV buffer (GB)</source>
@@ -3338,27 +3344,27 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Minimum free Live TV buffer (MB)</source>
-        <translation type="unfinished"></translation>
+        <translation>Minimal freier Live TV Buffer (MB)</translation>
     </message>
     <message>
         <source>How full the live TV buffer is allowed to grow before forcing an unpause.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wie voll der Live TV Buffer werden darf, bevor die Pause-Funktion unterbrochen wird.</translation>
     </message>
     <message>
         <source>Save original files after transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Originaldateien behalten</translation>
     </message>
     <message>
         <source>When set and the transcoder is active, the original nuv files will be renamed to nuv.old once the transcoding is complete.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt und der Umwandler ist aktiv, werden die originalen &apos;nuv&apos; Dateien nach &apos;nuv.old&apos; umbenannt nachdem die Umwandlung fertig ist.</translation>
     </message>
     <message>
         <source>Time offset for XMLTV listings</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeitversatz für XMLTV Listen</translation>
     </message>
     <message>
         <source>If your local timezone does not match the timezone returned by XMLTV, use this setting to have mythfilldatabase adjust the program start and end times.None will disable this feature, Auto will automatically detect your local timezone</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls Ihre lokale Zeitzone nicht mit der von XMLTV genutzten übereinstimmt, können Sie damit mythfilldatabase anweisen die Sendezeiten anzupassen. &apos;Auto&apos; wird die lokale Zeitzone automatisch bestimmen</translation>
     </message>
     <message>
         <source>Master Backend Override</source>
@@ -3486,11 +3492,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Enable channel change buffer warnings</source>
-        <translation type="unfinished"></translation>
+        <translation>Beim Umschalten warnen</translation>
     </message>
     <message>
         <source>If set, MythTV will warn you whenever you change the channel but are not caught up to live TV.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, wird MythTV Sie vor dem Senderwechsel auf den Verlust des Live TV Buffers hinweisen.</translation>
     </message>
 </context>
 <context>
@@ -3737,7 +3743,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Play</source>
-        <translation>Abspielen</translation>
+        <translation>Normal</translation>
     </message>
     <message>
         <source>Speed 5X</source>
@@ -3813,15 +3819,15 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Set Commercial Auto-Skip OFF</source>
-        <translation type="unfinished"></translation>
+        <translation>Werbung überspringen AUS</translation>
     </message>
     <message>
         <source>Set Commercial Auto-Skip ON</source>
-        <translation type="unfinished"></translation>
+        <translation>Werbung überspringen EIN</translation>
     </message>
     <message>
         <source>Set Commercial Auto-Skip to Notify</source>
-        <translation type="unfinished"></translation>
+        <translation>Bei Werbung nur hinweisen</translation>
     </message>
     <message>
         <source>Don&apos;t Auto Expire</source>
@@ -3837,15 +3843,15 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Auto-Skip OFF</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto-Sprung AUS</translation>
     </message>
     <message>
         <source>Auto-Skip ON</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto-Sprung EIN</translation>
     </message>
     <message>
         <source>Auto-Skip Notify</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto-Sprung Hinweisen</translation>
     </message>
     <message>
         <source>Zoom</source>
@@ -3873,11 +3879,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>You are currently behind real time. If you change channels now, you will lose any unwatched video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sie sehen gerade zeitverzögert fern. Wenn Sie nun umschalten geht der noch folgende Teil verloren.</translation>
     </message>
     <message>
         <source>Change the channel anyway</source>
-        <translation type="unfinished"></translation>
+        <translation>Trotzdem umschalten</translation>
     </message>
 </context>
 <context>
@@ -3912,11 +3918,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>To schedule a recording, exit this screen and</source>
-        <translation>Um eine Aufnahme zu planen wählen Sie</translation>
+        <translation>Um eine Aufnahme zu planen</translation>
     </message>
     <message>
         <source>Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
-        <translation>wählen Sie &apos;Übersicht&apos; oder &apos;Sendung suchen&apos;</translation>
+        <translation>wählen Sie &apos;Übersicht&apos; oder &apos;Suche&apos;</translation>
     </message>
     <message>
         <source>(1) Sort by Channel    (2) Sort by Priority</source>
@@ -3984,51 +3990,51 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Highlighting:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hervorgehoben:</translation>
     </message>
     <message>
         <source>Show  (1) All  (2) Important</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeige  (1) Alle  (2) Wichtige</translation>
     </message>
     <message>
         <source>Showing:</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeige:</translation>
     </message>
     <message>
         <source>Channel Recording Priorities</source>
-        <translation type="unfinished"></translation>
+        <translation>Sender Aufnahmeprioritäten</translation>
     </message>
     <message>
         <source>Program Recording Priorities</source>
-        <translation type="unfinished"></translation>
+        <translation>Sendung Aufnahmeprioritäten</translation>
     </message>
     <message>
         <source>Priority</source>
-        <translation type="unfinished">Priorität</translation>
+        <translation>Priorität</translation>
     </message>
     <message>
         <source>Final Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Endpriorität</translation>
     </message>
     <message>
         <source>[</source>
-        <translation type="unfinished"></translation>
+        <translation>[</translation>
     </message>
     <message>
         <source>]</source>
-        <translation type="unfinished"></translation>
+        <translation>]</translation>
     </message>
     <message>
         <source>]  = </source>
-        <translation type="unfinished"></translation>
+        <translation>]  =</translation>
     </message>
     <message>
         <source>Program Listings</source>
-        <translation type="unfinished">Fernsehprogramm</translation>
+        <translation>Fernsehprogramm</translation>
     </message>
     <message>
         <source>No listings found for this program. </source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Termine für diese Sendung gefunden.</translation>
     </message>
 </context>
 <context>
@@ -4122,7 +4128,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Important</source>
-        <translation>Wichtig</translation>
+        <translation>Wichtige</translation>
     </message>
     <message>
         <source>Recording</source>
