@@ -465,18 +465,20 @@ void PlaybackBox::checkForPlaylists()
             updateForeground();
             mainvisual->setVisual(visual_mode);
             
-            if (class LCD * lcd = LCD::Get())
+            if(curMeta)
             {
-                //Show the artist stuff on the LCD
-                QPtrList<LCDTextItem> textItems;
-                textItems.setAutoDelete(true);
+                if ( class LCD *lcd = LCD::Get())
+                {
+                    //Show the artist stuff on the LCD
+                    QPtrList<LCDTextItem> textItems;
+                    textItems.setAutoDelete(true);
 
-                textItems.append(new LCDTextItem(1, ALIGN_CENTERED,
-                                 curMeta->Artist() +" [" + 
-                                 curMeta->Album() + "] " +
-                                 curMeta->Title(), "Generic", true));
-                lcd->switchToGeneric(&textItems);
-
+                    textItems.append(new LCDTextItem(1, ALIGN_CENTERED,
+                                    curMeta->Artist() +" [" + 
+                                    curMeta->Album() + "] " +
+                                    curMeta->Title(), "Generic", true));
+                    lcd->switchToGeneric(&textItems);
+                }
             }
         }    
         else
@@ -544,19 +546,22 @@ void PlaybackBox::showVolume(bool on_or_off)
                     volume_status->SetOrder(-1);
                     volume_status->refresh();
 
-                    if (class LCD * lcd = LCD::Get())
+                    if (curMeta)
                     {
-                        //Show the artist stuff on the LCD
-                        QPtrList<LCDTextItem> textItems;
-                        textItems.setAutoDelete(true);
+                        if (class LCD * lcd = LCD::Get())
+                        {
+                            //Show the artist stuff on the LCD
+                            QPtrList<LCDTextItem> textItems;
+                            textItems.setAutoDelete(true);
 
-                        textItems.append(new LCDTextItem(1, ALIGN_CENTERED,
-                                         curMeta->Artist() +" [" + 
-                                         curMeta->Album() + "] " +
-                                         curMeta->Title(), "Generic", true));
+                            textItems.append(new LCDTextItem(1, ALIGN_CENTERED,
+                                             curMeta->Artist() +" [" + 
+                                             curMeta->Album() + "] " +
+                                             curMeta->Title(), "Generic", true));
 
-                        lcd->switchToGeneric(&textItems);
-                        lcd_volume_visible = false;
+                            lcd->switchToGeneric(&textItems);
+                            lcd_volume_visible = false;
+                        }
                     }
                 }
             }
@@ -842,7 +847,9 @@ void PlaybackBox::stop(void)
 void PlaybackBox::stopAll()
 {
     if (class LCD * lcd = LCD::Get())
+    {
         lcd->switchToTime();
+    }
 
     stop();
 
@@ -1188,21 +1195,24 @@ void PlaybackBox::customEvent(QCustomEvent *event)
                 time_string.sprintf("%02d:%02d / %02d:%02d", em, es, maxm, 
                                     maxs);
             
-            if (class LCD * lcd = LCD::Get())
+            if (curMeta)
             {
-                float percent_heard = ((float)rs / 
-                                       (float)curMeta->Length()) * 1000.0;
-                // Changed to use the Channel stuff as it allows us to
-                // display Artist, Album, and Title, as well as a progress bar
-                lcd->setGenericProgress(percent_heard);
+                if (class LCD * lcd = LCD::Get())
+                {
+                    float percent_heard = ((float)rs / 
+                                           (float)curMeta->Length()) * 1000.0;
+                    // Changed to use the Channel stuff as it allows us to
+                    // display Artist, Album, and Title, as well as a progress bar
+                    lcd->setGenericProgress(percent_heard);
 
-                QPtrList<LCDTextItem> textItems;
-                textItems.setAutoDelete(true);
+                    QPtrList<LCDTextItem> textItems;
+                    textItems.setAutoDelete(true);
 
-                textItems.append(new LCDTextItem(3, ALIGN_RIGHT,
-                                                 time_string, "Generic"));
+                    textItems.append(new LCDTextItem(3, ALIGN_RIGHT,
+                                                     time_string, "Generic"));
 
-                lcd->outputText(&textItems);
+                    lcd->outputText(&textItems);
+                }
             }
 
             QString info_string;
