@@ -118,7 +118,10 @@ class PlaybackBox : public MythDialog
 
     void doRemove(ProgramInfo *, bool forgetHistory);
     void promptEndOfRecording(ProgramInfo *);
-    void showDeletePopup(ProgramInfo *, int);
+    typedef enum {
+         EndOfRecording,DeleteRecording,AutoExpireRecording,StopRecording
+    } deletePopupType;
+    void showDeletePopup(ProgramInfo *, deletePopupType);
     void showActionPopup(ProgramInfo *program);
     void initPopup(MythPopupBox *popup, ProgramInfo *program, 
                    QString message, QString message2);
