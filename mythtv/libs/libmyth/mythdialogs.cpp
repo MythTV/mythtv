@@ -875,6 +875,15 @@ UIType* MythThemedDialog::getUIObject(const QString &name)
     return NULL;
 }
 
+UIType* MythThemedDialog::getCurrentFocusWidget()
+{
+    if(widget_with_current_focus)
+    {
+        return widget_with_current_focus;
+    }
+    return NULL;
+}
+
 UIManagedTreeListType* MythThemedDialog::getUIManagedTreeListType(const QString &name)
 {
     QPtrListIterator<LayerSet> an_it(my_containers);
