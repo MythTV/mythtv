@@ -141,8 +141,9 @@ int ProgramInfo::GetProgramRecordingStatus(void)
     QSqlQuery query;
 
     thequery = QString("SELECT * FROM singlerecord WHERE channum = %1 AND "
-                       "starttime = %2 AND endtime = %3;")
-                       .arg(channum).arg(sqlstarttime).arg(sqlendtime);
+                       "starttime = %2 AND endtime = %3 AND title = \"%4\";")
+                       .arg(channum).arg(sqlstarttime).arg(sqlendtime)
+                       .arg(title);
 
     query.exec(thequery);
 
@@ -160,8 +161,9 @@ int ProgramInfo::GetProgramRecordingStatus(void)
     }
 
     thequery = QString("SELECT * FROM timeslotrecord WHERE channum = %1 AND "
-                       "starttime = %2 AND endtime = %3;")
-                       .arg(channum).arg(sqlstarttime).arg(sqlendtime);
+                       "starttime = %2 AND endtime = %3 AND title = \"%4\";")
+                       .arg(channum).arg(sqlstarttime).arg(sqlendtime)
+                       .arg(title);
 
     query.exec(thequery);
 
