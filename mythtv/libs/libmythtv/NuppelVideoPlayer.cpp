@@ -391,12 +391,15 @@ int NuppelVideoPlayer::GetAudiotime(void)
     struct timeval now;
     gettimeofday(&now, NULL);
 
+    if (audiotime == 0)
+        return 0;
+
     pthread_mutex_lock(&avsync_lock);
 
     ret = audiotime;
  
-    audiotime += (now.tv_sec - audiotime_updated.tv_sec) * 1000;
-    audiotime += (now.tv_usec - audiotime_updated.tv_usec) / 1000;
+    ret += (now.tv_sec - audiotime_updated.tv_sec) * 1000;
+    ret += (now.tv_usec - audiotime_updated.tv_usec) / 1000;
 
     pthread_mutex_unlock(&avsync_lock);
     return ret;
@@ -525,8 +528,8 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
             {
                 int lameret = 0;
                 int len = 0;
-                short pcmlbuffer[audio_samplerate]; 
-                short pcmrbuffer[audio_samplerate];
+                short int pcmlbuffer[audio_samplerate]; 
+                short int pcmrbuffer[audio_samplerate];
                 int packetlen = frameheader.packetlength;
 
                 pthread_mutex_lock(&audio_buflock); // begin critical section
@@ -547,14 +550,13 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
                             printf("Audio buffer overflow, audio data lost!\n");
                         }
 
+                        short int *saudbuffer = (short int *)audiobuffer;
+
                         for (itemp = 0; itemp < lameret; itemp++)
                         {
-                            memcpy(&audiobuffer[waud], 
-                                   &pcmlbuffer[itemp], sizeof(short int));
-
-                            memcpy(&audiobuffer[waud+2], 
-                                   &pcmrbuffer[itemp], sizeof(short int));
-                            
+                            saudbuffer[waud / 2] = pcmlbuffer[itemp];
+                            saudbuffer[waud / 2 + 1] = pcmrbuffer[itemp];
+                           
                             waud += 4;
                             len += 4;
                             if (waud >= AUDBUFSIZE)
@@ -611,11 +613,11 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
 
 void NuppelVideoPlayer::OutputVideoLoop(void)
 {
-    struct timeval startt, nowt;
-    int framesdisplayed = 0;
+    //struct timeval startt, nowt;
+    //int framesdisplayed = 0;
     unsigned char *X11videobuf;
     int videosize;
-    int audiotime;
+    int laudiotime;
     int delay, avsync_delay;
 
     struct timeval lasttrigger, now; 
@@ -678,13 +680,13 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
            trial and error, it's a tradeoff between a/v sync and video jitter */
         if (audiofd > 0)
         {
-            audiotime = GetAudiotime(); // milliseconds, same scale as timecodes
-            while (audiotime == 0)
+            laudiotime = GetAudiotime(); // ms, same scale as timecodes
+            while (laudiotime == 0)
             {
                 usleep(100);
-                audiotime = GetAudiotime();
+                laudiotime = GetAudiotime();
             }
-            avsync_delay = (timecodes[rpos] - audiotime) * 1000; // uSecs
+            avsync_delay = (timecodes[rpos] - laudiotime) * 1000; // uSecs
 
             delay += (avsync_delay - delay) / 12;
 
@@ -709,24 +711,24 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         pthread_mutex_lock(&video_buflock);
         if (rpos != wpos) // if a seek occurred, rpos == wpos, in this case do
                           // nothing
-        rpos = (rpos + 1) % MAXVBUFFER;
+            rpos = (rpos + 1) % MAXVBUFFER;
         pthread_mutex_unlock(&video_buflock);
 
-        if (framesdisplayed == 60)
-        {
-            gettimeofday(&nowt, NULL);
+        //if (framesdisplayed == 60)
+        //{
+        //    gettimeofday(&nowt, NULL);
        
-            //double timedif = (nowt.tv_sec - startt.tv_sec) * 1000000 +
-            //                 (nowt.tv_usec - startt.tv_usec);
+        //    double timedif = (nowt.tv_sec - startt.tv_sec) * 1000000 +
+        //                     (nowt.tv_usec - startt.tv_usec);
             
-            //printf("FPS played: %f\n", 60000000.0 / timediff);
+        //    printf("FPS played: %f\n", 60000000.0 / timediff);
             
-            startt.tv_sec = nowt.tv_sec;
-            startt.tv_usec = nowt.tv_usec;
+        //    startt.tv_sec = nowt.tv_sec;
+        //    startt.tv_usec = nowt.tv_usec;
 
-            framesdisplayed = 0;
-        }
-        framesdisplayed++;
+        //    framesdisplayed = 0;
+        //}
+        //framesdisplayed++;
     }
 
     XJ_exit();             
@@ -751,7 +753,7 @@ void NuppelVideoPlayer::OutputAudioLoop(void)
         if (prebuffering)
         {
             //printf("audio thread waiting for prebuffer\n");
-            usleep(2000);
+            usleep(200);
             continue;
         }
 
@@ -770,7 +772,7 @@ void NuppelVideoPlayer::OutputAudioLoop(void)
         if (bytesperframe > audiolen(true))
         { 
             //printf("audio thread waiting for buffer to fill\n");
-            usleep(2000);
+            usleep(200);
             continue;
         }
 
@@ -784,7 +786,7 @@ void NuppelVideoPlayer::OutputAudioLoop(void)
         if (bytesperframe > space_on_soundcard)
         {
             //printf("waiting for space on soundcard\n");
-            usleep(2000);
+            usleep(200);
             continue;
         }
 
@@ -953,6 +955,7 @@ bool NuppelVideoPlayer::DoRewind(void)
     if (desiredFrame < 0)
         desiredFrame = 0;
 
+    long long storelastKey = lastKey;
     while (lastKey > desiredFrame)
     {
         lastKey -= 30;
@@ -969,9 +972,21 @@ bool NuppelVideoPlayer::DoRewind(void)
     {
         lastKey += 30;
         keyPos = (*positionMap)[lastKey / 30];
+        if (keyPos == 0)
+            continue;
         diff = keyPos - curPosition;
         normalframes = 0;
+        if (lastKey > storelastKey)
+        {
+            lastKey = storelastKey;
+            diff = 0;
+            normalframes = 0;
+            return false;
+        }
     }
+
+    if (keyPos == 0)
+        return false;
 
     ringBuffer->Seek(diff, SEEK_CUR);
     framesPlayed = lastKey;
