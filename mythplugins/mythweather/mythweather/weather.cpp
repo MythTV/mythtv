@@ -1685,7 +1685,8 @@ void Weather::closeConnection()
     {
 	QTextStream os(httpSock);
 	//cerr << "Connected! Requesting Weather Data ...\n";
-        os << "GET /m/chnk/d/weather_d_src.asp?acid=" << locale << "\n\n\n";
+        os << "GET /m/chnk/d/weather_d_src.asp?acid=" << locale << " HTTP/1.1";
+	os << "\nhostname:www.msnbc.com\n\n";
 	httpData = "";
     }
 
