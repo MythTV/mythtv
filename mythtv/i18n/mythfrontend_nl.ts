@@ -304,7 +304,7 @@
     </message>
     <message>
         <source>Delete this recording?</source>
-        <translation>Deze opname verwijderen?</translation>
+        <translation type="obsolete">Deze opname verwijderen?</translation>
     </message>
     <message>
         <source>Allow this program to AutoExpire?</source>
@@ -534,7 +534,7 @@
     </message>
     <message>
         <source>Description Search</source>
-        <translation>Zoeken op omschrijving</translation>
+        <translation type="obsolete">Zoeken op omschrijving</translation>
     </message>
     <message>
         <source>Channel Search</source>
@@ -575,6 +575,18 @@
     <message>
         <source>&lt;New Phrase&gt;</source>
         <translation>&lt;Nieuwe Zoekstring&gt;</translation>
+    </message>
+    <message>
+        <source>Keyword Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>People Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record</source>
+        <translation type="unfinished">Neem op</translation>
     </message>
 </context>
 <context>
@@ -1800,31 +1812,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>When using Blank Frame Detection and Auto-Flagging, flag blank frames following commercial breaks as part of the the commercial break.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>OK</source>
         <translation type="unfinished">OK</translation>
     </message>
     <message>
         <source>Repeat</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>T</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>W</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>C</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>A</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2533,13 +2525,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please wait while MythTV retrieves the list of available channels.
-You may wish to check the output as it
-runs by switching to the terminal from which you started
-this program.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Failed to retrieve channel information.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2674,10 +2659,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>XMLTV listings grabber</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ZIP/postal code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3129,10 +3110,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>F</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Find One Recording</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3330,10 +3307,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Return to menu.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>S</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3874,10 +3847,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>O</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Override Recording</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4040,6 +4009,137 @@ Myth will now exit.</source>
     <message>
         <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for frontend</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Free</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>T</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>W</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>C</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>F</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>O</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>D</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>R</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>X</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>P</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>T</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>N</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>C</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>L</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>K</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>B</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When using Blank Frame Detection and Auto-Flagging, flag blank frames following commercial breaks as part of the commercial break.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting will change the qt widget style on startup, if this setting is set to anything other than &apos;Desktop Style&apos;. Setting this setting to &apos;Desktop Style&apos; will have no effect on the currently running MythTV session.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Startup command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This command is executed right after starting the BE. As a parameter &apos;$status&apos; is replaced by either &apos;auto&apos; if the machine was started automatically or &apos;user&apos; if a user switched it on.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title Search</source>
+        <translation type="unfinished">Zoek programma&apos;s</translation>
+    </message>
+    <message>
+        <source>Keyword Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>People Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Search</source>
+        <translation type="unfinished">Onbekende zoekopdracht</translation>
     </message>
 </context>
 <context>

@@ -236,10 +236,12 @@ class PlaybackBox : public MythDialog
     QString chooseGroupPassword;
     bool groupnameAsAllProg;
     QPixmap *previewPixmap;
-    ProgramInfo *previewProgamInfo;
+    ProgramInfo *previewProgramInfo;
     int listOrder;
     int overrectime;
     int underrectime;
+
+    bool playingSomething;
 };
 
 #endif

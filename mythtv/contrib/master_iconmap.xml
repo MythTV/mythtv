@@ -14,6 +14,10 @@
         <network>AMC</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>AMCP</callsign>
+        <network>AMC</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>ANGEL1</callsign>
         <network>ANGEL1</network>
     </callsigntonetwork>
@@ -42,6 +46,10 @@
         <network>BET</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>BETP</callsign>
+        <network>BET</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>BLKSTZ</callsign>
         <network>STARZ</network>
     </callsigntonetwork>
@@ -55,6 +63,10 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>BRAVO</callsign>
+        <network>BRAVO</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>BRAVOP</callsign>
         <network>BRAVO</network>
     </callsigntonetwork>
     <callsigntonetwork>
@@ -155,6 +167,10 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>COURT</callsign>
+        <network>COURT</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>COURTP</callsign>
         <network>COURT</network>
     </callsigntonetwork>
     <callsigntonetwork>
@@ -263,6 +279,10 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>FOOD</callsign>
+        <network>FOOD</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>FOODP</callsign>
         <network>FOOD</network>
     </callsigntonetwork>
     <callsigntonetwork>
@@ -607,6 +627,10 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>HGTV</callsign>
+        <network>HGTV</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>HGTVP</callsign>
         <network>HGTV</network>
     </callsigntonetwork>
     <callsigntonetwork>
@@ -1010,6 +1034,10 @@
         <network>SCIFI</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>SCIFIP</callsign>
+        <network>SCIFI</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>SHOCSE</callsign>
         <network>SHOWTIME3</network>
     </callsigntonetwork>
@@ -1106,6 +1134,10 @@
         <network>TBS</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>TBSP</callsign>
+        <network>TBS</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>TCM</callsign>
         <network>TCM</network>
     </callsigntonetwork>
@@ -1154,6 +1186,10 @@
         <network>DISNEY</network>
     </callsigntonetwork>
     <callsigntonetwork>
+        <callsign>TOONP</callsign>
+        <network>CARTOONNETWORK</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
         <callsign>TRUE</callsign>
         <network>ENCORE</network>
     </callsigntonetwork>
@@ -1167,6 +1203,10 @@
     </callsigntonetwork>
     <callsigntonetwork>
         <callsign>TVLAND</callsign>
+        <network>TVLAND</network>
+    </callsigntonetwork>
+    <callsigntonetwork>
+        <callsign>TVLANDP</callsign>
         <network>TVLAND</network>
     </callsigntonetwork>
     <callsigntonetwork>

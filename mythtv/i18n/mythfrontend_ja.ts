@@ -304,7 +304,7 @@
     </message>
     <message>
         <source>Delete this recording?</source>
-        <translation>この録画を削除しますか？</translation>
+        <translation type="obsolete">この録画を削除しますか？</translation>
     </message>
     <message>
         <source>Allow this program to AutoExpire?</source>
@@ -534,7 +534,7 @@
     </message>
     <message>
         <source>Description Search</source>
-        <translation>内容で検索</translation>
+        <translation type="obsolete">内容で検索</translation>
     </message>
     <message>
         <source>Channel Search</source>
@@ -575,6 +575,18 @@
     <message>
         <source>Delete</source>
         <translation>削除</translation>
+    </message>
+    <message>
+        <source>Keyword Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>People Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record</source>
+        <translation type="unfinished">録画</translation>
     </message>
 </context>
 <context>
@@ -1802,7 +1814,7 @@
     </message>
     <message>
         <source>When using Blank Frame Detection and Auto-Flagging, flag blank frames following commercial breaks as part of the the commercial break.</source>
-        <translation>CMの自動マーク機能でブランクフレーム検知が指定されているときに，ブランクフレームをCMの一部としてマークするかどうかを指定します．</translation>
+        <translation type="obsolete">CMの自動マーク機能でブランクフレーム検知が指定されているときに，ブランクフレームをCMの一部としてマークするかどうかを指定します．</translation>
     </message>
     <message>
         <source>OK</source>
@@ -1814,19 +1826,19 @@
     </message>
     <message>
         <source>T</source>
-        <translation>T</translation>
+        <translation type="obsolete">T</translation>
     </message>
     <message>
         <source>W</source>
-        <translation>W</translation>
+        <translation type="obsolete">W</translation>
     </message>
     <message>
         <source>C</source>
-        <translation>C</translation>
+        <translation type="obsolete">C</translation>
     </message>
     <message>
         <source>A</source>
-        <translation>A</translation>
+        <translation type="obsolete">A</translation>
     </message>
     <message>
         <source>Single Recording</source>
@@ -2411,7 +2423,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
 You may wish to check the output as it
 runs by switching to the terminal from which you started
 this program.</source>
-        <translation>使用可能なチャンネルの検索が終わるまでお待ち下さい．
+        <translation type="obsolete">使用可能なチャンネルの検索が終わるまでお待ち下さい．
 このプログラムを起動したターミナルで出力を確認することができます．</translation>
     </message>
     <message>
@@ -2558,7 +2570,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>ZIP/postal code</source>
-        <translation>ZIPコード/郵便番号</translation>
+        <translation type="obsolete">ZIPコード/郵便番号</translation>
     </message>
     <message>
         <source>Region</source>
@@ -3165,10 +3177,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation>既定値</translation>
     </message>
     <message>
-        <source>F</source>
-        <translation></translation>
-    </message>
-    <message>
         <source></source>
         <translation></translation>
     </message>
@@ -3359,10 +3367,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>MythTV wants to record &quot;%1&quot; on %2 in %3 seconds. Do you want to:</source>
         <translation>MythTVは&quot;%1&quot;の録画を%2で%3秒後に開始します｡ どうしますか:</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <translation></translation>
     </message>
     <message>
         <source>Earlier Showing</source>
@@ -3897,10 +3901,6 @@ MythTVは終了します。</translation>
         <translation>このチャンネルの録画を見る時にフィルターが使用されます。開始時にグローバル再生フィルターに追加されます。</translation>
     </message>
     <message>
-        <source>O</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Override Recording</source>
         <translation>個別設定録画</translation>
     </message>
@@ -4063,6 +4063,137 @@ MythTVは終了します。</translation>
     <message>
         <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for frontend</source>
         <translation>バックエンドが終了する前に実行するコマンド。戻り値でバックエンドをシャットダウンするか決定します｡0 - はい, 1 - アイドル再開, 2 - リセットしてフロントエンドの接続待ち</translation>
+    </message>
+    <message>
+        <source>Commercial Free</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>T</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished">T</translation>
+    </message>
+    <message>
+        <source>W</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished">W</translation>
+    </message>
+    <message>
+        <source>C</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished">C</translation>
+    </message>
+    <message>
+        <source>A</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished">A</translation>
+    </message>
+    <message>
+        <source>F</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>O</source>
+        <comment>RecTypeChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>D</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>R</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>X</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>P</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>T</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished">T</translation>
+    </message>
+    <message>
+        <source>N</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>C</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished">C</translation>
+    </message>
+    <message>
+        <source>L</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>K</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>B</source>
+        <comment>RecStatusChar</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When using Blank Frame Detection and Auto-Flagging, flag blank frames following commercial breaks as part of the commercial break.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting will change the qt widget style on startup, if this setting is set to anything other than &apos;Desktop Style&apos;. Setting this setting to &apos;Desktop Style&apos; will have no effect on the currently running MythTV session.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Startup command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This command is executed right after starting the BE. As a parameter &apos;$status&apos; is replaced by either &apos;auto&apos; if the machine was started automatically or &apos;user&apos; if a user switched it on.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title Search</source>
+        <translation type="unfinished">タイトルで検索</translation>
+    </message>
+    <message>
+        <source>Keyword Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>People Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Search</source>
+        <translation type="unfinished">不明な検索</translation>
     </message>
 </context>
 <context>

@@ -530,7 +530,7 @@
     </message>
     <message>
         <source>Description Search</source>
-        <translation>Sök beskrivning</translation>
+        <translation type="obsolete">Sök beskrivning</translation>
     </message>
     <message>
         <source>Channel Search</source>
@@ -571,6 +571,18 @@
     <message>
         <source>&lt;New Phrase&gt;</source>
         <translation>&lt;Ny sökfras&gt;</translation>
+    </message>
+    <message>
+        <source>Keyword Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>People Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record</source>
+        <translation type="unfinished">Spela in</translation>
     </message>
 </context>
 <context>
@@ -1798,7 +1810,7 @@
     </message>
     <message>
         <source>When using Blank Frame Detection and Auto-Flagging, flag blank frames following commercial breaks as part of the the commercial break.</source>
-        <translation>När &apos;Svart bild&apos; och autodetektering används, markera svarta rutor som följer reklampausen som reklam.</translation>
+        <translation type="obsolete">När &apos;Svart bild&apos; och autodetektering används, markera svarta rutor som följer reklampausen som reklam.</translation>
     </message>
     <message>
         <source>OK</source>
@@ -2527,7 +2539,7 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
 You may wish to check the output as it
 runs by switching to the terminal from which you started
 this program.</source>
-        <translation>Vänligen vänta medans MythTV hämtar lista med tillfängliga kanaler.
+        <translation type="obsolete">Vänligen vänta medans MythTV hämtar lista med tillfängliga kanaler.
 Du kan kontrollera förloppet genom att byta över till terminalfönstret
 som du startade detta programmet i.</translation>
     </message>
@@ -2660,7 +2672,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>ZIP/postal code</source>
-        <translation>Postnummer</translation>
+        <translation type="obsolete">Postnummer</translation>
     </message>
     <message>
         <source>Region</source>
@@ -4146,6 +4158,26 @@ som du startade detta programmet i.</translation>
     <message>
         <source>Commercial Free</source>
         <translation>Reklamfri</translation>
+    </message>
+    <message>
+        <source>When using Blank Frame Detection and Auto-Flagging, flag blank frames following commercial breaks as part of the commercial break.</source>
+        <translation>När &apos;Svart bild&apos; och autodetektering används, markera svarta rutor som följer reklampausen som reklam.</translation>
+    </message>
+    <message>
+        <source>Title Search</source>
+        <translation type="unfinished">Sök titel</translation>
+    </message>
+    <message>
+        <source>Keyword Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>People Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Search</source>
+        <translation type="unfinished">Okänd sökning</translation>
     </message>
 </context>
 <context>

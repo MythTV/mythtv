@@ -569,7 +569,7 @@ void ExportIconMap(const QString &filename)
         QDomElement roote = iconmap.createElement(IM_DOC_TAG);
 
         QSqlQuery query;
-        query.exec("SELECT * FROM callsignnetworkmap");
+        query.exec("SELECT * FROM callsignnetworkmap ORDER BY callsign");
 
         if (query.isActive() && query.numRowsAffected() > 0)
         {
@@ -593,7 +593,7 @@ void ExportIconMap(const QString &filename)
             }
         }
 
-        query.exec("SELECT * FROM networkiconmap");
+        query.exec("SELECT * FROM networkiconmap ORDER BY network");
         if (query.isActive() && query.numRowsAffected() > 0)
         {
             while (query.next())
@@ -2524,7 +2524,7 @@ bool fillData(QValueList<Source> &sourcelist)
                 xmltv_grabber == "tv_grab_sn")
                 maxday = 14;
             if (xmltv_grabber == "datadirect")
-                maxday = 13;
+                maxday = 12;
 
             for (int i = 0; i < maxday; i++)
             {

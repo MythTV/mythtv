@@ -239,11 +239,11 @@
     <name>MythContext</name>
     <message>
         <source>Could not connect to the master backend server -- is it running?  Is the IP address set for it in the setup program correct?</source>
-        <translation>Konnte nicht zum Master Backend Server verbinden -- ist er gestartet? Stimmt seine IP Adresse im Setup?</translation>
+        <translation>Konnte nicht zum Master Rechner verbinden -- ist er gestartet? Stimmt seine IP Adresse im Setup?</translation>
     </message>
     <message>
         <source>The connection to the master backend server has gone away for some reason.. Is it running?</source>
-        <translation>Die Verbindung zum Master Backend Server wurde unterbrochen. Läuft der Server?</translation>
+        <translation>Die Verbindung zum Master Rechner wurde unterbrochen. Läuft der Server?</translation>
     </message>
 </context>
 <context>
@@ -444,15 +444,15 @@
     </message>
     <message>
         <source>There are %1 recordings in this display group</source>
-        <translation>Es gibt %1 Aufnahmen in dieser Gruppe</translation>
+        <translation>%1 Aufnahmen in dieser Gruppe</translation>
     </message>
     <message>
         <source>There is one recording in this display group</source>
-        <translation>Es gibt eine Aufnahme in dieser Gruppe</translation>
+        <translation>Eine Aufnahme in dieser Gruppe</translation>
     </message>
     <message>
         <source>There are no recordings in this display group</source>
-        <translation>Es gibt keine Aufnahmen in dieser Gruppe</translation>
+        <translation>Keine Aufnahmen in dieser Gruppe</translation>
     </message>
     <message>
         <source>Stop Transcoding</source>
@@ -495,7 +495,7 @@
     </message>
     <message>
         <source>       !! No Programs !!</source>
-        <translation>       !! Keine Programme!</translation>
+        <translation>       !! Keine Programme !!</translation>
     </message>
     <message>
         <source>Recording every day when shown in this timeslot</source>
@@ -511,11 +511,11 @@
     </message>
     <message>
         <source>Recording this showing with override options</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Manually not recording this showing</source>
-        <translation></translation>
+        <translation>Aufnahme wurde manuell blockiert</translation>
     </message>
 </context>
 <context>
@@ -534,7 +534,7 @@
     </message>
     <message>
         <source>Description Search</source>
-        <translation>Inhaltssuche</translation>
+        <translation type="obsolete">Inhaltssuche</translation>
     </message>
     <message>
         <source>Channel Search</source>
@@ -575,6 +575,18 @@
     <message>
         <source>&lt;New Phrase&gt;</source>
         <translation>&lt;Neuer Suchtext&gt;</translation>
+    </message>
+    <message>
+        <source>Keyword Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>People Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record</source>
+        <translation type="unfinished">Aufnahme</translation>
     </message>
 </context>
 <context>
@@ -625,11 +637,11 @@
     </message>
     <message>
         <source>Recording this showing with override options</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Manually not recording this showing</source>
-        <translation></translation>
+        <translation>Aufnahme wurde manuell blockiert</translation>
     </message>
 </context>
 <context>
@@ -1136,7 +1148,7 @@
     </message>
     <message>
         <source>Automatically clear saved position on a recording when the recording is played back.  If UNset, you can mark the beginning with rewind then save position.</source>
-        <translation>Löscht bei der Wiedergabe automatisch die gespeicherte Position in einer Aufnahme. Wenn diese Option nicht gesetzt ist, können Sie die Position durch &apos;Position speichern&apos; abspeichern.</translation>
+        <translation>Löscht bei der Wiedergabe automatisch die gespeicherte Position in einer Aufnahme. Wenn diese Option nicht gesetzt ist, können Sie die Position durch &quot;Position speichern&quot; abspeichern.</translation>
     </message>
     <message>
         <source>Alternate Clear Saved Position</source>
@@ -1160,11 +1172,11 @@
     </message>
     <message>
         <source>Always prompt</source>
-        <translation>Immer nachfragen</translation>
+        <translation>Nachfragen</translation>
     </message>
     <message>
         <source>If set to prompt, a menu will be displayed when you exit playback mode.  The options available will allow you to save your position, delete the recording, or continue watching.</source>
-        <translation>Wenn Nachfragen ausgewählt ist, wird beim Verlassen des Wiedergabemodus ein Menü eingeblendet. Dabei können Sie die aktuelle Position speichern, die Aufnahme löschen oder weiter ansehen.</translation>
+        <translation>Wenn &quot;Nachfragen&quot; ausgewählt ist, wird beim Verlassen des Wiedergabemodus ein Menü eingeblendet. Dabei können Sie die aktuelle Position speichern, die Aufnahme löschen oder weiter ansehen.</translation>
     </message>
     <message>
         <source>Prompt at end of recording</source>
@@ -1260,7 +1272,7 @@
     </message>
     <message>
         <source>If you have configured an exit key on the System Shutdown menu, you will be given the opportunity to exit MythTV or halt the system completely. Another possibility for this field is poweroff</source>
-        <translation>Falls Sie eine Beenden-Taste eingerichtet haben, können Sie damit entweder nur MythTV verlassen oder den Rechner herunterfahren. Eine weitere Möglichkeit ist, den Rechner auch auszuschalten.</translation>
+        <translation>Geben Sie hier den Befehl an, um den Rechner herunterzufahren, z.B. &quot;halt&quot; oder &quot;poweroff&quot;.</translation>
     </message>
     <message>
         <source>Xinerama screen</source>
@@ -1408,7 +1420,7 @@
     </message>
     <message>
         <source>This enables support for Xbox Specific hardware. Requires a frontend restart for changes to take effect.</source>
-        <translation>Dies schaltet die Unterstützung für Xbox-spezifische Hardware ein. Das Frontend muß dafür neu gestartet werden.</translation>
+        <translation>Schaltet die Unterstützung für Xbox-spezifische Hardware ein. Das Frontend muß dafür neu gestartet werden.</translation>
     </message>
     <message>
         <source>Xbox Linux Distribution</source>
@@ -1444,7 +1456,7 @@
     </message>
     <message>
         <source>This sets the LED mode when there is nothing else to display</source>
-        <translation>Dies bestimmt den LED Modus wenn es nichts anzuzeigen gibt</translation>
+        <translation>Bestimmt den LED Modus wenn es nichts anderes anzuzeigen gibt.</translation>
     </message>
     <message>
         <source>Recording LED mode</source>
@@ -1452,7 +1464,7 @@
     </message>
     <message>
         <source>This sets the LED mode when a backend is recording</source>
-        <translation>Dies bestimmt den LED Modus während einer Aufnahme</translation>
+        <translation>Bestimmt den LED Modus während einer Aufnahme</translation>
     </message>
     <message>
         <source>Recording Check Frequency</source>
@@ -1460,7 +1472,7 @@
     </message>
     <message>
         <source>This specifies how often in seconds to check if a recording is in progress and update the Xbox LED.</source>
-        <translation>Dies bestimmt wie oft auf eine laufende Aufnahme getestet wird um den LED Modus anzupassen.</translation>
+        <translation>Bestimmt wie oft auf eine laufende Aufnahme getestet wird, um den LED Modus anzupassen.</translation>
     </message>
     <message>
         <source>General playback</source>
@@ -1616,7 +1628,7 @@
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use &apos;high-quality&apos; encoding options.  This requires much more processing, but can result in better video.</source>
-        <translation>Falls gesetzt, nutzt der MPEG4 Kodierer qualitativ bessere Optionen. Dies erfordert deutlich mehr CPU-Zeit kann aber ein besseres Ergebnis erreichen.</translation>
+        <translation>Falls gesetzt, nutzt der MPEG4 Kodierer qualitativ bessere Optionen. Dies erfordert deutlich mehr CPU-Zeit, kann aber ein besseres Ergebnis erzielen.</translation>
     </message>
     <message>
         <source>Enable 4MV encoding</source>
@@ -1741,8 +1753,7 @@
     <message>
         <source>Advanced Filter configuration, format:
 [[&lt;filter&gt;=&lt;options&gt;,]...]</source>
-        <translation>Erweiterte Filterkonfiguration. Diese werden global für alle Sender verwendet.
-Format: [[&lt;filter&gt;=&lt;Optionen&gt;,]...]</translation>
+        <translation>Erweiterte Filterkonfiguration. Diese werden global für alle Sender verwendet. Format: [[&lt;filter&gt;=&lt;Optionen&gt;,]...]</translation>
     </message>
     <message>
         <source>Font size</source>
@@ -1802,7 +1813,7 @@ Format: [[&lt;filter&gt;=&lt;Optionen&gt;,]...]</translation>
     </message>
     <message>
         <source>When using Blank Frame Detection and Auto-Flagging, flag blank frames following commercial breaks as part of the the commercial break.</source>
-        <translation>Für die &apos;Dunkle Frames&apos; Methode und bei aktiver &apos;Werbung autom. markieren&apos; Option. Dunkle Frames nach einem Werbeblock werden wie Werbung behandelt.</translation>
+        <translation type="obsolete">Für die &apos;Dunkle Frames&apos; Methode und bei aktiver &apos;Werbung autom. markieren&apos; Option. Dunkle Frames nach einem Werbeblock werden wie Werbung behandelt.</translation>
     </message>
     <message>
         <source>OK</source>
@@ -1994,11 +2005,11 @@ Format: [[&lt;filter&gt;=&lt;Optionen&gt;,]...]</translation>
     </message>
     <message>
         <source>No Prompt on Exit</source>
-        <translation>Sofortiges beenden</translation>
+        <translation>Sofort beenden</translation>
     </message>
     <message>
         <source>If set, you will not be prompted when pressing the exit key.  Instead, MythTV will immediately exit.</source>
-        <translation>Falls gesezt, beendet sich MythTV nach Drücken der Beenden-Taste ohne nachzufragen.</translation>
+        <translation>Falls gesetzt, beendet sich MythTV nach Drücken der Beenden-Taste ohne nachzufragen.</translation>
     </message>
     <message>
         <source>Alpha - Transparent (CPU Usage - High)</source>
@@ -2222,7 +2233,7 @@ Format: [[&lt;filter&gt;=&lt;Optionen&gt;,]...]</translation>
     </message>
     <message>
         <source>Hide channels without channel number.</source>
-        <translation>Sender ohne Senderplatz ausfiltern.</translation>
+        <translation>Sender ohne Senderplatz ausfiltern</translation>
     </message>
     <message>
         <source>Channel Name</source>
@@ -2246,7 +2257,7 @@ Format: [[&lt;filter&gt;=&lt;Optionen&gt;,]...]</translation>
     </message>
     <message>
         <source>If this channel uses a format other than TV Format in the General Backend Setup screen, set it here.</source>
-        <translation>Falls dieser Sender eine Norm abweichend von &apos;TV Norm&apos; verwendet, dann bitte hier auswählen.</translation>
+        <translation>Bitte anpassen, falls dieser Sender eine TV Norm abweichend von der unter &quot;Globalen Backend Einstellungen&quot; gewählten verwendet.</translation>
     </message>
     <message>
         <source>Icon</source>
@@ -2527,7 +2538,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
 You may wish to check the output as it
 runs by switching to the terminal from which you started
 this program.</source>
-        <translation>Bitte warten Sie während MythTV eine Liste der verfügbaren Sender einliest.
+        <translation type="obsolete">Bitte warten Sie während MythTV eine Liste der verfügbaren Sender einliest.
 Weitere Meldungen finden Sie im Terminal-Fenster von dem aus Sie das Programm gestartet haben.</translation>
     </message>
     <message>
@@ -2576,7 +2587,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Change the cardtype to the appropriate type for the capture card you are configuring.</source>
-        <translation>Ändern Sie den Kartentyp entsprechend Ihrer TV-Karte die Sie einrichten.</translation>
+        <translation>Ändern Sie den Kartentyp entsprechend Ihrer TV-Karte.</translation>
     </message>
     <message>
         <source>Standard V4L capture card</source>
@@ -2676,11 +2687,11 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>ZIP/postal code</source>
-        <translation>PLZ</translation>
+        <translation type="obsolete">PLZ</translation>
     </message>
     <message>
         <source>Region</source>
-        <translation type="unfinished">Region</translation>
+        <translation>Region</translation>
     </message>
     <message>
         <source>Provider</source>
@@ -2928,7 +2939,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>The IP address of the master backend server. All frontend and non-master backend machines will connect to this server.  If you only have one backend, this should be the same IP address as above.</source>
-        <translation>Die IP Adresse des Master Backend Servers. Alle Frontends und Nicht-Master Backends verbinden zu diesem Server. Geben Sie hier die gleiche IP Adresse wie zuvor an, falls Sie nur ein Backend verwenden.</translation>
+        <translation>Die IP Adresse des Master Rechners. Alle Frontends und Slave Rechner verbinden zu diesem Server. Bei nur einem Backend tragen Sie hier die gleiche IP Adresse wie zuvor ein.</translation>
     </message>
     <message>
         <source>Port the master server runs on</source>
@@ -2988,7 +2999,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Save original files after transcoding</source>
-        <translation>Originaldateien behalten</translation>
+        <translation>Originale behalten</translation>
     </message>
     <message>
         <source>When set and the transcoder is active, the original nuv files will be renamed to nuv.old once the transcoding is complete.</source>
@@ -3004,83 +3015,83 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Reconnect wait time (secs)</source>
-        <translation type="unfinished"></translation>
+        <translation>Wartezeit für Verbindung (Sek.)</translation>
     </message>
     <message>
         <source>Length of time the frontend waits between the tries to wake up the master backend. This should be the time your masterbackend needs to startup. Set 0 to disable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wie lange ein Frontend zwischen zwei Versuchen, den Master Rechner zu starten, wartet. Diese Zeit sollte etwa so lange sein, wie der Rechner für den Startvorgang benötigt.</translation>
     </message>
     <message>
         <source>Count of reconnect tries</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederholversuche</translation>
     </message>
     <message>
         <source>Number of times the frontend will try to wake up the master backend.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wie oft ein Frontend versuchen wird den Master Rechner aufzuwecken.</translation>
     </message>
     <message>
         <source>Wake Command</source>
-        <translation type="unfinished"></translation>
+        <translation>Weckbefehl</translation>
     </message>
     <message>
         <source>The command used to wake up your master backend server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Das Kommando um den Master Rechner aufzuwecken.</translation>
     </message>
     <message>
         <source>Wake command for slaves</source>
-        <translation type="unfinished"></translation>
+        <translation>Weckbefehl für Slaves</translation>
     </message>
     <message>
         <source>The command used to wakeup your slave backends. Leave empty to disable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Befehl um die Slave Rechner aufzuwecken. Ein leeres Feld schaltet diese Option aus.</translation>
     </message>
     <message>
         <source>Idle timeout (secs)</source>
-        <translation type="unfinished"></translation>
+        <translation>Leerlaufzeit (Sek.)</translation>
     </message>
     <message>
         <source>The amount of time the master backend idles before it shuts down all backends. Set to 0 to disable auto shutdown.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wie lange der Master Rechner wartet, bis er alle Backend Rechner herunterfährt. &quot;0&quot; verhindert das automatische Abschalten.</translation>
     </message>
     <message>
         <source>Max. wait for recording (min)</source>
-        <translation type="unfinished"></translation>
+        <translation>Wartezeit zw. zwei Aufnahmen (Min.)</translation>
     </message>
     <message>
         <source>The amount of time the master backend waits for a recording.  If it&apos;s idle but a recording starts within this time period, the backends won&apos;t shut down.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wie lange der Master Rechner bis zur nächsten Aufnahme wartet. Falls die Leerlaufzeit abgelaufen ist, aber die nächste Aufnahme innerhalb dieser Zeit beginnt, werden die Backend Rechner nicht herunter gefahren.</translation>
     </message>
     <message>
         <source>Startup before rec. (secs)</source>
-        <translation type="unfinished"></translation>
+        <translation>Startzeit (Sek.)</translation>
     </message>
     <message>
         <source>The amount of time the master backend will be woken up before a recording starts.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Master Rechner wird um diese Zeitspanne vor dem Beginn einer Aufnahme gestartet. Diese Zeit sollte mindestens so lange sein, wie der Rechner für den Startvorgang benötigt.</translation>
     </message>
     <message>
         <source>Wakeup time format</source>
-        <translation type="unfinished"></translation>
+        <translation>Format der Weckzeit</translation>
     </message>
     <message>
         <source>The format of the time string passed to the &apos;setWakeuptime Command&apos; as $time. See QT::QDateTime.toString() for details. Set to &apos;time_t&apos; for seconds since epoch.</source>
-        <translation type="unfinished"></translation>
+        <translation>Das Format des Zeitstrings der dem &quot;Weckzeit setzen&quot; Kommando als $time übergeben wird. Näheres siehe QT::QDateTime.toString(). Bei &quot;time_t&quot; wird der String als Seconds-since-Epoch formatiert.</translation>
     </message>
     <message>
         <source>Set wakeuptime command</source>
-        <translation type="unfinished"></translation>
+        <translation>Weckzeit setzen Befehl</translation>
     </message>
     <message>
         <source>The command used to set the time (passed as $time) to wake up the masterbackend</source>
-        <translation type="unfinished"></translation>
+        <translation>Das Kommando um die nächste Weckzeit für den Master Rechner zu setzen. Dabei wird &quot;$time&quot; durch die Weckzeit ersetzt.</translation>
     </message>
     <message>
         <source>Server halt command</source>
-        <translation type="unfinished"></translation>
+        <translation>Abschaltbefehl</translation>
     </message>
     <message>
         <source>The command used to halt the backends.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Befehl um die Backend Rechner herunter zu fahren.</translation>
     </message>
     <message>
         <source>Host Address Backend Setup</source>
@@ -3116,7 +3127,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Wait for SEQ start header.</source>
-        <translation type="unfinished"></translation>
+        <translation>Warte auf SEQ-Start Header.</translation>
     </message>
     <message>
         <source>Enable channel change buffer warnings</source>
@@ -3136,7 +3147,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Manche preiswerte DVB</translation>
     </message>
     <message>
         <source>Time offset for thumbnail preview images</source>
@@ -3168,15 +3179,15 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Pre Shutdown check-command</source>
-        <translation type="unfinished"></translation>
+        <translation>Abschalt-Testprogramm</translation>
     </message>
     <message>
         <source>Block shutdown before client connected</source>
-        <translation type="unfinished"></translation>
+        <translation>Auf Frontend warten</translation>
     </message>
     <message>
         <source>If set, the automatic shutdown routine will be disabled until a client connects.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, wird die Abschaltlogik solange blockiert bis sich ein Frontend verbindet.</translation>
     </message>
     <message>
         <source>(All)</source>
@@ -3204,11 +3215,11 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Current Recs</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktuelle Aufnahmen</translation>
     </message>
     <message>
         <source>Previous Recs</source>
-        <translation type="unfinished"></translation>
+        <translation>Alte Aufnahmen</translation>
     </message>
     <message>
         <source>Duplicate Check</source>
@@ -3224,7 +3235,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Max episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>max. Folgen</translation>
     </message>
     <message>
         <source>Delete oldest over Max</source>
@@ -3240,7 +3251,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>This option makes the backend dvb-recorder only open the card when it is actually in-use leaving it free for other programs at other times.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, wird das Backend die DVB Karte nur bei Bedarf ansprechen. Ansonsten kann die Karte von anderen Programmen genutzt werden.</translation>
     </message>
     <message>
         <source>Password required to view all recordings</source>
@@ -3340,7 +3351,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>another program with a higher priority will be recorded instead.</source>
-        <translation>ein anderes Programm mit höherer Priorität wird stattdessen aufgenommen.</translation>
+        <translation>ein anderes Programm mit höherer Priorität aufgenommen wird.</translation>
     </message>
     <message>
         <source>this episode will be recorded at a later time instead.</source>
@@ -3353,7 +3364,8 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     <message>
         <source>The following programs will be recorded instead:
 </source>
-        <translation>Die folgende Sendung wird stattdessen aufgenommen:
+        <translation>Die folgenden Sendungen werden stattdessen aufgenommen:
+
 </translation>
     </message>
     <message>
@@ -3394,7 +3406,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Display &apos;favorite&apos; channels</source>
-        <translation>Zeige bevorzugte Sender</translation>
+        <translation>Nur Favoriten zeigen</translation>
     </message>
     <message>
         <source>If set, the EPG will initally display only the channels marked as favorites. &quot;4&quot; will toggle between favorites and all channels.</source>
@@ -3718,7 +3730,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Show group name instead of &quot;All Programs&quot;.</source>
-        <translation>Zeige Gruppennamen anstatt &quot;Alle Sendungen&quot;.</translation>
+        <translation>Zeige Gruppennamen anstatt &quot;Alle Sendungen&quot;</translation>
     </message>
     <message>
         <source>Use the name of the display group currently being show in place of the term &quot;All Programs&quot; in theplayback screen.</source>
@@ -3726,7 +3738,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Start in title section.</source>
-        <translation>Mit Titeln beginnen.</translation>
+        <translation>Mit Titeln beginnen</translation>
     </message>
     <message>
         <source>If set, focus will initially be on the show titles otherwise focus will be on the recordings.</source>
@@ -3734,7 +3746,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Show group summary.</source>
-        <translation>Gruppenzusammenfassung zeigen.</translation>
+        <translation>Gruppenzusammenfassung zeigen</translation>
     </message>
     <message>
         <source>While selecting a group, show a group summary instead of showing info about the first episode in that group.</source>
@@ -3782,7 +3794,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Desktop Style</source>
-        <translation type="unfinished"></translation>
+        <translation>Desktop Stil</translation>
     </message>
     <message>
         <source>Channel format</source>
@@ -3856,7 +3868,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Filters to be used when recording from this channel.  Not used with hardware encoding cards.</source>
-        <translation>Eine Liste von Filtern die für Aufnahmen auf diesem Sender verwendet werden. Wird bei Tunerkarten mit integriertem Kodierer (Hauppauge PVR250 u.a.) ignoriert.</translation>
+        <translation>Eine Liste von Filtern die für Aufnahmen auf diesem Sender verwendet werden. Wird bei Tunerkarten mit integriertem Kodierer (Hauppauge PVR250, Matrox G200 u.a.) ignoriert.</translation>
     </message>
     <message>
         <source>Playback filters</source>
@@ -3872,7 +3884,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Don&apos;t Record</source>
-        <translation type="unfinished">Nicht aufnehmen</translation>
+        <translation>Nicht aufnehmen</translation>
     </message>
     <message>
         <source>Reactivate</source>
@@ -3880,7 +3892,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Don&apos;t record</source>
-        <translation type="unfinished">Nicht aufnehmen</translation>
+        <translation>Nicht aufnehmen</translation>
     </message>
     <message>
         <source>Never record</source>
@@ -3888,7 +3900,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Edit Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnahmeoptionen...</translation>
     </message>
     <message>
         <source>Add Override</source>
@@ -3904,7 +3916,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Record this showing with normal options</source>
-        <translation type="unfinished">Diese Ausstrahlung mit normalen Optionen aufnehmen</translation>
+        <translation>Diese Ausstrahlung mit normalen Optionen aufnehmen</translation>
     </message>
     <message>
         <source>Record this showing with override options</source>
@@ -3912,7 +3924,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Do not record this showing</source>
-        <translation type="unfinished">Diese Ausstrahlung nicht aufnehmen</translation>
+        <translation>Diese Ausstrahlung nicht aufnehmen</translation>
     </message>
     <message>
         <source>External application or script to run when a keypress is received by LIRC.</source>
@@ -3920,11 +3932,11 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>This PIN is used to control access to the setup menus. If you want to use this feature, then setting the value to all numbers will make your life much easier.  Set it to blank to disable.</source>
-        <translation>Dieser PIN Code gewährt Zugang zu den Konfigurationsmenüs. Für eine einfachere Handhabung verwenden Sie für diesen Code bitte nur Ziffern. Freilassen schaltet die PIN Abfrage aus.</translation>
+        <translation>Dieser PIN Code gewährt Zugang zu den Konfigurationsmenüs. Für eine einfachere Handhabung verwenden Sie für diesen Code bitte nur Ziffern. Ein leeres Feld schaltet die Abfrage aus.</translation>
     </message>
     <message>
         <source>Separate video modes for GUI and TV playback</source>
-        <translation>Getrennte Bildschirmeinstellungen für GUI und TV Wiedergabe</translation>
+        <translation>Getrennte Einstellungen für GUI und TV Wiedergabe</translation>
     </message>
     <message>
         <source>Switch X Window video modes for TV. Requires &apos;xrandr&apos; support.</source>
@@ -3988,7 +4000,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>If enabled, the master backend will stream and delete files if it finds them in the video directory. Useful if you are using a central storage location, like a NFS share, and your slave backend isn&apos;t running.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, wird der Master Rechner Aufnahmen löschen oder an ein Frontend übertragen. Nützlich wenn Sie Aufnahmen zentral speichern und ein Slave Rechner nicht eingeschaltet ist.</translation>
     </message>
     <message>
         <source>Make the video look normal on a progressive display (i.e. monitor).  Deinterlace requires that your CPU supports SSE instructions.  Enabling this without proper CPU support will cause the program to segfault. </source>
@@ -4028,7 +4040,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for frontend</source>
-        <translation type="unfinished"></translation>
+        <translation>Dieses Kommando wird vor dem Herunterfahren ausgeführt. Der Rückgabewert bestimmt ob der Rechner herunter gefahren werden kann. 0 - Ja; 1 - Leerlaufzeit zurücksetzen; 2 - auf Frontend warten.</translation>
     </message>
     <message>
         <source>Commercial Free</source>
@@ -4135,11 +4147,31 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Startup command</source>
-        <translation type="unfinished"></translation>
+        <translation>Einschaltbefehl</translation>
     </message>
     <message>
         <source>This command is executed right after starting the BE. As a parameter &apos;$status&apos; is replaced by either &apos;auto&apos; if the machine was started automatically or &apos;user&apos; if a user switched it on.</source>
+        <translation>Dieses Kommando wird nach dem Start des Backends aufgerufen. Der Parameter &quot;$status&quot; wird, falls der Server automatisch gestartet wurde, durch &quot;auto&quot; ersetzt oder &quot;user&quot; wenn er manuell gestartet wurde.</translation>
+    </message>
+    <message>
+        <source>When using Blank Frame Detection and Auto-Flagging, flag blank frames following commercial breaks as part of the commercial break.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title Search</source>
+        <translation type="unfinished">Titelsuche</translation>
+    </message>
+    <message>
+        <source>Keyword Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>People Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Search</source>
+        <translation type="unfinished">Unbekannte Suche</translation>
     </message>
 </context>
 <context>

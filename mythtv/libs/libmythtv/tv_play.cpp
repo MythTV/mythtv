@@ -2978,7 +2978,7 @@ void TV::ToggleSleepTimer(void)
                               TRUE);
     }
 
-    text = tr("Sleep ") + sleep_timer_array[sleep_index].dispString;
+    text = tr("Sleep ") + " " + tr(sleep_timer_array[sleep_index].dispString);
 
     // display OSD
     if (osd && !browsemode)

@@ -45,6 +45,8 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     rbuffer = NULL;
     nvp = NULL;
 
+    playingSomething = false;
+
     // Number of items available in list, showData.count() for "All Programs"
     // In other words, this is the number of shows selected by the title selec.
     titleitems = 0;         
@@ -64,7 +66,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     skipCnt = 0;
     
     previewPixmap = NULL;
-    previewProgamInfo = NULL;
+    previewProgramInfo = NULL;
     
     updateFreeSpace = true;
     freeSpaceTotal = 0;
@@ -143,10 +145,11 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
         return;
     }
 
-    if(theme->GetSet("group_info") && gContext->GetNumSetting("ShowGroupInfo", 0) == 1)
+    if (theme->GetSet("group_info") && 
+        gContext->GetNumSetting("ShowGroupInfo", 0) == 1)
     {
         haveGroupInfoSet = true;
-        if(listtype)
+        if (listtype)
             listtype->ShowSelAlways(false);
     }
     else
@@ -190,12 +193,12 @@ PlaybackBox::~PlaybackBox(void)
     delete theme;
     delete bgTransBackup;
     
-    if(previewPixmap)
+    if (previewPixmap)
         delete previewPixmap;
         
     if (curitem)
         delete curitem;
-    if(delitem)
+    if (delitem)
         delete delitem;
         
     if (titleData)
@@ -568,10 +571,13 @@ void PlaybackBox::updateVideo(QPainter *p)
     if (((playbackPreview == 0) || !playingVideo || (state == kStarting) || 
         (state == kChanging)) && curitem)
     {
-        QPixmap temp = getPixmap(curitem);
-        if (temp.width() > 0)
+        if (!playingSomething)
         {
-            p->drawPixmap(videoRect.x(), videoRect.y(), temp);
+            QPixmap temp = getPixmap(curitem);
+            if (temp.width() > 0)
+            {
+                p->drawPixmap(videoRect.x(), videoRect.y(), temp);
+            }
         }
     }
 
@@ -645,7 +651,7 @@ void PlaybackBox::updateVideo(QPainter *p)
     }
 
     /* if we are playing and nvp is running, then grab a new video frame */
-    if ((state == kPlaying) && nvp->IsPlaying())
+    if ((state == kPlaying) && nvp->IsPlaying() && !playingSomething)
     {
         int w = 0, h = 0;
         VideoFrame *frame = nvp->GetCurrentFrame(w, h);
@@ -1492,6 +1498,7 @@ void PlaybackBox::play(ProgramInfo *rec)
 
     setEnabled(false);
     state = kKilling; // stop preview playback and don't restart it
+    playingSomething = true;
 
     if (tv->Playback(tvrec))
     {
@@ -1504,6 +1511,7 @@ void PlaybackBox::play(ProgramInfo *rec)
         }
     }
 
+    playingSomething = false;
     state = kStarting; // restart playback preview
     setEnabled(true);
 
@@ -2143,19 +2151,19 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
 {
     QPixmap retpixmap;
 
-    if(!generatePreviewPixmap)
+    if (!generatePreviewPixmap)
         return retpixmap;
         
     // Check and see if we've already tried this one.    
-    if(pginfo == previewProgamInfo)
+    if (pginfo == previewProgramInfo)
     {
-        if(previewPixmap)
+        if (previewPixmap)
             retpixmap = *previewPixmap;
         
         return retpixmap;
     }
     
-    if(previewPixmap)
+    if (previewPixmap)
     {
         delete previewPixmap;
         previewPixmap = NULL;
@@ -2172,6 +2180,7 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     previewPixmap = gContext->LoadScalePixmap(filename);
     if (previewPixmap)
     {
+        previewProgramInfo = pginfo;
         retpixmap = *previewPixmap;
         return retpixmap;
     }
@@ -2186,6 +2195,7 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
         if (previewPixmap)
         {
             retpixmap = *previewPixmap;
+            previewProgramInfo = pginfo;
             return retpixmap;
         }
 
@@ -2215,6 +2225,8 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     }
 
     retpixmap = *previewPixmap;
+    previewProgramInfo = pginfo;
+
     return retpixmap;
 }
 
