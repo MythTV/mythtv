@@ -29,6 +29,26 @@
         <source>Sorry: OpenGL support not available</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>SlideShow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotate CW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotate CCW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
