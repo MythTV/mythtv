@@ -260,6 +260,9 @@ void ViewScheduled::updateBackground(void)
 
 void ViewScheduled::paintEvent(QPaintEvent *e)
 {
+    if (doingSel)
+        return;
+
     QRect r = e->rect();
     QPainter p(this);
  

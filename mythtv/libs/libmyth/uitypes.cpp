@@ -929,6 +929,7 @@ UIListType::UIListType(const QString &name, QRect area, int dorder)
     m_justification = 0;
     m_uarrow = false;
     m_darrow = false;
+    m_fill_type = -1;
 }
 
 UIListType::~UIListType()
