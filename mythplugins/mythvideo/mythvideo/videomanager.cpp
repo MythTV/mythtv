@@ -1097,7 +1097,8 @@ void VideoManager::pageDown()
     {
 
       // if there's more data to show, go a page down
-
+      if (can_do_page_down) 
+      {
 
         if (inList >= (int)(listsize / 2) || inData != 0)
         {
@@ -1111,7 +1112,7 @@ void VideoManager::pageDown()
        // otherwise just go to the end of the list
         else
             inList = listsize - 1;
-
+      }
       
     } break;
     
