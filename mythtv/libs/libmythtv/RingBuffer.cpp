@@ -89,6 +89,7 @@ ThreadedFileWriter::ThreadedFileWriter(const char *filename,
     {
 	/* oops! */
 	printf("ERROR opening file '%s' in ThreadedFileWriter.\n", filename);
+        exit(0);
     }
     else
     {

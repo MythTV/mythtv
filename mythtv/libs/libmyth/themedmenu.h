@@ -104,9 +104,13 @@ class ThemedMenu : public MythDialog
 
     void paintLogo(QPainter *p);
     void paintTitle(QPainter *p);
-    void paintButton(unsigned int button, QPainter *p, bool erased);
+    void paintButton(unsigned int button, QPainter *p, bool erased,
+                     bool drawinactive = false);
 
     void drawText(QPainter *p, QRect &rect, int textflags, QString text);
+
+    void clearToBackground(void);
+    void drawInactiveButtons(void);
 
     QString prefix;
     
@@ -162,6 +166,8 @@ class ThemedMenu : public MythDialog
     QPoint titlePos;
     QRect titleRect;
     bool drawTitle;
+
+    QPixmap backgroundPixmap;
 };
 
 #endif

@@ -165,6 +165,8 @@ void ThemedMenu::parseBackground(QString dir, QDomElement &element)
         setPaletteBackgroundPixmap(background);
         erase(menuRect());
 
+        backgroundPixmap = background;
+
         delete bground;
     }
 }
@@ -833,6 +835,8 @@ void ThemedMenu::parseMenu(QString menuname)
         drawTitle = false;
     }
 
+    drawInactiveButtons();
+
     titleText = "MYTH-";
     titleText +=  menumode;
     gContext->LCDpopMenu(activebutton->text, titleText);
@@ -1011,6 +1015,37 @@ QRect ThemedMenu::menuRect() const
     return r;
 }
 
+void ThemedMenu::clearToBackground(void)
+{
+    if (backgroundPixmap.width() > 0)
+        setPaletteBackgroundPixmap(backgroundPixmap);
+
+    drawInactiveButtons();
+}
+
+void ThemedMenu::drawInactiveButtons(void)
+{
+    QPixmap bground = backgroundPixmap;
+
+    QPainter tmp(&bground);
+
+    ThemedButton *store = activebutton;
+    activebutton = NULL;
+    
+    for (unsigned int i = 0; i < buttonList.size(); i++)
+    {
+        paintButton(i, &tmp, true, true);
+    }
+
+    activebutton = store;
+
+    tmp.end();
+
+    setPaletteBackgroundPixmap(bground);
+
+    erase(menuRect());
+}
+
 void ThemedMenu::paintEvent(QPaintEvent *e)
 {
     QRect r = e->rect();
@@ -1065,7 +1100,8 @@ void ThemedMenu::paintTitle(QPainter *p)
     }
 }
 
-void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased)
+void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased,
+                             bool drawinactive)
 {
     QRect cr;
     if (buttonList[button].buttonicon)
@@ -1083,12 +1119,6 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased)
             return;
     }
 
-    QPixmap pix(cr.size());
-    pix.fill(this, cr.topLeft());
-
-    QPainter tmp;
-    tmp.begin(&pix, this);
-
     QRect newRect(0, 0, buttonList[button].posRect.width(),
                   buttonList[button].posRect.height());
     newRect.moveBy(buttonList[button].posRect.x() - cr.x(), 
@@ -1102,9 +1132,22 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased)
     }
     else
     {
-        buttonback = buttonnormal;
         buttonList[button].status = 0;
+
+        if (!drawinactive)
+        {
+            erase(cr);
+            return;
+        }
+        buttonback = buttonnormal;
     }
+
+    QPixmap pix(cr.size());
+
+    QPainter tmp;
+    tmp.begin(&pix, this);
+
+    tmp.drawPixmap(QPoint(0, 0), backgroundPixmap, cr);
 
     blendImageToPixmap(&pix, newRect.x(), newRect.y(), buttonback, &tmp, 0, 0);
 
@@ -1283,8 +1326,6 @@ void ThemedMenu::ReloadTheme(void)
 
     QString theme = gContext->GetSetting("Theme");
     QString themedir = gContext->FindThemeDir(theme);
- 
-    erase(menuRect());
 
     parseSettings(themedir + "/", "theme.xml");
 
@@ -1425,8 +1466,7 @@ void ThemedMenu::handleAction(QString &action)
     else if (action.left(5) == "MENU ")
     {
         QString rest = action.right(action.length() - 5);
- 
-        erase(menuRect());
+
         parseMenu(rest);
     }
     else if (action.left(6) == "UPMENU")
@@ -1437,7 +1477,6 @@ void ThemedMenu::handleAction(QString &action)
 
         menulevel -= 2;
  
-        erase(menuRect());
         parseMenu(file);
     }
     else
