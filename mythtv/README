@@ -31,7 +31,7 @@ This is what you need, software wise, to have installed:
            your distro, or from http://www.mysql.com
 
    XMLTV - If you are in North America, you need at least the latest version
-           (0.5.28 as of 2004-01-31).  This will do the work of actually 
+           (0.5.29 as of 2004-02-13).  This will do the work of actually 
            grabbing the program information. Get it from http://xmltv.sf.net
            If you're not, then you need some sort of listings grabber and
            will need to run the mythfilldatabase program in --manual mode.
