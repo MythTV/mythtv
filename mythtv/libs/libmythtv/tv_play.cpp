@@ -207,58 +207,72 @@ void *SpawnDecode(void *param)
 }
 
 TV::TV(void)
-  : QObject()
+    : QObject(),
+      // Configuration variables from database
+      repoLevel(0), baseFilters(""), fftime(0), rewtime(0),
+      jumptime(0), usePicControls(false), smartChannelChange(false),
+      showBufferedWarnings(false), bufferedChannelThreshold(0),
+      MuteIndividualChannels(false), arrowAccel(false),
+      vbimode(0), 
+      // Configuretion variables from DB in RunTV
+      stickykeys(0), ff_rew_repos(0), ff_rew_reverse(false),
+      smartForward(false),
+      // Configuration varibles from DB just before playback
+      autoCommercialSkip(false), tryUnflaggedSkip(false),
+      osd_display_time(0),
+      // State variables
+      internalState(kState_None), nextState(kState_None), changeState(false),
+      menurunning(false), runMainLoop(false), wantsToQuit(true), 
+      exitPlayer(false), paused(false), errored(false),
+      stretchAdjustment(false), editmode(false), zoomMode(false),
+      update_osd_pos(false), endOfRecording(false), requestDelete(false),
+      doSmartForward(false), switchingCards(false), lastRecorderNum(-1),
+      queuedTranscode(false), getRecorderPlaybackInfo(false), 
+      sleep_index(0), sleepTimer(new QTimer(this)), 
+      picAdjustment(kPictureAttribute_None),
+      recAdjustment(kPictureAttribute_None),
+      // Key processing buffer, lock, and state
+      keyRepeat(true), keyrepeatTimer(new QTimer(this)),
+      // Fast forward state
+      doing_ff_rew(0), ff_rew_index(0), speed_index(0), normal_speed(1.0f),
+      // Channel changing state variables
+      channelqueued(false), channelkeysstored(0), 
+      lastCC(""), lastCCDir(0), muteTimer(new QTimer(this)),
+      // previous channel functionality state variables
+      times_pressed(0), prevChannelTimer(new QTimer(this)),
+      // channel browsing state variables
+      browsemode(false), persistentbrowsemode(false),
+      browseTimer(new QTimer(this)),
+      browsechannum(""), browsechanid(""), browsestarttime(""),
+      // Program Info for currently playing video
+      playbackinfo(NULL), inputFilename(""), playbackLen(0),
+      recorderPlaybackInfo(NULL),
+      // estimated framerate from recorder
+      frameRate(30.0f),
+      // Video Players
+      nvp(NULL), pipnvp(NULL), activenvp(NULL),
+      // Remote Encoders
+      recorder(NULL), piprecorder(NULL), activerecorder(NULL),
+      // RingBuffers
+      prbuffer(NULL), piprbuffer(NULL), activerbuffer(NULL), 
+      // OSD info
+      osd(NULL), dialogname(""), treeMenu(NULL), udpnotify(NULL),
+      // LCD Info
+      lcdTitle(""), lcdSubtitle(""), lcdCallsign(""),
+      // Window info (GUI is optional, transcoding, preview img, etc)
+      myWindow(NULL), embedid(0), embx(0), emby(0), embw(0), embh(0)
 {
-    treeMenu = NULL;
-    switchingCards = false;
-    dialogname = "";
-    playbackinfo = NULL;
-    editmode = false;
-    queuedTranscode = false;
-    browsemode = false;
-    zoomMode = false;
-    prbuffer = NULL;
-    nvp = NULL;
-    osd = NULL;
-    requestDelete = false;
-    endOfRecording = false;
-    embedid = 0;
-    times_pressed = 0;
-    last_channel = "";
-    picAdjustment = kPictureAttribute_None;
-    recAdjustment = kPictureAttribute_None;
-    stretchAdjustment = false;
-    doSmartForward = false;
+    bzero(channelKeys, sizeof(channelKeys));
+    lastLcdUpdate = QDateTime::currentDateTime();
+    lastLcdUpdate.addYears(-1); // make last LCD update last year..
 
-    getRecorderPlaybackInfo = false;
-    recorderPlaybackInfo = NULL;
-    lastRecorderNum = -1;
-    wantsToQuit = true;
-
-    myWindow = NULL;
-    udpnotify = NULL;
-
-    normal_speed = 1.0;
-    errored = false;
-    
     gContext->addListener(this);
 
-    PrevChannelVector channame_vector(30);
-
-    prevChannelTimer = new QTimer(this);
     connect(prevChannelTimer, SIGNAL(timeout()), SLOT(SetPreviousChannel()));
-
-    muteTimer = new QTimer(this);
-    connect(muteTimer, SIGNAL(timeout()), SLOT(UnMute()));
-
-    keyrepeatTimer = new QTimer(this);
-    connect(keyrepeatTimer, SIGNAL(timeout()), SLOT(KeyRepeatOK()));
-
-    browseTimer = new QTimer(this);
-    connect(browseTimer, SIGNAL(timeout()), SLOT(BrowseEndTimer()));
-
-    sleepTimer = new QTimer(this);
-    connect(sleepTimer, SIGNAL(timeout()), SLOT(SleepEndTimer()));
+    connect(browseTimer,      SIGNAL(timeout()), SLOT(BrowseEndTimer()));
+    connect(muteTimer,        SIGNAL(timeout()), SLOT(UnMute()));
+    connect(keyrepeatTimer,   SIGNAL(timeout()), SLOT(KeyRepeatOK()));
+    connect(sleepTimer,       SIGNAL(timeout()), SLOT(SleepEndTimer()));
 }
 
 bool TV::Init(bool createWindow)
@@ -271,11 +285,11 @@ bool TV::Init(bool createWindow)
         errored = true;
         return false;
     }
-    
+
     repoLevel = gContext->GetNumSetting("TVRepositionLevel", 2);
     if ((repoLevel >= MAX_REPO_LEVEL) || (repoLevel < 0))
         repoLevel = MAX_REPO_LEVEL - 1;
-    
+
     baseFilters += gContext->GetSetting("CustomFilters");
     fftime = gContext->GetNumSetting("FastForwardAmount", 30);
     rewtime = gContext->GetNumSetting("RewindAmount", 5);
@@ -285,32 +299,11 @@ bool TV::Init(bool createWindow)
     showBufferedWarnings = gContext->GetNumSetting("CCBufferWarnings", 0);
     bufferedChannelThreshold = gContext->GetNumSetting("CCWarnThresh", 10);
     MuteIndividualChannels = gContext->GetNumSetting("IndividualMuteControl",0);
+    arrowAccel = gContext->GetNumSetting("UseArrowAccels", 1);
 
     QString vbiformat = gContext->GetSetting("VbiFormat");
-    if (vbiformat.lower() == "pal teletext")
-        vbimode = 1;
-    else if (vbiformat.lower().left(4) == "ntsc")
-        vbimode = 2;
-    else
-        vbimode = 0;
-
-    recorder = piprecorder = activerecorder = NULL;
-    nvp = pipnvp = activenvp = NULL;
-    prbuffer = piprbuffer = activerbuffer = NULL;
-
-    menurunning = false;
-
-    internalState = nextState = kState_None; 
-
-    runMainLoop = false;
-    changeState = false;
-
-    keyRepeat = true;
-
-    if (gContext->GetNumSetting("UseArrowAccels", 1))
-        arrowAccel = true;
-    else
-        arrowAccel = false;
+    vbimode = (vbiformat.lower() == "pal teletext") ? 1 : 0;
+    vbimode = (vbiformat.lower().left(4) == "ntsc") ? 2 : vbimode;
 
     if (createWindow)
     {

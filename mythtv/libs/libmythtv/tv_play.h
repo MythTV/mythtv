@@ -206,133 +206,135 @@ class TV : public QObject
 
     QString PlayMesg(void);
 
-    int osd_display_time;
-
-    bool arrowAccel;
-
-    bool channelqueued;
-    char channelKeys[5];
-    int channelkeysstored;
-    bool smartChannelChange;
-
-    bool menurunning;
-
-    TVState internalState;
-
-    bool runMainLoop;
-    bool exitPlayer;
-    bool paused;
-
-    int autoCommercialSkip;
-    bool tryUnflaggedSkip;
-
-    float frameRate;
-
-    pthread_t event, decode, pipdecode;
-    bool changeState;
-    TVState nextState;
-    QString inputFilename;
-
-    int playbackLen;
-
-    int jumptime;
+    // Configuration variables from database
+    int repoLevel;
+    QString baseFilters;
     int fftime;
     int rewtime;
+    int jumptime;
+    bool usePicControls;
+    bool smartChannelChange;
+    bool showBufferedWarnings;
+    int bufferedChannelThreshold;
+    bool MuteIndividualChannels;
+    bool arrowAccel;
+    char vbimode;
+
+    // Configuretion variables from DB in RunTV
     int stickykeys;
     int ff_rew_repos;
     bool ff_rew_reverse;
+    bool smartForward;
+    
+    // Configuration variables from DB just before playback
+    int autoCommercialSkip;
+    bool tryUnflaggedSkip;
+    int osd_display_time;
+
+    // State variables
+    TVState internalState;
+    TVState nextState;
+    bool changeState;
+    bool menurunning;
+    bool runMainLoop;
+    bool wantsToQuit;
+    bool exitPlayer;
+    bool paused;
+    bool errored;
+    bool stretchAdjustment; // is time stretch turned on
+    bool editmode;       // are we in video editing mode
+    bool zoomMode;
+    bool update_osd_pos; // redisplay osd?
+    bool endOfRecording; // !nvp->IsPlaying() && StateIsPlaying(internalState)
+    bool requestDelete;  // user wants last video deleted
+    bool doSmartForward;
+    bool switchingCards; // user wants new recorder, see mythfrontend/main.cpp
+    int lastRecorderNum; // last recorder, for implementing SwitchCards()
+    bool queuedTranscode;
+    bool getRecorderPlaybackInfo; // main loop should get recorderPlaybackInfo
+    int sleep_index;     // Off, go to sleep in 30 minutes, 60 minutes...
+    QTimer *sleepTimer;  // timer for turning off playback
+    int picAdjustment;   // player pict attr to modify (on arrow left or right)
+    int recAdjustment;   // which recorder picture attribute to modify...
+
+    // Key processing buffer, lock, and state
+    QMutex keyListLock;  // keys are processed outside Qt Event loop, need lock
+    QPtrList<QKeyEvent> keyList; // list of unprocessed key presses
+    bool keyRepeat;      // are repeats logical on last key?
+    QTimer *keyrepeatTimer; // timeout timer for repeat key filtering
+
+    // Fast forward state
     int doing_ff_rew;
     int ff_rew_index;
     int speed_index;
     float normal_speed;
-    bool stretchAdjustment;
 
-    OSD *osd;
-    bool update_osd_pos;
+    // Channel changing state variables
+    bool channelqueued;
+    char channelKeys[5];
+    int channelkeysstored;
+    QString lastCC;      // last channel
+    int lastCCDir;       // last channel changing direction
+    QTimer *muteTimer;   // for temporary audio muting during channel changes
 
-    NuppelVideoPlayer *nvp;
-    NuppelVideoPlayer *pipnvp;
-    NuppelVideoPlayer *activenvp;
+    // previous channel functionality state variables
+    typedef QValueVector<QString> PrevChannelVector;
+    PrevChannelVector channame_vector; // previous channels
+    unsigned int times_pressed; // number of repeats detected
+    QTimer *prevChannelTimer;   // for special (slower) repeat key filtering
 
-    RemoteEncoder *recorder;
-    RemoteEncoder *piprecorder;
-    RemoteEncoder *activerecorder;
-
-    RingBuffer *prbuffer;
-    RingBuffer *piprbuffer;
-    RingBuffer *activerbuffer;
-
-    QString dialogname;
-    bool editmode;
-    bool requestDelete;
-    bool endOfRecording;
-    bool queuedTranscode;
-
-    QTimer *browseTimer;
+    // channel browsing state variables
     bool browsemode;
     bool persistentbrowsemode;
+    QTimer *browseTimer;
     QString browsechannum;
     QString browsechanid;
     QString browsestarttime;
 
-    bool zoomMode;
+    // Program Info for currently playing video
+    // (or next video if changeState is true)
+    ProgramInfo *playbackinfo; // info sent in via Playback()
+    QString inputFilename;     // playbackinfo->pathname
+    int playbackLen;           // initial playbackinfo->CalculateLength()
+    ProgramInfo *recorderPlaybackInfo; // info requested from recorder
 
-    ProgramInfo *playbackinfo;
+    // other info on currently playing video
+    float frameRate; // estimated framerate from recorder
 
-    WId embedid;
-    int embx, emby, embw, embh;
+    // Video Players
+    NuppelVideoPlayer *nvp;
+    NuppelVideoPlayer *pipnvp;
+    NuppelVideoPlayer *activenvp;
 
-    typedef QValueVector<QString> PrevChannelVector;
-    PrevChannelVector channame_vector;
-    unsigned int times_pressed;
-    QTimer *prevChannelTimer;
-    QTimer *muteTimer;
-    QString last_channel;
+    // Remote Encoders
+    RemoteEncoder *recorder;
+    RemoteEncoder *piprecorder;
+    RemoteEncoder *activerecorder;
 
-    MythDialog *myWindow;
+    // RingBuffers
+    RingBuffer *prbuffer;
+    RingBuffer *piprbuffer;
+    RingBuffer *activerbuffer;
 
-    QPtrList<QKeyEvent> keyList;
-    QMutex keyListLock;
-
-    bool wantsToQuit;
-    int lastRecorderNum;
-    bool getRecorderPlaybackInfo;
-    ProgramInfo *recorderPlaybackInfo;
-
-    bool keyRepeat;
-    QTimer *keyrepeatTimer;
-    
-    int picAdjustment;
-    int recAdjustment;
-    bool usePicControls;
-
-    bool smartForward;
-    bool doSmartForward;
-
+    // OSD info
+    OSD *osd;
+    QString dialogname;
+    OSDGenericTree *treeMenu;
     UDPNotify *udpnotify;
 
-    QString lastCC;
-    int lastCCDir;
-    bool showBufferedWarnings;
-    int bufferedChannelThreshold;
-
-    bool MuteIndividualChannels;
-
-    bool switchingCards;
-
-    OSDGenericTree *treeMenu;
-
-    int sleep_index;
-    QTimer *sleepTimer;
-
-    char vbimode;
-
+    // LCD Info
     QDateTime lastLcdUpdate;
     QString lcdTitle, lcdSubtitle, lcdCallsign;
-    
-    QString baseFilters;
-    int repoLevel;
-    bool errored;
+
+    // Window info (GUI is optional, transcoding, preview img, etc)
+    MythDialog *myWindow;// Our MythDialow window, if it exists
+    WId embedid;         // Window ID when embedded in another widget
+    int embx, emby, embw, embh; // bounds when embedded in another widget
+
+    // Various threads
+    pthread_t event;     // TV::RunTV(), the event thread
+    pthread_t decode;    // nvp::StartPlaying(), video decoder thread
+    pthread_t pipdecode; // pipnvp, Picture-in-Picture video decoder thread
 };
 
 #endif
