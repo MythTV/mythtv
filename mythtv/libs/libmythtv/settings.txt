@@ -79,6 +79,14 @@ str OSDTheme=defaultosd
 # Path to the TTF used in the OSD. 
 str OSDFont=helr.ttf
 #str OSDFont=/usr/share/fonts/truetype/Arial.ttf
+#
+# Channel ordering.  How to choose the next channel when using the up/down
+# keys on the remote.
+# Possible values are: channum, chanid, callsign
+# channum is the default, channel 4 follows channel 3
+# chanid sorts according to the internal database order
+# callsign sorts according to the channel's callsign, like TVLAN, TWC, USA
+str ChannelOrdering=channum
 
 # TV options
 # 

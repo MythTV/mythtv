@@ -19,6 +19,8 @@ Channel::Channel(TV *parent, const QString &videodevice)
     currentcapchannel = 0;
     
     pParent = parent;
+    orderedchannels = false;
+    channelorder = "";
 }
 
 Channel::~Channel(void)
@@ -183,6 +185,13 @@ bool Channel::SetChannel(int i)
 
 bool Channel::ChannelUp(void)
 {
+    if (orderedchannels)
+    {
+        QString nextchan = pParent->GetNextChannel(true);
+        if (SetChannelByString(nextchan))
+            return true;
+    }
+
     bool finished = false;
     int chancount = 0;
     int startchannel = curchannel;
@@ -213,6 +222,13 @@ bool Channel::ChannelUp(void)
 
 bool Channel::ChannelDown(void)
 {
+    if (orderedchannels)
+    {
+        QString nextchan = pParent->GetNextChannel(false);
+        if (SetChannelByString(nextchan))
+            return true;
+    }
+
     bool finished = false;
     int chancount = 0;
     int startchannel = curchannel;

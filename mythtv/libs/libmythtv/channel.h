@@ -18,6 +18,9 @@ class Channel
     bool Open(void);
     void Close(void);
 
+    void SetChannelOrdering(bool order, QString chanorder) 
+                         { orderedchannels = order; channelorder = chanorder; }
+
     void SetFormat(const QString &format);
     void SetFreqTable(const QString &name);
 
@@ -37,6 +40,8 @@ class Channel
     void SetFd(int fd) { videofd = fd; } 
     QString GetDevice() { return device; }
 
+    QString GetOrdering() { return channelorder; }
+
   private:
     
     QString device;
@@ -54,6 +59,9 @@ class Channel
     int capchannels;
     int currentcapchannel;
     map<int, QString> channelnames;
+
+    bool orderedchannels;
+    QString channelorder;
 };
 
 #endif

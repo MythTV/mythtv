@@ -55,6 +55,7 @@ class TV
     
     bool CheckChannel(QString &channum, int &finetuning); 
     bool ChangeExternalChannel(QString &channum);
+    QString GetNextChannel(bool direction);
 
     QString GetFilePrefix() { return settings->GetSetting("RecordFilePrefix"); }
     QString GetInstallPrefix();

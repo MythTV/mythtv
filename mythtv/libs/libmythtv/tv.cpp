@@ -53,7 +53,12 @@ TV::TV(const QString &startchannel, int capturecardnum, int pipcardnum)
 
     db_conn = NULL;
     ConnectDB(capturecardnum);
-  
+ 
+    bool orderbychanid = false;
+    QString chanorder = settings->GetSetting("ChannelOrdering");
+    if (chanorder != "" && chanorder != "channum")
+        orderbychanid = true;
+ 
     audiosamplerate = pipaudiosamplerate = -1;
  
     GetDevices(capturecardnum, videodev, audiodev, audiosamplerate);
@@ -69,6 +74,7 @@ TV::TV(const QString &startchannel, int capturecardnum, int pipcardnum)
     channel->SetFormat(settings->GetSetting("TVFormat"));
     channel->SetFreqTable(settings->GetSetting("FreqTable"));
     channel->SetChannelByString(startchannel);
+    channel->SetChannelOrdering(orderbychanid, chanorder);
     channel->Close();  
 
     pipchannel = new Channel(this, pipvideodev);
@@ -77,6 +83,7 @@ TV::TV(const QString &startchannel, int capturecardnum, int pipcardnum)
         pipchannel->SetFormat(settings->GetSetting("TVFormat"));
         pipchannel->SetFreqTable(settings->GetSetting("FreqTable"));
         pipchannel->SetChannelByString(startchannel);
+        pipchannel->SetChannelOrdering(orderbychanid, chanorder);
         pipchannel->Close();
     }
 
@@ -1204,7 +1211,7 @@ int TV::calcSliderPos(int offset, QString &desc)
     }
 
     if (internalState == kState_WatchingRecording)
-        playbackLen = ((float)nvr->GetFramesWritten() / frameRate);
+        playbackLen = (int)(((float)nvr->GetFramesWritten() / frameRate));
 
     float secsplayed = ((float)nvp->GetFramesPlayed() / frameRate) + offset;
     if (secsplayed < 0)
@@ -1650,6 +1657,99 @@ bool TV::CheckChannel(QString &channum, int &finetuning)
 
     if (query.numRowsAffected() == 0)
         ret = true;
+
+    return ret;
+}
+
+QString TV::GetNextChannel(bool direction)
+{
+    QString ret = "";
+
+    QString channum = channel->GetCurrentName();
+    QString channelinput = channel->GetCurrentInput();
+    QString device = channel->GetDevice();
+
+    QString channelorder = channel->GetOrdering();
+
+    QString thequery = QString("SELECT %1 FROM "
+                               "channel,capturecard,cardinput "
+                               "WHERE channel.channum = \"%1\" AND "
+                               "channel.sourceid = cardinput.sourceid AND "
+                               "cardinput.inputname = \"%2\" AND "
+                               "cardinput.cardid = capturecard.cardid AND "
+                               "capturecard.videodevice = \"%3\";")
+                               .arg(channelorder).arg(channum)
+                               .arg(channelinput).arg(device);
+
+    QSqlQuery query = db_conn->exec(thequery);
+
+    QString id = QString::null;
+
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+
+        id = query.value(0).toString();
+    }
+
+    if (id == QString::null)
+        return ret;
+
+    QString comp = ">";
+    QString ordering = "";
+
+    if (direction == false)
+    {
+        comp = "<";
+        ordering = " DESC ";
+    }
+
+    thequery = QString("SELECT channel.channum FROM channel,capturecard,"
+                       "cardinput WHERE channel.%1 %2 \"%3\" AND "
+                       "channel.sourceid = cardinput.sourceid AND "
+                       "cardinput.inputname = \"%4\" AND "
+                       "cardinput.cardid = capturecard.cardid AND "
+                       "capturecard.videodevice = \"%5\" ORDER BY %6 %7 "
+                       "LIMIT 1;")
+                       .arg(channelorder).arg(comp).arg(id)
+                       .arg(channelinput).arg(device)
+                       .arg(channelorder).arg(ordering);
+
+    query = db_conn->exec(thequery);
+
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+
+        ret = query.value(0).toString();
+    }
+    else
+    {
+        if (direction)        
+            comp = "<";
+        else
+            comp = ">";
+
+        thequery = QString("SELECT channel.channum FROM channel,capturecard,"
+                           "cardinput WHERE channel.%1 %2 \"%3\" AND "
+                           "channel.sourceid = cardinput.sourceid AND "
+                           "cardinput.inputname = \"%4\" AND "
+                           "cardinput.cardid = capturecard.cardid AND "
+                           "capturecard.videodevice = \"%5\" ORDER BY %6 %7 "
+                           "LIMIT 1;")
+                           .arg(channelorder).arg(comp).arg(id)
+                           .arg(channelinput).arg(device)
+                           .arg(channelorder).arg(ordering);
+
+        query = db_conn->exec(thequery);
+ 
+        if (query.isActive() && query.numRowsAffected() > 0)
+        { 
+            query.next();
+
+            ret = query.value(0).toString();
+        }
+    }
 
     return ret;
 }
