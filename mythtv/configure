@@ -58,6 +58,7 @@ network="yes"
 zlib="yes"
 mp3lame="no"
 vorbis="no"
+lcdproc="no"
 a52="yes"
 a52bin="no"
 win32="no"
@@ -320,6 +321,8 @@ for opt do
   --enable-shared) lshared="yes"
   ;;
   --enable-lcd) lcdproc="yes"
+  ;;
+  --disable-lcd) lcdproc="no"
   ;;
   --disable-mpegaudio-hp) mpegaudio_hp="no"
   ;;
@@ -589,6 +592,7 @@ echo "gprof enabled    $gprof"
 echo "zlib enabled     $zlib"
 #echo "mp3lame enabled  $mp3lame"
 #echo "vorbis enabled   $vorbis"
+echo "lcd support      $lcdproc"
 echo "a52 support      $a52"
 echo "a52 dlopened     $a52bin"
 # echo "Video hooking    $vhook"
