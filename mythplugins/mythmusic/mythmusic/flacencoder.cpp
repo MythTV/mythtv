@@ -6,9 +6,8 @@
 using namespace std;
 
 #include "metadata.h"
-#include "flacdecoder.h"
-#include "encoder.h"
 #include "flacencoder.h"
+#include "metaioflacvorbiscomment.h"
 
 #include <FLAC/file_encoder.h>
 #include <FLAC/assert.h>
@@ -77,11 +76,13 @@ FlacEncoder::~FlacEncoder()
 
     if (metadata)
     {
-        FlacDecoder *decoder = new FlacDecoder(outfile->ascii(), NULL, NULL, 
-                                               NULL);
-        decoder->commitMetadata(metadata);
-
-        delete decoder;
+        MetaIOFLACVorbisComment *p_tagger = new MetaIOFLACVorbisComment;
+        QString filename = metadata->Filename();
+        QString tmp = *outfile;
+        metadata->setFilename(tmp);
+        p_tagger->write(metadata);
+        metadata->setFilename(filename);
+        delete p_tagger;
     }
 }
 

@@ -29,6 +29,7 @@ using namespace std;
 #include "output.h"
 #include "recycler.h"
 #include "metadata.h"
+#include "metaioavfcomment.h"
 
 #include <mythtv/mythcontext.h>
 
@@ -376,58 +377,38 @@ void avfDecoder::run()
     deinit();
 }
 
-Metadata* avfDecoder::getMetadata(QSqlDatabase *x)
+Metadata* avfDecoder::getMetadata(QSqlDatabase *db)
 {
-    Metadata *testdb = new Metadata(filename);
-    if (testdb->isInDatabase(x, musiclocation))
-        return testdb;
-
-    delete testdb;
-
-    QString artist = "", album = "", title = "", genre = "";
-    int year = 0, tracknum = 0, length = 0;
-
-    // This function gets called during the search for music
-    // data and may not have initialized the library
-    av_register_all();
-
-    // Open the specified file and populate the metadata info
-    if (av_open_input_file(&ic, filename, ifmt, 0, ap) < 0)
-        return NULL;
-    if (av_find_stream_info(ic) < 0)
-        return NULL;
-
-    av_estimate_timings(ic);
-
-    artist += (char *)ic->author;
-    album += (char *)ic->album;
-    title += (char *)ic->title;
-    genre += (char *)ic->genre;
-    year = ic->year;
-    tracknum = ic->track;
-    length = (ic->duration / AV_TIME_BASE) * 1000;
-
-    if (ignore_id3 || title.isEmpty())
+    Metadata *mdata = new Metadata(filename);
+    if (mdata->isInDatabase(db, musiclocation))
     {
-        getMetadataFromFilename(filename, QString(".wma$"), artist, album,
-                                title, genre, tracknum);
+        return mdata;
     }
 
-    Metadata *retdata = new Metadata(filename, artist, album, title, genre,
-                                     year, tracknum, length);
+    delete mdata;
 
-    retdata->dumpToDatabase(x, musiclocation);
 
+    MetaIOAVFComment* p_tagger = new MetaIOAVFComment;
+    if (ignore_id3)
+        mdata = p_tagger->readFromFilename(filename);
+    else
+        mdata = p_tagger->read(filename);
     
-    av_close_input_file(ic);
+    delete p_tagger;
 
-    ic = NULL;
-    return retdata;
+    if (mdata)
+        mdata->dumpToDatabase(db, musiclocation);
+    else
+        cerr << "avfdecoder.o: Could not read metadata from " << filename << endl;
+
+    return mdata;
 }    
 
 void avfDecoder::commitMetadata(Metadata *mdata)
 {
-    mdata = mdata;
+    MetaIOAVFComment* p_tagger = new MetaIOAVFComment;
+    p_tagger->write(mdata);
+    delete p_tagger;
 }
 
 bool avfDecoderFactory::supports(const QString &source) const

@@ -91,7 +91,6 @@ void Decoder::removeListener(QObject *object)
 
 // static methods
 
-QString Decoder::filename_format = "";
 int Decoder::ignore_id3 = 0;
 QString Decoder::musiclocation = "";
 
@@ -104,7 +103,6 @@ void Decoder::SetLocationFormatUseTags(void)
 
     musiclocation = startdir;
 
-    filename_format = gContext->GetSetting("NonID3FileNameFormat").upper();
     ignore_id3 = gContext->GetNumSetting("Ignore_ID3", 0);
 }
 
@@ -182,46 +180,4 @@ Decoder *Decoder::create(const QString &source, QIODevice *input,
     return decoder;
 }
 
-void Decoder::getMetadataFromFilename(const QString filename,
-                                      const QString regext, QString &artist, 
-                                      QString &album, QString &title, 
-                                      QString &genre, int &tracknum)
-{
-    // Ignore_ID3 header
-    int part_num = 0;
-    QStringList fmt_list = QStringList::split("/", filename_format);
-    QStringList::iterator fmt_it = fmt_list.begin();
-
-    // go through loop once to get minimum part number
-    for(; fmt_it != fmt_list.end(); fmt_it++, part_num--);
-
-    // reset to go through loop for real
-    fmt_it = fmt_list.begin();
-    for(; fmt_it != fmt_list.end(); fmt_it++, part_num++)
-    {
-        QString part_str = filename.section( "/", part_num, part_num);
-        part_str.replace(QRegExp(QString("_")), QString(" "));
-        part_str.replace(QRegExp(regext, FALSE), QString(""));
-
-        if ( *fmt_it == "GENRE" )
-            genre = part_str;
-        else if ( *fmt_it == "ARTIST" )
-            artist = part_str;
-        else if ( *fmt_it == "ALBUM" ) 
-            album = part_str;
-        else if ( *fmt_it == "TITLE" )
-            title = part_str;
-        else if ( *fmt_it == "TRACK_TITLE" ) 
-        {
-            part_str.replace(QRegExp(QString("-")), QString(" "));
-            QString s_tmp = part_str;
-            s_tmp.replace(QRegExp(QString(" .*"), FALSE), QString(""));
-            tracknum = s_tmp.toInt();
-            title = part_str;
-            title.replace(QRegExp(QString("^[0-9][0-9]? "), FALSE),
-                          QString(""));
-            title = title.simplifyWhiteSpace();
-        }
-    }
-}
 

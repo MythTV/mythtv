@@ -95,10 +95,6 @@ class Decoder : public QThread
 
     QString filename;
 
-    void getMetadataFromFilename(const QString filename, const QString regext,
-                                 QString &artist, QString &album,
-                                 QString &title, QString &genre, int &tracknum);
-
     static QString filename_format;
     static int ignore_id3;
     static QString musiclocation;

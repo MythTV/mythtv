@@ -21,7 +21,7 @@ class VorbisEncoder : public Encoder
     long packetsdone;
     int eos;
     long bytes_written;
-    vorbis_comment vc;
+    vorbis_comment* mpVc;
     ogg_stream_state os;
 
     vorbis_dsp_state vd;

@@ -15,6 +15,7 @@ using namespace std;
 #include "constants.h"
 #include "buffer.h"
 #include "output.h"
+#include "metaioid3v2.h"
 
 #include <mythtv/mythcontext.h>
 
@@ -537,224 +538,36 @@ enum mad_flow MadDecoder::madError(struct mad_stream *stream,
 
 Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
 {
-    Metadata *testdb = new Metadata(filename);
-    if (testdb->isInDatabase(db, musiclocation))
+    Metadata *mdata = new Metadata(filename);
+    if (mdata->isInDatabase(db, musiclocation))
     {
-        return testdb;
+        return mdata;
     }
 
-    delete testdb;
+    delete mdata;
 
-    QString artist = "", album = "", title = "", genre = "";
-    int year = 0, tracknum = 0, length = 0;
-    id3_file *id3file = NULL;
 
-    if (!ignore_id3)
-    {
-        id3file = id3_file_open(filename.local8Bit(), ID3_FILE_MODE_READONLY);
-        if (!id3file)
-            id3file = id3_file_open(filename.ascii(), ID3_FILE_MODE_READONLY);
-    }
-
-    if (id3file)
-    {
-        id3_tag *tag = id3_file_tag(id3file);
-
-        if (!tag)
-        {
-            id3_file_close(id3file);
-            return NULL;
-        }
-
-        struct {
-            char const *id;
-            char const *name;
-        } const info[] = {
-            { ID3_FRAME_TITLE,  "Title"  },
-            { ID3_FRAME_ARTIST, "Artist" },
-            { ID3_FRAME_ALBUM,  "Album"  },
-            { ID3_FRAME_YEAR,   "Year"   },
-            { ID3_FRAME_TRACK,  "Track"  },
-            { ID3_FRAME_GENRE,  "Genre"  },
-        };
-
-        for (unsigned int i = 0; i < sizeof(info) / sizeof(info[0]); ++i)
-        {
-            struct id3_frame *frame = id3_tag_findframe(tag, info[i].id, 0);
-            if (!frame)
-                continue;
-
-            id3_ucs4_t const *ucs4 = NULL;
-            id3_latin1_t *latin1;
-            union id3_field *field;
-            unsigned int nstrings;
-
-            field = &frame->fields[1];
-            nstrings = id3_field_getnstrings(field);
-
-            for (unsigned int j = 0; j < nstrings; ++j)
-            {
-                ucs4 = id3_field_getstrings(field, j);
-                if(!ucs4)
-                {
-                    cerr << "maddecoder.o: id3_field_getstrings() did not "
-                         << "return anything."
-                         << endl;
-                }
+    MetaIOID3v2* p_tagger = new MetaIOID3v2;
+    if (ignore_id3)
+        mdata = p_tagger->readFromFilename(filename);
                 else
-                {
-                    if (!strcmp(info[i].id, ID3_FRAME_GENRE))
-                        ucs4 = id3_genre_name(ucs4);
+        mdata = p_tagger->read(filename);
 
-                    latin1 = id3_ucs4_latin1duplicate(ucs4);
-                    if (!latin1)
-                        continue;
+    delete p_tagger;
 
-                    switch (i)
-                    {
-                        case 0: title += (char *)latin1; break;
-                        case 1: artist += (char *)latin1; break;
-                        case 2: album += (char *)latin1; break;
-                        case 3: if (year == 0) 
-                                    year = atoi((char *)latin1); 
-                                break;
-                        case 4: if (tracknum == 0) 
-                                    tracknum = atoi((char *)latin1); 
-                                break;
-                        case 5: if (genre != (char *)latin1)
-                                    genre += (char *)latin1; 
-                                break;
-                        default: break;
-                    }
-
-                    free(latin1);
-                }
-            }
-        }
-
-        id3_file_close(id3file);
-    }
-
-    if(title.isEmpty())
-    {
-        getMetadataFromFilename(filename, QString(".mp3$"), artist, album, 
-                                title, genre, tracknum);
-    }
-
-    struct mad_stream stream;
-    struct mad_header header;
-    mad_timer_t timer;
-
-    unsigned char buffer[8192];
-    unsigned int buflen = 0;
-
-    mad_stream_init(&stream);
-    mad_header_init(&header);
-   
-    timer = mad_timer_zero;
-
-    FILE *input = fopen(filename.local8Bit(), "r");
-    if (!input)
-        input = fopen(filename.ascii(), "r");
-
-    if (!input)
-        return NULL;
-
-    struct stat s;
-    fstat(fileno(input), &s);
-    unsigned long old_bitrate = 0;
-    bool vbr = false;
-    int amount_checked = 0;
-    int alt_length = 0;
-    bool loop_de_doo = true;
-    
-    while (loop_de_doo) 
-    {
-        if (buflen < sizeof(buffer)) 
-        {
-            int bytes;
-            bytes = fread(buffer + buflen, 1, sizeof(buffer) - buflen, input);
-            if (bytes <= 0)
-                break;
-            buflen += bytes;
-        }
-
-        mad_stream_buffer(&stream, buffer, buflen);
-
-        while (1)
-        {
-            if (mad_header_decode(&header, &stream) == -1)
-            {
-                if (!MAD_RECOVERABLE(stream.error))
-                {
-                    break;
-                }
-                if (stream.error == MAD_ERROR_LOSTSYNC)
-                {
-                    int tagsize = id3_tag_query(stream.this_frame,
-                                                stream.bufend - 
-                                                stream.this_frame);
-                    if (tagsize > 0)
-                    {
-                        mad_stream_skip(&stream, tagsize);
-                        s.st_size -= tagsize;
-                    }
-                }
-            }
-            else
-            {
-                if(amount_checked == 0)
-                {
-                    old_bitrate = header.bitrate;
-                }
-                else if(header.bitrate != old_bitrate)
-                {
-                    vbr = true;
-                }
-                if(amount_checked == 32 && !vbr)
-                {
-                    alt_length = (s.st_size * 8) / (old_bitrate / 1000);
-                    loop_de_doo = false;
-                    break;
-                }
-                amount_checked++;
-                mad_timer_add(&timer, header.duration);
-            }
-            
-        }
-        
-        if (stream.error != MAD_ERROR_BUFLEN)
-            break;
-
-        memmove(buffer, stream.next_frame, &buffer[buflen] - stream.next_frame);
-        buflen -= stream.next_frame - &buffer[0];
-    }
-
-    mad_header_finish(&header);
-    mad_stream_finish(&stream);
-
-    fclose(input);
-
-    if (vbr)
-    {
-        length = mad_timer_count(timer, MAD_UNITS_MILLISECONDS);
-    }
+    if (mdata)
+        mdata->dumpToDatabase(db, musiclocation);
     else
-    {
-        length = alt_length;
-    }
+        cerr << "maddecoder.o: Could not read metadata from " << filename << endl;
 
-    Metadata *retdata = new Metadata(filename, artist, album, title, genre,
-                                     year, tracknum, length);
-
-    retdata->dumpToDatabase(db, musiclocation);
-
-    return retdata;
+    return mdata;
 }
 
 void MadDecoder::commitMetadata(Metadata *mdata)
 {
-    mdata = mdata;
+    MetaIOID3v2* p_tagger = new MetaIOID3v2;
+    p_tagger->write(mdata);
+    delete p_tagger;
 }
 
 

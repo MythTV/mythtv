@@ -12,6 +12,7 @@ using namespace std;
 #include "output.h"
 #include "recycler.h"
 #include "metadata.h"
+#include "metaioflacvorbiscomment.h"
 
 #include <mythtv/mythcontext.h>
 
@@ -411,210 +412,37 @@ E=VALUE" */
 
 Metadata *FlacDecoder::getMetadata(QSqlDatabase *db)
 {
-    Metadata *testdb = new Metadata(filename);
-    if (testdb->isInDatabase(db, musiclocation))
-        return testdb;
-
-    delete testdb;
-
-    QString artist = "", album = "", title = "", genre = "";
-    int year = 0, tracknum = 0, length = 0;
-
-    FILE *input = fopen(filename.local8Bit(), "r");
-
-    if (!input)
-        return NULL;
-
-    FLAC__Metadata_Chain *chain = FLAC__metadata_chain_new();
-    if (!FLAC__metadata_chain_read(chain, filename.local8Bit()))
+    Metadata *mdata = new Metadata(filename);
+    if (mdata->isInDatabase(db, musiclocation))
     {
-        FLAC__metadata_chain_delete(chain); 
-        return NULL;
+        return mdata;
     }
 
-    bool found_vc_block = false;
-    FLAC__StreamMetadata *block = 0;
-    FLAC__Metadata_Iterator *iterator = FLAC__metadata_iterator_new();
+    delete mdata;
 
-    FLAC__metadata_iterator_init(iterator, chain);
-
-    block = FLAC__metadata_iterator_get_block(iterator);
-
-    FLAC__ASSERT(0 != block);
-    FLAC__ASSERT(block->type == FLAC__METADATA_TYPE_STREAMINFO);
-
-    int samplerate = block->data.stream_info.sample_rate;
-    int totalsamples = block->data.stream_info.total_samples;
-    int bytesperms = (samplerate) / 1000;
-
-    length = totalsamples / bytesperms;
-
-    do {
-        block = FLAC__metadata_iterator_get_block(iterator);
-        if (block->type == FLAC__METADATA_TYPE_VORBIS_COMMENT)
-            found_vc_block = true;
-    } while (!found_vc_block && FLAC__metadata_iterator_next(iterator));
-
-    if (!found_vc_block)
-    {
-        FLAC__metadata_chain_delete(chain);
-        FLAC__metadata_iterator_delete(iterator);
-        return NULL;
-    }
-
-    FLAC__ASSERT(0 != block);
-    FLAC__ASSERT(block->type == FLAC__METADATA_TYPE_VORBIS_COMMENT);
-
-    title = getComment(block, "title");
-
-    if (ignore_id3 || title.isEmpty())
-    {
-        title = "";
-        getMetadataFromFilename(filename, QString(".flac$"), artist, album, 
-                                title, genre, tracknum);
-    }
+    MetaIOFLACVorbisComment* p_tagger = new MetaIOFLACVorbisComment;
+    if (ignore_id3)
+        mdata = p_tagger->readFromFilename(filename);
     else
-    {
-        artist = getComment(block, "artist");
-        album = getComment(block, "album");
-        genre = getComment(block, "genre");
-        tracknum = getComment(block, "tracknumber").toInt(); 
-        year = getComment(block, "date").toInt();
-    }
+        mdata = p_tagger->read(filename);
 
-    Metadata *retdata = new Metadata(filename, artist, album, title, genre,
-                                     year, tracknum, length);
+    delete p_tagger;
 
-    FLAC__metadata_chain_delete(chain);
-    FLAC__metadata_iterator_delete(iterator);
+    if (mdata)
+        mdata->dumpToDatabase(db, musiclocation);
+    else
+        cerr << "flacdecoder.o: Could not read metadata from " << filename << endl;
 
-    retdata->dumpToDatabase(db, musiclocation);
-
-    fclose(input);
-
-    return retdata;
+    return mdata;
 }    
 
 void FlacDecoder::commitMetadata(Metadata *mdata)
 {
-    FILE *input = fopen(filename.local8Bit(), "r");
-
-    if (!input)
-        return;
-
-    FLAC__Metadata_Chain *chain = FLAC__metadata_chain_new();
-    if (!FLAC__metadata_chain_read(chain, filename.local8Bit()))
-    {
-        FLAC__metadata_chain_delete(chain);
-        return;
+    MetaIOFLACVorbisComment* p_tagger = new MetaIOFLACVorbisComment;
+    p_tagger->write(mdata);
+    delete p_tagger;
     }
 
-    bool found_vc_block = false;
-    FLAC__StreamMetadata *block = 0;
-    FLAC__Metadata_Iterator *iterator = FLAC__metadata_iterator_new();
-
-    FLAC__metadata_iterator_init(iterator, chain);
-
-    do {
-        block = FLAC__metadata_iterator_get_block(iterator);
-        if (block->type == FLAC__METADATA_TYPE_VORBIS_COMMENT)
-            found_vc_block = true;
-    } while (!found_vc_block && FLAC__metadata_iterator_next(iterator));
-
-    if (!found_vc_block)
-    {
-        block = FLAC__metadata_object_new(FLAC__METADATA_TYPE_VORBIS_COMMENT);
-
-        while (FLAC__metadata_iterator_next(iterator))
-            ;
-
-        if (!FLAC__metadata_iterator_insert_block_after(iterator, block))
-        {
-            FLAC__metadata_chain_delete(chain);
-            FLAC__metadata_iterator_delete(iterator);
-            return;
-        }
-
-        FLAC__ASSERT(FLAC__metadata_iterator_get_block(iterator) == block);
-    }
-
-    FLAC__ASSERT(0 != block);
-    FLAC__ASSERT(block->type == FLAC__METADATA_TYPE_VORBIS_COMMENT);
-
-    if (block->data.vorbis_comment.comments > 0)
-        FLAC__metadata_object_vorbiscomment_resize_comments(block, 0);
-
-    setComment(block, "artist", mdata->Artist());
-    setComment(block, "album", mdata->Album());
-    setComment(block, "title", mdata->Title());
-    setComment(block, "genre", mdata->Genre());
-
-    char text[128];
-    if (mdata->Track() != 0)
-    {
-        sprintf(text, "%d", mdata->Track());
-        setComment(block, "tracknumber", text);
-    }
-
-    if (mdata->Year() != 0)
-    {
-        sprintf(text, "%d", mdata->Year());
-        setComment(block, "date", text);
-    }
-
-    FLAC__metadata_chain_write(chain, false, false);
-
-    FLAC__metadata_chain_delete(chain);
-    FLAC__metadata_iterator_delete(iterator);
-
-    fclose(input);
-}
-
-QString FlacDecoder::getComment(FLAC__StreamMetadata *block, const char *label)
-{
-    FLAC__StreamMetadata_VorbisComment_Entry *entry;
-    entry = block->data.vorbis_comment.comments;
-
-    QString qlabel = label;
-    QString retstr = "";
-    for (unsigned int i = 0; i < block->data.vorbis_comment.num_comments; i++)
-    {
-        char *fieldname = new char[(entry + i)->length + 1];
-        fieldname[(entry + i)->length] = 0;
-        strncpy(fieldname, (char *)((entry + i)->entry), (entry + i)->length);
-        QString entrytext = fieldname;
-	    delete [] fieldname;
-        int loc;
-
-        if ((loc = entrytext.find("=")) && 
-            entrytext.lower().left(qlabel.length()) == qlabel.lower())
-        {
-            return QString::fromUtf8(entrytext.right(entrytext.length() - loc - 1));
-        }
-    }
-
-    return QString(NULL);
-}
-
-void FlacDecoder::setComment(FLAC__StreamMetadata *block, const char *label,
-                             const QString &data)
-{
-    if (data.length() < 1)
-        return;
-
-    QString test = getComment(block, label);
-
-    QString thenewentry = QString(label).upper() + "=" + data;
-    QCString utf8str = thenewentry.utf8();
-    int thenewentrylen = utf8str.length();
-
-    FLAC__StreamMetadata_VorbisComment_Entry entry;
-
-    entry.length = thenewentrylen;
-    entry.entry = (unsigned char *)utf8str.data();
-
-    FLAC__metadata_object_vorbiscomment_insert_comment(block, block->data.vorbis_comment.num_comments, entry, true);
-}
 
 bool FlacDecoderFactory::supports(const QString &source) const
 {

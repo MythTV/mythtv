@@ -42,6 +42,8 @@ class Encoder;
 #define MMX 1
 #endif
 
+#include "encoder.h"
+
 class LameEncoder : public Encoder 
 {
   public:
@@ -52,7 +54,7 @@ class LameEncoder : public Encoder
 
   private:
     int init_encoder(lame_global_flags *gf, int quality, bool vbr);
-    void init_id3tags(lame_global_flags *gf, Metadata *metadata);
+    void init_id3tags(lame_global_flags *gf);
 
     int quality;
     int bits;

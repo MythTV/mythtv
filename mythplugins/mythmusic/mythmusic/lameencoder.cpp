@@ -6,7 +6,7 @@
     Please send an e-mail to sfr@gmx.net if you have
     questions or comments.
 
-    Project Website:  http://www.mythtv.org/
+    Project Website: out http://www.mythtv.org/
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,8 +29,8 @@
 #include <qprogressbar.h>
 
 #include "metadata.h"
-#include "encoder.h"
 #include "lameencoder.h"
+#include "metaioid3v2.h"
 
 #include <iostream>
 
@@ -43,27 +43,15 @@ int write_buffer(char *buf, int bufsize, FILE *fp)
     return fwrite(buf, 1, bufsize, fp);
 }
 
-void LameEncoder::init_id3tags(lame_global_flags *gf, Metadata *metadata)
+void LameEncoder::init_id3tags(lame_global_flags *gf)
 {
+    // Very basic ID3v2 Header. Rewritten later, but libid3tag.
     id3tag_init(gf);
 
-    QString tagstr = metadata->Artist();
-    id3tag_set_artist(gf, tagstr);    
- 
-    tagstr = metadata->Title();
-    id3tag_set_title(gf, tagstr);
-
-    tagstr = metadata->Album();
-    id3tag_set_album(gf, tagstr);
-
-    tagstr = metadata->Genre();
-    id3tag_set_genre(gf, tagstr);
-
-    tagstr = QString::number(metadata->Track(), 10);
-    id3tag_set_track(gf, tagstr);
-
-    tagstr = QString::number(metadata->Year(), 10);
-    id3tag_set_year(gf, tagstr);
+    // Dummy tag. It'll get overwritten later by the more flexible
+    // libid3 (MAD). Unf. it wont write the id3 tag to the file if
+    // none exists, hense this dummy entry.
+    id3tag_set_title(gf, "Title");
 
     // write v2 tags.
     id3tag_v2_only(gf);
@@ -124,7 +112,7 @@ LameEncoder::LameEncoder(const QString &outfile, int qualitylevel,
 
     gf = lame_init();
 
-    init_id3tags(gf, metadata);
+    init_id3tags(gf);
 
     int lameret = init_encoder(gf, qualitylevel, vbr);
     if (lameret < 0)
@@ -143,6 +131,27 @@ LameEncoder::~LameEncoder()
         lame_close(gf);
     if (mp3buf)
         delete[] mp3buf;
+        
+    // Need to close the file here.
+    if (out)
+    {
+        fclose(out);
+        
+        // Make sure the base class doesn't do a double clear.
+        out = NULL;
+    }
+       
+    // Now write the Metadata
+    if (metadata)
+    {
+        MetaIOID3v2* p_tagger = new MetaIOID3v2;
+        QString filename = metadata->Filename();
+        QString tmp = *outfile;
+        metadata->setFilename(tmp);
+        p_tagger->write(metadata);
+        metadata->setFilename(filename);
+        delete p_tagger;
+    }
 }
 
 int LameEncoder::addSamples(int16_t * bytes, unsigned int length)

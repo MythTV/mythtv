@@ -1,9 +1,9 @@
 #ifndef FLACDECODER_H_
 #define FLACDECODER_H_
 
-#include "decoder.h"
-
 #include <FLAC/all.h>
+
+#include "decoder.h"
 
 class Metadata;
 
@@ -46,9 +46,7 @@ class FlacDecoder : public Decoder
     double totalTime, seekTime;
     unsigned long totalsamples;
 
-    QString getComment(FLAC__StreamMetadata *block, const char *label);
-    void setComment(FLAC__StreamMetadata *block, const char *label,
-                    const QString &data);
+
 };
 
 #endif

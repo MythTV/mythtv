@@ -40,8 +40,6 @@ class VorbisDecoder : public Decoder
     int chan;
     unsigned long output_size;
     double totalTime, seekTime;
-
-    QString getComment(vorbis_comment *comment, const char *label);
 };
 
 #endif

@@ -12,6 +12,7 @@ using namespace std;
 #include "output.h"
 #include "recycler.h"
 #include "metadata.h"
+#include "metaiooggvorbiscomment.h"
 
 #include <mythtv/mythcontext.h>
 
@@ -319,89 +320,38 @@ void VorbisDecoder::run()
 
 Metadata *VorbisDecoder::getMetadata(QSqlDatabase *db)
 {
-    Metadata *testdb = new Metadata(filename);
-    if (testdb->isInDatabase(db, musiclocation))
-        return testdb;
-
-    delete testdb;
-
-    QString artist = "", album = "", title = "", genre = "";
-    int year = 0, tracknum = 0, length = 0;
-
-    FILE *input = fopen(filename.local8Bit(), "r");
-
-    if (!input)
-        return NULL;
-
-    OggVorbis_File vf;
-    vorbis_comment *comment = NULL;
-
-    if (ov_open(input, &vf, NULL, 0))
+    Metadata *mdata = new Metadata(filename);
+    if (mdata->isInDatabase(db, musiclocation))
     {
-        fclose(input);
-        return NULL;
+        return mdata;
     }
 
-    comment = ov_comment(&vf, -1);
-    length = (int)ov_time_total(&vf, -1) * 1000;
+    delete mdata;
 
-    //
-    //  Try and fill metadata info from tags in the ogg file
-    //
 
-    artist = getComment(comment, "artist");
-    album = getComment(comment, "album");
-    title = getComment(comment, "title");
-    genre = getComment(comment, "genre");
-    tracknum = atoi(getComment(comment, "tracknumber").ascii()); 
-    year = atoi(getComment(comment, "date").ascii());
+    MetaIOOggVorbisComment* p_tagger = new MetaIOOggVorbisComment;
+    if (ignore_id3)
+        mdata = p_tagger->readFromFilename(filename);
+    else
+        mdata = p_tagger->read(filename);
 
-    //
-    //  If the user has elected to get metadata from file names or if the
-    //  above did not find a title tag
-    //
+    delete p_tagger;
 
-    if (ignore_id3 || title.isEmpty())
-    {
-        artist = "";
-        album = "";
-        title = "";
-        genre = "";
-        tracknum = 0;
-        year = 0;
-        getMetadataFromFilename(filename, QString(".ogg$"), artist, album, 
-                                title, genre, tracknum);
-    }
+    if (mdata)
+        mdata->dumpToDatabase(db, musiclocation);
+    else
+        cerr << "vorbisdecoder.o: Could not read metadata from " << filename << endl;    
 
-    ov_clear(&vf);
-
-    Metadata *retdata = new Metadata(filename, artist, album, title, genre,
-                                     year, tracknum, length);
-
-    retdata->dumpToDatabase(db, musiclocation);
-
-    return retdata;
+    return mdata;
 }    
 
 void VorbisDecoder::commitMetadata(Metadata *mdata)
 {
-    mdata = mdata;  // -Wall annoyance
+    MetaIOOggVorbisComment* p_tagger = new MetaIOOggVorbisComment;
+    p_tagger->write(mdata);
+    delete p_tagger;
 }
 
-
-QString VorbisDecoder::getComment(vorbis_comment *vc, const char *label)
-{
-    char *tag;
-    QString retstr;
-
-
-    if (vc && (tag = vorbis_comment_query(vc, (char *)label, 0)) != NULL)
-        retstr = QString::fromUtf8(tag);
-    else
-        retstr = "";
-
-    return retstr;
-}
 
 bool VorbisDecoderFactory::supports(const QString &source) const
 {
