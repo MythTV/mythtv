@@ -1,0 +1,53 @@
+<myththeme>
+
+  <background style="normal">
+    <image>background.png</image>
+    <buttonarea>25,100,750,480</buttonarea>
+    <visiblerowlimit>10</visiblerowlimit>
+  </background>
+
+  <genericbutton>
+    <normal>button_off.png</normal>
+    <active>button_on.png</active>
+    <text>
+      <area>20,10,20,5</area>
+      <color>white</color>
+      <fontname>Arial</fontname>
+      <fontsize>20</fontsize>
+      <bold>yes</bold>
+      <centered>yes</centered>
+    </text>
+  </genericbutton>
+  
+  <titles>
+    <position>65,36</position>
+    <image mode="TV">title/title_tv.png</image>
+    <image mode="MAIN">title/title_blank.png</image>
+    <image mode="MUSIC">title/title_music.png</image>
+    <image mode="GALLERY">title/title_gallery.png</image>
+    <image mode="GAMES">title/title_games.png</image>
+    <image mode="WEATHER">title/title_weather.png</image>
+    <image mode="SETUP">title/title_setup.png</image>
+    <image mode="VIDEO">title/title_video.png</image>
+    <image mode="DVD">title/title_dvd.png</image>
+    <image mode="SCHEDULE">title/title_tv.png</image>
+    <image mode="SEARCH">title/title_tv.png</image>
+    <image mode="WORDS">title/title_tv.png</image>
+    <image mode="LISTS">title/title_tv.png</image>
+    <image mode="TVSETUP">title/title_setup.png</image>
+    <image mode="SETUP_TVRECPRIORITIES">title/title_setup.png</image>
+    <image mode="MEDIA_SETUP">title/title_setup.png</image>
+    <image mode="INFO_SETUP">title/title_setup.png</image>
+    <image mode="DVD">title/title_dvd.png</image>
+    <image mode="DVD_SETTINGS">title/title_dvd.png</image>
+    <image mode="MUSIC_SETTINGS">title/title_music.png</image>
+    <image mode="VIDEO_SETTINGS">title/title_video.png</image>
+    <image mode="GAME_SETTINGS">title/title_games.png</image>
+    <image mode="MANAGE_RECORDINGS">title/title_tv.png</image>
+    <image mode="LIBRARY">title/title_blank.png</image>
+    <image mode="INFO">title/title_blank.png</image>
+    <image mode="OPTICAL_DISK">title/title_blank.png</image>
+    <image mode="UTIL">title/title_blank.png</image>
+  </titles>
+
+</myththeme>
