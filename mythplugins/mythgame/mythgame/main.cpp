@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    gContext = new MythContext();
+    gContext = new MythContext(MYTH_BINARY_VERSION);
 
     gContext->LoadSettingsFiles("mythgame-settings.txt");
 
@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    QString paths = gContext->GetSetting("TreeLevels");
+    QString paths = gContext->GetSetting("GameTreeLevels");
 
     QValueList<RomInfo> Romlist;
 

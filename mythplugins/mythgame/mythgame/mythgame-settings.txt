@@ -1,5 +1,5 @@
 # Order in which to sort the game roms - this is for all systems
-TreeLevels=system year genre gamename
+GameTreeLevels=system year genre gamename
 
 # Number of screenshots to show per column. if 0 then use game names only.
 # default is 0 -- set this to 5 if you want the screenshot selection menu.

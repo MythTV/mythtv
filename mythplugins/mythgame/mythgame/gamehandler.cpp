@@ -62,6 +62,8 @@ void GameHandler::processAllGames(void)
 
 GameHandler* GameHandler::GetHandler(RomInfo *rominfo)
 {
+    if (!rominfo)
+        return NULL;
     checkHandlers();
     GameHandler *handler = handlers->first();
     while(handler)

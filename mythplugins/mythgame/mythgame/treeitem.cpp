@@ -103,7 +103,7 @@ void TreeItem::setOpen(bool o)
         QString conjunction;
         QString column;
 
-        QStringList fields = QStringList::split(" ", gContext->GetSetting("TreeLevels"));
+        QStringList fields = QStringList::split(" ", gContext->GetSetting("GameTreeLevels"));
         for (QStringList::Iterator field = fields.begin();
              field != fields.end();
              ++field)
