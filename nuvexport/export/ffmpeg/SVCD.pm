@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.01.26 (xris)
+#Last Updated: 2005.02.06 (xris)
 #
 #  export::ffmpeg::SVCD
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
@@ -27,7 +27,7 @@ package export::ffmpeg::SVCD;
                      'enabled'         => 1,
                      'errors'          => [],
                     # Transcode-related settings
-                     'denoise'         => 1,
+                     'noise_reduction' => 1,
                      'deinterlace'     => 1,
                      'crop'            => 1,
                     # SVCD-specific settings
@@ -120,10 +120,12 @@ package export::ffmpeg::SVCD;
         my $res = ($standard eq 'PAL') ? '480x576' : '480x480';
     # Build the ffmpeg string
         $self->{'ffmpeg_xtra'} = ' -b ' . $self->{'v_bitrate'}
-                               . ' -vcodec mpeg2video'
-                               . ' -qmin ' . $self->{'quantisation'}
-                               . ' -ab ' . $self->{'a_bitrate'}
-                               . " -ar 44100 -acodec mp2 -s $res -f svcd";
+                                .' -vcodec mpeg2video'
+                                .' -qmin ' . $self->{'quantisation'}
+                                .' -ab ' . $self->{'a_bitrate'}
+                                ." -ar 44100 -acodec mp2"
+                                ." -aspect 4:3"
+                                ." -s $res -f svcd";
     # Execute the parent method
         $self->SUPER::export($episode, ".mpg");
     }

@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.01.26 (gjhurlbu)
+#Last Updated: 2005.02.06 (xris)
 #
 #  export::ffmpeg::VCD
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
@@ -54,8 +54,9 @@ package export::ffmpeg::VCD;
         my $res = ($standard eq 'PAL') ? '352x288' : '352x240';
     # Build the transcode string
         $self->{'ffmpeg_xtra'}  = " -b 1150 -vcodec mpeg1video"
-                                . " -ab 224 -ar 44100 -acodec mp2"
-                                . " -s $res -f vcd";
+                                 ." -ab 224 -ar 44100 -acodec mp2"
+                                 ." -aspect 4:3"
+                                 ." -s $res -f vcd";
     # Execute the parent method
         $self->SUPER::export($episode, ".mpg");
     }

@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.01.28 (xris)
+#Last Updated: 2005.02.06 (xris)
 #
 #  ffmpeg.pm
 #
@@ -128,7 +128,11 @@ package export::ffmpeg;
         }
 
     # Start the ffmpeg command
-        $ffmpeg .= "nice -n $Args{'nice'} ffmpeg -y -f s16le";
+        $ffmpeg .= "nice -n $Args{'nice'} ffmpeg";
+        if ($num_cpus > 1) {
+            $transcode .= ' -threads '.($num_cpus);
+        }
+        $ffmpeg .= " -y -f s16le";
         $ffmpeg .= " -ar " . $episode->{'finfo'}{'audio_sample_rate'};
         $ffmpeg .= " -ac " . $episode->{'finfo'}{'audio_channels'};
         $ffmpeg .= " -i /tmp/fifodir_$$/audout";

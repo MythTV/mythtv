@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.01.26 (xris)
+#Last Updated: 2005.02.06 (xris)
 #
 #  export::ffmpeg::XviD
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
@@ -28,7 +28,7 @@ package export::ffmpeg::XviD;
                      'enabled'         => 1,
                      'errors'          => [],
                     # Transcode-related settings
-                     'denoise'         => 1,
+                     'noise_reduction' => 1,
                      'deinterlace'     => 1,
                      'crop'            => 1,
                     # VBR-specific settings
@@ -112,7 +112,7 @@ package export::ffmpeg::XviD;
         load_finfo($episode);
     # Build the ffmpeg string
         $self->{'ffmpeg_xtra'} = ' -b ' . $self->{'v_bitrate'}
-                               . (($self->{'vbr'}) ? 
+                               . (($self->{'vbr'}) ?
                                  " -qmin $self->{'quantisation'} -qmax 31" : '')
                                . ' -vcodec xvid'
                                . ' -ab ' . $self->{'a_bitrate'}

@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.01.29 (xris)
+#Last Updated: 2005.02.06 (xris)
 #
 #  transcode.pm
 #
@@ -102,6 +102,22 @@ package export::transcode;
     # Take advantage of multiple CPU's?
         if ($num_cpus > 1) {
             $transcode .= ' -u 100,'.($num_cpus);
+        }
+    # Import aspect ratio
+        if ($episode->{'finfo'}{'aspect'}) {
+            $transcode .= ' --import_asr ';
+            if ($episode->{'finfo'}{'aspect'} == 1          || $episode->{'finfo'}{'aspect'} eq '1:1') {
+                $transcode .= '1';
+            }
+            elsif ($episode->{'finfo'}{'aspect'} =~ m/^1.3/ || $episode->{'finfo'}{'aspect'} eq '4:3') {
+                $transcode .= '2';
+            }
+            elsif ($episode->{'finfo'}{'aspect'} =~ m/^1.7/ || $episode->{'finfo'}{'aspect'} eq '16:9') {
+                $transcode .= '3';
+            }
+            elsif ($episode->{'finfo'}{'aspect'} == 2.21    || $episode->{'finfo'}{'aspect'} eq '2.21:1') {
+                $transcode .= '4';
+            }
         }
     # Not an mpeg
         unless ($episode->{'finfo'}{'is_mpeg'}) {
