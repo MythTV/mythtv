@@ -510,6 +510,19 @@ void GenericTree::deleteAllChildren()
     m_subnodes->clear();
 }
 
+void GenericTree::pruneAllChildren()
+{
+    //
+    //  This is just calls deleteAllChildren(), except that we turn off
+    //  AutoDelete'ion first. That way, we can pull out children that we
+    //  don't "own".
+    //
+
+    m_subnodes->setAutoDelete(false);
+    deleteAllChildren();
+    m_subnodes->setAutoDelete(true);
+}
+
 void GenericTree::MoveItemUpDown(GenericTree *item, bool flag)
 {
     if (item == m_subnodes->getFirst() && flag)

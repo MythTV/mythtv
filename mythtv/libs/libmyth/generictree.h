@@ -84,6 +84,7 @@ class GenericTree
     void sortByString();
     void sortBySelectable();
     void deleteAllChildren();
+    void pruneAllChildren();
 
     // only changes m_subnodes.  resort it if you want the others to change
     void MoveItemUpDown(GenericTree *item, bool flag);

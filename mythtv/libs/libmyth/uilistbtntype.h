@@ -96,7 +96,7 @@ class UIListTreeType : public UIType
     enum MovementUnit { MoveItem, MovePage, MoveMax };
     void MoveDown(MovementUnit unit = MoveItem);
     void MoveUp(MovementUnit unit = MoveItem);
-    void MoveLeft(bool do_refresh = false);
+    void MoveLeft(bool do_refresh = true);
     void MoveRight(void);
     void calculateScreenArea();
     void GoHome();

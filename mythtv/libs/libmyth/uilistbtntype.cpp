@@ -587,15 +587,65 @@ QStringList UIListTreeType::getRouteToCurrent()
 
 void UIListTreeType::tryToSetCurrent(QStringList route)
 {
+
+    //
+    //  Chutt, please fix this
+    //
+
     //
     //  Given a set of node strings/titles, try and follow them all the way
     //  into the current tree and then set the current node. If we don't
     //  make it all the way, go as far as we can, then set the current node.
     //
     
-    cout << "you want me to follow this: " 
-         << route.join("/")
-         << endl;
+
+    //
+    //  Start with the top, if that doesn't match, this is hopeless
+    //
+    
+    if(route.count() < 2)
+    {
+        return;
+    }
+    
+    if(route[0] != treetop->getString())
+    {
+        return;
+    }
+    
+    
+    currentpos = treetop;
+    curlevel = -1;
+    bool keep_going = true;
+    QStringList::Iterator it = route.begin();
+    ++it;
+    while(keep_going &&  it != route.end())
+    {
+        GenericTree *next_child = currentpos->getChildByName(*it);
+        if(next_child)
+        {
+            currentpos = (UIListGenericTree *)next_child;
+            curlevel++;
+            cout << "made it as far as " << *it << endl;
+        }
+        else
+        {
+            keep_going = false;
+            cout << "gave up on child descending with " << *it << endl;
+        }
+        ++it;
+    }
+
+
+    CreateLevel(curlevel);
+    currentlevel = GetLevel(curlevel);
+    
+    FillLevelFromTree(currentpos, currentlevel);
+
+    currentlevel->SetVisible(true);
+    currentlevel->SetActive(true);
+    SetCurrentPosition();
+    emit requestUpdate();
 }
 
 
