@@ -1,11 +1,13 @@
 CONFIG += debug
 #CONFIG += release
 
-PREFIX = /usr/local
+isEmpty( PREFIX ) {
+    PREFIX = /usr/local
+}
+
 MYTHLIBDIR = ../../mythtv/libs/
 
 INCLUDEPATH += $${PREFIX}/include
-INCLUDEPATH *= /usr/local/include
 INCLUDEPATH += $${MYTHLIBDIR}
 
 DEFINES += _GNU_SOURCE

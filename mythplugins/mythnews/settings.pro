@@ -1,12 +1,14 @@
 #CONFIG += debug
 CONFIG += release
 
-PREFIX = /usr/local
+isEmpty( PREFIX ) {
+    PREFIX = /usr/local
+}
+
 # FOR Debian
 #PREFIX = /usr
 
 INCLUDEPATH += $${PREFIX}/include
-INCLUDEPATH *= /usr/local/include
 
 LIBPATH += $${PREFIX}/lib
 

@@ -1,12 +1,13 @@
 CONFIG += debug
 #CONFIG += release
 
-PREFIX = /usr/local
+isEmpty( PREFIX ) {
+    PREFIX = /usr/local
+}
 
 LIBVERSION = 0.16
 
 INCLUDEPATH += $${PREFIX}/include
-INCLUDEPATH *= /usr/local/include
 
 LIBS *= -L$${PREFIX}/lib
 

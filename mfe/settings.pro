@@ -1,10 +1,11 @@
 CONFIG += debug
 #CONFIG += release
 
-PREFIX = /usr/local
+isEmpty( PREFIX ) {
+    PREFIX = /usr/local
+}
 
 INCLUDEPATH += $${PREFIX}/include
-INCLUDEPATH *= /usr/local/include
 
 DEFINES += _GNU_SOURCE
 DEFINES += PREFIX=\"$${PREFIX}\"
