@@ -159,10 +159,9 @@ int PlaybackSock::StartRecording(int capturecardnum, ProgramInfo *pginfo)
 void PlaybackSock::RecordPending(int capturecardnum, ProgramInfo *pginfo,
                                  int secsleft)
 {
-    QStringList strlist = QString("QUERY_REMOTEENCODER %1 %2")
-                                 .arg(capturecardnum).arg(secsleft);
+    QStringList strlist = QString("QUERY_REMOTEENCODER %1").arg(capturecardnum);
     strlist << "RECORD_PENDING";
-    strlist << "" + secsleft;
+    strlist << QString::number(secsleft);
     pginfo->ToStringList(strlist);
 
     SendReceiveStringList(strlist);

@@ -1471,7 +1471,7 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     else if (command == "RECORD_PENDING")
     {
         ProgramInfo *pginfo = new ProgramInfo();
-        int secsleft = commands[2].toInt();
+        int secsleft = slist[2].toInt();
         pginfo->FromStringList(slist, 3);
 
         enc->RecordPending(pginfo, secsleft);
