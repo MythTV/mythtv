@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2004-05-06, v0.14.11
+  2004-05-07, v0.14.12
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -6443,48 +6443,32 @@
 
   [1mCVS Only[0m
 
+  DataDirect will use different information for your video sources and
+  channels than was used by XMLTV. The following will clear your old
+  information in a way that will allow your EPG and existing recording
+  rules to continue to work as you'd expect.
+
   The first step is to create a backup of your database using the
   instructions found in ``I'd like to save or restore my database.''.
 
+  [1mNOTE[22m: Examine the contents of the backup file to be sure that the
+  backup succeeded before modifying your database.
+
+  [1mNOTE[22m: The MythTV DataDirect grabber requires wget version 1.9.1 or
+  later. Verify that this is installed before modifying your database.
   Next, start [1mmysql [22mand perform the following commands:
 
 
        $ mysql -u root mythconverg
        mysql>delete from program;
        mysql>drop table channel;
-       mysql>drop table videosource;
+       mysql>truncate table videosource;
 
 
 
-  At this point we need to recreate the two tables that we just deleted.
-  This will ensure that the channel numbers will lineup like they used
-  to - if we had not deleted the tables, the autoincrement would throw
-  everything off.  Open the mysqldump file you created in the backup
-  step and search for the CREATE TABLE channel and CREATE TABLE
-  videosource commands.
-
-  Cut-and-paste from the mysqldump file into the [1mmysql [22mmonitor.  Here is
-  an example, but make sure you use the one that's on [4myour[24m machine.
-
-
-       mysql>CREATE TABLE videosource (
-         sourceid int(10) unsigned NOT NULL auto_increment,
-         name varchar(128) NOT NULL default '',
-         xmltvgrabber varchar(128) default NULL,
-         userid varchar(128) NOT NULL default '',
-         freqtable varchar(16) NOT NULL default 'default',
-         lineupid varchar(64) default NULL,
-         password varchar(64) default NULL,
-         PRIMARY KEY  (sourceid),
-         UNIQUE KEY name (name)
-       ) TYPE=MyISAM;
-
-
-
-  Do the same for the CREATE TABLE channel section.  Once that's been
-  completed, exit from [1mmysql[22m.  Run the MythTV setup program and complete
-  the configuration as detailed in the section called ``Configuring the
-  Zap2It.com DataDirect service.'' and in ``Video Sources''.
+  Run the MythTV setup program and complete the configuration as
+  detailed in the section called ``Configuring the Zap2It.com DataDirect
+  service.'' and in ``Video Sources''.
 
   Once you're done running setup, run [1mmythfilldatabase [22mto populate the
   database with new data.
@@ -6512,13 +6496,12 @@
   then alter the [1murpmi [22mcommand appropriately.)
 
 
+       $ uname -a
+       Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
+       unknown GNU/Linux
 
-  $ uname -a
-  Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
-  unknown GNU/Linux
-
-  $ su
-  # urpmi kernel-source
+       $ su
+       # urpmi kernel-source
 
 
 
@@ -6529,7 +6512,7 @@
   Right now (2004-01-21), it's 0.1.9.  Untar the file.
 
 
-       $ tar -xzf ivtv-0.1.9.tar.gz
+  $ tar -xzf ivtv-0.1.9.tar.gz
 
 
 
@@ -6585,7 +6568,6 @@
        $ make
 
 
-
   Compile the [1mtest_ioctl [22mprogram:
 
 
@@ -6614,15 +6596,14 @@
   if you will not be using the IR remote that came with the card.
 
 
-
-  alias char-major-81     videodev
-  alias char-major-81-0   ivtv
-  alias char-major-61 lirc_i2c
-  options ivtv debug=1
-  options tuner type=2
-  options msp3400 once=1 simple=1
-  add below ivtv msp3400 saa7115 tuner
-  add above ivtv lirc_dev lirc_i2c
+       alias char-major-81     videodev
+       alias char-major-81-0   ivtv
+       alias char-major-61 lirc_i2c
+       options ivtv debug=1
+       options tuner type=2
+       options msp3400 once=1 simple=1
+       add below ivtv msp3400 saa7115 tuner
+       add above ivtv lirc_dev lirc_i2c
 
 
 
@@ -6637,11 +6618,12 @@
   located on the same key as the tilde " " and not the single quote.
 
 
-       $ su
-       # cd /lib/modules/`uname -r`
-       # pwd
-       /lib/modules/2.4.21-0.16mdk
-       # find . -name "msp3400*" | xargs rm -f
+
+  $ su
+  # cd /lib/modules/`uname -r`
+  # pwd
+  /lib/modules/2.4.21-0.16mdk
+  # find . -name "msp3400*" | xargs rm -f
 
 
 
@@ -6666,16 +6648,15 @@
   Check that the card is being recognized on the PCI bus:
 
 
+       $ lspci -v
+       <snip>
 
-  $ lspci -v
-  <snip>
-
-  00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
-  Encoder (rev 01)
-          Subsystem: Hauppauge computer works Inc.: Unknown device 4801
-          Flags: bus master, medium devsel, latency 32, IRQ 11
-          Memory at d0000000 (32-bit, prefetchable) [size=64M]
-          Capabilities: <available only to root>
+       00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
+       Encoder (rev 01)
+               Subsystem: Hauppauge computer works Inc.: Unknown device 4801
+               Flags: bus master, medium devsel, latency 32, IRQ 11
+               Memory at d0000000 (32-bit, prefetchable) [size=64M]
+               Capabilities: <available only to root>
 
 
 
@@ -6699,9 +6680,6 @@
   setup directory on the machine hosting the hardware MPEG-2 card.  When
   you add a new capture card, ensure that you are using the video0
   device.
-
-
-
      [1mNOTE[22m:  As of 2003-04-25 the ivtv driver does not support VBI, so
   closed-captioning is not available.  Leave the VBI device, audio
   device and audio sampling rate limit at the default values.  Change

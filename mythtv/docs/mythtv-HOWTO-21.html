@@ -848,49 +848,30 @@ driveropts=burnfree -dao -v tsize="$TSIZE"s -
 </H2>
 
 <P><B>CVS Only</B></P>
+<P>DataDirect will use different information for your video sources and
+channels than was used by XMLTV. The following will clear your old
+information in a way that will allow your EPG and existing recording rules
+to continue to work as you'd expect.</P>
 <P>The first step is to create a backup of your database using the
 instructions found in 
 <A HREF="#backupdb">I'd like to save or restore my database.</A>.</P>
+<P><B>NOTE</B>: Examine the contents of the backup file to be sure that the
+backup succeeded before modifying your database.</P>
+<P><B>NOTE</B>: The MythTV DataDirect grabber requires wget version 1.9.1 or
+later. Verify that this is installed before modifying your database.</P>
 <P>Next, start <B>mysql</B> and perform the following commands:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mysql -u root mythconverg
 mysql>delete from program;
 mysql>drop table channel;
-mysql>drop table videosource;
+mysql>truncate table videosource;
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>At this point we need to recreate the two tables that we just deleted.  This
-will ensure that the channel numbers will lineup like they used to - if we
-had not deleted the tables, the <CODE>autoincrement</CODE> would throw
-everything off.  Open the mysqldump file you created in the backup step and
-search for the <CODE>CREATE TABLE channel</CODE> and <CODE>CREATE TABLE
-videosource</CODE> commands.</P>
-<P>Cut-and-paste from the mysqldump file into the <B>mysql</B> monitor.  Here
-is an example, but make sure you use the one that's on <EM>your</EM>
-machine.
-<BLOCKQUOTE><CODE>
-<PRE>
-mysql>CREATE TABLE videosource (
-  sourceid int(10) unsigned NOT NULL auto_increment,
-  name varchar(128) NOT NULL default '',
-  xmltvgrabber varchar(128) default NULL,
-  userid varchar(128) NOT NULL default '',
-  freqtable varchar(16) NOT NULL default 'default',
-  lineupid varchar(64) default NULL,
-  password varchar(64) default NULL,
-  PRIMARY KEY  (sourceid),
-  UNIQUE KEY name (name)
-) TYPE=MyISAM;
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Do the same for the <CODE>CREATE TABLE channel</CODE> section.  Once that's been
-completed, exit from <B>mysql</B>.  Run the MythTV setup program and
-complete the configuration as detailed in the section called 
-<A HREF="mythtv-HOWTO-5.html#ConfigureDD">Configuring the Zap2It.com DataDirect service.</A> and
-in 
+<P>Run the MythTV setup program and complete the configuration as detailed in
+the section called 
+<A HREF="mythtv-HOWTO-5.html#ConfigureDD">Configuring the Zap2It.com DataDirect service.</A> and in 
 <A HREF="mythtv-HOWTO-9.html#VideoSources">Video Sources</A>.</P>
 <P>Once you're done running setup, run <B>mythfilldatabase</B> to populate
 the database with new data.</P>

@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2004-05-06, v0.14.11
+<date>2004-05-07, v0.14.12
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -5458,47 +5458,32 @@ driveropts=burnfree -dao -v tsize="$TSIZE"s -
 <sect1>Migrating from XMLTV to DataDirect. <label id="MigratingtoDD">
 <!-- Mostly from a post by Bruce Markey -->
 <p><bf>CVS Only</bf>
-<p>The first step is to create a backup of your database using the
+<p>DataDirect will use different information for your video sources and
+channels than was used by XMLTV. The following will clear your old
+information in a way that will allow your EPG and existing recording rules
+to continue to work as you'd expect.
+
+The first step is to create a backup of your database using the
 instructions found in <ref id="backupdb" name="I'd like to save or restore
 my database.">.
+
+<bf>NOTE</bf>: Examine the contents of the backup file to be sure that the
+backup succeeded before modifying your database.
+
+<bf>NOTE</bf>: The MythTV DataDirect grabber requires wget version 1.9.1 or
+later. Verify that this is installed before modifying your database.
 
 Next, start <bf>mysql</bf> and perform the following commands:
 <tscreen><verb>
 $ mysql -u root mythconverg
 mysql>delete from program;
 mysql>drop table channel;
-mysql>drop table videosource;
+mysql>truncate table videosource;
 </verb></tscreen>
 
-At this point we need to recreate the two tables that we just deleted.  This
-will ensure that the channel numbers will lineup like they used to - if we
-had not deleted the tables, the <tt>autoincrement</tt> would throw
-everything off.  Open the mysqldump file you created in the backup step and
-search for the <tt>CREATE TABLE channel</tt> and <tt>CREATE TABLE
-videosource</tt> commands.
-
-Cut-and-paste from the mysqldump file into the <bf>mysql</bf> monitor.  Here
-is an example, but make sure you use the one that's on <em>your</em>
-machine.
-<tscreen><verb>
-mysql>CREATE TABLE videosource (
-  sourceid int(10) unsigned NOT NULL auto_increment,
-  name varchar(128) NOT NULL default '',
-  xmltvgrabber varchar(128) default NULL,
-  userid varchar(128) NOT NULL default '',
-  freqtable varchar(16) NOT NULL default 'default',
-  lineupid varchar(64) default NULL,
-  password varchar(64) default NULL,
-  PRIMARY KEY  (sourceid),
-  UNIQUE KEY name (name)
-) TYPE=MyISAM;
-</verb></tscreen>
-
-Do the same for the <tt>CREATE TABLE channel</tt> section.  Once that's been
-completed, exit from <bf>mysql</bf>.  Run the MythTV setup program and
-complete the configuration as detailed in the section called <ref
-id="ConfigureDD" name="Configuring the Zap2It.com DataDirect service."> and
-in <ref id="VideoSources" name="Video Sources">.
+Run the MythTV setup program and complete the configuration as detailed in
+the section called <ref id="ConfigureDD" name="Configuring the Zap2It.com
+DataDirect service."> and in <ref id="VideoSources" name="Video Sources">.
 
 Once you're done running setup, run <bf>mythfilldatabase</bf> to populate
 the database with new data.
@@ -6320,6 +6305,7 @@ v0.14.10, 2004-05-05.  Update migration instructions for DataDirect.  It's for
 CVS.  Add some forward and backwards pointers in the Migration document.
 v0.14.11, 2004-05-06.  Add section on IRC and how to contribute.  Add wget
 1.9.1 requirement for DataDirect.
+v0.14.12, 2004-05-07.  Update DataDirect section (Bruce Markey)
 -->
 
 <!--
