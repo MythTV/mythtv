@@ -500,11 +500,24 @@ class ClearSavedPosition: public CheckBoxSetting, public GlobalSetting {
 public:
     ClearSavedPosition():
        GlobalSetting("ClearSavedPosition") {
-       setLabel("Clear Saved Position");
+       setLabel("Clear Saved Position on playback");
        setValue(true);
        setHelpText("Automatically clear saved position on a recording "
                    "when the recording is played back.  If UNset, you can "
                    "mark the beginning with rewind then save position.");
+    };
+};
+
+class AltClearSavedPosition: public CheckBoxSetting, public GlobalSetting {
+public:
+    AltClearSavedPosition():
+       GlobalSetting("AltClearSavedPosition") {
+       setLabel("Alternate Clear Saved Position");
+       setValue(true);
+       setHelpText("If set, during playback the select key (Enter or Space) "
+                   "will alternate between \"Position Saved\" and \"Position "
+                   "Cleared\". If UNset, select will save the current "
+                   "position for each keypress.");
     };
 };
 
@@ -1054,6 +1067,7 @@ PlaybackSettings::PlaybackSettings()
     general->addChild(new PlaybackExitPrompt());
     general->addChild(new EndOfRecordingExitPrompt());
     general->addChild(new ClearSavedPosition());
+    general->addChild(new AltClearSavedPosition());
     addChild(general);
 
     VerticalConfigurationGroup* seek = new VerticalConfigurationGroup(false);

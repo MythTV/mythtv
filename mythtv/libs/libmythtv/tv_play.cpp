@@ -1087,7 +1087,7 @@ void TV::ProcessKeypress(int keypressed)
             {
                 if (!was_doing_ff_rew)
                 {
-                    if (gContext->GetNumSetting("ClearSavedPosition", 1)
+                    if (gContext->GetNumSetting("AltClearSavedPosition", 1)
 			&& nvp->GetBookmark())
                         nvp->ClearBookmark(); 
                     else
