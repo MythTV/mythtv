@@ -60,6 +60,7 @@ typedef QPtrList<ThumbItem> ThumbList;
 
 class IconView : public MythDialog
 {
+     Q_OBJECT
 
 public:
 

@@ -41,7 +41,7 @@ void runGallery(void)
     }
     else {
         IconView icv(QSqlDatabase::database(), startdir,
-                     gContext->GetMainWindow(), "icon view");
+                     gContext->GetMainWindow(), "IconView");
         icv.exec();
     }
     
