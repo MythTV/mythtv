@@ -20,6 +20,7 @@ using namespace std;
 #include "util.h"
 #include "mythplugin.h"
 #include "dialogbox.h"
+#include "lcddevice.h"
 
 struct TextAttributes
 {
@@ -211,8 +212,6 @@ class ThemedMenuPrivate
     QPoint watermarkPos;
     QRect watermarkRect;
 
-    LCD *lcddev;
-
     bool allowreorder;
 };
 
@@ -235,8 +234,6 @@ ThemedMenuPrivate::ThemedMenuPrivate(ThemedMenu *lparent, float lwmult,
     downarrow = NULL;
 
     ignorekeys = false;
-
-    lcddev = gContext->GetLCDDevice();
 }
 
 ThemedMenuPrivate::~ThemedMenuPrivate()
@@ -1273,7 +1270,7 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
 
     drawInactiveButtons();
 
-    if (lcddev)
+    if (LCD::Get())
     {
         titleText = "MYTH-";
         titleText += menumode;
@@ -1286,7 +1283,8 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
 
 void ThemedMenuPrivate::updateLCD()
 {
-    if (!lcddev)
+    class LCD * lcddev = LCD::Get();
+    if (lcddev == NULL)
         return;
 
     // Build a list of the menu items
@@ -1945,7 +1943,7 @@ bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
         }
         else if (action == "SELECT")
         {
-            if (lcddev)
+            if (class LCD * lcddev = LCD::Get())
                 lcddev->stopAll();
 
             lastbutton = activebutton;

@@ -13,13 +13,14 @@
 
 #include <cmath>
 
+#include <qapplication.h>
 #include <qregexp.h>
 
 //#define LCD_DEVICE_DEBUG
 #define LCD_START_COL 3
 
 LCD::LCD()
-   :QObject()
+   :QObject(NULL, "LCD")
 {
     // Constructor for LCD
     //
@@ -94,22 +95,50 @@ LCD::LCD()
     connect(retryTimer, SIGNAL(timeout()), this, SLOT(restartConnection()));
 }
 
-void LCD::connectToHost(const QString &lhostname, unsigned int lport)
+bool LCD::m_server_unavailable = false;
+class LCD * LCD::m_lcd = NULL;
+
+class LCD * LCD::Get(void)
+{
+    if (m_lcd == NULL && m_server_unavailable == false)
+        m_lcd = new LCD;
+    return m_lcd;
+}
+
+bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
 {
     // Open communications
     // Store the hostname and port in case we need to reconnect.
 
+    int timeout = 1000;
     hostname = lhostname;
     port = lport;
 
     if (!connected)
     {
-#ifdef LCD_DEVICE    
         QTextStream os(socket);
         socket->connectToHost(hostname, port);
-        os << "hello\n";
-#endif
+
+        while (--timeout && socket->state() != QSocket::Idle)
+        {
+            qApp->lock();
+            qApp->processEvents();
+            qApp->unlock();
+            usleep(1000);
+
+            if (socket->state() == QSocket::Connected)
+            {
+                connected = true;
+                os << "hello\n";
+                break;
+            }
+        }
     }
+
+    if (connected == false)
+        m_server_unavailable = true;
+
+    return connected;
 }
 
 void LCD::beginScrollingText()
@@ -130,7 +159,6 @@ void LCD::beginScrollingText()
 
 void LCD::sendToServer(const QString &someText)
 {
-#ifdef LCD_DEVICE
     // Check the socket, make sure the connection is still up
     if (socket->state() == QSocket::Idle)
     {
@@ -170,10 +198,6 @@ void LCD::sendToServer(const QString &someText)
         send_buffer += someText;
         send_buffer += "\n";
     }
-
-#else
-    (void)someText;
-#endif
 }
 
 void LCD::restartConnection()
@@ -181,6 +205,7 @@ void LCD::restartConnection()
     // Reset the flag
     lcd_ready = false;
     connected = false;
+    m_server_unavailable = false;
 
     // Retry to connect. . .  Maybe the user restarted LCDd?
     connectToHost(hostname, port);
@@ -448,24 +473,21 @@ void LCD::setCellHeight(unsigned int x)
 
 void LCD::describeServer()
 {
-    cout << "lcddevice: The server is " << lcdWidth << "x" << lcdHeight
-         << " with each cell being " << cellWidth << "x" << cellHeight
-         << endl;
+    VERBOSE(VB_GENERAL, QString("lcddevice: The server is %1x%2 with each cell being %3x%4." )
+                        .arg(lcdWidth).arg(lcdHeight).arg(cellWidth).arg(cellHeight));
 }
 
 void LCD::veryBadThings(int anError)
 {
     // Deal with failures to connect and inabilities to communicate
-    
-    cerr << "The QSocket connector in lcddevice could not connect to an "
-            "LCDd..." << endl;
+    VERBOSE(VB_IMPORTANT, "Could not connect to an LCDd, LCD support will not be enabled.");
 
     if (anError == QSocket::ErrConnectionRefused)
-        cerr << "Why? The connection was refused." << endl ;  
+        VERBOSE(VB_IMPORTANT, "Why? The connection was refused.");
     else if (anError == QSocket::ErrHostNotFound)
-        cerr << "Why? The host was not found." << endl ;  
+        VERBOSE(VB_IMPORTANT, "Why? The host was not found.");
     else if (anError == QSocket::ErrSocketRead)
-        cerr << "Why? There was an error reading from the socket." << endl ;  
+        VERBOSE(VB_IMPORTANT, "Why? There was an error reading from the socket.");
     
     socket->clearPendingData();
     socket->close();
@@ -1395,7 +1417,6 @@ void LCD::switchToNothing()
 
 void LCD::shutdown()
 {
-#ifdef LCD_DEVICE
     stopAll();
 
     //  Remove all the widgets and screens for a clean exit from the server
@@ -1437,12 +1458,13 @@ void LCD::shutdown()
     socket->close();
 
     lcd_ready = false;
-#endif
     connected = false;
 }
 
 LCD::~LCD()
 {
+    m_lcd = NULL;
+
 #ifdef LCD_DEVICE_DEBUG
     cout << "lcddevice: An LCD device is being snuffed out of existence "
             "(~LCD() was called)" << endl ;

@@ -16,7 +16,6 @@
 using namespace std;
 
 #include "uitypes.h"
-#include "lcddevice.h"
 
 class XMLParse;
 class UIType;
@@ -234,7 +233,7 @@ class MythProgressDialog: public MythDialog
     QProgressBar *progress;
     int steps;
 
-    QPtrList<LCDTextItem> *textItems;
+    QPtrList<class LCDTextItem> * textItems;
 };
 
 class MythThemedDialog : public MythDialog

@@ -27,7 +27,6 @@ class QSqlDatabase;
 class QSqlQuery;
 class QSqlError;
 class QSocket;
-class LCD;
 class MythMainWindow;
 class MythPluginManager;
 class MediaMonitor;
@@ -122,7 +121,7 @@ class MythContext : public QObject
 {
     Q_OBJECT
   public:
-    MythContext(const QString &binversion, bool gui = true, bool lcd = true);
+    MythContext(const QString &binversion, bool gui = true);
     virtual ~MythContext();
 
     QString GetMasterHostPrefix(void);
@@ -200,8 +199,6 @@ class MythContext : public QObject
 
     void SetMainWindow(MythMainWindow *mainwin);
     MythMainWindow *GetMainWindow(void);
-
-    LCD *GetLCDDevice(void);
 
     bool TestPopupVersion(const QString &name, const QString &libversion,
                           const QString &pluginversion);

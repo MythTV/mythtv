@@ -21,7 +21,6 @@
 #include "themedmenu.h"
 #include "util.h"
 #include "remotefile.h"
-#include "lcddevice.h"
 #include "dialogbox.h"
 #include "mythdialogs.h"
 #include "mythplugin.h"
@@ -38,7 +37,7 @@ class MythContextPrivate
     MythContextPrivate(MythContext *lparent);
    ~MythContextPrivate();
 
-    void Init(bool gui, bool lcd);
+    void Init(bool gui);
 
     void LoadLogSettings(void);
 
@@ -68,8 +67,6 @@ class MythContextPrivate
     QMutex dbLock;
 
     QMap<QString, QImage> imageCache;
-
-    LCD *lcd_device;
 
     QString language;
 
@@ -127,7 +124,7 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
     screensaver = new ScreenSaverControl();
 }
 
-void MythContextPrivate::Init(bool gui, bool lcd)
+void MythContextPrivate::Init(bool gui)
 {
     if (!parent->LoadSettingsFiles("mysql.txt"))
         cerr << "Unable to read configuration file mysql.txt" << endl;
@@ -174,11 +171,6 @@ void MythContextPrivate::Init(bool gui, bool lcd)
 
     mainWindow = NULL;
 
-    if (lcd)
-        lcd_device = new LCD();
-    else
-        lcd_device = NULL;
-
     disablelibrarypopup = false;
 
     display_res = NULL;
@@ -198,8 +190,6 @@ MythContextPrivate::~MythContextPrivate()
         delete serverSock;
     if (eventSock)
         delete eventSock;
-    if (lcd_device)
-        delete lcd_device;
     if (m_priv_mutex)
         delete m_priv_mutex;
 }
@@ -211,7 +201,7 @@ void MythContextPrivate::LoadLogSettings(void)
     m_logprintlevel = parent->GetNumSetting("LogPrintLevel", LP_ERROR);
 }
 
-MythContext::MythContext(const QString &binversion, bool gui, bool lcd)
+MythContext::MythContext(const QString &binversion, bool gui)
            : QObject()
 {
     qInitNetworkProtocols();
@@ -228,7 +218,7 @@ MythContext::MythContext(const QString &binversion, bool gui, bool lcd)
 
     d = new MythContextPrivate(this);
 
-    d->Init(gui, lcd);
+    d->Init(gui);
 
     connect(d->eventSock, SIGNAL(connected()), 
             this, SLOT(EventSocketConnected()));
@@ -1477,11 +1467,6 @@ void MythContext::SetMainWindow(MythMainWindow *mainwin)
 MythMainWindow *MythContext::GetMainWindow(void)
 {
     return d->mainWindow;
-}
-
-LCD *MythContext::GetLCDDevice(void)
-{
-    return d->lcd_device;
 }
 
 bool MythContext::TestPopupVersion(const QString &name, 

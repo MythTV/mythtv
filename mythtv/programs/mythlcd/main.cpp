@@ -18,6 +18,7 @@
 
 using namespace std;
 
+#include <lcddevice.h>
 #include "mythlcd.h"
 #include "libmyth/mythcontext.h"
 
@@ -45,9 +46,12 @@ int main(int argc, char **argv)
     lcd_host = gContext->GetSetting("LCDHost", "localhost");
     lcd_port = gContext->GetNumSetting("LCDPort", 13666);
 
-    if (lcd_host.length() > 0 && lcd_port > 1024 && gContext->GetLCDDevice())
+    if (lcd_host.length() > 0 && lcd_port > 1024)
     {
-        gContext->GetLCDDevice()->connectToHost(lcd_host, lcd_port);
+        class LCD * lcd = LCD::Get();
+        if (lcd->connectToHost(lcd_host, lcd_port) == false)
+            return -1;
+
         MythLCD mythLCD;
         a.setMainWidget(&mythLCD);
         mythLCD.show();

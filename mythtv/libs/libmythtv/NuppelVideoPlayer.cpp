@@ -7,6 +7,7 @@
 #include <sys/time.h>
 #include <ctime>
 #include <cmath>
+#include <qapplication.h>
 #include <qstringlist.h>
 #include <qmap.h>
 

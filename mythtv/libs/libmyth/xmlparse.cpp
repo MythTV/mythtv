@@ -3,6 +3,8 @@ using namespace std;
 
 #include <cmath>
 
+#include <qapplication.h>
+
 #include "uilistbtntype.h"
 #include "xmlparse.h"
 

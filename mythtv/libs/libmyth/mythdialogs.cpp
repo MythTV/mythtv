@@ -1397,9 +1397,7 @@ MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)
     if (steps == 0)
         steps = 1;
 
-    LCD *lcddev = gContext->GetLCDDevice();
-
-    if (lcddev)
+    if (class LCD * lcddev = LCD::Get())
     {
         textItems = new QPtrList<LCDTextItem>;
         textItems->setAutoDelete(true);
@@ -1423,7 +1421,7 @@ void MythProgressDialog::Close(void)
 
     if (textItems)
     {
-        LCD *lcddev = gContext->GetLCDDevice();
+        LCD * lcddev = LCD::Get();
         lcddev->switchToNothing();
         lcddev->switchToTime();
         delete textItems;
@@ -1433,8 +1431,7 @@ void MythProgressDialog::Close(void)
 void MythProgressDialog::setProgress(int curprogress)
 {
     float fProgress = (float)curprogress / (steps * 1000.0);
-    LCD *lcddev = gContext->GetLCDDevice();
-    if (lcddev)
+    if (class LCD * lcddev = LCD::Get())
         lcddev->setGenericProgress(fProgress);
     progress->setProgress(curprogress);
     if (curprogress % steps == 0)

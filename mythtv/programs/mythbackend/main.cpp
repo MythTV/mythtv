@@ -420,7 +420,7 @@ int main(int argc, char **argv)
             close(logfd);
     }
 
-    gContext = new MythContext(MYTH_BINARY_VERSION, false, false);
+    gContext = new MythContext(MYTH_BINARY_VERSION, false);
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)

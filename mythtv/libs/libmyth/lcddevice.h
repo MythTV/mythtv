@@ -8,7 +8,6 @@
 #include <qsocket.h>
 #include <qtimer.h>
 #include <qdatetime.h>
-#include <qapplication.h>
 
 using namespace std;
 
@@ -102,12 +101,20 @@ class LCDTextItem
 class LCD : public QObject
 {
     Q_OBJECT
-  public:
+
+  protected:
     LCD();
+
+    static bool m_server_unavailable;
+    static class LCD * m_lcd;
+
+  public:
    ~LCD();
-       
+
+    static class LCD * Get(void);
+
     // Used to actually connect to an LCD device       
-    void connectToHost(const QString &hostname, unsigned int port);
+    bool connectToHost(const QString &hostname, unsigned int port);
 
     // When nothing else is going on, show the time
     void switchToTime();

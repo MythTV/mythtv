@@ -36,6 +36,7 @@ using namespace std;
 #include "dbcheck.h"
 #include "mythmediamonitor.h"
 #include "statusbox.h"
+#include "lcddevice.h"
 
 #define QUIT     1
 #define HALT     2
@@ -959,10 +960,13 @@ int main(int argc, char **argv)
 
     lcd_host = gContext->GetSetting("LCDHost", "localhost");
     lcd_port = gContext->GetNumSetting("LCDPort", 13666);
-    if (lcd_host.length() > 0 && lcd_port > 1024 && gContext->GetLCDDevice())
+    if (lcd_host.length() > 0 && lcd_port > 1024)
     {
-        gContext->GetLCDDevice()->connectToHost(lcd_host, lcd_port);
-        gContext->GetLCDDevice()->setupLEDs(RemoteGetRecordingMask);
+        class LCD * lcd = LCD::Get();
+        if (lcd->connectToHost(lcd_host, lcd_port) == false)
+            delete lcd;
+        else
+            lcd->setupLEDs(RemoteGetRecordingMask);
     }
 
     translator->load(PREFIX + QString("/share/mythtv/i18n/mythfrontend_") + 

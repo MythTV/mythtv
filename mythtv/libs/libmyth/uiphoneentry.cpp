@@ -3,6 +3,7 @@ using namespace std;
 
 #include <qpixmap.h>
 #include <qimage.h>
+#include <qapplication.h>
 
 #include "uiphoneentry.h"
 #include "mythcontext.h"

@@ -27,6 +27,7 @@ using namespace std;
 #include "udpnotify.h"
 #include "commercial_skip.h"
 #include "vsync.h"
+#include "lcddevice.h"
 #include "jobqueue.h"
 
 struct SeekSpeedInfo {
@@ -402,7 +403,8 @@ TV::~TV(void)
     if (m_db)
         delete m_db;
 
-    gContext->GetLCDDevice()->switchToTime();
+    if (class LCD * lcd = LCD::Get())
+        lcd->switchToTime();
 }
 
 TVState TV::GetState(void)
@@ -521,7 +523,8 @@ int TV::Playback(ProgramInfo *rcinfo)
 
     changeState = true;
 
-    gContext->GetLCDDevice()->switchToChannel(rcinfo->chansign, rcinfo->title, rcinfo->subtitle);
+    if (class LCD * lcd = LCD::Get())
+        lcd->switchToChannel(rcinfo->chansign, rcinfo->title, rcinfo->subtitle);
 
     return 1;
 }
@@ -1185,23 +1188,27 @@ void TV::RunTV(void)
                     ChannelClear();
             }
         }
-        
-        if (lastLcdUpdate.secsTo(QDateTime::currentDateTime()) > 60) 
+
+        if (class LCD * lcd = LCD::Get())
         {
+            if (lastLcdUpdate.secsTo(QDateTime::currentDateTime()) < 60)
+                continue;
+
+            float progress = 0.0;
+
             if (internalState == kState_WatchingLiveTV)
                 ShowLCDChannelInfo();
 
+            if (activenvp)
+            {
+                QString dummy;
+                int pos = activenvp->calcSliderPos(dummy);
+                progress = (float)pos / 1000;
+            }
+            lcd->setChannelProgress(progress);
+
             lastLcdUpdate = QDateTime::currentDateTime();
         }
-        
-        float progress = 0.0;
-        if (activenvp)
-        {
-            QString dummy;
-            int pos = activenvp->calcSliderPos(dummy);
-            progress = (float)pos / 1000;
-        }
-        gContext->GetLCDDevice()->setChannelProgress(progress);
     }
   
     nextState = kState_None;
@@ -2809,6 +2816,10 @@ void TV::UpdateLCD(void)
 
 void TV::ShowLCDChannelInfo(void)
 {
+    class LCD * lcd = LCD::Get();
+    if (lcd == NULL)
+        return;
+
     QString title, subtitle, callsign, dummy;
     GetChannelInfo(recorder, title, subtitle, dummy, dummy, dummy, dummy, 
                    callsign, dummy, dummy, dummy, dummy, dummy, dummy,
@@ -2817,7 +2828,7 @@ void TV::ShowLCDChannelInfo(void)
     if ((callsign != lcdCallsign) || (title != lcdTitle) || 
         (subtitle != lcdSubtitle))
     {
-        gContext->GetLCDDevice()->switchToChannel(callsign, title, subtitle);
+        lcd->switchToChannel(callsign, title, subtitle);
         lcdCallsign = callsign;
         lcdTitle = title;
         lcdSubtitle = subtitle;

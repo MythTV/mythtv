@@ -16,7 +16,7 @@ using namespace std;
 MythLCD::MythLCD(QWidget *parent, const char *name )
     : QWidget(parent,name)
 {
-    lcddev = gContext->GetLCDDevice();
+    lcddev = LCD::Get();
 
     // Create the LCD device
     

@@ -21,6 +21,7 @@
 
 #include <iostream>
 
+#include <qapplication.h>
 #include <qpixmap.h>
 #include <qpainter.h>
 #include <qimage.h>
