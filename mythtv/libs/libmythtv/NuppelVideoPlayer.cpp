@@ -3288,8 +3288,6 @@ int NuppelVideoPlayer::calcSliderPos(QString &desc)
 {
     float ret;
 
-    char text[512];
-
     if (livetv)
     {
         ret = ringBuffer->GetFreeSpace() / 
@@ -3317,30 +3315,29 @@ int NuppelVideoPlayer::calcSliderPos(QString &desc)
         {
             if (osd->getTimeType() == 0)
             {
-                sprintf(text,
+                desc.sprintf(
                         QObject::tr("%02d:%02d:%02d behind  --  %.2f%% full"), 
                         hours, mins, secs, (1000 - ret) / 10);
             }
             else
             {
-                sprintf(text, QObject::tr("%02d:%02d:%02d behind"),
-                        hours, mins, secs);
+                desc.sprintf(QObject::tr("%02d:%02d:%02d behind"),
+                             hours, mins, secs);
             }
         }
         else
         {
             if (osd->getTimeType() == 0)
             {
-                sprintf(text, QObject::tr("%02d:%02d behind  --  %.2f%% full"), 
-                        mins, secs, (1000 - ret) / 10);
+                desc.sprintf(QObject::tr("%02d:%02d behind  --  %.2f%% full"), 
+                             mins, secs, (1000 - ret) / 10);
             }
             else
             {
-                sprintf(text, QObject::tr("%02d:%02d behind"), mins, secs);
+                desc.sprintf(QObject::tr("%02d:%02d behind"), mins, secs);
             }
         }
 
-        desc = QString::fromUtf8(text);
         return (int)(1000 - ret);
     }
 
@@ -3369,13 +3366,11 @@ int NuppelVideoPlayer::calcSliderPos(QString &desc)
     int ssecs = (playbackLen - shours * 3600 - smins * 60);
 
     if (shours > 0)
-        sprintf(text, QObject::tr("%02d:%02d:%02d of %02d:%02d:%02d"), 
-                phours, pmins, psecs, shours, smins, ssecs);
+        desc.sprintf(QObject::tr("%02d:%02d:%02d of %02d:%02d:%02d"), 
+                     phours, pmins, psecs, shours, smins, ssecs);
     else
-        sprintf(text, QObject::tr("%02d:%02d of %02d:%02d"),
-                pmins, psecs, smins, ssecs);
-
-    desc = text;
+        desc.sprintf(QObject::tr("%02d:%02d of %02d:%02d"),
+                     pmins, psecs, smins, ssecs);
 
     return (int)(ret);
 }
