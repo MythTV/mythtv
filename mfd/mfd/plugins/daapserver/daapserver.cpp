@@ -1309,15 +1309,18 @@ void DaapServer::sendContainers(HttpInRequest *http_request, DaapRequest *daap_r
                     {
                         deletions = metadata_server->getLastDestroyedPlaylistList();
                     }
-
-                    response << Tag('mudl');
-                    for(uint i = 0; i < deletions.count(); i++)
+                    
+                    if(deletions.count() > 0)
                     {
-                        int deletion_value = *deletions.at(i);
-                        deletion_value = (which_collection_id * METADATA_UNIVERSAL_ID_DIVIDER) + deletion_value;
-                        response << Tag('miid') << (u32) deletion_value << end;
+                        response << Tag('mudl');
+                        for(uint i = 0; i < deletions.count(); i++)
+                        {
+                            int deletion_value = *deletions.at(i);
+                            deletion_value = (which_collection_id * METADATA_UNIVERSAL_ID_DIVIDER) + deletion_value;
+                            response << Tag('miid') << (u32) deletion_value << end;
+                        }
+                        response << end;
                     }
-                    response << end;
                 }
                 
              
