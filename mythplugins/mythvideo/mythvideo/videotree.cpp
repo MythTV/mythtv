@@ -247,7 +247,7 @@ bool VideoTree::ignoreExtension(QString extension)
 
 }
 
-void VideoTree::buildFileList(QString directory)
+void VideoTree::buildFileList(QString directory, bool checklevel)
 {
     QDir d(directory);
 
@@ -263,6 +263,10 @@ void VideoTree::buildFileList(QString directory)
     QFileInfoListIterator it(*list);
     QFileInfo *fi;
     QRegExp r;
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if(checklevel)
+        query.prepare("SELECT showlevel FROM videometadata WHERE filename = :FILE ;");
 
     while ((fi = it.current()) != 0)
     {
@@ -284,9 +288,22 @@ void VideoTree::buildFileList(QString directory)
         
         QString filename = fi->absFilePath();
         if (fi->isDir())
-            buildFileList(filename);
+            buildFileList(filename, checklevel);
         else
         {
+            bool addfile = true;
+            if(checklevel)
+            {
+                query.bindValue(":FILE", filename.utf8());
+
+                if(query.exec() && query.isActive() && query.size() > 0)
+                {
+                    query.next();
+                    addfile = (query.value(0).toInt() <= current_parental_level);
+                }
+            }
+
+            if(addfile)
             browser_mode_files.append(filename);
         }
     }
@@ -364,7 +381,7 @@ void VideoTree::buildVideoList()
         for (uint j=0; j < nodesname.count(); j++)
         {
             video_tree_data = video_tree_root->addNode(nodesname[j], -2, false);
-            buildFileList(nodespath[j]);
+            buildFileList(nodespath[j], nodesname[j] == "videos");
         }
 
         unsigned int mainnodeindex = 0;

@@ -25,7 +25,7 @@ class VideoTree : public MythThemedDialog
    ~VideoTree();
 
     void buildVideoList();
-    void buildFileList(QString directory);
+    void buildFileList(QString directory, bool checklevel);
     bool ignoreExtension(QString extension);
     
     virtual void playVideo(Metadata *someItem);
