@@ -180,7 +180,7 @@ char myHostname[64];
     QString Surname   = myHostname;
     QString FirstName = QString("Local Myth Host");
     QString NickName  = gContext->GetSetting("MySipName") + "(" + myHostname + ")";
-    QString Uri       = "MythPhone@" + GetMySipIp() + gContext->GetSetting("SipLocalPort");
+    QString Uri       = "MythPhone@" + GetMySipIp();
     int     myPort    = atoi((const char *)gContext->GetSetting("SipLocalPort"));
     if (myPort != 5060)
         Uri += ":" + QString::number(myPort);

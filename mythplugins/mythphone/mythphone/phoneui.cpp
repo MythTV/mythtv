@@ -92,7 +92,7 @@ PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
 
     // Update SIP Presence information
     sipStack->UiOpened();
-    sipStack->UiWatch(DirContainer->SpeeddialList());
+    sipStack->UiWatch(DirContainer->ListAllEntries(true));
 
     // Possibly (user-defined) control the volume
     volume_control = NULL;

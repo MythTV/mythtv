@@ -96,7 +96,7 @@ class Directory : public QPtrList<DirEntry>
     DirEntry *getDirEntrybyUrl(QString Url);
     void saveChangesinDB(QSqlDatabase *db);
     void deleteEntry(QSqlDatabase *db, DirEntry *Entry);
-    void addSpeeddialsToList(QStrList &l);
+    void AddAllEntriesToList(QStrList &l, bool SpeeddialsOnly);
 
   private:
     QString name;
@@ -184,7 +184,7 @@ class DirectoryContainer
     void clearAllVoicemail();
     void deleteVoicemail(QString vmailName);
     DirEntry *FindMatchingDirectoryEntry(QString url);
-    QStrList SpeeddialList();
+    QStrList ListAllEntries(bool SpeeddialsOnly);
 
 
   private:
