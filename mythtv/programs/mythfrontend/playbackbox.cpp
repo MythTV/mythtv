@@ -82,10 +82,10 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     curitem = NULL;
     delitem = NULL;
 
-    if (gContext->GetNumSetting("DisableArrowAccels", 0))
-        arrowAccel = false;
-    else
+    if (gContext->GetNumSetting("UseArrowAccels", 1))
         arrowAccel = true;
+    else
+        arrowAccel = false;
 
     groupnameAsAllProg = gContext->GetNumSetting("DispRecGroupAsAllProg", 0);
     listOrder = gContext->GetNumSetting("PlayBoxOrdering", 1);    

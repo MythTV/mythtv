@@ -856,10 +856,10 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, const char *name)
 {
     float wmult, hmult;
 
-    if (gContext->GetNumSetting("DisableArrowAccels", 0))
-        arrowAccel = false;
-    else
+    if (gContext->GetNumSetting("UseArrowAccels", 1))
         arrowAccel = true;
+    else
+        arrowAccel = false;
 
     gContext->GetScreenSettings(wmult, hmult);
 
@@ -885,10 +885,10 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, bool graphicPopup,
 {
     float wmult, hmult;
 
-    if (gContext->GetNumSetting("DisableArrowAccels", 0))
-        arrowAccel = false;
-    else
+    if (gContext->GetNumSetting("UseArrowAccels", 1))
         arrowAccel = true;
+    else
+        arrowAccel = false;
 
     gContext->GetScreenSettings(wmult, hmult);
 

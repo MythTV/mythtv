@@ -1098,18 +1098,17 @@ public:
     };
 };
 
-class DisableArrowAccels: public CheckBoxSetting, public GlobalSetting {
+class UseArrowAccels: public CheckBoxSetting, public GlobalSetting {
 public:
-    DisableArrowAccels() :
-        GlobalSetting("DisableArrowAccels") {
-        setLabel(QObject::tr("Disable Arrow Key Accelerators"));
-        setValue(false);
-        setHelpText(QObject::tr("If checked, Arrow key accelerators will be "
-                                "disabled on the OSD and popup menus. Normally "
-                                "LEFT will exit and RIGHT will select the "
-                                "current item."));
+    UseArrowAccels() :
+        GlobalSetting("UseArrowAccels") {
+        setLabel(QObject::tr("Use Arrow Key Accelerators"));
+        setValue(true);
+        setHelpText(QObject::tr("If enabled, Arrow key accelerators will "
+                    "be used, with LEFT performing an exit action and "
+                    "RIGHT selecting the current item."));
     };
-};
+}; 
 
 class SetupPinCode: public LineEditSetting, public GlobalSetting {
 public:
@@ -2393,7 +2392,7 @@ MainGeneralSettings::MainGeneralSettings()
     general->addChild(new NoPromptOnExit());
     general->addChild(new HaltCommand());
     general->addChild(new LircKeyPressedApp());
-    general->addChild(new DisableArrowAccels());
+    general->addChild(new UseArrowAccels());
     general->addChild(new SetupPinCodeRequired());
     general->addChild(new SetupPinCode());
     general->addChild(new EnableMediaMon());
