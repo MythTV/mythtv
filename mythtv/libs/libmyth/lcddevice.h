@@ -9,7 +9,6 @@
 #include <qtimer.h>
 #include <qdatetime.h>
 #include <qapplication.h>
-#include <math.h>
 
 using namespace std;
 
