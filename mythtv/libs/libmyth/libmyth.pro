@@ -29,10 +29,20 @@ inc.files += settings.h uitypes.h xmlparse.h mythplugin.h mythdialogs.h
 inc.files += audiooutput.h inetcomms.h httpcomms.h mythmedia.h mythwizard.h
 inc.files += uilistbtntype.h uiphoneentry.h generictree.h managedlist.h
 
-!win32 {
-    SOURCES += audiooutputoss.cpp mythcdrom.cpp mythmediamonitor.cpp
-    HEADERS += audiooutputoss.h mythcdrom.h mythmediamonitor.h
+using_oss {
+    SOURCES += audiooutputoss.cpp
+    HEADERS += audiooutputoss.h
+}
+
+unix {
+    SOURCES += mythcdrom.cpp mythmediamonitor.cpp
+    HEADERS += mythcdrom.h   mythmediamonitor.h
     inc.files += mythcdrom.h mythmediamonitor.h
+}
+
+macx {
+#    SOURCES += audiooutputdarwin.cpp
+#    SOURCES += mythcdrom-darwin.cpp
 }
 
 linux {
