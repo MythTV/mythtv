@@ -16,17 +16,6 @@
 #include "videosource.h"
 #include "channelsettings.h"
 
-/*******************
- TODO:
-    - Add HelpText for items!!!
-    - I(nfo) menu
-        - Add delete channel to menu.
-        - Hide channels without channel number option,
-    - ID() for new channel.
-    - Add the possibility of a 'Load' button between
-        cancel and back/next.
- *******************/
-
 ChannelWizard::ChannelWizard(int id, QSqlDatabase* _db)
              : ConfigurationWizard(), db(_db) {
     setLabel("Channel Options");

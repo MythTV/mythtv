@@ -89,6 +89,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(ChannelBase *channel)
     text_buffer_size = 0;
 
     childrenLive = false;
+    errored = false;
 
     recording = false;
 
@@ -390,6 +391,11 @@ void NuppelVideoRecorder::SetVideoFilters(QString &filters)
 bool NuppelVideoRecorder::IsRecording(void)
 {
     return recording;
+}
+
+bool NuppelVideoRecorder::IsErrored(void)
+{
+    return errored;
 }
 
 long long NuppelVideoRecorder::GetFramesWritten(void)
@@ -791,6 +797,7 @@ void NuppelVideoRecorder::StartRecording(void)
     if (lzo_init() != LZO_E_OK)
     {
         cerr << "lzo_init() failed, exiting\n";
+        errored = true;
         return;
     }
 
@@ -815,18 +822,21 @@ void NuppelVideoRecorder::StartRecording(void)
     {
         cerr << "Cannot open '" << ringBuffer->GetFilename() << "' for "
              << "writing, exiting\n";
+        errored = true;
         return;
     }
 
     if (childrenLive)
     {
         cerr << "Error: children are already alive\n";
+        errored = true;
         return;
     }
 
     if (SpawnChildren() < 0)
     {
         cerr << "Couldn't spawn children\n";
+        errored = true;
         return;
     }
 
@@ -848,13 +858,20 @@ void NuppelVideoRecorder::StartRecording(void)
     if (getuid() == 0)
         nice(-10);
 
+    int retries = 0;
     fd = open(videodevice.ascii(), O_RDWR);
-    if (fd <= 0)
+    while (fd <= 0)
     {
-        cerr << "Can't open video device: " << videodevice << endl;
-        perror("open video:");
-        KillChildren();
-        return;
+        usleep(30000);
+        fd = open(videodevice.ascii(), O_RDWR);
+        if (retries++ > 5)
+        { 
+            cerr << "Can't open video device: " << videodevice << endl;
+            perror("open video:");
+            KillChildren();
+            errored = true;
+            return;
+        }
     }
 
     usingv4l2 = true;

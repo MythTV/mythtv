@@ -1420,6 +1420,18 @@ public:
     };
 };
 
+class EnableMediaMon: public CheckBoxSetting, public GlobalSetting {
+public:
+    EnableMediaMon():
+        GlobalSetting("MonitorDrives") {
+        setLabel(QObject::tr("Monitor CD/DVD"));
+        setHelpText(QObject::tr("This enables support for monitoring "
+                    "your CD/DVD drives for new disks and launching"
+                    "the proper plugin to handle them."));
+        setValue(false);
+    };
+};
+
 class PVR350OutputEnable: public CheckBoxSetting, public GlobalSetting {
 public:
     PVR350OutputEnable():
@@ -1442,13 +1454,33 @@ public:
     };
 };
 
-class PVR350Settings: public  VerticalConfigurationGroup,
-                      public TriggeredConfigurationGroup {
+#ifdef USING_XVMC
+class UseXVMC: public CheckBoxSetting, public GlobalSetting {
 public:
-     PVR350Settings():
+    UseXVMC(): GlobalSetting("UseXVMC") {
+        setLabel(QObject::tr("Use HW XVMC MPEG Decoding"));
+        setValue(true);
+    };
+};
+#endif
+
+#ifdef USING_VIASLICE
+class UseViaSlice: public CheckBoxSetting, public GlobalSetting {
+public:
+    UseViaSlice(): GlobalSetting("UseViaSlice") {
+        setLabel(QObject::tr("Use VIA HW MPEG Decoding"));
+        setValue(true);
+    };
+};
+#endif
+
+class HwDecSettings: public  VerticalConfigurationGroup,
+                     public TriggeredConfigurationGroup {
+public:
+     HwDecSettings():
          VerticalConfigurationGroup(false),
          TriggeredConfigurationGroup(false) {
-         setLabel(QObject::tr("PVR-350 Settings"));
+         setLabel(QObject::tr("Hardware Decoding Settings"));
          setUseLabel(false);
 
          Setting* pvr350output = new PVR350OutputEnable();
@@ -1460,6 +1492,13 @@ public:
          addTarget("1", settings);
 
          addTarget("0", new VerticalConfigurationGroup(true));
+
+#ifdef USING_XVMC
+         addChild(new UseXVMC());
+#endif
+#ifdef USING_VIASLICE
+         addChild(new UseViaSlice());
+#endif
     };
 };
 
@@ -1474,6 +1513,7 @@ MainGeneralSettings::MainGeneralSettings()
     general->addChild(new HaltCommand());
     general->addChild(new SetupPinCodeRequired());
     general->addChild(new SetupPinCode());
+    general->addChild(new EnableMediaMon());
     general->addChild(new EnableXbox());
     addChild(general);
 }
@@ -1501,7 +1541,7 @@ PlaybackSettings::PlaybackSettings()
     gen2->addChild(new UDPNotifyPort());
     addChild(gen2);
 
-    addChild(new PVR350Settings());
+    addChild(new HwDecSettings());
 
     VerticalConfigurationGroup* seek = new VerticalConfigurationGroup(false);
     seek->setLabel(QObject::tr("Seeking"));

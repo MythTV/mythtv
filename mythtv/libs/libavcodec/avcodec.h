@@ -92,6 +92,8 @@ enum CodecID {
     CODEC_ID_TRUEMOTION1,
     CODEC_ID_VMDVIDEO,
     CODEC_ID_VMDAUDIO,
+    CODEC_ID_MSZH,
+    CODEC_ID_ZLIB,
 
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE,
@@ -961,6 +963,8 @@ typedef struct AVCodecContext {
 
     /**
      * qscale factor between p and i frames.
+     * if > 0 then the last p frame quantizer will be used (q= lastp_q*factor+offset)
+     * if < 0 then normal ratecontrol will be done (q= -normal_q*factor+offset)
      * - encoding: set by user.
      * - decoding: unused
      */
@@ -968,8 +972,6 @@ typedef struct AVCodecContext {
     
     /**
      * qscale offset between p and i frames.
-     * if > 0 then the last p frame quantizer will be used (q= lastp_q*factor+offset)
-     * if < 0 then normal ratecontrol will be done (q= -normal_q*factor+offset)
      * - encoding: set by user.
      * - decoding: unused
      */
@@ -1491,6 +1493,17 @@ typedef struct AVCodecContext {
      * - decoding: unused.
      */
     int error_rate;
+    
+    /**
+     * MP3 antialias algorithm, see FF_AA_* below.
+     * - encoding: unused
+     * - decoding: set by user
+     */
+    int antialias_algo;
+#define FF_AA_AUTO    0
+#define FF_AA_FASTINT 1 //not implemented yet
+#define FF_AA_INT     2
+#define FF_AA_FLOAT   3
 
     /**
      * VIA CLE266 Hardware MPEG decoding
@@ -1498,7 +1511,7 @@ typedef struct AVCodecContext {
      * - decoding: set by decoder
      */
     int via_hwslice;
-
+       
 } AVCodecContext;
 
 
@@ -1622,6 +1635,7 @@ extern AVCodec asv2_encoder;
 extern AVCodec vcr1_encoder;
 extern AVCodec ffv1_encoder;
 extern AVCodec mdec_encoder;
+extern AVCodec zlib_encoder;
 
 extern AVCodec h263_decoder;
 extern AVCodec mpeg4_decoder;
@@ -1686,6 +1700,8 @@ extern AVCodec flic_decoder;
 extern AVCodec vmdvideo_decoder;
 extern AVCodec vmdaudio_decoder;
 extern AVCodec truemotion1_decoder;
+extern AVCodec mszh_decoder;
+extern AVCodec zlib_decoder;
 extern AVCodec ra_144_decoder;
 extern AVCodec ra_288_decoder;
 extern AVCodec roq_dpcm_decoder;

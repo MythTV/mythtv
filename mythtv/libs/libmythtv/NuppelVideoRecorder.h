@@ -64,7 +64,8 @@ class NuppelVideoRecorder : public RecorderBase
     void WaitForPause(void);   
  
     bool IsRecording(void);
-   
+    bool IsErrored(void);
+
     long long GetFramesWritten(void); 
 
     int GetVideoFd(void);
@@ -193,6 +194,7 @@ class NuppelVideoRecorder : public RecorderBase
     pthread_t vbi_tid;
 
     bool recording;
+    bool errored;
 
     int keyframedist;
     vector<struct seektable_entry> *seektable;

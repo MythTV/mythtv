@@ -31,6 +31,7 @@ class MpegRecorder : public RecorderBase
     bool GetPause(void);
     void WaitForPause(void);
     bool IsRecording(void);
+    bool IsErrored(void) { return false; }
 
     long long GetFramesWritten(void);
 

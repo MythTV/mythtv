@@ -1,6 +1,7 @@
 /*
  * MPEG1 codec / MPEG2 decoder
  * Copyright (c) 2000,2001 Fabrice Bellard.
+ * Copyright (c) 2002-2004 Michael Niedermayer <michaelni@gmx.at> 
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -1744,6 +1745,7 @@ static int mpeg_decode_init(AVCodecContext *avctx)
 {
     Mpeg1Context *s = avctx->priv_data;
     
+    s->mpeg_enc_ctx.avctx= avctx;
     s->mpeg_enc_ctx.flags= avctx->flags;
     common_init(&s->mpeg_enc_ctx);
     init_vlcs();
@@ -2397,7 +2399,6 @@ static int mpeg1_decode_sequence(AVCodecContext *avctx,
         s->width = width;
         s->height = height;
         avctx->has_b_frames= 1;
-        s->avctx = avctx;
         avctx->width = width;
         avctx->height = height;
         av_reduce(
@@ -2501,7 +2502,6 @@ static int vcr2_init_sequence(AVCodecContext *avctx)
     s->height = avctx->height;
     avctx->has_b_frames= 0; //true?
     s->low_delay= 1;
-    s->avctx = avctx;
 
     //get_format() or set_video(width,height,aspect,pix_fmt);
     //until then pix_fmt may be changed right after codec init

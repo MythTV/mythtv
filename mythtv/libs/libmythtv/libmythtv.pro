@@ -59,13 +59,11 @@ SOURCES += udpnotify.cpp channeleditor.cpp channelsettings.cpp
 using_xv {
     SOURCES += videoout_xv.cpp
     HEADERS += videoout_xv.h
-    DEFINES += USING_XV
 }
 
 using_xvmc {
     SOURCES += videoout_xvmc.cpp
     HEADERS += videoout_xvmc.h
-    DEFINES += USING_XVMC
 }
 
 using_viahwslice {

@@ -16,8 +16,8 @@ HttpComms::HttpComms(QUrl &url, int timeoutms)
 {
     init(url);
     m_timer = new QTimer();
-    m_timer->start(timeoutms, TRUE);
     connect(m_timer, SIGNAL(timeout()), SLOT(timeout()));
+    m_timer->start(timeoutms, TRUE);
 }
 
 HttpComms::HttpComms(QUrl &url, QHttpRequestHeader &header)
@@ -63,6 +63,7 @@ void HttpComms::init(QUrl &url, QHttpRequestHeader &header)
     m_responseReason = "";
     m_timer = NULL;
     m_timeout = false;
+    m_url = url.toString();
 
     connect(http, SIGNAL(done(bool)), this, SLOT(done(bool)));
     connect(http, SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
@@ -85,8 +86,9 @@ void HttpComms::done(bool error)
 {
     if (error)
     {
-       cout << "MythVideo: NetworkOperation Error on Finish: "
-            << http->errorString() << ".\n";
+       cerr << "HttpComms::done() - NetworkOperation Error on Finish: "
+            << http->errorString() << " (" << error << ": url: " 
+            << m_url.latin1() << endl;
     }
     else if (http->bytesAvailable())
         m_data = QString(http->readAll());
@@ -113,7 +115,7 @@ void HttpComms::stateChanged(int state)
             case QHttp::Reading: cerr << "reading\n"; break;
             case QHttp::Connected: cerr << "connected\n"; break;
             case QHttp::Closing: cerr << "closing\n"; break;
-            default: break;
+            default: cerr << "unknown state: " << state << endl; break;
         }
     }
 }
@@ -143,6 +145,7 @@ void HttpComms::headerReceived(const QHttpResponseHeader &resp)
 
 void HttpComms::timeout() 
 {
+   cerr << "HttpComms::Timeout for url: " << m_url.latin1() << endl;
    m_timeout = true;
    m_done = true;
 }
@@ -158,10 +161,18 @@ QString HttpComms::getHttp(QString& url, int timeoutMS, int maxRetries,
     QString res = "";
     HttpComms *httpGrabber = NULL; 
     int m_debug = 0;
+    QString hostname = "";
 
     while (1) 
     {
         QUrl qurl(url);
+        if (hostname == "")
+            hostname = qurl.host();  // hold onto original host
+        if (!qurl.hasHost())        // can occur on redirects to partial paths
+            qurl.setHost(hostname);
+        if (m_debug > 0)
+            cerr << "getHttp: grabbing: " << qurl.toString() << endl;
+
         if (httpGrabber != NULL)
             delete httpGrabber; 
         httpGrabber = new HttpComms(qurl, timeoutMS);
@@ -197,13 +208,12 @@ QString HttpComms::getHttp(QString& url, int timeoutMS, int maxRetries,
         // Check for redirection
         if (!httpGrabber->getRedirectedURL().isEmpty()) 
         {
+            if (m_debug > 0) 
+                cerr << "redirection:" 
+                     << httpGrabber->getRedirectedURL().latin1() << " count:" 
+                     << redirectCount << " max:" << maxRedirects << endl;
             if (redirectCount++ < maxRedirects)
-            {
                 url = httpGrabber->getRedirectedURL();
-                if (m_debug > 0)
-                    cerr << "redirect " << redirectCount << "/" << maxRedirects
-                         << " to url:" << url.latin1() << endl;
-            }
 
             // Try again
             timeoutCount = 0;
@@ -219,6 +229,8 @@ QString HttpComms::getHttp(QString& url, int timeoutMS, int maxRetries,
     if (m_debug > 1)
         cerr << "Got " << res.length() << " bytes from url: '" 
              << url.latin1() << "'" << endl;
+    if (m_debug > 2)
+        cerr << res;
 
     return res;
 }

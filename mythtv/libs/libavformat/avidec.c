@@ -419,7 +419,11 @@ static int avi_read_packet(AVFormatContext *s, AVPacket *pkt)
                 ast = st->priv_data;
 
                 /* XXX: how to handle B frames in avi ? */
-                pkt->pts = ((int64_t)ast->frame_offset * ast->scale* AV_TIME_BASE) / ast->rate;
+                if(st->codec.codec_type == CODEC_TYPE_VIDEO)
+                    pkt->pts = ((int64_t)ast->frame_offset * ast->scale* AV_TIME_BASE) / ast->rate;
+                else //FIXME this is proably not correct for all weird avis
+                    pkt->pts = ((int64_t)ast->frame_offset * ast->scale* AV_TIME_BASE) / (ast->rate * st->codec.block_align);
+//printf("%Ld %d %d %d %d\n", pkt->pts, ast->frame_offset, ast->scale,  AV_TIME_BASE,  ast->rate);
                 pkt->stream_index = n;
                 /* FIXME: We really should read index for that */
                 if (st->codec.codec_type == CODEC_TYPE_VIDEO) {
@@ -496,7 +500,8 @@ static int avi_load_index(AVFormatContext *s)
     AVIContext *avi = s->priv_data;
     ByteIOContext *pb = &s->pb;
     uint32_t tag, size;
-
+    offset_t pos= url_ftell(pb);
+    
     url_fseek(pb, avi->movi_end, SEEK_SET);
 #ifdef DEBUG_SEEK
     printf("movi_end=0x%llx\n", avi->movi_end);
@@ -529,6 +534,7 @@ static int avi_load_index(AVFormatContext *s)
         }
     }
  the_end:
+    url_fseek(pb, pos, SEEK_SET);
     return 0;
 }
 

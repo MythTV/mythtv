@@ -40,7 +40,9 @@ EXTRA_LIBS += -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm
 # DVB support
 #CONFIG += using_dvb
 #DEFINES += USING_DVB
-#INCLUDEPATH += /usr/src/linux/include/linux/dvb/
+# Note: INCLUDEPATH should point to the directory with
+#   'linux/dvb/frontend.h', not the directory with frontend.h
+#INCLUDEPATH += /usr/src/linuxtv-dvb-1.0.1/include
 
 # Native lirc support
 #CONFIG += using_lirc
@@ -48,10 +50,12 @@ EXTRA_LIBS += -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm
 
 # XvMC support, modify as necessary.
 #CONFIG += using_xvmc
+#DEFINES += USING_XVMC
 #EXTRA_LIBS += -lXvMCNVIDIA -lXvMC
 
 # VIA cle266 support
 #CONFIG += using_viahwslice
+#DEFINES += USING_VIASLICE
 #EXTRA_LIBS += -lddmpeg
 
 # DirectFB support

@@ -1442,7 +1442,7 @@
         <value lang="SV">Beskrivning:</value>
       </textarea>
       <textarea name="description" draworder="6">
-        <area>180,130,400,120</area>
+        <area>180,130,600,120</area>
         <altarea>180,130,600,90</altarea>
         <font>info</font>
         <multiline>yes</multiline>
@@ -1531,7 +1531,7 @@
         <value lang="SV">Beskrivning:</value>
       </textarea>
       <textarea name="description" draworder="6">
-        <area>180,130,400,90</area>
+        <area>180,130,600,90</area>
         <altarea>180,130,600,90</altarea>
         <font>info</font>
         <multiline>yes</multiline>
@@ -1539,7 +1539,7 @@
     </container>
 
     <container name="video">
-      <area>610,400,160,120</area>
+      <area>610,355,160,120</area>
     </container>
 
     <popup name="confirmdelete">

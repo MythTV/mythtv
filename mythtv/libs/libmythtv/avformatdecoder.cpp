@@ -331,10 +331,12 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                     enc->codec_id == CODEC_ID_MPEG2VIDEO))
                 {
 #ifdef USING_XVMC
-                    enc->codec_id = CODEC_ID_MPEG2VIDEO_XVMC;
+                    if (gContext->GetNumSetting("UseXVMC", 1))
+                        enc->codec_id = CODEC_ID_MPEG2VIDEO_XVMC;
 #endif            
 #ifdef USING_VIASLICE
-                    enc->codec_id = CODEC_ID_MPEG2VIDEO_VIA;
+                    if (gContext->GetNumSetting("UseViaSlice", 1))
+                        enc->codec_id = CODEC_ID_MPEG2VIDEO_VIA;
 #endif
                 }
 

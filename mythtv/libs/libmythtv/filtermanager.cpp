@@ -147,8 +147,8 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
     QStrList OptsList (TRUE);
     QStringList FilterList = QStringList::split(",", Filters);
     VideoFilter *NewFilt = NULL;
-    FmtConv *FC, *FC2;
-    VideoFrameType ofmt;
+    FmtConv *FC, *FC2, *S1, *S2, *S3;
+    VideoFrameType ifmt;
     unsigned int i;
     int nbufsize;
     int cbufsize;
@@ -177,135 +177,127 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
             break;
         }
     }
-    if (FiltInfoChain.count())
-    {
-        if (inpixfmt == -1)
-            inpixfmt = FiltInfoChain.first()->formats[0].in;
-        if (outpixfmt == -1)
-            outpixfmt = FiltInfoChain.last()->formats[0].out;
-    }
-    else if (inpixfmt == -1)
-        inpixfmt = outpixfmt;
-    else if (outpixfmt == -1)
-        outpixfmt = inpixfmt;
-    ofmt = outpixfmt;
 
-    i = FiltInfoChain.count();
-    while (i > 0)
+    ifmt = inpixfmt;
+    for (i = 0; i < FiltInfoChain.count(); i++)
     {
-        i--;
+        S1 = S2 = S3 = NULL;
         FI = FiltInfoChain.at(i);
-        Opts = OptsList.at(i);
-        if (!i)
+        if (FiltInfoChain.count() - i == 1)
         {
             for (FC = FI->formats; FC->in != -1; FC++)
-                if (FC->out == ofmt && FC->in == inpixfmt)
+            {
+                if (FC->out == outpixfmt && FC->in == ifmt)
+                {
+                    S1 = FC;
                     break;
-
-            if (FC->in == -1)
-                for (FC = FI->formats; FC->in != -1; FC++)
-                    if (FC->in == inpixfmt)
-                        break;
+                }
+                if (FC->in == ifmt && !S2)
+                    S2 = FC;
+                if (FC->out == outpixfmt && !S3)
+                    S3 = FC;
+            }
         }
         else
         {
-            FI2 = FiltInfoChain.at(i-1);
+            FI2 = FiltInfoChain.at(i+1);
             for (FC = FI->formats; FC->in != -1; FC++)
             {
                 for (FC2 = FI2->formats; FC2->in != -1; FC2++)
-                    if (FC2->out == FC->in)
+                {
+                    if (FC->in == ifmt && FC->out == FC2->in)
+                    {
+                        S1 = FC;
                         break;
-                if (FC2->out == FC->in)
+                    }
+                    if (FC->out == FC2->in && !S3)
+                        S3 = FC;
+                }
+                if (S1)
                     break;
+                if (FC->in == ifmt && !S2)
+                    S2 = FC;
             }
         }
-        if (FC->in == -1)
-            for (FC = FI->formats; FC->in != -1; FC++)
-                if (FC->out == ofmt)
-                    break;
-
-        if (FC->in == -1)
+                
+        if (S1)
+            FC = S1;
+        else if (S2)
+            FC = S2;
+        else if (S3)
+            FC = S3;
+        else
             FC = FI->formats;
 
-        if (FC->out != ofmt)
+        if (FC->in != ifmt && (i > 0 || ifmt != -1))
         {
             if (!Convert)
             {
-                VERBOSE(VB_IMPORTANT,"FilterManager: format conversion needed "
-                        "but convert filter not found");
+                VERBOSE(VB_IMPORTANT, "FilterManager: format conversion "
+                        "needed but convert filter not found");
                 FiltInfoChain.clear();
                 break;
             }
-            FiltInfoChain.insert(i + 1, Convert);
-            OptsList.insert(i + 1, QString ());
-            FmtList.insert(0, new FmtConv);
-            if (FmtList.first())
+            FiltInfoChain.insert(i, Convert);
+            OptsList.insert(i, QString ());
+            FmtList.append(new FmtConv);
+            if (FmtList.last())
             {
-                FmtList.first()->in = FC->out;
-                FmtList.first()->out = ofmt;
+                FmtList.last()->in = ifmt;
+                FmtList.last()->out = FC->in;
+                i++;
             }
             else
             {
+                VERBOSE(VB_IMPORTANT, "FilterManager: failed to allocate FC "
+                        "for conver filter");
                 FiltInfoChain.clear();
                 break;
             }
         }
-        FmtList.insert(0, new FmtConv);
-        if (FmtList.first())
+        FmtList.append(new FmtConv);
+        if (FmtList.last())
         {
-            FmtList.first()->in = FC->in;
-            FmtList.first()->out = FC->out;
+            FmtList.last()->in = FC->in;
+            FmtList.last()->out = FC->out;
         }
         else
         {
+            VERBOSE(VB_IMPORTANT, "FilterManager: failed to allocate FC");
             FiltInfoChain.clear();
             break;
         }
-
-        ofmt = FC->in;
+        ifmt = FC->out;
     }
 
-    if (ofmt != inpixfmt)
+    if (ifmt != outpixfmt && outpixfmt != -1)
     {
         if (!Convert)
         {
-            VERBOSE(VB_IMPORTANT,"FilterManager: format conversion needed but "
-                    "convert filter not found");
+            VERBOSE(VB_IMPORTANT, "FilterManager: format conversion "
+                    "needed but convert filter not found");
             FiltInfoChain.clear();
         }
         else
         {
-            FiltInfoChain.insert(0, Convert);
-            OptsList.insert(0, QString());
-            FmtList.insert(0, new FmtConv);
-            if (FmtList.first())
+            FiltInfoChain.append(Convert);
+            OptsList.append( QString ());
+            FmtList.append(new FmtConv);
+            if (FmtList.last())
             {
-                FmtList.first()->in = inpixfmt;
-                FmtList.first()->out = ofmt;
+                FmtList.last()->in = ifmt;
+                FmtList.last()->out = outpixfmt;
             }
             else
+            {
+                VERBOSE(VB_IMPORTANT, "FilterManager: failed to allocate FC "
+                        "for conver filter");
                 FiltInfoChain.clear();
+            }
         }
     }
 
-    switch (inpixfmt)
-    {
-        case FMT_YV12:
-            bufsize = postfilt_width * postfilt_height * 3 / 2;
-            break;
-        case FMT_YUV422P:
-            bufsize = postfilt_width * postfilt_height * 2;
-            break;
-        case FMT_RGB24:
-            bufsize = postfilt_width * postfilt_height * 3;
-            break;
-        case FMT_ARGB32:
-            bufsize = postfilt_width * postfilt_height * 4;
-            break;
-        default:
-            bufsize = 0;
-    }
-    nbufsize = bufsize;
+    nbufsize = -1;
 
     if (!FiltInfoChain.count())
     {
@@ -330,6 +322,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
                     .arg(OptsList.at(i)?OptsList.at(i):"NULL")
                    );
             FiltChain = NULL;
+            nbufsize = -1;
             break;
         }
 
@@ -345,7 +338,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
             free(NewFilt);
         }
 
-        switch (inpixfmt)
+        switch (FmtList.at(i)->out)
         {
             case FMT_YV12:
                 cbufsize = postfilt_width * postfilt_height * 3 / 2;
@@ -369,10 +362,45 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
 
     if (FiltChain)
     {
-        nbufsize = cbufsize;
+        if (inpixfmt == -1)
+            inpixfmt = FmtList.first()->in;
+        if (outpixfmt == -1)
+            inpixfmt = FmtList.last()->out;
         width = postfilt_width;
         height = postfilt_height;
     }
+    else
+    {
+        if (inpixfmt == -1 && outpixfmt == -1)
+            inpixfmt == outpixfmt == FMT_YV12;
+        else if (inpixfmt == -1)
+            inpixfmt == outpixfmt;
+        else if (outpixfmt == -1)
+            outpixfmt == inpixfmt;
+    }
+
+    switch (inpixfmt)
+    {
+        case FMT_YV12:
+            cbufsize = postfilt_width * postfilt_height * 3 / 2;
+            break;
+        case FMT_YUV422P:
+            cbufsize = postfilt_width * postfilt_height * 2;
+            break;
+        case FMT_RGB24:
+            cbufsize = postfilt_width * postfilt_height * 3;
+            break;
+        case FMT_ARGB32:
+            cbufsize = postfilt_width * postfilt_height * 4;
+            break;
+        default:
+            cbufsize = 0;
+    }
+
+    if (cbufsize > nbufsize)
+        nbufsize = cbufsize;
+
+    bufsize = nbufsize;
 
     return FiltChain;
 }

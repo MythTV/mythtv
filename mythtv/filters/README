@@ -174,8 +174,14 @@ int invert(VideoFilter *vf, VideoFrame *frame)
     return 0;
 }
 
-A filter library must also provide an array of FilterInfo structures, 
-nameed filter_table.  The FilterInfo structure is defined as follow:
+As a special case, a filter's init function may return a pointer to a
+VideoFilter structure in which the filter function pointer is set to 
+NULL.  This will cause the filter to be removed from the chain, while 
+leaving the rest of the chain intact.  See the "force" filter directory 
+for an example of this feature.
+
+A filter library must also provide an array of FilterInfo structures,
+named filter_table.  The FilterInfo structure is defined as follow:
 
 typedef struct FilterInfo_ 
 {

@@ -50,6 +50,7 @@ class HttpComms : public QObject
     QHttp *http;
     bool m_done;
     QString m_data;
+    QString m_url;
     QTimer* m_timer;
     bool m_timeout;
     int  m_debug;

@@ -20,6 +20,9 @@
 #include "avi.h"
 #include "mpegaudio.h"
 
+#undef NDEBUG
+#include <assert.h>
+
 #define PACKET_SIZE 3200
 #define PACKET_HEADER_SIZE 12
 #define FRAME_HEADER_SIZE 17
@@ -38,6 +41,8 @@ typedef struct {
     int ds_chunk_size;
     int ds_data_size;
     int ds_silence_data;
+    
+    int packet_pos;
 
 } ASFStream;
 
@@ -113,6 +118,7 @@ typedef struct {
     int packet_obj_size;
     int packet_time_delta;
     int packet_time_start;
+    int packet_pos;
 
     int stream_index;
     ASFStream* asf_st; /* currently decoded stream */
@@ -174,6 +180,10 @@ static const GUID head1_guid = {
 
 static const GUID head2_guid = {
     0xabd3d211, 0xa9ba, 0x11cf, { 0x8e, 0xe6, 0x00, 0xc0, 0x0c, 0x20, 0x53, 0x65 },
+};
+
+static const GUID extended_content_header = {
+        0xD2D0A440, 0xE307, 0x11D2, { 0x97, 0xF0, 0x00, 0xA0, 0xC9, 0x5E, 0xA8, 0x50 },
 };
 
 /* I am not a number !!! This GUID is the one found on the PC used to
@@ -947,6 +957,38 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
             get_str16_nolen(pb, len3, s->copyright, sizeof(s->copyright));
             get_str16_nolen(pb, len4, s->comment, sizeof(s->comment));
 	    url_fskip(pb, len5);
+       } else if (!memcmp(&g, &extended_content_header, sizeof(GUID))) {
+                int desc_count, i;
+
+                desc_count = get_le16(pb);
+                for(i=0;i<desc_count;i++)
+                {
+                        int name_len,value_type,value_len,value_num = 0;
+                        char *name, *value;
+
+                        name_len = get_le16(pb);
+                        name = (char *)av_mallocz(name_len);
+                        get_str16_nolen(pb, name_len, name, name_len);
+                        value_type = get_le16(pb);
+                        value_len = get_le16(pb);
+                        if ((value_type == 0) || (value_type == 1)) // unicode or byte
+                        {
+                                value = (char *)av_mallocz(value_len);
+                                get_str16_nolen(pb, value_len, value, value_len);
+                                if (strcmp(name,"WM/AlbumTitle")==0) { strcpy(s->album, value); }
+                                av_free(value);
+                        }
+                        if ((value_type >= 2) || (value_type <= 5)) // boolean or DWORD or QWORD or WORD
+                        {
+                                if (value_type==2) value_num = get_le32(pb);
+                                if (value_type==3) value_num = get_le32(pb);
+                                if (value_type==4) value_num = get_le64(pb);
+                                if (value_type==5) value_num = get_le16(pb);
+                                if (strcmp(name,"WM/Track")==0) s->track = value_num + 1;
+                                if (strcmp(name,"WM/TrackNumber")==0) s->track = value_num;
+                        }
+                        av_free(name);
+                }
 #if 0
         } else if (!memcmp(&g, &head1_guid, sizeof(GUID))) {
             int v1, v2;
@@ -1020,12 +1062,15 @@ static int asf_get_packet(AVFormatContext *s)
     ASFContext *asf = s->priv_data;
     ByteIOContext *pb = &s->pb;
     uint32_t packet_length, padsize;
-    int rsize = 11;
-    int c = get_byte(pb);
+    int rsize = 9;
+    int c;
+    
+    assert((url_ftell(&s->pb) - s->data_offset) % asf->packet_size == 0);
+    
+    c = get_byte(pb);
     if (c != 0x82) {
         if (!url_feof(pb))
 	    printf("ff asf bad header %x  at:%lld\n", c, url_ftell(pb));
-	return -EIO;
     }
     if ((c & 0x0f) == 2) { // always true for now
 	if (get_le16(pb) != 0) {
@@ -1033,6 +1078,11 @@ static int asf_get_packet(AVFormatContext *s)
 		printf("ff asf bad non zero\n");
 	    return -EIO;
 	}
+        rsize+=2;
+/*    }else{
+        if (!url_feof(pb))
+	    printf("ff asf bad header %x  at:%lld\n", c, url_ftell(pb));
+	return -EIO;*/
     }
 
     asf->packet_flags = get_byte(pb);
@@ -1078,6 +1128,7 @@ static int asf_read_packet(AVFormatContext *s, AVPacket *pkt)
 	    //printf("PacketLeftSize:%d  Pad:%d Pos:%Ld\n", asf->packet_size_left, asf->packet_padsize, url_ftell(pb));
 	    /* fail safe */
 	    url_fskip(pb, ret);
+            asf->packet_pos= url_ftell(&s->pb);
 	    ret = asf_get_packet(s);
 	    //printf("READ ASF PACKET  %d   r:%d   c:%d\n", ret, asf->packet_size_left, pc++);
 	    if (ret < 0 || url_feof(pb))
@@ -1096,25 +1147,26 @@ static int asf_read_packet(AVFormatContext *s, AVPacket *pkt)
 	    DO_2BITS(asf->packet_property >> 4, asf->packet_seq, 0);
 	    DO_2BITS(asf->packet_property >> 2, asf->packet_frag_offset, 0);
 	    DO_2BITS(asf->packet_property, asf->packet_replic_size, 0);
-
+//printf("key:%d stream:%d seq:%d offset:%d replic_size:%d\n", asf->packet_key_frame, asf->stream_index, asf->packet_seq, //asf->packet_frag_offset, asf->packet_replic_size);
 	    if (asf->packet_replic_size > 1) {
+                assert(asf->packet_replic_size >= 8);
                 // it should be always at least 8 bytes - FIXME validate
 		asf->packet_obj_size = get_le32(pb);
 		asf->packet_frag_timestamp = get_le32(pb); // timestamp
 		if (asf->packet_replic_size > 8)
 		    url_fskip(pb, asf->packet_replic_size - 8);
 		rsize += asf->packet_replic_size; // FIXME - check validity
-	    } else {
+	    } else if (asf->packet_replic_size==1){
 		// multipacket - frag_offset is begining timestamp
 		asf->packet_time_start = asf->packet_frag_offset;
                 asf->packet_frag_offset = 0;
 		asf->packet_frag_timestamp = asf->packet_timestamp;
 
-		if (asf->packet_replic_size == 1) {
-		    asf->packet_time_delta = get_byte(pb);
-		    rsize++;
-		}
-	    }
+                asf->packet_time_delta = get_byte(pb);
+		rsize++;
+	    }else{
+                assert(asf->packet_replic_size==0);
+            }
 	    if (asf->packet_flags & 0x01) {
 		DO_2BITS(asf->packet_segsizetype >> 6, asf->packet_frag_size, 0); // 0 is illegal
 #undef DO_2BITS
@@ -1189,6 +1241,12 @@ static int asf_read_packet(AVFormatContext *s, AVPacket *pkt)
 	    asf_st->seq = asf->packet_seq;
 	    asf_st->pkt.pts = asf->packet_frag_timestamp - asf->hdr.preroll;
 	    asf_st->pkt.stream_index = asf->stream_index;
+            asf_st->packet_pos= asf->packet_pos;            
+//printf("new packet: stream:%d key:%d packet_key:%d audio:%d size:%d\n", 
+//asf->stream_index, asf->packet_key_frame, asf_st->pkt.flags & PKT_FLAG_KEY,
+//s->streams[asf->stream_index]->codec.codec_type == CODEC_TYPE_AUDIO, asf->packet_obj_size);
+	    if (s->streams[asf->stream_index]->codec.codec_type == CODEC_TYPE_AUDIO) 
+		asf->packet_key_frame = 1;
 	    if (asf->packet_key_frame)
 		asf_st->pkt.flags |= PKT_FLAG_KEY;
 	}
@@ -1250,20 +1308,204 @@ static int asf_read_close(AVFormatContext *s)
     return 0;
 }
 
-static int asf_read_seek(AVFormatContext *s, int stream_index, int64_t pts)
+// Added to support seeking after packets have been read
+// If information is not reset, read_packet fails due to
+// leftover information from previous reads
+static void asf_reset_header(AVFormatContext *s)
 {
-#if 0
     ASFContext *asf = s->priv_data;
+    ASFStream *asf_st;
     int i;
 
-    for(i = 0;; i++) {
-        url_fseek(&s->pb, asf->data_offset + i * asf->packet_size, SEEK_SET);
-        if (asf_get_packet(s) < 0)
-            break;
-        printf("timestamp=%0.3f\n",  asf->packet_timestamp / 1000.0);
+    asf->packet_nb_frames = 0;
+    asf->packet_timestamp_start = -1;
+    asf->packet_timestamp_end = -1;
+    asf->packet_size_left = 0;
+    asf->packet_segments = 0;
+    asf->packet_flags = 0;
+    asf->packet_property = 0;
+    asf->packet_timestamp = 0;
+    asf->packet_segsizetype = 0;
+    asf->packet_segments = 0;
+    asf->packet_seq = 0;
+    asf->packet_replic_size = 0;
+    asf->packet_key_frame = 0;
+    asf->packet_padsize = 0;
+    asf->packet_frag_offset = 0;
+    asf->packet_frag_size = 0;
+    asf->packet_frag_timestamp = 0;
+    asf->packet_multi_size = 0;
+    asf->packet_obj_size = 0;
+    asf->packet_time_delta = 0;
+    asf->packet_time_start = 0;
+    
+    for(i=0; i<s->nb_streams; i++){
+        asf_st= s->streams[i]->priv_data;
+        av_free_packet(&asf_st->pkt);
+        asf_st->frag_offset=0;
+        asf_st->seq=0;
     }
+    asf->asf_st= NULL;
+}
+
+static int64_t asf_read_pts(AVFormatContext *s, int64_t *ppos, int stream_index)
+{
+    ASFContext *asf = s->priv_data;
+    AVPacket pkt1, *pkt = &pkt1;
+    ASFStream *asf_st;
+    int64_t pts;
+    int64_t pos= *ppos;
+    int i;
+    int64_t start_pos[s->nb_streams];
+    
+    for(i=0; i<s->nb_streams; i++){
+        start_pos[i]= pos;
+    }
+
+//printf("asf_read_pts\n");
+    url_fseek(&s->pb, pos*asf->packet_size + s->data_offset, SEEK_SET);
+    asf_reset_header(s);
+    for(;;){
+        if (av_read_frame(s, pkt) < 0){
+            printf("seek failed\n");
+    	    return AV_NOPTS_VALUE;
+        }
+        pts= pkt->pts;
+
+        av_free_packet(pkt);
+        if(pkt->flags&PKT_FLAG_KEY){
+            i= pkt->stream_index;
+
+            asf_st= s->streams[i]->priv_data;
+
+            assert((asf_st->packet_pos - s->data_offset) % asf->packet_size == 0);
+            pos= (asf_st->packet_pos - s->data_offset) / asf->packet_size;
+
+            av_add_index_entry(s->streams[i], pos, pts, pos - start_pos[i] + 1, AVINDEX_KEYFRAME);
+            start_pos[i]= pos + 1;
+            
+            if(pkt->stream_index == stream_index)
+               break;
+        }
+    }
+
+    *ppos= pos;
+//printf("found keyframe at %Ld stream %d stamp:%Ld\n", *ppos, stream_index, pts);
+
+    return pts;
+}
+
+static int asf_read_seek(AVFormatContext *s, int stream_index, int64_t pts)
+{
+    ASFContext *asf = s->priv_data;
+    AVStream *st;
+    int64_t pos;
+    int64_t pos_min, pos_max, pts_min, pts_max, cur_pts, pos_limit;
+    int no_change;
+    
+    if (stream_index == -1)
+        stream_index= av_find_default_stream_index(s);
+    
+    if (asf->packet_size <= 0)
+        return -1;
+
+    pts_max=
+    pts_min= AV_NOPTS_VALUE;
+    pos_max= pos_limit= -1; // gcc thinks its uninitalized
+
+    st= s->streams[stream_index];
+    if(st->index_entries){
+        AVIndexEntry *e;
+        int index;
+
+        index= av_index_search_timestamp(st, pts);
+        e= &st->index_entries[index];
+        if(e->timestamp <= pts){
+            pos_min= e->pos;
+            pts_min= e->timestamp;
+#ifdef DEBUG_SEEK
+        printf("unsing cached pos_min=0x%llx dts_min=%0.3f\n", 
+               pos_min,pts_min / 90000.0);
 #endif
-    return -1;
+        }else{
+            assert(index==0);
+        }
+        index++;
+        if(index < st->nb_index_entries){
+            e= &st->index_entries[index];
+            assert(e->timestamp >= pts);
+            pos_max= e->pos;
+            pts_max= e->timestamp;
+            pos_limit= pos_max - e->min_distance;
+#ifdef DEBUG_SEEK
+        printf("unsing cached pos_max=0x%llx dts_max=%0.3f\n", 
+               pos_max,pts_max / 90000.0);
+#endif
+        }
+    }
+
+    if(pts_min == AV_NOPTS_VALUE){
+        pos_min = 0;
+        pts_min = asf_read_pts(s, &pos_min, stream_index);
+        if (pts_min == AV_NOPTS_VALUE) return -1;
+    }
+    if(pts_max == AV_NOPTS_VALUE){
+        pos_max = (url_filesize(url_fileno(&s->pb)) - 1 - s->data_offset) / asf->packet_size; //FIXME wrong
+        pts_max = s->duration; //FIXME wrong
+        pos_limit= pos_max;
+    } 
+
+    no_change=0;
+    while (pos_min < pos_limit) {
+        int64_t start_pos;
+        assert(pos_limit <= pos_max);
+
+        if(no_change==0){
+            int64_t approximate_keyframe_distance= pos_max - pos_limit;
+            // interpolate position (better than dichotomy)
+            pos = (int64_t)((double)(pos_max - pos_min) *
+                            (double)(pts - pts_min) /
+                            (double)(pts_max - pts_min)) + pos_min - approximate_keyframe_distance;
+        }else if(no_change==1){
+            // bisection, if interpolation failed to change min or max pos last time
+            pos = (pos_min + pos_limit)>>1;
+        }else{
+            // linear search if bisection failed, can only happen if there are very few or no keyframes between min/max
+            pos=pos_min;
+        }
+        if(pos <= pos_min)
+            pos= pos_min + 1;
+        else if(pos > pos_limit)
+            pos= pos_limit;
+        start_pos= pos;
+
+        // read the next timestamp 
+    	cur_pts = asf_read_pts(s, &pos, stream_index);    
+        if(pos == pos_max)
+            no_change++;
+        else
+            no_change=0;
+
+#ifdef DEBUG_SEEK
+printf("%Ld %Ld %Ld / %Ld %Ld %Ld target:%Ld limit:%Ld start:%Ld\n", pos_min, pos, pos_max, pts_min, cur_pts, pts_max, pts, pos_limit, start_pos);
+#endif
+        assert (cur_pts != AV_NOPTS_VALUE);
+        if (pts < cur_pts) {
+            pos_limit = start_pos - 1;
+            pos_max = pos;
+            pts_max = cur_pts;
+        } else {
+            pos_min = pos;
+            pts_min = cur_pts;
+            /* check if we are lucky */
+            if (pts == cur_pts)
+                break;
+        }
+    }
+    pos = pos_min;
+    url_fseek(&s->pb, pos*asf->packet_size + s->data_offset, SEEK_SET);
+    asf_reset_header(s);
+    return 0;
 }
 
 static AVInputFormat asf_iformat = {

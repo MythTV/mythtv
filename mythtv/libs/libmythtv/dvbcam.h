@@ -21,6 +21,7 @@ public:
     void CiHandlerLoop();
 
 public slots:
+    void ChannelChanged(dvb_channel_t& chan);
     void ChannelChanged(dvb_channel_t& chan, uint8_t* pmt, int len);
 
 private:
@@ -31,10 +32,9 @@ private:
 
     bool            exitCiThread;
     bool            ciThreadRunning;
-    bool            noCardSupport;
 
-    bool            setCamProgramMapTable;
-    bool            first;
+    pthread_mutex_t pmt_lock;
+    uint8_t*        cachedpmtbuf;
     uint8_t*        pmtbuf;
     int             pmtlen;
     pthread_t       ciHandlerThread;

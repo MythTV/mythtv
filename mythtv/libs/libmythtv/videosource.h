@@ -312,6 +312,25 @@ private:
     const CaptureCard& parent;
 };
 
+class DvbSatSetting: virtual public Setting, public SimpleDBStorage {
+protected:
+    DvbSatSetting(const CaptureCard& _parent, int _satnum, QString name):
+        SimpleDBStorage("dvb_sat", name),
+        parent(_parent), satnum(_satnum) {
+        setName(name);
+    };
+
+    int getCardID(void) const;
+    int getSatNum(void) const;
+
+protected:
+    virtual QString setClause(void);
+    virtual QString whereClause(void);
+private:
+    const CaptureCard& parent;
+    int satnum;
+};
+
 class VideoDevice: public PathSetting, public CCSetting {
 public:
     VideoDevice(const CaptureCard& parent):
@@ -426,6 +445,39 @@ public:
     };
 };
 
+class DVBNoSeqStart: public CheckBoxSetting, public CCSetting {
+public:
+    DVBNoSeqStart(const CaptureCard& parent):
+        CCSetting(parent, "no_seq_start") {
+        setLabel("Do not wait for SEQ start header.");
+        setHelpText("Normally the dvb-recording will drop packets from the card"
+            " untill a sequence start header is seen. This option turns"
+            " off this feature.");
+    };
+};
+
+class DVBPidBufferSize: public SpinBoxSetting, public CCSetting {
+public:
+    DVBPidBufferSize(const CaptureCard& parent):
+        SpinBoxSetting(0, 180000, 188),
+        CCSetting(parent, "dmx_buf_size") {
+        setLabel("Per PID driver buffer size.");
+        setValue(188*50);
+        setHelpText("");
+    };
+};
+
+class DVBBufferSize: public SpinBoxSetting, public CCSetting {
+public:
+    DVBBufferSize(const CaptureCard& parent):
+        SpinBoxSetting(0, 188000, 188),
+        CCSetting(parent, "pkt_buf_size") {
+        setLabel("Packet buffer.");
+    setValue(188*100);
+        setHelpText("");
+    };
+};
+
 class DVBAudioDevice: public LineEditSetting, public CCSetting {    
     Q_OBJECT
 public:
@@ -528,6 +580,162 @@ public slots:
     };
 };
 
+class DVBSatelliteConfigType: public ComboBoxSetting, public CCSetting {
+public:
+    DVBSatelliteConfigType(CaptureCard& parent):
+        CCSetting(parent, "dvb_sat_type") {
+        setLabel("Type");
+        addSelection("Single LNB","0");
+        addSelection("Tone Switch aka Mini DiSEqC (2-Way)","1");
+        addSelection("DiSEq v1.0 Switch (2-Way)","2");
+        addSelection("DiSEq v1.1 Switch (2-Way)","3");
+        addSelection("DiSEq v1.0 Switch (4-Way)","4");
+        addSelection("DiSEq v1.1 Switch (4-Way)","5");
+//        addSelection("DiSEqC Positioner","6");
+        setHelpText("Select the type of satellite equipment you have. Selecting"
+                    " 'Finish' on this screen will only save the type, and not"
+                    " the individual satellite, move down to the list to do this.");
+    };
+};
+
+class DVBSatelliteList: public ListBoxSetting, public TransientStorage {
+    Q_OBJECT
+public:
+    DVBSatelliteList(CaptureCard& _parent): parent(_parent) {
+        setLabel("Satellites");
+        db = NULL;
+        satellites = 1;
+        setHelpText("Select the satellite you want to configure and press the"
+                    " 'menu' key, and edit the satellite, when you are done"
+                    " configuring, press 'OK' to leave this wizard.");
+    };
+
+    void load(QSqlDatabase* _db);
+
+public slots:
+    void fillSelections(const QString& v) {
+        satellites = 1;
+        if (v.toInt() > 0)
+            satellites = 2;
+        if (v.toInt() > 3)
+            satellites = 4;
+        if (db)
+            load(db);
+    };
+protected:
+    QSqlDatabase* db;
+    CaptureCard& parent;
+    int satellites;
+};
+
+class DVBSatelliteWizard: public ConfigurationWizard {
+    Q_OBJECT
+public:
+    DVBSatelliteWizard(CaptureCard& _parent):
+        parent(_parent) {
+        VerticalConfigurationGroup* g = new VerticalConfigurationGroup(false);
+        g->setLabel("Satellite Configuration");
+        g->setUseLabel(false);
+        DVBSatelliteConfigType* type = new DVBSatelliteConfigType(parent);
+        list = new DVBSatelliteList(parent);
+        connect(type, SIGNAL(valueChanged(const QString&)),
+                list, SLOT(fillSelections(const QString&)));
+        connect(list, SIGNAL(menuButtonPressed(int)),
+                this, SLOT(editSat(int)));
+        g->addChild(type);
+        g->addChild(list);
+        addChild(g);
+    };
+
+    class SatName: public LineEditSetting, public DvbSatSetting {
+    public:
+        SatName(const CaptureCard& parent, int satnum):
+            DvbSatSetting(parent, satnum, "name") {
+            setLabel("Satellite Name");
+            setValue("Unnamed");
+            setHelpText("A textual representation of this satellite or cluster"
+                        " of satellites.");
+        };
+    };
+
+    class SatPos: public LineEditSetting, public DvbSatSetting {
+    public:
+        SatPos(const CaptureCard& parent, int satnum):
+            DvbSatSetting(parent, satnum, "pos") {
+            setLabel("Satellite Position");
+            setValue("");
+            setHelpText("A textual representation of which position the satellite"
+                        " is located at ('1W')");
+        };
+    };
+
+    class LofSwitch: public LineEditSetting, public DvbSatSetting {
+    public:
+        LofSwitch(const CaptureCard& parent, int satnum):
+            DvbSatSetting(parent, satnum, "lnb_lof_switch") {
+            setLabel("LNB LOF Switch");
+            setValue("11700000");
+            setHelpText("This defines at what frequency (in hz) the LNB will"
+                        " do a switch from high to low setting, and vice versa.");
+        };
+    };
+
+    class LofHigh: public LineEditSetting, public DvbSatSetting {
+    public:
+        LofHigh(const CaptureCard& parent, int satnum):
+            DvbSatSetting(parent, satnum, "lnb_lof_hi") {
+            setLabel("LNB LOF High");
+            setValue("10600000");
+            setHelpText("This defines the offset (in hz) the frequency coming"
+                        " from the lnb will be in high setting.");
+        };
+    };
+
+    class LofLow: public LineEditSetting, public DvbSatSetting {
+    public:
+        LofLow(const CaptureCard& parent, int satnum):
+            DvbSatSetting(parent, satnum, "lnb_lof_lo") {
+            setLabel("LNB LOF Low");
+            setValue("9750000");
+            setHelpText("This defines the offset (in hz) the frequency coming"
+                        " from the lnb will be in low setting.");
+        };
+    };
+
+    class SatEditor: public ConfigurationWizard {
+    public:
+        SatEditor(CaptureCard& _parent, int satnum):
+            parent(_parent) {
+            VerticalConfigurationGroup* g = new VerticalConfigurationGroup(false);
+            g->addChild(new SatName(parent, satnum));
+            g->addChild(new SatPos(parent, satnum));
+            g->addChild(new LofSwitch(parent, satnum));
+            g->addChild(new LofLow(parent, satnum));
+            g->addChild(new LofHigh(parent, satnum));
+            addChild(g);
+        };
+    protected:
+        CaptureCard& parent;
+    };
+
+    int exec(QSqlDatabase* _db) {
+        db = _db;
+        return ConfigurationWizard::exec(db);
+    };
+
+public slots:
+    void editSat(int satnum) {
+        SatEditor ed(parent, satnum);
+        ed.exec(db);
+        list->load(db);
+    };
+
+protected:
+    QSqlDatabase* db;
+    CaptureCard& parent;
+    DVBSatelliteList* list;
+};
+
 class DVBCardVerificationWizard: public ConfigurationWizard {
     Q_OBJECT
 public:
@@ -562,6 +770,9 @@ public:
 
         rec->addChild(new DVBSwFilter(parent));
         rec->addChild(new DVBRecordTS(parent));
+        rec->addChild(new DVBNoSeqStart(parent));
+        rec->addChild(new DVBPidBufferSize(parent));
+        rec->addChild(new DVBBufferSize(parent));
         addChild(rec);
     };
 };

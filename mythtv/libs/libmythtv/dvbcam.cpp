@@ -32,6 +32,8 @@
  */
 
 #include <qdatetime.h>
+#include <qsqldatabase.h>
+#include <qvariant.h>
 
 #include <iostream>
 #include <vector>
@@ -57,8 +59,9 @@ DVBCam::DVBCam(int cardNum): cardnum(cardNum)
 {
     exitCiThread = false;
     ciThreadRunning = false;
-    noCardSupport = false;
     ciHandler = NULL;
+    cachedpmtbuf = NULL;
+    pthread_mutex_init(&pmt_lock, NULL);
 }
 
 DVBCam::~DVBCam()
@@ -75,14 +78,9 @@ bool DVBCam::Open()
     ciHandler = cCiHandler::CreateCiHandler(dvbdevice(DVB_DEV_CA, cardnum));
 
     if (ciHandler == NULL)
-    {
-        ERRNO("CAM Support failed initialization.");
         return false;
-    }
 
-    GENERAL("CAM Support initialized successfully.");
-
-    setCamProgramMapTable = false;
+    GENERAL("CAM - Initialized successfully.");
 
     pthread_create(&ciHandlerThread, NULL, CiHandlerThreadHelper, this);
 
@@ -98,24 +96,79 @@ bool DVBCam::Close()
     return true;
 }
 
-void DVBCam::ChannelChanged(dvb_channel_t& chan, uint8_t* pmt, int len)
+void DVBCam::ChannelChanged(dvb_channel_t& chan)
 {
-    chan_opts = chan;
-    pmtbuf = pmt;
-    pmtlen = len;
+    QSqlDatabase *db = QSqlDatabase::database();
+    QSqlQuery query = db->exec(QString("SELECT pmtcache FROM dvb_channel"
+                               " WHERE serviceid=%1").arg(chan.serviceID));
 
-    if (!ciThreadRunning && !noCardSupport)
-        if (!Open())
-            noCardSupport = true;
-
-    if (chan.serviceID == 0)
+    if (!query.isActive())
     {
-        ERROR("CAM: ServiceID is not set.");
+        MythContext::DBError("pmtcache", query);
         return;
     }
 
-    setCamProgramMapTable = true;
-    first = true;
+    if (query.numRowsAffected() > 0)
+    {
+        query.next();
+        if (!query.value(0).isNull())
+        {
+            pthread_mutex_lock(&pmt_lock);
+            QByteArray ba = query.value(0).toByteArray();
+            GENERAL("CAM - Cached PMT found.");
+            if (cachedpmtbuf)
+                delete cachedpmtbuf;
+            chan_opts = chan;
+            pmtbuf = cachedpmtbuf = new uint8_t [ba.size()];
+            memcpy(pmtbuf, ba.data(), ba.size());
+            pmtlen = ba.size();
+            pthread_mutex_unlock(&pmt_lock);
+        }
+    }
+}
+
+void DVBCam::ChannelChanged(dvb_channel_t& chan, uint8_t* pmt, int len)
+{
+    if (chan.serviceID == 0)
+    {
+        ERROR("CAM - ServiceID is not set.");
+        return;
+    }
+
+    pthread_mutex_lock(&pmt_lock);
+
+    bool setpmt = true;
+    if (len == pmtlen && chan.serviceID == chan_opts.serviceID)
+        if (!memcmp(pmt, pmtbuf, len))
+            setpmt = false;
+
+    if (setpmt)
+    {
+        chan_opts = chan;
+        pmtbuf = pmt;
+        pmtlen = len;
+    }
+
+    pthread_mutex_unlock(&pmt_lock);
+
+    QByteArray ba;
+    ba.resize(len);
+    memcpy(ba.data(), pmt, len);
+
+    QSqlQuery query;
+    query.prepare(QString("UPDATE dvb_channel SET pmtcache=?"
+                  " WHERE serviceid=%2").arg(chan.serviceID));
+    query.bindValue(0, QVariant(ba));
+    query.exec();
+
+    if (!query.isActive())
+    {
+        MythContext::DBError("pmtcache", query);
+        return;
+    }
+
+    if (query.numRowsAffected() == 1)
+        GENERAL("CAM - PMT cache updated.");
 }
 
 void *DVBCam::CiHandlerThreadHelper(void*self)
@@ -138,9 +191,11 @@ void DVBCam::CiHandlerLoop()
         {
             const unsigned short *caids = ciHandler->GetCaSystemIds(s);
             // TODO: Only set cam with correct id.
-            if (caids != NULL && setCamProgramMapTable)
+
+            pthread_mutex_lock(&pmt_lock);
+            if (caids != NULL)
             {
-                GENERAL(QString("Sending PMT to CAM in slot %1.").arg(s));
+//                GENERAL(QString("CAM - Sending PMT to slot %1.").arg(s));
 
                 cCiCaPmt capmt(chan_opts.serviceID);
 
@@ -149,9 +204,8 @@ void DVBCam::CiHandlerLoop()
                 SetPids(capmt, chan_opts.pids);
 
                 ciHandler->SetCaPmt(capmt,s);
-
-                setCamProgramMapTable = false;
             }
+            pthread_mutex_unlock(&pmt_lock);
         }
     }
     

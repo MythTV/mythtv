@@ -118,8 +118,13 @@ bool DVBChannel::Open()
             diseqc = new DVBDiSEqC(cardnum, fd_frontend);
             diseqc->DiseqcReset();
         }
-
-        dvbcam = new DVBCam(cardnum);
+    }
+    
+    dvbcam = new DVBCam(cardnum);
+    if (dvbcam->Open())
+    {
+        connect(this, SIGNAL(ChannelChanged(dvb_channel_t&)),
+                dvbcam, SLOT(ChannelChanged(dvb_channel_t&)));
         connect(dvbsct, SIGNAL(ChannelChanged(dvb_channel_t&, uint8_t*, int)),
                 dvbcam, SLOT(ChannelChanged(dvb_channel_t&, uint8_t*, int)));
     }

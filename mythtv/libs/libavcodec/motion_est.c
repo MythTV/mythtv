@@ -1,7 +1,7 @@
 /*
  * Motion estimation 
  * Copyright (c) 2000,2001 Fabrice Bellard.
- * Copyright (c) 2002-2003 Michael Niedermayer
+ * Copyright (c) 2002-2004 Michael Niedermayer
  * 
  *
  * This library is free software; you can redistribute it and/or
@@ -840,13 +840,14 @@ static inline int h263_mv4_search(MpegEncContext *s, int mx, int my, int shift)
         dmin4= s->me.sub_motion_search(s, &mx4, &my4, dmin4, 
 					  pred_x4, pred_y4, src_data, ref_data, stride, uvstride, size, h, mv_penalty);
         
-        if(s->dsp.me_sub_cmp[0] != s->dsp.mb_cmp[0]){
+        if(s->dsp.me_sub_cmp[0] != s->dsp.mb_cmp[0]
+           && s->avctx->mb_decision == FF_MB_DECISION_SIMPLE){
             int dxy;
             const int offset= ((block&1) + (block>>1)*stride)*8;
             uint8_t *dest_y = s->me.scratchpad + offset;
 
             if(s->quarter_sample){
-                uint8_t *ref= ref_data[0] + (mx4>>2) + (my4>>2)*stride + offset;
+                uint8_t *ref= ref_data[0] + (mx4>>2) + (my4>>2)*stride;
                 dxy = ((my4 & 3) << 2) | (mx4 & 3);
 
                 if(s->no_rounding)
@@ -854,7 +855,7 @@ static inline int h263_mv4_search(MpegEncContext *s, int mx, int my, int shift)
                 else
                     s->dsp.put_qpel_pixels_tab       [1][dxy](dest_y   , ref    , stride);
             }else{
-                uint8_t *ref= ref_data[0] + (mx4>>1) + (my4>>1)*stride + offset;
+                uint8_t *ref= ref_data[0] + (mx4>>1) + (my4>>1)*stride;
                 dxy = ((my4 & 1) << 1) | (mx4 & 1);
 
                 if(s->no_rounding)
@@ -990,7 +991,8 @@ static int interlaced_search(MpegEncContext *s, uint8_t *frame_src_data[3], uint
             mv_table[xy][0]= mx_i;
             mv_table[xy][1]= my_i;
             
-            if(s->dsp.me_sub_cmp[0] != s->dsp.mb_cmp[0]){
+            if(s->dsp.me_sub_cmp[0] != s->dsp.mb_cmp[0]
+               && s->avctx->mb_decision == FF_MB_DECISION_SIMPLE){
                 int dxy;
 
                 //FIXME chroma ME

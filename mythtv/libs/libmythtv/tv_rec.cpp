@@ -485,13 +485,22 @@ void TVRec::HandleStateChange(void)
         SetVideoFiltersForChannel(channel, channel->GetCurrentName());
         pthread_create(&encode, NULL, SpawnEncode, nvr);
 
-        while (!nvr->IsRecording())
+        while (!nvr->IsRecording() && !nvr->IsErrored())
             usleep(50);
 
-        // evil.
-        channel->SetFd(nvr->GetVideoFd());
-
-        frameRate = nvr->GetFrameRate();
+        if (nvr->IsRecording())
+        {
+            // evil.
+            channel->SetFd(nvr->GetVideoFd());
+            frameRate = nvr->GetFrameRate();
+        }
+        else
+        {
+            FinishedRecording();
+            killRecordingFile = true;
+            closeRecorder = true;
+            tmpInternalState = kState_None;
+        }
     }
 
     if (closeRecorder)

@@ -55,6 +55,19 @@ QString CISetting::setClause(void) {
         .arg(getValue());
 }
 
+QString DvbSatSetting::whereClause(void) {
+    return QString("cardid = %1 AND diseqc_port = %2")
+        .arg(parent.getCardID()).arg(satnum);
+}
+
+QString DvbSatSetting::setClause(void) {
+    return QString("cardid = %1, diseqc_port = %2, %3 = '%4'")
+        .arg(parent.getCardID())
+        .arg(satnum)
+        .arg(getColumn())
+        .arg(getValue());
+}
+
 void RegionSelector::fillSelections() {
     clearSelections();
 
@@ -367,6 +380,14 @@ int CISetting::getInputID(void) const {
 
 int CCSetting::getCardID(void) const {
     return parent.getCardID();
+}
+
+int DvbSatSetting::getCardID(void) const {
+    return parent.getCardID();
+}
+
+int DvbSatSetting::getSatNum(void) const {
+    return satnum;
 }
 
 int CaptureCardEditor::exec(QSqlDatabase* db) {
@@ -820,8 +841,30 @@ void DVBAdvancedConfigMenu::execACW() {
 }
 
 void DVBAdvancedConfigMenu::execSAT() {
-// FIXME: TODO: Satellite Editor.
-    //DVBSatelliteWizard sw;
-    //sw.exec(db);
+    DVBSatelliteWizard sw(parent);
+    sw.exec(db);
+}
+
+void DVBSatelliteList::load(QSqlDatabase* _db)
+{
+    db = _db;
+    clearSelections();
+    QSqlQuery query = db->exec(
+        QString("SELECT name FROM dvb_sat WHERE cardid=%1")
+        .arg(parent.getCardID()));
+    if (!query.isActive())
+        MythContext::DBError("DvbSatelliteList", query);
+    for (int i=0; i<satellites; i++)
+    {
+        QString str = QString("%1. ").arg(i);
+        if (i<query.numRowsAffected())
+        {
+            query.next();
+            str += query.value(0).toString();
+        }
+        else
+            str += "Unconfigured";
+        addSelection(str);
+    }
 }
 

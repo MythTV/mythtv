@@ -60,3 +60,5 @@ channel preset support & misc:
     Ramon Roca <ramon dot roca at xcombo dot com>
 Dynamic MMX/3DNow in linearblend filter, genericbutton UI extensions:
     Simon Kenyon <simon@koala.ie>
+DVB Code rewrite, fixes for MPEG2 playback, Channel Editor
+    Kenneth Aafloy <ke-aa at frisurf.no>

@@ -32,7 +32,7 @@ SOURCES += golomb.c h264.c raw.c indeo3.c asv1.c vp3.c 4xm.c cabac.c
 SOURCES += ffv1.c ra144.c ra288.c vcr1.c cljr.c roqvideo.c dpcm.c
 SOURCES += interplayvideo.c xan.c rpza.c cinepak.c msrle.c msvideo1.c
 SOURCES += vqavideo.c idcinvideo.c adx.c rational.c faandct.c
-SOURCES += 8bps.c parser.c smc.c flicvideo.c truemotion1.c vmdav.c
+SOURCES += 8bps.c parser.c smc.c flicvideo.c truemotion1.c vmdav.c lcl.c
 SOURCES += libpostproc/postprocess.c
 
 inc.path = $${PREFIX}/include/mythtv/ffmpeg/

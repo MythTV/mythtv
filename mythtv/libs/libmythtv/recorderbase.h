@@ -45,6 +45,7 @@ class RecorderBase
     virtual void WaitForPause(void) = 0;
 
     virtual bool IsRecording(void) = 0;
+    virtual bool IsErrored(void) = 0;
 
     virtual long long GetFramesWritten(void) = 0;
     
