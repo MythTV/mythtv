@@ -48,8 +48,6 @@ AudioOutput *AudioOutput::OpenAudio(QString audiodevice, int audio_bits,
     else
         return new AudioOutputOSS(audiodevice, audio_bits,
                                   audio_channels, audio_samplerate);
-#else
-#error Need a default audio driver
 #endif
 
     return NULL;
