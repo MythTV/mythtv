@@ -78,6 +78,8 @@ public:
     };
 
     bool isChanged(void) { return changed; };
+    void setUnchanged(void) { changed = false; };
+    void setChanged(void) { changed = true; };
 
 public slots:
     virtual void setValue(const QString& newValue) {
@@ -89,8 +91,6 @@ signals:
     void valueChanged(const QString&);
 
 protected:
-    void setUnchanged(void) { changed = false; };
-
     QString settingValue;
     bool changed;
 };
