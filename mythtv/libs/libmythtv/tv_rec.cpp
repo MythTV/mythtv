@@ -443,6 +443,8 @@ void TVRec::HandleStateChange(void)
 
         // evil.
         channel->SetFd(nvr->GetVideoFd());
+        SetVideoFiltersForChannel(channel, channel->GetCurrentName());
+
         frameRate = nvr->GetFrameRate();
     }
 
