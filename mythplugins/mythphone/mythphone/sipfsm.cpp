@@ -497,7 +497,7 @@ void SipThread::ChangePrimaryCallState(SipFsm *sipFsm, int NewState)
                 int lPort = atoi((const char *)gContext->GetSetting("AudioLocalPort"));
                 QString spk = gContext->GetSetting("AudioOutputDevice");
                 Rtp = new rtp(0, lPort, remoteIp, remoteAudioPort, audioPayload, dtmfPayload, "None", spk, RTP_TX_AUDIO_SILENCE, RTP_RX_AUDIO_DISCARD);
-                vxml = new vxmlParser(Rtp, callerName);
+                vxml = new vxmlParser(Rtp, callerName.length() != 0 ? callerName : callerUser);
             }
 #endif
         }

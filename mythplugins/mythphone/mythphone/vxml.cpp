@@ -135,6 +135,8 @@ vxmlParser::vxmlParser(rtp *r, QString cName)
 {
     Rtp = r;
     callerName = cName;
+    if (callerName.length() == 0)
+        callerName = "Unknown";
     killVxmlThread = false;
     killVxmlPage = false;
     pthread_create(&vxmlthread, NULL, vxmlThread, this);
