@@ -105,6 +105,7 @@
         <value lang="PT">Director:</value>
         <value lang="SV">Regissör:</value>
 	<value lang="FR">Réalisateur:</value>
+	<value lang="JA">ディレクター:</value>
       </textarea>
       <textarea name="director" draworder="4">
         <area>170,75,350,35</area>
@@ -121,6 +122,7 @@
         <value lang="PT">Ano:</value>
         <value lang="SV">År:</value>
 	<value lang="FR">Année:</value>
+	<value lang="JA">年:</value>
       </textarea>
       <textarea name="year" draworder="4">
         <area>680,75,100,35</area>
@@ -137,6 +139,7 @@
         <value lang="PT">Classificação:</value>
         <value lang="SV">Klassificering:</value>
 	<value lang="FR">Notes:</value>
+	<value lang="JA">分類:</value>
       </textarea>
       <textarea name="rating" draworder="4">
         <area>170,105,600,35</area>
@@ -153,6 +156,7 @@
         <value lang="PT">Nível de Acesso:</value>
         <value lang="SV">Barnlåsnivå:</value>
         <value lang="FR">Niveau parental:</value>
+	<value lang="JA">再生制限レベル:</value>
       </textarea>
       <textarea name="level" draworder="4">
         <area>680,105,100,35</area>
@@ -167,6 +171,7 @@
         <value lang="DE">Listbar:</value>
         <value lang="CA">Llistable:</value>
 	<value lang="FR">Listé:</value>
+	<value lang="JA">表示:</value>
       </textarea>
       <textarea name="browseable" draworder="4">
         <area>680,135,100,35</area>
@@ -183,6 +188,7 @@
         <value lang="PT">Duração:</value>
         <value lang="SV">Längd:</value>
 	<value lang="FR">Durée:</value>
+	<value lang="JA">時間:</value>
       </textarea>
       <textarea name="length" draworder="4">
         <area>170,135,350,35</area>
@@ -199,6 +205,7 @@
         <value lang="PT">Resumo:</value>
         <value lang="SV">Handling:</value>
 	<value lang="FR">Résumé:</value>
+	<value lang="JA">脚本:</value>
       </textarea>
       <textarea name="plot" draworder="4">
         <area>170,165,600,35</area>
@@ -215,6 +222,7 @@
         <value lang="PT">Ficheiro:</value>
         <value lang="SV">Filnamn:</value>
 	<value lang="FR">Nom du fichier:</value>
+	<value lang="JA">ファイル名:</value>
       </textarea>
       <textarea name="filename" draworder="4">
         <area>170,195,600,35</area>
@@ -231,6 +239,7 @@
         <value lang="PT">Ficheiro de Capa:</value>
         <value lang="SV">Fil för omslagsbild:</value>
 	<value lang="FR">Affiche:</value>
+	<value lang="JA">カバーファイル:</value>
       </textarea>
       <textarea name="coverfile" draworder="4">
         <area>170,225,600,35</area>
@@ -244,6 +253,7 @@
         <value lang="DE">IMDB-Nr.:</value>
         <value lang="SV">IMDB-nummer:</value>
 	<value lang="FR">N° IMDB</value>
+	<value lang="JA">IMDB番号:</value>
       </textarea>
       <textarea name="inetref" draworder="4">
         <area>170,255,500,35</area>
@@ -282,6 +292,7 @@
         <value lang="DE">0-9: Editieren</value>
         <value lang="ES">0-9: Editar</value>
 	<value lang="FR">0-9: Editer</value>
+	<value lang="JA">0-9: 編集</value>
       </textarea>
       <textarea name="keyslbl_two" draworder="4" align="center">
         <area>300,275,200,15</area>
@@ -293,6 +304,7 @@
         <value lang="DE">Menu/Info: IMDB manuell</value>
         <value lang="ES">Menu/Info: IMDB Manual</value>
 	<value lang="FR">Menu/Info: IMDB Manuel</value>
+	<value lang="JA">メニュー/情報: IMDB入力</value>
       </textarea>
       <textarea name="keyslbl_three" draworder="4" align="right">
         <area>580,275,200,15</area>
@@ -304,6 +316,7 @@
         <value lang="CA">Enter/OK: IMDB automatisch</value>
         <value lang="ES">Enter/OK: IMDB Automático</value>
 	<value lang="FR">Entrée/Ok: IMDN Automatique</value>
+	<value lang="JA">Enter/OK: 自動IMDB</value>
       </textarea>
     </container>
     
@@ -320,6 +333,7 @@
         <value lang="PT">A obter a informação...</value>
         <value lang="SV">hämtar data...</value>
 	<value lang="FR">Récupération des données ...</value>
+	<value lang="JA">データ取得中...</value>
       </textarea>
       <textarea name="finder" draworder="0" align="center">
         <area>0,270,800,60</area>
@@ -332,6 +346,7 @@
         <value lang="PT">[ a obter ]</value>
         <value lang="SV">[ letar efter ]</value>
 	<value lang="FR">[ Recherche ]</value>
+	<value lang="JA">[ 検索中 ]</value>
       </textarea>
       <textarea name="title" draworder="0" align="center">
         <area>0,320,800,60</area>
@@ -375,6 +390,7 @@
         <value lang="PT">Chave IMDB #</value>
         <value lang="SV">Mata in IMDB-nummer</value>
 	<value lang="FR">Saisie le N° IMDB</value>
+	<value lang="JA">IMDB番号入力</value>
         <area>0,15,360,25</area>
       </textarea>
       <textarea name="numhold" draworder="7" align="center">
@@ -396,6 +412,7 @@
         <value lang="PT">A carregar...</value>
         <value lang="SV">laddar...</value>
 	<value lang="FR">Chargement</value>
+	<value lang="JA">読込中...</value>
       </textarea>
       <textarea name="title" draworder="0" align="center">
         <area>0,320,800,60</area>
@@ -415,6 +432,7 @@
          <value lang="PT">Não foram encontrados nenhuns filmes</value>
          <value lang="SV">Inga filmer funna</value>
 	 <value lang="FR">Aucune vidéo trouvée</value>
+	<value lang="JA">ビデオを見つけることが出来ませんでした｡</value>
          <multiline>yes</multiline> 
       </textarea>
     </container>
@@ -514,6 +532,7 @@
         <value lang="PT">Use os cursores Esquerda e Direita</value>
         <value lang="SV">Använd vänster och höger piltangent</value>
 	<value lang="FR">Utiliser les flèches droite et gauche</value>
+	<value lang="JA">左右キーを使用してください</value>
       </textarea>
       <textarea name="currentvideo" draworder="3" align="center">
         <area>10,64,500,35</area>
@@ -549,6 +568,7 @@
         <value lang="PT">Dirigido por</value>
         <value lang="SV">Regisserad av:</value>
 	<value lang="FR">Réalisé par:</value>
+	<value lang="JA">監督</value>
       </textarea>
       <textarea name="director" draworder="4">
         <area>166,80,350,35</area>
@@ -565,6 +585,7 @@
         <value lang="PT">Ano:</value>
         <value lang="SV">År:</value>
 	<value lang="FR">Année:</value>
+	<value lang="JA">年:</value>
       </textarea>
       <textarea name="year" draworder="4">
         <area>680,90,100,45</area>
@@ -581,6 +602,7 @@
         <value lang="PT">Resumo:</value>
         <value lang="SV">Handling:</value>
 	<value lang="FR">Résumé:</value>
+	<value lang="JA">脚本:</value>
       </textarea>
       <textarea name="plot" draworder="4">
         <area>240,150,500,105</area>
@@ -598,6 +620,7 @@
         <value lang="PT">Classificação:</value>
         <value lang="SV">Klassificering:</value>
 	<value lang="FR">Notes:</value>
+	<value lang="JA">定格:</value>
       </textarea>
       <textarea name="rating" draworder="4">
         <area>240,285,500,90</area>
@@ -615,6 +638,7 @@
         <value lang="PT">Duração:</value>
         <value lang="SV">Längd:</value>
 	<value lang="FR">Durée:</value>
+	<value lang="JA">時間:</value>
       </textarea>
       <textarea name="length" draworder="4">
         <area>240,405,350,35</area>
@@ -639,6 +663,7 @@
         <value lang="PT">A Carregar...</value>
         <value lang="SV">Laddar...</value>
 	<value lang="FR">Chargement...</value>
+	<value lang="JA">読込中...</value>
       </textarea>
       <textarea name="title" draworder="0" align="center">
         <area>0,320,800,60</area>
@@ -658,6 +683,7 @@
          <value lang="PT">Não foram encontrados nenhuns filmes</value>
          <value lang="SV">Inga filmer funna</value>
 	 <value lang="FR">Aucune vidéo trouvée</value>
+	<value lang="JA">ビデオファイルを削除できませんでした</value>
          <multiline>yes</multiline>
       </textarea>
     </container>
@@ -769,6 +795,7 @@
                 <value lang="CA">Arxiu:</value>
                 <value lang="ES">Archivo:</value>
 		<value lang="FR">Fichier:</value>
+		<value lang="JA">ファイル:</value>
             </textarea>
             <textarea name="player_label" draworder="0" align="right">
                 <area>30,196,90,40</area>
@@ -781,6 +808,7 @@
                 <value lang="CA">Comanda:</value>
                 <value lang="ES">Comando:</value>
 		<value lang="FR">Lecteur:</value>
+		<value lang="JA">俳優:</value>
             </textarea>
             <textarea name="video_file" draworder="0">
                 <area>130,155,380,40</area>
@@ -842,6 +870,7 @@
                 <value lang="CA">Associació d'arxius a MythVideo</value>
                 <value lang="ES">Asociación de archivos a MythVideo</value>
 		<value lang="FR">Association de fichiers de MythVideo</value>
+		<value lang="JA">MythVideo ファイル関連付け</value>
             </textarea>
  
  
@@ -856,6 +885,7 @@
                 <value lang="CA">Extensió:</value>
                 <value lang="ES">Extensión:</value>
 		<value lang="FR">Extension:</value>
+		<value lang="JA">拡張子:</value>
             </textarea>
 
             <textarea name="command_text" draworder="0" align="right">
@@ -868,6 +898,7 @@
                 <value lang="CA">Comanda:</value>
                 <value lang="ES">Comando:</value>
 		<value lang="FR">Commande:</value>
+		<value lang="JA">コマンド:</value>
             </textarea>
 
             <textarea name="default_text" draworder="0" align="right">
@@ -880,6 +911,7 @@
                 <value lang="CA">Reproductor:</value>
                 <value lang="ES">Reproductor:</value>
 		<value lang="FR">Utiliser le lecteur par défaut:</value>
+		<value lang="JA">既定のプレイヤー:</value>
             </textarea>
 
             <textarea name="ignore_text" draworder="0" align="right">
@@ -892,6 +924,7 @@
                 <value lang="CA">Ignorar:</value>
                 <value lang="ES">Ignorar:</value>
 		<value lang="FR">Ignoré:</value>
+		<value lang="JA">無視:</value>
             </textarea>
 
 
@@ -987,6 +1020,7 @@
                 <value lang="CA">Editar Informació del vídeo</value>
                 <value lang="ES">Editar Información del video</value>
 		<value lang="FR">Editer les informations de la vidéo</value>
+		<value lang="JA">ビデオ情報編集</value>
             </textarea>
 
             <!--
@@ -1003,6 +1037,7 @@
                 <value lang="CA">Nom:</value>
                 <value lang="ES">Nombre:</value>
                 <value lang="FR">Nom:</value>
+		<value lang="JA">名前:</value>
             </textarea>
 
             <textarea name="level_text" draworder="0" align="right">
@@ -1015,6 +1050,7 @@
                 <value lang="CA">Nivell d'Accès:</value>
                 <value lang="ES">Nível de Acceso:</value>
 		<value lang="FR">Niveau parental:</value>
+		<value lang="JA">再生制限:</value>
             </textarea>
 
             <textarea name="child_text" draworder="0" align="right">
@@ -1027,6 +1063,7 @@
                 <value lang="CA">Arxiu a reproduir després:</value>
                 <value lang="ES">Archivo a reproducir después:</value>
 		<value lang="FR">Fichier à toujours lire ensuite:</value>
+		<value lang="JA">いつも次を再生する:</value>
             </textarea>
 
             <textarea name="browse_text" draworder="0" align="right">
@@ -1039,6 +1076,7 @@
                 <value lang="CA">Incloure al llistar:</value>
                 <value lang="ES">Incluir al listar:</value>
 		<value lang="FR">Inclure dans la liste:</value>
+		<value lang="JA">表示する:</value>
             </textarea>
 
             <textarea name="coverart_text_label" draworder="0" align="right">
@@ -1051,6 +1089,7 @@
                 <value lang="CA">Imatge de caràtula:</value>
                 <value lang="ES">Imagen de portada:</value>
 		<value lang="FR">Affiche:</value>
+		<value lang="JA">カバー絵:</value>
             </textarea>
 
             <textarea name="player_text" draworder="0" align="right">
@@ -1063,6 +1102,7 @@
                 <value lang="CA">Comanda d'execució específica:</value>
                 <value lang="ES">Comando de ejecución específica:</value>
 		<value lang="ES">Commande de lecture:</value>
+		<value lang="JA">固有のプレイヤーコマンド:</value>
             </textarea>
 
             <!--

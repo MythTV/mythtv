@@ -11,6 +11,7 @@
       <text lang="SV">Generella inställningar</text>
       <text lang="FR">Options générales</text>
       <text lang="NL">Algemene Instellingen</text>
+      <text lang="JA">全般設定</text>
       <action>SETTINGS_GENERAL</action>
    </button>
 
@@ -25,6 +26,7 @@
       <text lang="SV">Spelarinställningar</text>
       <text lang="FR">Configuration du lecteur</text>
       <text lang="NL">Weergave Instellingen</text>
+      <text lang="JA">プレイヤー設定</text>
       <action>SETTINGS_PLAYER</action>
    </button>
 
@@ -37,7 +39,8 @@
       <text lang="DE">Dateitypen</text>
       <text lang="ES">Tipos de archivos</text>
       <text lang="FR">Types de fichier</text>
-      <text lang="NL">Bestandstypes</text>      
+      <text lang="NL">Bestandstypes</text>
+      <text lang="JA">ファイルタイプ</text>
       <action>SETTINGS_ASSOCIATIONS</action>
    </button>
 

@@ -113,7 +113,7 @@
     </message>
     <message>
         <source>This is the command used for any file that the extension is not specifically defined.</source>
-        <translation>Dies ist der Befehl, der für alle Dateien mit nicht speziell definierten Erweiterungen verwendet wird.</translation>
+        <translation type="obsolete">Dies ist der Befehl, der für alle Dateien mit nicht speziell definierten Erweiterungen verwendet wird.</translation>
     </message>
     <message>
         <source>General Settings</source>
@@ -165,6 +165,10 @@
     </message>
     <message>
         <source>If set, newly scanned files in the Video Manager will be marked as browsable and will appear in the &apos;Browse&apos; menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos; or &apos;MythXine&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
