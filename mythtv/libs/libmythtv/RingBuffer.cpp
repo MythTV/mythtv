@@ -240,6 +240,8 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write, bool needevents)
     readaheadrunning = false;
     readaheadpaused = false;
     wantseek = false;
+    fill_threshold = -1;
+    fill_min = -1;
 
     recorder_num = 0;   
  
@@ -306,6 +308,8 @@ RingBuffer::RingBuffer(const QString &lfilename, long long size,
     readaheadrunning = false;
     readaheadpaused = false;
     wantseek = false;
+    fill_threshold = -1;
+    fill_min = -1;
 
     recorder_num = 0;
     remoteencoder = NULL;
@@ -527,9 +531,43 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
 }
 
 #define READ_AHEAD_SIZE (10 * 1024 * 1024)
-#define READ_AHEAD_MIN_THRESHOLD (1 * 1024 * 1024)
-#define READ_AHEAD_MIN_FULL (256000)
-#define READ_AHEAD_MIN_FREE (128000)
+#define READ_AHEAD_BLOCK_SIZE (128000)
+
+void RingBuffer::CalcReadAheadThresh(int estbitrate)
+{
+    wantseek = true;
+    pthread_rwlock_wrlock(&rwlock);
+    wantseek = false;
+
+    fill_threshold = 0;
+    fill_min = 0;
+
+    if (remotefile)
+        fill_threshold += 256000;
+
+    if (estbitrate > 6000)
+        fill_threshold += 256000;
+
+    if (estbitrate > 10000)
+        fill_threshold += 256000;
+
+    if (estbitrate > 14000)
+        fill_threshold += 256000;
+
+    if (fill_threshold >= 256000)
+        fill_min = 128000;
+
+    readsallowed = false;
+
+    if (fill_threshold == 0)
+        fill_threshold = -1;
+    if (fill_min == 0)
+        fill_min = -1;
+
+cout << fill_threshold << " " << fill_min << endl;
+
+    pthread_rwlock_unlock(&rwlock);
+}
 
 int RingBuffer::ReadBufFree(void)
 {
@@ -648,10 +686,10 @@ void RingBuffer::ReadAheadThread(void)
         readaheadpaused = false;
 
         pthread_rwlock_rdlock(&rwlock);
-        if (totfree > READ_AHEAD_MIN_FREE)
+        if (totfree > READ_AHEAD_BLOCK_SIZE)
         {
             // limit the read size
-            totfree = READ_AHEAD_MIN_FREE;
+            totfree = READ_AHEAD_BLOCK_SIZE;
 
             if (rbwpos + totfree > READ_AHEAD_SIZE)
                 totfree = READ_AHEAD_SIZE - rbwpos;
@@ -731,18 +769,18 @@ void RingBuffer::ReadAheadThread(void)
             totfree = 0;
         }
 
-        if (!readsallowed && used >= READ_AHEAD_MIN_THRESHOLD)
+        if (!readsallowed && used >= fill_threshold)
             readsallowed = true;        
 
-        if (readsallowed && used < READ_AHEAD_MIN_FULL && !ateof)
+        if (readsallowed && used < fill_min && !ateof)
         {
             readsallowed = false;
-            cerr << "rebuffering...\n";
+            cerr << "rebuffering (" << used << " " << fill_min << ")\n";
         }
 
         pthread_rwlock_unlock(&rwlock);
 
-        if (totfree < READ_AHEAD_MIN_FREE || wantseek)
+        if (totfree < READ_AHEAD_BLOCK_SIZE || wantseek)
             usleep(500);
     }
 

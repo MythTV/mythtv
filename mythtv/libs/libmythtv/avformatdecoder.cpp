@@ -206,6 +206,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     fmt->flags &= ~AVFMT_NOFILE;
 
+    int bitrate = 0;
+
     for (int i = 0; i < ic->nb_streams; i++)
     {
         AVCodecContext *enc = &ic->streams[i]->codec;
@@ -213,6 +215,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         {
             case CODEC_TYPE_VIDEO:
             {
+                bitrate += enc->bit_rate;
+
                 double fps = (double)enc->frame_rate / enc->frame_rate_base;
                 m_parent->SetVideoParams(enc->width, enc->height, fps, 30);
               
@@ -244,6 +248,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             }
             case CODEC_TYPE_AUDIO:
             {
+                bitrate += enc->bit_rate;
                 m_parent->SetEffDsp(enc->sample_rate * 100);
                 m_parent->SetAudioParams(16, enc->channels, enc->sample_rate);
                 audio_sample_size = enc->channels * 2;
@@ -271,6 +276,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             exit(0);
         }
     }
+
+    ringBuffer->CalcReadAheadThresh(bitrate);
 
     dump_format(ic, 0, filename, 0);
 

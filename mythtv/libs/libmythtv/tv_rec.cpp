@@ -490,7 +490,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
     nvr->SetRingBuffer(rbuffer);
 
     nvr->SetBaseOption("videodevice", videodev);
-    nvr->SetBaseOption("audiodevice", vbidev);
+    nvr->SetBaseOption("vbidevice", vbidev);
     nvr->SetBaseOption("tvformat", gContext->GetSetting("TVFormat"));
     nvr->SetBaseOption("vbiformat", gContext->GetSetting("VbiFormat"));
     nvr->SetBaseOption("audiodevice", audiodev);

@@ -62,6 +62,8 @@ class RingBuffer
     void Unpause(void);
     bool isPaused(void);
 
+    void CalcReadAheadThresh(int estbitrate);
+
   protected:
     static void *startReader(void *type);
     void ReadAheadThread(void);
@@ -119,8 +121,9 @@ class RingBuffer
     long long internalreadpos;
     bool ateof;
     bool readsallowed;
-
     bool wantseek;
+    int fill_threshold;
+    int fill_min;
 };
 
 #endif

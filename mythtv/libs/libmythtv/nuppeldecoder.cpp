@@ -356,6 +356,8 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     delete [] space;
 
+    ringBuffer->CalcReadAheadThresh(0);
+
     ringBuffer->Seek(startpos, SEEK_SET);
 
     buf = new unsigned char[video_size];
