@@ -329,9 +329,9 @@ void vsync_wait_for_retrace( void )
         polldata.revents = 0;
         poll( &polldata, 1, 50 );
     } else if (s_glsync_good) {
+#ifdef USING_OPENGL_VSYNC
         unsigned int count;
         int r;
-#ifdef USING_OPENGL_VSYNC
         r = glXMakeCurrent(s_sync_display, s_sync_drawable, s_sync_context);
         //printf("glxmc: %d ", r);
         //glXSwapBuffers(s_sync_display, s_sync_drawable);
