@@ -41,8 +41,9 @@ Super VideoCD's are an mpeg2 enhancement of the original VideoCD format.
 In order to encode an svcd, you need ffmpeg, yuvscaler, and mpeg2enc.  Most of
 these come with the mjpeg package.
 
-You will also need an mp2 audio encoder.  mp2enc comes with mjpeg, but I strongly
-suggest that you grab toolame; it's a much better encoder.
+You will also need an mp2 audio encoder.  I strongly suggest that you grab
+toolame, it's an excellent encoder based on the LAME engine.  If you don't,
+nuvexport will use ffmpeg.
 
 To multiplex the audio and video streams, you can use mjpeg's mplex program, but
 I've had bad luck with this, and suggest that you install transcode in order to
@@ -105,9 +106,9 @@ format and use Microsoft's Windows Media Encoder to encode a WMV file.
 	use export_SVCD;
 	use export_VCD;
 	use export_WMV;
-        use export_Trans_XviD;
-        use export_Trans_VCD;
-        use export_Trans_SVCD;
+	use export_Trans_XviD;
+	use export_Trans_VCD;
+	use export_Trans_SVCD;
 
 # Make sure that we have mythtranscode installed
 	$Prog{mythtranscode} = find_program('mythtranscode');

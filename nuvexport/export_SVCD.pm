@@ -30,8 +30,7 @@ package export_SVCD;
 					};
 		bless($self, $class);
 	# Make sure that we have an mp2 encoder
-		$Prog{mp2_encoder} = find_program('toolame', 'mp2enc');
-		push @{$self->{errors}}, 'You need toolame or mp2enc to export an svcd.' unless ($Prog{mp2_encoder});
+		$Prog{mp2_encoder} = find_program('toolame');
 	# Make sure that we have an mplexer
 		$Prog{mplexer} = find_program('tcmplex', 'mplex');
 		push @{$self->{errors}}, 'You need tcmplex or mplex to export an svcd.' unless ($Prog{mplexer});
@@ -180,12 +179,18 @@ package export_SVCD;
 		}
 	# Now we fork off a process to encode the audio
 		if ($Prog{mp2_encoder} =~ /\btoolame$/) {
-			$sample = $nuv_info{audio_sample_rate} / 1000;
-			$command = "nice -n 19 toolame -s $sample -m j -b $self->{a_bitrate} $self->{fifodir}/audout $self->{tmp_a}";
+		# Resample audio?
+			if ($nuv_info{audio_sample_rate} != 44100) {
+				$command = "nice -n 19 sox -t raw -r $nuv_info{audio_sample_rate} -s -w -c 2 $self->{fifodir}/audout -t raw -r 44100 -s -w -c 2 - resample"
+						  ." | nice -n 19 toolame -s 44.1 -m j -b $self->{a_bitrate} - $self->{tmp_a}";
+			}
+		# Audio is the proper sample rate
+			else {
+				$command = "nice -n 19 toolame -s 44.1 -m j -b $self->{a_bitrate} $self->{fifodir}/audout $self->{tmp_a}";
+			}
 		}
 		else {
-			$command = "nice -n 19 ffmpeg -f s16le -ar $nuv_info{audio_sample_rate} -ac 2 -i $self->{fifodir}/audout -vn -f wav -"
-					  ." | nice -n 19 mp2enc -b $self->{a_bitrate} -r $nuv_info{audio_sample_rate} -s -o $self->{tmp_a}";
+			$command = "nice -n 19 ffmpeg -f s16le -ar $nuv_info{audio_sample_rate} -ac 2 -i $self->{fifodir}/audout -ar 44100 -ab $self->{a_bitrate} -vn -f mp2 $self->{tmp_a}";
 		}
 		if ($DEBUG) {
 			print "\ntoolame command:\n\n$command\n";
