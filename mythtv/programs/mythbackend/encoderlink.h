@@ -86,8 +86,7 @@ class EncoderLink
                         QString &channelname, QString &chanid);
     void GetInputName(QString &inputname);
 
-    void SpawnReadThread(QSocket *rsock);
-    void KillReadThread(void);
+    void SetReadThreadSock(QSocket *rsock);
     QSocket *GetReadThreadSocket(void);
 
     void RequestRingBufferBlock(int size);

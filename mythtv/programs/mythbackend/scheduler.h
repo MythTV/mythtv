@@ -95,8 +95,6 @@ class Scheduler : public QObject
 
     QMap<QString, bool> recPendingList;
 
-    pthread_mutex_t schedulerLock;
-
     bool threadrunning;
 
     void AddToDontRecord(ProgramInfo *pginfo);

@@ -15,16 +15,9 @@ using namespace std;
 FileTransfer::FileTransfer(QString &filename, QSocket *remote)
 {
     rbuffer = new RingBuffer(filename, false);
-    pthread_mutex_init(&readthreadLock, NULL);
     sock = remote;
-    readthreadlive = false;
-    readrequest = 0;
+    readthreadlive = true;
     ateof = false;
-
-    pthread_create(&readthread, NULL, FTReadThread, this);
-
-    while (!readthreadlive)
-        usleep(50);
 }
 
 FileTransfer::~FileTransfer()
@@ -33,6 +26,8 @@ FileTransfer::~FileTransfer()
 
     if (rbuffer)
         delete rbuffer;
+
+    readthreadLock.unlock();
 }
 
 bool FileTransfer::isOpen(void)
@@ -48,20 +43,20 @@ void FileTransfer::Stop(void)
     {
         readthreadlive = false;
         rbuffer->StopReads();
-        pthread_join(readthread, NULL);
+        readthreadLock.lock();
     }
 }
 
 void FileTransfer::Pause(void)
 {
     rbuffer->StopReads();
-    pthread_mutex_lock(&readthreadLock);
+    readthreadLock.lock();
 }
 
 void FileTransfer::Unpause(void)
 {
     rbuffer->StartReads();
-    pthread_mutex_unlock(&readthreadLock);
+    readthreadLock.unlock();
 }
 
 bool FileTransfer::RequestBlock(int size)
@@ -72,42 +67,28 @@ bool FileTransfer::RequestBlock(int size)
     if (size > 256000)
         size = 256000;
 
-    bool locked = false;
-    QDateTime curtime = QDateTime::currentDateTime();
-    curtime = curtime.addSecs(15);
+    char buffer[256001];
 
-    while (QDateTime::currentDateTime() < curtime)
+    readthreadLock.lock();
+
+    while (size > 0 && readthreadlive && !rbuffer->GetStopReads() && !ateof)
     {
-        locked = pthread_mutex_trylock(&readthreadLock);
-        if (locked)
-            break;
-        usleep(50);
-    }
-
-    if (!locked)
-    {
-        cerr << "Backend stopped in RequestBlock\n";
-        rbuffer->StopReads();
-        return true;
-    }
-
-    readrequest = size;
-    pthread_mutex_unlock(&readthreadLock);
-
-    curtime = QDateTime::currentDateTime();
-    curtime = curtime.addSecs(15);
-
-    while (readrequest > 0 && readthreadlive && !ateof)
-    {
-        usleep(100);
-
-        if (QDateTime::currentDateTime() > curtime)
+        int ret = rbuffer->Read(buffer, size);
+        if (!rbuffer->GetStopReads())
         {
-            cerr << "Backend stuffed up in RequestBlock\n";
-            rbuffer->StopReads();
-            break;
+            if (ret)
+                WriteBlock(sock, buffer, ret);
+            else
+            {
+                ateof = true;
+                size = 0;
+            }
         }
+
+        size -= ret;
     }
+
+    readthreadLock.unlock();
 
     return ateof;
 }
@@ -135,49 +116,6 @@ long long FileTransfer::Seek(long long curpos, long long pos, int whence)
 
     Unpause();
     return ret;
-}
-
-void FileTransfer::DoFTReadThread(void)
-{
-    char *buffer = new char[256001];
-
-    readthreadlive = true;
-    while (readthreadlive && rbuffer)
-    {
-        while (readrequest == 0 && readthreadlive)
-            usleep(5000);
-
-        if (!readthreadlive)
-            break;
-
-        pthread_mutex_lock(&readthreadLock);
-
-        int ret = rbuffer->Read(buffer, readrequest);
-        if (!rbuffer->GetStopReads())
-        {
-            if (ret)
-                WriteBlock(sock, buffer, ret);
-            else
-            {
-                ateof = true;
-                readrequest = 0;
-            }
-        }        
-
-        readrequest -= ret;
-
-        pthread_mutex_unlock(&readthreadLock);
-    }
-
-    delete [] buffer;
-}
-
-void *FileTransfer::FTReadThread(void *param)
-{
-    FileTransfer *ft = (FileTransfer *)param;
-    ft->DoFTReadThread();
-
-    return NULL;
 }
 
 long long FileTransfer::GetFileSize(void)

@@ -114,12 +114,14 @@ void MpegRecorder::StartRecording(void)
     {
         if (paused)
         {
+            mainpaused = true;
+            pauseWait.wakeAll();
+
             if (readfd > 0)
             {
                 close(readfd);
                 readfd = -1;
             }
-            mainpaused = true;
             usleep(50);
             continue;
         }
@@ -369,6 +371,13 @@ void MpegRecorder::Unpause(void)
 bool MpegRecorder::GetPause(void)
 {
     return mainpaused;
+}
+
+void MpegRecorder::WaitForPause(void)
+{
+    if (!mainpaused)
+        if (!pauseWait.wait(1000))
+            cerr << "Waited too long for recorder to pause\n";
 }
 
 bool MpegRecorder::IsRecording(void)

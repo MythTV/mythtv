@@ -113,9 +113,8 @@ class TVRec
                         QString &channelname, QString &chanid);
     void GetInputName(QString &inputname);
 
-    void SpawnReadThread(QSocket *sock);
-    void KillReadThread(void);
     QSocket *GetReadThreadSocket(void);
+    void SetReadThreadSock(QSocket *sock);
 
     void UnpauseRingBuffer(void);
     void PauseClearRingBuffer(void);
@@ -131,9 +130,6 @@ class TVRec
     void DoFlagCommercialsThread(void);
     static void *FlagCommercialsThread(void *param);
     void FlagCommercials(void);
-
-    void DoReadThread(void);
-    static void *ReadThread(void *param);
 
  private:
     void SetChannel(bool needopen = false);
@@ -201,11 +197,11 @@ class TVRec
     bool inoverrecord;
     int overrecordseconds;
 
-    long long readrequest;
     QSocket *readthreadSock;
     bool readthreadlive;
+    QMutex readthreadLock;
+
     bool flagthreadstarted;
-    pthread_mutex_t readthreadLock;
 
     int m_capturecardnum;
 

@@ -42,7 +42,6 @@ TVRec::TVRec(int capturecardnum)
     rbuffer = NULL;
     nvr = NULL;
     readthreadSock = NULL;
-    readrequest = 0;
     readthreadlive = false;
     m_capturecardnum = capturecardnum;
     ispip = false;
@@ -649,11 +648,12 @@ void TVRec::TeardownRecorder(bool killFile)
 
     if (rbuffer)
     {
-        if (readthreadlive)
-            KillReadThread();
-
+        rbuffer->StopReads();
+        readthreadLock.lock();
         delete rbuffer;
+        readthreadlive = false;
         rbuffer = NULL;
+        readthreadLock.unlock();
     }
 
     if (killFile)
@@ -1611,8 +1611,7 @@ void TVRec::PauseRecorder(void)
 
 void TVRec::ToggleInputs(void)
 {
-    while (!nvr->GetPause())
-        usleep(5);
+    nvr->WaitForPause();
 
     PauseClearRingBuffer();
 
@@ -1628,13 +1627,12 @@ void TVRec::ToggleInputs(void)
 
 void TVRec::ChangeChannel(int channeldirection)
 {
-    while (!nvr->GetPause())
-        usleep(5);
+    nvr->WaitForPause();
 
     PauseClearRingBuffer();
 
     rbuffer->Reset();
-    
+
     if (channeldirection == CHANNEL_DIRECTION_FAVORITE)
         channel->NextFavorite();
     else if (channeldirection == CHANNEL_DIRECTION_UP)
@@ -1749,8 +1747,7 @@ int TVRec::ChangeHue(bool direction)
 
 void TVRec::SetChannel(QString name)
 {
-    while (!nvr->GetPause())
-        usleep(5);
+    nvr->WaitForPause();
 
     PauseClearRingBuffer();
 
@@ -1887,7 +1884,7 @@ void TVRec::UnpauseRingBuffer(void)
         return;
 
     rbuffer->StartReads();
-    pthread_mutex_unlock(&readthreadLock);
+    readthreadLock.unlock();
 }
 
 void TVRec::PauseClearRingBuffer(void)
@@ -1896,7 +1893,7 @@ void TVRec::PauseClearRingBuffer(void)
         return;
 
     rbuffer->StopReads();
-    pthread_mutex_lock(&readthreadLock);
+    readthreadLock.lock();
 }
 
 long long TVRec::SeekRingBuffer(long long curpos, long long pos, int whence)
@@ -1921,35 +1918,29 @@ long long TVRec::SeekRingBuffer(long long curpos, long long pos, int whence)
     return ret;
 }
 
-void TVRec::SpawnReadThread(QSocket *sock)
-{
-    if (readthreadlive)
-        return;
-
-    pthread_mutex_init(&readthreadLock, NULL);
-    readthreadSock = sock;
-    readthreadlive = false;
-
-    pthread_create(&readthread, NULL, ReadThread, this);
-
-    while (!readthreadlive)
-        usleep(50);
-}
-
-void TVRec::KillReadThread(void)
-{
-    if (readthreadlive)
-    {
-        readthreadlive = false;
-        rbuffer->StopReads();
-        pthread_join(readthread, NULL);
-        readthreadSock = NULL;
-    }
-}
-
 QSocket *TVRec::GetReadThreadSocket(void)
 {
     return readthreadSock;
+}
+
+void TVRec::SetReadThreadSock(QSocket *sock)
+{
+    if ((readthreadlive && sock) || (!readthreadlive && !sock))
+        return;
+
+    if (sock)
+    {
+        readthreadSock = sock;
+        readthreadlive = true;
+    }
+    else
+    {
+        readthreadlive = false;
+        if (rbuffer)
+            rbuffer->StopReads();
+        readthreadLock.lock();
+        readthreadLock.unlock();
+    }
 }
 
 void TVRec::RequestRingBufferBlock(int size)
@@ -1957,81 +1948,23 @@ void TVRec::RequestRingBufferBlock(int size)
     if (!readthreadlive)
         return;
 
+    char buffer[256001];
+
     if (size > 256000)
         size = 256000;
 
-    bool locked = false;
-    QDateTime curtime = QDateTime::currentDateTime();
-    curtime = curtime.addSecs(15);
+    readthreadLock.lock();
 
-    while (QDateTime::currentDateTime() < curtime)
+    while (size > 0 && !rbuffer->GetStopReads() && readthreadlive)
     {
-        locked = pthread_mutex_trylock(&readthreadLock);
-        if (locked)
-            break;
-        usleep(50);
-    }
-
-    if (!locked)
-    {
-        cerr << "Backend stopped in RequestRingBufferBlock\n";
-        rbuffer->StopReads();
-        return;
-    }
-
-    readrequest = size; 
-    pthread_mutex_unlock(&readthreadLock);
-
-    curtime = QDateTime::currentDateTime();
-    curtime = curtime.addSecs(15);
-
-    while (readrequest > 0 && readthreadlive)
-    {
-        usleep(500);
-
-        if (QDateTime::currentDateTime() > curtime)
-        {
-            cerr << "Backend stuffed up in RequestRingBufferBlock\n";
-            rbuffer->StopReads();
-            break;
-        }
-    }
-}
-
-void TVRec::DoReadThread(void)
-{
-    readthreadlive = true;
-
-    char *buffer = new char[256001];
-
-    while (readthreadlive && rbuffer)
-    {
-        while (readrequest == 0 && readthreadlive)
-            usleep(5000);
-
-        if (!readthreadlive)
-            break;
-
-        pthread_mutex_lock(&readthreadLock);
-
-        int ret = rbuffer->Read(buffer, readrequest);
+        int ret = rbuffer->Read(buffer, size);
         if (!rbuffer->GetStopReads() && ret > 0)
             WriteBlock(readthreadSock, buffer, ret);
 
-        readrequest -= ret;
-
-        pthread_mutex_unlock(&readthreadLock);
+        size -= ret;
     }
 
-    delete [] buffer;
-}
-
-void *TVRec::ReadThread(void *param)
-{
-    TVRec *thetv = (TVRec *)param;
-    thetv->DoReadThread();
-
-    return NULL;
+    readthreadLock.unlock();
 }
 
 void TVRec::DoFlagCommercialsThread(void)

@@ -288,21 +288,21 @@ public:
     };
 };
 
-class RecordPreRoll: public SpinBoxSetting, public GlobalSetting {
+class RecordPreRoll: public SpinBoxSetting, public BackendSetting {
 public:
     RecordPreRoll():
         SpinBoxSetting(0, 600, 1),
-        GlobalSetting("RecordPreRoll") {
+        BackendSetting("RecordPreRoll") {
         setLabel("Time to record before start of show (in seconds)");
         setValue(0);
     };
 };
 
-class RecordOverTime: public SpinBoxSetting, public GlobalSetting {
+class RecordOverTime: public SpinBoxSetting, public BackendSetting {
 public:
     RecordOverTime():
         SpinBoxSetting(0, 600, 1),
-        GlobalSetting("RecordOverTime") {
+        BackendSetting("RecordOverTime") {
         setLabel("Time to record past end of show (in seconds)");
         setValue(0);
     };

@@ -569,26 +569,15 @@ void EncoderLink::GetInputName(QString &inputname)
     cerr << "Should be local only query: GetInputName\n";
 }
 
-void EncoderLink::SpawnReadThread(QSocket *rsock)
+void EncoderLink::SetReadThreadSock(QSocket *rsock)
 {
     if (local)
     {
-        tv->SpawnReadThread(rsock);
+        tv->SetReadThreadSock(rsock);
         return;
     }
 
     cerr << "Should be local only query: SpawnReadThread\n";
-}
-
-void EncoderLink::KillReadThread(void)
-{
-    if (local)
-    {
-        tv->KillReadThread();
-        return;
-    }
-
-    cerr << "Should be local only query: KillReadThread\n";
 }
 
 QSocket *EncoderLink::GetReadThreadSocket(void)

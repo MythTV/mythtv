@@ -57,7 +57,9 @@ class RemoteEncoder
                         QString &callsign, QString &iconpath,
                         QString &channelname, QString &chanid);
     void GetInputName(QString &inputname);
-  
+ 
+    QString GetCurrentChannel(void);
+ 
   private:
     QSocket *openControlSocket(const QString &host, short port);
     void SendReceiveStringList(QStringList &strlist);
@@ -69,6 +71,8 @@ class RemoteEncoder
 
     QString remotehost;
     short remoteport;
+
+    QString lastchannel;
 };
 
 #endif

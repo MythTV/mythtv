@@ -175,6 +175,8 @@ void HDTVRecorder::StartRecording(void)
                                     readfd = -1;
                                 }
                                 mainpaused = true;
+                                pauseWait.wakeAll();
+
                                 usleep(50);
                                 continue;
                             }
@@ -443,6 +445,13 @@ void HDTVRecorder::Unpause(void)
 bool HDTVRecorder::GetPause(void)
 {
     return mainpaused;
+}
+
+void HDTVRecorder::WaitForPause(void)
+{
+    if (!mainpaused)
+        if (!pauseWait.wait(1000))
+            cerr << "Waited too long for recorder to pause\n";
 }
 
 bool HDTVRecorder::IsRecording(void)

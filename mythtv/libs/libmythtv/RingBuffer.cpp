@@ -392,6 +392,7 @@ void RingBuffer::Start(void)
 {
     if (remotefile)
         remotefile->Start();
+
     if ((normalfile && writemode) || (!normalfile && !recorder_num))
     {
     }
@@ -413,13 +414,8 @@ void RingBuffer::Reset(void)
         }
         else
         {
-            delete tfw;
-            close(fd2);
-
-            tfw = new ThreadedFileWriter(filename.ascii(),
-                                         O_WRONLY|O_CREAT|O_TRUNC|O_LARGEFILE, 
-                                         0644);
-            fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE);
+            tfw->Seek(0, SEEK_SET);
+            lseek(fd2, 0, SEEK_SET);
         }
 
         totalwritepos = writepos = 0;
@@ -587,14 +583,14 @@ int RingBuffer::ReadBufFree(void)
 {
     int ret = 0;
 
-    pthread_mutex_lock(&readAheadLock);
+    readAheadLock.lock();
 
     if (rbwpos >= rbrpos)
         ret = rbrpos + READ_AHEAD_SIZE - rbwpos - 1;
     else
         ret = rbrpos - rbwpos - 1;
 
-    pthread_mutex_unlock(&readAheadLock);
+    readAheadLock.unlock();
     return ret;
 }
 
@@ -602,36 +598,34 @@ int RingBuffer::ReadBufAvail(void)
 {
     int ret = 0;
     
-    pthread_mutex_lock(&readAheadLock);
+    readAheadLock.lock();
 
     if (rbwpos >= rbrpos)
         ret = rbwpos - rbrpos;
     else
         ret = READ_AHEAD_SIZE - rbrpos + rbwpos;
 
-    pthread_mutex_unlock(&readAheadLock);
-
+    readAheadLock.unlock();
     return ret;
 }
 
 // must call with rwlock in write lock
 void RingBuffer::ResetReadAhead(long long newinternal)
 {
-    pthread_mutex_lock(&readAheadLock);
+    readAheadLock.lock();
     rbrpos = 0;
     rbwpos = 0;
     internalreadpos = newinternal;
     ateof = false;
     readsallowed = false;
     requestedblocks = 0;
-    pthread_mutex_unlock(&readAheadLock);
+    readAheadLock.unlock();
 }
 
 void RingBuffer::StartupReadAheadThread(void)
 {
     readaheadrunning = false;
 
-    pthread_mutex_init(&readAheadLock, NULL);
     pthread_create(&reader, NULL, startReader, this);
 
     while (!readaheadrunning)
@@ -645,6 +639,17 @@ void RingBuffer::KillReadAheadThread(void)
 
     readaheadrunning = false;
     pthread_join(reader, NULL);
+}
+
+void RingBuffer::StopReads(void)
+{
+    stopreads = true;
+    availWait.wakeAll();
+}
+
+void RingBuffer::StartReads(void)
+{
+    stopreads = false;
 }
 
 void RingBuffer::Pause(void)
@@ -665,6 +670,15 @@ bool RingBuffer::isPaused(void)
         return true;
 
     return readaheadpaused;
+}
+
+void RingBuffer::WaitForPause(void)
+{
+    if  (!readaheadpaused)
+    {
+        if (!pauseWait.wait(1000))
+            VERBOSE(VB_IMPORTANT, "Waited to long for ringbuffer pause..\n");
+    }
 }
 
 void *RingBuffer::startReader(void *type)
@@ -693,6 +707,7 @@ void RingBuffer::ReadAheadThread(void)
         if (pausereadthread)
         {
             readaheadpaused = true;
+            pauseWait.wakeAll();
             usleep(100);
             totfree = ReadBufFree();
             continue;
@@ -765,9 +780,9 @@ void RingBuffer::ReadAheadThread(void)
                 }
             }
 
-            pthread_mutex_lock(&readAheadLock);
+            readAheadLock.lock();
             rbwpos = (rbwpos + ret) % READ_AHEAD_SIZE;
-            pthread_mutex_unlock(&readAheadLock);
+            readAheadLock.unlock();
 
             if (ret == 0 && normalfile && !stopreads)
             {
@@ -794,12 +809,23 @@ void RingBuffer::ReadAheadThread(void)
                                                                .arg(fill_min));
         }
 
+        if (readsallowed || stopreads)
+            readsAllowedWait.wakeAll();
+
+        availWaitMutex.lock();
+        if (ateof || stopreads || wanttoread <= used)
+        {
+            availWait.wakeAll();
+        }
+        availWaitMutex.unlock();
+            
         pthread_rwlock_unlock(&rwlock);
 
-        if (used >= fill_threshold || wantseek)
+        if ((used >= fill_threshold || wantseek) && !pausereadthread)
             usleep(500);
 
-        sched_yield();
+        if (!pausereadthread)
+            sched_yield();
     }
 
     delete [] readAheadBuffer;
@@ -819,19 +845,25 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
     }
     else 
         while (!readsallowed && !stopreads)
-            usleep(100);
+        {
+            if (!readsAllowedWait.wait(5000))
+                cerr << "taking too long to be allowed to read..\n";
+        }
 
     int avail = ReadBufAvail();
 
-    while (avail < count && !stopreads)
+    if (avail < count && !stopreads)
     {
-        usleep(100);
+        availWaitMutex.lock();
+        wanttoread = count;
+        availWait.wait(&availWaitMutex, 1000);
+        wanttoread = 0;
+        availWaitMutex.unlock();
+
         avail = ReadBufAvail();
-        if (ateof && avail < count)
-            count = avail;
     }
 
-    if (stopreads && avail < count)
+    if ((ateof || stopreads) && avail < count)
         count = avail;
 
     if (rbrpos + count > READ_AHEAD_SIZE)
@@ -845,15 +877,14 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
     else
         memcpy(buf, readAheadBuffer + rbrpos, count);
 
-    pthread_mutex_lock(&readAheadLock);
+    readAheadLock.lock();
     rbrpos = (rbrpos + count) % READ_AHEAD_SIZE;
-    pthread_mutex_unlock(&readAheadLock);
+    readAheadLock.unlock();
 
     if (readone)
     {
         Pause();
-        while (!isPaused())
-            usleep(50);
+        WaitForPause();
     }
 
     return count;
@@ -906,16 +937,34 @@ int RingBuffer::Read(void *buf, int count)
         }
         else
         {
+            if (stopreads)
+            {
+                pthread_rwlock_unlock(&rwlock);
+                return 0;
+            }
+
+            availWaitMutex.lock();
+            wanttoread = totalreadpos + count;
+
             while (totalreadpos + count > totalwritepos - tfw->BufUsed())
             {
-                usleep(1000);
+                if (!availWait.wait(&availWaitMutex, 15000))
+                {
+                    cerr << "Couldn't read data from the capture card in 15 "
+                            "seconds.  Game over, man.\n";
+                    StopReads();
+                }
+
                 if (stopreads)
                 {
+                    availWaitMutex.unlock();
                     pthread_rwlock_unlock(&rwlock);
                     return 0;
                 }
             }
-            
+
+            availWaitMutex.unlock();
+
             if (readpos + count > filesize)
             {
                 int toread = filesize - readpos;
@@ -1015,6 +1064,11 @@ int RingBuffer::Write(const void *buf, int count)
             writepos += ret;
             totalwritepos += ret;
         }
+
+        availWaitMutex.lock();
+        if (totalwritepos >= wanttoread)
+            availWait.wakeAll();
+        availWaitMutex.unlock();
     }
 
     pthread_rwlock_unlock(&rwlock);

@@ -3,6 +3,7 @@
 
 #include <qstring.h>
 #include <pthread.h>
+#include <qmutex.h>
 
 class RingBuffer;
 class QSocket;
@@ -27,15 +28,9 @@ class FileTransfer
 
     long long GetFileSize(void);
 
-  protected:
-    void DoFTReadThread(void);
-    static void *FTReadThread(void *param);
-
   private:
-    int readrequest;
     bool readthreadlive;
-    pthread_mutex_t readthreadLock;
-    pthread_t readthread;
+    QMutex readthreadLock;
 
     RingBuffer *rbuffer;
     QSocket *sock;

@@ -206,8 +206,11 @@ void NuppelVideoPlayer::Pause(bool waitvideo)
     // pause the decoder thread first, as it's usually waiting for the video
     // thread.  Make sure that it's done pausing before continuing on.
     paused = true;
-    while (!actuallypaused)
-        usleep(50);
+    if (!actuallypaused)
+    {
+        if (!decoderThreadPaused.wait(1000))
+            VERBOSE(VB_IMPORTANT, "Waited too long for decoder to pause\n");
+    }
 
     PauseVideo(waitvideo);
     if (audioOutput)
@@ -246,8 +249,11 @@ void NuppelVideoPlayer::PauseVideo(bool wait)
     video_actually_paused = false;
     pausevideo = true;
 
-    while (wait && !video_actually_paused)
-        usleep(50);
+    if (wait && !video_actually_paused)
+    {
+        if (!videoThreadPaused.wait(1000))
+            VERBOSE(VB_IMPORTANT, "Waited too long for decoder to pause\n");
+    }
 }
 
 void NuppelVideoPlayer::UnpauseVideo(void)
@@ -480,14 +486,14 @@ int NuppelVideoPlayer::tbuffer_numvalid(void)
 {
     /* thread safe, returns number of valid slots in the text buffer */
     int ret;
-    pthread_mutex_lock(&text_buflock);
+    text_buflock.lock();
 
     if (wtxt >= rtxt)
         ret = wtxt - rtxt;
     else
         ret = MAXTBUFFER - (rtxt - wtxt);
 
-    pthread_mutex_unlock(&text_buflock);
+    text_buflock.unlock();
     return ret;
 }
 
@@ -542,9 +548,9 @@ void NuppelVideoPlayer::AddTextData(char *buffer, int len,
         memset(txtbuffers[wtxt].buffer, 0, text_size);
         memcpy(txtbuffers[wtxt].buffer, buffer, len);
 
-        pthread_mutex_lock(&text_buflock);
+        text_buflock.lock();
         wtxt = (wtxt+1) % MAXTBUFFER;
-        pthread_mutex_unlock(&text_buflock);
+        text_buflock.unlock();
     }
 }
 
@@ -835,12 +841,11 @@ void NuppelVideoPlayer::ShowText(void)
             }
         }
 
-        /* update rtxt */
-        pthread_mutex_lock(&text_buflock);
+        text_buflock.lock();
         if (rtxt != wtxt) // if a seek occurred, rtxt == wtxt, in this case do
                           // nothing
             rtxt = (rtxt + 1) % MAXTBUFFER;
-        pthread_mutex_unlock(&text_buflock);
+        text_buflock.unlock();
     }
 }
 
@@ -1192,6 +1197,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             }
 
             video_actually_paused = true;
+            videoThreadPaused.wakeAll();
 
             videoOutput->ProcessFrame(NULL, osd, videoFilters, pipplayer);
             videoOutput->PrepareFrame(NULL); 
@@ -1199,7 +1205,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             ResetNexttrigger(&nexttrigger);
 
             //printf("video waiting for unpause\n");
-            usleep(frame_interval * 2);
+            usleep(frame_interval);
             continue;
         }
         video_actually_paused = false;
@@ -1381,8 +1387,6 @@ void NuppelVideoPlayer::StartPlaying(void)
     rewindtime = fftime = 0;
     skipcommercials = 0;
 
-    pthread_mutex_init(&text_buflock, NULL);
-
     for (int i = 0; i < MAXTBUFFER; i++)
         txtbuffers[i].buffer = new unsigned char[text_size];
 
@@ -1439,6 +1443,7 @@ void NuppelVideoPlayer::StartPlaying(void)
         if (paused)
 	{ 
             actuallypaused = true;
+            decoderThreadPaused.wakeAll();
             pausecheck++;
 
             if (!(pausecheck % 20))
@@ -2496,8 +2501,6 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
     if (!hasFullPositionMap)
         return NULL;
 
-    pthread_mutex_init(&text_buflock, NULL);
-
     disablevideo = true;
 
     InitVideo();
@@ -2801,8 +2804,6 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
     nvr->StreamAllocate();
 
     playing = true;
-
-    pthread_mutex_init(&text_buflock, NULL);
 
     disablevideo = true;
 
@@ -3174,8 +3175,6 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed)
     db_lock.unlock();
 
     playing = true;
-
-    pthread_mutex_init(&text_buflock, NULL);
 
     disablevideo = true;
     InitVideo();

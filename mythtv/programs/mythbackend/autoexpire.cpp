@@ -22,8 +22,6 @@ AutoExpire::AutoExpire(bool runthread, bool master, QSqlDatabase *ldb)
     db = ldb;
     isMaster = master;
 
-    pthread_mutex_init(&expirerLock, NULL);
-
     threadrunning = runthread;
 
     if (runthread)
@@ -49,8 +47,6 @@ void AutoExpire::RunExpirer(void)
 
     while (1)
     {
-        pthread_mutex_lock(&expirerLock);
-
         if (isMaster)
             ExpireEpisodesOverMax();
 
@@ -121,8 +117,6 @@ void AutoExpire::RunExpirer(void)
                                   .arg(minFree);
             VERBOSE(VB_GENERAL, msg);
         }
-
-        pthread_mutex_unlock(&expirerLock);
 
         sleep(gContext->GetNumSetting("AutoExpireFrequency", 10) * 60);
     }

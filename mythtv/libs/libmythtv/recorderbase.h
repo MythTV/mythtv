@@ -4,6 +4,7 @@
 #include <qstring.h>
 #include <qmap.h>
 #include <qsqldatabase.h>
+#include <qwaitcondition.h>
 
 #include <pthread.h>
 
@@ -35,6 +36,7 @@ class RecorderBase
     virtual void Pause(bool clear = true) = 0;
     virtual void Unpause(void) = 0;
     virtual bool GetPause(void) = 0;
+    virtual void WaitForPause(void) = 0;
 
     virtual bool IsRecording(void) = 0;
 
@@ -62,6 +64,8 @@ class RecorderBase
 
     QSqlDatabase *db_conn;
     pthread_mutex_t *db_lock;
+
+    QWaitCondition pauseWait;
 };
 
 #endif

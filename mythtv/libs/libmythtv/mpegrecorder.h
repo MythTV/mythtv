@@ -25,6 +25,7 @@ class MpegRecorder : public RecorderBase
     void Pause(bool clear = true);
     void Unpause(void);
     bool GetPause(void);
+    void WaitForPause(void);
     bool IsRecording(void);
 
     long long GetFramesWritten(void);

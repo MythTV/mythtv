@@ -4,6 +4,7 @@
 #include <vector>
 #include <qstring.h>
 #include <qmutex.h>
+#include <qwaitcondition.h>
 #include <qptrqueue.h>
 
 #include "RingBuffer.h"
@@ -272,8 +273,8 @@ class NuppelVideoPlayer
     int rtxt;          /* next slot to read */
     struct TextContainer txtbuffers[MAXTBUFFER+1];
 
-    pthread_mutex_t text_buflock;  /* adjustments to rtxt and wtxt can only
-                                      be made while holding this lock */
+    QMutex text_buflock;  /* adjustments to rtxt and wtxt can only
+                             be made while holding this lock */
 
     /* Audio stuff */
     QString audiodevice;
@@ -284,16 +285,10 @@ class NuppelVideoPlayer
 
     AudioOutput *audioOutput;
 
-    /* Locking note:
-       A thread needing multiple locks must acquire in this order:
-  
-       1. audio_buflock
-       2. video_buflock
-
-       and release in reverse order. This should avoid deadlock situations. */
-
     bool paused, pausevideo;
     bool actuallypaused, video_actually_paused;
+    QWaitCondition decoderThreadPaused, videoThreadPaused;
+ 
     bool cc;
 
     bool playing;

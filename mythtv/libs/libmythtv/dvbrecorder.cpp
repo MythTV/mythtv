@@ -141,6 +141,7 @@ void DVBRecorder::StartRecording()
         {
             ioctl(dvr_fd, DMX_STOP);
             mainpaused = true;
+            pauseWait.wakeAll();
             was_paused = true;
             usleep(50);
             continue;
@@ -463,6 +464,13 @@ void DVBRecorder::Unpause(void)
 bool DVBRecorder::GetPause(void)
 {
     return mainpaused;
+}
+
+void DVBRecorder::WaitForPause(void)
+{
+    if (!mainpaused)
+        if (!pauseWait.wait(1000))
+            cerr << "Waited too long for recorder to pause\n";
 }
 
 bool DVBRecorder::IsRecording(void)

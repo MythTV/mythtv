@@ -7,6 +7,7 @@ class QSqlDatabase;
 #include <qmap.h> 
 #include <list>
 #include <vector>
+#include <qmutex.h>
 #include <qobject.h>
 
 using namespace std;
@@ -34,8 +35,6 @@ class AutoExpire : public QObject
     vector<ProgramInfo *> expireList;
 
     QSqlDatabase *db;
-
-    pthread_mutex_t expirerLock;
 
     bool threadrunning;
     bool isMaster;

@@ -26,8 +26,6 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
     db = ldb;
     m_tvList = tvList;
 
-    pthread_mutex_init(&schedulerLock, NULL);
-
     setupCards();
 
     threadrunning = runthread;
@@ -1155,8 +1153,6 @@ void Scheduler::RunScheduler(void)
     {
         curtime = QDateTime::currentDateTime();
 
-        pthread_mutex_lock(&schedulerLock);
-
         if (CheckForChanges() ||
             (lastupdate.date().day() != curtime.date().day()))
         {
@@ -1295,8 +1291,6 @@ void Scheduler::RunScheduler(void)
             else
                 recIter++;
         }
-
-        pthread_mutex_unlock(&schedulerLock);
 
         sleep(1);
     }

@@ -3,7 +3,7 @@
 
 #include <qsocket.h>
 #include <qstring.h>
-#include <pthread.h>
+#include <qmutex.h>
 
 class ProgramInfo;
 
@@ -52,7 +52,7 @@ class PlaybackSock
 
     bool backend;
 
-    pthread_mutex_t sockLock;
+    QMutex sockLock;
 
     bool expectingreply;
 };

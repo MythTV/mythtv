@@ -282,6 +282,12 @@ bool NuppelVideoRecorder::GetPause(void)
     return (audiopaused && mainpaused && actuallypaused);
 }
 
+void NuppelVideoRecorder::WaitForPause(void)
+{
+    while (!GetPause())
+        usleep(5000);
+}
+
 void NuppelVideoRecorder::SetVideoFilters(QString &filters)
 {
     videoFilterList = filters;

@@ -21,8 +21,6 @@ PlaybackSock::PlaybackSock(QSocket *lsock, QString lhostname, bool wantevents)
     backend = false;
     expectingreply = false;
 
-    pthread_mutex_init(&sockLock, NULL);
-
     if (hostname == localhostname)
         local = true;
     else
@@ -37,7 +35,7 @@ PlaybackSock::~PlaybackSock()
 
 void PlaybackSock::SendReceiveStringList(QStringList &strlist)
 {
-    pthread_mutex_lock(&sockLock);
+    sockLock.lock();
     expectingreply = true;
 
     WriteStringList(sock, strlist);
@@ -56,7 +54,7 @@ void PlaybackSock::SendReceiveStringList(QStringList &strlist)
     }
 
     expectingreply = false;
-    pthread_mutex_unlock(&sockLock);
+    sockLock.unlock();
 }
 
 void PlaybackSock::GetFreeSpace(int &totalspace, int &usedspace)

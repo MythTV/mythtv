@@ -2,6 +2,8 @@
 #define RINGBUFFER
 
 #include <qstring.h>
+#include <qwaitcondition.h>
+#include <qmutex.h>
 #include <pthread.h>
 
 class RemoteFile;
@@ -41,8 +43,8 @@ class RingBuffer
 
     void Reset(void);
 
-    void StopReads(void) { stopreads = true; }
-    void StartReads(void) { stopreads = false; }
+    void StopReads(void);
+    void StartReads(void);
     bool GetStopReads(void) { return stopreads; }
 
     bool LiveMode(void) { return !normalfile; }
@@ -56,6 +58,7 @@ class RingBuffer
     void Pause(void);
     void Unpause(void);
     bool isPaused(void);
+    void WaitForPause(void);
 
     void CalcReadAheadThresh(int estbitrate);
 
@@ -107,7 +110,7 @@ class RingBuffer
     void ResetReadAhead(long long newinternal);
     void KillReadAheadThread(void);
 
-    pthread_mutex_t readAheadLock;
+    QMutex readAheadLock;
     pthread_t reader;
 
     char *readAheadBuffer;
@@ -125,6 +128,14 @@ class RingBuffer
 
     int readblocksize;
     int requestedblocks;
+
+    QWaitCondition pauseWait;
+
+    int wanttoread;
+    QWaitCondition availWait;
+    QMutex availWaitMutex;
+
+    QWaitCondition readsAllowedWait;
 };
 
 #endif

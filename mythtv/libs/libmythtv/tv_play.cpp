@@ -1220,10 +1220,8 @@ void TV::SwapPIP(void)
     QString pipchanname;
     QString bigchanname;
 
-    piprecorder->GetChannelInfo(dummy, dummy, dummy, dummy, dummy, dummy,
-                                dummy, dummy, pipchanname, dummy);
-    recorder->GetChannelInfo(dummy, dummy, dummy, dummy, dummy, dummy,
-                             dummy, dummy, bigchanname, dummy);
+    pipchanname = piprecorder->GetCurrentChannel();
+    bigchanname = recorder->GetCurrentChannel();
 
     if (activenvp != nvp)
         ToggleActiveWindow();
@@ -1518,19 +1516,19 @@ void TV::ToggleInputs(void)
     }
 
     activenvp->Pause(false);
-    while (!activenvp->GetPause())
-        usleep(5);
+
+    // all we care about is the ringbuffer being paused, here..
+    activerbuffer->WaitForPause();
 
     activerecorder->Pause();
     activerbuffer->Reset();
     activerecorder->ToggleInputs();
 
     activenvp->ResetPlaying();
+    activenvp->Unpause(false);
 
     if (activenvp == nvp)
         UpdateOSDInput();
-
-    activenvp->Unpause(false);
 }
 
 void TV::ToggleChannelFavorite(void)
@@ -1556,8 +1554,8 @@ void TV::ChangeChannel(int direction)
     }
 
     activenvp->Pause(false);
-    while (!activenvp->GetPause())
-        usleep(5);
+    // all we care about is the ringbuffer being paused, here..
+    activerbuffer->WaitForPause();    
 
     // Save the current channel if this is the first time
     if (channame_vector.size() == 0)
@@ -1567,14 +1565,14 @@ void TV::ChangeChannel(int direction)
     activerbuffer->Reset();
     activerecorder->ChangeChannel(direction);
 
-    AddPreviousChannel();
-
     activenvp->ResetPlaying();
+    activenvp->Unpause(false);
 
     if (activenvp == nvp)
+    {
         UpdateOSD();
-
-    activenvp->Unpause(false);
+        AddPreviousChannel();
+    }
 
     channelqueued = false;
     channelKeys[0] = channelKeys[1] = channelKeys[2] = channelKeys[3] = ' ';
@@ -1663,8 +1661,8 @@ void TV::ChangeChannelByString(QString &name)
     }
 
     activenvp->Pause(false);
-    while (!activenvp->GetPause())
-        usleep(5);
+    // all we care about is the ringbuffer being paused, here..
+    activerbuffer->WaitForPause();
 
     // Save the current channel if this is the first time
     if (channame_vector.size() == 0)
@@ -1674,14 +1672,14 @@ void TV::ChangeChannelByString(QString &name)
     activerbuffer->Reset();
     activerecorder->SetChannel(name);
 
-    AddPreviousChannel();
-
     activenvp->ResetPlaying();
+    activenvp->Unpause(false);
 
     if (activenvp == nvp)
+    {
         UpdateOSD();
-
-    activenvp->Unpause(false);
+        AddPreviousChannel();
+    }
 
     if (muted)
         muteTimer->start(kMuteTimeout * 2, true);
@@ -1697,11 +1695,7 @@ void TV::AddPreviousChannel(void)
         channame_vector.erase(it);
     }
 
-    // Get the current channel and add it to the vector
-    QString dummy = "";
-    QString chan_name = "";
-    activerecorder->GetChannelInfo(dummy, dummy, dummy, dummy, dummy,
-                                   dummy, dummy, dummy, chan_name, dummy);
+    QString chan_name = activerecorder->GetCurrentChannel();
 
     // This method builds the stack of previous channels
     channame_vector.push_back(chan_name);
@@ -1752,10 +1746,7 @@ void TV::SetPreviousChannel()
     times_pressed = 0;
 
     // Only change channel if channame_vector[vector] != current channel
-    QString dummy = "";
-    QString chan_name = "";
-    activerecorder->GetChannelInfo(dummy, dummy, dummy, dummy, dummy,
-                                   dummy, dummy, dummy, chan_name, dummy);
+    QString chan_name = activerecorder->GetCurrentChannel();
 
     if (chan_name != channame_vector[vector].latin1())
     {
@@ -1948,8 +1939,7 @@ void TV::doLoadMenu(void)
     QString channame = "3";
 
     if (activerecorder)
-        activerecorder->GetChannelInfo(dummy, dummy, dummy, dummy, dummy, dummy,
-                                       dummy, dummy, channame, dummy);
+       channame = activerecorder->GetCurrentChannel();
 
     QString chanstr = RunProgramGuide(channame, true, this);
 

@@ -16,6 +16,8 @@ RemoteEncoder::RemoteEncoder(int num, const QString &host, short port)
     remotehost = host;
     remoteport = port;
 
+    lastchannel = "";
+
     controlSock = NULL;
     pthread_mutex_init(&lock, NULL); 
 }
@@ -421,6 +423,8 @@ void RemoteEncoder::GetChannelInfo(QString &title, QString &subtitle,
     iconpath = strlist[7];
     channelname = strlist[8];
     chanid = strlist[9];
+
+    lastchannel = channelname;
 }
 
 void RemoteEncoder::GetInputName(QString &inputname)
@@ -431,5 +435,17 @@ void RemoteEncoder::GetInputName(QString &inputname)
     SendReceiveStringList(strlist);
 
     inputname = strlist[0];
+}
+
+QString RemoteEncoder::GetCurrentChannel(void)
+{
+    if (lastchannel == "")
+    {
+        QString dummy;
+        GetChannelInfo(dummy, dummy, dummy, dummy, dummy, dummy,
+                                dummy, dummy, lastchannel, dummy);
+    }
+
+    return lastchannel;
 }
 
