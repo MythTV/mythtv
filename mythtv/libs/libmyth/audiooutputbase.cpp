@@ -1,6 +1,7 @@
 #include <qstring.h>
 #include <cstdio>
 #include <cstdlib>
+#include <cmath>
 
 using namespace std;
 #include "audiooutputbase.h"
