@@ -356,8 +356,9 @@ int mythplugin_config(void);
 void runMusicPlayback(void);
 void runMusicSelection(void);
 void runRipCD(void);
+void runScanMusic(void);
 
-void handleMedia(void) 
+void handleMedia(MythMediaDevice *) 
 {
     mythplugin_run();
 }
@@ -367,6 +368,7 @@ void setupKeys(void)
     REG_JUMP("Play music", "", "", runMusicPlayback);
     REG_JUMP("Select music playlists", "", "", runMusicSelection);
     REG_JUMP("Rip CD", "", "", runRipCD);
+    REG_JUMP("Scan music", "", "", runScanMusic);
 
     REG_KEY("Music", "DELETE", "Delete track from playlist", "D");
     REG_KEY("Music", "NEXTTRACK", "Move to the next track", ">,.,Z,End");
@@ -530,6 +532,30 @@ void runMusicPlayback(void)
     startPlayback(mdata.all_playlists, mdata.all_music);
     postMusic(&mdata);
 }
+
+void runScanMusic(void)
+{
+    MusicData mdata;
+    
+    mdata.paths = gContext->GetSetting("TreeLevels");
+    mdata.startdir = gContext->GetSetting("MusicLocation");
+    mdata.startdir = QDir::cleanDirPath(mdata.startdir);
+    if (!mdata.startdir.endsWith("/"));
+        mdata.startdir += "/";
+
+
+    preMusic(&mdata);
+    if ("" != mdata.startdir)
+    {
+        SearchDir(mdata.startdir);
+        mdata.all_music->resync();
+        
+        mdata.all_playlists->postLoad();
+    }
+    runMenu(&mdata, "musicmenu.xml");
+    postMusic(&mdata);
+}
+
 
 void runMusicSelection(void)
 {
