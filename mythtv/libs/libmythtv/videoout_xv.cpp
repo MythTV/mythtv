@@ -35,11 +35,12 @@ extern "C" {
 #include <X11/extensions/Xvlib.h>
 #define XMD_H 1
 #include <X11/extensions/xf86vmode.h>
-#include <X11/extensions/Xinerama.h>
 
 #include "yuv2rgb.h"
 
 extern "C" {
+#include <X11/extensions/Xinerama.h>
+
 extern int      XShmQueryExtension(Display*);
 extern int      XShmGetEventBase(Display*);
 extern XvImage  *XvShmCreateImage(Display*, XvPortID, int, char*, int, int, XShmSegmentInfo*);
