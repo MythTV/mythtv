@@ -730,11 +730,15 @@ QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg,
     box->setBackgroundOrigin(QWidget::WindowOrigin);
 
     QLabel* label = new QLabel(box);
-    label->setText(getLabel());
+    label->setText(getLabel() + ":");
     label->setBackgroundOrigin(QWidget::WindowOrigin);
 
     MythComboBox *widget = new MythComboBox(false, box);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);
+
+    QLabel *testlabel = new QLabel(box);
+    testlabel->setText("  ");
+    testlabel->setBackgroundOrigin(QWidget::WindowOrigin);
 
     imagelabel = new QLabel(box);
     imagelabel->setBackgroundOrigin(QWidget::WindowOrigin);
