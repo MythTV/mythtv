@@ -23,7 +23,7 @@ GameTree::GameTree(MythMainWindow *parent, QSqlDatabase *ldb,
     wireUpTheme();
 
     game_tree_root = new GenericTree("game root", 0, false);
-    game_tree_data = game_tree_root->addNode("All Games", 0, false);
+    game_tree_data = game_tree_root->addNode(tr("All Games"), 0, false);
 
     buildGameList();
 

@@ -13,7 +13,7 @@ public:
 
 PCSettingsDlg::PCSettingsDlg(QString romname)
 {
-    QString title = "PC Game Settings - " + romname + " - ";
+    QString title = tr("PC Game Settings - ") + romname + tr(" - ");
 
     VerticalConfigurationGroup *first = new VerticalConfigurationGroup(false);
     first->setLabel(title);

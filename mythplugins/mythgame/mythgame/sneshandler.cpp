@@ -188,11 +188,11 @@ void SnesHandler::processGames(bool bValidate)
         rom_extensions.append("2");
 
         QString GameName;
-        QString Genre("Unknown");
+        QString Genre(QObject::tr("Unknown"));
         int Year = 0;
         bool bRomFound;
 
-        MythProgressDialog pdial("Looking for SNES games...", List->count());
+        MythProgressDialog pdial(QObject::tr("Looking for SNES games..."), List->count());
         int progress = 0;
 
         for (QFileInfoListIterator it(*List); it; ++it)
@@ -225,7 +225,7 @@ void SnesHandler::processGames(bool bValidate)
                 {
                     if(Info.extension(false).lower() == *i)
                     {
-                        GameName = Info.baseName() + "   (bad checksum)";
+                        GameName = Info.baseName() + QObject::tr("   (bad checksum)");
                         bRomFound = true;
                         break;
                     }
@@ -272,7 +272,7 @@ void SnesHandler::processGames()
 
     RomHeader RHeader;
 
-    MythProgressDialog pdial("Looking for SNES games...", List->count());
+    MythProgressDialog pdial(QObject::tr("Looking for SNES games..."), List->count());
     int progress = 0;
 
     for (QFileInfoListIterator it(*List); it; ++it)
@@ -295,7 +295,7 @@ void SnesHandler::processGames()
             }
             NameBuffer[21] = '\0';
             QString GameName(NameBuffer);
-            QString Genre("Unknown");
+            QString Genre(QObject::tr("Unknown"));
             int Year = 0;
 
             cout << GameName << endl;

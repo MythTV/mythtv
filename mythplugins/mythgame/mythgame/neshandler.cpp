@@ -73,7 +73,7 @@ void NesHandler::processGames()
     if (!List)
         return;
 
-    MythProgressDialog pdial("Looking for NES games...", List->count());
+    MythProgressDialog pdial(QObject::tr("Looking for NES games..."), List->count());
     int progress = 0;
 
     for (QFileInfoListIterator it(*List); it; ++it)
@@ -91,7 +91,7 @@ void NesHandler::processGames()
             }
             cout << GameName << endl;
 
-            QString Genre("Unknown");
+            QString Genre(QObject::tr("Unknown"));
             int Year = 0;
             GetMetadata(GameName, &Genre, &Year);
             

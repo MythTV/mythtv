@@ -13,7 +13,7 @@ public:
 
 NesSettingsDlg::NesSettingsDlg(QString romname)
 {
-    QString title = "NES Game Settings - " + romname + " - ";
+    QString title = tr("NES Game Settings - ") + romname + tr(" - ");
 
     VerticalConfigurationGroup *first = new VerticalConfigurationGroup(false);
     first->setLabel(title);

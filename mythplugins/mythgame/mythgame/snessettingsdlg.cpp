@@ -30,10 +30,10 @@ class SnesDefaultOptions: public CheckBoxSetting, public SnesSetting {
 public: 
     SnesDefaultOptions(QString rom):
         SnesSetting("usedefault", rom) {
-        setLabel("Use defaults");
+        setLabel(QObject::tr("Use defaults"));
         setValue(true);
-        setHelpText("Use the global default SNES settings.  All other settings"
-                    " are ignored if this is set.");
+        setHelpText(QObject::tr("Use the global default SNES settings. "
+                    "All other settings are ignored if this is set."));
     };
 };
 
@@ -42,8 +42,9 @@ class SnesTransparency: public CheckBoxSetting, public SnesSetting {
 public:
     SnesTransparency(QString rom):
         SnesSetting("transparency", rom) {
-        setLabel("Use transparency");
+        setLabel(QObject::tr("Use transparency"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -51,8 +52,9 @@ class Snes16: public CheckBoxSetting, public SnesSetting {
 public:
     Snes16(QString rom):
         SnesSetting("sixteen", rom) {
-        setLabel("Use 16-bit mode");
+        setLabel(QObject::tr("Use 16-bit mode"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -60,8 +62,9 @@ class SnesHiRes: public CheckBoxSetting, public SnesSetting {
 public:
     SnesHiRes(QString rom):
         SnesSetting("hires", rom) {
-        setLabel("Use Hi-res mode");
+        setLabel(QObject::tr("Use Hi-res mode"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -69,8 +72,9 @@ class SnesNoModeSwitch: public CheckBoxSetting, public SnesSetting {
 public:
     SnesNoModeSwitch(QString rom):
         SnesSetting("nomodeswitch", rom) {
-        setLabel("No modeswitch");
+        setLabel(QObject::tr("No modeswitch"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -78,8 +82,9 @@ class SnesFullScreen: public CheckBoxSetting, public SnesSetting {
 public:
     SnesFullScreen(QString rom):
         SnesSetting("fullscreen", rom) {
-        setLabel("Fullscreen");
+        setLabel(QObject::tr("Fullscreen"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -87,8 +92,9 @@ class SnesStretch: public CheckBoxSetting, public SnesSetting {
 public:
     SnesStretch(QString rom):
         SnesSetting("stretch", rom) {
-        setLabel("Stretch to fit");
+        setLabel(QObject::tr("Stretch to fit"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -96,13 +102,14 @@ class SnesInterpolate: public ComboBoxSetting, public SnesSetting {
 public:
     SnesInterpolate(QString rom):
         SnesSetting("interpolate", rom) {
-        setLabel("Interpolation");
-        addSelection("None", "0");
-        addSelection("Interpolate 1", "1");
-        addSelection("Interpolate 2", "2");
-        addSelection("Interpolate 3", "3");
-        addSelection("Interpolate 4", "4");
-        addSelection("Interpolate 5", "5");
+        setLabel(QObject::tr("Interpolation"));
+        addSelection(QObject::tr("None"), "0");
+        addSelection(QObject::tr("Interpolate 1"), "1");
+        addSelection(QObject::tr("Interpolate 2"), "2");
+        addSelection(QObject::tr("Interpolate 3"), "3");
+        addSelection(QObject::tr("Interpolate 4"), "4");
+        addSelection(QObject::tr("Interpolate 5"), "5");
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -111,8 +118,9 @@ class SnesNoJoy: public CheckBoxSetting, public SnesSetting {
 public:
     SnesNoJoy(QString rom):
         SnesSetting("nojoy", rom) {
-        setLabel("No Joystick");
+        setLabel(QObject::tr("No Joystick"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -120,8 +128,9 @@ class SnesLayering: public CheckBoxSetting, public SnesSetting {
 public:
     SnesLayering(QString rom):
         SnesSetting("layering", rom) {
-        setLabel("Layering");
+        setLabel(QObject::tr("Layering"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -129,8 +138,9 @@ class SnesInterleaved: public CheckBoxSetting, public SnesSetting {
 public:
     SnesInterleaved(QString rom):
         SnesSetting("interleaved", rom) {
-        setLabel("Interleaved");
+        setLabel(QObject::tr("Interleaved"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -138,8 +148,9 @@ class SnesAltInterleaved: public CheckBoxSetting, public SnesSetting {
 public:
     SnesAltInterleaved(QString rom):
         SnesSetting("altinterleaved", rom) {
-        setLabel("AltInterleaved");
+        setLabel(QObject::tr("AltInterleaved"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -147,8 +158,9 @@ class SnesHirom: public CheckBoxSetting, public SnesSetting {
 public:
     SnesHirom(QString rom):
         SnesSetting("hirom", rom) {
-        setLabel("Hi Rom");
+        setLabel(QObject::tr("Hi Rom"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -156,8 +168,9 @@ class SnesLowrom: public CheckBoxSetting, public SnesSetting {
 public:
     SnesLowrom(QString rom):
         SnesSetting("lowrom", rom) {
-        setLabel("Low Rom");
+        setLabel(QObject::tr("Low Rom"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -165,8 +178,9 @@ class SnesHeader: public CheckBoxSetting, public SnesSetting {
 public:
     SnesHeader(QString rom):
         SnesSetting("header", rom) {
-        setLabel("Header");
+        setLabel(QObject::tr("Header"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -174,8 +188,9 @@ class SnesNoHeader: public CheckBoxSetting, public SnesSetting {
 public:
     SnesNoHeader(QString rom):
         SnesSetting("noheader", rom) {
-        setLabel("No Header");
+        setLabel(QObject::tr("No Header"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -183,8 +198,9 @@ class SnesNTSC: public CheckBoxSetting, public SnesSetting {
 public:
     SnesNTSC(QString rom):
         SnesSetting("ntsc", rom) {
-        setLabel("NTSC");
+        setLabel(QObject::tr("NTSC"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -192,8 +208,9 @@ class SnesPAL: public CheckBoxSetting, public SnesSetting {
 public:
     SnesPAL(QString rom):
         SnesSetting("pal", rom) {
-        setLabel("PAL");
+        setLabel(QObject::tr("PAL"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -201,8 +218,9 @@ class SnesNoHDMA: public CheckBoxSetting, public SnesSetting {
 public:
     SnesNoHDMA(QString rom):
         SnesSetting("nohdma", rom) {
-        setLabel("No HDMA");
+        setLabel(QObject::tr("No HDMA"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -210,8 +228,9 @@ class SnesNoWindows: public CheckBoxSetting, public SnesSetting {
 public:
     SnesNoWindows(QString rom):
         SnesSetting("nowindows", rom) {
-        setLabel("No Windows");
+        setLabel(QObject::tr("No Windows"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -219,8 +238,9 @@ class SnesNoSpeedHacks: public CheckBoxSetting, public SnesSetting {
 public:
     SnesNoSpeedHacks(QString rom):
         SnesSetting("nospeedhacks", rom) {
-        setLabel("No Speed Hacks");
+        setLabel(QObject::tr("No Speed Hacks"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -228,8 +248,9 @@ class SnesExtraOptions: public LineEditSetting, public SnesSetting {
 public:
     SnesExtraOptions(QString rom):
         SnesSetting("extraoption", rom) {
-        setLabel("Extra options");
+        setLabel(QObject::tr("Extra options"));
         setValue("");
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -238,8 +259,9 @@ class SnesNoSound: public CheckBoxSetting, public SnesSetting {
 public:
     SnesNoSound(QString rom):
         SnesSetting("nosound", rom) {
-        setLabel("No Sound");
+        setLabel(QObject::tr("No Sound"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -247,8 +269,9 @@ class SnesStereo: public CheckBoxSetting, public SnesSetting {
 public:
     SnesStereo(QString rom):
         SnesSetting("stereo", rom) {
-        setLabel("Use stereo audio");
+        setLabel(QObject::tr("Use stereo audio"));
         setValue(true);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -256,8 +279,9 @@ class SnesEnvx: public CheckBoxSetting, public SnesSetting {
 public:
     SnesEnvx(QString rom):
         SnesSetting("envx", rom) {
-        setLabel("Envx");
+        setLabel(QObject::tr("Envx"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -265,8 +289,9 @@ class SnesNoEcho: public CheckBoxSetting, public SnesSetting {
 public:
     SnesNoEcho(QString rom):
         SnesSetting("noecho", rom) {
-        setLabel("No Echo");
+        setLabel(QObject::tr("No Echo"));
         setValue(true);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -274,8 +299,9 @@ class SnesThreadSound: public CheckBoxSetting, public SnesSetting {
 public:
     SnesThreadSound(QString rom):
         SnesSetting("threadsound", rom) {
-        setLabel("Threaded Sound");
+        setLabel(QObject::tr("Threaded Sound"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -283,8 +309,9 @@ class SnesSyncSound: public CheckBoxSetting, public SnesSetting {
 public:
     SnesSyncSound(QString rom):
         SnesSetting("syncsound", rom) {
-        setLabel("Synced Sound");
+        setLabel(QObject::tr("Synced Sound"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -292,8 +319,9 @@ class SnesInterpSound: public CheckBoxSetting, public SnesSetting {
 public:
     SnesInterpSound(QString rom):
         SnesSetting("interpolatedsound", rom) {
-        setLabel("Interpolated Sound");
+        setLabel(QObject::tr("Interpolated Sound"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -301,8 +329,9 @@ class SnesNoSampleCache: public CheckBoxSetting, public SnesSetting {
 public:
     SnesNoSampleCache(QString rom):
         SnesSetting("nosamplecaching", rom) {
-        setLabel("No sample caching");
+        setLabel(QObject::tr("No sample caching"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -310,8 +339,9 @@ class SnesAltDecode: public CheckBoxSetting, public SnesSetting {
 public:
     SnesAltDecode(QString rom):
         SnesSetting("altsampledecode", rom) {
-        setLabel("Alt sample decoding");
+        setLabel(QObject::tr("Alt sample decoding"));
         setValue(true);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -319,8 +349,9 @@ class SnesNoMaster: public CheckBoxSetting, public SnesSetting {
 public:
     SnesNoMaster(QString rom):
         SnesSetting("nomastervolume", rom) {
-        setLabel("No master volume");
+        setLabel(QObject::tr("No master volume"));
         setValue(false);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -329,7 +360,7 @@ public:
     SnesBufferSize(QString rom):
         SpinBoxSetting(0, 32, 1),
         SnesSetting("buffersize", rom) {
-        setLabel("Audio buffer size");
+        setLabel(QObject::tr("Audio buffer size"));
         setValue(0);
         setHelpText("Select 0 to use the default buffer size");
     };
@@ -340,8 +371,9 @@ public:
     SnesSoundSkip(QString rom):
         SpinBoxSetting(0, 3, 1),
         SnesSetting("soundskip", rom) {
-        setLabel("Sound skip");
+        setLabel(QObject::tr("Sound skip"));
         setValue(0);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
@@ -350,26 +382,28 @@ public:
     SnesQuality(QString rom):
         SpinBoxSetting(0, 7, 1),
         SnesSetting("soundquality", rom) {
-        setLabel("Sound quality");
+        setLabel(QObject::tr("Sound quality"));
         setValue(4);
+        setHelpText(QObject::tr("No Help Text"));
     };
 };
 
 SnesSettingsDlg::SnesSettingsDlg(QString romname)
 {
-    QString title = "SNES Game Settings - " + romname + " - ";
+    QString title = QObject::tr("SNES Game Settings - ") + romname + 
+	    QObject::tr(" - ");
     if (romname != "default")
     {
         VerticalConfigurationGroup *toplevel = 
                                         new VerticalConfigurationGroup(false);
-        toplevel->setLabel(title + " - top level");
+        toplevel->setLabel(title + QObject::tr(" - top level"));
 
         toplevel->addChild(new SnesDefaultOptions(romname));
         addChild(toplevel);
     }
         
     VerticalConfigurationGroup *video1 = new VerticalConfigurationGroup(false);
-    video1->setLabel(title + "video");
+    video1->setLabel(title + QObject::tr("video"));
     video1->addChild(new SnesTransparency(romname));
     video1->addChild(new Snes16(romname));
     video1->addChild(new SnesHiRes(romname));
@@ -380,7 +414,7 @@ SnesSettingsDlg::SnesSettingsDlg(QString romname)
     addChild(video1);
 
     VerticalConfigurationGroup *misc1 = new VerticalConfigurationGroup(false);
-    misc1->setLabel(title + "misc page 1");
+    misc1->setLabel(title + QObject::tr("misc page 1"));
     misc1->addChild(new SnesNoJoy(romname));
     misc1->addChild(new SnesLayering(romname));
     misc1->addChild(new SnesInterleaved(romname));
@@ -390,7 +424,7 @@ SnesSettingsDlg::SnesSettingsDlg(QString romname)
     addChild(misc1);
 
     VerticalConfigurationGroup *misc2 = new VerticalConfigurationGroup(false);
-    misc2->setLabel(title + "misc page 2");
+    misc2->setLabel(title + QObject::tr("misc page 2"));
     misc2->addChild(new SnesHeader(romname));
     misc2->addChild(new SnesNoHeader(romname));
     misc2->addChild(new SnesNTSC(romname));
@@ -402,7 +436,7 @@ SnesSettingsDlg::SnesSettingsDlg(QString romname)
     addChild(misc2);
 
     VerticalConfigurationGroup *sound1 = new VerticalConfigurationGroup(false);
-    sound1->setLabel(title + "sound page 1");
+    sound1->setLabel(title + QObject::tr("sound page 1"));
     sound1->addChild(new SnesNoSound(romname));
     sound1->addChild(new SnesStereo(romname));
     sound1->addChild(new SnesEnvx(romname));
@@ -413,7 +447,7 @@ SnesSettingsDlg::SnesSettingsDlg(QString romname)
     addChild(sound1);
     
     VerticalConfigurationGroup *sound2 = new VerticalConfigurationGroup(false);
-    sound2->setLabel(title + "sound page 2");
+    sound2->setLabel(title + QObject::tr("sound page 2"));
     sound2->addChild(new SnesNoSampleCache(romname));
     sound2->addChild(new SnesAltDecode(romname));
     sound2->addChild(new SnesNoMaster(romname));

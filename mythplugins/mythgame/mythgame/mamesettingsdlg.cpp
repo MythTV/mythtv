@@ -31,10 +31,10 @@ class MameDefaultOptions: public CheckBoxSetting, public MameSetting {
 public:
     MameDefaultOptions(QString rom):
         MameSetting("usedefault", rom) {
-        setLabel("Use defaults");
+        setLabel(QObject::tr("Use defaults"));
         setValue(true);
-        setHelpText("Use the global default MAME settings.  All other settings"
-                    " are ignored if this is set.");
+        setHelpText(QObject::tr("Use the global default MAME settings. "
+                    "All other settings are ignored if this is set."));
     };
 };
 
@@ -43,16 +43,16 @@ class MameFullscreen: public ComboBoxSetting, public MameSetting {
 public:
     MameFullscreen(QString rom, Prefs *prefs):
         MameSetting("fullscreen", rom) {
-        setLabel("Fullscreen mode");
-        addSelection("Windowed", "0");
+        setLabel(QObject::tr("Fullscreen mode"));
+        addSelection(QObject::tr("Windowed"), "0");
         if ((!strcmp(prefs->xmame_display_target, "x11")) &&
             (atoi(prefs->xmame_minor) >= 61))
         {
-            addSelection("Fullscreen/DGA", "1");
-            addSelection("Fullscreen/Xv", "2");
+            addSelection(QObject::tr("Fullscreen/DGA"), "1");
+            addSelection(QObject::tr("Fullscreen/Xv"), "2");
         }
         else
-            addSelection("Fullscreen", "1");
+            addSelection(QObject::tr("Fullscreen"), "1");
     };
 };
 
@@ -60,8 +60,9 @@ class MameSkip: public CheckBoxSetting, public MameSetting {
 public:
     MameSkip(QString rom):
         MameSetting("autoframeskip", rom) {
-        setLabel("Auto frame skip");
+        setLabel(QObject::tr("Auto frame skip"));
         setValue(false);
+        setHelpText(QObject::tr("No Help text"));
     };
 };
 
@@ -69,8 +70,9 @@ class MameLeft: public CheckBoxSetting, public MameSetting {
 public:
     MameLeft(QString rom):
         MameSetting("rotleft", rom) {
-        setLabel("Rotate left");
+        setLabel(QObject::tr("Rotate left"));
         setValue(false);
+        setHelpText(QObject::tr("No Help text"));
     };
 };
 
@@ -78,8 +80,9 @@ class MameRight: public CheckBoxSetting, public MameSetting {
 public:
     MameRight(QString rom):
         MameSetting("rotright", rom) {
-        setLabel("Rotate right");
+        setLabel(QObject::tr("Rotate right"));
         setValue(false);
+        setHelpText(QObject::tr("No Help text"));
     };
 };
 
@@ -87,8 +90,9 @@ class MameFlipx: public CheckBoxSetting, public MameSetting {
 public:
     MameFlipx(QString rom):
         MameSetting("flipx", rom) {
-        setLabel("Flip X Axis");
+        setLabel(QObject::tr("Flip X Axis"));
         setValue(false);
+        setHelpText(QObject::tr("No Help text"));
     };
 };
 
@@ -96,8 +100,9 @@ class MameFlipy: public CheckBoxSetting, public MameSetting {
 public:
     MameFlipy(QString rom):
         MameSetting("flipy", rom) {
-        setLabel("Flip Y Axis");
+        setLabel(QObject::tr("Flip Y Axis"));
         setValue(false);
+        setHelpText(QObject::tr("No Help text"));
     };
 };
 
@@ -105,8 +110,9 @@ class MameExtraArt: public CheckBoxSetting, public MameSetting {
 public:
     MameExtraArt(QString rom):
         MameSetting("extra_artwork", rom) {
-        setLabel("Extra Artwork");
+        setLabel(QObject::tr("Extra Artwork"));
         setValue(false);
+        setHelpText(QObject::tr("No Help text"));
     };
 };
 
@@ -114,8 +120,9 @@ class MameScan: public CheckBoxSetting, public MameSetting {
 public:
     MameScan(QString rom):
         MameSetting("scanlines", rom) {
-        setLabel("Scanlines");
+        setLabel(QObject::tr("Scanlines"));
         setValue(false);
+        setHelpText(QObject::tr("No Help text"));
     };
 };
 
@@ -123,8 +130,9 @@ class MameColor: public CheckBoxSetting, public MameSetting {
 public:
     MameColor(QString rom):
         MameSetting("autocolordepth", rom) {
-        setLabel("Automatic color depth");
+        setLabel(QObject::tr("Automatic color depth"));
         setValue(false);
+        setHelpText(QObject::tr("No Help text"));
     };
 };
 
@@ -133,8 +141,9 @@ public:
     MameScale(QString rom):
         SpinBoxSetting(1, 5, 1),
         MameSetting("scale", rom) {
-        setLabel("Scaling");
+        setLabel(QObject::tr("Scaling"));
         setValue(1);
+        setHelpText(QObject::tr("No Help text"));
     };
 };
 
@@ -143,8 +152,9 @@ class MameAlias: public CheckBoxSetting, public MameSetting {
 public:
     MameAlias(QString rom):
         MameSetting("antialias", rom) {
-        setLabel("Antialiasing");
+        setLabel(QObject::tr("Antialiasing"));
         setValue(false);
+        setHelpText(QObject::tr("No Help text"));
     };
 };
 
@@ -152,8 +162,9 @@ class MameTrans: public CheckBoxSetting, public MameSetting {
 public:
     MameTrans(QString rom):
         MameSetting("translucency", rom) {
-        setLabel("Translucency");
+        setLabel(QObject::tr("Translucency"));
         setValue(false);
+        setHelpText(QObject::tr("No Help text"));
     };
 };
 
@@ -161,13 +172,14 @@ class MameRes: public ComboBoxSetting, public MameSetting {
 public:
     MameRes(QString rom):
         MameSetting("vectorres", rom) {
-        setLabel("Resolution");
-        addSelection("Use Scale", "0");
-        addSelection("640 x 480", "1");
-        addSelection("800 x 600", "2");
-        addSelection("1024 x 768", "3");
-        addSelection("1280 x 1024", "4");
-        addSelection("1600 x 1200", "5");
+        setLabel(QObject::tr("Resolution"));
+        addSelection(QObject::tr("Use Scale"), "0");
+        addSelection(QObject::tr("640 x 480"), "1");
+        addSelection(QObject::tr("800 x 600"), "2");
+        addSelection(QObject::tr("1024 x 768"), "3");
+        addSelection(QObject::tr("1280 x 1024"), "4");
+        addSelection(QObject::tr("1600 x 1200"), "5");
+        setHelpText(QObject::tr("No Help text"));
     };
 };
 
@@ -176,8 +188,9 @@ public:
     MameBeam(QString rom):
         SpinBoxSetting(1, 15, 1),
         MameSetting("beam", rom) {
-        setLabel("Scaling");
+        setLabel(QObject::tr("Scaling"));
         setValue(1);
+        setHelpText(QObject::tr("No Help text"));
     };
 };
 
@@ -186,8 +199,9 @@ public:
     MameFlicker(QString rom):
         SpinBoxSetting(0, 10, 1),
         MameSetting("beam", rom) {
-        setLabel("Scaling");
+        setLabel(QObject::tr("Scaling"));
         setValue(0);
+        setHelpText(QObject::tr("No Help text"));
     };
 };
 
@@ -196,8 +210,9 @@ class MameSound: public CheckBoxSetting, public MameSetting {
 public:
     MameSound(QString rom):
         MameSetting("sound", rom) {
-        setLabel("Use sound");
+        setLabel(QObject::tr("Use sound"));
         setValue(true);
+        setHelpText(QObject::tr("No Help text"));
     };
 };
 
@@ -205,8 +220,9 @@ class MameSamples: public CheckBoxSetting, public MameSetting {
 public:
     MameSamples(QString rom):
         MameSetting("samples", rom) {
-        setLabel("Use samples");
+        setLabel(QObject::tr("Use samples"));
         setValue(true);
+        setHelpText(QObject::tr("No Help text"));
     };
 };
 
@@ -214,8 +230,9 @@ class MameFake: public CheckBoxSetting, public MameSetting {
 public:
     MameFake(QString rom):
         MameSetting("fakesound", rom) {
-        setLabel("Fake sound");
+        setLabel(QObject::tr("Fake sound"));
         setValue(false);
+        setHelpText(QObject::tr("No Help text"));
     };
 };
 
@@ -224,8 +241,9 @@ public:
     MameVolume(QString rom):
         SpinBoxSetting(-32, 0, 1),
         MameSetting("volume", rom) {
-        setLabel("Volume");
+        setLabel(QObject::tr("Volume"));
         setValue(-16);
+        setHelpText(QObject::tr("No Help text"));
     };
 };
 
@@ -234,8 +252,9 @@ class MameCheat: public CheckBoxSetting, public MameSetting {
 public:
     MameCheat(QString rom):
         MameSetting("cheat", rom) {
-        setLabel("Enable cheats");
+        setLabel(QObject::tr("Enable cheats"));
         setValue(true);
+        setHelpText(QObject::tr("No Help text"));
     };
 };
 
@@ -243,8 +262,9 @@ class MameExtraOptions: public LineEditSetting, public MameSetting {
 public:
     MameExtraOptions(QString rom):
         MameSetting("extraoption", rom) {
-        setLabel("Extra options");
+        setLabel(QObject::tr("Extra options"));
         setValue("");
+        setHelpText(QObject::tr("No Help text"));
     };
 };
 
@@ -253,8 +273,9 @@ class MameWindows: public CheckBoxSetting, public MameSetting {
 public:
     MameWindows(QString rom):
         MameSetting("winkeys", rom) {
-        setLabel("Use Windows Keys");
+        setLabel(QObject::tr("Use Windows Keys"));
         setValue(false);
+        setHelpText(QObject::tr("No Help text"));
     };
 };
 
@@ -262,8 +283,9 @@ class MameMouse: public CheckBoxSetting, public MameSetting {
 public:
     MameMouse(QString rom):
         MameSetting("mouse", rom) {
-        setLabel("Use Mouse");
+        setLabel(QObject::tr("Use Mouse"));
         setValue(false);
+        setHelpText(QObject::tr("No Help text"));
     };
 };
 
@@ -271,8 +293,9 @@ class MameGrabMouse: public CheckBoxSetting, public MameSetting {
 public:
     MameGrabMouse(QString rom):
         MameSetting("grabmouse", rom) {
-        setLabel("Grab Mouse");
+        setLabel(QObject::tr("Grab Mouse"));
         setValue(false);
+        setHelpText(QObject::tr("No Help text"));
     };
 };
 
@@ -280,15 +303,16 @@ class MameJoystickType: public ComboBoxSetting, public MameSetting {
 public:
     MameJoystickType(QString rom):
         MameSetting("joytype", rom) {
-        setLabel("Joystick Type");
-        addSelection("No Joystick", "0");
-        addSelection("i386 Joystick", "1");
-        addSelection("Fm Town Pad", "2");
-        addSelection("X11 Input Extension Joystick", "3");
-        addSelection("new i386 linux 1.x.x Joystick", "4");
-        addSelection("NetBSD USB Joystick", "5");
-        addSelection("PS2-Linux native pad", "6");
-        addSelection("SDL Joystick", "7");
+        setLabel(QObject::tr("Joystick Type"));
+        addSelection(QObject::tr("No Joystick"), "0");
+        addSelection(QObject::tr("i386 Joystick"), "1");
+        addSelection(QObject::tr("Fm Town Pad"), "2");
+        addSelection(QObject::tr("X11 Input Extension Joystick"), "3");
+        addSelection(QObject::tr("New i386 linux 1.x.x Joystick"), "4");
+        addSelection(QObject::tr("NetBSD USB Joystick"), "5");
+        addSelection(QObject::tr("PS2-Linux native pad"), "6");
+        addSelection(QObject::tr("SDL Joystick"), "7");
+        setHelpText(QObject::tr("No Help text"));
     };
 };
 
@@ -296,26 +320,28 @@ class MameAnalogJoy: public CheckBoxSetting, public MameSetting {
 public:
     MameAnalogJoy(QString rom):
         MameSetting("analogjoy", rom) {
-        setLabel("Use joystick as analog");
+        setLabel(QObject::tr("Use joystick as analog"));
         setValue(false);
+        setHelpText(QObject::tr("No Help text"));
     };
 };
 
 MameSettingsDlg::MameSettingsDlg(QString romname, Prefs *prefs)
 {
-    QString title = "Mame Game Settings - " + romname + " - ";
+    QString title = QObject::tr("Mame Game Settings - ") + romname + 
+	    QObject::tr(" - ");
     if (romname != "default")
     {
         VerticalConfigurationGroup *toplevel =
                                         new VerticalConfigurationGroup(false);
-        toplevel->setLabel(title + " - top level");
+        toplevel->setLabel(title + QObject::tr(" - top level"));
 
         toplevel->addChild(new MameDefaultOptions(romname));
         addChild(toplevel);
     }
 
     VerticalConfigurationGroup *video1 = new VerticalConfigurationGroup(false);
-    video1->setLabel(title + "video page 1");
+    video1->setLabel(title + QObject::tr("video page 1"));
     video1->addChild(new MameFullscreen(romname, prefs));
     video1->addChild(new MameSkip(romname));
     video1->addChild(new MameLeft(romname));
@@ -325,7 +351,7 @@ MameSettingsDlg::MameSettingsDlg(QString romname, Prefs *prefs)
     addChild(video1);
 
     VerticalConfigurationGroup *video2 = new VerticalConfigurationGroup(false);
-    video2->setLabel(title + "video page 2");
+    video2->setLabel(title + QObject::tr("video page 2"));
     video2->addChild(new MameExtraArt(romname));
     video2->addChild(new MameScan(romname));
     video2->addChild(new MameColor(romname));
@@ -333,7 +359,7 @@ MameSettingsDlg::MameSettingsDlg(QString romname, Prefs *prefs)
     addChild(video2);
 
     VerticalConfigurationGroup *vector1 = new VerticalConfigurationGroup(false);
-    vector1->setLabel(title + "vector");
+    vector1->setLabel(title + QObject::tr("vector"));
     vector1->addChild(new MameAlias(romname));
     vector1->addChild(new MameTrans(romname));
     vector1->addChild(new MameRes(romname));
@@ -342,7 +368,7 @@ MameSettingsDlg::MameSettingsDlg(QString romname, Prefs *prefs)
     addChild(vector1);
 
     VerticalConfigurationGroup *sound1 = new VerticalConfigurationGroup(false);
-    sound1->setLabel(title + "sound");
+    sound1->setLabel(title + QObject::tr("sound"));
     sound1->addChild(new MameSound(romname));
     sound1->addChild(new MameSamples(romname));
     sound1->addChild(new MameFake(romname));
@@ -350,7 +376,7 @@ MameSettingsDlg::MameSettingsDlg(QString romname, Prefs *prefs)
     addChild(sound1);
 
     VerticalConfigurationGroup *input1 = new VerticalConfigurationGroup(false);
-    input1->setLabel(title + "input");
+    input1->setLabel(title + QObject::tr("input"));
     input1->addChild(new MameWindows(romname));
     input1->addChild(new MameMouse(romname));
     input1->addChild(new MameGrabMouse(romname));
@@ -359,7 +385,7 @@ MameSettingsDlg::MameSettingsDlg(QString romname, Prefs *prefs)
     addChild(input1);
 
     VerticalConfigurationGroup *misc1 = new VerticalConfigurationGroup(false);
-    misc1->setLabel(title + "misc");
+    misc1->setLabel(title + QObject::tr("misc"));
     misc1->addChild(new MameCheat(romname));
     misc1->addChild(new MameExtraOptions(romname));
     addChild(misc1);

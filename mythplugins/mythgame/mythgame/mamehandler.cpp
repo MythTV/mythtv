@@ -126,14 +126,15 @@ void MameHandler::processGames()
         map<QString, QString> CatMap;
         LoadCatfile(&CatMap);
  
-        MythProgressDialog pdial("Looking for Mame games...", supported_games);
+        MythProgressDialog pdial(QObject::tr("Looking for Mame games..."), 
+			supported_games);
 
         while (fgets(line, 500, xmame_info)) {
                 if (!strncmp(line, "game (", 6)) {
-                        romname = "Unknown";
-                        gamename = "Unknown";
+                        romname = QObject::tr("Unknown");
+                        gamename = QObject::tr("Unknown");
                         year = "-";
-                        manu = "Unknown";
+                        manu = QObject::tr("Unknown");
                         cloneof = "-";
                         romof = "-";
                         while (fgets(line, 500, xmame_info)) {
@@ -360,7 +361,7 @@ void MameHandler::processGames()
                             }
                             else
                             {
-                                rom->setGenre("Unknown");
+                                rom->setGenre(QObject::tr("Unknown"));
                             }
                            
                             thequery = QString("INSERT INTO gamemetadata "
@@ -434,7 +435,7 @@ void MameHandler::start_game(RomInfo * romdata)
         FILE *command;
         command = popen(exec + " 2>&1", "r");
 
-        MythProgressDialog pdial("Loading game...", romcount);
+        MythProgressDialog pdial(QObject::tr("Loading game..."), romcount);
         int loadprogress = 0;
 
         while (fgets(line, 500 - 1, command))
