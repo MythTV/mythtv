@@ -66,7 +66,7 @@ void PlaybackSock::GetFreeSpace(int &totalspace, int &usedspace)
     SendReceiveStringList(strlist);
 
     totalspace = strlist[0].toInt();
-    usedspace = strlist[0].toInt();
+    usedspace = strlist[1].toInt();
 }
 
 void PlaybackSock::DeleteRecording(ProgramInfo *pginfo)

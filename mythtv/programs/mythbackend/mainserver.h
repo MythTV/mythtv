@@ -80,9 +80,9 @@ class MainServer : public QObject
 
     HttpStatus *statusserver;
 
-    QSocket *masterServerSock;
     QTimer *masterServerReconnect;
-
+    PlaybackSock *masterServer;
+    
     bool ismaster;
 };
 

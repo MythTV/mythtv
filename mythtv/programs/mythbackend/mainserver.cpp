@@ -27,7 +27,7 @@ MainServer::MainServer(bool master, int port, int statusport,
                        QMap<int, EncoderLink *> *tvList)
 {
     ismaster = master;
-    masterServerSock = NULL;
+    masterServer = NULL;
 
     encoderList = tvList;
 
@@ -43,11 +43,12 @@ MainServer::MainServer(bool master, int port, int statusport,
 
     gContext->addListener(this);
 
-    
     if (!ismaster)
     {
         masterServerReconnect = new QTimer(this);
-        //masterServerReconnect->start(1000, true);
+        connect(masterServerReconnect, SIGNAL(timeout()), this, 
+                SLOT(reconnectTimeout()));
+        masterServerReconnect->start(1000, true);
     }
 }
 
@@ -216,11 +217,6 @@ void MainServer::customEvent(QCustomEvent *e)
             {
                 WriteStringList(pbs->getSocket(), broadcast);
             }
-        }
-
-        if (masterServerSock)
-        {
-            WriteStringList(masterServerSock, broadcast);
         }
     }
 }
@@ -1413,14 +1409,14 @@ bool MainServer::isRingBufSock(QSocket *sock)
 
 void MainServer::masterServerDied(void)
 {
-    delete masterServerSock;
-    masterServerSock = NULL;
-    masterServerReconnect->start(1000);
+    delete masterServer;
+    masterServer = NULL;
+    masterServerReconnect->start(1000, true);
 }
 
 void MainServer::reconnectTimeout(void)
 {
-    masterServerSock = new QSocket();
+    QSocket *masterServerSock = new QSocket();
 
     QString server = gContext->GetSetting("MasterServerIP", "localhost");
     int port = gContext->GetNumSetting("MasterServerPort", 6543);
@@ -1439,9 +1435,8 @@ void MainServer::reconnectTimeout(void)
         if (num > 100)
         {
             cerr << "Connection to master server timed out.\n";
-            masterServerReconnect->start(1000);
+            masterServerReconnect->start(1000, true);
             delete masterServerSock;
-            masterServerSock = NULL;
             return;
         }
     }
@@ -1449,9 +1444,9 @@ void MainServer::reconnectTimeout(void)
     if (masterServerSock->state() != QSocket::Connected)
     {
         cerr << "Could not connect to master server\n";
-        masterServerReconnect->start(1000);
+        masterServerReconnect->start(1000, true);
         delete masterServerSock;
-        masterServerSock = NULL;
+        return;
     }
 
     cerr << "done\n";
@@ -1467,6 +1462,9 @@ void MainServer::reconnectTimeout(void)
     connect(masterServerSock, SIGNAL(readyRead()), this, SLOT(readSocket()));
     connect(masterServerSock, SIGNAL(connectionClosed()), this, 
             SLOT(masterServerDied()));
+
+    masterServer = new PlaybackSock(masterServerSock, server, true);
+    playbackList.push_back(masterServer);
 }
 
 void MainServer::PrintStatus(QSocket *socket)
