@@ -44,7 +44,6 @@ IconView::IconView(QSqlDatabase *db, const QString& galleryDir,
 {
     m_db         = db;
     m_galleryDir = galleryDir;    
-    m_isGallery  = false;
 
     m_inMenu     = false;
     m_itemList.setAutoDelete(true);
@@ -56,6 +55,13 @@ IconView::IconView(QSqlDatabase *db, const QString& galleryDir,
     m_thumbGen = new ThumbGenerator(this, (int)(m_thumbW-10*wmult),
                                     (int)(m_thumbH-10*hmult));
     
+    m_currRow = 0;
+    m_currCol = 0;
+    m_lastRow = 0;
+    m_lastCol = 0;
+    m_topRow  = 0;
+    m_isGallery  = false;
+
     loadDirectory(galleryDir);
 }
 

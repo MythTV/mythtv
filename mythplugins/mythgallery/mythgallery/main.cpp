@@ -4,6 +4,7 @@
 #include <qapplication.h>
 #include <qsqldatabase.h>
 #include <qimage.h>
+#include <qdir.h>
 
 #include "iconview.h"
 #include "gallerysettings.h"
@@ -29,10 +30,20 @@ void runGallery(void)
     qApp->installTranslator(&translator);
 
     QString startdir = gContext->GetSetting("GalleryDir");
-    IconView icv(QSqlDatabase::database(), startdir,
-                  gContext->GetMainWindow(), "icon view");
-    icv.exec();
-
+    QDir dir(startdir);
+    if (!dir.exists() || !dir.isReadable()) {
+        DialogBox diag(gContext->GetMainWindow(),
+                       QObject::tr("Gallery Directory does not exist"
+                                   " or is unreadable."));
+        diag.AddButton(QObject::tr("Ok"));
+        diag.exec();
+    }
+    else {
+        IconView icv(QSqlDatabase::database(), startdir,
+                     gContext->GetMainWindow(), "icon view");
+        icv.exec();
+    }
+    
     qApp->removeTranslator(&translator);
 }
 
