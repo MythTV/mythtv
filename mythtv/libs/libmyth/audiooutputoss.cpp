@@ -109,6 +109,7 @@ bool AudioOutputOSS::OpenDevice()
     fragment_size = info.fragsize;
 
     audio_buffer_unused = info.bytes - (fragment_size * 4);
+    soundcard_buffer_bytes = info.bytes;
 
     int caps;
     
@@ -271,17 +272,17 @@ void AudioOutputOSS::VolumeInit()
         tmpVol = (volume << 8) + volume;
         int ret = ioctl(mixerfd, MIXER_WRITE(SOUND_MIXER_VOLUME), &tmpVol);
         if (ret < 0) {
-	    VERBOSE(VB_IMPORTANT, QString("Error Setting initial Master Volume"));
+            VERBOSE(VB_IMPORTANT, QString("Error Setting initial Master Volume"));
             perror("Setting master volume: ");
-	}
+        }
 
         volume = gContext->GetNumSetting("PCMMixerVolume", 80);
         tmpVol = (volume << 8) + volume;
         ret = ioctl(mixerfd, MIXER_WRITE(SOUND_MIXER_PCM), &tmpVol);
         if (ret < 0) {
-	    VERBOSE(VB_IMPORTANT, QString("Error setting initial PCM Volume"));
+            VERBOSE(VB_IMPORTANT, QString("Error setting initial PCM Volume"));
             perror("Setting PCM volume: ");
-	}
+        }
     }
 }
 
@@ -325,8 +326,8 @@ void AudioOutputOSS::SetVolumeChannel(int channel, int volume)
 {
     if (channel > 1) {
         // Don't support more than two channels!
-	VERBOSE(VB_IMPORTANT, QString("Error setting channel: %1.  Only stereo volume supported")
-	                            .arg(channel));
+    VERBOSE(VB_IMPORTANT, QString("Error setting channel: %1.  Only stereo volume supported")
+                                .arg(channel));
         return;
     }
 
@@ -338,17 +339,17 @@ void AudioOutputOSS::SetVolumeChannel(int channel, int volume)
     if (mixerfd > 0)
     {
         int tmpVol = 0;
-	if (channel == 0) {
-	    tmpVol = (GetVolumeChannel(1) << 8) + volume;
-	} else {
-	    tmpVol = (volume << 8) + GetVolumeChannel(0);
-	}
+        if (channel == 0) 
+            tmpVol = (GetVolumeChannel(1) << 8) + volume;
+        else
+            tmpVol = (volume << 8) + GetVolumeChannel(0);
+
         int ret = ioctl(mixerfd, MIXER_WRITE(control), &tmpVol);
-        if (ret < 0) {
+        if (ret < 0) 
+        {
             VERBOSE(VB_IMPORTANT, QString("Error setting volume on channel: %1").arg(channel));
             perror("Setting volume: ");
-	}
+        }
     }
-
 }
 
