@@ -1,9 +1,7 @@
 SOURCES += ../programs/mythfrontend/main.cpp 
 SOURCES += ../programs/mythfrontend/playbackbox.cpp 
-SOURCES += ../programs/mythfrontend/programlistitem.cpp 
 SOURCES += ../programs/mythfrontend/viewscheduled.cpp
 SOURCES += ../programs/mythfrontend/globalsettings.cpp 
-SOURCES += ../programs/mythfrontend/setrectime.cpp
 SOURCES += ../programs/mythfrontend/manualbox.cpp
 SOURCES += ../libs/libmythtv/guidegrid.cpp 
 SOURCES += ../libs/libmythtv/progfind.cpp

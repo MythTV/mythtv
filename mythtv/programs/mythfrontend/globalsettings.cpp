@@ -207,7 +207,7 @@ public:
     AutoCommercialFlag():
         BackendSetting("AutoCommercialFlag") {
         setLabel("Automatically Flag Commercials");
-        setValue(false);
+        setValue(true);
         setHelpText("Automatically flag commercials after a recording "
                     "completes.");
     };

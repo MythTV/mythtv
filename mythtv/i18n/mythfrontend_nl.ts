@@ -21,16 +21,20 @@
         <source>Not Recording</source>
         <translation>Niet Opnemen</translation>
     </message>
+    <message>
+        <source>Weekly Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>InfoDialog</name>
     <message>
         <source>Episode:</source>
-        <translation>Aflevering</translation>
+        <translation type="obsolete">Aflevering</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation>Beschrijving</translation>
+        <translation type="obsolete">Beschrijving</translation>
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown anywhere</source>
@@ -119,11 +123,11 @@
     </message>
     <message>
         <source>Delete this recording? It will be gone forever.</source>
-        <translation>Verwijder deze opname? Ze verdwijnt voorgoed.</translation>
+        <translation type="obsolete">Verwijder deze opname? Ze verdwijnt voorgoed.</translation>
     </message>
     <message>
         <source>It will be gone forever.</source>
-        <translation>Ze verdwijnt voorgoed.</translation>
+        <translation type="obsolete">Ze verdwijnt voorgoed.</translation>
     </message>
     <message>
         <source>Yes, get rid of it</source>
@@ -136,6 +140,10 @@
     <message>
         <source>No, keep it, I changed my mind</source>
         <translation>Nee, bewaar de opname, ik heb me bedacht.</translation>
+    </message>
+    <message>
+        <source>Delete this recording?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -154,7 +162,7 @@
     </message>
     <message>
         <source>Recording when shown in this timeslot</source>
-        <translation>Neem enkel vertoningen op in dit tijdsblok</translation>
+        <translation type="obsolete">Neem enkel vertoningen op in dit tijdsblok</translation>
     </message>
     <message>
         <source>Recording when shown on this channel</source>
@@ -175,6 +183,14 @@
     <message>
         <source>       !! No Programs !!</source>
         <translation>       !! Geen programma&apos;s !!</translation>
+    </message>
+    <message>
+        <source>Recording every day when shown in this timeslot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording every week when shown in this timeslot</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -307,39 +323,79 @@
         <source>cut</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not record this program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record only this showing of the program</source>
+        <translation type="unfinished">Enkel deze vertoning van het programma opnemen</translation>
+    </message>
+    <message>
+        <source>Record this program in this timeslot every day</source>
+        <translation type="unfinished">Dit programma dagelijks in dit tijdsblok opnemen</translation>
+    </message>
+    <message>
+        <source>Record this program whenever it&apos;s shown on this channel</source>
+        <translation type="unfinished">Dit programma altijd op dit kanaal opnemen</translation>
+    </message>
+    <message>
+        <source>Record this program whenever it&apos;s shown anywhere</source>
+        <translation type="unfinished">Dit programma altijd en op alle kanalen opnemen</translation>
+    </message>
+    <message>
+        <source>Record this program in this timeslot every week</source>
+        <translation type="unfinished">Dit programma wekelijks in dit tijdsblok opnemen</translation>
+    </message>
+    <message>
+        <source>Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(unspecified)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScheduledRecording</name>
     <message>
         <source>Episode:</source>
-        <translation>Aflevering:</translation>
+        <translation type="obsolete">Aflevering:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation>Beschrijving:</translation>
+        <translation type="obsolete">Beschrijving:</translation>
+    </message>
+    <message>
+        <source>Advanced Recording Options</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>SetRecTimeDialog</name>
     <message>
         <source>Change recording time:</source>
-        <translation>Wijzig opname-tijd:</translation>
+        <translation type="obsolete">Wijzig opname-tijd:</translation>
     </message>
     <message>
         <source>Episode:</source>
-        <translation>Aflevering:</translation>
+        <translation type="obsolete">Aflevering:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation>Beschrijving:</translation>
+        <translation type="obsolete">Beschrijving:</translation>
     </message>
     <message>
         <source>Start Time: </source>
-        <translation>Begintijd:</translation>
+        <translation type="obsolete">Begintijd:</translation>
     </message>
     <message>
         <source>End Time: </source>
-        <translation>Eindtijd:</translation>
+        <translation type="obsolete">Eindtijd:</translation>
     </message>
 </context>
 <context>
@@ -471,6 +527,10 @@
     <message>
         <source>Mute Off</source>
         <translation>Geluid aan</translation>
+    </message>
+    <message>
+        <source>Transcode</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -5,7 +5,6 @@
 #include <qlayout.h>
 #include <qlabel.h>
 #include <qapplication.h>
-#include <qlayout.h>
 #include <qregexp.h>
 
 class SRSetting: public SimpleDBStorage {
@@ -37,17 +36,19 @@ class SRRecordingType: public ComboBoxSetting, public SRSetting {
 public:
     SRRecordingType(const ScheduledRecording& parent):
         SRSetting(parent, "type") {
-        setLabel("When");
-        addSelection("Do not record this program",
+        setLabel(QObject::tr("Schedule"));
+        addSelection(QObject::tr("Do not record this program"),
                      QString::number(ScheduledRecording::NotRecording));
-        addSelection("Record only this showing of the program",
+        addSelection(QObject::tr("Record only this showing of the program"),
                      QString::number(ScheduledRecording::SingleRecord));
-        addSelection("Record this program in this timeslot",
+        addSelection(QObject::tr("Record this program in this timeslot every day"),
                      QString::number(ScheduledRecording::TimeslotRecord));
-        addSelection("Record this program whenever it's shown on this channel",
+        addSelection(QObject::tr("Record this program whenever it's shown on this channel"),
                      QString::number(ScheduledRecording::ChannelRecord));
-        addSelection("Record this program whenever it's shown anywhere",
+        addSelection(QObject::tr("Record this program whenever it's shown anywhere"),
                      QString::number(ScheduledRecording::AllRecord));
+        addSelection(QObject::tr("Record this program in this timeslot every week"),
+                     QString::number(ScheduledRecording::WeekslotRecord));
     };
 };
 
@@ -55,7 +56,7 @@ class SRProfileSelector: public ComboBoxSetting, public SRSetting {
 public:
     SRProfileSelector(const ScheduledRecording& parent):
         SRSetting(parent, "profile") {
-        setLabel("Profile");
+        setLabel(QObject::tr("Profile"));
     };
 
     virtual void load(QSqlDatabase* db) {
@@ -65,7 +66,7 @@ public:
 
     virtual void fillSelections(QSqlDatabase* db) {
         clearSelections();
-        addSelection("(unspecified)", "0");
+        addSelection(QObject::tr("(unspecified)"), "0");
         RecordingProfile::fillSelections(db, this);
     };
 };
@@ -145,17 +146,20 @@ ScheduledRecording::ScheduledRecording() {
     addChild(endTime = new SREndTime(*this));
     addChild(startDate = new SRStartDate(*this));
     addChild(endDate = new SREndDate(*this));
+
+    m_pginfo = NULL;
 }
 
-void ScheduledRecording::fromProgramInfo(const ProgramInfo& proginfo) {
-    channel->setValue(proginfo.chanid);
-    title->setValue(proginfo.title);
-    subtitle->setValue(proginfo.subtitle);
-    description->setValue(proginfo.description);
-    startTime->setValue(proginfo.startts.time());
-    startDate->setValue(proginfo.startts.date());
-    endTime->setValue(proginfo.endts.time());
-    endDate->setValue(proginfo.endts.date());
+void ScheduledRecording::fromProgramInfo(ProgramInfo* proginfo)
+{
+    channel->setValue(proginfo->chanid);
+    title->setValue(proginfo->title);
+    subtitle->setValue(proginfo->subtitle);
+    description->setValue(proginfo->description);
+    startTime->setValue(proginfo->startts.time());
+    startDate->setValue(proginfo->startts.date());
+    endTime->setValue(proginfo->endts.time());
+    endDate->setValue(proginfo->endts.date());
 }
 
 void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
@@ -188,11 +192,18 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
 "    AND "
 "    ((record.type = %3) " // timeslotrecord
 "     OR"
-"     ((TO_DAYS(record.startdate) = TO_DAYS(program.starttime)) " // date matches
+"     ((DAYOFWEEK(record.startdate) = DAYOFWEEK(program.starttime) "
 "      AND "
-"      (TIME_TO_SEC(record.endtime) = TIME_TO_SEC(program.endtime)) "
-"      AND "
-"      (TO_DAYS(record.enddate) = TO_DAYS(program.endtime)) "
+"      ((record.type = %4) " // weekslotrecord
+"       OR"
+"       ((TO_DAYS(record.startdate) = TO_DAYS(program.starttime)) " // date matches
+"        AND "
+"        (TIME_TO_SEC(record.endtime) = TIME_TO_SEC(program.endtime)) "
+"        AND "
+"        (TO_DAYS(record.enddate) = TO_DAYS(program.endtime)) "
+"        )"
+"       )"
+"      )"
 "     )"
 "    )"
 "   )"
@@ -201,7 +212,8 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
 ");")
         .arg(AllRecord)
         .arg(ChannelRecord)
-        .arg(TimeslotRecord);
+        .arg(TimeslotRecord)
+        .arg(WeekslotRecord);
 
      QSqlQuery result = db->exec(query);
      QDateTime now = QDateTime::currentDateTime();
@@ -242,18 +254,22 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
 }
 
 bool ScheduledRecording::loadByProgram(QSqlDatabase* db,
-                                       const ProgramInfo& proginfo) {
-    QString sqltitle(proginfo.title);
+                                       ProgramInfo* proginfo) {
+    QString sqltitle(proginfo->title);
+
+    m_pginfo = proginfo;
+
     // this doesn't have to be a QRegexp in qt 3.1+
     sqltitle.replace(QRegExp("\'"), "\\'");
     sqltitle.replace(QRegExp("\""), "\\\"");
 
     // prevent the SQL from breaking if chanid is null
-    QString chanid = proginfo.chanid;
+    QString chanid = proginfo->chanid;
     if (!chanid || chanid == "")
          chanid = "0";
 
     // XXX - this should set proginfo.duplicate as in findAllProgramsToRecord
+    // Have to split up into parts since .arg() only supports %1-%9
     QString query = QString(
 "SELECT "
 "recordid "
@@ -271,27 +287,38 @@ bool ScheduledRecording::loadByProgram(QSqlDatabase* db,
 "      AND "
 "     (TIME_TO_SEC(record.endtime) = TIME_TO_SEC('%6')) "
 "    )"
-"    AND "
-"    ((record.type = %7) " // timeslotrecord
+"    AND ")
+        .arg(sqltitle.utf8())
+        .arg(AllRecord)
+        .arg(chanid)
+        .arg(ChannelRecord)
+        .arg(proginfo->startts.time().toString(Qt::ISODate))
+        .arg(proginfo->endts.time().toString(Qt::ISODate));
+
+query += QString(
+"    ((record.type = %1) " // timeslotrecord
 "     OR"
-"     ((TO_DAYS(record.startdate) = TO_DAYS('%8')) " // date matches
+"     ((DAYOFWEEK(record.startdate) = DAYOFWEEK('%2') "
 "      AND "
-"      (TO_DAYS(record.enddate) = TO_DAYS('%9')) "
+"      ((record.type = %3) " // weekslotrecord
+"       OR "
+"       ((TO_DAYS(record.startdate) = TO_DAYS('%4')) " // date matches
+"        AND "
+"        (TO_DAYS(record.enddate) = TO_DAYS('%5')) "
+"        )"
+"       )"
+"      )"
 "     )"
 "    )"
 "   )"
 "  )"
 " )"
 ");")
-        .arg(sqltitle.utf8())
-        .arg(AllRecord)
-        .arg(chanid)
-        .arg(ChannelRecord)
-        .arg(proginfo.startts.time().toString(Qt::ISODate))
-        .arg(proginfo.endts.time().toString(Qt::ISODate))
         .arg(TimeslotRecord)
-        .arg(proginfo.startts.date().toString(Qt::ISODate))
-        .arg(proginfo.endts.date().toString(Qt::ISODate));
+        .arg(proginfo->startts.date().toString(Qt::ISODate))
+        .arg(WeekslotRecord)
+        .arg(proginfo->startts.date().toString(Qt::ISODate))
+        .arg(proginfo->endts.date().toString(Qt::ISODate));
 
     QSqlQuery result = db->exec(query);
     if (result.isActive()) {
@@ -439,86 +466,46 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     int bigfont = gContext->GetBigFontSize();
-    //int mediumfont = gContext->GetMediumFontSize();
+    int mediumfont = gContext->GetMediumFontSize();
 
     MythDialog* dialog = new ConfigurationDialogWidget(parent, name);
-    QVBoxLayout* vbox = new QVBoxLayout(dialog);
+    QVBoxLayout* vbox = new QVBoxLayout(dialog, (int)(20 * wmult));
 
-    QGridLayout *grid = new QGridLayout(vbox, 4, 2, (int)(10*wmult));
-    
-    QLabel *titlefield = new QLabel(title->getValue(), dialog);
-    titlefield->setBackgroundOrigin(QWidget::WindowOrigin);
-    titlefield->setFont(QFont("Arial", (int)(bigfont * hmult), QFont::Bold));
+    QLabel* header;
+    header = new QLabel(tr("Advanced Recording Options"), dialog);
+    header->setBackgroundOrigin(QWidget::WindowOrigin);
+    header->setFont(QFont("Arial", (int)(bigfont * hmult), QFont::Bold));
+    vbox->addWidget(header, 0, Qt::AlignLeft | Qt::AlignTop);
 
-    QString dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
-    QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
-    
-    QString dateText = "Date: ";
-    switch (getRecordingType()) {
-    case SingleRecord:
-        dateText += QDateTime(startDate->dateValue(),
-                             startTime->timeValue()).toString(dateFormat + " " + timeFormat);
-        break;
-    case TimeslotRecord:
-        dateText += QString("%1 - %2")
-            .arg(startTime->timeValue().toString(timeFormat))
-            .arg(endTime->timeValue().toString(timeFormat));
-        break;
-    case ChannelRecord:
-    case AllRecord:
-    case NotRecording:
-        dateText += "(any)";
-        break;
+    if (m_pginfo)
+    {
+        QGridLayout *grid = m_pginfo->DisplayWidget(this, dialog);
+        vbox->addLayout(grid);
     }
 
-    QLabel* date = new QLabel(dateText,dialog);
-    date->setBackgroundOrigin(QWidget::WindowOrigin);
-
-    QLabel *subtitlelabel = new QLabel(tr("Episode:"), dialog);
-    subtitlelabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    QLabel *subtitlefield = new QLabel(subtitle->getValue(), dialog);
-    subtitlefield->setBackgroundOrigin(QWidget::WindowOrigin);
-    subtitlefield->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-    QLabel *descriptionlabel = new QLabel(tr("Description:"), dialog);
-    descriptionlabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    QLabel *descriptionfield = new QLabel(description->getValue(), dialog);
-    descriptionfield->setBackgroundOrigin(QWidget::WindowOrigin);
-    descriptionfield->setAlignment(Qt::WordBreak | Qt::AlignLeft | 
-                                   Qt::AlignTop);
-
-    descriptionlabel->polish();
-
-    int descwidth = (int)(700 * wmult) - descriptionlabel->width();
-    int titlewidth = (int)(760 * wmult);
-
-    titlefield->setMinimumWidth(titlewidth);
-    titlefield->setMaximumWidth(titlewidth);
-
-    subtitlefield->setMinimumWidth(descwidth);
-    subtitlefield->setMaximumWidth(descwidth);
-
-    descriptionfield->setMinimumWidth(descwidth);
-    descriptionfield->setMaximumWidth(descwidth);
-
-    grid->addMultiCellWidget(titlefield, 0, 0, 0, 1, Qt::AlignLeft);
-    grid->addMultiCellWidget(date, 1, 1, 0, 1, Qt::AlignLeft);
-    grid->addWidget(subtitlelabel, 2, 0, Qt::AlignLeft | Qt::AlignTop);
-    grid->addWidget(subtitlefield, 2, 1, Qt::AlignLeft | Qt::AlignTop);
-    grid->addWidget(descriptionlabel, 3, 0, Qt::AlignLeft | Qt::AlignTop);
-    grid->addWidget(descriptionfield, 3, 1, Qt::AlignLeft | Qt::AlignTop);
-
-    grid->setColStretch(1, 2);
-    grid->setRowStretch(3, 1);
-
-    //vbox->addStretch(1);
-
-    QFrame *f = new QFrame(dialog);
+    QFrame *f;
+    f = new QFrame(dialog);
     f->setFrameStyle(QFrame::HLine | QFrame::Plain);
     f->setLineWidth((int)(4 * hmult));
     vbox->addWidget(f);    
 
+//    header = new QLabel(tr("Series Options"), dialog);
+//    header->setBackgroundOrigin(QWidget::WindowOrigin);
+//    header->setFont(QFont("Arial", (int)(mediumfont * hmult), QFont::Bold));
+//    vbox->addWidget(header, 0, Qt::AlignLeft | Qt::AlignTop);
+
     vbox->addWidget(type->configWidget(this, dialog));
     vbox->addWidget(profile->configWidget(this, dialog));
+
+//    f = new QFrame(dialog);
+//    f->setFrameStyle(QFrame::HLine | QFrame::Plain);
+//    f->setLineWidth((int)(4 * hmult));
+//    vbox->addWidget(f);    
+
+//    header = new QLabel(tr("Episode Options"), dialog);
+//    header->setBackgroundOrigin(QWidget::WindowOrigin);
+//    header->setFont(QFont("Arial", (int)(mediumfont * hmult), QFont::Bold));
+//    vbox->addWidget(header, 0, Qt::AlignLeft | Qt::AlignTop);
 
     return dialog;
 }
@@ -533,6 +520,7 @@ void ScheduledRecording::fillSelections(QSqlDatabase* db, SelectSetting* setting
             sr.loadByID(db, id);
 
             QString label;
+            QString weekly = "";
 
             switch (sr.getRecordingType()) {
             case AllRecord:
@@ -543,10 +531,13 @@ void ScheduledRecording::fillSelections(QSqlDatabase* db, SelectSetting* setting
                     .arg(sr.title->getValue())
                     .arg(sr.channel->getSelectionLabel());
                 break;
+            case WeekslotRecord:
+                weekly = QDate(sr.startDate->dateValue()).toString("dddd")+"s ";
             case TimeslotRecord:
-                label = QString("%1 on channel %2 (%3 - %4)")
+                label = QString("%1 on channel %2 (%3%4 - %5)")
                     .arg(sr.title->getValue())
                     .arg(sr.channel->getSelectionLabel())
+                    .arg(weekly)
                     .arg(sr.startTime->timeValue().toString())
                     .arg(sr.endTime->timeValue().toString());
                 break;

@@ -92,49 +92,38 @@ bool CommDetect::CheckFrameIsBlank(void)
 {
     const unsigned int max_brightness = 120;
     const unsigned int test_brightness = 80;
-    bool line_checked[height];
-    bool test = false;
+    const int pass_start[7] = {0, 4, 0, 2, 0, 1, 0};
+    const int pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
+    const int pass_ystart[7] = {0, 0, 4, 0, 2, 0, 1};
+    const int pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
+    bool isDim = false;
 
     if (!width || !height)
         return(false);
 
-    for(int y = 0; y < height; y++)
-        line_checked[y] = false;
-
-    for(int divisor = 3; divisor < 200; divisor += 3)
+    // go through the image in png interlacing style testing if blank
+    for(int pass = 0; pass < 7; pass++)
     {
-        int y_mult = (int)(height / divisor);
-        int x_mult = (int)(width / divisor);
-
-        if (x_mult < 1 || y_mult < 1)
-            continue;
-
-        for(int y = y_mult; y < height; y += y_mult)
+        for(int y = pass_ystart[pass]; y < height; y += pass_yinc[pass])
         {
-            if (line_checked[y])
-                continue;
-
-            for(int x = x_mult; x < width; x += x_mult)
+            for(int x = pass_start[pass]; x < width; x += pass_inc[pass])
             {
                 if (frame_ptr[y * width + x] > max_brightness)
                     return(false);
                 if (frame_ptr[y * width + x] > test_brightness)
-                    test = true;
+                    isDim = true;
             }
-            line_checked[y] = true;
         }
     }
 
     // frame is dim so test average
-    if (test)
+    if (isDim)
     {
         int avg = GetAvgBrightness();
 
         if (avg > 35)
             return(false);
     }
-
-    lastFrameWasBlank = true;
 
     return(true);
 }

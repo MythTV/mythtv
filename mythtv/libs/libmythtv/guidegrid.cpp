@@ -715,6 +715,9 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
                         case ScheduledRecording::AllRecord:
                             recFlag = 4;
                             break;
+                        case ScheduledRecording::WeekslotRecord:
+                            recFlag = 5;
+                            break;
                         case ScheduledRecording::NotRecording:
                             break;
                     }
@@ -971,6 +974,9 @@ void GuideGrid::paintInfo(QPainter *p)
             break;
         case ScheduledRecording::TimeslotRecord:
             recStatus = tr("Timeslot Recording");
+            break;
+        case ScheduledRecording::WeekslotRecord:
+            recStatus = tr("Weekly Recording");
             break;
         case ScheduledRecording::ChannelRecord:
             recStatus = tr("Channel Recording");
@@ -1416,15 +1422,10 @@ void GuideGrid::quickRecord()
     if (pginfo->title == unknownTitle)
         return;
 
-    ScheduledRecording::RecordingType currType = pginfo->GetProgramRecordingStatus(m_db);
-
     if (!pginfo)
         return;
 
-    if (currType == ScheduledRecording::SingleRecord)
-        pginfo->ApplyRecordStateChange(m_db, ScheduledRecording::NotRecording);
-    else if (currType == ScheduledRecording::NotRecording)
-        pginfo->ApplyRecordStateChange(m_db, ScheduledRecording::SingleRecord);
+    pginfo->ToggleRecord(m_db);
 
     fillProgramInfos();
     update(programRect);
@@ -1442,8 +1443,17 @@ void GuideGrid::displayInfo()
 
     if (pginfo)
     {
-        InfoDialog diag(pginfo, gContext->GetMainWindow(), "Program Info");
-        diag.exec();
+        if (pginfo->GetProgramRecordingStatus(m_db) > ScheduledRecording::AllRecord)
+        {
+            ScheduledRecording record;
+            record.loadByProgram(m_db, pginfo);
+            record.exec(m_db);
+        }
+        else
+        {
+            InfoDialog diag(pginfo, gContext->GetMainWindow(), "Program Info");
+            diag.exec();
+        }
     }
     else
         return;

@@ -430,7 +430,7 @@ void TVRec::HandleStateChange(void)
             pthread_mutex_unlock(&db_lock);
 
             if ((!prematurelystopped) &&
-                (gContext->GetNumSetting("AutoCommercialFlag", 0)))
+                (gContext->GetNumSetting("AutoCommercialFlag", 1)))
                 FlagCommercials();
         }
 
@@ -704,7 +704,7 @@ void TVRec::TeardownRecorder(bool killFile)
 
         if (!prematurelystopped)
         {
-            if (gContext->GetNumSetting("AutoCommercialFlag", 0))
+            if (gContext->GetNumSetting("AutoCommercialFlag", 1))
                 FlagCommercials();
 
             if (!gContext->GetNumSetting("TranscoderUseCutlist", 0))

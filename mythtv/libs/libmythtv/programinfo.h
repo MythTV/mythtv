@@ -54,6 +54,9 @@ class ProgramInfo
     void StartedRecording(QSqlDatabase *db);
     void FinishedRecording(QSqlDatabase* db);
 
+    QGridLayout* DisplayWidget(ScheduledRecording *rec = NULL,
+                               QWidget *parent = NULL);
+
     QString GetRecordBasename(void);
     QString GetRecordFilename(const QString &prefix);
 

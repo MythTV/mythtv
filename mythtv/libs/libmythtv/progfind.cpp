@@ -463,7 +463,10 @@ void ProgFinder::getInfo()
                     data = tr("Recording just this showing");
                     break;
                 case ScheduledRecording::TimeslotRecord:
-                    data = tr("Recording when shown in this timeslot");
+                    data = tr("Recording every day when shown in this timeslot");
+                    break;
+                case ScheduledRecording::WeekslotRecord:
+                    data = tr("Recording every week when shown in this timeslot");
                     break;
                 case ScheduledRecording::ChannelRecord:
                     data = tr("Recording when shown on this channel");
@@ -1138,6 +1141,17 @@ int ProgFinder::checkRecordingStatus(int showNum)
                     return curRecordings[j].type;
                 }
             }
+            if (curRecordings[j].type == ScheduledRecording::WeekslotRecord)
+            {
+                if ((showData[showNum].startdatetime).time() == 
+                     (curRecordings[j].startdatetime).time()
+                    && (showData[showNum].startdatetime).toString("dddd") == 
+                     (curRecordings[j].startdatetime).toString("dddd")
+                    && showData[showNum].channelID == curRecordings[j].chanid)
+                {
+                    return curRecordings[j].type;
+                }
+            }
             if (curRecordings[j].type == ScheduledRecording::ChannelRecord)
             {
                 if (showData[showNum].channelID == curRecordings[j].chanid)
@@ -1292,7 +1306,10 @@ void ProgFinder::selectShowData(QString progTitle)
                     data = tr("Recording just this showing");
                     break;
                 case ScheduledRecording::TimeslotRecord:
-                    data = tr("Recording when shown in this timeslot");
+                    data = tr("Recording every day when shown in this timeslot");
+                    break;
+                case ScheduledRecording::WeekslotRecord:
+                    data = tr("Recording every week when shown in this timeslot");
                     break;
                 case ScheduledRecording::ChannelRecord:
                     data = tr("Recording when shown on this channel");

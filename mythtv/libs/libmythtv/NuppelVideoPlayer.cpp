@@ -3089,6 +3089,7 @@ void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
     // if we make it here, then a blank was found
     int blank_seq_found = 0;
     int commercials_found = 0;
+    long long starting_pos = framesPlayed;
     do
     {
         if (killplayer)
@@ -3159,7 +3160,8 @@ void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
 
             comm_length++;
         }
-    } while (blank_seq_found);
+    } while ((blank_seq_found) &&
+             ((framesPlayed - starting_pos) < (300 * video_frame_rate)));
 
     if (killplayer)
         return;

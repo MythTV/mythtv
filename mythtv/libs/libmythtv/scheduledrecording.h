@@ -17,13 +17,14 @@ public:
         SingleRecord = 1,
         TimeslotRecord,
         ChannelRecord,
-        AllRecord
+        AllRecord,
+        WeekslotRecord
     };
 
     ScheduledRecording();
     //ScheduledRecording(const ScheduledRecording& other);
 
-    void fromProgramInfo(const ProgramInfo& proginfo);
+    void fromProgramInfo(ProgramInfo* proginfo);
 
     RecordingType getRecordingType(void) const;
     void setRecordingType(RecordingType);
@@ -36,7 +37,7 @@ public:
     virtual void save(QSqlDatabase* db);
 
     void loadByID(QSqlDatabase* db, int id);
-    bool loadByProgram(QSqlDatabase* db, const ProgramInfo& proginfo);
+    bool loadByProgram(QSqlDatabase* db, ProgramInfo* proginfo);
 
     void remove(QSqlDatabase* db);
     int getRecordID(void) const { return id->intValue(); };
@@ -81,6 +82,8 @@ private:
     class SRStartDate* startDate;
     class SREndTime* endTime;
     class SREndDate* endDate;
+
+    ProgramInfo* m_pginfo;
 };
 
 class ScheduledRecordingEditor: public ListBoxSetting, public ConfigurationDialog {

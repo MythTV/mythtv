@@ -676,13 +676,19 @@ void ViewScheduled::edit()
 
     if (rec)
     {
-        InfoDialog diag(rec, gContext->GetMainWindow(), "Program Info");
-        diag.exec();
+        if (rec->GetProgramRecordingStatus(db) > ScheduledRecording::AllRecord)
+        {
+            ScheduledRecording record;
+            record.loadByProgram(db, rec);
+            record.exec(db);
+        }
+        else
+        {
+            InfoDialog diag(rec, gContext->GetMainWindow(), "Program Info");
+            diag.exec();
+        }
 
-        QString thequery = "UPDATE settings SET data = \"yes\" WHERE value = "
-                           "\"RecordChanged\";";
-
-        db->exec(thequery);
+        ScheduledRecording::signalChange(db);
 
         FillList();
         update(fullRect);
@@ -716,8 +722,17 @@ void ViewScheduled::selected()
     }
     else if (rec)
     {
-        InfoDialog diag(rec, gContext->GetMainWindow(), "Program Info");
-        diag.exec();
+        if (rec->GetProgramRecordingStatus(db) > ScheduledRecording::AllRecord)
+        {
+            ScheduledRecording record;
+            record.loadByProgram(db, rec);
+            record.exec(db);
+        }
+        else
+        {
+            InfoDialog diag(rec, gContext->GetMainWindow(), "Program Info");
+            diag.exec();
+        }
 
         ScheduledRecording::signalChange(db);
 
@@ -794,9 +809,7 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
     }
     delete conflictlist;
 
-    thequery = "UPDATE settings SET data = \"yes\" WHERE value = "
-               "\"RecordChanged\";";
-    db->exec(thequery);
+    ScheduledRecording::signalChange(db);
 
     FillList();
 }
@@ -820,10 +833,7 @@ void ViewScheduled::handleDuplicate(ProgramInfo *rec)
     {
         rec->DeleteHistory(db);
 
-        QString thequery = "UPDATE settings SET data = \"yes\" WHERE value = "
-                           "\"RecordChanged\";";
-
-        db->exec(thequery);
+        ScheduledRecording::signalChange(db);
 
         FillList();
         update(fullRect);
@@ -1006,10 +1016,7 @@ void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
     }
     delete conflictlist;
 
-    thequery = "UPDATE settings SET data = \"yes\" WHERE value = "
-               "\"RecordChanged\";";
-
-    db->exec(thequery);
+    ScheduledRecording::signalChange(db);
 
     FillList();
 }

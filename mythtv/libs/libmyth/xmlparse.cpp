@@ -490,6 +490,8 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
                     inttype = 3;
                 else if (typ == "AllRecord") 
                     inttype = 4;
+                else if (typ == "WeekslotRecord") 
+                    inttype = 5;
 
                 recImgs[inttype] = img;
             }
@@ -538,7 +540,7 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
     guide->SetTextOffset(textoff);
     guide->SetRecordingColor(reccolor);
     guide->SetSelectorColor(selcolor);
-    for (int i = 1; i < 5; i++)
+    for (int i = 1; i < 6; i++)
         guide->LoadImage(i, recImgs[i]);
     if (seltype.lower() == "box")
         guide->SetSelectorType(1);

@@ -37,57 +37,15 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent,
                        const char *name)
           : MythDialog(parent, name)
 {
-    int bigfont = gContext->GetBigFontSize();
     int mediumfont = gContext->GetMediumFontSize();
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
-    QGridLayout *grid = new QGridLayout(vbox, 4, 2, (int)(10 * wmult));
-    
-    QLabel *titlefield = new QLabel(pginfo->title, this);
-    titlefield->setBackgroundOrigin(WindowOrigin);
-    titlefield->setFont(QFont("Arial", (int)(bigfont * hmult), QFont::Bold));
-
-    QLabel *date = getDateLabel(pginfo);
-    date->setBackgroundOrigin(WindowOrigin);
-
-    QLabel *subtitlelabel = new QLabel(tr("Episode:"), this);
-    subtitlelabel->setBackgroundOrigin(WindowOrigin);
-    QLabel *subtitlefield = new QLabel(pginfo->subtitle, this);
-    subtitlefield->setBackgroundOrigin(WindowOrigin);
-    subtitlefield->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-    QLabel *descriptionlabel = new QLabel(tr("Description:"), this);
-    descriptionlabel->setBackgroundOrigin(WindowOrigin);
-    QLabel *descriptionfield = new QLabel(pginfo->description, this);
-    descriptionfield->setBackgroundOrigin(WindowOrigin);
-    descriptionfield->setAlignment(Qt::WordBreak | Qt::AlignLeft | 
-                                   Qt::AlignTop);
-
-    descriptionlabel->polish();
-
-    int descwidth = (int)(800 * wmult) - descriptionlabel->width() - 100;
-    int titlewidth = (int)(760 * wmult);
-
-    titlefield->setMinimumWidth(titlewidth);
-    titlefield->setMaximumWidth(titlewidth);
-
-    subtitlefield->setMinimumWidth(descwidth);
-    subtitlefield->setMaximumWidth(descwidth);
-
-    descriptionfield->setMinimumWidth(descwidth);
-    descriptionfield->setMaximumWidth(descwidth);
-
-    grid->addMultiCellWidget(titlefield, 0, 0, 0, 1, Qt::AlignLeft);
-    grid->addMultiCellWidget(date, 1, 1, 0, 1, Qt::AlignLeft);
-    grid->addWidget(subtitlelabel, 2, 0, Qt::AlignLeft | Qt::AlignTop);
-    grid->addWidget(subtitlefield, 2, 1, Qt::AlignLeft | Qt::AlignTop);
-    grid->addWidget(descriptionlabel, 3, 0, Qt::AlignLeft | Qt::AlignTop);
-    grid->addWidget(descriptionfield, 3, 1, Qt::AlignLeft | Qt::AlignTop);
-
-    grid->setColStretch(1, 2);
-    grid->setRowStretch(3, 1);
-
-    //vbox->addStretch(1);
+    if (pginfo)
+    {
+        QGridLayout *grid = pginfo->DisplayWidget(NULL, this);
+        vbox->addLayout(grid);
+    }
 
     QFrame *f = new QFrame(this);
     f->setFrameStyle(QFrame::HLine | QFrame::Plain);
@@ -118,6 +76,8 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent,
             SLOT(selected(QListViewItem *)));
     connect(lview, SIGNAL(spacePressed(QListViewItem *)), this,
             SLOT(selected(QListViewItem *)));
+    connect(lview, SIGNAL(infoPressed(QListViewItem *)), this,
+            SLOT(advancedEdit(QListViewItem *)));
 
     RecListItem *item = new RecListItem(lview, tr("Record this program whenever"
                                         " it's shown anywhere"), 
@@ -134,14 +94,25 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent,
     programtype = pginfo->IsProgramRecurring();
 
     QString msg = "Shouldn't show up.";
-    if (programtype == 1)
-        msg = tr("Record this program in this timeslot every day");
-    else if (programtype == 2 || programtype == -1)
+    ScheduledRecording::RecordingType rt = ScheduledRecording::NotRecording;
+    if (programtype == 2 ||
+        programtype == -1 ||
+        recordstatus == ScheduledRecording::WeekslotRecord)
+    {
         msg = tr("Record this program in this timeslot every week");
+        rt = ScheduledRecording::WeekslotRecord;
+    }
+    else if (programtype == 1)
+    {
+        msg = tr("Record this program in this timeslot every day");
+        rt = ScheduledRecording::TimeslotRecord;
+    }
+
     if (programtype != 0)
     {
-        item = new RecListItem(lview, msg, ScheduledRecording::TimeslotRecord);
-        if (recordstatus == ScheduledRecording::TimeslotRecord)
+        item = new RecListItem(lview, msg, rt);
+        if ((recordstatus == ScheduledRecording::TimeslotRecord) ||
+            (recordstatus == ScheduledRecording::WeekslotRecord))
             selectItem = item;
     }
 
@@ -205,3 +176,14 @@ void InfoDialog::selected(QListViewItem *selitem)
     if (selitem)
         accept();
 }
+
+void InfoDialog::advancedEdit(QListViewItem *)
+{
+    QSqlDatabase *m_db = QSqlDatabase::database();;
+    ScheduledRecording record;
+    record.loadByProgram(m_db, myinfo);
+    record.exec(m_db);
+
+    reject();
+}
+

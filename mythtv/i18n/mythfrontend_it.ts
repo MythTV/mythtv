@@ -21,16 +21,20 @@
         <source>Not Recording</source>
         <translation>Nessuna registrazione</translation>
     </message>
+    <message>
+        <source>Weekly Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>InfoDialog</name>
     <message>
         <source>Episode:</source>
-        <translation>Episodio:</translation>
+        <translation type="obsolete">Episodio:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation>Descrizione:</translation>
+        <translation type="obsolete">Descrizione:</translation>
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown anywhere</source>
@@ -152,11 +156,11 @@
     </message>
     <message>
         <source>Delete this recording? It will be gone forever.</source>
-        <translation>Cancello questa registrazione?</translation>
+        <translation type="obsolete">Cancello questa registrazione?</translation>
     </message>
     <message>
         <source>It will be gone forever.</source>
-        <translation>La cancellazione sara&apos; definitiva.</translation>
+        <translation type="obsolete">La cancellazione sara&apos; definitiva.</translation>
     </message>
     <message>
         <source>Yes, get rid of it</source>
@@ -170,6 +174,10 @@
         <source>No, keep it, I changed my mind</source>
         <translation>No, non cancellare</translation>
     </message>
+    <message>
+        <source>Delete this recording?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgFinder</name>
@@ -179,7 +187,7 @@
     </message>
     <message>
         <source>Recording when shown in this timeslot</source>
-        <translation>Registrazione in questa fascia oraria</translation>
+        <translation type="obsolete">Registrazione in questa fascia oraria</translation>
     </message>
     <message>
         <source>Recording when shown on this channel</source>
@@ -208,6 +216,14 @@
     <message>
         <source>       !! No Programs !!</source>
         <translation>       !! Nessun Programma !!</translation>
+    </message>
+    <message>
+        <source>Recording every day when shown in this timeslot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording every week when shown in this timeslot</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -340,39 +356,79 @@
         <source>cut</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not record this program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record only this showing of the program</source>
+        <translation type="unfinished">Registra questo programma una volta sola</translation>
+    </message>
+    <message>
+        <source>Record this program in this timeslot every day</source>
+        <translation type="unfinished">Registra sempre questo canale in questo orario</translation>
+    </message>
+    <message>
+        <source>Record this program whenever it&apos;s shown on this channel</source>
+        <translation type="unfinished">Registra sempre questo programma, su questo canale</translation>
+    </message>
+    <message>
+        <source>Record this program whenever it&apos;s shown anywhere</source>
+        <translation type="unfinished">Registra sempre questo programma, su qualsiasi canale</translation>
+    </message>
+    <message>
+        <source>Record this program in this timeslot every week</source>
+        <translation type="unfinished">Registra tutte le settimane questo programma in questo orario</translation>
+    </message>
+    <message>
+        <source>Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(unspecified)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScheduledRecording</name>
     <message>
         <source>Episode:</source>
-        <translation>Episodio:</translation>
+        <translation type="obsolete">Episodio:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation>Descrizione:</translation>
+        <translation type="obsolete">Descrizione:</translation>
+    </message>
+    <message>
+        <source>Advanced Recording Options</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>SetRecTimeDialog</name>
     <message>
         <source>Episode:</source>
-        <translation>Episodio:</translation>
+        <translation type="obsolete">Episodio:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation>Descrizione:</translation>
+        <translation type="obsolete">Descrizione:</translation>
     </message>
     <message>
         <source>Start Time: </source>
-        <translation>Ora di inizio: </translation>
+        <translation type="obsolete">Ora di inizio: </translation>
     </message>
     <message>
         <source>End Time: </source>
-        <translation>Ora di fine: </translation>
+        <translation type="obsolete">Ora di fine: </translation>
     </message>
     <message>
         <source>Change recording time:</source>
-        <translation>Cambia l&apos;orario di registrazione:</translation>
+        <translation type="obsolete">Cambia l&apos;orario di registrazione:</translation>
     </message>
 </context>
 <context>
@@ -503,6 +559,10 @@
     </message>
     <message>
         <source>Mute Off</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transcode</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -20,6 +20,7 @@ class InfoDialog : public MythDialog
 
   protected slots:
     void selected(QListViewItem *);
+    void advancedEdit(QListViewItem *);
 
   private:
     QLabel *getDateLabel(ProgramInfo *pginfo);

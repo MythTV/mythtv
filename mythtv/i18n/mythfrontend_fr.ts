@@ -21,16 +21,20 @@
         <source>Not Recording</source>
         <translation type="unfinished">Pas enregistré</translation>
     </message>
+    <message>
+        <source>Weekly Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>InfoDialog</name>
     <message>
         <source>Episode:</source>
-        <translation>Épisode:</translation>
+        <translation type="obsolete">Épisode:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation>Description:</translation>
+        <translation type="obsolete">Description:</translation>
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown anywhere</source>
@@ -108,11 +112,11 @@
     </message>
     <message>
         <source>Delete this recording? It will be gone forever.</source>
-        <translation type="unfinished">Supprimer définitivement cet enregistrement?</translation>
+        <translation type="obsolete">Supprimer définitivement cet enregistrement?</translation>
     </message>
     <message>
         <source>It will be gone forever.</source>
-        <translation>Il disparaîtra pour toujours.</translation>
+        <translation type="obsolete">Il disparaîtra pour toujours.</translation>
     </message>
     <message>
         <source>Yes, get rid of it</source>
@@ -129,6 +133,10 @@
     <message>
         <source>% used</source>
         <translation type="unfinished">% utilisé</translation>
+    </message>
+    <message>
+        <source>Delete this recording?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -147,7 +155,7 @@
     </message>
     <message>
         <source>Recording when shown in this timeslot</source>
-        <translation>Enregistré à ce créneau horaire</translation>
+        <translation type="obsolete">Enregistré à ce créneau horaire</translation>
     </message>
     <message>
         <source>Recording when shown on this channel</source>
@@ -168,6 +176,14 @@
     <message>
         <source>Not recording this showing</source>
         <translation type="unfinished">Pas enregistré</translation>
+    </message>
+    <message>
+        <source>Recording every day when shown in this timeslot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording every week when shown in this timeslot</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -300,39 +316,79 @@
         <source>Start of program.</source>
         <translation type="unfinished">Début du programme.</translation>
     </message>
+    <message>
+        <source>Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not record this program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record only this showing of the program</source>
+        <translation type="unfinished">Enregistrer seulement cette instance du programme</translation>
+    </message>
+    <message>
+        <source>Record this program in this timeslot every day</source>
+        <translation type="unfinished">Enregistrer ce programme chaque jour à ce créneau horaire</translation>
+    </message>
+    <message>
+        <source>Record this program whenever it&apos;s shown on this channel</source>
+        <translation type="unfinished">Enregistrer ce programme à chaque apparition sur cette station</translation>
+    </message>
+    <message>
+        <source>Record this program whenever it&apos;s shown anywhere</source>
+        <translation type="unfinished">Enregistrer ce programme à chaque apparition</translation>
+    </message>
+    <message>
+        <source>Record this program in this timeslot every week</source>
+        <translation type="unfinished">Enregistrer ce programme chaque semaine à ce créneau horaire</translation>
+    </message>
+    <message>
+        <source>Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(unspecified)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScheduledRecording</name>
     <message>
         <source>Episode:</source>
-        <translation>Épisode:</translation>
+        <translation type="obsolete">Épisode:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation>Description:</translation>
+        <translation type="obsolete">Description:</translation>
+    </message>
+    <message>
+        <source>Advanced Recording Options</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>SetRecTimeDialog</name>
     <message>
         <source>Change recording time:</source>
-        <translation>Modifier le temps ou l&apos;heure d&apos;enregistrement:</translation>
+        <translation type="obsolete">Modifier le temps ou l&apos;heure d&apos;enregistrement:</translation>
     </message>
     <message>
         <source>Episode:</source>
-        <translation>Épisode:</translation>
+        <translation type="obsolete">Épisode:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation>Description:</translation>
+        <translation type="obsolete">Description:</translation>
     </message>
     <message>
         <source>Start Time: </source>
-        <translation>Début:</translation>
+        <translation type="obsolete">Début:</translation>
     </message>
     <message>
         <source>End Time: </source>
-        <translation>Fin:</translation>
+        <translation type="obsolete">Fin:</translation>
     </message>
 </context>
 <context>
@@ -464,6 +520,10 @@
     <message>
         <source>Mute Off</source>
         <translation type="unfinished">Muet désactivé</translation>
+    </message>
+    <message>
+        <source>Transcode</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

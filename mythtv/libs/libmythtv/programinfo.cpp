@@ -2,6 +2,8 @@
 #include <qsocket.h>
 #include <qregexp.h>
 #include <qmap.h>
+#include <qlayout.h>
+#include <qlabel.h>
 
 #include "programinfo.h"
 #include "scheduledrecording.h"
@@ -217,6 +219,10 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
     case ScheduledRecording::TimeslotRecord:
              progMap["rec_str"] = QObject::tr("Timeslot Recording");
              progMap["rec_type"] = "T";
+             break;
+    case ScheduledRecording::WeekslotRecord:
+             progMap["rec_str"] = QObject::tr("Weekslot Recording");
+             progMap["rec_type"] = "W";
              break;
     case ScheduledRecording::ChannelRecord:
              progMap["rec_str"] = QObject::tr("Channel Recording");
@@ -458,7 +464,7 @@ ScheduledRecording::RecordingType ProgramInfo::GetProgramRecordingStatus(QSqlDat
 {
     if (record == NULL) {
         record = new ScheduledRecording();
-        record->loadByProgram(db, *this);
+        record->loadByProgram(db, this);
     }
 
     return record->getRecordingType();
@@ -496,12 +502,16 @@ void ProgramInfo::ToggleRecord(QSqlDatabase *db)
              ApplyRecordStateChange(db, ScheduledRecording::TimeslotRecord);
              break;
     case ScheduledRecording::TimeslotRecord:
+             ApplyRecordStateChange(db, ScheduledRecording::WeekslotRecord);
+             break;
+    case ScheduledRecording::WeekslotRecord:
              ApplyRecordStateChange(db, ScheduledRecording::ChannelRecord);
              break;
     case ScheduledRecording::ChannelRecord:
              ApplyRecordStateChange(db, ScheduledRecording::AllRecord);
              break;
     case ScheduledRecording::AllRecord:
+    default:
              ApplyRecordStateChange(db, ScheduledRecording::NotRecording);
              break;
     }
@@ -1075,4 +1085,109 @@ void ProgramInfo::Save(void)
                     "0");
 
     query.exec(querystr.utf8().data());
+}
+
+QGridLayout* ProgramInfo::DisplayWidget(ScheduledRecording* rec,
+                                        QWidget *parent)
+{
+    int row = 0;
+    float wmult, hmult;
+    int screenwidth, screenheight;
+    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+
+    int bigfont = gContext->GetBigFontSize();
+
+    QGridLayout *grid = new QGridLayout(4, 2, (int)(10*wmult));
+    
+    QLabel *titlefield = new QLabel(title, parent);
+    titlefield->setBackgroundOrigin(QWidget::WindowOrigin);
+    titlefield->setFont(QFont("Arial", (int)(bigfont * hmult), QFont::Bold));
+
+    QString dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
+    
+    QString airDateText = startts.date().toString(dateFormat) + QString(", ") +
+                          startts.time().toString(timeFormat) + QString(" - ") +
+                          endts.time().toString(timeFormat);
+    QLabel *airDateLabel = new QLabel(QObject::tr("Air Date:"), parent);
+    airDateLabel->setBackgroundOrigin(QWidget::WindowOrigin);
+    QLabel* airDateField = new QLabel(airDateText,parent);
+    airDateField->setBackgroundOrigin(QWidget::WindowOrigin);
+
+    QString recDateText = "";
+    QLabel *recDateLabel;
+    QLabel *recDateField;
+    if (rec)
+    {
+        switch (rec->getRecordingType()) {
+        case ScheduledRecording::SingleRecord:
+            recDateText += startts.toString(dateFormat + " " + timeFormat);
+            break;
+        case ScheduledRecording::WeekslotRecord:
+            recDateText += startts.toString("dddd")+"s ";
+        case ScheduledRecording::TimeslotRecord:
+            recDateText += QString("%1 - %2")
+                .arg(startts.toString(timeFormat))
+                .arg(endts.toString(timeFormat));
+            break;
+        case ScheduledRecording::ChannelRecord:
+        case ScheduledRecording::AllRecord:
+        case ScheduledRecording::NotRecording:
+            recDateText += "(any)";
+            break;
+        }
+
+        recDateLabel = new QLabel(QObject::tr("Record Schedule:"), parent);
+        recDateLabel->setBackgroundOrigin(QWidget::WindowOrigin);
+        recDateField = new QLabel(recDateText,parent);
+        recDateField->setBackgroundOrigin(QWidget::WindowOrigin);
+    }
+
+    QLabel *subtitlelabel = new QLabel(QObject::tr("Episode:"), parent);
+    subtitlelabel->setBackgroundOrigin(QWidget::WindowOrigin);
+    QLabel *subtitlefield = new QLabel(subtitle, parent);
+    subtitlefield->setBackgroundOrigin(QWidget::WindowOrigin);
+    subtitlefield->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    QLabel *descriptionlabel = new QLabel(QObject::tr("Description:"), parent);
+    descriptionlabel->setBackgroundOrigin(QWidget::WindowOrigin);
+    QLabel *descriptionfield = new QLabel(description, parent);
+    descriptionfield->setBackgroundOrigin(QWidget::WindowOrigin);
+    descriptionfield->setAlignment(Qt::WordBreak | Qt::AlignLeft | 
+                                   Qt::AlignTop);
+
+    descriptionlabel->polish();
+
+    int descwidth = (int)(700 * wmult) - descriptionlabel->width();
+    int titlewidth = (int)(760 * wmult);
+
+    titlefield->setMinimumWidth(titlewidth);
+    titlefield->setMaximumWidth(titlewidth);
+
+    subtitlefield->setMinimumWidth(descwidth);
+    subtitlefield->setMaximumWidth(descwidth);
+
+    descriptionfield->setMinimumWidth(descwidth);
+    descriptionfield->setMaximumWidth(descwidth);
+
+    grid->addMultiCellWidget(titlefield, row, 0, 0, 1, Qt::AlignLeft);
+    row++;
+    grid->addWidget(airDateLabel, row, 0, Qt::AlignLeft | Qt::AlignTop);
+    grid->addWidget(airDateField, row, 1, Qt::AlignLeft);
+    row++;
+    if (rec)
+    {
+        grid->addWidget(recDateLabel, row, 0, Qt::AlignLeft | Qt::AlignTop);
+        grid->addWidget(recDateField, row, 1, Qt::AlignLeft);
+        row++;
+    }
+    grid->addWidget(subtitlelabel, row, 0, Qt::AlignLeft | Qt::AlignTop);
+    grid->addWidget(subtitlefield, row, 1, Qt::AlignLeft | Qt::AlignTop);
+    row++;
+    grid->addWidget(descriptionlabel, row, 0, Qt::AlignLeft | Qt::AlignTop);
+    grid->addWidget(descriptionfield, row, 1, Qt::AlignLeft | Qt::AlignTop);
+
+    grid->setColStretch(1, 2);
+    grid->setRowStretch(row, 1);
+
+    return grid;
 }

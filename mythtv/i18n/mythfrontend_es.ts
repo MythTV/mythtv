@@ -21,16 +21,20 @@
         <source>Not Recording</source>
         <translation>No grabar</translation>
     </message>
+    <message>
+        <source>Weekly Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>InfoDialog</name>
     <message>
         <source>Episode:</source>
-        <translation>Episodio:</translation>
+        <translation type="obsolete">Episodio:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation>Descripción:</translation>
+        <translation type="obsolete">Descripción:</translation>
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown anywhere</source>
@@ -119,11 +123,11 @@
     </message>
     <message>
         <source>Delete this recording? It will be gone forever.</source>
-        <translation>¿Borrar esta grabación? Se borrará definitivamente.</translation>
+        <translation type="obsolete">¿Borrar esta grabación? Se borrará definitivamente.</translation>
     </message>
     <message>
         <source>It will be gone forever.</source>
-        <translation>Será definitivo.</translation>
+        <translation type="obsolete">Será definitivo.</translation>
     </message>
     <message>
         <source>Yes, get rid of it</source>
@@ -136,6 +140,10 @@
     <message>
         <source>No, keep it, I changed my mind</source>
         <translation>No, guárdala, he cambiado de idea</translation>
+    </message>
+    <message>
+        <source>Delete this recording?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -154,7 +162,7 @@
     </message>
     <message>
         <source>Recording when shown in this timeslot</source>
-        <translation>Grabarlo cuando aparezca a esta hora</translation>
+        <translation type="obsolete">Grabarlo cuando aparezca a esta hora</translation>
     </message>
     <message>
         <source>Recording when shown on this channel</source>
@@ -175,6 +183,14 @@
     <message>
         <source>       !! No Programs !!</source>
         <translation>¡¡ No hay programas !!</translation>
+    </message>
+    <message>
+        <source>Recording every day when shown in this timeslot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording every week when shown in this timeslot</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -307,39 +323,79 @@
         <source>cut</source>
         <translation>cortes</translation>
     </message>
+    <message>
+        <source>Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not record this program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record only this showing of the program</source>
+        <translation type="unfinished">Graba este programa solamente esta vez</translation>
+    </message>
+    <message>
+        <source>Record this program in this timeslot every day</source>
+        <translation type="unfinished">Grabar este programa a esta hora cada dia</translation>
+    </message>
+    <message>
+        <source>Record this program whenever it&apos;s shown on this channel</source>
+        <translation type="unfinished">Grabar este programa siempre que aparezca en este canal</translation>
+    </message>
+    <message>
+        <source>Record this program whenever it&apos;s shown anywhere</source>
+        <translation type="unfinished">Grabar este programa en cualquier siempre que aparezca</translation>
+    </message>
+    <message>
+        <source>Record this program in this timeslot every week</source>
+        <translation type="unfinished">Grabar este programa a esta hora cada semana</translation>
+    </message>
+    <message>
+        <source>Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(unspecified)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScheduledRecording</name>
     <message>
         <source>Episode:</source>
-        <translation>Episodio:</translation>
+        <translation type="obsolete">Episodio:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation>Descripción:</translation>
+        <translation type="obsolete">Descripción:</translation>
+    </message>
+    <message>
+        <source>Advanced Recording Options</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>SetRecTimeDialog</name>
     <message>
         <source>Change recording time:</source>
-        <translation>Cambiar el tiempo de grabación:</translation>
+        <translation type="obsolete">Cambiar el tiempo de grabación:</translation>
     </message>
     <message>
         <source>Episode:</source>
-        <translation>Episodio:</translation>
+        <translation type="obsolete">Episodio:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation>Descripción:</translation>
+        <translation type="obsolete">Descripción:</translation>
     </message>
     <message>
         <source>Start Time: </source>
-        <translation>Fecha de Inicio:</translation>
+        <translation type="obsolete">Fecha de Inicio:</translation>
     </message>
     <message>
         <source>End Time: </source>
-        <translation>Fecha de Fin:</translation>
+        <translation type="obsolete">Fecha de Fin:</translation>
     </message>
 </context>
 <context>
@@ -471,6 +527,10 @@
     <message>
         <source>Searching...</source>
         <translation>Buscando...</translation>
+    </message>
+    <message>
+        <source>Transcode</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
