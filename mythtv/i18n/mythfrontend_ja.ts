@@ -345,7 +345,7 @@
     </message>
     <message>
         <source>Yes, but record this episode again next time</source>
-        <translation>はい，でも次回また録画します</translation>
+        <translation type="obsolete">はい，でも次回また録画します</translation>
     </message>
     <message>
         <source>Yes, delete it</source>
@@ -426,6 +426,10 @@
     <message>
         <source>, %1 GB free</source>
         <translation>, %1 GB 空</translation>
+    </message>
+    <message>
+        <source>Yes, but allow future recordings of this episode</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -881,7 +885,7 @@
     </message>
     <message>
         <source>This determines the method used by MythTV to detect when commercials start and end.  You must have automatic commercial turned on to use anything other than &apos;Blank Frame&apos;.</source>
-        <translation>MythTVがCMを検出する手法を選択します．&quot;ブランクフレーム&quot;以外を使う場合は，自動CMスキップを有効にする必要があります．</translation>
+        <translation type="obsolete">MythTVがCMを検出する手法を選択します．&quot;ブランクフレーム&quot;以外を使う場合は，自動CMスキップを有効にする必要があります．</translation>
     </message>
     <message>
         <source>Automatically Skip Commercials</source>
@@ -1811,15 +1815,15 @@
     </message>
     <message>
         <source>Other Showing</source>
-        <translation>他の番組</translation>
+        <translation type="obsolete">他の番組</translation>
     </message>
     <message>
         <source>Manual Conflict</source>
-        <translation>手動衝突回避</translation>
+        <translation type="obsolete">手動衝突回避</translation>
     </message>
     <message>
         <source>Auto Conflict</source>
-        <translation>自動衝突回避</translation>
+        <translation type="obsolete">自動衝突回避</translation>
     </message>
     <message>
         <source>Overlap</source>
@@ -1831,7 +1835,7 @@
     </message>
     <message>
         <source>R</source>
-        <translation>R</translation>
+        <translation type="obsolete">R</translation>
     </message>
     <message>
         <source>T</source>
@@ -1883,11 +1887,11 @@
     </message>
     <message>
         <source>The following scheduled recordings conflict with each other.  Which would you like to record?</source>
-        <translation>これらの予約は互いに衝突しています．どちらを録画しますか?</translation>
+        <translation type="obsolete">これらの予約は互いに衝突しています．どちらを録画しますか?</translation>
     </message>
     <message>
         <source>Remember this choice and use it automatically in the future</source>
-        <translation>この選択を覚えておいて，今後は自動的に選択する</translation>
+        <translation type="obsolete">この選択を覚えておいて，今後は自動的に選択する</translation>
     </message>
     <message>
         <source>Priority</source>
@@ -1935,19 +1939,19 @@
     </message>
     <message>
         <source>Use Recording Priorities</source>
-        <translation>録画優先順位を使用する</translation>
+        <translation type="obsolete">録画優先順位を使用する</translation>
     </message>
     <message>
         <source>Use program recording priorities to resolve conflicts.</source>
-        <translation>衝突の解決に番組録画の優先順位を使用する．</translation>
+        <translation type="obsolete">衝突の解決に番組録画の優先順位を使用する．</translation>
     </message>
     <message>
         <source>Recording Priorities First.</source>
-        <translation>録画優先順位を優先する．</translation>
+        <translation type="obsolete">録画優先順位を優先する．</translation>
     </message>
     <message>
         <source>Use recording priorities to resolve conflicts before using traditional conflict resolution.</source>
-        <translation>従来の衝突回避手法を使う前に，録画優先順位を使用して衝突を解決します．</translation>
+        <translation type="obsolete">従来の衝突回避手法を使う前に，録画優先順位を使用して衝突を解決します．</translation>
     </message>
     <message>
         <source>Single Recordings Priority</source>
@@ -2345,7 +2349,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Low Priority</source>
-        <translation>低優先順位</translation>
+        <translation type="obsolete">低優先順位</translation>
     </message>
     <message>
         <source>Low Disk Space</source>
@@ -2357,7 +2361,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>This showing conflicts with one or more other scheduled programs.</source>
-        <translation>この番組は他の録画予約と衝突しています．</translation>
+        <translation type="obsolete">この番組は他の録画予約と衝突しています．</translation>
     </message>
     <message>
         <source>This showing will be recorded.</source>
@@ -2405,7 +2409,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>this episode will be recorded at another time instead.</source>
-        <translation>その代わり，この番組は別の時間に録画されます．</translation>
+        <translation type="obsolete">その代わり，この番組は別の時間に録画されます．</translation>
     </message>
     <message>
         <source>too many recordings of this program have already been recorded.</source>
@@ -2417,15 +2421,15 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>another program with a higher recording priority will be recorded.</source>
-        <translation>別の優先順位の高い番組が録画されます．</translation>
+        <translation type="obsolete">別の優先順位の高い番組が録画されます．</translation>
     </message>
     <message>
         <source>another program was manually chosen to be recorded instead.</source>
-        <translation>代わりに手動で選択された別の番組が録画されます．</translation>
+        <translation type="obsolete">代わりに手動で選択された別の番組が録画されます．</translation>
     </message>
     <message>
         <source>another program was automatically chosen to be recorded instead.</source>
-        <translation>代わりに自動的に選択された別の番組が録画されます．</translation>
+        <translation type="obsolete">代わりに自動的に選択された別の番組が録画されます．</translation>
     </message>
     <message>
         <source>it is covered by another scheduled recording for the same program.</source>
@@ -3461,12 +3465,129 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <source>Logo Detection</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Unable to create AudioOutput.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Continue WITHOUT AUDIO!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Return to menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Earlier Showing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Later Showing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>this episode will be recorded at an earlier time instead.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>another program with a higher priority will be recorded instead.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>this episode will be recorded at a later time instead.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Override</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The following programs will be recorded instead:
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>30m</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1h</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1h30m</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2h</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input preference</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If the input preference is not equal for all inputs, the scheduler may choose to record a show at a later time so that it can record on an input with a higher value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Independent Muting of Left and Right Audio Channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable muting of just the left or right channel.  Useful if your broadcaster puts the original language on one channel, and a dubbed version of the program on the other one.  This modifies the behavior of the Mute key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This determines the method used by MythTV to detect when commercials start and end.  You must have &apos;Automatically Flag Commercials&apos; turned on to use anything other than &apos;Blank Frame&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display &apos;favorite&apos; channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the EPG will initally display only the channels marked as favorites. &quot;4&quot; will toggle between favorites and all channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reschedule Higher Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move higher priority programs to other cards and showings when resolving conflicts.  This can be used to record lower priority programs that would not otherwise be recorded, but risks missing a higher priority program if the schedule changes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use select to change the channel in the program guide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked the select key will change the channel while using the program guide during live TV.  If unchecked the select key will bring up the recording options screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScheduledRecording</name>
     <message>
         <source>See a list of all up-coming episodes/playtimes.</source>
-        <translation>これからの番組を見る</translation>
+        <translation type="obsolete">これからの番組を見る</translation>
+    </message>
+    <message>
+        <source>List upcoming episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;キャンセル</translation>
+    </message>
+    <message>
+        <source>&amp;Finish</source>
+        <translation type="unfinished">&amp;完了</translation>
     </message>
 </context>
 <context>
@@ -3754,6 +3875,54 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Zoom Mode ON</source>
         <translation>ズームモード ON</translation>
+    </message>
+    <message>
+        <source>Left Channel Muted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right Channel Muted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sleep </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>16:9 Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Guide</source>
+        <translation type="unfinished">番組ガイド</translation>
+    </message>
+    <message>
+        <source>Picture-in-Picture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable/Disable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Swap Channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Active Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable Browse Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Recording</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

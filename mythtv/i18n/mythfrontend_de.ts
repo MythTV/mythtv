@@ -345,7 +345,7 @@
     </message>
     <message>
         <source>Yes, but record this episode again next time</source>
-        <translation>Ja, aber diese Folge wieder aufnehmen</translation>
+        <translation type="obsolete">Ja, aber diese Folge wieder aufnehmen</translation>
     </message>
     <message>
         <source>Yes, delete it</source>
@@ -426,6 +426,10 @@
     <message>
         <source>, %1 GB free</source>
         <translation>, %1 GB frei</translation>
+    </message>
+    <message>
+        <source>Yes, but allow future recordings of this episode</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -897,7 +901,7 @@
     </message>
     <message>
         <source>This determines the method used by MythTV to detect when commercials start and end.  You must have automatic commercial turned on to use anything other than &apos;Blank Frame&apos;.</source>
-        <translation>Wählt die Methode aus, nach der Anfang und Ende eines Werbeblocks gesucht wird.</translation>
+        <translation type="obsolete">Wählt die Methode aus, nach der Anfang und Ende eines Werbeblocks gesucht wird.</translation>
     </message>
     <message>
         <source>Automatically Skip Commercials</source>
@@ -1826,15 +1830,15 @@
     </message>
     <message>
         <source>Other Showing</source>
-        <translation>Andere Ausstrahlung</translation>
+        <translation type="obsolete">Andere Ausstrahlung</translation>
     </message>
     <message>
         <source>Manual Conflict</source>
-        <translation>Manueller Konflikt</translation>
+        <translation type="obsolete">Manueller Konflikt</translation>
     </message>
     <message>
         <source>Auto Conflict</source>
-        <translation>Autom. Konflikt</translation>
+        <translation type="obsolete">Autom. Konflikt</translation>
     </message>
     <message>
         <source>Overlap</source>
@@ -1843,10 +1847,6 @@
     <message>
         <source>Repeat</source>
         <translation>Wiederholung</translation>
-    </message>
-    <message>
-        <source>R</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>T</source>
@@ -1902,11 +1902,11 @@
     </message>
     <message>
         <source>The following scheduled recordings conflict with each other.  Which would you like to record?</source>
-        <translation>Die folgenden geplanten Aufnahmen überlappen sich. Welche davon möchten Sie aufnehmen?</translation>
+        <translation type="obsolete">Die folgenden geplanten Aufnahmen überlappen sich. Welche davon möchten Sie aufnehmen?</translation>
     </message>
     <message>
         <source>Remember this choice and use it automatically in the future</source>
-        <translation>Diese Auswahl für die Zukunft merken</translation>
+        <translation type="obsolete">Diese Auswahl für die Zukunft merken</translation>
     </message>
     <message>
         <source>Priority</source>
@@ -1954,19 +1954,15 @@
     </message>
     <message>
         <source>Use Recording Priorities</source>
-        <translation>Aufnahmeprioritäten verwenden</translation>
+        <translation type="obsolete">Aufnahmeprioritäten verwenden</translation>
     </message>
     <message>
         <source>Use program recording priorities to resolve conflicts.</source>
-        <translation>Nutze Aufnahmeprioritäten um Überschneidungen zu vermeiden.</translation>
+        <translation type="obsolete">Nutze Aufnahmeprioritäten um Überschneidungen zu vermeiden.</translation>
     </message>
     <message>
         <source>Recording Priorities First.</source>
-        <translation>Aufnahmeprioritäten zuerst.</translation>
-    </message>
-    <message>
-        <source>Use recording priorities to resolve conflicts before using traditional conflict resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Aufnahmeprioritäten zuerst.</translation>
     </message>
     <message>
         <source>Single Recordings Priority</source>
@@ -2178,7 +2174,7 @@
     </message>
     <message>
         <source>Low Priority</source>
-        <translation>Niedrige Priorität</translation>
+        <translation type="obsolete">Niedrige Priorität</translation>
     </message>
     <message>
         <source>Low Disk Space</source>
@@ -2190,7 +2186,7 @@
     </message>
     <message>
         <source>This showing conflicts with one or more other scheduled programs.</source>
-        <translation>Diese Sendung überschneidet sich mit einer geplanten Aufnahme.</translation>
+        <translation type="obsolete">Diese Sendung überschneidet sich mit einer geplanten Aufnahme.</translation>
     </message>
     <message>
         <source>This showing will be recorded.</source>
@@ -2238,7 +2234,7 @@
     </message>
     <message>
         <source>this episode will be recorded at another time instead.</source>
-        <translation>diese Folge wird zu einer anderen Zeit aufgenommen.</translation>
+        <translation type="obsolete">diese Folge wird zu einer anderen Zeit aufgenommen.</translation>
     </message>
     <message>
         <source>too many recordings of this program have already been recorded.</source>
@@ -2250,15 +2246,15 @@
     </message>
     <message>
         <source>another program with a higher recording priority will be recorded.</source>
-        <translation>eine andere Sendung mit höherer Priorität aufgenommen wird.</translation>
+        <translation type="obsolete">eine andere Sendung mit höherer Priorität aufgenommen wird.</translation>
     </message>
     <message>
         <source>another program was manually chosen to be recorded instead.</source>
-        <translation>manuell eine andere Sendung zum aufnehmen gewählt wurde.</translation>
+        <translation type="obsolete">manuell eine andere Sendung zum aufnehmen gewählt wurde.</translation>
     </message>
     <message>
         <source>another program was automatically chosen to be recorded instead.</source>
-        <translation>automatisch eine andere Sendung zum aufnehmen bestimmt wurde.</translation>
+        <translation type="obsolete">automatisch eine andere Sendung zum aufnehmen bestimmt wurde.</translation>
     </message>
     <message>
         <source>it is covered by another scheduled recording for the same program.</source>
@@ -3462,12 +3458,129 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <source>Logo Detection</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Unable to create AudioOutput.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Continue WITHOUT AUDIO!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Return to menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Earlier Showing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Later Showing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>this episode will be recorded at an earlier time instead.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>another program with a higher priority will be recorded instead.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>this episode will be recorded at a later time instead.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Override</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The following programs will be recorded instead:
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>30m</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1h</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1h30m</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2h</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input preference</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If the input preference is not equal for all inputs, the scheduler may choose to record a show at a later time so that it can record on an input with a higher value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Independent Muting of Left and Right Audio Channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable muting of just the left or right channel.  Useful if your broadcaster puts the original language on one channel, and a dubbed version of the program on the other one.  This modifies the behavior of the Mute key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This determines the method used by MythTV to detect when commercials start and end.  You must have &apos;Automatically Flag Commercials&apos; turned on to use anything other than &apos;Blank Frame&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display &apos;favorite&apos; channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the EPG will initally display only the channels marked as favorites. &quot;4&quot; will toggle between favorites and all channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reschedule Higher Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move higher priority programs to other cards and showings when resolving conflicts.  This can be used to record lower priority programs that would not otherwise be recorded, but risks missing a higher priority program if the schedule changes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use select to change the channel in the program guide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked the select key will change the channel while using the program guide during live TV.  If unchecked the select key will bring up the recording options screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScheduledRecording</name>
     <message>
         <source>See a list of all up-coming episodes/playtimes.</source>
-        <translation>Liste der kommenden Folgen/Sendezeiten.</translation>
+        <translation type="obsolete">Liste der kommenden Folgen/Sendezeiten.</translation>
+    </message>
+    <message>
+        <source>List upcoming episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Abbrechen</translation>
+    </message>
+    <message>
+        <source>&amp;Finish</source>
+        <translation type="unfinished">&amp;Fertig</translation>
     </message>
 </context>
 <context>
@@ -3755,6 +3868,54 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     <message>
         <source>Zoom Mode ON</source>
         <translation>Zoom ein</translation>
+    </message>
+    <message>
+        <source>Left Channel Muted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right Channel Muted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sleep </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>16:9 Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Guide</source>
+        <translation type="unfinished">Programmübersicht (EPG)</translation>
+    </message>
+    <message>
+        <source>Picture-in-Picture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable/Disable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Swap Channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Active Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable Browse Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Recording</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
