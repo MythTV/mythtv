@@ -630,23 +630,28 @@ SipUrl::SipUrl(SipUrl *orig)
 
 void SipUrl::HostnameToIpAddr()
 {
-    QHostAddress ha;
-    ha.setAddress(thisHostname); // See if it is already an IP address
-    if (ha.toString() != thisHostname)
+    if (thisHostname.length() > 0)
     {
-        // Need a DNS lookup on the URL
-        struct hostent *h;
-        h = gethostbyname((const char *)thisHostname);
-        if (h != 0)
+        QHostAddress ha;
+        ha.setAddress(thisHostname); // See if it is already an IP address
+        if (ha.toString() != thisHostname)
         {
-            ha.setAddress(ntohl(*(long *)h->h_addr));
-            thisHostIp = ha.toString();
+            // Need a DNS lookup on the URL
+            struct hostent *h;
+            h = gethostbyname((const char *)thisHostname);
+            if (h != 0)
+            {
+                ha.setAddress(ntohl(*(long *)h->h_addr));
+                thisHostIp = ha.toString();
+            }
+            else
+                thisHostIp = "";
         }
         else
-            thisHostIp = "";
+            thisHostIp = thisHostname;
     }
     else
-        thisHostIp = thisHostname;
+        thisHostIp = "";
 }
 
 void SipUrl::encode()
