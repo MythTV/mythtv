@@ -61,6 +61,7 @@ class MainServer : public QObject
         QString title;
     } DeleteStruct;
 
+    void ProcessRequestWork(RefSocket *sock);
     void HandleAnnounce(QStringList &slist, QStringList commands, 
                         RefSocket *socket);
     void HandleDone(QSocket *socket);

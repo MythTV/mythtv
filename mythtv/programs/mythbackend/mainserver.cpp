@@ -184,9 +184,14 @@ void MainServer::readSocket(void)
 
 void MainServer::ProcessRequest(RefSocket *sock)
 {
-    if (sock->bytesAvailable() <= 0)
-        return;
+    while (sock->bytesAvailable() > 0)
+    {
+        ProcessRequestWork(sock);
+    }
+}
 
+void MainServer::ProcessRequestWork(RefSocket *sock)
+{
     QStringList listline;
     if (!ReadStringList(sock, listline))
         return;
@@ -413,6 +418,10 @@ void MainServer::ProcessRequest(RefSocket *sock)
     {
         VERBOSE(VB_ALL,"Reloading backend settings");
         HandleBackendRefresh(sock);
+    }
+    else if (command == "OK")
+    {
+        VERBOSE(VB_ALL, "Got 'OK' out of sync..");
     }
     else
     {
