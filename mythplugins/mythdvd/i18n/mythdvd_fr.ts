@@ -258,6 +258,57 @@ You have no DVD Device defined.</source>
     </message>
 </context>
 <context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Rip/Transcode</source>
+        <translation>Copie/Encodage</translation>
+    </message>
+    <message>
+        <source>Job 1 of 1</source>
+        <translation>Tâche 1 sur 1</translation>
+    </message>
+    <message>
+        <source>Length:</source>
+        <translation>Durée:</translation>
+    </message>
+    <message>
+        <source>Select:</source>
+        <translation>Copié:</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation>Nom:</translation>
+    </message>
+    <message>
+        <source>Quality:</source>
+        <translation>Qualité:</translation>
+    </message>
+    <message>
+        <source>Audio Track:</source>
+        <translation>Piste Audio:</translation>
+    </message>
+    <message>
+        <source>AC3 Audio:</source>
+        <translation>AC3 Audio:</translation>
+    </message>
+    <message>
+        <source>Subtitles:</source>
+        <translation>Sous-titres:</translation>
+    </message>
+    <message>
+        <source>View:</source>
+        <translation>Prévisualisation:</translation>
+    </message>
+    <message>
+        <source>Title 1 of 1</source>
+        <translation>Titre 1 sur 1</translation>
+    </message>
+    <message>
+        <source>0:00:00</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TitleDialog</name>
     <message>
         <source>Unkown</source>

@@ -270,6 +270,57 @@ Du har ingen DVD-enhet definierad.</translation>
     </message>
 </context>
 <context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Rip/Transcode</source>
+        <translation>Kopiering/Omkodning</translation>
+    </message>
+    <message>
+        <source>Job 1 of 1</source>
+        <translation>Jobb 1 av 1</translation>
+    </message>
+    <message>
+        <source>Length:</source>
+        <translation>Längd:</translation>
+    </message>
+    <message>
+        <source>Select:</source>
+        <translation>Välj:</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation>Namn:</translation>
+    </message>
+    <message>
+        <source>Quality:</source>
+        <translation>Kvalitet:</translation>
+    </message>
+    <message>
+        <source>Audio Track:</source>
+        <translation>Ljudspår:</translation>
+    </message>
+    <message>
+        <source>AC3 Audio:</source>
+        <translation>AC3-ljud:</translation>
+    </message>
+    <message>
+        <source>Subtitles:</source>
+        <translation>Textning:</translation>
+    </message>
+    <message>
+        <source>View:</source>
+        <translation>Vy:</translation>
+    </message>
+    <message>
+        <source>Title 1 of 1</source>
+        <translation>Titel 1 av 1</translation>
+    </message>
+    <message>
+        <source>0:00:00</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TitleDialog</name>
     <message>
         <source>Unkown</source>

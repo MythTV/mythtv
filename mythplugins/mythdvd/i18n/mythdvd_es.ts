@@ -266,6 +266,57 @@ No tiene definido dispositivo de para deproducir DVD.</translation>
     </message>
 </context>
 <context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Rip/Transcode</source>
+        <translation>Ripear/Trascodificar</translation>
+    </message>
+    <message>
+        <source>Job 1 of 1</source>
+        <translation>Trabajo 1 de 1</translation>
+    </message>
+    <message>
+        <source>Length:</source>
+        <translation>Duración:</translation>
+    </message>
+    <message>
+        <source>Select:</source>
+        <translation>Seleccione:</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation>Nombre:</translation>
+    </message>
+    <message>
+        <source>Quality:</source>
+        <translation>Calidad:</translation>
+    </message>
+    <message>
+        <source>Audio Track:</source>
+        <translation>Banda de audio:</translation>
+    </message>
+    <message>
+        <source>AC3 Audio:</source>
+        <translation>Audio AC3:</translation>
+    </message>
+    <message>
+        <source>Subtitles:</source>
+        <translation>Subtítulos:</translation>
+    </message>
+    <message>
+        <source>View:</source>
+        <translation>Ver:</translation>
+    </message>
+    <message>
+        <source>Title 1 of 1</source>
+        <translation>Título 1 de 1</translation>
+    </message>
+    <message>
+        <source>0:00:00</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TitleDialog</name>
     <message>
         <source>Unkown</source>

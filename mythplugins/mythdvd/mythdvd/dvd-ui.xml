@@ -57,14 +57,6 @@
                 <font>title</font>
                 <area>200,5,600,95</area>
                 <value>Rip/Transcode</value>
-                <value lang="DK">Rip/Genkod</value>
-		<value lang="FR">Copier/Encoder</value>
-                <value lang="PT">Cópia/Recodificação</value>
-                <value lang="SV">Kopiering/Omkodning</value>
-                <value lang="ES">Ripear/Trascodificar</value>
-                <value lang="CA">Volcar/Trascodificar</value>
-                <value lang="DE">Rippen/Umwandeln</value>
-                <value lang="JA">リッピング/変換</value>
             </textarea>
             <image name="progress_background" draworder="0">
                 <filename>md_progress_background.png</filename>
@@ -110,14 +102,6 @@
                 <font>display</font>
                 <area>275,330,150,30</area>
                 <value>Job 1 of 1</value>
-                <value lang="DK">Job 1 af 1</value>
-		<value lang="FR">Tâche 1 sur 1</value>
-                <value lang="PT">Processo 1 de 1</value>
-                <value lang="SV">Jobb 1 av 1</value>
-                <value lang="ES">Trabajo 1 de 1</value>
-                <value lang="CA">Tasca 1 de 1</value>
-                <value lang="DE">Auftrag 1 von 1</value>
-                <value lang="JA">ジョブ 1/1</value>
             </textarea>
 
             <statusbar name="overall_status" draworder="1" whitespace="15">
@@ -222,14 +206,6 @@
                 <font>title</font>
                 <area>200,5,600,95</area>
                 <value>Rip/Transcode</value>
-                <value lang="DK">Rip/Genkod</value>
-		<value lang="FR">Copie/Encodage</value>
-                <value lang="PT">Cópia/Recodificação</value>
-                <value lang="SV">Kopiering/Omkodning</value>
-                <value lang="ES">Ripear/Trascodificar</value>
-                <value lang="CA">Volcar/Trascodificar</value>
-                <value lang="DE">Rippen/Umwandeln</value>
-                <value lang="JA">リッピング/変換</value>
             </textarea>
             <image name="progress_background" draworder="0">
                 <filename>md_progress_background.png</filename>
@@ -249,112 +225,48 @@
                 <font>display</font>
                 <area>50,35,250,30</area>
                 <value>Length:</value>
-                <value lang="DK">Længde:</value>
-		<value lang="FR">Durée:</value>
-                <value lang="PT">Tamanho:</value>
-                <value lang="SV">Längd:</value>
-                <value lang="ES">Duración:</value>
-                <value lang="CA">Duració:</value>
-                <value lang="DE">Länge:</value>
-                <value lang="JA">長さ:</value>
             </textarea>
 
             <textarea name="ripcheck_text" draworder="0" align="right">
                 <font>display</font>
                 <area>50,75,250,30</area>
                 <value>Select:</value>
-                <value lang="DK">Vælg:</value>
-		<value lang="FR">Copié:</value>
-                <value lang="PT">Copiar:</value>
-                <value lang="SV">Välj:</value>
-                <value lang="ES">Seleccione:</value>
-                <value lang="CA">Sel·leccionat:</value>
-                <value lang="DE">Wähle:</value>
-                <value lang="JA">選択:</value>
             </textarea>
 
             <textarea name="ripname_text" draworder="0" align="right">
                 <font>display</font>
                 <area>50,110,250,30</area>
                 <value>Name:</value>
-                <value lang="DK">Navn:</value>
-		<value lang="FR">Nom:</value>
-                <value lang="PT">Nome:</value>
-                <value lang="SV">Namn:</value>
-                <value lang="ES">Nombre:</value>
-                <value lang="CA">Nom:</value>
-                <value lang="DE">Name:</value>
-                <value lang="JA">名前:</value>
             </textarea>
 
             <textarea name="ripquality_text" draworder="0" align="right">
                 <font>display</font>
                 <area>50,145,250,30</area>
                 <value>Quality:</value>
-                <value lang="DK">Kvalitet:</value>
-		<value lang="FR">Qualité:</value>
-                <value lang="PT">Qualidade:</value>
-                <value lang="SV">Kvalitet:</value>
-                <value lang="ES">Calidad:</value>
-                <value lang="CA">Qualitat:</value>
-                <value lang="DE">Qualität:</value>
-                <value lang="JA">品質:</value>
             </textarea>
 
             <textarea name="ripaudio_text" draworder="0" align="right">
                 <font>display</font>
                 <area>50,180,250,30</area>
                 <value>Audio Track:</value>
-                <value lang="DK">Lydspor:</value>
-		<value lang="FR">Piste Audio:</value>
-                <value lang="PT">Pista de Áudio:</value>
-                <value lang="SV">Ljudspår:</value>
-                <value lang="ES">Banda de audio:</value>
-                <value lang="CA">Pista d'àudio:</value>
-                <value lang="DE">Audiospur:</value>
-                <value lang="JA">オーディオトラック:</value>
             </textarea>
 
             <textarea name="ripacthree_text" draworder="0" align="right">
                 <font>display</font>
                 <area>50,215,250,30</area>
                 <value>AC3 Audio:</value>
-                <value lang="DK">AC3 lyd:</value>
-		<value lang="FR">AC3 Audio:</value>
-                <value lang="PT">Áudio AC3:</value>
-                <value lang="SV">AC3-ljud:</value>
-                <value lang="ES">Audio AC3:</value>
-                <value lang="CA">Àudio AC3:</value>
-                <value lang="DE">AC3 Audio:</value>
-                <value lang="JA">AC3オーディオ:</value>
             </textarea>
 
             <textarea name="subtitle_text" draworder="0" align="right">
                 <font>display</font>
                 <area>50,250,250,30</area>
                 <value>Subtitles:</value>
-                <value lang="DK">Undertekster:</value>
-		<value lang="FR">Sous-titres:</value>
-                <value lang="PT">Legendas:</value>
-                <value lang="SV">Textning:</value>
-                <value lang="ES">Subtítulos:</value>
-                <value lang="CA">Subtítols:</value>
-                <value lang="DE">Untertitel:</value>
-                <value lang="JA">サブタイトル:</value>
             </textarea>
 
             <textarea name="ripview_text" draworder="0" align="right">
                 <font>display</font>
                 <area>50,285,250,30</area>
                 <value>View:</value>
-                <value lang="DK">Se:</value>
-		<value lang="FR">Prévisualisation:</value>
-                <value lang="PT">Ângulo:</value>
-                <value lang="SV">Vy:</value>
-                <value lang="ES">Ver:</value>
-                <value lang="CA">Veure:</value>
-                <value lang="DE">Ansehen:</value>
-                <value lang="JA">ビュー:</value>
             </textarea>
 
             <!--
@@ -425,14 +337,6 @@
                 <font>display</font>
                 <area>265,330,170,30</area>
                 <value>Title 1 of 1</value>
-                <value lang="DK">Titel 1 af 1</value>
-		<value lang="FR">Titre 1 sur 1</value>
-                <value lang="PT">Título 1 de 1:</value>
-                <value lang="SV">Titel 1 av 1</value>
-                <value lang="ES">Título 1 de 1</value>
-                <value lang="CA">Títol 1 de 1</value>
-                <value lang="DE">Titel 1 von 1</value>
-                <value lang="JA">タイトル 1/1</value>
             </textarea>
 
             <pushbutton name="prev_title_button" draworder="0">

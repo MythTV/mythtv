@@ -266,6 +266,57 @@ DVDデバイスが設定されていません｡</translation>
     </message>
 </context>
 <context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Rip/Transcode</source>
+        <translation>リッピング/変換</translation>
+    </message>
+    <message>
+        <source>Job 1 of 1</source>
+        <translation>ジョブ 1/1</translation>
+    </message>
+    <message>
+        <source>Length:</source>
+        <translation>長さ:</translation>
+    </message>
+    <message>
+        <source>Select:</source>
+        <translation>選択:</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation>名前:</translation>
+    </message>
+    <message>
+        <source>Quality:</source>
+        <translation>品質:</translation>
+    </message>
+    <message>
+        <source>Audio Track:</source>
+        <translation>オーディオトラック:</translation>
+    </message>
+    <message>
+        <source>AC3 Audio:</source>
+        <translation>AC3オーディオ:</translation>
+    </message>
+    <message>
+        <source>Subtitles:</source>
+        <translation>サブタイトル:</translation>
+    </message>
+    <message>
+        <source>View:</source>
+        <translation>ビュー:</translation>
+    </message>
+    <message>
+        <source>Title 1 of 1</source>
+        <translation>タイトル 1/1</translation>
+    </message>
+    <message>
+        <source>0:00:00</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TitleDialog</name>
     <message>
         <source>Unkown</source>

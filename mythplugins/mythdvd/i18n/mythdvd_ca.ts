@@ -266,6 +266,57 @@ No hi ha un dispositiu de DVD definit.</translation>
     </message>
 </context>
 <context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Rip/Transcode</source>
+        <translation>Volcar/Trascodificar</translation>
+    </message>
+    <message>
+        <source>Job 1 of 1</source>
+        <translation>Tasca 1 de 1</translation>
+    </message>
+    <message>
+        <source>Length:</source>
+        <translation>Duració:</translation>
+    </message>
+    <message>
+        <source>Select:</source>
+        <translation>Sel·leccionat:</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation>Nom:</translation>
+    </message>
+    <message>
+        <source>Quality:</source>
+        <translation>Qualitat:</translation>
+    </message>
+    <message>
+        <source>Audio Track:</source>
+        <translation>Pista d&apos;àudio:</translation>
+    </message>
+    <message>
+        <source>AC3 Audio:</source>
+        <translation>Àudio AC3:</translation>
+    </message>
+    <message>
+        <source>Subtitles:</source>
+        <translation>Subtítols:</translation>
+    </message>
+    <message>
+        <source>View:</source>
+        <translation>Veure:</translation>
+    </message>
+    <message>
+        <source>Title 1 of 1</source>
+        <translation>Títol 1 de 1</translation>
+    </message>
+    <message>
+        <source>0:00:00</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TitleDialog</name>
     <message>
         <source>Unkown</source>
