@@ -579,7 +579,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 
     thequery = "SELECT recorded.chanid,starttime,endtime,title,subtitle,"
                "description,hostname,channum,name,callsign,commflagged,cutlist,"
-               "autoexpire,editing,bookmark FROM recorded "
+               "autoexpire,editing,bookmark,category FROM recorded "
                "LEFT JOIN channel ON recorded.chanid = channel.chanid "
                "ORDER BY starttime";
 
@@ -648,6 +648,10 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             flags |= query.value(14).toString().length() > 1 ? FL_BOOKMARK : 0;
 
             proginfo->programflags = flags;
+
+            QString test = query.value(15).toString();
+            if (test != QString::null) 
+               proginfo->category = QString::fromUtf8(test);
 
             QString lpath = proginfo->GetRecordFilename(fileprefix);
             PlaybackSock *slave = NULL;
