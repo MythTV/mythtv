@@ -480,15 +480,19 @@ void LCD::describeServer()
 void LCD::veryBadThings(int anError)
 {
     // Deal with failures to connect and inabilities to communicate
-    VERBOSE(VB_IMPORTANT, "Could not connect to an LCDd, LCD support will not be enabled.");
+
+    QString err;
 
     if (anError == QSocket::ErrConnectionRefused)
-        VERBOSE(VB_IMPORTANT, "Why? The connection was refused.");
+        err = "connection refused.";
     else if (anError == QSocket::ErrHostNotFound)
-        VERBOSE(VB_IMPORTANT, "Why? The host was not found.");
+        err = "host not found.";
     else if (anError == QSocket::ErrSocketRead)
-        VERBOSE(VB_IMPORTANT, "Why? There was an error reading from the socket.");
-    
+        err = "socket read failed.";
+    else
+        err = "unknown error.";
+
+    VERBOSE(VB_IMPORTANT, QString("Could not connect to LCDd: %1").arg(err));
     socket->clearPendingData();
     socket->close();
 }

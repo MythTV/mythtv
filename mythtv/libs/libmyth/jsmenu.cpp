@@ -97,7 +97,8 @@ int JoystickMenuClient::Init(QString &config_file)
     rc = ReadConfig(config_file);
     if (rc)
     {
-        cerr << config_file << " not found; menu keys from joystick disabled.\n";
+        VERBOSE(VB_FILE, QString("%1 not found.").arg(config_file));
+        VERBOSE(VB_GENERAL, "Joystick disabled.");
         return(rc);
     }
 
