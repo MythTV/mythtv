@@ -694,7 +694,7 @@
       <textarea name="time" draworder="6">
         <area>160,40,420,30</area>
         <font>info</font>
-	<value>%STARTDATE%, %STARTTIME% - %ENDTIME%</value>
+	<value>%RECSTARTDATE%, %RECSTARTTIME% - %RECENDTIME%</value>
       </textarea>
       <textarea name="subdescr" draworder="6">
         <area>20,70,560,140</area>
