@@ -33,7 +33,8 @@ using namespace std;
 
 
 VideoSelected::VideoSelected(QSqlDatabase *ldb,
-                             MythMainWindow *parent, const char *name, int idnum)
+                             MythMainWindow *parent, const char *name, 
+                             int idnum, bool startplaying)
             : MythDialog(parent, name)
 {
     db = ldb;
@@ -60,6 +61,9 @@ VideoSelected::VideoSelected(QSqlDatabase *ldb,
     updateBackground();
 
     setNoErase();
+
+    if (startplaying)
+        selected(curitem);
 }
 
 VideoSelected::~VideoSelected()

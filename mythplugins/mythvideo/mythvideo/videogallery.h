@@ -50,6 +50,7 @@ class VideoGallery : public VideoDialog
     void handleVideoSelect();
     
   protected:
+    void handleVideoPlay();
     virtual void parseContainer(QDomElement &element);
     virtual void handleMetaFetch(Metadata*);
     virtual void fetchVideos();

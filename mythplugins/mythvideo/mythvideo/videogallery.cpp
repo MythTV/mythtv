@@ -90,6 +90,10 @@ void VideoGallery::keyPressEvent(QKeyEvent *e)
         {
             handled = handleSelect();
         }
+        else if (action == "PLAYBACK")
+        {
+            handleVideoPlay();
+        }
         else if ( (action == "UP")  || (action == "DOWN") ||
                   (action == "LEFT") ||(action == "RIGHT") ||
                   (action == "PAGEUP") || (action == "PAGEDOWN"))
@@ -847,6 +851,18 @@ void VideoGallery::handleUpDirSelect()
             allowselect = (bool)(where_we_are->siblingCount() > 0);
         }
     }
+}
+
+void VideoGallery::handleVideoPlay()
+{
+    cancelPopup();
+
+    VideoSelected *selected = new VideoSelected(db, gContext->GetMainWindow(),
+                                                "video selected", where_we_are->getInt(), true);
+    qApp->unlock();
+    selected->exec();
+    qApp->lock();
+    delete selected;
 }
 
 void VideoGallery::handleVideoSelect()
