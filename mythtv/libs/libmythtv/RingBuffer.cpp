@@ -29,6 +29,10 @@ using namespace std;
 #define O_LARGEFILE 0
 #endif
 
+#if defined(_POSIX_SYNCHRONIZED_IO) && _POSIX_SYNCHRONIZED_IO > 0
+#define HAVE_FDATASYNC
+#endif
+
 class ThreadedFileWriter
 {
 public:
@@ -189,11 +193,10 @@ long long ThreadedFileWriter::Seek(long long pos, int whence)
 
 void ThreadedFileWriter::Sync(void)
 {
-#ifdef _WIN32
-    // Cynwin doesn't have a fdatasync
-    fsync(fd);
-#else
+#ifdef HAVE_FDATASYNC
     fdatasync(fd);
+#else
+    fsync(fd);
 #endif
 }
 
