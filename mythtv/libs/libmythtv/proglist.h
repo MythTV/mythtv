@@ -45,6 +45,7 @@ class ProgLister : public MythDialog
     void deleteKeyword(void);
     void select(void);
     void edit(void);
+    void upcoming(void);
     void chooseView(void);
 
 

@@ -10,7 +10,7 @@ mythfrontend
 - D to delete in both "Watch a Recording" and "Delete a Recording".
 - O to list the upcoming episodes for the currently selected show
     on the EPG, "Program Finder", "Program Recording Priorities",
-    or "Fix Scheduling Conflicts" screens.
+    "Fix Scheduling Conflicts" or search results screens.
 - I to edit recording options from the EPG, "Program Finder",
     "Program Recording Priorities", or "Fix Scheduling Conflicts" screens.
     From the Playback and Delete screens, 'I' presents options
