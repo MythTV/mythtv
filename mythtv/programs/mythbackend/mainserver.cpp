@@ -84,7 +84,6 @@ void MainServer::readSocket(void)
         line = line.simplifyWhiteSpace();
         QStringList tokens = QStringList::split(" ", line);
         QString command = tokens[0];
-cout << command << endl;
         if (command == "ANN")
         {
             if (tokens.size() < 3 || tokens.size() > 4)

@@ -1,5 +1,14 @@
 USE mythconverg;
 
+CREATE TABLE IF NOT EXISTS markup
+(
+    chanid INT UNSIGNED NOT NULL,
+    starttime TIMESTAMP NOT NULL,
+    mark BIGINT(20) NOT NULL,
+    type INT NOT NULL,
+    primary key (chanid,starttime, mark, type )
+);
+
 CREATE TABLE favorites (
     favid int(11) unsigned NOT NULL auto_increment,
     userid int(11) unsigned NOT NULL default '0',
@@ -17,13 +26,4 @@ ALTER TABLE recorded ADD COLUMN cutlist TEXT NULL;
 ALTER TABLE capturecard ADD COLUMN vbidevice VARCHAR(255);
 REPLACE INTO settings (value, data) VALUES ("LCDHost","localhost");
 REPLACE INTO settings (value, data) VALUES ("LCDPort","13666");
-
-CREATE TABLE IF NOT EXISTS markup
-(
-    chanid INT UNSIGNED NOT NULL,
-    starttime TIMESTAMP NOT NULL,
-    mark BIGINT(20) NOT NULL,
-    type INT NOT NULL,
-    primary key (chanid,starttime, mark, type )
-);
 
