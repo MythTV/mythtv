@@ -133,12 +133,17 @@ package export::transcode::SVCD;
         my $episode = shift;
     # Load nuv info
         load_finfo($episode);
+    # Force to 4:3 aspect ratio
+        $self->{'out_aspect'} = 1.3333;
+        $self->{'aspect_stretched'} = 1;
     # PAL or NTSC?
         my $standard = ($episode->{'finfo'}{'fps'} =~ /^2(?:5|4\.9)/) ? 'PAL' : 'NTSC';
-        my $res = ($standard eq 'PAL') ? '480x576' : '480x480';
+        $self->{'width'} = 480;
+        $self->{'height'} = ($standard eq 'PAL') ? '576' : '480';
+        $self->{'out_fps'} = ($standard eq 'PAL') ? 25 : 29.97;
         my $ntsc = ($standard eq 'PAL') ? '' : '-N';
     # Build the transcode string
-        $self->{'transcode_xtra'} = " -y mpeg2enc,mp2enc -Z $res"
+        $self->{'transcode_xtra'} = " -y mpeg2enc,mp2enc"
                                    .' -F 5,"-q '.$self->{'quantisation'}.'"'    # could add "-M $num_cpus" for multi-cpu here, but it actually seems to slow things down
                                    .' -w '.$self->{'v_bitrate'}
                                    .' -E 44100 -b '.$self->{'a_bitrate'};

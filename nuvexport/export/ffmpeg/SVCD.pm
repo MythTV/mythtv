@@ -139,6 +139,7 @@ package export::ffmpeg::SVCD;
         my $standard = ($episode->{'finfo'}{'fps'} =~ /^2(?:5|4\.9)/) ? 'PAL' : 'NTSC';
         $self->{'width'} = 480;
         $self->{'height'} = ($standard eq 'PAL') ? '576' : '480';
+        $self->{'out_fps'} = ($standard eq 'PAL') ? 25 : 29.97;
     # Build the ffmpeg string
         $self->{'ffmpeg_xtra'} = ' -b ' . $self->{'v_bitrate'}
                                 .' -vcodec mpeg2video'

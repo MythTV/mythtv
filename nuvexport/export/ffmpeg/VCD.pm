@@ -74,6 +74,7 @@ package export::ffmpeg::VCD;
         my $standard = ($episode->{'finfo'}{'fps'} =~ /^2(?:5|4\.9)/) ? 'PAL' : 'NTSC';
         $self->{'width'} = 352;
         $self->{'height'} = ($standard eq 'PAL') ? '288' : '240';
+        $self->{'out_fps'} = ($standard eq 'PAL') ? 25 : 29.97;
     # Build the transcode string
         $self->{'ffmpeg_xtra'}  = " -b 1150 -vcodec mpeg1video"
                                  ." -ab 224 -ar 44100 -acodec mp2"

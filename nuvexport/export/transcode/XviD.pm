@@ -105,6 +105,8 @@ package export::transcode::XviD;
                         }
                     }
                 }
+            } else {
+                $self->{'multipass'} = 0;
             }
         # Ask the user what video bitrate he/she wants
             if ($self->{'multipass'} || !$self->{'vbr'}) {
@@ -122,9 +124,9 @@ package export::transcode::XviD;
         my $episode = shift;
     # Make sure we have finfo
         load_finfo($episode);
+        $self->{'out_fps'} = $episode->{'finfo'}{'fps'};
     # Build the transcode string
-        my $params = " -Z $self->{'width'}x$self->{'height'}"
-                    ." -N 0x55" # make *sure* we're exporting mp3 audio
+        my $params = " -N 0x55" # make *sure* we're exporting mp3 audio
                     ." -b $self->{'a_bitrate'},0,2,0"
                     ;
        # unless ($episode->{'finfo'}{'fps'} =~ /^2(?:5|4\.9)/) {

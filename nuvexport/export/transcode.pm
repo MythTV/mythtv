@@ -64,6 +64,12 @@ package export::transcode;
     # Init the commands
         my $transcode     = '';
         my $mythtranscode = '';
+
+        my $aspect;
+        my $width;
+        my $height;
+        my $pad_h;
+        my $pad_w;
     # Load nuv info
         load_finfo($episode);
     # Start the transcode command
@@ -92,6 +98,118 @@ package export::transcode;
                 $transcode .= '4';
             }
         }
+    # Output aspect ratio
+        if ($self->{'out_aspect'}) {
+            $aspect = $self->{'out_aspect'};
+        } else {
+            $aspect = $episode->{'finfo'}{'aspect'};
+        }
+
+        if ($self->{'aspect_stretched'}) {
+            # The output is actually a stretched aspect ratio
+            # (like 480x480 for SVCD, which is 4:3)
+
+            # Stretch the width to the full aspect ratio for calculating
+            $width = int($self->{'height'} * $aspect + 0.5);
+            # Calculate the height required to keep the source in aspect
+            $height = $width / $episode->{'finfo'}{'aspect'};
+            # Round to nearest even number
+            $height = int(($height + 2) / 4) * 4;
+            # Calculate how much to pad the height (both top & bottom)
+            $pad_h = int(($self->{'height'} - $height) / 2);
+            # Set the real width again
+            $width = $self->{'width'};
+            # No padding on the width
+            $pad_w = 0;
+        } else {
+            # The output will need letter/pillarboxing
+            if ($self->{'width'} / $self->{'height'} <= $aspect) {
+                # We need to letterbox
+                $width = $self->{'width'};
+                $height = $width / $episode->{'finfo'}{'aspect'};
+                $height = int(($height + 2) / 4) * 4;
+                $pad_h = int(($self->{'height'} - $height) / 2);
+                $pad_w = 0;
+            } else {
+                # We need to pillarbox
+                $height = $self->{'height'};
+                $width = $height * $episode->{'finfo'}{'aspect'};
+                $width = int(($width + 2) / 4) * 4;
+                $pad_w = int(($self->{'width'} - $width) / 2);
+                $pad_h = 0;
+            }
+        }
+
+        $transcode .= ' --export_asr ';
+        if ($aspect == 1) {
+            $transcode .= '1';
+        }
+        elsif ($aspect =~ m/^1.3/) {
+            # 4:3
+            $transcode .= '2';
+        }
+        elsif ($aspect =~ m/^1.7/) {
+            # 16:9
+            $transcode .= '3';
+        }
+        elsif ($aspect == 2.21) {
+            $transcode .= '4';
+        }
+
+        my $fpsout = $self->{'out_fps'};
+        $transcode .= " --export_fps $fpsout";
+        if ($fpsout == 23.976) {
+            $transcode .= ",1";
+        }
+        elsif ($fpsout == 24) {
+            $transcode .= ",2";
+        }
+        elsif ($fpsout == 25) {
+            $transcode .= ",3";
+        }
+        elsif ($fpsout == 29.97) {
+            $transcode .= ",4";
+        }
+        elsif ($fpsout == 30) {
+            $transcode .= ",5";
+        }
+        elsif ($fpsout == 50) {
+            $transcode .= ",6";
+        }
+        elsif ($fpsout == 59.94) {
+            $transcode .= ",7";
+        }
+        elsif ($fpsout == 60) {
+            $transcode .= ",8";
+        }
+        elsif ($fpsout == 1) {
+            $transcode .= ",9";
+        }
+        elsif ($fpsout == 5) {
+            $transcode .= ",10";
+        }
+        elsif ($fpsout == 10) {
+            $transcode .= ",11";
+        }
+        elsif ($fpsout == 12) {
+            $transcode .= ",12";
+        }
+        elsif ($fpsout == 15) {
+            $transcode .= ",13";
+        }
+
+        if ($fpsout != $episode->{'finfo'}{'fps'}) {
+            $transcode .= " -J fps=" . $episode->{'finfo'}{'fps'} . ":" .
+                          $fpsout . ":pre";
+        }
+
+    # Resize & pad
+        $transcode .= " -Z $width"."x$height";
+        if( $pad_h || $pad_w ) {
+            $transcode .= " -Y ".(-1*$pad_h).",".(-1*$pad_w).",".(-1*$pad_h).
+                          ",".(-1*$pad_w);
+        }
+
     # Not an mpeg
         unless ($episode->{'finfo'}{'is_mpeg'}) {
         # swap red/blue -- used with svcd, need to see if it's needed everywhere

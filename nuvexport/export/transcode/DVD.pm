@@ -85,24 +85,22 @@ package export::transcode::DVD;
         }
     # Ask the user what video bitrate he/she wants, or calculate the max bitrate
         my $max_v_bitrate = 9500 - $self->{'a_bitrate'};
-        if ($self->val('v_bitrate') > $max_v_bitrate || $self->val('confirm')) {
-            if ($self->val('v_bitrate') > $max_v_bitrate) {
-                 $self->{'v_bitrate'} = $max_v_bitrate;
+        if ($self->val('v_bitrate') > $max_v_bitrate) {
+             $self->{'v_bitrate'} = $max_v_bitrate;
+        }
+        while (1) {
+            my $v_bitrate = query_text('Maximum video bitrate for VBR?',
+                                       'int',
+                                       $self->val('v_bitrate'));
+            if ($v_bitrate < 1000) {
+                print "Too low; please choose a bitrate between 1000 and $max_v_bitrate.\n";
             }
-            while (1) {
-                my $v_bitrate = query_text('Maximum video bitrate for VBR?',
-                                           'int',
-                                           $self->val('v_bitrate'));
-                if ($v_bitrate < 1000) {
-                    print "Too low; please choose a bitrate between 1000 and $max_v_bitrate.\n";
-                }
-                elsif ($v_bitrate > $max_v_bitrate) {
-                    print "Too high; please choose a bitrate between 1000 and $max_v_bitrate.\n";
-                }
-                else {
-                    $self->{'v_bitrate'} = $v_bitrate;
-                    last;
-                }
+            elsif ($v_bitrate > $max_v_bitrate) {
+                print "Too high; please choose a bitrate between 1000 and $max_v_bitrate.\n";
+            }
+            else {
+                $self->{'v_bitrate'} = $v_bitrate;
+                last;
             }
         }
     # Ask the user what vbr quality (quantisation) he/she wants - 1..31
@@ -128,14 +126,19 @@ package export::transcode::DVD;
         my $episode = shift;
     # Load nuv info
         load_finfo($episode);
+    # Force to 4:3 aspect ratio
+        $self->{'out_aspect'} = 1.3333;
+        $self->{'aspect_stretched'} = 1;
     # PAL or NTSC?
         my $standard = ($episode->{'finfo'}{'fps'} =~ /^2(?:5|4\.9)/) ? 'PAL' : 'NTSC';
-        my $res = ($standard eq 'PAL') ? '720x576' : '720x480';
+        $self->{'width'} = 720;
+        $self->{'height'} = ($standard eq 'PAL') ? '576' : '480';
+        $self->{'out_fps'} = ($standard eq 'PAL') ? 25 : 29.97;
         my $ntsc = ($standard eq 'PAL') ? '' : '-N';
     # Build the transcode string
-        $self->{'transcode_xtra'} = " -y mpeg2enc,mp2enc -Z $res"
+        $self->{'transcode_xtra'} = " -y mpeg2enc,mp2enc"
                                    .' -F 8,"-q '.$self->{'quantisation'}
-			           .        ' -Q 2 -V 230 -4 2 -2 1"'
+                                   .' -Q 2 -V 230 -4 2 -2 1"'
                                    .' -w '.$self->{'v_bitrate'}
                                    .' -E 48000 -b '.$self->{'a_bitrate'};
     # Add the temporary files that will need to be deleted

@@ -70,12 +70,17 @@ package export::transcode::VCD;
         my $episode = shift;
     # Load nuv info
         load_finfo($episode);
+    # Force to 4:3 aspect ratio
+        $self->{'out_aspect'} = 1.3333;
+        $self->{'aspect_stretched'} = 1;
     # PAL or NTSC?
         my $standard = ($episode->{'finfo'}{'fps'} =~ /^2(?:5|4\.9)/) ? 'PAL' : 'NTSC';
-        my $res = ($standard eq 'PAL') ? '352x288' : '352x240';
+        $self->{'width'} = 352;
+        $self->{'height'} = ($standard eq 'PAL') ? '288' : '240';
+        $self->{'out_fps'} = ($standard eq 'PAL') ? 25 : 29.97;
         my $ntsc = ($standard eq 'PAL') ? '' : '-N';
     # Build the transcode string
-        $self->{'transcode_xtra'} = " -y mpeg2enc,mp2enc -Z $res"
+        $self->{'transcode_xtra'} = " -y mpeg2enc,mp2enc"
                                    .' -F 1 -E 44100 -b 224';
     # Add the temporary files that will need to be deleted
         push @tmpfiles, $self->get_outfile($episode, ".$$.m1v"), $self->get_outfile($episode, ".$$.mpa");

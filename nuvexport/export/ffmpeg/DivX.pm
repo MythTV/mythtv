@@ -119,6 +119,7 @@ package export::ffmpeg::DivX;
         my $episode = shift;
     # Make sure we have finfo
         load_finfo($episode);
+        $self->{'out_fps'} = $episode->{'finfo'}{'fps'};
     # Dual pass?
         if ($self->{'multipass'}) {
         # Add the temporary file to the list

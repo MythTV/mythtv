@@ -88,24 +88,22 @@ package export::ffmpeg::DVD;
         }
     # Ask the user what video bitrate he/she wants, or calculate the max bitrate
         my $max_v_bitrate = 9500 - $self->{'a_bitrate'};
-        if ($self->val('v_bitrate') > $max_v_bitrate || $self->val('confirm')) {
-            if ($self->val('v_bitrate') > $max_v_bitrate) {
-                 $self->{'v_bitrate'} = $max_v_bitrate;
+        if ($self->val('v_bitrate') > $max_v_bitrate) {
+             $self->{'v_bitrate'} = $max_v_bitrate;
+        }
+        while (1) {
+            my $v_bitrate = query_text('Maximum video bitrate for VBR?',
+                                       'int',
+                                       $self->val('v_bitrate'));
+            if ($v_bitrate < 1000) {
+                print "Too low; please choose a bitrate between 1000 and $max_v_bitrate.\n";
             }
-            while (1) {
-                my $v_bitrate = query_text('Maximum video bitrate for VBR?',
-                                           'int',
-                                           $self->val('v_bitrate'));
-                if ($v_bitrate < 1000) {
-                    print "Too low; please choose a bitrate between 1000 and $max_v_bitrate.\n";
-                }
-                elsif ($v_bitrate > $max_v_bitrate) {
-                    print "Too high; please choose a bitrate between 1000 and $max_v_bitrate.\n";
-                }
-                else {
-                    $self->{'v_bitrate'} = $v_bitrate;
-                    last;
-                }
+            elsif ($v_bitrate > $max_v_bitrate) {
+                print "Too high; please choose a bitrate between 1000 and $max_v_bitrate.\n";
+            }
+            else {
+                $self->{'v_bitrate'} = $v_bitrate;
+                last;
             }
         }
     # Ask the user what vbr quality (quantisation) he/she wants - 1..31
@@ -138,6 +136,7 @@ package export::ffmpeg::DVD;
         my $standard = ($episode->{'finfo'}{'fps'} =~ /^2(?:5|4\.9)/) ? 'PAL' : 'NTSC';
         $self->{'width'} = 720;
         $self->{'height'} = ($standard eq 'PAL') ? '576' : '480';
+        $self->{'out_fps'} = ($standard eq 'PAL') ? 25 : 29.97;
     # Build the ffmpeg string
         $self->{'ffmpeg_xtra'} = ' -b ' . $self->{'v_bitrate'}
                                . ' -vcodec mpeg2video'

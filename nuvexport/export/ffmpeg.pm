@@ -146,6 +146,10 @@ package export::ffmpeg;
         if (!$self->{'audioonly'}) {
             $ffmpeg .= " -f $videotype";
             $ffmpeg .= " -s " . $episode->{'finfo'}{'width'} . "x" . $episode->{'finfo'}{'height'};
+            $ffmpeg .= " -aspect " . $episode->{'finfo'}{'aspect'};
+            $ffmpeg .= " -r " . $episode->{'finfo'}{'fps'};
+            $ffmpeg .= " -i $videofifo";
+
             if ($self->{'out_aspect'}) {
                 $aspect = $self->{'out_aspect'};
             } else {
@@ -188,8 +192,7 @@ package export::ffmpeg;
             }
 
             $ffmpeg .= " -aspect " . $aspect;
-            $ffmpeg .= " -r " . $episode->{'finfo'}{'fps'};
-            $ffmpeg .= " -i $videofifo";
+            $ffmpeg .= " -r " . $self->{'out_fps'};
 
         # Deinterlace in ffmpeg only if the user wants to
             if ($self->val('deinterlace') && !($self->val('noise_reduction') && $self->val('deint_in_yuvdenoise'))) {
