@@ -602,6 +602,8 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
             guide->SetJustification(Qt::AlignHCenter | Qt::AlignVCenter | jst);
         else if (align.lower() == "vcenter")
             guide->SetJustification(Qt::AlignVCenter | jst);
+        else if (align.lower() == "hcenter")
+            guide->SetJustification(Qt::AlignHCenter | jst);
     }
     else 
         guide->SetJustification(jst);
@@ -725,6 +727,9 @@ void XMLParse::parseBar(LayerSet *container, QDomElement &element)
             bar->SetJustification(Qt::AlignHCenter | Qt::AlignVCenter);
         else if (align.lower() == "vcenter")
             bar->SetJustification(Qt::AlignVCenter);
+        else if (align.lower() == "hcenter")
+            bar->SetJustification(Qt::AlignHCenter);
+    
     }
     align = "";
 
@@ -1027,6 +1032,8 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
             text->SetJustification(jst | Qt::AlignHCenter | Qt::AlignVCenter);
         else if (align.lower() == "vcenter")
             text->SetJustification(jst | Qt::AlignVCenter);
+        else if (align.lower() == "hcenter")
+            text->SetJustification(jst | Qt::AlignHCenter);
     }
     align = "";
     text->SetParent(container);
