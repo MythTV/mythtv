@@ -5,7 +5,11 @@
 #include <qobject.h>
 #include <qptrlist.h>
 #include <qstringlist.h>
-#include <iostream.h>
+#include <iostream>
+
+#include <mythtv/mythcontext.h>
+
+using namespace std;
 
 GameHandler::~GameHandler()
 {
@@ -13,19 +17,19 @@ GameHandler::~GameHandler()
 
 static QPtrList<GameHandler> *handlers = 0;
 
-static void checkHandlers()
+static void checkHandlers(MythContext *context)
 {
     if (! handlers)
     {
         handlers = new QPtrList<GameHandler>;
 
-        GameHandler::registerHandler(MameHandler::getHandler());
+        GameHandler::registerHandler(MameHandler::getHandler(context));
     }
 }
 
-void GameHandler::processAllGames()
+void GameHandler::processAllGames(MythContext *context)
 {
-    checkHandlers();
+    checkHandlers(context);
     GameHandler *handler = handlers->first();
     while(handler)
     {
@@ -34,9 +38,9 @@ void GameHandler::processAllGames()
     }
 }
 
-GameHandler* GameHandler::GetHandler(RomInfo *rominfo)
+GameHandler* GameHandler::GetHandler(MythContext *context, RomInfo *rominfo)
 {
-    checkHandlers();
+    checkHandlers(context);
     GameHandler *handler = handlers->first();
     while(handler)
     {
@@ -48,31 +52,33 @@ GameHandler* GameHandler::GetHandler(RomInfo *rominfo)
     return handler;
 }
 
-void GameHandler::Launchgame(RomInfo *romdata)
+void GameHandler::Launchgame(MythContext *context, RomInfo *romdata)
 {
     GameHandler *handler;
-    if((handler = GetHandler(romdata)))
+    if((handler = GetHandler(context, romdata)))
         handler->start_game(romdata);
 }
 
-void GameHandler::EditSettings(QWidget *parent,RomInfo *romdata)
+void GameHandler::EditSettings(MythContext *context, QWidget *parent,
+                               RomInfo *romdata)
 {
     GameHandler *handler;
-    if((handler = GetHandler(romdata)))
+    if((handler = GetHandler(context, romdata)))
         handler->edit_settings(parent,romdata);
 }
 
-void GameHandler::EditSystemSettings(QWidget *parent,RomInfo *romdata)
+void GameHandler::EditSystemSettings(MythContext *context, QWidget *parent,
+                                     RomInfo *romdata)
 {
     GameHandler *handler;
-    if((handler = GetHandler(romdata)))
+    if((handler = GetHandler(context, romdata)))
         handler->edit_system_settings(parent,romdata);
 }
 
-RomInfo* GameHandler::CreateRomInfo(RomInfo* parent)
+RomInfo* GameHandler::CreateRomInfo(MythContext *context, RomInfo* parent)
 {
     GameHandler *handler;
-    if((handler = GetHandler(parent)))
+    if((handler = GetHandler(context, parent)))
         return handler->create_rominfo(parent);
     return NULL;
 }

@@ -4,9 +4,7 @@
 #include <qimage.h>
 
 #include "treeitem.h"
-#include <mythtv/settings.h>
-
-extern Settings *globalsettings;
+#include <mythtv/mythcontext.h>
 
 #include "res/system_pix.xpm"
 #include "res/genre_pix.xpm"
@@ -17,22 +15,24 @@ QPixmap *TreeItem::game = NULL;
 QPixmap *TreeItem::genre = NULL;
 bool TreeItem::pixmapsSet = false;
 
-TreeItem::TreeItem(QListView *parent, QString &ltext,
-                             const QString &llevel, RomInfo *rinfo)
-             : QListViewItem(parent, ltext.prepend(" "))
+TreeItem::TreeItem(MythContext *context, QListView *parent, QString &ltext,
+                   const QString &llevel, RomInfo *rinfo)
+        : QListViewItem(parent, ltext.prepend(" "))
 {
     level = llevel;
     rominfo = rinfo;
+    m_context = context;
 
     pickPixmap();
 }
 
-TreeItem::TreeItem(TreeItem *parent, QString &ltext,
-                             const QString &llevel, RomInfo *rinfo)
-             : QListViewItem(parent, ltext.prepend(" "))
+TreeItem::TreeItem(MythContext *context, TreeItem *parent, QString &ltext,
+                   const QString &llevel, RomInfo *rinfo)
+        : QListViewItem(parent, ltext.prepend(" "))
 {
     level = llevel;
     rominfo = rinfo;
+    m_context = context;
 
     pickPixmap();
 }
@@ -40,7 +40,7 @@ TreeItem::TreeItem(TreeItem *parent, QString &ltext,
 void TreeItem::pickPixmap(void)
 {
     if (!pixmapsSet)
-        setupPixmaps();
+        setupPixmaps(m_context);
 
     if (level == "system")
         setPixmap(0, *system);
@@ -58,18 +58,12 @@ void TreeItem::pickPixmap(void)
         setPixmap(0, *genre);
 }
 
-void TreeItem::setupPixmaps(void)
+void TreeItem::setupPixmaps(MythContext *context)
 {
-    int screenheight = QApplication::desktop()->height();
-    int screenwidth = QApplication::desktop()->width();
+    int screenwidth = 0, screenheight = 0;
+    float wmult = 0, hmult = 0;
 
-    if (globalsettings->GetNumSetting("GuiWidth") > 0)
-        screenwidth = globalsettings->GetNumSetting("GuiWidth");
-    if (globalsettings->GetNumSetting("GuiHeight") > 0)
-        screenheight = globalsettings->GetNumSetting("GuiHeight");
-
-    float wmult = screenwidth / 800.0;
-    float hmult = screenheight / 600.0;
+    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     if (screenheight != 600 || screenwidth != 800) 
     {   
@@ -91,8 +85,8 @@ QPixmap *TreeItem::scalePixmap(const char **xpmdata, float wmult,
                                     float hmult)
 {
     QImage tmpimage(xpmdata);
-    QImage tmp2 = tmpimage.smoothScale(tmpimage.width() * wmult, 
-                                       tmpimage.height() * hmult);
+    QImage tmp2 = tmpimage.smoothScale((int)(tmpimage.width() * wmult), 
+                                       (int)(tmpimage.height() * hmult));
     QPixmap *ret = new QPixmap();
     ret->convertFromImage(tmp2);
 

@@ -12,12 +12,13 @@ class QListViewItem;
 class TreeItem;
 class QLabel;
 class QListView;
+class MythContext;
 
 class DatabaseBox : public QDialog
 {
     Q_OBJECT
   public:
-    DatabaseBox(QSqlDatabase *ldb, QString &paths,
+    DatabaseBox(MythContext *context, QSqlDatabase *ldb, QString &paths,
                 QWidget *parent = 0, const char *name = 0);
 
     void Show();
@@ -41,6 +42,8 @@ class DatabaseBox : public QDialog
     QSqlDatabase *db;
 
     QValueList<RomInfo> *rlist;
+
+    MythContext *m_context;
 };
 
 #endif

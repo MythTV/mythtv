@@ -1,5 +1,5 @@
 #include "mamesettingsdlg.h"
-#include <iostream.h>
+#include <iostream>
 
 #include <qapplication.h>
 #include <qvariant.h>
@@ -21,27 +21,27 @@
 
 #include "mamehandler.h"
 
-#include <mythtv/settings.h>
+#include <mythtv/mythcontext.h>
 
-extern Settings *globalsettings;
+using namespace std;
 
 #define SAVE_SETTINGS 1
 #define DONT_SAVE_SETTINGS 0
 
-MameSettingsDlg::MameSettingsDlg( QWidget* parent,  const char* name, bool modal, bool system, WFlags fl )
+MameSettingsDlg::MameSettingsDlg(MythContext *context, QWidget* parent,  
+                                 const char* name, bool modal, bool system, 
+                                 WFlags fl)
     : QDialog( parent, name, modal, fl ), bSystem(system)
 {
+    m_context = context;
+
     setCursor(QCursor(Qt::BlankCursor));
     if ( !name )
       setName( "MameSettings" );
 
-    int screenheight = QApplication::desktop()->height();
-    int screenwidth = QApplication::desktop()->width();
+    int screenwidth = 0, screenheight = 0;
 
-    if (globalsettings->GetNumSetting("GuiWidth") > 0)
-        screenwidth = globalsettings->GetNumSetting("GuiWidth");
-    if (globalsettings->GetNumSetting("GuiHeight") > 0)
-        screenheight = globalsettings->GetNumSetting("GuiHeight");
+    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     resize( screenwidth, screenheight );
     setSizePolicy( QSizePolicy( (QSizePolicy::SizeType)0, (QSizePolicy::SizeType)0, 0, 0, sizePolicy().hasHeightForWidth() ) );
@@ -57,88 +57,106 @@ MameSettingsDlg::MameSettingsDlg( QWidget* parent,  const char* name, bool modal
     MameTab->setBackgroundOrigin( QTabWidget::WindowOrigin );
     QFont MameTab_font(  MameTab->font() );
     MameTab_font.setFamily( "Helvetica [Urw]" );
-    MameTab_font.setPointSize( 16 );
+    MameTab_font.setPointSize( (int)(m_context->GetMediumFontSize() * wmult));
     MameTab_font.setBold( TRUE );
     MameTab->setFont( MameTab_font );
 
     SettingsTab = new QWidget( MameTab, "SettingsTab" );
 
     SettingsFrame = new QFrame( SettingsTab, "SettingsFrame" );
-    SettingsFrame->setGeometry( QRect( 0, 33, 800, 480 ) );
+    SettingsFrame->setGeometry( QRect(0, (int)(33 * hmult), 
+                                      (int)(800 * wmult), (int)(480 * hmult)));
     //SettingsFrame->setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
     SettingsFrame->setFrameShape( QFrame::StyledPanel );
     SettingsFrame->setFrameShadow( QFrame::Raised );
 
     DisplayGroup = new QGroupBox( SettingsFrame, "DisplayGroup" );
-    DisplayGroup->setGeometry( QRect( 0, 10, 420, 480 ) );
+    DisplayGroup->setGeometry( QRect(0, (int)(10 * hmult), 
+                                     (int)(420 * wmult), (int)(480 * hmult)));
     //DisplayGroup->setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
     DisplayGroup->setTitle( trUtf8( "Display" ) );
 
     FullCheck = new QCheckBox( DisplayGroup, "FullCheck" );
-    FullCheck->setGeometry( QRect( 11, 31, 160, 31 ) ); 
+    FullCheck->setGeometry( QRect((int)(11 * wmult), (int)(31 * hmult), 
+                                  (int)(160 * wmult), (int)(31 * hmult))); 
     FullCheck->setText( trUtf8( "Full screen" ) );
 
     SkipCheck = new QCheckBox( DisplayGroup, "SkipCheck" );
-    SkipCheck->setGeometry( QRect( 195, 31, 214, 31 ) ); 
+    SkipCheck->setGeometry( QRect( (int)(195 * wmult), (int)(31 * hmult), 
+                                   (int)(214 * wmult), (int)(31 * hmult))); 
     SkipCheck->setText( trUtf8( "Auto frame skip" ) );
 
     LeftCheck = new QCheckBox( DisplayGroup, "LeftCheck" );
-    LeftCheck->setGeometry( QRect( 11, 68, 170, 31 ) ); 
+    LeftCheck->setGeometry( QRect( (int)(11 * wmult), (int)(68 * hmult), 
+                                   (int)(170 * wmult), (int)(31 * hmult) ) ); 
     LeftCheck->setText( trUtf8( "Rotate Left" ) );
 
     RightCheck = new QCheckBox( DisplayGroup, "RightCheck" );
-    RightCheck->setGeometry( QRect( 195, 68, 190, 31 ) ); 
+    RightCheck->setGeometry( QRect( (int)(195 * wmult), (int)(68 * hmult), 
+                                    (int)(190 * wmult), (int)(31 * hmult) ) ); 
     RightCheck->setText( trUtf8( "Rotate Right" ) );
 
     FlipXCheck = new QCheckBox( DisplayGroup, "FlipXCheck" );
-    FlipXCheck->setGeometry( QRect( 11, 105, 178, 31 ) ); 
+    FlipXCheck->setGeometry( QRect( (int)(11 * wmult), (int)(105 * hmult), 
+                                    (int)(178 * wmult), (int)(31 * hmult))); 
     FlipXCheck->setText( trUtf8( "Flip X Axis" ) );
 
     FlipYCheck = new QCheckBox( DisplayGroup, "FlipYCheck" );
-    FlipYCheck->setGeometry( QRect( 195, 105, 180, 31 ) ); 
+    FlipYCheck->setGeometry( QRect( (int)(195 * wmult), (int)(105 * hmult), 
+                                    (int)(180 * wmult), (int)(31 * hmult))); 
     FlipYCheck->setText( trUtf8( "Flip Y Axis" ) );
 
     ExtraArtCheck = new QCheckBox( DisplayGroup, "ExtraArtCheck" );
-    ExtraArtCheck->setGeometry( QRect( 195, 142, 200, 31 ) ); 
+    ExtraArtCheck->setGeometry( QRect( (int)(195 * wmult), (int)(142 * hmult), 
+                                       (int)(200 * wmult), (int)(31 * hmult))); 
     ExtraArtCheck->setText( trUtf8( "Extra Artwork" ) );
 
     ScanCheck = new QCheckBox( DisplayGroup, "ScanCheck" );
-    ScanCheck->setGeometry( QRect( 10, 140, 178, 31 ) ); 
+    ScanCheck->setGeometry( QRect( (int)(10 * wmult), (int)(140 * hmult), 
+                                   (int)(178 * wmult), (int)(31 * hmult) ) ); 
     ScanCheck->setText( trUtf8( "Scanlines" ) );
 
     ColorCheck = new QCheckBox( DisplayGroup, "ColorCheck" );
-    ColorCheck->setGeometry( QRect( 11, 179, 398, 31 ) ); 
+    ColorCheck->setGeometry( QRect( (int)(11 * wmult), (int)(179 * hmult), 
+                                    (int)(398 * wmult), (int)(31 * hmult) ) ); 
     ColorCheck->setText( trUtf8( "Auto color depth" ) );
 
     ScaleLabel = new QLabel( DisplayGroup, "ScaleLabel" );
-    ScaleLabel->setGeometry( QRect( 20, 220, 71, 31 ) ); 
+    ScaleLabel->setGeometry( QRect( (int)(20 * wmult), (int)(220 * hmult), 
+                                    (int)(71 * wmult), (int)(31  * hmult)) ); 
     ScaleLabel->setText( trUtf8( "Scale" ) );
 
     ScaleSlider = new QSlider( DisplayGroup, "ScaleSlider" );
-    ScaleSlider->setGeometry( QRect( 97, 220, 270, 31 ) ); 
+    ScaleSlider->setGeometry( QRect( (int)(97 * wmult), (int)(220 * hmult), 
+                                     (int)(270 * wmult), (int)(31 * hmult) ) ); 
     ScaleSlider->setMinValue( 1 );
     ScaleSlider->setMaxValue( 5 );
     ScaleSlider->setOrientation( QSlider::Horizontal );
 
     ScaleValLabel = new QLabel( DisplayGroup, "ScaleValLabel" );
-    ScaleValLabel->setGeometry( QRect( 380, 220, 20, 31 ) ); 
+    ScaleValLabel->setGeometry( QRect( (int)(380 * wmult), (int)(220 * hmult), 
+                                       (int)(20 * wmult), (int)(31 * hmult))); 
     ScaleValLabel->setText( trUtf8( "5" ) );
 
     VectorGroup = new QGroupBox( DisplayGroup, "VectorGroup" );
     VectorGroup->setEnabled( TRUE );
-    VectorGroup->setGeometry( QRect( 17, 261, 391, 210 ) ); 
+    VectorGroup->setGeometry( QRect( (int)(17 * wmult), (int)(261 * hmult), 
+                                     (int)(391 * wmult), (int)(210 * hmult))); 
     VectorGroup->setTitle( trUtf8( "Vector" ) );
 
     AliasCheck = new QCheckBox( VectorGroup, "AliasCheck" );
-    AliasCheck->setGeometry( QRect( 10, 40, 170, 31 ) ); 
+    AliasCheck->setGeometry( QRect( (int)(10 * wmult), (int)(40 * hmult), 
+                                    (int)(170 * wmult), (int)(31 * hmult))); 
     AliasCheck->setText( trUtf8( "Antialiasing" ) );
 
     TransCheck = new QCheckBox( VectorGroup, "TransCheck" );
-    TransCheck->setGeometry( QRect( 190, 40, 190, 31 ) ); 
+    TransCheck->setGeometry( QRect( (int)(190 * wmult), (int)(40 * hmult), 
+                                    (int)(190 * wmult), (int)(31 * hmult) ) ); 
     TransCheck->setText( trUtf8( "Translucency" ) );
 
     ResBox = new QComboBox( FALSE, VectorGroup, "ResBox" );
-    ResBox->setGeometry( QRect( 170, 80, 210, 40 ) );
+    ResBox->setGeometry( QRect( (int)(170 * wmult), (int)(80 * hmult), 
+                                (int)(210 * wmult), (int)(40 * hmult) ) );
     ResBox->setFocusPolicy( QComboBox::TabFocus );
     ResBox->setAcceptDrops( TRUE );
     ResBox->setMaxCount( 6 );
@@ -150,108 +168,132 @@ MameSettingsDlg::MameSettingsDlg( QWidget* parent,  const char* name, bool modal
     ResBox->insertItem(trUtf8("1600 x 1200"));
 
     ResLabel = new QLabel( VectorGroup, "ResLabel" );
-    ResLabel->setGeometry( QRect( 10, 82, 150, 31 ) );
+    ResLabel->setGeometry( QRect( (int)(10 * wmult), (int)(82 * hmult), 
+                                  (int)(150 * wmult), (int)(31 * hmult) ) );
     ResLabel->setText( trUtf8( "Resolution" ) );
 
     BeamLabel = new QLabel( VectorGroup, "BeamLabel" );
-    BeamLabel->setGeometry( QRect( 10, 129, 80, 31 ) ); 
+    BeamLabel->setGeometry( QRect( (int)(10 * wmult), (int)(129 * hmult), 
+                                   (int)(80 * wmult), (int)(31 * hmult) ) ); 
     BeamLabel->setText( trUtf8( "Beam" ) );
 
     BeamSlider = new QSlider( VectorGroup, "BeamSlider" );
-    BeamSlider->setGeometry( QRect( 100, 130, 220, 31 ) ); 
-    BeamSlider->setMouseTracking( TRUE );
+    BeamSlider->setGeometry( QRect( (int)(100 * wmult), (int)(130 * hmult), 
+                                    (int)(220 * wmult), (int)(31 * hmult) ) ); 
+    BeamSlider->setMouseTracking( TRUE ); 
     BeamSlider->setMinValue( 10 );
     BeamSlider->setMaxValue( 150 );
     BeamSlider->setOrientation( QSlider::Horizontal );
 
     BeamValLabel = new QLabel( VectorGroup, "BeamValLabel" );
-    BeamValLabel->setGeometry( QRect( 330, 130, 52, 31 ) ); 
+    BeamValLabel->setGeometry( QRect( (int)(330 * wmult), (int)(130 * hmult), 
+                                      (int)(52 * wmult), (int)(31 * hmult) ) ); 
     BeamValLabel->setText( trUtf8( "13.8" ) );
 
     FlickerLabel = new QLabel( VectorGroup, "FlickerLabel" );
-    FlickerLabel->setGeometry( QRect( 10, 169, 90, 31 ) ); 
+    FlickerLabel->setGeometry( QRect( (int)(10 * wmult), (int)(169 * hmult), 
+                                      (int)(90 * wmult), (int)(31 * hmult) ) ); 
     FlickerLabel->setText( trUtf8( "Flicker" ) );
 
     FlickerSlider = new QSlider( VectorGroup, "FlickerSlider" );
-    FlickerSlider->setGeometry( QRect( 100, 170, 220, 30 ) ); 
+    FlickerSlider->setGeometry( QRect( (int)(100 * wmult), (int)(170 * hmult), 
+                                       (int)(220 * wmult), (int)(30 * hmult))); 
     FlickerSlider->setOrientation( QSlider::Horizontal );
 
     FlickerValLabel = new QLabel( VectorGroup, "FlickerValLabel" );
-    FlickerValLabel->setGeometry( QRect( 330, 170, 52, 31 ) ); 
+    FlickerValLabel->setGeometry( QRect( (int)(330 * wmult), (int)(170 * hmult),
+                                         (int)(52 * wmult), (int)(31 * hmult)));
     FlickerValLabel->setText( trUtf8( "88.8" ) );
 
     SoundGroup = new QGroupBox( SettingsFrame, "SoundGroup" );
-    SoundGroup->setGeometry( QRect( 410, 230, 390, 160 ) ); 
+    SoundGroup->setGeometry( QRect( (int)(410 * wmult), (int)(230 * hmult), 
+                                    (int)(390 * wmult), (int)(160 * hmult)) ); 
     //SoundGroup->setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
     SoundGroup->setTitle( trUtf8( "Sound" ) );
 
     VolumeLabel = new QLabel( SoundGroup, "VolumeLabel" );
-    VolumeLabel->setGeometry( QRect( 17, 120, 95, 31 ) ); 
+    VolumeLabel->setGeometry( QRect( (int)(17 * wmult), (int)(120 * hmult), 
+                                     (int)(95 * wmult), (int)(31 * hmult) ) ); 
     VolumeLabel->setText( trUtf8( "Volume" ) );
 
     SoundCheck = new QCheckBox( SoundGroup, "SoundCheck" );
-    SoundCheck->setGeometry( QRect( 7, 40, 160, 31 ) ); 
+    SoundCheck->setGeometry( QRect( (int)(7 * wmult), (int)(40 * hmult), 
+                                    (int)(160 * wmult), (int)(31 * hmult) ) ); 
     SoundCheck->setText( trUtf8( "Use Sound" ) );
 
     SamplesCheck = new QCheckBox( SoundGroup, "SamplesCheck" );
-    SamplesCheck->setGeometry( QRect( 177, 40, 201, 31 ) ); 
+    SamplesCheck->setGeometry( QRect( (int)(177 * wmult), (int)(40 * hmult), 
+                                      (int)(201 * wmult), (int)(31 * hmult))); 
     SamplesCheck->setText( trUtf8( "Use Samples" ) );
 
     FakeCheck = new QCheckBox( SoundGroup, "FakeCheck" );
-    FakeCheck->setGeometry( QRect( 7, 80, 180, 31 ) ); 
+    FakeCheck->setGeometry( QRect( (int)(7 * wmult), (int)(80 * hmult), 
+                                   (int)(180 * wmult), (int)(31 * hmult) ) ); 
     FakeCheck->setText( trUtf8( "Fake Sound" ) );
 
     VolumeValLabel = new QLabel( SoundGroup, "VolumeValLabel" );
-    VolumeValLabel->setGeometry( QRect( 340, 120, 40, 27 ) ); 
+    VolumeValLabel->setGeometry( QRect((int)(340 * wmult), (int)(120 * hmult), 
+                                       (int)(40 * wmult), (int)(27 * hmult))); 
     VolumeValLabel->setText( trUtf8( "-32" ) );
 
     VolumeSlider = new QSlider( SoundGroup, "VolumeSlider" );
-    VolumeSlider->setGeometry( QRect( 117, 120, 220, 31 ) ); 
+    VolumeSlider->setGeometry( QRect( (int)(117 * wmult), (int)(120 * hmult), 
+                                      (int)(220 * wmult), (int)(31 * hmult))); 
     VolumeSlider->setMinValue( -32 );
     VolumeSlider->setMaxValue( 0 );
     VolumeSlider->setOrientation( QSlider::Horizontal );
 
     MiscGroup = new QGroupBox( SettingsFrame, "MiscGroup" );
-    MiscGroup->setGeometry( QRect( 407, 390, 391, 91 ) ); 
+    MiscGroup->setGeometry( QRect( (int)(407 * wmult), (int)(390 * hmult), 
+                                   (int)(391 * wmult), (int)(91 * hmult) ) ); 
     //MiscGroup->setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
     MiscGroup->setTitle( trUtf8( "Miscelaneous" ) );
 
     OptionsLabel = new QLabel( MiscGroup, "OptionsLabel" );
-    OptionsLabel->setGeometry( QRect( 10, 50, 166, 31 ) ); 
+    OptionsLabel->setGeometry( QRect( (int)(10 * wmult), (int)(50 * hmult), 
+                                      (int)(166 * wmult), (int)(31 * hmult))); 
     OptionsLabel->setText( trUtf8( "Extra Options" ) );
 
     CheatCheck = new QCheckBox( MiscGroup, "CheatCheck" );
-    CheatCheck->setGeometry( QRect( 10, 30, 100, 21 ) ); 
+    CheatCheck->setGeometry( QRect( (int)(10 * wmult), (int)(30 * hmult), 
+                                    (int)(100 * wmult), (int)(21 * hmult) ) ); 
     CheatCheck->setText( trUtf8( "Cheat" ) );
 
     OptionsEdit = new QLineEdit( MiscGroup, "OptionsEdit" );
-    OptionsEdit->setGeometry( QRect( 180, 40, 201, 37 ) ); 
+    OptionsEdit->setGeometry( QRect( (int)(180 * wmult), (int)(40 * hmult), 
+                                     (int)(201 * wmult), (int)(37 * hmult) ) ); 
     OptionsEdit->setFocusPolicy( QLineEdit::TabFocus );
     OptionsEdit->setMaxLength( 1023 );
 
     InputGroup = new QGroupBox( SettingsFrame, "InputGroup" );
-    InputGroup->setGeometry( QRect( 410, 0, 410, 230 ) ); 
+    InputGroup->setGeometry( QRect( (int)(410 * wmult), 0, (int)(410 * wmult), 
+                                    (int)(230 * hmult) ) ); 
     //InputGroup->setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
     InputGroup->setTitle( trUtf8( "Input" ) );
 
     JoyLabel = new QLabel( InputGroup, "JoyLabel" );
-    JoyLabel->setGeometry( QRect( 27, 180, 105, 31 ) ); 
+    JoyLabel->setGeometry( QRect( (int)(27 * wmult), (int)(180 * hmult), 
+                                  (int)(105 * wmult), (int)(31 * hmult)) ); 
     JoyLabel->setText( trUtf8( "Joystick" ) );
 
     WinkeyCheck = new QCheckBox( InputGroup, "WinkeyCheck" );
-    WinkeyCheck->setGeometry( QRect( 11, 78, 388, 31 ) ); 
+    WinkeyCheck->setGeometry( QRect( (int)(11 * wmult), (int)(78 * hmult), 
+                                     (int)(388 * wmult), (int)(31 * hmult) ) ); 
     WinkeyCheck->setText( trUtf8( "Use Windows Keys" ) );
 
     MouseCheck = new QCheckBox( InputGroup, "MouseCheck" );
-    MouseCheck->setGeometry( QRect( 11, 125, 170, 31 ) ); 
+    MouseCheck->setGeometry( QRect( (int)(11 * wmult), (int)(125 * hmult), 
+                                    (int)(170 * wmult), (int)(31 * hmult) ) ); 
     MouseCheck->setText( trUtf8( "Use Mouse" ) );
 
     GrabCheck = new QCheckBox( InputGroup, "GrabCheck" );
-    GrabCheck->setGeometry( QRect( 188, 125, 191, 31 ) ); 
+    GrabCheck->setGeometry( QRect( (int)(188 * wmult), (int)(125 * hmult), 
+                                   (int)(191 * wmult), (int)(31 * hmult) ) ); 
     GrabCheck->setText( trUtf8( "Grab Mouse" ) );
 
     JoyBox = new QComboBox( FALSE, InputGroup, "JoyBox" );
-    JoyBox->setGeometry( QRect( 137, 170, 240, 41 ) ); 
+    JoyBox->setGeometry( QRect( (int)(137 * wmult), (int)(170 * hmult), 
+                                (int)(240 * wmult), (int)(41 * hmult) ) ); 
     JoyBox->setFocusPolicy( QComboBox::TabFocus );
     JoyBox->setSizeLimit( 5 );
     JoyBox->insertItem(trUtf8("No Joystick"));
@@ -261,17 +303,20 @@ MameSettingsDlg::MameSettingsDlg( QWidget* parent,  const char* name, bool modal
     JoyBox->insertItem(trUtf8("1.X.X Joystick"));
 
     JoyCheck = new QCheckBox( InputGroup, "JoyCheck" );
-    JoyCheck->setGeometry( QRect( 11, 31, 388, 31 ) ); 
+    JoyCheck->setGeometry( QRect( (int)(11 * wmult), (int)(31 * hmult),
+                                  (int)(388 * wmult), (int)(31 * hmult) ) ); 
     JoyCheck->setText( trUtf8( "Use Analog Joystick" ) );
 
     SaveButton = new QPushButton( SettingsTab, "SaveButton" );
-    SaveButton->setGeometry( QRect( 628, 513, 151, 40 ) ); 
+    SaveButton->setGeometry( QRect( (int)(628 * wmult), (int)(513 * hmult), 
+                                    (int)(151 * wmult), (int)(40 * hmult))); 
     SaveButton->setText( trUtf8( "Save" ) );
 
     if(!bSystem)
     {
         DefaultCheck = new QCheckBox( SettingsTab, "DefaultCheck" );
-        DefaultCheck->setGeometry( QRect( 8, 3, 190, 31 ) ); 
+        DefaultCheck->setGeometry(QRect((int)(8 * wmult), (int)(3 * hmult), 
+                                        (int)(190 * wmult), (int)(31 * hmult))); 
         DefaultCheck->setText( trUtf8( "use defaults" ) );
     }
     MameTab->insertTab( SettingsTab, trUtf8( "Settings" ) );
@@ -358,7 +403,8 @@ MameSettingsDlg::MameSettingsDlg( QWidget* parent,  const char* name, bool modal
     {
         SettingsFrame->setEnabled(true);
         ListButton = new QPushButton( SettingsTab, "ListButton" );
-        ListButton->setGeometry( QRect( 28, 513, 250, 40 ) );
+        ListButton->setGeometry( QRect( (int)(28 * wmult), (int)(513 * hmult), 
+                                        (int)(250 * wmult), (int)(40 * hmult)));
         ListButton->setText( trUtf8( "Reload Game List" ) );
         setTabOrder( SaveButton, ListButton );
         connect(ListButton, SIGNAL(pressed()), this,
@@ -396,9 +442,9 @@ int MameSettingsDlg::Show(GameSettings *settings, bool vector)
     AliasCheck->setChecked(game_settings->antialias);
     TransCheck->setChecked(game_settings->translucency);
     BeamSlider->setValue(int(game_settings->beam * 10));
-    setBeamLabel(game_settings->beam * 10);
+    setBeamLabel((int)(game_settings->beam * 10));
     FlickerSlider->setValue(int(game_settings->flicker * 10));
-    setFlickerLabel(game_settings->flicker * 10);
+    setFlickerLabel((int)(game_settings->flicker * 10));
     SoundCheck->setChecked(game_settings->sound);
     SamplesCheck->setChecked(game_settings->samples);
     FakeCheck->setChecked(game_settings->fake_sound);
@@ -501,7 +547,7 @@ void MameSettingsDlg::SetCabinet(QString picfile)
 void MameSettingsDlg::ScaleImageLabel(QPixmap &pixmap, QLabel *label)
 {
     int FrameWidth = width();
-    int FrameHeight = height() - 33;
+    int FrameHeight = (int)(height() - 33 * hmult);
     int ImageWidth = pixmap.width();
     int ImageHeight = pixmap.height();
     int x = 0, y = 0;
@@ -525,5 +571,5 @@ void MameSettingsDlg::ScaleImageLabel(QPixmap &pixmap, QLabel *label)
 
 void MameSettingsDlg::loadList()
 {
-    MameHandler::getHandler()->processGames();
+    MameHandler::getHandler(m_context)->processGames();
 }

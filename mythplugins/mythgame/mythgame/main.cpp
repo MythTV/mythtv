@@ -12,22 +12,19 @@ using namespace std;
 #include "rominfo.h"
 
 #include <mythtv/themedmenu.h>
-#include <mythtv/settings.h>
+#include <mythtv/mythcontext.h>
 
-Settings *globalsettings;
-char theprefix[] = PREFIX;
-
-void startDatabaseTree(QSqlDatabase *db, QString &paths)
+void startDatabaseTree(MythContext *context, QSqlDatabase *db, QString &paths)
 {
-    if(globalsettings->GetNumSetting("ShotCount")) // this will be a choice in the settings menu.
+    if(context->GetNumSetting("ShotCount")) // this will be a choice in the settings menu.
     {
-        ScreenBox screenbox(db, paths);
+        ScreenBox screenbox(context, db, paths);
         screenbox.Show();
         screenbox.exec();
     }
     else
     {
-        DatabaseBox dbbox(db, paths);
+        DatabaseBox dbbox(context, db, paths);
         dbbox.Show();
 
         dbbox.exec();
@@ -36,6 +33,7 @@ void startDatabaseTree(QSqlDatabase *db, QString &paths)
 
 struct GameCBData
 {
+    MythContext *context;
     QString paths;
     QSqlDatabase *db;
     QValueList<RomInfo> *romlist;
@@ -48,16 +46,17 @@ void GameCallback(void *data, QString &selection)
     QString sel = selection.lower();
 
     if (sel == "game_play")
-        startDatabaseTree(gdata->db, gdata->paths);
+        startDatabaseTree(gdata->context, gdata->db, gdata->paths);
 }
 
-bool runMenu(QString themedir, QSqlDatabase *db,
+void runMenu(MythContext *context, QString themedir, QSqlDatabase *db,
              QString paths, QValueList<RomInfo> &romlist)
 {
-    ThemedMenu *diag = new ThemedMenu(themedir.ascii(), theprefix, 
+    ThemedMenu *diag = new ThemedMenu(context, themedir.ascii(), 
                                       "gamemenu.xml");
 
     GameCBData data;
+    data.context = context;
     data.paths = paths;
     data.db = db;
     data.romlist = &romlist;
@@ -80,11 +79,9 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    globalsettings = new Settings();
+    MythContext *context = new MythContext();
 
-    globalsettings->LoadSettingsFiles("mythgame-settings.txt", theprefix);
-    globalsettings->LoadSettingsFiles("theme.txt", theprefix);
-    globalsettings->LoadSettingsFiles("mysql.txt", theprefix);
+    context->LoadSettingsFiles("mythgame-settings.txt");
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
@@ -92,11 +89,7 @@ int main(int argc, char *argv[])
         printf("Could not connect to database\n");
         return -1;
     }
-    db->setDatabaseName(globalsettings->GetSetting("DBName"));
-    db->setUserName(globalsettings->GetSetting("DBUserName"));
-    db->setPassword(globalsettings->GetSetting("DBPassword"));
-    db->setHostName(globalsettings->GetSetting("DBHostName"));
-    if (!db->open())
+    if (!context->OpenDatabase(db))
     {
         printf("could not open db\n");
         return -1;
@@ -108,25 +101,25 @@ int main(int argc, char *argv[])
     if (!query.isActive() || query.numRowsAffected() <= 0)
     {
         //for each game handler process it's games
-        GameHandler::processAllGames();
+        GameHandler::processAllGames(context);
     }
-    QString paths = globalsettings->GetSetting("TreeLevels");
+    QString paths = context->GetSetting("TreeLevels");
     QValueList<RomInfo> Romlist;
 
-    QString themename = globalsettings->GetSetting("Theme");
+    QString themename = context->GetSetting("Theme");
 
-    QString themedir = findThemeDir(themename, theprefix);
+    QString themedir = context->FindThemeDir(themename);
     if (themedir == "")
     {
         cerr << "Couldn't find theme " << themename << endl;
         exit(0);
     }
 
-    runMenu(themedir, db, paths, Romlist);
+    runMenu(context, themedir, db, paths, Romlist);
 
     db->close();
 
-    delete globalsettings;
+    delete context;
 
     return 0;
 }

@@ -5,12 +5,16 @@
 #include "mamerominfo.h"
 #include "mametypes.h"
 #include <qapplication.h>
-#include <map.h>
+#include <map>
+
+using namespace std;
+
+class MythContext;
 
 class MameHandler : public GameHandler
 {
   public:
-    MameHandler() {
+    MameHandler(MythContext *context) : GameHandler(context) {
                     systemname = "Mame";
                     SetGeneralPrefs();
                     SetDefaultSettings();
@@ -25,7 +29,7 @@ class MameHandler : public GameHandler
     QString Systemname() { return systemname; }
     void processGames();
 
-    static MameHandler* getHandler();
+    static MameHandler* getHandler(MythContext *context);
 
   protected:
     bool check_xmame_exe();

@@ -13,13 +13,14 @@ class QListViewItem;
 class TreeItem;
 class QLabel;
 class QListView;
+class MythContext;
 
 class ScreenBox : public QDialog
 {
     Q_OBJECT
   public:
-    ScreenBox(QSqlDatabase *ldb, QString &paths,
-                QWidget *parent = 0, const char *name = 0);
+    ScreenBox(MythContext *context, QSqlDatabase *ldb, QString &paths,
+              QWidget *parent = 0, const char *name = 0);
 
     void Show();
 
@@ -43,6 +44,8 @@ class ScreenBox : public QDialog
     SelectFrame *PicFrame;
     QString leafLevel;
     QLabel* mGameLabel;
+
+    MythContext *m_context;
 };
 
 #endif

@@ -2,9 +2,6 @@
 #include "mamerominfo.h"
 #include "mametypes.h"
 
-#include <mythtv/settings.h>
-
-extern Settings *globalsettings;
 extern struct Prefs general_prefs;
 
 void MameRomInfo::fillData(QSqlDatabase *db)
@@ -111,3 +108,4 @@ bool MameRomInfo::FindImage(QString type, QString *result)
 
     return (*result != "");
 }
+

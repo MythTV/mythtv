@@ -48,3 +48,4 @@ void RomInfo::fillData(QSqlDatabase *db)
         romname = query.value(4).toString();
     }
 }
+

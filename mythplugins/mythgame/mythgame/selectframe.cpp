@@ -3,19 +3,19 @@
 #include <qsqldatabase.h>
 #include <qpixmap.h>
 #include <qimage.h>
-#include <iostream.h>
+#include <iostream>
 #include <qlabel.h>
 #include <qimage.h>
 #include <stdlib.h>
 #include <qframe.h>
 
+using namespace std;
+
 #include "rominfo.h"
 #include "selectframe.h"
 #include "gamehandler.h"
 
-#include <mythtv/settings.h>
-
-extern Settings *globalsettings;
+#include <mythtv/mythcontext.h>
 
 void SelectFrame::keyPressEvent( QKeyEvent *e )
 {
@@ -61,7 +61,7 @@ void SelectFrame::focusInEvent(QFocusEvent* e)
     if(mButtons[mCurrentRow][mCurrentColumn]->isVisible())
     {
         mButtons[mCurrentRow][mCurrentColumn]->setFrameStyle(QFrame::Box | QFrame::Plain);
-        mButtons[mCurrentRow][mCurrentColumn]->setLineWidth(3);
+        mButtons[mCurrentRow][mCurrentColumn]->setLineWidth((int)(3 * wmult));
         emit gameChanged(RomList->current()->Gamename());
     }
     if((int)RomList->count() > mRows * mColumns)
@@ -73,7 +73,7 @@ void SelectFrame::focusInEvent(QFocusEvent* e)
 
 void SelectFrame::EditEvent()
 {
-    GameHandler::EditSettings(this,RomList->current());
+    GameHandler::EditSettings(m_context, this, RomList->current());
 }
 
 void SelectFrame::focusOutEvent(QFocusEvent* e)
@@ -90,7 +90,7 @@ void SelectFrame::focusOutEvent(QFocusEvent* e)
 
 void SelectFrame::CallSelection()
 {
-  GameHandler::Launchgame(RomList->current());
+  GameHandler::Launchgame(m_context, RomList->current());
 }
 
 void SelectFrame::UpEvent()
@@ -104,7 +104,7 @@ void SelectFrame::UpEvent()
             mButtons[mCurrentRow][mCurrentColumn]->setFrameStyle(QFrame::NoFrame);
             mCurrentRow--;
             mButtons[mCurrentRow][mCurrentColumn]->setFrameStyle(QFrame::Box | QFrame::Plain);
-            mButtons[mCurrentRow][mCurrentColumn]->setLineWidth(3);
+            mButtons[mCurrentRow][mCurrentColumn]->setLineWidth((int)(3 * wmult));
         }
         else
         {
@@ -141,7 +141,7 @@ void SelectFrame::DownEvent()
             mCurrentColumn = RomList->count() % mColumns - 1;
         }
         mButtons[mCurrentRow][mCurrentColumn]->setFrameStyle(QFrame::Box | QFrame::Plain);
-        mButtons[mCurrentRow][mCurrentColumn]->setLineWidth(3);
+        mButtons[mCurrentRow][mCurrentColumn]->setLineWidth((int)(3 * wmult));
         mScrollBar->setValue(mScrollBar->value() + 1);
         emit gameChanged(RomList->current()->Gamename());
         update();
@@ -156,7 +156,7 @@ void SelectFrame::LeftEvent()
         mButtons[mCurrentRow][mCurrentColumn]->setFrameStyle(QFrame::NoFrame);
         mCurrentColumn--;
         mButtons[mCurrentRow][mCurrentColumn]->setFrameStyle(QFrame::Box | QFrame::Plain);
-        mButtons[mCurrentRow][mCurrentColumn]->setLineWidth(3);
+        mButtons[mCurrentRow][mCurrentColumn]->setLineWidth((int)(3 * wmult));
         RomList->prev();
         emit gameChanged(RomList->current()->Gamename());
         update();
@@ -171,14 +171,15 @@ void SelectFrame::RightEvent()
         mButtons[mCurrentRow][mCurrentColumn]->setFrameStyle(QFrame::NoFrame);
         mCurrentColumn++;
         mButtons[mCurrentRow][mCurrentColumn]->setFrameStyle(QFrame::Box | QFrame::Plain);
-        mButtons[mCurrentRow][mCurrentColumn]->setLineWidth(3);
+        mButtons[mCurrentRow][mCurrentColumn]->setLineWidth((int)(3 * wmult));
         RomList->next();
         emit gameChanged(RomList->current()->Gamename());
         update();
     }
 }
 
-SelectFrame::SelectFrame(QWidget * parent, const char * name, WFlags f):
+SelectFrame::SelectFrame(MythContext *context, QWidget * parent, 
+                         const char * name, WFlags f):
     QFrame(parent,name,f),
     mColumns(0),
     mMinSpacer(0),
@@ -188,18 +189,22 @@ SelectFrame::SelectFrame(QWidget * parent, const char * name, WFlags f):
     mImageSize(0),
     mRows(0),
     mButtons(NULL),
-    RomList(NULL)
+    RomList(NULL),
+    m_context(context)
 {
     mScrollBar = new QScrollBar(Qt::Vertical, this); 
+
+    int screenheight = 0, screenwidth = 0;
+    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 }
 
 void SelectFrame::setDimensions()
 {
-    const int ScrollWidth = 17; //trial and error, not sure where to get the value.
-    mScrollBar->setGeometry(width() - ScrollWidth,0,width(),height());
+    const int ScrollWidth = mScrollBar->sizeHint().width(); 
+    mScrollBar->setGeometry(width() - ScrollWidth,0,ScrollWidth,height());
     mScrollBar->hide();
-    mColumns = globalsettings->GetNumSetting("ShotCount");               //will come from a setting.
-    mMinSpacer = 5;
+    mColumns = m_context->GetNumSetting("ShotCount");               //will come from a setting.
+    mMinSpacer = (int)(5 * wmult);
     mWidth = maximumWidth() - ScrollWidth;
     mImageSize = (mWidth - ((mColumns - 1) * mMinSpacer) - (mMinSpacer * 2)) / mColumns;
     if(mImageSize > height())
@@ -237,11 +242,10 @@ void SelectFrame::setRomlist(QPtrList<RomInfo> *romlist)
         mCurrentRow = 0;
         mCurrentColumn = 0;
     }
-    mScrollBar->setMinValue(0);
     int Max = RomList->count() / mColumns - 1;
     if(RomList->count() % mColumns)
         Max++;
-    mScrollBar->setMaxValue(Max);
+    mScrollBar->setRange(0, Max);
     mScrollBar->setValue(0);
     RomList->first();
 }

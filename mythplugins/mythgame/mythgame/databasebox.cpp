@@ -4,7 +4,9 @@
 #include <qcursor.h>
 #include <qstringlist.h>
 #include <qpixmap.h>
-#include <iostream.h>
+#include <iostream>
+
+using namespace std;
 
 #include "rominfo.h"
 #include "databasebox.h"
@@ -12,34 +14,28 @@
 #include "gamehandler.h"
 #include "extendedlistview.h"
 
-#include <mythtv/settings.h>
+#include <mythtv/mythcontext.h>
 
-extern Settings *globalsettings;
-
-DatabaseBox::DatabaseBox(QSqlDatabase *ldb, QString &paths,
-                         QWidget *parent, const char *name)
+DatabaseBox::DatabaseBox(MythContext *context, QSqlDatabase *ldb, 
+                         QString &paths, QWidget *parent, const char *name)
            : QDialog(parent, name)
 {
     db = ldb;
+    m_context = context;
 
-    int screenheight = QApplication::desktop()->height();
-    int screenwidth = QApplication::desktop()->width();
+    int screenheight = 0, screenwidth = 0;
+    float wmult = 0, hmult = 0;
 
-    if (globalsettings->GetNumSetting("GuiWidth") > 0)
-        screenwidth = globalsettings->GetNumSetting("GuiWidth");
-    if (globalsettings->GetNumSetting("GuiHeight") > 0)
-        screenheight = globalsettings->GetNumSetting("GuiHeight");
-
-    float wmult = screenwidth / 800.0;
-    float hmult = screenheight / 600.0;
+    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
-    setFont(QFont("Arial", 16 * hmult, QFont::Bold));
+    setFont(QFont("Arial", (int)(m_context->GetMediumFontSize() * hmult), 
+                  QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
-    QVBoxLayout *vbox = new QVBoxLayout(this, 20 * wmult);
+    QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
     ExtendedListView *listview = new ExtendedListView(this);
     listview->addColumn("Select game to play");
@@ -47,7 +43,7 @@ DatabaseBox::DatabaseBox(QSqlDatabase *ldb, QString &paths,
     listview->setSorting(-1);
     listview->setRootIsDecorated(false);
     listview->setAllColumnsShowFocus(true);
-    listview->setColumnWidth(0, 730 * wmult);
+    listview->setColumnWidth(0, (int)(730 * wmult));
     listview->setColumnWidthMode(0, QListView::Manual);
 
     connect(listview, SIGNAL(KeyPressed(QListViewItem *, int)), this,
@@ -62,6 +58,7 @@ DatabaseBox::DatabaseBox(QSqlDatabase *ldb, QString &paths,
     vbox->addWidget(listview, 1);
 
     listview->setCurrentItem(listview->firstChild());
+    listview->setSelected(listview->firstChild(), true);
 }
 
 void DatabaseBox::Show()
@@ -74,8 +71,8 @@ void DatabaseBox::fillList(QListView *listview, QString &paths)
 {
     QString templevel = "system";
     QString temptitle = "All Games";
-    TreeItem *allgames = new TreeItem(listview, temptitle,
-                                                templevel, NULL);
+    TreeItem *allgames = new TreeItem(m_context, listview, temptitle,
+                                      templevel, NULL);
     
     QStringList lines = QStringList::split(" ", paths);
 
@@ -105,8 +102,8 @@ void DatabaseBox::fillList(QListView *listview, QString &paths)
             RomInfo *rinfo = new RomInfo();
             rinfo->setField(first, current);
 
-            TreeItem *item = new TreeItem(allgames, current,
-                                                    first, rinfo);
+            TreeItem *item = new TreeItem(m_context, allgames, current,
+                                          first, rinfo);
             fillNextLevel(level, num, querystr, matchstr, line, lines,
                           item);
         }
@@ -152,7 +149,7 @@ void DatabaseBox::fillNextLevel(QString level, int num, QString querystr,
             RomInfo *rinfo;
             if(isleaf)
             {
-                rinfo = GameHandler::CreateRomInfo(parentinfo);
+                rinfo = GameHandler::CreateRomInfo(m_context, parentinfo);
                 rinfo->setField(level, current);
                 rinfo->fillData(db);
             }
@@ -162,8 +159,8 @@ void DatabaseBox::fillNextLevel(QString level, int num, QString querystr,
                 rinfo->setField(level, current);
             }
 
-            TreeItem *item = new TreeItem(parent, current, level,
-                                                    rinfo);
+            TreeItem *item = new TreeItem(m_context, parent, current, level,
+                                          rinfo);
 
             if (line != lines.end())
                 fillNextLevel(*line, num + 1, querystr, matchstr2, line, lines,
@@ -204,11 +201,11 @@ void DatabaseBox::editSettings(QListViewItem *item)
 
     if (tcitem->childCount() <= 0)
     {
-        GameHandler::EditSettings(this,tcitem->getRomInfo());
+        GameHandler::EditSettings(m_context, this, tcitem->getRomInfo());
     }
     else if("system" == tcitem->getLevel())
     {
-        GameHandler::EditSystemSettings(this,tcitem->getRomInfo());
+        GameHandler::EditSystemSettings(m_context, this, tcitem->getRomInfo());
     }
 }
 
@@ -218,7 +215,7 @@ void DatabaseBox::doSelected(QListViewItem *item)
 
     if (tcitem->childCount() <= 0)
     {
-        GameHandler::Launchgame(tcitem->getRomInfo());
+        GameHandler::Launchgame(m_context, tcitem->getRomInfo());
     }
 }
 

@@ -2,8 +2,10 @@
 #include <qapplication.h>
 #include <qsqldatabase.h>
 #include <qcursor.h>
-#include <iostream.h>
+#include <iostream>
 #include <stdlib.h>
+
+using namespace std;
 
 #include "rominfo.h"
 #include "screenbox.h"
@@ -11,42 +13,37 @@
 #include "gamehandler.h"
 #include "extendedlistview.h"
 
-#include <mythtv/settings.h>
+#include <mythtv/mythcontext.h>
 
-extern Settings *globalsettings;
-
-ScreenBox::ScreenBox(QSqlDatabase *ldb, QString &paths,
-                         QWidget *parent, const char *name)
+ScreenBox::ScreenBox(MythContext *context, QSqlDatabase *ldb, QString &paths,
+                     QWidget *parent, const char *name)
            : QDialog(parent, name)
 {
     db = ldb;
+    m_context = context;
 
-    int screenheight = QApplication::desktop()->height();
-    int screenwidth = QApplication::desktop()->width();
+    int screenheight = 0, screenwidth = 0;
+    float wmult = 0, hmult = 0;
 
-    if (globalsettings->GetNumSetting("GuiWidth") > 0)
-        screenwidth = globalsettings->GetNumSetting("GuiWidth");
-    if (globalsettings->GetNumSetting("GuiHeight") > 0)
-        screenheight = globalsettings->GetNumSetting("GuiHeight");
-
-    float wmult = screenwidth / 800.0;
-    float hmult = screenheight / 600.0;
+    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
-    setFont(QFont("Arial", 16 * hmult, QFont::Bold));
+    setFont(QFont("Arial", (int)(m_context->GetMediumFontSize() * hmult),
+                  QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
-    QVBoxLayout *vbox = new QVBoxLayout(this, 5, 5);
+    QVBoxLayout *vbox = new QVBoxLayout(this, (int)(5 * wmult), 
+                                        (int)(5 * wmult));
 
     mGameLabel = new QLabel(this);
-    mGameLabel->setFixedHeight(23);
+    mGameLabel->setFixedHeight((int)(23 * hmult));
     mGameLabel->setAlignment(Qt::AlignHCenter);
     mGameLabel->setText("");
 
     ExtendedListView *listview = new ExtendedListView(this);
-    listview->setFixedHeight(170);
+    listview->setFixedHeight((int)(170 * hmult));
     listview->addColumn("Select genre", -1);
 
     listview->setSorting(-1);
@@ -55,10 +52,10 @@ ScreenBox::ScreenBox(QSqlDatabase *ldb, QString &paths,
     listview->setColumnWidthMode(0, QListView::Maximum);
     listview->setResizeMode(QListView::LastColumn);
 
-    PicFrame = new SelectFrame(this);
-    PicFrame->setFixedWidth(790);
-    PicFrame->setFixedHeight(350);
-    PicFrame->setPaletteBackgroundColor( QColor(255,255,255));
+    PicFrame = new SelectFrame(context, this);
+    PicFrame->setFixedWidth((int)(790 * wmult));
+    PicFrame->setFixedHeight((int)(350 * hmult));
+    PicFrame->setPaletteBackgroundColor(QColor(255,255,255));
     PicFrame->setFocusPolicy(QWidget::NoFocus);
 
     connect(listview, SIGNAL(currentChanged(QListViewItem *)), this,
@@ -70,15 +67,16 @@ ScreenBox::ScreenBox(QSqlDatabase *ldb, QString &paths,
 
     fillList(listview, paths);
 
-    vbox->addWidget(listview, 1);
+    vbox->addWidget(listview, 0);
     vbox->addWidget(mGameLabel, 1);
-    vbox->addWidget(PicFrame, 1);
+    vbox->addWidget(PicFrame, 0);
 
     PicFrame->setDimensions();
     PicFrame->setButtons(NULL);
     PicFrame->setUpdatesEnabled(true);
 
     listview->setCurrentItem(listview->firstChild());
+    listview->setSelected(listview->firstChild(), true);
 }
 
 void ScreenBox::Show()
@@ -91,8 +89,8 @@ void ScreenBox::fillList(QListView *listview, QString &paths)
 {
     QString templevel = "system";
     QString temptitle = "All Games";
-    TreeItem *allgames = new TreeItem(listview, temptitle,
-                                                templevel, NULL);
+    TreeItem *allgames = new TreeItem(m_context, listview, temptitle,
+                                      templevel, NULL);
     
     QStringList lines = QStringList::split(" ", paths);
     int Levels = lines.count();
@@ -128,8 +126,8 @@ void ScreenBox::fillList(QListView *listview, QString &paths)
             RomInfo *rinfo = new RomInfo();
             rinfo->setField(first, current);
 
-            TreeItem *item = new TreeItem(allgames, current,
-                                                    first, rinfo);
+            TreeItem *item = new TreeItem(m_context, allgames, current,
+                                          first, rinfo);
             fillNextLevel(level, num, querystr, matchstr, line, lines,
                           item);
         }
@@ -175,8 +173,8 @@ void ScreenBox::fillNextLevel(QString level, int num, QString querystr,
             RomInfo *rinfo;
             rinfo = new RomInfo(*parentinfo);
             rinfo->setField(level, current);
-            TreeItem *item = new TreeItem(parent, current, level,
-                                                    rinfo);
+            TreeItem *item = new TreeItem(m_context, parent, current, level,
+                                          rinfo);
 
             if (line != lines.end() && *line != "gamename")
                 fillNextLevel(*line, num + 1, querystr, matchstr2, line, lines,
@@ -235,7 +233,7 @@ void ScreenBox::setImages(QListViewItem *item)
             QPtrList<RomInfo> *romlist = new QPtrList<RomInfo>;
             while (query.next())
             {
-                rinfo = GameHandler::CreateRomInfo(romdata);
+                rinfo = GameHandler::CreateRomInfo(m_context, romdata);
                 rinfo->setField("gamename",query.value(0).toString());
                 rinfo->fillData(db);
                 romlist->append(rinfo);
@@ -256,7 +254,7 @@ void ScreenBox::editSettings(QListViewItem *item)
 
     if("system" == tcitem->getLevel())
     {
-        GameHandler::EditSystemSettings(this,tcitem->getRomInfo());
+        GameHandler::EditSystemSettings(m_context, this, tcitem->getRomInfo());
     }
 }
 
