@@ -16,7 +16,7 @@ installfiles.files = mythmusic-settings.txt musicmenu.xml
 INSTALLS += installfiles
 
 LIBS += -lmad -lid3tag -logg -lvorbisfile -lvorbis -lvorbisenc -lcdaudio -lFLAC
-LIBS += -lcdda_paranoia -lcdda_interface -L/usr/local/lib -lmyth
+LIBS += -lcdda_paranoia -lcdda_interface -L/usr/local/lib -lmyth-$$LIBVERSION
 
 # Input
 HEADERS += audiooutput.h buffer.h cddecoder.h cdrip.h constants.h databasebox.h 
