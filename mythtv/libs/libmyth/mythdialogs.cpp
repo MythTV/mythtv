@@ -194,6 +194,7 @@ void MythMainWindow::Init(void)
 
     setFont(gContext->GetMediumFont());
     setCursor(QCursor(Qt::BlankCursor));
+    qApp->setOverrideCursor(QCursor(Qt::BlankCursor));
 
     gContext->ThemeWidget(this);
 
