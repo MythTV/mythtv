@@ -1800,43 +1800,76 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
 
     bool handled = false;
 
-    if (showData.count() > 0)
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
+
+    for (unsigned int i = 0; i < actions.size(); i++)
     {
-        handled = true;
-        switch (e->key())
+        QString action = actions[i];
+
+        if (showData.count() > 0)
         {
-            case Key_D: 
-                deleteSelected(); 
-                break;
-            case Key_I: 
-                showActionsSelected(); 
-                break;
-            case Key_P: 
-                playSelected(); 
-                break;
-            case Key_Space:
-            case Key_Enter:
-            case Key_Return:
+            if (action == "DELETE")
+            {
+                deleteSelected();
+                handled = true;
+            }
+            else if (action == "PLAYBACK")
+            {
+                playSelected();
+                handled = true;
+            }
+            else if (action == "MENU" || action == "INFO")
+            {
+                showActionsSelected();
+                handled = true;
+            }
+            else if (action == "SELECT")
+            {
                 selected();
-                break;
-            default:  handled = false; break;
+                handled = true;
+            }
+        }
+
+        if (action == "UP")
+        {
+            cursorUp();
+            handled = true;
+        }
+        else if (action == "DOWN")
+        {
+            cursorDown();
+            handled = true;
+        }
+        else if (action == "LEFT")
+        {
+            cursorLeft();
+            handled = true;
+        }
+        else if (action == "RIGHT")
+        {
+            cursorRight();
+            handled = true;
+        }
+        else if (action == "PAGEUP")
+        {
+            pageUp();
+            handled = true;
+        }
+        else if (action == "PAGEDOWN")
+        {
+            pageDown();
+            handled = true;
+        }
+        else if (action == "ESCAPE")
+        {
+            exitWin();
+            handled = true;
         }
     }
 
-    if (handled)
-        return;
-
-    switch (e->key())
-    {
-        case Key_Left: cursorLeft(); break;
-        case Key_Right: cursorRight(); break;
-        case Key_Down: cursorDown(); break;
-        case Key_Up: cursorUp(); break;
-        case Key_3: case Key_PageUp: pageUp(); break;
-        case Key_9: case Key_PageDown: pageDown(); break;
-        case Key_Escape: exitWin(); break;
-        default: MythDialog::keyPressEvent(e); break;
-    }   
+    if (!handled)
+        MythDialog::keyPressEvent(e);
 }
 
 void PlaybackBox::customEvent(QCustomEvent *e)

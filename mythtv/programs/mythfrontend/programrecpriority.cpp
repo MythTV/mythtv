@@ -164,39 +164,83 @@ void ProgramRecPriority::keyPressEvent(QKeyEvent *e)
     if (!allowKeys)
         return;
 
-    switch (e->key())
+    bool handled = false;
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions))
     {
-        case Key_Up: cursorUp(); break;
-        case Key_Down: cursorDown(); break;
-        case Key_PageUp: case Key_3: pageUp(); break;
-        case Key_PageDown: case Key_9: pageDown(); break;
-        case Key_Right: changeRecPriority(1); break;
-        case Key_Left: changeRecPriority(-1); break;
-        case Key_Escape: saveRecPriority();
-                         gContext->SaveSetting("ProgramRecPrioritySorting", 
-                                               (int)sortType);
-                         done(MythDialog::Accepted);
-                         break;
-        case Key_1: if (sortType == byTitle)
-                        break; 
-                    sortType = byTitle; 
-                    SortList();     
+        for (unsigned int i = 0; i < actions.size(); i++)
+        {
+            QString action = actions[i];
+            if (action == "UP")
+            {
+                cursorUp();
+                handled = true;
+            }
+            else if (action == "DOWN")
+            {
+                cursorDown();
+                handled = true;
+            }
+            else if (action == "PAGEUP")
+            {
+                pageUp();
+                handled = true;
+            }
+            else if (action == "PAGEDOWN")
+            {
+                pageDown();
+                handled = true;
+            }
+            else if (action == "RIGHT")
+            {
+                changeRecPriority(1);
+                handled = true;
+            }
+            else if (action == "LEFT")
+            {
+                changeRecPriority(-1);
+                handled = true;
+            }
+            else if (action == "ESCAPE")
+            {
+                saveRecPriority();
+                gContext->SaveSetting("ProgramRecPrioritySorting",
+                                      (int)sortType);
+                done(MythDialog::Accepted);
+                handled = true;
+            }
+            else if (action == "1")
+            {
+                if (sortType != byTitle)
+                {
+                    sortType = byTitle;
+                    SortList();
                     update(fullRect);
-                    break;
-        case Key_2: if (sortType == byRecPriority)
-                        break; 
-                    sortType = byRecPriority; 
-                    SortList(); 
+                }
+                handled = true;
+            }
+            else if (action == "2")
+            {
+                if (sortType != byRecPriority)
+                {
+                    sortType = byRecPriority;
+                    SortList();
                     update(fullRect);
-                    break;
-        case Key_Space:
-        case Key_Enter:
-        case Key_Return:
-        case Key_I: saveRecPriority(); 
-                    edit(); 
-                    break;
-        default: MythDialog::keyPressEvent(e); break;
+                }
+                handled = true;
+            }
+            else if (action == "SELECT" || action == "MENU" ||
+                     action == "INFO")
+            {
+                saveRecPriority();
+                edit();
+                handled = true;
+            }
+        }
     }
+
+    if (!handled)
+        MythDialog::keyPressEvent(e);
 }
 
 void ProgramRecPriority::LoadWindow(QDomElement &element)

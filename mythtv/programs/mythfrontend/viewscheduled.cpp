@@ -88,19 +88,63 @@ void ViewScheduled::keyPressEvent(QKeyEvent *e)
 
     allowEvents = false;
 
-    switch (e->key())
+    bool handled = false;
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions))
     {
-    case Key_Space: case Key_Enter: case Key_Return: selected(); break;
-    case Key_I: case Key_M: edit(); break;
-    case Key_Escape: done(MythDialog::Accepted); break;
-    case Key_1: setShowAll(true); break;
-    case Key_2: setShowAll(false); break;
-    case Key_Up: cursorUp(); break;
-    case Key_Down: cursorDown(); break;
-    case Key_PageUp: case Key_9: pageUp(); break;
-    case Key_PageDown: case Key_3: pageDown(); break;
-    default: MythDialog::keyPressEvent(e); break;
+        for (unsigned int i = 0; i < actions.size(); i++)
+        {
+            QString action = actions[i];
+            if (action == "SELECT")
+            {
+                selected();
+                handled = true;
+            }
+            else if (action == "MENU" || action == "INFO")
+            {
+                edit();
+                handled = true;
+            }
+            else if (action == "ESCAPE")
+            {
+                done(MythDialog::Accepted);
+                handled = true;
+            }
+            else if (action == "UP")
+            {
+                cursorUp();
+                handled = true;
+            }
+            else if (action == "DOWN")
+            {
+                cursorDown();
+                handled = true;
+            }
+            else if (action == "PAGEUP")
+            {
+                pageUp();
+                handled = true;
+            }
+            else if (action == "PAGEDOWN")
+            {
+                pageDown();
+                handled = true;
+            }
+            else if (action == "1")
+            {
+                setShowAll(true);
+                handled = true;
+            }
+            else if (action == "2")
+            {
+                setShowAll(false);
+                handled = true;
+            }
+        }
     }
+
+    if (!handled)
+        MythDialog::keyPressEvent(e);
 
     if (refillAll)
     {

@@ -1134,21 +1134,25 @@ void MythListBox::setCurrentItem(const QString& matchText)
             setCurrentItem(i);
 }
 
-/* XXX FIXME */
 void MythListBox::keyPressEvent(QKeyEvent* e) 
 {
-    switch (e->key()) 
+    bool handled = false;
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        case Key_Up:
-        case Key_Down:
-        case Key_Next:
-        case Key_Prior:
-        case Key_Home:
-        case Key_End:
-            QListBox::keyPressEvent(e);
-            break;
-        default:
-            e->ignore();
+        for (unsigned int i = 0; i < actions.size(); i++)
+        {
+            QString action = actions[i];
+            if (action == "UP" || action == "DOWN" || action == "PAGEUP" ||
+                action == "PAGEDOWN")
+            {
+                QListBox::keyPressEvent(e);
+                handled = true;
+            }
+        }
     }
+
+    if (!handled)
+        e->ignore();
 }
 

@@ -49,6 +49,11 @@ void startGuide(void)
     RunProgramGuide(startchannel);
 }
 
+void startFinder(void)
+{
+    RunProgramFind();
+}
+
 void startManaged(void)
 {
     QSqlDatabase *db = QSqlDatabase::database();
@@ -288,7 +293,7 @@ void TVMenuCallback(void *data, QString &selection)
     else if (sel == "tv_set_recpriorities")
         startProgramRecPriorities();
     else if (sel == "tv_progfind")
-        RunProgramFind();
+        startFinder();
     else if (sel == "settings appearance") 
     {
         AppearanceSettings settings;
@@ -466,6 +471,24 @@ QString RandTheme(QString &themename, QSqlDatabase *db)
     Theme.save(db);
 
     return themename;
+}
+
+void InitJumpPoints(void)
+{
+    REG_JUMP("Program Guide", "", "", startGuide);
+    REG_JUMP("Program Finder", "", "", startFinder);
+    REG_JUMP("Manage Recordings / Fix Conflicts", "", "", startManaged);
+    REG_JUMP("Program Recording Priorities", "", "", startProgramRecPriorities);
+    REG_JUMP("Channel Recording Priorities", "", "", startChannelRecPriorities);
+    REG_JUMP("TV Recording Playback", "", "F12", startPlayback);
+    REG_JUMP("TV Recording Deletion", "", "", startDelete);
+    REG_JUMP("Live TV", "", "", startTV);
+    REG_JUMP("Manual Record Scheduling", "", "", startManual);
+
+    REG_KEY("TV Frontend", "PAGEUP", "Page Up", "3");
+    REG_KEY("TV Frontend", "PAGEDOWN", "Page Down", "9");
+    REG_KEY("TV Frontend", "DELETE", "Delete Program", "D");
+    REG_KEY("TV Frontend", "PLAYBACK", "Play Program", "P");
 }
 
 int main(int argc, char **argv)
@@ -683,7 +706,7 @@ int main(int argc, char **argv)
     mainWindow->Init();
     gContext->SetMainWindow(mainWindow);
 
-    REG_JUMP("TV Recording Playback", "", "F12", startPlayback);
+    InitJumpPoints();
 
     gContext->UpdateImageCache();
 

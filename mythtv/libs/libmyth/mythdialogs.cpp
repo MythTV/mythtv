@@ -84,6 +84,8 @@ class MythMainWindowPrivate
     QMap<int, JumpData> jumpMap;
 
     void (*exitmenucallback)(void);
+
+    int escapekey;
 };
 
 MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal)
@@ -95,6 +97,7 @@ MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal)
     d->ignore_lirc_keys = false;
     d->exitingtomain = false;
     d->exitmenucallback = false;
+    d->escapekey = Key_Escape;
 
 #ifdef USE_LIRC
     pthread_t lirc_tid;
@@ -107,16 +110,30 @@ MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal)
 
     d->keyContexts.setAutoDelete(true);
 
-    RegisterKey("Global", "UP", "Up arrow", "Up");
-    RegisterKey("Global", "DOWN", "Down arrow", "Down");
-    RegisterKey("Global", "LEFT", "Left arrow", "Left");
-    RegisterKey("Global", "RIGHT", "Right arrow", "Right");
+    RegisterKey("Global", "UP", "Up Arrow", "Up");
+    RegisterKey("Global", "DOWN", "Down Arrow", "Down");
+    RegisterKey("Global", "LEFT", "Left Arrow", "Left");
+    RegisterKey("Global", "RIGHT", "Right Arrow", "Right");
     RegisterKey("Global", "SELECT", "Select", "Return");
     RegisterKey("Global", "SELECT", "Select", "Enter");
     RegisterKey("Global", "SELECT", "Select", "Space");
     RegisterKey("Global", "ESCAPE", "Escape", "Esc");
     RegisterKey("Global", "MENU", "Pop-up menu", "M");
     RegisterKey("Global", "INFO", "More information", "I");
+
+    RegisterKey("Global", "PAGEUP", "Page Up", "PgUp");
+    RegisterKey("Global", "PAGEDOWN", "Page Down", "PgDown");
+
+    RegisterKey("Global", "0", "0", "0");
+    RegisterKey("Global", "1", "1", "1");
+    RegisterKey("Global", "2", "2", "2");
+    RegisterKey("Global", "3", "3", "3");
+    RegisterKey("Global", "4", "4", "4");
+    RegisterKey("Global", "5", "5", "5");
+    RegisterKey("Global", "6", "6", "6");
+    RegisterKey("Global", "7", "7", "7");
+    RegisterKey("Global", "8", "8", "8");
+    RegisterKey("Global", "9", "9", "9");
 }
 
 MythMainWindow::~MythMainWindow()
@@ -197,7 +214,7 @@ void MythMainWindow::ExitToMainMenu(void)
             else if (MythDialog *dial = dynamic_cast<MythDialog*>(current))
             {
                 (void)dial;
-                QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, Key_Escape, 
+                QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, d->escapekey, 
                                                0, Qt::NoButton);
                 QObject *key_target = getTarget(*key);
                 QApplication::postEvent(key_target, key);
@@ -276,8 +293,11 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
         {
             d->keyContexts[context]->AddMapping(keynum, action);
             VERBOSE(VB_GENERAL, QString("Binding: %1 to action: %2 (%3)")
-                                       .arg(keynum).arg(action).arg(context));
+                                       .arg(key).arg(action).arg(context));
         }
+
+        if (action == "ESCAPE" && context == "Global")
+            d->escapekey = keynum;
     }
 }
 
@@ -307,6 +327,9 @@ void MythMainWindow::RegisterJump(const QString &destination,
                                         "point.").arg(key));
         }
     }
+    else
+        VERBOSE(VB_GENERAL, QString("JumpPoint: %2 exists, no keybinding")
+                                   .arg(destination));
 }
 
 void MythMainWindow::keyPressEvent(QKeyEvent *e)
@@ -336,7 +359,7 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
         QApplication::sendEvent(key_target, &key);
     }
 #ifdef USE_LIRC
-    else if (ce->type() == kLircKeycodeEventType && !ignore_lirc_keys) 
+    else if (ce->type() == kLircKeycodeEventType && !d->ignore_lirc_keys) 
     {
         LircKeycodeEvent *lke = (LircKeycodeEvent *)ce;
         int keycode = lke->getKeycode();
@@ -372,7 +395,7 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
     else if (ce->type() == kLircMuteEventType)
     {
         LircMuteEvent *lme = (LircMuteEvent *)ce;
-        ignore_lirc_keys = lme->eventsMuted();
+        d->ignore_lirc_keys = lme->eventsMuted();
     }
 #endif
 }
@@ -392,7 +415,7 @@ QObject *MythMainWindow::getTarget(QKeyEvent &key)
 
             // Yes this is special code for handling the
             // the escape key.
-            if (key.key() == Key_Escape && focus_widget->topLevelWidget())
+            if (key.key() == d->escapekey && focus_widget->topLevelWidget())
                 key_target = focus_widget->topLevelWidget();
         }
     }
@@ -1859,24 +1882,55 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
     
 }
 
-/* XXX FIXME */
 void MythImageFileDialog::keyPressEvent(QKeyEvent *e)
 {
-    switch(e->key())
+    bool handled = false;
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
-        case Key_Up:       file_browser->moveUp();             break;
-        case Key_Down:     file_browser->moveDown();           break;
-        case Key_Left:     file_browser->popUp();              break;
-        case Key_Right:    file_browser->pushDown();           break;
-        case Key_PageUp:   file_browser->pageUp();             break;
-        case Key_PageDown: file_browser->pageDown();           break;
-        
-        case Key_Space:
-        case Key_Enter:
-        case Key_Return:   file_browser->select();             break;
-        
-        default:           MythThemedDialog::keyPressEvent(e); break;
+        for (unsigned int i = 0; i < actions.size(); i++)
+        {
+            QString action = actions[i];
+            if (action == "UP")
+            {
+                file_browser->moveUp();
+                handled = true;
+            }
+            else if (action == "DOWN")
+            {
+                file_browser->moveDown();
+                handled = true;
+            }
+            else if (action == "LEFT")
+            {
+                file_browser->popUp();
+                handled = true;
+            }
+            else if (action == "RIGHT")
+            {
+                file_browser->pushDown();
+                handled = true;
+            }
+            else if (action == "PAGEUP")
+            {
+                file_browser->pageUp();
+                handled = true;
+            }
+            else if (action == "PAGEDOWN")
+            {
+                file_browser->pageDown();
+                handled = true;
+            }
+            else if (action == "SELECT")
+            {
+                file_browser->select();
+                handled = true;
+            }
+        }
     }
+
+    if (!handled)
+        MythThemedDialog::keyPressEvent(e);
 }
 
 void MythImageFileDialog::buildTree(QString starting_where)
