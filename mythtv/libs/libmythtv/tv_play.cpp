@@ -2948,7 +2948,6 @@ void TV::GetChannelInfo(RemoteEncoder *enc, QMap<QString, QString> &infoMap)
     
     if (airdate.isEmpty())
     {
-        cerr << " 1" << endl;
         originalAirDate = startts.date();
     }
     else
@@ -2956,8 +2955,7 @@ void TV::GetChannelInfo(RemoteEncoder *enc, QMap<QString, QString> &infoMap)
         originalAirDate = QDate::fromString(airdate, Qt::ISODate);
     }        
 
-    
-    if (!repeat.isEmpty())
+    if (!repeat.isEmpty() && repeat.toInt())
     {
         infoMap["REPEAT"] = QString("(%1) ").arg(QObject::tr("Repeat"));
         infoMap["LONGREPEAT"] = QString("(%1 %2) ")

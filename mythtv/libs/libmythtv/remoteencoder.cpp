@@ -206,7 +206,9 @@ void RemoteEncoder::CancelNextRecording(void)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
     strlist << "CANCEL_NEXT_RECORDING";
-
+    VERBOSE(VB_IMPORTANT, QString("Sending QUERY_RECORDER %1 - CANCEL_NEXT_RECORDING")
+                          .arg(recordernum));
+                          
     SendReceiveStringList(strlist);
 }
 
@@ -479,6 +481,7 @@ void RemoteEncoder::GetChannelInfo(QString &title, QString &subtitle,
     seriesid = strlist[10];
     programid = strlist[11];
     outputFilters = strlist[12];
+    
     repeat = strlist[13];
     airdate = strlist[14];
     stars = strlist[15];
@@ -531,14 +534,13 @@ void RemoteEncoder::GetInputName(QString &inputname)
 
 QString RemoteEncoder::GetCurrentChannel(void)
 {
-    if (lastchannel == "")
+    if (lastchannel == "" || lastchannel == "0")
     {
         QString dummy;
         GetChannelInfo(dummy, dummy, dummy, dummy, dummy, dummy,
                        dummy, dummy, lastchannel, dummy, dummy, 
                        dummy, dummy, dummy, dummy, dummy);
     }
-
     return lastchannel;
 }
 

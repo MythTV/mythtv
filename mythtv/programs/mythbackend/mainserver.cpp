@@ -1991,6 +1991,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     }
     else if (command == "CANCEL_NEXT_RECORDING")
     {
+        VERBOSE(VB_IMPORTANT, "Received: CANCEL_NEXT_RECORDING");
         enc->CancelNextRecording();
         retlist << "ok";
     }
@@ -2162,11 +2163,11 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
             programid = " ";
         if (chanOutputFilters == "")
             chanOutputFilters = " ";    
-        if (repeat = "" )
+        if (repeat == "" )
             repeat = "0";
-        if (airdate = "")
+        if (airdate == "")
             airdate = starttime;
-        if (stars = "")
+        if (stars == "")
             stars = " ";
 
         retlist << title;
