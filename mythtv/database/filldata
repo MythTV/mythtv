@@ -3,9 +3,48 @@
 use strict;
 
 use DBI;
+my %settings = ();
+my $settingsfile = "../mythfrontend/mysql.txt";
+if (open(FOO, $settingsfile)) {
+    while (<FOO>) {
+        chomp;
+        if (/str (.*?)=(.*)/) {
+            $settings{$1} = $2;
+        }
+    }
 
-my $dbh = DBI->connect("DBI:mysql:database=mythconverg:host=localhost",
-                       "mythtv", "mythtv", { PrintError => 0 } )
+    close FOO;
+}
+
+$settingsfile = "/usr/local/share/mythtv/mysql.txt";
+if (open(FOO, $settingsfile)) {
+    while (<FOO>) {
+        chomp;
+        if (/str (.*?)=(.*)/) {
+            $settings{$1} = $2;
+        }
+    }
+
+    close FOO;
+}
+
+$settingsfile = $ENV{"HOME"} . "/.mythtv/mysql.txt";
+if (open(FOO, $settingsfile)) {
+    while (<FOO>) {
+        chomp;
+        if (/str (.*?)=(.*)/) {
+            $settings{$1} = $2;
+        }
+    }
+
+    close FOO;
+}
+
+my $dbstr = "DBI:mysql:database=" . $settings{"DBName"} . ":host=" . 
+            $settings{"DBHostName"};
+
+my $dbh = DBI->connect($dbstr, $settings{"DBUserName"}, 
+                       $settings{"DBPassword"}, { PrintError => 0 } )
    or die DBI->errstr;
 
 my $offset;

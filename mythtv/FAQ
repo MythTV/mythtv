@@ -15,3 +15,14 @@
 ) I can't change the channel when watching TV?
 - Something's wrong with your program database.  Did filldata run with
   no major errors?
+
+) I want to run the database on another machine?
+- Ok, first, you'll need to edit the mc.sql script first to setup the proper 
+  permissions for the machine that'll be running mythtv and connecting to the
+  database.  Next, after you've followed all the directions and built all
+  MythTV's programs, and after you've done a make install, but before you've 
+  run filldata, you need to edit the /usr/local/share/mythtv/mysql.txt file
+  to it points to the server you're running the mysql on.  If you want, you
+  can copy that mysql.txt file to ~/.mythtv/.  If it's in ~/.mythtv/ then it
+  won't get copied over by another, future, 'make install'.  Once that's all
+  done, you should be all set, I think.
