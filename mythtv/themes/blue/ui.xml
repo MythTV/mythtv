@@ -1627,4 +1627,120 @@
  
   </window>
 
+  <window name="programlist">
+
+    <font name="active_font" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="inactive_font" face="Arial">
+      <color>#9999cc</color>
+      <size>16</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="record_font" face="Arial">
+      <color>#ffff33</color>
+      <size>16</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="title" face="Arial">
+      <color>#ffffff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>27</size>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="info" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="yellowinfo" face="Arial">
+      <color>#ffff33</color>
+      <size>17</size>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="message" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <container name="background">
+      <textarea name="sched" draworder="0">
+        <area>20,10,800,40</area>
+        <font>info</font>
+        <value>Program Listings</value>
+      </textarea>
+      <image name="filler" draworder="0" fleximage="yes">
+        <filename>rk-background.png</filename>
+        <position>0,35</position>
+      </image>
+    </container>
+
+    <container name="selector">
+      <area>0,39,800,375</area>
+      <listarea name="proglist" draworder="4">
+        <area>20,12,760,330</area>
+        <fcnfont name="active_font" function="active"></fcnfont>
+        <fcnfont name="inactive_font" function="inactive"></fcnfont>
+        <fcnfont name="active_font" function="selected"></fcnfont>
+        <fcnfont name="record_font" function="recording"></fcnfont>
+        <columnpadding>1</columnpadding>
+        <column number="1" width="150" context="-1"></column>
+        <column number="2" width="130" context="-1"></column>
+        <column number="3" width="500" context="-1"></column>
+        <items>11</items>
+        <image function="selectionbar" filename="rk-selectbar.png" location="-6,-2"></image>
+        <image function="uparrow" filename="uparrow.png" location="755,22"></image>
+        <image function="downarrow" filename="downarrow.png" location="755,290"></image>
+      </listarea>
+      <image name="showinglines" draworder="5" fleximage="no">
+        <filename>rk-lines.png</filename>
+        <position>0,0</position>
+      </image>
+    </container>
+
+    <container name="program_info">
+      <area>0,410,800,240</area>
+      <textarea name="title" draworder="6">
+        <area>20,0,800,50</area>
+        <font>title</font>
+      </textarea>
+      <textarea name="subtitle" draworder="6">
+        <area>20,40,579,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="description" draworder="6">
+        <area>20,70,579,90</area>
+        <font>info</font>
+       <multiline>yes</multiline>
+      </textarea>
+      <textarea name="type" draworder="6">
+        <area>20,160,430,30</area>
+        <font>yellowinfo</font>
+      </textarea>
+    </container>
+
+    <container name="noprograms_list">
+      <textarea name="msg" align="center" draworder="8">
+         <area>0,110,800,70</area>
+         <font>info</font>
+         <value>No listings found for this program. </value>
+         <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+  </window>
+
 </mythuitheme>

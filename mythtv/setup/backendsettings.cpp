@@ -212,17 +212,27 @@ public:
         };
 };
 
+class TranscoderAutoRun: public CheckBoxSetting, public BackendSetting {
+public:
+    TranscoderAutoRun():
+        BackendSetting("TranscoderAutoRun") {
+        setLabel("Auto-run the transcoder after each recording");
+        setValue(0);
+        setHelpText("When set and the transcoder is active, the transcoder "
+                    "will run automatically after each recording finishes."
+                );
+        };
+};
+
 class TranscoderUseCutlist: public CheckBoxSetting, public BackendSetting {
 public:
     TranscoderUseCutlist():
         BackendSetting("TranscoderUseCutlist") {
         setLabel("Use cutlist during transcoding");
-        setValue(0);
+        setValue(1);
         setHelpText("When set and the transcoder is active, the transcoded "
                     "files will not contain anything marked in the cutlist "
-                    "(i.e. commercials).  NOTE:  When enabled, automatic "
-                    "transcoding will be disabled."
-                );
+                    "(i.e. commercials).");
         };
 };
 
@@ -292,6 +302,7 @@ BackendSettings::BackendSettings() {
     group1->addChild(new BufferSize());
     group1->addChild(new MaxBufferFill());
     group1->addChild(new MaxTranscoders());
+    group1->addChild(new TranscoderAutoRun());
     group1->addChild(new TranscoderUseCutlist());
     addChild(group1);
 

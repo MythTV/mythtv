@@ -20,6 +20,7 @@ enum RecordingType
 class ProgramInfo;
 class QSqlDatabase;
 class ScheduledRecording: public ConfigurationGroup, public ConfigurationDialog {
+    Q_OBJECT
 public:
     ScheduledRecording();
     //ScheduledRecording(const ScheduledRecording& other);
@@ -66,6 +67,9 @@ public:
     static void ScheduledRecording::fillSelections(QSqlDatabase* db, SelectSetting* setting);
 
     static void signalChange(QSqlDatabase* db);
+
+protected slots:
+    void runProgList();
 
 private:
     class ID: virtual public IntegerSetting,

@@ -1502,6 +1502,8 @@ void NuppelVideoRecorder::WriteSeekTable(bool todumpfile)
     else
         ringBuffer->Write(&currentpos, sizeof(long long));
 
+    ringBuffer->WriterSeek(0, SEEK_END);
+
     if (!todumpfile && curRecording && positionMap.size() && db_lock && db_conn)
     {
         pthread_mutex_lock(db_lock);
@@ -1554,6 +1556,9 @@ void NuppelVideoRecorder::WriteKeyFrameAdjustTable(bool todumpfile,
     else
         ringBuffer->Write(&currentpos, sizeof(long long));
 
+    ringBuffer->WriterSeek(0, SEEK_END);
+
+    delete [] kfa_buf;
 }
 
 void NuppelVideoRecorder::UpdateSeekTable(int frame_num, bool use_db)

@@ -2,6 +2,8 @@
 #include "programinfo.h"
 #include "recordingprofile.h"
 #include "mythcontext.h"
+#include "proglist.h"
+
 #include <qlayout.h>
 #include <qlabel.h>
 #include <qapplication.h>
@@ -587,17 +589,8 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
     int screenwidth, screenheight;
     gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
-    int bigfont = gContext->GetBigFontSize();
-//    int mediumfont = gContext->GetMediumFontSize();
-
     MythDialog* dialog = new ConfigurationDialogWidget(parent, name);
     QVBoxLayout* vbox = new QVBoxLayout(dialog, (int)(20 * wmult));
-
-    QLabel* header;
-    header = new QLabel(tr("Advanced Recording Options"), dialog);
-    header->setBackgroundOrigin(QWidget::WindowOrigin);
-    header->setFont(QFont("Arial", (int)(bigfont * hmult), QFont::Bold));
-    vbox->addWidget(header, 0, Qt::AlignLeft | Qt::AlignTop);
 
     if (m_pginfo)
     {
@@ -611,28 +604,28 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
     f->setLineWidth((int)(4 * hmult));
     vbox->addWidget(f);    
 
-//    header = new QLabel(tr("Series Options"), dialog);
-//    header->setBackgroundOrigin(QWidget::WindowOrigin);
-//    header->setFont(QFont("Arial", (int)(mediumfont * hmult), QFont::Bold));
-//    vbox->addWidget(header, 0, Qt::AlignLeft | Qt::AlignTop);
-
     vbox->addWidget(type->configWidget(this, dialog));
     vbox->addWidget(profile->configWidget(this, dialog));
     vbox->addWidget(rank->configWidget(this, dialog));
     vbox->addWidget(autoexpire->configWidget(this, dialog));
     vbox->addWidget(maxepisodes->configWidget(this, dialog));
 
-//    f = new QFrame(dialog);
-//    f->setFrameStyle(QFrame::HLine | QFrame::Plain);
-//    f->setLineWidth((int)(4 * hmult));
-//    vbox->addWidget(f);    
-
-//    header = new QLabel(tr("Episode Options"), dialog);
-//    header->setBackgroundOrigin(QWidget::WindowOrigin);
-//    header->setFont(QFont("Arial", (int)(mediumfont * hmult), QFont::Bold));
-//    vbox->addWidget(header, 0, Qt::AlignLeft | Qt::AlignTop);
+    MythPushButton *button = new MythPushButton(tr("See a list of all up-coming"
+                                                   " episodes/playtimes."),
+                                                dialog);
+    connect(button, SIGNAL(clicked()), this, SLOT(runProgList()));
+    vbox->addWidget(button);
 
     return dialog;
+}
+
+void ScheduledRecording::runProgList(void)
+{
+    ProgLister *pl = new ProgLister(title->getValue(),
+                                    QSqlDatabase::database(),
+                                    gContext->GetMainWindow(), "proglist");
+    pl->exec();
+    delete pl;
 }
 
 void ScheduledRecording::fillSelections(QSqlDatabase* db, SelectSetting* setting) {

@@ -2621,10 +2621,11 @@ void NuppelVideoPlayer::ReencoderAddKFA(
                                 QPtrList<struct kfatable_entry> *kfa_table,
                                 long curframe, long lastkey, long num_keyframes)
 {
-    if (curframe - lastkey != keyframedist)
+    long delta = curframe - lastkey;
+    if (delta != 0 && delta != keyframedist)
     {
         struct kfatable_entry *kfate = new struct kfatable_entry;
-        kfate->adjust = keyframedist - (curframe - lastkey);
+        kfate->adjust = keyframedist - delta;
         kfate->keyframe_number = num_keyframes;
         kfa_table->append(kfate);
     }
@@ -2832,28 +2833,31 @@ int NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
             else
             {
                 writekeyframe = decoder->isLastFrameKey();
-                if (did_ff == 1 && decoder->GetRawVideoState())
-                {
-                    writekeyframe = true;
-                    did_ff++;
-                }
-                else if (writekeyframe && did_ff)
-                    did_ff = 0;
-
                 if (writekeyframe)
                 {
+                    // Currently, we don't create new sync frames,
+                    // (though we do create new 'I' frames), so we mark
+                    // the key-frames before deciding whether we need a
+                    // new 'I' frame.
+
+                    //need to correct the frame# and timecode here
+                    // Question:  Is it necessary to change the timecodes?
+                    decoder->UpdateFrameNumber(frame.frameNumber);
                     nvr->UpdateSeekTable(num_keyframes, false);
                     ReencoderAddKFA(&kfa_table, frame.frameNumber,lastKeyFrame,
                                     num_keyframes);
                     num_keyframes++;
                     lastKeyFrame = frame.frameNumber;
+
+                    if (did_ff)
+                        did_ff = 0;
                 }
-            }
-            if (!kfa_table.isEmpty())
-            {
-                //need to correct the frame# and timecode here
-                // Question:  Is it necessary to change the timecodes?
-               decoder->UpdateFrameNumber(frame.frameNumber);
+                else if (did_ff == 1 && decoder->GetRawVideoState())
+                {
+                    // Create a new 'I' frame if we just processed a cut.
+                    writekeyframe = true;
+                    did_ff++;
+                }
             }
 
             if (!did_ff && decoder->GetRawVideoState())

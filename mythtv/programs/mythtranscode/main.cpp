@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
     QString tmpfile = infile + ".tmp";
 
     if (use_db) 
-        StoreTranscodeState(pginfo, 1);
+        StoreTranscodeState(pginfo, TRANSCODE_STARTED);
     NuppelVideoPlayer *nvp = new NuppelVideoPlayer(db, pginfo);
 
     cout << "Transcoding from " << infile << " to " << tmpfile << "\n";
@@ -183,14 +183,14 @@ int main(int argc, char *argv[])
     if (result == REENCODE_OK)
     {
         if (use_db)
-            StoreTranscodeState(pginfo, 2);
+            StoreTranscodeState(pginfo, TRANSCODE_FINISHED);
         cout << "Transcoding " << infile << " done\n";
         retval = 0;
     } 
     else if (result == REENCODE_CUTLIST_CHANGE)
     {
         if (use_db)
-            StoreTranscodeState(pginfo, -2);
+            StoreTranscodeState(pginfo, TRANSCODE_RETRY);
         cout << "Transcoding " << infile 
              << " aborted because of cutlist update\n";
         retval = 1;
@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
     else
     {
         if (use_db)
-            StoreTranscodeState(pginfo, -1);
+            StoreTranscodeState(pginfo, TRANSCODE_FAILED);
         cout << "Transcoding " << infile << " failed\n";
         retval = -1;
     }

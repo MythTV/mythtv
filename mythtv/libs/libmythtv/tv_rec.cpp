@@ -719,7 +719,7 @@ void TVRec::TeardownRecorder(bool killFile)
             if (gContext->GetNumSetting("AutoCommercialFlag", 1))
                 FlagCommercials();
 
-            if (!gContext->GetNumSetting("TranscoderUseCutlist", 0))
+            if (gContext->GetNumSetting("TranscoderAutoRun", 0))
             {
                 QString message = QString("LOCAL_READY_TO_TRANSCODE %1 %2")
                            .arg(prevRecording->chanid)

@@ -24,6 +24,15 @@ enum MarkTypes {
     MARK_SCENE_CHANGE = 8
 };
 
+enum TranscoderStatus {
+    TRANSCODE_QUEUED = -3,
+    TRANSCODE_RETRY = -2,
+    TRANSCODE_FAILED = -1,
+    TRANSCODE_LAUNCHED = 0,
+    TRANSCODE_STARTED = 1,
+    TRANSCODE_FINISHED = 2,
+};
+
 class QSqlDatabase;
 
 class ProgramInfo
@@ -112,6 +121,9 @@ class ProgramInfo
 
     void DeleteHistory(QSqlDatabase *db);
 
+    static void GetProgramListByQuery(QSqlDatabase *db,
+                                        QPtrList<ProgramInfo> *proglist,
+                                        const QString &where);
     static void GetProgramRangeDateTime(QSqlDatabase *db,
                                         QPtrList<ProgramInfo> *proglist, 
                                         const QString &channel, 

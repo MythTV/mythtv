@@ -17,6 +17,7 @@ using namespace std;
 #include "programinfo.h"
 #include "oldsettings.h"
 #include "mythcontext.h"
+#include "proglist.h"
 
 class RecListItem : public QListViewItem
 {
@@ -78,6 +79,8 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent,
             SLOT(selected(QListViewItem *)));
     connect(lview, SIGNAL(infoPressed(QListViewItem *)), this,
             SLOT(advancedEdit(QListViewItem *)));
+    connect(lview, SIGNAL(numberPressed(QListViewItem *, int)), this,
+            SLOT(numberPress(QListViewItem *, int)));
 
     RecListItem *item = new RecListItem(lview, tr("Record this program whenever"
                                         " it's shown anywhere"), kAllRecord);
@@ -125,6 +128,21 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, MythMainWindow *parent,
         selectItem = item;
 
     vbox->addWidget(lview, 0);
+
+    f = new QFrame(this);
+    f->setFrameStyle(QFrame::HLine | QFrame::Plain);
+    f->setLineWidth((int)(4 * hmult));
+    vbox->addWidget(f);
+
+    QLabel *legend1 = new QLabel(tr("To go to the advanced recordings screen, "
+                                    "press 'i'"), this);
+    legend1->setBackgroundOrigin(WindowOrigin);
+    vbox->addWidget(legend1, 0);
+
+    QLabel *legend2 = new QLabel(tr("To see a list of all up-coming showings "
+                                    "of this program, press '5'"), this);
+    legend2->setBackgroundOrigin(WindowOrigin);
+    vbox->addWidget(legend2, 0);
 
     lview->setCurrentItem(selectItem);
     lview->setSelected(selectItem, true);
@@ -185,3 +203,16 @@ void InfoDialog::advancedEdit(QListViewItem *)
     reject();
 }
 
+void InfoDialog::numberPress(QListViewItem *, int num)
+{
+    if (num == 5)
+    {
+        ProgLister *pl = new ProgLister(myinfo->title, 
+                                        QSqlDatabase::database(),
+                                        gContext->GetMainWindow(), "proglist");
+        pl->exec();
+        delete pl;
+
+        lview->setFocus();
+    }
+}

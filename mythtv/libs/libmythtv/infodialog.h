@@ -21,6 +21,7 @@ class InfoDialog : public MythDialog
   protected slots:
     void selected(QListViewItem *);
     void advancedEdit(QListViewItem *);
+    void numberPress(QListViewItem *, int);
 
   private:
     QLabel *getDateLabel(ProgramInfo *pginfo);

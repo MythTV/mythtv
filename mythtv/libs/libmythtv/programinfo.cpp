@@ -256,22 +256,16 @@ int ProgramInfo::CalculateLength(void)
     return startts.secsTo(endts);
 }
 
-void ProgramInfo::GetProgramRangeDateTime(QSqlDatabase *db,
-                                          QPtrList<ProgramInfo> *proglist, 
-                                          const QString &channel, 
-                                          const QString &ltime,
-                                          const QString &rtime)
+void ProgramInfo::GetProgramListByQuery(QSqlDatabase *db,
+                                        QPtrList<ProgramInfo> *proglist, 
+                                        const QString &where)
 {
     QString thequery;
 
     thequery = QString("SELECT channel.chanid,starttime,endtime,title,subtitle,"
                        "description,category,channel.channum,channel.callsign, "
-                       "channel.name FROM program,channel "
-                       "WHERE program.chanid = %1 AND endtime >= %1 AND "
-                       "starttime <= %3 AND program.chanid = channel.chanid "
-                       "ORDER BY starttime;")
-                       .arg(channel).arg(ltime).arg(rtime);
-    // allowed to use default connection
+                       "channel.name FROM program,channel ") + where;
+
     QSqlQuery query = db->exec(thequery);
 
     if (query.isActive() && query.numRowsAffected() > 0)
@@ -307,6 +301,22 @@ void ProgramInfo::GetProgramRangeDateTime(QSqlDatabase *db,
         }
     }
 }    
+
+void ProgramInfo::GetProgramRangeDateTime(QSqlDatabase *db,
+                                          QPtrList<ProgramInfo> *proglist,
+                                          const QString &channel,
+                                          const QString &ltime,
+                                          const QString &rtime)
+{
+    QString where;
+
+    where = QString("WHERE program.chanid = %1 AND endtime >= %1 AND "
+                   "starttime <= %3 AND program.chanid = channel.chanid "
+                   "ORDER BY starttime;")
+                    .arg(channel).arg(ltime).arg(rtime);
+
+    GetProgramListByQuery(db, proglist, where);
+}
 
 ProgramInfo *ProgramInfo::GetProgramAtDateTime(QSqlDatabase *db,
                                                const QString &channel, 

@@ -324,7 +324,7 @@ bool Channel::SetChannelByString(const QString &chan)
         if (!TuneTo(freqid, finetune))
             return false;
     }
-    else if (!ChangeExternalChannel(chan))
+    else if (!ChangeExternalChannel(freqid))
         return false;
 
     curchannelname = chan;

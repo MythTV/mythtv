@@ -15,6 +15,10 @@ INSERT INTO settings VALUES ('DBSchemaVer', 1002, NULL);
 #   when a previously executed command is encountered.
 #
 
+INSERT INTO settings SET value="TranscoderAutoRun", data=0;
+DELETE FROM settings WHERE value="TranscoderUseCutlist";
+INSERT INTO settings SET value="TranscoderUseCutlist", data=1;
+
 ALTER TABLE record ADD maxepisodes INT DEFAULT 0 NOT NULL;
 
 ALTER TABLE record ADD autoexpire INT DEFAULT 0 NOT NULL;

@@ -105,9 +105,11 @@ pid_t Transcoder::Transcode(ProgramInfo *pginfo)
     }
     else if (child == 0)
     {
+        for(int i = 3; i < sysconf(_SC_OPEN_MAX) - 1; ++i)
+            close(i);
         execl("/bin/sh", "sh", "-c", command.ascii(), NULL);
         perror("exec");
-        exit(1);
+        _exit(1);
     }
     if (setpriority(PRIO_PROCESS, child, 19) != 0)
         cerr << "Failed to set priority of transcoder!\n";
@@ -117,12 +119,9 @@ pid_t Transcoder::Transcode(ProgramInfo *pginfo)
 void Transcoder::InitTranscoder(ProgramInfo *pginfo)
 {
      QString query;
-     query = QString("INSERT into transcoding "
-                     "(chanid,starttime,status,hostname) "
-                     "VALUES ('%1','%2',0,'%3');")
-                     .arg(pginfo->chanid)
-                     .arg(pginfo->startts.toString("yyyyMMddhhmmss"))
-                     .arg(gContext->GetHostName());
+     query = QString("UPDATE transcoding "
+                     "SET starttime = starttime, status = %1;")
+                     .arg(TRANSCODE_LAUNCHED);
      dblock->lock();
      MythContext::KickDatabase(db_conn);
      db_conn->exec(query);
@@ -199,17 +198,29 @@ void Transcoder::ClearTranscodeTable(bool skipPartial)
                                     .arg(dtstart.toString("yyyyMMddhhmmss"))
                                     .arg(gContext->GetHostName());
                     db_conn->exec(query);
-                    query = QString("DELETE FROM recordedmarkup WHERE "
-                                    "chanid = '%1' AND starttime = '%2';")
-                                    .arg(result.value(0).toString())
-                                    .arg(dtstart.toString("yyyyMMddhhmmss"));
-                    db_conn->exec(query);
-                    query = QString("UPDATE recorded WHERE "
-                                    "chanid = '%1' AND starttime = '%2' "
-                                    "SET cutlist = NULL, bookmark = NULL;")
-                                    .arg(result.value(0).toString())
-                                    .arg(dtstart.toString("yyyyMMddhhmmss"));
-                    db_conn->exec(query);
+                    if (useCutlist)
+                    {
+                        query = QString("DELETE FROM recordedmarkup WHERE "
+                                        "chanid = '%1' AND starttime = '%2';")
+                                        .arg(result.value(0).toString())
+                                        .arg(dtstart.toString("yyyyMMddhhmmss"))
+;
+                        db_conn->exec(query);
+                        query = QString("UPDATE recorded WHERE "
+                                        "chanid = '%1' AND starttime = '%2' "
+                                        "SET cutlist = NULL, bookmark = NULL;")
+                                        .arg(result.value(0).toString())
+                                        .arg(dtstart.toString("yyyyMMddhhmmss"));
+                        db_conn->exec(query);
+                    } else {
+                        query = QString("DELETE FROM recordedmarkup WHERE "
+                                        "chanid = '%1' AND starttime = '%2' "
+                                        "AND type = '%3';")
+                                        .arg(result.value(0).toString())
+                                        .arg(dtstart.toString("yyyyMMddhhmmss"))
+                                        .arg(MARK_KEYFRAME);
+                        db_conn->exec(query);
+                    }
                 }
             }
             else if (status == -1)
@@ -254,6 +265,8 @@ void Transcoder::EnqueueTranscode(ProgramInfo *pinfo)
         return;
     }
 
+    // Be careful in the future that we never try to aquire the
+    // dblock while holding transqlock otherwise we could deadlock.
     pthread_mutex_lock(&transqlock);
     if (!TranscodeQueue.isEmpty())
     {
@@ -269,13 +282,22 @@ void Transcoder::EnqueueTranscode(ProgramInfo *pinfo)
             }
         }
     }
-    dblock->unlock();
 
     // only transcode if this program is not already transcoding
       
     ProgramInfo *pinfo_copy = new ProgramInfo(*pinfo);
+    query = QString("INSERT into transcoding "
+                    "(chanid,starttime,status,hostname) "
+                    "VALUES ('%1','%2','%3','%4');")
+                    .arg(pinfo->chanid)
+                    .arg(pinfo->startts.toString("yyyyMMddhhmmss"))
+                    .arg(TRANSCODE_QUEUED)
+                    .arg(gContext->GetHostName());
+
+    db_conn->exec(query);
     TranscodeQueue.append(pinfo_copy);
     pthread_mutex_unlock(&transqlock);
+    dblock->unlock();
 }
 
 void Transcoder::TranscodePoll()

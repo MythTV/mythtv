@@ -134,7 +134,7 @@ bool ChannelBase::ChangeExternalChannel(const QString &channum)
             close(i);
         execl("/bin/sh", "sh", "-c", command.ascii(), NULL);
         perror("exec");
-        exit(1);
+        _exit(1);
     }
     else
     {

@@ -1154,9 +1154,15 @@ long long RingBuffer::WriterSeek(long long pos, int whence)
     long long ret = -1;
 
     if (dumpfw)
+    {
 	ret = dumpfw->Seek(pos, whence);
+        dumpwritepos = ret;
+    }
     else if (tfw)
+    {
 	ret = tfw->Seek(pos, whence);
+        totalwritepos = ret;
+    }
 
     return ret;
 }
