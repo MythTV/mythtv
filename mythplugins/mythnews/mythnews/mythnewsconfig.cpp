@@ -598,8 +598,14 @@ void MythNewsConfig::keyPressEvent(QKeyEvent *e)
         if (action == "UP") {
             cursorUp();
         }
+        else if (action == "PAGEUP") {
+             cursorUp(true);
+        }
         else if (action == "DOWN") {
             cursorDown();
+        }
+        else if (action == "PAGEDOWN") {
+             cursorDown(true);
         }
         else if (action == "LEFT") {
             cursorLeft();
@@ -624,31 +630,35 @@ void MythNewsConfig::keyPressEvent(QKeyEvent *e)
         update();
 }
 
-void MythNewsConfig::cursorUp()
+void MythNewsConfig::cursorUp(bool page)
 {
+    UIListBtnType::MovementUnit unit = page ? UIListBtnType::MovePage : UIListBtnType::MoveItem;
+
     if (m_InColumn == 0) {
-        m_UISelector->MoveUp();
+        m_UISelector->MoveUp(unit);
     }
     else if (m_Context == 0) {
         if (m_InColumn == 1)
-            m_UICategory->MoveUp();
+            m_UICategory->MoveUp(unit);
         else
-            m_UISite->MoveUp();
+            m_UISite->MoveUp(unit);
     }
     
     update();
 }
 
-void MythNewsConfig::cursorDown()
+void MythNewsConfig::cursorDown(bool page)
 {
+    UIListBtnType::MovementUnit unit = page ? UIListBtnType::MovePage : UIListBtnType::MoveItem;
+
     if (m_InColumn == 0) {
-        m_UISelector->MoveDown();
+        m_UISelector->MoveDown(unit);
     }
     else if (m_Context == 0) {
         if (m_InColumn == 1)
-            m_UICategory->MoveDown();
+            m_UICategory->MoveDown(unit);
         else
-            m_UISite->MoveDown();
+            m_UISite->MoveDown(unit);
     }
 
     update();

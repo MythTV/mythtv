@@ -72,8 +72,8 @@ private:
     void updateFreq();
     void updateBot();
     
-    void cursorUp();
-    void cursorDown();
+    void cursorUp(bool page=false);
+    void cursorDown(bool page=false);
     void cursorLeft();
     void cursorRight();
     
