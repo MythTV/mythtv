@@ -1536,7 +1536,6 @@ void ProgramInfo::SetPositionMapDelta(QMap<long long, long long> &posMap, int ty
 {
     QMap<long long, long long>::Iterator i;
 
-cerr << "SetPositionMapDelta: size: " << posMap.size() << endl;
     QString starts = recstartts.toString("yyyyMMddhhmm");
     starts += "00";
 
