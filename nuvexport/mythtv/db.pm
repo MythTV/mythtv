@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.08.25 (xris)
+#Last Updated: 2004.11.15 (xris)
 #
 #  mythtv::db
 #
@@ -38,8 +38,11 @@ package mythtv::db;
         or open(CONF, "/etc/mythtv/mysql.txt")
         or die ("Unable to locate mysql.txt:  $!\n\n");
     while (my $line = <CONF>) {
-        chomp($line);
+    # Cleanup
+        next if ($line =~ /^\s*#/);
         $line =~ s/^str //;
+        chomp($line);
+    # Split off the var=val pairs
         my ($var, $val) = split(/\=/, $line, 2);
         next unless ($var && $var =~ /\w/);
         if ($var eq 'DBHostName') {
@@ -54,6 +57,7 @@ package mythtv::db;
         elsif ($var eq 'DBPassword') {
             $db_pass = $val;
         }
+    # Hostname override
         elsif ($var eq 'LocalHostName') {
             $hostname = $val;
         }
