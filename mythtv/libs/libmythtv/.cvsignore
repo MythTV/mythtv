@@ -7,4 +7,5 @@ moc_scheduledrecording.cpp
 moc_progfind.cpp
 moc_proglist.cpp
 moc_tv_play.cpp
+moc_xbox.cpp
 Makefile
