@@ -1034,6 +1034,9 @@ OSDTypeEditSlider::OSDTypeEditSlider(const QString &name,
     m_redname = redfilename;
     m_bluename = bluefilename;
 
+    m_scalew = scalew;
+    m_scaleh = scaleh;
+
     LoadImage(m_redname, wmult, hmult, scalew, scaleh);
     if (m_isvalid)
     {
