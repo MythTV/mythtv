@@ -73,7 +73,7 @@ void MFDRtspPlugin::processRequest(MFDServiceClientSocket *a_client)
                     break;
                     
             case    RRT_GET_PARAMETER:
-                    handleGetParameteRequest(in_request, client_id);
+                    handleGetParameterRequest(in_request, client_id);
                     break;
                     
             case    RRT_OPTIONS:
@@ -154,54 +154,90 @@ void MFDRtspPlugin::sendResponse(int client_id, RtspOutResponse *rtsp_response)
 }
 
 
+//
+//  ALL default implementations just send RTSP 501 (not implemented)
+//
 
-void MFDRtspPlugin::handleDescribeRequest(RtspInRequest* /* in_request */, int /* client_id */)
+
+void MFDRtspPlugin::handleDescribeRequest(RtspInRequest *in_request, int client_id)
 {
+    RtspOutResponse *rtsp_response = new RtspOutResponse(this, in_request->getCSeq());
+    rtsp_response->setStatus(501, "Not Implemented");
+    sendResponse(client_id, rtsp_response);
+    delete rtsp_response;
 }
 
-void MFDRtspPlugin::handleGetParameteRequest(RtspInRequest* /* in_request */, int /* client_id */)
+void MFDRtspPlugin::handleGetParameterRequest(RtspInRequest *in_request, int client_id)
 {
+    RtspOutResponse *rtsp_response = new RtspOutResponse(this, in_request->getCSeq());
+    rtsp_response->setStatus(501, "Not Implemented");
+    sendResponse(client_id, rtsp_response);
+    delete rtsp_response;
 }
 
 void MFDRtspPlugin::handleOptionsRequest(RtspInRequest *in_request, int client_id)
 {
     RtspOutResponse *rtsp_response = new RtspOutResponse(this, in_request->getCSeq());
-    rtsp_response->addHeader("Public", "OPTIONS, SETUP, TEARDOWN, PLAY");
+    rtsp_response->setStatus(501, "Not Implemented");
     sendResponse(client_id, rtsp_response);
-    
     delete rtsp_response;
-
 }
 
-void MFDRtspPlugin::handlePauseRequest(RtspInRequest* /* in_request */, int /* client_id */)
+void MFDRtspPlugin::handlePauseRequest(RtspInRequest *in_request, int client_id)
 {
+    RtspOutResponse *rtsp_response = new RtspOutResponse(this, in_request->getCSeq());
+    rtsp_response->setStatus(501, "Not Implemented");
+    sendResponse(client_id, rtsp_response);
+    delete rtsp_response;
 }
 
-void MFDRtspPlugin::handlePlayRequest(RtspInRequest* /* in_request */, int /* client_id */)
+void MFDRtspPlugin::handlePlayRequest(RtspInRequest *in_request, int client_id)
 {
+    RtspOutResponse *rtsp_response = new RtspOutResponse(this, in_request->getCSeq());
+    rtsp_response->setStatus(501, "Not Implemented");
+    sendResponse(client_id, rtsp_response);
+    delete rtsp_response;
 }
 
-void MFDRtspPlugin::handlePingRequest(RtspInRequest* /* in_request */, int /* client_id */)
+void MFDRtspPlugin::handlePingRequest(RtspInRequest *in_request, int client_id)
 {
+    RtspOutResponse *rtsp_response = new RtspOutResponse(this, in_request->getCSeq());
+    rtsp_response->setStatus(501, "Not Implemented");
+    sendResponse(client_id, rtsp_response);
+    delete rtsp_response;
 }
 
-void MFDRtspPlugin::handleRedirectRequest(RtspInRequest* /* in_request */, int /* client_id */)
+void MFDRtspPlugin::handleRedirectRequest(RtspInRequest *in_request, int client_id)
 {
+    RtspOutResponse *rtsp_response = new RtspOutResponse(this, in_request->getCSeq());
+    rtsp_response->setStatus(501, "Not Implemented");
+    sendResponse(client_id, rtsp_response);
+    delete rtsp_response;
 }
 
-void MFDRtspPlugin::handleSetupRequest(RtspInRequest* /* in_request */, int /* client_id */)
+void MFDRtspPlugin::handleSetupRequest(RtspInRequest *in_request, int client_id)
 {
+    RtspOutResponse *rtsp_response = new RtspOutResponse(this, in_request->getCSeq());
+    rtsp_response->setStatus(501, "Not Implemented");
+    sendResponse(client_id, rtsp_response);
+    delete rtsp_response;
 }
 
-void MFDRtspPlugin::handleSetParameterRequest(RtspInRequest* /* in_request */, int /* client_id */)
+void MFDRtspPlugin::handleSetParameterRequest(RtspInRequest *in_request, int client_id)
 {
+    RtspOutResponse *rtsp_response = new RtspOutResponse(this, in_request->getCSeq());
+    rtsp_response->setStatus(501, "Not Implemented");
+    sendResponse(client_id, rtsp_response);
+    delete rtsp_response;
 }
 
-void MFDRtspPlugin::handleTeardownRequest(RtspInRequest* /* in_request */, int /* client_id */)
+void MFDRtspPlugin::handleTeardownRequest(RtspInRequest *in_request, int client_id)
 {
+    RtspOutResponse *rtsp_response = new RtspOutResponse(this, in_request->getCSeq());
+    rtsp_response->setStatus(501, "Not Implemented");
+    sendResponse(client_id, rtsp_response);
+    delete rtsp_response;
 }
-
-
 
 
 MFDRtspPlugin::~MFDRtspPlugin()

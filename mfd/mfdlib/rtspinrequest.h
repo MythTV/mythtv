@@ -46,7 +46,7 @@ class RtspInRequest
 
   public:
 
-    RtspInRequest(MFDRtspPlugin *owner, MFDServiceClientSocket *a_client);
+    RtspInRequest(MFDRtspPlugin *owner, MFDServiceClientSocket *a_client, bool dbo = false);
     ~RtspInRequest();
 
     bool            parseIncomingBytes();
@@ -58,6 +58,8 @@ class RtspInRequest
     void            parseRequestLine();
     RtspRequestType getRequest(){ return request; }
     int             getCSeq(){ return command_sequence; }
+    QString         getHeaderValue(const QString &header_field);
+    QString         getUrl(){ return QString(request_url); }
 
     void    log(const QString &log_message, int verbosity);
     void    warning(const QString &warning_message);
@@ -82,6 +84,7 @@ class RtspInRequest
     RtspRequestType         request;
     QUrl                    request_url;
     int                     command_sequence;
+    bool                    debug_on;
 };
 
 #endif

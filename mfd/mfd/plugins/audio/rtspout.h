@@ -22,7 +22,19 @@ class RtspOut: public MFDRtspPlugin
     RtspOut(MFD *owner, int identity);
     ~RtspOut();
 
+    //
+    //  Implement the RTSP requests we can deal with
+    //
+    
+    void handleOptionsRequest(RtspInRequest *in_request, int client_id);
+    void handleDescribeRequest(RtspInRequest *in_request, int client_id);
+
     void run();
+
+  private:
+  
+    QString my_ip_address;
+
 };
 
 #endif  // rtspout_h_

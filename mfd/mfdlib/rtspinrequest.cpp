@@ -16,7 +16,8 @@
 
 RtspInRequest::RtspInRequest(
                                 MFDRtspPlugin *owner, 
-                                MFDServiceClientSocket *a_client
+                                MFDServiceClientSocket *a_client,
+                                bool dbo
                             )
 {
     parent = owner;
@@ -27,6 +28,7 @@ RtspInRequest::RtspInRequest(
     payload_size = 0;
     request = RRT_UNKNOWN;
     command_sequence = -1;
+    debug_on = dbo;
 }
 
 bool RtspInRequest::parseIncomingBytes()
@@ -60,7 +62,10 @@ bool RtspInRequest::parseIncomingBytes()
 
 
 
-    printYourself();
+    if(debug_on)
+    {
+        printYourself();
+    }
 
     parseHeaders();
     if(!all_is_well)
@@ -543,6 +548,21 @@ void RtspInRequest::parseRequestLine()
     
    
 }
+
+QString RtspInRequest::getHeaderValue(const QString &header_field)
+{
+    QString response = "";
+    
+    HttpHeader *which_header= headers[header_field];
+    
+    if(which_header)
+    {
+        response = which_header->getValue();
+    }
+    
+    return response;
+}
+
 
 void RtspInRequest::log(const QString &log_message, int verbosity)
 {

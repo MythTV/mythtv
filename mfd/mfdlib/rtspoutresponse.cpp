@@ -12,10 +12,11 @@
 #include "rtspserver.h"
 #include "rtspoutresponse.h"
 
-RtspOutResponse::RtspOutResponse(MFDRtspPlugin *owner, int cseq)
+RtspOutResponse::RtspOutResponse(MFDRtspPlugin *owner, int cseq, bool dbo)
 {
     parent = owner;
     command_sequence = cseq;
+    debug_on = dbo;
     headers.setAutoDelete(true);
     
     //
@@ -56,7 +57,11 @@ void RtspOutResponse::addText(std::vector<char> *buffer, QString text_to_add)
     buffer->insert(buffer->end(), text_to_add.ascii(), text_to_add.ascii() + text_to_add.length()); 
 }
 
-
+void RtspOutResponse::setStatus(int stat_code, const QString &stat_string)
+{
+    status_code = stat_code;
+    status_string = stat_string;
+}
 
 void RtspOutResponse::send(MFDServiceClientSocket *which_client)
 {
@@ -72,6 +77,10 @@ void RtspOutResponse::send(MFDServiceClientSocket *which_client)
     
     addText(&outgoing_bytes, first_line);
     
+    //
+    //  Add all the headers
+    //
+
     QDictIterator<HttpHeader> it( headers );
     for( ; it.current(); ++it )
     {
@@ -82,12 +91,28 @@ void RtspOutResponse::send(MFDServiceClientSocket *which_client)
     }
 
     //
+    //  Calculate and add Content-Length header if there's a payload
+    //
+    
+    if(payload.size() > 0)
+    {
+        addText(&outgoing_bytes, QString("Content-Length: %1\r\n")
+                                 .arg(payload.size()));
+    }
+
+    //
     //  Add the "end of headers" blank line
     //
     
     addText(&outgoing_bytes, "\r\n");
 
-    sendBlock(which_client, outgoing_bytes);
+    if(sendBlock(which_client, outgoing_bytes))
+    {
+        if(payload.size() > 0)
+        {
+            sendBlock(which_client, payload);
+        }
+    }
 }
 
 bool RtspOutResponse::sendBlock(MFDServiceClientSocket *which_client, std::vector<char> &block_to_send)
@@ -209,6 +234,52 @@ bool RtspOutResponse::sendBlock(MFDServiceClientSocket *which_client, std::vecto
     return true;
 }
 
+
+void RtspOutResponse::addTextToPayload(const QString &text_to_add)
+{
+    QString altered_text = text_to_add;
+    altered_text.append("\r\n");
+    payload.insert(payload.end(), altered_text.ascii(), altered_text.ascii() + altered_text.length()); 
+}
+
+
+
+void RtspOutResponse::printYourself(bool with_payload)
+{
+    cout << "S->C " 
+         << "RTSP/1.0 " 
+         << status_code
+         << " "
+         << status_string 
+         << endl;
+         
+    if(headers.count() > 0)
+    {
+        QDictIterator<HttpHeader> iterator( headers );
+        for( ; iterator.current(); ++iterator )
+        {
+            cout << "     " << iterator.currentKey() << ": " << iterator.current()->getValue() << endl;
+        }
+        if(payload.size() > 0)
+        {
+            cout << "     " << "Content-Length: " << payload.size() << endl;
+        }
+    }
+    else
+    {
+        cout << "     " << "NO HEADERS" << endl;
+    }
+    
+    cout << endl;
+    
+    if(with_payload)
+    {
+        for (uint i = 0; i < payload.size(); i++)
+        {
+            cout << payload.at(i);
+        }
+    }
+}
 
 void RtspOutResponse::log(const QString &log_message, int verbosity)
 {

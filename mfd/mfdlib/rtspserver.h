@@ -27,19 +27,19 @@ class MFDRtspPlugin : public MFDServicePlugin
                     const QString &a_name = "unkown",
                     int l_minimum_thread_pool_size = 0
                  );
-    ~MFDRtspPlugin();
+    virtual ~MFDRtspPlugin();
 
 
     virtual void    processRequest(MFDServiceClientSocket *a_client);
     virtual void    sendResponse(int client_id, RtspOutResponse *rtsp_response);
 
     //
-    //  Standard RTSP request types (anything important will be
-    //  re-implemented in a sub class)
+    //  Standard RTSP request types (default implementations just send 501
+    //  Not Implemented responses)
     //
     
     virtual void    handleDescribeRequest(RtspInRequest *in_request, int client_id);
-    virtual void    handleGetParameteRequest(RtspInRequest *in_request, int client_id);
+    virtual void    handleGetParameterRequest(RtspInRequest *in_request, int client_id);
     virtual void    handleOptionsRequest(RtspInRequest *in_request, int client_id);
     virtual void    handlePauseRequest(RtspInRequest *in_request, int client_id);
     virtual void    handlePlayRequest(RtspInRequest *in_request, int client_id);

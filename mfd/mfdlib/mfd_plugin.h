@@ -66,7 +66,7 @@ class MFDBasePlugin : public QThread
   public:
 
     MFDBasePlugin(MFD* owner, int identifier, const QString &a_name = "unkown");
-    ~MFDBasePlugin();
+    virtual ~MFDBasePlugin();
 
     virtual void stop(); 
     virtual void wakeUp();
@@ -118,7 +118,7 @@ class MFDCapabilityPlugin : public MFDBasePlugin
 
 
     MFDCapabilityPlugin(MFD* owner, int identifier, const QString &a_name = "unkown");
-    ~MFDCapabilityPlugin();
+    virtual ~MFDCapabilityPlugin();
 
     virtual void doSomething(const QStringList &tokens, int socket_identifier);
     void         parseTokens(const QStringList &tokens, int socket_identifier);
@@ -148,7 +148,7 @@ class MFDServicePlugin : public MFDBasePlugin
                         bool l_use_thread_pool = true, 
                         uint l_minimum_thread_pool_size = 0
                     );
-    ~MFDServicePlugin();
+    virtual ~MFDServicePlugin();
     
     virtual void    run();
     virtual void    stop();

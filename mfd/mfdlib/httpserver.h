@@ -24,7 +24,7 @@ class MFDHttpPlugin : public MFDServicePlugin
                     const QString &a_name = "unkown",
                     int l_minimum_thread_pool_size = 0
                  );
-    ~MFDHttpPlugin();
+    virtual ~MFDHttpPlugin();
 
     virtual void    processRequest(MFDServiceClientSocket *a_client);
     virtual void    handleIncoming(HttpInRequest *request, int client_id);

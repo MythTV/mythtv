@@ -21,14 +21,17 @@ class RtspOutResponse
 
   public:
 
-    RtspOutResponse(MFDRtspPlugin *owner, int cseq);
+    RtspOutResponse(MFDRtspPlugin *owner, int cseq, bool dbo = false);
     ~RtspOutResponse();
 
     void addHeader(const QString &filed, const QString &value);
     void addText(std::vector<char> *buffer, QString text_to_add);
+    void setStatus(int stat_code, const QString &stat_string);
     void send(MFDServiceClientSocket *which_client);
     bool sendBlock(MFDServiceClientSocket *which_client, std::vector<char> &block_to_send);
+    void addTextToPayload(const QString &text_to_add);
 
+    void    printYourself(bool with_payload = false);
     void    log(const QString &log_message, int verbosity);
     void    warning(const QString &warning_message);
     
@@ -39,6 +42,8 @@ class RtspOutResponse
     QDict<HttpHeader> headers;
     int               status_code;
     QString           status_string;
+    bool              debug_on;
+    std::vector<char> payload;
 };
 
 #endif
