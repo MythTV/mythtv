@@ -746,7 +746,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
             Metadata *tmpdata = all_available_music->getMetadata(it->getValue() * -1);
             if (tmpdata)
             {
-                QString a_string = QString("%2 ~ %3").arg(tmpdata->Track()).arg(tmpdata->Artist()).arg(tmpdata->Title());
+                QString a_string = QString("%1 ~ %2").arg(tmpdata->Artist()).arg(tmpdata->Title());
                 GenericTree *added_node = tree_to_write_to->addNode(a_string, it->getValue() * -1, true);
                 ++a_counter;
                 added_node->setAttribute(0, 1);
