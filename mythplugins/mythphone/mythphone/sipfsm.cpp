@@ -2105,9 +2105,12 @@ int SipRegistration::FSM(int Event, SipMsg *sipMsg, void *Value)
             (parent->Timer())->Start(this, REG_RETRY_TIMER, SIP_RETX); 
             break;
         default:
-            cout << "SIP Registration failed; Reason " << sipMsg->getStatusCode() << " " << sipMsg->getReasonPhrase() << endl;
-            State = SIP_REG_FAILED;
-            (parent->Timer())->Start(this, REG_FAIL_RETRY_TIMER, SIP_RETX); // Try again in 3 minutes
+            if (sipMsg->getStatusCode() > 199)
+            {
+                cout << "SIP Registration failed; Reason " << sipMsg->getStatusCode() << " " << sipMsg->getReasonPhrase() << endl;
+                State = SIP_REG_FAILED;
+                (parent->Timer())->Start(this, REG_FAIL_RETRY_TIMER, SIP_RETX); // Try again in 3 minutes
+            }
             break;
         }
         break;
@@ -2124,9 +2127,12 @@ int SipRegistration::FSM(int Event, SipMsg *sipMsg, void *Value)
             (parent->Timer())->Start(this, (Expires-30)*1000, SIP_REG_TREGEXP); // Assume 30secs max to reregister
             break;
         default:
-            cout << "SIP Registration failed; Reason " << sipMsg->getStatusCode() << " " << sipMsg->getReasonPhrase() << endl;
-            State = SIP_REG_FAILED;
-            (parent->Timer())->Start(this, REG_FAIL_RETRY_TIMER, SIP_RETX); // Try again in 3 minutes
+            if (sipMsg->getStatusCode() > 199)
+            {
+                cout << "SIP Registration failed; Reason " << sipMsg->getStatusCode() << " " << sipMsg->getReasonPhrase() << endl;
+                State = SIP_REG_FAILED;
+                (parent->Timer())->Start(this, REG_FAIL_RETRY_TIMER, SIP_RETX); // Try again in 3 minutes
+            }
             break;
         }
         break;
