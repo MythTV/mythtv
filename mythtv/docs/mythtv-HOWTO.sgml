@@ -256,7 +256,8 @@ Get lame from <url url="http://www.mp3dev.org/mp3"
 name="http://www.mp3dev.org/mp3">.  Download the source code to v3.92 by
 following the links to sourceforge.net
 
-<sect1>Notes on compiling on a system with non-Intel processors. 
+<sect1>Notes on compiling on a system with non-Intel processors. <label
+id="nonintelcpu_">
 <p>If
 you've got a system with an AMD K6-2 or a VIA C3 processor, make the
 following change in the <tt>settings.pro</tt> file.
@@ -696,6 +697,12 @@ fault" errors, it is likely that the video4linux (v4l) subsystem did not
 like the height and width parameters specified.  It's best to leave the
 default as-is until you're sure that mythtv is operational.
 
+<label id="deinterlace_"><bf>NOTE</bf>: the <tt>int Deinterlace=1</tt> variable controls the deinterlacer. 
+Support for deinterlacing requires that your processor have MMX2.  Intel Celeron
+and Pentium Pro CPUs do not have MMX2, so make sure that you've got this set
+to "0" if you have one of these.  If you don't, you will get "Illegal
+Instruction" errors.
+
 Users in North America can now exit and save the file.  Users in other parts
 of the world need to modify the first line and modify the XMLTVGrabber
 variable to the correct grabber for their region.  <bf>tv_grab_uk</bf> for the
@@ -965,4 +972,62 @@ you're at the first level.
 <sect>mythgame.
 
 <sect>mythmusic.
+<p>mythmusic has a number of pre-requisites that must be satisfied before it
+is operational.
+
+Download MAD from <url url="http://www.mars.org/home/rob/proj/mpeg/"
+name="http://www.mars.org/home/rob/proj/mpeg/">  Save it to a directory you
+can find later.
+
+<tscreen><verb>
+% tar -xzf mad-0.14.2b.tar.gz
+% cd mad-0.14.2b
+% ./configure
+% make
+% su
+# make install
+# exit
+%
+</verb></tscreen>
+
+Install libvorbis-devel using urpmi or the Mandrake Control Center
+installer.
+
+Download FLAC from <url url="http://flac.sourceforge.net"
+name="http://flac.sourceforge.net"> and install:
+
+<tscreen><verb>
+% tar -xzf flac-1.0.4.tar.gz
+% cd flac-1.0.4
+% ./configure
+% make
+% su
+# make install
+# exit
+%
+</verb></tscreen>
+
+Download and install libcdaudio
+
+Install cdparanoia using urpmi or the Mandrake Control Center.
+
+Download cdparanoia from the website and copy interface/cdda_interface.h to
+/usr/local/include
+
+/usr/lib:
+ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
+ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
+
+<sect>Troubleshooting.
+<sect1>Illegal Instruction.
+<p>This error can happen for the following reasons:
+<itemize>
+<item>You have an AMD K6-2 or VIA C3 processor.  If you have either of
+these, make sure that you you followed the instructions in this <ref id="nonintelcpu_"
+name="section">.
+<item>You have an Intel Celeron or Pentium Pro.  If you have either of these
+processors, make sure that your <ref id="deinterlace_" name="deinterlace">
+variable is set correctly.
+</itemize>
+
 </article>

@@ -79,6 +79,10 @@
 
   12. mythgame.
   13. mythmusic.
+  14. Troubleshooting.
+     14.1 Illegal Instruction.
+
+
   ______________________________________________________________________
 
   [1m1.  Introduction.[0m
@@ -141,10 +145,11 @@
 
   +o  The developer states that his AMD1800+ system can [1malmost [22mencode two
      MPEG4 video streams and watch one program simultaneously.
-
   +o  A PIII/800Mhz system with 512MB RAM can encode one video stream
      using the RTJPEG codec with 480x480 capture resolution and play it
      back simultaneously, thereby allowing live TV watching.
+
+
   [1m2.2.  Software.[0m
 
   There are a few ways of installing programs on Linux systems; you can
@@ -210,7 +215,6 @@
   Desktop install of Red Hat Linux 8.0 make sure in addition you have
   selected:
 
-
   +o  KDE Desktop Environment
 
   +o  SQL Database Server -  you will have to click on "details" and make
@@ -267,6 +271,7 @@
   [1m2.2.2.3.  Gentoo.[0m
 
   [Please submit instructions]
+
 
 
   [1m3.  Setting up paths and ldconfig.[0m
@@ -333,20 +338,19 @@
   Next, we need to make sure that the libraries that we're building will
   be found when we need them.
 
-
   [1m3.3.  Modifying /etc/ld.so.conf[0m
 
   Switch to /etc and execute the following:
 
 
-  # cd /etc
-  # cat >> ld.so.conf
-  /usr/local/lib
-  ^D
+       # cd /etc
+       # cat >> ld.so.conf
+       /usr/local/lib
+       ^D
 
-  # ldconfig
-  # exit
-  %
+       # ldconfig
+       # exit
+       %
 
 
 
@@ -398,22 +402,21 @@
        # make install
 
 
-
   Check that it worked:
 
 
-  # ls -l /usr/local/lib
-  -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
-  -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
-  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
-  libmp3lame.so.0.0.0*
-  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
-  libmp3lame.so.0.0.0*
-  -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
-  libmp3lame.so.0.0.0*
+       # ls -l /usr/local/lib
+       -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
+       -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
+       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
+       libmp3lame.so.0.0.0*
+       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
+       libmp3lame.so.0.0.0*
+       -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
+       libmp3lame.so.0.0.0*
 
-  # exit
-  %
+       # exit
+       %
 
 
 
@@ -454,14 +457,16 @@
   Install the xmltv prerequisites:
 
 
-       % su -
-       # perl -MCPAN -e shell
-       cpan> install XML::Twig
-       cpan> install Date::Manip
-       Date::Manip is up to date.
-       cpan> install LWP
-       cpan> install XML::Writer
-       cpan> exit
+
+  % su -
+  # perl -MCPAN -e shell
+  cpan> install XML::Twig
+  cpan> install Date::Manip
+  Date::Manip is up to date.
+  cpan> install LWP
+  cpan> install XML::Writer
+  cpan> exit
+
 
 
   Change to the XMLTV directory and compile it:
@@ -571,8 +576,6 @@
        # exit
        %
 
-
-
   [1m6.  Setting up alsa and the mixer.[0m
 
   If your video doesn't appear to be in-sync with your audio, it could
@@ -582,7 +585,6 @@
 
   What you need to do is to mute the "line-in" of your sound card and
   also set it as the recording source.
-
 
   There are two ways to do this.  Graphically, and from the command
   line.
@@ -647,12 +649,12 @@
 
 
 
-  % amixer set Master,0 100%,100% unmute
-  % amixer set Line,0 100%,100% mute capture
-  % su -
-  # alsactl store
-  # exit
-  %
+       % amixer set Master,0 100%,100% unmute
+       % amixer set Line,0 100%,100% mute capture
+       % su -
+       # alsactl store
+       # exit
+       %
 
 
 
@@ -708,10 +710,9 @@
   as well.
 
 
-
-  % tar -xjf lirc-0.6.6.tar.bz2
-  % cd lirc-0.6.6
-  % ./setup.sh
+       % tar -xjf lirc-0.6.6.tar.bz2
+       % cd lirc-0.6.6
+       % ./setup.sh
 
 
 
@@ -770,9 +771,8 @@
   used to control mythtv.
 
 
-
-  % cd ~/mythtv-0.7/configfiles
-  % cp lircrc.example ~/.lircrc
+       % cd ~/mythtv-0.7/configfiles
+       % cp lircrc.example ~/.lircrc
 
 
 
@@ -825,7 +825,6 @@
   than the default lircrc.example file that came with mythtv.
 
   The lircrc.example file has this:
-
 
 
   begin
@@ -918,6 +917,12 @@
   not like the height and width parameters specified.  It's best to
   leave the default as-is until you're sure that mythtv is operational.
 
+  [1mNOTE[22m: the int Deinterlace=1 variable controls the deinterlacer.
+  Support for deinterlacing requires that your processor have MMX2.
+  Intel Celeron and Pentium Pro CPUs do not have MMX2, so make sure that
+  you've got this set to "0" if you have one of these.  If you don't,
+  you will get "Illegal Instruction" errors.
+
   Users in North America can now exit and save the file.  Users in other
   parts of the world need to modify the first line and modify the
   XMLTVGrabber variable to the correct grabber for their region.
@@ -945,7 +950,6 @@
   be helpful: http://www.snapstream.com/products/irblaster/sonydss.htm
   <http://www.snapstream.com/products/irblaster/sonydss.htm> for cable
   pinouts for RCA DSS receivers.
-
 
   [1m8.2.  Running setup.[0m
 
@@ -1008,10 +1012,11 @@
   [1mNOTE[22m:  [1mmythfilldatabase [22mmight take a while to complete, depending on
   any number of factors, most of which you can't control.  It's best to
   just let the program run to completion.
-
   [1mmythfilldatabase --manual [22mis another option; the manual option will
   allow you to fine tune channel frequencies and specify which channels
   will be added to the database.
+
+
 
   [1m8.3.1.  Setting mythfilldatabase  to run from cron[0m
 
@@ -1235,6 +1240,55 @@
   [1m12.  mythgame.[0m
 
   [1m13.  mythmusic.[0m
+
+  mythmusic has a number of pre-requisites that must be satisfied before
+  it is operational.
+
+  Download MAD from http://www.mars.org/home/rob/proj/mpeg/
+  <http://www.mars.org/home/rob/proj/mpeg/>  Save it to a directory you
+  can find later.
+
+
+
+       % tar -xzf mad-0.14.2b.tar.gz
+       % cd mad-0.14.2b
+       % ./configure
+       % make
+       % su
+       # make install
+       # exit
+       %
+
+
+  Install libvorbis-devel using urpmi or the Mandrake Control Center
+  installer.
+
+  Download and install flac
+
+  Download and install libcdaudio
+
+  Install cdparanoia using urpmi or the Mandrake Control Center.
+
+  Download cdparanoia from the website and copy
+  interface/cdda_interface.h to /usr/local/include
+
+  /usr/lib: ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so ln
+  -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
+
+
+  [1m14.  Troubleshooting.[0m
+
+  [1m14.1.  Illegal Instruction.[0m
+
+  This error can happen for the following reasons:
+
+  +o  You have an AMD K6-2 or VIA C3 processor.  If you have either of
+     these, make sure that you you followed the instructions in this
+     ``section''.
+
+  +o  You have an Intel Celeron or Pentium Pro.  If you have either of
+     these processors, make sure that your ``deinterlace'' variable is
+     set correctly.
 
 
 

@@ -46,6 +46,12 @@ anything, if you start mythtv and don't see video or you get "segmentation
 fault" errors, it is likely that the video4linux (v4l) subsystem did not
 like the height and width parameters specified.  It's best to leave the
 default as-is until you're sure that mythtv is operational.</P>
+<P>
+<A NAME="deinterlace_"></A> <B>NOTE</B>: the <CODE>int Deinterlace=1</CODE> variable controls the deinterlacer. 
+Support for deinterlacing requires that your processor have MMX2.  Intel Celeron
+and Pentium Pro CPUs do not have MMX2, so make sure that you've got this set
+to "0" if you have one of these.  If you don't, you will get "Illegal
+Instruction" errors.</P>
 <P>Users in North America can now exit and save the file.  Users in other parts
 of the world need to modify the first line and modify the XMLTVGrabber
 variable to the correct grabber for their region.  <B>tv_grab_uk</B> for the
