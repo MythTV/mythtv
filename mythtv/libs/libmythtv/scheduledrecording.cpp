@@ -165,7 +165,7 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
 "program.starttime, program.endtime, "
 "program.title, program.subtitle, program.description, "
 "channel.channum, channel.callsign, channel.name, "
-"record.recordid, oldrecorded.starttime IS NOT NULL AS duplicate "
+"oldrecorded.starttime IS NOT NULL AS duplicate "
 "FROM record "
 " INNER JOIN channel ON (channel.chanid = program.chanid) "
 " INNER JOIN program ON (program.title = record.title) "
@@ -224,9 +224,12 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
              proginfo->chanstr = result.value(7).toString();
              proginfo->chansign = result.value(8).toString();
              proginfo->channame = result.value(9).toString();
-             // XXX recordid ignored for now, should create and populate a ScheduledRecording
-             // and put it in the proginfo
-             proginfo->duplicate = result.value(11).toInt();
+             proginfo->duplicate = result.value(10).toInt();
+
+             // would save many queries to create and populate a
+             // ScheduledRecording and put it in the proginfo at the
+             // same time, since it will be loaded later anyway with
+             // multiple queries
 
              if (proginfo->title == QString::null)
                  proginfo->title = "";
