@@ -15,6 +15,7 @@
 
 #include <unistd.h>
 #include <signal.h>
+#include <sys/wait.h>
 
 #include <iostream>
 #include <fstream>
@@ -22,6 +23,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <ctime>
+
 
 #include "libmyth/mythcontext.h"
 #include "libmythtv/scheduledrecording.h"
