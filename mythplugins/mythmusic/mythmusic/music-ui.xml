@@ -221,7 +221,7 @@
                 <orientation>LeftToRight</orientation>
             </repeatedimage>
 
-            <textarea name="current_visualization_text" draworder="1" align="left">
+            <textarea name="current_visualization_text" draworder="1" align="right">
                 <font>currentartist</font>
                 <area>470,100,200,25</area>
                 <cutdown>no</cutdown>
