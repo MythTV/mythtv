@@ -526,6 +526,95 @@
     </message>
 </context>
 <context>
+    <name>VideoDialog</name>
+    <message>
+        <source>Switch to Browse View</source>
+        <translation type="unfinished">Ga naar Browsermodus</translation>
+    </message>
+    <message>
+        <source>Switch to Gallery View</source>
+        <translation type="unfinished">Ga naar Gallerijmodus</translation>
+    </message>
+    <message>
+        <source>Switch to List View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished">Ok</translation>
+    </message>
+    <message>
+        <source>Parental Pin:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>VideoFilterDialog</name>
+    <message>
+        <source>Result of this filter : %1 video(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Result of this filter : No Videos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">Onbekend</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation type="unfinished">minuten</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save as default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished">Klaar</translation>
+    </message>
+</context>
+<context>
+    <name>VideoGallery</name>
+    <message>
+        <source>Filter Display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch This Video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View Full Plot</source>
+        <translation type="unfinished">Beschrijving Inhoud</translation>
+    </message>
+    <message>
+        <source>View Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plain View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Folder View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuleer</translation>
+    </message>
+</context>
+<context>
     <name>VideoManager</name>
     <message>
         <source>minutes</source>
@@ -598,6 +687,17 @@
     <message>
         <source>Delete this file?</source>
         <translation>Dit bestand wissen?</translation>
+    </message>
+</context>
+<context>
+    <name>VideoSelected</name>
+    <message>
+        <source>No rating available.</source>
+        <translation type="unfinished">Geen beoordeling beschikbaar.</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation type="unfinished">minuten</translation>
     </message>
 </context>
 <context>

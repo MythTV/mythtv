@@ -219,6 +219,12 @@ bool checkParentPassword()
 
 void runVideoManager(void)
 {
+    QTranslator translator( 0 );
+    translator.load(gContext->GetTranslationsDir() + QString("mythvideo_") +
+                    QString(gContext->GetSetting("Language").lower()) +
+                    QString(".qm"), ".");
+    qApp->installTranslator(&translator);
+
     if (checkParentPassword())
     {
         QString startdir = gContext->GetSetting("VideoStartupDir",
@@ -233,10 +239,18 @@ void runVideoManager(void)
         qApp->lock();
         delete manage;
     }
+
+    qApp->removeTranslator(&translator);
 }
 
 void runVideoBrowser(void)
 {
+    QTranslator translator( 0 );
+    translator.load(gContext->GetTranslationsDir() + QString("mythvideo_") +
+                    QString(gContext->GetSetting("Language").lower()) +
+                    QString(".qm"), ".");
+    qApp->installTranslator(&translator);
+
     VideoBrowser *browse = new VideoBrowser(QSqlDatabase::database(),
                                             gContext->GetMainWindow(),
                                             "video browser");
@@ -244,10 +258,18 @@ void runVideoBrowser(void)
     browse->exec();
     qApp->lock();
     delete browse;
+
+    qApp->removeTranslator(&translator);
 }
 
 void runVideoTree(void)
 {
+    QTranslator translator( 0 );
+    translator.load(gContext->GetTranslationsDir() + QString("mythvideo_") +
+                    QString(gContext->GetSetting("Language").lower()) +
+                    QString(".qm"), ".");
+    qApp->installTranslator(&translator);
+
     VideoTree *tree = new VideoTree(gContext->GetMainWindow(),
                                     QSqlDatabase::database(),
                                     "videotree",
@@ -258,11 +280,14 @@ void runVideoTree(void)
     tree->exec();
     qApp->lock();
     delete tree;
+
+    qApp->removeTranslator(&translator);
 }
 
 void runDefaultView(void)
 {
     int viewType = gContext->GetNumSetting("Default MythVideo View", VideoDialog::DLG_GALLERY);
+
     switch (viewType)
     {
         case VideoDialog::DLG_BROWSER:
@@ -283,6 +308,12 @@ void runDefaultView(void)
 
 void runVideoGallery(void)
 {
+    QTranslator translator( 0 );
+    translator.load(gContext->GetTranslationsDir() + QString("mythvideo_") +
+                    QString(gContext->GetSetting("Language").lower()) +
+                    QString(".qm"), ".");
+    qApp->installTranslator(&translator);
+
     VideoGallery *gallery = new VideoGallery(QSqlDatabase::database(),
                                              gContext->GetMainWindow(),
                                              "video gallery");
@@ -290,6 +321,8 @@ void runVideoGallery(void)
     gallery->exec();
     qApp->lock();
     delete gallery;
+
+    qApp->removeTranslator(&translator);
 }
 
 void VideoCallback(void *data, QString &selection)

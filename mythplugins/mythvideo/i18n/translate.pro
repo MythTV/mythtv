@@ -7,8 +7,13 @@ SOURCES += ../mythvideo/metadata.cpp
 SOURCES += ../mythvideo/videobrowser.cpp
 SOURCES += ../mythvideo/videomanager.cpp
 SOURCES += ../mythvideo/videotree.cpp
+SOURCES += ../mythvideo/videodlg.cpp
+SOURCES += ../mythvideo/videofilter.cpp
+SOURCES += ../mythvideo/videogallery.cpp
+SOURCES += ../mythvideo/videoselected.cpp
 SOURCES += ./themestrings.h
 
+# Be sure to run 'lrelease -nocompress translate.pro'
 
 TRANSLATIONS  = mythvideo_it.ts mythvideo_es.ts mythvideo_ca.ts
 TRANSLATIONS += mythvideo_nl.ts mythvideo_de.ts mythvideo_dk.ts

@@ -556,6 +556,95 @@
     </message>
 </context>
 <context>
+    <name>VideoDialog</name>
+    <message>
+        <source>Switch to Browse View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to Gallery View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to List View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select action</source>
+        <translation type="unfinished">動作選択</translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parental Pin:</source>
+        <translation type="unfinished">再生制限ピン:</translation>
+    </message>
+</context>
+<context>
+    <name>VideoFilterDialog</name>
+    <message>
+        <source>Result of this filter : %1 video(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Result of this filter : No Videos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">不明</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation type="unfinished">分</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save as default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished">終了</translation>
+    </message>
+</context>
+<context>
+    <name>VideoGallery</name>
+    <message>
+        <source>Filter Display</source>
+        <translation type="unfinished">表示絞りこみ</translation>
+    </message>
+    <message>
+        <source>Watch This Video</source>
+        <translation type="unfinished">このビデオを見る</translation>
+    </message>
+    <message>
+        <source>View Full Plot</source>
+        <translation type="unfinished">全ての粗筋を表示する</translation>
+    </message>
+    <message>
+        <source>View Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plain View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Folder View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">キャンセル</translation>
+    </message>
+</context>
+<context>
     <name>VideoManager</name>
     <message>
         <source>Sorry there were no matches for the title</source>
@@ -636,6 +725,17 @@
     <message>
         <source>Delete this file?</source>
         <translation>このファイルを削除しますか?</translation>
+    </message>
+</context>
+<context>
+    <name>VideoSelected</name>
+    <message>
+        <source>No rating available.</source>
+        <translation type="unfinished">レイティングは使用できません.</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation type="unfinished">分</translation>
     </message>
 </context>
 <context>

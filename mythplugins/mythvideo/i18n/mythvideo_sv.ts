@@ -532,6 +532,95 @@
     </message>
 </context>
 <context>
+    <name>VideoDialog</name>
+    <message>
+        <source>Switch to Browse View</source>
+        <translation type="unfinished">Byt till bläddringsläge</translation>
+    </message>
+    <message>
+        <source>Switch to Gallery View</source>
+        <translation type="unfinished">Byt till galleriläge</translation>
+    </message>
+    <message>
+        <source>Switch to List View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select action</source>
+        <translation type="unfinished">Välj åtgärd</translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Parental Pin:</source>
+        <translation type="unfinished">PIN-kod (barnlås):</translation>
+    </message>
+</context>
+<context>
+    <name>VideoFilterDialog</name>
+    <message>
+        <source>Result of this filter : %1 video(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Result of this filter : No Videos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">Okänd</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation type="unfinished">minuter</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save as default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>VideoGallery</name>
+    <message>
+        <source>Filter Display</source>
+        <translation type="unfinished">Filtervisning</translation>
+    </message>
+    <message>
+        <source>Watch This Video</source>
+        <translation type="unfinished">Spela upp denna film</translation>
+    </message>
+    <message>
+        <source>View Full Plot</source>
+        <translation type="unfinished">Visa full beskrivning</translation>
+    </message>
+    <message>
+        <source>View Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plain View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Folder View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Avbryt</translation>
+    </message>
+</context>
+<context>
     <name>VideoManager</name>
     <message>
         <source>Manually Enter IMDB #</source>
@@ -604,6 +693,17 @@
     <message>
         <source>Delete this file?</source>
         <translation>Ta bort denna fil?</translation>
+    </message>
+</context>
+<context>
+    <name>VideoSelected</name>
+    <message>
+        <source>No rating available.</source>
+        <translation type="unfinished">Ingen rankning tillgänglig.</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation type="unfinished">minuter</translation>
     </message>
 </context>
 <context>
