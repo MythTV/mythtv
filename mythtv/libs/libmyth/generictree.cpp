@@ -505,6 +505,21 @@ GenericTree* GenericTree::getChildByName(const QString &a_name)
     return NULL;
 }
 
+GenericTree* GenericTree::getChildByInt(int an_int)
+{
+    QPtrListIterator<GenericTree> it(*m_subnodes);
+    GenericTree *child;
+    while ((child = it.current()) != 0)
+    {
+        if (child->getInt() == an_int)
+            return child;
+        ++it;
+    }
+    return NULL;
+}
+
+
+
 void GenericTree::sortByString()
 {
     m_ordered_subnodes->SetSortType(1);

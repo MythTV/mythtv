@@ -39,6 +39,7 @@ class GenericTree
     GenericTree *getSelectedChild(int ordering_index);
     GenericTree *getChildAt(uint reference, int ordering_index = -1);
     GenericTree *getChildByName(const QString &a_name);
+    GenericTree *getChildByInt(int an_int);
 
     QPtrList<GenericTree> *getAllChildren(int ordering_index = -1);
 
