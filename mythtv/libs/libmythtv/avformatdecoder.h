@@ -81,6 +81,9 @@ class AvFormatDecoder : public DecoderBase
     bool CheckVideoParams(int width, int height);
     bool CheckAudioParams(int freq, int channels);
 
+    int EncodeAC3Frame(unsigned char* data, int len, short *samples,
+		       int &samples_size);
+
     RingBuffer *ringBuffer;
 
     AVFormatContext *ic;
@@ -142,6 +145,8 @@ class AvFormatDecoder : public DecoderBase
     long long video_last_P_pts;
     long long lastvpts;
     long long lastapts; 
+
+    bool do_ac3_passthru;
 };
 
 #endif

@@ -115,6 +115,19 @@ public:
         };
 };
 
+class AC3PassThrough: public CheckBoxSetting, public GlobalSetting {
+public:
+    AC3PassThrough():
+        GlobalSetting("AC3PassThru") {
+        setLabel(QObject::tr("Enable AC3 to SPDIF passthrough"));
+        setValue(false);
+        setHelpText(QObject::tr("Enable sending AC3 sound directly to your "
+                    "sound card's SPDIF output, on sources which contain "
+                    "AC3 soundtracks (usually digital TV).  Requires that "
+                    "the audio output device be set to something suitable."));
+    };
+};
+
 class Deinterlace: public CheckBoxSetting, public GlobalSetting {
 public:
     Deinterlace():
@@ -1207,6 +1220,7 @@ public:
          setUseLabel(false);
 
          addChild(new AudioOutputDevice());
+         addChild(new AC3PassThrough());
          addChild(new AggressiveBuffer());
 
          Setting* volumeControl = new MythControlsVolume();

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <assert.h>
+#include <unistd.h>
 
 using namespace std;
 
@@ -14,7 +15,10 @@ extern "C" {
 #ifdef USING_XVMC
 #include "../libavcodec/xvmc_render.h"
 #endif
+#include "../libavcodec/liba52/a52.h"
 }
+
+#define MAX_AC3_FRAME_SIZE 6144
 
 extern pthread_mutex_t avcodeclock;
 
@@ -53,6 +57,8 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
 
     memset(&params, 0, sizeof(AVFormatParameters));
     memset(prvpkt, 0, 3);
+
+    do_ac3_passthru = gContext->GetNumSetting("AC3PassThru", false);
 }
 
 AvFormatDecoder::~AvFormatDecoder()
@@ -373,10 +379,22 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             {
                 bitrate += enc->bit_rate;
                 m_parent->SetEffDsp(enc->sample_rate * 100);
-                m_parent->SetAudioParams(16, enc->channels, enc->sample_rate);
-                audio_sample_size = enc->channels * 2;
-                audio_sampling_rate = enc->sample_rate;
-                audio_channels = enc->channels;
+                if (do_ac3_passthru && enc->codec_id == CODEC_ID_AC3) 
+                {
+                    // An AC3 stream looks like a 48KHz 2ch audio stream to 
+                    // the sound card 
+                    audio_sample_size = 4;
+                    audio_sampling_rate = 48000;
+                    audio_channels = 2;
+                }
+                else
+                {
+                    audio_sample_size = enc->channels * 2;
+                    audio_sampling_rate = enc->sample_rate;
+                    audio_channels = enc->channels;
+                }
+                m_parent->SetAudioParams(16, audio_channels, 
+                                         audio_sampling_rate);
                 break;
             }
             case CODEC_TYPE_DATA:
@@ -1027,8 +1045,16 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                         continue;
                     }
 
-                    ret = avcodec_decode_audio(&curstream->codec, samples,
-                                               &data_size, ptr, len);
+                    if (do_ac3_passthru)
+                    {
+                        data_size = pkt->size;
+                        ret = EncodeAC3Frame(ptr, len, samples, data_size);
+                    }
+                    else
+                    {
+                        ret = avcodec_decode_audio(&curstream->codec, samples,
+                                                   &data_size, ptr, len);
+                    }
 
                     ptr += ret;
                     len -= ret;
@@ -1036,17 +1062,20 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     if (data_size <= 0)
                         continue;
 
-                    if (CheckAudioParams(curstream->codec.sample_rate,
-                                         curstream->codec.channels))
+                    if (!do_ac3_passthru)
                     {
-                        audio_sampling_rate = curstream->codec.sample_rate;
-                        audio_channels = curstream->codec.channels;
-                        audio_sample_size = audio_channels * 2;
+                        if (CheckAudioParams(curstream->codec.sample_rate,
+                                             curstream->codec.channels))
+                        {
+                            audio_sampling_rate = curstream->codec.sample_rate;
+                            audio_channels = curstream->codec.channels;
+                            audio_sample_size = audio_channels * 2;
 
-                        m_parent->SetEffDsp(audio_sampling_rate * 100);
-                        m_parent->SetAudioParams(16, audio_channels,
-                                                 audio_sampling_rate);
-                        m_parent->ReinitAudio();
+                            m_parent->SetEffDsp(audio_sampling_rate * 100);
+                            m_parent->SetAudioParams(16, audio_channels,
+                                                     audio_sampling_rate);
+                            m_parent->ReinitAudio();
+                        }
                     }
 
                     long long temppts = lastapts;
@@ -1396,5 +1425,49 @@ void AvFormatDecoder::SetPositionMap(void)
 {
     if (m_playbackinfo && m_db)
         m_playbackinfo->SetPositionMap(positionMap, MARK_GOP_START, m_db);
+}
+
+int AvFormatDecoder::EncodeAC3Frame(unsigned char *data, int len,
+                                    short *samples, int &samples_size)
+{
+    int enc_len;
+    int flags, sample_rate, bit_rate;
+    unsigned char* ucsamples = (unsigned char*) samples;
+
+    // we don't do any length/crc validation of the AC3 frame here; presumably
+    // the receiver will have enough sense to do that.  if someone has a
+    // receiver that doesn't, here would be a good place to put in a call
+    // to a52_crc16_block(samples+2, data_size-2) - but what do we do if the
+    // packet is bad?  we'd need to send something that the receiver would
+    // ignore, and if so, may as well just assume that it will ignore
+    // anything with a bad CRC...
+
+    enc_len = a52_syncinfo(data, &flags, &sample_rate, &bit_rate);
+
+    if (enc_len == 0 || enc_len > len)
+    {
+        samples_size = 0;
+        return len;
+    }
+
+    if (enc_len > MAX_AC3_FRAME_SIZE - 8)
+        enc_len = MAX_AC3_FRAME_SIZE - 8;
+
+    swab(data, ucsamples + 8, enc_len);
+
+    // the following values come from ao_hwac3.c in mplayer.
+    // they form a valid IEC958 AC3 header.
+    ucsamples[0] = 0x72;
+    ucsamples[1] = 0xF8;
+    ucsamples[2] = 0x1F;
+    ucsamples[3] = 0x4E;
+    ucsamples[4] = 0x01;
+    ucsamples[5] = 0x00;
+    ucsamples[6] = (enc_len << 3) & 0xFF;
+    ucsamples[7] = (enc_len >> 5) & 0xFF;
+    memset(ucsamples + 8 + enc_len, 0, MAX_AC3_FRAME_SIZE - 8 - enc_len);
+    samples_size = MAX_AC3_FRAME_SIZE;
+
+    return len;  // consume whole frame even if len > enc_len ?
 }
 
