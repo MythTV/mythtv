@@ -14,6 +14,7 @@
 #include <qsqldatabase.h>
 #include <qstringlist.h> 
 #include <qcursor.h>
+#include <qregexp.h>
 #include <unistd.h>
 #include <time.h>
 
@@ -1015,7 +1016,8 @@ void ProgFinder::selectSearchData()
 
     if (query.isActive() && rows > 0)
     {
-	QStringList tempList;
+	typedef QMap<QString,QString> ShowData;
+	ShowData tempList;
 
         while (query.next())
         {
@@ -1029,30 +1031,30 @@ void ProgFinder::selectSearchData()
 		    if (data.left(5) == "The T" && searchData[curSearch] == "T")
 		    {
 			data = data.mid(4) + ", The";
-			tempList.append(data);
+			tempList[data.lower()] = data;
                 	listCount++;
 		    }
 		    else if (data.left(5) == "The A" && searchData[curSearch] == "A")
                     {
                         data = data.mid(4) + ", The";
-                        tempList.append(data);
+			tempList[data.lower()] = data;
                         listCount++;
                     }
 		    else if (data.left(3) == "A T" && searchData[curSearch] == "T")
 		    {
 			data = data.mid(2) + ", A";
-                        tempList.append(data);
+			tempList[data.lower()] = data;
                         listCount++;
 		    }
 		    else if (data.left(3) == "A A" && searchData[curSearch] == "A")
                     {
                         data = data.mid(2) + ", A";
-                        tempList.append(data);
+			tempList[data.lower()] = data;
                         listCount++;
                     }
 		   else if (data.left(4) != "The " && data.left(2) != "A ")
 		    {
-			tempList.append(data);
+			tempList[data.lower()] = data;
                         listCount++;
                     }
 
@@ -1064,7 +1066,7 @@ void ProgFinder::selectSearchData()
 		    if (data.left(2) == "A ")
 			data = data.mid(2) + ", A";
 
-		    tempList.append(data);
+		    tempList[data.lower()] = data;
                     listCount++;
 
 		}
@@ -1079,12 +1081,13 @@ void ProgFinder::selectSearchData()
     	else
         	progData = new QString[(int)listCount];
 
-	tempList.sort();
 	int cnt = 0;
 
-	for ( QStringList::Iterator it = tempList.begin(); it != tempList.end(); ++it )
+	ShowData::Iterator it;
+	for ( it = tempList.begin(); it != tempList.end(); ++it )
 	{
-		progData[cnt] = *it;
+		progData[cnt] = it.data();
+
 		if (progData[cnt].right(5) == ", The")
 			progData[cnt] = "The " + progData[cnt].left(progData[cnt].length() - 5);
 		if (progData[cnt].right(3) == ", A")
@@ -1429,7 +1432,8 @@ void ProgFinder::getSearchData(int charNum)
 
     if (query.isActive() && rows > 0)
     {
-	QStringList tempList;
+	typedef QMap<QString,QString> ShowData;
+        ShowData tempList;
 
         while (query.next())
         {
@@ -1440,30 +1444,30 @@ void ProgFinder::getSearchData(int charNum)
 		   if (data.left(5) == "The T" && charNum == 29)
                    {
                         data = data.mid(4) + ", The";
-                        tempList.append(data);
+                        tempList[data.lower()] = data;
                         cnts++;
                    }
                    else if (data.left(5) == "The A" && charNum == 10)
                    {
                         data = data.mid(4) + ", The";
-                        tempList.append(data);
+			tempList[data.lower()] = data;
                         cnts++;
                    }
                    else if (data.left(3) == "A T" && charNum == 29)
                    {
                         data = data.mid(2) + ", A";
-                        tempList.append(data);
+			tempList[data.lower()] = data;
                         cnts++;
                    }
                    else if (data.left(3) == "A A" && charNum == 10)
                    {
                         data = data.mid(2) + ", A";
-                        tempList.append(data);
+			tempList[data.lower()] = data;
                         cnts++;
                    }
                    else if (data.left(4) != "The " && data.left(2) != "A ")
                    {
-                        tempList.append(data);
+			tempList[data.lower()] = data;
                         cnts++;
                    }
 		}
@@ -1474,7 +1478,7 @@ void ProgFinder::getSearchData(int charNum)
 		    if (data.left(2) == "A ")
 			data = data.mid(2) + ", A";
 
-                    tempList.append(data);
+		    tempList[data.lower()] = data;
 		    cnts++;
 
                 }
@@ -1482,15 +1486,16 @@ void ProgFinder::getSearchData(int charNum)
 		qApp->processEvents();
 	}
 
-	tempList.sort();
         int cnt = 0;
 	int dNum = 0;
 
-        for ( QStringList::Iterator it = tempList.begin(); it != tempList.end(); ++it )
+	ShowData::Iterator it;
+        for ( it = tempList.begin(); it != tempList.end(); ++it )
         {
 		if (cnt <= (int)(showsPerListing / 2))
 		{
-			data = *it;
+			data = it.data();
+
 			if (data.right(5) == ", The")
 				data = "The " + data.left(data.length() - 5);
 			if (data.right(3) == ", A")
@@ -1502,7 +1507,8 @@ void ProgFinder::getSearchData(int charNum)
 
 		if (cnt >= (cnts - (int)(showsPerListing / 2)) && rows >= showsPerListing)
 		{
-			data = *it;
+			data = it.data();
+
                         if (data.right(5) == ", The")
                                 data = "The " + data.left(data.length() - 5);
 			if (data.right(3) == ", A")
@@ -1529,3 +1535,27 @@ void ProgFinder::getSearchData(int charNum)
 	showSearchList();
 
 }
+
+/*
+
+QStringList sortedList, KeyValuePair;
+QString sortKey, IP;
+int hits;
+
+sortedList.clear();
+IPLIST::iterator it = myList.begin();
+while (it != myList.end()){
+	sortKey = "0000000000|"+QString::number(it.data());
+	sortKey = sortKey.rightJustify(10)+"|"+it.key();
+	sortedList << sortKey;
+}
+sortedList.sort();
+QStringList::iterator sit = sortedList.end();
+while (sit != sortedList.begin()){
+	KeyValuePair = QStringList::split(QRegExp("|"),*sit);
+	hits = KeyValuePair.begin().toInt();
+	IP = KeyValuePair.end();
+	it--;
+}
+
+*/
