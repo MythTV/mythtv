@@ -29,10 +29,11 @@ bool WriteStringList(QSocket *socket, QStringList &list)
     payload.truncate(8);
     payload += utf8;
     size = payload.length();
-
+    // cerr << payload << endl; //DEBUG
     while (size > 0)
     {
         int temp = socket->writeBlock(payload.data() + written, size);
+	// cerr << "  written: " << temp << endl; //DEBUG
         written += temp;
         size -= temp;
         if (size > 0)
@@ -72,19 +73,18 @@ bool ReadStringList(QSocket *socket, QStringList &list)
     while (size > 0)
     {
         int temp = socket->readBlock(utf8.data() + read, size);
+	// cerr << "  read: " << temp << endl; //DEBUG
         read += temp;
         size -= temp;
         if (size > 0)
 	{
-            qApp->processEvents();
+	    if (++zerocnt >= 100)
+	    {
+		printf("EOF readStringList %u\n", read);
+		break; 
+	    }
 	    usleep(50);
-	}
-
-        zerocnt++;
-        if (zerocnt == 100)
-        {
-            printf("EOF readStringList %u\n", read);
-            break; 
+            qApp->processEvents();
         }
     }
 
@@ -129,15 +129,13 @@ int ReadBlock(QSocket *socket, void *data, int maxlen)
         size -= temp;
         if (size > 0)
 	{
-            qApp->processEvents();
+	    if (++zerocnt >= 100)
+	    {
+		printf("EOF ReadBlock %u\n", read);
+		break; 
+	    }
 	    usleep(50);
-	}
-
-        zerocnt++;
-        if (zerocnt == 100)
-        {
-            printf("EOF ReadBlock %u\n", read);
-            break; 
+            qApp->processEvents();
         }
     }
 
