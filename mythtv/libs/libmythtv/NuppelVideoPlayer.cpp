@@ -1197,7 +1197,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             continue;
         }
 
-        if (videoOutput->ValidVideoFrames() < 2)
+        if (!videoOutput->EnoughPrebufferedFrames())
         {
             //printf("entering prebuffering mode\n");
             setPrebuffering(true); 

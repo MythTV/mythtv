@@ -66,7 +66,8 @@ class VideoOutput
 
     bool EnoughFreeFrames(void);
     bool EnoughDecodedFrames(void);
-
+    bool EnoughPrebufferedFrames(void);
+    
     VideoFrame *GetNextFreeFrame(void);
     void ReleaseFrame(VideoFrame *frame);
     void DiscardFrame(VideoFrame *frame);
@@ -86,6 +87,9 @@ class VideoOutput
     void ClearAfterSeek(void);
 
   protected:
+    void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
+                     int needprebuffer, int keepprebuffer);
+	
     void ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer);
     int DisplayOSD(VideoFrame *frame, OSD *osd, int stride = -1);
 
@@ -124,6 +128,7 @@ class VideoOutput
 
     int needfreeframes;
     int needprebufferframes;
+    int keepprebufferframes;
 };
 
 #endif

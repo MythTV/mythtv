@@ -41,6 +41,7 @@ extern XvImage  *XvShmCreateImage(Display*, XvPortID, int, char*, int, int, XShm
 const int kNumBuffers = 7;
 const int kPrebufferFrames = 4;
 const int kNeedFreeFrames = 2;
+const int kKeepPrebuffer = 2;
 
 #define NO_SUBPICTURE 0
 #define OVERLAY_SUBPICTURE 1
@@ -171,7 +172,7 @@ bool VideoOutputXvMC::Init(int width, int height, float aspect,
     XvAdaptorInfo *ai;
 
     VideoOutput::InitBuffers(kNumBuffers, false, kNeedFreeFrames,
-                             kPrebufferFrames);
+                             kPrebufferFrames, kKeepPrebuffer);
     VideoOutput::Init(width, height, aspect, winid, winx, winy, winw, winh, 
                       embedid);
 

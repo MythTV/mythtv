@@ -34,7 +34,8 @@ extern "C" {
 
 const int kNumBuffers = 4;
 const int kPrebufferFrames = 1;
-const int kNeedFreeFrames = 1;
+const int kNeedFreeFrames = 2;
+const int kKeepPrebuffer = 1;
 
 struct ViaData
 {
@@ -141,7 +142,7 @@ bool VideoOutputVIA::Init(int width, int height, float aspect,
     pthread_mutex_init(&lock, NULL);
 
     VideoOutput::InitBuffers(kNumBuffers, false, kNeedFreeFrames,
-                             kPrebufferFrames);
+                             kPrebufferFrames, kKeepPrebuffer);
     VideoOutput::Init(width, height, aspect, winid, winx, winy, winw, winh, 
                       embedid);
 

@@ -465,6 +465,11 @@ bool VideoOutput::EnoughDecodedFrames(void)
     return (ValidVideoFrames() >= needprebufferframes);
 }
 
+bool VideoOutput::EnoughPrebufferedFrames(void)
+{
+    return (ValidVideoFrames() >= keepprebufferframes);
+}
+
 VideoFrame *VideoOutput::GetNextFreeFrame(void)
 {
     video_buflock.lock();
@@ -519,8 +524,9 @@ void VideoOutput::DoneDisplayingFrame(void)
     video_buflock.unlock();
 }
 
-void VideoOutput::InitBuffers(int numdecode, bool extra_for_pause, int need_free,
-                              int needprebuffer)
+void VideoOutput::InitBuffers(int numdecode, bool extra_for_pause, 
+                              int need_free, int needprebuffer, 
+                              int keepprebuffer)
 {
     int numcreate = numdecode + ((extra_for_pause) ? 1 : 0);
 
@@ -544,6 +550,7 @@ void VideoOutput::InitBuffers(int numdecode, bool extra_for_pause, int need_free
     numbuffers = numdecode;
     needfreeframes = need_free;
     needprebufferframes = needprebuffer;
+    keepprebufferframes = keepprebuffer;
 }
 
 void VideoOutput::ClearAfterSeek(void)
@@ -750,7 +757,7 @@ void VideoOutput::BlendSurfaceToI44(OSDSurface *surface, unsigned char *yuvptr,
         endcol = drawRect.right();
         endline = drawRect.bottom();
 
-        unsigned char *src, *usrc, *vsrc;
+        unsigned char *src;
         unsigned char *dest;
         unsigned char *alpha;
 
