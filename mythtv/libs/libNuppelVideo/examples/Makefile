@@ -3,13 +3,11 @@ CXX=g++
 #DEBUG=-O0 -g3
 OPT=-O6 -march=pentiumpro -fomit-frame-pointer -funroll-loops -fexpensive-optimizations -finline-functions
 
-CXXFLAGS  = -I../libNuppelVideo/ -Wall -DMMX -D_GNU_SOURCE -D_REENTRANT 
+CXXFLAGS  = -I../ -Wall -DMMX -D_GNU_SOURCE -D_REENTRANT 
 CXXFLAGS += $(OPT) $(DEBUG)
 
 CXXCOMPILE = $(CXX) $(CXXFLAGS)
 CXXLINK = $(CXX) $(CXXFLAGS) -o $@
-
-NUVLIBS = `../libNuppelVideo/nuppelvideo-config --libs`
 
 .SUFFIXES: .cpp .c .o
 
@@ -26,14 +24,11 @@ NUVPLAYLDF =-L../libNuppelVideo/ -lNuppelVideo $(NUVLIBS)
 NUVRECOBJ = nuvrec.o
 NUVRECLDF = -L../libNuppelVideo/ -lNuppelVideo $(NUVLIBS)
 
-libNuppelVideo.a:
-	$(MAKE) -C ../libNuppelVideo
-
-nuvplay: $(NUVPLAYOBJ) libNuppelVideo.a
+nuvplay: $(NUVPLAYOBJ)
 	@rm -f nuvplay
 	$(CXXLINK) $(NUVPLAYOBJ) $(NUVPLAYLDF)
 
-nuvrec: $(NUVRECOBJ) libNuppelVideo.a
+nuvrec: $(NUVRECOBJ)
 	@rm -f nuvrec
 	$(CXXLINK) $(NUVRECOBJ) $(NUVRECLDF)
 

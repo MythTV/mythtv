@@ -227,6 +227,26 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 
     ringBuffer->Read(&frameheader, FRAMEHEADERSIZE);
 
+    while (frameheader.frametype != 'A' && frameheader.frametype != 'V' &&
+           frameheader.frametype != 'S' && frameheader.frametype != 'T' &&
+           frameheader.frametype != 'R')
+    {
+        ringBuffer->Seek(startpos, SEEK_SET);
+        
+        char dummychar;
+        ringBuffer->Read(&dummychar, 1);
+
+        startpos = ringBuffer->Seek(0, SEEK_CUR);
+
+        ringBuffer->Read(&frameheader, FRAMEHEADERSIZE);
+
+        if (startpos > 20000)
+        {
+            delete [] space;
+            return 0;
+        }
+    }
+
     foundit = 0;
     effdsp = audio_samplerate;
 
