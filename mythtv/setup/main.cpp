@@ -104,7 +104,12 @@ int main(int argc, char *argv[])
     db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!context->OpenDatabase(db))
     {
-        printf("couldn't open db\n");
+        cerr << "Unable to open database:\n"
+             << "Driver error was:" << endl
+             << db->lastError().driverText() << endl
+             << "Database error was:" << endl
+             << db->lastError().databaseText() << endl;
+
         return -1;
     }
 
