@@ -35,6 +35,43 @@ bool be_nice = true;
 
 double fps = 29.97; 
 
+void BuildVideoMarkup(QSqlDatabase *db, QString& filename)
+{
+    ProgramInfo* program_info = new ProgramInfo;
+    program_info->recstartts = QDateTime::currentDateTime().addSecs( -180 * 60);
+    program_info->recendts = QDateTime::currentDateTime().addSecs(-1);
+    program_info->isVideo = true;
+    program_info->pathname = filename;
+
+    RingBuffer *tmprbuf = new RingBuffer(filename, false);
+
+    QString name = QString("commflag%1%2").arg(getpid()).arg(rand());
+
+    MythSqlDatabase *mdb = new MythSqlDatabase(name);
+
+    if (!mdb || !mdb->isOpen())
+    {
+        cerr << "Unable to open commflag db connection\n";
+        delete tmprbuf;
+        delete program_info;
+        return;
+    }
+
+    NuppelVideoPlayer *nvp = new NuppelVideoPlayer(mdb, program_info);
+    nvp->SetRingBuffer(tmprbuf);
+
+    nvp->RebuildSeekTable(!quiet);
+
+    if (!quiet)
+        printf( "Rebuilt\n" );
+
+    delete nvp;
+    delete tmprbuf;
+    delete program_info;
+    delete mdb;
+
+}
+
 void FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
 {
     int commDetectMethod = gContext->GetNumSetting("CommercialSkipMethod",
@@ -261,6 +298,10 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv, false);
     int argpos = 1;
+    bool isVideo = false;
+
+    QString filename;
+        
     QString chanid;
     QString starttime;
     time_t time_now;
@@ -309,6 +350,14 @@ int main(int argc, char *argv[])
             starttime = fullfile.dirName();
             starttime.replace(QRegExp("_[^_]*$"), "");
             starttime.replace(QRegExp("^[^_]*_"), "");
+        }
+        else if (!strcmp(a.argv()[argpos],"--video"))
+        {
+            filename = (a.argv()[++argpos]);
+            cerr << filename << endl;
+            isVideo = true;
+            rebuild_seektable = true;
+            be_nice = false;
         }
         else if (!strcmp(a.argv()[argpos], "--blanks"))
         {
@@ -449,6 +498,7 @@ int main(int argc, char *argv[])
                     "-c OR --chanid chanid        Flag recording with given channel ID" << endl <<
                     "-s OR --starttime starttime  Flag recording with given starttime" << endl <<
                     "-f OR --file filename        Flag recording with specific filename" << endl <<
+                    "--video filename             Rebuild the seektable for a video (non-recording) file" << endl <<
                     "--sleep                      Give up some cpu time after processing" << endl <<
                     "--rebuild                    Do not flag commercials, just rebuild seektable" << endl <<
                     "                             each frame." << endl <<
@@ -519,21 +569,32 @@ int main(int argc, char *argv[])
         printf( "MythTV Commercial Flagging, started at %s", ctime(&time_now));
 
         printf( "\n" );
-        printf( "Flagging commercial breaks for:\n" );
-        if (a.argc() == 1)
-            printf( "ALL Un-flagged programs\n" );
-        printf( "ChanID  Start Time      "
-                "Title                                      " );
-        if (rebuild_seektable)
-            printf("Status\n");
-        else
-            printf("Breaks\n");
+        if (!isVideo)
+        {
+            printf( "Flagging commercial breaks for:\n" );
+            if (a.argc() == 1)
+                printf( "ALL Un-flagged programs\n" );
+            printf( "ChanID  Start Time      "
+                    "Title                                      " );
+            if (rebuild_seektable)
+                printf("Status\n");
+            else
+                printf("Breaks\n");
 
-        printf( "------  --------------  "
-                "-----------------------------------------  ------\n" );
+            printf( "------  --------------  "
+                    "-----------------------------------------  ------\n" );
+        }
+        else
+        {
+            printf( "Building seek table for: %s\n", (const char*)filename);
+        }
     }
 
-    if (!chanid.isEmpty() && !starttime.isEmpty())
+    if (isVideo)
+    {
+        BuildVideoMarkup(db, filename);
+    }
+    else if (!chanid.isEmpty() && !starttime.isEmpty())
     {
         FlagCommercials(db, chanid, starttime);
     }
