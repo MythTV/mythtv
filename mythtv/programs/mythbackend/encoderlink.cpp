@@ -203,8 +203,10 @@ bool EncoderLink::isLowOnFreeSpace()
 {
     if (!isConnected())
         return true;
+
+    int minFree = gContext->GetNumSetting("MinRecordDiskThreshold",300);
    
-    if ((freeSpace >= 0) && (freeSpace < 250))
+    if ((freeSpace >= 0) && (freeSpace < minFree))
         return true;
 
     return false;

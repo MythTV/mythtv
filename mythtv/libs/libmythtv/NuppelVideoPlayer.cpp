@@ -1431,7 +1431,8 @@ void NuppelVideoPlayer::StartPlaying(void)
 
         QMutexLocker lockit(&db_lock);
 
-        m_playbackinfo->SetBookmark(0, m_db);
+        if (gContext->GetNumSetting("ClearSavedPosition", 1))
+            m_playbackinfo->SetBookmark(0, m_db);
     }
 
     LoadBlankList();
@@ -1618,16 +1619,21 @@ void NuppelVideoPlayer::SetBookmark(void)
 
     QMutexLocker lockit(&db_lock);
 
-    if (m_playbackinfo->GetBookmark(m_db))
-    {
-        m_playbackinfo->SetBookmark(0, m_db);
-        osd->SetSettingsText("Position Cleared", 1); 
-    }
-    else
-    {
-        m_playbackinfo->SetBookmark(framesPlayed, m_db);
-        osd->SetSettingsText("Position Saved", 1); 
-    }
+    m_playbackinfo->SetBookmark(framesPlayed, m_db);
+    osd->SetSettingsText("Position Saved", 1); 
+}
+
+void NuppelVideoPlayer::ClearBookmark(void)
+{
+    if (livetv)
+        return;
+    if (!m_db || !m_playbackinfo)
+        return;
+
+    QMutexLocker lockit(&db_lock);
+
+    m_playbackinfo->SetBookmark(0, m_db);
+    osd->SetSettingsText("Position Cleared", 1); 
 }
 
 long long NuppelVideoPlayer::GetBookmark(void)

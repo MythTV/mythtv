@@ -114,6 +114,7 @@ class NuppelVideoPlayer
 
     void SetWatchingRecording(bool mode);
     void SetBookmark(void);
+    void ClearBookmark(void);
     long long GetBookmark(void);
 
     void ToggleFullScreen(void);

@@ -1088,7 +1088,12 @@ void TV::ProcessKeypress(int keypressed)
             case Key_Space: case Key_Enter: case Key_Return: 
             {
                 if (!was_doing_ff_rew)
-                    nvp->SetBookmark(); 
+                {
+                    if (nvp->GetBookmark())
+                        nvp->ClearBookmark(); 
+                    else
+                        nvp->SetBookmark(); 
+                }
                 break;
             }
             case Key_E: case Key_M: editmode = nvp->EnableEdit(); break;

@@ -262,6 +262,18 @@ public:
     };
 };
 
+class MinRecordDiskThreshold: public SpinBoxSetting, public BackendSetting {
+public:
+    MinRecordDiskThreshold():
+        SpinBoxSetting(0, 1000000, 100),
+        BackendSetting("MinRecordDiskThreshold") {
+        setLabel("New Recording Free Disk Space Threshold (in Megabytes)");
+        setHelpText("MythTV will stop scheduling new recordings on a backend "
+                    "when its free disk space falls below this value.");
+        setValue(300);
+    };
+};
+
 class RecordPreRoll: public SpinBoxSetting, public GlobalSetting {
 public:
     RecordPreRoll():
@@ -478,6 +490,18 @@ public:
        setValue(false);
        setHelpText("If this is set, the TV picture will be shaped to fit a "
                    "4x3 aspect ratio when not in fullscreen mode.");
+    };
+};
+
+class ClearSavedPosition: public CheckBoxSetting, public GlobalSetting {
+public:
+    ClearSavedPosition():
+       GlobalSetting("ClearSavedPosition") {
+       setLabel("Clear Saved Position");
+       setValue(true);
+       setHelpText("Automatically clear saved position on a recording "
+                   "when the recording is played back.  If UNset, the "
+                   "saved position must be unset manually.");
     };
 };
 
@@ -1027,6 +1051,7 @@ PlaybackSettings::PlaybackSettings()
     general->addChild(new PlaybackExitPrompt());
     general->addChild(new EndOfRecordingExitPrompt());
     general->addChild(new FixedAspectRatio());
+    general->addChild(new ClearSavedPosition());
     addChild(general);
 
     VerticalConfigurationGroup* seek = new VerticalConfigurationGroup(false);
@@ -1084,6 +1109,7 @@ GeneralSettings::GeneralSettings()
     autoexp->addChild(new AutoExpireFrequency());
     autoexp->addChild(new AutoExpireMethod());
     autoexp->addChild(new AutoExpireDefault());
+    autoexp->addChild(new MinRecordDiskThreshold());
     addChild(autoexp);
 }
 
