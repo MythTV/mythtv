@@ -2275,6 +2275,9 @@ void NuppelVideoPlayer::DoPause(void)
 
     float temp_speed = audio_stretchfactor;
     frame_interval = (int)(1000000.0 * ffrew_skip / video_frame_rate / temp_speed);
+    VERBOSE(VB_PLAYBACK, QString("rate: %1 speed: %2 skip: %3 = interval %4")
+                                 .arg(video_frame_rate).arg(temp_speed)
+                                 .arg(ffrew_skip).arg(frame_interval));
     if (osd && forceVideoOutput != kVideoOutput_IVTV)
         osd->SetFrameInterval(frame_interval);
     if (videosync != NULL)
@@ -2323,6 +2326,9 @@ void NuppelVideoPlayer::DoPlay(void)
 
     float temp_speed = play_speed;
     frame_interval = (int)(1000000.0 * ffrew_skip / video_frame_rate / temp_speed);
+    VERBOSE(VB_PLAYBACK, QString("rate: %1 speed: %2 skip: %3 = interval %4")
+                                 .arg(video_frame_rate).arg(temp_speed)
+                                 .arg(ffrew_skip).arg(frame_interval));
     if (osd && forceVideoOutput != kVideoOutput_IVTV)
         osd->SetFrameInterval(frame_interval);
     if (videoOutput && videosync != NULL)
