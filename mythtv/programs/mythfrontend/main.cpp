@@ -117,45 +117,38 @@ void *runScheduler(void *dummy)
 
     Scheduler *sched = new Scheduler(db);
 
-    sched->FillRecordLists();
-
-    int secsleft = -1;
-    int asksecs = -1;
     bool asked = false;
-
+    int secsleft;
     TV *nexttv = NULL;
 
-    ProgramInfo *nextRecording = sched->GetNextRecording();
+    ProgramInfo *nextRecording = NULL;
     QDateTime nextrectime;
-    if (nextRecording)
-    {
-        nextrectime = nextRecording->startts;
-        asked = false;
-        if (tvList.find(nextRecording->cardid) == tvList.end())
-        {
-            cerr << "cardid: " << nextRecording->cardid 
-                 << " isn't in the databae of capture cards.\n";
-            exit(0);
-        }
-        nexttv = tvList[nextRecording->cardid];
-    }
-    QDateTime curtime = QDateTime::currentDateTime();
-
-    QDateTime lastupdate = curtime;
+    QDateTime curtime;
+    QDateTime lastupdate = QDateTime::currentDateTime().addDays(-1);
 
     while (1)
     {
         sleep(1);
 
-        if (sched->CheckForChanges() ||
+        curtime = QDateTime::currentDateTime();
+
+        if (sched->CheckForChanges() || 
             (lastupdate.date().day() != curtime.date().day()))
         {
-            lastupdate = curtime;
             sched->FillRecordLists();
+            //cout << "Found changes in the todo list.\n"; 
+            nextRecording = NULL;
+        }
+
+        if (!nextRecording)
+        {
+            lastupdate = curtime;
             nextRecording = sched->GetNextRecording();
             if (nextRecording)
             {
                 nextrectime = nextRecording->startts;
+                //cout << "Will record " << nextRecording->title
+                //     << " in " << curtime.secsTo(nextrectime) << "secs.\n";
                 asked = false;
                 if (tvList.find(nextRecording->cardid) == tvList.end())
                 {
@@ -166,40 +159,27 @@ void *runScheduler(void *dummy)
             }
         }
 
-        curtime = QDateTime::currentDateTime();
         if (nextRecording)
         {
             secsleft = curtime.secsTo(nextrectime);
-            asksecs = secsleft - 30;
 
-            if (nexttv->GetState() == kState_WatchingLiveTV && asksecs <= 0)
+            //cout << secsleft << " seconds until " << nextRecording->title 
+            //     << endl;
+
+            if (nexttv->GetState() == kState_WatchingLiveTV && 
+                secsleft <= 30 && !asked)
             {
-                if (!asked)
-                {
-                    asked = true;
-                    int result = askRecording(nexttv, nextRecording, secsleft);
+                asked = true;
+                int result = askRecording(nexttv, nextRecording, secsleft);
 
-                    if (result == 3)
-                    {
-                        sched->RemoveFirstRecording();
-                        nextRecording = sched->GetNextRecording();
-                    }
- 
-                    if (nextRecording)
-                    {
-                        nextrectime = nextRecording->startts;
-                        curtime = QDateTime::currentDateTime();
-                        secsleft = curtime.secsTo(nextrectime);
-                        if (tvList.find(nextRecording->cardid) == tvList.end())
-                        {
-                            cerr << "invalid cardid " << nextRecording->cardid 
-                                 << endl;
-                            exit(0);
-                        }
-                        nexttv = tvList[nextRecording->cardid];
-                    }
+                if (result == 3)
+                {
+                    //cout << "Skipping " << nextRecording->title << endl;
+                    sched->RemoveFirstRecording();
+                    nextRecording = NULL;
                 }
             }
+
             if (secsleft <= -2)
             {
                 // don't record stuff that's already started..
@@ -207,24 +187,8 @@ void *runScheduler(void *dummy)
                     startRecording(nexttv, nextRecording);
 
                 sched->RemoveFirstRecording();
-                nextRecording = sched->GetNextRecording();
-
-                if (nextRecording)
-                {
-                    nextrectime = nextRecording->startts;
-                    curtime = QDateTime::currentDateTime();
-                    secsleft = curtime.secsTo(nextrectime);
-                    if (tvList.find(nextRecording->cardid) == tvList.end())
-                    {
-                        cerr << "invalid cardid " << nextRecording->cardid 
-                             << endl;
-                        exit(0);
-                    }
-                    nexttv = tvList[nextRecording->cardid];
-                }
+                nextRecording = NULL;
             }
-//            else 
-//                cout << secsleft << " secs left until " << nextRecording->title << endl;
         }
     }
     

@@ -1271,7 +1271,9 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     InitFilters();
 
-    osd = new OSD(video_width, video_height, osdfilename, osdprefix, osdtheme);
+    if (!disablevideo)
+        osd = new OSD(video_width, video_height, osdfilename, osdprefix, 
+                      osdtheme);
 
     playing = true;
   
