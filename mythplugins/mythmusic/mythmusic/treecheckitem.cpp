@@ -107,98 +107,28 @@ static QPixmap *getPixmap(const QString &level)
     return NULL;
 }
 
-TreeCheckItem::TreeCheckItem(QListView *parent, QString &ltext, 
-                             const QString &llevel, int l_id)
-             : QCheckListItem(parent, ltext, 
-                              QCheckListItem::CheckBox)
+TreeCheckItem::TreeCheckItem(UIListGenericTree *parent, const QString &text, 
+                             const QString &level, int id)
+             : UIListGenericTree(parent, text, "TREECHECK", 0)
 {
-    checkable = true;
-    level = llevel;
-    id = l_id;
+    m_checkable = true;
+    m_level = level;
+    m_id = id;
 
-    pickPixmap();
-}
-
-TreeCheckItem::TreeCheckItem(TreeCheckItem *parent, QString &ltext, 
-                             const QString &llevel, int l_id)
-             : QCheckListItem(parent, ltext, 
-                              QCheckListItem::CheckBox)
-{
-    checkable = true;
-    level = llevel;
-    id = l_id;
-    
-    pickPixmap();
-}
-
-TreeCheckItem::TreeCheckItem(TreeCheckItem *parent, 
-                             TreeCheckItem *after,
-                             QString &ltext, 
-                             const QString &llevel, int l_id)
-#if (QT_VERSION >= 0x030100)
-             : QCheckListItem(parent, after, ltext, 
-                              QCheckListItem::CheckBox)
-#else
-#warning
-#warning ***   You should think seriously about upgrading your Qt to 3.1.0 or higher   ***
-#warning
-             : QCheckListItem(parent, ltext, 
-                              QCheckListItem::CheckBox)
-#endif
-{
-    checkable = true;
-    level = llevel;
-    id = l_id;
-    after = after;  // -Wall for Qt < 3.1.x
-    
     pickPixmap();
 }
 
 void TreeCheckItem::setCheckable(bool flag)
 {
-    if(flag == false)
-    {
-        QCheckListItem::setOn(false);
-    }
-    checkable = flag;
+    if (flag == false)
+        setCheck(-1);
+    m_checkable = flag;
 }
 
-void TreeCheckItem::setOn(bool flag)
+void TreeCheckItem::setCheck(int flag)
 {
-    if(checkable)
-    {
-        QCheckListItem::setOn(flag);
-    }
-}
-
-void TreeCheckItem::paintCell(QPainter * p, const QColorGroup & cg, 
-                              int column, int width, int align)
-{
-    if(!checkable)
-    {
-        QColorGroup *newcg = new QColorGroup();
-        *newcg = cg;
-        newcg->setColor(QColorGroup::Text, QColor(150, 150, 150));
-        newcg->setColor(QColorGroup::HighlightedText, QColor(150, 150, 150));
-        QCheckListItem::paintCell(p, *newcg, column, width, align);
-        delete newcg;
-    }
-    else
-    {
-        QCheckListItem::paintCell(p, cg, column, width, align);
-    }
-}
-
-CDCheckItem::CDCheckItem(QListView *parent, QString &ltext, 
-                             const QString &llevel, int l_track)
-             : TreeCheckItem(parent, ltext, llevel, l_track)
-{
-}
-
-CDCheckItem::CDCheckItem(CDCheckItem *parent, QString &ltext, 
-                             const QString &llevel, int l_track)
-             : TreeCheckItem(parent, ltext, llevel, l_track)
-{
+    if (m_checkable)
+        UIListGenericTree::setCheck(flag);
 }
 
 void TreeCheckItem::pickPixmap(void)
@@ -206,81 +136,25 @@ void TreeCheckItem::pickPixmap(void)
     if (!pixmapsSet)
         setupPixmaps();
 
-    QPixmap *pix = getPixmap(level);
+    QPixmap *pix = getPixmap(m_level);
     if (pix)
-        setPixmap(0, *pix);
+        m_image = pix;
 }
 
-PlaylistItem::PlaylistItem(QListView *parent, const QString &title)
-    : QListViewItem(parent, title)
+CDCheckItem::CDCheckItem(UIListGenericTree *parent, const QString &text, 
+                         const QString &level, int track)
+           : TreeCheckItem(parent, text, level, track)
 {
-    text = title;    
 }
 
-PlaylistItem::PlaylistItem(QListViewItem *parent, const QString &title)
-    : QListViewItem(parent, title)
-{
-    text = title;
-}
-
-PlaylistItem::PlaylistItem(QListViewItem *parent, QListViewItem *after, const QString &title)
-    : QListViewItem(parent, after, title)
+PlaylistItem::PlaylistItem(UIListGenericTree *parent, const QString &title)
+            : UIListGenericTree(parent, title, "PLAYLISTITEM", -1)
 {
     text = title;
 }
 
-bool PlaylistTitle::isDefault()
-{
-//    return ptr_to_owner->isDefault();
-    VERBOSE(VB_ALL, QString("Why are you asking?"));
-    return false;
-}
-
-void PlaylistTrack::beMoving(bool flag)
-{
-    if(flag)
-    {
-        setPixmap(0, *pixtrack_up_down);    
-    }
-    else
-    {
-        if (pixmap)
-            setPixmap(0, *pixmap);
-        else
-            setPixmap(0, *pixtrack);   
-    }
-}
-
-void PlaylistTrack::moveUpDown(bool flag)
-{
-    if(flag == true)
-    {
-        //  Check that we are not already at the top
-        if(PlaylistTrack *swapper = dynamic_cast<PlaylistTrack*>(this->itemAbove()))
-        {
-            swapper->moveItem(this);
-            ptr_to_owner->moveUpDown(true);
-        }        
-        else
-        {
-        }
-    }
-    else
-    {
-        //  Are we at the bottom?
-        if(!nextSibling())
-        {
-        }
-        else
-        {
-            moveItem(nextSibling());
-            ptr_to_owner->moveUpDown(false);
-        }
-    }
-}
-
-PlaylistTitle::PlaylistTitle(QListViewItem *parent, const QString &title)
-    : PlaylistItem(parent, title)
+PlaylistTitle::PlaylistTitle(UIListGenericTree *parent, const QString &title)
+             : PlaylistItem(parent, title)
 {
     active = false;
 
@@ -289,12 +163,11 @@ PlaylistTitle::PlaylistTitle(QListViewItem *parent, const QString &title)
 
     QPixmap *pix = getPixmap("playlist");
     if (pix)
-        setPixmap(0, *pix);
+        m_image = pix;
 }
 
-void PlaylistTitle::userSelectedMe()
+void PlaylistTitle::userSelectedMe(void)
 {
-//    ptr_to_owner->becomeActive();
 }
 
 void PlaylistTitle::setOwner(Playlist *owner)
@@ -302,8 +175,8 @@ void PlaylistTitle::setOwner(Playlist *owner)
     ptr_to_owner = owner;
 }
 
-PlaylistTrack::PlaylistTrack(QListViewItem *parent, const QString &title)
-    : PlaylistItem(parent, title)
+PlaylistTrack::PlaylistTrack(UIListGenericTree *parent, const QString &title)
+             : PlaylistItem(parent, title)
 {
     held = false;
 
@@ -316,41 +189,11 @@ PlaylistTrack::PlaylistTrack(QListViewItem *parent, const QString &title)
 
     pixmap = getPixmap(level);
     if (pixmap)
-        setPixmap(0, *pixmap);
+        m_image = pixmap;
 }
 
-PlaylistTrack::PlaylistTrack(QListViewItem *parent, QListViewItem *after, const QString &title)
-    : PlaylistItem(parent, after, title)
+void PlaylistTrack::userSelectedMe(void)
 {
-    held = false;
-
-    QString level = "title";
-    if (title.left(10).lower() == "playlist -")
-        level = "playlist";
-
-    if (!pixmapsSet)
-        setupPixmaps();
-
-    pixmap = getPixmap(level);
-    if (pixmap)
-        setPixmap(0, *pixmap);
-}
-
-PlaylistTitle::PlaylistTitle(QListView *parent, const QString &title)    : PlaylistItem(parent, title)
-{
-    active = false;
-
-    if (!pixmapsSet)
-        setupPixmaps();
-
-    QPixmap *pix = getPixmap("playlist");
-    if (pix)
-        setPixmap(0, *pix);
-}
-
-void PlaylistTrack::userSelectedMe()
-{
-    //ptr_to_owner->doSomething();
 }
 
 void PlaylistTrack::setOwner(Track *owner)
@@ -368,37 +211,36 @@ void PlaylistTitle::removeTrack(int x)
     ptr_to_owner->removeTrack(x, false);
 }
 
+void PlaylistTrack::beMoving(bool flag)
+{
+    if (flag)
+        setPixmap(pixtrack_up_down);
+    else if (pixmap)
+        setPixmap(pixmap);
+    else
+        setPixmap(pixtrack);
+}
 
-PlaylistPlaylist::PlaylistPlaylist(QListViewItem *parent, const QString &title)
-    : PlaylistTrack(parent, title)
+void PlaylistTrack::moveUpDown(bool flag)
+{
+    if (movePositionUpDown(flag))
+        ptr_to_owner->moveUpDown(flag);
+}
+
+PlaylistPlaylist::PlaylistPlaylist(UIListGenericTree *parent, 
+                                   const QString &title)
+                : PlaylistTrack(parent, title)
 {
     pixmap = getPixmap("playlist");
     if (pixmap)
-        setPixmap(0, *pixmap);
+        m_image = pixmap;
 }
 
-PlaylistPlaylist::PlaylistPlaylist(QListViewItem *parent, QListViewItem *after, const QString &title)
-    : PlaylistTrack(parent, after, title)
-{
-    pixmap = getPixmap("playlist");
-    if (pixmap)
-        setPixmap(0, *pixmap);
-}
-
-PlaylistCD::PlaylistCD(QListViewItem *parent, const QString &title)
-    : PlaylistTrack(parent, title)
+PlaylistCD::PlaylistCD(UIListGenericTree *parent, const QString &title)
+          : PlaylistTrack(parent, title)
 {
     pixmap = getPixmap("cd");
     if (pixmap)
-        setPixmap(0, *pixmap);
-}
-
-PlaylistCD::PlaylistCD(QListViewItem *parent, QListViewItem *after, const QString &title)
-    : PlaylistTrack(parent, after, title)
-{
-
-    pixmap = getPixmap("cd");
-    if (pixmap)
-        setPixmap(0, *pixmap);
+        m_image = pixmap;
 }
 

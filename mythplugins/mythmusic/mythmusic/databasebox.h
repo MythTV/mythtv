@@ -12,12 +12,10 @@
 #include "playlist.h"
 #include <mythtv/mythwidgets.h>
 #include <mythtv/lcddevice.h>
+#include <mythtv/uilistbtntype.h>
 
 class QSqlDatabase;
-class QListViewItem;
 class TreeCheckItem;
-class QLabel;
-class DatabaseBox;
 
 class ReadCDThread : public QThread
 {
@@ -34,13 +32,14 @@ class ReadCDThread : public QThread
     bool                cd_status_changed;
 };
 
-class DatabaseBox : public MythDialog
+class DatabaseBox : public MythThemedDialog
 {
     Q_OBJECT
   public:
     DatabaseBox(PlaylistsContainer *all_playlists,
-                AllMusic *music_ptr,
-                MythMainWindow *parent, const char *name = 0);
+                AllMusic *music_ptr, MythMainWindow *parent, 
+                const QString &window_name, const QString &theme_filename,
+                const char *name = 0);
    ~DatabaseBox();
 
     void dealWithTracks(PlaylistItem *item_ptr);
@@ -48,12 +47,12 @@ class DatabaseBox : public MythDialog
     void fillCD(void);
     
   protected slots:
-    void selected(QListViewItem *);
-    void doMenus(QListViewItem *);
-    void alternateDoMenus(QListViewItem *, int);
+    void selected(UIListGenericTree *);
+    void doMenus(UIListGenericTree *);
+    void alternateDoMenus(UIListGenericTree *, int);
     void keyPressEvent(QKeyEvent *e);
     void moveHeldUpDown(bool flag);
-    void deleteTrack(QListViewItem *item);
+    void deleteTrack(UIListGenericTree *item);
     void copyNewPlaylist();
     void copyToActive();
     void deletePlaylist();
@@ -74,28 +73,25 @@ class DatabaseBox : public MythDialog
     void CreateCDMP3();
     void BlankCDRW();
 
-  protected:
-    bool eventFilter(QObject *o, QEvent *e);
- 
   private:
-    void doSelected(QListViewItem *, bool cd_flag);
+    void doSelected(UIListGenericTree *, bool cd_flag);
     void doPlaylistPopup(TreeCheckItem *item_ptr);
     void doActivePopup(PlaylistTitle *item_ptr);
-    void checkParent(QListViewItem *);
+    void checkParent(UIListGenericTree *);
     LCDMenuItem *buildLCDMenuItem(TreeCheckItem *item_ptr, bool curMenuItem);
-    LCDMenuItem *buildLCDMenuItem(QListViewItem *item_ptr, bool curMenuItem);
+    LCDMenuItem *buildLCDMenuItem(UIListGenericTree *item_ptr, bool curMenuItem);
     void buildMenuTree(QPtrList<LCDMenuItem> *menuItems,
-                       TreeCheckItem *item_ptr, int level);
-    void buildMenuTree(QPtrList<LCDMenuItem> *menuItems,
-                       QListViewItem *item_ptr, int level);
+                       UIListGenericTree *item_ptr, int level);
 
     QString indentMenuItem(QString itemLevel);
  
-    void checkTree();
+    void checkTree(UIListGenericTree *startingpoint = NULL);
     QPixmap getPixmap(QString &level);
 
+    UIListGenericTree   *rootNode;
+    UIListTreeType      *tree;
+
     CDCheckItem         *cditem;
-    MythListView        *listview;
     PlaylistsContainer  *the_playlists;
     
     AllMusic            *all_music;

@@ -1031,7 +1031,7 @@ void PlaybackBox::editPlaylist()
 
     visual_mode_timer->stop();
     DatabaseBox dbbox(all_playlists, all_music, gContext->GetMainWindow(),
-                      "database box");
+                      "music_select", "music-", "database box");
     dbbox.exec();
     if (visual_mode_delay > 0)
         visual_mode_timer->start(visual_mode_delay * 1000);

@@ -1,12 +1,9 @@
 #include <iostream>
 using namespace std;
 
-#include <qlistview.h>
 #include <qapplication.h>
 #include <qsqldatabase.h>
-#include <qcursor.h>
 #include <qstringlist.h>
-#include <qheader.h>
 #include <qpixmap.h>
 #include <qregexp.h>
 #include <qframe.h>
@@ -19,15 +16,19 @@ using namespace std;
 #include "cddecoder.h"
 #include "playlist.h"
 
+#include <mythtv/dialogbox.h>
 #include <mythtv/mythcontext.h>
 #include <mythtv/lcddevice.h>
+#include <mythtv/uitypes.h>
+#include <mythtv/uilistbtntype.h>
 
 #define LCD_MAX_MENU_ITEMS 5
 
 DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
-                         AllMusic *music_ptr,
-                         MythMainWindow *parent, const char *name)
-           : MythDialog(parent, name)
+                         AllMusic *music_ptr, MythMainWindow *parent, 
+                         const QString &window_name, 
+                         const QString &theme_filename, const char *name)
+           : MythThemedDialog(parent, window_name, theme_filename, name)
 {
     the_playlists = all_playlists;
     active_playlist = NULL;
@@ -43,20 +44,8 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
     cd_checking_flag = false;
     cd_checking_flag = gContext->GetNumSetting("AutoLookupCD");
 
-    QString tree = gContext->GetSetting("TreeLevels", "artist album title");
-    QStringList treelevels = QStringList::split(" ", tree.lower());
-
-    QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
-
-    listview = new MythListView(this);
-    listview->addColumn(tr("Select music to be played:"));
-    listview->setSorting(-1);
-    listview->setRootIsDecorated(true);
-    listview->setAllColumnsShowFocus(true);
-    listview->setColumnWidth(0, (int)(730 * wmult));
-    listview->setColumnWidthMode(0, QListView::Manual);
-
-    listview->installEventFilter(this);
+    QString treelev = gContext->GetSetting("TreeLevels", "artist album title");
+    QStringList treelevels = QStringList::split(" ", treelev.lower());
 
     active_popup = NULL;
     active_pl_edit = NULL;
@@ -66,32 +55,35 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
     cditem = NULL;
     holding_track = false;
 
+    tree = getUIListTreeType("musictree");
+    if (!tree)
+    {
+        DialogBox diag(gContext->GetMainWindow(), tr("The theme you are using "
+                       "does not contain a 'musictree' element.  "
+                       "Please contact the theme creator and ask if they could "
+                       "please update it.<br><br>The next screen will be empty."
+                       "  Escape out of it to return to the menu."));
+        diag.AddButton(tr("OK"));
+        diag.exec();
+
+        return;
+    }
+ 
     // Make the first few nodes in the tree that everything else hangs off
     // as children
 
-    QString templevel, temptitle;
-    temptitle  = tr("Active Play Queue");
-    allcurrent = new PlaylistTitle(listview, temptitle);
-    templevel = "genre";
-    temptitle = tr("All My Playlists");
-    alllists = new TreeCheckItem(listview, temptitle, templevel, 0);
-    if(cd_checking_flag)
-    {
-        temptitle = all_music->getCDTitle();
-        temptitle = tr("Blechy Blech Blah");
-        templevel = "cd";
-        cditem = new CDCheckItem(listview, temptitle, templevel, 0);
-    }
-    templevel = "genre";
-    temptitle = tr("All My Music");
-    allmusic = new TreeCheckItem(listview, temptitle, templevel, 0);
+    rootNode = new UIListGenericTree(NULL, "Root Music Node");
 
-    vbox->addWidget(listview, 1);
+    allmusic = new TreeCheckItem(rootNode, tr("All My Music"), "genre", 0);
+    if (cd_checking_flag)
+        cditem = new CDCheckItem(rootNode, tr("Blechy Blech Blah"), "cd", 0);
+    alllists = new TreeCheckItem(rootNode, tr("All My Playlists"), "genre", 0);
+    allcurrent = new PlaylistTitle(rootNode, tr("Active Play Queue"));
 
-    listview->setCurrentItem(listview->firstChild());
+    tree->SetTree(rootNode);
 
     cd_reader_thread = NULL;
-    if(cd_checking_flag)
+    if (cd_checking_flag)
     {
         // Start the CD checking thread, and set up a timer to make it check 
         // occasionally
@@ -113,8 +105,6 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
     fill_list_timer = new QTimer(this);
     connect(fill_list_timer, SIGNAL(timeout()), this, SLOT(keepFilling()));
     fill_list_timer->start(20);
-
-    listview->setFocus();
 }
 
 DatabaseBox::~DatabaseBox()
@@ -126,51 +116,12 @@ DatabaseBox::~DatabaseBox()
         cd_reader_thread->wait();
         delete cd_reader_thread;
     }
+
     all_music->resetListings();
 
     gContext->GetLCDDevice()->switchToTime();
-}
 
-bool DatabaseBox::eventFilter(QObject *o, QEvent *e)
-{
-    (void)o;
-
-    if (e->type() != QEvent::KeyPress)
-        return false;
-
-    QKeyEvent *ke = (QKeyEvent *)e;
-
-    bool handled = false;
-    QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Music", ke, actions);
-
-    for (unsigned int i = 0; i < actions.size() && !handled; i++)
-    {
-        QString action = actions[i];
-        handled = true;
-
-        if (action == "DELETE")
-            deleteTrack(listview->currentItem());
-        else if (action == "MENU" || action == "INFO")
-            doMenus(listview->currentItem());
-        else if (action == "SELECT")
-            selected(listview->currentItem());
-        else if (action == "0" || action == "1" || action == "2" ||
-                 action == "3" || action == "4" || action == "5" ||
-                 action == "6" || action == "7" || action == "8" ||
-                 action == "9")
-        {
-            alternateDoMenus(listview->currentItem(), action.toInt());
-        }
-        else
-            handled = false;
-    }
-
-    if (handled)
-        return true;
-
-    updateLCDMenu(ke);
-    return false;    
+    delete rootNode;
 }
 
 void DatabaseBox::showWaiting()
@@ -196,7 +147,7 @@ void DatabaseBox::showWaiting()
         for (int i = 0; i < numb_wait_dots; i++)
             a_string += ".";
 
-        allmusic->setText(0, a_string);
+        allmusic->setText(a_string);
     }
 }
 
@@ -211,14 +162,13 @@ void DatabaseBox::keepFilling()
 
         if (all_music->putYourselfOnTheListView(allmusic, 100))
         {
-            allmusic->setText(0, tr("All My Music"));
+            allmusic->setText(tr("All My Music"));
             fill_list_timer->stop();
             the_playlists->setActiveWidget(allcurrent);
             active_playlist = the_playlists->getActive();
             active_playlist->putYourselfOnTheListView(allcurrent);
             the_playlists->showRelevantPlaylists(alllists);
-            listview->setOpen(allmusic, true);
-            listview->ensureItemVisible(listview->currentItem());
+            // XXX listview->ensureItemVisible(listview->currentItem());
             checkTree();
 
             //Display the menu when this opens up
@@ -284,7 +234,7 @@ void DatabaseBox::renamePlaylist()
         return;
     }
 
-    QListViewItem *item = listview->currentItem();
+    UIListGenericTree *item = tree->GetCurrentPosition();
     
     if (TreeCheckItem *rename_item = dynamic_cast<TreeCheckItem*>(item) )
     {
@@ -295,7 +245,8 @@ void DatabaseBox::renamePlaylist()
             {
                 the_playlists->renamePlaylist(rename_item->getID() * -1, 
                                               playlist_rename->text());
-                rename_item->setText(0, playlist_rename->text());
+                rename_item->setText(playlist_rename->text());
+                tree->Redraw();
                 closePlaylistPopup();
             }
             else
@@ -394,7 +345,6 @@ void DatabaseBox::ErrorPopup(const QString &msg)
 
     error_popup->ShowPopupAtXY(x, y, this, SLOT(closeErrorPopup()));
     mac_b->setFocus();
-    listview->setFocusPolicy(NoFocus);
 }
 
 void DatabaseBox::closeErrorPopup(void)
@@ -405,11 +355,7 @@ void DatabaseBox::closeErrorPopup(void)
     error_popup->hide();
     delete error_popup;
     error_popup = NULL;
-
-    listview->setFocusPolicy(TabFocus);
-    listview->setFocus();
 }
-
 
 void DatabaseBox::BlankCDRW()
 {
@@ -462,26 +408,23 @@ void DatabaseBox::deletePlaylist()
    
     closePlaylistPopup(); 
 
-    QListViewItem *item = listview->currentItem(); 
+    UIListGenericTree *item = tree->GetCurrentPosition(); 
     
     if (TreeCheckItem *check_item = dynamic_cast<TreeCheckItem*>(item) )
     {
         if (check_item->getID() < 0)
         {
-            if (check_item->itemBelow())
-            {
-                listview->ensureItemVisible(check_item->itemBelow());
-                listview->setCurrentItem(check_item->itemBelow());
-            }
-            else if (check_item->itemAbove())
-            {
-                listview->ensureItemVisible(check_item->itemAbove());
-                listview->setCurrentItem(check_item->itemAbove());
-            }
+            if (check_item->nextSibling(1))
+                tree->MoveDown();
+            else if (check_item->prevSibling(1))
+                tree->MoveUp();
+
             the_playlists->deletePlaylist(check_item->getID() * -1);
             //the_playlists->showRelevantPlaylists(alllists);
-            delete item;
+            item->RemoveFromParent();
+            //delete item; will be deleted by generic tree
             the_playlists->refreshRelevantPlaylists(alllists);
+            checkTree();
             return;
         }
     }
@@ -498,17 +441,17 @@ void DatabaseBox::copyToActive()
 
     closePlaylistPopup();
 
-    QListViewItem *item = listview->currentItem();
-    
+    UIListGenericTree *item = tree->GetCurrentPosition();
+ 
     if (TreeCheckItem *check_item = dynamic_cast<TreeCheckItem*>(item) )
     {
         if (check_item->getID() < 0)
         {
             the_playlists->copyToActive(check_item->getID() * -1);
-            the_playlists->showRelevantPlaylists(alllists);
+            the_playlists->refreshRelevantPlaylists(alllists);
+            tree->RefreshCurrentLevel();
             checkTree();
-            listview->setOpen(allcurrent, true);
-            listview->setCurrentItem(allcurrent);
+            // XXX listview->setCurrentItem(allcurrent);
             return;
         }
     }
@@ -522,33 +465,42 @@ void DatabaseBox::fillCD(void)
     if (cditem)
     {
         // Delete anything that might be there  
-    
-        while (cditem->firstChild())
-        {
-            delete cditem->firstChild();
+
+        if (cditem->childCount() > 0)
+        { 
+            while (cditem->getChildAt(0))
+            {
+                cditem->RemoveFromParent();
+                //delete cditem->getChildAt(0); Deleted by GenericTree
+            }
         }
     
         // Put on whatever all_music tells us is there
     
-        cditem->setText(0, all_music->getCDTitle());
-        cditem->setOn(false);
+        cditem->setText(all_music->getCDTitle());
+        cditem->setCheck(0);
         cditem->setCheckable(false);
+
         qApp->lock();
+
         all_music->putCDOnTheListView(cditem);
         
         //  reflect selections in cd playlist
 
-        QListViewItemIterator it(listview);
-        
-        for (it = cditem->firstChild(); it.current(); ++it)
+        QPtrListIterator<GenericTree> it = cditem->getFirstChildIterator();
+        UIListGenericTree *uit;
+                
+        while ((uit = (UIListGenericTree *)it.current()))
         {
-            if (CDCheckItem *track_ptr = dynamic_cast<CDCheckItem*>(it.current()))
+            if (CDCheckItem *track_ptr = dynamic_cast<CDCheckItem*>(uit))
             {
-                track_ptr->setOn(false);
+                track_ptr->setCheck(0);
                 if (the_playlists->checkCDTrack(track_ptr->getID()))
-                    track_ptr->setOn(true);
+                    track_ptr->setCheck(2);
             }
+            ++it;
         }
+
         qApp->unlock();
     }
     // Can't check what ain't there
@@ -556,11 +508,13 @@ void DatabaseBox::fillCD(void)
     if (cditem->childCount() > 0)
     {
         cditem->setCheckable(true);
+        cditem->setCheck(0);
         checkParent(cditem);
+        tree->Redraw();
     }
 }
 
-void DatabaseBox::doMenus(QListViewItem *item)
+void DatabaseBox::doMenus(UIListGenericTree *item)
 {
     if (TreeCheckItem *item_ptr = dynamic_cast<TreeCheckItem*>(item))
     {
@@ -571,27 +525,21 @@ void DatabaseBox::doMenus(QListViewItem *item)
         doActivePopup(item_ptr);
 }
 
-void DatabaseBox::alternateDoMenus(QListViewItem *item, int keypad_number)
+void DatabaseBox::alternateDoMenus(UIListGenericTree *item, int keypad_number)
 {
     if (TreeCheckItem *item_ptr = dynamic_cast<TreeCheckItem*>(item))
     {
         if (item_ptr->getID() < 0)
             doPlaylistPopup(item_ptr);
-        else if (item->parent())
+        else if (item->getParent())
         {
-            int a_number = item->parent()->childCount();
-            a_number = (int) (a_number * ( keypad_number / 10.0));
-            
-            QListViewItem *temp = item->parent()->firstChild();
+            int a_number = item->getParent()->childCount();
+            a_number = (int)(a_number * ( keypad_number / 10.0));
+           
+            tree->MoveUp(UIListTreeType::MoveMax);
             for (int i = 0; i < a_number; i++)
             {
-                if(temp)
-                    temp = temp->nextSibling();
-            }
-            if (temp)
-            {
-                listview->ensureItemVisible(temp);
-                listview->setCurrentItem(temp);
+                tree->MoveDown();
             }
         }
     }
@@ -599,21 +547,26 @@ void DatabaseBox::alternateDoMenus(QListViewItem *item, int keypad_number)
         doActivePopup(item_ptr);
 }
 
-void DatabaseBox::selected(QListViewItem *item)
+void DatabaseBox::selected(UIListGenericTree *item)
 {
-    // Try a dynamic cast to see if this is a TreeCheckItem, PlaylistItem, etc,
-    // or something else (Effectice C++ 2nd Ed on my lap, pg. 181, which I am 
-    // partially disregarding due to laziness)
+    if (!item)
+        return;
+
+    UIListGenericTree *parent = (UIListGenericTree *)item->getParent(); 
     
     if (CDCheckItem *item_ptr = dynamic_cast<CDCheckItem*>(item))
     {
         // Something to do with a CD
         if (active_playlist)
         {
-            item_ptr->setOn(!item_ptr->isOn());
+            if (item_ptr->getCheck() > 0)
+                item_ptr->setCheck(0);
+            else
+                item_ptr->setCheck(2);
             doSelected(item_ptr, true);
-            if (CDCheckItem *item_ptr = dynamic_cast<CDCheckItem*>(item->parent()))
+            if (CDCheckItem *item_ptr = dynamic_cast<CDCheckItem*>(parent))
                 checkParent(item_ptr);
+            tree->Redraw();
         }
         
     }
@@ -621,10 +574,14 @@ void DatabaseBox::selected(QListViewItem *item)
     {
         if (active_playlist)
         {
-            item_ptr->setOn(!item_ptr->isOn());
+            if (item_ptr->getCheck() > 0)
+                item_ptr->setCheck(0);
+            else
+                item_ptr->setCheck(2);
             doSelected(item_ptr, false);
-            if (TreeCheckItem *item_ptr = dynamic_cast<TreeCheckItem*>(item->parent()))
+            if (TreeCheckItem *item_ptr = dynamic_cast<TreeCheckItem*>(parent))
                 checkParent(item_ptr);
+            tree->Redraw();
         }
     } 
     else if (PlaylistItem *item_ptr = dynamic_cast<PlaylistTrack*>(item))
@@ -662,27 +619,15 @@ void DatabaseBox::doPlaylistPopup(TreeCheckItem *item_ptr)
                               SLOT(deletePlaylist()));
 
     playlist_rename = new MythRemoteLineEdit(playlist_popup);
+    playlist_rename->setText(item_ptr->getString());
     playlist_popup->addWidget(playlist_rename);
 
     playlist_popup->addButton(tr("Rename This Playlist"), this,
                               SLOT(renamePlaylist()));
 
-    int x, y;
-    QRect r;
+    playlist_popup->ShowPopup(this, SLOT(closePlaylistPopup()));
 
-    x = item_ptr->width(listview->fontMetrics(), listview, 0) + 
-        (int)(40 * wmult);
-    r = item_ptr->listView()->itemRect(item_ptr);
-    y = r.top() + listview->header()->height() + (int)(24 * hmult);
-
-    // If there isn't enough room to show it, move it up the hight of the frame
-
-    playlist_popup->ShowPopupAtXY(x, y, this, SLOT(closePlaylistPopup()));
-
-    playlist_rename->setText(item_ptr->text(0));
     mac_b->setFocus();
-
-    listview->setFocusPolicy(NoFocus);
 }
 
 void DatabaseBox::closePlaylistPopup(void)
@@ -693,9 +638,6 @@ void DatabaseBox::closePlaylistPopup(void)
     playlist_popup->hide();
     delete playlist_popup;
     playlist_popup = NULL;
-
-    listview->setFocusPolicy(TabFocus);
-    listview->setFocus();
 }
 
 void DatabaseBox::doActivePopup(PlaylistTitle *item_ptr)
@@ -784,24 +726,16 @@ void DatabaseBox::doActivePopup(PlaylistTitle *item_ptr)
         cdaudiob->setEnabled(false);
     }
  
-    int x, y;
-    QRect r;
-
-    x = item_ptr->width(listview->fontMetrics(), listview, 0) + 
-        (int)(40 * wmult);
-    r = item_ptr->listView()->itemRect(item_ptr);
-    y = r.top() + listview->header()->height() + (int)(24 * hmult);
-    
+    (void)item_ptr;
+  
     active_pl_edit->setText("");
 
-    active_popup->ShowPopupAtXY(x, y, this, SLOT(closeActivePopup()));
+    active_popup->ShowPopup(this, SLOT(closeActivePopup()));
 
     if (the_playlists->pendingWriteback())
         pb->setEnabled(true);
     else
         pb->setEnabled(false);
-
-    listview->setFocusPolicy(NoFocus);
 }
 
 void DatabaseBox::closeActivePopup(void)
@@ -812,9 +746,6 @@ void DatabaseBox::closeActivePopup(void)
     active_popup->hide();
     delete active_popup;
     active_popup = NULL;
-
-    listview->setFocusPolicy(TabFocus);
-    listview->setFocus();
 }
 
 void DatabaseBox::dealWithTracks(PlaylistItem *item_ptr)
@@ -828,6 +759,7 @@ void DatabaseBox::dealWithTracks(PlaylistItem *item_ptr)
         holding_track = false;
         track_held->beMoving(false);
         releaseKeyboard();
+        tree->RedrawCurrent();
     }
     else
     {
@@ -835,10 +767,11 @@ void DatabaseBox::dealWithTracks(PlaylistItem *item_ptr)
         track_held = dynamic_cast<PlaylistTrack*>(item_ptr);
         track_held->beMoving(true);
         grabKeyboard();
+        tree->RedrawCurrent();
     }
 }
 
-void DatabaseBox::doSelected(QListViewItem *item, bool cd_flag)
+void DatabaseBox::doSelected(UIListGenericTree *item, bool cd_flag)
 {
     bool keep_going = false;
 
@@ -847,7 +780,8 @@ void DatabaseBox::doSelected(QListViewItem *item, bool cd_flag)
     if (tcitem->childCount() > 0)
     {
         keep_going = true;
-        if (PlaylistItem *check_item = dynamic_cast<PlaylistItem*>(tcitem->firstChild()))
+        UIListGenericTree *test = (UIListGenericTree *)tcitem->getChildAt(0);
+        if (PlaylistItem *check_item = dynamic_cast<PlaylistItem*>(test))
         {
             (void)check_item;
             keep_going = false;
@@ -856,27 +790,28 @@ void DatabaseBox::doSelected(QListViewItem *item, bool cd_flag)
     
     if (keep_going)
     {
-        TreeCheckItem *child = (TreeCheckItem *)tcitem->firstChild();
-        while (child) 
+        QPtrListIterator<GenericTree> it = tcitem->getFirstChildIterator();
+        TreeCheckItem *child;
+        while ((child = (TreeCheckItem *)it.current())) 
         {
-            if (child->isOn() != tcitem->isOn())
+            if (child->getCheck() != tcitem->getCheck())
             {
-                child->setOn(tcitem->isOn());
+                child->setCheck(tcitem->getCheck());
                 doSelected(child, cd_flag);
             }
-            child = (TreeCheckItem *)child->nextSibling();
+            ++it;
         }
     }
     else 
     {
-        if (tcitem->isOn())
+        if (tcitem->getCheck() == 2)
             active_playlist->addTrack(tcitem->getID(), true, cd_flag);
         else
             active_playlist->removeTrack(tcitem->getID(), cd_flag);
     }
 }
 
-void DatabaseBox::checkParent(QListViewItem *item)
+void DatabaseBox::checkParent(UIListGenericTree *item)
 {
     if (!item)
         return;
@@ -894,49 +829,50 @@ void DatabaseBox::checkParent(QListViewItem *item)
         do_check = true;
     }
 
-    if (do_check); // XXX This can't be right...
+    if (do_check)
     {
         TreeCheckItem *tcitem = dynamic_cast<TreeCheckItem*>(item);
-        TreeCheckItem *child = (TreeCheckItem *)tcitem->firstChild();
+        TreeCheckItem *child = (TreeCheckItem *)tcitem->getChildAt(0);
         if (!child)
             return;
 
-        bool state = child->isOn();
-        bool same = true;
-        while (child)
+        bool allon = true;
+        bool oneon = false;
+
+        QPtrListIterator<GenericTree> it = tcitem->getFirstChildIterator();
+        
+        while ((child = (TreeCheckItem *)it.current()))
         {
-            if (child->isOn() != state)
-                same = false;
-            child = (TreeCheckItem *)child->nextSibling();
+            if (child->getCheck() > 0)
+                oneon = true;
+            if (child->getCheck() == 0)
+                allon = false;
+
+            ++it;
         }
 
-        if (same)
-            tcitem->setOn(state);
+        if (allon)
+            tcitem->setCheck(2);
+        else if (oneon)
+            tcitem->setCheck(1);
+        else
+            tcitem->setCheck(0);
 
-        if (!same)
-            tcitem->setOn(false);
-
-        if (tcitem->parent())
-            checkParent(tcitem->parent());
+        if (tcitem->getParent())
+            checkParent((UIListGenericTree *)tcitem->getParent());
     }
 }    
 
-void DatabaseBox::deleteTrack(QListViewItem *item)
+void DatabaseBox::deleteTrack(UIListGenericTree *item)
 {
     if (PlaylistTrack *delete_item = dynamic_cast<PlaylistCD*>(item) )
     {
-        if (delete_item->itemBelow())
-        {
-            listview->ensureItemVisible(delete_item->itemBelow());
-            listview->setCurrentItem(delete_item->itemBelow());
-        }
-        else if (delete_item->itemAbove())
-        {
-            listview->ensureItemVisible(delete_item->itemAbove());
-            listview->setCurrentItem(delete_item->itemAbove());
-        }
+        if (delete_item->nextSibling(1))
+            tree->MoveDown();
+        else if (delete_item->prevSibling(1))
+            tree->MoveUp();
 
-        QListViewItem *item = delete_item->parent();
+        UIListGenericTree *item = (UIListGenericTree *)delete_item->getParent();
         if (TreeCheckItem *item_owner = dynamic_cast<TreeCheckItem*>(item))
         {
             Playlist *owner = the_playlists->getPlaylist(item_owner->getID() * 
@@ -953,23 +889,18 @@ void DatabaseBox::deleteTrack(QListViewItem *item)
             cerr << "databasebox.o: I don't know how to delete whatever you're "
                     "trying to get rid of" << endl;
         }
+
         the_playlists->refreshRelevantPlaylists(alllists);
         checkTree();
     }
     else if (PlaylistTrack *delete_item = dynamic_cast<PlaylistTrack*>(item))
     {
-        if (delete_item->itemBelow())
-        {
-            listview->ensureItemVisible(delete_item->itemBelow());
-            listview->setCurrentItem(delete_item->itemBelow());
-        }
-        else if (delete_item->itemAbove())
-        {
-            listview->ensureItemVisible(delete_item->itemAbove());
-            listview->setCurrentItem(delete_item->itemAbove());
-        }
+        if (delete_item->nextSibling(1))
+            tree->MoveDown();
+        else if (delete_item->prevSibling(1))
+            tree->MoveUp();
 
-        QListViewItem *item = delete_item->parent();
+        UIListGenericTree *item = (UIListGenericTree *)delete_item->getParent();
         if (TreeCheckItem *item_owner = dynamic_cast<TreeCheckItem*>(item))
         {
             Playlist *owner = the_playlists->getPlaylist(item_owner->getID() * 
@@ -994,8 +925,9 @@ void DatabaseBox::deleteTrack(QListViewItem *item)
 void DatabaseBox::moveHeldUpDown(bool flag)
 {
     track_held->moveUpDown(flag);  
-    listview->ensureItemVisible(track_held);
-    listview->setCurrentItem(track_held);
+    tree->RedrawCurrent();
+    //XXX listview->ensureItemVisible(track_held);
+    //XXX listview->setCurrentItem(track_held);
 }
 
 void DatabaseBox::keyPressEvent(QKeyEvent *e)
@@ -1017,6 +949,7 @@ void DatabaseBox::keyPressEvent(QKeyEvent *e)
                 //  Done holding this track
                 holding_track = false;
                 track_held->beMoving(false);
+                tree->RedrawCurrent();
                 releaseKeyboard();
             }
             else if (action == "UP")
@@ -1026,41 +959,100 @@ void DatabaseBox::keyPressEvent(QKeyEvent *e)
             else
                 handled = false;
         }
+        return;
     }
-    else
+
+    bool handled = false;
+    QStringList actions;
+    gContext->GetMainWindow()->TranslateKeyPress("Music", e, actions);
+
+    UIListGenericTree *curItem = tree->GetCurrentPosition();
+
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
-        MythDialog::keyPressEvent(e);
+        QString action = actions[i];
+        handled = true;
+
+        if (action == "DELETE")
+            deleteTrack(curItem);
+        else if (action == "MENU" || action == "INFO")
+            doMenus(curItem);
+        else if (action == "SELECT")
+            selected(curItem);
+        else if (action == "0" || action == "1" || action == "2" ||
+                 action == "3" || action == "4" || action == "5" ||
+                 action == "6" || action == "7" || action == "8" ||
+                 action == "9")
+        {
+            alternateDoMenus(curItem, action.toInt());
+        }
+        else if (action == "UP")
+            tree->MoveUp();
+        else if (action == "DOWN")
+            tree->MoveDown();
+        else if (action == "LEFT")
+            tree->MoveLeft();
+        else if (action == "RIGHT")
+            tree->MoveRight();
+        else if (action == "PAGEUP")
+            tree->MoveUp(UIListTreeType::MovePage);
+        else if (action == "PAGEDOWN")
+            tree->MoveDown(UIListTreeType::MovePage);
+        else
+            handled = false;
     }
+
+    if (handled)
+        return;
+
+    updateLCDMenu(e);
+
+    MythDialog::keyPressEvent(e);
 }
 
-void DatabaseBox::checkTree()
+void DatabaseBox::checkTree(UIListGenericTree *startingpoint)
 {
-    QListViewItemIterator it(listview);
+    bool toplevel = false;
+    if (!startingpoint)
+    {
+        toplevel = true;
+        startingpoint = rootNode;
+    }
+
+    QPtrListIterator<GenericTree> it = startingpoint->getFirstChildIterator();
+    UIListGenericTree *uit;
 
     // Using the current playlist metadata, check the boxes on the ListView 
     // tree appropriately.
 
-    for (it = allmusic->firstChild(); it.current(); ++it )
+    while ((uit = (UIListGenericTree *)it.current()))
     {
         //  Only check things which are TreeCheckItem's
-        if (TreeCheckItem *item = dynamic_cast<TreeCheckItem*>(it.current()))
+        if (TreeCheckItem *item = dynamic_cast<TreeCheckItem*>(uit))
         {
-            //  Turn off
-            item->setOn(false);
+            item->setCheck(0);
             if (active_playlist->checkTrack(item->getID()))
             {
                 //  Turn on if it's on the current playlist
-                item->setOn(true);
-                checkParent(item->parent());
+                item->setCheck(2);
+                checkParent((UIListGenericTree *)item->getParent());
             }
+
+            if (item->childCount() > 0)
+                checkTree(item);
         }
+
+        ++it;
     }
+
+    if (toplevel)
+        tree->Redraw();
 }
 
 void DatabaseBox::setCDTitle(const QString& title)
 {
     if (cditem)
-        cditem->setText(0, title);
+        cditem->setText(title);
 }
 
 ReadCDThread::ReadCDThread(PlaylistsContainer *all_the_playlists, 
@@ -1164,7 +1156,7 @@ void ReadCDThread::run()
 void DatabaseBox::updateLCDMenu(QKeyEvent * e)
 {
     // Update the LCD with a menu of items
-    QListViewItem *curItem = listview->currentItem();
+    UIListGenericTree *curItem = tree->GetCurrentPosition();
 
     // Add the current item, and a few items below
     if(!curItem)
@@ -1178,7 +1170,7 @@ void DatabaseBox::updateLCDMenu(QKeyEvent * e)
 
     if (TreeCheckItem *item_ptr = dynamic_cast<TreeCheckItem*>(curItem))
         buildMenuTree(menuItems, item_ptr, 1);
-    else if (QListViewItem *item_ptr = dynamic_cast<QListViewItem*>(curItem))
+    else if (UIListGenericTree *item_ptr = dynamic_cast<UIListGenericTree*>(curItem))
         buildMenuTree(menuItems, item_ptr, 1);
 
     if (!menuItems->isEmpty())
@@ -1187,58 +1179,9 @@ void DatabaseBox::updateLCDMenu(QKeyEvent * e)
     //release the container
     delete menuItems;
 
-    //listview
-
     //Were done, so switch back to the time display
     if (e->key() == Key_Escape)
         gContext->GetLCDDevice()->switchToTime();
-}
-
-void DatabaseBox::buildMenuTree(QPtrList<LCDMenuItem> *menuItems, 
-                                TreeCheckItem *item_ptr, int level)
-{
-    if(!item_ptr || level > LCD_MAX_MENU_ITEMS)
-        return;
-
-    //If this is the first time in, try to add a few previous items
-    if (level == 1 && item_ptr->itemAbove())
-    {
-        TreeCheckItem *tcitem;
-        QListViewItem *qlvitem;
-
-        QListViewItem *testitem = item_ptr->itemAbove()->itemAbove();
-        if (testitem)
-        {
-            if ((tcitem = dynamic_cast<TreeCheckItem*>(testitem)))
-                menuItems->append(buildLCDMenuItem(tcitem, false));
-            else if ((qlvitem = dynamic_cast<QListViewItem*>(testitem)))
-                menuItems->append(buildLCDMenuItem(qlvitem, false));
-        }
-
-        testitem = item_ptr->itemAbove();
-        if ((tcitem = dynamic_cast<TreeCheckItem*>(testitem)))
-            menuItems->append(buildLCDMenuItem(tcitem, false));
-        else if ((qlvitem = dynamic_cast<QListViewItem*>(testitem)))
-            menuItems->append(buildLCDMenuItem(qlvitem, false));
-    }
-
-    // Is this the item to point at in the menu?
-    // The first item ever comming into this method is expected to be
-    // the currently highlighted item
-    bool tf = (level == 1 ? true: false);
-
-    // Add this item
-    menuItems->append(buildLCDMenuItem(dynamic_cast<TreeCheckItem*>(item_ptr), 
-                      tf));
-
-    TreeCheckItem *tcitem;
-    QListViewItem *qlvitem;
-
-    // If there is an item below, add it to the list
-    if ((tcitem = dynamic_cast<TreeCheckItem*>(item_ptr->itemBelow())))
-        buildMenuTree(menuItems, tcitem, ++level);
-    else if ((qlvitem = dynamic_cast<QListViewItem*>(item_ptr->itemBelow())))
-        menuItems->append(buildLCDMenuItem(qlvitem, false));
 }
 
 LCDMenuItem *DatabaseBox::buildLCDMenuItem(TreeCheckItem *item_ptr, 
@@ -1246,41 +1189,41 @@ LCDMenuItem *DatabaseBox::buildLCDMenuItem(TreeCheckItem *item_ptr,
 {
     CHECKED_STATE check_state;
 
-    if (item_ptr->isOn())
+    if (item_ptr->getCheck() == 2)
         check_state = CHECKED;
     else
         check_state = UNCHECKED;
 
     QString indent = indentMenuItem(item_ptr->getLevel());
-    QString name =  indent + item_ptr->text().stripWhiteSpace();
+    QString name = indent + item_ptr->getString().stripWhiteSpace();
     return new LCDMenuItem(curMenuItem, check_state, name, indent.length());
 }
 
 void DatabaseBox::buildMenuTree(QPtrList<LCDMenuItem> *menuItems, 
-                                QListViewItem *item_ptr, int level)
+                                UIListGenericTree *item_ptr, int level)
 {
     if (!item_ptr || level > LCD_MAX_MENU_ITEMS)
         return;
 
     // If this is the first time in, try to add a few previous items
-    if (level == 1 && item_ptr->itemAbove())
+    if (level == 1 && item_ptr->prevSibling(1))
     {
         TreeCheckItem *tcitem;
-        QListViewItem *qlvitem;
+        UIListGenericTree *qlvitem;
 
-        QListViewItem *testitem = item_ptr->itemAbove()->itemAbove();
+        UIListGenericTree *testitem = (UIListGenericTree *)item_ptr->prevSibling(2);
         if (testitem)
         {
             if ((tcitem = dynamic_cast<TreeCheckItem*>(testitem)))
                 menuItems->append(buildLCDMenuItem(tcitem, false));
-            else if ((qlvitem = dynamic_cast<QListViewItem*>(testitem)))
+            else if ((qlvitem = dynamic_cast<UIListGenericTree*>(testitem)))
                 menuItems->append(buildLCDMenuItem(qlvitem, false));
         }
 
-        testitem = item_ptr->itemAbove();
+        testitem = (UIListGenericTree *)item_ptr->prevSibling(1);
         if ((tcitem = dynamic_cast<TreeCheckItem*>(testitem)))
             menuItems->append(buildLCDMenuItem(tcitem, false));
-        else if ((qlvitem = dynamic_cast<QListViewItem*>(testitem)))
+        else if ((qlvitem = dynamic_cast<UIListGenericTree*>(testitem)))
             menuItems->append(buildLCDMenuItem(qlvitem, false));
     }
 
@@ -1290,21 +1233,23 @@ void DatabaseBox::buildMenuTree(QPtrList<LCDMenuItem> *menuItems,
     bool tf = (level == 1 ? true: false);
 
     // Add this item
-    menuItems->append(buildLCDMenuItem(dynamic_cast<QListViewItem*>(item_ptr), 
+    menuItems->append(buildLCDMenuItem(dynamic_cast<UIListGenericTree*>(item_ptr), 
                                        tf));
 
     TreeCheckItem *tcitem;
-    QListViewItem *qlvitem;
+    UIListGenericTree *qlvitem;
 
     // If there is an item below, add it to the list
 
-    if ((tcitem = dynamic_cast<TreeCheckItem*>(item_ptr->itemBelow())))
+    qlvitem = (UIListGenericTree *)item_ptr->nextSibling(1);
+
+    if ((tcitem = dynamic_cast<TreeCheckItem*>(qlvitem)))
         buildMenuTree(menuItems, tcitem, ++level);
-    else if ((qlvitem = dynamic_cast<QListViewItem*>(item_ptr->itemBelow())))
+    else
         menuItems->append(buildLCDMenuItem(qlvitem, false));
 }
 
-LCDMenuItem *DatabaseBox::buildLCDMenuItem(QListViewItem *item_ptr, 
+LCDMenuItem *DatabaseBox::buildLCDMenuItem(UIListGenericTree *item_ptr, 
                                            bool curMenuItem)
 {
     CHECKED_STATE check_state = NOTCHECKABLE;

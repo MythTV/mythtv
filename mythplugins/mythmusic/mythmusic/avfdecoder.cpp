@@ -40,45 +40,6 @@ typedef struct {
     uint8_t v4[8];
 } GUID;
 
-// These definitions and functions are used to support the ASF parsing
-// Submitted to libavformat team for inclusion but used here for simplicity
-// Should be removed if/when libavformat includes the changes
-
-static const GUID extended_content_header = 
-{
-    0xD2D0A440, 0xE307, 0x11D2, 
-    { 0x97, 0xF0, 0x00, 0xA0, 0xC9, 0x5E, 0xA8, 0x50 },
-};
-
-static void get_guid(ByteIOContext *s, GUID *g)
-{
-    int i;
-
-    g->v1 = get_le32(s);
-    g->v2 = get_le16(s);
-    g->v3 = get_le16(s);
-    for(i=0;i<8;i++)
-        g->v4[i] = get_byte(s);
-}
-
-static void get_str16_nolen(ByteIOContext *pb, int len, char *buf, int buf_size)
-{
-    int c;
-    char *q;
-
-    q = buf;
-    while (len > 0) 
-    {
-        c = get_le16(pb);
-        if ((q - buf) < buf_size - 1)
-            *q++ = c;
-        len-=2;
-    }
-    *q = '\0';
-}
-
-// Begin the class definition
-
 avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, QIODevice *i, 
                        Output *o) 
           : Decoder(d, i, o)

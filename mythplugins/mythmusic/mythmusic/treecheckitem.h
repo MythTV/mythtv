@@ -1,51 +1,52 @@
 #ifndef TREECHECKITEM_H_
 #define TREECHECKITEM_H_
 
-#include <qlistview.h>
+#include <mythtv/uilistbtntype.h>
 
 class QPixmap;
 class PlaylistsContainer;
 class Playlist;
 class Track;
 
-class TreeCheckItem : public QCheckListItem
+class TreeCheckItem : public UIListGenericTree
 {
   public:
-    TreeCheckItem(QListView *parent, QString &ltext, const QString &llevel, int l_id); 
-    TreeCheckItem(TreeCheckItem *parent, QString &ltext, const QString &llevel, int l_id);
-    TreeCheckItem(TreeCheckItem *parent, TreeCheckItem *after, QString &ltext, const QString &llevel, int l_id);
-    QString getLevel(void) { return level; }
-    int getID(){return id;}
-    void    setCheckable(bool flag); //  Need different use than setEnabled();
-    bool    isCheckable(){return checkable;}
-    void    paintCell(QPainter * p, const QColorGroup & cg, int column, int width, int align);
-    void    setOn(bool flag);
-    
+    TreeCheckItem(UIListGenericTree *parent, const QString &text, 
+                  const QString &level, int id);
+    virtual ~TreeCheckItem() { }
+
+    QString getLevel(void) { return m_level; }
+    int getID(void) { return m_id; }
+
+    void setCheckable(bool flag); //  Need different use than setEnabled();
+    bool isCheckable(void) { return m_checkable; }
+    //void paintCell(QPainter * p, const QColorGroup & cg, int column, int width, int align);
+    void setCheck(int flag);
+ 
   private:
     void pickPixmap(void);
 
-    int id;
-    QString level;
-
-    bool    checkable;
+    int m_id;
+    QString m_level;
+    bool m_checkable;
 };
 
 class CDCheckItem : public TreeCheckItem
 {
   public:
-    CDCheckItem(QListView *parent, QString &ltext, const QString &llevel, int l_track);
-    CDCheckItem(CDCheckItem *parent, QString &ltext, const QString &llevel, int l_track);
-
+    CDCheckItem(UIListGenericTree *parent, const QString &text, 
+                const QString &level, int track);
 };
 
-class PlaylistItem : public QListViewItem
+class PlaylistItem : public UIListGenericTree
 {
   public:
-    PlaylistItem(QListView *parent, const QString &title);
-    PlaylistItem(QListViewItem *parent, const QString &title);
-    PlaylistItem(QListViewItem *parent, QListViewItem *after, const QString &title);
-    virtual void userSelectedMe(){} // pure virtual, should always be reimplemented
-    QString getText() { return text; }
+    PlaylistItem(UIListGenericTree *parent, const QString &title);
+
+    virtual void userSelectedMe() = 0;
+
+    QString getText(void) { return text; }
+
   private:
     QString text;
 };
@@ -53,55 +54,45 @@ class PlaylistItem : public QListViewItem
 class PlaylistTitle : public PlaylistItem
 {
   public:
+    PlaylistTitle(UIListGenericTree *parent, const QString &title);
 
-    PlaylistTitle(QListView *parent, const QString &title);
-    PlaylistTitle(QListViewItem *parent, const QString &title);
     void setOwner(Playlist *owner);
-    void userSelectedMe();
+    void userSelectedMe(void);
     void removeTrack(int x);
-    bool isActive(){return active;}
-    bool isDefault();
+    bool isActive(void) { return active; }
 
-  private:
-  
-    Playlist       *ptr_to_owner;
-    bool           active;
+  private:  
+    Playlist *ptr_to_owner;
+    bool active;
 };
 
 class PlaylistTrack : public PlaylistItem
 {
   public:
-    PlaylistTrack(QListViewItem *parent, const QString &title);
-    PlaylistTrack(QListViewItem *parent, QListViewItem *after, 
-                  const QString &title);
+    PlaylistTrack(UIListGenericTree *parent, const QString &title);
+
     void setOwner(Track *owner);
     void userSelectedMe();
     void beMoving(bool flag);
     void moveUpDown(bool flag);
     int  getID();
-    QPixmap         *pixmap;
 
-  private:
-    Track           *ptr_to_owner;
-    bool            held;    
+  protected:
+    QPixmap *pixmap;
+    Track *ptr_to_owner;
+    bool held;    
 };
 
 class PlaylistPlaylist : public PlaylistTrack
 {
   public:
-    PlaylistPlaylist(QListViewItem *parent, const QString &title);
-    PlaylistPlaylist(QListViewItem *parent, QListViewItem *after, 
-                  const QString &title);
-
+    PlaylistPlaylist(UIListGenericTree *parent, const QString &title);
 };
 
 class PlaylistCD : public PlaylistTrack
 {
   public:
-    PlaylistCD(QListViewItem *parent, const QString &title);
-    PlaylistCD(QListViewItem *parent, QListViewItem *after, 
-                  const QString &title);
-
+    PlaylistCD(UIListGenericTree *parent, const QString &title);
 };
 
 #endif

@@ -255,7 +255,7 @@ void startPlayback(PlaylistsContainer *all_playlists, AllMusic *all_music)
 void startDatabaseTree(PlaylistsContainer *all_playlists, AllMusic *all_music)
 {
     DatabaseBox dbbox(all_playlists, all_music, gContext->GetMainWindow(),
-                      "music database");
+                      "music_select", "music-", "music database");
     qApp->unlock();
     dbbox.exec();
     qApp->lock();

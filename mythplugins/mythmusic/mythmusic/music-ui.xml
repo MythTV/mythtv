@@ -6,19 +6,55 @@
 
 -->
 <mythuitheme>
- 
+
+    <!-- music selection screen -->
+    <window name="music_select">
+      <font name="active" face="Arial">
+         <color>#ffffff</color>
+         <size>18</size>
+         <bold>yes</bold>
+      </font>
+
+      <font name="inactive" face="Arial">
+        <color>#9999cc</color>
+        <size>18</size>
+        <bold>yes</bold>
+      </font>
+
+      <container name="musictree">
+        <area>20,20,780,400</area>
+
+        <listtreearea name="musictree" draworder="0">
+          <area>0,0,760,400</area>
+          <listsize>0,0,450,360</listsize>
+          <leveloffset>10</leveloffset>
+          <gradient type="unselected" start="#505050" end="#000000" alpha="100">
+          </gradient>
+          <gradient type="selected" start="#52CA38" end="#349838" alpha="255">
+          </gradient>
+          <fcnfont name="active" function="active"></fcnfont>
+          <fcnfont name="inactive" function="inactive"></fcnfont>
+        </listtreearea>
+      </container>
+
+      <container name="info">
+        <area>0,400,800,200</area>
+
+        <image name="background" draworder="0" fleximage="no">
+          <filename>music-sel-bg.png</filename>
+          <position>0,0</position>
+        </image>
+      </container>
+
+    </window>
 
     <!--
-        
         The play music screen
-
     -->
     <window name="music_play">
     
         <!--
-
             First, define all the fonts we need on this screen
-
         -->
         <font name="active" face="Arial">
             <color>#ffffff</color>
@@ -63,9 +99,7 @@
         </font>
 
         <!--
-
             The (unchanging) background
-
         -->
 
         <container name="background">
@@ -89,9 +123,7 @@
         </container>
 
         <!--
-        
             The view of playlists; tracks at the top
-
         -->
         <container name="musicselector">
             <area>0,10,800,310</area>
@@ -127,8 +159,6 @@
 
                     NB: bins number 1 to # of bins inclusive
                         not 0 to #-1
-    
-
                 -->
                 <bin number="1">
                     <area>30,16,190,250</area>
@@ -145,9 +175,7 @@
             </managedtreelist>
 
             <!--
-
                 An image that go "on top" of the list bins
-
             -->
 
             <image name="showinglines" draworder="2" fleximage="yes">
@@ -157,9 +185,7 @@
             </image>
 
             <!--
-
                 An image for when we're waiting for data
-
             -->
             <image name="mm_waiting" draworder="0" fleximage="no">
                 <context>0</context>
@@ -174,10 +200,8 @@
             </textarea>
 
             <!--
-
                 An image for when we're only showing the last bin 
                 (ie. just the active playlist)
-
             -->
 
             <image name="mm_waiting" draworder="0" fleximage="no">
@@ -188,14 +212,11 @@
         </container>
 
         <!--
-
             An area to hold info about the playing track
-
         -->
 
         <container name="trackinfo">
             <area>0,315,680,160</area>
-
 
             <textarea name="title_text" draworder="1" align="left">
                 <font>currenttitle</font>
@@ -244,9 +265,7 @@
         </container>
 
         <!--
-
             On screen volume display
-
         -->
 
         <container name="volumedisplay">
@@ -260,9 +279,7 @@
         </container>
 
         <!--
-
             All the buttons
-
         -->
 
         <container name="musicbuttons">

@@ -11,6 +11,22 @@ using namespace std;
 
 #include "metadata.h"
 
+struct FieldSplitInfo {
+   QString testStr;
+   QString dispStr;
+};
+
+FieldSplitInfo splitArray[] =
+{ 
+  {"ABCDE", " (A B C D E)"},
+  {"FGHIJ", " (F G H I J)"},
+  {"KLMNO", " (K L M N O)"},
+  {"PQRST", " (P Q R S T)"},
+  {"UVWXYZ", " (U V W X Y Z)"}
+};
+
+const int kSplitArray_Max = sizeof splitArray / sizeof splitArray[0];
+
 bool operator==(const Metadata& a, const Metadata& b)
 {
     if (a.Filename() == b.Filename())
@@ -248,6 +264,22 @@ void Metadata::getField(const QString &field, QString *data)
         *data = title;
     else if (field == "genre")
         *data = genre;
+    else if (field == "splitartist")
+    {
+        bool set = false;
+        QString firstchar = artist.left(1).upper();
+        for (int i = 0; i < kSplitArray_Max; i++)
+        {
+            if (splitArray[i].testStr.contains(firstchar))
+            {
+                set = true;
+                *data = QObject::tr("Artists") + splitArray[i].dispStr;
+            }
+        }
+
+        if (!set)
+            *data = QObject::tr("Artists") + " (" + firstchar + ")";
+    }
     else
     {
         cerr << "metadata.o: Something asked me to return data about a field called " << field << endl ;
@@ -653,43 +685,36 @@ void AllMusic::writeTree(GenericTree *tree_to_write_to)
 
 bool AllMusic::putYourselfOnTheListView(TreeCheckItem *where, int how_many)
 {
-
-
     root_node->putYourselfOnTheListView(where, false);
 
-    if(how_many < 0)
+    if (how_many < 0)
     {
-    
-        QPtrListIterator<MusicNode> iter( top_nodes );
+        QPtrListIterator<MusicNode> iter(top_nodes);
         MusicNode *traverse;
-        iter.toLast();
-        while ( (traverse = iter.current()) != 0 )
+        while ((traverse = iter.current()) != 0)
         {
             traverse->putYourselfOnTheListView(where, true);
-            --iter;
+            ++iter;
         }
         return true;
     }
     else
     {
-        if(last_listed < 0)
-        {
+        if (last_listed < 0)
             last_listed = 0;
-        }
         
-        QPtrListIterator<MusicNode> iter( top_nodes );
+        QPtrListIterator<MusicNode> iter(top_nodes);
         MusicNode *traverse;
-        iter.toLast();
-        iter -= last_listed;
+        iter += last_listed;
         int numb_this_round = 0;
 
-        while(true)
+        while (true)
         {
             traverse = iter.current();
-            if(traverse)
+            if (traverse)
             {
                 traverse->putYourselfOnTheListView(where, true);
-                --iter;
+                ++iter;
                 ++last_listed;
                 ++numb_this_round;
                 if(numb_this_round >= how_many)
@@ -724,7 +749,7 @@ void AllMusic::putCDOnTheListView(CDCheckItem *where)
         QString title_temp = QString(QObject::tr("%1 - %2")).arg((*anit).Track()).arg(title_string);
         QString level_temp = QObject::tr("title");
         CDCheckItem *new_item = new CDCheckItem(where, title_temp, level_temp, (*anit).Track());
-        new_item->setOn(false); //  Avoiding -Wall     
+        new_item->setCheck(false); //  Avoiding -Wall     
     }  
 }
 
@@ -913,6 +938,7 @@ void AllMusic::setSorting(QString a_paths)
     {
         if( *it != "genre"  &&
             *it != "artist" &&
+            *it != "splitartist" && 
             *it != "album"  &&
             *it != "title")
         {
@@ -1011,7 +1037,7 @@ void MusicNode::putYourselfOnTheListView(TreeCheckItem *parent, bool show_node)
 {
     TreeCheckItem *current_parent;
 
-    if(show_node)
+    if (show_node)
     {
         QString title_temp = my_title;
         QString level_temp = my_level;
@@ -1025,24 +1051,24 @@ void MusicNode::putYourselfOnTheListView(TreeCheckItem *parent, bool show_node)
 
     QPtrListIterator<Metadata>  anit(my_tracks);
     Metadata *a_track;
-    anit.toLast();
-    while( (a_track = anit.current() ) != 0)
+    while ((a_track = anit.current() ) != 0)
     {
-        QString title_temp = QString(QObject::tr("%1 - %2")).arg(a_track->Track()).arg(a_track->Title());
+        QString title_temp = QString(QObject::tr("%1 - %2"))
+                                  .arg(a_track->Track()).arg(a_track->Title());
         QString level_temp = QObject::tr("title");
-        TreeCheckItem *new_item = new TreeCheckItem(current_parent, title_temp, level_temp, a_track->ID());
-        --anit;
-        new_item->setOn(false); //  Avoiding -Wall     
+        TreeCheckItem *new_item = new TreeCheckItem(current_parent, title_temp,
+                                                    level_temp, a_track->ID());
+        ++anit;
+        new_item->setCheck(false); //  Avoiding -Wall     
     }  
 
     
     QPtrListIterator<MusicNode> iter(my_subnodes);
     MusicNode *sub_traverse;
-    iter.toLast();
-    while( (sub_traverse = iter.current() ) != 0)
+    while ((sub_traverse = iter.current() ) != 0)
     {
         sub_traverse->putYourselfOnTheListView(current_parent, true);
-        --iter;
+        ++iter;
     }
     
 }
