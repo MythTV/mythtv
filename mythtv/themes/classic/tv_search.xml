@@ -11,7 +11,7 @@
    </button>
 
    <button>
-      <type>TV_SEARCH_DESCRIPTIONS</type>
+      <type>TV_SEARCH_KEYWORDS</type>
       <text>Descriptions</text>
       <text lang="DE">Inhalt</text>
       <text lang="SV">Beskrivning</text>
