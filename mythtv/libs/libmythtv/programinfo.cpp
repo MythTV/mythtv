@@ -2013,15 +2013,13 @@ void ProgramInfo::showDetails(QSqlDatabase *db)
            category_type = "tvshow";
     }
 
-    QString msg = title;
+    QString msg = "Title:  " + title;
 
     if (subtitle != "")
         msg += " - \"" + subtitle + "\"";
 
-    msg += "\n";
-
     if (description  != "")
-        msg += "    " + description;
+        msg += "\nDescription:  " + description;
 
     QString attr = "";
 
@@ -2056,7 +2054,7 @@ void ProgramInfo::showDetails(QSqlDatabase *db)
         attr.truncate(attr.findRev(','));
         msg += " (" + attr + ")";
     }
-    msg += "\n\n";
+    msg += "\n";
 
     if(category != "")
         msg += QObject::tr("Category:  ") + category + "\n";
@@ -2132,6 +2130,11 @@ void ProgramInfo::showDetails(QSqlDatabase *db)
             if (rstr == "director")
                 msg += "Director:  " + plist + "\n";
         }
+    }
+    if(filesize > 0)
+    {
+        msg += QObject::tr("Filesize:  ") + longLongToString(filesize) + "\n";
+        msg += QObject::tr("Recording Group:  ") + recgroup + "\n";
     }
     DialogBox *details_dialog = new DialogBox(gContext->GetMainWindow(), msg);
     details_dialog->AddButton(QObject::tr("OK"));
