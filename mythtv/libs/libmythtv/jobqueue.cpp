@@ -1582,17 +1582,6 @@ void JobQueue::DoFlagCommercialsThread(void)
         ChangeJobStatus(commthread_db->db(), jobID, JOB_ERRORED,
                         "ERROR: Unable to find mythcommflag.");
     }
-    else if (breaksFound == 254)
-    {
-        msg = QString("Commercial Flagging ERRORED for %1.")
-                      .arg(logDesc);
-
-        gContext->LogEntry("commflag", LP_WARNING,
-                           "Commercial Flagging Errored", msg);
-
-        ChangeJobStatus(commthread_db->db(), jobID, JOB_ERRORED,
-                        "Job aborted with Error.");
-    }
     else if ((*(jobControlFlags[key]) == JOB_STOP) ||
              (breaksFound == 255))
     {
@@ -1604,6 +1593,17 @@ void JobQueue::DoFlagCommercialsThread(void)
 
         ChangeJobStatus(commthread_db->db(), jobID, JOB_ABORTED,
                         "Job aborted by user.");
+    }
+    else if (breaksFound >= 200)
+    {
+        msg = QString("Commercial Flagging ERRORED for %1 with result %2.")
+                      .arg(logDesc).arg(breaksFound);
+
+        gContext->LogEntry("commflag", LP_WARNING,
+                           "Commercial Flagging Errored", msg);
+
+        ChangeJobStatus(commthread_db->db(), jobID, JOB_ERRORED,
+                        QString("Job aborted with Error %1.").arg(breaksFound));
     }
     else
     {
