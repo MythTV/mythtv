@@ -312,11 +312,11 @@ int main(int argc, char **argv)
                     QString(".qm"), ".");
     a.installTranslator(&translator);
 
+    WriteDefaults(db);
+
     QString server = gContext->GetSetting("MasterServerIP", "localhost");
     int port = gContext->GetNumSetting("MasterServerPort", 6543);
     gContext->ConnectServer(server, port);
-
-    WriteDefaults(db);
 
     QString themename = gContext->GetSetting("Theme", "blue");
     bool randomtheme = gContext->GetNumSetting("RandomTheme", 0);

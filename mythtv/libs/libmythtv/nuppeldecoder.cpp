@@ -734,6 +734,13 @@ void NuppelDecoder::GetFrame(int onlyvideo)
 
         if (frameheader.packetlength > 0)
         {
+            if (frameheader.packetlength > 10485760) // arbitrary 10MB limit
+            {
+                cerr << "Broken packet: " << frameheader.frametype
+                     << " " << frameheader.packetlength << endl;
+                m_parent->SetEof();
+                return;
+            }
             if (ringBuffer->Read(strm, frameheader.packetlength) !=
                 frameheader.packetlength)
             {
