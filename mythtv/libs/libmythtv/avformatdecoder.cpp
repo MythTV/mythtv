@@ -84,8 +84,7 @@ AvFormatDecoder::~AvFormatDecoder()
     }
 }
 
-void AvFormatDecoder::SeekReset(long long newKey, int skipFrames,
-                                bool needFlush)
+void AvFormatDecoder::SeekReset(long long, int skipFrames, bool)
 {
     lastapts = 0;
     lastvpts = 0;
@@ -292,7 +291,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     fmt = av_probe_input_format(&probe, true);
     if (!fmt)
     {
-        cerr << "Couldn't decode file\n";
+        VERBOSE(VB_IMPORTANT, QString("AvFormatDecoder: Couldn't decode file: \"%1\".").arg(filename));
         return -1;
     }
 
@@ -301,7 +300,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     ic = av_alloc_format_context();
     if (!ic)
     {
-        cerr << "Couldn't allocate context\n";
+        VERBOSE(VB_IMPORTANT, QString("AvFormatDecoder: Couldn't allocate format context."));
         return -1;
     }
 
@@ -310,14 +309,16 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     int err = av_open_input_file(&ic, filename, fmt, 0, &params);
     if (err < 0)
     {
-        cerr << "avformat error: " << err << endl;
+        VERBOSE(VB_IMPORTANT, QString("AvFormatDecoder: avformat error (%1) on av_open_input_file call.")
+                                      .arg(err));
         return -1;
     }
 
     int ret = av_find_stream_info(ic);
     if (ret < 0)
     {
-        cerr << "could not find codec parameters: " << filename << endl;
+        VERBOSE(VB_IMPORTANT, QString("AvFormatDecoder could not find codec parameters for \"%1\".")
+                                      .arg(filename));
         av_close_input_file(ic);
         ic = NULL;
         return -1;
@@ -466,7 +467,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             }
             default:
             {
-                cerr << "Unknown codec type: " << enc->codec_type << endl;
+                VERBOSE(VB_PLAYBACK, QString("AvFormatDecoder: Unknown codec type (%1).")
+                                             .arg(enc->codec_type));
                 break;
             }
         }
@@ -475,7 +477,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         codec = avcodec_find_decoder(enc->codec_id);
         if (!codec)
         {
-            cerr << "Unknown codec: " << enc->codec_id << endl;
+            VERBOSE(VB_IMPORTANT, QString("AvFormatDecoder: Could not find decoder for codec (%1) aborting.")
+                                  .arg(enc->codec_id));
             av_close_input_file(ic);
             ic = NULL;
             return -1;
@@ -483,7 +486,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
         if (avcodec_open(enc, codec) < 0)
         {
-            cerr << "Couldn't find lavc codec\n";
+            VERBOSE(VB_IMPORTANT, QString("AvFormatDecoder: Could not open codec aborting."));
             av_close_input_file(ic);
             ic = NULL;
             return -1;
@@ -537,8 +540,8 @@ bool AvFormatDecoder::CheckVideoParams(int width, int height)
     if (width == current_width && height == current_height)
         return false;
 
-    cerr << "Video has changed: " << width << " " << height << " from: "
-         << current_width << " " << current_height << endl;
+    VERBOSE(VB_PLAYBACK, QString("AvFormatDecoder: Video has changed from %1x%2 to %3x%4.")
+                                .arg(current_width).arg(current_height).arg(width).arg(height));
 
     for (int i = 0; i < ic->nb_streams; i++)
     {
@@ -792,7 +795,7 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
             {
                 gopset = true;
                 keyframedist = tempKeyFrameDist;
-                //cerr << "Stream initial keyframedist: " << keyframedist << endl;
+                VERBOSE(VB_PLAYBACK, QString("Stream initial keyframedist: %1.").arg(keyframedist));
                 m_parent->SetVideoParams(-1, -1, -1, keyframedist,
                                          current_aspect);
             }
@@ -801,8 +804,8 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
         {
             if (keyframedist != tempKeyFrameDist && tempKeyFrameDist > 0)
             {
-                //cerr << "KeyFrameDistance has changed to "
-                //     << tempKeyFrameDist << " from " << keyframedist << endl;
+                VERBOSE(VB_PLAYBACK, QString ("KeyFrameDistance has changed to %1 from %2.")
+                                             .arg(tempKeyFrameDist).arg(keyframedist));
 
                 keyframedist = tempKeyFrameDist;
                 m_parent->SetVideoParams(-1, -1, -1, keyframedist,
@@ -812,8 +815,8 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
                 long long totframes = index * keyframedist;
                 int length = (int)((totframes * 1.0) / fps);
 
-                cerr << "Setting(2) length to " << length
-                     << " " << totframes << endl;
+                VERBOSE(VB_PLAYBACK, QString("Setting(2) length to: %1,  total frames %2")
+                                     .arg(length).arg(totframes));
                 m_parent->SetFileLength(length, totframes);
             }
         }
@@ -836,9 +839,8 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
         if (framesRead > last_frame && keyframedist > 0)
         {
             long long startpos = pkt->startpos;
-
-            // cerr << "positionMap[" << prevgoppos / keyframedist <<
-            //         "] = " << startpos << "." << endl;
+            VERBOSE(VB_PLAYBACK, QString("positionMap[ %1 ] == %2.").arg(prevgoppos / keyframedist)
+                                         .arg(startpos));
 
             // Grow positionMap vector several entries at a time
             if (m_positionMap.capacity() == m_positionMap.size())
@@ -1225,7 +1227,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
 
         if (!curstream->codec.codec)
         {
-            cerr << "no codec for stream index " << pkt->stream_index << endl;
+            VERBOSE(VB_PLAYBACK, QString("No codec for stream index %1").arg(pkt->stream_index));
             av_free_packet(pkt);
             continue;
         }
@@ -1242,7 +1244,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     if (firstloop && pkt->pts != (int64_t)AV_NOPTS_VALUE)
                         lastapts = pkt->pts / (AV_TIME_BASE / 1000);
 
-                    if (onlyvideo != 0 || 
+                    if (onlyvideo != 0 ||
                         (pkt->stream_index != wantedAudioStream))
                     {
                         ptr += pkt->size;
