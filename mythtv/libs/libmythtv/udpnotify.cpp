@@ -43,6 +43,7 @@ match they will be ignored.
 using namespace std;
 
 #include "udpnotify.h"
+#include "mythcontext.h"
 #include "osd.h"
 #include "tv.h"
 
@@ -140,7 +141,8 @@ UDPNotify::UDPNotify(TV *tv, int udp_port)
     qsd = new QSocketDevice(QSocketDevice::Datagram);
     if (!qsd->bind(bcastaddr, udp_port))
     {
-        cerr << "Could not bind to UDP notify port: " << udp_port << endl;
+        VERBOSE(VB_ALL, QString("Could not bind to UDP notify port: %1")
+                                       .arg(udp_port));
         qsn = NULL;
     }
     else
@@ -213,7 +215,7 @@ void UDPNotify::parseTextArea(UDPNotifyOSDSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "Text area needs a name\n";
+        VERBOSE(VB_ALL, "Text area needs a name");
         return;
     }
 
@@ -240,7 +242,8 @@ void UDPNotify::parseTextArea(UDPNotifyOSDSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown tag in textarea: " << info.tagName() << endl;
+                VERBOSE(VB_ALL, QString("Unknown tag in text area: %1")
+                                       .arg(info.tagName()));
             }                   
         }
     }    
@@ -251,7 +254,7 @@ UDPNotifyOSDSet *UDPNotify::parseContainer(QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "Container needs a name\n";
+        VERBOSE(VB_ALL, "Container needs a name");
         return NULL;
     }
 
@@ -279,7 +282,8 @@ UDPNotifyOSDSet *UDPNotify::parseContainer(QDomElement &element)
             }
             else
             {
-                cerr << "Unknown container child: " << info.tagName() << endl;
+                VERBOSE(VB_ALL, QString("Unknown container child: %1")
+                                       .arg(info.tagName()));
             }
         }
     }
@@ -307,7 +311,16 @@ void UDPNotify::incomingData(int socket)
     // Read the data
     buf.resize(qsd->bytesAvailable());
     nr = qsd->readBlock(buf.data(), qsd->bytesAvailable()); 
-    //   cout << "Read " << nr << " bytes from peer IP " << qsd->peerAddress().toString() << " port " << qsd->port() << endl;
+    if (nr < 0)
+    {
+        VERBOSE(VB_ALL, "Error reading from udpnotify socket");
+        return;
+    }
+    buf.resize(nr);  // Resize to actual bytes read
+    //VERBOSE(VB_ALL, QString("Read %1 bytes from peer IP %2 port %3")
+    //                       .arg(nr)
+    //                       .arg(qsd->peerAddress().toString())
+    //                       .arg(qsd->port()));
 
     QString errorMsg;
     int errorLine = 0;
@@ -315,9 +328,11 @@ void UDPNotify::incomingData(int socket)
   
     if (!doc.setContent(buf, false, &errorMsg, &errorLine, &errorColumn))
     {
-        cout << "Error parsing udpnotify xml: " << endl;
-        cout << "at line: " << errorLine << "  column: " << errorColumn << endl;
-        cout << errorMsg << endl;
+        VERBOSE(VB_ALL, QString("Error parsing udpnotify xml:\n"
+                                "at line: %1  column: %2\n%3")
+                               .arg(errorLine)
+                               .arg(errorColumn)
+                               .arg(errorMsg));
         return;
     }
  
@@ -328,14 +343,14 @@ void UDPNotify::incomingData(int socket)
     {
         if (docElem.tagName() != "mythnotify")
         {
-            cout << "Unknown UDP packet (not <mythnotify> XML)" << endl;
+            VERBOSE(VB_ALL, "Unknown UDP packet (not <mythnotify> XML)");
             return;
         }
 
         QString version = docElem.attribute("version", "");
         if (version.isNull() || version.isEmpty())
         {
-            cout << "<mythnotify> missing 'version' attribute" << endl;
+            VERBOSE(VB_ALL, "<mythnotify> missing 'version' attribute");
             return;
         }
 
@@ -358,7 +373,8 @@ void UDPNotify::incomingData(int socket)
             }
             else
             {
-                cerr << "Unknown element: " << e.tagName() << endl;
+                VERBOSE(VB_ALL, QString("Unknown element: %1")
+                                       .arg(e.tagName()));
                 return;
             }
         }
