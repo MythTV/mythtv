@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-03-16, v2.00
+<date>2003-03-18, v2.01
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -66,7 +66,7 @@ The contributors to MythTV are:
 <item>Developer:  Matthew Zimmerman, <url url="mailto:mdz@debian.org">
 <item>Developer:  John Danner, <url url="mailto:jdanner@untzuntz.com">
 <item>Developer:  Chris Pinkham, <url url="mailto:cpinkham@bc2va.org">
-<item>Overall structure of HOWTO and Mandrake 9.0 documentation: Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
+<item>Overall structure of HOWTO and Mandrake 9.x documentation: Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
 <item>Red Hat Linux 8.0 documentation: Cedar McKay, <url url="mailto:mythhowto.3.ohthetrees@spamgourmet.com">
 <item>Gentoo documentation and package: Tony Clark, <url url="mailto:tclark@telia.com">
 <item>Debian package: Matthew Zimmerman, <url url="mailto:mdz@debian.org">
@@ -101,8 +101,8 @@ simultaneously encoding multiple programs.
 
 Here are a few data points:
 <itemize>
-<item>A PIII/733Mhz system can encode one video stream using the RTJPEG
-codec using 512x480 capture resolution.  This does not allow for live TV
+<item>A PIII/733Mhz system can encode one video stream using the MPEG-4
+codec using 480x480 capture resolution.  This does not allow for live TV
 watching, but does allow for encoding video and then watching it later.
 <item>The developer states that his AMD1800+ system can <bf>almost</bf>
 encode two MPEG4 video streams and watch one program simultaneously.
@@ -1424,7 +1424,7 @@ $ su
 </verb></tscreen>
 
 The first thing to configure is the master backend system.  If you are
-running multiple backend systems, the master backend will maintain make all
+running multiple backend systems, the master backend will make all
 decisions about which programs will be recorded on which tuners.  If you
 have only one backend, then it will be its own master.
 
@@ -2634,6 +2634,7 @@ mysql> quit
 <!-- Revision History
 v2.00, 2003-03-14.  Initial release for 0.8.  Added xset command for
 screensaver. Added lirc for Mandrake 9.1
+v2.01, 2003-03-18.  Fixed some typos.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

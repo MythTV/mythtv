@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-03-16, v2.00
+  2003-03-18, v2.01
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -197,7 +197,7 @@
 
   +o  Developer:  Chris Pinkham,  <mailto:cpinkham@bc2va.org>
 
-  +o  Overall structure of HOWTO and Mandrake 9.0 documentation: Robert
+  +o  Overall structure of HOWTO and Mandrake 9.x documentation: Robert
      Kulagowski,  <mailto:rkulagow@rocketmail.com>
 
   +o  Red Hat Linux 8.0 documentation: Cedar McKay,
@@ -244,8 +244,8 @@
 
   Here are a few data points:
 
-  +o  A PIII/733Mhz system can encode one video stream using the RTJPEG
-     codec using 512x480 capture resolution.  This does not allow for
+  +o  A PIII/733Mhz system can encode one video stream using the MPEG-4
+     codec using 480x480 capture resolution.  This does not allow for
      live TV watching, but does allow for encoding video and then
      watching it later.
 
@@ -1538,9 +1538,9 @@
        # exit
 
   The first thing to configure is the master backend system.  If you are
-  running multiple backend systems, the master backend will maintain
-  make all decisions about which programs will be recorded on which
-  tuners.  If you have only one backend, then it will be its own master.
+  running multiple backend systems, the master backend will make all
+  decisions about which programs will be recorded on which tuners.  If
+  you have only one backend, then it will be its own master.
 
   [1mNOTE[22m: Red Hat 8.0 users, if you haven't followed ``these'' steps, you
   [4mmust[24m do so before continuing.
