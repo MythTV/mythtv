@@ -5,7 +5,7 @@ USE mythconverg;
 #  data on a DVD
 #
 
-CREATE TABLE dvdinput
+CREATE TABLE IF NOT EXISTS dvdinput
 (
     intid       INT UNSIGNED NOT NULL PRIMARY KEY,
     hsize       INT UNSIGNED,
@@ -94,7 +94,7 @@ INSERT INTO dvdinput
 #  possible transcode parameters
 #
 
-CREATE TABLE dvdtranscode
+CREATE TABLE IF NOT EXISTS dvdtranscode
 (
     intid       INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
     input       INT UNSIGNED,
