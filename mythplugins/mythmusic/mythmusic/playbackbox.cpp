@@ -97,8 +97,8 @@ PlaybackBox::PlaybackBox(QString window_name,
     
     if (!keyboard_accelerators) 
     {
-        pledit_button->setText("Edit Playlist");
-        vis_button->setText("Visualize");
+        pledit_button->setText(tr("Edit Playlist"));
+        vis_button->setText(tr("Visualize"));
         if(!assignFirstFocus())
         {
             cerr << "playbackbox.o: Could not find a button to assign focus to. What's in your theme?" << endl;
@@ -107,8 +107,8 @@ PlaybackBox::PlaybackBox(QString window_name,
     } 
     else 
     {
-        pledit_button->setText("3 Edit Playlist");
-        vis_button->setText("4 Visualize");
+        pledit_button->setText(tr("3 Edit Playlist"));
+        vis_button->setText(tr("4 Visualize"));
     }
 
     //  
@@ -776,23 +776,23 @@ void PlaybackBox::setShuffleMode(unsigned int mode)
     {
         case SHUFFLE_INTELLIGENT:
             if (keyboard_accelerators)
-                shuffle_button->setText("1 Shuffle: Smart");
+                shuffle_button->setText(tr("1 Shuffle: Smart"));
             else
-                shuffle_button->setText("Shuffle: Smart");
+                shuffle_button->setText(tr("Shuffle: Smart"));
             music_tree_list->scrambleParents(true);
             break;
         case SHUFFLE_RANDOM:
             if (keyboard_accelerators)
-                shuffle_button->setText("1 Shuffle: Rand");
+                shuffle_button->setText(tr("1 Shuffle: Rand"));
             else
-                shuffle_button->setText("Shuffle: Rand");
+                shuffle_button->setText(tr("Shuffle: Rand"));
             music_tree_list->scrambleParents(true);
             break;
         default:
             if (keyboard_accelerators)
-                shuffle_button->setText("1 Shuffle: None");
+                shuffle_button->setText(tr("1 Shuffle: None"));
             else
-                shuffle_button->setText("Shuffle: None");
+                shuffle_button->setText(tr("Shuffle: None"));
             music_tree_list->scrambleParents(false);
             break;
     }
@@ -854,21 +854,21 @@ void PlaybackBox::setRepeatMode(unsigned int mode)
     {
         case REPEAT_ALL:
             if (keyboard_accelerators)
-                repeat_button->setText("2 Repeat: All");
+                repeat_button->setText(tr("2 Repeat: All"));
             else
-                repeat_button->setText("Repeat: All");
+                repeat_button->setText(tr("Repeat: All"));
             break;
         case REPEAT_TRACK:
             if (keyboard_accelerators)
-                repeat_button->setText("2 Repeat: Track");
+                repeat_button->setText(tr("2 Repeat: Track"));
             else
-                repeat_button->setText("Repeat: Track");
+                repeat_button->setText(tr("Repeat: Track"));
             break;
         default:
             if (keyboard_accelerators)
-                repeat_button->setText("2 Repeat: None");
+                repeat_button->setText(tr("2 Repeat: None"));
             else
-                repeat_button->setText("Repeat: None");
+                repeat_button->setText(tr("Repeat: None"));
             break;
     }
 }

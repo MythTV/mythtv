@@ -45,35 +45,23 @@
 <context>
     <name>PlaybackBox</name>
     <message>
-        <source>Shuffle Mode</source>
+        <source>1 Shuffle: None</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Repeat Mode</source>
+        <source>Shuffle: None</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Edit Playlist</source>
+        <source>2 Repeat: All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Visualize</source>
+        <source>Repeat: All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Rating</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Artist</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Title</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Length</source>
+        <source>2 Repeat: Track</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -81,7 +69,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Repeat: All</source>
+        <source>2 Repeat: None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Repeat: None</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -113,11 +105,35 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Shuffle: Intelligent</source>
+        <source>Edit Playlist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Shuffle: Random</source>
+        <source>Visualize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>3 Edit Playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4 Visualize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Smart</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shuffle: Smart</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Rand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shuffle: Rand</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
