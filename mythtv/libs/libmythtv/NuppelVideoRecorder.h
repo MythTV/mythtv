@@ -257,6 +257,7 @@ class NuppelVideoRecorder : public RecorderBase
     struct ccsubtitle subtitle;
 
     bool usingv4l2;
+    int channelfd;
 };
 
 #endif

@@ -48,6 +48,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
 {
     encoding = false;
     fd = 0;
+    channelfd = 0;
     lf = tf = 0;
     M1 = 0, M2 = 0, Q = 255;
     pid = pid2 = 0;
@@ -292,7 +293,7 @@ long long NuppelVideoRecorder::GetFramesWritten(void)
 
 int NuppelVideoRecorder::GetVideoFd(void)
 {
-    return fd;
+    return channelfd;
 }
 
 bool NuppelVideoRecorder::SetupAVCodec(void)
@@ -685,10 +686,21 @@ void NuppelVideoRecorder::StartRecording(void)
 
     if (usingv4l2)
     {
+        channelfd = open(videodevice.ascii(), O_RDWR);
+        if (channelfd < 0)
+        {
+            cerr << "Can't open video device: " << videodevice << endl;
+            perror("open video:");
+            KillChildren();
+            return;
+        }
+     
         DoV4L2();
         return;
     }
 #endif
+
+    channelfd = fd;
 
     struct video_capability vc;
     struct video_mmap mm;
@@ -881,9 +893,17 @@ void NuppelVideoRecorder::DoV4L2(void)
 
     if (ioctl(fd, VIDIOC_REQBUFS, &vrbuf) < 0)
     {
-        printf("Not able to get any capture buffers\n");
-        exit(0);
+        cerr << "Not able to get any capture buffers\n";
+        exit(-1);
     }
+
+    if (vrbuf.count < 5)
+    {
+        cerr << "Not enough buffer memory\n";
+        exit(-1);
+    }
+
+    numbuffers = vrbuf.count;
 
     unsigned char *buffers[numbuffers];
     int bufferlen[numbuffers];
@@ -930,6 +950,7 @@ void NuppelVideoRecorder::DoV4L2(void)
     recording = true;
 
     while (encoding) {
+again:
         if (paused)
         {
             mainpaused = true;
@@ -938,7 +959,7 @@ void NuppelVideoRecorder::DoV4L2(void)
                 gettimeofday(&stm, &tzone);
             continue;
         }
-again:
+
         tv.tv_sec = 5;
         tv.tv_usec = 0;
         FD_ZERO(&rdset);
@@ -959,10 +980,22 @@ again:
 
         memset(&vbuf, 0, sizeof(vbuf));
         vbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        ioctl(fd, VIDIOC_DQBUF, &vbuf);
+        if (ioctl(fd, VIDIOC_DQBUF, &vbuf) < 0)
+        {
+            perror("VIDIOC_DQBUF");
+            for (int i = 0; i < numbuffers; i++)
+            {
+                vbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+                vbuf.index = i;
+                ioctl(fd, VIDIOC_QBUF, &vbuf);
+            }
+            continue;
+        }
 
         frame = vbuf.index;
-        BufferIt(buffers[frame], video_buffer_size);
+
+        if (!paused)
+            BufferIt(buffers[frame], video_buffer_size);
 
         vbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         ioctl(fd, VIDIOC_QBUF, &vbuf);
@@ -983,6 +1016,7 @@ again:
 
     recording = false;
     close(fd);
+    close(channelfd);
 }
 
 void NuppelVideoRecorder::DoMJPEG(void)
