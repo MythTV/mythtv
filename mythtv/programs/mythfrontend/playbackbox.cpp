@@ -1394,7 +1394,7 @@ void PlaybackBox::doRemove(ProgramInfo *rec)
             }
         }
     }
-    update(listRect);
+    update(fullRect);
 }
 
 void PlaybackBox::remove(ProgramInfo *toDel)
