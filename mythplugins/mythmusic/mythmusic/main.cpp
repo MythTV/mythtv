@@ -247,7 +247,6 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     MythContext *context = new MythContext();
-    context->LoadQtConfig();
 
     context->LoadSettingsFiles("mythmusic-settings.txt");
 
@@ -262,6 +261,8 @@ int main(int argc, char *argv[])
         printf("couldn't open db\n");
         return -1;
     }
+
+    context->LoadQtConfig();
 
     CheckFreeDBServerFile();
 
