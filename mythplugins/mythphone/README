@@ -1,7 +1,15 @@
                              MythPhone
                              =========
-Release 0.15
+Release 0.15+ CVS
 Paul Volkaerts
+August 28th 2004
+
+
+Mythphone has, at the time of writing, just been checked into the main MYTH 
+CVS repository. Mythphone is a phone and videophone capability on MYTH using
+the standard SIP protocol.  It is compatible with Microsoft XP Messenger (see
+caveat below) and with SIP Service Providers such as Free World Dialup (
+fwd.pulver.com).
 
 
 
@@ -51,9 +59,18 @@ FEATURES / HOW-TO-USE
 =====================
 Mythphone uses a SIP stack to allow voice and/or video calls to
 be placed to other SIP clients. This includes other MythFrontends on your
-system, Mythfrontends over the Internet, or other standard SIP clients. I
-have verified SIP support against a couple of standards-based devices for
-voice calls but video has some caveats (see below).
+system, Mythfrontends over the Internet, or other standard SIP clients. 
+
+Mythphone operates best when registered to a Service Provider such as Free
+World Dialup. Accounts with FWD are free; just go to http://www.fwd.pulver.com
+and sign up. Mythphone should work with a variety of similar services but I
+have only tried a couple.  Your experience, positive or negative, with other
+providers is welcome.
+
+Mythphone does not force you to register; you can work in unregistered mode;
+but this moed may dissappear at any time as it doubles my test effort. There
+really is no advantage to not-registering anyway.
+
 
 Features:-
 
@@ -81,18 +98,23 @@ Keys:-
 * 0..9, * and # during a call send DTMF
 * 0..9, * and # NOT during open a dial dialogue
 * Volume Up/Down changes the speaker volume; but whilst in volume-change mode
-you can use Up/Down to switch to Brightness/Colour/Contrast etc.
+you can use Up/Down to switch to Brightness/Colour/Contrast/frame-rate etc.
 * Mute (|) mutes the microphone during a call
 
-The usual way of dialling is to add a contact into the database then
-dial by selecting this entry.  The contact URL should be of the format 
-user@ip-address or user@hostname.  Mythphone actually ignores "user" for 
-incoming calls so set this to anything you want when calling between
-mythfrontends.
+
+If you are registered with fwd.pulver.com (or similar) you call someone by 
+typing their phone number.  If you are not registered with a Service Provider
+then you need to dial a full URL, of the form name@hostname or name@ip-address.
+This is obviously a lot more hassle when using a numeric remote control! 
+
+Contacts can be added to the directory either before calling them (using the Menu
+button) or after placing/receiving a call by going to the call-history entry then
+pressing menu. Once in the menu; it is a lot easier to call people using the remote.
+
 
 Status-Bar:-
-The status bar shows 
-* call state (idle/connected/ringing etc)
+The status bar, when in a call, shows 
+* other party name
 * Audio & Video packet loss as xx%/yy% where xx% is percentage packet loss over
 the last 2 seconds and yy% packet loss is total for the call. This tells you
 how good your receive signal is
@@ -122,6 +144,9 @@ expect from the webcam; it does not configure the webcam).
 I also use the microphone built into this webcam by enabling the kernel 
 option for USB audio. 
 
+Webcam transmit frames/sec and resolution can be changed mid-call or between 
+calls using the volume+/- buttons then cursor keys.
+
 
 
 NAT and Firewall
@@ -136,25 +161,54 @@ This is a web site which returns your real address in response to a HTTP GET.
 It will consult this web server for every call.
 
 If you have several MYTH machines and want to make calls between them, then
-you can disable NAT within your home by setting the netmask. Any calls 
-to/from devices which fall into this netmask will not use the NAT address.
+you can disable NAT within your home by making directory entries for each
+Myth device in your home and setting the "On My Local LAN" checkbox.
 
-At your network router, you should configure it to forward port 5060 to your
-Myth box that you want to receive calls.
+At your network router, you may need to configure it to forward port 5060 
+to your Myth box that you want to receive calls.
 
-If you have a firewall, open up port 5060 and whatever ports you choose for
-audio and video media in the config screens.
+If you have a firewall, you may need to open up port 5060 and whatever 
+ports you choose for audio and video media in the config screens.
+
+
+
+MICROSOFT XP MESSENGER COMPATABILITY 
+====================================
+
+Video calls can be made to/from a Microsoft XP Messenger client.  I have
+tested this against Windows Messenger 4.7.  Note this is "not" the same 
+as MSN Messenger!!!
+
+Windows Messenger is, in its default mode, not a standards compliant SIP
+endpoint.  But it does have SIP support that you can enable as follows.
+
+1) Create an account for the Windows client at a Service Provider such as
+fwd.pulver.com.
+
+2) On Windows Messenger, click Tools->Options; select the "Accounts" tab,
+and enable the lower checkbox "My contacts include users of a communications
+service". Then in the Sign-in name enter the username 
+e.g. 123456@fwd.pulver.com.
+
+3) Click ADVANCED and set the server name to you service provider e.g.
+fwd.pulver.com and select connect using UDP.
+
+4) You may need to re-sign in; and when you do it should prompt you for your
+password.
+
+Now; simply call the Microsoft client using the phone number you were allocated
+in step 1; (in this example 123456).
+
+It is not worth trying high resolutions with this; Microsoft always sends at a
+pretty low resolution and they always display received video in a tiny rectangle
+regardless of the received resolution!
+
 
 
 
 
 CAVEATS
 =======
-
-* The video support is non-standard.  That is; it is H.263 but the way it 
-is packetised is non-standard. So you will only get video mythfrontend-to-
-mythfrontend. This will be fixed in a future release when I find something
-standards-based to test against.
 
 * There is no Microphone-volume control. This is because I use the microphone
 within my USB webcam and Linux has no drivers for volume control on USB 
@@ -168,49 +222,37 @@ whilst watching TV if someone calls; but in reality if you want to speak
 to someone you sort of need to call them first on a real phone!  Remember 
 this is a first-cut of software so do't be too hard on me :-)
 
-* It does not support registering with Service Providers which means you will
-not be able to place/receive calls to normal phones. This is going to be my 
-main priority once I am happy it works as far as it goes.
-
 
 
 
 VXML PAGES
 ----------
+VXML is a derivative of XML and HTML; but for voice calls. It allows information
+in HTML pages to be read out over a phone call. It is used in this project to
+provide voicemail and access to the TV guide over the phone using a text-to-speech
+engine.
+
 Within the setup there is an option which allows entry of a VXML web-page. If
 you only want voicemail; leave this blank, If you want to try some more complex
 things like allowing setting of recording via the phone, then enter a URL in
-this field pointing at an apache server. The files in the "vxml" folder contain
-some scripts that do some things but they do need improvement and testing.
+this field pointing to the mythweb vxml pages. The files in the "vxml" folder 
+in mythweb contain some scripts that do some things but they do need 
+improvement and testing.
 
 The following is a description of these files ...
 
-index.vxml -- This is the main script; put in somewhere accessible by apache 
-and configure with mythphone setup to point to this file. It basically prompts 
-the caller to leave a voicemail or enter a pin. The pin is hard-coded in this 
-file as "12345".
+index.vxml -- This is the main VXML which you should point mythphone to. It plays
+a welcome message then prompts the caller to leave a voicemail or enter a pin. 
+The pin is hard-coded in this file as "12345".
 
-voicemail.vxml -- Place in the same directory as the above file. If during the 
-execution of the above file the user asks to leave a voicemail it jumps to this 
-file for recording a prompt.
+voicemail.vxml -- If during the execution of the above file the user asks to 
+leave a voicemail it jumps to this file for recording a prompt.
 
-securemenu.vxml -- Place in the same directory as the above two files. If during
-the initial menu the user enters a correct pin it jumps to this file which then
-prompt with a second-level menu such as "read the TV guide". Edit this file and
-make sure it points to your "program_listing.php" file within mythweb.
+securemenu.vxml -- If during the initial menu the user enters a correct pin 
+it jumps to this file which then prompt with a second-level menu such as 
+"read the TV guide". Edit this file and make sure it points to your 
+"program_listing.php" file within mythweb.
 
-config/*
-themes/* -- These files add to the mythweb files to add a theme for VXML which
-formats the TV Guide data ready for reading through the Text to Speech engine.
-Copy these files into your mythweb directory structure.
-
-init.php -- This is a copy of includes/init.php from mythweb with a couple of 
-lines added to automatically select the vxml theme. If you have mythweb from 
-0.14 you may may able to copy this straight over the top but either way the 
-only difference should be the addition of the lines
-
-	elseif (strpos($_SERVER['HTTP_USER_AGENT'],"MythPhone") !== false) // The browser is MythPhone
-		define('Theme', 'vxml');
 
 
 
