@@ -136,8 +136,10 @@ PlaybackBox::PlaybackBox(MythContext *context, BoxType ltype, QWidget *parent,
     grid->setColStretch(1, 1);
     grid->setRowStretch(4, 1);
 
-    if (context->GetNumSetting("GeneratePreviewPixmap") == 1 ||
-        context->GetNumSetting("PlaybackPreview") == 1)
+    playbackPreview = (context->GetNumSetting("PlaybackPreview") == 1);
+    generatePreviewPixmap = (context->GetNumSetting("GeneratePreviewPixmaps") == 1);
+
+    if (playbackPreview || generatePreviewPixmap)
     {
         QPixmap temp((int)(160 * wmult), (int)(120 * hmult));
         temp.fill(black);
@@ -573,7 +575,7 @@ void PlaybackBox::timeout(void)
 
     if (!nvp && pixlabel)
     {
-        if (m_context->GetNumSetting("PlaybackPreview") == 1)
+        if (playbackPreview)
         {
             QListViewItem *curitem = listview->selectedItem();
 

@@ -65,6 +65,8 @@ class PlaybackBox : public MythDialog
 
     QDateTime lastUpdateTime;
     bool ignoreevents;
+    bool playbackPreview;
+    bool generatePreviewPixmap;
 };
 
 #endif
