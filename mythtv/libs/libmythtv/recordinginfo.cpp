@@ -49,7 +49,6 @@ struct tm *RecordingInfo::GetStructTM(string &timestamp)
 {
     string hour, min, sec, year, month, day;
 
-cout << "timestamp is " << timestamp << endl;
     year = timestamp.substr(0, 4);
     month = timestamp.substr(4, 2);
     day = timestamp.substr(6, 2);

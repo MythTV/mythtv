@@ -5,14 +5,21 @@
 #include <qsqlquery.h>
 #include <qaccel.h>
 #include <math.h>
+#include <qcursor.h>
 
 #include "guidegrid.h"
 #include "infodialog.h"
 #include "infostructs.h"
 
 GuideGrid::GuideGrid(int channel, QWidget *parent, const char *name)
-         : QWidget(parent, name)
+         : QDialog(parent, name)
 {
+    setGeometry(0, 0, 800, 600);
+    setFixedWidth(800);
+    setFixedHeight(600);
+
+    setCursor(QCursor(Qt::BlankCursor));
+
     setPalette(QPalette(QColor(250, 250, 250)));
     m_font = new QFont("Arial", 11, QFont::Bold);
     m_largerFont = new QFont("Arial", 13, QFont::Bold);
@@ -63,10 +70,15 @@ GuideGrid::GuideGrid(int channel, QWidget *parent, const char *name)
 
     accel->connectItem(accel->insertItem(Key_I), this, SLOT(displayInfo()));
 
-    connect(this, SIGNAL(killTheApp()), qApp, SLOT(quit()));
+    connect(this, SIGNAL(killTheApp()), this, SLOT(accept()));
 
     selectState = false;
     showInfo = false;
+
+    showFullScreen();
+    setActiveWindow();
+    raise();
+    setFocus();
 }
 
 int GuideGrid::getLastChannel(void)
@@ -740,12 +752,14 @@ void GuideGrid::scrollUp()
 
 void GuideGrid::enter()
 {
+    unsetCursor();
     selectState = 1;
     emit killTheApp();
 }
 
 void GuideGrid::escape()
 {
+    unsetCursor();
     emit killTheApp();
 }
 

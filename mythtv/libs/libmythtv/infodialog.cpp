@@ -30,7 +30,7 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
 
     QVBoxLayout *vbox = new QVBoxLayout(this, 20);
 
-    QGridLayout *grid = new QGridLayout(vbox, 4, 3, 10);
+    QGridLayout *grid = new QGridLayout(vbox, 4, 2, 10);
     
     QLabel *titlefield = new QLabel(pginfo->title, this);
     titlefield->setFont(QFont("Arial", 25, QFont::Bold));
@@ -51,7 +51,7 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
     grid->addWidget(descriptionlabel, 3, 0, Qt::AlignLeft | Qt::AlignTop);
     grid->addWidget(descriptionfield, 3, 1, Qt::AlignLeft | Qt::AlignTop);
 
-    grid->setColStretch(1, 10);
+    grid->setColStretch(1, 2);
     grid->setRowStretch(3, 1);
 
     //vbox->addStretch(1);

@@ -2,6 +2,7 @@
 #define GUIDEGRID_H_
 
 #include <qwidget.h>
+#include <qdialog.h>
 #include <qstring.h>
 #include <qpixmap.h>
 #include <qdatetime.h>
@@ -11,7 +12,7 @@ class ProgramInfo;
 class TimeInfo;
 class ChannelInfo;
 
-class GuideGrid : public QWidget
+class GuideGrid : public QDialog
 {
     Q_OBJECT
   public:

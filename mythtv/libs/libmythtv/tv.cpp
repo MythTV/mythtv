@@ -543,7 +543,7 @@ void TV::TeardownRecorder(bool killFile)
             curRecording = NULL;
         }
     }
-    else
+    else if (curRecording)
     {
         WriteRecordedRecord();
     }
