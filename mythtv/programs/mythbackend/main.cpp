@@ -466,7 +466,6 @@ int main(int argc, char **argv)
     VERBOSE(VB_ALL, QString("Enabled verbose msgs :%1").arg(verboseString));
 
     lockfile_location = gContext->GetSetting("RecordFilePrefix") + "/nfslockfile.lock";
-    int nfsfd = -1;
 
     if (ismaster)
 // Create a file in the recording directory.  A slave encoder will 
@@ -476,17 +475,15 @@ int main(int argc, char **argv)
 // If the slave doesn't find this file then it will assume that it has
 // a seperate store.
     {
-       nfsfd = open(lockfile_location.ascii(), O_WRONLY|O_CREAT|O_APPEND, 0664);
-       if (nfsfd < 0) 
-       {
-           perror(lockfile_location.ascii()); 
-           cerr << "Unable to open lockfile!\n"
-                << "Be sure that \'" << gContext->GetSetting("RecordFilePrefix")
-                << "\' exists and that both \nthe directory and that "
-                << "file are writeble by this user.\n";
-          return -1;
-       }
-       close(nfsfd);
+        if (creat(lockfile_location.ascii(), 0664) == -1)
+        {
+            perror(lockfile_location.ascii()); 
+            cerr << "Unable to open lockfile!\n"
+                 << "Be sure that \'" << gContext->GetSetting("RecordFilePrefix")
+                 << "\' exists and that both \nthe directory and that "
+                 << "file are writeble by this user.\n";
+            return -1;
+        }
     }
 
     new MainServer(ismaster, port, statusport, &tvList, msdb, sched);
