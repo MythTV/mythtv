@@ -67,7 +67,7 @@ Coppermine 0.18um core and are usually &lt;600Mhz), Pentium Pro and Pentium II
 CPUs do not have SSE, so make sure that you haven't enabled deinterlacing if
 your processor doesn't support it. If you enable it, and your processor
 doesn't support SSE, you will get "Illegal Instruction" errors.</P>
-<P>To determine if you've got SSE, you can:
+<P>To determine if you've got SSE on an Intel processor, you can:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cat /proc/cpuinfo
@@ -79,6 +79,9 @@ cmov pat pse36 mmx fxsr sse
 </P>
 <P>Notice the <B>sse</B> at the end of the line - this tells you that this
 processor will be able to deinterlace correctly.</P>
+<P>On an AMD processor, look for "3dnow" in the cpuinfo line; "3dnow" is AMD's
+implementation of SSE instructions, so if your processor has 3dnow you
+shouldn't have any issues with deinterlacing.</P>
 
 <H2><A NAME="ss10.5">10.5</A> <A HREF="mythtv-HOWTO.html#toc10.5">Recording</A>
 </H2>

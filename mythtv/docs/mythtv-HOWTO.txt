@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-04-11, v2.09
+  2003-04-11, v2.10
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -141,6 +141,7 @@
      19.6 I'd like to save or restore my database
      19.7 I'd like to delete the mysql database.
      19.8 btaudio
+     19.9 Removing unwanted channels.
 
   ______________________________________________________________________
 
@@ -1970,7 +1971,7 @@
   you enable it, and your processor doesn't support SSE, you will get
   "Illegal Instruction" errors.
 
-  To determine if you've got SSE, you can:
+  To determine if you've got SSE on an Intel processor, you can:
 
        $ cat /proc/cpuinfo
        [snip]
@@ -1979,6 +1980,10 @@
 
   Notice the [1msse [22mat the end of the line - this tells you that this
   processor will be able to deinterlace correctly.
+
+  On an AMD processor, look for "3dnow" in the cpuinfo line; "3dnow" is
+  AMD's implementation of SSE instructions, so if your processor has
+  3dnow you shouldn't have any issues with deinterlacing.
 
   [1m10.5.  Recording[0m
 
@@ -2011,11 +2016,11 @@
 
   Once it's on your machine, you must move the file and untar it:
 
-  $ su
-  # cp funhouse.tar.gz /usr/local/share/mythtv/themes
-  # cd /usr/local/share/mythtv/themes
-  # tar -xjf funhouse.tar.gz
-  # exit
+       $ su
+       # cp funhouse.tar.gz /usr/local/share/mythtv/themes
+       # cd /usr/local/share/mythtv/themes
+       # tar -xjf funhouse.tar.gz
+       # exit
 
   The theme will now be available in the mythfrontend Appearance
   section.
@@ -2958,7 +2963,7 @@
   [1m19.8.  btaudio[0m
 
   btaudio allows you to obtain the audio data from your tuner card
-  directly over the PCI bus without using a soundcard.  This is a useful
+  directly over the PCI bus without using a soundcard.  This is useful
   if you would like to use multiple tuner cards in a system without
   adding a soundcard for each one, or if your existing soundcard is not
   capable of full-duplex operation.
@@ -2999,4 +3004,31 @@
 
   Once btaudio loads, it should register additional /dev/dsp and
   /dev/mixer devices.  Typing $ dmesg will let you know what's going on.
+
+  [1m19.9.  Removing unwanted channels.[0m
+
+  If [1mmythfilldatabase [22mgrabbed a channel which you do not want to include
+  in your TV listings, you can remove the entries from the xmltv config
+  file and the mysql database.  This often happens with premium
+  channels; for example, HBO or Showtime may be available on your cable
+  TV system, but is scrambled because you're not a subscriber to that
+  channel.  Since you can never watch it, you want to get rid of it.
+
+  First, comment out the channel from the  /.mythtv/<sourcename>.xmltv
+  file by inserting a "#" in front of the unwanted entry. This will
+  prevent [1mmythfilldatabase [22mfrom grabbing future listings.
+
+  Next, delete the unwanted item from the channel table so that it will
+  not appear in the EPG or when changing channels.  For example,
+  assuming that HBO is channel 15:
+
+       $ mysql -u root mythconverg
+       mysql> delete from channel where chanid = '15';
+
+  Old program data will be removed over the course of a week. However,
+  you may want to immediately delete any current program listings for
+  the channel that has been removed:
+
+       $ mysql -u root mythconverg
+       mysql> delete from program where chanid = '15';
 

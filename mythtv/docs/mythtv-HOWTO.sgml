@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-04-11, v2.09
+<date>2003-04-11, v2.10
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1837,7 +1837,7 @@ CPUs do not have SSE, so make sure that you haven't enabled deinterlacing if
 your processor doesn't support it. If you enable it, and your processor
 doesn't support SSE, you will get "Illegal Instruction" errors.
 
-To determine if you've got SSE, you can:
+To determine if you've got SSE on an Intel processor, you can:
 <tscreen><verb>
 $ cat /proc/cpuinfo
 [snip]
@@ -1847,6 +1847,10 @@ cmov pat pse36 mmx fxsr sse
 
 Notice the <bf>sse</bf> at the end of the line - this tells you that this
 processor will be able to deinterlace correctly.
+
+On an AMD processor, look for "3dnow" in the cpuinfo line; "3dnow" is AMD's
+implementation of SSE instructions, so if your processor has 3dnow you
+shouldn't have any issues with deinterlacing.
 
 <sect1>Recording
 <p>Currently, MythTV supports two different video encoders, MPEG4 and RTJPEG. 
@@ -2804,7 +2808,7 @@ mysql> quit
 
 <sect1>btaudio <label id="btaudio">
 <p>btaudio allows you to obtain the audio data from your tuner card directly
-over the PCI bus without using a soundcard.  This is a useful if you would
+over the PCI bus without using a soundcard.  This is useful if you would
 like to use multiple tuner cards in a system without adding a soundcard for
 each one, or if your existing soundcard is not capable of full-duplex
 operation.
@@ -2845,6 +2849,36 @@ Once btaudio loads, it should register additional <tt>/dev/dsp</tt> and
 <tt>/dev/mixer</tt> devices.  Typing <tt>$ dmesg</tt> will let you know
 what's going on.
 
+<sect1>Removing unwanted channels.
+<p>If <bf>mythfilldatabase</bf> grabbed a channel which you do not want to
+include in your TV listings, you can remove the entries from the xmltv
+config file and the mysql database.  This often happens with premium
+channels; for example, HBO or Showtime may be available on your cable TV
+system, but is scrambled because you're not a subscriber to that channel. 
+Since you can never watch it, you want to get rid of it.
+
+First, comment out the channel from the ~/.mythtv/&lt;sourcename&gt;.xmltv file by
+inserting a "#" in front of the unwanted entry. This will prevent
+<bf>mythfilldatabase</bf> from grabbing future listings.
+
+Next, delete the unwanted item from the channel table so that it will not
+appear in the EPG or when changing channels.  For example, assuming that HBO
+is channel 15:
+
+<tscreen><verb>
+$ mysql -u root mythconverg
+mysql> delete from channel where chanid = '15';
+</verb></tscreen>
+
+Old program data will be removed over the course of a week. However, you may
+want to immediately delete any current program listings for the channel that
+has been removed:
+
+<tscreen><verb>
+$ mysql -u root mythconverg
+mysql> delete from program where chanid = '15';
+</verb></tscreen>
+
 </article>
 <!-- Revision History
 v2.00, 2003-03-14.  Initial release for 0.8.  Added xset command for
@@ -2867,6 +2901,7 @@ v2.07, 2003-03-31.  more b0rken btaudio.  Added to amixer commands.
 v2.08, 2003-04-07.  Updated XMLTV.
 v2.09, 2003-04-11.  Add spec for P4 2.4Ghz machine.  Added comment on repeat
 = commands for .lircrc file.
+v2.10, 2003-04-11.  Fixed typo.  AMD SSE info.  Channel removal information.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

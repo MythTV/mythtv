@@ -235,7 +235,7 @@ mysql> quit
 </H2>
 
 <P>btaudio allows you to obtain the audio data from your tuner card directly
-over the PCI bus without using a soundcard.  This is a useful if you would
+over the PCI bus without using a soundcard.  This is useful if you would
 like to use multiple tuner cards in a system without adding a soundcard for
 each one, or if your existing soundcard is not capable of full-duplex
 operation.</P>
@@ -272,6 +272,41 @@ how to configure btaudio on your system.</P>
 <P>Once btaudio loads, it should register additional <CODE>/dev/dsp</CODE> and
 <CODE>/dev/mixer</CODE> devices.  Typing <CODE>$ dmesg</CODE> will let you know
 what's going on.</P>
+
+<H2><A NAME="ss19.9">19.9</A> <A HREF="mythtv-HOWTO.html#toc19.9">Removing unwanted channels.</A>
+</H2>
+
+<P>If <B>mythfilldatabase</B> grabbed a channel which you do not want to
+include in your TV listings, you can remove the entries from the xmltv
+config file and the mysql database.  This often happens with premium
+channels; for example, HBO or Showtime may be available on your cable TV
+system, but is scrambled because you're not a subscriber to that channel. 
+Since you can never watch it, you want to get rid of it.</P>
+<P>First, comment out the channel from the &nbsp;/.mythtv/&lt;sourcename&gt;.xmltv file by
+inserting a "#" in front of the unwanted entry. This will prevent
+<B>mythfilldatabase</B> from grabbing future listings.</P>
+<P>Next, delete the unwanted item from the channel table so that it will not
+appear in the EPG or when changing channels.  For example, assuming that HBO
+is channel 15:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u root mythconverg
+mysql> delete from channel where chanid = '15';
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Old program data will be removed over the course of a week. However, you may
+want to immediately delete any current program listings for the channel that
+has been removed:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u root mythconverg
+mysql> delete from program where chanid = '15';
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
 <HR>
 Next
