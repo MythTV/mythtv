@@ -7,6 +7,8 @@
 #ifndef INLINES_H
 #define INLINES_H
 
+#include "config.h"
+
 // *fast* convenience functions
 
 static inline void stereo16_from_stereopcm8(register short *l,
@@ -130,6 +132,7 @@ static inline void mono16_from_monopcm16(register short *l,
     }
 }
 
+#ifdef FFTW_SUPPORT
 
 static inline void fast_short_set(register short *p,
 				  short v,
@@ -154,5 +157,66 @@ static inline void fast_short_set(register short *p,
 	}
     }
 }
+
+
+static inline void fast_real_set_from_short(register fftw_real *d,
+					    register short *s,
+					    long c)
+{
+    while (c >= 4l) {
+	d[0] = fftw_real(s[0]);
+	d[1] = fftw_real(s[1]);
+	d[2] = fftw_real(s[2]);
+	d[3] = fftw_real(s[3]);
+	d += 4;
+	s += 4;
+	c -= 4l;
+    }
+
+    if (c > 0l) {
+	d[0] = fftw_real(s[0]);
+	if (c > 1l) {
+	    d[1] = fftw_real(s[1]);
+	    if (c > 2l) {
+		d[2] = fftw_real(s[2]);
+	    }
+	}
+    }
+}
+
+static inline void fast_reals_set(register fftw_real *p1,
+				  register fftw_real *p2,
+				  fftw_real v,
+				  long c)
+{
+    while (c >= 4l) {
+	p1[0] = v;
+	p1[1] = v;
+	p1[2] = v;
+	p1[3] = v;
+	p2[0] = v;
+	p2[1] = v;
+	p2[2] = v;
+	p2[3] = v;
+	p1 += 4;
+	p2 += 4;
+	c -= 4l;
+    }
+
+    if (c > 0l) {
+	p1[0] = v;
+	p2[0] = v;
+	if (c > 1l) {
+	    p1[1] = v;
+	    p2[1] = v;
+	    if (c > 2l) {
+		p1[2] = v;
+		p2[2] = v;
+	    }
+	}
+    }
+}
+
+#endif	// fftw_support_yes
 
 #endif // INLINES_H

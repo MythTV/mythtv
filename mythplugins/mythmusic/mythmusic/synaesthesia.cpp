@@ -486,10 +486,12 @@ bool Synaesthesia::process(VisualNode *node)
     return false;
 }
 
-void Synaesthesia::draw(QPainter *p, const QColor &back)
+bool Synaesthesia::draw(QPainter *p, const QColor &back)
 {
     if (!outputImage)
-        return;
+    {
+        return false;
+	}
 
     register unsigned long *ptr2 = (unsigned long*)output;
 
@@ -519,4 +521,6 @@ void Synaesthesia::draw(QPainter *p, const QColor &back)
     }
 
     p->drawImage(QRect(0, 0, 800, 600), *outputImage);
+    
+    return true;
 }

@@ -26,7 +26,7 @@ public:
 
     void resize(const QSize &size);
     bool process(VisualNode *node);
-    void draw(QPainter *p, const QColor &back);
+    bool draw(QPainter *p, const QColor &back);
 
 private:
     void setupPalette(void);

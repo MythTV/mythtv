@@ -40,3 +40,23 @@ ParanoiaLevel=full
 
 # Shuffle mode for the player.  Can be either normal(the default) or random.
 #PlayMode=random
+
+# Hostname where LCDproc daemon is running
+# (No effect if libmyth was compiled without lcd support)
+LCDHost=localhost
+
+# Port number LCDproc is listening on (default is 16333)
+LCDPort=13666
+
+# VisualMode for the player
+# Can be one of: Synaesthesia Spectrum Gears Blank Random
+# (Random chooses anything but Blank)
+VisualMode=Gears
+
+# How many seconds to wait before turning on the visualizer automatically
+# (0 = no automatic, manual button press only)
+VisualModeDelay=10
+
+# Use keyboard (ie. remote control) accelerators in the playback screen
+# (true, false) You probably want to make this true.
+KeyboardAccelerators=false

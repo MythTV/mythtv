@@ -1,5 +1,5 @@
-                                   MythMusic
-			          Release 0.7
+                             MythMusic
+			Release (towards 0.8)
 
 
 There'll be more information here later, but for now:
@@ -29,12 +29,26 @@ In addition to MythTV's requirements, you'll need these software packages:
    cdparanoia - The integrated ripping support uses the libraries from this.
                 I'm using cdparanoia III 9.8.  http://www.xiph.org/paranoia/
 
-Phew.  Lotta stuff required, and once again I didn't write a configure script
-to try and find out if you have it or not.  So if you're missing a dependency,
-the compile will fail.
+Optionally:
+
+   fftw   - A very nice library for Fast Fourier Transforms (helps analyze
+	    audio data for playback visualizations). Currently using 2.1.3.
+	    http://www.fftw.org/
+
+   OpenGL - Just about everyone should have this already (?). 
+	    http://www.opengl.org
+
+
+Phew.  Lotta stuff required. If you're having problems, please check both
+the documentation and the mailing list archives at http://www.mythtv.org
 
 Ok.  Once you've got all the prerequisites installed, on to compiling.
-Just type 'make' in the main distribution directory.
+There's a configure script in the main distribution directory, but it does
+not check for all of the above packages. It's just a tiny little script that
+lets you turn on and off support for the fftw and OpenGL libraries. Run it
+with './configure --help' to see what you can set.
+
+Now type 'make' in the main distribution directory. 
 
 Compiling note:  If you get an error on building this, that says something
                  about 'mkspecs', then you don't have the QTDIR environment

@@ -124,6 +124,8 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     nextfileb->setIconSet(scalePixmap((const char **)nextfile_pix));
     connect(nextfileb, SIGNAL(clicked()), this, SLOT(next()));    
 
+
+
     controlbox->addWidget(prevfileb);
     controlbox->addWidget(prevb);
     controlbox->addWidget(pauseb);
@@ -165,6 +167,43 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     secondcontrol->addWidget(vis);
     connect(vis, SIGNAL(clicked()), this, SLOT(visEnable()));
 
+    QString keyboard_accelerator_flag = gContext->GetSetting("KeyboardAccelerators");
+	if(keyboard_accelerator_flag.lower() == "true")
+	{
+		//
+		//	There may be a better key press
+		//	mapping, but I have a pretty
+		//	serious flu at the moment and 
+		//	I can't think of one
+		//
+		//
+
+		prevfileb->setAccel(Key_Up);
+		prevfileb->setFocusPolicy( QWidget::NoFocus);
+		prevb->setAccel(Key_Left);
+		prevb->setFocusPolicy( QWidget::NoFocus);
+		pauseb->setAccel(Key_P);
+		pauseb->setFocusPolicy( QWidget::NoFocus);
+		playb->setAccel(Key_Space);
+		playb->setFocusPolicy( QWidget::NoFocus);
+		stopb->setAccel(Key_S);
+		stopb->setFocusPolicy( QWidget::NoFocus);
+		nextb->setAccel(Key_Right);
+		nextb->setFocusPolicy( QWidget::NoFocus);
+		nextfileb->setAccel(Key_Down);
+		nextfileb->setFocusPolicy( QWidget::NoFocus);
+		
+		randomize->setAccel(Key_1);
+		randomize->setFocusPolicy( QWidget::NoFocus);
+		repeat->setAccel(Key_2);
+		repeat->setFocusPolicy( QWidget::NoFocus);
+		pledit->setAccel(Key_3);
+		pledit->setFocusPolicy( QWidget::NoFocus);
+		vis->setAccel(Key_4);
+		vis->setFocusPolicy( QWidget::NoFocus);
+	}
+
+
     playview = new MythListView(this);
     playview->addColumn("#");
     playview->addColumn("Artist");  
@@ -194,7 +233,10 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
 
     vbox->addWidget(playview, 1);
 
-    playb->setFocus();
+	if(keyboard_accelerator_flag.lower() != "true")
+	{
+	    playb->setFocus();
+	}
 
     input = 0; decoder = 0; seeking = false; remainingTime = false;
     output = 0; outputBufferSize = 256;
@@ -220,11 +262,65 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
         playfile = curMeta.Filename();
         emit play();
     }
+    
+    //
+    //	Load Visualization settings and set up timer
+	//
+	
+   	visual_mode = gContext->GetSetting("VisualMode");
+    QString visual_delay = gContext->GetSetting("VisualModeDelay");
+    
+    bool delayOK;
+    visual_mode_delay = visual_delay.toInt(&delayOK);
+    if(!delayOK)
+    {
+    	visual_mode_delay = 0;
+    }
+    
+    visual_mode_timer = new QTimer();
+    if(visual_mode_delay > 0)
+    {
+    	visual_mode_timer->start(visual_mode_delay * 1000);
+	    connect(prevfileb, SIGNAL(clicked()), this, SLOT(resetTimer()));
+	    connect(pauseb, SIGNAL(clicked()), this, SLOT(resetTimer()));
+	    connect(playb, SIGNAL(clicked()), this, SLOT(resetTimer()));
+	    connect(stopb, SIGNAL(clicked()), this, SLOT(resetTimer()));
+	    connect(nextb, SIGNAL(clicked()), this, SLOT(resetTimer()));
+	    connect(nextfileb, SIGNAL(clicked()), this, SLOT(resetTimer()));
+	    connect(randomize, SIGNAL(clicked()), this, SLOT(resetTimer()));
+	    connect(repeat, SIGNAL(clicked()), this, SLOT(resetTimer()));
+	    connect(pledit, SIGNAL(clicked()), this, SLOT(resetTimer()));
+	    connect(vis, SIGNAL(clicked()), this, SLOT(resetTimer()));
+    }
+
+
+	visualizer_is_active = false;
+    connect(visual_mode_timer, SIGNAL(timeout()), this, SLOT(visEnable()));
+    connect(mainvisual, SIGNAL(hidingVisualization()), this, SLOT(restartTimer()));
+
+
 }
 
 PlaybackBox::~PlaybackBox(void)
 {
     stopAll();
+}
+
+void PlaybackBox::resetTimer()
+{
+	if(visual_mode_delay > 0)
+	{
+		visual_mode_timer->changeInterval(visual_mode_delay * 1000);
+	}
+}
+
+void PlaybackBox::restartTimer()
+{
+	if(visual_mode_delay > 0)
+	{
+		visual_mode_timer->start(visual_mode_delay * 1000);
+	}
+	visualizer_is_active = false;
 }
 
 QPixmap PlaybackBox::scalePixmap(const char **xpmdata)
@@ -367,8 +463,8 @@ void PlaybackBox::play()
         output = new AudioOutput(outputBufferSize * 1024, adevice);
         output->setBufferSize(outputBufferSize * 1024);
         output->addListener(this);
-        output->addListener(mainvisual);
-        output->addVisual(mainvisual);
+		output->addListener(mainvisual);
+    	output->addVisual(mainvisual);
 	
         startoutput = true;
 
@@ -443,13 +539,29 @@ void PlaybackBox::play()
         decoder->start();
 
         isplaying = true;
+        
+        //
+        //	thor	feb 12 2003
+        //
+        gContext->LCDswitchToChannel(curMeta.Artist(), curMeta.Title(), "");
     }
 }
 
-void PlaybackBox::visEnable(void)
+void PlaybackBox::visEnable()
 {
-    mainvisual->setVisual("Synaesthesia");
-    mainvisual->showFullScreen();
+	//	
+	//	thor	feb 12 2003
+	//
+	//	We need a visualization
+	//	
+
+	if(!visualizer_is_active)
+	{
+		visual_mode_timer->stop();
+		mainvisual->setVisual(visual_mode);
+		mainvisual->showFullScreen();
+		visualizer_is_active = true;
+	}
 }
 
 void PlaybackBox::pause(void)
@@ -546,6 +658,7 @@ void PlaybackBox::stop(void)
 
 void PlaybackBox::stopAll()
 {
+    gContext->LCDswitchToTime();
     stop();
 
     if (decoder) {
@@ -686,8 +799,13 @@ void PlaybackBox::editPlaylist()
     QString paths = gContext->GetSetting("TreeLevels");
     DatabaseBox dbbox(db, paths, &dblist);
 
+	visual_mode_timer->stop();
     dbbox.Show();
     dbbox.exec();
+	if(visual_mode_delay > 0)
+	{
+		visual_mode_timer->start(visual_mode_delay * 1000);
+	}
 
     listlock.lock();
 
@@ -716,7 +834,6 @@ void PlaybackBox::closeEvent(QCloseEvent *event)
     stopAll();
 
     hide();
-
     event->accept();
 }
 
@@ -754,6 +871,7 @@ void PlaybackBox::customEvent(QCustomEvent *event)
             OutputEvent *oe = (OutputEvent *) event;
 
             int em, es, rs;
+            float percent_heard;
 
             currentTime = rs = oe->elapsedSeconds();
 
@@ -761,8 +879,13 @@ void PlaybackBox::customEvent(QCustomEvent *event)
             es = rs % 60;
 
             timeString.sprintf("%02d:%02d", em, es);
+			
+			percent_heard = (  (float) rs /  (float) curMeta.Length() ) * 1000.0 ;
+        	cout << "Hurray an ouput event with percent_heard = " << percent_heard << endl << flush ;
 
-            if (! seeking) 
+			gContext->LCDsetChannelProgress(percent_heard);
+            if (! seeking)
+             
                 seekbar->setValue(oe->elapsedSeconds());
 
             infoString.sprintf("%d kbps, %.1f kHz %s.",

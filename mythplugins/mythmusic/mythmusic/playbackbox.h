@@ -6,6 +6,7 @@
 #include <qurloperator.h>
 #include <qptrlist.h>
 #include <qtoolbutton.h>
+#include <qtimer.h>
 #include <qmutex.h>
 
 #include <mythtv/mythwidgets.h>
@@ -56,6 +57,8 @@ class PlaybackBox : public MythDialog
     void editPlaylist();
     void nextAuto();
     void visEnable();
+    void resetTimer();
+    void restartTimer();
     
   private slots:
     void startseek();
@@ -106,6 +109,16 @@ class PlaybackBox : public MythDialog
     bool isplaying;
 
     MainVisual *mainvisual;
+
+	//
+	//	thor feb 12 2003
+	//    
+	QString	visual_mode;
+    int		visual_mode_delay;
+    QTimer	*visual_mode_timer;
+    QTimer	*lcd_update_timer;
+	bool	visualizer_is_active;
+
 };
 
 #endif

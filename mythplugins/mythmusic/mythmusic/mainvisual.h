@@ -9,6 +9,7 @@
 
 #include "visual.h"
 #include "polygon.h"
+#include "constants.h"
 
 #include <qwidget.h>
 #include <qdialog.h>
@@ -19,7 +20,7 @@
 class Buffer;
 class Output;
 class VisualNode;
-
+class LogScale;
 class QTimer;
 
 class VisualNode
@@ -40,16 +41,21 @@ public:
 
     short *left, *right;
     long length, offset;
+    
 };
 
 class VisualBase
 {
 public:
+	virtual ~VisualBase();
+
     // return true if the output should stop
     virtual bool process( VisualNode *node ) = 0;
-    virtual void draw( QPainter *, const QColor & ) = 0;
+    virtual bool draw( QPainter *, const QColor & ) = 0;
     virtual void resize( const QSize &size ) = 0;
 };
+
+
 
 // base class to handle things like frame rate...
 class MainVisual : public QDialog, public Visual
@@ -61,7 +67,7 @@ public:
     virtual ~MainVisual();
 
     VisualBase *visual() const { return vis; }
-    void setVisual( VisualBase *newvis );
+    void setVis( VisualBase *newvis );
     void setVisual( const QString &visualname );
 
     void add(Buffer *, unsigned long, int, int);
@@ -81,6 +87,9 @@ public:
 public slots:
     void timeout();
 
+signals:
+	void hidingVisualization();
+
 private:
     VisualBase *vis;
     QPixmap pixmap;
@@ -88,7 +97,19 @@ private:
     QTimer *timer;
     bool playing;
     int fps;
+
 };
+
+
+//
+//	thor	feb 13 2002
+//
+//	Not sure these ever worked in Myth
+//
+//
+
+
+/*
 
 class StereoScope : public VisualBase
 {
@@ -118,5 +139,28 @@ public:
    bool process( VisualNode *node );
    void draw( QPainter *p, const QColor &back );
 };  
+
+*/
+
+class LogScale
+{
+public:
+    LogScale(int = 0, int = 0);
+    ~LogScale();
+
+    int scale() const { return s; }
+    int range() const { return r; }
+
+    void setMax(int, int);
+
+    int operator[](int);
+
+
+private:
+    int *indices;
+    int s, r;
+};
+
     
 #endif // __mainvisual_h
+

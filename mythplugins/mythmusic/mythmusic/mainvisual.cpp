@@ -9,6 +9,7 @@
 #include "buffer.h"
 #include "output.h"
 #include "synaesthesia.h"
+#include "visualize.h"
 
 #include <qtimer.h>
 #include <qpainter.h>
@@ -23,6 +24,7 @@
 #include <qcursor.h>
 
 #include <math.h>
+#include <stdio.h>
 
 // fast inlines
 #include "inlines.h"
@@ -46,36 +48,73 @@ MainVisual::MainVisual(QWidget *parent, const char *name)
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
     timer->start(1000 / fps);
+
 }
 
 MainVisual::~MainVisual()
 {
-    delete vis;
-    vis = 0;
+	if(vis)
+	{
+	    delete vis;
+	    vis = 0;
+	}
 }
 
 void MainVisual::setVisual( const QString &visualname )
 {
     VisualBase *newvis = 0;
 
-    if (visualname == "Mono Scope")
-        newvis = new MonoScope;
-    else if (visualname == "Stereo Scope" )
-	newvis = new StereoScope;
+	//
+	//	thor	feb 12 2003
+	//
+	if(visualname == "Random")
+	{
+		int i = rand() % 3;
+		if(i == 0)
+		{
+			newvis = new Gears(this);
+		}
+		else if(i == 1)
+		{
+			newvis = new Spectrum;
+		}
+		else if(i == 2)
+		{
+			newvis = new Synaesthesia;
+		}
+	}
+	else if(visualname == "Gears")
+	{
+		newvis = new Gears(this);
+	}
+    else if (visualname == "Spectrum")
+    {
+        newvis = new Spectrum;
+	}
     else if (visualname == "Synaesthesia")
+    {
         newvis = new Synaesthesia;
+    }
+    else
+    {
+    	newvis = new Blank;
+    }
     	
-    setVisual( newvis );
+    setVis( newvis );
 }
 
-void MainVisual::setVisual( VisualBase *newvis )
+void MainVisual::setVis( VisualBase *newvis )
 {
     if (vis)
+    {
         delete vis;
+    }
 
     vis = newvis;
     if ( vis )
-	vis->resize( size() );
+    {
+		vis->resize( size() );
+	}
 
     // force an update
     timer->stop();
@@ -96,29 +135,50 @@ void MainVisual::add(Buffer *b, unsigned long w, int c, int p)
 
     len /= c;
     len /= (p / 8);
+    
     if (len > 512)
-	len = 512;
+    {
+		len = 512;
+	}
+
     cnt = len;
 
-    if (c == 2) {
-	l = new short[len];
-	r = new short[len];
+    if (c == 2) 
+    {
+		l = new short[len];
+		r = new short[len];
 
-	if (p == 8)
-	    stereo16_from_stereopcm8(l, r, b->data, cnt);
-	else if (p == 16)
-	    stereo16_from_stereopcm16(l, r, (short *) b->data, cnt);
-    } else if (c == 1) {
-	l = new short[len];
+		if (p == 8)
+		{
+			stereo16_from_stereopcm8(l, r, b->data, cnt);
+		}
+		else if (p == 16)
+		{
+	    	stereo16_from_stereopcm16(l, r, (short *) b->data, cnt);
+	    }
+    } 
+    else if (c == 1) 
+    {
+		l = new short[len];
 
-	if (p == 8)
-	    mono16_from_monopcm8(l, b->data, cnt);
-	else if (p == 16)
-	    mono16_from_monopcm16(l, (short *) b->data, cnt);
-    } else
-	len = 0;
+		if (p == 8)
+		{
+	    	mono16_from_monopcm8(l, b->data, cnt);
+	    }
+		else if (p == 16)
+		{
+	    	mono16_from_monopcm16(l, (short *) b->data, cnt);
+	    }
+    } 
+    else
+    {
+		len = 0;
+	}
+
+
 
     nodes.append(new VisualNode(l, r, len, w));
+    
 }
 
 void MainVisual::timeout()
@@ -153,12 +213,18 @@ void MainVisual::timeout()
     if (node)
         delete node;
 
-    if ( vis ) {
-	QPainter p(&pixmap);
-	vis->draw( &p, backgroundColor() );
-    } else
-	pixmap.fill( backgroundColor() );
-    bitBlt(this, 0, 0, &pixmap);
+    if ( vis ) 
+    {
+		QPainter p(&pixmap);
+		if(vis->draw( &p, Qt::black ))
+		{
+			bitBlt(this, 0, 0, &pixmap);
+		}
+    } 
+    else
+    {
+		//pixmap.fill( backgroundColor() );
+	}
 
     if (! playing && stop)
 	timer->stop();
@@ -205,9 +271,21 @@ void MainVisual::customEvent(QCustomEvent *event)
 
 void MainVisual::hideEvent(QHideEvent *e)
 {
-    setVisual(0);
+    setVis(0);
+    emit hidingVisualization();
     QDialog::hideEvent(e);
 }
+
+
+/*
+
+	//
+	//	thor	feb 13 2002
+	//
+	//	Not sure that StereoScope of Monoscope ever worked ?
+	//
+	
+
 
 StereoScope::StereoScope()
     : rubberband( true ), falloff( 1.0 ), fps( 30 )
@@ -429,41 +507,63 @@ bool MonoScope::process( VisualNode *node )
     double *magnitudesp = magnitudes.data();
     double val, tmp;
 
-    if (node) {
+    if (node) 
+    {
         index = 0;
-        for ( i = 0; i < size.width(); i++) {
+        for ( i = 0; i < size.width(); i++) 
+        {
             indexTo = index + step;
 
-            if ( rubberband ) {
+            if ( rubberband ) 
+            {
                 val = magnitudesp[ i ];
-                if (val < 0.) {
+                if (val < 0.) 
+                {
                     val += falloff;
                     if ( val > 0. )
+                    {
                         val = 0.;
-                } else {
+					}
+                } 
+                else 
+                {
                     val -= falloff;
                     if ( val < 0. )
+                    {
                         val = 0.;
+					}
                 }
-            } else
+            } 
+            else
+            {
                 val = 0.;
+			}
 
-            for (s = index; s < indexTo && s < node->length; s++) {
+            for (s = index; s < indexTo && s < node->length; s++) 
+            {
                 tmp = ( double( node->left[s] ) +
                         (node->right ? double( node->right[s] ) : 0) *
                         double( size.height() / 2 ) ) / 65536.;
                 if (tmp > 0)
+                {
                     val = (tmp > val) ? tmp : val;
+				}
                 else
-                    val = (tmp < val) ? tmp : val;
+                {
+					val = (tmp < val) ? tmp : val;
+				}
             }
 
             if ( val != 0. )
+            {
                 allZero = FALSE;
+			}
             magnitudesp[ i ] = val;
             index = indexTo;
         }
-    } else if (rubberband) {
+    } 
+    else if (rubberband) 
+    {
         for ( i = 0; i < size.width(); i++) {
             val = magnitudesp[ i ];
             if (val < 0) {
@@ -480,7 +580,9 @@ bool MonoScope::process( VisualNode *node )
                 allZero = FALSE;
             magnitudesp[ i ] = val;
         }
-    } else {
+    } 
+    else 
+    {
         for ( i = 0; i < size.width(); i++ )
             magnitudesp[ i ] = 0.;
     }
@@ -526,8 +628,84 @@ void MonoScope::draw( QPainter *p, const QColor &back )
         else if (b < 0.0)
             b = 0;
 
-        p->setPen(QColor(int(r), int(g), int(b)));
+        p->setPen(Qt::red);
+        //p->setPen(QColor(int(r), int(g), int(b)));
         p->drawLine( i - 1, (int)(size.height() / 2 + magnitudesp[ i - 1 ]),
                      i, (int)(size.height() / 2 + magnitudesp[ i ] ));
     }
 }
+
+*/
+
+LogScale::LogScale(int maxscale, int maxrange)
+    : indices(0), s(0), r(0)
+{
+    setMax(maxscale, maxrange);
+}
+
+
+LogScale::~LogScale()
+{
+    if (indices)
+	delete [] indices;
+}
+
+
+void LogScale::setMax(int maxscale, int maxrange)
+{
+    if (maxscale == 0 || maxrange == 0)
+	return;
+
+    s = maxscale;
+    r = maxrange;
+
+    if (indices)
+	delete [] indices;
+
+    double alpha;
+    int i, scaled;
+    double domain = double(maxscale),
+	    range = double(maxrange),
+		x = 1.0,
+	       dx = 1.0,
+		y = 0.0,
+	       yy = 0.0,
+		t = 0.0,
+	       e4 = double(1.0E-8);
+
+    indices = new int[maxrange];
+    for (i = 0; i < maxrange; i++)
+	indices[i] = 0;
+
+    // initialize log scale
+    while (fabs(dx) > e4) {
+	t = log((domain + x) / x);
+	y = (x * t) - range;
+	yy = t - (domain / (x + domain));
+	dx = y / yy;
+	x -= dx;
+    }
+
+    alpha = x;
+    for (i = 1; i < (int) domain; i++) {
+	scaled = (int) floor(0.5 + (alpha * log((double(i) + alpha) / alpha)));
+	if (indices[scaled - 1] < i)
+	    indices[scaled - 1] = i;
+    }
+}
+
+
+int LogScale::operator[](int index)
+{
+    return indices[index];
+}
+
+VisualBase::~VisualBase()
+{
+	//
+	//	This is only here so 
+	//	that derived classes
+	//	can destruct properly
+	//
+}
+
