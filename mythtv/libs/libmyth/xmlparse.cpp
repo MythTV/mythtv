@@ -203,7 +203,7 @@ void XMLParse::parseImage(LayerSet *container, QDomElement &element)
     }
 
     QString order = element.attribute("draworder", "");
-    if (name.isNull() || name.isEmpty())
+    if (order.isNull() || order.isEmpty())
     {
         cerr << "Image needs an order\n";
         exit(0);
@@ -300,7 +300,7 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
     }
 
     QString order = element.attribute("draworder", "");
-    if (name.isNull() || name.isEmpty())
+    if (order.isNull() || order.isEmpty())
     {
         cerr << "Guide needs an order\n";
         exit(0);
@@ -484,7 +484,7 @@ void XMLParse::parseBar(LayerSet *container, QDomElement &element)
     }
 
     QString order = element.attribute("draworder", "");
-    if (name.isNull() || name.isEmpty())
+    if (order.isNull() || order.isEmpty())
     {
         cerr << "Bar needs an order\n";
         exit(0);
@@ -1150,7 +1150,7 @@ void XMLParse::parseStatusBar(LayerSet *container, QDomElement &element)
     }
 
     QString order = element.attribute("draworder", "");
-    if (name.isNull() || name.isEmpty())
+    if (order.isNull() || order.isEmpty())
     {
         cerr << "StatusBar needs an order\n";
         exit(0);
@@ -1240,9 +1240,21 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     QRect binarea;
     int bins = 1;
 
+    //
+    //  A Map to store the geometry of
+    //  the bins as we parse
+    //
+
     typedef QMap<int, QRect> CornerMap;
     CornerMap bin_corners;
     bin_corners.clear();
+    
+    //
+    //  Some maps to store fonts as we parse
+    //
+    
+    QMap<QString, QString> fontFunctions;
+    QMap<QString, fontProp> theFonts;
 
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
@@ -1252,7 +1264,7 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     }
 
     QString order = element.attribute("draworder", "");
-    if (name.isNull() || name.isEmpty())
+    if (order.isNull() || order.isEmpty())
     {
         cerr << "ManagedTreeList needs an order\n";
         exit(0);
@@ -1275,24 +1287,60 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
                 area = parseRect(getFirstText(info));
                 normalizeRect(area);
             }
-            else if(info.tagName() == "binarea")
+            else if(info.tagName() == "bin")
             {
-                QString whichbin_string = info.attribute("bin", "");
-                cout << "I got whichbin_string = " << whichbin_string << endl ;
+                QString whichbin_string = info.attribute("number", "");
                 int whichbin = whichbin_string.toInt();
                 if(whichbin < 1)
                 {
-                    cerr << "xmlparse.o: Bad setting for bin number in binarea tag" << endl;
+                    cerr << "xmlparse.o: Bad setting for bin number in bin tag" << endl;
                     exit(0);
                 }
                 if(whichbin > bins + 1)
                 {
-                    cerr << "xmlparse.o: Attempt to set binarea with a bin reference larger than number of bins" << endl;
+                    cerr << "xmlparse.o: Attempt to set bin with a reference larger than number of bins" << endl;
                     exit(0);
                 }
-                binarea = parseRect(getFirstText(info));
-                normalizeRect(binarea);
-                bin_corners[whichbin] = binarea;
+                for (QDomNode child = info.firstChild(); !child.isNull();
+                child = child.nextSibling())
+                {
+                    QDomElement info = child.toElement();
+                    if (!info.isNull())
+                    {
+                        if (info.tagName() == "area")
+                        {
+                            binarea = parseRect(getFirstText(info));
+                            normalizeRect(binarea);
+                            bin_corners[whichbin] = binarea;
+                        }
+                        else if (info.tagName() == "fcnfont")
+                        {
+                            QString fontname = "";
+                            QString fontfcn = "";
+
+                            fontname = info.attribute("name", "");
+                            fontfcn = info.attribute("function", "");
+
+                            if (fontname.isNull() || fontname.isEmpty())
+                            {   
+                                cerr << "FcnFont needs a name\n";
+                                exit(0);
+                            }
+
+                            if (fontfcn.isNull() || fontfcn.isEmpty())
+                            {   
+                                cerr << "FcnFont needs a function\n";
+                                exit(0);
+                            }
+                            fontFunctions[fontfcn] = fontname;
+                        }
+                        else
+                        {
+                            cerr << "Unknown tag in bin: " << info.tagName() << endl;
+                            exit(0);
+                        }
+                    }
+                }
             }
             else
             {
@@ -1307,5 +1355,24 @@ void XMLParse::parseManagedTreeList(LayerSet *container, QDomElement &element)
     mtl->setArea(area);
     mtl->setBins(bins);
     mtl->setBinAreas(bin_corners);
+    mtl->setOrder(order.toInt());
+
+    //
+    //  Perform moegreen/jdanner font magic
+    //
+
+    typedef QMap<QString,QString> fontdata;
+    fontdata::Iterator it;
+    for ( it = fontFunctions.begin(); it != fontFunctions.end(); ++it )
+    {   
+        fontProp *testFont = GetFont(it.data());
+        if (testFont)
+            theFonts[it.data()] = *testFont;
+    }
+
+    if (theFonts.size() > 0)
+    {
+        mtl->setFonts(fontFunctions, theFonts);
+    }
     container->AddType(mtl);
 }

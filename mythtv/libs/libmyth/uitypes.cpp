@@ -1,4 +1,4 @@
-#include <qimage.h>
+
 #include <math.h>
 
 #include <iostream>
@@ -1467,6 +1467,76 @@ GenericTree* GenericTree::addNode(QString a_string, int an_int)
     return new_node;
 }
 
+int GenericTree::calculateDepth(int start)
+{
+    int current_depth;
+    int found_depth;
+    current_depth = start + 1;
+    QPtrListIterator<GenericTree> it( my_subnodes );
+    GenericTree *my_kids;
+
+    while( (my_kids = it.current()) != 0)
+    {
+        found_depth = my_kids->calculateDepth(start + 1);
+        if(found_depth > current_depth)
+        {
+            current_depth = found_depth;
+        }
+        ++it;
+    }
+    return current_depth;
+}
+
+GenericTree* GenericTree::findLeaf()
+{
+    if(my_subnodes.count() > 0)
+    {
+        return my_subnodes.getFirst()->findLeaf();
+    }
+    return this;
+}
+
+void GenericTree::printTree(int margin)
+{
+    for(int i = 0; i < margin; i++)
+    {
+        cout << " " ;
+    }
+    cout << "GenericTreeNode: my int is " << my_int << ", my string is \"" << my_string << "\"" << endl;
+    
+    //
+    //  recurse through my children
+    //
+
+    QPtrListIterator<GenericTree> it( my_subnodes );
+    GenericTree *my_kids;
+    while( (my_kids = it.current()) != 0)
+    {
+        my_kids->printTree(margin + 4);
+        ++it;
+    }
+}
+
+GenericTree* GenericTree::prevSibling(int number_up)
+{
+    //
+    //  Check if there are enough siblings
+    //  to go "up" this high
+    //
+/*
+    if(my_parent->childCount() - 1 < number_up)
+    
+    cout << "I have " << my_parent->childCount() << " siblings " << endl ;
+*/
+
+    return this;
+}
+
+GenericTree* GenericTree::nextSibling(int number_down)
+{
+    return this;
+}
+
 GenericTree::~GenericTree()
 {
 }
@@ -1479,6 +1549,8 @@ UIManagedTreeListType::UIManagedTreeListType(const QString & name)
     bins = 0;
     bin_corners.clear();
     my_tree_data = NULL;
+    tree_depth = 0;
+    m_justification = (Qt::AlignLeft | Qt::AlignVCenter);
 }
 
 UIManagedTreeListType::~UIManagedTreeListType()
@@ -1492,24 +1564,163 @@ UIManagedTreeListType::~UIManagedTreeListType()
 
 void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
 {
+    context = context;  // Would we ever want to use that?
+
+    if(drawlayer != m_order)
+    {
+        // not my turn
+        return;
+    }
 
     //
-    //  This (obviously) doesn't do much yet.
-    //  The idea is to use the data in my_tree_data
-    //  to list in the available bins.
+    //  Draw each bin, using current_node and working up
+    //  to tell us what to draw in each bin.
     //
 
+
+    for(int i = bins; i > 0; --i)
+    {
+        fontProp *tmpfont = NULL;
+        tmpfont = &m_fontfcns[m_fonts["active"]];
+        p->setFont(tmpfont->face);
+        //p->setBrush(tmpfont->color);
+        p->setPen(QPen(tmpfont->color, (int)(2 * m_wmult)));
+        if(i == bins)
+        {
+            int x_location = bin_corners[i].left();
+            int y_location = bin_corners[i].top() + (bin_corners[i].height() / 2)
+                             + (QFontMetrics(tmpfont->face).height() / 2);
+            QString msg = current_node->getString();
+            msg = cutDown(msg, &(tmpfont->face), bin_corners[i].width(), bin_corners[i].height());
+            p->drawText(x_location, y_location, msg);
+            
+            //
+            //  Do the ones above
+            //
+            
+            int numb_above = 1;
+            y_location -= QFontMetrics(tmpfont->face).height();
+            while (y_location - QFontMetrics(tmpfont->face).height() > bin_corners[i].top())
+            {
+                GenericTree *above = current_node->prevSibling(numb_above);
+                if(above)
+                {
+                    msg = above->getString();
+                    msg = cutDown(msg, &(tmpfont->face), bin_corners[i].width(), bin_corners[i].height());
+                    p->drawText(x_location, y_location, msg);
+                }    
+                y_location -= QFontMetrics(tmpfont->face).height();
+                numb_above++;
+            }
+            
+            //
+            //  Do the ones below
+            //
+            
+            y_location = bin_corners[i].top() + (bin_corners[i].height() / 2)
+                             + (QFontMetrics(tmpfont->face).height() / 2);
+            int numb_below = 1;
+            y_location += QFontMetrics(tmpfont->face).height();
+            while (y_location < bin_corners[i].bottom())
+            {
+                GenericTree *below = current_node->nextSibling(numb_below);
+                if(below)
+                {
+                    msg = below->getString();
+                    msg = cutDown(msg, &(tmpfont->face), bin_corners[i].width(), bin_corners[i].height());
+                    p->drawText(x_location, y_location, msg);
+                }    
+                y_location += QFontMetrics(tmpfont->face).height();
+                numb_below++;
+            }
+        }
+        // cout << "Drawing bin " << i << " Want to write " << current_node->getString() << endl;
+    }
+
+
+    //
+    //  Debugging, draw edges around bins
+    //
+    
     p->setPen(QColor(255,0,0));
     CornerMap::Iterator it;
     for ( it = bin_corners.begin(); it != bin_corners.end(); ++it )
     {
         p->drawRect(it.data());
     }
+
 }
+
+QString UIManagedTreeListType::cutDown(QString info, QFont *testFont, int maxwidth, int maxheight)
+{
+    QFontMetrics fm(*testFont);
+    QRect curFontSize;
+
+    curFontSize = fm.boundingRect(0, 0, maxwidth, maxheight, m_justification, info);
+
+    if (curFontSize.height() > maxheight)
+    {
+        QString testInfo = info;
+        curFontSize = fm.boundingRect(0, 0, maxwidth, maxheight, m_justification, testInfo);
+        int count = info.length();
+
+        while (curFontSize.height() >= maxheight)
+        {
+            testInfo = info.left(count);
+            curFontSize = fm.boundingRect(0, 0, maxwidth, maxheight, m_justification, testInfo);
+            count = count--;
+            if (count < 0)
+                break;
+        }
+        testInfo = testInfo + "...";
+        info = testInfo;
+    }
+    else if (curFontSize.width() > maxwidth)
+    {
+        int curFontWidth = fm.width(info);
+        if (curFontWidth > maxwidth)
+        {
+            QString testInfo = "";
+            curFontWidth = fm.width(testInfo);
+            int tmaxwidth = maxwidth - fm.width("LLL");
+            int count = 0;
+
+            while (curFontWidth < tmaxwidth)
+            {
+                testInfo = info.left(count);
+                curFontWidth = fm.width(testInfo);
+                count = count + 1;
+            }
+            testInfo = testInfo + "...";
+            info = testInfo;
+        }
+    }
+    return info;
+
+}
+
 
 void UIManagedTreeListType::assignTreeData(GenericTree *a_tree)
 {
     my_tree_data = a_tree;
+    
+    //
+    //  Trying to keep this as generic as possible, we
+    //  need to figure out depth from the root node of this
+    //  tree. That way, draw() knows what to draw.
+    //
+
+    tree_depth = my_tree_data->calculateDepth(0);
+
+    //
+    //  By default, current_node is first branch at every
+    //  level down till we hit a leaf node.
+    //
+    
+    current_node = my_tree_data->findLeaf();
+    
+    current_node->printTree(0);
+
 }
 
 void UIManagedTreeListType::sayHelloWorld()

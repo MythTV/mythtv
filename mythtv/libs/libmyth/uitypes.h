@@ -376,12 +376,18 @@ class GenericTree
     GenericTree(int an_int);
     ~GenericTree();
 
-    GenericTree* addNode(QString a_string);
-    GenericTree* addNode(QString a_string, int an_int);
-    void         init();
-    void         setInt(int an_int){my_int = an_int;}
-    void         setParent(GenericTree* a_parent){my_parent = a_parent;}
-    QString      getString(){return my_string;}
+    GenericTree*  addNode(QString a_string);
+    GenericTree*  addNode(QString a_string, int an_int);
+    GenericTree*  findLeaf();
+    GenericTree*  nextSibling(int number_down);
+    GenericTree*  prevSibling(int number_up);
+    void          init();
+    void          setInt(int an_int){my_int = an_int;}
+    void          setParent(GenericTree* a_parent){my_parent = a_parent;}
+    const QString getString(){return my_string;}
+    void          printTree(int margin);   // debugging
+    int           calculateDepth(int start);
+    int           childCount(){return my_subnodes.count();}
 
   private:
 
@@ -412,11 +418,17 @@ class UIManagedTreeListType : public UIType
     UIManagedTreeListType(const QString &name);
     ~UIManagedTreeListType();
 
-    void setArea(QRect an_area) { area = an_area; }
-    void setBins(int l_bins) { bins = l_bins; }
-    void setBinAreas(CornerMap some_bin_corners) { bin_corners = some_bin_corners; }
-    void Draw(QPainter *, int drawlayer, int context);
-    void assignTreeData(GenericTree *a_tree);
+    void    setOrder(int order) { m_order = order; }
+    void    setArea(QRect an_area) { area = an_area; }
+    void    setBins(int l_bins) { bins = l_bins; }
+    void    setBinAreas(CornerMap some_bin_corners) { bin_corners = some_bin_corners; }
+    void    Draw(QPainter *, int drawlayer, int context);
+    void    assignTreeData(GenericTree *a_tree);
+    void    setFonts(QMap<QString, QString> fonts, QMap<QString, fontProp> fontfcn) { 
+                          m_fonts = fonts; m_fontfcns = fontfcn; }
+    QString cutDown(QString, QFont *, int, int);
+    void    setJustification(int jst) { m_justification = jst; }
+    int     getJustification() { return m_justification; }
 
   public slots:
 
@@ -430,9 +442,16 @@ class UIManagedTreeListType : public UIType
 
     QRect area;
     int   bins;
+    int   tree_depth;
 
     CornerMap   bin_corners;
     GenericTree *my_tree_data;
+    GenericTree *current_node;
+
+    QMap<QString, QString> m_fonts;
+    QMap<QString, fontProp> m_fontfcns;
+    int m_justification;
+
 };
 
 #endif
