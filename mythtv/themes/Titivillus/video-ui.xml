@@ -1271,9 +1271,16 @@
 
   <window name="selected">
 
-    <font name="active_font" face="Arial">
+<font name="active_font" face="Arial">
       <color>#ffffff</color>
       <size>16</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="directorfnt" face="Arial">
+      <color>#ffff33</color>
+      <size>16</size>
+      <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
 
@@ -1285,17 +1292,15 @@
     </font>
 
     <font name="moviedata" face="Arial">
-      <color>#ffff33</color>
+      <color>#ffffbb</color>
       <size>15</size>
       <shadow>1,1</shadow>
-      <bold>yes</bold>
     </font>
 
     <font name="plotfnt" face="Arial">
-      <color>#ffff33</color>
+      <color>#ffffbb</color>
       <size>15</size>
       <shadow>1,1</shadow>
-      <bold>yes</bold>
     </font>
 
     <font name="inactive_font" face="Arial">
@@ -1321,18 +1326,25 @@
     </font>
 
     <font name="leadfnt" face="Arial">
-      <color>#ffff33</color>
+      <color>#ddddff</color>
       <dropcolor>#000000</dropcolor>
-      <shadow>2,2</shadow>
-      <size>26</size>
+      <shadow>4,4</shadow>
+      <size>24</size>
       <bold>yes</bold>
     </font>
 
     <font name="info" face="Arial">
       <color>#ffffff</color>
-      <size>17</size>
+      <size>15</size>
       <shadow>1,1</shadow>
       <bold>yes</bold>
+    </font>
+
+    <font name="helptext" face="Arial">
+      <color>#ffffff</color>
+      <size>15</size>
+      <shadow>1,1</shadow>
+      <bold>no</bold>
     </font>
 
     <font name="message" face="Arial">
@@ -1341,7 +1353,7 @@
       <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
-
+    
     <container name="background">
       <image name="filler" draworder="0" fleximage="no">
         <filename>mv_selected.png</filename>
