@@ -294,5 +294,8 @@ void Channel::SwitchToInput(const QString &input)
     ioctl(videofd, VIDIOCGCHAN, &set);
     set.channel = currentcapchannel;
     set.norm = videomode;
-    ioctl(videofd, VIDIOCSCHAN, &set);
+    if (ioctl(videofd, VIDIOCSCHAN, &set) < 0)
+    {
+        perror("VIDIOCSCHAN: ");
+    }
 }

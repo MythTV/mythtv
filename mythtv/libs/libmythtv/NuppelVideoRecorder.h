@@ -99,17 +99,19 @@ class NuppelVideoRecorder
     int SpawnChildren(void);
     void KillChildren(void);
     
-    void BufferIt(unsigned char *buf);
+    void BufferIt(unsigned char *buf, int len = -1);
     
     int CreateNuppelFile(void);
 
-    void WriteVideo(unsigned char *buf, int fnum, int timecode);
+    void WriteVideo(unsigned char *buf, int len, int fnum, int timecode);
     void WriteAudio(unsigned char *buf, int fnum, int timecode);
 
     bool SetupAVCodec(void);
 
     void WriteSeekTable(bool todumpfile);
 
+    void DoMJPEG();
+    
     QString sfilename;
     bool encoding;
     
@@ -220,6 +222,8 @@ class NuppelVideoRecorder
     vector<VideoFilter *> videoFilters;
 
     PixelFormat picture_format;
+
+    bool hardware_encode;
 };
 
 #endif

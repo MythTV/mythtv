@@ -126,6 +126,7 @@ typedef struct vidbuffertype
     int freeToEncode;
     int freeToBuffer;
     unsigned char *buffer;
+    int bufferlen;
 } vidbuffertyp;
 
 typedef struct audbuffertype

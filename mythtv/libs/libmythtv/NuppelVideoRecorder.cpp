@@ -16,6 +16,10 @@ using namespace std;
 
 #include "NuppelVideoRecorder.h"
 
+#ifndef MJPIOC_S_PARAMS
+#include "videodev_mjpeg.h"
+#endif
+
 #define KEYFRAMEDIST   30
 
 pthread_mutex_t avcodeclock = PTHREAD_MUTEX_INITIALIZER;
@@ -96,7 +100,8 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     seektable = new vector<struct seektable_entry>;
 
     pip = false;
-
+    hardware_encode = false;
+	
     videoFilterList = "";
 }
 
@@ -259,6 +264,12 @@ void NuppelVideoRecorder::Initialize(void)
 	lame_init_params(gf);
     }
 
+    if (codec == "hardware-mjpeg")
+    {
+        codec = "mjpeg";
+        hardware_encode = true;
+    }
+
     if (picture_format == PIX_FMT_YUV422P)
         video_buffer_size = w * h * 2;
     else
@@ -375,6 +386,7 @@ void NuppelVideoRecorder::InitBuffers(void)
         vidbuf->sample = 0;
         vidbuf->freeToEncode = 0;
         vidbuf->freeToBuffer = 1;
+        vidbuf->bufferlen = 0;
        
         videobuffer.push_back(vidbuf);
     }
@@ -399,7 +411,7 @@ void NuppelVideoRecorder::StartRecording(void)
         return;
     }
 
-    strm = new signed char[w * h + (w * h) / 2 + 10];
+    strm = new signed char[w * h * 2 + 10];
 
     if (ntsc)
         video_frame_rate = 29.97;
@@ -549,10 +561,6 @@ void NuppelVideoRecorder::StartRecording(void)
     recording = true;
 
     struct timeval startt, nowt;
-    int framesdisplayed = 0;
-    
-    unsigned char framebuf[video_buffer_size];
-    
     while (encoding) {
         if (paused)
         {
@@ -585,30 +593,10 @@ again:
         ioctl(fd, VIDIOC_DQBUF, &vbuf);
 
         frame = vbuf.index;
-        memcpy(framebuf, buffers[frame], video_buffer_size);
+        BufferIt(buffers[frame], video_buffer_size);
 	
-	//memset(buffers[frame], 0, bufferlen[frame]);
-
         vbuf.type = V4L2_BUF_TYPE_CAPTURE;
         ioctl(fd, VIDIOC_QBUF, &vbuf);
-
-	BufferIt(framebuf);
-
-	if (framesdisplayed == 60)
-        {
-            gettimeofday(&nowt, NULL);
-
-            double timediff = (nowt.tv_sec - startt.tv_sec) * 1000000 +
-                             (nowt.tv_usec - startt.tv_usec);
-
-            printf("FPS captured: %f\n", 60000000.0 / timediff);
-
-            startt.tv_sec = nowt.tv_sec;
-            startt.tv_usec = nowt.tv_usec;
-
-            framesdisplayed = 0;
-        }
-        framesdisplayed++;
     }
 
     ioctl(fd, VIDIOC_STREAMOFF, &turnon);
@@ -617,7 +605,8 @@ again:
     munmap(buffers[1], bufferlen[frame]);
 
 #else
-
+    
+    struct video_capability vc;
     struct video_mmap mm;
     struct video_mbuf vm;
     struct video_channel vchan;
@@ -629,6 +618,20 @@ again:
     memset(&vchan, 0, sizeof(vchan));
     memset(&va, 0, sizeof(va));
     memset(&vt, 0, sizeof(vt));
+    memset(&vc, 0, sizeof(vc));
+
+    if (ioctl(fd, VIDIOCGCAP, &vc) < 0)
+    {
+        perror("VIDIOCGCAP:");
+        KillChildren(); 
+        return;
+    }
+
+    if ((vc.type & VID_TYPE_MJPEG_ENCODER) && hardware_encode)
+    {
+        DoMJPEG();
+        return;
+    }
 
     if (ioctl(fd, VIDIOCGMBUF, &vm) < 0)
     {
@@ -708,7 +711,7 @@ again:
     mm.frame  = 1;
     if (ioctl(fd, VIDIOCMCAPTURE, &mm)<0) 
         perror("VIDIOCMCAPTUREi1");
-
+    
     encoding = true;
     recording = true;
 
@@ -726,7 +729,7 @@ again:
             perror("VIDIOCSYNC0");
         else 
         {
-            BufferIt(buf+vm.offsets[0]);
+            BufferIt(buf+vm.offsets[0], video_buffer_size);
             //memset(buf+vm.offsets[0], 0, video_buffer_size);
             if (ioctl(fd, VIDIOCMCAPTURE, &mm)<0) 
                 perror("VIDIOCMCAPTURE0");
@@ -737,7 +740,7 @@ again:
             perror("VIDIOCSYNC1");
         else 
         {
-            BufferIt(buf+vm.offsets[1]);
+            BufferIt(buf+vm.offsets[1], video_buffer_size);
             //memset(buf+vm.offsets[1], 0, video_buffer_size);
             if (ioctl(fd, VIDIOCMCAPTURE, &mm)<0) 
                 perror("VIDIOCMCAPTURE1");
@@ -751,6 +754,100 @@ again:
     if (!livetv)
         WriteSeekTable(false);
 
+    recording = false;
+    close(fd);
+}
+
+void NuppelVideoRecorder::DoMJPEG(void)
+{
+    struct mjpeg_params bparm;
+
+    if (ioctl(fd, MJPIOC_G_PARAMS, &bparm) < 0)
+    {
+        perror("MJPIOC_G_PARAMS:");
+        return;
+    }
+
+    cout << bparm.img_width << " " << bparm.img_height << endl;
+    cout << bparm.HorDcm << " " << bparm.VerDcm << " " << bparm.TmpDcm << endl;
+    cout << bparm.field_per_buff << " " << bparm.img_x << " " << bparm.img_y << " " << bparm.decimation << " " << endl;
+
+    cout << bparm.input << " " << bparm.norm << " " << bparm.quality << endl;
+    cout << bparm.APPn << " " << bparm.APP_len << " " << bparm.odd_even << endl;
+
+    bparm.input = 2;
+    bparm.norm = 1;
+    bparm.quality = 60;
+
+    bparm.HorDcm = 1;
+    bparm.VerDcm = 1;
+
+    for (int n = 0; n < 14; n++)
+         bparm.APP_data[n] = 0;
+
+    if (ioctl(fd, MJPIOC_S_PARAMS, &bparm) < 0)
+    {
+        perror("MJPIOC_S_PARAMS:");
+        return;
+    }
+
+    struct mjpeg_requestbuffers breq;
+
+    breq.count = 64;
+    breq.size = 256 * 1024;
+
+    if (ioctl(fd, MJPIOC_REQBUFS, &breq) < 0)
+    {
+        perror("MJPIOC_REQBUFS:");
+        return;
+    }
+
+    uint8_t *MJPG_buff = (uint8_t *)mmap(0, breq.count * breq.size, 
+                                         PROT_READ|PROT_WRITE, MAP_SHARED, fd, 
+                                         0);
+
+    if (MJPG_buff == MAP_FAILED)
+    {
+        cerr << "error mapping mjpeg buffers\n";
+        return;
+    } 
+  
+    struct mjpeg_sync bsync;
+ 
+    for (unsigned int count = 0; count < breq.count; count++)
+    {
+        if (ioctl(fd, MJPIOC_QBUF_CAPT, &count) < 0)
+            perror("MJPIOC_QBUF_CAPT:");
+    }
+
+    encoding = true;
+    recording = true;
+
+    while (encoding)
+    {
+        if (paused)
+        {
+           mainpaused = true;
+           usleep(50);
+           gettimeofday(&stm, &tzone);
+           continue;
+        }
+        if (ioctl(fd, MJPIOC_SYNC, &bsync) < 0)
+            encoding = false;
+
+        BufferIt((unsigned char *)(MJPG_buff + bsync.frame * breq.size),
+                 bsync.length);
+
+        if (ioctl(fd, MJPIOC_QBUF_CAPT, &(bsync.frame)) < 0)
+            encoding = false;
+    }
+
+    munmap(MJPG_buff, breq.count * breq.size);
+    KillChildren();
+	        
+    if (!livetv)
+        WriteSeekTable(false);
+		    
     recording = false;
     close(fd);
 }
@@ -813,7 +910,7 @@ void NuppelVideoRecorder::KillChildren(void)
     pthread_join(audio_tid, NULL);
 }
 
-void NuppelVideoRecorder::BufferIt(unsigned char *buf)
+void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len)
 {
     int act;
     long tcres;
@@ -866,7 +963,8 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf)
     // 'tcres' is at the end of the frame, so subtract the right # of ms
     videobuffer[act]->timecode = (ntsc) ? (tcres - 33) : (tcres - 40);
 
-    memcpy(videobuffer[act]->buffer, buf, video_buffer_size);
+    memcpy(videobuffer[act]->buffer, buf, len);
+    videobuffer[act]->bufferlen = len;
 
     videobuffer[act]->freeToBuffer = 0;
     act_video_buffer++;
@@ -1284,7 +1382,8 @@ void NuppelVideoRecorder::doWriteThread(void)
         {
             if (videobuffer[act_video_encode]->freeToEncode)
             {
-                WriteVideo(videobuffer[act_video_encode]->buffer, 
+                WriteVideo(videobuffer[act_video_encode]->buffer,
+                           videobuffer[act_video_encode]->bufferlen,
                            videobuffer[act_video_encode]->sample,
                            videobuffer[act_video_encode]->timecode);
                 videobuffer[act_video_encode]->sample = 0;
@@ -1314,9 +1413,10 @@ void NuppelVideoRecorder::doWriteThread(void)
     }
 }
 
-void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
+void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int len, int fnum, 
+                                     int timecode)
 {
-    int tmp, r = 0, out_len = OUT_LEN;
+    int tmp = 0, r = 0, out_len = OUT_LEN;
     struct rtframeheader frameheader;
     int xaa, freecount = 0, compressthis;
     int raw = 0;
@@ -1421,14 +1521,17 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
         else
             mpa_ctx->force_type = 0;
 
+	if (!hardware_encode)
+	{
 #ifdef EXTRA_LOCKING
-        pthread_mutex_lock(&avcodeclock);
+            pthread_mutex_lock(&avcodeclock);
 #endif
-        tmp = avcodec_encode_video(mpa_ctx, (unsigned char *)strm, 
-                                   video_buffer_size, &mpa_picture); 
+            tmp = avcodec_encode_video(mpa_ctx, (unsigned char *)strm, 
+                                       video_buffer_size, &mpa_picture); 
 #ifdef EXTRA_LOCKING
-        pthread_mutex_unlock(&avcodeclock);
+            pthread_mutex_unlock(&avcodeclock);
 #endif
+	}
     }
     else
     {
@@ -1509,6 +1612,13 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
             frameheader.packetlength = video_buffer_size;
             ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
             ringBuffer->Write(buf, video_buffer_size);
+        }
+        else if (hardware_encode)
+        {
+            frameheader.comptype = '4';
+            frameheader.packetlength = len;
+            ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+            ringBuffer->Write(buf, len);
         }
         else
         {
