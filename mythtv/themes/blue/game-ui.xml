@@ -1,0 +1,111 @@
+<mythuitheme>
+
+  <window name="gametree">
+
+    <container name="background">
+        <image name="filler" draworder="0" fleximage="yes">
+            <filename>game-background.png</filename>
+            <position>0,0</position>
+        </image>
+        <image name="titlelines" draworder="0" fleximage="no">
+            <filename>trans-titles.png</filename>
+            <position>0,40</position>
+        </image>
+      <!--  <image name="infofiller" draworder="0" fleximage="no">
+            <filename>pf-top.png</filename>
+            <position>26,350</position>
+        </image> -->
+    </container>
+
+    <container name="gameselector">
+        <area>0,10,800,400</area>
+        <managedtreelist name="gametreelist" draworder="1" bins="2">
+            <area>40,10,720,400</area>
+            <image function="selectionbar" filename="bar.png" location="-12,-3" padding="10" fleximage="no"></image>
+            <image function="uparrow" filename="uparrow.png"></image>
+            <image function="downarrow" filename="downarrow.png"></image>
+            <!--<image function="leftarrow" filename="leftarrow.png"></image>
+            <image function="rightarrow" filename="rightarrow.png"></image>-->
+            <bin number="1">
+                <area>30,56,190,250</area>
+                <fcnfont name="list-active" function="active"></fcnfont>
+                <fcnfont name="list-inactive" function="inactive"></fcnfont>
+                <fcnfont name="list-active" function="selected"></fcnfont>
+                <fcnfont name="list-selectable" function="selectable"></fcnfont>
+            </bin>
+            <bin number="2">
+                <area>240,10,530,350</area>
+                <fcnfont name="list-active" function="active"></fcnfont>
+                <fcnfont name="list-active" function="selected"></fcnfont>
+                <fcnfont name="list-inactive" function="inactive"></fcnfont>
+                <fcnfont name="list-selectable" function="selectable"></fcnfont>
+            </bin>
+        </managedtreelist>
+
+        <image name="showinglines" draworder="2" fleximage="yes">
+            <filename>gameshowings.png</filename>
+            <position>0,0</position>
+        </image>
+    </container>
+
+    <container name="game_info">
+      <area>35,400,750,220</area>
+
+      <textarea name="gametitle" draworder="6">
+        <area>13,8,500,50</area>
+        <font>title</font>
+      </textarea>
+
+      <textarea name="system" draworder="6">
+        <area>13,55,150,35</area>
+        <font>info</font>
+        <value>System:</value>
+      </textarea>
+
+      <textarea name="systemname" draworder="6">
+        <area>100,55,200,35</area>
+        <font>metadata</font>
+      </textarea>
+
+      <textarea name="year" draworder="6">
+        <area>213,55,150,35</area>
+        <font>info</font>
+        <value>Year:</value>
+      </textarea>
+
+      <textarea name="yearname" draworder="6">
+        <area>253,55,500,35</area>
+        <font>metadata</font>
+      </textarea>
+
+      <textarea name="genre" draworder="6">
+        <area>20,90,150,35</area>
+        <font>info</font>
+        <value>Genre:</value>
+      </textarea>
+
+      <textarea name="genrename" draworder="6">
+        <area>100,90,500,35</area>
+        <font>metadata</font>
+      </textarea>
+
+      <textarea name="favorite" draworder="6">
+        <area>0,125,150,35</area>
+        <font>info</font>
+        <value>Favorite:</value>
+      </textarea>
+
+      <textarea name="showfavorite" draworder="6">
+        <area>100,125,500,35</area>
+        <font>metadata</font>
+      </textarea>
+
+      <image name="gameimage" draworder="6" fleximage="no">
+          <position>562,14</position>
+          <staticsize>180,166</staticsize>
+      </image>
+    </container>
+  
+  </window>
+
+</mythuitheme>
