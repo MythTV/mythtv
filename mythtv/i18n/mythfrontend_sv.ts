@@ -146,6 +146,65 @@
     </message>
 </context>
 <context>
+    <name>JobQueue</name>
+    <message>
+        <source>Transcode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flag Commercials</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Job</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Queued</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pending</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Starting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Running</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paused</source>
+        <translation type="unfinished">Pausad</translation>
+    </message>
+    <message>
+        <source>Stopping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Done (Invalid status!)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aborted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Errored</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Undefined</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ManualBox</name>
     <message>
         <source>Manual Recording</source>
@@ -432,7 +491,7 @@
     </message>
     <message>
         <source>Yes, but allow future recordings of this episode</source>
-        <translation>Ja, men tillåt framtida inspelningar av detta avsnitt</translation>
+        <translation type="obsolete">Ja, men tillåt framtida inspelningar av detta avsnitt</translation>
     </message>
     <message>
         <source>There are %1 recordings in this display group</source>
@@ -465,6 +524,10 @@
     <message>
         <source>Default</source>
         <translation>Standard</translation>
+    </message>
+    <message>
+        <source>Yes, and allow re-record</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1124,7 +1187,7 @@
     </message>
     <message>
         <source>The horizontal offset the GUI will be displayed at.</source>
-        <translation>Justering av bildens position i horisontalled.</translation>
+        <translation type="obsolete">Justering av bildens position i horisontalled.</translation>
     </message>
     <message>
         <source>GUI Y offset</source>
@@ -1280,7 +1343,7 @@
     </message>
     <message>
         <source>Commercial Detection</source>
-        <translation>Reklamdetektering</translation>
+        <translation type="obsolete">Reklamdetektering</translation>
     </message>
     <message>
         <source>Overscan</source>
@@ -3702,7 +3765,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>Duplicate detection</source>
-        <translation>Dubblettkontroll</translation>
+        <translation type="obsolete">Dubblettkontroll</translation>
     </message>
     <message>
         <source>Scheduling Options</source>
@@ -3838,15 +3901,15 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>This setting determines approximately how much CPU Commercial Detection threads will consume. On &apos;High&apos;, all available CPU time will be used which may cause problems on slow systems.</source>
-        <translation>Denna inställning bestämmer ungefär hur mycket CPU trådarna för automatisk reklamdetektering använder. Vid &apos;Hög&apos; kommer all tillgänglig CPU-tid användas vilket kan orsaka problem på långsamma system.</translation>
+        <translation type="obsolete">Denna inställning bestämmer ungefär hur mycket CPU trådarna för automatisk reklamdetektering använder. Vid &apos;Hög&apos; kommer all tillgänglig CPU-tid användas vilket kan orsaka problem på långsamma system.</translation>
     </message>
     <message>
         <source>Commercial Detection Processing Host</source>
-        <translation>Värddator för automatisk reklamdetektering</translation>
+        <translation type="obsolete">Värddator för automatisk reklamdetektering</translation>
     </message>
     <message>
         <source>Select &apos;Default&apos; to run Commercial Detection on the same backend which created a recording, or select a hostname to run all detection jobs on a specific host.</source>
-        <translation>Välj &apos;Standard&apos; för att köra automatisk reklamdetektering på samma videoserver som skapade inspelningen, eller välj ett värddatornamn för att köra alla detekteringsjobb på en specifik dator.</translation>
+        <translation type="obsolete">Välj &apos;Standard&apos; för att köra automatisk reklamdetektering på samma videoserver som skapade inspelningen, eller välj ett värddatornamn för att köra alla detekteringsjobb på en specifik dator.</translation>
     </message>
     <message>
         <source>Enable stricter Commercial Detection code.  Disable if some commercials are not being detected.</source>
@@ -4134,7 +4197,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>Use VIA hardware MPEG Decoding</source>
-        <translation>Använd VIA MPEG-hårdvaruavkodning</translation>
+        <translation type="obsolete">Använd VIA MPEG-hårdvaruavkodning</translation>
     </message>
     <message>
         <source>Sample interval for DVB signal statistics (in seconds)</source>
@@ -4174,7 +4237,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>Commercial Detection (Playback)</source>
-        <translation>Reklamdetektering (Uppspelning)</translation>
+        <translation type="obsolete">Reklamdetektering (Uppspelning)</translation>
     </message>
     <message>
         <source>(Unassigned)</source>
@@ -4514,6 +4577,174 @@ som du startade detta programmet i.</translation>
         <source>Show the program guide when starting Live TV</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Completed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paused</source>
+        <translation type="unfinished">Pausad</translation>
+    </message>
+    <message>
+        <source>Restarting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Completed, %1 FPS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Breaks Found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Post Recording Processing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Black background for Closed Captioning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, captions will be displayed over a black space for maximum contrast. Otherwise, captions will use outlined text over the picture.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The horizontal offset the GUI will be displayed at.  May only work if run in a window.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default size is 12.</source>
+        <translation type="unfinished">Standardstorlek är 12.</translation>
+    </message>
+    <message>
+        <source>Use HW XVMC VLD Decoding (Via only)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enables the use of viaXvMC HW Mpeg decoding for the Via Unichome Chipset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Skip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Job Queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Job Queue shows any jobs currently in Myth&apos;s Job Queue such as a commercial flagging job.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Job Queue is currently empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum simultaneous jobs on this backend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Job Queue will be limited to running this many simultaneous jobs on this backend.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Job Queue Check frequency (in seconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When looking for new jobs to process, the Job Queue will wait this long between checks.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting controls approximately how much CPU jobs in the queue may consume. On &apos;High&apos;, all available CPU time may be used which could cause problems on slower systems.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run Jobs only on original recording host</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, jobs in the queue will be required to run on the backend that made the original recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Job #1 Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Description for this User Job.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Job #1 Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The command to run whenever this User Job number is scheduled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Job #2 Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Job #2 Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Job #3 Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Job #3 Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Job #4 Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Job #4 Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Transcoding jobs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow jobs of this type to run on this backend.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Commercial Detection jobs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow &apos;User Job #1&apos; jobs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow &apos;User Job #2&apos; jobs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow &apos;User Job #3&apos; jobs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow &apos;User Job #4&apos; jobs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Job Queue (Host-Specific)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Job Queue (Global)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StatusBox</name>
@@ -4532,6 +4763,14 @@ som du startade detta programmet i.</translation>
     <message>
         <source>is not recording</source>
         <translation>spelar inte in</translation>
+    </message>
+    <message>
+        <source>Job:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Status: </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4922,7 +5161,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>Jump to Begining</source>
-        <translation>Hoppa till början</translation>
+        <translation type="obsolete">Hoppa till början</translation>
     </message>
     <message>
         <source>You are exiting this video</source>
@@ -4931,6 +5170,10 @@ som du startade detta programmet i.</translation>
     <message>
         <source>Exit to the menu</source>
         <translation>Gå ut till menyn</translation>
+    </message>
+    <message>
+        <source>Jump to Beginning</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
