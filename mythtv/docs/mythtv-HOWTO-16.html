@@ -14,6 +14,23 @@
 <HR>
 <H2><A NAME="s16">16.</A> <A HREF="mythtv-HOWTO.html#toc16">MythVideo</A></H2>
 
+<P>The MythVideo application will allow you to use an external program to
+watch media files that are not directly supported by MythTV.</P>
+<P>Change into the MythVideo directory, then make and make install:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd mythvideo
+$ make
+$ su
+# make install
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The next step is to edit the
+<CODE>/usr/local/share/mythvideo/mythexplorer-settings.txt</CODE> file.  Change
+the StartDir to a valid mount point on your system.</P>
+
 <HR>
 <A HREF="mythtv-HOWTO-17.html">Next</A>
 <A HREF="mythtv-HOWTO-15.html">Previous</A>

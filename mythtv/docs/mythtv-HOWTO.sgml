@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-01-16, v1.077
+<date>2003-01-16, v1.078
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1794,6 +1794,21 @@ Enter Key            Switch between celsius and fahrenheit. Can also
 </verb></tscreen>
 
 <sect>MythVideo
+<p>The MythVideo application will allow you to use an external program to
+watch media files that are not directly supported by MythTV.
+
+Change into the MythVideo directory, then make and make install:
+<tscreen><verb>
+$ cd mythvideo
+$ make
+$ su
+# make install
+# exit
+</verb></tscreen>
+
+The next step is to edit the
+<tt>/usr/local/share/mythvideo/mythexplorer-settings.txt</tt> file.  Change
+the StartDir to a valid mount point on your system.
 
 <sect>Troubleshooting.
 <sect1>Illegal Instruction.
@@ -2139,6 +2154,8 @@ address or hostname of the back-end server and port.  You may specify
 <tt>localhost</tt> if the front-end and back-end programs will be running on
 the same machine.  This file is read by the backend server during start-up.
 
+<bf>NOTE</bf>:  Do not change the port settings.  Leave them as-is.
+
 Once you're done editing the file, start the setup program:
 <tscreen><verb>
 $ cd setup
@@ -2284,6 +2301,8 @@ zap2it.
 v1.076, 2003-01-16.  Slight adjustment to Gentoo docs.  Typo in path.
 v1.077, 2003-01-16.  Added "Can't see OSD" to troubleshooting with pointer
 back to RH80 strip instructions.
+v1.078, 2003-01-16.  Added initial mythvideo instructions.  Added
+instruction not to mess with port setting in backend for mythtv-0.8.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

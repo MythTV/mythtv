@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-01-16, v1.077
+  2003-01-16, v1.078
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -1895,6 +1895,21 @@
 
   [1m16.  MythVideo[0m
 
+  The MythVideo application will allow you to use an external program to
+  watch media files that are not directly supported by MythTV.
+
+  Change into the MythVideo directory, then make and make install:
+
+       $ cd mythvideo
+       $ make
+       $ su
+       # make install
+       # exit
+
+  The next step is to edit the /usr/local/share/mythvideo/mythexplorer-
+  settings.txt file.  Change the StartDir to a valid mount point on your
+  system.
+
   [1m17.  Troubleshooting.[0m
 
   [1m17.1.  Illegal Instruction.[0m
@@ -2020,28 +2035,28 @@
   Now, you need to clear out the old versions of the software to ensure
   that you're running with the debugging code, then compile and install.
 
-       $ make clean distclean
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # exit
+  $ make clean distclean
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # exit
 
   At this point, you now have debug-enabled software ready.  Let's
   assume that the problem you're having is in the setup program.
 
-  $ cd setup
-  $ gdb ./setup
+       $ cd setup
+       $ gdb ./setup
 
-  GNU gdb 5.2.1-2mdk (Mandrake Linux)
-  Copyright 2002 Free Software Foundation, Inc.
-  GDB is free software, covered by the GNU General Public License, and you are
-  welcome to change it and/or distribute copies of it under certain
-  conditions.
-  Type "show copying" to see the conditions.
-  There is absolutely no warranty for GDB.  Type "show warranty" for details.
-  This GDB was configured as "i586-mandrake-linux-gnu"...
-  (gdb)
+       GNU gdb 5.2.1-2mdk (Mandrake Linux)
+       Copyright 2002 Free Software Foundation, Inc.
+       GDB is free software, covered by the GNU General Public License, and you are
+       welcome to change it and/or distribute copies of it under certain
+       conditions.
+       Type "show copying" to see the conditions.
+       There is absolutely no warranty for GDB.  Type "show warranty" for details.
+       This GDB was configured as "i586-mandrake-linux-gnu"...
+       (gdb)
 
   [1mgdb [22mhas a number of options, read the man page for more information.
 
@@ -2145,11 +2160,11 @@
 
   Download the source to MPlayer and patch:
 
-  $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
-  $ tar -xjf MPlayer-0.90rc1.tar.bz2
-  $ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
-  $ cd MPlayer-0.90rc1
-  $ patch -p1 < mplayer-0.90pre10+mythtv.patch
+       $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
+       $ tar -xjf MPlayer-0.90rc1.tar.bz2
+       $ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
+       $ cd MPlayer-0.90rc1
+       $ patch -p1 < mplayer-0.90pre10+mythtv.patch
 
   At this point, you can read the MPlayer documentation and start the
   compile process.
@@ -2194,6 +2209,7 @@
 
   [1mTHERE IS NO GUARANTEE THAT THESE INSTRUCTIONS WILL WORK.  USE AT YOUR[0m
   [1mOWN RISK.[0m
+
   Here are some of the features in version 0.8:
 
   +o  A front-end and back-end system.  The back-end is responsible for
@@ -2238,6 +2254,8 @@
   port.  You may specify localhost if the front-end and back-end
   programs will be running on the same machine.  This file is read by
   the backend server during start-up.
+
+  [1mNOTE[22m:  Do not change the port settings.  Leave them as-is.
 
   Once you're done editing the file, start the setup program:
 
