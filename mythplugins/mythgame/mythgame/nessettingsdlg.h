@@ -5,6 +5,8 @@
 #include <qdialog.h>
 #include <qpixmap.h>
 
+#include <mythtv/mythwidgets.h>
+
 class QVBoxLayout; 
 class QHBoxLayout; 
 class QGridLayout; 
@@ -20,28 +22,22 @@ class QTabWidget;
 class QWidget;
 class MythContext;
 
-class NesSettingsDlg : public QDialog
+class NesSettingsDlg : public MythDialog
 { 
     Q_OBJECT
 
 public:
     NesSettingsDlg(QWidget* parent = 0, 
-        const char* name = 0, bool modal = FALSE, 
-        WFlags fl = 0 );
+        const char* name = 0, bool modal = FALSE);
     ~NesSettingsDlg();
 
     QTabWidget* NesTab;
     QWidget* SettingsTab;
     QPushButton* ListButton;
     
-    int Show();
-
 protected slots:
 
     void loadList();
-
-private:
-    float wmult, hmult;
 };
 
 #endif // NESSETTINGSDLG_H

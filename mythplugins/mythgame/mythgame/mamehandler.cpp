@@ -420,7 +420,7 @@ void MameHandler::edit_settings(QWidget *parent,RomInfo * romdata)
     MameRomInfo *mamedata = dynamic_cast<MameRomInfo*>(romdata);
     SetGameSettings(game_settings, mamedata);
 
-    MameSettingsDlg settingsdlg(parent, "gamesettings", true);
+    MameSettingsDlg settingsdlg(parent, "gamesettings");
     QString ImageFile;
     if(mamedata->FindImage("screenshot", &ImageFile))
         settingsdlg.SetScreenshot(ImageFile);

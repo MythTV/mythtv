@@ -28,17 +28,12 @@ using namespace std;
 #define DONT_SAVE_SETTINGS 0
 
 NesSettingsDlg::NesSettingsDlg(QWidget* parent,  
-                               const char* name, bool modal, 
-                               WFlags fl)
-    : QDialog( parent, name, modal, fl )
+                               const char* name, bool modal)
+    : MythDialog( parent, name, modal)
 {
     setCursor(QCursor(Qt::BlankCursor));
     if ( !name )
       setName( "NesSettings" );
-
-    int screenwidth = 0, screenheight = 0;
-
-    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     resize( screenwidth, screenheight );
     setSizePolicy( QSizePolicy( (QSizePolicy::SizeType)0, (QSizePolicy::SizeType)0, 0, 0, sizePolicy().hasHeightForWidth() ) );
@@ -73,15 +68,6 @@ NesSettingsDlg::NesSettingsDlg(QWidget* parent,
 NesSettingsDlg::~NesSettingsDlg()
 {
     // no need to delete child widgets, Qt does it all for us
-}
-
-int NesSettingsDlg::Show()
-{
-    showFullScreen();
-    setActiveWindow();
-    exec();
-    // No settings to save
-    return DONT_SAVE_SETTINGS;
 }
 
 void NesSettingsDlg::loadList()

@@ -10,6 +10,8 @@
 
 #include <iostream>
 
+#include <mythtv/mythwidgets.h>
+
 using namespace std;
 
 NesHandler* NesHandler::pInstance = 0;
@@ -47,8 +49,9 @@ void NesHandler::edit_system_settings(QWidget* parent, RomInfo* romdata)
     // Eliminate unused parameter warning from the compiler.                
     romdata = romdata;
 
-    NesSettingsDlg settingsdlg(parent, "gamesettings", true);
+    NesSettingsDlg settingsdlg(parent, "gamesettings");
     settingsdlg.Show();
+    settingsdlg.exec();
 }
 
 void NesHandler::processGames()
@@ -70,8 +73,14 @@ void NesHandler::processGames()
     if (!List)
         return;
 
+    MythProgressDialog pdial("Looking for NES games...", List->count());
+    int progress = 0;
+
     for (QFileInfoListIterator it(*List); it; ++it)
     {
+        pdial.setProgress(progress);
+        progress++;
+
         QFileInfo Info(*it.current());
         if (IsNesRom(Info.filePath()))
         {
@@ -100,6 +109,8 @@ void NesHandler::processGames()
             // Unknown type of file.
         }
     }
+   
+    pdial.Close();
 }
 
 RomInfo* NesHandler::create_rominfo(RomInfo* parent)
