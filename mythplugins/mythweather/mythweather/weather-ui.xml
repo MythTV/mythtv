@@ -333,7 +333,7 @@
         <area>0,18,800,45</area>
         <font>header</font>
         <value>extended forecast</value>
-        <value lang="DE">Erweiterte Vorhersage</value>
+        <value lang="DE">Weitere Vorhersage</value>
         <value lang="ES">próximos días</value>
         <value lang="CA">propers dies</value>
         <value lang="NL">komende dagen</value>
@@ -573,6 +573,7 @@
         <font>todayfont</font>
         <value>Forecast for</value>
         <value lang="ES">Previsión para el</value>
+	<value lang="DE">Vorhersage für</value>
         <value lang="ES">Previsió per al</value>
         <value lang="NL">Verwachtingen voor</value>
         <value lang="DK">Vejrudsigt for</value>
@@ -631,6 +632,7 @@
         <area>0,250,800,45</area>
         <font>header</font>
         <value>Map Unavailable</value>
+        <value lang="DE">Karte nicht verfügbar</value>
         <value lang="ES">Mapa no disponible</value>
         <value lang="CA">Mapa no disponible</value>
         <value lang="NL">Weerkaart niet beschikbaar</value>
@@ -644,6 +646,7 @@
         <area>85,70,114,15</area>
         <font>label</font>
         <value>RAIN</value>
+        <value lang="DE">REGEN</value>
         <value lang="PT">CHUVA</value>
         <value lang="SV">REGN</value>
         <value lang="CA">PLUJA</value>
@@ -654,6 +657,7 @@
         <area>341,70,114,15</area>
         <font>label</font>
         <value>MIX/ICE</value>
+        <value lang="DE">MIX/EIS</value>
         <value lang="PT">GELO</value>
         <value lang="SV">MIX/IS</value>
         <value lang="CA">GELADA</value>
@@ -664,6 +668,7 @@
         <area>597,70,114,15</area>
         <font>label</font>
         <value>SNOW</value>
+        <value lang="DE">SCHNEE</value>
         <value lang="PT">NEVE</value>
         <value lang="SV">SNÖ</value>
         <value lang="CA">NEU</value>
@@ -675,6 +680,7 @@
         <area>2,86,80,16</area>
         <font>label2</font>
         <value>LIGHT</value>
+        <value lang="DE">LEICHT</value>
         <value lang="PT">MENOS</value>
         <value lang="SV">LÄTT</value>
         <value lang="CA">SUAU</value>
@@ -685,6 +691,7 @@
         <area>257,86,80,16</area>
         <font>label2</font>
         <value>LIGHT</value>
+        <value lang="DE">LEICHT</value>
         <value lang="PT">MENOS</value>
         <value lang="SV">LÄTT</value>
         <value lang="CA">SUAU</value>
@@ -695,6 +702,7 @@
         <area>514,86,80,16</area>
         <font>label2</font>
         <value>LIGHT</value>
+        <value lang="DE">LEICHT</value>
         <value lang="PT">MENOS</value>
         <value lang="SV">LÄTT</value>
         <value lang="CA">SUAU</value>
@@ -706,6 +714,7 @@
         <area>199,86,80,16</area>
         <font>label2</font>
         <value>HEAVY</value>
+        <value lang="DE">KRÄFTIG</value>
         <value lang="PT">MAIS</value>
         <value lang="SV">KRAFTIGT</value>
         <value lang="CA">FORTA</value>
@@ -716,6 +725,7 @@
         <area>453,86,80,16</area>
         <font>label2</font>
         <value>HEAVY</value>
+        <value lang="DE">KRÄFTIG</value>
         <value lang="PT">MAIS</value>
         <value lang="SV">KRAFTIGT</value>
         <value lang="CA">FORTA</value>
@@ -726,6 +736,7 @@
         <area>710,86,80,16</area>
         <font>label2</font>
         <value>HEAVY</value>
+        <value lang="DE">KRÄFTIG</value>
         <value lang="PT">MAIS</value>
         <value lang="SV">KRAFTIGT</value>
         <value lang="CA">FORTA</value>
@@ -779,6 +790,7 @@
         <font>header</font>
         <value>weather setup</value>
         <value lang="ES">Configuración de "El Tiempo"</value>
+        <value lang="DE">Wetter Einstellungen</value>
         <value lang="CA">Configuració de "El Temps"</value>
         <value lang="NL">Configuratie "Het Weer"</value>
         <value lang="DK">Vejr opsætning"</value>
