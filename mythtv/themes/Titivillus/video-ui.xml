@@ -1,188 +1,140 @@
 <mythuitheme>
  
-   <window name="manager">
+<window name="manager">
 
-    <font name="active_font" face="Arial">
-      <color>#ffffff</color>
-      <size>16</size>
-      <size:big>18</size:big>
-      <size:small>14</size:small>
-    </font>
-
-    <font name="labels" face="Arial">
-      <color>#ffffff</color>
-      <size>16</size>
+    <font name="biginfo" base="info">
       <shadow>1,1</shadow>
-      <bold>yes</bold>
+      <size>26</size>
     </font>
 
-    <font name="keysfont" face="Arial">
-      <color>#ffffff</color>
-      <size>12</size>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="directorfnt" face="Arial">
-      <color>#ffffff</color>
-      <size>18</size>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="moviedata" face="Arial">
-      <color>#ffffbb</color>
-      <size>15</size>
-      <size:big>17</size:big>
-      <size:small>13</size:small>
-      <shadow>2,2</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="inactive_font" face="Arial">
-      <color>#9999cc</color>
-      <size>16</size>
-      <size:big>18</size:big>
-      <size:small>14</size:small>
-    </font>
-
-    <font name="bigtitle" face="Arial">
-      <color>#ffffff</color>
-      <dropcolor>#000000</dropcolor>
+    <font name="bigtitle" base="title">
       <size>50</size>
       <shadow>3,3</shadow>
-      <bold>yes</bold>
     </font>
 
-    <font name="titlefnt" face="Arial">
-      <color>#ffffff</color>
-      <dropcolor>#000000</dropcolor>
-      <shadow>1,1</shadow>
-      <size>27</size>
-      <bold>yes</bold>
-    </font>
-
-    <font name="leadfnt" face="Arial">
-      <color>#ddddff</color>
-      <dropcolor>#000000</dropcolor>
-      <shadow>4,4</shadow>
-      <size>24</size>
-      <bold>yes</bold>
-    </font>
-
-    <font name="info" face="Arial">
-      <color>#ffffdd</color>
-      <size>15</size>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="message" face="Arial">
-      <color>#ffffff</color>
-      <size>16</size>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
 
     <container name="background">
-      <image name="filler" draworder="0" fleximage="yes">
-        <filename>conflict/cr-background.png</filename>
-        <position>0,285</position>
-        <staticsize>800,290</staticsize>
+      <image name="filler" draworder="0" fleximage="no">
+        <filename>video/vm-background.png</filename>
+        <position>0,0</position>
+        <!--<staticsize>800,290</staticsize>-->
       </image>
-    </container>
+      </container>
 
     <container name="info">
       <area>0,0,800,280</area>
       <textarea name="title" draworder="4">
-        <area>108,40,690,80</area>
-        <font>leadfnt</font>
+        <area>30,35,800,80</area>
+        <font>title</font>
+      </textarea>
+      <textarea name="dirlbl" draworder="4">
+        <area>57,75,150,35</area>
+        <font>info</font>
+        <value>Director:</value>
+      </textarea>
+      <textarea name="director" draworder="4">
+        <area>140,75,350,35</area>
+        <font>metadata</font>
+      </textarea>
+      <textarea name="yrlbl" draworder="4" align="right">
+        <area>540,75,170,35</area>
+        <font>info</font>
+        <value>Year:</value>
+      </textarea>
+      <textarea name="year" draworder="4">
+        <area>720,75,100,35</area>
+        <font>metadata</font>
       </textarea>
       <textarea name="ratlbl" draworder="4">
-        <area>144,164,150,35</area>
-        <font>labels</font>
+        <area>76,135,150,35</area>
+        <font>info</font>
         <value>Rated:</value>
       </textarea>
       <textarea name="rating" draworder="4">
-        <area>205,164,580,35</area>
-        <font>moviedata</font>
+        <area>140,135,650,35</area>
+        <font>metadata</font>
       </textarea>
-      <textarea name="lvllbl" draworder="4" align="left">
-        <area>625,16,170,35</area>
-        <font>labels</font>
+      <textarea name="lvllbl" draworder="4" align="right">
+        <area>540,105,170,35</area>
+        <font>info</font>
         <value>Parental Level:</value>
       </textarea>
       <textarea name="level" draworder="4">
-        <area>766,16,100,35</area>
-        <font>moviedata</font>
+        <area>720,105,100,35</area>
+        <font>metadata</font>
       </textarea>
-      <textarea name="browselbl" draworder="4" align="right">
-        <area>430,135,170,35</area>
-        <font>labels</font>
+      <textarea name="browselbl" draworder="4" >
+        <area>303,105,170,35</area>
+        <font>info</font>
         <value>Browsable:</value>
       </textarea>
       <textarea name="browseable" draworder="4">
-        <area>606,135,100,35</area>
-        <font>moviedata</font>
+        <area>405,105,100,35</area>
+        <font>metadata</font>
       </textarea>
       <textarea name="lenlbl" draworder="4">
-        <area>300,135,150,35</area>
-        <font>labels</font>
+        <area>320,75,150,35</area>
+        <font>info</font>
         <value>Runtime:</value>
       </textarea>
       <textarea name="length" draworder="4">
-        <area>380,135,350,35</area>
-        <font>moviedata</font>
+        <area>405,75,350,35</area>
+        <font>metadata</font>
+      </textarea>
+      <textarea name="pltlbl" draworder="4">
+        <area>90,165,150,35</area>
+        <font>info</font>
+        <value>Plot:</value>
       </textarea>
       <textarea name="plot" draworder="4">
-        <area>108,195,670,100</area>
-        <font>moviedata</font>
+        <area>140,165,640,60</area>
+        <font>metadata</font>
         <multiline>yes</multiline>
       </textarea>
       <textarea name="fillbl" draworder="4">
-        <area>117,80,150,35</area>
-        <font>labels</font>
+        <area>46,225,150,35</area>
+        <font>info</font>
         <value>Filename:</value>
       </textarea>
       <textarea name="filename" draworder="4">
-        <area>205,80,600,35</area>
-        <font>moviedata</font>
+        <area>140,225,600,35</area>
+        <font>metadata</font>
       </textarea>
       <textarea name="cvflbl" draworder="4">
-        <area>108,108,150,35</area>
-        <font>labels</font>
+        <area>36,250,150,35</area>
+        <font>info</font>
         <value>Cover File:</value>
       </textarea>
       <textarea name="coverfile" draworder="4">
-        <area>205,108,600,35</area>
-        <font>moviedata</font>
+        <area>140,250,600,35</area>
+        <font>metadata</font>
       </textarea>
       <textarea name="imdblbl" draworder="4">
-        <area>134,135,155,35</area>
-        <font>labels</font>
-        <value>IMDB #:</value>
+        <area>30,105,155,35</area>
+        <font>info</font>
+        <value>IMDB Num.:</value>
       </textarea>
       <textarea name="inetref" draworder="4">
-        <area>205,135,500,35</area>
-        <font>moviedata</font>
+        <area>140,105,500,35</area>
+        <font>metadata</font>
       </textarea>
     </container>
  
     <container name="selector">
-      <area>0,285,800,320</area>
+      <area>0,300,800,320</area>
       <listarea name="listing" draworder="4">
         <area>20,12,760,242</area>
-        <fcnfont name="active_font" function="active"></fcnfont>
-        <fcnfont name="inactive_font" function="inactive"></fcnfont>
-        <fcnfont name="active_font" function="selected"></fcnfont>
+        <fcnfont name="list-active" function="active"></fcnfont>
+        <fcnfont name="list-inactive" function="inactive"></fcnfont>
+        <fcnfont name="list-selected" function="selected"></fcnfont>
         <columnpadding>10</columnpadding>
-        <column number="1" width="400" context="-1"></column>
-        <column number="2" width="250" context="-1"></column>
+        <column number="1" width="455" context="-1"></column>
+        <column number="2" width="200" context="-1"></column>
         <column number="3" width="100" context="-1"></column>
         <items>8</items>
-        <image function="selectionbar" filename="conflict/tit-cr-selectbar.png" location="-12,-5"></image>
-        <image function="uparrow" filename="shared/up_arrow.png" location="750,22"></image>
-        <image function="downarrow" filename="shared/down_arrow.png" location="750,220"></image>
+        <image function="selectionbar" filename="conflict/tit-cr-selectbar.png" location="-10,-8"></image>
+        <image function="uparrow" filename="shared/up_arrow.png" location="745,10"></image>
+        <image function="downarrow" filename="shared/down_arrow.png" location="745,222"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="no">
         <filename>conflict/cr-lines.png</filename>
@@ -191,17 +143,17 @@
       </image>
       <textarea name="keyslbl_one" draworder="4" align="left">
         <area>15,275,200,30</area>
-        <font>keysfont</font>
+        <font>help</font>
         <value>SELECT: Edit</value>
       </textarea>
       <textarea name="keyslbl_two" draworder="4" align="center">
         <area>280,275,240,30</area>
-        <font>keysfont</font>
+        <font>help</font>
         <value></value>
       </textarea>
       <textarea name="keyslbl_three" draworder="4" align="right">
-        <area>580,275,200,30</area>
-        <font>keysfont</font>
+        <area>555,275,230,30</area>
+        <font>help</font>
         <value>INFO - Action Menu</value>        
       </textarea>
     </container>
@@ -210,17 +162,17 @@
       <area>0,0,800,600</area>
       <textarea name="ld1" draworder="0">
         <area>68,140,350,90</area>
-        <font>titlefnt</font>
+        <font>biginfo</font>
         <value>retrieving data...</value>
       </textarea>
       <textarea name="finder" draworder="0" align="center">
         <area>0,270,800,60</area>
-        <font>titlefnt</font>
+        <font>biginfo</font>
         <value>[ looking for ]</value>
       </textarea>
       <textarea name="title" draworder="0" align="center">
         <area>0,320,800,60</area>
-        <font>titlefnt</font>
+        <font>biginfo</font>
       </textarea>
     </container>
 
@@ -228,15 +180,15 @@
       <area>207,100,377,400</area>
       <listarea name="listing" draworder="4">
         <area>12,15,359,370</area>
-        <fcnfont name="active_font" function="active"></fcnfont>
-        <fcnfont name="inactive_font" function="inactive"></fcnfont>
-        <fcnfont name="active_font" function="selected"></fcnfont>
+        <fcnfont name="list-active" function="active"></fcnfont>
+        <fcnfont name="list-inactive" function="inactive"></fcnfont>
+        <fcnfont name="list-selected" function="selected"></fcnfont>
         <columnpadding>10</columnpadding>
         <column number="1" width="355" context="-1"></column>
         <items>11</items>
         <image function="selectionbar" filename="mv-sel.png" location="-14,-5"></image>
-        <image function="uparrow" filename="shared/up_arrow.png" location="350,15"></image>
-        <image function="downarrow" filename="shared/down_arrow.png" location="350,330"></image>
+        <image function="uparrow" filename="uparrow.png" location="350,15"></image>
+        <image function="downarrow" filename="downarrow.png" location="350,330"></image>
       </listarea>
       <image name="showinglines" draworder="3" fleximage="no">
         <filename>mv-mselect.png</filename>
@@ -251,12 +203,12 @@
         <position>0,0</position>
       </image>
       <textarea name="msg" draworder="7" align="center">
-        <font>directorfnt</font>
+        <font>info</font>
         <value>Enter IMDB #</value>
         <area>0,15,360,25</area>
       </textarea>
       <textarea name="numhold" draworder="7" align="center">
-        <font>titlefnt</font>
+        <font>biginfo</font>
         <area>0,57,360,50</area>
       </textarea>
     </container>
@@ -270,7 +222,7 @@
       </textarea>
       <textarea name="title" draworder="0" align="center">
         <area>0,320,800,60</area>
-        <font>titlefnt</font>
+        <font>biginfo</font>
       </textarea>
     </container>
 
@@ -284,7 +236,7 @@
     </container>
 
   </window>
-
+  
   <window name="browser">
 
     <font name="active_font" face="Arial">
