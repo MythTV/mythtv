@@ -28,10 +28,7 @@ VideoBrowser::VideoBrowser(QSqlDatabase *ldb,
 {
     updateML = false;
     
-        
-    fetchVideos();
     m_state = 0;
-
     curitem = NULL;
     inData = 0;
     
@@ -41,10 +38,12 @@ VideoBrowser::VideoBrowser(QSqlDatabase *ldb,
     if (!bgTransBackup)
         bgTransBackup = new QPixmap();
 
+    setNoErase();
+
+    fetchVideos();
+
     SetCurrentItem();
     updateBackground();
-
-    setNoErase();
 }
 
 VideoBrowser::~VideoBrowser()
