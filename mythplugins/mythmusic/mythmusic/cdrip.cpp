@@ -219,12 +219,12 @@ void Ripper::fixFilename(QString &filename, const QString &addition)
 {
     QString tempcopy = addition;
 
-    tempcopy.replace('/', '_');
-    tempcopy.replace('\\', '_');
-    tempcopy.replace(':', '_');
-    tempcopy.replace('?', '_');
-    tempcopy.replace('\'', '_');
-    tempcopy.replace('\"', '_');
+    tempcopy.replace(QRegExp("/"), QString("_"));
+    tempcopy.replace(QRegExp("\\"), QString("_"));
+    tempcopy.replace(QRegExp(":"), QString("_"));
+    tempcopy.replace(QRegExp("?"), QString("_"));
+    tempcopy.replace(QRegExp("\'"), QString("_"));
+    tempcopy.replace(QRegExp("\""), QString("_"));
 
     filename += "/" + tempcopy;
 }
