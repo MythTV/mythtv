@@ -5,7 +5,7 @@
 # Provides:       mythbackend
 # Required-Start: $network $remote_fs
 # Required-Stop:
-# Should-State:  mysql
+# Should-Start:  mysql
 # Default-Start:  2 3 5
 # Default-Stop:
 # Description:    Start the MythTV backend
