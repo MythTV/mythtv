@@ -13,6 +13,7 @@
       <text lang="SV">Spela musik</text>
       <text lang="FR">Jouer de la musique</text>
       <text lang="JA">ミュージック再生</text>
+      <text lang="FI">Soita Musiikkia</text>
       <action>MUSIC_PLAY</action>
    </button>
 
@@ -29,6 +30,7 @@
       <text lang="SV">Välj musik</text>
       <text lang="FR">Sélectionner de la musicale</text>
       <text lang="JA">ミュージック選択</text>
+      <text lang="FI">Valitse Musiikkia</text>
       <action>MUSIC_CREATE_PLAYLIST</action>
    </button>
 
@@ -45,6 +47,7 @@
       <text lang="SV">Importera CD</text>
       <text lang="FR">Importer un CD</text>
       <text lang="JA">CD取込</text>
+      <text lang="FI">Tuo CD</text>
       <action>MUSIC_RIP</action>
    </button>
 
@@ -61,6 +64,7 @@
       <text lang="SV">Scanna efter ny musik</text>
       <text lang="FR">Rechercher de la musique</text>
       <text lang="JA">新しいミュージックを検索</text>
+      <text lang="FI">Hae Uutta Musiikkia</text>
       <action>SETTINGS_SCAN</action>
    </button>
 
