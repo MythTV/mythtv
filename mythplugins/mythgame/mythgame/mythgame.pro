@@ -9,21 +9,18 @@ target.path = /usr/local/bin
 INSTALLS += target
 
 installfiles.path = /usr/local/share/mythtv
-installfiles.files = mythgame-settings.txt
+installfiles.files = mythgame-settings.txt gamemenu.xml
 
 INSTALLS += installfiles
 
 include ( ../settings.pro )
 
+LIBS += -L/usr/local/lib -lmyth
+
 # Input
-HEADERS += constants.h databasebox.h 
-HEADERS += menubox.h gamehandler.h mamehandler.h rominfo.h 
-HEADERS += settings.h mamerominfo.h
-HEADERS += themedmenu.h treeitem.h
-HEADERS += mamesettingsdlg.h extendedlistview.h
+HEADERS += constants.h databasebox.h gamehandler.h mamehandler.h rominfo.h 
+HEADERS += mamerominfo.h treeitem.h mamesettingsdlg.h extendedlistview.h
 
 SOURCES += databasebox.cpp 
-SOURCES += main.cpp menubox.cpp 
-SOURCES += settings.cpp gamehandler.cpp mamehandler.cpp rominfo.cpp
-SOURCES += themedmenu.cpp treeitem.cpp mamerominfo.cpp
-SOURCES += mamesettingsdlg.cpp extendedlistview.cpp
+SOURCES += main.cpp gamehandler.cpp mamehandler.cpp rominfo.cpp
+SOURCES += treeitem.cpp mamerominfo.cpp mamesettingsdlg.cpp extendedlistview.cpp

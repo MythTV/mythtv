@@ -2,7 +2,6 @@
 #include "mamehandler.h"
 #include "mamerominfo.h"
 #include "mamesettingsdlg.h"
-#include "settings.h"
 
 #include <qobject.h>
 #include <qptrlist.h>
@@ -12,6 +11,8 @@
 
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <mythtv/settings.h>
 
 extern Settings *globalsettings;
 
@@ -106,7 +107,7 @@ void MameHandler::processGames()
         xmame_drv = popen(drvcmd, "r");
 
         while (fgets(line, 500, xmame_info)) {
-                if (!strcmp(line, "game (")) {
+                if (!strncmp(line, "game (", 6)) {
                         romname = "Unknown";
                         gamename = "Unknown";
                         year = "-";

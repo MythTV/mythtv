@@ -1,1 +1,6 @@
 .qmake.internal.cache
+Makefile
+moc_databasebox.cpp
+moc_extendedlistview.cpp
+moc_mamesettingsdlg.cpp
+mythgame

@@ -4,7 +4,7 @@
 #include <qimage.h>
 
 #include "treeitem.h"
-#include "settings.h"
+#include <mythtv/settings.h>
 
 extern Settings *globalsettings;
 

@@ -1,5 +1,4 @@
 #include "mamesettingsdlg.h"
-#include "settings.h"
 #include <iostream.h>
 
 #include <qapplication.h>
@@ -18,6 +17,8 @@
 #include <qtooltip.h>
 #include <qwhatsthis.h>
 #include <qimage.h>
+
+#include <mythtv/settings.h>
 
 extern Settings *globalsettings;
 
@@ -43,13 +44,13 @@ MameSettingsDlg::MameSettingsDlg( QWidget* parent,  const char* name, bool modal
     setSizePolicy( QSizePolicy( (QSizePolicy::SizeType)0, (QSizePolicy::SizeType)0, 0, 0, sizePolicy().hasHeightForWidth() ) );
     setMinimumSize( QSize( screenwidth, screenheight ) );
     setMaximumSize( QSize( screenwidth, screenheight ) );
-    setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
+    //setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
     setCaption( trUtf8( "XMame Settings" ) );
 
     MameTab = new QTabWidget( this, "MameTab" );
     MameTab->setGeometry( QRect( 0, 0, screenwidth, screenheight ) );
     MameTab->setSizePolicy( QSizePolicy( (QSizePolicy::SizeType)0, (QSizePolicy::SizeType)0, 0, 0, MameTab->sizePolicy().hasHeightForWidth() ) );
-    MameTab->setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
+    //MameTab->setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
     MameTab->setBackgroundOrigin( QTabWidget::WindowOrigin );
     QFont MameTab_font(  MameTab->font() );
     MameTab_font.setFamily( "Helvetica [Urw]" );
@@ -61,13 +62,13 @@ MameSettingsDlg::MameSettingsDlg( QWidget* parent,  const char* name, bool modal
 
     SettingsFrame = new QFrame( SettingsTab, "SettingsFrame" );
     SettingsFrame->setGeometry( QRect( 0, 33, 800, 480 ) );
-    SettingsFrame->setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
+    //SettingsFrame->setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
     SettingsFrame->setFrameShape( QFrame::StyledPanel );
     SettingsFrame->setFrameShadow( QFrame::Raised );
 
     DisplayGroup = new QGroupBox( SettingsFrame, "DisplayGroup" );
     DisplayGroup->setGeometry( QRect( 0, 10, 420, 480 ) );
-    DisplayGroup->setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
+    //DisplayGroup->setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
     DisplayGroup->setTitle( trUtf8( "Display" ) );
 
     FullCheck = new QCheckBox( DisplayGroup, "FullCheck" );
@@ -178,7 +179,7 @@ MameSettingsDlg::MameSettingsDlg( QWidget* parent,  const char* name, bool modal
 
     SoundGroup = new QGroupBox( SettingsFrame, "SoundGroup" );
     SoundGroup->setGeometry( QRect( 410, 230, 390, 160 ) ); 
-    SoundGroup->setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
+    //SoundGroup->setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
     SoundGroup->setTitle( trUtf8( "Sound" ) );
 
     VolumeLabel = new QLabel( SoundGroup, "VolumeLabel" );
@@ -209,7 +210,7 @@ MameSettingsDlg::MameSettingsDlg( QWidget* parent,  const char* name, bool modal
 
     MiscGroup = new QGroupBox( SettingsFrame, "MiscGroup" );
     MiscGroup->setGeometry( QRect( 407, 390, 391, 91 ) ); 
-    MiscGroup->setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
+    //MiscGroup->setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
     MiscGroup->setTitle( trUtf8( "Miscelaneous" ) );
 
     OptionsLabel = new QLabel( MiscGroup, "OptionsLabel" );
@@ -227,7 +228,7 @@ MameSettingsDlg::MameSettingsDlg( QWidget* parent,  const char* name, bool modal
 
     InputGroup = new QGroupBox( SettingsFrame, "InputGroup" );
     InputGroup->setGeometry( QRect( 410, 0, 410, 230 ) ); 
-    InputGroup->setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
+    //InputGroup->setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
     InputGroup->setTitle( trUtf8( "Input" ) );
 
     JoyLabel = new QLabel( InputGroup, "JoyLabel" );

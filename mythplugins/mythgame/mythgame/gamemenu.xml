@@ -1,0 +1,9 @@
+<mythmenu>
+
+  <button>
+     <type>GAME</type>
+     <text>Games</text>
+     <action>GAME_PLAY</action>
+  </button>
+
+</mythmenu>

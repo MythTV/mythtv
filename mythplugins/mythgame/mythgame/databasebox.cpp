@@ -10,8 +10,9 @@
 #include "rominfo.h"
 #include "databasebox.h"
 #include "treeitem.h"
-#include "settings.h"
 #include "gamehandler.h"
+
+#include <mythtv/settings.h>
 
 extern Settings *globalsettings;
 

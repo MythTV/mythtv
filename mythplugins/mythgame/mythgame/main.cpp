@@ -8,13 +8,12 @@ using namespace std;
 
 #include "gamehandler.h"
 #include "databasebox.h"
-#include "themedmenu.h"
-#include "menubox.h"
-#include "settings.h"
 #include "rominfo.h"
 
-Settings *globalsettings;
+#include <mythtv/themedmenu.h>
+#include <mythtv/settings.h>
 
+Settings *globalsettings;
 char theprefix[] = "/usr/local";
 
 void startDatabaseTree(QSqlDatabase *db, QString &paths,
@@ -26,52 +25,46 @@ void startDatabaseTree(QSqlDatabase *db, QString &paths,
     dbbox.exec();
 }
 
-bool runMenu(bool usetheme, QString themedir, QSqlDatabase *db,
+struct GameCBData
+{
+    QString paths;
+    QSqlDatabase *db;
+    QValueList<RomInfo> *romlist;
+};
+
+void GameCallback(void *data, QString &selection)
+{
+    GameCBData *gdata = (GameCBData *)data;
+
+    QString sel = selection.lower();
+
+    if (sel == "game_play")
+        startDatabaseTree(gdata->db, gdata->paths, gdata->romlist);
+}
+
+bool runMenu(QString themedir, QSqlDatabase *db,
              QString paths, QValueList<RomInfo> &romlist)
 {
-    if (usetheme)
-    {
-        ThemedMenu *diag = new ThemedMenu(themedir.ascii(), "game.menu");
+    ThemedMenu *diag = new ThemedMenu(themedir.ascii(), theprefix, 
+                                      "gamemenu.xml");
+
+    GameCBData data;
+    data.paths = paths;
+    data.db = db;
+    data.romlist = &romlist;
+
+    diag->setCallback(GameCallback, &data);
+    diag->setKillable();
         
-        if (diag->foundTheme())
-        {
-            diag->Show();
-            diag->exec();
-            
-            QString sel = diag->getSelection().lower();
-
-            bool retval = true;
-
-            if (sel == "play_game")
-                startDatabaseTree(db, paths, &romlist);
-            else
-                retval = false;
-
-            delete diag;
-
-            return retval;
-        }
-    }
-
-    MenuBox diag("MythGame");
-
-    diag.AddButton("Game");
-
-    diag.Show();
-       
-    int result = diag.exec();
-
-    bool retval = true;
-      
-    switch (result)
-    {   
-        case 1: startDatabaseTree(db, paths, &romlist); break;
-        default: break;
-    }
-    if (result == 0)
-        retval = false;
-
-    return retval;
+    if (diag->foundTheme())
+    {
+        diag->Show();
+        diag->exec();
+    }     
+    else
+    {
+        cerr << "Couldn't find theme " << themedir << endl;
+    }       
 }
 
 int main(int argc, char *argv[])
@@ -83,6 +76,7 @@ int main(int argc, char *argv[])
     globalsettings->LoadSettingsFiles("mythgame-settings.txt", theprefix);
     globalsettings->LoadSettingsFiles("theme.txt", theprefix);
     globalsettings->LoadSettingsFiles("mysql.txt", theprefix);
+
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
     {
@@ -106,15 +100,15 @@ int main(int argc, char *argv[])
     QValueList<RomInfo> Romlist;
 
     QString themename = globalsettings->GetSetting("Theme");
+
     QString themedir = findThemeDir(themename, theprefix);
-    bool usetheme = true;
     if (themedir == "")
-        usetheme = false;
-    while (1)
     {
-        if (!runMenu(usetheme, themedir, db, paths, Romlist))
-            break;
+        cerr << "Couldn't find theme " << themename << endl;
+        exit(0);
     }
+
+    runMenu(themedir, db, paths, Romlist);
 
     db->close();
 
