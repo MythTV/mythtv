@@ -78,6 +78,9 @@ private:
     int            m_TimerTimeout;
     unsigned int   m_UpdateFreq;
 
+    QString        timeFormat;
+    QString        dateFormat;
+
 private slots:
 
     void slotRetrieveNews();

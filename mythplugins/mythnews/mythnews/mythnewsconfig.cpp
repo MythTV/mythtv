@@ -131,8 +131,8 @@ MythNewsConfig::MythNewsConfig(QSqlDatabase *db,
     m_Context     = 0;
     m_InColumn    = 0;
 
-    m_UISelector->AddItem("Select News Feeds");
-    m_UISelector->AddItem("Set Update Frequency");
+    m_UISelector->AddItem(tr("Select News Feeds"));
+    m_UISelector->AddItem(tr("Set Update Frequency"));
     m_UISelector->SetActive(true);
 }
 
@@ -299,8 +299,8 @@ void MythNewsConfig::loadTheme()
 
     UITextType* ttype = (UITextType*)container->GetType("help");
     if (ttype) {
-        ttype->SetText("Set Update Frequency in Minutes\n"
-                       "Minimum allowed value is 30 Minutes");
+        ttype->SetText(tr("Set Update Frequency in Minutes\n"
+                          "Minimum allowed value is 30 Minutes"));
     }
         
     

@@ -56,6 +56,9 @@ MythNews::MythNews(QSqlDatabase *db, MythMainWindow *parent,
     m_UIArticles   = 0;
     m_TimerTimeout = 10*60*1000; 
 
+    timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
+    dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+
     setNoErase();
     loadTheme();
 
@@ -287,14 +290,14 @@ void MythNews::updateInfoView()
 
             if (site)
             {
-                QString text("Updated\n");
+                QString text(tr("Updated") + "\n");
                 QDateTime updated(site->lastUpdated());
                 if (updated.toTime_t() != 0) {
-                    text += site->lastUpdated().toString("ddd MMM d") + "\n";
-                    text += site->lastUpdated().toString("hh:mm AP");
+                    text += site->lastUpdated().toString(dateFormat) + "\n";
+                    text += site->lastUpdated().toString(timeFormat);
                 }
                 else
-                    text += "Unknown";
+                    text += tr("Unknown");
                 ttype->SetText(text);
             }
         }

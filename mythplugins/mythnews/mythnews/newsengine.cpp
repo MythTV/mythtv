@@ -199,7 +199,7 @@ void NewsSite::process()
     m_articleList.clear();
 
     if (m_state == RetrieveFailed)
-        m_errorString = "Retrieve Failed. ";
+        m_errorString = tr("Retrieve Failed. ");
     else
         m_errorString = "";
 
@@ -207,27 +207,27 @@ void NewsSite::process()
 
     QFile xmlFile(m_destDir+QString("/")+m_name);
     if (!xmlFile.exists()) {
-        new NewsArticle(this, "Failed to retrieve news", "");
-        m_errorString += "No Cached News";
+        new NewsArticle(this, tr("Failed to retrieve news"), "");
+        m_errorString += tr("No Cached News");
         return;
     }
 
     if (!xmlFile.open(IO_ReadOnly)) {
-        new NewsArticle(this, "Failed to retrieve news", "");
+        new NewsArticle(this, tr("Failed to retrieve news"), "");
         cerr << "MythNews: NewsEngine: failed to open xmlfile" << endl;
         return;
     }
 
     if (!domDoc.setContent(&xmlFile)) {
-        new NewsArticle(this, "Failed to retrieve news", "");
+        new NewsArticle(this, tr("Failed to retrieve news"), "");
         cerr << "MythNews: NewsEngine: failed to set content from xmlfile" << endl;
-        m_errorString += "Failed to read downloaded file";
+        m_errorString += tr("Failed to read downloaded file");
         return;
     }
 
 
     if (m_state == RetrieveFailed)
-        m_errorString += "Showing Cached News";
+        m_errorString += tr("Showing Cached News");
 
     QDomNode channelNode = domDoc.documentElement().namedItem(QString::fromLatin1("channel"));
 
