@@ -107,6 +107,69 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
         <source>Genre: </source>
         <translation>Genre: </translation>
     </message>
+    <message>
+        <source>Compilation Artist:<byte value="x9"/></source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EditMetadataDialog</name>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DB Statistics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Various Artists</source>
+        <translation type="unfinished">Blandade artister</translation>
+    </message>
+    <message>
+        <source>Select an Artist</source>
+        <translation type="unfinished">Välj en artist</translation>
+    </message>
+    <message>
+        <source>Select a Compilation Artist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select an Album</source>
+        <translation type="unfinished">Välj ett album</translation>
+    </message>
+    <message>
+        <source>Select a Genre</source>
+        <translation type="unfinished">Välj en genre</translation>
+    </message>
+    <message>
+        <source>Save Changes?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save to Database Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save to File Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save to File and Database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit/Do Not Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Avbryt</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to save the modified metadata to the file?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PlaybackBoxMusic</name>
@@ -220,27 +283,27 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     </message>
     <message>
         <source>Smart playlists</source>
-        <translation type="unfinished"></translation>
+        <translation>Smarta spellistor</translation>
     </message>
     <message>
         <source>All Tracks</source>
-        <translation type="unfinished"></translation>
+        <translation>Alla spår</translation>
     </message>
     <message>
         <source>Tracks by current Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Spår av aktuell artist</translation>
     </message>
     <message>
         <source>Tracks from current Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Spår från aktuellt album</translation>
     </message>
     <message>
         <source>Tracks from current Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Spår från aktuell genre</translation>
     </message>
     <message>
         <source>Tracks from current Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Spår från aktuellt år</translation>
     </message>
 </context>
 <context>
@@ -803,6 +866,10 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
 * Mellanslagsseparerad lista med &apos;genre&apos;, &apos;splitartist&apos;, &apos;artist&apos;, &apos;album&apos; och &apos;title&apos;
 * &apos;directory&apos; (=katalog), vilket betyder att trädet speglar den faktiska katalogstrukturen.</translation>
     </message>
+    <message>
+        <source>CD: %1 ~ %2 - %3</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Ripper</name>
@@ -858,97 +925,145 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
         <translation>Kopierar från CD:
 </translation>
     </message>
+    <message>
+        <source>Multi-Artist?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch Titles &amp;&amp; Artists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Artist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Length</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SmartPLCriteriaRow</name>
     <message>
         <source>Select an Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj en artist</translation>
     </message>
     <message>
         <source>Select an Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj ett album</translation>
     </message>
     <message>
         <source>Select a Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj en genre</translation>
     </message>
     <message>
         <source>Select a Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj en titel</translation>
     </message>
 </context>
 <context>
     <name>SmartPLOrderByDialog</name>
     <message>
         <source>Order By Fields</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortera efter fält</translation>
     </message>
     <message>
         <source>1 Add</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Lägg till</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till</translation>
     </message>
     <message>
         <source>2 Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>2 Radera</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Radera</translation>
     </message>
     <message>
         <source>3 Move Up</source>
-        <translation type="unfinished"></translation>
+        <translation>3 Flytta upp</translation>
     </message>
     <message>
         <source>Move Up</source>
-        <translation type="unfinished"></translation>
+        <translation>Flytta upp</translation>
     </message>
     <message>
         <source>4 Move Down</source>
-        <translation type="unfinished"></translation>
+        <translation>4 Flytta ned</translation>
     </message>
     <message>
         <source>Move Down</source>
-        <translation type="unfinished"></translation>
+        <translation>Flytta ned</translation>
     </message>
     <message>
         <source>5 Ascending</source>
-        <translation type="unfinished"></translation>
+        <translation>5 Stigande</translation>
     </message>
     <message>
         <source>Ascending</source>
-        <translation type="unfinished"></translation>
+        <translation>Stigande</translation>
     </message>
     <message>
         <source>6 Descending</source>
-        <translation type="unfinished"></translation>
+        <translation>6 Fallande</translation>
     </message>
     <message>
         <source>Descending</source>
-        <translation type="unfinished"></translation>
+        <translation>Fallande</translation>
     </message>
     <message>
         <source>7 OK</source>
-        <translation type="unfinished"></translation>
+        <translation>7 OK</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
     <name>SmartPLResultViewer</name>
     <message>
         <source>Smart Playlist Result Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Smart spellistsresultatvisare</translation>
     </message>
     <message>
         <source>Exit</source>
+        <translation>Avsluta</translation>
+    </message>
+    <message>
+        <source>ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Artist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Genre</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Year</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track No.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -956,38 +1071,42 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     <name>SmartPlaylistDialog</name>
     <message>
         <source>Smart Playlists</source>
-        <translation type="unfinished"></translation>
+        <translation>Smarta spellistor</translation>
     </message>
     <message>
         <source>1 Select</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Välj</translation>
     </message>
     <message>
         <source>Select</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj</translation>
     </message>
     <message>
         <source>2 New</source>
-        <translation type="unfinished"></translation>
+        <translation>2 Ny</translation>
     </message>
     <message>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>Ny</translation>
     </message>
     <message>
         <source>3 Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>3 Redigera</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Redigera</translation>
     </message>
     <message>
         <source>4 Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>4 Radera</translation>
     </message>
     <message>
         <source>Delete</source>
+        <translation>Radera</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this SmartPlaylist?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -995,74 +1114,86 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     <name>SmartPlaylistEditor</name>
     <message>
         <source>Smart Playlist Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Smart spellistseditor</translation>
     </message>
     <message>
         <source>Category:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategori:</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished">Titel: </translation>
+        <translation>Titel: </translation>
     </message>
     <message>
         <source>Match</source>
-        <translation type="unfinished"></translation>
+        <translation>Träff</translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>Alla</translation>
     </message>
     <message>
         <source>Any</source>
-        <translation type="unfinished"></translation>
+        <translation>Någon</translation>
     </message>
     <message>
         <source>Of The Following Conditions</source>
-        <translation type="unfinished"></translation>
+        <translation>av följande villkor</translation>
     </message>
     <message>
         <source>Order By:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordna efter:</translation>
     </message>
     <message>
         <source>Matches:</source>
-        <translation type="unfinished"></translation>
+        <translation>Träffar:</translation>
     </message>
     <message>
         <source>Limit:</source>
-        <translation type="unfinished"></translation>
+        <translation>Gräns:</translation>
+    </message>
+    <message>
+        <source></source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>Spara</translation>
+    </message>
+    <message>
+        <source>Show Results</source>
+        <translation>Visa resultat</translation>
+    </message>
+    <message>
+        <source>Smart Playlist Categories</source>
+        <translation>Smarta spellistskategorier</translation>
+    </message>
+    <message>
+        <source>New Category</source>
+        <translation>Ny kategori</translation>
+    </message>
+    <message>
+        <source>Delete Category</source>
+        <translation>Radera kategori</translation>
+    </message>
+    <message>
+        <source>Rename Category</source>
+        <translation>Byt namn på kategori</translation>
     </message>
     <message>
         <source> </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cancel</source>
+        <source>Are you sure you want to delete this Category?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Save</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show Results</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Smart Playlist Categories</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>New Category</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Delete Category</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rename Category</source>
+        <source>It will also delete any Smart Playlists belonging to this category.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

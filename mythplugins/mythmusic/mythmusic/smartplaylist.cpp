@@ -1207,9 +1207,9 @@ void SmartPlaylistEditor::deleteCategory(void)
     
     if (!MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(), 
             "Delete Category",
-            "Are you sure you want to delete this Category? \n\n" 
-            "\"" + category + "\""
-            "\n\nIt will also delete any Smart Playlists belonging to this category", 
+            tr("Are you sure you want to delete this Category?")
+            + "\n\n\"" + category + "\"\n\n"
+            + tr("It will also delete any Smart Playlists belonging to this category."), 
              false))
         return;    
     
@@ -1481,13 +1481,13 @@ SmartPLResultViewer::SmartPLResultViewer(MythMainWindow *parent, const char *nam
     // listview
     hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
     listView = new MythListView(this);
-    listView->addColumn("ID");
-    listView->addColumn("Artist");
-    listView->addColumn("Album");
-    listView->addColumn("Title");
-    listView->addColumn("Genre");
-    listView->addColumn("Year");
-    listView->addColumn("Track No.");
+    listView->addColumn(tr("ID"));
+    listView->addColumn(tr("Artist"));
+    listView->addColumn(tr("Album"));
+    listView->addColumn(tr("Title"));
+    listView->addColumn(tr("Genre"));
+    listView->addColumn(tr("Year"));
+    listView->addColumn(tr("Track No."));
     listView->setSorting(-1);         // disable sorting
     hbox->addWidget(listView);    
     
@@ -1759,8 +1759,8 @@ void SmartPlaylistDialog::deletePressed(void)
     
     if (!MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(), 
             "Delete SmartPlaylist",
-            "Are you sure you want to delete this SmartPlaylist? \n\n" 
-             "\"" + name + "\"", false))
+            tr("Are you sure you want to delete this SmartPlaylist?")
+            + "\n\n\"" + name + "\"", false))
     {    
         deleteButton->setFocus();   
         return;    

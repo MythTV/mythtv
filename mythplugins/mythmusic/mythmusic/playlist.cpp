@@ -37,7 +37,9 @@ void Track::postLoad(PlaylistsContainer *grandparent)
                                                  bad_reference);
     }
     else
+    {
         label = all_available_music->getLabel(index_value * -1, &bad_reference);
+    }
 }
 
 void Track::setParent(Playlist *parent_ptr)
@@ -828,7 +830,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
                 Metadata *tmpdata = all_available_music->getMetadata(it->getValue());
                 if (tmpdata)
                 {
-                    QString a_string = QString(QObject::tr("%1 ~ %2")).arg(tmpdata->Artist()).arg(tmpdata->Title());
+                    QString a_string = QString(QObject::tr("%1 ~ %2")).arg(tmpdata->FormatArtist()).arg(tmpdata->FormatTitle());
                     GenericTree *added_node = tree_to_write_to->addNode(a_string, it->getValue(), true);
                     ++a_counter;
                     added_node->setAttribute(0, 1);
@@ -874,9 +876,11 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
             Metadata *tmpdata = all_available_music->getMetadata(it->getValue());
             if (tmpdata)
             {
-                QString a_string = QString(QObject::tr("%1 ~ %2")).arg(tmpdata->Artist()).arg(tmpdata->Title());
-                if(tmpdata->Artist().length() < 1 ||
-                   tmpdata-> Title().length() < 1)
+                QString a_string = QString(QObject::tr("CD: %1 ~ %2 - %3"))
+                  .arg(tmpdata->FormatArtist()).arg(tmpdata->Track()).arg(tmpdata->FormatTitle());
+
+                if(tmpdata->FormatArtist().length() < 1 ||
+                   tmpdata->FormatTitle().length() < 1)
                 {
                     a_string = QString("CD Track %1").arg(tmpdata->Track());
                 }

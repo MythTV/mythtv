@@ -3,6 +3,8 @@
 
 #include <qregexp.h>
 
+#define MYTH_MUSICBRAINZ_ALBUMARTIST_UUID "89ad4ac3-39f7-470e-963a-56509c546377"
+
 // No need to include all the Metadata stuff just for the abstract pointer....
 class Metadata;
 

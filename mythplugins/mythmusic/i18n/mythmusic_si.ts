@@ -105,6 +105,69 @@
         <source>Clear CD-RW Disk</source>
         <translation>Izbriši CD-RW</translation>
     </message>
+    <message>
+        <source>Compilation Artist:<byte value="x9"/></source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EditMetadataDialog</name>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DB Statistics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Various Artists</source>
+        <translation type="unfinished">Različni izvajalci</translation>
+    </message>
+    <message>
+        <source>Select an Artist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a Compilation Artist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select an Album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a Genre</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Changes?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save to Database Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save to File Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save to File and Database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit/Do Not Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to save the modified metadata to the file?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PlaybackBox</name>
@@ -910,6 +973,10 @@
         <source>?</source>
         <translation>?</translation>
     </message>
+    <message>
+        <source>CD: %1 ~ %2 - %3</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Ripper</name>
@@ -964,6 +1031,26 @@
 </source>
         <translation>Kopiranje iz CD-ja:
 </translation>
+    </message>
+    <message>
+        <source>Multi-Artist?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch Titles &amp;&amp; Artists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Artist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Length</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1058,6 +1145,34 @@
         <source>Exit</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Artist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Genre</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Year</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track No.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SmartPlaylistDialog</name>
@@ -1095,6 +1210,10 @@
     </message>
     <message>
         <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this SmartPlaylist?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1141,7 +1260,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source> </source>
+        <source></source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1170,6 +1289,18 @@
     </message>
     <message>
         <source>Rename Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this Category?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It will also delete any Smart Playlists belonging to this category.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -16,17 +16,20 @@ class AllMusic;
 class Metadata
 {
   public:
-    Metadata(QString lfilename = "", QString lartist = "", QString lalbum = "", 
-             QString ltitle = "", QString lgenre = "", int lyear = 0, 
-             int ltracknum = 0, int llength = 0, int lid = 0,
+    Metadata(QString lfilename = "", QString lartist = "", QString lcompilation_artist = "", 
+             QString lalbum = "", QString ltitle = "", QString lgenre = "",
+             int lyear = 0, int ltracknum = 0, int llength = 0, int lid = 0,
              int lrating = 0, int lplaycount = 0, QString llastplay = "",
              bool lcompilation = false)
             {
                 filename = lfilename;
                 artist = lartist;
+                compilation_artist = lcompilation_artist;
                 album = lalbum;
                 title = ltitle;
-                genre = lgenre;
+                formattedartist = "";
+                formattedtitle = "";
+                 genre = lgenre;
                 year = lyear;
                 tracknum = ltracknum;
                 length = llength;
@@ -42,8 +45,11 @@ class Metadata
             {
                 filename = other.filename;
                 artist = other.artist;
+                compilation_artist = other.compilation_artist;
                 album = other.album;
                 title = other.title;
+                formattedartist = other.formattedartist;
+                formattedtitle = other.formattedtitle;
                 genre = other.genre;
                 year = other.year;
                 tracknum = other.tracknum;
@@ -59,13 +65,19 @@ class Metadata
     Metadata& operator=(Metadata *rhs);
 
     QString Artist() { return artist; }
-    void setArtist(const QString &lartist) { artist = lartist; }
+    void setArtist(const QString &lartist) { artist = lartist; formattedartist = formattedtitle = ""; }
+    
+    QString CompilationArtist() { return compilation_artist; }
+    void setCompilationArtist(const QString &lcompilation_artist) { compilation_artist = lcompilation_artist; formattedartist = formattedtitle = ""; }
     
     QString Album() { return album; }
-    void setAlbum(const QString &lalbum) { album = lalbum; }
+    void setAlbum(const QString &lalbum) { album = lalbum; formattedartist = formattedtitle = ""; }
 
     QString Title() { return title; }
     void setTitle(const QString &ltitle) { title = ltitle; }
+
+    QString FormatArtist();
+    QString FormatTitle();
 
     QString Genre() { return genre; }
     void setGenre(const QString &lgenre) { genre = lgenre; }
@@ -101,7 +113,8 @@ class Metadata
 
     // track is part of a compilation album
     bool Compilation() { return compilation; }
-    void setCompilation(bool state) { compilation = state; };
+    void setCompilation(bool state) { compilation = state; formattedartist = formattedtitle = ""; }
+    bool determineIfCompilation(bool cd = false);
     
     bool isInDatabase(QSqlDatabase *db, QString startdir);
     void dumpToDatabase(QSqlDatabase *db, QString startdir);
@@ -114,13 +127,20 @@ class Metadata
     void fillDataFromID(QSqlDatabase *db);
     void persist(QSqlDatabase *db);
     bool hasChanged(){return changed;}
+    static void setArtistAndTrackFormats();
 
     static void SetStartdir(const QString &dir);
 
   private:
+    void setCompilationFormatting(bool cd = false);
+    QString formatReplaceSymbols(const QString &format);
+
     QString artist;
+    QString compilation_artist;
     QString album;
     QString title;
+    QString formattedartist;
+    QString formattedtitle;
     QString genre;
     int year;
     int tracknum;
@@ -135,6 +155,17 @@ class Metadata
     bool    changed;
 
     static QString m_startdir;
+
+    // Various formatting strings
+    static QString formatnormalfileartist;
+    static QString formatnormalfiletrack;
+    static QString formatnormalcdartist;
+    static QString formatnormalcdtrack;
+
+    static QString formatcompilationfileartist;
+    static QString formatcompilationfiletrack;
+    static QString formatcompilationcdartist;
+    static QString formatcompilationcdtrack;
 };
 
 bool operator==(const Metadata& a, const Metadata& b);

@@ -43,6 +43,10 @@ Ripper::Ripper(QSqlDatabase *ldb, MythMainWindow *parent, const char *name)
 {
     db = ldb;
 
+    // Set this to false so we can tell if the ripper has done anything
+    // (i.e. we can tell if the user quit prior to ripping)
+    somethingwasripped = false;
+
     QString cddevice = gContext->GetSetting("CDDevice");
 
     int cdrom_fd = cd_init_device((char*)cddevice.ascii());
@@ -56,11 +60,6 @@ Ripper::Ripper(QSqlDatabase *ldb, MythMainWindow *parent, const char *name)
 
     cd_finish(cdrom_fd);
     
-    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
-    
-
-    Metadata *track = decoder->getLastMetadata();
-
     bigvb = new QVBoxLayout(this, 0);
 
     firstdiag = new QFrame(this);
@@ -108,94 +107,159 @@ Ripper::Ripper(QSqlDatabase *ldb, MythMainWindow *parent, const char *name)
     QLabel *artistl = new QLabel(tr("Artist: "), firstdiag);
     artistl->setBackgroundOrigin(WindowOrigin);
     artistedit = new MythComboBox(true, firstdiag);
+
+    // Quick and dirty hack: Find a better way of calc'ing a max width!!
+    // Large artist lists will create a massively wide listbox here
+    // which totally messes up the rest of the page.
+    artistedit->setMaximumWidth((int)(0.7 * screenwidth));
+
     fillComboBox(*artistedit, "artist");
-    if (track)
-    {
-        artistedit->setCurrentText(track->Artist());
-        artistname = track->Artist();
-    }
-    connect(artistedit, SIGNAL(activated(const QString &)),
-            artistedit, SIGNAL(textChanged(const QString &)));
-    connect(artistedit, SIGNAL(textChanged(const QString &)),
-            this, SLOT(artistChanged(const QString &)));
 
     QLabel *albuml = new QLabel(tr("Album: "), firstdiag);
     albuml->setBackgroundOrigin(WindowOrigin);
     albumedit = new MythLineEdit(firstdiag);
     albumedit->setRW();
-    if (track)
-    {
-        albumedit->setText(track->Album());
-        albumname = track->Album();
-    }
-    connect(albumedit, SIGNAL(textChanged(const QString &)), 
-            this, SLOT(albumChanged(const QString &))); 
 
     QLabel *genrelabel = new QLabel(tr("Genre: "), firstdiag);
     genrelabel->setBackgroundOrigin(WindowOrigin);
     genreedit = new MythComboBox(true, firstdiag);
     fillComboBox (*genreedit, "genre");
-    if (track)
-    {
-       genreedit->setCurrentText(track->Genre());
-       genrename = track->Genre();
-    }
-    connect(genreedit, SIGNAL(activated(const QString &)),
-            genreedit, SIGNAL(textChanged(const QString &)));
-    connect(genreedit, SIGNAL(textChanged(const QString &)),
-            this, SLOT(genreChanged(const QString &)));
- 
+
+
+    compilation = new MythCheckBox(firstdiag);
+    compilation->setBackgroundOrigin(WindowOrigin);
+    compilation->setText(tr("Multi-Artist?"));
+
+
+    // Create a button for swapping the names of the artist and the track title.
+    switchtitleartist = new MythPushButton(tr("Switch Titles && Artists"), firstdiag);
+
+    connect(switchtitleartist, SIGNAL(clicked()), this, SLOT(switchTitlesAndArtists())); 
+    
+
     grid->addMultiCellWidget(artistl, 0, 0, 0, 0);
     grid->addMultiCellWidget(artistedit,  0, 0, 1, 2);
     grid->addMultiCellWidget(albuml, 1, 1, 0, 0);
     grid->addMultiCellWidget(albumedit,  1, 1, 1, 2);
     grid->addMultiCellWidget(genrelabel, 2, 2, 0, 0);
     grid->addMultiCellWidget(genreedit, 2, 2, 1, 2);
+    grid->addMultiCellWidget(compilation, 3, 3, 0, 0);
+    grid->addMultiCellWidget(switchtitleartist, 3, 3, 1, 2);
 
     table = new MythTable(firstdiag);
-    grid->addMultiCellWidget(table, 3, 3, 0, 2);
-    table->setNumCols(3);
-    table->setTopMargin(0);    
+    grid->addMultiCellWidget(table, 4, 4, 0, 2);
+    table->setNumCols(4);
     table->setLeftMargin(0);
     table->setNumRows(1);
+    table->setTopMargin(36);    
+    table->horizontalHeader()->setLabel(0, "#");
+    table->horizontalHeader()->setLabel(1, tr("Title"));
+    table->horizontalHeader()->setLabel(2, tr("Artist"));
+    table->horizontalHeader()->setLabel(3, tr("Length"));
     table->setColumnReadOnly(0, true);
-    table->setColumnReadOnly(2, true);
+    table->setColumnReadOnly(3, true);
     table->setColumnStretchable(1, true);
+    table->setColumnStretchable(2, true);
     table->setCurrentCell(0, 1);
 
-    int row = 0;
-    QString label;
-    int length, min, sec;
 
-    for (int trackno = 0; trackno < decoder->getNumTracks(); trackno++)
+    // Set the values of the widgets.
+
+    bool iscompilation = false;
+
+    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
+
+    if (decoder)
     {
-        track = decoder->getMetadata(trackno + 1);
-        if (track)
+
+        int row = 0;
+        QString label;
+        int length, min, sec;
+        Metadata *track;
+
+        for (int trackno = 0; trackno < decoder->getNumTracks(); trackno++)
         {
-            length = track->Length() / 1000;
-            min = length / 60;
-            sec = length % 60;
+            track = decoder->getMetadata(trackno + 1);
+            if (track)
+            {
+                if (track->Compilation())
+                {
+                    iscompilation = true;
+                    artistname = track->CompilationArtist();
+                }
+                else if ("" == artistname)
+                {
+                    artistname = track->Artist();
+                }
 
-            table->setNumRows(row + 1);
+                if ("" == albumname)
+                    albumname = track->Album();
 
-            table->setRowHeight(row, (int)(30 * hmult));
+                if ("" == genrename 
+                    && "" != track->Genre())
+                {
+                    genrename = track->Genre();
+                }
 
-            label.sprintf("%d", trackno + 1);
-            table->setText(row, 0, label);
-
-            table->setText(row, 1, track->Title());
-
-            label.sprintf("%02d:%02d", min, sec);
-            table->setText(row, 2, label);
-
-            row++;
-            delete track;
+                length = track->Length() / 1000;
+                min = length / 60;
+                sec = length % 60;
+                
+                table->setNumRows(row + 1);
+                
+                table->setRowHeight(row, (int)(30 * hmult));
+                
+                label.sprintf("%d", trackno + 1);
+                table->setText(row, 0, label);
+                
+                table->setText(row, 1, track->Title());
+                
+                table->setText(row, 2, track->Artist());
+                
+                label.sprintf("%02d:%02d", min, sec);
+                table->setText(row, 3, label);
+                
+                row++;
+                delete track;
+            }
         }
+        
+        artistedit->setCurrentText(artistname);
+        albumedit->setText(albumname);
+        genreedit->setCurrentText(genrename);
+        compilation->setChecked(iscompilation);
+
+        if (!iscompilation)
+        {
+          switchtitleartist->hide();
+          table->hideColumn(2);
+        }
+
+        totaltracks = decoder->getNumCDAudioTracks();
+
+        
+        delete decoder;
     }
 
-    totaltracks = decoder->getNumCDAudioTracks();
 
-    delete decoder;
+
+    // Now that all defualt values are set, let's connect some events...
+    connect(artistedit, SIGNAL(activated(const QString &)),
+            artistedit, SIGNAL(textChanged(const QString &)));
+    connect(artistedit, SIGNAL(textChanged(const QString &)),
+            this, SLOT(artistChanged(const QString &)));
+
+    
+    connect(albumedit, SIGNAL(textChanged(const QString &)), 
+            this, SLOT(albumChanged(const QString &))); 
+
+    connect(genreedit, SIGNAL(activated(const QString &)),
+            genreedit, SIGNAL(textChanged(const QString &)));
+    connect(genreedit, SIGNAL(textChanged(const QString &)),
+            this, SLOT(genreChanged(const QString &)));
+ 
+    connect(compilation, SIGNAL(toggled(bool)),
+            this, SLOT(compilationChanged(bool)));
 
     connect(table, SIGNAL(valueChanged(int, int)), this, 
             SLOT(tableChanged(int, int)));
@@ -217,13 +281,30 @@ QSizePolicy Ripper::sizePolicy(void)
     return QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
+bool Ripper::somethingWasRipped()
+{
+    return somethingwasripped;
+}
+
 void Ripper::artistChanged(const QString &newartist)
 {
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
     Metadata *data = decoder->getMetadata(db, 1);
     
-    data->setArtist(newartist);
-    decoder->commitMetadata(data);
+    if (!decoder || !data)
+        return;
+
+    if (compilation->isChecked())
+    {
+      data->setCompilationArtist(newartist);
+      decoder->commitMetadata(data);
+    }
+    else
+    {
+        data->setArtist(newartist);
+        data->setCompilationArtist("");
+        decoder->commitMetadata(data);
+    }
 
     artistname = newartist;
 
@@ -235,6 +316,9 @@ void Ripper::albumChanged(const QString &newalbum)
 {
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
     Metadata *data = decoder->getMetadata(db, 1);
+
+    if (!decoder || !data)
+        return;
 
     data->setAlbum(newalbum);
     decoder->commitMetadata(data);
@@ -250,6 +334,9 @@ void Ripper::genreChanged(const QString &newgenre)
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
     Metadata *data = decoder->getMetadata(db, 1);
 
+    if (!decoder || !data)
+        return;
+
     data->setGenre(newgenre);
     decoder->commitMetadata(data);
 
@@ -259,15 +346,136 @@ void Ripper::genreChanged(const QString &newgenre)
     delete decoder;
 } 
 
+void Ripper::compilationChanged(bool state)
+{
+    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
+    Metadata *data;
+  
+    if (!decoder)
+        return;
+
+    if (!state)
+    {
+        // Update artist MetaData of each track on the ablum...
+        for (int trackno = 1; trackno <= totaltracks; ++trackno)
+        {
+            data = decoder->getMetadata(db, trackno);
+
+            // Make metadata appear to be just a normal track.
+            data->setCompilationArtist("");
+            data->setArtist(artistname);
+            data->setCompilation(false);
+            decoder->commitMetadata(data);
+            delete data;
+        }
+        
+        // Visual updates
+        table->hideColumn(2);
+        switchtitleartist->hide();
+    }
+    else
+    {
+        // Update artist MetaData of each track on the ablum...
+        for (int trackno = 1; trackno <= totaltracks; ++trackno)
+        {
+            data = decoder->getMetadata(db, trackno);
+
+            // Make metadata appear to be just a normal track.
+            data->setCompilationArtist(artistname);
+            data->setArtist(table->text(trackno - 1, 2));
+            data->setCompilation(true);
+            decoder->commitMetadata(data);
+            delete data;
+        }
+
+        // Visual updates
+        table->showColumn(2);
+        switchtitleartist->show();
+    }
+
+    delete decoder;
+
+}
+
 void Ripper::tableChanged(int row, int col)
 {
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
     Metadata *data = decoder->getMetadata(db, row + 1 );
 
-    data->setTitle(table->text(row, col));
+    if (!decoder || !data)
+        return;
+
+    // We only update the title if col 1 is edited...
+    if (1 == col)
+    {
+        data->setTitle(table->text(row, 1));
+    }
+    else if (2 == col
+             && compilation->isChecked())
+    {
+        if ("" == table->text(row, 2))
+        {
+            // This is a compilation layout, but the user has put a blank
+            // into the artist column. This probably means this track is 
+            // also performed by the person who is also the album artist.
+            data->setArtist(artistname);
+        }
+        else
+        {
+            data->setArtist(table->text(row, 2));
+        }
+    }
+
     decoder->commitMetadata(data);
 
     delete data;
+    delete decoder;
+}
+
+void Ripper::switchTitlesAndArtists()
+{
+    if (!compilation->isChecked())
+        return;
+
+    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
+    Metadata *data;
+  
+    if (!decoder)
+        return;
+
+    // Switch title and artist for each track
+    QString tmp;
+    for (int row = 0; row < totaltracks; ++row)
+    {
+        data = decoder->getMetadata(db, row + 1);
+      
+        if (data)
+        {
+            // Switch the columns first
+            tmp = table->text(row, 2);
+            table->setText(row, 2, table->text(row, 1));
+            table->setText(row, 1, tmp);
+
+            // Just set both title and artist
+            data->setTitle(table->text(row, 1));
+
+            if ("" == table->text(row, 2))
+            {
+                // This is a compilation layout, but the user has put a blank
+                // into the artist column. This probably means this track is 
+                // also performed by the person who is also the album artist.
+                data->setArtist(artistname);
+            }
+            else
+            {
+                data->setArtist(table->text(row, 2));
+            }
+
+            decoder->commitMetadata(data);
+            delete data;
+        }
+    }
+
     delete decoder;
 }
 
@@ -314,14 +522,14 @@ void Ripper::handleFileTokens(QString &filename, Metadata *track)
             i += rx.matchedLength();
             if ((rx.capturedTexts()[1] == "GENRE") && (track->Genre() != ""))
                 filename += fixFileToken(track->Genre()) + "/";
-            if ((rx.capturedTexts()[1] == "ARTIST") && (track->Artist() != ""))
-                filename += fixFileToken(track->Artist()) + "/";
+            if ((rx.capturedTexts()[1] == "ARTIST") && (track->FormatArtist() != ""))
+                filename += fixFileToken(track->FormatArtist()) + "/";
             if ((rx.capturedTexts()[1] == "ALBUM") && (track->Album() != ""))
                 filename += fixFileToken(track->Album()) + "/";
             if ((rx.capturedTexts()[1] == "TRACK") && (track->Track() >= 0))
                 filename += fixFileToken(QString::number(track->Track(), 10)) + "/";
-            if ((rx.capturedTexts()[1] == "TITLE") && (track->Title() != ""))
-                filename += fixFileToken(track->Title()) + "/";
+            if ((rx.capturedTexts()[1] == "TITLE") && (track->FormatTitle() != ""))
+                filename += fixFileToken(track->FormatTitle()) + "/";
             if ((rx.capturedTexts()[1] == "YEAR") && (track->Year() >= 0))
                 filename += fixFileToken(QString::number(track->Year(), 10)) + "/";
 
@@ -334,7 +542,6 @@ void Ripper::handleFileTokens(QString &filename, Metadata *track)
 
     // remove the dir part and other cruft
     fntempl.replace(QRegExp("(.*/)|\\s*"), "");
-
     QString tagsep = gContext->GetSetting("TagSeparator");
     QStringList tokens = QStringList::split("-", fntempl);
     QStringList fileparts;
@@ -344,8 +551,8 @@ void Ripper::handleFileTokens(QString &filename, Metadata *track)
     {
         if ((tokens[i] == "GENRE") && (track->Genre() != ""))
             fileparts += track->Genre();
-        else if ((tokens[i] == "ARTIST") && (track->Artist() != ""))
-            fileparts += track->Artist();
+        else if ((tokens[i] == "ARTIST") && (track->FormatArtist() != ""))
+            fileparts += track->FormatArtist();
         else if ((tokens[i] == "ALBUM") && (track->Album() != ""))
             fileparts += track->Album();
         else if ((tokens[i] == "TRACK") && (track->Track() >= 0))
@@ -355,19 +562,19 @@ void Ripper::handleFileTokens(QString &filename, Metadata *track)
                 tempstr.prepend('0');
             fileparts += tempstr;
         }
-        else if ((tokens[i] == "TITLE") && (track->Title() != ""))
-            fileparts += track->Title();
+        else if ((tokens[i] == "TITLE") && (track->FormatTitle() != ""))
+            fileparts += track->FormatTitle();
         else if ((tokens[i] == "YEAR") && (track->Year() >= 0))
             fileparts += QString::number(track->Year(), 10);
     }
 
     filepart = fileparts.join( tagsep );
     filename += fixFileToken(filepart);
-
+    
     if (filename == original || filename.length() > FILENAME_MAX)
     {
         QString tempstr = QString::number(track->Track(), 10);
-        tempstr += " - " + track->Title();
+        tempstr += " - " + track->FormatTitle();
         filename += fixFileToken(tempstr);
         VERBOSE(VB_GENERAL, QString("Invalid file storage definition."));
     }
@@ -376,9 +583,9 @@ void Ripper::handleFileTokens(QString &filename, Metadata *track)
         filename.replace(rx_ws, "_");
 }
 
-QString Ripper::fixFileToken(QString token)
+inline QString Ripper::fixFileToken(QString token)
 {
-    token.replace(QRegExp("(/|\\|:|\'|\")"), QString("_"));
+    token.replace(QRegExp("(/|\\\\|:|\'|\"|\\?|\\|)"), QString("_"));
     return token;
 }
 
@@ -507,6 +714,9 @@ void Ripper::ripthedisc(void)
             }
 
             ripTrack(cddevice, encoder, trackno + 1);
+
+            // Set the flag to show that we have ripped new files
+            somethingwasripped = true;
 
             overall->setProgress(trackno + 1);
             qApp->processEvents();

@@ -32,6 +32,11 @@ void EditMetadataDialog::fillWidgets()
         artist_edit->setText(m_metadata->Artist());
     }
 
+    if (compilation_artist_edit)
+    {
+        compilation_artist_edit->setText(m_metadata->CompilationArtist());
+    }
+
     if (title_edit)
     {
         title_edit->setText(m_metadata->Title());
@@ -179,6 +184,13 @@ void EditMetadataDialog::wireUpTheme()
         connect(artist_edit, SIGNAL(loosingFocus()), this, SLOT(editLostFocus()));
     }
     
+    compilation_artist_edit = getUIRemoteEditType("compilation_artist_edit");
+    if (compilation_artist_edit)
+    {
+        compilation_artist_edit->createEdit(this);
+        connect(compilation_artist_edit, SIGNAL(loosingFocus()), this, SLOT(editLostFocus()));
+    }
+    
     album_edit = getUIRemoteEditType("album_edit");
     if (album_edit)
     {
@@ -231,6 +243,12 @@ void EditMetadataDialog::wireUpTheme()
         connect(searchartist_button, SIGNAL(pushed()), this, SLOT(searchArtist()));
     }
 
+    searchcompilation_artist_button = getUIPushButtonType("searchcompilation_artist_button");
+    if (searchcompilation_artist_button)
+    {
+        connect(searchcompilation_artist_button, SIGNAL(pushed()), this, SLOT(searchCompilationArtist()));
+    }
+
     searchalbum_button = getUIPushButtonType("searchalbum_button");
     if (searchalbum_button)
     {
@@ -247,14 +265,7 @@ void EditMetadataDialog::wireUpTheme()
     if (done_button)
     {
         done_button->setText(tr("Done"));
-        connect(done_button, SIGNAL(pushed()), this, SLOT(closeDialog()));
-    }
-
-    save_button = getUITextButtonType("save_button");
-    if (save_button)
-    {
-        save_button->setText(tr("Save"));
-        connect(save_button, SIGNAL(pushed()), this, SLOT(showSaveMenu()));
+        connect(done_button, SIGNAL(pushed()), this, SLOT(showSaveMenu()));
     }
 
     rating_button = getUISelectorType("rating_button");
@@ -284,6 +295,10 @@ void EditMetadataDialog::editLostFocus()
     {
         m_metadata->setArtist(artist_edit->getText());
     }
+    else if (whichEditor == compilation_artist_edit)
+    {
+        m_metadata->setCompilationArtist(compilation_artist_edit->getText());
+    }
     else if (whichEditor == title_edit)
     {
         m_metadata->setTitle(title_edit->getText());
@@ -306,13 +321,27 @@ void EditMetadataDialog::editLostFocus()
 void EditMetadataDialog::checkClicked(bool state)
 {
     m_metadata->setCompilation(state);
-}
-
-void EditMetadataDialog::closeDialog()
-{
-    //FIXME should ask to save any changes 
-    *m_sourceMetadata = m_metadata;
-    done(1);
+    if (!state)
+    {
+        m_metadata->setCompilationArtist("");
+        
+        if (compilation_artist_edit)
+        {
+            compilation_artist_edit->setText("");
+        }
+    }
+    else
+    {
+        if (m_metadata->CompilationArtist().isEmpty())
+        {
+            m_metadata->setCompilationArtist(tr("Various Artists")); 
+            
+            if (compilation_artist_edit)
+            {
+                compilation_artist_edit->setText(tr("Various Artists"));
+            }
+        } 
+    }
 }
 
 bool EditMetadataDialog::showList(QString caption, QString &value)
@@ -367,6 +396,20 @@ void EditMetadataDialog::searchArtist()
     }
 }
 
+void EditMetadataDialog::searchCompilationArtist()
+{
+    QString s;
+    
+    fillSearchList("compilation_artist");
+    
+    s = m_metadata->CompilationArtist();
+    if (showList(tr("Select a Compilation Artist"), s))
+    {
+        m_metadata->setCompilationArtist(s);
+        fillWidgets();
+    }
+}
+
 void EditMetadataDialog::searchAlbum()
 {
     QString s;
@@ -400,6 +443,12 @@ void EditMetadataDialog::searchGenre()
    
 }
 
+void EditMetadataDialog::closeDialog()
+{
+    cancelPopup();
+    done(1);  
+}
+
 void EditMetadataDialog::showSaveMenu()
 {
     popup = new MythPopupBox(gContext->GetMainWindow(), "Menu");
@@ -413,6 +462,8 @@ void EditMetadataDialog::showSaveMenu()
                          SLOT(saveToFile()));
     popup->addButton(tr("Save to File and Database"), this,
                          SLOT(saveAll()));
+    popup->addButton(tr("Exit/Do Not Save"), this,
+                         SLOT(closeDialog()));
     popup->addButton(tr("Cancel"), this, SLOT(cancelPopup()));
 
     popup->ShowPopup(this, SLOT(cancelPopup()));
@@ -434,39 +485,58 @@ void EditMetadataDialog::cancelPopup()
 
 void EditMetadataDialog::saveToDatabase()
 {
-   cancelPopup();
+    cancelPopup();
 
-   QSqlDatabase *db = QSqlDatabase::database();
+    QSqlDatabase *db = QSqlDatabase::database();
 
-   m_metadata->updateDatabase(db, QString::null);
-   *m_sourceMetadata = m_metadata;
+    m_metadata->updateDatabase(db, QString::null);
+    *m_sourceMetadata = m_metadata;
+    done(1);
 }
 
 void EditMetadataDialog::saveToFile()
 {
-   cancelPopup();
+    cancelPopup();
    
-   if (!MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(), 
-            "Save To File",
-            tr("Are you sure you want to save the modified metadata to the file?"), 
-            false))
-   {
-       return;
-   }    
+    if (!MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(), 
+                                         "Save To File",
+                                         tr("Are you sure you want to save the "
+                                         "modified metadata to the file?"), 
+                                         false))
+    {
+        return;
+    }    
    
-   Decoder *decoder = Decoder::create(m_metadata->Filename(), NULL, NULL, true);
-   if (decoder)
-   {
-       decoder->commitMetadata(m_metadata);
-       delete decoder;
-   }
+    Decoder *decoder = Decoder::create(m_metadata->Filename(), NULL, NULL, true);
+    if (decoder)
+    {
+        decoder->commitMetadata(m_metadata);
+        delete decoder;
+    }
+    done(1);
 }
 
 void EditMetadataDialog::saveAll()
 {
-   cancelPopup();
-   saveToFile();
-   saveToDatabase();
+    cancelPopup();
+
+    if (!MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(),
+                                         "Save To File",
+                                         tr("Are you sure you want to save the "
+                                         "modified metadata to the file?"),
+                                         false))
+    {
+        return;
+    }
+
+    Decoder *decoder = Decoder::create(m_metadata->Filename(), NULL, NULL, true);
+    if (decoder)
+    {
+        decoder->commitMetadata(m_metadata);
+        delete decoder;
+    }
+
+    saveToDatabase();
 }
 
 EditMetadataDialog::~EditMetadataDialog()

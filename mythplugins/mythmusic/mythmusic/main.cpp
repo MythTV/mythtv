@@ -191,7 +191,7 @@ void SearchDir(QString &directory)
     file_checking = new MythProgressDialog(QObject::tr("Searching for music files"),
                                            query.numRowsAffected());
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.isActive() && query.size() > 0)
     {
         while (query.next())
         {
@@ -263,7 +263,7 @@ void startDatabaseTree(PlaylistsContainer *all_playlists, AllMusic *all_music)
     qApp->lock();
 }
 
-void startRipper(void)
+bool startRipper(void)
 {
     Ripper rip(QSqlDatabase::database(), gContext->GetMainWindow(), 
                "cd ripper");
@@ -271,6 +271,11 @@ void startRipper(void)
     qApp->unlock();
     rip.exec();
     qApp->lock();
+
+    if (rip.somethingWasRipped())
+      return true;
+    
+    return false;
 }
 
 struct MusicData
@@ -293,12 +298,16 @@ void MusicCallback(void *data, QString &selection)
         startPlayback(mdata->all_playlists, mdata->all_music);
     else if (sel == "music_rip")
     {
-        startRipper();
-        //  Reconcile with the database
-        SearchDir(mdata->startdir);
-        //  Tell the metadata to reset itself
-        mdata->all_music->resync();
-        mdata->all_playlists->postLoad();
+        if (startRipper())
+        {
+            // If startRipper returns true, then new data should be present
+
+            //  Reconcile with the database
+            SearchDir(mdata->startdir);
+            //  Tell the metadata to reset itself
+            mdata->all_music->resync();
+            mdata->all_playlists->postLoad();
+        }
     }
     else if (sel == "settings_scan")
     {
@@ -453,6 +462,10 @@ static void preMusic(MusicData *mdata)
         SearchDir(startdir);
 
     QString paths = gContext->GetSetting("TreeLevels");
+
+    // Set the various track formatting modes
+    Metadata::setArtistAndTrackFormats();
+    
     AllMusic *all_music = new AllMusic(db, paths, startdir);
 
     //  Load all playlists into RAM (once!)
@@ -539,9 +552,13 @@ void runRipCD(void)
     MusicData mdata;
 
     preMusic(&mdata);
-    startRipper();
-    SearchDir(mdata.startdir);
-    mdata.all_music->resync();
-    mdata.all_playlists->postLoad();
+    if (startRipper())
+    {
+        // if startRipper returns true, then new files should be present
+        // so we should look for them.
+        SearchDir(mdata.startdir);
+        mdata.all_music->resync();
+        mdata.all_playlists->postLoad();
+    }
     postMusic(&mdata);
 }

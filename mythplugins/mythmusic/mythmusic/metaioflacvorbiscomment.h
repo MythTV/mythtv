@@ -3,6 +3,7 @@
 
 #include "metaio.h"
 
+#define HAVE_INTTYPES_H
 #include <FLAC/all.h>
 
 class MetaIOFLACVorbisComment : public MetaIO

@@ -739,9 +739,9 @@ void PlaybackBoxMusic::showVolume(bool on_or_off)
                             textItems.setAutoDelete(true);
 
                             textItems.append(new LCDTextItem(1, ALIGN_CENTERED,
-                                             curMeta->Artist() +" [" + 
+                                             curMeta->FormatArtist() +" [" + 
                                              curMeta->Album() + "] " +
-                                             curMeta->Title(), "Generic", true));
+                                             curMeta->FormatTitle(), "Generic", true));
 
                             lcd->switchToGeneric(&textItems);
                             lcd_volume_visible = false;
@@ -809,7 +809,7 @@ void PlaybackBoxMusic::play()
     } 
     else
         input = new QFile(playfile);
-
+    
     if (decoder && !decoder->factory()->supports(sourcename))
         decoder = 0;
 
@@ -1482,9 +1482,9 @@ void PlaybackBoxMusic::handleTreeListSignals(int node_int, IntVector *attributes
 
         curMeta = all_music->getMetadata(node_int);
         if (title_text)
-            title_text->SetText(curMeta->Title());
+            title_text->SetText(curMeta->FormatTitle());
         if (artist_text)
-            artist_text->SetText(curMeta->Artist());
+            artist_text->SetText(curMeta->FormatArtist());
         if (album_text)
             album_text->SetText(curMeta->Album());
 
@@ -1495,8 +1495,8 @@ void PlaybackBoxMusic::handleTreeListSignals(int node_int, IntVector *attributes
             textItems.setAutoDelete(true);
 
             textItems.append(new LCDTextItem(1, ALIGN_CENTERED,
-                             curMeta->Artist() + " [" + curMeta->Album() + "] " +
-                             curMeta->Title(), "Generic", true));
+                             curMeta->FormatArtist() + " [" + curMeta->Album() + "] " +
+                             curMeta->FormatTitle(), "Generic", true));
 
             lcd->outputText(&textItems);
         }

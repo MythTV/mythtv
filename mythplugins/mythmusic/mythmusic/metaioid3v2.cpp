@@ -100,6 +100,36 @@ bool MetaIOID3v2::write(Metadata* mdata, bool exclusive)
         setComment(tag, ID3_FRAME_ARTIST, mdata->Artist());
     }
     
+    if (mdata->Compilation())
+    {
+        if (!exclusive)
+            removeComment(tag, 
+                          MYTH_ID3_FRAME_COMMENT,
+                          MYTH_ID3_FRAME_MUSICBRAINZ_ALBUMARTISTDESC);
+                          
+        setComment(tag, MYTH_ID3_FRAME_COMMENT,
+                   MYTH_MUSICBRAINZ_ALBUMARTIST_UUID, 
+                   MYTH_ID3_FRAME_MUSICBRAINZ_ALBUMARTISTDESC);
+        
+        if (!mdata->CompilationArtist().isEmpty())
+        {
+            if (!exclusive) 
+                removeComment(tag, MYTH_ID3_FRAME_COMPILATIONARTIST);
+                
+            setComment(tag, MYTH_ID3_FRAME_COMPILATIONARTIST,
+                       mdata->CompilationArtist());        
+        }
+    }
+    else if (!exclusive) 
+    {
+        removeComment(tag, 
+                      MYTH_ID3_FRAME_COMMENT,
+                      MYTH_ID3_FRAME_MUSICBRAINZ_ALBUMARTISTDESC);
+                      
+        removeComment(tag, MYTH_ID3_FRAME_COMPILATIONARTIST);
+      
+    }
+
     if (!mdata->Title().isEmpty())
     {
         if (!exclusive) removeComment(tag, ID3_FRAME_TITLE);
@@ -115,9 +145,12 @@ bool MetaIOID3v2::write(Metadata* mdata, bool exclusive)
     if (mdata->Year() > 999
         && mdata->Year() < 10000) // 4 digit year.
     {
-        if (!exclusive) removeComment(tag, ID3_FRAME_YEAR);
-        bln_hack_version = false; // v2.4 changes TYER to TDRC so need v2.4
-        setComment(tag, ID3_FRAME_YEAR, QString("%1").arg(mdata->Year()));
+        // User our old version of the ID3_FRAME_YEAR as newer libid3tags use
+        // v2.4 of ID3 which is less compatible and changes the TYER to use TDRC
+        // instead.
+        // For compatibility, we will try to stick to ID3 v2.3 for now.
+        if (!exclusive) removeComment(tag, MYTH_ID3_FRAME_YEAR);
+        setComment(tag, MYTH_ID3_FRAME_YEAR, QString("%1").arg(mdata->Year()));
     }
 
     QString data = mdata->Genre();
@@ -179,9 +212,6 @@ bool MetaIOID3v2::write(Metadata* mdata, bool exclusive)
     }
 
     return rv;
-
-    // Questions... Not sure about memory managment. I've not allocated any memory myself,
-    //              but not sure of libid3tag's memory managment model.
 }
 
 
@@ -194,8 +224,9 @@ bool MetaIOID3v2::write(Metadata* mdata, bool exclusive)
  */
 Metadata* MetaIOID3v2::read(QString filename)
 {
-    QString artist = "", album = "", title = "", genre = "";
+    QString artist = "", compilation_artist = "", album = "", title = "", genre = "";
     int year = 0, tracknum = 0, length = 0;
+    bool compilation = false;
     id3_file *p_input = NULL;
     
     p_input = id3_file_open(filename.local8Bit(), ID3_FILE_MODE_READONLY);
@@ -212,10 +243,15 @@ Metadata* MetaIOID3v2::read(QString filename)
             return NULL;
         }
         
-        title = getComment(tag, ID3_FRAME_TITLE);           
+        title = getComment(tag, ID3_FRAME_TITLE);
         artist = getComment(tag, ID3_FRAME_ARTIST);
+        compilation_artist = getComment(tag, MYTH_ID3_FRAME_COMPILATIONARTIST);
         album = getComment(tag, ID3_FRAME_ALBUM);
-        
+        compilation = (MYTH_MUSICBRAINZ_ALBUMARTIST_UUID 
+                       == getComment(tag,
+                                     MYTH_ID3_FRAME_COMMENT,
+                                     MYTH_ID3_FRAME_MUSICBRAINZ_ALBUMARTISTDESC));
+                                          
         // Get Track Num dealing with 1/16, 2/16 etc. format
         tracknum = getComment(tag, ID3_FRAME_TRACK)
             .replace(QRegExp("^([0-9]*).*"), QString("\\1")).toInt();
@@ -243,6 +279,7 @@ Metadata* MetaIOID3v2::read(QString filename)
 
         id3_utf8_t *p_utf8 = id3_ucs4_utf8duplicate(p_ucs4);  
         genre = (const char*)p_utf8;
+        
         free(p_utf8);
 
         id3_file_close(p_input);
@@ -256,8 +293,10 @@ Metadata* MetaIOID3v2::read(QString filename)
 
     length = getTrackLength(filename);
 
-    Metadata *retdata = new Metadata(filename, artist, album, title, genre,
-                                     year, tracknum, length);
+    Metadata *retdata = new Metadata(filename, artist, compilation_artist, album,
+                                     title, genre, year, tracknum, length);
+                                     
+    retdata->setCompilation(compilation);
 
     return retdata;
 }
@@ -372,27 +411,94 @@ int MetaIOID3v2::getTrackLength(QString filename)
     return alt_length;
 }
 
+
+inline QString MetaIOID3v2::getRawID3String(union id3_field *pField)
+{
+    QString tmp = "";
+        
+    id3_ucs4_t const *p_ucs4 = (id3_ucs4_t *) id3_field_getstring(pField);
+    
+    if (p_ucs4)
+    {
+        id3_utf8_t *p_utf8 = id3_ucs4_utf8duplicate(p_ucs4);
+        
+        if (!p_utf8)
+             return "";
+
+        tmp = QString::fromUtf8((const char*)p_utf8);
+
+        free(p_utf8);
+    }
+    else
+    {
+        unsigned int nstrings = id3_field_getnstrings(pField);
+    
+        for (unsigned int j=0; j<nstrings; ++j)
+        {
+            p_ucs4 = id3_field_getstrings(pField, j);
+
+            if (!p_ucs4)
+                break;
+
+           id3_utf8_t *p_utf8 = id3_ucs4_utf8duplicate(p_ucs4);
+
+           if (!p_utf8)
+               break;
+
+           tmp += QString::fromUtf8((const char*)p_utf8);
+
+           free(p_utf8);
+       }
+    }
+    
+    return tmp;
+  
+}
+
 //==========================================================================
 /*!
  * \brief Function to remove an individual comment in an ID3v2 Tag
  *
  * \param pTag Pointer to a id3_file object
  * \param pLabel The label of the comment you want to delete
+ * \param desc Optional descripton to delete (frame type pLabel must support this)
  * \returns Nothing
  */
 void MetaIOID3v2::removeComment(id3_tag *pTag,
-                                const char* pLabel)
+                                const char* pLabel,
+                                const QString desc)
 {
     if (!pLabel)
         return;
-        
+    
     struct id3_frame* p_frame = NULL;
-        
-    while ((p_frame = id3_tag_findframe(pTag, pLabel, 0)))
+    
+    bool just_delete = desc.isEmpty();
+    
+    for (int i=0; NULL != (p_frame = id3_tag_findframe(pTag, pLabel, i)); ++i)
     {
-        // Let's delete it!!
-        if (0 == id3_tag_detachframe(pTag, p_frame))
-            id3_frame_delete(p_frame);
+        if (just_delete)
+        {
+            // Let's delete it!!
+            if (0 == id3_tag_detachframe(pTag, p_frame))
+                id3_frame_delete(p_frame);
+        }
+        else
+        {
+            // Get the description to compare
+            QString tmp = getRawID3String(&p_frame->fields[1]);
+
+            // Let's compare the descriptions.
+            if (tmp == desc)
+            {
+                // Now we know the descriptions match so we delete the frame.
+                if (0 == id3_tag_detachframe(pTag, p_frame))
+                    id3_frame_delete(p_frame);
+                
+                // We're done
+                break;
+            }
+        }
     }
 }
 
@@ -403,44 +509,44 @@ void MetaIOID3v2::removeComment(id3_tag *pTag,
  *
  * \param pTag Pointer to a id3_file object
  * \param pLabel The label of the comment you want
+ * \param desc An optional description (frame type pLabel must support this)
  * \returns QString containing the contents of the comment you want
  */
-QString MetaIOID3v2::getComment(id3_tag *pTag, const char* pLabel)
+QString MetaIOID3v2::getComment(id3_tag *pTag, const char* pLabel, 
+                                const QString desc)
 {
     if (!pLabel)
         return "";
-        
-    struct id3_frame *p_frame = id3_tag_findframe(pTag, pLabel, 0);
-    if (!p_frame)
-        return "";
+
+    struct id3_frame *p_frame = NULL;
     
-    id3_ucs4_t const *p_ucs4 = NULL;
-    union id3_field *p_field;
-    
-    p_field = &p_frame->fields[1];
-    unsigned int nstrings = id3_field_getnstrings(p_field);
-    
-    QString rv = "";
-    for (unsigned int i=0; i<nstrings; ++i)
+    for (int i=0; NULL != (p_frame = id3_tag_findframe(pTag, pLabel, i)); ++i ) 
     {
-        p_ucs4 = id3_field_getstrings(p_field, i);
-        if (!p_ucs4)
+        int field_num = 1;
+        
+        QString tmp = "";
+        
+        // Compare the first field with the description if supplied
+        if (!desc.isEmpty())
         {
-            break;
-        }
-        else
-        {
-            id3_utf8_t *p_utf8 = id3_ucs4_utf8duplicate(p_ucs4);
-            if (!p_utf8)
-                break;
+            tmp = getRawID3String(&p_frame->fields[field_num++]);
 
-            rv += QString::fromUtf8((const char*)p_utf8);
-
-            free(p_utf8);
+            // Now compare tmp to desc
+            if (tmp != desc)
+            {
+                // No match - move on.
+                continue;
+            }      
         }
+          
+        // Get the value and return it.
+        tmp = getRawID3String(&p_frame->fields[field_num]);
+
+        return tmp;
     }
-
-    return rv;
+    
+    // Not found.
+    return "";
 }
 
 //==========================================================================
@@ -449,14 +555,16 @@ QString MetaIOID3v2::getComment(id3_tag *pTag, const char* pLabel)
  *
  * \param pTag Pointer to a id3_file object
  * \param pLabel The label of the comment you want
- * \param rData A reference to the data you want to write
+ * \param value A reference to the data you want to write
+ * \param desc An optional description (frame type pLabel must support this)
  * \returns Nothing
  */
 bool MetaIOID3v2::setComment(id3_tag *pTag,
                              const char* pLabel, 
-                             const QString& rData)
+                             const QString value,
+                             const QString desc)
 {
-    if (!pLabel || "" == rData)
+    if (!pLabel || "" == value)
       return false;
 
     struct id3_frame* p_frame = NULL;
@@ -467,15 +575,28 @@ bool MetaIOID3v2::setComment(id3_tag *pTag,
     if (NULL == p_frame)
       return false;
 
-    // Test
-    if (0 != id3_field_settextencoding(&p_frame->fields[0],
-                                       ID3_FIELD_TEXTENCODING_UTF_16))
+    // Write a description in field 1 if needs be.
+    if (!desc.isEmpty())
     {
-        id3_frame_delete(p_frame);
-        return false;
+        p_ucs4 = id3_utf8_ucs4duplicate((const id3_utf8_t*)(const char*)desc.utf8());
+    
+        if (!p_ucs4)
+        {
+            id3_frame_delete(p_frame);
+            return false;      
+        }
+    
+        if (0 != id3_field_setstring(&p_frame->fields[1], p_ucs4))
+        {
+            free(p_ucs4);
+            id3_frame_delete(p_frame);
+            return false;      
+        }
+          
+        free(p_ucs4);
     }
 
-    p_ucs4 = id3_utf8_ucs4duplicate((const id3_utf8_t*)(const char*)rData.utf8());
+    p_ucs4 = id3_utf8_ucs4duplicate((const id3_utf8_t*)(const char*)value.utf8());
 
     if (!p_ucs4)
     {
@@ -483,7 +604,8 @@ bool MetaIOID3v2::setComment(id3_tag *pTag,
         return false;      
     }
 
-    if (0 != id3_field_setstrings(&p_frame->fields[1], 1, &p_ucs4))
+    if ((desc.isEmpty() && id3_field_setstrings(&p_frame->fields[1], 1, &p_ucs4))
+        || (!desc.isEmpty() && id3_field_setstring(&p_frame->fields[2], p_ucs4)))
     {
         free(p_ucs4);
         id3_frame_delete(p_frame);

@@ -1,6 +1,7 @@
 #ifndef FLACDECODER_H_
 #define FLACDECODER_H_
 
+#define HAVE_INTTYPES_H
 #include <FLAC/all.h>
 
 #include "decoder.h"

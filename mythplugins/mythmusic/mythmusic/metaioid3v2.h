@@ -8,8 +8,10 @@ extern "C" {
 }
 
 // Similar to the ones define in id3tag.h
-#define MYTH_ID3_FRAME_ALBUMARTIST "TPE4"
-
+#define MYTH_ID3_FRAME_YEAR "TYER"
+#define MYTH_ID3_FRAME_COMPILATIONARTIST "TPE4"
+#define MYTH_ID3_FRAME_COMMENT "TXXX"
+#define MYTH_ID3_FRAME_MUSICBRAINZ_ALBUMARTISTDESC "MusicBrainz Album Artist Id"
 
 class MetaIOID3v2 : public MetaIO
 {
@@ -23,9 +25,13 @@ public:
 private:
     int getTrackLength(QString filename);
 
-    void removeComment(id3_tag *pTag, const char* pLabel);
-    QString getComment(id3_tag *pTag, const char* pLabel);
-    bool setComment(id3_tag *pTag, const char* pLabel, const QString& rData);
+    QString getRawID3String(union id3_field *pField);
+    void removeComment(id3_tag *pTag, const char* pLabel, const QString desc = "");
+    QString getComment(id3_tag *pTag, const char* pLabel,
+                       const QString desc = "");
+    
+    bool setComment(id3_tag *pTag, const char* pLabel, const QString value,
+                    const QString desc = "");
 };
 
 #endif

@@ -526,7 +526,7 @@ Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
     MetaIOID3v2* p_tagger = new MetaIOID3v2;
     if (ignore_id3)
         mdata = p_tagger->readFromFilename(filename);
-                else
+    else
         mdata = p_tagger->read(filename);
 
     delete p_tagger;

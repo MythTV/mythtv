@@ -9,7 +9,7 @@ using namespace std;
 
 #include "mythtv/mythcontext.h"
 
-const QString currentDatabaseVersion = "1004";
+const QString currentDatabaseVersion = "1005";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -313,6 +313,17 @@ void UpgradeMusicDatabaseSchema(void)
 ""
 };
         performActualUpdate(updates, "1004", dbver);
+    }
+
+    if (dbver == "1004")
+    {
+        const QString updates[] = {
+"ALTER TABLE musicmetadata ADD compilation_artist VARCHAR(128) NOT NULL AFTER artist;",
+"ALTER TABLE musicmetadata ADD INDEX (compilation_artist);",
+""
+};
+
+        performActualUpdate(updates, "1005", dbver);
     }
 }
 

@@ -109,6 +109,69 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
         <source>Length:<byte value="x9"/></source>
         <translation>Durée:</translation>
     </message>
+    <message>
+        <source>Compilation Artist:<byte value="x9"/></source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EditMetadataDialog</name>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DB Statistics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Various Artists</source>
+        <translation type="unfinished">Artistes Variés</translation>
+    </message>
+    <message>
+        <source>Select an Artist</source>
+        <translation type="unfinished">Choix d&apos;un Artiste</translation>
+    </message>
+    <message>
+        <source>Select a Compilation Artist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select an Album</source>
+        <translation type="unfinished">Choix d&apos;un Album</translation>
+    </message>
+    <message>
+        <source>Select a Genre</source>
+        <translation type="unfinished">Choix d&apos;un genre</translation>
+    </message>
+    <message>
+        <source>Save Changes?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save to Database Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save to File Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save to File and Database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit/Do Not Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuler</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to save the modified metadata to the file?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PlaybackBoxMusic</name>
@@ -222,27 +285,27 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     </message>
     <message>
         <source>Smart playlists</source>
-        <translation type="unfinished"></translation>
+        <translation>Listes astucieuses</translation>
     </message>
     <message>
         <source>All Tracks</source>
-        <translation type="unfinished"></translation>
+        <translation>Toutes pistes</translation>
     </message>
     <message>
         <source>Tracks by current Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Pistes de l&apos;artiste courant</translation>
     </message>
     <message>
         <source>Tracks from current Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Piste de l&apos;album courant</translation>
     </message>
     <message>
         <source>Tracks from current Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Piste du genre courant</translation>
     </message>
     <message>
         <source>Tracks from current Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Piste de l&apos;année courante</translation>
     </message>
 </context>
 <context>
@@ -803,6 +866,10 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
         <translation>Ordre dans lequel trier l&apos;arborescence de musique. Les valeurs possibles sont une liste séparé d&apos;espaces des valeurs genre, splitartist, artist, album, et title OU le mot clef &quot;directory&quot; qui indique que l&apos;arborescense affichée reflète le système de fichiers.</translation>
     </message>
+    <message>
+        <source>CD: %1 ~ %2 - %3</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Ripper</name>
@@ -858,97 +925,145 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
         <source>Ripping...</source>
         <translation>Compression...</translation>
     </message>
+    <message>
+        <source>Multi-Artist?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch Titles &amp;&amp; Artists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Artist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Length</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SmartPLCriteriaRow</name>
     <message>
         <source>Select an Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Choix d&apos;un Artiste</translation>
     </message>
     <message>
         <source>Select an Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Choix d&apos;un Album</translation>
     </message>
     <message>
         <source>Select a Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Choix d&apos;un genre</translation>
     </message>
     <message>
         <source>Select a Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Choix d&apos;un titre</translation>
     </message>
 </context>
 <context>
     <name>SmartPLOrderByDialog</name>
     <message>
         <source>Order By Fields</source>
-        <translation type="unfinished"></translation>
+        <translation>Trier par champs</translation>
     </message>
     <message>
         <source>1 Add</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Ajouter</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajouter</translation>
     </message>
     <message>
         <source>2 Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>2 supprimer</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprimer</translation>
     </message>
     <message>
         <source>3 Move Up</source>
-        <translation type="unfinished"></translation>
+        <translation>3 Vers le haut</translation>
     </message>
     <message>
         <source>Move Up</source>
-        <translation type="unfinished"></translation>
+        <translation>Vers le haut</translation>
     </message>
     <message>
         <source>4 Move Down</source>
-        <translation type="unfinished"></translation>
+        <translation>4 Vers le Bas</translation>
     </message>
     <message>
         <source>Move Down</source>
-        <translation type="unfinished"></translation>
+        <translation>Vers le Bas</translation>
     </message>
     <message>
         <source>5 Ascending</source>
-        <translation type="unfinished"></translation>
+        <translation>5 Ascendant</translation>
     </message>
     <message>
         <source>Ascending</source>
-        <translation type="unfinished"></translation>
+        <translation>Ascendant</translation>
     </message>
     <message>
         <source>6 Descending</source>
-        <translation type="unfinished"></translation>
+        <translation>6 Descendant</translation>
     </message>
     <message>
         <source>Descending</source>
-        <translation type="unfinished"></translation>
+        <translation>Descendant</translation>
     </message>
     <message>
         <source>7 OK</source>
-        <translation type="unfinished"></translation>
+        <translation>7 OK</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
     <name>SmartPLResultViewer</name>
     <message>
         <source>Smart Playlist Result Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Voir les résultats de playlist subtile</translation>
     </message>
     <message>
         <source>Exit</source>
+        <translation>Sortir</translation>
+    </message>
+    <message>
+        <source>ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Artist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Album</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Genre</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Year</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track No.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -956,38 +1071,42 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     <name>SmartPlaylistDialog</name>
     <message>
         <source>Smart Playlists</source>
-        <translation type="unfinished"></translation>
+        <translation>Playlistes subtiles</translation>
     </message>
     <message>
         <source>1 Select</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Sélectionner</translation>
     </message>
     <message>
         <source>Select</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner</translation>
     </message>
     <message>
         <source>2 New</source>
-        <translation type="unfinished"></translation>
+        <translation>2 Nouveau</translation>
     </message>
     <message>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>Nouveau</translation>
     </message>
     <message>
         <source>3 Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>3 Editer</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Editer</translation>
     </message>
     <message>
         <source>4 Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>4 Effacer</translation>
     </message>
     <message>
         <source>Delete</source>
+        <translation>Effacer</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this SmartPlaylist?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -995,74 +1114,86 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     <name>SmartPlaylistEditor</name>
     <message>
         <source>Smart Playlist Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Editer la Playliste subtile</translation>
     </message>
     <message>
         <source>Category:</source>
-        <translation type="unfinished"></translation>
+        <translation>Catégorie:</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished">Titre:</translation>
+        <translation>Titre:</translation>
     </message>
     <message>
         <source>Match</source>
-        <translation type="unfinished"></translation>
+        <translation>Trouver</translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>Tout</translation>
     </message>
     <message>
         <source>Any</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucun</translation>
     </message>
     <message>
         <source>Of The Following Conditions</source>
-        <translation type="unfinished"></translation>
+        <translation>Des conditions suivantes</translation>
     </message>
     <message>
         <source>Order By:</source>
-        <translation type="unfinished"></translation>
+        <translation>Trier par:</translation>
     </message>
     <message>
         <source>Matches:</source>
-        <translation type="unfinished"></translation>
+        <translation>Correspondances:</translation>
     </message>
     <message>
         <source>Limit:</source>
-        <translation type="unfinished"></translation>
+        <translation>Limite:</translation>
+    </message>
+    <message>
+        <source></source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>Sauver</translation>
+    </message>
+    <message>
+        <source>Show Results</source>
+        <translation>Voir les résultats</translation>
+    </message>
+    <message>
+        <source>Smart Playlist Categories</source>
+        <translation>Catégories de playliste subtile</translation>
+    </message>
+    <message>
+        <source>New Category</source>
+        <translation>Nouvelle catégorie</translation>
+    </message>
+    <message>
+        <source>Delete Category</source>
+        <translation>Effacer la catégorie</translation>
+    </message>
+    <message>
+        <source>Rename Category</source>
+        <translation>Renommer la catégorie</translation>
     </message>
     <message>
         <source> </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cancel</source>
+        <source>Are you sure you want to delete this Category?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Save</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show Results</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Smart Playlist Categories</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>New Category</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Delete Category</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rename Category</source>
+        <source>It will also delete any Smart Playlists belonging to this category.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

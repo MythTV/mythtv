@@ -602,50 +602,83 @@ void DatabaseBox::entered(UIListTreeType *treetype, UIListGenericTree *item)
     if (!item || !treetype)
         return;
 
+    // Determin if this is a CD entry
+    bool cd = false;
+    if (dynamic_cast<CDCheckItem*>(item))
+      cd = true;
+
     TreeCheckItem *item_ptr = dynamic_cast<TreeCheckItem*>(item);
 
-    if (item_ptr && item->childCount() == 0 && item_ptr->getLevel() == "title")
+    if (item_ptr 
+        && item->childCount() == 0
+        && item_ptr->getLevel() == "title")
     {
         int id = item_ptr->getID();
 
-        Metadata *mdata = all_music->getMetadata(id);
+        Metadata *mdata;
+        if (!cd)
+        {
+            mdata = all_music->getMetadata(id);
+            if (!mdata)
+                return;
+        }
+        else 
+        {
+            // Need to allocate storage for CD Metadata
+            mdata = new Metadata;
+            if (!all_music->getCDMetadata(id, mdata))
+            {
+                delete mdata;
+                return;
+            }
+        }
+        
+        unsigned int line = 0;
+        QString tmpstr;
 
-        if (!mdata)
-            return;
-
-        QString tmpstr = tr("Artist:\t") + mdata->Artist();
-        m_lines.at(0)->SetText(tmpstr);
+        if (mdata->Compilation())
+        {
+            tmpstr = tr("Compilation Artist:\t") + mdata->CompilationArtist();
+            m_lines.at(line++)->SetText(tmpstr);
+        }
+        tmpstr = tr("Artist:\t") + mdata->Artist();
+        m_lines.at(line++)->SetText(tmpstr);
         tmpstr = tr("Album:\t") + mdata->Album();
-        m_lines.at(1)->SetText(tmpstr);
+        m_lines.at(line++)->SetText(tmpstr);
         tmpstr = tr("Title:\t") + mdata->Title();
-        m_lines.at(2)->SetText(tmpstr);
-
-        if (m_lines.at(3))
+        m_lines.at(line++)->SetText(tmpstr);
+        
+        if (m_lines.at(line))
         {
             int maxTime = mdata->Length() / 1000;
-
+            
             int maxh = maxTime / 3600;
             int maxm = (maxTime / 60) % 60;
             int maxs = maxTime % 60;
-
+            
             QString timeStr;
             if (maxh > 0)
                 timeStr.sprintf("%02d:%02d:%02d", maxh, maxm, maxs);
             else
                 timeStr.sprintf("%02d:%02d", maxm, maxs);
-
+            
             tmpstr = tr("Length:\t") + timeStr;
-
+            
             if (mdata->Genre().length() > 0)
             {
                 tmpstr += "            " + tr("Genre: ") + mdata->Genre();
             }
-
-            m_lines.at(3)->SetText(tmpstr);
+            
+            m_lines.at(line)->SetText(tmpstr);
         }
-
-        for (unsigned int i = 4; i < m_lines.count(); i++)
-            m_lines.at(i)->SetText("");
+          
+        // Post increment as not incremented from previous use.
+        while (++line < m_lines.count())
+          m_lines.at(line)->SetText("");
+        
+        // Don't forget to delete the mdata storage if we allocated it.
+        if (cd)
+          delete mdata;
 
         return;
     }
@@ -1218,7 +1251,6 @@ void ReadCDThread::run()
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
     int tracknum = decoder->getNumCDAudioTracks();
 
-    bool setTitle = false;
     bool redo = false;
 
     if (tracknum != all_music->getCDTrackCount())
@@ -1235,8 +1267,7 @@ void ReadCDThread::run()
         all_music->clearCDData();
         the_playlists->clearCDList();
     }
-
-    if (tracknum > 0)
+    else if (tracknum > 0)
     {
         // Check the last track to see if it's differen than whatever it was 
         // before
@@ -1262,6 +1293,7 @@ void ReadCDThread::run()
     } 
 
     int tracks = decoder->getNumTracks();
+    bool setTitle = false;
 
     for (int actual_tracknum = 1; 
          redo && actual_tracknum <= tracks; actual_tracknum++)
@@ -1275,9 +1307,9 @@ void ReadCDThread::run()
             {
             
                 QString parenttitle = " ";
-                if (track->Artist().length() > 0)
+                if (track->FormatArtist().length() > 0)
                 {
-                    parenttitle += track->Artist();
+                    parenttitle += track->FormatArtist();
                     parenttitle += " ~ "; 
                 }
 

@@ -32,6 +32,7 @@ class EditMetadataDialog : public MythThemedDialog
 
     void closeDialog();
     void searchArtist();
+    void searchCompilationArtist();
     void searchAlbum();
     void searchGenre();
     void incRating(bool up_or_down);
@@ -54,6 +55,7 @@ class EditMetadataDialog : public MythThemedDialog
     //
 
     UIRemoteEditType    *artist_edit;
+    UIRemoteEditType    *compilation_artist_edit;
     UIRemoteEditType    *album_edit;
     UIRemoteEditType    *title_edit;
     UIRemoteEditType    *genre_edit;
@@ -67,6 +69,7 @@ class EditMetadataDialog : public MythThemedDialog
     UIRepeatedImageType *rating_image;
 
     UIPushButtonType    *searchartist_button;
+    UIPushButtonType    *searchcompilation_artist_button;
     UIPushButtonType    *searchalbum_button;
     UIPushButtonType    *searchgenre_button;
     UIPushButtonType    *rating_button;
@@ -74,7 +77,6 @@ class EditMetadataDialog : public MythThemedDialog
     UICheckBoxType      *compilation_check;
     
     UITextButtonType    *done_button;
-    UITextButtonType    *save_button;
     UITextButtonType    *dbStatistics_button;
     
     QStringList         searchList;

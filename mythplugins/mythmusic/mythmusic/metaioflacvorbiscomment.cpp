@@ -3,6 +3,7 @@
 using namespace std;
 
 #include "metaioflacvorbiscomment.h"
+#include "metaiovorbiscomment.h"
 #include "metadata.h"
 
 
@@ -81,22 +82,38 @@ bool MetaIOFLACVorbisComment::write(Metadata* mdata, bool exclusive)
     if (block->data.vorbis_comment.comments > 0)
         FLAC__metadata_object_vorbiscomment_resize_comments(block, 0);
 
-    setComment(block, "artist", mdata->Artist());
-    setComment(block, "album", mdata->Album());
-    setComment(block, "title", mdata->Title());
-    setComment(block, "genre", mdata->Genre());
+
+    setComment(block, MYTH_VORBISCOMMENT_ARTIST, mdata->Artist());
+
+    if (mdata->Compilation())
+    {
+        // We use the MusicBrainz Identifier to indicate a compilation
+        setComment(block, MYTH_VORBISCOMMENT_MUSICBRAINZ_ALBUMARTISTID,
+                   MYTH_MUSICBRAINZ_ALBUMARTIST_UUID);
+
+        if (!mdata->CompilationArtist().isEmpty())
+        {
+            setComment(block, MYTH_VORBISCOMMENT_COMPILATIONARTIST,
+                       mdata->CompilationArtist());
+        }
+        
+    }
+
+    setComment(block, MYTH_VORBISCOMMENT_ALBUM, mdata->Album());
+    setComment(block, MYTH_VORBISCOMMENT_TITLE, mdata->Title());
+    setComment(block, MYTH_VORBISCOMMENT_GENRE, mdata->Genre());
 
     char text[128];
     if (0 != mdata->Track())
     {
         snprintf(text, 128, "%d", mdata->Track());
-        setComment(block, "tracknumber", text);
+        setComment(block, MYTH_VORBISCOMMENT_TRACK, text);
     }
 
     if (0 != mdata->Year())
     {
         snprintf(text, 128, "%d", mdata->Year());
-        setComment(block, "date", text);
+        setComment(block, MYTH_VORBISCOMMENT_DATE, text);
     }
 
     FLAC__metadata_chain_write(chain, false, false);
@@ -117,8 +134,9 @@ bool MetaIOFLACVorbisComment::write(Metadata* mdata, bool exclusive)
  */
 Metadata* MetaIOFLACVorbisComment::read(QString filename)
 {
-    QString artist = "", album = "", title = "", genre = "";
+    QString artist = "", compilation_artist = "", album = "", title = "", genre = "";
     int year = 0, tracknum = 0, length = 0;
+    bool compilation = false;
 
     FLAC__Metadata_Chain *chain = FLAC__metadata_chain_new();
     if (!FLAC__metadata_chain_read(chain, filename.local8Bit())
@@ -157,7 +175,7 @@ Metadata* MetaIOFLACVorbisComment::read(QString filename)
     FLAC__ASSERT(0 != block);
     FLAC__ASSERT(block->type == FLAC__METADATA_TYPE_VORBIS_COMMENT);
 
-    title = getComment(block, "title");
+    title = getComment(block, MYTH_VORBISCOMMENT_TITLE);
 
     if (title.isEmpty())
     {
@@ -165,18 +183,27 @@ Metadata* MetaIOFLACVorbisComment::read(QString filename)
     }
     else
     {
-        artist = getComment(block, "artist");
-        album = getComment(block, "album");
-        genre = getComment(block, "genre");
-        tracknum = getComment(block, "tracknumber").toInt(); 
-        year = getComment(block, "date").toInt();
+        artist = getComment(block, MYTH_VORBISCOMMENT_ARTIST);
+        compilation_artist = getComment(block, 
+                                        MYTH_VORBISCOMMENT_COMPILATIONARTIST);
+        album = getComment(block, MYTH_VORBISCOMMENT_ALBUM);
+        genre = getComment(block, MYTH_VORBISCOMMENT_GENRE);
+        tracknum = getComment(block, MYTH_VORBISCOMMENT_TRACK).toInt(); 
+        year = getComment(block, MYTH_VORBISCOMMENT_DATE).toInt();
+        
+        QString tmp = getComment(block, 
+                                 MYTH_VORBISCOMMENT_MUSICBRAINZ_ALBUMARTISTID);
+        compilation = (MYTH_MUSICBRAINZ_ALBUMARTIST_UUID == tmp);
+        
     }
 
     FLAC__metadata_chain_delete(chain);
     FLAC__metadata_iterator_delete(iterator);
 
-    Metadata *retdata = new Metadata(filename, artist, album, title, genre,
-                                     year, tracknum, length);
+    Metadata *retdata = new Metadata(filename, artist, compilation_artist, album, 
+                                     title, genre, year, tracknum, length);
+
+    retdata->setCompilation(compilation);
 
     return retdata;
 }

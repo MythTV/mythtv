@@ -51,7 +51,7 @@ bool MetaIOAVFComment::write(Metadata* mdata, bool exclusive)
  */
 Metadata* MetaIOAVFComment::read(QString filename)
 {
-    QString artist = "", album = "", title = "", genre = "";
+    QString artist = "", compilation_artist = "", album = "", title = "", genre = "";
     int year = 0, tracknum = 0, length = 0;
     
     AVFormatContext* p_context = NULL;
@@ -76,6 +76,7 @@ Metadata* MetaIOAVFComment::read(QString filename)
     else
     {
         artist += (char *)p_context->author;
+        // compilation_artist???
         album += (char *)p_context->album;
         genre += (char *)p_context->genre;
         year = p_context->year;
@@ -84,8 +85,10 @@ Metadata* MetaIOAVFComment::read(QString filename)
     
     length = getTrackLength(p_context);
 
-    Metadata *retdata = new Metadata(filename, artist, album, title, genre,
-                                     year, tracknum, length);
+    Metadata *retdata = new Metadata(filename, artist, compilation_artist, album, 
+                                     title, genre, year, tracknum, length);
+
+    retdata->determineIfCompilation();
 
     av_close_input_file(p_context);
     

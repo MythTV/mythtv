@@ -105,6 +105,73 @@
         <source>Genre: </source>
         <translation>Genre: </translation>
     </message>
+    <message>
+        <source>Compilation Artist:<byte value="x9"/></source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EditMetadataDialog</name>
+    <message>
+        <source>Done</source>
+        <translation>Fertig</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="obsolete">Speichern</translation>
+    </message>
+    <message>
+        <source>DB Statistics</source>
+        <translation>Db Statistik</translation>
+    </message>
+    <message>
+        <source>Select an Artist</source>
+        <translation>Einen Interpreten wählen</translation>
+    </message>
+    <message>
+        <source>Select an Album</source>
+        <translation>Ein Album wählen</translation>
+    </message>
+    <message>
+        <source>Select a Genre</source>
+        <translation>Ein Genre wählen</translation>
+    </message>
+    <message>
+        <source>Save Changes?</source>
+        <translation>Änderungen speichern?</translation>
+    </message>
+    <message>
+        <source>Save to Database Only</source>
+        <translation>Nur in der Datenbank speichern</translation>
+    </message>
+    <message>
+        <source>Save to File Only</source>
+        <translation>Nur in der Datei speichern</translation>
+    </message>
+    <message>
+        <source>Save to File and Database</source>
+        <translation>In Datei und Datenbank speichern</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Abbrechen</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to save the modified metadata to the file?</source>
+        <translation>Sind sie sicher, daß Sie die Änderungen in der Datei speichern wollen?</translation>
+    </message>
+    <message>
+        <source>Various Artists</source>
+        <translation type="unfinished">Versch. Interpreten</translation>
+    </message>
+    <message>
+        <source>Select a Compilation Artist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit/Do Not Save</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PlaybackBoxMusic</name>
@@ -218,27 +285,27 @@
     </message>
     <message>
         <source>Smart playlists</source>
-        <translation type="unfinished"></translation>
+        <translation>Intelligente Playlists</translation>
     </message>
     <message>
         <source>All Tracks</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Titel</translation>
     </message>
     <message>
         <source>Tracks by current Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Titel dieses Interpreten</translation>
     </message>
     <message>
         <source>Tracks from current Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Titel dieses Albums</translation>
     </message>
     <message>
         <source>Tracks from current Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Titel dieses Genres</translation>
     </message>
     <message>
         <source>Tracks from current Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Titel dieses Jahres</translation>
     </message>
 </context>
 <context>
@@ -409,35 +476,35 @@
     </message>
     <message>
         <source>Rating Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Ihre Bewertung</translation>
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to your rating of a given track when ordering a group of songs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Für den intelligenten Mix-Modus. Bestimmt, wieviel Einfluß Ihre Bewertung eines Titels auf die Sortierung mehrerer Titel hat.</translation>
     </message>
     <message>
         <source>Play Count Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Wie oft gehört</translation>
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how many times a given track has been played when ordering a group of songs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Für den intelligenten Mix-Modus. Bestimmt, wieviel Einfluß der Wiedergabezähler auf die Sortierung mehrerer Titel hat.</translation>
     </message>
     <message>
         <source>Last Play Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Zuletzt gehört</translation>
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how long it has been since a given track was played when ordering a group of songs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Für den intelligenten Mix-Modus. Bestimmt, wieviel Einfluß der Zeitpunkt, zu dem ein Titel zuletzt gespielt wurde, auf die Sortierung mehrerer Titel hat.</translation>
     </message>
     <message>
         <source>Random Weight</source>
-        <translation type="unfinished"></translation>
+        <translation>Zufall</translation>
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to good old (peudo-)randomness when ordering a group of songs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Für den intelligenten Mix-Modus. Bestimmt, wie zufällig die Sortierung mehrerer Titel erfolgt.</translation>
     </message>
     <message>
         <source>Show Song Ratings</source>
@@ -465,7 +532,7 @@
     </message>
     <message>
         <source>Play mode</source>
-        <translation>Spielmodus</translation>
+        <translation>Wiedergabemodus</translation>
     </message>
     <message>
         <source>Normal</source>
@@ -481,7 +548,7 @@
     </message>
     <message>
         <source>Starting shuffle mode for the player.  Can be either normal, random, or intelligent (random).</source>
-        <translation>Gewünschter Abspielmodus. Möglich ist Normal, Zufall oder Intelligent (zufällig).</translation>
+        <translation>Gewünschter Mix-Modus bei der Wiedergabe. Möglich ist Aus, Normal, Zufall oder Intelligent (zufällig).</translation>
     </message>
     <message>
         <source>Delay before Visualizations start (seconds)</source>
@@ -799,6 +866,10 @@
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
         <translation>Sortierreihenfolge in der Musikauswahl. Mögliche Werte sind (durch Leerzeichen getrennt): &apos;genre&apos;, &apos;splitartist&apos;, &apos;artist&apos;, &apos;album&apos;, &apos;title&apos; ODER das Schlüsselwort &apos;directory&apos;. Bei &apos;directory&apos; entspricht die Darstellung der tatsächlichen Verzeichnisstruktur.</translation>
     </message>
+    <message>
+        <source>CD: %1 ~ %2 - %3</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Ripper</name>
@@ -852,211 +923,279 @@
         <source>Ripping...</source>
         <translation>Importiere...</translation>
     </message>
+    <message>
+        <source>Multi-Artist?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch Titles &amp;&amp; Artists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished">Titel</translation>
+    </message>
+    <message>
+        <source>Artist</source>
+        <translation type="unfinished">Interpret</translation>
+    </message>
+    <message>
+        <source>Length</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SmartPLCriteriaRow</name>
     <message>
         <source>Select an Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Einen Interpreten wählen</translation>
     </message>
     <message>
         <source>Select an Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Ein Album wählen</translation>
     </message>
     <message>
         <source>Select a Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Ein Genre wählen</translation>
     </message>
     <message>
         <source>Select a Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Einen Titel wählen</translation>
     </message>
 </context>
 <context>
     <name>SmartPLOrderByDialog</name>
     <message>
         <source>Order By Fields</source>
-        <translation type="unfinished"></translation>
+        <translation>Nach Feldern sortieren</translation>
     </message>
     <message>
         <source>1 Add</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Hinzufügen</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Hinzufügen</translation>
     </message>
     <message>
         <source>2 Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>2 Löschen</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Löschen</translation>
     </message>
     <message>
         <source>3 Move Up</source>
-        <translation type="unfinished"></translation>
+        <translation>3 Nach oben verschieben</translation>
     </message>
     <message>
         <source>Move Up</source>
-        <translation type="unfinished"></translation>
+        <translation>Nach oben verschieben</translation>
     </message>
     <message>
         <source>4 Move Down</source>
-        <translation type="unfinished"></translation>
+        <translation>4 Nach unten verschieben</translation>
     </message>
     <message>
         <source>Move Down</source>
-        <translation type="unfinished"></translation>
+        <translation>Nach unten verschieben</translation>
     </message>
     <message>
         <source>5 Ascending</source>
-        <translation type="unfinished"></translation>
+        <translation>5 Aufsteigend</translation>
     </message>
     <message>
         <source>Ascending</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufsteigend</translation>
     </message>
     <message>
         <source>6 Descending</source>
-        <translation type="unfinished"></translation>
+        <translation>6 Absteigend</translation>
     </message>
     <message>
         <source>Descending</source>
-        <translation type="unfinished"></translation>
+        <translation>Absteigend</translation>
     </message>
     <message>
         <source>7 OK</source>
-        <translation type="unfinished"></translation>
+        <translation>7 Ok</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
 </context>
 <context>
     <name>SmartPLResultViewer</name>
     <message>
         <source>Smart Playlist Result Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Intelligente Playlists - Treffer</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Zurück</translation>
+    </message>
+    <message>
+        <source>ID</source>
+        <translation>ID</translation>
+    </message>
+    <message>
+        <source>Artist</source>
+        <translation>Interpret</translation>
+    </message>
+    <message>
+        <source>Album</source>
+        <translation>Album</translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation>Titel</translation>
+    </message>
+    <message>
+        <source>Genre</source>
+        <translation>Genre</translation>
+    </message>
+    <message>
+        <source>Year</source>
+        <translation>Jahr</translation>
+    </message>
+    <message>
+        <source>Track No.</source>
+        <translation>Lied Nr.</translation>
     </message>
 </context>
 <context>
     <name>SmartPlaylistDialog</name>
     <message>
         <source>Smart Playlists</source>
-        <translation type="unfinished"></translation>
+        <translation>Intelligente Playlists</translation>
     </message>
     <message>
         <source>1 Select</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Auswahl</translation>
     </message>
     <message>
         <source>Select</source>
-        <translation type="unfinished"></translation>
+        <translation>Auswahl</translation>
     </message>
     <message>
         <source>2 New</source>
-        <translation type="unfinished"></translation>
+        <translation>2 Neu</translation>
     </message>
     <message>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>Neu</translation>
     </message>
     <message>
         <source>3 Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>3 Bearbeiten</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Bearbeiten</translation>
     </message>
     <message>
         <source>4 Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>4 Löschen</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Löschen</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this SmartPlaylist?</source>
+        <translation>Sind sie sicher daß Sie diese intell. Playlist löschen wollen?</translation>
     </message>
 </context>
 <context>
     <name>SmartPlaylistEditor</name>
     <message>
         <source>Smart Playlist Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Intelligente Playlists - Editor</translation>
     </message>
     <message>
         <source>Category:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategorie:</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished">Titel:</translation>
+        <translation>Name:</translation>
     </message>
     <message>
         <source>Match</source>
-        <translation type="unfinished"></translation>
+        <translation>Übereinstimmung:</translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle</translation>
     </message>
     <message>
         <source>Any</source>
-        <translation type="unfinished"></translation>
+        <translation>Eine</translation>
     </message>
     <message>
         <source>Of The Following Conditions</source>
-        <translation type="unfinished"></translation>
+        <translation>der folgenden Bedingungen</translation>
     </message>
     <message>
         <source>Order By:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortierung nach:</translation>
     </message>
     <message>
         <source>Matches:</source>
-        <translation type="unfinished"></translation>
+        <translation>Übereinstimmungen:</translation>
     </message>
     <message>
         <source>Limit:</source>
-        <translation type="unfinished"></translation>
+        <translation>Limit:</translation>
     </message>
     <message>
-        <source> </source>
-        <translation type="unfinished"></translation>
+        <source></source>
+        <translation></translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Speichern</translation>
     </message>
     <message>
         <source>Show Results</source>
-        <translation type="unfinished"></translation>
+        <translation>Treffer zeigen</translation>
     </message>
     <message>
         <source>Smart Playlist Categories</source>
-        <translation type="unfinished"></translation>
+        <translation>Intell. Playlist Kategorien</translation>
     </message>
     <message>
         <source>New Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Neue Kategorie</translation>
     </message>
     <message>
         <source>Delete Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategorie löschen</translation>
     </message>
     <message>
         <source>Rename Category</source>
+        <translation>Kategorie umbenennen</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this Category?</source>
+        <translation>Sind sie sicher, daß Sie diese Kategorie löschen wollen?</translation>
+    </message>
+    <message>
+        <source>It will also delete any Smart Playlists belonging to this category</source>
+        <translation type="obsolete">Damit werden auch alle Intell. Playlists dieser Kategorie gelöscht.</translation>
+    </message>
+    <message>
+        <source>It will also delete any Smart Playlists belonging to this category.</source>
+        <translation>Damit werden auch alle intell. Playlists dieser Kategorie gelöscht.</translation>
+    </message>
+    <message>
+        <source> </source>
         <translation type="unfinished"></translation>
     </message>
 </context>

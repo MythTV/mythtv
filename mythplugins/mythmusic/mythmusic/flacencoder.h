@@ -3,6 +3,7 @@
 
 #include <qstring.h>
 
+#define HAVE_INTTYPES_H
 #include <FLAC/file_encoder.h>
 
 #include "encoder.h"
