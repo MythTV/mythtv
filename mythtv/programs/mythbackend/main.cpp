@@ -372,7 +372,9 @@ int main(int argc, char **argv)
                     "                               libav,jobqueue" << endl <<
                     "--printexpire                  List of auto-expire programs" << endl <<
                     "--printsched                   Upcoming scheduled programs" << endl <<
+                    "--testsched                    Test run scheduler (ignore existing schedule)" << endl <<
                     "--resched                      Force the scheduler to update" << endl <<
+                    "--nosched                      Do not perform any scheduling" << endl <<
                     "--version                      Version information" << endl;
             return -1;
         }
