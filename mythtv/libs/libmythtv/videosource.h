@@ -122,7 +122,7 @@ public:
 
     void loadByID(QSqlDatabase* db, int id);
 
-    static void fillSelections(QSqlDatabase* db, StringSelectSetting* setting);
+    static void fillSelections(QSqlDatabase* db, SelectSetting* setting);
     static QString idToName(QSqlDatabase* db, int id);
 
     QString getSourceName(void) const { return name->getValue(); };
@@ -247,7 +247,7 @@ public:
 
     void loadByID(QSqlDatabase* db, int id);
 
-    static void fillSelections(QSqlDatabase* db, StringSelectSetting* setting);
+    static void fillSelections(QSqlDatabase* db, SelectSetting* setting);
 
 private:
     class ID: virtual public IntegerSetting,

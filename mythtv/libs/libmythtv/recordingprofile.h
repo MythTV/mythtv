@@ -71,6 +71,8 @@ public:
     virtual void loadByID(QSqlDatabase* db, int id);
     virtual void loadByName(QSqlDatabase* db, QString name);
 
+    static void fillSelections(QSqlDatabase* db, SelectSetting* setting);
+
     int getProfileNum(void) const {
         return id->intValue();
     };
@@ -93,6 +95,8 @@ public:
     virtual int exec(QSqlDatabase* db);
     virtual void load(QSqlDatabase* db);
     virtual void save(QSqlDatabase* db) { (void)db; };
+
+    static void fillSelections(QSqlDatabase* db, SelectSetting* setting);
 
 protected slots:
     void open(int id) {

@@ -212,7 +212,7 @@ void TriggeredConfigurationGroup::addTarget(QString triggerValue, Configurable* 
     triggerMap[triggerValue] = target;
 }
 
-void StringSelectSetting::addSelection(const QString& label, QString value, bool select) {
+void SelectSetting::addSelection(const QString& label, QString value, bool select) {
     if (value == QString::null)
         value = label;
     
@@ -225,14 +225,14 @@ void StringSelectSetting::addSelection(const QString& label, QString value, bool
         setValue(value);
 }
 
-void StringSelectSetting::clearSelections(void) {
+void SelectSetting::clearSelections(void) {
     labels.clear();
     values.clear();
     isSet = false;
     emit selectionsCleared();
 }
 
-void StringSelectSetting::setValue(const QString& newValue)  {
+void SelectSetting::setValue(const QString& newValue)  {
     bool found = false;
     for(unsigned i = 0 ; i < values.size() ; ++i)
         if (values[i] == newValue) {
@@ -722,7 +722,7 @@ HostnameSetting::HostnameSetting(void)  {
     }
 }
 
-void ChannelSetting::fillSelections(QSqlDatabase* db, StringSelectSetting* setting) {
+void ChannelSetting::fillSelections(QSqlDatabase* db, SelectSetting* setting) {
 
     // this should go somewhere else, in something that knows about
     // channels and how they're stored in the database.  We're just a

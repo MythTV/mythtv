@@ -273,7 +273,7 @@ public:
         QString fullsize, halfsize;
         int maxwidth, maxheight;
         if (tvFormat.lower() == "ntsc" || tvFormat.lower() == "ntsc-jp") {
-            maxwidth = 720;
+            maxwidth = 640;
             maxheight = 480;
 
         } else {
@@ -327,10 +327,7 @@ void RecordingProfile::loadByName(QSqlDatabase* db, QString name) {
 void RecordingProfileEditor::load(QSqlDatabase* db) {
     clearSelections();
     addSelection("(Create new profile)", "0");
-    QSqlQuery query = db->exec("SELECT name, id FROM recordingprofiles;");
-    if (query.isActive() && query.numRowsAffected() > 0)
-        while (query.next())
-            addSelection(query.value(0).toString(), query.value(1).toString());
+    fillSelections(db, this);
 }
 
 int RecordingProfileEditor::exec(QSqlDatabase* db) {
@@ -338,4 +335,11 @@ int RecordingProfileEditor::exec(QSqlDatabase* db) {
         open(getValue().toInt());
 
     return QDialog::Rejected;
+}
+
+void RecordingProfile::fillSelections(QSqlDatabase* db, SelectSetting* setting) {
+    QSqlQuery result = db->exec("SELECT name, id FROM recordingprofiles");
+    if (result.isActive() && result.numRowsAffected() > 0)
+        while (result.next())
+            setting->addSelection(result.value(0).toString(), result.value(1).toString());
 }

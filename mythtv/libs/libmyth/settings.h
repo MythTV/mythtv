@@ -72,6 +72,8 @@ public:
         return NULL;
     };
 
+    bool isChanged(void) { return changed; };
+
 public slots:
     virtual void setValue(const QString& newValue) {
         settingValue = newValue;
@@ -80,8 +82,8 @@ public slots:
     };
 signals:
     void valueChanged(const QString&);
+
 protected:
-    bool isChanged(void) { return changed; };
     void setUnchanged(void) { changed = false; };
 
     QString settingValue;
@@ -261,10 +263,10 @@ public:
                                   const char* widgetName = 0);
 };
 
-class StringSelectSetting: virtual public Setting {
+class SelectSetting: virtual public Setting {
     Q_OBJECT
 protected:
-    StringSelectSetting() { isSet = false; };
+    SelectSetting() { isSet = false; };
 public:
     virtual void addSelection(const QString& label,
                               QString value=QString::null,
@@ -282,7 +284,7 @@ public slots:
 
     virtual void setValue(int which) {
         if ((unsigned)which > values.size()-1) {
-            cout << "StringSelectSetting::setValue(): invalid index " << which << endl;
+            cout << "SelectSetting::setValue(): invalid index " << which << endl;
             return;
         }
         setValue(values[which]);
@@ -302,7 +304,7 @@ protected:
     bool isSet;
 };
 
-class SelectLabelSetting: public LabelSetting, public StringSelectSetting {
+class SelectLabelSetting: public LabelSetting, public SelectSetting {
 protected:
     SelectLabelSetting() {};
 
@@ -311,7 +313,7 @@ public:
                                   const char* widgetName = 0);
 };
 
-class ComboBoxSetting: public StringSelectSetting {
+class ComboBoxSetting: public SelectSetting {
 protected:
     ComboBoxSetting(bool _rw = false) {
         rw = _rw;
@@ -330,7 +332,7 @@ private:
     bool rw;
 };
 
-class ListBoxSetting: public StringSelectSetting {
+class ListBoxSetting: public SelectSetting {
     Q_OBJECT
 public:
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
@@ -340,13 +342,13 @@ protected slots:
     void setValueByLabel(const QString& label);
 };
 
-class RadioSetting: public StringSelectSetting {
+class RadioSetting: public SelectSetting {
 public:
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                   const char* widgetName = 0);
 };
 
-class ImageSelectSetting: public StringSelectSetting {
+class ImageSelectSetting: public SelectSetting {
     Q_OBJECT
 public:
     virtual ~ImageSelectSetting();
@@ -444,13 +446,13 @@ public:
     HostnameSetting();
 };
 
-class ChannelSetting: virtual public StringSelectSetting {
+class ChannelSetting: virtual public SelectSetting {
 public:
     ChannelSetting() {
         setLabel("Channel");
     };
 
-    static void fillSelections(QSqlDatabase* db, StringSelectSetting* setting);
+    static void fillSelections(QSqlDatabase* db, SelectSetting* setting);
     virtual void fillSelections(QSqlDatabase* db) {
         fillSelections(db, this);
     };

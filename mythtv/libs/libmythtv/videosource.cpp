@@ -118,7 +118,7 @@ void XMLTV_generic_config::save(QSqlDatabase* db) {
 }
 
 void VideoSource::fillSelections(QSqlDatabase* db,
-                                 StringSelectSetting* setting) {
+                                 SelectSetting* setting) {
     QString query = QString("SELECT name, sourceid FROM videosource;");
     QSqlQuery result = db->exec(query);
 
@@ -134,7 +134,7 @@ void VideoSource::loadByID(QSqlDatabase* db, int sourceid) {
 }
 
 void CaptureCard::fillSelections(QSqlDatabase* db,
-                                 StringSelectSetting* setting) {
+                                 SelectSetting* setting) {
     QString query = QString("SELECT videodevice, cardid FROM capturecard;");
     QSqlQuery result = db->exec(query);
 
@@ -222,7 +222,7 @@ void CardInputEditor::load(QSqlDatabase* db) {
     clearSelections();
 
     // We do this manually because we want custom labels.  If
-    // StringSelectSetting provided a facility to edit the labels, we
+    // SelectSetting provided a facility to edit the labels, we
     // could use CaptureCard::fillSelections
 
     QSqlQuery capturecards = db->exec("SELECT cardid,videodevice FROM capturecard;");
