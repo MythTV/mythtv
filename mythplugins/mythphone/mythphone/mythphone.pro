@@ -11,12 +11,10 @@ TARGET = mythphone
 target.path = $${PREFIX}/lib/mythtv/plugins
 INSTALLS += target
 
-installfiles.path = $${PREFIX}/share/mythtv
-installfiles.files = phonemenu.xml phone_settings.xml 
 uifiles.path = $${PREFIX}/share/mythtv/themes/default
 uifiles.files = webcam-ui.xml phone-ui.xml images/*.png
 
-INSTALLS += installfiles uifiles
+INSTALLS += uifiles
 
 LIBS += 
 
