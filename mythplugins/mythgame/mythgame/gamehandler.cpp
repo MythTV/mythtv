@@ -83,18 +83,18 @@ void GameHandler::Launchgame(RomInfo *romdata)
         handler->start_game(romdata);
 }
 
-void GameHandler::EditSettings(MythMainWindow *parent, RomInfo *romdata)
+void GameHandler::EditSettings(RomInfo *romdata)
 {
     GameHandler *handler;
     if((handler = GetHandler(romdata)))
-        handler->edit_settings(parent,romdata);
+        handler->edit_settings(romdata);
 }
 
-void GameHandler::EditSystemSettings(MythMainWindow *parent, RomInfo *romdata)
+void GameHandler::EditSystemSettings(RomInfo *romdata)
 {
     GameHandler *handler;
     if((handler = GetHandler(romdata)))
-        handler->edit_system_settings(parent,romdata);
+        handler->edit_system_settings(romdata);
 }
 
 RomInfo* GameHandler::CreateRomInfo(RomInfo* parent)

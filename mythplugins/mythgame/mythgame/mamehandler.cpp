@@ -447,32 +447,26 @@ void MameHandler::start_game(RomInfo * romdata)
         pclose(command);
 }
 
-void MameHandler::edit_settings(MythMainWindow *parent,RomInfo * romdata)
+void MameHandler::edit_settings(RomInfo * romdata)
 {
     GameSettings game_settings;
     MameRomInfo *mamedata = dynamic_cast<MameRomInfo*>(romdata);
     SetGameSettings(game_settings, mamedata);
 
-    MameSettingsDlg settingsdlg(parent, "gamesettings");
-    QString ImageFile;
-    if(mamedata->FindImage("screenshot", &ImageFile))
-        settingsdlg.SetScreenshot(ImageFile);
-    if(mamedata->FindImage("flyer", &ImageFile))
-        settingsdlg.SetFlyer(ImageFile);
-    if(mamedata->FindImage("cabinet", &ImageFile))
-        settingsdlg.SetCabinet(ImageFile);
     check_xmame_exe();
-    if(settingsdlg.Show(&general_prefs, &game_settings, mamedata->Vector()))
-        SaveGameSettings(game_settings, mamedata);
+    MameSettingsDlg settingsdlg(mamedata->Romname().latin1(), &general_prefs);
+    settingsdlg.exec(QSqlDatabase::database());
 }
 
-void MameHandler::edit_system_settings(MythMainWindow *parent,RomInfo * romdata)
+void MameHandler::edit_system_settings(RomInfo * romdata)
 {
     romdata = romdata;
-    MameSettingsDlg settingsDlg(parent, "mamesettings", true);
+
     check_xmame_exe();
-    if(settingsDlg.Show(&general_prefs, &defaultSettings, true))
-        SaveGameSettings(defaultSettings, NULL);    
+    MameSettingsDlg settingsDlg("default", &general_prefs);
+    settingsDlg.exec(QSqlDatabase::database());
+
+    SetDefaultSettings();
 }
 
 bool MameHandler::check_xmame_exe()
@@ -936,65 +930,6 @@ void MameHandler::SetGameSettings(GameSettings &game_settings, MameRomInfo *romi
             }
         }
     }
-}
-
-void MameHandler::SaveGameSettings(GameSettings &game_settings, MameRomInfo *rominfo)
-{
-    QSqlDatabase *db = QSqlDatabase::database();
-    QString thequery;
-    //bool exists = false;
-    QString RomName = "default";
-    if(rominfo)
-        RomName = rominfo->Romname();
-    thequery = QString("SELECT romname FROM mamesettings WHERE romname = \"%1\";").arg(RomName.latin1());
-    QSqlQuery query = db->exec(thequery);
-    if (query.isActive() && query.numRowsAffected() > 0)
-    {
-        thequery.sprintf("UPDATE mamesettings SET usedefault = %d, fullscreen = %d, "
-                          "scanlines = %d, extra_artwork = %d, autoframeskip = %d, "
-                          "autocolordepth = %d, rotleft = %d, rotright = %d, flipx = %d, "
-                          "flipy = %d, scale = %d, antialias = %d, translucency = %d, "
-                          "beam = %f, flicker = %f, vectorres = %d, analogjoy = %d, "
-                          "mouse = %d, winkeys = %d, grabmouse = %d, joytype = %d, "
-                          "sound = %d, samples = %d, fakesound = %d, volume = %d, "
-                          "cheat = %d, extraoption = \"%s\" WHERE romname = \"%s\";",
-                          game_settings.default_options, game_settings.fullscreen,
-                          game_settings.scanlines, game_settings.extra_artwork,
-                          game_settings.autoframeskip, game_settings.auto_colordepth,
-                          game_settings.rot_left, game_settings.rot_right,
-                          game_settings.flipx, game_settings.flipy, game_settings.scale,
-                          game_settings.antialias, game_settings.translucency,
-                          game_settings.beam, game_settings.flicker, game_settings.vectorres,
-                          game_settings.analog_joy, game_settings.mouse,
-                          game_settings.winkeys, game_settings.grab_mouse,
-                          game_settings.joytype, game_settings.sound, game_settings.samples,
-                          game_settings.fake_sound, game_settings.volume,
-                          game_settings.cheat, game_settings.extra_options.latin1(),
-                          RomName.latin1());
-    }
-    else
-    {
-        thequery.sprintf("INSERT INTO mamesettings (romname,usedefault,fullscreen,scanlines,"
-                          "extra_artwork,autoframeskip,autocolordepth,rotleft,rotright,"
-                          "flipx,flipy,scale,antialias,translucency,beam,flicker,"
-                          "vectorres,analogjoy,mouse,winkeys,grabmouse,joytype,"
-                          "sound,samples,fakesound,volume,cheat,extraoption) VALUES "
-                          "(\"%s\",%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%f,%f,%d,"
-                          "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,\"%s\");",RomName.latin1(),
-                          game_settings.default_options, game_settings.fullscreen,
-                          game_settings.scanlines, game_settings.extra_artwork,
-                          game_settings.autoframeskip, game_settings.auto_colordepth,
-                          game_settings.rot_left, game_settings.rot_right,
-                          game_settings.flipx, game_settings.flipy, game_settings.scale,
-                          game_settings.antialias, game_settings.translucency,
-                          game_settings.beam, game_settings.flicker, game_settings.vectorres,
-                          game_settings.analog_joy, game_settings.mouse,
-                          game_settings.winkeys, game_settings.grab_mouse,
-                          game_settings.joytype, game_settings.sound, game_settings.samples,
-                          game_settings.fake_sound, game_settings.volume,
-                          game_settings.cheat, game_settings.extra_options.latin1());
-    }
-    query = db->exec(thequery);
 }
 
 void MameHandler::SetDefaultSettings()

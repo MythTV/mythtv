@@ -36,8 +36,8 @@ class SnesHandler : public GameHandler
     virtual ~SnesHandler();
 
     void start_game(RomInfo *romdata);
-    void edit_settings(MythMainWindow *parent,RomInfo *romdata);
-    void edit_system_settings(MythMainWindow *parent,RomInfo *romdata);
+    void edit_settings(RomInfo *romdata);
+    void edit_system_settings(RomInfo *romdata);
     RomInfo* create_rominfo(RomInfo* parent);
     void processGames();
     void processGames(bool);
@@ -51,7 +51,7 @@ class SnesHandler : public GameHandler
     bool VerifyRomHeader(FILE* pFile,unsigned int offset, RomHeader* Header);
     void SetGameSettings(SnesGameSettings &game_settings, SnesRomInfo *rominfo);
     void SetDefaultSettings();
-    void SaveGameSettings(SnesGameSettings &game_settings, SnesRomInfo *romdata);
+
     SnesGameSettings defaultSettings;
 };
 

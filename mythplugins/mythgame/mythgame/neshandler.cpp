@@ -38,21 +38,20 @@ void NesHandler::start_game(RomInfo* romdata)
     pclose(command);
 }
 
-void NesHandler::edit_settings(MythMainWindow* parent, RomInfo* romdata)
+void NesHandler::edit_settings(RomInfo* romdata)
 {
-    // Eliminate unused parameter warning from the compiler.        
-    parent = parent;
     romdata = romdata;
+
+    NesSettingsDlg settingsdlg(romdata->Romname().latin1());
+    settingsdlg.exec(QSqlDatabase::database());
 }
 
-void NesHandler::edit_system_settings(MythMainWindow* parent, RomInfo* romdata)
+void NesHandler::edit_system_settings(RomInfo* romdata)
 {
-    // Eliminate unused parameter warning from the compiler.                
     romdata = romdata;
 
-    NesSettingsDlg settingsdlg(parent, "gamesettings");
-    settingsdlg.Show();
-    settingsdlg.exec();
+    NesSettingsDlg settingsdlg("default");
+    settingsdlg.exec(QSqlDatabase::database());
 }
 
 void NesHandler::processGames()

@@ -1,5 +1,5 @@
-#ifndef GALLERYSETTINGS_H
-#define GALLERYSETTINGS_H
+#ifndef GAMESETTINGS_H
+#define GAMESETTINGS_H
 
 #include "mythtv/settings.h"
 #include "mythtv/mythcontext.h"

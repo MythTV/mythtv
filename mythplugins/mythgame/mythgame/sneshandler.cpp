@@ -431,26 +431,28 @@ void SnesHandler::start_game(RomInfo * romdata)
     pclose(command);
 }
 
-void SnesHandler::edit_settings(MythMainWindow *parent,RomInfo * romdata)
+void SnesHandler::edit_settings(RomInfo * romdata)
 {
     SnesGameSettings game_settings;
     SnesRomInfo *snesdata = dynamic_cast<SnesRomInfo*>(romdata);
-    SetGameSettings(game_settings, snesdata);
 
-    SnesSettingsDlg settingsdlg(parent, "gamesettings");
+    SnesSettingsDlg settingsdlg(snesdata->Romname().latin1());
+    settingsdlg.exec(QSqlDatabase::database());
+
+/*
     QString ImageFile;
     if(snesdata->FindImage("screenshot", &ImageFile))
         settingsdlg.SetScreenshot(ImageFile);
-    if(settingsdlg.Show(&game_settings))
-        SaveGameSettings(game_settings, snesdata);
+*/
 }
 
-void SnesHandler::edit_system_settings(MythMainWindow *parent,RomInfo * romdata)
+void SnesHandler::edit_system_settings(RomInfo * romdata)
 {
     romdata = romdata;
-    SnesSettingsDlg settingsDlg(parent, "snessettings", true);
-    if(settingsDlg.Show(&defaultSettings))
-        SaveGameSettings(defaultSettings, NULL);    
+    SnesSettingsDlg settingsDlg("default");
+    settingsDlg.exec(QSqlDatabase::database());
+
+    SetDefaultSettings();
 }
 
 SnesHandler* SnesHandler::getHandler(void)
@@ -589,73 +591,6 @@ void SnesHandler::SetDefaultSettings()
         defaultSettings.extra_options = query.value(35).toString();
     }
 }
-
-void SnesHandler::SaveGameSettings(SnesGameSettings &game_settings, SnesRomInfo *rominfo)
-{
-    QSqlDatabase *db = QSqlDatabase::database();
-    QString thequery;
-    QString RomName = "default";
-    if(rominfo)
-        RomName = rominfo->Romname();
-    thequery = QString("SELECT romname FROM snessettings WHERE romname = \"%1\";").arg(RomName.latin1());
-    QSqlQuery query = db->exec(thequery);
-    if (query.isActive() && query.numRowsAffected() > 0)
-    {
-        thequery.sprintf("UPDATE snessettings SET usedefault = %d, transparency = %d, "
-                          "sixteen = %d, hires = %d, interpolate = %d, "
-                          "nomodeswitch = %d, fullscreen = %d, stretch = %d, nosound = %d, "
-                          "soundskip = %d, stereo = %d, soundquality = %d, envx = %d, "
-                          "threadsound = %d, syncsound = %d, interpolatedsound = %d, buffersize = %d, "
-                          "nosamplecaching = %d, altsampledecode = %d, noecho = %d , "
-                          "nomastervolume = %d, nojoy = %d, interleaved = %d, "
-                          "altinterleaved = %d, hirom = %d, lowrom = %d, header = %d, "
-                          "noheader = %d, pal = %d, ntsc = %d, layering = %d, nohdma = %d, nospeedhacks = %d, "
-                          "nowindows = %d, extraoption = \"%s\" WHERE romname = \"%s\";",
-                          game_settings.default_options, game_settings.transparency,
-                          game_settings.sixteen, game_settings.hi_res,
-                          game_settings.interpolate, game_settings.no_mode_switch,
-                          game_settings.full_screen, game_settings.stretch,
-                          game_settings.no_sound, game_settings.sound_skip, game_settings.stereo,
-                          game_settings.sound_quality, game_settings.envx,
-                          game_settings.thread_sound, game_settings.sound_sync, game_settings.interpolated_sound,
-                          game_settings.buffer_size, game_settings.no_sample_caching,
-                          game_settings.alt_sample_decode, game_settings.no_echo,
-                          game_settings.no_master_volume, game_settings.no_joy, game_settings.interleaved,
-                          game_settings.alt_interleaved, game_settings.hi_rom,
-                          game_settings.low_rom, game_settings.header, game_settings.no_header,
-                          game_settings.pal, game_settings.ntsc, game_settings.layering,
-                          game_settings.no_hdma, game_settings.no_speed_hacks,
-                          game_settings.no_windows, game_settings.extra_options.latin1(),
-                          RomName.latin1());
-    }
-    else
-    {
-        thequery.sprintf("INSERT INTO snessettings (romname,usedefault,transparency,sixteen,"
-                          "hires,interpolate,nomodeswitch,fullscreen,stretch,"
-                          "nosound,soundskip,stereo,soundquality,envx,threadsound,syncsound,"
-                          "interpolatedsound,buffersize,nosamplecaching,altsampledecode,noecho,nomastervolume,"
-                          "nojoy,interleaved,altinterleaved,hirom,lowrom,header,noheader,"
-                          "pal,ntsc,layering,nohdma,nospeedhacks,nowindows,extraoption) VALUES "
-                          "(\"%s\",%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,"
-                          "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,\"%s\");",RomName.latin1(),
-                          game_settings.default_options, game_settings.transparency,
-                          game_settings.sixteen, game_settings.hi_res,
-                          game_settings.interpolate, game_settings.no_mode_switch,
-                          game_settings.full_screen, game_settings.stretch,
-                          game_settings.no_sound, game_settings.sound_skip, game_settings.stereo,
-                          game_settings.sound_quality, game_settings.envx,
-                          game_settings.thread_sound, game_settings.sound_sync, game_settings.interpolated_sound,
-                          game_settings.buffer_size, game_settings.no_sample_caching,
-                          game_settings.alt_sample_decode, game_settings.no_echo,
-                          game_settings.no_master_volume, game_settings.no_joy, game_settings.interleaved,
-                          game_settings.alt_interleaved, game_settings.hi_rom,
-                          game_settings.low_rom, game_settings.header, game_settings.no_header,
-                          game_settings.pal, game_settings.ntsc, game_settings.layering,
-                          game_settings.no_hdma, game_settings.no_speed_hacks,
-                          game_settings.no_windows, game_settings.extra_options.latin1());
-    }
-    query = db->exec(thequery);
-} 
 
 SnesHandler* SnesHandler::pInstance = 0;
 

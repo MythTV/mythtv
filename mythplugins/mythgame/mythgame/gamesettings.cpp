@@ -20,17 +20,6 @@ public:
     };
 };
 
-class DisplayMode: public ComboBoxSetting, public GlobalSetting {
-public:
-    DisplayMode():
-        GlobalSetting("ShotCount") {
-        setLabel("Display mode");
-        addSelection("Tree", "0");
-        addSelection("Tree and Images", "5");
-        setHelpText("Mode to display the games in.");
-    };
-};
-
 class MameBinary: public LineEditSetting, public GlobalSetting {
 public:
     MameBinary():
@@ -240,7 +229,6 @@ MythGameSettings::MythGameSettings()
     VerticalConfigurationGroup *general = new VerticalConfigurationGroup(false);
     general->setLabel("MythGame Settings -- General");
     general->addChild(new GameTreeLevels());
-    general->addChild(new DisplayMode());
     addChild(general);
 
     VerticalConfigurationGroup *mame = new VerticalConfigurationGroup(false);

@@ -19,8 +19,8 @@ class NesHandler : public GameHandler
     virtual ~NesHandler() {};
 
     void start_game(RomInfo* romdata);
-    void edit_settings(MythMainWindow* parent, RomInfo* romdata);
-    void edit_system_settings(MythMainWindow* parent, RomInfo* romdata);
+    void edit_settings(RomInfo* romdata);
+    void edit_system_settings(RomInfo* romdata);
     void processGames();
     RomInfo* create_rominfo(RomInfo* parent);
     

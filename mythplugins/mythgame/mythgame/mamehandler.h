@@ -23,8 +23,8 @@ class MameHandler : public GameHandler
 
     void error(const QString &e);
     void start_game(RomInfo *romdata);
-    void edit_settings(MythMainWindow *parent, RomInfo *romdata);
-    void edit_system_settings(MythMainWindow *parent, RomInfo *romdata);
+    void edit_settings(RomInfo *romdata);
+    void edit_system_settings(RomInfo *romdata);
     RomInfo* create_rominfo(RomInfo* parent);
     QString Systemname() { return systemname; }
     void processGames();
@@ -36,7 +36,6 @@ class MameHandler : public GameHandler
     void makecmd_line(const char * game, QString* exec, MameRomInfo * romentry);
     void SetGeneralPrefs();
     void SetGameSettings(GameSettings &game_settings, MameRomInfo *rominfo);
-    void SaveGameSettings(GameSettings &game_settings, MameRomInfo *romdata);
     void SetDefaultSettings();
     void LoadCatfile(map<QString, QString>* pCatMap);
 

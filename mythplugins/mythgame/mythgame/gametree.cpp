@@ -176,11 +176,9 @@ void GameTree::edit(void)
         return;
 
     if (curitem->level == "system")
-        GameHandler::EditSystemSettings(gContext->GetMainWindow(),
-                                        curitem->rominfo);
+        GameHandler::EditSystemSettings(curitem->rominfo);
     else if (curitem->level == "gamename" && curitem->isleaf)
-        GameHandler::EditSettings(gContext->GetMainWindow(),
-                                  curitem->rominfo);
+        GameHandler::EditSettings(curitem->rominfo);
 }
 
 void GameTree::FillListFrom(GameTreeItem *item)

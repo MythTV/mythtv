@@ -1,586 +1,367 @@
-#include "mamesettingsdlg.h"
-#include <iostream>
-
-#include <qapplication.h>
-#include <qvariant.h>
-#include <qcheckbox.h>
-#include <qcombobox.h>
-#include <qframe.h>
-#include <qgroupbox.h>
-#include <qlabel.h>
-#include <qlineedit.h>
-#include <qpushbutton.h>
-#include <qslider.h>
-#include <qtabwidget.h>
-#include <qwidget.h>
-#include <qlayout.h>
-#include <qtooltip.h>
-#include <qwhatsthis.h>
-#include <qimage.h>
-
-#include "mamehandler.h"
+#include <qstring.h>
 
 #include <mythtv/mythcontext.h>
 
-using namespace std;
+#include "mamesettingsdlg.h"
+#include "mametypes.h"
 
-#define SAVE_SETTINGS 1
-#define DONT_SAVE_SETTINGS 0
+class MameSetting: public SimpleDBStorage {
+public:
+    MameSetting(QString name, QString _romname):
+        SimpleDBStorage("mamesettings", name),
+        romname(_romname) {
+        setName(name);
+    }
 
-MameSettingsDlg::MameSettingsDlg(MythMainWindow* parent, const char* name, 
-                                 bool system)
-               : MythDialog(parent, name), bSystem(system)
+    virtual QString setClause(void)
+    {
+        return QString("romname = \"%1\", %2 = '%3'")
+                      .arg(romname).arg(getColumn()).arg(getValue());
+    }
+
+    virtual QString whereClause(void)
+    {
+        return QString("romname = \"%1\"").arg(romname);
+    }
+
+    QString romname;
+};
+
+class MameDefaultOptions: public CheckBoxSetting, public MameSetting {
+public:
+    MameDefaultOptions(QString rom):
+        MameSetting("usedefault", rom) {
+        setLabel("Use defaults");
+        setValue(true);
+        setHelpText("Use the global default MAME settings.  All other settings"
+                    " are ignored if this is set.");
+    };
+};
+
+/* video */
+class MameFullscreen: public ComboBoxSetting, public MameSetting {
+public:
+    MameFullscreen(QString rom, Prefs *prefs):
+        MameSetting("fullscreen", rom) {
+        setLabel("Fullscreen mode");
+        addSelection("Windowed", "0");
+        if ((!strcmp(prefs->xmame_display_target, "x11")) &&
+            (atoi(prefs->xmame_minor) >= 61))
+        {
+            addSelection("Fullscreen/DGA", "1");
+            addSelection("Fullscreen/Xv", "2");
+        }
+        else
+            addSelection("Fullscreen", "1");
+    };
+};
+
+class MameSkip: public CheckBoxSetting, public MameSetting {
+public:
+    MameSkip(QString rom):
+        MameSetting("autoframeskip", rom) {
+        setLabel("Auto frame skip");
+        setValue(false);
+    };
+};
+
+class MameLeft: public CheckBoxSetting, public MameSetting {
+public:
+    MameLeft(QString rom):
+        MameSetting("rotleft", rom) {
+        setLabel("Rotate left");
+        setValue(false);
+    };
+};
+
+class MameRight: public CheckBoxSetting, public MameSetting {
+public:
+    MameRight(QString rom):
+        MameSetting("rotright", rom) {
+        setLabel("Rotate right");
+        setValue(false);
+    };
+};
+
+class MameFlipx: public CheckBoxSetting, public MameSetting {
+public:
+    MameFlipx(QString rom):
+        MameSetting("flipx", rom) {
+        setLabel("Flip X Axis");
+        setValue(false);
+    };
+};
+
+class MameFlipy: public CheckBoxSetting, public MameSetting {
+public:
+    MameFlipy(QString rom):
+        MameSetting("flipy", rom) {
+        setLabel("Flip Y Axis");
+        setValue(false);
+    };
+};
+
+class MameExtraArt: public CheckBoxSetting, public MameSetting {
+public:
+    MameExtraArt(QString rom):
+        MameSetting("extra_artwork", rom) {
+        setLabel("Extra Artwork");
+        setValue(false);
+    };
+};
+
+class MameScan: public CheckBoxSetting, public MameSetting {
+public:
+    MameScan(QString rom):
+        MameSetting("scanlines", rom) {
+        setLabel("Scanlines");
+        setValue(false);
+    };
+};
+
+class MameColor: public CheckBoxSetting, public MameSetting {
+public:
+    MameColor(QString rom):
+        MameSetting("autocolordepth", rom) {
+        setLabel("Automatic color depth");
+        setValue(false);
+    };
+};
+
+class MameScale: public SpinBoxSetting, public MameSetting {
+public:
+    MameScale(QString rom):
+        SpinBoxSetting(1, 5, 1),
+        MameSetting("scale", rom) {
+        setLabel("Scaling");
+        setValue(1);
+    };
+};
+
+/* vector */
+class MameAlias: public CheckBoxSetting, public MameSetting {
+public:
+    MameAlias(QString rom):
+        MameSetting("antialias", rom) {
+        setLabel("Antialiasing");
+        setValue(false);
+    };
+};
+
+class MameTrans: public CheckBoxSetting, public MameSetting {
+public:
+    MameTrans(QString rom):
+        MameSetting("translucency", rom) {
+        setLabel("Translucency");
+        setValue(false);
+    };
+};
+
+class MameRes: public ComboBoxSetting, public MameSetting {
+public:
+    MameRes(QString rom):
+        MameSetting("vectorres", rom) {
+        setLabel("Resolution");
+        addSelection("Use Scale", "0");
+        addSelection("640 x 480", "1");
+        addSelection("800 x 600", "2");
+        addSelection("1024 x 768", "3");
+        addSelection("1280 x 1024", "4");
+        addSelection("1600 x 1200", "5");
+    };
+};
+
+class MameBeam: public SpinBoxSetting, public MameSetting {
+public:
+    MameBeam(QString rom):
+        SpinBoxSetting(1, 15, 1),
+        MameSetting("beam", rom) {
+        setLabel("Scaling");
+        setValue(1);
+    };
+};
+
+class MameFlicker: public SpinBoxSetting, public MameSetting {
+public:
+    MameFlicker(QString rom):
+        SpinBoxSetting(0, 10, 1),
+        MameSetting("beam", rom) {
+        setLabel("Scaling");
+        setValue(0);
+    };
+};
+
+/* sound */
+class MameSound: public CheckBoxSetting, public MameSetting {
+public:
+    MameSound(QString rom):
+        MameSetting("sound", rom) {
+        setLabel("Use sound");
+        setValue(true);
+    };
+};
+
+class MameSamples: public CheckBoxSetting, public MameSetting {
+public:
+    MameSamples(QString rom):
+        MameSetting("samples", rom) {
+        setLabel("Use samples");
+        setValue(true);
+    };
+};
+
+class MameFake: public CheckBoxSetting, public MameSetting {
+public:
+    MameFake(QString rom):
+        MameSetting("fakesound", rom) {
+        setLabel("Fake sound");
+        setValue(false);
+    };
+};
+
+class MameVolume: public SpinBoxSetting, public MameSetting {
+public:
+    MameVolume(QString rom):
+        SpinBoxSetting(-32, 0, 1),
+        MameSetting("volume", rom) {
+        setLabel("Volume");
+        setValue(-16);
+    };
+};
+
+/* misc */
+class MameCheat: public CheckBoxSetting, public MameSetting {
+public:
+    MameCheat(QString rom):
+        MameSetting("cheat", rom) {
+        setLabel("Enable cheats");
+        setValue(true);
+    };
+};
+
+class MameExtraOptions: public LineEditSetting, public MameSetting {
+public:
+    MameExtraOptions(QString rom):
+        MameSetting("extraoption", rom) {
+        setLabel("Extra options");
+        setValue("");
+    };
+};
+
+/* input */
+class MameWindows: public CheckBoxSetting, public MameSetting {
+public:
+    MameWindows(QString rom):
+        MameSetting("winkeys", rom) {
+        setLabel("Use Windows Keys");
+        setValue(false);
+    };
+};
+
+class MameMouse: public CheckBoxSetting, public MameSetting {
+public:
+    MameMouse(QString rom):
+        MameSetting("mouse", rom) {
+        setLabel("Use Mouse");
+        setValue(false);
+    };
+};
+
+class MameGrabMouse: public CheckBoxSetting, public MameSetting {
+public:
+    MameGrabMouse(QString rom):
+        MameSetting("grabmouse", rom) {
+        setLabel("Grab Mouse");
+        setValue(false);
+    };
+};
+
+class MameJoystickType: public ComboBoxSetting, public MameSetting {
+public:
+    MameJoystickType(QString rom):
+        MameSetting("joytype", rom) {
+        setLabel("Joystick Type");
+        addSelection("No Joystick", "0");
+        addSelection("i386 Joystick", "1");
+        addSelection("Fm Town Pad", "2");
+        addSelection("X11 Input Extension Joystick", "3");
+        addSelection("new i386 linux 1.x.x Joystick", "4");
+        addSelection("NetBSD USB Joystick", "5");
+        addSelection("PS2-Linux native pad", "6");
+        addSelection("SDL Joystick", "7");
+    };
+};
+
+class MameAnalogJoy: public CheckBoxSetting, public MameSetting {
+public:
+    MameAnalogJoy(QString rom):
+        MameSetting("analogjoy", rom) {
+        setLabel("Use joystick as analog");
+        setValue(false);
+    };
+};
+
+MameSettingsDlg::MameSettingsDlg(QString romname, Prefs *prefs)
 {
-    setCursor(QCursor(Qt::BlankCursor));
-    if ( !name )
-      setName( "MameSettings" );
-
-    int screenwidth = 0, screenheight = 0;
-
-    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-
-    resize( screenwidth, screenheight );
-    setSizePolicy( QSizePolicy( (QSizePolicy::SizeType)0, (QSizePolicy::SizeType)0, 0, 0, sizePolicy().hasHeightForWidth() ) );
-    setMinimumSize( QSize( screenwidth, screenheight ) );
-    setMaximumSize( QSize( screenwidth, screenheight ) );
-    //setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
-    setCaption( trUtf8( "XMame Settings" ) );
-
-    MameTab = new QTabWidget( this, "MameTab" );
-    MameTab->setGeometry( QRect( 0, 0, screenwidth, screenheight ) );
-    MameTab->setSizePolicy( QSizePolicy( (QSizePolicy::SizeType)0, (QSizePolicy::SizeType)0, 0, 0, MameTab->sizePolicy().hasHeightForWidth() ) );
-    //MameTab->setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
-    MameTab->setBackgroundOrigin( QTabWidget::WindowOrigin );
-    QFont MameTab_font(  MameTab->font() );
-    MameTab_font.setFamily( "Helvetica [Urw]" );
-    MameTab_font.setPointSize( (int)(gContext->GetMediumFontSize() * wmult));
-    MameTab_font.setBold( TRUE );
-    MameTab->setFont( MameTab_font );
-
-    SettingsTab = new QWidget( MameTab, "SettingsTab" );
-
-    SettingsFrame = new QFrame( SettingsTab, "SettingsFrame" );
-    SettingsFrame->setGeometry( QRect(0, (int)(33 * hmult), 
-                                      (int)(800 * wmult), (int)(480 * hmult)));
-    //SettingsFrame->setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
-    SettingsFrame->setFrameShape( QFrame::StyledPanel );
-    SettingsFrame->setFrameShadow( QFrame::Raised );
-
-    DisplayGroup = new QGroupBox( SettingsFrame, "DisplayGroup" );
-    DisplayGroup->setGeometry( QRect(0, (int)(10 * hmult), 
-                                     (int)(420 * wmult), (int)(480 * hmult)));
-    //DisplayGroup->setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
-    DisplayGroup->setTitle( trUtf8( "Display" ) );
-
-    FullBox = new QComboBox( FALSE, DisplayGroup, "FullBox" );
-    FullBox->setGeometry( QRect((int)(11 * wmult), (int)(31 * hmult), 
-                                (int)(170 * wmult), (int)(31 * hmult))); 
-    FullBox->setFocusPolicy( QComboBox::TabFocus );
-
-    SkipCheck = new QCheckBox( DisplayGroup, "SkipCheck" );
-    SkipCheck->setGeometry( QRect( (int)(195 * wmult), (int)(31 * hmult), 
-                                   (int)(214 * wmult), (int)(31 * hmult))); 
-    SkipCheck->setText( trUtf8( "Auto frame skip" ) );
-
-    LeftCheck = new QCheckBox( DisplayGroup, "LeftCheck" );
-    LeftCheck->setGeometry( QRect( (int)(11 * wmult), (int)(68 * hmult), 
-                                   (int)(170 * wmult), (int)(31 * hmult) ) ); 
-    LeftCheck->setText( trUtf8( "Rotate Left" ) );
-
-    RightCheck = new QCheckBox( DisplayGroup, "RightCheck" );
-    RightCheck->setGeometry( QRect( (int)(195 * wmult), (int)(68 * hmult), 
-                                    (int)(190 * wmult), (int)(31 * hmult) ) ); 
-    RightCheck->setText( trUtf8( "Rotate Right" ) );
-
-    FlipXCheck = new QCheckBox( DisplayGroup, "FlipXCheck" );
-    FlipXCheck->setGeometry( QRect( (int)(11 * wmult), (int)(105 * hmult), 
-                                    (int)(178 * wmult), (int)(31 * hmult))); 
-    FlipXCheck->setText( trUtf8( "Flip X Axis" ) );
-
-    FlipYCheck = new QCheckBox( DisplayGroup, "FlipYCheck" );
-    FlipYCheck->setGeometry( QRect( (int)(195 * wmult), (int)(105 * hmult), 
-                                    (int)(180 * wmult), (int)(31 * hmult))); 
-    FlipYCheck->setText( trUtf8( "Flip Y Axis" ) );
-
-    ExtraArtCheck = new QCheckBox( DisplayGroup, "ExtraArtCheck" );
-    ExtraArtCheck->setGeometry( QRect( (int)(195 * wmult), (int)(142 * hmult), 
-                                       (int)(200 * wmult), (int)(31 * hmult))); 
-    ExtraArtCheck->setText( trUtf8( "Extra Artwork" ) );
-
-    ScanCheck = new QCheckBox( DisplayGroup, "ScanCheck" );
-    ScanCheck->setGeometry( QRect( (int)(10 * wmult), (int)(140 * hmult), 
-                                   (int)(178 * wmult), (int)(31 * hmult) ) ); 
-    ScanCheck->setText( trUtf8( "Scanlines" ) );
-
-    ColorCheck = new QCheckBox( DisplayGroup, "ColorCheck" );
-    ColorCheck->setGeometry( QRect( (int)(11 * wmult), (int)(179 * hmult), 
-                                    (int)(398 * wmult), (int)(31 * hmult) ) ); 
-    ColorCheck->setText( trUtf8( "Auto color depth" ) );
-
-    ScaleLabel = new QLabel( DisplayGroup, "ScaleLabel" );
-    ScaleLabel->setGeometry( QRect( (int)(20 * wmult), (int)(220 * hmult), 
-                                    (int)(71 * wmult), (int)(31  * hmult)) ); 
-    ScaleLabel->setText( trUtf8( "Scale" ) );
-
-    ScaleSlider = new QSlider( DisplayGroup, "ScaleSlider" );
-    ScaleSlider->setGeometry( QRect( (int)(97 * wmult), (int)(220 * hmult), 
-                                     (int)(270 * wmult), (int)(31 * hmult) ) ); 
-    ScaleSlider->setMinValue( 1 );
-    ScaleSlider->setMaxValue( 5 );
-    ScaleSlider->setOrientation( QSlider::Horizontal );
-
-    ScaleValLabel = new QLabel( DisplayGroup, "ScaleValLabel" );
-    ScaleValLabel->setGeometry( QRect( (int)(380 * wmult), (int)(220 * hmult), 
-                                       (int)(20 * wmult), (int)(31 * hmult))); 
-    ScaleValLabel->setText( trUtf8( "5" ) );
-
-    VectorGroup = new QGroupBox( DisplayGroup, "VectorGroup" );
-    VectorGroup->setEnabled( TRUE );
-    VectorGroup->setGeometry( QRect( (int)(17 * wmult), (int)(261 * hmult), 
-                                     (int)(391 * wmult), (int)(210 * hmult))); 
-    VectorGroup->setTitle( trUtf8( "Vector" ) );
-
-    AliasCheck = new QCheckBox( VectorGroup, "AliasCheck" );
-    AliasCheck->setGeometry( QRect( (int)(10 * wmult), (int)(40 * hmult), 
-                                    (int)(170 * wmult), (int)(31 * hmult))); 
-    AliasCheck->setText( trUtf8( "Antialiasing" ) );
-
-    TransCheck = new QCheckBox( VectorGroup, "TransCheck" );
-    TransCheck->setGeometry( QRect( (int)(190 * wmult), (int)(40 * hmult), 
-                                    (int)(190 * wmult), (int)(31 * hmult) ) ); 
-    TransCheck->setText( trUtf8( "Translucency" ) );
-
-    ResBox = new QComboBox( FALSE, VectorGroup, "ResBox" );
-    ResBox->setGeometry( QRect( (int)(170 * wmult), (int)(80 * hmult), 
-                                (int)(210 * wmult), (int)(40 * hmult) ) );
-    ResBox->setFocusPolicy( QComboBox::TabFocus );
-    ResBox->setAcceptDrops( TRUE );
-    ResBox->setMaxCount( 6 );
-    ResBox->insertItem(trUtf8("Use Scale"));
-    ResBox->insertItem(trUtf8("640 x 480"));
-    ResBox->insertItem(trUtf8("800 x 600"));
-    ResBox->insertItem(trUtf8("1024 x 768"));
-    ResBox->insertItem(trUtf8("1280 x 1024"));
-    ResBox->insertItem(trUtf8("1600 x 1200"));
-
-    ResLabel = new QLabel( VectorGroup, "ResLabel" );
-    ResLabel->setGeometry( QRect( (int)(10 * wmult), (int)(82 * hmult), 
-                                  (int)(150 * wmult), (int)(31 * hmult) ) );
-    ResLabel->setText( trUtf8( "Resolution" ) );
-
-    BeamLabel = new QLabel( VectorGroup, "BeamLabel" );
-    BeamLabel->setGeometry( QRect( (int)(10 * wmult), (int)(129 * hmult), 
-                                   (int)(80 * wmult), (int)(31 * hmult) ) ); 
-    BeamLabel->setText( trUtf8( "Beam" ) );
-
-    BeamSlider = new QSlider( VectorGroup, "BeamSlider" );
-    BeamSlider->setGeometry( QRect( (int)(100 * wmult), (int)(130 * hmult), 
-                                    (int)(220 * wmult), (int)(31 * hmult) ) ); 
-    BeamSlider->setMouseTracking( TRUE ); 
-    BeamSlider->setMinValue( 10 );
-    BeamSlider->setMaxValue( 150 );
-    BeamSlider->setOrientation( QSlider::Horizontal );
-
-    BeamValLabel = new QLabel( VectorGroup, "BeamValLabel" );
-    BeamValLabel->setGeometry( QRect( (int)(330 * wmult), (int)(130 * hmult), 
-                                      (int)(52 * wmult), (int)(31 * hmult) ) ); 
-    BeamValLabel->setText( trUtf8( "13.8" ) );
-
-    FlickerLabel = new QLabel( VectorGroup, "FlickerLabel" );
-    FlickerLabel->setGeometry( QRect( (int)(10 * wmult), (int)(169 * hmult), 
-                                      (int)(90 * wmult), (int)(31 * hmult) ) ); 
-    FlickerLabel->setText( trUtf8( "Flicker" ) );
-
-    FlickerSlider = new QSlider( VectorGroup, "FlickerSlider" );
-    FlickerSlider->setGeometry( QRect( (int)(100 * wmult), (int)(170 * hmult), 
-                                       (int)(220 * wmult), (int)(30 * hmult))); 
-    FlickerSlider->setOrientation( QSlider::Horizontal );
-
-    FlickerValLabel = new QLabel( VectorGroup, "FlickerValLabel" );
-    FlickerValLabel->setGeometry( QRect( (int)(330 * wmult), (int)(170 * hmult),
-                                         (int)(52 * wmult), (int)(31 * hmult)));
-    FlickerValLabel->setText( trUtf8( "88.8" ) );
-
-    SoundGroup = new QGroupBox( SettingsFrame, "SoundGroup" );
-    SoundGroup->setGeometry( QRect( (int)(410 * wmult), (int)(230 * hmult), 
-                                    (int)(390 * wmult), (int)(160 * hmult)) ); 
-    //SoundGroup->setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
-    SoundGroup->setTitle( trUtf8( "Sound" ) );
-
-    VolumeLabel = new QLabel( SoundGroup, "VolumeLabel" );
-    VolumeLabel->setGeometry( QRect( (int)(17 * wmult), (int)(120 * hmult), 
-                                     (int)(95 * wmult), (int)(31 * hmult) ) ); 
-    VolumeLabel->setText( trUtf8( "Volume" ) );
-
-    SoundCheck = new QCheckBox( SoundGroup, "SoundCheck" );
-    SoundCheck->setGeometry( QRect( (int)(7 * wmult), (int)(40 * hmult), 
-                                    (int)(160 * wmult), (int)(31 * hmult) ) ); 
-    SoundCheck->setText( trUtf8( "Use Sound" ) );
-
-    SamplesCheck = new QCheckBox( SoundGroup, "SamplesCheck" );
-    SamplesCheck->setGeometry( QRect( (int)(177 * wmult), (int)(40 * hmult), 
-                                      (int)(201 * wmult), (int)(31 * hmult))); 
-    SamplesCheck->setText( trUtf8( "Use Samples" ) );
-
-    FakeCheck = new QCheckBox( SoundGroup, "FakeCheck" );
-    FakeCheck->setGeometry( QRect( (int)(7 * wmult), (int)(80 * hmult), 
-                                   (int)(180 * wmult), (int)(31 * hmult) ) ); 
-    FakeCheck->setText( trUtf8( "Fake Sound" ) );
-
-    VolumeValLabel = new QLabel( SoundGroup, "VolumeValLabel" );
-    VolumeValLabel->setGeometry( QRect((int)(340 * wmult), (int)(120 * hmult), 
-                                       (int)(40 * wmult), (int)(27 * hmult))); 
-    VolumeValLabel->setText( trUtf8( "-32" ) );
-
-    VolumeSlider = new QSlider( SoundGroup, "VolumeSlider" );
-    VolumeSlider->setGeometry( QRect( (int)(117 * wmult), (int)(120 * hmult), 
-                                      (int)(220 * wmult), (int)(31 * hmult))); 
-    VolumeSlider->setMinValue( -32 );
-    VolumeSlider->setMaxValue( 0 );
-    VolumeSlider->setOrientation( QSlider::Horizontal );
-
-    MiscGroup = new QGroupBox( SettingsFrame, "MiscGroup" );
-    MiscGroup->setGeometry( QRect( (int)(407 * wmult), (int)(390 * hmult), 
-                                   (int)(391 * wmult), (int)(91 * hmult) ) ); 
-    //MiscGroup->setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
-    MiscGroup->setTitle( trUtf8( "Miscelaneous" ) );
-
-    OptionsLabel = new QLabel( MiscGroup, "OptionsLabel" );
-    OptionsLabel->setGeometry( QRect( (int)(10 * wmult), (int)(50 * hmult), 
-                                      (int)(166 * wmult), (int)(31 * hmult))); 
-    OptionsLabel->setText( trUtf8( "Extra Options" ) );
-
-    CheatCheck = new QCheckBox( MiscGroup, "CheatCheck" );
-    CheatCheck->setGeometry( QRect( (int)(10 * wmult), (int)(30 * hmult), 
-                                    (int)(100 * wmult), (int)(21 * hmult) ) ); 
-    CheatCheck->setText( trUtf8( "Cheat" ) );
-
-    OptionsEdit = new QLineEdit( MiscGroup, "OptionsEdit" );
-    OptionsEdit->setGeometry( QRect( (int)(180 * wmult), (int)(40 * hmult), 
-                                     (int)(201 * wmult), (int)(37 * hmult) ) ); 
-    OptionsEdit->setFocusPolicy( QLineEdit::TabFocus );
-    OptionsEdit->setMaxLength( 1023 );
-
-    InputGroup = new QGroupBox( SettingsFrame, "InputGroup" );
-    InputGroup->setGeometry( QRect( (int)(410 * wmult), 0, (int)(410 * wmult), 
-                                    (int)(230 * hmult) ) ); 
-    //InputGroup->setPaletteBackgroundColor( QColor( 192, 192, 192 ) );
-    InputGroup->setTitle( trUtf8( "Input" ) );
-
-    JoyLabel = new QLabel( InputGroup, "JoyLabel" );
-    JoyLabel->setGeometry( QRect( (int)(27 * wmult), (int)(180 * hmult), 
-                                  (int)(105 * wmult), (int)(31 * hmult)) ); 
-    JoyLabel->setText( trUtf8( "Joystick" ) );
-
-    WinkeyCheck = new QCheckBox( InputGroup, "WinkeyCheck" );
-    WinkeyCheck->setGeometry( QRect( (int)(11 * wmult), (int)(78 * hmult), 
-                                     (int)(388 * wmult), (int)(31 * hmult) ) ); 
-    WinkeyCheck->setText( trUtf8( "Use Windows Keys" ) );
-
-    MouseCheck = new QCheckBox( InputGroup, "MouseCheck" );
-    MouseCheck->setGeometry( QRect( (int)(11 * wmult), (int)(125 * hmult), 
-                                    (int)(170 * wmult), (int)(31 * hmult) ) ); 
-    MouseCheck->setText( trUtf8( "Use Mouse" ) );
-
-    GrabCheck = new QCheckBox( InputGroup, "GrabCheck" );
-    GrabCheck->setGeometry( QRect( (int)(188 * wmult), (int)(125 * hmult), 
-                                   (int)(191 * wmult), (int)(31 * hmult) ) ); 
-    GrabCheck->setText( trUtf8( "Grab Mouse" ) );
-
-    JoyBox = new QComboBox( FALSE, InputGroup, "JoyBox" );
-    JoyBox->setGeometry( QRect( (int)(137 * wmult), (int)(170 * hmult), 
-                                (int)(240 * wmult), (int)(41 * hmult) ) ); 
-    JoyBox->setFocusPolicy( QComboBox::TabFocus );
-    JoyBox->setSizeLimit( 5 );
-    JoyBox->insertItem(trUtf8("No Joystick"));
-    JoyBox->insertItem(trUtf8("i386 Joystick"));
-    JoyBox->insertItem(trUtf8("Fm Town Pad"));
-    JoyBox->insertItem(trUtf8("X11 Joystick"));
-    JoyBox->insertItem(trUtf8("1.X.X Joystick"));
-
-    JoyCheck = new QCheckBox( InputGroup, "JoyCheck" );
-    JoyCheck->setGeometry( QRect( (int)(11 * wmult), (int)(31 * hmult),
-                                  (int)(388 * wmult), (int)(31 * hmult) ) ); 
-    JoyCheck->setText( trUtf8( "Use Analog Joystick" ) );
-
-    SaveButton = new QPushButton( SettingsTab, "SaveButton" );
-    SaveButton->setGeometry( QRect( (int)(628 * wmult), (int)(513 * hmult), 
-                                    (int)(151 * wmult), (int)(40 * hmult))); 
-    SaveButton->setText( trUtf8( "Save" ) );
-
-    if(!bSystem)
+    QString title = "Mame Game Settings - " + romname + " - ";
+    if (romname != "default")
     {
-        DefaultCheck = new QCheckBox( SettingsTab, "DefaultCheck" );
-        DefaultCheck->setGeometry(QRect((int)(8 * wmult), (int)(3 * hmult), 
-                                        (int)(190 * wmult), (int)(31 * hmult))); 
-        DefaultCheck->setText( trUtf8( "use defaults" ) );
-    }
-    MameTab->insertTab( SettingsTab, trUtf8( "Settings" ) );
+        VerticalConfigurationGroup *toplevel =
+                                        new VerticalConfigurationGroup(false);
+        toplevel->setLabel(title + " - top level");
 
-    if(!bSystem)
-    {
-        ScreenTab = new QWidget( MameTab, "ScreenTab" );
-
-        ScreenPic = new QLabel( ScreenTab, "ScreenPic" );
-        ScreenPic->setEnabled( TRUE );
-        ScreenPic->setGeometry( QRect( 0, 0, screenwidth, screenheight ) );
-        ScreenPic->setScaledContents( TRUE );
-        MameTab->insertTab( ScreenTab, trUtf8( "ScreenShot" ) );
-
-        flyer = new QWidget( MameTab, "flyer" );
-
-        FlyerPic = new QLabel( flyer, "FlyerPic" );
-        FlyerPic->setGeometry( QRect( 0, 0, screenwidth, screenheight ) );
-        FlyerPic->setScaledContents( TRUE );
-        MameTab->insertTab( flyer, trUtf8( "Flyer" ) );
-
-        cabinet = new QWidget( MameTab, "cabinet" );
-
-        CabinetPic = new QLabel( cabinet, "CabinetPic" );
-        CabinetPic->setGeometry( QRect( 0, 0, screenwidth, screenheight ) );
-        CabinetPic->setScaledContents( TRUE );
-        MameTab->insertTab( cabinet, trUtf8( "Cabinet Photo" ) );
+        toplevel->addChild(new MameDefaultOptions(romname));
+        addChild(toplevel);
     }
 
-    // tab order
-    if(bSystem)
-    {
-        setTabOrder( MameTab, FullBox );
-    }
-    else
-    {
-        setTabOrder( MameTab, DefaultCheck );
-        setTabOrder( DefaultCheck, FullBox );
-    }
-    setTabOrder( FullBox, SkipCheck );
-    setTabOrder( SkipCheck, LeftCheck );
-    setTabOrder( LeftCheck, RightCheck );
-    setTabOrder( RightCheck, FlipXCheck );
-    setTabOrder( FlipXCheck, FlipYCheck );
-    setTabOrder( FlipYCheck, ScanCheck );
-    setTabOrder( ScanCheck, ExtraArtCheck );
-    setTabOrder( ExtraArtCheck, ColorCheck );
-    setTabOrder( ColorCheck, ScaleSlider );
-    setTabOrder( ScaleSlider, AliasCheck );
-    setTabOrder( AliasCheck, TransCheck );
-    setTabOrder( TransCheck, ResBox );
-    setTabOrder( ResBox, BeamSlider );
-    setTabOrder( BeamSlider, FlickerSlider );
-    setTabOrder( FlickerSlider, JoyCheck );
-    setTabOrder( JoyCheck, WinkeyCheck );
-    setTabOrder( WinkeyCheck, MouseCheck );
-    setTabOrder( MouseCheck, GrabCheck );
-    setTabOrder( GrabCheck, JoyBox );
-    setTabOrder( JoyBox, SoundCheck );
-    setTabOrder( SoundCheck, SamplesCheck );
-    setTabOrder( SamplesCheck, FakeCheck );
-    setTabOrder( FakeCheck, VolumeSlider );
-    setTabOrder( VolumeSlider, CheatCheck );
-    setTabOrder( CheatCheck, OptionsEdit );
-    setTabOrder( OptionsEdit, SaveButton );
+    VerticalConfigurationGroup *video1 = new VerticalConfigurationGroup(false);
+    video1->setLabel(title + "video page 1");
+    video1->addChild(new MameFullscreen(romname, prefs));
+    video1->addChild(new MameSkip(romname));
+    video1->addChild(new MameLeft(romname));
+    video1->addChild(new MameRight(romname));
+    video1->addChild(new MameFlipx(romname));
+    video1->addChild(new MameFlipy(romname));
+    addChild(video1);
 
-    if(!bSystem)
-    {
-        connect(DefaultCheck, SIGNAL(stateChanged(int)), this,
-            SLOT(defaultUpdate(int)));
-    }
-    connect(VolumeSlider, SIGNAL(valueChanged(int)), VolumeValLabel,
-            SLOT(setNum(int)));
-    connect(ScaleSlider, SIGNAL(valueChanged(int)), ScaleValLabel,
-            SLOT(setNum(int)));
-    connect(FlickerSlider, SIGNAL(valueChanged(int)), this,
-            SLOT(setFlickerLabel(int)));
-    connect(BeamSlider, SIGNAL(valueChanged(int)), this,
-            SLOT(setBeamLabel(int)));
-    connect(SaveButton, SIGNAL(pressed()), this,
-            SLOT(accept()));
+    VerticalConfigurationGroup *video2 = new VerticalConfigurationGroup(false);
+    video2->setLabel(title + "video page 2");
+    video2->addChild(new MameExtraArt(romname));
+    video2->addChild(new MameScan(romname));
+    video2->addChild(new MameColor(romname));
+    video2->addChild(new MameScale(romname));
+    addChild(video2);
 
-    if(bSystem)
-    {
-        SettingsFrame->setEnabled(true);
-        ListButton = new QPushButton( SettingsTab, "ListButton" );
-        ListButton->setGeometry( QRect( (int)(28 * wmult), (int)(513 * hmult), 
-                                        (int)(250 * wmult), (int)(40 * hmult)));
-        ListButton->setText( trUtf8( "Reload Game List" ) );
-        setTabOrder( SaveButton, ListButton );
-        connect(ListButton, SIGNAL(pressed()), this,
-                SLOT(loadList()));
-    }
+    VerticalConfigurationGroup *vector1 = new VerticalConfigurationGroup(false);
+    vector1->setLabel(title + "vector");
+    vector1->addChild(new MameAlias(romname));
+    vector1->addChild(new MameTrans(romname));
+    vector1->addChild(new MameRes(romname));
+    vector1->addChild(new MameBeam(romname));
+    vector1->addChild(new MameFlicker(romname));
+    addChild(vector1);
+
+    VerticalConfigurationGroup *sound1 = new VerticalConfigurationGroup(false);
+    sound1->setLabel(title + "sound");
+    sound1->addChild(new MameSound(romname));
+    sound1->addChild(new MameSamples(romname));
+    sound1->addChild(new MameFake(romname));
+    sound1->addChild(new MameVolume(romname));
+    addChild(sound1);
+
+    VerticalConfigurationGroup *input1 = new VerticalConfigurationGroup(false);
+    input1->setLabel(title + "input");
+    input1->addChild(new MameWindows(romname));
+    input1->addChild(new MameMouse(romname));
+    input1->addChild(new MameGrabMouse(romname));
+    input1->addChild(new MameJoystickType(romname));
+    input1->addChild(new MameAnalogJoy(romname));
+    addChild(input1);
+
+    VerticalConfigurationGroup *misc1 = new VerticalConfigurationGroup(false);
+    misc1->setLabel(title + "misc");
+    misc1->addChild(new MameCheat(romname));
+    misc1->addChild(new MameExtraOptions(romname));
+    addChild(misc1);
 }
 
-/*  
- *  Destroys the object and frees any allocated resources
- */
-MameSettingsDlg::~MameSettingsDlg()
-{
-    // no need to delete child widgets, Qt does it all for us
-}
-
-int MameSettingsDlg::Show(Prefs *prefs, GameSettings *settings, bool vector)
-{
-    system_prefs = prefs;
-    game_settings = settings;
-    if(!bSystem)
-    {
-        DefaultCheck->setChecked(game_settings->default_options);
-    }
-    VectorGroup->setEnabled(vector);
-    if ((!strcmp(system_prefs->xmame_display_target, "x11")) &&
-        (atoi(system_prefs->xmame_minor) >= 61))
-    {
-        FullBox->setSizeLimit( 3 );
-        FullBox->insertItem( trUtf8( "Windowed" ) );
-        FullBox->insertItem( trUtf8( "Fullscreen/DGA" ) );
-        FullBox->insertItem( trUtf8( "Fullscreen/Xv" ) );
-    }
-    else
-    {
-        FullBox->setSizeLimit( 2 );
-        FullBox->insertItem( trUtf8( "Windowed" ) );
-        FullBox->insertItem( trUtf8( "Fullscreen" ) );
-    }
-    FullBox->setCurrentItem(game_settings->fullscreen);
-    SkipCheck->setChecked(game_settings->autoframeskip);
-    LeftCheck->setChecked(game_settings->rot_left);
-    RightCheck->setChecked(game_settings->rot_right);
-    FlipXCheck->setChecked(game_settings->flipx);
-    FlipYCheck->setChecked(game_settings->flipy);
-    ExtraArtCheck->setChecked(game_settings->extra_artwork);
-    ScanCheck->setChecked(game_settings->scanlines);
-    ColorCheck->setChecked(game_settings->auto_colordepth);
-    ScaleSlider->setValue(game_settings->scale);
-    ScaleValLabel->setNum(game_settings->scale);
-    AliasCheck->setChecked(game_settings->antialias);
-    TransCheck->setChecked(game_settings->translucency);
-    BeamSlider->setValue(int(game_settings->beam * 10));
-    setBeamLabel((int)(game_settings->beam * 10));
-    FlickerSlider->setValue(int(game_settings->flicker * 10));
-    setFlickerLabel((int)(game_settings->flicker * 10));
-    SoundCheck->setChecked(game_settings->sound);
-    SamplesCheck->setChecked(game_settings->samples);
-    FakeCheck->setChecked(game_settings->fake_sound);
-    VolumeValLabel->setNum(game_settings->volume);
-    VolumeSlider->setValue(game_settings->volume);
-    CheatCheck->setChecked(game_settings->cheat);
-    OptionsEdit->setText(game_settings->extra_options);
-    WinkeyCheck->setChecked(game_settings->winkeys);
-    MouseCheck->setChecked(game_settings->mouse);
-    GrabCheck->setChecked(game_settings->grab_mouse);
-
-    show();
-    if(exec())
-    {
-        SaveSettings();
-        return SAVE_SETTINGS;
-    }
-    else
-        return DONT_SAVE_SETTINGS;
-}
-
-void MameSettingsDlg::defaultUpdate(int state)
-{
-    SettingsFrame->setEnabled(!state);
-    game_settings->default_options = state;
-}
-
-void MameSettingsDlg::setBeamLabel(int value)
-{
-    float actualValue = float(value) / 10.0;
-    BeamValLabel->setNum(actualValue);
-    game_settings->beam = actualValue;
-}
-
-void MameSettingsDlg::setFlickerLabel(int value)
-{
-    FlickerValLabel->setNum(value);
-    game_settings->flicker = value;
-}
-
-void MameSettingsDlg::SaveSettings()
-{
-    if(!bSystem)
-        game_settings->default_options = DefaultCheck->isChecked();
-    game_settings->fullscreen = FullBox->currentItem();
-    game_settings->autoframeskip = SkipCheck->isChecked();
-    game_settings->rot_left = LeftCheck->isChecked();
-    game_settings->rot_right = RightCheck->isChecked();
-    game_settings->flipx = FlipXCheck->isChecked();
-    game_settings->flipy = FlipYCheck->isChecked();
-    game_settings->extra_artwork = ExtraArtCheck->isChecked();
-    game_settings->scanlines = ScanCheck->isChecked();
-    game_settings->auto_colordepth = ColorCheck->isChecked();
-    game_settings->scale = ScaleSlider->value();
-    game_settings->antialias = AliasCheck->isChecked();
-    game_settings->translucency = TransCheck->isChecked();
-    game_settings->beam = float(BeamSlider->value()) / 10.0;
-    game_settings->flicker = FlickerSlider->value();
-    game_settings->sound = SoundCheck->isChecked();
-    game_settings->samples = SamplesCheck->isChecked();
-    game_settings->fake_sound = FakeCheck->isChecked();
-    game_settings->volume = VolumeSlider->value();
-    game_settings->cheat = CheatCheck->isChecked();
-    game_settings->extra_options = OptionsEdit->text();
-    game_settings->winkeys = WinkeyCheck->isChecked();
-    game_settings->mouse = MouseCheck->isChecked();
-    game_settings->grab_mouse = GrabCheck->isChecked();
-}
-
-void MameSettingsDlg::SetScreenshot(QString picfile)
-{
-    if(ScreenPic)
-    {
-        Screenshot.load(picfile);
-        ScaleImageLabel(Screenshot,ScreenPic);
-        ScreenPic->setPixmap(Screenshot);
-    }
-}
-
-void MameSettingsDlg::SetFlyer(QString picfile)
-{
-    if(FlyerPic)
-    {
-        Flyer.load(picfile);
-        ScaleImageLabel(Flyer,FlyerPic);
-        FlyerPic->setPixmap(Flyer);
-    }
-}
-
-void MameSettingsDlg::SetCabinet(QString picfile)
-{
-    if(CabinetPic)
-    {
-        Cabinet.load(picfile);
-        ScaleImageLabel(Cabinet,CabinetPic);
-        CabinetPic->setPixmap(Cabinet);
-    }
-}
-
-void MameSettingsDlg::ScaleImageLabel(QPixmap &pixmap, QLabel *label)
-{
-    int FrameWidth = width();
-    int FrameHeight = (int)(height() - 33 * hmult);
-    int ImageWidth = pixmap.width();
-    int ImageHeight = pixmap.height();
-    int x = 0, y = 0;
-    //QPoint test = label->mapToGlobal(QPoint(0,0));
-    if (float(ImageHeight)/float(ImageWidth) < float(FrameHeight)/float(FrameWidth))
-    {
-        int temp = ImageWidth;
-        ImageWidth = FrameWidth;
-        ImageHeight = (ImageWidth * ImageHeight) / temp;
-        y = (FrameHeight - ImageHeight) / 2;
-    }
-    else
-    {
-        int temp = ImageHeight;
-        ImageHeight = FrameHeight;
-        ImageWidth = (ImageHeight * ImageWidth) / temp;
-        x = (FrameWidth - ImageWidth) / 2;
-    }
-    label->setGeometry( QRect( x, y, ImageWidth, ImageHeight ) );
-}
-
-void MameSettingsDlg::loadList()
-{
-    MameHandler::getHandler()->processGames();
-}

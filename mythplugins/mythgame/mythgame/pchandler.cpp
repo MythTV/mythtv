@@ -111,21 +111,18 @@ void PCHandler::start_game(RomInfo * romdata)
     pclose(command);
 }
 
-void PCHandler::edit_settings(MythMainWindow *parent,RomInfo * romdata)
+void PCHandler::edit_settings(RomInfo * romdata)
 {
     PCRomInfo *pcdata = dynamic_cast<PCRomInfo*>(romdata);
-    PCSettingsDlg settingsdlg(parent, "gamesettings");
-    QString ImageFile;
-    if(pcdata->FindImage("screenshot", &ImageFile))
-        settingsdlg.SetScreenshot(ImageFile);
-    settingsdlg.Show(pcdata);
+    PCSettingsDlg settingsdlg(pcdata->Romname().latin1());
+    settingsdlg.exec(QSqlDatabase::database());
 }
 
-void PCHandler::edit_system_settings(MythMainWindow *parent,RomInfo * romdata)
+void PCHandler::edit_system_settings(RomInfo * romdata)
 {
     romdata = romdata;
-    PCSettingsDlg settingsDlg(parent, "pcsettings", true);
-    settingsDlg.Show(NULL);    
+    PCSettingsDlg settingsDlg("default");
+    settingsDlg.exec(QSqlDatabase::database());    
 }
 
 PCHandler* PCHandler::getHandler(void)

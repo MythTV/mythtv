@@ -17,8 +17,8 @@ class PCHandler : public GameHandler
     virtual ~PCHandler();
 
     void start_game(RomInfo *romdata);
-    void edit_settings(MythMainWindow *parent,RomInfo *romdata);
-    void edit_system_settings(MythMainWindow *parent,RomInfo *romdata);
+    void edit_settings(RomInfo *romdata);
+    void edit_system_settings(RomInfo *romdata);
     PCRomInfo* create_rominfo(RomInfo* parent);
     void processGames();
 
