@@ -58,6 +58,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
     avcodec_register_all();
 
     mpa_codec = 0;
+    mpa_ctx = NULL;
     osdtheme = "none";
 
     for (int i = 0; i < MAXVBUFFER; i++)
@@ -449,14 +450,16 @@ bool NuppelVideoPlayer::InitAVCodec(int codec)
         return false;
     }
 
-    memset(&mpa_ctx, 0, sizeof(mpa_ctx));
+    if (mpa_ctx)
+        free(mpa_ctx);
 
-    mpa_ctx.width = video_width;
-    mpa_ctx.height = video_height;
-    mpa_ctx.error_resilience = 0;
-    mpa_ctx.workaround_bugs = 0;
+    mpa_ctx = avcodec_alloc_context();
+
+    mpa_ctx->width = video_width;
+    mpa_ctx->height = video_height;
+    mpa_ctx->error_resilience = 2;
     
-    if (avcodec_open(&mpa_ctx, mpa_codec) < 0)
+    if (avcodec_open(mpa_ctx, mpa_codec) < 0)
     {
         cerr << "Couldn't find lavc codec\n";
         return false;
@@ -470,7 +473,11 @@ void NuppelVideoPlayer::CloseAVCodec(void)
     if (!mpa_codec)
         return;
 
-    avcodec_close(&mpa_ctx);
+    avcodec_close(mpa_ctx);
+
+    if (mpa_ctx)
+        free(mpa_ctx);
+    mpa_ctx = NULL;
 }
 
 void NuppelVideoPlayer::InitFilters(void)
@@ -552,7 +559,7 @@ unsigned char *NuppelVideoPlayer::DecodeFrame(struct rtframeheader *frameheader,
             InitAVCodec(frameheader->comptype - '3');
 
         int gotpicture = 0;
-        int ret = avcodec_decode_video(&mpa_ctx, &mpa_picture, &gotpicture,
+        int ret = avcodec_decode_video(mpa_ctx, &mpa_picture, &gotpicture,
                                        lstrm, frameheader->packetlength);
 
         if (ret < 0)
@@ -1757,7 +1764,9 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
 
 void NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname)
 { 
-
+    inputname = inputname;
+    outputname = outputname;
+/*
     filename = inputname;
      
     InitSubs();
@@ -1770,16 +1779,16 @@ void NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname)
         cout << "error finding codec\n";
         return;
     }
-    mpa_ctx.pix_fmt = PIX_FMT_YUV420P;
+    mpa_ctx->pix_fmt = PIX_FMT_YUV420P;
 
     mpa_picture.linesize[0] = video_width;
     mpa_picture.linesize[1] = video_width / 2;
     mpa_picture.linesize[2] = video_width / 2;
 
-    mpa_ctx.width = video_width;
-    mpa_ctx.height = video_height;
+    mpa_ctx->width = video_width;
+    mpa_ctx->height = video_height;
  
-    mpa_ctx.frame_rate = (int)(video_frame_rate * FRAME_RATE_BASE);
+    mpa_ctx->frame_rate = (int)(video_frame_rate * FRAME_RATE_BASE);
     mpa_ctx.bit_rate = 1800 * 1000;
     mpa_ctx.bit_rate_tolerance = 1024 * 8 * 1000;
     mpa_ctx.qmin = 2;
@@ -1880,4 +1889,5 @@ void NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname)
 
     fclose(out);
     avcodec_close(&mpa_ctx);
+*/
 }

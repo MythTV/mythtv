@@ -448,16 +448,37 @@ static inline void dv_decode_video_segment(DVVideoDecodeContext *s,
         for(j = 0;j < 6; j++) {
             idct_put = s->idct_put[mb->dct_mode];
             if (j < 4) {
-                if (s->sampling_411) {
+                if (s->sampling_411 && mb_x < (704 / 8)) {
+                    /* NOTE: at end of line, the macroblock is handled as 420 */
                     idct_put(y_ptr + (j * 8), s->linesize[0], block);
                 } else {
                     idct_put(y_ptr + ((j & 1) * 8) + ((j >> 1) * 8 * s->linesize[0]),
                              s->linesize[0], block);
                 }
             } else {
-                /* don't ask me why they inverted Cb and Cr ! */
-                idct_put(s->current_picture[6 - j] + c_offset, 
-                         s->linesize[6 - j], block);
+                if (s->sampling_411 && mb_x >= (704 / 8)) {
+                    uint8_t pixels[64], *c_ptr, *c_ptr1, *ptr;
+                    int y, linesize;
+                    /* NOTE: at end of line, the macroblock is handled as 420 */
+                    idct_put(pixels, 8, block);
+                    linesize = s->linesize[6 - j];
+                    c_ptr = s->current_picture[6 - j] + c_offset;
+                    ptr = pixels;
+                    for(y = 0;y < 8; y++) {
+                        /* convert to 411P */
+                        c_ptr1 = c_ptr + linesize;
+                        c_ptr1[0] = c_ptr[0] = (ptr[0] + ptr[1]) >> 1;
+                        c_ptr1[1] = c_ptr[1] = (ptr[2] + ptr[3]) >> 1;
+                        c_ptr1[2] = c_ptr[2] = (ptr[4] + ptr[5]) >> 1;
+                        c_ptr1[3] = c_ptr[3] = (ptr[6] + ptr[7]) >> 1;
+                        c_ptr += linesize * 2;
+                        ptr += 8;
+                    }
+                } else {
+                    /* don't ask me why they inverted Cb and Cr ! */
+                    idct_put(s->current_picture[6 - j] + c_offset, 
+                             s->linesize[6 - j], block);
+                }
             }
             block += 64;
             mb++;
@@ -473,7 +494,7 @@ static int dvvideo_decode_frame(AVCodecContext *avctx,
                                  UINT8 *buf, int buf_size)
 {
     DVVideoDecodeContext *s = avctx->priv_data;
-    int sct, dsf, apt, ds, nb_dif_segs, vs, size, width, height, i;
+    int sct, dsf, apt, ds, nb_dif_segs, vs, size, width, height, i, packet_size;
     UINT8 *buf_ptr;
     const UINT16 *mb_pos_ptr;
     AVPicture *picture;
@@ -510,16 +531,25 @@ static int dvvideo_decode_frame(AVCodecContext *avctx,
     /* init size */
     width = 720;
     if (dsf) {
-        if (buf_size != PAL_FRAME_SIZE)
-            return -1;
+        packet_size = PAL_FRAME_SIZE;
         height = 576;
         nb_dif_segs = 12;
     } else {
-        if (buf_size != NTSC_FRAME_SIZE)
-            return -1;
+        packet_size = NTSC_FRAME_SIZE;
         height = 480;
         nb_dif_segs = 10;
     }
+    /* NOTE: we only accept several full frames */
+    if (buf_size < packet_size)
+        return -1;
+    
+    /* XXX: is it correct to assume that 420 is always used in PAL
+       mode ? */
+    s->sampling_411 = !dsf;
+    if (s->sampling_411)
+        mb_pos_ptr = dv_place_411;
+    else
+        mb_pos_ptr = dv_place_420;
 
     /* (re)alloc picture if needed */
     if (s->width != width || s->height != height) {
@@ -530,7 +560,7 @@ static int dvvideo_decode_frame(AVCodecContext *avctx,
             s->linesize[i] = width;
             if (i >= 1) {
                 size >>= 2;
-                s->linesize[i] >>= 1;
+                s->linesize[i] >>= s->sampling_411 ? 2 : 1;
             }
             s->current_picture[i] = av_malloc(size);
             if (!s->current_picture[i])
@@ -540,14 +570,6 @@ static int dvvideo_decode_frame(AVCodecContext *avctx,
         s->height = height;
     }
 
-    /* XXX: is it correct to assume that 420 is always used in PAL
-       mode ? */
-    s->sampling_411 = !dsf;
-    if (s->sampling_411)
-        mb_pos_ptr = dv_place_411;
-    else
-        mb_pos_ptr = dv_place_420;
-    
     /* for each DIF segment */
     buf_ptr = buf;
     for (ds = 0; ds < nb_dif_segs; ds++) {
@@ -564,11 +586,13 @@ static int dvvideo_decode_frame(AVCodecContext *avctx,
         }
     }
 
+    emms_c();
+
     /* return image */
     avctx->width = width;
     avctx->height = height;
     if (s->sampling_411)
-        avctx->pix_fmt = PIX_FMT_YUV420P; /* XXX: incorrect, add PIX_FMT_YUV411P */
+        avctx->pix_fmt = PIX_FMT_YUV411P;
     else
         avctx->pix_fmt = PIX_FMT_YUV420P;
     if (dsf)
@@ -581,7 +605,7 @@ static int dvvideo_decode_frame(AVCodecContext *avctx,
         picture->data[i] = s->current_picture[i];
         picture->linesize[i] = s->linesize[i];
     }
-    return buf_size;
+    return packet_size;
 }
 
 static int dvvideo_decode_end(AVCodecContext *avctx)

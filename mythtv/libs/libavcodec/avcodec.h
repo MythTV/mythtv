@@ -5,8 +5,8 @@
 
 #define LIBAVCODEC_VERSION_INT 0x000406
 #define LIBAVCODEC_VERSION     "0.4.6"
-#define LIBAVCODEC_BUILD       4630
-#define LIBAVCODEC_BUILD_STR   "4630"
+#define LIBAVCODEC_BUILD       4631
+#define LIBAVCODEC_BUILD_STR   "4631"
 
 enum CodecID {
     CODEC_ID_NONE, 
@@ -64,7 +64,8 @@ enum PixelFormat {
     PIX_FMT_YUV444P,
     PIX_FMT_RGBA32,
     PIX_FMT_BGRA32,
-    PIX_FMT_YUV410P
+    PIX_FMT_YUV410P,
+    PIX_FMT_YUV411P
 };
 
 /* currently unused, may be used if 24/32 bits samples ever supported */
@@ -179,6 +180,7 @@ typedef struct AVCodecContext {
      * some codecs need / can use extra-data like huffman tables
      * mjpeg: huffman tables
      * rv10: additional flags
+     * mpeg4: global headers (they can be in the bitstream or here)
      * encoding: set/allocated/freed by lavc.
      * decoding: set/allocated/freed by user.
      */
@@ -413,12 +415,19 @@ typedef struct AVCodecContext {
     unsigned int codec_tag;  /* codec tag, only used if unknown codec */
     
     /**
-     * workaround bugs in encoders which cannot be detected automatically
+     * workaround bugs in encoders which sometimes cannot be detected automatically
      * encoding: unused
      * decoding: set by user
      */
     int workaround_bugs;
-    
+#define FF_BUG_AUTODETECT       1  //autodetection
+#define FF_BUG_OLD_MSMPEG4      2
+#define FF_BUG_XVID_ILACE       4
+#define FF_BUG_UMP4             8
+#define FF_BUG_NO_PADDING       16
+#define FF_BUG_AC_VLC           32
+//#define FF_BUG_FAKE_SCALABILITY 16 //autodetection should work 100%
+        
     /**
      * encoding: set by user
      * decoding: unused
@@ -713,6 +722,15 @@ typedef struct AVCodecContext {
      * decoding: set/allocated by user (or NULL)
      */
     int *slice_offset;
+
+    /**
+     * error concealment flags
+     * encoding: unused
+     * decoding: set by user
+     */
+    int error_concealment;
+#define FF_EC_GUESS_MVS   1
+#define FF_EC_DEBLOCK     2
 
     //FIXME this should be reordered after kabis API is finished ...
     //TODO kill kabi

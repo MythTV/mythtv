@@ -22,8 +22,6 @@ using namespace std;
 pthread_mutex_t NuppelVideoRecorder::avcodeclock = PTHREAD_MUTEX_INITIALIZER;
 int NuppelVideoRecorder::numencoders = 0;
 
-static const char *video_rc_eq = "tex^qComp";
-
 NuppelVideoRecorder::NuppelVideoRecorder(void)
 {
     sfilename = "output.nuv";
@@ -77,6 +75,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     avcodec_register_all();
 
     mpa_codec = 0;
+    mpa_ctx = NULL;
 
     codec = "rtjpeg";
     useavcodec = false;
@@ -130,8 +129,12 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
     }
 
     if (mpa_codec)
-        avcodec_close(&mpa_ctx);
+        avcodec_close(mpa_ctx);
     numencoders--;
+
+    if (mpa_ctx)
+        free(mpa_ctx);
+    mpa_ctx = NULL;
 
     if (videoFilters.size() > 0)
     {
@@ -151,8 +154,12 @@ void NuppelVideoRecorder::SetTVFormat(QString tvformat)
 bool NuppelVideoRecorder::SetupAVCodec(void)
 {
     if (mpa_codec)
-        avcodec_close(&mpa_ctx);
+        avcodec_close(mpa_ctx);
     
+    if (mpa_ctx)
+        free(mpa_ctx);
+    mpa_ctx = NULL;
+
     mpa_codec = avcodec_find_encoder_by_name(codec.ascii());
 
     if (!mpa_codec)
@@ -161,16 +168,16 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
         return false;
     }
 
-    mpa_ctx.pix_fmt = PIX_FMT_YUV420P;
+    mpa_ctx = avcodec_alloc_context();
+    
+    mpa_ctx->pix_fmt = PIX_FMT_YUV420P;
     
     mpa_picture.linesize[0] = w;
     mpa_picture.linesize[1] = w / 2;
     mpa_picture.linesize[2] = w / 2;
    
-    memset(&mpa_ctx, 0, sizeof(mpa_ctx));
-
-    mpa_ctx.width = w;
-    mpa_ctx.height = h;
+    mpa_ctx->width = w;
+    mpa_ctx->height = h;
 
     int usebitrate = targetbitrate * 1000;
     if (scalebitrate)
@@ -182,36 +189,32 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     if (targetbitrate == -1)
         usebitrate = -1;
 
-    mpa_ctx.frame_rate = (int)(video_frame_rate * FRAME_RATE_BASE);
-    mpa_ctx.bit_rate = usebitrate;
-    mpa_ctx.bit_rate_tolerance = usebitrate * 100;
-    mpa_ctx.qmin = maxquality;
-    mpa_ctx.qmax = minquality;
-    mpa_ctx.max_qdiff = qualdiff;
-    mpa_ctx.qcompress = 0.5;
-    mpa_ctx.qblur = 0.5;
-    mpa_ctx.rc_qsquish = 1.0;
-    mpa_ctx.max_b_frames = 0;
-    mpa_ctx.b_quant_factor = 0;
-    mpa_ctx.rc_strategy = 2;
-    mpa_ctx.b_frame_strategy = 0;
-    mpa_ctx.gop_size = 30;
-    mpa_ctx.flags = CODEC_FLAG_TYPE;
-    mpa_ctx.me_method = 5;
-    mpa_ctx.key_frame = -1;
-    mpa_ctx.rc_eq = (char *)video_rc_eq;
-    mpa_ctx.rc_max_rate = 0;
-    mpa_ctx.rc_min_rate = 0;
-    mpa_ctx.rc_buffer_size = 0;
-    mpa_ctx.rc_buffer_aggressivity = 1.0;
-    mpa_ctx.i_quant_factor = 1.25;
-    mpa_ctx.b_quant_factor = 1.25;
-    mpa_ctx.i_quant_offset = -0.8;
-    mpa_ctx.b_quant_offset = 0;
-    mpa_ctx.dct_algo = FF_DCT_AUTO;
-    mpa_ctx.idct_algo = FF_IDCT_AUTO;
-    
-    if (avcodec_open(&mpa_ctx, mpa_codec) < 0)
+    mpa_ctx->frame_rate = (int)(video_frame_rate * FRAME_RATE_BASE);
+    mpa_ctx->bit_rate = usebitrate;
+    mpa_ctx->bit_rate_tolerance = usebitrate * 100;
+    mpa_ctx->qmin = maxquality;
+    mpa_ctx->qmax = minquality;
+    mpa_ctx->max_qdiff = qualdiff;
+
+    mpa_ctx->qblur = 0.5;
+    mpa_ctx->max_b_frames = 0;
+    mpa_ctx->b_quant_factor = 0;
+    mpa_ctx->rc_strategy = 2;
+    mpa_ctx->b_frame_strategy = 0;
+    mpa_ctx->gop_size = 30;
+    mpa_ctx->flags = CODEC_FLAG_TYPE;
+    mpa_ctx->me_method = 5;
+    mpa_ctx->key_frame = -1;
+    mpa_ctx->rc_max_rate = 0;
+    mpa_ctx->rc_min_rate = 0;
+    mpa_ctx->rc_buffer_size = 0;
+    mpa_ctx->rc_buffer_aggressivity = 1.0;
+    mpa_ctx->rc_override_count = 0;
+    mpa_ctx->rc_initial_cplx = 0;
+    mpa_ctx->dct_algo = FF_DCT_AUTO;
+    mpa_ctx->idct_algo = FF_IDCT_AUTO;
+ 
+    if (avcodec_open(mpa_ctx, mpa_codec) < 0)
     {
         cerr << "Unable to open FFMPEG/MPEG4 codex\n" << endl;
         return false;
@@ -903,10 +906,10 @@ void NuppelVideoRecorder::WriteHeader(bool todumpfile)
             default: break;
         }
         moredata.video_fourcc = vidfcc;
-        moredata.lavc_bitrate = mpa_ctx.bit_rate;
-        moredata.lavc_qmin = mpa_ctx.qmin;
-        moredata.lavc_qmax = mpa_ctx.qmax;
-        moredata.lavc_maxqdiff = mpa_ctx.max_qdiff;
+        moredata.lavc_bitrate = mpa_ctx->bit_rate;
+        moredata.lavc_qmin = mpa_ctx->qmin;
+        moredata.lavc_qmax = mpa_ctx->qmax;
+        moredata.lavc_maxqdiff = mpa_ctx->max_qdiff;
     }
     else
     {
@@ -1286,11 +1289,11 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
         mpa_picture.data[1] = planes[1];
         mpa_picture.data[2] = planes[2];
 
-        mpa_ctx.key_frame = wantkeyframe;
+        mpa_ctx->key_frame = wantkeyframe;
 
         if (numencoders > 1)
             pthread_mutex_lock(&avcodeclock);
-        tmp = avcodec_encode_video(&mpa_ctx, (unsigned char *)strm, 
+        tmp = avcodec_encode_video(mpa_ctx, (unsigned char *)strm, 
                                    w * h + (w * h) / 2, &mpa_picture); 
         if (numencoders > 1)
             pthread_mutex_unlock(&avcodeclock);

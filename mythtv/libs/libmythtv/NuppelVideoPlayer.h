@@ -247,7 +247,7 @@ class NuppelVideoPlayer
     void CloseAVCodec(void);
 
     AVCodec *mpa_codec;
-    AVCodecContext mpa_ctx;
+    AVCodecContext *mpa_ctx;
     AVPicture mpa_picture;
 
     bool disablevideo;

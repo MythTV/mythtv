@@ -755,26 +755,18 @@ void OSD::DisplayInfo(unsigned char *yuvptr)
 
     }
 
-    rect.setLeft(rect.left() + 5);
-    rect.setRight(rect.right() - 5);
-    rect.setTop(rect.top() + 5);
-    rect.setBottom(rect.bottom() - 5);
-
     DrawStringWithOutline(yuvptr, rect, infotext, info_font);
 
     if (titleRect.width() > 0)
     {
         rect = infoRect;
-        rect.setLeft(rect.left() + 5);
-        rect.setRight(rect.right() - 5);
-        rect.setTop(rect.top() + 5);
-        rect.setBottom(rect.bottom() - 5);
     }
     else
     {
         rect.setTop(rect.top() + infofontsize * 3 / 2);
         rect.setBottom(rect.bottom() - infofontsize * 3 / 2);
     }
+
     DrawStringWithOutline(yuvptr, rect, subtitletext, info_font);
 
     rect = infoRect;
@@ -885,11 +877,6 @@ void OSD::DrawStringIntoBox(QRect rect, const QString &text,
 {
     int textlength = 0;
     info_font->CalcWidth(text, &textlength);
-
-    rect.setLeft(rect.left() + 5);
-    rect.setRight(rect.right() - 5);
-    rect.setTop(rect.top() + 5); 
-    rect.setBottom(rect.bottom() - 5);
 
     int maxlength = rect.width();
     if (textlength > maxlength)

@@ -284,8 +284,8 @@ static double get_qscale(MpegEncContext *s, RateControlEntry *rce, double rate_f
         NULL
     };
     static double (*func1[])(void *, double)={
-        bits2qp,
-        qp2bits,
+        (void *)bits2qp,
+        (void *)qp2bits,
         NULL
     };
     char *func1_names[]={
@@ -638,7 +638,7 @@ float ff_rate_estimate_qscale(MpegEncContext *s)
 //printf("%f ", q);
         if (q <= 0.0)
         {
-            q = 2.0;
+            q = 2.0; 
             printf("badq: %f\n", q);
         }
         assert(q>0.0);

@@ -322,16 +322,20 @@ typedef struct MpegEncContext {
     int last_bits; //temp var used for calculating the above vars
     
     /* error concealment / resync */
+    UINT8 *error_status_table;       /* table of the error status of each MB */ 
+#define VP_START            1        /* current MB is the first after a resync marker */
+#define AC_ERROR            2
+#define DC_ERROR            4
+#define MV_ERROR            8
+#define AC_END              16
+#define DC_END              32
+#define MV_END              64
+//FIXME some prefix?
+    
     int resync_mb_x;                 /* x position of last resync marker */
     int resync_mb_y;                 /* y position of last resync marker */
-    int mb_num_left;                 /* number of MBs left in this video packet */
-    GetBitContext next_resync_gb;    /* starts at the next resync marker */
-    int next_resync_qscale;          /* qscale of next resync marker */
-    int next_resync_pos;             /* bitstream position of next resync marker */
-#define DECODING_AC_LOST -1
-#define DECODING_ACDC_LOST -2
-#define DECODING_DESYNC -3
-    int decoding_error;
+    GetBitContext last_resync_gb;    /* used to serach for the next resync marker */
+    int mb_num_left;                 /* number of MBs left in this video packet (for partitioned Slices only)*/
     int next_p_frame_damaged;        /* set if the next p frame is damaged, to avoid showing trashed b frames */
     int error_resilience;
 
@@ -365,9 +369,9 @@ typedef struct MpegEncContext {
     int sprite_brightness_change;
     int num_sprite_warping_points;
     int real_sprite_warping_points;
-    int sprite_offset[2][2];
-    int sprite_delta[2][2][2];
-    int sprite_shift[2][2];
+    int sprite_offset[2][2];         /* sprite offset[isChroma][isMVY] */
+    int sprite_delta[2][2];          /* sprite_delta [isY][isMVY] */ 
+    int sprite_shift[2];             /* sprite shift [isChroma] */
     int mcsel;
     int quant_precision;
     int quarter_sample;              /* 1->qpel, 0->half pel ME/MC */ 
@@ -381,7 +385,8 @@ typedef struct MpegEncContext {
     int aspected_height;
     int sprite_warping_accuracy;
     int low_latency_sprite;
-    int data_partitioning;
+    int data_partitioning;           /* data partitioning flag from header */
+    int partitioned_frame;           /* is current frame partitioned */
     int rvlc;                        /* reversible vlc */
     int resync_marker;               /* could this stream contain resync markers*/
     int low_delay;                   /* no reordering needed / has no b-frames */
@@ -399,6 +404,7 @@ typedef struct MpegEncContext {
     INT16 (*field_mv_table)[2][2];   /* used for interlaced b frame decoding */
     INT8 (*field_select_table)[2];   /* wtf, no really another table for interlaced b frames */
     int t_frame;                     /* time distance of first I -> B, used for interlaced b frames */
+    int padding_bug_score;           /* used to detect the VERY common padding bug in MPEG4 */
 
     /* divx specific, used to workaround (many) bugs in divx5 */
     int divx_version;
@@ -406,6 +412,10 @@ typedef struct MpegEncContext {
 #define BITSTREAM_BUFFER_SIZE 1024*256
     UINT8 *bitstream_buffer; //Divx 5.01 puts several frames in a single one, this is used to reorder them
     int bitstream_buffer_size;
+    
+    /* lavc specific stuff, used to workaround bugs in libavcodec */
+    int ffmpeg_version;
+    int lavc_build;
     
     /* RV10 specific */
     int rv10_version; /* RV10 version: 0 or 3 */
@@ -475,6 +485,12 @@ typedef struct MpegEncContext {
     
     DCTELEM (*block)[64]; /* points to one of the following blocks */
     DCTELEM blocks[2][6][64] __align8; // for HQ mode we need to keep the best block
+    int (*decode_mb)(struct MpegEncContext *s, DCTELEM block[6][64]); // used by some codecs to avoid a switch()
+#define SLICE_OK         0
+#define SLICE_ERROR     -1
+#define SLICE_END       -2 //end marker found
+#define SLICE_NOEND     -3 //no end marker or error found but mb count exceeded
+    
     void (*dct_unquantize_mpeg1)(struct MpegEncContext *s, 
                            DCTELEM *block, int n, int qscale);
     void (*dct_unquantize_mpeg2)(struct MpegEncContext *s, 
@@ -487,10 +503,10 @@ typedef struct MpegEncContext {
     void (*fdct)(struct MpegEncContext *s, DCTELEM *block/* align 16*/);
     INT16 __align8 dct_quantize_temp_block[64];
     INT16 __align8 fdct_mmx_block_tmp[64];
-
     void (*idct_put)(UINT8 *dest/*align 8*/, int line_size, DCTELEM *block/*align 16*/);
     void (*idct_add)(UINT8 *dest/*align 8*/, int line_size, DCTELEM *block/*align 16*/);
 } MpegEncContext;
+
 
 int DCT_common_init(MpegEncContext *s);
 int MPV_common_init(MpegEncContext *s);
@@ -515,8 +531,29 @@ void ff_conceal_past_errors(MpegEncContext *s, int conceal_all);
 void ff_copy_bits(PutBitContext *pb, UINT8 *src, int length);
 void ff_clean_intra_table_entries(MpegEncContext *s);
 void ff_init_scantable(MpegEncContext *s, ScanTable *st, const UINT8 *src_scantable);
+void ff_error_resilience(MpegEncContext *s);
+void ff_draw_horiz_band(MpegEncContext *s);
 
 extern int ff_bit_exact;
+
+static inline void ff_init_block_index(MpegEncContext *s){
+    s->block_index[0]= s->block_wrap[0]*(s->mb_y*2 + 1) - 1 + s->mb_x*2;
+    s->block_index[1]= s->block_wrap[0]*(s->mb_y*2 + 1)     + s->mb_x*2;
+    s->block_index[2]= s->block_wrap[0]*(s->mb_y*2 + 2) - 1 + s->mb_x*2;
+    s->block_index[3]= s->block_wrap[0]*(s->mb_y*2 + 2)     + s->mb_x*2;
+    s->block_index[4]= s->block_wrap[4]*(s->mb_y + 1)                    + s->block_wrap[0]*(s->mb_height*2 + 2) + s->mb_x;
+    s->block_index[5]= s->block_wrap[4]*(s->mb_y + 1 + s->mb_height + 2) + s->block_wrap[0]*(s->mb_height*2 + 2) + s->mb_x;
+}
+
+static inline void ff_update_block_index(MpegEncContext *s){
+    s->block_index[0]+=2;
+    s->block_index[1]+=2;
+    s->block_index[2]+=2;
+    s->block_index[3]+=2;
+    s->block_index[4]++;
+    s->block_index[5]++;
+}
+
 
 /* motion_est.c */
 void ff_estimate_p_frame_motion(MpegEncContext * s,
@@ -526,6 +563,7 @@ void ff_estimate_b_frame_motion(MpegEncContext * s,
 int ff_get_best_fcode(MpegEncContext * s, int16_t (*mv_table)[2], int type);
 void ff_fix_long_p_mvs(MpegEncContext * s);
 void ff_fix_long_b_mvs(MpegEncContext * s, int16_t (*mv_table)[2], int f_code, int type);
+
 
 /* mpeg12.c */
 extern const INT16 ff_mpeg1_default_intra_matrix[64];
@@ -537,6 +575,7 @@ void mpeg1_encode_mb(MpegEncContext *s,
                      DCTELEM block[6][64],
                      int motion_x, int motion_y);
 void ff_mpeg1_encode_init(MpegEncContext *s);
+
 
 /* h263enc.c */
 typedef struct RLTable {
@@ -570,7 +609,6 @@ extern UINT8 ff_mpeg4_y_dc_scale_table[32];
 extern UINT8 ff_mpeg4_c_dc_scale_table[32];
 extern const INT16 ff_mpeg4_default_intra_matrix[64];
 extern const INT16 ff_mpeg4_default_non_intra_matrix[64];
-
 void h263_encode_mb(MpegEncContext *s, 
                     DCTELEM block[6][64],
                     int motion_x, int motion_y);
@@ -586,29 +624,33 @@ void mpeg4_pred_ac(MpegEncContext * s, INT16 *block, int n,
 void ff_set_mpeg4_time(MpegEncContext * s, int picture_number);
 void mpeg4_encode_picture_header(MpegEncContext *s, int picture_number);
 void h263_encode_init(MpegEncContext *s);
-
 void h263_decode_init_vlc(MpegEncContext *s);
 int h263_decode_picture_header(MpegEncContext *s);
-int h263_decode_gob_header(MpegEncContext *s);
-int mpeg4_decode_picture_header(MpegEncContext * s);
+int ff_h263_decode_gob_header(MpegEncContext *s);
+int ff_mpeg4_decode_picture_header(MpegEncContext * s, GetBitContext *gb);
+
+
 int intel_h263_decode_picture_header(MpegEncContext *s);
-int h263_decode_mb(MpegEncContext *s,
-                   DCTELEM block[6][64]);
+int ff_h263_decode_mb(MpegEncContext *s,
+                      DCTELEM block[6][64]);
 int h263_get_picture_format(int width, int height);
-int ff_mpeg4_decode_video_packet_header(MpegEncContext *s);
-int ff_mpeg4_resync(MpegEncContext *s);
 void ff_mpeg4_encode_video_packet_header(MpegEncContext *s);
 void ff_mpeg4_clean_buffers(MpegEncContext *s);
 void ff_mpeg4_stuffing(PutBitContext * pbc);
 void ff_mpeg4_init_partitions(MpegEncContext *s);
 void ff_mpeg4_merge_partitions(MpegEncContext *s);
-extern inline int ff_mpeg4_pred_dc(MpegEncContext * s, int n, UINT16 **dc_val_ptr, int *dir_ptr);
 void ff_clean_mpeg4_qscales(MpegEncContext *s);
 void ff_clean_h263_qscales(MpegEncContext *s);
+int ff_mpeg4_decode_partitions(MpegEncContext *s);
+int ff_mpeg4_get_video_packet_prefix_length(MpegEncContext *s);
+int ff_h263_resync(MpegEncContext *s);
+int ff_h263_get_gob_height(MpegEncContext *s);
+
 
 /* rv10.c */
 void rv10_encode_picture_header(MpegEncContext *s, int picture_number);
 int rv_decode_dc(MpegEncContext *s, int n);
+
 
 /* msmpeg4.c */
 void msmpeg4_encode_picture_header(MpegEncContext * s, int picture_number);
@@ -618,19 +660,18 @@ void msmpeg4_encode_mb(MpegEncContext * s,
                        int motion_x, int motion_y);
 int msmpeg4_decode_picture_header(MpegEncContext * s);
 int msmpeg4_decode_ext_header(MpegEncContext * s, int buf_size);
-int msmpeg4_decode_mb(MpegEncContext *s, 
-                      DCTELEM block[6][64]);
 int ff_msmpeg4_decode_init(MpegEncContext *s);
 void ff_msmpeg4_encode_init(MpegEncContext *s);
 
-/* mjpegenc.c */
 
+/* mjpegenc.c */
 int mjpeg_init(MpegEncContext *s);
 void mjpeg_close(MpegEncContext *s);
 void mjpeg_encode_mb(MpegEncContext *s, 
                      DCTELEM block[6][64]);
 void mjpeg_picture_header(MpegEncContext *s);
 void mjpeg_picture_trailer(MpegEncContext *s);
+
 
 /* rate control */
 int ff_rate_control_init(MpegEncContext *s);
