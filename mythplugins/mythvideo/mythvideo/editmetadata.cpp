@@ -349,7 +349,7 @@ void EditMetadataDialog::saveAndExit()
     done(0);
 }
 
-void EditMetadataDialog::setTitle(const QString &new_title)
+void EditMetadataDialog::setTitle(QString new_title)
 {
     working_metadata->setTitle(new_title);
 }
@@ -359,7 +359,7 @@ void EditMetadataDialog::setCategory(int new_category)
     working_metadata->setIdCategory(db, new_category);
 }
 
-void EditMetadataDialog::setPlayer(const QString &new_command)
+void EditMetadataDialog::setPlayer(QString new_command)
 {
     working_metadata->setPlayCommand(new_command);
 }
