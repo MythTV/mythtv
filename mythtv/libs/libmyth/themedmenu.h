@@ -102,7 +102,6 @@ class ThemedMenu : public QDialog
 
     void drawText(QPainter *p, QRect &rect, int textflags, QString text);
 
-    QPixmap *scalePixmap(QString filename);
     float wmult, hmult;
 
     int screenwidth, screenheight;
