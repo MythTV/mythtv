@@ -388,7 +388,7 @@ again:
         frame = vbuf.index;
         memcpy(framebuf, buffers[frame], video_buffer_size);
 	
-	memset(buffers[frame], 0, bufferlen[frame]);
+	//memset(buffers[frame], 0, bufferlen[frame]);
 
         vbuf.type = V4L2_BUF_TYPE_CAPTURE;
         ioctl(fd, VIDIOC_QBUF, &vbuf);
@@ -512,7 +512,7 @@ again:
     while (encoding) {
         if (paused)
         {
-            mainpaused = true;
+           mainpaused = true;
            usleep(50);
            gettimeofday(&stm, &tzone);
            continue;
@@ -523,9 +523,10 @@ again:
             perror("VIDIOCSYNC0");
         else 
         {
+            BufferIt(buf+vm.offsets[0]);
+            //memset(buf+vm.offsets[0], 0, video_buffer_size);
             if (ioctl(fd, VIDIOCMCAPTURE, &mm)<0) 
                 perror("VIDIOCMCAPTURE0");
-            BufferIt(buf+vm.offsets[0]);
         }
         frame = 1;
         mm.frame = 1;
@@ -533,9 +534,10 @@ again:
             perror("VIDIOCSYNC1");
         else 
         {
+            BufferIt(buf+vm.offsets[1]);
+            //memset(buf+vm.offsets[1], 0, video_buffer_size);
             if (ioctl(fd, VIDIOCMCAPTURE, &mm)<0) 
                 perror("VIDIOCMCAPTURE1");
-            BufferIt(buf+vm.offsets[1]);
         }
     }
 

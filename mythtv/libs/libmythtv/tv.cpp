@@ -134,7 +134,9 @@ void TV::LiveTV(void)
                case wsDown: ChangeChannel(false); break;
                case wsZero: case wsOne: case wsTwo: case wsThree: case wsFour: 
                case wsFive: case wsSix: case wsSeven: case wsEight:
-               case wsNine: ChannelKey(keypressed); break;
+               case wsNine: case '0': case '1': case '2': case '3': case '4':
+               case '5': case '6': case '7': case '8': case '9':
+                             ChannelKey(keypressed); break;
                case wsEnter: ChannelCommit(); break;
                default: break;
            }
@@ -212,7 +214,10 @@ void TV::ChangeChannel(bool up)
 
 void TV::ChannelKey(int key)
 {
-    char thekey = key - 256 - 0xb0 + '0';
+    char thekey = key;
+
+    if (key > 256)
+        thekey = key - 256 - 0xb0 + '0';
 
     if (channelkeysstored == 3)
     {

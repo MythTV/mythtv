@@ -36,6 +36,11 @@ GuideGrid::GuideGrid(int channel, QWidget *parent, const char *name)
     accel->connectItem(accel->insertItem(Key_Right), this, SLOT(cursorRight()));
     accel->connectItem(accel->insertItem(Key_Down), this, SLOT(cursorDown()));
     accel->connectItem(accel->insertItem(Key_Up), this, SLOT(cursorUp()));
+
+    accel->connectItem(accel->insertItem(Key_A), this, SLOT(cursorLeft()));
+    accel->connectItem(accel->insertItem(Key_D), this, SLOT(cursorRight()));
+    accel->connectItem(accel->insertItem(Key_S), this, SLOT(cursorDown()));
+    accel->connectItem(accel->insertItem(Key_W), this, SLOT(cursorUp()));
 }
 
 ChannelInfo *GuideGrid::getChannelInfo(int channum)
@@ -295,7 +300,7 @@ void GuideGrid::paintTimes(QPainter *p)
     QPainter tmp(&pix);
     tmp.setBrush(black);
     tmp.setPen(QPen(black, 2));
-    tmp.setFont(*m_font);
+    tmp.setFont(*m_largerFont);
 
     for (int i = 0; i < 5; i++)
     {
@@ -306,7 +311,7 @@ void GuideGrid::paintTimes(QPainter *p)
     {
         TimeInfo *tinfo = m_timeInfos[i];
 
-        QFontMetrics fm(*m_font);
+        QFontMetrics fm(*m_largerFont);
         int width = fm.width(tinfo->usertime);
         int height = fm.height();
 
