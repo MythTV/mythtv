@@ -34,6 +34,7 @@ using namespace std;
 #include "tv.h"
 #include "jobqueue.h"
 #include "util.h"
+#include "mythdbcon.h"
 
 StatusBox::StatusBox(MythMainWindow *parent, const char *name)
          : MythDialog(parent, name)
@@ -337,12 +338,11 @@ void StatusBox::keyPressEvent(QKeyEvent *e)
                                  QObject::tr("Yes"), QObject::tr("No"), 0);
                 if (retval == 0)
                 {
-                    QString query = QString("UPDATE mythlog "
-                                            "SET acknowledged = 1 "
-                                            "WHERE priority <= %1")
-                                            .arg(min_level);
-                    QSqlDatabase *db = QSqlDatabase::database();
-                    db->exec(query);
+                    MSqlQuery query(QString::null, QSqlDatabase::database());
+                    query.prepare("UPDATE mythlog SET acknowledged = 1 "
+                                  "WHERE priority <= :PRIORITY ;");
+                    query.bindValue(":PRIORITY", min_level);
+                    query.exec();
                     doLogEntries();
                 }
             }
@@ -494,11 +494,11 @@ void StatusBox::clicked()
                                    QObject::tr("Yes"), QObject::tr("No"), 0);
             if (retval == 0)
             {
-                QString query = QString("UPDATE mythlog SET acknowledged = 1 "
-                                        "WHERE logid = %1")
-                                        .arg(contentData[contentPos]);
-                QSqlDatabase *db = QSqlDatabase::database();
-                db->exec(query);
+                MSqlQuery query(QString::null, QSqlDatabase::database());
+                query.prepare("UPDATE mythlog SET acknowledged = 1 "
+                              "WHERE logid = :LOGID ;");
+                query.bindValue(":LOGID", contentData[contentPos]);
+                query.exec();
                 doLogEntries();
             }
         }
@@ -616,7 +616,6 @@ void StatusBox::doListingsStatus()
     QString querytext, DataDirectMessage;
     int DaysOfData;
     QDateTime qdtNow, GuideDataThrough;
-    QSqlDatabase *db = QSqlDatabase::database();
     int count = 0;
 
     contentLines.clear();
@@ -625,9 +624,10 @@ void StatusBox::doListingsStatus()
     doScroll = false;
 
     qdtNow = QDateTime::currentDateTime();
-    querytext = QString("SELECT max(endtime) FROM program;");
 
-    QSqlQuery query = db->exec(querytext);
+    MSqlQuery query(QString::null, QSqlDatabase::database());
+    query.prepare("SELECT max(endtime) FROM program;");
+    query.exec();
 
     if (query.isActive() && query.numRowsAffected())
     {
@@ -699,9 +699,9 @@ void StatusBox::doTunerStatus()
     int count = 0;
     doScroll = true;
 
-    QString querytext = QString("SELECT cardid FROM capturecard;");
-    QSqlDatabase *db = QSqlDatabase::database();
-    QSqlQuery query = db->exec(querytext);
+    MSqlQuery query(QString::null, QSqlDatabase::database());
+    query.prepare("SELECT cardid FROM capturecard;");
+    query.exec();
 
     contentLines.clear();
     contentDetail.clear();
@@ -770,36 +770,33 @@ void StatusBox::doDVBStatus(void)
     QString Status = QObject::tr("Details of DVB error statistics for last 48 "
                                  "hours:\n");
 
-    QString outerqry =
-        "SELECT starttime,endtime FROM recorded "
-        "WHERE starttime >= DATE_SUB(NOW(), INTERVAL 48 HOUR) "
-        "ORDER BY starttime;";
 
-    QSqlDatabase *db = QSqlDatabase::database();
-    QSqlQuery oquery = db->exec(outerqry);
+    MSqlQuery oquery(QString::null, QSqlDatabase::database());
+    oquery.prepare("SELECT starttime,endtime FROM recorded "
+                  "WHERE starttime >= DATE_SUB(NOW(), INTERVAL 48 HOUR) "
+                  "ORDER BY starttime;");
+    oquery.exec();
 
     if (oquery.isActive() && oquery.numRowsAffected())
     {
-        querytext = QString("SELECT cardid,"
-                            "max(fe_ss),min(fe_ss),avg(fe_ss),"
-                            "max(fe_snr),min(fe_snr),avg(fe_snr),"
-                            "max(fe_ber),min(fe_ber),avg(fe_ber),"
-                            "max(fe_unc),min(fe_unc),avg(fe_unc),"
-                            "max(myth_cont),max(myth_over),max(myth_pkts) "
-                            "FROM dvb_signal_quality "
-                            "WHERE sampletime BETWEEN ? AND ? "
-                            "GROUP BY cardid");
-
-        QSqlQuery query = db->exec(NULL);
-        query.prepare(querytext);
+        MSqlQuery query(QString::null, QSqlDatabase::database());
+        query.prepare("SELECT cardid,"
+                      "max(fe_ss),min(fe_ss),avg(fe_ss),"
+                      "max(fe_snr),min(fe_snr),avg(fe_snr),"
+                      "max(fe_ber),min(fe_ber),avg(fe_ber),"
+                      "max(fe_unc),min(fe_unc),avg(fe_unc),"
+                      "max(myth_cont),max(myth_over),max(myth_pkts) "
+                      "FROM dvb_signal_quality "
+                      "WHERE sampletime BETWEEN :STARTTIME AND :ENDTIME "
+                      "GROUP BY cardid");
         
         while (oquery.next())
         {
             QDateTime t_start = oquery.value(0).toDateTime();
             QDateTime t_end = oquery.value(1).toDateTime();
 
-            query.bindValue(0, t_start);
-            query.bindValue(1, t_end);
+            query.bindValue(":STARTTIME", t_start);
+            query.bindValue(":ENDTIME", t_end);
 
             if (!query.exec())
                 cout << query.lastError().databaseText() << "\r\n" 
@@ -854,14 +851,14 @@ void StatusBox::doLogEntries(void)
     contentFont.clear();
     contentData.clear();
 
-    QSqlDatabase *db = QSqlDatabase::database();
-    QString thequery;
+    MSqlQuery query(QString::null, QSqlDatabase::database());
+    query.prepare("SELECT logid, module, priority, logdate, host, "
+                  "message, details "
+                  "FROM mythlog WHERE acknowledged = 0 "
+                  "AND priority <= :PRIORITY ORDER BY logdate DESC;");
+    query.bindValue(":PRIORITY", min_level);
+    query.exec();
 
-    thequery = QString("SELECT logid, module, priority, logdate, host, "
-                       "message, details "
-                       "FROM mythlog WHERE acknowledged = 0 AND priority <= %1 "
-                       "ORDER BY logdate DESC;").arg(min_level);
-    QSqlQuery query = db->exec(thequery);
     if (query.isActive())
     {
         while (query.next())
@@ -1074,8 +1071,6 @@ static const QString uptimeStr(time_t uptime)
 
 void StatusBox::doMachineStatus()
 {
-    QSqlDatabase *db(QSqlDatabase::database());
-
     int           count(0);
     int           totalM, usedM, freeM;    // Physical memory
     int           totalS, usedS, freeS;    // Virtual  memory (swap)
@@ -1166,22 +1161,26 @@ void StatusBox::doMachineStatus()
     // get free disk space
     contentLines[count++] = QString(QObject::tr("Disk space:"));
 
-    if (db && isBackend)
+    if (isBackend)
     {
         QString str;
 
-        // Perform the database queries
-        QSqlQuery path = db->exec("SELECT * FROM settings"
-                                  " where value=\"RecordFilePrefix\";");
-
         contentLines[count] = "   " + QString(QObject::tr("Recordings")) + ": ";
 
+        // Perform the database queries
+        MSqlQuery query(QString::null, QSqlDatabase::database());
+        query.prepare("SELECT * FROM settings "
+                      "WHERE value=\"RecordFilePrefix\" "
+                      "AND hostname = :HOSTNAME ;");
+        query.bindValue(":HOSTNAME", gContext->GetHostName());
+        query.exec();
+
         // did we get results?
-        if (path.isActive() && path.numRowsAffected())
+        if (query.isActive() && query.numRowsAffected())
         {
             // skip to first result
-            path.next();
-            str = diskUsageStr(path.value(1).toCString());
+            query.next();
+            str = diskUsageStr(query.value(1).toCString());
         }
         else
             str = QString(QObject::tr("DB error - RecordFilePrefix unknown"));
@@ -1189,12 +1188,16 @@ void StatusBox::doMachineStatus()
 
         // Ditto for the second path
         contentLines[count] = "   " + QString(QObject::tr("TV buffer")) + ": ";
-        path = db->exec("SELECT * FROM settings"
-                        " where value=\"LiveBufferDir\";");
-        if (path.isActive() && path.numRowsAffected())
+
+        query.prepare("SELECT * FROM settings "
+                      "WHERE value=\"LiveBufferDir\" "
+                      "AND hostname = :HOSTNAME ;");
+        query.bindValue(":HOSTNAME", gContext->GetHostName());
+        query.exec();
+        if (query.isActive() && query.numRowsAffected())
         {
-            path.next();
-            str = diskUsageStr(path.value(1).toCString());
+            query.next();
+            str = diskUsageStr(query.value(1).toCString());
         }
         else
             str = QString(QObject::tr("DB error - LiveBufferDir unknown"));
