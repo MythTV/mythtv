@@ -42,6 +42,17 @@ enum VerboseMask {
     VB_ALL       = 0xffff
 };
 
+enum LogPriorities {
+    LP_EMERG     = 0,
+    LP_ALERT     = 1,
+    LP_CRITICAL  = 2,
+    LP_ERROR     = 3,
+    LP_WARNING   = 4,
+    LP_NOTICE    = 5,
+    LP_INFO      = 6,
+    LP_DEBUG     = 7
+};
+
 #define VERBOSE(mask,args...) \
 do { \
 if ((print_verbose_messages & mask) != 0) \
@@ -107,6 +118,8 @@ class MythContext : public QObject
     void LoadQtConfig(void);
     void UpdateImageCache(void);
 
+    void RefreshBackendConfig(void);
+
     void GetScreenSettings(float &wmult, float &hmult);
     void GetScreenSettings(int &width, float &wmult,
                            int &height, float &hmult);
@@ -120,6 +133,9 @@ class MythContext : public QObject
     static void KickDatabase(QSqlDatabase *db);
     static void DBError(const QString &where, const QSqlQuery& query);
     static QString DBErrorMessage(const QSqlError& err);
+
+    void LogEntry(const QString &module, int priority,
+                  const QString &message, const QString &details);
 
     Settings *settings(void);
     Settings *qtconfig(void);

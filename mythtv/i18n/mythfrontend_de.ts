@@ -3563,6 +3563,174 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
         <source>If checked the select key will change the channel while using the program guide during live TV.  If unchecked the select key will bring up the recording options screen.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Visible</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, the channel will be visible in the EPG.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DB Logging Enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, the Myth modules will send event details to the database, where they can be viewed with MythLog or emailed out periodically.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max. Number of Entries per Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If there are more than this number of entries for a module, the oldest log entries will be deleted to reduce the count to this number.  Set to 0 to disable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatic Log Cleaning Enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This enables the periodic cleanup of the events stored in the Myth database (see &apos;DB Logging Enabled&apos; on the previous page).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log Cleanup Frequency (Days)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The number of days between log cleanup runs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of days to keep acknowledged log entries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The number of days before a log entry that has been acknowledged will be deleted by the log cleanup process.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of days to keep unacknowledged log entries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The number of days before a log entry that has NOT been acknowledged will be deleted by the log cleanup process.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log Print Threshold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Messages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Debug and Higher</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Info and Higher</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notice and Higher</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning and Higher</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error and Higher</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Critical and Higher</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alert and Higher</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Emergency Only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disable Printed Output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This controls what messages will be printed out as well as being logged to the database.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically run mythfilldatabase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This enables the automatic execution of mythfilldatabase.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>mythfilldatabase Run Frequency (Days)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The number of days between mythfilldatabase runs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>mythfilldatabase Execution Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting and the following one define a time period when the mythfilldatabase process is allowed to run.  Ex. setting Min to 11 and Max to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>mythfilldatabase Execution End</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting and the preceding one define a time period when the mythfilldatabase process is allowed to run.  Ex. setting Min to 11 and Max to 13 would mean that the process would only run between 11 AM and 1 PM.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>mythfilldatabase Path</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Path (including executable) of the mythfilldatabase program.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>mythfilldatabase Arguments</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any arguments you want passed to the mythfilldatabase program.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>mythfilldatabase Log Path</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Path to use for logging output from mythfilldatabase program.  Leave blank to disable logging.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Myth Database Logging</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mythfilldatabase</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScheduledRecording</name>

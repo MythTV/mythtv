@@ -427,6 +427,8 @@ void TVMenuCallback(void *data, QString &selection)
         MainGeneralSettings mainsettings;
         mainsettings.exec(QSqlDatabase::database());
         menu->ReloadExitKey();
+        QStringList strlist = QString("REFRESH_BACKEND");
+        gContext->SendReceiveStringList(strlist);
     } 
     else if (sel == "settings playback") 
     {

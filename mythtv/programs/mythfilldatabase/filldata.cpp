@@ -2156,6 +2156,9 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+    gContext->LogEntry("mythfilldatabase", LP_INFO,
+                       "Listings Download Started", "");
+
     if (from_xawfile)
     {
         readXawtvChannels(fromxawfile_id, fromxawfile_name);
@@ -2192,8 +2195,13 @@ int main(int argc, char *argv[])
              }
              else
              {
-                  cerr << "There are no channel sources defined, did you run the "
-                       << "setup program?\n";
+                  cerr << "There are no channel sources defined, did you run "
+                       << "the setup program?\n";
+                  gContext->LogEntry("mythfilldatabase", LP_CRITICAL,
+                                     "No channel sources defined",
+                                     "Could not find any defined channel "
+                                     "sources - did you run the setup "
+                                     "program?");
                   exit(-1);
              }
         }
@@ -2208,6 +2216,8 @@ int main(int argc, char *argv[])
         if (!ret)
         {
              cerr << "Failed to fetch some program info\n";
+             gContext->LogEntry("mythfilldatabase", LP_WARNING,
+                                "Failed to fetch some program info", "");
              exit(1);
         }
     }
@@ -2222,6 +2232,8 @@ int main(int argc, char *argv[])
 
     ScheduledRecording::signalChange(db);
 
+    gContext->LogEntry("mythfilldatabase", LP_INFO,
+                       "Listings Download Finished", "");
     delete gContext;
 
     return 0;

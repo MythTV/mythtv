@@ -373,6 +373,11 @@ void MainServer::ProcessRequest(QSocket *sock)
         MythEvent me(message, extra);
         gContext->dispatch(me);
     }
+    else if (command == "REFRESH_BACKEND")
+    {
+        VERBOSE(VB_ALL,"Reloading backend settings");
+        HandleBackendRefresh(sock);
+    }
     else
         VERBOSE(VB_ALL, "Unknown command: " + command);
 }
@@ -2310,6 +2315,14 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     SendResponse(pbssock, retlist);    
 
     delete pginfo;
+}
+
+void MainServer::HandleBackendRefresh(QSocket *socket)
+{
+    gContext->RefreshBackendConfig();
+
+    QStringList retlist = "OK";
+    SendResponse(socket, retlist);    
 }
 
 void MainServer::endConnection(QSocket *socket)

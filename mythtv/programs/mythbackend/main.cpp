@@ -19,6 +19,7 @@ using namespace std;
 #include "mainserver.h"
 #include "encoderlink.h"
 #include "remoteutil.h"
+#include "housekeeper.h"
 
 #include "libmythtv/programinfo.h"
 #include "libmyth/mythcontext.h"
@@ -30,6 +31,7 @@ Scheduler *sched = NULL;
 Transcoder *trans = NULL;
 QString pidfile;
 QString lockfile_location;
+HouseKeeper *housekeeping = NULL;
 
 bool setupTVs(bool ismaster)
 {
@@ -48,9 +50,13 @@ bool setupTVs(bool ismaster)
 
             if (host.isNull() || host.isEmpty())
             {
-                cerr << "One of your capturecard entries does not have a "
-                     << "hostname.\n  Please run setup and confirm all of the "
-                     << "capture cards.\n";
+                QString msg = "One of your capturecard entries does not have a "
+                              "hostname.\n  Please run setup and confirm all "
+                              "of the capture cards.\n";
+
+                cerr << msg;
+                gContext->LogEntry("mythbackend", LP_CRITICAL,
+                                   "Problem with capture cards", msg);
                 exit(-1);
             }
 
@@ -85,6 +91,9 @@ bool setupTVs(bool ismaster)
     {
         cerr << "ERROR: no capture cards are defined in the database.\n";
         cerr << "Perhaps you should read the installation instructions?\n";
+        gContext->LogEntry("mythbackend", LP_CRITICAL,
+                           "No capture cards are defined", 
+                           "Please run the setup program.");
         return false;
     }
 
@@ -360,6 +369,13 @@ int main(int argc, char **argv)
         return -1;
     }
 
+    QSqlDatabase *hkthread = QSqlDatabase::addDatabase("QMYSQL3", "HKDB");
+    if (!hkthread)
+    {
+        cerr << "Couldn't connect to database\n";
+        return -1;
+    }
+
     QSqlDatabase *transthread = QSqlDatabase::addDatabase("QMYSQL3", "TRANSDB");
     if (!transthread)
     {
@@ -376,6 +392,7 @@ int main(int argc, char **argv)
 
     if (!gContext->OpenDatabase(db) || !gContext->OpenDatabase(subthread) ||
         !gContext->OpenDatabase(expthread) ||
+        !gContext->OpenDatabase(hkthread) ||
         !gContext->OpenDatabase(transthread) ||
         !gContext->OpenDatabase(msdb))
     {
@@ -437,6 +454,8 @@ int main(int argc, char **argv)
     if (masterip == myip)
     {
         cerr << "Starting up as the master server.\n";
+        gContext->LogEntry("mythbackend", LP_INFO,
+                           "MythBackend started as master server", "");
         ismaster = true;
 
         if (nosched)
@@ -446,6 +465,8 @@ int main(int argc, char **argv)
     else
     {
         cerr << "Running as a slave backend.\n";
+        gContext->LogEntry("mythbackend", LP_INFO,
+                           "MythBackend started as a slave backend", "");
     }
  
     bool runsched = setupTVs(ismaster);
@@ -458,6 +479,9 @@ int main(int argc, char **argv)
 
     QSqlDatabase *expdb = QSqlDatabase::database("EXPDB");
     expirer = new AutoExpire(true, ismaster, expdb);
+
+    QSqlDatabase *hkdb = QSqlDatabase::database("HKDB");
+    housekeeping = new HouseKeeper(true, ismaster, hkdb);
 
     QSqlDatabase *trandb = QSqlDatabase::database("TRANSDB");
     trans = new Transcoder(&tvList, trandb);
@@ -505,6 +529,7 @@ int main(int argc, char **argv)
 
     // delete trans;
 
+    gContext->LogEntry("mythbackend", LP_INFO, "MythBackend exiting", "");
     cleanup();
 
     return 0;

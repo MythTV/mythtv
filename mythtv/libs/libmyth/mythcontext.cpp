@@ -40,6 +40,8 @@ class MythContextPrivate
 
     void Init(bool gui, bool lcd);
 
+    void LoadLogSettings(void);
+
     MythContext *parent;
 
     Settings *m_settings;
@@ -94,6 +96,9 @@ class MythContextPrivate
         int allowexposure;
     } m_screensaver;
 
+    int m_logenable, m_logmaxcount, m_logprintlevel;
+    QMap<QString,int> lastLogCounts;
+    QMap<QString,QString> lastLogStrings;
 };
 
 MythContextPrivate::MythContextPrivate(MythContext *lparent)
@@ -159,6 +164,10 @@ void MythContextPrivate::Init(bool gui, bool lcd)
     serverSock = NULL;
     eventSock = new QSocket(0);
 
+    m_logenable = -1;
+    m_logmaxcount = -1;
+    m_logprintlevel = -1;
+
     mainWindow = NULL;
 
     if (lcd)
@@ -183,6 +192,13 @@ MythContextPrivate::~MythContextPrivate()
         delete eventSock;
     if (lcd_device)
         delete lcd_device;
+}
+
+void MythContextPrivate::LoadLogSettings(void)
+{
+    m_logenable = parent->GetNumSetting("LogEnabled", 0);
+    m_logmaxcount = parent->GetNumSetting("LogMaxCount", 0);
+    m_logprintlevel = parent->GetNumSetting("LogPrintLevel", LP_ERROR);
 }
 
 MythContext::MythContext(const QString &binversion, bool gui, bool lcd)
@@ -389,6 +405,11 @@ void MythContext::LoadQtConfig(void)
     d->m_backgroundimage = NULL;
 
     InitializeScreenSettings();
+}
+
+void MythContext::RefreshBackendConfig(void)
+{
+    d->LoadLogSettings();
 }
 
 void MythContext::UpdateImageCache(void)
@@ -1484,3 +1505,85 @@ void MythContext::ResetScreensaver(void)
 #endif
 #endif
 }
+
+void MythContext::LogEntry(const QString &module, int priority,
+                           const QString &message, const QString &details)
+{
+    unsigned int logid;
+    int howmany;
+
+    if (d->m_logenable == -1) // Haven't grabbed the settings yet
+        d->LoadLogSettings();
+    if (d->m_logenable == 1)
+    {
+        if (message.left(21) != "Last message repeated")
+        {
+            if (message == d->lastLogStrings[module])
+            {
+                d->lastLogCounts[module] += 1;
+                return;
+            }
+            else
+            {
+                if (0 < d->lastLogCounts[module])
+                {
+                    LogEntry(module, priority, 
+                             QString("Last message repeated %1 times")
+                                    .arg(d->lastLogCounts[module]),
+                             d->lastLogStrings[module]);
+                }
+
+                d->lastLogCounts[module] = 0;
+                d->lastLogStrings[module] = message;
+            }
+        }
+
+        d->dbLock.lock();
+    
+        if (d->m_db->isOpen())
+        {
+            KickDatabase(d->m_db);
+    
+            QString querystr = QString("INSERT INTO mythlog (module, priority, "
+                                       "logdate, host, message, details) "
+                                       "values ( '%1', %2, now(), '%3', "
+                                       "'%4','%5' );") 
+                                       .arg(module) 
+                                       .arg(priority)
+                                       .arg(d->m_localhostname)
+                                       .arg(message).arg(details);
+    
+            QSqlQuery result = d->m_db->exec(querystr);
+            if (!result.isActive())
+                MythContext::DBError("LogEntry", querystr);
+
+            if (d->m_logmaxcount > 0)
+            {
+                querystr = QString("SELECT logid FROM mythlog WHERE "
+                                   "module='%1' ORDER BY logdate ASC") 
+                                   .arg(module);
+                result = d->m_db->exec(querystr);
+                howmany = result.size();
+                if (howmany > d->m_logmaxcount)
+                {
+                    while (howmany > d->m_logmaxcount)
+                    {
+                        result.next();
+                        logid = result.value(0).toUInt();
+                        querystr = QString("DELETE FROM mythlog WHERE "
+                                           "logid=%1").arg(logid);
+                        d->m_db->exec(querystr);
+                        howmany--;
+                    }
+                }
+            }
+        }
+    
+        d->dbLock.unlock();
+
+	if (priority <= d->m_logprintlevel)
+            VERBOSE(VB_ALL, module + ": " + message);
+    }
+}
+
+

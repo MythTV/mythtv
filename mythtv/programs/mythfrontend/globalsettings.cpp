@@ -1442,11 +1442,13 @@ class SelectChangesChannel: public CheckBoxSetting, public GlobalSetting {
 public:
     SelectChangesChannel():
         GlobalSetting("SelectChangesChannel") {
-        setLabel(QObject::tr("Use select to change the channel in the program guide"));
+        setLabel(QObject::tr("Use select to change the channel in the program "
+                 "guide"));
         setValue(false);
-        setHelpText(QObject::tr("If checked the select key will change the channel "
-                    "while using the program guide during live TV.  If unchecked the select "
-                    "key will bring up the recording options screen."));
+        setHelpText(QObject::tr("If checked the select key will change the "
+                    "channel while using the program guide during live TV.  "
+                    "If unchecked the select key will bring up the recording "
+                    "options screen."));
     };
 };
 
@@ -1690,12 +1692,248 @@ public:
 
 #endif
 
+class LogEnabled: public CheckBoxSetting, public GlobalSetting {
+public:
+    LogEnabled():
+        GlobalSetting("LogEnabled") {
+        setLabel(QObject::tr("DB Logging Enabled"));
+        setValue(false);
+        setHelpText(QObject::tr("If checked, the Myth modules will send event "
+                    "details to the database, where they can be viewed with "
+                    "MythLog or emailed out periodically."));
+    };
+};
+
+class LogMaxCount: public SpinBoxSetting, public GlobalSetting {
+public:
+    LogMaxCount():
+        SpinBoxSetting(0,500,10),
+        GlobalSetting("LogMaxCount") {
+        setLabel(QObject::tr("Max. Number of Entries per Module"));
+        setValue(100);
+        setHelpText(QObject::tr("If there are more than this number of entries "
+                    "for a module, the oldest log entries will be deleted to "
+                    "reduce the count to this number.  Set to 0 to disable."));
+    };
+};
+
+class LogCleanEnabled: public CheckBoxSetting, public GlobalSetting {
+public:
+    LogCleanEnabled():
+        GlobalSetting("LogCleanEnabled") {
+        setLabel(QObject::tr("Automatic Log Cleaning Enabled"));
+        setValue(false);
+        setHelpText(QObject::tr("This enables the periodic cleanup of the "
+                    "events stored in the Myth database (see 'DB Logging "
+                    "Enabled' on the previous page)."));
+    };
+};
+
+class LogCleanPeriod: public SpinBoxSetting, public GlobalSetting {
+public:
+    LogCleanPeriod():
+        SpinBoxSetting(0,60,1),
+        GlobalSetting("LogCleanPeriod") {
+        setLabel(QObject::tr("Log Cleanup Frequency (Days)"));
+        setValue(14);
+        setHelpText(QObject::tr("The number of days between log cleanup runs"));
+    };
+};
+
+class LogCleanDays: public SpinBoxSetting, public GlobalSetting {
+public:
+    LogCleanDays():
+        SpinBoxSetting(0,60,1),
+        GlobalSetting("LogCleanDays") {
+        setLabel(QObject::tr("Number of days to keep acknowledged log "
+                 "entries"));
+        setValue(14);
+        setHelpText(QObject::tr("The number of days before a log entry that has"
+                    " been acknowledged will be deleted by the log cleanup "
+                    "process."));
+    };
+};
+
+class LogCleanMax: public SpinBoxSetting, public GlobalSetting {
+public:
+    LogCleanMax():
+        SpinBoxSetting(0,60,1),
+        GlobalSetting("LogCleanMax") {
+        setLabel(QObject::tr("Number of days to keep unacknowledged log "
+                 "entries"));
+        setValue(30);
+        setHelpText(QObject::tr("The number of days before a log entry that "
+                    "has NOT been acknowledged will be deleted by the log "
+                    "cleanup process."));
+    };
+};
+
+class LogPrintLevel: public ComboBoxSetting, public GlobalSetting {
+public:
+    LogPrintLevel() :
+      GlobalSetting("LogPrintLevel") {
+        setLabel(QObject::tr("Log Print Threshold"));
+        addSelection(QObject::tr("All Messages"), "8");
+        addSelection(QObject::tr("Debug and Higher"), "7");
+        addSelection(QObject::tr("Info and Higher"), "6");
+        addSelection(QObject::tr("Notice and Higher"), "5");
+        addSelection(QObject::tr("Warning and Higher"), "4");
+        addSelection(QObject::tr("Error and Higher"), "3");
+        addSelection(QObject::tr("Critical and Higher"), "2");
+        addSelection(QObject::tr("Alert and Higher"), "1");
+        addSelection(QObject::tr("Emergency Only"), "0");
+        addSelection(QObject::tr("Disable Printed Output"), "-1");
+        setHelpText(QObject::tr("This controls what messages will be printed "
+                    "out as well as being logged to the database."));
+    }
+};
+
+class MythFillEnabled: public CheckBoxSetting, public GlobalSetting {
+public:
+    MythFillEnabled():
+        GlobalSetting("MythFillEnabled") {
+        setLabel(QObject::tr("Automatically run mythfilldatabase"));
+        setValue(false);
+        setHelpText(QObject::tr("This enables the automatic execution of "
+                    "mythfilldatabase."));
+    };
+};
+
+class MythFillPeriod: public SpinBoxSetting, public GlobalSetting {
+public:
+    MythFillPeriod():
+        SpinBoxSetting(0,30,1),
+        GlobalSetting("MythFillPeriod") {
+        setLabel(QObject::tr("mythfilldatabase Run Frequency (Days)"));
+        setValue(1);
+        setHelpText(QObject::tr("The number of days between mythfilldatabase "
+                    "runs"));
+    };
+};
+
+class MythFillMinHour: public SpinBoxSetting, public GlobalSetting {
+public:
+    MythFillMinHour():
+        SpinBoxSetting(0,24,1),
+        GlobalSetting("MythFillMinHour") {
+        setLabel(QObject::tr("mythfilldatabase Execution Start"));
+        setValue(2);
+        setHelpText(QObject::tr("This setting and the following one define a "
+                    "time period when the mythfilldatabase process is allowed "
+                    "to run.  Ex. setting Min to 11 and Max to 13 would mean "
+                    "that the process would only run between 11 AM and 1 PM."));
+    };
+};
+
+class MythFillMaxHour: public SpinBoxSetting, public GlobalSetting {
+public:
+    MythFillMaxHour():
+        SpinBoxSetting(0,24,1),
+        GlobalSetting("MythFillMaxHour") {
+        setLabel(QObject::tr("mythfilldatabase Execution End"));
+        setValue(5);
+        setHelpText(QObject::tr("This setting and the preceding one define a "
+                    "time period when the mythfilldatabase process is allowed "
+                    "to run.  Ex. setting Min to 11 and Max to 13 would mean "
+                    "that the process would only run between 11 AM and 1 PM."));
+    };
+};
+
+class MythFillDatabasePath: public LineEditSetting, public GlobalSetting {
+public:
+    MythFillDatabasePath():
+        GlobalSetting("MythFillDatabasePath") {
+        setLabel(QObject::tr("mythfilldatabase Path"));
+        setValue("mythfilldatabase");
+        setHelpText(QObject::tr("Path (including executable) of the "
+                                "mythfilldatabase program."));
+    };
+};
+
+class MythFillDatabaseArgs: public LineEditSetting, public GlobalSetting {
+public:
+    MythFillDatabaseArgs():
+        GlobalSetting("MythFillDatabaseArgs") {
+        setLabel(QObject::tr("mythfilldatabase Arguments"));
+        setValue("");
+        setHelpText(QObject::tr("Any arguments you want passed to the "
+                                "mythfilldatabase program."));
+    };
+};
+
+class MythFillDatabaseLog: public LineEditSetting, public GlobalSetting {
+public:
+   MythFillDatabaseLog():
+       GlobalSetting("MythFillDatabaseLog") {
+       setLabel(QObject::tr("mythfilldatabase Log Path"));
+       setValue("");
+       setHelpText(QObject::tr("Path to use for logging output from "
+                               "mythfilldatabase program.  Leave blank "
+                               "to disable logging."));
+   };
+};
+
+class MythLogSettings: public VerticalConfigurationGroup,
+                      public TriggeredConfigurationGroup {
+public:
+    MythLogSettings():
+         VerticalConfigurationGroup(false),
+         TriggeredConfigurationGroup(false) {
+         setLabel(QObject::tr("Myth Database Logging"));
+//         setUseLabel(false);
+
+         Setting* logEnabled = new LogEnabled();
+         addChild(logEnabled);
+         setTrigger(logEnabled);
+         addChild(new LogMaxCount());
+
+         ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
+         settings->addChild(new LogPrintLevel());
+         settings->addChild(new LogCleanEnabled());
+         settings->addChild(new LogCleanPeriod());
+         settings->addChild(new LogCleanDays());
+         settings->addChild(new LogCleanMax());
+         addTarget("1", settings);
+         
+         // show nothing if logEnabled is off
+         addTarget("0", new VerticalConfigurationGroup(true));
+     };
+};
+
+class MythFillSettings: public VerticalConfigurationGroup,
+                        public TriggeredConfigurationGroup {
+public:
+     MythFillSettings():
+         VerticalConfigurationGroup(false),
+         TriggeredConfigurationGroup(false) {
+         setLabel(QObject::tr("Mythfilldatabase"));
+         setUseLabel(false);
+
+         Setting* fillEnabled = new MythFillEnabled();
+         addChild(fillEnabled);
+         setTrigger(fillEnabled);
+
+         ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
+         settings->addChild(new MythFillDatabasePath());
+         settings->addChild(new MythFillDatabaseArgs());
+         settings->addChild(new MythFillDatabaseLog());
+         settings->addChild(new MythFillPeriod());
+         settings->addChild(new MythFillMinHour());
+         settings->addChild(new MythFillMaxHour());
+         addTarget("1", settings);
+         
+         // show nothing if fillEnabled is off
+         addTarget("0", new VerticalConfigurationGroup(true));
+     };
+};
+
 MainGeneralSettings::MainGeneralSettings()
 {
     AudioSettings *audio = new AudioSettings();
     addChild(audio);
 
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
+    general->setLabel(QObject::tr("General"));
     general->addChild(new AllowQuitShutdown());
     general->addChild(new NoPromptOnExit());
     general->addChild(new HaltCommand());
@@ -1704,6 +1942,12 @@ MainGeneralSettings::MainGeneralSettings()
     general->addChild(new EnableMediaMon());
     general->addChild(new EnableXbox());
     addChild(general);
+
+    MythLogSettings *mythlog = new MythLogSettings();
+    addChild(mythlog);
+
+    MythFillSettings *mythfill = new MythFillSettings();
+    addChild(mythfill);
 }
 
 PlaybackSettings::PlaybackSettings()

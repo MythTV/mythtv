@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythcontext.h"
 
-const QString currentDatabaseVersion = "1034";
+const QString currentDatabaseVersion = "1035";
 
 void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -648,7 +648,29 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 };
         performActualUpdate(updates, "1034", dbver);
     }
+
+    if (dbver == "1034")
+    {
+        const QString updates[] = {
+"CREATE TABLE mythlog ("
+"  logid int(10) unsigned PRIMARY KEY NOT NULL auto_increment,"
+"  module char(32) NOT NULL,"
+"  priority int(11) NOT NULL,"
+"  acknowledged bool default 0,"
+"  logdate datetime,"
+"  host varchar(128),"
+"  message varchar(255) NOT NULL,"
+"  details text"
+");",
+"CREATE TABLE housekeeping ("
+"  tag varchar(64) PRIMARY KEY NOT NULL,"
+"  lastrun datetime"
+");",
+""
 };
+        performActualUpdate(updates, "1035", dbver);
+    }
+}
 
 void InitializeDatabase(void)
 {

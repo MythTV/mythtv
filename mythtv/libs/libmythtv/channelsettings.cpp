@@ -165,6 +165,17 @@ public:
     };
 };
 
+class Visible: public CheckBoxSetting, public CSetting {
+public:
+    Visible(const ChannelID& id):
+        CheckBoxSetting(), CSetting(id, "visible") {
+        setValue(true);
+        setLabel(QObject::tr("Visible"));
+        setHelpText(QObject::tr("If set, the channel will be visible in the "
+                    "EPG."));
+    };
+};
+
 /*****************************************************************************
         Channel Options - Video 4 Linux
  *****************************************************************************/
@@ -528,6 +539,7 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID& id)
     VerticalConfigurationGroup* left = new VerticalConfigurationGroup(false,true);
     left->addChild(new Channum(id));
     left->addChild(new Callsign(id));
+    left->addChild(new Visible(id));
     group1->addChild(left);
 
     VerticalConfigurationGroup* right = new VerticalConfigurationGroup(false, true);
