@@ -616,16 +616,24 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
     dupinWidget = dupin->configWidget(this, dialog);
     vbox2->addWidget(dupinWidget);
 
-    MythPushButton *button = new MythPushButton(tr("See a list of all up-coming"
-                                                   " episodes/playtimes."),
+    hbox = new QHBoxLayout(vbox, (int)(20 * wmult));
+    MythPushButton *button = new MythPushButton(tr("List upcoming episodes"),
                                                 dialog);
-    connect(button, SIGNAL(clicked()), this, SLOT(runProgList()));
-    vbox->addWidget(button);
+    hbox->addWidget(button);
+    hbox->addStretch( 42 );
+    MythPushButton *cancel = new MythPushButton(tr("&Cancel"), dialog);
+    hbox->addWidget(cancel);
+    hbox->addSpacing( 6 );
+    MythPushButton *finish = new MythPushButton(tr("&Finish"), dialog);
+    hbox->addWidget(finish);
 
     connect(type, SIGNAL(valueChanged(const QString&)), this,
             SLOT(setAvailableOptions(const QString&)));
     connect(maxepisodes, SIGNAL(valueChanged(int)), this,
             SLOT(setAvailableOptions(int)));
+    connect(button, SIGNAL(clicked()), this, SLOT(runProgList()));
+    connect(cancel, SIGNAL(clicked()), dialog, SLOT(reject()));
+    connect(finish, SIGNAL(clicked()), dialog, SLOT(accept()));
 
     typeWidget->setFocus();
     setAvailableOptions();
