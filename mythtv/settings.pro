@@ -14,7 +14,7 @@ DEFINES += PREFIX=\"$${PREFIX}\"
 
 release {
         DEFINES += MMX
-        QMAKE_CXXFLAGS_RELEASE = -O6 -march=pentiumpro -fomit-frame-pointer -funroll-loops -fexpensive-optimizations
+        QMAKE_CXXFLAGS_RELEASE = -O3 -march=pentiumpro -fomit-frame-pointer
 }
 
 EXTRA_LIBS = -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext
