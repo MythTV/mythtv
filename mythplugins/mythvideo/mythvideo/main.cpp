@@ -124,7 +124,7 @@ void runMenu(QString themedir, const QString &menuname,
 
     if (diag->foundTheme())
     {
-        gContext->LCDswitchToTime();
+        gContext->GetLCDDevice()->switchToTime();
         diag->exec();
     }
     else
