@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-02-10, v1.091
+<date>2003-02-12, v1.092
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2175,10 +2175,10 @@ correctly.
 instructions which tell you how to modify the Themes makefile. <ref id="RH80_OSD_Strip"
 name="Link">.
 
-<sect>Miscellaneous.
-<sect1>I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
-<p>Matthew Zimmerman has created a patch for MPlayer / Mencoder
-<url url="http://www.mplayerhq.hu" name="http://www.mplayerhq.hu"> that allows
+<sect>Miscellaneous. 
+<sect1>I'd like to watch the files without using MythTV / I'd like to convert the files to some other format. 
+<p>Matthew Zimmerman has created a patch for MPlayer / Mencoder <url
+url="http://www.mplayerhq.hu" name="http://www.mplayerhq.hu"> that allows
 you view the files created by MythTV.  MythTV doesn't use standard
 Nupplevideo files, which is why you MPlayer complains if you try to view
 them.
@@ -2223,7 +2223,8 @@ Style "myth*"      NoTitle, NoHandles, Sticky, WindowListSkip, BorderWidth 0
 $
 </verb></tscreen>
 
-<sect1>What resolution should I use?
+<sect1>What capture resolution should I use?  How does video work?
+<label id="capture_resolution_">
 <!-- Lots of the following is from a Bruce Markey mailto:bjm@lvcm.com post
 to the mailing list, 2003-01-21. -->
 <p>While MythTV allows you to set various GUI and capture resolutions, not
@@ -2271,12 +2272,94 @@ consistently exceeding .90, your CPU will not have enough cycles to service
 other system events, thereby causing frame drops when it context switches
 away from MythTV to service other processes.
 
-As an example, if you are capturing at 640x480, you may wish to run X
-Windows and the MythTV GUI at 640x480.
-
 If you'd like to read more on this, go to the vcdhelp website at <url
 url="http://www.vcdhelp.com/forum/userguides/94382.php"
 name="http://www.vcdhelp.com/forum/userguides/94382.php">.
+
+<sect1>MythTV GUI and X Display Sizes.
+<p>MythTV is designed to be run as dedicated full screen TV application
+but can also be run as a desktop application on a computer
+monitor. Here are a few consideration for configuring sizes to best
+suit you needs.
+
+There are three sizes that are important for matching the MythTV GUI and
+full screen TV playback to fit the screen:
+
+<itemize>
+<item>the X display size
+<item>the X Desktop (virtual) dimensions
+<item>the MythTV GUI dimensions
+</itemize>
+
+The MythTV GUI uses its GUI dimensions regardless of the other two and is
+anchored to the upper left corner of the X Desktop.
+
+The MythTV full screen mode uses the X display size dimensions regardless of
+the other two and is anchored to the upper left corner of the X display.
+
+<sect2>X Dimensions
+<p>For output to a Television, common resolutions are 640x480, 800x600, and
+some rare devices support 1024x768. Generally, higher resolutions are
+better. However, you may find that you prefer the picture quality at one of
+the lower resolutions. Everything in MythTV is scalable and should 'fit'
+regardless of the resolution you choose.
+
+Edit your X configuration file, usually "XF86Config-4", so that the the
+resolution you want to use is listed first in the lists under "Screen". If
+this resolution is higher than the resolutions supported by your output
+device, you will see a 'panning' effect where moving the mouse to the edge
+will scroll around a desktop area which is larger than the display size. If
+this happens, edit your X configuration file to match the display size then
+restart X.
+
+<sect2>MythTV Dimensions
+<p>Set the MythTV GUI size to these same dimensions as the X display. In
+0.7, edit the file <tt>themes.txt</tt>. In 0.8, from "mythfrontend" go to
+Setup->Appearance.  To ensure that your new dimension settings, exit and
+restart MythTV.  
+
+<bf>NOTE</bf>: When the GUI is full screen, you may need to set your window
+manager to 'Click to Focus' for windows to stack properly.
+
+The fonts for the GUI and OSD will scale to whatever sizes you use. Most
+font sizes can be changed in setup selections. Make sure to use fonts large
+enough to be read on a TV screen from a distance.
+
+The full screen TV size is based on the X display size. For Xinerama, you
+can specify a screen in Setup->General. The picture will be stretched to fit
+the entire screen regardless of the <ref id="capture_resolution_"
+name="capture resolutions"> used.
+
+<sect2>Overscan Dimensions
+<p>Because picture edges can be ragged and screen edges aren't straight,
+Television is designed to project an image larger than the physical screen.
+This is called "overscan". Underscan is fitting the entire image inside the
+screen. This is useful for computer monitors so that toolbars and scrollbars
+at the edges can be seen.
+
+For best results, match the X display area as close as possible to the edges
+of the physical screen. This can only be adjusted by your tv-out device or
+by the settings for the television set. Many sets have these adjustments in
+a 'service mode'.
+
+MythTV has settings for "Overscan" in Setup->Playback. These can not, and do
+not, cause the image to display beyond the edge of the X display area. The
+purpose of these settings are to cut off rough edges and to expand the image
+so that objects will appear to be the same size as a normal overscanned TV
+picture.
+
+<sect2>MythTV on the Desktop
+<p>When using MythTV on a high resolution desktop monitor, set the MythTV
+GUI dimensions to something much smaller than your X display resolution but
+still large enough to read the fonts. The GUI screens will always be in the
+upper left hand corner. However, your window manager may be able to minimize
+these (ALT-F4 in KDE for example).
+
+The TV picture will start in full screen mode. Press "f" to put the picture
+in a window that can be moved and resized. By default, the picture uses the
+recording resolution for its dimensions. If you check the box "Fixed
+Aspect Ratio" in Setup->Playback, the windowed picture will always be
+resized to normal 4:3 shape.
 
 <sect1>I'd like to delete the mysql database.
 <p><bf>NOTE</bf>:  Performing this step will remove the entire database. 
@@ -2517,6 +2600,8 @@ v1.088, 2003-02-01.  Added a section to check on the symlink in lirc.
 v1.089, 2003-02-03.  Added RH80 remote database instructions for v0.8
 v1.090, 2003-02-10.  Added stuff on MythWeather aggressiveness setting.
 v1.091, 2003-02-10.  Update XMLTV version.
+v1.092, 2003-02-12.  Bruce Markey submission on MythTV GUI and X Display
+Sizes
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
