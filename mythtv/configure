@@ -515,6 +515,8 @@ for opt do
   ;;
   --powerpc-perf-enable) powerpc_perf="yes"
   ;;
+  --enable-mmx) mmx="yes"
+  ;;
   --disable-mmx) mmx="no"
   ;;
   --disable-altivec) altivec="no"
@@ -917,6 +919,8 @@ if test x"$tune" = x"generic" -a x"$cpu_overide" != x"yes"; then
    elif expr "$processor" : ".*Pentium(R) III Xeon processor" > /dev/null ; then
        ARCHFLAGS="-march=pentium3"
    elif expr "$processor" : ".*Pentium III" > /dev/null ; then
+       ARCHFLAGS="-march=pentium3"
+   elif expr "$processor" : ".*Celeron (Coppermine)" > /dev/null ; then
        ARCHFLAGS="-march=pentium3"
    elif expr "$processor" : ".*Intel(R) Celeron(R) CPU" > /dev/null ; then
        if expr "$processor_flags" : ".*sse2" > /dev/null ; then
