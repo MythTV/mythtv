@@ -73,9 +73,9 @@ Weather::Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent,
     noACCID = false;
 
     wData = NULL;
+    fullRect = QRect(0, 0, size().width(), size().height());
+    newlocRect = QRect(0, 0, size().width(), size().height());
 
-    fullRect = QRect(0, 0, (int)(800*wmult), (int)(600*hmult));
-    newlocRect = QRect(0, 0, (int)(800*wmult), (int)(600*hmult));
 
     if (debug == true)
         cerr << "MythWeather: Reading InstallPrefix from context.\n";
