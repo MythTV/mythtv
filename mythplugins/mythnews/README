@@ -5,6 +5,8 @@ MythNews (A RSS News Feed Plugin for MythTV) v0.1
 INSTALLATION:
 ---------------------------------------------------------------------
 
+type 'qmake mythnews.pro' in the main directory to create the Makefile.
+
 type 'make' in the main directory to begin compiling
 
 Compiling note:  If you get an error on building this, that says
@@ -15,7 +17,7 @@ Compiling note:  If you get an error on building this, that says
 Once the make is completed, do a 'make install'.  
 
 - libmythnews.so will go into /usr/local/lib/mythtv/plugins
--  data files will be put into the 
+- data files will be put into the 
   /usr/local/share/mythtv/mythnews directory
 - image files and ui file go to /usr/local/share/mythtv/themes/default
 
