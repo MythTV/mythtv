@@ -51,7 +51,7 @@ not check for all of the above packages. It's just a tiny little script that
 lets you turn on and off support for the fftw, OpenGL, and SDL libraries. Run it
 with './configure --help' to see what you can set.
 
-Now type 'make' in the main distribution directory. 
+Now type 'qmake mythmusic.pro' then 'make' in the main distribution directory. 
 
 Compiling note:  If you get an error on building this, that says something
                  about 'mkspecs', then you don't have the QTDIR environment
