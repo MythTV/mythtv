@@ -294,11 +294,11 @@
     </message>
     <message>
         <source>Edit Playlist</source>
-        <translation type="obsolete">Editar Lista</translation>
+        <translation type="unfinished">Editar Lista</translation>
     </message>
     <message>
         <source>Visualize</source>
-        <translation type="obsolete">Ver Demo</translation>
+        <translation type="unfinished">Ver Demo</translation>
     </message>
     <message>
         <source>Rating</source>
@@ -318,39 +318,39 @@
     </message>
     <message>
         <source>Repeat: Track</source>
-        <translation type="obsolete">Repetir: Pista</translation>
+        <translation type="unfinished">Repetir: Pista</translation>
     </message>
     <message>
         <source>Repeat: All</source>
-        <translation type="obsolete">Repetir: Tudo</translation>
+        <translation type="unfinished">Repetir: Tudo</translation>
     </message>
     <message>
         <source>Playing stream.</source>
-        <translation type="obsolete">A Tocar.</translation>
+        <translation type="unfinished">A Tocar.</translation>
     </message>
     <message>
         <source>Buffering stream.</source>
-        <translation type="obsolete">A Carregar.</translation>
+        <translation type="unfinished">A Carregar.</translation>
     </message>
     <message>
         <source>Stream paused.</source>
-        <translation type="obsolete">Em Pausa.</translation>
+        <translation type="unfinished">Em Pausa.</translation>
     </message>
     <message>
         <source>Output error.</source>
-        <translation type="obsolete">Erro ao tocar.</translation>
+        <translation type="unfinished">Erro ao tocar.</translation>
     </message>
     <message>
         <source>Stream stopped.</source>
-        <translation type="obsolete">Parado.</translation>
+        <translation type="unfinished">Parado.</translation>
     </message>
     <message>
         <source>Finished playing stream.</source>
-        <translation type="obsolete">Fim de Música.</translation>
+        <translation type="unfinished">Fim de Música.</translation>
     </message>
     <message>
         <source>Decoder error.</source>
-        <translation type="obsolete">Erro de descodificação.</translation>
+        <translation type="unfinished">Erro de descodificação.</translation>
     </message>
     <message>
         <source>Shuffle: Intelligent</source>
@@ -370,78 +370,27 @@
     </message>
     <message>
         <source>1 Shuffle: None</source>
-        <translation type="obsolete">1 Aleatório: Não</translation>
+        <translation type="unfinished">1 Aleatório: Não</translation>
     </message>
     <message>
         <source>Shuffle: None</source>
-        <translation type="obsolete">Aleatório: Não</translation>
+        <translation type="unfinished">Aleatório: Não</translation>
     </message>
     <message>
         <source>2 Repeat: All</source>
-        <translation type="obsolete">2 Repetir: Tudo</translation>
+        <translation type="unfinished">2 Repetir: Tudo</translation>
     </message>
     <message>
         <source>2 Repeat: Track</source>
-        <translation type="obsolete">2 Repetir: Pista</translation>
+        <translation type="unfinished">2 Repetir: Pista</translation>
     </message>
     <message>
         <source>2 Repeat: None</source>
-        <translation type="obsolete">2 Repetir: Não</translation>
+        <translation type="unfinished">2 Repetir: Não</translation>
     </message>
     <message>
         <source>Repeat: None</source>
-        <translation type="obsolete">Repetir: Não</translation>
-    </message>
-    <message>
-        <source>3 Edit Playlist</source>
-        <translation type="obsolete">3 Editar Lista</translation>
-    </message>
-    <message>
-        <source>4 Visualize</source>
-        <translation type="obsolete">4 Ver Demo</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Smart</source>
-        <translation type="obsolete">1 Aleatório: Esperto</translation>
-    </message>
-    <message>
-        <source>Shuffle: Smart</source>
-        <translation type="obsolete">Aleatório: Esperto</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Rand</source>
-        <translation type="obsolete">1 Aleatório: Sim</translation>
-    </message>
-    <message>
-        <source>Shuffle: Rand</source>
-        <translation type="obsolete">Aleatório: Sim</translation>
-    </message>
-    <message>
-        <source>playlist root</source>
-        <translation type="obsolete">Raiz da Lista</translation>
-    </message>
-    <message>
-        <source>kbps</source>
-        <translation type="obsolete">Kbps</translation>
-    </message>
-    <message>
-        <source>kHz</source>
-        <translation type="obsolete">KHz</translation>
-    </message>
-    <message>
-        <source>ch</source>
-        <translation type="obsolete">canais</translation>
-    </message>
-</context>
-<context>
-    <name>PlaybackBoxMusic</name>
-    <message>
-        <source>Edit Playlist</source>
-        <translation type="unfinished">Editar Lista</translation>
-    </message>
-    <message>
-        <source>Visualize</source>
-        <translation type="unfinished">Ver Demo</translation>
+        <translation type="unfinished">Repetir: Não</translation>
     </message>
     <message>
         <source>3 Edit Playlist</source>
@@ -468,52 +417,8 @@
         <translation type="unfinished">Aleatório: Sim</translation>
     </message>
     <message>
-        <source>1 Shuffle: None</source>
-        <translation type="unfinished">1 Aleatório: Não</translation>
-    </message>
-    <message>
-        <source>Shuffle: None</source>
-        <translation type="unfinished">Aleatório: Não</translation>
-    </message>
-    <message>
-        <source>2 Repeat: All</source>
-        <translation type="unfinished">2 Repetir: Tudo</translation>
-    </message>
-    <message>
-        <source>Repeat: All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>2 Repeat: Track</source>
-        <translation type="unfinished">2 Repetir: Pista</translation>
-    </message>
-    <message>
-        <source>Repeat: Track</source>
-        <translation type="unfinished">Repetir: Pista</translation>
-    </message>
-    <message>
-        <source>2 Repeat: None</source>
-        <translation type="unfinished">2 Repetir: Não</translation>
-    </message>
-    <message>
-        <source>Repeat: None</source>
-        <translation type="unfinished">Repetir: Não</translation>
-    </message>
-    <message>
         <source>playlist root</source>
         <translation type="unfinished">Raiz da Lista</translation>
-    </message>
-    <message>
-        <source>Playing stream.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Buffering stream.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stream paused.</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>kbps</source>
@@ -527,21 +432,84 @@
         <source>ch</source>
         <translation type="unfinished">canais</translation>
     </message>
+</context>
+<context>
+    <name>PlaybackBoxMusic</name>
     <message>
-        <source>Output error.</source>
-        <translation type="unfinished"></translation>
+        <source>Edit Playlist</source>
+        <translation type="obsolete">Editar Lista</translation>
     </message>
     <message>
-        <source>Stream stopped.</source>
-        <translation type="unfinished"></translation>
+        <source>Visualize</source>
+        <translation type="obsolete">Ver Demo</translation>
     </message>
     <message>
-        <source>Finished playing stream.</source>
-        <translation type="unfinished"></translation>
+        <source>3 Edit Playlist</source>
+        <translation type="obsolete">3 Editar Lista</translation>
     </message>
     <message>
-        <source>Decoder error.</source>
-        <translation type="unfinished"></translation>
+        <source>4 Visualize</source>
+        <translation type="obsolete">4 Ver Demo</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Smart</source>
+        <translation type="obsolete">1 Aleatório: Esperto</translation>
+    </message>
+    <message>
+        <source>Shuffle: Smart</source>
+        <translation type="obsolete">Aleatório: Esperto</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Rand</source>
+        <translation type="obsolete">1 Aleatório: Sim</translation>
+    </message>
+    <message>
+        <source>Shuffle: Rand</source>
+        <translation type="obsolete">Aleatório: Sim</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: None</source>
+        <translation type="obsolete">1 Aleatório: Não</translation>
+    </message>
+    <message>
+        <source>Shuffle: None</source>
+        <translation type="obsolete">Aleatório: Não</translation>
+    </message>
+    <message>
+        <source>2 Repeat: All</source>
+        <translation type="obsolete">2 Repetir: Tudo</translation>
+    </message>
+    <message>
+        <source>2 Repeat: Track</source>
+        <translation type="obsolete">2 Repetir: Pista</translation>
+    </message>
+    <message>
+        <source>Repeat: Track</source>
+        <translation type="obsolete">Repetir: Pista</translation>
+    </message>
+    <message>
+        <source>2 Repeat: None</source>
+        <translation type="obsolete">2 Repetir: Não</translation>
+    </message>
+    <message>
+        <source>Repeat: None</source>
+        <translation type="obsolete">Repetir: Não</translation>
+    </message>
+    <message>
+        <source>playlist root</source>
+        <translation type="obsolete">Raiz da Lista</translation>
+    </message>
+    <message>
+        <source>kbps</source>
+        <translation type="obsolete">Kbps</translation>
+    </message>
+    <message>
+        <source>kHz</source>
+        <translation type="obsolete">KHz</translation>
+    </message>
+    <message>
+        <source>ch</source>
+        <translation type="obsolete">canais</translation>
     </message>
 </context>
 <context>
@@ -1299,6 +1267,54 @@ Não existem dados do MythMusic na base de dados.</translation>
     <message>
         <source>Please Wait...</source>
         <translation>Aguarde um Momento...</translation>
+    </message>
+    <message>
+        <source>Track Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Artist:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Album:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Genre:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Year:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track No.:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rating:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play Count:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last Play:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Compilation:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filename:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -116,117 +116,6 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     <name>PlaybackBox</name>
     <message>
         <source>Edit Playlist</source>
-        <translation type="obsolete">Editera spellista</translation>
-    </message>
-    <message>
-        <source>Visualize</source>
-        <translation type="obsolete">Visualisera</translation>
-    </message>
-    <message>
-        <source>3 Edit Playlist</source>
-        <translation type="obsolete">3 Redigera spellista</translation>
-    </message>
-    <message>
-        <source>4 Visualize</source>
-        <translation type="obsolete">4 Visualisera</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Smart</source>
-        <translation type="obsolete">1 Ordning: Intelligent</translation>
-    </message>
-    <message>
-        <source>Shuffle: Smart</source>
-        <translation type="obsolete">Ordning: Intelligent</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Rand</source>
-        <translation type="obsolete">1 Ordning: Slump</translation>
-    </message>
-    <message>
-        <source>Shuffle: Rand</source>
-        <translation type="obsolete">Ordning: Slump</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: None</source>
-        <translation type="obsolete">1 Ordning: Rak</translation>
-    </message>
-    <message>
-        <source>Shuffle: None</source>
-        <translation type="obsolete">Ordning: Rak</translation>
-    </message>
-    <message>
-        <source>2 Repeat: All</source>
-        <translation type="obsolete">2 Repetera: Alla</translation>
-    </message>
-    <message>
-        <source>Repeat: All</source>
-        <translation type="obsolete">Repetera: Alla</translation>
-    </message>
-    <message>
-        <source>2 Repeat: Track</source>
-        <translation type="obsolete">2 Repetera: Spår</translation>
-    </message>
-    <message>
-        <source>Repeat: Track</source>
-        <translation type="obsolete">Repetera: Spår</translation>
-    </message>
-    <message>
-        <source>2 Repeat: None</source>
-        <translation type="obsolete">2 Repetera: Ej</translation>
-    </message>
-    <message>
-        <source>Repeat: None</source>
-        <translation type="obsolete">Repetera: Inte</translation>
-    </message>
-    <message>
-        <source>playlist root</source>
-        <translation type="obsolete">rot för spellistor</translation>
-    </message>
-    <message>
-        <source>Playing stream.</source>
-        <translation type="obsolete">Spelar ström.</translation>
-    </message>
-    <message>
-        <source>Buffering stream.</source>
-        <translation type="obsolete">Buffrar ström.</translation>
-    </message>
-    <message>
-        <source>Stream paused.</source>
-        <translation type="obsolete">Ström pausad.</translation>
-    </message>
-    <message>
-        <source>kbps</source>
-        <translation type="obsolete">kbps</translation>
-    </message>
-    <message>
-        <source>kHz</source>
-        <translation type="obsolete">kHz</translation>
-    </message>
-    <message>
-        <source>ch</source>
-        <translation type="obsolete">ch</translation>
-    </message>
-    <message>
-        <source>Output error.</source>
-        <translation type="obsolete">Utmatningsfel.</translation>
-    </message>
-    <message>
-        <source>Stream stopped.</source>
-        <translation type="obsolete">Ström stoppad.</translation>
-    </message>
-    <message>
-        <source>Finished playing stream.</source>
-        <translation type="obsolete">Strömmen färdigspelad.</translation>
-    </message>
-    <message>
-        <source>Decoder error.</source>
-        <translation type="obsolete">Avkodningsfel.</translation>
-    </message>
-</context>
-<context>
-    <name>PlaybackBoxMusic</name>
-    <message>
-        <source>Edit Playlist</source>
         <translation type="unfinished">Editera spellista</translation>
     </message>
     <message>
@@ -332,6 +221,117 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     <message>
         <source>Decoder error.</source>
         <translation type="unfinished">Avkodningsfel.</translation>
+    </message>
+</context>
+<context>
+    <name>PlaybackBoxMusic</name>
+    <message>
+        <source>Edit Playlist</source>
+        <translation type="obsolete">Editera spellista</translation>
+    </message>
+    <message>
+        <source>Visualize</source>
+        <translation type="obsolete">Visualisera</translation>
+    </message>
+    <message>
+        <source>3 Edit Playlist</source>
+        <translation type="obsolete">3 Redigera spellista</translation>
+    </message>
+    <message>
+        <source>4 Visualize</source>
+        <translation type="obsolete">4 Visualisera</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Smart</source>
+        <translation type="obsolete">1 Ordning: Intelligent</translation>
+    </message>
+    <message>
+        <source>Shuffle: Smart</source>
+        <translation type="obsolete">Ordning: Intelligent</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Rand</source>
+        <translation type="obsolete">1 Ordning: Slump</translation>
+    </message>
+    <message>
+        <source>Shuffle: Rand</source>
+        <translation type="obsolete">Ordning: Slump</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: None</source>
+        <translation type="obsolete">1 Ordning: Rak</translation>
+    </message>
+    <message>
+        <source>Shuffle: None</source>
+        <translation type="obsolete">Ordning: Rak</translation>
+    </message>
+    <message>
+        <source>2 Repeat: All</source>
+        <translation type="obsolete">2 Repetera: Alla</translation>
+    </message>
+    <message>
+        <source>Repeat: All</source>
+        <translation type="obsolete">Repetera: Alla</translation>
+    </message>
+    <message>
+        <source>2 Repeat: Track</source>
+        <translation type="obsolete">2 Repetera: Spår</translation>
+    </message>
+    <message>
+        <source>Repeat: Track</source>
+        <translation type="obsolete">Repetera: Spår</translation>
+    </message>
+    <message>
+        <source>2 Repeat: None</source>
+        <translation type="obsolete">2 Repetera: Ej</translation>
+    </message>
+    <message>
+        <source>Repeat: None</source>
+        <translation type="obsolete">Repetera: Inte</translation>
+    </message>
+    <message>
+        <source>playlist root</source>
+        <translation type="obsolete">rot för spellistor</translation>
+    </message>
+    <message>
+        <source>Playing stream.</source>
+        <translation type="obsolete">Spelar ström.</translation>
+    </message>
+    <message>
+        <source>Buffering stream.</source>
+        <translation type="obsolete">Buffrar ström.</translation>
+    </message>
+    <message>
+        <source>Stream paused.</source>
+        <translation type="obsolete">Ström pausad.</translation>
+    </message>
+    <message>
+        <source>kbps</source>
+        <translation type="obsolete">kbps</translation>
+    </message>
+    <message>
+        <source>kHz</source>
+        <translation type="obsolete">kHz</translation>
+    </message>
+    <message>
+        <source>ch</source>
+        <translation type="obsolete">ch</translation>
+    </message>
+    <message>
+        <source>Output error.</source>
+        <translation type="obsolete">Utmatningsfel.</translation>
+    </message>
+    <message>
+        <source>Stream stopped.</source>
+        <translation type="obsolete">Ström stoppad.</translation>
+    </message>
+    <message>
+        <source>Finished playing stream.</source>
+        <translation type="obsolete">Strömmen färdigspelad.</translation>
+    </message>
+    <message>
+        <source>Decoder error.</source>
+        <translation type="obsolete">Avkodningsfel.</translation>
     </message>
 </context>
 <context>
@@ -981,6 +981,54 @@ Du har inga tabeller för Musikspelaren (MythMusic) i din databas.</translation>
     <message>
         <source>Please Wait...</source>
         <translation>Vänta...</translation>
+    </message>
+    <message>
+        <source>Track Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Artist:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Album:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Genre:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Year:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track No.:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rating:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play Count:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last Play:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Compilation:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filename:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

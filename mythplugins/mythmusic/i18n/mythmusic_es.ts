@@ -161,11 +161,11 @@
     </message>
     <message>
         <source>Edit Playlist</source>
-        <translation type="obsolete">Editar Lista</translation>
+        <translation type="unfinished">Editar Lista</translation>
     </message>
     <message>
         <source>Visualize</source>
-        <translation type="obsolete">Visualizar</translation>
+        <translation type="unfinished">Visualizar</translation>
     </message>
     <message>
         <source>Rating</source>
@@ -185,11 +185,190 @@
     </message>
     <message>
         <source>Repeat: Track</source>
-        <translation type="obsolete">Repetir: Pista</translation>
+        <translation type="unfinished">Repetir: Pista</translation>
+    </message>
+    <message>
+        <source>Repeat: All</source>
+        <translation type="unfinished">Repetir: Todo</translation>
+    </message>
+    <message>
+        <source>Playing stream.</source>
+        <translation type="unfinished">Reproduciendo.</translation>
+    </message>
+    <message>
+        <source>Buffering stream.</source>
+        <translation type="unfinished">Cargando reproducción.</translation>
+    </message>
+    <message>
+        <source>Stream paused.</source>
+        <translation type="unfinished">Reproducción en pausa.</translation>
+    </message>
+    <message>
+        <source>Output error.</source>
+        <translation type="unfinished">Error de salida.</translation>
+    </message>
+    <message>
+        <source>Stream stopped.</source>
+        <translation type="unfinished">Reproducción parada.</translation>
+    </message>
+    <message>
+        <source>Finished playing stream.</source>
+        <translation type="unfinished">Reproducción finalizada.</translation>
+    </message>
+    <message>
+        <source>Decoder error.</source>
+        <translation type="unfinished">Error de decodificación.</translation>
+    </message>
+    <message>
+        <source>Shuffle: Intelligent</source>
+        <translation type="obsolete">Aleat.: Inteligente</translation>
+    </message>
+    <message>
+        <source>Shuffle: Random</source>
+        <translation type="obsolete">Aleatorio: Casual</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Intelligent</source>
+        <translation type="obsolete">1 Aleat.: Inteligente</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Random</source>
+        <translation type="obsolete">1 Aleatorio: Casual</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: None</source>
+        <translation type="unfinished">1 Aleatorio: No</translation>
+    </message>
+    <message>
+        <source>Shuffle: None</source>
+        <translation type="unfinished">Aleatorio: No</translation>
+    </message>
+    <message>
+        <source>2 Repeat: All</source>
+        <translation type="unfinished">2 Repetir: Todo</translation>
+    </message>
+    <message>
+        <source>2 Repeat: Track</source>
+        <translation type="unfinished">2 Repetir: Pista</translation>
+    </message>
+    <message>
+        <source>2 Repeat: None</source>
+        <translation type="unfinished">2 Repetir: No</translation>
+    </message>
+    <message>
+        <source>Repeat: None</source>
+        <translation type="unfinished">Repetir: No</translation>
+    </message>
+    <message>
+        <source>3 Edit Playlist</source>
+        <translation type="unfinished">3 Editar Lista</translation>
+    </message>
+    <message>
+        <source>4 Visualize</source>
+        <translation type="unfinished">4 Visualizar</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Smart</source>
+        <translation type="unfinished">1 Aleatorio: Preferido</translation>
+    </message>
+    <message>
+        <source>Shuffle: Smart</source>
+        <translation type="unfinished">Aleatorio: Preferido</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Rand</source>
+        <translation type="unfinished">1 Aleatorio: Variable</translation>
+    </message>
+    <message>
+        <source>Shuffle: Rand</source>
+        <translation type="unfinished">Aleatorio: Variable</translation>
+    </message>
+    <message>
+        <source>playlist root</source>
+        <translation type="unfinished">raiz de la lista</translation>
+    </message>
+    <message>
+        <source>kbps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>kHz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ch</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PlaybackBoxMusic</name>
+    <message>
+        <source>Edit Playlist</source>
+        <translation type="obsolete">Editar Lista</translation>
+    </message>
+    <message>
+        <source>Visualize</source>
+        <translation type="obsolete">Visualizar</translation>
+    </message>
+    <message>
+        <source>3 Edit Playlist</source>
+        <translation type="obsolete">3 Editar Lista</translation>
+    </message>
+    <message>
+        <source>4 Visualize</source>
+        <translation type="obsolete">4 Visualizar</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Smart</source>
+        <translation type="obsolete">1 Aleatorio: Preferido</translation>
+    </message>
+    <message>
+        <source>Shuffle: Smart</source>
+        <translation type="obsolete">Aleatorio: Preferido</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Rand</source>
+        <translation type="obsolete">1 Aleatorio: Variable</translation>
+    </message>
+    <message>
+        <source>Shuffle: Rand</source>
+        <translation type="obsolete">Aleatorio: Variable</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: None</source>
+        <translation type="obsolete">1 Aleatorio: No</translation>
+    </message>
+    <message>
+        <source>Shuffle: None</source>
+        <translation type="obsolete">Aleatorio: No</translation>
+    </message>
+    <message>
+        <source>2 Repeat: All</source>
+        <translation type="obsolete">2 Repetir: Todo</translation>
     </message>
     <message>
         <source>Repeat: All</source>
         <translation type="obsolete">Repetir: Todo</translation>
+    </message>
+    <message>
+        <source>2 Repeat: Track</source>
+        <translation type="obsolete">2 Repetir: Pista</translation>
+    </message>
+    <message>
+        <source>Repeat: Track</source>
+        <translation type="obsolete">Repetir: Pista</translation>
+    </message>
+    <message>
+        <source>2 Repeat: None</source>
+        <translation type="obsolete">2 Repetir: No</translation>
+    </message>
+    <message>
+        <source>Repeat: None</source>
+        <translation type="obsolete">Repetir: No</translation>
+    </message>
+    <message>
+        <source>playlist root</source>
+        <translation type="obsolete">raiz de la lista</translation>
     </message>
     <message>
         <source>Playing stream.</source>
@@ -218,185 +397,6 @@
     <message>
         <source>Decoder error.</source>
         <translation type="obsolete">Error de decodificación.</translation>
-    </message>
-    <message>
-        <source>Shuffle: Intelligent</source>
-        <translation type="obsolete">Aleat.: Inteligente</translation>
-    </message>
-    <message>
-        <source>Shuffle: Random</source>
-        <translation type="obsolete">Aleatorio: Casual</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Intelligent</source>
-        <translation type="obsolete">1 Aleat.: Inteligente</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Random</source>
-        <translation type="obsolete">1 Aleatorio: Casual</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: None</source>
-        <translation type="obsolete">1 Aleatorio: No</translation>
-    </message>
-    <message>
-        <source>Shuffle: None</source>
-        <translation type="obsolete">Aleatorio: No</translation>
-    </message>
-    <message>
-        <source>2 Repeat: All</source>
-        <translation type="obsolete">2 Repetir: Todo</translation>
-    </message>
-    <message>
-        <source>2 Repeat: Track</source>
-        <translation type="obsolete">2 Repetir: Pista</translation>
-    </message>
-    <message>
-        <source>2 Repeat: None</source>
-        <translation type="obsolete">2 Repetir: No</translation>
-    </message>
-    <message>
-        <source>Repeat: None</source>
-        <translation type="obsolete">Repetir: No</translation>
-    </message>
-    <message>
-        <source>3 Edit Playlist</source>
-        <translation type="obsolete">3 Editar Lista</translation>
-    </message>
-    <message>
-        <source>4 Visualize</source>
-        <translation type="obsolete">4 Visualizar</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Smart</source>
-        <translation type="obsolete">1 Aleatorio: Preferido</translation>
-    </message>
-    <message>
-        <source>Shuffle: Smart</source>
-        <translation type="obsolete">Aleatorio: Preferido</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Rand</source>
-        <translation type="obsolete">1 Aleatorio: Variable</translation>
-    </message>
-    <message>
-        <source>Shuffle: Rand</source>
-        <translation type="obsolete">Aleatorio: Variable</translation>
-    </message>
-    <message>
-        <source>playlist root</source>
-        <translation type="obsolete">raiz de la lista</translation>
-    </message>
-</context>
-<context>
-    <name>PlaybackBoxMusic</name>
-    <message>
-        <source>Edit Playlist</source>
-        <translation type="unfinished">Editar Lista</translation>
-    </message>
-    <message>
-        <source>Visualize</source>
-        <translation type="unfinished">Visualizar</translation>
-    </message>
-    <message>
-        <source>3 Edit Playlist</source>
-        <translation type="unfinished">3 Editar Lista</translation>
-    </message>
-    <message>
-        <source>4 Visualize</source>
-        <translation type="unfinished">4 Visualizar</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Smart</source>
-        <translation type="unfinished">1 Aleatorio: Preferido</translation>
-    </message>
-    <message>
-        <source>Shuffle: Smart</source>
-        <translation type="unfinished">Aleatorio: Preferido</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Rand</source>
-        <translation type="unfinished">1 Aleatorio: Variable</translation>
-    </message>
-    <message>
-        <source>Shuffle: Rand</source>
-        <translation type="unfinished">Aleatorio: Variable</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: None</source>
-        <translation type="unfinished">1 Aleatorio: No</translation>
-    </message>
-    <message>
-        <source>Shuffle: None</source>
-        <translation type="unfinished">Aleatorio: No</translation>
-    </message>
-    <message>
-        <source>2 Repeat: All</source>
-        <translation type="unfinished">2 Repetir: Todo</translation>
-    </message>
-    <message>
-        <source>Repeat: All</source>
-        <translation type="unfinished">Repetir: Todo</translation>
-    </message>
-    <message>
-        <source>2 Repeat: Track</source>
-        <translation type="unfinished">2 Repetir: Pista</translation>
-    </message>
-    <message>
-        <source>Repeat: Track</source>
-        <translation type="unfinished">Repetir: Pista</translation>
-    </message>
-    <message>
-        <source>2 Repeat: None</source>
-        <translation type="unfinished">2 Repetir: No</translation>
-    </message>
-    <message>
-        <source>Repeat: None</source>
-        <translation type="unfinished">Repetir: No</translation>
-    </message>
-    <message>
-        <source>playlist root</source>
-        <translation type="unfinished">raiz de la lista</translation>
-    </message>
-    <message>
-        <source>Playing stream.</source>
-        <translation type="unfinished">Reproduciendo.</translation>
-    </message>
-    <message>
-        <source>Buffering stream.</source>
-        <translation type="unfinished">Cargando reproducción.</translation>
-    </message>
-    <message>
-        <source>Stream paused.</source>
-        <translation type="unfinished">Reproducción en pausa.</translation>
-    </message>
-    <message>
-        <source>kbps</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>kHz</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ch</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Output error.</source>
-        <translation type="unfinished">Error de salida.</translation>
-    </message>
-    <message>
-        <source>Stream stopped.</source>
-        <translation type="unfinished">Reproducción parada.</translation>
-    </message>
-    <message>
-        <source>Finished playing stream.</source>
-        <translation type="unfinished">Reproducción finalizada.</translation>
-    </message>
-    <message>
-        <source>Decoder error.</source>
-        <translation type="unfinished">Error de decodificación.</translation>
     </message>
 </context>
 <context>
@@ -1040,6 +1040,54 @@ You have no MythMusic tables in your database.</source>
     <message>
         <source>Please Wait...</source>
         <translation>Aguarde un momento...</translation>
+    </message>
+    <message>
+        <source>Track Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Artist:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Album:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Genre:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Year:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track No.:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rating:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play Count:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last Play:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Compilation:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filename:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

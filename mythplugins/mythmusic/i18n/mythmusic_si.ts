@@ -110,117 +110,6 @@
     <name>PlaybackBox</name>
     <message>
         <source>Edit Playlist</source>
-        <translation type="obsolete">Uredi predvajalni seznam</translation>
-    </message>
-    <message>
-        <source>Visualize</source>
-        <translation type="obsolete">Vizualizacija</translation>
-    </message>
-    <message>
-        <source>3 Edit Playlist</source>
-        <translation type="obsolete">3 Uredi predvajalni seznam</translation>
-    </message>
-    <message>
-        <source>4 Visualize</source>
-        <translation type="obsolete">4 Vizualizacija</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Smart</source>
-        <translation type="obsolete">1 Mešaj: Pametno</translation>
-    </message>
-    <message>
-        <source>Shuffle: Smart</source>
-        <translation type="obsolete">Mešaj: Pametno</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Rand</source>
-        <translation type="obsolete">1 Mešaj: Naključno</translation>
-    </message>
-    <message>
-        <source>Shuffle: Rand</source>
-        <translation type="obsolete">Mešaj: Naključno</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: None</source>
-        <translation type="obsolete">1 Mešaj: Nobeden</translation>
-    </message>
-    <message>
-        <source>Shuffle: None</source>
-        <translation type="obsolete">Mešaj: Nobeden</translation>
-    </message>
-    <message>
-        <source>2 Repeat: All</source>
-        <translation type="obsolete">2 Ponovi: Vse</translation>
-    </message>
-    <message>
-        <source>Repeat: All</source>
-        <translation type="obsolete">Ponovi: Vse</translation>
-    </message>
-    <message>
-        <source>2 Repeat: Track</source>
-        <translation type="obsolete">2 Ponovi: Komad</translation>
-    </message>
-    <message>
-        <source>Repeat: Track</source>
-        <translation type="obsolete">Ponovi: Komad</translation>
-    </message>
-    <message>
-        <source>2 Repeat: None</source>
-        <translation type="obsolete">2 Ponovi: Nobenega</translation>
-    </message>
-    <message>
-        <source>Repeat: None</source>
-        <translation type="obsolete">Ponovi: Nobenega</translation>
-    </message>
-    <message>
-        <source>playlist root</source>
-        <translation type="obsolete">domač imenik predvajalnega seznama</translation>
-    </message>
-    <message>
-        <source>Playing stream.</source>
-        <translation type="obsolete">Predvajalni tok.</translation>
-    </message>
-    <message>
-        <source>Buffering stream.</source>
-        <translation type="obsolete">Tok medpolnjenja.</translation>
-    </message>
-    <message>
-        <source>Stream paused.</source>
-        <translation type="obsolete">Tok pavziran.</translation>
-    </message>
-    <message>
-        <source>kbps</source>
-        <translation type="obsolete">kbps</translation>
-    </message>
-    <message>
-        <source>kHz</source>
-        <translation type="obsolete">kHz</translation>
-    </message>
-    <message>
-        <source>ch</source>
-        <translation type="obsolete">kanal</translation>
-    </message>
-    <message>
-        <source>Output error.</source>
-        <translation type="obsolete">Napaka izhoda.</translation>
-    </message>
-    <message>
-        <source>Stream stopped.</source>
-        <translation type="obsolete">Tok ustavljen.</translation>
-    </message>
-    <message>
-        <source>Finished playing stream.</source>
-        <translation type="obsolete">Predvajanje toka končano.</translation>
-    </message>
-    <message>
-        <source>Decoder error.</source>
-        <translation type="obsolete">Napaka dekoderja.</translation>
-    </message>
-</context>
-<context>
-    <name>PlaybackBoxMusic</name>
-    <message>
-        <source>Edit Playlist</source>
         <translation type="unfinished">Uredi predvajalni seznam</translation>
     </message>
     <message>
@@ -326,6 +215,117 @@
     <message>
         <source>Decoder error.</source>
         <translation type="unfinished">Napaka dekoderja.</translation>
+    </message>
+</context>
+<context>
+    <name>PlaybackBoxMusic</name>
+    <message>
+        <source>Edit Playlist</source>
+        <translation type="obsolete">Uredi predvajalni seznam</translation>
+    </message>
+    <message>
+        <source>Visualize</source>
+        <translation type="obsolete">Vizualizacija</translation>
+    </message>
+    <message>
+        <source>3 Edit Playlist</source>
+        <translation type="obsolete">3 Uredi predvajalni seznam</translation>
+    </message>
+    <message>
+        <source>4 Visualize</source>
+        <translation type="obsolete">4 Vizualizacija</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Smart</source>
+        <translation type="obsolete">1 Mešaj: Pametno</translation>
+    </message>
+    <message>
+        <source>Shuffle: Smart</source>
+        <translation type="obsolete">Mešaj: Pametno</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Rand</source>
+        <translation type="obsolete">1 Mešaj: Naključno</translation>
+    </message>
+    <message>
+        <source>Shuffle: Rand</source>
+        <translation type="obsolete">Mešaj: Naključno</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: None</source>
+        <translation type="obsolete">1 Mešaj: Nobeden</translation>
+    </message>
+    <message>
+        <source>Shuffle: None</source>
+        <translation type="obsolete">Mešaj: Nobeden</translation>
+    </message>
+    <message>
+        <source>2 Repeat: All</source>
+        <translation type="obsolete">2 Ponovi: Vse</translation>
+    </message>
+    <message>
+        <source>Repeat: All</source>
+        <translation type="obsolete">Ponovi: Vse</translation>
+    </message>
+    <message>
+        <source>2 Repeat: Track</source>
+        <translation type="obsolete">2 Ponovi: Komad</translation>
+    </message>
+    <message>
+        <source>Repeat: Track</source>
+        <translation type="obsolete">Ponovi: Komad</translation>
+    </message>
+    <message>
+        <source>2 Repeat: None</source>
+        <translation type="obsolete">2 Ponovi: Nobenega</translation>
+    </message>
+    <message>
+        <source>Repeat: None</source>
+        <translation type="obsolete">Ponovi: Nobenega</translation>
+    </message>
+    <message>
+        <source>playlist root</source>
+        <translation type="obsolete">domač imenik predvajalnega seznama</translation>
+    </message>
+    <message>
+        <source>Playing stream.</source>
+        <translation type="obsolete">Predvajalni tok.</translation>
+    </message>
+    <message>
+        <source>Buffering stream.</source>
+        <translation type="obsolete">Tok medpolnjenja.</translation>
+    </message>
+    <message>
+        <source>Stream paused.</source>
+        <translation type="obsolete">Tok pavziran.</translation>
+    </message>
+    <message>
+        <source>kbps</source>
+        <translation type="obsolete">kbps</translation>
+    </message>
+    <message>
+        <source>kHz</source>
+        <translation type="obsolete">kHz</translation>
+    </message>
+    <message>
+        <source>ch</source>
+        <translation type="obsolete">kanal</translation>
+    </message>
+    <message>
+        <source>Output error.</source>
+        <translation type="obsolete">Napaka izhoda.</translation>
+    </message>
+    <message>
+        <source>Stream stopped.</source>
+        <translation type="obsolete">Tok ustavljen.</translation>
+    </message>
+    <message>
+        <source>Finished playing stream.</source>
+        <translation type="obsolete">Predvajanje toka končano.</translation>
+    </message>
+    <message>
+        <source>Decoder error.</source>
+        <translation type="obsolete">Napaka dekoderja.</translation>
     </message>
 </context>
 <context>
@@ -947,6 +947,54 @@
     <message>
         <source>Please Wait...</source>
         <translation>Prosim počakajte...</translation>
+    </message>
+    <message>
+        <source>Track Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Artist:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Album:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Genre:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Year:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track No.:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rating:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play Count:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last Play:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Compilation:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filename:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

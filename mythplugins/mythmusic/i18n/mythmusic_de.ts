@@ -114,117 +114,6 @@
     <name>PlaybackBox</name>
     <message>
         <source>Edit Playlist</source>
-        <translation type="obsolete">Spielliste ändern</translation>
-    </message>
-    <message>
-        <source>Visualize</source>
-        <translation type="obsolete">Musik sehen</translation>
-    </message>
-    <message>
-        <source>3 Edit Playlist</source>
-        <translation type="obsolete">3 Liste ändern</translation>
-    </message>
-    <message>
-        <source>4 Visualize</source>
-        <translation type="obsolete">4 Musik sehen</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Smart</source>
-        <translation type="obsolete">1 Mix: Smart</translation>
-    </message>
-    <message>
-        <source>Shuffle: Smart</source>
-        <translation type="obsolete">Mix: Smart</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Rand</source>
-        <translation type="obsolete">1 Mix: Zufall</translation>
-    </message>
-    <message>
-        <source>Shuffle: Rand</source>
-        <translation type="obsolete">Mix: Zufall</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: None</source>
-        <translation type="obsolete">1 Mix: Nein</translation>
-    </message>
-    <message>
-        <source>Shuffle: None</source>
-        <translation type="obsolete">Mix: Nein</translation>
-    </message>
-    <message>
-        <source>2 Repeat: All</source>
-        <translation type="obsolete">2 Wdh: Alle</translation>
-    </message>
-    <message>
-        <source>Repeat: All</source>
-        <translation type="obsolete">Wdh: Alle</translation>
-    </message>
-    <message>
-        <source>2 Repeat: Track</source>
-        <translation type="obsolete">2 Wdh: Lied</translation>
-    </message>
-    <message>
-        <source>Repeat: Track</source>
-        <translation type="obsolete">Wdh: Lied</translation>
-    </message>
-    <message>
-        <source>2 Repeat: None</source>
-        <translation type="obsolete">2 Wdh: Nein</translation>
-    </message>
-    <message>
-        <source>Repeat: None</source>
-        <translation type="obsolete">Wdh: Nein</translation>
-    </message>
-    <message>
-        <source>Playing stream.</source>
-        <translation type="obsolete">Spiele Stream.</translation>
-    </message>
-    <message>
-        <source>Buffering stream.</source>
-        <translation type="obsolete">Puffere Stream.</translation>
-    </message>
-    <message>
-        <source>Stream paused.</source>
-        <translation type="obsolete">Stream angehalten.</translation>
-    </message>
-    <message>
-        <source>Output error.</source>
-        <translation type="obsolete">Ausgabefehler.</translation>
-    </message>
-    <message>
-        <source>Stream stopped.</source>
-        <translation type="obsolete">Stream gestoppt.</translation>
-    </message>
-    <message>
-        <source>Finished playing stream.</source>
-        <translation type="obsolete">Stream beendet.</translation>
-    </message>
-    <message>
-        <source>Decoder error.</source>
-        <translation type="obsolete">Dekodierfehler.</translation>
-    </message>
-    <message>
-        <source>playlist root</source>
-        <translation type="obsolete">Spiellistenstart</translation>
-    </message>
-    <message>
-        <source>kbps</source>
-        <translation type="obsolete">kbps</translation>
-    </message>
-    <message>
-        <source>kHz</source>
-        <translation type="obsolete">kHz</translation>
-    </message>
-    <message>
-        <source>ch</source>
-        <translation type="obsolete">Kanal</translation>
-    </message>
-</context>
-<context>
-    <name>PlaybackBoxMusic</name>
-    <message>
-        <source>Edit Playlist</source>
         <translation type="unfinished">Spielliste ändern</translation>
     </message>
     <message>
@@ -288,10 +177,6 @@
         <translation type="unfinished">Wdh: Nein</translation>
     </message>
     <message>
-        <source>playlist root</source>
-        <translation type="unfinished">Spiellistenstart</translation>
-    </message>
-    <message>
         <source>Playing stream.</source>
         <translation type="unfinished">Spiele Stream.</translation>
     </message>
@@ -302,18 +187,6 @@
     <message>
         <source>Stream paused.</source>
         <translation type="unfinished">Stream angehalten.</translation>
-    </message>
-    <message>
-        <source>kbps</source>
-        <translation type="unfinished">kbps</translation>
-    </message>
-    <message>
-        <source>kHz</source>
-        <translation type="unfinished">kHz</translation>
-    </message>
-    <message>
-        <source>ch</source>
-        <translation type="unfinished">Kanal</translation>
     </message>
     <message>
         <source>Output error.</source>
@@ -330,6 +203,133 @@
     <message>
         <source>Decoder error.</source>
         <translation type="unfinished">Dekodierfehler.</translation>
+    </message>
+    <message>
+        <source>playlist root</source>
+        <translation type="unfinished">Spiellistenstart</translation>
+    </message>
+    <message>
+        <source>kbps</source>
+        <translation type="unfinished">kbps</translation>
+    </message>
+    <message>
+        <source>kHz</source>
+        <translation type="unfinished">kHz</translation>
+    </message>
+    <message>
+        <source>ch</source>
+        <translation type="unfinished">Kanal</translation>
+    </message>
+</context>
+<context>
+    <name>PlaybackBoxMusic</name>
+    <message>
+        <source>Edit Playlist</source>
+        <translation type="obsolete">Spielliste ändern</translation>
+    </message>
+    <message>
+        <source>Visualize</source>
+        <translation type="obsolete">Musik sehen</translation>
+    </message>
+    <message>
+        <source>3 Edit Playlist</source>
+        <translation type="obsolete">3 Liste ändern</translation>
+    </message>
+    <message>
+        <source>4 Visualize</source>
+        <translation type="obsolete">4 Musik sehen</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Smart</source>
+        <translation type="obsolete">1 Mix: Smart</translation>
+    </message>
+    <message>
+        <source>Shuffle: Smart</source>
+        <translation type="obsolete">Mix: Smart</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Rand</source>
+        <translation type="obsolete">1 Mix: Zufall</translation>
+    </message>
+    <message>
+        <source>Shuffle: Rand</source>
+        <translation type="obsolete">Mix: Zufall</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: None</source>
+        <translation type="obsolete">1 Mix: Nein</translation>
+    </message>
+    <message>
+        <source>Shuffle: None</source>
+        <translation type="obsolete">Mix: Nein</translation>
+    </message>
+    <message>
+        <source>2 Repeat: All</source>
+        <translation type="obsolete">2 Wdh: Alle</translation>
+    </message>
+    <message>
+        <source>Repeat: All</source>
+        <translation type="obsolete">Wdh: Alle</translation>
+    </message>
+    <message>
+        <source>2 Repeat: Track</source>
+        <translation type="obsolete">2 Wdh: Lied</translation>
+    </message>
+    <message>
+        <source>Repeat: Track</source>
+        <translation type="obsolete">Wdh: Lied</translation>
+    </message>
+    <message>
+        <source>2 Repeat: None</source>
+        <translation type="obsolete">2 Wdh: Nein</translation>
+    </message>
+    <message>
+        <source>Repeat: None</source>
+        <translation type="obsolete">Wdh: Nein</translation>
+    </message>
+    <message>
+        <source>playlist root</source>
+        <translation type="obsolete">Spiellistenstart</translation>
+    </message>
+    <message>
+        <source>Playing stream.</source>
+        <translation type="obsolete">Spiele Stream.</translation>
+    </message>
+    <message>
+        <source>Buffering stream.</source>
+        <translation type="obsolete">Puffere Stream.</translation>
+    </message>
+    <message>
+        <source>Stream paused.</source>
+        <translation type="obsolete">Stream angehalten.</translation>
+    </message>
+    <message>
+        <source>kbps</source>
+        <translation type="obsolete">kbps</translation>
+    </message>
+    <message>
+        <source>kHz</source>
+        <translation type="obsolete">kHz</translation>
+    </message>
+    <message>
+        <source>ch</source>
+        <translation type="obsolete">Kanal</translation>
+    </message>
+    <message>
+        <source>Output error.</source>
+        <translation type="obsolete">Ausgabefehler.</translation>
+    </message>
+    <message>
+        <source>Stream stopped.</source>
+        <translation type="obsolete">Stream gestoppt.</translation>
+    </message>
+    <message>
+        <source>Finished playing stream.</source>
+        <translation type="obsolete">Stream beendet.</translation>
+    </message>
+    <message>
+        <source>Decoder error.</source>
+        <translation type="obsolete">Dekodierfehler.</translation>
     </message>
 </context>
 <context>
@@ -973,6 +973,54 @@ MythMusic Tabellen fehlen in der Datenbank.</translation>
     <message>
         <source>Please Wait...</source>
         <translation>Bitte warten...</translation>
+    </message>
+    <message>
+        <source>Track Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Artist:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Album:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Genre:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Year:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track No.:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rating:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play Count:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last Play:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Compilation:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filename:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
