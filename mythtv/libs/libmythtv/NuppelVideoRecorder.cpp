@@ -922,7 +922,7 @@ void NuppelVideoRecorder::StartRecording(void)
     positionMap.clear();
     positionMapDelta.clear();
 
-    if (codec.lower() == "rtjpeg")
+    if (codec.lower() == "rtjpeg" || codec.lower() == "mjpeg")
         useavcodec = false;
     else
         useavcodec = true;
