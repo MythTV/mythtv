@@ -365,7 +365,7 @@ void Transcoder::importMapFile(ProgramInfo *pinfo, QString mapfile)
     }
     QTextStream stream( &file );
 
-    int type;
+    int type = 0;
     bool done = false;
     while (!done && !stream.atEnd())
     {
@@ -385,7 +385,11 @@ void Transcoder::importMapFile(ProgramInfo *pinfo, QString mapfile)
         QStringList linelist = QStringList::split(" ", line);
         if (linelist.isEmpty() || linelist.count() != 2)
             continue;
-        posMap[linelist.first().toLongLong()] = linelist.last().toLongLong();
+        //toLongLong is a Qt3.2 thing, so use this hack for now
+        long long key, value;
+        sscanf(linelist.first().ascii(), "%lld", &key);
+        sscanf(linelist.last().ascii(), "%lld", &value);
+        posMap[key] = value;
     }
     file.close();
     pinfo->SetPositionMap(posMap, type, db_conn);
