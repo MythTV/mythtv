@@ -56,6 +56,8 @@ class XvVideoOutput
     int xv_port;
     int colorid;
 
+    int use_shm;
+
     unsigned char *scratchspace;
 
     pthread_mutex_t lock;

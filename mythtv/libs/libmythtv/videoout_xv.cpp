@@ -123,6 +123,8 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
     XJ_width = width;
     XJ_height = height;
 
+    use_shm = 1;
+
     XInitThreads();
 
     data->XJ_disp = XOpenDisplay(NULL);
@@ -200,6 +202,18 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
                 XvFreeAdaptorInfo(ai);
         }
 
+    // can be used to force non-Xv mode as well as non-Xv/non-Shm mode
+    if (getenv("NO_XV"))
+    {
+        xv_port = -1;
+        use_shm = 1;
+    }
+    if (getenv("NO_SHM"))
+    {
+        xv_port = -1;
+        use_shm = 0;
+    }
+
     GetMythTVGeometry(data->XJ_disp, XJ_screen_num,
                       &XJ_screenx, &XJ_screeny, 
                       &XJ_screenwidth, &XJ_screenheight);
@@ -207,13 +221,13 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
     curx = XJ_screenx + 4; cury = XJ_screeny + 20;
     curw = XJ_width; curh = XJ_height;
 
-    // if non-XV mode then run full-screen
+    // if non-XV mode then run @ GUI size
     if ( xv_port == -1 )
     {
         curx = XJ_screenx;
         cury = XJ_screeny;
-        curw = XJ_screenwidth;
-        curh = XJ_screenheight;
+        curw = gContext->GetNumSetting("GuiWidth", XJ_screenwidth);
+        curh = gContext->GetNumSetting("GuiHeight", XJ_screenheight);
     }
 
     dispx = 0; dispy = 0;
@@ -319,13 +333,13 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
     data->XJ_gc = XCreateGC(data->XJ_disp, data->XJ_win, 0, 0);
     XJ_depth = DefaultDepthOfScreen(data->XJ_screen);
 
-    if ( xv_port != -1 )
+    if (xv_port != -1 )
     {
         data->XJ_SHMInfo = new XShmSegmentInfo[num_buffers];
         for (int i = 0; i < num_buffers; i++)
         {
-            XvImage *image = XvShmCreateImage(data->XJ_disp, xv_port, colorid,
-                                              0, XJ_width, XJ_height, 
+            XvImage *image = XvShmCreateImage(data->XJ_disp, xv_port,
+                                              colorid, 0, XJ_width, XJ_height, 
                                               &(data->XJ_SHMInfo)[i]);
             (data->XJ_SHMInfo)[i].shmid = shmget(IPC_PRIVATE, image->data_size,
                                              IPC_CREAT|0777);
@@ -343,6 +357,40 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
             (data->XJ_SHMInfo)[i].readOnly = False;
 
             XShmAttach(data->XJ_disp, &(data->XJ_SHMInfo)[i]);
+            XSync(data->XJ_disp, 0);
+        }
+    }
+    else if (use_shm)
+    {
+        data->XJ_SHMInfo = new XShmSegmentInfo[num_buffers];
+        for (int i = 0; i < num_buffers; i++)
+        {
+            XImage *image = XShmCreateImage(data->XJ_disp,
+                                    DefaultVisual(data->XJ_disp, XJ_screen_num),
+                                    XJ_depth, ZPixmap, 0,
+                                    &(data->XJ_SHMInfo)[i],
+                                    curw, curh);
+            (data->XJ_SHMInfo)[i].shmid = shmget(IPC_PRIVATE,
+                                    image->bytes_per_line * image->height,
+                                    IPC_CREAT|0777);
+            if ((data->XJ_SHMInfo)[i].shmid < 0)
+            {
+                perror("shmget failed:");
+                return false;
+            }
+ 
+            image->data = (data->XJ_SHMInfo)[i].shmaddr = 
+                             (char *)shmat((data->XJ_SHMInfo)[i].shmid, 0, 0);
+            data->xbuffers[(unsigned char *)image->data] = image;
+            out_buffers[i] = (unsigned char *)image->data;
+
+            (data->XJ_SHMInfo)[i].readOnly = False;
+
+            if (!XShmAttach(data->XJ_disp, &(data->XJ_SHMInfo)[i]))
+            {
+                perror("XShmAttach() failed:");
+                return false;
+            }
             XSync(data->XJ_disp, 0);
         }
     }
@@ -413,6 +461,22 @@ void XvVideoOutput::Exit(void)
                 delete [] scratchspace;
 
             XvUngrabPort(data->XJ_disp, xv_port, CurrentTime);
+        }
+        else if (use_shm)
+        {
+            map<unsigned char *, XImage *>::iterator iter =
+                data->xbuffers.begin();
+            for(; iter != data->xbuffers.end(); ++iter, ++i) 
+            {
+                XShmDetach(data->XJ_disp, &(data->XJ_SHMInfo)[i]);
+                if ((data->XJ_SHMInfo)[i].shmaddr)
+                    shmdt((data->XJ_SHMInfo)[i].shmaddr);
+                if ((data->XJ_SHMInfo)[i].shmid > 0)
+                    shmctl((data->XJ_SHMInfo)[i].shmid, IPC_RMID, 0);
+                XFree(iter->second);
+            }
+
+            delete [] (data->XJ_SHMInfo);
         }
         else
         {
@@ -539,44 +603,82 @@ void XvVideoOutput::StopEmbedding(void)
     pthread_mutex_unlock(&lock);
 }
 
-void scale_image( unsigned char *src, int src_w, int src_h,
+void inline scale_image( unsigned char *src, int src_w, int src_h,
         unsigned char *dest, int dest_w, int dest_h, int bpp )
 {
-    unsigned int *src_32 = (unsigned int *)src;
-    unsigned short *src_16 = (unsigned short *)src;
-    unsigned char *src_8 = (unsigned char *)src;
-    unsigned int *dest_32 = (unsigned int *)dest;
-    unsigned short *dest_16 = (unsigned short *)dest;
-    unsigned char *dest_8 = (unsigned char *)dest;
+    int src_rows[dest_h];
+    int *src_row = src_rows;
+    int src_cols[dest_w];
+    int *src_col = src_cols;
+    int bytes_per_pixel = bpp / 8;
+    int src_stride = src_w * bytes_per_pixel;
+    int dest_stride = dest_w * bytes_per_pixel;
+    unsigned char *src_row_ptr = src;
+    unsigned char *dest_row_ptr = dest;
 
     if (( src_w == dest_w ) &&
         ( src_h == dest_h ))
     {
-        memcpy( dest, src, src_w * src_h * bpp / 8 );
+        memcpy( dest, src, src_w * src_h * bytes_per_pixel );
         return;
     }
 
+    for( int row = 0; row < dest_h; row++ )
+        src_rows[row] = row * src_h / dest_h;
+    for( int col = 0; col < dest_w; col++ )
+        src_cols[col] = col * src_w / dest_w;
+    
     int row, col;
+    int last_row = -1;
 
     for( row = 0; row < dest_h; row++ )
     {
-        int src_row = row * src_h / dest_h;
-        for( col = 0; col < dest_w; col++ )
+        if ( *src_row == last_row )
         {
-            int src_col = col * src_w / dest_w;
-            switch(bpp)
-            {
-                case 8:  dest_8[row * dest_w + col]
-                             = src_8[src_row * src_w + src_col];
-                         break;
-                case 16: dest_16[row * dest_w + col]
-                             = src_16[src_row * src_w + src_col];
-                         break;
-                case 32: dest_32[row * dest_w + col]
-                             = src_32[src_row * src_w + src_col];
-                         break;
-            }
+            memcpy( dest_row_ptr, dest_row_ptr - dest_stride, dest_stride );
         }
+        else
+        {
+            unsigned char *src = src_row_ptr;
+            unsigned char *dest = dest_row_ptr;
+            int last_col = -1;
+            src_col = src_cols;
+            if ( src_w == dest_w )
+            {
+                memcpy( dest, src, src_stride);
+            }
+            else
+            for( col = 0; col < dest_w; col++ )
+            {
+                if ( *src_col == last_col )
+                {
+                    // need to optimize somehow
+                    switch( bytes_per_pixel )
+                    {
+                        case 4: *((int *)dest) = *((int *)dest-1);      break;
+                        case 2: *((short *)dest) = *((short *)dest-1);  break;
+                        case 1: *(dest) = *(dest-1);                    break;
+                    }
+                    dest += bytes_per_pixel;
+                }
+                else
+                {
+                    // need to optimize somehow
+                    switch( bytes_per_pixel )
+                    {
+                        case 4: *((int *)dest) = *((int *)src);        break;
+                        case 2: *((short *)dest) = *((short *)src);    break;
+                        case 1: *(dest) = *(src);                      break;
+                    }
+                    dest += bytes_per_pixel;
+                    src += bytes_per_pixel;
+                }
+                last_col = *(src_col++);
+            }
+            src_row_ptr += src_stride;
+        }
+        last_row = *(src_row++);
+        dest_row_ptr += dest_stride;
     }
 }
 
@@ -627,8 +729,13 @@ void XvVideoOutput::Show(unsigned char *buffer, int width, int height)
    
         pthread_mutex_lock(&lock);
 
-        XPutImage(data->XJ_disp, data->XJ_curwin, data->XJ_gc, image, 
-                  0, 0, 0, 0, curw, curh );
+        if (use_shm)
+            XShmPutImage(data->XJ_disp, data->XJ_curwin, data->XJ_gc, image,
+                      0, 0, 0, 0, curw, curh, False );
+        else
+            XPutImage(data->XJ_disp, data->XJ_curwin, data->XJ_gc, image, 
+                      0, 0, 0, 0, curw, curh );
+
         XSync(data->XJ_disp, False);
 
         pthread_mutex_unlock(&lock);
