@@ -1100,6 +1100,7 @@ void TV::RunTV(void)
             {
                 osd->DialogAbort(dialogname);
                 osd->TurnDialogOff(dialogname);
+                usleep(1000);
             }
             nextState = kState_None;
             changeState = true;
@@ -1305,7 +1306,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             return;
     }
 
-    if (nvp->GetOSD() && osd->DialogShowing(dialogname))
+    if (nvp->GetOSD() && dialogname != "" && osd->DialogShowing(dialogname))
     {
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
@@ -1325,7 +1326,6 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 if (dialogname == "alreadybeingedited")
                 {
                     int result = osd->GetDialogResponse(dialogname);
-                    dialogname = "";
                     if (result == 1) 
                     {
                        m_db->lock();
@@ -1342,7 +1342,6 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 else if (dialogname == "exitplayoptions") 
                 {
                     int result = osd->GetDialogResponse(dialogname);
-                    dialogname = "";
 
                     switch (result)
                     {
@@ -1373,13 +1372,20 @@ void TV::ProcessKeypress(QKeyEvent *e)
                     else if (!paused)
                         activenvp->Play(1.0, true);
                 }     
-            else if (dialogname == "ccwarningstring")
+                else if (dialogname == "ccwarningstring")
                 {
                     if (osd->GetDialogResponse(dialogname) == 1)
                         ChangeChannelByString(lastCC, true);
                     else if (!paused)
                         activenvp->Play(1.0, true);
-                }    
+                }
+
+                while (osd->DialogShowing(dialogname))
+                {
+                    usleep(1000);
+                }
+
+                dialogname = "";
             }
             else
                 handled = false;
@@ -1511,6 +1517,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 if (osd->HideSets(osetname))
                 {
                     ChannelClear();
+                    while (osd->HideSets(osetname))
+                        usleep(1000);
                     return;
                 }
             }
@@ -1532,7 +1540,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 options += tr("Delete this recording");
 
                 dialogname = "exitplayoptions";
-                osd->NewDialogBox(dialogname, message, options, 0); 
+                osd->NewDialogBox(dialogname, message, options, 0);
             } 
             else 
             {

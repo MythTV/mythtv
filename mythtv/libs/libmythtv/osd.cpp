@@ -1597,6 +1597,10 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
     changed = true;
 
     osdlock.unlock();
+
+    int count = 0;
+    while (!container->HasDisplayed() && count++ < 10)
+        usleep(1000);
 }
 
 void OSD::HighlightDialogSelection(OSDSet *container, int num)
@@ -1689,7 +1693,11 @@ bool OSD::DialogShowing(const QString &name)
     if (name == "")
         return false;
 
-    return (GetSet(name) != NULL);
+    osdlock.lock();
+    bool ret = (GetSet(name) != NULL);
+    osdlock.unlock();
+
+    return ret;
 }
 
 void OSD::DialogAbort(const QString &name)
