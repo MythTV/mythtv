@@ -1,5 +1,6 @@
 #include <qapplication.h>
 #include <qdatetime.h>
+#include <qfileinfo.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -422,6 +423,13 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write, bool usereadahead)
                     }
                 }
             }
+
+            QFileInfo fileInfo(filename);
+            if (fileInfo.lastModified().secsTo(QDateTime::currentDateTime()) >
+                30 * 60)
+            {
+                oldfile = true;
+            }
         }
         else
             remotefile = new RemoteFile(filename);
@@ -465,6 +473,7 @@ RingBuffer::RingBuffer(const QString &lfilename, long long size,
 
 void RingBuffer::Init(void)
 {
+    oldfile = false; 
     startreadahead = true;
 
     readaheadrunning = false;
@@ -587,7 +596,7 @@ int RingBuffer::safe_read(int fd, void *data, unsigned sz)
                 break;
 
             zerocnt++;
-            if (zerocnt >= 50) // 3 second timeout with usleep(60000)
+            if (zerocnt >= ((oldfile) ? 2 : 50)) // 3 second timeout with usleep(60000), or .12 if it's an old, unmodified file.
             {
                 break;
             }
@@ -951,14 +960,13 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
     int avail = ReadBufAvail();
     readErr = 0;
     
-
     while (avail < count && !stopreads)
     {
         availWaitMutex.lock();
         wanttoread = count;
-        if (!availWait.wait(&availWaitMutex, 2000))
+        if (!availWait.wait(&availWaitMutex, 4000))
         {
-            VERBOSE(VB_IMPORTANT,"Waited 2 seconds for data to become available, waiting "
+            VERBOSE(VB_IMPORTANT,"Waited 4 seconds for data to become available, waiting "
                     "again...");
             readErr++;
             if (readErr > 7)

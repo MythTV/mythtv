@@ -1195,7 +1195,7 @@ void TV::RunTV(void)
             updatecheck = 0;
         }
 
-        if (channelqueued && nvp->GetOSD())
+        if (channelqueued && nvp && nvp->GetOSD())
         {
             OSDSet *set = osd->GetSet("channel_number");
             if ((set && !set->Displaying()) || !set)

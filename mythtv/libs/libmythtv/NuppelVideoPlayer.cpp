@@ -276,8 +276,12 @@ void NuppelVideoPlayer::Pause(bool waitvideo)
 
     if (!actuallypaused)
     {
-        while (!decoderThreadPaused.wait(1000))
+        while (!decoderThreadPaused.wait(4000))
+        {
+            if (eof)
+                return;
             VERBOSE(VB_IMPORTANT, "Waited too long for decoder to pause");
+        }
     }
 
     //cout << "stopping other threads" << endl;
@@ -287,11 +291,14 @@ void NuppelVideoPlayer::Pause(bool waitvideo)
     if (ringBuffer)
         ringBuffer->Pause();
 
-    //cout << "updating frames played" << endl;
-    if (disablevideo || forceVideoOutput == kVideoOutput_IVTV)
-        decoder->UpdateFramesPlayed();
-    else
-        framesPlayed = videoOutput->GetFramesPlayed();
+    if (decoder && videoOutput)
+    {
+        //cout << "updating frames played" << endl;
+        if (disablevideo || forceVideoOutput == kVideoOutput_IVTV)
+            decoder->UpdateFramesPlayed();
+        else
+            framesPlayed = videoOutput->GetFramesPlayed();
+    }
 }
 
 bool NuppelVideoPlayer::Play(float speed, bool normal, bool unpauseaudio)
@@ -334,7 +341,11 @@ void NuppelVideoPlayer::PauseVideo(bool wait)
     if (wait && !video_actually_paused)
     {
         while (!videoThreadPaused.wait(1000))
+        {
+            if (eof)
+                return;
             VERBOSE(VB_IMPORTANT, "Waited too long for video out to pause");
+        }
     }
 }
 
@@ -2035,6 +2046,8 @@ void NuppelVideoPlayer::StartPlaying(void)
             }
         }
     }
+
+    decoderThreadPaused.wakeAll();
 
     killvideo = true;
     pthread_join(output_video, NULL);

@@ -145,6 +145,8 @@ class RingBuffer
     int numfailures;
 
     bool commserror;
+
+    bool oldfile;
 };
 
 #endif

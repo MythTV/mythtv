@@ -1353,6 +1353,8 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
         autoSelectAudioTrack();
     }
 
+    bool skipaudio = (lastvpts == 0);
+
     while (!allowedquit)
     {
         if (gotvideo)
@@ -1477,6 +1479,18 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         continue;
                     }
 
+                    if (skipaudio)
+                    {
+                        if (lastapts < lastvpts - 30 || lastvpts == 0)
+                        {
+                            ptr += pkt->size;
+                            len -= pkt->size;
+                            continue;
+                        }
+                        else
+                            skipaudio = false;
+                    }
+                        
                     if (do_ac3_passthru)
                     {
                         data_size = pkt->size;
