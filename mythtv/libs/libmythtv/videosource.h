@@ -5,6 +5,7 @@
 #include <qregexp.h>
 #include <vector>
 #include <qdir.h>
+#include <qstringlist.h>
 
 class VideoSource;
 class VSSetting: public SimpleDBStorage {
@@ -242,6 +243,8 @@ public:
         dev.setPath("/dev/v4l");
         fillSelectionsFromDir(dev);
     };
+
+    static QStringList probeInputs(QString device);
 };
 
 class VbiDevice: public PathSetting, public CCSetting {
@@ -282,20 +285,16 @@ public:
     };
 };
 
-// XXX, this should find available inputs in a reasonable way
 class TunerCardInput: public ComboBoxSetting, public CCSetting {
+    Q_OBJECT
 public:
     TunerCardInput(const CaptureCard& parent):
         CCSetting(parent, "defaultinput") {
         setLabel("Default input");
-        addSelection("Television");
-        addSelection("Composite1");
-        addSelection("Composite3");
-        addSelection("S-Video");
-        addSelection("Tuner 0");
-        addSelection("Composite 0");
-        addSelection("S-Video 0");
     };
+
+public slots:
+    void fillSelections(const QString& device);
 };
 
 class CardType: public ComboBoxSetting, public CCSetting {
@@ -306,25 +305,32 @@ public:
         addSelection("Standard V4L or MJPEG capture card", "V4L");
         addSelection("Hardware MPEG Encoder card", "MPEG");
     };
+
 };
 
 class CaptureCard: public ConfigurationWizard {
 public:
     CaptureCard() {
+        VideoDevice* device;
+        TunerCardInput* input;
+
         // must be first
         addChild(id = new ID());
 
         ConfigurationGroup *devices = new VerticalConfigurationGroup(false);
         devices->setLabel("Capture card");
-        devices->addChild(new VideoDevice(*this));
+        devices->addChild(device = new VideoDevice(*this));
         devices->addChild(new VbiDevice(*this));
         devices->addChild(new AudioDevice(*this));
         devices->addChild(new AudioRateLimit(*this));
-        devices->addChild(new TunerCardInput(*this));
+        devices->addChild(input = new TunerCardInput(*this));
         devices->addChild(new CardType(*this));
         addChild(devices);
 
         addChild(new Hostname(*this));
+
+        connect(device, SIGNAL(valueChanged(const QString&)),
+                input, SLOT(fillSelections(const QString&)));
     };
 
     int getCardID(void) const {

@@ -262,6 +262,8 @@ int CardInputEditor::exec(QSqlDatabase* db) {
     return QDialog::Rejected;
 }
 
+
+
 void CardInputEditor::load(QSqlDatabase* db) {
     clearSelections();
 
@@ -279,81 +281,20 @@ void CardInputEditor::load(QSqlDatabase* db) {
             int cardid = capturecards.value(0).toInt();
             QString videodevice(capturecards.value(1).toString());
 
-            int videofd = open(videodevice.ascii(), O_RDWR);
-            if (videofd < 0) {
-                cout << "Couldn't open " << videodevice << " to probe its inputs.\n";
-                continue;
+            QStringList inputs = VideoDevice::probeInputs(videodevice);
+
+            for(QStringList::iterator i = inputs.begin(); i != inputs.end(); ++i) {
+                CardInput* cardinput = new CardInput();
+                cardinput->loadByInput(db, cardid, *i);
+                cardinputs.push_back(cardinput);
+                QString index = QString::number(cardinputs.size()-1);
+
+                QString label = QString("%1 (%2) -> %3")
+                    .arg(videodevice)
+                    .arg(*i)
+                    .arg(cardinput->getSourceName());
+                addSelection(label, index);
             }
-
-#ifdef HAVE_V4L2
-            bool usingv4l2 = false;
-
-            struct v4l2_capability vcap;
-            memset(&vcap, 0, sizeof(vcap));
-            if (ioctl(videofd, VIDIOC_QUERYCAP, &vcap) < 0)
-                usingv4l2 = false;
-            else {
-                if (vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE)
-                    usingv4l2 = true;
-            }
-
-            if (usingv4l2) {
-                struct v4l2_input vin;
-                memset(&vin, 0, sizeof(vin));
-                vin.index = 0;
-
-                while (ioctl(videofd, VIDIOC_ENUMINPUT, &vin) >= 0) {
-                    QString input((char *)vin.name);
-                    CardInput* cardinput = new CardInput();
-                    cardinput->loadByInput(db, cardid, input);
-                    cardinputs.push_back(cardinput);
-                    QString index = QString::number(cardinputs.size()-1);
-
-                    QString label = QString("%1 (%2) -> %3")
-                        .arg(videodevice)
-                        .arg(input)
-                        .arg(cardinput->getSourceName());
-                    addSelection(label, index);
-
-                    vin.index++;
-                }
-            }
-            else
-#endif
-            {
-                struct video_capability vidcap;
-                memset(&vidcap, 0, sizeof(vidcap));
-                if (ioctl(videofd, VIDIOCGCAP, &vidcap) != 0) {
-                    perror("ioctl");
-                    close(videofd);
-                    continue;
-                }
-
-                for (int i = 0; i < vidcap.channels; i++) {
-                    struct video_channel test;
-                    memset(&test, 0, sizeof(test));
-                    test.channel = i;
-
-                    if (ioctl(videofd, VIDIOCGCHAN, &test) != 0) {
-                        perror("ioctl");
-                        continue;
-                    }
-
-                    QString input(test.name);
-                    CardInput* cardinput = new CardInput();
-                    cardinput->loadByInput(db, cardid, input);
-                    cardinputs.push_back(cardinput);
-                    QString index = QString::number(cardinputs.size()-1);
-
-                    QString label = QString("%1 (%2) -> %3")
-                        .arg(videodevice)
-                        .arg(input)
-                        .arg(cardinput->getSourceName());
-                    addSelection(label, index);
-                }
-            }
-
-            close(videofd);
         }
 }
 
@@ -363,3 +304,78 @@ CardInputEditor::~CardInputEditor() {
         cardinputs.pop_back();
     }
 }
+
+QStringList VideoDevice::probeInputs(QString device) {
+    QStringList ret;
+
+    int videofd = open(device.ascii(), O_RDWR);
+    if (videofd < 0) {
+        cerr << "Couldn't open " << device << " to probe its inputs.\n";
+        return ret;
+    }
+
+#ifdef HAVE_V4L2
+    bool usingv4l2 = false;
+
+    struct v4l2_capability vcap;
+    memset(&vcap, 0, sizeof(vcap));
+    if (ioctl(videofd, VIDIOC_QUERYCAP, &vcap) < 0)
+         usingv4l2 = false;
+    else {
+        if (vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE)
+            usingv4l2 = true;
+    }
+
+    if (usingv4l2) {
+        struct v4l2_input vin;
+        memset(&vin, 0, sizeof(vin));
+        vin.index = 0;
+
+        while (ioctl(videofd, VIDIOC_ENUMINPUT, &vin) >= 0) {
+            QString input((char *)vin.name);
+
+            ret += input;
+
+            vin.index++;
+        }
+    }
+    else
+#endif
+    {
+        struct video_capability vidcap;
+        memset(&vidcap, 0, sizeof(vidcap));
+        if (ioctl(videofd, VIDIOCGCAP, &vidcap) != 0) {
+            perror("ioctl");
+            close(videofd);
+            return ret;
+        }
+
+        for (int i = 0; i < vidcap.channels; i++) {
+            struct video_channel test;
+            memset(&test, 0, sizeof(test));
+            test.channel = i;
+
+            if (ioctl(videofd, VIDIOCGCHAN, &test) != 0) {
+                perror("ioctl(VIDIOCGCHAN)");
+                continue;
+            }
+
+            ret += test.name;
+        }
+    }
+
+    close(videofd);
+    return ret;
+}
+
+void TunerCardInput::fillSelections(const QString& device) {
+    clearSelections();
+
+    if (device == QString::null || device == "")
+        return;
+
+    QStringList inputs = VideoDevice::probeInputs(device);
+    for(QStringList::iterator i = inputs.begin(); i != inputs.end(); ++i)
+        addSelection(*i);
+}
+
