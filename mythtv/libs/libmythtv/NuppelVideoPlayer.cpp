@@ -2299,6 +2299,8 @@ void NuppelVideoPlayer::DoPlay(void)
     if (osd && forceVideoOutput != kVideoOutput_IVTV)
         osd->SetFrameInterval(frame_interval);
     if (videosync != NULL)
+        videosync->SetFrameInterval(frame_interval, m_double_framerate);
+/*
     {
         // We have to do the deinterlacer setup again in case we've
         // changed to or from synchronous playback speed.
@@ -2335,7 +2337,7 @@ void NuppelVideoPlayer::DoPlay(void)
         }
         videofiltersLock.unlock();
     }
-
+*/
 #ifdef USING_IVTV
     if (forceVideoOutput == kVideoOutput_IVTV)
     {
