@@ -2800,7 +2800,8 @@ int fix_end_times(void)
                                "endtime = \"%2\" WHERE (chanid = \"%3\" AND "
                                "starttime = \"%4\");")
                                .arg(starttime)
-                               .arg(endtime, chanid)
+                               .arg(endtime)
+                               .arg(chanid)
                                .arg(starttime);
 
             if (!query2.exec(querystr)) 
