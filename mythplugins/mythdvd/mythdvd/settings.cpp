@@ -58,7 +58,9 @@ public :
        addSelection(QObject::tr("Display mythdvd menu menu"),"1");
        addSelection(QObject::tr("Do nothing"),"0");
        addSelection(QObject::tr("Play DVD"),"2");
+#ifdef TRANSCODE_SUPPORT       
        addSelection(QObject::tr("Rip DVD"),"3");
+#endif
        setHelpText(QObject::tr("Media Monitoring should be turned on to "
                    "allow this feature (Setup -> General -> CD/DVD Monitor"));
        };

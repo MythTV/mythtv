@@ -16,19 +16,4 @@
    </button>
 
 
-   <button>
-      <type>DVD_RIP</type>
-      <text>Rip DVD</text>
-      <text lang="DK">Genkod DVD</text>
-      <text lang="PT">Copiar DVD</text>
-      <text lang="DE">DVD rippen</text>
-      <text lang="SV">Kopiera DVD</text>
-      <text lang="ES">"Ripear" DVD</text>
-      <text lang="CA">Volcar DVD</text>
-      <text lang="FR">Copie DVD</text>
-      <text lang="NL">DVD Rip</text>
-      <text lang="JA">DVDリッピング</text>
-      <action>DVD_RIP</action>
-   </button>
-
 </mythmenu>
