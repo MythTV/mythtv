@@ -75,8 +75,6 @@ void IvtvDecoder::SeekReset(long long newkey, int skipframes)
     videoout->Start(0, skipframes+5);
     videoout->Pause();
 
-    while (ReadWrite(1, 0))
-        ;
     while (!videoout->GetFramesPlayed() && !ateof)
         ReadWrite(1, 0);
 
