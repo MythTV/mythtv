@@ -516,7 +516,7 @@ void RecordingProfile::fillSelections(QSqlDatabase* db, SelectSetting* setting,
     if (group == 0)
     {
        for(int i = 0; availProfiles[i][0] != 0; i++)
-           setting->addSelection(availProfiles[i],availProfiles[i]);
+           setting->addSelection(availProfiles[i],QString::number(i));
     }
     else
     {
