@@ -7,7 +7,7 @@
     </message>
     <message>
         <source>Cannot connect to your Myth Transcoding Daemon. You can try hitting any number key to start it. If you still see this message, then something is really wrong.</source>
-        <translation>Kan ej ansluta till Myth omkodningsdemon. Du kan försöka att trycka på godtycklig siffertangent för att starta den. Om du ser detta meddelande är något fel.</translation>
+        <translation>Kan ej ansluta till Myth omkodningsdemon. Du kan försöka med att trycka på godtycklig siffertangent för att starta den. Om du ser detta meddelande är något fel.</translation>
     </message>
     <message>
         <source>Attempting to connect to your mtd said host not found. This is unrecoverably bad. </source>
@@ -27,7 +27,7 @@
     </message>
     <message>
         <source>No jobs and nothing else to do. You could hit 0 to rip a DVD.</source>
-        <translation>Inga jobb och inget annat att göra. Du kan trycka 0 för att kopiera en DVD.</translation>
+        <translation>Inga kopieringsjobb och inget annat att göra. Tryck 0 för att kopiera en DVD.</translation>
     </message>
     <message>
         <source>No Jobs. Checking and/or waiting for DVD.</source>
@@ -150,7 +150,7 @@ Du har ingen DVD-enhet definierad.</translation>
     </message>
     <message>
         <source>If you choose any subtitles for ripping, this command is added to the end of the Title Play Command to allow previewing of subtitles. If  present %s will be set to the subtitle track. </source>
-        <translation>Om du väljer textning vid kopiering kommer dessa kommandoradsargument att läggas till på slutet av Titelabspelningskommandot. Om teckensekvensen %s anges kommer detta att ersättas med textningsspåret i det slutliga kommandot.</translation>
+        <translation>Om du väljer textning vid kopiering kommer dessa kommandoradsargument att läggas till på slutet av Titelavspelningskommandot. Om teckensekvensen %s anges kommer denna att ersättas med textningsspårets namn i det slutliga kommandot.</translation>
     </message>
     <message>
         <source>Base transcode command</source>
@@ -190,7 +190,7 @@ Du har ingen DVD-enhet definierad.</translation>
     </message>
     <message>
         <source>If set, mythdvd will use the (open, free) xvid codec rather than divx whenever possible.</source>
-        <translation>Om funktionen är aktiverad kommer MythDVD att använda den fria kodnings/dekodnings-mjukvaran xvid i stället för divx närhelst det är möjligt.</translation>
+        <translation>Om funktionen är aktiverad kommer MythDVD att använda den fria kodnings/avkodnings-mjukvaran xvid i stället för divx närhelst det är möjligt.</translation>
     </message>
     <message>
         <source>Nice level for MTD</source>
