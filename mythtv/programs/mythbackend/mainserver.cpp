@@ -567,7 +567,7 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
     {
         EncoderLink *elink = iter.data();
 
-        if (elink->isConnected() && elink->MatchesRecording(pginfo))
+        if (elink->isLocal() && elink->MatchesRecording(pginfo))
         {
             elink->StopRecording();
 
@@ -628,16 +628,19 @@ void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs)
                     (1024*1024/statbuf.f_bsize);
     }
 
-    vector<PlaybackSock *>::iterator iter = playbackList.begin();
-    for (; iter != playbackList.end(); iter++)
+    if (ismaster)
     {
-        PlaybackSock *pbs = (*iter);
-        if (pbs->isSlaveBackend())
+        vector<PlaybackSock *>::iterator iter = playbackList.begin();
+        for (; iter != playbackList.end(); iter++)
         {
-            int remtotal = -1, remused = -1;
-            pbs->GetFreeSpace(remtotal, remused);
-            totalspace += remtotal;
-            usedspace += remused;
+            PlaybackSock *pbs = (*iter);
+            if (pbs->isSlaveBackend())
+            {
+                int remtotal = -1, remused = -1;
+                pbs->GetFreeSpace(remtotal, remused);
+                totalspace += remtotal;
+                usedspace += remused;
+            }
         }
     }
 
@@ -1264,7 +1267,7 @@ void MainServer::endConnection(QSocket *socket)
         QSocket *sock = (*it)->getSocket();
         if (sock == socket)
         {
-            if ((*it)->isSlaveBackend())
+            if (ismaster && (*it)->isSlaveBackend())
             {
                 cout << "Slave backend: " << (*it)->getHostname() 
                      << " has left the building\n";
@@ -1331,6 +1334,9 @@ void MainServer::endConnection(QSocket *socket)
 
 PlaybackSock *MainServer::getSlaveByHostname(QString &hostname)
 {
+    if (!ismaster)
+        return NULL;
+
     vector<PlaybackSock *>::iterator iter = playbackList.begin();
     for (; iter != playbackList.end(); iter++)
     {
