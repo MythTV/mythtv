@@ -1,4 +1,4 @@
-#Last Updated: 2005.03.16 (xris)
+#Last Updated: 2005.04.03 (xris)
 #
 #  export::ffmpeg::DivX
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
@@ -102,13 +102,13 @@ package export::ffmpeg::DivX;
                         }
                     }
                 }
+            } else {
+                $self->{'multipass'} = 0;
             }
         # Ask the user what video bitrate he/she wants
-            if ($self->{'multipass'} || !$self->{'vbr'}) {
-                $self->{'v_bitrate'} = query_text('Video bitrate?',
-                                                  'int',
-                                                  $self->val('v_bitrate'));
-            }
+            $self->{'v_bitrate'} = query_text('Video bitrate?',
+                                              'int',
+                                              $self->val('v_bitrate'));
         }
     # Query the resolution
         $self->query_resolution();

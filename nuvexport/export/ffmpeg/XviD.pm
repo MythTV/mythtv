@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.03.11 (xris)
+#Last Updated: 2005.04.03 (xris)
 #
 #  export::ffmpeg::XviD
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
@@ -114,13 +114,10 @@ package export::ffmpeg::XviD;
             } else {
                 $self->{'multipass'} = 0;
             }
-
         # Ask the user what video bitrate he/she wants
-            if ($self->{'multipass'} || !$self->{'vbr'}) {
-                $self->{'v_bitrate'} = query_text('Video bitrate?',
-                                                  'int',
-                                                  $self->val('v_bitrate'));
-            }
+            $self->{'v_bitrate'} = query_text('Video bitrate?',
+                                              'int',
+                                              $self->val('v_bitrate'));
         }
     # Query the resolution
         $self->query_resolution();
@@ -166,7 +163,7 @@ package export::ffmpeg::XviD;
         else {
             $self->{'ffmpeg_xtra'} = ' -vcodec xvid'
                                    . ' -b ' . $self->{'v_bitrate'}
-                                   . (($self->{'vbr'}) 
+                                   . (($self->{'vbr'})
                                       ? " -qmin $self->{'quantisation'}"
                                       . ' -qmax 31 -minrate 32'
                                       . ' -maxrate '.(2*$self->{'v_bitrate'})
