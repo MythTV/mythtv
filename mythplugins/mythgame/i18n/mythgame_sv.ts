@@ -631,10 +631,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The path to the MAME hiscore.dat file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The path to the MAME history.dat file.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -785,6 +781,18 @@ Please enter the correct path and try again.</source>
     </message>
     <message>
         <source>Use Joystick as analog for analog controls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directory where MAME hiscores are kept.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MAME hiscores file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Path to the MAME hiscore.dat file</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
