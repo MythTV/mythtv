@@ -66,6 +66,8 @@ struct ivtv_sliced_data {
 #define IVTV_IOC_DEC_FLUSH     _IOW ('@', 34, int)
 #define IVTV_IOC_S_VBI_MODE    _IOWR('@', 35, struct ivtv_sliced_vbi_format)
 #define IVTV_IOC_G_VBI_MODE    _IOR ('@', 36, struct ivtv_sliced_vbi_format)
+#define IVTV_IOC_S_VBI_EMBED   _IOW ('@', 54, int)
+#define IVTV_IOC_G_VBI_EMBED   _IOR ('@', 55, int)
 
 /* ioctl for MSP_SET_MATRIX will have to be registered */
 #define MSP_SET_MATRIX     _IOW('m',17,struct msp_matrix)

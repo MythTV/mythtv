@@ -351,7 +351,9 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
     if (vbimode) {
         memset(&vbifmt, 0, sizeof(struct ivtv_sliced_vbi_format));
         vbifmt.service_set = (1==vbimode) ? VBI_TYPE_TELETEXT : VBI_TYPE_CC;
-        if (ioctl(chanfd, IVTV_IOC_S_VBI_MODE, &vbifmt) < 0) {
+        if ((ioctl(chanfd, IVTV_IOC_S_VBI_MODE, &vbifmt) < 0) || 
+            (ioctl(chanfd, IVTV_IOC_S_VBI_EMBED, &vbifmt) < 0)) 
+        {
             VERBOSE(VB_IMPORTANT, QString("Can't enable VBI recording"));
             perror("vbi");
         }
