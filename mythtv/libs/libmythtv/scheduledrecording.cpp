@@ -264,7 +264,7 @@ void ScheduledRecording::fromProgramInfo(ProgramInfo* proginfo)
     endTime->setValue(proginfo->endts.time());
     endDate->setValue(proginfo->endts.date());
     category->setValue(proginfo->category);
-    recpriority->setValue(proginfo->recpriority.toInt());
+    recpriority->setValue(proginfo->recpriority);
     autoexpire->setValue(gContext->GetNumSetting("AutoExpireDefault", 0));
 }
 
@@ -659,8 +659,8 @@ void ScheduledRecording::setEnd(const QDateTime& end) {
     endDate->setValue(end.date());
 }
 
-void ScheduledRecording::setRecPriority(const QString& newrecpriority) {
-    recpriority->setValue(newrecpriority.toInt());
+void ScheduledRecording::setRecPriority(int newrecpriority) {
+    recpriority->setValue(newrecpriority);
 }
 
 QString ScheduledRecording::getProfileName(void) const {

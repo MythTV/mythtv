@@ -48,7 +48,7 @@ public:
 
     void setStart(const QDateTime& start);
     void setEnd(const QDateTime& end);
-    void setRecPriority(const QString& recpriority);
+    void setRecPriority(int recpriority);
 
     virtual MythDialog* dialogWidget(MythMainWindow *parent, 
                                      const char *name = 0);

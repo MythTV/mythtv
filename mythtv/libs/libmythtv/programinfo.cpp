@@ -46,7 +46,7 @@ ProgramInfo::ProgramInfo(void)
     inputid = -1;
     cardid = -1;
     schedulerid = "";
-    recpriority = "";
+    recpriority = 0;
 
     repeat = false;
 
@@ -172,7 +172,7 @@ void ProgramInfo::ToStringList(QStringList &list)
     list << QString::number(sourceid);
     list << QString::number(cardid);
     list << QString::number(inputid);
-    list << ((recpriority != "") ? recpriority : QString(" "));
+    list << QString::number(recpriority);
     list << QString::number(recstatus);
     list << QString::number(recordid);
     list << QString::number(rectype);
@@ -218,7 +218,7 @@ void ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     sourceid = (*(it++)).toInt();
     cardid = (*(it++)).toInt();
     inputid = (*(it++)).toInt();
-    recpriority = *(it++);
+    recpriority = (*(it++)).toInt();
     recstatus = RecStatusType((*(it++)).toInt());
     recordid = (*(it++)).toInt();
     rectype = RecordingType((*(it++)).toInt());
@@ -250,8 +250,6 @@ void ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
         channame = "";
     if (chansign == " ")
         chansign = "";
-    if (recpriority == " ")
-        recpriority = "";
 }
 
 void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
@@ -715,7 +713,7 @@ void ProgramInfo::ApplyRecordTimeChange(QSqlDatabase *db,
 }
 
 void ProgramInfo::ApplyRecordRecPriorityChange(QSqlDatabase *db,
-                                        const QString &newrecpriority)
+                                        int newrecpriority)
 {
     GetProgramRecordingStatus(db);
     record->setRecPriority(newrecpriority);

@@ -99,8 +99,7 @@ class ProgramInfo
     void ApplyRecordTimeChange(QSqlDatabase *db, 
                                const QDateTime &newstartts,
                                const QDateTime &newendts);
-    void ApplyRecordRecPriorityChange(QSqlDatabase *db,
-                               const QString &newrecpriority);
+    void ApplyRecordRecPriorityChange(QSqlDatabase *db, int);
     void ToggleRecord(QSqlDatabase *dB);
 
     ScheduledRecording* GetScheduledRecording(QSqlDatabase *db) 
@@ -204,7 +203,7 @@ class ProgramInfo
     QString chanstr;
     QString chansign;
     QString channame;
-    QString recpriority;
+    int recpriority;
 
     QString pathname;
     long long filesize;

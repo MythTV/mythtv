@@ -254,8 +254,6 @@ void Scheduler::FillRecordListFromMaster(void)
 
 void Scheduler::PrintList(void)
 {
-    QString totrecpriority;
-
     cout << "--- print list start ---\n";
     list<ProgramInfo *>::iterator i = recordingList.begin();
     cout << "Title                 Chan  ChID  StartTime       S I C "
@@ -264,7 +262,8 @@ void Scheduler::PrintList(void)
     {
         ProgramInfo *first = (*i);
 
-        totrecpriority = QString::number(totalRecPriority(first));
+        QString totrecpriority = QString::number(totalRecPriority(first));
+        QString progrecpriority = QString::number(first->recpriority);
 
         cout << first->title.local8Bit().leftJustify(22, ' ', true)
              << first->chanstr.rightJustify(4, ' ') << "  " << first->chanid 
@@ -273,7 +272,7 @@ void Scheduler::PrintList(void)
              << " " << first->inputid << " " << first->cardid << "  "  
              << first->conflicting << " " << first->recording << " "
              << first->override << " " << first->RecStatusChar() << " "
-             << first->recpriority.rightJustify(8, ' ') << " "
+             << progrecpriority.rightJustify(8, ' ') << " "
              << totrecpriority.rightJustify(4, ' ')
              << endl;
     }
@@ -687,7 +686,7 @@ int Scheduler::totalRecPriority(ProgramInfo *info)
                                     info->GetRecordingTypeRecPriority(rectype);
     }
 
-    recpriority = info->recpriority.toInt();
+    recpriority = info->recpriority;
     recpriority += channelRecPriorityMap[info->chanid];
     recpriority += recTypeRecPriorityMap[rectype];
     recpriorityMap[info->schedulerid] = recpriority;
@@ -1816,7 +1815,7 @@ void Scheduler::findAllProgramsToRecord(list<ProgramInfo*>& proglist) {
              proginfo->chansign = result.value(8).toString();
              proginfo->channame = QString::fromUtf8(result.value(9).toString());
              proginfo->category = QString::fromUtf8(result.value(11).toString());
-             proginfo->recpriority = result.value(12).toString();
+             proginfo->recpriority = result.value(12).toInt();
              proginfo->recdups = RecordingDupsType(result.value(13).toInt());
              proginfo->rectype = RecordingType(result.value(15).toInt());
              proginfo->recordid = result.value(16).toInt();
@@ -1932,7 +1931,7 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo*>& proglist)
             if (proginfo->rectype == kSingleRecord)
                 proginfo->subtitle = QString::fromUtf8(result.value(6).toString());
             proginfo->description = QString::fromUtf8(result.value(7).toString());
-            proginfo->recpriority = result.value(8).toString();
+            proginfo->recpriority = result.value(8).toInt();
             proginfo->channame = QString::fromUtf8(result.value(10).toString());
             proginfo->recstartts = proginfo->startts;
             proginfo->recendts = proginfo->endts;

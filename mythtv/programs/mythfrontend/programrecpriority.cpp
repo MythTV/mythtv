@@ -440,7 +440,7 @@ void ProgramRecPriority::edit(void)
             if (query.numRowsAffected() > 0)
             {
                 query.next();
-                QString recPriority = query.value(0).toString();
+                int recPriority = query.value(0).toInt();
                 int rectype = query.value(1).toInt();
 
                 int cnt;
@@ -506,10 +506,10 @@ void ProgramRecPriority::changeRecPriority(int howMuch)
     progInfo = &(it.data());
 
     // inc/dec recording priority
-    tempRecPriority = progInfo->recpriority.toInt() + howMuch;
+    tempRecPriority = progInfo->recpriority + howMuch;
     if(tempRecPriority > -100 && tempRecPriority < 100) 
     {
-        progInfo->recpriority = QString::number(tempRecPriority);
+        progInfo->recpriority = tempRecPriority;
 
         // order may change if sorting by recording priority, so resort
         if (sortType == byRecPriority)
@@ -664,10 +664,10 @@ class programRecPrioritySort
     public:
         bool operator()(const RecPriorityInfo a, const RecPriorityInfo b) 
         {
-            int finalA = a.prog->recpriority.toInt() + 
+            int finalA = a.prog->recpriority + 
                          a.prog->channelRecPriority +
                          a.prog->recTypeRecPriority;
-            int finalB = b.prog->recpriority.toInt() + 
+            int finalB = b.prog->recpriority + 
                          b.prog->channelRecPriority +
                          b.prog->recTypeRecPriority;
 
@@ -778,7 +778,7 @@ void ProgramRecPriority::updateList(QPainter *p)
                     {
                         ProgramRecPriorityInfo *progInfo = &(it.data());
 
-                        int progRecPriority = progInfo->recpriority.toInt();
+                        int progRecPriority = progInfo->recpriority;
                         int finalRecPriority = progRecPriority + 
                                         progInfo->channelRecPriority +
                                         progInfo->recTypeRecPriority;
@@ -862,7 +862,7 @@ void ProgramRecPriority::updateInfo(QPainter *p)
         int progRecPriority, chanrecpriority, rectyperecpriority, finalRecPriority;
         RecordingType rectype; 
 
-        progRecPriority = curitem->recpriority.toInt();
+        progRecPriority = curitem->recpriority;
         chanrecpriority = curitem->channelRecPriority;
         rectyperecpriority = curitem->recTypeRecPriority;
         finalRecPriority = progRecPriority + chanrecpriority + rectyperecpriority;
@@ -955,10 +955,10 @@ void ProgramRecPriority::updateInfo(QPainter *p)
 
             type = (UITextType *)container->GetType("recpriority");
             if (type) {
-                if(curitem->recpriority.toInt() >= 0)
-                    type->SetText("+"+curitem->recpriority);
+                if(curitem->recpriority >= 0)
+                    type->SetText("+"+QString::number(curitem->recpriority));
                 else
-                    type->SetText(curitem->recpriority);
+                    type->SetText(QString::number(curitem->recpriority));
             }
 
             type = (UITextType *)container->GetType("recpriorityB");
