@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.01.21 (xris)
+#Last Updated: 2005.01.23 (xris)
 #
 #  transcode.pm
 #
@@ -94,7 +94,8 @@ package export::transcode;
         load_finfo($episode);
     # Start the transcode command
         $transcode = "nice -n $Args{'nice'} transcode"
-                    # this is now the default:  .' -V'                     # use YV12/I420 instead of RGB, for faster processing
+                        # -V is now the default, but need to keep using it because people are still using an older version of transcode
+                    .' -V'                     # use YV12/I420 instead of RGB, for faster processing
                     #.' -u 100,'.($num_cpus);   # Take advantage of multiple CPU's?  currently disabled because it actually seems to slow things down
                     ;
     # Not an mpeg
