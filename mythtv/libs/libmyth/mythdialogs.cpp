@@ -1875,12 +1875,6 @@ void MythThemedDialog::updateForegroundRegion(const QRect &r)
 
 void MythThemedDialog::paintEvent(QPaintEvent *e)
 {
-    if (this != m_parent->currentWidget())
-    {
-        MythDialog::paintEvent(e);
-        return;
-    }
-
     if (redrawRect.width() > 0 && redrawRect.height() > 0)
         ReallyUpdateForeground(redrawRect);
 

@@ -7,7 +7,8 @@ class SortableGenericTreeList : public QPtrList<GenericTree>
 {
   public:
     void SetSortType(int stype) { sort_type = stype; }
-    void SetOrderingIndex(int oindex) { ordering_index = oindex; }
+    void SetOrderingIndex(int oindex) 
+    { ordering_index = (oindex >= 0) ? oindex : 0; }
 
     int compareItems(QPtrCollection::Item item1, QPtrCollection::Item item2)
     {
@@ -257,6 +258,9 @@ int GenericTree::getPosition()
 
 int GenericTree::getPosition(int ordering_index)
 {
+    if (ordering_index == -1)
+        return getPosition();
+
     if (m_parent)
     {
         if (m_parent->getOrderingIndex() != ordering_index)
@@ -400,6 +404,7 @@ int GenericTree::getAttribute(uint which_one)
     if (m_attributes->size() < which_one + 1)
     {
         cerr << "asked a GenericTree node for a nonexistant attribute\n";
+        return 0;
     }
 
     return m_attributes->at(which_one);
