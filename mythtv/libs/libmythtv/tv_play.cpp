@@ -462,7 +462,6 @@ void TV::FinishRecording(void)
 
 void TV::AskAllowRecording(const QStringList &messages, int timeuntil)
 {
-    //TODO: integrate this dialog so that event doesn't have to wait
     if (GetState() != kState_WatchingLiveTV)
        return;
 
@@ -481,8 +480,7 @@ void TV::AskAllowRecording(const QStringList &messages, int timeuntil)
                                  .arg(title)
                                  .arg(channel)
                                  .arg(" %d ");
-    dialogname = "allowrecordingbox";
-
+    
     while (!osd)
     {
         qApp->unlock();
@@ -496,23 +494,9 @@ void TV::AskAllowRecording(const QStringList &messages, int timeuntil)
     options += tr("Let it record and go back to the Main Menu");
     options += tr("Don't let it record, I want to watch TV");
 
+    dialogname = "allowrecordingbox";
     osd->NewDialogBox(dialogname, message, options, timeuntil); 
 
-    while (osd->DialogShowing(dialogname))
-    {
-        qApp->unlock();
-        qApp->processEvents();
-        usleep(1000);
-        qApp->lock();
-    }
-
-    int result = osd->GetDialogResponse(dialogname);
-    dialogname = "";
-
-    if (result == 2)
-        StopLiveTV();
-    else if (result == 3)
-        recorder->CancelNextRecording();
 }
 
 int TV::Playback(ProgramInfo *rcinfo)
@@ -1469,6 +1453,15 @@ void TV::ProcessKeypress(QKeyEvent *e)
                         ChangeChannelByString(lastCC, true);
                     else if (!paused)
                         activenvp->Play(1.0, true);
+                }
+                else if (dialogname == "allowrecordingbox")
+                {
+                    int result = osd->GetDialogResponse(dialogname);
+    
+                    if (result == 2)
+                        StopLiveTV();
+                    else if (result == 3)
+                        recorder->CancelNextRecording();
                 }
 
                 while (osd->DialogShowing(dialogname))
