@@ -243,7 +243,7 @@ void Scheduler::PrintList(void)
     cout << "--- print list start ---\n";
     list<ProgramInfo *>::iterator i = recordingList.begin();
     cout << "Title                 Chan  ChID  StartTime       S I C "
-            "-- C R O N Rank Total" << endl;
+            " C R O N Rank Total" << endl;
     for (; i != recordingList.end(); i++)
     {
         ProgramInfo *first = (*i);
@@ -254,9 +254,9 @@ void Scheduler::PrintList(void)
              << first->chanstr.rightJustify(4, ' ') << "  " << first->chanid 
              << first->recstartts.toString("  MMM dd hh:mmap  ")
              << first->sourceid 
-             << " " << first->inputid << " " << first->cardid << " -- "  
+             << " " << first->inputid << " " << first->cardid << "  "  
              << first->conflicting << " " << first->recording << " "
-             << first->override << " " << first->norecord << " "
+             << first->override << " " << first->NoRecordChar() << " "
              << first->rank.rightJustify(4, ' ') << " "
              << totrank.rightJustify(4, ' ')
              << endl;
