@@ -149,59 +149,59 @@
     <name>JobQueue</name>
     <message>
         <source>Transcode</source>
-        <translation type="unfinished"></translation>
+        <translation>Omkoda</translation>
     </message>
     <message>
         <source>Flag Commercials</source>
-        <translation type="unfinished"></translation>
+        <translation>Markera reklam</translation>
     </message>
     <message>
         <source>Unknown Job</source>
-        <translation type="unfinished"></translation>
+        <translation>Okänt jobb</translation>
     </message>
     <message>
         <source>Queued</source>
-        <translation type="unfinished"></translation>
+        <translation>Köad</translation>
     </message>
     <message>
         <source>Pending</source>
-        <translation type="unfinished"></translation>
+        <translation>Avvaktande</translation>
     </message>
     <message>
         <source>Starting</source>
-        <translation type="unfinished"></translation>
+        <translation>Startar</translation>
     </message>
     <message>
         <source>Running</source>
-        <translation type="unfinished"></translation>
+        <translation>Körs</translation>
     </message>
     <message>
         <source>Paused</source>
-        <translation type="unfinished">Pausad</translation>
+        <translation>Pausad</translation>
     </message>
     <message>
         <source>Stopping</source>
-        <translation type="unfinished"></translation>
+        <translation>Stoppar</translation>
     </message>
     <message>
         <source>Done (Invalid status!)</source>
-        <translation type="unfinished"></translation>
+        <translation>Klar (Ogiltig status!)</translation>
     </message>
     <message>
         <source>Finished</source>
-        <translation type="unfinished"></translation>
+        <translation>Avslutad</translation>
     </message>
     <message>
         <source>Aborted</source>
-        <translation type="unfinished"></translation>
+        <translation>Avbruten</translation>
     </message>
     <message>
         <source>Errored</source>
-        <translation type="unfinished"></translation>
+        <translation>Fel</translation>
     </message>
     <message>
         <source>Undefined</source>
-        <translation type="unfinished"></translation>
+        <translation>Odefinierad</translation>
     </message>
 </context>
 <context>
@@ -490,10 +490,6 @@
         <translation>, %1 GB ledigt</translation>
     </message>
     <message>
-        <source>Yes, but allow future recordings of this episode</source>
-        <translation type="obsolete">Ja, men tillåt framtida inspelningar av detta avsnitt</translation>
-    </message>
-    <message>
         <source>There are %1 recordings in this display group</source>
         <translation>Det finns %1 inspelningar i denna visningsgrupp</translation>
     </message>
@@ -527,7 +523,7 @@
     </message>
     <message>
         <source>Yes, and allow re-record</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, och tillåt återinspelning</translation>
     </message>
 </context>
 <context>
@@ -619,6 +615,90 @@
         <source>Select Time</source>
         <translation>Välj tid</translation>
     </message>
+    <message>
+        <source>Power Search</source>
+        <translation>Avancerad sökning</translation>
+    </message>
+    <message>
+        <source>Select List</source>
+        <translation>Välj lista</translation>
+    </message>
+    <message>
+        <source>Select Search</source>
+        <translation>Välj sökning</translation>
+    </message>
+    <message>
+        <source>&lt;New Search&gt;</source>
+        <translation>&lt;Ny sökning&gt;</translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation>Redigera</translation>
+    </message>
+    <message>
+        <source>Edit Power Search Fields</source>
+        <translation>Redigera sökfält</translation>
+    </message>
+    <message>
+        <source>Optional title phrase:</source>
+        <translation>Valfri titelfras:</translation>
+    </message>
+    <message>
+        <source>Optional subtitle phrase:</source>
+        <translation>Valfri undertitelfras:</translation>
+    </message>
+    <message>
+        <source>Optional description phrase:</source>
+        <translation>Valfri beskrivningsfras:</translation>
+    </message>
+    <message>
+        <source>Movies</source>
+        <translation>Filmer</translation>
+    </message>
+    <message>
+        <source>Series</source>
+        <translation>Serier</translation>
+    </message>
+    <message>
+        <source>Show</source>
+        <translation>Visning</translation>
+    </message>
+    <message>
+        <source>Sports</source>
+        <translation>Sport</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation>Alla</translation>
+    </message>
+    <message>
+        <source>Specials</source>
+        <translation>Specialinslag</translation>
+    </message>
+    <message>
+        <source>Select Rating</source>
+        <translation>Välj betyg</translation>
+    </message>
+    <message>
+        <source>Select</source>
+        <translation>Välj</translation>
+    </message>
+    <message>
+        <source>4 stars</source>
+        <translation>4 stjärnor</translation>
+    </message>
+    <message>
+        <source>At least 3 1/2 stars</source>
+        <translation>Minst 3 1/2 stjärnor</translation>
+    </message>
+    <message>
+        <source>At least 3 stars</source>
+        <translation>Minst 3 stjärnor</translation>
+    </message>
+    <message>
+        <source>At least 2 stars</source>
+        <translation>Minst 2 stjärnor</translation>
+    </message>
 </context>
 <context>
     <name>ProgramRecPriority</name>
@@ -629,14 +709,6 @@
     <message>
         <source>Recording every week</source>
         <translation>Varje vecka</translation>
-    </message>
-    <message>
-        <source>Recording when shown in this timeslot</source>
-        <translation>Varje dag vid visning denna tid</translation>
-    </message>
-    <message>
-        <source>Recording when shown on this channel</source>
-        <translation>Alla visningar på denna kanal</translation>
     </message>
     <message>
         <source>Recording all showings</source>
@@ -659,20 +731,28 @@
         <translation>OK</translation>
     </message>
     <message>
-        <source>Recording one showing of this program</source>
-        <translation>En visning</translation>
-    </message>
-    <message>
         <source>Any</source>
         <translation>Alla</translation>
     </message>
     <message>
-        <source>Recording this showing with override options</source>
+        <source>Recording with override options</source>
         <translation>Spelar in med överskuggningsinställningar</translation>
     </message>
     <message>
-        <source>Manually not recording this showing</source>
-        <translation>Manuellt ställd att inte spela in</translation>
+        <source>Recording in this timeslot</source>
+        <translation>Spelar in i denna tidslucka</translation>
+    </message>
+    <message>
+        <source>Recording on this channel</source>
+        <translation>Spelar in på denna kanal</translation>
+    </message>
+    <message>
+        <source>Recording one showing</source>
+        <translation>Spelar in en visning</translation>
+    </message>
+    <message>
+        <source>Not allowed to record this showing</source>
+        <translation>Inte tillåten att spela in denna visning</translation>
     </message>
 </context>
 <context>
@@ -895,7 +975,7 @@
     </message>
     <message>
         <source>Commercial Skip Method</source>
-        <translation>Metod för reklamdetektering</translation>
+        <translation>Metod för reklamöverhoppning</translation>
     </message>
     <message>
         <source>Blank Frame Detection (default)</source>
@@ -951,7 +1031,7 @@
     </message>
     <message>
         <source>New Recording Free Disk Space Threshold (in Megabytes)</source>
-        <translation>Tröskelvärde för diskutrymme vid ny inspelning (Megabytes)</translation>
+        <translation>Tröskelvärde vid ny inspelning (Megabytes)</translation>
     </message>
     <message>
         <source>MythTV will stop scheduling new recordings on a backend when its free disk space falls below this value.</source>
@@ -1186,10 +1266,6 @@
         <translation>Positionering i horisontalled</translation>
     </message>
     <message>
-        <source>The horizontal offset the GUI will be displayed at.</source>
-        <translation type="obsolete">Justering av bildens position i horisontalled.</translation>
-    </message>
-    <message>
         <source>GUI Y offset</source>
         <translation>Positionering i vertikalled</translation>
     </message>
@@ -1340,10 +1416,6 @@
     <message>
         <source>Seeking</source>
         <translation>Snabbspolning</translation>
-    </message>
-    <message>
-        <source>Commercial Detection</source>
-        <translation type="obsolete">Reklamdetektering</translation>
     </message>
     <message>
         <source>Overscan</source>
@@ -2954,7 +3026,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Commercial Skip Auto-Rewind Amount</source>
-        <translation>Reklamdetektering tillbakaspolning</translation>
+        <translation>Tillbakaspolning vid reklamöverhoppning</translation>
     </message>
     <message>
         <source>If set, Myth will automatically rewind this many seconds after performing a commercial skip.</source>
@@ -3764,10 +3836,6 @@ som du startade detta programmet i.</translation>
         <translation>Spela in med &quot;%1&quot;-profilen</translation>
     </message>
     <message>
-        <source>Duplicate detection</source>
-        <translation type="obsolete">Dubblettkontroll</translation>
-    </message>
-    <message>
         <source>Scheduling Options</source>
         <translation>Inspelningsinställningar</translation>
     </message>
@@ -3898,18 +3966,6 @@ som du startade detta programmet i.</translation>
     <message>
         <source>High</source>
         <translation>Hög</translation>
-    </message>
-    <message>
-        <source>This setting determines approximately how much CPU Commercial Detection threads will consume. On &apos;High&apos;, all available CPU time will be used which may cause problems on slow systems.</source>
-        <translation type="obsolete">Denna inställning bestämmer ungefär hur mycket CPU trådarna för automatisk reklamdetektering använder. Vid &apos;Hög&apos; kommer all tillgänglig CPU-tid användas vilket kan orsaka problem på långsamma system.</translation>
-    </message>
-    <message>
-        <source>Commercial Detection Processing Host</source>
-        <translation type="obsolete">Värddator för automatisk reklamdetektering</translation>
-    </message>
-    <message>
-        <source>Select &apos;Default&apos; to run Commercial Detection on the same backend which created a recording, or select a hostname to run all detection jobs on a specific host.</source>
-        <translation type="obsolete">Välj &apos;Standard&apos; för att köra automatisk reklamdetektering på samma videoserver som skapade inspelningen, eller välj ett värddatornamn för att köra alla detekteringsjobb på en specifik dator.</translation>
     </message>
     <message>
         <source>Enable stricter Commercial Detection code.  Disable if some commercials are not being detected.</source>
@@ -4196,10 +4252,6 @@ som du startade detta programmet i.</translation>
         <translation>Använd XvMC MPEG-hårdvaruavkodning</translation>
     </message>
     <message>
-        <source>Use VIA hardware MPEG Decoding</source>
-        <translation type="obsolete">Använd VIA MPEG-hårdvaruavkodning</translation>
-    </message>
-    <message>
         <source>Sample interval for DVB signal statistics (in seconds)</source>
         <translation>Samplingsintervall för DVB signalstatistik (i sekunder)</translation>
     </message>
@@ -4236,10 +4288,6 @@ som du startade detta programmet i.</translation>
         <translation>Denna och föregående inställning avgör när mythfilldatabase tillåts köra. Exempelvis genom att sätta Min till 11 och Max till 13 kommer programmet endast tillåtas att köras mellan 11 och 13.</translation>
     </message>
     <message>
-        <source>Commercial Detection (Playback)</source>
-        <translation type="obsolete">Reklamdetektering (Uppspelning)</translation>
-    </message>
-    <message>
         <source>(Unassigned)</source>
         <translation>(Ej angiven)</translation>
     </message>
@@ -4254,10 +4302,6 @@ som du startade detta programmet i.</translation>
     <message>
         <source>Show group summary</source>
         <translation>Visa gruppsammanfattning</translation>
-    </message>
-    <message>
-        <source>Shows Program Guide when starting Live TV</source>
-        <translation type="obsolete">Visar programguiden när TV-läge startas</translation>
     </message>
     <message>
         <source>This starts the program guide immediately upon starting to watch Live TV.</source>
@@ -4410,10 +4454,6 @@ som du startade detta programmet i.</translation>
     <message>
         <source>Don&apos;t allow auto expire</source>
         <translation>Tillåt inte autoradering</translation>
-    </message>
-    <message>
-        <source>Delete oldest if this recording exceedes the max episodes</source>
-        <translation type="obsolete">Radera äldsta om max antal avsnitt överskrids</translation>
     </message>
     <message>
         <source>Don&apos;t record if this would exceed the max episodes</source>
@@ -4571,179 +4611,318 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>Delete oldest if this would exceede the max episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Radera äldsta om max antal avsnitt överskrids</translation>
     </message>
     <message>
         <source>Show the program guide when starting Live TV</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa programguiden när TV-läge startas</translation>
     </message>
     <message>
         <source>Completed</source>
-        <translation type="unfinished"></translation>
+        <translation>Slutförd</translation>
     </message>
     <message>
         <source>Paused</source>
-        <translation type="unfinished">Pausad</translation>
+        <translation>Pausad</translation>
     </message>
     <message>
         <source>Restarting</source>
-        <translation type="unfinished"></translation>
+        <translation>Startar om</translation>
     </message>
     <message>
         <source>Completed, %1 FPS</source>
-        <translation type="unfinished"></translation>
+        <translation>Slutförd, %1 FPS</translation>
     </message>
     <message>
         <source>Commercial Breaks Found</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklamavbrott hittade</translation>
     </message>
     <message>
         <source>Post Recording Processing</source>
-        <translation type="unfinished"></translation>
+        <translation>Efterinspelningsbearbetning</translation>
     </message>
     <message>
         <source>Black background for Closed Captioning</source>
-        <translation type="unfinished"></translation>
+        <translation>Svart bakgrund för textning</translation>
     </message>
     <message>
         <source>If enabled, captions will be displayed over a black space for maximum contrast. Otherwise, captions will use outlined text over the picture.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om aktiverad visas undertexter på ett svart område för maximal kontrast. Annars visas undertexter med konturerad text på bilden.</translation>
     </message>
     <message>
         <source>The horizontal offset the GUI will be displayed at.  May only work if run in a window.</source>
-        <translation type="unfinished"></translation>
+        <translation>Den horisontella förskjutning där GUI-et visas. Fungerar eventuellt bara om GUI-et körs i ett fönster.</translation>
     </message>
     <message>
         <source>Default size is 12.</source>
-        <translation type="unfinished">Standardstorlek är 12.</translation>
+        <translation>Standardstorlek är 12.</translation>
     </message>
     <message>
         <source>Use HW XVMC VLD Decoding (Via only)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enables the use of viaXvMC HW Mpeg decoding for the Via Unichome Chipset</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd XVMC VLD hårdvaruavkodning (endast VIA)</translation>
     </message>
     <message>
         <source>Commercial Skip</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklamöverhoppning</translation>
     </message>
     <message>
         <source>Job Queue</source>
-        <translation type="unfinished"></translation>
+        <translation>Jobbkö</translation>
     </message>
     <message>
         <source>Job Queue shows any jobs currently in Myth&apos;s Job Queue such as a commercial flagging job.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jobbkön visar alla jobb som för närvarande finns i Myths jobbkö som exempelvis ett reklamdetekteringsjobb.</translation>
     </message>
     <message>
         <source>Job Queue is currently empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jobbkön är för närvarande tom.</translation>
     </message>
     <message>
         <source>Maximum simultaneous jobs on this backend</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximalt antal samtidiga jobb på denna inspelningsserver</translation>
     </message>
     <message>
         <source>The Job Queue will be limited to running this many simultaneous jobs on this backend.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jobbkön kommer att begränsas till att köra så här många jobb på denna inspelningsserver.</translation>
     </message>
     <message>
         <source>Job Queue Check frequency (in seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Jobbkökontrollfrekvens (i sek)</translation>
     </message>
     <message>
         <source>When looking for new jobs to process, the Job Queue will wait this long between checks.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tid mellan sökningar efter nya jobb att bearbeta.</translation>
     </message>
     <message>
         <source>This setting controls approximately how much CPU jobs in the queue may consume. On &apos;High&apos;, all available CPU time may be used which could cause problems on slower systems.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denna inställning bestämmer ungefär hur mycket CPU jobb i kön får använda. Vid &apos;Hög&apos; kommer all tillgänglig CPU-tid användas vilket kan orsaka problem på långsamma system.</translation>
     </message>
     <message>
         <source>Run Jobs only on original recording host</source>
-        <translation type="unfinished"></translation>
+        <translation>Kör jobb endast på ursprunglig inspelningsserver</translation>
     </message>
     <message>
         <source>If set, jobs in the queue will be required to run on the backend that made the original recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om aktiverad kommer jobb i kön endast att köras på den inspelningsserver som skapade den ursprunliga inspelningen.</translation>
     </message>
     <message>
         <source>User Job #1 Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Beskrivning för användarjobb #1</translation>
     </message>
     <message>
         <source>The Description for this User Job.</source>
-        <translation type="unfinished"></translation>
+        <translation>Beskrivningen för detta användarjobb.</translation>
     </message>
     <message>
         <source>User Job #1 Command</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando för användardjobb #1</translation>
     </message>
     <message>
         <source>The command to run whenever this User Job number is scheduled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Det kommando som ska köras närhelst detta användarjobbnummer är satt att köras.</translation>
     </message>
     <message>
         <source>User Job #2 Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Beskrivning för användarjobb #2</translation>
     </message>
     <message>
         <source>User Job #2 Command</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando för användardjobb #2</translation>
     </message>
     <message>
         <source>User Job #3 Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Beskrivning för användarjobb #3</translation>
     </message>
     <message>
         <source>User Job #3 Command</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando för användardjobb #3</translation>
     </message>
     <message>
         <source>User Job #4 Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Beskrivning för användarjobb #4</translation>
     </message>
     <message>
         <source>User Job #4 Command</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando för användardjobb #4</translation>
     </message>
     <message>
         <source>Allow Transcoding jobs</source>
-        <translation type="unfinished"></translation>
+        <translation>Tillåt omkodningsjobb</translation>
     </message>
     <message>
         <source>Allow jobs of this type to run on this backend.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tillåt jobb av denna typ att köra på denna inspelningsserver.</translation>
     </message>
     <message>
         <source>Allow Commercial Detection jobs</source>
-        <translation type="unfinished"></translation>
+        <translation>Tillåt reklamdetekteringsjobb</translation>
     </message>
     <message>
         <source>Allow &apos;User Job #1&apos; jobs</source>
-        <translation type="unfinished"></translation>
+        <translation>Tillåt &apos;användarjobb #1&apos;-jobb</translation>
     </message>
     <message>
         <source>Allow &apos;User Job #2&apos; jobs</source>
-        <translation type="unfinished"></translation>
+        <translation>Tillåt &apos;användarjobb #2&apos;-jobb</translation>
     </message>
     <message>
         <source>Allow &apos;User Job #3&apos; jobs</source>
-        <translation type="unfinished"></translation>
+        <translation>Tillåt &apos;användarjobb #3&apos;-jobb</translation>
     </message>
     <message>
         <source>Allow &apos;User Job #4&apos; jobs</source>
-        <translation type="unfinished"></translation>
+        <translation>Tillåt &apos;användarjobb #4&apos;-jobb</translation>
     </message>
     <message>
         <source>Job Queue (Host-Specific)</source>
-        <translation type="unfinished"></translation>
+        <translation>Jobbkö (värdspecifik)</translation>
     </message>
     <message>
         <source>Job Queue (Global)</source>
-        <translation type="unfinished"></translation>
+        <translation>Jobbkö (global)</translation>
+    </message>
+    <message>
+        <source>Power Search</source>
+        <translation>Avancerad sökning</translation>
+    </message>
+    <message>
+        <source>Re-record programs which have been automatically expired</source>
+        <translation>Återinspela program som har tagits bort automatiskt</translation>
+    </message>
+    <message>
+        <source>If set, programs that are automatically deleted (expired) will be allowed to re-recorded if they are shown again.</source>
+        <translation>Om aktiverat kommer program som tas bort automatiskt (av funktionen autoradera) att tillåtas bli återinspelade om de visas igen.</translation>
+    </message>
+    <message>
+        <source>Enables the use of viaXvMC HW Mpeg decoding for the Via Unichrome Chipset</source>
+        <translation>Aktiverar användning av viaXvMC MPEG-hårdvaruavkodning för Via Unichrome-chipsetet</translation>
+    </message>
+    <message>
+        <source>Scale video as necessary</source>
+        <translation>Skala video vid behov</translation>
+    </message>
+    <message>
+        <source>If checked, video will be scaled to fit your window or screen. If unchecked, video will never be made larger than its actual pixel size.</source>
+        <translation>Om aktiverat kommer video att skalas för att passa ditt fönster eller skärm. Annars kommer aldrig video att göras större än verklig pixelstorlek.</translation>
+    </message>
+    <message>
+        <source>Frames to skip in fullscreen mode</source>
+        <translation>Bildrutor att hoppa över i fullskärmsläge</translation>
+    </message>
+    <message>
+        <source>Video displayed in fullscreen or non-windowed mode will skip this many frames for each frame drawn. Set to 0 to show every frame. Only valid when either &quot;Use GUI size for TV playback&quot; or &quot;Run the frontend in a window&quot; is not checked.</source>
+        <translation>Video som visas i fullskärmsläge eller i fönsterlöst läge kommer att hoppa över så här många bildrutor för varje uppritad ruta. Sätt till 0 för att visa varje ruta. Endast giltigt när antingen &quot;Använd GUI-storlek för uppspelning&quot; eller &quot;Kör användargränssnittet i ett fönster&quot; inte är aktiverat.</translation>
+    </message>
+    <message>
+        <source>Video in main window</source>
+        <translation>Video i huvudfönster</translation>
+    </message>
+    <message>
+        <source>If checked, video will be displayed in the main GUI window. Disable this when you only want video on the desktop or in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
+        <translation>Om aktiverat visas video i huvudfönstret. Avaktivera detta när du endast vill ha video på skrivbordet eller i ett flytande fönster. Endast giltigt när &quot;Använd GUI-storlek för uppspelning&quot; och &quot;Kör användargränssnittet i ett fönster&quot; är aktiverade.</translation>
+    </message>
+    <message>
+        <source>Frames to skip</source>
+        <translation>Bildrutor att hoppa över</translation>
+    </message>
+    <message>
+        <source>Video in the main window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
+        <translation>Video i huvudfönstret kommer att hoppa över så här många bildrutor för varje uppritad ruta. Sätt till 0 för att visa varje ruta.</translation>
+    </message>
+    <message>
+        <source>Opacity</source>
+        <translation>Ogenomskinlighet</translation>
+    </message>
+    <message>
+        <source>The opacity of the main window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
+        <translation>Ogenomskinlighet för huvudfönstret. Sätt till 100 för helt ogenomskinligt, sätt till 0 för helt genomskinligt.</translation>
+    </message>
+    <message>
+        <source>Video in floating window</source>
+        <translation>Video i flytande fönster</translation>
+    </message>
+    <message>
+        <source>If checked, video will be displayed in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
+        <translation>Om aktiverat kommer video att visas i ett flytande fönster. Endast giltigt när &quot;Använd GUI-storlek för uppspelning&quot; och &quot;Kör användargränssnittet i ett fönster&quot; är aktiverade.</translation>
+    </message>
+    <message>
+        <source>Video in the floating window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
+        <translation>Video i det flytande fönstret kommer att hoppa över så här många bildrutor för varje uppritad ruta. Sätt till 0 för att visa varje ruta.</translation>
+    </message>
+    <message>
+        <source>The opacity of the floating window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
+        <translation>Ogenomskinlighet för det flytande fönstret. Sätt till 100 för helt ogenomskinligt, sätt till 0 för helt genomskinligt.</translation>
+    </message>
+    <message>
+        <source>Video in the dock</source>
+        <translation>Video i dockan</translation>
+    </message>
+    <message>
+        <source>If checked, video will be displayed in the application&apos;s dock icon. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
+        <translation>Om aktiverat kommer video att visas i applikationens dockningsikon. Endast giltigt när &quot;Använd GUI-storlek för uppspelning&quot; och &quot;Kör användargränssnittet i ett fönster&quot; är aktiverade.</translation>
+    </message>
+    <message>
+        <source>Video in the dock icon will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
+        <translation>Video i dockningsikonen kommer att hoppa över så här många bildrutor för varje uppritad ruta. Sätt till 0 för att visa varje ruta.</translation>
+    </message>
+    <message>
+        <source>Video on the desktop</source>
+        <translation>Video på skrivbordet</translation>
+    </message>
+    <message>
+        <source>If checked, video will be displayed on the desktop, behind the Finder icons. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
+        <translation>Om aktiverat visas video på skrivbordet, bakom ikonerna. Endast giltigt när &quot;Använd GUI-storlek för uppspelning&quot; och &quot;Kör användargränssnittet i ett fönster&quot; är aktiverade.</translation>
+    </message>
+    <message>
+        <source>Video on the desktop will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
+        <translation>Video på skrivbordet kommer att hoppa över så här många bildrutor för varje uppritad ruta. Sätt till 0 för att visa varje ruta.</translation>
+    </message>
+    <message>
+        <source>Mac OS X video settings</source>
+        <translation>Mac OS X videoinställningar</translation>
+    </message>
+    <message>
+        <source>Delete Job?</source>
+        <translation>Ta bort jobb?</translation>
+    </message>
+    <message>
+        <source>Pause</source>
+        <translation>Pausa</translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation>Stoppa</translation>
+    </message>
+    <message>
+        <source>Job Queue Actions:</source>
+        <translation>Jobbköhandlingar:</translation>
+    </message>
+    <message>
+        <source>Resume</source>
+        <translation>Återuppta</translation>
+    </message>
+    <message>
+        <source>Requeue Job?</source>
+        <translation>Återköa jobb?</translation>
+    </message>
+    <message>
+        <source>Follow Symlinks when deleting files</source>
+        <translation>Följ symboliska länkar vid borttagning av filer</translation>
+    </message>
+    <message>
+        <source>This will cause Myth to follow symlinks when recordings and related files are deleted, instead of deleting the symlink and leaving the actual file.</source>
+        <translation>Detta får Myth att följa symboliska länkar när inspelningar och relaterade filer tas bort, i stället för att ta bort den symboliska länken och lämna kvar den egentliga filen.</translation>
+    </message>
+    <message>
+        <source>star</source>
+        <translation>stjärna</translation>
+    </message>
+</context>
+<context>
+    <name>ScheduledRecording</name>
+    <message>
+        <source>Power Search</source>
+        <translation>Avancerad sökning</translation>
     </message>
 </context>
 <context>
@@ -4766,11 +4945,15 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>Job:</source>
-        <translation type="unfinished"></translation>
+        <translation>Jobb:</translation>
     </message>
     <message>
         <source>Status: </source>
-        <translation type="unfinished"></translation>
+        <translation>Status: </translation>
+    </message>
+    <message>
+        <source>is not available</source>
+        <translation>är inte tillgänglig</translation>
     </message>
 </context>
 <context>
@@ -5160,10 +5343,6 @@ som du startade detta programmet i.</translation>
         <translation>Ljudspår</translation>
     </message>
     <message>
-        <source>Jump to Begining</source>
-        <translation type="obsolete">Hoppa till början</translation>
-    </message>
-    <message>
         <source>You are exiting this video</source>
         <translation>Du går ur denna inspelning</translation>
     </message>
@@ -5173,7 +5352,11 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>Jump to Beginning</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoppa till början</translation>
+    </message>
+    <message>
+        <source>Try Again</source>
+        <translation>Försök igen</translation>
     </message>
 </context>
 <context>
