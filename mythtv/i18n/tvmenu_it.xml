@@ -10,20 +10,13 @@
       <type>TV_SCHEDULE</type>
       <text>Programma una registrazione</text>
       <alttext>Schedule</alttext>
-      <action>MENU tv_schedule.xml</action>
+      <action>MENU tv_schedule_it.xml</action>
    </button>
 
    <button>
       <type>TV_PLAYBACK</type>
       <text>Guarda una registrazione</text>
       <action>TV_WATCH_RECORDING</action>
-   </button>
-
-   <button>
-      <type>TV_CONFLICTS</type>
-      <text>Correggi i conflitti</text>
-      <alttext>Fix Conflicts</alttext>
-      <action>TV_FIX_CONFLICTS</action>
    </button>
 
    <button>

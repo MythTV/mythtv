@@ -23,7 +23,14 @@ XMLParse::~XMLParse()
 bool XMLParse::LoadTheme(QDomElement &ele, QString winName, QString specialfile)
 {
     QString themepath = gContext->FindThemeDir("") + gContext->GetSetting("Theme");
-    QString themefile = themepath + "/" + specialfile + "ui.xml";
+    QString themefile = themepath + "/" + specialfile + "ui_" +
+                        QString(gContext->GetSetting("Locale").lower()) +
+                        ".xml";
+
+    QFile filetest(themefile);
+    
+    if (!filetest.exists())
+        themefile = themepath + "/" + specialfile + "ui.xml";
 
     QDomDocument doc;
     QFile f(themefile);

@@ -470,19 +470,19 @@ void ProgFinder::getInfo()
                 switch (rectype)
                 {
                         case ScheduledRecording::SingleRecord:
-                            data = "Recording just this showing";
+                            data = tr("Recording just this showing");
                             break;
                         case ScheduledRecording::TimeslotRecord:
-                            data = "Recording when shown in this timeslot";
+                            data = tr("Recording when shown in this timeslot");
                             break;
                         case ScheduledRecording::ChannelRecord:
-                            data = "Recording when shown on this channel";
+                            data = tr("Recording when shown on this channel");
                             break;
                         case ScheduledRecording::AllRecord:
-                            data = "Recording all showings";
+                            data = tr("Recording all showings");
                             break;
                         case ScheduledRecording::NotRecording:
-                            data = "Not recording this showing";
+                            data = tr("Not recording this showing");
                             break;
                         default:
                             data = "Error!";
@@ -1299,19 +1299,19 @@ void ProgFinder::selectShowData(QString progTitle)
 		switch (rectype)
 		{
 			case ScheduledRecording::SingleRecord:
-                            data = "Recording just this showing";
+                            data = tr("Recording just this showing");
                             break;
                         case ScheduledRecording::TimeslotRecord:
-                            data = "Recording when shown in this timeslot";
+                            data = tr("Recording when shown in this timeslot");
                             break;
                         case ScheduledRecording::ChannelRecord:
-                            data = "Recording when shown on this channel";
+                            data = tr("Recording when shown on this channel");
                             break;
                         case ScheduledRecording::AllRecord:
-                            data = "Recording all showings";
+                            data = tr("Recording all showings");
                             break;
                         case ScheduledRecording::NotRecording:
-			    data = "Not recording this showing";
+			    data = tr("Not recording this showing");
                             break;
 			default:
 			    data = "Error!";

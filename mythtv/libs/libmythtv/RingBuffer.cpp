@@ -42,6 +42,7 @@ private:
     pthread_mutex_t buflock;
     int in_dtor;
     pthread_t writer;
+    bool no_writes;
 };
 
 static unsigned safe_write(int fd, const void *data, unsigned sz)
@@ -78,6 +79,7 @@ ThreadedFileWriter::ThreadedFileWriter(const char *filename,
 {
     pthread_mutex_t init = PTHREAD_MUTEX_INITIALIZER;
 
+    no_writes = false;
     buflock = init;
     buf = NULL;
     rpos = wpos = 0;
@@ -101,6 +103,10 @@ ThreadedFileWriter::ThreadedFileWriter(const char *filename,
 
 ThreadedFileWriter::~ThreadedFileWriter()
 {
+    no_writes = true;
+    while(BufUsed() > 0)
+        usleep(5000);
+
     in_dtor = 1; /* tells child thread to exit */
 
     pthread_join(writer, NULL);
@@ -126,7 +132,10 @@ unsigned ThreadedFileWriter::Write(const void *data, unsigned count)
 	first = 0;
 	usleep(5000);
     }
-    
+   
+    if (no_writes)
+        return 0;
+ 
     if((wpos + count) > TFW_BUF_SIZE)
     {
 	int first_chunk_size = TFW_BUF_SIZE - wpos;
@@ -347,9 +356,13 @@ void RingBuffer::TransitionToFile(const QString &lfilename)
 // guaranteed to be paused, so don't need to lock this
 void RingBuffer::TransitionToRing(void)
 {
+    pthread_rwlock_wrlock(&rwlock);
+
     delete dumpfw;
     dumpfw = NULL;
     dumpwritepos = 0;
+
+    pthread_rwlock_unlock(&rwlock);
 }
 
 void RingBuffer::Reset(void)
@@ -544,22 +557,38 @@ int RingBuffer::Read(void *buf, int count)
 
 int RingBuffer::WriteToDumpFile(const void *buf, int count)
 {
+    pthread_rwlock_rdlock(&rwlock);
+
+    if (!dumpfw)
+    {
+        pthread_rwlock_unlock(&rwlock);
+        return -1;
+    }
+
     int ret = dumpfw->Write(buf, count);
     dumpwritepos += ret;
+    pthread_rwlock_unlock(&rwlock);
+
     return ret;
 }
 
 bool RingBuffer::IsIOBound(void)
 {
-    bool ret;
+    bool ret = false;
     int used, free;
     ThreadedFileWriter *fw;
     pthread_rwlock_rdlock(&rwlock);
 
     fw = dumpfw ? dumpfw : tfw;
 
-    used = tfw->BufUsed();
-    free = tfw->BufFree();
+    if (!fw)
+    {
+        pthread_rwlock_unlock(&rwlock);
+        return ret;
+    }
+
+    used = fw->BufUsed();
+    free = fw->BufFree();
 
     ret = (used * 5 > free);
 
@@ -572,6 +601,12 @@ int RingBuffer::Write(const void *buf, int count)
     int ret = -1;
 
     pthread_rwlock_rdlock(&rwlock);
+
+    if (!tfw)
+    {
+        pthread_rwlock_unlock(&rwlock);
+        return ret;
+    }
 
     if (normalfile)
     {
@@ -696,9 +731,9 @@ long long RingBuffer::WriterSeek(long long pos, int whence)
 {
     long long ret = -1;
 
-    if(dumpfw)
+    if (dumpfw)
 	ret = dumpfw->Seek(pos, whence);
-    else
+    else if (tfw)
 	ret = tfw->Seek(pos, whence);
 
     return ret;

@@ -8,9 +8,9 @@
 
    <button>
      <type>MUSIC</type>
-     <text>Music</text>
+     <text>Musica</text>
      <action>EXEC mythmusic</action>
-     <depends>musicmenu.xml</depends>
+     <depends>musicmenu_it.xml</depends>
    </button>
 
    <button>
