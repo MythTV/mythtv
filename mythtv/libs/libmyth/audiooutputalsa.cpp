@@ -225,21 +225,33 @@ void AudioOutputALSA::AddSamples(char *buffer, int frames, long long timecode)
     int err;
     
  retry:
-    if(pcm_handle == NULL)
+    if (pcm_handle == NULL)
         return;
     
 //    printf("Trying to write %d i frames to soundbuffer\n", frames);
-    err = snd_pcm_mmap_writei(pcm_handle, buffer, frames);
-    if (err == -EAGAIN || (err >= 0 && err != frames))
-        printf("Audio buffer overflow, audio data lost!\n");
-    else if (err < 0) {
-        if (xrun_recovery(pcm_handle, err) < 0) {
-            printf("Write error: %s\n", snd_strerror(err));
-            printf("Disabling sound output.\n");
-            snd_pcm_close(pcm_handle);
-            pcm_handle = NULL;
+    while (frames > 0)
+    {
+        err = snd_pcm_mmap_writei(pcm_handle, buffer, frames);
+        if (err >= 0)
+        {
+            buffer += err * audio_bytes_per_sample;
+            frames -= err;
         }
-        goto retry;
+        else if (err == -EAGAIN)
+        {
+            snd_pcm_wait(pcm_handle, 10);
+        }
+        else if (err < 0)
+        {
+            if (xrun_recovery(pcm_handle, err) < 0) 
+            {
+                printf("Write error: %s\n", snd_strerror(err));
+                printf("Disabling sound output.\n");
+                snd_pcm_close(pcm_handle);
+                pcm_handle = NULL;
+            }
+            goto retry;
+        }
     }
     
     if(timecode < 0) 

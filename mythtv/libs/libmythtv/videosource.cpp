@@ -130,6 +130,16 @@ void ProviderSelector::fillSelections(const QString& location) {
 void XMLTV_na_config::save(QSqlDatabase* db) {
     (void)db;
 
+    QString waitMsg(QObject::tr("Please wait while MythTV retrieves the "
+                                "list of channels for\nyour provider.  You "
+                                "might want to check the output as it\n"
+                                "runs by switching to the terminal from "
+                                "which you started\nthis program."));
+    MythProgressDialog pdlg( waitMsg, 2 );
+    VERBOSE(VB_GENERAL, QString("Please wait while we MythTV retrieves the "
+                                "list of channelsfor your provider")); 
+    pdlg.show(); 
+
     QString filename = QString("%1/.mythtv/%2.xmltv")
         .arg(QDir::homeDirPath()).arg(parent.getSourceName());
     QString command = QString("tv_grab_na --config-file '%1' --configure --retry-limit %2 --retry-delay %3 --postalcode %4 --provider %5 --auto-new-channels add")
@@ -139,17 +149,40 @@ void XMLTV_na_config::save(QSqlDatabase* db) {
         .arg(postalcode->getValue().replace(QRegExp(" "), ""))
         .arg(provider->getValue());
 
+    pdlg.setProgress(1);
+
     int ret = system(command);
 
     if (ret != 0)
     {
         VERBOSE(VB_GENERAL, command);
         VERBOSE(VB_GENERAL, QString("exited with status %1").arg(ret));
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
+                                  QObject::tr("Failed to get channel "
+                                              "information."),
+                                  QObject::tr("MythTV was unable to retrieve "
+                                              "channel information for your "
+                                              "provider.\nPlesae check the "
+                                              "terminal window for more "
+                                              "information"));
     }
+
+    pdlg.setProgress( 2 );
+    pdlg.Close();
 }
 
 void XMLTV_uk_config::save(QSqlDatabase* db) {
     (void)db;
+
+    QString waitMsg(QObject::tr("Please wait while MythTV retrieves the "
+                                "list of channels for\nyour provider.  You "
+                                "might want to check the output as it\n"
+                                "runs by switching to the terminal from "
+                                "which you started\nthis program."));
+    MythProgressDialog pdlg( waitMsg, 2 );
+    VERBOSE(VB_GENERAL, QString("Please wait while we MythTV retrieves the "
+                                "list of channelsfor your provider"));
+    pdlg.show();
 
     QString filename = QString("%1/.mythtv/%2.xmltv")
         .arg(QDir::homeDirPath()).arg(parent.getSourceName());
@@ -160,16 +193,39 @@ void XMLTV_uk_config::save(QSqlDatabase* db) {
         .arg(region->getValue())
         .arg(provider->getValue());
 
+    pdlg.setProgress(1);
+
     int ret = system(command);
     if (ret != 0)
     {
         VERBOSE(VB_GENERAL, command);
         VERBOSE(VB_GENERAL, QString("exited with status %1").arg(ret));
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                  QObject::tr("Failed to get channel "
+                                              "information."),
+                                  QObject::tr("MythTV was unable to retrieve "
+                                              "channel information for your "
+                                              "provider.\nPlesae check the "
+                                              "terminal window for more "
+                                              "information"));
     }
+
+    pdlg.setProgress( 2 );
+    pdlg.Close();
 }
 
 void XMLTV_generic_config::save(QSqlDatabase* db) {
     (void)db;
+
+    QString waitMsg(QObject::tr("Please wait while MythTV retrieves the "
+                                "list of channels for\nyour provider.  You "
+                                "might want to check the output as it\n"
+                                "runs by switching to the terminal from "
+                                "which you started\nthis program."));
+    MythProgressDialog pdlg( waitMsg, 2 );
+    VERBOSE(VB_GENERAL, QString("Please wait while we MythTV retrieves the "
+                                "list of channelsfor your provider"));
+    pdlg.show();
 
     QString command;
     if (grabber == "tv_grab_de") {
@@ -182,11 +238,22 @@ void XMLTV_generic_config::save(QSqlDatabase* db) {
             .arg(grabber).arg(filename);
     }
 
+    pdlg.setProgress(1);
+
     int ret = system(command);
     if (ret != 0)
     {
         VERBOSE(VB_GENERAL, command);
         VERBOSE(VB_GENERAL, QString("exited with status %1").arg(ret));
+
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                  QObject::tr("Failed to get channel "
+                                              "information."),
+                                  QObject::tr("MythTV was unable to retrieve "
+                                              "channel information for your "
+                                              "provider.\nPlesae check the "
+                                              "terminal window for more "
+                                              "information"));
     }
 
     if (grabber == "tv_grab_de" || grabber == "tv_grab_sn" || 
@@ -197,8 +264,20 @@ void XMLTV_generic_config::save(QSqlDatabase* db) {
              << "instead\n";
         cerr << "of just 'mythfilldatabase'.  Your grabber does not provide\n";
         cerr << "channel numbers, so you have to set them manually.\n";
+
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
+                                  QObject::tr("Warning."),
+                                  QObject::tr("You MUST run 'mythfilldatabase "
+                                              "--manual the first time,\n "
+                                              "instead of just "
+                                              "'mythfilldatabase'.\nYour "
+                                              "grabber does not provide "
+                                              "channel numbers, so you have to "
+                                              "set them manually.") );
     }
 
+    pdlg.setProgress( 2 );    
+    pdlg.Close();
 }
 
 void VideoSource::fillSelections(QSqlDatabase* db,
