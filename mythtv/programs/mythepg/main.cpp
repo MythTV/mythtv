@@ -1,5 +1,6 @@
 #include <qapplication.h>
 #include <qsqldatabase.h>
+#include <qcursor.h>
 
 #include "guidegrid.h"
 
@@ -30,14 +31,16 @@ int main(int argc, char **argv)
     gg.setFixedHeight(600);
     a.setMainWidget(&gg);
 
+    gg.setCursor(QCursor(Qt::BlankCursor));
     gg.showFullScreen();
-    //gg.show();
 
     gg.setActiveWindow();
     gg.raise();
     gg.setFocus();
 
     a.exec();
+
+    gg.unsetCursor();
 
     int chan = gg.getLastChannel();
     return chan;

@@ -731,9 +731,17 @@ void GuideGrid::displayInfo()
 {
     showInfo = 1;
 
-    InfoDialog *diag = new InfoDialog(this, "Program Info");
-    diag->setCaption("BLAH!!!");
-    diag->exec();
+    ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
+
+    if (pginfo)
+    {
+        InfoDialog *diag = new InfoDialog(pginfo, this, "Program Info");
+        diag->setCaption("BLAH!!!");
+        diag->exec();
+    }
 
     showInfo = 0;
+
+    setActiveWindow();
+    setFocus();
 }

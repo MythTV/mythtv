@@ -7,6 +7,7 @@
 #include <qdatetime.h>
 
 class QFont;
+
 class ChannelInfo 
 {
  public:
