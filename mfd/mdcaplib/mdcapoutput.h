@@ -74,6 +74,8 @@ class MdcapOutput
     void addCollectionCount(int collection_count);
     void addCollectionId(int collection_id);
     void addCollectionType(int collection_type);
+    void addCollectionEditable(bool yes_or_no);
+    void addCollectionRipable(bool yes_or_no);
     void addCollectionGeneration(int collection_generation);    
     void addUpdateType(bool full_or_not);
     void addTotalItems(uint count);

@@ -43,6 +43,8 @@ class MdcapInput
     uint32_t    popCollectionCount();
     uint32_t    popCollectionId();
     uint32_t    popCollectionType();
+    bool        popCollectionEditable();
+    bool        popCollectionRipable();
     uint32_t    popCollectionGeneration();
     bool        popUpdateType();
     uint32_t    popTotalItems();

@@ -41,6 +41,8 @@ const char MarkupCodes::collection_count;
 const char MarkupCodes::collection_id;
 const char MarkupCodes::collection_type;
 const char MarkupCodes::collection_generation;
+const char MarkupCodes::collection_is_editable;
+const char MarkupCodes::collection_is_ripable;
 const char MarkupCodes::update_type;
 const char MarkupCodes::total_items;
 const char MarkupCodes::added_items;

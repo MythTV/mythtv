@@ -379,6 +379,90 @@ uint32_t MdcapInput::popCollectionType()
 }
 
 
+bool MdcapInput::popCollectionEditable()
+{
+    //
+    //  Editable is 2 bytes
+    //  1 - content markup code
+    //  2 - int; 0 is false
+    //           1 is true
+    //
+    
+    if(amountLeft() < 2)
+    {
+        cerr << "mdcapinput.o: asked to popCollectionEditable(), but not enough "
+             << "bytes left";
+        return false;
+    }
+    
+    char content_code = popByte();
+    if(content_code != MarkupCodes::collection_is_editable)
+    {
+        cerr << "mdcapinput.o: asked to popCollectionEditable(), but "
+             << "content code is not collection_is_editable "
+             << endl;
+        return false;
+    }
+    
+    uint8_t result = popByte();
+    if(result == 1)
+    {
+        return true;
+    }
+    else if(result == 0)
+    {
+        return false;
+    }
+    
+    cerr << "mdcapinput.o: asked to popCollectionEditable(), but value was "
+         << "neither true not false"
+         << endl;
+    return false;
+}
+
+
+bool MdcapInput::popCollectionRipable()
+{
+    //
+    //  Ripable is 2 bytes
+    //  1 - content markup code
+    //  2 - int; 0 is false
+    //           1 is true
+    //
+    
+    if(amountLeft() < 2)
+    {
+        cerr << "mdcapinput.o: asked to popCollectionRipable(), but not enough "
+             << "bytes left";
+        return false;
+    }
+    
+    char content_code = popByte();
+    if(content_code != MarkupCodes::collection_is_ripable)
+    {
+        cerr << "mdcapinput.o: asked to popCollectionRipable(), but "
+             << "content code is not collection_is_ripable "
+             << endl;
+        return false;
+    }
+    
+    uint8_t result = popByte();
+    if(result == 1)
+    {
+        return true;
+    }
+    else if(result == 0)
+    {
+        return false;
+    }
+    
+    cerr << "mdcapinput.o: asked to popCollectionRipable(), but value was "
+         << "neither true not false"
+         << endl;
+    return false;
+}
+
+
 uint32_t MdcapInput::popCollectionGeneration()
 {
     //

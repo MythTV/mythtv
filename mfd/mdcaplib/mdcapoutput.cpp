@@ -344,6 +344,40 @@ void MdcapOutput::addCollectionType(int collection_type)
     append((uint32_t) collection_type);
 }
 
+void MdcapOutput::addCollectionEditable(bool yes_or_no)
+{
+    //
+    //  Editable is 2 bytes
+    //
+
+    append(MarkupCodes::collection_is_editable);
+    if(yes_or_no)
+    {
+        append((uint8_t) 1);
+    }    
+    else
+    {
+        append((uint8_t) 0);
+    }
+}
+
+void MdcapOutput::addCollectionRipable(bool yes_or_no)
+{
+    //
+    //  Ripable is 2 bytes
+    //
+
+    append(MarkupCodes::collection_is_ripable);
+    if(yes_or_no)
+    {
+        append((uint8_t) 1);
+    }    
+    else
+    {
+        append((uint8_t) 0);
+    }
+}
+
 void MdcapOutput::addCollectionGeneration(int collection_generation)
 {
     //
@@ -357,7 +391,7 @@ void MdcapOutput::addCollectionGeneration(int collection_generation)
 void MdcapOutput::addUpdateType(bool full_or_not)
 {
     //
-    //  Update type is 3 bytes
+    //  Update type is 2 bytes
     //
 
     append(MarkupCodes::update_type);
