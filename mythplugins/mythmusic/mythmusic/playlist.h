@@ -114,7 +114,7 @@ class PlaylistsContainer
 {
   public:
   
-    PlaylistsContainer(QSqlDatabase *db_ptr, AllMusic *all_music);
+    PlaylistsContainer(QSqlDatabase *db_ptr, AllMusic *all_music, QString host_name);
    ~PlaylistsContainer();
 
     void            load();
@@ -146,7 +146,6 @@ class PlaylistsContainer
     void            clearActive();
     bool            doneLoading(){return done_loading;}
     bool            cleanOutThreads();
-    void            setHost(QString a_name){my_host = a_name;}
 
   private:
   

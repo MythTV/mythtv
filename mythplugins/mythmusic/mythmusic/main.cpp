@@ -436,8 +436,7 @@ static void preMusic(MusicData *mdata)
     AllMusic *all_music = new AllMusic(db, paths, startdir);
 
     //  Load all playlists into RAM (once!)
-    PlaylistsContainer *all_playlists = new PlaylistsContainer(db, all_music);
-    all_playlists->setHost(gContext->GetHostName());
+    PlaylistsContainer *all_playlists = new PlaylistsContainer(db, all_music, gContext->GetHostName());
 
     mdata->paths = paths;
     mdata->startdir = startdir;

@@ -283,7 +283,7 @@ bool PlaylistsContainer::checkCDTrack(int track)
     return false;
 }
 
-PlaylistsContainer::PlaylistsContainer(QSqlDatabase *db_ptr, AllMusic *all_music)
+PlaylistsContainer::PlaylistsContainer(QSqlDatabase *db_ptr, AllMusic *all_music, QString host_name)
 {
     if(!db_ptr)
     {
@@ -292,7 +292,7 @@ PlaylistsContainer::PlaylistsContainer(QSqlDatabase *db_ptr, AllMusic *all_music
     }
     db = db_ptr;
     active_widget = NULL;
-    my_host = "";
+    my_host = host_name;
  
     active_playlist = NULL;
     backup_playlist = NULL;
