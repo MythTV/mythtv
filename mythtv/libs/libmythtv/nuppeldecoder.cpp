@@ -280,12 +280,12 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo)
 
     foundit = 0;
 
-    effdsp = audio_samplerate;
+    effdsp = audio_samplerate * 100;
     m_parent->SetEffDsp(effdsp);
 
     if (usingextradata)
     {
-        effdsp = extradata.audio_sample_rate;
+        effdsp = extradata.audio_sample_rate * 100;
         m_parent->SetEffDsp(effdsp);
         audio_samplerate = extradata.audio_sample_rate;
         m_parent->SetAudioParams(extradata.audio_bits_per_sample,
@@ -991,8 +991,7 @@ bool NuppelDecoder::DoFastForward(long long desiredFrame)
     return true;
 }
 
-char *NuppelDecoder::GetScreenGrab(int secondsin, int &bufflen, int &vw,
-                                   int &vh)
+char *NuppelDecoder::GetScreenGrab(int secondsin)
 {
     int number = (int)(secondsin * video_frame_rate);
 
@@ -1127,11 +1126,7 @@ char *NuppelDecoder::GetScreenGrab(int secondsin, int &bufflen, int &vw,
     }
 
     if (!frame)
-    {
-        bufflen = 0;
-        vw = vh = 0;
         return NULL;
-    }
 
     return (char *)buf;
 }

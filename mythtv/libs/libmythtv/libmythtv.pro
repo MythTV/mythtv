@@ -8,8 +8,8 @@ CONFIG += thread staticlib
 
 include ( ../../settings.pro )
 
-INCLUDEPATH += ../libmyth ../ 
-DEPENDPATH += ../libmyth ../libvbitext ../libavcodec
+INCLUDEPATH += ../libmyth ../  ../libavcodec ../libavformat
+DEPENDPATH += ../libmyth ../libvbitext ../libavcodec ../libavformat
 
 QMAKE_CXXFLAGS_RELEASE += `freetype-config --cflags`
 QMAKE_CXXFLAGS_DEBUG += `freetype-config --cflags`
@@ -21,7 +21,7 @@ HEADERS += minilzo.h mmx.h NuppelVideoPlayer.h NuppelVideoRecorder.h osd.h
 HEADERS += osdtypes.h programinfo.h recordingprofile.h remoteencoder.h
 HEADERS += remoteutil.h RingBuffer.h RTjpegN.h scheduledrecording.h
 HEADERS += ttfont.h tv_play.h tv_rec.h videosource.h XJ.h yuv2rgb.h
-HEADERS += progfind.h decoderbase.h nuppeldecoder.h
+HEADERS += progfind.h decoderbase.h nuppeldecoder.h avformatdecoder.h
 
 SOURCES += channel.cpp commercial_skip.cpp filter.c frequencies.c guidegrid.cpp
 SOURCES += infodialog.cpp infostructs.cpp jitterometer.cpp minilzo.cpp 
@@ -29,4 +29,4 @@ SOURCES += NuppelVideoPlayer.cpp NuppelVideoRecorder.cpp osd.cpp
 SOURCES += osdtypes.cpp programinfo.cpp recordingprofile.cpp remoteencoder.cpp
 SOURCES += remoteutil.cpp RingBuffer.cpp RTjpegN.cpp scheduledrecording.cpp
 SOURCES += ttfont.cpp tv_play.cpp tv_rec.cpp videosource.cpp XJ.cpp yuv2rgb.cpp
-SOURCES += progfind.cpp nuppeldecoder.cpp
+SOURCES += progfind.cpp nuppeldecoder.cpp avformatdecoder.cpp

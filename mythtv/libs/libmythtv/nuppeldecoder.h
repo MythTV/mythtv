@@ -38,7 +38,7 @@ class NuppelDecoder : public DecoderBase
     bool DoRewind(long long desiredFrame);
     bool DoFastForward(long long desiredFrame);
 
-    char *GetScreenGrab(int secondsin, int &bufflen, int &vw, int &vh);
+    char *GetScreenGrab(int secondsin);
 
   private:
     bool DecodeFrame(struct rtframeheader *frameheader,

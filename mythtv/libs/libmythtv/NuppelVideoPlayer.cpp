@@ -26,6 +26,7 @@ using namespace std;
 
 #include "decoderbase.h"
 #include "nuppeldecoder.h"
+#include "avformatdecoder.h"
 
 extern "C" {
 #include "../libvbitext/vbi.h"
@@ -440,7 +441,9 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 
     if (NuppelDecoder::CanHandle(testbuf))
         decoder = new NuppelDecoder(this);
- 
+    else if (AvFormatDecoder::CanHandle(testbuf, ringBuffer->GetFilename()))
+        decoder = new AvFormatDecoder(this);
+
     if (!decoder)
     {
         cerr << "Couldn't find a matching decoder for: "
@@ -2488,9 +2491,7 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
     wpos = 0;
     ClearAfterSeek();
 
-    unsigned char *frame = (unsigned char *)decoder->GetScreenGrab(secondsin, 
-                                                                   bufflen, 
-                                                                   vw, vh);
+    unsigned char *frame = (unsigned char *)decoder->GetScreenGrab(secondsin); 
 
     if (!frame)
     {

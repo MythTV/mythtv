@@ -29,8 +29,7 @@ class DecoderBase
     virtual bool DoRewind(long long desiredFrame) = 0;
     virtual bool DoFastForward(long long desiredFrame) = 0;
 
-    virtual char *GetScreenGrab(int secondsin, int &bufflen, int &vw, 
-                                int &vh) = 0;
+    virtual char *GetScreenGrab(int secondsin) = 0; 
 
   protected:
     NuppelVideoPlayer *m_parent;
