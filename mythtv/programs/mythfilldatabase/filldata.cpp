@@ -738,13 +738,13 @@ void ResetIconMap(bool reset_icons)
 // DataDirect stuff
 void DataDirectStationUpdate(Source source)
 {
-    MSqlQuery query(MSqlQuery::InitCon());
+    MSqlQuery query(MSqlQuery::DDCon());
     QString querystr;
     int chanid;
 
     ddprocessor.updateStationViewTable();
 
-    MSqlQuery query1(MSqlQuery::InitCon());
+    MSqlQuery query1(MSqlQuery::DDCon());
     query1.prepare("SELECT dd_v_station.stationid,dd_v_station.callsign,"
                "dd_v_station.stationname,dd_v_station.channel,"
                "dd_v_station.fccchannelnumber,dd_v_station.channelMinor "
@@ -821,14 +821,14 @@ void DataDirectStationUpdate(Source source)
         //  execute
         //
 
-        MSqlQuery dd_station_info(MSqlQuery::InitCon());
+        MSqlQuery dd_station_info(MSqlQuery::DDCon());
         dd_station_info.prepare("SELECT callsign, stationname, stationid,"
                 "channel, fccchannelnumber, channelMinor FROM dd_v_station;");
         dd_station_info.exec();
 
         if (dd_station_info.first())
         {
-            MSqlQuery dd_update(MSqlQuery::InitCon());
+            MSqlQuery dd_update(MSqlQuery::DDCon());
             dd_update.prepare("UPDATE channel SET callsign = :CALLSIGN,"
                     " name = :NAME, channum = :CHANNEL, freqid = :FREQID "
                     " WHERE xmltvid = :STATIONID AND sourceid = :SOURCEID;");
@@ -872,7 +872,7 @@ void DataDirectStationUpdate(Source source)
 
 void DataDirectProgramUpdate(Source source) 
 {
-    MSqlQuery query(MSqlQuery::InitCon());
+    MSqlQuery query(MSqlQuery::DDCon());
    
     //cerr << "Creating program view table...\n";
     ddprocessor.updateProgramViewTable(source.id);
@@ -956,7 +956,7 @@ bool grabDDData(Source source, int poffset, QDate pdate)
         needtoretrieve = false;
 
     QDateTime qdtNow = QDateTime::currentDateTime();
-    MSqlQuery query(MSqlQuery::InitCon());
+    MSqlQuery query(MSqlQuery::DDCon());
     QString status = "currently running.";
 
     query.exec(QString("UPDATE settings SET data ='%1' "
