@@ -1,7 +1,7 @@
 CXX=g++
 
-#DEBUG=-O0 -g3 
-OPT=-O6 -march=pentiumpro -DMMX -fomit-frame-pointer -funroll-loops -fexpensive-optimizations -finline-functions
+DEBUG=-O0 -g3 
+#OPT=-O6 -march=pentiumpro -DMMX -fomit-frame-pointer -funroll-loops -fexpensive-optimizations -finline-functions
 
 CXXFLAGS= -I/usr/src/linux/include -Wall -D_GNU_SOURCE -D_REENTRANT $(OPT) $(DEBUG)
 
@@ -17,6 +17,7 @@ all: libNuppelVideo.a nuppelvideo-config
 
 NUVOBJ  = XJ.o minilzo.o RTjpegN.o effects.o NuppelVideoPlayer.o 
 NUVOBJ += NuppelVideoRecorder.o RingBuffer.o ttfont.o osd.o jitterometer.o
+NUVOBJ += yuv2rgb.o
 NUVLDF = -L/usr/X11R6/lib -lmp3lame -lX11 -lXext -lXv -lttf -lm -lpthread
 
 libNuppelVideo.a: $(NUVOBJ)

@@ -3,7 +3,7 @@
 ######################################################################
 
 TEMPLATE = app
-CONFIG += thread release
+CONFIG += thread debug
 TARGET = mythfrontend
 target.path = /usr/local/bin
 INSTALLS = target
@@ -16,7 +16,7 @@ LIBS += `../tv/libNuppelVideo/nuppelvideo-config --libs` `mysql_config --libs`
 # Input
 HEADERS += ../epg/guidegrid.h ../epg/infodialog.h ../epg/infostructs.h 
 HEADERS += ../dialog/dialogbox.h menubox.h scheduler.h playbackbox.h
-HEADERS += deletebox.h
+HEADERS += deletebox.h programlistitem.h
 SOURCES += ../epg/guidegrid.cpp ../epg/infodialog.cpp ../epg/infostructs.cpp 
 SOURCES += ../dialog/dialogbox.cpp main.cpp menubox.cpp scheduler.cpp
-SOURCES += playbackbox.cpp deletebox.cpp
+SOURCES += playbackbox.cpp deletebox.cpp programlistitem.cpp

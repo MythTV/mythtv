@@ -22,10 +22,10 @@ int startGuide(int startchannel)
     return chan;
 }
 
-int startPlayback(TV *tv)
+int startPlayback(TV *tv, QString prefix)
 {
     QSqlDatabase *db = QSqlDatabase::database();  
-    PlaybackBox pbb(tv, db);
+    PlaybackBox pbb(prefix, tv, db);
 
     pbb.Show();
 
@@ -197,7 +197,7 @@ int main(int argc, char **argv)
         {
             case 0: startTV(tv); break;
             case 1: startGuide(3); break;
-            case 2: startPlayback(tv); break;
+            case 2: startPlayback(tv, prefix); break;
             case 3: startDelete(tv, prefix); break;
             default: break;
         }

@@ -10,34 +10,15 @@
 #include "playbackbox.h"
 #include "infostructs.h"
 #include "tv.h"
+#include "programlistitem.h"
 
-class ProgramListItem : public QListViewItem
-{
-  public:
-    ProgramListItem(QListView *parent, ProgramInfo *lpginfo);
-   ~ProgramListItem() { delete pginfo; }
-  
-    ProgramInfo *getProgramInfo() { return pginfo; }
- 
-  protected:
-    ProgramInfo *pginfo;
-};
-
-ProgramListItem::ProgramListItem(QListView *parent, ProgramInfo *lpginfo)
-               : QListViewItem(parent)
-{
-    pginfo = lpginfo;
-    setText(0, pginfo->channum);
-    setText(1, pginfo->startts.toString("MMMM d h:mm AP"));
-    setText(2, pginfo->title);
-}
-
-PlaybackBox::PlaybackBox(TV *ltv, QSqlDatabase *ldb, QWidget *parent, 
-                         const char *name)
+PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb, 
+                         QWidget *parent, const char *name)
            : QDialog(parent, name)
 {
     tv = ltv;
     db = ldb;
+    fileprefix = prefix;
 
     title = NULL;
 
@@ -99,7 +80,23 @@ PlaybackBox::PlaybackBox(TV *ltv, QSqlDatabase *ldb, QWidget *parent,
             proginfo->subtitle = query.value(4).toString();
             proginfo->description = query.value(5).toString();
 
-            item = new ProgramListItem(listview, proginfo); 
+            char startt[128];
+            char endt[128];
+    
+            QString starts = proginfo->startts.toString("yyyyMMddhhmm");
+            QString endts = proginfo->endts.toString("yyyyMMddhhmm");
+
+            sprintf(startt, "%s00", starts.ascii());
+            sprintf(endt, "%s00", endts.ascii());
+        
+            RecordingInfo *tvrec = new RecordingInfo(proginfo->channum.ascii(),
+                                                     startt, endt,
+                                                     proginfo->title.ascii(),
+                                                     proginfo->subtitle.ascii(),
+                                                 proginfo->description.ascii());
+                                                      
+            item = new ProgramListItem(listview, proginfo, tvrec, 3, tv,
+                                       fileprefix); 
         }
     }
     else
@@ -109,7 +106,9 @@ PlaybackBox::PlaybackBox(TV *ltv, QSqlDatabase *ldb, QWidget *parent,
    
     listview->setFixedHeight(300);
 
-    QGridLayout *grid = new QGridLayout(vbox, 4, 2, 1);
+    QHBoxLayout *hbox = new QHBoxLayout(vbox, 10);
+
+    QGridLayout *grid = new QGridLayout(hbox, 4, 2, 1);
     
     title = new QLabel(" ", this);
     title->setFont(QFont("Arial", 25, QFont::Bold));
@@ -133,6 +132,13 @@ PlaybackBox::PlaybackBox(TV *ltv, QSqlDatabase *ldb, QWidget *parent,
     
     grid->setColStretch(1, 1);
     grid->setRowStretch(3, 1);
+
+    QPixmap temp(160, 120);
+
+    pixlabel = new QLabel(this);
+    pixlabel->setPixmap(temp);
+
+    hbox->addWidget(pixlabel);
 
     listview->setCurrentItem(listview->firstChild());
 }
@@ -171,6 +177,11 @@ void PlaybackBox::changed(QListViewItem *lvitem)
         description->setText(rec->description);
     else
         description->setText("");
+
+    QPixmap *pix = pgitem->getPixmap();
+
+    if (pix)
+        pixlabel->setPixmap(*pix);
 }
 
 void PlaybackBox::selected(QListViewItem *lvitem)
@@ -191,6 +202,7 @@ void PlaybackBox::selected(QListViewItem *lvitem)
                                              startt, endt, rec->title.ascii(),
                                              rec->subtitle.ascii(),
                                              rec->description.ascii());
-    
+   
+ 
     tv->Playback(tvrec);
 }

@@ -631,6 +631,25 @@ void TV::TeardownPlayer(void)
     }
 }
 
+char *TV::GetScreenGrab(RecordingInfo *rcinfo, int secondsin, int &bufferlen)
+{
+    string filename;
+
+    string recprefix = settings->GetSetting("RecordFilePrefix");
+    rcinfo->GetRecordFilename(recprefix, filename);
+
+    RingBuffer *tmprbuf = new RingBuffer(filename, false);
+
+    NuppelVideoPlayer *nupvidplay = new NuppelVideoPlayer();
+    nupvidplay->SetRingBuffer(tmprbuf);
+    nupvidplay->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
+    char *retbuf = nupvidplay->GetScreenGrab(secondsin, bufferlen);
+
+    delete nupvidplay;
+
+    return retbuf;
+}
+
 void *TV::EventThread(void *param)
 {
     TV *thetv = (TV *)param;

@@ -13,8 +13,8 @@ class PlaybackBox : public QDialog
 {
     Q_OBJECT
   public:
-    PlaybackBox(TV *ltv, QSqlDatabase *ldb, QWidget *parent = 0, 
-                const char *name = 0);
+    PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb, 
+                QWidget *parent = 0, const char *name = 0);
 
     void Show();
   
@@ -26,10 +26,13 @@ class PlaybackBox : public QDialog
     QSqlDatabase *db;
     TV *tv;
 
+    QString fileprefix;
+
     QLabel *title;
     QLabel *subtitle;
     QLabel *description;
     QLabel *date;
+    QLabel *pixlabel;
 };
 
 #endif

@@ -14,6 +14,7 @@
 #include "minilzo.h"
 #include "XJ.h"
 #include "effects.h"
+#include "yuv2rgb.h"
 
 NuppelVideoPlayer::NuppelVideoPlayer(void)
 {
@@ -56,6 +57,16 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
         delete ringBuffer;
     if (osd)
         delete osd;
+    if (buf)
+        delete [] buf;
+    if (buf2)
+        delete [] buf2;
+    if (strm)
+        delete [] strm;
+    for (int i = 0; i < MAXVBUFFER; i++)
+    {
+        delete [] vbuffer[i];
+    }
 }
 
 void NuppelVideoPlayer::InitSound(void)
@@ -1199,6 +1210,111 @@ void NuppelVideoPlayer::ClearAfterSeek(void)
     pthread_mutex_unlock(&audio_buflock);
 }
 
+char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen)
+{
+    InitSubs();
+    OpenFile(false);
+
+    int number = (int)(secondsin * video_frame_rate);
+
+    long long desiredFrame = framesPlayed + number;
+    long long desiredKey = 0;
+
+    while (desiredKey < desiredFrame)
+    {
+        desiredKey += 30;
+    }
+    desiredKey -= 30;
+
+    int normalframes = number - desiredKey;
+    int fileend = 0;
+
+    buf = new unsigned char[video_width * video_height * 3 / 2];
+    strm = new unsigned char[video_width * video_height * 2];
+
+    unsigned char *frame = NULL;
+
+    while (lastKey < desiredKey && !fileend)
+    {
+        fileend = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader,
+                                                   FRAMEHEADERSIZE));
+
+        if (frameheader.frametype == 'S')
+        {
+            if (frameheader.comptype == 'V')
+            {
+                (*positionMap)[framesPlayed / 30] =
+                                             ringBuffer->GetReadPosition();
+                lastKey = framesPlayed;
+            }
+            if (frameheader.comptype == 'A')
+                if (frameheader.timecode > 0)
+                {
+                    effdsp = frameheader.timecode;
+                }
+        }
+        else if (frameheader.frametype == 'V')
+        {
+            framesPlayed++;
+        }
+
+        if (frameheader.frametype != 'R' && frameheader.packetlength > 0)
+        {
+            fileend = (ringBuffer->Read(strm, frameheader.packetlength) !=
+                       frameheader.packetlength);
+        }
+    }
+
+    while (normalframes > 0 && !fileend)
+    {
+        fileend = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader,
+                                                       FRAMEHEADERSIZE));
+
+        if (fileend)
+            continue;
+        if (frameheader.frametype == 'R')
+            continue;
+        else if (frameheader.frametype == 'S')
+        {
+            if (frameheader.comptype == 'A')
+            {
+                if (frameheader.timecode > 0)
+                {
+                    effdsp = frameheader.timecode;
+                }
+            }
+        }
+        fileend = (ringBuffer->Read(strm, frameheader.packetlength) !=
+                                    frameheader.packetlength);
+
+        if (frameheader.frametype == 'V')
+        {
+            framesPlayed++;
+            normalframes--;
+            frame = DecodeFrame(&frameheader, strm);
+        }
+    }
+
+    if (!frame)
+    {
+        bufflen = 0;
+        return NULL;
+    }
+
+    linearBlendYUV420(frame, video_width, video_height);
+
+    bufflen = video_width * video_height * 4;
+    unsigned char *outputbuf = new unsigned char[bufflen];
+
+    yuv2rgb_fun convert = yuv2rgb_init_mmx(32, MODE_RGB);
+    
+    convert(outputbuf, frame, frame + (video_width * video_height), 
+            frame + (video_width * video_height * 5 / 4), video_width,
+            video_height);
+
+    return (char *)outputbuf;
+}
+    
 void NuppelVideoPlayer::SetInfoText(const string &text, const string &subtitle,
                                     const string &desc, const string &category,
                                     const string &start, const string &end,

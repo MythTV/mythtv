@@ -79,6 +79,9 @@ class NuppelVideoPlayer
    
     bool OSDVisible(void) { if (osd) return osd->Visible(); else return false; }
 
+    // don't use this on something you're playing
+    char *GetScreenGrab(int secondsin, int &buflen);
+
  protected:
     void OutputAudioLoop(void);
     void OutputVideoLoop(void);

@@ -8,8 +8,6 @@
 #include <qdatetime.h>
 #include <qprogressbar.h>
 
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h>
 #include <stdio.h>
 
@@ -17,46 +15,7 @@
 #include "infostructs.h"
 #include "tv.h"
 #include "dialogbox.h"
-
-class ProgramListItem : public QListViewItem
-{
-  public:
-    ProgramListItem(QListView *parent, ProgramInfo *lpginfo, 
-                    RecordingInfo *lrecinfo, QString prefix);
-   ~ProgramListItem() { delete pginfo; delete recinfo; }
-  
-    ProgramInfo *getProgramInfo() { return pginfo; }
-    RecordingInfo *getRecordingInfo() { return recinfo; }
- 
-  protected:
-    ProgramInfo *pginfo;
-    RecordingInfo *recinfo;
-};
-
-ProgramListItem::ProgramListItem(QListView *parent, ProgramInfo *lpginfo,
-                                 RecordingInfo *lrecinfo, QString prefix)
-               : QListViewItem(parent)
-{
-    pginfo = lpginfo;
-    recinfo = lrecinfo;
-    setText(0, pginfo->channum);
-    setText(1, pginfo->startts.toString("MMMM d h:mm AP"));
-    setText(2, pginfo->title);
-
-    string filename;
-
-    recinfo->GetRecordFilename(prefix.ascii(), filename);
-
-    struct stat64 st;
-
-    long long size = 0;
-    if (stat64(filename.c_str(), &st) == 0)
-        size = st.st_size;
-    long int mbytes = size / 1024 / 1024;
-    QString filesize = QString("%1 MB").arg(mbytes);
-
-    setText(3, filesize);
-}
+#include "programlistitem.h"
 
 DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb, 
                      QWidget *parent, const char *name)
@@ -141,7 +100,8 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
                                                      proginfo->subtitle.ascii(),
                                                  proginfo->description.ascii());
 
-            item = new ProgramListItem(listview, proginfo, tvrec, fileprefix); 
+            item = new ProgramListItem(listview, proginfo, tvrec, 4, tv,
+                                       fileprefix); 
         }
     }
     else
@@ -151,7 +111,9 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
    
     listview->setFixedHeight(225);
 
-    QGridLayout *grid = new QGridLayout(vbox, 4, 2, 1);
+    QHBoxLayout *hbox = new QHBoxLayout(vbox, 10);
+
+    QGridLayout *grid = new QGridLayout(hbox, 4, 2, 1);
     
     title = new QLabel(" ", this);
     title->setFont(QFont("Arial", 25, QFont::Bold));
@@ -175,6 +137,13 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     
     grid->setColStretch(1, 1);
     grid->setRowStretch(3, 1);
+
+    QPixmap temp(160, 120);
+    
+    pixlabel = new QLabel(this);
+    pixlabel->setPixmap(temp);
+    
+    hbox->addWidget(pixlabel); 
 
     freespace = new QLabel(" ", this);
     vbox->addWidget(freespace);
@@ -220,6 +189,11 @@ void DeleteBox::changed(QListViewItem *lvitem)
         description->setText(rec->description);
     else
         description->setText("");
+
+    QPixmap *pix = pgitem->getPixmap();      
+                                             
+    if (pix)                                 
+        pixlabel->setPixmap(*pix);
 }
 
 void DeleteBox::selected(QListViewItem *lvitem)
@@ -277,6 +251,10 @@ void DeleteBox::selected(QListViewItem *lvitem)
                           startts.ascii(), endts.ascii());
 
         query = db->exec(thequery);
+
+        unlink(filename.c_str());
+
+        filename += ".png";
 
         unlink(filename.c_str());
 
