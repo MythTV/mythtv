@@ -328,27 +328,6 @@ void VideoOutputIvtv::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
 
     unsigned char *pipbuf = pipimage->buf;
 
-    switch (PIPLocation)
-    {
-        default:
-        case kPIPTopLeft:
-                xoff = 50;
-                yoff = 40;
-                break;
-        case kPIPBottomLeft:
-                xoff = 50;
-                yoff = frame->height - piph - 40;
-                break;
-        case kPIPTopRight:
-                xoff = frame->width - pipw - 50;
-                yoff = 40;
-                break;
-        case kPIPBottomRight:
-                xoff = frame->width - pipw - 50;
-                yoff = frame->height - piph - 40;
-                break;
-    }
-
     if (pipw != desired_pipw || piph != desired_piph)
     {
         DoPipResize(pipw, piph);
@@ -369,6 +348,27 @@ void VideoOutputIvtv::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
 
             pipbuf = piptmpbuf;
         }
+    }
+
+    switch (PIPLocation)
+    {
+        default:
+        case kPIPTopLeft:
+                xoff = 50;
+                yoff = 40;
+                break;
+        case kPIPBottomLeft:
+                xoff = 50;
+                yoff = frame->height - piph - 40;
+                break;
+        case kPIPTopRight:
+                xoff = frame->width - pipw - 50;
+                yoff = 40;
+                break;
+        case kPIPBottomRight:
+                xoff = frame->width - pipw - 50;
+                yoff = frame->height - piph - 40;
+                break;
     }
 
     unsigned char *outputbuf = new unsigned char[pipw * piph * 4];

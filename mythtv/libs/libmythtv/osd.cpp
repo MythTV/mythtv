@@ -926,6 +926,8 @@ bool OSD::LoadTheme(void)
             if (e.tagName() == "timeformat")
             {
                 timeFormat = getFirstText(e);
+                if (timeFormat.upper() == "FROMSETTINGS")
+                    timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
             }
             else if (e.tagName() == "fadeaway")
             {

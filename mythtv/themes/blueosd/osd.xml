@@ -1,5 +1,7 @@
 <mythosdtheme>
 
+  <!-- if timeformat is set to 'FROMSETTINGS', it will use the time format
+       specified in the general mythtv settings -->
   <timeformat>h:mm ap</timeformat>
   <fadeaway>30</fadeaway>
 

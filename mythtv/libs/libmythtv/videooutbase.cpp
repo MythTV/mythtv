@@ -718,27 +718,6 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
 
     unsigned char *pipbuf = pipimage->buf;
 
-    switch (PIPLocation)
-    {
-        default:
-        case kPIPTopLeft:
-                xoff = 30;
-                yoff = 40;
-                break;
-        case kPIPBottomLeft:
-                xoff = 30;
-                yoff = frame->height - piph - 40;
-                break;
-        case kPIPTopRight:
-                xoff = frame->width - pipw - 30;
-                yoff = 40;
-                break;
-        case kPIPBottomRight:
-                xoff = frame->width - pipw - 30;
-                yoff = frame->height - piph - 40;
-                break;
-    }
-
     if (pipw != desired_pipw || piph != desired_piph)
     {
         DoPipResize(pipw, piph);
@@ -759,6 +738,27 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
 
             pipbuf = piptmpbuf;
         }
+    }
+
+    switch (PIPLocation)
+    {
+        default:
+        case kPIPTopLeft:
+                xoff = 30;
+                yoff = 40;
+                break;
+        case kPIPBottomLeft:
+                xoff = 30;
+                yoff = frame->height - piph - 40;
+                break;
+        case kPIPTopRight:
+                xoff = frame->width - pipw - 30;
+                yoff = 40;
+                break;
+        case kPIPBottomRight:
+                xoff = frame->width - pipw - 30;
+                yoff = frame->height - piph - 40;
+                break;
     }
 
     for (int i = 0; i < piph; i++)
