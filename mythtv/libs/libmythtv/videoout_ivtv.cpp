@@ -195,9 +195,11 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
 
         stride = igfb.sizex * 4;
 
-        osdbuffer = new char[osdbufsize + PAGE_SIZE];
-        osdbuf_aligned = (char *)((int)osdbuffer + (PAGE_SIZE - 1));
-        osdbuf_aligned = (char *)((int)osdbuf_aligned & PAGE_MASK);
+        long pagesize = sysconf(_SC_PAGE_SIZE);
+        long pagemask = ~(pagesize-1);
+        osdbuffer = new char[osdbufsize + pagesize];
+        osdbuf_aligned = (char *)((int)osdbuffer + (pagesize - 1));
+        osdbuf_aligned = (char *)((int)osdbuf_aligned & pagemask);
 
         memset(osdbuf_aligned, 0x00, osdbufsize);
 
