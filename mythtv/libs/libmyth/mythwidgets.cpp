@@ -29,9 +29,6 @@ void MythComboBox::keyPressEvent(QKeyEvent *e)
         if (count() > 0)
             setCurrentItem((currentItem() + 1) % count());
         break;
-    case Key_Space:
-        popup();
-        break;
     default:
         e->ignore();
     }
@@ -75,8 +72,6 @@ bool MythSpinBox::eventFilter(QObject* o, QEvent* e)
     case Key_Right:
         stepUp();
         break;
-    default:
-        return FALSE;
     }
 
     return TRUE;
@@ -99,6 +94,7 @@ void MythSlider::keyPressEvent(QKeyEvent* e)
         break;
     case Key_Enter:
     case Key_Return:
+    case Key_Space:
         e->ignore();
     default:
         QSlider::keyPressEvent(e);
@@ -116,6 +112,7 @@ void MythLineEdit::keyPressEvent(QKeyEvent *e)
         break;
     case Key_Enter:
     case Key_Return:
+    case Key_Space:
         e->ignore();
     default:
         QLineEdit::keyPressEvent(e);
