@@ -8,9 +8,13 @@
 #include <qcursor.h>
 #include <qapplication.h>
 
+#include <iostream>
+using namespace std;
+
 #include "guidegrid.h"
 #include "infodialog.h"
 #include "infostructs.h"
+#include "programinfo.h"
 
 GuideGrid::GuideGrid(int channel, QWidget *parent, const char *name)
          : QDialog(parent, name)
@@ -457,7 +461,7 @@ void GuideGrid::paintPrograms(QPainter *p)
             ProgramInfo *pginfo = m_programInfos[y][x];
 
             if (pginfo->recordtype == -1)
-                pginfo->recordtype = GetProgramRecordingStatus(pginfo);
+                pginfo->GetProgramRecordingStatus();
 
             int spread = 1;
             if (pginfo->startts != lastprog)
@@ -856,8 +860,6 @@ void GuideGrid::displayInfo()
 
     setActiveWindow();
     setFocus();
-
-    pginfo->recordtype = GetProgramRecordingStatus(pginfo);
 
     update(programRect());
 }

@@ -98,12 +98,13 @@ void TV::LiveTV(void)
 {
     if (internalState == kState_RecordingOnly)
     {
-        string title, channum;
-        curRecording->GetTitle(title);
-        curRecording->GetChannel(channum);
         char cmdline[4096];
 
-        sprintf(cmdline, "mythdialog \"MythTV is already recording '%s' on channel %s.  Do you want to:\" \"Stop recording and watch TV\" \"Watch the in-progress recording\" \"Cancel\"", title.c_str(), channum.c_str());
+        sprintf(cmdline, "mythdialog \"MythTV is already recording '%s' on "
+                         "channel %s.  Do you want to:\" \"Stop recording and "
+                         "watch TV\" \"Watch the in-progress recording\" "
+                         "\"Cancel\"", curRecording->title.ascii(), 
+                         curRecording->channum.ascii());
 
         int result = system(cmdline);
 
@@ -129,19 +130,15 @@ void TV::LiveTV(void)
     }
 }
 
-int TV::AllowRecording(RecordingInfo *rcinfo, int timeuntil)
+int TV::AllowRecording(ProgramInfo *rcinfo, int timeuntil)
 {
     if (internalState != kState_WatchingLiveTV)
     {
         return 1;
     }
 
-    string channame;
-    rcinfo->GetChannel(channame);
-
-    string title;
-
-    rcinfo->GetTitle(title);
+    string channame = rcinfo->channum.ascii();
+    string title = rcinfo->title.ascii();
 
     string message = "MythTV wants to record \"";
     message += title + "\" on Channel " + channame;
@@ -163,15 +160,15 @@ int TV::AllowRecording(RecordingInfo *rcinfo, int timeuntil)
     return result;
 }
 
-void TV::StartRecording(RecordingInfo *rcinfo)
+void TV::StartRecording(ProgramInfo *rcinfo)
 {  
     string recprefix = settings->GetSetting("RecordFilePrefix");
 
     if (internalState == kState_None || 
         internalState == kState_WatchingPreRecorded)
     {
-        rcinfo->GetRecordFilename(recprefix, outputFilename);
-        recordEndTime = rcinfo->GetEndTime();
+        outputFilename = rcinfo->GetRecordFilename(recprefix.c_str());
+        recordEndTime = rcinfo->endts;
         curRecording = rcinfo;
 
         if (internalState == kState_None)
@@ -190,8 +187,8 @@ void TV::StartRecording(RecordingInfo *rcinfo)
             while (GetState() != kState_None)
                 usleep(50);
 
-            rcinfo->GetRecordFilename(recprefix, outputFilename);
-            recordEndTime = rcinfo->GetEndTime();
+            outputFilename = rcinfo->GetRecordFilename(recprefix.c_str());
+            recordEndTime = rcinfo->endts;
             curRecording = rcinfo;
 
             nextState = kState_RecordingOnly;
@@ -199,8 +196,8 @@ void TV::StartRecording(RecordingInfo *rcinfo)
         }
         else if (tvtorecording == 1)
         {
-            rcinfo->GetRecordFilename(recprefix, outputFilename);
-            recordEndTime = rcinfo->GetEndTime();
+            outputFilename = rcinfo->GetRecordFilename(recprefix.c_str());
+            recordEndTime = rcinfo->endts;
             curRecording = rcinfo;
 
             nextState = kState_WatchingRecording;
@@ -219,12 +216,12 @@ void TV::StopRecording(void)
     }
 }
 
-void TV::Playback(RecordingInfo *rcinfo)
+void TV::Playback(ProgramInfo *rcinfo)
 {
     if (internalState == kState_None || internalState == kState_RecordingOnly)
     {
         string recprefix = settings->GetSetting("RecordFilePrefix");
-        rcinfo->GetRecordFilename(recprefix, inputFilename);
+        inputFilename = rcinfo->GetRecordFilename(recprefix.c_str());
 
         if (internalState == kState_None)
             nextState = kState_WatchingPreRecorded;
@@ -309,7 +306,7 @@ void TV::WriteRecordedRecord(void)
     if (!curRecording)
         return;
 
-    curRecording->WriteToDB(db_conn);
+    curRecording->WriteRecordedToDB(db_conn);
     delete curRecording;
     curRecording = NULL;
 }
@@ -374,8 +371,7 @@ void TV::HandleStateChange(void)
              (internalState == kState_WatchingPreRecorded &&
               nextState == kState_WatchingOtherRecording))
     {   
-        string channame;
-        curRecording->GetChannel(channame);
+        string channame = curRecording->channum.ascii();
 
         channel->Open();
         channel->SetChannelByString(channame);
@@ -476,8 +472,7 @@ void TV::HandleStateChange(void)
 
         rbuffer->Reset();
 
-        string channame;
-        curRecording->GetChannel(channame);
+        string channame = curRecording->channum.ascii();
 
         channel->SetChannelByString(channame);
 
@@ -667,15 +662,13 @@ void TV::TeardownPlayer(void)
     }
 }
 
-char *TV::GetScreenGrab(RecordingInfo *rcinfo, int secondsin, int &bufferlen,
+char *TV::GetScreenGrab(ProgramInfo *rcinfo, int secondsin, int &bufferlen,
                         int &video_width, int &video_height)
 {
-    string filename;
-
     string recprefix = settings->GetSetting("RecordFilePrefix");
-    rcinfo->GetRecordFilename(recprefix, filename);
+    QString filename = rcinfo->GetRecordFilename(recprefix.c_str());
 
-    RingBuffer *tmprbuf = new RingBuffer(filename, false);
+    RingBuffer *tmprbuf = new RingBuffer(filename.ascii(), false);
 
     NuppelVideoPlayer *nupvidplay = new NuppelVideoPlayer();
     nupvidplay->SetRingBuffer(tmprbuf);
@@ -725,7 +718,7 @@ void TV::RunTV(void)
 
         if (StateIsRecording(internalState))
         {
-            if (time(NULL) > recordEndTime)
+            if (QDateTime::currentDateTime() > recordEndTime)
             {
                 if (watchingLiveTV)
                 {

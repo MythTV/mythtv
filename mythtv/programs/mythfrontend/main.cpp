@@ -8,7 +8,7 @@
 #include "menubox.h"
 #include "scheduler.h"
 #include "infostructs.h"
-#include "recordinginfo.h"
+#include "programinfo.h"
 #include "playbackbox.h"
 #include "deletebox.h"
 #include "viewscheduled.h"
@@ -65,39 +65,13 @@ void startTV(TV *tv)
 
 void startRecording(TV *tv, ProgramInfo *rec)
 {
-    char startt[128];
-    char endt[128];
-
-    QString starts = rec->startts.toString("yyyyMMddhhmm");
-    QString endts = rec->endts.toString("yyyyMMddhhmm");
-
-    sprintf(startt, "%s00", starts.ascii());
-    sprintf(endt, "%s00", endts.ascii());
-
-    RecordingInfo *tvrec = new RecordingInfo(rec->channum.ascii(),
-                                             startt, endt, rec->title.ascii(),
-                                             rec->subtitle.ascii(), 
-                                             rec->description.ascii());
-
+    ProgramInfo *tvrec = new ProgramInfo(*rec);
     tv->StartRecording(tvrec);
 }
 
 int askRecording(TV *tv, ProgramInfo *rec, int timeuntil)
 {
-    char startt[128];
-    char endt[128];
-    
-    QString starts = rec->startts.toString("yyyyMMddhhmm");
-    QString endts = rec->endts.toString("yyyyMMddhhmm");
-    
-    sprintf(startt, "%s00", starts.ascii());
-    sprintf(endt, "%s00", endts.ascii());
-    
-    RecordingInfo *tvrec = new RecordingInfo(rec->channum.ascii(),
-                                             startt, endt, rec->title.ascii(),
-                                             rec->subtitle.ascii(), 
-                                             rec->description.ascii());
-                                             
+    ProgramInfo *tvrec = new ProgramInfo(*rec);
     int retval = tv->AllowRecording(tvrec, timeuntil);
 
     delete tvrec;
@@ -188,8 +162,8 @@ void *runScheduler(void *dummy)
                    secsleft = curtime.secsTo(nextrectime);
                 }
             }
-            else 
-                cout << secsleft << " secs left until " << nextRecording->title << endl;
+         //   else 
+         //       cout << secsleft << " secs left until " << nextRecording->title << endl;
         }
     }
     

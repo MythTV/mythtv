@@ -1,5 +1,6 @@
 #include <qapplication.h>
 #include <qsqldatabase.h>
+#include <stdlib.h>
 
 #include "guidegrid.h"
 

@@ -12,7 +12,7 @@ using namespace std;
 #include "settings.h"
 
 #include "channel.h"
-#include "recordinginfo.h"
+#include "programinfo.h"
 
 typedef enum 
 {
@@ -26,6 +26,7 @@ typedef enum
 } TVState;
 
 class QSqlDatabase;
+class QDateTime;
 
 class TV
 {
@@ -35,14 +36,14 @@ class TV
 
     void LiveTV(void);
 
-    int AllowRecording(RecordingInfo *rcinfo, int timeuntil);
-    void StartRecording(RecordingInfo *rcinfo);
+    int AllowRecording(ProgramInfo *rcinfo, int timeuntil);
+    void StartRecording(ProgramInfo *rcinfo);
     void StopRecording(void);
-    RecordingInfo *GetRecording(void) { return curRecording; }
+    ProgramInfo *GetRecording(void) { return curRecording; }
 
     // next two functions only work on recorded programs.
-    void Playback(RecordingInfo *rcinfo);
-    char *GetScreenGrab(RecordingInfo *rcinfo, int secondsin, int &bufferlen,
+    void Playback(ProgramInfo *rcinfo);
+    char *GetScreenGrab(ProgramInfo *rcinfo, int secondsin, int &bufferlen,
                         int &video_width, int &video_height);
 
     bool IsRunning(void) { return runMainLoop; }
@@ -120,7 +121,7 @@ class TV
     bool runMainLoop;
     bool exitPlayer;
     bool paused;
-    time_t recordEndTime;
+    QDateTime recordEndTime;
 
     float frameRate;
 
@@ -131,7 +132,7 @@ class TV
 
     bool watchingLiveTV;
 
-    RecordingInfo *curRecording;
+    ProgramInfo *curRecording;
     int tvtorecording;
 };
 

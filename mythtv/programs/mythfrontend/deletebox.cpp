@@ -14,6 +14,7 @@
 
 #include "deletebox.h"
 #include "infostructs.h"
+#include "programinfo.h"
 #include "tv.h"
 #include "dialogbox.h"
 #include "programlistitem.h"
@@ -103,23 +104,7 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
             if (proginfo->description == QString::null)
                 proginfo->description = "";
 
-            char startt[128];
-            char endt[128];
-
-            QString starts = proginfo->startts.toString("yyyyMMddhhmm");
-            QString endts = proginfo->endts.toString("yyyyMMddhhmm");
-
-            sprintf(startt, "%s00", starts.ascii());
-            sprintf(endt, "%s00", endts.ascii());
-
-            RecordingInfo *tvrec = new RecordingInfo(proginfo->channum.ascii(),
-                                                     startt, endt, 
-                                                     proginfo->title.ascii(),
-                                                     proginfo->subtitle.ascii(),
-                                                 proginfo->description.ascii());
-
-            item = new ProgramListItem(listview, proginfo, tvrec, 4, tv,
-                                       fileprefix); 
+            item = new ProgramListItem(listview, proginfo, 4, tv, fileprefix);
         }
     }
     else
@@ -220,7 +205,6 @@ void DeleteBox::selected(QListViewItem *lvitem)
 {
     ProgramListItem *pgitem = (ProgramListItem *)lvitem;
     ProgramInfo *rec = pgitem->getProgramInfo();
-    RecordingInfo *recinfo = pgitem->getRecordingInfo();
 
     QString message = "Are you sure you want to delete:<br><br>";
     message += rec->title;
@@ -254,8 +238,7 @@ void DeleteBox::selected(QListViewItem *lvitem)
 
     if (result == 1)
     {
-        string filename;
-        recinfo->GetRecordFilename(fileprefix.ascii(), filename);
+        QString filename = rec->GetRecordFilename(fileprefix);
 
         QSqlQuery query;
         char thequery[512];
@@ -272,11 +255,11 @@ void DeleteBox::selected(QListViewItem *lvitem)
 
         query = db->exec(thequery);
 
-        unlink(filename.c_str());
+        unlink(filename.ascii());
 
         filename += ".png";
 
-        unlink(filename.c_str());
+        unlink(filename.ascii());
 
         if (lvitem->itemAbove())
             listview->setCurrentItem(lvitem->itemAbove());

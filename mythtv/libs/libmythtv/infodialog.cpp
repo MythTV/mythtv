@@ -9,6 +9,7 @@
 
 #include "infodialog.h"
 #include "infostructs.h"
+#include "programinfo.h"
 
 InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
           : QDialog(parent, name)
@@ -80,7 +81,7 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
     middleBox->addWidget(recone);
     connect(recone, SIGNAL(clicked()), this, SLOT(reconePressed()));
 
-    programtype = IsProgramRecurring(pginfo);
+    programtype = pginfo->IsProgramRecurring();
 
     QString msg = "Shouldn't show up.";
     if (programtype == 1)
@@ -113,7 +114,7 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
 
     vbox->activate();
 
-    recordstatus = GetProgramRecordingStatus(pginfo);
+    recordstatus = pginfo->GetProgramRecordingStatus();
 
     if (recordstatus == 2 && programtype == 0)
     {
@@ -225,7 +226,7 @@ void InfoDialog::okPressed(void)
         currentSelected = 3;
 
     if (currentSelected != recordstatus)
-        ApplyRecordStateChange(myinfo, currentSelected);   
+        myinfo->ApplyRecordStateChange(currentSelected);   
 
     accept();
 }

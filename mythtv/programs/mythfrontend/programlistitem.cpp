@@ -29,14 +29,12 @@ void MyListView::keyPressEvent(QKeyEvent *e)
 }
 
 ProgramListItem::ProgramListItem(QListView *parent, ProgramInfo *lpginfo,
-                                 RecordingInfo *lrecinfo, int numcols,
-                                 TV *ltv, QString lprefix)
+                                 int numcols, TV *ltv, QString lprefix)
                : QListViewItem(parent)
 {
     prefix = lprefix;
     tv = ltv;
     pginfo = lpginfo;
-    recinfo = lrecinfo;
     pixmap = NULL;
 
     setText(0, pginfo->channum);
@@ -45,14 +43,12 @@ ProgramListItem::ProgramListItem(QListView *parent, ProgramInfo *lpginfo,
 
     if (numcols == 4)
     {
-        string filename;
-
-        recinfo->GetRecordFilename(prefix.ascii(), filename);
+        QString filename = pginfo->GetRecordFilename(prefix);
 
         struct stat64 st;
  
         long long size = 0;
-        if (stat64(filename.c_str(), &st) == 0)
+        if (stat64(filename.ascii(), &st) == 0)
             size = st.st_size;
         long int mbytes = size / 1024 / 1024;
         QString filesize = QString("%1 MB").arg(mbytes);
@@ -66,8 +62,7 @@ QPixmap *ProgramListItem::getPixmap(void)
     if (pixmap)
         return pixmap;
 
-    string filename;
-    recinfo->GetRecordFilename(prefix.ascii(), filename);
+    QString filename = pginfo->GetRecordFilename(prefix);
     filename += ".png";
 
     int screenheight = QApplication::desktop()->height();
@@ -80,7 +75,7 @@ QPixmap *ProgramListItem::getPixmap(void)
 
     QImage tmpimage;
 
-    if (tmpimage.load(filename.c_str()))
+    if (tmpimage.load(filename.ascii()))
     {
         pixmap = new QPixmap();
 
@@ -97,7 +92,7 @@ QPixmap *ProgramListItem::getPixmap(void)
 
     int len = 0;
     int video_width, video_height;
-    unsigned char *data = (unsigned char *)tv->GetScreenGrab(recinfo, 65, len,
+    unsigned char *data = (unsigned char *)tv->GetScreenGrab(pginfo, 65, len,
                                                              video_width,
                                                              video_height);
 
@@ -107,11 +102,11 @@ QPixmap *ProgramListItem::getPixmap(void)
                    QImage::LittleEndian);
         img = img.smoothScale(160, 120);
 
-        img.save(filename.c_str(), "PNG");
+        img.save(filename.ascii(), "PNG");
 
         delete [] data;
 
-        if (tmpimage.load(filename.c_str()))
+        if (tmpimage.load(filename.ascii()))
         {
             pixmap = new QPixmap();
 

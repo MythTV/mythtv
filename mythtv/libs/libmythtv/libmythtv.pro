@@ -21,5 +21,5 @@ installfiles.files = helr.ttf
 INSTALLS = installfiles
  
 # Input
-HEADERS += channel.h frequencies.h recordinginfo.h settings.h tv.h
-SOURCES += channel.cpp frequencies.c recordinginfo.cpp settings.cpp tv.cpp
+HEADERS += channel.h frequencies.h programinfo.h settings.h tv.h
+SOURCES += channel.cpp frequencies.c programinfo.cpp settings.cpp tv.cpp

@@ -9,6 +9,9 @@ INSTALLS = target
 
 include (../settings.pro)
 
+INCLUDEPATH += ../libmythtv
+
 # Input
-HEADERS += guidegrid.h infodialog.h infostructs.h
-SOURCES += guidegrid.cpp infodialog.cpp infostructs.cpp main.cpp
+HEADERS += guidegrid.h infodialog.h infostructs.h ../libmythtv/programinfo.h
+SOURCES += guidegrid.cpp infodialog.cpp infostructs.cpp 
+SOURCES += ../libmythtv/programinfo.cpp main.cpp

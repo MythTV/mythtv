@@ -124,23 +124,7 @@ void ViewScheduled::FillList(void)
         ProgramInfo *originfo = (*pgiter);
         ProgramInfo *proginfo = new ProgramInfo(*originfo);
 
-        char startt[128];
-        char endt[128];
-
-        QString starts = proginfo->startts.toString("yyyyMMddhhmm");
-        QString endts = proginfo->endts.toString("yyyyMMddhhmm");
-
-        sprintf(startt, "%s00", starts.ascii());
-        sprintf(endt, "%s00", endts.ascii());
-
-        RecordingInfo *tvrec = new RecordingInfo(proginfo->channum.ascii(),
-                                                 startt, endt,
-                                                 proginfo->title.ascii(),
-                                                 proginfo->subtitle.ascii(),
-                                                 proginfo->description.ascii());
-
-        item = new ProgramListItem(listview, proginfo, tvrec, 3, tv,
-                                   fileprefix);
+        item = new ProgramListItem(listview, proginfo, 3, tv, fileprefix);
     }
 
     if (conflicts)

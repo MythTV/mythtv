@@ -10,6 +10,7 @@
 
 #include "playbackbox.h"
 #include "infostructs.h"
+#include "programinfo.h"
 #include "tv.h"
 #include "programlistitem.h"
 
@@ -97,23 +98,7 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
             if (proginfo->description == QString::null)
                 proginfo->description = "";
 
-            char startt[128];
-            char endt[128];
-    
-            QString starts = proginfo->startts.toString("yyyyMMddhhmm");
-            QString endts = proginfo->endts.toString("yyyyMMddhhmm");
-
-            sprintf(startt, "%s00", starts.ascii());
-            sprintf(endt, "%s00", endts.ascii());
-        
-            RecordingInfo *tvrec = new RecordingInfo(proginfo->channum.ascii(),
-                                                     startt, endt,
-                                                     proginfo->title.ascii(),
-                                                     proginfo->subtitle.ascii(),
-                                                 proginfo->description.ascii());
-                                                      
-            item = new ProgramListItem(listview, proginfo, tvrec, 3, tv,
-                                       fileprefix); 
+            item = new ProgramListItem(listview, proginfo, 3, tv, fileprefix); 
         }
     }
     else
@@ -209,20 +194,6 @@ void PlaybackBox::selected(QListViewItem *lvitem)
     ProgramListItem *pgitem = (ProgramListItem *)lvitem;
     ProgramInfo *rec = pgitem->getProgramInfo();
 
-    char startt[128];
-    char endt[128];
-    
-    QString starts = rec->startts.toString("yyyyMMddhhmm");
-    QString endts = rec->endts.toString("yyyyMMddhhmm");
-
-    sprintf(startt, "%s00", starts.ascii());
-    sprintf(endt, "%s00", endts.ascii());
-
-    RecordingInfo *tvrec = new RecordingInfo(rec->channum.ascii(),
-                                             startt, endt, rec->title.ascii(),
-                                             rec->subtitle.ascii(),
-                                             rec->description.ascii());
-   
- 
+    ProgramInfo *tvrec = new ProgramInfo(*rec);
     tv->Playback(tvrec);
 }
