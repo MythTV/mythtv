@@ -811,6 +811,7 @@ int SipFsm::MsgToEvent(SipMsg *sipMsg)
     if (Method == "SUBSCRIBE")  return SIP_SUBSCRIBE;
     if (Method == "NOTIFY")     return SIP_NOTIFY;
     if (Method == "MESSAGE")    return SIP_MESSAGE;
+    if (Method == "INFO")       return SIP_INFO;
 
     if (Method == "STATUS")
     {
@@ -821,6 +822,7 @@ int SipFsm::MsgToEvent(SipMsg *sipMsg)
         if (statusMethod == "BYE")         return SIP_BYESTATUS;
         if (statusMethod == "CANCEL")      return SIP_CANCELSTATUS;
         if (statusMethod == "MESSAGE")     return SIP_MESSAGESTATUS;
+        if (statusMethod == "INFO")        return SIP_INFOSTATUS;
 
         if (statusMethod == "INVITE")
         {
@@ -1105,6 +1107,9 @@ QString SipFsmBase::EventtoString(int Event)
     case SIP_STOPWATCH:           return "STOPWATCH";
     case SIP_MESSAGE:             return "MESSAGE";
     case SIP_MESSAGESTATUS:       return "MESSAGESTATUS";
+    case SIP_INFO:                return "INFO";
+    case SIP_INFOSTATUS:          return "INFOSTATUS";
+    case SIP_IM_TIMEOUT:          return "IM_TIMEOUT";
     default:
         break;
     }
@@ -1128,6 +1133,7 @@ QString SipFsmBase::StatetoString(int S)
     case SIP_WATCH_ACTIVE:      return "WTCH_ACTIVE"; 
     case SIP_WATCH_STOPPING:    return "WTCH_STOPPING";
     case SIP_WATCH_HOLDOFF:     return "WTCH_HOLDDOFF";
+    case SIP_IM_ACTIVE:         return "IM_ACTIVE";
 
     default:
         break;
@@ -2507,11 +2513,22 @@ int SipIM::FSM(int Event, SipMsg *sipMsg, void *Value)
     {
     case SIP_MESSAGE:
         ParseSipMsg(Event, sipMsg);
-        //State = SIP_IDLE;
         textContent = sipMsg->getPlainText();
         parent->SetNotification("IM", remoteUrl->getUser(), textContent, "");
-        //(parent->Timer())->Start(this, 120*1000, SIP_WATCH); 
         BuildSendStatus(200, "MESSAGE", sipMsg->getCSeqValue(), SIP_OPT_CONTACT);
+        State = SIP_IM_ACTIVE;
+        (parent->Timer())->Start(this, 30*60*1000, SIP_IM_TIMEOUT); // 30 min of inactivity and IM session clears
+        break;
+
+    case SIP_INFO:
+        ParseSipMsg(Event, sipMsg);
+        BuildSendStatus(200, "INFO", sipMsg->getCSeqValue(), SIP_OPT_CONTACT);
+        State = SIP_IM_ACTIVE;
+        (parent->Timer())->Start(this, 30*60*1000, SIP_IM_TIMEOUT); 
+        break;
+
+    case SIP_IM_TIMEOUT:
+        State = SIP_IM_IDLE;
         break;
 
     default:
