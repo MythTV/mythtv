@@ -3,30 +3,30 @@
     <name>GuideGrid</name>
     <message>
         <source>Recording Once</source>
-        <translation>Enregistrement simple</translation>
+        <translation type="unfinished">Enregistrement simple</translation>
     </message>
     <message>
         <source>Timeslot Recording</source>
-        <translation>Enregistrement de crÈneau horaire</translation>
+        <translation type="unfinished">Enregistrement de cr√©neau horaire</translation>
     </message>
     <message>
         <source>Channel Recording</source>
-        <translation>Enregistrement de station</translation>
+        <translation type="unfinished">Enregistrement de station</translation>
     </message>
     <message>
         <source>All Recording</source>
-        <translation>Toujours enregistrÈ</translation>
+        <translation type="unfinished">Toujours enregistr√©</translation>
     </message>
     <message>
         <source>Not Recording</source>
-        <translation>Pas enregistrÈ</translation>
+        <translation type="unfinished">Pas enregistr√©</translation>
     </message>
 </context>
 <context>
     <name>InfoDialog</name>
     <message>
         <source>Episode:</source>
-        <translation>…pisode:</translation>
+        <translation>√âpisode:</translation>
     </message>
     <message>
         <source>Description:</source>
@@ -34,19 +34,19 @@
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown anywhere</source>
-        <translation>Enregistrer ce programme ‡ chaque apparition</translation>
+        <translation>Enregistrer ce programme √† chaque apparition</translation>
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown on this channel</source>
-        <translation>Enregistrer ce programme ‡ chaque apparition sur cette station</translation>
+        <translation>Enregistrer ce programme √† chaque apparition sur cette station</translation>
     </message>
     <message>
         <source>Record this program in this timeslot every day</source>
-        <translation>Enregistrer ce programme chaque jour ‡ ce crÈneau horaire</translation>
+        <translation>Enregistrer ce programme chaque jour √† ce cr√©neau horaire</translation>
     </message>
     <message>
         <source>Record this program in this timeslot every week</source>
-        <translation>Enregistrer ce programme chaque semaine ‡ ce crÈneau horaire</translation>
+        <translation>Enregistrer ce programme chaque semaine √† ce cr√©neau horaire</translation>
     </message>
     <message>
         <source>Record only this showing of the program</source>
@@ -73,7 +73,7 @@
     </message>
     <message>
         <source>Duration:</source>
-        <translation>DurÈe:</translation>
+        <translation>Dur√©e:</translation>
     </message>
     <message>
         <source>minutes</source>
@@ -81,7 +81,7 @@
     </message>
     <message>
         <source>Start</source>
-        <translation>DÈbuter</translation>
+        <translation>D√©buter</translation>
     </message>
     <message>
         <source>Stop</source>
@@ -90,10 +90,6 @@
 </context>
 <context>
     <name>PlaybackBox</name>
-    <message>
-        <source>% used</source>
-        <translation>% utilisÈ</translation>
-    </message>
     <message>
         <source>, %d,%03d MB free</source>
         <translation>, %d,%03d MB disp.</translation>
@@ -104,19 +100,19 @@
     </message>
     <message>
         <source>You have finished watching:</source>
-        <translation>Vous avez terminÈ de visionner:</translation>
+        <translation>Vous avez termin√© de visionner:</translation>
     </message>
     <message>
         <source>Are you sure you want to delete:</source>
-        <translation> tes-vous certain de vouloir supprimer:</translation>
+        <translation>√ätes-vous certain de vouloir supprimer:</translation>
     </message>
     <message>
         <source>Delete this recording? It will be gone forever.</source>
-        <translation>Supprimer dÈfinitivement cet enregistrement?</translation>
+        <translation type="unfinished">Supprimer d√©finitivement cet enregistrement?</translation>
     </message>
     <message>
         <source>It will be gone forever.</source>
-        <translation>Il disparaÓtra pour toujours.</translation>
+        <translation>Il dispara√Ætra pour toujours.</translation>
     </message>
     <message>
         <source>Yes, get rid of it</source>
@@ -124,11 +120,15 @@
     </message>
     <message>
         <source>No, I might want to watch it again.</source>
-        <translation>Non, je pourrais vouloir le regarder encore</translation>
+        <translation type="unfinished">Non, je voudrais pouvoir le regarder encore</translation>
     </message>
     <message>
         <source>No, keep it, I changed my mind</source>
         <translation>Non, le conserver</translation>
+    </message>
+    <message>
+        <source>% used</source>
+        <translation type="unfinished">% utilis√©</translation>
     </message>
 </context>
 <context>
@@ -139,27 +139,19 @@
     </message>
     <message>
         <source>There are no available programs under this search. Please select another search.</source>
-        <translation>Aucun rÈsultat pour cette recherche. Veuillez essayer une autre recherche.</translation>
+        <translation>Aucun r√©sultat pour cette recherche. Veuillez essayer une autre recherche.</translation>
     </message>
     <message>
         <source>Recording just this showing</source>
-        <translation>Enregistrer seulement cet Èpisode</translation>
+        <translation>Enregistrer seulement cet √©pisode</translation>
     </message>
     <message>
         <source>Recording when shown in this timeslot</source>
-        <translation>EnregistrÈ ‡ ce crÈneau horaire</translation>
+        <translation>Enregistr√© √† ce cr√©neau horaire</translation>
     </message>
     <message>
         <source>Recording when shown on this channel</source>
-        <translation>EnregistrÈ sur cette station</translation>
-    </message>
-    <message>
-        <source>Recording all showings</source>
-        <translation>Toujours enregistrÈ</translation>
-    </message>
-    <message>
-        <source>Not recording this showing</source>
-        <translation>Pas enregistrÈ</translation>
+        <translation>Enregistr√© sur cette station</translation>
     </message>
     <message>
         <source>Error!</source>
@@ -168,6 +160,14 @@
     <message>
         <source>       !! No Programs !!</source>
         <translation>       !! Pas de programmes !!</translation>
+    </message>
+    <message>
+        <source>Recording all showings</source>
+        <translation type="unfinished">Toujours enregistr√©</translation>
+    </message>
+    <message>
+        <source>Not recording this showing</source>
+        <translation type="unfinished">Pas enregistr√©</translation>
     </message>
 </context>
 <context>
@@ -186,14 +186,126 @@
     </message>
     <message>
         <source>Yes, Exit and shutdown the computer</source>
-        <translation>Oui, quitter et Èteindre l'ordinateur</translation>
+        <translation>Oui, quitter et √©teindre l&apos;ordinateur</translation>
+    </message>
+    <message>
+        <source>cut point</source>
+        <translation type="unfinished">point de saut</translation>
+    </message>
+    <message>
+        <source>keyframe</source>
+        <translation type="unfinished">trame cl√©</translation>
+    </message>
+    <message>
+        <source>1 frame</source>
+        <translation type="unfinished">1 trame</translation>
+    </message>
+    <message>
+        <source>0.5 seconds</source>
+        <translation type="unfinished">0.5 secondes</translation>
+    </message>
+    <message>
+        <source>1 second</source>
+        <translation type="unfinished">1 seconde</translation>
+    </message>
+    <message>
+        <source>5 seconds</source>
+        <translation type="unfinished">5 secondes</translation>
+    </message>
+    <message>
+        <source>20 seconds</source>
+        <translation type="unfinished">20 secondes</translation>
+    </message>
+    <message>
+        <source>1 minute</source>
+        <translation type="unfinished">1 minute</translation>
+    </message>
+    <message>
+        <source>5 minutes</source>
+        <translation type="unfinished">5 minutes</translation>
+    </message>
+    <message>
+        <source>10 minutes</source>
+        <translation type="unfinished">10 minutes</translation>
+    </message>
+    <message>
+        <source>error</source>
+        <translation type="unfinished">erreur</translation>
+    </message>
+    <message>
+        <source>cut</source>
+        <translation type="unfinished">coup√©</translation>
+    </message>
+    <message>
+        <source>You are close to an existing cut point.  Would you like to:</source>
+        <translation type="unfinished">Vous √™tes pr√®s d&apos;un point de coupe existant. Vous pouvez:</translation>
+    </message>
+    <message>
+        <source>Delete this cut point</source>
+        <translation type="unfinished">Supprimer ce point de coupe</translation>
+    </message>
+    <message>
+        <source>Move this cut point to the current position</source>
+        <translation type="unfinished">D√©placer le point de coupe √† la position courante</translation>
+    </message>
+    <message>
+        <source>Flip directions - delete to the </source>
+        <translation type="unfinished">Inverser la direction - supprimer √† la </translation>
+    </message>
+    <message>
+        <source>right</source>
+        <translation type="unfinished">droite</translation>
+    </message>
+    <message>
+        <source>left</source>
+        <translation type="unfinished">gauche</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuler</translation>
+    </message>
+    <message>
+        <source>Insert a new cut point?</source>
+        <translation type="unfinished">Ins√©rer un nouveau point de coupe?</translation>
+    </message>
+    <message>
+        <source>Delete before this frame</source>
+        <translation type="unfinished">Supprimer avant cette trame</translation>
+    </message>
+    <message>
+        <source>Delete after this frame</source>
+        <translation type="unfinished">Supprimer apr√®s cette trame</translation>
+    </message>
+    <message>
+        <source>Auto-Skip %1 seconds</source>
+        <translation type="unfinished">Saut auto %1 secondes</translation>
+    </message>
+    <message>
+        <source>SKIP</source>
+        <translation type="unfinished">Saut</translation>
+    </message>
+    <message>
+        <source>Found %1 sec. commercial</source>
+        <translation type="unfinished">Commercial de %1 sec. trouv√©</translation>
+    </message>
+    <message>
+        <source>At Start of program.</source>
+        <translation type="unfinished">Au d√©but du programme.</translation>
+    </message>
+    <message>
+        <source>At End, can not Skip.</source>
+        <translation type="unfinished">√Ä la fin, saut impossible.</translation>
+    </message>
+    <message>
+        <source>Start of program.</source>
+        <translation type="unfinished">D√©but du programme.</translation>
     </message>
 </context>
 <context>
     <name>ScheduledRecording</name>
     <message>
         <source>Episode:</source>
-        <translation>pisode:</translation>
+        <translation>√âpisode:</translation>
     </message>
     <message>
         <source>Description:</source>
@@ -204,11 +316,11 @@
     <name>SetRecTimeDialog</name>
     <message>
         <source>Change recording time:</source>
-        <translation>Modifier le temps ou l'heure d'enregistrement:</translation>
+        <translation>Modifier le temps ou l&apos;heure d&apos;enregistrement:</translation>
     </message>
     <message>
         <source>Episode:</source>
-        <translation>…pisode:</translation>
+        <translation>√âpisode:</translation>
     </message>
     <message>
         <source>Description:</source>
@@ -216,7 +328,7 @@
     </message>
     <message>
         <source>Start Time: </source>
-        <translation>DÈbut:</translation>
+        <translation>D√©but:</translation>
     </message>
     <message>
         <source>End Time: </source>
@@ -227,7 +339,7 @@
     <name>TV</name>
     <message>
         <source>MythTV is already using all available inputs for recording.  If you want to watch an in-progress recording, select one from the playback menu.  If you want to watch live TV, cancel one of the in-progress recordings from the delete menu.</source>
-        <translation>MythTV utilise dÈj‡ toutes les entrÈes TV disponibles. Si vous voulez regarder un enregistrement en cours, veullez le selectionner ‡ partir du menu de visionnement. Si vous voulez regarder la TV en direct, veuillez supprimer un des enregistrements en cours.</translation>
+        <translation>MythTV utilise d√©j√† toutes les entr√©es TV disponibles. Si vous voulez regarder un enregistrement en cours, veullez le selectionner √† partir du menu de visionnement. Si vous voulez regarder la TV en direct, veuillez supprimer un des enregistrements en cours.</translation>
     </message>
     <message>
         <source>Cancel and go back to the TV menu</source>
@@ -235,15 +347,15 @@
     </message>
     <message>
         <source>Record and watch while it records</source>
-        <translation>Enregistrer et visionner simultanÈment</translation>
+        <translation>Enregistrer et visionner simultan√©ment</translation>
     </message>
     <message>
         <source>Let it record and go back to the Main Menu</source>
-        <translation>Maintenir l'enregistrement et revenir au menu prÈcÈdent</translation>
+        <translation>Maintenir l&apos;enregistrement et revenir au menu pr√©c√©dent</translation>
     </message>
     <message>
         <source>Don&apos;t let it record, I want to watch TV</source>
-        <translation>Ne pas enregistrer, plutÙt regarder la TV</translation>
+        <translation>Ne pas enregistrer, continuer √† regarder la TV</translation>
     </message>
     <message>
         <source>You are exiting this recording</source>
@@ -266,20 +378,12 @@
         <translation>Supprimer cet enregistrement</translation>
     </message>
     <message>
-        <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
-        <translation>%02d:%02d:%02d en arriËre -- %.2f%% utilisÈ</translation>
-    </message>
-    <message>
-        <source>%02d:%02d:%02d behind</source>
-        <translation>%02d:%02d:%02d en arriËre</translation>
-    </message>
-    <message>
         <source>%02d:%02d behind  --  %.2f%% full</source>
-        <translation>%02d:%02d en arriËre -- %.2f%% plein</translation>
+        <translation>%02d:%02d en arri√®re -- %.2f%% plein</translation>
     </message>
     <message>
         <source>%02d:%02d behind</source>
-        <translation>%02d:%02d en arriËre</translation>
+        <translation>%02d:%02d en arri√®re</translation>
     </message>
     <message>
         <source>%02d:%02d:%02d of %02d:%02d:%02d</source>
@@ -311,7 +415,7 @@
     </message>
     <message>
         <source>Jump Back</source>
-        <translation>Saut arriËre</translation>
+        <translation>Saut arri√®re</translation>
     </message>
     <message>
         <source>Searching...</source>
@@ -323,11 +427,11 @@
     </message>
     <message>
         <source>Brightness %1 %</source>
-        <translation>LuminositÈ %1 %</translation>
+        <translation>Luminosit√© %1 %</translation>
     </message>
     <message>
         <source>Adjust Picture</source>
-        <translation>Ajustement de l'image</translation>
+        <translation>Ajustement de l&apos;image</translation>
     </message>
     <message>
         <source>Contrast %1 %</source>
@@ -346,12 +450,20 @@
         <translation>Ajustement Volume</translation>
     </message>
     <message>
+        <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
+        <translation type="unfinished">%02d:%02d:%02d en arri√®re -- %.2f%% plein</translation>
+    </message>
+    <message>
+        <source>%02d:%02d:%02d behind</source>
+        <translation type="unfinished">%02d:%02d:%02d en arri√®re</translation>
+    </message>
+    <message>
         <source>Mute On</source>
-        <translation>Muet activÈ</translation>
+        <translation type="unfinished">Muet activ√©</translation>
     </message>
     <message>
         <source>Mute Off</source>
-        <translation>Muet dÈsactivÈ</translation>
+        <translation type="unfinished">Muet d√©sactiv√©</translation>
     </message>
 </context>
 <context>
@@ -366,19 +478,19 @@
     </message>
     <message>
         <source>Recording this program has been deactivated because it conflicts with another scheduled recording.  Do you want to re-enable this recording?</source>
-        <translation>Cet programme a ÈtÈ dÈsactivÈ car il Ètait en conflict avec un autre programme. RÈactiver ce programme?</translation>
+        <translation>Cet programme a √©t√© d√©sactiv√© car il √©tait en conflict avec un autre programme. R√©activer ce programme?</translation>
     </message>
     <message>
         <source>Yes, I want to record it.</source>
-        <translation>Oui, l'enregistrer</translation>
+        <translation>Oui, l&apos;enregistrer</translation>
     </message>
     <message>
         <source>No, leave it disabled.</source>
-        <translation>Non, le garder dÈsactivÈ.</translation>
+        <translation type="unfinished">Non, le garder d√©sactiv√©</translation>
     </message>
     <message>
         <source>Recording this program has been suppressed because it has already been recorded in the past.</source>
-        <translation>Ce programme a ÈtÈ dÈsactivÈ car il a dÈj‡ ÈtÈ enregistrÈ auparavant.</translation>
+        <translation>Ce programme a √©t√© d√©sactiv√© car il a d√©j√† √©t√© enregistr√© auparavant.</translation>
     </message>
     <message>
         <source>OK</source>
@@ -386,7 +498,7 @@
     </message>
     <message>
         <source>Unsuppress recording</source>
-        <translation>RÈactiver l'enregistrement</translation>
+        <translation>R√©activer l&apos;enregistrement</translation>
     </message>
     <message>
         <source>The follow scheduled recordings conflict with each other.  Which would you like to record?</source>
@@ -394,7 +506,7 @@
     </message>
     <message>
         <source>Remember this choice and use it automatically in the future</source>
-        <translation>Conserver ce choix et l'utiliser automatiquement dans le futur</translation>
+        <translation>Conserver ce choix et l&apos;utiliser automatiquement dans le futur</translation>
     </message>
 </context>
 </TS>
