@@ -295,7 +295,7 @@ public:
         setLabel(QObject::tr("Show group name instead of \"All Programs\"."));
         setValue(false);
         setHelpText(QObject::tr("Use the name of the display group currently "
-                    "being show in place of the term \"All Programs\" in the"
+                    "being shown in place of the term \"All Programs\" in the "
                     "playback screen."));
     };
 };
