@@ -1801,7 +1801,7 @@ void NuppelVideoPlayer::OutputAudioLoop(void)
         {
             //printf("waiting for space to write %d bytes on soundcard whish has %d bytes free\n", bytesperframe, space_on_soundcard);
             numlowbuffer++;
-            if (numlowbuffer > 2 && audio_buffer_unused)
+            if (numlowbuffer > 5 && audio_buffer_unused)
             {
                 cerr << "dropping back audio_buffer_unused\n";
                 audio_buffer_unused /= 2;
