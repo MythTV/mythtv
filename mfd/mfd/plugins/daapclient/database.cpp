@@ -1481,16 +1481,21 @@ void Database::beIgnorant()
     have_playlists = false;
     
     //
-    //  We also need to delete all out playlists, as they are probably stale
+    //  We also need to get rid of any metadata and playlists if we have any 
     //
+    
+    
     
     if(new_playlists)
     {
         new_playlists->setAutoDelete(true);
-        delete new_playlists;
-        new_playlists = NULL;
-        
-        new_playlists = new QIntDict<Playlist>;
+        new_playlists->clear();
+    }
+    
+    if(new_metadata)
+    {
+        new_metadata->setAutoDelete(true);
+        new_metadata->clear();
     }
 }
 
