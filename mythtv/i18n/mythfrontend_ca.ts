@@ -624,11 +624,11 @@
         <translation>Rànquing</translation>
     </message>
     <message>
-        <source>Allow recording even if duplicate episode</source>
+        <source>Record duplicates</source>
         <translation>Permetre gravar encara que estigui duplicat</translation>
     </message>
     <message>
-        <source>Allow recordings to be Auto-Expired</source>
+        <source>Auto Expire</source>
         <translation>Permetre que les gravacions auto-expirin</translation>
     </message>
     <message>

@@ -242,7 +242,7 @@ void Scheduler::PrintList(void)
     cout << "--- print list start ---\n";
     list<ProgramInfo *>::iterator i = recordingList.begin();
     cout << "Title                 Chan  ChID  StartTime       S I C "
-            "-- C R D S Rank Total" << endl;
+            "-- C R O N Rank Total" << endl;
     for (; i != recordingList.end(); i++)
     {
         ProgramInfo *first = (*i);
@@ -255,7 +255,7 @@ void Scheduler::PrintList(void)
              << first->sourceid 
              << " " << first->inputid << " " << first->cardid << " -- "  
              << first->conflicting << " " << first->recording << " "
-             << first->duplicate << " " << first->suppressed << " "
+             << first->override << " " << first->norecord << " "
              << first->rank.rightJustify(4, ' ') << " "
              << totrank.rightJustify(4, ' ')
              << endl;
@@ -394,10 +394,8 @@ void Scheduler::PruneList(void)
 
         if (!rec->AllowRecordingNewEpisodes(db))
         {
-            rec->suppressed = true;
             rec->recording = false;
-            rec->reasonsuppressed = tr("the maximum number of episodes have "
-                                       "already been recorded.");
+            rec->norecord = nrTooManyRecordings;
         }
 
         q++;
@@ -424,6 +422,7 @@ void Scheduler::PruneList(void)
             if ((*dreciter).IsSameProgramTimeslot(*rec))
             {
                 rec->recording = false;
+                rec->norecord = nrDontRecordList;
             }
         }
 
@@ -445,60 +444,41 @@ void Scheduler::PruneList(void)
             q++;
     }
 
-    i = recordingList.rbegin();
-    while (i != recordingList.rend())
+    for (i = recordingList.rbegin(); i != recordingList.rend(); i++)
     {
-        list<ProgramInfo *>::reverse_iterator j = i;
-        j++;
-
         ProgramInfo *first = (*i);
 
-        if (first->GetProgramRecordingStatus(db) > kSingleRecord &&
-            (first->subtitle.length() > 2 && first->description.length() > 2))
+        if (!first->recording || first->rectype == kSingleRecord ||
+            first->subtitle.length() <= 2 && first->description.length() <= 2)
+            continue;
+
+        list<ProgramInfo *>::reverse_iterator j = i;
+
+        for (j++; j != recordingList.rend(); j++)
         {
-            if (first->duplicate)
+            ProgramInfo *second = (*j);
+
+            if (!second->recording)
+                continue;
+
+            if (first->IsSameProgram(*second))
             {
-                first->recording = false;
-            }
-            else
-            {
-                while (j != recordingList.rend())
+                if (((second->conflicting && !first->conflicting) ||
+                     second->startts < now.addSecs(-15) || first->override == 1) 
+                    && second->override != 1 
+                    && second->recdups != kRecordDupsAlways)
                 {
-                    ProgramInfo *second = (*j);
-                    if (first->IsSameTimeslot(*second)) 
-                    {
-                        delete second;
-                        deliter = j.base();
-                        deliter--;
-                        recordingList.erase(deliter);
-                    }
-                    else if (first->IsSameProgram(*second))
-                    {
-                        if ((second->conflicting && !first->conflicting) ||
-                            second->startts < now.addSecs(-15))
-                        {
-                            delete second;
-                            deliter = j.base();
-                            deliter--;
-                            recordingList.erase(deliter);
-                        }
-                        else
-                        {
-                            delete first;
-                            deliter = i.base();
-                            deliter--;
-                            recordingList.erase(deliter);
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        j++;
-                    }
+                    second->recording = false;
+                    second->norecord = nrOtherShowing;
+                }
+                else if (first->override != 1
+                         && first->recdups != kRecordDupsAlways)
+                {
+                    first->recording = false;
+                    first->norecord = nrOtherShowing;
                 }
             }
         }
-        i++;
     }    
 }
 
@@ -591,6 +571,7 @@ void Scheduler::CheckRank(ProgramInfo *info,
         if (rank > srank)
         {
             second->recording = false;
+            second->norecord = nrLowerRanking;
             resolved++;
         }
     }
@@ -626,6 +607,7 @@ void Scheduler::CheckOverride(ProgramInfo *info,
             ProgramInfo *del = (*i);
 
             del->recording = false;
+            del->norecord = nrManualConflict;
         }
         info->conflicting = false;
     }
@@ -669,6 +651,7 @@ void Scheduler::MarkSingleConflict(ProgramInfo *info,
                     test->endts == badend)
                 {
                     test->recording = false;
+                    test->norecord = nrManualConflict;
                 }
             }
         }
@@ -707,6 +690,7 @@ void Scheduler::MarkSingleConflict(ProgramInfo *info,
                 if (test->title == badtitle)
                 {
                     test->recording = false;
+                    test->norecord = nrManualConflict;
                 }
             }
         }
@@ -872,12 +856,14 @@ void Scheduler::GuessSingle(ProgramInfo *info,
         {
             ProgramInfo *pginfo = (*i);
             pginfo->recording = false;
+            pginfo->norecord = nrAutoConflict;
         }
         best->conflicting = false;
     }
     else
     {
         info->recording = false;
+        info->norecord = nrAutoConflict;
     } 
 }
 

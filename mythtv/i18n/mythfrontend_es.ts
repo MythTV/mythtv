@@ -572,11 +572,11 @@
         <translation>Ránking</translation>
     </message>
     <message>
-        <source>Allow recording even if duplicate episode</source>
+        <source>Record duplicates</source>
         <translation>Grabar aunque se trate de episodios duplicados</translation>
     </message>
     <message>
-        <source>Allow recordings to be Auto-Expired</source>
+        <source>Auto Expire</source>
         <translation>Permitir que las grabaciones autoexpiren</translation>
     </message>
     <message>

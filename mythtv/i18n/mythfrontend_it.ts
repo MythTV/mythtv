@@ -589,11 +589,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Allow recording even if duplicate episode</source>
+        <source>Record duplicates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Allow recordings to be Auto-Expired</source>
+        <source>Auto Expire</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

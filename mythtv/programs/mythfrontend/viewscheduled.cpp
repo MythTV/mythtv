@@ -688,61 +688,42 @@ void ViewScheduled::selected()
 
     MythContext::KickDatabase(db);
 
-    if (rec->duplicate)
-    {
-         handleDuplicate(rec);
-    }
-    else if (rec->suppressed)
-    {
-         handleSuppressed(rec);
-    } 
-    else if (!rec->recording)
-    {
-         handleNotRecording(rec);
-    } 
-    else if (rec->conflicting)
-    {
+    if (rec->conflicting)
         handleConflicting(rec);
-    }
+    else if (rec->recording)
+        handleRecording(rec);
     else
-    {
-        if ((gContext->GetNumSetting("AdvancedRecord", 0)) ||
-            (rec->GetProgramRecordingStatus(db) > kAllRecord))
-        {
-            ScheduledRecording record;
-            record.loadByProgram(db, rec);
-            record.exec(db);
-        }
-        else
-        {
-            InfoDialog diag(rec, gContext->GetMainWindow(), "Program Info");
-            diag.exec();
-        }
-
-        ScheduledRecording::signalChange(db);
-
-        FillList();
-        update(fullRect);
-    }
+        handleNotRecording(rec);
 
     doingSel = false;
 }
 
 void ViewScheduled::handleNotRecording(ProgramInfo *rec)
 {
-    QString message = tr("Recording this program has been deactivated because "
-                         "it conflicts with another scheduled recording.  Do "
-                         "you want to re-enable this recording?");
+    QString message = QString("This showing will not be recorded because %1.")
+        .arg(rec->NoRecordText());
 
-    DialogBox diag(gContext->GetMainWindow(), message);
+    DialogBox diag(gContext->GetMainWindow(), tr(message));
+    diag.AddButton(tr("OK"));
 
-    diag.AddButton(tr("Yes, I want to record it."));
-    diag.AddButton(tr("No, leave it disabled."));
+    if (rec->norecord != nrTooManyRecordings &&
+        rec->norecord != nrDontRecordList &&
+        rec->norecord != nrLowerRanking)
+        diag.AddButton(tr("Record it anyway"));
 
     int ret = diag.exec();
 
-    if (ret != 1)
+    if (ret <= 1)
         return;
+
+    if (rec->norecord != nrManualConflict &&
+        rec->norecord != nrAutoConflict)
+    {
+        rec->SetOverride(db, 1);
+        FillList();
+        update(fullRect);
+        return;
+    }
 
     QString pstart = rec->startts.toString("yyyyMMddhhmm");
     pstart += "00";
@@ -810,35 +791,22 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
     return;
 }
 
-void ViewScheduled::handleDuplicate(ProgramInfo *rec)
+void ViewScheduled::handleRecording(ProgramInfo *rec)
 {
-    QString message = tr("Recording this program has been suppressed because "
-                         "it has already been recorded in the past.");
+    QString message = "This showing will be recorded.";
 
-    DialogBox diag(gContext->GetMainWindow(), message);
+    DialogBox diag(gContext->GetMainWindow(), tr(message));
     diag.AddButton(tr("OK"));
-    diag.AddButton(tr("Unsuppress recording"));
+    diag.AddButton(tr("Don't record it"));
+
     int ret = diag.exec();
-    if (ret == 2)
-    {
-        rec->DeleteHistory(db);
 
-        ScheduledRecording::signalChange(db);
+    if (ret <= 1)
+      return;
 
-        FillList();
-        update(fullRect);
-    }
-}
-
-void ViewScheduled::handleSuppressed(ProgramInfo *rec)
-{
-    QString message = tr("Recording this program has been suppressed because: ");
-
-    message += rec->reasonsuppressed;
-
-    DialogBox diag(gContext->GetMainWindow(), message);
-    diag.AddButton(tr("OK"));
-    diag.exec();
+    rec->SetOverride(db, 2);
+    FillList();
+    update(fullRect);
 }
 
 void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)

@@ -619,11 +619,11 @@
         <translation>Preferência</translation>
     </message>
     <message>
-        <source>Allow recording even if duplicate episode</source>
+        <source>Record duplicates</source>
         <translation>Permitir gravação mesmo que seja um episódio duplicado</translation>
     </message>
     <message>
-        <source>Allow recordings to be Auto-Expired</source>
+        <source>Auto Expire</source>
         <translation>Permitir que a gravação seja apagada automaticamente</translation>
     </message>
     <message>

@@ -577,11 +577,11 @@
         <translation type="obsolete">Wieviele Episoden behalten (0 für alle)</translation>
     </message>
     <message>
-        <source>Allow recording even if duplicate episode</source>
+        <source>Record duplicates</source>
         <translation>Auch Serienwdh. aufnehmen</translation>
     </message>
     <message>
-        <source>Allow recordings to be Auto-Expired</source>
+        <source>Auto Expire</source>
         <translation>Automatisch löschen</translation>
     </message>
     <message>

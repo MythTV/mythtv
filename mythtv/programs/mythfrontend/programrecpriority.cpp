@@ -63,7 +63,11 @@ ProgramRankInfo& ProgramRankInfo::operator=(const ProgramInfo &other)
 
     conflicting = other.conflicting;
     recording = other.recording;
-    duplicate = other.duplicate;
+    override = other.override;
+    norecord = other.norecord;
+    recordid = other.recordid;
+    rectype = other.rectype;
+    recdups = other.recdups;
 
     sourceid = other.sourceid;
     inputid = other.inputid;

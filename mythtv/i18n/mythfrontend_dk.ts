@@ -553,11 +553,11 @@
         <translation>Rang</translation>
     </message>
     <message>
-        <source>Allow recording even if duplicate episode</source>
+        <source>Record duplicates</source>
         <translation>Tillad optagelse af tidligere optagede episoder</translation>
     </message>
     <message>
-        <source>Allow recordings to be Auto-Expired</source>
+        <source>Auto Expire</source>
         <translation>Tillad at optagelser auto-udløber</translation>
     </message>
     <message>

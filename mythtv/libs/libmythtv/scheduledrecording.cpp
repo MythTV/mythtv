@@ -73,12 +73,15 @@ public:
     };
 };
 
-class SRRecordDups: public CheckBoxSetting, public SRSetting {
+class SRRecordDups: public ComboBoxSetting, public SRSetting {
 public:
     SRRecordDups(const ScheduledRecording& parent):
         SRSetting(parent, "recorddups") {
-        setLabel(QObject::tr("Allow recording even if duplicate episode"));
-        setValue(false);
+        setLabel(QObject::tr("Record duplicates"));
+        addSelection(QObject::tr("Never"), QString::number(kRecordDupsNever));
+        addSelection(QObject::tr("If deleted"),
+                     QString::number(kRecordDupsIfDeleted));
+        addSelection(QObject::tr("Always"), QString::number(kRecordDupsAlways));
     };
 };
 
@@ -86,7 +89,7 @@ class SRAutoExpire: public CheckBoxSetting, public SRSetting {
 public:
     SRAutoExpire(const ScheduledRecording& parent):
         SRSetting(parent, "autoexpire") {
-        setLabel(QObject::tr("Allow recordings to be Auto-Expired"));
+        setLabel(QObject::tr("Auto Expire"));
     };
 };
 
@@ -258,7 +261,8 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
 "channel.channum, channel.callsign, channel.name, "
 "oldrecorded.starttime IS NOT NULL AS oldrecduplicate, program.category, "
 "record.rank, record.recorddups, "
-"recorded.starttime IS NOT NULL as recduplicate, record.type "
+"recorded.starttime IS NOT NULL as recduplicate, record.type, "
+"record.recordid, recordoverride.type "
 "FROM record "
 " INNER JOIN channel ON (channel.chanid = program.chanid) "
 " INNER JOIN program ON (program.title = record.title) "
@@ -277,6 +281,16 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
 "    recorded.subtitle IS NOT NULL AND recorded.subtitle <> '' AND program.subtitle = recorded.subtitle "
 "     AND "
 "    recorded.description IS NOT NULL AND recorded.description <> '' AND program.description = recorded.description"
+"  ) "
+" LEFT JOIN recordoverride ON "
+"  ( "
+"    record.recordid = recordoverride.recordid "
+"    AND program.chanid = recordoverride.chanid "
+"    AND program.starttime = recordoverride.starttime "
+"    AND program.endtime = recordoverride.endtime "
+"    AND program.title = recordoverride.title "
+"    AND program.subtitle = recordoverride.subtitle "
+"    AND program.description = recordoverride.description "
 "  ) "
 "WHERE "
 "((record.type = %1) " // allrecord
@@ -319,6 +333,7 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
      {
          while (result.next()) {
              ProgramInfo *proginfo = new ProgramInfo;
+             proginfo->recording = true;
              proginfo->chanid = result.value(0).toString();
              proginfo->sourceid = result.value(1).toInt();
              proginfo->startts = result.value(2).toDateTime();
@@ -329,27 +344,39 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
              proginfo->chanstr = result.value(7).toString();
              proginfo->chansign = result.value(8).toString();
              proginfo->channame = result.value(9).toString();
-
-             if (result.value(15).toInt() == kSingleRecord)
-             {
-                 // force single-recording to be non-duplicate
-                 proginfo->duplicate = false;
-             }
-             else
-             {
-                 // if recorddups is set then check if recording still exists
-                 // in recorded table otherwise check for dup in oldrecorded.
-                 if (result.value(13).toInt())
-                     proginfo->duplicate = result.value(14).toInt();
-                 else
-                     proginfo->duplicate = result.value(10).toInt();
-             }
-
-             if (proginfo->duplicate)
-                 proginfo->recording = false;
-
              proginfo->category = QString::fromUtf8(result.value(11).toString());
              proginfo->rank = result.value(12).toString();
+             proginfo->recdups = RecordingDupsType(result.value(13).toInt());
+             proginfo->rectype = RecordingType(result.value(15).toInt());
+             proginfo->recordid = result.value(16).toInt();
+             proginfo->override = result.value(17).toInt();
+
+             if (proginfo->override == 2)
+             {
+                 proginfo->recording = false;
+                 proginfo->norecord = nrManualOverride;
+             }
+             else if (proginfo->rectype != kSingleRecord &&
+                      proginfo->override != 1 &&
+                      proginfo->recdups != kRecordDupsAlways)
+             {
+                 if (proginfo->recdups == kRecordDupsIfDeleted)
+                 {
+                     if (result.value(14).toInt())
+                     {
+                         proginfo->recording = false;
+                         proginfo->norecord = nrCurrentRecording;
+                     }
+                 }
+                 else
+                 {
+                     if (result.value(10).toInt())
+                     {
+                         proginfo->recording = false;
+                         proginfo->norecord = nrPreviousRecording;
+                     }
+                 }
+             }
 
              // would save many queries to create and populate a
              // ScheduledRecording and put it in the proginfo at the
@@ -369,7 +396,6 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
                  delete proginfo;
              else 
                  proglist.push_back(proginfo);
-             
          }
     }
     else if (!result.isActive())
@@ -383,7 +409,7 @@ void ScheduledRecording::findAllScheduledPrograms(QSqlDatabase* db,
     QString query = QString("SELECT record.chanid, record.starttime, "
 "record.startdate, record.endtime, record.enddate, record.title, "
 "record.subtitle, record.description, record.rank, record.type, "
-"channel.name FROM record "
+"channel.name, record.recordid FROM record "
 "LEFT JOIN channel ON (channel.chanid = record.chanid) "
 "ORDER BY title ASC;");
 
@@ -394,10 +420,12 @@ void ScheduledRecording::findAllScheduledPrograms(QSqlDatabase* db,
         {
             ProgramInfo *proginfo = new ProgramInfo;
             proginfo->chanid = result.value(0).toString();
+            proginfo->rectype = RecordingType(result.value(9).toInt());
+            proginfo->recordid = result.value(11).toInt();
 
-            int type = result.value(9).toInt();
-            if (type == kSingleRecord || type == kTimeslotRecord ||
-                type == kWeekslotRecord) 
+            if (proginfo->rectype == kSingleRecord || 
+                proginfo->rectype == kTimeslotRecord ||
+                proginfo->rectype == kWeekslotRecord) 
             {
                 temptime = result.value(1).toString();
                 tempdate = result.value(2).toString();
@@ -434,7 +462,6 @@ void ScheduledRecording::findAllScheduledPrograms(QSqlDatabase* db,
             proglist.push_back(proginfo);
         }
 }
-
 
 bool ScheduledRecording::loadByProgram(QSqlDatabase* db,
                                        ProgramInfo* proginfo) {
@@ -580,6 +607,8 @@ void ScheduledRecording::save(QSqlDatabase* db) {
 
 void ScheduledRecording::remove(QSqlDatabase* db) {
     QString query = QString("DELETE FROM record WHERE recordid = %1").arg(getRecordID());
+    db->exec(query);
+    query = QString("DELETE FROM recordoverride WHERE recordid = %1").arg(getRecordID());
     db->exec(query);
 }
 

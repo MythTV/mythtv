@@ -27,10 +27,12 @@ ProgramInfo::ProgramInfo(void)
     hostname = "";
 
     conflicting = false;
-    recording = true;
-    duplicate = false;
-    suppressed = false;
-    reasonsuppressed = QObject::tr("Not Currently Suppressed");
+    recording = false;
+    override = 0;
+    norecord = nrUnknown;
+    recordid = 0;
+    rectype = kNotRecording;
+    recdups = kRecordDupsNever;
 
     sourceid = -1;
     inputid = -1;
@@ -62,9 +64,11 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
  
     conflicting = other.conflicting;
     recording = other.recording;
-    duplicate = other.duplicate;
-    suppressed = other.suppressed;
-    reasonsuppressed = other.reasonsuppressed;
+    override = other.override;
+    norecord = other.norecord;
+    recordid = other.recordid;
+    rectype = other.rectype;
+    recdups = other.recdups;
 
     sourceid = other.sourceid;
     inputid = other.inputid;
@@ -102,14 +106,16 @@ void ProgramInfo::ToStringList(QStringList &list)
     list << endts.toString(Qt::ISODate);
     list << QString::number(conflicting);
     list << QString::number(recording);
-    list << QString::number(duplicate);
+    list << QString::number(override);
     list << ((hostname != "") ? hostname : QString(" "));
     list << QString::number(sourceid);
     list << QString::number(cardid);
     list << QString::number(inputid);
     list << ((rank != "") ? rank : QString(" "));
-    list << QString::number(suppressed);
-    list << ((reasonsuppressed != "") ? reasonsuppressed : QString(" "));
+    list << QString::number(norecord);
+    list << QString::number(recordid);
+    list << QString::number(rectype);
+    list << QString::number(recdups);
 }
 
 void ProgramInfo::FromStringList(QStringList &list, int offset)
@@ -135,14 +141,16 @@ void ProgramInfo::FromStringList(QStringList &list, int offset)
     endts = QDateTime::fromString(list[offset + 12], Qt::ISODate);
     conflicting = list[offset + 13].toInt();
     recording = list[offset + 14].toInt();
-    duplicate = list[offset + 15].toInt();
+    override = list[offset + 15].toInt();
     hostname = list[offset + 16];
     sourceid = list[offset + 17].toInt();
     cardid = list[offset + 18].toInt();
     inputid = list[offset + 19].toInt();
     rank = list[offset + 20];
-    suppressed = list[offset + 21].toInt();
-    reasonsuppressed = list[offset + 22];
+    norecord = NoRecordType(list[offset + 21].toInt());
+    recordid = list[offset + 22].toInt();
+    rectype = RecordingType(list[offset + 23].toInt());
+    recdups = RecordingDupsType(list[offset + 24].toInt());
 
     if (title == " ")
         title = "";
@@ -168,8 +176,6 @@ void ProgramInfo::FromStringList(QStringList &list, int offset)
         chansign = "";
     if (rank == " ")
         rank = "";
-    if (reasonsuppressed == " ")
-        reasonsuppressed = "";
 }
 
 void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
@@ -1225,6 +1231,105 @@ void ProgramInfo::DeleteHistory(QSqlDatabase *db)
 {
     GetProgramRecordingStatus(db);
     record->forgetHistory(db, *this);
+}
+
+void ProgramInfo::SetOverride(QSqlDatabase *db, int override)
+{
+    QString sqltitle = title;
+    sqltitle.replace(QRegExp("\'"), "\\'");
+    sqltitle.replace(QRegExp("\""), "\\\"");
+    QString sqlsubtitle = subtitle;
+    sqlsubtitle.replace(QRegExp("\'"), "\\'");
+    sqlsubtitle.replace(QRegExp("\""), "\\\"");
+    QString sqldescription = description;
+    sqldescription.replace(QRegExp("\'"), "\\'");
+    sqldescription.replace(QRegExp("\""), "\\\"");
+
+    QString thequery;
+    QSqlQuery query;
+
+    thequery = QString("DELETE FROM recordoverride WHERE "
+       "recordid = %2 AND chanid = %3 AND starttime = %4 AND endtime = %5 AND "
+       "title = \"%6\" AND subtitle = \"%7\" AND description = \"%8\";")
+        .arg(recordid).arg(chanid)
+        .arg(startts.toString("yyyyMMddhhmmss").ascii())
+        .arg(endts.toString("yyyyMMddhhmmss").ascii())
+        .arg(sqltitle.utf8()).arg(sqlsubtitle.utf8())
+        .arg(sqldescription.utf8());
+    query = db->exec(thequery);
+
+    if (!query.isActive())
+        MythContext::DBError("record override update", thequery);
+    else
+    {
+        thequery = QString("INSERT INTO recordoverride SET type = %1, "
+            "recordid = %2, chanid = %3, starttime = %4, endtime = %5, "
+            "title = \"%6\", subtitle = \"%7\", description = \"%8\";")
+            .arg(override).arg(recordid).arg(chanid)
+            .arg(startts.toString("yyyyMMddhhmmss").ascii())
+            .arg(endts.toString("yyyyMMddhhmmss").ascii())
+            .arg(sqltitle.utf8()).arg(sqlsubtitle.utf8())
+            .arg(sqldescription.utf8());
+        query = db->exec(thequery);
+        if (!query.isActive())
+            MythContext::DBError("record override update", thequery);
+    }
+
+    ScheduledRecording::signalChange(db);
+}
+
+QString ProgramInfo::NoRecordText(void)
+{
+    switch (norecord)
+    {
+    case nrManualOverride:
+        return "it was manually set to not record";
+    case nrPreviousRecording:
+        return "this episode was recorded previously and recording of duplicates is not set";
+    case nrCurrentRecording:
+        return "this episode was recorded previously and is still available for watching";
+    case nrOtherShowing:
+        return "this episode will be recorded at another time instead";
+    case nrTooManyRecordings:
+        return "too many recordings of this program have already been recorded";
+    case nrDontRecordList:
+        return "it is currently being recorded or was manually canceled";
+    case nrLowerRanking:
+        return "another program with a higher ranking will be recorded instead";
+    case nrManualConflict:
+        return "another program was manually chosen to be recorded instead";
+    case nrAutoConflict:
+        return "another program was automatically chosen to be recorded instead";
+    case nrUnknown:
+    default:
+        return "you should never see this";
+    }
+}
+
+void ProgramInfo::FillInRecordInfo(vector<ProgramInfo *> &reclist)
+{
+    vector<ProgramInfo *>::iterator i;
+
+    for (i = reclist.begin(); i != reclist.end(); i++)
+    {
+        ProgramInfo *p = (*i);
+        if (chanid == p->chanid && 
+            startts == p->startts &&
+            endts == p->endts && 
+            title == p->title &&
+            subtitle == p->subtitle && 
+            description == p->description)
+        {
+            conflicting = p->conflicting;
+            recording = p->recording;
+            override = p->override;
+            norecord = p->norecord;
+            recordid = p->recordid;
+            rectype = p->rectype;
+            recdups = p->recdups;
+            return;
+        }
+    }
 }
 
 void ProgramInfo::Save(QSqlDatabase *db)

@@ -36,8 +36,7 @@ class ViewScheduled : public MythDialog
     QMap<QString, ProgramInfo> conflictData;
 
     void handleConflicting(ProgramInfo *rec);
-    void handleDuplicate(ProgramInfo *rec);
-    void handleSuppressed(ProgramInfo *rec);
+    void handleRecording(ProgramInfo *rec);
     void handleNotRecording(ProgramInfo *rec);
     void chooseConflictingProgram(ProgramInfo *rec);
 

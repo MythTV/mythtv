@@ -433,11 +433,11 @@
         <translation>(ospecifierad)</translation>
     </message>
     <message>
-        <source>Allow recording even if duplicate episode</source>
+        <source>Record duplicates</source>
         <translation>Tillåt inspelning även vid dublerat avsnitt</translation>
     </message>
     <message>
-        <source>Allow recordings to be Auto-Expired</source>
+        <source>Auto Expire</source>
         <translation>Tillåt inspelningar att auto-raderas</translation>
     </message>
     <message>

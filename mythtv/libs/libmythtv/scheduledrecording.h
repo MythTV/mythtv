@@ -17,6 +17,13 @@ enum RecordingType
     kWeekslotRecord
 };
 
+enum RecordingDupsType
+{
+    kRecordDupsNever = 0,
+    kRecordDupsIfDeleted,
+    kRecordDupsAlways
+};
+
 class ProgramInfo;
 class QSqlDatabase;
 class ScheduledRecording: public ConfigurationGroup, public ConfigurationDialog {

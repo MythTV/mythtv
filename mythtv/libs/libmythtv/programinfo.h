@@ -7,7 +7,7 @@
 #include <qmap.h>
 #include "scheduledrecording.h"
 
-#define NUMPROGRAMLINES 23
+#define NUMPROGRAMLINES 25
 
 enum MarkTypes {
     MARK_UPDATED_CUT = -3,
@@ -34,6 +34,19 @@ enum TranscoderStatus {
     TRANSCODE_USE_CUTLIST = 0x10,
     TRANSCODE_STOP        = 0x20,
     TRANSCODE_FLAGS       = 0xF0
+};
+
+enum NoRecordType {
+    nrUnknown = 0,
+    nrManualOverride = 1,
+    nrPreviousRecording = 2,
+    nrCurrentRecording = 3,
+    nrOtherShowing = 4,
+    nrTooManyRecordings = 5,
+    nrDontRecordList = 6,
+    nrLowerRanking = 7,
+    nrManualConflict = 8,
+    nrAutoConflict = 9
 };
 
 class QSqlDatabase;
@@ -126,6 +139,9 @@ class ProgramInfo
                         long long min_frame = -1, long long max_frame = -1);
 
     void DeleteHistory(QSqlDatabase *db);
+    void SetOverride(QSqlDatabase *db, int override);
+    QString NoRecordText(void);
+    void FillInRecordInfo(vector<ProgramInfo *> &reclist);
 
     static void GetProgramListByQuery(QSqlDatabase *db,
                                         QPtrList<ProgramInfo> *proglist,
@@ -171,9 +187,11 @@ class ProgramInfo
 
     bool conflicting;
     bool recording;
-    bool duplicate;
-    bool suppressed;
-    QString reasonsuppressed;
+    int override;
+    NoRecordType norecord;
+    unsigned recordid;
+    RecordingType rectype;
+    RecordingDupsType recdups;
 
     int sourceid;
     int inputid;
