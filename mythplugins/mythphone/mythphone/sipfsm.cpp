@@ -904,6 +904,13 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         break;
     case SIP_IDLE_OUTCALL:
         remoteUrl = new SipUrl(DestinationUri, "");
+        if ((remoteUrl->getHostIp()).length() == 0)
+        {
+            cout << "SIP: Tried to call " << DestinationUri << " but can't get destination IP address\n";
+            State = SIP_IDLE;
+            break;
+        }
+
 #ifdef SIPREGISTRAR
         // If the domain matches the local registrar, see if user is registered
         if ((remoteUrl->getHost() == "volkaerts") &&
