@@ -1408,6 +1408,8 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
                        .arg(status));
 
     int systemcall_status = system(command.ascii());
+    bool succeeded = WIFEXITED(systemcall_status) &&
+         WEXITSTATUS(systemcall_status) == 0;
 
     qdtNow = QDateTime::currentDateTime();
     query.exec(QString("UPDATE settings SET data ='%1' "
@@ -1416,7 +1418,7 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
 
     status = "Successful.";
 
-    if (systemcall_status != 0)
+    if (!succeeded)
     {
         status = QString("FAILED:  xmltv returned error code %1.")
                          .arg(systemcall_status);
@@ -1434,7 +1436,7 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
     QFile thefile(filename);
     thefile.remove();
 
-    return (systemcall_status == 0);
+    return succeeded;
 }
 
 void clearOldDBEntries(void)
