@@ -67,6 +67,7 @@ ProgramInfo::ProgramInfo(void)
 
     seriesid = "";
     programid = "";
+    catType = "";
 
     sortTitle = "";
 
@@ -141,6 +142,7 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
 
     seriesid = other.seriesid;
     programid = other.programid;
+    catType = other.catType;
 
     sortTitle = other.sortTitle;
 
@@ -449,6 +451,7 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
    
     progMap["seriesid"] = seriesid;
     progMap["programid"] = programid;
+    progMap["catType"] = catType;
 
     progMap["year"] = year;
     
@@ -521,7 +524,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
                        "channel.callsign,channel.name,channel.commfree, "
                        "channel.outputfilters,seriesid,programid,filesize, "
                        "lastmodified,stars,previouslyshown,originalairdate, "
-                       "hostname "
+                       "category_type, hostname "
                        "FROM recorded "
                        "LEFT JOIN channel "
                        "ON recorded.chanid = channel.chanid "
@@ -577,7 +580,8 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
                                                           Qt::ISODate);
             proginfo->hasAirDate = true;
         }
-        proginfo->hostname = query.value(18).toString();
+        proginfo->catType = query.value(18).toString();
+        proginfo->hostname = query.value(19).toString();
 
         proginfo->spread = -1;
 
@@ -827,7 +831,7 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
     if (dupmethod & kDupCheckNone)
         return false;
 
-    if (programid.contains(QRegExp("^SH.*0000$")))
+    if (catType == "series" && programid.contains(QRegExp("0000$")))
         return false;
 
     if (programid != "" && other.programid != "")
@@ -2410,7 +2414,8 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
                 addov = button++;
             }
             if (rectype != kFindOneRecord &&
-                !programid.contains(QRegExp("^SH.*0000$")) &&
+                !(catType == "series" &&
+                  programid.contains(QRegExp("0000$"))) &&
                 ((!(dupmethod & kDupCheckNone) && programid != "") ||
                  ((dupmethod & kDupCheckSub) && subtitle != "") ||
                  ((dupmethod & kDupCheckDesc) && description != "")))
@@ -2652,7 +2657,8 @@ bool ProgramList::FromProgram(QSqlDatabase *db, const QString sql,
         "    program.category, channel.channum, channel.callsign, "
         "    channel.name, program.previouslyshown, channel.commfree, "
         "    channel.outputfilters, program.seriesid, program.programid, "
-        "    program.airdate, program.stars, program.originalairdate "
+        "    program.airdate, program.stars, program.originalairdate, "
+        "    program.category_type "
         "FROM program "
         "LEFT JOIN channel ON program.chanid = channel.chanid "
         "%1 ").arg(sql);
@@ -2702,8 +2708,6 @@ bool ProgramList::FromProgram(QSqlDatabase *db, const QString sql,
         p->year = query.value(15).toString();
         p->stars = query.value(16).toString().toFloat();
         
-        
-        
         if (query.value(17).isNull() || query.value(17).toString().isEmpty())
         {
             p->originalAirDate = p->startts.date();
@@ -2715,6 +2719,7 @@ bool ProgramList::FromProgram(QSqlDatabase *db, const QString sql,
                                                    Qt::ISODate);
             p->hasAirDate = true;
         }
+        p->catType = query.value(18).toString();
 
         ProgramInfo *s;
         for (s = schedList.first(); s; s = schedList.next())
@@ -2746,7 +2751,7 @@ bool ProgramList::FromOldRecorded(QSqlDatabase *db, const QString sql)
     QString querystr = QString(
         "SELECT oldrecorded.chanid, starttime, endtime, "
         "    title, subtitle, description, category, seriesid, programid, "
-        "    channel.channum, channel.callsign, channel.name "
+        "    category_type, channel.channum, channel.callsign, channel.name "
         "FROM oldrecorded "
         "LEFT JOIN channel ON oldrecorded.chanid = channel.chanid "
          "%1 ").arg(sql);
@@ -2775,9 +2780,10 @@ bool ProgramList::FromOldRecorded(QSqlDatabase *db, const QString sql)
         p->category = QString::fromUtf8(query.value(6).toString());
         p->seriesid = query.value(7).toString();
         p->programid = query.value(8).toString();
-        p->chanstr = query.value(9).toString();
-        p->chansign = QString::fromUtf8(query.value(10).toString());
-        p->channame = QString::fromUtf8(query.value(11).toString());
+        p->catType = query.value(9).toString();
+        p->chanstr = query.value(10).toString();
+        p->chansign = QString::fromUtf8(query.value(11).toString());
+        p->channame = QString::fromUtf8(query.value(12).toString());
         p->recstatus = rsPreviousRecording;
 
         append(p);

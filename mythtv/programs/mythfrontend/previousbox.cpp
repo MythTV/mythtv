@@ -547,7 +547,8 @@ void PreviousBox::updateList(QPainter *p)
 
                 ltype->SetItemText(i, 3, tmptitle);
 
-                //if (pi->programid.contains(QRegExp("^SH.*0000$")) ||
+                //if ((pi->catType == "series" &&
+                //     pi->programid.contains(QRegExp(".*0000$"))) ||
                 //    (pi->programid == "" && pi->subtitle == "" &&
                 //      pi->description == ""))
                 //    ltype->EnableForcedFont(i, "inactive");

@@ -277,6 +277,7 @@ class ProgramInfo
     
     QString seriesid;
     QString programid;
+    QString catType;
 
     QString sortTitle;
 

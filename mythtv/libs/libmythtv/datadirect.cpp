@@ -207,11 +207,12 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
 
         if (prefix == "MV")
            cat_type = "movie";
-        else if (prefix == "EP")
-           cat_type = "series";
         else if (prefix == "SP")
            cat_type = "sports";
-        else if (prefix == "SH")
+        else if (prefix == "EP" ||
+                 curr_program.showtype.contains("series", false))
+           cat_type = "series";
+        else
            cat_type = "tvshow";
 
         query.prepare("INSERT INTO dd_program (programid, title, subtitle, "

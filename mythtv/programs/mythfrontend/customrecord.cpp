@@ -72,7 +72,8 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
     m_csql << "AND program.previouslyshown = 0 \n";
 
     m_clause->insertItem(tr("Exclude unidentified episodes (Data Direct)"));
-    m_csql << "AND program.programid NOT LIKE \"SH%0000\" \n";
+    m_csql << QString("AND NOT (program.category_type = \"series\" \n"
+                      "AND program.programid LIKE \"%0000\") \n");
 
     m_clause->insertItem(tr("Exclude unidentified episodes (XMLTV)"));
     m_csql << "AND NOT (program.subtitle = \"\" AND program.description = \"\") \n";
@@ -215,11 +216,13 @@ void CustomRecord::testClicked(void)
 
 void CustomRecord::recordClicked(void)
 {
-    QSqlDatabase *db = QSqlDatabase::database();
+    QString desc = m_description->text();
+    // To address possible quoting issues if needed...
+    //desc.replace("\"", "\\\"");
 
+    QSqlDatabase *db = QSqlDatabase::database();
     ScheduledRecording record;
-    record.loadBySearch(db, kPowerSearch, m_title->text(),
-                        m_description->text());
+    record.loadBySearch(db, kPowerSearch, m_title->text(), desc);
     record.exec(db);
     accept();
 }

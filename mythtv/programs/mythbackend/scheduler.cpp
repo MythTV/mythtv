@@ -1237,8 +1237,15 @@ void Scheduler::BuildNewRecordsQueries(QStringList &from, QStringList &where)
 
     while (result.next())
     {
-    qphrase = result.value(3).toString();
-    qphrase.replace("\'", "\\\'");
+        qphrase = result.value(3).toString();
+        qphrase.replace("\'", "\\\'");
+
+        if (qphrase == "")
+        {
+            VERBOSE(VB_IMPORTANT, QString("Invalid search key in recordid %1")
+                                         .arg(result.value(0).toString()));
+            continue;
+        }
 
         switch (result.value(1).toInt())
         {
@@ -1275,8 +1282,10 @@ void Scheduler::BuildNewRecordsQueries(QStringList &from, QStringList &where)
                 .arg(qphrase);
             break;
         default:
-            cerr << "Unknown RecSearchType (" << result.value(1).toInt()
-                 << ") for recordid " << result.value(0).toString() << endl;
+            VERBOSE(VB_SCHEDULE, QString("Unknown RecSearchType "
+                                         "(%1) for recordid %2")
+                                         .arg(result.value(1).toInt())
+                                         .arg(result.value(0).toString()));
             break;
         }
     }
@@ -1375,7 +1384,7 @@ void Scheduler::AddNewRecords(void) {
 "program.previouslyshown, record.recgroup, record.dupmethod, "
 "channel.commfree, capturecard.cardid, "
 "cardinput.cardinputid, UPPER(cardinput.shareable) = 'Y' AS shareable, "
-"program.seriesid, program.programid, "
+"program.seriesid, program.programid, program.category_type, "
 "program.airdate, program.stars, program.originalairdate "
 
 "FROM record, program ") + fromclauses[clause] + QString(
@@ -1389,7 +1398,8 @@ void Scheduler::AddNewRecords(void) {
 "    program.title = oldrecorded.title "
 "     AND "
 "     ( "
-"      (program.programid <> '' AND program.programid NOT LIKE 'SH%0000' "
+"      (program.programid <> '' AND NOT "
+"       (program.category_type = 'series' AND program.programid LIKE '%0000') "
 "       AND program.programid = oldrecorded.programid) "
 "      OR "
 "      ( "
@@ -1409,7 +1419,8 @@ void Scheduler::AddNewRecords(void) {
 "    program.title = recorded.title "
 "     AND "
 "     ( "
-"      (program.programid <> '' AND program.programid NOT LIKE 'SH%0000' "
+"      (program.programid <> '' AND NOT "
+"       (program.category_type = 'series' AND program.programid LIKE '%0000') "
 "       AND program.programid = recorded.programid) "
 "      OR "
 "      ( "
@@ -1510,18 +1521,19 @@ void Scheduler::AddNewRecords(void) {
 
         p->recstartts = result.value(18).toDateTime();
         p->recendts = recendts;
+        p->repeat = result.value(20).toInt();
+        p->recgroup = result.value(21).toString();
         p->chancommfree = result.value(23).toInt();
         p->cardid = cardid;
         p->inputid = result.value(25).toInt();
         p->shareable = result.value(26).toInt();
         p->seriesid = result.value(27).toString();
         p->programid = result.value(28).toString();
-        p->year = result.value(29).toString();
-        p->stars =  result.value(30).toDouble();
-        
-        p->repeat = result.value(20).toInt();
-        
-        if(result.value(31).isNull())
+        p->catType = result.value(29).toString();
+        p->year = result.value(30).toString();
+        p->stars =  result.value(31).toDouble();
+
+        if(result.value(32).isNull())
             p->originalAirDate = p->startts.date();
         else
             p->originalAirDate = QDate::fromString(result.value(30).toString(), Qt::ISODate);
@@ -1538,9 +1550,6 @@ void Scheduler::AddNewRecords(void) {
             p->recstartts = p->startts;
             p->recendts = p->endts;
         }
-
-        
-        p->recgroup = result.value(21).toString();
 
         p->schedulerid = 
             p->startts.toString() + "_" + p->chanid;
@@ -1596,7 +1605,6 @@ void Scheduler::AddNewRecords(void) {
                 result.value(14).toInt())
                 p->recstatus = rsCurrentRecording;
         }
-
         tmpList.push_back(p);
     }
 
