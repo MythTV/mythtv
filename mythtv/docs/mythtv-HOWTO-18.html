@@ -448,7 +448,7 @@ more information.</P>
 around this, edit <CODE>libs/libavcodec/Makefile</CODE> and remove any
 "-fPIC" you find there and then recompile.</P>
 
-<H2><A NAME="ss18.19">18.19</A> <A HREF="mythtv-HOWTO.html#toc18.19">make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
+<H2><A NAME="mkspecs_error"></A> <A NAME="ss18.19">18.19</A> <A HREF="mythtv-HOWTO.html#toc18.19">make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
 </H2>
 
 <P>This error happens when there's a missing link in the
@@ -457,6 +457,7 @@ error:
 1.  Create the link manually:
 <BLOCKQUOTE><CODE>
 <PRE>
+$ su
 # cd /usr/lib/qt3/mkspecs
 # ln -sf linux-g++ default
 </PRE>
@@ -464,11 +465,17 @@ error:
 
 and then restart the compile,</P>
 <P>or</P>
-<P>2.  Re-run <B>qmake</B> in the mythtv directory.  Rerunning <B>qmake</B>
-will create a new Makefile for you, however this still doesn't fix the root
-cause of the issue, which is that your distribution didn't create the
-symlink for you when the qt3 package was installed.  The first choice is the
-better solution.</P>
+<P>2.  Run <B>qmake mythtv.pro</B> in the mythtv directory.  Rerunning
+<B>qmake</B> will create a new Makefile for you, however this still
+doesn't fix the root cause of the issue, which is that your distribution
+didn't create the symlink for you when the qt3 package was installed.  The
+first choice is the better solution.</P>
+
+<H2><A NAME="ss18.20">18.20</A> <A HREF="mythtv-HOWTO.html#toc18.20">make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
+</H2>
+
+<P>You didn't set your <CODE>QTDIR</CODE>.  Re-read the section on 
+<A HREF="mythtv-HOWTO-4.html#Setting_up_paths">Setting up paths</A>.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-19.html">Next</A>

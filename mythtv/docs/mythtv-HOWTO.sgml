@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-06-09, v2.42
+<date>2003-06-09, v2.43
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -583,6 +583,11 @@ start compiling.
 <tt>QTDIR</tt> needs to be set, and <tt>/usr/lib/qt3/bin</tt> must be added
 to your path.  Your distribution may already be making these changes as a part of the
 installation of the software prerequisites detailed earlier.
+
+Also, check that there has been a link created in
+<tt>/usr/lib/qt3/mkspecs</tt> called <tt>default</tt>.  If not, you'll get
+errors during the compile.  See the Troubleshooting Section for <ref
+id="mkspecs_error" name="more"> information.
 
 <sect1>Distribution-specific information. <label
 id="Distribution-specific_information">
@@ -2943,12 +2948,13 @@ around this, edit <tt>libs/libavcodec/Makefile</tt> and remove any
 "-fPIC" you find there and then recompile.
 
 <sect1>make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
-
+<label id="mkspecs_error">
 <p>This error happens when there's a missing link in the
 <tt>/usr/lib/qt3/mkspecs</tt> directory.  There are two ways to fix this
 error:
 1.  Create the link manually:
 <tscreen><verb>
+$ su
 # cd /usr/lib/qt3/mkspecs
 # ln -sf linux-g++ default
 </verb></tscreen>
@@ -2956,11 +2962,15 @@ and then restart the compile,
 
 or
 
-2.  Re-run <bf>qmake</bf> in the mythtv directory.  Rerunning <bf>qmake</bf>
-will create a new Makefile for you, however this still doesn't fix the root
-cause of the issue, which is that your distribution didn't create the
-symlink for you when the qt3 package was installed.  The first choice is the
-better solution.
+2.  Run <bf>qmake mythtv.pro</bf> in the mythtv directory.  Rerunning
+<bf>qmake</bf> will create a new Makefile for you, however this still
+doesn't fix the root cause of the issue, which is that your distribution
+didn't create the symlink for you when the qt3 package was installed.  The
+first choice is the better solution.
+
+<sect1>make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
+<p>You didn't set your <tt>QTDIR</tt>.  Re-read the section on <ref
+id="Setting_up_paths" name="Setting up paths">.
 
 <sect>Miscellaneous. 
 <sect1>I'd like to watch the files without using MythTV / I'd like to convert the files to some other format. 
@@ -3736,6 +3746,8 @@ MythMusic.  Updated MythVideo docs.
 v2.41, 2003-06-09.  Bumped version numbers to 0.9.
 v2.42, 2003-06-09.  Added troubleshooting note on Suse.  Added the mkspecs
 ->default error.
+v2.43, 2003-06-09.  Slight tweak to mkspecs troubleshooting.  Added the
+error message you get when QTDIR isn't set.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
