@@ -1,5 +1,3 @@
-(all this information is available in the README as well)
-
 UPGRADING FROM PREVIEW RELEASE 1
 --------------------------------
 You need to add the record.sql script to the database, so, mysql < record.sql
@@ -32,3 +30,7 @@ compiling, and you should be all set.  Please note that upgrading will wipe
 out most scheduled recordings in your database.  Sorry about that, but there
 really wasn't any clean way to migrate the data over to the new database
 format.
+
+UPGRADING FROM RELEASE 0.6
+--------------------------
+No database changes have been made.

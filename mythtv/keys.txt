@@ -1,0 +1,49 @@
+Various keys and their actions:
+
+mythfrontend
+------------
+
+- Arrow keys are used to move the highlight point around.
+- ALT-F4 to exit out of the application.
+- Space or Enter to take action on the item under the highlight point.
+
+Watching TV or a recording
+--------------------------
+
+- Up and down arrow keys change the channel.
+- Type the channel number to go directly to the channel.
+- P to pause / unpause.
+- Left arrow to rewind the configured number of seconds.  (default is 5)
+- Right arrow to fast forward the configured number of seconds. (default is 30)
+- C to hange inputs on TV Tuner card
+- ESC quits
+- I puts the Onscreen Display up again
+- M brings up the electronic program guide (Grid) -- see the EPG section.
+
+If you have two tuner cards:
+
+- V toggle Picture-in-picture on or off
+- B toggles the active window (lets you change channels on the PiP window.
+- N swaps the two channels
+
+While watching a recording:
+
+- SPACE or ENTER will set a bookmark at that point.  Next time you start the 
+  recording, you will automatically jump forward to this point and clear the 
+  bookmark.
+- E enters/exits edit mode.
+  - The left and right keys move forward and backward.
+  - The up and down arrow keys alter the amount of time you jump forward and
+    backward.  Increments are: nearest cutpoint, nearest video keyframe, 
+    1 frame, 0.5 seconds, 1 second, 20 seconds, 1 minute, 5 minutes, and 
+    10 minutes.
+  - Space/Enter allows you to set or delete a cut point.
+
+
+EPG
+---
+
+- I or Space will bring up more information about a show, and allow you to
+  schedule a recording
+- Pressing M or ENTER when on a channel will change to that channel
+- Pressing ESC or C exits without changing the channel

@@ -1,5 +1,5 @@
                                    MythTV
-			         Release 0.6
+			         Release 0.7
 
 
 There'll be more information here later, but for now:
@@ -95,27 +95,14 @@ finetuning amounts for specific channels (like in xawtv), run
 'mythfilldatabase --manual' instead.
 
 Once 'mythfilldata' has finished, try running the 'mythepg' binary.  It should 
-be populated with program info.  Use the arrow keys to move around in the grid.
-'M' and 'Enter' quit.  So does 'C', but it's 'quit without selecting the 
-channel'. 
+be populated with program info.  Just hit escape to exit out of it.
 
 Anyway.  Now that you have the program database populated and configured, try
 running the 'mythtv' binary.  Use the arrow keys to change channels up and 
-down, type in channel numbers to directly skip channels, use the 'p' key to 
-pause/unpause, and the right/left arrow keys to ff/rew.  Escape quits.  
-'c' will change inputs on the TV tuner card.  These keybindings aren't 
-configurable yet.
+down, and Escape exits out of the program as with mythepg. 
 
-When you change channels, it should show the proper information on the OSD.  
-Hitting 'M' should pop up the program guide.  Exiting the program guide with 
-'Enter' or 'M' will change to the channel it currently was on, exiting with 
-'Escape' will just exit without changing the channel.  Pressing 'I' will let 
-you get more information about a program, and if you're running mythfrontend, 
-will allow you to schedule recordings.
-
-If you have two tuner cards setup properly, you can hit 'V' to turn on/off the
-Picture-in-Picture support, 'B' to toggle the active window (for channel 
-changes and the like), and 'N' to swap the two active channels.
+Now would be a good time to look over 'keys.txt' for a list of all the 
+keybindings.
 
 Ok, so try running 'mythfrontend'.  You should see a nice graphical menu show 
 up. This should be pretty simple to figure out.  mythfrontend is designed to 
