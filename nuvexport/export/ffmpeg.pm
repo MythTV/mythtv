@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.06 (xris)
+#Last Updated: 2005.02.10 (xris)
 #
 #  ffmpeg.pm
 #
@@ -210,10 +210,10 @@ package export::ffmpeg;
                     $frames = int($1);
                 }
             # ffmpeg warnings?
-            #  I don't actually have any examples of these, so this is commented out for now.
-            #    elsif ($l =~ /?????/) {
-            #        $warnings .= $l;
-            #    }
+                elsif ($l =~ /^Unknown.+?codec/) {
+                    $warnings .= $l;
+                    die "\n\nffmpeg had critical errors:\n\n$warnings";
+                }
             }
         # Read from the mythtranscode handle?
             while (has_data($mythtrans_h) and $l = <$mythtrans_h>) {
