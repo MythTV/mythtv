@@ -4127,7 +4127,8 @@
   G           rotate between the various Picture Adjustments (Colour, Hue, etc.) for recording. These values affect the look of the resulting .nuv file, and are independent of the playback picture settings. While Picture Adjustment is on-screen, use Left and Right arrows to adjust.
   H           Channel history. Each repeat steps back through the previous channels.
   O           Turns on 'Browse' mode, allowing user to browse channels and program info while watching current show FullScreen.
-  F8          toggle the sleep timer 30m->1hr->1hr30m->2hr->OffY                                                                                                                                                                                                                               switch between multiple capture cards.  [1mNOTE[22m:you lose your LiveTV buffer on your current card. Useful for different-sourced cards (such as Dish Network on one, HDTV over-the-air on another card.)
+  F8          toggle the sleep timer 30m->1hr->1hr30m->2hr->Off
+  Y           switch between multiple capture cards.  [1mNOTE[22m:you will lose your LiveTV buffer on your current card. Useful for different-sourced cards (such as Dish Network on one, HDTV over-the-air on another card.)
 
 
   [1m11.1.4.  Watching a recording only[0m
@@ -4161,9 +4162,6 @@
   Space/Enter         change channel to channel of current listed program
               R/r     Toggle recording of current program (cycles through types)
             ESC/O     Exit Browse mode
-
-
-  [1m11.1.6.  Playback Recording Zoom Mode[0m
 
 
 
@@ -4219,6 +4217,8 @@
             Right     advance 1 frame
                 >     advance 1 second
 
+  [1m11.1.6.  Playback Recording Zoom Mode[0m
+
 
              Left     Move video to Left
             Right     Move video to Right
@@ -4228,6 +4228,7 @@
   PageDown            Zoom Out
   Space/Enter         Exit Zoom mode leaving picture at current size and position
               ESC     Exit Zoom mode and return to original size
+
 
   [1m11.1.7.  If you have two or more tuner cards[0m
 
@@ -4293,6 +4294,7 @@
   D           on a custom profile group displays a popup to delete the group
 
 
+
   [1m11.1.13.  Recording Groups[0m
 
   In the Watch Recordings screen, Recording Groups allow you to separate
@@ -4356,7 +4358,6 @@
 
   The theme will now be available in the mythfrontend Appearance
   section.
-
 
 
         [1mNOTE[22m:  if the theme file you downloaded is a bz2 file, use
