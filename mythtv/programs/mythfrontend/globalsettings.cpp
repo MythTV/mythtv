@@ -1031,7 +1031,7 @@ public:
         setLabel(QObject::tr("Keypress Application"));
         setValue("");
         setHelpText(QObject::tr("External application or script to run when "
-                    "a keypress is received by lirc"));
+                    "a keypress is received by LIRC."));
     };
 };
 
@@ -1041,7 +1041,7 @@ public:
         GlobalSetting("SetupPinCode") {
         setLabel(QObject::tr("Setup Pin Code"));
         setHelpText(QObject::tr("This PIN is used to control access to the "
-                    "setup menues. If you want to use this feature, then "
+                    "setup menus. If you want to use this feature, then "
                     "setting the value to all numbers will make your life "
                     "much easier.  Set it to blank to disable."));
     };
@@ -1966,7 +1966,7 @@ public:
         setLabel(QObject::tr("mythfilldatabase Run Frequency (Days)"));
         setValue(1);
         setHelpText(QObject::tr("The number of days between mythfilldatabase "
-                    "runs"));
+                    "runs."));
     };
 };
 
@@ -2027,7 +2027,7 @@ public:
        setLabel(QObject::tr("mythfilldatabase Log Path"));
        setValue("");
        setHelpText(QObject::tr("Path to use for logging output from "
-                               "mythfilldatabase program.  Leave blank "
+                               "the mythfilldatabase program.  Leave blank "
                                "to disable logging."));
    };
 };
