@@ -29,6 +29,9 @@ public:
 
     long long Seek(long long pos, int whence);
     unsigned Write(const void *data, unsigned count);
+
+    // Note, this doesn't even try to flush our queue, only ensure that
+    // data which has already been sent to the kernel is written to disk
     void Sync(void);
 
     unsigned BufUsed();  /* # of bytes queued for write by the write thread */
