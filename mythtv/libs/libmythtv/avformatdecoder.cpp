@@ -36,8 +36,9 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
     wantedAudioStream = -1;
 
     audio_check_1st = 2;
-    audio_sample_size = 4;
-    audio_sampling_rate = 48000;
+    audio_channels = -1;
+    audio_sample_size = -1;
+    audio_sampling_rate = -1;
 
     hasbframes = false;
 
@@ -342,6 +343,10 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     if (-1 == ret)
         return ret;
 
+    // Scan for audio tracks and pick one to use.
+    if (scanAudioTracks())
+        autoSelectAudioTrack();
+
     ringBuffer->CalcReadAheadThresh(bitrate);
 
     if ((m_playbackinfo && m_db) || livetv || watchingrecording)
@@ -480,32 +485,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             case CODEC_TYPE_AUDIO:
             {
                 assert(enc->codec_id);
-
-                if (i == wantedAudioStream)
-                {
-                    VERBOSE(VB_AUDIO, QString("Initializing audio parms from stream #%1.").arg(i));
-                    bitrate += enc->bit_rate;
-                    m_parent->SetEffDsp(enc->sample_rate * 100);
-
-                    do_ac3_passthru = enc->codec_id == CODEC_ID_AC3 &&
-                                      gContext->GetNumSetting("AC3PassThru", false);
-                    if (do_ac3_passthru)
-                    {
-                        // An AC3 stream looks like a 48KHz 2ch audio stream to
-                        // the sound card
-                        audio_sample_size = 4;
-                        audio_sampling_rate = 48000;
-                        audio_channels = 2;
-                    }
-                    else
-                    {
-                        audio_sample_size = enc->channels * 2;
-                        audio_sampling_rate = enc->sample_rate;
-                        audio_channels = enc->channels;
-                    }
-                    m_parent->SetAudioParams(16, audio_channels,
-                                             audio_sampling_rate);
-                }
+                bitrate += enc->bit_rate;
                 break;
             }
             case CODEC_TYPE_DATA:
@@ -549,11 +529,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         }
     }
 
+    // Select a new track at the next opportunity.
     currentAudioTrack = -1;
-    // Scan for audio tracks and pick one to use.
-    if (scanAudioTracks())
-        autoSelectAudioTrack();
-
     return 0;
 }
 
@@ -589,20 +566,20 @@ bool AvFormatDecoder::CheckVideoParams(int width, int height)
     return true;
 }
 
-bool AvFormatDecoder::CheckAudioParams(int freq, int channels)
+void AvFormatDecoder::CheckAudioParams(int freq, int channels, bool safe)
 {
-    //cerr << "AvFormatDecoder::CheckAudioParams freq == " << freq << " channels == " << channels << endl;
-    //cerr << "AvFormatDecoder::CheckAudioParams audio_sampling_rate == " << audio_sampling_rate
-    //     << " audio_channels == " << audio_channels << endl;
+    if (freq <= 0 || channels <= 0)
+        return;
 
-    if (audio_check_1st == 2)
+    if (safe || audio_check_1st == 2)
     {
         if (freq == audio_sampling_rate && channels == audio_channels)
-            return false;
+            return;
         audio_check_1st = 1;
         audio_sampling_rate_2nd = freq;
         audio_channels_2nd = channels;
-        return false;
+        if (safe == false)
+            return;
     }
     else
     {
@@ -612,37 +589,33 @@ bool AvFormatDecoder::CheckAudioParams(int freq, int channels)
             audio_sampling_rate_2nd = -1;
             audio_channels_2nd = -1;
             audio_check_1st = 2;
-            return false;
+            return;
         }
 
         if (audio_check_1st == 1)
         {
             audio_check_1st = 0;
-            return false;
+            return;
         }
-
-        audio_check_1st = 2;
     }
 
-    QString chan = "stereo";
-    if (channels == 1)
-        chan = "mono";
-    else if (channels > 2)
-        chan = "multi";
+    audio_check_1st = 2;
 
-    VERBOSE(VB_AUDIO, QString("Audio format changed from %1 channels, %2hz to %3 channels %4hz")
-                      .arg(audio_channels).arg(audio_sampling_rate).arg(channels).arg(freq));
+    if (audio_channels != -1)
+        VERBOSE(VB_AUDIO, QString("Audio format changed from %1 channels,"
+                " %2hz to %3 channels %4hz").arg(audio_channels)
+                .arg(audio_sampling_rate).arg(channels).arg(freq));
 
     AVCodecContext *enc = &ic->streams[wantedAudioStream]->codec;
     AVCodec *codec = enc->codec;
-    if ( enc->channels == channels )
-    {
+    if (codec)
         avcodec_close(enc);
-        avcodec_open(enc, codec);
-        return true;
-    }
+    codec = avcodec_find_decoder(enc->codec_id);
+    avcodec_open(enc, codec);
 
-    return true;
+    SetupAudioStream();
+    m_parent->ReinitAudio();
+    return;
 }
 
 int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
@@ -1025,6 +998,9 @@ void AvFormatDecoder::incCurrentAudioTrack()
 
         currentAudioTrack = tempTrackNo;
         wantedAudioStream = audioStreams[currentAudioTrack];
+
+        AVCodecContext *e = &ic->streams[wantedAudioStream]->codec;
+        CheckAudioParams(e->sample_rate, e->channels, true);
     }
 }
 
@@ -1039,6 +1015,9 @@ void AvFormatDecoder::decCurrentAudioTrack()
 
         currentAudioTrack = tempTrackNo;
         wantedAudioStream = audioStreams[currentAudioTrack];
+
+        AVCodecContext *e = &ic->streams[wantedAudioStream]->codec;
+        CheckAudioParams(e->sample_rate, e->channels, true);
     }
 }
 
@@ -1050,9 +1029,13 @@ bool AvFormatDecoder::setCurrentAudioTrack(int trackNo)
         return false;
 
     currentAudioTrack = trackNo;
-    if (currentAudioTrack > -1)
-        wantedAudioStream = audioStreams[currentAudioTrack];
+    if (currentAudioTrack < 0)
+        return false;
 
+    wantedAudioStream = audioStreams[currentAudioTrack];
+
+    AVCodecContext *e = &ic->streams[wantedAudioStream]->codec;
+    CheckAudioParams(e->sample_rate, e->channels, true);
     return true;
 }
 
@@ -1083,6 +1066,9 @@ bool AvFormatDecoder::autoSelectAudioTrack()
                                   .arg(track + 1).arg(tempStream));
                 VERBOSE(VB_AUDIO, QString("It has %1 channels and we needed at least %2")
                                   .arg(e->channels).arg(minChannels + 1));
+
+                AVCodecContext *e = &ic->streams[wantedAudioStream]->codec;
+                CheckAudioParams(e->sample_rate, e->channels, true);
                 return true;
             }
         }
@@ -1091,6 +1077,43 @@ bool AvFormatDecoder::autoSelectAudioTrack()
             return false;
     }
     return false;
+}
+
+void AvFormatDecoder::SetupAudioStream(void)
+{
+    if (wantedAudioStream >= ic->nb_streams ||
+        currentAudioTrack < 0)
+        return;
+
+    AVStream *curstream = ic->streams[wantedAudioStream];
+    if (curstream == NULL)
+        return;
+
+    VERBOSE(VB_ALL, QString("Initializing audio parms from stream #%1.")
+            .arg(currentAudioTrack));
+
+    m_parent->SetEffDsp(curstream->codec.sample_rate * 100);
+
+    do_ac3_passthru = curstream->codec.codec_id == CODEC_ID_AC3 &&
+                      gContext->GetNumSetting("AC3PassThru", false);
+
+    if (do_ac3_passthru)
+    {
+        // An AC3 stream looks like a 48KHz 2ch audio stream to
+        // the sound card
+        audio_sample_size = 4;
+        audio_sampling_rate = 48000;
+        audio_channels = 2;
+    }
+    else
+    {
+        audio_sample_size = curstream->codec.channels * 2;
+        audio_sampling_rate = curstream->codec.sample_rate;
+        audio_channels = curstream->codec.channels;
+    }
+
+    assert(curstream->codec.sample_fmt == SAMPLE_FMT_S16);
+    m_parent->SetAudioParams(16, audio_channels, audio_sampling_rate);
 }
 
 void AvFormatDecoder::GetFrame(int onlyvideo)
@@ -1108,7 +1131,6 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
 
     bool allowedquit = false;
     bool storevideoframes = false;
-
 
     if (currentAudioTrack == -1 )
     {
@@ -1263,21 +1285,8 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                         continue;
 
                     if (!do_ac3_passthru)
-                    {
-                        if (CheckAudioParams(curstream->codec.sample_rate,
-                                             curstream->codec.channels))
-                        {
-                            audio_sampling_rate = curstream->codec.sample_rate;
-                            audio_channels = curstream->codec.channels;
-                            audio_sample_size = audio_channels * 2;
-
-                            m_parent->SetEffDsp(audio_sampling_rate * 100);
-                            // DS note: shouldn't this be in the codec someplace?
-                            int bitsPerSample = 16;
-                            m_parent->SetAudioParams(bitsPerSample, audio_channels, audio_sampling_rate);
-                            m_parent->ReinitAudio();
-                        }
-                    }
+                        CheckAudioParams(curstream->codec.sample_rate,
+                                         curstream->codec.channels, false);
 
                     long long temppts = lastapts;
 
