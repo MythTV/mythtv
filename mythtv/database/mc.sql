@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS singlerecord
     title VARCHAR(128) NULL,
     subtitle VARCHAR(128) NULL,
     description TEXT NULL,
-    profile INT UNSIGNED NOT NULL DEFAULT 0 REFERENCES recordingprofiles(id);
+    profile INT UNSIGNED NOT NULL DEFAULT 0 REFERENCES recordingprofiles(id),
     PRIMARY KEY (chanid, starttime),
     INDEX (endtime)
 );
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS timeslotrecord
     starttime TIME NOT NULL,
     endtime TIME NOT NULL,
     title VARCHAR(128) NULL,
-    profile INT UNSIGNED NOT NULL DEFAULT 0 REFERENCES recordingprofiles(id);
+    profile INT UNSIGNED NOT NULL DEFAULT 0 REFERENCES recordingprofiles(id),
     PRIMARY KEY(chanid, starttime),
     INDEX (endtime)
 );
