@@ -46,7 +46,7 @@ class Database
     MFD                 *the_mfd;
     MetadataContainer   *my_metadatacontainer;
 
+
     bool    fake_temp_bool;
-    
 };
 #endif  // database_h_

@@ -124,6 +124,9 @@ class AudioMetadata : public Metadata
     int year;
     int tracknum;
     int length;
+    
+    
+
 
     bool changed;
 };

@@ -316,12 +316,12 @@ void DaapServer::sendServerInfo(HttpRequest *http_request)
                 << Tag('msup') << (u8) 0 << end 
                 << Tag('msau') << (u32) 2 << end 
 
-                //<< Tag('mspi') << (u8) 0 << end 
-                //<< Tag('msex') << (u8) 0 << end 
-                //<< Tag('msbr') << (u8) 0 << end 
-                //<< Tag('msqy') << (u8) 0 << end 
-                //<< Tag('msix') << (u8) 0 << end 
-                //<< Tag('msrs') << (u8) 0 << end 
+                << Tag('mspi') << (u8) 0 << end 
+                << Tag('msex') << (u8) 0 << end 
+                << Tag('msbr') << (u8) 0 << end 
+                << Tag('msqy') << (u8) 0 << end 
+                << Tag('msix') << (u8) 0 << end 
+                << Tag('msrs') << (u8) 0 << end 
 
                 << Tag('msdc') << (u32) 1 << end   //  if only iTunes *did something* with more than 1 database
              
@@ -656,7 +656,7 @@ void DaapServer::sendDatabase(HttpRequest *http_request, DaapRequest *daap_reque
 
                                 if(meta_codes & DAAP_META_PERSISTENTID)
                                 {
-                                    //
+                                    response << Tag('mper') << (u64) which_item->getDatabaseId() << end;
                                 }
                     
                                 if(meta_codes & DAAP_META_SONGALBUM)

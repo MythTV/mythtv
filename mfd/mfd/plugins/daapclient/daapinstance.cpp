@@ -606,7 +606,35 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
             update_request.addGetVariable("meta", 
                                           QString(
                                                     "dmap.itemname,"
-                                                    "dmap.itemid"
+                                                    "dmap.itemid,"
+                                                    "daap.songalbum,"
+                                                    "daap.songartist,"
+                                                    "daap.songbeatsperminute,"
+                                                    "daap.songbitrate,"
+                                                    "daap.songcomment,"
+                                                    "daap.songcompilation,"
+                                                    "daap.songcomposer,"
+                                                    "daap.songdateadded,"
+                                                    "daap.songdatemodified,"
+                                                    "daap.songdisccount,"
+                                                    "daap.songdiscnumber,"
+                                                    "daap.songdisabled,"
+                                                    "daap.songeqpreset,"
+                                                    "daap.songformat,"
+                                                    "daap.songgenre,"
+                                                    "daap.songdescription,"
+                                                    "daap.songrelativevolume,"
+                                                    "daap.songsamplerate,"
+                                                    "daap.songsize,"
+                                                    "daap.songstarttime,"
+                                                    "daap.songstoptime,"
+                                                    "daap.songtime,"
+                                                    "daap.songtrackcount,"
+                                                    "daap.songtracknumber,"
+                                                    "daap.songuserrating,"
+                                                    "daap.songyear,"
+                                                    "daap.songdatakind,"
+                                                    "daap.songdataurl"
                                                  ));
             
             update_request.send(client_socket_to_daap_server);
@@ -681,7 +709,7 @@ void DaapInstance::doServerInfoResponse(TagInput& dmap_data)
                 
                 dmap_data >> a_string;
                 {
-                    QString q_string = QString(a_string.c_str());
+                    QString q_string = QString::fromUtf8(a_string.c_str());
                     if(q_string != service_name)
                     {
                         warning(QString("daap instance got conflicting names for "
@@ -1161,7 +1189,7 @@ void DaapInstance::parseDatabaseListings(TagInput& dmap_data, int how_many)
                     //
                 
                     internal_listing >> a_string;
-                    new_database_name = QString(a_string.c_str());
+                    new_database_name = QString::fromUtf8(a_string.c_str());
                     break;
 
                 case 'mimc':
@@ -1303,7 +1331,10 @@ void DaapInstance::parseItems(TagInput& dmap_data, int how_many)
     Tag a_tag;
 
     u8  a_u8_variable;
+    u16 a_u16_variable;
     u32 a_u32_variable;
+    u64 a_u64_variable;
+    
     std::string a_string;
     Chunk listing;
 
@@ -1325,6 +1356,37 @@ void DaapInstance::parseItems(TagInput& dmap_data, int how_many)
                     "where one simply must be.");
         }
         
+        int     new_item_id = -1;
+        int     new_item_persistent_id = 1;
+        QString new_item_name = "";
+        QString new_item_album_name = "";
+        QString new_item_artist_name = "";
+        int     new_item_bpm = -1;
+        int     new_item_bitrate = -1;
+        QString new_item_comment = "";
+        bool    new_item_compilation = false;
+        QString new_item_composer_name = "";
+        int     new_item_date_added = -1;   //  seconds since epoch?
+        int     new_item_date_modified = -1;
+        int     new_item_disc_count = -1;
+        int     new_item_disc_number = -1;
+        int     new_item_disabled = -1;
+        QString new_item_eqpreset = "";
+        QString new_item_format = "";
+        QString new_item_genre = "";
+        QString new_item_description = "";
+        int     new_item_relative_volume = 0;
+        int     new_item_sample_rate = -1;
+        int     new_item_size = -1;
+        int     new_item_start_time = -1;
+        int     new_item_stop_time = -1;
+        int     new_item_total_time = -1;
+        int     new_item_track_count = -1;
+        int     new_item_track_number = -1;
+        int     new_item_rating = -1;
+        int     new_item_year = -1;
+        QString new_item_url = "";
+        
         TagInput internal_listing(listing);
         while(!internal_listing.isFinished())
         {
@@ -1333,10 +1395,15 @@ void DaapInstance::parseItems(TagInput& dmap_data, int how_many)
         
             switch(a_tag.type)
             {
+                //
+                //  This ain't pretty, and there are a lot of them, but it
+                //  works (and, suprisingly, it's not aching slow)
+                //
+
                 case 'mikd':
                 
                     //
-                    //  item kind 
+                    //  item kind ... no idea what that means
                     //
 
                     internal_listing >> a_u8_variable;
@@ -1359,6 +1426,13 @@ void DaapInstance::parseItems(TagInput& dmap_data, int how_many)
                     //
                 
                     internal_listing >> a_u32_variable;
+                    new_item_id = a_u32_variable;
+                    break;
+                    
+                case 'mper':
+                
+                    internal_listing >> a_u64_variable;
+                    new_item_persistent_id = a_u64_variable;
                     break;
 
                 case 'minm':
@@ -1368,15 +1442,299 @@ void DaapInstance::parseItems(TagInput& dmap_data, int how_many)
                     //
                 
                     internal_listing >> a_string;
+                    new_item_name = QString::fromUtf8(a_string.c_str());
                     break;
                 
+                case 'asal':
+                
+                    //
+                    //  Album name
+                    //
+                    
+                    internal_listing >> a_string;
+                    new_item_album_name = QString::fromUtf8(a_string.c_str());
+                    break;
+                
+                case 'asar':
+                
+                    //
+                    //  Artist name
+                    //
+                    
+                    internal_listing >> a_string;
+                    new_item_artist_name = QString::fromUtf8(a_string.c_str());
+                    break;
+                    
+                case 'asbt':
+                
+                    //
+                    //  Beats per minute
+                    //
+                    
+                    internal_listing >> a_u16_variable;
+                    new_item_bpm = a_u16_variable;
+                    break;
+                    
+                case 'asbr':
+                
+                    //
+                    //  Bitrate (probably not used to calculate anything)
+                    //    
+                    
+                    internal_listing >> a_u16_variable;
+                    new_item_bitrate = a_u16_variable;
+                    break;
+                    
+                case 'ascm':
+                
+                    //
+                    //  Comment
+                    //
+                    
+                    internal_listing >> a_string;
+                    new_item_comment = QString::fromUtf8(a_string.c_str());
+                    break;
+                    
+                case 'asco':
+                
+                    //
+                    //  Part of a compilation (this is probably a bool flag)
+                    //
+                    
+                    internal_listing >> a_u8_variable;
+                    new_item_compilation = (bool) a_u8_variable;
+                    break;
+                
+                case 'ascp':
+                
+                    //
+                    //  Composer's name
+                    //
+                    
+                    internal_listing >> a_string;
+                    new_item_composer_name = QString::fromUtf8(a_string.c_str());
+                    break;
+                    
+                case 'asda':
+                
+                    //
+                    //  Date added
+                    //
+                    
+                    internal_listing >> a_u32_variable;
+                    new_item_date_added = a_u32_variable;
+                    break;
+                    
+                case 'asdm':
+                
+                    //
+                    //  Date modified
+                    //
+                    
+                    internal_listing >> a_u32_variable;
+                    new_item_date_modified = a_u32_variable;
+                    break;
+                    
+                case 'asdc':
+                
+                    //
+                    //  Number of discs in the collection this item came
+                    //  from
+                    //   
+                    
+                    internal_listing >> a_u16_variable;
+                    new_item_disc_count = a_u16_variable;
+                    break;
+                    
+                case 'asdn':
+                
+                    //
+                    //  The disc number (out of disc count) the item is/was
+                    //  on
+                    //
+                
+                    internal_listing >> a_u16_variable;
+                    new_item_disc_number = a_u16_variable;
+                    break;
+                    
+                case 'asdb':
+                
+                    //
+                    //  Song is disabled (ie. not checked for playing in
+                    //  iTunes)
+                    //
+
+                    internal_listing >> a_u8_variable;
+                    new_item_disabled = a_u8_variable;
+                    break;
+                    
+                case 'aseq':
+                
+                    //
+                    //  Song eq preset (e.g. "Bass Booster", "Spoken Word")
+                    //
+                    
+                    internal_listing >> a_string;
+                    new_item_eqpreset = QString::fromUtf8(a_string.c_str());
+                    break;
+                
+                case 'asfm':
+                
+                    //
+                    //  Song format (wav, ogg, etc.)
+                    //
+                    
+                    internal_listing >> a_string;
+                    new_item_format = QString::fromUtf8(a_string.c_str());
+                    break;
+                    
+                case 'asgn':
+
+                    //
+                    //  Genre
+                    //      
+                    
+                    internal_listing >> a_string;
+                    new_item_genre = QString::fromUtf8(a_string.c_str());
+                    break;
+
+                case 'asdt':
+                
+                    //
+                    //  Description
+                    //
+                    
+                    internal_listing >> a_string;
+                    new_item_description = QString::fromUtf8(a_string.c_str());
+                    break; 
+                    
+                case 'asrv':
+                
+                    //
+                    //  relative volume (probably -100 to +100, or 0-256 ?)
+                    //
+                    
+                    internal_listing >> a_u8_variable;
+                    new_item_relative_volume = a_u8_variable;
+                    break;
+                    
+                case 'assr':
+                
+                    //
+                    //  Sample rate (44.1, etc.)
+                    //
+                    
+                    internal_listing >> a_u32_variable;
+                    new_item_sample_rate = a_u32_variable;
+                    break;
+
+                case 'assz':
+                
+                    //
+                    //  Song size (bytes ?)
+                    //
+                    
+                    internal_listing >> a_u32_variable;
+                    new_item_size = a_u32_variable;
+                    break;
+                    
+                case 'asst':
+                
+                    //
+                    //  Start time (I guess you could set to always skip
+                    //  over something)
+                    //
+                    
+                    internal_listing >> a_u32_variable;
+                    new_item_start_time = a_u32_variable;
+                    break;
+                    
+                case 'assp':
+                
+                    //
+                    //  Stop time
+                    //
+                    
+                    internal_listing >> a_u32_variable;
+                    new_item_stop_time = a_u32_variable;
+                    break;
+                    
+                case 'astm':
+                
+                    //
+                    //  Total time
+                    //
+                    
+                    internal_listing >> a_u32_variable;
+                    new_item_total_time = a_u32_variable;
+                    break;
+                    
+                    
+                case 'astc':
+                
+                    //
+                    //  Track count (how many in total)
+                    //
+                    
+                    internal_listing >> a_u16_variable;
+                    new_item_track_count = a_u16_variable;
+                    break;
+                    
+                case 'astn':
+                
+                    //
+                    //  Track number
+                    //
+                    
+                    internal_listing >> a_u16_variable;
+                    new_item_track_number = a_u16_variable;
+                    break;
+                    
+                case 'asur':
+                
+                    //
+                    //  User rating (0 to 100)
+                    //
+                    
+                    internal_listing >> a_u8_variable;
+                    new_item_rating = a_u8_variable;
+                    break;
+
+                case 'asyr':
+                
+                    //
+                    //  Year song was released (?)
+                    //
+                    
+                    internal_listing >> a_u16_variable;
+                    new_item_year = a_u16_variable;
+                    break;
+
+                case 'asul':
+                
+                    //
+                    //  A url for the song (link to band home page? I have
+                    //  no idea)
+                    //
+                    
+                    internal_listing >> a_string;
+                    new_item_url = QString::fromUtf8(a_string.c_str());
+                    break;
+
                 default:
                     
                     warning("unknown tag while parsing database item");
                     internal_listing >> emergency_throwaway_chunk;
             }
             internal_listing >> end;
-        }    
+        }
+        
+        //
+        //  If we have enough data, make a Metadata object
+        //  (once we have the metadata mess sorted out)
+        //
+        
+        
     }
     
     double elapsed_time = loading_time.elapsed() / 1000.0;
