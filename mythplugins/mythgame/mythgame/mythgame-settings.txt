@@ -8,17 +8,17 @@ ShotCount=0
 ### Nes specific settings ###
 
 # Path and name of nes emulator
-str NesBinary=/usr/local/bin/fceu
+NesBinary=/usr/local/bin/fceu
 
 # Directory where nes roms are located.
-str NesRomLocation=/home/media/games/nes/roms
+NesRomLocation=/home/media/games/nes/roms
 
 # Path and name of nes crc file.  This is the same file that comes
 # with the xmame(xmess) distribution: xmame-0.XX/CRC/nes.crc.
-str NesCRCFile=/home/media/games/nes/nes.crc
+NesCRCFile=/home/media/games/nes/nes.crc
 
 # Directory where screenshots are kept
-str NesScreensLocation=/home/media/games/nes/screens
+NesScreensLocation=/home/media/games/nes/screens
 
 
 ### Mame specific settings ###
@@ -50,5 +50,7 @@ MameCabinetsLocation=/cabs
 # Direstory where cheat files are kept
 #MameCheatLocation=
 
-
+# Choose to show or not to show the disclaimer
+MameShowDisclaimer=0
+MameShowGameInfo=1
 

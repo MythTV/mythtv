@@ -797,8 +797,21 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
             *exec+= general_prefs.highscore_dir;
           }
         }
-        *exec+= game_settings.fullscreen ? (" -nocursor" + fullscreen) : 
-                windowed;
+
+        // The .65 builds of mame finally allow you to turn off the disclaimer
+        //  and the game info screen.  See if the user wants them off
+        if (xmame_minor >= 65 ) {
+            *exec+= general_prefs.show_disclaimer ? " -noskip_disclaimer" : " -skip_disclaimer";
+            *exec+= general_prefs.show_gameinfo ?" -noskip_gameinfo" : " -skip_gameinfo";
+        }
+        /* the nocursor option doesn't apply to SDL builds of xmame */
+        if ( strcmp(general_prefs.xmame_display_target, "SDL")) {
+          *exec+= game_settings.fullscreen ? (" -nocursor" + fullscreen) : 
+                  windowed;
+        }
+        else
+          *exec+= game_settings.fullscreen ? fullscreen : windowed;
+
         *exec+= game_settings.scanlines ? " -scanlines" : " -noscanlines";
         *exec+= game_settings.extra_artwork ? " -artwork" : " -noartwork";
         *exec+= game_settings.autoframeskip ? " -autoframeskip" : " -noautoframeskip";
@@ -841,7 +854,8 @@ void MameHandler::SetGeneralPrefs()
     general_prefs.cabinet_dir = gContext->GetSetting("MameCabinetsLocation");
     general_prefs.game_history_file = gContext->GetSetting("MameHistoryLocation");
     general_prefs.cheat_file = gContext->GetSetting("MameCheatLocation");
-
+    general_prefs.show_disclaimer = gContext->GetNumSetting("MameShowDisclaimer");
+    general_prefs.show_gameinfo = gContext->GetNumSetting("MameShowGameInfo");
 }
 
 void MameHandler::SetGameSettings(GameSettings &game_settings, MameRomInfo *rominfo)

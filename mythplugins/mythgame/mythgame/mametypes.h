@@ -30,6 +30,9 @@ class Prefs
     int xmame_release;
     int romdir_time;
 
+    int show_disclaimer;
+    int show_gameinfo;
+
     QString rom_url;
     QString screenshot_url;
     QString flyer_url;
