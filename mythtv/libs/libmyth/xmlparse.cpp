@@ -884,6 +884,7 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
 {
     int context = -1;
     QRect area = QRect(0, 0, 0, 0);
+    QRect altArea = QRect(0, 0, 0, 0);
     QPoint shadowOffset = QPoint(0, 0);
     QString font = "";
     QString cutdown = "";
@@ -921,6 +922,11 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
             {
                 area = parseRect(getFirstText(info));
                 normalizeRect(area);
+            }
+            else if (info.tagName() == "altarea")
+            {
+                altArea = parseRect(getFirstText(info));
+                normalizeRect(altArea);
             }
             else if (info.tagName() == "font")
             {
@@ -968,7 +974,8 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
         exit(0);
     }
 
-    UITextType *text = new UITextType(name, testfont, value, draworder, area);
+    UITextType *text = new UITextType(name, testfont, value, draworder, area,
+                                      altArea);
     text->SetScreen(wmult, hmult);
     if (context != -1)
     {

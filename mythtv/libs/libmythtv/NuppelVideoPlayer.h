@@ -57,7 +57,7 @@ class NuppelVideoPlayer
     void SetFileName(QString lfilename) { filename = lfilename; }
 
     void SetExactSeeks(bool exact) { exactseeks = exact; }
-    void SetAutoCommercialSkip(int autoskip) { autocommercialskip = autoskip; }
+    void SetAutoCommercialSkip(int autoskip);
     void SetCommercialSkipMethod(int method) { commercialskipmethod = method; }
 
     void StartPlaying(void);

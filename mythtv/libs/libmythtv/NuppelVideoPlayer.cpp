@@ -1864,6 +1864,12 @@ void NuppelVideoPlayer::SetCommBreakIter(void)
     }
 }
 
+void NuppelVideoPlayer::SetAutoCommercialSkip(int autoskip)
+{
+    SetCommBreakIter();
+    autocommercialskip = autoskip;
+}
+
 bool NuppelVideoPlayer::EnableEdit(void)
 {
     editmode = false;

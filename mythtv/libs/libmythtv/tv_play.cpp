@@ -976,7 +976,7 @@ void TV::ProcessKeypress(int keypressed)
             nvp->ToggleCC();
             break;
         }
-        case Key_Z:
+        case Key_Z: case Key_End:
         {
             DoSkipCommercials(1);
             break;
@@ -986,7 +986,7 @@ void TV::ProcessKeypress(int keypressed)
             DoQueueTranscode();
             break;
         }
-        case Key_Q:
+        case Key_Q: case Key_Home:
         {
             DoSkipCommercials(-1);
             break;

@@ -61,6 +61,7 @@ class LayerSet
     void    ClearAllText(void);
     void    SetTextByRegexp(QMap<QString, QString> &regexpMap);
 
+    void    UseAlternateArea(bool useAlt);
 
   private:
     bool    m_debug;
@@ -404,10 +405,12 @@ class UITextType : public UIType
 {
   public:
     UITextType(const QString &, fontProp *, const QString &, int,
-                QRect displayrect);
+                QRect displayrect, QRect altdisplayrect);
     ~UITextType();
 
     QString Name() { return m_name; }
+
+    void UseAlternateArea(bool useAlt);
 
     void SetText(const QString &text);
     QString GetText() { return m_message; }
@@ -426,6 +429,8 @@ class UITextType : public UIType
     //QString cutDown(QString, QFont *, int, int);
     int m_justification;
     QRect m_displaysize;
+    QRect m_origdisplaysize;
+    QRect m_altdisplaysize;
     QString m_message;
     QString m_default_msg;
     QString m_name;

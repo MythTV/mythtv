@@ -119,6 +119,17 @@ void LayerSet::SetTextByRegexp(QMap<QString, QString> &regexpMap)
     }
 }
 
+void LayerSet::UseAlternateArea(bool useAlt)
+{
+    vector<UIType *>::iterator i = allTypes->begin();
+    for (; i != allTypes->end(); i++)
+    {
+        UIType *type = (*i);
+        if (UITextType *item = dynamic_cast<UITextType *>(type))
+            item->UseAlternateArea(useAlt);
+    }
+}
+
 // **************************************************************
 
 UIType::UIType(const QString &name)
@@ -1564,7 +1575,8 @@ void UIRepeatedImageType::refresh()
 // ******************************************************************
 
 UITextType::UITextType(const QString &name, fontProp *font,
-                       const QString &text, int dorder, QRect displayrect)
+                       const QString &text, int dorder, QRect displayrect,
+                       QRect altdisplayrect)
            : UIType(name)
 {
     m_name = name;
@@ -1572,6 +1584,8 @@ UITextType::UITextType(const QString &name, fontProp *font,
     m_default_msg = text;
     m_font = font;
     m_displaysize = displayrect;
+    m_origdisplaysize = displayrect;
+    m_altdisplaysize = altdisplayrect;
     m_cutdown = true;
     m_order = dorder;
     m_justification = (Qt::AlignLeft | Qt::AlignTop);
@@ -1579,6 +1593,14 @@ UITextType::UITextType(const QString &name, fontProp *font,
 
 UITextType::~UITextType()
 {
+}
+
+void UITextType::UseAlternateArea(bool useAlt)
+{
+    if (useAlt && (m_altdisplaysize.width() > 1))
+        m_displaysize = m_altdisplaysize;
+    else
+        m_displaysize = m_origdisplaysize;
 }
 
 void UITextType::SetText(const QString &text)

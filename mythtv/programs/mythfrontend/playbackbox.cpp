@@ -341,6 +341,10 @@ void PlaybackBox::updateInfo(QPainter *p)
             container = theme->GetSet("program_info_del");
         if (container)
         {
+            if ((playbackPreview == 0) &&
+                (generatePreviewPixmap == 0))
+                container->UseAlternateArea(true);
+
             container->ClearAllText();
             container->SetTextByRegexp(regexpMap);
 
