@@ -1,0 +1,6 @@
+.qmake.internal.cache
+moc_deletebox.cpp
+moc_menubox.cpp
+moc_playbackbox.cpp
+moc_viewscheduled.cpp
+mythfrontend
