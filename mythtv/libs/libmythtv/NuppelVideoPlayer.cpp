@@ -286,7 +286,7 @@ bool NuppelVideoPlayer::Play(float speed, bool normal, bool unpauseaudio)
 
     play_speed = speed;
     normal_speed = normal;
-    if (speed > 0.0 && speed <= 1.5)
+    if (speed > 0.0 && speed <= 3.0)
         temp_ffrew_skip = 1;
     else
     {
