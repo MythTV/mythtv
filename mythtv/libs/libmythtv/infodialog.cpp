@@ -16,7 +16,7 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
     setFixedWidth(800); 
     setFixedHeight(600);
 
-    setFont(QFont("Arial", 14, QFont::Bold));
+    setFont(QFont("Arial", 16, QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
     QPushButton *ok = new QPushButton("OK", this, "close");

@@ -14,7 +14,7 @@ DialogBox::DialogBox(const QString &text, QWidget *parent = 0,
     setFixedWidth(800);
     setFixedHeight(600);
 
-    setFont(QFont("Arial", 14, QFont::Bold));
+    setFont(QFont("Arial", 16, QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
     QLabel *maintext = new QLabel(text, this);

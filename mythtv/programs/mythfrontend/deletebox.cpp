@@ -47,10 +47,10 @@ ProgramListItem::ProgramListItem(QListView *parent, ProgramInfo *lpginfo,
 
     recinfo->GetRecordFilename(prefix.ascii(), filename);
 
-    struct stat st;
+    struct stat64 st;
 
     long long size = 0;
-    if (stat(filename.c_str(), &st) == 0)
+    if (stat64(filename.c_str(), &st) == 0)
         size = st.st_size;
     long int mbytes = size / 1024 / 1024;
     QString filesize = QString("%1 MB").arg(mbytes);
@@ -89,7 +89,7 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     listview->setColumnWidth(0, 40);
     listview->setColumnWidth(1, 190); 
     listview->setColumnWidth(2, 435);
-    listview->setColumnWidth(3, 85);
+    listview->setColumnWidth(3, 90);
 
     listview->setSorting(-1);
     listview->setAllColumnsShowFocus(TRUE);
