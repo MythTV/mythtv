@@ -149,13 +149,13 @@ bool WriteStringList(QSocketDevice *socket, QStringList &list)
         }
         else
         {
-            if (timer.elapsed() > 10000)
+            if (timer.elapsed() > 100000)
             {
                 VERBOSE(VB_GENERAL, "WriteStringList timeout");
                 return false;
             }  
             
-            usleep(50);
+            usleep(500);
         }
     }
 
@@ -179,20 +179,20 @@ bool ReadStringList(QSocketDevice *socket, QStringList &list, bool quickTimeout)
     while (socket->waitForMore(5) < 8)
     {
         elapsed = timer.elapsed();
-        if (!quickTimeout && elapsed >= 30000)
+        if (!quickTimeout && elapsed >= 300000)
         {
             VERBOSE(VB_GENERAL, "ReadStringList timeout.");
             socket->close();
             return false;
         }
-        else if (quickTimeout && elapsed >= 8000)
+        else if (quickTimeout && elapsed >= 20000)
         {
             VERBOSE(VB_GENERAL, "ReadStringList timeout (quick).");
             socket->close();
             return false;
         }
         
-        usleep(50);
+        usleep(500);
     }
 
     QCString sizestr(8 + 1);
@@ -223,7 +223,7 @@ bool ReadStringList(QSocketDevice *socket, QStringList &list, bool quickTimeout)
             btr -= sret;
             if (btr > 0)
             {
-                usleep(50);
+                usleep(500);
                 timer.start();
             }    
         }
@@ -238,9 +238,9 @@ bool ReadStringList(QSocketDevice *socket, QStringList &list, bool quickTimeout)
         else
         {
             elapsed = timer.elapsed();
-            if (elapsed  > 1000)
+            if (elapsed  > 10000)
             {
-                if ((elapsed - errmsgtime) > 1000)
+                if ((elapsed - errmsgtime) > 10000)
                 {
                     errmsgtime = elapsed;
                     VERBOSE(VB_GENERAL, QString("Waiting for data: %1 %2")
@@ -248,13 +248,13 @@ bool ReadStringList(QSocketDevice *socket, QStringList &list, bool quickTimeout)
                 }                            
             }
             
-            if (elapsed > 10000)
+            if (elapsed > 100000)
             {
                 VERBOSE(VB_GENERAL, "ReadStringList timeout. (readBlock)");
                 return false;
             }
             
-            usleep(50);
+            usleep(500);
         }
     }
 
@@ -293,7 +293,7 @@ bool WriteBlock(QSocketDevice *socket, void *data, int len)
             zerocnt = 0;
             written += sret;
             if (written < len)
-                usleep(10);
+                usleep(500);
         }
         else if (sret < 0 && socket->error() != QSocketDevice::NoError)
         {
@@ -310,7 +310,7 @@ bool WriteBlock(QSocketDevice *socket, void *data, int len)
                 VERBOSE(VB_IMPORTANT, "WriteBlock zerocnt timeout");
                 return false;
             }    
-            usleep(100); // We're waiting on the client.
+            usleep(1000); // We're waiting on the client.
         }
     }
     
@@ -426,7 +426,7 @@ bool ReadStringList(QSocket *socket, QStringList &list)
         }
 
         qApp->unlock();
-        usleep(50);
+        usleep(500);
         qApp->lock();
     }
 
@@ -458,7 +458,7 @@ bool ReadStringList(QSocket *socket, QStringList &list)
                 printf("EOF readStringList %u\n", read);
                 break; 
             }
-            usleep(50);
+            usleep(500);
             qApp->processEvents();
 
             if (zerocnt == 5)
@@ -532,7 +532,7 @@ int ReadBlock(QSocket *socket, void *data, int maxlen)
                 printf("EOF ReadBlock %u\n", read);
                 break; 
             }
-            usleep(50);
+            usleep(500);
             qApp->processEvents();
         }
     }
