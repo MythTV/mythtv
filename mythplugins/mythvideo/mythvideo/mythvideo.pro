@@ -16,8 +16,8 @@ installfiles.path = $${PREFIX}/share/mythtv/
 installfiles.files = videomenu.xml video_settings.xml
 installimages.path = $${PREFIX}/share/mythtv/themes/default
 installimages.files = images/*.png
-installimages.path = $${PREFIX}/share/mythtv/mythvideo/scripts
-installimages.files = scripts/*
+installscripts.path = $${PREFIX}/share/mythtv/mythvideo/scripts
+installscripts.files = scripts/*
 
 INSTALLS += installfiles uifiles installimages installscripts
 
