@@ -373,6 +373,18 @@ public:
     };
 };
 
+class CommRewindAmount: public SpinBoxSetting, public GlobalSetting {
+public:
+    CommRewindAmount():
+        SpinBoxSetting(0, 10, 1),
+        GlobalSetting("CommRewindAmount") {
+        setLabel(QObject::tr("Commercial Skip Auto-Rewind Amount"));
+        setHelpText(QObject::tr("If set, Myth will automatically rewind "
+                    "this many seconds after performing a commercial skip."));
+        setValue(0);
+    };
+};
+
 class AutoExpireDiskThreshold: public SpinBoxSetting, public BackendSetting {
 public:
     AutoExpireDiskThreshold():
@@ -1710,6 +1722,7 @@ PlaybackSettings::PlaybackSettings()
     comms->addChild(new CommercialSkipMethod());
     comms->addChild(new AggressiveCommDetect());
     comms->addChild(new CommSkipAllBlanks());
+    comms->addChild(new CommRewindAmount());
     comms->addChild(new AutoCommercialSkip());
     comms->addChild(new TryUnflaggedSkip());
     addChild(comms);

@@ -88,6 +88,11 @@ public:
     static void signalChange(QSqlDatabase* db);
 
 protected slots:
+    void setAvailableOptions(const QString& newValue)
+                             { setAvailableOptions(); };
+    void setAvailableOptions(int newValue)
+                             { setAvailableOptions(); };
+    void setAvailableOptions(void);
     void runProgList();
 
 private:
@@ -122,6 +127,18 @@ private:
     class SRCategory* category;
     class SRRecPriority* recpriority;
     class SRRecGroup* recgroup;
+
+    QWidget *typeWidget;
+    QWidget *profileWidget;
+    QWidget *recpriorityWidget;
+    QWidget *autoexpireWidget;
+    QWidget *recgroupWidget;
+    QWidget *startoffsetWidget;
+    QWidget *endoffsetWidget;
+    QWidget *maxepisodesWidget;
+    QWidget *maxnewestWidget;
+    QWidget *dupinWidget;
+    QWidget *dupmethodWidget;
 
     ProgramInfo* m_pginfo;
 };

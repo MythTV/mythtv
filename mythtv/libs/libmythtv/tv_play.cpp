@@ -1063,6 +1063,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
     if (zoomMode)
     {
+        int passThru = 0;
+
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
             action = actions[i];
@@ -1094,11 +1096,18 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 nvp->Zoom(kZoomIn);
             else if (action == "JUMPRWND")
                 nvp->Zoom(kZoomOut);
+            else if (action == "VOLUMEDOWN" || action == "VOLUMEUP" ||
+                     action == "MUTE" || action == "PAUSE")
+            {
+                passThru = 1;
+                handled = false;
+            }
             else
                 handled = false;
         }
 
-        return;
+        if (!passThru)
+            return;
     }
 
     if (nvp->GetOSD() && osd->DialogShowing(dialogname))

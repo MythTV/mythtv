@@ -585,23 +585,34 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
     f->setLineWidth((int)(4 * hmult));
     vbox->addWidget(f);    
 
-    vbox->addWidget(type->configWidget(this, dialog));
+    typeWidget = type->configWidget(this, dialog);
+    vbox->addWidget(typeWidget);
 
     QHBoxLayout* hbox = new QHBoxLayout(vbox, (int)(20 * wmult));
     QVBoxLayout* vbox1 = new QVBoxLayout(hbox, (int)(10 * wmult));
     QVBoxLayout* vbox2 = new QVBoxLayout(hbox, (int)(10 * wmult));
 
-    vbox1->addWidget(profile->configWidget(this, dialog));
-    vbox1->addWidget(recpriority->configWidget(this, dialog));
-    vbox1->addWidget(autoexpire->configWidget(this, dialog));
-    vbox1->addWidget(maxepisodes->configWidget(this, dialog));
-    vbox1->addWidget(maxnewest->configWidget(this, dialog));
+    profileWidget = profile->configWidget(this, dialog);
+    vbox1->addWidget(profileWidget);
+    recpriorityWidget = recpriority->configWidget(this, dialog);
+    vbox1->addWidget(recpriorityWidget);
+    autoexpireWidget = autoexpire->configWidget(this, dialog);
+    vbox1->addWidget(autoexpireWidget);
+    maxepisodesWidget = maxepisodes->configWidget(this, dialog);
+    vbox1->addWidget(maxepisodesWidget);
+    maxnewestWidget = maxnewest->configWidget(this, dialog);
+    vbox1->addWidget(maxnewestWidget);
 
-    vbox2->addWidget(recgroup->configWidget(this, dialog));
-    vbox2->addWidget(startoffset->configWidget(this, dialog));
-    vbox2->addWidget(endoffset->configWidget(this, dialog));
-    vbox2->addWidget(dupmethod->configWidget(this, dialog));
-    vbox2->addWidget(dupin->configWidget(this, dialog));
+    recgroupWidget = recgroup->configWidget(this, dialog);
+    vbox2->addWidget(recgroupWidget);
+    startoffsetWidget = startoffset->configWidget(this, dialog);
+    vbox2->addWidget(startoffsetWidget);
+    endoffsetWidget = endoffset->configWidget(this, dialog);
+    vbox2->addWidget(endoffsetWidget);
+    dupmethodWidget = dupmethod->configWidget(this, dialog);
+    vbox2->addWidget(dupmethodWidget);
+    dupinWidget = dupin->configWidget(this, dialog);
+    vbox2->addWidget(dupinWidget);
 
     MythPushButton *button = new MythPushButton(tr("See a list of all up-coming"
                                                    " episodes/playtimes."),
@@ -609,7 +620,49 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
     connect(button, SIGNAL(clicked()), this, SLOT(runProgList()));
     vbox->addWidget(button);
 
+    connect(type, SIGNAL(valueChanged(const QString&)), this,
+            SLOT(setAvailableOptions(const QString&)));
+    connect(maxepisodes, SIGNAL(valueChanged(int)), this,
+            SLOT(setAvailableOptions(int)));
+
+    typeWidget->setFocus();
+    setAvailableOptions();
+
     return dialog;
+}
+
+void ScheduledRecording::setAvailableOptions(void)
+{
+    bool multiEpisode = true;
+    bool isScheduled = true;
+    bool maxIsSet = false;
+
+    switch(type->getValue().toInt())
+    {
+        case kNotRecording:
+                isScheduled = false;
+                break;
+
+        case kSingleRecord:
+        case kFindOneRecord:
+                multiEpisode = false;
+                break;
+    }
+
+    if (maxepisodes->getValue().toInt() > 0)
+        maxIsSet = true;
+
+    profileWidget->setEnabled(isScheduled);
+    recpriorityWidget->setEnabled(isScheduled);
+    autoexpireWidget->setEnabled(isScheduled);
+    recgroupWidget->setEnabled(isScheduled);
+    startoffsetWidget->setEnabled(isScheduled);
+    endoffsetWidget->setEnabled(isScheduled);
+
+    maxepisodesWidget->setEnabled(isScheduled && multiEpisode);
+    maxnewestWidget->setEnabled(isScheduled && multiEpisode && maxIsSet);
+    dupinWidget->setEnabled(isScheduled && multiEpisode);
+    dupmethodWidget->setEnabled(isScheduled && multiEpisode);
 }
 
 void ScheduledRecording::runProgList(void)

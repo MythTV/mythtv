@@ -812,7 +812,7 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
         return false;
 
     if ((dupmethod & kDupCheckDesc) &&
-        ((description == "") &&
+        ((description == "") ||
          (description != other.description)))
         return false;
 

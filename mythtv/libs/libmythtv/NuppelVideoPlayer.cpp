@@ -3760,7 +3760,15 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
             int spos = calcSliderPos(desc);
             osd->StartPause(spos, false, comm_msg, desc, 2);
         }
-        JumpToFrame(commBreakIter.key());
+
+        int commRewindAmount =
+                (int)(gContext->GetNumSetting("CommRewindAmount",0) *
+                      video_frame_rate);
+        if ((direction > 0) &&
+            (commBreakIter.key() > commRewindAmount))
+            JumpToFrame(commBreakIter.key() - commRewindAmount);
+        else
+            JumpToFrame(commBreakIter.key());
         commBreakIter++;
 
         GetFrame(1, true);
