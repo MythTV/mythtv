@@ -1927,6 +1927,18 @@ static HostCheckBox *EnableXbox()
     return gc;
 }
 
+static HostCheckBox *RealtimePriority()
+{
+    HostCheckBox *gc = new HostCheckBox("RealtimePriority");
+    gc->setLabel(QObject::tr("Enable realtime priority threads"));
+    gc->setHelpText(QObject::tr("When running mythfrontend with root "
+                    "privileges, some threads can be given enhanced priority. "
+                    "Disable this if mythfrontend freezes during video "
+                    "playback."));
+    gc->setValue(false);
+    return gc;
+}
+
 static HostComboBox *XboxBlinkBIN()
 {
     HostComboBox *gc = new HostComboBox("XboxBlinkBIN");
@@ -2309,7 +2321,6 @@ public:
      };
 };
 
-#ifdef LCD_DEVICE
 static HostCheckBox *LCDShowTime()
 {
     HostCheckBox *gc = new HostCheckBox("LCDShowTime");
@@ -2390,7 +2401,46 @@ static HostCheckBox *LCDBacklightOn()
     gc->setValue(true);
     return gc;
 }
-#endif
+
+static HostCheckBox *LCDEnable()
+{
+    HostCheckBox *gc = new HostCheckBox("LCDEnable");
+    gc->setLabel(QObject::tr("Enable LCD device"));
+    gc->setHelpText(QObject::tr("Use an LCD display to view MythTV status "
+                    "information. Need to restart mythfrontend to "
+                    "(de)activate it."));
+    gc->setValue(false);
+    return gc;
+}
+
+class LcdSettings: public  VerticalConfigurationGroup,
+                   public TriggeredConfigurationGroup {
+public:
+     LcdSettings():
+         VerticalConfigurationGroup(false),
+         TriggeredConfigurationGroup(false) {
+         setLabel(QObject::tr("LCD device display"));
+         setUseLabel(false);
+
+         Setting* lcd_enable = LCDEnable();
+         addChild(lcd_enable);
+         setTrigger(lcd_enable);
+
+         ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
+         settings->addChild(LCDShowTime());
+         settings->addChild(LCDShowMenu());
+         settings->addChild(LCDPopupTime());
+         settings->addChild(LCDShowMusic());
+         settings->addChild(LCDShowChannel());
+         settings->addChild(LCDShowVolume());
+         settings->addChild(LCDShowGeneric());
+         settings->addChild(LCDBacklightOn());
+         addTarget("1", settings);
+
+         addTarget("0", new VerticalConfigurationGroup(true));
+    };
+};
+
 
 #ifdef CONFIG_DARWIN
 static HostCheckBox *MacGammaCorrect()
@@ -2683,6 +2733,7 @@ PlaybackSettings::PlaybackSettings()
     general->addChild(new DeinterlaceSettings());
     general->addChild(CustomFilters());
     general->addChild(UseMPEG2Dec());
+    general->addChild(RealtimePriority());
     general->addChild(UseVideoTimebase());
     general->addChild(DecodeExtraAudio());
     general->addChild(AspectOverride());
@@ -2913,19 +2964,7 @@ AppearanceSettings::AppearanceSettings()
     qttheme->addChild(PlayBoxShading());
     addChild(qttheme );
 
-#ifdef LCD_DEVICE
-    VerticalConfigurationGroup* lcdscreen = new VerticalConfigurationGroup(false);
-    lcdscreen->setLabel(QObject::tr("LCD device display"));
-    lcdscreen->addChild(LCDShowTime());
-    lcdscreen->addChild(LCDShowMenu());
-    lcdscreen->addChild(LCDPopupTime());
-    lcdscreen->addChild(LCDShowMusic());
-    lcdscreen->addChild(LCDShowChannel());
-    lcdscreen->addChild(LCDShowVolume());
-    lcdscreen->addChild(LCDShowGeneric());
-    lcdscreen->addChild(LCDBacklightOn());
-    addChild(lcdscreen);
-#endif
+    addChild(new LcdSettings());
 }
 
 XboxSettings::XboxSettings()

@@ -114,6 +114,14 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
     int timeout = 1000;
     hostname = lhostname;
     port = lport;
+    
+    // Don't even try to connect if we're currently disabled.
+    if (!gContext->GetNumSetting("LCDEnable", 0))
+    {
+        connected = false;
+        m_server_unavailable = true;
+        return connected;
+    }
 
     if (!connected)
     {

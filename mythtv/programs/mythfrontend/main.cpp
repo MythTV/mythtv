@@ -669,6 +669,7 @@ static void *run_priv_thread(void *data)
             switch (req.getType()) 
             {
             case MythPrivRequest::MythRealtime:
+                if (gContext->GetNumSetting("RealtimePriority", 1))
                 {
                     pthread_t *target_thread = (pthread_t *)(req.getData());
                     // Raise the given thread to realtime priority

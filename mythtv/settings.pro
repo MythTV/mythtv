@@ -57,9 +57,6 @@ DEFINES += USING_IVTV
 # Use the installed ivtv header instead of the local copy (needs >= v0.2)
 #DEFINES += USING_IVTV_HEADER
 
-# LCDProc support
-#DEFINES += LCD_DEVICE
-
 # Default audio output, OSS.  
 # Do NOT disable unless compiling on a non-linux platform.
 CONFIG += using_oss
