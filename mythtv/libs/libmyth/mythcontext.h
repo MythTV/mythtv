@@ -135,6 +135,8 @@ class MythContext : public QObject
     QString FindThemeDir(const QString &themename);
     QString GetThemeDir(void);
 
+    QString GetMenuThemeDir(void);
+
     int OpenDatabase(QSqlDatabase *db);
     static void KickDatabase(QSqlDatabase *db);
     static void DBError(const QString &where, const QSqlQuery& query);

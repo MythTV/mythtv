@@ -1138,8 +1138,23 @@ void ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
 
     if (!f.open(IO_ReadOnly))
     {
+        
         cerr << "Couldn't read menu file " << menuname << endl;
-        exit(1);
+        if(menuname == "mainmenu.xml" )
+        {
+            exit(0);
+        }
+        else
+        {
+            MythPopupBox::showOkPopup(gContext->GetMainWindow(), QObject::tr("No Menu File"),
+                                      QObject::tr(QString("Myth could not locate the menu file %1.\n\n"
+                                      "We will now return to the main menu.").arg(menuname)));
+
+            parseMenu("mainmenu.xml");
+            return;
+        }
+        
+        
     }
 
     QString errorMsg;
@@ -1964,11 +1979,16 @@ bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
 QString ThemedMenuPrivate::findMenuFile(const QString &menuname)
 {
     QString testdir = QDir::homeDirPath() + "/.mythtv/" + menuname;
-   
     QFile file(testdir);
     if (file.exists())
         return testdir;
 
+    testdir = gContext->GetMenuThemeDir() + "/" + menuname;
+    file.setName(testdir);
+    if (file.exists())
+        return testdir;
+
+        
     testdir = gContext->GetThemeDir() + "/" + menuname;
     file.setName(testdir);
     if (file.exists())

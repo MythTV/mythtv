@@ -47,6 +47,7 @@ class MythContextPrivate
     QString m_installprefix;
 
     bool m_themeloaded;
+    QString m_menuthemepathname;
     QString m_themepathname;
     QPixmap *m_backgroundimage;
     QPalette m_palette;
@@ -395,6 +396,9 @@ void MythContext::LoadQtConfig(void)
         delete d->m_backgroundimage;
     d->m_backgroundimage = NULL;
 
+    themename = GetSetting("MenuTheme");
+    d->m_menuthemepathname = FindThemeDir(themename) +"/";
+    
     InitializeScreenSettings();
 }
 
@@ -691,6 +695,10 @@ QString MythContext::FindThemeDir(const QString &themename)
 
     cerr << "Could not find theme: " << themename << endl;
     return "";
+}
+QString MythContext::GetMenuThemeDir(void)
+{
+    return d->m_menuthemepathname;
 }
 
 QString MythContext::GetThemeDir(void)

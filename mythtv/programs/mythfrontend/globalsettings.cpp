@@ -560,6 +560,34 @@ public:
     };
 };
 
+class MenuTheme: public ComboBoxSetting, public GlobalSetting {
+public:
+    MenuTheme():
+        GlobalSetting("MenuTheme") {
+        setLabel(QObject::tr("Menu theme"));
+
+        QDir themes(PREFIX"/share/mythtv/themes");
+        themes.setFilter(QDir::Dirs);
+        themes.setSorting(QDir::Name | QDir::IgnoreCase);
+        addSelection(tr("Default"));
+        const QFileInfoList *fil = themes.entryInfoList(QDir::Dirs);
+        if (!fil)
+            return;
+
+        QFileInfoListIterator it( *fil );
+        QFileInfo *theme;
+
+        for( ; it.current() != 0 ; ++it ) {
+            theme = it.current();
+            QFileInfo xml(theme->absFilePath() + "/mainmenu.xml");
+
+            if (theme->fileName()[0] != '.' && xml.exists())
+                addSelection(theme->fileName());
+        }
+    }
+};
+
+
 class OSDTheme: public ComboBoxSetting, public GlobalSetting {
 public:
     OSDTheme():
@@ -1011,7 +1039,7 @@ class GuiWidth: public SpinBoxSetting, public GlobalSetting {
 public:
     GuiWidth():
         SpinBoxSetting(0, 1920, 8), GlobalSetting("GuiWidth") {
-        setLabel(QObject::tr("GUI width"));
+        setLabel(QObject::tr("GUI width (px)"));
         setValue(0);
         setHelpText(QObject::tr("The width of the GUI.  Do not make the GUI "
                     "wider than your actual screen resolution.  Set to 0 to "
@@ -1023,7 +1051,7 @@ class GuiHeight: public SpinBoxSetting, public GlobalSetting {
 public:
     GuiHeight():
         SpinBoxSetting(0, 1600, 8), GlobalSetting("GuiHeight") {
-        setLabel(QObject::tr("GUI height"));
+        setLabel(QObject::tr("GUI height (px)"));
         setValue(0);
         setHelpText(QObject::tr("The height of the GUI.  Do not make the GUI "
                     "taller than your actual screen resolution.  Set to 0 to "
@@ -1226,6 +1254,7 @@ public:
         SpinBoxSetting(1, 48, 1), GlobalSetting("QtFontBig") {
         setLabel(QObject::tr("\"Big\" font"));
         setValue(25);
+        setHelpText(QObject::tr("Default size is 25."));
     };
 };
 
@@ -1235,6 +1264,7 @@ public:
         SpinBoxSetting(1, 48, 1), GlobalSetting("QtFontMedium") {
         setLabel(QObject::tr("\"Medium\" font"));
         setValue(16);
+        setHelpText(QObject::tr("Default size is 16."));
     };
 };
 
@@ -1244,6 +1274,7 @@ public:
         SpinBoxSetting(1, 48, 1), GlobalSetting("QtFontSmall") {
         setLabel(QObject::tr("\"Small\" font"));
         setValue(12);
+        setHelpText(QObject::tr("Default size is 12."));
     };
 };
 
@@ -2144,8 +2175,7 @@ GeneralSettings::GeneralSettings()
 EPGSettings::EPGSettings()
 {
     VerticalConfigurationGroup* epg = new VerticalConfigurationGroup(false);
-    epg->setLabel(QObject::tr("Program Guide"));
-
+    epg->setLabel(QObject::tr("Program Guide") + " 1/2");
     epg->addChild(new EPGFillType());
     epg->addChild(new EPGShowCategoryColors());
     epg->addChild(new EPGShowCategoryText());
@@ -2157,7 +2187,7 @@ EPGSettings::EPGSettings()
     addChild(epg);
 
     VerticalConfigurationGroup* gen = new VerticalConfigurationGroup(false);
-    gen->setLabel(QObject::tr("Program Guide"));
+    gen->setLabel(QObject::tr("Program Guide") + " 2/2");
     gen->addChild(new UnknownTitle());
     gen->addChild(new UnknownCategory());
     gen->addChild(new DefaultTVChannel());
@@ -2188,6 +2218,7 @@ AppearanceSettings::AppearanceSettings()
     theme->addChild(new ThemeSelector());
     theme->addChild(new ThemeFontSizeType());
     theme->addChild(new RandomTheme());
+    theme->addChild(new MenuTheme());    
     addChild(theme);
 
     VerticalConfigurationGroup* screen = new VerticalConfigurationGroup(false);
