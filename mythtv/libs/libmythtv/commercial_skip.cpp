@@ -453,9 +453,12 @@ bool CommDetect::CheckFrameIsBlank(void)
     totalMinBrightness += min;
     DimAVG = min + 10;
 
-    if (((max - min) <= MaxDiff) ||
-        (max < DarkBrightness) ||
-        ((max < DimBrightness) && (avg < DimAVG)))
+    if ((max - min) <= MaxDiff)
+        return(true);
+
+    if ((!aggressiveDetection) &&
+        ((max < DarkBrightness) ||
+         ((max < DimBrightness) && (avg < DimAVG))))
         return(true);
 
     return(false);
