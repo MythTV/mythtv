@@ -69,3 +69,6 @@ VisualScaleHeight=1
 # Use keyboard (ie. remote control) accelerators in the playback screen
 # (true, false) You probably want to make this true.
 KeyboardAccelerators=false
+
+# Eject the CD after ripping
+EjectCDAfterRipping=true
