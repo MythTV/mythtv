@@ -52,6 +52,7 @@ ProgramInfo::ProgramInfo(void)
     conflictpriority = -1000;
     reactivate = false;
     recordid = 0;
+    parentid = 0;
     rectype = kNotRecording;
     dupin = kDupsInAll;
     dupmethod = kDupCheckSubDesc;
@@ -128,6 +129,7 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     conflictpriority = other.conflictpriority;
     reactivate = other.reactivate;
     recordid = other.recordid;
+    parentid = other.parentid;
     rectype = other.rectype;
     dupin = other.dupin;
     dupmethod = other.dupmethod;
@@ -872,11 +874,15 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
     if (rectype == kFindOneRecord)
         return recordid == other.recordid;
 
+    if (findid && findid == other.findid &&
+        (recordid == other.recordid || recordid == other.parentid))
+           return true;
+
     if (title != other.title)
         return false;
 
-    if (findid && other.findid)
-        return findid == other.findid;
+    if (findid && findid == other.findid)
+        return true;
 
     if (dupmethod & kDupCheckNone)
         return false;

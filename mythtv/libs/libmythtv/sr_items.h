@@ -529,6 +529,16 @@ class SRFindId: public IntegerSetting, public SimpleSRSetting
         }
 };
 
+class SRParentId: public IntegerSetting, public SimpleSRSetting
+{
+    public:
+        SRParentId(ScheduledRecording& parent)
+            : SimpleSRSetting(parent, "parentid")
+        {
+            setVisible(false);
+        }
+};
+
 class SRAutoTranscode: public SRSelectSetting 
 {
     public:

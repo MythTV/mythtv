@@ -129,13 +129,24 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
                       "      OR HOUR(program.starttime) >= 23) ");
 
     m_clause->insertItem(tr("Multiple sports teams (complete example)"));
-    m_csql << QString("program.title LIKE \"NBA B%\" \n"
-              "AND program.subtitle REGEXP \"(Rockets|Cavaliers|Lakers)\" ");
+    m_csql << QString("program.title LIKE \"MLB%Baseball\" \n"
+              "AND program.subtitle REGEXP \"(Giants|Yankees|Cubs)\" ");
 
     m_clause->insertItem(tr("Sci-fi B-movies (complete example)"));
     m_csql << QString("program.category_type=\"movie\" \n"
               "AND program.category=\"Science fiction\" \n"
               "AND program.stars <= 0.5 AND airdate < 1970 ");
+
+    m_clause->insertItem(tr("SportsCenter Overnight (complete example - use FindDaily)"));
+    m_csql << QString("program.title = \"SportsCenter\" \n"
+              "AND HOUR(program.starttime) >= 2 \n"
+              "AND HOUR(program.starttime) <= 6 ");
+
+    m_clause->insertItem(tr("Movie of the Week (complete example - use FindWeekly)"));
+    m_csql << QString("program.category_type=\"movie\" \n"
+              "AND program.stars >= 1.0 AND airdate >= 1965 \n"
+              "AND DAYNAME(program.starttime) = \"Friday\" \n"
+              "AND HOUR(program.starttime) >= 12 ");
 
     vbox->addWidget(m_clause);
 

@@ -66,6 +66,7 @@ ScheduledRecording::ScheduledRecording()
     findday = new SRFindDay(*this);
     findtime = new SRFindTime(*this);
     findid = new SRFindId(*this);
+    parentid = new SRParentId(*this);
     search = new SRRecSearchType(*this);
     
     rootGroup = new RootSRGroup(*this);
@@ -158,6 +159,7 @@ void ScheduledRecording::loadBySearch(RecSearchType lsearch,
         QString ltitle = QString("%1 %2").arg(textname).arg(searchType);
         title->setValue(ltitle);
         description->setValue(forwhat);
+        findday->setValue((startDate->dateValue().dayOfWeek() + 1) % 7);
     } 
 }
 
@@ -384,19 +386,20 @@ void ScheduledRecording::save()
 
 void ScheduledRecording::remove() 
 {
-    if (!getRecordID())
+    int rid = getRecordID();
+
+    if (!rid)
         return;
 
+    QString querystr;
     MSqlQuery query(MSqlQuery::InitCon());
-    QString querystr = QString("DELETE FROM record WHERE recordid = %1")
-                               .arg(getRecordID());
+    querystr = QString("DELETE FROM record WHERE recordid = %1").arg(rid);
     query.prepare(querystr);
     query.exec();
 
-    // FIXME: query has no exec, why?
-    querystr = QString("UPDATE recordid FROM recorded SET recordid = NULL "
-                    "WHERE recordid = %1")
-                    .arg(getRecordID());
+    querystr = QString("DELETE FROM oldfind WHERE recordid = %1").arg(rid);
+    query.prepare(querystr);
+    query.exec();
 }
 
 void ScheduledRecording::signalChange(int recordid) 
@@ -461,12 +464,23 @@ void ScheduledRecording::addHistory(const ProgramInfo& proginfo)
     {
         MythContext::DBError("addHistory", result);
     }
-    else
+
+    if (proginfo.findid)
     {
-        // The addition of an entry to oldrecorded may affect near-future
-        // scheduling decisions, so recalculate
-        signalChange(0);
+        result.prepare("REPLACE INTO oldfind (recordid, findid) "
+                       "VALUES(:RECORDID,:FINDID);");
+        result.bindValue(":RECORDID", proginfo.recordid);
+        result.bindValue(":FINDID", proginfo.findid);
+    
+        result.exec();
+        if (!result.isActive())
+        {
+            MythContext::DBError("addFindHistory", result);
+        }
     }
+    // The removal of an entry from oldrecorded may affect near-future
+    // scheduling decisions, so recalculate
+    signalChange(0);
 }
 
 void ScheduledRecording::forgetHistory(const ProgramInfo& proginfo)
@@ -491,7 +505,7 @@ void ScheduledRecording::forgetHistory(const ProgramInfo& proginfo)
 
     if (proginfo.findid)
     {
-        result.prepare("UPDATE oldrecorded SET findid = 0 WHERE "
+        result.prepare("DELETE FROM oldfind WHERE "
                        "recordid = :RECORDID AND findid = :FINDID");
         result.bindValue(":RECORDID", proginfo.recordid);
         result.bindValue(":FINDID", proginfo.findid);
@@ -699,6 +713,7 @@ void ScheduledRecording::setDefault(bool haschannel)
     findday->setValue(-1);
     findtime->setValue(QTime::fromString("00:00:00", Qt::ISODate));
     findid->setValue(0);
+    parentid->setValue(0);
     category->setValue("");
     search->setValue(kNoSearch);
 
@@ -786,6 +801,8 @@ void ScheduledRecording::makeOverride(void)
         search->setValue(kNoSearch);
 
     setProgram(m_pginfo);
+
+    parentid->setValue(m_pginfo->recordid);
 
     profile->setChanged();
     dupin->setChanged();

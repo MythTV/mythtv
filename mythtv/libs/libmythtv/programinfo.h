@@ -259,6 +259,7 @@ class ProgramInfo
                                 // 2 = requested, replaced
                                 // -1 = reactivated
     int recordid;
+    int parentid;
     RecordingType rectype;
     RecordingDupInType dupin;
     RecordingDupMethodType dupmethod;

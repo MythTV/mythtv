@@ -48,6 +48,7 @@ class SRProgramid;
 class SRFindDay;
 class SRFindTime;
 class SRFindId;
+class SRParentId;
 
 class ScheduledRecording: public ConfigurationGroup, public ConfigurationDialog {
     Q_OBJECT
@@ -153,6 +154,7 @@ public:
     void setFindDayObj(SRFindDay* val) {findday = val;}
     void setFindTimeObj(SRFindTime* val) {findtime = val;}
     void setFindIdObj(SRFindId* val) {findid = val;}
+    void setParentIdObj(SRParentId* val) {parentid = val;}
     
     void ToMap(QMap<QString, QString>& infoMap);
     
@@ -216,6 +218,7 @@ protected:
     class SRFindDay* findday;
     class SRFindTime* findtime;
     class SRFindId* findid;
+    class SRParentId* parentid;
     
     ProgramInfo* m_pginfo;
     QGuardedPtr<RootSRGroup> rootGroup;

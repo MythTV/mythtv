@@ -464,6 +464,7 @@ void Scheduler::BuildListMaps(void)
         {
             cardlistmap[p->cardid].push_back(p);
             titlelistmap[p->title].push_back(p);
+            recordidlistmap[p->recordid].push_back(p);
         }
     }
 }
@@ -472,6 +473,7 @@ void Scheduler::ClearListMaps(void)
 {
     cardlistmap.clear();
     titlelistmap.clear();
+    recordidlistmap.clear();
 }
 
 bool Scheduler::FindNextConflict(RecList &cardlist, ProgramInfo *p, RecIter &j)
@@ -500,10 +502,31 @@ bool Scheduler::FindNextConflict(RecList &cardlist, ProgramInfo *p, RecIter &j)
     return false;
 }
 
-void Scheduler::MarkOtherShowings(RecList &titlelist, ProgramInfo *p)
+void Scheduler::MarkOtherShowings(ProgramInfo *p)
 {
-    RecIter i = titlelist.begin();
-    for ( ; i != titlelist.end(); i++)
+    RecList &showinglist = titlelistmap[p->title];
+
+    MarkShowingsList(showinglist, p);
+
+    if (p->rectype == kFindOneRecord || 
+        p->rectype == kFindDailyRecord ||
+        p->rectype == kFindWeeklyRecord)
+    {
+        showinglist = recordidlistmap[p->recordid];
+        MarkShowingsList(showinglist, p);
+    }
+
+    if (p->rectype == kOverrideRecord && p->findid > 0)
+    {
+        showinglist = recordidlistmap[p->parentid];
+        MarkShowingsList(showinglist, p);
+    }
+}
+
+void Scheduler::MarkShowingsList(RecList &showinglist, ProgramInfo *p)
+{
+    RecIter i = showinglist.begin();
+    for ( ; i != showinglist.end(); i++)
     {
         ProgramInfo *q = *i;
         if (q == p)
@@ -547,13 +570,20 @@ void Scheduler::RestoreRecStatus(void)
     }
 }
 
-bool Scheduler::TryAnotherShowing(RecList &titlelist, ProgramInfo *p)
+bool Scheduler::TryAnotherShowing(ProgramInfo *p)
 {
     if (p->recstatus == rsRecording)
         return false;
 
-    RecIter j = titlelist.begin();
-    for ( ; j != titlelist.end(); j++)
+    RecList &showinglist = titlelistmap[p->title];
+
+    if (p->rectype == kFindOneRecord || 
+        p->rectype == kFindDailyRecord ||
+        p->rectype == kFindWeeklyRecord)
+        showinglist = recordidlistmap[p->recordid];
+
+    RecIter j = showinglist.begin();
+    for ( ; j != showinglist.end(); j++)
     {
         ProgramInfo *q = *j;
         if (q == p)
@@ -562,7 +592,7 @@ bool Scheduler::TryAnotherShowing(RecList &titlelist, ProgramInfo *p)
 
     p->recstatus = rsLaterShowing;
 
-    for (j++; j != titlelist.end(); j++)
+    for (j++; j != showinglist.end(); j++)
     {
         ProgramInfo *q = *j;
         if (q->recstatus != rsEarlierShowing &&
@@ -583,7 +613,7 @@ bool Scheduler::TryAnotherShowing(RecList &titlelist, ProgramInfo *p)
             continue;
 
         q->recstatus = rsWillRecord;
-        MarkOtherShowings(titlelist, q);
+        MarkOtherShowings(q);
         PrintRec(p, "     -");
         PrintRec(q, "     +");
         return true;
@@ -601,12 +631,9 @@ void Scheduler::SchedNewRecords(void)
     for ( ; i != reclist.end(); i++)
     {
         ProgramInfo *p = *i;
-        if (p->recstatus == rsRecording ||
-            p->recstatus == rsWillRecord)
-        {
-            RecList &titlelist = titlelistmap[p->title];
-            MarkOtherShowings(titlelist, p);
-        }
+        if (p->recstatus == rsRecording || p->recstatus == rsWillRecord)
+            MarkOtherShowings(p);
+
         if (p->recstatus != rsUnknown)
             continue;
 
@@ -614,9 +641,8 @@ void Scheduler::SchedNewRecords(void)
         RecIter k = cardlist.begin();
         if (!FindNextConflict(cardlist, p, k))
         {
-            RecList &titlelist = titlelistmap[p->title];
             p->recstatus = rsWillRecord;
-            MarkOtherShowings(titlelist, p);
+            MarkOtherShowings(p);
             PrintRec(p, "  +");
         }
         else
@@ -643,16 +669,14 @@ void Scheduler::MoveHigherRecords(void)
 
         BackupRecStatus();
         p->recstatus = rsWillRecord;
-        RecList &titlelist = titlelistmap[p->title];
-        MarkOtherShowings(titlelist, p);
+        MarkOtherShowings(p);
 
         RecList &cardlist = cardlistmap[p->cardid];
         RecIter k = cardlist.begin();
         for ( ; FindNextConflict(cardlist, p, k); k++)
         {
-            RecList &ktitlelist = titlelistmap[(*k)->title];
             if ((p->recpriority < (*k)->recpriority && !schedMoveHigher) ||
-                !TryAnotherShowing(ktitlelist, *k))
+                !TryAnotherShowing(*k))
             {
                 RestoreRecStatus();
                 break;
@@ -1672,16 +1696,16 @@ void Scheduler::AddNewRecords(void) {
 "cardinput.preference, "
 "record.dupin, "
 "recorded.endtime IS NOT NULL AND recorded.endtime < NOW() AS recduplicate, "
-"record.type, record.recordid, 0, "
+"oldfind.findid IS NOT NULL AS findduplicate, "
+"record.type, record.recordid, "
 "program.starttime - INTERVAL record.startoffset minute AS recstartts, "
 "program.endtime + INTERVAL record.endoffset minute AS recendts, "
 "program.previouslyshown, record.recgroup, record.dupmethod, "
 "channel.commfree, capturecard.cardid, "
 "cardinput.cardinputid, UPPER(cardinput.shareable) = 'Y' AS shareable, "
 "program.seriesid, program.programid, program.category_type, "
-"program.airdate, program.stars, program.originalairdate, record.inactive, ")
-+ progfindid + QString(
-
+"program.airdate, program.stars, program.originalairdate, record.inactive, "
+"record.parentid, ") + progfindid + QString(
 "FROM recordmatch "
 
 " INNER JOIN record ON (recordmatch.recordid = record.recordid) "
@@ -1738,7 +1762,11 @@ void Scheduler::AddNewRecords(void) {
 "          AND program.description = recorded.description)) "
 "      ) "
 "     ) "
-"  ) ");
+"  ) "
+" LEFT JOIN oldfind ON "
+"  (oldfind.recordid = recordmatch.recordid AND "
+"   oldfind.findid = ") + progfindid + QString(") "
+);
 
     VERBOSE(VB_SCHEDULE, QString(" |-- Start DB Query..."));
 
@@ -1785,8 +1813,8 @@ void Scheduler::AddNewRecords(void) {
         p->recpriority = result.value(12).toInt();
         p->dupin = RecordingDupInType(result.value(13).toInt());
         p->dupmethod = RecordingDupMethodType(result.value(22).toInt());
-        p->rectype = RecordingType(result.value(15).toInt());
-        p->recordid = result.value(16).toInt();
+        p->rectype = RecordingType(result.value(16).toInt());
+        p->recordid = result.value(17).toInt();
 
         p->recstartts = result.value(18).toDateTime();
         p->recendts = recendts;
@@ -1814,7 +1842,8 @@ void Scheduler::AddNewRecords(void) {
         }
 
         bool inactive = result.value(33).toInt();
-        p->findid = result.value(34).toInt();
+        p->parentid = result.value(34).toInt();
+        p->findid = result.value(35).toInt();
 
         if (!recTypeRecPriorityMap.contains(p->rectype))
             recTypeRecPriorityMap[p->rectype] = 
@@ -1873,11 +1902,14 @@ void Scheduler::AddNewRecords(void) {
         {
             if (p->dupin == kDupsNewEpi && p->repeat)
                 p->recstatus = rsRepeat;
-        
+
+            if (result.value(15).toInt())
+                p->recstatus = rsPreviousRecording;
+
             if (((p->dupin & kDupsInOldRecorded) || (p->dupin == kDupsNewEpi)) &&
                 result.value(10).toInt())
                 p->recstatus = rsPreviousRecording;
-            
+
             if (((p->dupin & kDupsInRecorded) || (p->dupin == kDupsNewEpi)) &&
                 result.value(14).toInt())
                 p->recstatus = rsCurrentRecording;
