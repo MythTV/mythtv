@@ -232,10 +232,6 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 void MainServer::HandleDone(QSocket *socket)
 {
     socket->close();
-    if (isRingBufSock(socket))
-    {
-
-    }
 }
 
 void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
@@ -934,6 +930,23 @@ void MainServer::endConnection(QSocket *socket)
         QSocket *sock = *rt;
         if (sock == socket)
         {
+            QMap<int, EncoderLink *>::iterator i = encoderList->begin();
+            for (; i != encoderList->end(); ++i)
+            {
+                EncoderLink *enc = i.data();
+                if (enc->isBusy() && enc->GetReadThreadSocket() == socket)
+                {
+                    if (enc->GetState() == kState_WatchingLiveTV)
+                    {
+                        enc->StopLiveTV();
+                    }
+                    else if (enc->GetState() == kState_WatchingRecording)
+                    {
+                        enc->StopPlaying();
+                    }
+                }
+            }
+
             delete (*rt);
             ringBufList.erase(rt);
             return;

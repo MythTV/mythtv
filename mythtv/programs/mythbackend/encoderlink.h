@@ -58,6 +58,7 @@ class EncoderLink
 
     void SpawnReadThread(QSocket *sock);
     void KillReadThread(void);
+    QSocket *GetReadThreadSocket(void);
 
     void PauseRingBuffer(void);
     void UnpauseRingBuffer(void);

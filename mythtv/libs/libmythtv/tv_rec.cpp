@@ -1258,7 +1258,13 @@ void TVRec::KillReadThread(void)
         readthreadlive = false;
         rbuffer->StopReads();
         pthread_join(readthread, NULL);
+        readthreadSock = NULL;
     }
+}
+
+QSocket *TVRec::GetReadThreadSocket(void)
+{
+    return readthreadSock;
 }
 
 void TVRec::RequestRingBufferBlock(int size)

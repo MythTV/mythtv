@@ -258,6 +258,13 @@ void EncoderLink::KillReadThread(void)
         tv->KillReadThread();
 }
 
+QSocket *EncoderLink::GetReadThreadSocket(void)
+{
+    if (local)
+        return tv->GetReadThreadSocket();
+    return NULL;
+}
+
 void EncoderLink::PauseRingBuffer(void)
 {
     if (local)

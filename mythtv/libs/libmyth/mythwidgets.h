@@ -1,6 +1,7 @@
 #ifndef MYTHWIDGETS_H_
 #define MYTHWIDGETS_H_
 
+#include <qbutton.h>
 #include <qcombobox.h>
 #include <qspinbox.h>
 #include <qslider.h>
