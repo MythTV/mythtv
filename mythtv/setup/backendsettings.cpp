@@ -106,7 +106,7 @@ class PIPBufferSize: public SpinBoxSetting, public BackendSetting {
 public:
     PIPBufferSize():
         SpinBoxSetting(1, 1024, 1), BackendSetting("PIPBufferSize") {
-        setLabel("Buffer size");
+        setLabel("Picture-in-picture buffer size");
         setValue(1);
     };
 };
@@ -117,6 +117,8 @@ public:
         SpinBoxSetting(1, 100, 1), BackendSetting("PIPMaxBufferFill") {
         setLabel("Max buffer fill (%)");
         setValue(50);
+        setHelpText("How full the picture-in-picture buffer is allowed to grow before "
+                    "forcing an unpause");
     };
 };
 
@@ -124,8 +126,9 @@ class PIPBufferName: public LineEditSetting, public BackendSetting {
 public:
     PIPBufferName():
         BackendSetting("PIPBufferName") {
-        setLabel("Buffer name");
+        setLabel("Picture-in-picture buffer path");
         setValue("/mnt/store/ringbuf2.nuv");
+        setHelpText("Create the picture-in-picture buffer at this pathname");
     };
 };
 
