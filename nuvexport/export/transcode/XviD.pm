@@ -140,7 +140,7 @@ package export::transcode::XviD;
             $self->{'transcode_xtra'} = " -y xvid,null $params"
                                        ." -R 1,/tmp/xvid.$$.log"
                                        ." -w $self->{'v_bitrate'} ";
-            $self->SUPER::export($episode);
+            $self->SUPER::export($episode, '', 1);
         # Restore the path
             $self->{'path'} = $path_bak;
         # Second pass
