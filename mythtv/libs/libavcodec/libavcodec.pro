@@ -131,5 +131,4 @@ contains( TARGET_ALTIVEC, yes ) {
 macx {
     LIBS               += -lz
     QMAKE_LFLAGS_SHLIB += -single_module
-  }
 }
