@@ -1,5 +1,10 @@
 USE mythconverg;
 
+ALTER TABLE record MODIFY starttime TIME NOT NULL;
+ALTER TABLE record MODIFY startdate DATE NOT NULL;
+ALTER TABLE record MODIFY endtime TIME NOT NULL;
+ALTER TABLE record MODIFY enddate DATE NOT NULL;
+
 ALTER TABLE cardinput ADD tunechan CHAR(5) NOT NULL;
 ALTER TABLE cardinput ADD startchan CHAR(5) NOT NULL;
 
@@ -46,8 +51,3 @@ ALTER TABLE recorded ADD COLUMN cutlist TEXT NULL;
 ALTER TABLE capturecard ADD COLUMN vbidevice VARCHAR(255);
 REPLACE INTO settings (value, data) VALUES ("LCDHost","localhost");
 REPLACE INTO settings (value, data) VALUES ("LCDPort","13666");
-
-ALTER TABLE record MODIFY starttime TIME NOT NULL;
-ALTER TABLE record MODIFY startdate DATE NOT NULL;
-ALTER TABLE record MODIFY endtime TIME NOT NULL;
-ALTER TABLE record MODIFY enddate DATE NOT NULL;
