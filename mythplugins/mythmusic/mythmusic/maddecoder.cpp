@@ -606,23 +606,20 @@ Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
                 if (!latin1)
                     continue;
 
-                bool found = true;
-
                 switch (i)
                 {
-                    case 0: title = (char *)latin1; break;
-                    case 1: artist = (char *)latin1; break;
-                    case 2: album = (char *)latin1; break;
-                    case 3: year = atoi((char *)latin1); break;
-                    case 4: tracknum = atoi((char *)latin1); break;
-                    case 5: genre = (char *)latin1; break;
-                    default: found = false; break;
+                    case 0: title += (char *)latin1; break;
+                    case 1: artist += (char *)latin1; break;
+                    case 2: album += (char *)latin1; break;
+                    case 3: if (year == 0) 
+                                year = atoi((char *)latin1); break;
+                    case 4: if (tracknum == 0) 
+                                tracknum = atoi((char *)latin1); break;
+                    case 5: genre += (char *)latin1; break;
+                    default: break;
                 }
 
                 free(latin1);
-
-                if (found)
-                    break;
             }
         }
 
