@@ -2628,7 +2628,7 @@ void NuppelVideoPlayer::UpdateSeekAmount(bool up)
         case 5: text = "5 seconds"; seekamount = fps * 5; break;
         case 6: text = "20 seconds"; seekamount = fps * 20; break;
         case 7: text = "1 minute"; seekamount = fps * 60; break;
-        case 8: text = "5 mintues"; seekamount = fps * 300; break;
+        case 8: text = "5 minutes"; seekamount = fps * 300; break;
         case 9: text = "10 minutes"; seekamount = fps * 600; break;
         default: text = "error"; seekamount = fps; break;
     }
