@@ -942,7 +942,7 @@ void SIScan::AddEvents()
         if (counter > 0)
         {
             SISCAN(QString("Added %1 events, running scheduler to check for updates").arg(counter));
-            ScheduledRecording::signalChange(db);
+            ScheduledRecording::signalChange(-1);
             gContext->LogEntry("DVB/ATSC Guide Scanner", LP_INFO,"Added some events", "");
         }
         events->clear();
