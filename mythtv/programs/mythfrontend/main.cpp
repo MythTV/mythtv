@@ -145,15 +145,6 @@ void TVMenuCallback(void *data, QString &selection)
     } else if (sel == "settings epg") {
         EPGSettings settings(context);
         settings.exec(QSqlDatabase::database());
-    } else if (sel == "settings tuner capturecard") {
-        CaptureCardEditor cce(context, QSqlDatabase::database());
-        cce.exec(QSqlDatabase::database());
-    } else if (sel == "settings tuner videosource") {
-        VideoSourceEditor vse(context, QSqlDatabase::database());
-        vse.exec(QSqlDatabase::database());
-    } else if (sel == "settings tuner cardinput") {
-        CardInputEditor cie(context, QSqlDatabase::database());
-        cie.exec(QSqlDatabase::database());
     }
 }
 
