@@ -201,8 +201,6 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
             MarkConflicts();
         }
 
-        // PrintList();
-
         MarkConflictsToRemove();
         if (doautoconflicts)
         {
@@ -212,6 +210,8 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
         }
         MarkConflicts();
     }
+
+    // PrintList();
 
     return hasconflicts;
 }
@@ -990,6 +990,9 @@ void Scheduler::RunScheduler(void)
     QDateTime lastupdate = QDateTime::currentDateTime().addDays(-1);
 
     list<ProgramInfo *>::iterator recIter;
+
+    // wait for slaves to connect
+    sleep(2);
 
     while (1)
     {
