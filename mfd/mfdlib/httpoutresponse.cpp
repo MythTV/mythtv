@@ -1705,7 +1705,8 @@ void HttpOutResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_cl
             int64_t starting_time_in_micro_seconds = (int64_t) 
                                         ((range_begin / (total_possible_range + 0.0)) 
                                         * exact_time_in_micro_seconds);
-            if(av_seek_frame(format_context, 0, starting_time_in_micro_seconds) < 0)
+            if(av_seek_frame(format_context, 0, starting_time_in_micro_seconds, 
+                AVSEEK_FLAG_BYTE) < 0)
             {
                 warning("failed to seek in wma file, http headers "
                         "(already sent) have wrong Content-Length "

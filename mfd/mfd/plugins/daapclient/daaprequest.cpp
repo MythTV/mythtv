@@ -45,6 +45,12 @@ DaapRequest::DaapRequest(
     //  type
     //
     
+    if(server_type == DAAP_SERVER_ITUNES47)
+    {
+        addHeader("User-Agent: iTunes/4.7 (Windows; N)");
+        addHeader("Accept-Language: en-us, en;q=5.0");
+        addHeader("Client-DAAP-Version: 3.0");
+    }
     if(server_type == DAAP_SERVER_ITUNES46)
     {
         addHeader("User-Agent: iTunes/4.6 (Windows; N)");
@@ -79,7 +85,7 @@ DaapRequest::DaapRequest(
 
 
     //
-    //  iTunes 4.5 and 4.6 have an incredibly annoying feature that you
+    //  iTunes 4.5, 4.6, etc. have an incredibly annoying feature that you
     //  sometimes have to use a different URL than the one you are actually
     //  requesting. But only in some cases. This will get used if it's set.
     //
@@ -113,7 +119,8 @@ bool DaapRequest::send(QSocketDevice *where_to_send, bool add_validation)
             }
             else
             {
-                if(server_type == DAAP_SERVER_ITUNES46 ||
+                if(server_type == DAAP_SERVER_ITUNES47 ||
+                   server_type == DAAP_SERVER_ITUNES46 ||
                    server_type == DAAP_SERVER_ITUNES45 )
                 {
                     daap_version_major = 3;

@@ -60,6 +60,21 @@ DaapServer::DaapServer(MFD *owner, int identity)
 
 void DaapServer::handleIncoming(HttpInRequest *http_request, int client_id)
 {
+
+    /*
+
+    //
+    //  Debugging (mostly for new versions of iTunes, when you need to print
+    //  out what this server is getting as requests in order to figure out
+    //  exactly what the daap*client* plugin should be sending in the other
+    //  direction)
+    //
+
+    http_request->printRequest();
+    http_request->printHeaders();
+
+    */
+
     //
     //  Create a DaapRequest object that will be built up to understand the
     //  request that has just come in from a client
@@ -1180,7 +1195,7 @@ void DaapServer::sendDatabaseItem(HttpInRequest *http_request, u32 song_id, Daap
     {
         if(which_one->getType() == MDT_audio)
         {
-            // http_request->printHeaders();   //  If you want to see the request
+            //http_request->printHeaders();   //  If you want to see the request
 
             //
             //  All daap responses must be dmap-tagged, even those (such as

@@ -311,7 +311,8 @@ void avfDecoder::run()
         // Look to see if user has requested a seek
         if (seekTime >= 0.0) 
         {
-            if (av_seek_frame(ic, 0, (int64_t)(seekTime * AV_TIME_BASE)) < 0)
+            if (av_seek_frame(ic, 0, (int64_t)(seekTime * AV_TIME_BASE),
+                AVSEEK_FLAG_BYTE) < 0)
             {
                 cerr << "avfdecoder.o: error seeking" << endl;
             }
