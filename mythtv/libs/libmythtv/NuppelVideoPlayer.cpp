@@ -1182,7 +1182,9 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
 
             timecodes[wpos] = frameheader.timecode;
 
+            vpos = wpos;
             wpos = (wpos+1) % MAXVBUFFER;
+
             pthread_mutex_unlock(&video_buflock);
 
             if (vbuffer_numvalid() >= usepre)
@@ -2064,7 +2066,7 @@ void NuppelVideoPlayer::StartPlaying(void)
             else if (rewindtime > 0)
             {   
                 DoRewind();
-                    
+                
                 GetFrame(audiofd <= 0);
                 resetvideo = true;
                 while (resetvideo)
@@ -2125,7 +2127,7 @@ void NuppelVideoPlayer::StartPlaying(void)
             fftime = 0;
 	}
 
-        if ( skipcommercials )
+        if (skipcommercials)
         {
             PauseVideo();
 
@@ -2296,10 +2298,11 @@ bool NuppelVideoPlayer::DoRewind(void)
             framesPlayed++;
             normalframes--;
 
-	    pthread_mutex_lock(&video_buflock);
+            pthread_mutex_lock(&video_buflock);
             DecodeFrame(&frameheader, strm, vbuffer[wpos]);
+            vpos = wpos;
             wpos = (wpos + 1) % MAXVBUFFER;
-	    pthread_mutex_unlock(&video_buflock);
+            pthread_mutex_unlock(&video_buflock);
         }
     }
 
@@ -2465,10 +2468,11 @@ bool NuppelVideoPlayer::DoFastForward(void)
             framesPlayed++;
             normalframes--;
 
-	    pthread_mutex_lock(&video_buflock);
+            pthread_mutex_lock(&video_buflock);
             DecodeFrame(&frameheader, strm, vbuffer[wpos]);
+            vpos = wpos;
             wpos = (wpos + 1) % MAXVBUFFER;
-	    pthread_mutex_unlock(&video_buflock);
+            pthread_mutex_unlock(&video_buflock);
         }
     }
 
@@ -2537,6 +2541,7 @@ void NuppelVideoPlayer::ClearAfterSeek(void)
     {
         timecodes[i] = 0;
     }
+    vpos = 0;
     wpos = 0;
     rpos = 0;
     for (int i = 0; i < MAXTBUFFER; i++)
@@ -3435,8 +3440,6 @@ unsigned int NuppelVideoPlayer::GetFrameVariance(int vposition)
 
 void NuppelVideoPlayer::AutoCommercialSkip(void)
 {
-    int vpos = 0;
-
     PauseVideo();
 
     while (!GetVideoPause())
@@ -3444,7 +3447,7 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
 
     if (autocommercialskip == COMMERCIAL_SKIP_BLANKS)
     {
-        int variance = GetFrameVariance(wpos);
+        int variance = GetFrameVariance(vpos);
         if (variance < 20)
         {
             consecutive_blanks++;
@@ -3456,11 +3459,9 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
                 // search a 10-frame window for another blank
                 int tries = 10;
 
-                vpos = wpos;
                 GetFrame(1, true);
                 while ((tries > 0) && (GetFrameVariance(vpos) >= 20))
                 {
-                     vpos = wpos;
                      GetFrame(1, true);
                      tries--;
                 }
@@ -3499,7 +3500,6 @@ void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
     int first_blank_frame;
     int saved_position;
     int min_blank_frame_seq = 1;
-    int vpos = 0;
 
     // rewind 2 seconds in case user hit Skip right after a break
     JumpToNetFrame((long long int)(-2 * video_frame_rate));
@@ -3511,7 +3511,6 @@ void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
 
     while (scanned_frames < (64 * video_frame_rate))
     {
-        vpos = wpos;
         GetFrame(1, true);
         if (GetFrameVariance(vpos) < 20)
         {
@@ -3558,7 +3557,6 @@ void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
             first_blank_frame = 0;
             while (scanned_frames < (3 * video_frame_rate))
             {
-                vpos = wpos;
                 GetFrame(1, true);
                 if (GetFrameVariance(vpos) < 20)
                 {
