@@ -339,7 +339,7 @@ void ChannelEditor::menu(int /*iSelected*/) {
 void ChannelEditor::scan()
 {
 #ifdef USING_DVB
-    ScanWizard scanwizard();
+    ScanWizard scanwizard;
     scanwizard.exec(false,true);
 
     list->fillSelections();

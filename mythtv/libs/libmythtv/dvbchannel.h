@@ -15,6 +15,7 @@
 using namespace std;
 
 #include "mythcontext.h"
+#include "mythdbcon.h"
 #include "channelbase.h"
 
 #include "dvbtypes.h"

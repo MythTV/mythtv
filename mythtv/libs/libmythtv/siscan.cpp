@@ -886,9 +886,10 @@ int SIScan::GenerateNewChanID()
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString theQuery = QString("select max(chanid) as maxchan from channel where sourceid=%1")
-                       .arg(sourceID);
-    query.prepare(query);
+    QString theQuery =
+        QString("SELECT max(chanid) as maxchan "
+                "FROM channel WHERE sourceid=%1").arg(sourceID);
+    query.prepare(theQuery);
 
     if(!query.exec())
         MythContext::DBError("Calculating new ChanID", query);

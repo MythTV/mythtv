@@ -42,7 +42,7 @@ bool CardUtil::isCardPresent(const QString &strType)
                   " AND capturecard.cardtype= :CARDTYPE "
                   " AND capturecard.hostname = :HOSTNAME ;");
     query.bindValue(":CARDTYPE", strType);
-    query.bindValue(":CARDTYPE", gContext->GetHostName());
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
 
     if (query.exec() && query.isActive() && query.size() > 0)
     {

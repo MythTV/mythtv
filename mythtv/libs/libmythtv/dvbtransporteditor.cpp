@@ -167,9 +167,9 @@ void DVBTransportsEditor::del() {
     if (val == 0) 
     {
         MSqlQuery query(MSqlQuery::InitCon());
-        QSstring querystr = QString("DELETE FROM dtv_multiplex "
-                                 "WHERE mplexid ='%1'").arg(m_nID));
-        query.prepare(querystr):
+        QString querystr = QString("DELETE FROM dtv_multiplex "
+                                   "WHERE mplexid ='%1'").arg(m_nID);
+        query.prepare(querystr);
 
         if (!query.exec() || !query.isActive())
             MythContext::DBError("TransportEditor Delete DVBTransport", query);
@@ -449,7 +449,7 @@ DVBTransportWizard::DVBTransportWizard(int id, unsigned _nVideoSourceID) :
            "SELECT capturecard.videodevice FROM cardinput,capturecard "
            " WHERE capturecard.cardid = cardinput.cardid "
            " AND cardinput.sourceid=%1 "
-           " AND capturecard.cardtype=\"DVB\"").arg(_nVideoSourceID));
+           " AND capturecard.cardtype=\"DVB\"").arg(_nVideoSourceID);
     query.prepare(querystr);
 
     if (query.exec() && query.isActive() && query.size() > 0)
