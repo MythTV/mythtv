@@ -1095,8 +1095,8 @@ void ScanWizardScanner::scan()
 }
 
 ScanWizard::ScanWizard() :
-    nScanType(ScanTypeSetting::FullScan), nVideoDev(0),
-    nATSCTransport(0)
+    nScanType(ScanTypeSetting::FullScan), nCaptureCard(0), nVideoDev(0),
+    nCardType(CardUtil::ERROR_PROBE), nATSCTransport(0)
 {
     ScanWizardScanner *page3 = new ScanWizardScanner(this);
     ScanWizardScanType *page1 = new ScanWizardScanType(this);
