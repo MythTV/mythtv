@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.08.11 (xris)
+#Last Updated: 2004.09.26 (xris)
 #nuvinfo.pl
 
 # Add a couple of include paths so we can load the various export and gui modules
@@ -7,18 +7,19 @@
     use lib dirname($ENV{'_'}), '/usr/share/nuvexport', '/usr/local/share/nuvexport';
 
 # Load the nuv utilities
-    use nuv_utils;
+    use mythtv::nuvinfo;
 
 # No file specified?
     die "usage:\n\n   nuvinfo /path/to/file.nuv\n\n" unless ($ARGV[0]);
 
 # Get the info about the requested file
-    my $file = ($ARGV[0] or '');
+    my $file = $ARGV[0];
     my %info = nuv_info($file);
 
 # Print the info
-    print "\n\ninfo for: $file\n\n";
+    print "\ninfo for: $file\n\n";
     foreach $key (sort keys %info) {
+        print ' ' x (23 - length($key)) if (length($key) < 23);
         print "$key:  $info{$key}\n";
     }
     print "\ndone\n\n";

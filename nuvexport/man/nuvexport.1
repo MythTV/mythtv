@@ -1,0 +1,101 @@
+.\" Comments
+.Dd Sept 26, 2004 
+.ds volume-operating-system NuvExport
+.Os 
+.Dt NUVEXPORT 1 1
+.Sh NAME
+.Nm nuvexport
+.Nd export nuv files created by mythtv to other formats
+.Sh SYNOPSIS
+.Nm
+.Op Fl Fl title string
+.Op Fl Fl subtitle string
+.Op Fl Fl description string
+.Op Fl Fl debug
+.Op Fl Fl mode=mode
+
+.Sh DESCRIPTION
+.Nm
+is a perl script built to assist in exporting .NUV files from mythtv into various formats. Most of the usage is interactive with the program.
+
+.Sh OPTIONS
+The following command line options are available:
+.Bl -tag -width indent
+.It Fl Fl title
+search on title for programs
+.It Fl Fl subtitle
+search on subtitle for programs
+.It Fl Fl description
+search on description for programs
+.It Fl Fl debug
+enables debugging information, as well as changes reencode behavior to print out actions rather then executing them. useful for understanding what programs are being run by nuvexport to do the reencoding work
+.It Fl Fl mode=mode
+used for running nuvexport in a given mode, current accepted values are : xvid, dvd, vcd, dvcd, wmv exporters
+.El
+
+.Sh USAGE
+As mentioned, the program is interactive, and is fairly self explanitory.  The following are the basic steps to export a file from mythtv.
+.Bd -literal
+1) Choose export type from the prompts, detaisl of the choices are below 
+    in EXPORT TYPES section
+2) Choose from the show titles.
+3) Choose a specific show from the titles.
+4) hit "c" to continue and begin the reencode process
+5) the following questions are usually ok to leave with defaults, 
+    especially if you are unsure as to their function
+.Ed 
+
+.Sh DIAGNOSTICS
+.Ex -std
+
+.Sh DEPENDANCIES
+.Nm
+depends on the following programs to work
+.Bd -literal
+ffmpeg : used to re-encode the nuv to requested media type for WMV
+transcode : used to re-encode to VCD, SVCD, DVD, and XviD
+mplex : used to recombine the video and audio streams
+tcmplex : alternate program used for recombining video and audio
+Time::HiRes : Perl module for time calculations
+avidemux2 : demultiplexes MPEG2 files
+Xvfb : used to keep avidemux2 from requiring a X11 GUI frontend
+lvemux : remultiplex MPEG2 files
+.Ed
+
+.Sh EXPORT TYPES
+Supported export formats:
+.Pp
+.Bd -literal
+XviD - export to XviD AVI file
+SVCD - export to SVCD compliaint mpeg files, optionally burn SVCD disc
+VCD - export to VCD compliant mpeg files, optionally burn VCD disc
+DVCD - export to VCD format, but using 48kHz audio, useful for DVDs
+DVD - export to DVD
+WMV - Windows Media Player files, exports ASF files with the mpeg4 codec
+.Ed
+
+.Sh SEE ALSO
+.Xr transcode 1 ,
+.Xr ffmpeg 1 ,
+.Xr mythtranscode 1 ,
+.Xr mythtv 1 ,
+.Xr nuvexport-xvid 1 ,
+.Xr nuvexport-svcd 1 ,
+.Xr nuvexport-vcd 1 ,
+.Xr nuvexport-dvcd 1 ,
+.Xr nuvexport-dvd 1 ,
+.Xr nuvexport-wmv 1
+
+.Sh HISTORY
+This program was written a while ago, now it's getting better
+.Pp
+
+.Sh AUTHOR
+.Bd -literal
+Main code by:  Chris Petersen (mythtv@forevermore.net)
+Additional exporter work:  Gavin Hurlbut (gjhurlbu@gmail.com)
+ManPage by: Paul Greidanus (paul@majestik.org)
+.Ed
+
+.Sh BUGS
+Please check http://www.forevermore.net/nuvexport to check on current status of nuvexport, and to check on any bugs
