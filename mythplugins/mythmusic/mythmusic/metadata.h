@@ -60,6 +60,7 @@ class Metadata
     void setLength(int llength) { length = llength; }
 
     unsigned int ID() { return id; }
+    void setID(int lid) { id = lid; }
 
     QString Filename() const { return filename; }
     void setFilename(QString &lfilename) { filename = lfilename; }
@@ -69,6 +70,7 @@ class Metadata
 
     void setField(QString field, QString data);
     void fillData(QSqlDatabase *db);
+    void fillDataFromID(QSqlDatabase *db);
 
   private:
     QString artist;

@@ -15,6 +15,7 @@ using namespace std;
 #include "databasebox.h"
 #include "playbackbox.h"
 #include "cdrip.h"
+#include "playlist.h"
 
 #include <mythtv/themedmenu.h>
 #include <mythtv/settings.h>
@@ -231,7 +232,9 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
+    LoadDefaultPlaylist(db, playlist);
     runMenu(themedir, db, paths, playlist, startdir);
+    SaveDefaultPlaylist(db, playlist);
 
     db->close();
 

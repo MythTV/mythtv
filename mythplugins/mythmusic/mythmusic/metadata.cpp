@@ -120,3 +120,32 @@ void Metadata::fillData(QSqlDatabase *db)
         id = query.value(8).toUInt();
     }
 }
+
+void Metadata::fillDataFromID(QSqlDatabase *db)
+{       
+    if (id == 0)
+        return; 
+        
+    QString thequery;
+    thequery = QString("SELECT title,artist,album,title,genre,year,tracknum,"
+                       "length,filename FROM musicmetadata WHERE intid=%1;")
+                      .arg(id);
+        
+    QSqlQuery query = db->exec(thequery);
+
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+
+        title = query.value(0).toString();
+        artist = query.value(1).toString();
+        album = query.value(2).toString();
+        title = query.value(3).toString();
+        genre = query.value(4).toString();
+        year = query.value(5).toInt();
+        tracknum = query.value(6).toInt();
+        length = query.value(7).toInt();
+        filename = query.value(8).toString();
+    }
+}
+
