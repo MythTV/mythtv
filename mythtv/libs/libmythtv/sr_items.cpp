@@ -67,7 +67,7 @@ SREpisodesGroup::SREpisodesGroup(ScheduledRecording& _rec, ManagedList* _list, M
 
     connect(maxEpisodes->getItem(), SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
 
-    maxNewest = new SRMaxNewest(_rec, _list);
+    maxNewest = new SRMaxNewest(_rec, this, _list);
     addItem(maxNewest->getItem(), -1);
 
     connect(maxNewest->getItem(), SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
@@ -161,7 +161,7 @@ SRStorageOptionsGroup::SRStorageOptionsGroup(ScheduledRecording& _rec, ManagedLi
     recGroup = new SRRecGroup(_rec, _parentList, this);
     addItem(recGroup->getItem(), -1);
 
-    autoExpire = new SRAutoExpire(_rec, _parentList);
+    autoExpire = new SRAutoExpire(_rec, this, parentList);
     addItem(autoExpire->getItem(), -1);
 
     maxEpisodes = new SRMaxEpisodes(_rec, _parentList);
@@ -169,7 +169,7 @@ SRStorageOptionsGroup::SRStorageOptionsGroup(ScheduledRecording& _rec, ManagedLi
 
     connect(maxEpisodes->getItem(), SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
 
-    maxNewest = new SRMaxNewest(_rec, _parentList);
+    maxNewest = new SRMaxNewest(_rec, this, _parentList);
     addItem(maxNewest->getItem(), -1);
 
 }

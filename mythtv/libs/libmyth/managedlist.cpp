@@ -35,29 +35,22 @@ void ManagedListItem::setParentList(ManagedList* _parentList)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-BoolManagedListItem::BoolManagedListItem(bool initialValue, ManagedList* pList, QObject* _parent, const char* _name)
-                   : ManagedListItem("", pList, _parent, _name)
+BoolManagedListItem::BoolManagedListItem(bool _initialValue, ManagedListGroup* pGroup,
+                                         ManagedList* pList, QObject* _parent, const char* _name)
+                   : SelectManagedListItem("", pGroup, pList, _parent, _name)
 {
-    setValue(initialValue);
+    initialValue = _initialValue;
+
 }
 
 void BoolManagedListItem::setLabels(const QString& trueLbl, const QString& falseLbl)
 {
+    addSelection(trueLbl, "1", false);
+    addSelection(falseLbl, "0", false);
+
     trueLabel = trueLbl;
     falseLabel = falseLbl;
-
-    syncTextToValue();
-}
-
-
-void BoolManagedListItem::syncTextToValue()
-{
-    if (boolValue())
-        text = trueLabel;
-    else
-        text = falseLabel;
-
-    ManagedListItem::syncTextToValue();
+    setValue(initialValue);
 }
 
 

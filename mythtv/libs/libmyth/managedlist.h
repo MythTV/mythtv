@@ -30,7 +30,7 @@ class ManagedListItem : public QObject
         ManagedListItem(const QString& startingText = "", ManagedList* _parentList=NULL, QObject* _parent=NULL, const char* _name=0);
 
         virtual bool hasLeft(){ return false; }
-        virtual bool hasRight(){ return true; }
+        virtual bool hasRight(){ return false; }
 
         const int getState() const { return curState; }
         void setState(int val) { curState = val; emit changed(this); }
@@ -130,6 +130,7 @@ class IntegerManagedListItem : public ManagedListItem
 
         const QString& getShortText() const { return shortText; }
         virtual bool hasLeft(){ return true; }
+        virtual bool hasRight(){ return true; }
     public slots:
         virtual void cursorLeft(bool page = false) { if (enabled) changeValue(page ? (0 - bigStep) : (0 - step)); }
         virtual void cursorRight(bool page = false) { if (enabled) changeValue(page ? bigStep : step); }
@@ -154,41 +155,6 @@ class IntegerManagedListItem : public ManagedListItem
 };
 
 
-class BoolManagedListItem : public ManagedListItem
-{
-    Q_OBJECT
-    public:
-        BoolManagedListItem(bool initialValue, ManagedList* parentList=NULL, QObject* _parent=NULL, const char* _name=0);
-        void setLabels(const QString& trueLbl, const QString& falseLbl);
-        virtual bool hasLeft(){ return true; }
-
-
-        virtual void setValue(bool val)
-        {
-            // DS note: using QString::number(val) blows up...
-            if (val)
-                ManagedListItem::setValue("1");
-            else
-                ManagedListItem::setValue("0");
-
-            syncTextToValue();
-        }
-
-
-        bool boolValue() const {return (bool)valueText.toInt();}
-
-
-
-    public slots:
-        virtual void cursorLeft(bool) { if (enabled) setValue(!boolValue()); }
-        virtual void cursorRight(bool) { if (enabled) setValue(!boolValue()); }
-
-    protected:
-        virtual void syncTextToValue();
-        void setText(const QString& newText) { text = newText; emit(changed(this)); }
-        QString trueLabel;
-        QString falseLabel;
-};
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -349,6 +315,42 @@ class SelectManagedListItem : public ManagedListGroup
 };
 
 
+class BoolManagedListItem : public SelectManagedListItem
+{
+    Q_OBJECT
+    public:
+        BoolManagedListItem(bool initialValue, ManagedListGroup* pGroup=NULL, ManagedList* parentList=NULL,
+                            QObject* _parent=NULL, const char* _name=0);
+        void setLabels(const QString& trueLbl, const QString& falseLbl);
+        virtual bool hasLeft(){ return true; }
+        virtual bool hasRight(){ return true; }
+
+
+        virtual void setValue(bool val)
+        {
+            // DS note: using QString::number(val) blows up...
+            if (val)
+                SelectManagedListItem::setValue("1");
+            else
+                SelectManagedListItem::setValue("0");
+        }
+
+
+        bool boolValue() const {return (bool)valueText.toInt();}
+
+
+
+    public slots:
+        virtual void cursorLeft(bool) { if (enabled) setValue(!boolValue()); }
+        virtual void cursorRight(bool) { if (enabled) setValue(!boolValue()); }
+
+    protected:
+        void setText(const QString& newText) { text = newText; emit(changed(this)); }
+        QString trueLabel;
+        QString falseLabel;
+        bool initialValue;
+};
+
 
 class ManagedListSetting: public SimpleDBStorage
 {
@@ -492,10 +494,11 @@ class BoolManagedListSetting : public ManagedListSetting
 {
     public:
         BoolManagedListSetting(const QString& trueText, const QString& falseText, const QString& ItemName,
-                               QString _table, QString _column, ManagedList* _parentList=NULL)
+                               QString _table, QString _column, ManagedListGroup* _group,
+                               ManagedList* _parentList=NULL)
                             : ManagedListSetting(_table, _column, _parentList)
         {
-            boolListItem = new BoolManagedListItem(false, _parentList, this, ItemName);
+            boolListItem = new BoolManagedListItem(false, _group, _parentList, this, ItemName);
             listItem = boolListItem;
             boolListItem->setLabels(QObject::tr(trueText), QObject::tr(falseText));
             connect(listItem, SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));

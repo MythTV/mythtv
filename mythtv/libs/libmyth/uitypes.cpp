@@ -1120,8 +1120,6 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
         int i = m_current;
         fontProp *tmpfont = NULL;
         int tempArrows;
-        int offsetRight = 0;
-        int offsetLeft = 0;
 
         if (m_active == true)
             tmpfont = &m_fontfcns[m_fonts["selected"]];
