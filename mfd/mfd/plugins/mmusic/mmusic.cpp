@@ -818,10 +818,28 @@ AudioMetadata* MMusicWatcher::loadFromDatabase(
                 //
                 //  Convert datetime stuff
                 //
+
+                QDateTime seconds_since_disco;
+                seconds_since_disco.setTime_t(0);
                 
-                QDateTime lastplay  = getQtTimeFromMySqlTime(query.value(9).toString());
-                QDateTime date_added = getQtTimeFromMySqlTime(query.value(13).toString());
-                QDateTime date_modified = getQtTimeFromMySqlTime(query.value(14).toString());
+                QDateTime lastplay = seconds_since_disco;
+                QDateTime date_added = seconds_since_disco;
+                QDateTime date_modified = seconds_since_disco;               
+                
+                if(!query.value(9).isNull())
+                {
+                    lastplay  = getQtTimeFromMySqlTime(query.value(9).toString());
+                }
+                
+                if(!query.value(13).isNull())
+                {
+                    date_added = getQtTimeFromMySqlTime(query.value(13).toString());
+                }
+                
+                if(!query.value(14).isNull())
+                {
+                    date_modified = getQtTimeFromMySqlTime(query.value(14).toString());
+                }
                 
                 //
                 //  Build basic audio metadata object
@@ -1124,7 +1142,6 @@ void MMusicWatcher::persistMetadata(AudioMetadata *an_item)
     QString date_added = an_item->getDateAdded().toString("yyyyMMddhhmmss");
     QString date_modified = an_item->getDateModified().toString("yyyyMMddhhmmss");
     
-
     //
     //  Long and ugly, but easy to see what is going on
     //
