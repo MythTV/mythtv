@@ -42,7 +42,7 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
 
     listview = new MythListView(this);
     listview->DontFixSpaceBar();
-    listview->addColumn("Select music to be played:");
+    listview->addColumn(tr("Select music to be played:"));
     listview->setSorting(-1);
     listview->setRootIsDecorated(true);
     listview->setAllColumnsShowFocus(true);
@@ -65,15 +65,16 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
     active_pl_edit = new MythRemoteLineEdit(active_popup);
     active_popup->addWidget(active_pl_edit);
     active_pl_edit->setFocus();
-    MythPushButton *active_b = new MythPushButton("Copy To New Playlist", 
+    MythPushButton *active_b = new MythPushButton(tr("Copy To New Playlist"), 
                                                   active_popup);
     active_popup->addWidget(active_b);
     connect(active_b, SIGNAL(clicked()), this, SLOT(copyNewPlaylist()));
-    MythPushButton *active_clear_b = new MythPushButton("Clear the Active Play "
-                                                        "Queue", active_popup);
+    MythPushButton *active_clear_b = new MythPushButton(tr("Clear the Active "
+                                                           "Play Queue"), 
+                                                        active_popup);
     active_popup->addWidget(active_clear_b);
     connect(active_clear_b, SIGNAL(clicked()), this, SLOT(clearActive()));
-    pop_back_button = new MythPushButton("Save Back to Playlist Tree", 
+    pop_back_button = new MythPushButton(tr("Save Back to Playlist Tree"), 
                                          active_popup);
     active_popup->addWidget(pop_back_button);
     connect(pop_back_button, SIGNAL(clicked()), this, SLOT(popBackPlaylist()));
@@ -84,16 +85,17 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
 
     //  Popup for all other playlists (up top)
     playlist_popup = new MythPopupBox(this);
-    playlist_mac_b = new MythPushButton("Move to Active Play Queue", 
+    playlist_mac_b = new MythPushButton(tr("Move to Active Play Queue"), 
                                         playlist_popup);
     playlist_popup->addWidget(playlist_mac_b);
     connect(playlist_mac_b, SIGNAL(clicked()), this, SLOT(copyToActive()));
-    playlist_del_b = new MythPushButton("Delete This Playlist", playlist_popup);
+    playlist_del_b = new MythPushButton(tr("Delete This Playlist"), 
+                                        playlist_popup);
     playlist_popup->addWidget(playlist_del_b);
     connect(playlist_del_b, SIGNAL(clicked()), this, SLOT(deletePlaylist()));
     playlist_rename = new MythRemoteLineEdit(playlist_popup);
     playlist_popup->addWidget(playlist_rename);
-    playlist_rename_button = new MythPushButton("Rename This Playlist", 
+    playlist_rename_button = new MythPushButton(tr("Rename This Playlist"), 
                                                 playlist_popup);
     playlist_popup->addWidget(playlist_rename_button);
     connect(playlist_rename_button, SIGNAL(clicked()), this, 
@@ -112,11 +114,11 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
     //  as children
     //
     QString templevel, temptitle;
-    temptitle  = "Active Play Queue";
+    temptitle  = tr("Active Play Queue");
     allcurrent = new PlaylistTitle(listview, temptitle);
     the_playlists->setActiveWidget(allcurrent);
     templevel = "genre";
-    temptitle = "All My Playlists";
+    temptitle = tr("All My Playlists");
     alllists = new TreeCheckItem(listview, temptitle, templevel, 0);
     if(cd_checking_flag)
     {
@@ -126,7 +128,7 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
         cditem = new CDCheckItem(listview, temptitle, templevel, 0);
     }
     templevel = "genre";
-    temptitle = "All My Music";
+    temptitle = tr("All My Music");
     allmusic = new TreeCheckItem(listview, temptitle, templevel, 0);
 
     vbox->addWidget(listview, 1);

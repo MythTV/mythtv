@@ -3,6 +3,7 @@
    <button>
       <type>SETUP</type>
       <text>Scan Music</text>
+      <text lang="IT">Rileggi lista brani</text>
       <text lang="ES">Actualizar lista</text>
       <text lang="CA">Actualitzar llista</text>
       <action>SETTINGS_SCAN</action>
@@ -11,6 +12,7 @@
    <button>
       <type>MUSIC</type>
       <text>General Settings</text>
+      <text lang="IT">Impostazioni generali</text>
       <text lang="ES">Opciones Generales</text>
       <text lang="CA">Opcions Generals</text>
       <action>MUSIC_SET_GENERAL</action>
@@ -19,6 +21,7 @@
    <button>
       <type>MUSIC</type>
       <text>Player Settings</text>
+      <text lang="IT">Opzioni di lettura</text>
       <text lang="ES">Opciones de reproducción</text>
       <text lang="CA">Opcions de reproducció</text>
       <action>MUSIC_SET_PLAYER</action>

@@ -62,8 +62,8 @@ Ripper::Ripper(QSqlDatabase *ldb, QWidget *parent, const char *name)
 
     QVBoxLayout *vbox = new QVBoxLayout(firstdiag, (int)(24 * wmult));
 
-    QLabel *inst = new QLabel("Please select a quality level and check the "
-                              "album information below:", firstdiag);
+    QLabel *inst = new QLabel(tr("Please select a quality level and check the "
+                                 "album information below:"), firstdiag);
     inst->setBackgroundOrigin(WindowOrigin);
     vbox->addWidget(inst);
 
@@ -72,22 +72,22 @@ Ripper::Ripper(QSqlDatabase *ldb, QWidget *parent, const char *name)
     qualitygroup->setFrameStyle(QFrame::NoFrame);
     qualitygroup->hide();
 
-    QRadioButton *lowvorb = new QRadioButton("Low", firstdiag);
+    QRadioButton *lowvorb = new QRadioButton(tr("Low"), firstdiag);
     lowvorb->setBackgroundOrigin(WindowOrigin);
     qualbox->addWidget(lowvorb);
     qualitygroup->insert(lowvorb);
 
-    QRadioButton *medvorb = new QRadioButton("Medium", firstdiag);
+    QRadioButton *medvorb = new QRadioButton(tr("Medium"), firstdiag);
     medvorb->setBackgroundOrigin(WindowOrigin);
     qualbox->addWidget(medvorb);
     qualitygroup->insert(medvorb);
 
-    QRadioButton *highvorb = new QRadioButton("High", firstdiag);
+    QRadioButton *highvorb = new QRadioButton(tr("High"), firstdiag);
     highvorb->setBackgroundOrigin(WindowOrigin);
     qualbox->addWidget(highvorb);
     qualitygroup->insert(highvorb);
 
-    QRadioButton *perfectflac = new QRadioButton("Perfect", firstdiag);
+    QRadioButton *perfectflac = new QRadioButton(tr("Perfect"), firstdiag);
     perfectflac->setBackgroundOrigin(WindowOrigin);
     qualbox->addWidget(perfectflac);
     qualitygroup->insert(perfectflac);
@@ -97,7 +97,7 @@ Ripper::Ripper(QSqlDatabase *ldb, QWidget *parent, const char *name)
 
     QGridLayout *grid = new QGridLayout(vbox, 1, 1, 20);
     
-    QLabel *artistl = new QLabel("Artist: ", firstdiag);
+    QLabel *artistl = new QLabel(tr("Artist: "), firstdiag);
     artistl->setBackgroundOrigin(WindowOrigin);
     artistedit = new MythLineEdit(firstdiag);
     if (track)
@@ -108,7 +108,7 @@ Ripper::Ripper(QSqlDatabase *ldb, QWidget *parent, const char *name)
     connect(artistedit, SIGNAL(textChanged(const QString &)),
             this, SLOT(artistChanged(const QString &)));
 
-    QLabel *albuml = new QLabel("Album: ", firstdiag);
+    QLabel *albuml = new QLabel(tr("Album: "), firstdiag);
     albuml->setBackgroundOrigin(WindowOrigin);
     albumedit = new MythLineEdit(firstdiag);
     if (track)
@@ -176,7 +176,7 @@ Ripper::Ripper(QSqlDatabase *ldb, QWidget *parent, const char *name)
 
     totaltracks = tracknum;
 
-    MythPushButton *ripit = new MythPushButton("Import this CD", firstdiag);
+    MythPushButton *ripit = new MythPushButton(tr("Import this CD"), firstdiag);
     vbox->addWidget(ripit);
 
     connect(ripit, SIGNAL(clicked()), this, SLOT(ripthedisc())); 
@@ -249,7 +249,7 @@ void Ripper::ripthedisc(void)
 {
     firstdiag->hide();
 
-    QString tots = "Importing CD:\n" + artistname + "\n" + albumname;
+    QString tots = tr("Importing CD:\n") + artistname + "\n" + albumname;
 
     int screenwidth = 0, screenheight = 0;
     float wmult = 0, hmult = 0;
@@ -307,7 +307,7 @@ void Ripper::ripthedisc(void)
 
         Metadata *track = decoder->getMetadata(db, i + 1);
 
-        textstatus = "Copying from CD:\n" + track->Title();       
+        textstatus = tr("Copying from CD:\n") + track->Title();       
         statusline->setText(textstatus);
 
         current->setProgress(0);

@@ -5,4 +5,4 @@
 TEMPLATE = subdirs
 
 # Directories
-SUBDIRS = mythmusic
+SUBDIRS = mythmusic i18n

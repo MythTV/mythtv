@@ -180,9 +180,9 @@ void SearchDir(QSqlDatabase *db, QString &directory)
 
     int counter = 0;
 
-    MythProgressDialog *file_checking =
-                         new MythProgressDialog("Searching for music files",
-                                                query.numRowsAffected());
+    MythProgressDialog *file_checking;
+    file_checking = new MythProgressDialog(QObject::tr("Searching for music files"),
+                                           query.numRowsAffected());
 
     if (query.isActive() && query.numRowsAffected() > 0)
     {
@@ -203,8 +203,8 @@ void SearchDir(QSqlDatabase *db, QString &directory)
     file_checking->Close();
     delete file_checking;
 
-    file_checking =
-        new MythProgressDialog("Updating music database", music_files.size());
+    file_checking = new MythProgressDialog(QObject::tr("Updating music database"), 
+                                           music_files.size());
 
     QRegExp quote_regex("\"");
     for (iter = music_files.begin(); iter != music_files.end(); iter++)
@@ -350,6 +350,7 @@ int main(int argc, char *argv[])
     srand(time(NULL));
 
     QApplication a(argc, argv);
+    QTranslator translator(0);
 
     //  Load the context
     gContext = new MythContext(MYTH_BINARY_VERSION);
@@ -366,6 +367,11 @@ int main(int argc, char *argv[])
     }
     gContext->LoadQtConfig();
     CheckFreeDBServerFile();
+
+    translator.load(PREFIX + QString("/share/mythtv/i18n/mythmusic_") +
+                    QString(gContext->GetSetting("Language").lower()) +
+                    QString(".qm"), ".");
+    a.installTranslator(&translator);
 
     //  See if we should be talking to an LCDproc daemon
 

@@ -307,7 +307,7 @@ PlaybackBox::PlaybackBox(PlaylistsContainer *the_playlists,
 
         randomize = new MythToolButton(this);
         randomize->setAutoRaise(true);
-        randomize->setText("Shuffle Mode");
+        randomize->setText(tr("Shuffle Mode"));
         randomize->setFont(buttonfont);
         secondcontrol->addWidget(randomize);
         connect(randomize, SIGNAL(clicked()), shuffleAction, 
@@ -315,21 +315,21 @@ PlaybackBox::PlaybackBox(PlaylistsContainer *the_playlists,
 
         repeat = new MythToolButton(this);
         repeat->setAutoRaise(true);
-        repeat->setText("Repeat Mode");
+        repeat->setText(tr("Repeat Mode"));
         repeat->setFont(buttonfont);
         secondcontrol->addWidget(repeat);
         connect(repeat, SIGNAL(clicked()), repeatAction, SIGNAL(activated()));
 
         pledit = new MythToolButton(this);
         pledit->setAutoRaise(true);
-        pledit->setText("Edit Playlist");
+        pledit->setText(tr("Edit Playlist"));
         pledit->setFont(buttonfont);
         secondcontrol->addWidget(pledit);
         connect(pledit, SIGNAL(clicked()), pleditAction, SIGNAL(activated()));
 
         vis = new MythToolButton(this);
         vis->setAutoRaise(true);
-        vis->setText("Visualize");
+        vis->setText(tr("Visualize"));
         vis->setFont(buttonfont);
         secondcontrol->addWidget(vis);
         connect(vis, SIGNAL(clicked()), visAction, SIGNAL(activated()));
@@ -366,10 +366,10 @@ PlaybackBox::PlaybackBox(PlaylistsContainer *the_playlists,
     playview = new MythListView(this);
     playview->addColumn("#");
     if (showrating)
-        playview->addColumn("Rating");
-    playview->addColumn("Artist");  
-    playview->addColumn("Title");
-    playview->addColumn("Length");
+        playview->addColumn(tr("Rating"));
+    playview->addColumn(tr("Artist"));  
+    playview->addColumn(tr("Title"));
+    playview->addColumn(tr("Length"));
     playview->setFont(buttonfont);
 
     playview->setFocusPolicy(NoFocus);
@@ -1305,10 +1305,10 @@ void PlaybackBox::setShuffleMode(unsigned int mode)
 
     switch (shufflemode) {
         case SHUFFLE_INTELLIGENT:
-            shufflelabel->setText("Shuffle: Intelligent");
+            shufflelabel->setText(tr("Shuffle: Intelligent"));
             break;
         case SHUFFLE_RANDOM:
-            shufflelabel->setText("Shuffle: Random");
+            shufflelabel->setText(tr("Shuffle: Random"));
             break;
         default:
             shufflelabel->setText("");
@@ -1382,10 +1382,10 @@ void PlaybackBox::setRepeatMode(unsigned int mode)
 
     switch (repeatmode) {
         case REPEAT_TRACK:
-            repeatlabel->setText("Repeat: Track");
+            repeatlabel->setText(tr("Repeat: Track"));
             break;
         case REPEAT_ALL:
-            repeatlabel->setText("Repeat: All");
+            repeatlabel->setText(tr("Repeat: All"));
             break;
         default:
             repeatlabel->setText("");
