@@ -455,6 +455,18 @@ long long decodeLongLong(QStringList &list, int offset)
 
     int l1 = list[offset].toInt();
     int l2 = list[offset + 1].toInt();
+
+    retval = ((long long)(l2) & 0xffffffffLL) | ((long long)(l1) << 32);
+
+    return retval;
+}
+
+long long decodeLongLong(QStringList &list, QStringList::iterator &it)
+{
+    long long retval = 0;
+
+    int l1 = (*(it++)).toInt();
+    int l2 = (*(it++)).toInt();
  
     retval = ((long long)(l2) & 0xffffffffLL) | ((long long)(l1) << 32);
 

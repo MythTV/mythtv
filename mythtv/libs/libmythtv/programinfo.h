@@ -106,6 +106,7 @@ class ProgramInfo
 
     void ToStringList(QStringList &list);
     void FromStringList(QStringList &list, int offset);
+    void FromStringList(QStringList &list, QStringList::iterator &it);
     void ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap);
 
     void SetBookmark(long long pos, QSqlDatabase *db);

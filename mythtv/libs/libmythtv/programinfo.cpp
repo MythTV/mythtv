@@ -144,33 +144,39 @@ void ProgramInfo::FromStringList(QStringList &list, int offset)
         return;
     }
 
-    title = list[offset];
-    subtitle = list[offset + 1];
-    description = list[offset + 2];
-    category = list[offset + 3];
-    chanid = list[offset + 4];
-    chanstr = list[offset + 5];
-    chansign = list[offset + 6];
-    channame = list[offset + 7];
-    pathname = list[offset + 8];
-    filesize = decodeLongLong(list, offset + 9);
-    startts = QDateTime::fromString(list[offset + 11], Qt::ISODate);
-    endts = QDateTime::fromString(list[offset + 12], Qt::ISODate);
-    conflicting = list[offset + 13].toInt();
-    recording = list[offset + 14].toInt();
-    override = list[offset + 15].toInt();
-    hostname = list[offset + 16];
-    sourceid = list[offset + 17].toInt();
-    cardid = list[offset + 18].toInt();
-    inputid = list[offset + 19].toInt();
-    recpriority = list[offset + 20];
-    norecord = NoRecordType(list[offset + 21].toInt());
-    recordid = list[offset + 22].toInt();
-    rectype = RecordingType(list[offset + 23].toInt());
-    recdups = RecordingDupsType(list[offset + 24].toInt());
-    recstartts = QDateTime::fromString(list[offset + 25], Qt::ISODate);
-    recendts = QDateTime::fromString(list[offset + 26], Qt::ISODate);
-    repeat = list[offset + 27].toInt();
+    QStringList::iterator it = list.at(offset);
+    FromStringList(list, it);
+}
+
+void ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
+{
+    title = *(it++);
+    subtitle = *(it++);
+    description = *(it++);
+    category = *(it++);
+    chanid = *(it++);
+    chanstr = *(it++);
+    chansign = *(it++);
+    channame = *(it++);
+    pathname = *(it++);
+    filesize = decodeLongLong(list, it);
+    startts = QDateTime::fromString(*(it++), Qt::ISODate);
+    endts = QDateTime::fromString(*(it++), Qt::ISODate);
+    conflicting = (*(it++)).toInt();
+    recording = (*(it++)).toInt();
+    override = (*(it++)).toInt();
+    hostname = *(it++);
+    sourceid = (*(it++)).toInt();
+    cardid = (*(it++)).toInt();
+    inputid = (*(it++)).toInt();
+    recpriority = *(it++);
+    norecord = NoRecordType((*(it++)).toInt());
+    recordid = (*(it++)).toInt();
+    rectype = RecordingType((*(it++)).toInt());
+    recdups = RecordingDupsType((*(it++)).toInt());
+    recstartts = QDateTime::fromString(*(it++), Qt::ISODate);
+    recendts = QDateTime::fromString(*(it++), Qt::ISODate);
+    repeat = (*(it++)).toInt();
 
     if (title == " ")
         title = "";

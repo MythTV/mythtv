@@ -98,7 +98,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
         exit(0);
     }
 
-    firstrun = true;
+    connected = FillList();
 
     curTitle = 0;
 
@@ -415,7 +415,7 @@ void PlaybackBox::updateInfo(QPainter *p)
 
         timer->start(500);
     }
-    else if (!firstrun)
+    else
     {
         LayerSet *norec = theme->GetSet("norecordings_info");
         if (type != Delete && norec)
@@ -761,7 +761,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
 
     leftRight = false;
 
-    if (showData.count() == 0 && !firstrun)
+    if (showData.count() == 0)
     {
         LayerSet *norec = theme->GetSet("norecordings_list");
         if (type != Delete && norec)
@@ -1775,14 +1775,6 @@ void PlaybackBox::timeout(void)
         return;
     if (noUpdate)
         return;
-
-    if (firstrun)
-    {
-        firstrun = false;
-        connected = FillList();
-        skipUpdate = false;
-        repaint(fullRect);
-    }
 
     if (showData.count() == 0)
         return;

@@ -21,17 +21,24 @@ vector<ProgramInfo *> *RemoteGetRecordedList(bool deltype)
     int numrecordings = strlist[0].toInt();
 
     vector<ProgramInfo *> *info = new vector<ProgramInfo *>;
-    int offset = 1;
 
-    for (int i = 0; i < numrecordings; i++)
+    if (numrecordings > 0)
     {
-        ProgramInfo *pginfo = new ProgramInfo();
-        pginfo->FromStringList(strlist, offset);
-        info->push_back(pginfo);
+        if (numrecordings * NUMPROGRAMLINES + 1 > (int)strlist.size())
+        {
+            cerr << "length mismatch between programinfo\n";
+            return info;
+        }
 
-        offset += NUMPROGRAMLINES;
-    }
-
+        QStringList::iterator it = strlist.at(1);
+        for (int i = 0; i < numrecordings; i++)
+        {
+            ProgramInfo *pginfo = new ProgramInfo();
+            pginfo->FromStringList(strlist, it);
+            info->push_back(pginfo);
+        }
+    } 
+ 
     return info;
 }
 
@@ -110,15 +117,21 @@ bool RemoteGetAllPendingRecordings(vector<ProgramInfo *> &recordinglist)
     bool conflicting = strlist[0].toInt();
     int numrecordings = strlist[1].toInt();
 
-    int offset = 2;
-
-    for (int i = 0; i < numrecordings; i++)
+    if (numrecordings > 0)
     {
-        ProgramInfo *pginfo = new ProgramInfo();
-        pginfo->FromStringList(strlist, offset);
-        recordinglist.push_back(pginfo);
+        if (numrecordings * NUMPROGRAMLINES + 2 > (int)strlist.size())
+        {
+            cerr << "length mismatch between programinfo\n";
+            return conflicting;
+        }
 
-        offset += NUMPROGRAMLINES;
+        QStringList::iterator it = strlist.at(2);
+        for (int i = 0; i < numrecordings; i++)
+        {
+            ProgramInfo *pginfo = new ProgramInfo();
+            pginfo->FromStringList(strlist, it);
+            recordinglist.push_back(pginfo);
+        }
     }
 
     return conflicting;
@@ -132,15 +145,22 @@ void RemoteGetAllScheduledRecordings(vector<ProgramInfo *> &scheduledlist)
         return;
 
     int numrecordings = strlist[0].toInt();
-    int offset = 1;
 
-    for (int i = 0; i < numrecordings; i++)
+    if (numrecordings > 0)
     {
-        ProgramInfo *pginfo = new ProgramInfo();
-        pginfo->FromStringList(strlist, offset);
-        scheduledlist.push_back(pginfo);
+        if (numrecordings * NUMPROGRAMLINES + 1 > (int)strlist.size())
+        {
+            cerr << "length mismatch between programinfo\n";
+            return;
+        }
 
-        offset += NUMPROGRAMLINES;
+        QStringList::iterator it = strlist.at(1);
+        for (int i = 0; i < numrecordings; i++)
+        {
+            ProgramInfo *pginfo = new ProgramInfo();
+            pginfo->FromStringList(strlist, it);
+            scheduledlist.push_back(pginfo);
+        }
     }
 }
 
@@ -155,17 +175,25 @@ vector<ProgramInfo *> *RemoteGetConflictList(ProgramInfo *pginfo,
         return NULL;
 
     int numrecordings = strlist[0].toInt();
-    int offset = 1;
 
     vector<ProgramInfo *> *retlist = new vector<ProgramInfo *>;
 
-    for (int i = 0; i < numrecordings; i++)
+    if (numrecordings > 0)
     {
-        ProgramInfo *pginfo = new ProgramInfo();
-        pginfo->FromStringList(strlist, offset);
-        retlist->push_back(pginfo);
+        if (numrecordings * NUMPROGRAMLINES + 1 > (int)strlist.size())
+        {
+            cerr << "length mismatch between programinfo\n";
+            return retlist;
+        }
 
-        offset += NUMPROGRAMLINES;
+        QStringList::iterator it = strlist.at(1);
+
+        for (int i = 0; i < numrecordings; i++)
+        {
+            ProgramInfo *pginfo = new ProgramInfo();
+            pginfo->FromStringList(strlist, it);
+            retlist->push_back(pginfo);
+        }
     }
 
     return retlist;
