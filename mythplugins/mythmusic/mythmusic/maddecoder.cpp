@@ -772,6 +772,7 @@ Decoder *MadDecoderFactory::create(const QString &file, QIODevice *input,
         decoder = new MadDecoder(file, this, input, output);
     } else {
         decoder->setInput(input);
+        decoder->setFilename(file);
         decoder->setOutput(output);
     }
 

@@ -645,6 +645,7 @@ Decoder *FlacDecoderFactory::create(const QString &file, QIODevice *input,
         decoder = new FlacDecoder(file, this, input, output);
     } else {
         decoder->setInput(input);
+        decoder->setFilename(file);
         decoder->setOutput(output);
     }
 

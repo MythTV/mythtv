@@ -421,6 +421,7 @@ Decoder *VorbisDecoderFactory::create(const QString &file, QIODevice *input,
         decoder = new VorbisDecoder(file, this, input, output);
     } else {
         decoder->setInput(input);
+        decoder->setFilename(file);
         decoder->setOutput(output);
     }
 

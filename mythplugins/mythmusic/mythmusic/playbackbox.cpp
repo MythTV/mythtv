@@ -568,6 +568,7 @@ void PlaybackBox::play()
     else 
     {
         decoder->setInput(input);
+        decoder->setFilename(sourcename);
         decoder->setOutput(output);
     }
 

@@ -550,6 +550,7 @@ Decoder *CdDecoderFactory::create(const QString &file, QIODevice *input,
         decoder = new CdDecoder(file, this, input, output);
     } else {
         decoder->setInput(input);
+        decoder->setFilename(file);
         decoder->setOutput(output);
     }
 

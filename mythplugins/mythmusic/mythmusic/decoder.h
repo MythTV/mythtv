@@ -64,6 +64,7 @@ class Decoder : public QThread
     Output *output() { return out; }
     void setInput(QIODevice *);
     void setOutput(Output *);
+    void setFilename(const QString &newName) { filename = newName; }
 
     QMutex *mutex() { return &mtx; }
     QWaitCondition *cond() { return &cnd; }
