@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
- <TITLE>Installing and using MythTV: MythDVD.</TITLE>
+ <TITLE>Installing and using MythTV: Troubleshooting.</TITLE>
  <LINK HREF="mythtv-HOWTO-20.html" REL=next>
  <LINK HREF="mythtv-HOWTO-18.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc19" REL=contents>
@@ -12,9 +12,505 @@
 <A HREF="mythtv-HOWTO-18.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc19">Contents</A>
 <HR>
-<H2><A NAME="s19">19.</A> <A HREF="mythtv-HOWTO.html#toc19">MythDVD.</A></H2>
+<H2><A NAME="s19">19.</A> <A HREF="mythtv-HOWTO.html#toc19">Troubleshooting.</A></H2>
 
+<H2><A NAME="ss19.1">19.1</A> <A HREF="mythtv-HOWTO.html#toc19.1">Illegal Instruction.</A>
+</H2>
 
+<P>This error can happen for the following reasons:
+<UL>
+<LI>You have an AMD K6-2 or VIA C3 processor.  If you have either of
+these, make sure that you you followed the instructions in this 
+<A HREF="mythtv-HOWTO-5.html#nonintelcpu_">section</A>.</LI>
+<LI>You have an early production Intel Celeron, Pentium Pro or Pentium II.  If you have any
+of these processors, make sure that your 
+<A HREF="mythtv-HOWTO-10.html#deinterlace_">deinterlace</A>
+variable is set correctly.  Your CPU needs to support SSE instructions for
+deinterlace support.  You may check this by doing a <CODE>$ cat
+/proc/cpuinfo</CODE> and looking for "sse" in the processor flags section.</LI>
+</UL>
+</P>
+<H2><A NAME="ss19.2">19.2</A> <A HREF="mythtv-HOWTO.html#toc19.2">mythfilldatabase failing.</A>
+</H2>
+
+<P>If mythfilldatabase suddenly appears to be failing, check to see what version of
+XMLTV you're running.  Versions prior to 0.5.4 need to have the following
+change made: edit the
+<CODE>/usr/lib/perl5/site_perl/5.8.0/XMLTV/ZapListings.pm</CODE> file and
+perform a global search and replace, searching for "tvlistings2" and
+replacing it with "tvlistings".
+<B>NOTE</B>:  It is highly recommended to run the latest version of XMLTV
+available.  In North America, zap2it, the listings provider, has been
+making numerous changes to their website which negatively impact XMLTV.</P>
+<H2><A NAME="ss19.3">19.3</A> <A HREF="mythtv-HOWTO.html#toc19.3">MythTV seems to disappear; can't see video.</A>
+</H2>
+
+<P>If you're using Gnome as your window manager, try switching to KDE.  For
+Red Hat Linux 8.0 users, edit <CODE>/etc/sysconfig/desktop</CODE> and
+change "GNOME" to "KDE".</P>
+<H2><A NAME="Setting_DMA"></A> <A NAME="ss19.4">19.4</A> <A HREF="mythtv-HOWTO.html#toc19.4">Fast CPU, choppy or jittery video. </A>
+</H2>
+
+<P>First, you should check that your kernel has been enabled for DMA:
+<BLOCKQUOTE><CODE>
+<PRE>
+[mythtv@pvr mythtv]$ dmesg |grep DMA
+    ide0: BM-DMA at 0xd800-0xd807, BIOS settings: hda:DMA, hdb:DMA
+    ide1: BM-DMA at 0xd808-0xd80f, BIOS settings: hdc:DMA, hdd:pio
+hda: 156301488 sectors (80026 MB) w/2048KiB Cache, CHS=9729/255/63, UDMA(33)
+hdb: 80043264 sectors (40982 MB) w/2048KiB Cache, CHS=4982/255/63, UDMA(33)
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>From the listing above, you can see that hda, hdb and hdc are set for DMA,
+and hdd is set for pio.  If your kernel is not reporting DMA being enabled,
+you may need to recompile your kernel. Check your motherboard's chipset
+(look in the "ATA/IDE/MFM/RLL support" section in "make menuconfig") for more
+information.</P>
+<P>Next, check that the hard drive has DMA enabled.  Use the <B>hdparm</B>
+program to check and enable DMA.
+<BLOCKQUOTE><CODE>
+<PRE>
+# hdparm -d /dev/hd?
+</PRE>
+</CODE></BLOCKQUOTE>
+ will tell you the DMA status for your hard drives.  If you run
+<B>hdparm</B> with the <CODE>-d1</CODE> parameter, it will turn DMA on.</P>
+
+<P>You may also setup your PC to do this at boot time, either by adding the
+command to your <CODE>/etc/rc.local</CODE> file, or by adding files to
+/etc/sysconfig.</P>
+<P>On Mandrake and other distributions, if you install <B>hdparm</B> from an RPM you
+will most likely get a <CODE>/etc/sysconfig/harddisks</CODE> file installed. 
+This file will be parsed by the <CODE>/etc/rc.sysinit</CODE> script.  If you use
+the default <CODE>harddisks</CODE> file, your changes will affect all IDE devices
+(including CD ROMs).  If you wish to use different parameters for various
+devices, rename and/or copy the file to <CODE>harddiskhda</CODE>,
+<CODE>harddiskhdb</CODE>, etc.  Edit the file to your liking and on the next
+reboot your setting will be preserved.</P>
+
+<H2><A NAME="ss19.5">19.5</A> <A HREF="mythtv-HOWTO.html#toc19.5">I keep losing all of my settings every time I compile!</A>
+</H2>
+
+<P>MythTV will overwrite any settings in <CODE>/usr/local/share/mythtv</CODE>.
+If you want to make sure that you don't lose your modifications, make a
+directory <CODE>~/.mythtv</CODE> and copy your mysql.txt file to this
+location.</P>
+<H2><A NAME="ss19.6">19.6</A> <A HREF="mythtv-HOWTO.html#toc19.6">Compile errors.</A>
+</H2>
+
+<P>Some compile errors are worse than others.  If you get an error that
+doesn't abort the compilation, and says something like:
+<BLOCKQUOTE><CODE>
+<PRE>
+cc1plus: warning: changing search order for system directory
+"/usr/local/include"
+cc1plus: warning:   as it has already been specified as a non-system
+directory
+</PRE>
+</CODE></BLOCKQUOTE>
+
+then it shouldn't be a problem.</P>
+<P>If you get an error like <CODE>/usr/bin/ld: cannot find -lXext</CODE>, the
+compiler is telling you that you don't have XFree86-devel installed, or that
+your distribution hasn't set it up 
+<A HREF="mythtv-HOWTO-3.html#RH_XFree86-devel">correctly</A>.  This needs to be fixed before MythTV will compile.</P>
+
+<H2><A NAME="ss19.7">19.7</A> <A HREF="mythtv-HOWTO.html#toc19.7">My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.</A>
+</H2>
+
+<P>This is due to DPMS, the Display Power Management System, which is used
+to save power by turning off your monitor when the system decides that it's
+not being used or to a screensaver that has defaulted to a blank screen. 
+Since it's likely that watching TV will not generate keyboard or mouse
+events for a time, you need to turn off DPMS and the screensaver.  There are a few ways to do
+this.  You may also need to check your BIOS for power saving modes and
+disable screen blanking there as well.</P>
+<P>Edit your <CODE>/etc/X11/XF86Config-4</CODE> file, and look for:
+<BLOCKQUOTE><CODE>
+<PRE>
+Section "ServerFlags"
+    #DontZap # disable &lt;Crtl>&lt;Alt>&lt;BS> (server abort)
+    #DontZoom # disable &lt;Crtl>&lt;Alt>&lt;KP_+>/&lt;KP_-> (resolution switching)
+    AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
+EndSection
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Add <CODE>Option "NoPM" "true"</CODE> and <CODE>Option "BlankTime" "0"</CODE>to the ServerFlags section.</P>
+<P>Also, look for:
+<BLOCKQUOTE><CODE>
+<PRE>
+Section "Device"
+    Identifier "device1"
+    VendorName "nVidia Corporation"
+    BoardName "NVIDIA GeForce 256 (generic)"
+    Driver "nv"
+    Option "DPMS"
+EndSection
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>In this case, you would need to either delete the <CODE>Option "DPMS"</CODE>
+line, or change it to <CODE># Option "DPMS"</CODE> to comment it out.  The next
+time you start XFree this change will take effect.</P>
+<P>Finally, check:
+<BLOCKQUOTE><CODE>
+<PRE>
+Section "Monitor"
+    Identifier "monitor1"
+    VendorName "Plug'n Play"
+    HorizSync 30-85
+    VertRefresh 50-160
+
+    # Sony Vaio C1(X,XS,VE,VN)?
+    # 1024x480 @ 85.6 Hz, 48 kHz hsync
+    ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+
+    # TV fullscreen mode or DVD fullscreen output.
+    # 768x576 @ 79 Hz, 50 kHz hsync
+    ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+
+    # 768x576 @ 100 Hz, 61.6 kHz hsync
+    ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+EndSection
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Ensure that there isn't an <CODE>Option "DPMS"</CODE> in the Monitor
+configuration.</P>
+<P>You can also turn off DPMS from the Command Line, but this will not survive
+a reboot.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ xset -dpms
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Using <CODE>xset +dpms</CODE> will turn it back on.</P>
+<P>Another technique to try, which will turn off the screensaver:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ xset s off
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>You may also combine the command to turn off DPMS and the screensaver:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ xset -dpms s off
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Finally, depending on your distribution, you may be able to turn it off from
+within the control panel.</P>
+
+<H2><A NAME="ss19.8">19.8</A> <A HREF="mythtv-HOWTO.html#toc19.8">I can't checkout using CVS anymore! </A>
+</H2>
+
+<P>Isaac has changed some things around.  The CVS repository is now known as
+<CODE>cvs.mythtv.org</CODE>, rather than <CODE>www.mythtv.org</CODE> or
+<CODE>mythtv.org</CODE> and the path has changed.  Make sure you change your
+<CODE>CVSROOT</CODE> to point to the new server and path, delete your old tree,
+and re-do the checkout.  See Section 1, 
+<A HREF="mythtv-HOWTO-1.html#how_to_obtain">How to Obtain this document</A> for the full name and path.</P>
+
+<H2><A NAME="ss19.9">19.9</A> <A HREF="mythtv-HOWTO.html#toc19.9">I get segfaults / MythTV isn't doing anything.</A>
+</H2>
+
+<P>Without details, the developers will not be able to determine if you have
+discovered a genuine code-bug,  or if the problem is with your system.  In
+order to determine what's going on, you must recompile MythTV with debugging
+support and run MythTV within <B>gdb</B>, the GNU debugger.</P>
+<P>Edit the settings.pro file.  Make sure that the top of the file looks like this:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cat settings.pro
+CONFIG += debug
+#CONFIG += release
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Now, you need to clear out the old versions of the software to ensure that
+you're running with the debugging code, then compile and install.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ make clean distclean
+$ ./configure
+$ make
+$ su
+# make install
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>At this point, you now have debug-enabled software ready.  Let's assume that
+the problem you're having is in the <CODE>setup</CODE> program.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd setup
+$ gdb ./setup
+
+GNU gdb 5.3-1mdk (Mandrake Linux)
+Copyright 2002 Free Software Foundation, Inc.
+GDB is free software, covered by the GNU General Public License, and you are
+welcome to change it and/or distribute copies of it under certain
+conditions.
+Type "show copying" to see the conditions.
+There is absolutely no warranty for GDB.  Type "show warranty" for details.
+This GDB was configured as "i586-mandrake-linux-gnu"...
+(gdb) handle SIGPIPE nostop
+Signal        Stop      Print   Pass to program Description
+SIGPIPE       No        Yes     Yes             Broken pipe
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><B>gdb</B> has a number of options, read the <CODE>man</CODE> page for more
+information.</P>
+<P>Once at the <CODE>(gdb)</CODE> prompt, type <CODE>run</CODE> to start program
+execution.  When the program segfaults or appears to lock-up (press CTRL-C),
+type 
+<BLOCKQUOTE><CODE>
+<PRE>
+(gdb) thread apply all bt full
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The backtrace information for all the threads should be posted to the
+mythtv-dev mailing list, along with the steps you followed to get the
+program to crash.</P>
+<P>If you're trying to troubleshoot and you can't get back to the gdb window
+for some reason, it may be easier to use two systems or to start
+mythfrontend from the text console.</P>
+<P>If you're going to troubleshoot from a remote system, connect to the machine
+that you're going to test using <B>ssh</B> or <B>telnet</B>. Next, type
+<CODE>$ export DISPLAY=localhost:0.0</CODE>.  This will allow the graphics to be
+displayed on the X console (usually ALT-F6 or ALT-F7) and still give you
+output and control of <B>mythfrontend</B>, either from the <B>ssh</B>
+session, or by switching back to the text console by pressing CTRL-ALT-F1. 
+You can now continue troubleshooting using <B>gdb</B> as detailed in the
+instructions.</P>
+
+<H2><A NAME="ss19.10">19.10</A> <A HREF="mythtv-HOWTO.html#toc19.10">MythTV makes my system crash. </A>
+</H2>
+
+<P>MythTV <EM>can not</EM> crash your system - it is a user-level program. 
+If your system is crashing when you run MythTV, then you have some
+issue with the drivers for your capture card or other hardware, or the CPU
+fan has fallen off/broken and your system is overheating when asked to
+perform a CPU intensive task like encoding video.</P>
+
+<H2><A NAME="Troubleshooting_Audio"></A> <A NAME="ss19.11">19.11</A> <A HREF="mythtv-HOWTO.html#toc19.11">Troubleshooting audio. </A>
+</H2>
+
+<P>By Bruce Markey, 
+<A HREF="mailto:bjm@lvcm.com">mailto:bjm@lvcm.com</A>
+<B>NOTE</B>:  the following instructions do not apply to PVR-250/350
+encoders; the MPEG-2 file will have the audio embedded in the stream so it
+is not accessible using <CODE>/dev/dsp</CODE>.  See 
+<A HREF="mythtv-HOWTO-20.html#troubleshooting_pvraudio">this</A> in the PVR-250 
+<A HREF="mythtv-HOWTO-20.html#pvr250">section</A> for more information.</P>
+<P>Audio appears to be one of the bigger issues that users run into on the
+mailing list.  If the audio isn't configured correctly, then MythTV will
+often appear to hang, when in fact it is trying to manipulate the audio
+subsystem and failing.  You may or may not receive error messages indicating
+that the source of the error is the audio subsystem.</P>
+<P>You can not use <B>xawtv</B> to determine if your audio is working
+correctly, since <B>xawtv</B> is simply using the the analog sound patched
+through line-in to line-out. It doesn't need to digitize the sound unless
+you are using the recording function.</P>
+<P>A better test to verify that sound will work for MythTV (and recording with
+<B>xawtv</B> for that matter) is to startup <B>xawtv</B>, mute the
+line-in then run <CODE>aplay /dev/dsp</CODE>. You should hear the recorded audio
+slightly delayed behind the realtime video.  Once this test succeeds, MythTV
+should work correctly because it writes to and read from /dev/dsp in
+the same way that <B>aplay</B> does.</P>
+<P>To record audio along with video the audio signal must be digitized by a DSP
+so that the audio data can be stored in a file. On playback, the audio data
+is written to /dev/dsp and converted back to an analog signal. This analog
+signal should then be sent to your speakers. Here is what is needed in
+alsamixer:</P>
+<P>CAPTUR source - the analog source to be sent to the DSP. This should be set
+to the input source from the tuner card to the sound card. In most cases
+this is Line but this could also be Aux, CD, Mic, etc., depending on how you
+connect the input cable. This source should be muted to prevent patching
+through the analog sound. The volume of this source will not affect the
+record level.</P>
+<P>Capture mixer - this sets the level for the analog to digital recording.
+While a volume of 100% is recommended for testing, distortion may occur.
+Lowering this level to 75% to 85% may result in better audio quality.
+"Capture" should be marked as the CAPTUR destination.</P>
+<P>PCM mixer - this sets the level for the digital to analog playback. While a
+volume of 100% is recommended for testing, distortion may occur. Lowering
+this level to 75% to 85% may result in better audio quality.</P>
+<P>Master mixer - sets the level for the analog signal sent to line-out or the
+speakers.</P>
+<P>You may also want to ensure that <CODE>/dev/dsp</CODE> hasn't already been
+grabbed by another process, like <B>esd</B> or <B>artsd</B>.  If
+<CODE>/dev/dsp</CODE> isn't available, then MythTV won't work.  Check your
+window manager documentation for instructions on disabling the sound manager.
+If you wish to see what application is grabbing a resource, you can use the
+<CODE>fuser</CODE> command:
+<BLOCKQUOTE><CODE>
+<PRE>
+# fuser -v /dev/dsp
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>To disable aRts in KDE, go to KDE->Control Center->Sound->Sound System and
+uncheck the "Start aRts soundserver on KDE startup" box.  Run <CODE># killall
+artsd</CODE> from the command line to stop the artsd program.</P>
+<P>If you're using multiple sound cards and multiple tuners, use <CODE>alsamixer
+-c 1</CODE> to work with the second sound card.  The first card is #0, the
+second card is #1, etc.</P>
+
+<H2><A NAME="ss19.12">19.12</A> <A HREF="mythtv-HOWTO.html#toc19.12">I can't see parts of the On Screen Display.</A>
+</H2>
+
+<P>If you're a Red Hat 8.0 user, make sure that you've followed the
+instructions which tell you how to modify the Themes makefile. 
+<A HREF="mythtv-HOWTO-5.html#RH80_OSD_Strip">Link</A>.</P>
+
+<H2><A NAME="ss19.13">19.13</A> <A HREF="mythtv-HOWTO.html#toc19.13">The mythbackend program told me to look at this section.</A>
+</H2>
+
+<P>mythbackend does a check to see if your sound device is capable of full
+duplex operation.  If it's not, it's most likely that you're going to run
+into issues when you try to record and play sound at the same time.  If your
+backend is a separate machine than your frontend, then there's no problem,
+since you're only going to be doing one thing at a time with the card. 
+Likewise, if you're running the frontend and backend on the same machine,
+but you're using btaudio as your recording source, and using the playback
+function of your soundcard, then you also shouldn't have an issue, since the
+sound card isn't being asked to perform two functions at once.</P>
+<P>If you can't get your soundcard to go full duplex and need it to, then check
+your distribution for updated sound drivers.  If your soundcard is not
+capable of full-duplex operation, either because the drivers don't support
+it, or it has been designed that way, then you're pretty much out of luck
+and will either need to purchase a new sound card, or will need to get
+btaudio 
+<A HREF="mythtv-HOWTO-20.html#btaudio">operational</A>.</P>
+
+<H2><A NAME="ss19.14">19.14</A> <A HREF="mythtv-HOWTO.html#toc19.14">My remote doesn't work / works sometimes and not others / "ghost"</A>
+keypresses.</H2>
+
+<P>This can be due to a number of factors.  The simplest case is the
+"ghost" keypresses.  For me, it was due to compact fluorescent lights in
+the same room as the IR receiver, which the receiver was picking up as
+keypresses.  Once the lights were switched to incandescent bulbs, the ghost
+went away.</P>
+<P>You may have an issue with <B>lirc</B> misinterpreting IR commands from a
+different remote.  I also have an issue where the Tivo "Peanut" remote will
+eventually cause <B>lircd</B> to stop responding; even though <B>lircd</B>
+is configured for the Pinnacle Systems remote, the Tivo remote IR patterns
+are being seen by the IR receiver.</P>
+<P>If your remote has been properly configured, and <B>irw</B> and
+<B>irxevent</B> are working correctly, then it's highly likely that your
+window manager is not giving focus correctly to the various Myth programs as
+they run.  The following window managers are known to work correctly:</P>
+<P>
+<UL>
+<LI>fvwm</LI>
+<LI>blackbox  (using "Sloppy Focus" and "Focus New Windows")</LI>
+</UL>
+</P>
+
+<H2><A NAME="ss19.15">19.15</A> <A HREF="mythtv-HOWTO.html#toc19.15">My PVR-250 card doesn't show inputs in the setup screen.</A>
+</H2>
+
+<P>See message 
+<A HREF="http://lists.snowman.net/pipermail/mythtv-users/2003-April/002527.html">http://lists.snowman.net/pipermail/mythtv-users/2003-April/002527.html</A></P>
+
+<H2><A NAME="ss19.16">19.16</A> <A HREF="mythtv-HOWTO.html#toc19.16">Where's my "canada-cable" entry gone to?</A>
+</H2>
+
+<H2><A NAME="ss19.17">19.17</A> <A HREF="mythtv-HOWTO.html#toc19.17">My channels are off by one.</A>
+</H2>
+
+<P>There is no such thing as "Canada Cable"; Canada uses the same
+frequencies as the United States.  "Canada Cable" was a hack that some
+people used when they would discover that their channels were off-by-one,
+ie, when tuning to channel 42, they might get channel 41 or 43.  This is
+actually due to the tuner on the video capture device being mis-detected. 
+You must manually specify the tuner type in your <CODE>/etc/modules.conf</CODE>. 
+See the video4linux mailing list (
+<A HREF="https://listman.redhat.com/mailman/listinfo/video4linux-list">https://listman.redhat.com/mailman/listinfo/video4linux-list</A>) for
+more information.</P>
+
+<H2><A NAME="ss19.18">19.18</A> <A HREF="mythtv-HOWTO.html#toc19.18">Mythweb is showing a db_open error when I connect to it.</A>
+</H2>
+
+<P>Find your php.ini file. Make sure you've got a line in it like this:</P>
+<P><CODE>extension=mysql.so</CODE></P>
+<P>Restart apache for it to take effect.</P>
+
+<H2><A NAME="ss19.19">19.19</A> <A HREF="mythtv-HOWTO.html#toc19.19">error: can't find a register in class 'BREG' while reloading 'asm'</A>
+</H2>
+
+<P>This is due to the broken Qt that is being distributed by Suse.  To work
+around this, edit <CODE>libs/libavcodec/Makefile</CODE> and remove any
+"-fPIC" you find there and then recompile.</P>
+
+<H2><A NAME="mkspecs_error"></A> <A NAME="ss19.20">19.20</A> <A HREF="mythtv-HOWTO.html#toc19.20">make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
+</H2>
+
+<P>This error happens when there's a missing link in the
+<CODE>/usr/lib/qt3/mkspecs</CODE> directory.  There are two ways to fix this
+error:</P>
+<P>1.  Create the link manually:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# cd /usr/lib/qt3/mkspecs
+# ln -sf linux-g++ default
+</PRE>
+</CODE></BLOCKQUOTE>
+
+and then restart the compile,</P>
+<P>or</P>
+<P>2.  Run <B>qmake mythtv.pro</B> in the mythtv directory.  Rerunning
+<B>qmake</B> will create a new Makefile for you, however this still
+doesn't fix the root cause of the issue, which is that your distribution
+didn't create the symlink for you when the qt3 package was installed.  The
+first choice is the better solution.</P>
+
+<H2><A NAME="ss19.21">19.21</A> <A HREF="mythtv-HOWTO.html#toc19.21">make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.</A>
+</H2>
+
+<P>You didn't set your <CODE>QTDIR</CODE>.  Re-read the section on 
+<A HREF="mythtv-HOWTO-4.html#Setting_up_paths">Setting up paths</A>.</P>
+
+<H2><A NAME="ss19.22">19.22</A> <A HREF="mythtv-HOWTO.html#toc19.22">My mouse pointer disappears when placed over the MythTV windows.</A>
+</H2>
+
+<P>This is the intended behavior.  The MythTV interface is meant for use
+with a remote control or a keyboard.</P>
+
+<H2><A NAME="ss19.23">19.23</A> <A HREF="mythtv-HOWTO.html#toc19.23">What does "strange error flushing buffer" mean on my console?</A>
+</H2>
+
+<P>Nothing, really.  It's just lame (the mp3 encoder) complaining for some
+obscure reason.  This seems to be fixed in more recent versions of the
+libmp3lame library.</P>
+
+<H2><A NAME="ss19.24">19.24</A> <A HREF="mythtv-HOWTO.html#toc19.24">I can't change the channel when watching Live TV.</A>
+</H2>
+
+<P>Something's wrong with your program database.  Did mythfilldatabase run
+with no major errors?</P>
+
+<H2><A NAME="ss19.25">19.25</A> <A HREF="mythtv-HOWTO.html#toc19.25">Colors are wrong, people have blue faces.</A>
+</H2>
+
+<P>If you are using the binary nVidia drivers, make sure you're using at
+least version 1.0-2960.</P>
+
+<H2><A NAME="ss19.26">19.26</A> <A HREF="mythtv-HOWTO.html#toc19.26">When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"</A>
+</H2>
+
+<P>You didn't add <CODE>/usr/local/lib</CODE> to <CODE>/etc/ld.so.conf</CODE>.  See the
+section on modifying 
+<A HREF="mythtv-HOWTO-4.html#modifying_ld.so.conf">/etc/ld.so.conf</A>.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-20.html">Next</A>

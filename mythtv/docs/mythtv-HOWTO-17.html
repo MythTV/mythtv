@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
- <TITLE>Installing and using MythTV: MythWeather.</TITLE>
+ <TITLE>Installing and using MythTV: MythVideo.</TITLE>
  <LINK HREF="mythtv-HOWTO-18.html" REL=next>
  <LINK HREF="mythtv-HOWTO-16.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc17" REL=contents>
@@ -12,30 +12,14 @@
 <A HREF="mythtv-HOWTO-16.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc17">Contents</A>
 <HR>
-<H2><A NAME="s17">17.</A> <A HREF="mythtv-HOWTO.html#toc17">MythWeather.</A></H2>
+<H2><A NAME="s17">17.</A> <A HREF="mythtv-HOWTO.html#toc17">MythVideo.</A></H2>
 
-<P>The MythWeather module will obtain the weather information for the
-location that you specify.  You must be running MythTV v0.10 or later 
-in order to use MythWeather.</P>
-<P>
-<HR>
-<PRE>
-NOTE for Red Hat Linux 8.0 users: Red Hat 8 users must make the following
-modification, or several weather icons will fail to be installed.
-
-From the mythweather build directory move to the mythweather sub-directory
-and edit the Makefile there.
-
-Find and comment out (using a '#' symbol) the following line:
-
-strip "$(INSTALL_ROOT)/usr/local/share/mythtv/mythweather/images/"
-</PRE>
-<HR>
-</P>
-<P>Change into the MythWeather directory, then make and make install:
+<P>The MythVideo application will allow you to use an external program to
+watch media files that are not directly supported by MythTV.</P>
+<P>Change into the MythVideo directory, then make and make install:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd mythweather
+$ cd mythvideo
 $ make
 $ su
 # make install
@@ -43,38 +27,16 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>MythWeather uses MSNBC.com as its source for weather data and weather.com
-for its radar image.</P>
-<P>These are the keyboard commands for MythWeather:
+<P>The next step is to create the create the videometadata table in the
+database.  Simply do the following:
 <BLOCKQUOTE><CODE>
 <PRE>
-Left Key             Goes back one page, and extends the time spent
-                     on the page you are on.
-Right Key            Goes forward one page, see above.
-Space                Pause, wait on the current page until space is hit
-                     again.
-Numeric Keys         You can check other weather by keying in other ZIP codes.
-Enter Key            Switch between Celsius and Fahrenheit. Can also
-                     be used a way to force a data update.
-"m" Key              Resets the location to the database default, then updates the data.
-"i"                  Enter / Save settings
-ESC                  Exit the settings screen without saving / Exit the program
+$ cd videodb
+$ mysql -u mythtv -p &lt; metadata.sql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>MythWeather also has an "Aggressiveness" setting.  This affects how long
-MythWeather waits for data from the msnbc.com website before timing out.  If
-you are on a slow connection, or have a slow DNS, or MythWeather just
-doesn't seem to be working and you've already tried everything else, then
-try increasing the aggressiveness level parameter.  This parameter is
-inverse; a higher number actually means that MythWeather will be less
-aggressive, and will therefore wait longer before timing out.</P>
-<P>MythWeather will print debugging information on the terminal.  If you wish
-to see additional debugging information while MythWeather is running, run
-mythweather from the command line with as <CODE>mythweather --debug</CODE></P>
-<P>You may also force mythweather to re-run the configuration by starting it on
-the command line as <CODE>mythweather --configure</CODE>.  These two options are
-mutually exclusive.</P>
+<P>See MythVideo's <CODE>README</CODE> file for additional information.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-18.html">Next</A>

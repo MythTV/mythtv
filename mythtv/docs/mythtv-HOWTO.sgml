@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-08-19, v2.59
+<date>2003-08-19, v2.60
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2365,9 +2365,9 @@ name="http://www.snapstream.com/products/irblaster/sonydss.htm"> for cable
 pinouts for RCA DSS receivers.
 
 <sect>MythWeb.
-<p>MythWeb allows you to use a web page to control various aspects of your
-MythTV system.  MythWeb is a separate application, but it's dependent on
-MythTV being installed and operational.
+<p>The MythWeb allows you to use a web page to control various
+aspects of your MythTV system.  MythWeb is a separate application, but it's
+dependent on MythTV being installed and operational.
 
 <sect1>Installation and prerequisites.
 <p>Download mythweb from <url url="http://www.mythtv.org/"
@@ -2402,14 +2402,27 @@ $ su
 # exit
 $ 
 </verb></tscreen>
+
+By default, MythWeb uses the Apache <tt>.htaccess</tt> file to restrict
+access to the website.  If you do not wish to use access control, then
+rename or remove the <tt>/var/www/html/mythweb/.htaccess</tt> file.
+
+To create the password file for Apache, you could do something like this:
+<tscreen><verb>
+# cd /var/www
+# htpasswd -c htpasswd mythtv
+New password:
+Re-type new password:
+Adding password for user mythtv
+</verb></tscreen>
+
+See the man page for <bf>htaccess</bf> for more examples.
+
 To access the web page, open a web browser and use <bf>http://[name or ip
 address]/mythweb/</bf>
 
 <bf>NOTE</bf>: Make sure that you have a trailing slash on the URL,
 otherwise you will get a <tt>404 Page not Found</tt> error.
-
-<sect>MythWeb2.
-<p>
 
 <sect>MythGallery.
 <p>MythGallery is a photo and slideshow application.  MythGallery is a
@@ -4284,6 +4297,9 @@ compiling".  Added additional examples to mythbackend -help
 v2.58/2.59, 2003-08-19.  Version bump.  Added example if LVM needs new method of
 adding partitions. Gentoo updates from Max Kalika max@gentoo.org.  XMLTV
 version update.  Add MythDVD section.  Add MythWeb2 section.
+v2.60, 2003-08-19.  MythWeb2 is now the default, but is called MythWeb, so
+get rid of the just-added section.  Add instructions for generating
+htpasswd.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

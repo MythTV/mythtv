@@ -14,9 +14,9 @@
 <HR>
 <H2><A NAME="s12">12.</A> <A HREF="mythtv-HOWTO.html#toc12">MythWeb.</A></H2>
 
-<P>MythWeb allows you to use a web page to control various aspects of your
-MythTV system.  MythWeb is a separate application, but it's dependent on
-MythTV being installed and operational.</P>
+<P>The MythWeb allows you to use a web page to control various
+aspects of your MythTV system.  MythWeb is a separate application, but it's
+dependent on MythTV being installed and operational.</P>
 
 <H2><A NAME="ss12.1">12.1</A> <A HREF="mythtv-HOWTO.html#toc12.1">Installation and prerequisites.</A>
 </H2>
@@ -61,8 +61,23 @@ $ su
 $ 
 </PRE>
 </CODE></BLOCKQUOTE>
-
-To access the web page, open a web browser and use <B>http://[name or ip
+</P>
+<P>By default, MythWeb uses the Apache <CODE>.htaccess</CODE> file to restrict
+access to the website.  If you do not wish to use access control, then
+rename or remove the <CODE>/var/www/html/mythweb/.htaccess</CODE> file.</P>
+<P>To create the password file for Apache, you could do something like this:
+<BLOCKQUOTE><CODE>
+<PRE>
+# cd /var/www
+# htpasswd -c htpasswd mythtv
+New password:
+Re-type new password:
+Adding password for user mythtv
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>See the man page for <B>htaccess</B> for more examples.</P>
+<P>To access the web page, open a web browser and use <B>http://[name or ip
 address]/mythweb/</B></P>
 <P><B>NOTE</B>: Make sure that you have a trailing slash on the URL,
 otherwise you will get a <CODE>404 Page not Found</CODE> error.</P>

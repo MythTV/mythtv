@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-08-19, v2.59
+  2003-08-19, v2.60
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -129,80 +129,80 @@
         12.1.1 Mandrake 9.0
      12.2 Completing the installation.
 
-  13. MythWeb2.
-  14. MythGallery.
-     14.1 Installation and prerequisites.
-     14.2 Importing Pictures
+  13. MythGallery.
+     13.1 Installation and prerequisites.
+     13.2 Importing Pictures
 
-  15. MythGame.
-  16. MythMusic.
-     16.1 Manual installation of prerequisites.
-     16.2 Mandrake 9.0
-        16.2.1 Additional options with MythMusic
-     16.3 Red Hat Linux 9/8.0
-     16.4 Compiling MythMusic.
-     16.5 Configuring MythMusic.
-     16.6 Using MythMusic.
-     16.7 Troubleshooting MythMusic.
-        16.7.1 When I run MythMusic and try and look up a CD, I get an error message
-  17. MythWeather.
-  18. MythVideo.
-  19. MythDVD.
-  20. Troubleshooting.
-     20.1 Illegal Instruction.
-     20.2 mythfilldatabase failing.
-     20.3 MythTV seems to disappear; can't see video.
-     20.4 Fast CPU, choppy or jittery video.
-     20.5 I keep losing all of my settings every time I compile!
-     20.6 Compile errors.
-     20.7 My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.
-     20.8 I can't checkout using CVS anymore!
-     20.9 I get segfaults / MythTV isn't doing anything.
-     20.10 MythTV makes my system crash.
-     20.11 Troubleshooting audio.
-     20.12 I can't see parts of the On Screen Display.
-     20.13 The mythbackend program told me to look at this section.
-     20.14 My remote doesn't work / works sometimes and not others / "ghost" keypresses.
-     20.15 My PVR-250 card doesn't show inputs in the setup screen.
-     20.16 Where's my "canada-cable" entry gone to?
-     20.17 My channels are off by one.
-     20.18 Mythweb is showing a db_open error when I connect to it.
-     20.19 error: can't find a register in class 'BREG' while reloading 'asm'
-     20.20 make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
-     20.21 make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
-     20.22 My mouse pointer disappears when placed over the MythTV windows.
-     20.23 What does "strange error flushing buffer" mean on my console?
-     20.24 I can't change the channel when watching Live TV.
-     20.25 Colors are wrong, people have blue faces.
-     20.26 When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"
+  14. MythGame.
+  15. MythMusic.
+     15.1 Manual installation of prerequisites.
+     15.2 Mandrake 9.0
+        15.2.1 Additional options with MythMusic
+     15.3 Red Hat Linux 9/8.0
+     15.4 Compiling MythMusic.
+     15.5 Configuring MythMusic.
+     15.6 Using MythMusic.
+     15.7 Troubleshooting MythMusic.
+        15.7.1 When I run MythMusic and try and look up a CD, I get an error message
 
-  21. Miscellaneous.
-     21.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
-     21.2 I'd like to use some other window manager.
-     21.3 I'd like MythTV to automatically startup.
-     21.4 What capture resolution should I use?  How does video work?
-     21.5 MythTV GUI and X Display Sizes.
-        21.5.1 X Dimensions
-        21.5.2 MythTV Dimensions
-        21.5.3 Overscan Dimensions
-        21.5.4 MythTV on the Desktop
-     21.6 I'd like to save or restore my database.
-     21.7 I'd like to delete the mysql database.
-     21.8 btaudio
-     21.9 Removing unwanted channels.
-     21.10 I'd like to use a hardware MPEG-2 encoder (ie, a PVR-250/350).
-     21.11 I'd like to use NFS.
-     21.12 I'd like to automatically start mythbackend at system boot time.
-        21.12.1 Red Hat And Mandrake
-           21.12.1.1 Log files
-           21.12.1.2 Mandrake 9.x
-        21.12.2 Gentoo
-     21.13 Advanced Backend Configurations.
-     21.14 Advanced Partition Formatting.
-        21.14.1 Ext3
-     21.15 I'd like to have more flexible disk storage with LVM.
-        21.15.1 ReiserFS
-        21.15.2 ext2 or ext3
+  16. MythWeather.
+  17. MythVideo.
+  18. MythDVD.
+  19. Troubleshooting.
+     19.1 Illegal Instruction.
+     19.2 mythfilldatabase failing.
+     19.3 MythTV seems to disappear; can't see video.
+     19.4 Fast CPU, choppy or jittery video.
+     19.5 I keep losing all of my settings every time I compile!
+     19.6 Compile errors.
+     19.7 My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.
+     19.8 I can't checkout using CVS anymore!
+     19.9 I get segfaults / MythTV isn't doing anything.
+     19.10 MythTV makes my system crash.
+     19.11 Troubleshooting audio.
+     19.12 I can't see parts of the On Screen Display.
+     19.13 The mythbackend program told me to look at this section.
+     19.14 My remote doesn't work / works sometimes and not others / "ghost" keypresses.
+     19.15 My PVR-250 card doesn't show inputs in the setup screen.
+     19.16 Where's my "canada-cable" entry gone to?
+     19.17 My channels are off by one.
+     19.18 Mythweb is showing a db_open error when I connect to it.
+     19.19 error: can't find a register in class 'BREG' while reloading 'asm'
+     19.20 make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
+     19.21 make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
+     19.22 My mouse pointer disappears when placed over the MythTV windows.
+     19.23 What does "strange error flushing buffer" mean on my console?
+     19.24 I can't change the channel when watching Live TV.
+     19.25 Colors are wrong, people have blue faces.
+     19.26 When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"
+
+  20. Miscellaneous.
+     20.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
+     20.2 I'd like to use some other window manager.
+     20.3 I'd like MythTV to automatically startup.
+     20.4 What capture resolution should I use?  How does video work?
+     20.5 MythTV GUI and X Display Sizes.
+        20.5.1 X Dimensions
+        20.5.2 MythTV Dimensions
+        20.5.3 Overscan Dimensions
+        20.5.4 MythTV on the Desktop
+     20.6 I'd like to save or restore my database.
+     20.7 I'd like to delete the mysql database.
+     20.8 btaudio
+     20.9 Removing unwanted channels.
+     20.10 I'd like to use a hardware MPEG-2 encoder (ie, a PVR-250/350).
+     20.11 I'd like to use NFS.
+     20.12 I'd like to automatically start mythbackend at system boot time.
+        20.12.1 Red Hat And Mandrake
+           20.12.1.1 Log files
+           20.12.1.2 Mandrake 9.x
+        20.12.2 Gentoo
+     20.13 Advanced Backend Configurations.
+     20.14 Advanced Partition Formatting.
+        20.14.1 Ext3
+     20.15 I'd like to have more flexible disk storage with LVM.
+        20.15.1 ReiserFS
+        20.15.2 ext2 or ext3
 
 
   ______________________________________________________________________
@@ -3052,7 +3052,7 @@
 
   [1m12.  MythWeb.[0m
 
-  MythWeb allows you to use a web page to control various aspects of
+  The MythWeb allows you to use a web page to control various aspects of
   your MythTV system.  MythWeb is a separate application, but it's
   dependent on MythTV being installed and operational.
 
@@ -3097,6 +3097,23 @@
 
 
 
+  By default, MythWeb uses the Apache .htaccess file to restrict access
+  to the website.  If you do not wish to use access control, then rename
+  or remove the /var/www/html/mythweb/.htaccess file.
+
+  To create the password file for Apache, you could do something like
+  this:
+
+  # cd /var/www
+  # htpasswd -c htpasswd mythtv
+  New password:
+  Re-type new password:
+  Adding password for user mythtv
+
+
+
+  See the man page for [1mhtaccess [22mfor more examples.
+
   To access the web page, open a web browser and use [1mhttp://[name or ip[0m
   [1maddress]/mythweb/[0m
 
@@ -3104,17 +3121,13 @@
   you will get a 404 Page not Found error.
 
 
-  [1m13.  MythWeb2.[0m
-
-
-
-  [1m14.  MythGallery.[0m
+  [1m13.  MythGallery.[0m
 
   MythGallery is a photo and slideshow application.  MythGallery is a
   separate application, but it's dependent on MythTV being installed and
   operational.
 
-  [1m14.1.  Installation and prerequisites.[0m
+  [1m13.1.  Installation and prerequisites.[0m
 
   Download MythGallery from http://www.mythtv.org/
   <http://www.mythtv.org/> and save it to a location where you can find
@@ -3159,7 +3172,7 @@
      around while in zoom mode, 5 centers and 0 exits zoom.
 
 
-  [1m14.2.  Importing Pictures[0m
+  [1m13.2.  Importing Pictures[0m
 
   The import path in the setup dialog is a colon separated list of
   directories and/or executable files.  When the import key is pressed,
@@ -3212,9 +3225,9 @@
 
 
 
-  [1m15.  MythGame.[0m
+  [1m14.  MythGame.[0m
 
-  [1m16.  MythMusic.[0m
+  [1m15.  MythMusic.[0m
 
   MythMusic has a number of prerequisites that must be satisfied before
   it is operational.  Depending on your distribution, some of these
@@ -3236,7 +3249,7 @@
   +o  CDParanoia
 
 
-  [1m16.1.  Manual installation of prerequisites.[0m
+  [1m15.1.  Manual installation of prerequisites.[0m
 
   These instructions are for distributions which don't have pre-compiled
   versions of the software necessary to run MythTV.
@@ -3277,14 +3290,15 @@
   install:
 
 
-       $ tar -xzf libcdaudio-0.99.9.tar.gz
-       $ cd libcdaudio-0.99.9
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # exit
-       $
+
+  $ tar -xzf libcdaudio-0.99.9.tar.gz
+  $ cd libcdaudio-0.99.9
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # exit
+  $
 
 
 
@@ -3293,22 +3307,21 @@
   alpha9.8.src.tgz>.
 
 
-
-  $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
-  $ cd cdparanoia-III-alpha9.8
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # cd /usr/lib
-  # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
-  # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
-  # exit
-  $
-
+       $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
+       $ cd cdparanoia-III-alpha9.8
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # cd /usr/lib
+       # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
+       # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
+       # exit
+       $
 
 
-  [1m16.2.  Mandrake 9.0[0m
+
+  [1m15.2.  Mandrake 9.0[0m
 
   Mandrake 9.0 has a number of the prerequisites available on the
   installation CD.  Some of the software you're going to need will have
@@ -3337,7 +3350,7 @@
 
 
 
-  [1m16.2.1.  Additional options with MythMusic[0m
+  [1m15.2.1.  Additional options with MythMusic[0m
 
   Additional visualizations have been added to MythMusic.  If you wish
   to use these, there are some prerequisites you must install prior to
@@ -3355,6 +3368,8 @@
 
 
        # urpmi libfftw2 libfftw2-devel
+
+
 
   OpenGL should be installed on practically all distributions.  However,
   you will need the devel module.  In Mandrake 9.1 it may be installed
@@ -3374,7 +3389,7 @@
 
 
 
-  [1m16.3.  Red Hat Linux 9/8.0[0m
+  [1m15.3.  Red Hat Linux 9/8.0[0m
 
   Red Hat provides packages for several of the prerequisites, making
   installation very simple. Of the prerequisites, Red Hat provides
@@ -3400,13 +3415,12 @@
   installation section'' to install all of MythMusic in one step.
 
 
-  [1m16.4.  Compiling MythMusic.[0m
+  [1m15.4.  Compiling MythMusic.[0m
 
   Once all the prerequisites have been installed, you can proceed with
   getting MythMusic going. Make sure that you run ./configure first.  If
   you wish to use the new visualizations, make sure you install the
   prerequisites.  Run ./configure --help for help.
-
 
 
   ______________________________________________________________________
@@ -3433,7 +3447,7 @@
 
 
 
-  [1m16.5.  Configuring MythMusic.[0m
+  [1m15.5.  Configuring MythMusic.[0m
 
   Configuration of MythMusic occurs in two places.  The main
   mythfrontend Setup is for global MythMusic configuration.  Go to the
@@ -3471,8 +3485,7 @@
   track length, just the portion that tries to read ID3 info.
 
 
-
-  [1m16.6.  Using MythMusic.[0m
+  [1m15.6.  Using MythMusic.[0m
 
   MythMusic is fairly simple to use.  It is recommended that you insert
   the CD before selecting "Import CD".  You should also ensure that your
@@ -3534,11 +3547,11 @@
   from the popup.
 
 
-  [1m16.7.  Troubleshooting MythMusic.[0m
+  [1m15.7.  Troubleshooting MythMusic.[0m
 
   You may run into errors when running MythMusic.
 
-  [1m16.7.1.  When I run MythMusic and try and look up a CD, I get an error[0m
+  [1m15.7.1.  When I run MythMusic and try and look up a CD, I get an error[0m
   [1mmessage[0m
 
   The full text of the message will say:
@@ -3570,7 +3583,7 @@
   you use CDs.
 
 
-  [1m17.  MythWeather.[0m
+  [1m16.  MythWeather.[0m
 
   The MythWeather module will obtain the weather information for the
   location that you specify.  You must be running MythTV v0.10 or later
@@ -3641,7 +3654,7 @@
   are mutually exclusive.
 
 
-  [1m18.  MythVideo.[0m
+  [1m17.  MythVideo.[0m
 
   The MythVideo application will allow you to use an external program to
   watch media files that are not directly supported by MythTV.
@@ -3655,8 +3668,6 @@
        # make install
        # exit
 
-
-
   The next step is to create the create the videometadata table in the
   database.  Simply do the following:
 
@@ -3669,13 +3680,13 @@
   See MythVideo's README file for additional information.
 
 
-  [1m19.  MythDVD.[0m
+  [1m18.  MythDVD.[0m
 
 
 
-  [1m20.  Troubleshooting.[0m
+  [1m19.  Troubleshooting.[0m
 
-  [1m20.1.  Illegal Instruction.[0m
+  [1m19.1.  Illegal Instruction.[0m
 
   This error can happen for the following reasons:
 
@@ -3690,7 +3701,7 @@
      this by doing a $ cat /proc/cpuinfo and looking for "sse" in the
      processor flags section.
 
-  [1m20.2.  mythfilldatabase failing.[0m
+  [1m19.2.  mythfilldatabase failing.[0m
 
   If mythfilldatabase suddenly appears to be failing, check to see what
   version of XMLTV you're running.  Versions prior to 0.5.4 need to have
@@ -3702,13 +3713,13 @@
   listings provider, has been making numerous changes to their website
   which negatively impact XMLTV.
 
-  [1m20.3.  MythTV seems to disappear; can't see video.[0m
+  [1m19.3.  MythTV seems to disappear; can't see video.[0m
 
   If you're using Gnome as your window manager, try switching to KDE.
   For Red Hat Linux 8.0 users, edit /etc/sysconfig/desktop and change
   "GNOME" to "KDE".
 
-  [1m20.4.  Fast CPU, choppy or jittery video.[0m
+  [1m19.4.  Fast CPU, choppy or jittery video.[0m
 
   First, you should check that your kernel has been enabled for DMA:
 
@@ -3731,7 +3742,7 @@
   program to check and enable DMA.
 
 
-  # hdparm -d /dev/hd?
+       # hdparm -d /dev/hd?
 
 
 
@@ -3753,13 +3764,13 @@
   your setting will be preserved.
 
 
-  [1m20.5.  I keep losing all of my settings every time I compile![0m
+  [1m19.5.  I keep losing all of my settings every time I compile![0m
 
   MythTV will overwrite any settings in /usr/local/share/mythtv.  If you
   want to make sure that you don't lose your modifications, make a
   directory ~/.mythtv and copy your mysql.txt file to this location.
 
-  [1m20.6.  Compile errors.[0m
+  [1m19.6.  Compile errors.[0m
 
   Some compile errors are worse than others.  If you get an error that
   doesn't abort the compilation, and says something like:
@@ -3780,7 +3791,7 @@
   fixed before MythTV will compile.
 
 
-  [1m20.7.  My screen goes blank, but comes back when I wiggle the mouse or[0m
+  [1m19.7.  My screen goes blank, but comes back when I wiggle the mouse or[0m
   [1muse the keyboard.[0m
 
   This is due to DPMS, the Display Power Management System, which is
@@ -3795,12 +3806,11 @@
   Edit your /etc/X11/XF86Config-4 file, and look for:
 
 
-
-  Section "ServerFlags"
-      #DontZap # disable <Crtl><Alt><BS> (server abort)
-      #DontZoom # disable <Crtl><Alt><KP_+>/<KP_-> (resolution switching)
-      AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
-  EndSection
+       Section "ServerFlags"
+           #DontZap # disable <Crtl><Alt><BS> (server abort)
+           #DontZoom # disable <Crtl><Alt><KP_+>/<KP_-> (resolution switching)
+           AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
+       EndSection
 
 
 
@@ -3849,6 +3859,7 @@
 
   Ensure that there isn't an Option "DPMS" in the Monitor configuration.
 
+
   You can also turn off DPMS from the Command Line, but this will not
   survive a reboot.
 
@@ -3877,7 +3888,7 @@
   off from within the control panel.
 
 
-  [1m20.8.  I can't checkout using CVS anymore![0m
+  [1m19.8.  I can't checkout using CVS anymore![0m
 
   Isaac has changed some things around.  The CVS repository is now known
   as cvs.mythtv.org, rather than www.mythtv.org or mythtv.org and the
@@ -3887,7 +3898,7 @@
   path.
 
 
-  [1m20.9.  I get segfaults / MythTV isn't doing anything.[0m
+  [1m19.9.  I get segfaults / MythTV isn't doing anything.[0m
 
   Without details, the developers will not be able to determine if you
   have discovered a genuine code-bug,  or if the problem is with your
@@ -3909,12 +3920,13 @@
   that you're running with the debugging code, then compile and install.
 
 
-       $ make clean distclean
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # exit
+
+  $ make clean distclean
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # exit
 
 
 
@@ -3967,7 +3979,7 @@
   instructions.
 
 
-  [1m20.10.  MythTV makes my system crash.[0m
+  [1m19.10.  MythTV makes my system crash.[0m
 
   MythTV [4mcan[24m [4mnot[24m crash your system - it is a user-level program.  If
   your system is crashing when you run MythTV, then you have some issue
@@ -3976,7 +3988,7 @@
   perform a CPU intensive task like encoding video.
 
 
-  [1m20.11.  Troubleshooting audio.[0m
+  [1m19.11.  Troubleshooting audio.[0m
 
   By Bruce Markey, mailto:bjm@lvcm.com <mailto:bjm@lvcm.com> [1mNOTE[22m:  the
   following instructions do not apply to PVR-250/350 encoders; the
@@ -4037,7 +4049,8 @@
   application is grabbing a resource, you can use the fuser command:
 
 
-       # fuser -v /dev/dsp
+
+  # fuser -v /dev/dsp
 
 
 
@@ -4050,14 +4063,14 @@
   #0, the second card is #1, etc.
 
 
-  [1m20.12.  I can't see parts of the On Screen Display.[0m
+  [1m19.12.  I can't see parts of the On Screen Display.[0m
 
   If you're a Red Hat 8.0 user, make sure that you've followed the
   instructions which tell you how to modify the Themes makefile.
   ``Link''.
 
 
-  [1m20.13.  The mythbackend program told me to look at this section.[0m
+  [1m19.13.  The mythbackend program told me to look at this section.[0m
 
   mythbackend does a check to see if your sound device is capable of
   full duplex operation.  If it's not, it's most likely that you're
@@ -4078,7 +4091,7 @@
   will need to get btaudio ``operational''.
 
 
-  [1m20.14.  My remote doesn't work / works sometimes and not others /[0m
+  [1m19.14.  My remote doesn't work / works sometimes and not others /[0m
   [1m"ghost" keypresses.[0m
 
   This can be due to a number of factors.  The simplest case is the
@@ -4101,10 +4114,11 @@
 
   +o  fvwm
 
+
   +o  blackbox  (using "Sloppy Focus" and "Focus New Windows")
 
 
-  [1m20.15.  My PVR-250 card doesn't show inputs in the setup screen.[0m
+  [1m19.15.  My PVR-250 card doesn't show inputs in the setup screen.[0m
 
   See message http://lists.snowman.net/pipermail/mythtv-
   users/2003-April/002527.html
@@ -4112,10 +4126,9 @@
   users/2003-April/002527.html>
 
 
+  [1m19.16.  Where's my "canada-cable" entry gone to?[0m
 
-  [1m20.16.  Where's my "canada-cable" entry gone to?[0m
-
-  [1m20.17.  My channels are off by one.[0m
+  [1m19.17.  My channels are off by one.[0m
 
   There is no such thing as "Canada Cable"; Canada uses the same
   frequencies as the United States.  "Canada Cable" was a hack that some
@@ -4129,7 +4142,7 @@
   more information.
 
 
-  [1m20.18.  Mythweb is showing a db_open error when I connect to it.[0m
+  [1m19.18.  Mythweb is showing a db_open error when I connect to it.[0m
 
   Find your php.ini file. Make sure you've got a line in it like this:
 
@@ -4138,7 +4151,7 @@
   Restart apache for it to take effect.
 
 
-  [1m20.19.  error: can't find a register in class 'BREG' while reloading[0m
+  [1m19.19.  error: can't find a register in class 'BREG' while reloading[0m
   [1m'asm'[0m
 
   This is due to the broken Qt that is being distributed by Suse.  To
@@ -4146,7 +4159,7 @@
   you find there and then recompile.
 
 
-  [1m20.20.  make: *** No rule to make target[0m
+  [1m19.20.  make: *** No rule to make target[0m
   [1m/usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.[0m
 
   This error happens when there's a missing link in the
@@ -4172,48 +4185,49 @@
   choice is the better solution.
 
 
-  [1m20.21.  make: *** No rule to make target /mkspecs/default/qmake.conf',[0m
+  [1m19.21.  make: *** No rule to make target /mkspecs/default/qmake.conf',[0m
   [1mneeded by Makefile'.  Stop.[0m
 
   You didn't set your QTDIR.  Re-read the section on ``Setting up
   paths''.
 
-  [1m20.22.  My mouse pointer disappears when placed over the MythTV win-[0m
+
+  [1m19.22.  My mouse pointer disappears when placed over the MythTV win-[0m
   [1mdows.[0m
 
   This is the intended behavior.  The MythTV interface is meant for use
   with a remote control or a keyboard.
 
 
-  [1m20.23.  What does "strange error flushing buffer" mean on my console?[0m
+  [1m19.23.  What does "strange error flushing buffer" mean on my console?[0m
 
   Nothing, really.  It's just lame (the mp3 encoder) complaining for
   some obscure reason.  This seems to be fixed in more recent versions
   of the libmp3lame library.
 
 
-  [1m20.24.  I can't change the channel when watching Live TV.[0m
+  [1m19.24.  I can't change the channel when watching Live TV.[0m
 
   Something's wrong with your program database.  Did mythfilldatabase
   run with no major errors?
 
 
-  [1m20.25.  Colors are wrong, people have blue faces.[0m
+  [1m19.25.  Colors are wrong, people have blue faces.[0m
 
   If you are using the binary nVidia drivers, make sure you're using at
   least version 1.0-2960.
 
 
-  [1m20.26.  When trying to run setup, I get an error like this: "./setup:[0m
+  [1m19.26.  When trying to run setup, I get an error like this: "./setup:[0m
   [1merror while loading shared libraries:"[0m
 
   You didn't add /usr/local/lib to /etc/ld.so.conf.  See the section on
   modifying ``/etc/ld.so.conf''.
 
 
-  [1m21.  Miscellaneous.[0m
+  [1m20.  Miscellaneous.[0m
 
-  [1m21.1.  I'd like to watch the files without using MythTV / I'd like to[0m
+  [1m20.1.  I'd like to watch the files without using MythTV / I'd like to[0m
   [1mconvert the files to some other format.[0m
 
   Matthew Zimmerman has created a patch for MPlayer / Mencoder
@@ -4231,19 +4245,19 @@
   <http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/>.
 
 
-       $ wget http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/mplayer-0.90rc5-mythtv-20030407.diff
+
+  $ wget http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/mplayer-0.90rc5-mythtv-20030407.diff
 
 
 
   Download the source to MPlayer and patch:
 
 
-
-  $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90.tar.bz2
-  $ tar -xjf MPlayer-0.90.tar.bz2
-  $ cp mplayer-0.90rc5-mythtv-20030407.diff MPlayer-0.90
-  $ cd MPlayer-0.90
-  $ patch -p1 < mplayer-0.90rc5-mythtv-20030407.diff
+       $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90.tar.bz2
+       $ tar -xjf MPlayer-0.90.tar.bz2
+       $ cp mplayer-0.90rc5-mythtv-20030407.diff MPlayer-0.90
+       $ cd MPlayer-0.90
+       $ patch -p1 < mplayer-0.90rc5-mythtv-20030407.diff
 
 
 
@@ -4251,14 +4265,14 @@
   compile process.
 
 
-  [1m21.2.  I'd like to use some other window manager.[0m
+  [1m20.2.  I'd like to use some other window manager.[0m
 
   MythTV is not dependent on any particular window manager.  If you wish
   to run a lightweight window manager, the configfiles/ directory has an
   example of a .twmrc and .fvwmrc file you may use.
 
 
-  [1m21.3.  I'd like MythTV to automatically startup.[0m
+  [1m20.3.  I'd like MythTV to automatically startup.[0m
 
   Here's an example submitted to the mythtv-dev list by Pat Pflaum
   mailto:pat@netburp.com <mailto:pat@netburp.com> using fvwm:
@@ -4297,7 +4311,7 @@
   in it.
 
 
-  [1m21.4.  What capture resolution should I use?  How does video work?[0m
+  [1m20.4.  What capture resolution should I use?  How does video work?[0m
 
   While MythTV allows you to set various GUI and capture resolutions,
   not all combinations make sense.
@@ -4358,7 +4372,8 @@
   <http://www.vcdhelp.com/forum/userguides/94382.php>.
 
 
-  [1m21.5.  MythTV GUI and X Display Sizes.[0m
+
+  [1m20.5.  MythTV GUI and X Display Sizes.[0m
 
   MythTV is designed to be run as dedicated full screen TV application
   but can also be run as a desktop application on a computer monitor.
@@ -4367,6 +4382,7 @@
 
   There are three sizes that are important for matching the MythTV GUI
   and full screen TV playback to fit the screen:
+
 
   +o  the X display size
 
@@ -4382,7 +4398,7 @@
   of the X display.
 
 
-  [1m21.5.1.  X Dimensions[0m
+  [1m20.5.1.  X Dimensions[0m
 
   For output to a Television, common resolutions are 640x480, 800x600,
   and some rare devices support 1024x768. Generally, higher resolutions
@@ -4399,7 +4415,7 @@
   configuration file to match the display size then restart X.
 
 
-  [1m21.5.2.  MythTV Dimensions[0m
+  [1m20.5.2.  MythTV Dimensions[0m
 
   In 0.10 and later, from "mythfrontend" go to Setup->Appearance.  The
   default for the height and width is "0" - this will cause MythTV to
@@ -4419,7 +4435,7 @@
   resolutions'' used.
 
 
-  [1m21.5.3.  Overscan Dimensions[0m
+  [1m20.5.3.  Overscan Dimensions[0m
 
   Because picture edges can be ragged and screen edges aren't straight,
   Television is designed to project an image larger than the physical
@@ -4439,7 +4455,7 @@
   size as a normal overscanned TV picture.
 
 
-  [1m21.5.4.  MythTV on the Desktop[0m
+  [1m20.5.4.  MythTV on the Desktop[0m
 
   When using MythTV on a high resolution desktop monitor, set the MythTV
   GUI dimensions to something much smaller than your X display
@@ -4454,7 +4470,7 @@
   will always be resized to normal 4:3 shape.
 
 
-  [1m21.6.  I'd like to save or restore my database.[0m
+  [1m20.6.  I'd like to save or restore my database.[0m
 
   See the [1mmysqldump [22mmanpage for more information.
 
@@ -4478,20 +4494,21 @@
   database for multiple systems'' section for more information.
 
 
-  [1m21.7.  I'd like to delete the mysql database.[0m
+  [1m20.7.  I'd like to delete the mysql database.[0m
 
   [1mNOTE[22m:  Performing this step will remove the entire database.  You will
   lose all of your settings and will need to re-run the mc.sql script to
   setup the database structure before running the setup program.
 
 
-       $ mysql -u root
-       mysql> drop database mythconverg;
-       mysql> quit
+
+  $ mysql -u root
+  mysql> drop database mythconverg;
+  mysql> quit
 
 
 
-  [1m21.8.  btaudio[0m
+  [1m20.8.  btaudio[0m
 
   btaudio allows you to obtain the audio data from your tuner card
   directly over the PCI bus without using a soundcard.  This is useful
@@ -4538,7 +4555,7 @@
   /dev/mixer devices.  Typing $ dmesg will let you know what's going on.
 
 
-  [1m21.9.  Removing unwanted channels.[0m
+  [1m20.9.  Removing unwanted channels.[0m
 
   If [1mmythfilldatabase [22mgrabbed a channel which you do not want to include
   in your TV listings, you can remove the entries from the xmltv config
@@ -4572,7 +4589,7 @@
 
 
 
-  [1m21.10.  I'd like to use a hardware MPEG-2 encoder (ie, a PVR-250/350).[0m
+  [1m20.10.  I'd like to use a hardware MPEG-2 encoder (ie, a PVR-250/350).[0m
 
   [1mNOTE[22m:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS NOT
   GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR IVTV DRIVER
@@ -4676,16 +4693,15 @@
   Check that the card is being recognized on the PCI bus:
 
 
+       $ lspci -v
+       <snip>
 
-  $ lspci -v
-  <snip>
-
-  00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
-  Encoder (rev 01)
-          Subsystem: Hauppauge computer works Inc.: Unknown device 4801
-          Flags: bus master, medium devsel, latency 32, IRQ 11
-          Memory at d0000000 (32-bit, prefetchable) [size=64M]
-          Capabilities: <available only to root>
+       00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
+       Encoder (rev 01)
+               Subsystem: Hauppauge computer works Inc.: Unknown device 4801
+               Flags: bus master, medium devsel, latency 32, IRQ 11
+               Memory at d0000000 (32-bit, prefetchable) [size=64M]
+               Capabilities: <available only to root>
 
 
 
@@ -4736,7 +4752,8 @@
   parameters, add something like the following to your rc.local:
 
 
-       /path/to/ivtv/utils/test_ioctl -c bitrate=4500000,bitrate_peak=6000000
+
+  /path/to/ivtv/utils/test_ioctl -c bitrate=4500000,bitrate_peak=6000000
 
 
 
@@ -4770,7 +4787,7 @@
 
 
 
-  [1m21.11.  I'd like to use NFS.[0m
+  [1m20.11.  I'd like to use NFS.[0m
 
   You may want to use a central server to store your files.
 
@@ -4801,11 +4818,10 @@
   error, and the nfsvers is required for filesizes over 2GB.
 
 
-
-  [1m21.12.  I'd like to automatically start mythbackend at system boot[0m
+  [1m20.12.  I'd like to automatically start mythbackend at system boot[0m
   [1mtime.[0m
 
-  [1m21.12.1.  Red Hat And Mandrake[0m
+  [1m20.12.1.  Red Hat And Mandrake[0m
 
   Here's a method for automatically starting mythbackend submitted by
   Mike Thomson (mailto:linux@m-thomson.net <mailto:linux@m-thomson.net>)
@@ -4851,7 +4867,7 @@
 
 
 
-  [1m21.12.1.1.  Log files[0m
+  [1m20.12.1.1.  Log files[0m
 
   By default, the log file for mythbackend will be written to
   /var/tmp/mythbackend.log. This has been tested and is known to work on
@@ -4862,7 +4878,6 @@
   add your usual MythTV users to that group. If you changed the user
   that starts mythbackend from the default of root you [4mmust[24m perform this
   step.
-
 
   Create the directory /var/log/mythtv and set its permissions as
   follows:
@@ -4879,7 +4894,7 @@
 
 
 
-  [1m21.12.1.2.  Mandrake 9.x[0m
+  [1m20.12.1.2.  Mandrake 9.x[0m
 
   Mandrake adds one more twist in the form of the msec utility, which
   runs regularly and (at the default or any higher security level) sets
@@ -4924,8 +4939,7 @@
   get the results you expect, check that you're not asking msec to add
   missing permissions to the files or directories you created.
 
-
-  [1m21.12.2.  Gentoo[0m
+  [1m20.12.2.  Gentoo[0m
 
   The portage file for MythTV has scripts that will allow you to run
   mythbackend at startup.
@@ -4951,7 +4965,7 @@
 
 
 
-  [1m21.13.  Advanced Backend Configurations.[0m
+  [1m20.13.  Advanced Backend Configurations.[0m
 
   MythTV is flexible in the way that you define multiple backend tuner
   configurations.  The only hard-and-fast rule is that the Master
@@ -5000,12 +5014,12 @@
   is not available.
 
 
-  [1m21.14.  Advanced Partition Formatting.[0m
+  [1m20.14.  Advanced Partition Formatting.[0m
 
   MythTV creates large files.  The partitions that your distribution
   sets up for you may not be optimized for large files.
 
-  [1m21.14.1.  Ext3[0m
+  [1m20.14.1.  Ext3[0m
 
   With Ext3, your biggest gain is that in case of a crash and reboot you
   don't have to wait very long for your partition to be remounted.  With
@@ -5038,7 +5052,7 @@
   [1mman [22mpage for details.
 
 
-  [1m21.15.  I'd like to have more flexible disk storage with LVM.[0m
+  [1m20.15.  I'd like to have more flexible disk storage with LVM.[0m
 
   LVM greatly increases the flexibility you have in managing your
   storage than traditional physical partitions. This section will
@@ -5047,6 +5061,7 @@
   There's lots more that can be done with LVM, so check the LVM HOWTO
   http://tldp.org/HOWTO/lvm-HOWTO/ <http://tldp.org/HOWTO/lvm-HOWTO/>
   document for details.
+
 
   Make sure your kernel configuration includes LVM support or that it's
   available as a module. Today, most vendors include this by default.
@@ -5111,7 +5126,6 @@
   Now create a 5GB volume for mythmusic files if you like:
 
 
-
   # lvcreate --name music --size 5G VGforMyth
   # mkreiserfs /dev/VGforMyth/music
   # mount /dev/VGforMyth/music /var/music
@@ -5146,7 +5160,7 @@
   check that you've got more space.
 
 
-  [1m21.15.1.  ReiserFS[0m
+  [1m20.15.1.  ReiserFS[0m
 
   Make the logical volume used for video bigger:
 
@@ -5162,7 +5176,7 @@
 
 
 
-  [1m21.15.2.  ext2 or ext3[0m
+  [1m20.15.2.  ext2 or ext3[0m
 
   LVM comes with a program called [1me2fsadm[22m.
 
