@@ -23,6 +23,7 @@ Channel::Channel(TVRec *parent, const QString &videodevice)
     curList = 0;
     totalChannels = 0;
     pParent = parent;
+    usingv4l2 = false;
     videomode = VIDEO_MODE_NTSC;
     capchannels = 0;
     currentcapchannel = 0;
@@ -43,6 +44,18 @@ bool Channel::Open(void)
         isopen = true;
     else
          perror(device.ascii());
+
+#ifdef HAVE_V4L2
+    struct v4l2_capability vcap;
+    memset(&vcap, 0, sizeof(vcap));
+    if (ioctl(videofd, VIDIOC_QUERYCAP, &vcap) < 0)
+        usingv4l2 = false;
+    else
+    {
+        if (vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE)
+            usingv4l2 = true;
+    }
+#endif
     return isopen;
 }
 
@@ -60,7 +73,47 @@ void Channel::SetFormat(const QString &format)
 
     if (!isopen)
         return;
-    
+   
+#ifdef HAVE_V4L2
+    if (usingv4l2)
+    {
+        struct v4l2_input vin;
+        memset(&vin, 0, sizeof(vin));
+        vin.index = 0;
+
+        while (ioctl(videofd, VIDIOC_ENUMINPUT, &vin) >= 0)
+        {
+            cout << "Probed: " << device << " - " << vin.name << endl;
+            channelnames[vin.index] = (char *)vin.name;
+            inputChannel[vin.index] = "";
+            inputTuneTo[vin.index] = "";
+            externalChanger[vin.index] = "";
+            vin.index++;
+
+            capchannels = vin.index;
+        }
+
+        if (format == "NTSC")
+            videomode = V4L2_STD_NTSC;
+        else if (format == "PAL")
+            videomode = V4L2_STD_PAL;
+        else if (format == "SECAM")
+            videomode = V4L2_STD_SECAM;
+        else if (format == "PAL-NC")
+            videomode = V4L2_STD_PAL_Nc;
+        else if (format == "PAL-M")
+            videomode = V4L2_STD_PAL_M;
+        else if (format == "PAL-N")
+            videomode = V4L2_STD_PAL_N;
+        else if (format == "NTSC-JP")
+            videomode = V4L2_STD_NTSC_M_JP;
+
+        pParent->RetrieveInputChannels(inputChannel, inputTuneTo, 
+                                       externalChanger);
+        return;
+    }
+#endif
+ 
     int mode = VIDEO_MODE_AUTO;
     struct video_tuner tuner;
 
@@ -182,6 +235,23 @@ bool Channel::TuneTo(const QString &chan, int finetune)
 {
     int i = GetCurrentChannelNum(chan);
     int frequency = curList[i].freq * 16 / 1000 + finetune;
+
+#ifdef HAVE_V4L2
+    if (usingv4l2)
+    {
+        struct v4l2_frequency vf;
+        memset(&vf, 0, sizeof(vf));
+        vf.frequency = frequency;
+
+        if (ioctl(videofd, VIDIOC_S_FREQUENCY, &vf) < 0)
+        {
+            perror("channel set:");
+            return false;
+        }
+        return true;
+    }
+#endif
+
     if (ioctl(videofd, VIDIOCSFREQ, &frequency) == -1)
     {
         perror("channel set:");
@@ -344,14 +414,25 @@ void Channel::SwitchToInput(int newcapchannel, bool setstarting)
     if (newcapchannel == currentcapchannel)
         return;
 
-    struct video_channel set;
-    memset(&set, 0, sizeof(set));
-    ioctl(videofd, VIDIOCGCHAN, &set);
-    set.channel = newcapchannel;
-    set.norm = videomode;
-    if (ioctl(videofd, VIDIOCSCHAN, &set) < 0)
+#ifdef HAVE_V4L2
+    if (usingv4l2)
     {
-        perror("VIDIOCSCHAN: ");
+        if (ioctl(videofd, VIDIOC_S_INPUT, &newcapchannel) < 0)
+            perror("VIDIOC_S_INPUT:");
+    
+        if (ioctl(videofd, VIDIOC_S_STD, &videomode) < 0)
+            perror("VIDIOC_S_STD:");
+    }
+    else
+#endif
+    {
+        struct video_channel set;
+        memset(&set, 0, sizeof(set));
+        ioctl(videofd, VIDIOCGCHAN, &set);
+        set.channel = newcapchannel;
+        set.norm = videomode;
+        if (ioctl(videofd, VIDIOCSCHAN, &set) < 0)
+           perror("VIDIOCSCHAN: ");
     }
 
     currentcapchannel = newcapchannel;

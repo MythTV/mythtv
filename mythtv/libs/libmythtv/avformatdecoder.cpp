@@ -28,6 +28,26 @@ AvFormatDecoder::~AvFormatDecoder()
 
 void AvFormatDecoder::Reset(void)
 {
+    lastapts = 0;
+    lastvpts = 0;
+
+    AVPacketList *pktl = NULL;
+    while (pktl = ic->packet_buffer)
+    {
+        *pkt = pktl->pkt;
+        ic->packet_buffer = pktl->next;
+        av_free(pktl);
+    }
+
+    ic->pb.pos = 0;
+    ic->pb.buf_ptr = ic->pb.buffer;
+    ic->pb.buf_end = ic->pb.buffer;
+
+    for (int i = 0; i < ic->nb_streams; i++)
+    {
+        AVCodecContext *enc = &ic->streams[i]->codec;
+        avcodec_flush_buffers(enc);
+    }
 }
 
 bool AvFormatDecoder::CanHandle(char testbuf[2048], const QString &filename)

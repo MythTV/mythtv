@@ -80,6 +80,8 @@ class Channel
     map<int, QString> inputChannel;
 
     QString channelorder;
+
+    bool usingv4l2;
 };
 
 #endif

@@ -1516,20 +1516,6 @@ static inline int mpeg2_decode_block_intra(MpegEncContext *s,
     return 0;
 }
 
-/* compressed picture size */
-#define PICTURE_BUFFER_SIZE 100000
-
-typedef struct Mpeg1Context {
-    MpegEncContext mpeg_enc_ctx;
-    uint32_t header_state;
-    int start_code; /* current start code */
-    uint8_t buffer[PICTURE_BUFFER_SIZE]; 
-    uint8_t *buf_ptr;
-    int buffer_size;
-    int mpeg_enc_ctx_allocated; /* true if decoding context allocated */
-    int repeat_field; /* true if we must repeat the field */
-} Mpeg1Context;
-
 static int mpeg_decode_init(AVCodecContext *avctx)
 {
     Mpeg1Context *s = avctx->priv_data;

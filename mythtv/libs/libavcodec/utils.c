@@ -566,6 +566,15 @@ void avcodec_flush_buffers(AVCodecContext *avctx)
     
     switch(avctx->codec_id){
     case CODEC_ID_MPEG1VIDEO:
+    {
+        Mpeg1Context *c = avctx->priv_data;
+        c->header_state = 0xff;
+        c->start_code = -1;
+        c->buf_ptr = c->buffer;
+        c->mpeg_enc_ctx.picture_number = 0;
+        c->repeat_field = 0;
+        /* fall through */
+    }
     case CODEC_ID_H263:
     case CODEC_ID_RV10:
     case CODEC_ID_MJPEG:

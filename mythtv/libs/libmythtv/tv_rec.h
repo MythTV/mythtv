@@ -111,7 +111,8 @@ class TVRec
                         QString &channelname, QString &chanid);
 
     void GetDevices(int cardnum, QString &video, QString &vbi, QString &audio,
-                    int &rate, QString &defaultinput, QString &startchannel);
+                    int &rate, QString &defaultinput, QString &startchannel,
+                    QString &type);
 
     void ConnectDB(int cardnum);
     void DisconnectDB(void);
@@ -164,7 +165,7 @@ class TVRec
     ProgramInfo *prevRecording;
     int tvtorecording;
     
-    QString videodev, vbidev, audiodev;
+    QString videodev, vbidev, audiodev, cardtype;
     int audiosamplerate;
 
     bool inoverrecord;

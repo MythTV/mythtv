@@ -20,6 +20,7 @@ using namespace std;
 #include "programinfo.h"
 #include "recorderbase.h"
 #include "NuppelVideoRecorder.h"
+#include "mpegrecorder.h"
 #include "NuppelVideoPlayer.h"
 #include "channel.h"
 #include "commercial_skip.h"
@@ -57,7 +58,7 @@ TVRec::TVRec(int capturecardnum)
     QString inputname, startchannel;
 
     GetDevices(capturecardnum, videodev, vbidev, audiodev, audiosamplerate,
-               inputname, startchannel);
+               inputname, startchannel, cardtype);
 
     channel = new Channel(this, videodev);
     channel->Open();
@@ -435,6 +436,18 @@ void TVRec::SetOption(RecordingProfile &profile, const QString &name)
 
 void TVRec::SetupRecorder(RecordingProfile &profile) 
 {
+    if (cardtype == "MPEG")
+    {
+        nvr = new MpegRecorder();
+        nvr->SetRingBuffer(rbuffer);
+        nvr->SetBaseOption("videodevice", videodev);
+        nvr->SetBaseOption("tvformat", gContext->GetSetting("TVFormat"));
+        nvr->SetBaseOption("vbiformat", gContext->GetSetting("VbiFormat"));
+
+        nvr->Initialize();
+        return;
+    }
+
     nvr = new NuppelVideoRecorder();
 
     nvr->ChangeDeinterlacer(deinterlace_mode);
@@ -888,21 +901,22 @@ void TVRec::DisconnectDB(void)
 
 void TVRec::GetDevices(int cardnum, QString &video, QString &vbi, 
                        QString &audio, int &rate, QString &defaultinput,
-                       QString &startchan)
+                       QString &startchan, QString &type)
 {
     video = "";
     vbi = "";
     audio = "";
     defaultinput = "Television";
     startchan = "3";
+    type = "V4L";
 
     pthread_mutex_lock(&db_lock);
 
     MythContext::KickDatabase(db_conn);
 
     QString thequery = QString("SELECT videodevice,vbidevice,audiodevice,"
-                               "audioratelimit,defaultinput FROM capturecard "
-                               "WHERE cardid = %1;")
+                               "audioratelimit,defaultinput,cardtype "
+                               "FROM capturecard WHERE cardid = %1;")
                               .arg(cardnum);
 
     QSqlQuery query = db_conn->exec(thequery);
@@ -929,6 +943,9 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
         test = query.value(4).toString();
         if (test != QString::null)
             defaultinput = QString::fromUtf8(test);
+        test = query.value(5).toString();
+        if (test != QString::null)
+            type = QString::fromUtf8(test);
 
         if (testnum > 0)
             rate = testnum;
