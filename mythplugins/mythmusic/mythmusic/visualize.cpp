@@ -307,11 +307,15 @@ bool AlbumArt::draw(QPainter *p, const QColor &back)
         if (art.isNull())
             return false;
 
+        QSize artsize = art.scale(size, QImage::ScaleMin).size();
+
         // Paint the image
         p->fillRect(0, 0, size.width(), size.height(), back);
-        p->drawPixmap(0, 0, art.smoothScale(size));
+        p->drawPixmap((size.width() - artsize.width()) / 2,
+                      (size.height() - artsize.height()) / 2,
+                      art.smoothScale(size, QImage::ScaleMin));
         // Store our new size
-        cursize = art.smoothScale(size).size();
+        cursize = size;
         return true;
     }
     art.reset();
