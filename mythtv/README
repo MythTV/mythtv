@@ -118,4 +118,11 @@ Hitting 'M' should pop up the program guide.  Exiting the program guide with
 'Enter' or 'M' will change to the channel it currently was on, exiting with
 'C' will just exit without changing the channel.
 
+NOTE: epg is designed to show up at 800x600, so it's full screen on a TV. 
+      mythtv will just go to fullscreen regardless of the resolution, but it
+      also runs best at 800x600.  Things will look weird at other resolutions.
+
+In the 'configfiles' subdir there are some example lirc config files to get a
+remote working with this stuff.  Just use irxevent and it should all work.
+
 Feel free to send patches to ijr@po.cwru.edu
