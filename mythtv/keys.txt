@@ -72,6 +72,7 @@ Watching TV only:
 - F7/F8 decrease/increase hue
 - O   Turns on 'Browse' mode, allowing user to browse channels and program
       info while watching current show FullScreen.
+- H   Channel history
 
 LiveTV Browse Mode:
 - Left          browse program prior to current listed program.
