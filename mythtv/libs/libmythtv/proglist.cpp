@@ -88,7 +88,6 @@ ProgLister::ProgLister(ProgListType pltype, const QString &view,
     curView = -1;
     fillViewList(view);
 
-    itemList.setAutoDelete(true);
     curItem = -1;
     fillItemList();
 
@@ -260,11 +259,11 @@ void ProgLister::paintEvent(QPaintEvent *e)
 
 void ProgLister::cursorDown(bool page)
 {
-    if (curItem < itemCount - 1)
+    if (curItem < (int)itemList.count() - 1)
     {
         curItem += (page ? listsize : 1);
-        if (curItem > itemCount - 1)
-            curItem = itemCount - 1;
+        if (curItem > (int)itemList.count() - 1)
+            curItem = itemList.count() - 1;
         update(fullRect);
     }
 }
@@ -282,12 +281,12 @@ void ProgLister::cursorUp(bool page)
 
 void ProgLister::prevView(void)
 {
-    if (viewCount < 2)
+    if (viewList.count() < 2)
         return;
 
     curView--;
     if (curView < 0)
-        curView = viewCount - 1;
+        curView = viewList.count() - 1;
 
     curItem = -1;
     refillAll = true;
@@ -295,11 +294,11 @@ void ProgLister::prevView(void)
 
 void ProgLister::nextView(void)
 {
-    if (viewCount < 2)
+    if (viewList.count() < 2)
         return;
 
     curView++;
-    if (curView >= viewCount)
+    if (curView >= (int)viewList.count())
         curView = 0;
 
     curItem = -1;
@@ -449,7 +448,6 @@ void ProgLister::deleteKeyword(void)
     chooseListBox->removeItem(view + 1);
     viewList.remove(text);
     viewTextList.remove(text);
-    viewCount--;
 
     if (view < curView)
         curView--;
@@ -460,7 +458,7 @@ void ProgLister::deleteKeyword(void)
         view = chooseListBox->count() - 2;
 
     chooseListBox->setSelected(view + 1, true);
-    if (viewCount < 1)
+    if (viewList.count() < 1)
         chooseLineEdit->setFocus();
     else
         chooseListBox->setFocus();
@@ -470,7 +468,7 @@ void ProgLister::chooseView(void)
 {
     if (type == plChannel || type == plCategory)
     {
-        if (viewCount < 2)
+        if (viewList.count() < 2)
             return;
 
         choosePopup = new MythPopupBox(gContext->GetMainWindow(), "");
@@ -551,7 +549,7 @@ void ProgLister::chooseView(void)
         connect(chooseDeleteButton, SIGNAL(clicked()), this, SLOT(deleteKeyword()));
         connect(chooseRecordButton, SIGNAL(clicked()), this, SLOT(addSearchRecord()));
 
-        if (viewCount < 1)
+        if (viewList.count() < 1)
             chooseLineEdit->setFocus();
         else
             chooseListBox->setFocus();
@@ -570,7 +568,7 @@ void ProgLister::chooseView(void)
         delete choosePopup;
         choosePopup = NULL;
 
-        if (viewCount < 1 || (oldView < 0 && curView < 0))
+        if (viewList.count() < 1 || (oldView < 0 && curView < 0))
             reject();
         else if (curView < 0)
         {
@@ -615,7 +613,6 @@ void ProgLister::fillViewList(const QString &view)
 {
     viewList.clear();
     viewTextList.clear();
-    viewCount = 0;
 
     if (type == plChannel) // list by channel
     {
@@ -642,7 +639,6 @@ void ProgLister::fillViewList(const QString &view)
 
                 viewList << chanid;
                 viewTextList << chantext;
-                viewCount++;
             }
         }
         if (view != "")
@@ -663,7 +659,6 @@ void ProgLister::fillViewList(const QString &view)
                 category = QString::fromUtf8(query.value(0).toString());
                 viewList << category;
                 viewTextList << category;
-                viewCount++;
             }
         }
         if (view != "")
@@ -687,7 +682,6 @@ void ProgLister::fillViewList(const QString &view)
                 phrase = QString::fromUtf8(query.value(0).toString());
                 viewList << phrase;
                 viewTextList << phrase;
-                viewCount++;
             }
         }
         if (view != "")
@@ -699,7 +693,6 @@ void ProgLister::fillViewList(const QString &view)
     {
         viewList << view;
         viewTextList << view;
-        viewCount++;
         if (view != "")
             curView = 0;
         else
@@ -709,19 +702,15 @@ void ProgLister::fillViewList(const QString &view)
     {
         viewList << "";
         viewTextList << "";
-        viewCount++;
         curView = 0;
     }
 
-    if (curView >= viewCount)
-        curView = viewCount - 1;
+    if (curView >= (int)viewList.count())
+        curView = viewList.count() - 1;
 }
 
 void ProgLister::fillItemList(void)
 {
-    itemList.clear();
-    itemCount = 0;
-
     if (curView < 0)
         return;
 
@@ -730,133 +719,88 @@ void ProgLister::fillItemList(void)
     if (type == plTitle) // per title listings
     {
         where = QString("WHERE channel.visible = 1 "
-                        "AND program.title = \"%1\" "
-                        "AND program.endtime > %2 "
-                        "AND program.chanid = channel.chanid "
-                        "GROUP BY starttime,endtime,channum,callsign "
-                        "ORDER BY program.starttime,%3;")
-                        .arg(viewList[curView].utf8())
+                        "  AND program.endtime > %1 "
+                        "  AND program.title = \"%2\" ")
                         .arg(startTime.toString("yyyyMMddhhmm50"))
-                        .arg(channelOrdering);
+                        .arg(viewList[curView].utf8());
     }
     else if (type == plNewListings) // what's new list
     {
-        where = QString("LEFT JOIN oldprogram ON title=oldtitle "
+        where = QString("LEFT JOIN oldprogram ON "
+                        "  oldprogram.oldtitle = program.title "
                         "WHERE channel.visible = 1 "
-                        "AND oldtitle IS NULL AND program.endtime > %1 "
-                        "AND program.chanid = channel.chanid "
-                        "AND (program.category_type <> 'movie' OR "
-                        "(program.category_type = 'movie' AND "
-                        "program.airdate >= YEAR(NOW() - INTERVAL 2 YEAR))) "
-                        "GROUP BY title ORDER BY starttime LIMIT 500;")
+                        "  AND program.endtime > %1 "
+                        "  AND oldprogram.oldtitle IS NULL "
+                        "  AND ((program.category_type <> 'movie' "
+                        "    AND programid NOT LIKE \"MV\%\") "
+                        "    OR program.airdate >= "
+                        "      YEAR(NOW() - INTERVAL 2 YEAR)) "
+                        "GROUP BY title ")
                         .arg(startTime.toString("yyyyMMddhhmm50"));
     }
     else if (type == plTitleSearch) // keyword search
     {
         where = QString("WHERE channel.visible = 1 "
-                        "AND program.title LIKE \"\%%1\%\" "
-                        "AND program.endtime > %2 "
-                        "AND program.chanid = channel.chanid "
-                        "GROUP BY starttime,endtime,channum,callsign "
-                        "ORDER BY program.starttime,%3 "
-                        "LIMIT 500;")
-                        .arg(viewList[curView].utf8())
+                        "  AND program.endtime > %1 "
+                        "  AND program.title LIKE \"\%%2\%\" ")
                         .arg(startTime.toString("yyyyMMddhhmm50"))
-                        .arg(channelOrdering);
+                        .arg(viewList[curView].utf8());
     }
     else if (type == plKeywordSearch) // keyword search
     {
         where = QString("WHERE channel.visible = 1 "
-                        "AND (program.title LIKE \"\%%1\%\" "
-                        "OR program.subtitle LIKE \"\%%2\%\" "
-                        "OR program.description LIKE \"\%%3\%\") "
-                        "AND program.endtime > %4 "
-                        "AND program.chanid = channel.chanid "
-                        "GROUP BY starttime,endtime,channum,callsign "
-                        "ORDER BY program.starttime,%5 "
-                        "LIMIT 500;")
-                        .arg(viewList[curView].utf8())
-                        .arg(viewList[curView].utf8())
-                        .arg(viewList[curView].utf8())
+                        "  AND program.endtime > %1 "
+                        "  AND (program.title LIKE \"\%%2\%\" "
+                        "    OR program.subtitle LIKE \"\%%3\%\" "
+                        "    OR program.description LIKE \"\%%4\%\") ")
                         .arg(startTime.toString("yyyyMMddhhmm50"))
-                        .arg(channelOrdering);
+                        .arg(viewList[curView].utf8())
+                        .arg(viewList[curView].utf8())
+                        .arg(viewList[curView].utf8());
     }
     else if (type == plPeopleSearch) // people search
     {
-        where = QString(", people, credits "
+        where = QString("LEFT JOIN credits ON credits.chanid = program.chanid "
+                        "  AND credits.starttime = program.starttime "
+                        "LEFT JOIN people ON people.person = credits.person "
                         "WHERE channel.visible = 1 "
-                        "AND people.name LIKE \"\%%1\%\" "
-                        "AND credits.person = people.person "
-                        "AND program.chanid = credits.chanid "
-                        "AND program.starttime = credits.starttime "
-                        "AND channel.chanid = program.chanid "
-                        "AND program.endtime > %2 "
-                        "GROUP BY starttime,endtime,channum,callsign "
-                        "ORDER BY program.starttime,%3 "
-                        "LIMIT 500;")
-                        .arg(viewList[curView].utf8())
+                        "  AND program.endtime > %1 "
+                        "  AND people.name LIKE \"\%%2\%\" ")
                         .arg(startTime.toString("yyyyMMddhhmm50"))
-                        .arg(channelOrdering);
+                        .arg(viewList[curView].utf8());
     }
     else if (type == plChannel) // list by channel
     {
         where = QString("WHERE channel.visible = 1 "
-                        "AND channel.chanid = \"%1\" "
-                        "AND program.endtime > %2 "
-                        "AND program.chanid = channel.chanid "
-                        "ORDER BY program.starttime;")
-                        .arg(viewList[curView])
-                        .arg(startTime.toString("yyyyMMddhhmm50"));
+                        "  AND program.endtime > %1 "
+                        "  AND channel.chanid = \"%2\" ")
+                        .arg(startTime.toString("yyyyMMddhhmm50"))
+                        .arg(viewList[curView]);
     }
     else if (type == plCategory) // list by category
     {
         where = QString("WHERE channel.visible = 1 "
-                        "AND program.category = \"\%1\" "
-                        "AND program.endtime > %2 "
-                        "AND program.chanid = channel.chanid "
-                        "GROUP BY starttime,endtime,channum,callsign "
-                        "ORDER BY program.starttime,%3 "
-                        "LIMIT 500;")
-                        .arg(viewList[curView].utf8())
+                        "  AND program.endtime > %1 "
+                        "  AND program.category = \"\%2\" ")
                         .arg(startTime.toString("yyyyMMddhhmm50"))
-                        .arg(channelOrdering);
+                        .arg(viewList[curView].utf8());
     }
     else if (type == plMovies) // list movies
     {
         where = QString("WHERE channel.visible = 1 "
-                        "AND (program.category_type = 'movie' "
-                        "OR programid LIKE \"MV\%\") "
-                        "AND program.endtime > %1 "
-                        "AND program.chanid = channel.chanid "
-                        "GROUP BY starttime,endtime,channum,callsign "
-                        "ORDER BY program.starttime,%2 "
-                        "LIMIT 500;")
-                        .arg(startTime.toString("yyyyMMddhhmm50"))
-                        .arg(channelOrdering);
+                        "  AND program.endtime > %1 "
+                        "  AND (program.category_type = 'movie' "
+                        "    OR programid LIKE \"MV\%\") ")
+                        .arg(startTime.toString("yyyyMMddhhmm50"));
     }
 
-    ProgramInfo::GetProgramListByQuery(db, &itemList, where);
-    itemCount = itemList.count();
+    schedList.FromScheduler();
+    itemList.FromProgram(db, where, schedList);
 
-    if (curItem < 0 && itemCount > 0)
+    if (curItem < 0 && itemList.count() > 0)
         curItem = 0;
-    else if (curItem >= itemCount)
-        curItem = itemCount - 1;
-
-    vector<ProgramInfo *> recList;
-    RemoteGetAllPendingRecordings(recList);
-
-    ProgramInfo *pi;
-
-    for (pi = itemList.first(); pi; pi = itemList.next())
-        pi->FillInRecordInfo(recList);
-
-    while (!recList.empty())
-    {
-        pi = recList.back();
-        delete pi;
-        recList.pop_back();
-    }
+    else if (curItem >= (int)itemList.count())
+        curItem = itemList.count() - 1;
 }
 
 void ProgLister::updateView(QPainter *p)
@@ -905,19 +849,19 @@ void ProgLister::updateList(QPainter *p)
             ltype->SetActive(true);
 
             int skip;
-            if (itemCount <= listsize || curItem <= listsize / 2)
+            if ((int)itemList.count() <= listsize || curItem <= listsize/2)
                 skip = 0;
-            else if (curItem >= itemCount - listsize + listsize / 2)
-                skip = itemCount - listsize;
+            else if (curItem >= (int)itemList.count() - listsize + listsize/2)
+                skip = itemList.count() - listsize;
             else
                 skip = curItem - listsize / 2;
             ltype->SetUpArrow(skip > 0);
-            ltype->SetDownArrow(skip + listsize < itemCount);
+            ltype->SetDownArrow(skip + listsize < (int)itemList.count());
 
             int i;
             for (i = 0; i < listsize; i++)
             {
-                if (i + skip >= itemCount)
+                if (i + skip >= (int)itemList.count())
                     break;
 
                 ProgramInfo *pi = itemList.at(i+skip);
@@ -950,7 +894,7 @@ void ProgLister::updateList(QPainter *p)
         }
     }
 
-    if (itemCount == 0)
+    if (itemList.count() == 0)
         container = theme->GetSet("noprograms_list");
 
     if (container)

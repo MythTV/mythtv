@@ -18,6 +18,7 @@
 #include "libmyth/uitypes.h"
 #include "libmyth/xmlparse.h"
 #include "libmyth/mythwidgets.h"
+#include "programinfo.h"
 
 class QListView;
 class ProgramInfo;
@@ -29,39 +30,6 @@ void RunProgramFind(bool thread = false, bool ggActive = false);
 
 class ProgFinder : public MythDialog
 {
-    struct showRecord 
-    {
-        QString title;
-        QString subtitle;
-        QString description;
-        QString channelID;
-        QString startDisplay;
-        QString endDisplay;
-        QString channelNum;
-        QString channelCallsign;
-        QString channelName;
-        QString starttime;
-        QString endtime;
-	QDateTime startdatetime;
-	int recording;
-	QString recText;
-        QString seriesid;
-        QString programid;
-    };
-
-    struct recordingRecord 
-    {
-        QString chanid;
-        QDateTime startdatetime;
-        QString title;
-        QString subtitle;
-        QString description;
-        int type;
-        QString chansign;
-        QString seriesid;
-        QString programid;
-    };
-
     Q_OBJECT
   public:
     ProgFinder(MythMainWindow *parent, const char *name = 0, bool gg = false);
@@ -82,6 +50,7 @@ class ProgFinder : public MythDialog
     void pageDown();
     void select();
     void quickRecord();
+    void customEvent(QCustomEvent *e);
 
   protected:
     void paintEvent(QPaintEvent *e);
@@ -107,7 +76,6 @@ class ProgFinder : public MythDialog
     int curSearch;
     int curProgram;
     int curShow;
-    int recordingCount;
     int searchCount;
     int listCount;
     int showCount;
@@ -120,14 +88,12 @@ class ProgFinder : public MythDialog
 
     QTimer *update_Timer;
 
-    showRecord *showData;
-    recordingRecord *curRecordings;
+    ProgramList showData;
+    ProgramList schedList;
 
     TV *m_player;
 
     QString baseDir;
-    QString curDateTime;
-    QString curChannel;
     QString *searchData;
     QString *initData;
     QString *progData;
@@ -140,9 +106,7 @@ class ProgFinder : public MythDialog
     void clearProgramList();
     void clearShowData();
     void selectSearchData();
-    void selectShowData(QString);
-    int checkRecordingStatus(int);
-    void getRecordingInfo();
+    void selectShowData(QString, int);
     void getSearchData(int);
     void getInitialProgramData();
 

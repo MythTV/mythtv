@@ -215,20 +215,20 @@ void ProgramInfo::ToStringList(QStringList &list)
     list << ((programid != "") ? programid : QString(" "));
 }
 
-void ProgramInfo::FromStringList(QStringList &list, int offset)
+bool ProgramInfo::FromStringList(QStringList &list, int offset)
 {
     QStringList::iterator it = list.at(offset);
-    FromStringList(list, it);
+    return FromStringList(list, it);
 }
 
-void ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
+bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
 {
     QStringList::iterator checkit = it;
     checkit += (NUMPROGRAMLINES - 1);
     if (checkit == list.end())
     {
         cerr << "Not enough items in list for ProgramInfo object" << endl;
-        return;
+        return false;
     }
 
     title = *(it++);
@@ -296,6 +296,8 @@ void ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
         seriesid = "";
     if (programid == " ")
         programid = "";
+
+    return true;
 }
 
 void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
@@ -394,129 +396,24 @@ int ProgramInfo::CalculateLength(void)
     return startts.secsTo(endts);
 }
 
-void ProgramInfo::GetProgramListByQuery(QSqlDatabase *db,
-                                        QPtrList<ProgramInfo> *proglist, 
-                                        const QString &where)
-{
-    QString thequery;
-     
-    thequery = QString("SELECT channel.chanid,program.starttime,endtime,title,"
-                       "subtitle,description,category,channel.channum,"
-                       "channel.callsign,channel.name,previouslyshown,"
-                       "channel.commfree,channel.outputfilters,"
-                       "seriesid,programid "
-                       "FROM program,channel ")
-                       + where;
-
-    QSqlQuery query = db->exec(thequery);
-
-    if (query.isActive() && query.numRowsAffected() > 0)
-    {
-        while (query.next())
-        {
-            ProgramInfo *proginfo = new ProgramInfo;
-            proginfo->chanid = query.value(0).toString();
-            proginfo->startts = QDateTime::fromString(query.value(1).toString(),
-                                                      Qt::ISODate);
-            proginfo->endts = QDateTime::fromString(query.value(2).toString(),
-                                                    Qt::ISODate);
-            proginfo->recstartts = proginfo->startts;
-            proginfo->recendts = proginfo->endts;
-            proginfo->title = QString::fromUtf8(query.value(3).toString());
-            proginfo->subtitle = QString::fromUtf8(query.value(4).toString());
-            proginfo->description = 
-                                   QString::fromUtf8(query.value(5).toString());
-            proginfo->category = QString::fromUtf8(query.value(6).toString());
-            proginfo->chanstr = query.value(7).toString();
-            proginfo->chansign = query.value(8).toString();
-            proginfo->channame = query.value(9).toString();
-            proginfo->repeat = query.value(10).toInt();
-            proginfo->chancommfree = query.value(11).toInt();
-            proginfo->chanOutputFilters = query.value(12).toString();
-            proginfo->seriesid = query.value(13).toString();
-            proginfo->programid = query.value(14).toString();
-
-            proginfo->spread = -1;
-
-            proglist->append(proginfo);
-        }
-    }
-}    
-
-void ProgramInfo::GetProgramRangeDateTime(QSqlDatabase *db,
-                                          QPtrList<ProgramInfo> *proglist,
-                                          const QString &channel,
-                                          const QString &ltime,
-                                          const QString &rtime)
-{
-    QString where;
-
-    where = QString("WHERE program.chanid = %1 AND endtime >= %2 AND "
-                    "starttime <= %3 AND program.chanid = channel.chanid "
-                    "ORDER BY starttime;")
-                    .arg(channel).arg(ltime).arg(rtime);
-
-    GetProgramListByQuery(db, proglist, where);
-}
-
-ProgramInfo *ProgramInfo::GetProgramAtDateTime(QSqlDatabase *db,
-                                               const QString &channel, 
-                                               const QString &ltime)
-{ 
-    QString thequery;
-   
-    thequery = QString("SELECT channel.chanid,starttime,endtime,title,subtitle,"
-                       "description,category,channel.channum,channel.callsign, "
-                       "channel.name,previouslyshown,channel.commfree,"
-                       "channel.outputfilters,seriesid,programid "
-                       "FROM program,channel "
-                       "WHERE program.chanid = %1 AND starttime < %2 AND "
-                       "endtime > %3 AND program.chanid = channel.chanid;")
-                       .arg(channel).arg(ltime).arg(ltime);
-
-    QSqlQuery query = db->exec(thequery);
-
-    if (query.isActive() && query.numRowsAffected() > 0)
-    {
-        query.next();
-
-        ProgramInfo *proginfo = new ProgramInfo;
-        proginfo->chanid = query.value(0).toString();
-        proginfo->startts = QDateTime::fromString(query.value(1).toString(),
-                                                  Qt::ISODate);
-        proginfo->endts = QDateTime::fromString(query.value(2).toString(),
-                                                Qt::ISODate);
-        proginfo->recstartts = proginfo->startts;
-        proginfo->recendts = proginfo->endts;
-        proginfo->title = QString::fromUtf8(query.value(3).toString());
-        proginfo->subtitle = QString::fromUtf8(query.value(4).toString());
-        proginfo->description = QString::fromUtf8(query.value(5).toString());
-        proginfo->category = QString::fromUtf8(query.value(6).toString());
-        proginfo->chanstr = query.value(7).toString();
-        proginfo->chansign = query.value(8).toString();
-        proginfo->channame = query.value(9).toString();
-        proginfo->repeat = query.value(10).toInt();
-        proginfo->chancommfree = query.value(11).toInt();
-        proginfo->chanOutputFilters = query.value(12).toString();
-        proginfo->seriesid = query.value(13).toString();
-        proginfo->programid = query.value(14).toString();
-        
-        proginfo->spread = -1;
-
-        return proginfo;
-    }
-
-    return NULL;
-}
-
 ProgramInfo *ProgramInfo::GetProgramAtDateTime(QSqlDatabase *db,
                                                const QString &channel, 
                                                QDateTime &dtime)
 {
-    QString sqltime = dtime.toString("yyyyMMddhhmm");
-    sqltime += "50"; 
+    ProgramList schedList;
+    ProgramList progList;
 
-    return GetProgramAtDateTime(db, channel, sqltime);
+    QString querystr = QString(
+        "WHERE program.chanid = %1 AND starttime < %2 AND "
+        "    endtime > %3 ")
+        .arg(channel)
+        .arg(dtime.toString("yyyyMMddhhmm50"))
+        .arg(dtime.toString("yyyyMMddhhmm50"));
+
+    schedList.FromScheduler();
+    progList.FromProgram(db, querystr, schedList);
+
+    return progList.take(0);
 }
 
 ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
@@ -2220,151 +2117,136 @@ void ProgramInfo::handleNotRecording(QSqlDatabase *db)
     return;
 }
 
-
-PGInfoCon::PGInfoCon()
+bool ProgramList::FromScheduler(bool &hasConflicts)
 {
-    init();
-}
+    clear();
+    hasConflicts = false;
 
-PGInfoCon::~PGInfoCon() 
-{
-    init();
-}
-
-void PGInfoCon::updateAll(const vector<ProgramInfo *> &pginfoList)
-{
-    ProgramInfo *tmp = allData.at(selectedPos);
-    ProgramInfo org;
-
-    if (tmp)
-        org = *tmp;
-    else
-        selectedPos = -1;
-
-    allData.clear();
-    vector<ProgramInfo *>::const_iterator i;
-    for (i = pginfoList.begin(); i != pginfoList.end(); i++)
-        allData.append(*i);
-
-    if (selectedPos >= 0)
+    QStringList slist = QString("QUERY_GETALLPENDING");
+    if (!gContext->SendReceiveStringList(slist) || slist.size() < 2)
     {
-        tmp = allData.at(selectedPos);
-        if (tmp && tmp->MakeUniqueKey() == org.MakeUniqueKey())
-            ;
+        cerr << "error querying master in ProgramList::FromScheduler" << endl;
+        return false;
+    }
+
+    hasConflicts = slist[0].toInt();
+
+    bool result = true;
+    QStringList::Iterator sit = slist.at(2);
+
+    while (result && sit != slist.end())
+    {
+        ProgramInfo *p = new ProgramInfo();
+        result = p->FromStringList(slist, sit);
+        if (result)
+            append(p);
         else
+            delete p;
+    }
+
+    if (count() != slist[1].toUInt())
+    {
+        cerr << "length mismatch in ProgramList::FromScheduler" << endl;
+        result = false;
+    }
+
+    return result;
+}
+
+bool ProgramList::FromProgram(QSqlDatabase *db, const QString sql,
+                              ProgramList &schedList)
+{
+    clear();
+
+    QString querystr = QString(
+        "SELECT program.chanid, program.starttime, program.endtime, "
+        "    program.title, program.subtitle, program.description, "
+        "    program.category, channel.channum, channel.callsign, "
+        "    channel.name, program.previouslyshown, channel.commfree, "
+        "    channel.outputfilters, program.seriesid, program.programid "
+        "FROM program "
+        "LEFT JOIN channel ON program.chanid = channel.chanid "
+        "%1 ").arg(sql);
+    if (!sql.contains(" GROUP BY "))
+        querystr += "GROUP BY program.starttime, channel.channum, "
+            "  channel.callsign ";
+    if (!sql.contains(" ORDER BY "))
+        querystr += QString("ORDER BY program.starttime, %2 ")
+            .arg(gContext->GetSetting("ChannelOrdering", "channum+0"));
+    if (!sql.contains(" LIMIT "))
+        querystr += "LIMIT 1000 ";
+
+    QSqlQuery query = db->exec(querystr);
+    if (!query.isActive())
+    {
+        MythContext::DBError("ProgramList::FromProgram", querystr);
+        return false;
+    }
+
+    while (query.next())
+    {
+        ProgramInfo *p = new ProgramInfo;
+        p->chanid = query.value(0).toString();
+        p->startts = QDateTime::fromString(query.value(1).toString(),
+                                           Qt::ISODate);
+        p->endts = QDateTime::fromString(query.value(2).toString(),
+                                         Qt::ISODate);
+        p->recstartts = p->startts;
+        p->recendts = p->endts;
+        p->title = QString::fromUtf8(query.value(3).toString());
+        p->subtitle = QString::fromUtf8(query.value(4).toString());
+        p->description = QString::fromUtf8(query.value(5).toString());
+        p->category = QString::fromUtf8(query.value(6).toString());
+        p->chanstr = query.value(7).toString();
+        p->chansign = query.value(8).toString();
+        p->channame = query.value(9).toString();
+        p->repeat = query.value(10).toInt();
+        p->chancommfree = query.value(11).toInt();
+        p->chanOutputFilters = query.value(12).toString();
+        p->seriesid = query.value(13).toString();
+        p->programid = query.value(14).toString();
+
+        ProgramInfo *s;
+        for (s = schedList.first(); s; s = schedList.next())
         {
-            tmp = find(org);
-            if (!tmp)
-                tmp = findNearest(org);
-
-            if (tmp)
-                selectedPos = allData.find(tmp);
+            if (p->IsSameTimeslot(*s))
+            {
+                p->recordid = s->recordid;
+                p->recstatus = s->recstatus;
+                p->rectype = s->rectype;
+                p->recstartts = s->recstartts;
+                p->recendts = s->recendts;
+                p->cardid = s->cardid;
+                p->inputid = s->inputid;
+                p->dupin = s->dupin;
+                p->dupmethod = s->dupmethod;
+            }
         }
+
+        append(p);
     }
 
-    checkSetIndex();
+    return true;
 }
 
-bool PGInfoCon::update(const ProgramInfo &pginfo)
+bool ProgramList::FromRecorded(QSqlDatabase *db, const QString sql,
+                               ProgramList &schedList)
 {
-    ProgramInfo *oldpginfo = find(pginfo);
-
-    if (oldpginfo)
-    {
-        *oldpginfo = pginfo;
-        return true;
-    }    
-
-    return false;    
+    clear();
+    return false;
 }
 
-int PGInfoCon::count()
+bool ProgramList::FromRecord(QSqlDatabase *db, const QString sql)
 {
-    return allData.count();
+    clear();
+    return false;
 }
 
-void PGInfoCon::clear()
+int ProgramList::compareItems(ProgramInfo *p1, ProgramInfo *p2)
 {
-    init();
+    if (compareFunc)
+        return compareFunc(p1, p2);
+    else
+        return 0;
 }
-
-PGInfoCon::PGInfoConIt PGInfoCon::iterator()
-{
-    PGInfoConIt it(allData);
-    return it;
-}
-
-int PGInfoCon::selectedIndex()
-{
-    return selectedPos;
-}
-
-void PGInfoCon::setSelected(int delta)
-{
-    selectedPos += delta;
-    checkSetIndex();        
-}
-
-bool PGInfoCon::getSelected(ProgramInfo &pginfo)
-{
-    ProgramInfo *current = allData.at(selectedPos);
-    if (current)
-    {
-        pginfo = *current;
-        return true;
-    }    
-
-    return false;    
-}
-
-void PGInfoCon::init()
-{
-    selectedPos = -1;
-    allData.setAutoDelete(true);
-    allData.clear();
-}
-
-void PGInfoCon::checkSetIndex()
-{
-    if (selectedPos < 0)
-        selectedPos = 0;
-    else if (selectedPos > count() - 1)
-        selectedPos = count() - 1;
-
-    if (count() == 0)
-        selectedPos = -1;
-}
-
-ProgramInfo *PGInfoCon::find(const ProgramInfo &pginfo)
-{
-    QString key(pginfo.MakeUniqueKey());
-    return findFromKey(key);
-}
-
-ProgramInfo *PGInfoCon::findFromKey(const QString &key)
-{
-    if (key == "")
-        return NULL;
-
-    ProgramInfo *pginfo;
-    for (PGInfoConIt it(allData); (pginfo = it.current()) != 0; ++it)
-    {
-        if (pginfo->MakeUniqueKey() == key)
-            return pginfo;
-    }        
-
-    return NULL;                
-}
-
-ProgramInfo *PGInfoCon::findNearest(const ProgramInfo &pginfo)
-{
-    ProgramInfo *tmppginfo;
-    for (PGInfoConIt it(allData); (tmppginfo = it.current()) != 0; ++it)
-    {
-        if (tmppginfo->recstartts >= pginfo.recstartts)
-            return tmppginfo;
-    }
-    return allData.last();
-}
-
 

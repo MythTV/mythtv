@@ -276,16 +276,14 @@ bool Scheduler::FillRecordLists(void)
 
 void Scheduler::FillRecordListFromMaster(void)
 {
-    vector<ProgramInfo *> remotelist;
-
-    RemoteGetAllPendingRecordings(remotelist);
-
-    vector<ProgramInfo *>::iterator pgiter = remotelist.begin();
+    ProgramList schedList(false);
+    schedList.FromScheduler();
 
     QMutexLocker lockit(reclist_lock);
 
-    for (; pgiter != remotelist.end(); pgiter++)
-        reclist.push_back(*pgiter);
+    ProgramInfo *p;
+    for (p = schedList.first(); p; p = schedList.next())
+        reclist.push_back(p);
 }
 
 void Scheduler::PrintList(bool onlyFutureRecordings)

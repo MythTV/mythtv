@@ -241,7 +241,7 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
 
     //int fillchannels = clock.elapsed();
     //clock.restart();
-    fillRecordInfos();
+    m_recList.FromScheduler();
     fillProgramInfos();
     //int fillprogs = clock.elapsed();
 
@@ -277,13 +277,6 @@ GuideGrid::~GuideGrid()
     }
 
     m_channelInfos.clear();
-
-    while (!m_recList.empty())
-    {
-        ProgramInfo *p = m_recList.back();
-        delete p;
-        m_recList.pop_back();
-    }
 
     delete theme;
 }
@@ -630,18 +623,6 @@ void GuideGrid::fillTimeInfos()
     m_currentEndTime = t;
 }
 
-void GuideGrid::fillRecordInfos(void)
-{
-    while (!m_recList.empty())
-    {
-        ProgramInfo *p = m_recList.back();
-        delete p;
-        m_recList.pop_back();
-    }
-
-    RemoteGetAllPendingRecordings(m_recList);
-}
-
 void GuideGrid::fillProgramInfos(void)
 {
     LayerSet *container = NULL;
@@ -676,7 +657,7 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
     if (type)
         type->ResetRow(row);
  
-    QPtrList<ProgramInfo> *proglist;
+    ProgramList *proglist;
     ProgramInfo *program;
     ProgramInfo *proginfo = NULL;
 
@@ -695,32 +676,16 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
     if (chanNum < 0)
         chanNum = 0;
 
-    m_programs[row] = proglist = new QPtrList<ProgramInfo>;
-    m_programs[row]->setAutoDelete(true);
+    m_programs[row] = proglist = new ProgramList();
 
-    QString chanid = QString("%1").arg(m_channelInfos[chanNum].chanid);
+    QString querystr = QString(
+        "WHERE program.chanid = %1 AND program.endtime >= %2 "
+        "    AND program.starttime <= %3 ")
+        .arg(m_channelInfos[chanNum].chanid)
+        .arg(m_currentStartTime.toString("yyyyMMddhhmm00"))
+        .arg(m_currentEndTime.toString("yyyyMMddhhmm00"));
 
-    char temp[16];
-    sprintf(temp, "%4d%02d%02d%02d%02d00",
-            m_currentStartTime.date().year(),
-            m_currentStartTime.date().month(),
-            m_currentStartTime.date().day(),
-            m_currentStartTime.time().hour(),
-            m_currentStartTime.time().minute());
-    QString starttime = temp;
-    sprintf(temp, "%4d%02d%02d%02d%02d00",
-            m_currentEndTime.date().year(),
-            m_currentEndTime.date().month(),
-            m_currentEndTime.date().day(),
-            m_currentEndTime.time().hour(),
-            m_currentEndTime.time().minute());
-    QString endtime = temp;
-
-    ProgramInfo::GetProgramRangeDateTime(m_db, proglist, chanid, starttime, 
-                                         endtime);
-
-    for (program = proglist->first(); program; program = proglist->next())
-            program->FillInRecordInfo(m_recList);
+    proglist->FromProgram(m_db, querystr, m_recList);
 
     QDateTime ts = m_currentStartTime;
 
@@ -901,7 +866,7 @@ void GuideGrid::customEvent(QCustomEvent *e)
 
         if (message == "SCHEDULE_CHANGE")
         {
-            fillRecordInfos();
+            m_recList.FromScheduler();
             fillProgramInfos();
             update(fullRect);
         }
@@ -1191,7 +1156,7 @@ void GuideGrid::generateListings()
     if (DISPLAY_CHANS > maxchannel)
         DISPLAY_CHANS = maxchannel;
 
-    fillRecordInfos();
+    m_recList.FromScheduler();
     fillProgramInfos();
     update(fullRect);
 }
@@ -1398,16 +1363,6 @@ void GuideGrid::scrollDown()
 {
     setStartChannel(m_currentStartChannel + 1);
 
-    QPtrList<ProgramInfo> *proglist = m_programs[0];
-    for (int y = 0; y < DISPLAY_CHANS - 1; y++)
-    {
-        m_programs[y] = m_programs[y + 1];
-        for (int x = 0; x < DISPLAY_TIMES; x++)
-        {
-            m_programInfos[y][x] = m_programInfos[y + 1][x];
-        }
-    } 
-    m_programs[DISPLAY_CHANS - 1] = proglist;
     fillProgramInfos();
 
     repaint(programRect, false);
@@ -1419,16 +1374,6 @@ void GuideGrid::scrollUp()
 {
     setStartChannel((int)(m_currentStartChannel) - 1);
 
-    QPtrList<ProgramInfo> *proglist = m_programs[DISPLAY_CHANS - 1];
-    for (int y = DISPLAY_CHANS - 1; y > 0; y--)
-    {
-        m_programs[y] = m_programs[y - 1];
-        for (int x = 0; x < DISPLAY_TIMES; x++)
-        {
-            m_programInfos[y][x] = m_programInfos[y - 1][x];
-        }
-    } 
-    m_programs[0] = proglist;
     fillProgramInfos();
 
     repaint(programRect, false);
@@ -1583,7 +1528,7 @@ void GuideGrid::quickRecord()
 
     pginfo->ToggleRecord(m_db);
 
-    fillRecordInfos();
+    m_recList.FromScheduler();
     fillProgramInfos();
     repaint(programRect, false);
     repaint(infoRect, false);
@@ -1611,7 +1556,7 @@ void GuideGrid::editRecording()
     setActiveWindow();
     setFocus();
 
-    fillRecordInfos();
+    m_recList.FromScheduler();
     fillProgramInfos();
     repaint(fullRect, false);
 }
@@ -1638,7 +1583,7 @@ void GuideGrid::editScheduled()
     setActiveWindow();
     setFocus();
 
-    fillRecordInfos();
+    m_recList.FromScheduler();
     fillProgramInfos();
     repaint(fullRect, false);
 }

@@ -137,8 +137,8 @@ class ProgramInfo
     int CalculateLength(void);
 
     void ToStringList(QStringList &list);
-    void FromStringList(QStringList &list, int offset);
-    void FromStringList(QStringList &list, QStringList::iterator &it);
+    bool FromStringList(QStringList &list, int offset);
+    bool FromStringList(QStringList &list, QStringList::iterator &it);
     void ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap);
 
     void SetBookmark(long long pos, QSqlDatabase *db);
@@ -193,17 +193,6 @@ class ProgramInfo
 
     int getProgramFlags(QSqlDatabase *db);
 
-    static void GetProgramListByQuery(QSqlDatabase *db,
-                                        QPtrList<ProgramInfo> *proglist,
-                                        const QString &where);
-    static void GetProgramRangeDateTime(QSqlDatabase *db,
-                                        QPtrList<ProgramInfo> *proglist, 
-                                        const QString &channel, 
-                                        const QString &ltime, 
-                                        const QString &rtime);
-    static ProgramInfo *GetProgramAtDateTime(QSqlDatabase *db, 
-                                             const QString &channel, 
-                                             const QString &time);
     static ProgramInfo *GetProgramAtDateTime(QSqlDatabase *db,
                                              const QString &channel, 
                                              QDateTime &dtime);
@@ -279,33 +268,52 @@ private:
     class ScheduledRecording* record;
 };
 
-class PGInfoCon
-{
-  public:
-    PGInfoCon();
-    ~PGInfoCon();
-    
-    typedef QPtrListIterator<ProgramInfo> PGInfoConIt;
-    
-    void updateAll(const vector<ProgramInfo *> &pginfoList);
-    bool update(const ProgramInfo &pginfo);
-    int count();
-    void clear();
-   
-    int selectedIndex();
-    void setSelected(int delta = 1);
-    bool getSelected(ProgramInfo &pginfo);
-    
-    PGInfoConIt iterator();
-  private:
-    void init();
-    void checkSetIndex();
-    ProgramInfo *find(const ProgramInfo &pginfo);
-    ProgramInfo *findFromKey(const QString &key);
-    ProgramInfo *findNearest(const ProgramInfo &pginfo);
-     
-    QPtrList<ProgramInfo> allData;
-    int selectedPos;
+class ProgramList: public QPtrList<ProgramInfo> {
+ public:
+    ProgramList(bool autoDelete = true) {
+        setAutoDelete(autoDelete);
+        compareFunc = NULL;
+    };
+    ~ProgramList(void) { };
+
+    ProgramInfo * operator[](uint index) {
+        return at(index);
+    };
+
+    bool FromScheduler(bool &hasConflicts);
+    bool FromScheduler(void) {
+        bool dummyConflicts;
+        return FromScheduler(dummyConflicts);
+    };
+
+    bool FromProgram(QSqlDatabase *db, const QString sql,
+                     ProgramList &schedList);
+    bool FromProgram(QSqlDatabase *db, const QString sql) {
+        ProgramList dummySched;
+        return FromProgram(db, sql, dummySched);
+    }
+
+    bool FromRecorded(QSqlDatabase *db, const QString sql,
+                      ProgramList &schedList);
+    bool FromRecorded(QSqlDatabase *db, const QString sql) {
+        ProgramList dummySched;
+        return FromRecorded(db, sql, dummySched);
+    }
+
+    bool FromRecord(QSqlDatabase *db, const QString sql);
+
+    typedef int (*CompareFunc)(ProgramInfo *p1, ProgramInfo *p2);
+    void Sort(CompareFunc func) {
+        compareFunc = func;
+        sort();
+    };
+
+ protected:
+    virtual int compareItems(ProgramInfo *p1, ProgramInfo *p2);
+
+ private:
+    CompareFunc compareFunc;
 };
 
 #endif
+

@@ -1521,12 +1521,8 @@
         <area>13,62,500,27</area>
        <font>info</font>
       </textarea>
-      <textarea name="channelnum" draworder="6" align="center">
-        <area>500,60,250,40</area>
-        <font>channel</font>
-      </textarea>
-      <textarea name="channelname" draworder="6" align="center">
-        <area>500,95,250,40</area>
+      <textarea name="channel" draworder="6" align="center">
+        <area>500,80,250,40</area>
         <font>channel</font>
       </textarea>
       <textarea name="description" draworder="6">
@@ -1534,7 +1530,7 @@
         <font>info</font>
         <multiline>yes</multiline>
       </textarea>
-      <textarea name="recordingstatus" draworder="6">
+      <textarea name="rec_str" draworder="6">
         <area>13,185,500,27</area>
         <font>recinfo</font>
       </textarea>

@@ -70,7 +70,8 @@ class ViewScheduled : public MythDialog
 
     bool showAll;
 
-    PGInfoCon recList;
+    int listPos;
+    ProgramList recList;
 };
 
 #endif

@@ -117,7 +117,6 @@ void ProgFinder::Initialize(void)
 
     inSearch = 0;
     pastInitial = false;
-    recordingCount = 0;
 
     initData = new QString[(int)(searchCount*showsPerListing)];
     gotInitData = new int[searchCount];
@@ -134,16 +133,17 @@ void ProgFinder::Initialize(void)
     update_Timer->start((int)(100));
 
     setNoErase();
+    gContext->addListener(this);
 
     showInfo = false;
 }
 
 ProgFinder::~ProgFinder()
 {
+    gContext->removeListener(this);
+
     if (inSearch > 0)
         delete [] progData;
-    if (inSearch == 2)
-            delete [] showData;
     delete [] searchData;
     delete [] initData;
 
@@ -328,79 +328,27 @@ void ProgFinder::updateInfo(QPainter *p)
     }
     else if (inSearch == 2)
     {
-        QString title = "";
-        QString subtitle = "";
-        QString timedate = "";
-        QString description = "";
-        QString channum = "";
-        QString channame = "";
-        QString recording = "";
-        QString seriesid = "";
-        QString programid = "";
-
-        if (channelFormat.contains("<num>"))
-            channum = showData[curShow].channelNum;
-        if (channelFormat.contains("<sign>"))
-            channame = showData[curShow].channelCallsign;
-        else if (channelFormat.contains("<name>"))
-            channame = showData[curShow].channelName;
-        title = progData[curProgram];
-        timedate = showData[curShow].startDisplay + " - " +
-                   showData[curShow].endDisplay;
-        if (showData[curShow].subtitle.stripWhiteSpace().length() > 0)
-            subtitle = "\"" + showData[curShow].subtitle + "\"";
-        else
-            subtitle = "";
-        description = showData[curShow].description;
-        recording = showData[curShow].recText;
-        seriesid = showData[curShow].seriesid;
-        programid = showData[curShow].programid;
-
-        if (gotInitData[curSearch] == 1)
-        {
-            title = tr("No Programs");
-            description = tr("There are no available programs under this "
-                             "search. Please select another search.");
-        }
-
         container = theme->GetSet("program_info");
         if (container)
         {
-            UITextType *type = (UITextType *)container->GetType("title");
-            if (type)
-                type->SetText(title);
-
-            type = (UITextType *)container->GetType("subtitle");
-            if (type)
-                type->SetText(subtitle);
-
-            type = (UITextType *)container->GetType("timedate");
-            if (type)
-                type->SetText(timedate);
-
-            type = (UITextType *)container->GetType("description");
-            if (type)
-                type->SetText(description);
-
-            type = (UITextType *)container->GetType("channelnum");
-            if (type)
-                type->SetText(channum);
-
-            type = (UITextType *)container->GetType("channelname");
-            if (type)
-                type->SetText(channame);
-
-            type = (UITextType *)container->GetType("recordingstatus");
-            if (type)
-                type->SetText(recording);
-
-            type = (UITextType *)container->GetType("seriesid");
-            if (type)
-                type->SetText(seriesid);
-
-            type = (UITextType *)container->GetType("programid");
-            if (type)
-                type->SetText(programid);
+            container->ClearAllText();
+            if (gotInitData[curSearch] == 1)
+            {
+                UITextType *type = (UITextType *)container->GetType("title");
+                if (type)
+                    type->SetText(tr("No Programs"));
+                type = (UITextType *)container->GetType("description");
+                if (type)
+                    type->SetText(tr("There are no available programs under "
+                                     "this search. Please select another "
+                                     "search."));
+            }
+            else
+            {
+                QMap<QString, QString> infoMap;
+                showData[curShow]->ToMap(m_db, infoMap);
+                container->SetText(infoMap);
+            }
         }
     }
 
@@ -479,90 +427,25 @@ void ProgFinder::parseContainer(QDomElement &element)
 
 void ProgFinder::getInfo(bool toggle)
 {
-    int rectype = 0;
-    QString data = "";
     if (inSearch == 2)
     {
         showInfo = 1;
-        ProgramInfo *curPick = ProgramInfo::GetProgramAtDateTime(m_db,
-                                                                 curChannel,
-                                                            curDateTime + "50");
+        ProgramInfo *curPick = showData[curShow];
 
         if (curPick)
         {
             if (toggle)
-            {
                 curPick->ToggleRecord(m_db);
-            }
             else
-            {
-                if ((gContext->GetNumSetting("AdvancedRecord", 0)) ||
-                    (curPick->GetProgramRecordingStatus(m_db) > kAllRecord))
-                {
-                    ScheduledRecording record;
-                    record.loadByProgram(m_db, curPick);
-                    record.exec(m_db);
-                }
-                else
-                {
-                    InfoDialog diag(curPick, gContext->GetMainWindow(),
-                                    "Program Info");
-                    diag.exec();
-                }
-            }
+                curPick->EditRecording(m_db);
         }
         else
             return;
 
         showInfo = 0;
 
-        curPick->GetProgramRecordingStatus(m_db);
+        selectShowData(curPick->title, curShow);
 
-        getRecordingInfo();
-
-        for (int i = 0; i < showCount; i++)
-        {
-            rectype = checkRecordingStatus(i);
-            showData[i].recording = rectype;
-
-            switch (rectype)
-            {
-                case kSingleRecord:
-                    data = tr("Recording just this showing");
-                    break;
-                case kOverrideRecord:
-                    data = tr("Recording this showing with override options");
-                    break;
-                case kFindOneRecord:
-                    data = tr("Recording one showing of this program");
-                    break;
-                case kTimeslotRecord:
-                    data = tr("Recording every day when shown in this timeslot");
-                    break;
-                case kWeekslotRecord:
-                    data = tr("Recording every week when shown in this timeslot");
-                    break;
-                case kChannelRecord:
-                    data = tr("Recording when shown on this channel");
-                    break;
-                case kAllRecord:
-                    data = tr("Recording all showings");
-                    break;
-                case kDontRecord:
-                    data = tr("Manually not recording this showing");
-                    break;
-                case kNotRecording:
-                    data = tr("Not recording this showing");
-                    break;
-                default:
-                    data = tr("Error!");
-                    break;
-            }
-
-            showData[i].recText = data;
-        }
-
-        showShowingList();
         setActiveWindow();
         setFocus();
     }
@@ -650,7 +533,7 @@ void ProgFinder::cursorRight()
         if (inSearch == 2)
         {
             if (gotInitData[curSearch] > 10)
-                selectShowData(progData[curProgram]);
+                selectShowData(progData[curProgram], 0);
             else
                 inSearch = 1;
         }
@@ -769,7 +652,7 @@ void ProgFinder::cursorUp()
         if (curShow == -1)
         {
             curShow = showCount - 1;
-            while (showData[curShow].title == "**!0")
+            while (!showData[curShow])
                 curShow--;
         }
 
@@ -814,7 +697,7 @@ void ProgFinder::cursorDown()
         if ((curShow + 1) >= showCount)
             curShow = -1;
 
-        if (showData[curShow + 1].title != "**!0")
+        if (showData[curShow + 1])
         {
             curShow++;
             if (curShow == showCount)
@@ -981,30 +864,22 @@ void ProgFinder::showShowingList()
                     if (i >= showCount)
                         t = i - showCount;
 
-                    if ((&showData[t]) != NULL)
+                    if (showData[t])
                     {
-                        if (showData[t].title != "**!0")
-                        {
-                            ltype->SetItemText(curLabel, " " +
-                                               showData[t].startDisplay);
+                        ltype->SetItemText(curLabel, " "
+                            + showData[t]->startts.toString(dateFormat)
+                            + " " + showData[t]->startts.toString(timeFormat));
 
-                            if (showData[t].recording > 0)
-                                ltype->EnableForcedFont(curLabel, "recording");
+                        if (showData[t]->recstatus <= rsWillRecord)
+                            ltype->EnableForcedFont(curLabel, "recording");
 
-                        }
-                        else
-                            ltype->SetItemText(curLabel, "");
                     }
                     else
-                    {
                         ltype->SetItemText(curLabel, "");
-                    }
                     curLabel++;
                 }
             }
         }
-        curChannel = showData[curShow].channelID;
-        curDateTime = showData[curShow].starttime;
     }
     update(infoRect);
     update(listRect);
@@ -1095,10 +970,10 @@ void ProgFinder::clearProgramList()
         {
             UIListType *ltype = (UIListType *)container->GetType("shows");
             if (ltype)
+            {
                 for (int i = 0; i < showsPerListing; i++)
-                {
                     ltype->SetItemText(i, "");
-                }
+            }
         }
 
         for (int j = 0; j < searchCount; j++)
@@ -1128,7 +1003,7 @@ void ProgFinder::clearProgramList()
 
 void ProgFinder::clearShowData()
 {
-    delete [] showData;
+    showData.clear();
 
     LayerSet *container = theme->GetSet("selector");
     if (container)
@@ -1137,274 +1012,41 @@ void ProgFinder::clearShowData()
         if (ltype)
         {
             for (int i = 0; i < showsPerListing; i++)
-            {
                 ltype->SetItemText(i, "");
-            }
         }
     }
     update(infoRect);
 }
 
-int ProgFinder::checkRecordingStatus(int showNum)
-{
-    for (int j = 0; j < recordingCount; j++)
-    {
-        if (showData[showNum].title == curRecordings[j].title)
-        {
-            if (showData[showNum].subtitle == curRecordings[j].subtitle &&
-                showData[showNum].description == curRecordings[j].description)
-            {
-                if (curRecordings[j].type == kSingleRecord ||
-                    curRecordings[j].type == kOverrideRecord ||
-                    curRecordings[j].type == kDontRecord)
-                {
-                    if (showData[showNum].startdatetime ==
-                        curRecordings[j].startdatetime)
-                    {
-                        return curRecordings[j].type;
-                    }
-                }
-            }
-            if (curRecordings[j].type == kTimeslotRecord)
-            {
-                if ((showData[showNum].startdatetime).time() ==
-                     (curRecordings[j].startdatetime).time()
-                    && (showData[showNum].channelID == curRecordings[j].chanid
-                      || (showData[showNum].channelCallsign != ""
-                         && showData[showNum].channelCallsign ==
-                            curRecordings[j].chansign)))
-                {
-                    return curRecordings[j].type;
-                }
-            }
-            if (curRecordings[j].type == kWeekslotRecord)
-            {
-                if ((showData[showNum].startdatetime).time() ==
-                     (curRecordings[j].startdatetime).time()
-                    && (showData[showNum].startdatetime).toString("dddd") ==
-                     (curRecordings[j].startdatetime).toString("dddd")
-                    && (showData[showNum].channelID == curRecordings[j].chanid
-                      || (showData[showNum].channelCallsign != ""
-                         && showData[showNum].channelCallsign ==
-                            curRecordings[j].chansign)))
-                {
-                    return curRecordings[j].type;
-                }
-            }
-            if (curRecordings[j].type == kChannelRecord)
-            {
-                if (showData[showNum].channelID == curRecordings[j].chanid
-                      || (showData[showNum].channelCallsign != ""
-                         && showData[showNum].channelCallsign ==
-                            curRecordings[j].chansign))
-                {
-                    return curRecordings[j].type;
-                }
-            }
-            if (curRecordings[j].type == kAllRecord)
-            {
-                return curRecordings[j].type;
-            }
-            if (curRecordings[j].type == kFindOneRecord)
-            {
-                return curRecordings[j].type;
-            }
-        }
-    }
-    return 0;
-}
-
-void ProgFinder::getRecordingInfo()
-{
-    if (running == false)
-        return;
-    QDateTime recDateTime;
-    QString thequery;
-    QString data;
-
-    thequery = QString("SELECT record.chanid,starttime,startdate,"
-                       "title,subtitle,description,type,callsign,"
-                       "seriesid,programid "
-                       "FROM record,channel "
-                       "WHERE record.chanid = channel.chanid;");
-
-    QSqlQuery query = m_db->exec(thequery);
-
-    int rows = query.numRowsAffected();
-
-    if (rows == -1)
-    {
-        cerr << "MythProgFind: Error executing query! (getRecordingInfo)\n";
-        cerr << "MythProgFind: QUERY = " << thequery.local8Bit() << endl;
-        return;
-    }
-
-    recordingCount = 0;
-    if (rows > 0)
-    {
-        curRecordings = new recordingRecord[(int)rows];
-
-        if (query.isActive() && rows > 0)
-        {
-            while (query.next())
-            {
-                recDateTime = QDateTime::fromString(query.value(2).toString() +
-                                                    "T" +
-                                                    query.value(1).toString(),
-                                                    Qt::ISODate);
-
-                curRecordings[recordingCount].chanid = query.value(0).toString();
-                curRecordings[recordingCount].startdatetime = recDateTime;
-                curRecordings[recordingCount].title = QString::fromUtf8(query.value(3).toString());
-                curRecordings[recordingCount].subtitle = QString::fromUtf8(query.value(4).toString());
-                curRecordings[recordingCount].description = QString::fromUtf8(query.value(5).toString());
-                curRecordings[recordingCount].type = query.value(6).toInt();
-                curRecordings[recordingCount].chansign = QString::fromUtf8(query.value(7).toString());
-                curRecordings[recordingCount].seriesid = QString::fromUtf8(query.value(8).toString());
-                curRecordings[recordingCount].programid = QString::fromUtf8(query.value(9).toString());
-
-                recordingCount++;
-            }
-        }
-    }
-}
-
-void ProgFinder::selectShowData(QString progTitle)
+void ProgFinder::selectShowData(QString progTitle, int newCurShow)
 {
     if (running == false)
         return;
 
     allowkeypress = false;
     QDateTime progStart = QDateTime::currentDateTime();
-    QDateTime progEnd;
-    QString thequery;
-    QString data;
-    int rectype = 0;
 
-    QSqlQuery query(QString::null, m_db);
-    query.prepare("SELECT subtitle,starttime,channel.channum,"
-                  "channel.callsign,description,endtime,channel.chanid,"
-                  "channel.sourceid,channel.name,seriesid,programid "
-                  "FROM program,channel "
-                  "WHERE program.title = :TITLE AND "
-                  "program.chanid = channel.chanid "
-                  "AND program.starttime > :STARTTIME "
-                  "GROUP BY starttime,endtime,channum,callsign "
-                  "ORDER BY starttime," +
-                  gContext->GetSetting("ChannelOrdering", "channum + 0") +";");
-    query.bindValue(":TITLE", progTitle.utf8());
-    query.bindValue(":STARTTIME", progStart.toString("yyyyMMddhhmm50"));
+    schedList.FromScheduler();
 
-    if (!query.exec())
-    {
-        cerr << "MythProgFind: Error executing query! (selectShowData)\n";
-        cerr << "MythProgFind: QUERY = " << thequery.local8Bit() << endl;
-        return;
-    }
+    QString querystr = QString(
+        "WHERE program.title = '%1' "
+        "    AND program.endtime > %2 ")
+        .arg(progTitle.utf8().replace("'", "\\'"))
+        .arg(progStart.toString("yyyyMMddhhmm50"));
 
-    int rows = query.numRowsAffected();
+    showData.FromProgram(m_db, querystr, schedList);
 
-    if (rows == -1)
-    {
-        cerr << "MythProgFind: Error executing query! (selectShowData)\n";
-        cerr << "MythProgFind: QUERY = " << thequery.local8Bit() << endl;
-        return;
-    }
-
-    showCount = 0;
-
-    if (rows < showsPerListing)
-    {
-        showData = new showRecord[showsPerListing];
-        for (int i = 0; i < showsPerListing; i++)
-            showData[i].title = "**!0";
-    }
-    else
-    {
-        showData = new showRecord[rows];
-    }
-
-    if (query.isActive() && rows > 0)
-    {
-        while (query.next())
-        {
-            progStart = QDateTime::fromString(query.value(1).toString(),
-                                              Qt::ISODate);
-            progEnd = QDateTime::fromString(query.value(5).toString(),
-                                            Qt::ISODate);
-
-            // DATE, CHANNEL NUM, CHANNEL CALLSIGN, SUBTITLE, DESCRIPTION, SQL START, SQL END
-
-            showData[showCount].startdatetime = progStart;
-            QString DateTimeFormat = dateFormat + " " + timeFormat;
-
-            showData[showCount].startDisplay = progStart.toString(DateTimeFormat);
-            showData[showCount].endDisplay = progEnd.toString(timeFormat);
-            showData[showCount].channelNum = query.value(2).toString();
-            showData[showCount].channelCallsign = query.value(3).toString();
-            showData[showCount].title = progTitle;
-            showData[showCount].subtitle = QString::fromUtf8(query.value(0).toString());
-            showData[showCount].description = QString::fromUtf8(query.value(4).toString());
-            showData[showCount].channelID = query.value(6).toString();
-            showData[showCount].channelName = query.value(8).toString();
-            showData[showCount].starttime = progStart.toString("yyyyMMddhhmm");
-            showData[showCount].endtime = progEnd.toString("yyyyMMddhhmm");
-            rectype = checkRecordingStatus(showCount);
-            showData[showCount].recording = rectype;
-            showData[showCount].seriesid = query.value(9).toString();
-            showData[showCount].programid = query.value(10).toString();
-
-            switch (rectype)
-            {
-                case kSingleRecord:
-                    data = tr("Recording just this showing");
-                    break;
-                case kOverrideRecord:
-                    data = tr("Recording this showing with override options");
-                    break;
-                case kFindOneRecord:
-                    data = tr("Recording one showing of this program");
-                    break;
-                case kTimeslotRecord:
-                    data = tr("Recording every day when shown in this timeslot");
-                    break;
-                case kWeekslotRecord:
-                    data = tr("Recording every week when shown in this timeslot");
-                    break;
-                case kChannelRecord:
-                    data = tr("Recording when shown on this channel");
-                    break;
-                case kAllRecord:
-                    data = tr("Recording all showings");
-                    break;
-                case kDontRecord:
-                    data = tr("Manually not recording this showing");
-                    break;
-                case kNotRecording:
-                    data = tr("Not recording this showing");
-                    break;
-                default:
-                    data = tr("Error!");
-                    break;
-            }
-
-            showData[showCount].recText = data;
-
-            showCount++;
-        }
-    }
-
-    if (rows < showsPerListing)
+    showCount = showData.count();
+    if (showCount < showsPerListing)
         showCount = showsPerListing;
 
-    curShow = 0;
+    curShow = newCurShow;
     allowkeypress = true;
     showShowingList();
 }
 
 void ProgFinder::getInitialProgramData()
 {
-    getRecordingInfo();
     getAllProgramData();
 }
 
@@ -1629,6 +1271,25 @@ void ProgFinder::getAllProgramData()
             charNum = 13;
 
         getSearchData(charNum);
+    }
+}
+
+void ProgFinder::customEvent(QCustomEvent *e)
+{
+    if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
+    {
+        MythEvent *me = (MythEvent *)e;
+        QString message = me->Message();
+
+        if (message == "SCHEDULE_CHANGE")
+        {
+            if (inSearch == 2)
+            {
+                ProgramInfo *curPick = showData[curShow];
+                if (curPick)
+                    selectShowData(curPick->title, curShow);
+            }
+        }
     }
 }
 

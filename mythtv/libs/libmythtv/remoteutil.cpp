@@ -118,36 +118,6 @@ bool RemoteReactivateRecording(ProgramInfo *pginfo)
     return strlist[0].toInt();
 }
 
-bool RemoteGetAllPendingRecordings(vector<ProgramInfo *> &recordinglist)
-{
-    QStringList strlist = QString("QUERY_GETALLPENDING");
-
-    if (!gContext->SendReceiveStringList(strlist))
-        return false;
-
-    bool conflicting = strlist[0].toInt();
-    int numrecordings = strlist[1].toInt();
-
-    if (numrecordings > 0)
-    {
-        if (numrecordings * NUMPROGRAMLINES + 2 > (int)strlist.size())
-        {
-            cerr << "length mismatch between programinfo\n";
-            return conflicting;
-        }
-
-        QStringList::iterator it = strlist.at(2);
-        for (int i = 0; i < numrecordings; i++)
-        {
-            ProgramInfo *pginfo = new ProgramInfo();
-            pginfo->FromStringList(strlist, it);
-            recordinglist.push_back(pginfo);
-        }
-    }
-
-    return conflicting;
-}
-
 void RemoteGetAllScheduledRecordings(vector<ProgramInfo *> &scheduledlist)
 {
     QStringList strlist = QString("QUERY_GETALLSCHEDULED");

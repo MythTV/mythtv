@@ -65,13 +65,12 @@ class ProgLister : public MythDialog
     RecSearchType searchtype;
 
     int curView;
-    int viewCount;
     QStringList viewList;
     QStringList viewTextList;
 
     int curItem;
-    int itemCount;
-    QPtrList<ProgramInfo> itemList;
+    ProgramList itemList;
+    ProgramList schedList;
 
     XMLParse *theme;
     QDomElement xmldata;
