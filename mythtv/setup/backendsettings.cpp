@@ -169,7 +169,6 @@ public:
         addSelection("china-bcast");
         addSelection("southafrica");
         addSelection("argentina");
-        addSelection("canada-cable");
         addSelection("australia-optus");
         setHelpText("Select the appropriate frequency table for your "
                     "system.  If you have an antenna, use a \"-bcast\" "

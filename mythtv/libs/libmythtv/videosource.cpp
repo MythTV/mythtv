@@ -352,7 +352,7 @@ QStringList VideoDevice::probeInputs(QString device) {
         struct video_capability vidcap;
         memset(&vidcap, 0, sizeof(vidcap));
         if (ioctl(videofd, VIDIOCGCAP, &vidcap) != 0) {
-            perror("ioctl");
+            perror("VIDIOCGCAP");
             vidcap.channels = 0;
         }
 

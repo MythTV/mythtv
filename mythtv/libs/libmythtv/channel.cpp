@@ -189,8 +189,8 @@ void Channel::SetFreqTable(const QString &name)
     }
     if (!curList)
     {
-        curList = chanlists[0].list;
-        totalChannels = chanlists[0].count;
+        curList = chanlists[1].list;
+        totalChannels = chanlists[1].count;
     }
 }
  

@@ -16,23 +16,29 @@ using namespace std;
 #include "mpegrecorder.h"
 #include "RingBuffer.h"
 
+extern "C" {
+#include "../libavcodec/avcodec.h"
+#include "../libavformat/avformat.h"
+
+extern AVInputFormat mpegps_demux;
+}
+
 MpegRecorder::MpegRecorder()
 {
-    childrenLive = false;
     paused = false;
-    pausewritethread = false;
-    actuallypaused = false;
     mainpaused = false;
-
     recording = false;
 
-    framesWritten = false;
+    framesWritten = 0;
 
     chanfd = -1; 
     readfd = -1;
 
     width = 720;
     height = 480;
+
+    keyframedist = 15;
+    gopset = false;
 }
 
 MpegRecorder::~MpegRecorder()
@@ -67,26 +73,36 @@ void MpegRecorder::Initialize(void)
 {
 }
 
+static void mpg_write_packet(void *opaque, uint8_t *buf, int buf_size)
+{
+    (void)opaque;
+    (void)buf;
+    (void)buf_size;
+}
+
+static int mpg_read_packet(void *opaque, uint8_t *buf, int buf_size)
+{
+    (void)opaque;
+    (void)buf;
+    (void)buf_size;
+    return 0;
+}
+
+static int mpg_seek_packet(void *opaque, int64_t offset, int whence)
+{
+    (void)opaque;
+    (void)offset;
+    (void)whence;
+    return 0;
+}
+
 void MpegRecorder::StartRecording(void)
 {
-    if (childrenLive)
-    {
-        cerr << "Error: children are already alive\n";
-        return;
-    }
-
-    if (SpawnChildren() < 0)
-    {
-        cerr << "Couldn't spawn children\n";
-        return;
-    }
-
     chanfd = open(videodevice.ascii(), O_RDWR);
     if (chanfd <= 0)
     {
         cerr << "Can't open video device: " << videodevice << endl;
         perror("open video:");
-        KillChildren();
         return;
     }
 
@@ -97,7 +113,6 @@ void MpegRecorder::StartRecording(void)
     {
         cerr << "Error getting format\n";
         perror("VIDIOC_G_FMT:");
-        KillChildren();
         return;
     }
 
@@ -108,7 +123,6 @@ void MpegRecorder::StartRecording(void)
     {
         cerr << "Error setting format\n";
         perror("VIDIOC_S_FMT:");
-        KillChildren();
         return;
     }
 
@@ -117,11 +131,10 @@ void MpegRecorder::StartRecording(void)
     {
         cerr << "Can't open video device: " << videodevice << endl;
         perror("open video:");
-        KillChildren();
         return;
     }
 
-    char buffer[256001];
+    unsigned char buffer[256001];
     int ret;
 
     encoding = true;
@@ -129,6 +142,45 @@ void MpegRecorder::StartRecording(void)
 
     struct timeval stm, now;
     gettimeofday(&stm, NULL);
+
+    AVInputFormat *fmt = &mpegps_demux;
+    fmt->flags |= AVFMT_NOFILE;
+
+    ic = (AVFormatContext *)av_mallocz(sizeof(AVFormatContext));
+    if (!ic)
+    {
+        cerr << "Couldn't allocate context\n";
+        return;
+    }
+
+    QString filename = "blah.mpg";
+    char *cfilename = (char *)filename.ascii();
+    AVFormatParameters params;
+
+    ic->pb.buffer_size = 256001;
+    ic->pb.buffer = NULL;
+    ic->pb.buf_ptr = NULL;
+    ic->pb.write_flag = 0;
+    ic->pb.buf_end = NULL;
+    ic->pb.opaque = this;
+    ic->pb.read_packet = mpg_read_packet;
+    ic->pb.write_packet = mpg_write_packet;
+    ic->pb.seek = mpg_seek_packet;
+    ic->pb.pos = 0;
+    ic->pb.must_flush = 0;
+    ic->pb.eof_reached = 0;
+    ic->pb.is_streamed = 0;
+    ic->pb.max_packet_size = 0;
+
+    int err = av_open_input_file(&ic, cfilename, fmt, 0, &params);
+    if (err < 0)
+    {
+        cerr << "Couldn't initialize decocder\n";
+        return;
+    } 
+
+    encoding = true;
+    recording = true;
 
     while (encoding)
     {
@@ -158,14 +210,95 @@ void MpegRecorder::StartRecording(void)
             continue;
         }
         else if (ret > 0)
-            ringBuffer->Write(buffer, ret);
+            ProcessData(buffer, ret);
   
         gettimeofday(&now, NULL);
     }
 
-    KillChildren();
-
     recording = false;
+}
+
+#define GOP_START     0x000001B8
+#define PICTURE_START 0x00000100
+#define SLICE_MIN     0x00000101
+#define SLICE_MAX     0x000001af
+
+bool MpegRecorder::PacketHasHeader(unsigned char *buf, int len,
+                                   unsigned int startcode)
+{
+    unsigned char *bufptr;
+    unsigned int state = 0xFFFFFFFF, v;
+
+    bufptr = buf;
+
+    while (bufptr < buf + len)
+    {
+        v = *bufptr++;
+        if (state == 0x000001)
+        {
+            state = ((state << 8) | v) & 0xFFFFFF;
+            if (state >= SLICE_MIN && state <= SLICE_MAX)
+                return false;
+            if (state == startcode)
+                return true;
+        }
+        state = ((state << 8) | v) & 0xFFFFFF;
+    }
+
+    return false;
+}
+
+void MpegRecorder::ProcessData(unsigned char *buffer, int len)
+{
+    AVPacket pkt;
+
+    ic->pb.buffer = buffer;
+    ic->pb.buf_ptr = ic->pb.buffer;
+    ic->pb.buf_end = ic->pb.buffer + len;
+    ic->pb.eof_reached = 0;
+    ic->pb.pos = len;
+
+    while (ic->pb.eof_reached == 0)
+    {
+        if (av_read_packet(ic, &pkt) < 0)
+            break;
+        
+        if (pkt.stream_index > ic->nb_streams)
+        {
+            cerr << "bad stream\n";
+            av_free_packet(&pkt);
+            continue;
+        }
+
+        AVStream *curstream = ic->streams[pkt.stream_index];
+        if (pkt.size > 0 && curstream->codec.codec_type == CODEC_TYPE_VIDEO)
+        {
+            if (PacketHasHeader(pkt.data, pkt.size, PICTURE_START))
+            {
+                framesWritten++;
+            }
+
+            if (PacketHasHeader(pkt.data, pkt.size, GOP_START))
+            {
+                int frameNum = framesWritten - 1;
+
+                if (!gopset && frameNum > 0)
+                {
+                    keyframedist = frameNum;
+                    gopset = true;
+                }
+
+                long long startpos = ringBuffer->GetFileWritePosition();
+                startpos += pkt.startpos;
+
+                positionMap[frameNum / keyframedist] = startpos;
+            }
+        }
+
+        av_free_packet(&pkt);
+    }
+
+    ringBuffer->Write(buffer, len);
 }
 
 void MpegRecorder::StopRecording(void)
@@ -175,26 +308,37 @@ void MpegRecorder::StopRecording(void)
 
 void MpegRecorder::Reset(void)
 {
+    AVPacketList *pktl = NULL;
+    while ((pktl = ic->packet_buffer))
+    {
+        ic->packet_buffer = pktl->next;
+        av_free(pktl);
+    }
+
+    ic->pb.pos = 0;
+    ic->pb.buf_ptr = ic->pb.buffer;
+    ic->pb.buf_end = ic->pb.buffer;
+
     framesWritten = 0;
+
+    positionMap.clear();
 }
 
 void MpegRecorder::Pause(bool clear)
 {
     cleartimeonpause = clear;
-    actuallypaused = mainpaused = false;
+    mainpaused = false;
     paused = true;
-    pausewritethread = true;
 }
 
 void MpegRecorder::Unpause(void)
 {
     paused = false;
-    pausewritethread = false;
 }
 
 bool MpegRecorder::GetPause(void)
 {
-    return (mainpaused && actuallypaused);
+    return mainpaused;
 }
 
 bool MpegRecorder::IsRecording(void)
@@ -224,56 +368,15 @@ void MpegRecorder::TransitionToRing(void)
 
 long long MpegRecorder::GetKeyframePosition(long long desired)
 {
-    return framesWritten;
+    long long ret = -1;
+
+    if (positionMap.find(desired) != positionMap.end())
+        ret = positionMap[desired];
+
+    return ret;
 }
 
 void MpegRecorder::GetBlankFrameMap(QMap<long long, int> &blank_frame_map)
 {
-}
-
-int MpegRecorder::SpawnChildren(void)
-{
-    int result;
-
-    childrenLive = true;
-
-    result = pthread_create(&write_tid, NULL, MpegRecorder::WriteThread, this);
-
-    if (result)
-    {
-        cerr << "Couldn't spawn writer thread, exiting\n";
-        return -1;
-    }
-
-    return 0;
-}
-
-void MpegRecorder::KillChildren(void)
-{
-    childrenLive = false;
-
-    pthread_join(write_tid, NULL);
-}
-
-void *MpegRecorder::WriteThread(void *param)
-{
-    MpegRecorder *mr = (MpegRecorder *)param;
-    mr->doWriteThread();
-    return NULL;
-}
-
-void MpegRecorder::doWriteThread(void)
-{
-    actuallypaused = false;
-    while (childrenLive)
-    {
-        if (pausewritethread)
-        {
-            actuallypaused = true;
-            usleep(50);
-            continue;
-        }
-
-        usleep(100);
-    }
+    (void)blank_frame_map;
 }

@@ -50,6 +50,8 @@ class AvFormatDecoder : public DecoderBase
     void InitByteContext(void);
     bool PacketHasHeader(unsigned char *buf, int len, unsigned int startcode);
 
+    void SeekReset(void);
+
     RingBuffer *ringBuffer;
 
     AVFormatContext *ic;

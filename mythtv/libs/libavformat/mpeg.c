@@ -694,7 +694,7 @@ static AVOutputFormat mpeg2vob_mux = {
     mpeg_mux_end,
 };
 
-static AVInputFormat mpegps_demux = {
+AVInputFormat mpegps_demux = {
     "mpeg",
     "MPEG PS format",
     sizeof(MpegDemuxContext),

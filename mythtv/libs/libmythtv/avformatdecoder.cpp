@@ -6,6 +6,7 @@ using namespace std;
 #include "avformatdecoder.h"
 #include "RingBuffer.h"
 #include "NuppelVideoPlayer.h"
+#include "remoteencoder.h"
 
 extern pthread_mutex_t avcodeclock;
 
@@ -45,7 +46,7 @@ AvFormatDecoder::~AvFormatDecoder()
     }
 }
 
-void AvFormatDecoder::Reset(void)
+void AvFormatDecoder::SeekReset(void)
 {
     lastapts = 0;
     lastvpts = 0;
@@ -67,6 +68,15 @@ void AvFormatDecoder::Reset(void)
         AVCodecContext *enc = &ic->streams[i]->codec;
         avcodec_flush_buffers(enc);
     }
+}
+
+void AvFormatDecoder::Reset(void)
+{
+    SeekReset();
+
+    positionMap.clear();
+    framesPlayed = 0;
+    framesRead = 0;
 }
 
 bool AvFormatDecoder::CanHandle(char testbuf[2048], const QString &filename)
@@ -442,12 +452,9 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                         m_parent->SetVideoParams(-1, -1, -1, keyframedist);
                     }
 
-                    if (frameNum % keyframedist == 0)
-                    {
-                        lastKey = frameNum;
-                        if (!haspositionmap)
-                            positionMap[lastKey / keyframedist] = pkt.startpos;
-                    }
+                    lastKey = frameNum;
+                    if (!haspositionmap)
+                        positionMap[lastKey / keyframedist] = pkt.startpos;
                 }
             }
         }
@@ -631,7 +638,7 @@ bool AvFormatDecoder::DoRewind(long long desiredFrame)
     if (!exactseeks)
         normalframes = 0;
 
-    Reset();
+    SeekReset();
 
     while (normalframes > 0)
     {
@@ -668,7 +675,6 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame)
         {
             keyPos = positionMap[desiredKey / keyframedist];
         }
-#if 0
         else if (livetv || (watchingrecording && nvr_enc &&
                             nvr_enc->IsValidRecorder()))
         {
@@ -680,7 +686,6 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame)
             }
             keyPos = positionMap[desiredKey / keyframedist];
         }
-#endif
     }
 
     bool needflush = false;
@@ -749,7 +754,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame)
         normalframes = 0;
 
     if (needflush)
-        Reset();
+        SeekReset();
 
     while (normalframes > 0)
     {

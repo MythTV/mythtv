@@ -3,6 +3,9 @@
 
 #include "recorderbase.h"
 
+struct AVFormatContext;
+struct AVPacket;
+
 class MpegRecorder : public RecorderBase
 {
   public:
@@ -33,25 +36,14 @@ class MpegRecorder : public RecorderBase
     long long GetKeyframePosition(long long desired);
     void GetBlankFrameMap(QMap<long long, int> &blank_frame_map);
 
-  protected:
-    static void *WriteThread(void *param);
-
-    void doWriteThread(void);
-
   private:
-    int SpawnChildren(void);
-    void KillChildren(void);
-
-    bool childrenLive;
-
-    pthread_t write_tid;
+    bool PacketHasHeader(unsigned char *buf, int len, unsigned int startcode);
+    void ProcessData(unsigned char *buffer, int len);
 
     bool recording;
     bool encoding;
 
     bool paused;
-    bool pausewritethread;
-    bool actuallypaused;
     bool mainpaused;
     bool cleartimeonpause;
 
@@ -61,6 +53,13 @@ class MpegRecorder : public RecorderBase
 
     int chanfd;
     int readfd;
+
+    AVFormatContext *ic;
+
+    int keyframedist;
+    bool gopset;
+
+    QMap<long long, long long> positionMap;
 };
 
 #endif
