@@ -36,7 +36,10 @@ bool WriteStringList(QSocket *socket, QStringList &list)
         written += temp;
         size -= temp;
         if (size > 0)
+        {
+            printf("Partial WriteStringList %u\n", written);
             qApp->processEvents();
+        }
     }
 
     qApp->lock();
@@ -75,11 +78,12 @@ bool ReadStringList(QSocket *socket, QStringList &list)
             qApp->processEvents();
 
         zerocnt++;
-        if (zerocnt == 10)
+        if (zerocnt == 100)
         {
             printf("EOF readStringList %u\n", read);
             break; 
         }
+        usleep(50);
     }
 
     QString str = QString::fromUtf8(utf8.data());
@@ -101,7 +105,7 @@ void WriteBlock(QSocket *socket, void *data, int len)
         size -= temp;
         if (size > 0)
         {
-            cerr << size << endl;
+            printf("Partial WriteBlock %u\n", written);
             qApp->processEvents();
         }
     }
@@ -114,6 +118,8 @@ int ReadBlock(QSocket *socket, void *data, int maxlen)
 {
     int read = 0;
     int size = maxlen;
+    unsigned int zerocnt = 0;
+
     while (size > 0)
     {
         int temp = socket->readBlock((char *)data + read, size);
@@ -121,6 +127,14 @@ int ReadBlock(QSocket *socket, void *data, int maxlen)
         size -= temp;
         if (size > 0)
             qApp->processEvents();
+
+        zerocnt++;
+        if (zerocnt == 100)
+        {
+            printf("EOF ReadBlock %u\n", read);
+            break; 
+        }
+        usleep(50);
     }
 
     return maxlen;
