@@ -652,8 +652,8 @@ void ScheduledRecording::setDefault(QSqlDatabase *db, bool haschannel)
     profile->fillSelections(db);
     profile->setValue(QObject::tr("Default"));
     
-    dupin->setValue(0);
-    dupmethod->setValue(0);
+    dupin->setValue(kDupsInAll);
+    dupmethod->setValue(kDupCheckSubDesc);
     maxepisodes->setValue(0);
     startoffset->setValue(0);
     endoffset->setValue(0);   
