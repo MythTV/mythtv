@@ -13,7 +13,8 @@ class ProgramListItem : public QListViewItem
     ProgramListItem(QListView *parent, ProgramInfo *lpginfo,
                     RecordingInfo *lrecinfo, int numcols, TV *ltv,
                     QString lprefix);
-   ~ProgramListItem() { delete pginfo; delete recinfo; }
+   ~ProgramListItem() { delete pginfo; delete recinfo; 
+                        if (pixmap) delete pixmap; }
 
     virtual void paintCell(QPainter *p, const QColorGroup &cg,
                            int column, int width, int alignment);

@@ -29,7 +29,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
 
     gf = NULL;
     rtjd = NULL;
- 
+    positionMap = NULL; 
+
     lastaudiolen = 0;
     strm = NULL;
     wpos = rpos = 0;
@@ -63,6 +64,9 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
         delete [] buf2;
     if (strm)
         delete [] strm;
+    if (positionMap)
+        delete positionMap;
+
     for (int i = 0; i < MAXVBUFFER; i++)
     {
         delete [] vbuffer[i];
@@ -656,7 +660,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
     gettimeofday(&nexttrigger, NULL);
   
-    Jitterometer *output_jmeter = new Jitterometer("video_output", 100);
+    //Jitterometer *output_jmeter = new Jitterometer("video_output", 100);
 
     videosize = video_width * video_height * 3 / 2;
  
@@ -721,7 +725,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         /* a/v sync assumes that when 'XJ_show' returns, that is the instant
            the frame has become visible on screen */
 
-        output_jmeter->RecordCycleTime();
+        //output_jmeter->RecordCycleTime();
 
         /* compute new value of nexttrigger */
         nexttrigger.tv_usec += (int)(1000000 / video_frame_rate);

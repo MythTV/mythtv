@@ -85,6 +85,10 @@ OSD::OSD(int width, int height, const string &filename, const string &prefix)
 
 OSD::~OSD(void)
 {
+    if (info_font)
+        Efont_free(info_font);
+    if (channum_font)
+        Efont_free(channum_font);
 }
 
 void OSD::SetInfoText(const string &text, const string &subtitle,

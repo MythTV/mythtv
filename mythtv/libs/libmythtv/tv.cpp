@@ -683,6 +683,7 @@ char *TV::GetScreenGrab(RecordingInfo *rcinfo, int secondsin, int &bufferlen,
                                              video_height);
 
     delete nupvidplay;
+    delete tmprbuf;
 
     return retbuf;
 }
@@ -824,6 +825,8 @@ void TV::ProcessKeypress(int keypressed)
 
             case wsDown: ChangeChannel(false); break;
 
+            case 'c': case 'C': ToggleInputs(); break;
+
             case wsZero: case wsOne: case wsTwo: case wsThree: case wsFour:
             case wsFive: case wsSix: case wsSeven: case wsEight:
             case wsNine: case '0': case '1': case '2': case '3': case '4':
@@ -837,6 +840,34 @@ void TV::ProcessKeypress(int keypressed)
             default: break;
         }
     }
+}
+
+void TV::ToggleInputs(void)
+{
+    nvp->Pause();
+    while (!nvp->GetPause())
+        usleep(5);
+
+    nvr->Pause();
+    while (!nvr->GetPause())
+        usleep(5);
+
+    rbuffer->Reset();
+
+    channel->ToggleInputs();
+
+    nvr->Reset();
+    nvr->Unpause();
+
+    nvp->ResetPlaying();
+    while (!nvp->ResetYet())
+        usleep(5);
+
+    usleep(300000);
+
+    UpdateOSD();
+
+    nvp->Unpause();
 }
 
 void TV::ChangeChannel(bool up)
@@ -947,13 +978,23 @@ void TV::ChangeChannel(char *name)
 
 void TV::UpdateOSD(void)
 {
-    string title, subtitle, desc, category, starttime, endtime;
-    GetChannelInfo(channel->GetCurrent(), title, subtitle, desc, category, 
-                   starttime, endtime);
+    string channelname = channel->GetCurrentName();
+    if (channelname.size() > 6)
+    {
+        string dummy = "";
+        nvp->SetInfoText(channelname, dummy, dummy, dummy, dummy, dummy,
+                         osd_display_time);
+    }
+    else
+    {
+        string title, subtitle, desc, category, starttime, endtime;
+        GetChannelInfo(channel->GetCurrent(), title, subtitle, desc, category, 
+                       starttime, endtime);
 
-    nvp->SetInfoText(title, subtitle, desc, category, starttime, endtime,
-                     osd_display_time);
-    nvp->SetChannelText(channel->GetCurrentName(), osd_display_time);
+        nvp->SetInfoText(title, subtitle, desc, category, starttime, endtime,
+                         osd_display_time);
+        nvp->SetChannelText(channel->GetCurrentName(), osd_display_time);
+    }
 }
 
 void TV::GetChannelInfo(int lchannel, string &title, string &subtitle,

@@ -12,17 +12,17 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    DialogBox *diag = new DialogBox(argv[1]);
-    a.setMainWidget(diag);
+    DialogBox diag(argv[1]);
+    a.setMainWidget(&diag);
 
     for (int i = 2; i < argc; i++)
     {
-        diag->AddButton(argv[i]);
+        diag.AddButton(argv[i]);
     }
 
-    diag->Show();
+    diag.Show();
 
-    int result = diag->exec();
+    int result = diag.exec();
 
     printf("result was %d\n", result);
 

@@ -71,15 +71,31 @@ void Channel::SetFormat(const string &format)
         mode = 6;
 
     tuner.mode = mode;
-
     ioctl(videofd, VIDIOCSTUNER, &tuner);
 
-    struct video_channel vc;
+    struct video_capability vidcap;
+    memset(&vidcap, 0, sizeof(vidcap));
+    ioctl(videofd, VIDIOCGCAP, &vidcap);
 
+    capchannels = vidcap.channels;
+    for (int i = 0; i < vidcap.channels; i++)
+    {
+        struct video_channel test;
+        memset(&test, 0, sizeof(test));
+        test.channel = i;
+        ioctl(videofd, VIDIOCGCHAN, &test);
+
+        cout << "Probed: " << test.name << endl;
+        channelnames[i] = test.name;
+    }
+
+    struct video_channel vc;
     memset(&vc, 0, sizeof(vc));
     ioctl(videofd, VIDIOCGCHAN, &vc);
     vc.norm = mode;
     ioctl(videofd, VIDIOCSCHAN, &vc);
+
+    videomode = mode;
 }
 
 void Channel::SetFreqTable(const string &name)
@@ -123,6 +139,7 @@ bool Channel::SetChannelByString(const string &chan)
 	    break;
 	}
     }
+
     if (!foundit)
         return false;
 
@@ -194,6 +211,22 @@ bool Channel::ChannelDown(void)
 
 char *Channel::GetCurrentName(void)
 {
-    return curList[curchannel].name;
+    if (currentcapchannel == 0)
+        return curList[curchannel].name;
+    else
+        return (char *)(channelnames[currentcapchannel].c_str());
 }
 
+void Channel::ToggleInputs(void)
+{
+    currentcapchannel++;
+    if (currentcapchannel >= capchannels)
+        currentcapchannel = 0;
+
+    struct video_channel set;
+    memset(&set, 0, sizeof(set));
+    ioctl(videofd, VIDIOCGCHAN, &set);
+    set.channel = currentcapchannel;
+    set.norm = videomode;
+    ioctl(videofd, VIDIOCSCHAN, &set);
+}

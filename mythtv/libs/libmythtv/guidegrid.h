@@ -17,6 +17,7 @@ class GuideGrid : public QDialog
     Q_OBJECT
   public:
     GuideGrid(int channel, QWidget *parent = 0, const char *name = 0);
+   ~GuideGrid();
 
     int getLastChannel(void);
 

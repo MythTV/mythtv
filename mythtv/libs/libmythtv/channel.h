@@ -1,6 +1,7 @@
 #ifndef CHANNEL_H
 #define CHANNEL_H
 
+#include <map>
 #include <string>
 #include "frequencies.h"
 
@@ -24,7 +25,9 @@ class Channel
     bool SetChannel(int i);
     bool ChannelUp(void);
     bool ChannelDown(void);
-  
+ 
+    void ToggleInputs(void); 
+ 
     char *GetCurrentName(void);
     int GetCurrent(void) { return curchannel + 1; }
     
@@ -40,6 +43,12 @@ class Channel
     int totalChannels;
 
     TV *pParent;
+
+    int videomode;
+
+    int capchannels;
+    int currentcapchannel;
+    map<int, string> channelnames;
 };
 
 #endif

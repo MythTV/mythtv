@@ -81,6 +81,23 @@ GuideGrid::GuideGrid(int channel, QWidget *parent, const char *name)
     setFocus();
 }
 
+GuideGrid::~GuideGrid()
+{
+    for (int y = 0; y < 10; y++)
+    {
+        if (m_channelInfos[y])
+            delete m_channelInfos[y];
+        if (m_timeInfos[y])
+            delete m_timeInfos[y];
+
+        for (int x = 0; x < 10; x++)
+        {
+            if (m_programInfos[x][y])
+                delete m_programInfos[x][y];
+        }
+    }
+}
+
 int GuideGrid::getLastChannel(void)
 {
     if (selectState)
@@ -766,9 +783,9 @@ void GuideGrid::displayInfo()
 
     if (pginfo)
     {
-        InfoDialog *diag = new InfoDialog(pginfo, this, "Program Info");
-        diag->setCaption("BLAH!!!");
-        diag->exec();
+        InfoDialog diag(pginfo, this, "Program Info");
+        diag.setCaption("BLAH!!!");
+        diag.exec();
     }
 
     showInfo = 0;

@@ -98,7 +98,10 @@ int askRecording(TV *tv, ProgramInfo *rec, int timeuntil)
                                              rec->subtitle.ascii(), 
                                              rec->description.ascii());
                                              
-    return tv->AllowRecording(tvrec, timeuntil);
+    int retval = tv->AllowRecording(tvrec, timeuntil);
+
+    delete tvrec;
+    return retval;
 }
 
 void *runScheduler(void *dummy)
@@ -254,6 +257,8 @@ int main(int argc, char **argv)
 
         delete diag;
     }
+
+    delete tv;
 
     return 0;
 }
