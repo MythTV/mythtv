@@ -38,7 +38,7 @@ for in-depth instructions on installing and compiling mythtv and the
 pre-requisites.
 
 Debian users:  mythtv has been packaged by Matthew Zimmerman.  The package
-is available from http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/
+is available from http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/
 
 You also need v4l setup and working properly.  If xawtv works, this should, too.
 

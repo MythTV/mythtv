@@ -41,8 +41,9 @@ The document authors are:
 
 For users with a Debian system, the mythtv program has been packaged by Matt
 Zimmerman <url url="mailto:mdz@debian.org"> and is available at <url 
-url="http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/"
-name="http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/">  The mailing list
+url="http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/"
+name="http://dijkstra.csh.rit.edu:8088/~mdz/debian/dists/woody/mythtv/"
+>  The mailing list
 message for this announcement can be accessed at <url
 url="http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html"
 name="http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html">.
