@@ -46,6 +46,7 @@ With the stickykeys option selected:
 - Right starts fast forward mode.
 - Left starts rewind mode.
    While in fast forward or rewind mode.
+   - Left/Right increases the ff/rew speed.
    - 0 plays at normal speed, but leaves the time indicator on screen.
    - 1 or 2 plays back more slowly than normal ff/rew speed (1 is slowest).
    - 3 plays back at normal ff/rew speed.

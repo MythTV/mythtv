@@ -229,9 +229,9 @@ public:
         GlobalSetting("PlayBoxOrdering") {
         setLabel("List Newest Recording First");
         setValue(true);
-        setHelpText("If checked (default) the most recent recording will be listed "
-		    "first in the 'Watch Recordings' screen. If unchecked the oldest recording "
-		    "will be listed first.");
+        setHelpText("If checked (default) the most recent recording will be "
+                    "listed first in the 'Watch Recordings' screen. If "
+                    "unchecked the oldest recording will be listed first.");
     };
 };
 
@@ -241,9 +241,10 @@ public:
         GlobalSetting("StickyKeys") {
         setLabel("Sticky keys");
         setValue(false);
-        setHelpText("If this is set, fast forward and rewind continue after the key is released, until "
-                    "the key is pressed again.  If enabled, set FastForwardAmount "
-                    "and RewindAmount to one second.");
+        setHelpText("If this is set, fast forward and rewind continue after "
+                    "the key is released.  Pressing the key again increases "
+                    "the fast forward or rewind speed.  The alternate fast "
+                    "forward and rewind keys always behave in this way.");
     };
 };
 
