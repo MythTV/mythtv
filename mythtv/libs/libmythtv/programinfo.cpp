@@ -652,37 +652,6 @@ int ProgramInfo::GetAutoRunJobs(QSqlDatabase *db)
     return record->GetAutoRunJobs();
 }
 
-bool ProgramInfo::AllowRecordingNewEpisodes(QSqlDatabase *db)
-{
-    if (record == NULL) 
-    {
-        record = new ScheduledRecording();
-        record->loadByProgram(db, this);
-    }
-
-    int maxEpisodes = record->GetMaxEpisodes();
-
-    if (!maxEpisodes || record->GetMaxNewest())
-        return true;
-
-    QSqlQuery query(QString::null, db);
-
-    query.prepare("SELECT count(*) FROM recorded WHERE title = :TITLE;");
-    query.bindValue(":TITLE", title.utf8());
-
-    query.exec();
-
-    if (query.isActive() && query.numRowsAffected() > 0)
-    {
-        query.next();
-
-        if (query.value(0).toInt() >= maxEpisodes)
-            return false;
-    }
-
-    return true;
-}
-
 int ProgramInfo::GetChannelRecPriority(QSqlDatabase *db, const QString &chanid)
 {
     QString thequery;

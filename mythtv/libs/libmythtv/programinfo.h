@@ -106,7 +106,7 @@ class ProgramInfo
 
     RecordingType GetProgramRecordingStatus(QSqlDatabase *db);
     QString GetProgramRecordingProfile(QSqlDatabase *db);
-    bool AllowRecordingNewEpisodes(QSqlDatabase *db);
+
     int GetChannelRecPriority(QSqlDatabase *db, const QString &chanid);
     int GetRecordingTypeRecPriority(RecordingType type);
 

@@ -1284,9 +1284,11 @@ void Scheduler::BuildNewRecordsQueries(QStringList &from, QStringList &where)
 }
 
 void Scheduler::AddNewRecords(void) {
+
+    struct timeval dbstart, dbend;
+
     QMap<RecordingType, int> recTypeRecPriorityMap;
     RecList tmpList;
-    QMap<int, bool> allowmap;
 
     QMap<int, bool> cardMap;
     QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
@@ -1295,6 +1297,52 @@ void Scheduler::AddNewRecords(void) {
         EncoderLink *enc = enciter.data();
         if (enc->isConnected())
             cardMap[enc->getCardId()] = true;
+    }
+
+    QMap<int, bool> tooManyMap;
+    bool checkTooMany = false;
+
+    QSqlQuery rlist(QString::null, db);
+    rlist.prepare("SELECT recordid,title,maxepisodes,maxnewest FROM record;");
+
+    rlist.exec();
+
+    if (!rlist.isActive())
+    {
+        MythContext::DBError("CheckTooMany", rlist);
+        return;
+    }
+
+    while (rlist.next())
+    {
+        int recid = rlist.value(0).toInt();
+        QString qtitle = QString::fromUtf8(rlist.value(1).toString());
+        int maxEpisodes = rlist.value(2).toInt();
+        int maxNewest = rlist.value(3).toInt();
+
+        tooManyMap[recid] = false;
+
+        if (maxEpisodes && !maxNewest)
+        {
+            QSqlQuery epicnt(QString::null, db);
+
+            epicnt.prepare("SELECT count(*) FROM recorded "
+                           "WHERE title = :TITLE;");
+            epicnt.bindValue(":TITLE", qtitle.utf8());
+
+            epicnt.exec();
+
+            if (epicnt.isActive() && epicnt.numRowsAffected() > 0)
+            {
+                epicnt.next();
+
+                if (epicnt.value(0).toInt() >= maxEpisodes)
+                {
+                    tooManyMap[recid] = true;
+                    checkTooMany = true;
+                }
+            }
+        }
     }
 
     unsigned clause;
@@ -1416,7 +1464,10 @@ void Scheduler::AddNewRecords(void) {
 
     VERBOSE(VB_SCHEDULE, QString(" |-- Start DB Query %1...").arg(clause));
     //cerr << query << endl;
+
+    gettimeofday(&dbstart, NULL);
     QSqlQuery result = db->exec(query);
+    gettimeofday(&dbend, NULL);
 
     if (!result.isActive())
     {
@@ -1424,8 +1475,11 @@ void Scheduler::AddNewRecords(void) {
         return;
     }
 
-    VERBOSE(VB_SCHEDULE, QString(" |-- Processing %1 results...")
-                          .arg(result.size()));
+    VERBOSE(VB_SCHEDULE, QString(" |-- %1 results in %2 sec. Processing...")
+            .arg(result.size())
+            .arg(((dbend.tv_sec  - dbstart.tv_sec) * 1000000 +
+                  (dbend.tv_usec - dbstart.tv_usec)) / 1000000.0));
+
     while (result.next())
     {
         // Don't bother if card isn't on-line of end time has already passed
@@ -1480,7 +1534,7 @@ void Scheduler::AddNewRecords(void) {
 
         if (p->recstartts >= p->recendts)
         {
-            // pre/post-roll are invalid so ignore
+            // start/end-offsets are invalid so ignore
             p->recstartts = p->startts;
             p->recendts = p->endts;
         }
@@ -1520,9 +1574,7 @@ void Scheduler::AddNewRecords(void) {
             continue;
 
         // Check for rsTooManyRecordings
-        if (!allowmap.contains(p->recordid))
-            allowmap[p->recordid] = p->AllowRecordingNewEpisodes(db);
-        if (!p->reactivate && !allowmap[p->recordid])
+        if (checkTooMany && tooManyMap[p->recordid] && !p->reactivate)
             p->recstatus = rsTooManyRecordings;
 
         // Check for rsCurrentRecording and rsPreviousRecording
