@@ -687,10 +687,16 @@ void MFDServicePlugin::waitForSomethingToHappen()
     //  Add the server socket to things we want to watch
     //
 
-    FD_SET(core_server_socket->socket(), &readfds);
-    if(nfds <= core_server_socket->socket())
+    if(core_server_socket)
     {
-        nfds = core_server_socket->socket() + 1;
+        if(core_server_socket->socket() > 0)
+        {
+            FD_SET(core_server_socket->socket(), &readfds);
+            if(nfds <= core_server_socket->socket())
+            {
+                nfds = core_server_socket->socket() + 1;
+            }
+        }
     }
 
     //

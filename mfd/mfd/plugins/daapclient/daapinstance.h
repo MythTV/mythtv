@@ -86,6 +86,7 @@ class DaapInstance: public QThread
 
     QPtrList<Database>  databases;
     Database            *current_request_db;
+    int                 current_request_playlist;
 
     //
     //  A WHOLE bunch of values that are filled in by talking to the server

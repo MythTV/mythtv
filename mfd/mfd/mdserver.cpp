@@ -370,6 +370,7 @@ void MetadataServer::doAtomicDataSwap(
                                         QValueList<int> playlist_deletions
                                      )
 {
+
     //
     //  Lock the metadata, find the right container, and swap out its data. 
     //  The idea is that a plugin can take as long as it wants to build a
@@ -416,6 +417,21 @@ void MetadataServer::doAtomicDataSwap(
                                     playlist_additions,
                                     playlist_deletions
                                     );
+
+                    log(QString("container %1 swapped in new data: "
+                                "%2 items (+%3/-%4) and "
+                                "%5 containers/playlists (+%6/-%7)")
+                                .arg(target->getIdentifier())
+
+                                .arg(new_metadata->count())
+                                .arg(metadata_additions.count())
+                                .arg(metadata_deletions.count())
+                                
+                                .arg(new_playlists->count())
+                                .arg(playlist_additions.count())
+                                .arg(playlist_deletions.count())
+                                ,4);
+
                     if(target->isAudio())
                     {
                         metadata_audio_generation_mutex.lock();

@@ -36,6 +36,7 @@ Database::Database(
     have_items = false;
     have_playlist_list = false;
     have_playlists = false;
+    generation_delta = 0;
 
     //
     //  Set info about me
@@ -68,7 +69,7 @@ Database::Database(
     new_metadata->setAutoDelete(true);
     new_playlists = new QIntDict<Playlist>;
     new_metadata->setAutoDelete(true);
-    
+
     /*
     metadata_additions.clear();
     metadata_deletions.clear();
@@ -76,6 +77,22 @@ Database::Database(
     playlist_deletions.clear();
     */
 
+}
+
+int Database::getFirstPlaylistWithoutList()
+{
+    int return_value = -23;
+
+    QIntDictIterator<Playlist> it( *new_playlists ); 
+    for ( ; it.current(); ++it )
+    {
+        if(it.current()->waitingForList())
+        {
+            return_value = it.current()->getId();
+            break;
+        }
+    }
+    return return_value;
 }
 
 void Database::doDatabaseItemsResponse(TagInput& dmap_data)
@@ -111,6 +128,10 @@ void Database::doDatabaseItemsResponse(TagInput& dmap_data)
                 if(a_u32_variable == 200)    // like HTTP 200 (OK!)
                 {
                     database_items_status = true;
+                }
+                else
+                {
+                    warning("got bad status for database items");
                 }
                 break;
 
@@ -611,6 +632,8 @@ void Database::parseItems(TagInput& dmap_data, int how_many)
             //
             //  Add in whatever else the daap server told us about
             //            
+            
+            new_item->setCollectionId(container_id);
 
             QDateTime when;
             when.setTime_t(new_item_date_added);
@@ -695,6 +718,10 @@ void Database::doDatabaseListPlaylistsResponse(TagInput &dmap_data)
                 {
                     database_playlist_list_status = true;
                 }
+                else
+                {
+                    warning("got bad status for playlists list");
+                }
                 break;
 
             case 'muty':
@@ -776,7 +803,7 @@ void Database::parseContainers(TagInput& dmap_data, int how_many)
             //  this should not happen
             //
             warning("got a non mlit tag "
-                    "that I really really wanted one.");
+                    "that I really really wanted.");
         }
         
         int     new_playlist_id = -1;
@@ -840,6 +867,15 @@ void Database::parseContainers(TagInput& dmap_data, int how_many)
             //
             //  Make a playlist
             //
+            
+            Playlist *new_playlist = new Playlist(
+                                                    container_id,
+                                                    new_playlist_name,
+                                                    "",
+                                                    new_playlist_id
+                                                 );
+            new_playlist->waitingForList(true);
+            new_playlists->insert(new_playlist->getId(), new_playlist);
         }
         else
         {
@@ -857,7 +893,359 @@ void Database::parseContainers(TagInput& dmap_data, int how_many)
 
 }
 
+void Database::doDatabasePlaylistResponse(TagInput &dmap_data, int which_playlist, int new_generation)
+{
+    //
+    //  First, find the playlist
+    //
+    
+    Playlist *the_playlist = new_playlists->find(which_playlist);
+    if(!the_playlist)
+    {
+        warning("can't do doDatabasePlaylistResponse() "
+                "with bad playlist id");
+        return;
+    }
 
+    //
+    //  Put the tracks in the playlist
+    //
+
+    Tag a_tag;
+    Chunk a_chunk;
+
+    bool list_status = false;
+    int  numb_list_items = 0;
+    int  numb_received_list_items;
+
+    while(!dmap_data.isFinished())
+    {
+        //
+        //  parse responses to a /database/x/containers request
+        //
+
+        dmap_data >> a_tag;
+
+        u32 a_u32_variable;
+        u8  a_u8_variable;
+
+        switch(a_tag.type)
+        {
+            case 'mstt':
+
+                //
+                //  status of request
+                //
+                
+                dmap_data >> a_u32_variable;
+                if(a_u32_variable == 200)    // like HTTP 200 (OK!)
+                {
+                    list_status = true;
+                }
+                else
+                {
+                    warning("got bad status for playlist");
+                }
+                break;
+
+            case 'muty':
+            
+                //
+                //  update type ... only ever seen 0 here ... dunno ?
+                //
+                
+                dmap_data >> a_u8_variable;
+                break;
+                
+            case 'mtco':
+                
+                //
+                //  number of items on the list
+                //
+                
+                dmap_data >> a_u32_variable;
+                numb_list_items = a_u32_variable;
+                break;
+                
+            case 'mrco':
+            
+                //
+                //  received number of items
+                //                
+                
+                dmap_data >> a_u32_variable;
+                numb_received_list_items = a_u32_variable;
+                break;
+                
+            case 'mlcl':
+
+                //
+                //  This is "listing" tag, saying there's a list of other tags to come
+                //
+                
+                dmap_data >> a_chunk;
+                {
+                    TagInput re_rebuilt_internal(a_chunk);
+                    parsePlaylist(re_rebuilt_internal, numb_received_list_items, the_playlist);
+                }
+                break;
+
+            default:
+                warning("got an unknown tag type "
+                        "while doing doDatabasePlaylistResponse()");
+                dmap_data >> a_chunk;
+        }
+
+        dmap_data >> end;
+
+    }
+
+    //
+    //  Mark this playlist as "filled"
+    //
+
+
+    the_playlist->waitingForList(false);
+    
+    //
+    //  Check and see if all playlists are filled
+    //
+    
+    bool all_filled = true;
+
+    QIntDictIterator<Playlist> it( *new_playlists ); 
+    for ( ; it.current(); ++it )
+    {
+        if(it.current()->waitingForList())
+        {
+            all_filled = false;
+            break;
+        }
+    }
+
+    if(all_filled)
+    {
+        have_playlists = true;
+        
+        //
+        //  We now have all items (metadata) and all containers (playlists)
+        //  from our daap server. Time to tell the metadata container about
+        //  it.
+        //
+        
+        doTheMetadataSwap();
+
+        //
+        //  We are now up to date with this generation of data.
+        //
+
+        generation_delta = new_generation;
+        
+    }
+}
+
+void Database::parsePlaylist(TagInput &dmap_data, int how_many, Playlist *which_playlist)
+{
+    Tag a_tag;
+
+    u8  a_u8_variable;
+    u32 a_u32_variable;
+
+    Chunk listing;
+
+    for(int i = 0; i < how_many; i++)
+    {
+        Chunk emergency_throwaway_chunk;
+
+        dmap_data >> a_tag >> listing >> end;
+    
+        if(a_tag.type != 'mlit')
+        {
+            //
+            //  this should not happen
+            //
+            warning("got a non mlit tag "
+                    "and I really really wanted one.");
+        }
+        
+        TagInput internal_listing(listing);
+        while(!internal_listing.isFinished())
+        {
+    
+            internal_listing >> a_tag;
+        
+            switch(a_tag.type)
+            {
+
+                case 'mikd':
+            
+                    //
+                    //  item kind
+                    //
+                
+                    internal_listing >> a_u8_variable;
+                    if(a_u8_variable != 2)
+                    {
+                        warning("got an item kind in a playlist "
+                                "list that I don't understand");
+                    }
+                    break;
+                    
+                case 'miid':
+            
+                    //
+                    //   Item id
+                    //
+                
+                    internal_listing >> a_u32_variable;
+                    which_playlist->addToList(a_u32_variable);
+                    break;
+                
+                case 'mcti':
+                
+                    //
+                    //  Another id ... ignore it
+                    //
+                    
+                    internal_listing >> a_u32_variable;
+                    break;
+                
+                default:
+                    
+                    warning("unknown tag while parsing database playlist");
+                    internal_listing >> emergency_throwaway_chunk;
+            }
+            internal_listing >> end;
+        }
+    }
+}
+
+void Database::doTheMetadataSwap()
+{
+    //
+    //  This gets called when everything is up to date.
+    //
+
+
+    //
+    //  Make a reference to what we had, so we can tell next time what changed
+    //    
+    
+    //
+    //  find new metadata (additions)
+    //
+
+    QIntDictIterator<Metadata> iter(*new_metadata);
+    for (; iter.current(); ++iter)
+    {
+        int an_integer = iter.currentKey();
+        if(previous_metadata.find(an_integer) == previous_metadata.end())
+        {
+            metadata_additions.push_back(an_integer);
+        }
+    }
+            
+    //
+    //  find old metadata (deletions)
+    //
+            
+    QValueList<int>::iterator other_iter;
+    for ( other_iter = previous_metadata.begin(); other_iter != previous_metadata.end(); ++other_iter )
+    {
+        int an_integer = (*other_iter);
+        if(!new_metadata->find(an_integer))
+        {
+            metadata_deletions.push_back(an_integer);
+        }
+    }
+
+
+    //
+    //  find new playlists (additions)
+    //
+
+    QIntDictIterator<Playlist> apl_iter(*new_playlists);
+    for (; apl_iter.current(); ++apl_iter)
+    {
+        int an_integer = apl_iter.currentKey();
+        if(previous_playlists.find(an_integer) == previous_playlists.end())
+        {
+            playlist_additions.push_back(an_integer);
+        }
+    }
+            
+    //
+    //  find old playlists (deletions)
+    //
+            
+    QValueList<int>::iterator ysom_iter;
+    for ( ysom_iter = previous_playlists.begin(); ysom_iter != previous_playlists.end(); ++ysom_iter )
+    {
+        int an_integer = (*ysom_iter);
+        if(!new_playlists->find(an_integer))
+        {
+            playlist_deletions.push_back(an_integer);
+        }
+    }
+
+    //
+    //  Make copies for next time through
+    //    
+    
+    previous_metadata.clear();
+    QIntDictIterator<Metadata> yano_iter(*new_metadata);
+    for (; yano_iter.current(); ++yano_iter)
+    {
+        int an_integer = yano_iter.currentKey();
+        previous_metadata.push_back(an_integer);
+    }
+            
+    
+    previous_playlists.clear();
+    QIntDictIterator<Playlist> syano_iter(*new_playlists);
+    for (; syano_iter.current(); ++syano_iter)
+    {
+        int an_integer = syano_iter.currentKey();
+        previous_playlists.push_back(an_integer);
+    }
+            
+    metadata_server->doAtomicDataSwap(
+                                        metadata_container, 
+                                              new_metadata, 
+                                        metadata_additions,
+                                        metadata_deletions,
+                                             new_playlists,
+                                        playlist_additions,
+                                        playlist_deletions
+                                     );
+
+
+    //
+    //  The container now owns the metadata and playlists. We need some new
+    //  ones (in case we get an /update response)
+    //
+    
+    new_metadata = new QIntDict<Metadata>;
+    new_metadata->setAutoDelete(true);
+    new_playlists = new QIntDict<Playlist>;
+    new_metadata->setAutoDelete(true);
+    
+    
+    
+}
+
+void Database::beIgnorant()
+{
+    //
+    //  When our parent (daapinstance) gets a hanging update request, we
+    //  have to say that we are not up to speed on the latest generation of
+    //  data.
+    //
+    
+    have_items = false;
+    have_playlist_list = false;
+    have_playlists = false;
+}
 
 void Database::log(const QString &log_message, int verbosity)
 {

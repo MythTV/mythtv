@@ -46,14 +46,22 @@ class Database
     bool    hasPlaylists(){return have_playlists;}
     
     int     getDaapId(){return daap_id;}
+    int     getFirstPlaylistWithoutList();
 
     void    doDatabaseItemsResponse(TagInput &dmap_data);
-    void    parseItems(TagInput &dmap_Data, int how_many);
+    void    parseItems(TagInput &dmap_data, int how_many);
 
     void    doDatabaseListPlaylistsResponse(TagInput &dmap_data);    
-    void    parseContainers(TagInput &dmap_Data, int how_many);
+    void    parseContainers(TagInput &dmap_data, int how_many);
 
-     
+    void    doDatabasePlaylistResponse(TagInput &dmap_data, int which_playlist, int new_generation);
+    void    parsePlaylist(TagInput &dmap_data, int how_many, Playlist *which_playlist);
+
+    void    doTheMetadataSwap();
+    
+    int     getKnownGeneration(){return generation_delta;}
+    void    beIgnorant();
+         
   private:   
 
     DaapClient *parent;
@@ -79,6 +87,17 @@ class Database
 
     QIntDict<Metadata>  *new_metadata;
     QIntDict<Playlist>  *new_playlists;
+
+    QValueList<int>     metadata_additions;
+    QValueList<int>     metadata_deletions;
+    
+    QValueList<int>     playlist_additions;
+    QValueList<int>     playlist_deletions;
+
+    QValueList<int>     previous_metadata;
+    QValueList<int>     previous_playlists;
+
+    int generation_delta;
 
 };
 #endif  // database_h_

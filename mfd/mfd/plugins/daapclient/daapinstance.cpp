@@ -90,6 +90,7 @@ DaapInstance::DaapInstance(
 
     databases.setAutoDelete(true);
     current_request_db = NULL;
+    current_request_playlist = -1;
 }                           
 
 void DaapInstance::run()
@@ -598,6 +599,24 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
                     "have no current database ");
         }
     }
+    else if(top_level_tag.type == 'apso')
+    {
+        if(current_request_db &&
+           current_request_playlist != -1)
+        {
+            current_request_db->doDatabasePlaylistResponse(
+                                                            rebuilt_internal, 
+                                                            current_request_playlist,
+                                                            metadata_generation
+                                                          );            
+        }
+        else
+        {
+            warning("got an apso response, but "
+                    "have no current database "
+                    "and/or current playlist");
+        }
+    }
     else
     {
         warning("got a top level "
@@ -620,7 +639,13 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
             QString request_string = QString("/databases/%1/items").arg(which_database);
             DaapRequest update_request(this, request_string, server_address);
             update_request.addGetVariable("session-id", session_id);
-            //update_request.addGetVariable("revision-number", metadata_generation);
+            update_request.addGetVariable("revision-number", metadata_generation);
+            
+            int generation_delta = a_database->getKnownGeneration();
+            if(generation_delta > 0)
+            {
+                update_request.addGetVariable("delta", generation_delta);
+            }
             
             //
             //  We have to add a meta GET variable listing all the
@@ -678,7 +703,14 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
             DaapRequest update_request(this, request_string, server_address);
             update_request.addGetVariable("session-id", session_id);
 
-            //update_request.addGetVariable("revision-number", metadata_generation);
+            update_request.addGetVariable("revision-number", metadata_generation);
+
+            int generation_delta = a_database->getKnownGeneration();
+            if(generation_delta > 0)
+            {
+                update_request.addGetVariable("delta", generation_delta);
+            }
+            
             
             current_request_db = a_database;            
             update_request.send(client_socket_to_daap_server);
@@ -689,15 +721,52 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
 
             a_database = databases.last();
         }
+        else if(!a_database->hasPlaylists())
+        {
+            int which_database = a_database->getDaapId();
+            current_request_playlist = a_database->getFirstPlaylistWithoutList();
+
+            QString request_string = QString("/databases/%1/containers/%2/items")
+                                    .arg(which_database)
+                                    .arg(current_request_playlist);
+
+            DaapRequest update_request(this, request_string, server_address);
+            update_request.addGetVariable("session-id", session_id);
+
+            update_request.addGetVariable("revision-number", metadata_generation);
+            
+            int generation_delta = a_database->getKnownGeneration();
+            if(generation_delta > 0)
+            {
+                update_request.addGetVariable("delta", generation_delta);
+            }
+            
+            
+            current_request_db = a_database;            
+            update_request.send(client_socket_to_daap_server);
+            
+            //
+            //  We've already sent a request, don't send another one
+            //
+
+            a_database = databases.last();
+            
+            
+        }
         else
         {
             current_request_db = NULL;
+            current_request_playlist = -1;
         }
     }
 
     //
     //  If there's nothing to send, do a hanging update request
     //
+
+    DaapRequest update_request(this, "/update", server_address);
+    update_request.addGetVariable("session-id", session_id);
+    update_request.addGetVariable("revision-number", metadata_generation);
 }
 
 
@@ -1056,6 +1125,17 @@ void DaapInstance::doUpdateResponse(TagInput& dmap_data)
         metadata_generation = new_metadata_generation;
         
         //
+        //  Tell our databases to be ignorant 
+        //
+        
+        Database *a_database = NULL;
+        for ( a_database = databases.first(); a_database; a_database = databases.next() )
+        {   
+            a_database->beIgnorant();
+        }
+    
+        
+        //
         //  time of see what kind of databases are available
         //
         
@@ -1283,6 +1363,8 @@ void DaapInstance::parseDatabaseListings(TagInput& dmap_data, int how_many)
                                                 server_address,
                                                 server_port
                                              );
+        log(QString("creating new database with daap server id of %1")
+            .arg(new_database_id), 9);
         databases.append(new_database);
     }
 }

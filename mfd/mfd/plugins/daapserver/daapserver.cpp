@@ -223,6 +223,8 @@ void DaapServer::handleIncoming(HttpRequest *http_request, int client_id)
             {
                 hanging_updates_mutex.lock();
                     hanging_updates.append(client_id);
+                    log(QString("now have %1 clients sitting in hanging updates")
+                        .arg(hanging_updates.count()), 8);
                 hanging_updates_mutex.unlock();
             }
         }

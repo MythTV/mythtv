@@ -196,6 +196,7 @@ Playlist::Playlist(int l_collection_id, QString new_name, QString raw_songlist, 
             db_references.append((*it).toUInt());
         }
     }
+    waiting_for_list = false;
 }
 
 void Playlist::mapDatabaseToId(QIntDict<Metadata> *the_metadata)
@@ -223,6 +224,11 @@ void Playlist::mapDatabaseToId(QIntDict<Metadata> *the_metadata)
             // warning("playlist had an entry that did not map to any metadata");
         }
     }
+}
+
+void Playlist::addToList(int an_id)
+{
+    song_references.push_back(an_id);
 }
 
 uint Playlist::getUniversalId()

@@ -65,7 +65,7 @@ class Metadata
 
     int           getUniversalId(); // no set, it's a function 
                                     // of collection_id and id
-
+                                    
     int           getDbId(){return db_id;}
     void          setDbId(int l_db_id){db_id = l_db_id;}
 
@@ -249,8 +249,11 @@ class Playlist
     QString          getName(){return name;}
     uint             getCount(){return song_references.count();}
     QValueList<uint> getList(){return song_references;}
+    void             addToList(int an_id);
     void             mapDatabaseToId(QIntDict<Metadata> *the_metadata);    
     uint             getCollectionId(){return collection_id;}    
+    bool             waitingForList(){ return waiting_for_list; }
+    void             waitingForList(bool uh_huh_or_nope_not_me){waiting_for_list = uh_huh_or_nope_not_me;}
     
   private:
   
@@ -259,6 +262,7 @@ class Playlist
     QValueList<uint> db_references;
     uint             id;
     uint             collection_id;
+    bool             waiting_for_list;
 };
 
 #endif
