@@ -4,6 +4,10 @@
 #include <qsocketdevice.h>
 #include <rtp.h>
 
+extern "C" {
+#include "gsm/gsm.h"
+}
+
 extern uchar alaw_comp_table[16384];
 extern uchar ulaw_comp_table[16384];
 extern short alaw_exp_table[256];
@@ -31,6 +35,20 @@ public:
     virtual int Silence(uchar *out, int ms);
     virtual QString WhoAreYou() { return "G711u"; };
 private:
+};
+
+class gsmCodec : public codec
+{
+public:
+    gsmCodec();
+    ~gsmCodec();
+    virtual int Decode(uchar *In, short *out, int Len, short &maxPower);
+    virtual int Encode(short *In, uchar *out, int Samples, short &maxPower, int gain);
+    virtual int Silence(uchar *out, int ms);
+    virtual QString WhoAreYou() { return "GSM"; };
+private:
+    gsm gsmEncData;
+    gsm gsmDecData;
 };
 
 #ifdef VA_G729

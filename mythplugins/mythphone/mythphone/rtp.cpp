@@ -260,6 +260,8 @@ void rtp::rtpInitialise()
         else if (audioPayload == RTP_PAYLOAD_G729)
             Codec = new g729();
 #endif
+        else if (audioPayload == RTP_PAYLOAD_GSM)
+            Codec = new gsmCodec();
         else 
         {
             cerr << "Unknown audio payload " << audioPayload << endl;

@@ -226,9 +226,9 @@ public:
     CodecPriorityList():
         GlobalSetting("CodecPriorityList") {
         setLabel(QObject::tr("Codecs Supported"));
-        setValue("G.711u;G.711a");
+        setValue("GSM;G.711u;G.711a");
         setHelpText(QObject::tr("The list of codecs to use, in the preferred order separated by semicolon. "
-                                "Supported codecs are G.711u and G.711a."));
+                                "Supported codecs are G.711u, G.711a and GSM."));
     }
 };
 

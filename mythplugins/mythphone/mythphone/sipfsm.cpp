@@ -1225,6 +1225,11 @@ void SipCall::initialise()
             CodecList[n++].Encoding = "G729";
         }
 #endif
+        else if (CodecStr == "GSM")
+        {
+            CodecList[n].Payload = 3;
+            CodecList[n++].Encoding = "GSM";
+        }
         else
             cout << "Unknown codec " << CodecStr << " in Codec Priority List\n";
         if (sep != -1)
@@ -1718,16 +1723,22 @@ void SipCall::GetSDPInfo(SipMsg *sipMsg)
         sdpCodec *c;
         if (audioCodecs)
         {
+            for (int n=0; (n<MAX_AUDIO_CODECS) && (CodecList[n].Payload != -1) &&
+                          (audioPayloadIdx == -1); n++)
+            {
+                for (c=audioCodecs->first(); c; c=audioCodecs->next())
+                {
+                    if (CodecList[n].Payload == c->intValue())
+                        audioPayloadIdx = n;
+                        
+                    // Note - no checking for dynamic payloads implemented yet --- need to match
+                    // by text if .Payload == -1
+                }
+            }
+    
+            // Also check for DTMF
             for (c=audioCodecs->first(); c; c=audioCodecs->next())
             {
-                for (int n=0; (n<MAX_AUDIO_CODECS) && (audioPayloadIdx == -1); n++)
-                    if ((CodecList[n].Payload != -1) && (CodecList[n].Payload == c->intValue()))
-                        audioPayloadIdx = n;
-    
-                // Note - no checking for dynamic payloads implemented yet --- need to match
-                // by text if .Payload == -1
-    
-                // Also check for DTMF
                 if (c->strValue() == "telephone-event/8000")
                     dtmfPayload = c->intValue();
             }

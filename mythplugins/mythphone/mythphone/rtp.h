@@ -80,10 +80,11 @@ typedef struct VIDEOBUFFER
 } VIDEOBUFFER;
 
 // Values for RTP Payload Type
-#define RTP_PAYLOAD_G711U		    0x00
-#define RTP_PAYLOAD_G711A    		0x08
+#define RTP_PAYLOAD_G711U	0x00
+#define RTP_PAYLOAD_G711A    	0x08
 #define RTP_PAYLOAD_COMF_NOISE  0x0D
-#define RTP_PAYLOAD_G729		    0x12
+#define RTP_PAYLOAD_G729	0x12
+#define RTP_PAYLOAD_GSM    	0x03
 #define RTP_PAYLOAD_MARKER_BIT	0x80
 #define PAYLOAD(r)              (((r)->RtpMPT) & (~RTP_PAYLOAD_MARKER_BIT))
 #define RTP_DTMF_EBIT           0x80
