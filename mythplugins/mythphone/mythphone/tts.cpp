@@ -44,6 +44,7 @@ tts::tts()
 
 tts::~tts()
 {
+    festival_tidy_up();
 }
 
 

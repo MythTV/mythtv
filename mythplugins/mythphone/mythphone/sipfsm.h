@@ -210,6 +210,7 @@ private:
 #define REG_RETRY_TIMER                   3000 // seconds
 #define REG_FAIL_RETRY_TIMER              180000 // 3 minutes
 #define REG_RETRY_MAXCOUNT                5
+#define SIP_POLL_OFFLINE_UA               180000 // 3 minutes - period between polls to see if a logged off user has logged on
 
 #define SIP_POLL_PERIOD                   2   // Twice per second
 

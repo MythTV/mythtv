@@ -45,12 +45,17 @@ class vxmlParser
 {
 
   public:
-    vxmlParser(rtp *r, QString cName);
+    vxmlParser();
     virtual ~vxmlParser();
+    void beginVxmlSession(rtp *r, QString cName);
+    void endVxmlSession();
+
 
   private:
     static void *vxmlThread(void *p);
+    void runVxmlSession();
     bool killVxmlThread;
+    bool killVxmlSession;
     bool killVxmlPage;
     QString callerName;
     QString vxmlUrl;
@@ -80,6 +85,7 @@ class vxmlParser
     bool evaluateExpression(QString Expression);
 
     pthread_t vxmlthread;
+    QWaitCondition *waker;
     QDomDocument vxmlDoc;
     vxmlVarContainer *vxmlVarList;
     QUrl lastUrl;

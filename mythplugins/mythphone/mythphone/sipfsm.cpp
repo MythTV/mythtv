@@ -267,7 +267,7 @@ void SipThread::SipThreadWorker()
     rnaTimer = -1;
     vxmlCallActive = false;
 #ifndef WIN32
-    vxml = 0;
+    vxml = new vxmlParser();
     Rtp = 0;
 #endif
 
@@ -323,6 +323,7 @@ void SipThread::SipThreadWorker()
         debugFile->close();
         delete debugFile;
     }
+    delete vxml;
 }
 
 void SipThread::CheckUIEvents(SipFsm *sipFsm)
@@ -473,6 +474,8 @@ void SipThread::ChangePrimaryCallState(SipFsm *sipFsm, int NewState)
             EventQLock.unlock();
 
             rnaTimer = atoi((const char *)gContext->GetSetting("TimeToAnswer")) * SIP_POLL_PERIOD;
+            if (rnaTimer == 0) // Never auto-answer
+                rnaTimer = -1;
         }
         else
             rnaTimer = -1;
@@ -497,7 +500,7 @@ void SipThread::ChangePrimaryCallState(SipFsm *sipFsm, int NewState)
                 int lPort = atoi((const char *)gContext->GetSetting("AudioLocalPort"));
                 QString spk = gContext->GetSetting("AudioOutputDevice");
                 Rtp = new rtp(0, lPort, remoteIp, remoteAudioPort, audioPayload, dtmfPayload, "None", spk, RTP_TX_AUDIO_SILENCE, RTP_RX_AUDIO_DISCARD);
-                vxml = new vxmlParser(Rtp, callerName.length() != 0 ? callerName : callerUser);
+                vxml->beginVxmlSession(Rtp, callerName.length() != 0 ? callerName : callerUser);
             }
 #endif
         }
@@ -518,9 +521,7 @@ void SipThread::ChangePrimaryCallState(SipFsm *sipFsm, int NewState)
         if ((OldState == SIP_CONNECTED) && vxmlCallActive)
         {
             vxmlCallActive = false;
-            if (vxml != 0)
-                delete vxml;
-            vxml = 0;
+            vxml->endVxmlSession();
             if (Rtp != 0)
                 delete Rtp;
             Rtp = 0;
@@ -596,7 +597,7 @@ void SipFsm::Debug(SipDebugEvent::Type t, QString dbg)
     if (eventWindow)
         QApplication::postEvent(eventWindow, new SipDebugEvent(t, dbg));
 #else
-    if ((debugStream) && ((t == SipDebugEvent::SipTraceRxEv) || (t == SipDebugEvent::SipTraceTxEv)))
+    if ((debugStream) && ((t == SipDebugEvent::SipTraceRxEv) || (t == SipDebugEvent::SipTraceTxEv) || (t == SipDebugEvent::SipDebugEv)))
         *debugStream << dbg;
 #endif
 }
@@ -2554,7 +2555,7 @@ int SipWatcher::FSM(int Event, SipMsg *sipMsg, void *Value)
             // We failed to get a response; so retry after a delay
             State = SIP_WATCH_HOLDOFF;
             parent->SetNotification("PRESENCE", watchedUrlString, "offline", "offline");
-            (parent->Timer())->Start(this, 120*1000, SIP_WATCH); 
+            (parent->Timer())->Start(this, SIP_POLL_OFFLINE_UA, SIP_WATCH); 
         }
         break;
 
@@ -2580,7 +2581,7 @@ int SipWatcher::FSM(int Event, SipMsg *sipMsg, void *Value)
             // should depend on status code; e.g. 404 means try again but 403 means never retry again
             State = SIP_WATCH_HOLDOFF;
             parent->SetNotification("PRESENCE", watchedUrlString, "offline", "offline");
-            (parent->Timer())->Start(this, 120*1000, SIP_WATCH); 
+            (parent->Timer())->Start(this, SIP_POLL_OFFLINE_UA, SIP_WATCH); 
         }
         break;
 

@@ -128,33 +128,38 @@ the necessary action. The VXML page must be wrapped with a <vxml ...>
 construct and can contain one of the elements described at the top of
 this file.
 
+Note this runs as a background task constantly; because once the TTS
+engine is initialised it must continue to be called from the same 
+process.
+
 **********************************************************************/
 
 
-vxmlParser::vxmlParser(rtp *r, QString cName)
+vxmlParser::vxmlParser()
 {
-    Rtp = r;
-    callerName = cName;
-    if (callerName.length() == 0)
-        callerName = "Unknown";
+    Rtp = 0;
+    callerName = "";
     killVxmlThread = false;
+    killVxmlSession = false;
     killVxmlPage = false;
+    waker = new QWaitCondition();
     pthread_create(&vxmlthread, NULL, vxmlThread, this);
 }
 
 vxmlParser::~vxmlParser()
 {
     killVxmlThread = true;
+    killVxmlSession = true;
     killVxmlPage = true;
+    waker->wakeAll();
     pthread_join(vxmlthread, NULL);
+    delete waker;
 }
 
 void *vxmlParser::vxmlThread(void *p)
 {
     vxmlParser *me = (vxmlParser *)p;
-    cout << "VXML Thread Starting\n";
     me->vxmlThreadWorker();
-    cout << "VXML Thread Ending\n";
     return NULL;
 }
 
@@ -163,6 +168,47 @@ void vxmlParser::vxmlThreadWorker()
 {
     speechEngine = new tts();
 
+    while (!killVxmlThread)
+    {
+        waker->wait();
+        if (Rtp != 0)
+        {
+            cout << "Starting VXML Session; caller=" << callerName << endl;
+            runVxmlSession();
+            Rtp = 0;
+        }    
+    }
+    
+    Rtp = 0;
+    delete speechEngine;
+} 
+
+void vxmlParser::beginVxmlSession(rtp *r, QString cName)
+{
+    if ((!killVxmlThread) && (Rtp == 0))
+    {
+        killVxmlPage = false;
+        killVxmlSession = false;
+        callerName = cName;
+        if (callerName.length() == 0)
+            callerName = "Unknown";
+        Rtp = r;
+        waker->wakeAll();
+    }
+    else
+        cerr << "VXML: Cannot process session; thread dead or busy\n";
+}
+
+void vxmlParser::endVxmlSession()
+{
+    killVxmlPage = true;
+    killVxmlSession = true;
+    while (Rtp != 0)
+        usleep(100000);
+}
+
+void vxmlParser::runVxmlSession()
+{
     QString ttsVoice = "voice_" + gContext->GetSetting("TTSVoice");
     speechEngine->setVoice(ttsVoice);
 
@@ -174,7 +220,7 @@ void vxmlParser::vxmlThreadWorker()
     if (vxmlUrl == "")
         vxmlUrl = "Default";
 
-    while ((!killVxmlThread) && (vxmlUrl != ""))
+    while ((!killVxmlSession) && (vxmlUrl != ""))
     {
         loadVxmlPage(vxmlUrl, httpMethod, postNamelist, vxmlDoc);
         vxmlUrl = "";
@@ -184,8 +230,6 @@ void vxmlParser::vxmlThreadWorker()
         Parse(vxmlDoc);
         killVxmlPage = false;
     }
-
-    delete speechEngine;
 } 
 
 
@@ -255,7 +299,7 @@ bool vxmlParser::loadVxmlPage(QString strUrl, QString Method, QString Namelist, 
         port = 80;
     if (hostIp.setAddress(Url.host()))
         hostIp.setAddress("127.0.0.1");
-    cout << "Requesting page from host " << hostIp.toString() << ":" << port << " Method: " << Method << " path " << Url.path() << Query << endl;
+    //cout << "Requesting page from host " << hostIp.toString() << ":" << port << " Method: " << Method << " path " << Url.path() << Query << endl;
 
     if (httpSock->connect(hostIp, port))
     {
