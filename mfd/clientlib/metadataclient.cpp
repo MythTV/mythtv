@@ -1450,6 +1450,16 @@ void MetadataClient::buildTree()
         }
         
         //
+        //  If this collection is editable, add ability for user to create
+        //  new playlist
+        //
+        
+        if(a_collection->isEditable())
+        {
+            new_collection->addNewPlaylistAbility(a_collection->getName());
+        }
+        
+        //
         //  Sort everything
         //
         

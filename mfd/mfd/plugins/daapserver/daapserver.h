@@ -48,6 +48,7 @@ class DaapServer: public MFDHttpPlugin
     void    sendDatabaseItem(HttpInRequest *http_request, u32 song_id, DaapRequest *daap_request);
     void    sendContainers(HttpInRequest *http_request, DaapRequest *daap_request, int which_database);
     void    sendContainer(HttpInRequest *http_request, u32 container_id, int which_database);
+    void    addPlaylistWithinPlaylist(TagOutput &response, HttpInRequest *http_request, int which_playlist, int which_container);
     void    handleMetadataChange(int which_collection);
 
     DaapSessions daap_sessions;

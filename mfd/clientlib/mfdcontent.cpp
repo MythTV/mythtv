@@ -26,6 +26,8 @@ using namespace std;
 //
 
 #include "pixmaps/container_pix.xpm"
+#include "pixmaps/edit_playlist_pix.xpm"
+#include "pixmaps/new_playlist_pix.xpm"
 #include "pixmaps/playlist_pix.xpm"
 #include "pixmaps/artist_pix.xpm"
 #include "pixmaps/genre_pix.xpm"
@@ -38,6 +40,8 @@ using namespace std;
 
 static bool pixmaps_are_setup = false;
 static QPixmap *pixcontainer = NULL;
+static QPixmap *pixeditplaylist = NULL;
+static QPixmap *pixnewplaylist = NULL;
 static QPixmap *pixplaylist = NULL;
 static QPixmap *pixartist = NULL;
 static QPixmap *pixgenre = NULL;
@@ -88,12 +92,18 @@ MfdContentCollection::MfdContentCollection(
     
     audio_artist_tree = new UIListGenericTree(NULL, "All by Artist");
     audio_artist_tree->setPixmap(pixartist);
+    
     audio_genre_tree = new UIListGenericTree(NULL, "All by Genre");
     audio_genre_tree->setPixmap(pixgenre);
+    
     audio_playlist_tree = new UIListGenericTree(NULL, "All Playlists");
     audio_playlist_tree->setPixmap(pixplaylist);
+    
     audio_collection_tree =  new UIListGenericTree(NULL, "Grouped by Collection");
     audio_collection_tree->setPixmap(pixcontainer);
+    
+    new_playlist_tree = NULL;
+    editable_playlist_tree = NULL;
 
     //
     //  Set some core attributes
@@ -180,6 +190,32 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, MetadataCol
     playlist_node->setAttribute(0, 0);  //  collection id is 0
     playlist_node->setAttribute(1, 2); 
     playlist_node->setAttribute(2, 0); 
+
+    //
+    //  If it's editable, add it to the list of editable playlists
+    //
+
+    if(collection->isEditable())
+    {
+        //
+        //  Make the root editable playlists node (this could be the first
+        //  editable playlist)
+        //
+        
+        if(!editable_playlist_tree)
+        {
+            editable_playlist_tree = new UIListGenericTree(NULL, "Edit Playlists");
+            editable_playlist_tree->setPixmap(pixeditplaylist);
+            editable_playlist_tree->setAttribute(1, 5);
+        }
+
+        UIListGenericTree *edit_node = new UIListGenericTree(editable_playlist_tree, new_playlist->getName());
+        edit_node->setPixmap(pixeditplaylist);
+        edit_node->setInt(new_playlist->getId()); 
+        edit_node->setAttribute(0, new_playlist->getCollectionId());
+        edit_node->setAttribute(1, 5);  //  magic number for edit playlist command
+    }
+    
 
     //
     //  Find or "create as we go" another node for this playlist in the "By
@@ -276,6 +312,20 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, MetadataCol
         ++counter;
     }
     
+}
+
+void MfdContentCollection::addNewPlaylistAbility(const QString &collection_name)
+{
+    if(!new_playlist_tree)
+    {
+        new_playlist_tree = new UIListGenericTree(NULL, "New Playlist");
+        new_playlist_tree->setPixmap(pixnewplaylist);
+        new_playlist_tree->setAttribute(1, 4);
+    }
+    
+    UIListGenericTree *new_node = new UIListGenericTree(new_playlist_tree, QString("in %1").arg(collection_name));
+    new_node->setPixmap(pixnewplaylist);
+    new_node->setAttribute(1, 4);
 }
 
 void MfdContentCollection::recursivelyAddSubPlaylist(
@@ -517,6 +567,12 @@ void MfdContentCollection::sort()
     
     audio_collection_tree->sortByAttributeThenByString(2);
     audio_collection_tree->reOrderAsSorted();
+    
+    if(editable_playlist_tree)
+    {
+        editable_playlist_tree->sortByString();
+        editable_playlist_tree->reOrderAsSorted();
+    }
 
 }
 
@@ -527,6 +583,8 @@ void MfdContentCollection::setupPixmaps()
         if (client_height != 600 || client_width != 800)
         {
             pixcontainer = scalePixmap((const char **)container_pix_xpm, client_wmult, client_hmult);
+            pixeditplaylist = scalePixmap((const char **)edit_playlist_pix_xpm, client_wmult, client_hmult);
+            pixnewplaylist = scalePixmap((const char **)new_playlist_pix_xpm, client_wmult, client_hmult);
             pixplaylist = scalePixmap((const char **)playlist_pix_xpm, client_wmult, client_hmult);
             pixartist = scalePixmap((const char **)artist_pix_xpm, client_wmult, client_hmult);
             pixgenre = scalePixmap((const char **)genre_pix_xpm, client_wmult, client_hmult);
@@ -536,6 +594,8 @@ void MfdContentCollection::setupPixmaps()
         else
         {
             pixcontainer = new QPixmap((const char **)container_pix_xpm);
+            pixeditplaylist = new QPixmap((const char **)edit_playlist_pix_xpm);
+            pixnewplaylist = new QPixmap((const char **)new_playlist_pix_xpm);
             pixplaylist = new QPixmap((const char **)playlist_pix_xpm);
             pixartist = new QPixmap((const char **)artist_pix_xpm);
             pixgenre = new QPixmap((const char **)genre_pix_xpm);
@@ -572,6 +632,18 @@ MfdContentCollection::~MfdContentCollection()
     {
         delete audio_collection_tree;
         audio_collection_tree = NULL;
+    }
+    
+    if(new_playlist_tree)
+    {
+        delete new_playlist_tree;
+        new_playlist_tree = NULL;
+    }
+
+    if(editable_playlist_tree)
+    {
+        delete editable_playlist_tree;
+        editable_playlist_tree = NULL;
     }
 }
 

@@ -750,7 +750,7 @@ void ClientHttpServer::showPlaylists(HttpOutResponse *response)
                     response->addToPayload("</td>");
 
                     response->addToPayload("<td>");
-                    response->addToPayload(QString("&nbsp; %1 track(s) &nbsp;").arg(a_playlist->getCount()));
+                    response->addToPayload(QString("&nbsp; %1 track(s) &nbsp;").arg(a_playlist->getFlatCount()));
                     response->addToPayload("</td>");
 
                     response->addToPayload("<td>");

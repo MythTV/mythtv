@@ -1356,7 +1356,7 @@ void DaapServer::sendContainers(HttpInRequest *http_request, DaapRequest *daap_r
                                 response << Tag('mlit');
                                     response << Tag('miid') << (u32) a_playlist->getUniversalId() << end ;
                                     response << Tag('minm') << a_playlist->getName().utf8() << end ;
-                                    response << Tag('mimc') << (u32) a_playlist->getCount() << end ;
+                                    response << Tag('mimc') << (u32) a_playlist->getFlatCount() << end ;
                                 response << end;
                             }
                         }
@@ -1455,7 +1455,7 @@ void DaapServer::sendContainer(HttpInRequest *http_request, u32 container_id, in
         }
         else
         {
-            how_many = the_playlist->getCount();
+            how_many = the_playlist->getFlatCount();
         }
     }
     else
@@ -1484,12 +1484,21 @@ void DaapServer::sendContainer(HttpInRequest *http_request, u32 container_id, in
                         QValueList<int>::iterator iter;
                         for ( iter = songs_in_list.begin(); iter != songs_in_list.end(); ++iter )
                         {
-                            int actual_id = (*iter) + (METADATA_UNIVERSAL_ID_DIVIDER * the_playlist->getCollectionId());
-                            response << Tag('mlit') 
-                                        << Tag('mikd') << (u8) 2  << end
-                                        << Tag('miid') << (u32) actual_id << end 
-                                        << Tag('mcti') << (u32) actual_id << end 
-                                     << end;
+                            if((*iter) > 0)
+                            {
+                                int actual_id = (*iter) + (METADATA_UNIVERSAL_ID_DIVIDER * the_playlist->getCollectionId());
+                                response << Tag('mlit') 
+                                            << Tag('mikd') << (u8) 2  << end
+                                            << Tag('miid') << (u32) actual_id << end 
+                                            << Tag('mcti') << (u32) actual_id << end 
+                                         << end;
+                            }
+                            else
+                            {
+                                int sub_playlist_id = (*iter);
+                                sub_playlist_id = sub_playlist_id * -1;
+                                addPlaylistWithinPlaylist(response, http_request, sub_playlist_id, the_playlist->getCollectionId());
+                            }
                         }
                     }
                     else
@@ -1541,6 +1550,47 @@ void DaapServer::sendContainer(HttpInRequest *http_request, u32 container_id, in
 
     sendTag( http_request, response.data() );
 }
+
+void DaapServer::addPlaylistWithinPlaylist(
+                                            TagOutput &response, 
+                                            HttpInRequest *http_request, 
+                                            int which_playlist, 
+                                            int which_container
+                                          )
+{
+    Playlist *the_playlist = NULL;
+    
+    the_playlist = metadata_server->getPlaylistByContainerAndId(which_container, which_playlist);
+    if(!the_playlist)
+    {
+        warning("asked for playlist within playlist with bad reference");
+        http_request->getResponse()->setError(404);
+        return;
+    }
+
+
+    QValueList<int> songs_in_list = the_playlist->getList();
+    QValueList<int>::iterator iter;
+    for ( iter = songs_in_list.begin(); iter != songs_in_list.end(); ++iter )
+    {
+        if((*iter) > 0)
+        {
+            int actual_id = (*iter) + (METADATA_UNIVERSAL_ID_DIVIDER * the_playlist->getCollectionId());
+            response << Tag('mlit') 
+                        << Tag('mikd') << (u8) 2  << end
+                        << Tag('miid') << (u32) actual_id << end 
+                        << Tag('mcti') << (u32) actual_id << end 
+                     << end;
+        }
+        else
+        {
+            int sub_playlist_id = (*iter);
+            sub_playlist_id = sub_playlist_id * -1;
+            addPlaylistWithinPlaylist(response, http_request, sub_playlist_id, the_playlist->getCollectionId());
+        }
+    }
+}
+
 
 void DaapServer::handleMetadataChange(int which_collection)
 {

@@ -270,6 +270,7 @@ class Playlist
     QString          getName(){return name;}
     QString          getRawSongList(){return raw_song_list;}
     uint             getCount(){return song_references.count();}
+    uint             getFlatCount(){return flat_tree_item_count;}
     QValueList<int>  getList(){return song_references;}
     QValueList<int>* getListPtr(){return &song_references;}
     QValueList<int>* getDbList(){return &db_references;}
@@ -304,6 +305,7 @@ class Playlist
     uint             id;
     int              db_id;
     uint             collection_id;
+    uint             flat_tree_item_count;
     bool             internal_change;
     bool             waiting_for_list;
     QString          raw_song_list;

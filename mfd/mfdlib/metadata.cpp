@@ -198,6 +198,7 @@ Playlist::Playlist(
                     uint new_id
                   )
 {
+    flat_tree_item_count = 0;
     collection_id = l_collection_id;
     id = new_id;
     name = new_name;
@@ -235,6 +236,7 @@ Playlist::Playlist(
                     uint new_id
                   )
 {
+    flat_tree_item_count = 0;
     collection_id = l_collection_id;
     id = new_id;
     name = new_name;
@@ -242,6 +244,7 @@ Playlist::Playlist(
     QValueList<int>::iterator it;
     for(it = l_song_references->begin(); it != l_song_references->end(); ++it)
     {
+        ++flat_tree_item_count;
         song_references.push_back((*it));
     }
 
@@ -261,6 +264,7 @@ void Playlist::mapDatabaseToId(
     if(depth == 0)
     {
         song_list->clear();
+        flat_tree_item_count = 0;
     }
     else if(depth > 20)
     {
@@ -293,6 +297,7 @@ void Playlist::mapDatabaseToId(
             if(which_one)
             {
                 song_list->append(which_one->getId());
+                flat_tree_item_count++;
             }
             else
             {
@@ -322,6 +327,7 @@ void Playlist::mapDatabaseToId(
                                                 the_playlists,
                                                  depth + 1
                                               );
+                    flat_tree_item_count = song_list->count();
                 }
                 else
                 {
@@ -332,6 +338,23 @@ void Playlist::mapDatabaseToId(
                     int reference_id = which_one->getId();
                     reference_id = reference_id * -1;
                     song_list->append(reference_id);
+                    
+                    //
+                    //  We still need to ask this sub playlist to map out
+                    //  it's playlist entries (on itself, at depth 0) in
+                    //  order to get an accurate flat_tree_item_count from
+                    //  it.
+                    //
+                    
+                    which_one->mapDatabaseToId(
+                                                the_metadata,
+                                                which_one->getDbList(),
+                                                which_one->getListPtr(),
+                                                the_playlists,
+                                                0,
+                                                false
+                                              );
+                    flat_tree_item_count += which_one->getFlatCount();
                 }
             }
             else
@@ -347,6 +370,7 @@ void Playlist::mapDatabaseToId(
 void Playlist::addToList(int an_id)
 {
     song_references.push_back(an_id);
+    flat_tree_item_count++;
 }
 
 bool Playlist::removeFromList(int an_id)
@@ -366,6 +390,7 @@ bool Playlist::removeFromList(int an_id)
         {
             song_references.remove(it);
             deleted_something = true;
+            flat_tree_item_count--;
             break;
         }
     }
@@ -385,6 +410,7 @@ void Playlist::checkAgainstMetadata(QIntDict<Metadata> *the_metadata)
         if(!the_metadata->find((*it)))
         {
             it = song_references.remove(it);
+            flat_tree_item_count--;
         }
         else
         {
