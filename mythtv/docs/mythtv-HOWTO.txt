@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-06-09, v2.38
+  2003-06-09, v2.39
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -103,16 +103,16 @@
      11.3 Adding support for an external tuner.
 
   12. MythWeb.
-     12.1 Installation and pre-requisites.
+     12.1 Installation and prerequisites.
         12.1.1 Mandrake 9.0
      12.2 Completing the installation.
 
   13. MythGallery.
-     13.1 Installation and pre-requisites.
+     13.1 Installation and prerequisites.
 
   14. MythGame.
   15. MythMusic.
-     15.1 Manual installation of pre-requisites.
+     15.1 Manual installation of prerequisites.
      15.2 Mandrake 9.0
         15.2.1 Additional options with CVS MythMusic
      15.3 Red Hat Linux 8.0
@@ -544,7 +544,7 @@
   NOTE:  If you are going to be using RPMs to install various
   components, you should be aware that not all packages include the necessary
   headers for compiling packages.  If you're having trouble compiling, ensure
-  that you've installed the -devel version of a pre-requisite.
+  that you've installed the -devel version of a prerequisite.
 
   NOTE:  Other than where noted, Mandrake 9.1 users may follow the
   Mandrake 9.0 instructions.
@@ -670,7 +670,7 @@
 
   [1m3.2.2.  Command-line installation.[0m
 
-  This section details the various methods for installing pre-requisites
+  This section details the various methods for installing prerequisites
   from the command line.
 
 
@@ -691,8 +691,8 @@
 
   Mandrake 8.2 does not have a pre-packaged libqt3-devel, so you must
   compile and install this manually.  The following command will install
-  the pre-requisites for qt3, so don't skip this step.  The simplest
-  tool for installing packages from the command line is urpmi.
+  the prerequisites for qt3, so don't skip this step.  The simplest tool
+  for installing packages from the command line is urpmi.
 
   Open a shell, and execute the following.  You may get asked a number
   of questions regarding dependencies.  It's best to answer "YES".
@@ -704,8 +704,8 @@
 
 
 
-  Once all of the pre-requisites have been installed, the next step is
-  to obtain and compile the source RPM.
+  Once all of the prerequisites have been installed, the next step is to
+  obtain and compile the source RPM.
 
   Go to http://www.rpmfind.net <http://www.rpmfind.net> and search for
   qt3.  There will be a number of different versions available.  As of
@@ -842,7 +842,7 @@
 
   QTDIR needs to be set, and /usr/lib/qt3/bin must be added to your
   path.  Your distribution may already be making these changes as a part
-  of the installation of the software pre-requisites detailed earlier.
+  of the installation of the software prerequisites detailed earlier.
 
 
   [1m4.1.  Distribution-specific information.[0m
@@ -1076,7 +1076,7 @@
 
 
   ______________________________________________________________________
-  NOTE for Mandrake Users: you may install the XMLTV pre-requisites if you
+  NOTE for Mandrake Users: you may install the XMLTV prerequisites if you
   have added a cooker mirror by typing:
 
   # urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
@@ -1713,6 +1713,21 @@
 
 
 
+  [1mNOTE[22m:  The above example assumes that your receiver uses the standard
+  serial driver.  Some receivers do not, including receivers that plug
+  into a TV capture card.  Check the lirc documentation, but it may be
+  necessary to replace the link created above with a a character pipe:
+
+
+  # mknod /dev/lirc c 61 0
+
+
+
+  See the lirc documentation for additional information.  The lirc
+  installation [4mshould[24m create this for you, so manually creating it
+  indicates that your lirc installation may have other issues.
+
+
   [1m8.4.1.  Recompiling your kernel on Red Hat Linux[0m
 
   Don't Panic! Red Hat makes a kernel recompile very easy. They provide
@@ -1829,9 +1844,8 @@
   If your remote ends up working well, you should consider submitting
   your lircd.conf file back to the lirc developers. Once finished:
 
-
-       $ su
-       # cp myremote /etc/lircd.conf
+  $ su
+  # cp myremote /etc/lircd.conf
 
 
 
@@ -1889,8 +1903,7 @@
 
   if you've got a Pinnacle Studio PCTV remote.
 
-
-       $ irw
+  $ irw
 
 
 
@@ -1951,19 +1964,22 @@
   my /home/[yourusername]/.lircrc file:
 
 
-       begin
-           prog = irxevent
-           button = channel+
-           repeat = 3
-           config = Key Up CurrentWindow
-       end
 
-       begin
-           prog = irxevent
-           button = channel-
-           repeat = 3
-           config = Key Down CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = channel+
+      repeat = 3
+      config = Key Up CurrentWindow
+  end
+
+  begin
+      prog = irxevent
+      button = channel-
+      repeat = 3
+      config = Key Down CurrentWindow
+  end
+
+
 
   which took care of basic functionality.  Because the PCTV Studio
   remote has additional buttons, look at the configfiles/lircrc.exam-
@@ -2013,19 +2029,19 @@
   kernel module you might see the following message during make:
 
 
-       lirc_sir.c:56:2: warning: #warning
-       "******************************************"
+  lirc_sir.c:56:2: warning: #warning
+  "******************************************"
 
-       lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
+  lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
 
-       lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
+  lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
 
-       lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
+  lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
 
-       lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
+  lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
 
-       lirc_sir.c:61:2: warning: #warning
-       "******************************************"
+  lirc_sir.c:61:2: warning: #warning
+  "******************************************"
 
 
 
@@ -2076,8 +2092,6 @@
        000000000000bff8 00 2 gi-motorola-dct2000
        000000000000f7f0 00 ENTER gi-motorola-dct2000
 
-
-
   Once you've verified lirc is working you can press [1mCTRL-C [22mto exit [1mirw[0m
   and configure the channel changing script.
 
@@ -2092,16 +2106,17 @@
   /dev/device. Unlike bourne or bash, csh scripts automatically close
   parent file descriptors before they start.
 
-  $ cd /usr/local/bin
-  # su
-  # cat > change_channel.csh
-  #!/bin/csh
-  echo "changing to $1"
-  /usr/local/bin/channel.pl $1 &
-  ^D
-  # chmod a+x change_channel.csh
-  # exit
-  $ exit
+
+       $ cd /usr/local/bin
+       # su
+       # cat > change_channel.csh
+       #!/bin/csh
+       echo "changing to $1"
+       /usr/local/bin/channel.pl $1 &
+       ^D
+       # chmod a+x change_channel.csh
+       # exit
+       $ exit
 
 
 
@@ -2142,7 +2157,6 @@
        # exit
 
 
-
   The first thing to configure is the master backend system.  If you are
   running multiple backend systems, the master backend will make all
   decisions about which programs will be recorded on which tuners.  If
@@ -2156,6 +2170,7 @@
   tuner on the master will always be the first choice. You will then
   want to add your ``other backends'' in the order of your preference
   for recording.
+
   See ``Advanced Backend Configurations'' for information on configuring
   multiple backend systems in various ways.
 
@@ -2205,6 +2220,7 @@
   Once the graphical setup starts, you'll see that there are four
   choices.
 
+
   1. General
 
   2. Capture Cards
@@ -2215,7 +2231,6 @@
 
   Use the arrow keys to move around, and press the space bar to select
   which option you wish to configure.
-
 
 
   [1m9.1.1.  General[0m
@@ -2344,14 +2359,13 @@
   As of 2003-03-27, the available options are:
 
 
-
-  $ mythbackend -h
-  Invalid argument: -h
-  Valid options are:
-  -l or --logfile filename       Writes STDERR and STDOUT messages to filename
-  -p or --pidfile filename       Write PID of mythbackend to filename
-  -d or --daemon                 Runs mythbackend as a daemon
-  -v or --verbose                Prints more information
+       $ mythbackend -h
+       Invalid argument: -h
+       Valid options are:
+       -l or --logfile filename       Writes STDERR and STDOUT messages to filename
+       -p or --pidfile filename       Write PID of mythbackend to filename
+       -d or --daemon                 Runs mythbackend as a daemon
+       -v or --verbose                Prints more information
 
 
 
@@ -2403,13 +2417,11 @@
   [1mmythfilldatabase --xawchannels [22mis an option if you have used [1mxawtv [22mto
   fine-tune your channels and would like to import the fine tuning
   offsets into MythTV.
-
-
-
   [1m9.4.1.  Setting mythfilldatabase  to run from cron[0m
 
   In order to keep your database filled, [1mmythfilldatabase [22mshould be run
   once a day.
+
   There are two ways to accomplish this:  either as a user-based cron
   job, or as a system based cron.  If you use a user-based cron, you can
   select the time that the cron job will be run.  A system-based cron
@@ -2458,18 +2470,19 @@
   will run, save and exit, and return to the shell prompt.
 
 
-       $ cd configfiles
-       $ crontab mythcrontab
-       $ crontab -l  NOTE: this is a lowercase L.
-       # The following will run the mythfilldatabase shell script at 0430
-       # every day.  Format is
-       # minutes hour day_of_month month day_of_week
-       # man 5 crontab for more information
-       # Need to use a shell script because the QTDIR environment variable isn't
-       # being honored by crontab?
-       # The next text should be all on the same line.
-       30 04 * * * /bin/bash $HOME/mythtv-0.8/configfiles/mythfilldatabasecron
-       $
+
+  $ cd configfiles
+  $ crontab mythcrontab
+  $ crontab -l  NOTE: this is a lowercase L.
+  # The following will run the mythfilldatabase shell script at 0430
+  # every day.  Format is
+  # minutes hour day_of_month month day_of_week
+  # man 5 crontab for more information
+  # Need to use a shell script because the QTDIR environment variable isn't
+  # being honored by crontab?
+  # The next text should be all on the same line.
+  30 04 * * * /bin/bash $HOME/mythtv-0.8/configfiles/mythfilldatabasecron
+  $
 
 
 
@@ -2583,6 +2596,7 @@
   3dnow you shouldn't have any issues with deinterlacing.
 
 
+
   [1m10.5.  Recording[0m
 
   Currently, MythTV supports two different video encoders, MPEG-4 and
@@ -2647,6 +2661,7 @@
   box, you should add /usr/local/bin/changechannel to your Input
   Connections in the mythbackend configuration GUI.
 
+
   The [1mchangechannel [22mprogram is not supplied with MythTV, so this is
   going to be dependent on what sort of external tuner you have.
   Example scripts for Sony and RCA receivers can be obtained from
@@ -2670,7 +2685,7 @@
   dependent on MythTV being installed and operational.
 
 
-  [1m12.1.  Installation and pre-requisites.[0m
+  [1m12.1.  Installation and prerequisites.[0m
 
   Download mythweb from http://www.mythtv.org/ <http://www.mythtv.org/>
   and save it to a location where you can find it.  The next step
@@ -2723,20 +2738,20 @@
   separate application, but it's dependent on MythTV being installed and
   operational.
 
-  [1m13.1.  Installation and pre-requisites.[0m
+  [1m13.1.  Installation and prerequisites.[0m
 
   Download MythGallery from http://www.mythtv.org/
   <http://www.mythtv.org/> and save it to a location where you can find
   it.
 
 
-  $ tar -xjf mythgallery-0.8.tar.bz2
-  $ cd mythgallery-0.8
-  $ make
-  # su
-  # make install
-  # exit
-  $
+       $ tar -xjf mythgallery-0.8.tar.bz2
+       $ cd mythgallery-0.8
+       $ make
+       # su
+       # make install
+       # exit
+       $
 
 
 
@@ -2763,16 +2778,17 @@
 
   [1m15.  MythMusic.[0m
 
-  MythMusic has a number of pre-requisites that must be satisfied before
+  MythMusic has a number of prerequisites that must be satisfied before
   it is operational.  Depending on your distribution, some of these
   prerequisites can be satisfied through the various package managers.
   If your distribution doesn't offer pre-compiled versions of the
   software below, then follow the generic instructions for manually
   compiling and installing the software.
 
-  The pre-requisites for MythMusic are:
+  The prerequisites for MythMusic are:
 
   +o  MAD
+
 
   +o  libvorbis-devel
 
@@ -2783,7 +2799,7 @@
   +o  CDParanoia
 
 
-  [1m15.1.  Manual installation of pre-requisites.[0m
+  [1m15.1.  Manual installation of prerequisites.[0m
 
   These instructions are for distributions which don't have pre-compiled
   versions of the software necessary to run MythTV.
@@ -2793,15 +2809,14 @@
   can find later.
 
 
-
-  $ tar -xzf mad-0.14.2b.tar.gz
-  $ cd mad-0.14.2b
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
-  $
+       $ tar -xzf mad-0.14.2b.tar.gz
+       $ cd mad-0.14.2b
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
+       $
 
 
 
@@ -2857,7 +2872,7 @@
 
   [1m15.2.  Mandrake 9.0[0m
 
-  Mandrake 9.0 has a number of the pre-requisites available on the
+  Mandrake 9.0 has a number of the prerequisites available on the
   installation CD.  Some of the software you're going to need will have
   to be obtained from the "contrib" or "cooker" development
   repositories.  Applications downloaded from "cooker" come from the
@@ -2900,8 +2915,6 @@
 
        # urpmi libfftw2 libfftw2-devel
 
-
-
   OpenGL should be installed on practically all distributions.  However,
   you will need the devel module.  In Mandrake 9.1 it may be installed
   by typing:
@@ -2916,14 +2929,13 @@
   typing:
 
 
-
-  # urpmi libsdl1.2 libsdl1.2-devel
+       # urpmi libsdl1.2 libsdl1.2-devel
 
 
 
   [1m15.3.  Red Hat Linux 8.0[0m
 
-  Red Hat provides packages for several of the pre-requisites, making
+  Red Hat provides packages for several of the prerequisites, making
   installation very simple. Of the prerequisites, Red Hat provides
   packages for Vorbis, cdparanoia, SDL, and OpenGL (which you probably
   already have installed). To install these all at once, simply type
@@ -2946,7 +2958,7 @@
 
   [1m15.4.  Compiling MythMusic.[0m
 
-  Once all the pre-requisites have been installed, you can proceed with
+  Once all the prerequisites have been installed, you can proceed with
   getting MythMusic going. Make sure that you run ./configure first.  If
   you wish to use the new visualizations, make sure you install the
   prerequisites.  Run ./configure --help for help.
@@ -2964,8 +2976,6 @@
 
   save and close settings.pro and proceed with compiling MythMusic.
   ______________________________________________________________________
-
-
 
        $ make
        $ su
@@ -3094,11 +3104,12 @@
   Change into the MythWeather directory, then make and make install:
 
 
-       $ cd mythweather
-       $ make
-       $ su
-       # make install
-       # exit
+
+  $ cd mythweather
+  $ make
+  $ su
+  # make install
+  # exit
 
 
 
@@ -3107,17 +3118,18 @@
 
   These are the keyboard commands for MythWeather:
 
-  Left Key             Goes back one page, and extends the time spent
-                       on the page you are on.
-  Right Key            Goes forward one page, see above.
-  Space                Pause, wait on the current page until space is hit
-                       again.
-  Numeric Keys         You can check other weather by keying in other ZIP codes.
-  Enter Key            Switch between Celsius and Fahrenheit. Can also
-                       be used a way to force a data update.
-  "m" Key              Resets the location to the database default, then updates the data.
-  "i"                  Enter / Save settings
-  ESC                  Exit the settings screen without saving / Exit the program
+
+       Left Key             Goes back one page, and extends the time spent
+                            on the page you are on.
+       Right Key            Goes forward one page, see above.
+       Space                Pause, wait on the current page until space is hit
+                            again.
+       Numeric Keys         You can check other weather by keying in other ZIP codes.
+       Enter Key            Switch between Celsius and Fahrenheit. Can also
+                            be used a way to force a data update.
+       "m" Key              Resets the location to the database default, then updates the data.
+       "i"                  Enter / Save settings
+       ESC                  Exit the settings screen without saving / Exit the program
 
 
 
@@ -3221,8 +3233,6 @@
 
        # hdparm -d /dev/hd?
 
-
-
   will tell you the DMA status for your hard drives.  If you run [1mhdparm[0m
   with the -d1 parameter, it will turn DMA on.
 
@@ -3283,11 +3293,12 @@
   Edit your /etc/X11/XF86Config-4 file, and look for:
 
 
-       Section "ServerFlags"
-           #DontZap # disable <Crtl><Alt><BS> (server abort)
-           #DontZoom # disable <Crtl><Alt><KP_+>/<KP_-> (resolution switching)
-           AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
-       EndSection
+
+  Section "ServerFlags"
+      #DontZap # disable <Crtl><Alt><BS> (server abort)
+      #DontZoom # disable <Crtl><Alt><KP_+>/<KP_-> (resolution switching)
+      AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
+  EndSection
 
 
 
@@ -3297,14 +3308,13 @@
   Also, look for:
 
 
-
-  Section "Device"
-      Identifier "device1"
-      VendorName "nVidia Corporation"
-      BoardName "NVIDIA GeForce 256 (generic)"
-      Driver "nv"
-      Option "DPMS"
-  EndSection
+       Section "Device"
+           Identifier "device1"
+           VendorName "nVidia Corporation"
+           BoardName "NVIDIA GeForce 256 (generic)"
+           Driver "nv"
+           Option "DPMS"
+       EndSection
 
 
 
@@ -3358,6 +3368,7 @@
 
 
        $ xset -dpms s off
+
 
 
   Finally, depending on your distribution, you may be able to turn it
@@ -3424,6 +3435,8 @@
        Signal        Stop      Print   Pass to program Description
        SIGPIPE       No        Yes     Yes             Broken pipe
 
+
+
   [1mgdb [22mhas a number of options, read the man page for more information.
 
   Once at the (gdb) prompt, type run to start program execution.  When
@@ -3487,7 +3500,6 @@
   delayed behind the realtime video.  Once this test succeeds, MythTV
   should work correctly because it writes to and read from /dev/dsp in
   the same way that [1maplay [22mdoes.
-
 
   To record audio along with video the audio signal must be digitized by
   a DSP so that the audio data can be stored in a file. On playback, the
@@ -3598,6 +3610,7 @@
   users/2003-April/002527.html>
 
 
+
   [1m18.16.  Where's my "canada-cable" entry gone to?[0m
 
   There is no such thing as "Canada Cable"; Canada uses the same
@@ -3619,6 +3632,7 @@
   extension=mysql.so
 
   Restart apache for it to take effect.
+
 
   [1m19.  Miscellaneous.[0m
 
@@ -3681,12 +3695,11 @@
   The following also works with blackbox:
 
 
-
-  $ cat > .xinitrc
-  xset -dpms s off &
-  irxevent &
-  mythfrontend &
-  blackbox
+       $ cat > .xinitrc
+       xset -dpms s off &
+       irxevent &
+       mythfrontend &
+       blackbox
 
 
 
@@ -3725,6 +3738,7 @@
 
   +o  720x480 (but more commonly, 704x480.  "DVD" resolution)
 
+
   +o  640x480 4:3
 
   +o  544x480 (TiVo high resolution)
@@ -3747,6 +3761,7 @@
   720x240 is possible, but isn't a good tradeoff relative to the number
   of vertical lines lost.  In a PAL country, the you would use values
   like 720x576 or x288.
+
   The higher resolutions will be more CPU intensive. If the CPU is
   overtaxed, frames will be dropped causing uneven motion. You will
   likely see the best results at resolutions which average at least 10%
@@ -3856,8 +3871,6 @@
   picture uses the recording resolution for its dimensions. If you check
   the box "Fixed Aspect Ratio" in Setup->Playback, the windowed picture
   will always be resized to normal 4:3 shape.
-
-
   [1m19.6.  I'd like to save or restore my database.[0m
 
   See the [1mmysqldump [22mmanpage for more information.
@@ -3919,6 +3932,7 @@
 
   +o  ATI TV Wonder
 
+
   The following cards do not work:
 
   +o  Pinnacle Studio PCTV Pro - note: this has a MSP34xx, but it's not
@@ -3940,6 +3954,7 @@
 
   Once btaudio loads, it should register additional /dev/dsp and
   /dev/mixer devices.  Typing $ dmesg will let you know what's going on.
+
 
   [1m19.9.  Removing unwanted channels.[0m
 
@@ -4002,7 +4017,6 @@
 
   [1mNOTE[22m:  You do not need to recompile your kernel.
 
-
   Download the IVTV driver from CVS:
 
 
@@ -4039,12 +4053,13 @@
   Add the following to /etc/modules.conf:
 
 
-       alias char-major-81     videodev
-       alias char-major-81-0   ivtv
-       options ivtv debug=1
-       options tuner type=2
-       options msp3400 once=1 simple=1
-       add below ivtv msp3400 saa7115 tuner
+
+  alias char-major-81     videodev
+  alias char-major-81-0   ivtv
+  options ivtv debug=1
+  options tuner type=2
+  options msp3400 once=1 simple=1
+  add below ivtv msp3400 saa7115 tuner
 
 
 
@@ -4127,20 +4142,27 @@
 
        # echo "/sbin/modprobe ivtv" >> /etc/rc.d/rc.local
 
+
+
   By default, the IVTV driver uses a 16Mbps peak rate with a 8Mbps VBR.
   This will create files at about 4GB/hour.  If you wish to adjust these
-  parameters, add the following to your rc.local:
+  parameters, add something like the following to your rc.local:
 
 
-       /path/to/ivtv/utils/test_ioctl -c bitrate=2500000,bitrate_peak=8000000
+       /path/to/ivtv/utils/test_ioctl -c bitrate=4500000,bitrate_peak=6000000
 
 
+
+  The actual values to use should be adjusted to your liking and in part
+  depend on the capture resolution.  The above example is more than
+  adequate for 480x480.  Once the IVTV API has settled down MythTV will
+  incorporate the ability to modify the bitrate internally.
 
   [1mNOTE[22m:  some people complain that their PVR-250/350 card is not
-  capturing audio.  The most like source for this is that your system is
-  not loading the correct msp3400.o file; ivtv uses a custom msp3400.c,
-  and if the resulting module isn't loaded you will not get sound.
-  Switch to your /lib/modules directory and rename the existing
+  capturing audio.  The most likely source for this is that your system
+  is not loading the correct msp3400.o file; ivtv uses a custom
+  msp3400.c, and if the resulting module isn't loaded you will not get
+  sound.  Switch to your /lib/modules directory and rename the existing
   msp3400.o file, then copy the msp3400.o from the ivtv driver directory
   and re-run [1mdepmod[22m.  If that still doesn't work, then check the ivtv
   mailing list for more information.
@@ -4154,9 +4176,12 @@
 
   2. Turn off DNR
 
-  To turn off DNR, add the following someplace in your rc.local:
-  /path/to/ivtv/utils/test_ioctl --set-codec-
-  params=dnr_mode=0,dnr_temporal=0
+  To turn off DNR, add the following to your rc.local:
+
+
+
+  /path/to/ivtv/utils/test_ioctl --set-codec-params=dnr_mode=0,dnr_temporal=0
+
 
 
   [1m19.11.  I'd like to use NFS.[0m
@@ -4251,7 +4276,6 @@
   that starts mythbackend from the default of root you [4mmust[24m perform this
   step.
 
-
   Create the directory /var/log/mythtv and set its permissions as
   follows:
 
@@ -4277,13 +4301,12 @@
   to edit the /etc/security/msec/perm.local file to include the
   following:
 
-
-       # /etc/security/msec/perm.local
-       # Local overrides to the msec program
-       #
-       # Full file path                user.group              permissions
-       /var/log/mythtv/                root.mythtv             775
-       /var/log/mythtv/*               root.mythtv             664
+  # /etc/security/msec/perm.local
+  # Local overrides to the msec program
+  #
+  # Full file path                user.group              permissions
+  /var/log/mythtv/                root.mythtv             775
+  /var/log/mythtv/*               root.mythtv             664
 
 
 
@@ -4311,7 +4334,6 @@
   [1mNOTE[22m: msec can only [4mreduce[24m the permissions of files, so if you don't
   get the results you expect, check that you're not asking msec to add
   missing permissions to the files or directories you created.
-
 
   [1m19.12.2.  Gentoo[0m
 
@@ -4405,7 +4427,7 @@
   already been created using [1mfdisk[22m.
 
 
-       # mkfs.ext3 -T largefile4 -m 0 /dev/hdb1
+  # mkfs.ext3 -T largefile4 -m 0 /dev/hdb1
 
 
 

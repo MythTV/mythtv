@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-06-09, v2.38
+<date>2003-06-09, v2.39
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -349,7 +349,7 @@ NOTE:  QT v3.1 is recommended, but not required.
 NOTE:  If you are going to be using RPMs to install various
 components, you should be aware that not all packages include the necessary
 headers for compiling packages.  If you're having trouble compiling, ensure
-that you've installed the -devel version of a pre-requisite.
+that you've installed the -devel version of a prerequisite.
 
 NOTE:  Other than where noted, Mandrake 9.1 users may follow the
 Mandrake 9.0 instructions.
@@ -452,7 +452,7 @@ XFree-86 development libraries:
 </verb></tscreen>
 
 <sect2>Command-line installation. <label id="CLIinstalltools_">
-<p> This section details the various methods for installing pre-requisites
+<p> This section details the various methods for installing prerequisites
 from the command line.
 
 <sect3>Mandrake
@@ -468,7 +468,7 @@ load the <tt>lame</tt> library without compiling from source.
 <sect4>Special instructions for Mandrake 8.2  
 <p>Mandrake 8.2 does not have a pre-packaged libqt3-devel, so you must compile
 and install this manually.  The following command will install the
-pre-requisites for qt3, so don't skip this step.  The simplest tool for
+prerequisites for qt3, so don't skip this step.  The simplest tool for
 installing packages from the command line is urpmi.
 
 Open a shell, and execute the following.  You may get asked a number of
@@ -478,7 +478,7 @@ questions regarding dependencies.  It's best to answer "YES".
 $ urpmi mesa-common-devel libmng1-devel mysql-devel libunixodbc2-devel
 $ urpmi postgresql-devel xfree86-static-libs
 </verb></tscreen>
-Once all of the pre-requisites have been installed, the next step is to
+Once all of the prerequisites have been installed, the next step is to
 obtain and compile the source RPM.
 
 Go to <url url="http://www.rpmfind.net"
@@ -582,7 +582,7 @@ start compiling.
 
 <tt>QTDIR</tt> needs to be set, and <tt>/usr/lib/qt3/bin</tt> must be added
 to your path.  Your distribution may already be making these changes as a part of the
-installation of the software pre-requisites detailed earlier.
+installation of the software prerequisites detailed earlier.
 
 <sect1>Distribution-specific information. <label
 id="Distribution-specific_information">
@@ -772,7 +772,7 @@ $ cd xmltv-0.5.10
 Install the xmltv prerequisites:
 
 <code>
-NOTE for Mandrake Users: you may install the XMLTV pre-requisites if you
+NOTE for Mandrake Users: you may install the XMLTV prerequisites if you
 have added a cooker mirror by typing:
 
 # urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
@@ -1293,6 +1293,18 @@ $ su
 # exit
 $
 </verb></tscreen>
+
+<bf>NOTE</bf>:  The above example assumes that your receiver uses the
+standard serial driver.  Some receivers do not, including receivers that
+plug into a TV capture card.  Check the lirc documentation, but it may be
+necessary to replace the link created above with a a character pipe:
+<tscreen><verb>
+# mknod /dev/lirc c 61 0
+</verb></tscreen>
+
+See the lirc documentation for additional information.  The lirc
+installation <em>should</em> create this for you, so manually creating it
+indicates that your lirc installation may have other issues.
 
 <sect2>Recompiling your kernel on Red Hat Linux
 <p>Don't Panic! Red Hat makes a kernel recompile very easy. They provide  
@@ -2111,7 +2123,7 @@ pinouts for RCA DSS receivers.
 MythTV system.  MythWeb is a separate application, but it's dependent on
 MythTV being installed and operational.
 
-<sect1>Installation and pre-requisites.
+<sect1>Installation and prerequisites.
 <p>Download mythweb from <url url="http://www.mythtv.org/"
 name="http://www.mythtv.org/"> and save it to a location where you can find
 it.  The next step depends on whether your distribution has a web server and
@@ -2154,7 +2166,7 @@ otherwise you will get a <tt>404 Page not Found</tt> error.
 <p>MythGallery is a photo and slideshow application.  MythGallery is a
 separate application, but it's dependent on MythTV being installed and
 operational.
-<sect1>Installation and pre-requisites.
+<sect1>Installation and prerequisites.
 <p>Download MythGallery from <url url="http://www.mythtv.org/"
 name="http://www.mythtv.org/"> and save it to a location where you can find
 it.
@@ -2186,13 +2198,13 @@ you're at the first level.
 <sect>MythGame.
 
 <sect>MythMusic.  
-<p>MythMusic has a number of pre-requisites that must be satisfied before it
+<p>MythMusic has a number of prerequisites that must be satisfied before it
 is operational.  Depending on your distribution, some of these prerequisites can
 be satisfied through the various package managers.  If your distribution doesn't
 offer pre-compiled versions of the software below, then follow the generic
 instructions for manually compiling and installing the software.
 
-The pre-requisites for MythMusic are:
+The prerequisites for MythMusic are:
 <itemize>
 <item>MAD
 <item>libvorbis-devel
@@ -2201,7 +2213,7 @@ The pre-requisites for MythMusic are:
 <item>CDParanoia
 </itemize>
 
-<sect1>Manual installation of pre-requisites.
+<sect1>Manual installation of prerequisites.
 <p>These instructions are for distributions which don't have pre-compiled
 versions of the software necessary to run MythTV.
 
@@ -2263,7 +2275,7 @@ $
 </verb></tscreen>
 
 <sect1>Mandrake 9.0
-<p>Mandrake 9.0 has a number of the pre-requisites available on the
+<p>Mandrake 9.0 has a number of the prerequisites available on the
 installation CD.  Some of the software you're going to need will have to be
 obtained from the "contrib" or "cooker" development repositories. 
 Applications downloaded from "cooker" come from the development branch, so
@@ -2316,7 +2328,7 @@ typing:
 </verb></tscreen>
 
 <sect1>Red Hat Linux 8.0
-<p>Red Hat provides packages for several of the pre-requisites, making 
+<p>Red Hat provides packages for several of the prerequisites, making 
 installation very simple. Of the prerequisites, Red Hat provides 
 packages for Vorbis, cdparanoia, SDL, and OpenGL (which you probably 
 already have installed). To install these all at once, simply type (all on
@@ -2335,7 +2347,7 @@ installing fftw do not use the rpm package offered on the website because it
 will cause an error, so use the source package instead.
 
 <sect1>Compiling MythMusic.  
-<p>Once all the pre-requisites have been installed, you can proceed with
+<p>Once all the prerequisites have been installed, you can proceed with
 getting MythMusic going. Make sure that you run <tt>./configure</tt> first. 
 If you wish to use the new visualizations, make sure you install the
 prerequisites.  Run <tt>./configure --help</tt> for help.
@@ -3353,13 +3365,18 @@ command to <tt>/etc/rc.d/rc.local</tt>:
 
 By default, the IVTV driver uses a 16Mbps peak rate with a 8Mbps VBR.  This
 will create files at about 4GB/hour.  If you wish to adjust these
-parameters, add the following to your <tt>rc.local</tt>:
+parameters, add something like the following to your <tt>rc.local</tt>:
 <tscreen><verb>
-/path/to/ivtv/utils/test_ioctl -c bitrate=2500000,bitrate_peak=8000000
+/path/to/ivtv/utils/test_ioctl -c bitrate=4500000,bitrate_peak=6000000
 </verb></tscreen>
 
+The actual values to use should be adjusted to your liking and in part
+depend on the capture resolution.  The above example is more than adequate
+for 480x480.  Once the IVTV API has settled down MythTV will incorporate the
+ability to modify the bitrate internally.
+
 <label id="troubleshooting_pvraudio"><bf>NOTE</bf>:  some people complain
-that their PVR-250/350 card is not capturing audio.  The most like source
+that their PVR-250/350 card is not capturing audio.  The most likely source
 for this is that your system is not loading the correct msp3400.o file; ivtv
 uses a custom msp3400.c, and if the resulting module isn't loaded you will
 not get sound.  Switch to your <tt>/lib/modules</tt> directory and rename
@@ -3376,8 +3393,10 @@ firmware issue, apparently.  There are two ways around this:
 <item>Turn off DNR
 </enum>
 
-To turn off DNR, add the following someplace in your <tt>rc.local</tt>:
+To turn off DNR, add the following to your <tt>rc.local</tt>:
+<tscreen><verb>
 /path/to/ivtv/utils/test_ioctl --set-codec-params=dnr_mode=0,dnr_temporal=0
+</verb></tscreen>
 
 <sect1>I'd like to use NFS.
 <p>You may want to use a central server to store your files.  
@@ -3630,7 +3649,7 @@ v2.14, 2003-04-16.  Update on lirc hanging issues - Tivo remote can hang
 lirc.
 v2.15, 2003-04-23.  Specified that configuration is relative to the
 mythtv-0.8 directory.  Added urpmi for Mandrake Cooker for XMLTV
-pre-requisites.  Added gist.com instructions.  Incorporated pre-requisite
+prerequisites.  Added gist.com instructions.  Incorporated prerequisite
 text from Ray Olszewski [ray@comarre.com] with edits.
 v2.16, 2003-04-23.  Additional stuff in the hardware pre-req section.
 v2.17, 2003-04-24.  John Crombe's suggestion WRT ld.so.conf.  Another scan
@@ -3679,6 +3698,10 @@ v2.38, 2003-06-09.  Fix some more tags.  (WTF is it with the tags lately?)
 Update non-US mythtv website and POC.  Add the stuff about DNR for PVR-250. 
 Added Advanced Partition formatting section.  Fixed the chkconfig example to
 add -levels.
+v2.39, 2003-06-09.  Standardized on pre-requisite vs. prerequisite.  Modify
+lirc example so that the user knows that only certain kinds of serial
+modules should have the link to ttySx.  Altered the PVR-250 bitrate example.
+
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

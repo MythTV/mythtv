@@ -145,6 +145,19 @@ $
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P><B>NOTE</B>:  The above example assumes that your receiver uses the
+standard serial driver.  Some receivers do not, including receivers that
+plug into a TV capture card.  Check the lirc documentation, but it may be
+necessary to replace the link created above with a a character pipe:
+<BLOCKQUOTE><CODE>
+<PRE>
+# mknod /dev/lirc c 61 0
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>See the lirc documentation for additional information.  The lirc
+installation <EM>should</EM> create this for you, so manually creating it
+indicates that your lirc installation may have other issues.</P>
 
 <H3>Recompiling your kernel on Red Hat Linux</H3>
 
