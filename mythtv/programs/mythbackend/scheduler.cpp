@@ -133,16 +133,8 @@ static bool comp_recstart(ProgramInfo *a, ProgramInfo *b)
     // Note: the PruneRedundants logic depends on the following
     if (a->recordid != b->recordid)
         return a->recordid < b->recordid;
-    if (a->chansign != "" || b->chansign != "")
-    {
-        if (a->chansign != b->chansign)
-            return a->chansign < b->chansign;
-    }
-    else
-    {
-        if (a->chanid != b->chanid)
-            return a->chanid < b->chanid;
-    }
+    if (a->chansign != b->chansign)
+        return a->chansign < b->chansign;
     return a->recstatus < b->recstatus;
 }
 
@@ -1179,7 +1171,6 @@ void Scheduler::AddNewRecords(void) {
 "FROM record "
 " INNER JOIN program ON (program.title = record.title) "
 " INNER JOIN channel ON (channel.chanid = program.chanid) "
-" LEFT JOIN channel AS chantmp ON (record.chanid = chantmp.chanid) "
 " INNER JOIN cardinput ON (channel.sourceid = cardinput.sourceid) "
 " INNER JOIN capturecard ON (capturecard.cardid = cardinput.cardid) "
 " LEFT JOIN oldrecorded ON "
@@ -1201,7 +1192,7 @@ void Scheduler::AddNewRecords(void) {
 " LEFT JOIN recordoverride ON "
 "  ( "
 "    record.recordid = recordoverride.recordid "
-"    AND program.chanid = recordoverride.chanid "
+"    AND channel.callsign = recordoverride.station "
 "    AND program.starttime = recordoverride.starttime "
 "    AND program.endtime = recordoverride.endtime "
 "    AND program.title = recordoverride.title "
@@ -1212,9 +1203,7 @@ void Scheduler::AddNewRecords(void) {
 "((record.type = %1 " // allrecord
 "OR record.type = %2) " // findonerecord
 " OR "
-" (((chantmp.callsign IS NOT NULL AND chantmp.callsign <> '' "
-"  AND chantmp.callsign = channel.callsign) "
-" OR record.chanid = program.chanid) " // channel matches
+" ((record.station = channel.callsign) " // channel matches
 "  AND "
 "  ((record.type = %3) " // channelrecord
 "   OR"
@@ -1429,7 +1418,7 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
 "record.subtitle, record.description, record.recpriority, record.type, "
 "channel.name, record.recordid, record.recgroup, record.dupin, "
 "record.dupmethod, channel.commfree FROM record "
-"LEFT JOIN channel ON (channel.chanid = record.chanid) "
+"LEFT JOIN channel ON (channel.callsign = record.station) "
 "ORDER BY title ASC;");
 
     QSqlQuery result = db->exec(query);
