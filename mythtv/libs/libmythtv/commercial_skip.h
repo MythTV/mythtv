@@ -46,6 +46,7 @@ class CommDetect
     ~CommDetect(void);
 
     void Init(int w, int h, double frame_rate, int method);
+    void SetCommDetectMethod(int method) { commDetectMethod = method; };
 
     void ProcessNextFrame(VideoFrame *frame, long long frame_number = -1);
     void SetVerboseDebugging(bool beVerbose = true)

@@ -1717,6 +1717,12 @@ void NuppelVideoPlayer::StartPlaying(void)
     rewindtime = fftime = 0;
     skipcommercials = 0;
 
+    // in the player, pretend we use Blank-frame detection so we can
+    // utilize the blank-frame info from the recorder if no commercial
+    // skip list exists.
+    if (commDetect)
+        commDetect->SetCommDetectMethod(COMM_DETECT_BLANKS);
+
     for (int i = 0; i < MAXTBUFFER; i++)
         txtbuffers[i].buffer = new unsigned char[text_size];
 
