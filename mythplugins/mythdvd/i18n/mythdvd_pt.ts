@@ -381,7 +381,7 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>EMT: </source>
-        <translation>Tempo:</translation>
+        <translation type="obsolete">Tempo:</translation>
     </message>
     <message>
         <source>Transcoding Pass 1 of 2 ~</source>

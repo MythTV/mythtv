@@ -233,10 +233,6 @@ You have no DVD Device defined.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>EMT: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Transcoding Pass 1 of 2 ~</source>
         <translation type="unfinished"></translation>
     </message>

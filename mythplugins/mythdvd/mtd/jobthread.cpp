@@ -1095,7 +1095,7 @@ bool DVDTranscodeThread::runTranscode(int which_run)
                 //
 
                 QString status_line = tc_process->readLineStdout();
-                status_line = status_line.section(QObject::tr("EMT: "), 1, 1);
+                status_line = status_line.section("EMT: ", 1, 1);
                 status_line = status_line.section(",",0,0);
                 QString h_string = status_line.section(":",0,0);
                 QString m_string = status_line.section(":",1,1);

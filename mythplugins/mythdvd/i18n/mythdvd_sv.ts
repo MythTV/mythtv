@@ -241,10 +241,6 @@ Du har ingen DVD-enhet definierad.</translation>
         <translation>Väntar på tillstånd att börja omkodning</translation>
     </message>
     <message>
-        <source>EMT: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Transcoding Pass 1 of 2 ~</source>
         <translation>Omkodar pass 1 av 2 ~</translation>
     </message>
