@@ -62,7 +62,27 @@ Database::Database(
 
     the_mfd = my_mfd;
     metadata_server = the_mfd->getMetadataServer();
-    metadata_container = metadata_server->createContainer(name, MCCT_audio, MCLT_lan);
+    if(daap_server_type == DAAP_SERVER_ITUNES41)
+    {
+        metadata_container = metadata_server->createContainer(name, MCCT_audio, MCLT_lan, MST_daap_itunes41);
+    }
+    else if(daap_server_type == DAAP_SERVER_ITUNES42)
+    {
+         metadata_container = metadata_server->createContainer(name, MCCT_audio, MCLT_lan, MST_daap_itunes42);
+    }
+    else if(daap_server_type == DAAP_SERVER_ITUNES43)
+    {
+         metadata_container = metadata_server->createContainer(name, MCCT_audio, MCLT_lan, MST_daap_itunes43);
+    }
+    else if(daap_server_type == DAAP_SERVER_ITUNES45)
+    {
+         metadata_container = metadata_server->createContainer(name, MCCT_audio, MCLT_lan, MST_daap_itunes45);
+    }
+    else
+    {
+         metadata_container = metadata_server->createContainer(name, MCCT_audio, MCLT_lan);
+    }
+
     container_id = metadata_container->getIdentifier();
 
     //
@@ -710,7 +730,7 @@ void Database::parseItems(TagInput& dmap_data, int how_many_now)
                 //  filename)
                 //  
             
-                QString new_url = QString("://%1:%2/databases/%3/items/%4.%5?session-id=%6")
+                QString new_url = QString("daap://%1:%2/databases/%3/items/%4.%5?session-id=%6")
                                   .arg(host_address)
                                   .arg(host_port)
                                   .arg(daap_id)
@@ -718,23 +738,6 @@ void Database::parseItems(TagInput& dmap_data, int how_many_now)
                                   .arg(new_item_format)
                                   .arg(session_id);
                                   
-                //
-                //  If the server is iTunes (or other) the url's protocol
-                //  should be daap. If it's another myth box, it should be
-                //  mdaap (which just lets the audio plugin realize that the
-                //  content is on another myth box when it sees the url)
-                //
-                
-                if(daap_server_type == DAAP_SERVER_MYTH)
-                {
-                    new_url.prepend("mdaap");
-                }
-                else
-                {
-                    new_url.prepend("daap");
-                }
-
-
                 AudioMetadata *new_item = new AudioMetadata
                                     (
                                         new_url,

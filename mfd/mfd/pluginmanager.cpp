@@ -624,7 +624,8 @@ void MFDPluginManager::fillValidationHeader(
                                                 int server_daap_version_major,
                                                 const QString &request, 
                                                 unsigned char *resulting_hash,
-                                                int request_id
+                                                int request_id,
+                                                int hash_algorithm_version
                                             )
 {
     hashing_mutex.lock();
@@ -633,7 +634,7 @@ void MFDPluginManager::fillValidationHeader(
             generateHashFunction(
                                     server_daap_version_major,
                                     (const unsigned char *)request.ascii(),
-                                    2,  // should this always be 2 ?
+                                    hash_algorithm_version,
                                     resulting_hash,
                                     request_id
                                 );

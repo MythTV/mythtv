@@ -25,7 +25,8 @@ MetadataContainer::MetadataContainer(
                                         MFD *l_parent, 
                                         int l_unique_identifier,
                                         MetadataCollectionContentType  l_content_type,
-                                        MetadataCollectionLocationType l_location_type
+                                        MetadataCollectionLocationType l_location_type,
+                                        MetadataCollectionServerType   l_server_type
                                     )
 {
     my_name = a_name;
@@ -33,6 +34,7 @@ MetadataContainer::MetadataContainer(
     unique_identifier = l_unique_identifier;
     content_type = l_content_type;
     location_type = l_location_type;
+    server_type = l_server_type;
     current_metadata = NULL;
     current_playlists = NULL;
     current_playlist_id = 2;

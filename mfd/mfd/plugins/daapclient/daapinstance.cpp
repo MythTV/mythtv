@@ -43,6 +43,7 @@ DaapInstance::DaapInstance(
     {
         warning("could not create a u shaped pipe");
     }
+
     daap_server_type = DAAP_SERVER_UNKNOWN;
     
 
@@ -508,13 +509,34 @@ bool DaapInstance::checkServerType(const QString &server_description)
         
         bool copasetic = true;
         
-        if(server_description.left(6) == "iTunes")
+        if(server_description.left(9) == "iTunes/4.")
         {
-            QString version_string = server_description.section(" ", 0, 0);
-            version_string = version_string.section("/", 1, 1);
+            QString sub_version_string = server_description.section(" ", 0, 0);
+            sub_version_string = sub_version_string.section("/4.", 1, 1);
             bool ok = true;
-            float itunes_version = version_string.toFloat(&ok);
-            if(itunes_version == 4.5)
+            int itunes_sub_version = sub_version_string.toInt(&ok);
+            if(itunes_sub_version == 1)
+            {
+                if(daap_server_type != DAAP_SERVER_ITUNES41)
+                {
+                    copasetic = false;
+                }
+            }
+            else if(itunes_sub_version == 2)
+            {
+                if(daap_server_type != DAAP_SERVER_ITUNES42)
+                {
+                    copasetic = false;
+                }
+            }
+            else if(itunes_sub_version == 3)
+            {
+                if(daap_server_type != DAAP_SERVER_ITUNES43)
+                {
+                    copasetic = false;
+                }
+            }
+            else if(itunes_sub_version == 5)
             {
                 if(daap_server_type != DAAP_SERVER_ITUNES45)
                 {
@@ -554,26 +576,49 @@ bool DaapInstance::checkServerType(const QString &server_description)
     }
     else
     {
-        if(server_description.left(6) == "iTunes")
+        if(server_description.left(9) == "iTunes/4.")
         {
             service_details_mutex.lock();
             daap_server_type = DAAP_SERVER_ITUNES4X;
-            QString version_string = server_description.section(" ", 0, 0);
-            version_string = version_string.section("/", 1, 1);
+            QString sub_version_string = server_description.section(" ", 0, 0);
+            sub_version_string = sub_version_string.section("/4.", 1, 1);
             bool ok = true;
-            float itunes_version = version_string.toFloat(&ok);
-            if(itunes_version == 4.5)
+            int itunes_sub_version = sub_version_string.toInt(&ok);
+            if(!ok)
             {
-                daap_server_type = DAAP_SERVER_ITUNES45;
-                //log("I'm a client of version 4.5 iTunes. You may nee"
-                //        "and/or wait for an update to libopendaap)");
-                //return false;
+                warning("could not determine iTunes minor version number");
             }
-            log(QString("discovered service "
+            else
+            {
+                if(itunes_sub_version == 1)
+                {
+                    daap_server_type = DAAP_SERVER_ITUNES41;
+                }
+                else if(itunes_sub_version == 2)
+                {
+                    daap_server_type = DAAP_SERVER_ITUNES42;
+                }
+                else if(itunes_sub_version == 3)
+                {
+                    daap_server_type = DAAP_SERVER_ITUNES43;
+                }
+                else if(itunes_sub_version == 5)
+                {
+                    daap_server_type = DAAP_SERVER_ITUNES45;
+                }
+                else
+                {
+                    warning(QString("seems to be a new version of "
+                            "iTunes I don't know about: %1")
+                            .arg(itunes_sub_version));
+                }                
+                
+                log(QString("discovered service "
                         "named \"%1\" is being served by "
-                        "iTunes version %2")
+                        "iTunes version 4.%2")
                         .arg(service_name)
-                        .arg(itunes_version), 2);
+                        .arg(itunes_sub_version), 2);
+            }
             service_details_mutex.unlock();
             
             //

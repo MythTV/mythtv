@@ -116,7 +116,8 @@ class MFDPluginManager : public QObject
                                 int server_daap_version_major,
                                 const QString &request, 
                                 unsigned char *resulting_hash,
-                                int request_id
+                                int request_id,
+                                int hash_algorithm_version = 2
                              );
     bool haveLibOpenDaap();
     int  bumpDaapRequestId();

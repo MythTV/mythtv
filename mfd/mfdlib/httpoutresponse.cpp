@@ -67,6 +67,7 @@ HttpOutResponse::HttpOutResponse(MFDHttpPlugin *owner, HttpInRequest *requestor)
     stored_skip = 0;
     file_to_send = NULL;
     file_transformation = FILE_TRANSFORM_NONE;
+    bytes_in_content_range_header = false;
 
     //
     //  flac stuff (only used if this response is going to end up streaming
@@ -305,10 +306,21 @@ void HttpOutResponse::createHeaderBlock(
                 total_possible_range > -1
               )
             {
-                QString file_range_header = QString("Content-Range: bytes %1-%2/%3\r\n")
-                                            .arg(range_begin)
-                                            .arg(range_end)
-                                            .arg(total_possible_range);
+                QString file_range_header;
+                if(bytes_in_content_range_header)
+                {                
+                    file_range_header = QString("Content-Range: bytes %1-%2/%3\r\n")
+                                                .arg(range_begin)
+                                                .arg(range_end)
+                                                .arg(total_possible_range);
+                }
+                else
+                {
+                    file_range_header = QString("Content-Range: %1-%2/%3\r\n")
+                                                .arg(range_begin)
+                                                .arg(range_end)
+                                                .arg(total_possible_range);
+                }
                 addText(header_block, file_range_header);
                 if((range_end - range_begin) + 1 != payload_size)
                 {

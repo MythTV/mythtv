@@ -40,7 +40,7 @@ class DaapRequest : public HttpOutRequest
                
     ~DaapRequest();
 
-    bool send(QSocketDevice *where_to_send, bool add_validation = false);
+    bool send(QSocketDevice *where_to_send, bool daap_validation = false);
     void warning(const QString &warn_text);
     void setHashingUrl(const QString &a_string){hashing_url = a_string;}
     

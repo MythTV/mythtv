@@ -41,22 +41,17 @@ DaapRequest::DaapRequest(
 
 
     //
-    //  Add the client daap version
-    //
-    
-    addHeader("Client-DAAP-Version: 3.0");
-
-
-    //
-    //  user agent header, depending on the server type
+    //  user agent header and daap version headers, depending on the server
+    //  type
     //
     
     if(server_type == DAAP_SERVER_ITUNES45)
     {
         addHeader("User-Agent: iTunes/4.5 (Windows; N)");
         addHeader("Accept-Language: en-us, en;q=5.0");
+        addHeader("Client-DAAP-Version: 3.0");
     }
-    else
+    else if(server_type == DAAP_SERVER_MYTH)
     {
         addHeader("User-Agent: MythTV/1.0 (Probably Linux)");
         QString accept_string = "Accept: audio/wav,audio/mpg,audio/ogg,audio/flac";
@@ -64,6 +59,10 @@ DaapRequest::DaapRequest(
         accept_string.append(",audio/m4a");
 #endif
         addHeader(accept_string);
+    }
+    else
+    {
+        addHeader("User-Agent: MythTV/1.0 (Probably Linux)");
     }
 
     //
@@ -75,8 +74,8 @@ DaapRequest::DaapRequest(
 
     //
     //  iTunes 4.5 has an incredibly annoying feature that you sometimes
-    //  have to has a different URL than the one you are actually
-    //  requesting. But only in some case. This will get used if it's set.
+    //  have to use a different URL than the one you are actually
+    //  requesting. But only in some cases. This will get used if it's set.
     //
     
     hashing_url = "";
@@ -97,42 +96,58 @@ bool DaapRequest::send(QSocketDevice *where_to_send, bool add_validation)
 
     if(plugin_manager)
     {
-        unsigned char hash[33] = {0};
-        
-        int daap_version_major = 3;
-        if(parent)
+        if(plugin_manager->haveLibOpenDaap())
         {
-            daap_version_major = parent->getDaapVersionMajor();
-        }
+            unsigned char hash[33] = {0};
         
-        QString request_string = getRequestString();
-        if(hashing_url.length() > 0)
-        {
-            request_string = hashing_url;
-        }
-
-        //
-        //  Debugging output
-        //    
-
-        /*
-        cout << "################################################################### " << endl;
-        cout << "daap validation header inputs:" << endl;
-        cout << "       daap version major is " << daap_version_major << endl;
-        cout << "       GET request string is \"" << request_string.ascii() << "\"" << endl;
-        cout << "               session id is " << request_id << endl;
-        cout << "################################################################### " << endl;
-        */
+            int daap_version_major = 2;
+            if(parent)
+            {
+                daap_version_major = parent->getDaapVersionMajor();
+            }
+            else
+            {
+                if(server_type == DAAP_SERVER_ITUNES45)
+                {
+                    daap_version_major = 3;
+                }
+            }
         
-        plugin_manager->fillValidationHeader(
-                                                daap_version_major, 
-                                                request_string.ascii(), 
-                                                hash,
-                                                request_id
-                                            );
-        QString validation_header = QString("Client-DAAP-Validation: %1").arg((char *)hash);
-        addHeader(validation_header);
-        addHeader("Client-DAAP-Access-Index: 2");
+            QString request_string = getRequestString();
+            if(hashing_url.length() > 0)
+            {
+                request_string = hashing_url;
+            }
+
+            //
+            //  Debugging output
+            //    
+
+            /*
+            cout << "################################################################### " << endl;
+            cout << "daap validation header inputs:" << endl;
+            cout << "       daap version major is " << daap_version_major << endl;
+            cout << "       GET request string is \"" << request_string.ascii() << "\"" << endl;
+            cout << "               session id is " << request_id << endl;
+            cout << "################################################################### " << endl;
+            */
+        
+        
+            //
+            //  Ask the plugin manager to ask libopendaap to generate the
+            //  validation hash
+            //
+        
+            plugin_manager->fillValidationHeader(
+                                                    daap_version_major, 
+                                                    request_string.ascii(), 
+                                                    hash,
+                                                    request_id
+                                                );
+            QString validation_header = QString("Client-DAAP-Validation: %1").arg((char *)hash);
+            addHeader(validation_header);
+            addHeader("Client-DAAP-Access-Index: 2");
+        }
     }
 
     return HttpOutRequest::send(where_to_send);

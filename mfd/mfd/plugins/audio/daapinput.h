@@ -27,7 +27,7 @@ class DaapInput: public QIODevice
 
   public:
 
-    DaapInput(MFDServicePlugin*, QUrl, DaapServerType l_daap_server_type = DAAP_SERVER_ITUNES45);
+    DaapInput(MFDServicePlugin*, QUrl, DaapServerType l_daap_server_type = DAAP_SERVER_MYTH);
     ~DaapInput();
 
     bool              open(int mode );

@@ -51,7 +51,7 @@ class HttpOutResponse
                  );
     void log(const QString &warn_text, int verbosity);
     void warning(const QString &warn_text);
-
+    void setBytesInContentRangeHeader(bool x){ bytes_in_content_range_header = x;}
 
     //
     //  functions that are only of use for streaming out flac's as wav files
@@ -87,7 +87,8 @@ class HttpOutResponse
     int     range_end;
     int     total_possible_range;
     int     stored_skip;
-    
+    bool    bytes_in_content_range_header;
+        
     QFile                  *file_to_send;
     FileSendTransformation file_transformation;
 

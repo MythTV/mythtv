@@ -45,8 +45,7 @@ DaapInput::DaapInput(MFDServicePlugin *owner, QUrl a_url, DaapServerType l_daap_
     //  parse out my url
     //
     
-    if(my_url.protocol() != "daap" &&
-       my_url.protocol() != "mdaap")
+    if(my_url.protocol() != "daap")
     {
         warning(QString("I don't speak this protocol: %1")
                 .arg(my_url.protocol()));

@@ -63,7 +63,8 @@ class MetadataServer : public MFDHttpPlugin
     MetadataContainer*           createContainer(
                                                     const QString &a_name,
                                                     MetadataCollectionContentType content_type, 
-                                                    MetadataCollectionLocationType location_type
+                                                    MetadataCollectionLocationType location_type,
+                                                    MetadataCollectionServerType server_type = MST_unknown
                                                 );
 
     void                         deleteContainer(int container_id);

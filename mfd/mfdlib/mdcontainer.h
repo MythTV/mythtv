@@ -39,6 +39,16 @@ enum MetadataCollectionLocationType
     MCLT_net
 };
 
+enum MetadataCollectionServerType
+{
+    MST_unknown = 0,
+    MST_daap_myth,
+    MST_daap_itunes41,
+    MST_daap_itunes42,
+    MST_daap_itunes43,
+    MST_daap_itunes45
+};
+
 class MetadataContainer
 {
     //
@@ -53,7 +63,8 @@ class MetadataContainer
                         MFD *l_parent,
                         int l_unique_identifier,
                         MetadataCollectionContentType  l_content_type,
-                        MetadataCollectionLocationType l_location_type
+                        MetadataCollectionLocationType l_location_type,
+                        MetadataCollectionServerType l_server_type = MST_unknown
                      );
 
     virtual ~MetadataContainer();
@@ -104,7 +115,7 @@ class MetadataContainer
 
     MetadataCollectionContentType  getContentType(){ return content_type;}
     MetadataCollectionLocationType getLocationType(){ return location_type;}
-
+    MetadataCollectionServerType   getServerType(){ return server_type;}
  
   protected:
 
@@ -122,6 +133,7 @@ class MetadataContainer
     
     MetadataCollectionContentType  content_type;
     MetadataCollectionLocationType location_type;
+    MetadataCollectionServerType   server_type;
 
     QIntDict<Metadata>          *current_metadata;
     QDeepCopy<QValueList<int> > metadata_additions;

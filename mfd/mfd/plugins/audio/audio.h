@@ -30,7 +30,7 @@ class AudioPlugin: public MFDServicePlugin
     void    run();
     void    doSomething(const QStringList &tokens, int socket_identifier);
 
-    bool    playUrl(QUrl url);
+    bool    playUrl(QUrl url, int collection_id = -1);
     bool    playMetadata(int collection_id, int metadata_id);
     void    stopAudio();
     void    pauseAudio(bool true_or_false);

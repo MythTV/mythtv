@@ -348,7 +348,7 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
 }
 
 
-bool AudioPlugin::playUrl(QUrl url)
+bool AudioPlugin::playUrl(QUrl url, int collection_id)
 {
     log(QString("attempting to play this url: \"%1\"")
                 .arg(url), 9);
@@ -387,7 +387,6 @@ bool AudioPlugin::playUrl(QUrl url)
     }
     else if(
             url.protocol() == "daap" ||
-            url.protocol() == "mdaap" ||
             url.protocol() == "cd"
            )
     {
@@ -448,11 +447,44 @@ bool AudioPlugin::playUrl(QUrl url)
         }
         else if(url.protocol() == "daap")
         {
-            input = new DaapInput(this, url);
-        }
-        else if(url.protocol() == "mdaap")
-        {
-            input = new DaapInput(this, url, DAAP_SERVER_MYTH);
+            //
+            //  We know it's daap. Need to find out the server type of this
+            //  collection though to know if we need to jump through iTunes
+            //  hoops or not
+            //
+
+            if(collection_id < 1)
+            {
+                input = new DaapInput(this, url, DAAP_SERVER_MYTH);
+            }
+            else
+            {
+                metadata_server->lockMetadata();
+                MetadataContainer *which_container = metadata_server->getMetadataContainer(collection_id);
+                int daap_server_type = which_container->getServerType();
+                metadata_server->unlockMetadata();
+
+                if(daap_server_type == MST_daap_itunes45)
+                {
+                    input = new DaapInput(this, url, DAAP_SERVER_ITUNES45);
+                }
+                else if(daap_server_type == MST_daap_itunes43)
+                {
+                    input = new DaapInput(this, url, DAAP_SERVER_ITUNES43);
+                }
+                else if(daap_server_type == MST_daap_itunes42)
+                {
+                    input = new DaapInput(this, url, DAAP_SERVER_ITUNES42);
+                }
+                else if(daap_server_type == MST_daap_itunes41)
+                {
+                    input = new DaapInput(this, url, DAAP_SERVER_ITUNES41);
+                }
+                else
+                {
+                    input = new DaapInput(this, url, DAAP_SERVER_MYTH);
+                }
+            }
         }
         else
         {
@@ -583,7 +615,7 @@ bool AudioPlugin::playMetadata(int collection_id, int metadata_id)
 
         QUrl url_to_play = audio_metadata_to_play->getUrl();
         metadata_server->unlockMetadata();
-        bool result = playUrl(url_to_play);
+        bool result = playUrl(url_to_play, collection_id);
         if(result)
         {
             play_data_mutex.lock();
