@@ -205,7 +205,7 @@ class SRStartOffset : public SRBoundedIntegerSetting
 {
     public:
         SRStartOffset(ScheduledRecording& _parent, ManagedListGroup* _group, ManagedList* _list)
-                     : SRBoundedIntegerSetting( -120, 120, 10, 1, _parent, "startoffsetList", "startoffset",
+                     : SRBoundedIntegerSetting( -480, 480, 10, 1, _parent, "startoffsetList", "startoffset",
                                                 _group, _list, true)
         {
             setTemplates(QObject::tr("Start recording %1 minutes late"),
@@ -224,7 +224,7 @@ class SREndOffset : public SRBoundedIntegerSetting
 {
     public:
         SREndOffset(ScheduledRecording& _parent, ManagedListGroup* _group, ManagedList* _list)
-                     : SRBoundedIntegerSetting( -120, 240, 10, 1, _parent, "endoffsetList", "endoffset",
+                     : SRBoundedIntegerSetting( -480, 480, 10, 1, _parent, "endoffsetList", "endoffset",
                                                 _group, _list)
         {
             setTemplates(QObject::tr("End recording %1 minutes early"), 
