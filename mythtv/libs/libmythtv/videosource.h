@@ -182,6 +182,9 @@ public:
 
         addTarget("tv_grab_es", new XMLTV_generic_config(parent, "tv_grab_es"));
         grabber->addSelection("Spain", "tv_grab_es");
+
+        addTarget("tv_grab_nl", new XMLTV_generic_config(parent, "tv_grab_nl"));
+        grabber->addSelection("Holland", "tv_grab_nl");
     };
 };
 

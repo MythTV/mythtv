@@ -1183,6 +1183,10 @@ bool grabData(Source source, int offset)
         command.sprintf("nice -19 %s --days 7 --output %s",
                         xmltv_grabber.ascii(),
                         filename.ascii());
+    else if (xmltv_grabber == "tv_grab_nl")
+        command.sprintf("nice -19 %s --output %s",
+                        xmltv_grabber.ascii(),
+                        filename.ascii());
     else if (xmltv_grabber == "tv_grab_fi")
         // Use the default of 10 days for Finland's grabber
         command.sprintf("nice -19 %s --offset %d --config-file '%s' --output %s",
@@ -1237,6 +1241,7 @@ bool grabData(Source source, int offset)
          xmltv_grabber == "tv_grab_sn" ||
          xmltv_grabber == "tv_grab_uk" ||
          xmltv_grabber == "tv_grab_uk_rt" ||
+         xmltv_grabber == "tv_grab_nl" ||
          xmltv_grabber == "tv_grab_fi"))
          command += " --quiet";
 
@@ -1290,7 +1295,8 @@ bool fillData(QValueList<Source> &sourcelist)
     for (it = sourcelist.begin(); it != sourcelist.end(); ++it) {
         QString xmltv_grabber = (*it).xmltvgrabber;
         if (xmltv_grabber == "tv_grab_uk" || xmltv_grabber == "tv_grab_de" ||
-            xmltv_grabber == "tv_grab_fi" || xmltv_grabber == "tv_grab_es")
+            xmltv_grabber == "tv_grab_fi" || xmltv_grabber == "tv_grab_es" ||
+            xmltv_grabber == "tv_grab_nl")
         {
             // tv_grab_uk|de doesn't support the --offset option, so just grab a 
             // week.

@@ -14,6 +14,7 @@
      <text lang="CA">Música</text>
      <text lang="NL">Muziek</text>
      <text lang="FR">Musique</text>
+     <text lang="DE">Musik</text>
      <action>EXEC mythmusic</action>
      <depends>musicmenu.xml</depends>
    </button>
@@ -26,6 +27,7 @@
      <text lang="CA">Jocs</text>
      <text lang="NL">Spelen</text>
      <text lang="FR">Jeux</text>
+     <text lang="DE">Spiele</text>
      <action>EXEC mythgame</action>
      <depends>gamemenu.xml</depends>
    </button>
@@ -38,6 +40,7 @@
      <text lang="CA">Imatges</text>
      <text lang="NL">Beelden</text>
      <text lang="FR">Images</text>
+     <text lang="DE">Photos</text>
      <action>EXEC mythgallery</action>
      <depends>mythgallery-settings.txt</depends>
    </button>
@@ -50,6 +53,7 @@
      <text lang="CA">Vídeo</text>
      <text lang="NL">Films</text>
      <text lang="FR">Vidéos</text>
+     <text lang="DE">Videos</text>
      <action>EXEC mythvideo</action>
      <depends>videomenu.xml</depends>
    </button>
@@ -62,6 +66,7 @@
      <text lang="CA">El Temps</text>
      <text lang="NL">Het Weer</text>
      <text lang="FR">Météo</text>
+     <text lang="DE">Wetter</text>
      <action>EXEC mythweather</action>
      <depends>mythweather</depends>
    </button>
@@ -73,6 +78,7 @@
       <text lang="ES">Configurar</text>
       <text lang="CA">Configurar</text>
       <text lang="FR">Configuration</text>
+      <text lang="DE">Konfiguration</text>
       <action>MENU main_settings.xml</action>
    </button>
 

@@ -818,6 +818,7 @@ public:
         addSelection("Spanish", "ES");
         addSelection("Dutch", "NL");
         addSelection("French", "FR");
+        addSelection("German", "DE");
         setHelpText("Your preferred language.");
     };
 };

@@ -6,6 +6,7 @@
       <text lang="ES">General</text>
       <text lang="CA">General</text>
       <text lang="FR">Général</text>
+      <text lang="DE">Allgemeines</text>
       <action>SETTINGS MAINGENERAL</action>
    </button>
 
@@ -16,6 +17,7 @@
       <text lang="ES">Aspecto</text>
       <text lang="CA">Aspecte</text>
       <text lang="FR">Apparence</text>
+      <text lang="DE">Aussehen</text>
       <action>SETTINGS APPEARANCE</action>
    </button>
 
@@ -23,6 +25,7 @@
      <type>TV</type>
      <text>TV Settings</text>
      <text lang="FR">Options TV</text>
+     <text lang="DE">TV Einstellungen</text>
      <action>MENU tv_settings.xml</action>
    </button>
 
