@@ -192,7 +192,6 @@ class VideoOutputQuartzView
     ImageSequence      theCodec;      // QuickTime sequence ID
     RgnHandle          theMask;       // clipping region
 
-    bool               suspended;     // are we active?
     int                frameSkip;     // do we skip frames?
     int                frameCounter;  // keep track of skip status
     bool               drawBlank;     // draw a blank frame before next Show
@@ -211,7 +210,6 @@ VideoOutputQuartzView::VideoOutputQuartzView(QuartzData *pData)
     theCodec = NULL;
     theMask = NULL;
 
-    suspended = false;
     frameSkip = 1;
     frameCounter = 0;
     drawBlank = true;
@@ -512,37 +510,30 @@ void VideoOutputQuartzView::BlankScreen(bool deferred)
     viewLock.lock();
     if (thePort)
     {
-        // fill the port with black
         SetPort(thePort);
         
         // set clipping rectangle
+        Rect clipRect;
         if (desiredWidth && desiredHeight)
         {
-            Rect clipRect;
             clipRect.left   = desiredXoff;
             clipRect.top    = desiredYoff;
             clipRect.right  = desiredWidth - desiredXoff;
             clipRect.bottom = desiredHeight - desiredYoff;
-            ClipRect(&clipRect);
         }
+        else
+        {
+            GetPortBounds(thePort, &clipRect);
+        }
+        RgnHandle clipRgn = NewRgn();
+        RectRgn(clipRgn, &clipRect);
 
-        // change pen and background to all black
+        // erase our rectangle to black
         RGBColor rgbBlack = { 0, 0, 0 };
         RGBBackColor(&rgbBlack);
-        RGBForeColor(&rgbBlack);
-
-        Pattern black;
-        memset(&black, 255, sizeof(Pattern));
-        BackPat(&black);
-        PenPat(&black);
-
-        Rect portBounds;
-        GetPortBounds(thePort, &portBounds);
-        EraseRect(&portBounds);
-
-        RgnHandle fullScreen = NewRgn();
-        RectRgn(fullScreen, &portBounds);
-        QDFlushPortBuffer(thePort, fullScreen);
+        EraseRect(&clipRect);
+        QDFlushPortBuffer(thePort, clipRgn);
+        
         drawBlank = false;
     }
     viewLock.unlock();
@@ -560,10 +551,6 @@ void VideoOutputQuartzView::SetFrameSkip(int numskip)
 
 void VideoOutputQuartzView::Show(void)
 {
-    // normal conditions where we don't draw
-    if (suspended || (frameSkip == 0))
-        return;
-
     if (drawBlank)
         BlankScreen(false);
 
@@ -689,15 +676,19 @@ class VoqvMainWindow : public VideoOutputQuartzView
         viewLock.unlock();
     };
 
-    // On embedding, we make the window opaque and
-    // suspend video playback.
+    // On embedding, we stop video playback.
     void EmbedChanged(bool embedded)
     {
-        VideoOutputQuartzView::EmbedChanged(embedded);
-        SetWindowAlpha(parentData->window,
-                       embedded ? 1.0 : alpha);
-        suspended = embedded;
-        BlankScreen(!embedded);
+        if (embedded)
+        {
+            End();
+            EndPort();
+        }
+        else
+        {
+            BeginPort();
+            Begin();
+        }
     };
 };
 
@@ -986,7 +977,6 @@ class VoqvFloater : public VideoOutputQuartzView
 
         viewLock.unlock();
         ShowWindow(window);
-        BlankScreen(false);
         // don't lose focus from main window
         SelectWindow(parentData->window);
 
@@ -1023,17 +1013,16 @@ class VoqvFloater : public VideoOutputQuartzView
     // We hide the window during embedding.
     void EmbedChanged(bool embedded)
     {
-        suspended = embedded;
         if (embedded)
         {
+            End();
             HideWindow(window);
         }
         else
         {
             ShowWindow(window);
-            BlankScreen(false);
+            Begin();
         }
-
     };
 };
 
@@ -1172,7 +1161,6 @@ class VoqvDesktop : public VideoOutputQuartzView
         }
         viewLock.unlock();
         ShowWindow(window);
-        BlankScreen(false);
         // don't lose focus from main window
         SelectWindow(parentData->window);
 
