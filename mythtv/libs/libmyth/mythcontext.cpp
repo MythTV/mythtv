@@ -123,7 +123,9 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
 
     serverSock = new QSocket();
 
-    cout << "connecting to backend server: " << hostname << ":" << port << endl;
+    VERBOSE(VB_GENERAL, QString("Connecting to backend server: %1:%2")
+            .arg(hostname).arg(port));
+
     serverSock->connectToHost(hostname, port);
 
     int num = 0;
@@ -383,15 +385,17 @@ void MythContext::CacheThemeImagesDirectory(const QString &dir)
         if (!cacheinfo.exists() ||
             (cacheinfo.lastModified() < fi->lastModified()))
         {
-            cout << "generating cache image for: " << fi->absFilePath() << endl;
+            VERBOSE(VB_FILE, QString("generating cache image for: %1")
+                    .arg(fi->absFilePath()));
+
             QImage *tmpimage = LoadScaleImage(fi->absFilePath(), false);
 
             if (tmpimage)
             {
                 if (!tmpimage->save(themecachedir + filename, "PNG"))
                 {
-                    cerr << "Couldn't save cache image: " 
-                         << themecachedir + filename << endl;
+                    VERBOSE(VB_FILE, QString("Couldn't save cache image: %1")
+                            .arg(themecachedir + filename));
                 }
              
                 delete tmpimage;

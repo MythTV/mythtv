@@ -541,7 +541,7 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
 
     requestedbytes -= tot;
 
-    VERBOSE(VB_FILE, QString ("sz: %1 return: %2 requested: %3 avail: %4")
+    VERBOSE(VB_NETWORK, QString ("sz: %1 return: %2 requested: %3 avail: %4")
             .arg(sz).arg(tot).arg(requestedbytes).arg(available));
 
     return tot;

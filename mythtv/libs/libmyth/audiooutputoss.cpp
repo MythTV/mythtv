@@ -78,7 +78,8 @@ void AudioOutputOSS::Reconfigure(int laudio_bits, int laudio_channels,
     QDateTime curtime = QDateTime::currentDateTime();
     curtime = curtime.addSecs(2);
     
-    printf("Opening OSS audio device '%s'.\n", audiodevice.ascii());
+    VERBOSE(VB_GENERAL, QString("Opening OSS audio device '%1'.")
+            .arg(audiodevice));
     
     while (QDateTime::currentDateTime() < curtime && audiofd == -1)
     {

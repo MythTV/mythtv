@@ -422,14 +422,13 @@ void TVRec::HandleStateChange(void)
 
     if (!changed)
     {
-        printf("Unknown state transition: %s to %s\n", origname.ascii(),
-                                                       statename.ascii());
+        VERBOSE(VB_IMPORTANT, QString("Unknown state transition: %1 to %2")
+                .arg(origname).arg(statename));
     }
     else
     {
-        QString trans = QString("Changing from %1 to %2")
-                               .arg(origname).arg(statename);
-        VERBOSE(VB_GENERAL, trans);
+        VERBOSE(VB_GENERAL, QString("Changing from %1 to %2")
+                .arg(origname).arg(statename));
     }
  
     if (startRecorder)

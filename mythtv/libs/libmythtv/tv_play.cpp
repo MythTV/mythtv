@@ -490,10 +490,15 @@ void TV::HandleStateChange(void)
     }
 
     if (!changed)
-        printf("Unknown state transition: %d to %d\n", internalState,
-                                                       nextState);
+    {
+        VERBOSE(VB_IMPORTANT, QString("Unknown state transition: %1 to %2")
+                .arg(internalState).arg(nextState));
+    }
     else
-        printf("Changing from %s to %s\n", origname.ascii(), statename.ascii());
+    {
+        VERBOSE(VB_GENERAL, QString("Changing from %1 to %2")
+                .arg(origname).arg(statename));
+    }
 
     internalState = tmpInternalState;
     changeState = false;

@@ -322,7 +322,7 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
         if (fo)
             XFree(fo);
 
-        printf("Using XV port %d\n", xv_port);
+        VERBOSE(VB_GENERAL, QString("Using XV port %1").arg(xv_port));
         XvGrabPort(data->XJ_disp, xv_port, CurrentTime);
     }
 
