@@ -477,7 +477,7 @@ void PlaybackBox::updateVideo(QPainter *p)
         int w = 0, h = 0;
         VideoFrame *frame = nvp->GetCurrentFrame(w, h);
 
-        if (w == 0 || h == 0 || !frame)
+        if (w == 0 || h == 0 || !frame || !(frame->buf))
             return;
 
         unsigned char *buf = frame->buf;
