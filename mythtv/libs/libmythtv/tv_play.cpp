@@ -322,9 +322,13 @@ void TV::HandleStateChange(void)
                      << "recording\n";
                 nextState = kState_WatchingPreRecorded;
                 delete recorder;
+                activerecorder = recorder = NULL;
             }
-            activerecorder = recorder;
-            recorder->Setup();
+            else
+            {
+                activerecorder = recorder;
+                recorder->Setup();
+            }
         }
 
         internalState = nextState;
