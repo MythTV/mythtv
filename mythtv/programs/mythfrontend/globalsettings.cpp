@@ -306,7 +306,6 @@ public:
         setLabel("Closed Caption font");
         addSelection("FreeMono.ttf");
         addSelection("FreeSans.ttf");
-        addSelection("ClosedCaption.ttf");
     };
 };
 
