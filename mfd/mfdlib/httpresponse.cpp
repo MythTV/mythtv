@@ -304,7 +304,7 @@ bool HttpResponse::sendBlock(MFDServiceClientSocket *which_client, std::vector<c
         int result = select(nfds, NULL, &writefds, NULL, &timeout);
         if(result < 0)
         {
-            cerr << "Crappity crap crap" << endl;
+            cerr << "Crappity crap crap and double crap" << endl;
         }
 
         if(FD_ISSET(which_client->socket(), &writefds))
@@ -379,7 +379,7 @@ void HttpResponse::sendFile(QString file_path)
     if (fd < 0)
 	{
 	    //  my_request-> do a real warning()
-	    cout << "Crappity crap crap" << endl;
+	    cout << "Crappity crap crap, there's no file called \"" << file_path.ascii() << "\"" << endl;
 	    setError(404);
         return;
     }

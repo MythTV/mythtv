@@ -397,7 +397,8 @@ bool MetadataMythMusicMonitor::sweepMetadata()
         {
             while (query.next())
             {
-                QString name = query.value(0).toString();
+                QString name = startdir;
+                name += query.value(0).toString();
                 if (name != QString::null)
                 {
                     if ((mf_iterator = music_files.find(name)) != music_files.end())
@@ -432,7 +433,10 @@ bool MetadataMythMusicMonitor::sweepMetadata()
             //  It's in the database, but not on the file system, so delete
             //  from database
             //
+            
+            cout << "thinking about deleting " << mf_iterator.key() << endl;
 
+            /*
             QString name(mf_iterator.key());
             name.replace(quote_regex, "\"\"");
             QString querystr = QString("DELETE FROM musicmetadata WHERE "
@@ -440,6 +444,7 @@ bool MetadataMythMusicMonitor::sweepMetadata()
             query.exec(querystr);
             music_files.remove(mf_iterator);
             something_changed = true;
+            */
             
         }
         else if(*mf_iterator == MFL_on_file_system)
@@ -514,7 +519,7 @@ bool MetadataMythMusicMonitor::sweepMetadata()
                                     (
                                         parent->bumpMetadataId(),
                                         query.value(0).toInt(),
-                                        QUrl(query.value(8).toString()),
+                                        QUrl(startdir + query.value(8).toString()),
                                         query.value(9).toInt(),
                                         QDateTime::fromString(timestamp, Qt::ISODate),
                                         query.value(11).toInt(),
