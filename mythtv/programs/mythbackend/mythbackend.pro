@@ -30,8 +30,8 @@ TARGETDEPS += ../../libs/libmythtv/libmythtv.a
 TARGETDEPS += ../../libs/libavcodec/libavcodec.a
 
 # Input
-HEADERS += encoderlink.h filetransfer.h mainserver.h playbacksock.h 
+HEADERS += encoderlink.h filetransfer.h httpstatus.h mainserver.h playbacksock.h
 HEADERS += scheduler.h server.h
 
-SOURCES += encoderlink.cpp filetransfer.cpp main.cpp mainserver.cpp 
-SOURCES += playbacksock.cpp scheduler.cpp server.cpp
+SOURCES += encoderlink.cpp filetransfer.cpp httpstatus.cpp main.cpp 
+SOURCES += mainserver.cpp playbacksock.cpp scheduler.cpp server.cpp

@@ -14,8 +14,9 @@ using namespace std;
 
 #include "mainserver.h"
 #include "scheduler.h"
+#include "httpstatus.h"
 
-MainServer::MainServer(MythContext *context, int port, 
+MainServer::MainServer(MythContext *context, int port, int statusport,
                        QMap<int, EncoderLink *> *tvList)
 {
     encoderList = tvList;
@@ -29,12 +30,17 @@ MainServer::MainServer(MythContext *context, int port,
     connect(mythserver, SIGNAL(endConnect(QSocket *)), 
             SLOT(endConnection(QSocket *)));
 
+    statusserver = new HttpStatus(this, statusport);    
+
     m_context->addListener(this);
 }
 
 MainServer::~MainServer()
 {
     delete mythserver;
+
+    if (statusserver)
+        delete statusserver;
 }
 
 void MainServer::newConnection(QSocket *socket)
@@ -918,4 +924,25 @@ bool MainServer::isRingBufSock(QSocket *sock)
     }
 
     return false;
+}
+
+void MainServer::PrintStatus(QSocket *socket)
+{
+    QTextStream os(socket);
+    os.setEncoding(QTextStream::UnicodeUTF8);
+
+    os << "HTTP/1.0 200 Ok\r\n"
+       << "Content-Type: text/html; charset=\"utf-8\"\r\n"
+       << "\r\n";
+
+    os << "<HTTP>\r\n"
+       << "<HEAD>\r\n"
+       << "  <TITLE>MythTV Status</TITLE>\r\n"
+       << "</HEAD>\r\n"
+       << "<BODY>\r\n";
+
+    os << "Status information will eventually go here.\r\n";
+ 
+    os << "</BODY>\r\n"
+       << "</HTTP>\r\n";
 }

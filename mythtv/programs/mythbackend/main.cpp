@@ -165,7 +165,9 @@ int main(int argc, char **argv)
     pthread_create(&scthread, NULL, runScheduler, context);
 
     int port = context->GetNumSetting("ServerPort", 6543);
-    MainServer *ms = new MainServer(context, port, &tvList);
+    int statusport = context->GetNumSetting("StatusPort", 6544);
+
+    MainServer *ms = new MainServer(context, port, statusport, &tvList);
     a.setMainWidget(ms);
 
     a.exec();

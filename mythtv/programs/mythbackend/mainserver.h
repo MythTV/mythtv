@@ -12,17 +12,19 @@
 #include "filetransfer.h"
 
 class MythContext;
+class HttpStatus;
 
 class MainServer : public QVBox
 {
     Q_OBJECT
   public:
-    MainServer(MythContext *context, int port, 
+    MainServer(MythContext *context, int port, int statusport,
                QMap<int, EncoderLink *> *tvList);
 
    ~MainServer();
 
     void customEvent(QCustomEvent *e);
+    void PrintStatus(QSocket *socket);
 
   private slots:
     void newConnection(QSocket *);
@@ -65,6 +67,8 @@ class MainServer : public QVBox
     MythContext *m_context;
 
     QString recordfileprefix;
+
+    HttpStatus *statusserver;
 };
 
 #endif
