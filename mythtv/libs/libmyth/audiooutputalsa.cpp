@@ -215,7 +215,7 @@ inline int AudioOutputALSA::getBufferedOnSoundcard(void)
     // this should be more like what you want, previously this function
     // was returning the soundcard buffer size -dag
 
-    snd_pcm_sframes_t delay;
+    snd_pcm_sframes_t delay = 0;
 
     snd_pcm_state_t state = snd_pcm_state(pcm_handle);
     if (state == SND_PCM_STATE_RUNNING || 
