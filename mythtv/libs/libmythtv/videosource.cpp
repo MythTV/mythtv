@@ -75,9 +75,8 @@ void ProviderSelector::fillSelections(const QString& zipcode) {
 void XMLTV_na_config::save(QSqlDatabase* db) {
     (void)db;
 
-    char *home = getenv("HOME");
     QString filename = QString("%1/.mythtv/%2.xmltv")
-        .arg(home).arg(parent.getSourceName());
+        .arg(getenv("HOME")).arg(parent.getSourceName());
     QString command = QString("tv_grab_na --config-file %1 --configure --retry-limit %2 --retry-delay %3 --postalcode %4 --provider %5 --auto-new-channels add")
         .arg(filename)
         .arg(2)
@@ -88,6 +87,34 @@ void XMLTV_na_config::save(QSqlDatabase* db) {
     int ret = system(command);
     if (ret != 0)
         cout << command << endl << "exited with status " << ret << endl;
+}
+
+void XMLTV_generic_config::save(QSqlDatabase* db) {
+    (void)db;
+
+    QString command;
+    if (grabber == "tv_grab_de") {
+        command = "tv_grab_de --configure";
+    } else {
+        QString filename = QString("%1/.mythtv/%2.xmltv")
+            .arg(getenv("HOME")).arg(parent.getSourceName());
+
+        command = QString("%1 --config-file %2 --configure")
+            .arg(grabber).arg(filename);
+    }
+
+    int ret = system(command);
+    if (ret != 0)
+        cout << command << endl << "exited with status " << ret << endl;
+
+    if (grabber == "tv_grab_uk" || grabber == "tv_grab_de" ||
+        grabber == "tv_grab_sn") {
+        cout << "You _MUST_ run 'mythfilldatabase --manual the first time, "
+             << "instead\n";
+        cout << "of just 'mythfilldatabase'.  Your grabber does not provide\n";
+        cout << "channel numbers, so you have to set them manually.\n";
+    }
+
 }
 
 void VideoSource::fillSelections(QSqlDatabase* db,
@@ -245,4 +272,11 @@ void CardInputEditor::load(QSqlDatabase* db) {
 
             close(videofd);
         }
+}
+
+CardInputEditor::~CardInputEditor() {
+    while (cardinputs.size() > 0) {
+        delete cardinputs.back();
+        cardinputs.pop_back();
+    }
 }

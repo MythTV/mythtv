@@ -65,6 +65,23 @@ protected:
     ProviderSelector* provider;
 };
 
+class XMLTV_generic_config: public LabelSetting {
+public:
+    XMLTV_generic_config(const VideoSource& _parent, QString _grabber):
+        parent(_parent),
+        grabber(_grabber) {
+        setLabel(grabber);
+        setValue("Configuration will run in the terminal window");
+    };
+
+    virtual void load(QSqlDatabase* db) { (void)db; };
+    virtual void save(QSqlDatabase* db);
+
+protected:
+    const VideoSource& parent;
+    QString grabber;
+};
+
 class XMLTVConfig: public VerticalConfigurationGroup, public TriggeredConfigurationGroup {
 public:
     XMLTVConfig(const VideoSource& parent) {
@@ -78,16 +95,16 @@ public:
         addTarget("tv_grab_na", new XMLTV_na_config(parent));
         grabber->addSelection("tv_grab_na");
 
-        addTarget("tv_grab_de", new VerticalConfigurationGroup());
+        addTarget("tv_grab_de", new XMLTV_generic_config(parent, "tv_grab_de"));
         grabber->addSelection("tv_grab_de");
 
-        addTarget("tv_grab_sn", new VerticalConfigurationGroup());
+        addTarget("tv_grab_sn", new XMLTV_generic_config(parent, "tv_grab_sn"));
         grabber->addSelection("tv_grab_sn");
 
-        addTarget("tv_grab_uk", new VerticalConfigurationGroup());
+        addTarget("tv_grab_uk", new XMLTV_generic_config(parent, "tv_grab_uk"));
         grabber->addSelection("tv_grab_uk");
 
-        addTarget("tv_grab_uk_rt", new VerticalConfigurationGroup());
+        addTarget("tv_grab_uk_rt", new XMLTV_generic_config(parent, "tv_grab_uk_rt"));
         grabber->addSelection("tv_grab_uk_rt");
     };
 };
@@ -422,6 +439,7 @@ public:
         ConfigurationDialog(context), db(_db) {
         setLabel("Input connections");
     };
+    virtual ~CardInputEditor();
 
     virtual int exec(QSqlDatabase* db);
     virtual void load(QSqlDatabase* db);

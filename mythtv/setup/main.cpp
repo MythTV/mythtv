@@ -45,57 +45,6 @@ QString getResponse(const QString &query, const QString &def)
     return qresponse;
 }
 
-void configXMLTV()
-{
-    QSqlQuery result = db->exec("SELECT sourceid FROM videosource;");
-
-    if (!result.isActive() || result.numRowsAffected() < 1) {
-        cerr << "No channel sources?  Try again...\n";
-        exit(1);
-    }
-
-    char *home = getenv("HOME");
-    while (result.next())
-    {
-        VideoSource source(context);
-        source.loadByID(db, result.value(0).toInt());
-        QString name = source.byName("name")->getValue();
-        QString xmltv_grabber = source.byName("xmltvgrabber")->getValue();
-        QString filename = QString("%1/.mythtv/%2.xmltv").arg(home).arg(name);
-
-        if (xmltv_grabber == "tv_grab_na")
-          // Set up through the GUI
-          continue;
-
-        cout << "mythsetup will now run " << xmltv_grabber 
-             << " --configure\n\n";
-        sleep(1);
-
-        QString command;
-
-        if (xmltv_grabber == "tv_grab_de")
-            command = xmltv_grabber + " --configure";
-        else
-            command = xmltv_grabber + " --configure --config-file " + filename;
-
-        cout << "--------------- Start of XMLTV output ---------------" << endl;
-
-
-        system(command);
-
-        cout << "---------------- End of XMLTV output ----------------" << endl;
-
-        if (xmltv_grabber == "tv_grab_uk" || xmltv_grabber == "tv_grab_de" ||
-            xmltv_grabber == "tv_grab_sn") {
-            cout << "You _MUST_ run 'mythfilldatabase --manual the first time, "
-                 << "instead\n";
-            cout << "of just 'mythfilldatabase'.  Your grabber does not provide\n";
-            cout << "channel numbers, so you have to set them manually.\n";
-        }
-    }
-
-}
-
 void clearDB(void)
 {
     QSqlQuery query;
@@ -172,8 +121,6 @@ int main(int argc, char *argv[])
         clearDB();
 
     SetupMenu(context);
-
-    configXMLTV();
 
     cout << "Now, please run 'mythfilldatabase' to populate the database\n";
     cout << "with channel information.\n";
