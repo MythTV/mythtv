@@ -5,5 +5,5 @@
 TEMPLATE = subdirs
 
 # Directories
-SUBDIRS  = libNuppelVideo libmythtv mythdialog mythepg mythtv mythfrontend
-SUBDIRS += menutest
+SUBDIRS += libavcodec libNuppelVideo libmythtv mythdialog mythepg mythtv 
+SUBDIRS += menutest mythfrontend

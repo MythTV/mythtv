@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <qimage.h>
+
+#include "yuv2rgb.h"
 #include "ttfont.h"
 #include "osd.h"
 
@@ -82,6 +85,19 @@ OSD::OSD(int width, int height, const QString &filename, const QString &prefix)
     Efont_extents(info_font, "M", NULL, NULL, &mwidth, NULL, NULL, NULL, NULL);
 
     space_width = twidth - (mwidth * 2);
+
+#if 0
+    QImage *tmpimage = new QImage("/root/osd-background.png");
+    QImage tmp2 = tmpimage->smoothScale(tmpimage->width() * 0.95,  tmpimage->height());
+    qosdoverlay = new QImage(tmp2);
+    int owidth = qosdoverlay->width();
+    int oheight = qosdoverlay->height();
+    osdoverlayyuv = new unsigned char[owidth * oheight * 2];
+    
+    rgb32_to_yuv420p(osdoverlayyuv, osdoverlayyuv + (owidth * oheight),
+                     osdoverlayyuv + (owidth * oheight * 5 / 4),
+                     qosdoverlay->bits(), owidth, oheight);
+#endif
 }
 
 OSD::~OSD(void)
@@ -156,6 +172,46 @@ void OSD::TurnOff(void)
 
 void OSD::Display(unsigned char *yuvptr)
 {
+#if 0
+    unsigned char *dest, *src;
+    int alpha, tmp1, tmp2;
+    int yoffset = vid_height - vid_height * 0.05 - qosdoverlay->height();
+    int xoffset = vid_width * 0.04;
+
+    for (int y = 0; y < qosdoverlay->height(); y++)
+    {
+        for (int x = 0; x < qosdoverlay->width(); x++)
+        {
+            alpha = qAlpha(qosdoverlay->pixel(x, y));
+            dest = yuvptr + x + xoffset + (y + yoffset) * vid_width;
+            src = osdoverlayyuv + x + y * qosdoverlay->width();
+            
+            tmp1 = (*src - *dest) * alpha;
+            tmp2 = *dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+            *dest = tmp2 & 0xff;
+        } 
+    }
+    for (int y = 0; y < qosdoverlay->height() / 2; y++)
+    {
+        for (int x = 0; x < qosdoverlay->width() / 2; x++)
+        {
+            alpha = qAlpha(qosdoverlay->pixel(x * 2, y * 2));
+
+            dest = yuvptr + (vid_width * vid_height) + x + xoffset / 2 + (y + yoffset / 2) * (vid_width / 2);
+            src = osdoverlayyuv + (qosdoverlay->width() * qosdoverlay->height() * 5 / 4) + x + y * (qosdoverlay->width() / 2);
+            tmp1 = (*src - *dest) * alpha;
+            tmp2 = *dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+            *dest = tmp2 & 0xff;
+
+            dest = yuvptr + (vid_width * vid_height * 5 / 4) + x + xoffset / 2 + (y + yoffset / 2) * (vid_width / 2);
+            src = osdoverlayyuv + (qosdoverlay->width() * qosdoverlay->height()) + x + y * (qosdoverlay->width() / 2);
+            tmp1 = (*src - *dest) * alpha;
+            tmp2 = *dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
+            *dest = tmp2 & 0xff;
+        }
+    }
+#endif
+    
     if (!enableosd)
         return;
 

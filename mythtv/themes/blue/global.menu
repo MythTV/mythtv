@@ -26,6 +26,13 @@ int ButtonTextItalics=1
 int ButtonTextBold=1
 # Is the text centered? 1 for yes, 0 for no
 int ButtonTextCentered=1
+# Is the text outlined? 1 for yes, 0 for no
+int ButtonTextOutline=1
+# Color of the text outline
+str ButtonTextOutlineColor=black
+# Number of pixels of the text outline.  Depending on the font, a size of
+# 1 or 2 would probably look best.
+int ButtonTextOutlineSize=2
 
 # If this setting exists, draw a shadow below the text in the following color
 str ButtonShadowColor=black

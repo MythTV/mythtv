@@ -1,0 +1,484 @@
+#!/bin/sh
+#
+# ffmpeg configure script (c) 2000, 2001, 2002 Fabrice Bellard
+#
+# set temporary file name
+if test ! -z "$TMPDIR" ; then
+    TMPDIR1="${TMPDIR}"
+elif test ! -z "$TEMPDIR" ; then
+    TMPDIR1="${TEMPDIR}"
+else
+    TMPDIR1="/tmp"
+fi
+
+TMPC="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.c"
+TMPO="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.o"
+TMPS="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.S"
+TMPH="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.h"
+
+# default parameters
+prefix="/usr/local"
+cross_prefix=""
+cc="gcc"
+ar="ar"
+make="make"
+strip="strip"
+cpu=`uname -m`
+mmx="default"
+case "$cpu" in
+  i386|i486|i586|i686|i86pc|BePC)
+    cpu="x86"
+  ;;
+  armv4l)
+    cpu="armv4l"
+  ;;
+  alpha)
+    cpu="alpha"
+  ;;
+  *)
+    cpu="unknown"
+  ;;
+esac
+gprof="no"
+v4l="yes"
+audio_oss="yes"
+network="yes"
+zlib="yes"
+mp3lame="no"
+a52="yes"
+a52bin="no"
+win32="no"
+lshared="no"
+extralibs="-lm"
+simpleidct="yes"
+bigendian="no"
+vhook="no"
+mpegaudio_hp="yes"
+SHFLAGS=-shared
+
+# OS specific
+targetos=`uname -s`
+case $targetos in
+BeOS)
+prefix="/boot/home/config"
+# helps building libavcodec
+CFLAGS="-O3 -DPIC -fomit-frame-pointer"
+SHFLAGS=-nostart
+# disable linux things
+audio_oss="no"
+v4l="no"
+# no need for libm, but the inet stuff
+# Check for BONE
+if (echo $BEINCLUDES|grep 'headers/be/bone' >/dev/null); then
+extralibs="-lbind -lsocket"
+else
+echo "Not sure building for net_server will succeed... good luck."
+extralibs="-lsocket"
+fi ;;
+BSD/OS)
+v4l="no"
+audio_oss="yes"
+extralibs="-lpoll -lgnugetopt -lm"
+make="gmake"
+;;
+*) ;;
+esac
+
+# find source path
+# XXX: we assume an absolute path is given when launching configure, 
+# except in './configure' case.
+source_path=${0%configure}
+source_path=${source_path%/}
+source_path_used="yes"
+if test -z "$source_path" -o "$source_path" = "." ; then
+    source_path=`pwd`
+    source_path_used="no"
+fi
+
+cat > $TMPC << EOF
+#include <dlfcn.h>
+int main( void ) { return (int) dlopen("foo", 0); }
+EOF
+
+if $cc -o $TMPO $TMPC -ldl 2> /dev/null  ; then
+: vhook=yes
+fi
+
+cat > $TMPC << EOF
+#include <X11/Xlib.h>
+#include <Imlib2.h>
+int main( void ) { return (int) imlib_load_font("foo"); }
+EOF
+
+imlib2=no
+if $cc -o $TMPO $TMPC -lImlib2 2> /dev/null  ; then
+imlib2=yes
+fi
+
+for opt do
+  case "$opt" in
+  --prefix=*) prefix=`echo $opt | cut -d '=' -f 2`
+  ;;
+  --source-path=*) source_path=`echo $opt | cut -d '=' -f 2`
+  ;;
+  --cross-prefix=*) cross_prefix=`echo $opt | cut -d '=' -f 2`
+  ;;
+  --cc=*) cc=`echo $opt | cut -d '=' -f 2`
+  ;;
+  --make=*) make=`echo $opt | cut -d '=' -f 2`
+  ;;
+  --extra-cflags=*) CFLAGS="${opt#--extra-cflags=}"
+  ;;
+  --extra-ldflags=*) LDFLAGS=${opt#--extra-ldflags=}
+  ;;
+  --extra-libs=*) extralibs=${opt#--extra-libs=}
+  ;;
+  --cpu=*) cpu=`echo $opt | cut -d '=' -f 2`
+  ;;
+  --disable-mmx) mmx="no"
+  ;;
+  --enable-gprof) gprof="yes"
+  ;;
+  --disable-v4l) v4l="no"
+  ;;
+  --disable-audio-oss) audio_oss="no"
+  ;;
+  --disable-network) network="no"
+  ;;
+  --disable-zlib) zlib="no"
+  ;;
+  --disable-a52) a52="no"
+  ;;
+  --enable-a52bin) a52bin="yes" ; extralibs="-ldl $extralibs"
+  ;;
+  --enable-mp3lame) mp3lame="yes"
+  ;;
+  --disable-vhook) vhook="no"
+  ;;
+  --disable-simple_idct) simpleidct="no"
+  ;;
+  --enable-win32) win32="yes"
+  ;;
+  --enable-shared) lshared="yes"
+  ;;
+  --disable-mpegaudio-hp) mpegaudio_hp="no"
+  ;;
+  esac
+done
+
+# compute mmx state
+if test $mmx = "default"; then
+    if test $cpu = "x86"; then
+        mmx="yes"
+    else
+        mmx="no"
+    fi
+fi
+
+# Checking for CFLAGS
+if test -z "$CFLAGS"; then
+    CFLAGS="-O3"
+fi
+
+if test "$win32" = "yes" ; then
+    cross_prefix="i386-mingw32msvc-"
+    v4l="no"
+    audio_oss="no"
+    network="no"
+fi
+
+cc="${cross_prefix}${cc}"
+ar="${cross_prefix}${ar}"
+strip="${cross_prefix}${strip}"
+
+# ---
+# big/little endian test
+cat > $TMPC << EOF
+#include <inttypes.h>
+int main(int argc, char ** argv){
+	volatile uint32_t i=0x01234567;
+	return (*((uint8_t*)(&i))) == 0x67;
+}
+EOF
+
+if $cc -o $TMPO $TMPC 2>/dev/null ; then
+$TMPO && bigendian="yes"
+else
+echo big/little test failed
+fi
+
+# ---
+# check availability of some header files
+
+cat > $TMPC << EOF
+#include <malloc.h>
+int main( void ) { return 0; }
+EOF
+
+_memalign=no
+_malloc_h=no
+if $cc -o $TMPO $TMPC 2> /dev/null ; then
+_malloc_h=yes
+_memalign=yes
+# check for memalign - atmos
+cat > $TMPC << EOF
+#include <malloc.h>
+int main ( void ) {
+char *string = NULL;
+string = memalign(64, sizeof(char));
+return 0;
+}
+EOF
+$cc -o $TMPO $TMPC 2> /dev/null || _memalign=no
+fi
+
+cat > $TMPC << EOF
+#define _GNU_SOURCE
+#include <time.h>
+int main( void ) { return *strptime("", "", 0); }
+EOF
+
+strptime=no
+if $cc -o $TMPO $TMPC 2> /dev/null ; then
+  strptime=yes
+fi
+
+if test "$zlib" = "yes"; then
+# check for zlib - mmu_man
+cat > $TMPC << EOF
+#include <zlib.h>
+int main ( void ) {
+if (zlibVersion() != ZLIB_VERSION)
+   puts("zlib version differs !!!");
+   return 1;
+return 0;
+}
+EOF
+$cc -o $TMPO $TMPC -lz 2> /dev/null || zlib="no"
+# $TMPO 2> /dev/null > /dev/null || zlib="no"
+# XXX: more tests needed - runtime test
+fi
+if test "$zlib" = "yes"; then
+extralibs="$extralibs -lz"
+fi
+
+_restrict=
+for restrict_keyword in restrict __restrict__ __restrict; do
+  echo "void foo(char * $restrict_keyword p);" > $TMPC
+  if $cc -c -o $TMPO $TMPC 2> /dev/null; then
+    _restrict=$restrict_keyword
+    break;
+  fi
+done
+
+if test x"$1" = x"-h" -o x"$1" = x"--help" ; then
+cat << EOF
+
+Usage: configure [options]
+Options: [defaults in brackets after descriptions]
+
+EOF
+echo "Standard options:"
+echo "  --help                   print this message"
+echo "  --prefix=PREFIX          install in PREFIX [$prefix]"
+echo "  --enable-mp3lame         enable mp3 encoding via libmp3lame [default=no]"
+echo "  --enable-win32           enable win32 cross compile"
+echo "  --disable-a52            disable GPL'ed A52 support [default=no]"
+echo "  --enable-a52bin          open liba52.so.0 at runtime [default=no]"
+echo "  --enable-shared          build shared libraries [default=no]"
+echo ""
+echo "Advanced options (experts only):"
+echo "  --source-path=PATH       path of source code [$source_path]"
+echo "  --cross-prefix=PREFIX    use PREFIX for compile tools [$cross_prefix]"
+echo "  --cc=CC                  use C compiler CC [$cc]"
+echo "  --make=MAKE              use specified make [$make]"
+echo "  --extra-cflags=ECFLAGS   add ECFLAGS to CFLAGS [$CFLAGS]"
+echo "  --extra-ldflags=ELDFLAGS add ELDFLAGS to LDFLAGS [$LDFLAGS]"
+echo "  --extra-libs=ELIBS       add ELIBS [$ELIBS]"
+echo "  --cpu=CPU                force cpu to CPU  [$cpu]"
+echo "  --disable-mmx            disable mmx usage"
+echo "  --disable-audio-oss      disable OSS audio support [default=no]"
+echo "  --disable-v4l            disable video4linux grabbing [default=no]"
+echo "  --disable-network        disable network support [default=no]"
+echo "  --disable-zlib           disable zlib [default=no]"
+echo "  --disable-simple_idct    disable simple IDCT routines [default=no]"
+# echo "  --disable-vhook          disable video hooking support"
+echo "  --enable-gprof           enable profiling with gprof [$gprof]"
+echo "  --disable-mpegaudio-hp   faster (but less accurate)"
+echo "                           mpegaudio decoding [default=no]"
+echo ""
+echo "NOTE: The object files are build at the place where configure is launched"
+exit 1
+fi
+
+echo "Install prefix   $prefix"
+echo "Source path      $source_path"
+echo "C compiler       $cc"
+echo "make             $make"
+echo "CPU              $cpu"
+echo "Big Endian       $bigendian"
+echo "MMX enabled      $mmx"
+echo "gprof enabled    $gprof"
+echo "zlib enabled     $zlib"
+echo "mp3lame enabled  $mp3lame"
+echo "a52 support      $a52"
+echo "a52 dlopened     $a52bin"
+# echo "Video hooking    $vhook"
+
+if test "$vhook" = "yes" ; then
+: echo "Imlib2 support   $imlib2"
+fi
+
+echo "Creating config.mak and config.h"
+
+echo "# Automatically generated by configure - do not modify" > config.mak
+echo "/* Automatically generated by configure - do not modify */" > $TMPH
+
+echo "prefix=$prefix" >> config.mak
+echo "MAKE=$make" >> config.mak
+echo "CC=$cc" >> config.mak
+echo "AR=$ar" >> config.mak
+echo "STRIP=$strip" >> config.mak
+echo "OPTFLAGS=$CFLAGS" >> config.mak
+echo "LDFLAGS=$LDFLAGS" >> config.mak
+echo "SHFLAGS=$SHFLAGS" >> config.mak
+if test "$cpu" = "x86" ; then
+  echo "TARGET_ARCH_X86=yes" >> config.mak
+  echo "#define ARCH_X86 1" >> $TMPH
+elif test "$cpu" = "armv4l" ; then
+  echo "TARGET_ARCH_ARMV4L=yes" >> config.mak
+  echo "#define ARCH_ARMV4L 1" >> $TMPH
+elif test "$cpu" = "alpha" ; then
+  echo "TARGET_ARCH_ALPHA=yes" >> config.mak
+  echo "#define ARCH_ALPHA 1" >> $TMPH
+elif test "$cpu" = "powerpc" ; then
+  echo "TARGET_ARCH_POWERPC=yes" >> config.mak
+  echo "#define ARCH_POWERPC 1" >> $TMPH
+fi
+if test "$bigendian" = "yes" ; then
+  echo "WORDS_BIGENDIAN=yes" >> config.mak
+  echo "#define WORDS_BIGENDIAN 1" >> $TMPH
+fi
+if test "$mmx" = "yes" ; then
+  echo "TARGET_MMX=yes" >> config.mak
+  echo "#define HAVE_MMX 1" >> $TMPH
+fi
+if test "$gprof" = "yes" ; then
+  echo "TARGET_GPROF=yes" >> config.mak
+  echo "#define HAVE_GPROF 1" >> $TMPH
+fi
+if test "$strptime" = "yes" ; then
+  echo "#define HAVE_STRPTIME 1" >> $TMPH
+else
+  echo "BUILD_STRPTIME=yes" >> config.mak
+fi
+if test "$imlib2" = "yes" ; then
+  echo "HAVE_IMLIB2=yes" >> config.mak
+fi
+if test "$vhook" = "yes" ; then
+  echo "BUILD_VHOOK=yes" >> config.mak
+  echo "#define HAVE_VHOOK 1" >> $TMPH
+  extralibs="$extralibs -ldl"
+fi
+if test "$lshared" = "yes" ; then
+  echo "BUILD_SHARED=yes" >> config.mak
+  echo "PIC=-fPIC" >> config.mak
+fi
+echo "EXTRALIBS=$extralibs" >> config.mak
+echo -n "VERSION=" >>config.mak
+echo "0.4.6" >>config.mak
+echo "" >>config.mak
+# if you do not want to use encoders, disable that.
+echo "#define CONFIG_ENCODERS 1" >> $TMPH
+echo "CONFIG_ENCODERS=yes" >> config.mak
+
+# if you do not want to use decoders, disable that.
+echo "#define CONFIG_DECODERS 1" >> $TMPH
+echo "CONFIG_DECODERS=yes" >> config.mak
+
+# AC3
+if test "$a52" = "yes" ; then
+  echo "#define CONFIG_AC3 1" >> $TMPH
+  echo "CONFIG_AC3=yes" >> config.mak
+
+  if test "$a52bin" = "yes" ; then
+    echo "#define CONFIG_A52BIN 1" >> $TMPH
+    echo "CONFIG_A52BIN=yes" >> config.mak
+  fi
+fi
+
+# mpeg audio high precision mode
+if test "$mpegaudio_hp" = "yes" ; then
+  echo "#define CONFIG_MPEGAUDIO_HP 1" >> $TMPH
+fi
+
+if test "$v4l" = "yes" ; then
+  echo "#define CONFIG_VIDEO4LINUX 1" >> $TMPH
+  echo "CONFIG_VIDEO4LINUX=yes" >> config.mak
+fi
+
+if test "$audio_oss" = "yes" ; then
+  echo "#define CONFIG_AUDIO_OSS 1" >> $TMPH
+  echo "CONFIG_AUDIO_OSS=yes" >> config.mak
+fi
+
+if test "$network" = "yes" ; then
+  echo "#define CONFIG_NETWORK 1" >> $TMPH
+  echo "CONFIG_NETWORK=yes" >> config.mak
+fi
+
+if test "$zlib" = "yes" ; then
+  echo "#define CONFIG_ZLIB 1" >> $TMPH
+  echo "CONFIG_ZLIB=yes" >> config.mak
+fi
+
+if test "$mp3lame" = "yes" ; then
+  echo "#define CONFIG_MP3LAME 1" >> $TMPH
+  echo "CONFIG_MP3LAME=yes" >> config.mak
+fi
+
+if test "$win32" = "yes" ; then
+  echo "#define CONFIG_WIN32 1" >> $TMPH
+  echo "CONFIG_WIN32=yes" >> config.mak
+fi
+
+if test "$_malloc_h" = "yes" ; then
+  echo "#define HAVE_MALLOC_H 1" >> $TMPH
+else
+  echo "#undef  HAVE_MALLOC_H" >> $TMPH
+fi
+
+if test "$_memalign" = "yes" ; then
+  echo "#define HAVE_MEMALIGN 1" >> $TMPH
+else
+  echo "#undef  HAVE_MEMALIGN" >> $TMPH
+fi
+
+if test "$simpleidct" = "yes" ; then
+  echo "#define SIMPLE_IDCT 1" >> $TMPH
+fi
+
+echo "#define restrict $_restrict" >> $TMPH
+
+# build tree in object directory if source path is different from current one
+if test "$source_path_used" = "yes" ; then
+    DIRS="libav libavcodec libavcodec/alpha libavcodec/armv4l libavcodec/i386 \
+          libavcodec/liba52 libavcodec/mlib tests"
+    FILES="Makefile libav/Makefile libavcodec/Makefile tests/Makefile"
+    for dir in $DIRS ; do
+            mkdir -p $dir
+    done
+    for f in $FILES ; do
+        ln -sf $source_path/$f $f
+    done
+fi
+echo "SRC_PATH=$source_path" >> config.mak
+
+diff $TMPH config.h >/dev/null 2>&1
+if test $? -ne 0 ; then
+	mv -f $TMPH config.h
+else
+	echo "config.h is unchanged"
+fi
+
+rm -f $TMPO $TMPC $TMPS $TMPH

@@ -240,3 +240,70 @@ yuv2rgb_fun yuv2rgb_init_mmx (int bpp, int mode)
     return NULL; // Fallback to C.
 }
 
+#define SCALEBITS 8
+#define ONE_HALF  (1 << (SCALEBITS - 1)) 
+#define FIX(x)          ((int) ((x) * (1L<<SCALEBITS) + 0.5))
+
+void rgb32_to_yuv420p(unsigned char *lum, unsigned char *cb, unsigned char *cr,
+                      unsigned char *src, int width, int height)
+{           
+    int wrap, wrap4, x, y;
+    int r, g, b, r1, g1, b1;
+    unsigned char *p;
+                      
+    wrap = width;
+    wrap4 = width * 4;
+    p = src;
+    for(y=0;y<height;y+=2) {
+        for(x=0;x<width;x+=2) {
+            r = p[0];
+            g = p[1];
+            b = p[2];
+            r1 = r;
+            g1 = g;
+            b1 = b;
+            lum[0] = (FIX(0.29900) * r + FIX(0.58700) * g +
+                      FIX(0.11400) * b + ONE_HALF) >> SCALEBITS;
+            r = p[4];
+            g = p[5];
+            b = p[6];
+            r1 += r;
+            g1 += g;
+            b1 += b;
+            lum[1] = (FIX(0.29900) * r + FIX(0.58700) * g +
+                      FIX(0.11400) * b + ONE_HALF) >> SCALEBITS;
+            p += wrap4;
+            lum += wrap;
+
+            r = p[0];
+            g = p[1];
+            b = p[2];
+            r1 += r;
+            g1 += g;
+            b1 += b;
+            lum[0] = (FIX(0.29900) * r + FIX(0.58700) * g +
+                      FIX(0.11400) * b + ONE_HALF) >> SCALEBITS;
+            r = p[4];
+            g = p[5];
+            b = p[6];
+            r1 += r;
+            g1 += g;
+            b1 += b;
+            lum[1] = (FIX(0.29900) * r + FIX(0.58700) * g +
+                      FIX(0.11400) * b + ONE_HALF) >> SCALEBITS;
+
+            cb[0] = ((- FIX(0.16874) * r1 - FIX(0.33126) * g1 +
+                      FIX(0.50000) * b1 + 4 * ONE_HALF - 1) >> (SCALEBITS + 2)) + 128;
+            cr[0] = ((FIX(0.50000) * r1 - FIX(0.41869) * g1 -
+                     FIX(0.08131) * b1 + 4 * ONE_HALF - 1) >> (SCALEBITS + 2)) + 128;
+
+            cb++;
+            cr++;
+            p += -wrap4 + 2 * 4;
+            lum += -wrap + 2;
+        }
+        p += wrap4;
+        lum += wrap;
+    }
+}
+

@@ -134,6 +134,8 @@ class TV
 
     ProgramInfo *curRecording;
     int tvtorecording;
+    
+    int playbackLen;
 };
 
 #endif

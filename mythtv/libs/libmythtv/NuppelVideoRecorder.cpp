@@ -65,6 +65,20 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
 
     audiobytes = 0;
     audio_samplerate = 44100;
+
+    avcodec_init();
+    avcodec_register_all();
+
+    mpa_codec = 0;
+
+    codec = "rtjpeg";
+    useavcodec = false;
+
+    targetbitrate = 2200;
+    scalebitrate = 1;
+    maxquality = 2;
+    minquality = 31;
+    qualdiff = 3;
 }
 
 NuppelVideoRecorder::~NuppelVideoRecorder(void)
@@ -96,6 +110,65 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         delete ab;
         audiobuffer.pop_back();
     }
+
+    if (mpa_codec)
+        avcodec_close(&mpa_ctx);
+}
+
+bool NuppelVideoRecorder::SetupAVCodec(void)
+{
+    if (mpa_codec)
+        avcodec_close(&mpa_ctx);
+    
+    mpa_codec = avcodec_find_encoder_by_name(codec.ascii());
+
+    if (!mpa_codec)
+    {
+        cout << "error finding codec\n";
+        return false;
+    }
+
+    mpa_ctx.pix_fmt = PIX_FMT_YUV420P;
+    
+    mpa_picture.linesize[0] = w;
+    mpa_picture.linesize[1] = w / 2;
+    mpa_picture.linesize[2] = w / 2;
+   
+    memset(&mpa_ctx, 0, sizeof(mpa_ctx));
+
+    mpa_ctx.width = w;
+    mpa_ctx.height = h;
+
+    int usebitrate = targetbitrate * 1000;
+    if (scalebitrate)
+    {
+        float diff = (w * h) / (640.0 * 480.0);
+        usebitrate = (int)(diff * usebitrate);
+    }
+
+    mpa_ctx.frame_rate = (int)(video_frame_rate * FRAME_RATE_BASE);
+    mpa_ctx.bit_rate = usebitrate;
+    mpa_ctx.bit_rate_tolerance = 1024 * 8 * 1000;
+    mpa_ctx.qmin = maxquality;
+    mpa_ctx.qmax = minquality;
+    mpa_ctx.max_qdiff = qualdiff;
+    mpa_ctx.qcompress = 0.5;
+    mpa_ctx.qblur = 0.5;
+    mpa_ctx.max_b_frames = 0;
+    mpa_ctx.b_quant_factor = 2.0;
+    mpa_ctx.rc_strategy = 2;
+    mpa_ctx.b_frame_strategy = 0;
+    mpa_ctx.gop_size = 30;
+    mpa_ctx.flags = CODEC_FLAG_TYPE;
+    mpa_ctx.me_method = 5;
+    mpa_ctx.key_frame = -1;
+
+    if (avcodec_open(&mpa_ctx, mpa_codec) < 0)
+    {
+        cerr << "Unable to open FFMPEG/MPEG4 codex\n" << endl;
+        return false;
+    }
+    return true;
 }
 
 void NuppelVideoRecorder::Initialize(void)
@@ -247,15 +320,27 @@ void NuppelVideoRecorder::StartRecording(void)
         return;
     }
 
-    int setval;
-    rtjc = new RTjpeg();
-    setval = RTJ_YUV420;
-    rtjc->SetFormat(&setval);
-    rtjc->SetSize(&w, &h);
-    rtjc->SetQuality(&Q);
-    setval = 2;
-    rtjc->SetIntra(&setval, &M1, &M2);
+    if (codec.lower() == "rtjpeg")
+        useavcodec = false;
+    else
+        useavcodec = true;
 
+    if (useavcodec)
+        useavcodec = SetupAVCodec();
+
+    if (!useavcodec)
+    {
+        cout << "using rtjpeg\n";
+        int setval;
+        rtjc = new RTjpeg();
+        setval = RTJ_YUV420;
+        rtjc->SetFormat(&setval);
+        rtjc->SetSize(&w, &h);
+        rtjc->SetQuality(&Q);
+        setval = 2;
+        rtjc->SetIntra(&setval, &M1, &M2);
+    }
+    
     if (childrenLive)
         return;
 
@@ -1025,6 +1110,8 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
     // see if it's time for a seeker header, sync information and a keyframe
     frameheader.keyframe  = frameofgop;             // no keyframe defaulted
 
+    bool wantkeyframe = false;
+
     if (((fnum-startnum)>>1) % keyframedist == 0) {
         frameheader.keyframe=0;
         frameofgop=0;
@@ -1051,26 +1138,41 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
                 keyframedist = KEYFRAMEDISTEND;
 	} 
    
+        wantkeyframe = true;
         sync();   
     }
 
-    if (!raw) 
-        tmp = rtjc->Compress(strm, planes);
-    else 
-        tmp = video_buffer_size;
+    if (useavcodec)
+    {
+        mpa_picture.data[0] = planes[0];
+        mpa_picture.data[1] = planes[1];
+        mpa_picture.data[2] = planes[2];
 
-    // here is lzo compression afterwards
-    if (compressthis) {
-        if (raw) 
-            r = lzo1x_1_compress((unsigned char*)buf, video_buffer_size, out,
-                                (lzo_uint *)&out_len, wrkmem);
-        else
-            r = lzo1x_1_compress((unsigned char *)strm, tmp, out,
-                                 (lzo_uint *)&out_len, wrkmem);
-        if (r != LZO_E_OK) 
-        {
-            cerr << "lzo compression failed\n";
-            return;
+        mpa_ctx.key_frame = wantkeyframe;
+
+        tmp = avcodec_encode_video(&mpa_ctx, (unsigned char *)strm, 
+                                   w * h + (w * h) / 2, &mpa_picture); 
+    }
+    else
+    {
+        if (!raw) 
+            tmp = rtjc->Compress(strm, planes);
+        else 
+            tmp = video_buffer_size;
+
+        // here is lzo compression afterwards
+        if (compressthis) {
+            if (raw) 
+                r = lzo1x_1_compress((unsigned char*)buf, video_buffer_size, 
+                                     out, (lzo_uint *)&out_len, wrkmem);
+            else
+                r = lzo1x_1_compress((unsigned char *)strm, tmp, out,
+                                     (lzo_uint *)&out_len, wrkmem);
+            if (r != LZO_E_OK) 
+            {
+                cerr << "lzo compression failed\n";
+                return;
+            }
         }
     }
 
@@ -1118,7 +1220,14 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
     frameheader.filters   = 0;             // no filters applied
 
     // compr ends here
-    if (compressthis == 0 || (tmp < out_len)) 
+    if (useavcodec)
+    {
+        frameheader.comptype = '3' + (int)(mpa_codec->id);
+        frameheader.packetlength = tmp;
+        ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+        ringBuffer->Write(strm, tmp);
+    }
+    else if (compressthis == 0 || (tmp < out_len)) 
     {
         if (!raw) 
         {
@@ -1234,7 +1343,6 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
 
         lameret = lame_encode_flush_nogap(gf, (unsigned char *)mp3gapless, 
                                           7200);
-
         if (lameret < 0)
         {
             cerr << "lame error, exiting\n";

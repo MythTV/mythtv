@@ -49,6 +49,15 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
 
     osd = NULL;
     audio_samplerate = 44100;
+    editmode = false;
+    advancevideo = resetvideo = advancedecoder = false;
+
+    totalLength = 0;
+
+    avcodec_init();
+    avcodec_register_all();
+
+    mpa_codec = 0;
 }
 
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
@@ -74,6 +83,8 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
     {
         delete [] vbuffer[i];
     }
+
+    CloseAVCodec();
 }
 
 void NuppelVideoPlayer::InitSound(void)
@@ -290,7 +301,42 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 
     return 0;
 }
-      
+
+bool NuppelVideoPlayer::InitAVCodec(int codectype)
+{
+    if (mpa_codec)
+        CloseAVCodec();
+
+    mpa_codec = avcodec_find_decoder((enum CodecID)codectype);
+
+    if (!mpa_codec)
+    {
+        cout << "couldn't find codec " << codectype << endl;
+        return false;
+    }
+
+    memset(&mpa_ctx, 0, sizeof(mpa_ctx));
+
+    mpa_ctx.width = video_width;
+    mpa_ctx.height = video_height;
+
+    if (avcodec_open(&mpa_ctx, mpa_codec) < 0)
+    {
+        cerr << "Couldn't find codec\n";
+        return false;
+    }
+
+    return true;
+}
+    
+void NuppelVideoPlayer::CloseAVCodec(void)
+{
+    if (!mpa_codec)
+        return;
+
+    avcodec_close(&mpa_ctx);
+}
+
 unsigned char *NuppelVideoPlayer::DecodeFrame(struct rtframeheader *frameheader,
                                               unsigned char *lstrm)
 {
@@ -306,31 +352,22 @@ unsigned char *NuppelVideoPlayer::DecodeFrame(struct rtframeheader *frameheader,
         planes[2] = planes[1] + (video_width * video_height) / 4;
     }
 
-    if (frameheader->frametype == 'V') {
-        if (frameheader->comptype == 'N') {
-            memset(buf, 0,  video_width * video_height);
-            memset(buf + video_width * video_height, 127,
-                   (video_width * video_height)/2);
-            return(buf);
-        }
-        if (frameheader->comptype == 'L') {
-            switch(lastct) {
-                case '0':
-                case '3': return(buf2); break;
-                case '1':
-                case '2': return(buf); break;
-                default: return(buf);
-            }
+    if (frameheader->comptype == 'N') {
+        memset(buf, 0,  video_width * video_height);
+        memset(buf + video_width * video_height, 127,
+                (video_width * video_height)/2);
+        return(buf);
+    }
+    if (frameheader->comptype == 'L') {
+        switch(lastct) {
+            case '0': case '3': return buf2;
+            case '1': case '2': return buf;
+            default: return buf;
         }
     }
 
-    //keyframe = frameheader->keyframe==0;
-    //if (keyframe) {
-    //}
-
-    if (frameheader->comptype == '0' || frameheader->comptype == '1') 
-        compoff=1;
-    else if (frameheader->comptype == '2' || frameheader->comptype == '3') 
+    compoff = 1;
+    if (frameheader->comptype == '2' || frameheader->comptype == '3') 
         compoff=0;
 
     lastct = frameheader->comptype;
@@ -345,21 +382,73 @@ unsigned char *NuppelVideoPlayer::DecodeFrame(struct rtframeheader *frameheader,
         }
     }
 
-    if (frameheader->frametype=='V' && frameheader->comptype == '0') 
+    if (frameheader->comptype == '0') 
     {
         memcpy(buf2, lstrm, (int)(video_width * video_height*1.5));
-        return(buf2);
+        return buf2;
     }
 
-    if (frameheader->frametype=='V' && frameheader->comptype == '3') 
-        return(buf2);
+    if (frameheader->comptype == '3') 
+        return buf2;
 
-    if (compoff) 
-        rtjd->Decompress((int8_t*)lstrm, planes);
+    if (frameheader->comptype == '2' || frameheader->comptype == '1')
+    {
+        if (compoff) 
+            rtjd->Decompress((int8_t*)lstrm, planes);
+        else
+            rtjd->Decompress((int8_t*)buf2, planes);
+    }
     else
-        rtjd->Decompress((int8_t*)buf2, planes);
+    {
+        if (!mpa_codec)
+            InitAVCodec(frameheader->comptype - '3');
 
-    return(buf);
+        int gotpicture = 0;
+        int ret = avcodec_decode_video(&mpa_ctx, &mpa_picture, &gotpicture,
+                                       lstrm, frameheader->packetlength);
+
+        if (ret < 0)
+        {
+            cout << "decoding error\n";
+            return buf;
+        }
+
+        if (!gotpicture)
+        {
+            cout << "nopicture\n";
+            return buf;
+        }
+
+        if (mpa_picture.linesize[0] != video_width)
+        {
+            for (int i = 0; i < video_height; i++)
+            {
+                memcpy(planes[0] + i * video_width, 
+                       mpa_picture.data[0] + i * mpa_picture.linesize[0], 
+                       video_width);
+            }
+
+            for (int i = 0; i < video_height / 2; i++)
+            {
+                memcpy(planes[1] + i * video_width / 2, 
+                       mpa_picture.data[1] + i * mpa_picture.linesize[1],
+                       video_width / 2);
+                memcpy(planes[2] + i * video_width / 2,
+                       mpa_picture.data[2] + i * mpa_picture.linesize[2],
+                       video_width / 2);
+            }
+        }
+        else
+        {
+            memcpy(planes[0], mpa_picture.data[0], video_width * video_height);
+            memcpy(planes[1], mpa_picture.data[1], 
+                   video_width * video_height / 4);
+            memcpy(planes[2], mpa_picture.data[2], 
+                   video_width * video_height / 4);
+        }
+    }
+
+    return buf;
 }
 
 int NuppelVideoPlayer::audiolen(bool use_lock)
@@ -696,6 +785,19 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         {
             if (!video_actually_paused)
                 pause_rpos = rpos;
+
+            if (advancevideo)
+            {
+                rpos = (rpos + 1) % MAXVBUFFER;
+                pause_rpos = rpos;
+                advancevideo = false;
+            }
+            if (resetvideo)
+            {
+                resetvideo = false;
+                pause_rpos = 0;
+            }
+
             video_actually_paused = true;
             if (livetv && ringBuffer->GetFreeSpace() < -1000)
             {
@@ -706,10 +808,10 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             {
                 //printf("video waiting for unpause\n");
                 usleep(50);
-		ResetNexttrigger(&nexttrigger);
                 memcpy(X11videobuf, vbuffer[pause_rpos], videosize);
                 osd->Display(X11videobuf);
                 XJ_show(video_width, video_height);
+                ResetNexttrigger(&nexttrigger);
                 continue;
             }
         }
@@ -803,17 +905,14 @@ void NuppelVideoPlayer::OutputAudioLoop(void)
     {
 	if (audiofd <= 0) 
 	    break;
-	
+
 	if (paused)
 	{
-	    audio_actually_paused = true;
-	    //ioctl(audiofd, SNDCTL_DSP_RESET, NULL);
-	    //usleep(50);
-	    
-	    audiotime = 0; // mark 'audiotime' as invalid.
-	    WriteAudio(zeros, 1024);
-	    //printf("audio waiting for unpause\n");
-	    continue;
+            audio_actually_paused = true;
+            //usleep(50);
+            audiotime = 0; // mark 'audiotime' as invalid.
+            WriteAudio(zeros, 1024);
+            continue;
 	}    
 	
         if (prebuffering)
@@ -824,7 +923,7 @@ void NuppelVideoPlayer::OutputAudioLoop(void)
 	    //printf("audio thread waiting for prebuffer\n");
 	    continue;
         }
-
+ 
         SetAudiotime(); // once per loop, calculate stuff for a/v sync
 	
         /* do audio output */
@@ -970,6 +1069,22 @@ void NuppelVideoPlayer::StartPlaying(void)
                 paused = false;
 		printf("forced unpause\n");
 	    }
+            else if (advancedecoder)
+            {
+                if (vbuffer_numvalid() <= 1)
+                {
+                    fftime = 1;
+                    DoFastForward();
+                    fftime = 0;
+
+                    GetFrame(audiofd <= 0);
+                    resetvideo = true;
+                }
+                else
+                    advancevideo = true;
+                advancedecoder = false;
+                continue;
+            }
 	    else
             {
                 //printf("startplaying waiting for unpause\n");
@@ -982,7 +1097,8 @@ void NuppelVideoPlayer::StartPlaying(void)
 	{
 	    rewindtime *= video_frame_rate;
 
-            DoRewind();
+            if (rewindtime >= 5)
+                DoRewind();
 
             rewindtime = 0;
 	}
@@ -991,7 +1107,8 @@ void NuppelVideoPlayer::StartPlaying(void)
             CalcMaxFFTime();
 	    fftime *= video_frame_rate;
 
-            DoFastForward();
+            if (fftime >= 5)
+                DoFastForward();
 
             fftime = 0;
 	}
@@ -1012,9 +1129,6 @@ void NuppelVideoPlayer::StartPlaying(void)
 
 bool NuppelVideoPlayer::DoRewind(void)
 {
-    if (rewindtime < 5)
-        return false;
-
     int number = (int)rewindtime;
 
     long long desiredFrame = framesPlayed - number;
@@ -1120,9 +1234,6 @@ void NuppelVideoPlayer::CalcMaxFFTime(void)
 
 bool NuppelVideoPlayer::DoFastForward(void)
 {
-    if (fftime < 5)
-        return false;
-
     int number = (int)fftime;
 
     long long desiredFrame = framesPlayed + number;
@@ -1367,4 +1478,131 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
     vh = video_height;
 
     return (char *)outputbuf;
+}
+
+void NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname)
+{ 
+
+    filename = inputname;
+     
+    InitSubs();
+    OpenFile(false);
+
+    mpa_codec = avcodec_find_encoder(CODEC_ID_MPEG4);
+
+    if (!mpa_codec)
+    {
+        cout << "error finding codec\n";
+        return;
+    }
+    mpa_ctx.pix_fmt = PIX_FMT_YUV420P;
+
+    mpa_picture.linesize[0] = video_width;
+    mpa_picture.linesize[1] = video_width / 2;
+    mpa_picture.linesize[2] = video_width / 2;
+
+    mpa_ctx.width = video_width;
+    mpa_ctx.height = video_height;
+ 
+    mpa_ctx.frame_rate = (int)(video_frame_rate * FRAME_RATE_BASE);
+    mpa_ctx.bit_rate = 1800 * 1000;
+    mpa_ctx.bit_rate_tolerance = 1024 * 8 * 1000;
+    mpa_ctx.qmin = 2;
+    mpa_ctx.qmax = 15;
+    mpa_ctx.max_qdiff = 3;
+    mpa_ctx.qcompress = 0.5;
+    mpa_ctx.qblur = 0.5;
+    mpa_ctx.max_b_frames = 3;
+    mpa_ctx.b_quant_factor = 2.0;
+    mpa_ctx.rc_strategy = 2;
+    mpa_ctx.b_frame_strategy = 0;
+    mpa_ctx.gop_size = 30;
+    mpa_ctx.flags = CODEC_FLAG_HQ; // | CODEC_FLAG_TYPE; 
+    mpa_ctx.me_method = 5;
+    mpa_ctx.key_frame = -1; 
+
+    if (avcodec_open(&mpa_ctx, mpa_codec) < 0)
+    {
+        cerr << "Unable to open FFMPEG/MPEG4 codex\n" << endl;
+        return;
+    }
+
+    FILE *out = fopen(outputname, "w+");
+
+    int fileend = 0;
+
+    buf = new unsigned char[video_width * video_height * 3 / 2];
+    strm = new unsigned char[video_width * video_height * 2];
+
+    unsigned char *frame = NULL;
+
+    static unsigned long int tbls[128];
+
+    fwrite(&fileheader, FILEHEADERSIZE, 1, out);
+    frameheader.frametype = 'D';
+    frameheader.comptype = 'R';
+    frameheader.packetlength = sizeof(tbls);
+
+    fwrite(&frameheader, FRAMEHEADERSIZE, 1, out);
+    fwrite(tbls, sizeof(tbls), 1, out);
+
+    int outsize;
+    unsigned char *outbuffer = new unsigned char[1000 * 1000 * 3];
+    bool nextiskey = true;
+
+    while (!fileend)
+    {
+        fileend = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader,
+                                                       FRAMEHEADERSIZE));
+
+        if (fileend)
+            continue;
+        if (frameheader.frametype == 'R')
+        {
+            fwrite("RTjjjjjjjjjjjjjjjjjjjjjjjj", FRAMEHEADERSIZE, 1, out);
+            continue;
+        }
+        else if (frameheader.frametype == 'S')
+        {
+            fwrite(&frameheader, FRAMEHEADERSIZE, 1, out);
+            nextiskey = true;
+            continue;
+        }
+
+        fileend = (ringBuffer->Read(strm, frameheader.packetlength) !=
+                                    frameheader.packetlength);
+
+        if (frameheader.frametype == 'V')
+        {
+            framesPlayed++;
+            frame = DecodeFrame(&frameheader, strm);
+
+            mpa_picture.data[0] = frame;
+            mpa_picture.data[1] = frame + (video_width * video_height);
+            mpa_picture.data[2] = frame + (video_width * video_height * 5 / 4);
+        
+            mpa_ctx.key_frame = nextiskey;
+
+            outsize = avcodec_encode_video(&mpa_ctx, outbuffer, 
+                                           1000 * 1000 * 3, &mpa_picture);
+
+            frameheader.comptype = '3' + CODEC_ID_MPEG4;
+            frameheader.packetlength = outsize;
+
+            fwrite(&frameheader, FRAMEHEADERSIZE, 1, out);
+            fwrite(outbuffer, frameheader.packetlength, 1, out);
+            cout << framesPlayed << endl; 
+            nextiskey = false;
+        }
+        else
+        {
+            fwrite(&frameheader, FRAMEHEADERSIZE, 1, out);
+            fwrite(strm, frameheader.packetlength, 1, out);
+        }
+    }
+
+    delete [] outbuffer;
+
+    fclose(out);
+    avcodec_close(&mpa_ctx);
 }

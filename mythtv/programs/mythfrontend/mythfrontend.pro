@@ -16,8 +16,8 @@ setting.files += theme.txt mysql.txt
 INSTALLS += setting
 
 INCLUDEPATH += ../mythepg ../mythdialog ../libNuppelVideo ../libmythtv
-LIBS += -L../libmythtv -L../libNuppelVideo -lmythtv -lNuppelVideo -lXv
-LIBS += -lttf -lmp3lame
+LIBS += -L../libmythtv -L../libNuppelVideo -L../libavcodec
+LIBS += -lmythtv -lNuppelVideo -lXv -lttf -lmp3lame -lavcodec
 
 TARGETDEPS = ../libNuppelVideo/libNuppelVideo.a ../libmythtv/libmythtv.a
 

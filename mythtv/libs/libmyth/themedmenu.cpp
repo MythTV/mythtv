@@ -49,6 +49,28 @@ ThemedMenu::ThemedMenu(const char *cdir, const char *menufile,
         return;
     }
 
+    parseSettings(dir, menufile);
+}
+
+ThemedMenu::~ThemedMenu(void)
+{
+    if (logo)
+        delete logo;
+    if (buttonnormal)
+        delete buttonnormal;
+    if (buttonactive)
+        delete buttonactive;
+    for (unsigned int i = 0; i < buttonList.size(); i++)
+    {
+        if (buttonList[i].icon)
+            delete buttonList[i].icon;
+    }
+}
+
+void ThemedMenu::parseSettings(QString dir, QString menuname)
+{
+    QString filename = dir + menuname;
+
     Settings *settings = new Settings(filename);
 
     QString setting = settings->GetSetting("Include");
@@ -220,6 +242,17 @@ ThemedMenu::ThemedMenu(const char *cdir, const char *menufile,
         shadowalpha = settings->GetNumSetting("ButtonShadowAlpha");
     }
 
+    hasoutline = false;
+    int dooutline = settings->GetNumSetting("ButtonTextOutline");
+    if (dooutline)
+    {
+        hasoutline = true;
+        QString outlinecolor = settings->GetSetting("ButtonTextOutlineColor");
+        outlineColor = QColor(outlinecolor);
+        outlinesize = settings->GetNumSetting("ButtonTextOutlineSize");
+        outlinesize = (int)(outlinesize * hmult);
+    }
+
     int centered = settings->GetNumSetting("ButtonTextCentered");
     
     if (centered)
@@ -238,21 +271,8 @@ ThemedMenu::ThemedMenu(const char *cdir, const char *menufile,
     selection = "";
 
     update(menuRect());
-}
 
-ThemedMenu::~ThemedMenu(void)
-{
-    if (logo)
-        delete logo;
-    if (buttonnormal)
-        delete buttonnormal;
-    if (buttonactive)
-        delete buttonactive;
-    for (unsigned int i = 0; i < buttonList.size(); i++)
-    {
-        if (buttonList[i].icon)
-            delete buttonList[i].icon;
-    }
+    delete settings;
 }
 
 QPixmap *ThemedMenu::scalePixmap(QString filename)
@@ -412,11 +432,8 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p)
         bitBlt(&pix, buttonTextRect.topLeft(), &textpix, myrect, Qt::CopyROP);
     }
 
-    tmp.setPen(QPen(textColor, 1));
     tmp.setFont(font);
-
-    tmp.drawText(buttonTextRect, textflags, buttonList[button].text);
-
+    drawText(&tmp, buttonTextRect, textflags, buttonList[button].text);
 
     if (buttonList[button].icon)
     {
@@ -433,6 +450,50 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p)
     tmp.end();
 
     p->drawPixmap(cr.topLeft(), pix);
+}
+
+void ThemedMenu::drawText(QPainter *p, QRect &rect, int textflags, QString text)
+{
+    if (hasoutline)
+    {
+        QRect outlinerect = rect;
+
+        p->setPen(QPen(outlineColor, 1));
+        outlinerect.moveBy(0 - outlinesize, 0 - outlinesize);
+        p->drawText(outlinerect, textflags, text);
+
+        for (int i = (0 - outlinesize + 1); i <= outlinesize; i++)
+        {
+            outlinerect.moveBy(1, 0);
+            p->drawText(outlinerect, textflags, text);
+        }
+
+        for (int i = (0 - outlinesize + 1); i <= outlinesize; i++)
+        {
+            outlinerect.moveBy(0, 1);
+            p->drawText(outlinerect, textflags, text);
+        }
+  
+        for (int i = (0 - outlinesize + 1); i <= outlinesize; i++)
+        {
+            outlinerect.moveBy(-1, 0);
+            p->drawText(outlinerect, textflags, text);
+        }
+
+        for (int i = (0 - outlinesize + 1); i <= outlinesize; i++)
+        {
+            outlinerect.moveBy(0, -1);
+            p->drawText(outlinerect, textflags, text);
+        }
+
+        p->setPen(QPen(textColor, 1));
+        p->drawText(rect, textflags, text);
+    }
+    else
+    {
+        p->setPen(QPen(textColor, 1));
+        p->drawText(rect, textflags, text);
+    }
 }
 
 void ThemedMenu::keyPressEvent(QKeyEvent *e)

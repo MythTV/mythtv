@@ -19,6 +19,9 @@
 #include "osd.h"
 #include "jitterometer.h"
 
+extern "C" {
+#include "../libavcodec/avcodec.h"
+}
 using namespace std;
 
 #define MAXVBUFFER 21
@@ -47,14 +50,19 @@ class NuppelVideoPlayer
 
     void SetAudioSampleRate(int rate) { audio_samplerate = rate; }
 
-    bool TogglePause(void) { return (paused = !paused); }
+    bool TogglePause(void) { if (paused) Unpause(); else Pause(); 
+                             return paused; 
+                           }
     void Pause(void) { paused = true; actuallypaused = false; 
                        audio_actually_paused = false; 
                        video_actually_paused = false; }
     void Unpause(void) { paused = false; }
     bool GetPause(void) { return (actuallypaused && audio_actually_paused &&
                                   video_actually_paused); }
-    
+   
+    bool ToggleEdit(void) { editmode = !editmode; return editmode; }
+    void AdvanceOneFrame(void) { advancedecoder = true; } 
+ 
     void FastForward(float seconds) { fftime = seconds; }
     void Rewind(float seconds) { rewindtime = seconds; }
     void ResetPlaying(void) { resetplaying = true; actuallyreset = false; }
@@ -95,6 +103,10 @@ class NuppelVideoPlayer
 
     // don't use this on something you're playing
     char *GetScreenGrab(int secondsin, int &buflen, int &vw, int &vh);
+
+    void SetLength(int len) { totalLength = len; }
+
+    void ReencodeFile(char *inputname, char *outputname);
 
  protected:
     void OutputAudioLoop(void);
@@ -215,6 +227,10 @@ class NuppelVideoPlayer
     long long framesPlayed;
     
     bool livetv;
+    bool editmode;
+    bool advancevideo;
+    bool resetvideo;
+    bool advancedecoder;
 
     map<long long, long long> *positionMap;
     long long lastKey;
@@ -225,9 +241,18 @@ class NuppelVideoPlayer
     bool resetplaying;
     bool actuallyreset;
 
+    int totalLength;
+
     QString osdfilename;
     QString osdprefix;
     OSD *osd;
+
+    bool InitAVCodec(int codectype);
+    void CloseAVCodec(void);
+
+    AVCodec *mpa_codec;
+    AVCodecContext mpa_ctx;
+    AVPicture mpa_picture;
 };
 
 #endif

@@ -223,6 +223,7 @@ void TV::Playback(ProgramInfo *rcinfo)
     {
         QString recprefix = settings->GetSetting("RecordFilePrefix");
         inputFilename = rcinfo->GetRecordFilename(recprefix);
+        playbackLen = rcinfo->CalculateLength();
 
         if (internalState == kState_None)
             nextState = kState_WatchingPreRecorded;
@@ -554,15 +555,26 @@ void TV::SetupRecorder(void)
 
     nvr = new NuppelVideoRecorder();
     nvr->SetRingBuffer(rbuffer);
-    nvr->SetMotionLevels(settings->GetNumSetting("LumaFilter"),
-                         settings->GetNumSetting("ChromaFilter"));
-    nvr->SetQuality(settings->GetNumSetting("Quality"));
+    nvr->SetVideoDevice(settings->GetSetting("V4LDevice"));
     nvr->SetResolution(settings->GetNumSetting("Width"),
-                     settings->GetNumSetting("Height"));
+                       settings->GetNumSetting("Height"));
+    nvr->SetCodec(settings->GetSetting("Codec"));
+    
+    nvr->SetRTJpegMotionLevels(settings->GetNumSetting("LumaFilter"),
+                               settings->GetNumSetting("ChromaFilter"));
+    nvr->SetRTJpegQuality(settings->GetNumSetting("Quality"));
+
+    nvr->SetMP4TargetBitrate(settings->GetNumSetting("TargetBitrate"));
+    nvr->SetMP4ScaleBitrate(settings->GetNumSetting("ScaleBitrate"));
+    nvr->SetMP4Quality(settings->GetNumSetting("MaxQuality"),
+                       settings->GetNumSetting("MinQuality"),
+                       settings->GetNumSetting("QualDiff"));
+    
     nvr->SetMP3Quality(settings->GetNumSetting("MP3Quality"));
     nvr->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
-    nvr->SetVideoDevice(settings->GetSetting("V4LDevice"));
     nvr->SetAudioDevice(settings->GetSetting("AudioDevice"));
+    nvr->SetAudioCompression(!settings->GetNumSetting("DontCompressAudio"));
+
     nvr->Initialize();
 }
 
@@ -612,6 +624,7 @@ void TV::SetupPlayer(void)
     nvp->SetOSDFontName(settings->GetSetting("OSDFont"), theprefix);
     nvp->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
     nvp->SetAudioDevice(settings->GetSetting("AudioDevice"));
+    nvp->SetLength(playbackLen);
     osd_display_time = settings->GetNumSetting("OSDDisplayTime");
 }
 
@@ -791,6 +804,8 @@ void TV::ProcessKeypress(int keypressed)
 
         case wsEscape: exitPlayer = true; break;
 
+        case 'e': case 'E': nvp->ToggleEdit(); break;
+        case ' ': nvp->AdvanceOneFrame(); break;
         default: break;
     }
 

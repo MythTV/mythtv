@@ -22,6 +22,8 @@ class ProgramInfo
 
     QString GetRecordFilename(const QString &prefix);
 
+    int CalculateLength(void);
+
     QString title;
     QString subtitle;
     QString description;

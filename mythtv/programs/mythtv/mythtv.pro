@@ -11,8 +11,8 @@ INSTALLS = target
 include ( ../settings.pro )
 
 INCLUDEPATH += ../libNuppelVideo ../libmythtv
-LIBS += -L../libNuppelVideo -L../libmythtv -lmythtv -lNuppelVideo -lXv
-LIBS += -lttf -lmp3lame
+LIBS += -L../libNuppelVideo -L../libmythtv -L../libavcodec
+LIBS += -lmythtv -lNuppelVideo -lXv -lttf -lmp3lame -lavcodec
 
 TARGETDEPS = ../libNuppelVideo/libNuppelVideo.a ../libmythtv/libmythtv.a
 

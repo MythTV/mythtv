@@ -23,6 +23,10 @@
 #include "format.h"
 #include "RingBuffer.h"
 
+extern "C" {
+#include "../libavcodec/avcodec.h"
+}
+
 using namespace std;
 
 class NuppelVideoRecorder
@@ -33,10 +37,16 @@ class NuppelVideoRecorder
 
     void SetRingBuffer(RingBuffer *rbuf) { ringBuffer = rbuf; }
 
-    void SetMotionLevels(int lM1, int lM2) { M1 = lM1; M2 = lM2; }
-    void SetQuality(int quality) { Q = quality; }
+    void SetCodec(QString desiredcodec) { codec = desiredcodec; }
+    void SetRTJpegMotionLevels(int lM1, int lM2) { M1 = lM1; M2 = lM2; }
+    void SetRTJpegQuality(int quality) { Q = quality; }
+    void SetMP4TargetBitrate(int rate) { targetbitrate = rate; }
+    void SetMP4ScaleBitrate(int scale) { scalebitrate = scale;}
+    void SetMP4Quality(int max, int min, int diff) 
+                       { maxquality = max; minquality = min; qualdiff = diff; }
     void SetResolution(int width, int height) { w = width; h = height; }
     void SetAudioSampleRate(int rate) { audio_samplerate = rate; }   
+    void SetAudioCompression(bool compress) { compressaudio = compress; }
  
     void SetFilename(QString filename) { sfilename = filename; }
     void SetAudioDevice(QString device) { audiodevice = device; }
@@ -86,6 +96,8 @@ class NuppelVideoRecorder
 
     void WriteVideo(unsigned char *buf, int fnum, int timecode);
     void WriteAudio(unsigned char *buf, int fnum, int timecode);
+
+    bool SetupAVCodec(void);
 
     QString sfilename;
     bool encoding;
@@ -169,6 +181,19 @@ class NuppelVideoRecorder
     
     int last_block;
     int firsttc;
+
+    bool useavcodec;
+
+    AVCodec *mpa_codec;
+    AVCodecContext mpa_ctx;
+    AVPicture mpa_picture;
+
+    int targetbitrate;
+    int scalebitrate;
+    int maxquality;
+    int minquality;
+    int qualdiff;
+    QString codec;
 };
 
 #endif

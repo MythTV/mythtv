@@ -1,6 +1,8 @@
 .qmake.internal.cache
+Makefile
 moc_deletebox.cpp
 moc_menubox.cpp
 moc_playbackbox.cpp
 moc_viewscheduled.cpp
+moc_themedmenu.cpp
 mythfrontend

@@ -27,6 +27,11 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
     conflicting = other.conflicting;
     recording = other.recording;
 }   
+
+int ProgramInfo::CalculateLength(void)
+{
+    return startts.secsTo(endts);
+}
     
 ProgramInfo *GetProgramAtDateTime(int channel, const char *time)
 {

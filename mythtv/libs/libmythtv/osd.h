@@ -5,6 +5,7 @@
 #include <qstring.h>
 #include <time.h>
 
+class QImage;
 class OSD
 {
  public:
@@ -86,6 +87,9 @@ class OSD
 
     int currentdialogoption;
     bool show_dialog;
+
+    QImage *qosdoverlay;
+    unsigned char *osdoverlayyuv;
 };
     
 #endif

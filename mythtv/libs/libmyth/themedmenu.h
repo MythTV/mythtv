@@ -38,6 +38,8 @@ class ThemedMenu : public QDialog
     void keyPressEvent(QKeyEvent *e);
 
   private:
+    void parseSettings(QString dir, QString menuname);
+
     QPoint parsePoint(QString text);
     QRect parseRect(QString text);
     QValueList<int> parseOrder(QString text);
@@ -46,6 +48,8 @@ class ThemedMenu : public QDialog
 
     void paintLogo(QPainter *p);
     void paintButton(unsigned int button, QPainter *p);
+
+    void drawText(QPainter *p, QRect &rect, int textflags, QString text);
 
     QPixmap *scalePixmap(QString filename);
     float wmult, hmult;
@@ -72,6 +76,10 @@ class ThemedMenu : public QDialog
     QColor shadowColor;
     QPoint shadowOffset;
     int shadowalpha;
+
+    bool hasoutline;
+    QColor outlineColor;
+    int outlinesize;
 
     QString selection;
     bool foundtheme;

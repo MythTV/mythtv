@@ -1,4 +1,5 @@
 # Live TV options
+#
 # Size of the buffer for watching live tv, in GB
 int BufferSize=5
 # The amount of space to fill the buffer up before forcing an unpause, in MB
@@ -7,27 +8,59 @@ int BufferSize=5
 int MaxBufferFill=50
 # The desired path + name of the live tv buffer
 str BufferName=/mnt/store/ringbuf.nuv
+# Path to store recordings in
 str RecordFilePrefix=/mnt/store
 
 # Record settings
+#
+# Video settings
+#
+# V4L device
+str V4LDevice=/dev/video
 # Resolution to capture at
 int Width=480
 int Height=480
+# What codec to use?  Tested values are rtjpeg (the default) and mpeg4
+str Codec=rtjpeg
+#
+# RTjpeg specific settings
+#
 # Quality level to capture at (higher better, 255 being best)
 int Quality=170
 # Motion Levels (lower better, 0 being best)
 int LumaFilter=0
 int ChromaFilter=0
-# Audio Sample Rate: one of 32000, 44100, 48000
-int AudioSampleRate=44100
-# Quality level for the MP3 compression (0 best - 9 worst)
-int MP3Quality=7
-# V4L device
-str V4LDevice=/dev/video
+#
+# MPEG4 specific settings
+# 
+# Desired bitrate, in bits/second.  2200 means about a gigabyte an hour.
+int TargetBitrate=2200
+# Scale bitrate by frame size.  If this is set to 1, the target bitrate given
+# above will be used as a guideline for 640x480.  Other resolutions will scale
+# the target bitrate down according to the framesize.
+int ScaleBitrate=1
+# Maximum quality level.  1 is best, 31 is worst
+int MaxQuality=2
+# Minimum quality level.  1 is best, 31 is worst
+int MinQuality=31
+# Maximum quality difference between frames.
+int QualDiff=3
+# 
+# Audio settings
+#
 # dsp device
 str AudioDevice=/dev/dsp
+# Audio Sample Rate: one of 32000, 44100, 48000
+int AudioSampleRate=44100
+# Turn off the audio compression? 1 for yes, 0 for no.  Compression saves 500 
+# megabytes an hour, but takes extra CPU time.
+int DontCompressAudio=0
+# Quality level for the MP3 compression (0 best - 9 worst)
+int MP3Quality=7
 
+#
 # Playback options
+#
 # Deinterlace playback (1 for on, 0 for no) -- adds to CPU usage
 int Deinterlace=1
 # How long should the OSD stay up for in seconds?
@@ -37,5 +70,8 @@ str OSDFont=helr.ttf
 #str OSDFont=/usr/share/fonts/truetype/Arial.ttf
 
 # TV options
+# 
+#
 str TVFormat=NTSC
+#
 str FreqTable=us-cable
