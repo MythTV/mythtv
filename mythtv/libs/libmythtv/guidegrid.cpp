@@ -2262,6 +2262,10 @@ void GuideGrid::escape()
 void GuideGrid::quickRecord()
 {
     ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
+
+    if (pginfo->title == unknownTitle)
+        return;
+
     ScheduledRecording::RecordingType currType = pginfo->GetProgramRecordingStatus(m_db);
 
     if (!pginfo)
@@ -2281,6 +2285,9 @@ void GuideGrid::displayInfo()
     showInfo = 1;
 
     ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
+
+    if (pginfo->title == unknownTitle)
+        return;
 
     if (pginfo)
     {
