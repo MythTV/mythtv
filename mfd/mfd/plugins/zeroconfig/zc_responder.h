@@ -52,7 +52,7 @@ class RegisteredService
 //  this mfd.
 //
 
-class ZeroConfigResponder: public MFDBasePlugin
+class ZeroConfigResponder: public MFDServicePlugin
 {
 
   public:
@@ -88,23 +88,13 @@ class ZeroConfigResponder: public MFDBasePlugin
     
   private:
   
-    int         bumpIdentifiers(){++service_identifier; return service_identifier;}
-
-    MFD     *parent;
+    int     bumpIdentifiers(){++service_identifier; return service_identifier;}
     int     unique_identifier;
-
     int     service_identifier;
 
     QPtrList<RegisteredService>   registered_services;
-
-    QPtrList<SocketBuffer>  things_to_do;
-    QMutex                  things_to_do_mutex;
-
-    MFDFileDescriptorWatchingPlugin *fd_watcher;
-
-    IntValueList    *file_descriptors;
-    QMutex          *file_descriptors_mutex;
-    QMutex           file_watching_mutex;
+    QPtrList<SocketBuffer>        things_to_do;
+    QMutex                        things_to_do_mutex;
 
 };
 

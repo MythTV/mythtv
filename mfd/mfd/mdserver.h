@@ -31,20 +31,12 @@ class MetadataServer : public MFDServicePlugin
     MetadataServer(MFD *owner, int port);
     ~MetadataServer();
     void    run();
-    void    makeMeDoSomething(const QString& what_to_do);
     void    doSomething(const QStringList &tokens, int socket_identifier);
 
   private:
   
     bool    checkMetadata();
     
-    MFDFileDescriptorWatchingPlugin *fd_watcher;
-
-    QMutex file_watching_mutex;
-    
-    IntValueList      *file_descriptors;
-    QMutex            *file_descriptors_mutex;
-      
 };
 
 

@@ -1,9 +1,9 @@
 /*
-	zc_client.cpp
+    zc_client.cpp
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
-	Part of the mythTV project
-	
+    (c) 2003 Thor Sigvaldason and Isaac Richards
+    Part of the mythTV project
+    
     !! This code is covered the the Apple Public Source License !!
     
     See ./apple/APPLE_LICENSE
@@ -290,12 +290,8 @@ extern "C" void BrowseCallback(mDNS *const m, DNSQuestion *question, const Resou
 
 
 ZeroConfigClient::ZeroConfigClient(MFD *owner, int identifier)
-                 :MFDBasePlugin(owner, identifier)
+                 :MFDServicePlugin(owner, identifier, -1)
 {
-    fd_watcher = NULL;
-    file_descriptors = new IntValueList();
-    file_descriptors_mutex = new QMutex();
-
     //
     //  Keep going (unless told otherwise)
     //
@@ -494,15 +490,15 @@ void ZeroConfigClient::run()
     //  Initialize Apple's mDNS code
     //
 
-	status = mDNS_Init(
-	                    &mDNSStorage, 
-	                    &PlatformStorage,
-    	                gRRCache, 
-    	                RR_CACHE_SIZE,
-    	                mDNS_Init_DontAdvertiseLocalAddresses,
-    	                mDNS_Init_NoInitCallback, 
-    	                mDNS_Init_NoInitCallbackContext
-    	              );
+    status = mDNS_Init(
+                        &mDNSStorage, 
+                        &PlatformStorage,
+                        gRRCache, 
+                        RR_CACHE_SIZE,
+                        mDNS_Init_DontAdvertiseLocalAddresses,
+                        mDNS_Init_NoInitCallback, 
+                        mDNS_Init_NoInitCallbackContext
+                      );
 
     if(status != mStatus_NoError)
     {
@@ -526,29 +522,6 @@ void ZeroConfigClient::run()
     //  arrives. The pipe just lets us wake up that thread from this thread.
     //    
 
-    int nfds = 0;
-	fd_set readfds;
-    struct timeval timeout;
-    int fd_watching_pipe[2];
-    if(pipe(fd_watching_pipe) < 0)
-    {
-        warning("zeroconfig client could not create a pipe to its FD watching thread");
-    }
-
-    //
-    //  Create the File Descriptor Watcher, but lock it out (with a mutex)
-    //  till we get down in our loop
-    //
-
-    fd_watcher = new MFDFileDescriptorWatchingPlugin(   this, 
-                                                        &file_watching_mutex,
-                                                        file_descriptors_mutex, 
-                                                        file_descriptors, 
-                                                        30,
-                                                        0);
-    file_watching_mutex.lock();
-    fd_watcher->start();
-    
 
     while(keep_going)
     {
@@ -576,128 +549,66 @@ void ZeroConfigClient::run()
         {
             doSomething(pending_tokens, pending_socket);
         }
-        
-        
-        //
-        //  Let mDNS code do whatever it needs to do, and then tell us when
-        //  it next wants to be called.
-        //
-
-        int next_time = mDNS_Execute(&mDNSStorage);
-
-        int time_difference = next_time - mDNSPlatformTimeNow();
-        int seconds_to_wait = ((int) (time_difference / 1000));
-        int usecs_to_wait = time_difference % 1000;
-        if(seconds_to_wait < 0)
+        else
         {
-            seconds_to_wait = 0;
-        }
-        if(usecs_to_wait < 0)
-        {
-            usecs_to_wait = 0;
-        }
-        timeout.tv_sec = seconds_to_wait;
-        timeout.tv_usec = usecs_to_wait;
-        
-		nfds = 0;
-		FD_ZERO(&readfds);
-		mDNSPosixGetFDSet(&mDNSStorage, &nfds, &readfds, &timeout);
-
-		//
-		//  The mDNS code (immediately above) generally will have set the
-		//  timeout to something it wants. We have to tell our watching
-		//  thread to sit in it's select() call for that long. But we put an
-		//  upper bound on it so that we can get out if we're shutting down
-		//  or reloading.
-		//
-
-        if(timeout.tv_sec > 10)
-        {
-            timeout.tv_sec = 10;
-        }
-
-		fd_watcher->setTimeout(timeout.tv_sec, timeout.tv_usec);
-
-        //
-        //  Create the set of things the descriptor watching thread should watch
-        //
-
-        file_descriptors_mutex->lock();
 
             //
-            //  Zero 'em out.
+            //  Let mDNS code do whatever it needs to do, and then tell us when
+            //  it next wants to be called.
             //
 
-            file_descriptors->clear();
-                
-            //
-            //  Add everything the Apple nDNS code said we should watch
-            //
+            int next_time = mDNS_Execute(&mDNSStorage);
 
-            for(int i = 0; i < nfds; i++)
+            int time_difference = next_time - mDNSPlatformTimeNow();
+            int seconds_to_wait = ((int) (time_difference / 1000));
+            int usecs_to_wait = time_difference % 1000;
+            if(seconds_to_wait < 0)
             {
-                if(FD_ISSET(i, &readfds))
-                {
-                    file_descriptors->append(i);
-                }
+                seconds_to_wait = 0;
             }
-            
-    		//
-    		//  Add the read side of the control pipe
-    		//
-    		    
-    	    file_descriptors->append(fd_watching_pipe[0]);
-
-        file_descriptors_mutex->unlock();
+            if(usecs_to_wait < 0)
+            {
+                usecs_to_wait = 0;
+            }
         
-        //
-        //  Let the watching thread watch
-        //
-
-        file_watching_mutex.unlock();
-
-        //
-        //  Sit and wait for something to happen.
-        //
-
-        main_wait_condition.wait();
+            timeout.tv_sec = seconds_to_wait;
+            timeout.tv_usec = usecs_to_wait;
         
-        //
-        //  Hmmmm ... something woke us up. It was either the core mfd
-        //  passing us some tokens to parse or the fd watching thread
-        //  telling us that new information about available services has
-        //  arrived.
-        //
-        //  In either case, we need control of the file descriptors back, so
-        //  we send a bit of data out on our pipe. That will cause the fd
-        //  watching thread to return from select() and release its lock on
-        //  the fd set.
-        //
+            int nfds = 0;
+            fd_set readfds;
+            FD_ZERO(&readfds);
 
-        write(fd_watching_pipe[1], "X", 1);
-        file_watching_mutex.lock();
-        char back[2];
-        read(fd_watching_pipe[0], back, 2);
+            mDNSPosixGetFDSet(&mDNSStorage, &nfds, &readfds, &timeout);
 
-        //
-        //  OK, let the mDNS do anything it needs to
-        //        
-        
-	    mDNSPosixProcessFDSet(&mDNSStorage, &readfds);
-        
+            //
+            //  Add our pipe to the watcher thread as one of file descriptors it
+            //  should monitor
+            //
+
+            FD_SET(u_shaped_pipe[0], &readfds);
+            if(nfds <= u_shaped_pipe[0])
+            {
+                nfds = u_shaped_pipe[0] + 1;
+            }
+ 
+            int result = select(nfds, &readfds, NULL, NULL, &timeout);
+            if(result < 0)
+            {
+                warning("zero config client got an error on select()");
+            }
+
+            if(FD_ISSET(u_shaped_pipe[0], &readfds))
+            {
+                char read_back[10];
+                read(u_shaped_pipe[0], read_back, 9);
+            }
+
+            mDNSPosixProcessFDSet(&mDNSStorage, &readfds);
+
+        }    
     }
 
     log("zeroconfig client is leaving its event loop", 10);
-
-    //
-    //  Stop the sub thread
-    //
-    
-    fd_watcher->stop();
-    file_watching_mutex.unlock();
-    fd_watcher->wait();
-    delete fd_watcher;
-    fd_watcher = NULL;
 
     //
     //  We're done and exiting. Clean up a bit.
@@ -708,10 +619,11 @@ void ZeroConfigClient::run()
         DNSQuestion *a_question = dns_questions.at(i);
         mDNS_StopQuery(&mDNSStorage, a_question);
     }
-  	mDNS_Close(&mDNSStorage);
-  	dns_questions.clear();
-  	
-  	
+      
+    mDNS_Close(&mDNSStorage);
+    dns_questions.clear();
+      
+      
 }
 
 bool ZeroConfigClient::checkServiceName(const QString &new_name)
@@ -824,34 +736,6 @@ void ZeroConfigClient::doSomething(const QStringList &tokens, int socket_identif
 
 ZeroConfigClient::~ZeroConfigClient()
 {
-    if(fd_watcher)
-    {
-        delete fd_watcher;
-    }
-    if(file_descriptors)
-    {
-        if(file_descriptors_mutex)
-        {
-            file_descriptors_mutex->lock();
-            file_descriptors->clear();
-            delete file_descriptors;
-            file_descriptors = NULL;
-            file_descriptors_mutex->unlock();
-        }
-        else
-        {
-            file_descriptors->clear();
-            delete file_descriptors;
-            file_descriptors = NULL;
-        }
-    }
-
-    if(file_descriptors_mutex)
-    {
-        delete file_descriptors_mutex;
-        file_descriptors_mutex = NULL;
-    }
-
     log("zeroconfig client is being killed off", 10);
     dns_questions.clear();
     available_services.clear();

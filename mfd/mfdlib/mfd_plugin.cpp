@@ -209,6 +209,25 @@ MFDServicePlugin::MFDServicePlugin(MFD *owner, int identifier, int port)
     port_number = port;
     core_server_socket = NULL;
     client_sockets.setAutoDelete(true);
+    if(pipe(u_shaped_pipe) < 0)
+    {
+        warning("mfd service could not create a u shaped pipe");
+    }
+    
+    //
+    //  Add the read side of the pipe to the set of internal descriptors we
+    //  watch. We can then wake this thread up just by writing to the write
+    //  side of the pipe (see wakeUp())
+    //
+
+    internal_file_descriptors.append(u_shaped_pipe[0]);
+
+    //
+    //  Set default timeout values for select()'ing
+    //
+    
+    time_wait_seconds = 5;
+    time_wait_usecs = 0;
 }
 
 bool MFDServicePlugin::initServerSocket()
@@ -223,6 +242,13 @@ bool MFDServicePlugin::initServerSocket()
         return false;
     }
     core_server_socket->setBlocking(false);
+    
+    //
+    //  Add the fd for this socket to the list of internal descriptors we
+    //  watch for changes on
+    //
+
+    internal_file_descriptors.append(core_server_socket->socket());
     return true;
 }
 
@@ -236,16 +262,17 @@ void MFDServicePlugin::updateSockets()
     findNewClients();
 
     //
+    //  drop any dead connections
+    //
+    
+    dropDeadClients();
+
+    //
     //  Get any incoming commands
     //
     
     readClients();
 
-    //
-    //  drop any dead connections
-    //
-    
-    dropDeadClients();
 
 
 }
@@ -267,6 +294,7 @@ void MFDServicePlugin::findNewClients()
                                     QSocketDevice::Stream
                                    );
             client_sockets.append(new_client);
+            internal_file_descriptors.append(new_client->socket());
         }
         else
         {
@@ -291,6 +319,12 @@ void MFDServicePlugin::dropDeadClients()
                 //  No bytes to read, and we didn't even make it through
                 //  the 100 msec's .... client gone away.
                 //
+
+                if(!internal_file_descriptors.remove(a_client->socket()))
+                {
+                    warning("service plugin saw a client go away that was not on our list of internal descriptors");
+                }
+
                 client_sockets.remove(a_client);
             }
         }
@@ -303,6 +337,7 @@ void MFDServicePlugin::addToDo(QString new_stuff_todo, int client_id)
         SocketBuffer *new_request = new SocketBuffer(QStringList::split(" ", new_stuff_todo), client_id);
         things_to_do.append(new_request);
     things_to_do_mutex.unlock();
+    wakeUp();
 }
 
 void MFDServicePlugin::readClients()
@@ -395,6 +430,118 @@ void MFDServicePlugin::sendMessage(const QString &message)
     }
 }
 
+void MFDServicePlugin::wakeUp()
+{
+    //
+    //  Tell the main thread to wake up by sending some data to ourselves on
+    //  our u_shaped_pipe
+    //
+
+    u_shaped_pipe_mutex.lock();
+        write(u_shaped_pipe[1], "wakeup\0", 7);
+    u_shaped_pipe_mutex.unlock();
+}
+
+void MFDServicePlugin::addFileDescriptor(int fd)
+{
+    file_descriptors_mutex.lock();
+        extra_file_descriptors.append(fd);
+    file_descriptors_mutex.unlock();    
+}
+
+void MFDServicePlugin::removeFileDescriptor(int fd)
+{
+    file_descriptors_mutex.lock();
+        if(!extra_file_descriptors.remove(fd))
+        {
+            warning("service plugin was asked to remove a descriptor that is not on our extra list");
+        }
+    file_descriptors_mutex.unlock();    
+}
+
+void MFDServicePlugin::clearFileDescriptors()
+{
+    file_descriptors_mutex.lock();
+        extra_file_descriptors.clear();
+    file_descriptors_mutex.unlock();    
+}
+
+void MFDServicePlugin::waitForSomethingToHappen()
+{
+    int nfds = 0;
+    fd_set readfds;
+
+    FD_ZERO(&readfds);
+            
+    file_descriptors_mutex.lock();
+
+
+        QValueList<int>::iterator int_it;
+        for (
+                int_it  = internal_file_descriptors.begin(); 
+                int_it != internal_file_descriptors.end(); 
+                ++int_it
+            ) 
+        {
+            FD_SET((*int_it), &readfds);
+            if(nfds <= (*int_it))
+            {
+                nfds = (*int_it) + 1;
+            }
+        }
+        for (
+                int_it  = extra_file_descriptors.begin(); 
+                int_it != extra_file_descriptors.end(); 
+                ++int_it
+            ) 
+        {
+            FD_SET((*int_it), &readfds);
+            if(nfds <= (*int_it))
+            {
+                nfds = (*int_it) + 1;
+            }
+        }
+
+    file_descriptors_mutex.unlock();    
+    
+    timeout_mutex.lock();
+        timeout.tv_sec = time_wait_seconds;
+        timeout.tv_usec = time_wait_usecs;
+    timeout_mutex.unlock();
+
+    //
+    //  Sit in select() until data arrives
+    //
+    
+    int result = select(nfds, &readfds, NULL, NULL, &timeout);
+    if(result < 0)
+    {
+        warning("service plugin file descriptors watcher got an error on select()");
+    }
+    
+    //
+    //  In case data came in on out u_shaped_pipe, clean it out
+    //
+
+    if(FD_ISSET(u_shaped_pipe[0], &readfds))
+    {
+        char read_back[10];
+        read(u_shaped_pipe[0], read_back, 9);
+    }
+    
+}
+
+void MFDServicePlugin::setTimeout(int numb_seconds, int numb_useconds)
+{
+    timeout_mutex.lock();
+        time_wait_seconds = numb_seconds;
+        time_wait_usecs = numb_useconds;
+    timeout_mutex.unlock();
+}
+
+
+
+
 MFDServicePlugin::~MFDServicePlugin()
 {
     if(core_server_socket)
@@ -404,6 +551,8 @@ MFDServicePlugin::~MFDServicePlugin()
     }
     
     client_sockets.clear();
+    internal_file_descriptors.clear();
+    extra_file_descriptors.clear();
 }
 
 /*
@@ -417,110 +566,4 @@ MFDServiceClientSocket::MFDServiceClientSocket(int identifier, int socket_id, Ty
     setBlocking(false);
 }                     
 
-
-/*
----------------------------------------------------------------------
-*/
-
-MFDFileDescriptorWatchingPlugin::MFDFileDescriptorWatchingPlugin(
-                                                                 MFDBasePlugin *owner,
-                                                                 QMutex *fwmtx,
-                                                                 QMutex *fdmtx,
-                                                                 QValueList<int>* fd_list,
-                                                                 int time_seconds,
-                                                                 int time_usecs
-                                                                )
-{
-    parent = owner;
-    file_watching_mutex = fwmtx;
-    keep_going = true;
-    file_descriptors = fd_list;
-    file_descriptors_mutex = fdmtx;
-    time_wait_seconds = time_seconds;
-    time_wait_usecs = time_usecs;
-}
-
-void MFDFileDescriptorWatchingPlugin::run()
-{
-    int result;
-    
-    while(keep_going)
-    {
-        if(file_watching_mutex->tryLock())
-        {
-            //
-            //  Set and zero-out the status of anything we're supposed to be
-            //  watching
-            //
-
-            int nfds = 0;
-	        fd_set readfds;
-
-	    	FD_ZERO(&readfds);
-	    	
-
-	    	file_descriptors_mutex->lock();
-    	    	IntValueList::iterator int_it;
-	        	for (
-	        	        int_it  = file_descriptors->begin(); 
-	    	            int_it != file_descriptors->end(); 
-	    	            ++int_it
-	    	        ) 
-	    	    {
-                    FD_SET((*int_it), &readfds);
-                    if(nfds <= (*int_it))
-                    {
-                        nfds = (*int_it) + 1;
-                    }
-                }
-            file_descriptors_mutex->unlock();
-
-            //
-            //  Set the select() timeout 
-            //
-
-            timeout_mutex.lock();
-                timeout.tv_sec = time_wait_seconds;
-                timeout.tv_usec = time_wait_usecs;
-            timeout_mutex.unlock();
-            
-            
-            //
-            //  Sit in select until something arrives, or we timeout
-            //
-
-    		result = select(nfds, &readfds, NULL, NULL, &timeout);
-
-    		if(result < 0)
-    		{
-    		    parent->warning("file descriptors watcher got an error on select()");
-    		}
-            parent->wakeUp();
-    		file_watching_mutex->unlock();
-        }
-        else
-        {
-            usleep(100);
-        }        
-    }
-}
-
-void MFDFileDescriptorWatchingPlugin::stop()
-{
-    keep_going_mutex.lock();
-        keep_going = false;
-    keep_going_mutex.unlock();
-}
-
-void MFDFileDescriptorWatchingPlugin::setTimeout(int numb_seconds, int numb_useconds)
-{
-    timeout_mutex.lock();
-        time_wait_seconds = numb_seconds;
-        time_wait_usecs = numb_useconds;
-    timeout_mutex.unlock();
-}
-
-MFDFileDescriptorWatchingPlugin::~MFDFileDescriptorWatchingPlugin()
-{
-}
 

@@ -82,7 +82,7 @@ class MFDService
 };
 
 
-class ZeroConfigClient: public MFDBasePlugin
+class ZeroConfigClient: public MFDServicePlugin
 {
     //
     //  The client continously looks for
@@ -117,11 +117,6 @@ class ZeroConfigClient: public MFDBasePlugin
     QPtrList<SocketBuffer>  things_to_do;
     QMutex                  things_to_do_mutex;
 
-    MFDFileDescriptorWatchingPlugin *fd_watcher;
-    
-    IntValueList    *file_descriptors;
-    QMutex          *file_descriptors_mutex;
-    QMutex           file_watching_mutex;
 };
 
 #endif  // zc_client_h_

@@ -46,12 +46,6 @@ class AudioPlugin: public MFDServicePlugin
     bool        is_paused;
     QString     audio_device;
 
-    MFDFileDescriptorWatchingPlugin *fd_watcher;
-
-    IntValueList    *file_descriptors;
-    QMutex          *file_descriptors_mutex;
-    QMutex           file_watching_mutex;
-    
     int     elapsed_time;
     int     current_channels;
     int     current_bitrate;

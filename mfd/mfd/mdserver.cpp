@@ -19,18 +19,7 @@ using namespace std;
 MetadataServer::MetadataServer(MFD* owner, int port)
                :MFDServicePlugin(owner, -1, port)
 {
-    file_descriptors_mutex = new QMutex();
-    file_descriptors = new IntValueList();
 };
-
-void MetadataServer::makeMeDoSomething(const QString& what_to_do)
-{
-    things_to_do_mutex.lock();
-        SocketBuffer *new_request = new SocketBuffer(what_to_do, -1);
-        things_to_do.append(new_request);    
-    things_to_do_mutex.unlock();
-    main_wait_condition.wakeAll();
-}
 
 void MetadataServer::run()
 {
@@ -68,24 +57,6 @@ void MetadataServer::run()
         return;
     }
     
-    int fd_watching_pipe[2];
-    if(pipe(fd_watching_pipe) < 0)
-    {
-        warning("metadata server could not create a pipe to its FD watching thread");
-    }
-
-
-    fd_watcher = new MFDFileDescriptorWatchingPlugin(
-                                                        this, 
-                                                        &file_watching_mutex, 
-                                                        file_descriptors_mutex, 
-                                                        file_descriptors, 
-                                                        30,
-                                                        0);
-    file_watching_mutex.lock();
-    fd_watcher->start();
-
-
     while(keep_going)
     {
         //
@@ -119,84 +90,9 @@ void MetadataServer::run()
         }
         else
         {
-            //
-            //  List descriptors that should be watched in the file descriptor watching thread/object
-            //
-
-            file_descriptors_mutex->lock();
-                
-                //
-                //  Zero 'em out.
-                //
-
-                file_descriptors->clear();
-                
-                //
-                //  Add the server socket
-                //
-
-                file_descriptors->append(core_server_socket->socket());
-            
-                //
-                //  Next, add all the client sockets
-                //
-            
-                QPtrListIterator<MFDServiceClientSocket> iterator(client_sockets);
-                MFDServiceClientSocket *a_client;
-                while ( (a_client = iterator.current()) != 0 )
-                {
-                    ++iterator;
-                    file_descriptors->append(a_client->socket());
-                }
-            
-    		    
-    		    //
-    		    //  Finally, add the read side of the control pipe
-    		    //
-    		    
-    		    file_descriptors->append(fd_watching_pipe[0]);
-
-            file_descriptors_mutex->unlock();
-
- 
- 
-            //
-            //  Let the descriptor watching thread run to it's select() call
-            //
-
-            file_watching_mutex.unlock();
-
-
-            //
-            //  Wait for something to happen
-            //
-
-            main_wait_condition.wait();
-
-
-            //
-            //  In case it was not the descriptor watcher that woke us up,
-            //  make it give up it's lock on the watching mutex.
-            //
-
-            write(fd_watching_pipe[1], "X", 1);
-            file_watching_mutex.lock();
-            char back[3];
-            read(fd_watching_pipe[0], back, 2);
+            waitForSomethingToHappen();
         }
     }
-
-    //
-    //  Stop the sub thread
-    //
-    
-    fd_watcher->stop();
-    file_watching_mutex.unlock();
-    fd_watcher->wait();
-    delete fd_watcher;
-    fd_watcher = NULL;
-
-
 }
 
 void MetadataServer::doSomething(const QStringList &tokens, int socket_identifier)
@@ -228,31 +124,4 @@ bool MetadataServer::checkMetadata()
 
 MetadataServer::~MetadataServer()
 {
-    if(fd_watcher)
-    {
-        delete fd_watcher;
-    }
-    if(file_descriptors)
-    {
-        if(file_descriptors_mutex)
-        {
-            file_descriptors_mutex->lock();
-            file_descriptors->clear();
-            delete file_descriptors;
-            file_descriptors = NULL;
-            file_descriptors_mutex->unlock();
-        }
-        else
-        {
-            file_descriptors->clear();
-            delete file_descriptors;
-            file_descriptors = NULL;
-        }
-    }
-
-    if(file_descriptors_mutex)
-    {
-        delete file_descriptors_mutex;
-        file_descriptors_mutex = NULL;
-    }
 }

@@ -61,7 +61,7 @@ class MFDBasePlugin : public QThread
     ~MFDBasePlugin();
 
     virtual void stop(); 
-    void         wakeUp();
+    virtual void wakeUp();
     void         log(const QString &log_message, int verbosity);
     void         warning(const QString &warning_message);
     void         fatal(const QString &death_rattle);
@@ -139,6 +139,13 @@ class MFDServicePlugin : public MFDBasePlugin
     void    dropDeadClients();
     void    readClients();
     void    addToDo(QString new_stuff_todo, int client_id);
+    void    wakeUp();
+    void    addFileDescriptor(int fd);
+    void    removeFileDescriptor(int fd);
+    void    clearFileDescriptors();
+    void    waitForSomethingToHappen();
+    void    setTimeout(int numb_seconds, int numb_useconds);
+
     int     bumpClient(){
                             ++client_socket_identifier;
                             return client_socket_identifier;
@@ -156,47 +163,20 @@ class MFDServicePlugin : public MFDBasePlugin
     QPtrList<MFDServiceClientSocket> client_sockets;
     int                              client_socket_identifier;
 
-};
-
-
-typedef QValueList<int> IntValueList;
-
-
-class MFDFileDescriptorWatchingPlugin : public QThread
-{
-  public:
-  
-    MFDFileDescriptorWatchingPlugin(
-                                    MFDBasePlugin *owner,
-                                    QMutex *fwmtx,
-                                    QMutex *fdmtx,
-                                    IntValueList* fd_list,
-                                    int time_seconds = 2,
-                                    int time_usecs = 0
-                                    );
-    ~MFDFileDescriptorWatchingPlugin();
-    void run();
-    void stop();
-    void setTimeout(int numb_seconds, int numb_useconds);
-    
-  private:
-  
-    MFDBasePlugin *parent;
-    bool          keep_going;
-    QMutex        keep_going_mutex;
-    int           *numb_file_descriptors;
-
     struct  timeval timeout;
     int     time_wait_seconds;
     int     time_wait_usecs;
     QMutex  timeout_mutex;
 
-    QMutex          *file_watching_mutex;
-    QMutex          *file_descriptors_mutex;
-    IntValueList    *file_descriptors;
+    QMutex  u_shaped_pipe_mutex;
+    int     u_shaped_pipe[2];
+
+    QMutex          file_descriptors_mutex;
+    QValueList<int> internal_file_descriptors;
+    QValueList<int> extra_file_descriptors;
+
+
 };
-
-
 
 #endif
 

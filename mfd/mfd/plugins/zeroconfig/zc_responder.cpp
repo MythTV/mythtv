@@ -1,9 +1,9 @@
 /*
 	zc_responder.cpp
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
-	Part of the mythTV project
-	
+    (c) 2003 Thor Sigvaldason and Isaac Richards
+    Part of the mythTV project
+    
     !! This code is covered the the Apple Public Source License !!
     
     See ./apple/APPLE_LICENSE
@@ -54,7 +54,7 @@ extern "C" void RegistrationCallback(mDNS *const m, ServiceRecordSet *const this
 
 
 ZeroConfigResponder::ZeroConfigResponder(MFD *owner, int identifier)
-                    :MFDBasePlugin(owner, identifier)
+                    :MFDServicePlugin(owner, identifier, -1)
 {
     //
     //  Hold a pointer to the mfd so we can
@@ -68,8 +68,6 @@ ZeroConfigResponder::ZeroConfigResponder(MFD *owner, int identifier)
 
     registered_services.setAutoDelete(true);
 
-    file_descriptors = new IntValueList();
-    file_descriptors_mutex = new QMutex();
 }
 
 
@@ -317,11 +315,11 @@ bool ZeroConfigResponder::registerService(
     port.b[0] = (port_number >> 8) & 0x0FF;
     port.b[1] = (port_number >> 0) & 0x0FF;;
     bstatus = mDNS_RegisterService(&mDNSStorage_responder, new_service->getCoreService(),
-                &name, &type, &domain,				    // Name, type, domain
-                NULL, port, 						    // Host and port
+                &name, &type, &domain,                    // Name, type, domain
+                NULL, port,                             // Host and port
                 f_service_text, f_service_text_length,  // TXT data, length
-                NULL, 0,							    // Subtypes
-                mDNSInterface_Any,					    // Interace ID
+                NULL, 0,                                // Subtypes
+                mDNSInterface_Any,                        // Interace ID
                 RegistrationCallback,                   // Callback
                 new_service);                           // context
     if(bstatus != mStatus_NoError)
@@ -344,47 +342,21 @@ void ZeroConfigResponder::run()
     status = mDNS_Init(
                         &mDNSStorage_responder, 
                         &PlatformStorage_responder,
-    	                mDNS_Init_NoCache, 
-    	                mDNS_Init_ZeroCacheSize,
-    	                mDNS_Init_AdvertiseLocalAddresses,
-    	                mDNS_Init_NoInitCallback, 
-    	                mDNS_Init_NoInitCallbackContext
-    	              );
+                        mDNS_Init_NoCache, 
+                        mDNS_Init_ZeroCacheSize,
+                        mDNS_Init_AdvertiseLocalAddresses,
+                        mDNS_Init_NoInitCallback, 
+                        mDNS_Init_NoInitCallbackContext
+                      );
 
     if (status != mStatus_NoError)
     {
         fatal("zeroconfig responder could not initialize mDNS core");
     }
 
-    int nfds;
-    fd_set readfds;
-    struct timeval timeout;
-    int fd_watching_pipe[2];
-    if(pipe(fd_watching_pipe) < 0)
-    {
-        warning("zeroconfig responder could not create a pipe to its FD watching thread");
-    }
-
-    //
-    //  Create the File Descriptor Watcher, but lock it out (with a mutex)
-    //  till we get down in our loop
-    //
-
-    fd_watcher = new MFDFileDescriptorWatchingPlugin(   this, 
-                                                        &file_watching_mutex,
-                                                        file_descriptors_mutex, 
-                                                        file_descriptors, 
-                                                        30,
-                                                        0);
-    file_watching_mutex.lock();
-    fd_watcher->start();
-    
-
-
-
     while(keep_going)
     {
-		
+        
         //
         //  First, see if we have any pending requests
         //
@@ -409,111 +381,69 @@ void ZeroConfigResponder::run()
         {
             doSomething(pending_tokens, pending_socket);
         }
+        else
+        {        
         
-        
-        //
-        //  Ask mDNS execute to do anything pending and tell in how much
-        //  time it would like to be called again.
-        //
-
-        int next_time = mDNS_Execute(&mDNSStorage_responder);
-
-        int time_difference = next_time - mDNSPlatformTimeNow();
-        int seconds_to_wait = ((int) (time_difference / 1000));
-        int usecs_to_wait = time_difference % 1000;
-        if(seconds_to_wait < 0)
-        {
-            seconds_to_wait = 0;
-        }
-        if(usecs_to_wait < 0)
-        {
-            usecs_to_wait = 0;
-        }
-        timeout.tv_sec = seconds_to_wait;
-        timeout.tv_usec = usecs_to_wait;
-
-        nfds = 0;
-        FD_ZERO(&readfds);
-        mDNSPosixGetFDSet(&mDNSStorage_responder, &nfds, &readfds, &timeout);
-
-		//
-		//  The mDNS code (immediately above) generally will have set the
-		//  timeout to something it wants. We have to tell our watching
-		//  thread to sit in it's select() call for that long. But we put an
-		//  upper bound on it so that we can get out if we're shutting down
-		//  or reloading.
-		//
-
-        if(timeout.tv_sec > 10)
-        {
-            timeout.tv_sec = 10;
-        }
-
-		fd_watcher->setTimeout(timeout.tv_sec, timeout.tv_usec);
-
-        //
-        //  Create the set of things the descriptor watching thread should watch
-        //
-
-        file_descriptors_mutex->lock();
-
             //
-            //  Zero 'em out.
+            //  Ask mDNS execute to do anything pending and tell in how much
+            //  time it would like to be called again.
             //
 
-            file_descriptors->clear();
-                
-            //
-            //  Add everything the Apple nDNS code said we should watch
-            //
+            int next_time = mDNS_Execute(&mDNSStorage_responder);
 
-            for(int i = 0; i < nfds; i++)
+            int time_difference = next_time - mDNSPlatformTimeNow();
+            int seconds_to_wait = ((int) (time_difference / 1000));
+            int usecs_to_wait = time_difference % 1000;
+            if(seconds_to_wait < 0)
             {
-                if(FD_ISSET(i, &readfds))
-                {
-                    file_descriptors->append(i);
-                }
+                seconds_to_wait = 0;
             }
+            if(usecs_to_wait < 0)
+            {
+                usecs_to_wait = 0;
+            }
+            timeout.tv_sec = seconds_to_wait;
+            timeout.tv_usec = usecs_to_wait;
+
+
+            int nfds = 0;
+            fd_set readfds;
+            FD_ZERO(&readfds);
+
+            mDNSPosixGetFDSet(&mDNSStorage_responder, &nfds, &readfds, &timeout);
+
+            //
+            //  Add our pipe to the watcher thread as one of file descriptors it
+            //  should monitor
+            //
+
+            FD_SET(u_shaped_pipe[0], &readfds);
+            if(nfds <= u_shaped_pipe[0])
+            {
+                nfds = u_shaped_pipe[0] + 1;
+            }
+ 
+            int result = select(nfds, &readfds, NULL, NULL, &timeout);
             
-    		//
-    		//  Add the read side of the control pipe
-    		//
-    		    
-    	    file_descriptors->append(fd_watching_pipe[0]);
+            if(result < 0)
+            {
+                warning("zero config responder got an error on select()");
+            }
 
-        file_descriptors_mutex->unlock();
-        
-        //
-        //  Let the watching thread watch
-        //
+            if(FD_ISSET(u_shaped_pipe[0], &readfds))
+            {
+                char read_back[10];
+                read(u_shaped_pipe[0], read_back, 9);
+            }
 
-        file_watching_mutex.unlock();
 
-        //
-        //  Sit and wait for something to happen.
-        //
-
-        main_wait_condition.wait();
-        
-        write(fd_watching_pipe[1], "X", 1);
-        file_watching_mutex.lock();
-        char back[3];
-        read(fd_watching_pipe[0], back, 2);
-        
-		mDNSPosixProcessFDSet(&mDNSStorage_responder, &readfds);
+            mDNSPosixProcessFDSet(&mDNSStorage_responder, &readfds);
+        }
     }
 
     log("zeroconfig responder is leaving its event loop", 10);
 
-    fd_watcher->stop();
-    file_watching_mutex.unlock();
-    fd_watcher->wait();
-    delete fd_watcher;
-    fd_watcher = NULL;
-    
     removeAllServices();
-
-    
     
     //
     //  Be nice to the rest of the network and properly remove all service
@@ -626,34 +556,6 @@ void ZeroConfigResponder::doSomething(const QStringList &tokens, int socket_iden
 
 ZeroConfigResponder::~ZeroConfigResponder()
 {
-    if(fd_watcher)
-    {
-        delete fd_watcher;
-    }
-    if(file_descriptors)
-    {
-        if(file_descriptors_mutex)
-        {
-            file_descriptors_mutex->lock();
-            file_descriptors->clear();
-            delete file_descriptors;
-            file_descriptors = NULL;
-            file_descriptors_mutex->unlock();
-        }
-        else
-        {
-            file_descriptors->clear();
-            delete file_descriptors;
-            file_descriptors = NULL;
-        }
-    }
-
-    if(file_descriptors_mutex)
-    {
-        delete file_descriptors_mutex;
-        file_descriptors_mutex = NULL;
-    }
-
     log("zeroconfig responder is being killed off", 10);
     registered_services.clear();
 }

@@ -18,13 +18,9 @@
 AudioPlugin::AudioPlugin(MFD *owner, int identity)
       :MFDServicePlugin(owner, identity, 2343)
 {
-    file_descriptors_mutex = new QMutex();
-    file_descriptors = new IntValueList();
-
     input = NULL;
     output = NULL;
     decoder = NULL;
-    fd_watcher = NULL;
     output_buffer_size = 256;
     elapsed_time = 0;
     is_playing = false;
@@ -92,24 +88,6 @@ void AudioPlugin::run()
         return;
     }
     
-    int fd_watching_pipe[2];
-    if(pipe(fd_watching_pipe) < 0)
-    {
-        warning("audio plugin could not create a pipe to its FD watching thread");
-    }
-
-    fd_watcher = new MFDFileDescriptorWatchingPlugin(
-                                                        this, 
-                                                        &file_watching_mutex, 
-                                                        file_descriptors_mutex, 
-                                                        file_descriptors, 
-                                                        30,
-                                                        0);
-
-    file_watching_mutex.lock();
-    fd_watcher->start();
-
-
     while(keep_going)
     {
         //
@@ -141,75 +119,9 @@ void AudioPlugin::run()
         }
         else
         {
-            //
-            //  List descriptors that should be watched in the file descriptor watching thread/object
-            //
-
-            file_descriptors_mutex->lock();
-                
-                //
-                //  Zero 'em out.
-                //
-
-                file_descriptors->clear();
-                
-                //
-                //  Add the server socket
-                //
-
-                file_descriptors->append(core_server_socket->socket());
-            
-                //
-                //  Next, add all the client sockets
-                //
-            
-                QPtrListIterator<MFDServiceClientSocket> iterator(client_sockets);
-                MFDServiceClientSocket *a_client;
-                while ( (a_client = iterator.current()) != 0 )
-                {
-                    ++iterator;
-                    file_descriptors->append(a_client->socket());
-                }
-            
-    		    
-    		    //
-    		    //  Finally, add the read side of the control pipe
-    		    //
-    		    
-    		    file_descriptors->append(fd_watching_pipe[0]);
-
-            file_descriptors_mutex->unlock();
-
-
-            //
-            //  Let the descriptor watcher watch
-            // 
- 
-            file_watching_mutex.unlock();
-
-            //
-            //  Wait for something to happen
-            //
-
-            main_wait_condition.wait();
-
-            write(fd_watching_pipe[1], "X", 1);
-            file_watching_mutex.lock();
-            char back[2];
-            read(fd_watching_pipe[0], back, 2);
-
+            waitForSomethingToHappen();
         }
     }
-
-    //
-    //  Stop the sub thread
-    //
-    
-    fd_watcher->stop();
-    file_watching_mutex.unlock();
-    fd_watcher->wait();
-    delete fd_watcher;
-    fd_watcher = NULL;
 
     stopAudio();
 }
@@ -578,32 +490,4 @@ void AudioPlugin::seekAudio(int seek_amount)
 
 AudioPlugin::~AudioPlugin()
 {
-    if(fd_watcher)
-    {
-        delete fd_watcher;
-    }
-    if(file_descriptors)
-    {
-        if(file_descriptors_mutex)
-        {
-            file_descriptors_mutex->lock();
-            file_descriptors->clear();
-            delete file_descriptors;
-            file_descriptors = NULL;
-            file_descriptors_mutex->unlock();
-        }
-        else
-        {
-            file_descriptors->clear();
-            delete file_descriptors;
-            file_descriptors = NULL;
-        }
-    }
-
-    if(file_descriptors_mutex)
-    {
-        delete file_descriptors_mutex;
-        file_descriptors_mutex = NULL;
-    }
-    
 }
