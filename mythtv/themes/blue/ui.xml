@@ -1820,6 +1820,7 @@
       <size>18</size>
       <size:small>10</size:small>
       <shadow>2,2</shadow>
+      <bold>yes</bold>
     </font>
 
     <font name="infob" face="Arial">
