@@ -122,7 +122,7 @@ void RecOptDialog::keyPressEvent(QKeyEvent *e)
         if (action == "ESCAPE")
         {
             if(!listMenu.goBack())
-                accept();
+                done(MythDialog::Rejected);
         }
         else if (action == "UP")
             listMenu.cursorUp(false);
