@@ -24,6 +24,7 @@ using namespace std;
 #include "globalsettings.h"
 #include "fileassoc.h"
 #include "dbcheck.h"
+#include "videoscan.h"
 
 #include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
@@ -31,19 +32,12 @@ using namespace std;
 #include <mythtv/lcddevice.h>
 #include <mythtv/mythdbcon.h>
 
-enum VideoFileLocation
-{
-    kFileSystem,
-    kDatabase,
-    kBoth
-};
 
-typedef QMap <QString, VideoFileLocation> VideoLoadedMap;
 
 void runMenu(QString, const QString &);
 void VideoCallback(void *, QString &);
 void SearchDir(QString &);
-void BuildFileList(QString &, VideoLoadedMap &, QStringList &);
+
 
 extern "C" {
 int mythplugin_init(const char *libversion);
@@ -207,7 +201,8 @@ void runVideoManager(void)
     {
         QString startdir = gContext->GetSetting("VideoStartupDir",
                                                 "/share/Movies/dvd");
-        SearchDir(startdir);
+        VideoScanner scanner;
+        scanner.doScan(startdir);
 
         VideoManager *manage = new VideoManager(gContext->GetMainWindow(),
                                                 "video manager");
@@ -326,156 +321,8 @@ void VideoCallback(void *data, QString &selection)
     }
 }
 
-void SearchDir(QString &directory)
-{
-    VideoLoadedMap video_files;
-    VideoLoadedMap::Iterator iter;
 
-    QStringList imageExtensions = QImage::inputFormatList();
-    BuildFileList(directory, video_files, imageExtensions);
 
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.exec("SELECT filename FROM videometadata;");
 
-    int counter = 0;
 
-    MythProgressDialog *file_checking =
-               new MythProgressDialog(QObject::tr("Searching for video files"),
-                                      query.numRowsAffected());
-
-    if (query.isActive() && query.size() > 0)
-    {
-        while (query.next())
-        {
-            QString name = QString::fromUtf8(query.value(0).toString());
-            if (name != QString::null)
-            {
-                if ((iter = video_files.find(name)) != video_files.end())
-                    video_files.remove(iter);
-                else
-                    video_files[name] = kDatabase;
-            }
-            file_checking->setProgress(++counter);
-        }
-    }
-
-    file_checking->Close();
-    delete file_checking;
-
-    file_checking =
-        new MythProgressDialog(QObject::tr("Updating video database"), 
-                               video_files.size());
-
-    Metadata *myNewFile = NULL;
-
-    QRegExp quote_regex("\"");
-    for (iter = video_files.begin(); iter != video_files.end(); iter++)
-    {
-        if (*iter == kFileSystem)
-        {
-            QString name(iter.key());
-
-            myNewFile = new Metadata(name, QObject::tr("No Cover"), "", 
-                                     1895, "00000000", QObject::tr("Unknown"), 
-                                     QObject::tr("None"), 0.0, 
-                                     QObject::tr("NR"), 0, 0, 1);
-            myNewFile->guessTitle();
-            myNewFile->dumpToDatabase();
-            if (myNewFile)
-                delete myNewFile;
-        }
-        if (*iter == kDatabase)
-        {
-            QString name(iter.key());
-
-            query.prepare("DELETE FROM videometadata WHERE "
-                          "filename = :FILE ;");
-            query.bindValue(":FILE", name);
-            query.exec();
-        }
-
-        file_checking->setProgress(++counter);
-    }
-    file_checking->Close();
-    delete file_checking;
-}
-
-bool IgnoreExtension(QString extension)
-{
-    MSqlQuery a_query(MSqlQuery::InitCon());
-    a_query.prepare("SELECT f_ignore FROM videotypes WHERE extension = :EXT");
-    a_query.bindValue(":EXT", extension);
-
-    if(a_query.exec() && a_query.isActive() && a_query.size() > 0)
-    {
-        //
-        //  This extension is a recognized
-        //  file type (in the videotypes
-        //  database). Return true only if
-        //  ignore explicitly set.
-        //
-        a_query.next();
-        return a_query.value(0).toBool();
-    }
-    
-    //
-    //  Otherwise, ignore this file only
-    //  if the user has a setting to
-    //  ignore unknown file types.
-    //
-    
-    return !gContext->GetNumSetting("VideoListUnknownFileTypes", 1);
-}
-
-void BuildFileList(QString &directory, 
-                   VideoLoadedMap &video_files,
-                   QStringList &imageExtensions)
-{
-    QDir d(directory);
-
-    d.setSorting(QDir::DirsFirst | QDir::Name | QDir::IgnoreCase );
-
-    if (!d.exists())
-        return;
-
-    const QFileInfoList *list = d.entryInfoList();
-    if (!list)
-        return;
-
-    QFileInfoListIterator it(*list);
-    QFileInfo *fi;
-    QRegExp r;
-
-    while ((fi = it.current()) != 0)
-    {
-        ++it;
-        if (fi->fileName() == "." || 
-            fi->fileName() == ".." ||
-            fi->fileName() == "Thumbs.db")
-        {
-            continue;
-        }
-        
-        if(!fi->isDir())
-        {
-            if(IgnoreExtension(fi->extension(false)))
-            {
-                continue;
-            }
-        }
-        
-        QString filename = fi->absFilePath();
-        if (fi->isDir())
-            BuildFileList(filename, video_files, imageExtensions);
-        else
-        {
-            r.setPattern("^" + fi->extension() + "$");
-            r.setCaseSensitive(false);
-            QStringList result = imageExtensions.grep(r);
-
-            if (result.isEmpty())
-                video_files[filename] = kFileSystem;
-        }
-    }
-}
 
