@@ -70,7 +70,7 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
     return true;
 }
 
-void VideoOutputIvtv::Reopen(int skipframes)
+void VideoOutputIvtv::Reopen(int skipframes, int newstartframe)
 {
     if (videofd >= 0)
     {
@@ -83,19 +83,27 @@ void VideoOutputIvtv::Reopen(int skipframes)
 
     videofd = -1;
 
-    /* needs to be #defined*/
     if ((videofd = open(videoDevice.ascii(), O_WRONLY | O_LARGEFILE, 0555)) < 0)
         perror("Cannot open ivtv video out device");
     else
     {
-        ivtv_cfg_start_decode sd;
-        memset(&sd, 0, sizeof(sd));
+        ivtv_cfg_start_decode startd;
+        memset(&startd, 0, sizeof(startd));
 
         if (skipframes > 0)
-            sd.gop_offset = skipframes;
+            startd.gop_offset = skipframes;
 
-        ioctl(videofd, IVTV_IOC_S_START_DECODE, &sd);
+        ioctl(videofd, IVTV_IOC_S_START_DECODE, &startd);
+
+        // change it back to hide last frame, in case we die unexpectedly.
+        ivtv_cfg_stop_decode stopd;
+        memset(&stopd, 0, sizeof(stopd));
+
+        stopd.hide_last = 1;
+        ioctl(videofd, IVTV_IOC_S_STOP_DECODE, &stopd);
     }
+
+    startframenum = newstartframe;
 }
 
 void VideoOutputIvtv::EmbedInWidget(unsigned long wid, int x, int y, int w, 
@@ -141,23 +149,6 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
     (void)pipPlayer;
 }
 
-unsigned long VideoOutputIvtv::FrameSync()
-{
-    struct ivtv_ioctl_framesync frameinfo;
-    if (ioctl(videofd, IVTV_IOC_FRAMESYNC, &frameinfo) < 0)
-    {
-        perror("IVTV_IOC_FRAMESYNC");
-        return 0;
-    }
-
-    static const float MPEG_CLOCK_FREQ = 90000.0;
-    unsigned long frame = (unsigned long)roundf(((float)frameinfo.pts /
-                                                MPEG_CLOCK_FREQ) * fps);
-
-    //return frameinfo.frame;
-    return frame;
-}
-
 void VideoOutputIvtv::Play()
 {
     ioctl(videofd, IVTV_IOC_PLAY, 0);
@@ -170,7 +161,7 @@ void VideoOutputIvtv::Pause()
 
 int VideoOutputIvtv::WriteBuffer(unsigned char *buf, int count)
 {
-    int origcount = count, n = 0;
+    int n = 0;
 
     while (count > 0)
     {
@@ -184,6 +175,18 @@ int VideoOutputIvtv::WriteBuffer(unsigned char *buf, int count)
         buf += n;
     }
 
-    return origcount;
+    struct ivtv_ioctl_framesync frameinfo;
+    memset(&frameinfo, 0, sizeof(frameinfo));
+    if (ioctl(videofd, IVTV_IOC_GET_TIMING, &frameinfo) < 0)
+    {
+        perror("IVTV_IOC_FRAMESYNC");
+        return 0;
+    }
+
+    // seems the decoder doesn't initialize this properly.
+    if (frameinfo.frame >= 20000000)
+        frameinfo.frame = 0;
+
+    return frameinfo.frame + startframenum;
 }
 

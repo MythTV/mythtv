@@ -34,11 +34,10 @@ class VideoOutputIvtv: public VideoOutput
                       NuppelVideoPlayer *pipPlayer);
 
     int WriteBuffer(unsigned char *buf, int count);
-    unsigned long FrameSync();
     void Pause(void);
     void Play(void);
 
-    void Reopen(int skipframes = 0);
+    void Reopen(int skipframes = 0, int newstartframe = 0);
 
     void SetFPS(float lfps) { fps = lfps; }
 
@@ -50,6 +49,8 @@ class VideoOutputIvtv: public VideoOutput
     QString videoDevice;
 
     QMutex lock;
+
+    long long startframenum;
 };
 
 #endif

@@ -50,7 +50,7 @@ IvtvDecoder::~IvtvDecoder()
 void IvtvDecoder::SeekReset(int skipframes)
 {
     VideoOutputIvtv *videoout = (VideoOutputIvtv *)m_parent->getVideoOutput();
-    videoout->Reopen(skipframes);
+    videoout->Reopen(skipframes, framesPlayed);
 }
 
 void IvtvDecoder::Reset(void)
@@ -227,6 +227,7 @@ void IvtvDecoder::GetFrame(int onlyvideo)
     VideoOutputIvtv *videoout = (VideoOutputIvtv *)m_parent->getVideoOutput();
     long long startpos = ringBuffer->GetReadPosition();
     int count = 0;
+    int newframes = 0;
 
     while (!allowedquit)
     {
@@ -234,10 +235,13 @@ void IvtvDecoder::GetFrame(int onlyvideo)
 
         MpegPreProcessPkt(buf, count, startpos);
         if (onlyvideo >= 0)
-            videoout->WriteBuffer(buf, count);
-                
+            newframes = videoout->WriteBuffer(buf, count);
+
         allowedquit = true;
     }                    
+
+    if (newframes > framesPlayed)
+        framesPlayed = newframes;
 
     m_parent->SetFramesPlayed(framesPlayed);
 }
@@ -337,23 +341,8 @@ bool IvtvDecoder::DoFastForward(long long desiredFrame)
         }
     }
 
-    bool needflush = false;
-
-    if (keyPos != -1)
+    if (keyPos == -1 && desiredKey != lastKey && !livetv && !watchingrecording)
     {
-        lastKey = desiredKey;
-        long long diff = keyPos - ringBuffer->GetTotalReadPosition();
-
-        ringBuffer->Seek(diff, SEEK_CUR);
-        needflush = true;
-
-        framesPlayed = lastKey;
-        framesRead = lastKey;
-    }
-    else if (desiredKey != lastKey && !livetv && !watchingrecording)
-    {
-        needflush = true;
-
         while (framesRead < desiredKey + 1 || 
                !positionMap.contains(desiredKey / keyframedist))
         {
@@ -365,18 +354,21 @@ bool IvtvDecoder::DoFastForward(long long desiredFrame)
                 return false;
         }
 
-        if (needflush)
-        {
-            lastKey = desiredKey;
-            keyPos = positionMap[desiredKey / keyframedist];
-            long long diff = keyPos - ringBuffer->GetTotalReadPosition();
-
-            ringBuffer->Seek(diff, SEEK_CUR);
-        }
-
-        framesPlayed = lastKey;
-        framesRead = lastKey;
+        keyPos = positionMap[desiredKey / keyframedist];
     }
+
+    if (keyPos == -1)
+    {
+        cerr << "Didn't find keypos, time to bail ff\n";
+        return false;
+    }
+
+    lastKey = desiredKey;
+    long long diff = keyPos - ringBuffer->GetTotalReadPosition();
+
+    ringBuffer->Seek(diff, SEEK_CUR);
+
+    framesPlayed = framesRead = lastKey;
 
     normalframes = desiredFrame - framesPlayed;
 
