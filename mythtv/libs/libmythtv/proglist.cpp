@@ -118,6 +118,7 @@ ProgLister::ProgLister(ProgListType pltype, const QString &view,
 
 ProgLister::~ProgLister()
 {
+    itemList.clear();
     gContext->removeListener(this);
     delete theme;
 }
