@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-01-06, v1.065
+  2003-01-09, v1.066
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -94,25 +94,27 @@
      14.2 Mandrake 9.0
      14.3 Compiling mythmusic.
 
-  15. Troubleshooting.
-     15.1 Illegal Instruction.
-     15.2 mythfilldatabase failing.
-     15.3 mythtv seems to disappear; can't see video
-     15.4 Fast CPU, choppy or jittery video.
-     15.5 I keep losing all of my settings every time I compile!
-     15.6 Compile errors.
-     15.7 My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.
-     15.8 I can't checkout using CVS anymore!
-     15.9 I get segfaults / mythtv isn't doing anything.
-     15.10 Mythtv makes my system crash.
-     15.11 Troubleshooting audio
+  15. mythweather
+  16. mythvideo
+  17. Troubleshooting.
+     17.1 Illegal Instruction.
+     17.2 mythfilldatabase failing.
+     17.3 mythtv seems to disappear; can't see video
+     17.4 Fast CPU, choppy or jittery video.
+     17.5 I keep losing all of my settings every time I compile!
+     17.6 Compile errors.
+     17.7 My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.
+     17.8 I can't checkout using CVS anymore!
+     17.9 I get segfaults / mythtv isn't doing anything.
+     17.10 Mythtv makes my system crash.
+     17.11 Troubleshooting audio
 
-  16. Miscellaneous.
-     16.1 I'd like to watch the files without using mythtv / I'd like to convert the files to some other format.
-     16.2 I'd like to use some other window manager.
-     16.3 I'd like mythtv to automatically startup.
-     16.4 I'd like to delete the mysql database.
-     16.5 I'd like to start using the development version of mythtv.
+  18. Miscellaneous.
+     18.1 I'd like to watch the files without using mythtv / I'd like to convert the files to some other format.
+     18.2 I'd like to use some other window manager.
+     18.3 I'd like mythtv to automatically startup.
+     18.4 I'd like to delete the mysql database.
+     18.5 I'd like to start using the development version of mythtv.
 
   ______________________________________________________________________
 
@@ -138,6 +140,7 @@
   the distribution tarballs, it is [1mstrongly [22mrecommended that you join
   <http://www.snowman.net/mailman/listinfo/mythtv-commits/> the mythtv-
   dev mailing list.
+
   This HOWTO is for mythtv v0.7.
 
   [1m2.  Introduction.[0m
@@ -664,53 +667,29 @@
 
   [1m5.5.  Gentoo.[0m
 
-  [Documentation being finalized]
+  Installation of mythtv on Gentoo consists of making a local portage
+  directory with the necessary ebuild and digest files.  Tony Clark
+  <mailto:tclark@telia.net> has created a portage file which can be
+  downloaded from http://smalltime.com/mythtv/mythtv-gentoo-
+  portage.tar.bz2 <http://smalltime.com/mythtv/mythtv-gentoo-
+  portage.tar.bz2>
 
-  There are ebuilds setup for mythtv and for XMLTV.  To use them, do the
-  following, add the following to your /etc/make.conf:
+  Once you have downloaded the portage file, installation is simple.
 
-       # PORTDIR_OVERLAY is a directory where local ebuilds may be stored without
-       #     concern that they will be deleted by rsync updates. Default is not
-       #     defined.
-       PORTDIR_OVERLAY=/home/[yourusername]/portage
+       $ su -
+       # emerge rsync # make sure portage is up to date.
+       # cd /usr/local
+       # tar xvfjp Path_To/mythtv-gentoo-portage.tar-bz2
+       # vi /etc/make.conf
 
-  Next, create the following directories:
+  Add mysql to your USE variable.  ie USE="mysql ...."
 
-       mkdir -p /home/[yourusername]/portage/video-media/mythtv
-       mkdir -p /home/[yourusername]/portage/dev-perl/xmltv
+  Locate the line that contains: #/usr/local/portage and remove the #
 
-  Download the ebuilds and save them to their respective directories
-  made above.  Make sure the downloaded file names are the same as those
-  on bugs.gentoo.org.  The correct source files will fail to download if
-  the ebuild names are wrong.  The two ebuilds are:
+       # ACCEPT_KEYWORDS="~x86" emerge mythtv
 
-  +o  mythtv: http://bugs.gentoo.org/show_bug.cgi?id=10533
-     <http://bugs.gentoo.org/show_bug.cgi?id=10533>
-
-  +o  XMLTV: http://bugs.gentoo.org/show_bug.cgi?id=10536
-     <http://bugs.gentoo.org/show_bug.cgi?id=10536>
-
-  emerge mythtv:
-
-       $ emerge /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0
-
-  It should download the source then complain about a missing digest.
-  To fix this,
-
-       $ ebuild /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0.ebuild digest
-
-  emerge mythtv again and it should compile and install.
-
-  Do the same for xmltv but an additional step will be required first to
-  fool it into thinking XML-Twig is installed.
-
-       $ su
-       # emerge inject dev-perl/XML-Twig
-       # emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
-       # ebuild /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2.ebuild digest
-       # emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
-       # exit
-       $
+  [1mNOTE[22m: If you have perl dependency problems update to >=ExtUtils-
+  MakeMaker-6.05-r4
 
   [1m5.6.  Debian.[0m
 
@@ -763,7 +742,7 @@
 
   [1m6.4.2.  Debian 3.0[0m
 
-  $ mysql < mc.sql
+       $ mysql < mc.sql
 
   [1m6.4.3.  Red Hat Linux 8.0[0m
 
@@ -851,7 +830,6 @@
   Download the development release (0.9.x) from the ALSA web site
   http://www.alsa-project.org <http://www.alsa-project.org>.  You need
   at least three files:
-
   +o  alsa-driver-0.9.x.tar.bz2
 
   +o  alsa-lib-0.9.x.tar.bz2
@@ -897,18 +875,18 @@
   conflicts in the future.  You should end up with a /etc/modules.conf
   file that has this configuration:
 
-       alias char-major-116 snd
-       alias snd-card-0 snd-XXX
-       # module options should go here
-       # OSS/Free portion
-       alias char-major-14 soundcore
-       alias sound-slot-0 snd-card-0
-       # card #1
-       alias sound-service-0-0 snd-mixer-oss
-       alias sound-service-0-1 snd-seq-oss
-       alias sound-service-0-3 snd-pcm-oss
-       alias sound-service-0-8 snd-seq-oss
-       alias sound-service-0-12 snd-pcm-oss
+  alias char-major-116 snd
+  alias snd-card-0 snd-XXX
+  # module options should go here
+  # OSS/Free portion
+  alias char-major-14 soundcore
+  alias sound-slot-0 snd-card-0
+  # card #1
+  alias sound-service-0-0 snd-mixer-oss
+  alias sound-service-0-1 snd-seq-oss
+  alias sound-service-0-3 snd-pcm-oss
+  alias sound-service-0-8 snd-seq-oss
+  alias sound-service-0-12 snd-pcm-oss
 
   "XXX" should be the ALSA driver name for your sound card/chip. In some
   rare cases you need to supply extra options to the driver. These
@@ -999,15 +977,15 @@
 
   Next, open a shell and login as superuser.
 
-       $ su
-       # mkdir /usr/src
-       # mv linux-2.4.19.tar.bz2 /usr/src
-       # cd /usr/src
-       # tar -xjf linux-2.4.19.tar.bz2
-       # chown -R root.root linux-2.4.19
-       # ln -sf linux-2.4.19 linux
-       # exit
-       $
+  $ su
+  # mkdir /usr/src
+  # mv linux-2.4.19.tar.bz2 /usr/src
+  # cd /usr/src
+  # tar -xjf linux-2.4.19.tar.bz2
+  # chown -R root.root linux-2.4.19
+  # ln -sf linux-2.4.19 linux
+  # exit
+  $
 
   [1m8.2.  Red Hat Linux 8.0[0m
 
@@ -1051,7 +1029,6 @@
   you will have to load the lirc_serial module. If you did not get any
   such messages skip the kernel recompile steps below and go directly to
   making and installing the lirc driver.
-
   Once the configuration step is complete:
 
        $ make
@@ -1098,11 +1075,11 @@
   Only change things you know you can change. If you are not sure, just
   stick to the one required change. Click "save and exit".  Next:
 
-       # make dep
-       # make clean
-       # make bzImage modules
-       # make modules_install
-       # make install
+  # make dep
+  # make clean
+  # make bzImage modules
+  # make modules_install
+  # make install
 
   if you are using [1mgrub[22m, that should be it, reboot and select your
   custom kernel upon boot. If you are using [1mlilo[22m, change your lilo
@@ -1219,17 +1196,17 @@
 
   The lircrc.example file has this:
 
-  begin
-      prog = irxevent
-      button = ChannelUp
-      config = Key Up CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = ChannelUp
+           config = Key Up CurrentWindow
+       end
 
-  begin
-      prog = irxevent
-      button = ChannelDown
-      config = Key Down CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = ChannelDown
+           config = Key Down CurrentWindow
+       end
 
   but the /etc/lircd.conf that comes in the lircd package defines the
   buttons for the Pinnacle Studio PCTV as:
@@ -1240,17 +1217,17 @@
   rather than "ChannelUp" and "ChannelDown".  I added the following to
   my /home/[yourusername]/.lircrc file:
 
-       begin
-           prog = irxevent
-           button = channel+
-           config = Key Up CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = channel+
+      config = Key Up CurrentWindow
+  end
 
-       begin
-           prog = irxevent
-           button = channel-
-           config = Key Down CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = channel-
+      config = Key Down CurrentWindow
+  end
 
   which took care of basic functionality.  Because the PCTV Studio
   remote has additional buttons, look at the configfiles/lircrc.exam-
@@ -1289,19 +1266,19 @@
   Depending on whether you have your serial port driver configured as a
   kernel module you might see the following message during make:
 
-       lirc_sir.c:56:2: warning: #warning
-       "******************************************"
+  lirc_sir.c:56:2: warning: #warning
+  "******************************************"
 
-       lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
+  lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
 
-       lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
+  lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
 
-       lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
+  lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
 
-       lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
+  lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
 
-       lirc_sir.c:61:2: warning: #warning
-       "******************************************"
+  lirc_sir.c:61:2: warning: #warning
+  "******************************************"
 
   If you do receive this statement make sure to run the [1msetserial[0m
   command before you load the lirc_sir module. Follow this with the
@@ -1316,15 +1293,15 @@
   The configuration for starting [1mlircd [22mdiffers if you're going to be
   sending and receiving IR versus just receiving.
 
-  # cd /etc/rc.d
-  # cat >> rc.local
-  echo "Starting lircd"
-  setserial /dev/ttySx uart none        # (if required)
-  modprobe lirc_sir
-  /usr/local/sbin/lircd
-  ^D
-  # exit
-  $
+       # cd /etc/rc.d
+       # cat >> rc.local
+       echo "Starting lircd"
+       setserial /dev/ttySx uart none        # (if required)
+       modprobe lirc_sir
+       /usr/local/sbin/lircd
+       ^D
+       # exit
+       $
 
   At this point you have to populate the /etc/lircd.conf file with the
   proper codes for your A/V remote. You should be able to find your
@@ -1337,10 +1314,10 @@
   being received. If everything is configured correctly you should see
   something similar to the following:
 
-       $ irw
-       0000000000007ff0 00 1 gi-motorola-dct2000
-       000000000000bff8 00 2 gi-motorola-dct2000
-       000000000000f7f0 00 ENTER gi-motorola-dct2000
+  $ irw
+  0000000000007ff0 00 1 gi-motorola-dct2000
+  000000000000bff8 00 2 gi-motorola-dct2000
+  000000000000f7f0 00 ENTER gi-motorola-dct2000
 
   Once you've verified lirc is working you can press [1mCTRL-C [22mto exit [1mirw[0m
   and configure the channel changing script.
@@ -1358,44 +1335,44 @@
   /dev/device. Unlike bourne or bash, csh scripts automatically close
   parent file descriptors before they start.
 
-  $ cd /usr/local/bin
-  # su
-  # cat > change_channel.csh
-  #!/bin/csh
-  echo "changing to $1"
-  /usr/local/bin/channel.pl $1 &
-  ^D
-  # chmod a+x change_channel.csh
-  # exit
-  $ exit
+       $ cd /usr/local/bin
+       # su
+       # cat > change_channel.csh
+       #!/bin/csh
+       echo "changing to $1"
+       /usr/local/bin/channel.pl $1 &
+       ^D
+       # chmod a+x change_channel.csh
+       # exit
+       $ exit
 
   The following file should be saved as /usr/local/bin/channel.pl
 
-       #!/usr/bin/perl
+  #!/usr/bin/perl
 
-       # make sure to set this string to
-       # the corresponding remote in /etc/lircd.conf
-       $remote_name = "gi-motorola-dct2000";
+  # make sure to set this string to
+  # the corresponding remote in /etc/lircd.conf
+  $remote_name = "gi-motorola-dct2000";
 
-       sub change_channel {
-               my($channel_digit) = @_;
-               system ("rc SEND_ONCE $remote_name $channel_digit");
-               sleep 1;
-       }
+  sub change_channel {
+          my($channel_digit) = @_;
+          system ("rc SEND_ONCE $remote_name $channel_digit");
+          sleep 1;
+  }
 
-       $channel=$ARGV[0];
-       sleep 1;
-       if (length($channel) > 2) {
-               change_channel(substr($channel,0,1));
-               change_channel(substr($channel,1,1));
-               change_channel(substr($channel,2,1));
-       } elsif (length($channel) > 1) {
-               change_channel(substr($channel,0,1));
-               change_channel(substr($channel,1,1));
-       } else {
-               change_channel(substr($channel,0,1));
-       }
-       system ("rc SEND_ONCE $remote_name ENTER");
+  $channel=$ARGV[0];
+  sleep 1;
+  if (length($channel) > 2) {
+          change_channel(substr($channel,0,1));
+          change_channel(substr($channel,1,1));
+          change_channel(substr($channel,2,1));
+  } elsif (length($channel) > 1) {
+          change_channel(substr($channel,0,1));
+          change_channel(substr($channel,1,1));
+  } else {
+          change_channel(substr($channel,0,1));
+  }
+  system ("rc SEND_ONCE $remote_name ENTER");
 
   The last statement within the perl script is the lirc rc command. This
   is the command that transmits the code to your cable/dss box. Make
@@ -1515,26 +1492,25 @@
   If you want to know what time your job will run, you can do the
   following:
 
-  # cat /etc/crontab
-  SHELL=/bin/bash
-  PATH=/sbin:/bin:/usr/sbin:/usr/bin
-  MAILTO=root
-  HOME=/
+       # cat /etc/crontab
+       SHELL=/bin/bash
+       PATH=/sbin:/bin:/usr/sbin:/usr/bin
+       MAILTO=root
+       HOME=/
 
-  # run-parts
-  01 * * * * root nice -n 19 run-parts /etc/cron.hourly
-  02 4 * * * root nice -n 19 run-parts /etc/cron.daily
-  22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
-  42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
-  # exit
-  $
+       # run-parts
+       01 * * * * root nice -n 19 run-parts /etc/cron.hourly
+       02 4 * * * root nice -n 19 run-parts /etc/cron.daily
+       22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
+       42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
+       # exit
+       $
 
   We can see from the display that the cron.daily job will run at 0402
   every morning.
 
   If you wish to specify a custom time, then the user-based cron job is
   the better method.
-
   The default [1mconfigfiles/mythcrontab [22mfile will run the [1mmythfilldatabase[0m
   program every day at 0430.  If you want to change this, then open the
   configfiles/mythcrontab file in your favorite editor and modify it as
@@ -1677,6 +1653,7 @@
   mythgallery is a photo and slideshow application.  mythgallery is a
   separate application, but it's dependant on mythtv being installed and
   operational.
+
   [1m12.1.  Installation and pre-requisites.[0m
 
   Download mythgallery from http://www.mythtv.org/
@@ -1780,19 +1757,19 @@
   <http://www.xiph.org/paranoia/download/cdparanoia-III-
   alpha9.8.src.tgz>.
 
-  $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
-  $ cd cdparanoia-III-alpha9.8
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  <!-- see if the next step is a Mandrake only issue -->
-  # cp interface/cdda_interface.h /usr/local/include
-  # cd /usr/lib
-  # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
-  # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
-  # exit
-  $
+       $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
+       $ cd cdparanoia-III-alpha9.8
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       <!-- see if the next step is a Mandrake only issue -->
+       # cp interface/cdda_interface.h /usr/local/include
+       # cd /usr/lib
+       # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
+       # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
+       # exit
+       $
 
   [1m14.2.  Mandrake 9.0[0m
 
@@ -1827,9 +1804,73 @@
   Edit the /usr/local/share/mythtv/mythmusic-settings.txt file for your
   particular system.
 
-  [1m15.  Troubleshooting.[0m
+  [1m15.  mythweather[0m
 
-  [1m15.1.  Illegal Instruction.[0m
+  The mythweather module will obtain the weather information for the
+  zipcode that you specify.
+
+  Change into the mythweather directory, then make and make install:
+
+       $ cd mythvideo
+       $ make
+       $ su
+       # make install
+       # exit
+
+  Mythweather uses msnbc as its source for weather data.  You may
+  specify a number of identifiers in order to obtain your local weather.
+
+  +o  Your zip code.
+
+  +o  An airport code.
+
+  +o  The "accid"
+
+  In order to determine your accid, you would access the msnbc.com
+  weather site at the following URL:
+  http://www.msnbc.com/news/wea_front.asp?0wl=w3&tab=oth&ta=y
+  <http://www.msnbc.com/news/wea_front.asp?0wl=w3&tab=oth&ta=y>  Once
+  there, fill in your location.  Once the msnbc server completes your
+  request, look at the URL in your address bar for "accid=XXXXX".  The
+  "XXXXX" portion is the area id you will need for the next
+  configuration step.
+
+  For now, you must manually configure mythweather:
+
+       $ mysql -u root
+       mysql> use mythconverg;
+       mysql> insert into settings (value, data) VALUES ('locale','YOUR_ZIPCODE_OR_AREA_ID_OR_AIRPORTCODE');
+       mysql> exit
+       $
+
+  So, as an example for zipcode 60561:
+
+       $ mysql -u root
+       mysql> use mythconverg;
+       mysql> insert into settings (value, data) VALUES ('locale','60561');
+       mysql> exit
+       $
+
+  If you wish to use Celsius:
+
+       mysql> insert into settings (value, data) VALUES ('SIUnits', 'Yes');
+       mysql>
+
+  These are the keyboard commands for mythweather:
+
+  MYTHWEATHER KEYBOARD COMMANDS ----------------------------- Left Key
+  Goes back one page, this also extends the time spent on the page you
+  are at.  Right Key            Goes forward one page, see above.  Space
+  Pause, wait on the current page until space is hit again.  Numeric
+  Keys         You can check other weather by keying in other ZIP codes.
+  Enter Key            Switch between celsius and fahrenheit. Can also
+  be used a way to force a data update.
+
+  [1m16.  mythvideo[0m
+
+  [1m17.  Troubleshooting.[0m
+
+  [1m17.1.  Illegal Instruction.[0m
 
   This error can happen for the following reasons:
 
@@ -1844,7 +1885,7 @@
      this by doing a $ cat /proc/cpuinfo and looking for "sse" in the
      processor flags section.
 
-  [1m15.2.  mythfilldatabase failing.[0m
+  [1m17.2.  mythfilldatabase failing.[0m
 
   If mythtvfilldatabase suddenly appears to be failing, check to see
   what version of XMLTV you're running.  Versions prior to 0.5.4 need to
@@ -1853,13 +1894,13 @@
   global search and replace, searching for "tvlistings2" and replacing
   it with "tvlistings".
 
-  [1m15.3.  mythtv seems to disappear; can't see video[0m
+  [1m17.3.  mythtv seems to disappear; can't see video[0m
 
   If you're using Gnome as your window manager, try switching to KDE.
   For Red Hat Linux 8.0 users, edit /etc/sysconfig/desktop and change
   "GNOME" to "KDE".
 
-  [1m15.4.  Fast CPU, choppy or jittery video.[0m
+  [1m17.4.  Fast CPU, choppy or jittery video.[0m
 
   This is most likely because your hard drive isn't setup to use DMA.
   Use the [1mhdparm [22mprogram to check and enable DMA.
@@ -1869,13 +1910,13 @@
   will tell you the DMA status for your hard drives.  If you run [1mhdparm[0m
   with the -d1 parameter, it will turn DMA on.
 
-  [1m15.5.  I keep losing all of my settings every time I compile![0m
+  [1m17.5.  I keep losing all of my settings every time I compile![0m
 
   mythtv will overwrite any settings in /usr/local/share/mythtv.  If you
   want to make sure that you don't lose your modifications, make a
   directory ~/.mythtv and copy your settings.txt file to this location.
 
-  [1m15.6.  Compile errors.[0m
+  [1m17.6.  Compile errors.[0m
 
   Some compile errors are worse than others.  If you get an error that
   doesn't abort the compilation, and says something like:
@@ -1891,7 +1932,7 @@
   is telling you that you don't have XFree86-devel installed, and this
   needs to be fixed before mythtv will work correctly.
 
-  [1m15.7.  My screen goes blank, but comes back when I wiggle the mouse or[0m
+  [1m17.7.  My screen goes blank, but comes back when I wiggle the mouse or[0m
   [1muse the keyboard.[0m
 
   This is due to DPMS, the Display Power Management System, which is
@@ -1924,14 +1965,14 @@
   Finally, depending on your distribution, you may be able to turn it
   off from within the control panel.
 
-  [1m15.8.  I can't checkout using CVS anymore![0m
+  [1m17.8.  I can't checkout using CVS anymore![0m
 
   Isaac has changed some things around.  The CVS repository is now known
   as cvs.mythtv.org, rather than www.mythtv.org or mythtv.org.  Make
   sure you change your CVSROOT to point to the new server, delete your
   old tree, and re-do the checkout.
 
-  [1m15.9.  I get segfaults / mythtv isn't doing anything.[0m
+  [1m17.9.  I get segfaults / mythtv isn't doing anything.[0m
 
   Without details, the developers will not be able to determine if you
   have discovered a genuine code-bug,  or it the problem is with your
@@ -1942,20 +1983,20 @@
   Edit the settings.pro file.  Make sure that the top of the file looks
   like this:
 
-  $ cat settings.pro
-  CONFIG += debug
-  #CONFIG += release
+       $ cat settings.pro
+       CONFIG += debug
+       #CONFIG += release
 
   Now, you need to clear out the old versions of the software to ensure
   that you're running with the debugging code, then compile and install.
 
-       $ make clean
-       $ make distclean
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # exit
+  $ make clean
+  $ make distclean
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # exit
 
   At this point, you now have debug-enabled software ready.  Let's
   assume that the problem you're having is in the setup program.
@@ -1980,7 +2021,7 @@
   should be posted to the mythtv-dev mailing list, along with the steps
   you followed to get the program to crash.
 
-  [1m15.10.  Mythtv makes my system crash.[0m
+  [1m17.10.  Mythtv makes my system crash.[0m
 
   mythtv [4mcan[24m [4mnot[24m crash your system - it is a user-level program.  If
   your system is crashing when you run mythtv, then you have some issue
@@ -1988,7 +2029,7 @@
   fan has fallen off/broken and your system is overheating when asked to
   perform a CPU intensive task like encoding video.
 
-  [1m15.11.  Troubleshooting audio[0m
+  [1m17.11.  Troubleshooting audio[0m
 
   By Bruce Markey, mailto:bjm@lvcm.com <mailto:bjm@lvcm.com>
 
@@ -2041,9 +2082,9 @@
   by another process, like [1mesd[22m.  If /dev/dsp isn't available, then
   mythtv won't work.
 
-  [1m16.  Miscellaneous.[0m
+  [1m18.  Miscellaneous.[0m
 
-  [1m16.1.  I'd like to watch the files without using mythtv / I'd like to[0m
+  [1m18.1.  I'd like to watch the files without using mythtv / I'd like to[0m
   [1mconvert the files to some other format.[0m
 
   Matthew Zimmerman has created a patch for MPlayer / Mencoder
@@ -2055,26 +2096,26 @@
   http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/
   <http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/>.
 
-  $ wget http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/mplayer-0.90pre10+mythtv.patch
+       $ wget http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/mplayer-0.90pre10+mythtv.patch
 
   Download the source to MPlayer and patch:
 
-       $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
-       $ tar -xjf MPlayer-0.90rc1.tar.bz2
-       $ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
-       $ cd MPlayer-0.90rc1
-       $ patch -p1 < mplayer-0.90pre10+mythtv.patch
+  $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
+  $ tar -xjf MPlayer-0.90rc1.tar.bz2
+  $ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
+  $ cd MPlayer-0.90rc1
+  $ patch -p1 < mplayer-0.90pre10+mythtv.patch
 
   At this point, you can read the MPlayer documentation and start the
   compile process.
 
-  [1m16.2.  I'd like to use some other window manager.[0m
+  [1m18.2.  I'd like to use some other window manager.[0m
 
   mythtv is not dependent on any particular window manager.  If you wish
   to run a lightweight window manager, the configfiles/ directory has an
   example of a .twmrc file you may use.
 
-  [1m16.3.  I'd like mythtv to automatically startup.[0m
+  [1m18.3.  I'd like mythtv to automatically startup.[0m
 
   Here's an example submitted to the mythtv-dev list by Pat Pflaum
   mailto:pat@netburp.com <mailto:pat@netburp.com> using fvwm:
@@ -2088,7 +2129,7 @@
        ^D
        $
 
-  [1m16.4.  I'd like to delete the mysql database.[0m
+  [1m18.4.  I'd like to delete the mysql database.[0m
 
   [1mNOTE[22m:  Performing this step will remove the entire database.  You will
   lose all of your settings and will need to re-run the mc.sql script to
@@ -2098,7 +2139,7 @@
        mysql> drop database mythconverg;
        mysql> quit
 
-  [1m16.5.  I'd like to start using the development version of mythtv.[0m
+  [1m18.5.  I'd like to start using the development version of mythtv.[0m
 
   [Content under development]
 
@@ -2108,7 +2149,6 @@
 
   [1mTHERE IS NO GUARANTEE THAT THESE INSTRUCTIONS WILL WORK.  USE AT YOUR[0m
   [1mOWN RISK.[0m
-
   Here are some of the features in version 0.8:
 
   +o  A front-end and back-end system.  The back-end is responsible for

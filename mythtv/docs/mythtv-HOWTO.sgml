@@ -3,7 +3,7 @@
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-01-06, v1.065
+<date>2003-01-09, v1.066
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -540,61 +540,31 @@ $ su
 </verb></tscreen>
 
 <sect1>Gentoo. <label id="Gentoo_build">
-<p>[Documentation being finalized]
-<p>There are ebuilds setup for mythtv and for XMLTV.  To use them, do the
-following, add the following to your <tt>/etc/make.conf</tt>:
+<p>Installation of mythtv on Gentoo consists of making a local portage
+directory with the necessary ebuild and digest files.  Tony Clark <url
+url="mailto:tclark@telia.net"> has
+created a portage file which can be downloaded from
+<url url="http://smalltime.com/mythtv/mythtv-gentoo-portage.tar.bz2"
+name="http://smalltime.com/mythtv/mythtv-gentoo-portage.tar.bz2">
 
+Once you have downloaded the portage file, installation is simple.
 <tscreen><verb>
-# PORTDIR_OVERLAY is a directory where local ebuilds may be stored without
-#     concern that they will be deleted by rsync updates. Default is not
-#     defined.
-PORTDIR_OVERLAY=/home/[yourusername]/portage
+$ su -
+# emerge rsync # make sure portage is up to date.
+# cd /usr/local
+# tar xvfjp Path_To/mythtv-gentoo-portage.tar-bz2
+# vi /etc/make.conf
 </verb></tscreen>
 
-Next, create the following directories:
-<tscreen><verb>
-mkdir -p /home/[yourusername]/portage/video-media/mythtv
-mkdir -p /home/[yourusername]/portage/dev-perl/xmltv
-</verb></tscreen>
+Add mysql to your USE variable.  ie <tt>USE="mysql ...."</tt>
 
-Download the ebuilds and save them to their respective directories made
-above.  Make sure the downloaded file names are the same as those on
-bugs.gentoo.org.  The correct source files will fail to download if the
-ebuild names are wrong.  The two ebuilds are:
-
-<itemize>
-<item>mythtv: <url url="http://bugs.gentoo.org/show_bug.cgi?id=10533"
-name="http://bugs.gentoo.org/show_bug.cgi?id=10533">
-<item>XMLTV: <url url="http://bugs.gentoo.org/show_bug.cgi?id=10536"
-name="http://bugs.gentoo.org/show_bug.cgi?id=10536">
-</itemize>
-
-emerge mythtv:
-<tscreen><verb>
-$ emerge /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0
-</verb></tscreen>
-
-It should download the source then complain about a missing digest.  To fix
-this,
+Locate the line that contains: <tt>#/usr/local/portage</tt> and remove the #
 
 <tscreen><verb>
-$ ebuild /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0.ebuild digest
+# ACCEPT_KEYWORDS="~x86" emerge mythtv
 </verb></tscreen>
 
-emerge mythtv again and it should compile and install.
-
-Do the same for xmltv but an additional step will be required first to fool
-it into thinking XML-Twig is installed.  
-
-<tscreen><verb>
-$ su
-# emerge inject dev-perl/XML-Twig
-# emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
-# ebuild /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2.ebuild digest
-# emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
-# exit
-$ 
-</verb></tscreen>
+<bf>NOTE</bf>: If you have perl dependency problems update to >=ExtUtils-MakeMaker-6.05-r4
 
 <sect1>Debian.
 <p>Debian packages for MythTV and some of its add-on modules have been
@@ -1733,6 +1703,75 @@ $ mysql -u root < metadata.sql
 Edit the <tt>/usr/local/share/mythtv/mythmusic-settings.txt</tt> file for
 your particular system.
 
+<sect>mythweather
+<p>The mythweather module will obtain the weather information for the zipcode
+that you specify.
+
+Change into the mythweather directory, then make and make install:
+<tscreen><verb>
+$ cd mythvideo
+$ make
+$ su
+# make install
+# exit
+</verb></tscreen>
+
+Mythweather uses msnbc as its source for weather data.  You may specify a
+number of identifiers in order to obtain your local weather.
+<itemize>
+<item>Your zip code.
+<item>An airport code.
+<item>The "accid"
+</itemize>
+
+In order to determine your accid, you would access the msnbc.com weather
+site at the following URL: <url
+url="http://www.msnbc.com/news/wea_front.asp?0wl=w3&amp;tab=oth&amp;ta=y"
+name="http://www.msnbc.com/news/wea_front.asp?0wl=w3&amp;tab=oth&amp;ta=y">  Once
+there, fill in your location.  Once the msnbc server completes your request,
+look at the URL in your address bar for "accid=XXXXX".  The "XXXXX" portion
+is the area id you will need for the next configuration step.
+
+For now, you must manually configure mythweather:
+
+<tscreen><verb>
+$ mysql -u root
+mysql> use mythconverg;
+mysql> insert into settings (value, data) VALUES ('locale','YOUR_ZIPCODE_OR_AREA_ID_OR_AIRPORTCODE');
+mysql> exit
+$
+</verb></tscreen>
+
+So, as an example for zipcode 60561:
+<tscreen><verb>
+$ mysql -u root
+mysql> use mythconverg;
+mysql> insert into settings (value, data) VALUES ('locale','60561');
+mysql> exit
+$
+</verb></tscreen>
+
+If you wish to use Celsius:
+<tscreen><verb>
+mysql> insert into settings (value, data) VALUES ('SIUnits', 'Yes');
+mysql>
+</verb></tscreen>
+
+These are the keyboard commands for mythweather:
+
+MYTHWEATHER KEYBOARD COMMANDS
+-----------------------------
+   Left Key             Goes back one page, this also extends the time spent
+                        on the page you are at.
+   Right Key            Goes forward one page, see above.
+   Space                Pause, wait on the current page until space is hit
+                        again.
+   Numeric Keys         You can check other weather by keying in other ZIP codes.
+   Enter Key            Switch between celsius and fahrenheit. Can also
+                        be used a way to force a data update.
+
+<sect>mythvideo
+
 <sect>Troubleshooting.
 <sect1>Illegal Instruction.
 <p>This error can happen for the following reasons:
@@ -2174,6 +2213,9 @@ instructions for .gdbinit
 v1.065, 2003-01-06.  Break up the html file back into seperate sections, per
 Isaac.  Comment out the gdb handle instructions until I figure out what's
 going on.
+v1.066, 2003-01-09.  Modified gentoo instructions, now that there's a
+download site for the portage file.  Added section identifiers for
+mythweather and mythvideo.  Added content for mythweather.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

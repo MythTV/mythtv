@@ -197,71 +197,32 @@ $ su
 <H2><A NAME="Gentoo_build"></A> <A NAME="ss5.5">5.5</A> <A HREF="mythtv-HOWTO.html#toc5.5">Gentoo. </A>
 </H2>
 
-<P>[Documentation being finalized]</P>
-<P>There are ebuilds setup for mythtv and for XMLTV.  To use them, do the
-following, add the following to your <CODE>/etc/make.conf</CODE>:</P>
+<P>Installation of mythtv on Gentoo consists of making a local portage
+directory with the necessary ebuild and digest files.  Tony Clark 
+<A HREF="mailto:tclark@telia.net">mailto:tclark@telia.net</A> has
+created a portage file which can be downloaded from
+<A HREF="http://smalltime.com/mythtv/mythtv-gentoo-portage.tar.bz2">http://smalltime.com/mythtv/mythtv-gentoo-portage.tar.bz2</A></P>
+<P>Once you have downloaded the portage file, installation is simple.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su -
+# emerge rsync # make sure portage is up to date.
+# cd /usr/local
+# tar xvfjp Path_To/mythtv-gentoo-portage.tar-bz2
+# vi /etc/make.conf
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Add mysql to your USE variable.  ie <CODE>USE="mysql ...."</CODE></P>
+<P>Locate the line that contains: <CODE>#/usr/local/portage</CODE> and remove the #</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-# PORTDIR_OVERLAY is a directory where local ebuilds may be stored without
-#     concern that they will be deleted by rsync updates. Default is not
-#     defined.
-PORTDIR_OVERLAY=/home/[yourusername]/portage
+# ACCEPT_KEYWORDS="~x86" emerge mythtv
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Next, create the following directories:
-<BLOCKQUOTE><CODE>
-<PRE>
-mkdir -p /home/[yourusername]/portage/video-media/mythtv
-mkdir -p /home/[yourusername]/portage/dev-perl/xmltv
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Download the ebuilds and save them to their respective directories made
-above.  Make sure the downloaded file names are the same as those on
-bugs.gentoo.org.  The correct source files will fail to download if the
-ebuild names are wrong.  The two ebuilds are:</P>
-<P>
-<UL>
-<LI>mythtv: 
-<A HREF="http://bugs.gentoo.org/show_bug.cgi?id=10533">http://bugs.gentoo.org/show_bug.cgi?id=10533</A></LI>
-<LI>XMLTV: 
-<A HREF="http://bugs.gentoo.org/show_bug.cgi?id=10536">http://bugs.gentoo.org/show_bug.cgi?id=10536</A></LI>
-</UL>
-</P>
-<P>emerge mythtv:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ emerge /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>It should download the source then complain about a missing digest.  To fix
-this,</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-$ ebuild /home/[yourusername]/portage/video-media/mythtv/mythtv-0.7.0.ebuild digest
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>emerge mythtv again and it should compile and install.</P>
-<P>Do the same for xmltv but an additional step will be required first to fool
-it into thinking XML-Twig is installed.  </P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# emerge inject dev-perl/XML-Twig
-# emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
-# ebuild /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2.ebuild digest
-# emerge /home/[yourusername]/portage/dev-perl/xmltv/xmltv-0.5.2
-# exit
-$ 
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
+<P><B>NOTE</B>: If you have perl dependency problems update to >=ExtUtils-MakeMaker-6.05-r4</P>
 
 <H2><A NAME="ss5.6">5.6</A> <A HREF="mythtv-HOWTO.html#toc5.6">Debian.</A>
 </H2>

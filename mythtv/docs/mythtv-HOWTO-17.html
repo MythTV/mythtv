@@ -1,0 +1,246 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
+ <TITLE>Installing and using mythtv: Troubleshooting.</TITLE>
+ <LINK HREF="mythtv-HOWTO-18.html" REL=next>
+ <LINK HREF="mythtv-HOWTO-16.html" REL=previous>
+ <LINK HREF="mythtv-HOWTO.html#toc17" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="mythtv-HOWTO-18.html">Next</A>
+<A HREF="mythtv-HOWTO-16.html">Previous</A>
+<A HREF="mythtv-HOWTO.html#toc17">Contents</A>
+<HR>
+<H2><A NAME="s17">17.</A> <A HREF="mythtv-HOWTO.html#toc17">Troubleshooting.</A></H2>
+
+<H2><A NAME="ss17.1">17.1</A> <A HREF="mythtv-HOWTO.html#toc17.1">Illegal Instruction.</A>
+</H2>
+
+<P>This error can happen for the following reasons:
+<UL>
+<LI>You have an AMD K6-2 or VIA C3 processor.  If you have either of
+these, make sure that you you followed the instructions in this 
+<A HREF="mythtv-HOWTO-5.html#nonintelcpu_">section</A>.</LI>
+<LI>You have an early production Intel Celeron, Pentium Pro or Pentium II.  If you have any
+of these processors, make sure that your 
+<A HREF="mythtv-HOWTO-9.html#deinterlace_">deinterlace</A>
+variable is set correctly.  Your CPU needs to support SSE instructions for
+deinterlace support.  You may check this by doing a <CODE>$ cat
+/proc/cpuinfo</CODE> and looking for "sse" in the processor flags section.</LI>
+</UL>
+</P>
+<H2><A NAME="ss17.2">17.2</A> <A HREF="mythtv-HOWTO.html#toc17.2">mythfilldatabase failing.</A>
+</H2>
+
+<P>If mythtvfilldatabase suddenly appears to be failing, check to see what version of
+XMLTV you're running.  Versions prior to 0.5.4 need to have the following
+change made: edit the
+<CODE>/usr/lib/perl5/site_perl/5.8.0/XMLTV/ZapListings.pm</CODE> file and
+perform a global search and replace, searching for "tvlistings2" and
+replacing it with "tvlistings".</P>
+<H2><A NAME="ss17.3">17.3</A> <A HREF="mythtv-HOWTO.html#toc17.3">mythtv seems to disappear; can't see video</A>
+</H2>
+
+<P>If you're using Gnome as your window manager, try switching to KDE.  For
+Red Hat Linux 8.0 users, edit <CODE>/etc/sysconfig/desktop</CODE> and
+change "GNOME" to "KDE".</P>
+<H2><A NAME="Setting_DMA"></A> <A NAME="ss17.4">17.4</A> <A HREF="mythtv-HOWTO.html#toc17.4">Fast CPU, choppy or jittery video. </A>
+</H2>
+
+<P>This is most likely because your hard drive isn't setup to use DMA.  Use
+the <B>hdparm</B> program to check and enable DMA.
+<BLOCKQUOTE><CODE>
+<PRE>
+# hdparm -d /dev/hd?
+</PRE>
+</CODE></BLOCKQUOTE>
+ will tell you the DMA status for your hard drives.  If you run
+<B>hdparm</B> with the <CODE>-d1</CODE> parameter, it will turn DMA on.</P>
+<H2><A NAME="ss17.5">17.5</A> <A HREF="mythtv-HOWTO.html#toc17.5">I keep losing all of my settings every time I compile!</A>
+</H2>
+
+<P>mythtv will overwrite any settings in <CODE>/usr/local/share/mythtv</CODE>.
+If you want to make sure that you don't lose your modifications, make a
+directory <CODE>~/.mythtv</CODE> and copy your settings.txt file to this
+location.</P>
+<H2><A NAME="ss17.6">17.6</A> <A HREF="mythtv-HOWTO.html#toc17.6">Compile errors.</A>
+</H2>
+
+<P>Some compile errors are worse than others.  If you get an error that
+doesn't abort the compilation, and says something like:
+<BLOCKQUOTE><CODE>
+<PRE>
+cc1plus: warning: changing search order for system directory
+"/usr/local/include"
+cc1plus: warning:   as it has already been specified as a non-system
+directory
+</PRE>
+</CODE></BLOCKQUOTE>
+
+then it shouldn't be a problem.</P>
+<P>If you get an error like <CODE>/usr/bin/ld: cannot find -lXext</CODE>, the
+compiler is telling you that you don't have XFree86-devel installed, and
+this needs to be fixed before mythtv will work correctly.</P>
+<H2><A NAME="ss17.7">17.7</A> <A HREF="mythtv-HOWTO.html#toc17.7">My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.</A>
+</H2>
+
+<P>This is due to DPMS, the Display Power Management System, which is used
+to save power by turning off your monitor when the system decides that it's
+not being used.  Since it's likely that watching TV will not generate
+keyboard or mouse events for a time, you need to turn off DPMS.  There are a
+few ways to do this.</P>
+<P>You can edit your <CODE>/etc/X11/XF86Config-4</CODE> file, and look for:
+<BLOCKQUOTE><CODE>
+<PRE>
+Section "Device"
+    Identifier "device1"
+    VendorName "nVidia Corporation"
+    BoardName "NVIDIA GeForce 256 (generic)"
+    Driver "nv"
+    Option "DPMS"
+EndSection
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>In this case, you would need to either delete the <CODE>Option "DPMS"</CODE>
+line, or change it to <CODE># Option "DPMS"</CODE> to comment it out.  The next
+time you start XFree this change will take effect.</P>
+<P>You can also turn off DPMS from the Command Line, but this will not survive
+a reboot.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ xset -DPMS
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Using <CODE>xset +DPMS</CODE> will turn it back on.</P>
+<P>Finally, depending on your distribution, you may be able to turn it off from
+within the control panel.</P>
+
+<H2><A NAME="ss17.8">17.8</A> <A HREF="mythtv-HOWTO.html#toc17.8">I can't checkout using CVS anymore!</A>
+</H2>
+
+<P>Isaac has changed some things around.  The CVS repository is now known as
+<CODE>cvs.mythtv.org</CODE>, rather than <CODE>www.mythtv.org</CODE> or
+<CODE>mythtv.org</CODE>.  Make sure you change your <CODE>CVSROOT</CODE> to point to
+the new server, delete your old tree, and re-do the checkout.</P>
+
+<H2><A NAME="ss17.9">17.9</A> <A HREF="mythtv-HOWTO.html#toc17.9">I get segfaults / mythtv isn't doing anything.</A>
+</H2>
+
+<P>Without details, the developers will not be able to determine if you have
+discovered a genuine code-bug,  or it the problem is with your system.  In
+order to determine what's going on, you must recompile mythtv with debugging
+support and run mythtv within <B>gdb</B>, the GNU debugger.</P>
+<P>Edit the settings.pro file.  Make sure that the top of the file looks like this:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cat settings.pro
+CONFIG += debug
+#CONFIG += release
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Now, you need to clear out the old versions of the software to ensure that
+you're running with the debugging code, then compile and install.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ make clean
+$ make distclean
+$ ./configure
+$ make
+$ su
+# make install
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>At this point, you now have debug-enabled software ready.  Let's assume that
+the problem you're having is in the <CODE>setup</CODE> program.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd setup
+$ gdb ./setup
+
+GNU gdb 5.2.1-2mdk (Mandrake Linux)
+Copyright 2002 Free Software Foundation, Inc.
+GDB is free software, covered by the GNU General Public License, and you are
+welcome to change it and/or distribute copies of it under certain
+conditions.
+Type "show copying" to see the conditions.
+There is absolutely no warranty for GDB.  Type "show warranty" for details.
+This GDB was configured as "i586-mandrake-linux-gnu"...
+(gdb)
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><B>gdb</B> has a number of options, read the <CODE>man</CODE> page for more
+information.</P>
+<P>Once at the <CODE>(gdb)</CODE> prompt, type <CODE>run</CODE> to start program
+execution.  When the program segfaults, type <CODE>bt</CODE> to get the
+backtrace.  The backtrace should be posted to the mythtv-dev mailing list,
+along with the steps you followed to get the program to crash.</P>
+
+
+<H2><A NAME="ss17.10">17.10</A> <A HREF="mythtv-HOWTO.html#toc17.10">Mythtv makes my system crash. </A>
+</H2>
+
+<P>mythtv <EM>can not</EM> crash your system - it is a user-level program. 
+If your system is crashing when you run mythtv, then you have some
+issue with the drivers for your capture card or other hardware, or the CPU
+fan has fallen off/broken and your system is overheating when asked to
+perform a CPU intensive task like encoding video.</P>
+
+<H2><A NAME="ss17.11">17.11</A> <A HREF="mythtv-HOWTO.html#toc17.11">Troubleshooting audio</A>
+</H2>
+
+<P>By Bruce Markey, 
+<A HREF="mailto:bjm@lvcm.com">mailto:bjm@lvcm.com</A></P>
+<P>Audio appears to be one of the bigger issues that users run into on the
+mailing list.  If the audio isn't configured correctly, then mythtv will
+often appear to hang, when in fact it is trying to manipulate the audio
+subsystem and failing.  You may or may not receive error messages indicating
+that the source of the error is the audio subsystem.</P>
+<P>You can not use <B>xawtv</B> to determine if your audio is working
+correctly, since <B>xawtv</B> is simply using the the analog sound patched
+through line-in to line-out. It doesn't need to digitize the sound unless
+you are using the recording function.</P>
+<P>A better test to verify that sound will work for MythTV (and recording with
+<B>xawtv</B> for that matter) is to startup <B>xawtv</B>, mute the
+line-in then run <CODE>aplay /dev/dsp</CODE>. Once this test succeeds, MythTV
+should also work correctly because it writes to and read from /dev/dsp in
+the same way that <B>aplay</B> does.</P>
+<P>To record audio along with video the audio signal must be digitized by a DSP
+so that the audio data can be stored in a file. On playback, the audio data
+is written to /dev/dsp and converted back to an analog signal. This analog
+signal should then be sent to your speakers. Here is what is needed in
+alsamixer:</P>
+<P>CAPTUR source - the analog source to be sent to the DSP. This should be set
+to the input source from the tuner card to the sound card. In most cases
+this is Line but this could also be Aux, CD, Mic, etc., depending on how you
+connect the input cable. This source should be muted to prevent patching
+through the analog sound. The volume of this source will not affect the
+record level.</P>
+<P>Capture mixer - this sets the level for the analog to digital recording.
+While a volume of 100% is recommended for testing, distortion may occur.
+Lowering this level to 75% to 85% may result in better audio quality.
+"Capture" should be marked as the CAPTUR destination.</P>
+<P>PCM mixer - this sets the level for the digital to analog playback. While a
+volume of 100% is recommended for testing, distortion may occur. Lowering
+this level to 75% to 85% may result in better audio quality.</P>
+<P>Master mixer - sets the level for the analog signal sent to line-out or the
+speakers.</P>
+<P>You may also want to ensure that <CODE>/dev/dsp</CODE> hasn't already been
+grabbed by another process, like <B>esd</B>.  If <CODE>/dev/dsp</CODE> isn't
+available, then mythtv won't work.</P>
+
+<HR>
+<A HREF="mythtv-HOWTO-18.html">Next</A>
+<A HREF="mythtv-HOWTO-16.html">Previous</A>
+<A HREF="mythtv-HOWTO.html#toc17">Contents</A>
+</BODY>
+</HTML>
