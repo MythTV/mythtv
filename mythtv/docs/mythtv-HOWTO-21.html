@@ -233,12 +233,12 @@ $ mysql -u mythtv -pmythtv mythconverg &lt; mythtv_backup.sql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>You may need to alter the mysql permissions if this database is being shared
+<P>You may need to alter the MySQL permissions if this database is being shared
 with multiple systems.  See the 
 <A HREF="mythtv-HOWTO-6.html#modify_perm_mysql">Modifying access to the MySQL database for multiple systems</A> section for more
 information.</P>
 
-<H2><A NAME="ss21.6">21.6</A> <A HREF="mythtv-HOWTO.html#toc21.6">I'd like to delete the mysql database.</A>
+<H2><A NAME="ss21.6">21.6</A> <A HREF="mythtv-HOWTO.html#toc21.6">I'd like to delete the MySQL database.</A>
 </H2>
 
 <P><B>NOTE</B>:  Performing this step will remove the entire database. 
@@ -300,20 +300,29 @@ what's going on.</P>
 
 <P>If <B>mythfilldatabase</B> grabbed a channel which you do not want to
 include in your TV listings, you can remove the entries from the xmltv
-config file and the mysql database.  This often happens with premium
+config file and the MySQL database.  This often happens with premium
 channels; for example, HBO or Showtime may be available on your cable TV
 system, but is scrambled because you're not a subscriber to that channel. 
 Since you can never watch it, you want to get rid of it.</P>
-<P>First, comment out the channel from the &nbsp;/.mythtv/&lt;sourcename&gt;.xmltv file by
-inserting a "#" in front of the unwanted entry. This will prevent
-<B>mythfilldatabase</B> from grabbing future listings.</P>
+<P>First, comment out the channel from the &nbsp;/.mythtv/&lt;sourcename&gt;.xmltv
+file by inserting the word "not " (including the space) in front of the
+unwanted entry. This will prevent <B>xmltv</B> from grabbing future
+listings.</P>
 <P>Next, delete the unwanted item from the channel table so that it will not
-appear in the EPG or when changing channels.  The channels will always have
-"1000" added to them, so for example, assuming that HBO is channel 15:
+appear in the EPG or when changing channels.  To delete the data from the
+database we need to perform some steps.  First, assuming that HBO is channel
+15, we need to find out the internal <CODE>chanid</CODE> used by MySQL:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mysql -u root mythconverg
-mysql> delete from channel where chanid = '1015';
+mysql> select chanid from channel where channum=15;
++--------+
+| chanid |
++--------+
+|   1015 |
++--------+
+1 row in set (0.00 sec)
+mysql> delete from channel where chanid = 1015;
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -323,7 +332,7 @@ has been removed:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mysql -u root mythconverg
-mysql> delete from program where chanid = '1015';
+mysql> delete from program where chanid = 1015;
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>

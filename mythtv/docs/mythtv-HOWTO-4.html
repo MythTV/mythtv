@@ -141,34 +141,15 @@ whenever you run setup or mythfilldatabase you will get a lot of UTF-8
 warnings. There is an 
 <A HREF="http://membled.com/work/patches/DateManip/">http://membled.com/work/patches/DateManip/</A> updated version of
 Date::Manip at the XMLTV site fixing this and other XMLTV related
-# bugs.</P>
+bugs.</P>
 
 <H3>Debian</H3>
 
 <P>Debian source packages are available from the same place as the
 binary packages.  These can be used to build customized packages, and
-to automatically satisfy MythTV's build-time dependencies.</P>
-<P>
+to automatically satisfy MythTV's build-time dependencies.
 <BLOCKQUOTE><CODE>
 <PRE>
-sh-2.05b# apt-get build-dep mythtv
-Reading Package Lists...
-Building Dependency Tree...
-The following NEW packages will be installed:
-  debconf-utils debhelper file fontconfig gettext html2text intltool-debian
-  libaudio2 libexpat1 libfontconfig1 libfontconfig1-dev libfreetype6
-  libfreetype6-dev libglib2.0-0 libjpeg62 libjpeg62-dev liblame-dev liblame0
-  liblcms1 liblcms1-dev libmagic1 libmng-dev libmng1 libmysqlclient-dev
-  libmysqlclient12 libogg-dev libogg0 libpng12-0 libpng12-dev libqt3-headers
-  libqt3-mt-dev libqt3c102-mt libvorbis-dev libvorbis0a libvorbisenc2
-  libvorbisfile3 libxcursor-dev libxcursor1 libxft2 libxft2-dev libxrender-dev
-  libxrender1 mysql-common pkg-config po-debconf qt3-dev-tools xfree86-common
-  xlibmesa-gl-dev xlibmesa-glu-dev xlibmesa3-gl xlibmesa3-glu xlibs xlibs-dev
-  zlib1g-dev
-0 upgraded, 54 newly installed, 0 to remove and 0 not upgraded.
-Need to get 0B/24.0MB of archives.
-After unpacking 78.7MB of additional disk space will be used.
-Do you want to continue? [Y/n] 
 [...]
 sh-2.05b# cd /tmp
 sh-2.05b# apt-get source mythtv

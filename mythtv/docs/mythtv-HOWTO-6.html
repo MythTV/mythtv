@@ -17,11 +17,11 @@
 <H2><A NAME="ss6.1">6.1</A> <A HREF="mythtv-HOWTO.html#toc6.1">Mandrake 9.0</A>
 </H2>
 
-<P>If this is the system maintaining the database, make sure that mysql is
+<P>If this is the system maintaining the database, make sure that MySQL is
 running and started at boot.  Click on Mandrake Control
-Center->System->Services, find mysql and click the "On Boot" button and the
-"Start" button if the mysql status shows that it isn't running yet.</P>
-<P><B>NOTE</B>:  There have been reports that mysql isn't starting at boot.
+Center->System->Services, find MySQL and click the "On Boot" button and the
+"Start" button if the MySQL status shows that it isn't running yet.</P>
+<P><B>NOTE</B>:  There have been reports that MySQL isn't starting at boot.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
@@ -35,7 +35,7 @@ $ su
 <H2><A NAME="ss6.2">6.2</A> <A HREF="mythtv-HOWTO.html#toc6.2">Red Hat Linux</A>
 </H2>
 
-<P>If this is the system maintaining the database, make sure that mysql is
+<P>If this is the system maintaining the database, make sure that MySQL is
 running and started at boot. Click on Redhat menu>Server Settings>Services
 and enter the root password when asked. Check "mysqld" and then click Start.
 Click Save, then close the window.</P>
@@ -51,7 +51,7 @@ Click Save, then close the window.</P>
 <H2><A NAME="ss6.3">6.3</A> <A HREF="mythtv-HOWTO.html#toc6.3">Gentoo</A>
 </H2>
 
-<P>After installing mysql you need to initialize the database by running
+<P>After installing MySQL you need to initialize the database by running
 mysql_install_db as root. </P>
 
 <H2><A NAME="ss6.4">6.4</A> <A HREF="mythtv-HOWTO.html#toc6.4">Setting up the initial database.</A>
@@ -60,7 +60,7 @@ mysql_install_db as root. </P>
 <P>This step is only required on the system maintaining the database, which
 may or may not be one of your MythTV boxes.  If the database is on a
 non-MythTV machine you'll need to copy the <CODE>database/mc.sql</CODE> file to it.</P>
-<P>To setup the initial mysql databases:
+<P>To setup the initial MySQL databases:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cd database
@@ -95,7 +95,7 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 
-<B>NOTE</B>: It is good practice to set a root password for mysql. 
+<B>NOTE</B>: It is good practice to set a root password for MySQL. 
 Instructions for doing so can be found on MySQL's web site at 
 <A HREF="http://www.mysql.com/doc/en/Security.html">http://www.mysql.com/doc/en/Security.html</A>.</P>
 

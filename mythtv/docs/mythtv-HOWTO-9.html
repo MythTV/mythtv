@@ -14,11 +14,23 @@
 <HR>
 <H2><A NAME="Configuring_mythtv"></A> <A NAME="s9">9.</A> <A HREF="mythtv-HOWTO.html#toc9">Configuring MythTV. </A></H2>
 
-<P>By this point, all of the prerequisites have been installed,
+<P>By this point, all of the compile-time prerequisites have been installed,
 <B>mysql</B> is running and has had its initial database setup.  It's now
 time to configure MythTV.</P>
+<P><B>NOTE</B>:  If you're running Debian unstable and you have compiled
+MythTV from source, you will need to install an additional package before
+you will be able to run MythTV.  Execute the following to install the MySQL
+driver for QT.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su -
+# apt-get install libqt3c102-mt-mysql
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
-<H2><A NAME="ss9.1">9.1</A> <A HREF="mythtv-HOWTO.html#toc9.1">Configuring the master backend system.</A>
+<H2><A NAME="ss9.1">9.1</A> <A HREF="mythtv-HOWTO.html#toc9.1">Configuring the Master backend system.</A>
 </H2>
 
 <P>Open a shell and decide where you will store your video files.  By
@@ -41,21 +53,25 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>The first thing to configure is the master backend system.  If you are
-running multiple backend systems, the master backend will make all
+<P>The first thing to configure is the Master backend system.  If you are
+running multiple backend systems, the Master backend will make all
 decisions about which programs will be recorded on which tuners.  If you
 have only one backend, then it will be its own master.</P>
-<P>The master will always choose the first available tuner in the same order as
-you add cards through "setup". In other words, the second card you add will
-only be used when there are two overlapping recordings, the third when there
-are three, and so on. Therefore, you will want to have your largest disk
-space on the master because the tuner on the master will always be the first
-choice. You will then want to add your 
-<A HREF="#nonmaster_backend">other backends</A> in the order of your preference for recording.</P>
-<P>See 
-<A HREF="mythtv-HOWTO-21.html#advanced_backend_config">Advanced Backend Configurations</A> for information on configuring multiple backend systems in
-various ways.</P>
-<P>Because MythTV now uses a database to store most configuration variables,
+<P>The Master backend will always choose the first available tuner in the same
+order as you add cards through "setup". In other words, the second card you
+add will only be used when there are two overlapping recordings, the third
+when there are three, and so on. Therefore, you will want to have the
+greatest amount of disk space on the Master backend because its tuner will
+always be the first choice. You will then want to add your 
+<A HREF="#nonmaster_backend">other backends</A> in the order of your
+preference for recording.</P>
+<P><B>NOTE</B>:  It is possible to <EM>not</EM> have the cards on the Master
+backend be the first ones used.  However, if you are new to MythTV it is
+easier to configure the Master backend first before moving on to the Slaves,
+at least until you become more familiar with the MythTV system.  See 
+<A HREF="mythtv-HOWTO-21.html#advanced_backend_config">Advanced Backend Configurations</A> for
+information on configuring multiple backend systems in various ways.</P>
+<P>Because MythTV now uses a database to store all configuration variables,
 part of the bootstrap of MythTV is to indicate the location of the MySQL
 database server. If the frontend, backend and MySQL database server are all
 going to be running on the same box, you can continue to the next step.  If
@@ -89,12 +105,13 @@ configurations for your capture cards.  Initially, you should say "YES" so
 that there are no surprises later.</P>
 <P>The next question will ask you if you wish to clear out your video source
 information.  You should answer "YES" to this as well.</P>
-<P>Once the graphical setup starts, you'll see that there are four choices.
+<P>Once the graphical setup starts, you'll see that there are five choices.
 <OL>
 <LI>General</LI>
 <LI>Capture Cards</LI>
 <LI>Video Sources</LI>
 <LI>Input Connections</LI>
+<LI>Channel Editor</LI>
 </OL>
 </P>
 <P>Use the arrow keys to move around, and press the space bar to select which

@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-02-06, v0.14.02
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-02-22, v0.14.03
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -19,6 +19,9 @@ necessary.</EM>
 <P>
 <H2><A NAME="toc1">1.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s1">How to obtain this document. </A></H2>
 
+<UL>
+<LI><A NAME="toc1.1">1.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.1">Mailing lists / getting help.</A>
+</UL>
 <P>
 <H2><A NAME="toc2">2.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s2">Introduction.</A></H2>
 
@@ -79,7 +82,7 @@ necessary.</EM>
 <H2><A NAME="toc9">9.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s9">Configuring MythTV. </A></H2>
 
 <UL>
-<LI><A NAME="toc9.1">9.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss9.1">Configuring the master backend system.</A>
+<LI><A NAME="toc9.1">9.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss9.1">Configuring the Master backend system.</A>
 <LI><A NAME="toc9.2">9.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss9.2">Post-configuration.</A>
 <LI><A NAME="toc9.3">9.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss9.3">Configuring a non-master backend. </A>
 <LI><A NAME="toc9.4">9.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss9.4">Configuring and running mythfilldatabase.</A>
@@ -117,7 +120,8 @@ necessary.</EM>
 
 <UL>
 <LI><A NAME="toc13.1">13.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss13.1">Installation and prerequisites.</A>
-<LI><A NAME="toc13.2">13.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss13.2">Importing Pictures</A>
+<LI><A NAME="toc13.2">13.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss13.2">Using MythGallery.</A>
+<LI><A NAME="toc13.3">13.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss13.3">Importing Pictures</A>
 </UL>
 <P>
 <H2><A NAME="toc14">14.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s14">MythGame.</A></H2>
@@ -194,7 +198,7 @@ necessary.</EM>
 <LI><A NAME="toc21.3">21.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.3">What capture resolution should I use?  How does video work?</A>
 <LI><A NAME="toc21.4">21.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.4">MythTV GUI and X Display Sizes.</A>
 <LI><A NAME="toc21.5">21.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.5">I'd like to save or restore my database.</A>
-<LI><A NAME="toc21.6">21.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.6">I'd like to delete the mysql database.</A>
+<LI><A NAME="toc21.6">21.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.6">I'd like to delete the MySQL database.</A>
 <LI><A NAME="toc21.7">21.7</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.7">btaudio </A>
 <LI><A NAME="toc21.8">21.8</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.8">Removing unwanted channels.</A>
 <LI><A NAME="toc21.9">21.9</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss21.9">I'd like to use NFS.</A>
@@ -228,11 +232,18 @@ am <EM>NOT</EM> the author/programmer of the MythTV application!)</P>
 <A HREF="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html">http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html</A> or as a PDF
 at 
 <A HREF="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">http://www.mythtv.org/docs/mythtv-HOWTO.pdf</A>.</P>
+<P>This HOWTO is for MythTV v0.14.</P>
+
+<H2><A NAME="ss1.1">1.1</A> <A HREF="#toc1.1">Mailing lists / getting help.</A>
+</H2>
+
 <P>It's recommended that you join the user list at 
-<A HREF="http://www.mythtv.org/mailman/listinfo/mythtv-users">http://www.mythtv.org/mailman/listinfo/mythtv-users</A>.</P>
+<A HREF="http://www.mythtv.org/mailman/listinfo/mythtv-users">http://www.mythtv.org/mailman/listinfo/mythtv-users</A>.  The developer
+list is at 
+<A HREF="http://mythtv.org/cgi-bin/mailman/listinfo/mythtv-dev">http://mythtv.org/cgi-bin/mailman/listinfo/mythtv-dev</A>.  Please keep
+the developer list strictly for development-related issues.</P>
 <P>Searchable archives for the lists are available at 
 <A HREF="http://www.gossamer-threads.com/archive/MythTV_C2/">http://www.gossamer-threads.com/archive/MythTV_C2/</A>.</P>
-<P>This HOWTO is for MythTV v0.14.</P>
 
 <H2><A NAME="s2">2.</A> <A HREF="#toc2">Introduction.</A></H2>
 
@@ -306,13 +317,14 @@ Rewind functions for live TV requires more CPU then just encoding or
 decoding.  MythTV also supports multiple encoder cards in a single PC,
 thereby increasing the CPU requirements if you plan on simultaneously
 encoding multiple programs.  As a general guideline, plan on 1GHz per
-encoder.</P>
+encoder if you are doing software-based encoding, less if you are using a
+hardware-based encoder.</P>
 <P>Here are a few data points:
 <UL>
 <LI>A PIII/733MHz system can encode one video stream using the MPEG-4
 codec using 480x480 capture resolution.  This does not allow for live TV
 watching, but does allow for encoding video and then watching it later.</LI>
-<LI>The developer states that his AMD1800+ system can <B>almost</B>
+<LI>A developer states that his AMD1800+ system can <B>almost</B>
 encode two MPEG-4 video streams and watch one program simultaneously.</LI>
 <LI>A PIII/800MHz system with 512MB RAM can encode one video
 stream using the RTjpeg codec with 480x480 capture resolution and play it back
@@ -365,7 +377,7 @@ filesystem that will allow you to create large files.  Filesystems known to
 have problems with large files are FAT and FAT32.</P>
 <P>Because of the size of these files, it may be useful to plan for future
 expansion right from the beginning.  If your case and power supply have the
-capability for additional hard drives, read through the 
+capacity for additional hard drives, read through the 
 <A HREF="#LVM">LVM</A> and 
 <A HREF="#advancedpartitionformatting">Advanced Partition Formatting</A> sections for some pointers.</P>
 <P>
@@ -422,8 +434,8 @@ the bttv modules by typing:
 <P>You want to see the <CODE>bttv</CODE> module listed.</P>
 <H3>Hardware MPEG-2 encoders.</H3>
 
-<P>While inexpensive video-capture cards just capture raw frames, leaving
-encoding to software, some higher-end cards incorporate hardware-level
+<P>While inexpensive video-capture cards simply capture raw frames, leaving
+encoding to software, some higher-end cards incorporate hardware-based
 encoding. Using either a G200 MJPEG encoder card, or a MPEG-2 encoder card
 supported by the IvyTV project 
 <A HREF="http://ivtv.sourceforge.net/">http://ivtv.sourceforge.net/</A> such as the Hauppauge PVR-250, PVR-350,
@@ -474,6 +486,17 @@ to operate in the United States - the card available from
 only be used to capture over-the-air HDTV.  There are no known capture
 devices which will allow you to capture the HDTV output from a set-top box
 commonly found with digital cable systems or satellite systems.</P>
+<P>To playback HDTV content, plan on a powerful CPU.  "How powerful?" depends
+on a number of factors, such as the capture resolution, whether the video is
+progressive or interlaced, and whether your display card has hardware-assist
+support for Linux. For 720p content (1280x720), a 2.4GHz P4 should be
+sufficient.</P>
+<P>For 1920x1080i->1920x1080p with the better deinterlacing methods
+done in real time a 2.4GHz CPU is taxed, but should work if you use "Bob and
+Weave" deinterlacing, or if you have an NVIDIA card with MPEG-2 hardware
+accelleration.  If you enable the hardware accelleration, you may be able to
+use a 1.8GHz processor.</P>
+
 <H3>Hardware known NOT to work and other issues.</H3>
 
 <P>
@@ -838,7 +861,7 @@ installed.</P>
 <P>Click the magnifying glass or press <B>CTRL-F</B> and enter "perl" as your
 search term.  You should find it under the "Perl" folder.  You need at least
 the perl 5.80 base package installed.  If not, click on the "Mark" button.</P>
-<P>If you are going to be installing mysql on this system, search for mysql -
+<P>If you are going to be installing MySQL on this system, search for mysql -
 it should be under "Databases".  Make sure that mysql and mysql-clients are
 installed.  If not, click on "Mark".</P>
 <P>Search for gcc.  You're going to need gcc and gcc-c++ installed.</P>
@@ -935,7 +958,7 @@ described in the Gentoo section then you also need to install lame.
 </CODE></BLOCKQUOTE>
 </P>
 <P>If you have already installed Qt: you will need to rebuild because the
-default installation doesn't include mysql support, a requirement for MythTV.  
+default installation doesn't include MySQL support, a requirement for MythTV.  
 To enable SQL support, add "mysql" to your USE variable in 
 <CODE>/etc/make.conf</CODE> and rebuild Qt by running
 <BLOCKQUOTE><CODE>
@@ -946,7 +969,48 @@ To enable SQL support, add "mysql" to your USE variable in
 </P>
 <P>All the necessary files will be downloaded and built. Even on a fast machine
 this may take a lot of time if you need to do a full Qt build.</P>
+<H3>Debian.</H3>
 
+<P>See 
+<A HREF="http://dijkstra.csh.rit.edu/~mdz/debian/dists/unstable/mythtv/">http://dijkstra.csh.rit.edu/~mdz/debian/dists/unstable/mythtv/</A> for
+up-to-date information for Debian.</P>
+<P>Build-dependencies for MythTV can be satisfied by adding the following to
+your <CODE>/etc/apt/sources.list</CODE>
+<BLOCKQUOTE><CODE>
+<PRE>
+# MythTV
+deb http://dijkstra.csh.rit.edu/~mdz/debian unstable mythtv
+deb-src http://dijkstra.csh.rit.edu/~mdz/debian unstable mythtv
+
+# Christian Marillat's packages (mplayer, lame)
+deb ftp://ftp.nerim.net/debian-marillat/ unstable main
+</PRE>
+</CODE></BLOCKQUOTE>
+
+and executing:
+<BLOCKQUOTE><CODE>
+<PRE>
+sh-2.05b# apt-get build-dep mythtv
+Reading Package Lists...
+Building Dependency Tree...
+The following NEW packages will be installed:
+  debconf-utils debhelper file fontconfig gettext html2text intltool-debian
+  libaudio2 libexpat1 libfontconfig1 libfontconfig1-dev libfreetype6
+  libfreetype6-dev libglib2.0-0 libjpeg62 libjpeg62-dev liblame-dev liblame0
+  liblcms1 liblcms1-dev libmagic1 libmng-dev libmng1 libmysqlclient-dev
+  libmysqlclient12 libogg-dev libogg0 libpng12-0 libpng12-dev libqt3-headers
+  libqt3-mt-dev libqt3c102-mt libvorbis-dev libvorbis0a libvorbisenc2
+  libvorbisfile3 libxcursor-dev libxcursor1 libxft2 libxft2-dev libxrender-dev
+  libxrender1 mysql-common pkg-config po-debconf qt3-dev-tools xfree86-common
+  xlibmesa-gl-dev xlibmesa-glu-dev xlibmesa3-gl xlibmesa3-glu xlibs xlibs-dev
+  zlib1g-dev
+0 upgraded, 54 newly installed, 0 to remove and 0 not upgraded.
+Need to get 0B/24.0MB of archives.
+After unpacking 78.7MB of additional disk space will be used.
+Do you want to continue? [Y/n] 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 <H2><A NAME="Setting_up_paths"></A> <A NAME="s4">4.</A> <A HREF="#toc4">System Configuration Requirements for Compiling MythTV </A></H2>
 
 <P>Before you compile MythTV from the current source tarball or from CVS, you 
@@ -1076,34 +1140,15 @@ whenever you run setup or mythfilldatabase you will get a lot of UTF-8
 warnings. There is an 
 <A HREF="http://membled.com/work/patches/DateManip/">http://membled.com/work/patches/DateManip/</A> updated version of
 Date::Manip at the XMLTV site fixing this and other XMLTV related
-# bugs.</P>
+bugs.</P>
 
 <H3>Debian</H3>
 
 <P>Debian source packages are available from the same place as the
 binary packages.  These can be used to build customized packages, and
-to automatically satisfy MythTV's build-time dependencies.</P>
-<P>
+to automatically satisfy MythTV's build-time dependencies.
 <BLOCKQUOTE><CODE>
 <PRE>
-sh-2.05b# apt-get build-dep mythtv
-Reading Package Lists...
-Building Dependency Tree...
-The following NEW packages will be installed:
-  debconf-utils debhelper file fontconfig gettext html2text intltool-debian
-  libaudio2 libexpat1 libfontconfig1 libfontconfig1-dev libfreetype6
-  libfreetype6-dev libglib2.0-0 libjpeg62 libjpeg62-dev liblame-dev liblame0
-  liblcms1 liblcms1-dev libmagic1 libmng-dev libmng1 libmysqlclient-dev
-  libmysqlclient12 libogg-dev libogg0 libpng12-0 libpng12-dev libqt3-headers
-  libqt3-mt-dev libqt3c102-mt libvorbis-dev libvorbis0a libvorbisenc2
-  libvorbisfile3 libxcursor-dev libxcursor1 libxft2 libxft2-dev libxrender-dev
-  libxrender1 mysql-common pkg-config po-debconf qt3-dev-tools xfree86-common
-  xlibmesa-gl-dev xlibmesa-glu-dev xlibmesa3-gl xlibmesa3-glu xlibs xlibs-dev
-  zlib1g-dev
-0 upgraded, 54 newly installed, 0 to remove and 0 not upgraded.
-Need to get 0B/24.0MB of archives.
-After unpacking 78.7MB of additional disk space will be used.
-Do you want to continue? [Y/n] 
 [...]
 sh-2.05b# cd /tmp
 sh-2.05b# apt-get source mythtv
@@ -1490,8 +1535,8 @@ and a frontend.  However, you <EM>will</EM> need to install the database
 access libraries.</P>
 <P>Once MythTV is compiled and installed, you must change your
 <CODE>/usr/local/share/mythtv/mysql.txt</CODE> or <CODE>~/.mythtv/mysql.txt</CODE>
-file's "DBHostName" field to point to your master backend's IP address.</P>
-<P>Run the MythTV setup program on your master backend. Under the "General"
+file's "DBHostName" field to point to your Master backend's IP address.</P>
+<P>Run the MythTV setup program on your Master backend. Under the "General"
 menu, change the IP address of the current machine (by default, "127.0.0.1")
 to the real external IP address - 127.0.0.1 is the loopback address and no
 external machine can access it. Change the Master Server IP setting to the
@@ -1522,11 +1567,11 @@ Add mysql to your USE variable.  i.e. <CODE>USE="mysql ...."</CODE>
 <H2><A NAME="ss6.1">6.1</A> <A HREF="#toc6.1">Mandrake 9.0</A>
 </H2>
 
-<P>If this is the system maintaining the database, make sure that mysql is
+<P>If this is the system maintaining the database, make sure that MySQL is
 running and started at boot.  Click on Mandrake Control
-Center->System->Services, find mysql and click the "On Boot" button and the
-"Start" button if the mysql status shows that it isn't running yet.</P>
-<P><B>NOTE</B>:  There have been reports that mysql isn't starting at boot.
+Center->System->Services, find MySQL and click the "On Boot" button and the
+"Start" button if the MySQL status shows that it isn't running yet.</P>
+<P><B>NOTE</B>:  There have been reports that MySQL isn't starting at boot.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
@@ -1540,7 +1585,7 @@ $ su
 <H2><A NAME="ss6.2">6.2</A> <A HREF="#toc6.2">Red Hat Linux</A>
 </H2>
 
-<P>If this is the system maintaining the database, make sure that mysql is
+<P>If this is the system maintaining the database, make sure that MySQL is
 running and started at boot. Click on Redhat menu>Server Settings>Services
 and enter the root password when asked. Check "mysqld" and then click Start.
 Click Save, then close the window.</P>
@@ -1556,7 +1601,7 @@ Click Save, then close the window.</P>
 <H2><A NAME="ss6.3">6.3</A> <A HREF="#toc6.3">Gentoo</A>
 </H2>
 
-<P>After installing mysql you need to initialize the database by running
+<P>After installing MySQL you need to initialize the database by running
 mysql_install_db as root. </P>
 
 <H2><A NAME="ss6.4">6.4</A> <A HREF="#toc6.4">Setting up the initial database.</A>
@@ -1565,7 +1610,7 @@ mysql_install_db as root. </P>
 <P>This step is only required on the system maintaining the database, which
 may or may not be one of your MythTV boxes.  If the database is on a
 non-MythTV machine you'll need to copy the <CODE>database/mc.sql</CODE> file to it.</P>
-<P>To setup the initial mysql databases:
+<P>To setup the initial MySQL databases:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cd database
@@ -1600,7 +1645,7 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 
-<B>NOTE</B>: It is good practice to set a root password for mysql. 
+<B>NOTE</B>: It is good practice to set a root password for MySQL. 
 Instructions for doing so can be found on MySQL's web site at 
 <A HREF="http://www.mysql.com/doc/en/Security.html">http://www.mysql.com/doc/en/Security.html</A>.</P>
 
@@ -2464,11 +2509,23 @@ the IRDA device within a few feet of the box.</P>
 
 <H2><A NAME="Configuring_mythtv"></A> <A NAME="s9">9.</A> <A HREF="#toc9">Configuring MythTV. </A></H2>
 
-<P>By this point, all of the prerequisites have been installed,
+<P>By this point, all of the compile-time prerequisites have been installed,
 <B>mysql</B> is running and has had its initial database setup.  It's now
 time to configure MythTV.</P>
+<P><B>NOTE</B>:  If you're running Debian unstable and you have compiled
+MythTV from source, you will need to install an additional package before
+you will be able to run MythTV.  Execute the following to install the MySQL
+driver for QT.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su -
+# apt-get install libqt3c102-mt-mysql
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
-<H2><A NAME="ss9.1">9.1</A> <A HREF="#toc9.1">Configuring the master backend system.</A>
+<H2><A NAME="ss9.1">9.1</A> <A HREF="#toc9.1">Configuring the Master backend system.</A>
 </H2>
 
 <P>Open a shell and decide where you will store your video files.  By
@@ -2491,21 +2548,25 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>The first thing to configure is the master backend system.  If you are
-running multiple backend systems, the master backend will make all
+<P>The first thing to configure is the Master backend system.  If you are
+running multiple backend systems, the Master backend will make all
 decisions about which programs will be recorded on which tuners.  If you
 have only one backend, then it will be its own master.</P>
-<P>The master will always choose the first available tuner in the same order as
-you add cards through "setup". In other words, the second card you add will
-only be used when there are two overlapping recordings, the third when there
-are three, and so on. Therefore, you will want to have your largest disk
-space on the master because the tuner on the master will always be the first
-choice. You will then want to add your 
-<A HREF="#nonmaster_backend">other backends</A> in the order of your preference for recording.</P>
-<P>See 
-<A HREF="#advanced_backend_config">Advanced Backend Configurations</A> for information on configuring multiple backend systems in
-various ways.</P>
-<P>Because MythTV now uses a database to store most configuration variables,
+<P>The Master backend will always choose the first available tuner in the same
+order as you add cards through "setup". In other words, the second card you
+add will only be used when there are two overlapping recordings, the third
+when there are three, and so on. Therefore, you will want to have the
+greatest amount of disk space on the Master backend because its tuner will
+always be the first choice. You will then want to add your 
+<A HREF="#nonmaster_backend">other backends</A> in the order of your
+preference for recording.</P>
+<P><B>NOTE</B>:  It is possible to <EM>not</EM> have the cards on the Master
+backend be the first ones used.  However, if you are new to MythTV it is
+easier to configure the Master backend first before moving on to the Slaves,
+at least until you become more familiar with the MythTV system.  See 
+<A HREF="#advanced_backend_config">Advanced Backend Configurations</A> for
+information on configuring multiple backend systems in various ways.</P>
+<P>Because MythTV now uses a database to store all configuration variables,
 part of the bootstrap of MythTV is to indicate the location of the MySQL
 database server. If the frontend, backend and MySQL database server are all
 going to be running on the same box, you can continue to the next step.  If
@@ -2539,12 +2600,13 @@ configurations for your capture cards.  Initially, you should say "YES" so
 that there are no surprises later.</P>
 <P>The next question will ask you if you wish to clear out your video source
 information.  You should answer "YES" to this as well.</P>
-<P>Once the graphical setup starts, you'll see that there are four choices.
+<P>Once the graphical setup starts, you'll see that there are five choices.
 <OL>
 <LI>General</LI>
 <LI>Capture Cards</LI>
 <LI>Video Sources</LI>
 <LI>Input Connections</LI>
+<LI>Channel Editor</LI>
 </OL>
 </P>
 <P>Use the arrow keys to move around, and press the space bar to select which
@@ -2821,11 +2883,12 @@ other editor that you're comfortable with.  You may also add the
 <H2><A NAME="s10">10.</A> <A HREF="#toc10">Configuring mythfrontend.</A></H2>
 
 <P>Once you have completed configuration of your backend systems, the next
-step is to configure the frontend client.  You should run the MythTV setup
-program before using any other modules such as MythMusic, etc. to correctly
-initialize the database.</P>
+step is to configure the frontend client.  </P>
 <P>When you start mythfrontend, you should have a number of choices.  Before
 doing anything, go to TV, then to Setup and configure the frontend client.</P>
+<P><B>NOTE</B>:  You should go through the various setup screens in
+mythfrontend before using any other modules such as MythMusic, etc. to
+correctly initialize the database.</P>
 
 <H2><A NAME="ss10.1">10.1</A> <A HREF="#toc10.1">General</A>
 </H2>
@@ -3505,8 +3568,32 @@ in mythfrontend.  Make sure you set your pictures directory to wherever
 you're storing your photos.</P>
 <P>The controls for MythGallery can be found in the README that comes with the
 application.</P>
+<H2><A NAME="ss13.2">13.2</A> <A HREF="#toc13.2">Using MythGallery.</A>
+</H2>
 
-<H2><A NAME="ss13.2">13.2</A> <A HREF="#toc13.2">Importing Pictures</A>
+<P>When you first start MythGallery, you will see a thumbnail view of any
+folders and pictures in the Gallery Directory you specified in setup.  If
+this is the first time you have accessed this directoy, the thumbnails will
+be generated on the fly.  If the Gallery Dir is writable, these thumbnails
+will be cached thus speeding up future access.  On the left is a greyed-out
+menu of options.</P>
+<P>Use the arrow keys to select a folder or picture to open/view with the
+Select key, or use the Menu key to toggle access the menu on the left.  The
+menu options are as follows:
+<UL>
+<LI> Slideshow - Will cycle through all the pictures in the current folder. 
+The currently selected item must be a picture (not a folder) for this to
+work.  It does not currently traverse subfolders.</LI>
+<LI> Rotate CW - Rotate the current image 90 degress in the clockwise
+direction.  This change persists if the current directory is writable.</LI>
+<LI> Rotate CCW - As above except the direction of rotation is counter(anti)
+clockwise.</LI>
+<LI> Import - Import pictures into you Gallery Dir.  This option is
+described in the next section.</LI>
+<LI> Settings - Access the MythGallery settings screen.</LI>
+</UL>
+</P>
+<H2><A NAME="ss13.3">13.3</A> <A HREF="#toc13.3">Importing Pictures</A>
 </H2>
 
 <P>The import path in the setup dialog is a colon separated list of
@@ -4784,12 +4871,12 @@ $ mysql -u mythtv -pmythtv mythconverg &lt; mythtv_backup.sql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>You may need to alter the mysql permissions if this database is being shared
+<P>You may need to alter the MySQL permissions if this database is being shared
 with multiple systems.  See the 
 <A HREF="#modify_perm_mysql">Modifying access to the MySQL database for multiple systems</A> section for more
 information.</P>
 
-<H2><A NAME="ss21.6">21.6</A> <A HREF="#toc21.6">I'd like to delete the mysql database.</A>
+<H2><A NAME="ss21.6">21.6</A> <A HREF="#toc21.6">I'd like to delete the MySQL database.</A>
 </H2>
 
 <P><B>NOTE</B>:  Performing this step will remove the entire database. 
@@ -4851,20 +4938,29 @@ what's going on.</P>
 
 <P>If <B>mythfilldatabase</B> grabbed a channel which you do not want to
 include in your TV listings, you can remove the entries from the xmltv
-config file and the mysql database.  This often happens with premium
+config file and the MySQL database.  This often happens with premium
 channels; for example, HBO or Showtime may be available on your cable TV
 system, but is scrambled because you're not a subscriber to that channel. 
 Since you can never watch it, you want to get rid of it.</P>
-<P>First, comment out the channel from the &nbsp;/.mythtv/&lt;sourcename&gt;.xmltv file by
-inserting a "#" in front of the unwanted entry. This will prevent
-<B>mythfilldatabase</B> from grabbing future listings.</P>
+<P>First, comment out the channel from the &nbsp;/.mythtv/&lt;sourcename&gt;.xmltv
+file by inserting the word "not " (including the space) in front of the
+unwanted entry. This will prevent <B>xmltv</B> from grabbing future
+listings.</P>
 <P>Next, delete the unwanted item from the channel table so that it will not
-appear in the EPG or when changing channels.  The channels will always have
-"1000" added to them, so for example, assuming that HBO is channel 15:
+appear in the EPG or when changing channels.  To delete the data from the
+database we need to perform some steps.  First, assuming that HBO is channel
+15, we need to find out the internal <CODE>chanid</CODE> used by MySQL:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mysql -u root mythconverg
-mysql> delete from channel where chanid = '1015';
+mysql> select chanid from channel where channum=15;
++--------+
+| chanid |
++--------+
+|   1015 |
++--------+
+1 row in set (0.00 sec)
+mysql> delete from channel where chanid = 1015;
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -4874,7 +4970,7 @@ has been removed:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mysql -u root mythconverg
-mysql> delete from program where chanid = '1015';
+mysql> delete from program where chanid = 1015;
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -5985,28 +6081,7 @@ useful.</P>
 <P>With Ext3, your biggest gain is that in case of a crash and reboot you
 don't have to wait very long for your partition to be remounted.  With Ext2,
 the <B>fsck</B> may take a long time to run on multi-gigabyte partitions.</P>
-<P>When formatting the partition, the following command line should be better
-than the default.  This example assumes that <CODE>/dev/hdb1</CODE> has already
-been created using <B>fdisk</B>.  If you're using LVM, <CODE>/dev/hdb1</CODE>
-may be something like <CODE>/dev/VGforMyth/video</CODE>.
-<BLOCKQUOTE><CODE>
-<PRE>
-# mkfs.ext3 -T largefile4 -m 0 /dev/hdb1
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>The "-T largefile4" option creates one inode per 4 megabytes.  The "-m 0"
-(zero, not "oh") parameter sets the amount of spaced reserved for root to
-zero. By default, this is 5%, which on a multi-gigabyte drive is a lot of
-reserved space.</P>
-<P>You may also modify some aspects of a filesystem such as the reserved block
-percentage after it has been created using the <B>tune2fs</B> program:
-<BLOCKQUOTE><CODE>
-<PRE>
-# tune2fs -m 0 /dev/hdb1
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
+
 <P>You can check on your filesystem using the <B>dumpe2fs</B> program.  See
 the <B>man</B> page for details.</P>
 </BODY>

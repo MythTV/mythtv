@@ -62,13 +62,14 @@ Rewind functions for live TV requires more CPU then just encoding or
 decoding.  MythTV also supports multiple encoder cards in a single PC,
 thereby increasing the CPU requirements if you plan on simultaneously
 encoding multiple programs.  As a general guideline, plan on 1GHz per
-encoder.</P>
+encoder if you are doing software-based encoding, less if you are using a
+hardware-based encoder.</P>
 <P>Here are a few data points:
 <UL>
 <LI>A PIII/733MHz system can encode one video stream using the MPEG-4
 codec using 480x480 capture resolution.  This does not allow for live TV
 watching, but does allow for encoding video and then watching it later.</LI>
-<LI>The developer states that his AMD1800+ system can <B>almost</B>
+<LI>A developer states that his AMD1800+ system can <B>almost</B>
 encode two MPEG-4 video streams and watch one program simultaneously.</LI>
 <LI>A PIII/800MHz system with 512MB RAM can encode one video
 stream using the RTjpeg codec with 480x480 capture resolution and play it back
@@ -121,7 +122,7 @@ filesystem that will allow you to create large files.  Filesystems known to
 have problems with large files are FAT and FAT32.</P>
 <P>Because of the size of these files, it may be useful to plan for future
 expansion right from the beginning.  If your case and power supply have the
-capability for additional hard drives, read through the 
+capacity for additional hard drives, read through the 
 <A HREF="mythtv-HOWTO-22.html#LVM">LVM</A> and 
 <A HREF="mythtv-HOWTO-22.html#advancedpartitionformatting">Advanced Partition Formatting</A> sections for some pointers.</P>
 <P>
@@ -178,8 +179,8 @@ the bttv modules by typing:
 <P>You want to see the <CODE>bttv</CODE> module listed.</P>
 <H3>Hardware MPEG-2 encoders.</H3>
 
-<P>While inexpensive video-capture cards just capture raw frames, leaving
-encoding to software, some higher-end cards incorporate hardware-level
+<P>While inexpensive video-capture cards simply capture raw frames, leaving
+encoding to software, some higher-end cards incorporate hardware-based
 encoding. Using either a G200 MJPEG encoder card, or a MPEG-2 encoder card
 supported by the IvyTV project 
 <A HREF="http://ivtv.sourceforge.net/">http://ivtv.sourceforge.net/</A> such as the Hauppauge PVR-250, PVR-350,
@@ -230,6 +231,17 @@ to operate in the United States - the card available from
 only be used to capture over-the-air HDTV.  There are no known capture
 devices which will allow you to capture the HDTV output from a set-top box
 commonly found with digital cable systems or satellite systems.</P>
+<P>To playback HDTV content, plan on a powerful CPU.  "How powerful?" depends
+on a number of factors, such as the capture resolution, whether the video is
+progressive or interlaced, and whether your display card has hardware-assist
+support for Linux. For 720p content (1280x720), a 2.4GHz P4 should be
+sufficient.</P>
+<P>For 1920x1080i->1920x1080p with the better deinterlacing methods
+done in real time a 2.4GHz CPU is taxed, but should work if you use "Bob and
+Weave" deinterlacing, or if you have an NVIDIA card with MPEG-2 hardware
+accelleration.  If you enable the hardware accelleration, you may be able to
+use a 1.8GHz processor.</P>
+
 <H3>Hardware known NOT to work and other issues.</H3>
 
 <P>
@@ -594,7 +606,7 @@ installed.</P>
 <P>Click the magnifying glass or press <B>CTRL-F</B> and enter "perl" as your
 search term.  You should find it under the "Perl" folder.  You need at least
 the perl 5.80 base package installed.  If not, click on the "Mark" button.</P>
-<P>If you are going to be installing mysql on this system, search for mysql -
+<P>If you are going to be installing MySQL on this system, search for mysql -
 it should be under "Databases".  Make sure that mysql and mysql-clients are
 installed.  If not, click on "Mark".</P>
 <P>Search for gcc.  You're going to need gcc and gcc-c++ installed.</P>
@@ -691,7 +703,7 @@ described in the Gentoo section then you also need to install lame.
 </CODE></BLOCKQUOTE>
 </P>
 <P>If you have already installed Qt: you will need to rebuild because the
-default installation doesn't include mysql support, a requirement for MythTV.  
+default installation doesn't include MySQL support, a requirement for MythTV.  
 To enable SQL support, add "mysql" to your USE variable in 
 <CODE>/etc/make.conf</CODE> and rebuild Qt by running
 <BLOCKQUOTE><CODE>
@@ -702,7 +714,48 @@ To enable SQL support, add "mysql" to your USE variable in
 </P>
 <P>All the necessary files will be downloaded and built. Even on a fast machine
 this may take a lot of time if you need to do a full Qt build.</P>
+<H3>Debian.</H3>
 
+<P>See 
+<A HREF="http://dijkstra.csh.rit.edu/~mdz/debian/dists/unstable/mythtv/">http://dijkstra.csh.rit.edu/~mdz/debian/dists/unstable/mythtv/</A> for
+up-to-date information for Debian.</P>
+<P>Build-dependencies for MythTV can be satisfied by adding the following to
+your <CODE>/etc/apt/sources.list</CODE>
+<BLOCKQUOTE><CODE>
+<PRE>
+# MythTV
+deb http://dijkstra.csh.rit.edu/~mdz/debian unstable mythtv
+deb-src http://dijkstra.csh.rit.edu/~mdz/debian unstable mythtv
+
+# Christian Marillat's packages (mplayer, lame)
+deb ftp://ftp.nerim.net/debian-marillat/ unstable main
+</PRE>
+</CODE></BLOCKQUOTE>
+
+and executing:
+<BLOCKQUOTE><CODE>
+<PRE>
+sh-2.05b# apt-get build-dep mythtv
+Reading Package Lists...
+Building Dependency Tree...
+The following NEW packages will be installed:
+  debconf-utils debhelper file fontconfig gettext html2text intltool-debian
+  libaudio2 libexpat1 libfontconfig1 libfontconfig1-dev libfreetype6
+  libfreetype6-dev libglib2.0-0 libjpeg62 libjpeg62-dev liblame-dev liblame0
+  liblcms1 liblcms1-dev libmagic1 libmng-dev libmng1 libmysqlclient-dev
+  libmysqlclient12 libogg-dev libogg0 libpng12-0 libpng12-dev libqt3-headers
+  libqt3-mt-dev libqt3c102-mt libvorbis-dev libvorbis0a libvorbisenc2
+  libvorbisfile3 libxcursor-dev libxcursor1 libxft2 libxft2-dev libxrender-dev
+  libxrender1 mysql-common pkg-config po-debconf qt3-dev-tools xfree86-common
+  xlibmesa-gl-dev xlibmesa-glu-dev xlibmesa3-gl xlibmesa3-glu xlibs xlibs-dev
+  zlib1g-dev
+0 upgraded, 54 newly installed, 0 to remove and 0 not upgraded.
+Need to get 0B/24.0MB of archives.
+After unpacking 78.7MB of additional disk space will be used.
+Do you want to continue? [Y/n] 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 <HR>
 <A HREF="mythtv-HOWTO-4.html">Next</A>
 <A HREF="mythtv-HOWTO-2.html">Previous</A>
