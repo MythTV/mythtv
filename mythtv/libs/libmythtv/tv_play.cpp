@@ -824,7 +824,7 @@ void TV::ProcessKeypress(int keypressed)
             case '5': case '6': case '7': case '8': case '9':
                      ChannelKey(keypressed); break;
 
-            case wsEnter: ChannelCommit(); break;
+            case ' ': case wsEnter: case wsReturn: ChannelCommit(); break;
 
             case 'M': case 'm': LoadMenu(); break;
 

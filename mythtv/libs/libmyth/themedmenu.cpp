@@ -690,6 +690,7 @@ void ThemedMenu::parseThemeButton(QDomElement &element)
     QString type = "";
     QString text = "";
     QString action = "";
+    QString alttext = "";
 
     bool addit = true;
 
@@ -706,6 +707,10 @@ void ThemedMenu::parseThemeButton(QDomElement &element)
             else if (info.tagName() == "text")
             {
                 text = getFirstText(info);
+            }
+            else if (info.tagName() == "alttext")
+            {
+                alttext = getFirstText(info);
             }
             else if (info.tagName() == "action")
             {
@@ -736,7 +741,7 @@ void ThemedMenu::parseThemeButton(QDomElement &element)
     }
 
     if (addit)
-        addButton(type, text, action);
+        addButton(type, text, alttext, action);
 }
 
 void ThemedMenu::parseMenu(QString menuname)
@@ -842,7 +847,8 @@ QRect ThemedMenu::parseRect(QString text)
     return retval;
 }
 
-void ThemedMenu::addButton(QString &type, QString &text, QString &action)
+void ThemedMenu::addButton(QString &type, QString &text, QString &alttext,
+                           QString &action)
 {
     ThemedButton newbutton;
 
@@ -851,6 +857,7 @@ void ThemedMenu::addButton(QString &type, QString &text, QString &action)
         newbutton.buttonicon = &(allButtonIcons[type]);
 
     newbutton.text = text;
+    newbutton.altText = alttext;
     newbutton.action = action;
     newbutton.status = -1;
 
@@ -1088,6 +1095,17 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased)
     QRect buttonTextRect = textRect;
     buttonTextRect.moveBy(newRect.x(), newRect.y());
 
+    QString message = buttonList[button].text;
+
+    QRect testBound = tmp.boundingRect(buttonTextRect, textflags, 
+                                       message);
+
+    if (testBound.height() > buttonTextRect.height() && 
+        buttonList[button].altText != "")
+    {
+        message = buttonList[button].altText;
+    }
+
     if (hasshadow && shadowalpha > 0)
     {
         QPixmap textpix(buttonTextRect.size());
@@ -1101,13 +1119,13 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased)
         texttmp.begin(&textpix, this);
         texttmp.setPen(QPen(shadowColor, 1));
         texttmp.setFont(font);
-        texttmp.drawText(myrect, textflags, buttonList[button].text);
+        texttmp.drawText(myrect, textflags, message);
         texttmp.end();
 
         texttmp.begin(textpix.mask());
         texttmp.setPen(QPen(Qt::color1, 1));
         texttmp.setFont(font);
-        texttmp.drawText(myrect, textflags, buttonList[button].text);
+        texttmp.drawText(myrect, textflags, message);
         texttmp.end();
 
         QImage im = textpix.convertToImage();
@@ -1130,7 +1148,7 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased)
     }
 
     tmp.setFont(font);
-    drawText(&tmp, buttonTextRect, textflags, buttonList[button].text);
+    drawText(&tmp, buttonTextRect, textflags, message);
 
     if (buttonList[button].buttonicon)
     {

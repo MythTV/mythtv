@@ -32,6 +32,7 @@ struct ThemedButton
     QRect iconRect;
 
     QString text;
+    QString altText;
     QString action;
 
     int status;
@@ -87,7 +88,8 @@ class ThemedMenu : public MythDialog
 
     void setDefaults(void);
 
-    void addButton(QString &type, QString &text, QString &action);
+    void addButton(QString &type, QString &text, QString &alttext,
+                   QString &action);
     void layoutButtons(void);
    
     void handleAction(QString &action);
