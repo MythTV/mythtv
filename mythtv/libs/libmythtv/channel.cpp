@@ -342,6 +342,9 @@ bool Channel::SetChannelByString(const QString &chan)
     QString freqid = query.value(1).toString();
     QString tvformat = query.value(2).toString();
 
+    if (tvformat.isNull() || tvformat.isEmpty())
+        tvformat = "Default";
+
     pthread_mutex_unlock(&db_lock);
 
     // Tune

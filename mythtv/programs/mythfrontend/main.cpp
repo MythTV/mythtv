@@ -31,6 +31,7 @@ using namespace std;
 #include "remoteutil.h"
 #include "xbox.h"
 #include "dbcheck.h"
+#include "mythmediamonitor.h"
 
 #define QUIT     1
 #define HALT     2
@@ -748,11 +749,21 @@ int main(int argc, char **argv)
     qApp->lock();
     qApp->unlock();
 
+#if 0
+    MediaMonitor mon( NULL, 500, true );
+    mon.addFSTab();
+    VERBOSE( VB_ALL, QString("Starting media monitor.") );
+    mon.startMonitoring();
+#endif
+
     int exitstatus = RunMenu(themedir);
 
     if (exitstatus == HALT)
         haltnow();
 
+#if 0
+    mon.stopMonitoring();
+#endif
     delete gContext;
     return exitstatus;
 }

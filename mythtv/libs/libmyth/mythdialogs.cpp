@@ -25,6 +25,7 @@ using namespace std;
 #include "xmlparse.h"
 #include "mythdialogs.h"
 #include "lcddevice.h"
+#include "mythmediamonitor.h"
 
 #ifdef USE_LIRC
 static void *SpawnLirc(void *param)
@@ -68,6 +69,14 @@ struct JumpData
     QString description;
 };
 
+struct MHData
+{
+    void (*callback)(void);
+    int MediaType;
+    QString destination;
+    QString description;
+};
+
 class MythMainWindowPrivate
 {
   public:
@@ -83,6 +92,7 @@ class MythMainWindowPrivate
 
     QDict<KeyContext> keyContexts;
     QMap<int, JumpData> jumpMap;
+    QMap<QString, MHData> mediaHandlerMap;
 
     void (*exitmenucallback)(void);
 
@@ -403,6 +413,28 @@ void MythMainWindow::RegisterJump(const QString &destination,
     //                               .arg(destination));
 }
 
+void MythMainWindow::RegisterMediaHandler(const QString &destination,
+                                          const QString &description,
+                                          const QString &key, 
+                                          void (*callback)(void),
+                                          int mediaType)
+{
+    if (d->mediaHandlerMap.count(destination) == 0) 
+    {
+        MHData mhd = { callback, mediaType, destination, description };
+
+        VERBOSE(VB_GENERAL, QString("Registering %1 as a media handler")
+                                   .arg(destination));
+
+        d->mediaHandlerMap[destination] = mhd;
+    }
+    else 
+    {
+       VERBOSE(VB_GENERAL, QString("%1 is already registered as a media "
+                                   "handler.").arg(destination));
+    }
+}
+
 void MythMainWindow::keyPressEvent(QKeyEvent *e)
 {
     QWidget *current = currentWidget();
@@ -428,6 +460,32 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
         QObject *key_target = getTarget(key);
 
         QApplication::sendEvent(key_target, &key);
+    }
+    else if (ce->type() == kMediaEventType) 
+    {
+        MediaEvent *media_event = (MediaEvent*)ce;
+        // Let's see which of our jump points are configured to handle this 
+        // type of media...  If there's more than one we'll want to show some 
+        // UI to allow the user to select which jump point to use. But for 
+        // now we're going to just use the first one.
+        QMap<QString, MHData>::Iterator itr = d->mediaHandlerMap.begin();
+        MythMediaDevice *pDev = media_event->getDevice();
+
+        if (pDev) 
+        {
+            while (itr != d->mediaHandlerMap.end())
+            {
+                if ((itr.data().MediaType & (int)pDev->getMediaType()))
+                {
+                    cout << "Found a handler" << endl;
+                    d->exitingtomain = true;
+                    d->exitmenucallback = itr.data().callback;
+                    QApplication::postEvent(this, new ExitToMainMenuEvent());
+                    break;
+                }
+                itr++;
+            }
+        }
     }
 #ifdef USE_LIRC
     else if (ce->type() == kLircKeycodeEventType && !d->ignore_lirc_keys) 

@@ -31,6 +31,7 @@ class UIImageType;
 class UIStatusBarType;
 class LayerSet;
 class GenericTree;
+class MythMediaDevice;
 
 const int kExternalKeycodeEventType = 33213;
 const int kExitToMainMenuEventType = 33214;
@@ -55,6 +56,7 @@ class ExitToMainMenuEvent : public QCustomEvent
 
 #define REG_KEY(a, b, c, d) gContext->GetMainWindow()->RegisterKey(a, b, c, d)
 #define REG_JUMP(a, b, c, d) gContext->GetMainWindow()->RegisterJump(a, b, c, d)
+#define REG_MEDIA_HANDLER(a, b, c, d, e) gContext->GetMainWindow()->RegisterMediaHandler(a, b, c, d, e)
 
 class MythMainWindowPrivate;
 
@@ -80,6 +82,9 @@ class MythMainWindow : public QDialog
                      const QString &description, const QString &key);
     void RegisterJump(const QString &destination, const QString &description,
                       const QString &key, void (*callback)(void));
+    void RegisterMediaHandler(const QString &destination, 
+                              const QString &description, const QString &key, 
+                              void (*callback)(void), int mediaType);
 
   protected:
     void keyPressEvent(QKeyEvent *e);
