@@ -7,7 +7,7 @@ CXX=g++
 OPT=-O6 -march=pentiumpro -DMMX -fomit-frame-pointer -funroll-loops -fexpensive-optimizations -finline-functions
 
 CXXFLAGS  = -IlibNuppelVideo/ -Wall -D_GNU_SOURCE -D_REENTRANT 
-CXXFLAGS += -I/usr/include/mysql $(OPT) $(DEBUG)
+CXXFLAGS += `mysql_config --cflags` $(OPT) $(DEBUG)
 
 CXXCOMPILE = $(CXX) $(CXXFLAGS)
 CXXLINK = $(CXX) $(CXXFLAGS) -o $@

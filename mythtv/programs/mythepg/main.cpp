@@ -8,7 +8,6 @@ int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
 
-
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     db->setDatabaseName("mythconverg");
     db->setUserName("mythtv");
