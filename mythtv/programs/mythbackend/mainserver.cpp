@@ -1549,8 +1549,8 @@ void MainServer::getFreeSpace(int &totalspace, int &usedspace)
         // total space available to user is total blocks - reserved blocks
         totalspace = (statbuf.f_blocks - (statbuf.f_bfree - statbuf.f_bavail)) /
                       (1024*1024/statbuf.f_bsize);
-        usedspace = (statbuf.f_blocks - statbuf.f_bavail) /
-                     (1024*1024/statbuf.f_bsize);
+        usedspace = totalspace - (statbuf.f_bavail) /
+                      (1024*1024/statbuf.f_bsize);
     }
 
     if (ismaster)
@@ -3082,23 +3082,285 @@ void MainServer::ShutSlaveBackendsDown(QString &haltcmd)
     }
 }
 
-#if USING_DVB
-void MainServer::PrintDVBStatus(QTextStream& os)
+void MainServer::FillStatusXML( QDomDocument *pDoc )
 {
-    QString querytext;
+    QString   oldDateFormat   = gContext->GetSetting("OldDateFormat", "M/d/yyyy");
+    QString   shortdateformat = gContext->GetSetting("ShortDateFormat", "M/d");
+    QString   timeformat      = gContext->GetSetting("TimeFormat", "h:mm AP");
+    QDateTime qdtNow          = QDateTime::currentDateTime();
 
-    bool doneAnything = false;
-    
-    os << "\r\n  <div class=\"content\">\r\n" <<
-        "    <h2>DVB Signal Information</h2>\r\n" <<
-        "    Details of DVB error statistics for last 48 hours:<br />\r\n";
+    // Add Root Node.
 
+    QDomElement root = pDoc->createElement("Status");
+    pDoc->appendChild(root);
 
+    root.setAttribute("date"    , qdtNow.toString(oldDateFormat));
+    root.setAttribute("time"    , qdtNow.toString(timeformat)   );
+    root.setAttribute("version" , MYTH_BINARY_VERSION           );
+    root.setAttribute("protoVer", MYTH_PROTO_VERSION            );
+
+    // Add all encoders, if any
+
+    QDomElement encoders = pDoc->createElement("Encoders");
+    root.appendChild(encoders);
+
+    int  numencoders = 0;
+    bool isLocal     = true;
+
+    QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
+
+    for (; iter != encoderList->end(); ++iter)
+    {
+        EncoderLink *elink = iter.data();
+
+        if (elink != NULL)
+        {
+            QDomElement encoder = pDoc->createElement("Encoder");
+            encoders.appendChild(encoder);
+
+            encoder.setAttribute("id"            , elink->getCardId()       );
+            encoder.setAttribute("local"         , isLocal                  );
+            encoder.setAttribute("hostname"      , gContext->GetHostName()  );
+            encoder.setAttribute("connected"     , elink->isConnected()     );
+            encoder.setAttribute("state"         , elink->GetState()        );
+            encoder.setAttribute("lowOnFreeSpace", elink->isLowOnFreeSpace());
+
+            if (elink->isConnected())
+                numencoders++;
+
+            switch (elink->GetState())
+            {
+                case kState_WatchingLiveTV:
+                {
+                    if (isLocal)
+                    {
+                        QString title, subtitle, desc, category, starttime,
+                                endtime, callsign, iconpath, channelname,
+                                chanid, seriesid, programid, chanFilters,
+                                repeat, airdate, stars;
+
+                        elink->GetChannelInfo(title, subtitle, desc, category,
+                                              starttime, endtime, callsign,
+                                              iconpath, channelname, chanid,
+                                              seriesid, programid, chanFilters,
+                                              repeat, airdate, stars);
+
+                        QDomElement program = pDoc->createElement("Program");
+                        encoder.appendChild(program);
+
+                        program.setAttribute("seriesId" , seriesid );
+                        program.setAttribute("programId", programid);
+                        program.setAttribute("title"    , title    );
+                        program.setAttribute("subTitle" , subtitle );
+                        program.setAttribute("category" , category );
+                        program.setAttribute("startTime", starttime);
+                        program.setAttribute("endTime"  , endtime  );
+                        program.setAttribute("repeat"   , repeat   );
+                        program.setAttribute("airdate"  , airdate  );
+                        program.setAttribute("stars"    , stars    );
+
+                        QDomText textNode = pDoc->createTextNode(desc);
+                        program.appendChild(textNode);
+
+                        QDomElement channel = pDoc->createElement("Channel");
+                        program.appendChild(channel);
+
+                        channel.setAttribute("chanId"     , chanid     );
+                        channel.setAttribute("callSign"   , callsign   );
+                        channel.setAttribute("iconPath"   , iconpath   );
+                        channel.setAttribute("channelName", channelname);
+                        channel.setAttribute("chanFilters", chanFilters);
+
+                    }
+                    break;
+                }
+                case kState_RecordingOnly:
+                case kState_WatchingRecording:
+                {
+                    if (isLocal)
+                    {
+                        ProgramInfo *pInfo = elink->GetRecording();
+
+                        if (pInfo)
+                        {
+                            FillProgramInfo(pDoc, encoder, pInfo);
+                            delete pInfo;
+                        }
+                    }
+
+                    break;
+                }
+
+                default:
+                    break;
+            }
+        }
+    }
+
+    encoders.setAttribute("count", numencoders);
+
+    // Add upcoming shows
+
+    QDomElement scheduled = pDoc->createElement("Scheduled");
+    root.appendChild(scheduled);
+
+    list<ProgramInfo *> recordingList;
+
+    if (m_sched)
+        m_sched->getAllPending(&recordingList);
+
+    unsigned int iNum = 10;
+    unsigned int iNumRecordings = 0;
+
+    list<ProgramInfo *>::iterator itProg = recordingList.begin();
+    for (; (itProg != recordingList.end()) && iNumRecordings < iNum; itProg++)
+    {
+        if (((*itProg)->recstatus  <= rsWillRecord) &&
+            ((*itProg)->recstartts >= QDateTime::currentDateTime()))
+        {
+            iNumRecordings++;
+            FillProgramInfo(pDoc, scheduled, *itProg);
+        }
+    }
+
+    while (recordingList.size() > 0)
+    {
+        ProgramInfo *pginfo = recordingList.back();
+        delete pginfo;
+        recordingList.pop_back();
+    }
+
+    scheduled.setAttribute("count", iNumRecordings);
+
+    // Add Job Queue Entries
+
+    QDomElement jobqueue = pDoc->createElement("JobQueue");
+    root.appendChild(jobqueue);
+
+    QMap<int, JobQueueEntry> jobs;
+    QMap<int, JobQueueEntry>::Iterator it;
+
+    JobQueue::GetJobsInQueue(jobs,
+                             JOB_LIST_NOT_DONE | JOB_LIST_ERROR |
+                             JOB_LIST_RECENT);
+
+    if (jobs.size())
+    {
+        for (it = jobs.begin(); it != jobs.end(); ++it)
+        {
+            ProgramInfo *pInfo;
+
+            pInfo = ProgramInfo::GetProgramFromRecorded(it.data().chanid,
+                                                        it.data().starttime);
+
+            if (!pInfo)
+                continue;
+
+            QDomElement job = pDoc->createElement("Job");
+            jobqueue.appendChild(job);
+
+            job.setAttribute("id"        , it.data().id         );
+            job.setAttribute("chanId"    , it.data().chanid     );
+            job.setAttribute("startTime" , it.data().starttime.toTime_t());
+            job.setAttribute("startTs"   , it.data().startts    );
+            job.setAttribute("insertTime", it.data().inserttime.toTime_t());
+            job.setAttribute("type"      , it.data().type       );
+            job.setAttribute("cmds"      , it.data().cmds       );
+            job.setAttribute("flags"     , it.data().flags      );
+            job.setAttribute("status"    , it.data().status     );
+            job.setAttribute("statusTime", it.data().statustime.toTime_t());
+            job.setAttribute("args"      , it.data().args       );
+
+            if (it.data().hostname == "")
+                job.setAttribute("hostname", QObject::tr("master"));
+            else
+                job.setAttribute("hostname",it.data().hostname);
+
+            QDomText textNode = pDoc->createTextNode(it.data().comment);
+            job.appendChild(textNode);
+
+            FillProgramInfo(pDoc, job, pInfo);
+
+            delete pInfo;
+        }
+    }
+
+    jobqueue.setAttribute( "count", jobs.size() );
+
+    // Add Machine information
+
+    QDomElement mInfo   = pDoc->createElement("MachineInfo");
+    QDomElement storage = pDoc->createElement("Storage"    );
+    QDomElement load    = pDoc->createElement("Load"       );
+    QDomElement guide   = pDoc->createElement("Guide"      );
+
+    root.appendChild (mInfo  );
+    mInfo.appendChild(storage);
+    mInfo.appendChild(load   );
+    mInfo.appendChild(guide  );
+
+    // drive space   ---------------------
+
+    int iTotal = -1, iUsed = -1;
+
+    getFreeSpace(iTotal, iUsed);
+
+    storage.setAttribute("total", iTotal);
+    storage.setAttribute("used" , iUsed);
+    storage.setAttribute("free" , iTotal - iUsed);
+
+    // load average ---------------------
+
+    double rgdAverages[3];
+
+    if (getloadavg(rgdAverages, 3) != -1)
+    {
+        load.setAttribute("avg1", rgdAverages[0]);
+        load.setAttribute("avg2", rgdAverages[1]);
+        load.setAttribute("avg3", rgdAverages[2]);
+    }
+
+    // Guide Data ---------------------
+
+    QDateTime GuideDataThrough;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT max(endtime) FROM program;");
+
+    if (query.exec() && query.isActive() && query.size())
+    {
+        query.next();
+
+        if (query.isValid())
+            GuideDataThrough = QDateTime::fromString(query.value(0).toString(),
+                                                     Qt::ISODate);
+    }
+
+    guide.setAttribute("start", gContext->GetSetting("mythfilldatabaseLastRunStart"));
+    guide.setAttribute("end", gContext->GetSetting("mythfilldatabaseLastRunEnd"));
+    guide.setAttribute("status", gContext->GetSetting("mythfilldatabaseLastRunStatus"));
+
+    if (!GuideDataThrough.isNull())
+    {
+        guide.setAttribute("guideThru", QDateTime(GuideDataThrough).toString("yyyy-MM-dd hh:mm"));
+        guide.setAttribute("guideDays", qdtNow.daysTo(GuideDataThrough));
+    }
+
+    QDomText dataDirectMessage = pDoc->createTextNode(gContext->GetSetting("DataDirectMessage"));
+    guide.appendChild(dataDirectMessage);
+
+#if USING_DVB
+    // DVB Status
+
+    QDomElement dvbstatus = pDoc->createElement("DVBStatus");
+    root.appendChild(dvbstatus);
 
     MSqlQuery oquery(MSqlQuery::InitCon());
     oquery.prepare("SELECT starttime,endtime FROM recorded "
                    "WHERE starttime >= DATE_SUB(NOW(), INTERVAL 48 HOUR) "
                    "ORDER BY starttime;");
+
+    QString querytext;
 
     if (oquery.exec() && oquery.isActive() && oquery.size() > 0)
     {
@@ -3114,571 +3376,107 @@ void MainServer::PrintDVBStatus(QTextStream& os)
                             "GROUP BY cardid");
 
         query.prepare(querytext);
-        
+
         while (oquery.next())
         {
+            QDomElement dvbinterval = pDoc->createElement("DVBInterval");
+            dvbstatus.appendChild(dvbinterval);
+
             QDateTime t_start = oquery.value(0).toDateTime();
-            QDateTime t_end = oquery.value(1).toDateTime();
+            QDateTime t_end   = oquery.value(1).toDateTime();
+
+            dvbinterval.setAttribute("start", t_start.toTime_t());
+            dvbinterval.setAttribute("end"  , t_end.toTime_t());
 
             query.bindValue(0, t_start);
             query.bindValue(1, t_end);
 
-            if (!query.exec())
-                cout << query.lastError().databaseText() << "\r\n" 
-                     << query.lastError().driverText() << "\r\n";
-            
-            if (query.isActive() && query.size() > 0)
+            query.exec();
+            if (query.isActive() && query.numRowsAffected())
             {
-                os << "    <br />Recording period from " 
-                   << t_start.toString() << 
-                    " to " << t_end.toString() <<
-                    "<br />\n";
-                
                 while (query.next())
                 {
-                    os << "    Encoder " << query.value(0).toInt() <<
-                        " Min SNR: " << query.value(5).toInt() <<
-                        " Avg SNR: " << query.value(6).toInt() <<
-                        " Min BER: " << query.value(8).toInt() <<
-                        " Avg BER: " << query.value(9).toInt() <<
-                        " Cont Errs: " << query.value(13).toInt() <<
-                        " Overflows: " << query.value(14).toInt() <<
-                        "<br />\r\n";
+                    QDomElement dvbInfo = pDoc->createElement("DVBInfo");
+                    dvbinterval.appendChild(dvbInfo);
 
-                    doneAnything = true;
+                    dvbInfo.setAttribute("cardId"   , query.value(0).toInt() );
+                    dvbInfo.setAttribute("minSNR"   , query.value(5).toInt() );
+                    dvbInfo.setAttribute("avgSNR"   , query.value(6).toInt() );
+                    dvbInfo.setAttribute("minBER"   , query.value(8).toInt() );
+                    dvbInfo.setAttribute("avgBER"   , query.value(9).toInt() );
+                    dvbInfo.setAttribute("contErrs" , query.value(13).toInt());
+                    dvbInfo.setAttribute("overflows", query.value(14).toInt());
                 }
             }
         }
     }
-
-    if (!doneAnything)
-    {
-        os << "    <br />There is no DVB signal quality data available to "
-            "display.<br />\r\n";
-    }
-
-    os << "  </div>\r\n";
+#endif
 }
-#endif
 
-void MainServer::PrintStatus(QSocket *socket)
+void MainServer::FillProgramInfo(QDomDocument *pDoc, QDomElement &e, 
+                                 ProgramInfo *pInfo)
 {
-    QTextStream os(socket);
-    QString shortdateformat = gContext->GetSetting("ShortDateFormat", "M/d");
-    QString timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
-
-    os.setEncoding(QTextStream::UnicodeUTF8);
-
-    QDateTime qdtNow = QDateTime::currentDateTime();
-
-    os << "HTTP/1.0 200 Ok\r\n"
-       << "Content-Type: text/html; charset=\"UTF-8\"\r\n"
-       << "\r\n";
-
-    os << "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
-       << "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n"
-       << "<html xmlns=\"http://www.w3.org/1999/xhtml\""
-       << " xml:lang=\"en\" lang=\"en\">\r\n"
-       << "<head>\r\n"
-       << "  <meta http-equiv=\"Content-Type\""
-       << "content=\"text/html; charset=UTF-8\" />\r\n"
-       << "  <style type=\"text/css\" title=\"Default\" media=\"all\">\r\n"
-       << "  <!--\r\n"
-       << "  body {\r\n"
-       << "    background-color:#fff;\r\n"
-       << "    font:11px verdana, arial, helvetica, sans-serif;\r\n"
-       << "    margin:20px;\r\n"
-       << "  }\r\n"
-       << "  h1 {\r\n"
-       << "    font-size:28px;\r\n"
-       << "    font-weight:900;\r\n"
-       << "    color:#ccc;\r\n"
-       << "    letter-spacing:0.5em;\r\n"
-       << "    margin-bottom:30px;\r\n"
-       << "    width:650px;\r\n"
-       << "    text-align:center;\r\n"
-       << "  }\r\n"
-       << "  h2 {\r\n"
-       << "    font-size:18px;\r\n"
-       << "    font-weight:800;\r\n"
-       << "    color:#360;\r\n"
-       << "    border:none;\r\n"
-       << "    letter-spacing:0.3em;\r\n"
-       << "    padding:0px;\r\n"
-       << "    margin-bottom:10px;\r\n"
-       << "    margin-top:0px;\r\n"
-       << "  }\r\n"
-       << "  hr {\r\n"
-       << "    display:none;\r\n"
-       << "  }\r\n"
-       << "  div.content {\r\n"
-       << "    width:650px;\r\n"
-       << "    border-top:1px solid #000;\r\n"
-       << "    border-right:1px solid #000;\r\n"
-       << "    border-bottom:1px solid #000;\r\n"
-       << "    border-left:10px solid #000;\r\n"
-       << "    padding:10px;\r\n"
-       << "    margin-bottom:30px;\r\n"
-       << "    -moz-border-radius:8px 0px 0px 8px;\r\n"
-       << "  }\r\n"
-       << "  div#schedule a {\r\n"
-       << "    display:block;\r\n"
-       << "    color:#000;\r\n"
-       << "    text-decoration:none;\r\n"
-       << "    padding:.2em .8em;\r\n"
-       << "    border:thin solid #fff;\r\n"
-       << "    width:350px;\r\n"
-       << "  }\r\n"
-       << "  div#schedule a span {\r\n"
-       << "    display:none;\r\n"
-       << "  }\r\n"
-       << "  div#schedule a:hover {\r\n"
-       << "    background-color:#F4F4F4;\r\n"
-       << "    border-top:thin solid #000;\r\n"
-       << "    border-bottom:thin solid #000;\r\n"
-       << "    border-left:thin solid #000;\r\n"
-       << "    cursor:default;\r\n"
-       << "  }\r\n"
-       << "  div#schedule a:hover span {\r\n"
-       << "    display:block;\r\n"
-       << "    position:absolute;\r\n"
-       << "    background-color:#F4F4F4;\r\n"
-       << "    color:#000;\r\n"
-       << "    left:400px;\r\n"
-       << "    margin-top:-20px;\r\n"
-       << "    width:280px;\r\n"
-       << "    padding:5px;\r\n"
-       << "    border:thin dashed #000;\r\n"
-       << "  }\r\n"
-       << "  div.diskstatus {\r\n"
-       << "    width:325px;\r\n"
-       << "    height:7em;\r\n"
-       << "    float:left;\r\n"
-       << "  }\r\n"
-       << "  div.loadstatus {\r\n"
-       << "    width:325px;\r\n"
-       << "    height:7em;\r\n"
-       << "    float:right;\r\n"
-       << "  }\r\n"
-       << "  .jobfinished { color: #0000ff; }\r\n"
-       << "  .jobaborted { color: #7f0000; }\r\n"
-       << "  .joberrored { color: #ff0000; }\r\n"
-       << "  .jobrunning { color: #005f00; }\r\n"
-       << "  -->\r\n"
-       << "  </style>\r\n"
-       << "  <title>MythTV Status - " 
-       << qdtNow.toString(shortdateformat) 
-       << " " << qdtNow.toString(timeformat) << " - "
-       << MYTH_BINARY_VERSION << "</title>\r\n"
-       << "</head>\r\n"
-       << "<body>\r\n\r\n"
-       << "  <h1>MythTV Status</h1>\r\n"
-       << "  <div class=\"content\">\r\n"
-       << "    <h2>Encoder status</h2>\r\n";
-
-    // encoder information ---------------------
-    QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
-    int numencoders = 0;
-    for (; iter != encoderList->end(); ++iter)
-    {
-        EncoderLink *elink = iter.data();
-
-        bool bIsLocal = elink->isLocal();
-
-        if (bIsLocal)
-        {
-            os << "    Encoder " << elink->getCardId() << " is local on "
-               << gContext->GetHostName();
-            numencoders++;
-        }
-        else
-        {
-            os << "    Encoder " << elink->getCardId() << " is remote on "
-               << elink->getHostname();
-            if (!elink->isConnected())
-            {
-                os << " (currently not connected).<br />";
-                continue;
-            }
-            else
-                numencoders++;
-        }
-
-        TVState encstate = elink->GetState();
-
-        if (encstate == kState_WatchingLiveTV)
-        {
-            os << " and is watching Live TV";
-            if (bIsLocal)
-            {
-                QString title, callsign, dummy;
-                elink->GetChannelInfo(title, dummy, dummy, dummy, dummy,
-                                      dummy, callsign, dummy, dummy,
-                                      dummy, dummy, dummy, dummy,
-                                      dummy, dummy, dummy);
-                os << ": '" << title << "' on "  << callsign;
-            }
-            os << ".";
-        }
-        else if (encstate == kState_RecordingOnly || 
-                 encstate == kState_WatchingRecording)
-        {
-            os << " and is recording";
-            if (bIsLocal)
-            {
-                ProgramInfo *pi = elink->GetRecording();
-                if (pi)
-                {
-                    os << " '" << pi->title << "'. This recording will end "
-                       << "at " << (pi->recendts).toString(timeformat);
-                    delete pi;
-                }
-            }
-            os << ".";
-        }
-        else
-            os << " and is not recording.";
-
-        if (elink->isLowOnFreeSpace())
-            os << " <strong>WARNING</strong>:"
-               << " This backend is low on free disk space!";
-
-        os << "<br />\r\n";
-    }
-
-    os << "  </div>\r\n\r\n"
-       << "  <div class=\"content\">\r\n"
-       << "    <h2>Schedule</h2>\r\n";
-
-    // upcoming shows ---------------------
-    list<ProgramInfo *> recordingList;
-    if (m_sched)
-        m_sched->getAllPending(&recordingList);
-
-    list<ProgramInfo *>::iterator iterCnt = recordingList.begin();
-
-    unsigned int iNum = 10;
-
-    // count the number of upcoming recordings
-    unsigned int iNumRecordings = 0;
-    while (iterCnt != recordingList.end())
-    {
-        if (!((*iterCnt)->recstatus > rsWillRecord ||     
-               ((*iterCnt)->recstartts) < QDateTime::currentDateTime())) 
-        {                       
-               iNumRecordings++;
-        }
-
-        if (iNumRecordings > iNum) break;
-        iterCnt++;
-    }
-
-    if (iNumRecordings < iNum) 
-        iNum = iNumRecordings;
-
-    if (iNum == 0)
-        os << "    There are no shows scheduled for recording.\r\n";
-    else
-    {
-       os << "    The next " << iNum << " show" << (iNum == 1 ? "" : "s" )
-          << " that " << (iNum == 1 ? "is" : "are") 
-          << " scheduled for recording:\r\n";
-
-       os << "    <div id=\"schedule\">\r\n";
-
-       list<ProgramInfo *>::iterator iter = recordingList.begin();
-
-       for (unsigned int i = 0; (iter != recordingList.end()) && i < iNum; 
-            iter++, i++)
-       {
-           if ((*iter)->recstatus > rsWillRecord ||     // bad entry, don't show as upcoming
-               ((*iter)->recstartts) < QDateTime::currentDateTime()) // rec
-           {                       
-               i--;
-           }
-           else
-           {
-               QString qstrTitle = ((*iter)->title).replace(QRegExp("\""), 
-                                                            "&quot;");
-               QString qstrDescription = ((*iter)->description).replace(
-                                                     QRegExp("\""), "&quot;");
-               QString qstrSubtitle = ((*iter)->subtitle).replace(
-                                                     QRegExp("\""), "&quot;");
-               QString timeToRecstart = "in";
-               int totalSecsToRecstart = qdtNow.secsTo((*iter)->recstartts);
-               int preRollSeconds = gContext->GetNumSetting("RecordPreRoll", 0);
-               totalSecsToRecstart -= preRollSeconds;
-               totalSecsToRecstart -= 60; //since we're not displaying seconds
-               int totalDaysToRecstart = totalSecsToRecstart / 86400;
-               int hoursToRecstart = (totalSecsToRecstart / 3600)
-                                     - (totalDaysToRecstart * 24);
-               int minutesToRecstart = (totalSecsToRecstart / 60) % 60;
-
-               if (totalDaysToRecstart > 1)
-                   timeToRecstart += QString(" %1 days,")
-                                             .arg(totalDaysToRecstart);
-               else if (totalDaysToRecstart == 1)
-                   timeToRecstart += (" 1 day,");
-
-               if (hoursToRecstart != 1)
-                   timeToRecstart += QString(" %1 hours and")
-                                             .arg(hoursToRecstart);
-               else if (hoursToRecstart == 1)
-                   timeToRecstart += " 1 hour and";
- 
-               if (minutesToRecstart != 1)
-                   timeToRecstart += QString(" %1 minutes")
-                                             .arg(minutesToRecstart);
-               else
-                   timeToRecstart += " 1 minute";
-
-               if (hoursToRecstart == 0 && minutesToRecstart == 0)
-                   timeToRecstart = "within one minute";
-
-               if (totalSecsToRecstart < 0)
-                   timeToRecstart = "soon";
-
-               os << "      <a href=\"#\">"
-                  << ((*iter)->recstartts).addSecs(-preRollSeconds)
-                                          .toString("ddd") << " "
-                  << ((*iter)->recstartts).addSecs(-preRollSeconds)
-                                          .toString(shortdateformat) << " "
-                  << ((*iter)->recstartts).addSecs(-preRollSeconds)
-                                          .toString(timeformat) << " - ";
-               if (numencoders > 1)
-                   os << "Encoder " << (*iter)->cardid << " - ";
-               os << (*iter)->channame << " - " << qstrTitle << "<br />"
-                  << "<span><strong>" << qstrTitle << "</strong> ("
-                  << (*iter)->startts.toString(timeformat) << "-"
-                  << (*iter)->endts.toString(timeformat) << ")<br />"
-                  << (qstrSubtitle == "" ? QString("") : "<em>" + qstrSubtitle
-                                                          + "</em><br /><br />")
-                  << qstrDescription << "<br /><br />"
-                  << "This recording will start "  << timeToRecstart
-                  << " using encoder " << (*iter)->cardid << " with the '";
-               os << (*iter)->GetProgramRecordingProfile();
-               os << "' profile.</span></a><hr />\r\n";
-           }
-       }
-       os  << "    </div>\r\n";
-   }
-
-    os << "  </div>\r\n\r\n"
-       << "  <div class=\"content\">\r\n"
-       << "    <h2>Job Queue</h2>\r\n";
-
-    // Job Queue Entries -----------------
-    QMap<int, JobQueueEntry> jobs;
-    QMap<int, JobQueueEntry>::Iterator it;
-    JobQueue::GetJobsInQueue(jobs,
-                             JOB_LIST_NOT_DONE | JOB_LIST_ERROR |
-                             JOB_LIST_RECENT);
-
-    if (jobs.size())
-    {
-        QString statusColor;
-        QString jobColor;
-        QString timeDateFormat;
-        timeDateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d") +
-                         " " + gContext->GetSetting("TimeFormat", "h:mm AP");
-
-
-        os << "    Jobs currently in Queue or recently ended:\r\n<br />"
-           << "    <div id=\"schedule\">\r\n";
-
-        for (it = jobs.begin(); it != jobs.end(); ++it)
-        {
-            ProgramInfo *pginfo;
-
-            pginfo = ProgramInfo::GetProgramFromRecorded(it.data().chanid,
-                                                         it.data().starttime);
-
-            if (!pginfo)
-                continue;
-
-            if (it.data().status == JOB_ABORTED)
-            {
-                statusColor = " class=\"jobaborted\"";
-                jobColor = "";
-            }
-            else if (it.data().status == JOB_ERRORED)
-            {
-                statusColor = " class=\"joberrored\"";
-                jobColor = " class=\"joberrored\"";
-            }
-            else if (it.data().status == JOB_FINISHED)
-            {
-                statusColor = " class=\"jobfinished\"";
-                jobColor = " class=\"jobfinished\"";
-            }
-            else if (it.data().status == JOB_RUNNING)
-            {
-                statusColor = " class=\"jobrunning\"";
-                jobColor = " class=\"jobrunning\"";
-            }
-            else
-            {
-                statusColor = "";
-                jobColor = "";
-            }
-
-            QString qstrTitle = pginfo->title.replace(QRegExp("\""), 
-                                                        "&quot;");
-            QString qstrSubtitle = pginfo->subtitle.replace(
-                                                 QRegExp("\""), "&quot;");
-
-            os << "<a href=\"#\">"
-               << pginfo->recstartts.toString("ddd") << " "
-               << pginfo->recstartts.toString(shortdateformat) << " "
-               << pginfo->recstartts.toString(timeformat) << " - "
-               << qstrTitle << " - <font" << jobColor << ">"
-               << JobQueue::JobText(it.data().type) << "</font><br />"
-               << "<span><strong>" << qstrTitle << "</strong> ("
-               << pginfo->startts.toString(timeformat) << "-"
-               << pginfo->endts.toString(timeformat) << ")<br />"
-               << (qstrSubtitle == "" ? QString("") : "<em>" + qstrSubtitle
-                                                          + "</em><br /><br />")
-               << "Job: " << JobQueue::JobText(it.data().type) << "<br />"
-               << "Status: <font" << statusColor << ">"
-               << JobQueue::StatusText(it.data().status)
-               << "</font><br />"
-               << "Status Time: "
-               << it.data().statustime.toString(timeDateFormat)
-               << "<br />";
-
-            if (it.data().status != JOB_QUEUED)
-            {
-                os << "Host: ";
-                if (it.data().hostname == "")
-                    os << QObject::tr("master");
-                else
-                    os << it.data().hostname;
-                os << "<br />";
-            }
-
-            if (it.data().comment != "")
-            {
-                os << "<br />Comments:<br />" << it.data().comment << "<br />";
-            }
-
-            os << "</span></a><hr />\r\n";
-
-            delete pginfo;
-        }
-        os << "      </div>\r\n";
-    }
-    else
-    {
-        os << "    Job Queue is currently empty.\r\n\r\n";
-    }
-
-    os << "  </div>\r\n\r\n  <div class=\"content\">\r\n"
-       << "    <h2>Machine information</h2>\r\n"
-       << "    <div class=\"diskstatus\">\r\n";
-
-    // drive space   ---------------------
-    int iTotal = -1, iUsed = -1;
-    QString rep;
-
-    getFreeSpace(iTotal, iUsed);
-
-    os << "      Disk Usage:\r\n      <ul>\r\n        <li>Total Space: ";
-    rep.sprintf(tr("%d,%03d MB "), (iTotal) / 1000, (iTotal) % 1000);
-    os << rep << "</li>\r\n";
-
-    os << "        <li>Space Used: ";
-    rep.sprintf(tr("%d,%03d MB "), (iUsed) / 1000, (iUsed) % 1000);
-    os << rep << "</li>\r\n";
-
-    os << "        <li>Space Free: ";
-    rep.sprintf(tr("%d,%03d MB "), (iTotal - iUsed) / 1000,
-                (iTotal - iUsed) % 1000);
-    os << rep << "</li>\r\n      </ul>\r\n    </div>\r\n\r\n";
-
-    // load average ---------------------
-    os << "    <div class=\"loadstatus\">\r\n";
-    double rgdAverages[3];
-    if (getloadavg(rgdAverages, 3) != -1)
-    {
-        os << "      This machine's load average:"
-           << "\r\n      <ul>\r\n        <li>"
-           << "1 Minute: " << rgdAverages[0] << "</li>\r\n"
-           << "        <li>5 Minutes: " << rgdAverages[1] << "</li>\r\n"
-           << "        <li>15 Minutes: " << rgdAverages[2]
-           << "</li>\r\n      </ul>\r\n";
-    }
-
-    os << "    </div>\r\n";    // end of disk status and load average
-
-    QString querytext;
-    int DaysOfData;
-    QDateTime GuideDataThrough;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT max(endtime) FROM program;");
-
-    if (query.exec() && query.isActive() && query.size())
-    {
-        query.next();
-        if (query.isValid())
-            GuideDataThrough = QDateTime::fromString(query.value(0).toString(),
-                                                     Qt::ISODate);
-    }
-
-    QString mfdLastRunStart, mfdLastRunEnd, mfdLastRunStatus;
-    QString DataDirectMessage;
-
-    mfdLastRunStart = gContext->GetSetting("mythfilldatabaseLastRunStart");
-    mfdLastRunEnd = gContext->GetSetting("mythfilldatabaseLastRunEnd");
-    mfdLastRunStatus = gContext->GetSetting("mythfilldatabaseLastRunStatus");
-    DataDirectMessage = gContext->GetSetting("DataDirectMessage");
-
-    os << "    Last mythfilldatabase run started on " << mfdLastRunStart
-       << " and ";
-
-    if (mfdLastRunEnd < mfdLastRunStart) 
-        os << "is ";
-    else 
-        os << "ended on " << mfdLastRunEnd << ". ";
-
-    os << mfdLastRunStatus << "<br />\r\n";    
-
-    if (!GuideDataThrough.isNull())
-    {
-        os << "    There's guide data until "
-           << QDateTime(GuideDataThrough).toString("yyyy-MM-dd hh:mm");
-
-        DaysOfData = qdtNow.daysTo(GuideDataThrough);
-
-        if (DaysOfData > 0)
-            os << " (" << DaysOfData << " day"
-               << (DaysOfData == 1 ? "" : "s" ) << ").";
-        else
-           os << ".";
-
-        if (DaysOfData <= 3)
-            os << " <strong>WARNING</strong>: is mythfilldatabase running?";
-    }
-    else
-        os << "    There's <strong>no guide data</strong> available! "
-           << "Have you run mythfilldatabase?";
-
-    if (!DataDirectMessage.isNull())
-        os << "<br />\r\nDataDirect Status: " << DataDirectMessage;
-
-    os << "\r\n  </div>\r\n";
-
-#if USING_DVB
-    PrintDVBStatus(os);
-#endif
-
-    os << "\r\n</body>\r\n</html>\r\n";
-
-    while (recordingList.size() > 0)
-    {
-        ProgramInfo *pginfo = recordingList.back();
-        delete pginfo;
-        recordingList.pop_back();
-    }
+    if ((pDoc == NULL) || (pInfo == NULL))
+        return;
+
+    // Build Program Element
+
+    QDomElement program = pDoc->createElement( "Program" );
+    e.appendChild( program );
+
+    program.setAttribute( "seriesId"    , pInfo->seriesid     );
+    program.setAttribute( "programId"   , pInfo->programid    );
+    program.setAttribute( "title"       , pInfo->title        );
+    program.setAttribute( "subTitle"    , pInfo->subtitle     );
+    program.setAttribute( "category"    , pInfo->category     );
+    program.setAttribute( "catType"     , pInfo->catType      );
+    program.setAttribute( "startTime"   , pInfo->startts.toTime_t());
+    program.setAttribute( "endTime"     , pInfo->endts.toTime_t());
+    program.setAttribute( "repeat"      , pInfo->repeat       );
+    program.setAttribute( "stars"       , pInfo->stars        );
+//    program.setAttribute( "fileSize"    , pInfo->filesize );
+    program.setAttribute( "lastModified", pInfo->lastmodified.toTime_t() );
+    program.setAttribute( "programFlags", pInfo->programflags );
+    program.setAttribute( "hostname"    , pInfo->hostname     );
+
+    if (pInfo->hasAirDate)
+        program.setAttribute( "airdate"  , pInfo->originalAirDate.toString() );
+
+    QDomText textNode = pDoc->createTextNode( pInfo->description );
+    program.appendChild( textNode );
+
+    // Build Channel Child Element
+
+    QDomElement channel = pDoc->createElement( "Channel" );
+    program.appendChild( channel );
+
+    channel.setAttribute( "chanId"     , pInfo->chanid      );
+    channel.setAttribute( "callSign"   , pInfo->chansign    );
+//    channel.setAttribute( "iconPath"   , pInfo->iconpath    );
+    channel.setAttribute( "channelName", pInfo->channame    );
+    channel.setAttribute( "chanFilters", pInfo->chanOutputFilters );
+    channel.setAttribute( "sourceId"   , pInfo->sourceid    );
+    channel.setAttribute( "inputId"    , pInfo->inputid     );
+
+    // Build Recording Child Element
+
+    QDomElement recording = pDoc->createElement( "Recording" );
+    program.appendChild( recording );
+
+    recording.setAttribute( "recordId"      , pInfo->recordid    );
+    recording.setAttribute( "recStartTs"    , pInfo->recstartts.toTime_t());
+    recording.setAttribute( "recEndTs"      , pInfo->recendts.toTime_t());
+    recording.setAttribute( "recStatus"     , pInfo->recstatus   );
+    recording.setAttribute( "recPriority"   , pInfo->recpriority );
+    recording.setAttribute( "recGroup"      , pInfo->recgroup    );
+    recording.setAttribute( "recType"       , pInfo->rectype     );
+    recording.setAttribute( "dupInType"     , pInfo->dupin       );
+    recording.setAttribute( "dupMethod"     , pInfo->dupmethod   );
+
+    recording.setAttribute( "encoderId"     , pInfo->cardid      );
+
+    recording.setAttribute( "recProfile"    , pInfo->GetProgramRecordingProfile());
+
+    recording.setAttribute( "preRollSeconds", gContext->GetNumSetting("RecordPreRoll", 0));
 }
 

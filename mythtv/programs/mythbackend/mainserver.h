@@ -6,6 +6,7 @@
 #include <qtimer.h>
 #include <qurl.h>
 #include <qmutex.h>
+#include <qdom.h>
 #include <vector>
 using namespace std;
 
@@ -30,7 +31,9 @@ class MainServer : public QObject
    ~MainServer();
 
     void customEvent(QCustomEvent *e);
-    void PrintStatus(QSocket *socket);
+
+    void FillProgramInfo(QDomDocument *pDoc, QDomElement &e, ProgramInfo *pInfo);
+    void FillStatusXML(QDomDocument *pDoc);
 
     bool isClientConnected();
     void ShutSlaveBackendsDown(QString &haltcmd);
@@ -107,8 +110,6 @@ class MainServer : public QObject
 
     void getFreeSpace(int &total, int &used);
     void getGuideDataThrough(QDateTime &GuideDataThrough);
-
-    void PrintDVBStatus(QTextStream &os);
 
     PlaybackSock *getSlaveByHostname(QString &hostname);
     PlaybackSock *getPlaybackBySock(QSocket *socket);
