@@ -49,6 +49,7 @@ class MetadataServer : public MFDServicePlugin
     Metadata*                    getMetadataByUniversalId(uint id);
     Metadata*                    getMetadataByContainerAndId(int container_id, int metadata_id);
     Playlist*                    getPlaylistByUniversalId(uint id);
+    Playlist*                    getPlaylistByContainerAndId(int container_id, int playlist_id);
     
 
 

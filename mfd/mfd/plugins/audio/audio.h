@@ -36,6 +36,10 @@ class AudioPlugin: public MFDServicePlugin
     void    pauseAudio(bool true_or_false);
     void    seekAudio(int seek_amount);
     void    swallowOutputUpdate(int numb_seconds, int channels, int bitrate, int frequency);
+    void    handleInternalMessage(QString the_message);
+    void    setPlaylistMode(int container, int id, int index = 0);
+    void    stopPlaylistMode();
+    void    playFromPlaylist(bool augment_index = true);
         
   private:
   
@@ -54,8 +58,17 @@ class AudioPlugin: public MFDServicePlugin
     int     current_channels;
     int     current_bitrate;
     int     current_frequency;
-    QMutex play_data_mutex;
+    QMutex  play_data_mutex;
+
+
     MetadataServer *metadata_server;
+    
+    QMutex  playlist_mode_mutex;
+    bool    playlist_mode;
+    int     current_playlist_container;
+    int     current_playlist_id;
+    int     current_playlist_item_index;
+
 };
 
 #endif  // audio_h_

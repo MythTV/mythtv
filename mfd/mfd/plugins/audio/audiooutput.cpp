@@ -425,7 +425,9 @@ void MMAudioOutput::run()
 void MMAudioOutput::dispatch(OutputEvent &e)
 {
     //
-    //  Send the event to anyone who is listening
+    //  Send the event to anyone who is listening. Note that we don't
+    //  actually "send" this event, we force directly onto our parent (the
+    //  main audio plugin).
     //
     
     parent->swallowOutputUpdate(

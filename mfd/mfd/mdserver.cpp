@@ -193,7 +193,16 @@ Metadata* MetadataServer::getMetadataByUniversalId(uint universal_id)
 
 Metadata* MetadataServer::getMetadataByContainerAndId(int container_id, int metadata_id)
 {
-    metadata_mutex.lock();
+    //
+    //  Metadata should be locked _before_ calling this method
+    //
+    
+    if(metadata_mutex.tryLock())
+    {
+        metadata_mutex.unlock();
+        warning("getMetadataByContainerAndId() called without "
+                "metadata_mutex being locked");
+    }
 
     //
     //  Find the collection
@@ -214,8 +223,6 @@ Metadata* MetadataServer::getMetadataByContainerAndId(int container_id, int meta
             break; 
         }
     }
-    
-    metadata_mutex.unlock();
     
     return return_value;
 }
@@ -267,6 +274,44 @@ Playlist* MetadataServer::getPlaylistByUniversalId(uint universal_id)
     }
     return return_value;
 }
+
+Playlist* MetadataServer::getPlaylistByContainerAndId(int container_id, int playlist_id)
+{
+    //
+    //  Metadata should be locked _before_ calling this method
+    //
+    
+    if(metadata_mutex.tryLock())
+    {
+        metadata_mutex.unlock();
+        warning("getPlaylistByContainerAndId() called without "
+                "metadata_mutex being locked");
+    }
+
+    //
+    //  Find the collection
+    //
+    
+    Playlist *return_value = NULL;
+    
+    MetadataContainer * a_container;
+    for (
+            a_container = metadata_containers->first(); 
+            a_container; 
+            a_container = metadata_containers->next()
+        )
+    {
+        if(a_container->getIdentifier() == container_id)
+        {
+            return_value = a_container->getPlaylist(playlist_id);
+            break; 
+        }
+    }
+    
+    return return_value;
+}
+
+
 
 MetadataContainer* MetadataServer::createContainer(
                                                     MetadataCollectionContentType content_type,

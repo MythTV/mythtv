@@ -308,6 +308,7 @@ void MFDServicePlugin::run()
         
         updateSockets();
         waitForSomethingToHappen();
+        checkInternalMessages();
         if(metadata_changed_flag)
         {
             //
@@ -616,6 +617,41 @@ void MFDServicePlugin::sendMessage(const QString &message)
             }
         }
     client_sockets_mutex.unlock();
+}
+
+void MFDServicePlugin::sendInternalMessage(const QString &the_message)
+{
+    //
+    //  This would typically be called by another object in another thread,
+    //  and it gets put on a queue. The actual plugin will check for it
+    //  in checkInternalMessages()
+    //
+    
+    internal_messages_mutex.lock();
+        internal_messages.push_back(the_message);
+    internal_messages_mutex.unlock();
+    wakeUp();
+}
+
+void MFDServicePlugin::checkInternalMessages()
+{
+    QString message = "";
+    internal_messages_mutex.lock();
+        if(!internal_messages.isEmpty() > 0)
+        {
+            message = internal_messages.first();
+            internal_messages.pop_front();
+        }
+    internal_messages_mutex.unlock();
+    if(message.length() > 0)
+    {
+        handleInternalMessage(message);
+    }
+}
+
+void MFDServicePlugin::handleInternalMessage(QString)
+{
+    warning("has not re-implemented handleInternalMessage()");
 }
 
 void MFDServicePlugin::sendCoreMFDMessage(const QString &message, int socket_identifier)

@@ -24,6 +24,8 @@
 #include "decoder_event.h"
 #include "metadata.h"
 
+#include "mfd_plugin.h"
+
 class DecoderFactory;
 
 class Decoder : public QThread 
@@ -34,6 +36,7 @@ class Decoder : public QThread
     virtual ~Decoder();
 
     virtual bool initialize() = 0;
+    void setParent(MFDServicePlugin *p){parent = p;}
     virtual void seek(double) = 0;
     virtual void stop() = 0;
 
@@ -73,6 +76,11 @@ class Decoder : public QThread
 
     QString filename_format;
     int ignore_id3;
+    void log(const QString &log_message, int verbosity);
+    void warning(const QString &warn_message);
+    void message(const QString &internal_message);
+
+    MFDServicePlugin *parent;
 
   private:
 
@@ -86,6 +94,7 @@ class Decoder : public QThread
     QWaitCondition cnd;
 
     int blksize;
+
 };
 
 class DecoderFactory

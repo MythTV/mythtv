@@ -359,19 +359,15 @@ void MadDecoder::run()
         return;
     }
 
-    stat = DecoderEvent::Decoding;
-
     mutex()->unlock();
 
-    {
-        DecoderEvent e((DecoderEvent::Type) stat);
-        dispatch(e);
-    }
 
-    while (! done && ! finish && ! derror) {
+    while (! done && ! finish && ! derror)
+    {
         mutex()->lock();
 
-        if (seekTime >= 0.0) {
+        if (seekTime >= 0.0)
+        {
             long seek_pos = long(seekTime * input()->size() / totalTime);
             input()->at(seek_pos);
             output_size = long(seekTime) * long(freq * channels * 16 / 2);
@@ -383,21 +379,28 @@ void MadDecoder::run()
 
         finish = eof;
 
-        if (! eof) {
-            if (stream.next_frame && seekTime == -1.) {
+        if (! eof)
+        {
+            if (stream.next_frame && seekTime == -1.)
+            {
                 input_bytes = &input_buf[input_bytes] - 
                                (char *) stream.next_frame;
                 memmove(input_buf, stream.next_frame, input_bytes);
             }
 
-            if (input_bytes < globalBufferSize) {
+            if (input_bytes < globalBufferSize)
+            {
                 int len = input()->readBlock((char *) input_buf + input_bytes,
                                              globalBufferSize - input_bytes);
 
-                if (len == 0) {
+                if (len == 0)
+                {
                     eof = true;
-                } else if (len < 0) {
+                } 
+                else if (len < 0) 
+                {
                     derror = true;
+                    message("decoder error");
                     break;
                 }
 
@@ -412,12 +415,15 @@ void MadDecoder::run()
 
         mutex()->unlock();
 
-        while (! done && ! finish && ! derror) {
-            if (mad_frame_decode(&frame, &stream) == -1) {
+        while (! done && ! finish && ! derror)
+        {
+            if (mad_frame_decode(&frame, &stream) == -1)
+            {
                 if (stream.error == MAD_ERROR_BUFLEN)
                     break;
 
-                if (! MAD_RECOVERABLE(stream.error)) {
+                if (! MAD_RECOVERABLE(stream.error))
+                {
                     derror = true;
                     break;
                 }
@@ -426,7 +432,8 @@ void MadDecoder::run()
 
             mutex()->lock();
 
-            if (seekTime >= 0.) {
+            if (seekTime >= 0.)
+            {
                 mutex()->unlock();
                 break;
             }
@@ -439,12 +446,15 @@ void MadDecoder::run()
 
     mutex()->lock();
 
-    if (! user_stop && eof) {
+    if (! user_stop && eof) 
+    {
         flush(TRUE);
 
-        if (output()) {
+        if (output())
+        {
             output()->recycler()->mutex()->lock();
-            while (! output()->recycler()->empty() && ! user_stop) {
+            while (! output()->recycler()->empty() && ! user_stop)
+            {
                 output()->recycler()->cond()->wakeOne();
                 mutex()->unlock();
                 output()->recycler()->cond()->wait(
@@ -456,21 +466,22 @@ void MadDecoder::run()
 
         done = TRUE;
         if (! user_stop)
+        {
             finish = TRUE;
+        }
     }
 
-    if (finish)
-        stat = DecoderEvent::Finished;
-    else if (user_stop)
-        stat = DecoderEvent::Stopped;
+
+    if(finish)
+    {
+        message("decoder finish");
+    }
+    else if(done)
+    {
+        message("decoder stop");
+    }
 
     mutex()->unlock();
-
-    {
-        DecoderEvent e((DecoderEvent::Type) stat);
-        dispatch(e);
-    }
-
     deinit();
 }
 

@@ -25,6 +25,7 @@
 Decoder::Decoder(DecoderFactory *d, QIODevice *i, Output *o)
        : fctry(d), in(i), out(o), blksize(0)
 {
+    parent = NULL;
 }
 
 Decoder::~Decoder()
@@ -94,6 +95,31 @@ void Decoder::removeListener(QObject *object)
     listeners.remove(object);
 }
 */
+
+
+void Decoder::log(const QString &log_message, int verbosity)
+{
+    if(parent)
+    {
+        parent->log(log_message, verbosity);
+    }
+}
+
+void Decoder::warning(const QString &warn_message)
+{
+    if(parent)
+    {
+        parent->warning(warn_message);
+    }
+}
+
+void Decoder::message(const QString &internal_message)
+{
+    if(parent)
+    {
+        parent->sendInternalMessage(internal_message);
+    }
+}
 
 
 // static methods

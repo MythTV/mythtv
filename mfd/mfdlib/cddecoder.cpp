@@ -216,25 +216,19 @@ void CdDecoder::run()
         return;
     }
 
-    stat = DecoderEvent::Decoding;
-
     mutex()->unlock();
-
-    {
-        DecoderEvent e((DecoderEvent::Type) stat);
-        dispatch(e);
-    }
 
     int16_t *cdbuffer;
 
-    while (! done && ! finish) {
+    while (! done && ! finish)
+    {
         mutex()->lock();
         // decode
 
-        if (seekTime >= 0.0) {
+        if (seekTime >= 0.0)
+        {
             curpos = (int)(((seekTime * 44100) / CD_FRAMESAMPLES) + start);
             paranoia_seek(paranoia, curpos, SEEK_SET);
-
             seekTime = -1.0;
         }
 
@@ -243,21 +237,25 @@ void CdDecoder::run()
         {
             cdbuffer = paranoia_read(paranoia, paranoia_cb);
 
-	    memcpy((char *)(output_buf + output_at), (char *)cdbuffer, 
+	        memcpy((char *)(output_buf + output_at), (char *)cdbuffer, 
                    CD_FRAMESIZE_RAW);
-	    output_at += CD_FRAMESIZE_RAW;
+	        output_at += CD_FRAMESIZE_RAW;
             output_bytes += CD_FRAMESIZE_RAW;
 
             if (output())
+            {
                 flush();
+            }
         }
         else
         {
             flush(TRUE);
 
-            if (output()) {
+            if (output())
+            {
                 output()->recycler()->mutex()->lock();
-                while (! output()->recycler()->empty() && ! user_stop) {
+                while (! output()->recycler()->empty() && ! user_stop)
+                {
                     output()->recycler()->cond()->wakeOne();
                     mutex()->unlock();
                     output()->recycler()->cond()->wait(
@@ -268,7 +266,8 @@ void CdDecoder::run()
             }
 
             done = TRUE;
-            if (! user_stop) {
+            if (! user_stop)
+            {
                 finish = TRUE;
             }
         } 
@@ -278,17 +277,17 @@ void CdDecoder::run()
 
     mutex()->lock();
 
-    if (finish)
-        stat = DecoderEvent::Finished;
-    else if (user_stop)
-        stat = DecoderEvent::Stopped;
+    if(finish)
+    {
+        message("decoder finish");
+    }
+    else if(done)
+    {
+        message("decoder stop");
+    }
+
 
     mutex()->unlock();
-
-    {
-        DecoderEvent e((DecoderEvent::Type) stat);
-        dispatch(e);
-    }
 
     deinit();
 }
@@ -300,14 +299,14 @@ int CdDecoder::getNumTracks(void)
     struct disc_info discinfo;
     if (cd_stat(cd, &discinfo) != 0)
     {
-        error("Couldn't stat CD, Error.");
+        warning("CdDecoder: couldn't stat CD");
         cd_finish(cd);
         return 0;
     }
 
     if (!discinfo.disc_present)
     {
-        error("No disc present");
+        warning("CdDecoder: no disc present");
         cd_finish(cd);
         return 0;
     }
@@ -326,14 +325,14 @@ int CdDecoder::getNumCDAudioTracks(void)
     struct disc_info discinfo;
     if (cd_stat(cd, &discinfo) != 0)
     {
-        error("Couldn't stat CD, Error.");
+        warning("CdDecoder: couldn't stat CD");
         cd_finish(cd);
         return 0;
     }
 
     if (!discinfo.disc_present)
     {
-        error("No disc present");
+        warning("no disc present");
         cd_finish(cd);
         return 0;
     }
@@ -403,14 +402,14 @@ Metadata *CdDecoder::getMetadata()
     struct disc_info discinfo;
     if (cd_stat(cd, &discinfo) != 0)
     {
-        error("Couldn't stat CD, Error.");
+        warning("couldn't stat CD");
         cd_finish(cd);
         return NULL;
     }
 
     if (!discinfo.disc_present)
     {
-        error("No disc present");
+        warning("no disc present");
         cd_finish(cd);
         return NULL;
     }
@@ -427,14 +426,14 @@ Metadata *CdDecoder::getMetadata()
 
     if (tracknum > discinfo.disc_total_tracks)
     {
-        error("No such track on CD");
+        warning("no such track on CD");
         cd_finish(cd);
         return NULL;
     }
 
     if(discinfo.disc_track[tracknum - 1].track_type != CDAUDIO_TRACK_AUDIO )
     {
-        error("Exclude non audio tracks");
+        warning("exclude non audio tracks");
         cd_finish(cd);
         return NULL;
     }
@@ -497,14 +496,14 @@ void CdDecoder::commitMetadata(Metadata *mdata)
     struct disc_info discinfo;
     if (cd_stat(cd, &discinfo) != 0)
     {
-        error("Couldn't stat CD, Error.");
+        warning("couldn't stat CD");
         cd_finish(cd);
         return;
     }
 
     if (!discinfo.disc_present)
     {
-        error("No disc present");
+        warning("no disc present");
         cd_finish(cd);
         return;
     }
@@ -513,7 +512,7 @@ void CdDecoder::commitMetadata(Metadata *mdata)
 
     if (tracknum > discinfo.disc_total_tracks)
     {
-        error("No such track on CD");
+        warning("no such track on CD");
         cd_finish(cd);
         return;
     }

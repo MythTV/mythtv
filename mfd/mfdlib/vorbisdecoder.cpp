@@ -288,19 +288,15 @@ void VorbisDecoder::run()
         return;
     }
 
-    stat = DecoderEvent::Decoding;
-
     mutex()->unlock();
 
-    {
-        DecoderEvent e((DecoderEvent::Type) stat);
-        dispatch(e);
-    }
 
     int section = 0;
 
-    while (! done && ! finish) {
+    while (! done && ! finish)
+    {
         mutex()->lock();
+    
         // decode
 
         if (seekTime >= 0.0)
@@ -345,7 +341,7 @@ void VorbisDecoder::run()
             // error in read
             error("DecoderOgg: Error while decoding stream, File appears to be "
                   "corrupted");
-
+            message("decoder error");
             finish = TRUE;
         }
 
@@ -354,17 +350,16 @@ void VorbisDecoder::run()
 
     mutex()->lock();
 
-    if (finish)
-        stat = DecoderEvent::Finished;
-    else if (user_stop)
-        stat = DecoderEvent::Stopped;
+    if(finish)
+    {
+        message("decoder finish");
+    }
+    else if(done)
+    {
+        message("decoder stop");
+    }
 
     mutex()->unlock();
-
-    {
-        DecoderEvent e((DecoderEvent::Type) stat);
-        dispatch(e);
-    }
 
     deinit();
 }

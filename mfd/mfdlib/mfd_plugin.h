@@ -15,6 +15,8 @@
 #include <qthread.h>
 #include <qmutex.h>
 #include <qstringlist.h>
+#include <qptrlist.h>
+#include <qvaluelist.h>
 #include <qsocketdevice.h>
 #include <vector>
 using namespace std;
@@ -157,7 +159,9 @@ class MFDServicePlugin : public MFDBasePlugin
     void            sendCoreMFDMessage(const QString &message);
     void            sendMessage(const QString &message, int socket_identifier);
     void            sendMessage(const QString &message);
-
+    void            sendInternalMessage(const QString &the_message);
+    void            checkInternalMessages();
+    virtual void    handleInternalMessage(QString the_message);
 
     virtual void    processRequest(MFDServiceClientSocket *a_client);
     void            markUnused(ServiceRequestThread *which_one);
@@ -217,6 +221,19 @@ class MFDServicePlugin : public MFDBasePlugin
     //
     
     QTime thread_exhaustion_timestamp;
+
+    //
+    //  A little queue of "internal" messages. These are things that
+    //  sub-threads want to be able to pass to each other. An example would
+    //  be where an audio decoder wants to tell the main audio plugin thread
+    //  that it has finished playing something.
+    //
+
+
+    QValueList<QString>  internal_messages;
+    QMutex             internal_messages_mutex;
+
+
 };
 
 class MFDHttpPlugin : public MFDServicePlugin

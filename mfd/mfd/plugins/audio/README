@@ -7,3 +7,5 @@ pause on
 pause off
 stop
 seek foo    {where foo is a signed integer, seconds}
+play item foo bar {where foo is container id, bar is an item id}
+play playlist foo bar {where foo is container id, bar is an item id}

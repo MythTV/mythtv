@@ -32,7 +32,7 @@ class FlacDecoder : public Decoder
 
     void doWrite(const FLAC__Frame *frame, const FLAC__int32 * const buffer[]);
     void setFlacMetadata(const FLAC__StreamMetadata *metadata);
-
+    void flacError(FLAC__StreamDecoderErrorStatus status);
     AudioMetadata *getMetadata();
     //  void commitMetadata(Metadata *mdata);
 

@@ -29,6 +29,7 @@ AudioPlugin::AudioPlugin(MFD *owner, int identity)
     audio_device = "/dev/dsp";  //  <--- ewww ... change that soon
     state_of_play_mutex = new QMutex(true);    
     metadata_server = parent->getMetadataServer();
+    stopPlaylistMode();
 }
 
 void AudioPlugin::swallowOutputUpdate(int numb_seconds, int channels, int bitrate, int frequency)
@@ -91,11 +92,13 @@ void AudioPlugin::run()
     while(keep_going)
     {
         //
-        //  Update the status of our sockets.
+        //  Update the status of our sockets and wait for something to happen
         //
         
         updateSockets();
         waitForSomethingToHappen();
+        checkInternalMessages();
+        
     }
 
     stopAudio();
@@ -160,6 +163,49 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
                 }
                 else if(tokens[1] == "container" || tokens[1] == "playlist")
                 {
+                    if(tokens.count() < 4)
+                    {
+                        ok = false;
+                    }
+                    else
+                    {
+                        bool parsed_ok = true;
+                        int collection_id = tokens[2].toInt(&parsed_ok);
+                        if(!parsed_ok)
+                        {
+                            ok = false;
+                        }
+                        else
+                        {
+                            int playlist_id = tokens[3].toInt(&parsed_ok);
+                            if(!parsed_ok)
+                            {
+                                ok = false;
+                            }
+                            else
+                            {
+                                if(tokens.count() >= 5)
+                                {
+                                    int index_position = tokens[4].toInt(&parsed_ok);
+                                    if(!parsed_ok)
+                                    {
+                                        ok = false;
+                                    }
+                                    else
+                                    {
+                                        setPlaylistMode(collection_id, playlist_id, index_position);
+                                        playFromPlaylist(false);
+                                    }
+                                }
+                                else
+                                {
+                                    setPlaylistMode(collection_id, playlist_id);
+                                    playFromPlaylist(false);
+                                }
+                            }
+                        }
+                    }
+                    
                 }
                 else
                 {
@@ -228,6 +274,8 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
 
 bool AudioPlugin::playUrl(QUrl url)
 {
+    log(QString("attempting to play this url: \"%1\"")
+                .arg(url), 9);
 
     //
     //  Before we do anything else, check to see if we can access this new
@@ -336,6 +384,7 @@ bool AudioPlugin::playUrl(QUrl url)
         {
         
             decoder = Decoder::create(url_path, input, output);
+
             if(!decoder)
             {
                 warning(QString("passed unsupported url in unsupported format: %1")
@@ -348,6 +397,7 @@ bool AudioPlugin::playUrl(QUrl url)
                 return false;
             }
             decoder->setBlockSize(globalBlockSize);
+            decoder->setParent(this);
         }
         else
         {
@@ -403,6 +453,7 @@ bool AudioPlugin::playMetadata(int collection_id, int metadata_id)
     //  anything else
     //
     
+    metadata_server->lockMetadata();
     Metadata *metadata_to_play = 
             metadata_server->getMetadataByContainerAndId(
                                                             collection_id,
@@ -425,10 +476,13 @@ bool AudioPlugin::playMetadata(int collection_id, int metadata_id)
     if(metadata_to_play->getType() == MDT_audio)
     {
         AudioMetadata *audio_metadata_to_play = (AudioMetadata *)metadata_to_play;
-        return playUrl(audio_metadata_to_play->getUrl());
+        QUrl url_to_play = audio_metadata_to_play->getUrl();
+        metadata_server->unlockMetadata();
+        return playUrl(url_to_play);
     }
     else
     {
+        metadata_server->unlockMetadata();
         warning(QString("was asked to play container %1 "
                         "item %2, which is not audio content")
                         .arg(collection_id)
@@ -499,17 +553,28 @@ void AudioPlugin::stopAudio()
         is_paused = false;
 
     state_of_play_mutex->unlock();
+    
 }
 
 void AudioPlugin::pauseAudio(bool true_or_false)
 {
     state_of_play_mutex->lock();
+    
+        if(!is_playing)
+        {
+            //
+            //  you can't be paused if you're not playing!
+            //
+            
+            true_or_false = false;
+            
+        }
+    
         if(true_or_false == is_paused)
         {
             //
             //  already in the right state of pause
             //
-    
         }
         else
         {
@@ -582,6 +647,136 @@ void AudioPlugin::seekAudio(int seek_amount)
             output->mutex()->unlock();
         }
     state_of_play_mutex->unlock();
+}
+
+void AudioPlugin::handleInternalMessage(QString the_message)
+{
+    //
+    //  This is where we handle internal messages (coming from the decoder)
+    //
+    
+    if(the_message == "decoder error")
+    {
+        //  Don't do anything about this at the moment
+    }
+    if(the_message == "decoder stop")
+    {
+        //
+        //  Well, ok ... stop means we really stopped (not that we just
+        //  reached the end of a file), nothing to do
+        //
+        
+    }
+    if(the_message == "decoder finish")
+    {
+        //
+        //  If we're in playlist mode, find the next thing to play.
+        //  Otherwise, destruct everything.
+        //
+
+        if(playlist_mode)
+        {
+            playFromPlaylist(true);
+        }
+        else
+        {
+            stopAudio();
+        }
+    }
+}
+
+void AudioPlugin::setPlaylistMode(int container, int id, int index)
+{
+
+    playlist_mode_mutex.lock();
+        playlist_mode = true;
+        current_playlist_container = container;
+        current_playlist_id = id;
+        current_playlist_item_index = index;
+        log(QString("entering playlist mode "
+                    "(container=%1, playlist=%2)")
+                    .arg(container)
+                    .arg(id), 7);
+    playlist_mode_mutex.unlock();
+}
+
+void AudioPlugin::stopPlaylistMode()
+{
+    playlist_mode_mutex.lock();
+        playlist_mode = false;
+        current_playlist_container = -1;
+        current_playlist_id = -1;
+        current_playlist_item_index = -1;
+        log(QString("leaving playlist mode"), 7);
+    playlist_mode_mutex.unlock();
+}
+
+void AudioPlugin::playFromPlaylist(bool augment_index)
+{
+
+    QUrl url_to_play_next;
+
+    playlist_mode_mutex.lock();
+
+    if(augment_index)
+    {
+        ++current_playlist_item_index;
+    }
+
+    //
+    //  find the playlist in question
+    //
+
+    metadata_server->lockMetadata();
+
+    Playlist *playlist_to_play = 
+             metadata_server->getPlaylistByContainerAndId(
+                 
+                               current_playlist_container,
+                               current_playlist_id
+                                                         );        
+                                                          
+    if(!playlist_to_play)
+    {
+        warning("asked to play from playlist that doesn't exist");
+        metadata_server->unlockMetadata();
+        playlist_mode_mutex.unlock();
+        stopPlaylistMode();
+        return;
+    }
+        
+    //
+    //  Get the list of references.
+    //
+        
+    QValueList<uint> song_list = playlist_to_play->getList();
+
+    if(current_playlist_item_index >= (int) song_list.count())
+    {
+        //
+        //  No (more?) songs to play in this list
+        //
+
+        metadata_server->unlockMetadata();
+        playlist_mode_mutex.unlock();
+        stopPlaylistMode();
+        return;
+    }
+        
+    //
+    //  Get the relevant reference
+    //
+        
+    uint song_to_play = song_list[current_playlist_item_index];
+    uint collection_to_play_from = current_playlist_container;
+
+    metadata_server->unlockMetadata();        
+    playlist_mode_mutex.unlock();
+
+    if(!playMetadata(collection_to_play_from, song_to_play))
+    {
+        stopPlaylistMode();
+    }
 }
 
 AudioPlugin::~AudioPlugin()

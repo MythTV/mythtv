@@ -250,8 +250,13 @@ bool avfDecoder::initialize()
     totalTime = (ic->duration / AV_TIME_BASE) * 1000;
 
     if (output())
-    // Do I need to modify this?
-        output()->configure(44100, 2, 16, 44100 * 2 * 16);
+    {
+        output()->configure(audio_dec->sample_rate, 
+                            audio_dec->channels, 
+                            16, 
+                            audio_dec->sample_rate * 
+                            audio_dec->channels * 16);
+    }
 
     inited = TRUE;
     return TRUE;
@@ -297,14 +302,7 @@ void avfDecoder::run()
         return;
     }
 
-    stat = DecoderEvent::Decoding;
-
     mutex()->unlock();
-
-    {
-        DecoderEvent e((DecoderEvent::Type) stat);
-        dispatch(e);
-    }
 
     av_read_play(ic);
     while (!done && !finish && !user_stop) 
@@ -314,7 +312,6 @@ void avfDecoder::run()
         // Look to see if user has requested a seek
         if (seekTime >= 0.0) 
         {
-            cerr << "avfdecoder.o: seek time " << seekTime << endl;
             if (av_seek_frame(ic, 0, (int64_t)(seekTime * AV_TIME_BASE)) < 0)
             {
                 cerr << "avfdecoder.o: error seeking" << endl;
@@ -327,7 +324,7 @@ void avfDecoder::run()
         // if (av_read_packet(ic, pkt) < 0)
         if (av_read_frame(ic, pkt) < 0)
         {
-            cerr << "avfdecoder.o: read frame failed" << endl;
+            message("decoder error");
             mutex()->unlock();
             finish = TRUE;
             break;
@@ -402,17 +399,17 @@ void avfDecoder::run()
     }
 
     flush(TRUE);
-    if (finish)
-        stat = DecoderEvent::Finished;
-    else if (user_stop)
-        stat = DecoderEvent::Stopped;
 
-    // mutex()->unlock();
-
+    mutex()->lock();
+    if(finish)
     {
-        DecoderEvent e((DecoderEvent::Type) stat);
-        dispatch(e);
+        message("decoder finish");
     }
+    else if(done)
+    {
+        message("decoder stop");
+    }
+    mutex()->unlock();
 
     deinit();
 }

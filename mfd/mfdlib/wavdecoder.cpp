@@ -67,7 +67,7 @@ WavDecoder::WavDecoder(const QString &file, DecoderFactory *d,
 
 void WavDecoder::stop()
 {
-    user_stop = TRUE;
+    user_stop = true;
 }
 
 void WavDecoder::flush(bool final)
@@ -93,7 +93,7 @@ void WavDecoder::flush(bool final)
         if (user_stop || finish)
         {
             inited = false;
-            done = TRUE;
+            done = true;
         } 
         else 
         {
@@ -139,7 +139,7 @@ bool WavDecoder::initialize()
 
     if (! input())
     {
-        cerr << "WavDecoder: cannot initialize.  No input." << endl;
+        warning("WavDecoder: cannot initialize as it has no input");
         return false;
     }
 
@@ -155,7 +155,7 @@ bool WavDecoder::initialize()
     {
         if (! input()->open(IO_ReadOnly))
         {
-            cerr << "WavDecoder: Failed to open input" << endl;
+            warning("WavDecoder: failed to open input");
             return false;
         }
     }
@@ -167,7 +167,7 @@ bool WavDecoder::initialize()
 
     if(!readWavHeader(input()))
     {
-        cerr << "WavDecoder: problem reading wav header" << endl;
+        warning("WavDecoder: problem reading wav header");
         return false;
     }
 
@@ -177,8 +177,8 @@ bool WavDecoder::initialize()
         output()->configure(freq, chan, bits_per_sample, bitrate);
     }
 
-    inited = TRUE;
-    return TRUE;
+    inited = true;
+    return true;
 
 }
 
@@ -226,7 +226,7 @@ bool WavDecoder::readWavHeader(QIODevice *the_input)
         header[3] != 'F'
       )
     {
-        cerr << "WavDecoder: did not get RIFF as first bytes of wav" << endl;
+        warning("WavDecoder: did not get RIFF as first bytes of wav");
         return false;
     }
     
@@ -241,7 +241,7 @@ bool WavDecoder::readWavHeader(QIODevice *the_input)
         header[11] != 'E'
       )
     {
-        cerr << "WavDecoder: did not get WAVE as internal format" << endl;
+        warning("WavDecoder: did not get WAVE as internal format");
         return false;
     }
 
@@ -253,7 +253,7 @@ bool WavDecoder::readWavHeader(QIODevice *the_input)
     
     if(fmt_subchunk_length != 16)
     {
-        cerr << "WavDecoder: wav format subchunk is not 16 bytes long" << endl;
+        warning("WavDecoder: wav format subchunk is not 16 bytes long");
         return false;
     }
     
@@ -265,7 +265,7 @@ bool WavDecoder::readWavHeader(QIODevice *the_input)
 
     if(audio_format != 1)
     {
-        cerr << "WavDecoder: wav file does not contain PCM data" << endl;
+        warning("WavDecoder: wav file does not contain PCM data");
         return false;
     }    
     
@@ -276,12 +276,14 @@ bool WavDecoder::readWavHeader(QIODevice *the_input)
     chan = getU16(header[22], header[23]);
     if(chan < 1)
     {
-        cerr << "WavDecoder: wav header said there were 0 channels" << endl;
+        warning("WavDecoder: wav header said there were 0 channels");
         return false;
     }
     if(chan != 2)
     {
-        cerr << "WavDecoder: wav header said there were " << chan << " channel(s), which is a bit odd" << endl;
+        log(QString("WavDecoder: wav header said there were "
+                    "%1 channel(s), which is a bit odd")
+                    .arg(chan), 2);
     }
     
     //
@@ -291,12 +293,14 @@ bool WavDecoder::readWavHeader(QIODevice *the_input)
     freq = getU32(header[24], header[25], header[26], header[27]);
     if(freq < 1)
     {
-        cerr << "WavDecoder: wav header said frequency is 0" << endl;
+        warning("WavDecoder: wav header said frequency is 0");
         return false;
     }
     if(freq != 44100)
     {
-        cerr << "WavDecoder: wav header said frequency is " << freq << ", which seems a bit odd" << endl;
+        log(QString("WavDecoder: wav header said frequency is "
+                    "%1 which seems a bit odd")
+                    .arg(freq), 2);
     }
 
     //
@@ -306,7 +310,7 @@ bool WavDecoder::readWavHeader(QIODevice *the_input)
     byte_rate = getU32(header[28], header[29], header[30], header[31]);
     if(byte_rate < 1)
     {
-        cerr << "WavDecoder: wav header said byte rate is 0" << endl;
+        warning("WavDecoder: wav header said byte rate is 0");
         return false;
     }
     
@@ -319,7 +323,7 @@ bool WavDecoder::readWavHeader(QIODevice *the_input)
     block_align = getU16(header[32], header[33]);
     if(block_align < 1)
     {
-        cerr << "WavDecoder: wav header said block align is 0" << endl;
+        warning("WavDecoder: wav header said block align is 0");
         return false;
     }
     
@@ -330,15 +334,14 @@ bool WavDecoder::readWavHeader(QIODevice *the_input)
     bits_per_sample = getU16(header[34], header[35]);
     if(bits_per_sample < 1)
     {
-        cerr << "WavDecoder: wav header said there were 0 bits per sample" << endl;
+        warning("WavDecoder: wav header said there were 0 bits per sample");
         return false;
     }
     if(bits_per_sample != 16)
     {
-        cerr << "WavDecoder: wav header said there bits per sample is " 
-             << bits_per_sample 
-             << ", which may not work properly" 
-             << endl;
+        log(QString("WavDecoder: wav header said there bits per sample is " 
+                    "%1, which may not work properly")
+                    .arg(bits_per_sample), 2);
     }
     
     //
@@ -352,14 +355,14 @@ bool WavDecoder::readWavHeader(QIODevice *the_input)
         header[39] != 'a'
       )
     {
-        cerr << "WavDecoder: did not get \"data\" as subchunk tag" << endl;
+        warning("WavDecoder: did not get \"data\" as subchunk tag");
         return false;
     }
 
     pcm_data_size = getU32(header[40], header[41], header[42], header[43]);
     if(pcm_data_size < 1)
     {
-        cerr << "WavDecoder: wav header said there was no PCM data" << endl;
+        warning("WavDecoder: wav header said there was no PCM data");
         return false;
     }    
 
@@ -371,7 +374,7 @@ bool WavDecoder::readWavHeader(QIODevice *the_input)
 
     if(pcm_data_size + 44 != (long) the_input->size())
     {
-        cerr << "WavDecoder: pcm data size and file size are mismatched" << endl;
+        warning("WavDecoder: pcm data size and file size are mismatched");
         return false;
     }
     
@@ -413,7 +416,7 @@ void WavDecoder::seek(double pos)
     }
     if(seekTime > totalTime)
     {
-        seekTime = totalTime;
+        seekTime = totalTime - 0.5;
     }
 
 }
@@ -435,15 +438,12 @@ void WavDecoder::run()
 
     if (! inited)
     {
+        warning("WavDecoder run() without being init()'d");
         mutex()->unlock();
         return;
     }
 
-    stat = DecoderEvent::Decoding;
-
     mutex()->unlock();
-    DecoderEvent e((DecoderEvent::Type) stat);
-    dispatch(e);
 
     while (! done && ! finish)
     {
@@ -465,14 +465,14 @@ void WavDecoder::run()
             //  sample boundary or get our channels switched .. so correct for block_align.
             //
             
-            while(go_to_where % block_align != 0)
+            while(go_to_where % block_align != 1)
             {
                 ++go_to_where;
             }
             
             if(!input()->at(go_to_where))
             {
-                cerr << "WavDecoder: cannot seem to seek (?)" << endl;
+                warning("WavDecoder: cannot seem to seek (?)");
             }
             seekTime = -1.0;
         }
@@ -490,7 +490,7 @@ void WavDecoder::run()
         } 
         else if (len == 0)
         {
-            flush(TRUE);
+            flush(true);
 
             if (output()) 
             {
@@ -505,10 +505,10 @@ void WavDecoder::run()
                 output()->recycler()->mutex()->unlock();
             }
 
-            done = TRUE;
+            done = true;
             if (! user_stop)
             {
-                finish = TRUE;
+                finish = true;
             }
         } 
         else 
@@ -517,24 +517,24 @@ void WavDecoder::run()
             //  negative length for readBlock, something bad happened
             //
 
-            cerr << "WavDecoder: error from read" << endl;
-            finish = TRUE;
-            //done = TRUE;
+            warning("WavDecoder: error from read");
+            message("decoder error");
+            finish = true;
         }
 
         mutex()->unlock();
     }
 
     mutex()->lock();
-    if (finish)
-        stat = DecoderEvent::Finished;
-    else if (user_stop)
-        stat = DecoderEvent::Stopped;
-    mutex()->unlock();
+    if(finish)
     {
-        DecoderEvent e((DecoderEvent::Type) stat);
-        dispatch(e);
+        message("decoder finish");
     }
+    else if(done)
+    {
+        message("decoder stop");
+    }
+    mutex()->unlock();
 
     deinit();
 }

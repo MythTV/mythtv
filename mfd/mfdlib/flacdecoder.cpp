@@ -163,11 +163,8 @@ void FlacDecoder::setFlacMetadata(const FLAC__StreamMetadata *metadata)
 static void flacerror(const FLAC__SeekableStreamDecoder *decoder, FLAC__StreamDecoderErrorStatus status, void *client_data)
 {
     decoder = decoder;
-
-    FLAC__FileDecoder *file_decoder = (FLAC__FileDecoder *)client_data;
-
-    file_decoder = file_decoder;
-    status = status;
+    FlacDecoder *dflac = (FlacDecoder *)client_data;
+    dflac->flacError(status);
 }
 
 
@@ -270,9 +267,9 @@ bool FlacDecoder::initialize()
     seekTime = -1.0;
     totalTime = 0.0;
 
-    if (! input()) {
-        error("FlacDecoder: cannot initialize.  No input.");
-
+    if (! input())
+    {
+        warning("FlacDecoder: cannot initialize, no input");
         return FALSE;
     }
 
@@ -285,8 +282,7 @@ bool FlacDecoder::initialize()
     {
         if (! input()->open(IO_ReadOnly)) 
         {
-            error("FlacOgg: Failed to open input. Error " +
-                  QString::number(input()->status()) + ".");
+            warning("FlacOgg: Failed to open input.");
             return FALSE;
         }
     }
@@ -348,14 +344,8 @@ void FlacDecoder::run()
 
         return;
     }
-    stat = DecoderEvent::Decoding;
 
     mutex()->unlock();
-
-    {
-        DecoderEvent e((DecoderEvent::Type) stat);
-        dispatch(e);
-    }
 
     bool flacok = true;
     FLAC__SeekableStreamDecoderState decoderstate;
@@ -414,18 +404,15 @@ void FlacDecoder::run()
     
 
     mutex()->lock();
-
-    if (finish)
-        stat = DecoderEvent::Finished;
-    else if (user_stop)
-        stat = DecoderEvent::Stopped;
-
-    mutex()->unlock();
-
+    if(finish)
     {
-        DecoderEvent e((DecoderEvent::Type) stat);
-        dispatch(e);
+        message("decoder finish");
     }
+    else if(done)
+    {
+        message("decoder stop");
+    }
+    mutex()->unlock();
 
     deinit();
 }
@@ -618,6 +605,18 @@ QString FlacDecoder::getComment(FLAC__StreamMetadata *block, const char *label)
 
     return retstr;
 }
+
+void FlacDecoder::flacError(FLAC__StreamDecoderErrorStatus status)
+{
+    status = status;
+    
+    log("FlacDecoder: got an error during flac "
+        "decoding, but will try to continue", 3);
+
+}
+
+
+
 
 /*
 void FlacDecoder::setComment(FLAC__StreamMetadata *block, const char *label,
