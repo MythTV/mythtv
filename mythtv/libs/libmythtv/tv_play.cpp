@@ -3280,7 +3280,10 @@ void TV::BrowseDispInfo(int direction)
 
     browsechannum = infoMap["channum"];
     browsechanid = infoMap["chanid"];
-    browsestarttime = infoMap["dbstarttime"];
+
+    if ((direction == BROWSE_LEFT) ||
+        (direction == BROWSE_RIGHT))
+        browsestarttime = infoMap["dbstarttime"];
 
     QDateTime startts = QDateTime::fromString(browsestarttime, Qt::ISODate);
 
