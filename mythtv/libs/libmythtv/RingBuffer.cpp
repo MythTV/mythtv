@@ -219,7 +219,6 @@ int RingBuffer::Write(const void *buf, int count)
         {
             write(dumpfd, buf, count);
         }
-        sync();
     }
 
     pthread_rwlock_unlock(&rwlock);

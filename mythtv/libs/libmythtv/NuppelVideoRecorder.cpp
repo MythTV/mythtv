@@ -1046,7 +1046,9 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
             keyswritten++;
 	    if (keyswritten > 6)
                 keyframedist = KEYFRAMEDISTEND;
-	}    
+	} 
+   
+        sync();   
     }
 
     if (!raw) 
