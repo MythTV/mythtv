@@ -190,8 +190,9 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     mpa_ctx.max_qdiff = qualdiff;
     mpa_ctx.qcompress = 0.5;
     mpa_ctx.qblur = 0.5;
+    mpa_ctx.rc_qsquish = 1.0;
     mpa_ctx.max_b_frames = 0;
-    mpa_ctx.b_quant_factor = 2.0;
+    mpa_ctx.b_quant_factor = 0;
     mpa_ctx.rc_strategy = 2;
     mpa_ctx.b_frame_strategy = 0;
     mpa_ctx.gop_size = 30;
@@ -205,7 +206,7 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     mpa_ctx.rc_buffer_aggressivity = 1.0;
     mpa_ctx.i_quant_factor = 1.25;
     mpa_ctx.b_quant_factor = 1.25;
-    mpa_ctx.i_quant_offset = -0.5;
+    mpa_ctx.i_quant_offset = -0.8;
     mpa_ctx.b_quant_offset = 0;
     mpa_ctx.dct_algo = FF_DCT_AUTO;
     

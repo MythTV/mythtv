@@ -222,6 +222,6 @@ extern void (*av_fdct)(MpegEncContext *s, DCTELEM *block);
 
 void fdct_ifast(MpegEncContext *s, DCTELEM *data);
 void ff_jpeg_fdct_islow (MpegEncContext *s, DCTELEM *data);
-void fdct_mmx(MpegEncContext *s, DCTELEM *block);
+void ff_fdct_mmx(MpegEncContext *s, DCTELEM *block);
 
 #endif

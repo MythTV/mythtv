@@ -504,7 +504,7 @@ unsigned char *NuppelVideoPlayer::DecodeFrame(struct rtframeheader *frameheader,
         if (!gotpicture)
         {
             cout << "nopicture\n";
-            return buf;
+            return NULL;
         }
 
         if (mpa_picture.linesize[0] != video_width)
@@ -717,6 +717,9 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
         {
             unsigned char *ret = DecodeFrame(&frameheader, strm);
 
+            if (!ret)
+                continue;
+	    
             while (vbuffer_numfree() == 0)
             {
                 //cout << "waiting for video buffer to drain.\n";
