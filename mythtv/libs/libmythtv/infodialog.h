@@ -4,7 +4,8 @@
 #include <qwidget.h>
 #include <qdialog.h>
 
-class ProgramInfo;
+#include "programinfo.h"
+
 class QLabel;
 class QCheckBox;
 
@@ -30,7 +31,7 @@ class InfoDialog : public QDialog
     QCheckBox *recevery;
 
     int programtype;
-    int recordstatus;
+    RecordingType recordstatus;
     ProgramInfo *myinfo;
 };
 

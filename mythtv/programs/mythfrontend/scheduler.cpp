@@ -179,7 +179,7 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
             proginfo->subtitle = query.value(5).toString();
             proginfo->description = query.value(6).toString();
             proginfo->chanstr = query.value(7).toString();
-            proginfo->recordtype = 1;
+            proginfo->recordtype = kSingleRecord;
 
             if (proginfo->title == QString::null)
                 proginfo->title = "";
@@ -268,7 +268,7 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
                         proginfo->subtitle = subquery.value(4).toString();
                         proginfo->description = subquery.value(5).toString();
                         proginfo->chanstr = subquery.value(6).toString();
-                        proginfo->recordtype = 2;
+                        proginfo->recordtype = kTimeslotRecord;
 
                         if (proginfo->title == QString::null)
                             proginfo->title = "";
@@ -310,7 +310,7 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
                     curtime.minute());
 
             thequery = QString("SELECT channel.chanid,sourceid,starttime,"
-                               "endtime,title,subtitle,description,category,"
+                               "endtime,title,subtitle,description,"
                                "channel.channum "
                                "FROM program,channel WHERE starttime >= %1 AND "
                                "endtime < %2 AND title = \"%3\" AND "
@@ -338,7 +338,7 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
                     proginfo->description = subquery.value(6).toString();
                     proginfo->chanstr = subquery.value(7).toString();
 
-                    proginfo->recordtype = 3;
+                    proginfo->recordtype = kAllRecord;
 
                     if (proginfo->title == QString::null)
                         proginfo->title = "";
@@ -386,7 +386,7 @@ void Scheduler::PrintList(void)
     for (; i != recordingList.end(); i++)
     {
         ProgramInfo *first = (*i);
-        cout << first->title << " " << first->chanstr << " \"" << first->startts.toString() << "\" " << first->sourceid << " " << first->inputid << " " << first->cardid << " --\t"  << first->conflicting << " " << first->recording << endl;
+        cout << first->title << " " << first->chanstr << " " << first->chanid << " " << " \"" << first->startts.toString() << "\" " << first->sourceid << " " << first->inputid << " " << first->cardid << " --\t"  << first->conflicting << " " << first->recording << endl;
     }
 
     cout << endl << endl;
@@ -508,7 +508,7 @@ void Scheduler::PruneList(void)
 
         ProgramInfo *first = (*i);
 
-        if (first->recordtype > 1 && 
+        if (first->recordtype > kSingleRecord && 
             (first->subtitle.length() > 2 || first->description.length() > 2))
         {
             if (FindInOldRecordings(first))
@@ -767,7 +767,7 @@ void Scheduler::RemoveConflicts(void)
 ProgramInfo *Scheduler::GetBest(ProgramInfo *info, 
                                 list<ProgramInfo *> *conflictList)
 {
-    int type = info->recordtype;
+    RecordingType type = info->recordtype;
     ProgramInfo *best = info;
 
     list<ProgramInfo *>::iterator i;

@@ -5,6 +5,16 @@
 #include <qstring.h>
 #include <qdatetime.h>
 
+enum RecordingType
+{
+    kUnknown = -1,
+    kNotRecording = 0,
+    kSingleRecord = 1,
+    kTimeslotRecord,
+    kChannelRecord,
+    kAllRecord
+};
+
 class ProgramInfo
 {
   public:
@@ -14,9 +24,8 @@ class ProgramInfo
     // returns 0 for one-time, 1 for weekdaily, 2 for weekly
     int IsProgramRecurring(void);
 
-    // returns 0 for no recording, 1 for onetime, 2 for timeslot, 3 for every
-    int GetProgramRecordingStatus(void);
-    void ApplyRecordStateChange(int newstate);
+    RecordingType GetProgramRecordingStatus(void);
+    void ApplyRecordStateChange(RecordingType newstate);
 
     void WriteRecordedToDB(QSqlDatabase *db);
 
@@ -38,7 +47,7 @@ class ProgramInfo
     int spread;
     int startCol;
 
-    int recordtype;
+    RecordingType recordtype;
     bool conflicting;
     bool recording;
 

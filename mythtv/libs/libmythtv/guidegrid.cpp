@@ -561,7 +561,7 @@ void GuideGrid::paintPrograms(QPainter *p)
         {
             ProgramInfo *pginfo = m_programInfos[y][x];
 
-            if (pginfo->recordtype == -1)
+            if (pginfo->recordtype == kUnknown)
                 pginfo->GetProgramRecordingStatus();
 
             int spread = 1;
@@ -618,16 +618,16 @@ void GuideGrid::paintPrograms(QPainter *p)
                 tmp.drawLine(startx, ydifference * y, startx, 
                              ydifference * (y + 1));
 
-                if (pginfo->recordtype > 0)
+                if (pginfo->recordtype > kNotRecording)
                 {
                     tmp.setPen(QPen(red, (int)(2 * wmult)));
                     QString text;
 
-                    if (pginfo->recordtype == 1)
+                    if (pginfo->recordtype == kSingleRecord)
                         text = "R";
-                    else if (pginfo->recordtype == 2)
+                    else if (pginfo->recordtype == kTimeslotRecord)
                         text = "T";
-                    else if (pginfo->recordtype == 3) 
+                    else if (pginfo->recordtype == kAllRecord) 
                         text = "A";
 
                     int width = fm.width(text);
@@ -635,7 +635,7 @@ void GuideGrid::paintPrograms(QPainter *p)
                     startx = (int)((x + spread) * xdifference - width * 1.5); 
                     tmp.drawText(startx, (y + 1) * ydifference - height,
                                  (int)(width * 1.5), height, AlignLeft, text);
-             
+            
                     tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
                 }
 
@@ -1014,7 +1014,7 @@ void GuideGrid::displayInfo()
 
     int startcol = pginfo->startCol;
     int spread = pginfo->spread;
-    int rectype = pginfo->recordtype;
+    RecordingType rectype = pginfo->recordtype;
 
     for (int i = 0; i < spread; i++)
     {

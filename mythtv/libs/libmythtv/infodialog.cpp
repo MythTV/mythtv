@@ -125,17 +125,17 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
 
     recordstatus = pginfo->GetProgramRecordingStatus();
 
-    if (recordstatus == 2 && programtype == 0)
+    if (recordstatus == kTimeslotRecord && programtype == 0)
     {
         printf("error, somehow set to record timeslot and it doesn't seem to have one\n");
-        recordstatus = 1;
+        recordstatus = kSingleRecord;
     }
 
-    if (recordstatus == 1)
+    if (recordstatus == kSingleRecord)
         recone->setChecked(true);
-    else if (recordstatus == 2)
+    else if (recordstatus == kTimeslotRecord)
         rectimeslot->setChecked(true);
-    else if (recordstatus == 3)
+    else if (recordstatus == kAllRecord)
         recevery->setChecked(true);
     else
         norec->setChecked(true);
@@ -226,13 +226,13 @@ void InfoDialog::receveryPressed(void)
 
 void InfoDialog::okPressed(void)
 {
-    int currentSelected = 0;
+    RecordingType currentSelected = kNotRecording;
     if (recone->isChecked())
-        currentSelected = 1;
+        currentSelected = kSingleRecord;
     else if (rectimeslot->isChecked())
-        currentSelected = 2;
+        currentSelected = kTimeslotRecord;
     else if (recevery->isChecked())
-        currentSelected = 3;
+        currentSelected = kAllRecord;
 
     if (currentSelected != recordstatus)
         myinfo->ApplyRecordStateChange(currentSelected);   

@@ -7,7 +7,7 @@ ProgramInfo::ProgramInfo(void)
 
     chanstr = "";
 
-    recordtype = -1;
+    recordtype = kUnknown;
     conflicting = false;
     recording = true;
 
@@ -74,7 +74,7 @@ ProgramInfo *GetProgramAtDateTime(QString channel, const QString &ltime)
         proginfo->category = QString::fromUtf8(query.value(6).toString());
         proginfo->chanstr = query.value(7).toString();
         proginfo->spread = -1;
-        proginfo->recordtype = -1;
+        proginfo->recordtype = kUnknown;
 
         if (proginfo->title == QString::null)
             proginfo->title = "";
@@ -139,8 +139,7 @@ int ProgramInfo::IsProgramRecurring(void)
     return 0;
 }
 
-// returns 0 for no recording, 1 for onetime, 2 for timeslot, 3 for every
-int ProgramInfo::GetProgramRecordingStatus(void)
+RecordingType ProgramInfo::GetProgramRecordingStatus(void)
 {
     QString starts = startts.toString("yyyyMMddhhmm");
     QString ends = endts.toString("yyyyMMddhhmm");
@@ -164,8 +163,8 @@ int ProgramInfo::GetProgramRecordingStatus(void)
     if (query.isActive() && query.numRowsAffected() > 0)
     {
         query.next();
-        recordtype = 1;
-        return 1;
+        recordtype = kSingleRecord;
+        return kSingleRecord;
     }
 
     for (int i = 0; i < 8; i++)
@@ -184,8 +183,8 @@ int ProgramInfo::GetProgramRecordingStatus(void)
     if (query.isActive() && query.numRowsAffected() > 0)
     {
         query.next();
-        recordtype = 2;
-        return 2;
+        recordtype = kTimeslotRecord;
+        return kTimeslotRecord;
     }
 
     thequery = QString("SELECT NULL FROM allrecord WHERE title = \"%1\";")
@@ -196,16 +195,16 @@ int ProgramInfo::GetProgramRecordingStatus(void)
     if (query.isActive() && query.numRowsAffected() > 0)
     {
         query.next();
-        recordtype = 3;
-        return 3;
+        recordtype = kAllRecord;
+        return kAllRecord;
     }
 
-    recordtype = 0;
-    return 0;
+    recordtype = kNotRecording;
+    return kNotRecording;
 }
 
 // newstate uses same values as return of GetProgramRecordingState
-void ProgramInfo::ApplyRecordStateChange(int newstate)
+void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
 {
     QString starts = startts.toString("yyyyMMddhhmm");
     QString ends = endts.toString("yyyyMMddhhmm");
@@ -219,7 +218,7 @@ void ProgramInfo::ApplyRecordStateChange(int newstate)
     QString thequery;
     QSqlQuery query;
 
-    if (recordtype == 1)
+    if (recordtype == kSingleRecord)
     {
         thequery = QString("DELETE FROM singlerecord WHERE "
                            "chanid = %1 AND starttime = %2 AND "
@@ -227,7 +226,7 @@ void ProgramInfo::ApplyRecordStateChange(int newstate)
                            .arg(sqlendtime);
         query.exec(thequery);
     }
-    else if (recordtype == 2)
+    else if (recordtype == kTimeslotRecord)
     {
         char tempstarttime[512], tempendtime[512];
         strcpy(tempstarttime, sqlstarttime);
@@ -245,7 +244,7 @@ void ProgramInfo::ApplyRecordStateChange(int newstate)
 
         query.exec(thequery);
     }
-    else if (recordtype == 3)
+    else if (recordtype == kAllRecord)
     {
         thequery = QString("DELETE FROM allrecord WHERE title = \"%1\";")
                           .arg(title);
@@ -253,7 +252,7 @@ void ProgramInfo::ApplyRecordStateChange(int newstate)
         query.exec(thequery);
     }
 
-    if (newstate == 1)
+    if (newstate == kSingleRecord)
     {
         thequery = QString("INSERT INTO singlerecord (chanid,starttime,"
                            "endtime,title,subtitle,description) "
@@ -262,7 +261,7 @@ void ProgramInfo::ApplyRecordStateChange(int newstate)
                            .arg(title).arg(subtitle).arg(description);
         query.exec(thequery);
     }
-    else if (newstate == 2)
+    else if (newstate == kTimeslotRecord)
     {
         for (int i = 0; i < 8; i++)
         {
@@ -276,7 +275,7 @@ void ProgramInfo::ApplyRecordStateChange(int newstate)
                            .arg(title);
         query.exec(thequery);
     }
-    else if (newstate == 3)
+    else if (newstate == kAllRecord)
     {
         thequery = QString("INSERT INTO allrecord (title) VALUES(\"%1\");")
                            .arg(title);
@@ -346,7 +345,7 @@ void ProgramInfo::WriteRecordedToDB(QSqlDatabase *db)
 
     qquery = db->exec(query);
 
-    if (recordtype == 1)
+    if (recordtype == kSingleRecord)
     {
         query = QString("DELETE FROM singlerecord WHERE chanid = %1 AND "
                         "starttime = %2 AND endtime = %3;").arg(chanid)
