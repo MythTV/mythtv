@@ -233,12 +233,26 @@ ChanInfo *parseChannel(QDomElement &element, QUrl baseUrl)
                     {
                         QStringList split = QStringList::split(" ", 
                                                                chaninfo->name);
-           
-                        chaninfo->xmltvid = split[1];
-                        chaninfo->chanstr = split[1];
-                        if (split.size() > 2)
-                            chaninfo->callsign = split[2];
+          
+                        if (split[0] == "Channel")
+                        { 
+                            chaninfo->xmltvid = split[1];
+                            chaninfo->chanstr = split[1];
+                            if (split.size() > 2)
+                                chaninfo->callsign = split[2];
+                        }
+                        else
+                        {
+                            chaninfo->xmltvid = split[0];
+                            chaninfo->chanstr = split[0];
+                            if (split.size() > 1)
+                                chaninfo->callsign = split[1];
+                        }
                     }
+                }
+                else if (chaninfo->chanstr.length() == 0)
+                {
+                    chaninfo->chanstr = info.text();
                 }
             }
         }
