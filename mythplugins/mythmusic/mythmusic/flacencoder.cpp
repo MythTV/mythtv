@@ -51,7 +51,7 @@ FlacEncoder::FlacEncoder(const QString &outfile, int qualitylevel,
     FLAC__file_encoder_set_rice_parameter_search_dist(encoder, 
                                                     rice_parameter_search_dist);
 
-    FLAC__file_encoder_set_filename(encoder, outfile.ascii());
+    FLAC__file_encoder_set_filename(encoder, outfile.local8Bit());
 
     int ret = FLAC__file_encoder_init(encoder);
     if (ret != FLAC__FILE_ENCODER_OK)

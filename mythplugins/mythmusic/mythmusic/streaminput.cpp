@@ -100,7 +100,7 @@ void StreamInput::readyread()
     }
 
     if (line.left(5) != "*GOOD") {
-	qDebug("server error response: %s", line.latin1());
+	qDebug("server error response: %s", line.local8Bit());
 	stage = -1;
 	return;
     }

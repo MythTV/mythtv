@@ -125,13 +125,11 @@ bool MetaIOID3v2::write(Metadata* mdata, bool exclusive)
     {
         if (!exclusive) removeComment(tag, ID3_FRAME_GENRE);
         
-        id3_latin1_t* p_tmp = new id3_latin1_t[data.length() + 1];
-        strncpy((char*)p_tmp, data, data.length());
-
-        id3_ucs4_t* p_ucs4 = id3_latin1_ucs4duplicate(p_tmp);
-        delete[] p_tmp;
+        id3_ucs4_t* p_ucs4 = id3_utf8_ucs4duplicate((const id3_utf8_t*)(const char*)data.utf8());
    
         int genrenum = id3_genre_number(p_ucs4);
+
+        free(p_ucs4);
 
         if (genrenum >= 0)
             setComment(tag, ID3_FRAME_GENRE, QString("%1").arg(genrenum));
@@ -238,16 +236,14 @@ Metadata* MetaIOID3v2::read(QString filename)
         // Genre.
         genre = getComment(tag, ID3_FRAME_GENRE);
 
-        id3_latin1_t* p_latin1 = new id3_latin1_t[genre.length() + 1];
-        strncpy((char*)p_latin1, genre, genre.length() + 1);
-
-        id3_ucs4_t * p_tmp = id3_latin1_ucs4duplicate(p_latin1);
-        delete[] p_latin1;
+        id3_ucs4_t *p_tmp = id3_utf8_ucs4duplicate((const id3_utf8_t*)(const char*)genre.utf8());
         
-        id3_ucs4_t const* p_ucs4 = id3_genre_name(p_tmp);
+        id3_ucs4_t const *p_ucs4 = id3_genre_name(p_tmp);
         free(p_tmp);
 
-        genre = (char*)id3_ucs4_latin1duplicate(p_ucs4);  
+        id3_utf8_t *p_utf8 = id3_ucs4_utf8duplicate(p_ucs4);  
+        genre = (const char*)p_utf8;
+        free(p_utf8);
 
         id3_file_close(p_input);
     }
@@ -419,7 +415,6 @@ QString MetaIOID3v2::getComment(id3_tag *pTag, const char* pLabel)
         return "";
     
     id3_ucs4_t const *p_ucs4 = NULL;
-    id3_latin1_t *p_latin1;
     union id3_field *p_field;
     
     p_field = &p_frame->fields[1];
@@ -435,16 +430,16 @@ QString MetaIOID3v2::getComment(id3_tag *pTag, const char* pLabel)
         }
         else
         {
-            p_latin1 = id3_ucs4_latin1duplicate(p_ucs4);
-            if (!p_latin1)
+            id3_utf8_t *p_utf8 = id3_ucs4_utf8duplicate(p_ucs4);
+            if (!p_utf8)
                 break;
-            
-            rv += (char *)p_latin1;
 
-            free(p_latin1);
+            rv += QString::fromUtf8((const char*)p_utf8);
+
+            free(p_utf8);
         }
     }
-    
+
     return rv;
 }
 
@@ -463,7 +458,7 @@ bool MetaIOID3v2::setComment(id3_tag *pTag,
 {
     if (!pLabel || "" == rData)
       return false;
-      
+
     struct id3_frame* p_frame = NULL;
     id3_ucs4_t* p_ucs4 = NULL;
 
@@ -480,11 +475,8 @@ bool MetaIOID3v2::setComment(id3_tag *pTag,
         return false;
     }
 
-    id3_latin1_t* p_tmp = new id3_latin1_t[rData.length() + 1];
-    strncpy((char*)p_tmp, rData, rData.length() + 1);
-    
-    p_ucs4 = id3_latin1_ucs4duplicate(p_tmp);
-    delete[] p_tmp;
+    p_ucs4 = id3_utf8_ucs4duplicate((const id3_utf8_t*)(const char*)rData.utf8());
+
     if (!p_ucs4)
     {
         id3_frame_delete(p_frame);
@@ -493,9 +485,12 @@ bool MetaIOID3v2::setComment(id3_tag *pTag,
 
     if (0 != id3_field_setstrings(&p_frame->fields[1], 1, &p_ucs4))
     {
+        free(p_ucs4);
         id3_frame_delete(p_frame);
         return false;      
     }
+
+    free(p_ucs4);
 
     if (0 != id3_tag_attachframe(pTag, p_frame))
     {

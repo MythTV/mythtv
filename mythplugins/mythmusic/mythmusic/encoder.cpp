@@ -11,9 +11,9 @@ Encoder::Encoder(const QString &outfile, int qualitylevel, Metadata *metadata)
 {
     if (outfile) 
     {
-        out = fopen(outfile.ascii(), "w");
+        out = fopen(outfile.local8Bit(), "w");
         if (!out) 
-            VERBOSE(VB_GENERAL, QString("Error opening output file: %1").arg(outfile));
+            VERBOSE(VB_GENERAL, QString("Error opening output file: %1").arg(outfile.local8Bit()));
     } 
     else 
         out = NULL;

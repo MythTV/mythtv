@@ -398,8 +398,8 @@ Metadata *CdDecoder::getMetadata()
         return NULL;
     }
 
-    artist = discdata.data_artist;
-    album = discdata.data_title;
+    artist = QString::fromUtf8(discdata.data_artist);
+    album = QString::fromUtf8(discdata.data_title);
     genre = cddb_genre(discdata.data_genre);
  
     if (!genre.isEmpty()) 
@@ -409,8 +409,8 @@ Metadata *CdDecoder::getMetadata()
         genre = flet + rt;
     }
 
-    QString temptitle = discdata.data_track[tracknum - 1].track_name;        
-    QString trackartist = discdata.data_track[tracknum - 1].track_artist;
+    QString temptitle = QString::fromUtf8(discdata.data_track[tracknum - 1].track_name);        
+    QString trackartist = QString::fromUtf8(discdata.data_track[tracknum - 1].track_artist);
 
     if (trackartist.length() > 0)
         title = trackartist + " / " + temptitle;
@@ -475,13 +475,13 @@ void CdDecoder::commitMetadata(Metadata *mdata)
         return;
     }
   
-    if (mdata->Artist() != discdata.data_artist)
-        strncpy(discdata.data_artist, mdata->Artist().ascii(), 256);
-    if (mdata->Album() != discdata.data_title)
-        strncpy(discdata.data_title, mdata->Album().ascii(), 256);
-    if (mdata->Title() != discdata.data_track[tracknum - 1].track_name)
+    if (mdata->Artist().utf8() != discdata.data_artist)
+        strncpy(discdata.data_artist, mdata->Artist().utf8(), 256);
+    if (mdata->Album().utf8() != discdata.data_title)
+        strncpy(discdata.data_title, mdata->Album().utf8(), 256);
+    if (mdata->Title().utf8() != discdata.data_track[tracknum - 1].track_name)
     {
-        strncpy(discdata.data_track[tracknum - 1].track_name, mdata->Title(),
+        strncpy(discdata.data_track[tracknum - 1].track_name, mdata->Title().utf8(),
                 256);
         strncpy(discdata.data_track[tracknum - 1].track_artist, "", 256);
     }

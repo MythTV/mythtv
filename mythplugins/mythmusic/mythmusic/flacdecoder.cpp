@@ -403,7 +403,7 @@ Metadata *FlacDecoder::getMetadata(QSqlDatabase *db)
     if (mdata)
         mdata->dumpToDatabase(db, musiclocation);
     else
-        cerr << "flacdecoder.o: Could not read metadata from " << filename << endl;
+        cerr << "flacdecoder.o: Could not read metadata from " << filename.local8Bit() << endl;
 
     return mdata;
 }    
