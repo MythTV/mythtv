@@ -168,7 +168,7 @@ public:
 
         setLabel("Minimum quality");
         setValue(15);
-	setHelpText("Lower is better.");
+	setHelpText("Leave this alone unless you know exactly what you are doing.");
     };
 };
 
@@ -180,7 +180,7 @@ public:
 
         setLabel("Maximum quality");
         setValue(2);
-	setHelpText("Lower is better.");
+	setHelpText("Leave this alone unless you know exactly what you are doing.");
     };
 };
 
@@ -190,7 +190,7 @@ public:
         CodecParam(parent, "mpeg4qualdiff"),
         SliderSetting(1,31,1) {
 
-        setLabel("Max quality difference between frames");
+        setLabel("Leave this alone unless you know exactly what you are doing.");
         setValue(3);
     };
 };
