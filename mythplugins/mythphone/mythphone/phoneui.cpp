@@ -1078,8 +1078,6 @@ void PhoneUIBox::doUrlPopup(char key, bool digitsOrUrl)
         urlRemoteField = new MythRemoteLineEdit(urlPopup);
         urlField = 0;
         urlPopup->addWidget(urlRemoteField);
-        urlRemoteField->setText(text);
-        urlRemoteField->setCursorPosition(text.length());
         urlRemoteField->setFocus();
     }
     urlPopup->addButton(tr("Place Videocall Now"), this, SLOT(dialUrlVideo()));
