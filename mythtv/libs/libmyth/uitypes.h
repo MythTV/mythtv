@@ -81,7 +81,8 @@ class UIType : public QObject
     void SetOrder(int order);
     void SetParent(LayerSet *);
     void SetScreen(double wmult, double hmult) { m_wmult = wmult; m_hmult = hmult; }
-    void SetContext(int con) { m_context = con; }
+    void SetContext(int con) { m_context = con;}
+    int  GetContext(){return m_context;}
     void SetDebug(bool db) { m_debug = db; }
     void allowFocus(bool yes_or_no){takes_focus = yes_or_no;}
     QString Name();
