@@ -133,20 +133,20 @@ void TVMenuCallback(void *data, QString &selection)
     else if (sel == "tv_fix_conflicts")
         startManaged(context);
     else if (sel == "settings appearance") {
-        AppearanceSettings settings(context);
-        settings.exec(QSqlDatabase::database());
+        AppearanceSettings settings;
+        settings.exec(context, QSqlDatabase::database());
     } else if (sel == "settings recording") {
-        RecordingProfileEditor editor(context, QSqlDatabase::database());
-        editor.exec(QSqlDatabase::database());
+        RecordingProfileEditor editor(QSqlDatabase::database());
+        editor.exec(context, QSqlDatabase::database());
     } else if (sel == "settings general") {
-        GeneralSettings settings(context);
-        settings.exec(QSqlDatabase::database());
+        GeneralSettings settings;
+        settings.exec(context, QSqlDatabase::database());
     } else if (sel == "settings playback") {
-        PlaybackSettings settings(context);
-        settings.exec(QSqlDatabase::database());
+        PlaybackSettings settings;
+        settings.exec(context, QSqlDatabase::database());
     } else if (sel == "settings epg") {
-        EPGSettings settings(context);
-        settings.exec(QSqlDatabase::database());
+        EPGSettings settings;
+        settings.exec(context, QSqlDatabase::database());
     }
 }
 
@@ -216,16 +216,16 @@ int RunMenu(QString themedir, MythContext *context)
 void WriteDefaults(MythContext* context, QSqlDatabase* db) {
     // If any settings are missing from the database, this will write
     // the default values
-    PlaybackSettings ps(context);
+    PlaybackSettings ps;
     ps.load(db);
     ps.save(db);
-    GeneralSettings gs(context);
+    GeneralSettings gs;
     gs.load(db);
     gs.save(db);
-    EPGSettings es(context);
+    EPGSettings es;
     es.load(db);
     es.save(db);
-    AppearanceSettings as(context);
+    AppearanceSettings as;
     as.load(db);
     as.save(db);
 }

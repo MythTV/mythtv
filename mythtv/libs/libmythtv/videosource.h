@@ -158,7 +158,7 @@ public:
 
 class VideoSource: public VerticalConfigurationGroup, public ConfigurationDialog {
 public:
-    VideoSource(MythContext* context): ConfigurationDialog(context) {
+    VideoSource() {
         // must be first
         addChild(id = new ID());
         addChild(name = new Name(*this));
@@ -278,7 +278,7 @@ public:
 
 class CaptureCard: public VerticalConfigurationGroup, public ConfigurationDialog {
 public:
-    CaptureCard(MythContext* context): ConfigurationDialog(context) {
+    CaptureCard() {
         setLabel("Capture card");
         // must be first
         addChild(id = new ID());
@@ -394,7 +394,7 @@ public:
 
 class CardInput: public VerticalConfigurationGroup, public ConfigurationDialog {
 public:
-    CardInput(MythContext* context): ConfigurationDialog(context) {
+    CardInput() {
         setLabel("Connect source to input");
         addChild(id = new ID());
         addChild(cardid = new CardID(*this));
@@ -438,76 +438,79 @@ private:
 class CaptureCardEditor: public ListBoxSetting, public ConfigurationDialog {
     Q_OBJECT
 public:
-    CaptureCardEditor(MythContext* context, QSqlDatabase* _db):
-        ConfigurationDialog(context), db(_db) {
+    CaptureCardEditor(QSqlDatabase* _db):
+        db(_db) {
         setLabel("Capture cards");
     };
 
-    virtual int exec(QSqlDatabase* db);
+    virtual int exec(MythContext* context, QSqlDatabase* db);
     virtual void load(QSqlDatabase* db);
     virtual void save(QSqlDatabase* db) { (void)db; };
 
 protected slots:
     void edit(int id) {
-        CaptureCard cc(m_context);
+        CaptureCard cc;
 
         if (id != 0)
             cc.loadByID(db,id);
 
-        cc.exec(db);
+        cc.exec(m_context, db);
     };
 
 protected:
+    MythContext* m_context;
     QSqlDatabase* db;
 };
 
 class VideoSourceEditor: public ListBoxSetting, public ConfigurationDialog {
     Q_OBJECT
 public:
-    VideoSourceEditor(MythContext* context, QSqlDatabase* _db):
-        ConfigurationDialog(context), db(_db) {
+    VideoSourceEditor(QSqlDatabase* _db):
+        db(_db) {
         setLabel("Video sources");
     };
 
-    virtual int exec(QSqlDatabase* db);
+    virtual int exec(MythContext* context, QSqlDatabase* db);
     virtual void load(QSqlDatabase* db);
     virtual void save(QSqlDatabase* db) { (void)db; };
 
 protected slots:
     void edit(int id) {
-        VideoSource vs(m_context);
+        VideoSource vs;
 
         if (id != 0)
             vs.loadByID(db,id);
 
-        vs.exec(db);
+        vs.exec(m_context, db);
     };
 
 protected:
+    MythContext* m_context;
     QSqlDatabase* db;
 };
 
 class CardInputEditor: public ListBoxSetting, public ConfigurationDialog {
     Q_OBJECT
 public:
-    CardInputEditor(MythContext* context, QSqlDatabase* _db):
-        ConfigurationDialog(context), db(_db) {
+    CardInputEditor(QSqlDatabase* _db):
+        db(_db) {
         setLabel("Input connections");
     };
     virtual ~CardInputEditor();
 
-    virtual int exec(QSqlDatabase* db);
+    virtual int exec(MythContext* context, QSqlDatabase* db);
     virtual void load(QSqlDatabase* db);
     virtual void save(QSqlDatabase* db) { (void)db; };
 
 protected slots:
     void edit(int id) {
-        cardinputs[id]->exec(db);
+        cardinputs[id]->exec(m_context,db);
     };
 
 protected:
     vector<CardInput*> cardinputs;
     QSqlDatabase* db;
+    MythContext* m_context;
 };
 
 #endif

@@ -591,8 +591,7 @@ public:
     };
 };
 
-PlaybackSettings::PlaybackSettings(MythContext *context)
-                : ConfigurationWizard(context)
+PlaybackSettings::PlaybackSettings()
 {
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
     general->setLabel("General playback");
@@ -620,8 +619,7 @@ PlaybackSettings::PlaybackSettings(MythContext *context)
     addChild(oscan);
 }
 
-GeneralSettings::GeneralSettings(MythContext *context)
-               : ConfigurationWizard(context)
+GeneralSettings::GeneralSettings()
 {
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
     general->setLabel("General");
@@ -649,8 +647,7 @@ GeneralSettings::GeneralSettings(MythContext *context)
     addChild(general3);
 }
 
-EPGSettings::EPGSettings(MythContext *context)
-           : ConfigurationWizard(context)
+EPGSettings::EPGSettings()
 {
     VerticalConfigurationGroup* epg = new VerticalConfigurationGroup(false);
     epg->setLabel("Program Guide");
@@ -678,8 +675,7 @@ EPGSettings::EPGSettings(MythContext *context)
     addChild(gen);
 }
 
-AppearanceSettings::AppearanceSettings(MythContext *context)
-             : ConfigurationWizard(context)
+AppearanceSettings::AppearanceSettings()
 {
     VerticalConfigurationGroup* theme = new VerticalConfigurationGroup(false);
     theme->setLabel("Theme");

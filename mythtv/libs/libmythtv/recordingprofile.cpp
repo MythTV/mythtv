@@ -286,8 +286,7 @@ public:
     };
 };
 
-RecordingProfile::RecordingProfile(MythContext *context)
-                : ConfigurationWizard(context)
+RecordingProfile::RecordingProfile()
 {
     // This must be first because it is needed to load/save the other settings
     addChild(id = new ID());
@@ -330,8 +329,9 @@ void RecordingProfileEditor::load(QSqlDatabase* db) {
     RecordingProfile::fillSelections(db, this);
 }
 
-int RecordingProfileEditor::exec(QSqlDatabase* db) {
-    while (ConfigurationDialog::exec(db) == QDialog::Accepted)
+int RecordingProfileEditor::exec(MythContext* context, QSqlDatabase* db) {
+    m_context = context;
+    while (ConfigurationDialog::exec(context, db) == QDialog::Accepted)
         open(getValue().toInt());
 
     return QDialog::Rejected;

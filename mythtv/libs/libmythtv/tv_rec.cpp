@@ -315,7 +315,7 @@ void TVRec::HandleStateChange(void)
 
         context->KickDatabase(db_conn);
 
-        RecordingProfile profile(context);
+        RecordingProfile profile;
         if (curRecording)
             if (curRecording->recordingprofileid > 0)
                 profile.loadByID(db_conn, curRecording->recordingprofileid);

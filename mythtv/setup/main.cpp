@@ -64,17 +64,17 @@ void SetupMenuCallback(void* data, QString& selection) {
     QString sel = selection.lower();
 
     if (sel == "general") {
-        BackendSettings be(context);
-        be.exec(db);
+        BackendSettings be;
+        be.exec(context, db);
     } else if (sel == "capture cards") {
-        CaptureCardEditor cce(context, db);
-        cce.exec(db);
+        CaptureCardEditor cce(db);
+        cce.exec(context, db);
     } else if (sel == "video sources") {
-        VideoSourceEditor vse(context, db);
-        vse.exec(db);
+        VideoSourceEditor vse(db);
+        vse.exec(context, db);
     } else if (sel == "card inputs") {
-        CardInputEditor cie(context, db);
-        cie.exec(db);
+        CardInputEditor cie(db);
+        cie.exec(context, db);
     }
 }
 

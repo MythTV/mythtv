@@ -171,31 +171,22 @@ public:
 
 class ConfigurationDialog: virtual public Configurable {
 public:
-    ConfigurationDialog(MythContext *context) { m_context = context; }
-
     // Make a modal dialog containing configWidget
-    virtual MythDialog* dialogWidget(QWidget* parent,
+    virtual MythDialog* dialogWidget(MythContext* context,
+                                     QWidget* parent,
                                      const char* widgetName = 0);
 
     // Show a dialogWidget, and save if accepted
-    int exec(QSqlDatabase* db);
-
-protected:
-    MythContext *m_context;
+    int exec(MythContext* context, QSqlDatabase* db);
 };
 
 // A wizard is a group with one child per page
 class ConfigurationWizard: public ConfigurationDialog,
                            public ConfigurationGroup {
 public:
-    ConfigurationWizard(MythContext *context) : ConfigurationDialog(context),
-                                                ConfigurationGroup(false)
-                                             { }
-
-    virtual MythDialog* dialogWidget(QWidget* parent,
+    virtual MythDialog* dialogWidget(MythContext* context,
+                                     QWidget* parent,
                                      const char* widgetName=0);
-    virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                  const char* widgetName=0);
 };
 
 // Read-only display of a setting

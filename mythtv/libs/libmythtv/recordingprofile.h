@@ -66,7 +66,7 @@ protected:
         };
     };
 public:
-    RecordingProfile(MythContext *context);
+    RecordingProfile();
 
     virtual void loadByID(QSqlDatabase* db, int id);
     virtual void loadByName(QSqlDatabase* db, QString name);
@@ -89,10 +89,10 @@ private:
 class RecordingProfileEditor: public ListBoxSetting, public ConfigurationDialog {
     Q_OBJECT
 public:
-    RecordingProfileEditor(MythContext* context, QSqlDatabase* _db):
-        ConfigurationDialog(context), db(_db) {};
+    RecordingProfileEditor(QSqlDatabase* _db):
+        db(_db) {};
 
-    virtual int exec(QSqlDatabase* db);
+    virtual int exec(MythContext* context, QSqlDatabase* db);
     virtual void load(QSqlDatabase* db);
     virtual void save(QSqlDatabase* db) { (void)db; };
 
@@ -100,17 +100,18 @@ public:
 
 protected slots:
     void open(int id) {
-        RecordingProfile* profile = new RecordingProfile(m_context);
+        RecordingProfile* profile = new RecordingProfile();
 
         if (id != 0)
             profile->loadByID(db,id);
 
-        if (profile->exec(db) == QDialog::Accepted)
+        if (profile->exec(m_context, db) == QDialog::Accepted)
             profile->save(db);
         delete profile;
     };
 
 protected:
+    MythContext* m_context;
     QSqlDatabase* db;
 };
 

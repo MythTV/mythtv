@@ -511,9 +511,10 @@ void ConfigurationDialogWidget::keyPressEvent(QKeyEvent* e) {
     }
 }
 
-MythDialog* ConfigurationDialog::dialogWidget(QWidget* parent,
+MythDialog* ConfigurationDialog::dialogWidget(MythContext* context,
+                                              QWidget* parent,
                                               const char* widgetName) {
-    MythDialog* dialog = new ConfigurationDialogWidget(m_context, parent, 
+    MythDialog* dialog = new ConfigurationDialogWidget(context, parent, 
                                                        widgetName);
     QVBoxLayout* layout = new QVBoxLayout(dialog, 20);
     layout->addWidget(configWidget(NULL, dialog));
@@ -521,10 +522,10 @@ MythDialog* ConfigurationDialog::dialogWidget(QWidget* parent,
     return dialog;
 }
 
-int ConfigurationDialog::exec(QSqlDatabase* db) {
+int ConfigurationDialog::exec(MythContext* context, QSqlDatabase* db) {
     load(db);
 
-    MythDialog* dialog = dialogWidget(NULL);
+    MythDialog* dialog = dialogWidget(context, NULL);
     dialog->setCursor(QCursor(Qt::ArrowCursor));
     dialog->Show();
 
@@ -538,9 +539,10 @@ int ConfigurationDialog::exec(QSqlDatabase* db) {
     return ret;
 }
 
-MythDialog* ConfigurationWizard::dialogWidget(QWidget* parent,
+MythDialog* ConfigurationWizard::dialogWidget(MythContext* context,
+                                              QWidget* parent,
                                               const char* widgetName) {
-    MythWizard* wizard = new MythWizard(m_context, parent, widgetName, TRUE);
+    MythWizard* wizard = new MythWizard(context, parent, widgetName, TRUE);
 
     connect(this, SIGNAL(changeHelpText(QString)), wizard,
             SLOT(setHelpText(QString)));
@@ -558,13 +560,6 @@ MythDialog* ConfigurationWizard::dialogWidget(QWidget* parent,
         }
         
     return wizard;
-}
-
-QWidget* ConfigurationWizard::configWidget(ConfigurationGroup *cg,
-                                           QWidget* parent,
-                                           const char* widgetName) {
-    cg = cg;
-    return dialogWidget(parent, widgetName);
 }
 
 void SimpleDBStorage::load(QSqlDatabase* db) {

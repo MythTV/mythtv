@@ -5,7 +5,7 @@
 
 class BackendSettings: virtual public ConfigurationWizard {
 public:
-    BackendSettings(MythContext *context);
+    BackendSettings();
 };
 
 #endif

@@ -102,9 +102,7 @@ public:
     };
 };
 
-BackendSettings::BackendSettings(MythContext* context):
-    ConfigurationWizard(context) {
-
+BackendSettings::BackendSettings() {
     VerticalConfigurationGroup* group1 = new VerticalConfigurationGroup(false);
     group1->setLabel("General");
     group1->addChild(new RecordFilePrefix());

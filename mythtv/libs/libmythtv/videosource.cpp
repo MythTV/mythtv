@@ -231,8 +231,9 @@ int CCSetting::getCardID(void) const {
     return parent.getCardID();
 }
 
-int CaptureCardEditor::exec(QSqlDatabase* db) {
-    while (ConfigurationDialog::exec(db) == QDialog::Accepted)
+int CaptureCardEditor::exec(MythContext* context, QSqlDatabase* db) {
+    m_context = context;
+    while (ConfigurationDialog::exec(context, db) == QDialog::Accepted)
         edit(getValue().toInt());
 
     return QDialog::Rejected;
@@ -244,8 +245,9 @@ void CaptureCardEditor::load(QSqlDatabase* db) {
     CaptureCard::fillSelections(db, this);
 }
 
-int VideoSourceEditor::exec(QSqlDatabase* db) {
-    while (ConfigurationDialog::exec(db) == QDialog::Accepted)
+int VideoSourceEditor::exec(MythContext* context, QSqlDatabase* db) {
+    m_context = context;
+    while (ConfigurationDialog::exec(context, db) == QDialog::Accepted)
         edit(getValue().toInt());
 
     return QDialog::Rejected;
@@ -257,8 +259,9 @@ void VideoSourceEditor::load(QSqlDatabase* db) {
     VideoSource::fillSelections(db, this);
 }
 
-int CardInputEditor::exec(QSqlDatabase* db) {
-    while (ConfigurationDialog::exec(db) == QDialog::Accepted)
+int CardInputEditor::exec(MythContext* context, QSqlDatabase* db) {
+    m_context = context;
+    while (ConfigurationDialog::exec(context, db) == QDialog::Accepted)
         edit(getValue().toInt());
 
     return QDialog::Rejected;
@@ -302,7 +305,7 @@ void CardInputEditor::load(QSqlDatabase* db) {
                 }
 
                 QString input(test.name);
-                CardInput* cardinput = new CardInput(m_context);
+                CardInput* cardinput = new CardInput();
                 cardinput->loadByInput(db, cardid, input);
                 cardinputs.push_back(cardinput);
                 QString index = QString::number(cardinputs.size()-1);
