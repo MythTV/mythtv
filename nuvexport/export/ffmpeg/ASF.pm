@@ -1,4 +1,4 @@
-#Last Updated: 2005.03.07 (xris)
+#Last Updated: 2005.03.11 (xris)
 #
 #  export::ffmpeg::ASF
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
@@ -126,8 +126,10 @@ package export::ffmpeg::ASF;
             $self->{'path'} = '/dev/null';
         # First pass
             print "First pass...\n";
-            $self->{'ffmpeg_xtra'} = ' -b ' . $self->{'v_bitrate'}
-                                   . ' -vcodec msmpeg4'
+            $self->{'ffmpeg_xtra'} = ' -vcodec msmpeg4'
+                                   . ' -b ' . $self->{'v_bitrate'}
+                                   . ' -minrate 32 -maxrate '.(2*$self->{'v_bitrate'}).' -bt 32'
+                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.7'
                                    . " -s $self->{'width'}x$self->{'height'}"
                                    . " -pass 1 -passlogfile '/tmp/asf.$$.log'"
                                    . ' -f asf';
@@ -136,22 +138,26 @@ package export::ffmpeg::ASF;
             $self->{'path'} = $path_bak;
         # Second pass
             print "Final pass...\n";
-            $self->{'ffmpeg_xtra'} = ' -b ' . $self->{'v_bitrate'}
-                                   . ' -vcodec msmpeg4'
-                                   . ' -ab ' . $self->{'a_bitrate'}
+            $self->{'ffmpeg_xtra'} = ' -vcodec msmpeg4'
+                                   . ' -b ' . $self->{'v_bitrate'}
+                                   . ' -minrate 32 -maxrate '.(2*$self->{'v_bitrate'}).' -bt 32'
+                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.7'
                                    . ' -acodec mp3'
+                                   . ' -ab ' . $self->{'a_bitrate'}
                                    . " -s $self->{'width'}x$self->{'height'}"
                                    . " -pass 2 -passlogfile '/tmp/asf.$$.log'"
                                    . ' -f asf';
         }
     # Single Pass
         else {
-            $self->{'ffmpeg_xtra'} = ' -b ' . $self->{'v_bitrate'}
+            $self->{'ffmpeg_xtra'} = ' -vcodec msmpeg4'
+                                   . ' -b ' . $self->{'v_bitrate'}
+                                   . ' -minrate 32 -maxrate '.(2*$self->{'v_bitrate'}).' -bt 32'
+                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.7'
                                    . (($self->{'vbr'}) ?
                                      " -qmin $self->{'quantisation'} -qmax 31" : '')
-                                   . ' -vcodec msmpeg4'
-                                   . ' -ab ' . $self->{'a_bitrate'}
                                    . ' -acodec mp3'
+                                   . ' -ab ' . $self->{'a_bitrate'}
                                    . " -s $self->{'width'}x$self->{'height'}"
                                    . ' -f asf';
         }

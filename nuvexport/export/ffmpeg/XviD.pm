@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.03.07 (xris)
+#Last Updated: 2005.03.11 (xris)
 #
 #  export::ffmpeg::XviD
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
@@ -137,10 +137,10 @@ package export::ffmpeg::XviD;
             $self->{'path'} = '/dev/null';
         # First pass
             print "First pass...\n";
-            $self->{'ffmpeg_xtra'} = ' -b ' . $self->{'v_bitrate'}
-                                   . ' -vcodec xvid'
-                                   #. ' -ab ' . $self->{'a_bitrate'}
-                                   #. ' -acodec mp3'
+            $self->{'ffmpeg_xtra'} = ' -vcodec xvid'
+                                   . ' -b ' . $self->{'v_bitrate'}
+                                   . ' -minrate 32 -maxrate '.(2*$self->{'v_bitrate'}).' -bt 32'
+                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.7'
                                    . " -s $self->{'width'}x$self->{'height'}"
                                    . " -pass 1 -passlogfile '/tmp/xvid.$$.log'"
                                    . ' -f avi';
@@ -149,22 +149,28 @@ package export::ffmpeg::XviD;
             $self->{'path'} = $path_bak;
         # Second pass
             print "Final pass...\n";
-            $self->{'ffmpeg_xtra'} = ' -b ' . $self->{'v_bitrate'}
-                                   . ' -vcodec xvid'
-                                   . ' -ab ' . $self->{'a_bitrate'}
+            $self->{'ffmpeg_xtra'} = ' -vcodec xvid'
+                                   . ' -b ' . $self->{'v_bitrate'}
+                                   . ' -minrate 32 -maxrate '.(2*$self->{'v_bitrate'}).' -bt 32'
+                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.7'
                                    . ' -acodec mp3'
+                                   . ' -ab ' . $self->{'a_bitrate'}
                                    . " -s $self->{'width'}x$self->{'height'}"
-                                   . " -pass 2 -passlogfile '/tmp/xvid.$$.log'";
+                                   . " -pass 2 -passlogfile '/tmp/xvid.$$.log'"
+                                   . ' -f avi';
         }
     # Single Pass
         else {
-            $self->{'ffmpeg_xtra'} = ' -b ' . $self->{'v_bitrate'}
+            $self->{'ffmpeg_xtra'} = ' -vcodec xvid'
+                                   . ' -b ' . $self->{'v_bitrate'}
+                                   . ' -minrate 32 -maxrate '.(2*$self->{'v_bitrate'}).' -bt 32'
+                                   . ' -lumi_mask 0.05 -dark_mask 0.02 -scplx_mask 0.7'
                                    . (($self->{'vbr'}) ?
                                      " -qmin $self->{'quantisation'} -qmax 31" : '')
-                                   . ' -vcodec xvid'
-                                   . ' -ab ' . $self->{'a_bitrate'}
                                    . ' -acodec mp3'
-                                   . " -s $self->{'width'}x$self->{'height'}";
+                                   . ' -ab ' . $self->{'a_bitrate'}
+                                   . " -s $self->{'width'}x$self->{'height'}"
+                                   . ' -f avi';
         }
     # Execute the (final pass) encode
         $self->SUPER::export($episode, '.avi');
@@ -173,4 +179,3 @@ package export::ffmpeg::XviD;
 1;  #return true
 
 # vim:ts=4:sw=4:ai:et:si:sts=4
-
