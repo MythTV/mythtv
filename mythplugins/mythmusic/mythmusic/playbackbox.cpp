@@ -1170,12 +1170,12 @@ void PlaybackBox::customEvent(QCustomEvent *event)
             statusString = tr("Output error.");
 
             OutputEvent *aoe = (OutputEvent *) event;
-            cerr << statusString << " " << *aoe->errorMessage() << endl;
-            //OutputEvent *aoe = (OutputEvent *) event;
-            //QMessageBox::critical(qApp->activeWindow(),
-            //                      statusString,
-            //                      *aoe->errorMessage());
 
+            cerr << statusString << " " << *aoe->errorMessage() << endl;
+            MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
+                                      statusString,
+                                      QString("MythMusic has encountered the following error:\n%1")
+                                      .arg(*aoe->errorMessage()));
             stopAll();
 
             break;
@@ -1200,10 +1200,12 @@ void PlaybackBox::customEvent(QCustomEvent *event)
             statusString = tr("Decoder error.");
 
             DecoderEvent *dxe = (DecoderEvent *) event;
+ 
             cerr << statusString << " " << *dxe->errorMessage() << endl;
-            //QMessageBox::critical(qApp->activeWindow(),
-            //                      statusString,
-            //                      *dxe->errorMessage());
+            MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
+                                      statusString,
+                                      QString("MythMusic has encountered the following error:\n%1")
+                                      .arg(*dxe->errorMessage()));
             break;
         }
     }
