@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <sys/mman.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <math.h>
@@ -53,7 +54,12 @@ struct ViaData
    
     unsigned char *tempbuffer;
 
+    DDLOCK ddLock;
+    VIASUBPICT VIASubPict;
+    int fd;
     unsigned char *lpSubSurface;
+
+    unsigned char reorder_palette[64];
 
     DDSURFACEDESC ddSurfaceDesc;
     DDUPDATEOVERLAY ddUpdateOverlay;
@@ -212,8 +218,30 @@ bool VideoOutputVIA::CreateViaBuffers(void)
     data->ddSurfaceDesc.dwFourCC = FOURCC_SUBP;
     VIADriverProc(CREATESURFACE, &data->ddSurfaceDesc);
 
-// FIXME: overlay address stuff.
-    
+    data->ddLock.dwFourCC = FOURCC_SUBP;
+    VIADriverProc(LOCKSURFACE, &data->ddLock);
+
+    data->fd = open("/dev/mem", O_RDWR);
+    if (data->fd >= 0)
+    {
+        data->lpSubSurface = (unsigned char *)mmap(0, 16 * 1024 * 1024,
+                                                   PROT_READ | PROT_WRITE,
+                                                   MAP_SHARED, data->fd, 
+                                           (off_t)data->ddLock.dwPhysicalBase);
+        if (data->lpSubSurface == MAP_FAILED)
+        {
+            perror("mmap");
+            cerr << "Couldn't map overlay surface\n";
+            data->lpSubSurface = NULL;
+        }
+
+        data->lpSubSurface += data->ddLock.SubDev.dwSUBPhysicalAddr[0];
+
+        close(data->fd);
+    }
+    else
+        cerr << "Couldn't open /dev/mem to map overlay surface\n";
+     
     for (int i = 0; i < 4; i++)
     {
          data->decode_buffers[i].image_number = i;

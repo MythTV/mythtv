@@ -1540,14 +1540,11 @@ void OSD::SetVisible(OSDSet *set, int length)
     osdlock.unlock();
 }
 
-void OSD::Display(VideoFrame *frame)
+OSDSurface *OSD::Display(VideoFrame *frame)
 {
-    //QTime timer;
-    //timer.start();
-
     bool anytodisplay = false;
-    if (!setList || frame->codec != FMT_YV12)
-        return;
+    if (!setList)
+        return NULL;
 
     bool actuallydraw = false;
  
@@ -1609,13 +1606,9 @@ void OSD::Display(VideoFrame *frame)
     m_setsvisible = anytodisplay;
 
     if (m_setsvisible)
-    {
-        unsigned char *yuvptr = frame->buf;
-        BlendSurfaceToYUV(drawSurface, yuvptr);
-    }
+        return drawSurface;
 
-    //int msecs = timer.elapsed();
-    //cout << "drawing took: " << msecs << endl;
+    return NULL;
 }
 
 bool OSD::Visible(void)
@@ -1678,68 +1671,3 @@ void OSD::RemoveSet(OSDSet *set)
     delete set;
 }
 
-void OSD::BlendSurfaceToYUV(OSDSurface *surface, unsigned char *yuvptr)
-{
-    unsigned char *uptrdest = yuvptr + surface->width * surface->height;
-    unsigned char *vptrdest = uptrdest + surface->width * surface->height / 4;
-
-    QMemArray<QRect> rects = surface->usedRegions.rects();
-    QMemArray<QRect>::Iterator it = rects.begin();
-    for (; it != rects.end(); ++it)
-    {
-        QRect drawRect = *it;
-
-        int startcol, startline, endcol, endline;
-        startcol = drawRect.left();
-        startline = drawRect.top();
-        endcol = drawRect.right();
-        endline = drawRect.bottom();
-
-        unsigned char *src, *usrc, *vsrc;
-        unsigned char *dest, *udest, *vdest;
-        unsigned char *alpha;
-
-        int yoffset;
-
-        for (int y = startline; y <= endline; y++)
-        {
-            yoffset = y * surface->width;
-
-            src = surface->y + yoffset + startcol;
-            dest = yuvptr + yoffset + startcol;
-            alpha = surface->alpha + yoffset + startcol;
-
-            usrc = surface->u + yoffset / 4 + startcol / 2;
-            udest = uptrdest + yoffset / 4 + startcol / 2;
-
-            vsrc = surface->v + yoffset / 4 + startcol / 2;
-            vdest = vptrdest + yoffset / 4 + startcol / 2;
-
-            for (int x = startcol; x <= endcol; x++)
-            {
-                if (*alpha == 0)
-                    goto blendimageend;
-
-                *dest = blendColorsAlpha(*src, *dest, *alpha);
-
-                if ((y % 2 == 0) && (x % 2 == 0))
-                {
-                    *udest = blendColorsAlpha(*usrc, *udest, *alpha);
-                    *vdest = blendColorsAlpha(*vsrc, *vdest, *alpha);
-                }
-
-blendimageend:
-                if ((y % 2 == 0) && (x % 2 == 0))
-                {
-                    usrc++;
-                    udest++;
-                    vsrc++;
-                    vdest++;
-                }
-                src++;
-                dest++;
-                alpha++;
-            }
-        }
-    }
-}

@@ -15,6 +15,7 @@ using namespace std;
 
 class NuppelVideoPlayer;
 class OSD;
+class OSDSurface;
 
 enum VideoOutputType
 {
@@ -88,6 +89,8 @@ class VideoOutput
     void ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer);
     void DisplayOSD(VideoFrame *frame, OSD *osd);
 
+    void BlendSurfaceToYV12(OSDSurface *surface, unsigned char *yuvptr);
+    
     int XJ_width, XJ_height;
     float XJ_aspect;
 

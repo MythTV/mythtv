@@ -12,15 +12,6 @@ class TTFFont;
 class OSDType;
 class OSDSurface;
 
-static inline unsigned char blendColorsAlpha(int src, int dest, int alpha)
-{
-    int tmp1, tmp2;
-
-    tmp1 = (src - dest) * alpha;
-    tmp2 = dest + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-    return tmp2 & 0xff;
-}
-
 class OSDSet
 {
   public:

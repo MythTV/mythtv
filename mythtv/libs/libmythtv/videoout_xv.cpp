@@ -17,6 +17,7 @@
 using namespace std;
 
 #include "videoout_xv.h"
+#include "osdsurface.h"
 #include "../libmyth/util.h"
 
 extern "C" {

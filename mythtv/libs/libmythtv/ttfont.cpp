@@ -29,7 +29,7 @@ using namespace std;
 #include "ttfont.h"
 
 #include "osdtypes.h"
-#include "osd.h"
+#include "osdsurface.h"
 
 static int          have_library = 0;
 static FT_Library   the_library;

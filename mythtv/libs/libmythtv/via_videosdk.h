@@ -227,7 +227,6 @@ typedef DDUPDATEOVERLAY * LPDDUPDATEOVERLAY;
 #define DDOVER_SHOW       0x00000002	/* hide video */
 #define DDOVER_KEYDEST    0x00000004	/* Enable colorkey */
 
-
 /*
  *  Structure for ioctl VIA_VID_SETALPHAWIN
  */

@@ -10,7 +10,6 @@
 #include <qmap.h>
 #include <qdom.h>
 #include <qmutex.h>
-#include <qregion.h>
 
 #include <vector>
 using namespace std;
@@ -22,87 +21,8 @@ class OSDTypeImage;
 class OSDTypePositionIndicator;
 
 #include "frame.h"
+#include "osdsurface.h"
 
-class OSDSurface
-{
-  public:
-    OSDSurface(int w, int h)
-    {
-        yuvbuffer = new unsigned char[w * h * 3 / 2];
-        y = yuvbuffer;
-        u = yuvbuffer + w * h;
-        v = u + w * h / 4;
-        alpha = new unsigned char[w * h];
-
-        width = w;
-        height = h;
-
-        size = width * height;
-
-        for (int i = 0; i < 256; i++)
-        {
-            for (int j = 0; j < 256; j++)
-            {
-                int divisor = (i + (j * (255 - i)) / 255);
-                if (divisor > 0) 
-                    pow_lut[i][j] = (i * 255) / divisor;
-                else
-                    pow_lut[i][j] = 0;
-            }
-        }
-
-        Clear();
-    }
-
-   ~OSDSurface()
-    {
-        delete [] yuvbuffer;
-        delete [] alpha;
-    }
-
-    void Clear(void)
-    {
-        memset(y, 0, size);
-        memset(u, 127, size / 4);
-        memset(v, 127, size / 4);
-        memset(alpha, 0, size);
-        usedRegions = QRegion();
-    }
-
-    bool IntersectsDrawn(QRect &newrect)
-    {
-        QMemArray<QRect> rects = usedRegions.rects();
-        QMemArray<QRect>::Iterator it = rects.begin();
-        for (; it != rects.end(); ++it)
-            if (newrect.intersects(*it))
-                return true;
-        return false;
-    }
-
-    void AddRect(QRect &newrect)
-    {
-        usedRegions = usedRegions.unite(newrect);
-    }
-
-
-    unsigned char *yuvbuffer;
-
-    // just pointers into yuvbuffer
-    unsigned char *y;
-    unsigned char *u;
-    unsigned char *v;
-
-    unsigned char *alpha;
-
-    int width;
-    int height;
-    int size;
-
-    QRegion usedRegions;
-
-    unsigned char pow_lut[256][256];
-};
- 
 class OSD
 {
  public:
@@ -111,7 +31,7 @@ class OSD
         int dispx, int dispy, int dispw, int disph);
    ~OSD(void);
 
-    void Display(VideoFrame *frame);
+    OSDSurface *Display(VideoFrame *frame);
 
     void ClearAllText(const QString &name);
     void SetTextByRegexp(const QString &name, QMap<QString, QString> &regexpMap,
@@ -167,8 +87,6 @@ class OSD
                 int dispw, int disph);
 
     void SetFrameInterval(int frint);
-
-    static void BlendSurfaceToYUV(OSDSurface *surface, unsigned char *yuvptr);
 
  private:
     void SetDefaults();

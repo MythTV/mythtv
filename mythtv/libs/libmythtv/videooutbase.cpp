@@ -2,6 +2,7 @@
 
 #include "videooutbase.h"
 #include "osd.h"
+#include "osdsurface.h"
 #include "NuppelVideoPlayer.h"
 
 #include "../libmyth/mythcontext.h"
@@ -477,6 +478,88 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
 void VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd)
 {
     if (osd)
-        osd->Display(frame);
+    {
+        OSDSurface *surface = osd->Display(frame);
+        if (surface)
+        {
+            switch (frame->codec)
+            {
+                case FMT_YV12:
+                {
+                    unsigned char *yuvptr = frame->buf;
+                    BlendSurfaceToYV12(surface, yuvptr);
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+    }
 }
  
+void VideoOutput::BlendSurfaceToYV12(OSDSurface *surface, unsigned char *yuvptr)
+{
+    unsigned char *uptrdest = yuvptr + surface->width * surface->height;
+    unsigned char *vptrdest = uptrdest + surface->width * surface->height / 4;
+
+    QMemArray<QRect> rects = surface->usedRegions.rects();
+    QMemArray<QRect>::Iterator it = rects.begin();
+    for (; it != rects.end(); ++it)
+    {
+        QRect drawRect = *it;
+
+        int startcol, startline, endcol, endline;
+        startcol = drawRect.left();
+        startline = drawRect.top();
+        endcol = drawRect.right();
+        endline = drawRect.bottom();
+
+        unsigned char *src, *usrc, *vsrc;
+        unsigned char *dest, *udest, *vdest;
+        unsigned char *alpha;
+
+        int yoffset;
+
+        for (int y = startline; y <= endline; y++)
+        {
+            yoffset = y * surface->width;
+
+            src = surface->y + yoffset + startcol;
+            dest = yuvptr + yoffset + startcol;
+            alpha = surface->alpha + yoffset + startcol;
+
+            usrc = surface->u + yoffset / 4 + startcol / 2;
+            udest = uptrdest + yoffset / 4 + startcol / 2;
+
+            vsrc = surface->v + yoffset / 4 + startcol / 2;
+            vdest = vptrdest + yoffset / 4 + startcol / 2;
+
+            for (int x = startcol; x <= endcol; x++)
+            {
+                if (*alpha == 0)
+                    goto blendimageyv12end;
+
+                *dest = blendColorsAlpha(*src, *dest, *alpha);
+
+                if ((y % 2 == 0) && (x % 2 == 0))
+                {
+                    *udest = blendColorsAlpha(*usrc, *udest, *alpha);
+                    *vdest = blendColorsAlpha(*vsrc, *vdest, *alpha);
+                }
+
+blendimageyv12end:
+                if ((y % 2 == 0) && (x % 2 == 0))
+                {
+                    usrc++;
+                    udest++;
+                    vsrc++;
+                    vdest++;
+                }
+                src++;
+                dest++;
+                alpha++;
+            }
+        }
+    }
+}
+

@@ -9,8 +9,7 @@ using namespace std;
 #include "yuv2rgb.h"
 #include "osdtypes.h"
 #include "ttfont.h"
-
-#include "osd.h"
+#include "osdsurface.h"
 
 #include "mythcontext.h"
 
