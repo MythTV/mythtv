@@ -213,7 +213,7 @@ int RunMenu(QString themedir, MythContext *context)
     return exitstatus;
 }   
 
-void WriteDefaults(MythContext* context, QSqlDatabase* db) {
+void WriteDefaults(QSqlDatabase* db) {
     // If any settings are missing from the database, this will write
     // the default values
     PlaybackSettings ps;
@@ -250,7 +250,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    WriteDefaults(context, db);
+    WriteDefaults(db);
 
     QString themename = context->GetSetting("Theme");
     QString themedir = context->FindThemeDir(themename);
