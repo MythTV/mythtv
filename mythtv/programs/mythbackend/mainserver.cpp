@@ -2515,7 +2515,8 @@ void MainServer::PrintDVBStatus(QTextStream& os)
             query.bindValue(1, t_end);
 
             if (!query.exec())
-                cout << query.lastError().text() << "\r\n";
+                cout << query.lastError().databaseText() << "\r\n" 
+                     << query.lastError().driverText() << "\r\n";
             
             if (query.isActive())
             {
