@@ -701,7 +701,7 @@
          <value lang="ES">"seleccione "Guia de Programas" o "Busqueda de programas"</value>
          <value lang="CA">vagi a "Guia de programes" o "Cercar Programes"</value>
          <value lang="NL">kies "Programmagids" of "Programma Zoeker"</value>
-         <value lang="DE">'TV Planer' oder 'Sendung suchen'</value>
+         <value lang="DE">'Übersicht' oder 'Sendung suchen'</value>
          <value lang="DK">vælg 'Program Guide' eller 'Program Finder'</value>
          <value lang="PT">Selecione "Guia de Programação" ou "Procurar Programas"</value>
          <value lang="SV">välj 'Programguide' eller 'Sök program'</value>
@@ -866,7 +866,7 @@
          <value lang="ES">"seleccione "Guia de Programas" o "Busqueda de programas"</value>
          <value lang="CA">vagi a "Guia de programes" o "Cercar Programes"</value>
          <value lang="NL">kies "Programmagids" of "Programma Zoeker"</value>
-         <value lang="DE">wählen Sie 'TV Planer' oder 'Sendung suchen'</value>
+         <value lang="DE">wählen Sie 'Übersicht' oder 'Sendung suchen'</value>
          <value lang="DK">vælg 'Program Guide' eller 'Program Finder'</value>
          <value lang="PT">Selecione "Guia de Programação" ou "Procurar Programas"</value>
          <value lang="SV">välj 'Programguide' eller 'Sök program'</value>
@@ -1153,7 +1153,7 @@
          <value lang="ES">"seleccione "Guia de Programas" o "Busqueda de programas"</value>
          <value lang="CA">vagi a "Guia de programes" o "Cercar Programes"</value>
          <value lang="NL">kies "Programmagids" of "Programma Zoeker"</value>
-         <value lang="DE">wählen Sie 'TV Planer' oder 'Sendung suchen'</value>
+         <value lang="DE">wählen Sie 'Übersicht' oder 'Sendung suchen'</value>
          <value lang="DK">vælg 'Program Guide' eller 'Program Finder'</value>
          <value lang="PT">Selecione "Guia de Programação" ou "Procurar Programas"</value>
          <value lang="SV">välj 'Programguide' eller 'Sök program'</value>
@@ -1578,7 +1578,7 @@
         <value lang="ES">(4) Guia de Programas **(6) Busqueda de programas **</value>
         <value lang="CA">(4) Guia de programes **(6) Cerca Programes **</value>
         <value lang="NL">(4) Programmagids     **(6) Programma Zoeker **</value>
-        <value lang="DE">(4) TV Planer         **(6) Sendung suchen **</value>
+        <value lang="DE">(4) Übersicht         **(6) Sendung suchen **</value>
         <value lang="DK">(4) Program Guide     **(6) Program Finder **</value>
         <value lang="PT">(4) Guia de Programação  **(6) Procurar Programas **</value>
         <value lang="SV">(4) Programguide      **(6) Sök program **</value>

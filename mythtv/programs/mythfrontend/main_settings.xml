@@ -116,6 +116,7 @@
    <button>
      <type>DVD</type>
      <text>DVD Settings</text>
+     <text lang="DE">DVD Einstellungen</text>
      <text lang="PT">Configurar DVD</text>
      <text lang="SV">Inställningar för DVD</text>
      <action>CONFIGPLUGIN mythdvd</action>
@@ -125,6 +126,7 @@
    <button>
      <type>NEWS</type>
      <text>News Settings</text>
+     <text lang="DE">Nachrichten Einstellungen</text>
      <action>CONFIGPLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>

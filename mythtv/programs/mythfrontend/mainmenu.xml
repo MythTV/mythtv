@@ -90,6 +90,7 @@
    <button>
      <type>DVD</type>
      <text>DVD</text>
+     <text lang="DE">DVD</text>
      <text lang="PT">DVD</text>
      <action>PLUGIN mythdvd</action>
      <depends>mythdvd</depends>
@@ -98,6 +99,7 @@
    <button>
      <type>NEWS</type>
      <text>News Feeds</text>
+     <text lang="DE">Nachrichten</text>
      <action>PLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>

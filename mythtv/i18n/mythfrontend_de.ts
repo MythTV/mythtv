@@ -104,7 +104,7 @@
     <name>ManualSchedule</name>
     <message>
         <source>Manual Recording Scheduler</source>
-        <translation>Manueller Aufnahmeplaner</translation>
+        <translation>Manuelle Aufnahme</translation>
     </message>
     <message>
         <source>Channel:</source>
@@ -144,11 +144,11 @@
     </message>
     <message>
         <source>Save this scheduled recording and exit</source>
-        <translation>Geplante Aufnahme speichern und zurück ins Menü</translation>
+        <translation>Speichern und zurück ins Menü</translation>
     </message>
     <message>
         <source>Save this scheduled recording and set another</source>
-        <translation>Aufnahme speichern und eine weitere planen</translation>
+        <translation>Speichern und eine weitere Aufnahme eingeben</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -163,19 +163,19 @@
     <name>MythWizard</name>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Abbrechen</translation>
     </message>
     <message>
         <source>&lt; &amp;Back</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt; &amp;Zurück</translation>
     </message>
     <message>
         <source>&amp;Next &gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Weiter &gt;</translation>
     </message>
     <message>
         <source>&amp;Finish</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Fertig</translation>
     </message>
 </context>
 <context>
@@ -238,47 +238,47 @@
     </message>
     <message>
         <source>Are you sure you want to stop:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sind Sie sicher, daß Sie abbrechen wollen:</translation>
     </message>
     <message>
         <source>Yes, stop recording it</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, die Aufnahme abbrechen</translation>
     </message>
     <message>
         <source>No, do not AutoExpire</source>
-        <translation type="unfinished"></translation>
+        <translation>Nein, nicht autom. löschen</translation>
     </message>
     <message>
         <source>No, continue recording it</source>
-        <translation type="unfinished"></translation>
+        <translation>Nein, weiter aufnehmen</translation>
     </message>
     <message>
         <source>Select action:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitte wählen:</translation>
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished">Abspielen</translation>
+        <translation>Abspielen</translation>
     </message>
     <message>
         <source>Stop Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnahme abbrechen</translation>
     </message>
     <message>
         <source>Don&apos;t Auto Expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicht autom. löschen</translation>
     </message>
     <message>
         <source>Auto Expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch löschen</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Löschen</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Abbrechen</translation>
+        <translation>Abbrechen</translation>
     </message>
 </context>
 <context>
@@ -491,7 +491,7 @@
     </message>
     <message>
         <source>Schedule</source>
-        <translation>Plan</translation>
+        <translation>Modus</translation>
     </message>
     <message>
         <source>Do not record this program</source>
@@ -627,7 +627,7 @@
     </message>
     <message>
         <source>Pre-scaling theme images</source>
-        <translation>Skaliere Bilder</translation>
+        <translation>Skaliere Themenbilder</translation>
     </message>
     <message>
         <source>Audio output device</source>
@@ -843,7 +843,7 @@
     </message>
     <message>
         <source>Catalan</source>
-        <translation>Baskisch</translation>
+        <translation>Katalanisch</translation>
     </message>
     <message>
         <source>Spanish</source>
@@ -875,7 +875,7 @@
     </message>
     <message>
         <source>Your preferred language.</source>
-        <translation>Ihre gewünschte Sprache.</translation>
+        <translation>Ihre bevorzugte Sprache.</translation>
     </message>
 </context>
 <context>
@@ -970,15 +970,15 @@
     </message>
     <message>
         <source>Record and watch while it records</source>
-        <translation>Aufnehmen und gleichzeitig Ansehen</translation>
+        <translation>Aufnehmen und gleichzeitig ansehen</translation>
     </message>
     <message>
         <source>Let it record and go back to the Main Menu</source>
-        <translation>Aufnehmen und zurück zum Hauptmenü</translation>
+        <translation>Aufnehmen und zurück ins Hauptmenü</translation>
     </message>
     <message>
         <source>Don&apos;t let it record, I want to watch TV</source>
-        <translation>Nicht Aufnehmen, Ich will fernsehen</translation>
+        <translation>Nicht aufnehmen, ich will fernsehen</translation>
     </message>
     <message>
         <source>You are exiting this recording</source>
@@ -1026,7 +1026,7 @@
     </message>
     <message>
         <source>Paused</source>
-        <translation>Angehalten</translation>
+        <translation>Pause</translation>
     </message>
     <message>
         <source>Position</source>
@@ -1038,15 +1038,15 @@
     </message>
     <message>
         <source>Rewind </source>
-        <translation>Rückwärts</translation>
+        <translation>Zurück</translation>
     </message>
     <message>
         <source>Jump Ahead</source>
-        <translation>Nach vorne springen</translation>
+        <translation>Vowärts</translation>
     </message>
     <message>
         <source>Jump Back</source>
-        <translation>Zurück springen</translation>
+        <translation>Zurück</translation>
     </message>
     <message>
         <source>Searching...</source>
@@ -1126,27 +1126,27 @@
     </message>
     <message>
         <source>Speed 5X</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeitraffer 5x</translation>
     </message>
     <message>
         <source>Speed 3X</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeitraffer 3X</translation>
     </message>
     <message>
         <source>Speed 2X</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeitraffer 2X</translation>
     </message>
     <message>
         <source>Speed 1/3X</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeitlupe 1/3X</translation>
     </message>
     <message>
         <source>Speed 1/8X</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeitlupe 1/8X</translation>
     </message>
     <message>
         <source>Speed 1/16X</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeitlupe 1/16X</translation>
     </message>
     <message>
         <source>Skip</source>
@@ -1162,15 +1162,15 @@
     </message>
     <message>
         <source>This program is currently being edited</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese Aufnahme wird momentan bearbeitet</translation>
     </message>
     <message>
         <source>Continue Editing</source>
-        <translation type="unfinished"></translation>
+        <translation>Weiterhin bearbeiten</translation>
     </message>
     <message>
         <source>Do not edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicht bearbeiten</translation>
     </message>
 </context>
 <context>

@@ -17,6 +17,7 @@ Video Filters:
     Richard Jones <richard at earthmen.com>
 Misc changes:
     Grant Taylor <gtaylor at picante.com>
+    Stefan Frank <sfr at gmx.net>
 Colorize the EPG:
     skrpub <skrpub at earthlink.net>
 Bugfixes, EPG updates, more UK friendly database filling, lots of other things:
@@ -44,6 +45,8 @@ Commercial skipping, non-Xv display support:
 Closed Caption / Teletext Support:
     Erik Arendse <erik_nospam.arendse at bigfoot.com>
     Martin Moeller <martin at martinm-76.dk>
+German Translation:
+    Stefan Frank <sfr at gmx.net>
 Danish Translation:
     Martin Moeller <martin at martinm-76.dk>
 Swedish Translation:
