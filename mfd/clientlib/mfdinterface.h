@@ -27,8 +27,11 @@ class MfdInterface : public QObject
 
   public:
 
-    MfdInterface();
+    MfdInterface(int client_screen_width = 800, int client_screen_height = 600);
     ~MfdInterface();
+
+    int getClientWidth(){  return client_width;  }
+    int getClientHeight(){ return client_height; }
 
     //
     //  Methods that the linking client application can call to make an mfd
@@ -78,6 +81,10 @@ class MfdInterface : public QObject
     int                   mfd_id_counter;
     
     QIntDict<MfdContentCollection>   mfd_collections;
+    
+    int client_width;
+    int client_height;
+
 };
 
 #endif

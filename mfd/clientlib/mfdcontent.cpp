@@ -18,21 +18,74 @@ using namespace std;
 #include "mfdcontent.h"
 #include "../mfdlib/metadata.h"
 #include "playlist.h"
+#include "metadatacollection.h"
 
-MfdContentCollection::MfdContentCollection(int an_id)
+//
+//  Include pixmap images for kinds of things on a list (playlist, artist,
+//  album, etc.)
+//
+
+#include "pixmaps/playlist_pix.xpm"
+#include "pixmaps/artist_pix.xpm"
+#include "pixmaps/album_pix.xpm"
+#include "pixmaps/track_pix.xpm"
+
+//
+//  Statis QPixmap's to hold each of the pixmaps included above.
+//
+
+static QPixmap *pixplaylist = NULL;
+static QPixmap *pixartist = NULL;
+static QPixmap *pixalbum = NULL;
+static QPixmap *pixtrack = NULL;
+
+//
+//  Static function to scale pixmaps (if we are not running 800x600)
+//
+
+static QPixmap *scalePixmap(const char **xpmdata, float wmult, float hmult)
+{
+    QImage tmpimage(xpmdata);
+    QImage tmp2 = tmpimage.smoothScale((int)(tmpimage.width() * wmult),
+                                       (int)(tmpimage.height() * hmult));
+    QPixmap *ret = new QPixmap();
+    ret->convertFromImage(tmp2);
+                                                                                                                                                     
+    return ret;
+}
+
+
+MfdContentCollection::MfdContentCollection(
+                                            int an_id,
+                                            int client_screen_width,
+                                            int client_screen_height
+                                          )
 {
     collection_id = an_id;
+    
+    client_width = client_screen_width;
+    client_height = client_screen_height;
+    client_wmult = client_screen_width / 800.0;
+    client_hmult = client_screen_height / 600.0;
     
     audio_item_dictionary.resize(9973); //  large prime
     audio_item_dictionary.setAutoDelete(true);
     
     //
+    //  Prep the pixmaps
+    //
+
+    setupPixmaps();
+
+    //
     //  Make the core tree branches
     //
     
     audio_artist_tree = new UIListGenericTree(NULL, "All by Artist");
+    audio_artist_tree->setPixmap(pixartist);
     audio_genre_tree = new UIListGenericTree(NULL, "All by Genre");
     audio_playlist_tree = new UIListGenericTree(NULL, "All Playlists");
+    audio_playlist_tree->setPixmap(pixplaylist);
     audio_collection_tree =  new UIListGenericTree(NULL, "Grouped by Collection");
 
     //
@@ -42,7 +95,6 @@ MfdContentCollection::MfdContentCollection(int an_id)
     audio_artist_tree->setAttribute(1, 1);
     audio_genre_tree->setAttribute(1, 1);
     audio_playlist_tree->setAttribute(1, 2);
-
 }
 
 void MfdContentCollection::addMetadata(Metadata *new_item, const QString &collection_name)
@@ -106,14 +158,18 @@ void MfdContentCollection::addMetadata(Metadata *new_item, const QString &collec
 
 }
 
-void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, const QString &collection_name)
+void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, MetadataCollection *collection)
 {
 
+    QString collection_name = collection->getName();
+    
     //
     //  Create a node for this playlist in the audio playlist tree
     //
 
     UIListGenericTree *playlist_node = new UIListGenericTree(audio_playlist_tree, new_playlist->getName());
+
+    playlist_node->setPixmap(pixplaylist);   
     playlist_node->setAttribute(0, 0);  //  collection id is 0
     playlist_node->setAttribute(1, 2); 
     playlist_node->setAttribute(2, 0); 
@@ -123,7 +179,7 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, const QStri
     //  Collection Tree"
     //
     
-    GenericTree *by_playlist_node = NULL;
+    UIListGenericTree *by_playlist_node = NULL;
 
     /*
     cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Am trying to add a playlist called \""
@@ -136,7 +192,12 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, const QStri
          << endl;
     */   
 
-    GenericTree *collection_node = audio_collection_tree->getChildByName(collection_name);
+    UIListGenericTree *collection_node = NULL;
+    GenericTree *gt_collection_node = audio_collection_tree->getChildByName(collection_name);
+    if(gt_collection_node)
+    {
+        collection_node = (UIListGenericTree *)gt_collection_node;
+    }
     if(!collection_node)
     {
         collection_node = new UIListGenericTree(audio_collection_tree, collection_name);
@@ -146,19 +207,23 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, const QStri
         //
 
         by_playlist_node = new UIListGenericTree((UIListGenericTree *)collection_node, "Playlist");
+        by_playlist_node->setPixmap(pixplaylist);
         by_playlist_node->setAttribute(1, 2);
     }
     else
     {
-        by_playlist_node = collection_node->getChildByName("Playlist");
+        GenericTree *gt_by_playlist_node = collection_node->getChildByName("Playlist");
+        by_playlist_node = (UIListGenericTree *) gt_by_playlist_node;
         if(!by_playlist_node)
         {
-            by_playlist_node = by_playlist_node = new UIListGenericTree((UIListGenericTree *)collection_node, "Playlist");
+            by_playlist_node = new UIListGenericTree((UIListGenericTree *)collection_node, "Playlist");
+            by_playlist_node->setPixmap(pixplaylist);
             by_playlist_node->setAttribute(1, 2);
         }
     }
 
     UIListGenericTree *collection_playlist_node = new UIListGenericTree((UIListGenericTree *)by_playlist_node, new_playlist->getName());
+    collection_playlist_node->setPixmap(pixplaylist);
     collection_playlist_node->setAttribute(1, 2);
     
     //
@@ -170,20 +235,93 @@ void MfdContentCollection::addPlaylist(ClientPlaylist *new_playlist, const QStri
     QValueList<PlaylistEntry>::iterator l_it;
     for(l_it = the_list->begin(); l_it != the_list->end(); ++l_it)
     {
-        UIListGenericTree *track_node = new UIListGenericTree(playlist_node, (*l_it).getName());
-        track_node->setInt(new_playlist->getId());
-        track_node->setAttribute(0, new_playlist->getCollectionId());
-        track_node->setAttribute(1, 2);
-        track_node->setAttribute(2, counter);
+        if( (*l_it).isAnotherPlaylist())
+        {
+            recursivelyAddSubPlaylist(  
+                                        playlist_node,
+                                        collection, (*l_it).getId(), 
+                                        counter
+                                     );
+            recursivelyAddSubPlaylist(
+                                        collection_playlist_node, 
+                                        collection, 
+                                        (*l_it).getId(), 
+                                        counter
+                                     );
+        }
+        else
+        {
+            UIListGenericTree *track_node = new UIListGenericTree(playlist_node, (*l_it).getName());
+            track_node->setPixmap(pixtrack);
+            track_node->setInt(new_playlist->getId());
+            track_node->setAttribute(0, new_playlist->getCollectionId());
+            track_node->setAttribute(1, 2);
+            track_node->setAttribute(2, counter);
 
-        UIListGenericTree *o_track_node = new UIListGenericTree(collection_playlist_node, (*l_it).getName());
-        o_track_node->setInt(new_playlist->getId());
-        o_track_node->setAttribute(0, new_playlist->getCollectionId());
-        o_track_node->setAttribute(1, 2);
-        o_track_node->setAttribute(2, counter);
+            UIListGenericTree *o_track_node = new UIListGenericTree(collection_playlist_node, (*l_it).getName());
+            o_track_node->setInt(new_playlist->getId());
+            o_track_node->setPixmap(pixtrack);
+            o_track_node->setAttribute(0, new_playlist->getCollectionId());
+            o_track_node->setAttribute(1, 2);
+            o_track_node->setAttribute(2, counter);
+        }
         ++counter;
     }
     
+}
+
+void MfdContentCollection::recursivelyAddSubPlaylist(
+                                                        UIListGenericTree *where_to_add, 
+                                                        MetadataCollection *collection, 
+                                                        int playlist_id,
+                                                        int spot_counter
+                                                    )
+{
+    //
+    //  Use the playlist_id to find the playlist in this collection
+    //
+    
+    ClientPlaylist *playlist = collection->getPlaylistById(playlist_id);
+    if(!playlist)
+    {
+        cerr << "mfdcontent.o: there is no playlist with an id of " <<  playlist_id << endl;
+        return;
+    }
+
+    //
+    //  Create the parent node of all the nodes on this playlist
+    //
+
+    UIListGenericTree *playlist_node = new UIListGenericTree(where_to_add, playlist->getName());
+    playlist_node->setPixmap(pixplaylist);
+    playlist_node->setAttribute(1, 2);
+    playlist_node->setAttribute(2, spot_counter);
+
+    int counter = 0;
+    QValueList<PlaylistEntry> *the_list = playlist->getListPtr();
+    QValueList<PlaylistEntry>::iterator l_it;
+    for(l_it = the_list->begin(); l_it != the_list->end(); ++l_it)
+    {
+        if( (*l_it).isAnotherPlaylist())
+        {
+            recursivelyAddSubPlaylist(
+                                        playlist_node, 
+                                        collection, 
+                                        (*l_it).getId(), 
+                                        counter
+                                     );
+        }
+        else
+        {
+            UIListGenericTree *track_node = new UIListGenericTree(playlist_node, (*l_it).getName());
+            track_node->setPixmap(pixtrack);
+            track_node->setInt(playlist->getId());
+            track_node->setAttribute(0, playlist->getCollectionId());
+            track_node->setAttribute(1, 2);
+            track_node->setAttribute(2, counter);
+        }
+        ++counter;
+    }
 }
 
 void MfdContentCollection::addItemToAudioArtistTree(AudioMetadata *item, GenericTree *starting_point)
@@ -197,20 +335,24 @@ void MfdContentCollection::addItemToAudioArtistTree(AudioMetadata *item, Generic
     // The Artist --> Album --> Track   branch
     //
             
-    GenericTree *artist_node = starting_point->getChildByName(artist);
+    UIListGenericTree *artist_node = NULL;
+    artist_node = (UIListGenericTree *)starting_point->getChildByName(artist);
     if(!artist_node)
     {
         artist_node = new UIListGenericTree((UIListGenericTree *) starting_point, artist);
+        artist_node->setPixmap(pixartist);
         artist_node->setAttribute(0, 0);
         artist_node->setAttribute(1, 1);
         artist_node->setAttribute(2, 0);
     }
 
 
-    GenericTree *album_node = artist_node->getChildByName(album);
+    UIListGenericTree *album_node = NULL;
+    album_node = (UIListGenericTree *)artist_node->getChildByName(album);
     if(!album_node)
     {
         album_node = new UIListGenericTree((UIListGenericTree *) artist_node, album);
+        album_node->setPixmap(pixalbum);
         album_node->setAttribute(0, 0);
         album_node->setAttribute(1, 1);
         album_node->setAttribute(2, 0);
@@ -218,6 +360,7 @@ void MfdContentCollection::addItemToAudioArtistTree(AudioMetadata *item, Generic
             
     UIListGenericTree *title_node = new UIListGenericTree((UIListGenericTree *) album_node, 
                                         QString("%1. %2").arg(track_no).arg(title));
+    title_node->setPixmap(pixtrack);
     title_node->setInt(item->getId());
     title_node->setAttribute(0, item->getCollectionId());
     title_node->setAttribute(1, 1);
@@ -245,19 +388,24 @@ void MfdContentCollection::addItemToAudioGenreTree(AudioMetadata *item, GenericT
         genre_node->setAttribute(2, 0);
     }
 
-    GenericTree *artist_node = genre_node->getChildByName(artist);
+    UIListGenericTree *artist_node = NULL;
+    artist_node = (UIListGenericTree *) genre_node->getChildByName(artist);
     if(!artist_node)
     {
         artist_node = new UIListGenericTree((UIListGenericTree *)genre_node, artist);
+        artist_node->setPixmap(pixartist);
         artist_node->setAttribute(0, 0);
         artist_node->setAttribute(1, 1);
         artist_node->setAttribute(2, 0);
     }
 
-    GenericTree *album_node = artist_node->getChildByName(album);
+    UIListGenericTree *album_node = NULL;
+    album_node = (UIListGenericTree *) artist_node->getChildByName(album);
+    
     if(!album_node)
     {
-        album_node = new UIListGenericTree((UIListGenericTree *) artist_node, album);
+        album_node = new UIListGenericTree(artist_node, album);
+        album_node->setPixmap(pixartist);
         album_node->setAttribute(0, 0);
         album_node->setAttribute(1, 1);
         album_node->setAttribute(2, 0);
@@ -265,6 +413,7 @@ void MfdContentCollection::addItemToAudioGenreTree(AudioMetadata *item, GenericT
             
     UIListGenericTree *title_node = new UIListGenericTree((UIListGenericTree *) album_node, 
                                         QString("%1. %2").arg(track_no).arg(title));
+    title_node->setPixmap(pixtrack);
     title_node->setInt(item->getId());
     title_node->setAttribute(0, item->getCollectionId());
     title_node->setAttribute(1, 1);
@@ -279,8 +428,8 @@ void MfdContentCollection::addItemToAudioCollectionTree(AudioMetadata *item, con
     QString artist = item->getArtist();
     QString title  = item->getTitle();
 
-    GenericTree *by_artist_node = NULL;
-    GenericTree *by_genre_node = NULL;
+    UIListGenericTree *by_artist_node = NULL;
+    UIListGenericTree *by_genre_node = NULL;
      
             
     //
@@ -297,14 +446,15 @@ void MfdContentCollection::addItemToAudioCollectionTree(AudioMetadata *item, con
         //
 
         by_artist_node = new UIListGenericTree((UIListGenericTree *)collection_node, "By Artist");
+        by_artist_node->setPixmap(pixartist);
         by_artist_node->setAttribute(1, 1);
         by_genre_node = new UIListGenericTree((UIListGenericTree *)collection_node, "By Genre");
         by_genre_node->setAttribute(1, 1);
     }
     else
     {
-        by_artist_node = collection_node->getChildByName("By Artist");
-        by_genre_node = collection_node->getChildByName("By Genre");
+        by_artist_node = (UIListGenericTree *)collection_node->getChildByName("By Artist");
+        by_genre_node = (UIListGenericTree *)collection_node->getChildByName("By Genre");
     }
 
     //
@@ -356,6 +506,24 @@ void MfdContentCollection::sort()
     audio_collection_tree->sortByAttributeThenByString(2);
     audio_collection_tree->reOrderAsSorted();
 
+}
+
+void MfdContentCollection::setupPixmaps()
+{
+    if (client_height != 600 || client_width != 800)
+    {
+        pixplaylist = scalePixmap((const char **)playlist_pix, client_wmult, client_hmult);
+        pixartist = scalePixmap((const char **)artist_pix, client_wmult, client_hmult);
+        pixalbum = scalePixmap((const char **)album_pix, client_wmult, client_hmult);
+        pixtrack = scalePixmap((const char **)track_pix, client_wmult, client_hmult);
+    }
+    else
+    {
+        pixplaylist = new QPixmap((const char **)playlist_pix);
+        pixartist = new QPixmap((const char **)artist_pix);
+        pixalbum = new QPixmap((const char **)album_pix);
+        pixtrack = new QPixmap((const char **)track_pix);
+    }
 }
 
 MfdContentCollection::~MfdContentCollection()

@@ -13,6 +13,7 @@
 #include <qsocketdevice.h>
 #include <qurl.h>
 #include <qptrlist.h>
+#include <qvaluestack.h>
 
 #include "mfd_plugin.h"
 #include "../../mdserver.h"
@@ -65,6 +66,8 @@ class AudioPlugin: public MFDServicePlugin
     int     current_playlist_item;
     QMutex  play_data_mutex;
 
+    QValueStack<int>    current_chain_playlist;
+    QValueStack<int>    current_chain_position;
 
     MetadataServer *metadata_server;
     

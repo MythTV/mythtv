@@ -39,6 +39,8 @@ MetadataContainer::MetadataContainer(
     current_playlists = NULL;
     current_playlist_id = 2;
     generation = 1;
+    editable = false;
+    ripable = false;
 }
 
 void MetadataContainer::log(const QString &log_message, int verbosity)
@@ -389,7 +391,8 @@ void MetadataContainer::mapPlaylists(
                                                 mapout_it.current()->getDbList(), 
                                                 mapout_it.current()->getListPtr(),
                                                 current_playlists, 
-                                                0   // initial depth is 0
+                                                0,   // initial depth is 0
+                                                !editable    // editable containers should not flatten playlist
                                             );
                                             
         //

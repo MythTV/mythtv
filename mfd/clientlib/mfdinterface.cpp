@@ -16,8 +16,16 @@ using namespace std;
 #include "discoverythread.h"
 #include "events.h"
 
-MfdInterface::MfdInterface()
+MfdInterface::MfdInterface(int client_screen_width, int client_screen_height)
 {
+
+    //
+    //  Store information about the GUI client that has loaded us as a library
+    //
+    
+    client_width = client_screen_width;
+    client_height = client_screen_height;
+    
     //
     //  Create a thread which just sits around looking for mfd's to appear or dissappear
     //

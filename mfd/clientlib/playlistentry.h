@@ -18,7 +18,7 @@ class PlaylistEntry
   public:
   
     PlaylistEntry();
-    PlaylistEntry(int an_id, const QString &a_name);
+    PlaylistEntry(int an_id, const QString &a_name, bool is_another_playlist = false);
     ~PlaylistEntry();
   
     int     getId(){return id;}
@@ -26,11 +26,14 @@ class PlaylistEntry
     
     QString getName(){return name;}
     void    setName(const QString &a_name){ name=a_name;}
+    
+    bool    isAnotherPlaylist(){ return is_playlist_reference; }
   
   private:
   
     int     id;
-    QString name;  
+    QString name;
+    bool    is_playlist_reference;
 };
 
 #endif

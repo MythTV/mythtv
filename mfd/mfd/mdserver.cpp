@@ -1547,34 +1547,58 @@ void MetadataServer::addAudioList(
         QValueList<int>::iterator item_it;
         for(item_it = list_items->begin(); item_it != list_items->end(); ++item_it)
         {
-
-            //
-            //  Find the Metadata this item_it refers to
-            //
-
-            Metadata *a_metadata = getMetadataByContainerAndId(container->getIdentifier(), (*item_it));
-            if(a_metadata)
+            if( (*item_it) > 0)
             {
-                AudioMetadata *audio_metadata = (AudioMetadata *)a_metadata;
-                if(audio_metadata)
+
+                //
+                //  Find the Metadata this item_it refers to
+                //
+
+                Metadata *a_metadata = getMetadataByContainerAndId(container->getIdentifier(), (*item_it));
+                if(a_metadata)
                 {
-                    response->addListItemGroup();
-                        response->addListItemName(
-                                                    QString("%1 ~ %2")
-                                                    .arg(audio_metadata->getArtist())
-                                                    .arg(audio_metadata->getTitle())
-                                                );
-                        response->addListItem((*item_it));
-                    response->endGroup();
+                    AudioMetadata *audio_metadata = (AudioMetadata *)a_metadata;
+                    if(audio_metadata)
+                    {
+                        response->addListItemGroup();
+                            response->addListItemName(
+                                                        QString("%1 ~ %2")
+                                                        .arg(audio_metadata->getArtist())
+                                                        .arg(audio_metadata->getTitle())
+                                                    );
+                            response->addListItem((*item_it));
+                        response->endGroup();
+                    }
+                    else
+                    {
+                        warning("me no do non audio yet");
+                    }
                 }
                 else
                 {
-                    warning("me no do non audio yet");
+                    warning("playlist entry that does not point to metadata");
                 }
             }
             else
             {
-                warning("playlist entry that does not point to metadata");
+                //
+                //  Find the Playlist this item_it refers to
+                //
+                
+                int playlist_reference = (*item_it);
+                playlist_reference = playlist_reference * -1;
+                Playlist *a_playlist = getPlaylistByContainerAndId(container->getIdentifier(), playlist_reference);
+                if(a_playlist)
+                {
+                    response->addListListGroup();
+                        response->addListItemName(a_playlist->getName());
+                        response->addListItem(playlist_reference);
+                    response->endGroup();
+                }
+                else
+                {
+                    warning("negative playlist entry that does not point to another playlist");
+                }
             }
                      
         }
@@ -1618,6 +1642,8 @@ void MetadataServer::buildUpdateResponse(MdcapOutput *response)
             {
                 warning("collection that is neither audio not video");
             }
+            response->addCollectionEditable(container->isEditable());
+            response->addCollectionRipable(container->isRipable());
             response->addCollectionCount(container->getMetadataCount());
             response->addCollectionName(container->getName());
             response->addCollectionGeneration(container->getGeneration());

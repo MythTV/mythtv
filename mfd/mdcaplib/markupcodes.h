@@ -39,12 +39,13 @@ class MarkupCodes
     static const char added_items_group      = 6;
     static const char added_item_group       = 7;
     static const char added_list_item_group  = 8;
-    static const char deleted_items_group    = 9;
+    static const char added_list_list_group  = 9;
+    static const char deleted_items_group    = 10;
 
-    static const char list_group             = 10;
-    static const char added_lists_group      = 11;
-    static const char deleted_lists_group    = 12;
-    static const char added_list_group       = 13;
+    static const char list_group             = 11;
+    static const char added_lists_group      = 12;
+    static const char deleted_lists_group    = 13;
+    static const char added_list_group       = 14;
     
     //
     //  Smaller items that implicitly imply groups (by virtue of being of

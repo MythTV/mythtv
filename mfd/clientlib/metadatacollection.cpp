@@ -47,7 +47,12 @@ MetadataCollection::MetadataCollection(
     playlists.resize(9973);          // Big prime
     playlists.setAutoDelete(true);
     
+    //
+    //  Set defaults
+    //    
     
+    editable = false;
+    ripable = false;
 }
 
 bool MetadataCollection::itemsUpToDate()
@@ -321,9 +326,36 @@ void MetadataCollection::addList(MdcapInput &mdcap_input)
                     {
                         list_entries.push_back(new_entry);
                     }
+                    else
+                    {
+                        cerr << "metadatacollection.o: got a negative value "
+                             << "for an item on a playlist"
+                             << endl;
+                    }
                     delete list_entry;
                 }
 
+                break;
+                
+            case MarkupCodes::added_list_list_group:
+                {
+                    QValueVector<char> *list_entry = new QValueVector<char>;
+                    mdcap_input.popGroup(list_entry);
+                    MdcapInput rebuilt_internals(list_entry);
+                    PlaylistEntry new_entry = addListEntry(rebuilt_internals, true);
+                    if(new_entry.getId() > 0)
+                    {
+                        list_entries.push_back(new_entry);
+                    }
+                    else
+                    {
+                        cerr << "metadatacollection.o: got a negative value "
+                             << "for a (sub) playlist on a playlist"
+                             << endl;
+                    }
+                    delete list_entry;
+                    
+                }
                 break;
                 
             default:
@@ -365,7 +397,7 @@ void MetadataCollection::addList(MdcapInput &mdcap_input)
     }
 }
 
-PlaylistEntry MetadataCollection::addListEntry(MdcapInput &mdcap_input)
+PlaylistEntry MetadataCollection::addListEntry(MdcapInput &mdcap_input, bool is_another_playlist)
 {
     QString list_entry_name;
     int     list_entry_id;
@@ -393,7 +425,7 @@ PlaylistEntry MetadataCollection::addListEntry(MdcapInput &mdcap_input)
     
     if(all_is_well)
     {
-        return PlaylistEntry(list_entry_id, list_entry_name);
+        return PlaylistEntry(list_entry_id, list_entry_name, is_another_playlist);
     }
     
     return PlaylistEntry();
@@ -445,6 +477,11 @@ void MetadataCollection::printMetadata()
              << " items"
              << endl;
     }
+}
+
+ClientPlaylist* MetadataCollection::getPlaylistById(int which_playlist)
+{
+    return playlists.find(which_playlist);
 }
 
 MetadataCollection::~MetadataCollection()

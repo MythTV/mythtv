@@ -51,6 +51,7 @@ class MdcapOutput
     void addAddedListsGroup();
     void addAddedListGroup();
     void addListItemGroup();
+    void addListListGroup();
     void addDeletedListsGroup();
     
 

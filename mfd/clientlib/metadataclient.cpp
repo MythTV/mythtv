@@ -915,6 +915,8 @@ int MetadataClient::parseCollection(MdcapInput &mdcap_input)
     uint32_t new_collection_generation = 0;
     QString  new_collection_name = "";
     uint32_t new_collection_type = 0;
+    bool     new_collection_editable = false;
+    bool     new_collection_ripable = false;
 
     bool all_is_well = true;
     while(mdcap_input.size() > 0 && all_is_well)
@@ -933,6 +935,14 @@ int MetadataClient::parseCollection(MdcapInput &mdcap_input)
                 
             case MarkupCodes::collection_type:
                 new_collection_type =  mdcap_input.popCollectionType();   
+                break;
+                
+            case MarkupCodes::collection_is_editable:
+                new_collection_editable = mdcap_input.popCollectionEditable();
+                break;
+                
+            case MarkupCodes::collection_is_ripable:
+                new_collection_ripable = mdcap_input.popCollectionRipable();
                 break;
                 
             case MarkupCodes::collection_count:
@@ -1035,6 +1045,8 @@ int MetadataClient::parseCollection(MdcapInput &mdcap_input)
                                         new_collection_generation,
                                         metadata_type
                                        );
+            new_collection->setEditable(new_collection_editable);
+            new_collection->setRipable(new_collection_ripable);
             metadata_collections.append(new_collection);
         }
              
@@ -1397,7 +1409,11 @@ void MetadataClient::buildTree()
     //  that reflects everything available from this mfd.
     //
     
-    MfdContentCollection *new_collection = new MfdContentCollection(getId());
+    MfdContentCollection *new_collection = new MfdContentCollection(
+                                                    getId(), 
+                                                    mfd_interface->getClientWidth(),
+                                                    mfd_interface->getClientHeight()
+                                                                   );
     
   
     //
@@ -1430,7 +1446,7 @@ void MetadataClient::buildTree()
         QIntDictIterator<ClientPlaylist> p_it( *playlist ); 
         for ( ; p_it.current(); ++p_it )
         {
-            new_collection->addPlaylist(p_it.current(), a_collection->getName());
+            new_collection->addPlaylist(p_it.current(), a_collection);
         }
         
         //

@@ -75,6 +75,10 @@ class MetadataContainer
     bool                isAudio();
     bool                isVideo();
     bool                isLocal();
+    bool                isEditable() { return editable; }
+    void                setEditable(bool x) { editable = x; }
+    bool                isRipable() { return ripable; }
+    void                setRipable(bool x) { ripable = x; }
     uint                getMetadataCount();
     uint                getPlaylistCount();
     void                setName(const QString &a_name){my_name = a_name;}
@@ -144,9 +148,10 @@ class MetadataContainer
     QDeepCopy<QValueList<int> > playlist_deletions;
     
     QString my_name;
-    
-    int current_playlist_id;
-    int generation;                        
+    int     current_playlist_id;
+    int     generation;                        
+    bool    editable;
+    bool    ripable;
 };
 
 #endif

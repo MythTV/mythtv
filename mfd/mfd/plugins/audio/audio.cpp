@@ -856,6 +856,8 @@ void AudioPlugin::stopPlaylistMode()
         current_playlist_id = -1;
         current_playlist_item_index = -1;
         log(QString("leaving playlist mode"), 7);
+        current_chain_playlist.clear();
+        current_chain_position.clear();
     playlist_mode_mutex.unlock();
 }
 
@@ -933,20 +935,99 @@ void AudioPlugin::playFromPlaylist(int augment_index)
 
     if(current_playlist_item_index >= (int) song_list.count())
     {
-        current_playlist_item_index = 0;
+        //
+        //  We've reached the end of the list moving forwards (down the
+        //  list).  Perhaps we can pop up a level ?
+        //
+        
+        if(current_chain_playlist.count() > 0)
+        {
+            current_playlist_id         = current_chain_playlist.pop();
+            current_playlist_item_index = current_chain_position.pop();
+            metadata_server->unlockMetadata();        
+            playlist_mode_mutex.unlock();
+            playFromPlaylist(1);
+            return;
+        }
+        else
+        {
+            current_playlist_item_index = 0;
+        }
     }
         
     if(current_playlist_item_index < 0)
     {
-        current_playlist_item_index = (int) song_list.count() - 1;
+        //
+        //  We've reached the end of the list moving backwards (up the
+        //  list).  Perhaps we can pop up a level ?
+        //
+        
+        if(current_chain_playlist.count() > 0)
+        {
+            current_playlist_id         = current_chain_playlist.pop();
+            current_playlist_item_index = current_chain_position.pop();
+            metadata_server->unlockMetadata();        
+            playlist_mode_mutex.unlock();
+            playFromPlaylist(-1);
+            return;
+        }
+        else
+        {
+            current_playlist_item_index = (int) song_list.count() - 1;
+        }
     }
         
     //
     //  Get the relevant reference
     //
         
-    uint song_to_play = song_list[current_playlist_item_index];
+    int song_to_play = song_list[current_playlist_item_index];
     uint collection_to_play_from = current_playlist_container;
+
+
+    if(song_to_play < 0)
+    {
+        //
+        //  We have a reference to another playlist, so we need to push down
+        //
+        
+        Playlist *down_playlist = metadata_server->getPlaylistByContainerAndId(
+                                                            current_playlist_container,
+                                                            song_to_play * -1
+                                                                              );        
+        if(down_playlist)
+        {
+            current_chain_playlist.push(current_playlist_id);
+            current_chain_position.push(current_playlist_item_index);
+            current_playlist_id = song_to_play * -1;
+            
+            int where_to_jump = 1;
+            current_playlist_item_index = -1;
+
+            if(augment_index < 0)
+            {
+                if(down_playlist->getList().count() > 0)
+                {
+                    current_playlist_item_index = down_playlist->getList().count();
+                    where_to_jump = -1;
+                }
+            }
+            metadata_server->unlockMetadata();        
+            playlist_mode_mutex.unlock();
+            playFromPlaylist(where_to_jump);
+            return;
+        }
+        else
+        {
+            warning(QString("bad reference to another playlist "
+                            "on a playlist: %1")
+                            .arg(song_to_play));
+            metadata_server->unlockMetadata();        
+            playlist_mode_mutex.unlock();
+            stopPlaylistMode();
+        }
+    }
+
 
     metadata_server->unlockMetadata();        
     playlist_mode_mutex.unlock();

@@ -144,6 +144,12 @@ void MMusicWatcher::initialize()
     container_id = metadata_container->getIdentifier();
     
     //
+    //  Since this is local files, it is editable
+    //
+    
+    metadata_container->setEditable(true);
+    
+    //
     //  load the playlists (only once, whenever we initialize)
     //
 

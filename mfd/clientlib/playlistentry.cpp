@@ -14,12 +14,14 @@ PlaylistEntry::PlaylistEntry()
 {
     id = -1;
     name = "";
+    is_playlist_reference = false;
 }
 
-PlaylistEntry::PlaylistEntry(int an_id, const QString &a_name)
+PlaylistEntry::PlaylistEntry(int an_id, const QString &a_name, bool is_another_playlist)
 {
     id = an_id;
     name = a_name;
+    is_playlist_reference = is_another_playlist;
 }
 
 PlaylistEntry::~PlaylistEntry()

@@ -138,6 +138,13 @@ void MdcapOutput::addListItemGroup()
     append((uint32_t) 0);
 }
 
+void MdcapOutput::addListListGroup()
+{
+    append(MarkupCodes::added_list_list_group);
+    open_groups.push(contents.size());
+    append((uint32_t) 0);
+}
+
 void MdcapOutput::addAddedListGroup()
 {
     append(MarkupCodes::added_list_group);

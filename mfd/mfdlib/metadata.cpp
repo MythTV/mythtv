@@ -254,7 +254,8 @@ void Playlist::mapDatabaseToId(
                                 QValueList<int> *reference_list,
                                 QValueList<int> *song_list,
                                 QIntDict<Playlist> *the_playlists,
-                                int depth
+                                int depth,
+                                bool flatten_playlists
                               )
 {
     if(depth == 0)
@@ -312,13 +313,26 @@ void Playlist::mapDatabaseToId(
             }
             if(which_one)
             {
-                which_one->mapDatabaseToId(
-                                            the_metadata, 
-                                            which_one->getDbList(),
-                                            song_list,
-                                            the_playlists,
-                                            depth + 1
-                                          );
+                if(flatten_playlists)
+                {
+                    which_one->mapDatabaseToId(
+                                                the_metadata, 
+                                                which_one->getDbList(),
+                                                song_list,
+                                                the_playlists,
+                                                 depth + 1
+                                              );
+                }
+                else
+                {
+                    //  
+                    //  Just put the playlist id on the list, but as a negative value
+                    //
+                    
+                    int reference_id = which_one->getId();
+                    reference_id = reference_id * -1;
+                    song_list->append(reference_id);
+                }
             }
             else
             {
@@ -326,7 +340,6 @@ void Playlist::mapDatabaseToId(
                      << "that does not exist" 
                      << endl;
             }
-            
         }
     }
 }

@@ -17,6 +17,7 @@ const char MarkupCodes::collection_group;
 const char MarkupCodes::item_group;
 const char MarkupCodes::added_items_group;
 const char MarkupCodes::added_list_item_group;
+const char MarkupCodes::added_list_list_group;
 const char MarkupCodes::deleted_items_group;
 const char MarkupCodes::added_item_group;
 const char MarkupCodes::list_group;

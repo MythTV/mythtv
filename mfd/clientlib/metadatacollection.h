@@ -46,7 +46,7 @@ class MetadataCollection
     QString       getListsRequest(uint32_t session_id);
     void          addItem(MdcapInput &mdcap_input);
     void          addList(MdcapInput &mdcap_input);
-    PlaylistEntry addListEntry(MdcapInput &mdcap_input);
+    PlaylistEntry addListEntry(MdcapInput &mdcap_input, bool is_another_playlist = false);
     void          setMetadataGeneration(int an_int){current_metadata_generation = an_int;}
     void          setPlaylistGeneration(int an_int){current_playlist_generation = an_int;}
     void          clearAllMetadata(){metadata.clear();}
@@ -56,7 +56,10 @@ class MetadataCollection
     void          deleteItem(uint which_item);
     void          deleteList(uint which_list);
     void          printMetadata();   // Debugging
-    
+    void          setEditable(bool x){ editable = x; }
+    bool          isEditable(){ return editable; }
+    void          setRipable(bool x){ ripable = x; }
+    bool          isRipable(){ return ripable; }    
 
     //
     //  Get at the contents
@@ -64,6 +67,12 @@ class MetadataCollection
 
     QIntDict<Metadata>*       getMetadata(){ return &metadata;}
     QIntDict<ClientPlaylist>* getPlaylists(){ return &playlists;}
+
+    //
+    //  Get at individual parts of the contents
+    //
+    
+    ClientPlaylist*           getPlaylistById(int which_playlist);
     
   private:
   
@@ -79,6 +88,9 @@ class MetadataCollection
 
     QIntDict<Metadata>        metadata;    
     QIntDict<ClientPlaylist>  playlists;
+    
+    bool         editable;
+    bool         ripable;
 };
 
 #endif

@@ -18,17 +18,23 @@ class AudioMetadata;
 class ClientPlaylist;
 class GenericTree;
 class UIListGenericTree;
+class MetadataCollection;
 
 class MfdContentCollection
 {
   public:
   
-     MfdContentCollection(int an_id);
+     MfdContentCollection(int an_id, int client_screen_width = 800, int client_screen_height = 600);
     ~MfdContentCollection();
 
     void addMetadata(Metadata *an_item, const QString &collection_name);
-    void addPlaylist(ClientPlaylist *a_playlist, const QString &collection_name);
-
+    void addPlaylist(ClientPlaylist *a_playlist, MetadataCollection *collection);
+    void recursivelyAddSubPlaylist(
+                                    UIListGenericTree *where_to_add, 
+                                    MetadataCollection *collection, 
+                                    int playlist_id, 
+                                    int spot_counter
+                                  );
     void addItemToAudioArtistTree(AudioMetadata *item, GenericTree *starting_point);
     void addItemToAudioGenreTree(AudioMetadata *item, GenericTree *starting_point);
     void addItemToAudioCollectionTree(AudioMetadata *item, const QString &collection_name);
@@ -41,6 +47,7 @@ class MfdContentCollection
     AudioMetadata*  getAudioItem(int which_collection, int which_id);
 
     void sort();
+    void setupPixmaps();
     
   private:
 
@@ -52,6 +59,11 @@ class MfdContentCollection
     UIListGenericTree *audio_genre_tree;
     UIListGenericTree *audio_playlist_tree;
     UIListGenericTree *audio_collection_tree;
+    
+    int   client_width;
+    int   client_height;
+    float client_wmult;
+    float client_hmult;
 };
 
 #endif

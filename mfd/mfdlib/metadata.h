@@ -281,7 +281,8 @@ class Playlist
                                         QValueList<int>* reference_list,
                                         QValueList<int>* song_list,
                                         QIntDict<Playlist> *the_playlists,
-                                        int depth
+                                        int depth,
+                                        bool flatten_playlists = true
                                     );    
 
     uint             getCollectionId(){return collection_id;}    
