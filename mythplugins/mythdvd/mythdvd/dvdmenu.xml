@@ -1,0 +1,16 @@
+<mythmenu name="DVD">
+
+   <button>
+      <type>DVD_PLAY</type>
+      <text>Play DVD</text>
+      <action>DVD_PLAY</action>
+   </button>
+
+
+   <button>
+      <type>DVD_RIP</type>
+      <text>Rip DVD</text>
+      <action>DVD_RIP</action>
+   </button>
+
+</mythmenu>

@@ -1,0 +1,20 @@
+
+The usual bunch of people, probably including:
+
+    Isaac Richards <ijr at po dot cwru dot edu>
+    Thor Sigvaldason <myth at lamedomainname dot com>
+
+Some inspiration from original attempts by:
+
+    Torquil Gault <torquilgaul at yahoo dot com>
+
+MythDVD relies heavily on the transcode project:
+
+    http://www.theorie.physik.uni-goettingen.de/~ostreich/transcode/
+    Main Author: Thomas Östreich <ostreich@theorie.physik.uni-goettingen.de>
+    Current Maintainer: Tilmann Bitterberg <transcode@tibit.org>
+
+and, by the time anyone reads this file, probably a lot of patch
+contributors.
+
+

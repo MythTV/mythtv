@@ -1,0 +1,7 @@
+
+   <button>
+      <type>DVD_RIP</type>
+      <text>Rip Settings</text>
+      <action>DVD_SETTINGS_RIP</action>
+   </button>
+

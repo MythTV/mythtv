@@ -1,0 +1,174 @@
+<!--
+
+    This is a myth style theme file for mythdvd
+
+    (c) 2003 by a whole bunch of people associated with MythTV
+
+-->
+<mythuitheme>
+ 
+
+    <!--
+        
+        The dvd ripping/transcoding screen
+
+    -->
+    <window name="dvd_rip">
+    
+        <!--
+
+            First, define all the fonts we need on this screen
+
+        -->
+        <font name="title" face="Arial">
+            <color>#ffffff</color>
+            <dropcolor>#000000</dropcolor>
+            <size>40</size>
+            <shadow>3,3</shadow>
+            <bold>yes</bold>
+            
+        </font>
+
+        <font name="warning" face="Arial">
+            <color>#ffffff</color>
+            <dropcolor>#000000</dropcolor>
+            <size>24</size>
+            <shadow>2,2</shadow>
+            <bold>yes</bold>
+        </font>
+  
+        <font name="display" face="Arial">
+            <color>#ffffff</color>
+            <size>16</size>
+            <bold>yes</bold>
+        </font>
+
+        <font name="buttons" face="Arial">
+            <color>#ffffff</color>
+            <size>14</size>
+            <bold>yes</bold>
+        </font>
+
+        <container name="background">
+            <image name="banner" draworder="0" fleximage="no">
+                <filename>md_rip_banner.png</filename>
+                <position>0,0</position>
+            </image>
+            <textarea name="banner" draworder="0">
+                <font>title</font>
+                <area>200,5,600,95</area>
+                <value>Rip and Transcode</value>
+            </textarea>
+            <image name="progress_background" draworder="0">
+                <filename>md_progress_background.png</filename>
+                <position>50,120</position>
+            </image>
+
+        </container>
+
+        <container name="main_display">
+            <area>50,120,700,480</area>
+
+
+            <!-- 
+                Context 1 & 2
+                Warnings or Status Messages
+            -->
+
+            <textarea name="warning" draworder="0" align="center">
+                <multiline>yes</multiline>
+                <font>warning</font>
+                <area>50,50,600,300</area>
+            </textarea>
+
+            <!-- 
+                Context 3
+                Browse active jobs
+            -->
+
+            <textarea name="overall_text" draworder="1" align="center">
+                <context>3</context>
+                <font>display</font>
+                <area>0,30,700,30</area>
+            </textarea>
+
+            <textarea name="job_text" draworder="1" align="center">
+                <context>3</context>
+                <font>display</font>
+                <area>0,180,700,30</area>
+            </textarea>
+
+            <textarea name="numb_jobs_text" draworder="1" align="center">
+                <context>3</context>
+                <font>display</font>
+                <area>275,330,150,30</area>
+                <value>Job 1 of 1</value>
+            </textarea>
+
+            <statusbar name="overall_status" draworder="1" whitespace="15">
+                <context>3</context>
+                <container fleximage="no">md_job_progress_background.png</container>
+                <fill>md_job_progress_foreground.png</fill>
+                <position>110,70</position>
+                <orientation>LeftToRight</orientation>
+            </statusbar>
+        
+            <statusbar name="job_status" draworder="1" whitespace="15">
+                <context>3</context>
+                <container fleximage="no">md_job_progress_background.png</container>
+                <fill>md_job_progress_foreground.png</fill>
+                <position>110,220</position>
+                <orientation>LeftToRight</orientation>
+            </statusbar>
+
+            <pushbutton name="job_next_button" draworder="2">
+                <context>3</context>
+                <position>435,315</position>
+                <image function="on" filename="md_job_next_on.png"></image>
+                <image function="off" filename="md_job_next_off.png"></image>
+                <image function="pushed" filename="md_job_next_pushed.png"></image>
+            </pushbutton>
+            
+            <pushbutton name="job_prev_button" draworder="2">
+                <context>3</context>
+                <position>205,315</position>
+                <image function="on" filename="md_job_prev_on.png"></image>
+                <image function="off" filename="md_job_prev_off.png"></image>
+                <image function="pushed" filename="md_job_prev_pushed.png"></image>
+            </pushbutton>
+            
+            <textbutton name="ripscreen_button" draworder="1">
+                <context>3</context>
+                <position>275,410</position>
+                <image function="on" filename="md_text_button_on.png"></image>
+                <image function="off" filename="md_text_button_off.png"></image>
+                <image function="pushed" filename="md_text_button_pushed.png"></image>
+                <font>buttons</font>
+            </textbutton>
+
+            <!-- 
+                Context 4
+                Browse DVD, start a job
+
+                Right now this is a HACK, because the widgets
+                used are actually Qt-derived widgets not theme-able
+                Myth widgets. This will change.
+
+            -->
+                
+            
+            <!--
+                Context 4
+                Want to rip, no DVD
+            
+            <textarea name="nodvd_text" draworder="0" align="center">
+                <context>4</context>
+                <multiline>yes</multiline>
+                <font>warning</font>
+                <area>50,100,600,300</area>
+            </textarea>
+            -->
+            
+        </container>
+    </window>
+</mythuitheme>

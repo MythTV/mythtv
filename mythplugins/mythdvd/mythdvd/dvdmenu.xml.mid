@@ -1,0 +1,6 @@
+
+   <button>
+      <type>DVD_RIP</type>
+      <text>Rip DVD</text>
+      <action>DVD_RIP</action>
+   </button>
