@@ -427,7 +427,8 @@ list<ProgramInfo *> *Scheduler::getConflicting(ProgramInfo *pginfo,
         ProgramInfo *second = (*i);
 
         if (second->title == pginfo->title && 
-            second->startts == pginfo->startts)
+            second->startts == pginfo->startts &&
+            second->channum == pginfo->channum)
             continue;
 
         if (removenonplaying && (!pginfo->recording || !second->recording))

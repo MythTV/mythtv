@@ -12,11 +12,11 @@ INCLUDEPATH += ../libNuppelVideo
 TARGETDEPS = ../libNuppelVideo/libNuppelVideo.a 
 
 installfiles.path = /usr/local/share/mythtv
-installfiles.files = helr.ttf settings.txt
+installfiles.files = helr.ttf
 
-#!exists( /usr/local/share/mythtv/settings.txt ) {
-#    installfiles.files += settings.txt
-#}
+!exists( /usr/local/share/mythtv/settings.txt ) {
+    installfiles.files += settings.txt
+}
 
 INSTALLS = installfiles
  

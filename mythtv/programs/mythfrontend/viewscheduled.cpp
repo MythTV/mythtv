@@ -258,7 +258,7 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
 
 void ViewScheduled::handleConflicting(ProgramInfo *rec)
 {
-    list<ProgramInfo *> *conflictlist = sched->getConflicting(rec);
+    list<ProgramInfo *> *conflictlist = sched->getConflicting(rec, false);
 
     QString message = "The follow scheduled recordings conflict with each other.  Which would you like to record?";
 
