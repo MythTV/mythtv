@@ -1851,6 +1851,7 @@ extern AVCodec mpeg1video_decoder;
 extern AVCodec mpeg2video_decoder;
 extern AVCodec mpegvideo_decoder;
 extern AVCodec mpeg_xvmc_decoder;
+extern AVCodec mpeg_xvmc_vld_decoder;
 extern AVCodec h263i_decoder;
 extern AVCodec flv_decoder;
 extern AVCodec rv10_decoder;
