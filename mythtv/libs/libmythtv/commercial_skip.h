@@ -59,6 +59,7 @@ class CommDetect
 
     int width;
     int height;
+    int border;
     double frame_rate;
     bool blankFramesOnly;
 

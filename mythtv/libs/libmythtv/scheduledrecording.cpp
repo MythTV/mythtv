@@ -41,15 +41,15 @@ public:
         setLabel(QObject::tr("Schedule"));
         addSelection(QObject::tr("Do not record this program"),
                      QString::number(kNotRecording));
-        addSelection(QObject::tr("Record only this showing of the program"),
+        addSelection(QObject::tr("Record only this showing"),
                      QString::number(kSingleRecord));
-        addSelection(QObject::tr("Record this program in this timeslot every day"),
+        addSelection(QObject::tr("Record in this timeslot every day"),
                      QString::number(kTimeslotRecord));
-        addSelection(QObject::tr("Record this program whenever it's shown on this channel"),
+        addSelection(QObject::tr("Record at any time on this channel"),
                      QString::number(kChannelRecord));
-        addSelection(QObject::tr("Record this program whenever it's shown anywhere"),
+        addSelection(QObject::tr("Record at any time on any channel"),
                      QString::number(kAllRecord));
-        addSelection(QObject::tr("Record this program in this timeslot every week"),
+        addSelection(QObject::tr("Record in this timeslot every week"),
                      QString::number(kWeekslotRecord));
     };
 };
@@ -87,6 +87,24 @@ public:
     SRAutoExpire(const ScheduledRecording& parent):
         SRSetting(parent, "autoexpire") {
         setLabel(QObject::tr("Allow recordings to be Auto-Expired"));
+    };
+};
+
+class SRPreRoll: public SpinBoxSetting, public SRSetting {
+public:
+    SRPreRoll(const ScheduledRecording& parent):
+        SpinBoxSetting(-60, 60, 1),
+        SRSetting(parent, "preroll") {
+        setLabel(QObject::tr("Pre-Roll Minutes"));
+    };
+};
+
+class SRPostRoll: public SpinBoxSetting, public SRSetting {
+public:
+    SRPostRoll(const ScheduledRecording& parent):
+        SpinBoxSetting(-60, 60, 1),
+        SRSetting(parent, "postroll") {
+        setLabel(QObject::tr("Post-Roll Minutes"));
     };
 };
 
@@ -198,6 +216,8 @@ ScheduledRecording::ScheduledRecording() {
     addChild(recorddups = new SRRecordDups(*this));
     addChild(autoexpire = new SRAutoExpire(*this));
     addChild(maxepisodes = new SRMaxEpisodes(*this));
+    addChild(preroll = new SRPreRoll(*this));
+    addChild(postroll = new SRPostRoll(*this));
     addChild(maxnewest = new SRMaxNewest(*this));
     addChild(channel = new SRChannel(*this));
     addChild(title = new SRTitle(*this));
@@ -232,7 +252,8 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
                                                  list<ProgramInfo*>& proglist) {
      QString query = QString(
 "SELECT DISTINCT channel.chanid, channel.sourceid, "
-"program.starttime, program.endtime, "
+"program.starttime - INTERVAL preroll minute, "
+"program.endtime + INTERVAL postroll minute, "
 "program.title, program.subtitle, program.description, "
 "channel.channum, channel.callsign, channel.name, "
 "oldrecorded.starttime IS NOT NULL AS oldrecduplicate, program.category, "
@@ -434,7 +455,7 @@ bool ScheduledRecording::loadByProgram(QSqlDatabase* db,
     // Have to split up into parts since .arg() only supports %1-%9
     QString query = QString(
 "SELECT "
-"recordid "
+"recordid, preroll, postroll "
 "FROM record "
 "WHERE "
 "record.title = \"%1\" "
@@ -445,15 +466,24 @@ bool ScheduledRecording::loadByProgram(QSqlDatabase* db,
 "  AND "
 "  ((record.type = %4) " // channelrecord
 "   OR"
-"   (((TIME_TO_SEC(record.starttime) = TIME_TO_SEC('%5')) " // timeslot matches
+"   ((((TIME_TO_SEC(record.starttime) = TIME_TO_SEC('%5')) " // timeslot matches
 "      AND "
 "     (TIME_TO_SEC(record.endtime) = TIME_TO_SEC('%6')) "
-"    )"
+"     ) OR "
+"     (((preroll <> 0) OR (postroll <> 0)) "
+"      AND "
+"      (TIME_TO_SEC(record.starttime) = MOD((TIME_TO_SEC('%7') + (preroll * 60)), 86400)) " // timeslot w/ pre & post-rolls matches
+"      AND "
+"      (TIME_TO_SEC(record.endtime) = MOD((TIME_TO_SEC('%8') - (postroll * 60)), 86400)) "
+"     ) "
+"    ) "
 "    AND ")
         .arg(sqltitle.utf8())
         .arg(kAllRecord)
         .arg(chanid)
         .arg(kChannelRecord)
+        .arg(proginfo->startts.time().toString(Qt::ISODate))
+        .arg(proginfo->endts.time().toString(Qt::ISODate))
         .arg(proginfo->startts.time().toString(Qt::ISODate))
         .arg(proginfo->endts.time().toString(Qt::ISODate));
 
@@ -487,6 +517,19 @@ query += QString(
         if (result.numRowsAffected() > 0) {
             result.next();
             loadByID(db, result.value(0).toInt());
+
+            if (result.value(1).toInt())
+            {
+                startTime->setValue(proginfo->startts.time());
+                startDate->setValue(proginfo->startts.date());
+            }
+
+            if (result.value(2).toInt())
+            {
+                endTime->setValue(proginfo->endts.time());
+                endDate->setValue(proginfo->endts.date());
+            }
+
             return true;
         } else {
             fromProgramInfo(proginfo);
@@ -649,7 +692,7 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
     gContext->GetScreenSettings(wmult, hmult);
 
     MythDialog* dialog = new ConfigurationDialogWidget(parent, name);
-    QVBoxLayout* vbox = new QVBoxLayout(dialog, (int)(20 * wmult));
+    QVBoxLayout* vbox = new QVBoxLayout(dialog, (int)(10 * wmult));
 
     if (m_pginfo)
     {
@@ -666,14 +709,16 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
     vbox->addWidget(type->configWidget(this, dialog));
 
     QHBoxLayout* hbox = new QHBoxLayout(vbox, (int)(20 * wmult));
-    QVBoxLayout* vbox1 = new QVBoxLayout(hbox, (int)(20 * wmult));
-    QVBoxLayout* vbox2 = new QVBoxLayout(hbox, (int)(20 * wmult));
+    QVBoxLayout* vbox1 = new QVBoxLayout(hbox, (int)(10 * wmult));
+    QVBoxLayout* vbox2 = new QVBoxLayout(hbox, (int)(10 * wmult));
 
     vbox1->addWidget(profile->configWidget(this, dialog));
     vbox1->addWidget(rank->configWidget(this, dialog));
+    vbox1->addWidget(autoexpire->configWidget(this, dialog));
 
     vbox2->addWidget(recorddups->configWidget(this, dialog));
-    vbox2->addWidget(autoexpire->configWidget(this, dialog));
+    vbox2->addWidget(preroll->configWidget(this, dialog));
+    vbox2->addWidget(postroll->configWidget(this, dialog));
 
     vbox->addWidget(maxepisodes->configWidget(this, dialog));
     vbox->addWidget(maxnewest->configWidget(this, dialog));

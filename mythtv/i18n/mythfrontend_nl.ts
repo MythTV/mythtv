@@ -512,6 +512,30 @@
         <translation>Plannen</translation>
     </message>
     <message>
+        <source>Do not record this proram</source>
+        <translation>Dit programma niet opnemen</translation>
+    </message>
+    <message>
+        <source>Record only this showing</source>
+        <translation>Enkel deze vertoning van het programma opnemen</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every day</source>
+        <translation>Dit programma dagelijks in dit tijdsblok opnemen</translation>
+    </message>
+    <message>
+        <source>Record at any time on this channel</source>
+        <translation>Dit programma altijd op dit kanaal opnemen</translation>
+    </message>
+    <message>
+        <source>Record at any time on any channel</source>
+        <translation>Dit programma altijd en op alle kanalen opnemen</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every week</source>
+        <translation>Dit programma wekelijks in dit tijdsblok opnemen</translation>
+    </message>
+    <message>
         <source>Do not record this program</source>
         <translation>Dit programma niet opnemen</translation>
     </message>

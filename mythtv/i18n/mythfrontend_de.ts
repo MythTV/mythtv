@@ -509,6 +509,30 @@
         <translation>Modus</translation>
     </message>
     <message>
+        <source>Do not record this proram</source>
+        <translation>Nicht aufnehmen</translation>
+    </message>
+    <message>
+        <source>Record only this showing</source>
+        <translation>Einmalige Aufnahme</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every day</source>
+        <translation>Täglich zu dieser Zeit aufnehmen</translation>
+    </message>
+    <message>
+        <source>Record at any time on this channel</source>
+        <translation>Nur auf diesem Sender aufnehmen</translation>
+    </message>
+    <message>
+        <source>Record at any time on any channel</source>
+        <translation>Auf jedem Sender aufnehmen</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every week</source>
+        <translation>Wöchentlich zu dieser Zeit aufnehmen</translation>
+    </message>
+    <message>
         <source>Do not record this program</source>
         <translation>Nicht aufnehmen</translation>
     </message>

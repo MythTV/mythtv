@@ -227,15 +227,18 @@ public:
     };
 };
 
-class AutoCommercialSkip: public CheckBoxSetting, public GlobalSetting {
+class AutoCommercialSkip: public ComboBoxSetting, public GlobalSetting {
 public:
     AutoCommercialSkip():
         GlobalSetting("AutoCommercialSkip") {
         setLabel(QObject::tr("Automatically Skip Commercials"));
-        setValue(false);
+        addSelection(QObject::tr("Off"), "0");
+        addSelection(QObject::tr("Notify, but do not skip"), "2");
+        addSelection(QObject::tr("Automatically Skip"), "1");
         setHelpText(QObject::tr("Automatically skip commercial breaks that "
                     "have been flagged during Automatic Commercial Flagging "
-                    "or by the mythcommflag program."));
+                    "or by the mythcommflag program, or just notify that a "
+                    "commercial has been detected."));
     };
 };
 

@@ -512,6 +512,30 @@
         <translation>Parrilla</translation>
     </message>
     <message>
+        <source>Do not record this proram</source>
+        <translation>No grabar este programa</translation>
+    </message>
+    <message>
+        <source>Record only this showing</source>
+        <translation>Graba este programa solamente esta vez</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every day</source>
+        <translation>Grabar este programa a esta hora cada dia</translation>
+    </message>
+    <message>
+        <source>Record at any time on this channel</source>
+        <translation>Grabar este programa siempre que aparezca en este canal</translation>
+    </message>
+    <message>
+        <source>Record at any time on any channel</source>
+        <translation>Grabar este programa en cualquier siempre que aparezca</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every week</source>
+        <translation>Grabar este programa a esta hora cada semana</translation>
+    </message>
+    <message>
         <source>Do not record this program</source>
         <translation>No grabar este programa</translation>
     </message>

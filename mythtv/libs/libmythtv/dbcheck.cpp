@@ -284,6 +284,17 @@ void UpgradeTVDatabaseSchema(void)
 };
         performActualUpdate(updates, "1009", dbver);
     }
+
+    if (dbver == "1009")
+    {
+        const QString updates[] = {
+"ALTER TABLE record ADD COLUMN preroll INT DEFAULT 0 NOT NULL;",
+"ALTER TABLE record ADD COLUMN postroll INT DEFAULT 0 NOT NULL;",
+""
+};
+        performActualUpdate(updates, "1010", dbver);
+    }
+
 }
 
 void InitializeDatabase(void)

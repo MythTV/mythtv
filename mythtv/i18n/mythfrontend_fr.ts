@@ -505,6 +505,30 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Do not record this proram</source>
+        <translation>Ne pas enregistrer ce programme</translation>
+    </message>
+    <message>
+        <source>Record only this showing</source>
+        <translation>Enregistrer seulement cette instance du programme</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every day</source>
+        <translation>Enregistrer ce programme chaque jour à ce créneau horaire</translation>
+    </message>
+    <message>
+        <source>Record at any time on this channel</source>
+        <translation>Enregistrer ce programme à chaque apparition sur cette station</translation>
+    </message>
+    <message>
+        <source>Record at any time on any channel</source>
+        <translation>Enregistrer ce programme à chaque apparition</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every week</source>
+        <translation>Enregistrer ce programme chaque semaine à ce créneau horaire</translation>
+    </message>
+    <message>
         <source>Do not record this program</source>
         <translation>Ne pas enregistrer ce programme</translation>
     </message>
@@ -541,7 +565,7 @@
         <translation>Rang</translation>
     </message>
     <message>
-        <source>Allow recording even if duplicate episode</source>
+        <source>Allow recording even if duplicate episodE</source>
         <translation>Enregistrer même si copie en double</translation>
     </message>
     <message>

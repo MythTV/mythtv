@@ -90,6 +90,8 @@ private:
     class SRProfileSelector* profile;
     class SRRecordDups* recorddups;
     class SRAutoExpire* autoexpire;
+    class SRPreRoll* preroll;
+    class SRPostRoll* postroll;
     class SRMaxEpisodes* maxepisodes;
     class SRMaxNewest* maxnewest;
     class SRChannel* channel;

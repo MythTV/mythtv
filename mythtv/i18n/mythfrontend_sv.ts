@@ -377,6 +377,30 @@
         <translation>Schemalägg</translation>
     </message>
     <message>
+        <source>Do not record this proram</source>
+        <translation>Spela inte in detta program</translation>
+    </message>
+    <message>
+        <source>Record only this showing</source>
+        <translation>Spela bara in denna visning av detta program</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every day</source>
+        <translation>Spela in detta program denna tid varje dag</translation>
+    </message>
+    <message>
+        <source>Record at any time on this channel</source>
+        <translation>Spela in detta program närhelst det visas på denna kanal</translation>
+    </message>
+    <message>
+        <source>Record at any time on any channel</source>
+        <translation>Spela in detta program närhelst det visas på vilken kanal som helst</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every week</source>
+        <translation>Spela in detta program denna tid varje vecka</translation>
+    </message>
+    <message>
         <source>Do not record this program</source>
         <translation>Spela inte in detta program</translation>
     </message>

@@ -637,13 +637,13 @@ static void NormalizeTimeval(struct timeval *tv)
 {
     while (tv->tv_usec > 999999)
     {
-	tv->tv_sec++;
-	tv->tv_usec -= 1000000;
+        tv->tv_sec++;
+        tv->tv_usec -= 1000000;
     }
     while (tv->tv_usec < 0)
     {
-	tv->tv_sec--;
-	tv->tv_usec += 1000000;
+        tv->tv_sec--;
+        tv->tv_usec += 1000000;
     }
 }
 
@@ -1465,7 +1465,7 @@ void NuppelVideoPlayer::StartPlaying(void)
     while (!eof && !killplayer)
     {
         if (paused)
-	{ 
+        { 
             actuallypaused = true;
             decoderThreadPaused.wakeAll();
             pausecheck++;
@@ -1475,8 +1475,8 @@ void NuppelVideoPlayer::StartPlaying(void)
                 if (livetv && ringBuffer->GetFreeSpace() < -1000)
                 {
                     Unpause();
-		    printf("forced unpause\n");
-	        }
+                    printf("forced unpause\n");
+                }
                 pausecheck = 0;
             }
 
@@ -1511,10 +1511,10 @@ void NuppelVideoPlayer::StartPlaying(void)
                 usleep(500);
                 continue;
             }
-	}
-	
-	if (rewindtime > 0)
-	{
+        }
+
+        if (rewindtime > 0)
+        {
             PauseVideo();
 
             if (rewindtime >= 1)
@@ -1524,10 +1524,10 @@ void NuppelVideoPlayer::StartPlaying(void)
             while (GetVideoPause())
                 usleep(50);
             rewindtime = 0;
-	}
+        }
 
-	if (fftime > 0)
-	{
+        if (fftime > 0)
+        {
             fftime = CalcMaxFFTime(fftime);
             PauseVideo();
 
@@ -1541,7 +1541,7 @@ void NuppelVideoPlayer::StartPlaying(void)
             while (GetVideoPause())
                 usleep(50);
             fftime = 0;
-	}
+        }
 
         if (skipcommercials != 0)
         {
@@ -2018,6 +2018,7 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
             break; 
         }
         case Qt::Key_C:
+        case Qt::Key_Q:
         {
             QMap<long long, int>::Iterator it;
             for (it = deleteMap.begin(); it != deleteMap.end(); ++it)
@@ -3479,21 +3480,34 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
                 return;
 
             if (commBreakIter.key() == totalFrames)
+            {
                 eof = 1;
+            }
             else
             {
                 if (osd)
                 {
+                    QString comm_msg;
                     int skipped_seconds = (int)((commBreakIter.key() -
                             framesPlayed) / video_frame_rate);
-                    QString comm_msg = QString(QObject::tr("Skip %1 seconds"))
-                                      .arg(skipped_seconds);
+                    if (autocommercialskip == 1)
+                    {
+                        comm_msg = QString(QObject::tr("Skip %1 seconds"))
+                                   .arg(skipped_seconds);
+                    }
+                    else if (autocommercialskip == 2)
+                    {
+                        comm_msg = QString(QObject::tr(
+                                   "Commercial: %1 seconds")) 
+                                   .arg(skipped_seconds);
+                    }
                     QString desc;
                     int spos = calcSliderPos(skipped_seconds, desc);
                     osd->StartPause(spos, false, comm_msg, desc, 1);
                 }
 
-                JumpToFrame(commBreakIter.key());
+                if (autocommercialskip == 1)
+                    JumpToFrame(commBreakIter.key());
             }
 
             GetFrame(1, true);
@@ -3781,3 +3795,5 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
 
     return true;
 }
+
+

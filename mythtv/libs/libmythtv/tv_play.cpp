@@ -588,7 +588,9 @@ void TV::SetupPlayer(void)
     nvp->SetAudioDevice(gContext->GetSetting("AudioOutputDevice"));
     nvp->SetLength(playbackLen);
     nvp->SetExactSeeks(gContext->GetNumSetting("ExactSeeking"));
-    nvp->SetAutoCommercialSkip(gContext->GetNumSetting("AutoCommercialSkip"));
+
+    autoCommercialSkip = gContext->GetNumSetting("AutoCommercialSkip");
+    nvp->SetAutoCommercialSkip(autoCommercialSkip);
     nvp->SetCommercialSkipMethod(gContext->GetNumSetting("CommercialSkipMethod"));
 
     osd_display_time = gContext->GetNumSetting("OSDDisplayTime");
@@ -949,6 +951,15 @@ void TV::ProcessKeypress(int keypressed)
                             break;
                     }
                 }
+                if (dialogname == "programmenubox") 
+                {
+                    int result = osd->GetDialogResponse(dialogname);
+
+                    osd->HideAll();
+                    dialogname = "";
+
+                    ProgramMenuAction(result);
+                }
                 break;
             }
             default: break;
@@ -1219,6 +1230,11 @@ void TV::ProcessKeypress(int keypressed)
                 if (editmode)
                     nvp->SetPlaySpeed(1.0, false);
                 break;        
+            }
+            case Key_O:
+            {
+                DoProgramMenu();
+                break;
             }
             case Key_Up:
             {
@@ -2590,4 +2606,104 @@ void TV::DoChangePictureAttribute(bool up)
 OSD *TV::GetOSD(void)
 {
     return nvp->GetOSD();
+}
+
+void TV::DoProgramMenu(void)
+{
+    if (GetState() == kState_WatchingLiveTV)
+       return;
+
+    if (!osd)
+        return;
+
+    NormalSpeed();
+
+    if (paused)
+    {
+        osd->EndPause();
+    }
+    else
+    {
+        activenvp->Pause();
+        paused = true;
+    }
+
+    osd->HideAll();
+
+    dialogname = "programmenubox";
+
+    QString message = tr("Program Menu");
+
+    QStringList options;
+
+    if (autoCommercialSkip == 1)
+        options += tr("Set Commercial Auto-Skip OFF");
+    else if (autoCommercialSkip == 2)
+        options += tr("Set Commercial Auto-Skip ON");
+    else
+        options += tr("Set Commercial Auto-Skip to Notify");
+
+    if (playbackinfo->GetAutoExpireFromRecorded(m_db))
+        options += tr("Don't Auto Expire");
+    else
+        options += tr("Auto Expire");
+
+    options += tr("Cancel");
+
+    osd->NewDialogBox(dialogname, message, options, 10); 
+}
+
+void TV::ProgramMenuAction(int result)
+{
+    QString desc = "";
+
+    activenvp->Unpause();
+    paused = false;
+
+    while (osd->Visible())
+        usleep(50);
+
+    switch(result)
+    {
+        case 1:
+            if (autoCommercialSkip == 1)
+            {
+                autoCommercialSkip = 0;
+                desc = tr("Auto-Skip OFF");
+            }
+            else if (autoCommercialSkip == 2)
+            {
+                autoCommercialSkip = 1;
+                desc = tr("Auto-Skip ON");
+            }
+            else
+            {
+                autoCommercialSkip = 2;
+                desc = tr("Auto-Skip Notify");
+            }
+
+            nvp->SetAutoCommercialSkip(autoCommercialSkip);
+            break;
+
+        case 2:
+            if (playbackinfo->GetAutoExpireFromRecorded(m_db))
+            {
+                playbackinfo->SetAutoExpire(false, m_db);
+                desc = "Auto-Expire OFF";
+            }
+            else
+            {
+                playbackinfo->SetAutoExpire(true, m_db);
+                desc = "Auto-Expire ON";
+            }
+            break;
+    }
+
+    if (activenvp == nvp && desc != "" )
+    {
+        QString curTime = "";
+        int pos = nvp->calcSliderPos(0, curTime);
+        osd->StartPause(pos, false, desc, curTime, 1);
+        update_osd_pos = false;
+    }
 }

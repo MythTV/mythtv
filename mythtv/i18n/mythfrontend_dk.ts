@@ -381,6 +381,30 @@
         <translation>Programmér</translation>
     </message>
     <message>
+        <source>Do not record this proram</source>
+        <translation>Optag ikke dette program</translation>
+    </message>
+    <message>
+        <source>Record only this showing</source>
+        <translation>Optag kun denne sending af udsendelsen</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every day</source>
+        <translation>Optag denne udsendelse på dette klokkeslet hver dag</translation>
+    </message>
+    <message>
+        <source>Record at any time on this channel</source>
+        <translation>Optag denne udsendelse når den vises på denne kanal</translation>
+    </message>
+    <message>
+        <source>Record at any time on any channel</source>
+        <translation>Optag denne udsendelse nårsomhelst, hvorsomhelst</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every week</source>
+        <translation>Optag denne udsendelse på dette klokkeslet hver uge</translation>
+    </message>
+    <message>
         <source>Do not record this program</source>
         <translation>Optag ikke dette program</translation>
     </message>

@@ -35,6 +35,8 @@ void CommDetect::Init(int w, int h, double fps)
 
     framesProcessed = 0;
 
+    border = 10;
+
     detectBlankFrames = true;
     detectSceneChanges = false;
 
@@ -97,24 +99,38 @@ bool CommDetect::CheckFrameIsBlank(void)
     const int pass_ystart[7] = {0, 0, 4, 0, 2, 0, 1};
     const int pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
     bool isDim = false;
+    int dimCount = 0;
+    int pixelsChecked = 0;
 
     if (!width || !height)
         return(false);
 
     // go through the image in png interlacing style testing if blank
+    // skip region 'border' pixels wide/high around border of image.
     for(int pass = 0; pass < 7; pass++)
     {
-        for(int y = pass_ystart[pass]; y < height; y += pass_yinc[pass])
+        for(int y = pass_ystart[pass] + border; y < (height - border);
+                                                y += pass_yinc[pass])
         {
-            for(int x = pass_start[pass]; x < width; x += pass_inc[pass])
+            for(int x = pass_start[pass] + border; x < (width - border);
+                                                   x += pass_inc[pass])
             {
+                pixelsChecked++;
+
                 if (frame_ptr[y * width + x] > max_brightness)
                     return(false);
                 if (frame_ptr[y * width + x] > test_brightness)
+                {
                     isDim = true;
+                    dimCount++;
+                }
             }
         }
     }
+
+    if ((dimCount > (int)(.05 * pixelsChecked)) &&
+        (dimCount < (int)(.35 * pixelsChecked)))
+        return(false);
 
     // frame is dim so test average
     if (isDim)
@@ -137,8 +153,8 @@ bool CommDetect::CheckSceneHasChanged(void)
     if (lastHistogram[0] == -1)
     {
         memset(lastHistogram, 0, sizeof(lastHistogram));
-        for(int y = 0; y < height; y += 2)
-            for(int x = 0; x < width; x += 2)
+        for(int y = border; y < (height - border); y += 2)
+            for(int x = border; x < (width - border); x += 2)
                 lastHistogram[frame_ptr[y * width + x]]++;
 
         return(false);
@@ -148,8 +164,8 @@ bool CommDetect::CheckSceneHasChanged(void)
 
     // compare current frame with last frame here
     memset(histogram, 0, sizeof(histogram));
-    for(int y = 0; y < height; y += 2)
-        for(int x = 0; x < width; x += 2)
+    for(int y = border; y < (height - border); y += 2)
+        for(int x = border; x < (width - border); x += 2)
             histogram[frame_ptr[y * width + x]]++;
 
     if (lastFrameWasSceneChange)
@@ -168,7 +184,7 @@ bool CommDetect::CheckSceneHasChanged(void)
             similar += lastHistogram[i];
     }
 
-    if (similar < (width * height / 4 * .91))
+    if (similar < ((width - (border * 2)) * (height - (border * 2)) / 4 * .91))
     {
         memcpy(lastHistogram, histogram, sizeof(histogram));
         return(true);
@@ -296,8 +312,8 @@ int CommDetect::GetAvgBrightness()
     int brightness = 0;
     int pixels = 0;
 
-    for(int y = 0; y < height; y += 4)
-        for(int x = 0; x < width; x += 4)
+    for(int y = border; y < (height - border); y += 4)
+        for(int x = border; x < (width - border); x += 4)
         {
             brightness += frame_ptr[y * width + x];
             pixels++;

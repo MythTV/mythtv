@@ -533,6 +533,30 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Do not record this proram</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record only this showing</source>
+        <translation type="unfinished">Registra questo programma una volta sola</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every day</source>
+        <translation type="unfinished">Registra sempre questo canale in questo orario</translation>
+    </message>
+    <message>
+        <source>Record at any time on this channel</source>
+        <translation type="unfinished">Registra sempre questo programma, su questo canale</translation>
+    </message>
+    <message>
+        <source>Record at any time on any channel</source>
+        <translation type="unfinished">Registra sempre questo programma, su qualsiasi canale</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every week</source>
+        <translation type="unfinished">Registra tutte le settimane questo programma in questo orario</translation>
+    </message>
+    <message>
         <source>Do not record this program</source>
         <translation type="unfinished"></translation>
     </message>

@@ -564,6 +564,30 @@
         <translation>Programació</translation>
     </message>
     <message>
+        <source>Do not record this proram</source>
+        <translation>No gravar aquest programa</translation>
+    </message>
+    <message>
+        <source>Record only this showing</source>
+        <translation>Grava aquest programa només aquesta vegada</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every day</source>
+        <translation>Grava aquest programa in aquesta hora cada dia</translation>
+    </message>
+    <message>
+        <source>Record at any time on this channel</source>
+        <translation>Grava aquest programa sempre que el trobi en aquest canal</translation>
+    </message>
+    <message>
+        <source>Record at any time on any channel</source>
+        <translation>Grava aquest programa sempre que el trobi</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every week</source>
+        <translation>Grava aquest programa en aquesta hora cada setmana</translation>
+    </message>
+    <message>
         <source>Do not record this program</source>
         <translation>No gravar aquest programa</translation>
     </message>

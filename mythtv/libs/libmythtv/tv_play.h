@@ -169,6 +169,9 @@ class TV : public QObject
     void DoTogglePictureAttribute(void);
     void DoChangePictureAttribute(bool up);
 
+    void DoProgramMenu(void);
+    void ProgramMenuAction(int result);
+
     int osd_display_time;
 
     bool channelqueued;
@@ -183,6 +186,8 @@ class TV : public QObject
     bool runMainLoop;
     bool exitPlayer;
     bool paused;
+
+    int autoCommercialSkip;
 
     float frameRate;
 

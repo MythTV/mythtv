@@ -559,6 +559,30 @@
         <translation>Programação</translation>
     </message>
     <message>
+        <source>Do not record this proram</source>
+        <translation>Não gravar este programa</translation>
+    </message>
+    <message>
+        <source>Record only this showing</source>
+        <translation>Gravar este programa apenas esta vez</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every day</source>
+        <translation>Gravar este programa neste período de tempo todos os dias</translation>
+    </message>
+    <message>
+        <source>Record at any time on this channel</source>
+        <translation>Gravar este programa sempre que apareça neste canal</translation>
+    </message>
+    <message>
+        <source>Record at any time on any channel</source>
+        <translation>Gravar este programa sempre que esteja programado</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every week</source>
+        <translation>Gravar este programa neste período de tempo todas as semanas</translation>
+    </message>
+    <message>
         <source>Do not record this program</source>
         <translation>Não gravar este programa</translation>
     </message>
