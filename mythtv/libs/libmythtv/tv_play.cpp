@@ -980,7 +980,7 @@ void TV::TeardownPlayer(void)
     speed_index = 0;
     sleep_index = 0;
 
-    nvp = NULL;
+    nvp = activenvp = NULL;
     osd = NULL;
  
     playbackinfo = NULL;
@@ -993,7 +993,7 @@ void TV::TeardownPlayer(void)
     if (prbuffer)
     {
         delete prbuffer;
-        prbuffer = NULL;
+        prbuffer = activerbuffer = NULL;
     }
 }
 
