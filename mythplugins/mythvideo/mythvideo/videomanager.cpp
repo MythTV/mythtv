@@ -193,9 +193,9 @@ void VideoManager::RefreshMovieList()
 
 //    QSqlQuery query("SELECT intid FROM videometadata ORDER BY title;", db);
     QString thequery = QString("SELECT intid FROM %1 %2 %3")
-				.arg(currentVideoFilter->BuildClauseFrom())
-				.arg(currentVideoFilter->BuildClauseWhere())
-				.arg(currentVideoFilter->BuildClauseOrderBy());
+                               .arg(currentVideoFilter->BuildClauseFrom())
+                               .arg(currentVideoFilter->BuildClauseWhere())
+                               .arg(currentVideoFilter->BuildClauseOrderBy());
    QSqlQuery query(thequery,db);
     Metadata *myData;
 
@@ -1035,11 +1035,17 @@ void VideoManager::cursorDown()
     case SHOWING_MAINWINDOW:
     {
 
-      // if we're beyond halfway through the list, scroll the window
-      if (inList > (int)((int)(listsize / 2) - 1)
+      
+      if(inList == (listCount - 1))
+      {
+          inList = 0;
+          inData = 0;
+      }
+      else if (inList > (int)((int)(listsize / 2) - 1)
           && ((int)(inData + listsize) <= (int)(dataCount - 1))
           && can_do_page_down == true)
       {
+          // if we're beyond halfway through the list, scroll the window
           inData++;
           inList = (int)(listsize / 2);
       }
@@ -1091,7 +1097,7 @@ void VideoManager::pageDown()
     {
 
       // if there's more data to show, go a page down
-      if (can_do_page_down) {
+
 
         if (inList >= (int)(listsize / 2) || inData != 0)
         {
@@ -1102,12 +1108,9 @@ void VideoManager::pageDown()
             inData = (int)(listsize / 2) + inList;
             inList = (int)(listsize / 2);
         }
-        
-      }
-
-      // otherwise just go to the end of the list
-      else
-        inList = listsize - 1;
+       // otherwise just go to the end of the list
+        else
+            inList = listsize - 1;
 
       
     } break;
@@ -1154,13 +1157,13 @@ void VideoManager::validateUp() {
 
       if ((int)(inData + inList) >= (int)(dataCount))
       {
-        inData = dataCount - listsize;
         inList = listsize - 1;
       }
       else if ((int)(inData + listsize) >= (int)(dataCount))
       {
         inData = dataCount - listsize;
       }
+      
       if (inList >= listCount)
         inList = listCount - 1;
 
@@ -1202,13 +1205,14 @@ void VideoManager::cursorUp()
 
     case SHOWING_MAINWINDOW:
     {
-
-    //  cout << "CursorUp - SHOWING_MAINWINDOW\n";
-
-
-      // if we're beyond halfway through the list, scroll the window
-      if (inList < ((int)(listsize / 2) + 1) && inData > 0)
+      if(inList == 0)
       {
+          inData = dataCount - listsize;
+          inList = listsize - 1;
+      }
+      else if (inList < ((int)(listsize / 2) + 1) && inData > 0)
+      {
+           // if we're beyond halfway through the list, scroll the window
         inList = (int)(listsize / 2);
         inData--;
         if (inData < 0)
@@ -1217,7 +1221,6 @@ void VideoManager::cursorUp()
           inList--;
         }
       }
-
       // otherwise just move the selection bar up one
       else
         inList--;
@@ -1283,8 +1286,8 @@ void VideoManager::pageUp()
         
         update(fullRect);
       }
-
-      else {
+      else 
+      {
         inData = 0;
         inList = 0;
       }      

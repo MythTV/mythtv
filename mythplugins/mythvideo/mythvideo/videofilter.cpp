@@ -8,8 +8,10 @@
 
 #include "videofilter.h"
 
-VideoFilterSettings::VideoFilterSettings(QSqlDatabase * ldb, bool loaddefaultsettings)
+VideoFilterSettings::VideoFilterSettings(QSqlDatabase * ldb, bool loaddefaultsettings, bool _allowBrowse)
 {
+    
+    
     // do nothing yet
     db = ldb;
     if (loaddefaultsettings){
@@ -31,6 +33,11 @@ VideoFilterSettings::VideoFilterSettings(QSqlDatabase * ldb, bool loaddefaultset
         browse = -1;
         orderby = 0;
     }
+    
+    allowBrowse = _allowBrowse;
+    if (!allowBrowse)
+        browse = 1;
+
 }
 
 VideoFilterSettings::VideoFilterSettings(VideoFilterSettings *other)
@@ -43,6 +50,7 @@ VideoFilterSettings::VideoFilterSettings(VideoFilterSettings *other)
     runtime = other->runtime;
     userrating = other->userrating;
     browse = other->browse;
+    allowBrowse = other->allowBrowse;
     orderby = other->orderby;
     db = other->db;
 }
@@ -79,7 +87,8 @@ VideoFilterDialog::VideoFilterDialog(QSqlDatabase *ldb,
     
     if(!ldb)
     {
-        cerr << "videofilter.o: Where I am supposed to load stuff from if you don't give me a db pointer?" << endl;
+        cerr << "videofilter.o: Where I am supposed to load stuff from if you don't give me a db pointer?"
+             << endl;
         exit(0);
     }
     db = ldb;
@@ -189,12 +198,12 @@ QString VideoFilterSettings::BuildClauseWhere()
             where = QString(" WHERE userrating >= %1").arg(userrating);
     }
     
-    if (browse !=-1)
+    if(browse !=-1)
     {
         if (where)
-            where += QString(" AND browse >= %1").arg(browse);
+            where += QString(" AND browse = %1").arg(browse);
         else 
-            where = QString(" WHERE browse >= %1").arg(browse);
+            where = QString(" WHERE browse = %1").arg(browse);
     }
 
     return where;
@@ -248,7 +257,7 @@ void VideoFilterDialog::fillWidgets()
 {
     if (category_select)
     {
-        category_select->addItem(-1,"All");
+        category_select->addItem(-1, "All");
         QString q_string = QString("SELECT intid, category FROM videocategory "
                                    "ORDER BY category");
         QSqlQuery a_query(q_string,db);
@@ -377,10 +386,18 @@ void VideoFilterDialog::fillWidgets()
     
     if (browse_select)
     {
-        browse_select->addItem(-1,"All");
-        browse_select->addItem(1,"Yes");
-        browse_select->addItem(0,"No");
-        browse_select->setToItem(currentSettings->getBrowse());
+        if(originalSettings->getAllowBrowse())
+        {
+            browse_select->addItem(-1,"All");
+            browse_select->addItem(1,"Yes");
+            browse_select->addItem(0,"No");
+            browse_select->setToItem(currentSettings->getBrowse());
+        }
+        else
+        {
+            browse_select->addItem(1,"Yes");
+            browse_select->setToItem(currentSettings->getBrowse());
+        }
     }
     if (orderby_select)
     {
@@ -576,10 +593,12 @@ void VideoFilterDialog::wireUpTheme()
         connect(runtime_select, SIGNAL(pushed(int)),
                 this, SLOT(setRunTime(int)));
 
+   
     browse_select = getUISelectorType("browse_select");
     if (browse_select)
         connect(browse_select, SIGNAL(pushed(int)),
                 this, SLOT(setBrowse(int)));
+   
 
     orderby_select = getUISelectorType("orderby_select");
     if (orderby_select)

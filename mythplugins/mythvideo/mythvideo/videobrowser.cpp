@@ -27,7 +27,7 @@ VideoBrowser::VideoBrowser(QSqlDatabase *ldb,
     db = ldb;
     updateML = false;
     currentParentalLevel = gContext->GetNumSetting("VideoDefaultParentalLevel", 4);
-    currentVideoFilter = new VideoFilterSettings(db);
+    currentVideoFilter = new VideoFilterSettings(db, true, false);
     RefreshMovieList();
 
     popup = NULL;
@@ -187,9 +187,9 @@ void VideoBrowser::keyPressEvent(QKeyEvent *e)
         else if (action == "DOWN")
             jumpSelection(-1);
         else if (action == "PAGEDOWN")
-            jumpSelection(0-(int)(m_list.count() / 5));
-        else if (action == "PAGEUP")
             jumpSelection((int)(m_list.count() / 5));
+        else if (action == "PAGEUP")
+            jumpSelection(0-(int)(m_list.count() / 5));
         else if (action == "INCPARENT")
             doParental(1);
         else if (action == "DECPARENT")

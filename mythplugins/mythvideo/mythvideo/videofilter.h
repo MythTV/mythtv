@@ -20,7 +20,7 @@ using namespace std;
 class VideoFilterSettings
 {
     public :
-        VideoFilterSettings(QSqlDatabase *db, bool loaddefaultsettings = true);
+        VideoFilterSettings(QSqlDatabase *db, bool loaddefaultsettings = true, bool _allowBrowse = true);
         VideoFilterSettings(VideoFilterSettings *other);
         ~VideoFilterSettings();
         QString BuildClauseFrom();
@@ -47,6 +47,9 @@ class VideoFilterSettings
         void setBrowse(int lbrowse){browse = lbrowse;};
         int getOrderby (void) {return orderby;};
         void setOrderby (int lorderby) {orderby = lorderby;};
+        
+        bool getAllowBrowse(void){return allowBrowse;};
+        void setAllowBrowse(bool _allowBrowse){allowBrowse = _allowBrowse;};
     private : 
         int category;
         int genre;
@@ -57,6 +60,7 @@ class VideoFilterSettings
         //int showlevel;
         int browse;
         int orderby;
+        bool allowBrowse;
         QSqlDatabase	*db;
 };
 
