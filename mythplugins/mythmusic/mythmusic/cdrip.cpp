@@ -324,7 +324,12 @@ void Ripper::ripthedisc(void)
             mkdir(outfile, 0777);
             fixFilename(outfile, track->Album());
             mkdir(outfile, 0777);
-            fixFilename(outfile, track->Title());
+
+            QString tempstr;
+            tempstr.sprintf("%02d - %s", track->Track(), 
+                            track->Title().latin1());
+
+            fixFilename(outfile, tempstr);
 
             if (encodequal < 3)
             {
