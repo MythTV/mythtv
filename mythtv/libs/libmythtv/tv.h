@@ -188,6 +188,8 @@ class TV
     int overrecordseconds;
 
     QString dialogname;
+
+    bool editmode;
 };
 
 #endif

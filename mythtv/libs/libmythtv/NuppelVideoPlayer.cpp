@@ -387,6 +387,8 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
                     (*positionMap)[ste.keyframe_number] = ste.file_offset;
                 }
                 haspositionmap = true;
+                totalLength = (int)((ste.keyframe_number * keyframedist * 1.0) /
+                                     video_frame_rate);
             }
         }
 
@@ -1798,6 +1800,20 @@ void NuppelVideoPlayer::ClearAfterSeek(void)
     pthread_mutex_unlock(&avsync_lock);
     pthread_mutex_unlock(&video_buflock);
     pthread_mutex_unlock(&audio_buflock);
+}
+
+bool NuppelVideoPlayer::EnableEdit(void)
+{
+    editmode = false;
+    if (haspositionmap)
+    {
+        editmode = true;
+    }
+    return editmode;   
+}
+
+void NuppelVideoPlayer::DoKeypress(int keypress)
+{
 }
 
 char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,

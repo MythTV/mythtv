@@ -48,6 +48,7 @@ TV::TV(MythContext *lcontext, const QString &startchannel, int capturecardnum,
     context = lcontext;
     db_conn = NULL;
     dialogname = "";
+    editmode = false;
 
     ConnectDB(capturecardnum);
  
@@ -1102,8 +1103,6 @@ void TV::ProcessKeypress(int keypressed)
         }
         case wsEscape: exitPlayer = true; break;
 
-//        case 'e': case 'E': nvp->ToggleEdit(); break;
-//        case ' ': nvp->AdvanceOneFrame(); break;
         default: 
         {
             if (doing_ff || doing_rew)
@@ -1162,10 +1161,17 @@ void TV::ProcessKeypress(int keypressed)
     }
     else if (StateIsPlaying(internalState))
     {
+        if (editmode)
+        {
+            nvp->DoKeypress(keypressed);
+            return;
+        }
+       
         switch (keypressed)
         {
             case 'i': case 'I': DoPosition(); break;
             case ' ': case wsEnter: case wsReturn: nvp->SetBookmark(); break;
+            case 'e': case 'E': editmode = nvp->EnableEdit(); break;
             default: break;
         }
     }
@@ -1302,6 +1308,8 @@ int TV::calcSliderPos(int offset, QString &desc)
 
     if (internalState == kState_WatchingRecording)
         playbackLen = (int)(((float)nvr->GetFramesWritten() / frameRate));
+    else
+        playbackLen = nvp->GetLength();
 
     float secsplayed = ((float)nvp->GetFramesPlayed() / frameRate) + offset;
     if (secsplayed < 0)

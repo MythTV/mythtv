@@ -64,7 +64,6 @@ class NuppelVideoPlayer
     void Unpause(void) { paused = false; }
     bool GetPause(void);
    
-    bool ToggleEdit(void) { editmode = !editmode; return editmode; }
     void AdvanceOneFrame(void) { advancedecoder = true; } 
  
     void FastForward(float seconds) 
@@ -91,6 +90,7 @@ class NuppelVideoPlayer
     char *GetScreenGrab(int secondsin, int &buflen, int &vw, int &vh);
 
     void SetLength(int len) { totalLength = len; }
+    int GetLength(void) { return totalLength; }
 
     void ReencodeFile(char *inputname, char *outputname);
 
@@ -108,6 +108,10 @@ class NuppelVideoPlayer
     void SetBookmark(void);
 
     void ToggleFullScreen(void);
+
+    // edit mode stuff
+    bool EnableEdit(void);
+    void DoKeypress(int keypress);
 
  protected:
     void OutputAudioLoop(void);
