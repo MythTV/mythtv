@@ -47,7 +47,7 @@ Weather::Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent,
     stopProcessing = false;
 
     allowkeys = true;
-    wantAnimated = gContext->GetNumSetting("WeatherGetAnimated", 1);   
+    wantAnimated = gContext->GetNumSetting("WeatherWantAnimated", 0);   
     weatherTimeoutInt = gContext->GetNumSetting("WeatherTimeout", 20);
     weatherTimeoutInt *= 1000;
     
@@ -2135,9 +2135,9 @@ bool Weather::UpdateData()
             if(wantAnimated)
             {
                 
-                msg = QString("Myth was unable to retrieve your weather data within the "
+                msg = QString(tr("Myth was unable to retrieve your weather data within the "
                               "time allowed (%1 seconds).\nPress OK to try again with a larger "
-                              "timeout value. Press Cancel to try again without animated radar maps.")
+                              "timeout value. Press Cancel to try again without animated radar maps."))
                               .arg(weatherTimeoutInt / 1000);
                 
                 wantRetry = MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(),
@@ -2150,9 +2150,9 @@ bool Weather::UpdateData()
             }
             else
             {
-                msg = QString("Myth was unable to retrieve your weather data within the "
+                msg = QString(tr("Myth was unable to retrieve your weather data within the "
                               "time allowed (%1 seconds).\nPress OK to try again with a larger "
-                              "timeout value. Press Cancel to try again without animated radar maps.")
+                              "timeout value. Press Cancel to abort."))
                                .arg(weatherTimeoutInt / 1000);
                 
                 wantRetry = MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(),
