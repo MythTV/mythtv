@@ -87,6 +87,10 @@ While watching a recording:
     backward.  Increments are: nearest cutpoint, nearest video keyframe, 
     1 frame, 0.5 seconds, 1 second, 20 seconds, 1 minute, 5 minutes, and 
     10 minutes.
+  - The page up dand down keys move forward and backward to the nearest cut
+    point.
+  - The < and > keys move forward or backward by 10 times the normal jump
+    amount.
   - Space/Enter allows you to set or delete a cut point.
   - 'Z' loads the commercial skip list (if one exists) into the cutlist.
   - 'C' clears all cut points in the cutlist.

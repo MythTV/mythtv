@@ -72,10 +72,10 @@ TVRec::TVRec(int capturecardnum)
             channel->SetChannelOrdering(chanorder);
         // don't close this channel, otherwise we cannot read data
     }
-    else
+    else // "V4L" or "MPEG", ie, analog TV
     {
         Channel *achannel = new Channel(this, videodev);
-        channel = achannel;
+        channel = achannel; // here for SetFormat()->RetrieveInputChannels()
         channel->Open();
         achannel->SetFormat(gContext->GetSetting("TVFormat"));
         achannel->SetFreqTable(gContext->GetSetting("FreqTable"));
@@ -554,6 +554,8 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
         nvr->Initialize();
         return;
     }
+
+    // V4L from here on
 
     nvr = new NuppelVideoRecorder();
 

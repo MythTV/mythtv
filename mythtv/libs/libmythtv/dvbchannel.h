@@ -31,7 +31,7 @@ class DVBChannel : public ChannelBase
     virtual void SetFormat(const QString &format) {}
     virtual void ToggleInputs() {}
     virtual void SwitchToInput(const QString &input) {}
-    virtual void SwitchToInput(const QString &input, const QString &chan) {}
+    virtual void SwitchToInput(const QString &input, const QString &chan);
     virtual void SwitchToInput(int newcapchannel, bool setstarting) {}
 
     enum DVB_Type {DVB_S, DVB_T, DVB_C};

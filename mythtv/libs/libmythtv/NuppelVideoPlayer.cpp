@@ -1980,6 +1980,55 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
             }
             break;
         }
+        case Qt::Key_PageUp:
+        {
+            int old_seekamount = seekamount;
+            seekamount = -2;
+            HandleArbSeek(false);
+            seekamount = old_seekamount;
+            UpdateTimeDisplay();
+            break;
+        }
+        case Qt::Key_PageDown:
+        {
+            int old_seekamount = seekamount;
+            seekamount = -2;
+            HandleArbSeek(true);
+            seekamount = old_seekamount;
+            UpdateTimeDisplay();
+            break;
+        }
+#define FFREW_MULTICOUNT 10
+        case Qt::Key_Less: case Qt::Key_Comma:
+        {
+             if (seekamount > 0)
+                 rewindtime = seekamount * FFREW_MULTICOUNT;
+            else
+            {
+                int fps = (int)ceil(video_frame_rate);
+                rewindtime = fps * FFREW_MULTICOUNT / 2;
+            }
+            while (rewindtime != 0)
+                usleep(50);
+            UpdateEditSlider();
+            UpdateTimeDisplay();
+            break;
+        }
+        case Qt::Key_Greater: case Qt::Key_Period:
+        {
+             if (seekamount > 0)
+                 fftime = seekamount * FFREW_MULTICOUNT;
+            else
+            {
+                int fps = (int)ceil(video_frame_rate);
+                fftime = fps * FFREW_MULTICOUNT / 2;
+            }
+            while (fftime != 0)
+                usleep(50);
+            UpdateEditSlider();
+            UpdateTimeDisplay();
+            break;
+        }
         case Qt::Key_Escape: case Qt::Key_E: case Qt::Key_M:
         {
             DisableEdit();

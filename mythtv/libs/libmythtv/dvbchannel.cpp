@@ -117,12 +117,12 @@ bool DVBChannel::SetPID()
         if (demux_fd.size() != pid.size())
             cerr << "aaarggg! sizes don't match" <<endl;
         for (unsigned int i = 0; i < pid.size(); i++)
-          {
+        {
             cout << "demux" << i << "=" << demux_fd[i] << " pid " << pid[i] << endl;
             set_ts_filt(demux_fd[i], pid[i], DMX_PES_OTHER);
             /* if we used DMX_PES_VIDEO/AUDIO, it would allow the full cards
                to decode, but we don't need that anyways. */
-          }
+        }
 #endif
     }
     // else we did that in Open() already
@@ -258,22 +258,25 @@ bool FetchDVBTuningOptions(QSqlDatabase* db_conn, pthread_mutex_t db_lock,
     QString option;
     if (dvb_type == DVBChannel::DVB_S)
     {
-        int opt_int = query.value(1).toInt();
-        if (opt_int == 'V' || opt_int == 'v')
+        option = query.value(1).toString();
+        if (option == 'V' || option == 'v')
             s.pol_v = true;
-        else if (opt_int == 'H' || opt_int == 'h')
+        else if (option == 'H' || option == 'h')
             s.pol_v = false;
         else
             return false;
 
-        s.symbol_rate = query.value(2).toInt();
-        if (s.symbol_rate == 0)
-            return false;
-
+        // for symbol rate, see below
         s.tone = query.value(3).toInt();
         s.diseqc = query.value(4).toInt();
     }
-    else if (dvb_type == DVBChannel::DVB_T)
+    if (dvb_type == DVBChannel::DVB_S || dvb_type == DVBChannel::DVB_C)
+    {
+        s.symbol_rate = query.value(2).toInt();
+        if (s.symbol_rate == 0)
+            return false;
+    }
+    if (dvb_type == DVBChannel::DVB_T)
     {
         /* All DVB-T settings are optional in the channel settings,
            they are usually the same all over the country and we'll use
@@ -282,16 +285,7 @@ bool FetchDVBTuningOptions(QSqlDatabase* db_conn, pthread_mutex_t db_lock,
            The driver defines all the settings as enums, so I have to hardcode
            all possible value here *sigh* */
 
-        if ((option = query.value(5).toString().lower()) != QString::null)
-        {
-            if (option == "1" || option == "on"
-                     || option == "yes") s.inversion = INVERSION_ON;
-            else if (option == "0" || option == "off"
-                     || option == "no") s.inversion = INVERSION_OFF;
-            else if (option == "auto") s.inversion = INVERSION_AUTO;
-            else cerr << "invalid inversion option " << option
-                      << " for channel " << chan << endl;
-        }
+        // for inversion, see below
         if ((option = query.value(6).toString().lower()) != QString::null)
         {
             if (option == "6") s.bandwidth = BANDWIDTH_6_MHZ;
@@ -312,6 +306,7 @@ bool FetchDVBTuningOptions(QSqlDatabase* db_conn, pthread_mutex_t db_lock,
             else if (option == "4_5") s.hp_code_rate = FEC_4_5;
             else if (option == "5_6") s.hp_code_rate = FEC_5_6;
             else if (option == "6_7") s.hp_code_rate = FEC_6_7;
+            else if (option == "7_8") s.hp_code_rate = FEC_7_8;
             else if (option == "8_9") s.hp_code_rate = FEC_8_9;
             else if (option == "auto") s.hp_code_rate = FEC_AUTO;
             else cerr << "invalid hp code rate option " << option
@@ -328,23 +323,13 @@ bool FetchDVBTuningOptions(QSqlDatabase* db_conn, pthread_mutex_t db_lock,
             else if (option == "4_5") s.lp_code_rate = FEC_4_5;
             else if (option == "5_6") s.lp_code_rate = FEC_5_6;
             else if (option == "6_7") s.lp_code_rate = FEC_6_7;
+            else if (option == "7_8") s.lp_code_rate = FEC_7_8;
             else if (option == "8_9") s.lp_code_rate = FEC_8_9;
             else if (option == "auto") s.lp_code_rate = FEC_AUTO;
             else cerr << "invalid lp code rate option " << option
                       << " for channel " << chan << endl;
         }
-        if ((option = query.value(9).toString().lower()) != QString::null)
-        {
-            if (option == "qpsk") s.modulation = QPSK;
-            else if (option == "qam_16") s.modulation = QAM_16;
-            else if (option == "qam_32") s.modulation = QAM_32;
-            else if (option == "qam_64") s.modulation = QAM_64;
-            else if (option == "qam_128") s.modulation = QAM_128;
-            else if (option == "qam_256") s.modulation = QAM_256;
-            else if (option == "qam_auto") s.modulation = QAM_AUTO;
-            else cerr << "invalid modulation option " << option
-                      << " for channel " << chan << endl;
-        }
+        // for modulation, see below
         if ((option = query.value(10).toString().lower()) != QString::null)
         {
             if (option == "2") s.transmission_mode = TRANSMISSION_MODE_2K;
@@ -374,6 +359,31 @@ bool FetchDVBTuningOptions(QSqlDatabase* db_conn, pthread_mutex_t db_lock,
             else if (option == "4") s.hierarchy = HIERARCHY_4;
             else if (option == "auto") s.hierarchy = HIERARCHY_AUTO;
             else cerr << "invalid hierarchy option " << option
+                      << " for channel " << chan << endl;
+        }
+    }
+    if (dvb_type == DVBChannel::DVB_T || dvb_type == DVBChannel::DVB_C)
+    {
+        if ((option = query.value(5).toString().lower()) != QString::null)
+        {
+            if (option == "1" || option == "on"
+                     || option == "yes") s.inversion = INVERSION_ON;
+            else if (option == "0" || option == "off"
+                     || option == "no") s.inversion = INVERSION_OFF;
+            else if (option == "auto") s.inversion = INVERSION_AUTO;
+            else cerr << "invalid inversion option " << option
+                      << " for channel " << chan << endl;
+        }
+        if ((option = query.value(9).toString().lower()) != QString::null)
+        {
+            if (option == "qpsk") s.modulation = QPSK;
+            else if (option == "qam_16") s.modulation = QAM_16;
+            else if (option == "qam_32") s.modulation = QAM_32;
+            else if (option == "qam_64") s.modulation = QAM_64;
+            else if (option == "qam_128") s.modulation = QAM_128;
+            else if (option == "qam_256") s.modulation = QAM_256;
+            else if (option == "qam_auto") s.modulation = QAM_AUTO;
+            else cerr << "invalid modulation option " << option
                       << " for channel " << chan << endl;
         }
     }
@@ -459,7 +469,10 @@ bool DVBChannel::SetChannelByString(const QString &chan)
     cout << "got tuning parameters" << endl;
 
     if (!DVBTune(tunerSettings, cardnum))
+    {
+        cerr << "invalid tuning parameters" << endl;
         return false;
+    }
 
     pid = tunerSettings.pid;
     if (!SetPID())
@@ -476,3 +489,9 @@ bool DVBChannel::SetChannelByString(const QString &chan)
     return false;
 #endif
 }
+
+void DVBChannel::SwitchToInput(const QString &input, const QString &chan)
+{
+  SetChannelByString(chan);
+}
+

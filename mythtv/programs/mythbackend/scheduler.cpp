@@ -171,7 +171,7 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
     }
 
     QMap<QString, bool>::Iterator askIter = askedList.begin();
-    for (; askIter != askedList.end(); askIter++)
+    for (; askIter != askedList.end(); ++askIter)
     {
         QString id = askIter.key();
 
@@ -180,6 +180,9 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
             askedList.remove(askIter);
             askIter = askedList.begin();
         }
+
+        if (askIter == askedList.end())
+            break;
     }
 
     if (recordingList.size() > 0)

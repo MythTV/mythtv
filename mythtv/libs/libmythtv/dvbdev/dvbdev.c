@@ -63,6 +63,9 @@ char* secdev[4]={"/dev/ost/sec0","/dev/ost/sec1","/dev/ost/sec2","/dev/ost/sec3"
 char* demuxdev[4]={"/dev/ost/demux0","/dev/ost/demux1","/dev/ost/demux2","/dev/ost/demux3"};
 #endif
 
+  if (cardnum > 3)
+    return "no such device number";
+
   switch(type)
   {
     case dvbdev_frontend:
@@ -70,7 +73,11 @@ char* demuxdev[4]={"/dev/ost/demux0","/dev/ost/demux1","/dev/ost/demux2","/dev/o
     case dvbdev_dvr:
       return dvrdev[cardnum];
     case dvbdev_sec:
+#ifdef NEWSTRUCT
       return "not valid in newstruct";
+#else
+      return secdev[cardnum];
+#endif
     case dvbdev_demux:
       return demuxdev[cardnum];
   }
@@ -154,6 +161,7 @@ void ts_to_ps(uint8_t* buf, uint16_t *pids, int npids, ipack **ipacks,
   uint8_t off = 0;
   ipack *p = 0;
   int i;
+  struct append_buffer app_buf;
 
   if (!(buf[3] & 0x10)) // no payload?
     return;
@@ -164,7 +172,6 @@ void ts_to_ps(uint8_t* buf, uint16_t *pids, int npids, ipack **ipacks,
   if (p == 0)
     return;
 
-  struct append_buffer app_buf;
   app_buf.memory = out_buf;
   app_buf.buf_len = out_buf_max_len;
   app_buf.content_len = 0;

@@ -9,6 +9,8 @@ using namespace std;
 
 class TVRec;
 
+// Implements tuning for analog TV cards (both software and hardware encoding)
+// using the V4L driver API
 class Channel : public ChannelBase
 {
  public:

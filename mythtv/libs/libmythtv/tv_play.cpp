@@ -968,7 +968,7 @@ void TV::ProcessKeypress(int keypressed)
         case Key_Escape:
         {
             if (StateIsPlaying(internalState) && 
-                gContext->GetNumSetting("PlaybackExitPrompt")) 
+                gContext->GetNumSetting("PlaybackExitPrompt") == 1) 
             {
                 nvp->Pause();
 
@@ -985,6 +985,8 @@ void TV::ProcessKeypress(int keypressed)
             } 
             else 
             {
+                if (gContext->GetNumSetting("PlaybackExitPrompt") == 2)
+                    nvp->SetBookmark();
                 exitPlayer = true;
                 break;
             }

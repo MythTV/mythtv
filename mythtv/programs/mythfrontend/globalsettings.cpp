@@ -411,13 +411,16 @@ public:
     };
 };
 
-class PlaybackExitPrompt: public CheckBoxSetting, public GlobalSetting {
+class PlaybackExitPrompt: public ComboBoxSetting, public GlobalSetting {
 public:
     PlaybackExitPrompt():
         GlobalSetting("PlaybackExitPrompt") {
-        setLabel("Prompt on playback exit");
-        setValue(false);
-        setHelpText("If set, a menu will be displayed when you exit "
+        setLabel("Action on playback exit");
+        setValue("0");
+        addSelection("Just exit", "0");
+        addSelection("Save position and exit", "2");
+        addSelection("Always prompt", "1");
+        setHelpText("If set to prompt, a menu will be displayed when you exit "
                     "playback mode.  The options available will "
                     "allow you to save your position, delete the "
                     "recording, or continue watching.");

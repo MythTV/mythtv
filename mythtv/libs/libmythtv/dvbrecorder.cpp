@@ -64,7 +64,7 @@ void DVBRecorder::SetOption(const QString &name, int value)
 
 /* This Recorder fetches the PIDs itself when the recording starts,
    but maybe the channel gets changed during a recording?
-   We can't rely on this SetOption either, because that's called by the
+   We can't rely on this SetPID either, because that's called by the
    Channel when the channel changes, and when the initial channel is
    set, this Recorder doesn't exist yet. */
 void DVBRecorder::SetPID(const vector<int>& some_pids)
@@ -146,6 +146,7 @@ void DVBRecorder::StartRecording()
         }
         else if (was_paused)
         {
+            // Re-open
             if (Open())
                 was_paused = false;
                 // XXX need to set mainpaused = false? mpegrecorder doesn't.
@@ -183,10 +184,10 @@ void DVBRecorder::StartRecording()
                 }
 
                 /* This function call fulfills 2 purposes:
-                   - Converts MPEG-TS (transport stream) to MPEG-PS (what's
-                     usually used in MPEG video files)
+                   - Converts MPEG-TS (transport stream for transmission)
+                     to MPEG-PS (what's usually used in MPEG video files)
                    - Filters out all unneeded program streams.
-                     This is redundant for use_ts==false,
+                     This is redundant (but cheap) for use_ts==false,
                      but required for use_ts==true. */
                 ts_to_ps(buffer_raw,
                          pid_array, npids, &ipacks_p,
@@ -231,7 +232,7 @@ int DVBRecorder::GetVideoFd(void)
    Generic MPEG code follows (identical in MpegRecorder, DVBRecorder and co).
    I would have liked to use a common base class for that, but Isaac preferred
    to have all the code for a given class in one file
-   =========================================================================== */
+   ========================================================================= */
 
 static void mpg_write_packet(void *opaque, uint8_t *buf, int buf_size)
 {
