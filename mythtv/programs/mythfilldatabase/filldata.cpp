@@ -3134,8 +3134,54 @@ int main(int argc, char *argv[])
     }
     else if (from_file)
     {
+        QString status = "currently running.";
+        QDateTime GuideDataBefore, GuideDataAfter;
+
+        query.exec(QString("UPDATE settings SET data ='%1' "
+                           "WHERE value='mythfilldatabaseLastRunStart'")
+                           .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm")));
+
+        query.exec(QString("UPDATE settings SET data ='%1' "
+                           "WHERE value='mythfilldatabaseLastRunStatus'")
+                           .arg(status));
+
+        query.exec(QString("SELECT MAX(endtime) FROM program;"));
+        if (query.isActive() && query.numRowsAffected())
+        {
+            query.next();
+
+            if (!query.isNull(0))
+                GuideDataBefore = QDateTime::fromString(query.value(0).toString(),
+                                                    Qt::ISODate);
+        }
+
         grabDataFromFile(fromfile_id, fromfile_offset, fromfile_name);
         clearOldDBEntries();
+
+        query.exec(QString("UPDATE settings SET data ='%1' "
+                           "WHERE value='mythfilldatabaseLastRunEnd'")
+                          .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm")));
+
+        query.exec(QString("SELECT MAX(endtime) FROM program;"));
+        if (query.isActive() && query.numRowsAffected())
+        {
+            query.next();
+
+            if (!query.isNull(0))
+                GuideDataAfter = QDateTime::fromString(query.value(0).toString(),
+                                                   Qt::ISODate);
+        }
+
+        if (GuideDataAfter == GuideDataBefore)
+            status = "mythfilldatabase ran, but did not insert "
+                     "any new data into the Guide.  This can indicate a "
+                     "potential problem with the XML file used for the update.";
+        else
+            status = "Successful.";
+
+        query.exec(QString("UPDATE settings SET data ='%1' "
+                           "WHERE value='mythfilldatabaseLastRunStatus'")
+                           .arg(status));
     }
     else
     {
