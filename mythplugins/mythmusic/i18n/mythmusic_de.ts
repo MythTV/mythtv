@@ -162,7 +162,7 @@
     </message>
     <message>
         <source>Various Artists</source>
-        <translation type="unfinished">Versch. Interpreten</translation>
+        <translation>Versch. Interpreten</translation>
     </message>
     <message>
         <source>Select a Compilation Artist</source>
@@ -170,7 +170,7 @@
     </message>
     <message>
         <source>Exit/Do Not Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Zurück/Nicht speichern</translation>
     </message>
 </context>
 <context>
@@ -692,7 +692,7 @@
     </message>
     <message>
         <source> ~ </source>
-        <translation>~</translation>
+        <translation> ~ </translation>
     </message>
     <message>
         <source>Ooops</source>
@@ -868,7 +868,7 @@
     </message>
     <message>
         <source>CD: %1 ~ %2 - %3</source>
-        <translation type="unfinished"></translation>
+        <translation>CD: %1 ~ %2 - %3</translation>
     </message>
 </context>
 <context>
@@ -925,7 +925,7 @@
     </message>
     <message>
         <source>Multi-Artist?</source>
-        <translation type="unfinished"></translation>
+        <translation>Mehrere Interpreten?</translation>
     </message>
     <message>
         <source>Switch Titles &amp;&amp; Artists</source>
@@ -933,15 +933,15 @@
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished">Titel</translation>
+        <translation>Titel</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation type="unfinished">Interpret</translation>
+        <translation>Interpret</translation>
     </message>
     <message>
         <source>Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Länge</translation>
     </message>
 </context>
 <context>
@@ -1196,7 +1196,7 @@
     </message>
     <message>
         <source> </source>
-        <translation type="unfinished"></translation>
+        <translation> </translation>
     </message>
 </context>
 <context>

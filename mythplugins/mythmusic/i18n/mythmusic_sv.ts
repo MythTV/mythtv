@@ -109,66 +109,66 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     </message>
     <message>
         <source>Compilation Artist:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Kompileringsartist:<byte value="x9"/></translation>
     </message>
 </context>
 <context>
     <name>EditMetadataDialog</name>
     <message>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Klar</translation>
     </message>
     <message>
         <source>DB Statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>DB-statistik</translation>
     </message>
     <message>
         <source>Various Artists</source>
-        <translation type="unfinished">Blandade artister</translation>
+        <translation>Blandade artister</translation>
     </message>
     <message>
         <source>Select an Artist</source>
-        <translation type="unfinished">Välj en artist</translation>
+        <translation>Välj en artist</translation>
     </message>
     <message>
         <source>Select a Compilation Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj en kompileringsartist</translation>
     </message>
     <message>
         <source>Select an Album</source>
-        <translation type="unfinished">Välj ett album</translation>
+        <translation>Välj ett album</translation>
     </message>
     <message>
         <source>Select a Genre</source>
-        <translation type="unfinished">Välj en genre</translation>
+        <translation>Välj en genre</translation>
     </message>
     <message>
         <source>Save Changes?</source>
-        <translation type="unfinished"></translation>
+        <translation>Spara ändringar?</translation>
     </message>
     <message>
         <source>Save to Database Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Spara endast till databas</translation>
     </message>
     <message>
         <source>Save to File Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Spara endast till fil</translation>
     </message>
     <message>
         <source>Save to File and Database</source>
-        <translation type="unfinished"></translation>
+        <translation>Spara till fil och databas</translation>
     </message>
     <message>
         <source>Exit/Do Not Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Avsluta/Spara inte</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
+        <translation>Avbryt</translation>
     </message>
     <message>
         <source>Are you sure you want to save the modified metadata to the file?</source>
-        <translation type="unfinished"></translation>
+        <translation>Är du säker på att du vill spara ändrad metadata till filen?</translation>
     </message>
 </context>
 <context>
@@ -690,7 +690,7 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     </message>
     <message>
         <source> ~ </source>
-        <translation>~</translation>
+        <translation> ~ </translation>
     </message>
     <message>
         <source>Ooops</source>
@@ -868,7 +868,7 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     </message>
     <message>
         <source>CD: %1 ~ %2 - %3</source>
-        <translation type="unfinished"></translation>
+        <translation>CD: %1 ~ %2 - %3</translation>
     </message>
 </context>
 <context>
@@ -927,23 +927,23 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     </message>
     <message>
         <source>Multi-Artist?</source>
-        <translation type="unfinished"></translation>
+        <translation>Flera artister?</translation>
     </message>
     <message>
         <source>Switch Titles &amp;&amp; Artists</source>
-        <translation type="unfinished"></translation>
+        <translation>Växla Titlar &amp;&amp; Artister</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Artist</translation>
     </message>
     <message>
         <source>Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Längd</translation>
     </message>
 </context>
 <context>
@@ -1040,31 +1040,31 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     </message>
     <message>
         <source>ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ID</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Artist</translation>
     </message>
     <message>
         <source>Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Album</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel</translation>
     </message>
     <message>
         <source>Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Genre</translation>
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>År</translation>
     </message>
     <message>
         <source>Track No.</source>
-        <translation type="unfinished"></translation>
+        <translation>Spår nr.</translation>
     </message>
 </context>
 <context>
@@ -1107,7 +1107,7 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     </message>
     <message>
         <source>Are you sure you want to delete this SmartPlaylist?</source>
-        <translation type="unfinished"></translation>
+        <translation>Är du säker på att du vill radera denna spellista?</translation>
     </message>
 </context>
 <context>
@@ -1185,16 +1185,12 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
         <translation>Byt namn på kategori</translation>
     </message>
     <message>
-        <source> </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Are you sure you want to delete this Category?</source>
-        <translation type="unfinished"></translation>
+        <translation>Är du säker på att du vill radera denna kategori?</translation>
     </message>
     <message>
         <source>It will also delete any Smart Playlists belonging to this category.</source>
-        <translation type="unfinished"></translation>
+        <translation>Alla smarta spellistor som hör till denna kategori raderas också.</translation>
     </message>
 </context>
 <context>
