@@ -87,11 +87,10 @@ ManualSchedule::ManualSchedule(MythMainWindow *parent, const char *name)
       while(query.next()) {
           QString channel = longChannelFormat;
           channel.replace("<num>", query.value(1).toString())
-              .replace("<sign>", query.value(2).toString())
-              .replace("<name>", 
-                       QString::fromUtf8(query.value(3).toString()));
+              .replace("<sign>", QString::fromUtf8(query.value(2).toString()))
+              .replace("<name>", QString::fromUtf8(query.value(3).toString()));
           m_channel->insertItem(channel);
-          m_chanids << query.value(0).toString();
+          m_chanids << query.value(2).toString();
       }
       
     }
@@ -487,28 +486,34 @@ void ManualSchedule::saveScheduledRecording(void)
 
     QSqlQuery query;
 
-    QString chanid = m_chanids[m_channel->currentItem()];
+    QString callsign = m_chanids[m_channel->currentItem()];
 
-    QString thequery=QString("SELECT channum, callsign, name FROM channel "
-                             "WHERE chanid=%1;").arg(chanid);
+    query.prepare("SELECT chanid, channum, callsign, name "
+                  "FROM channel WHERE callsign=:CALLSIGN");
+    query.bindValue(":CALLSIGN", callsign);
 
-    query.exec(thequery);
-    
-    if (query.isActive() && query.numRowsAffected() && query.next()) 
-    {  
-        progInfo.chanid = chanid;
-        progInfo.chanstr = query.value(0).toString();
-        progInfo.chansign = query.value(1).toString();
-        progInfo.channame = query.value(2).toString();
+    query.exec();
 
-        cout << "Record scheduled on channel " 
-             << chanid << " - " << m_channel->currentText()
-             << " at "
-             << progInfo.startts.toString("yyyy/MM/dd hh:mm") 
-             << " to "
-	     << progInfo.endts.toString("hh:mm") << endl;
+    if (query.isActive() && query.numRowsAffected()) 
+    {
+        QString chanid;
 
-        progInfo.Save(db);
+        while (query.next())
+        {
+            chanid = progInfo.chanid = query.value(0).toString();;
+            progInfo.chanstr = query.value(1).toString();
+            progInfo.chansign = query.value(2).toString();
+            progInfo.channame = query.value(3).toString();
+
+            cout << "Program added to channel " 
+                 << chanid << " - " << m_channel->currentText()
+                 << " at "
+                 << progInfo.startts.toString("yyyy/MM/dd hh:mm") 
+                 << " to "
+	         << progInfo.endts.toString("hh:mm") << endl;
+
+            progInfo.Save(db);
+        }
 
         ProgramList pglist;
         QString query;

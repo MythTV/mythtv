@@ -1943,11 +1943,12 @@ bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
             lastbutton = activebutton;
             activebutton = NULL;
             parent->repaint(lastbutton->posRect);
-            for (QStringList::Iterator it = lastbutton->action.begin();
-                 it != lastbutton->action.end(); ++it)
+            for (unsigned int pos = 0; pos < lastbutton->action.count();
+                 pos++)
             {
-                handleAction(*it);
+                handleAction(lastbutton->action[pos]);
             }
+
             lastbutton = NULL;
         }
         else if (action == "ESCAPE")
