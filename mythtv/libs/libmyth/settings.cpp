@@ -28,7 +28,8 @@ QWidget* VerticalConfigurationGroup::configWidget(QWidget* parent,
     QVBoxLayout* layout = new QVBoxLayout(widget, 20);
     widget->setTitle(getLabel());
     for(unsigned i = 0 ; i < children.size() ; ++i)
-        layout->add(children[i]->configWidget(widget, NULL));
+        if (children[i]->isVisible())
+            layout->add(children[i]->configWidget(widget, NULL));
         
     return widget;
 }
@@ -38,7 +39,8 @@ QWidget* StackedConfigurationGroup::configWidget(QWidget* parent,
     QWidgetStack* widget = new QWidgetStack(parent, widgetName);
 
     for(unsigned i = 0 ; i < children.size() ; ++i)
-        widget->addWidget(children[i]->configWidget(widget, NULL), i);
+        if (children[i]->isVisible())
+            widget->addWidget(children[i]->configWidget(widget, NULL), i);
 
     widget->raiseWidget(top);
 
@@ -53,7 +55,8 @@ QWidget* TabbedConfigurationGroup::configWidget(QWidget* parent,
     QTabDialog* widget = new QTabDialog(parent, widgetName);
     
     for(unsigned i = 0 ; i < children.size() ; ++i)
-        widget->addTab(children[i]->configWidget(widget), children[i]->getLabel());
+        if (children[i]->isVisible())
+            widget->addTab(children[i]->configWidget(widget), children[i]->getLabel());
 
     return widget;
 };
@@ -211,15 +214,16 @@ QDialog* ConfigurationWizard::dialogWidget(QWidget* parent,
     wizard->resize(600, 480); // xxx
 
     unsigned i;
-    for(i = 0 ; i < children.size() ; ++i) {
-        QWidget* child = children[i]->configWidget(parent);
-        wizard->addPage(child, children[i]->getLabel());
-        if (i == children.size()-1)
-            // Last page always has finish enabled for now
-            // stuff should have sane defaults anyway
-            wizard->setFinishEnabled(child, true);
-    }
-
+    for(i = 0 ; i < children.size() ; ++i)
+        if (children[i]->isVisible()) {
+            QWidget* child = children[i]->configWidget(parent);
+            wizard->addPage(child, children[i]->getLabel());
+            if (i == children.size()-1)
+                // Last page always has finish enabled for now
+                // stuff should have sane defaults anyway
+                wizard->setFinishEnabled(child, true);
+        }
+        
     return wizard;
 }
 
@@ -240,12 +244,6 @@ void SimpleDBStorage::load(QSqlDatabase* db) {
     }
 }
 
-void SimpleDBStorage::purge(QSqlDatabase* db) {
-    QString querystr = QString("DELETE FROM %1 WHERE %2")
-        .arg(table).arg(whereClause());
-    QSqlQuery query = db->exec(querystr);
-}
-
 void SimpleDBStorage::save(QSqlDatabase* db) {
     QString querystr = QString("SELECT * FROM %1 WHERE %2")
         .arg(table).arg(whereClause());
@@ -261,5 +259,26 @@ void SimpleDBStorage::save(QSqlDatabase* db) {
         querystr = QString("INSERT INTO %1 SET %2")
             .arg(table).arg(setClause());
         query = db->exec(querystr);
+    }
+}
+
+void AutoIncrementStorage::save(QSqlDatabase* db) {
+    if (intValue() == 0) {
+        // Generate a new, unique ID
+        QString query = QString("INSERT INTO %1 (%2) VALUES (0)").arg(table).arg(column);
+        QSqlQuery result = db->exec(query);
+        if (!result.isActive() || result.numRowsAffected() < 1) {
+            cerr << "Failed to insert new entry for ("
+                 << table << "," << column << ")\n";
+            return;
+        }
+        result = db->exec("SELECT LAST_INSERT_ID()");
+        if (!result.isActive() || result.numRowsAffected() < 1) {
+            cerr << "Failed to fetch last insert id" << endl;
+            return;
+        }
+
+        result.next();
+        setValue(result.value(0).toInt());
     }
 }

@@ -29,8 +29,8 @@ TARGETDEPS += ../../libs/libavcodec/libavcodec.a
 
 # Input
 HEADERS += scheduler.h playbackbox.h programlistitem.h viewscheduled.h
-HEADERS += themesetup.h globalsettings.h recordingprofile.h
+HEADERS += themesetup.h globalsettings.h recordingprofile.h videosource.h
 
 SOURCES += main.cpp scheduler.cpp playbackbox.cpp programlistitem.cpp
 SOURCES += viewscheduled.cpp themesetup.cpp globalsettings.cpp
-SOURCES += recordingprofile.cpp
+SOURCES += recordingprofile.cpp videosource.cpp

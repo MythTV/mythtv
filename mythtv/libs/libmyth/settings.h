@@ -16,7 +16,8 @@ class QDialog;
 class Configurable: virtual public QObject {
     Q_OBJECT
 public:
-    Configurable() {};
+    Configurable():
+        visible(true) {};
     virtual ~Configurable() {};
 
     // Create and return a widget for configuring this entity
@@ -25,7 +26,6 @@ public:
 
     virtual void load(QSqlDatabase* db) = 0;
     virtual void save(QSqlDatabase* db) = 0;
-    virtual void purge(QSqlDatabase* db) = 0;
 
     // A name for looking up the setting
     void setName(QString str) {
@@ -34,15 +34,19 @@ public:
             setLabel(str);
     };
     QString getName(void) const { return configName; };
-    virtual QString byName(QString name) = 0;
+    virtual QString byName(QString name) const = 0;
 
     // A label displayed to the user
     void setLabel(QString str) { label = str; };
     QString getLabel(void) const { return label; };
 
+    void setVisible(bool b) { visible = b; };
+    bool isVisible(void) const { return visible; };
+
 private:
     QString configName;
     QString label;
+    bool visible;
 };
 
 class Setting: virtual public Configurable {
@@ -50,12 +54,12 @@ class Setting: virtual public Configurable {
 public:
     virtual ~Setting() {};
 
-    virtual QString getValue(void) {
+    virtual QString getValue(void) const {
         cerr << "getValue(" << getName() << "): " << settingValue << endl;
         return settingValue;
     };
 
-    virtual QString byName(QString name) {
+    virtual QString byName(QString name) const {
         if (name == getName())
             return getValue();
         return QString::null;
@@ -87,8 +91,8 @@ public:
         children.push_back(child);
     };
 
-    virtual QString byName(QString name) {
-        for(childList::iterator i = children.begin() ;
+    virtual QString byName(QString name) const {
+        for(childList::const_iterator i = children.begin() ;
             i != children.end() ;
             ++i ) {
 
@@ -112,13 +116,6 @@ public:
             i != children.end() ;
             ++i )
             (*i)->save(db);
-    };
-
-    virtual void purge(QSqlDatabase* db) {
-        for(childList::iterator i = children.begin() ;
-            i != children.end() ;
-            ++i )
-            (*i)->purge(db);
     };
 
 protected:
@@ -190,7 +187,7 @@ class IntegerSetting: virtual public Setting {
 protected:
     IntegerSetting() {};
 public:
-    int intValue(void) {
+    int intValue(void) const {
         return settingValue.toInt();
     };
 public slots:
@@ -302,7 +299,7 @@ public:
 class BooleanSetting: virtual public Setting {
     Q_OBJECT
 public:
-    bool boolValue(void) {
+    bool boolValue(void) const {
         return getValue() == "true";
     };
 public slots:
@@ -322,29 +319,48 @@ public:
     virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0);
 };
 
-class SimpleDBStorage: virtual public Setting {
+class DBStorage: virtual public Setting {
 public:
-    SimpleDBStorage(QString _table, QString _column) {
-        table = _table;
-        column = _column;
-    };
+    DBStorage(QString _table, QString _column):
+        table(_table), column(_column) {};
+
+    virtual void load(QSqlDatabase* db) = 0;
+    virtual void save(QSqlDatabase* db) = 0;
+
+protected:
+    QString getColumn(void) const { return column; };
+
+    QString table;
+    QString column;
+};
+
+class SimpleDBStorage: public DBStorage {
+public:
+    SimpleDBStorage(QString table, QString column):
+        DBStorage(table, column) {};
 
     virtual ~SimpleDBStorage() {};
 
     virtual void load(QSqlDatabase* db);
     virtual void save(QSqlDatabase* db);
-    virtual void purge(QSqlDatabase* db);
 
 protected:
-    QString table;
-    QString column;
-
-    QString getColumn(void) const { return column; };
 
     virtual QString whereClause(void) = 0;
     virtual QString setClause(void) {
         return QString("%1 = '%2'").arg(column).arg(getValue());
     };
+};
+
+class AutoIncrementStorage: virtual public IntegerSetting, public DBStorage {
+public:
+    AutoIncrementStorage(QString table, QString column):
+        DBStorage(table, column) {
+        setValue(0);
+    };
+
+    virtual void load(QSqlDatabase* db) { (void)db; };
+    virtual void save(QSqlDatabase* db);
 };
 
 #endif

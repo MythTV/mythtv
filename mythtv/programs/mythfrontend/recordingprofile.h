@@ -30,26 +30,13 @@ protected:
     virtual QString whereClause(void);
 };
 
-class VideoCodecParam: public SimpleDBStorage,
-                       public RecordingProfileSetting {
+class CodecParam: public SimpleDBStorage,
+                  public RecordingProfileSetting {
 protected:
-    VideoCodecParam(const RecordingProfile& parentProfile,
+    CodecParam(const RecordingProfile& parentProfile,
                     QString name):
         SimpleDBStorage("codecparams", "value"),
         RecordingProfileSetting(parentProfile) {
-        setName(name);
-    };
-
-    virtual QString setClause(void);
-    virtual QString whereClause(void);
-};
-
-class AudioCodecParam: public SimpleDBStorage,
-                       public RecordingProfileSetting {
-protected:
-    AudioCodecParam(const RecordingProfile& parentProfile, QString name):
-        SimpleDBStorage("codecparams", "value"),
-        RecordingProfileSetting(parentProfile)  {
         setName(name);
     };
 
@@ -100,10 +87,10 @@ private:
     CodecSettingMap codecSettingMap;
 };
 
-class MP3Quality: public AudioCodecParam, public SliderSetting {
+class MP3Quality: public CodecParam, public SliderSetting {
 public:
     MP3Quality(const RecordingProfile& parent):
-        AudioCodecParam(parent, "mp3quality"),
+        CodecParam(parent, "mp3quality"),
         SliderSetting(1,9,1) {
         setLabel("MP3 Quality");
         setValue(7);
@@ -111,10 +98,10 @@ public:
 };
 
 
-class SampleRate: public AudioCodecParam, public SpinBoxSetting {
+class SampleRate: public CodecParam, public SpinBoxSetting {
 public:
     SampleRate(const RecordingProfile& parent):
-        AudioCodecParam(parent, "samplerate"),
+        CodecParam(parent, "samplerate"),
         SpinBoxSetting(32000,48000,100) {
         setLabel("Sampling rate");
         setValue(32000);
@@ -146,40 +133,40 @@ public:
     };
 };
 
-class RTjpegQuality: public VideoCodecParam, public SliderSetting {
+class RTjpegQuality: public CodecParam, public SliderSetting {
 public:
     RTjpegQuality(const RecordingProfile& parent):
-        VideoCodecParam(parent, "rtjpegquality"),
+        CodecParam(parent, "rtjpegquality"),
         SliderSetting(1,255,1) {
         setLabel("RTjpeg Quality");
         setValue(170);
     };
 };
 
-class RTjpegLumaFilter: public VideoCodecParam, public SpinBoxSetting {
+class RTjpegLumaFilter: public CodecParam, public SpinBoxSetting {
 public:
     RTjpegLumaFilter(const RecordingProfile& parent):
-        VideoCodecParam(parent, "rtjpeglumafilter"),
+        CodecParam(parent, "rtjpeglumafilter"),
         SpinBoxSetting(0,31,1) {
         setLabel("Luma filter");
         setValue(0);
     };
 };
 
-class RTjpegChromaFilter: public VideoCodecParam, public SpinBoxSetting {
+class RTjpegChromaFilter: public CodecParam, public SpinBoxSetting {
 public:
     RTjpegChromaFilter(const RecordingProfile& parent):
-        VideoCodecParam(parent, "rtjpegchromafilter"),
+        CodecParam(parent, "rtjpegchromafilter"),
         SpinBoxSetting(0,31,1) {
         setLabel("Chroma filter");
         setValue(0);
     };
 };
 
-class MPEG4bitrate: public VideoCodecParam, public SliderSetting {
+class MPEG4bitrate: public CodecParam, public SliderSetting {
 public:
     MPEG4bitrate(const RecordingProfile& parent):
-        VideoCodecParam(parent, "mpeg4bitrate"),
+        CodecParam(parent, "mpeg4bitrate"),
         SliderSetting(100,8000,100) {
 
         setLabel("Quality");
@@ -187,19 +174,19 @@ public:
     };
 };
 
-class MPEG4ScaleBitrate: public VideoCodecParam, public CheckBoxSetting {
+class MPEG4ScaleBitrate: public CodecParam, public CheckBoxSetting {
 public:
     MPEG4ScaleBitrate(const RecordingProfile& parent):
-        VideoCodecParam(parent, "mpeg4scalebitrate") {
+        CodecParam(parent, "mpeg4scalebitrate") {
         setLabel("Scale bitrate for frame size");
         setValue(true);
     };
 };
 
-class MPEG4MinQuality: public VideoCodecParam, public SliderSetting {
+class MPEG4MinQuality: public CodecParam, public SliderSetting {
 public:
     MPEG4MinQuality(const RecordingProfile& parent):
-        VideoCodecParam(parent, "mpeg4minquality"),
+        CodecParam(parent, "mpeg4minquality"),
         SliderSetting(1,31,1) {
 
         setLabel("Min quality");
@@ -207,10 +194,10 @@ public:
     };
 };
 
-class MPEG4MaxQuality: public VideoCodecParam, public SliderSetting {
+class MPEG4MaxQuality: public CodecParam, public SliderSetting {
 public:
     MPEG4MaxQuality(const RecordingProfile& parent):
-        VideoCodecParam(parent, "mpeg4maxquality"),
+        CodecParam(parent, "mpeg4maxquality"),
         SliderSetting(1,31,1) {
 
         setLabel("Max quality");
@@ -218,10 +205,10 @@ public:
     };
 };
 
-class MPEG4QualDiff: public VideoCodecParam, public SliderSetting {
+class MPEG4QualDiff: public CodecParam, public SliderSetting {
 public:
     MPEG4QualDiff(const RecordingProfile& parent):
-        VideoCodecParam(parent, "mpeg4qualdiff"),
+        CodecParam(parent, "mpeg4qualdiff"),
         SliderSetting(1,31,1) {
 
         setLabel("Max quality difference");
@@ -229,20 +216,20 @@ public:
     };
 };
 
-class HardwareMJPEGQuality: public VideoCodecParam, public SliderSetting {
+class HardwareMJPEGQuality: public CodecParam, public SliderSetting {
 public:
     HardwareMJPEGQuality(const RecordingProfile& parent):
-        VideoCodecParam(parent, "hardwaremjpegquality"),
+        CodecParam(parent, "hardwaremjpegquality"),
         SliderSetting(0, 100, 1) {
         setLabel("Quality");
         setValue(100);
     };
 };
 
-class HardwareMJPEGDecimation: public VideoCodecParam, public SliderSetting {
+class HardwareMJPEGDecimation: public CodecParam, public SliderSetting {
 public:
     HardwareMJPEGDecimation(const RecordingProfile& parent):
-        VideoCodecParam(parent, "hardwaremjpegdecimation"),
+        CodecParam(parent, "hardwaremjpegdecimation"),
         SliderSetting(1, 2, 1) {
         setLabel("Decimation");
         setValue(2);
@@ -309,21 +296,21 @@ public:
 
 class ImageSize: public VerticalConfigurationGroup {
 public:
-    class Width: public SpinBoxSetting, public VideoCodecParam {
+    class Width: public SpinBoxSetting, public CodecParam {
     public:
         Width(const RecordingProfile& parent, int maxwidth=704):
             SpinBoxSetting(120,maxwidth,4),
-            VideoCodecParam(parent, "width") {
+            CodecParam(parent, "width") {
             setLabel("Width");
             setValue(maxwidth);
         };
     };
 
-    class Height: public SpinBoxSetting, public VideoCodecParam {
+    class Height: public SpinBoxSetting, public CodecParam {
     public:
         Height(const RecordingProfile& parent, int maxheight=576):
             SpinBoxSetting(120,maxheight,4),
-            VideoCodecParam(parent, "height") {
+            CodecParam(parent, "height") {
             setLabel("Height");
             setValue(maxheight);
         };
@@ -350,6 +337,22 @@ public:
 
 class RecordingProfile: public ConfigurationWizard {
 protected:
+    class ID: virtual public IntegerSetting,
+              public AutoIncrementStorage {
+    public:
+        ID():
+            AutoIncrementStorage("recordingprofiles", "id") {
+            setVisible(false);
+        };
+
+        // Should never be called because this setting is not visible
+        virtual QWidget* configWidget(QWidget* parent = NULL,
+                                      const char* widgetName = NULL) {
+            (void)parent; (void)widgetName;
+            return NULL;
+        };
+    };
+
     class Name: public ComboBoxSetting, public RecordingProfileParam {
     public:
         Name(const RecordingProfile& parent):
@@ -363,7 +366,9 @@ protected:
     };
 public:
     RecordingProfile() {
-        id = -1;
+        // This must be first because it is needed to load/save the other settings
+        addChild(id = new ID());
+
         ConfigurationGroup* profile = new VerticalConfigurationGroup();
         profile->setLabel("Profile");
         profile->addChild(name = new Name(*this));
@@ -384,17 +389,16 @@ public:
     };
 
     virtual void loadByID(QSqlDatabase* db, int id);
-    virtual void save(QSqlDatabase* db);
 
     int getProfileNum(void) const {
-        return id;
+        return id->intValue();
     };
 
     QString getName(void) const { return name->getValue(); };
     const ImageSize& getImageSize(void) const { return *imageSize; };
     
 private:
-    int id;
+    ID* id;
     Name* name;
     ImageSize* imageSize;
 };

@@ -8,53 +8,21 @@ QString RecordingProfileParam::whereClause(void) {
   return QString("id = %1").arg(parentProfile.getProfileNum());
 }
 
-QString VideoCodecParam::setClause(void) {
+QString CodecParam::setClause(void) {
   return QString("profile = %1, name = '%2', value = '%3'")
     .arg(parentProfile.getProfileNum())
     .arg(getName())
     .arg(getValue());
 }
 
-QString VideoCodecParam::whereClause(void) {
-  return QString("profile = %1 AND name = '%2'")
-    .arg(parentProfile.getProfileNum()).arg(getName());
-}
-
-QString AudioCodecParam::setClause(void) {
-  return QString("profile = %1, name = '%2', value = '%3'")
-    .arg(parentProfile.getProfileNum())
-    .arg(getName())
-    .arg(getValue());
-}
-
-QString AudioCodecParam::whereClause(void) {
+QString CodecParam::whereClause(void) {
   return QString("profile = %1 AND name = '%2'")
     .arg(parentProfile.getProfileNum()).arg(getName());
 }
 
 void RecordingProfile::loadByID(QSqlDatabase* db, int profileId) {
-    id = profileId;
+    id->setValue(profileId);
     load(db);
-}
-
-void RecordingProfile::save(QSqlDatabase* db) {
-  if (id == -1) {
-    // Generate a new, unique ID
-    QSqlQuery result = db->exec("INSERT INTO recordingprofiles (id) VALUES (0)");
-    if (!result.isActive() || result.numRowsAffected() < 1) {
-      cerr << "Failed to insert new recordingprofile entry" << endl;
-      return;
-    }
-    result = db->exec("SELECT LAST_INSERT_ID()");
-    if (!result.isActive() || result.numRowsAffected() < 1) {
-      cerr << "Failed to fetch last insert id" << endl;
-      return;
-    }
-
-    result.next();
-    id = result.value(0).toInt();
-  }
-  ConfigurationWizard::save(db);
 }
 
 RecordingProfileBrowser::RecordingProfileBrowser(MythContext* context,
