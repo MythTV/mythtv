@@ -52,25 +52,25 @@ void clearCardDB(void)
 {
     QSqlQuery query;
 
-    query.exec("DELETE FROM capturecard;");
-    query.exec("DELETE FROM cardinput;");
-    query.exec("DELETE FROM dvb_sat;");
-    query.exec("DELETE FROM dvb_signal_quality;");
+    query.exec("TRUNCATE TABLE capturecard;");
+    query.exec("TRUNCATE TABLE cardinput;");
+    query.exec("TRUNCATE TABLE dvb_sat;");
+    query.exec("TRUNCATE TABLE dvb_signal_quality;");
 }
 
 void clearAllDB(void)
 {
     QSqlQuery query;
 
-    query.exec("DELETE FROM channel;");
-    query.exec("DELETE FROM program;");
-    query.exec("DELETE FROM videosource;");
-    query.exec("DELETE FROM credits;");
-    query.exec("DELETE FROM programrating;");
-    query.exec("DELETE FROM programgenres;");
-    query.exec("DELETE FROM dvb_channel;");
-    query.exec("DELETE FROM dvb_pids;");
-    query.exec("DELETE FROM cardinput;");
+    query.exec("TRUNCATE TABLE channel;");
+    query.exec("TRUNCATE TABLE program;");
+    query.exec("TRUNCATE TABLE videosource;");
+    query.exec("TRUNCATE TABLE credits;");
+    query.exec("TRUNCATE TABLE programrating;");
+    query.exec("TRUNCATE TABLE programgenres;");
+    query.exec("TRUNCATE TABLE dvb_channel;");
+    query.exec("TRUNCATE TABLE dvb_pids;");
+    query.exec("TRUNCATE TABLE cardinput;");
 }
 
 void SetupMenuCallback(void* data, QString& selection) {
