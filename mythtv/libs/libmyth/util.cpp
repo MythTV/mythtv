@@ -149,10 +149,12 @@ bool ReadStringList(QSocket *socket, QStringList &list)
     return true;
 }
 
-void WriteBlock(QSocket *socket, void *data, int len)
+bool WriteBlock(QSocket *socket, void *data, int len)
 {
     int size = len;
     int written = 0;
+
+    unsigned int errorcount = 0;
 
     while (size > 0)
     {
@@ -165,6 +167,9 @@ void WriteBlock(QSocket *socket, void *data, int len)
         {
             printf("Partial WriteBlock %u\n", written);
             qApp->processEvents();
+
+            if (++errorcount > 50)
+                return false;
         }
     }
 
@@ -175,6 +180,8 @@ void WriteBlock(QSocket *socket, void *data, int len)
 
     while (socket->bytesToWrite() >= (unsigned) written)
         usleep(50000);
+
+    return true;
 }
 
 int ReadBlock(QSocket *socket, void *data, int maxlen)

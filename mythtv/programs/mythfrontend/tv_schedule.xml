@@ -8,7 +8,7 @@
       <text lang="CA">Guia de programes</text>
       <text lang="NL">Programma Gids</text>
       <text lang="FR">Grille Horaire</text>
-      <text lang="DE">Übersicht</text>
+      <text lang="DE">Programm- übersicht</text>
       <text lang="DK">Program Guide</text>
       <text lang="PT">Guia de Programação</text>
       <text lang="SV">Programguide</text>
@@ -16,7 +16,7 @@
       <alttext lang="FR">Grille</alttext>
       <alttext lang="ES">Parilla</alttext>
       <alttext lang="CA">Guia</alttext>
-      <alttext lang="DE">Übersicht</alttext>
+      <alttext lang="DE">Programm</alttext>
       <alttext lang="DK">Guide</alttext>
       <alttext lang="NL">Gids</alttext>
       <alttext lang="NL">Guia</alttext>
@@ -78,7 +78,7 @@
       <text>Manual Schedule</text>
       <text lang="ES">Programar Grabaciones</text>
       <text lang="CA">Programar Gravacions</text>
-      <text lang="DE">Manuelle Eingabe</text>
+      <text lang="DE">Manuelle Aufnahme</text>
       <text lang="DK">Manuel programmering</text>
       <text lang="NL">Manuele Opname</text>
       <text lang="PT">Gravação Manual</text>
@@ -123,7 +123,7 @@
       <text lang="CA">Resoldre Conflictes</text>
       <text lang="NL">Conflicten Oplossen</text>
       <text lang="FR">Gestion des conflits</text>
-      <text lang="DE">Konflikte beheben</text>
+      <text lang="DE">Aufnahmeplan</text>
       <text lang="DK">Løs optagelseskonflikter</text>
       <text lang="PT">Resolver Conflitos</text>
       <text lang="SV">Åtgärda schemakonflikter</text>

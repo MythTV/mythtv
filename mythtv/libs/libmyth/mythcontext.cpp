@@ -990,6 +990,7 @@ bool MythContext::SendReceiveStringList(QStringList &strlist)
 
     if (!ok)
     {
+        qApp->lock();
         cout << "Connection to backend server lost\n";
         MythPopupBox::showOkPopup(mainWindow, "connection failure",
                                   tr("The connection to the master backend "
@@ -999,6 +1000,7 @@ bool MythContext::SendReceiveStringList(QStringList &strlist)
         serverSock->close();
         delete serverSock;
         serverSock = NULL;
+        qApp->unlock();
     }
 
     expectingReply = false;

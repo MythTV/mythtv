@@ -733,7 +733,7 @@ void TV::RunTV(void)
 
             recorder->Setup();
 
-            if(recorder->IsRecording())
+            if (recorder->IsRecording())
             {
                 recorderPlaybackInfo = recorder->GetRecording();
                 RemoteFillProginfo(recorderPlaybackInfo, 
@@ -2117,12 +2117,15 @@ void TV::ToggleMute(void)
 void TV::ToggleLetterbox(void)
 {
     nvp->ToggleLetterbox();
-    bool letterbox = nvp->GetLetterbox();
+    int letterbox = nvp->GetLetterbox();
     QString text;
-    if (letterbox)
-        text = tr("16:9");
-    else
-        text = tr("4:3");
+
+    switch (letterbox)
+    {
+        case 2: text = tr("4:3 Zoom"); break;
+        case 1: text = tr("16:9"); break;
+        default: text = tr("4:3"); break;
+    }
 
     if (osd && !browsemode )
         osd->SetSettingsText(text, 3);

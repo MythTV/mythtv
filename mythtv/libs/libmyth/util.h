@@ -13,7 +13,7 @@ class QFont;
 bool WriteStringList(QSocket *socket, QStringList &list);
 bool ReadStringList(QSocket *socket, QStringList &list);
 
-void WriteBlock(QSocket *socket, void *data, int len);
+bool WriteBlock(QSocket *socket, void *data, int len);
 int ReadBlock(QSocket *socket, void *data, int maxlen);
 
 void encodeLongLong(QStringList &list, long long num);

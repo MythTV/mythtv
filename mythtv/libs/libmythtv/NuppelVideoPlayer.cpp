@@ -343,12 +343,15 @@ void NuppelVideoPlayer::ReinitVideo(void)
 {
     videoOutput->InputChanged(video_width, video_height, video_aspect);
 
-    int dispx = 0, dispy = 0, dispw = video_width, disph = video_height;
+    if (osd)
+    {
+        int dispx = 0, dispy = 0, dispw = video_width, disph = video_height;
 
-    videoOutput->GetDrawSize(dispx, dispy, dispw, disph);
+        videoOutput->GetDrawSize(dispx, dispy, dispw, disph);
 
-    osd->Reinit(video_width, video_height, frame_interval,
-                dispx, dispy, dispw, disph);
+        osd->Reinit(video_width, video_height, frame_interval,
+                    dispx, dispy, dispw, disph);
+    }
 
     ClearAfterSeek();
 }
@@ -2097,7 +2100,7 @@ void NuppelVideoPlayer::DoKeypress(int keypress)
     decoder->setExactSeeks(exactstore);
 }
 
-bool NuppelVideoPlayer::GetLetterbox(void)
+int NuppelVideoPlayer::GetLetterbox(void)
 {
     if (videoOutput)
         return videoOutput->GetLetterbox();

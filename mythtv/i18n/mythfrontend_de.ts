@@ -527,7 +527,7 @@
     </message>
     <message>
         <source>Rank</source>
-        <translation>Rang</translation>
+        <translation>Wertung</translation>
     </message>
     <message>
         <source>Auto-Expire recordings</source>
@@ -1110,7 +1110,7 @@
     </message>
     <message>
         <source>Skip Ahead</source>
-        <translation>Nach vorne springen</translation>
+        <translation>Vorwärts</translation>
     </message>
     <message>
         <source>Rewind</source>

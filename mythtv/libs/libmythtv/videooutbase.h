@@ -59,7 +59,7 @@ class VideoOutput
 
     virtual void DrawUnusedRects(void) = 0;
 
-    bool GetLetterbox(void) { return letterbox; }
+    int GetLetterbox(void) { return letterbox; }
     void ToggleLetterbox(void);
 
     int ValidVideoFrames(void);
@@ -118,7 +118,7 @@ class VideoOutput
 
     int numbuffers;
 
-    bool letterbox;
+    int letterbox;
 
     VideoFrame *vbuffers;
 

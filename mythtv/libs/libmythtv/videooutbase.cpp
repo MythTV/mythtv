@@ -183,7 +183,7 @@ VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type)
 
 VideoOutput::VideoOutput()
 {
-    letterbox = false;
+    letterbox = 0;
     rpos = 0;
     vpos = 0;
 
@@ -448,17 +448,30 @@ void VideoOutput::MoveResize(void)
         dispyoff = (oldheight - disphoff) / 2;
     }
 
+    // Provide zoom for 4:3 stuff broadcast in 16:9. Vertical zoom is 
+    // natively done already.  Takes the 4:3 chunk out of the middle of a 
+    // 16:9.  Like pan and scan
+ 
+    if (letterbox == 2)
+    {
+        int oldwidth = dispwoff;
+
+        dispwoff = (int)(disphoff * 16.0 / 9);
+        dispxoff = (oldwidth - dispwoff) / 2;
+    }
+
     DrawUnusedRects();
 }
 
 void VideoOutput::ToggleLetterbox(void)
 {
-    if (letterbox)
-        AspectChanged(4.0 / 3);
-    else
-        AspectChanged(16.0 / 9);
+    if (++letterbox > 2)
+        letterbox = 0;
 
-    letterbox = !letterbox;
+    if (letterbox == 1)
+        AspectChanged(16.0 / 9);
+    else
+        AspectChanged(4.0 / 3);
 }
 
 int VideoOutput::ValidVideoFrames(void)

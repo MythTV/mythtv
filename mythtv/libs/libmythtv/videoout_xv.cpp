@@ -731,16 +731,22 @@ void VideoOutputXv::DrawUnusedRects(void)
 
 void VideoOutputXv::UpdatePauseFrame(void)
 {
+    pthread_mutex_lock(&lock);
+
     VideoFrame *pauseb = scratchFrame;
     if (usedVideoBuffers.count() > 0)
         pauseb = usedVideoBuffers.head();
     memcpy(pauseFrame.buf, pauseb->buf, pauseb->size);
+
+    pthread_mutex_unlock(&lock);
 }
 
 void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
                                  vector<VideoFilter *> &filterList,
                                  NuppelVideoPlayer *pipPlayer)
 {
+    pthread_mutex_lock(&lock);
+
     if (!frame)
     {
         frame = scratchFrame;
@@ -751,5 +757,7 @@ void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
 
     ShowPip(frame, pipPlayer);
     DisplayOSD(frame, osd);
+
+    pthread_mutex_unlock(&lock);
 }
 

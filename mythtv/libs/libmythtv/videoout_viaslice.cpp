@@ -370,7 +370,7 @@ void VideoOutputVIA::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
     if (curdata->code == 1)
         data->current = data->buffer;
 
-    memset(data->tempbuffer, 0, curdata->slice_datalen + 32);
+    memset(data->tempbuffer + curdata->slice_datalen, 0, 32);
     memcpy(data->tempbuffer, curdata->slice_data, curdata->slice_datalen);
 
     unsigned char *lpDataTmp;

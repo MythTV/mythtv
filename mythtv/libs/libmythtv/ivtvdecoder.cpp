@@ -262,7 +262,6 @@ bool IvtvDecoder::DoRewind(long long desiredFrame)
 {
     lastKey = (framesPlayed / keyframedist) * keyframedist;
     long long storelastKey = lastKey;
-
     while (lastKey > desiredFrame)
     {
         lastKey -= keyframedist;
