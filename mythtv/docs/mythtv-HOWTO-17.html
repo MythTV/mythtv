@@ -27,9 +27,16 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>The next step is to edit the
-<CODE>/usr/local/share/mythtv/mythvideo-settings.txt</CODE> file.  Change
-the StartDir to a valid mount point on your system.</P>
+<P>The next step is to create the create the videometadata table in the
+database.  Simply do the following:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd videodb
+$ mysql -u mythtv -p &lt; metadata.sql
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>See MythVideo's <CODE>README</CODE> file for additional information.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-18.html">Next</A>

@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-06-09, v2.39
+  2003-06-09, v2.40
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -1583,9 +1583,9 @@
 
   MythTV does not have native remote control receiver and decoder
   software built-in.  Instead, remote control functions are implemented
-  by cooperating with [1mlirc[22m, the Linux Infra Red Control program.  [1mlirc[0m
-  handles the IR hardware and passes keystrokes to MythTV, which then
-  acts as if the user had pressed the keys on the keyboard.
+  by cooperating with [1mlirc[22m, the Linux Infrared Remote Control program.
+  [1mlirc [22mhandles the IR hardware and passes keystrokes to MythTV, which
+  then acts as if the user had pressed the keys on the keyboard.
 
   [1mNOTE[22m:If you are running Mandrake 9.1, you may install [1mlirc [22mby
   executing: # urpmi lirc lirc-remotes and bypass the manual compilation
@@ -2890,7 +2890,7 @@
   dependencies, say "Yes".
 
 
-       # urpmi libmad0 libmad0-devel libflac4 libflac4-devel libcdaudio cdparanoia
+       # urpmi libmad0 libmad0-devel libflac4 libflac4-devel libcdaudio1 cdparanoia
        # urpmi libcdda0 libcdda0-devel libvorbis0 libvorbis0-devel
        # urpmi libcdaudio1-devel
 
@@ -2929,7 +2929,7 @@
   typing:
 
 
-       # urpmi libsdl1.2 libsdl1.2-devel
+       # urpmi libSDL1.2 libSDL1.2-devel
 
 
 
@@ -3168,9 +3168,16 @@
 
 
 
-  The next step is to edit the /usr/local/share/mythtv/mythvideo-
-  settings.txt file.  Change the StartDir to a valid mount point on your
-  system.
+  The next step is to create the create the videometadata table in the
+  database.  Simply do the following:
+
+
+       $ cd videodb
+       $ mysql -u mythtv -p < metadata.sql
+
+
+
+  See MythVideo's README file for additional information.
 
 
   [1m18.  Troubleshooting.[0m
@@ -3233,6 +3240,8 @@
 
        # hdparm -d /dev/hd?
 
+
+
   will tell you the DMA status for your hard drives.  If you run [1mhdparm[0m
   with the -d1 parameter, it will turn DMA on.
 
@@ -3293,12 +3302,11 @@
   Edit your /etc/X11/XF86Config-4 file, and look for:
 
 
-
-  Section "ServerFlags"
-      #DontZap # disable <Crtl><Alt><BS> (server abort)
-      #DontZoom # disable <Crtl><Alt><KP_+>/<KP_-> (resolution switching)
-      AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
-  EndSection
+       Section "ServerFlags"
+           #DontZap # disable <Crtl><Alt><BS> (server abort)
+           #DontZoom # disable <Crtl><Alt><KP_+>/<KP_-> (resolution switching)
+           AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
+       EndSection
 
 
 
@@ -3351,7 +3359,8 @@
   survive a reboot.
 
 
-       $ xset -dpms
+
+  $ xset -dpms
 
 
 
@@ -3407,12 +3416,13 @@
   that you're running with the debugging code, then compile and install.
 
 
-       $ make clean distclean
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # exit
+
+  $ make clean distclean
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # exit
 
 
 
@@ -3535,7 +3545,8 @@
   application is grabbing a resource, you can use the fuser command:
 
 
-       # fuser -v /dev/dsp
+
+  # fuser -v /dev/dsp
 
 
 
@@ -3599,6 +3610,7 @@
 
   +o  fvwm
 
+
   +o  blackbox  (using "Sloppy Focus" and "Focus New Windows")
 
 
@@ -3608,7 +3620,6 @@
   users/2003-April/002527.html
   <http://lists.snowman.net/pipermail/mythtv-
   users/2003-April/002527.html>
-
 
 
   [1m18.16.  Where's my "canada-cable" entry gone to?[0m
@@ -3738,7 +3749,6 @@
 
   +o  720x480 (but more commonly, 704x480.  "DVD" resolution)
 
-
   +o  640x480 4:3
 
   +o  544x480 (TiVo high resolution)
@@ -3795,7 +3805,6 @@
 
   The MythTV GUI uses its GUI dimensions regardless of the other two and
   is anchored to the upper left corner of the X Desktop.
-
   The MythTV full screen mode uses the X display size dimensions
   regardless of the other two and is anchored to the upper left corner
   of the X display.
@@ -3871,6 +3880,8 @@
   picture uses the recording resolution for its dimensions. If you check
   the box "Fixed Aspect Ratio" in Setup->Playback, the windowed picture
   will always be resized to normal 4:3 shape.
+
+
   [1m19.6.  I'd like to save or restore my database.[0m
 
   See the [1mmysqldump [22mmanpage for more information.
@@ -3932,7 +3943,6 @@
 
   +o  ATI TV Wonder
 
-
   The following cards do not work:
 
   +o  Pinnacle Studio PCTV Pro - note: this has a MSP34xx, but it's not
@@ -3987,8 +3997,6 @@
 
        $ mysql -u root mythconverg
        mysql> delete from program where chanid = '1015';
-
-
 
   [1m19.10.  I'd like to use a hardware MPEG-2 encoder.[0m
 
@@ -4051,8 +4059,6 @@
 
 
   Add the following to /etc/modules.conf:
-
-
 
   alias char-major-81     videodev
   alias char-major-81-0   ivtv

@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-06-09, v2.39
+<date>2003-06-09, v2.40
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1185,7 +1185,7 @@ the mythfrontend setup page for options.
 <sect>Setting up a remote control.
 <p>MythTV does not have native remote control receiver and decoder software
 built-in.  Instead, remote control functions are implemented by cooperating
-with <bf>lirc</bf>, the Linux Infra Red Control program.  <bf>lirc</bf>
+with <bf>lirc</bf>, the Linux Infrared Remote Control program.  <bf>lirc</bf>
 handles the IR hardware and passes keystrokes to MythTV, which then acts as
 if the user had pressed the keys on the keyboard.
 
@@ -2291,7 +2291,7 @@ Once you have done that, you can proceed.  If <bf>urpmi</bf> prompts you
 about other modules that need to be installed to satisfy dependencies, say
 "Yes".
 <tscreen><verb>
-# urpmi libmad0 libmad0-devel libflac4 libflac4-devel libcdaudio cdparanoia
+# urpmi libmad0 libmad0-devel libflac4 libflac4-devel libcdaudio1 cdparanoia
 # urpmi libcdda0 libcdda0-devel libvorbis0 libvorbis0-devel
 # urpmi libcdaudio1-devel
 </verb></tscreen>
@@ -2324,7 +2324,7 @@ installed by typing:
 name="http://www.libsdl.org">.  In Mandrake 9.1 it may be installed by
 typing:
 <tscreen><verb>
-# urpmi libsdl1.2 libsdl1.2-devel
+# urpmi libSDL1.2 libSDL1.2-devel
 </verb></tscreen>
 
 <sect1>Red Hat Linux 8.0
@@ -2535,9 +2535,14 @@ $ su
 # exit
 </verb></tscreen>
 
-The next step is to edit the
-<tt>/usr/local/share/mythtv/mythvideo-settings.txt</tt> file.  Change
-the StartDir to a valid mount point on your system.
+The next step is to create the create the videometadata table in the
+database.  Simply do the following:
+<tscreen><verb>
+$ cd videodb
+$ mysql -u mythtv -p < metadata.sql
+</verb></tscreen>
+
+See MythVideo's <tt>README</tt> file for additional information.
 
 <sect>Troubleshooting.
 <sect1>Illegal Instruction.
@@ -3701,7 +3706,8 @@ add -levels.
 v2.39, 2003-06-09.  Standardized on pre-requisite vs. prerequisite.  Modify
 lirc example so that the user knows that only certain kinds of serial
 modules should have the link to ttySx.  Altered the PVR-250 bitrate example.
-
+v2.40, 2003-06-09.  Fixed lirc acronym expansion.  sdl vs. SDL in Mandrake
+MythMusic.  Updated MythVideo docs.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
