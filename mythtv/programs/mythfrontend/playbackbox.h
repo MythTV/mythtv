@@ -3,6 +3,7 @@
 
 #include <qwidget.h>
 #include <qdatetime.h>
+//#include <qpixmap.h>
 #include "libmyth/mythwidgets.h"
 
 #include <pthread.h>
@@ -32,6 +33,13 @@ class PlaybackBox : public MythDialog
     void play(QListViewItem *);
     void changed(QListViewItem *);
     void timeout(void);
+
+/*
+  protected:
+    void paintEvent(QPaintEvent *);
+    void paintObject(QObject *obj, QRect &rect);
+    bool eventFilter(QObject *, QEvent *);
+*/
 
   private:
     QListViewItem *FillList(bool selectsomething);
@@ -74,6 +82,8 @@ class PlaybackBox : public MythDialog
     bool displayChanNum;
     QString dateformat;
     QString timeformat;
+
+//    QPixmap *testing;
 };
 
 #endif

@@ -9,7 +9,7 @@
 class TV;
 
 class ProgramListItem : public QListViewItem
-{   
+{ 
   public:
     ProgramListItem(QListView *parent, ProgramInfo *lpginfo, int type);
    ~ProgramListItem() { delete pginfo; if (pixmap) delete pixmap; }

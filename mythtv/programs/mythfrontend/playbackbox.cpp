@@ -30,6 +30,22 @@ using namespace std;
 #include "libmythtv/programinfo.h"
 #include "libmythtv/remoteutil.h"
 
+/*
+class CustomPaintEvent : public QCustomEvent
+{
+  public: 
+    enum Type { CustomPaintNum = (User + 2000) };
+
+    CustomPaintEvent(QObject *obj, QPaintEvent *e)
+          : QCustomEvent(CustomPaintNum)
+
+         {   object = obj; rect = e->rect(); }
+
+    QObject *object;
+    QRect rect;
+};
+*/
+
 PlaybackBox::PlaybackBox(BoxType ltype, QWidget *parent, const char *name)
            : MythDialog(parent, name)
 {
@@ -53,6 +69,12 @@ PlaybackBox::PlaybackBox(BoxType ltype, QWidget *parent, const char *name)
     vbox->addWidget(label);
 
     listview = new MythListView(this);
+
+    //label->installEventFiltere(this);
+    //listview->header()->installEventFilter(this);
+    //listview->viewport()->installEventFilter(this);
+    //listview->setStaticBackground(true);
+    //testing = new QPixmap("button_off.png");
 
     listview->addColumn("Date");
     listview->addColumn("Title");
@@ -203,6 +225,51 @@ PlaybackBox::~PlaybackBox(void)
     delete timer;
 }
 
+/*
+void PlaybackBox::paintEvent(QPaintEvent *e)
+{
+    QPainter p(this);
+
+    QRect r = e->rect();
+
+    if (r.intersects(QRect(0, 0, 800, 200)))
+    {
+        p.drawPixmap(QPoint(0, 0), *testing);
+    }
+}
+
+void PlaybackBox::paintObject(QObject *o, QRect &rect)
+{
+    QRect r = rect;
+
+    QWidget *w = (QWidget *)o;
+
+    int xoff = w->x();
+    int yoff = w->y();
+
+    if (w->parent() != this)
+    {
+        xoff += ((QWidget *)(w->parent()))->x();
+        yoff += ((QWidget *)(w->parent()))->y();
+    }
+
+    QPainter p(w);
+
+    p.drawPixmap(r.x(), r.y(), *testing, xoff, yoff + r.y(), r.width() - xoff, r.height());    
+}
+
+bool PlaybackBox::eventFilter(QObject *o, QEvent *e)
+{
+    if (e->type() == QEvent::Paint)
+    {
+        CustomPaintEvent *e2 = new CustomPaintEvent(o, (QPaintEvent *)e);
+        QApplication::postEvent(this, e2);
+    }
+
+    return false;
+}
+*/
+    
 QListViewItem *PlaybackBox::FillList(bool selectsomething)
 {
     QString chanid = "";
@@ -753,6 +820,13 @@ void PlaybackBox::customEvent(QCustomEvent *e)
                 UpdateProgressBar();
         }
     }
+/*
+    else if ((CustomPaintEvent::Type)(e->type()) == CustomPaintEvent::CustomPaintNum)
+    {
+        CustomPaintEvent *ce = (CustomPaintEvent *)e;
+        paintObject(ce->object, ce->rect);
+    }
+*/
 }
 
 bool PlaybackBox::fileExists(const QString &pathname)
