@@ -1321,7 +1321,8 @@ void ThemedMenu::paintTitle(QPainter *p)
 void ThemedMenu::paintWatermark(QPainter *p)
 {
     erase(watermarkRect);
-    if (activebutton && activebutton->buttonicon->watermark)
+    if (activebutton && activebutton->buttonicon &&
+        activebutton->buttonicon->watermark)
     {
         p->drawImage(watermarkPos, *(activebutton->buttonicon->watermark));
     }
