@@ -219,10 +219,13 @@ void HttpResponse::send(MFDServiceClientSocket *which_client)
         //  the response, let the requesting client know that's just fine.
         //
         
-        if(my_request->getHeader("Connection") == "close")
+        if(my_request)
         {
-            QString connection_header = QString("Connection: close\r\n");
-            addText(&header_block, connection_header);
+            if(my_request->getHeader("Connection") == "close")
+            {
+                QString connection_header = QString("Connection: close\r\n");
+                addText(&header_block, connection_header);
+            }
         }
 
         //
@@ -238,18 +241,21 @@ void HttpResponse::send(MFDServiceClientSocket *which_client)
         //  request (eg. seeking in an mp3) explain the byte ranges returned
         //
         
-        if(
-            my_request->getHeader("Range") &&
-            range_begin          > -1 &&
-            range_end            > -1 &&
-            total_possible_range > -1
-          )
+        if(my_request)
         {
-            QString file_range_header = QString("Content-Range: %1-%2/%3\r\n")
-                                        .arg(range_begin)
-                                        .arg(range_end)
-                                        .arg(total_possible_range);
-            addText(&header_block, file_range_header);
+            if(
+                my_request->getHeader("Range") &&
+                range_begin          > -1 &&
+                range_end            > -1 &&
+                total_possible_range > -1
+              )
+            {
+                QString file_range_header = QString("Content-Range: %1-%2/%3\r\n")
+                                            .arg(range_begin)
+                                            .arg(range_end)
+                                            .arg(total_possible_range);
+                addText(&header_block, file_range_header);
+            }
         }
 
         //
@@ -327,6 +333,20 @@ bool HttpResponse::sendBlock(MFDServiceClientSocket *which_client, std::vector<c
 
     while(keep_going)
     {
+        if(my_request)
+        {
+            if(!my_request->getParent()->keepGoing())
+            {
+                //
+                //  We are shutting down or something terrible has happened
+                //
+
+                my_request->getParent()->log("httpresponse aborted sending some socket data because it thinks its time to shut down", 6);
+
+                return false;
+            }
+        }
+
         FD_ZERO(&writefds);
         FD_SET(which_client->socket(), &writefds);
         if(nfds <= which_client->socket())
@@ -334,51 +354,52 @@ bool HttpResponse::sendBlock(MFDServiceClientSocket *which_client, std::vector<c
             nfds = which_client->socket() + 1;
         }
         
-        timeout.tv_sec = 5;
+        timeout.tv_sec = 2;
         timeout.tv_usec = 0;
         int result = select(nfds, NULL, &writefds, NULL, &timeout);
         if(result < 0)
         {
-            cerr << "Crappity crap crap and double crap" << endl;
-        }
-
-        if(FD_ISSET(which_client->socket(), &writefds))
-        {
-            //
-            //  Socket is available for writing
-            //
-            
-            int bytes_sent = which_client->writeBlock( &(block_to_send[amount_written]), block_to_send.size() - amount_written);
-            if(bytes_sent < 0)
-            {
-                //
-                //  Hmm, select() said we were ready, but now we're getting
-                //  an error ... client has gone away?
-                //
-                
-                return false;
-                
-            }
-            else if(bytes_sent >= (int) (block_to_send.size() - amount_written))
-            {
-                //
-                //  All done
-                //
-
-                keep_going = false;
-            }
-            else
-            {
-                amount_written += bytes_sent;
-            }
+            my_request->getParent()->warning("httpresponse got an error from select()");
         }
         else
         {
-            //
-            //  We just time'd out
-            //
-        }
+            if(FD_ISSET(which_client->socket(), &writefds))
+            {
+                //
+                //  Socket is available for writing
+                //
+            
+                int bytes_sent = which_client->writeBlock( &(block_to_send[amount_written]), block_to_send.size() - amount_written);
+                if(bytes_sent < 0)
+                {
+                    //
+                    //  Hmm, select() said we were ready, but now we're getting
+                    //  an error ... client has gone away?
+                    //
+                
+                    return false;
+                
+                }
+                else if(bytes_sent >= (int) (block_to_send.size() - amount_written))
+                {
+                    //
+                    //  All done
+                    //
 
+                    keep_going = false;
+                }
+                else
+                {
+                    amount_written += bytes_sent;
+                }
+            }
+            else
+            {
+                //
+                //  We just time'd out
+                //
+            }
+        }
     }
     return true;
 }
@@ -413,9 +434,12 @@ void HttpResponse::sendFile(QString file_path, int skip)
     QFile the_file(file_path.local8Bit());
     if(!the_file.exists())
     {
-	    my_request->getParent()->warning(QString("httpresponse was asked to send "
-	                                           "a file that does not exist: %1")
-	                                   .arg(file_path.local8Bit()));
+        if(my_request)
+        {
+    	    my_request->getParent()->warning(QString("httpresponse was asked to send "
+	                                               "a file that does not exist: %1")
+	                                       .arg(file_path.local8Bit()));
+	    }
 	    setError(404);
         return;
     }
@@ -429,18 +453,24 @@ void HttpResponse::sendFile(QString file_path, int skip)
 
     if(!the_file.open(IO_ReadOnly | IO_Raw))
     {
-	    my_request->getParent()->warning(QString("httpresponse could not open (permissions?) a "
-	                                           "file it was asked to send: %1")
-	                                   .arg(file_path.local8Bit()));
+        if(my_request)
+        {
+    	    my_request->getParent()->warning(QString("httpresponse could not open (permissions?) a "
+	                                               "file it was asked to send: %1")
+	                                       .arg(file_path.local8Bit()));
+	    }
         setError(404);
         return;
     }
     
     if(!the_file.at(skip))
     {
-	    my_request->getParent()->warning(QString("httpresponse could not seek in a "
-	                                           "file it was asked to send: %1")
-	                                   .arg(file_path.local8Bit()));
+        if(my_request)
+        {
+    	    my_request->getParent()->warning(QString("httpresponse could not seek in a "
+	                                               "file it was asked to send: %1")
+	                                       .arg(file_path.local8Bit()));
+	    }
         setError(404);
         the_file.close();
         return;
@@ -451,6 +481,21 @@ void HttpResponse::sendFile(QString file_path, int skip)
     {
         payload.insert(payload.end(), buf, buf + len);
 		len = the_file.readBlock(buf, 10000);
+		if(my_request)
+		{
+    		if(!my_request->getParent()->keepGoing())
+	    	{
+		        //
+		        //  Oh crap, we're shutting down
+		        //
+
+                my_request->getParent()->log("httpresponse aborted preparing a file to send because it thinks its time to shut down", 6);
+		        payload.clear();
+		        setError(500);
+		        the_file.close();
+		        return;
+		    }
+		}
     }
     the_file.close();
     

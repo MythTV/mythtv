@@ -32,6 +32,7 @@ class ServiceRequestThread : public QThread
     QWaitCondition          wait_condition;
     bool                    do_stuff;
     bool                    keep_going;
+    QMutex                  keep_going_mutex;
 };
 
 

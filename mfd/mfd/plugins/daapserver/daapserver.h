@@ -9,6 +9,11 @@
 	Headers for the daap server
 */
 
+#include <iostream>
+using namespace std; 
+
+#include <qvaluelist.h>
+
 #include "mfd_plugin.h"
 
 struct httpd;
@@ -26,7 +31,7 @@ class DaapServer: public MFDHttpPlugin
     DaapServer(MFD *owner, int identity);
     ~DaapServer();
 
-    void    handleIncoming(HttpRequest *request);
+    void    handleIncoming(HttpRequest *request, int client_id);
     void    parsePath(HttpRequest *http_request, DaapRequest *daap_request);
     void    sendServerInfo(HttpRequest *http_request);
     void    sendTag(HttpRequest *http_request, const Chunk& c);
@@ -48,7 +53,8 @@ class DaapServer: public MFDHttpPlugin
     QString service_name;
 
     uint metadata_audio_generation;
-    
+
+    QValueList<int> hanging_updates;
 };
 
 #endif  // daapserver_h_

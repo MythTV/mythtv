@@ -74,6 +74,7 @@ class MFDBasePlugin : public QThread
     virtual void sendMessage(const QString &message);
     virtual void huh(const QStringList &tokens, int socket_identifier);
     void         setName(const QString &a_name);
+    bool         keepGoing();
     
 
   protected:
@@ -205,9 +206,8 @@ class MFDHttpPlugin : public MFDServicePlugin
     MFDHttpPlugin(MFD *owner, int identifier, int port);
     ~MFDHttpPlugin();
 
-    void            run();
     virtual void    processRequest(MFDServiceClientSocket *a_client);
-    virtual void    handleIncoming(HttpRequest *request);
+    virtual void    handleIncoming(HttpRequest *request, int client_id);
     virtual void    sendResponse(int client_id, HttpResponse *http_response);
 };
 

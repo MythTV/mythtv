@@ -112,6 +112,16 @@ void MFDBasePlugin::setName(const QString &a_name)
     name = a_name;
 }
 
+bool MFDBasePlugin::keepGoing()
+{
+    bool return_value;
+    keep_going_mutex.lock();
+        return_value = keep_going;
+    keep_going_mutex.unlock();
+    
+    return return_value;
+}
+
 MFDBasePlugin::~MFDBasePlugin()
 {
 }
@@ -251,7 +261,12 @@ MFDServicePlugin::MFDServicePlugin(MFD *owner, int identifier, int port, bool l_
 
 void MFDServicePlugin::run()
 {
-    initServerSocket();
+    if(!initServerSocket())
+    {
+        warning(QString("%1 plugin could not init its server socker on port %2")
+                .arg(name)
+                .arg(port_number));
+    }
 
     while(keep_going)
     {
@@ -263,6 +278,7 @@ void MFDServicePlugin::run()
         updateSockets();
         waitForSomethingToHappen();
     }
+
 }
 
 
@@ -719,17 +735,51 @@ MFDServicePlugin::~MFDServicePlugin()
         }
     }
     
+    //
+    //  Make sure we have a lock on the client sockets, and then close them
+    //
 
+    client_sockets_mutex.lock();
+        QPtrListIterator<MFDServiceClientSocket> iterator(client_sockets);
+        MFDServiceClientSocket *a_client;
+        while ( (a_client = iterator.current()) != 0 )
+        {
+            ++iterator;
+            a_client->lockWriteMutex();
+                    
+                //
+                //  ah, all ours
+                //
+                    
+                a_client->flush();
+                a_client->close();
+            a_client->unlockWriteMutex();
+
+        }
+
+
+        //
+        //  They're all closed, get rid of them
+        //    
+
+        client_sockets.clear();
+
+    client_sockets_mutex.unlock();
+
+    //
+    //  Wipe out the server socket
+    //
 
     if(core_server_socket)
     {
+        core_server_socket->flush();
+        core_server_socket->close();
         delete core_server_socket;
         core_server_socket = NULL;
     }
     
-    client_sockets.clear();
 
-    
+
 }
 
 
@@ -745,34 +795,8 @@ MFDServicePlugin::~MFDServicePlugin()
 MFDHttpPlugin::MFDHttpPlugin(MFD *owner, int identifier, int port)
                  :MFDServicePlugin(owner, identifier, port)
 {
-    initServerSocket();
 }
 
-
-MFDHttpPlugin::~MFDHttpPlugin()
-{
-    if(core_server_socket)
-    {
-        delete core_server_socket;
-        core_server_socket = NULL;
-    }
-    
-    client_sockets.clear();
-}
-
-void MFDHttpPlugin::run()
-{
-    while(keep_going)
-    {
-
-        //
-        //  Update the status of our sockets.
-        //
-        
-        updateSockets();
-        waitForSomethingToHappen();
-    }
-}
 
 void MFDHttpPlugin::processRequest(MFDServiceClientSocket *a_client)
 {
@@ -817,7 +841,7 @@ void MFDHttpPlugin::processRequest(MFDServiceClientSocket *a_client)
             //  in any actual plugin
             //
             
-            handleIncoming(new_request);
+            handleIncoming(new_request, client_id);
             if(new_request->sendResponse())
             {
                 sendResponse(client_id, new_request->getResponse());
@@ -828,7 +852,7 @@ void MFDHttpPlugin::processRequest(MFDServiceClientSocket *a_client)
 }
 
 
-void MFDHttpPlugin::handleIncoming(HttpRequest *)
+void MFDHttpPlugin::handleIncoming(HttpRequest *, int)
 {
     warning(QString("%1 plugin called base class handleRequest()")
             .arg(name));
@@ -867,3 +891,8 @@ void MFDHttpPlugin::sendResponse(int client_id, HttpResponse *http_response)
 
     a_client->unlockWriteMutex();
 }
+
+MFDHttpPlugin::~MFDHttpPlugin()
+{
+}
+

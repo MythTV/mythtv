@@ -18,9 +18,6 @@
 #include "mcc_bitfield.h"
 
 
-#include <iostream>
-using namespace std;
-
 #include "daaplib/tagoutput.h"
 #include "daaplib/registry.h"
 
@@ -61,7 +58,7 @@ DaapServer::DaapServer(MFD *owner, int identity)
 }
 
 
-void DaapServer::handleIncoming(HttpRequest *http_request)
+void DaapServer::handleIncoming(HttpRequest *http_request, int client_id)
 {
     metadata_audio_generation = parent->getMetadataAudioGeneration();
 
@@ -106,7 +103,7 @@ void DaapServer::handleIncoming(HttpRequest *http_request)
 
 
     //
-    //  IF we've made it this far, then we have a logged in client, so we
+    //  If we've made it this far, then we have a logged in client, so we
     //  should be able to parse the request to get session ID, etc.
     //
 
@@ -180,8 +177,15 @@ void DaapServer::handleIncoming(HttpRequest *http_request)
             //  music does change, we have some way to push back the update
             //
             
-            //  FIX            
             http_request->sendResponse(false);
+            if(http_request->getHeader("Connection") == "close")
+            {
+                warning("daapserver has a hanging /update request, but the client set Connection header to close??");
+            }
+            else
+            {
+                hanging_updates.append(client_id);
+            }
         }
     }
 
@@ -1079,4 +1083,25 @@ void DaapServer::sendContainer(HttpRequest *http_request, u32 container_id, int 
 
 DaapServer::~DaapServer()
 {
+    //
+    //  Tell any clients that are hanging on an /update that we're going
+    //  away
+    //
+    
+    //
+    //  Not really sure what iTunes says when it is going away, we send a 404
+    //  FIX when daapclient is working well enough that we can find out what
+    //  iTunes sends
+    //
+        
+    HttpResponse *going_away_response = new HttpResponse(NULL);
+    going_away_response->setError(404);
+
+    QValueList<int>::iterator it;
+    for(it = hanging_updates.begin(); it != hanging_updates.end(); ++it ) 
+    {
+        sendResponse((*it), going_away_response);
+    }
+    
+    delete going_away_response;    
 }

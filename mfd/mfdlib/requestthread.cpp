@@ -44,7 +44,9 @@ void ServiceRequestThread::killMe()
     //  Turn off the keep_going flag, so we will exit.
     //
     
-    keep_going = false;
+    keep_going_mutex.lock();
+        keep_going = false;
+    keep_going_mutex.unlock();
     wait_condition.wakeOne();
 }
 
@@ -53,7 +55,7 @@ void ServiceRequestThread::run()
     //
     //  Deceptively simple. Only because this is very closely based on the
     //  thread pool from mythbackend mainserver.cpp, which has been well
-    //  though out.
+    //  thought out.
     //
 
     while (keep_going)
