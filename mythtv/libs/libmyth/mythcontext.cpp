@@ -51,6 +51,11 @@ class MythContextPrivate
    ~MythContextPrivate();
 
     void Init(bool gui);
+    bool IsWideMode() const {return (m_baseWidth == 1280);}
+    void SetWideMode() {m_baseWidth = 1280; m_baseHeight = 720;}
+    bool IsSquareMode() const {return (m_baseWidth == 800);}
+    void SetSquareMode() {m_baseWidth = 800; m_baseHeight = 600;}
+
 
     void LoadLogSettings(void);
     void LoadDatabaseSettings(bool reload);
@@ -81,7 +86,8 @@ class MythContextPrivate
 
     int m_xbase, m_ybase;
     int m_height, m_width;
-
+    int m_baseWidth, m_baseHeight;
+    
     QString m_localhostname;
 
     QMutex serverSockLock;
@@ -126,6 +132,8 @@ class MythContextPrivate
     QWaitCondition m_priv_queued;
 };
 
+
+
 MythContextPrivate::MythContextPrivate(MythContext *lparent)
 {
     pluginmanager = NULL;
@@ -166,6 +174,8 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
 
     m_db = QSqlDatabase::addDatabase("QMYSQL3", "MythContext");
     screensaver = ScreenSaverControl::get();
+    m_baseHeight = 600;
+    m_baseWidth = 800;
 }
 
 void MythContextPrivate::Init(bool gui)
@@ -825,9 +835,21 @@ void MythContext::LoadQtConfig(void)
     if (style != "")
         qApp->setStyle(style);
 
-    QString themename = GetSetting("Theme");
+    QString themename = GetSetting("Theme");    
     QString themedir = FindThemeDir(themename);
     
+    if (themename.contains("-wide", false))
+    {
+        VERBOSE( VB_ALL, QString("Switching to wide mode (%1)").arg(themename));
+        d->SetWideMode();
+    }
+    else
+    {
+        VERBOSE( VB_ALL, QString("Switching to square mode (%1)").arg(themename));
+        d->SetSquareMode();
+    }
+
+        
     d->m_themepathname = themedir + "/";
     
     themedir += "/qtlook.txt";
@@ -945,7 +967,7 @@ void MythContext::CacheThemeImages(void)
 {
     QString baseDir = d->m_installprefix + "/share/mythtv/themes/default/";
 
-    if (d->m_screenwidth == 800 && d->m_screenheight == 600)
+    if (d->m_screenwidth == d->m_baseWidth && d->m_screenheight == d->m_baseHeight)
         return;
 
     CacheThemeImagesDirectory(d->m_themepathname);
@@ -1117,8 +1139,8 @@ void MythContext::InitializeScreenSettings()
         height = 480;
     }
 
-    d->m_wmult = width / 800.0;
-    d->m_hmult = height / 600.0;
+    d->m_wmult = width / (float)d->m_baseWidth;
+    d->m_hmult = height / (float)d->m_baseHeight;
     d->m_screenwidth = width;   
     d->m_screenheight = height;
 
@@ -1572,7 +1594,7 @@ QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
 
     GetScreenSettings(width, wmult, height, hmult);
 
-    if (width != 800 || height != 600)
+    if (width != d->m_baseWidth || height != d->m_baseHeight)
     {
         QImage tmpimage;
 
@@ -1660,7 +1682,7 @@ QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache)
 
     GetScreenSettings(width, wmult, height, hmult);
 
-    if (width != 800 || height != 600)
+    if (width != d->m_baseWidth || height != d->m_baseHeight)
     {           
         QImage tmpimage;
 
@@ -2185,4 +2207,3 @@ bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
         return d->WriteSettingsFile(params, true);
     return true;
 }
-    
