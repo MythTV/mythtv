@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-01-26, v1.083
+<date>2003-01-29, v1.084
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -316,11 +316,15 @@ id="Setting_up_paths">
 <p>There are some paths that need to be modified before starting the main
 compile of MythTV, otherwise you will get errors.
 
-<sect1>Distribution-specific information. <label
-id="Distribution-specific_information">
-<sect2>Mandrake 9.0
-<p>As root, create the following file in <tt>/etc/profile.d</tt>  On my system
-I call it "mythtv.sh".
+<tt>QTDIR</tt> needs to be set, and <tt>/usr/lib/qt3/bin</tt> must be added
+to your path.
+
+The following instructions work for Mandrake 9.0 using <tt>bash</tt> as the
+shell, and may be applicable for a distribution which uses
+<tt>/etc/profile.d</tt>.
+
+As root, create the following file in <tt>/etc/profile.d</tt>  The example
+filename is "mythtv.sh".  Use what you feel is appropriate.
 
 Open a shell, and switch to superuser mode.
 <bf>NOTE: ^D</bf> means press <bf>CTRL</bf> and <bf>d</bf> at the same time.
@@ -339,6 +343,9 @@ $ exit
 </verb></tscreen>
 The last two commands are to exit out of the shell.  This way, when you next
 open a shell your new commands will take effect.
+
+<sect1>Distribution-specific information. <label
+id="Distribution-specific_information">
 
 <sect2>Red Hat Linux 8.0 <label id="RH80-LANG">
 <!-- Content submitted by Michael D. Cencula" <mike@cencula.com> -->
@@ -363,7 +370,7 @@ $ exit
 </verb></tscreen>
 
 <sect1>Checking that it worked. <label id="Checking_that_it_worked">
-<p>Open a shell and switch to superuser mode.
+<p>Open a new shell and switch to superuser mode.
 <tscreen><verb>
 $ su
 # set
@@ -373,6 +380,10 @@ QTDIR=/usr/lib/qt3
 PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
 </verb></tscreen>
 You should see QTDIR and the path changes you made.
+
+If you don't, do not proceed past this step until you have resolved this
+error.  You may need to manually specify the QTDIR and PATH at the shell
+prompt before compiling.
 
 Next, we need to make sure that the libraries that we're building will be
 found when we need them.
@@ -479,6 +490,7 @@ $ ./configure
 $ make
 $ su
 # make install
+# /sbin/ldconfig
 # exit
 $ 
 </verb></tscreen>
@@ -2083,6 +2095,12 @@ You may also want to ensure that <tt>/dev/dsp</tt> hasn't already been
 grabbed by another process, like <bf>esd</bf> or <bf>artsd</bf>.  If
 <tt>/dev/dsp</tt> isn't available, then MythTV won't work.  Check your
 windowmanager documentation for instructions on disabling the sound manager.
+If you wish to see what application is grabbing a resource, you can use the
+<tt>fuser</tt> command:
+<tscreen><verb>
+# fuser -v /dev/dsp
+</verb></tscreen>
+
 
 If you're using multiple sound cards and multiple tuners, use <tt>alsamixer
 -c 1</tt> to work with the second sound card.  The first card is #0, the
@@ -2144,6 +2162,47 @@ Style "myth*"      NoTitle, NoHandles, Sticky, WindowListSkip, BorderWidth 0
 ^D
 $
 </verb></tscreen>
+
+<sect1>What resolution should I use?
+<!-- Lots of the following is from a Bruce Markey mailto:bjm@lvcm.com post
+to the mailing list, 2003-01-21. -->
+<p>While MythTV allows you to set various GUI and capture resolutions, not
+all combinations make sense.
+
+First, analog video signals have a defined vertical resolution.  In NTSC,
+the video standard specifies that there are 525 vertical scan lines.  Once
+the "extra" lines are removed (they're used to synchronize the video signal,
+and encode closed captioning data), you have 480 vertical lines.
+
+In PAL, there are 625 "raw" lines of resolution, with a net of 576 vertical
+lines.
+
+Horizontally, the maximum you can expect from a Bt8X8 chip is 720.
+
+With this in mind, there are certain commonly accepted values for
+resolution.  While other values may be accepted, they will cause scan lines
+to be repeated or dropped.
+
+From "best" to "worst", in NTSC:
+<itemize>
+<item>720x480 (but more commonly, 704x480.  "DVD" resolution)
+<item>640x480 4:3
+<item>480x480 (Video CD resolution)
+<item>352x480 (ReplayTV "Standard" quality)
+<item>320x480 
+<item>480x240 
+<item>352x240 
+<item>320x240
+</itemize>
+
+As you can see, the lower quality values are half of the better ones. 
+720x240 is possible, but isn't a good tradeoff relative to the number of
+vertical lines lost.
+
+The higher resolutions will be more CPU intensive.
+
+As an example, if you are capturing at 640x480, you may wish to run X
+Windows and the MythTV GUI at 640x480.
 
 <sect1>I'd like to delete the mysql database.
 <p><bf>NOTE</bf>:  Performing this step will remove the entire database. 
@@ -2362,6 +2421,9 @@ to use KDE vs. Gnome for RH8.
 v1.081, 2003-01-20.  Fixed XMLTV version error (Darren Mak)
 v1.082, 2003-01-24.  Added help for MDK 9.0 mysql startup.
 v1.083, 2003-01-26.  Fixed link to webcvs in section 1.  (Cedar McKay)
+v1.084, 2003-01-29.  Modified section 4 to make it a little clearer. 
+Modified libexpat instructions.  Added fuser for /dev/dsp.  Added resolution
+hints.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

@@ -71,7 +71,41 @@ $
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss18.4">18.4</A> <A HREF="mythtv-HOWTO.html#toc18.4">I'd like to delete the mysql database.</A>
+<H2><A NAME="ss18.4">18.4</A> <A HREF="mythtv-HOWTO.html#toc18.4">What resolution should I use?</A>
+</H2>
+
+<P>While MythTV allows you to set various GUI and capture resolutions, not
+all combinations make sense.</P>
+<P>First, analog video signals have a defined vertical resolution.  In NTSC,
+the video standard specifies that there are 525 vertical scan lines.  Once
+the "extra" lines are removed (they're used to synchronize the video signal,
+and encode closed captioning data), you have 480 vertical lines.</P>
+<P>In PAL, there are 625 "raw" lines of resolution, with a net of 576 vertical
+lines.</P>
+<P>Horizontally, the maximum you can expect from a Bt8X8 chip is 720.</P>
+<P>With this in mind, there are certain commonly accepted values for
+resolution.  While other values may be accepted, they will cause scan lines
+to be repeated or dropped.</P>
+<P>From "best" to "worst", in NTSC:
+<UL>
+<LI>720x480 (but more commonly, 704x480.  "DVD" resolution)</LI>
+<LI>640x480 4:3</LI>
+<LI>480x480 (Video CD resolution)</LI>
+<LI>352x480 (ReplayTV "Standard" quality)</LI>
+<LI>320x480 </LI>
+<LI>480x240 </LI>
+<LI>352x240 </LI>
+<LI>320x240</LI>
+</UL>
+</P>
+<P>As you can see, the lower quality values are half of the better ones. 
+720x240 is possible, but isn't a good tradeoff relative to the number of
+vertical lines lost.</P>
+<P>The higher resolutions will be more CPU intensive.</P>
+<P>As an example, if you are capturing at 640x480, you may wish to run X
+Windows and the MythTV GUI at 640x480.</P>
+
+<H2><A NAME="ss18.5">18.5</A> <A HREF="mythtv-HOWTO.html#toc18.5">I'd like to delete the mysql database.</A>
 </H2>
 
 <P><B>NOTE</B>:  Performing this step will remove the entire database. 
@@ -87,7 +121,7 @@ mysql> quit
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss18.5">18.5</A> <A HREF="mythtv-HOWTO.html#toc18.5">I'd like to start using the development version of MythTV.</A>
+<H2><A NAME="ss18.6">18.6</A> <A HREF="mythtv-HOWTO.html#toc18.6">I'd like to start using the development version of MythTV.</A>
 </H2>
 
 <P>[Content under development]</P>

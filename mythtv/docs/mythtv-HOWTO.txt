@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-01-26, v1.083
+  2003-01-29, v1.084
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -28,8 +28,7 @@
 
   4. Setting up paths, ldconfig and other shell variables.
      4.1 Distribution-specific information.
-        4.1.1 Mandrake 9.0
-        4.1.2 Red Hat Linux 8.0
+        4.1.1 Red Hat Linux 8.0
      4.2 Checking that it worked.
      4.3 Modifying /etc/ld.so.conf
 
@@ -116,8 +115,9 @@
      18.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
      18.2 I'd like to use some other window manager.
      18.3 I'd like MythTV to automatically startup.
-     18.4 I'd like to delete the mysql database.
-     18.5 I'd like to start using the development version of MythTV.
+     18.4 What resolution should I use?
+     18.5 I'd like to delete the mysql database.
+     18.6 I'd like to start using the development version of MythTV.
 
   ______________________________________________________________________
 
@@ -448,12 +448,15 @@
   There are some paths that need to be modified before starting the main
   compile of MythTV, otherwise you will get errors.
 
-  [1m4.1.  Distribution-specific information.[0m
+  QTDIR needs to be set, and /usr/lib/qt3/bin must be added to your
+  path.
 
-  [1m4.1.1.  Mandrake 9.0[0m
+  The following instructions work for Mandrake 9.0 using bash as the
+  shell, and may be applicable for a distribution which uses
+  /etc/profile.d.
 
-  As root, create the following file in /etc/profile.d  On my system I
-  call it "mythtv.sh".
+  As root, create the following file in /etc/profile.d  The example
+  filename is "mythtv.sh".  Use what you feel is appropriate.
 
   Open a shell, and switch to superuser mode.  [1mNOTE: ^D [22mmeans press [1mCTRL[0m
   and [1md [22mat the same time.
@@ -471,7 +474,10 @@
 
   The last two commands are to exit out of the shell.  This way, when
   you next open a shell your new commands will take effect.
-  [1m4.1.2.  Red Hat Linux 8.0[0m
+
+  [1m4.1.  Distribution-specific information.[0m
+
+  [1m4.1.1.  Red Hat Linux 8.0[0m
 
   Red Hat Linux 8.0 uses an unusual character encoding scheme which
   causes problems when running certain programs. As a result, whenever
@@ -494,7 +500,7 @@
 
   [1m4.2.  Checking that it worked.[0m
 
-  Open a shell and switch to superuser mode.
+  Open a new shell and switch to superuser mode.
 
        $ su
        # set
@@ -505,6 +511,10 @@
 
   You should see QTDIR and the path changes you made.
 
+  If you don't, do not proceed past this step until you have resolved
+  this error.  You may need to manually specify the QTDIR and PATH at
+  the shell prompt before compiling.
+
   Next, we need to make sure that the libraries that we're building will
   be found when we need them.
 
@@ -512,14 +522,14 @@
 
   Switch to /etc and execute the following:
 
-       # cd /etc
-       # cat >> ld.so.conf
-       /usr/local/lib
-       ^D
+  # cd /etc
+  # cat >> ld.so.conf
+  /usr/local/lib
+  ^D
 
-       # /sbin/ldconfig
-       # exit
-       $
+  # /sbin/ldconfig
+  # exit
+  $
 
   [1mNOTE[22m:  It appears that Red Hat Linux 8.0 requires that the [1mldconfig[0m
   command needs to be run twice. Red Hat will also frequently "forget"
@@ -571,18 +581,18 @@
 
   Check that it worked:
 
-  # ls -l /usr/local/lib
-  -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
-  -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
-  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
-  libmp3lame.so.0.0.0*
-  lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
-  libmp3lame.so.0.0.0*
-  -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
-  libmp3lame.so.0.0.0*
+       # ls -l /usr/local/lib
+       -rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
+       -rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
+       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
+       libmp3lame.so.0.0.0*
+       lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
+       libmp3lame.so.0.0.0*
+       -rwxr-xr-x    1 root     root       360197 Nov  4 14:22
+       libmp3lame.so.0.0.0*
 
-  # exit
-  $
+       # exit
+       $
 
   [1m5.3.  Building XMLTV.[0m
 
@@ -612,6 +622,7 @@
        $ make
        $ su
        # make install
+       # /sbin/ldconfig
        # exit
        $
 
@@ -622,8 +633,8 @@
 
   Untar the xmltv file:
 
-  $ tar -xjf xmltv-0.5.6.tar.bz2
-  $ cd xmltv-0.5.6
+       $ tar -xjf xmltv-0.5.6.tar.bz2
+       $ cd xmltv-0.5.6
 
   Install the xmltv prerequisites:
 
@@ -761,7 +772,7 @@
 
   [1m6.4.2.  Debian 3.0[0m
 
-       $ mysql < mc.sql
+  $ mysql < mc.sql
 
   [1m6.4.3.  Red Hat Linux 8.0[0m
 
@@ -873,21 +884,21 @@
 
   Install the rest of the packages:
 
-  $ cd ~
-  $ tar -xjf alsa-lib-0.9.x.tar.bz2
-  $ cd alsa-lib-0.9.x
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
-  $ cd ..
-  $ tar -xjf alsa-utils-0.9.x.tar.bz2
-  $ cd alsa-utils-0.9.x
-  $ ./configure
-  $ make
-  $ su
-  # make install
+       $ cd ~
+       $ tar -xjf alsa-lib-0.9.x.tar.bz2
+       $ cd alsa-lib-0.9.x
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
+       $ cd ..
+       $ tar -xjf alsa-utils-0.9.x.tar.bz2
+       $ cd alsa-utils-0.9.x
+       $ ./configure
+       $ make
+       $ su
+       # make install
 
   Next, you must edit /etc/modules.conf so that the ALSA modules are
   loaded automatically. The first step is to remove your old OSS
@@ -926,6 +937,7 @@
   the mixer settings won't get restored the next time you boot unless
   you ran the shutdown script or you've explicitly saved the state which
   you can do as root with:
+
        # alsactl -f /etc/asound.state store
 
   Reboot your machine.  Login and adjust the sound levels using
@@ -978,6 +990,7 @@
   Some IR devices require a kernel recompile, and some don't. However,
   all at least require having the kernel source available as a resource
   for the lirc build process.
+
   [1m8.1.  Gentoo[0m
 
   To install lirc on Gentoo, all you need to do is:
@@ -1017,10 +1030,10 @@
   package you installed in section 3.2. Ensure that a symlink has been
   created:
 
-       $ cd /usr/src
-       $ su
-       # ln -s linux-2.4.18-x.x.x linux
-       # exit
+  $ cd /usr/src
+  $ su
+  # ln -s linux-2.4.18-x.x.x linux
+  # exit
 
   [1m8.4.  Obtaining and compiling lirc.[0m
 
@@ -1076,11 +1089,11 @@
   For the impatient: Make sure you have an emergency floppy boot disk
   available!
 
-  $ cd /usr/src/linux
-  $ su
-  # make mrproper
-  # cd configs
-  # ls
+       $ cd /usr/src/linux
+       $ su
+       # make mrproper
+       # cd configs
+       # ls
 
   at this point you must look at the file names and determine which
   config file is right for you. For instance if you have an Athlon XP
@@ -1122,7 +1135,7 @@
   /etc/modules.conf file. Add this line as the first thing in the file.
   It must come first, or it may not work.
 
-       alias char-major-61 XXX
+  alias char-major-61 XXX
 
   replace XXX with the name which you determined earlier, which in this
   example was "lirc_serial"
@@ -2175,7 +2188,10 @@
   You may also want to ensure that /dev/dsp hasn't already been grabbed
   by another process, like [1mesd [22mor [1martsd[22m.  If /dev/dsp isn't available,
   then MythTV won't work.  Check your windowmanager documentation for
-  instructions on disabling the sound manager.
+  instructions on disabling the sound manager.  If you wish to see what
+  application is grabbing a resource, you can use the fuser command:
+
+       # fuser -v /dev/dsp
 
   If you're using multiple sound cards and multiple tuners, use
   alsamixer -c 1 to work with the second sound card.  The first card is
@@ -2210,11 +2226,11 @@
 
   Download the source to MPlayer and patch:
 
-  $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
-  $ tar -xjf MPlayer-0.90rc1.tar.bz2
-  $ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
-  $ cd MPlayer-0.90rc1
-  $ patch -p1 < mplayer-0.90pre10+mythtv.patch
+       $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
+       $ tar -xjf MPlayer-0.90rc1.tar.bz2
+       $ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
+       $ cd MPlayer-0.90rc1
+       $ patch -p1 < mplayer-0.90pre10+mythtv.patch
 
   At this point, you can read the MPlayer documentation and start the
   compile process.
@@ -2239,7 +2255,54 @@
        ^D
        $
 
-  [1m18.4.  I'd like to delete the mysql database.[0m
+  [1m18.4.  What resolution should I use?[0m
+
+  While MythTV allows you to set various GUI and capture resolutions,
+  not all combinations make sense.
+
+  First, analog video signals have a defined vertical resolution.  In
+  NTSC, the video standard specifies that there are 525 vertical scan
+  lines.  Once the "extra" lines are removed (they're used to
+  synchronize the video signal, and encode closed captioning data), you
+  have 480 vertical lines.
+
+  In PAL, there are 625 "raw" lines of resolution, with a net of 576
+  vertical lines.
+
+  Horizontally, the maximum you can expect from a Bt8X8 chip is 720.
+
+  With this in mind, there are certain commonly accepted values for
+  resolution.  While other values may be accepted, they will cause scan
+  lines to be repeated or dropped.
+
+  From "best" to "worst", in NTSC:
+
+  +o  720x480 (but more commonly, 704x480.  "DVD" resolution)
+
+  +o  640x480 4:3
+
+  +o  480x480 (Video CD resolution)
+
+  +o  352x480 (ReplayTV "Standard" quality)
+
+  +o  320x480
+
+  +o  480x240
+
+  +o  352x240
+
+  +o  320x240
+
+  As you can see, the lower quality values are half of the better ones.
+  720x240 is possible, but isn't a good tradeoff relative to the number
+  of vertical lines lost.
+
+  The higher resolutions will be more CPU intensive.
+
+  As an example, if you are capturing at 640x480, you may wish to run X
+  Windows and the MythTV GUI at 640x480.
+
+  [1m18.5.  I'd like to delete the mysql database.[0m
 
   [1mNOTE[22m:  Performing this step will remove the entire database.  You will
   lose all of your settings and will need to re-run the mc.sql script to
@@ -2249,7 +2312,7 @@
        mysql> drop database mythconverg;
        mysql> quit
 
-  [1m18.5.  I'd like to start using the development version of MythTV.[0m
+  [1m18.6.  I'd like to start using the development version of MythTV.[0m
 
   [Content under development]
 
@@ -2259,6 +2322,7 @@
 
   [1mTHERE IS NO GUARANTEE THAT THESE INSTRUCTIONS WILL WORK.  USE AT YOUR[0m
   [1mOWN RISK.[0m
+
   Here are some of the features in version 0.8:
 
   +o  A front-end and back-end system.  The back-end is responsible for
@@ -2272,7 +2336,6 @@
   +o  GUI-based configuration.  Much of the configuration of MythTV can
      now be done using a GUI-based setup, avoiding the necessity to edit
      the settings.txt file.
-
   +o  Themes.  MythTV now has more themes for the user to choose from.
 
   +o  Recording profiles.  You may now setup various encoder profiles
@@ -2326,7 +2389,6 @@
   You should see the connection established between the front-end and
   back-end systems by examining the mythbackend window; it will display
   the client connection attempts.
-
   The cvs version of MythTV now supports pressing the ESC key to exit
   the application.  If you wish to configure MythTV to exit on ESC, go
   to the mythfrontend setup screen (not the setup program used to
