@@ -71,7 +71,7 @@ class MythEvent : public QCustomEvent
     QString extradata;
 };
 
-#define MYTH_BINARY_VERSION "0.13.11272003-1"
+#define MYTH_BINARY_VERSION "0.13.11282003-1"
 
 extern int print_verbose_messages;
 
