@@ -110,6 +110,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
     audio_channels = 2;
     audio_samplerate = 44100;
     audio_bytes_per_sample = audio_channels * audio_bits / 8;
+    audio_buffer_unused = 0;
 
     editmode = false;
     advancevideo = resetvideo = advancedecoder = false;
@@ -328,6 +329,14 @@ void NuppelVideoPlayer::InitSound(void)
     }
 
     audio_bytes_per_sample = audio_channels * audio_bits / 8;
+
+    audio_buf_info info;
+    ioctl(audiofd, SNDCTL_DSP_GETOSPACE, &info);
+
+    audio_buffer_unused = info.bytes - audio_bytes_per_sample * 
+                          audio_samplerate / 10;
+    if(audio_buffer_unused < 0)
+       audio_buffer_unused = 0;
 
     if (ioctl(audiofd, SNDCTL_DSP_GETCAPS, &caps) >= 0 && 
         !(caps & DSP_CAP_REALTIME))
@@ -1693,7 +1702,8 @@ void NuppelVideoPlayer::OutputAudioLoop(void)
     int bytesperframe;
     int space_on_soundcard;
     unsigned char zeros[1024];
-    
+    audio_buf_info info;   
+ 
     bzero(zeros, 1024);
 
     while (!eof && !killaudio)
@@ -1706,14 +1716,39 @@ void NuppelVideoPlayer::OutputAudioLoop(void)
             audio_actually_paused = true;
             //usleep(50);
             audiotime = 0; // mark 'audiotime' as invalid.
-            WriteAudio(zeros, 1024);
+
+            ioctl(audiofd, SNDCTL_DSP_GETOSPACE, &info);
+            space_on_soundcard = info.bytes - audio_buffer_unused;
+
+            if (1024 < space_on_soundcard)
+            {
+                WriteAudio(zeros, 1024);
+            }
+            else
+            {
+             //printf("waiting for space to write 1024 zeros on soundcard which has %d bytes free\n",space_on_soundcard);
+                usleep(50);
+            }
+
             continue;
 	}    
 	
         if (prebuffering)
         {
 	    audiotime = 0; // mark 'audiotime' as invalid
-	    WriteAudio(zeros, 1024);
+
+            ioctl(audiofd, SNDCTL_DSP_GETOSPACE, &info);
+            space_on_soundcard = info.bytes - audio_buffer_unused;
+
+            if (1024 < space_on_soundcard)
+            {
+                WriteAudio(zeros, 1024);
+            }
+            else
+            {
+             //printf("waiting for space to write 1024 zeros on soundcard which has %d bytes free\n",space_on_soundcard);
+                usleep(50);
+            }
 
 	    //printf("audio thread waiting for prebuffer\n");
 	    continue;
@@ -1740,11 +1775,11 @@ void NuppelVideoPlayer::OutputAudioLoop(void)
 	
         audio_buf_info info;
         ioctl(audiofd, SNDCTL_DSP_GETOSPACE, &info);
-        space_on_soundcard = info.bytes;
+        space_on_soundcard = info.bytes - audio_buffer_unused;
 
         if (bytesperframe > space_on_soundcard)
         {
-            //printf("waiting for space on soundcard\n");
+            //printf("waiting for space to write %d bytes on soundcard whish has %d bytes free\n", bytesperframe, space_on_soundcard);
             usleep(200);
             continue;
         }

@@ -211,6 +211,7 @@ class NuppelVideoPlayer
     int audio_bits;
     int audio_bytes_per_sample;
     int audio_samplerate;
+    int audio_buffer_unused;
     int filesize;
     int startpos;
 
