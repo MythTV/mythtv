@@ -12,12 +12,12 @@ using namespace std;
 #include "playbackbox.h"
 #include "viewscheduled.h"
 #include "themesetup.h"
+#include "globalsettings.h"
+#include "recordingprofile.h"
 
 #include "libmyth/themedmenu.h"
 #include "libmyth/programinfo.h"
 #include "libmyth/mythcontext.h"
-#include "libmyth/recordingprofile.h"
-#include "libmyth/globalsettings.h"
 
 QMap<int, TV *> tvList;
 ThemedMenu *menu;
@@ -189,21 +189,6 @@ void themesSettings(MythContext *context)
     menu->ReloadTheme();
 }
 
-void recordingSettings(MythContext* context)
-{
-    RecordingProfileEditor editor(context, NULL, QSqlDatabase::database());
-
-    editor.show();
-    editor.exec();
-}
-
-void generalSettings(MythContext* context)
-{
-    GlobalSettings settings;
-
-    settings.exec(QSqlDatabase::database());
-}
-
 void TVMenuCallback(void *data, QString &selection)
 {
     MythContext *context = (MythContext *)data;
@@ -222,10 +207,17 @@ void TVMenuCallback(void *data, QString &selection)
         startManaged(context);
     else if (sel == "settings themes")
         themesSettings(context);
-    else if (sel == "settings recording")
-      recordingSettings(context);
-    else if (sel == "settings general")
-      generalSettings(context);
+    else if (sel == "settings recording") {
+        RecordingProfileEditor editor(context, NULL, QSqlDatabase::database());
+        editor.show();
+        editor.exec();
+    } else if (sel == "settings general") {
+        GeneralSettings settings;
+        settings.exec(QSqlDatabase::database());
+    } else if (sel == "settings playback") {
+        PlaybackSettings settings;
+        settings.exec(QSqlDatabase::database());
+    }
 }
 
 bool RunMenu(QString themedir, MythContext *context)

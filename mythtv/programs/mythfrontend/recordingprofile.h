@@ -1,11 +1,11 @@
 #ifndef RECORDINGPROFILE_H
 #define RECORDINGPROFILE_H
 
-#include "settings.h"
+#include "libmyth/settings.h"
+#include "libmyth/mythcontext.h"
 #include <qlistview.h>
 #include <qdialog.h>
 #include <vector>
-#include "mythcontext.h"
 
 class RecordingProfile;
 

@@ -1,8 +1,8 @@
-#ifndef GLOBALSETTINGS_H
-#define GLOBALSETTINGS_H
+#ifndef MYTHSETTINGS_H
+#define MYTHSETTINGS_H
 
-#include "settings.h"
-#include "mythcontext.h"
+#include "libmyth/settings.h"
+#include "libmyth/mythcontext.h"
 
 class GlobalSetting: public SimpleDBStorage, virtual public Configurable {
 public:
@@ -292,38 +292,56 @@ public:
     };
 };
 
-class GlobalSettings: virtual public ConfigurationDialog,
-                      virtual public VerticalConfigurationGroup {
+class PlaybackSettings: virtual public ConfigurationWizard {
 public:
-    GlobalSettings() {
+    PlaybackSettings() {
+        VerticalConfigurationGroup* general = new VerticalConfigurationGroup();
+        general->setLabel("General playback");
+        general->addChild(new AudioOutputDevice());
+        general->addChild(new Deinterlace());
+        general->addChild(new FastForwardAmount());
+        general->addChild(new RewindAmount());
+        general->addChild(new StickyKeys());
+        general->addChild(new ExactSeeking());
+        general->addChild(new VertScanMode());
+        general->addChild(new HorizScanMode());
+        general->addChild(new VertScanPercentage());
+        general->addChild(new HorizScanPercentage());
+        general->addChild(new XScanDisplacement());
+        general->addChild(new YScanDisplacement());
+        addChild(general);
+
+        VerticalConfigurationGroup* osd = new VerticalConfigurationGroup();
+        osd->setLabel("On-screen display");
+        osd->addChild(new OSDDisplayTime());
+        osd->addChild(new OSDTheme());
+        osd->addChild(new OSDFont());
+        addChild(osd);
+
+        VerticalConfigurationGroup* liveTV = new VerticalConfigurationGroup();
+        liveTV->setLabel("Live TV");
+        liveTV->addChild(new BufferName());
+        liveTV->addChild(new BufferSize());
+        liveTV->addChild(new MaxBufferFill());
+        // add PIP stuff here
+        addChild(liveTV);
+
+    };
+};
+
+// Temporary dumping ground for things that have not been properly categorized yet
+class GeneralSettings: virtual public ConfigurationDialog,
+                       virtual public VerticalConfigurationGroup {
+public:
+    GeneralSettings() {
         addChild(new XMLTVGrab());
-        addChild(new BufferName());
-        addChild(new BufferSize());
-        addChild(new MaxBufferFill());
         addChild(new RecordFilePrefix());
-        addChild(new AudioOutputDevice());
-        addChild(new Deinterlace());
-        addChild(new FastForwardAmount());
-        addChild(new RewindAmount());
-        addChild(new ExactSeeking());
-        addChild(new RecordOverTime());
-        addChild(new StickyKeys());
-        addChild(new OSDDisplayTime());
-        addChild(new OSDTheme());
-        addChild(new OSDFont());
         addChild(new ChannelOrdering());
         addChild(new TunerCardInput());
         addChild(new TVFormat());
         addChild(new FreqTable());
-        addChild(new VertScanMode());
-        addChild(new HorizScanMode());
-        addChild(new VertScanPercentage());
-        addChild(new HorizScanPercentage());
-        addChild(new XScanDisplacement());
-        addChild(new YScanDisplacement());
+        addChild(new RecordOverTime());
     };
-
-    virtual void exec(QSqlDatabase* db);
 };
 
 #endif

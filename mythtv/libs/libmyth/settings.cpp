@@ -18,6 +18,7 @@
 #include <qcheckbox.h>
 #include <qwidgetstack.h>
 #include <qdialog.h>
+#include <qtabdialog.h>
 
 QWidget* VerticalConfigurationGroup::configWidget(QWidget* parent,
                                                   const char* widgetName) {
@@ -36,8 +37,7 @@ QWidget* StackedConfigurationGroup::configWidget(QWidget* parent,
                                                  const char* widgetName) {
     QWidgetStack* widget = new QWidgetStack(parent, widgetName);
 
-    unsigned i;
-    for(i = 0 ; i < children.size() ; ++i)
+    for(unsigned i = 0 ; i < children.size() ; ++i)
         widget->addWidget(children[i]->configWidget(widget, NULL), i);
 
     widget->raiseWidget(top);
@@ -47,6 +47,16 @@ QWidget* StackedConfigurationGroup::configWidget(QWidget* parent,
 
     return widget;
 }
+
+QWidget* TabbedConfigurationGroup::configWidget(QWidget* parent,
+                                                const char* widgetName) {
+    QTabDialog* widget = new QTabDialog(parent, widgetName);
+    
+    for(unsigned i = 0 ; i < children.size() ; ++i)
+        widget->addTab(children[i]->configWidget(widget), children[i]->getLabel());
+
+    return widget;
+};
 
 void StackedConfigurationGroup::raise(Configurable* child) {
     for(unsigned i = 0 ; i < children.size() ; ++i)
@@ -106,12 +116,12 @@ QWidget* SliderSetting::configWidget(QWidget* parent,
 QWidget* SpinBoxSetting::configWidget(QWidget* parent,
                                       const char* widgetName) {
 
-    QWidget* widget = new QHBox(parent, widgetName);
+    QWidget* box = new QHBox(parent, widgetName);
 
-    QLabel* label = new QLabel(widget, QString(widgetName) + "-label");
+    QLabel* label = new QLabel(box);
     label->setText(getLabel() + ":");
 
-    QSpinBox* spinbox = new MythSpinBox(widget, QString(widgetName) + "-spinbox");
+    QSpinBox* spinbox = new MythSpinBox(box);
     spinbox->setMinValue(min);
     spinbox->setMaxValue(max);
     spinbox->setLineStep(step);
@@ -120,12 +130,16 @@ QWidget* SpinBoxSetting::configWidget(QWidget* parent,
     connect(spinbox, SIGNAL(valueChanged(int)), this, SLOT(setValue(int)));
     connect(this, SIGNAL(valueChanged(int)), spinbox, SLOT(setValue(int)));
 
-    return widget;
+    return box;
 }
 
 QWidget* ComboBoxSetting::configWidget(QWidget* parent,
                                        const char* widgetName) {
-    QComboBox* widget = new MythComboBox(rw, parent, widgetName);
+    QWidget* box = new QHBox(parent, widgetName);
+
+    QLabel* label = new QLabel(box);
+    label->setText(getLabel() + ":");
+    QComboBox* widget = new MythComboBox(rw, box);
 
     for(unsigned int i = 0 ; i < labels.size() ; ++i) {
         widget->insertItem(labels[i]);
@@ -136,7 +150,7 @@ QWidget* ComboBoxSetting::configWidget(QWidget* parent,
     connect(widget, SIGNAL(highlighted(int)),
             this, SLOT(setValue(int)));
 
-    return widget;
+    return box;
 }
 
 QWidget* RadioSetting::configWidget(QWidget* parent,
@@ -176,6 +190,16 @@ QDialog* ConfigurationDialog::dialogWidget(QWidget* parent,
     layout->addWidget(configWidget(dialog));
 
     return dialog;
+}
+
+void ConfigurationDialog::exec(QSqlDatabase* db) {
+    QDialog* dialog = dialogWidget(NULL);
+    dialog->show();
+
+    if (dialog->exec() == QDialog::Accepted)
+        save(db);
+
+    delete dialog;
 }
 
 QDialog* ConfigurationWizard::dialogWidget(QWidget* parent,

@@ -149,13 +149,21 @@ protected:
     unsigned top;
 };
 
-// Displays configWidget in a modal dialog, and returns a status
+class TabbedConfigurationGroup: virtual public ConfigurationGroup {
+    Q_OBJECT
+public:
+    virtual QWidget* configWidget(QWidget* parent,
+                                  const char* widgetName = 0);
+};
+
 class ConfigurationDialog: virtual public Configurable {
 public:
+    // Make a modal dialog containing configWidget
     virtual QDialog* dialogWidget(QWidget* parent,
                                   const char* widgetName = 0);
-//     virtual QWidget* configWidget(QWidget* parent,
-//                                   const char* widgetName = 0);
+
+    // Show a dialogWidget, and save if accepted
+    virtual void exec(QSqlDatabase* db);
 };
 
 // A wizard is a group with one child per page
