@@ -775,7 +775,7 @@ void MetadataServer::doAtomicDataDelta(
     //  Lock the metadata, find the right container, and _delta_ its data. 
     //
     //  The "atomic" idea is the same as above, but here we're adding to
-    //  whats already there (for metadata, playlists are still a swap out)
+    //  whats already there
     //
 
     lockMetadata();

@@ -193,6 +193,7 @@ void MetadataContainer::dataDelta(
                                     bool rewrite_playlists
                                 )
 {
+
     //
     //  Add the new metadata
     //
@@ -369,6 +370,16 @@ void MetadataContainer::mapPlaylists(
     QIntDictIterator<Playlist> mapout_it( *current_playlists );
     for ( ; mapout_it.current(); ++mapout_it )
     {
+        //
+        //  Take note of how this playlist currently maps
+        //
+        
+        QValueList<int> old_list = mapout_it.current()->getList();
+        
+        //
+        //  Make it map out
+        //
+
         mapout_it.current()->mapDatabaseToId(
                                                 current_metadata, 
                                                 mapout_it.current()->getDbList(), 
@@ -376,6 +387,27 @@ void MetadataContainer::mapPlaylists(
                                                 current_playlists, 
                                                 0   // initial depth is 0
                                             );
+                                            
+        //
+        //  Get its new list
+        //
+        
+        QValueList<int> new_list = mapout_it.current()->getList();
+
+        //
+        //  See if the lists have changed
+        //
+        
+        if(old_list != new_list)
+        {
+            //
+            //  This goes on the list of changed/added playlists
+            //
+
+            playlist_in.push_back(mapout_it.current()->getId());
+
+        } 
+                                           
     }
                                                                 
 

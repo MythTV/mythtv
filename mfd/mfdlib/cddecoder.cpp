@@ -488,6 +488,7 @@ AudioMetadata* CdDecoder::getMetadata(int track)
     retdata->setSampleRate(44100);
     retdata->setBitrate((176400 * 8) / 1024);
     retdata->setSize(size);
+    retdata->setFormat("cda");
 
     cd_finish(cd);
     return retdata;

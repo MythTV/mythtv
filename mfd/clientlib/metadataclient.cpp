@@ -148,7 +148,11 @@ void MetadataClient::handleIncoming()
             //  Well, something is borked.
             //
             
-            cerr << "there is something seriously wrong with this metdata server" << endl;
+            cerr << "there is something seriously wrong "
+                 << "with this metdata server: \""
+                 << ip_address
+                 << "\""
+                 << endl;
             
         }
     }
@@ -1339,7 +1343,9 @@ MetadataCollection* MetadataClient::findCollection(int collection_id)
 void MetadataClient::printMetadata()
 {
     cout << "@@@@@@@@@@@@@@@@@@@ DEBUGGING OUTPUT @@@@@@@@@@@@@@@@@@@@" << endl;
-    cout << "mfd client library metadata client has " 
+    cout << "mfd client library metadata client connected to "
+         << ip_address
+         << " has " 
          << metadata_collections.count()
          << " collections. They are:"
          << endl

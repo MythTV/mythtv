@@ -318,12 +318,26 @@ void MetadataCollection::addList(MdcapInput &mdcap_input)
     }
     
     //
-    //  If we have all the right info, add a metadata list
+    //  If we have all the right info, add a metadata list and/or update an existing list
     //
     
 
     if(new_list_id > 0)
     {   
+        //
+        //  Does this list exist already?
+        //
+
+        if(playlists.find(new_list_id))
+        {
+            //
+            //  Remove the old copy
+            //
+            
+            playlists.remove(new_list_id);
+
+        }
+
         Playlist *new_playlist = new Playlist(
                                                 id,
                                                 new_list_name,
