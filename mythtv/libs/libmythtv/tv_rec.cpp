@@ -1022,13 +1022,14 @@ long long TVRec::SeekRingBuffer(long long curpos, long long pos, int whence)
         long long desired = curpos + pos;
         long long realpos = rbuffer->GetReadPosition();
 
+        cout << realpos << " " << rbuffer->Seek(0, SEEK_CUR) << endl;
+
         pos = desired - realpos;
     }
 
     long long ret = rbuffer->Seek(pos, whence);
 
     UnpauseRingBuffer();
-
     return ret;
 }
 
@@ -1060,12 +1061,13 @@ void TVRec::DoReadThread(void)
     while (readthreadlive)
     {
         pthread_mutex_lock(&readthreadLock);
+
         int ret = rbuffer->Read(buffer, 16000);
         WriteBlock(readthreadSock, buffer, ret);
 
         pthread_mutex_unlock(&readthreadLock);
  
-        usleep(50);
+        usleep(5000);
     }
 
     delete [] buffer;

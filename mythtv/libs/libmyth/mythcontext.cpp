@@ -816,6 +816,8 @@ long long MythContext::SeekRemoteRing(int recorder, QSocket *sock,
 
     strlist.clear();
 
+    usleep(100);
+
     int avail = sock->bytesAvailable();
     char *trash = new char[avail + 1];
     sock->readBlock(trash, avail);

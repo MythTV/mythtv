@@ -80,7 +80,8 @@ void WriteBlock(QSocket *socket, void *data, int len)
         }
     }
 
-    socket->flush();
+    while (socket->bytesToWrite() > 0)
+        socket->flush();
 }
 
 int ReadBlock(QSocket *socket, void *data, int maxlen)

@@ -1001,6 +1001,7 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
     int gotvideo = 0;
     int seeked = 0;
     bool ret = false;
+    int seeklen = 0;
 
     if (weseeked)
     {
@@ -1022,10 +1023,7 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
                frameheader.frametype != 'S' && frameheader.frametype != 'T' &&
                frameheader.frametype != 'R' && frameheader.frametype != 'X')
         {
-cout << "unknown frameheader: " << frameheader.frametype << endl;
-	  /* we didnt get a known frametype! 
-	     so move down one char and look again... */
-            ringBuffer->Seek((long long)1-FRAMEHEADERSIZE, SEEK_CUR);
+            ringBuffer->Seek((long long)seeklen-FRAMEHEADERSIZE, SEEK_CUR);
 
             if (ringBuffer->Read(&frameheader, FRAMEHEADERSIZE)
                 != FRAMEHEADERSIZE)
@@ -1033,6 +1031,7 @@ cout << "unknown frameheader: " << frameheader.frametype << endl;
                 eof = 1;
                 return;
             }
+            seeklen = 1;
         }
 
         if (frameheader.frametype == 'R') 
@@ -1894,7 +1893,10 @@ bool NuppelVideoPlayer::DoRewind(void)
     }
 
     if (keyPos == 0)
+    {
+        cout << "unknown position\n";
         return false;
+    }
 
     ringBuffer->Seek(diff, SEEK_CUR);
     framesPlayed = lastKey;
@@ -2018,6 +2020,12 @@ bool NuppelVideoPlayer::DoFastForward(void)
     {
         keyPos = m_context->GetKeyframePosition(nvr_num, desiredKey / 
                                                 keyframedist);
+        for (int i = lastKey / keyframedist; i < desiredKey / keyframedist; 
+             i++)
+        {
+            if (positionMap->find(i) == positionMap->end())
+                (*positionMap)[i] = m_context->GetKeyframePosition(nvr_num, i);
+        }
     }
 
     if (keyPos != -1)

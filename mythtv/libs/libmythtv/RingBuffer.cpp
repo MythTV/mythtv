@@ -384,7 +384,10 @@ int RingBuffer::safe_read(int fd, void *data, unsigned sz)
         if(tot < sz)
            usleep(1000);
         if (stopreads)
+        {
+           printf("breaking out of safe_reed: %d of %d\n", tot, sz);
            break;
+        }
     }
     return tot;
 }
@@ -400,7 +403,7 @@ int RingBuffer::safe_read(QSocket *sock, void *data, unsigned sz)
         zerocnt++;
         if (zerocnt == 100)
         {
-            printf("EOF %d %d\n", sock->bytesAvailable(), sz);
+            printf("EOF %d %u\n", sock->bytesAvailable(), sz);
             break;
         }
         usleep(1000);
@@ -410,7 +413,7 @@ int RingBuffer::safe_read(QSocket *sock, void *data, unsigned sz)
 
     if (sock->bytesAvailable() >= sz)
     {
-        ret = sock->readBlock((char *)data+tot, sz-tot);
+        ret = sock->readBlock(((char *)data) + tot, sz - tot);
         tot += ret;
     }
     return tot;
