@@ -890,11 +890,12 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                     float aspect = GetMpegAspect(context, aspectratioinfo,
                                                  width, height);
 
-                    if (CheckVideoParams(width, height) ||
-                        aspect != current_aspect)
+                    if (width < 2500 && height < 2000 &&
+                        (CheckVideoParams(width, height) ||
+                         aspect != current_aspect))
                     {
-                        m_parent->SetVideoParams(ALIGN(width,16),
-                                                 ALIGN(height,16), fps,
+                        m_parent->SetVideoParams(ALIGN(width, 16),
+                                                 ALIGN(height, 16), fps,
                                                  keyframedist, aspect);
                         m_parent->ReinitVideo();
                         current_width = width;
