@@ -12,11 +12,14 @@ VERSION = 0.17.0
 INCLUDEPATH = ../../
 
 # Debug mode on x86 must compile without -fPIC and with -O, otherwise gcc runs 
-# out of registers
+# out of registers.  But, on x86_64, -fPIC is required.
 QMAKE_CFLAGS_SHLIB = 
+contains(TARGET_ARCH_X86_64, yes) {
+    QMAKE_CFLAGS_SHLIB = -fPIC
+}
 
 QMAKE_CFLAGS_RELEASE += $$OPTFLAGS -DPIC -fPIC -fomit-frame-pointer -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
-QMAKE_CFLAGS_DEBUG += -g -O -DHAVE_AV_CONFIG_H -I.. -DPIC -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
+QMAKE_CFLAGS_DEBUG += -g -O -DHAVE_AV_CONFIG_H -I.. -DPIC $$QMAKE_CFLAGS_SHLIB -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
 
 # Input
 SOURCES += utils.c mem.c allcodecs.c mpegvideo.c h263.c jrevdct.c

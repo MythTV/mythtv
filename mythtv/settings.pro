@@ -18,10 +18,9 @@ release {
         DEFINES += MMX
         QMAKE_CXXFLAGS_RELEASE = -O3 -march=pentiumpro -fomit-frame-pointer
     }
-    # probably should change this...
     contains(TARGET_ARCH_X86_64, yes) {
         DEFINES += MMX
-        QMAKE_CXXFLAGS_RELEASE = -O3 -march=pentiumpro -fomit-frame-pointer
+        QMAKE_CXXFLAGS_RELEASE = -O3 -march=k8 -fomit-frame-pointer
     }
     contains( TARGET_ARCH_POWERPC, yes ) {
         # Do not use -O3, it causes some Qt moc methods to go missing

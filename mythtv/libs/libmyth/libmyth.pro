@@ -138,7 +138,7 @@ using_directx {
 using_x11 {
     HEADERS += screensaver-x11.h
     SOURCES += screensaver-x11.cpp
-    LIBS += -L/usr/X11R6/lib -lXinerama
+    LIBS += $$EXTRA_LIBS
 }
 
 using_xrandr {
