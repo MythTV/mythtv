@@ -27,6 +27,8 @@
 #include "mpegvideo.h"
 #include "xvmc_render.h"
 
+#undef fprintf
+
 #include "xvmccommon.c"
 
 int XVMC_VLD_field_start(MpegEncContext* s, AVCodecContext* avctx)
