@@ -524,7 +524,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
                        "channel.callsign,channel.name,channel.commfree, "
                        "channel.outputfilters,seriesid,programid,filesize, "
                        "lastmodified,stars,previouslyshown,originalairdate, "
-                       "category_type, hostname "
+                       "hostname "
                        "FROM recorded "
                        "LEFT JOIN channel "
                        "ON recorded.chanid = channel.chanid "
@@ -580,8 +580,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
                                                           Qt::ISODate);
             proginfo->hasAirDate = true;
         }
-        proginfo->catType = query.value(18).toString();
-        proginfo->hostname = query.value(19).toString();
+        proginfo->hostname = query.value(18).toString();
 
         proginfo->spread = -1;
 
