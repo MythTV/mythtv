@@ -584,8 +584,10 @@ class UIManagedTreeListType : public UIType
     void    assignTreeData(GenericTree *a_tree);
     void    moveToNode(QValueList<int> route_of_branches);
     void    moveToNodesFirstChild(QValueList<int> route_of_branchs);
-    QValueList <int> * getRouteToActive();
+    QValueList <int>* getRouteToActive();
+    QStringList getRouteToCurrent();
     bool    tryToSetActive(QValueList <int> route);
+    bool    tryToSetCurrent(QStringList route);
     void    setHighlightImage(QPixmap an_image){highlight_image = an_image;}
     void    setArrowImages(QPixmap up, QPixmap down, QPixmap left, QPixmap right)
                           {
@@ -612,6 +614,8 @@ class UIManagedTreeListType : public UIType
     void    sortTreeBySelectable(){if(my_tree_data) my_tree_data->sortBySelectable();}
     GenericTree *getCurrentNode() { return current_node; }
     void    setCurrentNode(GenericTree *a_node);
+    int     getActiveBin();
+    void    setActiveBin(int a_bin);
 
   public slots:
 

@@ -2076,7 +2076,22 @@ QValueList <int> * UIManagedTreeListType::getRouteToActive()
         return &route_to_active;   
     }
     return NULL;    
-    return &route_to_active;
+}
+
+QStringList UIManagedTreeListType::getRouteToCurrent()
+{
+    QStringList route_to_current;
+    if(current_node)
+    {
+        GenericTree *climber = current_node;
+        route_to_current.push_front(climber->getString());
+        while( (climber = climber->getParent()) )
+        {
+            route_to_current.push_front(climber->getString());
+        }
+        return route_to_current;
+    }
+    return route_to_current;
 }
 
 bool UIManagedTreeListType::tryToSetActive(QValueList <int> route)
@@ -2093,6 +2108,47 @@ bool UIManagedTreeListType::tryToSetActive(QValueList <int> route)
         }
     }
     return false;
+}
+
+bool UIManagedTreeListType::tryToSetCurrent(QStringList route)
+{
+    if(!my_tree_data)
+    {
+        current_node = NULL;
+        return false;
+    }
+
+    current_node = my_tree_data;
+
+    //  
+    //  
+    //
+    
+    if(route.count() > 0)
+    {
+        if(route[0] == my_tree_data->getString())
+        {
+            for(uint i = 1; i < route.count(); i ++)
+            {
+                GenericTree *descender = current_node->getChildByName(route[i]);
+                if(descender)
+                {
+                    current_node = descender;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    return false;
+    
 }
 
 void UIManagedTreeListType::assignTreeData(GenericTree *a_tree)
@@ -2126,6 +2182,23 @@ void UIManagedTreeListType::setCurrentNode(GenericTree *a_node)
     if(a_node)
     {
         current_node = a_node;
+    }
+}
+
+int UIManagedTreeListType::getActiveBin()
+{
+    return active_bin;
+}
+
+void UIManagedTreeListType::setActiveBin(int a_bin)
+{
+    if(a_bin > bins)
+    {
+        active_bin = bins;
+    }
+    else
+    {
+        active_bin = a_bin;
     }
 }
 
