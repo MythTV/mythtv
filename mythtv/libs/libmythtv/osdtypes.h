@@ -112,8 +112,9 @@ class OSDSet : public QObject
     bool m_draweveryframe;
 };
 
-class OSDType
+class OSDType : public QObject
 {
+    Q_OBJECT
   public:
     OSDType(const QString &name);
     virtual ~OSDType();
@@ -210,12 +211,15 @@ class OSDTypeImage : public OSDType
                  int scaleh = -1);
     OSDTypeImage(const OSDTypeImage &other);
     OSDTypeImage(const QString &name);    
+    OSDTypeImage(void);
     virtual ~OSDTypeImage();
 
+    void SetName(const QString &name);
     void Reinit(float wmult, float hmult);
 
     void LoadImage(const QString &filename, float wmult, float hmult, 
                    int scalew = -1, int scaleh = -1);
+    void LoadFromQImage(const QImage &img);
 
     void SetStaticSize(int scalew, int scaleh) { m_scalew = scalew;
                                                  m_scaleh = scaleh; }
@@ -224,6 +228,9 @@ class OSDTypeImage : public OSDType
     void SetPosition(QPoint pos) { m_displaypos = pos; }
 
     QRect ImageSize() { return m_imagesize; }
+
+    int width() { return m_imagesize.width(); }
+    int height() { return m_imagesize.height(); }
 
     virtual void Draw(OSDSurface *surface, int fade, int maxfade, int xoff, 
                       int yoff);

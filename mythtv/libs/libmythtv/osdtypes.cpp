@@ -728,6 +728,26 @@ OSDTypeImage::OSDTypeImage(const QString &name)
     m_drawwidth = -1;
     m_onlyusefirst = false;
 
+    m_displaypos = QPoint(0, 0);
+
+    m_yuv = NULL;
+    m_alpha = NULL;
+    m_ybuffer = NULL;
+    m_ubuffer = NULL;
+    m_vbuffer = NULL;
+    m_isvalid = false;
+    m_filename = "";
+}
+
+OSDTypeImage::OSDTypeImage(void)
+            : OSDType("")
+{
+    m_name = "";
+    m_drawwidth = -1;
+    m_onlyusefirst = false;
+
+    m_displaypos = QPoint(0, 0);
+
     m_yuv = NULL;
     m_alpha = NULL;
     m_ybuffer = NULL;
@@ -743,6 +763,11 @@ OSDTypeImage::~OSDTypeImage()
         delete [] m_yuv;
     if (m_alpha)
         delete [] m_alpha;
+}
+
+void OSDTypeImage::SetName(const QString &name)
+{
+    m_name = name;
 }
 
 void OSDTypeImage::Reinit(float wmult, float hmult)
@@ -812,6 +837,38 @@ void OSDTypeImage::LoadImage(const QString &filename, float wmult, float hmult,
 
     rgb32_to_yuv420p(m_ybuffer, m_ubuffer, m_vbuffer, m_alpha, tmp2.bits(),
                      width, height, tmp2.width());
+
+    m_imagesize = QRect(0, 0, width, height);
+}
+
+void OSDTypeImage::LoadFromQImage(const QImage &img)
+{
+    if (m_isvalid)
+    {
+        if (m_yuv)
+            delete [] m_yuv;
+        if (m_alpha)
+            delete [] m_alpha;
+
+        m_isvalid = false;
+        m_yuv = NULL;
+        m_alpha = NULL;
+    }
+
+    m_isvalid = true;
+
+    int width = (img.width() / 2) * 2;
+    int height = (img.height() / 2) * 2;
+
+    m_yuv = new unsigned char[width * height * 3 / 2];
+    m_ybuffer = m_yuv;
+    m_ubuffer = m_yuv + (width * height);
+    m_vbuffer = m_yuv + (width * height * 5 / 4);
+
+    m_alpha = new unsigned char[width * height];
+
+    rgb32_to_yuv420p(m_ybuffer, m_ubuffer, m_vbuffer, m_alpha, img.bits(),
+                     width, height, img.width());
 
     m_imagesize = QRect(0, 0, width, height);
 }

@@ -22,6 +22,8 @@ using namespace std;
 #include "libmyth/oldsettings.h"
 #include "udpnotify.h"
 
+#include "osdlistbtntype.h"
+
 OSD::OSD(int width, int height, int frint, const QString &font, 
          const QString &ccfont, const QString &prefix, const QString &osdtheme,
          int dispx, int dispy, int dispw, int disph)
@@ -145,6 +147,49 @@ void OSD::SetDefaults(void)
                                           displaywidth, displayheight);
         container->AddType(ccpage);
     }
+
+/*
+    container = GetSet("menu");
+    if (!container)
+    {
+        QString name = "menu";
+        container = new OSDSet(name, true, vid_width, vid_height,
+                               wmult, hmult, frameint);
+        AddSet(container, name);
+
+        QRect area = QRect(20, 20, 200, 300);
+        OSDListBtnType *lb = new OSDListBtnType("menu", area, wmult,
+                                                hmult, true, true);
+        lb->SetItemRegColor(QColor("#505050"), QColor("#000000"), 100);
+        lb->SetItemSelColor(QColor("#52CA38"), QColor("#349838"), 255);
+
+        lb->SetSpacing((int)(2 * hmult));
+        lb->SetMargin((int)(2 * wmult));
+
+        TTFFont *actfont = GetFont("infofont");
+        TTFFont *inactfont = GetFont("infofontgray");
+
+        lb->SetFontActive(actfont);
+        lb->SetFontInactive(inactfont);
+
+        lb->SetActive(true);
+
+        container->AddType(lb);
+
+        OSDListBtnTypeItem *item;
+
+        item = new OSDListBtnTypeItem(lb, "test 1");
+        item = new OSDListBtnTypeItem(lb, "test 2");
+        item = new OSDListBtnTypeItem(lb, "test 3");
+        item = new OSDListBtnTypeItem(lb, "test 4");
+        item = new OSDListBtnTypeItem(lb, "test 5");
+        item = new OSDListBtnTypeItem(lb, "test 6");
+        item = new OSDListBtnTypeItem(lb, "test 7");
+        item = new OSDListBtnTypeItem(lb, "test 8");
+        item = new OSDListBtnTypeItem(lb, "test 9");
+        item = new OSDListBtnTypeItem(lb, "test 10");
+    }
+*/
 }
 
 void OSD::Reinit(int width, int height, int frint, int dispx, int dispy, 
