@@ -1810,11 +1810,9 @@ the author.
 
 <sect1>Adding support for an external tuner.
 <p>MythTV supports changing the channel on an external tuner.  If you have
-an external tuner, such as a DirecTV or digital cable set top box, the
-following command should be added to your settings.txt file:
-<tscreen><verb>
-str ExternalChannelCommand=/usr/local/bin/changechannel
-</verb></tscreen>
+an external tuner, such as a DirecTV or digital cable set top box, you
+should add <tt>/usr/local/bin/changechannel</tt> to your Input Connections in the
+mythbackend configuration GUI.
 
 The <bf>changechannel</bf> program is not supplied with MythTV, so this is
 going to be dependent on what sort of external tuner you have.  Example

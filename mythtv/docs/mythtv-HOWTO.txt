@@ -1939,9 +1939,8 @@
 
   MythTV supports changing the channel on an external tuner.  If you
   have an external tuner, such as a DirecTV or digital cable set top
-  box, the following command should be added to your settings.txt file:
-
-       str ExternalChannelCommand=/usr/local/bin/changechannel
+  box, you should add /usr/local/bin/changechannel to your Input
+  Connections in the mythbackend configuration GUI.
 
   The [1mchangechannel [22mprogram is not supplied with MythTV, so this is
   going to be dependent on what sort of external tuner you have.
@@ -2079,14 +2078,14 @@
   Download FLAC from http://flac.sourceforge.net
   <http://flac.sourceforge.net> and install:
 
-  $ tar -xzf flac-1.1.0.tar.gz
-  $ cd flac-1.1.0
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
-  $
+       $ tar -xzf flac-1.1.0.tar.gz
+       $ cd flac-1.1.0
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
+       $
 
   Download libcdaudio from libcdaudio.sourceforge.net
   <http://sourceforge.net/project/showfiles.php?group_id=27134> and
