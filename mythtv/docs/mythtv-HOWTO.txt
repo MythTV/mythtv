@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2002-12-16, v1.050
+  2002-12-17, v1.050
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -121,6 +121,8 @@
   <http://www.snowman.net/mailman/listinfo/mythtv-commits/> the mythtv-
   dev mailing list.
 
+  This HOWTO is for mythtv v0.7.
+
   [1m2.  Introduction.[0m
 
   This HOWTO document will focus on mythtv in a North American
@@ -135,7 +137,6 @@
 
   +o  Red Hat Linux 8.0: Cedar McKay,
      <mailto:mythhowto.3.ohthetrees@spamgourmet.com>
-
   +o  Gentoo: Tony Clark,  <mailto:tclark@telia.com>
 
   +o  Debian: Matthew Zimmerman,  <mailto:mdz@debian.org>
@@ -914,15 +915,24 @@
   That takes care of setting the volume correctly, and the ALSA startup
   script will restore the volume after a reboot.
 
+  You may also use the [1malsamixer [22mprogram to set the volume.  First,
+  start [1malsamixer [22mfrom the command line.  You should start out on the
+  "Master" volume control slider.  Use the up and down cursor to set the
+  master volume to around 75%.  Next, use the left and right cursor keys
+  to move around on the screen until you find the "Line" slider.  Press
+  SPACE to set it as the capture source, set the level to around 50-75%
+  and press "M" to mute it.  You can now press ESC to exit out of the
+  [1malsamixer [22mprogram.
+
   [1m8.  Setting up a remote control.[0m
 
   mythtv does not have native remote control receiver and decoder
   software built-in.  Instead, remote control functions are implemented
-  by cooperating with lirc, the Linux Infra Red Control program.  lirc
+  by cooperating with [1mlirc[22m, the Linux Infra Red Control program.  [1mlirc[0m
   handles the IR hardware and passes keystrokes to mythtv, which then
   acts as if the user had pressed the keys on the keyboard.
 
-  lircd has two prerequisites:  dialog, available in Mandrake through
+  lircd has two prerequisites:  [1mdialog[22m, available in Mandrake through
   the "cdialog" RPM, and the kernel source.  Mandrake 9.0 is using the
   2.4.19 kernel, so the easiest thing is to go to http://www.kernel.org
   <http://www.kernel.org> and download the full 2.4.19 tar file from
@@ -1007,11 +1017,11 @@
 
   or
 
-       $ cp lircrc.example.pinnaclestudiopctv ~/.lircrc
+  $ cp lircrc.example.pinnaclestudiopctv ~/.lircrc
 
   if you've got a Pinnacle Studio PCTV remote.
 
-  $ irw
+       $ irw
 
   Start pressing the keys on your remote; [1mirw [22mwill print the name of the
   button as it is defined in your /etc/lircd.conf. If you don't see any-
@@ -1115,19 +1125,19 @@
   Depending on whether you have your serial port driver configured as a
   kernel module you might see the following message during make:
 
-  lirc_sir.c:56:2: warning: #warning
-  "******************************************"
+       lirc_sir.c:56:2: warning: #warning
+       "******************************************"
 
-  lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
+       lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
 
-  lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
+       lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
 
-  lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
+       lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
 
-  lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
+       lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
 
-  lirc_sir.c:61:2: warning: #warning
-  "******************************************"
+       lirc_sir.c:61:2: warning: #warning
+       "******************************************"
 
   If you do receive this statement make sure to run the [1msetserial[0m
   command before you load the lirc_sir module. Follow this with the
@@ -1163,10 +1173,10 @@
   being received. If everything is configured correctly you should see
   something similar to the following:
 
-  $ irw
-  0000000000007ff0 00 1 gi-motorola-dct2000
-  000000000000bff8 00 2 gi-motorola-dct2000
-  000000000000f7f0 00 ENTER gi-motorola-dct2000
+       $ irw
+       0000000000007ff0 00 1 gi-motorola-dct2000
+       000000000000bff8 00 2 gi-motorola-dct2000
+       000000000000f7f0 00 ENTER gi-motorola-dct2000
 
   Once you've verified lirc is working you can press [1mCTRL-C [22mto exit [1mirw[0m
   and configure the channel changing script.
