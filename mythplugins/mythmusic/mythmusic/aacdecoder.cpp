@@ -341,6 +341,13 @@ bool aacDecoder::initializeMP4()
     seconds = (float)samples*(float)(f-1.0)/(float)mp4ASC.samplingFrequency;
 
     totalTime = seconds;
+
+    // If max_bitrate == avg_bitrate, then file is fixed bitrate
+    if (mp4ff_get_avg_bitrate(mp4_input_file, aac_track_number) ==
+	mp4ff_get_max_bitrate(mp4_input_file, aac_track_number))
+    {
+	bitrate = mp4ff_get_avg_bitrate(mp4_input_file, aac_track_number) / 1000;
+    }
     
     //
     //  Check we got same answers from mp4ASC
@@ -364,6 +371,7 @@ bool aacDecoder::initializeMP4()
     if (output())
     {
 	output()->Reconfigure(16, channels, sample_rate);
+	output()->SetSourceBitrate(bitrate);
     }
 
     inited = TRUE;
@@ -555,6 +563,20 @@ void aacDecoder::run()
                     output_bytes += sample_count * 2;
                     if (output())
                     {
+			// If source is VBR, bitrate == 0
+			if (bitrate)
+			{
+			    output()->SetSourceBitrate(bitrate);
+			} 
+                        else 
+                        {
+			    output()->SetSourceBitrate(
+				(int) ((float) (frame_info.bytesconsumed * 8) /
+				       (frame_info.samples / 
+				        frame_info.num_front_channels) 
+				* frame_info.samplerate) / 1000);
+			}
+
                         flush();
                     }
                 }

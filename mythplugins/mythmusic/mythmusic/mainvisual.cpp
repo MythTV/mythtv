@@ -29,6 +29,7 @@
 #include "inlines.h"
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdialogs.h>
 
 #include <iostream>
 using namespace std;
@@ -225,6 +226,13 @@ void MainVisual::add(uchar *b, unsigned long b_len, unsigned long w, int c, int 
 
 void MainVisual::timeout()
 {
+    bool process = true;
+    if (parent() != gContext->GetMainWindow()->currentWidget())
+    {
+        process = false;
+        return;
+    }
+
     VisualNode *node = 0;
 
     if (playing && output()) {
@@ -244,12 +252,12 @@ void MainVisual::timeout()
     }
 
     bool stop = TRUE;
-    if ( vis )
-	stop = vis->process( node );
+    if (vis && process)
+	stop = vis->process(node);
     if (node)
         delete node;
 
-    if ( vis ) 
+    if (vis && process) 
     {
         QPainter p(&pixmap);
         if (vis->draw(&p, Qt::black))
