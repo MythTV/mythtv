@@ -691,28 +691,6 @@ void ResetIconMap(bool reset_icons)
 } // namespace
 
 // DataDirect stuff
-QString GetFreqId(const QString& freqid, const QString& minor, 
-                  QString& channel)
-{
-    // For NTSC channels, freqid is the same as channel.
-    // For ATSC channels, it's "<fccchannelnumber>-<channelMinor>"
-    // Also for *new* atsc channels, preset channel by appending channelMinor.
-    QString ret;
-    if (freqid == "")
-    {
-        ret = channel;
-    }
-    else 
-    {
-        if (minor != "") 
-        {
-            ret = freqid + "-" + minor;
-            channel = channel + "_" + minor; // default channel number
-        }
-    }
-    return ret;
-}
-
 void DataDirectStationUpdate(Source source)
 {
     QSqlQuery query;
@@ -761,7 +739,14 @@ void DataDirectStationUpdate(Source source)
             QString channel = query1.value(3).toString();
             QString freqid = query1.value(4).toString();
             QString minor = query1.value(5).toString();
-            freqid = GetFreqId(freqid, minor, channel);
+
+            if (minor != "") 
+            {
+                freqid += "-" + minor;
+                channel += "_" + minor; // default channel number
+            }
+            else
+                freqid = channel;
 
             query.prepare("INSERT INTO channel (chanid,channum,sourceid,"
                           "callsign, name, xmltvid, freqid, tvformat) "
@@ -798,7 +783,14 @@ void DataDirectStationUpdate(Source source)
             QString channel = dd_station_info.value(3).toString();
             QString freqid = dd_station_info.value(4).toString();
             QString minor = dd_station_info.value(5).toString();
-            freqid = GetFreqId(freqid, minor, channel);
+
+            if (minor != "")
+            {
+                freqid += "-" + minor;
+                channel += "_" + minor; // default channel number
+            }
+            else
+                freqid = channel;
 
             dd_update.bindValue(":CALLSIGN", dd_station_info.value(0));
             dd_update.bindValue(":NAME", dd_station_info.value(1));
