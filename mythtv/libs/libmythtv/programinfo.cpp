@@ -1746,8 +1746,10 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
 
     DialogBox diag(gContext->GetMainWindow(), QObject::tr(message));
     diag.AddButton(QObject::tr("OK"));
-    diag.AddButton(QObject::tr("Don't record this showing"));
-    diag.AddButton(QObject::tr("I've already seen this episode"));
+    diag.AddButton(QObject::tr("Don't record it"));
+
+    if (subtitle != "" && description != "")
+        diag.AddButton(QObject::tr("Never record this episode"));
 
     int ret = diag.exec();
 
