@@ -52,6 +52,8 @@ class AudioOutput : public VolumeBase, public OutputListeners
 
     virtual int GetAudiotime(void) = 0;
 
+    virtual void SetSourceBitrate(int ) { }
+
     QString GetError() { return lastError; };
 
  protected:

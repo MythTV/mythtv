@@ -55,7 +55,8 @@ AudioOutputBase::~AudioOutputBase()
 
 void AudioOutputBase::SetSourceBitrate(int rate)
 {
-    source_bitrate = rate;
+    if (rate > 0)
+        source_bitrate = rate;
 }
 
 void AudioOutputBase::SetStretchFactorLocked(float laudio_stretchfactor)
@@ -648,7 +649,7 @@ void AudioOutputBase::Status()
 
     if (ct / 1000 != current_seconds) 
     {
-        current_seconds = ct;
+        current_seconds = ct / 1000;
         OutputEvent e(current_seconds, ct,
                       source_bitrate, audio_samplerate, audio_bits, 
                       audio_channels);

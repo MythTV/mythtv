@@ -312,7 +312,7 @@
 
             <textarea name="info_text" draworder="1" align="left">
                 <font>infotext</font>
-                <area>270,129,250,25</area>
+                <area>265,125,260,25</area>
             </textarea>
 
             <textarea name="time_text" draworder="1" align="right">

@@ -165,8 +165,8 @@ bool ChannelBase::ChangeExternalChannel(const QString &channum)
     if (externalChanger[currentcapchannel].isEmpty())
         return false;
 
-    QString command = QString("%1 %2 &").arg(externalChanger[currentcapchannel])
-                                        .arg(channum);
+    QString command = QString("%1 %2").arg(externalChanger[currentcapchannel])
+                                      .arg(channum);
 
     VERBOSE(VB_CHANNEL, QString("External channel change: %1").arg(command));
     pid_t child = fork();
