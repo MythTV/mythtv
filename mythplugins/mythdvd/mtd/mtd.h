@@ -26,13 +26,17 @@ class DiscCheckingThread : public QThread
 
   public:
   
-    DiscCheckingThread(DVDProbe *probe, QMutex *drive_access_mutex,
-                                        QMutex *mutex_for_titles);
+    DiscCheckingThread( MTD *owner,
+                        DVDProbe *probe, 
+                        QMutex *drive_access_mutex,
+                        QMutex *mutex_for_titles);
     virtual void run();
     bool    haveDisc(){return have_disc;}
+    bool    keepGoing();
     
   private:
   
+    MTD      *parent;
     DVDProbe *dvd_probe;
     bool     have_disc;
     QMutex   *dvd_drive_access;

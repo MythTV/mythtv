@@ -171,6 +171,14 @@ void DVDRipBox::createSocket()
 
 void DVDRipBox::connectionClosed()
 {
+    if(client_socket)
+    {
+        delete client_socket;
+        client_socket = NULL;
+        connected = false;
+    }
+
+    stopStatusPolling();
     setContext(0);
     have_disc = false;
     ripscreen_button->SetContext(-2);

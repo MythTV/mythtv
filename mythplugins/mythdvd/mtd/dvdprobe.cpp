@@ -193,10 +193,6 @@ DVDTitle::DVDTitle()
     audio_tracks.clear();
     audio_tracks.setAutoDelete(true);
 
-    is_selected = false;
-    selected_quality = 0;
-    selected_audio = 0;
-    name = "";
 }
 
 void DVDTitle::setTime(uint h, uint m, uint s, double fr)

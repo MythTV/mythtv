@@ -68,10 +68,6 @@ class DVDTitle
     void    setAngles(uint a_uint){numb_angles = a_uint;}
     void    setTrack(uint a_uint){track_number = a_uint;}
     void    setTime(uint h, uint m, uint s, double fr);
-    void    setSelected(bool yes_or_no){is_selected = yes_or_no;}
-    void    setQuality(int a_level){selected_quality = a_level;}
-    void    setAudio(int which_track){selected_audio = which_track;}
-    void    setName(QString a_name){name = a_name;}
     
     //
     //  Get
@@ -85,10 +81,6 @@ class DVDTitle
     uint    getHours(){return hours;}
     uint    getMinutes(){return minutes;}
     uint    getSeconds(){return seconds;}
-    bool    getSelected(){return is_selected;}
-    int     getQuality(){return selected_quality;}
-    QString getName(){return name;}
-    int     getAudio(){return selected_audio;}
 
     void                printYourself();
     void                addAudio(DVDAudio *new_audio_track);
@@ -107,11 +99,6 @@ class DVDTitle
     
     QPtrList<DVDAudio>  audio_tracks;
 
-    bool    is_selected;
-    int     selected_quality;
-    int     selected_audio;
-    QString name;
-    
 };
 
 class DVDProbe

@@ -19,39 +19,51 @@
 #include "logging.h"
 
 
-DiscCheckingThread::DiscCheckingThread(DVDProbe *probe, QMutex *drive_access_mutex,
-                                                        QMutex *mutex_for_titles)
+DiscCheckingThread::DiscCheckingThread(MTD *owner,
+                                       DVDProbe *probe, 
+                                       QMutex *drive_access_mutex,
+                                       QMutex *mutex_for_titles)
 {
     have_disc = false;
     dvd_probe = probe;
     dvd_drive_access = drive_access_mutex;
     titles_mutex = mutex_for_titles;
+    parent = owner;
 }
+
+bool DiscCheckingThread::keepGoing()
+{
+    return parent->threadsShouldContinue();
+} 
 
 void DiscCheckingThread::run()
 {
-    while(!dvd_drive_access->tryLock())
+    while(keepGoing())
     {
-        sleep(3);
-    }
-    while(!titles_mutex->tryLock())
-    {
-        sleep(3);
-    }
-    if(dvd_probe->probe())
-    {
-        //
-        //  Yeah! We can read the DVD
-        //
+        while(!dvd_drive_access->tryLock())
+        {
+            sleep(3);
+        }
+        while(!titles_mutex->tryLock())
+        {
+            sleep(3);
+        }
+        if(dvd_probe->probe())
+        {
+            //
+            //  Yeah! We can read the DVD
+            //
         
-        have_disc = true;
+            have_disc = true;
+        }
+        else
+        {
+            have_disc = false;
+        }
+        titles_mutex->unlock();
+        dvd_drive_access->unlock();
+        sleep(1);
     }
-    else
-    {
-        have_disc = false;
-    }
-    titles_mutex->unlock();
-    dvd_drive_access->unlock();
     return;
 }
 
@@ -151,57 +163,50 @@ MTD::MTD(QSqlDatabase *ldb, int port, bool log_stdout)
         exit(0);
     }
     dvd_probe = new DVDProbe(dvd_device);
-    disc_checking_thread = new DiscCheckingThread(dvd_probe, dvd_drive_access, titles_mutex);
-    disc_checking_thread->run();
+    disc_checking_thread = new DiscCheckingThread(this, dvd_probe, dvd_drive_access, titles_mutex);
+    disc_checking_thread->start();
     disc_checking_timer = new QTimer();
-    disc_checking_timer->start(600);
+    disc_checking_timer->start(1000);
     connect(disc_checking_timer, SIGNAL(timeout()), this, SLOT(checkDisc()));
 
 }
 
 void MTD::checkDisc()
 {
-    if(!disc_checking_thread->running())
+    bool had_disc = have_disc;
+    QString old_name = dvd_probe->getName();
+    if(disc_checking_thread->haveDisc())
     {
-
-        bool had_disc = have_disc;
-        QString old_name = dvd_probe->getName();
-        if(disc_checking_thread->haveDisc())
+        have_disc = true;
+        if(had_disc)
         {
-            have_disc = true;
-            if(had_disc)
-            {
-                if(!old_name == dvd_probe->getName())
-                {
-                    //
-                    //  DVD has changed
-                    //
-                    
-                    emit writeToLog(QString("DVD changed to: %1").arg(dvd_probe->getName()));
-                }
-            }
-            else
+            if(!old_name == dvd_probe->getName())
             {
                 //
-                //  DVD inserted
+                //  DVD changed
                 //
-                
-                emit writeToLog(QString("DVD inserted: %1").arg(dvd_probe->getName()));                
+                emit writeToLog(QString("DVD changed to: %1").arg(dvd_probe->getName()));
             }
         }
         else
         {
-            have_disc = false;
-            if(had_disc)
-            {
-                //
-                //  DVD removed
-                //
-
-                emit writeToLog("DVD removed");
-            }
+            //
+            //  DVD inserted
+            //
+            emit writeToLog(QString("DVD inserted: %1").arg(dvd_probe->getName()));
+            
         }
-        disc_checking_thread->start();
+    }
+    else
+    {
+        have_disc = false;
+        if(had_disc)
+        {
+            //
+            //  DVD removed
+            //
+            emit writeToLog("DVD removed");
+        }
     }
 }
 
