@@ -637,10 +637,10 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf)
      // missed at least one frame, this code might be inaccurate!
      
             if (ntsc)
-                fn = fn/33;
+                fn = (fn+16)/33;
             else 
-                fn = fn/40;
-            if (fn==0) 
+                fn = (fn+20)/40;
+            if (fn<1)
                 fn=1;
             tf += 2*fn; // two fields
         }
@@ -1063,23 +1063,17 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
 
     frameheader.frametype = 'V'; // video frame
     frameheader.timecode  = timecode;
+    lasttimecode = frameheader.timecode;
     frameheader.filters   = 0;             // no filters applied
 
     dropped = (((fnum-lf)>>1) - 1); // should be += 0 ;-)
 
     if (dropped>0) 
     {
-        timeperframe = (timecode - lasttimecode)/(dropped + 1); 
-        if (timeperframe < 0) 
-        {
-            if (ntsc)
-                timeperframe = 1000/30;
-            else
-                timeperframe = 1000/25;
-       
-        }
-        frameheader.timecode = lasttimecode + timeperframe;
-        lasttimecode = frameheader.timecode;
+	if (ntsc)
+	    timeperframe = 1000/30;
+	else
+	    timeperframe = 1000/25;
     }
 
     // compr ends here
