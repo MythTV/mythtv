@@ -211,7 +211,7 @@ void Webcam::SetSize(int width, int height)
   vWin.height = height;
 
   if (ioctl(hDev, VIDIOCSWIN, &vWin) == -1)
-    cerr << "Error setting display size" << endl;
+    cerr << "Webcam: Error setting capture size " << width << "x" << height << endl;
 
   readCaps();
 }
