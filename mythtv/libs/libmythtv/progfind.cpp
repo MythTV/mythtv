@@ -662,7 +662,7 @@ void ProgFinder::pageUp()
    if (inSearch == 0)
    {
         curSearch = curSearch - showsPerListing;
-        if (curSearch < -1)
+        if (curSearch <= -1)
                 curSearch = searchCount + curSearch;
 
 	if (gotInitData[curSearch] <= 1)
