@@ -50,7 +50,8 @@ class ProgramInfo
         return record;
     };
 
-    void WriteRecordedToDB(QSqlDatabase *db);
+    void StartedRecording(QSqlDatabase *db);
+    void FinishedRecording(QSqlDatabase* db);
 
     QString GetRecordBasename(void);
     QString GetRecordFilename(const QString &prefix);

@@ -549,7 +549,7 @@ QString ProgramInfo::GetRecordFilename(const QString &prefix)
     return retval;
 }               
 
-void ProgramInfo::WriteRecordedToDB(QSqlDatabase *db)
+void ProgramInfo::StartedRecording(QSqlDatabase *db)
 {
     if (!db)
         return;
@@ -580,6 +580,9 @@ void ProgramInfo::WriteRecordedToDB(QSqlDatabase *db)
     if (!qquery.isActive())
         MythContext::DBError("WriteRecordedToDB", qquery);
 
+}
+
+void ProgramInfo::FinishedRecording(QSqlDatabase* db) {
     GetProgramRecordingStatus(db);
     record->doneRecording(db, *this);
 }

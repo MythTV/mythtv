@@ -156,7 +156,8 @@ class TVRec
     TVState RemovePlaying(TVState state);
     TVState RemoveRecording(TVState state);
 
-    void WriteRecordedRecord(void);
+    void StartedRecording(void);
+    void FinishedRecording(void);
 
     void SetOption(RecordingProfile &profile, const QString &name);
 

@@ -260,7 +260,7 @@ TVState TVRec::RemovePlaying(TVState state)
     return kState_Error;
 }
 
-void TVRec::WriteRecordedRecord(void)
+void TVRec::StartedRecording(void)
 {
     if (!curRecording)
         return;
@@ -268,11 +268,22 @@ void TVRec::WriteRecordedRecord(void)
     pthread_mutex_lock(&db_lock);
     MythContext::KickDatabase(db_conn);
 
-    curRecording->WriteRecordedToDB(db_conn);
+    curRecording->StartedRecording(db_conn);
     pthread_mutex_unlock(&db_lock);
 
     MythEvent me("RECORDING_LIST_CHANGE");
     gContext->dispatch(me);
+}
+
+void TVRec::FinishedRecording(void)
+{
+    if (!curRecording)
+        return;
+    pthread_mutex_lock(&db_lock);
+    MythContext::KickDatabase(db_conn);
+
+    curRecording->FinishedRecording(db_conn);
+    pthread_mutex_unlock(&db_lock);
 }
 
 void TVRec::HandleStateChange(void)
@@ -321,7 +332,7 @@ void TVRec::HandleStateChange(void)
         SetChannel(true);  
         rbuffer = new RingBuffer(outputFilename, true);
 
-        WriteRecordedRecord();
+        StartedRecording();
 
         internalState = nextState;
         nextState = kState_None;
@@ -334,6 +345,7 @@ void TVRec::HandleStateChange(void)
              (internalState == kState_WatchingRecording &&
               nextState == kState_WatchingPreRecorded))
     {
+        FinishedRecording();
         closeRecorder = true;
         internalState = nextState;
         changed = true;
@@ -358,7 +370,7 @@ void TVRec::HandleStateChange(void)
 
         nvr->Unpause();
 
-        WriteRecordedRecord();
+        StartedRecording();
 
         internalState = nextState;
         changed = true;
@@ -373,9 +385,14 @@ void TVRec::HandleStateChange(void)
             usleep(5);
 
         if (curRecording)
+        {
+            FinishedRecording();
             prevRecording = new ProgramInfo(*curRecording);
+        }
         else
+        {
             prevRecording = NULL;
+        }
 
         if (prevRecording)
             nvr->GetBlankFrameMap(blank_frame_map);
