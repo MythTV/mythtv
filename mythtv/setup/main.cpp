@@ -44,13 +44,12 @@ QString getResponse(const QString &query, const QString &def)
     return qresponse;
 }
 
-bool configXMLTV()
+void configXMLTV()
 {
-    bool ret = false;
     QSqlQuery result = db->exec("SELECT sourceid FROM videosource");
 
     if (!result.isActive() || result.numRowsAffected() < 1) {
-        cerr << "No channel sources?\n";
+        cerr << "No channel sources?  Try again...\n";
         exit(1);
     }
 
@@ -62,6 +61,10 @@ bool configXMLTV()
         QString name = source.byName("name")->getValue();
         QString xmltv_grabber = source.byName("xmltvgrabber")->getValue();
         QString filename = QString("%1/.mythtv/%2.xmltv").arg(home).arg(name);
+
+        if (xmltv_grabber == "tv_grab_na")
+          // Set up through the GUI
+          continue;
 
         cout << "mythsetup will now run " << xmltv_grabber 
              << " --configure\n\n";
@@ -82,11 +85,14 @@ bool configXMLTV()
         cout << "---------------- End of XMLTV output ----------------" << endl;
 
         if (xmltv_grabber == "tv_grab_uk" || xmltv_grabber == "tv_grab_de" ||
-            xmltv_grabber == "tv_grab_sn")
-            ret = true;
+            xmltv_grabber == "tv_grab_sn") {
+            cout << "You _MUST_ run 'mythfilldatabase --manual the first time, "
+                 << "instead\n";
+            cout << "of just 'mythfilldatabase'.  Your grabber does not provide\n";
+            cout << "channel numbers, so you have to set them manually.\n";
+        }
     }
 
-    return ret;
 }
 
 void clearDB(void)
@@ -124,11 +130,12 @@ int main(int argc, char *argv[])
     if (!dir.exists())
         dir.mkdir(fileprefix);
 
-    if ("y" != getResponse("This will clear all program/channel/recording/card "
-                           "info from the database.\nProceed?", "y"))
-        exit(1);
-
-    clearDB();
+    QString response = getResponse("This will clear all program/channel/recording/card "
+                                   "info from the database.\nProceed?", "y");
+    if (response == "y")
+      clearDB();
+    else if (response != "!")
+      exit(1);
 
     CaptureCardEditor cce(context, db);
     cce.exec(db);
@@ -139,20 +146,11 @@ int main(int argc, char *argv[])
     CardInputEditor cie(context, db);
     cie.exec(db);
 
-    bool need_manual = configXMLTV();
+    configXMLTV();
 
-    cout << endl << endl;
     cout << "Now, please run 'mythfilldatabase' to populate the database\n";
     cout << "with channel information.\n";
     cout << endl;
-
-    if (need_manual)
-    {
-        cout << "You _MUST_ run 'mythfilldatabase --manual the first time, "
-             << "instead\n";
-        cout << "of just 'mythfilldatabase'.  Your grabber does not provide\n";
-        cout << "channel numbers, so you have to set them manually.\n";
-    }
 
     return 0;
 }
