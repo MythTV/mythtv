@@ -489,7 +489,7 @@
         <value>loading...</value>
         <value lang="ES">cargando...</value>
         <value lang="CA">carregant...</value>
-        <value lang="DK">Indlæser...</value>
+        <value lang="DK">IndlÃ¦ser...</value>
       </textarea>
       <textarea name="title" draworder="0" align="center">
         <area>0,320,800,60</area>

@@ -911,12 +911,14 @@
         <font>tinyinfo</font>
         <value>Rank</value>
         <value lang="DE">Rang</value>
+        <value lang="DK">Rang</value>
       </textarea>
       <textarea name="finalranklabel" draworder="0">
         <area>690,20,800,40</area>
         <font>tinyinfo</font>
         <value>Final Rank</value>
         <value lang="DE">Endbewertung</value>
+        <value lang="DK">Slutrang</value>
       </textarea>
       <image name="filler" draworder="0" fleximage="yes">
         <filename>rk-background.png</filename>
@@ -1761,6 +1763,7 @@ END sample status images -->
          <area>0,110,800,70</area>
          <font>info</font>
          <value>No listings found for this program. </value>
+         <value lang="DK">Ingen visninger af dette program fundet. </value>
          <multiline>yes</multiline>
       </textarea>
     </container>

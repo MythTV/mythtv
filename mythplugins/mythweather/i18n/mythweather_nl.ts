@@ -227,15 +227,19 @@
     </message>
     <message>
         <source>*** Invalid Area ID Entered *** Use a valid area id.</source>
-        <translation>*** Ongeldige Locatie ingevoerd *** Gebruik een geldige ID.</translation>
+        <translation type="obsolete">*** Ongeldige Locatie ingevoerd *** Gebruik een geldige ID.</translation>
     </message>
     <message>
         <source>Weather Data Not Available</source>
-        <translation>Weerbericht Niet Beschikbaar</translation>
+        <translation type="obsolete">Weerbericht Niet Beschikbaar</translation>
     </message>
     <message>
         <source>!!! Timeout Limit !!! Change aggressiveness level.</source>
-        <translation>!!! Timeout !!! Wijzig uw aggressiviteit.</translation>
+        <translation type="obsolete">!!! Timeout !!! Wijzig uw aggressiviteit.</translation>
+    </message>
+    <message>
+        <source>*** Invalid Area ID or Server Error ***</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

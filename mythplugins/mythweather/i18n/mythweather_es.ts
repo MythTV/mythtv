@@ -227,15 +227,19 @@
     </message>
     <message>
         <source>*** Invalid Area ID Entered *** Use a valid area id.</source>
-        <translation>*** ID de Area inválido *** Use uno correcto.</translation>
+        <translation type="obsolete">*** ID de Area inválido *** Use uno correcto.</translation>
     </message>
     <message>
         <source>Weather Data Not Available</source>
-        <translation>Datos del tiempo no disponibles</translation>
+        <translation type="obsolete">Datos del tiempo no disponibles</translation>
     </message>
     <message>
         <source>!!! Timeout Limit !!! Change aggressiveness level.</source>
-        <translation>¡¡¡ Tiempo de espera excedido !!! Cambie el tipo de conexión,</translation>
+        <translation type="obsolete">¡¡¡ Tiempo de espera excedido !!! Cambie el tipo de conexión,</translation>
+    </message>
+    <message>
+        <source>*** Invalid Area ID or Server Error ***</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

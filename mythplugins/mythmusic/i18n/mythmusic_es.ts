@@ -273,5 +273,9 @@
         <translation>Copiando de CD:
 </translation>
     </message>
+    <message>
+        <source>Genre: </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

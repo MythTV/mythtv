@@ -60,6 +60,14 @@
         <source>Don&apos;t record this program</source>
         <translation>Diese Sendung nicht aufnehmen</translation>
     </message>
+    <message>
+        <source>To go to the advanced recordings screen, press &apos;i&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To see a list of all up-coming showings of this program, press &apos;5&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ManualBox</name>
@@ -429,11 +437,27 @@
     </message>
     <message>
         <source>Auto-Expire recordings</source>
-        <translation>Aufnahmen autom. löschen</translation>
+        <translation type="obsolete">Aufnahmen autom. löschen</translation>
     </message>
     <message>
         <source>Number of most recent episodes to keep (set to 0 for ALL)</source>
-        <translation>Wieviele Episoden behalten (0 für alle)</translation>
+        <translation type="obsolete">Wieviele Episoden behalten (0 für alle)</translation>
+    </message>
+    <message>
+        <source>Allow recording even if duplicate episode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow recordings to be Auto-Expired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum number of episodes to keep (set to 0 for ALL)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record new episodes and delete oldest once maximum count is reached</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -479,7 +503,11 @@
     </message>
     <message>
         <source>Advanced Recording Options</source>
-        <translation>Erweiterte Aufnahmeoptionen</translation>
+        <translation type="obsolete">Erweiterte Aufnahmeoptionen</translation>
+    </message>
+    <message>
+        <source>See a list of all up-coming episodes/playtimes.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -637,11 +665,19 @@
     </message>
     <message>
         <source>Transcode</source>
-        <translation>Umwandlung</translation>
+        <translation type="obsolete">Umwandlung</translation>
     </message>
     <message>
         <source>Hue %1 %</source>
         <translation>Farbton %1 %</translation>
+    </message>
+    <message>
+        <source>Stopping Transcode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transcoding</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -685,6 +721,10 @@
     <message>
         <source>Remember this choice and use it automatically in the future</source>
         <translation>Diese Auswahl für die Zukunft merken</translation>
+    </message>
+    <message>
+        <source>Recording this program has been suppressed because: </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

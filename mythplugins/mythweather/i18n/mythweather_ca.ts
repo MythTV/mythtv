@@ -227,15 +227,19 @@
     </message>
     <message>
         <source>*** Invalid Area ID Entered *** Use a valid area id.</source>
-        <translation>*** Area Invàlida *** Entri una àrea vàlida.</translation>
+        <translation type="obsolete">*** Area Invàlida *** Entri una àrea vàlida.</translation>
     </message>
     <message>
         <source>Weather Data Not Available</source>
-        <translation>Informació meteorològica no disponible</translation>
+        <translation type="obsolete">Informació meteorològica no disponible</translation>
     </message>
     <message>
         <source>!!! Timeout Limit !!! Change aggressiveness level.</source>
-        <translation>Temps d&apos;espera excedit !!! Canvii el tipus de connexió.</translation>
+        <translation type="obsolete">Temps d&apos;espera excedit !!! Canvii el tipus de connexió.</translation>
+    </message>
+    <message>
+        <source>*** Invalid Area ID or Server Error ***</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

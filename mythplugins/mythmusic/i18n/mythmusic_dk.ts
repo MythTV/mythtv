@@ -194,5 +194,9 @@
         <translation>Kopierer fra CD:
 </translation>
     </message>
+    <message>
+        <source>Genre: </source>
+        <translation>Genre:</translation>
+    </message>
 </context>
 </TS>

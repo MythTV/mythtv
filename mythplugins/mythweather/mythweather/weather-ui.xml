@@ -246,7 +246,7 @@
         <value lang="ES">Radiaci贸n solar (UV)</value>
         <value lang="CA">Radiaci贸 solar (UV)</value>
         <value lang="NL">UV Index</value>
-        <value lang="DK">UV Indeks</value>
+        <value lang="DK">UV Str錶ing</value>
       </textarea>
       <textarea name="uvlevel" draworder="5" align="right">
         <context>1</context>
@@ -509,7 +509,7 @@
         <value lang="ES">Previsi贸n para el</value>
         <value lang="ES">Previsi贸 per al</value>
         <value lang="NL">Verwachtingen voor</value>
-        <value lang="NL">Vejrudsigt for</value>
+        <value lang="DK">Vejrudsigt for</value>
       </textarea>
       <textarea name="forecastdate" draworder="5">
         <context>4</context>
@@ -563,7 +563,7 @@
         <value lang="ES">Mapa no disponible</value>
         <value lang="CA">Mapa no disponible</value>
         <value lang="NL">Weerkaart niet beschikbaar</value>
-        <value lang="DK">Kortet er ikke tilg鎛geligt</value>
+        <value lang="DK">Kortet er ikke tilg忙ngeligt</value>
       </textarea>
       <image name="radarbk" draworder="4">
         <context>5</context>
@@ -608,7 +608,7 @@
         <value lang="ES">Configuraci贸n de "El Tiempo"</value>
         <value lang="CA">Configuraci贸 de "El Temps"</value>
         <value lang="NL">Configuratie "Het Weer"</value>
-        <value lang="DK">Vejr ops鎡ning"</value>
+        <value lang="DK">Vejr ops忙tning"</value>
       </textarea>
       <textarea name="help" draworder="7" align="center">
         <font>weatherdata</font>
@@ -632,7 +632,7 @@
         <value lang="ES">Para guardar, pulse 'i' - para cancelar, para cancelar salga</value>
         <value lang="CA">Per a guardar, premi 'i' - per cancel-lar, surti</value>
         <value lang="NL">Druk 'i' om op te slaan - druk escape om te annuleren</value>
-        <value lang="DK">Gem med 'i' - afbryd med ESCape</value>
+        <value lang="DK">Gem med 'i' - afbryd med escape</value>
         <area>47,350,200,150</area>
         <multiline>yes</multiline>
       </textarea>

@@ -90,12 +90,14 @@
         <area>30,170,400,50</area>
         <value>loading...</value>
         <value lang="DE">Lade...</value>
+        <value lang="DK">Indlæser...</value>
       </textarea>
       <textarea name="retrieve" draworder="3" align="center">
         <font>timedate</font>
         <area>0,480,800,42</area>
         <value>[ retrieving weather data ... ]</value>
         <value lang="DE">[ hole Wetterdaten ... ]</value>
+        <value lang="DK">[ henter vejrdata ... ]</value>
       </textarea>
     </container>
 
@@ -153,6 +155,7 @@
         <font>header</font>
         <value>current conditions</value>
         <value lang="DE">Aktuelles Wetter</value>
+        <value lang="DK">Nuværende vejr</value>
       </textarea>
       <textarea name="humiditylbl" draworder="5">
         <context>1</context>
@@ -160,6 +163,7 @@
         <font>weatherdata</font>
         <value>Humidity</value>
         <value lang="DE">Luftfeuchtigkeit</value>
+        <value lang="DK">Luftfugtighed</value>
       </textarea>
       <textarea name="humidity" draworder="5" align="right">
         <context>1</context>
@@ -172,6 +176,7 @@
         <font>weatherdata</font>
         <value>Pressure</value>
         <value lang="DE">Druck</value>
+        <value lang="DK">Tryk</value>
       </textarea>
       <textarea name="barometer" draworder="5" align="right">
         <context>1</context>
@@ -184,6 +189,7 @@
         <font>weatherdata</font>
         <value>Wind</value>
         <value lang="DE">Windgeschwindigkeit</value>
+        <value lang="DK">Vind</value>
       </textarea>
       <textarea name="winddata" draworder="5" align="right">
         <context>1</context>
@@ -196,6 +202,7 @@
         <font>weatherdata</font>
         <value>Visibility</value>
         <value lang="DE">Sichtweite</value>
+        <value lang="DK">Sigtbarhed</value>
       </textarea>
       <textarea name="visibility" draworder="5" align="right">
         <context>1</context>
@@ -208,6 +215,7 @@
         <font>weatherdata</font>
         <value>Wind Chill</value>
         <value lang="DE">Gefühlte Temperatur</value>
+        <value lang="DK">Vindafkølet luft</value>
       </textarea>
       <textarea name="windchill" draworder="5" align="right">
         <context>1</context>
@@ -220,6 +228,7 @@
         <font>weatherdata</font>
         <value>UV Index</value>
         <value lang="DE">UV Strahlung</value>
+        <value lang="DK">UV Stråling</value>
       </textarea>
       <textarea name="uvlevel" draworder="5" align="right">
         <context>1</context>
@@ -267,6 +276,7 @@
         <font>header</font>
         <value>extended forecast</value>
         <value lang="DE">Erweiterte Vorhersage</value>
+        <value lang="DK">Udvidet vejrudsigt</value>
       </textarea>
       <textarea name="date1" draworder="5" align="center">
         <context>2</context>
@@ -290,6 +300,7 @@
         <font>lohifont</font>
         <value>LO</value>
         <value lang="DE">Min</value>
+        <value lang="DK">Min</value>
       </textarea>
       <textarea name="hilbl1" draworder="5" align="center">
         <context>2</context>
@@ -297,6 +308,7 @@
         <font>lohifont</font>
         <value>HI</value>
         <value lang="DE">Max</value>
+        <value lang="DK">Maks</value>
       </textarea>
       <textarea name="low1" draworder="5" align="center">
         <context>2</context>
@@ -330,6 +342,7 @@
         <font>lohifont</font>
         <value>LO</value>
         <value lang="DE">Min</value>
+        <value lang="DK">Min</value>
       </textarea>
       <textarea name="hilbl2" draworder="5" align="center">
         <context>2</context>
@@ -337,6 +350,7 @@
         <font>lohifont</font>
         <value>HI</value>
         <value lang="DE">Max</value>
+        <value lang="DK">Maks</value>
       </textarea>
       <textarea name="low2" draworder="5" align="center">
         <context>2</context>
@@ -370,6 +384,7 @@
         <font>lohifont</font>
         <value>LO</value>
         <value lang="DE">Min</value>
+        <value lang="DK">Min</value>
       </textarea>
       <textarea name="hilbl3" draworder="5" align="center">
         <context>2</context>
@@ -377,6 +392,7 @@
         <font>lohifont</font>
         <value>HI</value>
         <value lang="DE">Max</value>
+        <value lang="DK">Maks</value>
       </textarea>
       <textarea name="low3" draworder="5" align="center">
         <context>2</context>
@@ -407,6 +423,7 @@
         <font>header</font>
         <value>today's forecast</value>
         <value lang="DE">Vorhersage für heute</value>
+        <value lang="DK">Vejrudsigt for idag</value>
       </textarea>
       <textarea name="updatetime-3" draworder="5">
         <context>3</context>
@@ -438,12 +455,14 @@
         <font>header</font>
         <value>tomorrow's outlook</value>
         <value lang="DE">Vorhersage für Morgen</value>
+        <value lang="DK">Vejrudsigt for i morgen</value>
       </textarea>
       <textarea name="forecastlbl" draworder="5">
         <context>4</context>
         <area>260,235,500,40</area>
         <font>todayfont</font>
         <value>Forecast for</value>
+        <value lang="DK">Vejrudsigt for</value>
       </textarea>
       <textarea name="forecastdate" draworder="5">
         <context>4</context>
@@ -485,12 +504,14 @@
         <font>header</font> 
         <value>doppler radar</value>
         <value lang="DE">Dopplerradar</value>
+        <value lang="DK">Dopplerradar</value>
       </textarea>
       <textarea name="err1" draworder="5" align="center">
         <context>5</context>
         <area>0,250,800,45</area>
         <font>header</font>
         <value>Map Unavailable</value>
+        <value lang="DK">Kort ikke tilgængeligt</value>
       </textarea>
       <image name="radarbk" draworder="4">
         <context>5</context>
@@ -521,6 +542,7 @@
         <font>timedate</font>
         <value>Enter Zip Code</value>
         <value lang="DE">Postleitzahl eingeben</value>
+        <value lang="DK">Indtast postkode</value>
         <area>0,215,800,25</area>
       </textarea>
       <textarea name="locationhold" draworder="7" align="center">
@@ -554,6 +576,7 @@
         <font>footer</font>
         <value>To save, press 'i' again - to cancel, hit escape</value>
         <value lang="DE">Mit 'i' speichern; ESCAPE um abzubrechen</value>
+        <value lang="DK">For at gemme, tryk 'i' igen, for at afbryde tryk escape</value>
         <area>47,350,200,150</area>
         <multiline>yes</multiline>
       </textarea>

@@ -127,11 +127,11 @@
     </message>
     <message>
         <source> Visibility will be unlimited for today.</source>
-        <translation> Synbarheden vil være ubegrænset idag.</translation>
+        <translation> Sightbarheden vil være ubegrænset idag.</translation>
     </message>
     <message>
         <source> Visibility conditions are unknown.</source>
-        <translation> Synbarheds tilstanden er ukendt.</translation>
+        <translation> Sigtbarhedstilstanden er ukendt.</translation>
     </message>
     <message>
         <source> There will be a visibility of </source>
@@ -147,7 +147,7 @@
     </message>
     <message>
         <source>SUN</source>
-        <translation>S�</translation>
+        <translation>Søn</translation>
     </message>
     <message>
         <source>Sunday</source>
@@ -155,7 +155,7 @@
     </message>
     <message>
         <source>MON</source>
-        <translation>MAN</translation>
+        <translation>Man</translation>
     </message>
     <message>
         <source>Monday</source>
@@ -163,7 +163,7 @@
     </message>
     <message>
         <source>TUE</source>
-        <translation>TIR</translation>
+        <translation>Tir</translation>
     </message>
     <message>
         <source>Tuesday</source>
@@ -171,7 +171,7 @@
     </message>
     <message>
         <source>WED</source>
-        <translation>ONS</translation>
+        <translation>Ons</translation>
     </message>
     <message>
         <source>Wednesday</source>
@@ -179,7 +179,7 @@
     </message>
     <message>
         <source>THU</source>
-        <translation>TOR</translation>
+        <translation>Tor</translation>
     </message>
     <message>
         <source>Thursday</source>
@@ -187,7 +187,7 @@
     </message>
     <message>
         <source>FRI</source>
-        <translation>FRE</translation>
+        <translation>Fre</translation>
     </message>
     <message>
         <source>Friday</source>
@@ -195,7 +195,7 @@
     </message>
     <message>
         <source>SAT</source>
-        <translation>L�</translation>
+        <translation>Lør</translation>
     </message>
     <message>
         <source>Saturday</source>
@@ -227,15 +227,19 @@
     </message>
     <message>
         <source>*** Invalid Area ID Entered *** Use a valid area id.</source>
-        <translation>*** Ugyldigt område ID indtastet *** Brug et gyldigt område id.</translation>
+        <translation type="obsolete">*** Ugyldigt område ID indtastet *** Brug et gyldigt område id.</translation>
     </message>
     <message>
         <source>Weather Data Not Available</source>
-        <translation>Vejr data ikke tilgængelig</translation>
+        <translation type="obsolete">Vejr data ikke tilgængelig</translation>
     </message>
     <message>
         <source>!!! Timeout Limit !!! Change aggressiveness level.</source>
-        <translation>!!! Tidsgrænsen udløb !!! Sæt et andet aggressivitets niveau.</translation>
+        <translation type="obsolete">!!! Tidsgrænsen udløb !!! Sæt et andet aggressivitets niveau.</translation>
+    </message>
+    <message>
+        <source>*** Invalid Area ID or Server Error ***</source>
+        <translation>*** Ugyldigt område ID eller server fejl ***</translation>
     </message>
 </context>
 </TS>

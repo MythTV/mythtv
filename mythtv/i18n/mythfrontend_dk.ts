@@ -52,6 +52,14 @@
         <source>Don&apos;t record this program</source>
         <translation>Undlad at optage denne udsendelse</translation>
     </message>
+    <message>
+        <source>To go to the advanced recordings screen, press &apos;i&apos;</source>
+        <translation>For at komme til avancerede optagelsesindstillinger, tryk &apos;i&apos;</translation>
+    </message>
+    <message>
+        <source>To see a list of all up-coming showings of this program, press &apos;5&apos;</source>
+        <translation>For at se en liste over kommende visninger af dette program, tryk &apos;5&apos;</translation>
+    </message>
 </context>
 <context>
     <name>ManualBox</name>
@@ -187,15 +195,15 @@
     </message>
     <message>
         <source>Allow this program to AutoExpire?</source>
-        <translation type="unfinished"></translation>
+        <translation>Tillad dette program at auto-udløbe?</translation>
     </message>
     <message>
         <source>Yes, AutoExpire</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, auto-udløb er OK</translation>
     </message>
     <message>
         <source>No, Do Not AutoExpire</source>
-        <translation type="unfinished"></translation>
+        <translation>Nej, undlad auto-udløb</translation>
     </message>
 </context>
 <context>
@@ -412,12 +420,20 @@
         <translation>Rang</translation>
     </message>
     <message>
-        <source>Auto-Expire recordings</source>
-        <translation type="unfinished"></translation>
+        <source>Allow recording even if duplicate episode</source>
+        <translation>Tillad optagelse af tidligere optagede episoder</translation>
     </message>
     <message>
-        <source>Number of most recent episodes to keep (set to 0 for ALL)</source>
-        <translation type="unfinished"></translation>
+        <source>Allow recordings to be Auto-Expired</source>
+        <translation>Tillad at optagelser auto-udløber</translation>
+    </message>
+    <message>
+        <source>Maximum number of episodes to keep (set to 0 for ALL)</source>
+        <translation>Maksimalt antal episoder der beholdes (sæt til 0 for alle)</translation>
+    </message>
+    <message>
+        <source>Record new episodes and delete oldest once maximum count is reached</source>
+        <translation>Optag nye episoder og slet de ældste når maksimalt antal er nået</translation>
     </message>
 </context>
 <context>
@@ -455,7 +471,11 @@
     <name>ScheduledRecording</name>
     <message>
         <source>Advanced Recording Options</source>
-        <translation>Avancerede optagelsesindstillinger</translation>
+        <translation type="obsolete">Avancerede optagelsesindstillinger</translation>
+    </message>
+    <message>
+        <source>See a list of all up-coming episodes/playtimes.</source>
+        <translation>Se en liste med kommende episoder/visninger.</translation>
     </message>
 </context>
 <context>
@@ -550,7 +570,7 @@
     </message>
     <message>
         <source>Transcode</source>
-        <translation>Genkodning</translation>
+        <translation type="obsolete">Genkodning</translation>
     </message>
     <message>
         <source>Searching...</source>
@@ -594,7 +614,15 @@
     </message>
     <message>
         <source>Hue %1 %</source>
-        <translation type="unfinished"></translation>
+        <translation>Lød %1 %</translation>
+    </message>
+    <message>
+        <source>Stopping Transcode</source>
+        <translation>Stopper genkodning</translation>
+    </message>
+    <message>
+        <source>Transcoding</source>
+        <translation>Genkoder</translation>
     </message>
 </context>
 <context>
@@ -638,6 +666,10 @@
     <message>
         <source>Remember this choice and use it automatically in the future</source>
         <translation>Husk dette valg og brug det automatisk i fremtiden</translation>
+    </message>
+    <message>
+        <source>Recording this program has been suppressed because: </source>
+        <translation>Optagelse af dette progam er blevet undertrykt fordi:</translation>
     </message>
 </context>
 </TS>

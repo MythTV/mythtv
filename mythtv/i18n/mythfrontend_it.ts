@@ -60,6 +60,14 @@
         <source>Don&apos;t record this program</source>
         <translation>Non registrare questo programma</translation>
     </message>
+    <message>
+        <source>To go to the advanced recordings screen, press &apos;i&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To see a list of all up-coming showings of this program, press &apos;5&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ManualBox</name>
@@ -468,11 +476,19 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Auto-Expire recordings</source>
+        <source>Allow recording even if duplicate episode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Number of most recent episodes to keep (set to 0 for ALL)</source>
+        <source>Allow recordings to be Auto-Expired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum number of episodes to keep (set to 0 for ALL)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record new episodes and delete oldest once maximum count is reached</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -518,7 +534,7 @@
         <translation type="obsolete">Descrizione:</translation>
     </message>
     <message>
-        <source>Advanced Recording Options</source>
+        <source>See a list of all up-coming episodes/playtimes.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -676,11 +692,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Transcode</source>
+        <source>Hue %1 %</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Hue %1 %</source>
+        <source>Stopping Transcode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transcoding</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -724,6 +744,10 @@
     </message>
     <message>
         <source>Unsuppress recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording this program has been suppressed because: </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
