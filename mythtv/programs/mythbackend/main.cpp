@@ -22,26 +22,58 @@ using namespace std;
 QMap<int, EncoderLink *> tvList;
 MythContext *gContext;
 
-void setupTVs(void)
+void setupTVs(bool ismaster)
 {
     QString startchannel = gContext->GetSetting("DefaultTVChannel");
     if (startchannel == "")
         startchannel = "3";
 
+    QString localhostname = gContext->GetHostName();
+
     QSqlQuery query;
 
-    query.exec("SELECT cardid FROM capturecard ORDER BY cardid;");
+    query.exec("SELECT cardid,hostname FROM capturecard ORDER BY cardid;");
 
     if (query.isActive() && query.numRowsAffected())
     {
         while (query.next())
         {
             int cardid = query.value(0).toInt();
+            QString host = query.value(1).toString();
 
-            TVRec *tv = new TVRec(startchannel, cardid);
-            tv->Init();
-            EncoderLink *enc = new EncoderLink(tv);
-            tvList[cardid] = enc;
+            if (host.isNull() || host.isEmpty())
+            {
+                cerr << "One of your capturecard entries does not have a "
+                     << "hostname.\n  Please run setup and confirm all of the "
+                     << "capture cards.\n";
+                exit(-1);
+            }
+
+            if (!ismaster)
+            {
+                if (host == localhostname)
+                {
+                    TVRec *tv = new TVRec(startchannel, cardid);
+                    tv->Init();
+                    EncoderLink *enc = new EncoderLink(cardid, tv);
+                    tvList[cardid] = enc;
+                }
+            }
+            else
+            {
+                if (host == localhostname)
+                {
+                    TVRec *tv = new TVRec(startchannel, cardid);
+                    tv->Init();
+                    EncoderLink *enc = new EncoderLink(cardid, tv);
+                    tvList[cardid] = enc;
+                }
+                else
+                {
+                    EncoderLink *enc = new EncoderLink(cardid, NULL, host);
+                    tvList[cardid] = enc;
+                }
+            }
         }
     }
     else
@@ -147,20 +179,49 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    setupTVs();
-
-    QSqlDatabase *scdb = QSqlDatabase::database("SUBDB");
-    Scheduler *sched = new Scheduler(&tvList, scdb);
-
     int port = gContext->GetNumSetting("BackendServerPort", 6543);
     int statusport = gContext->GetNumSetting("BackendStatusPort", 6544);
+
+    QString myip = gContext->GetSetting("BackendServerIP");
+    QString masterip = gContext->GetSetting("MasterServerIP");
+
+    bool ismaster = false;
+
+    if (myip.isNull() || myip.isEmpty())
+    {
+        cerr << "No setting found for this machine's BackendServerIP.\n"
+             << "Please run setup on this machine and modify the first page\n"
+             << "of the general settings.\n";
+        exit(-1);
+    }
+
+    if (masterip == myip)
+    {
+        cerr << "Starting up as the master server.\n";
+        ismaster = true;
+    }
+    else
+    {
+        cerr << "Running as a slave backend.\n";
+    }
+ 
+    setupTVs(ismaster);
+
+    Scheduler *sched = NULL;
+    if (ismaster)
+    {
+        QSqlDatabase *scdb = QSqlDatabase::database("SUBDB");
+        sched = new Scheduler(&tvList, scdb);
+    }
 
     new MainServer(port, statusport, &tvList);
 
     a.exec();
 
     delete gContext;
-    delete sched;
+
+    if (sched)
+        delete sched;
 
     if (pidfile != "")
         unlink(pidfile.ascii());

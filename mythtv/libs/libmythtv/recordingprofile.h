@@ -68,7 +68,7 @@ public:
     RecordingProfile();
 
     virtual void loadByID(QSqlDatabase* db, int id);
-    virtual void loadByName(QSqlDatabase* db, QString name);
+    virtual bool loadByName(QSqlDatabase* db, QString name);
 
     static void fillSelections(QSqlDatabase* db, SelectSetting* setting);
 

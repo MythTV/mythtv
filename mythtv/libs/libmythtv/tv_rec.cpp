@@ -102,30 +102,6 @@ TVRec::~TVRec(void)
         DisconnectDB();
 }
 
-int TVRec::AllowRecording(ProgramInfo *rcinfo, int timeuntil)
-{
-    if (internalState != kState_WatchingLiveTV)
-    {
-        return 1;
-    }
-
-    QString message = QString("MythTV wants to record \"") + rcinfo->title;
-    if (gContext->GetNumSetting("DisplayChanNum") != 0)
-        message += QString("\" on ") + rcinfo->channame + " [" +
-                   rcinfo->chansign + "]";
-    else
-        message += "\" on Channel " + rcinfo->chanstr;
-    message += " in %d seconds.  Do you want to:";
-
-    QString query = QString("ASK_RECORDING %1 %2").arg(m_capturecardnum)
-                                                  .arg(timeuntil - 2);
-
-    MythEvent me(query, message);
-    gContext->dispatch(me);
-
-    return -1;
-}
-
 void TVRec::StartRecording(ProgramInfo *rcinfo)
 {  
     QString recprefix = gContext->GetSetting("RecordFilePrefix");
@@ -392,15 +368,23 @@ void TVRec::HandleStateChange(void)
         MythContext::KickDatabase(db_conn);
 
         RecordingProfile profile;
-        if (curRecording) {
-	    int profileID = curRecording->GetScheduledRecording(db_conn)->getProfileID();
-	    if (profileID > 0)
-                profile.loadByID(db_conn, profileID);
-            else
-                profile.loadByName(db_conn, "Default");
-	} else {
-            profile.loadByName(db_conn, "Live TV");
-	}
+
+        if (!profile.loadByName(db_conn, gContext->GetHostName()))
+        {
+            if (curRecording) 
+            {
+	        int profileID = curRecording->GetScheduledRecording(db_conn)
+                                            ->getProfileID();
+                if (profileID > 0)
+                    profile.loadByID(db_conn, profileID);
+                else
+                    profile.loadByName(db_conn, "Default");
+            } 
+            else 
+            {
+                profile.loadByName(db_conn, "Live TV");
+            }
+        }
 
         pthread_mutex_unlock(&db_lock);
 

@@ -791,6 +791,11 @@ void Scheduler::DoMultiCard(void)
                     second->inputid = sourceToInput[second->sourceid][z];
                     second->cardid = inputToCard[second->inputid];
 
+                    if (!((*m_tvList)[second->cardid])->isConnected())
+                    {
+                        continue;
+                    }
+
                     if (!Conflict(first, second))
                     {
                         fixed = true;
@@ -813,6 +818,11 @@ void Scheduler::DoMultiCard(void)
                 {
                     first->inputid = sourceToInput[first->sourceid][z];
                     first->cardid = inputToCard[first->inputid];
+
+                    if (!((*m_tvList)[first->cardid])->isConnected())
+                    {
+                        continue;
+                    }
 
                     if (!Conflict(first, second))
                     {

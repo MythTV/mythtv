@@ -22,7 +22,6 @@ class TVRec
 
     void Init(void);
 
-    int AllowRecording(ProgramInfo *rcinfo, int timeuntil);
     void StartRecording(ProgramInfo *rcinfo);
     void StopRecording(void);
 

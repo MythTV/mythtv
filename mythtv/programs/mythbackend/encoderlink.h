@@ -11,8 +11,8 @@ class MainServer;
 class EncoderLink
 {
   public:
-    EncoderLink(QSocket *lsock, QString lhostname);
-    EncoderLink(TVRec *ltv);
+    EncoderLink(int capturecardnum, QSocket *lsock, QString lhostname);
+    EncoderLink(int capturecardnum, TVRec *ltv);
 
    ~EncoderLink();
 
@@ -22,6 +22,8 @@ class EncoderLink
     TVRec *getTV() { return tv; }
 
     bool isLocal() { return local; }
+
+    bool isConnected();
 
     bool isBusy();
     TVState GetState();
@@ -69,6 +71,8 @@ class EncoderLink
     char *GetScreenGrab(QString filename, int secondsin, int &bufferlen,
                         int &video_width, int &video_height);
   private:
+    int m_capturecardnum;
+
     QSocket *sock;
     QString hostname;
 

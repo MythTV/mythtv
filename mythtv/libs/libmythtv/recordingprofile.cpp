@@ -344,14 +344,16 @@ void RecordingProfile::loadByID(QSqlDatabase* db, int profileId) {
     load(db);
 }
 
-void RecordingProfile::loadByName(QSqlDatabase* db, QString name) {
-    QString query = QString("SELECT id FROM recordingprofiles WHERE name = '%1';").arg(name);
+bool RecordingProfile::loadByName(QSqlDatabase* db, QString name) {
+    QString query = QString("SELECT id FROM recordingprofiles "
+                            "WHERE name = '%1';").arg(name);
     QSqlQuery result = db->exec(query);
     if (result.isActive() && result.numRowsAffected() > 0) {
         result.next();
         loadByID(db, result.value(0).toInt());
+        return true;
     } else {
-        cout << "Profile not found: " << name << endl;
+        return false;
     }
 }
 
@@ -372,5 +374,6 @@ void RecordingProfile::fillSelections(QSqlDatabase* db, SelectSetting* setting) 
     QSqlQuery result = db->exec("SELECT name, id FROM recordingprofiles;");
     if (result.isActive() && result.numRowsAffected() > 0)
         while (result.next())
-            setting->addSelection(result.value(0).toString(), result.value(1).toString());
+            setting->addSelection(result.value(0).toString(), 
+                                  result.value(1).toString());
 }
