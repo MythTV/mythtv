@@ -1456,6 +1456,7 @@ void MythContext::DisableScreensaver(void)
         d->m_screensaver.saved = true;
     }
 
+    XResetScreenSaver(qt_xdisplay());
     XSetScreenSaver(qt_xdisplay(), 0, 0, 0, 0);
 }
 #endif
