@@ -742,7 +742,7 @@ void NuppelVideoPlayer::OutputAudioLoop(void)
         if (paused)
         {
             audio_actually_paused = true;
-
+            ioctl(audiofd, SNDCTL_DSP_RESET, NULL);
             //printf("audio waiting for unpause\n");
             usleep(50);
             continue;
@@ -810,6 +810,7 @@ void NuppelVideoPlayer::OutputAudioLoop(void)
         }
         pthread_mutex_unlock(&audio_buflock); // end critical section
     }
+    ioctl(audiofd, SNDCTL_DSP_RESET, NULL);
 }
 
 void *NuppelVideoPlayer::kickoffOutputAudioLoop(void *player)
@@ -1153,6 +1154,9 @@ void NuppelVideoPlayer::ClearAfterSeek(void)
     audiotime = 0;
     gettimeofday(&audiotime_updated, NULL);
     prebuffering = true;
+
+    if (audiofd)
+        ioctl(audiofd, SNDCTL_DSP_RESET, NULL);
 
     pthread_mutex_unlock(&avsync_lock);
     pthread_mutex_unlock(&video_buflock);
