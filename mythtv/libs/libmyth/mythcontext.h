@@ -110,7 +110,7 @@ class MythPrivRequest
     void *m_data;
 };
 
-#define MYTH_BINARY_VERSION "0.16.20041014-1"
+#define MYTH_BINARY_VERSION "0.16.20041106-1"
 #define MYTH_PROTO_VERSION "14"
 
 extern int print_verbose_messages;

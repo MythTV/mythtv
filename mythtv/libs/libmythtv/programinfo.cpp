@@ -2440,7 +2440,6 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
     else if (ret == stop)
     {
         RemoteStopRecording(this);
-        FinishedRecording(db, false);
     }
     else if (ret == addov)
         ApplyRecordStateChange(db, kDontRecord);

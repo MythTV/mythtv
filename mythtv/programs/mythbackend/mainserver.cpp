@@ -1196,8 +1196,8 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
 
     QString startts = pginfo->recstartts.toString("yyyyMMddhhmm");
     startts += "00";
-    QString endts = pginfo->endts.toString("yyyyMMddhhmm");
-    endts += "00";
+    QString recendts = pginfo->recendts.toString("yyyyMMddhhmm");
+    recendts += "00";
     QDateTime now(QDateTime::currentDateTime());
     QString newendts = now.toString("yyyyMMddhhmm");
     newendts += "00";
@@ -1216,7 +1216,7 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
     query.bindValue(":CHANID", pginfo->chanid);
     query.bindValue(":TITLE", pginfo->title.utf8());
     query.bindValue(":STARTTIME", startts);
-    query.bindValue(":ENDTIME", endts);
+    query.bindValue(":ENDTIME", recendts);
 
     query.exec();
 
