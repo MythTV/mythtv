@@ -255,7 +255,7 @@ char *XJ_init(int width, int height, char *window_name, char *icon_name)
   
   XJ_started=1;
 
-  //XJ_toggleFullscreen();
+  XJ_toggleFullscreen();
   
   return(sbuf);
 }
