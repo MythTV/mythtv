@@ -142,6 +142,9 @@ void DatabaseBox::doSelected(QListViewItem *item)
  //	 cout << "command:" << command << endl;
 
         system((QString("%1 ") .arg(command)).ascii() );
+
+        raise();
+        setActiveWindow();
     }
     else if (mdata != NULL && mdata->Genre() == "dir")
     {
