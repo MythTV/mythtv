@@ -767,9 +767,9 @@ void ThemedMenu::layoutButtons(void)
         exit(0);
     }
     
-    if (columns < 2)
+    if (columns < 1)
     {
-        cerr << "Must have room for at least 2 columns of buttons\n";
+        cerr << "Must have room for at least 1 column of buttons\n";
         exit(0);
     }
 
