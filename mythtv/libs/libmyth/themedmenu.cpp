@@ -1803,6 +1803,11 @@ void ThemedMenu::handleAction(QString &action)
         QString rest = action.right(action.length() - 7);
         MythPluginManager::run_plugin(rest.stripWhiteSpace());
     }
+    else if (action.left(8) == "SHUTDOWN")
+    {
+        if (menulevel == 1)
+            done(0);
+    }
     else
     {
         selection = action;

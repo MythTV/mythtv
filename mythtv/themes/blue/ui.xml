@@ -943,7 +943,7 @@
         <area>20,10,800,40</area>
         <font>info</font>
         <value>Program Rankings</value>
-        <value lang="DE">Sendungen Bewertungen</value>
+        <value lang="DE">Bewertungen</value>
         <value lang="DK">Program rangering</value>
         <value lang="PT">Programas Preferenciais</value>
         <value lang="SV">Programrankning</value>
@@ -1019,7 +1019,7 @@
         <area>20,70,280,30</area>
         <font>info</font>
         <value>Record Type:</value>
-        <value lang="DE">Aufnahmemodus:</value>
+        <value lang="DE">Modus:</value>
         <value lang="DK">Optagelsestype:</value>
         <value lang="PT">Tipo de Gravação:</value>
         <value lang="SV">Inspelningstyp:</value>
