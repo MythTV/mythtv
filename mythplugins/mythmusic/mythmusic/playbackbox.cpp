@@ -295,6 +295,7 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                 case Key_Home:
                     music_tree_list->syncCurrentWithActive();
                     music_tree_list->forceLastBin();
+                    music_tree_list->refresh();
                     handled = true;
                     break;
                 case Key_4:
