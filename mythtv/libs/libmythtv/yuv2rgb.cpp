@@ -309,6 +309,9 @@ yuv2rgb_fun yuv2rgb_init_mmxext (int bpp, int mode)
 	return mmxext_rgb16;
     else if ((bpp == 32) && (mode == MODE_RGB))
 	return mmxext_argb32;
+#else
+    (void)bpp;
+    (void)mode;
 #endif
 
     return NULL; /* Fallback to C */
