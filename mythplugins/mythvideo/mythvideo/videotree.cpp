@@ -193,9 +193,15 @@ void VideoTree::handleTreeListSelection(int node_int, IntVector *)
         //
         
         system((QString("%1 ").arg(command)).ascii());
+
+        //
+        //  Go back to tree browsing
+        //
+
         video_tree_list->deactivate();
-        raise();
-        setActiveWindow();
+        gContext->GetMainWindow()->raise();
+        gContext->GetMainWindow()->setActiveWindow();
+        gContext->GetMainWindow()->currentWidget()->setFocus();
     }
 }
 
