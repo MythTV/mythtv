@@ -23,7 +23,7 @@
 #include <sys/ioctl.h>
 #include <sys/types.h>
 
-#ifndef _WIN32
+#if defined(CONFIG_VIDEO4LINUX)
 #include "videodev_myth.h"
 #endif
 
@@ -1204,7 +1204,7 @@ CardInputEditor::~CardInputEditor() {
 QStringList VideoDevice::probeInputs(QString device) {
     QStringList ret;
 
-#ifndef _WIN32
+#if defined(CONFIG_VIDEO4LINUX)
     int videofd = open(device.ascii(), O_RDWR);
     if (videofd < 0) {
         cerr << "Couldn't open " << device << " to probe its inputs.\n";
@@ -1264,7 +1264,7 @@ QStringList VideoDevice::probeInputs(QString device) {
     close(videofd);
 
 #else
-    ret += QObject::tr("ERROR, V4L support unavailable on Windows");
+    ret += QObject::tr("ERROR, V4L support unavailable on this OS");
 #endif
 
     return ret;

@@ -25,8 +25,14 @@ release {
 
 EXTRA_LIBS = -lfreetype -lmp3lame
 
-unix:linux*: CONFIG += linux
-unix:freebsd*: CONFIG += freebsd
+unix:linux*: {
+    CONFIG  += linux
+    DEFINES += CONFIG_VIDEO4LINUX
+}
+unix:freebsd*: {
+    CONFIG  += freebsd
+    DEFINES += CONFIG_VIDEO4LINUX
+}
 
 # X11 support
 CONFIG += using_x11
