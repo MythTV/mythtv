@@ -443,6 +443,9 @@ void ThemedMenuPrivate::parseFont(QDomElement &element)
     QString name;
     QString face;
     QString bold;
+    QString ital;
+    QString under;
+    
     int size = -1;
     int sizeSmall = -1;
     int sizeBig = -1;
@@ -461,6 +464,9 @@ void ThemedMenuPrivate::parseFont(QDomElement &element)
     bool haveDropColor = false;
     bool haveBold = false;
     bool haveShadow = false;
+    bool haveItal = false;
+    bool haveUnder = false;
+    
     
     
     fontProp *baseFont = NULL;
@@ -554,6 +560,16 @@ void ThemedMenuPrivate::parseFont(QDomElement &element)
                 haveBold = true;
                 bold = getFirstText(info);
             }
+            else if (info.tagName() == "italic")
+            {
+                haveItal = true;
+                ital = getFirstText(info);
+            }
+            else if (info.tagName() == "underline")
+            {
+                haveUnder = true;
+                under = getFirstText(info);
+            }
             else
             {
                 cerr << "Unknown tag " << info.tagName() << " in font\n";
@@ -617,8 +633,29 @@ void ThemedMenuPrivate::parseFont(QDomElement &element)
     {
         if (bold.lower() == "yes")
             newFont.face.setBold(true);
+        else
+            newFont.face.setBold(false);
     }
     
+    if (baseFont && !haveItal)
+        newFont.face.setItalic(baseFont->face.italic());
+    else        
+    {
+        if (ital.lower() == "yes")
+            newFont.face.setItalic(true);
+        else
+            newFont.face.setItalic(false);
+    }
+
+    if (baseFont && !haveUnder)
+        newFont.face.setUnderline(baseFont->face.underline());
+    else        
+    {
+        if (under.lower() == "yes")
+            newFont.face.setUnderline(true);
+        else
+            newFont.face.setUnderline(false);
+    }    
     
     if (haveColor)
     {
