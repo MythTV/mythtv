@@ -432,6 +432,7 @@ void Ripper::ripthedisc(void)
     QString cddevice = gContext->GetSetting("CDDevice");
     QString encodertype = gContext->GetSetting("EncoderType");
     int encodequal = qualitygroup->id(qualitygroup->selected());
+    bool mp3usevbr = gContext->GetNumSetting("Mp3UseVBR", 0);
 
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
 
@@ -477,7 +478,8 @@ void Ripper::ripthedisc(void)
                 if (encodertype == "mp3")
                 {
                     outfile += ".mp3";
-                    encoder = new LameEncoder(outfile, encodequal, track);
+                    encoder = new LameEncoder(outfile, encodequal, track, 
+                                              mp3usevbr);
                 }
                 else // ogg
                 {

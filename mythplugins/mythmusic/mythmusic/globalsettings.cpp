@@ -155,6 +155,8 @@ public:
     };
 };
 
+// Encoder settings
+
 class EncoderType: public ComboBoxSetting, public GlobalSetting {
 public:
     EncoderType():
@@ -165,6 +167,31 @@ public:
         setHelpText(QObject::tr("Audio encoder to use for CD ripping. "
                     "Note that the quality level 'Perfect' will use the "
 		    "FLAC encoder."));
+    };
+};
+
+class DefaultRipQuality: public ComboBoxSetting, public GlobalSetting {
+public:
+    DefaultRipQuality():
+        GlobalSetting("DefaultRipQuality") {
+        setLabel(QObject::tr("Default Rip Quality"));
+        addSelection(QObject::tr("Low"), "0");
+        addSelection(QObject::tr("Medium"), "1");
+        addSelection(QObject::tr("High"), "2");
+        addSelection(QObject::tr("Perfect"), "3");
+        setHelpText(QObject::tr("Default quality for new CD rips."));
+    };
+};
+
+class Mp3UseVBR: public CheckBoxSetting, public GlobalSetting {
+public:
+    Mp3UseVBR():
+        GlobalSetting("Mp3UseVBR") {
+        setLabel(QObject::tr("Use variable bitrates"));
+        setValue(false);
+        setHelpText(QObject::tr("If set, the MP3 encoder will use variable "
+                    "bitrates (VBR) except for the low quality setting. "
+                    "The Ogg encoder will always use variable bitrates."));
     };
 };
 
@@ -402,19 +429,6 @@ public:
     };
 };
 
-class DefaultRipQuality: public ComboBoxSetting, public GlobalSetting {
-public:
-    DefaultRipQuality():
-        GlobalSetting("DefaultRipQuality") {
-        setLabel(QObject::tr("Default Rip Quality"));
-        addSelection(QObject::tr("Low"), "0");
-        addSelection(QObject::tr("Medium"), "1");
-        addSelection(QObject::tr("High"), "2");
-        addSelection(QObject::tr("Perfect"), "3");
-        setHelpText(QObject::tr("Default quality for new CD rips."));
-    };
-};
-
 MusicGeneralSettings::MusicGeneralSettings()
 {
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
@@ -458,8 +472,6 @@ MusicRipperSettings::MusicRipperSettings()
 {
     VerticalConfigurationGroup* rippersettings = new VerticalConfigurationGroup(false);
     rippersettings->setLabel(QObject::tr("CD Ripper Settings"));
-    rippersettings->addChild(new EncoderType());
-    rippersettings->addChild(new DefaultRipQuality());
     rippersettings->addChild(new ParanoiaLevel());
     rippersettings->addChild(new FilenameTemplate());
     rippersettings->addChild(new TagSeparator());
@@ -467,4 +479,12 @@ MusicRipperSettings::MusicRipperSettings()
     rippersettings->addChild(new PostCDRipScript());
     rippersettings->addChild(new EjectCD());
     addChild(rippersettings);
+
+    VerticalConfigurationGroup* encodersettings = new VerticalConfigurationGroup(false);
+    encodersettings->setLabel(QObject::tr("CD Ripper Settings (part 2)"));
+    encodersettings->addChild(new EncoderType());
+    encodersettings->addChild(new DefaultRipQuality());
+    encodersettings->addChild(new Mp3UseVBR());
+    addChild(encodersettings);
 }
+
