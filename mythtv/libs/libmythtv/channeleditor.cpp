@@ -105,12 +105,16 @@ void ChannelListSetting::fillSelections(void)
     QString currentValue = getValue();
     clearSelections();
     addSelection("(New Channel)");
-    QString querystr = QString("SELECT name, channum, chanid FROM channel");
-    if (currentSourceID != "")
-        querystr += QString(" WHERE sourceid='%1'").arg(currentSourceID);
+    QString querystr = "SELECT channel.name,channum,chanid ";
+    if (currentSourceID == "")
+        querystr += ",videosource.name FROM channel,videosource WHERE "
+                    "channel.sourceid = videosource.sourceid ";
+    else
+        querystr += QString("FROM channel WHERE sourceid='%1' ")
+                           .arg(currentSourceID);
         
     if (currentSortMode == QObject::tr("Channel Name"))
-        querystr += " ORDER BY name";
+        querystr += " ORDER BY channel.name";
     else if (currentSortMode == QObject::tr("Channel Number"))
         querystr += " ORDER BY channum + 0";
 
@@ -120,7 +124,8 @@ void ChannelListSetting::fillSelections(void)
             QString name = QString::fromUtf8(query.value(0).toString());
             QString channum = query.value(1).toString();
             QString chanid = query.value(2).toString();
-             
+            QString sourceid = query.value(3).toString();
+ 
             if (channum == "" && currentHideMode) continue;
 
             if (name == "") name = "(Unnamed : " + chanid + ")";
@@ -133,6 +138,9 @@ void ChannelListSetting::fillSelections(void)
                 else
                     name = "???. " + name;
             }
+
+            if (currentSourceID == "")
+                name += " (" + sourceid  + ")";
 
             addSelection(name, chanid, (chanid == currentValue) ? true : false);
         }
