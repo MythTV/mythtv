@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.10 (xris)
+#Last Updated: 2005.02.12 (xris)
 #
 #  ffmpeg.pm
 #
@@ -210,7 +210,7 @@ package export::ffmpeg;
                     $frames = int($1);
                 }
             # ffmpeg warnings?
-                elsif ($l =~ /^Unknown.+?codec/) {
+                elsif ($l =~ /^Unknown.+?(codec|format)/
                     $warnings .= $l;
                     die "\n\nffmpeg had critical errors:\n\n$warnings";
                 }
