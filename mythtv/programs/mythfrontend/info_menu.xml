@@ -44,6 +44,7 @@
      <type>RECIPE</type>
      <text>Recipes</text>
      <text lang="SV">Recept</text>
+     <text lang="NL">Recepten</text>
      <action>PLUGIN mythRecipe</action>
      <depends>mythrecipe</depends>
    </button>
@@ -52,6 +53,7 @@
       <type>TV_STATUS</type>
       <text>System Status</text>
       <text lang="DE">Systemstatus</text>
+      <text lang="NL">Systeemstatus</text>
       <text lang="SV">Systemstatus</text>
       <text lang="JA">システムステータス</text>
       <action>TV_STATUS</action>

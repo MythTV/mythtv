@@ -53,6 +53,7 @@
      <type>FM</type>
      <text>Listen to the radio</text>
      <text lang="SV">Lyssna pÃ¥ radio</text>
+     <text lang="NL">Radio Luisteren</text>
      <action>PLUGIN mythFM</action>
      <depends>mythFM mythfm</depends>
    </button>

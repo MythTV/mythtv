@@ -43,6 +43,7 @@
    <button>
       <type>TV_SEARCH_TIMES</type>
       <text>Time</text>
+      <text lang="NL">Tijdstip</text>
       <action>TV_SEARCH_TIME</action>
    </button>
 

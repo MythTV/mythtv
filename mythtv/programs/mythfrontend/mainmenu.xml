@@ -20,6 +20,7 @@
      <type>MENU_MEDIA_LIBRARY</type>
      <text>Media Library</text>
      <text lang="DE">Medienbibliothek</text>
+     <text lang="NL">Media-Center</text>     
      <text lang="SV">Mediabibliotek</text>
      <action>MENU library.xml</action>
    </button>
@@ -30,7 +31,7 @@
       <text lang="IT">Programma una registrazione</text>
       <text lang="ES">Programar Grabaciones</text>
       <text lang="CA">Programar Gravacions</text>
-      <text lang="NL">Opnames Plannen</text>
+      <text lang="NL">Opnames Beheren</text>
       <text lang="FR">Programmer des enregistrements</text>
       <text lang="DE">Aufnahmen planen</text>
       <text lang="DK">Optag udsendelse</text>
@@ -44,6 +45,7 @@
      <type>MENU_INFO_CENTER</type>
      <text>Information Center</text>
      <text lang="DE">Informationszentrale</text>
+     <text lang="NL">Informatiecentrale</text>
      <text lang="SV">Informationscenter</text>
      <action>MENU info_menu.xml</action>
    </button>
@@ -52,6 +54,7 @@
      <type>MENU_OPTICAL_DISKS</type>
      <text>Optical Disks</text>
      <text lang="DE">Optische Medien</text>
+     <text lang="NL">DVD-CD media</text>
      <text lang="SV">Optiska diskar</text>
      <action>MENU optical_menu.xml</action>
      <depends>mythmusic mythdvd</depends>
@@ -77,6 +80,7 @@
      <type>SHUTDOWN</type>
      <text>Shutdown</text>
      <text lang="SV">Avstängning</text>
+     <text lang="NL">Uitschakelen</text>
      <action>SHUTDOWN</action>
    </button> -->
 

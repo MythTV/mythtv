@@ -20,6 +20,7 @@
       <type>TV_RECPRIORITIES</type>
       <text>Set Priorities</text>
       <text lang="DE">Prioritäten</text>
+      <text lang="NL">Prioriteiten</text>
       <text lang="SV">Prioriteter</text>
       <text lang="JA">録画優先順位</text>
       <action>TV_SET_RECPRIORITIES</action>
@@ -31,7 +32,7 @@
       <text lang="IT">Correggi i conflitti</text>
       <text lang="ES">Resolver conflictos</text>
       <text lang="CA">Resoldre Conflictes</text>
-      <text lang="NL">Conflicten Oplossen</text>
+      <text lang="NL">Geplande Opnames</text>
       <text lang="FR">Gestion des conflits</text>
       <text lang="DE">Aufnahmeplan</text>
       <text lang="DK">Løs optagelseskonflikter</text>

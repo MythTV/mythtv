@@ -4,6 +4,7 @@
       <type>MUSIC_PLAYLIST</type>
       <text>Music Tools</text>
       <text lang="DE">Musik-Manager</text>
+      <text lang="NL">Muziek Beheren</text>
       <text lang="SV">Musikverktyg</text>
       <action>PLUGIN mythmusic</action>
       <depends>mythmusic</depends>	
