@@ -1322,16 +1322,13 @@ void Weather::updateAggr()
         int h;
         int cnt = 0;
 
-        for (int i = config_Aggressiveness - 3; i < (config_Aggressiveness + 4); i++)
+        for (int i = config_Aggressiveness - 4; i < (config_Aggressiveness + 5); i++)
         {
                 h = i;
                 if (i < 1)
                         h = 15 + i;
                 if (i > 15)
                         h = i - 15;
-
-                if (h == config_Aggressiveness)
-                        aggrNum[cnt].setPaletteBackgroundColor(topbot_bgColor);
 
                 if (h == 1)
                         temp = " 1  High Speed Connection";
@@ -1401,7 +1398,7 @@ void Weather::cursorLeft()
 	{
 		lbLocale->setText("Use the right arrow key to select the aggressiveness level...");
 		lbAggr->setPaletteBackgroundColor(topbot_bgColor);
-		aggrNum[3].setPaletteBackgroundColor(QColor(0, 0, 0));
+		aggrNum[4].setPaletteBackgroundColor(QColor(0, 0, 0));
 	}
 
 	if (curConfig != 2)
@@ -1449,7 +1446,7 @@ void Weather::cursorRight()
 	{
 		lbLocale->setText("Use the up and down arrow keys to select the aggressiveness level...");
 		lbAggr->setPaletteBackgroundColor(QColor(0, 0, 0));
-		aggrNum[3].setPaletteBackgroundColor(topbot_bgColor);
+		aggrNum[4].setPaletteBackgroundColor(topbot_bgColor);
 	}
 
 	deepSetup = true;
@@ -2567,6 +2564,7 @@ if (pageNum == 4)
 
  	page5Dia->setMaximumWidth((int)(750*wmult));
 	page5Dia->setPaletteBackgroundColor(main_bgColor);
+	page5Dia->setFrameStyle( QFrame::Panel | QFrame::Raised );
    	QHBoxLayout *ext5  = new QHBoxLayout(0, 0, 0);
 	QVBoxLayout *ext5v = new QVBoxLayout(0, 10, 10);
 	QLabel *spc = new QLabel("", page5Dia);
@@ -2585,16 +2583,19 @@ if (pageNum == 4)
 	lbUnits->setMaximumWidth((int)250);
 	lbUnits->setMinimumWidth((int)250);
 	lbUnits->setMaximumHeight((int)(2*fontMet.height()));
+	lbUnits->setFrameStyle( QFrame::Panel | QFrame::Raised );
 	lbLocal = new QLabel("Location", page5Dia);
 	lbLocal->setAlignment(Qt::AlignCenter);
 	lbLocal->setMaximumWidth((int)250);
 	lbLocal->setMinimumWidth((int)250);
 	lbLocal->setMaximumHeight((int)(2*fontMet.height()));
+	lbLocal->setFrameStyle( QFrame::Panel | QFrame::Raised );
 	lbAggr = new QLabel("Aggressiveness", page5Dia);
 	lbAggr->setAlignment(Qt::AlignCenter);
 	lbAggr->setMaximumWidth((int)250);
 	lbAggr->setMinimumWidth((int)250);
 	lbAggr->setMaximumHeight((int)(2*fontMet.height()));
+	lbAggr->setFrameStyle( QFrame::Panel | QFrame::Raised );
 
 	ext5v->addWidget(lbUnits, 0);
 	ext5v->addWidget(lbLocal, 0);
@@ -2605,6 +2606,9 @@ if (pageNum == 4)
 	unitType = new QFrame(page5Dia);
     	location = new QFrame(page5Dia);
    	aggressv = new QFrame(page5Dia);
+	unitType->setFrameStyle( QFrame::Panel | QFrame::Raised );
+	location->setFrameStyle( QFrame::Panel | QFrame::Raised );
+	aggressv->setFrameStyle( QFrame::Panel | QFrame::Raised );
 	unitType->setPaletteBackgroundColor(main_bgColor);
 	location->setPaletteBackgroundColor(main_bgColor);
 	aggressv->setPaletteBackgroundColor(main_bgColor);
@@ -2618,10 +2622,12 @@ if (pageNum == 4)
 	unitType->hide();
 	aggressv->hide();
 
-	ImpUnits = new QLabel(" 1. Imperial Units (fahrenheit, mph)", unitType);
-	SIUnits = new QLabel(" 2. SI Units (celsius, kph)         ", unitType);
+	ImpUnits = new QLabel(" 1. Imperial Units (Fahrenheit, MPH)", unitType);
+	SIUnits = new QLabel(" 2. SI Units (Celsius, KPH)         ", unitType);
 	ImpUnits->setMaximumHeight((int)(2*fontMet.height()));
 	SIUnits->setMaximumHeight((int)(2*fontMet.height()));
+	ImpUnits->setFrameStyle( QFrame::Panel | QFrame::Raised );
+	SIUnits->setFrameStyle( QFrame::Panel | QFrame::Raised );
 
 	ImpUnits->setMaximumWidth((int)(398*wmult));
 	ImpUnits->setMinimumWidth((int)(398*wmult));
@@ -2652,6 +2658,8 @@ if (pageNum == 4)
 
 	letterList[4].setPaletteBackgroundColor(QColor(0, 0, 0));
 	cityList[4].setPaletteBackgroundColor(QColor(0, 0, 0));
+	letterList[4].setFrameStyle( QFrame::Panel | QFrame::Raised );
+	cityList[4].setFrameStyle( QFrame::Panel | QFrame::Raised );
 
 	for (int j = curLetter - 4; j < curLetter + 5; j++)
         {
@@ -2667,6 +2675,7 @@ if (pageNum == 4)
 		letterList[cnt].setMaximumHeight((int)(1.5*fontMet.height()));
 		letterList[cnt].setMaximumWidth((int)(50*wmult));
 		letterList[cnt].setMinimumWidth((int)(50*wmult));
+		letterList[cnt].setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);
 		letBox->addWidget(&letterList[cnt], 0, 0);
 		temp = "some test city!";
 		cityList[cnt].setText(temp);
@@ -2678,19 +2687,19 @@ if (pageNum == 4)
 	loadCityData(curCity);
 	showCityName();
 
-	aggrNum = new QLabel[7](" ", aggressv);
+	aggrNum = new QLabel[9](" ", aggressv);
 	cnt = 0;
 
-	for (int i = config_Aggressiveness - 3; i < (config_Aggressiveness + 4); i++)
+	aggrNum[4].setPaletteBackgroundColor(QColor(0, 0, 0));
+        aggrNum[4].setFrameStyle( QFrame::Panel | QFrame::Raised );
+
+	for (int i = config_Aggressiveness - 4; i < (config_Aggressiveness + 5); i++)
 	{
 		h = i;
 		if (i < 1)
 			h = 15 + i;
 		if (i > 15)
 			h = i - 15;
-
-		if (h == config_Aggressiveness)
-			aggrNum[cnt].setPaletteBackgroundColor(QColor(0, 0, 0));
 
 		if (h == 1)
 			temp = " 1  High Speed Connection";
