@@ -28,6 +28,16 @@
 #include "vxml.h"
 
 
+class SipEvent : public QCustomEvent
+{
+public:
+    enum Type { SipStateChange = (QEvent::User + 400), SipNotification  };
+
+    SipEvent(Type t) : QCustomEvent(t) {}
+    ~SipEvent() {}
+
+};
+
 
 
 // Call States
@@ -194,14 +204,13 @@ class SipContainer
     void PlaceNewCall(QString Mode, QString uri, QString name, bool disableNat);
     void AnswerRingingCall(QString Mode, bool disableNat);
     void HangupCall();
-    void UiOpened();
+    void UiOpened(QObject *);
     void UiClosed();
     void UiWatch(QStrList uriList);
     void UiStopWatchAll();
     bool GetNotification(QString &type, QString &url, QString &param1, QString &param2);
     void GetRegistrationStatus(bool &Registered, QString &RegisteredTo, QString &RegisteredAs);
-    int  CheckforRxEvents();
-    int  getCallState();
+    int  GetSipState();
     void GetIncomingCaller(QString &u, QString &d, QString &l, bool &audOnly);
     void GetSipSDPDetails(QString &ip, int &aport, int &audPay, QString &audCodec, int &dtmfPay, int &vport, int &vidPay, QString &vidCodec, QString &vidRes);
 
@@ -213,9 +222,9 @@ class SipContainer
     void CheckUIEvents(SipFsm *sipFsm);
     void CheckNetworkEvents(SipFsm *sipFsm);
     void CheckRegistrationStatus(SipFsm *sipFsm);
+    void ChangePrimaryCallState(SipFsm *sipFsm, int NewState);
 
     pthread_t sipthread;
-    QMutex EventQLock;
     QStringList EventQ;
     bool killSipThread;
     bool FrontEndActive;

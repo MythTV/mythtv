@@ -22,6 +22,20 @@
 #define MAX_DECOMP_AUDIO_SAMPLES  (MAX_COMP_AUDIO_SIZE) // CHANGE FOR HIGHER COMPRESSION CODECS; G.711 has same no. samples after decomp.
 #define PCM_SAMPLES_PER_MS        8
 
+
+class RtpEvent : public QCustomEvent
+{
+public:
+    enum Type { RxVideoFrame = (QEvent::User + 300) };
+
+    RtpEvent(Type t) : QCustomEvent(t) { }
+    ~RtpEvent() {  }
+
+};
+
+
+
+
 typedef struct RTPPACKET
 {
   int     len;                       // Not part of the RTP frame itself
@@ -132,7 +146,7 @@ class rtp
 {
 
 public:
-    rtp(int localPort, QString remoteIP, int remotePort, int mediaPay, int dtmfPay, QString micDev, QString spkDev, rtpTxMode txm=RTP_TX_AUDIO_FROM_MICROPHONE, rtpRxMode rxm=RTP_RX_AUDIO_TO_SPEAKER);
+    rtp(QObject *callingApp, int localPort, QString remoteIP, int remotePort, int mediaPay, int dtmfPay, QString micDev, QString spkDev, rtpTxMode txm=RTP_TX_AUDIO_FROM_MICROPHONE, rtpRxMode rxm=RTP_RX_AUDIO_TO_SPEAKER);
     ~rtp();
     void Transmit(short *pcmBuffer, int Samples);
     void Transmit(int ms);
@@ -183,6 +197,7 @@ private:
     void transmitQueuedVideo();
     void AddToneToAudio(short *buffer, int Samples);
 
+    QObject *eventWindow;
     pthread_t rtpthread;
     QMutex rtpMutex;
     QSocketDevice *rtpSocket;

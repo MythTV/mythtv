@@ -29,8 +29,9 @@
 using namespace std;
 
 
-rtp::rtp(int localPort, QString remoteIP, int remotePort, int mediaPay, int dtmfPay, QString micDev, QString spkDev, rtpTxMode txm, rtpRxMode rxm)
+rtp::rtp(QObject *callingApp, int localPort, QString remoteIP, int remotePort, int mediaPay, int dtmfPay, QString micDev, QString spkDev, rtpTxMode txm, rtpRxMode rxm)
 {
+    eventWindow = callingApp;
     yourIP.setAddress(remoteIP);
     myPort = localPort;
     yourPort = remotePort;
@@ -873,6 +874,8 @@ void rtp::StreamInVideo()
                             cout << "Discarding frame, app consuming too slowly\n";
                         }
                         rtpMutex.unlock();
+                        if (eventWindow)
+                            QApplication::postEvent(eventWindow, new RtpEvent(RtpEvent::RxVideoFrame));
                         picture = 0;
                     }
                     else

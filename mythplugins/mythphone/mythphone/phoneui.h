@@ -56,9 +56,8 @@ class PhoneUIBox : public MythThemedDialog
 
     void MenuButtonPushed();
     void handleTreeListSignals(int, IntVector*);
-    void fsmTimerExpiry();
-    void rxVideoTimerExpiry();
     void TransmitLocalWebcamImage(uchar *yuvBuffer, int w, int h);
+    void OnScreenClockTick();
     void closeUrlPopup();
     void dialUrlVideo();
     void dialUrlVoice();
@@ -97,6 +96,9 @@ class PhoneUIBox : public MythThemedDialog
   private:
     void    DrawLocalWebcamImage();
     void    TransmitLocalWebcamImage();
+    void    ProcessRxVideoFrame();
+    void    ProcessSipStateChange();
+    void    ProcessSipNotification();
     void    PlaceorAnswerCall(QString url, QString name, QString Mode, bool onLocalLan=false);
     void    HangUp();
     void    StartVideo(int lPort, QString remoteIp, int remoteVideoPort, int videoPayload, QString rxVidRes);
@@ -121,7 +123,6 @@ class PhoneUIBox : public MythThemedDialog
     PhoneUIStatusBar *phoneUIStatusBar;
 
     int    State;
-    QTimer *fsmTimer;
     rtp    *rtpAudio;
     rtp    *rtpVideo;
     Tone   *ringbackTone;
@@ -140,8 +141,9 @@ class PhoneUIBox : public MythThemedDialog
     QRect rxVideoArea;
 
     H263Container *h263;
-    QTimer *rxVideoTimer;
     QTimer *powerDispTimer;
+    QTimer *OnScreenClockTimer;
+    int ConnectTime;
  
     VolumeControl     *volume_control;
     QTimer            *volume_display_timer;

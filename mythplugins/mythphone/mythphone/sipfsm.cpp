@@ -32,11 +32,9 @@ using namespace std;
 // Static variables for the debug file used
 QFile *debugFile;
 QTextStream *debugStream;
-
-
-// Global queue used to pass events back to the UI
+QObject *eventWindow;
 QStringList NotifyQ;
-QMutex NotifyQLock;
+QMutex EventQLock;
 
 
 
@@ -59,6 +57,7 @@ SipContainer::SipContainer()
     vxmlCallActive = false;
     vxml = 0;
     Rtp = 0;
+    eventWindow = 0;
 
     pthread_create(&sipthread, NULL, SipThread, this);
 }
@@ -90,12 +89,14 @@ void SipContainer::SipThreadWorker()
 
     while(!killSipThread)
     {
+        int OldCallState = CallState;
+
         // This blocks for timeout or data
         CheckNetworkEvents(sipFsm);
-    
         CheckUIEvents(sipFsm);
         CheckRegistrationStatus(sipFsm); // Probably don't need to do this every 1/2 sec but this is a fallout of a non event-driven arch.
         sipFsm->HandleTimerExpiries();
+        ChangePrimaryCallState(sipFsm, sipFsm->getPrimaryCallState());
 
         // A Ring No Answer timer runs to send calls to voicemail after x seconds
         if ((CallState == SIP_ICONNECTING) && (rnaTimer != -1))
@@ -107,6 +108,13 @@ void SipContainer::SipThreadWorker()
                 sipFsm->Answer(true, "", false);
             }
         }
+
+        ChangePrimaryCallState(sipFsm, sipFsm->getPrimaryCallState());
+
+        EventQLock.lock();
+        if ((OldCallState != CallState) && (eventWindow))
+            QApplication::postEvent(eventWindow, new SipEvent(SipEvent::SipStateChange));
+        EventQLock.unlock();
     }
 
     delete sipFsm;
@@ -190,6 +198,8 @@ void SipContainer::CheckUIEvents(SipFsm *sipFsm)
     }
     else if (event == "UISTOPWATCHALL")
         sipFsm->StopWatchers();
+
+    ChangePrimaryCallState(sipFsm, sipFsm->getPrimaryCallState());
 }
 
 void SipContainer::CheckRegistrationStatus(SipFsm *sipFsm)
@@ -201,13 +211,19 @@ void SipContainer::CheckRegistrationStatus(SipFsm *sipFsm)
 
 void SipContainer::CheckNetworkEvents(SipFsm *sipFsm)
 {
-    // Periodically check for incoming messages
-    int OldState = CallState;
+    // Check for incoming SIP messages
     sipFsm->CheckRxEvent();
 
     // We only handle state changes in the "primary" call; we ignore additional calls which are
     // currently just rejected with busy
-    CallState = sipFsm->getPrimaryCallState();
+    ChangePrimaryCallState(sipFsm, sipFsm->getPrimaryCallState());
+}
+
+
+void SipContainer::ChangePrimaryCallState(SipFsm *sipFsm, int NewState)
+{
+    int OldState = CallState;
+    CallState = NewState;
 
     if (OldState != CallState)
     {
@@ -256,7 +272,7 @@ void SipContainer::CheckNetworkEvents(SipFsm *sipFsm)
             {
                 int lPort = atoi((const char *)gContext->GetSetting("AudioLocalPort"));
                 QString spk = gContext->GetSetting("AudioOutputDevice");
-                Rtp = new rtp(lPort, remoteIp, remoteAudioPort, audioPayload, dtmfPayload, "None", spk, RTP_TX_AUDIO_SILENCE, RTP_RX_AUDIO_DISCARD);
+                Rtp = new rtp(0, lPort, remoteIp, remoteAudioPort, audioPayload, dtmfPayload, "None", spk, RTP_TX_AUDIO_SILENCE, RTP_RX_AUDIO_DISCARD);
                 vxml = new vxmlParser(Rtp, callerName);
             }
         }
@@ -312,9 +328,10 @@ void SipContainer::HangupCall()
     EventQLock.unlock();
 }
 
-void SipContainer::UiOpened()
+void SipContainer::UiOpened(QObject *callingApp)
 {
     EventQLock.lock();
+    eventWindow = callingApp;
     EventQ.append("UIOPENED");
     EventQLock.unlock();
 }
@@ -322,6 +339,7 @@ void SipContainer::UiOpened()
 void SipContainer::UiClosed()
 {
     EventQLock.lock();
+    eventWindow = 0;
     EventQ.append("UICLOSED");
     EventQLock.unlock();
 }
@@ -345,7 +363,7 @@ void SipContainer::UiStopWatchAll()
     EventQLock.unlock();
 }
 
-int SipContainer::CheckforRxEvents()
+int SipContainer::GetSipState()
 {
     int tempState;
     EventQLock.lock();
@@ -359,7 +377,7 @@ int SipContainer::CheckforRxEvents()
 bool SipContainer::GetNotification(QString &type, QString &url, QString &param1, QString &param2)
 {
     bool notifyFlag = false;
-    NotifyQLock.lock();
+    EventQLock.lock();
 
     if (!NotifyQ.empty())
     {
@@ -376,7 +394,7 @@ bool SipContainer::GetNotification(QString &type, QString &url, QString &param1,
         NotifyQ.remove(it);
     }
 
-    NotifyQLock.unlock();
+    EventQLock.unlock();
     return notifyFlag;
 }
 
@@ -767,12 +785,17 @@ void SipFsm::CheckRxEvent()
 
 void SipFsm::SetNotification(QString type, QString uri, QString param1, QString param2)
 {
-    NotifyQLock.lock();
-    NotifyQ.append(type);
-    NotifyQ.append(uri);
-    NotifyQ.append(param1);
-    NotifyQ.append(param2);
-    NotifyQLock.unlock();
+    EventQLock.lock();
+    if (eventWindow) // Is there someone listening?
+    {
+        NotifyQ.append(type);
+        NotifyQ.append(uri);
+        NotifyQ.append(param1);
+        NotifyQ.append(param2);
+
+        QApplication::postEvent(eventWindow, new SipEvent(SipEvent::SipNotification));
+    }
+    EventQLock.unlock();
 }
 
 

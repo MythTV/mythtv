@@ -93,7 +93,7 @@ PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
     updateForeground();
 
     // Update SIP Presence information
-    sipStack->UiOpened();
+    sipStack->UiOpened(this);
     sipStack->UiWatch(DirContainer->ListAllEntries(true));
 
     // Possibly (user-defined) control the volume
@@ -111,15 +111,12 @@ PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
     rtpAudio = 0;
     rtpVideo = 0;
 
-    fsmTimer = new QTimer(this);
-    connect(fsmTimer, SIGNAL(timeout()), this, SLOT(fsmTimerExpiry()));
-    fsmTimer->start(500); // Twice a second - there are other dependancies on this such as time calculations in fsmTimerExpiry()
-
-    rxVideoTimer = new QTimer(this);
-    connect(rxVideoTimer, SIGNAL(timeout()), this, SLOT(rxVideoTimerExpiry()));
-
     powerDispTimer = new QTimer(this);
     connect(powerDispTimer, SIGNAL(timeout()), this, SLOT(DisplayMicSpkPower()));
+
+    OnScreenClockTimer = new QTimer(this);
+    connect(OnScreenClockTimer, SIGNAL(timeout()), this, SLOT(OnScreenClockTick()));
+    ConnectTime = 0;
 
     // Create the local webcam and start it
     webcam = new Webcam();
@@ -187,7 +184,7 @@ PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
     Tone f3(852, 7000, 100);
     Tone f4(941, 7000, 100);
 
-    toneDtmf[0] = new Tone(f4);   // zero
+    toneDtmf[0] = new Tone(f4);   // Digits zero ..
     toneDtmf[0]->sum(1336, 7000);
     toneDtmf[1] = new Tone(f1);
     toneDtmf[1]->sum(1209, 7000);
@@ -205,12 +202,15 @@ PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
     toneDtmf[7]->sum(1209, 7000);
     toneDtmf[8] = new Tone(f3);
     toneDtmf[8]->sum(1336, 7000);
-    toneDtmf[9] = new Tone(f3);
+    toneDtmf[9] = new Tone(f3);   // .. through nine
     toneDtmf[9]->sum(1477, 7000);
     toneDtmf[10] = new Tone(f4);   // *
     toneDtmf[10]->sum(1209, 7000);
     toneDtmf[11] = new Tone(f4);   // #
     toneDtmf[11]->sum(1477, 7000);
+
+    // Generate a self-event to get current SIP Stack state
+    QApplication::postEvent(this, new SipEvent(SipEvent::SipStateChange));
 
 }
 
@@ -432,6 +432,25 @@ void PhoneUIBox::customEvent(QCustomEvent *event)
                 TransmitLocalWebcamImage();
         }
         break;
+
+    case RtpEvent::RxVideoFrame:
+        {
+            ProcessRxVideoFrame();
+        }
+        break;
+
+    case SipEvent::SipStateChange:
+        {
+            ProcessSipStateChange();
+        }
+        break;
+
+    case SipEvent::SipNotification:
+        {
+            ProcessSipNotification();
+        }
+        break;
+
     }
 
     QWidget::customEvent(event);
@@ -491,14 +510,13 @@ void PhoneUIBox::StartVideo(int lPort, QString remoteIp, int remoteVideoPort, in
 {
     videoCifModeToRes(rxVidRes, rxWidth, rxHeight);
 
-    rtpVideo = new rtp (lPort, remoteIp, remoteVideoPort, videoPayload, -1, "", "", RTP_TX_VIDEO, RTP_RX_VIDEO);
+    rtpVideo = new rtp (this, lPort, remoteIp, remoteVideoPort, videoPayload, -1, "", "", RTP_TX_VIDEO, RTP_RX_VIDEO);
 
     if (h263->H263StartEncoder(txWidth, txHeight, txFps) && 
         h263->H263StartDecoder(rxWidth, rxHeight))
     {
         txClient = webcam->RegisterClient(VIDEO_PALETTE_YUV420P, txFps, this);
         VideoOn = true;
-        rxVideoTimer->start(20); // Max frame rate supported is 30/sec; go slightly faster to accomodate for jitter
     }
     else
     {
@@ -514,7 +532,6 @@ void PhoneUIBox::StopVideo()
         h263->H263StopEncoder();
         h263->H263StopDecoder();
 
-        rxVideoTimer->stop();
         VideoOn = false;
     }
     if (txClient)
@@ -651,7 +668,7 @@ void PhoneUIBox::TransmitLocalWebcamImage()
 }
 
 
-void PhoneUIBox::rxVideoTimerExpiry()
+void PhoneUIBox::ProcessRxVideoFrame()
 {
     QPixmap Pixmap;
     QImage ScaledImage;
@@ -687,14 +704,14 @@ void PhoneUIBox::rxVideoTimerExpiry()
     }
 }
 
-void PhoneUIBox::fsmTimerExpiry()
+
+void PhoneUIBox::ProcessSipStateChange()
 {
-    static int ConnectTime = 0;
     bool inAudioOnly;
+    int OldState = State;
 
     // Poll the FSM for network events
-    int OldState = State;
-    State = sipStack->CheckforRxEvents();
+    State = sipStack->GetSipState();
 
     // Handle state transitions
     if (State != OldState)
@@ -753,7 +770,7 @@ void PhoneUIBox::fsmTimerExpiry()
         {
             if (currentCallEntry)
             {
-                currentCallEntry->setDuration(ConnectTime/2);
+                currentCallEntry->setDuration(ConnectTime);
                 DirContainer->AddToCallHistory(currentCallEntry, true);
                 DirectoryList->refresh();
             }
@@ -762,12 +779,14 @@ void PhoneUIBox::fsmTimerExpiry()
         }
         else if (State == SIP_CONNECTED)
         {
+            OnScreenClockTimer->start(1000);
             phoneUIStatusBar->DisplayInCallStats(true);
             startRTP();
         }
 
         if (OldState == SIP_CONNECTED) // Disconnecting
         {
+            OnScreenClockTimer->stop();
             // Stop the RTP connection
             if (rtpAudio != 0)
             {
@@ -796,7 +815,11 @@ void PhoneUIBox::fsmTimerExpiry()
             break;
         }
     }
+}
 
+
+void PhoneUIBox::ProcessSipNotification()
+{
     // If the SIP stack has something to tell the user, then display that first
     QString NotifyType, NotifyUrl, NotifyParam1, NotifyParam2;
     while (sipStack->GetNotification(NotifyType, NotifyUrl, NotifyParam1, NotifyParam2))
@@ -839,31 +862,31 @@ void PhoneUIBox::fsmTimerExpiry()
         else 
             cerr << "SIP: Unknown Notify type " << NotifyType << endl;
     }
+}
 
-    // Increment the on-screen clock if we are in a call & gather statistics
-    if (State == SIP_CONNECTED)
+
+void PhoneUIBox::OnScreenClockTick()
+{
+    ConnectTime++; 
+    phoneUIStatusBar->updateMidCallTime(ConnectTime);
+
+    int pIn=0, pMiss=0, pLate=0, bIn=0, bOut=0, bPlayed=0, pOut = 0;        
+    rtpAudio->getRxStats(pIn, pMiss, pLate, bIn, bPlayed, bOut);
+    rtpAudio->getTxStats(pOut);
+    phoneUIStatusBar->updateMidCallAudioStats(pIn, pMiss, pLate, pOut);
+
+    if (rtpVideo)
     {
-        ConnectTime++; // This fn is called twice a second, assume its accurate!
-        phoneUIStatusBar->updateMidCallTime(ConnectTime/2);
-
-        int pIn=0, pMiss=0, pLate=0, bIn=0, bOut=0, bPlayed=0, pOut = 0;        
-        rtpAudio->getRxStats(pIn, pMiss, pLate, bIn, bPlayed, bOut);
-        rtpAudio->getTxStats(pOut);
-        phoneUIStatusBar->updateMidCallAudioStats(pIn, pMiss, pLate, pOut);
-
-        if (rtpVideo)
-        {
-            int bvIn=0, bvOut=0;
-            pIn=0, pMiss=0, pLate=0, bPlayed=0, pOut = 0;        
-            rtpVideo->getRxStats(pIn, pMiss, pLate, bvIn, bPlayed, bvOut);
-            rtpVideo->getTxStats(pOut);
-            phoneUIStatusBar->updateMidCallVideoStats(pIn, pMiss, pLate, pOut);
-            bIn += bvIn;
-            bOut += bvOut;
-        }
-
-        phoneUIStatusBar->updateMidCallBandwidth(bIn, bOut);
+        int bvIn=0, bvOut=0;
+        pIn=0, pMiss=0, pLate=0, bPlayed=0, pOut = 0;        
+        rtpVideo->getRxStats(pIn, pMiss, pLate, bvIn, bPlayed, bvOut);
+        rtpVideo->getTxStats(pOut);
+        phoneUIStatusBar->updateMidCallVideoStats(pIn, pMiss, pLate, pOut);
+        bIn += bvIn;
+        bOut += bvOut;
     }
+
+    phoneUIStatusBar->updateMidCallBandwidth(bIn, bOut);
 }
 
 
@@ -880,7 +903,7 @@ void PhoneUIBox::startRTP()
         int lvPort = atoi((const char *)gContext->GetSetting("VideoLocalPort"));
         QString spk = gContext->GetSetting("AudioOutputDevice");
         QString mic = gContext->GetSetting("MicrophoneDevice");
-        rtpAudio = new rtp (laPort, remoteIp, remoteAudioPort, audioPayload, dtmfPayload, mic, spk);
+        rtpAudio = new rtp (this, laPort, remoteIp, remoteAudioPort, audioPayload, dtmfPayload, mic, spk);
         phoneUIStatusBar->updateMidCallAudioCodec(audioCodec);
         powerDispTimer->start(100);
         if (videoPayload != -1)
@@ -1918,7 +1941,6 @@ PhoneUIBox::~PhoneUIBox(void)
         webcam->UnregisterClient(txClient);
 
     webcam->camClose();
-    fsmTimer->stop();
     if (volume_control)
         delete volume_control;
     delete DirContainer;
@@ -1930,8 +1952,8 @@ PhoneUIBox::~PhoneUIBox(void)
     delete h263;
 
     delete phoneUIStatusBar;
-    delete fsmTimer;
     delete powerDispTimer;
+    delete OnScreenClockTimer;
     delete volume_display_timer;
 }
 

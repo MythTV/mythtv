@@ -57,7 +57,7 @@ struct wcClient
 class WebcamEvent : public QCustomEvent
 {
 public:
-    enum Type { Decoding = (QEvent::User + 200), FrameReady };
+    enum Type { FrameReady = (QEvent::User + 200)  };
 
     WebcamEvent(Type t, wcClient *c)
         : QCustomEvent(t)
