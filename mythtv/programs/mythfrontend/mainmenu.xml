@@ -11,7 +11,7 @@
       <text lang="DE">Fernsehen</text>
       <text lang="DK">Se TV</text>
       <text lang="PT">Ver TelevisÃ£o</text>
-      <text lang="SV">Se pÃ¥ TV</text>
+      <text lang="SV">Se på TV</text>
       <text lang="JA">TVãè¦ã</text>
       <action>TV_WATCH_LIVE</action>
    </button>
@@ -68,7 +68,7 @@
      <text lang="DK">Konfiguration</text>
      <text lang="NL">Instellingen</text>
      <text lang="PT">Configurações</text>
-     <text lang="SV">Verktyg/Setup</text>
+     <text lang="SV">Verktyg/Inställningar</text>
      <text lang="JA">設定</text>
      <action>MENU util_menu.xml</action>
    </button>
