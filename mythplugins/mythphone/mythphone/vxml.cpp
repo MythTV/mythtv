@@ -258,32 +258,32 @@ bool vxmlParser::loadVxmlPage(QString strUrl, QString Method, QString Namelist, 
     if (httpSock->connect(hostIp, port))
     {
         int bytesAvail;
-        if ((httpSock->writeBlock(httpRequest, httpRequest.length()) != -1) &&
-            ((bytesAvail = httpSock->waitForMore(3000)) != -1))
+        if (httpSock->writeBlock(httpRequest, httpRequest.length()) != -1) 
         {
-            char *httpResponse = new char[bytesAvail+1];
-            int len = httpSock->readBlock(httpResponse, bytesAvail);
-            if (len >= 0)
+            QString resp = "";
+            while ((bytesAvail = httpSock->waitForMore(3000)) != -1)
             {
-                httpResponse[len] = 0;
-                QString resp(httpResponse);
-                QString firstLine = resp.section('\n', 0);
-                if (firstLine.contains("200 OK"))
+                char *httpResponse = new char[bytesAvail+1];
+                int len = httpSock->readBlock(httpResponse, bytesAvail);
+                if (len >= 0)
                 {
-                    int ContentStart = resp.find("\r\n\r\n");
-                    if (ContentStart != -1)
+                    httpResponse[len] = 0;
+                    resp += QString(httpResponse);
+                    //cout << "Got HTML response\n" << resp << endl;
+                    QString firstLine = resp.section('\n', 0);
+                    if ((firstLine.contains("200 OK")) && !resp.contains("</vxml>"))
                     {
-                       Content = resp.mid(ContentStart+4, len);
-                       script.setContent(Content);
-                       //cout << "Got VXML content\n" << Content << endl;
+                        delete httpResponse;
+                        continue;
                     }
-                    else
-                        cout << "No valid content in returned VXML page\n";
+
+                    Content = resp.section("\r\n\r\n", 1, 1);
+                    script.setContent(Content);
+                    //cout << "Got VXML content\n" << Content << endl;
                 }
-                else
-                    cout << "Got invalid HTML response: " << endl << firstLine << endl;
+                delete httpResponse;
+                break;
             }
-            delete httpResponse;
         }
         else
             cerr << "Error sending VXML GET to socket\n";
