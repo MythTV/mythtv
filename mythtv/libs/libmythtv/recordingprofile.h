@@ -96,8 +96,6 @@ public:
     virtual void load(QSqlDatabase* db);
     virtual void save(QSqlDatabase* db) { (void)db; };
 
-    static void fillSelections(QSqlDatabase* db, SelectSetting* setting);
-
 protected slots:
     void open(int id) {
         RecordingProfile* profile = new RecordingProfile();
