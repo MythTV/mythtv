@@ -250,7 +250,7 @@
         <font>title</font>
       </textarea>
       <textarea name="subtitle" draworder="6">
-        <area>4,62,376,30</area>
+        <area>84,50,376,30</area>
         <font>subtitle</font>
         <!--<value>%SUBTITLE|"|"%</value> -->
       </textarea>
@@ -555,13 +555,13 @@
     </container>
 
     <container name="showlevel_info">
-      <area>25,345,280,20</area>
-      <textarea name="showing" draworder="4">
-        <area>0,0,105,20</area>
+      <area>25,345,280,30</area>
+      <textarea name="showing" draworder="7">
+        <area>0,0,105,30</area>
         <font>info</font>
         <value>Showing:</value>
       </textarea>
-      <textarea name="showlevel" draworder="4">
+      <textarea name="showlevel" draworder="7">
         <area>110,0,150,30</area>
         <font>info</font>
       </textarea>
@@ -578,14 +578,14 @@
         <fcnfont name="list-record" function="recording"></fcnfont>
         <fcnfont name="list-selected" function="selected"></fcnfont>
         <columnpadding>10</columnpadding>
-        <column number="1" width="150" context="-1"></column>
+        <column number="1" width="165" context="-1"></column>
         <column number="2" width="110" context="-1"></column>
         <column number="3" width="420" context="-1"></column>
         <column number="4" width="20" context="-1"></column>
         <items>9</items>
-        <image function="selectionbar" filename="cr-selectbar.png" location="-10,-10"></image>
+        <image function="selectionbar" filename="cr-selectbar.png" location="-10,-2"></image>
         <image function="uparrow" filename="uparrow.png" location="745,12"></image>
-        <image function="downarrow" filename="downarrow.png" location="745,238"></image>
+        <image function="downarrow" filename="downarrow.png" location="745,244"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="no">
         <filename>cr-lines.png</filename>
@@ -594,22 +594,22 @@
     </container>
 
     <container name="program_info">
-      <area>25,370,775,210</area>
+      <area>25,365,775,210</area>
       <textarea name="title" draworder="6">
-        <area>0,0,740,40</area>
+        <area>0,0,730,40</area>
         <font>title</font>
       </textarea>
       <textarea name="channel" draworder="6">
-        <area>0,40,160,30</area>
+        <area>0,45,160,30</area>
         <font>info</font>
       </textarea>
       <textarea name="timedate" draworder="6">
-        <area>175,40,420,30</area>
+        <area>175,45,420,30</area>
         <font>info</font>
       </textarea>
       <textarea name="subdescr" draworder="6">
-        <area>0,70,720,140</area>
-        <font>description</font>
+        <area>0,75,720,140</area>
+        <font>metadata</font>
         <multiline>yes</multiline>
         <value>%SUBTITLE|"|"
 %%REPEAT%%STARS%%DESCRIPTION%</value>
@@ -993,19 +993,19 @@
         <fcnfont name="list-active" function="active"></fcnfont>
         <fcnfont name="list-selected" function="selected"></fcnfont>
         <fcnfont name="list-inactive" function="inactive"></fcnfont>
-        <columnpadding>10</columnpadding>
-        <column number="1" width="353" context="-1"></column>
-        <column number="2" width="55" context="-1"></column>
-        <column number="3" width="110" context="0"></column>
+        <columnpadding>5</columnpadding>
+        <column number="1" width="340" context="-1"></column>
+        <column number="2" width="60" context="-1"></column>
+        <column number="3" width="134" context="0"></column>
         <column number="4" width="110" context="1"></column>
         <items>7</items>
-        <image function="selectionbar" filename="bar.png" location="-20,-7"></image>
+        <image function="selectionbar" filename="bar.png" location="-20,-5"></image>
         <image function="uparrow" filename="uparrow.png" location="743,12"></image>
         <image function="downarrow" filename="downarrow.png" location="743,251"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="yes">
         <filename>showings.png</filename>
-        <position>0,0</position>
+        <position>0,4</position>
       </image>
       <textarea name="current" draworder="6">
         <area>34,131,185,40</area>
@@ -1035,14 +1035,15 @@
     <container name="program_info_play">
       <context>0</context>
       <area>0,340,800,300</area>
+      
       <textarea name="title" draworder="6">
-        <area>25,14,580,40</area>
+        <area>25,5,580,40</area>
         <altarea>20,5,580,40</altarea>
         <font>title</font>
       </textarea>
 
       <textarea name="subtitle" draworder="6">
-        <area>25,47,605,40</area>
+        <area>25,44,605,40</area>
         <font>subtitle</font>
         <multiline>no</multiline>
       </textarea>
@@ -1053,14 +1054,14 @@
       </textarea>
 
       <textarea name="timedate" draworder="6">
-        <area>170,74,440,30</area>
+        <area>194,74,440,30</area>
         <font>info</font>
       </textarea>
 
       <textarea name="description" draworder="6">
-        <area>25,140,750,125</area>
+        <area>25,135,750,125</area>
         <altarea>25,140,755,125</altarea>
-        <font>description</font>
+        <font>metadata</font>
         <multiline>yes</multiline>
         <value>%LONGREPEAT%%STARS%%DESCRIPTION%</value>
         </textarea>
@@ -1091,7 +1092,7 @@
 
     <container name="program_info_del">
       <context>1</context>
-      <area>0,360,800,190</area>
+      <area>0,345,800,190</area>
       <textarea name="title" draworder="6">
         <area>20,0,580,40</area>
         <altarea>20,0,760,40</altarea>
@@ -1109,7 +1110,7 @@
       <textarea name="subdescr" draworder="6">
         <area>20,70,600,125</area>
         <altarea>20,70,760,125</altarea>
-        <font>description</font>
+        <font>metadata</font>
         <multiline>yes</multiline>
         <value>%SUBTITLE|"|"
 %%STARS%%DESCRIPTION%</value>
@@ -1127,7 +1128,7 @@
 
     <container name="usage">
       <context>1</context>
-      <area>0,555,800,40</area>
+      <area>0,550,800,40</area>
       <statusbar name="usedbar" draworder="5">
         <container fleximage="yes">container.png</container>
         <fill>filler.png</fill>
@@ -1198,7 +1199,7 @@
         <fcnfont name="list-selected" function="selected"></fcnfont>
         <fcnfont name="list-inactive" function="inactive"></fcnfont>
         <items>9</items>
-        <image function="selectionbar" filename="progfind_sel1.png" location="-14,-9"></image>
+        <image function="selectionbar" filename="progfind_sel1.png" location="-14,0"></image>
       </listarea>
       <listarea name="shows" draworder="2">
         <area>88,8,380,295</area>
@@ -1207,7 +1208,7 @@
         <fcnfont name="list-inactive" function="inactive"></fcnfont>
         <column number="1" width="380" context="-1"></column>
         <items>9</items>
-        <image function="selectionbar" filename="progfind_sel2.png" location="-14,-9"></image>
+        <image function="selectionbar" filename="progfind_sel2.png" location="-14,0"></image>
       </listarea>
       <listarea name="times" draworder="2">
         <area>470,8,280,295</area>
@@ -1216,18 +1217,18 @@
         <fcnfont name="list-inactive" function="inactive"></fcnfont>
         <fcnfont name="list-record" function="recording"></fcnfont>
         <items>9</items>
-        <image function="selectionbar" filename="progfind_sel3.png" location="-6,-9"></image>
+        <image function="selectionbar" filename="progfind_sel3.png" location="-6,0"></image>
       </listarea>
       <image name="lines" draworder="5" fleximage="no">
         <filename>progfind_lines.png</filename>
-        <position>0,0</position>
+        <position>0,10</position>
       </image>
     </container>
 
     <container name="program_info">
       <area>25,25,750,220</area>
       <textarea name="title" draworder="6">
-        <area>25,15,515,45</area>
+        <area>25,10,515,45</area>
         <font>title</font>
       </textarea>
       <textarea name="subtitle" draworder="6">
@@ -1333,9 +1334,9 @@
     </container>
 
         <container name="selector">
-     <area>0,40,800,300</area>
+     <area>0,40,800,290</area>
       <listarea name="proglist" draworder="4">
-        <area>20,15,760,280</area>
+        <area>20,15,760,270</area>
         <fcnfont name="list-active" function="active"></fcnfont>
         <fcnfont name="list-inactive" function="inactive"></fcnfont>
         <fcnfont name="list-selected" function="selected"></fcnfont>
@@ -1345,14 +1346,14 @@
         <column number="1" width="160" context="-1"></column>
         <column number="2" width="120" context="-1"></column>
         <column number="3" width="440" context="-1"></column>
-        <items>9</items>
-        <image function="selectionbar" filename="cr-selectbar.png" location="-15,-10"></image>
-        <image function="uparrow" filename="uparrow.png" location="745,10"></image>
-        <image function="downarrow" filename="downarrow.png" location="745,250"></image>
+        <items>8</items>
+        <image function="selectionbar" filename="cr-selectbar.png" location="-15,0"></image>
+        <image function="uparrow" filename="uparrow.png" location="745,13"></image>
+        <image function="downarrow" filename="downarrow.png" location="745,255"></image>
       </listarea>
       <image name="showinglines" draworder="5" fleximage="no">
         <filename>rk-lines.png</filename>
-        <position>0,0</position>
+        <position>0,5</position>
       </image>
     </container>
 
@@ -1373,7 +1374,7 @@
       </textarea>
       <textarea name="subdescr" draworder="6">
         <area>0,70,720,90</area>
-        <font>description</font>
+        <font>metadata</font>
         <multiline>yes</multiline>
         <value>%SUBTITLE|"|"
 %%STARS%%DESCRIPTION%</value>
@@ -1404,12 +1405,11 @@
   <window name="recording_options">
 
     
-    <font name="enabled_state_0_font" face="Arial">
+    <font name="enabled_state_0_font" base="list-active">
       <color>#ffffff</color>
-      <size>18</size>
-      <size:small>11</size:small>
-      <bold>yes</bold>
     </font>
+    
+    
 
     <container name="background">
       <image name="filler" draworder="0" fleximage="yes">
@@ -1421,7 +1421,7 @@
     <container name="selector">
       <area>0,300,800,300</area>
       <listarea name="menu_list" draworder="4">
-        <area>20,15,760,274</area>
+        <area>20,10,760,274</area>
         <fcnfont name="list-active" function="active"></fcnfont>
         <fcnfont name="list-inactive" function="inactive"></fcnfont>
         <fcnfont name="list-inactive" function="disabled"></fcnfont>
@@ -1430,14 +1430,14 @@
         <columnpadding>1</columnpadding>
         <column number="1" width="745" context="-1"></column>
         <items>8</items>
-        <image function="selectionbar" filename="cr-selectbar.png" location="-10,-8"></image>
+        <image function="selectionbar" filename="cr-selectbar.png" location="-10,0"></image>
         <image function="uparrow" filename="uparrow.png" location="755,15"></image>
         <image function="downarrow" filename="downarrow.png" location="755,235"></image>
-        <image function="rightarrow" filename="rightarrow.png" location="0,-5"></image>
-        <image function="leftarrow" filename="leftarrow.png" location="-10,-5"></image>
+        <image function="rightarrow" filename="rightarrow.png" location="0,3"></image>
+        <image function="leftarrow" filename="leftarrow.png" location="-10,3"></image>
 
       </listarea>
-      <image name="showinglines" draworder="5" fleximage="no">
+      <image name="showinglines" draworder="3" fleximage="no">
         <filename>rk-lines.png</filename>
         <position>0,0</position>
       </image>
@@ -1454,31 +1454,31 @@
         <font>subtitle</font>
       </textarea>
       <textarea name="infotime" draworder="6" align="right">
-        <area>0,70,120,30</area>
+        <area>10,70,120,30</area>
         <font>info</font>
         <value>Airdate:</value>
       </textarea>
       <textarea name="timedate" draworder="6">
-        <area>125,70,600,30</area>
+        <area>135,70,600,30</area>
         <font>info</font>
       </textarea>
       <textarea name="infochan" draworder="6" align="right">
-        <area>0,100,120,30</area>
+        <area>10,100,120,30</area>
         <font>info</font>
         <value>Channel:</value>
       </textarea>
       <textarea name="channel" draworder="6">
-        <area>125,100,600,30</area>
+        <area>135,100,600,30</area>
         <font>info</font>
       </textarea>
       <textarea name="infodesc" draworder="6" align="right">
-        <area>0,130,120,30</area>
+        <area>0,130,130,30</area>
         <font>info</font>
         <value>Description:</value>
       </textarea>
       <textarea name="description" draworder="6">
-        <area>125,130,620,100</area>
-        <font>description</font>
+        <area>135,130,605,100</area>
+        <font>metadata</font>
         <multiline>yes</multiline>
       </textarea>
     </container>
