@@ -396,7 +396,7 @@ void VideoOutput::MoveResize(void)
         disphoff = (int)pixNeeded;
     }
 
-    if (letterbox > 1) 
+    if ((letterbox > 1) && (letterbox < 4))
     {
         // Zoom mode
         //printf("Before zoom: %dx%d%+d%+d\n", dispwoff, disphoff,
@@ -406,6 +406,17 @@ void VideoOutput::MoveResize(void)
         dispwoff = dispwoff*4/3;
         dispyoff -= (disphoff/6);
         disphoff = disphoff*4/3;
+    }
+
+    if (letterbox > 3)
+    {
+        //Stretch mode
+        //Should be used to eliminate side bars on 4:3 material
+        //encoded to 16:9. Basically crop a 16:9 to 4:3
+        //printf("Before zoom: %dx%d%+d%+d\n", dispwoff, disphoff,
+        //dispxoff, dispyoff);
+        dispxoff -= (dispwoff/6); // 1/6 of original is 1/8 of new
+        dispwoff = dispwoff*4/3;
     }
 
     if (ZoomedIn)
@@ -487,13 +498,13 @@ void VideoOutput::Zoom(int direction)
 
 void VideoOutput::ToggleLetterbox(void)
 {
-    if (++letterbox > 3)
+    if (++letterbox > 4)
         letterbox = 0;
 
     switch (letterbox) 
     {
         default: case 0: case 2: AspectChanged(4.0 / 3); break;
-        case 1: case 3: AspectChanged(16.0 / 9); break;
+        case 1: case 3: case 4: AspectChanged(16.0 / 9); break;
     }
 }
 
