@@ -183,8 +183,8 @@ bool MediaMonitor::addDevice(const char* devPath )
         if (!is_supermount) 
         {
             if (is_cdrom)
-                pDevice = new MythCDROM(this, QString(mep->mnt_fsname),
-                                        is_supermount, m_AllowEject);
+                pDevice = MythCDROM::get(this, QString(mep->mnt_fsname),
+                                         is_supermount, m_AllowEject);
         }
         else 
         {
@@ -201,8 +201,8 @@ bool MediaMonitor::addDevice(const char* devPath )
                 strncpy(devstr, dev, len);
                 devstr[len] = 0;
                 if (is_cdrom)
-                    pDevice = new MythCDROM(this, QString(devstr),
-                                            is_supermount, m_AllowEject);
+                    MythCDROM::get(this, QString(devstr),
+                                   is_supermount, m_AllowEject);
             }
             else
                 return false;   

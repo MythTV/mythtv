@@ -2,7 +2,6 @@
 #define MYTH_MEDIA_MONITOR_H
 
 #include "mythmedia.h"
-#include "mythcdrom.h"
 #include <qvaluelist.h>
 #include <qguardedptr.h>
 #include <qthread.h>

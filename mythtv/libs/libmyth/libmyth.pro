@@ -35,6 +35,14 @@ inc.files += uilistbtntype.h uiphoneentry.h generictree.h
     inc.files += mythcdrom.h mythmediamonitor.h
 }
 
+linux {
+    SOURCES += mythcdrom-linux.cpp
+}
+
+freebsd {
+    SOURCES += mythcdrom-freebsd.cpp
+}
+
 INSTALLS += inc
 
 using_alsa {
