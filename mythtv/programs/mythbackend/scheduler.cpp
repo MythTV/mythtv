@@ -1406,7 +1406,8 @@ void Scheduler::RunScheduler(void)
             {
                 QString msg;
 
-                nextRecording->recstartts = QDateTime::currentDateTime();
+                nextRecording->recstartts = 
+                    QDateTime::currentDateTime().addSecs(30);
                 nextRecording->recstartts.setTime(QTime(
                                    nextRecording->recstartts.time().hour(),
                                    nextRecording->recstartts.time().minute()));
