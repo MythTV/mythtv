@@ -21,10 +21,14 @@ INETComms::INETComms(QUrl &url)
 void INETComms::newData(const QByteArray &ba, QNetworkOperation *result)
 {
     int ecode = result->errorCode();
-    if ( ecode == QNetworkProtocol::ErrListChildren || ecode == QNetworkProtocol::ErrParse ||
-         ecode == QNetworkProtocol::ErrUnknownProtocol || ecode == QNetworkProtocol::ErrLoginIncorrect ||
-         ecode == QNetworkProtocol::ErrValid || ecode == QNetworkProtocol::ErrHostNotFound ||
-         ecode == QNetworkProtocol::ErrFileNotExisting ) 
+    if (ecode == QNetworkProtocol::ErrListChildren || 
+        ecode == QNetworkProtocol::ErrParse ||
+        ecode == QNetworkProtocol::ErrUnknownProtocol || 
+        ecode == QNetworkProtocol::ErrLoginIncorrect ||
+        ecode == QNetworkProtocol::ErrValid || 
+        ecode == QNetworkProtocol::ErrHostNotFound ||
+        ecode == QNetworkProtocol::ErrFileNotExisting ||
+        ecode == QNetworkProtocol::ErrGet) 
     {
        cout << "MythVideo: NetworkOperation Error on NewData.\n";
     }
@@ -47,16 +51,18 @@ void INETComms::stop()
 void INETComms::finished(QNetworkOperation *result)
 {
     int ecode = result->errorCode();
-    if ( ecode == QNetworkProtocol::ErrListChildren || ecode == QNetworkProtocol::ErrParse ||
-         ecode == QNetworkProtocol::ErrUnknownProtocol || ecode == QNetworkProtocol::ErrLoginIncorrect ||
-         ecode == QNetworkProtocol::ErrValid || ecode == QNetworkProtocol::ErrHostNotFound ||
-         ecode == QNetworkProtocol::ErrFileNotExisting )
+    if (ecode == QNetworkProtocol::ErrListChildren || 
+        ecode == QNetworkProtocol::ErrParse ||
+        ecode == QNetworkProtocol::ErrUnknownProtocol || 
+        ecode == QNetworkProtocol::ErrLoginIncorrect ||
+        ecode == QNetworkProtocol::ErrValid || 
+        ecode == QNetworkProtocol::ErrHostNotFound ||
+        ecode == QNetworkProtocol::ErrFileNotExisting ||
+        ecode == QNetworkProtocol::ErrGet)
     {
        cout << "MythVideo: NetworkOperation Error on Finish.\n";
     }
 
     m_done = true;
- 
 }
-
 
