@@ -39,8 +39,9 @@ VideoManager::VideoManager(QSqlDatabase *ldb,
     artDir = gContext->GetSetting("VideoArtworkDir");
     currentVideoFilter = new VideoFilterSettings(db, true, "VideoManager");
     RefreshMovieList();
-
-    fullRect = QRect(0, 0, (int)(800*wmult), (int)(600*hmult));
+    
+    fullRect = QRect(0, 0, size().width(), size().height());
+    //fullRect = QRect(0, 0, (int)(800*wmult), (int)(600*hmult));
 
     noUpdate = false;
     curIMDBNum = "";
