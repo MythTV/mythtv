@@ -1908,7 +1908,7 @@
     </message>
     <message>
         <source>MPEG-4 Parameters</source>
-        <translation>MPEGß4 Parameter</translation>
+        <translation>MPEG-4 Parameter</translation>
     </message>
     <message>
         <source>Hardware MJPEG Parameters</source>
@@ -2439,7 +2439,7 @@
     </message>
     <message>
         <source>Inversion</source>
-        <translation type="unfinished"></translation>
+        <translation>Inversion</translation>
     </message>
     <message>
         <source>Auto</source>
@@ -2471,11 +2471,11 @@
     </message>
     <message>
         <source>Constellation</source>
-        <translation type="unfinished"></translation>
+        <translation>Konstellation</translation>
     </message>
     <message>
         <source>FEC</source>
-        <translation type="unfinished"></translation>
+        <translation>FEC</translation>
     </message>
     <message>
         <source>LP Coderate</source>
@@ -2495,7 +2495,7 @@
     </message>
     <message>
         <source>Hierarchy</source>
-        <translation type="unfinished"></translation>
+        <translation>Hierarchie</translation>
     </message>
     <message>
         <source>Channel Options - Common</source>
@@ -2699,7 +2699,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Normally the dvb-recording will drop packets from the card untill a sequence start header is seen. This option turns off this feature.</source>
-        <translation>Bei DVB Aufnahmen werden normalerweise Datenpakete verworfen solange kein Sequence Startheader emfangen wurde. Diese Option schaltet dieses Merkmal ab.</translation>
+        <translation>Bei DVB Aufnahmen werden normalerweise Datenpakete verworfen solange kein Sequence Startheader empfangen wurde. Diese Option schaltet dieses Merkmal ab.</translation>
     </message>
     <message>
         <source>Per PID driver buffer size</source>
@@ -3443,7 +3443,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>While selecting a group, show a group summary instead of showing info about the first episode in that group.</source>
-        <translation type="unfinished"></translation>
+        <translation>Beim Auswählen einer Gruppe die Gruppenübersicht anzeigen statt die Informationen über die erste Episode in dieser Gruppe.</translation>
     </message>
     <message>
         <source>Menu theme</source>
@@ -3976,11 +3976,11 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Use Arrow Key Accelerators</source>
-        <translation>&apos;Lynx&apos; ähnliche Navigation</translation>
+        <translation>Navigation mit Pfeiltasten erlauben</translation>
     </message>
     <message>
         <source>If enabled, Arrow key accelerators will be used, with LEFT performing an exit action and RIGHT selecting the current item.</source>
-        <translation>Falls gesetzt, können die Pfeiltasten ähnlich wie in Lynx benutzt werden.</translation>
+        <translation>Falls gesetzt, können die Pfeiltasten zur Navigation benutzt werden. LINKS verlässt das Menü und RECHTS wählt den aktuellen Menüpunkt aus.</translation>
     </message>
     <message>
         <source>Display Size - Width</source>
@@ -5104,27 +5104,27 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Scan for channels(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Sendersuchlauf</translation>
     </message>
     <message>
         <source>This button will scan for digital channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>Damit wird die Suche nach digitalen Sendern gestartet.</translation>
     </message>
     <message>
         <source>Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation>Erweitert</translation>
     </message>
     <message>
         <source>Advanced editing options for digital channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Erweiterte Optionen für digitale Sender</translation>
     </message>
     <message>
         <source>Use on air guide</source>
-        <translation type="unfinished"></translation>
+        <translation>EPG über DVB benutzen</translation>
     </message>
     <message>
         <source>If set the guide information will be taken from the On Air Channel guide.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, werden die Programminformationen automatisch per DVB geholt.</translation>
     </message>
     <message>
         <source>Unable to initialize video.</source>
@@ -5208,7 +5208,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Transport</source>
-        <translation type="unfinished"></translation>
+        <translation>Transponder</translation>
     </message>
     <message>
         <source>Capture Card</source>
@@ -5216,11 +5216,11 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Scanning</source>
-        <translation type="unfinished"></translation>
+        <translation>Scannen</translation>
     </message>
     <message>
         <source>Scan Activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Scanaktivität</translation>
     </message>
     <message>
         <source>This recording schedule is inactive</source>
@@ -5232,11 +5232,11 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Record in TS format instead of PS.</source>
-        <translation type="unfinished"></translation>
+        <translation>TS-Format zum Aufnehmen benutzen statt PS.</translation>
     </message>
     <message>
         <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk for processing errors.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deaktiviert die Umwandlung vom Transport-Stream zum Program-Stream. Das Aufnehmen in TS erzeugt etwas größere Dateien, dabei sinkt aber das Fehler-Risiko bei der Umwandlung.</translation>
     </message>
     <message>
         <source>DiSEqC Input Type: (DVB-S)</source>
@@ -5268,11 +5268,11 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Free to air channels only.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nur unverschlüsselte Sender.</translation>
     </message>
     <message>
         <source>If set, only free to air channels will be used.</source>
-        <translation type="unfinished"></translation>
+        <translation>Falls gesetzt, werden nur unverschlüsselte Sender benutzt.</translation>
     </message>
     <message>
         <source>The Latitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format 35.78 for 35.78 degrees North Longitude</source>
@@ -5573,37 +5573,37 @@ Myth wird nun beendet.</translation>
     <message>
         <source>Frequency (Option has no default)
 The frequency for this channel in Hz.</source>
-        <translation type="unfinished"></translation>
+        <translation>Frequenz (kein Standardwert) Die Frequenz für diesen Sender in Hz.</translation>
     </message>
     <message>
         <source>Symbol Rate (Option has no default)</source>
-        <translation type="unfinished"></translation>
+        <translation>Symbolrate (kein Standardwert)</translation>
     </message>
     <message>
         <source>Polarity (Option has no default)</source>
-        <translation type="unfinished"></translation>
+        <translation>Polarität (kein Standardwert)</translation>
     </message>
     <message>
         <source>Inversion (Default: Auto):
 Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
-        <translation type="unfinished"></translation>
+        <translation>Inversion (Standard: Auto): Die meisten Karten erkennen diesen Wert automatisch, wenn möglich auf Auto lassen.</translation>
     </message>
     <message>
         <source>Bandwidth (Default: Auto)
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Bandbreite (Standard: Auto)</translation>
     </message>
     <message>
         <source>Modulation (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Modulation (Standard: Auto)</translation>
     </message>
     <message>
         <source>Constellation (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Konstellation (Standard: Auto)</translation>
     </message>
     <message>
         <source>Forward Error Correction (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>FEC - Forward Error Correction (Standard: Auto)</translation>
     </message>
     <message>
         <source>Low Priority Code Rate (Default: Auto)</source>
@@ -5623,7 +5623,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Hierarchy (Default: Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>Hierarchie (Standard: Auto)</translation>
     </message>
     <message>
         <source>Enable realtime priority threads</source>
@@ -5635,7 +5635,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Enable LCD device</source>
-        <translation type="unfinished"></translation>
+        <translation>LCD-Geräte erlauben</translation>
     </message>
     <message>
         <source>Use an LCD display to view MythTV status information. Need to restart mythfrontend to (de)activate it.</source>
@@ -5646,7 +5646,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <name>ScanProgressPopup</name>
     <message>
         <source>Scan Progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan-Fortschritt</translation>
     </message>
     <message>
         <source>Tuning</source>
@@ -5661,30 +5661,30 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <name>ScanWizardScanType</name>
     <message>
         <source>Scan Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Scantyp</translation>
     </message>
 </context>
 <context>
     <name>ScanWizardScanner</name>
     <message>
         <source>Scanning</source>
-        <translation type="unfinished"></translation>
+        <translation>Scannen</translation>
     </message>
     <message>
         <source>ScanWizard</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan-Assistent</translation>
     </message>
     <message>
         <source>Error tuning to transport</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler beim Einstellen der Transponderfrequenz</translation>
     </message>
     <message>
         <source>Error detecting card type</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler beim Ermitteln des Karten-Typs</translation>
     </message>
     <message>
         <source>Error parsing parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler beim Analysieren der Parameter</translation>
     </message>
 </context>
 <context>
