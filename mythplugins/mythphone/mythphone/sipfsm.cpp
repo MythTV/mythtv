@@ -163,6 +163,23 @@ void SipContainer::CheckUIEvents(SipFsm *sipFsm)
         sipFsm->StatusChanged("OPEN");
     else if (event == "UICLOSED")
         sipFsm->StatusChanged("CLOSED");
+    else if (event == "UIWATCH")
+    {
+        QString uri;
+        do
+        {
+            EventQLock.lock();
+            it = EventQ.begin();
+            uri = *it;
+            EventQ.remove(it);
+            EventQLock.unlock();
+            if (uri.length() > 0)
+                sipFsm->CreateWatcherFsm(uri);
+        }
+        while (uri.length() > 0);
+    }
+    else if (event == "UISTOPWATCHALL")
+        sipFsm->StopWatchers();
 }
 
 void SipContainer::CheckRegistrationStatus(SipFsm *sipFsm)
@@ -305,6 +322,27 @@ void SipContainer::UiClosed()
 {
     EventQLock.lock();
     EventQ.append("UICLOSED");
+    EventQLock.unlock();
+}
+
+void SipContainer::UiWatch(QStrList uriList)
+{
+    QStrListIterator it(uriList);
+    for (; it.current(); ++it)
+        cout << "UI said Watch " << it.current() << endl;
+
+    EventQLock.lock();
+    EventQ.append("UIWATCH");
+    for (; it.current(); ++it)
+        EventQ.append(it.current());
+    EventQ.append("");
+    EventQLock.unlock();
+}
+
+void SipContainer::UiStopWatchAll()
+{
+    EventQLock.lock();
+    EventQ.append("UISTOPWATCHALL");
     EventQLock.unlock();
 }
 
@@ -827,6 +865,14 @@ SipWatcher *SipFsm::CreateWatcherFsm(QString Url)
     return watcher;
 }
 
+void SipFsm::StopWatchers()
+{
+    SipFsmBase *it;
+    for (it=FsmList.first(); it; it=FsmList.next())
+        if (it->type() == "WATCHER")
+            it->FSM(SIP_STOPWATCH);
+}
+
 int SipFsm::numCalls()
 {
     SipFsmBase *it;
@@ -1024,6 +1070,7 @@ QString SipFsmBase::EventtoString(int Event)
     case SIP_PRESENCE_CHANGE:     return "PRESENCE_CHNG";
     case SIP_SUBSCRIBE_EXPIRE:    return "SUB_EXPIRE";
     case SIP_WATCH:               return "WATCH";
+    case SIP_STOPWATCH:           return "STOPWATCH";
     default:
         break;
     }
@@ -2075,7 +2122,7 @@ int SipSubscriber::FSM(int Event, SipMsg *sipMsg, void *Value)
         ParseSipMsg(Event, sipMsg);
         expires = sipMsg->getExpires();
         if (expires == -1) // No expires in SUBSCRIBE, choose default value
-            expires = 60;
+            expires = 600;
         BuildSendStatus(200, "SUBSCRIBE", sipMsg->getCSeqValue(), SIP_OPT_CONTACT | SIP_OPT_EXPIRES, expires);
         DebugSent += "  Sent 200 OK for Subscribe\n";
         if (expires > 0)
@@ -2238,6 +2285,12 @@ int SipWatcher::FSM(int Event, SipMsg *sipMsg, void *Value)
             (parent->Timer())->Start(this, t1, SIP_RETX);
             DebugSent += "  Retransmitted last message\n";
         }
+        else 
+        {
+            State = SIP_WATCH_STOPPING;
+            SendSubscribe(0);
+            DebugSent += "  Sent Un-Subscribe\n";
+        }
         break;
 
     case SIP_WATCH_TRYING_SUBSTATUS:
@@ -2285,6 +2338,34 @@ int SipWatcher::FSM(int Event, SipMsg *sipMsg, void *Value)
         DebugSent += "  Sent 200 OK for Notify\n";
         break;
 
+    case SIP_WATCH_TRYING_STOPWATCH:
+    case SIP_WATCH_ACTIVE_STOPWATCH:
+        State = SIP_WATCH_STOPPING;
+        SendSubscribe(0);
+        DebugSent += "  Sent Un-Subscribe\n";
+        break;
+
+    case SIP_WATCH_STOPPING_RETX:
+        if (Retransmit(false))
+        {
+            (parent->Timer())->Start(this, t1, SIP_RETX);
+            DebugSent += "  Retransmitted last message\n";
+        }
+        else
+            State = SIP_WATCH_IDLE;
+        break;
+
+    case SIP_WATCH_STOPPING_SUBSTATUS:
+        cout << "SIP Watcher FSM: Received SUBSCRIBE STATUS " << sipMsg->getStatusCode() << "\n";
+        if (sipMsg->getStatusCode() == 407)
+        {
+            SendSubscribe(sipMsg);
+            DebugSent += "  Sent Un-Subscribe with Authorization\n";
+        }
+        else 
+            State = SIP_WATCH_IDLE;
+        break;
+
     default:
         cerr << "SIP Watcher FSM: Unknown Event " << EventtoString(Event) << " in State " << State << "\n";
         break;
@@ -2305,6 +2386,8 @@ void SipWatcher::SendSubscribe(SipMsg *authMsg)
     if (authMsg == 0)
         cseq++;
     Subscribe.addCSeq(cseq);
+    if (State == SIP_WATCH_STOPPING)
+        Subscribe.addExpires(0);
 
     if (authMsg)
     {

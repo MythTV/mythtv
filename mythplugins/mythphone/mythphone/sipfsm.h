@@ -54,6 +54,7 @@
 #define SIP_WATCH_IDLE          SIP_IDLE
 #define SIP_WATCH_TRYING        0x20
 #define SIP_WATCH_ACTIVE        0x21
+#define SIP_WATCH_STOPPING      0x22
 
 // Events
 #define SIP_OUTCALL             0x100
@@ -80,6 +81,7 @@
 #define SIP_PRESENCE_CHANGE     0x1600
 #define SIP_SUBSCRIBE_EXPIRE    0x1700
 #define SIP_WATCH               0x1800
+#define SIP_STOPWATCH           0x1900
 
 #define SIP_CMD(s)              (((s)==SIP_INVITE) || ((s)==SIP_ACK) || ((s)==SIP_BYE) || ((s)==SIP_CANCEL) || ((s)==SIP_REGISTER) || ((s)==SIP_SUBSCRIBE) || ((s)==SIP_NOTIFY) )
 #define SIP_STATUS(s)           (((s)==SIP_INVITESTATUS_2xx) || ((s)==SIP_INVITESTATUS_1xx) || ((s)==SIP_INVITESTATUS_3456xx) || ((s)==SIP_BYTESTATUS) || ((s)==SIP_CANCELSTATUS) || ((s)==SIP_SUBSTATUS) || ((s)==SIP_NOTSTATUS) )
@@ -142,6 +144,10 @@
 #define SIP_WATCH_TRYING_SUBSTATUS        (SIP_WATCH_TRYING   | SIP_SUBSTATUS)
 #define SIP_WATCH_ACTIVE_SUBSTATUS        (SIP_WATCH_ACTIVE   | SIP_SUBSTATUS)
 #define SIP_WATCH_ACTIVE_NOTIFY           (SIP_WATCH_ACTIVE   | SIP_NOTIFY)
+#define SIP_WATCH_TRYING_STOPWATCH        (SIP_WATCH_TRYING   | SIP_STOPWATCH)
+#define SIP_WATCH_ACTIVE_STOPWATCH        (SIP_WATCH_ACTIVE   | SIP_STOPWATCH)
+#define SIP_WATCH_STOPPING_RETX           (SIP_WATCH_STOPPING | SIP_RETX)
+#define SIP_WATCH_STOPPING_SUBSTATUS      (SIP_WATCH_STOPPING | SIP_SUBSTATUS)
 
 
 // Build Options logically OR'ed and sent to build procs
@@ -184,6 +190,8 @@ class SipContainer
     void HangupCall();
     void UiOpened();
     void UiClosed();
+    void UiWatch(QStrList uriList);
+    void UiStopWatchAll();
     void GetNotification(int &n, QString &ns);
     void GetRegistrationStatus(bool &Registered, QString &RegisteredTo, QString &RegisteredAs);
     int  CheckforRxEvents(bool &Notify);
@@ -440,6 +448,7 @@ class SipFsm : public QWidget
     SipCall *CreateCallFsm();
     SipSubscriber *CreateSubscriberFsm();
     SipWatcher *CreateWatcherFsm(QString Url);
+    void StopWatchers();
     int numCalls();
     int getPrimaryCall() { return primaryCall; };
     int getPrimaryCallState();

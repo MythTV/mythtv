@@ -58,7 +58,6 @@ PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
     QString regAs;
     QString regTo;
     sipStack->GetRegistrationStatus(reg, regTo, regAs);
-    sipStack->UiOpened();
     if (reg)
         phoneUIStatusBar->DisplayNotification(QString("Registered to " + regTo + " as " + regAs), 5);
     else
@@ -91,6 +90,9 @@ PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
 
     updateForeground();
 
+    // Update SIP Presence information
+    sipStack->UiOpened();
+    sipStack->UiWatch(DirContainer->SpeeddialList());
 
     // Possibly (user-defined) control the volume
     volume_control = NULL;
@@ -1831,6 +1833,7 @@ void PhoneUIBox::handleTreeListSignals(int , IntVector *attributes)
 
 PhoneUIBox::~PhoneUIBox(void)
 {
+    sipStack->UiStopWatchAll();
     sipStack->UiClosed();
     webcam->camClose();
     fsmTimer->stop();

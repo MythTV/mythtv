@@ -248,6 +248,14 @@ void Directory::deleteEntry(QSqlDatabase *db, DirEntry *Entry)
     }
 }
 
+void Directory::addSpeeddialsToList(QStrList &l)
+{
+    DirEntry *it;
+    for (it=first(); it; it=next())
+        if (it->isSpeedDial())
+            l.append(it->getUri());
+    return;
+}
 
 
 
@@ -484,7 +492,7 @@ DirectoryContainer::~DirectoryContainer()
     while ((p = AllDirs.first()) != 0)
     {
         AllDirs.remove();
-	delete p;   // auto-delete is disabled
+        delete p;   // auto-delete is disabled
     }
 
     delete callHistory;
@@ -946,5 +954,15 @@ void DirectoryContainer::clearAllVoicemail()
 }
 
 
+QStrList DirectoryContainer::SpeeddialList()
+{
+    QStrList l;
+    Directory *it;
+    for (it=AllDirs.first(); it; it=AllDirs.next())
+    {
+        it->addSpeeddialsToList(l);
+    }
+    return l;
+}
 
 
