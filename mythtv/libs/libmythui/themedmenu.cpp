@@ -420,7 +420,9 @@ void ThemedMenuState::parseShadow(TextAttributes &attributes,
         {
             if (info.tagName() == "color")
             {
-                attributes.font.shadowColor = QColor(getFirstText(info));
+                // workaround alpha bug with named colors
+                QColor temp(getFirstText(info));
+                attributes.font.shadowColor = QColor(temp.name());
                 hascolor = true;
             }
             else if (info.tagName() == "offset")
@@ -479,7 +481,9 @@ void ThemedMenuState::parseOutline(TextAttributes &attributes,
         {
             if (info.tagName() == "color")
             {
-                attributes.font.outlineColor = QColor(getFirstText(info));
+                // workaround alpha bug with named colors
+                QColor temp(getFirstText(info));
+                attributes.font.outlineColor = QColor(temp.name());
                 hascolor = true;
             }
             else if (info.tagName() == "size")
@@ -566,7 +570,9 @@ void ThemedMenuState::parseText(TextAttributes &attributes,
             }
             else if (info.tagName() == "color")
             {
-                attributes.font.color = QColor(getFirstText(info));
+                // workaround alpha bug with named colors
+                QColor temp(getFirstText(info));
+                attributes.font.color = QColor(temp.name());
             }
             else if (info.tagName() == "centered")
             {
