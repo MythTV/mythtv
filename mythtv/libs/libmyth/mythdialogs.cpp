@@ -862,6 +862,7 @@ MythPopupBox::MythPopupBox(MythMainWindow *parent, const char *name)
     setFrameShape(QFrame::Panel);
     setFrameShadow(QFrame::Raised);
     setPalette(parent->palette());
+    popupForegroundColor = foregroundColor ();
     setFont(parent->font());
     setCursor(QCursor(Qt::BlankCursor));
 
@@ -961,11 +962,11 @@ QLabel *MythPopupBox::addLabel(QString caption, LabelSize size, bool wrap)
         case Medium: label->setFont(defaultMediumFont); break;
         case Small: label->setFont(defaultSmallFont); break;
     }
-
+    
     label->setMaximumWidth((int)m_parent->width() / 2);
     if (wrap)
         label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
-
+    
     addWidget(label, false);
     return label;
 }
