@@ -91,6 +91,9 @@ class NuppelVideoPlayer
 
     void ReencodeFile(char *inputname, char *outputname);
 
+//Kulagowski
+    void FindCommercial(char *inputname);
+
     unsigned char *GetCurrentFrame(int &w, int &h);
 
     void SetPipPlayer(NuppelVideoPlayer *pip) { setpipplayer = pip; 

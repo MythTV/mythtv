@@ -1374,7 +1374,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             continue;
         }
 
-        if (vbuffer_numvalid() < usepre)
+        if (vbuffer_numvalid() == 0)
         {
            prebuffering = true;
            continue;
@@ -2952,4 +2952,174 @@ void NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname)
     fclose(out);
     avcodec_close(&mpa_ctx);
 */
+}
+
+void NuppelVideoPlayer::FindCommercial(char *inputname)
+{ 
+/* Robert Kulagowski, mailto:rkulagow@rocketmail.com
+   2002-11-26
+
+What this routine does.
+o  Reads through the file.
+o  For each frame, get 200 random pixels.  Stay away from the edges, since
+there's usually garbage there.
+o  Get the variance of the pixels.
+o  Store the variance.
+o  Analyze, looking for a frame that's not black
+o  Write the time marker to a bookmark file.
+
+It's not a perfect "commerical detector", since it's actually just looking
+for black frames, but it will let you skip pretty quickly, since you can
+jump over stuff.  
+
+Note, routine will get confused if there's a dark scene in the middle
+of a program.  Later versions of the routine can check the audio levels
+during each block being analyzed, or see if the "commericial" is in the
+correct place with respect to when commericals usually happen.
+
+*/
+
+
+//Using array of 200 pixels.  This will have to be determined if it's too
+//high or too low once the code is working.
+
+    unsigned int average_Y, pixel_Y[200], squared_difference[200], variance, temp;
+    average_Y = variance = temp = 0;
+
+    int i,x,y,top,bottom;
+
+    i = x = y = top = bottom = 0;
+
+    AVCodecContext *mpa_ctx=NULL;
+    AVCodec *mpa_codec;
+    AVPicture mpa_picture;
+
+//    inputname = inputname;  //What?
+
+    filename = inputname;
+     
+    InitSubs();
+    OpenFile(false);
+
+    mpa_codec = avcodec_find_encoder(CODEC_ID_MPEG4);
+
+    if (!mpa_codec)
+    {
+        cout << "error finding codec\n";
+        return;
+    }
+
+    mpa_ctx = avcodec_alloc_context();
+
+    mpa_ctx->pix_fmt = PIX_FMT_YUV420P;
+
+    mpa_picture.linesize[0] = video_width;
+    mpa_picture.linesize[1] = video_width / 2;
+    mpa_picture.linesize[2] = video_width / 2;
+
+    mpa_ctx->width = video_width;
+    mpa_ctx->height = video_height;
+ 
+    mpa_ctx->frame_rate = (int)(video_frame_rate * FRAME_RATE_BASE);
+    mpa_ctx->bit_rate = 1800 * 1000;
+    mpa_ctx->bit_rate_tolerance = 1024 * 8 * 1000;
+    mpa_ctx->qmin = 2;
+    mpa_ctx->qmax = 15;
+    mpa_ctx->max_qdiff = 3;
+    mpa_ctx->qcompress = 0.5;
+    mpa_ctx->qblur = 0.5;
+    mpa_ctx->max_b_frames = 3;
+    mpa_ctx->b_quant_factor = 2.0;
+    mpa_ctx->rc_strategy = 2;
+    mpa_ctx->b_frame_strategy = 0;
+    mpa_ctx->gop_size = 30; 
+    mpa_ctx->flags = CODEC_FLAG_HQ; // | CODEC_FLAG_TYPE; 
+    mpa_ctx->me_method = 5;
+    mpa_ctx->key_frame = -1; 
+
+    if (avcodec_open(mpa_ctx, mpa_codec) < 0)
+    {
+        cerr << "Unable to open FFMPEG/MPEG4 codex\n" << endl;
+        return;
+    }
+
+    int fileend = 0;
+
+    buf = new unsigned char[video_width * video_height * 3 / 2];
+    strm = new unsigned char[video_width * video_height * 2];
+
+//    unsigned char *frame = NULL;
+
+    static unsigned long int tbls[128];
+
+
+    frameheader.frametype = 'D';
+    frameheader.comptype = 'R';
+    frameheader.packetlength = sizeof(tbls);
+
+    unsigned char *outbuffer = new unsigned char[1000 * 1000 * 3];
+
+    while (!fileend)
+    {
+        fileend = (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader,
+                                                       FRAMEHEADERSIZE));
+
+        if (fileend)
+            continue;
+
+        fileend = (ringBuffer->Read(strm, frameheader.packetlength) !=
+                                    frameheader.packetlength);
+
+        if (frameheader.frametype == 'V')
+        {
+            framesPlayed++;
+//            frame = DecodeFrame(&frameheader, strm, outbuffer);
+
+            DecodeFrame(&frameheader, strm, outbuffer);
+
+//            mpa_picture.data[0] = frame;
+            mpa_picture.data[0] = outbuffer;
+
+            //For y values, we want to get out of the letterbox zone.  Estimate
+            //that letterbox is 10% of the top and bottom?
+            top=(int)(video_height*.10);
+            bottom=(int)(video_height*.90);
+
+            for (i=0;i<200;i++)  //Get 200 pixels
+            {
+                x=10+(rand()%(video_width-10));  // Get away from the edges.
+                y=top+(rand()%(bottom-top));
+                pixel_Y[i] = mpa_picture.data[0][y * mpa_picture.linesize[0] + x];
+printf("Frame Number %lld i=%d, x:%d,y:%d Y=%d\n",framesPlayed,i,x,y,pixel_Y[i]);
+            }
+			
+            //Now, get the average
+            for(i=0;i<200;i++) average_Y+=pixel_Y[i];
+printf("Average: %d\n",average_Y);
+            //square the difference of each pixel from the average
+            for(i=0;i<200;i++) squared_difference[i]=(pixel_Y[i]-average_Y)*(pixel_Y[i]-average_Y);
+            //Get the sum of the squared_differences
+            for(i=0;i<200;i++) temp+=squared_difference[i];
+            //Determine the variance:
+            variance = (unsigned int)(temp / 200);
+printf("Variance for frame %lld is %d\n",framesPlayed,variance);
+        } 
+
+/* 
+
+Thoughts on what to do next:
+   1.  Setup an array, analyze the variances in 10 second chunks.  That's
+3000 elements, which isn't crazy.
+   2.  Have a ringbuffer of the last 5 seconds' worth of variance values. 
+Analyze those.  Smaller memory hit, more complicated programming
+   3.  Setup a very big array of thousands of unsigned ints worth of
+variance values, do the entire file first, then go back and analyze.
+
+*/
+
+    }  //End of the file
+
+    delete [] outbuffer;
+
+    avcodec_close(mpa_ctx);
 }
