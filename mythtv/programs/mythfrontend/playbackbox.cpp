@@ -532,7 +532,8 @@ void PlaybackBox::remove(QListViewItem *lvitem)
             changed(NULL);
 
         delete lvitem;
-        UpdateProgressBar();
+        if (type == Delete)
+            UpdateProgressBar();
     }    
     else if (m_context->GetNumSetting("PlaybackPreview") == 1)
         startPlayer(rec);

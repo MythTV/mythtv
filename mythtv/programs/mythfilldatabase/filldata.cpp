@@ -13,6 +13,8 @@
 #include <qsqlquery.h>
 
 #include <iostream>
+#include <fstream>
+#include <string>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -864,6 +866,84 @@ void fillData(QValueList<Source> &sourcelist)
     clearOldDBEntries();
 }
 
+ChanInfo *xawtvChannel(QString &id, QString &channel, QString &fine)
+{
+    ChanInfo *chaninfo = new ChanInfo;
+    chaninfo->xmltvid = id;
+    chaninfo->name = id;
+    chaninfo->callsign = id;
+    chaninfo->chanstr = channel;
+    chaninfo->finetune = fine;
+
+    chaninfo->iconpath = "";
+
+    return chaninfo;
+}
+
+void readXawtvChannels(int id, QString xawrcfile)
+{
+    fstream fin(xawrcfile.ascii(), ios::in);
+    if (!fin.is_open()) return;
+
+    QValueList<ChanInfo> chanlist;
+
+    QString xawid;
+    QString channel;
+    QString fine;
+
+    string strLine;
+    int nSplitPoint = 0;
+
+    while(!fin.eof())
+    {
+        getline(fin,strLine);
+
+        if ((strLine[0] != '#') && (!strLine.empty()))
+        {
+            if (strLine[0] == '[')
+            {
+                if ((nSplitPoint = strLine.find(']')) > 1)
+                {
+                    if ((xawid != "") && (channel != ""))
+                    {
+                        ChanInfo *chinfo = xawtvChannel(xawid, channel, fine);
+                        chanlist.push_back(*chinfo);
+                        delete chinfo;
+                    }
+                    xawid = strLine.substr(1, nSplitPoint - 1).c_str();
+                    channel = "";
+                    fine = "";
+                }
+            }
+            else if ((nSplitPoint = strLine.find('=') + 1) > 0)
+            {
+                while (strLine.substr(nSplitPoint,1) == " ")
+                { ++nSplitPoint; }
+
+                if (!strncmp(strLine.c_str(), "channel", 7))
+                {
+                    channel = strLine.substr(nSplitPoint, 
+                                             strLine.size()).c_str();
+                }
+                else if (!strncmp(strLine.c_str(), "fine", 4))
+                {
+                    fine = strLine.substr(nSplitPoint, strLine.size()).c_str();
+                }
+            }
+        }
+    }
+
+    if ((xawid != "") && (channel != ""))
+    {
+        ChanInfo *chinfo = xawtvChannel(xawid, channel, fine);
+        chanlist.push_back(*chinfo);
+        delete chinfo;
+    }
+
+    handleChannels(id, &chanlist);
+}
+
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv, false);
@@ -871,6 +951,9 @@ int main(int argc, char *argv[])
     int fromfile_id = 1;
     int fromfile_offset = 0;
     QString fromfile_name;
+    bool from_xawfile = false;
+    int fromxawfile_id = 1;
+    QString fromxawfile_name;
 
     while (argpos < a.argc())
     {
@@ -907,6 +990,22 @@ int main(int argc, char *argv[])
             cout << "### bypassing grabbers, reading directly from file\n";
             from_file = true;
         }
+        else if (!strcmp(a.argv()[argpos], "--xawchannels"))
+        {
+            if (((argpos + 2) >= a.argc()) ||
+                !strncmp(a.argv()[argpos + 1], "--", 2) ||
+                !strncmp(a.argv()[argpos + 2], "--", 2))
+            {
+                printf("missing or invalid parameters for --xawchannels option\n");
+                return -1;
+            }
+
+            fromxawfile_id = atoi(a.argv()[++argpos]);
+            fromxawfile_name = a.argv()[++argpos];
+
+            cout << "### reading channels from xawtv configfile\n";
+            from_xawfile = true;
+        }
         else if (!strcmp(a.argv()[argpos], "--help"))
         {
             cout << "usage:\n";
@@ -925,6 +1024,11 @@ int main(int argc, char *argv[])
             cout << "                (-1 meaning from today on all future entries)\n";
             cout << "   <xmlfile>  = file to read\n";
             cout << "\n";
+            cout << "--xawchannels <sourceid> <xawtvrcfile>\n";
+            cout << "   (--manual flag works in combination with this)\n";
+            cout << "   Read channels as defined in xawtvrc file given\n";
+            cout << "   <sourceid>    = cardinput\n";
+            cout << "   <xawtvrcfile> = file to read\n";
             cout << "--help\n";
             cout << "   This text\n";
             cout << "\n";
@@ -951,7 +1055,11 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    if (from_file)
+    if (from_xawfile)
+    {
+        readXawtvChannels(fromxawfile_id, fromxawfile_name);
+    }
+    else if (from_file)
     {
         grabDataFromFile(fromfile_id, fromfile_offset, fromfile_name);
     }
