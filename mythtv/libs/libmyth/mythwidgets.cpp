@@ -740,7 +740,41 @@ void MythToolButton::drawButton(QPainter *p)
     drawButtonLabel(p);
 }
 
-void MythPushButton::drawButton( QPainter * p )
+void MythToolButton::keyPressEvent(QKeyEvent *e)
+{
+    switch (e->key())
+    {
+        case Key_Enter:
+        case Key_Return:
+        case Key_Space:
+            setDown(TRUE);
+            emit pressed();
+            break;
+        default:
+            QToolButton::keyPressEvent(e);
+            break;
+    }
+}
+
+void MythToolButton::keyReleaseEvent(QKeyEvent *e)
+{
+    switch (e->key())
+    {
+        case Key_Enter:
+        case Key_Return:
+        case Key_Space:
+        {
+            QKeyEvent tempe(QEvent::KeyRelease, Key_Space, ' ', 0, " ");
+            QToolButton::keyReleaseEvent(&tempe);
+            break;
+        }
+        default:
+            QToolButton::keyReleaseEvent(e);
+            break;
+    }
+}
+
+void MythPushButton::drawButton(QPainter * p)
 {
     int diw = 0;
     if ( isDefault() || autoDefault() ) {
@@ -810,6 +844,40 @@ void MythPushButton::drawButton( QPainter * p )
                         colorGroup(), flags);
 
     drawButtonLabel(p);
+}
+
+void MythPushButton::keyPressEvent(QKeyEvent *e)
+{
+    switch (e->key())
+    {
+        case Key_Enter:
+        case Key_Return:
+        case Key_Space:
+            setDown(TRUE);
+            emit pressed();
+            break;
+        default:
+            QPushButton::keyPressEvent(e);
+            break;
+    }
+}
+
+void MythPushButton::keyReleaseEvent(QKeyEvent *e)
+{
+    switch (e->key())
+    {
+        case Key_Enter:
+        case Key_Return:
+        case Key_Space:
+        {
+            QKeyEvent tempe(QEvent::KeyRelease, Key_Space, ' ', 0, " ");
+            QPushButton::keyReleaseEvent(&tempe);            
+            break;
+        }
+        default:
+            QPushButton::keyReleaseEvent(e);
+            break;
+    }
 }
 
 MythDialog::MythDialog(QWidget *parent, const char *name, bool modal)
@@ -1087,3 +1155,4 @@ void MythPopupBox::addWidget(QWidget *widget, bool setAppearance)
     }
     vbox->addWidget(widget);
 }
+

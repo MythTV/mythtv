@@ -234,6 +234,8 @@ class MythToolButton : public QToolButton
                       setBackgroundOrigin(WindowOrigin); }
 
     void drawButton(QPainter *p);
+    void keyPressEvent(QKeyEvent *e);
+    void keyReleaseEvent(QKeyEvent *e);
 
   private:
     QColor origcolor;
@@ -251,6 +253,8 @@ class MythPushButton : public QPushButton
                   { setBackgroundOrigin(WindowOrigin); }
 
     void drawButton(QPainter *p);
+    void keyPressEvent(QKeyEvent *e);
+    void keyReleaseEvent(QKeyEvent *e);
 
   private:
     QColor origcolor;
