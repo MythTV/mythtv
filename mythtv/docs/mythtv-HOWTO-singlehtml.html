@@ -99,9 +99,10 @@ necessary.</EM>
 <H2><A NAME="toc11">11.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s11">Using MythTV.</A></H2>
 
 <UL>
-<LI><A NAME="toc11.1">11.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.1">Using themes with MythTV.</A>
-<LI><A NAME="toc11.2">11.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.2">Adding DirecTV information to the database.</A>
-<LI><A NAME="toc11.3">11.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.3">Adding support for an external tuner.</A>
+<LI><A NAME="toc11.1">11.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.1">Keyboard commands.</A>
+<LI><A NAME="toc11.2">11.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.2">Using themes with MythTV.</A>
+<LI><A NAME="toc11.3">11.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.3">Adding DirecTV information to the database.</A>
+<LI><A NAME="toc11.4">11.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss11.4">Adding support for an external tuner.</A>
 </UL>
 <P>
 <H2><A NAME="toc12">12.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s12">MythWeb.</A></H2>
@@ -3085,7 +3086,6 @@ the frontend should poll the backend to determine if the status has changed.</P>
 
 <H2><A NAME="s11">11.</A> <A HREF="#toc11">Using MythTV.</A></H2>
 
-<P>The <CODE>keys.txt</CODE> file describes what the various keyboard commands are.</P>
 <P><B>NOTE to Red Hat users</B>:Red Hat Linux 9 ships with Gnome as
 the default desktop environment.  However, Gnome seems to have issues with
 window focus and window switching which sometimes cause mythfrontend to
@@ -3093,7 +3093,11 @@ obscure the video. KDE does not seem to have any such issues. Therefore you
 will need to switch to KDE by selecting RedHatMenu>Extras>System
 Settings>Desktop Switching Tool and choose "KDE".</P>
 
-<H2><A NAME="ss11.1">11.1</A> <A HREF="#toc11.1">Using themes with MythTV.</A>
+<H2><A NAME="ss11.1">11.1</A> <A HREF="#toc11.1">Keyboard commands.</A>
+</H2>
+
+<P>The <CODE>keys.txt</CODE> file describes what the various keyboard commands are.</P>
+<H2><A NAME="ss11.2">11.2</A> <A HREF="#toc11.2">Using themes with MythTV.</A>
 </H2>
 
 <P>MythTV is "themeable", meaning that the visual appearance of the program
@@ -3115,7 +3119,7 @@ $ su
 <P><B>NOTE</B>:  if the theme file you downloaded is a <CODE>bz2</CODE> file, use
 <CODE>tar -xjf</CODE> rather than <CODE>tar -xzf</CODE>.</P>
 
-<H2><A NAME="ss11.2">11.2</A> <A HREF="#toc11.2">Adding DirecTV information to the database.</A>
+<H2><A NAME="ss11.3">11.3</A> <A HREF="#toc11.3">Adding DirecTV information to the database.</A>
 </H2>
 
 <P>A script for adding DirecTV information into the database has been
@@ -3126,7 +3130,7 @@ available at
 user-supplied program, so if you have issues with the script, please contact
 the author.</P>
 
-<H2><A NAME="ss11.3">11.3</A> <A HREF="#toc11.3">Adding support for an external tuner.</A>
+<H2><A NAME="ss11.4">11.4</A> <A HREF="#toc11.4">Adding support for an external tuner.</A>
 </H2>
 
 <P>MythTV supports changing the channel on an external tuner.  If you have

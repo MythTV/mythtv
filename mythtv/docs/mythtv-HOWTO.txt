@@ -129,9 +129,10 @@
      10.6 Xbox Frontends
 
   11. Using MythTV.
-     11.1 Using themes with MythTV.
-     11.2 Adding DirecTV information to the database.
-     11.3 Adding support for an external tuner.
+     11.1 Keyboard commands.
+     11.2 Using themes with MythTV.
+     11.3 Adding DirecTV information to the database.
+     11.4 Adding support for an external tuner.
 
   12. MythWeb.
      12.1 Installation and prerequisites.
@@ -276,7 +277,6 @@
 
   See http://mysettopbox.tv <http://mysettopbox.tv> if you'd like to
   install a custom version of Knoppix optimized for MythTV.
-
   [1m3.  Checking prerequisites.[0m
 
   You must ensure that any firewalls (either hardware, or a software
@@ -3417,8 +3417,6 @@
 
   [1m11.  Using MythTV.[0m
 
-  The keys.txt file describes what the various keyboard commands are.
-
   [1mNOTE to Red Hat users[22m:Red Hat Linux 9 ships with Gnome as the default
   desktop environment.  However, Gnome seems to have issues with window
   focus and window switching which sometimes cause mythfrontend to
@@ -3428,7 +3426,11 @@
   "KDE".
 
 
-  [1m11.1.  Using themes with MythTV.[0m
+  [1m11.1.  Keyboard commands.[0m
+
+  The keys.txt file describes what the various keyboard commands are.
+
+  [1m11.2.  Using themes with MythTV.[0m
 
   MythTV is "themeable", meaning that the visual appearance of the
   program can be modified by the user without re-compiling or altering
@@ -3453,7 +3455,7 @@
   rather than tar -xzf.
 
 
-  [1m11.2.  Adding DirecTV information to the database.[0m
+  [1m11.3.  Adding DirecTV information to the database.[0m
 
   A script for adding DirecTV information into the database has been
   written by tarek Lubani  <mailto:tarek@tarek.2y.net> and is available
@@ -3462,7 +3464,7 @@
   issues with the script, please contact the author.
 
 
-  [1m11.3.  Adding support for an external tuner.[0m
+  [1m11.4.  Adding support for an external tuner.[0m
 
   MythTV supports changing the channel on an external tuner.  If you
   have an external tuner, such as a DirecTV or digital cable set top

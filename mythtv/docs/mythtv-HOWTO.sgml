@@ -2697,15 +2697,15 @@ Colors should be self explanatory.  The update interval determines how often
 the frontend should poll the backend to determine if the status has changed.
 
 <sect>Using MythTV.
-<p>The <tt>keys.txt</tt> file describes what the various keyboard commands are.
-
-<bf>NOTE to Red Hat users</bf>:Red Hat Linux 9 ships with Gnome as
+<p><bf>NOTE to Red Hat users</bf>:Red Hat Linux 9 ships with Gnome as
 the default desktop environment.  However, Gnome seems to have issues with
 window focus and window switching which sometimes cause mythfrontend to
 obscure the video. KDE does not seem to have any such issues. Therefore you
 will need to switch to KDE by selecting RedHatMenu>Extras>System
 Settings>Desktop Switching Tool and choose "KDE".
 
+<sect1>Keyboard commands.
+<p>The <tt>keys.txt</tt> file describes what the various keyboard commands are.
 <sect1>Using themes with MythTV.
 <p>MythTV is "themeable", meaning that the visual appearance of the program
 can be modified by the user without re-compiling or altering the program
@@ -5128,7 +5128,8 @@ the <bf>man</bf> page for details.
 <!-- Revision History
 v0.14.00, 2004-01-31.  Initial version for MythTV v0.14.  Rename docs
 version to match.  Standardize spelling of RTjpeg.  Add section on Channel
-Editor in setup.  Remove duplicate note in 10.5.
+Editor in setup.  Remove duplicate note in 10.5.  Make keys.txt its own
+subsection.
 -->
 
 <!--
