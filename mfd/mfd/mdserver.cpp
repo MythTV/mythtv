@@ -353,10 +353,10 @@ void MetadataServer::doAtomicDataSwap(
                     {
                         local_audio_metadata_count = 
                                 local_audio_metadata_count 
-                                - target->getMetadataCount();
+                                + target->getMetadataCount();
                         local_audio_playlist_count = 
                                 local_audio_playlist_count 
-                                - target->getPlaylistCount();
+                                + target->getPlaylistCount();
                     }
                 local_audio_playlist_count_mutex.unlock();
             local_audio_metadata_count_mutex.unlock();
