@@ -15,7 +15,7 @@ installfiles.files = mythgame-settings.txt gamemenu.xml
 
 INSTALLS += installfiles
 
-LIBS += -L/usr/local/lib -lmyth
+LIBS += -L/usr/local/lib -lmyth-$$LIBVERSION
 
 # Input
 HEADERS += constants.h databasebox.h gamehandler.h mamehandler.h rominfo.h 
