@@ -223,12 +223,13 @@ void Scheduler::PrintList(void)
     for (; i != recordingList.end(); i++)
     {
         ProgramInfo *first = (*i);
-        cout << first->title.leftJustify(24, ' ', true)
+        cout << first->title.leftJustify(20, ' ', true)
              << first->chanstr.rightJustify(4, ' ') << "  " << first->chanid 
              << " \"" << first->startts.toString() << "\" " << first->sourceid 
              << " " << first->inputid << " " << first->cardid << " -- "  
              << first->conflicting << " " << first->recording << " "
-             << first->duplicate << endl;
+             << first->duplicate << " " << first->rank.rightJustify(4, ' ')
+             << endl;
     }
 
     cout << "---  print list end  ---\n";

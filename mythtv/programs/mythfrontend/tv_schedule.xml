@@ -60,6 +60,13 @@
    </button>
 
    <button>
+      <type>TV_RANKINGS</type>
+      <text>Set Program Rankings</text>
+      <alttext>Set Rankings</alttext>
+      <action>TV_SET_RANKINGS</action>
+   </button>
+
+   <button>
       <type>TV_CONFLICTS</type>
       <text>Fix Scheduling Conflicts</text>
       <text lang="IT">Correggi i conflitti</text>
@@ -73,13 +80,6 @@
       <alttext lang="ES">Conflictos</alttext>
       <alttext lang="FR">Conflictes</alttext>
       <action>TV_FIX_CONFLICTS</action>
-   </button>
-
-   <button>
-      <type>TV_RANKINGS</type>
-      <text>Set Program Rankings</text>
-      <alttext>Set Rankings</alttext>
-      <action>TV_SET_RANKINGS</action>
    </button>
 
 </mythmenu>

@@ -889,7 +889,7 @@
       <textarea name="infotype" draworder="6">
         <area>20,80,180,30</area>
         <font>info</font>
-        <value>Recording Type:</value>
+        <value>Record Type:</value>
       </textarea>
       <textarea name="type" draworder="6">
         <area>200,80,430,30</area>

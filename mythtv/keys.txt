@@ -8,7 +8,8 @@ mythfrontend
 - Space or Enter to take action on the item under the highlight point.
 - P to play in both "Watch a Recording" and "Delete a Recording".
 - D to delete in both "Watch a Recording" and "Delete a Recording".
-- I to edit a recording in the "Fix Scheduling Conflicts" screen.
+- I to edit recording options from the EPG, "Program Finder",
+    "Program Rankings", or "Fix Scheduling Conflicts" screens.
 
 
 Watching TV or a recording
@@ -121,6 +122,16 @@ EPG
 - Pressing '/' will mark/unmark the current channel as a "favorite"
 - Pressing 4 will toggle the guide listing between all channels and filtered
   "favorites".
+
+Set Program Rankings and Set Channel Rankings
+---------------------------------------------
+
+- Right increases rank value.
+- Left decreases rank value.
+- 1 sorts by title.
+- 2 sorts by rank.
+- I to edit recording options.
+- ESC commits changes and exits.
 
 Remote Controls
 ---------------
