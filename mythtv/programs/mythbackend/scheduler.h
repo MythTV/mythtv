@@ -77,6 +77,8 @@ class Scheduler
 
     MythContext *m_context;
     QMap<int, EncoderLink *> *m_tvList;   
+
+    QMap<QString, bool> askedList;
 };
 
 #endif

@@ -148,6 +148,31 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
     ScheduledRecording::findAllProgramsToRecord(QSqlDatabase::database(),
                                                 recordingList);
 
+    QMap<QString, bool> foundlist;
+
+    list<ProgramInfo *>::iterator iter = recordingList.begin();
+    for (; iter != recordingList.end(); iter++)
+    {
+        ProgramInfo *pginfo = (*iter);
+        QString id = pginfo->startts.toString() + "_" + pginfo->chanid;
+
+        foundlist[id] = true;
+        if (!askedList.contains(id))
+            askedList[id] = false;
+    }
+
+    QMap<QString, bool>::Iterator askIter = askedList.begin();
+    for (; askIter != askedList.end(); askIter++)
+    {
+        QString id = askIter.key();
+
+        if (!foundlist.contains(id))
+        {
+            askedList.remove(askIter);
+            askIter = askedList.begin();
+        }
+    }
+    
     if (recordingList.size() > 0)
     {
         recordingList.sort(comp_proginfo());
@@ -181,7 +206,10 @@ void Scheduler::PrintList(void)
     for (; i != recordingList.end(); i++)
     {
         ProgramInfo *first = (*i);
-        cout << first->title << " " << first->chanstr << " " << first->chanid << " \"" << first->startts.toString() << "\" " << first->sourceid << " " << first->inputid << " " << first->cardid << " --\t"  << first->conflicting << " " << first->recording << endl;
+        cout << first->title << " " << first->chanstr << " " << first->chanid 
+             << " \"" << first->startts.toString() << "\" " << first->sourceid 
+             << " " << first->inputid << " " << first->cardid << " --\t"  
+             << first->conflicting << " " << first->recording << endl;
     }
 
     cout << endl << endl;
@@ -275,9 +303,8 @@ void Scheduler::MarkConflicts(list<ProgramInfo *> *uselist)
 
 bool Scheduler::FindInOldRecordings(ProgramInfo *pginfo)
 {
-    QSqlQuery query;
     QString thequery;
-   
+  
     if (pginfo->subtitle.length() <= 2 || pginfo->description.length() < 2)
         return false;
 
@@ -286,7 +313,7 @@ bool Scheduler::FindInOldRecordings(ProgramInfo *pginfo)
                        "description = \"%3\";").arg(pginfo->title)
                        .arg(pginfo->subtitle).arg(pginfo->description);
 
-    query = db->exec(thequery);
+    QSqlQuery query = db->exec(thequery);
 
     if (!query.isActive()) {
         MythContext::DBError("find in oldrecorded", query);
@@ -295,6 +322,7 @@ bool Scheduler::FindInOldRecordings(ProgramInfo *pginfo)
 
     if (query.numRowsAffected() > 0)
         return true;
+
     return false;
 }
 
@@ -809,7 +837,6 @@ void Scheduler::DoMultiCard(void)
 
 void Scheduler::RunScheduler(void)
 {
-    bool asked = false;
     int secsleft;
     EncoderLink *nexttv = NULL;
 
@@ -819,6 +846,8 @@ void Scheduler::RunScheduler(void)
     QDateTime curtime;
     QDateTime lastupdate = QDateTime::currentDateTime().addDays(-1);
 
+    list<ProgramInfo *>::iterator recIter;
+
     while (1)
     {
         curtime = QDateTime::currentDateTime();
@@ -827,36 +856,32 @@ void Scheduler::RunScheduler(void)
             (lastupdate.date().day() != curtime.date().day()))
         {
             FillRecordLists();
-            //cout << "Found changes in the todo list.\n";
-            nextRecording = NULL;
-        }
-
-        if (!nextRecording)
-        {
             lastupdate = curtime;
-            nextRecording = GetNextRecording();
-            if (nextRecording)
-            {
-                nextrectime = nextRecording->startts;
-                //cout << "Will record " << nextRecording->title
-                //     << " in " << curtime.secsTo(nextrectime) << "secs.\n";
-                asked = false;
-                if (m_tvList->find(nextRecording->cardid) == m_tvList->end())
-                {
-                    cerr << "invalid cardid " << nextRecording->cardid << endl;
-                    exit(0);
-                }
-                nexttv = (*m_tvList)[nextRecording->cardid];
-            }
+            //cout << "Found changes in the todo list.\n";
         }
 
-        if (nextRecording)
+        recIter = recordingList.begin();
+        for (; recIter != recordingList.end(); recIter++)
         {
+            nextRecording = (*recIter);
+
+            nextrectime = nextRecording->startts;
             secsleft = curtime.secsTo(nextrectime);
 
-            //cout << secsleft << " seconds until " << nextRecording->title
-            //     << endl;
+            cout << secsleft << " seconds until " << nextRecording->title
+                 << endl;
 
+            if (secsleft > 35)
+                break;
+ 
+            if (m_tvList->find(nextRecording->cardid) == m_tvList->end())
+            {
+                cerr << "invalid cardid " << nextRecording->cardid << endl;
+                exit(0);
+            }
+            nexttv = (*m_tvList)[nextRecording->cardid];
+
+/*
             if (nexttv->GetState() == kState_WatchingLiveTV &&
                 secsleft <= 30 && !asked)
             {
@@ -871,6 +896,7 @@ void Scheduler::RunScheduler(void)
                     continue;
                 }
             }
+*/
 
             if (secsleft <= -2)
             {
@@ -878,7 +904,7 @@ void Scheduler::RunScheduler(void)
                 //cout << "Started recording " << nextRecording->title << endl;
                 RemoveFirstRecording();
                 nextRecording = NULL;
-                continue;
+                recIter = recordingList.begin();
             }
         }
 

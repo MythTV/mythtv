@@ -55,6 +55,18 @@ public:
     };
 };
 
+class JumpAmount: public SpinBoxSetting, public GlobalSetting {
+public:
+    JumpAmount():
+        SpinBoxSetting(1, 30, 1),
+        GlobalSetting("JumpAmount") {
+        setLabel("Jump amount (minutes)");
+        setValue(10);
+        setHelpText("How many minutes to jump forward or backward "
+                   "when the jump keys are pressed");
+    };
+};
+
 class FastForwardAmount: public SpinBoxSetting, public GlobalSetting {
 public:
     FastForwardAmount():
@@ -608,6 +620,7 @@ PlaybackSettings::PlaybackSettings()
     seek->addChild(new RewindAmount());
     seek->addChild(new StickyKeys());
     seek->addChild(new ExactSeeking());
+    seek->addChild(new JumpAmount());
     addChild(seek);
 
     VerticalConfigurationGroup* oscan = new VerticalConfigurationGroup(false);

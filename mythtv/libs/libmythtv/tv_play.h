@@ -76,6 +76,8 @@ class TV : public QObject
     void DoPause(void);
     void DoFF(void);
     void DoRew(void);
+    void DoJumpAhead(void);
+    void DoJumpBack(void);
     int  calcSliderPos(int offset, QString &desc);
     
     void UpdateOSD(void);
@@ -135,6 +137,7 @@ class TV : public QObject
 
     int playbackLen;
 
+    int jumptime;
     int fftime;
     int rewtime;
     int stickykeys;

@@ -21,6 +21,10 @@ using namespace std;
 #define wsDown          0x54 + 256
 #define wsLeft          0x51 + 256
 #define wsRight         0x53 + 256
+#define wsPageUp        0x55 + 256
+#define wsPageDown      0x56 + 256
+#define wsEnd           0x57 + 256
+#define wsBegin         0x58 + 256
 #define wsEscape        0x1b + 256
 #define wsZero          0xb0 + 256
 #define wsOne           0xb1 + 256
@@ -58,13 +62,9 @@ TV::TV(MythContext *lcontext)
 
 void TV::Init(void)
 {
-    fftime = m_context->GetNumSetting("FastForwardAmount");
-    if (fftime <= 0)
-        fftime = 5;
-
-    rewtime = m_context->GetNumSetting("RewindAmount");
-    if (rewtime <= 0)
-        rewtime = 5;
+    fftime = m_context->GetNumSetting("FastForwardAmount", 30);
+    rewtime = m_context->GetNumSetting("RewindAmount", 5);
+    jumptime = m_context->GetNumSetting("JumpAmount", 10);
 
     recorder = piprecorder = activerecorder = NULL;
     nvp = pipnvp = activenvp = NULL;
@@ -751,6 +751,16 @@ void TV::ProcessKeypress(int keypressed)
             DoRew(); 
             break;
         }
+        case wsPageUp:
+        {
+            DoJumpAhead(); 
+            break;
+        }
+        case wsPageDown:
+        {
+            DoJumpBack(); 
+            break;
+        }
         case wsEscape:
         {
             if (StateIsPlaying(internalState) && 
@@ -1101,6 +1111,38 @@ void TV::DoRew(void)
     }
 
     activenvp->Rewind(rewtime * ff_rew_scaling);
+}
+
+void TV::DoJumpAhead(void)
+{
+    bool slidertype = false;
+    if (internalState == kState_WatchingLiveTV)
+        slidertype = true;
+
+    if (activenvp == nvp)
+    {
+        QString desc = "";
+        int pos = calcSliderPos((int)(jumptime * 60), desc);
+        osd->StartPause(pos, slidertype, "Jump Ahead", desc, 2);
+    }
+
+    activenvp->FastForward(jumptime * 60);
+}
+
+void TV::DoJumpBack(void)
+{
+    bool slidertype = false;
+    if (internalState == kState_WatchingLiveTV)
+        slidertype = true;
+
+    if (activenvp == nvp)
+    {
+        QString desc = "";
+        int pos = calcSliderPos(0 - (int)(jumptime * 60), desc);
+        osd->StartPause(pos, slidertype, "Jump Back", desc, 2);
+    }
+
+    activenvp->Rewind(jumptime * 60);
 }
 
 void TV::ToggleInputs(void)
