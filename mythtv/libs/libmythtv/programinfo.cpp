@@ -75,9 +75,15 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
     record = NULL;
 }
 
-ProgramInfo::~ProgramInfo() {
+ProgramInfo::~ProgramInfo() 
+{
     if (record != NULL)
         delete record;
+}
+
+QString ProgramInfo::MakeUniqueKey(void)
+{
+    return title + ":" + chanid + ":" + startts.toString(Qt::ISODate);
 }
 
 void ProgramInfo::ToStringList(QStringList &list)

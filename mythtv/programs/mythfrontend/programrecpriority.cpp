@@ -442,8 +442,7 @@ void RankPrograms::edit(void)
 
                 // also set the origRankData with new rank so we don't
                 // save to db again when we exit
-                QString key = progInfo->title + ":" + progInfo->chanid + ":" + 
-                              progInfo->startts.toString(Qt::ISODate);
+                QString key = progInfo->MakeUniqueKey(); 
                 origRankData[key] = progInfo->rank;
 
                 SortList();
@@ -503,8 +502,7 @@ void RankPrograms::saveRank(void)
     for (it = programData.begin(); it != programData.end(); ++it) 
     {
         ProgramRankInfo *progInfo = &(it.data());
-        QString key = progInfo->title + ":" + progInfo->chanid + ":" + 
-                      progInfo->startts.toString(Qt::ISODate);
+        QString key = progInfo->MakeUniqueKey(); 
 
         // if this program's rank changed from when we entered
         // save new value out to db
@@ -533,8 +531,7 @@ void RankPrograms::FillList(void)
 
         // save rank value in map so we don't have to save all program's
         // rank values when we exit
-        QString key = (*pgiter)->title + ":" + (*pgiter)->chanid + ":" + 
-                      (*pgiter)->startts.toString(Qt::ISODate);
+        QString key = (*pgiter)->MakeUniqueKey();
         origRankData[key] = (*pgiter)->rank;
 
         delete (*pgiter);
@@ -606,8 +603,7 @@ void RankPrograms::FillList(void)
             for (it = programData.begin(); it != programData.end(); ++it)
             {
                 ProgramRankInfo *progInfo = &(it.data());
-                QString keyB = progInfo->title + ":" + progInfo->chanid + ":" +
-                               progInfo->startts.toString(Qt::ISODate);
+                QString keyB = progInfo->MakeUniqueKey();
                 if(keyA == keyB)
                 {
                     progInfo->channelRank = channelRank;
@@ -757,9 +753,7 @@ void RankPrograms::updateList(QPainter *p)
                     {
                         ProgramRankInfo *progInfo = &(it.data());
 
-                        QString key = progInfo->title + ":" + 
-                                      progInfo->chanid + ":" +
-                                      progInfo->startts.toString(Qt::ISODate);
+                        QString key = progInfo->MakeUniqueKey(); 
 
                         int progRank = progInfo->rank.toInt();
                         int finalRank = progRank + progInfo->channelRank +

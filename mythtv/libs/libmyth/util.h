@@ -25,4 +25,7 @@ void GetMythTVGeometry(Display *dpy, int screen_num, int *x, int *y,
 
 QRgb blendColors(QRgb source, QRgb add, int alpha);
 
+#define MYTH_SYSTEM_DONT_BLOCK_LIRC (1)
+int myth_system(const QString &command, int flags = 0);
+
 #endif

@@ -2,6 +2,7 @@
 #define LIRCEVENT_H_
 
 const int kLircKeycodeEventType = 23423;
+const int kLircMuteEventType = 23424;
 
 class LircKeycodeEvent : public QCustomEvent 
 {
@@ -29,6 +30,33 @@ class LircKeycodeEvent : public QCustomEvent
     QString lirctext;
     int keycode;
     bool keydown;
+};
+
+class LircMuteEvent : public QCustomEvent
+{
+  public:
+    LircMuteEvent(bool mute_events) : QCustomEvent(kLircMuteEventType),
+            mute_lirc_events(mute_events) {}
+
+    bool eventsMuted()
+    {
+        return mute_lirc_events;
+    }
+
+  private:
+    bool mute_lirc_events;
+};
+
+class LircEventLock
+{
+  public:
+    LircEventLock(bool lock_events = true);
+    ~LircEventLock();
+    void lock();
+    void unlock();
+
+  private:
+    bool events_locked;
 };
 
 #endif

@@ -50,6 +50,8 @@ class MythMainWindow : public QDialog
     int screenwidth, screenheight;
 
     vector<QWidget *> widgetList;
+
+    bool ignore_lirc_keys;
 };
 
 class MythDialog : public QFrame

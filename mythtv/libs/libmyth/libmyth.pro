@@ -38,8 +38,8 @@ using_alsa {
 
 using_lirc {
     DEFINES += USE_LIRC
-    HEADERS += lirc.h
-    SOURCES += lirc.cpp
+    HEADERS += lirc.h lircevent.h
+    SOURCES += lirc.cpp lircevent.cpp
 }
 
 INSTALLS += inc

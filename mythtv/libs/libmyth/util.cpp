@@ -19,6 +19,10 @@ extern "C" {
 #include <qpainter.h>
 #include <qpixmap.h>
 
+#ifdef USE_LIRC
+#include "lircevent.h"
+#endif
+
 bool WriteStringList(QSocket *socket, QStringList &list)
 {
     QString str = list.join("[]:[]");
@@ -253,5 +257,14 @@ QRgb blendColors(QRgb source, QRgb add, int alpha)
     sblue = tmp2 & 0xff;
 
     return qRgb(sred, sgreen, sblue);
+}
+
+int myth_system(const QString &command, int flags)
+{
+#ifdef USE_LIRC
+    LircEventLock lirc_lock(!(flags & MYTH_SYSTEM_DONT_BLOCK_LIRC));
+#endif
+
+    return system(command);
 }
 

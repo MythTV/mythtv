@@ -1291,7 +1291,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             pthread_mutex_unlock(&video_buflock);
 
             //printf("video waiting for unpause\n");
-            usleep(5000);
+            usleep(frame_interval * 2);
             continue;
         }
         video_actually_paused = false;

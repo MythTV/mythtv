@@ -1691,7 +1691,7 @@ void ThemedMenu::handleAction(QString &action)
     if (action.left(5) == "EXEC ")
     {
         QString rest = action.right(action.length() - 5);
-        system(rest);
+        myth_system(rest);
     }
     else if (action.left(7) == "EXECTV ")
     {
@@ -1707,7 +1707,7 @@ void ThemedMenu::handleAction(QString &action)
                                 (const char*)strlist[2],
                                 (const char*)strlist[3]);
 
-            system(rest);
+            myth_system(rest);
 
             strlist = QString("FREE_TUNER %1").arg(cardid);
             gContext->SendReceiveStringList(strlist);

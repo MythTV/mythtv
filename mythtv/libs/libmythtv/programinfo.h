@@ -85,6 +85,8 @@ class ProgramInfo
     QString GetRecordBasename(void);
     QString GetRecordFilename(const QString &prefix);
 
+    QString MakeUniqueKey(void);
+
     int CalculateLength(void);
 
     void ToStringList(QStringList &list);

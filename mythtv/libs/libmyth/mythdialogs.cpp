@@ -37,6 +37,7 @@ MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal)
               : QDialog(parent, name, modal)
 {
     Init();
+    ignore_lirc_keys = false;
 #ifdef USE_LIRC
     pthread_t lirc_tid;
     pthread_attr_t attr;
@@ -124,7 +125,7 @@ void MythMainWindow::keyPressEvent(QKeyEvent *e)
 void MythMainWindow::customEvent(QCustomEvent *ce)
 {
 #ifdef USE_LIRC
-    if (ce->type() == kLircKeycodeEventType) 
+    if (ce->type() == kLircKeycodeEventType && !ignore_lirc_keys) 
     {
         LircKeycodeEvent *lke = (LircKeycodeEvent *)ce;
         int keycode = lke->getKeycode();
@@ -172,6 +173,12 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
                  << lke->getLircText() << "' to a key sequence failed. Fix"
                                            " your key mappings.\n";
         }
+    }
+
+    if (ce->type() == kLircMuteEventType)
+    {
+        LircMuteEvent *lme = (LircMuteEvent *)ce;
+        ignore_lirc_keys = lme->eventsMuted();
     }
 #endif
 }
