@@ -140,6 +140,7 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
         //alllists->setCheckable(false);
     }
 
+    listview->setFocus();
 }
 
 DatabaseBox::~DatabaseBox()
