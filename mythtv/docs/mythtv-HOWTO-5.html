@@ -85,6 +85,12 @@ by following the links from "Using" through "Download...".</P>
 <H2><A NAME="cpuspecificoptimizations"></A> <A NAME="ss5.1">5.1</A> <A HREF="mythtv-HOWTO.html#toc5.1">Notes on compiling for different processors</A>
 </H2>
 
+<P><B>NOTE</B>: the following section applies to MythTV 0.17.  If you are
+running CVS, MythTV has a more intelligent <B>configure</B> script that
+will auto-detect your system and compile processor-specific optimizations. 
+You will not edit the <CODE>settings.pro</CODE> file as described below at all;
+run <CODE>./configure --help</CODE> to obtain the full list of options.  You may
+skip this entire section.</P>
 <P>By default, MythTV is compiled for a Pentium Pro or i686 processor. This
 generates good code for most CPUs, but does not take advantage of MMX or
 SSE, and does not work with recent processors that are compatible with older

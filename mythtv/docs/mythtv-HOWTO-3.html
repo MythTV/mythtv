@@ -28,6 +28,13 @@ The ports for MySQL (TCP port 3306) and mythbackend (TCP ports 6543 and
 <P>Hardware selection is a complex topic, one this HOWTO will only discuss
 briefly and in general terms. The following subsections offer some general 
 guidance but stop short of offering specific recommendations.</P>
+<P>For a good MythTV experience, you must understand that MythTV exercises your
+hardware more than a typical desktop. Encoder cards generate DMA across the
+PCI bus.  The CPU is busy encoding / decoding video. Hard drives are
+constantly reading and writing data. Building a MythTV system on older /
+"spare" hardware may be an exercise in frustration.  Using hardware that is
+marginal for the intended application will cause many, many hours of
+frustration!</P>
 <P>For more detail about actual configurations that others have used, Mark
 Cooper has setup a hardware database at 
 <A HREF="http://pvrhw.goldfish.org/">http://pvrhw.goldfish.org/</A>. The
@@ -208,6 +215,10 @@ is able to use these MPEG-2 encoders as an input device for live TV and for
 scheduled recordings.  (The PVR-350 can simultaneously be used as an output
 device.) Using the on-board MPEG-2 encoder drastically reduces the CPU
 requirements for encoding.</P>
+<P><B>NOTE</B>:  Motherboards with the Via chipset are notoriously bad with
+DMA and have caused numerous issues with ivtv, including hard locks.  See
+the ivtv website (url url="http://ivtv.sf.net" name="http://ivtv.sf.net")
+for the latest information on what works and what doesn't.</P>
 <P>Here are some data points for encoding:
 <UL>
 <LI>A Celeron 450 uses 2% CPU for encoding a 480x480 16Mbps MPEG-2 stream.</LI>
@@ -268,6 +279,15 @@ use a 1.8GHz processor.</P>
 <H3>Firewire.</H3>
 
 <P>You may use the Firewire output of the DCT6200 or the SA3250.</P>
+
+<H3>USB Capture Devices.</H3>
+
+<P>The Plextor ConvertX PVR devices are supported through Linux drivers
+available from 
+<A HREF="http://www.plextor.com/english/support/LinuxSDK.htm">http://www.plextor.com/english/support/LinuxSDK.htm</A>. MythTV uses the
+Plextor to capture hardware encoded MPEG-4, so the host CPU requirements are low.</P>
+<P><B>NOTE</B>: MythTV support for the Plextor devices is in CVS as of
+2005-03-19.</P>
 
 <H3>Hardware known NOT to work and other issues</H3>
 
@@ -444,9 +464,21 @@ inexpensive Savage card with TV out) is broken. See
 </UL>
 </P>
 
-<H3>Hauppauge PVR-350</H3>
+<H3><A NAME="PVR-350"></A> Hauppauge PVR-350 </H3>
 
-<P>MythTV supports the TV-out and MPEG-2 decoder functions in the IvyTV driver.</P>
+<P>MythTV supports the TV-out and MPEG-2 decoder functions in the IvyTV
+driver.</P>
+<P>The PVR-350 is unique in that it also supports audio output. However, as of
+MythTV 0.17, the IvyTV drivers do not support volume control.  There are two
+courses of action you may take:
+<OL>
+<LI>Take the audio output from the PVR-350 and plug it into an input on a
+sound card on your machine.  You may then use MythTV's internal audio
+controls.</LI>
+<LI>Take the audio output from the PVR-350 and connect it directly to your television / audio system.  
+You must indicate that you are using external audio control on the PVR-350 setup page.</LI>
+</OL>
+</P>
 
 <H3>Other Options</H3>
 

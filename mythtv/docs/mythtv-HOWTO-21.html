@@ -381,7 +381,7 @@ masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,hard,intr,nfsvers=
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Then run <CODE># fstab -a</CODE> to re-read the file to mount the file system.</P>
+<P>Then run <CODE># mount -a</CODE> to re-read the file to mount the file system.</P>
 <P>In this case, the source is a machine called "masterbackend" which is
 exporting the directory "/var/video", which we're mounting locally at
 "/var/video".  The rsize and wsize options are used to increase the
@@ -1227,6 +1227,9 @@ you will not see any boot-time messages.</P>
 card.</P>
 <P>Non-MPEG-2 content will be displayed on the PVR-350 output using framebuffer
 features, placing a large load on the host CPU.</P>
+<P>Note that for the PVR-350 there are some 
+<A HREF="mythtv-HOWTO-3.html#PVR-350">considerations</A>
+regarding the way audio is handled.</P>
 
 <H2><A NAME="ss21.24">21.24</A> <A HREF="mythtv-HOWTO.html#toc21.24">Changing channels on an external Set Top Box</A>
 </H2>

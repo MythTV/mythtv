@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2005-03-17, v0.17.02
+  2005-03-27, v0.17.03
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -17,7 +17,7 @@
   1. First things first.
      1.1 What is MythTV?
      1.2 QuickStart
-     1.3 Upgrading from previous versions.
+     1.3 Upgrading from previous versions
      1.4 How to obtain this document
      1.5 Document conventions
      1.6 Mailing lists / getting help
@@ -38,6 +38,7 @@
            3.1.5.3 DVB capture cards.
            3.1.5.4 HDTV.
            3.1.5.5 Firewire.
+           3.1.5.6 USB Capture Devices.
         3.1.6 Hardware known NOT to work and other issues
         3.1.7 Sound card
         3.1.8 Video Display Card
@@ -146,6 +147,7 @@
         10.4.4 Usage Considerations
      10.5 Recording
      10.6 Xbox Frontends
+
   11. Using MythTV.
      11.1 Keyboard commands
         11.1.1 mythfrontend
@@ -212,6 +214,7 @@
      18.1 Manual Compilation of Prerequisites
      18.2 Pre-compiled binaries
      18.3 Running the Myth Transcoding Daemon
+
   19. MythNews.
   20. Troubleshooting.
      20.1 Compiling
@@ -400,15 +403,15 @@
   See http://wilsonet.com/mythtv/ <http://wilsonet.com/mythtv/> for
   instructions tailored to RedHat's Fedora Core distribution.
 
-  [1m1.3.  Upgrading from previous versions.[0m
+  [1m1.3.  Upgrading from previous versions[0m
 
   The upgrade from previous versions should be transparent.  Any changes
   to the database structure should be applied automatically.
 
   It is [4mstrongly[24m recommended that you back up your database before
   installing a new version of MythTV.
-
   See ``Saving or Restoring the database'' for instructions.
+
 
   [1m1.4.  How to obtain this document[0m
 
@@ -463,10 +466,12 @@
   threads.com/lists/mythtv/>.
 
 
+
   [1m1.7.  IRC[0m
 
   There are two IRC channels dedicated to MythTV which can be found on
   irc.freenode.net
+
   +o  mythtv
 
   +o  mythtv-users
@@ -530,12 +535,22 @@
   (TCP ports 6543 and 6544) must be open.  It is [4mstrongly[24m recommended
   that you do [4mnot[24m expose the MythTV and MySQL ports to the Internet or
   your "Outside" LAN.
+
+
   [1m3.1.  Hardware[0m
 
   Hardware selection is a complex topic, one this HOWTO will only
   discuss briefly and in general terms. The following subsections offer
   some general guidance but stop short of offering specific
   recommendations.
+
+  For a good MythTV experience, you must understand that MythTV
+  exercises your hardware more than a typical desktop. Encoder cards
+  generate DMA across the PCI bus.  The CPU is busy encoding / decoding
+  video. Hard drives are constantly reading and writing data. Building a
+  MythTV system on older / "spare" hardware may be an exercise in
+  frustration.  Using hardware that is marginal for the intended
+  application will cause many, many hours of frustration!
 
   For more detail about actual configurations that others have used,
   Mark Cooper has setup a hardware database at
@@ -594,7 +609,6 @@
   +o  A PIII/800MHz system with 512MB RAM can encode one video stream
      using the RTjpeg codec with 480x480 capture resolution and play it
      back simultaneously, thereby allowing live TV watching.
-
 
   +o  A dual Celeron/450MHz is able to view a 480x480 MPEG-4/3300kbps
      file created on a different system with 30% CPU usage.
@@ -714,8 +728,7 @@
   bttv modules by typing:
 
 
-
-  # lsmod |grep bttv
+       # lsmod |grep bttv
 
 
 
@@ -735,6 +748,12 @@
   recordings.  (The PVR-350 can simultaneously be used as an output
   device.) Using the on-board MPEG-2 encoder drastically reduces the CPU
   requirements for encoding.
+
+  [1mNOTE[22m:  Motherboards with the Via chipset are notoriously bad with DMA
+  and have caused numerous issues with ivtv, including hard locks.  See
+  the ivtv website (url url="http://ivtv.sf.net"
+  name="http://ivtv.sf.net") for the latest information on what works
+  and what doesn't.
 
   Here are some data points for encoding:
 
@@ -761,7 +780,6 @@
      information contained in the section will also apply to other
      MPEG-2 encoder cards supported by the IVTV driver.
 
-
   [1m3.1.5.3.  DVB capture cards.[0m
 
   DVB is a video standard primarily found in Europe.  MythTV supports
@@ -775,7 +793,6 @@
 
   In the United States, you may use a card such as the TwinHan to obtain
   unencrypted Free-To-Air satellite channels.
-
 
 
   [1m3.1.5.4.  HDTV.[0m
@@ -809,12 +826,25 @@
   You may use the Firewire output of the DCT6200 or the SA3250.
 
 
+  [1m3.1.5.6.  USB Capture Devices.[0m
+
+  The Plextor ConvertX PVR devices are supported through Linux drivers
+  available from http://www.plextor.com/english/support/LinuxSDK.htm
+  <http://www.plextor.com/english/support/LinuxSDK.htm>. MythTV uses the
+  Plextor to capture hardware encoded MPEG-4, so the host CPU
+  requirements are low.
+
+  [1mNOTE[22m: MythTV support for the Plextor devices is in CVS as of
+  2005-03-19.
+
+
   [1m3.1.6.  Hardware known NOT to work and other issues[0m
 
 
   +o  Hauppauge WinTV-D or -HD (no driver)
 
   +o  Hauppauge WinTV-USB series
+
 
   +o  Hauppauge WinTV-PVR-usb, or PCI cards (no driver - this is not the
      PVR-250/350 series of cards supported by the IvyTV driver)
@@ -940,6 +970,7 @@
      reported.
 
 
+
   [1m3.1.9.2.  Matrox[0m
 
   The standard Matrox driver included with XFree86 does not support TV-
@@ -970,6 +1001,8 @@
   +o  Matrox Millennium 550GX AGP. Uses external adapter to provide
      Composite and S-Video ports. TV-out implementation does [4mNOT[24m support
      XVideo.
+
+
   [1m3.1.9.3.  NVIDIA[0m
 
   Some NVIDIA cards with TV-out can be run using the standard nv driver
@@ -1003,6 +1036,7 @@
   http://www.probo.com/timr/savage40.html
   <http://www.probo.com/timr/savage40.html> for details.
 
+
   Specific cards:
 
   +o  Savage 2000 AGP. Has Composite and SVideo ports. Does not support
@@ -1015,6 +1049,18 @@
 
   MythTV supports the TV-out and MPEG-2 decoder functions in the IvyTV
   driver.
+
+  The PVR-350 is unique in that it also supports audio output. However,
+  as of MythTV 0.17, the IvyTV drivers do not support volume control.
+  There are two courses of action you may take:
+
+  1. Take the audio output from the PVR-350 and plug it into an input on
+     a sound card on your machine.  You may then use MythTV's internal
+     audio controls.
+
+  2. Take the audio output from the PVR-350 and connect it directly to
+     your television / audio system.  You must indicate that you are
+     using external audio control on the PVR-350 setup page.
 
 
   [1m3.1.9.6.  Other Options[0m
@@ -1057,9 +1103,6 @@
   There are a few ways of installing programs on Linux systems; you can
   either use a pre-compiled package, or install from a tarball after
   satisfying any prerequisites.
-
-
-
       [1mNOTE[22m: you must have the MySQL database software installed on a
   system to store the master database.  This does not necessarily mean
   that MySQL must run on one of the MythTV boxes.
@@ -1093,6 +1136,7 @@
   logical step is ``configuring MySQL'', which you may or may not have
   to perform.  See your package documentation.
 
+
   [1m3.2.1.1.  Red Hat Linux/Fedora Core[0m
 
   Red Hat Linux (9, 8.0 and 7.3) and Fedora Core (2 and 1) packages for
@@ -1118,7 +1162,8 @@
   <http://ATrpms.net/name/atrpms-kickstart/>.  Install the package with:
 
 
-       # rpm -Uvh atrpms-kickstart*
+
+  # rpm -Uvh atrpms-kickstart*
 
 
 
@@ -1156,6 +1201,8 @@
   may be obtained from http://rpm.nyvalls.se/ <http://rpm.nyvalls.se/>
   If you have problems with the RPMs, please send him email directly at
   thac@nyvalls.se <thac@nyvalls.se>.
+
+
   [1m3.2.1.3.  Debian[0m
 
   Debian packages for MythTV and most of its add-on modules are
@@ -1178,9 +1225,6 @@
   to your /etc/apt/sources.list file.  Running [1mapt-get update [22mand then
   executing [1mapt-get build-dep mythtv [22mshould install all the pre-
   requisites required to compile MythTV.
-
-
-
    [1mNOTE[22m:  Due to the requirement for Qt 3.1+, there are no packages for
   Debian woody/stable.
 
@@ -1210,7 +1254,6 @@
   package in order to compile [1mlircd [22mif your distribution doesn't have a
   pre-packaged [1mlirc[22m.  If you are using [1mXMLTV [22mas a grabber, you will need
   [1mperl[22m.
-
 
 
   ______________________________________________________________________
@@ -1245,6 +1288,7 @@
   some are a part of the apache web server, others are a part of the
   perl distribution.  In each case, we're looking to make sure that the
   primary module is getting installed.
+
 
   Click the magnifying glass or press [1mCTRL-F [22mand enter "perl" as your
   search term.  You should find it under the "Perl" folder.  You need at
@@ -1309,8 +1353,6 @@
   Open a shell, and execute the following, all on the same line. You may
   get asked a number of questions regarding dependencies.  It's best to
   answer "YES".
-
-
        $ su
        # urpmi mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
        # urpmi XFree86-devel perl
@@ -1370,6 +1412,7 @@
   All the necessary files will be downloaded and built. Even on a fast
   machine this may take a lot of time if you need to do a full Qt build.
 
+
   [1m3.2.4.3.  Debian.[0m
 
   See http://dijkstra.csh.rit.edu/~mdz/debian/dists/unstable/mythtv/
@@ -1392,25 +1435,24 @@
   and executing:
 
 
-
-  sh-2.05b# apt-get build-dep mythtv
-  Reading Package Lists...
-  Building Dependency Tree...
-  The following NEW packages will be installed:
-    debconf-utils debhelper file fontconfig gettext html2text intltool-debian
-    libaudio2 libexpat1 libfontconfig1 libfontconfig1-dev libfreetype6
-    libfreetype6-dev libglib2.0-0 libjpeg62 libjpeg62-dev liblame-dev liblame0
-    liblcms1 liblcms1-dev libmagic1 libmng-dev libmng1 libmysqlclient-dev
-    libmysqlclient12 libogg-dev libogg0 libpng12-0 libpng12-dev libqt3-headers
-    libqt3-mt-dev libqt3c102-mt libvorbis-dev libvorbis0a libvorbisenc2
-    libvorbisfile3 libxcursor-dev libxcursor1 libxft2 libxft2-dev libxrender-dev
-    libxrender1 mysql-common pkg-config po-debconf qt3-dev-tools xfree86-common
-    xlibmesa-gl-dev xlibmesa-glu-dev xlibmesa3-gl xlibmesa3-glu xlibs xlibs-dev
-    zlib1g-dev
-  0 upgraded, 54 newly installed, 0 to remove and 0 not upgraded.
-  Need to get 0B/24.0MB of archives.
-  After unpacking 78.7MB of additional disk space will be used.
-  Do you want to continue? [Y/n]
+       sh-2.05b# apt-get build-dep mythtv
+       Reading Package Lists...
+       Building Dependency Tree...
+       The following NEW packages will be installed:
+         debconf-utils debhelper file fontconfig gettext html2text intltool-debian
+         libaudio2 libexpat1 libfontconfig1 libfontconfig1-dev libfreetype6
+         libfreetype6-dev libglib2.0-0 libjpeg62 libjpeg62-dev liblame-dev liblame0
+         liblcms1 liblcms1-dev libmagic1 libmng-dev libmng1 libmysqlclient-dev
+         libmysqlclient12 libogg-dev libogg0 libpng12-0 libpng12-dev libqt3-headers
+         libqt3-mt-dev libqt3c102-mt libvorbis-dev libvorbis0a libvorbisenc2
+         libvorbisfile3 libxcursor-dev libxcursor1 libxft2 libxft2-dev libxrender-dev
+         libxrender1 mysql-common pkg-config po-debconf qt3-dev-tools xfree86-common
+         xlibmesa-gl-dev xlibmesa-glu-dev xlibmesa3-gl xlibmesa3-glu xlibs xlibs-dev
+         zlib1g-dev
+       0 upgraded, 54 newly installed, 0 to remove and 0 not upgraded.
+       Need to get 0B/24.0MB of archives.
+       After unpacking 78.7MB of additional disk space will be used.
+       Do you want to continue? [Y/n]
 
 
 
@@ -1458,6 +1500,9 @@
   programs, if it is not already there.  You do this, as root, by
   editing /etc/ld.so.conf, then running [1mldconfig[22m. There are many ways to
   do this; one that works is to enter this series of commands:
+
+
+
        $ su -
        # echo /usr/local/lib >> /etc/ld.so.conf
        # /sbin/ldconfig
@@ -1494,6 +1539,7 @@
 
   For Mandrake, you should see a value like /usr/lib/qt3 for QTDIR and
   /usr/lib/qt3/bin should be in $PATH.
+
 
   For Gentoo, you should see a value like /usr/qt/3 for QTDIR and
   /usr/qt/3/bin should be in $PATH.
@@ -1566,39 +1612,38 @@
   automatically satisfy MythTV's build-time dependencies.
 
 
-
-  [...]
-  sh-2.05b# cd /tmp
-  sh-2.05b# apt-get source mythtv
-  Reading Package Lists...
-  Building Dependency Tree...
-  Need to get 3085kB of source archives.
-  Get:1 http://dijkstra.csh.rit.edu unstable/mythtv mythtv 0.11-4 (dsc) [507B]
-  Get:2 http://dijkstra.csh.rit.edu unstable/mythtv mythtv 0.11-4 (tar) [3071kB]
-  Get:3 http://dijkstra.csh.rit.edu unstable/mythtv mythtv 0.11-4 (diff) [13.9kB]
-  Fetched 3085kB in 0s (8120kB/s)
-  dpkg-source: extracting mythtv in mythtv-0.11
-  sh-2.05b# cd mythtv-0.11
-  [customize settings.pro, etc.]
-  [edit debian/changelog and increment the version number]
-  sh-2.05b# dpkg-buildpackage -rfakeroot -us -uc -b
-  [...]
-  dpkg-deb: building package `mythtv-backend' in `../mythtv-backend_0.11-4_i386.deb'.
-  dpkg-deb: building package `mythtv-frontend' in `../mythtv-frontend_0.11-4_i386.deb'.
-  dpkg-deb: building package `libmyth-0.11' in `../libmyth-0.11_0.11-4_i386.deb'.
-  dpkg-deb: building package `libmyth-0.11-dev' in `../libmyth-0.11-dev_0.11-4_i386.deb'.
-   dpkg-genchanges -b
-  dpkg-genchanges: binary-only upload - not including any source code
-  dpkg-buildpackage: binary only upload (no source included)
-  sh-2.05b# ls -l ../*.deb
-  -rw-r--r--    1 root     root        31734 Sep  6 19:07 ../libmyth-0.11-dev_0.11-4_i386.deb
-  -rw-r--r--    1 root     root       408444 Sep  6 19:07 ../libmyth-0.11_0.11-4_i386.deb
-  -rw-r--r--    1 root     root      3324966 Sep  6 19:07 ../mythtv-backend_0.11-4_i386.deb
-  -rw-r--r--    1 root     root        15350 Sep  6 19:07 ../mythtv-common_0.11-4_all.deb
-  -rw-r--r--    1 root     root        17978 Sep  6 19:07 ../mythtv-database_0.11-4_all.deb
-  -rw-r--r--    1 root     root       422232 Sep  6 19:07 ../mythtv-doc_0.11-4_all.deb
-  -rw-r--r--    1 root     root      4900474 Sep  6 19:07 ../mythtv-frontend_0.11-4_i386.deb
-  -rw-r--r--    1 root     root        12372 Sep  6 19:07 ../mythtv_0.11-4_all.deb
+       [...]
+       sh-2.05b# cd /tmp
+       sh-2.05b# apt-get source mythtv
+       Reading Package Lists...
+       Building Dependency Tree...
+       Need to get 3085kB of source archives.
+       Get:1 http://dijkstra.csh.rit.edu unstable/mythtv mythtv 0.11-4 (dsc) [507B]
+       Get:2 http://dijkstra.csh.rit.edu unstable/mythtv mythtv 0.11-4 (tar) [3071kB]
+       Get:3 http://dijkstra.csh.rit.edu unstable/mythtv mythtv 0.11-4 (diff) [13.9kB]
+       Fetched 3085kB in 0s (8120kB/s)
+       dpkg-source: extracting mythtv in mythtv-0.11
+       sh-2.05b# cd mythtv-0.11
+       [customize settings.pro, etc.]
+       [edit debian/changelog and increment the version number]
+       sh-2.05b# dpkg-buildpackage -rfakeroot -us -uc -b
+       [...]
+       dpkg-deb: building package `mythtv-backend' in `../mythtv-backend_0.11-4_i386.deb'.
+       dpkg-deb: building package `mythtv-frontend' in `../mythtv-frontend_0.11-4_i386.deb'.
+       dpkg-deb: building package `libmyth-0.11' in `../libmyth-0.11_0.11-4_i386.deb'.
+       dpkg-deb: building package `libmyth-0.11-dev' in `../libmyth-0.11-dev_0.11-4_i386.deb'.
+        dpkg-genchanges -b
+       dpkg-genchanges: binary-only upload - not including any source code
+       dpkg-buildpackage: binary only upload (no source included)
+       sh-2.05b# ls -l ../*.deb
+       -rw-r--r--    1 root     root        31734 Sep  6 19:07 ../libmyth-0.11-dev_0.11-4_i386.deb
+       -rw-r--r--    1 root     root       408444 Sep  6 19:07 ../libmyth-0.11_0.11-4_i386.deb
+       -rw-r--r--    1 root     root      3324966 Sep  6 19:07 ../mythtv-backend_0.11-4_i386.deb
+       -rw-r--r--    1 root     root        15350 Sep  6 19:07 ../mythtv-common_0.11-4_all.deb
+       -rw-r--r--    1 root     root        17978 Sep  6 19:07 ../mythtv-database_0.11-4_all.deb
+       -rw-r--r--    1 root     root       422232 Sep  6 19:07 ../mythtv-doc_0.11-4_all.deb
+       -rw-r--r--    1 root     root      4900474 Sep  6 19:07 ../mythtv-frontend_0.11-4_i386.deb
+       -rw-r--r--    1 root     root        12372 Sep  6 19:07 ../mythtv_0.11-4_all.deb
 
 
 
@@ -1629,6 +1674,8 @@
 
   Check for a file called /etc/security/console.perms.  Open the file in
   your favorite text editor and look for a line that has:
+
+
        <console>  0600 <v4l>        0600 root.video
 
 
@@ -1711,6 +1758,13 @@
 
   [1m5.1.  Notes on compiling for different processors[0m
 
+  [1mNOTE[22m: the following section applies to MythTV 0.17.  If you are
+  running CVS, MythTV has a more intelligent [1mconfigure [22mscript that will
+  auto-detect your system and compile processor-specific optimizations.
+  You will not edit the settings.pro file as described below at all; run
+  ./configure --help to obtain the full list of options.  You may skip
+  this entire section.
+
   By default, MythTV is compiled for a Pentium Pro or i686 processor.
   This generates good code for most CPUs, but does not take advantage of
   MMX or SSE, and does not work with recent processors that are
@@ -1731,6 +1785,7 @@
   +o  [1m-march=k6-2      [22mfor the AMD K6 CPU with MMX and 3dNOW! (i586
      compatible)
 
+
   +o  -march=athlon             for the AMD Athlon CPU with MMX, 3dNOW!,
      enhanced 3dNOW! and some of SSE. (pentium2 compatible)
 
@@ -1745,7 +1800,6 @@
 
         [1mNOTE[22m:  If you wish to compile with the -march=k8 flag you
   must use gcc v3.4 or higher.
-
 
   If you have a Via processor change the following in the settings.pro
   file. Replace
@@ -1795,7 +1849,6 @@
 
   +o  -march=pentium-m   for the Intel Pentium-M CPU with MMX, SSE and
      SSE2.  Used in Centrino notebooks.
-
   +o  -march=pentium4    for the Intel Pentium4 CPU with MMX, SSE and
      SSE2
 
@@ -1812,6 +1865,7 @@
   compiling for the for the Athlon XP you leave the default of
 
   -march=pentiumpro
+
 
   Athlon XP.
 
@@ -1858,8 +1912,7 @@
   page has a list of all the dependent packages you must download and
   install.
 
-
-       # rpm -Uvh xmltv* perl*
+  # rpm -Uvh xmltv* perl*
 
 
 
@@ -1873,6 +1926,7 @@
 
 
        # urpmi xmltv xmltv-grabbers
+
 
 
   If this does not work, it is possible that contrib for your Mandrake
@@ -1918,8 +1972,6 @@
 
        $ cd xmltv-0.5.38
        $ perl Makefile.PL
-
-
 
   You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes"
   to the grabber required for your location.
@@ -1985,10 +2037,9 @@
 
   Unpack MythTV
 
-
-       $ tar -xjf mythtv-0.17.tar.bz2
-       $ cd mythtv-0.17
-       $ ./configure
+  $ tar -xjf mythtv-0.17.tar.bz2
+  $ cd mythtv-0.17
+  $ ./configure
 
 
 
@@ -2048,8 +2099,6 @@
        # make install
        # exit
 
-
-
      [1mNOTE[22m:  subsequent configuration steps assume that you are within
   the MythTV directory that you cd'd to above.
 
@@ -2057,7 +2106,6 @@
 
   MythTV supports real-time scheduling of the video output thread if it
   is installed SUID root.
-
 
   This is an optional, but recommended step, if you understand the
   potential negative impact.  As a positive, It can make the video
@@ -2118,7 +2166,6 @@
   point to your Master backend's IP address.
 
 
-
   [1m5.6.  Gentoo[0m
 
   Installation of MythTV on Gentoo consists of simply emerging the
@@ -2173,9 +2220,9 @@
 
   This can be done from the command line by typing:
 
+  # /sbin/chkconfig mysqld on
+  # /sbin/service mysqld start
 
-       # /sbin/chkconfig mysqld on
-       # /sbin/service mysqld start
 
 
   [1m6.1.3.  Gentoo[0m
@@ -2226,6 +2273,7 @@
   [1mNOTE[22m: It is good practice to set a root password for MySQL. Instruc-
   tions for doing so can be found on MySQL's web site at
   http://www.mysql.com/doc/en/Security.html <http://www.mysql.com/doc/en/Security.html>.
+
 
   [1m6.2.4.  Modifying access to the MySQL database for multiple systems[0m
 
@@ -2294,6 +2342,7 @@
   There are two ways to do this.  Graphically, and from the command
   line.
 
+
   [1m7.1.  Graphically setting up the mixer[0m
 
   [1m7.1.1.  Mandrake 9.0 and Red Hat Linux/Fedora Core[0m
@@ -2350,7 +2399,6 @@
   HOWTO.  Once ALSA is working correctly, change the output sound device
   in mythfrontend->setup->Audio from /dev/dsp to ALSA:default.  This
   field may be edited to suit your ALSA requirements.
-
 
   [1m7.2.  Setting the mixer from the command line[0m
 
@@ -2421,6 +2469,9 @@
   compilation steps described below by jumping to the ``Completing the
   lirc install'' section. See the contrib/mandrake91.etc.sysconfig.lircd
   file for an example of how to configure lircd.
+
+
+
      [1mNOTE[22m:  If you wish to use the remote control that comes with the
   Hauppauge PVR-250/350 cards, you will need to run the lirc 0.7.0pre2
   code. See the example installation in the "Hauppauge PVR-250 remote
@@ -2472,8 +2523,6 @@
        # ln -s linux-2.4 /usr/src/linux
        # exit
 
-
-
   [1m8.4.  Obtaining and compiling lirc[0m
 
   You're going to need to download and compile [1mlircd[22m.  Go to
@@ -2481,9 +2530,10 @@
   2002-11-07, the version available is 0.6.6.  Grab the remotes.tgz file
   as well.
 
-  $ tar -xjf lirc-0.6.6.tar.bz2
-  $ cd lirc-0.6.6
-  $ ./setup.sh
+
+       $ tar -xjf lirc-0.6.6.tar.bz2
+       $ cd lirc-0.6.6
+       $ ./setup.sh
 
 
 
@@ -2535,8 +2585,6 @@
 
 
        crw-------    1 root     root      61,   0 Dec 31  1969 lirc
-
-
 
   Some IR receivers (including some homebrew units) use a character
   device as their data interface as opposed to a link to a serial port.
@@ -2601,6 +2649,8 @@
   guide/ch-custom-kernel.html
   <http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-
   guide/ch-custom-kernel.html>
+
+
 
      [1mNOTE[22m: Suitable Red Hat kernels for MythTV (i2c update, v4l2 API,
   CONFIG_SERIAL modularized) are available from ATrpms:
@@ -2714,17 +2764,15 @@
   If your remote ends up working well, you should consider submitting
   your lircd.conf file back to the lirc developers. Once finished:
 
-
-       $ su
-       # cp myremote /etc/lircd.conf
+  $ su
+  # cp myremote /etc/lircd.conf
 
 
 
   now try to start lircd again:
 
 
-
-  # /usr/local/sbin/lircd
+       # /usr/local/sbin/lircd
 
 
 
@@ -2842,20 +2890,19 @@
   my /home/[yourusername]/.lircrc file:
 
 
+       begin
+           prog = irxevent
+           button = channel+
+           repeat = 3
+           config = Key Up CurrentWindow
+       end
 
-  begin
-      prog = irxevent
-      button = channel+
-      repeat = 3
-      config = Key Up CurrentWindow
-  end
-
-  begin
-      prog = irxevent
-      button = channel-
-      repeat = 3
-      config = Key Down CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = channel-
+           repeat = 3
+           config = Key Down CurrentWindow
+       end
 
 
 
@@ -2903,22 +2950,19 @@
   lircd in addition to a kernel module for the SIR transmitter.
   Depending on whether you have your serial port driver configured as a
   kernel module you might see the following message during make:
+       lirc_sir.c:56:2: warning: #warning
+       "******************************************"
 
+       lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
 
+       lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
 
-  lirc_sir.c:56:2: warning: #warning
-  "******************************************"
+       lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
 
-  lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
+       lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
 
-  lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
-
-  lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
-
-  lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
-
-  lirc_sir.c:61:2: warning: #warning
-  "******************************************"
+       lirc_sir.c:61:2: warning: #warning
+       "******************************************"
 
 
 
@@ -6654,7 +6698,7 @@
 
 
 
-  Then run # fstab -a to re-read the file to mount the file system.
+  Then run # mount -a to re-read the file to mount the file system.
 
   In this case, the source is a machine called "masterbackend" which is
   exporting the directory "/var/video", which we're mounting locally at
@@ -7571,6 +7615,10 @@
 
   Non-MPEG-2 content will be displayed on the PVR-350 output using
   framebuffer features, placing a large load on the host CPU.
+  Note that for the PVR-350 there are some ``considerations'' regarding
+  the way audio is handled.
+
+
   [1m21.24.  Changing channels on an external Set Top Box[0m
 
   If you need to use an external Set Top Box (STB), such as for
@@ -7690,7 +7738,10 @@
   top of the Makefile in the driver directory is a line like this:
 
 
-       KERNELDIR= /lib/modules/$(KERNVER)/build
+
+  KERNELDIR= /lib/modules/$(KERNVER)/build
+
+
 
   edit it so that it looks like:
 
@@ -7794,20 +7845,18 @@
        # exit
 
 
-
   Check that the card is being recognized on the PCI bus:
 
 
+       $ lspci -v
+       <snip>
 
-  $ lspci -v
-  <snip>
-
-  00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
-  Encoder (rev 01)
-          Subsystem: Hauppauge computer works Inc.: Unknown device 4801
-          Flags: bus master, medium devsel, latency 32, IRQ 11
-          Memory at d0000000 (32-bit, prefetchable) [size=64M]
-          Capabilities: <available only to root>
+       00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
+       Encoder (rev 01)
+               Subsystem: Hauppauge computer works Inc.: Unknown device 4801
+               Flags: bus master, medium devsel, latency 32, IRQ 11
+               Memory at d0000000 (32-bit, prefetchable) [size=64M]
+               Capabilities: <available only to root>
 
 
 
@@ -8618,6 +8667,13 @@
   [1mNOTE[22m: if you have anything in the unc column ("uncorrectable errors")
   you will probably have problems with HDTV.  Check you antenna, cables,
   etc.
+
+  Once you have confirmed that your card is able to lock onto a HDTV
+  signal it is time to configure MythTV. Start the setup program, and in
+  the Capture Cards section change the card type to "Digital Video
+  Broadcast".
+
+  For HDTV you do not need to use the Advanced configuration.
 
 
 

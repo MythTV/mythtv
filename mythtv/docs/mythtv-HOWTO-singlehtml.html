@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-03-17, v0.17.02
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-03-27, v0.17.03
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -22,7 +22,7 @@ necessary.</EM>
 <UL>
 <LI><A NAME="toc1.1">1.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.1">What is MythTV?</A>
 <LI><A NAME="toc1.2">1.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.2">QuickStart</A>
-<LI><A NAME="toc1.3">1.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.3">Upgrading from previous versions.</A>
+<LI><A NAME="toc1.3">1.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.3">Upgrading from previous versions</A>
 <LI><A NAME="toc1.4">1.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.4">How to obtain this document </A>
 <LI><A NAME="toc1.5">1.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.5">Document conventions</A>
 <LI><A NAME="toc1.6">1.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.6">Mailing lists / getting help</A>
@@ -288,7 +288,7 @@ like to install MythTV on an XBox.</P>
 <P>See 
 <A HREF="http://wilsonet.com/mythtv/">http://wilsonet.com/mythtv/</A> for instructions tailored to RedHat's
 Fedora Core distribution.</P>
-<H2><A NAME="ss1.3">1.3</A> <A HREF="#toc1.3">Upgrading from previous versions.</A>
+<H2><A NAME="ss1.3">1.3</A> <A HREF="#toc1.3">Upgrading from previous versions</A>
 </H2>
 
 <P>The upgrade from previous versions should be transparent.  Any changes to
@@ -427,6 +427,13 @@ The ports for MySQL (TCP port 3306) and mythbackend (TCP ports 6543 and
 <P>Hardware selection is a complex topic, one this HOWTO will only discuss
 briefly and in general terms. The following subsections offer some general 
 guidance but stop short of offering specific recommendations.</P>
+<P>For a good MythTV experience, you must understand that MythTV exercises your
+hardware more than a typical desktop. Encoder cards generate DMA across the
+PCI bus.  The CPU is busy encoding / decoding video. Hard drives are
+constantly reading and writing data. Building a MythTV system on older /
+"spare" hardware may be an exercise in frustration.  Using hardware that is
+marginal for the intended application will cause many, many hours of
+frustration!</P>
 <P>For more detail about actual configurations that others have used, Mark
 Cooper has setup a hardware database at 
 <A HREF="http://pvrhw.goldfish.org/">http://pvrhw.goldfish.org/</A>. The
@@ -607,6 +614,10 @@ is able to use these MPEG-2 encoders as an input device for live TV and for
 scheduled recordings.  (The PVR-350 can simultaneously be used as an output
 device.) Using the on-board MPEG-2 encoder drastically reduces the CPU
 requirements for encoding.</P>
+<P><B>NOTE</B>:  Motherboards with the Via chipset are notoriously bad with
+DMA and have caused numerous issues with ivtv, including hard locks.  See
+the ivtv website (url url="http://ivtv.sf.net" name="http://ivtv.sf.net")
+for the latest information on what works and what doesn't.</P>
 <P>Here are some data points for encoding:
 <UL>
 <LI>A Celeron 450 uses 2% CPU for encoding a 480x480 16Mbps MPEG-2 stream.</LI>
@@ -667,6 +678,15 @@ use a 1.8GHz processor.</P>
 <H3>Firewire.</H3>
 
 <P>You may use the Firewire output of the DCT6200 or the SA3250.</P>
+
+<H3>USB Capture Devices.</H3>
+
+<P>The Plextor ConvertX PVR devices are supported through Linux drivers
+available from 
+<A HREF="http://www.plextor.com/english/support/LinuxSDK.htm">http://www.plextor.com/english/support/LinuxSDK.htm</A>. MythTV uses the
+Plextor to capture hardware encoded MPEG-4, so the host CPU requirements are low.</P>
+<P><B>NOTE</B>: MythTV support for the Plextor devices is in CVS as of
+2005-03-19.</P>
 
 <H3>Hardware known NOT to work and other issues</H3>
 
@@ -843,9 +863,21 @@ inexpensive Savage card with TV out) is broken. See
 </UL>
 </P>
 
-<H3>Hauppauge PVR-350</H3>
+<H3><A NAME="PVR-350"></A> Hauppauge PVR-350 </H3>
 
-<P>MythTV supports the TV-out and MPEG-2 decoder functions in the IvyTV driver.</P>
+<P>MythTV supports the TV-out and MPEG-2 decoder functions in the IvyTV
+driver.</P>
+<P>The PVR-350 is unique in that it also supports audio output. However, as of
+MythTV 0.17, the IvyTV drivers do not support volume control.  There are two
+courses of action you may take:
+<OL>
+<LI>Take the audio output from the PVR-350 and plug it into an input on a
+sound card on your machine.  You may then use MythTV's internal audio
+controls.</LI>
+<LI>Take the audio output from the PVR-350 and connect it directly to your television / audio system.  
+You must indicate that you are using external audio control on the PVR-350 setup page.</LI>
+</OL>
+</P>
 
 <H3>Other Options</H3>
 
@@ -1529,6 +1561,12 @@ by following the links from "Using" through "Download...".</P>
 <H2><A NAME="cpuspecificoptimizations"></A> <A NAME="ss5.1">5.1</A> <A HREF="#toc5.1">Notes on compiling for different processors</A>
 </H2>
 
+<P><B>NOTE</B>: the following section applies to MythTV 0.17.  If you are
+running CVS, MythTV has a more intelligent <B>configure</B> script that
+will auto-detect your system and compile processor-specific optimizations. 
+You will not edit the <CODE>settings.pro</CODE> file as described below at all;
+run <CODE>./configure --help</CODE> to obtain the full list of options.  You may
+skip this entire section.</P>
 <P>By default, MythTV is compiled for a Pentium Pro or i686 processor. This
 generates good code for most CPUs, but does not take advantage of MMX or
 SSE, and does not work with recent processors that are compatible with older
@@ -6217,7 +6255,7 @@ masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,hard,intr,nfsvers=
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Then run <CODE># fstab -a</CODE> to re-read the file to mount the file system.</P>
+<P>Then run <CODE># mount -a</CODE> to re-read the file to mount the file system.</P>
 <P>In this case, the source is a machine called "masterbackend" which is
 exporting the directory "/var/video", which we're mounting locally at
 "/var/video".  The rsize and wsize options are used to increase the
@@ -7063,6 +7101,9 @@ you will not see any boot-time messages.</P>
 card.</P>
 <P>Non-MPEG-2 content will be displayed on the PVR-350 output using framebuffer
 features, placing a large load on the host CPU.</P>
+<P>Note that for the PVR-350 there are some 
+<A HREF="#PVR-350">considerations</A>
+regarding the way audio is handled.</P>
 
 <H2><A NAME="ss21.24">21.24</A> <A HREF="#toc21.24">Changing channels on an external Set Top Box</A>
 </H2>
@@ -8096,8 +8137,12 @@ $
 </CODE></BLOCKQUOTE>
 
 <B>NOTE</B>: if you have anything in the unc column ("uncorrectable
-errors") you will probably have problems with HDTV.  Check you antenna, cables, etc.</P>
-
+errors") you will probably have problems with HDTV.  Check you antenna,
+cables, etc.</P>
+<P>Once you have confirmed that your card is able to lock onto a HDTV signal it
+is time to configure MythTV. Start the setup program, and in the Capture
+Cards section change the card type to "Digital Video Broadcast".</P>
+<P>For HDTV you do not need to use the Advanced configuration. </P>
 
 
 </BODY>
