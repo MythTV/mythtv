@@ -272,6 +272,9 @@ CPU utilization.</LI>
 </P>
 <P><B>NOTE</B>:  Problem reports for version 0.8 posted to the mailing list
 should have accompanying solutions.</P>
+
+<H3>Prepping for 0.8</H3>
+
 <P>Before you begin, shutdown all running instances of 0.7.  You should perform
 a <CODE>make clean distclean</CODE> before starting the compile process.</P>
 <P>Compile and install the system as you would MythTV 0.7 by following the
@@ -290,8 +293,56 @@ $ ./setup
 </CODE></BLOCKQUOTE>
 </P>
 <P>This will open the setup wizard which will allow you to graphically
-configure your system.</P>
-<P>Once the setup wizard is done: to run the new version of MythTV, you must
+configure your system.  </P>
+<P><B>NOTE</B>: If you're going to have multiple backend systems,
+one of them must be the master.  Do not use "127.0.0.1" as the IP addresses
+in the IP configuration screen unless you will be running a single system
+running the frontend and backend on the same box.</P>
+
+<H3>Modifying access to the MySQL database for multiple systems</H3>
+
+<P>If you're going to have multiple systems accessing a master backend server,
+you must grant access to the database from remote systems.  By default, the
+<CODE>mc.sql</CODE> script is only granting access to the localhost.</P>
+<P>To allow other hosts access to your master backend database, you can either
+set it up for no security at all, or more granularly.  The "%" is the
+wildcard character in MySQL.</P>
+<P><B>NOTE</B>:  The "no security" option is <EM>very</EM>
+dangerous unless you're in a controlled environment.</P>
+<P>This example has no security at all, and allows access from any host.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u root mythconverg
+mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>For a more secure setup, you can restrict which machines or subnets have
+access. If you have a complete DNS system operational, you could do the
+following:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u root mythconverg
+mysql> grant all on mythconverg.* to mythtv@"%.mydomain.com" identified by "mythtv";
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Finally, if you just want to restrict by IP subnet:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u root mythconverg
+mysql> grant all on mythconverg.* to mythtv@"192.168.1.%" identified by "mythtv";
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss18.9">18.9</A> <A HREF="mythtv-HOWTO.html#toc18.9">Running MythTV</A>
+</H2>
+
+<P>Once the setup wizard is done, to run the new version of MythTV, you must
 first start the backend server:</P>
 <P>
 <BLOCKQUOTE><CODE>
@@ -300,7 +351,10 @@ $ mythbackend &amp;
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>and then run the frontend client:
+<P>If you're running a remote frontend client, edit the
+<CODE>/usr/local/share/mythtv/mysql.txt</CODE> file and change the
+<B>DBHostname</B> to the IP address of the master backend server.</P>
+<P>Start the frontend client:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mythfrontend
@@ -321,9 +375,9 @@ MythTV.  Control, Meta and ALT modifiers mean that the Modifier + ESC key
 must be pressed to activate the exit from MythTV function.</P>
 <P><B>NOTE</B>:  Users that have been running the frontend and the backend on
 different machines using Red Hat Linux 8.0 have stated that they have been
-having issues with remote access of the MySQL database.  This is not yet a
-supported configuration.  The following instructions may or may not work. 
-Add the following to <CODE>/etc/my.cnf</CODE> on the backend machine.
+having issues with remote access to the MySQL database.  The following
+instructions may or may not work.  Add the following to <CODE>/etc/my.cnf</CODE>
+on the backend machine and restart MySQL.
 <BLOCKQUOTE><CODE>
 <PRE>
 skip-innodb

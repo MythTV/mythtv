@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-03-10, v1.103
+<date>2003-03-10, v1.104
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -31,6 +31,10 @@ $ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/cvs checkout MC
 </verb></tscreen>
 
 This documentation will be in the <tt>docs/</tt> subdirectory.
+
+A PDF version of this documentation can be obtained from <url
+url="http://www.smalltime.com/mythtv/MythTV_How-To.pdf"
+name="http://www.smalltime.com/mythtv/MythTV_How-To.pdf">
 
 <bf>NOTE</bf>: If you are going to use CVS to compile MythTV rather than
 using the distribution tarball, it is <bf>strongly</bf> recommended that you
@@ -1888,23 +1892,7 @@ $ su
 # exit
 </verb></tscreen>
 
-MythWeather uses MSNBC.com as its source for weather data.  You may specify a
-number of identifiers in order to obtain your local weather.
-<itemize>
-<item>Your zip code.
-<item>An airport code.
-<item>The "accid".
-</itemize>
-
-In order to determine your accid, access the msnbc.com weather
-site at the following URL: <url
-url="http://www.msnbc.com/news/wea_front.asp?0wl=w3&amp;tab=oth&amp;ta=y"
-name="http://www.msnbc.com/news/wea_front.asp?0wl=w3&amp;tab=oth&amp;ta=y">  Once
-there, fill in your location.  After the MSNBC server completes your request,
-check the URL in the address bar for "accid=XXXXX".  The "XXXXX" portion
-is the area id you will need for the next configuration step.
-
-To configure MythWeather, go to Mythfrontend->Watch TV->Setup->Weather
+MythWeather uses MSNBC.com as its source for weather data.
 
 These are the keyboard commands for MythWeather:
 <tscreen><verb>
@@ -1917,6 +1905,8 @@ Numeric Keys         You can check other weather by keying in other ZIP codes.
 Enter Key            Switch between Celsius and Fahrenheit. Can also
                      be used a way to force a data update.
 "m" Key              Resets the location to the database default, then updates the data.
+"i"                  Enter / Save settings
+ESC                  Exit the settings screen without saving / Exit the program
 </verb></tscreen>
 
 MythWeather also has an "Aggressiveness" setting.  This affects how long
@@ -2478,7 +2468,8 @@ CPU utilization.
 <bf>NOTE</bf>:  Problem reports for version 0.8 posted to the mailing list
 should have accompanying solutions.
 
-Before you begin, shutdown all running instances of 0.7.  You should perform
+<sect2>Prepping for 0.8
+<p>Before you begin, shutdown all running instances of 0.7.  You should perform
 a <tt>make clean distclean</tt> before starting the compile process.
 
 Compile and install the system as you would MythTV 0.7 by following the
@@ -2497,16 +2488,61 @@ $ ./setup
 </verb></tscreen>
 
 This will open the setup wizard which will allow you to graphically
-configure your system.
+configure your system.  
 
-Once the setup wizard is done: to run the new version of MythTV, you must
+<bf>NOTE</bf>: If you're going to have multiple backend systems,
+one of them must be the master.  Do not use "127.0.0.1" as the IP addresses
+in the IP configuration screen unless you will be running a single system
+running the frontend and backend on the same box.
+
+<sect2>Modifying access to the MySQL database for multiple systems
+<p>If you're going to have multiple systems accessing a master backend server,
+you must grant access to the database from remote systems.  By default, the
+<tt>mc.sql</tt> script is only granting access to the localhost.
+
+To allow other hosts access to your master backend database, you can either
+set it up for no security at all, or more granularly.  The "%" is the
+wildcard character in MySQL.
+
+<bf>NOTE</bf>:  The "no security" option is <em>very</em>
+dangerous unless you're in a controlled environment.
+
+This example has no security at all, and allows access from any host.
+
+<tscreen><verb>
+$ mysql -u root mythconverg
+mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
+</verb></tscreen>
+
+For a more secure setup, you can restrict which machines or subnets have
+access. If you have a complete DNS system operational, you could do the
+following:
+
+<tscreen><verb>
+$ mysql -u root mythconverg
+mysql> grant all on mythconverg.* to mythtv@"%.mydomain.com" identified by "mythtv";
+</verb></tscreen>
+
+Finally, if you just want to restrict by IP subnet:
+
+<tscreen><verb>
+$ mysql -u root mythconverg
+mysql> grant all on mythconverg.* to mythtv@"192.168.1.%" identified by "mythtv";
+</verb></tscreen>
+
+<sect1>Running MythTV
+<p>Once the setup wizard is done, to run the new version of MythTV, you must
 first start the backend server:
 
 <tscreen><verb>
 $ mythbackend &
 </verb></tscreen>
 
-and then run the frontend client:
+If you're running a remote frontend client, edit the
+<tt>/usr/local/share/mythtv/mysql.txt</tt> file and change the
+<bf>DBHostname</bf> to the IP address of the master backend server.
+
+Start the frontend client:
 <tscreen><verb>
 $ mythfrontend
 </verb></tscreen>
@@ -2527,9 +2563,9 @@ must be pressed to activate the exit from MythTV function.
 
 <bf>NOTE</bf>:  Users that have been running the frontend and the backend on
 different machines using Red Hat Linux 8.0 have stated that they have been
-having issues with remote access of the MySQL database.  This is not yet a
-supported configuration.  The following instructions may or may not work. 
-Add the following to <tt>/etc/my.cnf</tt> on the backend machine.
+having issues with remote access to the MySQL database.  The following
+instructions may or may not work.  Add the following to <tt>/etc/my.cnf</tt>
+on the backend machine and restart MySQL.
 <tscreen><verb>
 skip-innodb
 set-variable=thread_stack=256k
@@ -2694,6 +2730,8 @@ troubleshooting step since you're now forced to go through setup.  Change to
 the CPU % idle tip.  Reversed the save database / delete database steps. 
 Altered text on MythTV height/width since we now fullscreen by default. 
 Added some more about sound troubleshooting.
+v1.104, 2003-03-10.  Added link to pdf version of docs.  More on 0.8. 
+Removed stuff from mythweather since there's a setup program now.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
