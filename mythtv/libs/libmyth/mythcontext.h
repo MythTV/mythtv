@@ -44,7 +44,7 @@ class MythEvent : public QCustomEvent
     QString extradata;
 };
 
-#define MYTH_BINARY_VERSION "0.9.04152003-1"
+#define MYTH_BINARY_VERSION "0.9.04162003-1"
 
 class MythContext : public QObject
 {

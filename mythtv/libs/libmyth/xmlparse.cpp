@@ -249,6 +249,8 @@ void XMLParse::parseImage(LayerSet *container, QDomElement &element)
             else if (info.tagName() == "skipin")
             {
                 skipin = parsePoint(getFirstText(info));
+                skipin.setX((int)(skipin.x() * wmult));
+                skipin.setY((int)(skipin.y() * hmult));
             }
             else
             {
