@@ -387,3 +387,13 @@ void MythListBox::keyPressEvent(QKeyEvent* e) {
         e->ignore();
     }
 }
+
+void MythWizard::showPage(QWidget* page) {
+    QWizard::showPage(page);
+
+    if (indexOf(page) == pageCount()-1) {
+        // last page
+        finishButton()->setEnabled(TRUE);
+        finishButton()->setFocus();
+    }
+}

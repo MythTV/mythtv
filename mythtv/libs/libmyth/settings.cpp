@@ -418,7 +418,7 @@ int ConfigurationDialog::exec(QSqlDatabase* db) {
 
 QDialog* ConfigurationWizard::dialogWidget(QWidget* parent,
                                            const char* widgetName) {
-    QWizard* wizard = new QWizard(parent, widgetName, TRUE, 0);
+    QWizard* wizard = new MythWizard(parent, widgetName);
 
     unsigned i;
     for(i = 0 ; i < children.size() ; ++i)
@@ -427,8 +427,8 @@ QDialog* ConfigurationWizard::dialogWidget(QWidget* parent,
             wizard->addPage(child, children[i]->getLabel());
             wizard->setHelpEnabled(child, false);
             if (i == children.size()-1)
-                // Last page always has finish enabled for now
-                // stuff should have sane defaults anyway
+                // Last page always has finish enabled.  Stuff should
+                // have sane defaults.
                 wizard->setFinishEnabled(child, true);
         }
         

@@ -14,6 +14,7 @@
 #include <qbuttongroup.h>
 #include <qlistbox.h>
 #include <qcheckbox.h>
+#include <qwizard.h>
 
 class MythContext;
 
@@ -165,6 +166,15 @@ public:
 public slots:
     void setCurrentItem(const QString& text);
     void setCurrentItem(int index) { QListBox::setCurrentItem(index); };
+};
+
+class MythWizard: public QWizard {
+    Q_OBJECT
+public:
+    MythWizard(QWidget* parent=NULL, const char* name=0):
+        QWizard(parent, name, TRUE) {};
+
+    virtual void showPage(QWidget* page);
 };
 
 #endif
