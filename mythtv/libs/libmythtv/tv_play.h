@@ -43,7 +43,9 @@ class TV : public QObject
     bool IsPlaying(void) { return StateIsPlaying(internalState); }
     bool IsRecording(void) { return StateIsRecording(internalState); }
 
+    // for the guidegrid to use
     void EmbedOutput(unsigned long wid, int x, int y, int w, int h);
+
     void StopEmbeddingOutput(void);
    
     bool getRequestDelete(void) { return requestDelete; }

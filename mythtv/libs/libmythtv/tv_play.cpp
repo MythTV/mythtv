@@ -1325,15 +1325,6 @@ void TV::StopEmbeddingOutput(void)
         nvp->StopEmbedding();
 }
 
-static void embedcb(void *data, unsigned long wid, int x, int y, int w, int h)
-{
-    TV *tv = (TV *)data;
-    if (x == -1 && y == -1 && w == -1 && h == -1)
-        tv->StopEmbeddingOutput();
-    else
-        tv->EmbedOutput(wid, x, y, w, h);
-}
-
 void TV::doLoadMenu(void)
 {
     QString dummy;
@@ -1343,7 +1334,7 @@ void TV::doLoadMenu(void)
         recorder->GetChannelInfo(dummy, dummy, dummy, dummy, dummy, dummy, 
                                  dummy, dummy, channame);
 
-    QString chanstr = RunProgramGuide(m_context, channame, true, embedcb, this);
+    QString chanstr = RunProgramGuide(m_context, channame, true, this);
 
     if (chanstr != "")
     {

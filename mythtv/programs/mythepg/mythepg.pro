@@ -11,9 +11,9 @@ INSTALLS = target
 
 INCLUDEPATH += ../../libs/ ../../libs/libmyth
 LIBS += -L../../libs/libmyth -L../../libs/libmythtv -L../../libs/libavcodec
-LIBS += -lmythtv -lavcodec -lmyth-$$LIBVERSION -lXinerama
+LIBS += -lmythtv -lavcodec -lmyth-$$LIBVERSION -lXv -lXinerama -lmp3lame
 
-DEPENDPATH += ../../libs/libmyth
+DEPENDPATH += ../../libs/libmyth ../../libs/libmythtv
 
 TARGETDEPS += ../../libs/libmythtv/libmythtv.a
 TARGETDEPS += ../../libs/libavcodec/libavcodec.a

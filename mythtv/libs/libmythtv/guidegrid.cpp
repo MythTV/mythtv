@@ -24,16 +24,15 @@ using namespace std;
 #include "infostructs.h"
 #include "programinfo.h"
 #include "oldsettings.h"
+#include "tv.h"
 
 QString RunProgramGuide(MythContext *context, QString startchannel, bool thread,
-                        void (*embedcb)(void *data, unsigned long wid,
-                                        int x, int y, int w, int h),
-                        void *data)
+                        TV *player)
 {
     if (thread)
         qApp->lock();
 
-    GuideGrid gg(context, startchannel, embedcb, data);
+    GuideGrid gg(context, startchannel, player);
 
     if (thread)
     {
@@ -53,18 +52,14 @@ QString RunProgramGuide(MythContext *context, QString startchannel, bool thread,
     return chanstr;
 }
 
-GuideGrid::GuideGrid(MythContext *context, const QString &channel, 
-                     void (*embedcb)(void *data, unsigned long wid, int x, 
-                                     int y, int w, int h), void *data,
+GuideGrid::GuideGrid(MythContext *context, const QString &channel, TV *player,
                      QWidget *parent, const char *name)
          : MythDialog(context, parent, name)
 {
     DISPLAY_CHANS = 6;
     int maxchannel = 0;
 
-    embedcallback = embedcb;
-    callbackdata = data;
-
+    m_player = player;
     m_db = QSqlDatabase::database();
 
     context->KickDatabase(m_db);
@@ -482,9 +477,9 @@ void GuideGrid::timeout()
     QString curTime = new_time.toString("h:mm:ss ap");
     currentTime->setText("  " + curTime);
 
-    if (embedcallback)
-        embedcallback(callbackdata, forvideo->winId(), 0, 0, 
-                      forvideo->width(), forvideo->height());
+    if (m_player)
+        m_player->EmbedOutput(forvideo->winId(), 0, 0, 
+                              forvideo->width(), forvideo->height());
 }
 
 void GuideGrid::fillChannelInfos(int &maxchannel)
@@ -2032,8 +2027,8 @@ void GuideGrid::enter()
     if (timeCheck)
     {
         timeCheck->stop();
-        if (embedcallback)
-            embedcallback(callbackdata, 0, -1, -1, -1, -1);
+        if (m_player)
+            m_player->StopEmbeddingOutput();
     }
 
     unsetCursor();
@@ -2046,8 +2041,8 @@ void GuideGrid::escape()
     if (timeCheck)
     {
         timeCheck->stop();
-        if (embedcallback)
-            embedcallback(callbackdata, 0, -1, -1, -1, -1);
+        if (m_player)
+            m_player->StopEmbeddingOutput();
     }
 
     unsetCursor();

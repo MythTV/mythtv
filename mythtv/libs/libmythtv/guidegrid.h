@@ -20,6 +20,7 @@ class TimeInfo;
 class ChannelInfo;
 class MythContext;
 class QSqlDatabase;
+class TV;
 
 #define MAX_DISPLAY_CHANS 8
 #define DISPLAY_TIMES 30
@@ -27,19 +28,14 @@ class QSqlDatabase;
 
 // Use this function to instantiate a guidegrid instance.
 QString RunProgramGuide(MythContext *context, QString startchannel, 
-                        bool thread = false,
-                        void (*embedcb)(void *data, unsigned long wid,
-                                        int x, int y, int w, int h) = NULL,
-                        void *data = NULL);
+                        bool thread = false, TV *player = NULL);
 
 
 class GuideGrid : public MythDialog
 {
     Q_OBJECT
   public:
-    GuideGrid(MythContext *context, const QString &channel,
-              void (*embedcb)(void *data, unsigned long wid, int x, int y, 
-                              int w, int h) = NULL, void *data = NULL,
+    GuideGrid(MythContext *context, const QString &channel, TV *player = NULL,
               QWidget *parent = 0, const char *name = 0);
    ~GuideGrid();
 
@@ -180,9 +176,7 @@ class GuideGrid : public MythDialog
     QColor misChanIcon_fgColor;
     int progArrow_Type;
 
-    void (*embedcallback)(void *data, unsigned long wid, int x, int y,
-                          int w, int h);
-    void *callbackdata;
+    TV *m_player;
 
     QString channelOrdering;
     QString dateformat;
