@@ -245,15 +245,23 @@ void Scheduler::FillRecordListFromMaster(void)
     }
 }
 
-void Scheduler::PrintList(void)
+void Scheduler::PrintList(bool onlyFutureRecordings)
 {
+    QDateTime now = QDateTime::currentDateTime();
+
     cout << "--- print list start ---\n";
     list<ProgramInfo *>::iterator i = recordingList.begin();
     cout << "Title                 Chan  ChID  StartTime       S I C "
             " C R O N Priority" << endl;
+
     for (; i != recordingList.end(); i++)
     {
         ProgramInfo *first = (*i);
+
+        if ((first->recendts < now) ||
+            ((!first->recording) &&
+             (first->recstartts < now)))
+            continue;
 
         cout << first->title.local8Bit().leftJustify(22, ' ', true)
              << first->chanstr.rightJustify(4, ' ') << "  " << first->chanid 

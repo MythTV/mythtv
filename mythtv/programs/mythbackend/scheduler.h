@@ -46,7 +46,7 @@ class Scheduler : public QObject
                                         bool removenonplaying = true,
                                         list<ProgramInfo *> *uselist = NULL);
 
-    void PrintList(void);
+    void PrintList(bool onlyFutureRecordings = false);
 
     bool HasConflicts(void) { return hasconflicts; }
 

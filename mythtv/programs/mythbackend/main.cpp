@@ -401,7 +401,7 @@ int main(int argc, char **argv)
             sched->FillRecordLists(false);
         }
 
-        sched->PrintList();
+        sched->PrintList(true);
         cleanup();
         exit(0);
     }
