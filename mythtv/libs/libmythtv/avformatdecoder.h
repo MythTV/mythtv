@@ -20,7 +20,7 @@ class AvFormatDecoder : public DecoderBase
 
     static bool CanHandle(char testbuf[2048], const QString &filename);
 
-    int OpenFile(RingBuffer *rbuffer, bool novideo);
+    int OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[2048]);
     void GetFrame(int onlyvideo);
 
     bool DoRewind(long long desiredFrame);
@@ -28,13 +28,28 @@ class AvFormatDecoder : public DecoderBase
 
     char *GetScreenGrab(int secondsin);
 
+  protected:
+    RingBuffer *getRingBuf(void) { return ringBuffer; }
+
   private:
     friend int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
     friend void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
 
+    friend int open_avf(URLContext *h, const char *filename, int flags);
+    friend int read_avf(URLContext *h, uint8_t *buf, int buf_size);
+    friend int write_avf(URLContext *h, uint8_t *buf, int buf_size);
+    friend offset_t seek_avf(URLContext *h, offset_t offset, int whence);
+    friend int close_avf(URLContext *h);
+
+    void InitByteContext(void);
+
+    RingBuffer *ringBuffer;
+
     AVFormatContext *ic;
     AVFormatParameters params;
     AVPacket *pkt;
+
+    URLContext readcontext;
 
     unsigned char *directbuf;
 

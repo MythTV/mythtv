@@ -17,7 +17,8 @@ class DecoderBase
 
     virtual void Reset(void) = 0;
 
-    virtual int OpenFile(RingBuffer *rbuffer, bool novideo) = 0;
+    virtual int OpenFile(RingBuffer *rbuffer, bool novideo,
+                         char testbuf[2048]) = 0;
 
     void setExactSeeks(bool exact) { exactseeks = exact; }
     void setLiveTVMode(bool live) { livetv = live; }

@@ -140,17 +140,5 @@ int url_close_dyn_buf(ByteIOContext *s, uint8_t **pbuffer);
 extern URLProtocol file_protocol;
 extern URLProtocol pipe_protocol;
 
-/* udp.c */
-extern URLProtocol udp_protocol;
-int udp_set_remote_url(URLContext *h, const char *uri);
-int udp_get_local_port(URLContext *h);
-int udp_get_file_handle(URLContext *h);
-
-/* tcp.c  */
-extern URLProtocol tcp_protocol;
-
-/* http.c */
-extern URLProtocol http_protocol;
-
 #endif
 

@@ -93,8 +93,11 @@ bool NuppelDecoder::CanHandle(char testbuf[2048])
     return false;
 }
 
-int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo)
+int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, 
+                            char testbuf[2048])
 {
+    (void)testbuf;
+
     ringBuffer = rbuffer;
     disablevideo = novideo;
 

@@ -460,7 +460,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     text_size = 8 * (sizeof(teletextsubtitle) + VT_WIDTH);
 
     int ret;
-    if ((ret = decoder->OpenFile(ringBuffer, disablevideo)) < 0)
+    if ((ret = decoder->OpenFile(ringBuffer, disablevideo, testbuf)) < 0)
     {
         cerr << "Couldn't open decoder for: " << ringBuffer->GetFilename()
              << endl;

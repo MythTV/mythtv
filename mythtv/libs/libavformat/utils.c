@@ -308,10 +308,15 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
     char buf[PROBE_BUF_SIZE];
     AVProbeData probe_data, *pd = &probe_data;
 
-    ic = av_mallocz(sizeof(AVFormatContext));
-    if (!ic) {
-        err = AVERROR_NOMEM;
-        goto fail;
+    if (*ic_ptr) {
+        ic = *ic_ptr;
+    }
+    else {
+        ic = av_mallocz(sizeof(AVFormatContext));
+        if (!ic) {
+            err = AVERROR_NOMEM;
+            goto fail;
+        }
     }
     pstrcpy(ic->filename, sizeof(ic->filename), filename);
     pd->filename = ic->filename;

@@ -45,10 +45,125 @@ bool AvFormatDecoder::CanHandle(char testbuf[2048], const QString &filename)
     return false;
 }
 
-int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo)
+int open_avf(URLContext *h, const char *filename, int flags)
 {
+    (void)h;
+    (void)filename;
+    (void)flags;
+    return 0;
+}
+
+int read_avf(URLContext *h, uint8_t *buf, int buf_size)
+{
+    AvFormatDecoder *dec = (AvFormatDecoder *)h->priv_data;
+
+    return dec->getRingBuf()->Read(buf, buf_size);
+}
+
+int write_avf(URLContext *h, uint8_t *buf, int buf_size)
+{
+    (void)h;
+    (void)buf;
+    (void)buf_size;
+    return 0;
+}
+
+offset_t seek_avf(URLContext *h, offset_t offset, int whence)
+{
+    AvFormatDecoder *dec = (AvFormatDecoder *)h->priv_data;
+
+    return dec->getRingBuf()->Seek(offset, whence);
+}
+
+int close_avf(URLContext *h)
+{
+    (void)h;
+    return 0;
+}
+
+URLProtocol rbuffer_protocol = {
+    "rbuffer",
+    open_avf,
+    read_avf,
+    write_avf,
+    seek_avf,
+    close_avf,
+    NULL
+};
+
+static void avf_write_packet(void *opaque, uint8_t *buf, int buf_size)
+{
+    URLContext *h = (URLContext *)opaque;
+    url_write(h, buf, buf_size);
+}
+
+static int avf_read_packet(void *opaque, uint8_t *buf, int buf_size)
+{
+    URLContext *h = (URLContext *)opaque;
+    return url_read(h, buf, buf_size);
+}
+
+static int avf_seek_packet(void *opaque, int64_t offset, int whence)
+{
+    URLContext *h = (URLContext *)opaque;
+    url_seek(h, offset, whence);
+    return 0;
+}
+
+void AvFormatDecoder::InitByteContext(void)
+{
+    readcontext.prot = &rbuffer_protocol;
+    readcontext.flags = 0;
+    readcontext.is_streamed = 0;
+    readcontext.max_packet_size = 0;
+    readcontext.priv_data = this;
+
+    ic->pb.buffer_size = 32768;
+    ic->pb.buffer = (unsigned char *)av_malloc(ic->pb.buffer_size);
+    ic->pb.buf_ptr = ic->pb.buffer;
+    ic->pb.write_flag = 0;
+    ic->pb.buf_end = ic->pb.buffer;
+    ic->pb.opaque = &readcontext;
+    ic->pb.read_packet = avf_read_packet;
+    ic->pb.write_packet = avf_write_packet;
+    ic->pb.seek = avf_seek_packet;
+    ic->pb.pos = 0;
+    ic->pb.must_flush = 0;
+    ic->pb.eof_reached = 0;
+    ic->pb.is_streamed = 0;
+    ic->pb.max_packet_size = 0;
+}
+
+int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
+                              char testbuf[2048])
+{
+    ringBuffer = rbuffer;
+
     AVInputFormat *fmt = NULL;
     char *filename = (char *)(rbuffer->GetFilename().ascii());
+
+    AVProbeData probe;
+    probe.filename = filename;
+    probe.buf = (unsigned char *)testbuf;
+    probe.buf_size = 2048;
+
+    fmt = av_probe_input_format(&probe, true);
+    if (!fmt)
+    {
+        cerr << "Couldn't decode file\n";
+        return -1;
+    }
+
+    fmt->flags |= AVFMT_NOFILE;
+
+    ic = (AVFormatContext *)av_mallocz(sizeof(AVFormatContext));
+    if (!ic)
+    {
+        cerr << "Couldn't allocate context\n";
+        return -1;
+    }
+
+    InitByteContext();
 
     int err = av_open_input_file(&ic, filename, fmt, 0, &params);
     if (err < 0)
@@ -63,6 +178,8 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo)
         cerr << "could not find codec parameters: " << filename << endl;
         exit(0);
     }
+
+    fmt->flags &= ~AVFMT_NOFILE;
 
     for (int i = 0; i < ic->nb_streams; i++)
     {
@@ -286,8 +403,8 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     if (mpa_pic.pict_type == FF_I_TYPE ||
                         mpa_pic.pict_type == FF_P_TYPE)
                     {
-                        lastvpts = pkt.pts * 1.0 * ic->pts_num / 
-                                   (ic->pts_den / 1000);
+                        lastvpts = (long long int)(pkt.pts * 1.0 * 
+                                   ic->pts_num / (ic->pts_den / 1000));
                     }
                     else
                         lastvpts += 33;
