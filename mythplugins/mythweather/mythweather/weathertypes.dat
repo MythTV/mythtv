@@ -45,6 +45,7 @@
 101,Few Snow Showers/Wind,snowshow.png
 103,Light Snow/Wind,flurries.png
 104,Wintry Mix,flurries.png
+106,Hvy Rain/Freezing Rain,rainsnow.png
 108,AM Light Snow,flurries.png
 109,PM Rain/Snow/Wind,rainsnow.png
 114,Rain/Freezing Rain,showers.png
@@ -68,6 +69,7 @@
 194,Drizzle,showers.png
 201,AM Light Rain/Wind,showers.png
 204,AM Rain/Wind,showers.png
+231,Rain,showers.png
 271,Snow Showers/Windy,snowshow.png
 997,Clear,clear.png
 998,A Few Clouds,pcloudy.png
