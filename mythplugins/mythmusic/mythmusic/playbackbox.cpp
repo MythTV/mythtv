@@ -688,10 +688,7 @@ void PlaybackBox::jumpToItem(QListViewItem *curItem)
 {
     if (curItem)
     {
-        if (curItem->itemBelow())
-            playview->ensureItemVisible(curItem->itemBelow());
-        if (curItem->itemAbove())
-            playview->ensureItemVisible(curItem->itemAbove());
+        playview->ensureItemVCentered(curItem);
         playview->setCurrentItem(curItem);
         playview->setSelected(curItem, true);
         playview->ensureItemVisible(curItem);
