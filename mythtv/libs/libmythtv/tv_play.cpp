@@ -630,6 +630,10 @@ void TV::TeardownPlayer(void)
 {
     if (nvp)
     {
+        prbuffer->Pause();
+        while (!prbuffer->isPaused())
+            usleep(50);
+
         prbuffer->StopReads();
         nvp->StopPlaying();
         pthread_join(decode, NULL);
@@ -660,6 +664,10 @@ void TV::TeardownPipPlayer(void)
 {
     if (pipnvp)
     {
+        piprbuffer->Pause();
+        while (!piprbuffer->isPaused())
+            usleep(50);
+
         piprbuffer->StopReads();
         pipnvp->StopPlaying();
         pthread_join(pipdecode, NULL);

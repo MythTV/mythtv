@@ -175,7 +175,7 @@ void ThreadedFileWriter::DiskLoop()
 	
 	if(size == 0)
 	{
-	    usleep(5000);
+	    usleep(500);
 	    continue;
 	}
 
@@ -235,6 +235,10 @@ unsigned ThreadedFileWriter::BufFree()
 
 RingBuffer::RingBuffer(const QString &lfilename, bool write, bool needevents)
 {
+    readaheadrunning = false;
+    readaheadpaused = false;
+    wantseek = false;
+
     recorder_num = 0;   
  
     normalfile = true;
@@ -273,8 +277,11 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write, bool needevents)
 RingBuffer::RingBuffer(const QString &lfilename, long long size, 
                        long long smudge, RemoteEncoder *enc)
 {
-    recorder_num = 0;
+    readaheadrunning = false;
+    readaheadpaused = false;
+    wantseek = false;
 
+    recorder_num = 0;
     remoteencoder = NULL;
 
     if (enc)
@@ -318,6 +325,8 @@ RingBuffer::RingBuffer(const QString &lfilename, long long size,
 
 RingBuffer::~RingBuffer(void)
 {
+    KillReadAheadThread();
+
     pthread_rwlock_wrlock(&rwlock);
     if (remotefile)
     {
@@ -343,6 +352,11 @@ void RingBuffer::Start(void)
 {
     if (remotefile)
         remotefile->Start();
+    if ((normalfile && writemode) || (!normalfile && !recorder_num))
+    {
+    }
+    else if (!readaheadrunning)
+        StartupReadAheadThread();
 }
 
 // guaranteed to be paused, so don't need to lock this
@@ -367,7 +381,9 @@ void RingBuffer::TransitionToRing(void)
 
 void RingBuffer::Reset(void)
 {
+    wantseek = true;
     pthread_rwlock_wrlock(&rwlock);
+    wantseek = false;
 
     if (!normalfile)
     {
@@ -390,6 +406,9 @@ void RingBuffer::Reset(void)
         totalreadpos = readpos = 0;
 
         wrapcount = 0;
+
+        if (readaheadrunning)
+            ResetReadAhead(0);
     }
     
     pthread_rwlock_unlock(&rwlock);
@@ -424,12 +443,10 @@ int RingBuffer::safe_read(int fd, void *data, unsigned sz)
                 break;
             }
         }
+        if (stopreads)
+            break;
         if(tot < sz)
            usleep(1000);
-        if (stopreads)
-        {
-           break;
-        }
     }
     return tot;
 }
@@ -458,9 +475,10 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
         {
             break;
         }
-        usleep(100);
         if (stopreads)
             break;
+
+        usleep(100);
 
         qApp->lock();
         available = sock->bytesAvailable();
@@ -471,7 +489,7 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
     available = sock->bytesAvailable();
     qApp->unlock();
 
-    if (available >= sz)
+    if (available > 0)
     {
         qApp->lock();
         ret = sock->readBlock(((char *)data) + tot, sz - tot);
@@ -482,6 +500,261 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
     return tot;
 }
 
+#define READ_AHEAD_SIZE (10 * 1024 * 1024)
+#define READ_AHEAD_MIN_THRESHOLD (1 * 1024 * 1024)
+#define READ_AHEAD_MIN_FULL (256000)
+#define READ_AHEAD_MIN_FREE (128000)
+
+int RingBuffer::ReadBufFree(void)
+{
+    int ret = 0;
+
+    pthread_mutex_lock(&readAheadLock);
+
+    if (rbwpos >= rbrpos)
+        ret = rbrpos + READ_AHEAD_SIZE - rbwpos - 1;
+    else
+        ret = rbrpos - rbwpos - 1;
+
+    pthread_mutex_unlock(&readAheadLock);
+    return ret;
+}
+
+int RingBuffer::ReadBufAvail(void)
+{
+    int ret = 0;
+    
+    pthread_mutex_lock(&readAheadLock);
+
+    if (rbwpos >= rbrpos)
+        ret = rbwpos - rbrpos;
+    else
+        ret = READ_AHEAD_SIZE - rbrpos + rbwpos;
+
+    pthread_mutex_unlock(&readAheadLock);
+
+    return ret;
+}
+
+// must call with rwlock in write lock
+void RingBuffer::ResetReadAhead(long long newinternal)
+{
+    pthread_mutex_lock(&readAheadLock);
+    rbrpos = 0;
+    rbwpos = 0;
+    internalreadpos = newinternal;
+    ateof = false;
+    readsallowed = false;
+    pthread_mutex_unlock(&readAheadLock);
+}
+
+void RingBuffer::StartupReadAheadThread(void)
+{
+    readaheadrunning = false;
+
+    pthread_mutex_init(&readAheadLock, NULL);
+    pthread_create(&reader, NULL, startReader, this);
+
+    while (!readaheadrunning)
+        usleep(50);
+}
+
+void RingBuffer::KillReadAheadThread(void)
+{
+    if (!readaheadrunning)
+        return;
+
+    readaheadrunning = false;
+    pthread_join(reader, NULL);
+}
+
+void RingBuffer::Pause(void)
+{
+    pausereadthread = true;
+    StopReads();
+}
+
+void RingBuffer::Unpause(void)
+{
+    StartReads();
+    pausereadthread = false;
+}
+
+bool RingBuffer::isPaused(void)
+{
+    if (!readaheadrunning)
+        return true;
+
+    return readaheadpaused;
+}
+
+void *RingBuffer::startReader(void *type)
+{
+    RingBuffer *rbuffer = (RingBuffer *)type;
+    rbuffer->ReadAheadThread();
+    return NULL;
+}
+
+void RingBuffer::ReadAheadThread(void)
+{
+    long long totfree = 0;
+    int ret = -1;
+    int used = 0;
+
+    pausereadthread = false;
+
+    readAheadBuffer = new char[READ_AHEAD_SIZE + 256000];
+    
+    ResetReadAhead(0);
+    totfree = ReadBufFree();
+
+    readaheadrunning = true;
+    while (readaheadrunning)
+    {
+        if (pausereadthread)
+        {
+            readaheadpaused = true;
+            usleep(100);
+            totfree = ReadBufFree();
+            continue;
+        }
+
+        readaheadpaused = false;
+
+        pthread_rwlock_rdlock(&rwlock);
+        if (totfree > READ_AHEAD_MIN_FREE)
+        {
+            // limit the read size
+            totfree = READ_AHEAD_MIN_FREE;
+
+            if (rbwpos + totfree > READ_AHEAD_SIZE)
+                totfree = READ_AHEAD_SIZE - rbwpos;
+
+            if (normalfile)
+            {
+                if (!writemode)
+                {
+                    if (remotefile)
+                    {
+                        ret = safe_read(remotefile, readAheadBuffer + rbwpos,
+                                        totfree);
+                        internalreadpos += ret;
+                    }
+                    else
+                    {
+                        ret = safe_read(fd2, readAheadBuffer + rbwpos, totfree);
+                        internalreadpos += ret;
+                    }
+                }
+            }
+            else
+            {
+                if (remotefile)
+                {
+                    ret = safe_read(remotefile, readAheadBuffer + rbwpos, 
+                                    totfree);
+
+                    if (internalreadpos + totfree > filesize)
+                    {
+                        int toread = filesize - readpos;
+                        int left = totfree - toread;
+ 
+                        internalreadpos = left;
+                    }
+                    else
+                        internalreadpos += ret;
+                }
+                else if (internalreadpos + totfree > filesize)
+                {
+                    int toread = filesize - internalreadpos;
+
+                    ret = safe_read(fd2, readAheadBuffer + rbwpos, toread);
+
+                    int left = totfree - toread;
+                    lseek(fd2, 0, SEEK_SET);
+
+                    ret = safe_read(fd2, readAheadBuffer + rbwpos + toread, 
+                                    left);
+                    ret += toread;
+
+                    internalreadpos = left;
+                }
+                else
+                {
+                    ret = safe_read(fd2, readAheadBuffer + rbwpos, totfree);
+                    internalreadpos += ret;
+                }
+            }
+
+            pthread_mutex_lock(&readAheadLock);
+            rbwpos = (rbwpos + ret) % READ_AHEAD_SIZE;
+            pthread_mutex_unlock(&readAheadLock);
+
+            if (ret != totfree && normalfile)
+            {
+                ateof = true;
+            }
+        }
+
+        totfree = ReadBufFree();
+        used = READ_AHEAD_SIZE - totfree;
+
+        if (ateof)
+        {
+            readsallowed = true;
+            totfree = 0;
+        }
+
+        if (!readsallowed && used >= READ_AHEAD_MIN_THRESHOLD)
+            readsallowed = true;        
+
+        if (readsallowed && used < READ_AHEAD_MIN_FULL && !ateof)
+        {
+            readsallowed = false;
+            cerr << "rebuffering...\n";
+        }
+
+        pthread_rwlock_unlock(&rwlock);
+
+        if (totfree < READ_AHEAD_MIN_FREE || wantseek)
+            usleep(500);
+    }
+
+    delete [] readAheadBuffer;
+}
+
+int RingBuffer::ReadFromBuf(void *buf, int count)
+{
+    while (!readsallowed && !stopreads)
+        usleep(100);
+
+    int avail = ReadBufAvail();
+
+    while (avail < count && !stopreads)
+    {
+        usleep(100);
+        avail = ReadBufAvail();
+        if (ateof && avail < count)
+            count = avail;
+    }
+
+    if (rbrpos + count > READ_AHEAD_SIZE)
+    {
+        int firstsize = READ_AHEAD_SIZE - rbrpos;
+        int secondsize = count - firstsize;
+
+        memcpy(buf, readAheadBuffer + rbrpos, firstsize);
+        memcpy((char *)buf + firstsize, readAheadBuffer, secondsize);
+    }
+    else
+        memcpy(buf, readAheadBuffer + rbrpos, count);
+
+    pthread_mutex_lock(&readAheadLock);
+    rbrpos = (rbrpos + count) % READ_AHEAD_SIZE;
+    pthread_mutex_unlock(&readAheadLock);
+
+    return count;
+}
 
 int RingBuffer::Read(void *buf, int count)
 {
@@ -492,16 +765,16 @@ int RingBuffer::Read(void *buf, int count)
     {
         if (!writemode)
         {
-            if (remotefile)
+            if (!readaheadrunning)
             {
-                ret = safe_read(remotefile, buf, count);
+                ret = safe_read(fd2, buf, count);
                 totalreadpos += ret;
                 readpos += ret;
             }
             else
             {
-                ret = safe_read(fd2, buf, count);
-	        totalreadpos += ret;
+                ret = ReadFromBuf(buf, count);
+                totalreadpos += ret;
                 readpos += ret;
             }
         }
@@ -515,9 +788,9 @@ int RingBuffer::Read(void *buf, int count)
 //cout << "reading: " << totalreadpos << " " << readpos << " " << count << " " << filesize << endl;
         if (remotefile)
         {
-            ret = safe_read(remotefile, buf, count);
-
-            if (readpos + count > filesize)
+            ret = ReadFromBuf(buf, count);
+  
+            if (readpos + ret > filesize)
             {
                 int toread = filesize - readpos;
                 int left = count - toread;
@@ -527,27 +800,27 @@ int RingBuffer::Read(void *buf, int count)
             else
                 readpos += ret;
             totalreadpos += ret;
-        } 
+        }
         else if (readpos + count > filesize)
         {
-	    int toread = filesize - readpos;
+            int toread = filesize - readpos;
 
-	    ret = safe_read(fd2, buf, toread);
-	    
-	    int left = count - toread;
-	    lseek(fd2, 0, SEEK_SET);
+            ret = safe_read(fd2, buf, toread);
 
-	    ret = safe_read(fd2, (char *)buf + toread, left);
-	    ret += toread;
+            int left = count - toread;
+            lseek(fd2, 0, SEEK_SET);
 
-	    totalreadpos += ret;
-	    readpos = left;
-	}
-	else
+            ret = safe_read(fd2, (char *)buf + toread, left);
+            ret += toread;
+ 
+            totalreadpos += ret;
+            readpos = left;
+        }
+        else
         {
             ret = safe_read(fd2, buf, count);
             readpos += ret;
-	    totalreadpos += ret;
+            totalreadpos += ret;
         }
     }
 
@@ -671,7 +944,9 @@ long long RingBuffer::GetFileWritePosition(void)
 
 long long RingBuffer::Seek(long long pos, int whence)
 {
-    pthread_rwlock_rdlock(&rwlock);
+    wantseek = true;  
+    pthread_rwlock_wrlock(&rwlock);
+    wantseek = false;
 
     long long ret = -1;
     if (normalfile)
@@ -679,7 +954,15 @@ long long RingBuffer::Seek(long long pos, int whence)
         if (remotefile)
             ret = remotefile->Seek(pos, whence, readpos);
         else
-            ret = lseek(fd2, pos, whence);
+        {
+            if (whence == SEEK_SET)
+                ret = lseek(fd2, pos, whence);
+            else
+            {
+                long long realseek = readpos + pos;        
+                ret = lseek(fd2, realseek, SEEK_SET);
+            }
+        }
 
         if (whence == SEEK_SET)
             readpos = ret;
@@ -722,6 +1005,10 @@ long long RingBuffer::Seek(long long pos, int whence)
                 readpos += filesize;
         }
     }
+
+    if (readaheadrunning)
+        ResetReadAhead(readpos);
+
     pthread_rwlock_unlock(&rwlock);
 
     return ret;

@@ -228,6 +228,9 @@ void NuppelVideoPlayer::Pause(void)
 
     PauseVideo();
     PauseAudio();
+
+    if (ringBuffer)
+        ringBuffer->Pause();
 }
 
 void NuppelVideoPlayer::Unpause(void)
@@ -235,15 +238,22 @@ void NuppelVideoPlayer::Unpause(void)
     paused = false;
     UnpauseVideo();
     UnpauseAudio();
+
+    if (ringBuffer)
+        ringBuffer->Unpause();
 }
 
 bool NuppelVideoPlayer::GetPause(void)
 {
+    bool rbpaused = true;
+    if (ringBuffer)
+        rbpaused = ringBuffer->isPaused();
+
     if (disableaudio)
     {
-        return (actuallypaused && GetVideoPause());
+        return (actuallypaused && rbpaused && GetVideoPause());
     }
-    return (actuallypaused && GetAudioPause() && GetVideoPause());
+    return (actuallypaused && rbpaused && GetAudioPause() && GetVideoPause());
 }
 
 inline bool NuppelVideoPlayer::GetVideoPause(void)

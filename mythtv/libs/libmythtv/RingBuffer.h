@@ -10,7 +10,7 @@ class ThreadedFileWriter;
 
 class RingBuffer
 {
- public:
+  public:
     RingBuffer(const QString &lfilename, bool write, bool needevents = false);
     RingBuffer(const QString &lfilename, long long size, long long smudge,
                RemoteEncoder *enc = NULL);
@@ -58,7 +58,15 @@ class RingBuffer
 
     void Start(void);
 
- private:
+    void Pause(void);
+    void Unpause(void);
+    bool isPaused(void);
+
+  protected:
+    static void *startReader(void *type);
+    void ReadAheadThread(void);
+
+  private:
     int safe_read(int fd, void *data, unsigned sz);
     int safe_read(RemoteFile *rf, void *data, unsigned sz);
 
@@ -89,6 +97,30 @@ class RingBuffer
     int recorder_num;
     RemoteEncoder *remoteencoder;
     RemoteFile *remotefile;
+
+    int ReadFromBuf(void *buf, int count);
+
+    inline int ReadBufFree(void);
+    inline int ReadBufAvail(void);
+
+    void StartupReadAheadThread(void);
+    void ResetReadAhead(long long newinternal);
+    void KillReadAheadThread(void);
+
+    pthread_mutex_t readAheadLock;
+    pthread_t reader;
+
+    char *readAheadBuffer;
+    bool readaheadrunning;
+    bool readaheadpaused;
+    bool pausereadthread;
+    int rbrpos;
+    int rbwpos;
+    long long internalreadpos;
+    bool ateof;
+    bool readsallowed;
+
+    bool wantseek;
 };
 
 #endif
