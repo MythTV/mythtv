@@ -646,7 +646,12 @@ AudioMetadata *MadDecoder::getMetadata()
                             year = atoi((char *)latin1); break;
                 case 4: if (tracknum == 0) 
                             tracknum = atoi((char *)latin1); break;
-                case 5: genre += (char *)latin1; break;
+                case 5: if (genre != (char *)latin1)
+                        {
+                            genre += (char *)latin1;
+                        }
+                        break;
+
                 default: break;
             }
 
@@ -753,6 +758,8 @@ AudioMetadata *MadDecoder::getMetadata()
     {
         length = alt_length;
     }
+
+    metadataSanityCheck(&artist, &album, &title, &genre);
 
     AudioMetadata *retdata = new AudioMetadata(
                                                 filename, 

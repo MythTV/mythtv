@@ -197,7 +197,7 @@ void MMusicWatcher::run()
         //  minutes). Set to 0 to only sweep when a sweep is forced
         //
 
-        int sweep_wait = mfdContext->getNumSetting("music_sweep_time", 15) * 60 * 1000;  
+        int sweep_wait = mfdContext->getNumSetting("music_sweep_time", 1) * 60 * 1000;  
         if( ( metadata_sweep_time.elapsed() > sweep_wait  &&
               sweep_wait > 0 && keep_going ) || ( force_sweep && keep_going) )
         {
@@ -305,8 +305,6 @@ void MMusicWatcher::run()
 bool MMusicWatcher::sweepMetadata()
 {
 
-    QTime sweep_timer;
-    sweep_timer.start();
 
     //
     //  Figure out where the files are. We do this ever sweep, so ... in
@@ -410,6 +408,9 @@ bool MMusicWatcher::sweepMetadata()
     }
    
 
+    QTime sweep_timer;
+    sweep_timer.start();
+
     //
     //  Now, we need to check our master list against the latest sweep
     //
@@ -480,28 +481,46 @@ void MMusicWatcher::checkForDeletions(MusicFileMap &music_files, const QString &
     //  that do not refer to something in the sweep
     //
     
+    QTime delete_timer;
+    delete_timer.start();
+    int count = 0;
+    
     QSqlQuery query("SELECT intid, filename FROM musicmetadata ;", db);
     
     if(query.isActive())
     {
         if(query.numRowsAffected() > 0)
         {
-            query.next();
-            if(music_files.find(startdir + query.value(1).toString()) == music_files.end())
+            while(query.next() && keep_going)
             {
-                //
-                //  This record should _not_ be in the database
-                //
-                QSqlQuery delete_query;
-                delete_query.prepare("DELETE FROM musicmetadata WHERE intid = ?");
-                delete_query.bindValue(0, query.value(0).toUInt());
-                delete_query.exec();
+                if(music_files.find(startdir + query.value(1).toString()) == music_files.end())
+                {
+                    //
+                    //  This record should _not_ be in the database
+                    //
+
+                    ++count;
+                    QSqlQuery delete_query;
+                    delete_query.prepare("DELETE FROM musicmetadata WHERE intid = ?");
+                    delete_query.bindValue(0, query.value(0).toUInt());
+                    delete_query.exec();
+                    log(QString("removed item %1 (\"%2\") from the database")
+                        .arg(query.value(0).toInt())
+                        .arg(query.value(1).toString()), 9);
+                }
             }
         }
     }
     else
     {
         warning("something wrong with your musicmetadata table");
+    }
+    
+    if(count > 0)
+    {
+        log(QString("removed %1 items from music metadata table in %2 second(s)")
+            .arg(count)
+            .arg(delete_timer.elapsed() / 1000.0), 2);
     }
     
 }
@@ -1186,6 +1205,7 @@ AudioMetadata *MMusicWatcher::checkNewFile(
         new_item->setDbId(retrieve_query.value(0).toUInt());
         new_item->setDateAdded(QDateTime::currentDateTime());
         new_item->setLastPlayed(earliest_possible);
+        new_item->setId(bumpMetadataId());
         
         log(QString("added audio file: \"%1\"").arg(filename), 4);
         
@@ -1209,8 +1229,19 @@ bool MMusicWatcher::updateMetadata(AudioMetadata *an_item)
     //  database, and return
     //
     
-    
-    AudioMetadata *corrected_item = getMetadataFromFile(an_item->getUrl().path());
+    QString full_file_path = an_item->getUrl();
+    QString protocol = an_item->getUrl().protocol();
+    if(protocol.length() > 0)
+    {
+        //
+        //  pull off file: if it it exists in the url
+        //
+
+        full_file_path = full_file_path.replace(0, an_item->getUrl().protocol().length() + 1, "");
+    }
+
+
+    AudioMetadata *corrected_item = getMetadataFromFile(full_file_path);
     if(corrected_item)
     {
         //

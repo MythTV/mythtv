@@ -487,6 +487,7 @@ AudioMetadata *FlacDecoder::getMetadata()
     tracknum = getComment(block, "tracknumber").toInt(); 
     year = getComment(block, "date").toInt();
 
+    metadataSanityCheck(&artist, &album, &title, &genre);
 
     AudioMetadata *retdata = new AudioMetadata(
                                                 filename, 

@@ -401,6 +401,9 @@ AudioMetadata *VorbisDecoder::getMetadata()
     year = atoi(getComment(comment, "date").ascii());
 
     ov_clear(&vf);
+    
+    metadataSanityCheck(&artist, &album, &title, &genre);
+    
     AudioMetadata *retdata = new AudioMetadata(
                                                 filename, 
                                                 artist, 

@@ -795,6 +795,8 @@ AudioMetadata* aacDecoder::getMetadata()
     free(mp4_cb);
     fclose(input);
 
+    metadataSanityCheck(&artist, &album, &title, &genre);
+
     AudioMetadata *retdata = new AudioMetadata(
                                                 filename, 
                                                 artist, 
@@ -807,7 +809,7 @@ AudioMetadata* aacDecoder::getMetadata()
                                               );
     retdata->setComposer(writer);
     retdata->setComment(comment);
-    retdata->setBitrate(mp4ASC.samplingFrequency);
+    //retdata->setBitrate(mp4ASC.samplingFrequency);
 
     return retdata;
 }    

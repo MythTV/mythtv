@@ -440,6 +440,8 @@ AudioMetadata* avfDecoder::getMetadata()
     tracknum = ic->track;
     length = (ic->duration / AV_TIME_BASE) * 1000;
 
+    metadataSanityCheck(&artist, &album, &title, &genre);
+
     AudioMetadata *retdata = new AudioMetadata(
                                                 filename, 
                                                 artist, 

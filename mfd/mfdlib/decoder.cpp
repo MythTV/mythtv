@@ -96,6 +96,30 @@ void Decoder::removeListener(QObject *object)
 }
 */
 
+void Decoder::metadataSanityCheck(QString *artist, QString *album, QString *title, QString *genre)
+{
+    if(artist->length() < 1)
+    {
+        artist->append("Unkown Artist");
+    }
+    
+    if(album->length() < 1)
+    {
+        album->append("Unknown Album");
+    }
+    
+    if(title->length() < 1)
+    {
+        title->append("Unknown Title");
+    }
+    
+    if(genre->length() < 1)
+    {
+        genre->append("Unknown Genre");
+    }
+    
+}
+
 
 void Decoder::log(const QString &log_message, int verbosity)
 {

@@ -462,6 +462,8 @@ AudioMetadata* CdDecoder::getMetadata(int track)
     
     QString url = QString("cd://localhost%1/%2.cda").arg(devicename).arg(tracknum);
 
+    metadataSanityCheck(&artist, &album, &title, &genre);
+
     AudioMetadata *retdata = new AudioMetadata(
                                                 url, 
                                                 artist, 

@@ -65,6 +65,8 @@ class Decoder : public QThread
 
     virtual AudioMetadata *getMetadata() = 0;
     
+    void metadataSanityCheck(QString *artist, QString *album, QString *title, QString *genre);
+    
   protected:
     Decoder(DecoderFactory *, QIODevice *, Output *);
 
