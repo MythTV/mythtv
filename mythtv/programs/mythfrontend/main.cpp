@@ -135,6 +135,9 @@ void TVMenuCallback(void *data, QString &selection)
     } else if (sel == "settings playback") {
         PlaybackSettings settings(context);
         settings.exec(QSqlDatabase::database());
+    } else if (sel == "settings epg") {
+        EPGSettings settings(context);
+        settings.exec(QSqlDatabase::database());
     }
 }
 

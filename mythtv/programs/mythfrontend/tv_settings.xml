@@ -20,7 +20,7 @@
    <button>
       <type>TV_SCHEDULE</type>
       <text>Program Guide</text>
-      <action>SETTINGS SCHEDULE</action>
+      <action>SETTINGS EPG</action>
    </button>
 
    <button>
