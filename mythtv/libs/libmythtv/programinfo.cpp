@@ -462,11 +462,14 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
 {
     QString thequery;
    
-    thequery = QString("SELECT recorded.chanid,starttime,endtime,title,subtitle,"
-                       "description,channel.channum,channel.callsign, "
-                       "channel.name FROM recorded,channel WHERE "
-                       "recorded.chanid = %1 AND starttime = %2 AND "
-                       "recorded.chanid = channel.chanid;")
+    thequery = QString("SELECT recorded.chanid,starttime,endtime,title, "
+                               "subtitle,description,channel.channum, "
+                               "channel.callsign,channel.name "
+                           "FROM recorded "
+                           "LEFT JOIN channel "
+                               "ON recorded.chanid = channel.chanid "
+                           "WHERE recorded.chanid = %1 "
+                               "AND starttime = %2;")
                        .arg(channel).arg(starttime);
 
     QSqlQuery query = db->exec(thequery);
@@ -486,6 +489,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
         proginfo->title = QString::fromUtf8(query.value(3).toString());
         proginfo->subtitle = QString::fromUtf8(query.value(4).toString());
         proginfo->description = QString::fromUtf8(query.value(5).toString());
+
         proginfo->chanstr = query.value(6).toString();
         proginfo->chansign = query.value(7).toString();
         proginfo->channame = query.value(8).toString();
@@ -499,6 +503,13 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
             proginfo->description = "";
         if (proginfo->category == QString::null)
             proginfo->category = "";
+
+        if (proginfo->chanstr == QString::null)
+            proginfo->chanstr = "";
+        if (proginfo->chansign == QString::null)
+            proginfo->chansign = "";
+        if (proginfo->channame == QString::null)
+            proginfo->channame = "";
 
         return proginfo;
     }
