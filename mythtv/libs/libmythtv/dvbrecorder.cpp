@@ -68,6 +68,8 @@ DVBRecorder::DVBRecorder(DVBChannel* advbchannel): RecorderBase()
     mainpaused = false;
     recording = false;
 
+    wait_for_seqstart = false;
+    wait_for_seqstart_enabled = false;
 }
 
 DVBRecorder::~DVBRecorder()
@@ -84,6 +86,8 @@ void DVBRecorder::SetOption(const QString &name, int value)
         swfilter = (value == 1);
     else if (name == "recordts")
         recordts = (value == 1);
+    else if (name == "wait_for_seqstart")
+        wait_for_seqstart_enabled = (value == 1);
     else
         RecorderBase::SetOption(name, value);
 }
@@ -91,7 +95,10 @@ void DVBRecorder::SetOption(const QString &name, int value)
 void DVBRecorder::ChannelChanged(dvb_channel_t& chan)
 {
     chan_opts = chan;
-    wait_for_keyframe = true;
+
+    if (wait_for_seqstart_enabled)
+        wait_for_seqstart = true;
+
     channel_changed = true;
 
     framesWritten = 0;
@@ -478,13 +485,15 @@ void DVBRecorder::LocalProcessData(unsigned char *buffer, int len)
                 if (state >= SLICE_MIN && state <= SLICE_MAX)
                     continue;
 
+                // TODO: Could SeqStart appear in the middle of a pkt?
+                //       If so, rewrite this packet, if not remove TODO.
+                if (state == SEQ_START)
+                    wait_for_seqstart = false;
+
                 switch (state)
                 {
                     case GOP_START:
                     {
-                        if (wait_for_keyframe)
-                            wait_for_keyframe = false;
-
                         long long startpos = ringBuffer->GetFileWritePosition();
 
                         if (!gopset && framesWritten > 0)
@@ -517,8 +526,7 @@ void DVBRecorder::LocalProcessData(unsigned char *buffer, int len)
                     break;
 
                     case PICTURE_START:
-                        if (!wait_for_keyframe)
-                            framesWritten++;
+                        framesWritten++;
                     break;
 
                 }
@@ -530,7 +538,7 @@ void DVBRecorder::LocalProcessData(unsigned char *buffer, int len)
         memcpy(prvpkt, &buffer[len-3], 3);
     }
 
-    if (!wait_for_keyframe)
+    if (!wait_for_seqstart)
         ringBuffer->Write(buffer, len);
 }
 

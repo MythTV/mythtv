@@ -36,7 +36,8 @@ typedef struct dvbtuning
     struct dvb_frontend_parameters params;
     fe_sec_voltage_t    voltage;
     fe_sec_tone_mode_t  tone;
-    unsigned int lnb_diseqc_port;
+    unsigned int diseqc_type;
+    unsigned int diseqc_port;
     unsigned int lnb_lof_switch;
     unsigned int lnb_lof_hi;
     unsigned int lnb_lof_lo;

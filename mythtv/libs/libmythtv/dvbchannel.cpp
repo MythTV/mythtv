@@ -192,11 +192,10 @@ bool DVBChannel::GetChannelOptions(QString channum)
     switch(info.type)
     {
         case FE_QPSK:
-            thequery += QString("symbolrate, fec, polarity, diseqc_port,"
-                                " lof_switch, lof_hi, lof_lo "
-                                " FROM dvb_channel, dvb_lnb, dvb_sat "
+            thequery += QString("symbolrate, fec, polarity, diseqc_type,"
+                                " diseqc_port, lnb_lof_switch, lnb_lof_hi,"
+                                " lnb_lof_lo FROM dvb_channel, dvb_sat "
                                 " WHERE dvb_channel.satid=dvb_sat.satid"
-                                " AND dvb_sat.lnbid=dvb_lnb.lnbid"
                                 " AND chanid='%1'").arg(chanid);
             break;
         case FE_QAM:
@@ -296,15 +295,18 @@ void DVBChannel::PrintChannelOptions()
     switch(info.type)
     {
         case FE_QPSK:
-            msg = QString("Frequency: %1 Symbol Rate: %2 Pol: %3 ")
+            msg = QString("Frequency: %1 Symbol Rate: %2 Pol: %3")
                     .arg(t.params.frequency)
                     .arg(t.params.u.qpsk.symbol_rate)
                     .arg(t.voltage==SEC_VOLTAGE_13?'V':'H');
 
-            if (t.lnb_diseqc_port > 0)
-                msg += QString("Diseqc: %1.").arg(t.lnb_diseqc_port);
-            else
-                msg += QString("Diseqc: Off.");
+            switch(t.params.inversion) {
+                case INVERSION_AUTO: msg += " Inv: Auto"; break;
+                case INVERSION_OFF: msg += " Inv: Off"; break;
+                case INVERSION_ON: msg += " Inv: On"; break;
+            }
+
+            //NOTE: Diseqc and LNB is handled by DVBDiSEqC.
             break;
 
         case FE_QAM:
@@ -495,7 +497,8 @@ bool DVBChannel::ParseQuery(QSqlQuery& query)
                            query.value(6).toString(), query.value(7).toString(),
                            query.value(8).toString(), query.value(9).toString(),
                            query.value(10).toString(), query.value(11).toString(),
-                           query.value(12).toString(), chan_opts.tuning))
+                           query.value(12).toString(), query.value(13).toString(),
+                           chan_opts.tuning))
             {
                 pthread_mutex_unlock(&chan_opts.lock);
                 return false;
@@ -529,7 +532,8 @@ bool DVBChannel::ParseQuery(QSqlQuery& query)
 
 bool DVBChannel::ParseQPSK(const QString& frequency, const QString& inversion,
                            const QString& symbol_rate, const QString& fec_inner,
-                           const QString& pol, const QString& lnb_diseqc_port,
+                           const QString& pol, 
+                           const QString& deseqc_type, const QString& diseqc_port,
                            const QString& lnb_lof_switch, const QString& lnb_lof_hi,
                            const QString& lnb_lof_lo, dvb_tuning_t& t)
 {
@@ -575,7 +579,8 @@ bool DVBChannel::ParseQPSK(const QString& frequency, const QString& inversion,
                   return false;
     }
 
-    t.lnb_diseqc_port = lnb_diseqc_port.toInt();
+    t.diseqc_type = diseqc_type.toInt();
+    t.diseqc_port = diseqc_port.toInt();
     t.lnb_lof_switch = lnb_lof_switch.toInt();
     t.lnb_lof_hi = lnb_lof_hi.toInt();
     t.lnb_lof_lo = lnb_lof_lo.toInt();

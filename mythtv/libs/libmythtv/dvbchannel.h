@@ -46,7 +46,8 @@ public:
 
     bool ParseQPSK(const QString& frequency, const QString& inversion,
                    const QString& symbol_rate, const QString& fec_inner,
-                   const QString& pol, const QString& lnb_diseqc_port,
+                   const QString& pol, 
+                   const QString& diseqc_type, const QString& diseqc_port,
                    const QString& lnb_lof_switch, const QString& lnb_lof_hi,
                    const QString& lnb_lof_lo, dvb_tuning_t& t);
 
@@ -64,10 +65,10 @@ public:
 
 signals:
     void ChannelChanged(dvb_channel_t& chan);
-    void StatusSignalToNoise(unsigned int val);
-    void StatusSignalStrength(unsigned int val);
-    void StatusBitErrorRate(unsigned int val);
-    void StatusUncorrectedBlocks(unsigned int val);
+    void StatusSignalToNoise(int val);
+    void StatusSignalStrength(int val);
+    void StatusBitErrorRate(int val);
+    void StatusUncorrectedBlocks(int val);
     void Status(fe_status_t status);
 
 private:

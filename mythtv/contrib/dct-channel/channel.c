@@ -42,7 +42,7 @@ double timeout_scale = 1.0;
 						   some (status, etc) */
 #define TIMEOUT_SHORT (int)(timeout_scale*1500)	/* For most messages */
 #define TIMEOUT_LONG (int)(timeout_scale*5000) 	/* Waiting for chan. change */
-#define KEY_SLEEP (int)(timeout_scale*250)	/* After sending keypress */
+#define KEY_SLEEP (int)(timeout_scale*300)	/* After sending keypress */
 #define POWER_SLEEP (int)(timeout_scale*6000)	/* For box to power on */
 #define BLIND_SLEEP (int)(timeout_scale*1000)	/* Blind mode delay between 
 						   keypresses */
@@ -333,6 +333,14 @@ int main(int argc, char *argv[])
 				verb("Failed to set new channel\n");
 				switch(tries) {
 				case 1:
+				case 2:
+					/* Try increasing timeouts by 50%,
+					   which will also increase the
+					   delay between keypresses */
+					timeout_scale *= 1.5;
+					verb("Increased timeout_scale to %f\n",
+					     timeout_scale);
+					break;
 				case 3:
 					/* Try sending exit key a few
 					   times to make sure we're
@@ -341,14 +349,6 @@ int main(int argc, char *argv[])
 					for(i=0;i<4;i++)
 						if(send_keypress(KEY_EXIT)<0)
 							break;
-					break;
-				case 2:
-					/* Try increasing timeouts by 50%,
-					   which will also increase the
-					   delay between keypresses */
-					timeout_scale *= 1.5;
-					verb("Increased timeout_scale to %f\n",
-					     timeout_scale);
 					break;
 				case 4:
 					/* After 4 unsuccessful tries,

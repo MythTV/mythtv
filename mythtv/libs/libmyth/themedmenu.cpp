@@ -1465,6 +1465,7 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased,
     if (testBound.height() > buttonTextRect.height() && tbutton->altText != "")
         message = buttonList[button].altText;
 
+#ifndef QWS
     if (attributes.hasshadow && attributes.shadowalpha > 0)
     {
         QPixmap textpix(buttonTextRect.size());
@@ -1506,6 +1507,7 @@ void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased,
         myrect.moveTopLeft(QPoint(0, 0));
         bitBlt(&pix, buttonTextRect.topLeft(), &textpix, myrect, Qt::CopyROP);
     }
+#endif
 
     tmp.setFont(attributes.font);
     drawText(&tmp, buttonTextRect, attributes, message);

@@ -2515,6 +2515,40 @@ void MainServer::PrintStatus(QSocket *socket)
 
     os << "</TD></TR></TABLE>";    // end the machine information table
 
+    dblock.lock();
+
+    QString querytext;
+    int DaysOfData;
+    QDateTime GuideDataThrough;
+
+    querytext = QString("SELECT max(endtime) FROM program;");
+
+    QSqlQuery query = m_db->exec(querytext);
+
+    if (query.isActive() && query.numRowsAffected())
+    {
+        query.next();
+        GuideDataThrough = QDateTime::fromString(query.value(0).toString(),
+                                                 Qt::ISODate);
+    }
+    dblock.unlock();
+
+    os << "Guide data until "
+       << QDateTime(GuideDataThrough).toString("yyyy-MM-dd hh:mm")
+       << "\r\n";
+
+    DaysOfData = qdtNow.daysTo(GuideDataThrough);
+
+    os << "<p>There " << (DaysOfData == 1 ? "is " : "are ")
+       << DaysOfData
+       << " day" << (DaysOfData == 1 ? "" : "s" ) << " of guide data.\r\n";
+
+    if (DaysOfData <= 3)
+    {
+        os << "<p><strong>WARNING</strong>: is "
+           << "<tt>mythfilldatabase</tt> running?\r\n";
+    }
+
     os << "</BODY>\r\n"
        << "</HTTP>\r\n";
 }

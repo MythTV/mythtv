@@ -236,9 +236,11 @@ MythDialog::~MythDialog()
 
 void MythDialog::setNoErase(void)
 {
+#ifndef QWS
     WFlags flags = getWFlags();
     flags |= WRepaintNoErase;
     setWFlags(flags);
+#endif
 }
 
 void MythDialog::Show(void)

@@ -86,7 +86,8 @@ private:
     unsigned char prvpkt[3];
 
     bool gopset;
-    bool wait_for_keyframe;
+    bool wait_for_seqstart;
+    bool wait_for_seqstart_enabled;
 
     QMap<long long, long long> positionMap;
     long long prev_gop_save_pos;

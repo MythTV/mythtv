@@ -1075,25 +1075,6 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
 
                     VideoFrame *picframe = (VideoFrame *)(mpa_pic.opaque);
 
-                    if (mpa_pic.qscale_table != NULL && mpa_pic.qstride > 0)
-                    {
-                        //FIXME: Unhandled context->height != to->height
-                        int tblsize = mpa_pic.qstride * picframe->height;
-
-                        if (picframe->qstride != mpa_pic.qstride ||
-                            picframe->qscale_table == NULL)
-                        {
-                            picframe->qstride = mpa_pic.qstride;
-                            if (picframe->qscale_table)
-                                delete [] picframe->qscale_table;
-                            picframe->qscale_table = new unsigned char[tblsize];
-                        }
-
-                        //TODO: Optimized memcpy from libavcodec?
-                        memcpy(picframe->qscale_table, mpa_pic.qscale_table,
-                               tblsize);
-                    }
-
                     if (!directrendering)
                     {
                         AVPicture tmppicture;
@@ -1134,6 +1115,24 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     }
                     else
                         lastvpts += (int)(1000.0 / fps);
+
+                    if (mpa_pic.qscale_table != NULL && mpa_pic.qstride > 0 &&
+                        context->height == picframe->height)
+                    {
+                        int tblsize = mpa_pic.qstride * picframe->height;
+
+                        if (picframe->qstride != mpa_pic.qstride ||
+                            picframe->qscale_table == NULL)
+                        {
+                            picframe->qstride = mpa_pic.qstride;
+                            if (picframe->qscale_table)
+                                delete [] picframe->qscale_table;
+                            picframe->qscale_table = new unsigned char[tblsize];
+                        }
+
+                        memcpy(picframe->qscale_table, mpa_pic.qscale_table,
+                               tblsize);
+                    }
 
                     m_parent->ReleaseNextVideoFrame(picframe, lastvpts);
                     if (directrendering)

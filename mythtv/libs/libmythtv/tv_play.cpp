@@ -523,7 +523,8 @@ void TV::StartPlayerAndRecorder(bool startPlayer, bool startRecorder)
 
         frameRate = nvp->GetFrameRate();
         osd = nvp->GetOSD();
-        osd->SetUpOSDClosedHandler(this);
+        if (osd)
+            osd->SetUpOSDClosedHandler(this);
     }
 }
 

@@ -1,3 +1,6 @@
+1.65, 2003-11-08
+        Minor adjustments to key timings and retries
+
 1.6, 2003-10-31
 	Try 5 times instead of 4, and increase timeouts by 50% after
 	second failed attempt to change channel.
