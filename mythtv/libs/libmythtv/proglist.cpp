@@ -645,8 +645,8 @@ void ProgLister::fillViewList(const QString &view)
             {
                 QString chanid = query.value(0).toString();
                 QString channum = query.value(1).toString();
-                QString chansign = query.value(2).toString();
-                QString channame = query.value(3).toString();
+                QString chansign = QString::fromUtf8(query.value(2).toString());
+                QString channame = QString::fromUtf8(query.value(3).toString());
 
                 QString chantext = channelFormat;
                 chantext.replace("<num>", channum)

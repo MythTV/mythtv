@@ -476,8 +476,8 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
         proginfo->description = QString::fromUtf8(query.value(5).toString());
 
         proginfo->chanstr = query.value(6).toString();
-        proginfo->chansign = query.value(7).toString();
-        proginfo->channame = query.value(8).toString();
+        proginfo->chansign = QString::fromUtf8(query.value(7).toString());
+        proginfo->channame = QString::fromUtf8(query.value(8).toString());
         proginfo->chancommfree = query.value(9).toInt();
         proginfo->chanOutputFilters = query.value(10).toString();
         proginfo->seriesid = query.value(11).toString();
@@ -2284,8 +2284,8 @@ bool ProgramList::FromProgram(QSqlDatabase *db, const QString sql,
         p->description = QString::fromUtf8(query.value(5).toString());
         p->category = QString::fromUtf8(query.value(6).toString());
         p->chanstr = query.value(7).toString();
-        p->chansign = query.value(8).toString();
-        p->channame = query.value(9).toString();
+        p->chansign = QString::fromUtf8(query.value(8).toString());
+        p->channame = QString::fromUtf8(query.value(9).toString());
         p->repeat = query.value(10).toInt();
         p->chancommfree = query.value(11).toInt();
         p->chanOutputFilters = query.value(12).toString();

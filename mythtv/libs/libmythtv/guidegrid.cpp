@@ -556,12 +556,12 @@ void GuideGrid::fillChannelInfos(int &maxchannel, bool gotostartchannel)
             val.chanstr = query.value(0).toString();
             if (val.chanstr != "")
             {
-                val.callsign = query.value(1).toString();
+                val.callsign = QString::fromUtf8(query.value(1).toString());
                 val.iconpath = query.value(2).toString();
                 val.chanstr = query.value(0).toString();
                 val.chanid = query.value(3).toInt();
                 val.favid = query.value(4).toInt();
-                val.channame = query.value(5).toString();
+                val.channame = QString::fromUtf8(query.value(5).toString());
                 val.icon = NULL;
         
                 if (gotostartchannel && val.chanstr == m_startChanStr && !set)

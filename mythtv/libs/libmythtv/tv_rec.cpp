@@ -973,7 +973,7 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
         subtitle = QString::fromUtf8(query.value(3).toString());
         desc = QString::fromUtf8(query.value(4).toString());
         category = QString::fromUtf8(query.value(5).toString());
-        callsign = query.value(6).toString();
+        callsign = QString::fromUtf8(query.value(6).toString());
         iconpath = query.value(7).toString();
         chanid = query.value(8).toString();
         seriesid = query.value(9).toString();
@@ -1002,7 +1002,7 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
         {
             query.next();
 
-            callsign = query.value(0).toString();
+            callsign = QString::fromUtf8(query.value(0).toString());
             iconpath = query.value(1).toString();
             chanid = query.value(2).toString();
             outputFilters = query.value(3).toString();
