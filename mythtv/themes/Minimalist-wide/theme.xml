@@ -98,7 +98,7 @@
     <image>background.jpg</image>
     <buttonspread>yes</buttonspread>
     <balancerows>no</balancerows>
-    <buttonarea>20,215,1240,400</buttonarea>
+    <buttonarea>15,215,1250,400</buttonarea>
     <visiblerowlimit>6</visiblerowlimit>
     <columns>6</columns> 
   </background>
@@ -202,15 +202,15 @@
   </buttondef>
 
   <buttondef name="DVD_SETTINGS_PLAY">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/dvd_play.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/DVD_PLAY_off.png</image>
+    <activeimage>buttons/DVD_PLAY.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="DVD_SETTINGS_RIP">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/dvd_rip.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/DVD_RIP_off.png</image>
+    <activeimage>buttons/DVD_RIP.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
 <!-- ###############################-->
@@ -218,21 +218,21 @@
 <!-- ###############################-->
 
   <buttondef name="DVD_PLAY">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/dvd_play.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/DVD_PLAY_off.png</image>
+    <activeimage>buttons/DVD_PLAY.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="VCD_PLAY">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/vcd_play.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/VCD_PLAY_off.png</image>
+    <activeimage>buttons/VCD_PLAY.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="DVD_RIP">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/dvd_rip.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/DVD_RIP_off.png</image>
+    <activeimage>buttons/DVD_RIP.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
 <!-- #####################################-->
@@ -289,32 +289,31 @@
     <image>buttons/IMAGES_off.png</image>
     <activeimage>buttons/IMAGES.png</activeimage>
 <!--     <watermarkimage>watermark/gallery.png</watermarkimage> -->
-    <offset>50,-100</offset>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="GAME">
     <image>buttons/GAME_off.png</image>
     <activeimage>buttons/GAME.png</activeimage>
-<!--     <watermarkimage>watermark/game.png</watermarkimage> -->
-    <offset>40,-100</offset>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="WEATHER">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/weather.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/WEATHER_off.png</image>
+    <activeimage>buttons/WEATHER.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="NEWS">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/news.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/NEWS_off.png</image>
+    <activeimage>buttons/NEWS.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="WEBPAGE">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/web.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/WEBPAGE_off.png</image>
+    <activeimage>buttons/WEBPAGE.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="RECIPE">
@@ -324,9 +323,9 @@
   </buttondef>
 
   <buttondef name="SETUP">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/setup.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/MENU_UTILITIES_SETUP_off.png</image>
+    <activeimage>buttons/MENU_UTILITIES_SETUP.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="SHUTDOWN">
@@ -340,39 +339,39 @@
 <!-- #####################################-->
 
   <buttondef name="SETTINGS_GENERAL">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/setup.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/MENU_UTILITIES_SETUP_off.png</image>
+    <activeimage>buttons/MENU_UTILITIES_SETUP.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="SETTINGS_APPEARANCE">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/setup.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/SETTINGS_APPEARANCE_off.png</image>
+    <activeimage>buttons/SETTINGS_APPEARANCE.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="SETTINGS_TV">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/tv.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/TV_WATCH_TV_off.png</image>
+    <activeimage>buttons/TV_WATCH_TV.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="SETTINGS_MUSIC">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/music.png</watermarkimage> -->
-    <offset>50,-100</offset>
+    <image>buttons/MUSIC_PLAY_off.png</image>
+    <activeimage>buttons/MUSIC_PLAY.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="SETTINGS_VIDEO">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/video.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/VIDEO_MANAGER_off.png</image>
+    <activeimage>buttons/VIDEO_MANAGER.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="SETTINGS_DVD">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/dvd.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/DVD_PLAY_off.png</image>
+    <activeimage>buttons/DVD_PLAY.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="SETTINGS_FM">
@@ -382,33 +381,33 @@
   </buttondef>
 
   <buttondef name="SETTINGS_IMAGES">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/gallery.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/IMAGES_off.png</image>
+    <activeimage>buttons/IMAGES.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="SETTINGS_GAME">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/game.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/GAME_off.png</image>
+    <activeimage>buttons/GAME.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="SETTINGS_WEATHER">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/weather.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/WEATHER_off.png</image>
+    <activeimage>buttons/WEATHER.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="SETTINGS_NEWS">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/news.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/NEWS_off.png</image>
+    <activeimage>buttons/NEWS.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="SETTINGS_WEBPAGE">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/web.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/WEBPAGE_off.png</image>
+    <activeimage>buttons/WEBPAGE.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="SETTINGS_RECIPE">
@@ -440,21 +439,21 @@
 <!-- ######################################-->
 
   <buttondef name="MUSIC_SETTINGS_GENERAL">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/music.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/MUSIC_PLAY_off.png</image>
+    <activeimage>buttons/MUSIC_PLAY.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="MUSIC_SETTINGS_PLAYER">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/music_playlist.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/MUSIC_PLAYLIST_off.png</image>
+    <activeimage>buttons/MUSIC_PLAYLIST.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="MUSIC_SETTINGS_RIP">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/music_rip.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/MUSIC_RIP_off.png</image>
+    <activeimage>buttons/MUSIC_RIP.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
 <!-- #################################-->
@@ -464,26 +463,25 @@
   <buttondef name="MUSIC_PLAY">
     <image>buttons/MUSIC_PLAY_off.png</image>
     <activeimage>buttons/MUSIC_PLAY.png</activeimage>
-<!--     <watermarkimage>watermark/music.png</watermarkimage> -->
-    <offset>50,-100</offset>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="MUSIC_PLAYLIST">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/music_playlist.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/MUSIC_PLAYLIST_off.png</image>
+    <activeimage>buttons/MUSIC_PLAYLIST.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="MUSIC_RIP">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/music_rip.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/MUSIC_RIP_off.png</image>
+    <activeimage>buttons/MUSIC_RIP.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="MUSIC_SCAN">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/music_scan.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/MUSIC_SCAN_off.png</image>
+    <activeimage>buttons/MUSIC_SCAN.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
 <!-- ##############################################-->
@@ -507,9 +505,9 @@
 <!-- #############################-->
 
   <buttondef name="SETUP_GENERAL">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/setup.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/MENU_UTILITIES_SETUP_off.png</image>
+    <activeimage>buttons/MENU_UTILITIES_SETUP.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="SETUP_CAPTURE_CARDS">
@@ -541,40 +539,50 @@
 <!-- ###################################-->
 
   <buttondef name="TV_PROGRAM_GUIDE">
-    <image>text-blank.png</image>
+    <image>buttons/TV_PROGRAM_GUIDE_off.png</image>
+    <activeimage>buttons/TV_PROGRAM_GUIDE.png</activeimage>
 <!--     <watermarkimage>watermark/tv_programguide.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="TV_PROGFIND">
-    <image>text-blank.png</image>
+    <image>buttons/TV_PROGFIND_off.png</image>
+    <activeimage>buttons/TV_PROGFIND.png</activeimage>
 <!--     <watermarkimage>watermark/tv_progfind.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="TV_SEARCH_WORDS">
-    <image>text-blank.png</image>
+    <image>buttons/TV_SEARCH_WORDS_off.png</image>
+    <activeimage>buttons/TV_SEARCH_WORDS.png</activeimage>
 <!--     <watermarkimage>watermark/search_words.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="TV_SEARCH_LISTS">
-    <image>text-blank.png</image>
+    <image>buttons/TV_SEARCH_LISTS_off.png</image>
+    <activeimage>buttons/TV_SEARCH_LISTS.png</activeimage>
 <!--     <watermarkimage>watermark/search_lists.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <offset>25,-100</offset>
   </buttondef>
-
+  
+  <buttondef name="TV_CUSTOM_RECORD">
+    <image>buttons/TV_CUSTOM_RECORD_off.png</image>
+    <activeimage>buttons/TV_CUSTOM_RECORD.png</activeimage>
+    <offset>25,-100</offset>
+  </buttondef>
+  
   <buttondef name="TV_MANUAL_SCHEDULE">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/tv_schedule.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/TV_MANUAL_SCHEDULE_off.png</image>
+    <activeimage>buttons/TV_MANUAL_SCHEDULE.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="TV_RECPRIORITIES">
     <image>buttons/TV_RECPRIORITIES_off.png</image>
     <activeimage>buttons/TV_RECPRIORITIES.png</activeimage>
 <!--     <watermarkimage>watermark/tv_recpriorities.png</watermarkimage> -->
-    <offset>50,-100</offset>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="TV_CONFLICTS">
@@ -588,27 +596,27 @@
 <!-- #################################-->
 
   <buttondef name="TV_SEARCH_TITLES">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/search_titles.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/TV_SEARCH_TITLES_off.png</image>
+    <activeimage>buttons/TV_SEARCH_TITLES.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="TV_SEARCH_KEYWORDS">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/search_keywords.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/TV_SEARCH_WORDS_off.png</image>
+    <activeimage>buttons/TV_SEARCH_WORDS.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="TV_SEARCH_PEOPLE">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/search_people.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/TV_SEARCH_PEOPLE_off.png</image>
+    <activeimage>buttons/TV_SEARCH_PEOPLE.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="TV_SEARCH_POWER">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/search_power.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/TV_SEARCH_POWER_off.png</image>
+    <activeimage>buttons/TV_SEARCH_POWER.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
 <!-- ################################-->
@@ -616,45 +624,46 @@
 <!-- ################################-->
 
   <buttondef name="TV_SEARCH_NEW_TITLES">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/search_new_titles.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/TV_SEARCH_NEW_TITLES_off.png</image>
+    <activeimage>buttons/TV_SEARCH_NEW_TITLES.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="TV_SEARCH_MOVIES">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/search_movies.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/TV_SEARCH_MOVIES_off.png</image>
+    <activeimage>buttons/TV_SEARCH_MOVIES.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="TV_SEARCH_CATEGORIES">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/search_categories.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/TV_SEARCH_CATEGORIES_off.png</image>
+    <activeimage>buttons/TV_SEARCH_CATEGORIES.png</activeimage>
+    <offset>25,-100</offset>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="TV_SEARCH_CHANNELS">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/search_channels.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/TV_SEARCH_CHANNELS_off.png</image>
+    <activeimage>buttons/TV_SEARCH_CHANNELS.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="TV_SEARCH_TIMES">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/search_time.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/TV_SEARCH_TIME_off.png</image>
+    <activeimage>buttons/TV_SEARCH_TIME.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
     <buttondef name="TV_SEARCH_DESCRIPTIONS">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/search_keywords.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/TV_SEARCH_TITLES_off.png</image>
+    <activeimage>buttons/TV_SEARCH_TITLES.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
   
     <buttondef name="TV_SEARCH_LISTINGS">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/tv_searchlistings.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/TV_SEARCH_LISTINGS_off.png</image>
+    <activeimage>buttons/TV_SEARCH_LISTINGS.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
   
   
@@ -663,9 +672,9 @@
 <!-- ###################################-->
 
   <buttondef name="TV_SETTINGS_GENERAL">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/tv.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/MENU_UTILITIES_SETUP_off.png</image>
+    <activeimage>buttons/MENU_UTILITIES_SETUP.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="TV_SETTINGS_PROGRAM_GUIDE">
@@ -675,9 +684,9 @@
   </buttondef>
 
   <buttondef name="TV_SETTINGS_PLAYBACK">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/tv_playback.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/TV_WATCH_TV_off.png</image>
+    <activeimage>buttons/TV_WATCH_TV.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="TV_SETTINGS_RECORDING_PROFILES">
@@ -699,42 +708,40 @@
   <buttondef name="TV_WATCH_TV">
     <image>buttons/TV_WATCH_TV_off.png</image>
     <activeimage>buttons/TV_WATCH_TV.png</activeimage>
-<!--     <watermarkimage>watermark/tv.png</watermarkimage> -->
-    <offset>50,-100</offset>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="TV_SCHEDULE_RECORDINGS">
     <image>buttons/TV_SCHEDULE_RECORDINGS_off.png</image>
     <activeimage>buttons/TV_SCHEDULE_RECORDINGS.png</activeimage>
 <!--     <watermarkimage>watermark/tv_schedule.png</watermarkimage> -->
-    <offset>50,-100</offset>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="TV_WATCH_RECORDINGS">
     <image>buttons/TV_WATCH_RECORDINGS_off.png</image>
     <activeimage>buttons/TV_WATCH_RECORDINGS.png</activeimage>
 <!--     <watermarkimage>watermark/tv_playback.png</watermarkimage> -->
-    <offset>50,-100</offset>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="TV_DELETE">
     <image>buttons/TV_DELETE_off.png</image>
     <activeimage>buttons/TV_DELETE.png</activeimage>
 <!--     <watermarkimage>watermark/tv_delete.png</watermarkimage> -->
-    <offset>50,-100</offset>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="TV_PREVIOUS">
     <image>buttons/TV_PREVIOUS_off.png</image>
     <activeimage>buttons/TV_PREVIOUS.png</activeimage>
-<!--     <watermarkimage>watermark/tv_previous.png</watermarkimage> -->
-    <offset>50,-100</offset>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="TV_STATUS">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/tv_status.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/TV_STATUS_off.png</image>
+    <activeimage>buttons/TV_STATUS.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
 <!-- ######################################-->
@@ -767,7 +774,7 @@
     <image>buttons/VIDEO_BROWSER_off.png</image>
     <activeimage>buttons/VIDEO_BROWSER.png</activeimage>
 <!--     <watermarkimage>watermark/video_browser.png</watermarkimage> -->
-    <offset>50,-100</offset>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="VIDEO_LIST">
@@ -777,9 +784,9 @@
   </buttondef>
 
   <buttondef name="VIDEO_MANAGER">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/video_manager.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/VIDEO_MANAGER_off.png</image>
+    <activeimage>buttons/VIDEO_MANAGER.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
 <!-- ###########################################-->
@@ -789,55 +796,50 @@
   <buttondef name="TV_UPCOMING_RECORDINGS">
     <image>buttons/TV_UPCOMING_RECORDINGS_off.png</image>
     <activeimage>buttons/TV_UPCOMING_RECORDINGS.png</activeimage>
-<!--     <watermarkimage>watermark/tv_progfind.png</watermarkimage> -->
-    <offset>50,-100</offset>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="SETTINGS_MEDIA">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/video_browser.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/MENU_MEDIA_LIBRARY_off.png</image>
+    <activeimage>buttons/MENU_MEDIA_LIBRARY.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="SETTINGS_INFO_CENTER">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/info_center.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/MENU_INFO_CENTER_off.png</image>
+    <activeimage>buttons/MENU_INFO_CENTER.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="MENU_MEDIA_LIBRARY">
     <image>buttons/MENU_MEDIA_LIBRARY_off.png</image>
     <activeimage>buttons/MENU_MEDIA_LIBRARY.png</activeimage>
-<!--     <watermarkimage>watermark/video_browser.png</watermarkimage> -->
-    <offset>50,-100</offset>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="MENU_MANAGE_RECORDINGS">
     <image>buttons/MENU_MANAGE_RECORDINGS_off.png</image>
     <activeimage>buttons/MENU_MANAGE_RECORDINGS.png</activeimage>
 <!--     <watermarkimage>watermark/video_manager.png</watermarkimage> -->
-    <offset>50,-100</offset>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="MENU_INFO_CENTER">
     <image>buttons/MENU_INFO_CENTER_off.png</image>
     <activeimage>buttons/MENU_INFO_CENTER.png</activeimage>
-<!--     <watermarkimage>watermark/info_center.png</watermarkimage> -->
-    <offset>50,-100</offset>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="MENU_OPTICAL_DISKS">
     <image>buttons/MENU_OPTICAL_DISKS_off.png</image>
     <activeimage>buttons/MENU_OPTICAL_DISKS.png</activeimage>
-<!--     <watermarkimage>watermark/dvd.png</watermarkimage> -->
-    <offset>50,-100</offset>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="MENU_UTILITIES_SETUP">
     <image>buttons/MENU_UTILITIES_SETUP_off.png</image>
     <activeimage>buttons/MENU_UTILITIES_SETUP.png</activeimage>
-<!--     <watermarkimage>watermark/setup.png</watermarkimage> -->
-    <offset>50,-100</offset>
+    <offset>25,-100</offset>
   </buttondef>
 
   <buttondef name="SETUP_FRONTEND">
@@ -853,9 +855,9 @@
   </buttondef>
 
   <buttondef name="SETUP_MENU">
-    <image>text-blank.png</image>
-<!--     <watermarkimage>watermark/setup.png</watermarkimage> -->
-    <offset>0,0</offset>
+    <image>buttons/MENU_UTILITIES_SETUP_off.png</image>
+    <activeimage>buttons/MENU_UTILITIES_SETUP.png</activeimage>
+    <offset>25,-100</offset>
   </buttondef>
 
 </myththeme>
