@@ -337,7 +337,7 @@ merge_text(unsigned char *yuv, TT_Raster_Map * rmap, int offset_x, int offset_y,
 }
 
 void
-EFont_draw_string(unsigned char *yuvptr, int x, int y, const string &text,
+EFont_draw_string(unsigned char *yuvptr, int x, int y, const QString &text,
 		  Efont * font, int maxx, int maxy, bool white, 
                   bool rightjustify)
 {
@@ -348,7 +348,7 @@ EFont_draw_string(unsigned char *yuvptr, int x, int y, const string &text,
    int video_width = font->vid_width;
    int video_height = font->vid_height;
 
-   char *ctext = (char *)text.c_str();
+   char *ctext = (char *)text.ascii();
    
    inx = 0;
    iny = 0;
@@ -594,7 +594,7 @@ Efont_load(char *file, int size, int video_width, int video_height)
 }
 
 void
-Efont_extents(Efont * f, const string &text, int *font_ascent_return,
+Efont_extents(Efont * f, const QString &text, int *font_ascent_return,
 	      int *font_descent_return, int *width_return,
 	      int *max_ascent_return, int *max_descent_return,
 	      int *lbearing_return, int *rbearing_return)
@@ -602,7 +602,7 @@ Efont_extents(Efont * f, const string &text, int *font_ascent_return,
    int                 i, ascent, descent, pw;
    TT_Glyph_Metrics    gmetrics;
 
-   char *ctext = (char *)text.c_str();
+   char *ctext = (char *)text.ascii();
    
    if (!f)
       return;

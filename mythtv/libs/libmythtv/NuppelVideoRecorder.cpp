@@ -9,6 +9,9 @@
 #include <sys/mman.h>
 #include <errno.h>
 
+#include <iostream>
+using namespace std;
+
 #include "NuppelVideoRecorder.h"
 
 #define KEYFRAMEDISTEND   30
@@ -121,7 +124,7 @@ void NuppelVideoRecorder::Initialize(void)
 
     if (AudioInit() != 0)
     {
-        fprintf(stderr, "Could not detect audio blocksize\n");
+        cerr << "Could not detect audio blocksize\n";
     }
 
     if (audio_buffer_size != 0)
@@ -152,10 +155,9 @@ int NuppelVideoRecorder::AudioInit(void)
     int afmt, afd;
     int frag, channels, rate, blocksize = 4096;
 
-    if (-1 == (afd = open(audiodevice.c_str(), O_RDONLY)))
+    if (-1 == (afd = open(audiodevice.ascii(), O_RDONLY)))
     {
-        fprintf(stderr, "\n%s\n", "Cannot open DSP, audio record thread "
-                                  "exiting");
+        cerr << "Cannot open DSP '" << audiodevice << "', dying.\n";
         return(1);
     }
   
@@ -168,7 +170,7 @@ int NuppelVideoRecorder::AudioInit(void)
     ioctl(afd, SNDCTL_DSP_SETFMT, &afmt);
     if (afmt != AFMT_S16_LE) 
     {
-        fprintf(stderr, "\n%s\n", "Can't get 16 bit DSP, exiting");
+        cerr << "Can't get 16 bit DSP, exiting\n";
         return(1);
     }
 
@@ -179,19 +181,19 @@ int NuppelVideoRecorder::AudioInit(void)
     rate = audio_samplerate;
     if (ioctl(afd, SNDCTL_DSP_SPEED, &rate) < 0)
     {
-        fprintf(stderr, "setting sample rate failed\n");
+        cerr << "setting sample rate failed, exiting\n";
         return 1;
     }
 
     if (rate != audio_samplerate)
     {
-        fprintf(stderr, "setting sample rate failed\n");
+        cerr << "setting sample rate to " << audio_samplerate << " failed\n";
         return 1;
     }
 
     if (-1 == ioctl(afd, SNDCTL_DSP_GETBLKSIZE, &blocksize)) 
     {
-        fprintf(stderr, "\n%s\n", "Can't get DSP blocksize, exiting");
+        cerr << "Can't get DSP blocksize, exiting\n";
         return(1);
     }
     blocksize *= 4;
@@ -232,7 +234,7 @@ void NuppelVideoRecorder::StartRecording(void)
 {
     if (lzo_init() != LZO_E_OK)
     {
-        fprintf(stderr, "lzo_init() failed\n");
+        cerr << "lzo_init() failed, exiting\n";
         return;
     }
 
@@ -240,7 +242,8 @@ void NuppelVideoRecorder::StartRecording(void)
 
     if (CreateNuppelFile() != 0)
     {
-        fprintf(stderr, "Cannot open %s for writing\n", sfilename.c_str());
+        cerr << "Cannot open '" << ringBuffer->GetFilename() << "' for "
+             << "writing, exiting\n";
         return;
     }
 
@@ -265,9 +268,10 @@ void NuppelVideoRecorder::StartRecording(void)
     if (getuid() == 0)
         nice(-10);
 
-    fd = open(videodevice.c_str(), O_RDWR);
+    fd = open(videodevice.ascii(), O_RDWR);
     if (fd <= 0)
     {
+        cerr << "Can't open video device: " << videodevice << endl;
         perror("open video:");
         KillChildren();
         return;
@@ -576,7 +580,7 @@ int NuppelVideoRecorder::SpawnChildren(void)
 
     if (result)
     {
-        fprintf(stderr, "Couldn't spawn writer thread\n");
+        cerr << "Couldn't spawn writer thread, exiting\n";
 	return -1;
     }
 
@@ -585,7 +589,7 @@ int NuppelVideoRecorder::SpawnChildren(void)
 
     if (result)
     {
-        fprintf(stderr, "Couldn't spawn audio thread\n");
+        cerr << "Couldn't spawn audio thread, exiting\n";
 	return -1;
     }
 
@@ -805,9 +809,9 @@ void NuppelVideoRecorder::doAudioThread(void)
 
     act_audio_sample = 0;
 
-    if (-1 == (afd = open(audiodevice.c_str(), O_RDONLY))) 
+    if (-1 == (afd = open(audiodevice.ascii(), O_RDONLY))) 
     {
-        fprintf(stderr, "\n%s\n", "Cannot open DSP, exiting");
+        cerr << "Cannot open DSP '" << audiodevice << "', exiting";
         return;
     }
 
@@ -820,7 +824,7 @@ void NuppelVideoRecorder::doAudioThread(void)
     ioctl(afd, SNDCTL_DSP_SETFMT, &afmt);
     if (afmt != AFMT_S16_LE) 
     {
-        fprintf(stderr, "\n%s\n", "Can't get 16 bit DSP, exiting");
+        cerr << "Can't get 16 bit DSP, exiting";
         close(afd);
         return;
     }
@@ -834,7 +838,7 @@ void NuppelVideoRecorder::doAudioThread(void)
 
     if (-1 == ioctl(afd, SNDCTL_DSP_GETBLKSIZE,  &blocksize)) 
     {
-        fprintf(stderr, "\n%s\n", "Can't get DSP blocksize, exiting");
+        cerr << "Can't get DSP blocksize, exiting";
         close(afd);
         return;
     }
@@ -843,9 +847,8 @@ void NuppelVideoRecorder::doAudioThread(void)
 
     if (blocksize != audio_buffer_size) 
     {
-        fprintf(stderr, "\nwarning: audio blocksize = '%d'"
-                        "audio_buffer_size='%ld'\n",
-                        blocksize, audio_buffer_size);
+        cerr << "warning: audio blocksize = '" << blocksize << "'"
+             << " audio_buffer_size='" << audio_buffer_size << "'\n";
     }
 
     buffer = new unsigned char[audio_buffer_size];
@@ -876,8 +879,8 @@ void NuppelVideoRecorder::doAudioThread(void)
         if (audio_buffer_size != (lastread = read(afd, buffer,
                                                   audio_buffer_size))) 
         {
-            fprintf(stderr, "only read %d from %ld bytes from '%s'\n", 
-                    lastread, audio_buffer_size, audiodevice.c_str());
+            cerr << "only read " << lastread << " from " << audio_buffer_size
+                 << " bytes from '" << audiodevice << "'\n";
             perror("read audio");
         }
 
@@ -885,7 +888,7 @@ void NuppelVideoRecorder::doAudioThread(void)
 
         if (!audiobuffer[act]->freeToBuffer) 
         {
-            fprintf(stderr, "ran out of free AUDIO buffers :-(\n");
+            cerr << "ran out of free AUDIO buffers :-(\n";
             act_audio_sample++;
             continue;
         }
@@ -1066,7 +1069,7 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
                                  (lzo_uint *)&out_len, wrkmem);
         if (r != LZO_E_OK) 
         {
-            fprintf(stderr,"%s\n","lzo compression failed");
+            cerr << "lzo compression failed\n";
             return;
         }
     }
@@ -1224,16 +1227,17 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
                                                  mp3buf_size);
         if (lameret < 0)
         {
-            printf("lame error '%d'\n", lameret);
+            cerr << "lame error, exiting\n";
             exit(-1); 
         }
         compressedsize = lameret;
 
         lameret = lame_encode_flush_nogap(gf, (unsigned char *)mp3gapless, 
                                           7200);
+
         if (lameret < 0)
         {
-            printf("lame error '%d'\n", lameret);
+            cerr << "lame error, exiting\n";
             exit(-1);
         }
         gaplesssize = lameret;
@@ -1259,7 +1263,7 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
     // 'uncountable' video frame drop -> material==worthless
     if (audio_behind > 0) 
     {
-        fprintf(stderr, "audio behind!!!!!\n\n\n");
+        cerr << "audio behind!!!!!\n";
         frameheader.frametype = 'A'; // audio frame
         frameheader.comptype  = 'N'; // output a nullframe with
         frameheader.packetlength = 0;

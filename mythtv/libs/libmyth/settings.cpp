@@ -13,23 +13,26 @@
 #include <fstream.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <string>
+#include <qstring.h>
 #include <stdlib.h>
 #include <time.h>
 #include <sys/time.h>
 
-Settings::Settings(string strSettingsFile)
+#include <string>
+using namespace std;
+
+Settings::Settings(QString strSettingsFile)
 {
-	if (strSettingsFile.empty())
+	if (strSettingsFile.length() == 0)
 	{
 		strSettingsFile = "settings.txt";
 	}
-	m_pStringSettings = new map<string, string>;
-	m_pIntSettings = new map<string, int>;
-	m_pFloatSettings = new map<string, float>;
-	m_pVoidSettings = new map<string, void*>;
+	m_pStringSettings = new map<QString, QString>;
+	m_pIntSettings = new map<QString, int>;
+	m_pFloatSettings = new map<QString, float>;
+	m_pVoidSettings = new map<QString, void*>;
 	
-	this->ReadSettings(strSettingsFile.c_str());	// load configuration values from settings.txt in this dir	
+	this->ReadSettings(strSettingsFile);	// load configuration values from settings.txt in this dir	
 }
 
 Settings::~Settings()
@@ -57,9 +60,9 @@ Settings::~Settings()
 		
 // Setting retrieval functions
 /** Generic Setting Retrieval functions */
-string Settings::GetSetting(string strSetting)
+QString Settings::GetSetting(QString strSetting)
 {
-	map<string, string>::iterator i;
+	map<QString, QString>::iterator i;
 	if ((!m_pStringSettings->empty()) && ((i = m_pStringSettings->find(strSetting)) != m_pStringSettings->end()))
 	{
 		return (*i).second;
@@ -68,9 +71,9 @@ string Settings::GetSetting(string strSetting)
 }
 
 /** Generic Setting Retrieval function for numeric values */
-int Settings::GetNumSetting(string strSetting)
+int Settings::GetNumSetting(QString strSetting)
 {
-	map<string, int>::iterator i;
+	map<QString, int>::iterator i;
 	if ((!m_pIntSettings->empty()) && ((i = m_pIntSettings->find(strSetting)) != m_pIntSettings->end()))
 	{
 		return (*i).second;
@@ -79,9 +82,9 @@ int Settings::GetNumSetting(string strSetting)
 }
 
 /** Generic Setting Retrieval function for float values */
-float Settings::GetFloatSetting(string strSetting)
+float Settings::GetFloatSetting(QString strSetting)
 {
-	map<string, float>::iterator i;
+	map<QString, float>::iterator i;
 	if ((!m_pFloatSettings->empty()) && ((i = m_pFloatSettings->find(strSetting)) != m_pFloatSettings->end()))
 	{
 		return (*i).second;
@@ -90,9 +93,9 @@ float Settings::GetFloatSetting(string strSetting)
 }
 
 /** Generic Setting Retrieval functions for pointers */
-void* Settings::GetPointer(string strSetting)
+void* Settings::GetPointer(QString strSetting)
 {
-	map<string, void*>::iterator i;
+	map<QString, void*>::iterator i;
 	if ((!m_pVoidSettings->empty()) && ((i = m_pVoidSettings->find(strSetting)) != m_pVoidSettings->end()))
 	{
 		return (*i).second;
@@ -102,38 +105,38 @@ void* Settings::GetPointer(string strSetting)
 
 // Setting Setting functions
 /** Generic Setting Setting function */
-void Settings::SetSetting(string strSetting, string strNewVal)
+void Settings::SetSetting(QString strSetting, QString strNewVal)
 {
 	(*m_pStringSettings)[strSetting] = strNewVal;
 }
 
 /** Generic Setting Setting function for int values */
-void Settings::SetSetting(string strSetting, int nNewVal)
+void Settings::SetSetting(QString strSetting, int nNewVal)
 {
 	(*m_pIntSettings)[strSetting] = nNewVal;
 }
 
 /** Generic Setting Setting function for float values */
-void Settings::SetSetting(string strSetting, float fNewVal)
+void Settings::SetSetting(QString strSetting, float fNewVal)
 {
 	(*m_pFloatSettings)[strSetting] = fNewVal;
 }
 
 /** Generic Setting Setting function for pointer values */
-void Settings::SetSetting(string strSetting, void* pNewVal)
+void Settings::SetSetting(QString strSetting, void* pNewVal)
 {
 	(*m_pVoidSettings)[strSetting] = pNewVal;
 }
 
-int Settings::ReadSettings(const char* pszFile)
+int Settings::ReadSettings(QString pszFile)
 {
-	fstream fin(pszFile, ios::in);
+	fstream fin(pszFile.ascii(), ios::in);
 	if (!fin.is_open()) return -1;
 	
 	string strLine;
-	string strKey;
-	string strVal;
-	string strType;
+	QString strKey;
+	QString strVal;
+	QString strType;
 	int nSplitPoint = 0;
 	while(!fin.eof())
 	{
@@ -143,16 +146,16 @@ int Settings::ReadSettings(const char* pszFile)
 			nSplitPoint = strLine.find('=');
 			if (nSplitPoint != -1)
 			{
-				strType = strLine.substr(0, 3);
-				strKey = strLine.substr(4, nSplitPoint  - 4);
-				strVal = strLine.substr(nSplitPoint + 1, strLine.size());
+				strType = strLine.substr(0, 3).c_str();
+				strKey = strLine.substr(4, nSplitPoint  - 4).c_str();
+				strVal = strLine.substr(nSplitPoint + 1, strLine.size()).c_str();
 				if (strType == "flt")
 				{
-					(*m_pFloatSettings)[strKey] = atof(strVal.c_str());
+					(*m_pFloatSettings)[strKey] = atof(strVal.ascii());
 				}
 				else if (strType == "int")
 				{
-					(*m_pIntSettings)[strKey] = atoi(strVal.c_str());
+					(*m_pIntSettings)[strKey] = atoi(strVal.ascii());
 				}
 				else if (strType == "str")
 				{
@@ -161,26 +164,5 @@ int Settings::ReadSettings(const char* pszFile)
 			}		
 		}
 	} // wend
-/*
-	// debug code
-	map<string, string>::iterator i;
-	map<string, int>::iterator j;
-	map<string, float>::iterator k;
-	// displaying read in settings
-	for (i = m_pStringSettings->begin(); i != m_pStringSettings->end(); i++)
-	{
-		cout << (*i).first << " : " << (*i).second << endl;
-	}
-	
-	for (j = m_pIntSettings->begin(); j != m_pIntSettings->end(); j++)
-	{
-		cout << (*j).first << " : " << (*j).second << endl;
-	}
-	
-	for (k = m_pFloatSettings->begin(); k != m_pFloatSettings->end(); k++)
-	{
-		cout << (*k).first << " : " << (*k).second << endl;
-	}
-	*/
 	return 0;
 }

@@ -1,3 +1,4 @@
+#include <qstring.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -5,7 +6,7 @@
 #include "ttfont.h"
 #include "osd.h"
 
-OSD::OSD(int width, int height, const string &filename, const string &prefix)
+OSD::OSD(int width, int height, const QString &filename, const QString &prefix)
 {
     vid_width = width;
     vid_height = height;
@@ -53,18 +54,18 @@ OSD::OSD(int width, int height, const string &filename, const string &prefix)
   
     enableosd = false;
  
-    string fullname = prefix + string("/share/mythtv/") + fontname;
+    QString fullname = prefix + "/share/mythtv/" + fontname;
 
-    info_font = Efont_load((char *)fullname.c_str(), infofontsize, vid_width,
+    info_font = Efont_load((char *)fullname.ascii(), infofontsize, vid_width,
                            vid_height);
     if (!info_font)
     {
         fullname = fontname;
-        info_font = Efont_load((char *)fullname.c_str(), infofontsize,
+        info_font = Efont_load((char *)fullname.ascii(), infofontsize,
                                vid_width, vid_height);
     }
 
-    channum_font = Efont_load((char *)fullname.c_str(), channumfontsize,
+    channum_font = Efont_load((char *)fullname.ascii(), channumfontsize,
                               vid_width, vid_height);
 
     if (!info_font || !channum_font)
@@ -91,9 +92,9 @@ OSD::~OSD(void)
         Efont_free(channum_font);
 }
 
-void OSD::SetInfoText(const string &text, const string &subtitle,
-                      const string &desc, const string &category,
-                      const string &start, const string &end, int length)
+void OSD::SetInfoText(const QString &text, const QString &subtitle,
+                      const QString &desc, const QString &category,
+                      const QString &start, const QString &end, int length)
 {
     displayframes = time(NULL) + length;
     show_info = true;
@@ -102,12 +103,12 @@ void OSD::SetInfoText(const string &text, const string &subtitle,
     subtitletext = subtitle;
     desctext = desc;
 
-    string dummy = category;
+    QString dummy = category;
     dummy = start;
     dummy = end;
 }
 
-void OSD::SetChannumText(const string &text, int length)
+void OSD::SetChannumText(const QString &text, int length)
 {
     displayframes = time(NULL) + length;
     show_channum = true;
@@ -127,8 +128,8 @@ void OSD::DialogDown(void)
         currentdialogoption++;
 }
 
-void OSD::SetDialogBox(const string &message, const string &optionone,
-                       const string &optiontwo, const string &optionthree,
+void OSD::SetDialogBox(const QString &message, const QString &optionone,
+                       const QString &optiontwo, const QString &optionthree,
                        int length)
 {
     currentdialogoption = 1;
@@ -244,7 +245,7 @@ void OSD::Display(unsigned char *yuvptr)
 }
 
 void OSD::DrawStringIntoBox(int xstart, int ystart, int xend, int yend,
-                            const string &text, unsigned char *screen)
+                            const QString &text, unsigned char *screen)
 {
     int textlength = 0;
     Efont_extents(info_font, text, NULL, NULL, &textlength, NULL, NULL, NULL,
@@ -253,7 +254,7 @@ void OSD::DrawStringIntoBox(int xstart, int ystart, int xend, int yend,
     int maxlength = (xend - 5) - (xstart + 5);
     if (textlength > maxlength)
     {
-        char *orig = strdup((char *)text.c_str());
+        char *orig = strdup((char *)text.ascii());
         int length = 0;
         int lines = 0;
         char line[512];

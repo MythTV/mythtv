@@ -1,7 +1,7 @@
 #ifndef NUPPELVIDEORECORDER
 #define NUPPELVIDEORECORDER
 
-#include <string>
+#include <qstring.h>
 #include <vector>
 #include <sys/time.h>
 #include <time.h>
@@ -38,9 +38,9 @@ class NuppelVideoRecorder
     void SetResolution(int width, int height) { w = width; h = height; }
     void SetAudioSampleRate(int rate) { audio_samplerate = rate; }   
  
-    void SetFilename(char *filename) { sfilename = filename; }
-    void SetAudioDevice(char *device) { audiodevice = device; }
-    void SetVideoDevice(char *device) { videodevice = device; }
+    void SetFilename(QString filename) { sfilename = filename; }
+    void SetAudioDevice(QString device) { audiodevice = device; }
+    void SetVideoDevice(QString device) { videodevice = device; }
    
     void Initialize(void);
     void StartRecording(void);
@@ -87,7 +87,7 @@ class NuppelVideoRecorder
     void WriteVideo(unsigned char *buf, int fnum, int timecode);
     void WriteAudio(unsigned char *buf, int fnum, int timecode);
 
-    string sfilename;
+    QString sfilename;
     bool encoding;
     
     int fd; // v4l input file handle
@@ -123,8 +123,8 @@ class NuppelVideoRecorder
     long __LZO_MMODEL var [ ((size) + (sizeof(long) - 1)) / sizeof(long) ]    
     HEAP_ALLOC(wrkmem, LZO1X_1_MEM_COMPRESS);
 
-    string audiodevice;
-    string videodevice;
+    QString audiodevice;
+    QString videodevice;
  
     vector<struct vidbuffertype *> videobuffer;
     vector<struct audbuffertype *> audiobuffer;

@@ -157,80 +157,47 @@ unsigned char *XJ_init(int width, int height, char *window_name,
     printf("XvQueryAdaptors failed.\n");
   }
 
-  for (i = 0; i < p_num_adaptors; i++) {
-    /*printf(" name:        %s\n"
-           " type:        %s%s%s%s%s\n"
-           " ports:       %ld\n"
-           " first port:  %ld\n",
-           ai[i].name,
-           (ai[i].type & XvInputMask)   ? "input | "    : "",
-           (ai[i].type & XvOutputMask)  ? "output | "   : "",
-           (ai[i].type & XvVideoMask)   ? "video | "    : "",
-           (ai[i].type & XvStillMask)   ? "still | "    : "",
-           (ai[i].type & XvImageMask)   ? "image | "    : "",
-           ai[i].num_ports,
-           ai[i].base_id);*/
-    xv_port = ai[i].base_id;
-
-    /*
-    printf("adaptor %d ; format list:\n", i);
-    for (j = 0; j < ai[i].num_formats; j++) {
-      printf(" depth=%d, visual=%ld\n",
-             ai[i].formats[j].depth,
-             ai[i].formats[j].visual_id);
+  xv_port = -1;
+  for (i = 0; i < p_num_adaptors; i++) 
+  {
+    if ((ai[i].type & XvInputMask) &&
+        (ai[i].type & XvImageMask))
+    {
+        xv_port = ai[i].base_id;
+        break;
     }
-    for (p = ai[i].base_id; p < ai[i].base_id+ai[i].num_ports; p++) {
-
-      printf(" encoding list for port %d\n", p);
-      if (XvQueryEncodings(XJ_disp, p, &encodings, &ei) != Success) {
-        printf("XvQueryEncodings failed.\n");
-        continue;
-      }
-      for (j = 0; j < encodings; j++) {
-        printf("  id=%ld, name=%s, size=%ldx%ld, numerator=%d, denominator=%d\n"
-,
-               ei[j].encoding_id, ei[j].name, ei[j].width, ei[j].height,
-               ei[j].rate.numerator, ei[j].rate.denominator);
-      }
-      XvFreeEncodingInfo(ei);
-
-      printf(" attribute list for port %d\n", p);
-      at = XvQueryPortAttributes(XJ_disp, p, &attributes);
-      for (j = 0; j < attributes; j++) {
-        printf("  name:       %s\n"
-               "  flags:     %s%s\n"
-               "  min_color:  %i\n"
-               "  max_color:  %i\n",
-               at[j].name,
-               (at[j].flags & XvGettable) ? " get" : "",
-               (at[j].flags & XvSettable) ? " set" : "",
-
-               at[j].min_value, at[j].max_value);
-      }
-      if (at)
-        XFree(at);
-
-      printf(" image format list for port %d\n", p);
-      fo = XvListImageFormats(XJ_disp, p, &formats);
-      for (j = 0; j < formats; j++) {
-        printf("  0x%x (%4.4s) %s\n",
-               fo[j].id,
-               (char *)&fo[j].id,
-               (fo[j].format == XvPacked) ? "packed" : "planar");
-      }
-      if (fo)
-        XFree(fo);
-    }
-    */
-    //printf("\n");
   }
-  
-  XvGrabPort(XJ_disp, xv_port, CurrentTime);
-		  
+ 
   if (p_num_adaptors > 0)
     XvFreeAdaptorInfo(ai);
   if (xv_port == -1)
+  {
+    printf("Couldn't find Xv support, exiting\n");
     exit (0);
+  }
+
+  int formats;
+  XvImageFormatValues *fo;
+  bool foundimageformat = false;
+
+  fo = XvListImageFormats(XJ_disp, xv_port, &formats);
+  for (i = 0; i < formats; i++)
+  {
+      if (fo[i].id == GUID_YUV12_PLANAR)
+          foundimageformat = true;
+  }
+
+  if (fo) 
+      XFree(fo);
+
+  if (!foundimageformat)
+  {
+      printf("Couldn't find the proper Xv image format\n");
+      exit(0);
+  }
+
+  printf("Using XV port %d\n", xv_port);
+  XvGrabPort(XJ_disp, xv_port, CurrentTime);
 
   XJ_gc = XCreateGC(XJ_disp, XJ_win, 0, 0);
   XJ_depth = DefaultDepthOfScreen(XJ_screen);
@@ -321,7 +288,7 @@ void XJ_toggleFullscreen(void)
     curx = 0 - (int)ceil(XJ_screenwidth * .05); 
     cury = 0 - (int)ceil(XJ_screenheight * 0.05); 
     curw = (int)ceil(XJ_screenwidth * 1.10); 
-    curh = (int)ceil(XJ_screenheight * 1.10);
+    curh = (int)ceil(XJ_screenheight * 1.12);
     hide_cursor();
     decorate(0);
   }

@@ -2,7 +2,7 @@
 #define CHANNEL_H
 
 #include <map>
-#include <string>
+#include <qstring.h>
 #include "frequencies.h"
 
 using namespace std;
@@ -12,30 +12,30 @@ class TV;
 class Channel
 {
  public:
-    Channel(TV *parent, const string &videodevice);
+    Channel(TV *parent, const QString &videodevice);
    ~Channel(void);
 
     void Open(void);
     void Close(void);
 
-    void SetFormat(const string &format);
-    void SetFreqTable(const string &name);
+    void SetFormat(const QString &format);
+    void SetFreqTable(const QString &name);
 
-    bool SetChannelByString(const string &chan); 
+    bool SetChannelByString(const QString &chan); 
     bool SetChannel(int i);
     bool ChannelUp(void);
     bool ChannelDown(void);
  
     void ToggleInputs(void); 
-    void SwitchToInput(const string &input);
+    void SwitchToInput(const QString &input);
  
-    string GetCurrentName(void);
+    QString GetCurrentName(void);
     int GetCurrent(void) { return curchannel + 1; }
     
     void SetFd(int fd) { videofd = fd; } 
  private:
     
-    string device;
+    QString device;
     bool isopen;  
     int videofd;
     int curchannel;
@@ -49,7 +49,7 @@ class Channel
 
     int capchannels;
     int currentcapchannel;
-    map<int, string> channelnames;
+    map<int, QString> channelnames;
 };
 
 #endif

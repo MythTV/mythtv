@@ -1,8 +1,8 @@
 #ifndef NUPPELVIDEOPLAYER
 #define NUPPELVIDEOPLAYER
 
-#include <string>
 #include <map>
+#include <qstring.h>
 
 #ifdef MMX
 #undef MMX
@@ -32,8 +32,8 @@ class NuppelVideoPlayer
     NuppelVideoPlayer();
    ~NuppelVideoPlayer();
 
-    void SetAudioDevice(char *device) { audiodevice = device; }
-    void SetFileName(char *lfilename) { filename = lfilename; }
+    void SetAudioDevice(QString device) { audiodevice = device; }
+    void SetFileName(QString lfilename) { filename = lfilename; }
 
     void StartPlaying(void);
     void StopPlaying(void) { killplayer = true; }
@@ -66,19 +66,19 @@ class NuppelVideoPlayer
 
     void SetRecorder(NuppelVideoRecorder *nvcr) { nvr = nvcr; }
 
-    void SetOSDFontName(char *filename, char *prefix) 
+    void SetOSDFontName(QString filename, char *prefix) 
                       { osdfilename = filename; osdprefix = prefix; }
     
-    void SetInfoText(const string &text, const string &subtitle,
-                     const string &desc, const string &category,
-                     const string &start, const string &end, int secs)
+    void SetInfoText(const QString &text, const QString &subtitle,
+                     const QString &desc, const QString &category,
+                     const QString &start, const QString &end, int secs)
                       { osd->SetInfoText(text, subtitle, desc, category,
                                          start, end, secs); }
-    void SetChannelText(const string &text, int secs)
+    void SetChannelText(const QString &text, int secs)
                       { osd->SetChannumText(text, secs); }
 
-    void SetDialogBox(const string &message, const string &optionone,
-                      const string &optiontwo, const string &optionthree,
+    void SetDialogBox(const QString &message, const QString &optionone,
+                      const QString &optiontwo, const QString &optionthree,
                       int secs)
                       { osd->SetDialogBox(message, optionone, optiontwo,
                                           optionthree, secs); }
@@ -137,8 +137,8 @@ class NuppelVideoPlayer
     
     int audiofd;
 
-    string filename;
-    string audiodevice;
+    QString filename;
+    QString audiodevice;
     
     /* rtjpeg_plugin stuff */
     int eof;
@@ -225,8 +225,8 @@ class NuppelVideoPlayer
     bool resetplaying;
     bool actuallyreset;
 
-    string osdfilename;
-    string osdprefix;
+    QString osdfilename;
+    QString osdprefix;
     OSD *osd;
 };
 

@@ -10,7 +10,7 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 #include <iostream>
-#include <string>
+#include <qstring.h>
 #include <map>
 
 using namespace std;
@@ -22,40 +22,40 @@ using namespace std;
 
 class Settings {
 public: 
-	Settings(string strSettingFile = "settings.txt");
+	Settings(QString strSettingFile = "settings.txt");
 	~Settings();
 	
 	// Setting retrieval functions
 	/** Generic Setting Retrieval functions */
-	string GetSetting(string strSetting);
+	QString GetSetting(QString strSetting);
 	/** Generic Setting Retrieval function for numeric values */
-	int GetNumSetting(string strSetting);
+	int GetNumSetting(QString strSetting);
 	/** Generic Setting Retrieval function for float values */
-	float GetFloatSetting(string strSetting);
+	float GetFloatSetting(QString strSetting);
 	/** Generic Setting Retrieval functions for pointers */
-	void* GetPointer(string strSetting);
+	void* GetPointer(QString strSetting);
 	
 	// Setting Setting functions
 	/** Generic Setting Setting function */
-	void SetSetting(string strSetting, string strNewVal);
+	void SetSetting(QString strSetting, QString strNewVal);
 	/** Generic Setting Setting function for int values */
-	void SetSetting(string strSetting, int nNewVal);
+	void SetSetting(QString strSetting, int nNewVal);
 	/** Generic Setting Setting function for float values */
-	void SetSetting(string strSetting, float fNewVal);
+	void SetSetting(QString strSetting, float fNewVal);
 	/** Generic Setting Setting function for pointer values */
-	void SetSetting(string strSetting, void* pNewVal);
+	void SetSetting(QString strSetting, void* pNewVal);
 
         /** parse settings file */
-        int ReadSettings(const char *pszFile);
+        int ReadSettings(QString pszFile);
 private: // Private attributes
 	/** main property-value mapping for strings */
-	map<string, string>* m_pStringSettings;
+	map<QString, QString>* m_pStringSettings;
 	/** main property-value mapping for ints */
-	map<string, int>* m_pIntSettings;
+	map<QString, int>* m_pIntSettings;
 	/** main property-value mapping for floats */
-	map<string, float>* m_pFloatSettings;
+	map<QString, float>* m_pFloatSettings;
 	/** main property-value mapping for pointers */
-	map<string, void*>* m_pVoidSettings;
+	map<QString, void*>* m_pVoidSettings;
 };
 
 #endif

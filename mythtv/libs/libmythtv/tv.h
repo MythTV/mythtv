@@ -1,9 +1,7 @@
 #ifndef TV_H
 #define TV_H
 
-#include <string>
-using namespace std;
-
+#include <qstring.h>
 #include <pthread.h>
 
 #include "NuppelVideoRecorder.h"
@@ -31,7 +29,7 @@ class QDateTime;
 class TV
 {
  public:
-    TV(const string &startchannel);
+    TV(const QString &startchannel);
    ~TV(void);
 
     void LiveTV(void);
@@ -54,7 +52,7 @@ class TV
     bool CheckChannel(char *channum); 
     bool ChangeExternalChannel(char *channum);
 
-    string GetFilePrefix() { return settings->GetSetting("RecordFilePrefix"); }
+    QString GetFilePrefix() { return settings->GetSetting("RecordFilePrefix"); }
  protected:
     void doLoadMenu(void);
     static void *MenuHandler(void *param);
@@ -72,9 +70,9 @@ class TV
     void ToggleInputs(void); 
  
     void UpdateOSD(void); 
-    void GetChannelInfo(int lchannel, string &title, string &subtitle, 
-                        string &desc, string &category, string &starttime,
-                        string &endtime);
+    void GetChannelInfo(int lchannel, QString &title, QString &subtitle, 
+                        QString &desc, QString &category, QString &starttime,
+                        QString &endtime);
 
     void ConnectDB(void);
     void DisconnectDB(void);
@@ -89,7 +87,7 @@ class TV
 
     void ProcessKeypress(int keypressed);
 
-    void StateToString(TVState state, string &statestr);
+    void StateToString(TVState state, QString &statestr);
     void HandleStateChange();
     bool StateIsRecording(TVState state);
     bool StateIsPlaying(TVState state);
@@ -128,7 +126,7 @@ class TV
     pthread_t event, encode, decode;
     bool changeState;
     TVState nextState;
-    string inputFilename, outputFilename;
+    QString inputFilename, outputFilename;
 
     bool watchingLiveTV;
 

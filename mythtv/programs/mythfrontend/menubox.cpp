@@ -30,14 +30,18 @@ MenuBox::MenuBox(const char *text, QWidget *parent = 0,
 
     QLabel *maintext = new QLabel(text, this);
 
-    //QPixmap *logo = new QPixmap("mythtv-logo.png");
-    //logo->setMask(logo->createHeuristicMask());
+/*
+    if (strlen(text) < 1)
+    {
+        QPixmap *logo = new QPixmap("/usr/local/share/mythtv/mythtv-logo.png");
+        logo->setMask(logo->createHeuristicMask());
+        maintext->setPixmap(*logo);
+        delete logo;
+    }
+*/
 
-    //maintext->setPixmap(*logo);
     maintext->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
     maintext->setFont(QFont("Arial", 40 * hmult, QFont::Bold));
-
-    //delete logo;
 
     box = new QVBoxLayout(this, 20 * wmult);
 

@@ -28,10 +28,9 @@ void *SpawnDecode(void *param)
     return NULL;
 }
 
-TV::TV(const string &startchannel)
+TV::TV(const QString &startchannel)
 {
-    string settingsfile = string(theprefix) + 
-                          string("/share/mythtv/settings.txt");
+    QString settingsfile = QString(theprefix) + "/share/mythtv/settings.txt";
     settings = new Settings(settingsfile);
 
     settings->ReadSettings("settings.txt");
@@ -137,16 +136,13 @@ int TV::AllowRecording(ProgramInfo *rcinfo, int timeuntil)
         return 1;
     }
 
-    string channame = rcinfo->channum.ascii();
-    string title = rcinfo->title.ascii();
-
-    string message = "MythTV wants to record \"";
-    message += title + "\" on Channel " + channame;
+    QString message = "MythTV wants to record \"";
+    message += rcinfo->title + "\" on Channel " + rcinfo->channum;
     message += " in %d seconds.  Do you want to:";
 
-    string option1 = "Record and watch while it records";
-    string option2 = "Let it record and go back to the Main Menu";
-    string option3 = "Don't let it record, I want to watch TV";
+    QString option1 = "Record and watch while it records";
+    QString option2 = "Let it record and go back to the Main Menu";
+    QString option3 = "Don't let it record, I want to watch TV";
 
     nvp->SetDialogBox(message, option1, option2, option3, timeuntil);
 
@@ -162,12 +158,12 @@ int TV::AllowRecording(ProgramInfo *rcinfo, int timeuntil)
 
 void TV::StartRecording(ProgramInfo *rcinfo)
 {  
-    string recprefix = settings->GetSetting("RecordFilePrefix");
+    QString recprefix = settings->GetSetting("RecordFilePrefix");
 
     if (internalState == kState_None || 
         internalState == kState_WatchingPreRecorded)
     {
-        outputFilename = rcinfo->GetRecordFilename(recprefix.c_str());
+        outputFilename = rcinfo->GetRecordFilename(recprefix);
         recordEndTime = rcinfo->endts;
         curRecording = rcinfo;
 
@@ -187,7 +183,7 @@ void TV::StartRecording(ProgramInfo *rcinfo)
             while (GetState() != kState_None)
                 usleep(50);
 
-            outputFilename = rcinfo->GetRecordFilename(recprefix.c_str());
+            outputFilename = rcinfo->GetRecordFilename(recprefix);
             recordEndTime = rcinfo->endts;
             curRecording = rcinfo;
 
@@ -196,7 +192,7 @@ void TV::StartRecording(ProgramInfo *rcinfo)
         }
         else if (tvtorecording == 1)
         {
-            outputFilename = rcinfo->GetRecordFilename(recprefix.c_str());
+            outputFilename = rcinfo->GetRecordFilename(recprefix);
             recordEndTime = rcinfo->endts;
             curRecording = rcinfo;
 
@@ -220,8 +216,8 @@ void TV::Playback(ProgramInfo *rcinfo)
 {
     if (internalState == kState_None || internalState == kState_RecordingOnly)
     {
-        string recprefix = settings->GetSetting("RecordFilePrefix");
-        inputFilename = rcinfo->GetRecordFilename(recprefix.c_str());
+        QString recprefix = settings->GetSetting("RecordFilePrefix");
+        inputFilename = rcinfo->GetRecordFilename(recprefix);
 
         if (internalState == kState_None)
             nextState = kState_WatchingPreRecorded;
@@ -236,7 +232,7 @@ void TV::Playback(ProgramInfo *rcinfo)
     }
 }
 
-void TV::StateToString(TVState state, string &statestr)
+void TV::StateToString(TVState state, QString &statestr)
 {
     switch (state) {
         case kState_None: statestr = "None"; break;
@@ -321,9 +317,9 @@ void TV::HandleStateChange(void)
     bool killRecordingFile = false;
     bool sleepBetween = false;
 
-    string statename;
+    QString statename;
     StateToString(nextState, statename);
-    string origname;
+    QString origname;
     StateToString(internalState, origname);
 
     if (nextState == kState_Error)
@@ -350,8 +346,6 @@ void TV::HandleStateChange(void)
 
         watchingLiveTV = true;
         sleepBetween = true;
-
-        printf("Changing from %s to %s\n", origname.c_str(), statename.c_str());
     }
     else if (internalState == kState_WatchingLiveTV && 
              nextState == kState_None)
@@ -363,18 +357,14 @@ void TV::HandleStateChange(void)
         changed = true;
 
         watchingLiveTV = false;
-
-        printf("Changing from %s to %s\n", origname.c_str(), statename.c_str());
     }
     else if ((internalState == kState_None && 
               nextState == kState_RecordingOnly) || 
              (internalState == kState_WatchingPreRecorded &&
               nextState == kState_WatchingOtherRecording))
     {   
-        string channame = curRecording->channum.ascii();
-
         channel->Open();
-        channel->SetChannelByString(channame);
+        channel->SetChannelByString(curRecording->channum);
         channel->Close();
 
         rbuffer = new RingBuffer(outputFilename, true);
@@ -384,8 +374,6 @@ void TV::HandleStateChange(void)
         changed = true;
 
         startRecorder = true;
-
-        printf("Changing from %s to %s\n", origname.c_str(), statename.c_str());
     }   
     else if ((internalState == kState_RecordingOnly && 
               nextState == kState_None) ||
@@ -400,8 +388,6 @@ void TV::HandleStateChange(void)
         changed = true;
 
         watchingLiveTV = false;
-
-        printf("Changing from %s to %s\n", origname.c_str(), statename.c_str());
     }
     else if ((internalState == kState_None && 
               nextState == kState_WatchingPreRecorded) ||
@@ -416,8 +402,6 @@ void TV::HandleStateChange(void)
         changed = true;
 
         startPlayer = true;
-    
-        printf("Changing from %s to %s\n", origname.c_str(), statename.c_str());
     }
     else if ((internalState == kState_WatchingPreRecorded && 
               nextState == kState_None) || 
@@ -432,8 +416,6 @@ void TV::HandleStateChange(void)
         changed = true;
 
         watchingLiveTV = false;
-
-        printf("Changing from %s to %s\n", origname.c_str(), statename.c_str());
     }
     else if (internalState == kState_RecordingOnly && 
              nextState == kState_WatchingLiveTV)
@@ -456,8 +438,6 @@ void TV::HandleStateChange(void)
 
         watchingLiveTV = true;
         sleepBetween = true;
-
-        printf("Changing from %s to %s\n", origname.c_str(), statename.c_str());
     }
     else if (internalState == kState_WatchingLiveTV &&  
              nextState == kState_WatchingRecording)
@@ -472,9 +452,7 @@ void TV::HandleStateChange(void)
 
         rbuffer->Reset();
 
-        string channame = curRecording->channum.ascii();
-
-        channel->SetChannelByString(channame);
+        channel->SetChannelByString(curRecording->channum);
 
         rbuffer->TransitionToFile(outputFilename);
         nvr->WriteHeader(true);
@@ -490,8 +468,6 @@ void TV::HandleStateChange(void)
         nvp->Unpause();
         internalState = nextState;
         changed = true;
-
-        printf("Changing from %s to %s\n", origname.c_str(), statename.c_str());
     }
     else if ((internalState == kState_WatchingRecording &&
               nextState == kState_WatchingLiveTV) ||
@@ -510,8 +486,6 @@ void TV::HandleStateChange(void)
  
         internalState = nextState;
         changed = true;
-
-        printf("Changing from %s to %s\n", origname.c_str(), statename.c_str());
     }
     else if (internalState == kState_None && 
              nextState == kState_None)
@@ -523,6 +497,10 @@ void TV::HandleStateChange(void)
     {
         printf("Unknown state transition: %d to %d\n", internalState,
                                                        nextState);
+    }
+    else
+    {
+        printf("Changing from %s to %s\n", origname.ascii(), statename.ascii());
     }
     changeState = false;
  
@@ -578,8 +556,8 @@ void TV::SetupRecorder(void)
                      settings->GetNumSetting("Height"));
     nvr->SetMP3Quality(settings->GetNumSetting("MP3Quality"));
     nvr->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
-    nvr->SetVideoDevice((char *)settings->GetSetting("V4LDevice").c_str());
-    nvr->SetAudioDevice((char *)settings->GetSetting("AudioDevice").c_str());
+    nvr->SetVideoDevice(settings->GetSetting("V4LDevice"));
+    nvr->SetAudioDevice(settings->GetSetting("AudioDevice"));
     nvr->Initialize();
 }
 
@@ -601,7 +579,7 @@ void TV::TeardownRecorder(bool killFile)
 
     if (killFile)
     {
-        unlink(outputFilename.c_str());
+        unlink(outputFilename.ascii());
         if (curRecording)
         {
             delete curRecording;
@@ -626,10 +604,9 @@ void TV::SetupPlayer(void)
     nvp->SetRingBuffer(prbuffer);
     nvp->SetRecorder(nvr);
     nvp->SetDeinterlace((bool)settings->GetNumSetting("Deinterlace"));
-    nvp->SetOSDFontName((char *)settings->GetSetting("OSDFont").c_str(),
-                        theprefix);
+    nvp->SetOSDFontName(settings->GetSetting("OSDFont"), theprefix);
     nvp->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
-    nvp->SetAudioDevice((char *)settings->GetSetting("AudioDevice").c_str());
+    nvp->SetAudioDevice(settings->GetSetting("AudioDevice"));
     osd_display_time = settings->GetNumSetting("OSDDisplayTime");
 }
 
@@ -668,10 +645,10 @@ void TV::TeardownPlayer(void)
 char *TV::GetScreenGrab(ProgramInfo *rcinfo, int secondsin, int &bufferlen,
                         int &video_width, int &video_height)
 {
-    string recprefix = settings->GetSetting("RecordFilePrefix");
-    QString filename = rcinfo->GetRecordFilename(recprefix.c_str());
+    QString recprefix = settings->GetSetting("RecordFilePrefix");
+    QString filename = rcinfo->GetRecordFilename(recprefix);
 
-    RingBuffer *tmprbuf = new RingBuffer(filename.ascii(), false);
+    RingBuffer *tmprbuf = new RingBuffer(filename, false);
 
     NuppelVideoPlayer *nupvidplay = new NuppelVideoPlayer();
     nupvidplay->SetRingBuffer(tmprbuf);
@@ -975,16 +952,16 @@ void TV::ChangeChannel(char *name)
 
 void TV::UpdateOSD(void)
 {
-    string channelname = channel->GetCurrentName();
-    if (channelname.size() > 6)
+    QString channelname = channel->GetCurrentName();
+    if (channelname.length() > 6)
     {
-        string dummy = "";
+        QString dummy = "";
         nvp->SetInfoText(channelname, dummy, dummy, dummy, dummy, dummy,
                          osd_display_time);
     }
     else
     {
-        string title, subtitle, desc, category, starttime, endtime;
+        QString title, subtitle, desc, category, starttime, endtime;
         GetChannelInfo(channel->GetCurrent(), title, subtitle, desc, category, 
                        starttime, endtime);
 
@@ -994,9 +971,9 @@ void TV::UpdateOSD(void)
     }
 }
 
-void TV::GetChannelInfo(int lchannel, string &title, string &subtitle,
-                        string &desc, string &category, string &starttime,
-                        string &endtime)
+void TV::GetChannelInfo(int lchannel, QString &title, QString &subtitle,
+                        QString &desc, QString &category, QString &starttime,
+                        QString &endtime)
 {
     title = "";
     subtitle = "";
@@ -1027,20 +1004,20 @@ void TV::GetChannelInfo(int lchannel, string &title, string &subtitle,
     {
         query.next();
 
-        starttime = query.value(1).toString().ascii();
-        endtime = query.value(2).toString().ascii();
+        starttime = query.value(1).toString();
+        endtime = query.value(2).toString();
         test = query.value(3).toString();
         if (test != QString::null)
-            title = test.ascii();
+            title = test;
         test = query.value(4).toString();
         if (test != QString::null)
-            subtitle = test.ascii();
+            subtitle = test;
         test = query.value(5).toString();
         if (test != QString::null)
-            desc = test.ascii();
+            desc = test;
         test = query.value(6).toString();
         if (test != QString::null)
-            category = test.ascii();
+            category = test;
     }
 }
 
@@ -1097,11 +1074,11 @@ bool TV::CheckChannel(char *channum)
 
 bool TV::ChangeExternalChannel(char *channum)
 {
-    string command = settings->GetSetting("ExternalChannelCommand");
+    QString command = settings->GetSetting("ExternalChannelCommand");
 
-    command += string(" ") + string(channum);
+    command += QString(" ") + QString(channum);
 
-    int ret = system(command.c_str());
+    int ret = system(command.ascii());
 
     if (ret > 0)
         return true;
@@ -1110,11 +1087,11 @@ bool TV::ChangeExternalChannel(char *channum)
 
 void TV::doLoadMenu(void)
 {
-    string epgname = "mythepg";
+    QString epgname = "mythepg";
 
     char runname[512];
 
-    sprintf(runname, "%s %d", epgname.c_str(), channel->GetCurrent());
+    sprintf(runname, "%s %d", epgname.ascii(), channel->GetCurrent());
     int ret = system(runname);
 
     if (ret > 0)

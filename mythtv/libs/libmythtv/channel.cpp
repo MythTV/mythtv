@@ -10,7 +10,7 @@
 #include "frequencies.h"
 #include "tv.h"
 
-Channel::Channel(TV *parent, const string &videodevice)
+Channel::Channel(TV *parent, const QString &videodevice)
 {
     device = videodevice;
     isopen = false;
@@ -28,7 +28,7 @@ Channel::~Channel(void)
 
 void Channel::Open(void)
 {
-    videofd = open(device.c_str(), O_RDWR);
+    videofd = open(device.ascii(), O_RDWR);
     if (videofd > 0)
         isopen = true;
 }
@@ -40,7 +40,7 @@ void Channel::Close(void)
     videofd = -1;
 }
 
-void Channel::SetFormat(const string &format)
+void Channel::SetFormat(const QString &format)
 {
     if (!isopen)
         Open();
@@ -98,7 +98,7 @@ void Channel::SetFormat(const string &format)
     videomode = mode;
 }
 
-void Channel::SetFreqTable(const string &name)
+void Channel::SetFreqTable(const QString &name)
 {
     int i = 0;
     char *listname = (char *)chanlists[i].name;
@@ -122,7 +122,7 @@ void Channel::SetFreqTable(const string &name)
     }
 }
   
-bool Channel::SetChannelByString(const string &chan)
+bool Channel::SetChannelByString(const QString &chan)
 {
     if (!isopen)
         Open();
@@ -158,7 +158,7 @@ bool Channel::SetChannel(int i)
     if (currentcapchannel == 0)
         sprintf(channame, "%d", i+1);
     else
-        sprintf(channame, "%s:%d", channelnames[currentcapchannel].c_str(), 
+        sprintf(channame, "%s:%d", channelnames[currentcapchannel].ascii(), 
                                    i+1);
 
     if (pParent->CheckChannel(channame))
@@ -214,13 +214,13 @@ bool Channel::ChannelDown(void)
     return finished;
 }
 
-string Channel::GetCurrentName(void)
+QString Channel::GetCurrentName(void)
 {
     if (currentcapchannel == 0)
         return curList[curchannel].name;
     else
     {
-        string ret = channelnames[currentcapchannel];
+        QString ret = channelnames[currentcapchannel];
         ret += ":";
         char temp[10];
         sprintf(temp, "%d", curchannel);
@@ -244,7 +244,7 @@ void Channel::ToggleInputs(void)
     ioctl(videofd, VIDIOCSCHAN, &set);
 }
 
-void Channel::SwitchToInput(const string &input)
+void Channel::SwitchToInput(const QString &input)
 {
     int inputnum = 0;
     for (int i = 0; i < capchannels; i++)

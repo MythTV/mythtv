@@ -204,14 +204,25 @@ int main(int argc, char **argv)
 
     TV *tv = new TV("3");
 
-    string recprefix = tv->GetFilePrefix();
-    QString prefix = recprefix.c_str();
+    QString prefix = tv->GetFilePrefix();
  
     pthread_t scthread;
     pthread_create(&scthread, NULL, runScheduler, tv);
 
     while (1)
     {
+//        MenuBox *maindiag = new MenuBox("");
+//
+//        maindiag->AddButton("TV");
+//        maindiag->AddButton("Music");
+
+//        maindiag->Show();
+//        int result = maindiag->exec();
+
+//        if (result == 1)
+//        {
+//    while (1)
+//    {
         MenuBox *diag = new MenuBox("MythTV");
 
         diag->AddButton("Watch TV");
@@ -234,6 +245,16 @@ int main(int argc, char **argv)
         }
 
         delete diag;
+//        if (result == 0)
+//            break;
+//    }
+//        }
+//        else if (result == 2)
+//        {
+//            system("mythmusic /root/music/");
+//        }
+//    
+//        delete maindiag;
     }
 
     delete tv;

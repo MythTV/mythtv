@@ -2,28 +2,27 @@
 #define OSD_H
 
 #include "ttfont.h"
-#include <string>
-
-using namespace std;
+#include <qstring.h>
+#include <time.h>
 
 class OSD
 {
  public:
-    OSD(int width, int height, const string &filename, const string &prefix);
+    OSD(int width, int height, const QString &filename, const QString &prefix);
    ~OSD(void);
 
     void Display(unsigned char *yuvptr);
     
-    void SetInfoText(const string &text, const string &subtitle, 
-                     const string &desc, const string &category,
-                     const string &start, const string &end, int length);
-    void SetChannumText(const string &text, int length);
+    void SetInfoText(const QString &text, const QString &subtitle, 
+                     const QString &desc, const QString &category,
+                     const QString &start, const QString &end, int length);
+    void SetChannumText(const QString &text, int length);
 
     void ShowLast(int length);
     void TurnOff(void);
    
-    void SetDialogBox(const string &message, const string &optionone, 
-                      const string &optiontwo, const string &optionthree,
+    void SetDialogBox(const QString &message, const QString &optionone, 
+                      const QString &optiontwo, const QString &optionthree,
                       int length);
     void DialogUp(void);
     void DialogDown(void);
@@ -36,10 +35,10 @@ class OSD
     void DarkenBox(int xstart, int ystart, int xend, int yend,
                    unsigned char *screen);
     void DrawStringIntoBox(int xstart, int ystart, int xend, int yend, 
-                           const string &text, unsigned char *screen);
+                           const QString &text, unsigned char *screen);
     void DrawRectangle(int xstart, int ystart, int xend, int yend,
                        unsigned char *screen);
-    string fontname;
+    QString fontname;
 
     int vid_width;
     int vid_height;
@@ -51,9 +50,9 @@ class OSD
     int info_width;
     int info_height;
     bool show_info;
-    string infotext;
-    string subtitletext;
-    string desctext;
+    QString infotext;
+    QString subtitletext;
+    QString desctext;
     Efont *info_font;
     int infofontsize;
 
@@ -63,7 +62,7 @@ class OSD
     int channum_x_end;
     int channum_width;
     int channum_height;
-    string channumtext;
+    QString channumtext;
     bool show_channum;
     Efont *channum_font;
     int channumfontsize;
@@ -80,10 +79,10 @@ class OSD
     int dialog_x_end;
     int dialog_width;
     int dialog_height;
-    string dialogmessagetext;
-    string dialogoptionone;
-    string dialogoptiontwo;
-    string dialogoptionthree;
+    QString dialogmessagetext;
+    QString dialogoptionone;
+    QString dialogoptiontwo;
+    QString dialogoptionthree;
 
     int currentdialogoption;
     bool show_dialog;

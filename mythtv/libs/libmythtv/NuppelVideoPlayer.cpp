@@ -9,6 +9,9 @@
 #include <time.h>
 #include <math.h>
 
+#include <iostream>
+using namespace std;
+
 #include "NuppelVideoPlayer.h"
 #include "NuppelVideoRecorder.h"
 #include "minilzo.h"
@@ -77,16 +80,17 @@ void NuppelVideoPlayer::InitSound(void)
 {
     int bits = 16, stereo = 1, speed = audio_samplerate;
 
-    audiofd = open(audiodevice.c_str(), O_WRONLY);
+    audiofd = open(audiodevice.ascii(), O_WRONLY);
     if (audiofd == -1)
     {
-        fprintf(stderr, "Can't open audio device\n");
+        cerr << "player: Can't open audio device: " << audiodevice << endl;
+        perror("open audio:");
 	return;
     }
 
     if (ioctl(audiofd, SNDCTL_DSP_SAMPLESIZE, &bits) < 0)
     {
-        fprintf(stderr, "problem setting sample size\n");
+        cerr << "problem setting sample size, exiting\n";
         close(audiofd);
         audiofd = -1;
         return;
@@ -94,7 +98,7 @@ void NuppelVideoPlayer::InitSound(void)
 
     if (ioctl(audiofd, SNDCTL_DSP_STEREO, &stereo) < 0) 
     {
-        fprintf(stderr, "problem setting to stereo\n");
+        cerr << "problem setting to stereo, exiting\n";
         close(audiofd);
         audiofd = -1;
         return;
@@ -102,7 +106,7 @@ void NuppelVideoPlayer::InitSound(void)
 
     if (ioctl(audiofd, SNDCTL_DSP_SPEED, &speed) < 0) 
     {
-        fprintf(stderr,"problem setting sample rate\n");
+        cerr << "problem setting sample rate, exiting\n";
         close(audiofd);
         audiofd = -1;
         return;
@@ -124,7 +128,7 @@ void NuppelVideoPlayer::WriteAudio(unsigned char *aubuf, int size)
     {
         if (lw == -1)
         {
-            fprintf(stderr, "Error writing to audio device\n");
+            cerr << "Error writing to audio device, exiting\n";
             close(audiofd);
             audiofd = -1;
             return;
@@ -148,7 +152,7 @@ int NuppelVideoPlayer::InitSubs(void)
 
     if (lzo_init() != LZO_E_OK)
     {
-        fprintf(stderr, "lzo_init() failed");
+        cerr << "lzo_init() failed, exiting\n";
         return -1;
     }
 
@@ -177,7 +181,8 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 
         if (!ringBuffer->IsOpen())
         {
-            fprintf(stderr, "File not found: %s\n", filename.c_str());
+            fprintf(stderr, "File not found: %s\n", 
+                    ringBuffer->GetFilename().ascii());
             return -1;
         }
     }
@@ -195,26 +200,26 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 
     if (FRAMEHEADERSIZE != ringBuffer->Read(&frameheader, FRAMEHEADERSIZE))
     {
-        fprintf(stderr, "File not big enough for a header\n");
+        cerr << "File not big enough for a header\n";
         return -1;
     }
     if (frameheader.frametype != 'D') 
     {
-        fprintf(stderr, "Illegal file format\n");
+        cerr << "Illegal file format\n";
         return -1;
     }
     if (frameheader.packetlength != ringBuffer->Read(space, 
                                                      frameheader.packetlength))
     {
-        fprintf(stderr, "File not big enough for first frame data\n");
+        cerr << "File not big enough for first frame data\n";
         return -1;
     }
 
     if ((video_height & 1) == 1)
     {
         video_height--;
-        fprintf(stderr, "Incompatible video height, reducing to %d\n", 
-                video_height);
+        cerr << "Incompatible video height, reducing to " << video_height 
+             << endl; 
     }
 
     if (skipDsp)
@@ -336,10 +341,7 @@ unsigned char *NuppelVideoPlayer::DecodeFrame(struct rtframeheader *frameheader,
                               NULL);
         if (r != LZO_E_OK) 
         {
-            fprintf(stderr,"\nminilzo: can't decompress illegal data, "
-                    "ft='%c' ct='%c' len=%d tc=%d\n",
-                    frameheader->frametype, frameheader->comptype,
-                    frameheader->packetlength, frameheader->timecode);
+            cerr << "minilzo: can't decompress illegal data\n";
         }
     }
 
@@ -529,7 +531,7 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
 
             while (vbuffer_numfree() == 0)
             {
-                //printf("waiting for video buffer to drain.\n");
+                //cout << "waiting for video buffer to drain.\n";
                 prebuffering = false;
                 usleep(2000);
             }
@@ -579,7 +581,7 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
                         if (lameret * 4 > afree)
                         {
                             lameret = afree / 4;
-                            printf("Audio buffer overflow, audio data lost!\n");
+                            cout << "Audio buffer overflow, audio data lost!\n";
                         }
 
                         short int *saudbuffer = (short int *)audiobuffer;
@@ -597,7 +599,7 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
                     }
                     else if (lameret < 0)
                     {
-                        printf("lame decode error\n");
+                        cout << "lame decode error, exiting\n";
                         exit(-1);
                     }
                     packetlen = 0;
@@ -616,7 +618,7 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
                   
                 if (len > afree)
                 {
-                    printf("Audio buffer overflow, audio data lost!\n");
+                    cout << "Audio buffer overflow, audio data lost!\n";
                     len = afree;
                 }
 
@@ -698,7 +700,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             if (livetv && ringBuffer->GetFreeSpace() < -1000)
             {
                 paused = false;
-                printf("forced unpause\n");
+                cout << "forced unpause\n";
             }
             else
             {
@@ -736,7 +738,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
                 (nexttrigger.tv_usec - now.tv_usec); // uSecs
 
         if (delay > 1000000)
-            printf("%d\n", delay);
+            cout << delay << endl;
         /* trigger */
         if (delay > 0)
             usleep(delay);

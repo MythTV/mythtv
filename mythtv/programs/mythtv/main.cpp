@@ -1,5 +1,6 @@
 #include <qapplication.h>
 #include <qsqldatabase.h>
+#include <qstring.h>
 #include <unistd.h>
 #include "tv.h"
 
@@ -7,7 +8,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    string startChannel = "3";
+    QString startChannel = "3";
 
     TV *tv = new TV(startChannel);
     tv->LiveTV();

@@ -1,16 +1,14 @@
 #ifndef RINGBUFFER
 #define RINGBUFFER
 
-#include <string>
+#include <qstring.h>
 #include <pthread.h>
-
-using namespace std;
 
 class RingBuffer
 {
  public:
-    RingBuffer(const string &lfilename, bool write);
-    RingBuffer(const string &lfilename, long long size, long long smudge);
+    RingBuffer(const QString &lfilename, bool write);
+    RingBuffer(const QString &lfilename, long long size, long long smudge);
     
    ~RingBuffer();
 
@@ -22,7 +20,7 @@ class RingBuffer
     // this should _only_ be used when transitioning from livetv->recording
     int WriteToDumpFile(const void *buf, int count);
 
-    void TransitionToFile(const string &lfilename);
+    void TransitionToFile(const QString &lfilename);
     void TransitionToRing(void);
 
     long long Seek(long long pos, int whence);
@@ -42,8 +40,10 @@ class RingBuffer
     void StopReads(void) { stopreads = true; }
     bool LiveMode(void) { return !normalfile; }
 
+    const QString GetFilename(void) { return filename; }
+
  private:
-    string filename;
+    QString filename;
 
     int fd, fd2;
     int dumpfd;   

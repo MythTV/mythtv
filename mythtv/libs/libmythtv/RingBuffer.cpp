@@ -6,20 +6,20 @@
 #include <fcntl.h>
 #include "RingBuffer.h"
 
-RingBuffer::RingBuffer(const string &lfilename, bool write)
+RingBuffer::RingBuffer(const QString &lfilename, bool write)
 {
     normalfile = true;
-    filename = (string)lfilename;
+    filename = (QString)lfilename;
     fd = -1;
 
     if (write)
     {
-        fd = open(filename.c_str(), O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE, 0644);
+        fd = open(filename.ascii(), O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE, 0644);
         writemode = true;
     }
     else
     {
-        fd2 = open(filename.c_str(), O_RDONLY|O_LARGEFILE);
+        fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE);
         writemode = false;
     }
 
@@ -33,17 +33,17 @@ RingBuffer::RingBuffer(const string &lfilename, bool write)
     pthread_rwlock_init(&rwlock, NULL);
 }
 
-RingBuffer::RingBuffer(const string &lfilename, long long size, 
+RingBuffer::RingBuffer(const QString &lfilename, long long size, 
                        long long smudge)
 {
     normalfile = false;
-    filename = (string)lfilename;
+    filename = (QString)lfilename;
     filesize = size;
    
     fd = -1; fd2 = -1;
 
-    fd = open(filename.c_str(), O_WRONLY|O_CREAT|O_LARGEFILE, 0644);
-    fd2 = open(filename.c_str(), O_RDONLY|O_LARGEFILE);
+    fd = open(filename.ascii(), O_WRONLY|O_CREAT|O_LARGEFILE, 0644);
+    fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE);
 
     totalwritepos = writepos = 0;
     totalreadpos = readpos = 0;
@@ -67,11 +67,11 @@ RingBuffer::~RingBuffer(void)
         close(dumpfd);
 }
 
-void RingBuffer::TransitionToFile(const string &lfilename)
+void RingBuffer::TransitionToFile(const QString &lfilename)
 {
     pthread_rwlock_wrlock(&rwlock);
 
-    dumpfd = open(lfilename.c_str(), 
+    dumpfd = open(lfilename.ascii(), 
                   O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE, 0644);
 
     pthread_rwlock_unlock(&rwlock);
@@ -96,8 +96,8 @@ void RingBuffer::Reset(void)
         close(fd);
         close(fd2);
 
-        fd = open(filename.c_str(), O_WRONLY|O_CREAT|O_LARGEFILE, 0644);
-        fd2 = open(filename.c_str(), O_RDONLY|O_LARGEFILE);
+        fd = open(filename.ascii(), O_WRONLY|O_CREAT|O_LARGEFILE, 0644);
+        fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE);
  
         totalwritepos = writepos = 0;
         totalreadpos = readpos = 0;
