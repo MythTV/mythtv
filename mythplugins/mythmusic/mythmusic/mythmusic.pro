@@ -20,13 +20,14 @@ LIBS += -lcdda_paranoia -lcdda_interface
 
 # Input
 HEADERS += audiooutput.h buffer.h cddecoder.h cdrip.h constants.h databasebox.h 
-HEADERS += decoder.h flacdecoder.h flacencoder.h maddecoder.h menubox.h 
-HEADERS += metadata.h playbackbox.h output.h recycler.h settings.h 
-HEADERS += scrolllabel.h streaminput.h themedmenu.h treecheckitem.h 
-HEADERS += vorbisdecoder.h vorbisencoder.h
+HEADERS += decoder.h flacdecoder.h flacencoder.h maddecoder.h mainvisual.h
+HEADERS += menubox.h metadata.h playbackbox.h polygon.h output.h recycler.h 
+HEADERS += settings.h scrolllabel.h streaminput.h synaesthesia.h themedmenu.h 
+HEADERS += treecheckitem.h visual.h vorbisdecoder.h vorbisencoder.h polygon.h
 
 SOURCES += audiooutput.cpp cddecoder.cpp cdrip.cpp databasebox.cpp decoder.cpp 
-SOURCES += flacdecoder.cpp flacencoder.cpp maddecoder.cpp main.cpp menubox.cpp 
-SOURCES += metadata.cpp playbackbox.cpp output.cpp recycler.cpp settings.cpp 
-SOURCES += scrolllabel.cpp streaminput.cpp themedmenu.cpp treecheckitem.cpp 
-SOURCES += vorbisdecoder.cpp vorbisencoder.cpp
+SOURCES += flacdecoder.cpp flacencoder.cpp maddecoder.cpp main.cpp 
+SOURCES += mainvisual.cpp menubox.cpp metadata.cpp playbackbox.cpp output.cpp 
+SOURCES += recycler.cpp settings.cpp scrolllabel.cpp streaminput.cpp 
+SOURCES += synaesthesia.cpp themedmenu.cpp treecheckitem.cpp vorbisdecoder.cpp 
+SOURCES += vorbisencoder.cpp

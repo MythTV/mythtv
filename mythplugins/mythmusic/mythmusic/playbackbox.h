@@ -23,6 +23,7 @@ class QListViewItem;
 class QSlider;
 class ScrollLabel;
 class MyButton;
+class MainVisual;
 
 class PlaybackBox : public QDialog
 {
@@ -105,6 +106,8 @@ class PlaybackBox : public QDialog
     bool repeatmode;
 
     bool isplaying;
+
+    MainVisual *mainvisual;
 };
 
 #endif

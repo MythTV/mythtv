@@ -17,6 +17,7 @@ class OutputEvent;
 #include "recycler.h"
 
 class QObject;
+class Visual;
 
 
 class OutputEvent : public QCustomEvent
@@ -79,6 +80,9 @@ public:
     void addListener(QObject *);
     void removeListener(QObject *);
 
+    void addVisual(Visual *);
+    void removeVisual(Visual *);
+    
     QMutex *mutex() { return &mtx; }
 
     void setBufferSize(unsigned int sz) { bufsize = sz; }
@@ -99,13 +103,15 @@ public:
 protected:
     void dispatch(OutputEvent &e);
     void error(const QString &e);
-
+    void dispatchVisual(Buffer *, unsigned long, int, int);
+    void prepareVisuals();
 
 private:
     QMutex mtx;
     Recycler r;
     QPtrList<QObject> listeners;
-
+    QPtrList<Visual> visuals;
+    
     unsigned int bufsize;
 };
 

@@ -2,6 +2,7 @@
 Makefile
 moc_cdrip.cpp
 moc_databasebox.cpp
+moc_mainvisual.cpp
 moc_menubox.cpp
 moc_playbackbox.cpp
 moc_scrolllabel.cpp

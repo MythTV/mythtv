@@ -23,6 +23,7 @@
 #include "playbackbox.h"
 #include "databasebox.h"
 #include "settings.h"
+#include "mainvisual.h"
 
 #include "res/nextfile.xpm"
 #include "res/next.xpm"
@@ -102,6 +103,9 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
 
     QVBoxLayout *vbox = new QVBoxLayout(this, 20 * wmult);
 
+    mainvisual = new MainVisual();
+    //mainvisual->setVisual("Synaesthesia");
+    
     QVBoxLayout *vbox2 = new QVBoxLayout(vbox, 2 * wmult);
 
     QGroupBox *topdisplay = new QGroupBox(this);
@@ -118,15 +122,15 @@ PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
     titlelabel = new ScrollLabel(topdisplay);
     titlelabel->setText("  ");
     titlelabel->setPaletteBackgroundColor(QColor("grey"));
-
     framebox->addWidget(titlelabel);   
+
+    QHBoxLayout *framehbox = new QHBoxLayout(framebox);
 
     timelabel = new QLabel(topdisplay);
     timelabel->setText("  ");
     timelabel->setPaletteBackgroundColor(QColor("grey"));
     timelabel->setAlignment(AlignRight);
-
-    framebox->addWidget(timelabel);
+    framehbox->addWidget(timelabel);
 
     seekbar = new QSlider(Qt::Horizontal, this);
     seekbar->setFocusPolicy(NoFocus);
@@ -401,7 +405,9 @@ void PlaybackBox::play()
         output = new AudioOutput(outputBufferSize * 1024, adevice);
         output->setBufferSize(outputBufferSize * 1024);
         output->addListener(this);
-
+        output->addListener(mainvisual);
+        output->addVisual(mainvisual);
+	
         startoutput = true;
 
         if (!output->initialize())
@@ -446,6 +452,9 @@ void PlaybackBox::play()
     currentTime = 0;
     maxTime = curMeta.Length() / 1000;
 
+    mainvisual->setDecoder(decoder);
+    mainvisual->setOutput(output);
+    
     if (decoder->initialize()) {
         seekbar->setMinValue(0);
         seekbar->setValue(0);
@@ -548,6 +557,9 @@ void PlaybackBox::stop(void)
         delete output;
         output = 0;
     }
+
+    mainvisual->setDecoder(0);
+    mainvisual->setOutput(0);
 
     delete input;
     input = 0;
@@ -654,6 +666,12 @@ void PlaybackBox::seek(int pos)
         if (decoder && decoder->running()) {
             decoder->mutex()->lock();
             decoder->seek(pos);
+
+            if (mainvisual) {
+                mainvisual->mutex()->lock();
+                mainvisual->prepare();
+                mainvisual->mutex()->unlock();
+            }
 
             decoder->mutex()->unlock();
         }

@@ -9,6 +9,7 @@
 #include "audiooutput.h"
 #include "constants.h"
 #include "buffer.h"
+#include "visual.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -123,6 +124,8 @@ void AudioOutput::configure(long freq, int chan, int prec, int rate)
     }
 
     lr = rate;
+
+    prepareVisuals();
 }
 
 
@@ -313,6 +316,7 @@ void AudioOutput::run()
 		n += m;
 
 		status();
+                dispatchVisual(b, total_written, lc, lp);
 	    } else {
 		// force buffer change
 		n = b->nbytes;

@@ -7,6 +7,7 @@
 #include <qobject.h>
 
 #include "output.h"
+#include "visual.h"
 
 #include <stdio.h>
 
@@ -53,3 +54,42 @@ void Output::error(const QString &e) {
     }
 }
 
+void Output::addVisual(Visual *v)
+{
+    if (visuals.find(v) == -1) {
+       visuals.append(v);
+    }
+}
+
+void Output::removeVisual(Visual *v)
+{
+    visuals.remove(v);
+}
+
+void Output::dispatchVisual(Buffer *buffer, unsigned long written,
+                            int chan, int prec)
+{
+    if (! buffer)
+       return;
+
+    Visual *visual = visuals.first();
+    while (visual) {
+       visual->mutex()->lock();
+       visual->add(buffer, written, chan, prec);
+       visual->mutex()->unlock();
+
+       visual = visuals.next();
+    }
+}
+
+void Output::prepareVisuals()
+{
+    Visual *visual = visuals.first();
+    while (visual) {
+       visual->mutex()->lock();
+       visual->prepare();
+       visual->mutex()->unlock();
+
+       visual = visuals.next();
+    }
+}

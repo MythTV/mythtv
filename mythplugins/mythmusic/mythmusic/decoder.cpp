@@ -8,6 +8,7 @@
 #include "constants.h"
 #include "buffer.h"
 #include "output.h"
+#include "visual.h"
 
 #include <qobject.h>
 #include <qptrlist.h>
