@@ -3604,7 +3604,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>ATSC Signal Threshold</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC Signalschwelle</translation>
     </message>
     <message>
         <source>General (page 2)</source>
@@ -4807,6 +4807,97 @@ Myth wird nun beendet.</translation>
         <source>This will cause Myth to follow symlinks when recordings and related files are deleted, instead of deleting the symlink and leaving the actual file.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Scale video as necessary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, video will be scaled to fit your window or screen. If unchecked, video will never be made larger than its actual pixel size.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frames to skip in fullscreen mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video displayed in fullscreen or non-windowed mode will skip this many frames for each frame drawn. Set to 0 to show every frame. Only valid when either &quot;Use GUI size for TV playback&quot; or &quot;Run the frontend in a window&quot; is not checked.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video in main window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, video will be displayed in the main GUI window. Disable this when you only want video on the desktop or in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frames to skip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video in the main window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Opacity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The opacity of the main window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video in floating window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, video will be displayed in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video in the floating window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The opacity of the floating window. Set to 100 for completely opaque, set to 0 for completely transparent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video in the dock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, video will be displayed in the application&apos;s dock icon. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video in the dock icon will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video on the desktop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, video will be displayed on the desktop, behind the Finder icons. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video on the desktop will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mac OS X video settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScheduledRecording</name>
+    <message>
+        <source>Power Search</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StatusBox</name>
@@ -4837,6 +4928,14 @@ Myth wird nun beendet.</translation>
     <message>
         <source>is not available</source>
         <translation>ist nicht verfügbar</translation>
+    </message>
+    <message>
+        <source>System Status - Select a category to view the status</source>
+        <translation>Systemstatus - Bitte eine Kategorie wählen</translation>
+    </message>
+    <message>
+        <source>This screen displays the status of various system components</source>
+        <translation>Zeigt den Status verschiedener Systemkomponenten</translation>
     </message>
 </context>
 <context>
@@ -5231,7 +5330,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Auto-Skip Pre-Notify</source>
-        <translation>Auto-Sprung Hinweis</translation>
+        <translation>Auto-Sprung Vorwarnung</translation>
     </message>
     <message>
         <source>Jump to Beginning</source>
@@ -5285,7 +5384,7 @@ Myth wird nun beendet.</translation>
         <translation>Welche Aufnahme soll gelöscht werden:</translation>
     </message>
     <message>
-        <source>Select a recording to view:</source>
+        <source>Select a recording to watch:</source>
         <translation>Welche Aufnahme möchten Sie sehen:</translation>
     </message>
     <message>
@@ -5305,16 +5404,16 @@ Myth wird nun beendet.</translation>
         <translation>Wählen Sie einen Buchstaben...</translation>
     </message>
     <message>
-        <source>Pick the letter in which the show starts with, then hit ENTER or the right arrow</source>
-        <translation>Wählen Sie den Anfangsbuchstaben der Sendung, danach ENTER oder Cursor-Rechts</translation>
+        <source>Pick the letter in which the show starts with, then press SELECT or the right arrow</source>
+        <translation>Wählen Sie den Anfangsbuchstaben der Sendung. Weiter mit &quot;SELECT&quot; oder Pfeil-Rechts.</translation>
     </message>
     <message>
         <source>Select a program...</source>
         <translation>Wählen Sie eine Sendung...</translation>
     </message>
     <message>
-        <source>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting &apos;info&apos; will allow you to setup recording options.</source>
-        <translation>Wählen Sie den Titel der gesuchten Sendung. Weiter mit ENTER oder Pfeil-Rechts. Mit &quot;info&quot; können Sie eine Aufnahme planen.</translation>
+        <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
+        <translation>Wählen Sie den Titel der gesuchten Sendung. Beenden mit Pfeil-Links oder &quot;SELECT&quot; um eine Aufnahme zu planen.</translation>
     </message>
     <message>
         <source>No Programs</source>
@@ -5367,6 +5466,14 @@ Myth wird nun beendet.</translation>
     <message>
         <source>No listings found for this program. </source>
         <translation>Keine Termine für diese Sendung gefunden.</translation>
+    </message>
+    <message>
+        <source>Airdate:</source>
+        <translation>Sendezeit:</translation>
+    </message>
+    <message>
+        <source>Loading...</source>
+        <translation>Lade...</translation>
     </message>
 </context>
 <context>
