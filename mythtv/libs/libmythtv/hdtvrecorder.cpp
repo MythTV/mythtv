@@ -364,6 +364,9 @@ void HDTVRecorder::fill_ringbuffer(void)
             ringbuf.writePtr = ringbuf.buffer;
     }
 
+    close(_stream_fd);
+    _stream_fd = -1;
+
     pthread_exit(reinterpret_cast<void *>(0));
 }
 

@@ -104,9 +104,9 @@ CONFIG += using_joystick_menu
 #LIRC_LIBS = -llirc_client
 
 # XvMC support, modify as necessary.
-#CONFIG += using_xvmc
-#DEFINES += USING_XVMC
-#EXTRA_LIBS += -lXvMCNVIDIA -lXvMC
+CONFIG += using_xvmc
+DEFINES += USING_XVMC
+EXTRA_LIBS += -lXvMCNVIDIA -lXvMC
 
 # XvMC_VLD support, modify as necessary. Incompatible with normal XvMC support.
 #CONFIG += using_xvmc using_xvmc_vld

@@ -201,14 +201,14 @@ void DTVRecorder::HandleKeyframe() {
         _position_map_delta[frameNum] = startpos;
         _position_map[frameNum] = startpos;
 
-        if (curRecording && db_lock && db_conn)
+        if (curRecording && db_lock && db_conn &&
+            _position_map_delta.size() == 30)
         {
             pthread_mutex_lock(db_lock);
             MythContext::KickDatabase(db_conn);
             curRecording->SetPositionMapDelta(_position_map_delta, 
                                               MARK_GOP_BYFRAME, db_conn);
-            if (_position_map.size() % 30 == 0)
-                curRecording->SetFilesize(startpos, db_conn);
+            curRecording->SetFilesize(startpos, db_conn);
             pthread_mutex_unlock(db_lock);
             _position_map_delta.clear();
         }
