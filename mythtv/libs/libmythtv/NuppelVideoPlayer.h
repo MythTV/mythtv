@@ -408,6 +408,9 @@ class NuppelVideoPlayer
     int commrewindamount;
     int commnotifyamount;
     bool tryunflaggedskip;
+    int lastCommSkipDirection;
+    long long lastCommSkipStart;
+    time_t lastCommSkipTime;
 
     QString ccline;
     int cccol;

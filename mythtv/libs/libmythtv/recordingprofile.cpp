@@ -672,7 +672,11 @@ public:
 
         QString fullsize, halfsize;
         int maxwidth, maxheight;
-        if (tvFormat.lower() == "ntsc" || tvFormat.lower() == "ntsc-jp") {
+        if (profName.left(11) == "Transcoders") {
+            maxwidth = 1920;
+            maxheight = 1088;
+        } else if ((tvFormat.lower() == "ntsc") ||
+                   (tvFormat.lower() == "ntsc-jp")) {
             maxwidth = 720;
             maxheight = 480;
         } else if (tvFormat.lower() == "atsc") {

@@ -173,6 +173,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(ProgramInfo *info)
                                                    COMM_DETECT_BLANKS);
     commrewindamount = gContext->GetNumSetting("CommRewindAmount",0);
     commnotifyamount = gContext->GetNumSetting("CommNotifyAmount",0);
+    lastCommSkipDirection = 0;
+    lastCommSkipStart = 0;
 
     m_DeintSetting = gContext->GetNumSetting("Deinterlace", 0);
 
@@ -3729,7 +3731,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
                  (((currentFrame->frameNumber % 100) == 0) &&
                   (watchingrecording)))
             {
-                if (totalFrames)
+                if (totalFrames && !watchingrecording)
                 {
                     JobQueue::ChangeJobComment(jobID, QObject::tr(
                                                "%1% Completed @ %2 fps.")
@@ -4370,6 +4372,27 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
 
     if (hascommbreaktable)
     {
+        if ((direction == (0 - lastCommSkipDirection)) &&
+            ((time(NULL) - lastCommSkipTime) <= 3))
+        {
+            QString comm_msg = QString(QObject::tr("Skipping Back."));
+            QString desc;
+            int spos = calcSliderPos(desc);
+            if (osd)
+                osd->StartPause(spos, false, comm_msg, desc, 2);
+
+            if (lastCommSkipStart > (2 * video_frame_rate))
+                lastCommSkipStart -= 2 * video_frame_rate;
+
+            JumpToFrame(lastCommSkipStart);
+            lastCommSkipDirection = 0;
+            lastCommSkipTime = time(NULL);
+            return true;
+        }
+        lastCommSkipDirection = direction;
+        lastCommSkipStart = framesPlayed;
+        lastCommSkipTime = time(NULL);
+
         SetCommBreakIter();
 
         if ((commBreakIter == commBreakMap.begin()) &&
