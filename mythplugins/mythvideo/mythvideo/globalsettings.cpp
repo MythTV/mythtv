@@ -33,8 +33,7 @@ public:
         setHelpText(QObject::tr("This PIN is used to control the current "
                     "Parental Level. If you want to use this feature, then "
                     "setting the value to all numbers will make your life much "
-                    "easier. If you don't want to be bothered by PC dialogs, "
-                    "please set it to be blank.")); 
+                    "easier."));
     };
 };
 

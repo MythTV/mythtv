@@ -85,7 +85,7 @@
     </message>
     <message>
         <source>This PIN is used to control the current Parental Level. If you want to use this feature, then setting the value to all numbers will make your life much easier. If you don&apos;t want to be bothered by PC dialogs, please set it to be blank.</source>
-        <translation>PIN zur Einstellung des aktuellen Kindersicherungs-Levels. Es ist einfacher, wenn Sie für die PIN nur Zahlen verwenden. Lassen Sie den Wert leer, um nicht von PC-Dialogen gestört zu werden.</translation>
+        <translation type="obsolete">PIN zur Einstellung des aktuellen Kindersicherungs-Levels. Es ist einfacher, wenn Sie für die PIN nur Zahlen verwenden. Lassen Sie den Wert leer, um nicht von PC-Dialogen gestört zu werden.</translation>
     </message>
     <message>
         <source>Aggresive Parental Control</source>
@@ -169,6 +169,51 @@
     </message>
     <message>
         <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos; or &apos;MythXine&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This PIN is used to control the current Parental Level. If you want to use this feature, then setting the value to all numbers will make your life much easier.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to search for movie listings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This command must be executable by the user running MythVideo.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to search for movie posters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to extract data for movies</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directory that holds movie posters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This directory must exist, and the user running MythVideo needs to have read/write permission to the directory.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Manager</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not retrieve poster</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A movie poster exists for this movie but Myth could not retrieve it within a reasonable amount of time.
+</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -326,6 +371,54 @@
         <source>PL </source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>UserRating:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filters video list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Genre :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Country :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Year :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Runtime :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Rating :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Browse :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort by :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aucune video</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>VideoBrowser</name>
@@ -349,24 +442,28 @@
         <source>minutes</source>
         <translation>Minuten</translation>
     </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>VideoManager</name>
     <message>
         <source>Sorry there were no matches for the title</source>
-        <translation>Leider keine Treffer für den Titel</translation>
+        <translation type="obsolete">Leider keine Treffer für den Titel</translation>
     </message>
     <message>
         <source>Manually Enter IMDB #</source>
-        <translation>Manuelle Eingabe der IMDB-Nr.</translation>
+        <translation type="obsolete">Manuelle Eingabe der IMDB-Nr.</translation>
     </message>
     <message>
         <source>Reset Entry</source>
-        <translation>Eintrag zurücksetzen</translation>
+        <translation type="obsolete">Eintrag zurücksetzen</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Abbrechen</translation>
+        <translation type="obsolete">Abbrechen</translation>
     </message>
     <message>
         <source>minutes</source>
@@ -395,6 +492,14 @@
     <message>
         <source>NR</source>
         <translation>Unbewertet</translation>
+    </message>
+    <message>
+        <source>Delete this file ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>delete failed</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

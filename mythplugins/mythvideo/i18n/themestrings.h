@@ -25,6 +25,7 @@ void strings_null() {
     ThemeUI::tr("Plot:");
     ThemeUI::tr("Rated:");
     ThemeUI::tr("Runtime:");
+    ThemeUI::tr("UserRating:");
     ThemeUI::tr("loading...");
     ThemeUI::tr("No Videos Found");
     ThemeUI::tr("File:");
@@ -38,10 +39,21 @@ void strings_null() {
     ThemeUI::tr("Ignore:");
     ThemeUI::tr("Edit Video Information");
     ThemeUI::tr("Name:");
+    ThemeUI::tr("Category:");
     ThemeUI::tr("Parental Control:");
     ThemeUI::tr("File to Always Play Next:");
     ThemeUI::tr("Include while Browsing:");
     ThemeUI::tr("Cover Art:");
     ThemeUI::tr("Unique Player Command:");
     ThemeUI::tr("/path/to/the/thing.jpg");
+    ThemeUI::tr("Filters video list");
+    ThemeUI::tr("Category :");
+    ThemeUI::tr("Genre :");
+    ThemeUI::tr("Country :");
+    ThemeUI::tr("Year :");
+    ThemeUI::tr("Runtime :");
+    ThemeUI::tr("User Rating :");
+    ThemeUI::tr("Browse :");
+    ThemeUI::tr("Sort by :");
+    ThemeUI::tr("Aucune video");
 }
