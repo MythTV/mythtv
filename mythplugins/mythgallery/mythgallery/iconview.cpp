@@ -18,7 +18,6 @@
 
 #include <iostream>
 
-#include <qsqldatabase.h>
 #include <qevent.h>
 #include <qimage.h>
 #include <qdir.h>
@@ -47,9 +46,9 @@ extern "C" {
 #endif
 
 
-int ThumbItem::GetRotationAngle(QSqlDatabase *db)
+int ThumbItem::GetRotationAngle()
 {
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT angle FROM gallerymetadata WHERE "
                   "image = :PATH ;");
     query.bindValue(":PATH", path.utf8());
@@ -63,9 +62,9 @@ int ThumbItem::GetRotationAngle(QSqlDatabase *db)
     return GalleryUtil::getNaturalRotation(path);
 }
 
-void ThumbItem::SetRotationAngle(int angle, QSqlDatabase *db)
+void ThumbItem::SetRotationAngle(int angle)
 {
-    MSqlQuery query(QString::null, db);
+    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("REPLACE INTO gallerymetadata SET image = :IMAGE , "
                   "angle = :ANGLE ;");
     query.bindValue(":IMAGE", path.utf8());
@@ -73,11 +72,10 @@ void ThumbItem::SetRotationAngle(int angle, QSqlDatabase *db)
     query.exec();
 }
 
-IconView::IconView(QSqlDatabase *db, const QString& galleryDir,
-                   MythMainWindow* parent, const char* name )
+IconView::IconView(const QString& galleryDir, MythMainWindow* parent, 
+                   const char* name )
     : MythDialog(parent, name)
 {
-    m_db         = db;
     m_galleryDir = galleryDir;    
 
     m_inMenu     = false;
@@ -353,7 +351,7 @@ void IconView::keyPressEvent(QKeyEvent *e)
                     if (useOpenGL) {
 
                         if (QGLFormat::hasOpenGL()) {
-                            GLSDialog gv(m_db, m_itemList, pos, slideShow,
+                            GLSDialog gv(m_itemList, pos, slideShow,
                                          gContext->GetMainWindow());
                             gv.exec();
                         }
@@ -366,7 +364,7 @@ void IconView::keyPressEvent(QKeyEvent *e)
                     else 
 #endif
                     {
-                        SingleView sv(m_db, m_itemList, pos, slideShow,
+                        SingleView sv(m_itemList, pos, slideShow,
                                       gContext->GetMainWindow());
                         sv.exec();
                     }                         
@@ -429,7 +427,7 @@ void IconView::customEvent(QCustomEvent *e)
             delete item->pixmap;
         item->pixmap = 0;
 
-        int rotateAngle = item->GetRotationAngle(m_db);
+        int rotateAngle = item->GetRotationAngle();
 
         if (rotateAngle)
         {
@@ -699,7 +697,7 @@ void IconView::loadThumbnail(ThumbItem *item)
                                   QImage::ScaleMax);
         int rotateAngle = 0;
 
-        rotateAngle = item->GetRotationAngle(m_db);
+        rotateAngle = item->GetRotationAngle();
 
         if (rotateAngle != 0)
         {
@@ -788,7 +786,7 @@ void IconView::actionRotateCW()
     if (!item || item->isDir)
         return;
 
-    int rotAngle = item->GetRotationAngle(m_db);
+    int rotAngle = item->GetRotationAngle();
     
     rotAngle += 90;
     if (rotAngle >= 360)
@@ -796,7 +794,7 @@ void IconView::actionRotateCW()
     if (rotAngle < 0)
         rotAngle += 360;
 
-    item->SetRotationAngle(rotAngle, m_db);
+    item->SetRotationAngle(rotAngle);
 
     if (item->pixmap) {
         delete item->pixmap;
@@ -811,7 +809,7 @@ void IconView::actionRotateCCW()
     if (!item || item->isDir)
         return;
 
-    int rotAngle = item->GetRotationAngle(m_db);;
+    int rotAngle = item->GetRotationAngle();
     
     rotAngle -= 90;
     if (rotAngle >= 360)
@@ -819,7 +817,7 @@ void IconView::actionRotateCCW()
     if (rotAngle < 0)
         rotAngle += 360;
 
-    item->SetRotationAngle(rotAngle, m_db);
+    item->SetRotationAngle(rotAngle);
 
     if (item->pixmap) {
         delete item->pixmap;
@@ -840,8 +838,7 @@ void IconView::actionSlideShow()
     int useOpenGL = gContext->GetNumSetting("SlideshowUseOpenGL");
     if (useOpenGL) {
         if (QGLFormat::hasOpenGL()) {
-            GLSDialog gv(m_db, m_itemList, pos, 1,
-                         gContext->GetMainWindow());
+            GLSDialog gv(m_itemList, pos, 1, gContext->GetMainWindow());
             gv.exec();
         }
         else {
@@ -853,8 +850,7 @@ void IconView::actionSlideShow()
     else 
 #endif
     {
-        SingleView sv(m_db, m_itemList, pos, 1,
-                      gContext->GetMainWindow());
+        SingleView sv(m_itemList, pos, 1, gContext->GetMainWindow());
         sv.exec();
     }                         
 }
@@ -872,8 +868,7 @@ void IconView::actionRandomShow()
     int useOpenGL = gContext->GetNumSetting("SlideshowUseOpenGL");
     if (useOpenGL) {
         if (QGLFormat::hasOpenGL()) {
-            GLSDialog gv(m_db, m_itemList, pos, 2,
-                         gContext->GetMainWindow());
+            GLSDialog gv(m_itemList, pos, 2, gContext->GetMainWindow());
             gv.exec();
         }
         else {
@@ -885,8 +880,7 @@ void IconView::actionRandomShow()
     else 
 #endif
     {
-        SingleView sv(m_db, m_itemList, pos, 2,
-                      gContext->GetMainWindow());
+        SingleView sv(m_itemList, pos, 2, gContext->GetMainWindow());
         sv.exec();
     }                         
 }
@@ -894,7 +888,7 @@ void IconView::actionRandomShow()
 void IconView::actionSettings()
 {
     GallerySettings settings;
-    settings.exec(QSqlDatabase::database());
+    settings.exec();
 }
 
 void IconView::actionImport()

@@ -1,6 +1,6 @@
 #include <iostream>
-#include <qsqldatabase.h>
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
 #include <sys/types.h>
 #include <cstdlib>
 #include <unistd.h>
@@ -9,23 +9,24 @@
 
 extern struct Prefs general_prefs;
 
-void MameRomInfo::fillData(QSqlDatabase *db)
+void MameRomInfo::fillData()
 {
     if (gamename == "")
     {
         return;
     }
 
-    RomInfo::fillData(db);
+    RomInfo::fillData();
 
+    MSqlQuery query(MSqlQuery::InitCon());
     QString thequery = "SELECT manu,cloneof,romof,driver,"
                        "cpu1,cpu2,cpu3,cpu4,sound1,sound2,sound3,sound4,"
                        "players,buttons,image_searched,rom_path FROM mamemetadata WHERE "
                        "romname=\"" + romname + "\";";
 
-    QSqlQuery query = db->exec(thequery);
+    query.exec(thequery);
 
-    if (query.isActive() && query.numRowsAffected() > 0);
+    if (query.isActive() && query.size() > 0);
     {
         query.next();
         manu = query.value(0).toString();

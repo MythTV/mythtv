@@ -3,7 +3,6 @@
 using namespace std;
 
 #include <qapplication.h>
-#include <qsqldatabase.h>
 #include <unistd.h>
 
 #include "gamehandler.h"
@@ -14,11 +13,11 @@ using namespace std;
 
 #include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
 #include <mythtv/lcddevice.h>
 
 struct GameData
 {
-    QSqlDatabase *db;
 };
 
 void GameCallback(void *data, QString &selection)
@@ -31,7 +30,7 @@ void GameCallback(void *data, QString &selection)
     if (sel == "game_settings")
     {
         MythGameSettings settings;
-        settings.exec(QSqlDatabase::database());
+        settings.exec();
     }
     else if (sel == "search_for_games")
     {
@@ -42,13 +41,11 @@ void GameCallback(void *data, QString &selection)
 void runMenu(QString which_menu)
 {
     QString themedir = gContext->GetThemeDir();
-    QSqlDatabase *db = QSqlDatabase::database();
 
     ThemedMenu *diag = new ThemedMenu(themedir.ascii(), which_menu,
                                       gContext->GetMainWindow(), "game menu");
 
     GameData data;
-    data.db = db;
 
     diag->setCallback(GameCallback, &data);
     diag->setKillable();
@@ -95,8 +92,8 @@ int mythplugin_init(const char *libversion)
     UpgradeGameDatabaseSchema();
 
     MythGameSettings settings;
-    settings.load(QSqlDatabase::database());
-    settings.save(QSqlDatabase::database());
+    settings.load();
+    settings.save();
 
     setupKeys();
 
@@ -105,15 +102,14 @@ int mythplugin_init(const char *libversion)
 
 void runGames(void)
 {
-    QSqlDatabase *db = QSqlDatabase::database();
-
     //look for new systems that haven't been added to the database
     //yet and tell them to scan their games
 
     //build a list of all the systems in the database
     QStringList systems;
-    QString thequery = "SELECT DISTINCT system FROM gamemetadata;";
-    QSqlQuery query = db->exec(thequery);
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec("SELECT DISTINCT system FROM gamemetadata;");
     while (query.next())
     {
         QString name = query.value(0).toString();
@@ -134,7 +130,7 @@ void runGames(void)
 
     QString paths = gContext->GetSetting("GameTreeLevels");
 
-    GameTree gametree(gContext->GetMainWindow(), db, "gametree", "game-",
+    GameTree gametree(gContext->GetMainWindow(), "gametree", "game-",
                       paths);
     gametree.exec();
 }

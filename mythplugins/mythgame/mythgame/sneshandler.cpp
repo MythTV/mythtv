@@ -6,13 +6,13 @@
 #include <qobject.h>
 #include <qptrlist.h>
 #include <qstringlist.h>
-#include <qsqldatabase.h>
 #include <qdir.h>
 
 #include <sys/types.h>
 #include <unistd.h>
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
 #include <mythtv/mythdialogs.h>
 
 #include <string>
@@ -165,10 +165,9 @@ void SnesHandler::processGames(bool bValidate)
     else
     {
         QString thequery;
-        QSqlDatabase* db = QSqlDatabase::database();
+        MSqlQuery query(MSqlQuery::InitCon());
         
-        thequery = "DELETE FROM gamemetadata WHERE system = \"Snes\";";
-        db->exec(thequery);
+        query.exec("DELETE FROM gamemetadata WHERE system = \"Snes\";");
 
         // Search the rom dir for valid new roms.
         QDir RomDir(gContext->GetSetting("SnesRomLocation"));
@@ -243,7 +242,7 @@ void SnesHandler::processGames(bool bValidate)
                                    .arg(Info.fileName().latin1())
                                    .arg(GameName.latin1()).arg(Genre.latin1())
                                    .arg(Year);
-                db->exec(thequery);
+                query.exec(thequery);
             }
         }
 
@@ -255,13 +254,12 @@ void SnesHandler::processGames()
 {
     QString thequery;
 
-    QSqlDatabase* db = QSqlDatabase::database();
+    MSqlQuery query(MSqlQuery::InitCon());
 
     // Remove all metadata entries from the tables, all correct values will be
     // added as they are found.  This is done so that entries that may no longer be
     // available or valid are removed each time the game list is remade.
-    thequery = "DELETE FROM gamemetadata WHERE system = \"Snes\";";
-    db->exec(thequery);
+    query.exec("DELETE FROM gamemetadata WHERE system = \"Snes\";");
 
     // Search the rom dir for valid new roms.
     QDir RomDir(gContext->GetSetting("SnesRomLocation"));
@@ -307,7 +305,7 @@ void SnesHandler::processGames()
                                .arg(Info.fileName().latin1())
                                .arg(GameName.latin1()).arg(Genre.latin1())
                                .arg(Year);
-            db->exec(thequery);
+            query.exec(thequery);
         }
     }
 
@@ -458,7 +456,7 @@ void SnesHandler::edit_settings(RomInfo * romdata)
     SnesRomInfo *snesdata = dynamic_cast<SnesRomInfo*>(romdata);
 
     SnesSettingsDlg settingsdlg(snesdata->Romname().latin1());
-    settingsdlg.exec(QSqlDatabase::database());
+    settingsdlg.exec();
 
 /*
     QString ImageFile;
@@ -471,7 +469,7 @@ void SnesHandler::edit_system_settings(RomInfo * romdata)
 {
     romdata = romdata;
     SnesSettingsDlg settingsDlg("default");
-    settingsDlg.exec(QSqlDatabase::database());
+    settingsDlg.exec();
 
     SetDefaultSettings();
 }
@@ -517,12 +515,12 @@ void SnesHandler::SetGameSettings(SnesGameSettings &game_settings, SnesRomInfo *
     game_settings = defaultSettings;
     if(rominfo)
     {
-        QSqlDatabase *db = QSqlDatabase::database();
+        MSqlQuery query(MSqlQuery::InitCon());
         QString thequery;
         thequery = QString("SELECT * FROM snessettings WHERE romname = \"%1\";")
                           .arg(rominfo->Romname().latin1());
-        QSqlQuery query = db->exec(thequery);
-        if (query.isActive() && query.numRowsAffected() > 0)
+        query.exec(thequery);
+        if (query.isActive() && query.size() > 0)
         {
             query.next();
             if (!query.value(1).toBool())
@@ -569,10 +567,10 @@ void SnesHandler::SetGameSettings(SnesGameSettings &game_settings, SnesRomInfo *
 
 void SnesHandler::SetDefaultSettings()
 {
-    QSqlDatabase *db = QSqlDatabase::database();
-    QSqlQuery query = db->exec("SELECT * FROM snessettings WHERE romname = \"default\";");
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec("SELECT * FROM snessettings WHERE romname = \"default\";");
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.isActive() && query.size() > 0)
     {
         query.next();
         defaultSettings.default_options = query.value(1).toBool();

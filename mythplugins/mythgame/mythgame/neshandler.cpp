@@ -1,8 +1,9 @@
 #include <string>
 #include <zlib.h>
 #include <qdir.h>
-#include <qsqldatabase.h>
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
+
 #include "neshandler.h"
 #include "nesrominfo.h"
 #include "nessettingsdlg.h"
@@ -43,7 +44,7 @@ void NesHandler::edit_settings(RomInfo* romdata)
     romdata = romdata;
 
     NesSettingsDlg settingsdlg(romdata->Romname().latin1());
-    settingsdlg.exec(QSqlDatabase::database());
+    settingsdlg.exec();
 }
 
 void NesHandler::edit_system_settings(RomInfo* romdata)
@@ -51,20 +52,17 @@ void NesHandler::edit_system_settings(RomInfo* romdata)
     romdata = romdata;
 
     NesSettingsDlg settingsdlg("default");
-    settingsdlg.exec(QSqlDatabase::database());
+    settingsdlg.exec();
 }
 
 void NesHandler::processGames()
 {
-    QString thequery;
-
-    QSqlDatabase* db = QSqlDatabase::database();
 
     // Remove all metadata entries from the tables, all correct values will be
     // added as they are found.  This is done so that entries that may no longer be
     // available or valid are removed each time the game list is remade.
-    thequery = "DELETE FROM gamemetadata WHERE system = \"Nes\";";
-    db->exec(thequery);
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec("DELETE FROM gamemetadata WHERE system = \"Nes\";");
 
     // Search the rom dir for valid new roms.
     QDir RomDir(gContext->GetSetting("NesRomLocation"));
@@ -96,13 +94,13 @@ void NesHandler::processGames()
             GetMetadata(GameName, &Genre, &Year);
             
             // Put the game into the database.
-            thequery = QString("INSERT INTO gamemetadata "
+            QString thequery = QString("INSERT INTO gamemetadata "
                                "(system, romname, gamename, genre, year) "
                                "VALUES (\"Nes\", \"%1\", \"%2\", \"%3\", %4);")
                                .arg(Info.fileName().latin1())
                                .arg(GameName.latin1()).arg(Genre.latin1())
                                .arg(Year);
-            db->exec(thequery);
+            query.exec(thequery);
         }
         else
         {
@@ -293,9 +291,11 @@ void NesHandler::GetMetadata(QString GameName, QString* Genre, int* Year)
     thequery = QString("SELECT releasedate, keywords FROM nestitle "
                        "WHERE MATCH(description) AGAINST ('%1');")
                        .arg(GameName);
-    QSqlDatabase* db = QSqlDatabase::database();
-    QSqlQuery query = db->exec(thequery);
-    if (query.isActive() && query.numRowsAffected() > 0)
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec(thequery);
+
+    if (query.isActive() && query.size() > 0)
     {
         // Take first entry since that will be the most relevant match.
         query.first();
@@ -310,8 +310,9 @@ void NesHandler::GetMetadata(QString GameName, QString* Genre, int* Year)
                 continue;
 
             thequery = QString("SELECT value FROM neskeyword WHERE keyword = '%1';").arg(*keyword);
-            QSqlQuery query = db->exec(thequery);
-            if (query.isActive() && query.numRowsAffected() > 0)
+            query.exec(thequery);
+
+            if (query.isActive() && query.size() > 0)
             {
                 query.first();
                 *Genre = query.value(0).toString();

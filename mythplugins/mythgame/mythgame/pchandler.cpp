@@ -2,12 +2,12 @@
 #include "pchandler.h"
 
 #include <qobject.h>
-#include <qsqldatabase.h>
 
 #include <sys/types.h>
 #include <unistd.h>
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
 #include <qfile.h>
 #include <qdom.h>
 #include <string>
@@ -22,11 +22,8 @@ PCHandler::~PCHandler()
 
 void PCHandler::processGames()
 {
-    QString thequery;
-    QSqlDatabase* db = QSqlDatabase::database();
-
-    thequery = "DELETE FROM gamemetadata WHERE system = \"PC\";";
-    db->exec(thequery);
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec("DELETE FROM gamemetadata WHERE system = \"PC\";");
 
     QString GameDoc = gContext->GetSetting("PCGameList");
     if(!QFile::exists(GameDoc))
@@ -90,13 +87,13 @@ void PCHandler::processGames()
 
                 if(GameName != "" && Command != "")
                 {
-                    thequery = QString("INSERT INTO gamemetadata "
+                    QString thequery = QString("INSERT INTO gamemetadata "
                                    "(system, romname, gamename, genre, year) "
                                    "VALUES (\"PC\", \"%1\", \"%2\", \"%3\", %4);")
                                    .arg(Command.latin1())
                                    .arg(GameName.latin1()).arg(Genre.latin1())
                                    .arg(Year);
-                    db->exec(thequery);
+                    query.exec(thequery);
                 }
             }
         }
@@ -115,14 +112,14 @@ void PCHandler::edit_settings(RomInfo * romdata)
 {
     PCRomInfo *pcdata = dynamic_cast<PCRomInfo*>(romdata);
     PCSettingsDlg settingsdlg(pcdata->Romname().latin1());
-    settingsdlg.exec(QSqlDatabase::database());
+    settingsdlg.exec();
 }
 
 void PCHandler::edit_system_settings(RomInfo * romdata)
 {
     romdata = romdata;
     PCSettingsDlg settingsDlg("default");
-    settingsDlg.exec(QSqlDatabase::database());    
+    settingsDlg.exec();
 }
 
 PCHandler* PCHandler::getHandler(void)

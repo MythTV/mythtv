@@ -36,9 +36,8 @@ class GLSDialog : public MythDialog
 {
 public:
     
-    GLSDialog(QSqlDatabase *db, const ThumbList& itemList,
-              int pos, int slideShow, MythMainWindow *parent,
-              const char *name=0);
+    GLSDialog(const ThumbList& itemList, int pos, int slideShow, 
+              MythMainWindow *parent, const char *name=0);
 
 protected:
 
@@ -55,8 +54,7 @@ class GLSingleView : public QGLWidget
 
 public:
 
-    GLSingleView(QSqlDatabase *db, ThumbList itemList,
-                 int pos, int slideShow, QWidget *parent);
+    GLSingleView(ThumbList itemList, int pos, int slideShow, QWidget *parent);
     ~GLSingleView();
 
     void cleanUp();
@@ -79,7 +77,6 @@ private:
         ThumbItem    *item;
     } TexItem;
 
-    QSqlDatabase *m_db;
     int           m_pos;
     ThumbList     m_itemList;
 

@@ -2,7 +2,6 @@
 
 
 #include <qapplication.h>
-#include <qsqldatabase.h>
 #include <qimage.h>
 #include <qdir.h>
 
@@ -34,8 +33,7 @@ void runGallery(void)
         diag.exec();
     }
     else {
-        IconView icv(QSqlDatabase::database(), startdir,
-                     gContext->GetMainWindow(), "IconView");
+        IconView icv(startdir, gContext->GetMainWindow(), "IconView");
         icv.exec();
     }
 }
@@ -79,8 +77,8 @@ int mythplugin_init(const char *libversion)
     UpgradeGalleryDatabaseSchema();
 
     GallerySettings settings;
-    settings.load(QSqlDatabase::database());
-    settings.save(QSqlDatabase::database());    
+    settings.load();
+    settings.save();
 
     setupKeys();
 
@@ -96,7 +94,7 @@ int mythplugin_run(void)
 int mythplugin_config(void)
 {
     GallerySettings settings;
-    settings.exec(QSqlDatabase::database());
+    settings.exec();
 
     return 0;
 }

@@ -8,7 +8,6 @@
 
 class MythMainWindow;
 class GameHandler;
-class QSqlDatabase;
 class QObject;
 
 class GameHandler

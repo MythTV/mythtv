@@ -1,4 +1,3 @@
-#include <qsqldatabase.h>
 #include <qstring.h>
 
 #include <iostream>
@@ -7,15 +6,16 @@ using namespace std;
 #include "dbcheck.h"
 
 #include "mythtv/mythcontext.h"
+#include "mythtv/mythdbcon.h"
 
 const QString currentDatabaseVersion = "1004";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
-    QSqlDatabase *db_conn = QSqlDatabase::database();
+    MSqlQuery query(MSqlQuery::InitCon());
 
-    db_conn->exec("DELETE FROM settings WHERE value='GameDBSchemaVer';");
-    db_conn->exec(QString("INSERT INTO settings (value, data, hostname) "
+    query.exec("DELETE FROM settings WHERE value='GameDBSchemaVer';");
+    query.exec(QString("INSERT INTO settings (value, data, hostname) "
                           "VALUES ('GameDBSchemaVer', %1, NULL);")
                          .arg(newnumber));
 }
@@ -23,7 +23,7 @@ static void UpdateDBVersionNumber(const QString &newnumber)
 static void performActualUpdate(const QString updates[], QString version,
                                 QString &dbver)
 {
-    QSqlDatabase *db_conn = QSqlDatabase::database();
+    MSqlQuery query(MSqlQuery::InitCon());
 
     VERBOSE(VB_ALL, QString("Upgrading to MythGame schema version ") + 
             version);
@@ -33,7 +33,7 @@ static void performActualUpdate(const QString updates[], QString version,
 
     while (thequery != "")
     {
-        db_conn->exec(thequery);
+        query.exec(thequery);
         counter++;
         thequery = updates[counter];
     }
@@ -44,8 +44,6 @@ static void performActualUpdate(const QString updates[], QString version,
 
 static void InitializeDatabase(void)
 {
-    QSqlDatabase *db_conn = QSqlDatabase::database();
-
     VERBOSE(VB_ALL, "Inserting MythGame initial database information.");
 
     const QString updates[] = {
@@ -167,11 +165,13 @@ static void InitializeDatabase(void)
     QString dbver = "";
     performActualUpdate(updates, "1000", dbver);
 
-    QSqlQuery qQuery = db_conn->exec("SELECT * FROM mamesettings WHERE "
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec("SELECT * FROM mamesettings WHERE "
                                      "romname = \"default\";");
-    if (!qQuery.isActive() || qQuery.numRowsAffected() <= 0)
+
+    if (!query.isActive() || query.size() <= 0)
     {
-        db_conn->exec("INSERT INTO mamesettings (romname,usedefault,"
+        query.exec("INSERT INTO mamesettings (romname,usedefault,"
                       "fullscreen,scanlines,extra_artwork,autoframeskip,"
                       "autocolordepth,rotleft,rotright,flipx,flipy,scale,"
                       "antialias,translucency,beam,flicker,vectorres,analogjoy,"
@@ -181,11 +181,12 @@ static void InitializeDatabase(void)
                       "0,0,0,4,1,1,0,-16,0,\"\");");
     }
 
-    qQuery = db_conn->exec("SELECT * FROM snessettings WHERE "
+    query.exec("SELECT * FROM snessettings WHERE "
                            "romname = \"default\";");
-    if (!qQuery.isActive() || qQuery.numRowsAffected() <= 0)
+
+    if (!query.isActive() || query.size() <= 0)
     {
-        db_conn->exec("INSERT INTO snessettings (romname,usedefault,"
+        query.exec("INSERT INTO snessettings (romname,usedefault,"
                       "transparency,sixteen,hires,interpolate,nomodeswitch,"
                       "fullscreen,stretch,nosound,soundskip,stereo,"
                       "soundquality,envx,threadsound,syncsound,"
@@ -198,8 +199,9 @@ static void InitializeDatabase(void)
                       "0,0,0,0,0,0,0,0,0,0,0,0,0,0,\"\");");
     }
 
-    qQuery = db_conn->exec("SELECT * FROM nestitle;");
-    if (!qQuery.isActive() || qQuery.numRowsAffected() <= 0)
+    query.exec("SELECT * FROM nestitle;");
+
+    if (!query.isActive() || query.size() <= 0)
     {
         const QString updates2[] = {
 "INSERT INTO nestitle VALUES (1,'10 Yard Fight',2,2,1985,897,'1PL 2PX FTB SPT');",
@@ -969,8 +971,8 @@ static void InitializeDatabase(void)
         performActualUpdate(updates2, "1000", dbver);
     }
 
-    qQuery = db_conn->exec("SELECT * FROM neskeyword;");
-    if (!qQuery.isActive() || qQuery.numRowsAffected() <= 0)
+    query.exec("SELECT * FROM neskeyword;");
+    if (!query.isActive() || query.size() <= 0)
     {
         const QString updates2[] = {
 "INSERT INTO neskeyword VALUES ('1PL','1 Player');",

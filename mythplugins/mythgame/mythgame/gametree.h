@@ -11,8 +11,6 @@
 
 #include "rominfo.h"
 
-class QSqlDatabase;
-
 class GameTreeItem
 {
   public:
@@ -62,9 +60,8 @@ class GameTree : public MythThemedDialog
 
     typedef QValueVector<int> IntVector;
 
-    GameTree(MythMainWindow *parent, QSqlDatabase *ldb,
-             QString window_name, QString theme_filename,
-             QString &paths, const char *name = 0);
+    GameTree(MythMainWindow *parent, QString window_name, 
+             QString theme_filename, QString &paths, const char *name = 0);
    ~GameTree();
 
     void buildGameList();
@@ -85,8 +82,6 @@ class GameTree : public MythThemedDialog
     void toggleFavorite(void);
 
     QString getClause(QString field, GameTreeItem *item);
-
-    QSqlDatabase *db;
 
     UIManagedTreeListType *game_tree_list;
     GenericTree           *game_tree_root;

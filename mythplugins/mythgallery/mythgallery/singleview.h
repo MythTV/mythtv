@@ -31,8 +31,7 @@ class SingleView : public MythDialog
     
 public:
 
-    SingleView(QSqlDatabase *db, ThumbList itemList,
-               int pos, int slideShow,
+    SingleView(ThumbList itemList, int pos, int slideShow, 
                MythMainWindow *parent, const char *name=0);
     ~SingleView();
 
@@ -43,7 +42,6 @@ protected:
 
 private:
     
-    QSqlDatabase *m_db;
     ThumbList     m_itemList;
     int           m_pos;
     

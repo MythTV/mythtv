@@ -1,6 +1,9 @@
 #include <iostream>
 #include <qfile.h>
-#include <qsqldatabase.h>
+
+#include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
+
 #include "nesrominfo.h"
 
 bool NesRomInfo::FindImage(QString type, QString* result)
@@ -17,9 +20,10 @@ bool NesRomInfo::FindImage(QString type, QString* result)
     thequery = QString("SELECT screenshot, description FROM nestitle WHERE "
                        "MATCH(description) AGAINST ('%1');").arg(Gamename());
     
-    QSqlDatabase* db = QSqlDatabase::database();
-    QSqlQuery query = db->exec(thequery);
-    if (query.isActive() && query.numRowsAffected() > 0)
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec(thequery);
+
+    if (query.isActive() && query.size() > 0)
     {
         // Take first entry since that will be the most relevant match.
         query.first();

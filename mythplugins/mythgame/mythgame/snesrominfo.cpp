@@ -1,4 +1,3 @@
-#include <qsqldatabase.h>
 #include <qfile.h>
 #include "snesrominfo.h"
 #include <iostream>

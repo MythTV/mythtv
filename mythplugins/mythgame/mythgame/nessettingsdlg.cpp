@@ -7,8 +7,8 @@ public:
         setLabel("NES settings have not been written yet.");
     };
 
-    virtual void load(QSqlDatabase *db) { (void)db; };
-    virtual void save(QSqlDatabase *db) { (void)db; };
+    virtual void load() {};
+    virtual void save() {};
 };
 
 NesSettingsDlg::NesSettingsDlg(QString romname)

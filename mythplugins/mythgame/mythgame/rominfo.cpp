@@ -1,4 +1,6 @@
-#include <qsqldatabase.h>
+#include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
+
 #include "rominfo.h"
 
 bool operator==(const RomInfo& a, const RomInfo& b)
@@ -22,17 +24,17 @@ void RomInfo::setField(QString field, QString data)
         favorite = data.toInt();
 }
 
-void RomInfo::setFavorite(QSqlDatabase *db)
+void RomInfo::setFavorite()
 {
     favorite = 1 - favorite;
 
     QString thequery = QString("UPDATE gamemetadata SET favorite=\"%1\" WHERE "
                                "romname=\"%2\";").arg(favorite).arg(romname);
-
-    db->exec(thequery);
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec(thequery);
 }
 
-void RomInfo::fillData(QSqlDatabase *db)
+void RomInfo::fillData()
 {
     if (gamename == "")
     {
@@ -47,9 +49,10 @@ void RomInfo::fillData(QSqlDatabase *db)
 
     thequery += ";";
 
-    QSqlQuery query = db->exec(thequery);
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec(thequery);
 
-    if (query.isActive() && query.numRowsAffected() > 0);
+    if (query.isActive() && query.size() > 0);
     {
         query.next();
 

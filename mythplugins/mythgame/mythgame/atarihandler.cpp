@@ -1,7 +1,7 @@
 #include <string>
 #include <qdir.h>
-#include <qsqldatabase.h>
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
 #include "atarihandler.h"
 #include "atarirominfo.h"
 #include "atarisettingsdlg.h"
@@ -40,7 +40,7 @@ void AtariHandler::edit_settings(RomInfo* romdata)
     romdata = romdata;
 
     AtariSettingsDlg settingsdlg(romdata->Romname().latin1());
-    settingsdlg.exec(QSqlDatabase::database());
+    settingsdlg.exec();
 }
 
 void AtariHandler::edit_system_settings(RomInfo* romdata)
@@ -48,21 +48,21 @@ void AtariHandler::edit_system_settings(RomInfo* romdata)
     romdata = romdata;
 
     AtariSettingsDlg settingsdlg("default");
-    settingsdlg.exec(QSqlDatabase::database());
+    settingsdlg.exec();
 }
 
 void AtariHandler::processGames()
 {
     QString thequery;
 
-    QSqlDatabase* db = QSqlDatabase::database();
+    MSqlQuery query(MSqlQuery::InitCon());
 
     // Remove all metadata entries from the tables, all correct values will be
     // added as they are found.  This is done so that entries that may no longer be
     // available or valid are removed each time the game list is remade.
     thequery = "DELETE FROM gamemetadata WHERE system = \"%1\";";
     thequery.arg(systemname);
-    db->exec(thequery);
+    query.exec(thequery);
 
     // Search the rom dir for valid new roms.
     QDir RomDir(gContext->GetSetting(QString("%1RomLocation").arg(systemname)));
@@ -101,7 +101,7 @@ void AtariHandler::processGames()
                                .arg(Info.fileName().latin1())
                                .arg(GameName.latin1()).arg(Genre.latin1())
                                .arg(Year);
-            db->exec(thequery);
+            query.exec(thequery);
         }
         else
         {

@@ -1,5 +1,4 @@
 #include <qapplication.h>
-#include <qsqldatabase.h>
 #include <stdlib.h>
 #include <iostream>
 using namespace std;
@@ -8,15 +7,14 @@ using namespace std;
 #include "gamehandler.h"
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
 #include <mythtv/mythwidgets.h>
 #include <mythtv/uitypes.h>
 
-GameTree::GameTree(MythMainWindow *parent, QSqlDatabase *ldb,
-                   QString window_name, QString theme_filename,
-                   QString &paths, const char *name)
+GameTree::GameTree(MythMainWindow *parent, QString window_name, 
+                   QString theme_filename, QString &paths, const char *name)
         : MythThemedDialog(parent, window_name, theme_filename, name)
 {
-    db = ldb;
     m_paths = paths;
     m_pathlist = QStringList::split(" ", m_paths);
     showfavs = gContext->GetSetting("GameShowFavorites");
@@ -88,9 +86,10 @@ void GameTree::buildGameList(void)
     QString thequery = QString("SELECT DISTINCT %1 FROM gamemetadata "
                                "ORDER BY %2;").arg(first).arg(first);
 
-    QSqlQuery query = db->exec(thequery);
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec(thequery);
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.isActive() && query.size() > 0)
     {
         while (query.next())
         {
@@ -215,7 +214,7 @@ void GameTree::toggleFavorite(void)
 
     if (curitem->level == "gamename" && curitem->isleaf)
     {
-        curitem->rominfo->setFavorite(db);
+        curitem->rominfo->setFavorite();
         if (curitem->rominfo->Favorite())
             game_favorite->SetText("Yes");
         else
@@ -259,8 +258,10 @@ void GameTree::FillListFrom(GameTreeItem *item)
 
     bool isleaf = (column == "gamename");
 
-    QSqlQuery query = db->exec(thequery);
-    if (query.isActive() && query.numRowsAffected() > 0)
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec(thequery);
+
+    if (query.isActive() && query.size() > 0)
     {
         while (query.next())
         {
@@ -275,7 +276,7 @@ void GameTree::FillListFrom(GameTreeItem *item)
             {
                 rinfo = GameHandler::CreateRomInfo(item->rominfo);
                 rinfo->setField(column, current);
-                rinfo->fillData(db);
+                rinfo->fillData();
             }
             else
             {

@@ -1,4 +1,3 @@
-#include <qsqldatabase.h>
 #include <qstring.h>
 
 #include <iostream>
@@ -7,15 +6,16 @@ using namespace std;
 #include "dbcheck.h"
 
 #include "mythtv/mythcontext.h"
+#include "mythtv/mythdbcon.h"
 
 const QString currentDatabaseVersion = "1000";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
-    QSqlDatabase *db_conn = QSqlDatabase::database();
+    MSqlQuery query(MSqlQuery::InitCon());
 
-    db_conn->exec("DELETE FROM settings WHERE value='GalleryDBSchemaVer';");
-    db_conn->exec(QString("INSERT INTO settings (value, data, hostname) "
+    query.exec("DELETE FROM settings WHERE value='GalleryDBSchemaVer';");
+    query.exec(QString("INSERT INTO settings (value, data, hostname) "
                           "VALUES ('GalleryDBSchemaVer', %1, NULL);")
                          .arg(newnumber));
 }
@@ -23,7 +23,7 @@ static void UpdateDBVersionNumber(const QString &newnumber)
 static void performActualUpdate(const QString updates[], QString version,
                                 QString &dbver)
 {
-    QSqlDatabase *db_conn = QSqlDatabase::database();
+    MSqlQuery query(MSqlQuery::InitCon());
 
     VERBOSE(VB_ALL, QString("Upgrading to MythGallery schema version ") + 
             version);
@@ -33,7 +33,7 @@ static void performActualUpdate(const QString updates[], QString version,
 
     while (thequery != "")
     {
-        db_conn->exec(thequery);
+        query.exec(thequery);
         counter++;
         thequery = updates[counter];
     }

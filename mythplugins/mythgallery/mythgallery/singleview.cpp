@@ -19,7 +19,6 @@
 #include <iostream>
 #include <cmath>
 
-#include <qsqldatabase.h>
 #include <qevent.h>
 #include <qimage.h>
 #include <qfileinfo.h>
@@ -31,12 +30,10 @@
 #include "constants.h"
 #include "galleryutil.h"
 
-SingleView::SingleView(QSqlDatabase *db, ThumbList itemList,
-                       int pos, int slideShow,
+SingleView::SingleView(ThumbList itemList, int pos, int slideShow,
                        MythMainWindow *parent, const char *name )
     : MythDialog(parent, name)
 {
-    m_db        = db;
     m_itemList  = itemList;
     m_pos       = pos;
     m_slideShow = slideShow;
@@ -456,7 +453,7 @@ void SingleView::loadImage()
         
         if (!m_image.isNull()) {
 
-          m_rotateAngle = item->GetRotationAngle(m_db);
+          m_rotateAngle = item->GetRotationAngle();
           
           if (m_rotateAngle != 0) {
             QWMatrix matrix;
@@ -486,7 +483,7 @@ void SingleView::rotate(int angle)
 
     ThumbItem *item = m_itemList.at(m_pos);
     if (item) {
-        item->SetRotationAngle(m_rotateAngle, m_db);
+        item->SetRotationAngle(m_rotateAngle);
 
         // Delete thumbnail for this
         if (item->pixmap)

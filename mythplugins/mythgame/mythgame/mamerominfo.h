@@ -11,7 +11,6 @@ typedef enum _RomStatus {
         MAY_WORK
 } RomStatus;
 
-class QSqlDatabase;
 
 class MameRomInfo : public RomInfo
 {
@@ -126,7 +125,7 @@ class MameRomInfo : public RomInfo
 
     int Timesplayed() const { return timesplayed; }
     void setTimesplayed(int ltimesplayed) { timesplayed = ltimesplayed; }
-    virtual void fillData(QSqlDatabase *db);
+    virtual void fillData();
 
     virtual bool FindImage(QString type,QString *result);
 

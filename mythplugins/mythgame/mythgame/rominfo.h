@@ -3,7 +3,6 @@
 
 #include <qstring.h>
 
-class QSqlDatabase;
 
 class RomInfo
 {
@@ -45,10 +44,10 @@ class RomInfo
     void setYear(int lyear) { year = lyear; }
 
     int Favorite() { return favorite; }
-    virtual void setFavorite(QSqlDatabase *db);
+    virtual void setFavorite();
 
     virtual void setField(QString field, QString data);
-    virtual void fillData(QSqlDatabase *db);
+    virtual void fillData();
 
     virtual bool FindImage(QString type, QString *result) { type = type;
                                                             result = result;

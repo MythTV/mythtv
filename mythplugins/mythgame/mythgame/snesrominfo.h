@@ -5,7 +5,6 @@
 #include <mythtv/mythcontext.h>
 #include "rominfo.h"
 
-class QSqlDatabase;
 
 class SnesGameSettings
 {

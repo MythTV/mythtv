@@ -22,7 +22,6 @@
 #include <iostream>
 #include <math.h>
 
-#include <qsqldatabase.h>
 #include <qtimer.h>
 #include <qimage.h>
 #include <qlayout.h>
@@ -35,13 +34,12 @@
 #include "glsingleview.h"
 #include "galleryutil.h"
 
-GLSDialog::GLSDialog(QSqlDatabase *db, const ThumbList& itemList,
-                     int pos, int slideShow, MythMainWindow *parent,
-                     const char *name)
+GLSDialog::GLSDialog(const ThumbList& itemList, int pos, int slideShow, 
+                     MythMainWindow *parent, const char *name)
     : MythDialog(parent, name)
 {
     QBoxLayout *l = new QVBoxLayout(this);
-    m_view = new GLSingleView(db, itemList, pos, slideShow, this);
+    m_view = new GLSingleView(itemList, pos, slideShow, this);
     l->addWidget(m_view);
 
     setFocusProxy(m_view);
@@ -57,11 +55,10 @@ void GLSDialog::closeEvent(QCloseEvent *e)
     e->accept();
 }
 
-GLSingleView::GLSingleView(QSqlDatabase *db, ThumbList itemList,
-                           int pos, int slideShow, QWidget *parent)
+GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow, 
+                           QWidget *parent)
     : QGLWidget(parent)
 {
-    m_db       = db;
     m_pos      = pos;
     m_itemList = itemList;
     m_movieState  = 0;
@@ -536,7 +533,7 @@ void GLSingleView::loadImage()
         t.item     = item;
         t.angle    = 0;
 
-        t.angle = item->GetRotationAngle(m_db);
+        t.angle = item->GetRotationAngle();
 
         t.width  = image.width();
         t.height = image.height();
@@ -587,7 +584,7 @@ void GLSingleView::rotate(int angle)
 
     ThumbItem *item = m_itemList.at(m_pos);
     if (item) {
-        item->SetRotationAngle(ang, m_db);
+        item->SetRotationAngle(ang);
 
         // Delete thumbnail for this
         if (item->pixmap)

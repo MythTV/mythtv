@@ -27,8 +27,6 @@
 
 #include <mythtv/mythdialogs.h>
 
-class QSqlDatabase;
-
 class XMLParse;
 class UIListBtnType;
 
@@ -50,8 +48,8 @@ public:
             delete pixmap;
     }
 
-    int GetRotationAngle(QSqlDatabase *db);
-    void SetRotationAngle(int angle, QSqlDatabase *db);
+    int GetRotationAngle();
+    void SetRotationAngle(int angle);
 
     QPixmap *pixmap;
     QString  name;
@@ -67,8 +65,8 @@ class IconView : public MythDialog
 
 public:
 
-    IconView(QSqlDatabase *db, const QString& galleryDir,
-             MythMainWindow* parent, const char* name = 0);
+    IconView(const QString& galleryDir, MythMainWindow* parent, 
+             const char* name = 0);
     ~IconView();
 
 protected:
@@ -103,7 +101,6 @@ private:
     void loadThumbnail(ThumbItem *item);
     void importFromDir(const QString &fromDir, const QString &toDir);
     
-    QSqlDatabase*       m_db;
     QPtrList<ThumbItem> m_itemList;
     QDict<ThumbItem>    m_itemDict;
     QString             m_galleryDir;
