@@ -226,6 +226,10 @@ class MythPasswordDialog: public MythDialog
   
     void checkPassword(const QString &);
 
+ protected:
+ 
+    void keyPressEvent(QKeyEvent *e);
+
   private:
   
     MythLineEdit        *password_editor;

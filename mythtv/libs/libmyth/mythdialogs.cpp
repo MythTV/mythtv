@@ -1170,6 +1170,15 @@ MythPasswordDialog::MythPasswordDialog(QString message,
     
 }
 
+void MythPasswordDialog::keyPressEvent(QKeyEvent *e)
+{
+    if (e->key() == Key_Escape)
+    {
+        MythDialog::keyPressEvent(e);
+    }
+}
+
+
 void MythPasswordDialog::checkPassword(const QString &the_text)
 {
     if(the_text == target_text)
