@@ -317,6 +317,22 @@ public:
     };
 };
 
+class SRSeriesid: public LineEditSetting, public SRSetting {
+public:
+    SRSeriesid(const ScheduledRecording& parent):
+        SRSetting(parent, "seriesid") {
+        setVisible(false);
+    };
+};
+
+class SRProgramid: public LineEditSetting, public SRSetting {
+public:
+    SRProgramid(const ScheduledRecording& parent):
+        SRSetting(parent, "programid") {
+        setVisible(false);
+    };
+};
+
 ScheduledRecording::ScheduledRecording() {
     addChild(id = new ID());
     addChild(type = new SRRecordingType(*this));
@@ -340,6 +356,8 @@ ScheduledRecording::ScheduledRecording() {
     addChild(category = new SRCategory(*this));
     addChild(recpriority = new SRRecPriority(*this));
     addChild(recgroup = new SRRecGroup(*this));
+    addChild(seriesid = new SRSeriesid(*this));
+    addChild(programid = new SRProgramid(*this));
 
     m_pginfo = NULL;
 }
@@ -372,6 +390,8 @@ void ScheduledRecording::fromProgramInfo(ProgramInfo* proginfo,
     dupin->setValue(0);
     dupmethod->setValue(0);
     autoexpire->setValue(gContext->GetNumSetting("AutoExpireDefault", 0));
+    seriesid->setValue(proginfo->seriesid);
+    programid->setValue(proginfo->programid);
     maxepisodes->setValue(0);
     maxnewest->setValue(0);
     startoffset->setValue(0);
@@ -628,17 +648,20 @@ void ScheduledRecording::addHistory(QSqlDatabase* db,
     sqldescription.replace(QRegExp("\""), QString("\\\""));
     sqlcategory.replace(QRegExp("\""), QString("\\\""));
 
-    QString query = QString("INSERT INTO oldrecorded (chanid,starttime,endtime,title,"
-                            "subtitle,description,category) "
+    QString query = QString("INSERT INTO oldrecorded (chanid,starttime,"
+                            "endtime,title,subtitle,description,category,"
+                            "seriesid,programid) "
                             "VALUES(%1,\"%2\",\"%3\",\"%4\",\"%5\",\"%6\","
-                            "\"%7\");")
+                            "\"%7\",\"%8\",\"%9\");")
         .arg(proginfo.chanid)
         .arg(proginfo.recstartts.toString(Qt::ISODate))
         .arg(proginfo.recendts.toString(Qt::ISODate))
         .arg(sqltitle.utf8()) 
         .arg(sqlsubtitle.utf8())
         .arg(sqldescription.utf8())
-        .arg(sqlcategory.utf8());
+        .arg(sqlcategory.utf8())
+        .arg(proginfo.seriesid)
+        .arg(proginfo.programid);
 
     QSqlQuery result = db->exec(query);
     if (!result.isActive())

@@ -75,6 +75,9 @@ ProgramRecPriorityInfo& ProgramRecPriorityInfo::operator=(const ProgramInfo &oth
     schedulerid = other.schedulerid;
     recpriority = other.recpriority;
 
+    seriesid = other.seriesid;
+    programid = other.programid;
+
     return(*this);
 }
 

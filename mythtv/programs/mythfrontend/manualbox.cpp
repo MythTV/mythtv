@@ -283,7 +283,7 @@ void ManualBox::refreshTimeout(void)
         m_tv->GetChannelInfo(NULL, title, subtitle, m_descString,
                              m_categoryString, m_startString, dummy,
                              dummy, dummy, dummy,
-                             m_chanidString);
+                             m_chanidString, dummy, dummy);
 
         if (m_lastStarttime != m_startString || m_lastChanid != m_chanidString)
         {

@@ -851,7 +851,8 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
                            QString &desc, QString &category, 
                            QString &starttime, QString &endtime, 
                            QString &callsign, QString &iconpath, 
-                           QString &channelname, QString &chanid)
+                           QString &channelname, QString &chanid,
+                           QString &seriesid, QString &programid)
 {
     title = "";
     subtitle = "";
@@ -863,6 +864,8 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
     iconpath = "";
     channelname = "";
     chanid = "";
+    seriesid = "";
+    programid = "";
 
     if (!db_conn)
         return;
@@ -884,7 +887,7 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
  
     QString thequery = QString("SELECT starttime,endtime,title,subtitle,"
                                "description,category,callsign,icon,"
-                               "channel.chanid "
+                               "channel.chanid, seriesid, programid "
                                "FROM program,channel,capturecard,cardinput "
                                "WHERE channel.channum = \"%1\" "
                                "AND starttime < %2 AND endtime > %3 AND "
@@ -926,6 +929,12 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
         test = query.value(8).toString();
         if (test != QString::null)
             chanid = test;
+        test = query.value(9).toString();
+        if (test != QString::null)
+            seriesid = test;
+        test = query.value(10).toString();
+        if (test != QString::null)
+            programid = test;
     }
     else
     {
@@ -1879,7 +1888,8 @@ void TVRec::GetNextProgram(int direction,
                         QString &title, QString &subtitle, QString &desc,
                         QString &category, QString &starttime,
                         QString &endtime, QString &callsign, QString &iconpath,
-                        QString &channelname, QString &chanid)
+                        QString &channelname, QString &chanid,
+                        QString &seriesid, QString &programid)
 {
     QString querystr;
     QString nextchannum = channelname;
@@ -1888,7 +1898,7 @@ void TVRec::GetNextProgram(int direction,
 
     querystr = QString("SELECT title, subtitle, description, category, "
                        "starttime, endtime, callsign, icon, channum, "
-                       "program.chanid "
+                       "program.chanid, seriesid. programid "
                        "FROM program, channel "
                        "WHERE program.chanid = channel.chanid ");
 
@@ -1961,6 +1971,8 @@ void TVRec::GetNextProgram(int direction,
             iconpath = sqlquery.value(7).toString();
             channelname = sqlquery.value(8).toString();
             chanid = sqlquery.value(9).toString();
+            seriesid = sqlquery.value(10).toString();
+            programid = sqlquery.value(11).toString();
         }
     }
     else
@@ -1983,10 +1995,12 @@ void TVRec::GetNextProgram(int direction,
 void TVRec::GetChannelInfo(QString &title, QString &subtitle, QString &desc,
                         QString &category, QString &starttime,
                         QString &endtime, QString &callsign, QString &iconpath,
-                        QString &channelname, QString &chanid)
+                        QString &channelname, QString &chanid,
+                        QString &seriesid, QString &programid)
 {
     GetChannelInfo(channel, title, subtitle, desc, category, starttime,
-                   endtime, callsign, iconpath, channelname, chanid);
+                   endtime, callsign, iconpath, channelname, chanid,
+                   seriesid, programid);
 }
 
 void TVRec::GetInputName(QString &inputname)

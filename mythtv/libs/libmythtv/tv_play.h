@@ -64,13 +64,15 @@ class TV : public QObject
                         QString &title, QString &subtitle,
                         QString &desc, QString &category, QString &starttime,
                         QString &endtime, QString &callsign, QString &iconpath,
-                        QString &channelname, QString &chanid);
+                        QString &channelname, QString &chanid,
+                        QString &seriesid, QString &programid);
 
     void GetChannelInfo(RemoteEncoder *enc, QMap<QString, QString> &infoMap);
     void GetChannelInfo(RemoteEncoder *enc, QString &title, QString &subtitle,
                         QString &desc, QString &category, QString &starttime,
                         QString &endtime, QString &callsign, QString &iconpath,
-                        QString &channelname, QString &chanid);
+                        QString &channelname, QString &chanid,
+                        QString &seriesid, QString &programid);
 
     // for the guidegrid to use
     void EmbedOutput(WId wid, int x, int y, int w, int h);

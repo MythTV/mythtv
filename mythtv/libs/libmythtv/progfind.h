@@ -45,6 +45,8 @@ class ProgFinder : public MythDialog
 	QDateTime startdatetime;
 	int recording;
 	QString recText;
+        QString seriesid;
+        QString programid;
     };
 
     struct recordingRecord 
@@ -56,6 +58,8 @@ class ProgFinder : public MythDialog
         QString description;
         int type;
         QString chansign;
+        QString seriesid;
+        QString programid;
     };
 
     Q_OBJECT

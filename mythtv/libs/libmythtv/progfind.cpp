@@ -332,6 +332,8 @@ void ProgFinder::updateInfo(QPainter *p)
         QString channum = "";
         QString channame = "";
         QString recording = "";
+        QString seriesid = "";
+        QString programid = "";
 
         if (channelFormat.contains("<num>"))
             channum = showData[curShow].channelNum;
@@ -348,6 +350,8 @@ void ProgFinder::updateInfo(QPainter *p)
             subtitle = "";
         description = showData[curShow].description;
         recording = showData[curShow].recText;
+        seriesid = showData[curShow].seriesid;
+        programid = showData[curShow].programid;
 
         if (gotInitData[curSearch] == 1)
         {
@@ -386,6 +390,14 @@ void ProgFinder::updateInfo(QPainter *p)
             type = (UITextType *)container->GetType("recordingstatus");
             if (type)
                 type->SetText(recording);
+
+            type = (UITextType *)container->GetType("seriesid");
+            if (type)
+                type->SetText(seriesid);
+
+            type = (UITextType *)container->GetType("programid");
+            if (type)
+                type->SetText(programid);
         }
     }
 
@@ -1198,7 +1210,8 @@ void ProgFinder::getRecordingInfo()
     QString data;
 
     thequery = QString("SELECT record.chanid,starttime,startdate,"
-                       "title,subtitle,description,type,callsign "
+                       "title,subtitle,description,type,callsign,"
+                       "seriesid,programid "
                        "FROM record,channel "
                        "WHERE record.chanid = channel.chanid;");
 
@@ -1234,6 +1247,8 @@ void ProgFinder::getRecordingInfo()
                 curRecordings[recordingCount].description = QString::fromUtf8(query.value(5).toString());
                 curRecordings[recordingCount].type = query.value(6).toInt();
                 curRecordings[recordingCount].chansign = QString::fromUtf8(query.value(7).toString());
+                curRecordings[recordingCount].seriesid = QString::fromUtf8(query.value(8).toString());
+                curRecordings[recordingCount].programid = QString::fromUtf8(query.value(9).toString());
 
                 if (curRecordings[recordingCount].title == QString::null)
                     curRecordings[recordingCount].title = "";
@@ -1243,6 +1258,10 @@ void ProgFinder::getRecordingInfo()
                     curRecordings[recordingCount].description = "";
                 if (curRecordings[recordingCount].chansign == QString::null)
                     curRecordings[recordingCount].chansign = "";
+                if (curRecordings[recordingCount].seriesid == QString::null)
+                    curRecordings[recordingCount].seriesid = "";
+                if (curRecordings[recordingCount].programid == QString::null)
+                    curRecordings[recordingCount].programid = "";
 
                 recordingCount++;
             }
@@ -1265,7 +1284,7 @@ void ProgFinder::selectShowData(QString progTitle)
     QSqlQuery query(QString::null, m_db);
     query.prepare("SELECT subtitle,starttime,channel.channum,"
                   "channel.callsign,description,endtime,channel.chanid,"
-                  "channel.sourceid,channel.name "
+                  "channel.sourceid,channel.name,seriesid,programid "
                   "FROM program,channel "
                   "WHERE program.title = :TITLE AND "
                   "program.chanid = channel.chanid "
@@ -1332,11 +1351,17 @@ void ProgFinder::selectShowData(QString progTitle)
             showData[showCount].endtime = progEnd.toString("yyyyMMddhhmm");
             rectype = checkRecordingStatus(showCount);
             showData[showCount].recording = rectype;
+            showData[showCount].seriesid = query.value(9).toString();
+            showData[showCount].programid = query.value(10).toString();
 
             if (showData[showCount].subtitle == QString::null)
                 showData[showCount].subtitle = "";
             if (showData[showCount].description == QString::null)
                 showData[showCount].description = "";
+            if (showData[showCount].seriesid == QString::null)
+                showData[showCount].seriesid = "";
+            if (showData[showCount].programid == QString::null)
+                showData[showCount].programid = "";
             switch (rectype)
             {
                 case kSingleRecord:

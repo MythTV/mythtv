@@ -237,8 +237,9 @@ void AutoExpire::FillOldestFirst(void)
 {
     QString fileprefix = gContext->GetFilePrefix();
     QString querystr = QString(
-               "SELECT recorded.chanid, starttime, endtime, title, subtitle, "
-               "description, hostname, channum, name, callsign FROM recorded "
+               "SELECT recorded.chanid,starttime,endtime,title,subtitle, "
+               "description,hostname,channum,name,callsign,seriesid,programid "
+               "FROM recorded "
                "LEFT JOIN channel ON recorded.chanid = channel.chanid "
                "WHERE recorded.hostname = '%1' "
                "AND autoexpire > 0 "
@@ -285,6 +286,16 @@ void AutoExpire::FillOldestFirst(void)
                 proginfo->channame = "#" + proginfo->chanid;
                 proginfo->chansign = "#" + proginfo->chanid;
             }
+
+            proginfo->seriesid = query.value(10).toString();
+
+            if (proginfo->seriesid == QString::null)
+                proginfo->seriesid = "";
+
+            proginfo->programid = query.value(11).toString();
+
+            if (proginfo->programid == QString::null)
+                proginfo->programid = "";
 
             proginfo->pathname = proginfo->GetRecordFilename(fileprefix);
 

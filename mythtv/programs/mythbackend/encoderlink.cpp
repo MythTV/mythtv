@@ -542,13 +542,15 @@ void EncoderLink::GetNextProgram(int direction,
                                  QString &desc, QString &category, 
                                  QString &starttime, QString &endtime, 
                                  QString &callsign, QString &iconpath,
-                                 QString &channelname, QString &chanid)
+                                 QString &channelname, QString &chanid,
+                                 QString &seriesid, QString &programid)
 {
     if (local)
     {
         tv->GetNextProgram(direction,
                            title, subtitle, desc, category, starttime,
-                           endtime, callsign, iconpath, channelname, chanid);
+                           endtime, callsign, iconpath, channelname, chanid,
+                           seriesid, programid);
         return;
     }
 
@@ -559,12 +561,14 @@ void EncoderLink::GetChannelInfo(QString &title, QString &subtitle,
                                  QString &desc, QString &category, 
                                  QString &starttime, QString &endtime, 
                                  QString &callsign, QString &iconpath,
-                                 QString &channelname, QString &chanid)
+                                 QString &channelname, QString &chanid,
+                                 QString &seriesid, QString &programid)
 {
     if (local)
     {
         tv->GetChannelInfo(title, subtitle, desc, category, starttime,
-                           endtime, callsign, iconpath, channelname, chanid);
+                           endtime, callsign, iconpath, channelname, chanid,
+                           seriesid, programid);
         return;
     }
 

@@ -52,11 +52,13 @@ class RemoteEncoder
                         QString &title, QString &subtitle, QString &desc, 
                         QString &category, QString &starttime, QString &endtime,
                         QString &callsign, QString &iconpath,
-                        QString &channelname, QString &chanid);
+                        QString &channelname, QString &chanid,
+                        QString &seriesid, QString &programid);
     void GetChannelInfo(QString &title, QString &subtitle, QString &desc, 
                         QString &category, QString &starttime, QString &endtime,
                         QString &callsign, QString &iconpath,
-                        QString &channelname, QString &chanid);
+                        QString &channelname, QString &chanid,
+                        QString &seriesid, QString &programid);
     void GetInputName(QString &inputname);
  
     QString GetCurrentChannel(void);

@@ -630,7 +630,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                "recorded.hostname,channum,name,callsign,commflagged,cutlist,"
                "recorded.autoexpire,editing,bookmark,recorded.category,"
                "recorded.recgroup,record.dupin,record.dupmethod,"
-               "record.recordid, outputfilters "
+               "record.recordid,outputfilters,"
+               "recorded.seriesid,recorded.programid "
                "FROM recorded "
                "LEFT JOIN record ON recorded.recordid = record.recordid "
                "LEFT JOIN channel ON recorded.chanid = channel.chanid "
@@ -671,6 +672,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             proginfo->dupmethod = RecordingDupMethodType(query.value(18).toInt());
             proginfo->recordid = query.value(19).toInt();
             proginfo->chanOutputFilters = query.value(20).toString();
+            proginfo->seriesid = query.value(21).toString();
+            proginfo->programid = query.value(22).toString();
 
             if (proginfo->hostname.isEmpty() || proginfo->hostname.isNull())
                 proginfo->hostname = gContext->GetHostName();
@@ -684,6 +687,12 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 
             if (proginfo->chanOutputFilters == QString::null)
                 proginfo->chanOutputFilters = "";
+
+            if (proginfo->seriesid == QString::null)
+                proginfo->seriesid = "";
+
+            if (proginfo->programid == QString::null)
+                proginfo->programid = "";
 
             if (!query.value(7).toString().isNull())
             {
@@ -1876,10 +1885,12 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
 
         QString title = "", subtitle = "", desc = "", category = "";
         QString endtime = "", callsign = "", iconpath = "";
+        QString seriesid = "", programid = "";
 
         enc->GetNextProgram(direction,
                             title, subtitle, desc, category, starttime,
-                            endtime, callsign, iconpath, channelname, chanid);
+                            endtime, callsign, iconpath, channelname, chanid,
+                            seriesid, programid);
 
         if (title == "")
             title = " ";
@@ -1901,6 +1912,10 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
             channelname = " ";
         if (chanid == "")
             chanid = " ";
+        if (seriesid == "")
+            seriesid = " ";
+        if (programid == "")
+            programid = " ";
 
         retlist << title;
         retlist << subtitle;
@@ -1912,15 +1927,18 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         retlist << iconpath;
         retlist << channelname;
         retlist << chanid;
+        retlist << seriesid;
+        retlist << programid;
     }
     else if (command == "GET_PROGRAM_INFO")
     {
         QString title = "", subtitle = "", desc = "", category = "";
         QString starttime = "", endtime = "", callsign = "", iconpath = "";
-        QString channelname = "", chanid = "";
+        QString channelname = "", chanid = "", seriesid = "", programid = "";
 
         enc->GetChannelInfo(title, subtitle, desc, category, starttime,
-                            endtime, callsign, iconpath, channelname, chanid);
+                            endtime, callsign, iconpath, channelname, chanid,
+                            seriesid, programid);
 
         if (title == "")
             title = " ";
@@ -1942,6 +1960,10 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
             channelname = " ";
         if (chanid == "")
             chanid = " ";
+        if (seriesid == "")
+            seriesid = " ";
+        if (programid == "")
+            programid = " ";
 
         retlist << title;
         retlist << subtitle;
@@ -1953,6 +1975,8 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         retlist << iconpath;
         retlist << channelname;
         retlist << chanid;
+        retlist << seriesid;
+        retlist << programid;
     }
     else if (command == "GET_INPUT_NAME")
     {
@@ -2882,8 +2906,9 @@ void MainServer::PrintStatus(QSocket *socket)
             if (bIsLocal)
             {
                 QString title, callsign, dummy;
-                elink->GetChannelInfo(title, dummy, dummy, dummy, dummy, dummy,
-                                      callsign, dummy, dummy, dummy);
+                elink->GetChannelInfo(title, dummy, dummy, dummy, dummy,
+                                      dummy, callsign, dummy, dummy,
+                                      dummy, dummy, dummy);
                 os << ": '" << title << "' on "  << callsign;
             }
             os << ".";

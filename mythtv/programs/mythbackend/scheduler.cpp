@@ -1190,7 +1190,8 @@ void Scheduler::AddNewRecords(void) {
 "program.endtime + INTERVAL record.endoffset minute AS recendts, "
 "program.previouslyshown, record.recgroup, record.dupmethod, "
 "channel.commfree, capturecard.cardid, "
-"cardinput.cardinputid, UPPER(cardinput.shareable) = 'Y' AS shareable "
+"cardinput.cardinputid, UPPER(cardinput.shareable) = 'Y' AS shareable, "
+"program.seriesid, program.programid "
 "FROM record "
 " INNER JOIN program ON (program.title = record.title) "
 " INNER JOIN channel ON (channel.chanid = program.chanid) "
@@ -1299,6 +1300,8 @@ void Scheduler::AddNewRecords(void) {
         p->cardid = cardid;
         p->inputid = result.value(25).toInt();
         p->shareable = result.value(26).toInt();
+        p->seriesid = result.value(27).toString();
+        p->programid = result.value(28).toString();
 
         if (!recTypeRecPriorityMap.contains(p->rectype))
             recTypeRecPriorityMap[p->rectype] = 
@@ -1333,6 +1336,10 @@ void Scheduler::AddNewRecords(void) {
             p->category = "";
         if (p->chansign == QString::null)
             p->chansign = "";
+        if (p->seriesid == QString::null)
+            p->seriesid = "";
+        if (p->programid == QString::null)
+            p->programid = "";
 
         // Chedk if already in reclist and don't bother if so
         RecIter rec = reclist.begin();
@@ -1423,7 +1430,8 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
 "record.startdate, record.endtime, record.enddate, record.title, "
 "record.subtitle, record.description, record.recpriority, record.type, "
 "channel.name, record.recordid, record.recgroup, record.dupin, "
-"record.dupmethod, channel.commfree, channel.channum, channel.callsign "
+"record.dupmethod, channel.commfree, channel.channum, channel.callsign, "
+"record.seriesid, record.programid "
 "FROM record,channel "
 "WHERE channel.callsign = record.station GROUP BY recordid "
 "ORDER BY title ASC;");
@@ -1473,6 +1481,8 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
             proginfo->chancommfree = result.value(15).toInt();
             proginfo->chanstr = result.value(16).toString();
             proginfo->chansign = result.value(17).toString();
+            proginfo->seriesid = result.value(18).toString();
+            proginfo->programid = result.value(19).toString();
             
             proginfo->recstartts = proginfo->startts;
             proginfo->recendts = proginfo->endts;
@@ -1483,6 +1493,10 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
                 proginfo->subtitle = "";
             if (proginfo->description == QString::null)
                 proginfo->description = "";
+            if (proginfo->seriesid == QString::null)
+                proginfo->seriesid = "";
+            if (proginfo->programid == QString::null)
+                proginfo->programid = "";
 
             proglist.push_back(proginfo);
         }

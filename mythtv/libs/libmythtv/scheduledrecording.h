@@ -136,6 +136,8 @@ private:
     class SRCategory* category;
     class SRRecPriority* recpriority;
     class SRRecGroup* recgroup;
+    class SRSeriesid* seriesid;
+    class SRProgramid* programid;
 
     QWidget *typeWidget;
     QWidget *profileWidget;

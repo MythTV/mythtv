@@ -2556,15 +2556,18 @@ void TV::GetNextProgram(RemoteEncoder *enc, int direction,
         enc = activerecorder;
 
     QString title, subtitle, description, category, starttime, endtime;
-    QString callsign, iconpath, channum, chanid;
+    QString callsign, iconpath, channum, chanid, seriesid, programid;
 
     starttime = infoMap["dbstarttime"];
     chanid = infoMap["chanid"];
     channum = infoMap["channum"];
+    seriesid = infoMap["seriesid"];
+    programid = infoMap["programid"];
 
     enc->GetNextProgram(direction,
                         title, subtitle, description, category, starttime,
-                        endtime, callsign, iconpath, channum, chanid);
+                        endtime, callsign, iconpath, channum, chanid,
+                        seriesid, programid);
 
     QString tmFmt = gContext->GetSetting("TimeFormat");
     QString dtFmt = gContext->GetSetting("ShortDateFormat");
@@ -2587,6 +2590,8 @@ void TV::GetNextProgram(RemoteEncoder *enc, int direction,
     infoMap["channum"] = channum;
     infoMap["chanid"] = chanid;
     infoMap["iconpath"] = iconpath;
+    infoMap["seriesid"] = seriesid;
+    infoMap["programid"] = programid;
 
     seconds = startts.secsTo(endts);
     minutes = seconds / 60;
@@ -2601,14 +2606,16 @@ void TV::GetNextProgram(RemoteEncoder *enc, int direction,
                         QString &title, QString &subtitle, 
                         QString &desc, QString &category, QString &starttime, 
                         QString &endtime, QString &callsign, QString &iconpath,
-                        QString &channelname, QString &chanid)
+                        QString &channelname, QString &chanid,
+                        QString &seriesid, QString &programid)
 {
     if (!enc)
         enc = activerecorder;
 
     enc->GetNextProgram(direction,
                         title, subtitle, desc, category, starttime, endtime, 
-                        callsign, iconpath, channelname, chanid);
+                        callsign, iconpath, channelname, chanid,
+                        seriesid, programid);
 }
 
 void TV::GetChannelInfo(RemoteEncoder *enc, QMap<QString, QString> &infoMap)
@@ -2617,10 +2624,11 @@ void TV::GetChannelInfo(RemoteEncoder *enc, QMap<QString, QString> &infoMap)
         enc = activerecorder;
 
     QString title, subtitle, description, category, starttime, endtime;
-    QString callsign, iconpath, channum, chanid;
+    QString callsign, iconpath, channum, chanid, seriesid, programid;
 
     enc->GetChannelInfo(title, subtitle, description, category, starttime,
-                        endtime, callsign, iconpath, channum, chanid);
+                        endtime, callsign, iconpath, channum, chanid,
+                        seriesid, programid);
 
     QString tmFmt = gContext->GetSetting("TimeFormat");
     QString dtFmt = gContext->GetSetting("ShortDateFormat");
@@ -2645,6 +2653,8 @@ void TV::GetChannelInfo(RemoteEncoder *enc, QMap<QString, QString> &infoMap)
     infoMap["channum"] = channum;
     infoMap["chanid"] = chanid;
     infoMap["iconpath"] = iconpath;
+    infoMap["seriesid"] = seriesid;
+    infoMap["programid"] = programid;
 
     seconds = startts.secsTo(endts);
     minutes = seconds / 60;
@@ -2658,13 +2668,15 @@ void TV::GetChannelInfo(RemoteEncoder *enc, QMap<QString, QString> &infoMap)
 void TV::GetChannelInfo(RemoteEncoder *enc, QString &title, QString &subtitle, 
                         QString &desc, QString &category, QString &starttime, 
                         QString &endtime, QString &callsign, QString &iconpath,
-                        QString &channelname, QString &chanid)
+                        QString &channelname, QString &chanid,
+                        QString &seriesid, QString &programid)
 {
     if (!enc)
         enc = activerecorder;
 
     enc->GetChannelInfo(title, subtitle, desc, category, starttime, endtime, 
-                        callsign, iconpath, channelname, chanid);
+                        callsign, iconpath, channelname, chanid,
+                        seriesid, programid);
 }
 
 void TV::EmbedOutput(WId wid, int x, int y, int w, int h)
@@ -3070,10 +3082,11 @@ void TV::BrowseStart(void)
     browsemode = true;
 
     QString title, subtitle, desc, category, starttime, endtime;
-    QString callsign, iconpath, channum, chanid;
+    QString callsign, iconpath, channum, chanid, seriesid, programid;
 
     GetChannelInfo(activerecorder, title, subtitle, desc, category, 
-                   starttime, endtime, callsign, iconpath, channum, chanid);
+                   starttime, endtime, callsign, iconpath, channum, chanid,
+                   seriesid, programid);
 
     browsechannum = channum;
     browsechanid = chanid;
@@ -3155,10 +3168,11 @@ void TV::ToggleRecord(void)
     if (!browsemode)
     {
         QString title, subtitle, desc, category, starttime, endtime;
-        QString callsign, iconpath, channum, chanid;
+        QString callsign, iconpath, channum, chanid, seriesid, programid;
 
         GetChannelInfo(activerecorder, title, subtitle, desc, category, 
-                       starttime, endtime, callsign, iconpath, channum, chanid);
+                       starttime, endtime, callsign, iconpath, channum, chanid,
+                       seriesid, programid);
 
         QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
 

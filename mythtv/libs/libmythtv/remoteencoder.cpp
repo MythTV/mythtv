@@ -394,7 +394,8 @@ void RemoteEncoder::GetNextProgram(int direction,
                                    QString &desc, QString &category,
                                    QString &starttime, QString &endtime,
                                    QString &callsign, QString &iconpath,
-                                   QString &channelname, QString &chanid)
+                                   QString &channelname, QString &chanid,
+                                   QString &seriesid, QString &programid)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
     strlist << "GET_NEXT_PROGRAM_INFO";
@@ -415,6 +416,8 @@ void RemoteEncoder::GetNextProgram(int direction,
     iconpath = strlist[7];
     channelname = strlist[8];
     chanid = strlist[9];
+    seriesid = strlist[10];
+    programid = strlist[11];
 
     if (title == " ")
         title = "";
@@ -436,13 +439,18 @@ void RemoteEncoder::GetNextProgram(int direction,
         channelname = "";
     if (chanid == " ")
         chanid = "";
+    if (seriesid == " ")
+        seriesid = "";
+    if (programid == " ")
+        programid = "";
 }
 
 void RemoteEncoder::GetChannelInfo(QString &title, QString &subtitle,
                                    QString &desc, QString &category,
                                    QString &starttime, QString &endtime,
                                    QString &callsign, QString &iconpath,
-                                   QString &channelname, QString &chanid)
+                                   QString &channelname, QString &chanid,
+                                   QString &seriesid, QString &programid)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
     strlist << "GET_PROGRAM_INFO";
@@ -459,6 +467,8 @@ void RemoteEncoder::GetChannelInfo(QString &title, QString &subtitle,
     iconpath = strlist[7];
     channelname = strlist[8];
     chanid = strlist[9];
+    seriesid = strlist[10];
+    programid = strlist[11];
 
     if (title == " ")
         title = "";
@@ -480,6 +490,10 @@ void RemoteEncoder::GetChannelInfo(QString &title, QString &subtitle,
         channelname = "";
     if (chanid == " ")
         chanid = "";
+    if (seriesid == " ")
+        seriesid = "";
+    if (programid == " ")
+        programid = "";
 
     lastchannel = channelname;
 }
@@ -500,7 +514,7 @@ QString RemoteEncoder::GetCurrentChannel(void)
     {
         QString dummy;
         GetChannelInfo(dummy, dummy, dummy, dummy, dummy, dummy,
-                                dummy, dummy, lastchannel, dummy);
+                       dummy, dummy, lastchannel, dummy, dummy, dummy);
     }
 
     return lastchannel;

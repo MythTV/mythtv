@@ -7,7 +7,7 @@
 #include <qmap.h>
 #include "scheduledrecording.h"
 
-#define NUMPROGRAMLINES 33
+#define NUMPROGRAMLINES 35
 
 enum MarkTypes {
     MARK_UPDATED_CUT = -3,
@@ -258,6 +258,9 @@ class ProgramInfo
     int programflags;
     QString chanOutputFilters;
     
+    QString seriesid;
+    QString programid;
+
 
 private:
     void handleRecording(QSqlDatabase *db);
