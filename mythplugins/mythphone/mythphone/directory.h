@@ -59,6 +59,9 @@ class DirEntry
         void    setDBUpToDate() { changed=false; inDatabase=true; }
         void    updateYourselfInDB(QSqlDatabase *db, QString Dir);
         void    deleteYourselfFromDB(QSqlDatabase *db);
+        GenericTree *getTreeNode()       { return TreeNode; };
+        GenericTree *getSpeeddialNode()  { return SpeeddialNode; };
+    
 
 
   private:
@@ -75,6 +78,9 @@ class DirEntry
         bool    inDatabase;
         bool    changed;
         int     dbId;
+
+        GenericTree *TreeNode;
+        GenericTree *SpeeddialNode;
 
 	// To Add:-
 	//	call options for this entry
@@ -97,6 +103,7 @@ class Directory : public QPtrList<DirEntry>
     void saveChangesinDB(QSqlDatabase *db);
     void deleteEntry(QSqlDatabase *db, DirEntry *Entry);
     void AddAllEntriesToList(QStrList &l, bool SpeeddialsOnly);
+    void ChangePresenceStatus(QString Uri, int Status, QString StatusString, bool SpeeddialsOnly);
 
   private:
     QString name;
@@ -185,6 +192,7 @@ class DirectoryContainer
     void deleteVoicemail(QString vmailName);
     DirEntry *FindMatchingDirectoryEntry(QString url);
     QStrList ListAllEntries(bool SpeeddialsOnly);
+    void ChangePresenceStatus(QString Uri, int Status, QString StatusString, bool SpeeddialsOnly);
 
 
   private:

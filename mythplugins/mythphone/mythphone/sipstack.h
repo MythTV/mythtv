@@ -64,6 +64,7 @@ public:
     SipCallId &getCallId() { return *callId; }
     SipMsg &operator= (SipMsg &rhs);
     SipSdp *getSdp()         { return sdp; }
+    SipXpidf *getXpidf()     { return xpidf; }
     SipUrl *getContactUrl()  { return contactUrl; }
     SipUrl *getRecRouteUrl() { return recRouteUrl; }
     SipUrl *getFromUrl()     { return fromUrl; }

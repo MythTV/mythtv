@@ -17,7 +17,7 @@
     <window name="phone_ui">
     
       	<font name="active" face="Arial">
-      	    <color>#ffffff</color>
+      	    <color>#9999cc</color>
       	    <size>18</size>
       	    <bold>yes</bold>
       	</font>
@@ -30,6 +30,12 @@
       
       	<font name="selected" face="Arial">
       	    <color>#ffff00</color>
+      	    <size>18</size>
+      	    <bold>yes</bold>
+      	</font>
+      
+      	<font name="selectable" face="Arial">
+      	    <color>#ffffff</color>
       	    <size>18</size>
       	    <bold>yes</bold>
       	</font>
@@ -156,12 +162,14 @@
                     <fcnfont name="active" function="active"></fcnfont>
                     <fcnfont name="inactive" function="inactive"></fcnfont>
                     <fcnfont name="selected" function="selected"></fcnfont>
+                    <fcnfont name="selectable" function="selectable"></fcnfont>
                 </bin>
                 <bin number="2">
                     <area>235,10,535,200</area>
                     <fcnfont name="active" function="active"></fcnfont>
                     <fcnfont name="selected" function="selected"></fcnfont>
                     <fcnfont name="inactive" function="inactive"></fcnfont>
+                    <fcnfont name="selectable" function="selectable"></fcnfont>
                 </bin>
             </managedtreelist>
 

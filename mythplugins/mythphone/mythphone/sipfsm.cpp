@@ -34,6 +34,11 @@ QFile *debugFile;
 QTextStream *debugStream;
 
 
+// Global queue used to pass events back to the UI
+QStringList NotifyQ;
+QMutex NotifyQLock;
+
+
 
 /**********************************************************************
 SipContainer
@@ -50,7 +55,6 @@ SipContainer::SipContainer()
     killSipThread = false;
     FrontEndActive = false;
     CallState = -1;
-    feNotify = false;
     rnaTimer = -1;
     vxmlCallActive = false;
     vxml = 0;
@@ -160,9 +164,15 @@ void SipContainer::CheckUIEvents(SipFsm *sipFsm)
     else if (event == "HANGUPCALL")
         sipFsm->HangUp();
     else if (event == "UIOPENED")
+    {
         sipFsm->StatusChanged("OPEN");
+        FrontEndActive = true;
+    }
     else if (event == "UICLOSED")
+    {
         sipFsm->StatusChanged("CLOSED");
+        FrontEndActive = false;
+    }
     else if (event == "UIWATCH")
     {
         QString uri;
@@ -193,20 +203,11 @@ void SipContainer::CheckNetworkEvents(SipFsm *sipFsm)
 {
     // Periodically check for incoming messages
     int OldState = CallState;
-    bool Notification = false;
-    sipFsm->CheckRxEvent(Notification);
+    sipFsm->CheckRxEvent();
 
     // We only handle state changes in the "primary" call; we ignore additional calls which are
     // currently just rejected with busy
     CallState = sipFsm->getPrimaryCallState();
-
-    if (Notification)
-    {
-        EventQLock.lock();
-        sipFsm->GetNotification(feNotifyValue, feNotifyString);
-        feNotify = true;
-        EventQLock.unlock();
-    }
 
     if (OldState != CallState)
     {
@@ -344,28 +345,39 @@ void SipContainer::UiStopWatchAll()
     EventQLock.unlock();
 }
 
-int SipContainer::CheckforRxEvents(bool &Notify)
+int SipContainer::CheckforRxEvents()
 {
     int tempState;
     EventQLock.lock();
     tempState = CallState;
     if ((tempState == SIP_CONNECTED) && (vxmlCallActive))
         tempState = SIP_CONNECTED_VXML;
-    Notify = feNotify;
     EventQLock.unlock();
     return tempState;
 }
 
-void SipContainer::GetNotification(int &n, QString &ns)
+bool SipContainer::GetNotification(QString &type, QString &url, QString &param1, QString &param2)
 {
-    EventQLock.lock();
-    if (feNotify)
+    bool notifyFlag = false;
+    NotifyQLock.lock();
+
+    if (!NotifyQ.empty())
     {
-        n = feNotifyValue;
-        ns = feNotifyString;
-        feNotify = false;
+        QStringList::Iterator it;
+        notifyFlag = true;
+        it = NotifyQ.begin();
+        type = *it;
+        it = NotifyQ.remove(it);
+        url = *it;
+        it = NotifyQ.remove(it);
+        param1 = *it;
+        it = NotifyQ.remove(it);
+        param2 = *it;
+        NotifyQ.remove(it);
     }
-    EventQLock.unlock();
+
+    NotifyQLock.unlock();
+    return notifyFlag;
 }
 
 void SipContainer::GetRegistrationStatus(bool &Registered, QString &RegisteredTo, QString &RegisteredAs)
@@ -415,8 +427,6 @@ SipFsm::SipFsm(QWidget *parent, const char *name)
 {
     callCount = 0;
     primaryCall = -1; 
-    NotificationId = 0;
-    NotificationString = "";
     PresenceStatus = "CLOSED";
 
     sipSocket = 0;
@@ -722,12 +732,10 @@ int SipFsm::getPrimaryCallState()
 }
 
 
-void SipFsm::CheckRxEvent(bool &Notify)
+void SipFsm::CheckRxEvent()
 {
     int newState = -1;
     SipCall *call = 0;
-
-    Notify = false;  // Set to true if we have something to tell the user
 
     SipMsg sipRcv;
     if ((sipSocket->waitForMore(1000/SIP_POLL_PERIOD) > 0) && (Receive(sipRcv)))
@@ -753,14 +761,6 @@ void SipFsm::CheckRxEvent(bool &Notify)
             }
         }
 
-        // For non-200 Status response to an INVITE; tell the user
-        if ((Event == SIP_INVITESTATUS_1xx) || (Event == SIP_INVITESTATUS_3456xx))
-        {
-            Notify = true;
-            NotificationId = sipRcv.getStatusCode();
-            NotificationString = sipRcv.getReasonPhrase();
-        }
-
         // Now push the event through the FSM
         if (fsm)
             newState = fsm->FSM(Event, &sipRcv);
@@ -773,6 +773,16 @@ void SipFsm::CheckRxEvent(bool &Notify)
     }
 }
 
+
+void SipFsm::SetNotification(QString type, QString uri, QString param1, QString param2)
+{
+    NotifyQLock.lock();
+    NotifyQ.append(type);
+    NotifyQ.append(uri);
+    NotifyQ.append(param1);
+    NotifyQ.append(param2);
+    NotifyQLock.unlock();
+}
 
 
 int SipFsm::MsgToEvent(SipMsg *sipMsg)
@@ -854,11 +864,6 @@ SipSubscriber *SipFsm::CreateSubscriberFsm()
 
 SipWatcher *SipFsm::CreateWatcherFsm(QString Url)
 {
-    // If the dialled number if just a username and we are registered to a proxy, append 
-    // the proxy hostname
-    if ((!Url.contains('@')) && (sipRegistration != 0) && (sipRegistration->isRegistered()))
-        Url.append(QString("@") + gContext->GetSetting("SipProxyName"));
-
     SipWatcher *watcher = new SipWatcher(this, natIp, localPort, sipRegistration, Url);
     FsmList.append(watcher);
     return watcher;
@@ -1306,10 +1311,12 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         break;
     case SIP_OCONNECTING1_INVITESTATUS_1xx:
         (parent->Timer())->Stop(this, SIP_RETX);
+        parent->SetNotification("CALLSTATUS", "", QString::number(sipMsg->getStatusCode()), sipMsg->getReasonPhrase());
         State = SIP_OCONNECTING2;
         break;
     case SIP_OCONNECTING1_INVITESTATUS_3456:
         (parent->Timer())->Stop(this, SIP_RETX);
+        parent->SetNotification("CALLSTATUS", "", QString::number(sipMsg->getStatusCode()), sipMsg->getReasonPhrase());
         // Fall through
     case SIP_OCONNECTING2_INVITESTATUS_3456:
         if ((sipMsg->getStatusCode() == 407) && (viaRegProxy != 0) && (viaRegProxy->isRegistered())) // Authentication Required
@@ -2224,6 +2231,13 @@ SipWatcher::SipWatcher(SipFsm *par, QString localIp, int localPort, SipRegistrat
     sipLocalIp = localIp;
     sipLocalPort = localPort;
     regProxy = reg;
+    watchedUrlString = destUrl;
+
+    // If the dialled number if just a username and we are registered to a proxy, append 
+    // the proxy hostname
+    if ((!destUrl.contains('@')) && (regProxy != 0))
+        destUrl.append(QString("@") + gContext->GetSetting("SipProxyName"));
+
     watchedUrl = new SipUrl(destUrl, "");
     State = SIP_WATCH_IDLE;
     cseq = 1;
@@ -2253,6 +2267,7 @@ SipWatcher::~SipWatcher()
 int SipWatcher::FSM(int Event, SipMsg *sipMsg, void *Value)
 {
     int OldState = State;
+    SipXpidf *xpidf;
 
     switch (Event | State)
     {
@@ -2278,6 +2293,7 @@ int SipWatcher::FSM(int Event, SipMsg *sipMsg, void *Value)
         {
             // We failed to get a response; so retry after a delay
             State = SIP_WATCH_HOLDOFF;
+            parent->SetNotification("PRESENCE", watchedUrlString, "offline", "offline");
             (parent->Timer())->Start(this, 120*1000, SIP_WATCH); 
         }
         break;
@@ -2295,12 +2311,14 @@ int SipWatcher::FSM(int Event, SipMsg *sipMsg, void *Value)
             if (expires == -1) // No expires in SUBSCRIBE, choose default value
                 expires = 600;
             (parent->Timer())->Start(this, expires*1000, SIP_SUBSCRIBE_EXPIRE);
+            parent->SetNotification("PRESENCE", watchedUrlString, "open", "undetermined");
         }
         else 
         {
             // We got an invalid response so wait before we retry. Ideally here this
             // should depend on status code; e.g. 404 means try again but 403 means never retry again
             State = SIP_WATCH_HOLDOFF;
+            parent->SetNotification("PRESENCE", watchedUrlString, "offline", "offline");
             (parent->Timer())->Start(this, 120*1000, SIP_WATCH); 
         }
         break;
@@ -2328,7 +2346,14 @@ int SipWatcher::FSM(int Event, SipMsg *sipMsg, void *Value)
 
     case SIP_WATCH_ACTIVE_NOTIFY:
         ParseSipMsg(Event, sipMsg);
-        BuildSendStatus(200, "NOTIFY", sipMsg->getCSeqValue(), SIP_OPT_CONTACT);
+        xpidf = sipMsg->getXpidf();
+        if (xpidf)
+        {
+            parent->SetNotification("PRESENCE", watchedUrlString, xpidf->getStatus(), xpidf->getSubstatus());
+            BuildSendStatus(200, "NOTIFY", sipMsg->getCSeqValue(), SIP_OPT_CONTACT);
+        }
+        else
+            BuildSendStatus(406, "NOTIFY", sipMsg->getCSeqValue(), SIP_OPT_CONTACT);
         break;
 
     case SIP_WATCH_TRYING_STOPWATCH:

@@ -82,6 +82,8 @@ PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
 
     // Finally initialise the GUI box
     DirectoryList->showWholeTree(true);
+    DirectoryList->colorSelectables(true);
+
     QValueList <int> branches_to_current_node;
     branches_to_current_node.append(0); //  Root node
     branches_to_current_node.append(0); //  Speed Dials!
@@ -642,12 +644,11 @@ void PhoneUIBox::rxVideoTimerExpiry()
 void PhoneUIBox::fsmTimerExpiry()
 {
     static int ConnectTime = 0;
-    bool Notification = false;
     bool inAudioOnly;
 
     // Poll the FSM for network events
     int OldState = State;
-    State = sipStack->CheckforRxEvents(Notification);
+    State = sipStack->CheckforRxEvents();
 
     // Handle state transitions
     if (State != OldState)
@@ -745,22 +746,38 @@ void PhoneUIBox::fsmTimerExpiry()
     }
 
     // If the SIP stack has something to tell the user, then display that first
-    if (Notification)
+    QString NotifyType, NotifyUrl, NotifyParam1, NotifyParam2;
+    while (sipStack->GetNotification(NotifyType, NotifyUrl, NotifyParam1, NotifyParam2))
     {
-        int NotifyId = 0;
-        QString NotifyString;
-
-        sipStack->GetNotification(NotifyId, NotifyString);
-        if (NotifyId != 0)
+        // See if the notification is a received STATUS messages in response to making a call
+        if (NotifyType == "CALLSTATUS")
         {
-            phoneUIStatusBar->DisplayCallState(NotifyString);
+            switch (atoi(NotifyParam1))
+            {
+            case 0:
+                break;
+    
+            case 180: // 180 Ringing
+                {
+                    QString spk = gContext->GetSetting("AudioOutputDevice");
+                    ringbackTone->Play(spk, true);
+                }
+                break;
+    
+            default:
+                phoneUIStatusBar->DisplayCallState(NotifyParam2);
+                break;
+            }
         }
 
-        if (NotifyId == 180) // 180 Ringing
+        // See if the notification is a change in presence status of a remote client
+        else if (NotifyType == "PRESENCE")
         {
-            QString spk = gContext->GetSetting("AudioOutputDevice");
-            ringbackTone->Play(spk, true);
+            DirContainer->ChangePresenceStatus(NotifyUrl, (NotifyParam1 == "offline" ? 0 : 1), NotifyParam2, true);
+            DirectoryList->refresh();
         }
+        else if (NotifyType == "PRESENCE")
+            cerr << "SIP: Unknown Notify type " << NotifyType << endl;
     }
 
     // Increment the on-screen clock if we are in a call & gather statistics

@@ -47,6 +47,8 @@ DirEntry::DirEntry(DirEntry *Original)
     inDatabase = false;
     changed = true;
     dbId = -1;
+    TreeNode = 0;
+    SpeeddialNode = 0;
 }
 
 
@@ -92,14 +94,17 @@ void DirEntry::writeTree(GenericTree *tree_to_write_to, GenericTree *sdTree)
         sub_node->setAttribute(0, TA_DIRENTRY);
         sub_node->setAttribute(1, id);
         sub_node->setAttribute(2, getAlphaSortId(NickName));
+        TreeNode = sub_node;
     }
 
     if ((SpeedDial) && (sdTree != 0))
     {
-        sub_node = sdTree->addNode(NickName, 0, true);
+        // Default "selectable" to FALSE on speed-dials as it gets changed to true based on presence status
+        sub_node = sdTree->addNode(NickName, 0, false); 
         sub_node->setAttribute(0, TA_SPEEDDIALENTRY);
         sub_node->setAttribute(1, id);
         sub_node->setAttribute(2, getAlphaSortId(NickName));
+        SpeeddialNode = sub_node;
     }
 }
 
@@ -257,6 +262,24 @@ void Directory::AddAllEntriesToList(QStrList &l, bool SpeeddialsOnly)
     return;
 }
 
+void Directory::ChangePresenceStatus(QString Uri, int Status, QString StatusString, bool SpeeddialsOnly)
+{
+    DirEntry *it;
+    for (it=first(); it; it=next())
+        if ((it->urlMatches(Uri)) && 
+            ((!SpeeddialsOnly) || (it->isSpeedDial())))
+    {
+        {
+            if (!SpeeddialsOnly) 
+            {
+                (it->getTreeNode())->setSelectable(Status == 1 ? true : false);
+                (it->getTreeNode())->setString(it->getNickName() + "      (" + StatusString + ")");
+            }
+            (it->getSpeeddialNode())->setSelectable(Status == 1 ? true : false);
+            (it->getSpeeddialNode())->setString(it->getNickName() + "      (" + StatusString + ")");
+        }
+    }
+}
 
 
 
@@ -965,4 +988,13 @@ QStrList DirectoryContainer::ListAllEntries(bool SpeeddialsOnly)
     return l;
 }
 
+
+void DirectoryContainer::ChangePresenceStatus(QString Uri, int Status, QString StatusString, bool SpeeddialsOnly)
+{
+    Directory *it;
+    for (it=AllDirs.first(); it; it=AllDirs.next())
+    {
+        it->ChangePresenceStatus(Uri, Status, StatusString, SpeeddialsOnly);
+    }
+}
 

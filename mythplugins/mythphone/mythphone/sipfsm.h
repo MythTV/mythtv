@@ -156,19 +156,18 @@
 
 
 // Build Options logically OR'ed and sent to build procs
-#define SIP_OPT_SDP		        1
-#define SIP_OPT_CONTACT		    2
-#define SIP_OPT_VIA           4
-#define SIP_OPT_ALLOW         8
-#define SIP_OPT_EXPIRES       16
+#define SIP_OPT_SDP		                    1
+#define SIP_OPT_CONTACT		                2
+#define SIP_OPT_VIA                       4
+#define SIP_OPT_ALLOW                     8
+#define SIP_OPT_EXPIRES                   16
 
 // Timers
-#define REG_RETRY_TIMER       3000 // seconds
-#define REG_FAIL_RETRY_TIMER  180000 // 3 minutes
-#define REG_RETRY_MAXCOUNT    5
+#define REG_RETRY_TIMER                   3000 // seconds
+#define REG_FAIL_RETRY_TIMER              180000 // 3 minutes
+#define REG_RETRY_MAXCOUNT                5
 
-#define SIP_POLL_PERIOD       2   // Twice per second
-
+#define SIP_POLL_PERIOD                   2   // Twice per second
 
 
 // Forward reference.
@@ -197,11 +196,10 @@ class SipContainer
     void UiClosed();
     void UiWatch(QStrList uriList);
     void UiStopWatchAll();
-    void GetNotification(int &n, QString &ns);
+    bool GetNotification(QString &type, QString &url, QString &param1, QString &param2);
     void GetRegistrationStatus(bool &Registered, QString &RegisteredTo, QString &RegisteredAs);
-    int  CheckforRxEvents(bool &Notify);
+    int  CheckforRxEvents();
     int  getCallState();
-    void SetFrontEndActive(bool Active) { FrontEndActive = Active; };
     void GetIncomingCaller(QString &u, QString &d, QString &l, bool &audOnly);
     void GetSipSDPDetails(QString &ip, int &aport, int &audPay, QString &audCodec, int &dtmfPay, int &vport, int &vidPay, QString &vidCodec, QString &vidRes);
 
@@ -223,9 +221,6 @@ class SipContainer
     vxmlParser *vxml;
     rtp *Rtp;
     int CallState;
-    int feNotifyValue;
-    QString feNotifyString;
-    bool feNotify;
     bool regStatus;
     QString regTo;
     QString regAs;
@@ -427,6 +422,7 @@ class SipWatcher : public SipFsmBase
     int sipLocalPort;
     SipRegistration *regProxy;
     SipUrl *watchedUrl;
+    QString watchedUrlString;
     int State;
     int expires;
     int cseq;
@@ -447,7 +443,7 @@ class SipFsm : public QWidget
     void Answer(bool audioOnly, QString videoMode, bool DisableNat);
     void StatusChanged(char *newStatus);
     void DestroyFsm(SipFsmBase *Fsm);
-    void CheckRxEvent(bool &Notify);
+    void CheckRxEvent();
     SipCall *MatchCall(int cr);
     SipFsmBase *MatchCallId(SipCallId &CallId);
     SipCall *CreateCallFsm();
@@ -461,8 +457,7 @@ class SipFsm : public QWidget
     void CloseSocket();
     void Transmit(QString Msg, QString destIP, int destPort);
     bool Receive(SipMsg &sipMsg);
-    void GetNotification(int &n, QString &ns)
-            { n = NotificationId; ns = NotificationString; NotificationId = 0; }
+    void SetNotification(QString type, QString url, QString param1, QString param2);
     SipTimer *Timer() { return timerList; };
     void HandleTimerExpiries();
     SipRegistrar *getRegistrar() { return sipRegistrar; }
@@ -485,8 +480,6 @@ class SipFsm : public QWidget
     int callCount;
     int primaryCall;                   // Currently the frontend is only interested in one call at a time, and others are rejected
     int lastStatus;
-    int NotificationId;
-    QString NotificationString;
     SipTimer *timerList;
     SipRegistrar    *sipRegistrar;
     SipRegistration *sipRegistration;

@@ -325,6 +325,7 @@ QString SipMsg::StatusPhrase(int Code)
     case 200: return "OK";
     case 400: return "Bad Request";
     case 404: return "Not Found";
+    case 406: return "Not Acceptable";
     case 481: return "Call Leg/Transaction Does Not Exist";
     case 486: return "Busy Here";
     case 488: return "Not Acceptable Here";
@@ -607,8 +608,6 @@ void SipMsg::decodeXpidf(QString content)
             nextNode = n.parentNode().nextSibling();
         n = nextNode;
     }
-
-    cout << "SIP Decode XPIDF: Uri " << xpidf->getUser() << "@" << xpidf->getHost() << " became " << xpidf->getStatus() << "(" << xpidf->getSubstatus() << ")\n";
 }
 
 QPtrList<sdpCodec> *SipMsg::decodeSDPLine(QString sdpLine, QPtrList<sdpCodec> *codecList)
