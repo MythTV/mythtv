@@ -79,6 +79,33 @@ void VideoGallery::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
+    
+    gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions);
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
+    {
+        QString action = actions[i];
+        
+
+        if (action == "SELECT")
+        {
+            handled = true;
+            handled = handleSelect();
+        }
+        else if ( (action == "UP")  || (action == "DOWN") ||
+                  (action == "LEFT") ||(action == "RIGHT") ||
+                  (action == "PAGEUP") || (action == "PAGEDOWN"))
+        {
+            handled = true;
+            moveCursor(action);
+        }
+        else if (action == "1" || action == "2" ||
+                 action == "3" || action == "4")
+        {
+            handled = true;
+            setParentalLevel(action.toInt());        // parental control
+        }
+    }    
+    
     gContext->GetMainWindow()->TranslateKeyPress("Video", e, actions);
 
     for (unsigned int i = 0; i < actions.size() && !handled; i++)
@@ -89,17 +116,6 @@ void VideoGallery::keyPressEvent(QKeyEvent *e)
         if (action == "SELECT")
         {
             handled = handleSelect();
-        }
-        else if ( (action == "UP")  || (action == "DOWN") ||
-                  (action == "LEFT") ||(action == "RIGHT") ||
-                  (action == "PAGEUP") || (action == "PAGEDOWN"))
-        {
-             moveCursor(action);
-        }
-        else if (action == "1" || action == "2" ||
-                 action == "3" || action == "4")
-        {
-            setParentalLevel(action.toInt());        // parental control
         }
         else if (action == "FILTER")
         {
