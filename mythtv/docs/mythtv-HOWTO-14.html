@@ -20,7 +20,7 @@ is operational.  Depending on your distribution, some of these prerequisites can
 be satisfied through the various package managers.  If your distribution doesn't
 offer pre-compiled versions of the software below, then follow the generic
 instructions for manually compiling and installing the software.</P>
-<P>The pre-requisites for mythtmusic are:
+<P>The pre-requisites for mythmusic are:
 <UL>
 <LI>MAD</LI>
 <LI>libvorbis-devel</LI>
@@ -68,11 +68,13 @@ can find later.</P>
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Download and install libcdaudio:
+<P>Download libcdaudio from 
+<A HREF="http://sourceforge.net/project/showfiles.php?group_id=27134">libcdaudio.sourceforge.net</A> and
+install:
 <BLOCKQUOTE><CODE>
 <PRE>
-% tar -xzf libcdaudio-XXXXX
-% cd libcdaudio-XXXXX
+% tar -xzf libcdaudio-0.99-6.tar.gz
+% cd libcdaudio-0.99.6
 % ./configure
 % make
 % su
@@ -82,24 +84,42 @@ can find later.</P>
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Download cdparanoia from the website and copy interface/cdda_interface.h to
-/usr/local/include</P>
-<P>/usr/lib:
-ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
-ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so</P>
-
+<P>Download cdparanoia from 
+<A HREF="http://www.xiph.org/paranoia/download/cdparanoia-III-alpha9.8.src.tgz">http://www.xiph.org/paranoia/down.html</A>.
+<BLOCKQUOTE><CODE>
+<PRE>
+% tar -xzf cdparanoia-III-alpha9.8.src.tgz
+% cd cdparanoia-III-alpha9.8
+% ./configure
+% make
+% su
+# make install
+&lt;!-- see if the next step is a Mandrake only issue -->
+# cp interface/cdda_interface.h /usr/local/include
+# cd /usr/lib
+# ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
+# ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
+# exit
+%
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 <H2><A NAME="ss14.2">14.2</A> <A HREF="mythtv-HOWTO.html#toc14.2">Mandrake 9.0</A>
 </H2>
 
-<P>Mandrake 9.0 has a number of the pre-requisites available on the installation
-CD.  Some of the software you're going to need will have to be obtained from the "
-contrib" or "cooker" development repositories.  Applications downloaded from "
-cooker" come from the development branch, so there may be issues with some
-software.</P>
+<P>Mandrake 9.0 has a number of the pre-requisites available on the
+installation CD.  Some of the software you're going to need will have to be
+obtained from the "contrib" or "cooker" development repositories. 
+Applications downloaded from " cooker" come from the development branch, so
+there may be issues with some software.</P>
 
 <P>Install libvorbis-devel using urpmi or the Mandrake Control Center
 installer.</P>
 <P>Install cdparanoia using urpmi or the Mandrake Control Center.</P>
+
+<H2><A NAME="ss14.3">14.3</A> <A HREF="mythtv-HOWTO.html#toc14.3">Compiling mythmusic.</A>
+</H2>
+
 <P>Once all the pre-requisites have been installed, you can proceed with
 getting mythmusic going.
 <BLOCKQUOTE><CODE>

@@ -31,6 +31,8 @@ v1.041, 2002-11-29.  Added some explanatory text about hdparm.
 v1.042, 2002-11-29.  Cleaned up the text that talks about Tivo and hardware
 based encoders.
 v1.043, 2002-11-29.  More RH 8.0 LANG stuff.
+v1.044, 2002-11-29.  Working on the mythmusic install instructions.  Added
+information about creating your own ~/.mythtv to maintain settings.
 -->
 <!--
 To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
@@ -41,7 +43,7 @@ To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-11-29, v1.043
+<date>2002-11-29, v1.044
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1341,7 +1343,7 @@ be satisfied through the various package managers.  If your distribution doesn't
 offer pre-compiled versions of the software below, then follow the generic
 instructions for manually compiling and installing the software.
 
-The pre-requisites for mythtmusic are:
+The pre-requisites for mythmusic are:
 <itemize>
 <item>MAD
 <item>libvorbis-devel
@@ -1383,10 +1385,12 @@ name="http://flac.sourceforge.net"> and install:
 %
 </verb></tscreen>
 
-Download and install libcdaudio:
+Download libcdaudio from <url name="libcdaudio.sourceforge.net"
+url="http://sourceforge.net/project/showfiles.php?group_id=27134"> and
+install:
 <tscreen><verb>
-% tar -xzf libcdaudio-XXXXX
-% cd libcdaudio-XXXXX
+% tar -xzf libcdaudio-0.99-6.tar.gz
+% cd libcdaudio-0.99.6
 % ./configure
 % make
 % su
@@ -1395,19 +1399,29 @@ Download and install libcdaudio:
 %
 </verb></tscreen>
 
-Download cdparanoia from the website and copy interface/cdda_interface.h to
-/usr/local/include
-
-/usr/lib:
-ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
-ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
-
+Download cdparanoia from <url name="http://www.xiph.org/paranoia/down.html"
+url="http://www.xiph.org/paranoia/download/cdparanoia-III-alpha9.8.src.tgz">.
+<tscreen><verb>
+% tar -xzf cdparanoia-III-alpha9.8.src.tgz
+% cd cdparanoia-III-alpha9.8
+% ./configure
+% make
+% su
+# make install
+<!-- see if the next step is a Mandrake only issue -->
+# cp interface/cdda_interface.h /usr/local/include
+# cd /usr/lib
+# ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
+# ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
+# exit
+%
+</verb></tscreen>
 <sect1>Mandrake 9.0
-<p>Mandrake 9.0 has a number of the pre-requisites available on the installation
-CD.  Some of the software you're going to need will have to be obtained from the "
-contrib" or "cooker" development repositories.  Applications downloaded from "
-cooker" come from the development branch, so there may be issues with some
-software.
+<p>Mandrake 9.0 has a number of the pre-requisites available on the
+installation CD.  Some of the software you're going to need will have to be
+obtained from the "contrib" or "cooker" development repositories. 
+Applications downloaded from " cooker" come from the development branch, so
+there may be issues with some software.
 
 <!-- insert instructions on configuring urpmi for contrib and cooker -->
 
@@ -1416,7 +1430,8 @@ installer.
 
 Install cdparanoia using urpmi or the Mandrake Control Center.
 
-Once all the pre-requisites have been installed, you can proceed with
+<sect1>Compiling mythmusic.
+<p>Once all the pre-requisites have been installed, you can proceed with
 getting mythmusic going.
 <tscreen><verb>
 % ./configure
@@ -1443,7 +1458,9 @@ processors, make sure that your <ref id="deinterlace_" name="deinterlace">
 variable is set correctly.
 </itemize>
 <sect1>mythfilldatabase failing.
-<p>If mythtvfilldatabase appears to be failing, edit the
+<p>If mythtvfilldatabase suddenly appears to be failing, check to see what version of
+XMLTV you're running.  Versions prior to 0.5.3 need to have the following
+change made: edit the
 <tt>/usr/lib/perl5/site_perl/5.8.0/XMLTV/ZapListings.pm</tt> file and
 perform a global search and replace, searching for "tvlistings2" and
 replacing it with "tvlistings".
@@ -1457,4 +1474,9 @@ the <bf>hdparm</bf> program to check and enable DMA.<tscreen><verb>
 # hdparm -d /dev/hd?
 </verb></tscreen> will tell you the DMA status for your hard drives.  If you run
 <bf>hdparm</bf> with the <tt>-d1</tt> parameter, it will turn DMA on.
+<sect1>I keep losing all of my settings every time I compile!
+<p>mythtv will overwrite any settings in <tt>/usr/local/share/mythtv</tt>.
+If you want to make sure that you don't lose your modifications, make a
+directory <tt>~/.mythtv</tt> and copy your settings.txt file to this
+location.
 </article>

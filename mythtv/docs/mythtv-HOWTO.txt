@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2002-11-29, v1.043
+  2002-11-29, v1.044
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -83,12 +83,14 @@
   14. mythmusic.
      14.1 Manual installation of pre-requisites
      14.2 Mandrake 9.0
+     14.3 Compiling mythmusic.
 
   15. Troubleshooting.
      15.1 Illegal Instruction.
      15.2 mythfilldatabase failing.
      15.3 mythtv seems to disappear; can't see video
      15.4 Fast CPU, choppy or jittery video.
+     15.5 I keep losing all of my settings every time I compile!
 
   ______________________________________________________________________
 
@@ -1381,7 +1383,7 @@
   software below, then follow the generic instructions for manually
   compiling and installing the software.
 
-  The pre-requisites for mythtmusic are:
+  The pre-requisites for mythmusic are:
 
   +o  MAD
 
@@ -1423,10 +1425,12 @@
        # exit
        %
 
-  Download and install libcdaudio:
+  Download libcdaudio from libcdaudio.sourceforge.net
+  <http://sourceforge.net/project/showfiles.php?group_id=27134> and
+  install:
 
-       % tar -xzf libcdaudio-XXXXX
-       % cd libcdaudio-XXXXX
+       % tar -xzf libcdaudio-0.99-6.tar.gz
+       % cd libcdaudio-0.99.6
        % ./configure
        % make
        % su
@@ -1434,17 +1438,29 @@
        # exit
        %
 
-  Download cdparanoia from the website and copy
-  interface/cdda_interface.h to /usr/local/include
+  Download cdparanoia from http://www.xiph.org/paranoia/down.html
+  <http://www.xiph.org/paranoia/download/cdparanoia-III-
+  alpha9.8.src.tgz>.
 
-  /usr/lib: ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so ln
-  -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
+       % tar -xzf cdparanoia-III-alpha9.8.src.tgz
+       % cd cdparanoia-III-alpha9.8
+       % ./configure
+       % make
+       % su
+       # make install
+       <!-- see if the next step is a Mandrake only issue -->
+       # cp interface/cdda_interface.h /usr/local/include
+       # cd /usr/lib
+       # ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
+       # ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
+       # exit
+       %
 
   [1m14.2.  Mandrake 9.0[0m
 
   Mandrake 9.0 has a number of the pre-requisites available on the
   installation CD.  Some of the software you're going to need will have
-  to be obtained from the " contrib" or "cooker" development
+  to be obtained from the "contrib" or "cooker" development
   repositories.  Applications downloaded from " cooker" come from the
   development branch, so there may be issues with some software.
 
@@ -1452,6 +1468,8 @@
   installer.
 
   Install cdparanoia using urpmi or the Mandrake Control Center.
+
+  [1m14.3.  Compiling mythmusic.[0m
 
   Once all the pre-requisites have been installed, you can proceed with
   getting mythmusic going.
@@ -1483,7 +1501,9 @@
 
   [1m15.2.  mythfilldatabase failing.[0m
 
-  If mythtvfilldatabase appears to be failing, edit the
+  If mythtvfilldatabase suddenly appears to be failing, check to see
+  what version of XMLTV you're running.  Versions prior to 0.5.3 need to
+  have the following change made: edit the
   /usr/lib/perl5/site_perl/5.8.0/XMLTV/ZapListings.pm file and perform a
   global search and replace, searching for "tvlistings2" and replacing
   it with "tvlistings".
@@ -1503,4 +1523,10 @@
 
   will tell you the DMA status for your hard drives.  If you run [1mhdparm[0m
   with the -d1 parameter, it will turn DMA on.
+
+  [1m15.5.  I keep losing all of my settings every time I compile![0m
+
+  mythtv will overwrite any settings in /usr/local/share/mythtv.  If you
+  want to make sure that you don't lose your modifications, make a
+  directory ~/.mythtv and copy your settings.txt file to this location.
 
