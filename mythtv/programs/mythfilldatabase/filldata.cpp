@@ -288,8 +288,8 @@ ChanInfo *parseChannel(QDomElement &element, QUrl baseUrl)
 
 int TimezoneToInt (QString timezone)
 {
-    // we signal an error by setting it invalid (> 720min = 12hr)
-    int result = 721;
+    // we signal an error by setting it invalid (> 840min = 14hr)
+    int result = 841;
 
     if (timezone.length() == 5)
     {
@@ -298,7 +298,7 @@ int TimezoneToInt (QString timezone)
         result = timezone.mid(1,2).toInt(&ok, 10);
 
         if (!ok)
-            result = 721;
+            result = 841;
         else
         {
             result *= 60;
@@ -306,7 +306,7 @@ int TimezoneToInt (QString timezone)
             int min = timezone.right(2).toInt(&ok, 10);
 
             if (!ok)
-                result = 721;
+                result = 841;
             else
             {
                 result += min;
@@ -320,7 +320,7 @@ int TimezoneToInt (QString timezone)
 
 void addTimeOffset(QString &timestr, int localTimezoneOffset)
 {
-    if (timestr.isEmpty() || abs(localTimezoneOffset) > 720)
+    if (timestr.isEmpty() || abs(localTimezoneOffset) > 840)
         return;
 
     QStringList split = QStringList::split(" ", timestr);
@@ -333,7 +333,7 @@ void addTimeOffset(QString &timestr, int localTimezoneOffset)
         tmp.stripWhiteSpace();
 
         ts_offset = TimezoneToInt(tmp);
-        if (abs(ts_offset) > 720)
+        if (abs(ts_offset) > 840)
             ts_offset = localTimezoneOffset;
     }
 
@@ -591,8 +591,8 @@ void parseFile(QString filename, QValueList<ChanInfo> *chanlist,
     // now we calculate the localTimezoneOffset, so that we can fix
     // the programdata if needed
     QString config_offset = gContext->GetSetting("TimeOffset", "None");
-    // we disable this feature by setting it invalid (> 720min = 12hr)
-    int localTimezoneOffset = 721;
+    // we disable this feature by setting it invalid (> 840min = 14hr)
+    int localTimezoneOffset = 841;
 
     if (config_offset == "Auto")
     {
@@ -604,7 +604,7 @@ void parseFile(QString filename, QValueList<ChanInfo> *chanlist,
     else if (config_offset != "None")
     {
         localTimezoneOffset = TimezoneToInt(config_offset);
-        if (abs(localTimezoneOffset) > 720)
+        if (abs(localTimezoneOffset) > 840)
             cerr << "Ignoring invalid TimeOffset " << config_offset << endl;
     }
 
