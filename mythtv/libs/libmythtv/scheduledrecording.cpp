@@ -639,7 +639,7 @@ MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
     connect(cancel, SIGNAL(clicked()), dialog, SLOT(reject()));
     connect(finish, SIGNAL(clicked()), dialog, SLOT(accept()));
 
-    typeWidget->setFocus();
+    button->setFocus();
     setAvailableOptions();
 
     return dialog;
