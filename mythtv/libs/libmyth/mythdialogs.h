@@ -284,12 +284,16 @@ class MythThemedDialog : public MythDialog
 
   private:
 
+    void ReallyUpdateForeground(const QRect &);
+
     XMLParse *theme;
     QDomElement xmldata;
     int context;
 
     QPtrList<LayerSet>  my_containers;
     QPtrList<UIType>    focus_taking_widgets;
+
+    QRect redrawRect;
 };
 
 class MythPasswordDialog: public MythDialog

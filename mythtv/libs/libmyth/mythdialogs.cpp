@@ -1290,6 +1290,8 @@ MythThemedDialog::MythThemedDialog(MythMainWindow *parent, QString window_name,
     my_containers.clear();
     widget_with_current_focus = NULL;
 
+    redrawRect = QRect(0, 0, 0, 0);
+
     //
     //  Load the theme. Crap out if we can't find it.
     //
@@ -1515,23 +1517,24 @@ void MythThemedDialog::updateForeground(const QRect &r)
         rect_to_update = this->geometry();
     }
 
+    redrawRect = redrawRect.unite(r);
 
+    update(redrawRect);
+}
 
-    //
-    //  Debugging
-    //
+void MythThemedDialog::ReallyUpdateForeground(const QRect &r)
+{
+    QRect rect_to_update = r;
+    if(r.width() == 0 || r.height() == 0)
+    {
+        cerr << "MythThemedDialog.o: something is requesting a screen update of zero size. "
+             << "A widget probably has not done a calculateScreeArea(). Will redraw "
+             << "the whole screen (inefficient!)."
+             << endl;
 
-    /*    
-    cout << "I am updating the foreground from "
-         << rect_to_update.left()
-         << ","
-         << rect_to_update.top()
-         << " to "
-         << rect_to_update.left() + rect_to_update.width()
-         << ","
-         << rect_to_update.top() + rect_to_update.height()
-         << endl;
-    */
+        rect_to_update = this->geometry();
+    }
+
     //
     //  We paint offscreen onto a pixmap
     //  and then BitBlt it over
@@ -1606,7 +1609,7 @@ void MythThemedDialog::updateForeground(const QRect &r)
         whole_dialog_painter.end();
     }
 
-    update(rect_to_update);
+    redrawRect = QRect(0, 0, 0, 0);
 }
 
 void MythThemedDialog::updateForegroundRegion(const QRect &r)
@@ -1654,6 +1657,9 @@ void MythThemedDialog::updateForegroundRegion(const QRect &r)
 
 void MythThemedDialog::paintEvent(QPaintEvent *e)
 {
+    if (redrawRect.width() > 0 && redrawRect.height() > 0)
+        ReallyUpdateForeground(redrawRect);
+
     bitBlt(this, e->rect().left(), e->rect().top(),
            &my_foreground, e->rect().left(), e->rect().top(),
            e->rect().width(), e->rect().height());

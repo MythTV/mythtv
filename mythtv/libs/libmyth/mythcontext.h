@@ -93,7 +93,7 @@ class MythEvent : public QCustomEvent
     QStringList extradata;
 };
 
-#define MYTH_BINARY_VERSION "0.15.20040505-1"
+#define MYTH_BINARY_VERSION "0.15.20040525-1"
 #define MYTH_PROTO_VERSION "8"
 
 extern int print_verbose_messages;
