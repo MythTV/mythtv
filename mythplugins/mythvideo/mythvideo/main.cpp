@@ -5,8 +5,16 @@ using namespace std;
 #include <qapplication.h>
 #include <qsqldatabase.h>
 #include <unistd.h>
+#include <qsocketnotifier.h>
 
 //#include <cdaudio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <sys/time.h>
+
 
 #include "metadata.h"
 
@@ -16,55 +24,29 @@ using namespace std;
 
 #include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
-
-
-Metadata * CheckFile(MythContext *context, QString &filename)
-{
-  QString s = filename.section( '/',-1); // s == "myapp"
-
-    Metadata *retdata = new Metadata(filename, s, "album", "title", "genre",
-                                     1900, 3, 40);
-    return(retdata);
-}
-
-void SearchDir(MythContext *context, QString &directory,QValueList<Metadata> &playlist)
-{
-    QDir d(directory);
-    Metadata *data;
-    if (!d.exists())
-        return;
-    const QFileInfoList *list = d.entryInfoList();
-    if (!list)
-        return;
-
-    QFileInfoListIterator it(*list);
-    QFileInfo *fi;
-
-    while ((fi = it.current()) != 0)
-    {
-        ++it;
-        if (fi->fileName() == "." || fi->fileName() == "..")
-            continue;
-        QString filename = fi->absFilePath();
-        if (fi->isDir())
-            SearchDir(context, filename,playlist);
-        else
-	  {
-	    QString ext=filename.section('.',-1);
-	    if(context->GetSetting("Profile").contains(ext))
-	      {
-		data=CheckFile(context, filename);
-	    	    playlist.append(*data);
-	      }
-	  }
-    }
-}
-
+#include "dirlist.h"
+#include "lirc_client.h"
+int lfd;
+    struct lirc_config *config;
 
 void startDatabaseTree(MythContext *context, QSqlDatabase *db, QString &paths, 
                        QValueList<Metadata> *playlist)
 {
+  int flags;
     DatabaseBox dbbox(context, db, paths, playlist);
+    QSocketNotifier *sn;
+    fcntl(lfd,F_SETOWN,getpid());
+    flags=fcntl(lfd,F_GETFL,0);
+    if(flags!=-1)
+      {
+	fcntl(lfd,F_SETFL,flags|O_NONBLOCK);
+      }
+ 
+    sn = new QSocketNotifier( lfd, QSocketNotifier::Read, NULL);
+    QObject::connect( sn, SIGNAL(activated(int)),
+		      &dbbox, SLOT(dataReceived()) );
+
+
     dbbox.Show();
 
     dbbox.exec();
@@ -87,6 +69,10 @@ int main(int argc, char *argv[])
 
     
     MythContext *context = new MythContext();
+
+    lfd=lirc_init("mythvideo",1);
+    lirc_readconfig(NULL,&config,NULL);
+
     context->LoadQtConfig();
 
     context->LoadSettingsFiles("mythexplorer-settings.txt");
@@ -109,11 +95,11 @@ int main(int argc, char *argv[])
     }
 
     QString startdir = context->GetSetting("StartDir");
-
-    QValueList<Metadata> playlist;
-
-    if (startdir != "")
-        SearchDir(context, startdir,playlist);
+    
+    //    if (startdir != "")
+        Dirlist md = Dirlist(context, startdir);
+ 
+   QValueList<Metadata> playlist = md.GetPlaylist();
 
 
     QString themename = context->GetSetting("Theme");

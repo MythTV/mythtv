@@ -20,9 +20,11 @@ class TreeCheckItem : public QListViewItem
     Metadata *getMetadata(void) { return metadata; }
     QString getLevel(void) { return level; }
 
+
   private:
     void pickPixmap();
 
+      virtual void paintCell(QPainter* p, const QColorGroup& cg,int column, int width, int align);
     static void setupPixmaps(MythContext *context);
     static QPixmap *scalePixmap(const char **xpmdata, float wmult, float hmult);
 

@@ -24,12 +24,13 @@ class DatabaseBox : public QDialog
 
     void Show();
 
-  protected slots:
-    void selected(QListViewItem *);
-
+    protected slots:
+    
+      void selected(QListViewItem *);
+    void dataReceived();
+     
   private:
     void doSelected(QListViewItem *);
-
     void fillList(QListView *listview, QValueList<Metadata> *playlist );
 
 
