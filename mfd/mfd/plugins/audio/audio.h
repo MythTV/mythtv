@@ -40,10 +40,10 @@ class AudioPlugin: public MFDServicePlugin
     Output      *output;
     Decoder     *decoder;
     
-    int                           output_buffer_size;
-    bool                          is_playing;
-    bool                          is_paused;
-    QString                       audio_device;
+    int         output_buffer_size;
+    bool        is_playing;
+    bool        is_paused;
+    QString     audio_device;
 
     MFDFileDescriptorWatchingPlugin *fd_watcher;
     QMutex file_descriptors_mutex;

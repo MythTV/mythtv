@@ -18,7 +18,7 @@
 
 #include "mfd.h"
 #include "../mfdlib/mfd_events.h"
-
+#include "mdserver.h"
 
 MFD::MFD(QSqlDatabase *ldb, int port, bool log_stdout, int logging_verbosity)
     :QObject()
@@ -85,7 +85,13 @@ MFD::MFD(QSqlDatabase *ldb, int port, bool log_stdout, int logging_verbosity)
             this, SLOT(registerMFDService(void)));
     registerMFDService();
     
+    //
+    //  Create the metadata server object (separate thread object that has
+    //  it's own server port for serving metadata)
+    //
     
+    metadata_server = new MetadataServer(this, 2344);
+    metadata_server->start();
 }
 
 
@@ -817,6 +823,11 @@ MFD::~MFD()
         mfd_log = NULL;
     }
     
+    if(metadata_server)
+    {
+        delete metadata_server;
+        metadata_server = NULL;
+    }    
 }
 
 

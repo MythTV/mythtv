@@ -19,6 +19,7 @@
 #include "logging.h"
 #include "mdcontainer.h"
 
+class MetadataServer;
 
 class MFD : public QObject
 {
@@ -104,6 +105,8 @@ class MFD : public QObject
 
     QMutex                      metadata_mutex;
     QMutex                      playlist_mutex;
+    
+    MetadataServer              *metadata_server;
 };
 
 #endif  // mfd_h_

@@ -27,8 +27,8 @@ LIBS += -lmyth-$$LIBVERSION
 
 
 HEADERS +=          mfd.h   pluginmanager.h   serversocket.h   logging.h   \
-           metadata.h   mdcontainer.h   mdmonitor.h
+           metadata.h   mdcontainer.h   mdmonitor.h   mdserver.h
 SOURCES += main.cpp mfd.cpp pluginmanager.cpp serversocket.cpp logging.cpp \
-           metadata.cpp mdcontainer.cpp mdmonitor.cpp
+           metadata.cpp mdcontainer.cpp mdmonitor.cpp mdserver.cpp
 
 

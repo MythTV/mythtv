@@ -155,7 +155,7 @@ bool MetadataMythDBContainer::tryToUpdate()
     {
         warning("metadata mythdb container wanted to update metadata, but there doesn't seem to be any new metadata");
     }
-    return false;
+    return return_value;
 }
 
 MetadataMythDBContainer::~MetadataMythDBContainer()
