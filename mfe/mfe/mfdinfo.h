@@ -39,9 +39,9 @@ class MfdInfo
     AudioMetadata*          getAudioMetadata(int collection_id, int item_id);
 
     void                    setCurrentPlayingData();
-    void                    setCurrentPlayingData(int which_container, int which_metadata, int numb_seconds);
-    QString                 getPlayingString(){return playing_string;}
-    void                    clearCurrentPlayingData(){playing_string = "";}
+    bool                    setCurrentPlayingData(int which_container, int which_metadata, int numb_seconds);
+    QStringList             getPlayingStrings(){return playing_strings;}
+    void                    clearCurrentPlayingData(){playing_strings.clear();}
     double                  getPercentPlayed(){return played_percentage;}
     
     void                    setPauseState(bool new_state){ pause_state = new_state; }
@@ -60,11 +60,13 @@ class MfdInfo
     bool        knows_whats_playing;
     int         current_container;
     int         current_item;
+    int         previous_container;
+    int         previous_item;
     int         current_elapsed;
 
     MfdContentCollection *mfd_content_collection;
     QStringList previous_tree_position;
-    QString playing_string;
+    QStringList playing_strings;
     double      played_percentage;
     bool        pause_state;
     bool        is_stopped;

@@ -97,7 +97,7 @@ class MfeDialog : public MythThemedDialog
     //
     
     UITextType       *current_mfd_text;
-    UITextType       *now_playing_text;
+    UIMultiTextType  *now_playing_texts;
     UIStatusBarType  *time_progress;
 
     UIImageType *stop_button;

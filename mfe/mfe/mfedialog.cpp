@@ -252,8 +252,8 @@ void MfeDialog::wireUpTheme()
     current_mfd_text = getUITextType("current_mfd_text");
     current_mfd_text->SetText("No mfd!!!");
     
-    now_playing_text = getUITextType("now_playing_text");
- 
+    now_playing_texts = getUIMultiTextType("now_playing_text");
+    
     time_progress = getUIStatusBarType("time_progress");
     if(!time_progress)
     {
@@ -428,7 +428,7 @@ void MfeDialog::changeMetadata(int which_mfd, MfdContentCollection *new_collecti
             if(!current_mfd->knowsWhatsPlaying())
             {
                 current_mfd->setCurrentPlayingData();
-                now_playing_text->SetText(current_mfd->getPlayingString());
+                now_playing_texts->setTexts(current_mfd->getPlayingStrings());
                 time_progress->SetUsed((int)(current_mfd->getPercentPlayed() * 1000));
             }    
         }
@@ -560,7 +560,7 @@ void MfeDialog::stopped(int which_mfd)
         relevant_mfd->isStopped(true);
         if(relevant_mfd == current_mfd)
         {
-            now_playing_text->SetText("");
+            now_playing_texts->clearTexts();
             time_progress->SetUsed(0);
 
             //
@@ -602,11 +602,14 @@ void MfeDialog::playing(
     
     if(relevant_mfd)
     {
-        relevant_mfd->setCurrentPlayingData(container_id, metadata_id, seconds);
+        bool update_texts = relevant_mfd->setCurrentPlayingData(container_id, metadata_id, seconds);
         relevant_mfd->isStopped(false);
         if(relevant_mfd == current_mfd)
         {
-            now_playing_text->SetText(current_mfd->getPlayingString());
+            if(update_texts)
+            {
+                now_playing_texts->setTexts(current_mfd->getPlayingStrings());
+            }
             time_progress->SetUsed((int)(current_mfd->getPercentPlayed() * 1000));
             
             stop_button->hide();
@@ -669,7 +672,7 @@ void MfeDialog::syncToCurrentMfd()
             play_button->hide();
             pause_button->hide();
             stop_button->show();
-            now_playing_text->SetText("");
+            now_playing_texts->clearTexts();
             time_progress->SetUsed(0);
         }
         else
@@ -680,7 +683,7 @@ void MfeDialog::syncToCurrentMfd()
             {
                 current_mfd->setCurrentPlayingData();
             }
-            now_playing_text->SetText(current_mfd->getPlayingString());
+            now_playing_texts->setTexts(current_mfd->getPlayingStrings());
             time_progress->SetUsed((int)(current_mfd->getPercentPlayed() * 1000));
             if(current_mfd->getPauseState())
             {
@@ -703,7 +706,7 @@ void MfeDialog::syncToCurrentMfd()
             menu->toggleShow();
         }
         menu->GoHome();
-        now_playing_text->SetText("");
+        now_playing_texts->clearTexts();
         time_progress->SetUsed(0);
     }
 }

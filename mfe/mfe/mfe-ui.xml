@@ -15,7 +15,7 @@
     
         <font name="now_playing_font" face="Arial">
             <color>#8cc4fc</color>
-            <size>26</size>
+            <size>24</size>
             <bold>yes</bold>
         </font>
 
@@ -30,10 +30,6 @@
                 <filename>mfe_back.png</filename>
                 <position>0,0</position>
             </image>
-            <image name="mfe_brushed_top" draworder="0" fleximage="no">
-                <filename>mfe_brushed_top.png</filename>
-                <position>0,0</position>
-            </image>
             <image name="mfe_brushed_bottom" draworder="0" fleximage="no">
                 <filename>mfe_brushed_bottom.png</filename>
                 <position>0,520</position>
@@ -42,12 +38,66 @@
 
         <container name="nowplaying">
             <area>0,0,800,80</area>
-            <textarea name="now_playing_text" draworder="0" align="center">
+            <image name="mfe_black_top" draworder="1" fleximage="no">
+                <filename>mfe_black_top.png</filename>
+                <position>0,0</position>
+            </image>
+            <image name="mfe_brushed_top_a" draworder="3" fleximage="no">
+                <filename>mfe_brushed_top_a.png</filename>
+                <position>0,0</position>
+            </image>
+            <image name="mfe_brushed_top_bl" draworder="3" fleximage="no">
+                <filename>mfe_brushed_top_bl.png</filename>
+                <position>0,10</position>
+            </image>
+            <image name="mfe_brushed_top_br" draworder="3" fleximage="no">
+                <filename>mfe_brushed_top_br.png</filename>
+                <position>744,10</position>
+            </image>
+            <image name="mfe_brushed_top_c" draworder="3" fleximage="no">
+                <filename>mfe_brushed_top_c.png</filename>
+                <position>0,51</position>
+            </image>
+            <multitextarea name="now_playing_text" draworder="2" align="center">
                 <font>now_playing_font</font>
-                <area>100,12,600,40</area>
-            </textarea>
+                <area>38,9,726,40</area>
 
-            <statusbar name="time_progress" draworder="0" whitespace="15">
+                <!--    
+                <padding> is spaces to add to beginning and end of each
+                string when it is displayed. We use padding here only
+                because the "brushed metal" image on top of the text is
+                curved
+                -->
+                <padding>1</padding>
+
+                <!--
+                <dropdelay> is number of milliseconds to wait between each
+                step of scrolling a message down. If 0, no drop down
+                -->
+                <dropdelay>15</dropdelay>
+
+                <!--
+                <droppause> is number of milliseconds to wait after the drop
+                before starting to scroll
+                -->
+                <droppause>500</droppause>
+
+                <!--
+                <scrolldelay> is number of milliseconds to wait between each
+                horizontal step when scrolling
+                -->
+                <scrolldelay>50</scrolldelay>
+
+                <!--
+                <scrollpause> is number of milliseconds to wait after
+                scrolling (if any) is done before then moving on to the next
+                message
+                -->
+                <scrollpause>4000</scrollpause>
+
+            </multitextarea>
+
+            <statusbar name="time_progress" draworder="4" whitespace="15">
                 <context>-1</context>
                 <container fleximage="no">mfe_time_bar_back.png</container>
                 <fill>mfe_time_bar.png</fill>
