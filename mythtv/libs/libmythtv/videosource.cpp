@@ -2,6 +2,7 @@
 #include <qsqldatabase.h>
 #include <qcursor.h>
 #include <qlayout.h>
+#include <qfile.h>
 #include <iostream>
 
 #include <unistd.h>
@@ -43,6 +44,32 @@ QString CISetting::setClause(void) {
         .arg(parent.getInputID())
         .arg(getColumn())
         .arg(getValue());
+}
+
+void providerSelector::fillSelections(const QString& zipcode) {
+    if (zipcode.length() < 5)
+        return;
+
+    clearSelections();
+
+    QString command = QString("tv_grab_na --configure --postalcode %1 --list-providers")
+        .arg(zipcode);
+    FILE* fp = popen(command.ascii(), "r");
+
+    if (fp == NULL) {
+        perror("open");
+        return;
+    }
+
+    QFile f;
+    f.open(IO_ReadOnly, fp);
+    for(QString line ; f.readLine(line, 1024) > 0 ; ) {
+        QStringList fields = QStringList::split(":", line.stripWhiteSpace());
+        addSelection(fields.last(), fields.first());
+    }
+
+    f.close();
+    fclose(fp);
 }
 
 void VideoSource::fillSelections(QSqlDatabase* db,

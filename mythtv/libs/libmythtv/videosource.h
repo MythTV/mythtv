@@ -22,13 +22,76 @@ protected:
     const VideoSource& parent;
 };
 
+
+class XMLTVGrabber: public ComboBoxSetting, public VSSetting {
+public:
+    XMLTVGrabber(const VideoSource& parent): VSSetting(parent, "xmltvgrabber") {
+        setLabel("XMLTV listings grabber");
+    };
+};
+
+class zipcode: public LineEditSetting, public TransientStorage {
+public: zipcode() { setLabel("ZIP/postal code"); };
+};
+
+class providerSelector: public ComboBoxSetting, public TransientStorage {
+    Q_OBJECT
+public:
+    providerSelector() { setLabel("Provider"); };
+
+public slots:
+    void fillSelections(const QString& zipcode);
+};
+
+class XMLTV_na_config: public VerticalConfigurationGroup {
+public:
+    XMLTV_na_config(const VideoSource& _parent): parent(_parent) {
+        setLabel("tv_grab_na configuration");
+        zipcode* z = new zipcode();
+        addChild(z);
+
+        providerSelector* p = new providerSelector();
+        addChild(p);
+
+        connect(z, SIGNAL(valueChanged(const QString&)),
+                p, SLOT(fillSelections(const QString&)));
+    };
+
+protected:
+    const VideoSource& parent;
+};
+
+class XMLTVConfig: public VerticalConfigurationGroup, public TriggeredConfigurationGroup {
+public:
+    XMLTVConfig(const VideoSource& parent) {
+        XMLTVGrabber* grabber = new XMLTVGrabber(parent);
+        addChild(grabber);
+        setTrigger(grabber);
+
+        addTarget("tv_grab_na", new XMLTV_na_config(parent));
+        grabber->addSelection("tv_grab_na");
+
+        addTarget("tv_grab_de", new VerticalConfigurationGroup());
+        grabber->addSelection("tv_grab_de");
+
+        addTarget("tv_grab_sn", new VerticalConfigurationGroup());
+        grabber->addSelection("tv_grab_sn");
+
+        addTarget("tv_grab_uk", new VerticalConfigurationGroup());
+        grabber->addSelection("tv_grab_uk");
+
+        addTarget("tv_grab_uk_rt", new VerticalConfigurationGroup());
+        grabber->addSelection("tv_grab_uk_rt");
+    };
+};
+
 class VideoSource: public VerticalConfigurationGroup, public ConfigurationDialog {
 public:
     VideoSource(MythContext* context): ConfigurationDialog(context) {
         // must be first
         addChild(id = new ID());
         addChild(new Name(*this));
-        addChild(new XMLTVGrab(*this));
+        addChild(new XMLTVConfig(*this));
     };
         
     int getSourceID(void) const { return id->intValue(); };
@@ -58,18 +121,6 @@ private:
         Name(const VideoSource& parent):
             VSSetting(parent, "name") {
             setLabel("Video source name");
-        };
-    };
-
-    class XMLTVGrab: public ComboBoxSetting, public VSSetting {
-    public:
-        XMLTVGrab(const VideoSource& parent): VSSetting(parent, "xmltvgrabber") {
-            setLabel("XMLTV listings grabber");
-            addSelection("tv_grab_na");
-            addSelection("tv_grab_de");
-            addSelection("tv_grab_sn");
-            addSelection("tv_grab_uk");
-            addSelection("tv_grab_uk_rt");
         };
     };
 
