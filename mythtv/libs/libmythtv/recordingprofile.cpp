@@ -29,10 +29,12 @@ void RecordingProfile::loadByID(QSqlDatabase* db, int profileId) {
 void RecordingProfile::loadByName(QSqlDatabase* db, QString name) {
     QString query = QString("SELECT id FROM recordingprofiles WHERE name = '%1'").arg(name);
     QSqlQuery result = db->exec(query);
-    if (result.isActive() && result.numRowsAffected() > 0)
+    if (result.isActive() && result.numRowsAffected() > 0) {
+        query.next();
         loadByID(db, result.value(0).toInt());
-    else
+    } else {
         cout << "Profile not found: " << name << endl;
+    }
 }
 
 RecordingProfileBrowser::RecordingProfileBrowser(MythContext* context,
