@@ -3,6 +3,53 @@
 # ffmpeg configure script (c) 2000, 2001, 2002 Fabrice Bellard
 #
 
+# default parameters
+compile_type="release"
+prefix="/usr/local"
+mandir=""
+bindir=""
+cross_prefix=""
+cc="gcc"
+cxx="g++"
+ccache="yes"
+distcc="yes"
+ar="ar"
+ranlib="ranlib"
+make="make"
+strip="strip"
+cpu=`uname -m`
+cpu_raw="$cpu"
+processor=`uname -p`
+processor_flags=""
+tune="generic"
+powerpc_perf="no"
+mmx="default"
+altivec="default"
+mmi="default"
+audio_oss="default"
+audio_alsa="default"
+audio_arts="default"
+audio_jack="default"
+ivtv="yes"
+ivtv_header="no"
+dvb="no"
+dvb_path=""
+dvb_eit="no"
+lirc="yes"
+joystick_menu="yes"
+firewire_cable_box="yes"
+x11="yes"
+xrandr="yes"
+xv="yes"
+xvmc="no"
+xvmc_vld="yes"
+opengl_vsync="no"
+direct_fb="no"
+direct_x="no"
+CONFIG_INCLUDEPATH=""
+CONFIG_DEFINES=""
+PROFILEFLAGS=""
+
 if test x"$1" = x"-h" -o x"$1" = x"--help" ; then
 cat << EOF
 
@@ -12,8 +59,11 @@ Options: [defaults in brackets after descriptions]
 EOF
 echo "Standard options:"
 echo "  --help                   print this message"
-#echo "  --prefix=PREFIX          install in PREFIX [$prefix]"
+echo "  --compile-type=CTYPE     one of release, profile, debug [$compile_type]"
+echo "  --prefix=PREFIX          install in PREFIX [$prefix]"
 #echo "  --mandir=DIR             man documentation in DIR [PREFIX/man]"
+echo "  --disable-ccache         disable compiler cache (ccache)"
+echo "  --disable-distcc         disable distributed compilation (distcc)"
 #echo "  --enable-mp3lame         enable mp3 encoding via libmp3lame [default=no]"
 #echo "  --enable-vorbis          enable vorbis support via libvorbisenc [default=no]"
 #echo "  --enable-faad            enable faad support via libfaad [default=no]"
@@ -37,12 +87,15 @@ echo "Advanced options (experts only):"
 echo "  --extra-cflags=ECFLAGS   add ECFLAGS to CFLAGS [$CFLAGS]"
 #echo "  --extra-ldflags=ELDFLAGS add ELDFLAGS to LDFLAGS [$LDFLAGS]"
 #echo "  --extra-libs=ELIBS       add ELIBS [$ELIBS]"
-#echo "  --cpu=CPU                force cpu to CPU  [$cpu]"
-#echo "  --tune=PROCESSOR         tune code for a particular CPU (may fails or misperforms on other CPUs)"
+echo "  --cpu=CPU                force cpu to CPU [$cpu] (will fail on other CPUs)"
+echo "  --tune=PROCESSOR         tune code for a particular CPU (may fail on other CPUs)"
 #echo "  --powerpc-perf-enable    enable performance report on PPC (requires enabling PMC)"
-#echo "  --disable-mmx            disable mmx usage"
-#echo "  --disable-altivec        disable AltiVec usage"
-#echo "  --disable-audio-oss      disable OSS audio support [default=no]"
+echo "  --disable-mmx            disable mmx usage"
+echo "  --disable-altivec        disable AltiVec usage"
+echo "  --disable-audio-oss      disable OSS audio support"
+echo "  --disable-audio-alsa     disable ALSA audio support"
+echo "  --disable-audio-arts     disable aRts audio support"
+echo "  --disable-audio-jack     disable JACK audio support"
 #echo "  --disable-audio-beos     disable BeOS audio support [default=no]"
 #echo "  --disable-v4l            disable video4linux grabbing [default=no]"
 #echo "  --disable-dv1394         disable DV1394 grabbing [default=no]"
@@ -61,6 +114,28 @@ echo "  --extra-cflags=ECFLAGS   add ECFLAGS to CFLAGS [$CFLAGS]"
 #echo "  --enable-small           optimize for size instead of speed"
 #echo "  --enable-memalign-hack   emulate memalign, interferes with memory debuggers"
 #echo "  --disable-strip          disable stripping of executables and shared libraries"
+echo "  --disable-lirc           disable lirc support (Infrared Remotes)"
+echo "  --disable-joystick-menu  disable joystick menu"
+echo "  --disable-firewire       disable support for FireWire cable boxes"
+echo "  --disable-ivtv           disable ivtv support (PVR-250, PVR-350)"
+#echo "  --enable-ivtv-sys-header use ivtv system headers instead of myth headers"
+echo "  --enable-dvb             enable DVB support (must supply header directory)"
+echo "  --dvb-path=HDRLOC        location of directory containing"
+echo "                           'linux/dvb/frontend.h', not the"
+echo "                           directory with frontend.h"
+echo "                           Note: This MUST NOT be your linux kernel"
+echo "                           source includes. Copy the DVB includes"
+echo "                           into a separate directory for now."
+echo "                           [$dvb-path]"
+echo "  --enable-dvb-eit         enable DVB EIT support (--enable-dvb is required)"
+echo "  --disable-x11            disable X11 support"
+echo "  --disable-xrandr         disable X11 resolution switching"
+echo "  --disable-xv             disable XVideo   (X11 video output accel.)"
+echo "  --enable-xvmc            enable XvMC      (Linux/BSD MPEG accel.)"
+echo "  --disable-xvmc-vld       disable XvMC-VLD (VIA Epia MPEG accel.)"
+echo "  --enable-opengl-vsync    enable OpenGL vsync method"
+echo "  --enable-directfb        enable DirectFB  (Linux non-X11 video)"
+echo "  --enable-directx         enable DirectX   (Microsoft video)"
 #echo ""
 #echo "NOTE: The object files are build at the place where configure is launched"
 exit 1
@@ -81,22 +156,13 @@ TMPE="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}"
 TMPS="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.S"
 TMPH="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.h"
 
-# default parameters
-prefix="/usr/local"
-mandir=""
-bindir=""
-cross_prefix=""
-cc="gcc"
-ar="ar"
-ranlib="ranlib"
-make="make"
-strip="strip"
-cpu=`uname -m`
-tune="generic"
-powerpc_perf="no"
-mmx="default"
-altivec="default"
-mmi="default"
+if test -f /proc/cpuinfo ; then
+    if test x"$processor" = x"" -o x"$processor" = x"$cpu_raw" ; then
+        processor=`cat /proc/cpuinfo | grep "model name" | head -n 1`
+    fi
+    processor_flags=`cat /proc/cpuinfo | grep "flags" | head -n 1`
+fi
+
 case "$cpu" in
   i386|i486|i586|i686|i86pc|BePC)
     cpu="x86"
@@ -137,7 +203,6 @@ case "$cpu" in
 esac
 gprof="no"
 v4l="yes"
-audio_oss="yes"
 audio_beos="no"
 dv1394="no"
 dc1394="no"
@@ -226,7 +291,6 @@ extralibs="-lnet"
 fi ;;
 SunOS)
 v4l="no"
-audio_oss="no"
 dv1394="no"
 make="gmake"
 LDFLAGS=""
@@ -236,15 +300,16 @@ extralibs="$extralibs -lsocket -lnsl"
 ;;
 FreeBSD)
 v4l="no"
-audio_oss="yes"
+joystick_menu="no"
 dv1394="no"
 make="gmake"
 CFLAGS="-pthread"
 LDFLAGS="$LDFLAGS -export-dynamic -pthread"
+CCONFIG="$CCONFIG freebsd backend"
 ;;
 BSD/OS)
 v4l="no"
-audio_oss="yes"
+joystick_menu="no"
 dv1394="no"
 extralibs="-lpoll -lgnugetopt -lm"
 make="gmake"
@@ -252,7 +317,14 @@ make="gmake"
 Darwin)
 cc="cc"
 v4l="no"
+ivtv="no"
+dvb="no"
+x11="no"
+joystick_menu="no"
 audio_oss="no"
+audio_alsa="no"
+audio_arts="no"
+audio_jack="no"
 dv1394="no"
 ffserver="no"
 SHFLAGS="-dynamiclib"
@@ -269,7 +341,14 @@ mingw32="yes"
 ;;
 CYGWIN*)
 v4l="no"
-audio_oss="yes"
+ivtv="no"
+dvb="no"
+x11="no"
+joystick_menu="no"
+audio_oss="no"
+audio_alsa="no"
+audio_arts="no"
+audio_jack="no"
 dv1394="no"
 extralibs=""
 cygwin="yes"
@@ -278,9 +357,11 @@ test -f /usr/include/inttypes.h || \
 test -f /usr/local/include/inttypes.h || \
 echo "Missing inttypes.h, please copy cygwin_inttypes.h to" \
      "/usr/local/include/inttypes.h !!!"
+CONFIG_DEFINES="$CONFIG_DEFINES _WIN32"
 ;;
 Linux)
 LDFLAGS="$LDFLAGS -rdynamic"
+CCONFIG="$CCONFIG linux backend"
 ;;
 IRIX*)
 ranlib="echo ignoring ranlib"
@@ -351,6 +432,8 @@ done
 
 for opt do
   case "$opt" in
+  --compile-type=*) compile_type=`echo $opt | cut -d '=' -f 2`
+  ;;  
   --prefix=*) prefix=`echo $opt | cut -d '=' -f 2`
   ;;
   --mandir=*) mandir=`echo $opt | cut -d '=' -f 2`
@@ -373,6 +456,10 @@ for opt do
   ;;
   --tune=*) tune=`echo $opt | cut -d '=' -f 2`
   ;;
+  --disable-ccache) ccache="no"
+  ;;
+  --disable-distcc) distcc="no"
+  ;;
   --powerpc-perf-enable) powerpc_perf="yes"
   ;;
   --disable-mmx) mmx="no"
@@ -384,6 +471,12 @@ for opt do
   --disable-v4l) v4l="no"
   ;;
   --disable-audio-oss) audio_oss="no"
+  ;;
+  --disable-audio-alsa) audio_alsa="no"
+  ;;
+  --disable-audio-arts) audio_arts="no"
+  ;;
+  --disable-audio-jack) audio_jack="no"
   ;;
   --disable-audio-beos) audio_beos="no"
   ;;
@@ -455,8 +548,75 @@ for opt do
   ;;
   --disable-strip) dostrip="no"
   ;;
+  --enable-ivtv) ivtv="yes"
+  ;;
+  --disable-ivtv) ivtv="no"
+  ;;
+  --enable-ivtv-sys-header) ivtv_header="yes"
+  ;;
+  --disable-ivtv-sys-header) ivtv_header="no"
+  ;;
+  --enable-lirc) lirc="yes"
+  ;;
+  --disable-lirc) lirc="no"
+  ;;
+  --enable-joystick-menu) joystick_menu="yes"
+  ;;
+  --disable-joystick-menu) joystick_menu="no"
+  ;;
+  --enable-firewire) firewire_cable_box="yes"
+  ;;
+  --disable-firewire) firewire_cable_box="no"
+  ;;
+  --enable-dvb) dvb="yes"
+  ;;
+  --disable-dvb) dvb="no"
+  ;;
+  --dvb-path=*) dvb_path=`echo $opt | cut -d '=' -f 2`
+  ;;
+  --enable-dvb-eit) dvb_eit="yes"
+  ;;
+  --disable-dvb-eit) dvb_eit="no"
+  ;;
+  --enable-x11) x11="yes"
+  ;;
+  --disable-x11) x11="no"
+  ;;
+  --enable-xrandr) xrandr="yes"
+  ;;
+  --disable-xrandr) xrandr="no"
+  ;;
+  --enable-xv) xv="yes"
+  ;;
+  --disable-xv) xv="no"
+  ;;
+  --enable-xvmc) xvmc="yes"
+  ;;
+  --disable-xvmc) xvmc="no"
+  ;;
+  --enable-xvmc-vld) xvmc_vld="yes"
+  ;;
+  --disable-xvmc-vld) xvmc_vld="no"
+  ;;
+  --enable-opengl-vsync) opengl_vsync="yes"
+  ;;
+  --disable-opengl-vsync) opengl_vsync="no"
+  ;;
+  --enable-directfb) direct_fb="yes"
+  ;;
+  --disable-directfb) direct_fb="no"
+  ;;
+  --enable-directx) direct_x="yes"
+  ;;
+  --disable-directx) direct_x="no"
+  ;;
   esac
 done
+
+CCONFIG="$CCONFIG $compile_type"
+if test x$compile_type = x"profile" ; then
+    PROFILEFLAGS="-g -DNDEBUG"
+fi
 
 if test "$gpl" != "yes"; then
     if test "$pp" != "no" -o "$shared_pp" != "no"; then
@@ -511,11 +671,19 @@ EOF
 fi
 
 # compute mmx state
-if test $mmx = "default"; then
-    if test $cpu = "x86" -o $cpu = "x86_64"; then
+if test x"$mmx" = x"default"; then
+    # defaults to mmx="yes" with i686 (despite pentiumpro),
+    mmx="no"
+    if test x"$cpu_raw" = x"i686" -o x"$cpu" = x"x86_64"; then
         mmx="yes"
-    else
+    fi
+
+    # unless processor_flags is set, then do right thing.
+    if test x"$processor_flags" != x"" ; then
         mmx="no"
+        if expr "$processor_flags" : ".*mmx" > /dev/null ; then
+            mmx="yes"
+        fi
     fi
 fi
 
@@ -561,49 +729,49 @@ POWERPCMODE="32bits"
 if test $tune != "generic"; then
     case $tune in
 	601|ppc601|PowerPC601)
-	    CFLAGS="$CFLAGS -mcpu=601"
+            ARCHFLAGS="-mcpu=601"
 	    if test $altivec = "yes"; then
 		echo "WARNING: tuning for PPC601 but altivec enabled !";
 	    fi
 	    TUNECPU=ppc601
 	;;
 	603*|ppc603*|PowerPC603*)
-	    CFLAGS="$CFLAGS -mcpu=603"
+	    ARCHFLAGS="-mcpu=603"
 	    if test $altivec = "yes"; then
 		echo "WARNING: tuning for PPC603 but altivec enabled !";
 	    fi
 	    TUNECPU=ppc603
 	;;
 	604*|ppc604*|PowerPC604*)
-	    CFLAGS="$CFLAGS -mcpu=604"
+	    ARCHFLAGS="-mcpu=604"
 	    if test $altivec = "yes"; then
 		echo "WARNING: tuning for PPC604 but altivec enabled !";
 	    fi
 	    TUNECPU=ppc604
 	;;
 	G3|g3|75*|ppc75*|PowerPC75*)
-	    CFLAGS="$CFLAGS -mcpu=750 -mtune=750 -mpowerpc-gfxopt"
+	    ARCHFLAGS="-mcpu=750 -mtune=750 -mpowerpc-gfxopt"
 	    if test $altivec = "yes"; then
 		echo "WARNING: tuning for PPC75x but altivec enabled !";
 	    fi
 	    TUNECPU=ppc750
 	;;
 	G4|g4|745*|ppc745*|PowerPC745*)
-	    CFLAGS="$CFLAGS -mcpu=7450 -mtune=7450 -mpowerpc-gfxopt"
+	    ARCHFLAGS="-mcpu=7450 -mtune=7450 -mpowerpc-gfxopt"
 	    if test $altivec = "no"; then
 		echo "WARNING: tuning for PPC745x but altivec disabled !";
 	    fi
 	    TUNECPU=ppc7450
 	;;
 	74*|ppc74*|PowerPC74*)
-	    CFLAGS="$CFLAGS -mcpu=7400 -mtune=7400 -mpowerpc-gfxopt"
+	    ARCHFLAGS="-mcpu=7400 -mtune=7400 -mpowerpc-gfxopt"
 	    if test $altivec = "no"; then
 		echo "WARNING: tuning for PPC74xx but altivec disabled !";
 	    fi
 	    TUNECPU=ppc7400
 	;;
 	G5|g5|970|ppc970|PowerPC970|power4*|Power4*)
-	    CFLAGS="$CFLAGS -mcpu=970 -mtune=970 -mpowerpc-gfxopt -mpowerpc64"
+	    ARCHFLAGS="-mcpu=970 -mtune=970 -mpowerpc-gfxopt -mpowerpc64"
 	    if test $altivec = "no"; then
 		echo "WARNING: tuning for PPC970 but altivec disabled !";
 	    fi
@@ -611,7 +779,7 @@ if test $tune != "generic"; then
             POWERPCMODE="64bits"
 	;;
 	*)
-	echo "WARNING: unknown CPU "$tune", ignored"
+            ARCHFLAGS="-mcpu=$tune"
 	;;
     esac
 fi
@@ -620,9 +788,9 @@ fi
 if test $cpu = "powerpc"; then
     if test $altivec = "yes"; then
         if test -n "`$cc -v 2>&1 | grep version | grep Apple`"; then
-            CFLAGS="$CFLAGS -faltivec"
+            ARCHFLAGS="$ARCHFLAGS -faltivec"
         else
-            CFLAGS="$CFLAGS -maltivec -mabi=altivec"
+            ARCHFLAGS="$ARCHFLAGS -maltivec -mabi=altivec"
         fi
     fi
 fi
@@ -634,7 +802,7 @@ int main( void ) { return 0; }
 EOF
 
 _altivec_h="no"
-if $cc $CFLAGS -o $TMPE $TMPC 2> /dev/null ; then
+if $cc $CFLAGS $ARCHFLAGS -o $TMPE $TMPC 2> /dev/null ; then
 _altivec_h="yes"
 fi
 
@@ -658,8 +826,47 @@ int main(void) {
 }
 EOF
 fi
-$cc $CFLAGS -o $TMPE $TMPC 2> /dev/null || altivec="no"
+$cc $CFLAGS $ARCHFLAGS -o $TMPE $TMPC 2> /dev/null || altivec="no"
 fi
+
+# if either tune or cpu is c3 or c3-2 optimize for smallness
+if test x"$tune" = x"c3" -o x"$tune" = x"c3-2" -o x"$cpu" = x"c3" -o x"$cpu" = x"c3-2"; then
+    optimize="small"
+fi
+
+# if no tune setting and we know cpu class look at $processor 
+if test x"$tune" = x"generic" -a x"$cpu" = x"x86"; then
+   if expr "$processor" : ".*Intel(R) Pentium(R) 4" > /dev/null ; then
+       ARCHFLAGS="-march=pentium4"
+   elif expr "$processor" : ".*Intel(R) Pentium(R) M" > /dev/null ; then
+       ARCHFLAGS="-march=pentium4"
+   elif expr "$processor" : ".*AMD Athlon(tm)" > /dev/null ; then
+       ARCHFLAGS="-march=pentiumpro -mmmx"
+   elif expr "$processor" : ".*VIA C3 Ezra" > /dev/null ; then
+       ARCHFLAGS="-march=c3 -Os"
+   elif expr "$processor" : ".*VIA Samuel 2" > /dev/null ; then
+       ARCHFLAGS="-march=c3 -Os"
+
+   elif test x"$cpu_raw" = x"i686" -a x"$mmx" = x"yes" ; then
+       ARCHFLAGS="-march=pentium2"
+   elif test x"$cpu_raw" = x"i686" -a x"$mmx" = x"no" ; then
+       ARCHFLAGS="-march=pentiumpro"
+   elif test x"$cpu_raw" = x"i586" -a x"$mmx" = x"yes" ; then
+       ARCHFLAGS="-march=pentium-mmx"
+   elif test x"$cpu_raw" = x"i586" -a x"$mmx" = x"no" ; then
+       ARCHFLAGS="-march=i586"
+   elif test x"$cpu_raw" = x"i486"; then
+       ARCHFLAGS="-march=i486"
+   elif test x"$cpu_raw" = x"i386"; then
+       ARCHFLAGS="-march=i386"
+   fi
+elif test x"$tune" = x"generic" -a x"$cpu" = x"x86_64"; then
+   ARCHFLAGS="-march=k8"
+fi
+
+# if architecture specific flags don't work blank them
+echo "int main( void ) { return 0; }" > $TMPC
+$cc $CFLAGS $ARCHFLAGS -o $TMPE $TMPC 2> /dev/null || ARCHFLAGS=""
 
 # Can only do mmi on mips
 if test $mmi = "default"; then
@@ -683,7 +890,14 @@ fi
 
 if test "$mingw32" = "yes" ; then
     v4l="no"
+    ivtv="no"
+    dvb="no"
+    x11="no"
+    joystick_menu="no"
     audio_oss="no"
+    audio_alsa="no"
+    audio_arts="no"
+    audio_jack="no"
     dv1394="no"
     dc1394="no"
     ffserver="no"
@@ -695,6 +909,7 @@ if test "$mingw32" = "yes" ; then
     EXESUF=".exe"
     prefix="/c/Program Files/FFmpeg"
     bindir="$prefix"
+    CONFIG_DEFINES="$CONFIG_DEFINES _WIN32"
 fi
 
 cc="${cross_prefix}${cc}"
@@ -728,6 +943,49 @@ if test "$cpu" = "powerpc" -o "$cpu" = "mips" ; then
 fi
 
 fi
+
+# test for distcc
+if test x"$distcc" = x"yes"; then
+    if test x"`distcc --version 2> /dev/null`" = x""; then
+        distcc="no"
+    else
+        XYZ=`which $cc`
+        if test x"$XYZ" != x"" -a x"`ls -l $XYZ | grep -o distcc`" != x""; then
+            distcc="yes, using distcc symlinked $cc"
+        fi
+    fi
+fi
+
+# test for ccache
+if test x"$ccache" = x"yes"; then
+    if test x"`ccache -V 2> /dev/null`" = x""; then
+        ccache="no"
+    else
+        XYZ=`which $cc`
+        if test x"$XYZ" != x"" -a x"`ls -l $XYZ | grep -o ccache`" != x""; then
+            ccache="yes, using ccache symlinked $cc"
+        fi
+    fi
+fi
+
+# ccache should be used before distcc for better cache coherency
+if test x"$distcc" = x"yes"; then
+    if test x"$ccache" = x"no"; then
+        cc="distcc $cc"
+        cxx="distcc $cxx"
+    elif test x"$ccache" = x"yes"; then
+        cc="ccache distcc $cc"
+        cxx="ccache distcc $cxx"
+    else
+        distcc="not using distcc explicitly, since ccache symlink is present"
+    fi
+else
+    if test x"$ccache" = x"yes"; then
+        cc="ccache $cc"
+        cxx="ccache $cxx"
+    fi
+fi
+
 
 # ---
 # *inttypes.h* test
@@ -1017,6 +1275,84 @@ ipv6=yes
 fi
 fi
 
+##########################################
+# OSS probe
+
+if test x"$audio_oss" = x"default" -o x"$audio_oss" = x"yes" ; then
+
+cat > $TMPC << EOF
+#include <sys/ioctl.h>
+#include <sys/soundcard.h>
+int main(void) { return (int) EV_SEQ_LOCAL; }
+EOF
+
+audio_oss=no
+if $cc -o $TMPE $TMPC > /dev/null 2>&1; then
+audio_oss=yes
+fi
+
+fi
+
+##########################################
+# ALSA probe
+
+if test x"$audio_alsa" = x"default" -o x"$audio_alsa" = x"yes" ; then
+
+cat > $TMPC << EOF
+#include <alsa/asoundlib.h>
+int main(void) { return (int) SND_LIB_MAJOR; }
+EOF
+
+audio_alsa=no
+audio_alsa_libs="-lasound"
+if $cc -o $TMPE $TMPC $audio_alsa_libs > /dev/null 2>&1; then
+audio_alsa=yes
+fi
+
+fi
+
+##########################################
+# aRts probe
+
+if test x"$audio_arts" = x"default" -o x"$audio_arts" = x"yes" ; then
+
+cat > $TMPC << EOF
+#include <artsc/artsc.h>
+int main(void) { return (int) ARTS_P_BUFFER_SIZE; }
+EOF
+
+audio_arts=no
+if (artsc-config --version) > /dev/null 2>&1; then
+audio_arts_libs=`artsc-config --libs`
+audio_arts_tmp=`artsc-config --cflags`
+audio_arts_cflags=`echo $audio_arts_tmp | sed "s/include\/artsc/include/g"`
+if $cc -o $TMPE $TMPC $audio_arts_cflags $audio_arts_libs > /dev/null 2>&1; then
+audio_arts=yes
+fi
+fi
+
+fi
+
+##########################################
+# JACK probe
+
+if test x"$audio_jack" = x"default" -o x"$audio_jack" = x"yes" ; then
+
+cat > $TMPC << EOF
+#include <jack/jack.h>
+int main(void) { return (int) JACK_MAX_FRAMES; }
+EOF
+
+audio_jack=no
+audio_jack_libs="-ljack"
+if $cc -o $TMPE $TMPC $audio_jack_libs > /dev/null 2>&1; then
+audio_jack=yes
+fi
+
+fi
+
+
+
 case "`$cc -v 2>&1 | grep version`" in
     *gcc*)
 	CFLAGS="-Wall -Wno-switch $CFLAGS"
@@ -1055,8 +1391,125 @@ if test x"$mandir" = x""; then
 mandir="${prefix}/man"
 fi
 
-echo "Please note that these settings only deal with libavcodec, not MythTV."
-#echo "Install prefix   $prefix"
+if test x"$dvb" = x"yes" ; then
+    dvb="no"
+    if test -f "$dvb_path"/linux/dvb/frontend.h ; then
+        if test -f "$dvb_path"/linux/timer.h ; then
+            echo "Error, DVB location points into kernel [$dvb_path]"
+        else
+            dvb="yes"
+        fi
+    else
+        echo "DVB location does not contain linux/dvb/frontend.h [$dvb_path]"
+    fi
+fi
+
+if test x"$dvb_eit" = x"yes" ; then
+    dvb_eit="no"
+    if test x"$dvb" = x"yes" ; then
+        dvb_eit="yes"
+    fi
+fi
+
+
+if test x"$lirc" = x"yes" ; then
+   lirc="no"
+   lirc_c1=`ls /usr/lib/liblirc_client.so* 2> /dev/null | head -n 1`
+   lirc_c2=`ls /usr/local/lib/liblirc_client.so* 2> /dev/null | head -n 1`
+   if test x"$lirc_c1" != x"" -o x"$lirc_c2" != x"" ; then
+       lirc="yes"
+   fi
+fi
+
+if test x"$firewire_cable_box" = x"yes" ; then
+    firewire_cable_box="no"
+    libiec1=`ls /usr/local/lib/libiec61883* 2> /dev/null | head -n 1`
+    libiec2=`ls /usr/lib/libiec61883* 2> /dev/null | head -n 1`
+    if test x"$libiec1" != x"" -o x"$libiec2" != x"" ; then
+        libraw1=`ls /usr/local/lib/libraw1394* 2> /dev/null | head -n 1`
+        libraw2=`ls /usr/lib/libraw1394* 2> /dev/null | head -n 1`
+        if test x"$libraw1" != x"" -o x"$libraw2" != x"" ; then
+            firewire_cable_box="yes"
+        fi
+    fi
+fi
+
+if test x"$x11" = x"yes" ; then
+    x11="no"
+    if test -f /usr/X11R6/bin/xinit ; then
+        x11="yes"
+    fi
+fi
+if test x"$x11" = x"no" ; then
+    xrandr="no"
+    xv="no"
+    xvmc="no"
+    xvmc_vld="no"
+fi
+
+if test x"$xrandr" = x"yes" ; then
+    xrandr="no"
+    if test -f /usr/X11R6/include/X11/extensions/Xrandr.h ; then
+        xrandr="yes"
+    fi
+fi
+
+if test x"$xv" = x"yes" ; then
+    xv="no"
+    if test x`ls /usr/X11R6/lib/libXv.* 2> /dev/null | head -n 1` != x"" ; then
+        xv="yes"
+    fi
+fi
+
+VENDOR_XVMC_LIBS=""
+if test x"$xvmc" = x"yes"; then
+    xvmc="no"
+    nvidia_xvmc=`ls /usr/X11R6/lib/libXvMCNVIDIA* 2> /dev/null | head -n 1`
+    if test x`ls /usr/X11R6/lib/libXvMCW.* 2> /dev/null | head -n 1` != x"" ; then
+        VENDOR_XVMC_LIBS="-lXvMCW"
+        xvmc="yes"
+    elif test x"$nvidia_xvmc" != x""; then
+        VENDOR_XVMC_LIBS="-lXvMCNVIDIA"
+        xvmc="yes"
+    elif test x`ls /usr/X11R6/lib/libI810XvMC.* 2> /dev/null | head -n 1` != x"" ; then
+        VENDOR_XVMC_LIBS="-lI810XvMC"
+        xvmc="yes"
+    fi
+fi
+
+if test x"$xvmc_vld" = x"yes" ; then
+    xvmc_vld="no"
+    if test x`ls /usr/X11R6/lib/libviaXvMC.* 2> /dev/null | head -n 1` != x"" ; then
+        VENDOR_XVMC_LIBS="-lviaXvMC"
+    fi
+    if test x"$VENDOR_XVMC_LIBS" = x"-lviaXvMC" ; then
+        if test x`ls /usr/X11R6/lib/libXvMCW.* 2> /dev/null | head -n 1` != x"" ; then
+            VENDOR_XVMC_LIBS="-lXvMCW"
+        fi
+
+        xvmc_vld="yes"
+        xvmc="yes"
+    fi
+fi
+
+if test x"$opengl_vsync" = x"yes" ; then
+    CONFIG_OPENGL_VSYNC_LIBS="-lGL -lGLU"
+fi
+
+if test x"$direct_fb" = x"yes" ; then
+    direct_fb="no"
+    if test x`which directfb-config 2> /dev/null` != x"" ; then
+        direct_fb="yes"
+        CONFIG_DIRECTFB_LIBS=`directfb-config --libs`
+        CONFIG_DIRECTFB_CXXFLAGS=`directfb-config --cflags`
+    fi
+fi
+
+echo "# Basic Settings"
+echo "Compile type     $compile_type"
+echo "Compiler cache   $ccache"
+echo "DistCC           $distcc"
+echo "Install prefix   $prefix"
 #echo "Source path      $source_path"
 #echo "C compiler       $cc"
 #echo "make             $make"
@@ -1109,7 +1562,35 @@ fi
 #else
 #echo "License: GPL"
 #fi
-
+echo
+echo "# Input Support"
+echo "Joystick menu    $joystick_menu"
+echo "lirc support     $lirc"
+echo "ivtv support     $ivtv"
+if test x"$ivtv_header" = x"yes" ; then
+echo "ivtv sys headers $ivtv_header"
+fi
+echo "FireWire support $firewire_cable_box"
+echo "DVB support      $dvb [$dvb_path]"
+echo
+echo "# Sound Output Support"
+echo "OSS support      $audio_oss"
+echo "ALSA support     $audio_alsa"
+echo "aRts support     $audio_arts"
+echo "JACK support     $audio_jack"
+echo
+echo "# Video Output Support"
+echo "x11 support      $x11"
+echo "xrandr support   $xrandr"
+echo "xv support       $xv"
+echo "XvMC support     $xvmc"
+echo "XvMC VLD support $xvmc_vld"
+echo "OpenGL vsync     $opengl_vsync"
+if test x"$mingw32" = x"yes" -o x"$cygwin" = x"yes" ; then
+echo "DirectFB         $direct_fb"
+echo "DirectX          $direct_x"
+fi
+echo
 
 echo "Creating config.mak and config.h"
 
@@ -1123,7 +1604,8 @@ echo "#define FFMPEG_CONFIGURATION "'"'"$FFMPEG_CONFIGURATION"'"' >> $TMPH
 #echo "bindir=$bindir" >> config.mak
 #echo "mandir=$mandir" >> config.mak
 #echo "MAKE=$make" >> config.mak
-#echo "CC=$cc" >> config.mak
+echo "QMAKE_CC=$cc" >> config.mak
+echo "QMAKE_CXX=$cxx" >> config.mak
 #echo "AR=$ar" >> config.mak
 #echo "RANLIB=$ranlib" >> config.mak
 #if test "$dostrip" = "yes" ; then
@@ -1141,6 +1623,8 @@ echo "#define FFMPEG_CONFIGURATION "'"'"$FFMPEG_CONFIGURATION"'"' >> $TMPH
 #   CFLAGS="$CFLAGS -mdynamic-no-pic"
 #fi
 
+echo "ARCHFLAGS=$ARCHFLAGS" >> config.mak
+echo "PROFILEFLAGS=$PROFILEFLAGS" >> config.mak
 echo "OPTFLAGS=$CFLAGS" >> config.mak
 #echo "SHCFLAGS=$SHCFLAGS">>config.mak
 #echo "LDFLAGS=$LDFLAGS" >> config.mak
@@ -1342,8 +1826,27 @@ if test "$dlfcn" = "yes" ; then
 fi
 
 if test "$audio_oss" = "yes" ; then
+    CCONFIG="$CCONFIG using_oss"
   echo "#define CONFIG_AUDIO_OSS 1" >> $TMPH
-  echo "CONFIG_AUDIO_OSS=yes" >> config.mak
+fi
+
+if test "$audio_alsa" = "yes" ; then
+    CCONFIG="$CCONFIG using_alsa"
+  echo "#define CONFIG_AUDIO_ALSA 1" >> $TMPH
+  echo "CONFIG_AUDIO_ALSA_LIBS=$audio_alsa_libs" >> config.mak
+fi
+
+if test "$audio_arts" = "yes" ; then
+    CCONFIG="$CCONFIG using_arts"
+  echo "#define CONFIG_AUDIO_ARTS 1" >> $TMPH
+  echo "CONFIG_AUDIO_ARTS_LIBS=$audio_arts_libs" >> config.mak
+  echo "CONFIG_AUDIO_ARTS_CFLAGS=$audio_arts_cflags" >> config.mak
+fi
+
+if test "$audio_jack" = "yes" ; then
+    CCONFIG="$CCONFIG using_jack"
+  echo "#define CONFIG_AUDIO_JACK 1" >> $TMPH
+  echo "CONFIG_AUDIO_JACK_LIBS=$audio_jack_libs" >> config.mak
 fi
 
 if test "$audio_beos" = "yes" ; then
@@ -1536,11 +2039,106 @@ fi
 
 fi
 
+if test x"$mmx" = x"yes"; then
+  CONFIG_DEFINES="$CONFIG_DEFINES MMX"
+fi
+
+if test x"$ivtv" = x"yes" ; then
+  CCONFIG="$CCONFIG using_ivtv"
+  CONFIG_DEFINES="$CONFIG_DEFINES USING_IVTV"
+fi
+
+if test x"$ivtv_header" = x"yes" ; then
+  CONFIG_DEFINES="$CONFIG_DEFINES USING_IVTV_HEADER"
+fi
+
+if test x"$firewire_cable_box" = x"yes" ; then
+  CCONFIG="$CCONFIG using_firewire"
+  CONFIG_DEFINES="$CONFIG_DEFINES USING_FIREWIRE"
+  echo "CONFIG_FIREWIRE_LIBS=-lraw1394 -liec61883" >> config.mak
+fi
+
+if test x"$lirc" = x"yes" ; then
+  CCONFIG="$CCONFIG using_lirc"
+  echo "CONFIG_LIRC_LIBS=-llirc_client" >> config.mak
+fi
+
+if test "$joystick_menu" = "yes" ; then
+  CCONFIG="$CCONFIG using_joystick_menu"
+fi
+
+if test x"$dvb" = x"yes" ; then
+  CCONFIG="$CCONFIG using_dvb"
+  CONFIG_DEFINES="$CONFIG_DEFINES USING_DVB"
+  CONFIG_INCLUDEPATH="$CONFIG_INCLUDEPATH $dvb_path"
+fi
+
+if test x"$dvb_eit" = x"yes" ; then
+  CONFIG_DEFINES="$CONFIG_DEFINES USING_DVB_EIT"
+fi
+
+if test x"$x11" = x"yes" ; then
+  CCONFIG="$CCONFIG using_x11"
+fi
+
+if test x"$xv" = x"yes" ; then
+  CCONFIG="$CCONFIG using_xv"
+  echo "CONFIG_XV_LIBS=-lXinerama -lXv -lX11 -lXext -lXxf86vm" >> config.mak
+fi
+
+if test x"$xrandr" = x"yes" ; then
+  CCONFIG="$CCONFIG using_xrandr"
+  CONFIG_DEFINES="$CONFIG_DEFINES USING_XRANDR"
+fi
+
+if test x"$xvmc" = x"yes" ; then
+  CCONFIG="$CCONFIG using_xvmc"
+  CONFIG_DEFINES="$CONFIG_DEFINES USING_XVMC"
+fi
+
+if test x"$xvmc_vld" = x"yes" ; then
+  CCONFIG="$CCONFIG using_xvmc_vld"
+  CONFIG_DEFINES="$CONFIG_DEFINES USING_XVMC_VLD"
+fi
+
+if test x"$VENDOR_XVMC_LIBS" != x"" ; then
+  echo "CONFIG_XVMC_LIBS=$VENDOR_XVMC_LIBS -lXvMC" >> config.mak
+fi
+
+if test x"$direct_fb" = x"yes" ; then
+  CCONFIG="$CCONFIG using_directfb"
+  echo "CONFIG_DIRECTFB_LIBS=$CONFIG_DIRECTFB_LIBS" >> config.mak
+  echo "CONFIG_DIRECTFB_CXXFLAGS=$CONFIG_DIRECTFB_CXXFLAGS" >> config.mak
+fi
+
+if test x"$direct_x" = x"yes" ; then
+  CCONFIG="$CCONFIG using_directx"
+  CONFIG_DEFINES="$CONFIG_DEFINES USING_DIRECTX"
+fi
+
+if test x"$opengl_vsync" = x"yes" ; then
+  CCONFIG="$CCONFIG using_opengl_vsync"
+  CONFIG_DEFINES="$CONFIG_DEFINES USING_OPENGL_VSYNC"
+  echo "CONFIG_OPENGL_VSYNC_LIBS=$CONFIG_OPENGL_VSYNC_LIBS" >> config.mak
+fi
+
+if test x"$CCONFIG" != x"" ; then
+  echo "CCONFIG=$CCONFIG" >> config.mak
+fi
+
+if test x"$CONFIG_DEFINES" != x"" ; then
+  echo "CONFIG_DEFINES=$CONFIG_DEFINES" >> config.mak
+fi
+
+if test x"$CONFIG_INCLUDEPATH" != x"" ; then
+  echo "CONFIG_INCLUDEPATH=$CONFIG_INCLUDEPATH" >> config.mak
+fi
+
 diff $TMPH config.h >/dev/null 2>&1
 if test $? -ne 0 ; then
-	mv -f $TMPH config.h
+  mv -f $TMPH config.h
 else
-	echo "config.h is unchanged"
+  echo "config.h is unchanged"
 fi
 
 rm -f $TMPO $TMPC $TMPE $TMPS $TMPH

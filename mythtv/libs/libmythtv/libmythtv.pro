@@ -146,7 +146,7 @@ using_directx {
     HEADERS += videoout_dx.h
 }
 
-using_opengl {
+using_opengl_vsync {
     CONFIG += opengl
 }
 
