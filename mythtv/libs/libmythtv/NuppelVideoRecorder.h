@@ -131,6 +131,7 @@ class NuppelVideoRecorder : public RecorderBase
     unsigned int lf, tf;
     int M1, M2, Q;
     int w, h;
+    int pip_mode;
     int pid, pid2;
     int inputchannel;
     int compression;

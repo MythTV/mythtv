@@ -624,6 +624,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
         nvr->SetOption("rtjpeglumafilter", 0);
         nvr->SetOption("rtjpegquality", 255);
         nvr->SetOption("audiocompression", 0);
+        nvr->SetOption("pip_mode", 1);
     }
  
     nvr->Initialize();

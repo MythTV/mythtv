@@ -55,6 +55,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     usebttv = 1;
     w = 352;
     h = 240;
+	pip_mode = 0;
 
     deinterlace_mode = DEINTERLACE_NONE;
     framerate_multiplier = 1.0;
@@ -257,6 +258,8 @@ void NuppelVideoRecorder::SetOption(const QString &opt, int value)
         audio_samplerate = value;
     else if (opt == "audioframesize")
         audio_buffer_size = value;
+    else if (opt == "pip_mode")
+        pip_mode = value;
     else
         RecorderBase::SetOption(opt, value);
 }
@@ -668,10 +671,13 @@ void NuppelVideoRecorder::StartRecording(void)
         return;
     }
 
-    if (commDetect)
-        commDetect->Init(w, h, video_frame_rate);
-    else
-        commDetect = new CommDetect(w, h, video_frame_rate);
+    if (!pip_mode)
+    {
+        if (commDetect)
+            commDetect->Init(w, h, video_frame_rate);
+        else
+            commDetect = new CommDetect(w, h, video_frame_rate);
+    }
 
     // save the start time
     gettimeofday(&stm, &tzone);
@@ -2957,7 +2963,7 @@ void NuppelVideoRecorder::WriteVideo(Frame *frame, bool skipsync, bool forcekey)
     frameofgop++;
     framesWritten++;
 
-    if ((!hardware_encode) && (commDetect))
+    if ((!hardware_encode) && (commDetect) && (!pip_mode))
     {
         commDetect->ProcessNextFrame(buf, (fnum-startnum)>>1 );
         if (commDetect->FrameIsBlank())
