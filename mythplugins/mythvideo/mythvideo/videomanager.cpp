@@ -10,6 +10,7 @@
 #include <qnetwork.h>
 #include <qurl.h>
 #include <qdir.h>
+#include <qurloperator.h>
 
 using namespace std;
 
@@ -51,7 +52,7 @@ VideoManager::VideoManager(QSqlDatabase *ldb,
     stopProcessing = false;
 
     m_state = 0;
-    InetGrabber = NULL;
+    httpGrabber = NULL;
 
     urlTimer = new QTimer(this);
     connect(urlTimer, SIGNAL(timeout()), SLOT(GetMovieListingTimeOut()));
@@ -87,8 +88,9 @@ VideoManager::VideoManager(QSqlDatabase *ldb,
         }
     }
 
-    bgTransBackup = new QPixmap();
-    resizeImage(bgTransBackup, "trans-backup.png");
+    bgTransBackup = gContext->LoadScalePixmap("trans-backup.png");
+    if (!bgTransBackup)
+        bgTransBackup = new QPixmap();
 
     updateBackground();
 
@@ -97,10 +99,10 @@ VideoManager::VideoManager(QSqlDatabase *ldb,
 
 VideoManager::~VideoManager(void)
 {
-    if (InetGrabber)
+    if (httpGrabber)
     {
-        InetGrabber->stop();
-        delete InetGrabber;
+        httpGrabber->stop();
+        delete httpGrabber;
     }
     delete urlTimer;
 
@@ -284,7 +286,7 @@ QMap<QString, QString> VideoManager::parseMovieList(QString data)
         endint = data.find(end, start + 1);
         count++;
         if (count == 10)
-		break;
+    	break;
     }
     return listing;
 
@@ -333,27 +335,26 @@ QString VideoManager::GetMoviePoster(QString movieNum)
 
     QString host = "www.imdb.com";
 
-    QUrl url("http://" + host + "/Posters?" + movieNum
-           + " HTTP/1.1\nHost: " + host + "\nUser-Agent: Mozilla/9.876 (X11; U; Linux 2.2.12-20 i686, en)"
-           + " Gecko/25250101 Netscape/5.432b1\n");
+    QUrl url("http://" + host + "/title/tt" + movieNum + "/posters");
 
     //cout << "Grabbing Poster HTML From: " << url.toString() << endl;
 
-    if (InetGrabber)
+    if (httpGrabber)
     {
-        InetGrabber->stop();
-        delete InetGrabber;
+        httpGrabber->stop();
+        delete httpGrabber;
     }
 
-    InetGrabber = new INETComms(url);
+    httpGrabber = new HttpComms(url);
 
-    while (!InetGrabber->isDone())
+    while (!httpGrabber->isDone())
     {
         qApp->processEvents();
+        usleep(10000);
     }
 
     QString res;
-    res = InetGrabber->getData();
+    res = httpGrabber->getData();
 
     QString beg = "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" "
                   "background=\"http://posters.imdb.com/posters/";
@@ -400,30 +401,28 @@ void VideoManager::GetMovieData(QString movieNum)
     movieNumber = movieNum;
     QString host = "www.imdb.com";
 
-    QUrl url("http://" + host + "/Title?" + movieNum
-           + " HTTP/1.1\nHost: " + host + "\nUser-Agent: Mozilla/9.876 (X11; U; Linux 2.2.12-20 i686, en)"
-           + " Gecko/25250101 Netscape/5.432b1\n");
+    QUrl url("http://" + host + "/title/tt" + movieNum + "/");
 
     //cout << "Grabbing Data From: " << url.toString() << endl;
 
-    if (InetGrabber)
+    if (httpGrabber)
     {
-        InetGrabber->stop();
-        delete InetGrabber;
+        httpGrabber->stop();
+        delete httpGrabber;
     }
 
-    InetGrabber = new INETComms(url);
+    httpGrabber = new HttpComms(url);
 
-    while (!InetGrabber->isDone())
+    while (!httpGrabber->isDone())
     {
         qApp->processEvents();
+        usleep(10000);
     }
 
     QString res;
-    res = InetGrabber->getData();
+    res = httpGrabber->getData();
 
     ParseMovieData(res);
-
 }
 
 int VideoManager::GetMovieListing(QString movieName)
@@ -432,36 +431,36 @@ int VideoManager::GetMovieListing(QString movieName)
     QString host = "us.imdb.com";
     theMovieName = movieName;
 
-    QUrl url("http://" + host + "/Tsearch?title=" + movieName + "&type=fuzzy&from_year=1890"
-           + "&to_year=2010&sort=smart&tv=off&x=12&y=14"
-	   + " HTTP/1.1\nHost: us.imdb.com\nUser-Agent: Mozilla/9.876 (X11; U; Linux 2.2.12-20 i686, en)"
-	   + " Gecko/25250101 Netscape/5.432b1\n");
+    QUrl url("http://" + host + "/Tsearch?title=" + movieName + 
+             "&type=fuzzy&from_year=1890" +
+             "&to_year=2010&sort=smart&tv=off&x=12&y=14");
 
     //cout << "Grabbing Listing From: " << url.toString() << endl;
 
-    if (InetGrabber)
+    if (httpGrabber)
     {
-        InetGrabber->stop();
-        delete InetGrabber;
+        httpGrabber->stop();
+        delete httpGrabber;
     }
 
-    InetGrabber = new INETComms(url);
+    httpGrabber = new HttpComms(url);
 
     urlTimer->stop();
     urlTimer->start(10000);
 
     stopProcessing = false;
-    while (!InetGrabber->isDone())
+    while (!httpGrabber->isDone())
     {
         qApp->processEvents();
-	if (stopProcessing)
-		return 1;
+        if (stopProcessing)
+            return 1;
+        usleep(10000);
     }
 
     urlTimer->stop();
 
     QString res;
-    res = InetGrabber->getData();
+    res = httpGrabber->getData();
 
     QString movies = parseData(res, "<A NAME=\"mov\">Movies</A></H2>", "</TABLE>");
 
@@ -506,7 +505,7 @@ void VideoManager::ParseMovieData(QString data)
     else 
         movieYear = mYear.toInt();
  
-    movieDirector = parseData(data, ">Directed by</b><br>\n<a href=\"/Name?", "</a><br>");
+    movieDirector = parseData(data, ">Directed by</b><br>\n<a href=\"/name/nm?", "</a><br>");
     if (movieDirector != "<NULL>")
         movieDirector = movieDirector.right(movieDirector.length() - movieDirector.find("\">") - 2);
     moviePlot = parseData(data, "<b class=\"ch\">Plot Outline:</b> ", "<a href=\"");
@@ -557,45 +556,15 @@ void VideoManager::ParseMovieData(QString data)
     RefreshMovieList();
 }
 
-void VideoManager::resizeImage(QPixmap *dst, QString file)
-{
-    QString baseDir = gContext->GetInstallPrefix();
-    QString themeDir = gContext->FindThemeDir("");
-    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
-    baseDir = baseDir + "/share/mythtv/themes/default/";
-
-    QFile checkFile(themeDir + file);
-
-    if (checkFile.exists())
-         file = themeDir + file;
-    else
-         file = baseDir + file;
-
-    if (hmult == 1 && wmult == 1)
-    {
-         dst->load(file);
-    }
-    else
-    {
-        QImage *sourceImg = new QImage();
-        if (sourceImg->load(file))
-        {
-            QImage scalerImg;
-            scalerImg = sourceImg->smoothScale((int)(sourceImg->width() * wmult),
-                                               (int)(sourceImg->height() * hmult));
-            dst->convertFromImage(scalerImg);
-        }
-        delete sourceImg;
-    }
-}
-
 void VideoManager::grayOut(QPainter *tmp)
 {
    int transparentFlag = gContext->GetNumSetting("PlayBoxShading", 0);
    if (transparentFlag == 0)
-       tmp->fillRect(QRect(QPoint(0, 0), size()), QBrush(QColor(10, 10, 10), Dense4Pattern));
+       tmp->fillRect(QRect(QPoint(0, 0), size()), QBrush(QColor(10, 10, 10), 
+                     Dense4Pattern));
    else if (transparentFlag == 1)
-       tmp->drawPixmap(0, 0, *bgTransBackup, 0, 0, (int)(800*wmult), (int)(600*hmult));
+       tmp->drawPixmap(0, 0, *bgTransBackup, 0, 0, (int)(800*wmult), 
+                       (int)(600*hmult));
 }
 
 void VideoManager::paintEvent(QPaintEvent *e)
@@ -933,7 +902,6 @@ void VideoManager::updateInfo(QPainter *p)
     }
     tmp.end();
     p->drawPixmap(pr.topLeft(), pix);
-
 }
 
 void VideoManager::LoadWindow(QDomElement &element)
@@ -989,7 +957,7 @@ void VideoManager::exitWin()
         backup.end();
         update(fullRect);
         noUpdate = false;
-	urlTimer->stop();
+        urlTimer->stop();
     }
     else
         emit accept();

@@ -60,7 +60,6 @@ class VideoBrowser : public MythDialog
     void updatePlayWait(QPainter *);
 
     void grayOut(QPainter *);
-    void resizeImage(QPixmap *, QString);
 
     QPixmap *bgTransBackup;
     Metadata *curitem;

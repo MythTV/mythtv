@@ -6,7 +6,7 @@
 #include <qapplication.h>
 #include <qstringlist.h>
 
-#include <mythtv/inetcomms.h>
+#include <mythtv/httpcomms.h>
 #include "metadata.h"
 #include <mythtv/mythwidgets.h>
 #include <qdom.h>
@@ -62,7 +62,7 @@ class VideoManager : public MythDialog
     QMap<QString, QString> parseMovieList(QString);
     void ResetCurrentItem();
 
-    INETComms *InetGrabber;
+    HttpComms *httpGrabber;
     void RefreshMovieList();
     QString ratingCountry;
     void GetMovieData(QString);
@@ -80,7 +80,6 @@ class VideoManager : public MythDialog
     void updateIMDBEnter(QPainter *);
 
     void grayOut(QPainter *);
-    void resizeImage(QPixmap *, QString);
 
     QPixmap *bgTransBackup;
     Metadata *curitem;
