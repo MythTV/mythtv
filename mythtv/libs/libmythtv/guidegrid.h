@@ -6,10 +6,6 @@
 #include <qpixmap.h>
 #include <qdatetime.h>
 
-#include <vector>
-
-using namespace std;
-
 class QFont;
 class ChannelInfo 
 {
@@ -44,15 +40,23 @@ class ProgramInfo
     QString starttime;
     QString endtime;
     QString channum;
+
+    int spread;
+    int startCol;
 };
 
 class GuideGrid : public QWidget
 {
     Q_OBJECT
   public:
-    GuideGrid(QWidget *parent = 0, const char *name = 0);
+    GuideGrid(int channel, QWidget *parent = 0, const char *name = 0);
 
   protected slots:
+    void cursorLeft();
+    void cursorRight();
+    void cursorDown();
+    void cursorUp();
+
     void scrollLeft();
     void scrollRight();
     void scrollDown();
@@ -79,15 +83,18 @@ class GuideGrid : public QWidget
     void fillProgramInfos(void);
 
     QFont *m_font;
-    vector<ChannelInfo *> m_channelInfos;
-    vector<TimeInfo *> m_timeInfos;
+    QFont *m_largerFont;
+
+    ChannelInfo *m_channelInfos[10];
+    TimeInfo *m_timeInfos[10];
+    ProgramInfo *m_programInfos[10][10];
 
     QDateTime m_currentStartTime;
     unsigned int m_currentStartChannel;
     unsigned int m_currentEndChannel;
 
-    ProgramInfo *m_programInfos[10][10];
-    int m_programRows;
+    int m_currentRow;
+    int m_currentCol;
 };
 
 #define CHANNUM_MAX  128

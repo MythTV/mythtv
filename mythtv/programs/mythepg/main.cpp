@@ -17,7 +17,7 @@ int main(int argc, char **argv)
     if (!db->open())
         printf("couldn't open db\n");
 
-    GuideGrid gg;
+    GuideGrid gg(3);
     gg.setGeometry(0, 0, 800, 600);
     gg.setFixedWidth(800);
     gg.setFixedHeight(600);
