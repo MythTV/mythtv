@@ -669,7 +669,7 @@ static int mpegps_probe(AVProbeData *p)
     if (p->buf_size < 6)
         return 0;
 
-    for (i = 0; i < 20; i++) {
+    for (i = 0; i < 120; i++) {
         c = p->buf[i];
         code = (code << 8) | c;
         if ((code & 0xffffff00) == 0x100) {

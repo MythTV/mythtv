@@ -168,6 +168,8 @@ MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal)
     RegisterKey("Global", "PREVVIEW", "Previous View", "Home");
     RegisterKey("Global", "NEXTVIEW", "Next View", "End");
 
+    RegisterKey("Global", "HELP", "Help", "F1");
+
     RegisterKey("Global", "0", "0", "0");
     RegisterKey("Global", "1", "1", "1");
     RegisterKey("Global", "2", "2", "2");

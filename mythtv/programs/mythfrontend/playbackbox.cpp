@@ -1928,7 +1928,7 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
 
         if (action == "ESCAPE")
             exitWin();
-        else if (action == "1")
+        else if (action == "1" || action == "HELP")
             showIconHelp();
         else if (action == "MENU")
             showMenu();
