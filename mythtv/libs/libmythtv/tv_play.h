@@ -205,6 +205,7 @@ class TV : public QObject
     int rewtime;
     int stickykeys;
     int ff_rew_repos;
+    bool ff_rew_reverse;
     int doing_ff_rew;
     int ff_rew_index;
     int speed_index;

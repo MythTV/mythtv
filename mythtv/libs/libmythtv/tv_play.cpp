@@ -809,6 +809,7 @@ void TV::RunTV(void)
 
     stickykeys = gContext->GetNumSetting("StickyKeys");
     ff_rew_repos = gContext->GetNumSetting("FFRewRepos", 1);
+    ff_rew_reverse = gContext->GetNumSetting("FFRewReverse", 1);
     smartForward = gContext->GetNumSetting("SmartForward", 0);
 
     doing_ff_rew = 0;
@@ -1688,6 +1689,16 @@ void TV::ChangeFFRew(int direction)
 {
     if (doing_ff_rew == direction)
         ff_rew_index = (++ff_rew_index % SSPEED_MAX);
+    else if (!ff_rew_reverse && doing_ff_rew == -direction)
+    {
+        if (ff_rew_index > SSPEED_NORMAL)
+            ff_rew_index = (--ff_rew_index % SSPEED_MAX);
+        else
+        {
+            float time = StopFFRew();
+            UpdatePosOSD(time, tr("Play"));
+        }
+    }
     else
     {
         NormalSpeed();

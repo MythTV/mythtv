@@ -429,6 +429,20 @@ public:
     };
 };
 
+class FFRewReverse: public CheckBoxSetting, public GlobalSetting {
+public:
+    FFRewReverse():
+        GlobalSetting("FFRewReverse") {
+        setLabel(QObject::tr("Reverse direction in fast forward/rewind"));
+        setValue(true);
+        setHelpText(QObject::tr("If set, pressing the sticky rewind key "
+                    "in fast forward mode will switch to rewind mode, and "
+                    "vice versa.  If not set, doing so will decrease the "
+                    "speed in the current direction or switch to play mode if "
+                    "the speed can't be decreased further.."));
+    };
+};
+
 class OSDDisplayTime: public SpinBoxSetting, public GlobalSetting {
 public:
     OSDDisplayTime():
@@ -1412,6 +1426,7 @@ PlaybackSettings::PlaybackSettings()
     seek->addChild(new SmartForward());
     seek->addChild(new StickyKeys());
     seek->addChild(new FFRewRepos());
+    seek->addChild(new FFRewReverse());
     seek->addChild(new ExactSeeking());
     seek->addChild(new JumpAmount());
     addChild(seek);
