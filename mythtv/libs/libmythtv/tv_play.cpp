@@ -233,6 +233,7 @@ void TV::Init(bool createWindow)
     smartChannelChange = gContext->GetNumSetting("SmartChannelChange", 0);
     showBufferedWarnings = gContext->GetNumSetting("CCBufferWarnings", 0);
     bufferedChannelThreshold = gContext->GetNumSetting("CCWarnThresh", 10);
+    MuteIndividualChannels = gContext->GetNumSetting("IndividualMuteControl",0);
 
     recorder = piprecorder = activerecorder = NULL;
     nvp = pipnvp = activenvp = NULL;
@@ -2854,18 +2855,31 @@ void TV::ChangeVolume(bool up)
 
 void TV::ToggleMute(void)
 {
+    kMuteState mute_status;
+
     if (!volumeControl)
         return;
 
-    volumeControl->ToggleMute();
-    bool muted = volumeControl->GetMute();
+    if (!MuteIndividualChannels)
+    {
+        volumeControl->ToggleMute();
+        bool muted = volumeControl->GetMute();
+        if (muted) 
+            mute_status = MUTE_BOTH;
+        else
+            mute_status = MUTE_OFF;
+    }
+    else mute_status = volumeControl->IterateMutedChannels();
 
     QString text;
 
-    if (muted)
-        text = tr("Mute On");
-    else
-        text = tr("Mute Off");
+    switch (mute_status)
+    {
+       case MUTE_OFF: text = tr("Mute Off"); break;
+       case MUTE_BOTH:  text = tr("Mute On"); break;
+       case MUTE_LEFT: text = tr("Left Channel Muted"); break;
+       case MUTE_RIGHT: text = tr("Right Channel Muted"); break;
+    }
  
     if (osd && !browsemode)
         osd->SetSettingsText(text, 5);

@@ -300,6 +300,8 @@ class TV : public QObject
     bool showBufferedWarnings;
     int bufferedChannelThreshold;
 
+    bool MuteIndividualChannels;
+
     bool switchingCards;
 
     OSDGenericTree *treeMenu;

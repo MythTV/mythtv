@@ -115,6 +115,22 @@ public:
         };
 };
 
+class IndividualMuteControl: public CheckBoxSetting, public GlobalSetting {
+public:
+    IndividualMuteControl():
+        GlobalSetting("IndividualMuteControl") {
+        setLabel(QObject::tr("Independent Muting of Left and Right Audio "
+                 "Channels"));
+        setValue(false);
+        setHelpText(QObject::tr("Enable muting of just the left or right "
+                    "channel.  Useful if your broadcaster "
+                    "puts the original language on one channel, and a dubbed "
+                    "version of the program on the other one.  This modifies "
+                    "the behavior of the Mute key."));
+    };
+};
+
+
 class AC3PassThrough: public CheckBoxSetting, public GlobalSetting {
 public:
     AC3PassThrough():
@@ -1445,6 +1461,7 @@ public:
          settings->addChild(new MixerControl());
          settings->addChild(new MixerVolume());
          settings->addChild(new PCMVolume());
+         settings->addChild(new IndividualMuteControl());
          addTarget("1", settings);
          
          // show nothing if volumeControl is off

@@ -21,6 +21,7 @@ VolumeControl::VolumeControl(bool setstartingvolume)
 
 #ifndef _WIN32
     mute = false;
+    current_mute_state = MUTE_OFF;
   
     QString device = gContext->GetSetting("MixerDevice", "/dev/mixer");
     mixerfd = open(device.ascii(), O_RDONLY);
@@ -159,3 +160,42 @@ void VolumeControl::ToggleMute(void)
     SetMute(!mute);
 }
 
+kMuteState VolumeControl::IterateMutedChannels(void)
+{
+// current_mute_state is initialized to "MUTE_OFF".  If individual muting
+// is enabled, each call to SetMute will advance to the next state:
+// MUTE_OFF -> MUTE_LEFT -> MUTE_RIGHT -> MUTE_BOTH -> MUTE_OFF
+#ifndef _WIN32
+    int realvol;
+
+    switch (current_mute_state)
+    {
+       case MUTE_OFF:
+           current_mute_state = MUTE_LEFT;
+           realvol = (internal_volume << 8) + 0;
+           break;
+       case MUTE_LEFT:
+           current_mute_state = MUTE_RIGHT;
+           realvol = (0 << 8) + internal_volume;
+           break;
+       case MUTE_RIGHT:
+           current_mute_state = MUTE_BOTH;
+           realvol = 0;
+           break;
+       case MUTE_BOTH:
+           current_mute_state = MUTE_OFF;
+           realvol = (internal_volume << 8) + internal_volume;
+           break;
+    }
+
+    if (mixerfd > 0)
+    {
+        int ret = ioctl(mixerfd, MIXER_WRITE(control), &realvol);
+        if (ret < 0)
+            perror("IterateMutedChannels:");
+    }
+
+    return (current_mute_state);
+
+#endif
+}
