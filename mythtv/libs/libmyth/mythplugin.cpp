@@ -23,7 +23,7 @@ int MythPluginManager::MythPlugin::init(const char *libversion)
     if (ifunc)
         return ifunc(libversion);
 
-    return (-1);
+    return -1;
 }
 
 void MythPluginManager::MythPlugin::run(void)

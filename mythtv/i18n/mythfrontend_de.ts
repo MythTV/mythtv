@@ -112,11 +112,11 @@
     </message>
     <message>
         <source>hr</source>
-        <translation type="unfinished"></translation>
+        <translation>Uhr</translation>
     </message>
     <message>
         <source>min</source>
-        <translation type="unfinished"></translation>
+        <translation>min</translation>
     </message>
     <message>
         <source>Duration:</source>
@@ -199,15 +199,15 @@
     </message>
     <message>
         <source>Allow this program to AutoExpire?</source>
-        <translation type="unfinished"></translation>
+        <translation>Diese Sendung automatisch löschen?</translation>
     </message>
     <message>
         <source>Yes, AutoExpire</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, automatisch löschen</translation>
     </message>
     <message>
         <source>No, Do Not AutoExpire</source>
-        <translation type="unfinished"></translation>
+        <translation>Nein. Nicht automatisch löschen</translation>
     </message>
 </context>
 <context>
@@ -429,11 +429,11 @@
     </message>
     <message>
         <source>Auto-Expire recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnahmen autom. löschen</translation>
     </message>
     <message>
         <source>Number of most recent episodes to keep (set to 0 for ALL)</source>
-        <translation type="unfinished"></translation>
+        <translation>Wieviele Episoden behalten (0 für alle)</translation>
     </message>
 </context>
 <context>
@@ -585,7 +585,7 @@
     </message>
     <message>
         <source>Rewind </source>
-        <translation>Rckwärts</translation>
+        <translation>Rückwärts</translation>
     </message>
     <message>
         <source>Jump Ahead</source>
