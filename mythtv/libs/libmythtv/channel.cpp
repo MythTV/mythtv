@@ -27,6 +27,7 @@ Channel::Channel(TVRec *parent, const QString &videodevice)
     totalChannels = 0;
     usingv4l2 = false;
     videomode = VIDEO_MODE_NTSC;
+    currentFormat = "";
 }
 
 Channel::~Channel(void)
@@ -88,7 +89,18 @@ void Channel::SetFormat(const QString &format)
 {
     if (!Open())
         return;
-   
+
+    if (currentFormat == format)
+        return;
+
+    currentFormat = format;
+  
+    QString fmt;
+    if (format == "Default")
+        fmt = gContext->GetSetting("TVFormat");
+    else
+        fmt = format;
+ 
     if (usingv4l2)
     {
         struct v4l2_input vin;
@@ -109,21 +121,21 @@ void Channel::SetFormat(const QString &format)
             capchannels = vin.index;
         }
 
-        if (format == "NTSC")
+        if (fmt == "NTSC")
             videomode = V4L2_STD_NTSC;
-        else if (format == "ATSC")
+        else if (fmt == "ATSC")
             videomode = V4L2_STD_ATSC_8_VSB;
-        else if (format == "PAL")
+        else if (fmt == "PAL")
             videomode = V4L2_STD_PAL;
-        else if (format == "SECAM")
+        else if (fmt == "SECAM")
             videomode = V4L2_STD_SECAM;
-        else if (format == "PAL-NC")
+        else if (fmt == "PAL-NC")
             videomode = V4L2_STD_PAL_Nc;
-        else if (format == "PAL-M")
+        else if (fmt == "PAL-M")
             videomode = V4L2_STD_PAL_M;
-        else if (format == "PAL-N")
+        else if (fmt == "PAL-N")
             videomode = V4L2_STD_PAL_N;
-        else if (format == "NTSC-JP")
+        else if (fmt == "NTSC-JP")
             videomode = V4L2_STD_NTSC_M_JP;
 
         pParent->RetrieveInputChannels(inputChannel, inputTuneTo, 
@@ -138,21 +150,21 @@ void Channel::SetFormat(const QString &format)
 
     ioctl(videofd, VIDIOCGTUNER, &tuner);
     
-    if (format == "NTSC")
+    if (fmt == "NTSC")
         mode = VIDEO_MODE_NTSC;
-    else if (format == "ATSC")
+    else if (fmt == "ATSC")
         mode = VIDEO_MODE_ATSC;
-    else if (format == "PAL")
+    else if (fmt == "PAL")
         mode = VIDEO_MODE_PAL;
-    else if (format == "SECAM")
+    else if (fmt == "SECAM")
         mode = VIDEO_MODE_SECAM;
-    else if (format == "PAL-NC")
+    else if (fmt == "PAL-NC")
         mode = 3;
-    else if (format == "PAL-M")
+    else if (fmt == "PAL-M")
         mode = 4;
-    else if (format == "PAL-N")
+    else if (fmt == "PAL-N")
         mode = 5;
-    else if (format == "NTSC-JP")
+    else if (fmt == "NTSC-JP")
         mode = 6;
 
     tuner.mode = mode;
@@ -312,13 +324,13 @@ bool Channel::SetChannelByString(const QString &chan)
         return false;
 
     pthread_mutex_lock(&db_lock);
-    QString thequery = QString("SELECT finetune, freqid "
+    QString thequery = QString("SELECT finetune, freqid, tvformat "
                                "FROM channel WHERE channum = \"%1\";")
                                .arg(chan);
 
     QSqlQuery query = db_conn->exec(thequery);
     if (!query.isActive())
-        MythContext::DBError("fetchtuningparamschanid", query);
+        MythContext::DBError("fetchtuningparams", query);
     if (query.numRowsAffected() <= 0)
     {
         pthread_mutex_unlock(&db_lock);
@@ -328,6 +340,7 @@ bool Channel::SetChannelByString(const QString &chan)
 
     int finetune = query.value(0).toInt();
     QString freqid = query.value(1).toString();
+    QString tvformat = query.value(2).toString();
 
     pthread_mutex_unlock(&db_lock);
 
@@ -341,6 +354,8 @@ bool Channel::SetChannelByString(const QString &chan)
         return false;
 
     curchannelname = chan;
+
+    SetFormat(tvformat);
 
     pParent->SetVideoFiltersForChannel(this, chan);
     SetContrast();

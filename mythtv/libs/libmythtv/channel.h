@@ -58,6 +58,8 @@ class Channel : public ChannelBase
 
     int videomode;
     bool usingv4l2;
+
+    QString currentFormat;
 };
 
 #endif
