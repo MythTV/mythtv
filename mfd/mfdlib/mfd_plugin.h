@@ -148,8 +148,6 @@ class MFDServicePlugin : public MFDBasePlugin
   protected:
 
     int                     port_number;
-    QPtrList<SocketBuffer>  things_to_do;
-    QMutex                  things_to_do_mutex;
     
     QSocketDevice                    *core_server_socket;
     QPtrList<MFDServiceClientSocket> client_sockets;

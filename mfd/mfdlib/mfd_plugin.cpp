@@ -680,33 +680,7 @@ void MFDHttpPlugin::run()
         //
         
         updateSockets();
-        
-        
-        QStringList pending_tokens;
-        int         pending_socket = 0;
-
-        //
-        //  Pull off the first pending command request
-        //
-
-        
-        things_to_do_mutex.lock();
-            if(things_to_do.count() > 0)
-            {
-                pending_tokens = things_to_do.getFirst()->getTokens();
-                pending_socket = things_to_do.getFirst()->getSocketIdentifier();
-                things_to_do.removeFirst();
-            }
-        things_to_do_mutex.unlock();
-                    
-        if(pending_tokens.count() > 0)
-        {
-            //doSomething(pending_tokens, pending_socket);
-        }
-        else
-        {
-            waitForSomethingToHappen();
-        }
+        waitForSomethingToHappen();
     }
 }
 
