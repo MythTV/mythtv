@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
- <TITLE>Installing and using mythtv: Setting up paths and ldconfig.</TITLE>
+ <TITLE>Installing and using mythtv: Setting up paths, ldconfig and other shell variables.</TITLE>
  <LINK HREF="mythtv-HOWTO-5.html" REL=next>
  <LINK HREF="mythtv-HOWTO-3.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc4" REL=contents>
@@ -12,7 +12,7 @@
 <A HREF="mythtv-HOWTO-3.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc4">Contents</A>
 <HR>
-<H2><A NAME="s4">4.</A> <A HREF="mythtv-HOWTO.html#toc4">Setting up paths and ldconfig.</A></H2>
+<H2><A NAME="s4">4.</A> <A HREF="mythtv-HOWTO.html#toc4">Setting up paths, ldconfig and other shell variables.</A></H2>
 
 <P>There are some paths that need to be modified before starting the main
 compile of mythtv, otherwise you will get errors.</P>
@@ -45,7 +45,7 @@ export PATH=$PATH:/usr/lib/qt3/bin
 The last two commands are to exit out of the shell.  This way, when you next
 open a shell your new commands will take effect.</P>
 
-<H3>Red Hat Linux 8.0</H3>
+<H3><A NAME="RH80-LANG"></A> Red Hat Linux 8.0 </H3>
 
 <P>Red Hat Linux 8.0 uses an unusual character encoding scheme
 that some programs don't deal well with. As a result, whenever you run setup
@@ -66,7 +66,8 @@ LANG="en_US"
 </CODE></BLOCKQUOTE>
 </P>
 <P>By making these modifications, you can follow the "other distributions"
-instructions in the "Configuring mythtv" section later in this document.</P>
+instructions in the 
+<A HREF="mythtv-HOWTO-9.html#Configuring_mythtv">Configuring mythtv</A> section later in this document.</P>
 
 <H2><A NAME="ss4.2">4.2</A> <A HREF="mythtv-HOWTO.html#toc4.2">Checking that it worked.</A>
 </H2>

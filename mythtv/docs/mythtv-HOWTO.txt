@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2002-11-29, v1.039
+  2002-11-29, v1.040
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -24,7 +24,7 @@
            3.2.2.2 Red Hat Linux 8.0
            3.2.2.3 Gentoo.
 
-  4. Setting up paths and ldconfig.
+  4. Setting up paths, ldconfig and other shell variables.
      4.1 Distribution-specific information.
         4.1.1 Mandrake 9.0
         4.1.2 Red Hat Linux 8.0
@@ -346,10 +346,11 @@
   All the necessary files will be downloaded and built.  This will take
   a lot of time, even on a fast machine.
 
-  [1m4.  Setting up paths and ldconfig.[0m
+  [1m4.  Setting up paths, ldconfig and other shell variables.[0m
 
   There are some paths that need to be modified before starting the main
   compile of mythtv, otherwise you will get errors.
+
   [1m4.1.  Distribution-specific information.[0m
 
   [1m4.1.1.  Mandrake 9.0[0m
@@ -394,8 +395,8 @@
        % exit
 
   By making these modifications, you can follow the "other
-  distributions" instructions in the "Configuring mythtv" section later
-  in this document.
+  distributions" instructions in the ``Configuring mythtv'' section
+  later in this document.
 
   [1m4.2.  Checking that it worked.[0m
 
@@ -1099,15 +1100,18 @@
   Now that you've edited your settings.txt file, it's time to run the
   setup program and perform the initial configuration.
 
+  [1mNOTE[22m: Red Hat 8.0 users, if you haven't followed ``these'' steps,
+  ensure that you follow the Red Hat instructions.
+
   Open a shell, and switch to the setup directory:
 
        % cd setup
 
-  Red Hat 8.0 users, ensure that you do this:
+  [1mRed Hat 8.0[0m
 
        % env LANG=C setup
 
-  instead of what all the other distributions should use:
+  [1mOther distributions[22m:
 
        % ./setup
 
@@ -1119,7 +1123,7 @@
   Now that the setup program has completed, run [1mmythfilldatabase [22mto get
   one week of data inserted into the database.
 
-  Red Hat 8.0 users, ensure that you do this:
+  [1mRed Hat 8.0[0m
 
        % env LANG=C mythfilldatabase
 

@@ -25,6 +25,8 @@ Cencula, additional modifications on Genoo by Tony Clark.
 v1.038, 2002-11-28.  Modified the XMLTV version to get, still working on the
 Gentoo instructions.
 v1.039, 2002-11-29.  More work on the Gentoo instructions.
+v1.040, 2002-11-29.  Slight change to the RH 8.0 LANG instructions; put a
+reference to the "special" instructions for RH 8.0 users.
 -->
 <!--
 To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
@@ -35,7 +37,7 @@ To create documentation, execute "% linuxdoc -B html mythtv-HOWTO.sgml" or
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-11-29, v1.039
+<date>2002-11-29, v1.040
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -278,12 +280,10 @@ enable SQL support you need to add to your USE variable (USE="mysql") in
 % emerge mysql
 </verb></tscreen>
 
-
 All the necessary files will be downloaded and built.  This will take a lot
 of time, even on a fast machine.
 
-<sect>Setting up paths and ldconfig.
-
+<sect>Setting up paths, ldconfig and other shell variables.
 <p>There are some paths that need to be modified before starting the main
 compile of mythtv, otherwise you will get errors.
 
@@ -310,7 +310,7 @@ export PATH=$PATH:/usr/lib/qt3/bin
 The last two commands are to exit out of the shell.  This way, when you next
 open a shell your new commands will take effect.
 
-<sect2>Red Hat Linux 8.0
+<sect2>Red Hat Linux 8.0 <label id="RH80-LANG">
 <!-- Content submitted by Michael D. Cencula" <mike@cencula.com> -->
 <p>Red Hat Linux 8.0 uses an unusual character encoding scheme
 that some programs don't deal well with. As a result, whenever you run setup
@@ -331,7 +331,7 @@ LANG="en_US"
 </verb></tscreen>
 
 By making these modifications, you can follow the "other distributions"
-instructions in the "Configuring mythtv" section later in this document.
+instructions in the <ref id="Configuring_mythtv" name="Configuring mythtv"> section later in this document.
 
 <sect1>Checking that it worked.
 <p>Open a shell and switch to superuser mode again.
@@ -1003,7 +1003,7 @@ The last statement within the perl script is the lirc rc command. This is
 the command that transmits the code to your cable/dss box. Make sure to have
 the IRDA device within a few feet of the box.
 
-<sect>Configuring mythtv.
+<sect>Configuring mythtv. <label id="Configuring_mythtv">
 <p>By this point, all of the prerequisites have been installed,
 <bf>mysql</bf> is running and has had its initial database setup.  It's now
 time to configure mythtv.
@@ -1049,19 +1049,21 @@ UK, etc.  Use the name from the xmltv directory.
 <p>Now that you've edited your <tt>settings.txt</tt> file, it's time to run the
 setup program and perform the initial configuration.
 
+<bf>NOTE</bf>: Red Hat 8.0 users, if you haven't followed <ref id="RH80-LANG" name="these">
+steps, ensure that you follow the Red Hat instructions.
+
 Open a shell, and switch to the setup directory:
 
 <tscreen><verb>
 % cd setup
 </verb></tscreen>
 
-Red Hat 8.0 users, ensure that you do this:
+<bf>Red Hat 8.0</bf>
 <tscreen><verb>
 % env LANG=C setup 
 </verb></tscreen>
 
-instead of what all the other distributions should use:
-
+<bf>Other distributions</bf>:
 <tscreen><verb>
 % ./setup
 </verb></tscreen>
@@ -1073,13 +1075,12 @@ XMLTV grabber program.
 <p>Now that the setup program has completed, run <bf>mythfilldatabase</bf> to
 get one week of data inserted into the database.
 
-Red Hat 8.0 users, ensure that you do this:
+<bf>Red Hat 8.0</bf>
 <tscreen><verb>
 % env LANG=C mythfilldatabase
 </verb></tscreen>
 
 All other distributions can execute the following:
-
 <tscreen><verb>
 % mythfilldatabase
 </verb></tscreen>

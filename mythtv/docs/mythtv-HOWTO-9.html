@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
- <TITLE>Installing and using mythtv: Configuring mythtv.</TITLE>
+ <TITLE>Installing and using mythtv: Configuring mythtv. </TITLE>
  <LINK HREF="mythtv-HOWTO-10.html" REL=next>
  <LINK HREF="mythtv-HOWTO-8.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc9" REL=contents>
@@ -12,7 +12,7 @@
 <A HREF="mythtv-HOWTO-8.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc9">Contents</A>
 <HR>
-<H2><A NAME="s9">9.</A> <A HREF="mythtv-HOWTO.html#toc9">Configuring mythtv.</A></H2>
+<H2><A NAME="Configuring_mythtv"></A> <A NAME="s9">9.</A> <A HREF="mythtv-HOWTO.html#toc9">Configuring mythtv. </A></H2>
 
 <P>By this point, all of the prerequisites have been installed,
 <B>mysql</B> is running and has had its initial database setup.  It's now
@@ -62,6 +62,9 @@ UK, etc.  Use the name from the xmltv directory.</P>
 
 <P>Now that you've edited your <CODE>settings.txt</CODE> file, it's time to run the
 setup program and perform the initial configuration.</P>
+<P><B>NOTE</B>: Red Hat 8.0 users, if you haven't followed 
+<A HREF="mythtv-HOWTO-4.html#RH80-LANG">these</A>
+steps, ensure that you follow the Red Hat instructions.</P>
 <P>Open a shell, and switch to the setup directory:</P>
 <P>
 <BLOCKQUOTE><CODE>
@@ -70,15 +73,14 @@ setup program and perform the initial configuration.</P>
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Red Hat 8.0 users, ensure that you do this:
+<P><B>Red Hat 8.0</B>
 <BLOCKQUOTE><CODE>
 <PRE>
 % env LANG=C setup 
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>instead of what all the other distributions should use:</P>
-<P>
+<P><B>Other distributions</B>:
 <BLOCKQUOTE><CODE>
 <PRE>
 % ./setup
@@ -93,15 +95,14 @@ XMLTV grabber program.</P>
 
 <P>Now that the setup program has completed, run <B>mythfilldatabase</B> to
 get one week of data inserted into the database.</P>
-<P>Red Hat 8.0 users, ensure that you do this:
+<P><B>Red Hat 8.0</B>
 <BLOCKQUOTE><CODE>
 <PRE>
 % env LANG=C mythfilldatabase
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>All other distributions can execute the following:</P>
-<P>
+<P>All other distributions can execute the following:
 <BLOCKQUOTE><CODE>
 <PRE>
 % mythfilldatabase
