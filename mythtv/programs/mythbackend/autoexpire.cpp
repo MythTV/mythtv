@@ -82,7 +82,7 @@ void AutoExpire::RunExpirer(void)
                                       .arg(pginfo->title)
                                       .arg(pginfo->startts.toString())
                                       .arg((int)(pginfo->filesize/1024/1024));
-                VERBOSE(VB_GENERAL, msg);
+                VERBOSE(VB_GENERAL, msg.local8Bit());
                 gContext->LogEntry("autoexpire", LP_NOTICE, "Expired Program", msg);
 
                 QString message =

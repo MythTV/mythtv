@@ -512,8 +512,8 @@ class SRAutoCommFlag: public SRSelectSetting
             : SRSelectSetting(_parent, "autoCommFlagList", "[ Automatically Commercial Flag ]", _group, 
                               "autocommflag", _list) 
         {
-            addSelection("Commercial Flag new recordings", 1);
-            addSelection("Do not Commercial Flag new recordings", 0);
+            addSelection(QObject::tr("Commercial Flag new recordings"), 1);
+            addSelection(QObject::tr("Do not Commercial Flag new recordings"), 0);
             setValue(1);
             _parent.setAutoCommFlagObj(this);
         }
@@ -527,8 +527,8 @@ class SRAutoUserJob1: public SRSelectSetting
                               "autouserjob1", _list) 
         {
             QString desc = gContext->GetSetting("UserJobDesc1");
-            addSelection("Run '" + desc + "'", 1);
-            addSelection("Do not run '" + desc + "' for new recordings", 0);
+            addSelection(QObject::tr("Run '%1'").arg(desc), 1);
+            addSelection(QObject::tr("Do not run '%1' for new recordings").arg(desc), 0);
             setValue(0);
             _parent.setAutoUserJob1Obj(this);
         }
@@ -542,8 +542,8 @@ class SRAutoUserJob2: public SRSelectSetting
                               "autouserjob2", _list) 
         {
             QString desc = gContext->GetSetting("UserJobDesc2");
-            addSelection("Run '" + desc + "'", 1);
-            addSelection("Do not run '" + desc + "' for new recordings", 0);
+            addSelection(QObject::tr("Run '%1'").arg(desc), 1);
+            addSelection(QObject::tr("Do not run '%1' for new recordings").arg(desc), 0);
             setValue(0);
             _parent.setAutoUserJob2Obj(this);
         }
@@ -557,8 +557,8 @@ class SRAutoUserJob3: public SRSelectSetting
                               "autouserjob3", _list) 
         {
             QString desc = gContext->GetSetting("UserJobDesc3");
-            addSelection("Run '" + desc + "'", 1);
-            addSelection("Do not run '" + desc + "' for new recordings", 0);
+            addSelection(QObject::tr("Run '%1'").arg(desc), 1);
+            addSelection(QObject::tr("Do not run '%1' for new recordings").arg(desc), 0);
             setValue(0);
             _parent.setAutoUserJob3Obj(this);
         }
@@ -572,8 +572,8 @@ class SRAutoUserJob4: public SRSelectSetting
                               "autouserjob4", _list) 
         {
             QString desc = gContext->GetSetting("UserJobDesc4");
-            addSelection("Run '" + desc + "'", 1);
-            addSelection("Do not run '" + desc + "' for new recordings", 0);
+            addSelection(QObject::tr("Run '%1'").arg(desc), 1);
+            addSelection(QObject::tr("Do not run '%1' for new recordings").arg(desc), 0);
             setValue(0);
             _parent.setAutoUserJob4Obj(this);
         }

@@ -104,7 +104,7 @@ void ChannelListSetting::fillSelections(void)
 {
     QString currentValue = getValue();
     clearSelections();
-    addSelection("(New Channel)");
+    addSelection(QObject::tr("(New Channel)"));
     QString querystr = "SELECT channel.name,channum,chanid ";
     if ((currentSourceID == "") ||
         (currentSourceID == "Unassigned"))
