@@ -117,6 +117,7 @@ class MythMainWindowPrivate
     float wmult, hmult;
     int screenwidth, screenheight;
     int xbase, ybase;
+    bool does_fill_screen;
 
     vector<QWidget *> widgetList;
 
@@ -174,6 +175,11 @@ MythMainWindow::MythMainWindow(QWidget *parent, const char *name, bool modal,
               : QDialog(parent, name, modal, flags)
 {
     d = new MythMainWindowPrivate;
+
+    if (gContext->GetNumSetting("RunFrontendInWindow", 0))
+        d->does_fill_screen = false;
+    else
+        d->does_fill_screen = true;
 
     Init();
     d->exitingtomain = false;
@@ -264,6 +270,34 @@ void MythMainWindow::Init(void)
 #endif
 #endif
 
+    // Set window border based on fullscreen attribute
+    Qt::WFlags flags = 0;
+    if (d->does_fill_screen)
+        flags = Qt::WStyle_Customize | Qt::WStyle_NoBorder;
+    else
+        flags = Qt::WStyle_Customize | Qt::WStyle_NormalBorder;
+
+    // Workarounds for Qt/Mac bugs
+#ifdef Q_WS_MACX
+    if (d->does_fill_screen)
+    {
+  #if QT_VERSION >= 0x030303
+        flags = Qt::WStyle_Customize | Qt::WStyle_Splash;
+  #else
+        // Qt/Mac 3.3.2 and earlier have problems with input focus
+        // when a borderless window is created more than once,
+        // so we have to force windows to have borders
+        flags = Qt::WStyle_Customize | Qt::WStyle_DialogBorder;
+
+        // Move this window up enough to hide its title bar, which in
+        // all the OS X releases so far is the same height as the menubar
+        d->ybase -= GetMBarHeight();
+  #endif
+    }
+#endif  
+
+    reparent(parentWidget(), flags, pos());
+
     gContext->ThemeWidget(this);
 
     Show();
@@ -274,11 +308,15 @@ void MythMainWindow::Show(void)
 {
     show();
 #ifdef Q_WS_MACX
-    if (!testWFlags(Qt::WStyle_NormalBorder))
+    if (d->does_fill_screen)
         HideMenuBar();
+    else
+        ShowMenuBar();
 #endif
 
     setActiveWindow();
+    raise();
+    qApp->wakeUpGuiThread();    // ensures that setActiveWindow() occurs
 }
 
 void MythMainWindow::attach(QWidget *child)

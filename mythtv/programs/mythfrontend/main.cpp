@@ -993,21 +993,7 @@ int main(int argc, char **argv)
 
     gContext->LoadQtConfig();
 
-    Qt::WFlags flags = 0;
-    if (gContext->GetNumSetting("RunFrontendInWindow", 0))
-    {
-        flags = Qt::WStyle_Customize | Qt::WStyle_NormalBorder;
-    }
-    else
-    {
-#ifdef Q_WS_MACX
-        flags = Qt::WStyle_Customize | Qt::WStyle_Splash;
-#else
-        flags = Qt::WStyle_Customize | Qt::WStyle_NoBorder;
-#endif
-    }
-
-    MythMainWindow *mainWindow = new MythMainWindow(NULL, 0, false, flags);
+    MythMainWindow *mainWindow = new MythMainWindow();
     gContext->SetMainWindow(mainWindow);
 
     InitJumpPoints();
