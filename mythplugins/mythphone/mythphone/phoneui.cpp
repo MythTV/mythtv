@@ -667,7 +667,6 @@ void PhoneUIBox::ProcessRxVideoFrame()
     QPixmap Pixmap;
     QImage ScaledImage;
     VIDEOBUFFER *v;
-    int vLen;
 
     if (VideoOn && rtpVideo && (v = rtpVideo->getRxedVideo()))
     {
@@ -1931,6 +1930,12 @@ void PhoneUIBox::handleTreeListSignals(int , IntVector *attributes)
 
 PhoneUIBox::~PhoneUIBox(void)
 {
+    // Just in case we are still mid-call; kill the RTP threads
+    if (rtpAudio != 0)
+        delete rtpAudio;
+    if (rtpVideo != 0)
+        StopVideo();
+
     sipStack->UiStopWatchAll();
     sipStack->UiClosed();
     if (localClient != 0)

@@ -1,5 +1,5 @@
-#CONFIG += debug
-CONFIG += release
+CONFIG += debug
+#CONFIG += release
 
 PREFIX = /usr/local
 MYTHLIBDIR = ../../mythtv/libs/
