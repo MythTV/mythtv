@@ -33,6 +33,8 @@ struct DVDemuxContext {
     AVStream*        ast[2];       
     AVPacket         audio_pkt[2];
     int              ach;
+    int              frames;
+    uint64_t         abytes;
 };
 
 struct DVMuxContext {
@@ -610,7 +612,7 @@ int dv_assemble_frame(DVMuxContext *c, AVStream* st,
     if (st->codec.codec_type == CODEC_TYPE_VIDEO) {
         /* FIXME: we have to have more sensible approach than this one */
 	if (c->has_video)
-	    fprintf(stderr, "Can't process DV frame #%d. Insufficient audio data or severe sync problem.\n", c->frames);
+	    av_log(&st->codec, AV_LOG_ERROR, "Can't process DV frame #%d. Insufficient audio data or severe sync problem.\n", c->frames);
 	    
         dv_inject_video(c, data, *frame);
 	c->has_video = 1;
@@ -635,7 +637,7 @@ int dv_assemble_frame(DVMuxContext *c, AVStream* st,
     
         /* FIXME: we have to have more sensible approach than this one */
         if (fifo_size(&c->audio_data, c->audio_data.rptr) + data_size >= 100*AVCODEC_MAX_AUDIO_FRAME_SIZE)
-	    fprintf(stderr, "Can't process DV frame #%d. Insufficient video data or severe sync problem.\n", c->frames);
+	    av_log(&st->codec, AV_LOG_ERROR, "Can't process DV frame #%d. Insufficient video data or severe sync problem.\n", c->frames);
 	fifo_write(&c->audio_data, (uint8_t *)data, data_size, &c->audio_data.wptr);
     }
 
@@ -720,6 +722,8 @@ DVDemuxContext* dv_init_demux(AVFormatContext *s)
     c->fctx = s;
     c->ast[1] = NULL;
     c->ach = 0;
+    c->frames = 0;
+    c->abytes = 0;
     c->audio_pkt[0].size = 0;
     c->audio_pkt[1].size = 0;
     
@@ -731,6 +735,8 @@ DVDemuxContext* dv_init_demux(AVFormatContext *s)
     c->ast[0]->codec.codec_id = CODEC_ID_PCM_S16LE;
    
     s->ctx_flags |= AVFMTCTX_NOHEADER; 
+    
+    av_set_pts_info(s, 64, 1, 30000);
     
     return c;
     
@@ -770,8 +776,9 @@ int dv_produce_packet(DVDemuxContext *c, AVPacket *pkt,
                       uint8_t* buf, int buf_size)
 {
     int size, i;
+    const DVprofile* sys = dv_frame_profile(buf);
    
-    if (buf_size < 4 || buf_size < dv_frame_profile(buf)->frame_size)
+    if (buf_size < 4 || buf_size < sys->frame_size)
         return -1;   /* Broken frame, or not enough data */
 
     /* Queueing audio packet */
@@ -782,8 +789,11 @@ int dv_produce_packet(DVDemuxContext *c, AVPacket *pkt,
        if (av_new_packet(&c->audio_pkt[i], size) < 0)
            return AVERROR_NOMEM;
        c->audio_pkt[i].stream_index = c->ast[i]->index;
+       c->audio_pkt[i].pts = c->abytes * 30000*8 / c->ast[i]->codec.bit_rate;
+       c->audio_pkt[i].flags |= PKT_FLAG_KEY;
     }
     dv_extract_audio(buf, c->audio_pkt[0].data, c->audio_pkt[1].data);
+    c->abytes += size;
     
     /* Now it's time to return video packet */
     size = dv_extract_video_info(c, buf);
@@ -793,10 +803,21 @@ int dv_produce_packet(DVDemuxContext *c, AVPacket *pkt,
     pkt->size     = size; 
     pkt->flags   |= PKT_FLAG_KEY;
     pkt->stream_index = c->vst->id;
+    pkt->pts      = c->frames * sys->frame_rate_base * (30000/sys->frame_rate);
+    
+    c->frames++;
 
     return size;
 }
                            
+int64_t dv_frame_offset(DVDemuxContext *c, int64_t timestamp)
+{
+    const DVprofile* sys = dv_codec_profile(&c->vst->codec);
+
+    return sys->frame_size * ((timestamp * sys->frame_rate) / 
+	                      (AV_TIME_BASE * sys->frame_rate_base));
+}
+
 /************************************************************
  * Implementation of the easiest DV storage of all -- raw DV.
  ************************************************************/
@@ -837,6 +858,13 @@ static int dv_read_packet(AVFormatContext *s, AVPacket *pkt)
     return size;
 }
 
+static int dv_read_seek(AVFormatContext *s, int stream_index, int64_t timestamp)
+{
+    RawDVContext *c = s->priv_data;
+
+    return url_fseek(&s->pb, dv_frame_offset(c->dv_demux, timestamp), SEEK_SET);
+}
+
 static int dv_read_close(AVFormatContext *s)
 {
     RawDVContext *c = s->priv_data;
@@ -848,7 +876,7 @@ static int dv_write_header(AVFormatContext *s)
 {
     s->priv_data = dv_init_mux(s);
     if (!s->priv_data) {
-        fprintf(stderr, "Can't initialize DV format!\n"
+        av_log(s, AV_LOG_ERROR, "Can't initialize DV format!\n"
 		    "Make sure that you supply exactly two streams:\n"
 		    "     video: 25fps or 29.97fps, audio: 2ch/48Khz/PCM\n");
 	return -1;
@@ -892,7 +920,8 @@ static AVInputFormat dv_iformat = {
     dv_read_header,
     dv_read_packet,
     dv_read_close,
-    .extensions = "dv",
+    dv_read_seek,
+    .extensions = "dv,dif",
 };
 
 static AVOutputFormat dv_oformat = {
@@ -908,7 +937,7 @@ static AVOutputFormat dv_oformat = {
     dv_write_trailer,
 };
 
-int dv_init(void)
+int ff_dv_init(void)
 {
     av_register_input_format(&dv_iformat);
     av_register_output_format(&dv_oformat);

@@ -45,7 +45,7 @@ void av_register_all(void)
     avienc_init();
 #endif //CONFIG_ENCODERS
     avidec_init();
-    wav_init();
+    ff_wav_init();
     swf_init();
     au_init();
 #ifdef CONFIG_ENCODERS
@@ -56,7 +56,7 @@ void av_register_all(void)
     movenc_init();
 //    jpeg_init();
 #endif //CONFIG_ENCODERS
-    dv_init();
+    ff_dv_init();
     fourxm_init();
 #ifdef CONFIG_ENCODERS
     flvenc_init();
@@ -96,6 +96,7 @@ void av_register_all(void)
 //#endif
 
     nut_init();
+    matroska_init();
 
 #ifdef CONFIG_ENCODERS
     /* image formats */
@@ -111,6 +112,7 @@ void av_register_all(void)
 #endif
 //    av_register_image_format(&jpeg_image_format);
 //    av_register_image_format(&gif_image_format);
+//    av_register_image_format(&sgi_image_format);
 #endif //CONFIG_ENCODERS
 
     /* file protocols */

@@ -27,12 +27,6 @@
 
 #include "avformat.h"
 
-#define LE_16(x)  ((((uint8_t*)(x))[1] << 8) | ((uint8_t*)(x))[0])
-#define LE_32(x)  ((((uint8_t*)(x))[3] << 24) | \
-                   (((uint8_t*)(x))[2] << 16) | \
-                   (((uint8_t*)(x))[1] << 8) | \
-                    ((uint8_t*)(x))[0])
-
 #define RoQ_MAGIC_NUMBER 0x1084
 #define RoQ_CHUNK_PREAMBLE_SIZE 8
 #define RoQ_AUDIO_SAMPLE_RATE 22050
@@ -135,7 +129,7 @@ static int roq_read_header(AVFormatContext *s,
             break;
 
         default:
-            printf (" unknown RoQ chunk type (%04X)\n", LE_16(&preamble[0]));
+            av_log(s, AV_LOG_ERROR, " unknown RoQ chunk type (%04X)\n", LE_16(&preamble[0]));
             return AVERROR_INVALIDDATA;
             break;
         }
@@ -268,7 +262,7 @@ static int roq_read_packet(AVFormatContext *s,
             break;
 
         default:
-            printf ("  unknown RoQ chunk (%04X)\n", chunk_type);
+            av_log(s, AV_LOG_ERROR, "  unknown RoQ chunk (%04X)\n", chunk_type);
             return AVERROR_INVALIDDATA;
             break;
         }

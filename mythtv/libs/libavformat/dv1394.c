@@ -43,8 +43,6 @@ struct dv1394_data {
     int avail;  /* Number of frames available for reading */
     int done;   /* Number of completed frames */
 
-    int64_t pts;  /* Current timestamp */
-
     DVDemuxContext* dv_demux; /* Generic DV muxing/demuxing context */
 };
 
@@ -121,8 +119,6 @@ static int dv1394_read_header(AVFormatContext * context, AVFormatParameters * ap
         goto failed;
     }
 
-    av_set_pts_info(context, 48, 1, 1000000);
-
     if (dv1394_start(dv) < 0)
         goto failed;
 
@@ -140,7 +136,7 @@ static int dv1394_read_packet(AVFormatContext *context, AVPacket *pkt)
 
     size = dv_get_packet(dv->dv_demux, pkt);
     if (size > 0)
-        goto out;
+        return size;
 
     if (!dv->avail) {
         struct dv1394_status s;
@@ -153,7 +149,7 @@ static int dv1394_read_packet(AVFormatContext *context, AVPacket *pkt)
                  * We have to reset :(.
                  */
   
-                fprintf(stderr, "DV1394: Ring buffer overflow. Reseting ..\n");
+                av_log(context, AV_LOG_ERROR, "DV1394: Ring buffer overflow. Reseting ..\n");
  
                 dv1394_reset(dv);
                 dv1394_start(dv);
@@ -191,7 +187,7 @@ restart_poll:
         dv->done  = 0;
 
         if (s.dropped_frames) {
-            fprintf(stderr, "DV1394: Frame drop detected (%d). Reseting ..\n",
+            av_log(context, AV_LOG_ERROR, "DV1394: Frame drop detected (%d). Reseting ..\n",
                     s.dropped_frames);
 
             dv1394_reset(dv);
@@ -209,10 +205,7 @@ restart_poll:
 			     DV1394_PAL_FRAME_SIZE);
     dv->index = (dv->index + 1) % DV1394_RING_FRAMES;
     dv->done++; dv->avail--;
-    dv->pts = av_gettime() & ((1LL << 48) - 1);
     
-out:
-    pkt->pts = dv->pts;
     return size;
 }
 

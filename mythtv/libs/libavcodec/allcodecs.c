@@ -74,6 +74,7 @@ void avcodec_register_all(void)
     register_avcodec(&asv2_encoder);
     register_avcodec(&ffv1_encoder);
     register_avcodec(&zlib_encoder);
+    register_avcodec(&dvvideo_encoder);
 #endif /* CONFIG_ENCODERS */
     register_avcodec(&rawvideo_encoder);
     register_avcodec(&rawvideo_decoder);
@@ -157,6 +158,7 @@ void avcodec_register_all(void)
     register_avcodec(&interplay_dpcm_decoder);
     register_avcodec(&xan_dpcm_decoder);
     register_avcodec(&qtrle_decoder);
+    register_avcodec(&flac_decoder);
 #endif /* CONFIG_DECODERS */
 
 #ifdef AMR_NB

@@ -17,7 +17,7 @@ extern "C" {
 
 #define FFMPEG_VERSION_INT     0x000408
 #define FFMPEG_VERSION         "0.4.8"
-#define LIBAVCODEC_BUILD       4702
+#define LIBAVCODEC_BUILD       4707
 
 #define LIBAVCODEC_VERSION_INT FFMPEG_VERSION_INT
 #define LIBAVCODEC_VERSION     FFMPEG_VERSION
@@ -25,6 +25,9 @@ extern "C" {
 #define AV_STRINGIFY(s)	AV_TOSTRING(s)
 #define AV_TOSTRING(s) #s
 #define LIBAVCODEC_IDENT	"FFmpeg" LIBAVCODEC_VERSION "b" AV_STRINGIFY(LIBAVCODEC_BUILD)
+
+#define AV_NOPTS_VALUE int64_t_C(0x8000000000000000)
+#define AV_TIME_BASE 1000000
 
 enum CodecID {
     CODEC_ID_NONE, 
@@ -132,6 +135,8 @@ enum CodecID {
     CODEC_ID_ROQ_DPCM,
     CODEC_ID_INTERPLAY_DPCM,
     CODEC_ID_XAN_DPCM,
+    
+    CODEC_ID_FLAC,
     
     CODEC_ID_MPEG2TS, /* _FAKE_ codec to indicate a raw MPEG2 transport
                          stream (only used by libavformat) */
@@ -287,6 +292,8 @@ extern int motion_estimation_method;
    used */
 #define CODEC_CAP_PARSE_ONLY      0x0004
 #define CODEC_CAP_TRUNCATED       0x0008
+/* codec can export data for HW decoding (XvMC) */
+#define CODEC_CAP_HWACCEL         0x0010
 
 //the following defines might change, so dont expect compatibility if u use them
 #define MB_TYPE_INTRA4x4   0x0001
@@ -371,8 +378,8 @@ typedef struct AVPanScan{
     int pict_type;\
 \
     /**\
-     * presentation timestamp in micro seconds (time when frame should be shown to user)\
-     * if 0 then the frame_rate will be used as reference\
+     * presentation timestamp in AV_TIME_BASE (=micro seconds currently) (time when frame should be shown to user)\
+     * if AV_NOPTS_VALUE then the frame_rate will be used as reference\
      * - encoding: MUST be set by user\
      * - decoding: set by lavc\
      */\
@@ -525,6 +532,13 @@ typedef struct AVPanScan{
      * - decoding: set by lavc (before get_buffer() call))\
      */\
     int buffer_hints;\
+\
+    /**\
+     * DCT coeffitients\
+     * - encoding: unused\
+     * - decoding: set by lavc\
+     */\
+    short *dct_coeff;\
 
 #define FF_QSCALE_TYPE_MPEG1	0
 #define FF_QSCALE_TYPE_MPEG2	1
@@ -557,9 +571,26 @@ typedef struct AVFrame {
 #define DEFAULT_FRAME_RATE_BASE 1001000
 
 /**
+ * Used by av_log
+ */
+typedef struct AVCLASS AVClass;
+struct AVCLASS {
+    const char* class_name;
+    const char* (*item_name)(void*); /* actually passing a pointer to an AVCodecContext
+					or AVFormatContext, which begin with an AVClass.
+					Needed because av_log is in libavcodec and has no visibility
+					of AVIn/OutputFormat */
+};
+
+/**
  * main external api structure.
  */
 typedef struct AVCodecContext {
+    /**
+     * Info on struct for av_log
+     * - set by avcodec_alloc_context
+     */
+    AVClass *av_class;
     /**
      * the average bitrate.
      * - encoding: set by user. unused for constant quantizer encoding
@@ -624,11 +655,6 @@ typedef struct AVCodecContext {
      */
     int width, height;
     
-#define FF_ASPECT_SQUARE 1
-#define FF_ASPECT_4_3_625 2
-#define FF_ASPECT_4_3_525 3
-#define FF_ASPECT_16_9_625 4
-#define FF_ASPECT_16_9_525 5
 #define FF_ASPECT_EXTENDED 15
 
     /**
@@ -1139,7 +1165,7 @@ typedef struct AVCodecContext {
 #define FF_DEBUG_MB_TYPE   8
 #define FF_DEBUG_QP        16
 #define FF_DEBUG_MV        32
-//#define FF_DEBUG_VIS_MV    0x00000040
+#define FF_DEBUG_DCT_COEFF 0x00000040
 #define FF_DEBUG_SKIP      0x00000080
 #define FF_DEBUG_STARTCODE 0x00000100
 #define FF_DEBUG_PTS       0x00000200
@@ -1267,7 +1293,7 @@ typedef struct AVCodecContext {
      * - encoding: unused
      * - decoding: set by user, if not set then the native format will always be choosen
      */
-    enum PixelFormat (*get_format)(struct AVCodecContext *s, enum PixelFormat * fmt);
+    enum PixelFormat (*get_format)(struct AVCodecContext *s, const enum PixelFormat * fmt);
 
     /**
      * DTG active format information (additionnal aspect ratio
@@ -1522,7 +1548,7 @@ typedef struct AVCodecContext {
      * the codec may call this to execute several independant things. it will return only after
      * finishing all tasks, the user may replace this with some multithreaded implementation, the
      * default implementation will execute the parts serially
-     * @param count the number of functions this will be identical to thread_count if possible
+     * @param count the number of things to execute
      * - encoding: set by lavc, user can override
      * - decoding: set by lavc, user can override
      */
@@ -1542,7 +1568,7 @@ typedef struct AVCodecContext {
      * - decoding: set by decoder
      */
     int via_hwslice;
-       
+
 } AVCodecContext;
 
 
@@ -1607,6 +1633,7 @@ typedef struct AVCodec {
     const AVOption *options;
     struct AVCodec *next;
     void (*flush)(AVCodecContext *);
+    const AVRational *supported_framerates; ///array of supported framerates, or NULL if any, array is terminated by {0,0}
 } AVCodec;
 
 /**
@@ -1651,6 +1678,7 @@ extern AVCodec h263p_encoder;
 extern AVCodec flv_encoder;
 extern AVCodec rv10_encoder;
 extern AVCodec rv20_encoder;
+extern AVCodec dvvideo_encoder;
 extern AVCodec mjpeg_encoder;
 extern AVCodec ljpeg_encoder;
 extern AVCodec mpeg4_encoder;
@@ -1739,6 +1767,7 @@ extern AVCodec roq_dpcm_decoder;
 extern AVCodec interplay_dpcm_decoder;
 extern AVCodec xan_dpcm_decoder;
 extern AVCodec qtrle_decoder;
+extern AVCodec flac_decoder;
 
 /* pcm codecs */
 #define PCM_CODEC(id, name) \
@@ -1876,15 +1905,16 @@ void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode);
 
 void avcodec_get_context_defaults(AVCodecContext *s);
 AVCodecContext *avcodec_alloc_context(void);
+void avcodec_get_frame_defaults(AVFrame *pic);
 AVFrame *avcodec_alloc_frame(void);
 
 int avcodec_default_get_buffer(AVCodecContext *s, AVFrame *pic);
 void avcodec_default_release_buffer(AVCodecContext *s, AVFrame *pic);
 void avcodec_default_free_buffers(AVCodecContext *s);
 
-int avcodec_pthread_init(AVCodecContext *s, int thread_count);
-void avcodec_pthread_free(AVCodecContext *s);
-int avcodec_pthread_execute(AVCodecContext *s, int (*func)(AVCodecContext *c2, void *arg2),void **arg, int *ret, int count);
+int avcodec_thread_init(AVCodecContext *s, int thread_count);
+void avcodec_thread_free(AVCodecContext *s);
+int avcodec_thread_execute(AVCodecContext *s, int (*func)(AVCodecContext *c2, void *arg2),void **arg, int *ret, int count);
 //FIXME func typedef
 
 /**
@@ -2072,14 +2102,12 @@ void *av_mallocz(unsigned int size);
 void *av_realloc(void *ptr, unsigned int size);
 void av_free(void *ptr);
 char *av_strdup(const char *s);
-void __av_freep(void **ptr);
-#define av_freep(p) __av_freep((void **)(p))
+void av_freep(void *ptr);
 void *av_fast_realloc(void *ptr, unsigned int *size, unsigned int min_size);
 /* for static data only */
 /* call av_free_static to release all staticaly allocated tables */
 void av_free_static(void);
-void *__av_mallocz_static(void** location, unsigned int size);
-#define av_mallocz_static(p, s) __av_mallocz_static((void **)(p), s)
+void *av_mallocz_static(unsigned int size);
 
 /* add by bero : in adx.c */
 int is_adx(const unsigned char *buf,size_t bufsize);
@@ -2095,19 +2123,23 @@ void img_copy(AVPicture *dst, const AVPicture *src,
 #define AV_LOG_INFO 1
 #define AV_LOG_DEBUG 2
 
-extern void av_log(AVCodecContext*, int level, const char *fmt, ...) __attribute__ ((__format__ (__printf__, 3, 4)));
-extern void av_vlog(AVCodecContext*, int level, const char *fmt, va_list);
+extern void av_log(void*, int level, const char *fmt, ...) __attribute__ ((__format__ (__printf__, 3, 4)));
+extern void av_vlog(void*, int level, const char *fmt, va_list);
 extern int av_log_get_level(void);
 extern void av_log_set_level(int);
-extern void av_log_set_callback(void (*)(AVCodecContext*, int, const char*, va_list));
+extern void av_log_set_callback(void (*)(void*, int, const char*, va_list));
 
-#undef  AV_LOG_TRAP_PRINTF
-#ifdef AV_LOG_TRAP_PRINTF
-#define printf DO NOT USE
-#define fprintf DO NOT USE
-#undef stderr
-#define stderr DO NOT USE
-#endif
+/* endian macros */
+#define BE_16(x)  ((((uint8_t*)(x))[0] << 8) | ((uint8_t*)(x))[1])
+#define BE_32(x)  ((((uint8_t*)(x))[0] << 24) | \
+                   (((uint8_t*)(x))[1] << 16) | \
+                   (((uint8_t*)(x))[2] << 8) | \
+                    ((uint8_t*)(x))[3])
+#define LE_16(x)  ((((uint8_t*)(x))[1] << 8) | ((uint8_t*)(x))[0])
+#define LE_32(x)  ((((uint8_t*)(x))[3] << 24) | \
+                   (((uint8_t*)(x))[2] << 16) | \
+                   (((uint8_t*)(x))[1] << 8) | \
+                    ((uint8_t*)(x))[0])
 
 #ifdef __cplusplus
 }

@@ -33,7 +33,7 @@ SOURCES += ffv1.c ra144.c ra288.c vcr1.c cljr.c roqvideo.c dpcm.c
 SOURCES += interplayvideo.c xan.c rpza.c cinepak.c msrle.c msvideo1.c
 SOURCES += vqavideo.c idcinvideo.c adx.c rational.c faandct.c
 SOURCES += 8bps.c parser.c smc.c flicvideo.c truemotion1.c vmdav.c lcl.c
-SOURCES += qtrle.c g726.c
+SOURCES += qtrle.c g726.c flac.c vp3dsp.c
 SOURCES += libpostproc/postprocess.c
 
 inc.path = $${PREFIX}/include/mythtv/ffmpeg/
@@ -89,7 +89,7 @@ contains( TARGET_GPROF, yes ) {
 contains( TARGET_MMX, yes ) {
     SOURCES += i386/fdct_mmx.c i386/cputest.c i386/dsputil_mmx.c
     SOURCES += i386/mpegvideo_mmx.c i386/idct_mmx.c i386/motion_est_mmx.c
-    SOURCES += i386/simple_idct_mmx.c i386/fft_sse.c
+    SOURCES += i386/simple_idct_mmx.c i386/fft_sse.c i386/vp3dsp_mmx.c
 #    contains( TARGET_BUILTIN_VECTOR, yes ) {
 #        QMAKE_CFLAGS_RELEASE += -msse
 #        QMAKE_CFLAGS_DEBUG += -msse

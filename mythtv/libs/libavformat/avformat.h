@@ -27,9 +27,6 @@ extern "C" {
 #define MININT64 int64_t_C(0x8000000000000000)
 #endif
 
-#define AV_NOPTS_VALUE MININT64
-#define AV_TIME_BASE 1000000
-
 typedef struct AVPacket {
     int64_t pts; /* presentation time stamp in AV_TIME_BASE units (or
                     pts_den units in muxers or demuxers) */
@@ -249,6 +246,7 @@ typedef struct AVStream {
 
 /* format I/O context */
 typedef struct AVFormatContext {
+    AVClass *av_class; /* set by av_alloc_format_context */
     /* can only be iformat or oformat, not both at the same time */
     struct AVInputFormat *iformat;
     struct AVOutputFormat *oformat;
@@ -375,6 +373,7 @@ extern AVImageFormat png_image_format;
 #endif
 extern AVImageFormat jpeg_image_format;
 extern AVImageFormat gif_image_format;
+extern AVImageFormat sgi_image_format;
 
 /* XXX: use automatic init with either ELF sections or C file parser */
 /* modules */
@@ -433,7 +432,7 @@ int au_init(void);
 int amr_init(void);
 
 /* wav.c */
-int wav_init(void);
+int ff_wav_init(void);
 
 /* raw.c */
 int pcm_read_seek(AVFormatContext *s, 
@@ -450,7 +449,7 @@ int yuv4mpeg_init(void);
 int ogg_init(void);
 
 /* dv.c */
-int dv_init(void);
+int ff_dv_init(void);
 
 /* ffm.c */
 int ffm_init(void);
@@ -491,6 +490,9 @@ int flic_init(void);
 
 /* sierravmd.c */
 int vmd_init(void);
+
+/* matroska.c */
+int matroska_init(void);
 
 //#include "rtp.h"
 
@@ -533,6 +535,8 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
                        AVInputFormat *fmt,
                        int buf_size,
                        AVFormatParameters *ap);
+/* no av_open for output, so applications will need this: */
+AVFormatContext *av_alloc_format_context(void);
 
 #define AVERROR_UNKNOWN     (-1)  /* unknown error */
 #define AVERROR_IO          (-2)  /* i/o error */
@@ -559,7 +563,6 @@ int av_find_default_stream_index(AVFormatContext *s);
 int av_index_search_timestamp(AVStream *st, int timestamp);
 int av_add_index_entry(AVStream *st,
                        int64_t pos, int64_t timestamp, int distance, int flags);
-
 
 /* media file output */
 int av_set_parameters(AVFormatContext *s, AVFormatParameters *ap);

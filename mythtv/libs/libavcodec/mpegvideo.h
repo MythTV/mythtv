@@ -275,6 +275,7 @@ typedef struct MpegEncContext {
     int picture_number;       //FIXME remove, unclear definition
     int picture_in_gop_number; ///< 0-> first pic in gop, ... 
     int b_frames_since_non_b;  ///< used for encoding, relative to not yet reordered input 
+    int64_t user_specified_pts;///< last non zero pts from AVFrame which was passed into avcodec_encode_video()
     int mb_width, mb_height;   ///< number of MBs horizontally & vertically 
     int mb_stride;             ///< mb_width+1 used for some arrays to allow simple addressng of left & top MBs withoutt sig11
     int b8_stride;             ///< 2*mb_width+1 used for some 8x8 block arrays to allow simple addressng
@@ -354,6 +355,9 @@ typedef struct MpegEncContext {
     int last_pict_type;
     int last_non_b_pict_type;   ///< used for mpeg4 gmc b-frames & ratecontrol 
     int frame_rate_index;
+    int frame_rate_ext_n;       ///< MPEG-2 specific framerate modificators (numerator)
+    int frame_rate_ext_d;       ///< MPEG-2 specific framerate modificators (denominator)
+
     /* motion compensation */
     int unrestricted_mv;        ///< mv can point outside of the coded picture 
     int h263_long_vectors;      ///< use horrible h263v1 long vector mode 
@@ -464,7 +468,7 @@ typedef struct MpegEncContext {
     /** identical to the above but for MMX & these are not permutated, second 64 entries are bias*/
     uint16_t (*q_intra_matrix16)[2][64];
     uint16_t (*q_inter_matrix16)[2][64];
-    int block_last_index[6];  ///< last non zero coefficient in block
+    int block_last_index[12];  ///< last non zero coefficient in block
     /* scantables */
     ScanTable __align8 intra_scantable;
     ScanTable intra_h_scantable;
@@ -533,6 +537,7 @@ typedef struct MpegEncContext {
     int alt_inter_vlc;              ///< alternative inter vlc
     int modified_quant;
     int loop_filter;    
+    int custom_pcf;
     
     /* mpeg4 specific */
     int time_increment_resolution;
@@ -652,6 +657,11 @@ typedef struct MpegEncContext {
     int alternate_scan;
     int repeat_first_field;
     int chroma_420_type;
+    int chroma_format;
+#define CHROMA_420 1
+#define CHROMA_422 2
+#define CHROMA_444 3
+
     int progressive_frame;
     int full_pel[2];
     int interlaced_dct;
@@ -696,6 +706,7 @@ typedef struct MpegEncContext {
 
 
 int DCT_common_init(MpegEncContext *s);
+void MPV_decode_defaults(MpegEncContext *s);
 int MPV_common_init(MpegEncContext *s);
 void MPV_common_end(MpegEncContext *s);
 void MPV_decode_mb(MpegEncContext *s, DCTELEM block[6][64]);
@@ -737,6 +748,7 @@ void ff_print_debug_info(MpegEncContext *s, AVFrame *pict);
 void ff_write_quant_matrix(PutBitContext *pb, int16_t *matrix);
 int ff_find_unused_picture(MpegEncContext *s, int shared);
 void ff_denoise_dct(MpegEncContext *s, DCTELEM *block);
+void ff_update_duplicate_context(MpegEncContext *dst, MpegEncContext *src);
 
 void ff_er_frame_start(MpegEncContext *s);
 void ff_er_frame_end(MpegEncContext *s);

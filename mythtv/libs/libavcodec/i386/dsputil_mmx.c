@@ -31,16 +31,16 @@ extern const uint8_t ff_h263_loop_filter_strength[32];
 int mm_flags; /* multimedia extension flags */
 
 /* pixel operations */
-static const uint64_t mm_bone __attribute__ ((aligned(8))) = 0x0101010101010101ULL;
-static const uint64_t mm_wone __attribute__ ((aligned(8))) = 0x0001000100010001ULL;
-static const uint64_t mm_wtwo __attribute__ ((aligned(8))) = 0x0002000200020002ULL;
+static const uint64_t mm_bone attribute_used __attribute__ ((aligned(8))) = 0x0101010101010101ULL;
+static const uint64_t mm_wone attribute_used __attribute__ ((aligned(8))) = 0x0001000100010001ULL;
+static const uint64_t mm_wtwo attribute_used __attribute__ ((aligned(8))) = 0x0002000200020002ULL;
 
-static const uint64_t ff_pw_20 __attribute__ ((aligned(8))) = 0x0014001400140014ULL;
-static const uint64_t ff_pw_3  __attribute__ ((aligned(8))) = 0x0003000300030003ULL;
-static const uint64_t ff_pw_16 __attribute__ ((aligned(8))) = 0x0010001000100010ULL;
-static const uint64_t ff_pw_15 __attribute__ ((aligned(8))) = 0x000F000F000F000FULL;
+static const uint64_t ff_pw_20 attribute_used __attribute__ ((aligned(8))) = 0x0014001400140014ULL;
+static const uint64_t ff_pw_3  attribute_used __attribute__ ((aligned(8))) = 0x0003000300030003ULL;
+static const uint64_t ff_pw_16 attribute_used __attribute__ ((aligned(8))) = 0x0010001000100010ULL;
+static const uint64_t ff_pw_15 attribute_used __attribute__ ((aligned(8))) = 0x000F000F000F000FULL;
 
-static const uint64_t ff_pb_FC __attribute__ ((aligned(8))) = 0xFCFCFCFCFCFCFCFCULL;
+static const uint64_t ff_pb_FC attribute_used __attribute__ ((aligned(8))) = 0xFCFCFCFCFCFCFCFCULL;
 
 #define JUMPALIGN() __asm __volatile (".balign 8"::)
 #define MOVQ_ZERO(regd)  __asm __volatile ("pxor %%" #regd ", %%" #regd ::)
@@ -2098,18 +2098,18 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
     }
 
 #if 0
-    fprintf(stderr, "libavcodec: CPU flags:");
+    av_log(avctx, AV_LOG_INFO, "libavcodec: CPU flags:");
     if (mm_flags & MM_MMX)
-        fprintf(stderr, " mmx");
+        av_log(avctx, AV_LOG_INFO, " mmx");
     if (mm_flags & MM_MMXEXT)
-        fprintf(stderr, " mmxext");
+        av_log(avctx, AV_LOG_INFO, " mmxext");
     if (mm_flags & MM_3DNOW)
-        fprintf(stderr, " 3dnow");
+        av_log(avctx, AV_LOG_INFO, " 3dnow");
     if (mm_flags & MM_SSE)
-        fprintf(stderr, " sse");
+        av_log(avctx, AV_LOG_INFO, " sse");
     if (mm_flags & MM_SSE2)
-        fprintf(stderr, " sse2");
-    fprintf(stderr, "\n");
+        av_log(avctx, AV_LOG_INFO, " sse2");
+    av_log(avctx, AV_LOG_INFO, "\n");
 #endif
 
     if (mm_flags & MM_MMX) {
@@ -2145,6 +2145,11 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
             }
             c->idct_permutation_type= FF_LIBMPEG2_IDCT_PERM;
         }
+
+        /* VP3 optimized DSP functions */
+        c->vp3_dsp_init = vp3_dsp_init_mmx;
+        c->vp3_idct_put = vp3_idct_put_mmx;
+        c->vp3_idct_add = vp3_idct_add_mmx;
         
 #ifdef CONFIG_ENCODERS
         c->get_pixels = get_pixels_mmx;

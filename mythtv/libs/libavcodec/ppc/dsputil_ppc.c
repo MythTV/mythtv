@@ -46,7 +46,7 @@ int mm_support(void)
 unsigned long long perfdata[POWERPC_NUM_PMC_ENABLED][powerpc_perf_total][powerpc_data_total];
 /* list below must match enum in dsputil_ppc.h */
 static unsigned char* perfname[] = {
-  "fft_calc_altivec",
+  "ff_fft_calc_altivec",
   "gmc1_altivec",
   "dct_unquantize_h263_altivec",
   "fdct_altivec",
@@ -69,13 +69,13 @@ static unsigned char* perfname[] = {
 void powerpc_display_perf_report(void)
 {
   int i, j;
-  fprintf(stderr, "PowerPC performance report\n Values are from the PMC registers, and represent whatever the registers are set to record.\n");
+  av_log(NULL, AV_LOG_INFO, "PowerPC performance report\n Values are from the PMC registers, and represent whatever the registers are set to record.\n");
   for(i = 0 ; i < powerpc_perf_total ; i++)
   {
     for (j = 0; j < POWERPC_NUM_PMC_ENABLED ; j++)
       {
 	if (perfdata[j][i][powerpc_data_num] != (unsigned long long)0)
-	  fprintf(stderr,
+	  av_log(NULL, AV_LOG_INFO,
 		  " Function \"%s\" (pmc%d):\n\tmin: %llu\n\tmax: %llu\n\tavg: %1.2lf (%llu)\n",
 		  perfname[i],
 		  j+1,
@@ -129,7 +129,11 @@ POWERPC_PERF_START_COUNT(powerpc_clear_blocks_dcbz32, 1);
       i += 16;
     }
     for ( ; i < sizeof(DCTELEM)*6*64 ; i += 32) {
+#ifndef __MWERKS__
       asm volatile("dcbz %0,%1" : : "b" (blocks), "r" (i) : "memory");
+#else
+      __dcbz( blocks, i );
+#endif
     }
     if (misal) {
       ((unsigned long*)blocks)[188] = 0L;

@@ -36,9 +36,10 @@
 #include "avcodec.h"
 #include "dsputil.h"
 
-#include "truemotion1data.h"
+#define printf(...) {} //(f)printf() usage is forbidden in libavcodec, use av_log
+#define fprintf(...) {} 
 
-#define LE_16(x)  ((((uint8_t*)(x))[1] << 8) | ((uint8_t*)(x))[0])
+#include "truemotion1data.h"
 
 typedef struct TrueMotion1Context {
     AVCodecContext *avctx;

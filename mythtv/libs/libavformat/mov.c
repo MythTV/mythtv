@@ -16,6 +16,9 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+
+#include <limits.h>
+ 
 #include "avformat.h"
 #include "avi.h"
 
@@ -220,6 +223,8 @@ typedef struct MOVStreamContext {
     long sample_size;
     long sample_count;
     long *sample_sizes;
+    long keyframe_count;
+    long *keyframes;
     int time_scale;
     long current_sample;
     long left_in_chunk; /* how many samples before next chunk */
@@ -1102,6 +1107,34 @@ printf("track[%i].stsc.entries = %i\n", c->fc->nb_streams-1, entries);
     return 0;
 }
 
+static int mov_read_stss(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
+{
+    AVStream *st = c->fc->streams[c->fc->nb_streams-1];
+    MOVStreamContext *sc = (MOVStreamContext *)st->priv_data;
+    int entries, i;
+
+    print_atom("stss", atom);
+
+    get_byte(pb); /* version */
+    get_byte(pb); get_byte(pb); get_byte(pb); /* flags */
+
+    entries = get_be32(pb);
+    sc->keyframe_count = entries;
+#ifdef DEBUG
+    av_log(NULL, AV_LOG_DEBUG, "keyframe_count = %ld\n", sc->keyframe_count);
+#endif
+    sc->keyframes = (long*) av_malloc(entries * sizeof(long));
+    if (!sc->keyframes)
+        return -1;
+    for(i=0; i<entries; i++) {
+        sc->keyframes[i] = get_be32(pb);
+#ifdef DEBUG
+/*        av_log(NULL, AV_LOG_DEBUG, "keyframes[]=%ld\n", sc->keyframes[i]); */
+#endif
+    }
+    return 0;
+}
+
 static int mov_read_stsz(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
 {
     AVStream *st = c->fc->streams[c->fc->nb_streams-1];
@@ -1138,8 +1171,8 @@ static int mov_read_stts(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
     AVStream *st = c->fc->streams[c->fc->nb_streams-1];
     //MOVStreamContext *sc = (MOVStreamContext *)st->priv_data;
     int entries, i;
-    int duration=0;
-    int total_sample_count=0;
+    int64_t duration=0;
+    int64_t total_sample_count=0;
 
     print_atom("stts", atom);
 
@@ -1175,31 +1208,16 @@ printf("track[%i].stts.entries = %i\n", c->fc->nb_streams-1, entries);
 #endif
     }
 
-#define MAX(a,b) a>b?a:b
-#define MIN(a,b) a>b?b:a
     /*The stsd atom which contain codec type sometimes comes after the stts so we cannot check for codec_type*/
     if(duration>0)
     {
-        //Find greatest common divisor to avoid overflow using the Euclidean Algorithm...
-        uint32_t max=MAX(duration,total_sample_count);
-        uint32_t min=MIN(duration,total_sample_count);
-        uint32_t spare=max%min;
-
-        while(spare!=0)
-        {
-            max=min;
-            min=spare;
-            spare=max%min;
-        }
-        
-        duration/=min;
-        total_sample_count/=min;
-
-        //Only support constant frame rate. But lets calculate the average. Needed by .mp4-files created with nec e606 3g phone.
-        //To get better precision, we use the duration as frame_rate_base
-
-        st->codec.frame_rate_base=duration;
-        st->codec.frame_rate = c->streams[c->total_streams]->time_scale * total_sample_count;
+        av_reduce(
+            &st->codec.frame_rate, 
+            &st->codec.frame_rate_base, 
+            c->streams[c->total_streams]->time_scale * total_sample_count,
+            duration,
+            INT_MAX
+        );
 
 #ifdef DEBUG
         printf("FRAME RATE average (video or audio)= %f (tot sample count= %i ,tot dur= %i timescale=%d)\n", (float)st->codec.frame_rate/st->codec.frame_rate_base,total_sample_count,duration,c->streams[c->total_streams]->time_scale);
@@ -1210,8 +1228,6 @@ printf("track[%i].stts.entries = %i\n", c->fc->nb_streams-1, entries);
         st->codec.frame_rate_base = 1;
         st->codec.frame_rate = c->streams[c->total_streams]->time_scale;
     }
-#undef MAX
-#undef MIN
     return 0;
 }
 
@@ -1409,7 +1425,7 @@ static const MOVParseTableEntry mov_default_parse_table[] = {
 { MKTAG( 's', 't', 's', 'c' ), mov_read_stsc },
 { MKTAG( 's', 't', 's', 'd' ), mov_read_stsd }, /* sample description */
 { MKTAG( 's', 't', 's', 'h' ), mov_read_default },
-{ MKTAG( 's', 't', 's', 's' ), mov_read_leaf }, /* sync sample */
+{ MKTAG( 's', 't', 's', 's' ), mov_read_stss }, /* sync sample */
 { MKTAG( 's', 't', 's', 'z' ), mov_read_stsz }, /* sample size */
 { MKTAG( 's', 't', 't', 's' ), mov_read_stts },
 { MKTAG( 't', 'k', 'h', 'd' ), mov_read_tkhd }, /* track header */
@@ -1455,6 +1471,7 @@ static void mov_free_stream_context(MOVStreamContext *sc)
         av_free(sc->chunk_offsets);
         av_free(sc->sample_to_chunk);
         av_free(sc->sample_sizes);
+        av_free(sc->keyframes);
         av_free(sc->header_data);
         av_free(sc);
     }
@@ -1534,7 +1551,7 @@ static int mov_read_header(AVFormatContext *s, AVFormatParameters *ap)
     /* check MOV header */
     err = mov_read_default(mov, pb, atom);
     if (err<0 || (!mov->found_moov && !mov->found_mdat)) {
-	fprintf(stderr, "mov: header not found !!! (err:%d, moov:%d, mdat:%d) pos:%lld\n",
+	av_log(s, AV_LOG_ERROR, "mov: header not found !!! (err:%d, moov:%d, mdat:%d) pos:%lld\n",
 		err, mov->found_moov, mov->found_mdat, url_ftell(pb));
 	return -1;
     }
@@ -1586,7 +1603,7 @@ static int mov_read_packet(AVFormatContext *s, AVPacket *pkt)
     MOVContext *mov = (MOVContext *) s->priv_data;
     MOVStreamContext *sc;
     int64_t offset = 0x0FFFFFFFFFFFFFFFLL;
-    int i;
+    int i, a, b, m;
     int size;
     size = 0x0FFFFFFF;
 
@@ -1720,6 +1737,27 @@ readchunk:
         get_buffer(&s->pb, pkt->data, pkt->size);
     }
     pkt->stream_index = sc->ffindex;
+    
+    // If the keyframes table exists, mark any samples that are in the table as key frames.
+    // If no table exists, treat very sample as a key frame.
+    if (sc->keyframes) {        
+        a = 0;
+        b = sc->keyframe_count - 1;
+        
+        while (a < b) {
+            m = (a + b + 1) >> 1;
+            if (sc->keyframes[m] > sc->current_sample) {
+                b = m - 1;
+            } else {
+                a = m;
+            }    
+        }
+        
+        if (sc->keyframes[a] == sc->current_sample)
+            pkt->flags |= PKT_FLAG_KEY;
+    }
+    else
+        pkt->flags |= PKT_FLAG_KEY;
 
 #ifdef DEBUG
 /*

@@ -360,6 +360,11 @@ static int rv20_decode_picture_header(MpegEncContext *s)
         return -1;
     }
     
+    if(s->last_picture_ptr==NULL && s->pict_type==B_TYPE){
+        av_log(s->avctx, AV_LOG_ERROR, "early B pix\n");
+        return -1;
+    }
+    
     if (get_bits(&s->gb, 1)){
         av_log(s->avctx, AV_LOG_ERROR, "unknown bit set\n");
         return -1;
@@ -403,7 +408,7 @@ static int rv20_decode_picture_header(MpegEncContext *s)
             s->time= seq;
             s->pb_time= s->pp_time - (s->last_non_b_time - s->time);
             if(s->pp_time <=s->pb_time || s->pp_time <= s->pp_time - s->pb_time || s->pp_time<=0){
-                printf("messed up order, seeking?, skiping current b frame\n");
+                av_log(s->avctx, AV_LOG_DEBUG, "messed up order, seeking?, skiping current b frame\n");
                 return FRAME_SKIPED;
             }
         }
@@ -436,6 +441,8 @@ static int rv10_decode_init(AVCodecContext *avctx)
     MpegEncContext *s = avctx->priv_data;
     static int done=0;
 
+    MPV_decode_defaults(s);
+    
     s->avctx= avctx;
     s->out_format = FMT_H263;
     s->codec_id= avctx->codec_id;
@@ -484,8 +491,6 @@ static int rv10_decode_init(AVCodecContext *avctx)
         return -1;
 
     h263_decode_init_vlc(s);
-
-    s->progressive_sequence=1;
 
     /* init rv vlc */
     if (!done) {
