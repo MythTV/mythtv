@@ -186,9 +186,11 @@ int mythplugin_init(const char *libversion)
     PlayerSettings psettings;
     psettings.load(QSqlDatabase::database());
     psettings.save(QSqlDatabase::database());
+#ifdef TRANSCODE_SUPPORT
     RipperSettings rsettings;
     rsettings.load(QSqlDatabase::database());
     rsettings.save(QSqlDatabase::database());
+#endif
 
     return 0;
 }
