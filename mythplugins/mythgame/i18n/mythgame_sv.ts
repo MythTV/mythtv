@@ -368,7 +368,7 @@
     </message>
     <message>
         <source>Fm Town Pad</source>
-        <translation type="unfinished"></translation>
+        <translation>Fm Town Pad</translation>
     </message>
     <message>
         <source>X11 Input Extension Joystick</source>
@@ -384,7 +384,7 @@
     </message>
     <message>
         <source>PS2-Linux native pad</source>
-        <translation type="unfinished"></translation>
+        <translation>PS2-Linux originalpad</translation>
     </message>
     <message>
         <source>SDL Joystick</source>
@@ -556,7 +556,7 @@
     </message>
     <message>
         <source>Envx</source>
-        <translation type="unfinished"></translation>
+        <translation>Envx</translation>
     </message>
     <message>
         <source>No Echo</source>
@@ -624,216 +624,217 @@
     </message>
     <message>
         <source>Show Only Favorites</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa endast favoriter</translation>
     </message>
     <message>
         <source>Limit games listed to only those tagged as &quot;favorite&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Begränsa listade spel till de märkta som &quot;favoriter&quot;</translation>
     </message>
     <message>
         <source>The path to the MAME history.dat file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökvägen till MAME-filen history.dat.</translation>
     </message>
     <message>
         <source>The path to the MAME cheat.dat file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökvägen till MAME-filen cheat.dat.</translation>
     </message>
     <message>
         <source>Wrong xmame version.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fel xmame-version.</translation>
     </message>
     <message>
         <source>This version of xmame is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denna version av xmame stöds ej.</translation>
     </message>
     <message>
         <source>Failed to read catver.ini</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte läsa catver.ini</translation>
     </message>
     <message>
         <source>MythTV was unable to read catver.ini.
 Please enter the correct path and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV kunde inte läsa catver.ini
+Ange korrekt sökväg och försök igen.</translation>
     </message>
     <message>
         <source>Order in which to sort the games - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorteringsordning för spelen - detta gäller alla system. Tillgängliga val: system, år, genre och spelnamn</translation>
     </message>
     <message>
         <source>MAME image downloader</source>
-        <translation type="unfinished"></translation>
+        <translation>MAME bildnedladdare</translation>
     </message>
     <message>
         <source>The path to the MAME image downloader helper.  (See the contrib/ dir in the mythgame source.)</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till MAME bildnedladdare. (Se katalogen contrib/ i mythgame-källkoden.)</translation>
     </message>
     <message>
         <source>Automatically download images</source>
-        <translation type="unfinished"></translation>
+        <translation>Ladda ner bilder automatiskt</translation>
     </message>
     <message>
         <source>Attempt to automatically download ROM images if they don&apos;t exist.</source>
-        <translation type="unfinished"></translation>
+        <translation>Försök ladda ner ROM-bilder automatiskt om de inte finns.</translation>
     </message>
     <message>
         <source>SNES Emulator</source>
-        <translation type="unfinished"></translation>
+        <translation>SNES-emulator</translation>
     </message>
     <message>
         <source>SNES9x</source>
-        <translation type="unfinished"></translation>
+        <translation>SNES9x</translation>
     </message>
     <message>
         <source>zSNES</source>
-        <translation type="unfinished"></translation>
+        <translation>zSNES</translation>
     </message>
     <message>
         <source>Which emulator to use</source>
-        <translation type="unfinished"></translation>
+        <translation>Emulator att använda</translation>
     </message>
     <message>
         <source>Enable autoframeskip</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoppa över bildrutor</translation>
     </message>
     <message>
         <source>Rotate screen anti-clockwise</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotera skärm motsols</translation>
     </message>
     <message>
         <source>Rotate screen clockwise</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotera skärm medsols</translation>
     </message>
     <message>
         <source>Flip screen left-right</source>
-        <translation type="unfinished"></translation>
+        <translation>Vänd skärm vänster-höger</translation>
     </message>
     <message>
         <source>Flip screen upside-down</source>
-        <translation type="unfinished"></translation>
+        <translation>Vänd skärm uppochner</translation>
     </message>
     <message>
         <source>Use additional game artwork</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd extra spel-artwork</translation>
     </message>
     <message>
         <source>Enable displaying simulated scanlines</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa simulerade scanningslinjer</translation>
     </message>
     <message>
         <source>Enable antialiasing</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivera antialiasing</translation>
     </message>
     <message>
         <source>Beam</source>
-        <translation type="unfinished"></translation>
+        <translation>Stråle</translation>
     </message>
     <message>
         <source>Set the beam size for vector games (float)</source>
-        <translation type="unfinished"></translation>
+        <translation>Sätt strålstorlek för vektorspel (flyttal)</translation>
     </message>
     <message>
         <source>Flicker</source>
-        <translation type="unfinished"></translation>
+        <translation>Flimmer</translation>
     </message>
     <message>
         <source>Set the flicker for vector games (float)</source>
-        <translation type="unfinished"></translation>
+        <translation>Sätt flimmer för vektorspel (flyttal)</translation>
     </message>
     <message>
         <source>Enable sound (if available)</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivera ljud (om tillgängligt)</translation>
     </message>
     <message>
         <source>Enable samples (if available)</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivera samplingar (om tillgängligt)</translation>
     </message>
     <message>
         <source>Enable cheat subsystem</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivera fusk-undersystem</translation>
     </message>
     <message>
         <source>Enable mouse (if supported)</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivera mus (om stöd finns)</translation>
     </message>
     <message>
         <source>Select type of joystick support to use</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj typ av joystick-stöd</translation>
     </message>
     <message>
         <source>Use Joystick as analog for analog controls</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd joystick som analog för analoga kontroller</translation>
     </message>
     <message>
         <source>Directory where MAME hiscores are kept.</source>
-        <translation type="unfinished"></translation>
+        <translation>Katalog där MAME bästa resultat lagras.</translation>
     </message>
     <message>
         <source>MAME hiscores file</source>
-        <translation type="unfinished"></translation>
+        <translation>MAME-fil för bästa resultat</translation>
     </message>
     <message>
         <source>Path to the MAME hiscore.dat file</source>
-        <translation type="unfinished"></translation>
+        <translation>Sökväg till MAME-filen hiscore.dat</translation>
     </message>
     <message>
         <source>Atari binary location</source>
-        <translation type="unfinished"></translation>
+        <translation>Plats för Atari-binär</translation>
     </message>
     <message>
         <source>Location of the Atari emulator binary.</source>
-        <translation type="unfinished"></translation>
+        <translation>Plats för Atari emulatorbinärfilen.</translation>
     </message>
     <message>
         <source>Atari ROM location</source>
-        <translation type="unfinished"></translation>
+        <translation>Plats för Atari ROM</translation>
     </message>
     <message>
         <source>Location of the Atari games.</source>
-        <translation type="unfinished"></translation>
+        <translation>Plats för Atari-spelen.</translation>
     </message>
     <message>
         <source>Odyssey2 binary location</source>
-        <translation type="unfinished"></translation>
+        <translation>Plats för Odyssey2-binär</translation>
     </message>
     <message>
         <source>Location of the Odyssey2 emulator binary.</source>
-        <translation type="unfinished"></translation>
+        <translation>Plats för Odyssey2 emulatorbinärfilen.</translation>
     </message>
     <message>
         <source>Odyssey2 ROM location</source>
-        <translation type="unfinished"></translation>
+        <translation>Plats för Odyssey2 ROM</translation>
     </message>
     <message>
         <source>Location of the Odyssey2 games.</source>
-        <translation type="unfinished"></translation>
+        <translation>Plats för Odyssey2-spelen.</translation>
     </message>
     <message>
         <source>MythGame Settings -- Atari Emulation</source>
-        <translation type="unfinished"></translation>
+        <translation>MythGameinställningar -- Atari-emulering</translation>
     </message>
     <message>
         <source>MythGame Settings -- Odyssey2 Emulation</source>
-        <translation type="unfinished"></translation>
+        <translation>MythGameinställningar -- Odyssey2-emulering</translation>
     </message>
     <message>
         <source>Set X-Y Scale to the same aspect ratio. For vector games scale may have values like 1.5 and even 0.5. For scaling of regular games this will be rounded to an int</source>
-        <translation type="unfinished"></translation>
+        <translation>Sätt X-Y-skala till samma bildaspekt. För vektorspel kan skalan ha värden som 1.5 eller t.o.m. 0.5. För skalning av vanliga spel avrundas detta till ett heltal</translation>
     </message>
     <message>
         <source>Enable translucency</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivera genomskinlighet</translation>
     </message>
     <message>
         <source>Always scale vectorgames to X x Y, keeping their aspect ratio. This overrides the scale options.</source>
-        <translation type="unfinished"></translation>
+        <translation>Skala alltid vektorspel till X x Y och bevara bildaspekt. Detta åsidosätter skalningsinställningarna.</translation>
     </message>
     <message>
         <source>Generate sound even when sound is disabled. This is needed for some games which won&apos;t run without sound.</source>
-        <translation type="unfinished"></translation>
+        <translation>Skapa ljud även när ljud är avstängt. Detta behövs för några spel som inte vill starta utan ljud.</translation>
     </message>
     <message>
         <source>Set volume to x db, (-32 (soft) - 0 (loud) )</source>
-        <translation type="unfinished"></translation>
+        <translation>Sätt volym till x dB, (-32 (låg) - 0 (hög) )</translation>
     </message>
 </context>
 <context>
@@ -852,7 +853,7 @@ Please enter the correct path and try again.</source>
     </message>
     <message>
         <source>Favorite:</source>
-        <translation>Genre:</translation>
+        <translation>Favorit:</translation>
     </message>
 </context>
 </TS>
