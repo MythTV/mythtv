@@ -1,8 +1,8 @@
-include ( ../settings.pro )
-
 INCLUDEPATH += ../mfdlib
 DEPENDPATH += ../mfdlib
 LIBS += -Wl,--export-dynamic -L../mfdlib/ -lmfdlib 
+
+include ( ../settings.pro )
 
 !exists(../config.pro ) {
     error(Missing config.pro: please run the configure script)
@@ -26,6 +26,7 @@ TARGET = mfd
 LIBS += -lmyth-$$LIBVERSION 
 }
 
+LIBS += -Wl,-rpath,$${PREFIX}/lib
 
 HEADERS +=          mfd.h   pluginmanager.h   serversocket.h   logging.h   \
            mdserver.h
