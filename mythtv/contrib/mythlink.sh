@@ -16,6 +16,8 @@ perl -w -e '
         while (<>) {
                 chomp;
                 my ($chanid,$start,$end,$title,$subtitle) = split /\t/;
+                $start =~ s/[^0-9]//g;
+                $end =~ s/[^0-9]//g;
                 $subtitle = "" if(!defined $subtitle);
                 my $ofn = "${chanid}_${start}_${end}.nuv";
                 do { print "Skipping $mythpath/$ofn\n"; next } unless -e "$mythpath/$ofn";
