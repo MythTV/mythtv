@@ -214,6 +214,11 @@ package export::ffmpeg;
                     $warnings .= $l;
                     die "\n\nffmpeg had critical errors:\n\n$warnings";
                 }
+            # Segfault?
+                elsif ($l =~ /^Segmentation\sfault/m) {
+                    $warnings .= $l;
+                    die "\n\nffmpeg had critical errors:\n\n$warnings";
+                }
             }
         # Read from the mythtranscode handle?
             while (has_data($mythtrans_h) and $l = <$mythtrans_h>) {
