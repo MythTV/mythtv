@@ -86,11 +86,10 @@ void SipContainer::SipThreadWorker()
 
     while(!killSipThread)
     {
-        // Sleep, checking SIP stack every 1/2 second
-        usleep(1000000/SIP_POLL_PERIOD);  // Not very optimal; can look into event-driving it later
-
-        CheckUIEvents(sipFsm);
+        // This blocks for timeout or data
         CheckNetworkEvents(sipFsm);
+    
+        CheckUIEvents(sipFsm);
         CheckRegistrationStatus(sipFsm); // Probably don't need to do this every 1/2 sec but this is a fallout of a non event-driven arch.
         sipFsm->HandleTimerExpiries();
 
@@ -415,10 +414,10 @@ SipFsm::SipFsm(QWidget *parent, const char *name)
         }
         else
             cout << "SIP: Cannot register; proxy, username or password not set\n";
-
-        // Test -- watch my PC
-        //CreateWatcherFsm("487658@fwd.pulver.com");//"Mythphone@192.168.254.102");//
     }
+
+    // Test -- watch my PC
+    //CreateWatcherFsm("Mythphone@192.168.254.102:5070");//"487658@fwd.pulver.com");//
 
 }
 
@@ -437,7 +436,7 @@ SipFsm::~SipFsm()
 QString SipFsm::OpenSocket(int Port)
 {
     sipSocket = new QSocketDevice (QSocketDevice::Datagram);
-    sipSocket->setBlocking(false);
+    sipSocket->setBlocking(true);
 
     QString ifName = gContext->GetSetting("SipBindInterface");
     struct ifreq ifreq;
@@ -699,7 +698,7 @@ void SipFsm::CheckRxEvent(bool &Notify)
     Notify = false;  // Set to true if we have something to tell the user
 
     SipMsg sipRcv;
-    if (Receive(sipRcv))
+    if ((sipSocket->waitForMore(1000/SIP_POLL_PERIOD) > 0) && (Receive(sipRcv)))
     {
         int Event = MsgToEvent(&sipRcv);
 
