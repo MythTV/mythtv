@@ -2177,7 +2177,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
             if(!show_whole_tree)
             {
                 x_location = area.left() + 40; // that 40 is a HACK
-                y_location = area.top() + (area.height() / 2) + (QFontMetrics(tmpfont->face).height() / 2);
+                y_location = area.top() + (area.height() / 2);
             }
 
             if(i == bins)
@@ -2277,13 +2277,13 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
                     if(i == bins && hotspot_node->childCount() > 0)
                     {
                         p->drawPixmap(x_location + (*highlight_map[i]).width() - right_arrow_image.width(),
-                                      y_location - QFontMetrics(tmpfont->face).height() + QFontMetrics(tmpfont->face).descent(),
+                                      y_location - QFontMetrics(tmpfont->face).height() + right_arrow_image.height() / 2,
                                       right_arrow_image);
                     }
                     if(i == 1 && hotspot_node->getParent()->getParent())
                     {
                         p->drawPixmap(x_location,
-                                      y_location - QFontMetrics(tmpfont->face).height() + QFontMetrics(tmpfont->face).descent(),
+                                      y_location - QFontMetrics(tmpfont->face).height() + left_arrow_image.height() / 2,
                                       left_arrow_image);
                     }
                 }
