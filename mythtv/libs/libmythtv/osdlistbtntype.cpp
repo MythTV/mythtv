@@ -890,9 +890,7 @@ void OSDListBtnType::Init()
 
 void OSDListBtnType::LoadPixmap(OSDTypeImage& pix, const QString& fileName)
 {
-    QString file = "/usr/local/share/mythtv/themes/default/lb-" + fileName + 
-                   ".png";
-    
+    QString file = gContext->GetThemesParentDir() + "default/lb-" + fileName + ".png";
     pix.LoadImage(file, m_wmult, m_hmult);
 }
 
