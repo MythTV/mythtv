@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-04-22, v2.15
+  2003-04-23, v2.16
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -254,7 +254,7 @@
   software video encoder, which means that it uses a fairly generic
   "dumb" video capture card to get frames of video, encodes them using
   the CPU on your motherboard and writes them to disk.  High-end video
-  capture cards and devices like the Tivo and RePlay have dedicated
+  capture cards and devices like the Tivo and ReplayTV have dedicated
   encoder chips which use specialized hardware to convert the video
   stream to the MPEG-2 format without using the motherboard CPU.  The
   main CPU has the responsibility of running the Operating System and
@@ -311,8 +311,8 @@
 
   Encoded video takes up a lot of hard disk space. The exact amount
   depends on the encoding scheme, the size of the raw images, and the
-  frames per second, but a typical value for MythTV is 1 gigabyte/hour
-  if using MPEG-4.
+  frames per second, but typical values for MythTV range from 700
+  megabytes/hour to 2 gigabyte/hour.
 
   [1mNOTE[22m:  You [4mmust[24m use DMA for hard drive access to prevent choppy or
   jittery video.  Red Hat Linux 8.0 apparently does not enable DMA at
@@ -418,25 +418,44 @@
   with TV-out outputs that are supported by Linux and XFree86, or (b) an
   external VGA-to-TV converter.
 
-  For (a), recent nVidia cards are reported to work with the nvtv
-  drivers, available at http://sourceforge.net/projects/nv-tv-out/
-  <http://sourceforge.net/projects/nv-tv-out/>.  See the forums at
+  For (a), all nVidia cards with tv-out that are supported by the
+  current drivers from nVidia should be able to display on a television.
+  Some cards with certain chip sets support overscan adjustment. See
+  http://www.nvidia.com/content/drivers/drivers.asp
+  <http://www.nvidia.com/content/drivers/drivers.asp> for nVidia driver
+  information.
+
+  Many older nVidia cards (such as GeForce2 cards with tv-out) can use
+  [1mnvtv [22mhttp://sourceforge.net/projects/nv-tv-out/
+  <http://sourceforge.net/projects/nv-tv-out/>, a utility which provides
+  controls for overscan, x,y position and several other useful controls
+  to fine tune output.
+
+  See the forums at
   http://sourceforge.net/forum/forum.php?forum_id=105850
   <http://sourceforge.net/forum/forum.php?forum_id=105850> for more
-  infomation on which cards work with the driver. Recent Matrox cards
-  (the G450 and G550) are reported to work with kernel patches (for
-  Linux 2.4.19) available at http://www.bglug.ca/matrox_tvout/
-  <http://www.bglug.ca/matrox_tvout/>.
+  infomation on which cards work with [1mnvtv[22m.
+
+  Recent Matrox cards (the G450 and G550) are reported to work with
+  kernel patches (for Linux 2.4.19) available at
+  http://www.bglug.ca/matrox_tvout/ <http://www.bglug.ca/matrox_tvout/>.
 
   Cards made by ATI have no official support for TV out under Linux and
   XFree86, though some people report making them work with the
-  experimental version of the GATOS drivers, available at
+  experimental devel branch of the GATOS drivers, available at
   http://gatos.sourceforge.net/watching_tv.php
   <http://gatos.sourceforge.net/watching_tv.php>.
 
   For choice (b), VGA-to-TV converters work well; many people have
-  stated they are satisfied with the output of the AITech Web Cable Plus
-  on their NTSC televisions.
+  stated they are satisfied with the output of the following devices:
+  +o  AITech Web Cable Plus, powered by external transformer or takes
+     power from PS/2 keyboard connector, support resolutions up to
+     1024x768, outputs composite and SVideo, provides position
+     adjustment.
+
+  +o  Averkey lite, powered by a USB port, has Composite, SVideo, YPbPr
+     outputs; pan, brightness, overscan/underscan controls; supports up
+     to 1024x768 outputs; and supports PAL and NTSC.
 
   [1m3.2.  Software.[0m
 
@@ -550,7 +569,6 @@
   Red Hat Linux 8.0 installation CD, and it allows you to select
   packages at installation time, or once the system is up and running.
   You can access this program by selecting
-
   RedHatMenu>System Settings>Packages
 
   If you did a typical Desktop install of Red Hat Linux 8.0 make sure
@@ -615,6 +633,7 @@
 
   Once all of the pre-requisites have been installed, the next step is
   to obtain and compile the source RPM.
+
   Go to http://www.rpmfind.net <http://www.rpmfind.net> and search for
   qt3.  There will be a number of different versions available.  As of
   2002-12-02, the latest version for Mandrake is called
@@ -690,7 +709,7 @@
   locate the "USE" variable. If the line is commented out, remove the
   comment. The line should have at least:
 
-       USE="mysql qt alsa"
+  USE="mysql qt alsa"
 
   Next you need to build KDE. If you don't plan on using the ebuilds as
   described in the Gentoo section then you also need to install lame.
@@ -704,6 +723,7 @@
        $ emerge qt
 
   Install MySQL if this is the master system:
+
        $ emerge mysql
 
   All the necessary files will be downloaded and built. This will take a
@@ -733,16 +753,16 @@
   Open a shell, and switch to superuser mode.  [1mNOTE: ^D [22mmeans press [1mCTRL[0m
   and [1md [22mat the same time.
 
-       $ su
-       # cd /etc/profile.d
-       cat > mythtv.sh
-       export QTDIR=/usr/lib/qt3
-       export PATH=$PATH:/usr/lib/qt3/bin
-       ^D
+  $ su
+  # cd /etc/profile.d
+  cat > mythtv.sh
+  export QTDIR=/usr/lib/qt3
+  export PATH=$PATH:/usr/lib/qt3/bin
+  ^D
 
-       # chmod a+x mythtv.sh
-       # exit
-       $ exit
+  # chmod a+x mythtv.sh
+  # exit
+  $ exit
 
   The last two commands are to exit out of the shell.  This way, when
   you next open a shell your new commands will take effect.
@@ -935,14 +955,14 @@
   and skipping to the compile step.
   ______________________________________________________________________
 
-       $ su
-       # perl -MCPAN -e shell
-       cpan> install XML::Twig
-       cpan> install Date::Manip
-       Date::Manip is up to date.
-       cpan> install LWP
-       cpan> install XML::Writer
-       cpan> exit
+  $ su
+  # perl -MCPAN -e shell
+  cpan> install XML::Twig
+  cpan> install Date::Manip
+  Date::Manip is up to date.
+  cpan> install LWP
+  cpan> install XML::Writer
+  cpan> exit
 
   Change to the XMLTV directory and compile it:
 
@@ -1063,6 +1083,7 @@
   This step is only required on the system maintaining the database,
   which may or may not be one of your MythTV boxes.  If the database is
   on a non-MythTV machine, then copy the database/mc.sql file to it.
+
   To setup the initial mysql databases:
 
        $ cd database
@@ -1117,8 +1138,8 @@
 
   Finally, if you just want to restrict by IP subnet:
 
-       $ mysql -u root mythconverg
-       mysql> grant all on mythconverg.* to mythtv@"192.168.1.%" identified by "mythtv";
+  $ mysql -u root mythconverg
+  mysql> grant all on mythconverg.* to mythtv@"192.168.1.%" identified by "mythtv";
 
   [1m7.  Setting up ALSA and the mixer.[0m
 
@@ -1211,36 +1232,36 @@
 
   Start with the alsa-driver package:
 
-  $ tar -xjf alsa-driver-0.9.x.tar.bz2
-  $ cd alsa-driver-0.9.x
-  $ ./configure --with-cards=XXX --with-sequencer=yes
-  $ make
-  $ su
-  # make install
-  # ./snddevices
-  # exit
-  $
+       $ tar -xjf alsa-driver-0.9.x.tar.bz2
+       $ cd alsa-driver-0.9.x
+       $ ./configure --with-cards=XXX --with-sequencer=yes
+       $ make
+       $ su
+       # make install
+       # ./snddevices
+       # exit
+       $
 
   This will compile and install the kernel modules and initialization
   scripts, as well as create device nodes in /dev.
 
   Install the rest of the packages:
 
-       $ cd ~
-       $ tar -xjf alsa-lib-0.9.x.tar.bz2
-       $ cd alsa-lib-0.9.x
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # exit
-       $ cd ..
-       $ tar -xjf alsa-utils-0.9.x.tar.bz2
-       $ cd alsa-utils-0.9.x
-       $ ./configure
-       $ make
-       $ su
-       # make install
+  $ cd ~
+  $ tar -xjf alsa-lib-0.9.x.tar.bz2
+  $ cd alsa-lib-0.9.x
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # exit
+  $ cd ..
+  $ tar -xjf alsa-utils-0.9.x.tar.bz2
+  $ cd alsa-utils-0.9.x
+  $ ./configure
+  $ make
+  $ su
+  # make install
 
   Next, you must edit /etc/modules.conf so that the ALSA modules are
   loaded automatically. The first step is to remove your old OSS
@@ -1279,7 +1300,6 @@
   the mixer settings won't get restored the next time you boot unless
   you ran the shutdown script or you've explicitly saved the state which
   you can do as root with:
-
        # alsactl -f /etc/asound.state store
 
   Reboot your machine.  Login and adjust the sound levels using
@@ -1311,13 +1331,13 @@
   Note the spelling in the following commands.
   ______________________________________________________________________
 
-  $ amixer set Master,0 100%,100% unmute
-  $ amixer set Line,0 75%,75% mute captur
-  $ amixer set Capture,0 100%,100% mute captur
-  $ su
-  # alsactl store
-  # exit
-  $
+       $ amixer set Master,0 100%,100% unmute
+       $ amixer set Line,0 75%,75% mute captur
+       $ amixer set Capture,0 100%,100% mute captur
+       $ su
+       # alsactl store
+       # exit
+       $
 
   If you have multiple sound cards, then use the -c parameter to specify
   which card to adjust.  Note that the first card will be "0", the
@@ -1431,10 +1451,10 @@
   At this point, if you're using a serial receiver, check that the link
   has been correctly made in /dev
 
-       $ ls -l /dev/li*
-       lr-xr-xr-x    1 root     root            5 Jan 27 09:00 /dev/lirc -> ttyS0
-       srw-rw-rw-    1 root     root            0 Jan 27 15:01 /dev/lircd=
-       prw-r--r--    1 root     root            0 Jan 27 09:00 /dev/lircm|
+  $ ls -l /dev/li*
+  lr-xr-xr-x    1 root     root            5 Jan 27 09:00 /dev/lirc -> ttyS0
+  srw-rw-rw-    1 root     root            0 Jan 27 15:01 /dev/lircd=
+  prw-r--r--    1 root     root            0 Jan 27 09:00 /dev/lircm|
 
   As you can see, there's a link from /dev/lirc to ttyS0, aka "COM1".
 
@@ -1464,11 +1484,11 @@
   For the impatient: Make sure you have an emergency floppy boot disk
   available!
 
-  $ cd /usr/src/linux
-  $ su
-  # make mrproper
-  # cd configs
-  # ls
+       $ cd /usr/src/linux
+       $ su
+       # make mrproper
+       # cd configs
+       # ls
 
   at this point you must look at the file names and determine which
   config file is right for you. For instance if you have an Athlon XP
@@ -1553,9 +1573,9 @@
   Now, we're going to add the commands necessary for lircd to run each
   time we boot.  Mandrake 9.1 users, you can execute:
 
-  $ su
-  # chkconfig --level 35 lircd on
-  # exit
+       $ su
+       # chkconfig --level 35 lircd on
+       # exit
 
   All other distributions:
 
@@ -1598,7 +1618,7 @@
   [1mirxevent [22misn't a daemon, so if you know that your remote is working
   you need to invoke it like this:
 
-  $ irxevent &
+       $ irxevent &
 
   If [1mirxevent [22misn't running, then MythTV will not respond to your remote
   control.
@@ -1612,17 +1632,17 @@
 
   The lircrc.example file has this:
 
-       begin
-           prog = irxevent
-           button = ChannelUp
-           config = Key Up CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = ChannelUp
+      config = Key Up CurrentWindow
+  end
 
-       begin
-           prog = irxevent
-           button = ChannelDown
-           config = Key Down CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = ChannelDown
+      config = Key Down CurrentWindow
+  end
 
   but the /etc/lircd.conf that comes in the lircd package defines the
   buttons for the Pinnacle Studio PCTV as:
@@ -1716,7 +1736,6 @@
 
   The configuration for starting [1mlircd [22mdiffers if you're going to be
   sending and receiving IR versus just receiving.
-
        # cd /etc/rc.d
        # cat >> rc.local
        echo "Starting lircd"
@@ -1770,7 +1789,6 @@
 
   See contrib/channel.pl for the actual file.  Copy it to
   /usr/local/bin/
-
   The last statement within the perl script is the lirc rc command. This
   is the command that transmits the code to your cable/dss box. Make
   sure to have the IRDA device within a few feet of the box.
@@ -2166,10 +2184,10 @@
 
   To determine if you've got SSE on an Intel processor, you can:
 
-       $ cat /proc/cpuinfo
-       [snip]
-       flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca
-       cmov pat pse36 mmx fxsr sse
+  $ cat /proc/cpuinfo
+  [snip]
+  flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca
+  cmov pat pse36 mmx fxsr sse
 
   Notice the [1msse [22mat the end of the line - this tells you that this
   processor will be able to deinterlace correctly.
@@ -2274,13 +2292,13 @@
 
   [1m12.2.  Completing the installation.[0m
 
-       $ tar -xjf mythweb-0.8.tar.bz2
-       $ cd mythweb-0.8
-       $ su
-       # mkdir /var/www/html/mythweb
-       # cp -r . /var/www/html/mythweb
-       # exit
-       $
+  $ tar -xjf mythweb-0.8.tar.bz2
+  $ cd mythweb-0.8
+  $ su
+  # mkdir /var/www/html/mythweb
+  # cp -r . /var/www/html/mythweb
+  # exit
+  $
 
   To access the web page, open a web browser and use [1mhttp://[name or ip[0m
   [1maddress]/mythweb/[0m
@@ -2371,14 +2389,14 @@
   Download FLAC from http://flac.sourceforge.net
   <http://flac.sourceforge.net> and install:
 
-  $ tar -xzf flac-1.1.0.tar.gz
-  $ cd flac-1.1.0
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
-  $
+       $ tar -xzf flac-1.1.0.tar.gz
+       $ cd flac-1.1.0
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
+       $
 
   Download libcdaudio from libcdaudio.sourceforge.net
   <http://sourceforge.net/project/showfiles.php?group_id=27134> and
@@ -2467,6 +2485,7 @@
   packages for Vorbis, cdparanoia, SDL, and OpenGL (which you probably
   already have installed). To install these all at once, simply type
   (all on the same line):
+
        $ up2date --solvedeps libvorbis libvorbis-devel vorbis-tools cdparanoia-devel cdparanoia-libs cdparanoia SDL-devel SDL
 
   If you get the following message: "None of the packages you requested

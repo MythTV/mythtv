@@ -39,7 +39,7 @@ or capture sizes, etc.</P>
 encoder, which means that it uses a fairly generic "dumb" video capture card
 to get frames of video, encodes them using the CPU on your motherboard and
 writes them to disk.  High-end video capture cards and devices like the Tivo
-and RePlay have dedicated encoder chips which use specialized hardware to
+and ReplayTV have dedicated encoder chips which use specialized hardware to
 convert the video stream to the MPEG-2 format without using the motherboard
 CPU.  The main CPU has the responsibility of running the Operating System
 and reading and writing the encoded frames to the disk.  These tasks have
@@ -86,9 +86,10 @@ may be useful if you are running multiple encoders.</P>
 
 <H3>Hard Disk(s)</H3>
 
-<P>Encoded video takes up a lot of hard disk space. The exact amount depends 
-on the encoding scheme, the size of the raw images, and the frames per 
-second, but a typical value for MythTV is 1 gigabyte/hour if using MPEG-4.</P>
+<P>Encoded video takes up a lot of hard disk space. The exact amount depends
+on the encoding scheme, the size of the raw images, and the frames per
+second, but typical values for MythTV range from 700 megabytes/hour to 2
+gigabyte/hour.</P>
 <P><B>NOTE</B>:  You <EM>must</EM> use DMA for hard drive access to prevent
 choppy or jittery video.  Red Hat Linux 8.0 apparently does not enable DMA
 at boot time.  See the Troubleshooting Section for 
@@ -193,21 +194,38 @@ video card to be listed as one of the adapters.</P>
 you need either (a) one of the relatively small number of cards with TV-out 
 outputs that are supported by Linux and XFree86, or (b) an external 
 VGA-to-TV converter.</P>
-<P>For (a), recent nVidia cards are reported to work with the nvtv drivers,
-available at 
-<A HREF="http://sourceforge.net/projects/nv-tv-out/">http://sourceforge.net/projects/nv-tv-out/</A>.  See the forums at 
+<P>For (a), all nVidia cards with tv-out that are supported by the current drivers
+from nVidia should be able to display on a television. Some cards with
+certain chip sets support overscan adjustment. See 
+<A HREF="http://www.nvidia.com/content/drivers/drivers.asp">http://www.nvidia.com/content/drivers/drivers.asp</A> for nVidia driver
+information.</P>
+<P>Many older nVidia cards (such as GeForce2 cards with tv-out) can use
+<B>nvtv</B> 
+<A HREF="http://sourceforge.net/projects/nv-tv-out/">http://sourceforge.net/projects/nv-tv-out/</A>, a utility which provides
+controls for overscan, x,y position and several other useful controls to
+fine tune output.</P>
+<P>See the forums at 
 <A HREF="http://sourceforge.net/forum/forum.php?forum_id=105850">http://sourceforge.net/forum/forum.php?forum_id=105850</A> for more
-infomation on which cards work with the driver. Recent Matrox cards (the
-G450 and G550) are reported to work with kernel patches (for Linux 2.4.19)
-available at 
+infomation on which cards work with <B>nvtv</B>. </P>
+<P>Recent Matrox cards (the G450 and G550) are reported to work with kernel
+patches (for Linux 2.4.19) available at 
 <A HREF="http://www.bglug.ca/matrox_tvout/">http://www.bglug.ca/matrox_tvout/</A>.</P>
 <P>Cards made by ATI have no official support for TV out under Linux and
 XFree86, though some people report making them work with the experimental
-version of the GATOS drivers, available at 
+devel branch of the GATOS drivers, available at 
 <A HREF="http://gatos.sourceforge.net/watching_tv.php">http://gatos.sourceforge.net/watching_tv.php</A>. </P>
 <P>For choice (b), VGA-to-TV converters work well; many people have stated they
-are satisfied with the output of the AITech Web Cable Plus on their NTSC
-televisions.</P>
+are satisfied with the output of the following devices:</P>
+<P>
+<UL>
+<LI>AITech Web Cable Plus, powered by external transformer or takes power
+from PS/2 keyboard connector, support resolutions up to 1024x768, outputs
+composite and SVideo, provides position adjustment.</LI>
+<LI>Averkey lite, powered by a USB port, has Composite, SVideo, YPbPr
+outputs; pan, brightness, overscan/underscan controls; supports up to
+1024x768 outputs; and supports PAL and NTSC.</LI>
+</UL>
+</P>
 
 <H2><A NAME="ss3.2">3.2</A> <A HREF="mythtv-HOWTO.html#toc3.2">Software.</A>
 </H2>
