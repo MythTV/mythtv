@@ -24,8 +24,6 @@
 #include <qfileinfo.h>
 #include <qdir.h>
 
-#include <cmath>
-
 #include "singleview.h"
 
 SingleView::SingleView(QSqlDatabase *db, ThumbList itemList,
@@ -406,7 +404,7 @@ void SingleView::retreatFrame()
 
 void SingleView::loadImage()
 {
-    if (!m_pixmap) {
+    if (m_pixmap) {
         delete m_pixmap;
         m_pixmap = 0;
     }
