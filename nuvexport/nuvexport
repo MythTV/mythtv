@@ -91,6 +91,8 @@
             my $start = time();
         # Encode
             $exporter->export($episode);
+        # Remove tmpfiles
+            wipe_tmpfiles();
         # Report how long the encode lasted
             print "\nEncode finished:  ".localtime()."\n";
             my $seconds = time() - $start;

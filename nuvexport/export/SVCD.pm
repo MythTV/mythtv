@@ -29,6 +29,7 @@ package export::SVCD;
                     # Transcode-related settings
                      'denoise'         => 1,
                      'deinterlace'     => 1,
+                     'crop'            => 1,
                     # SVCD-specific settings
                      'quantisation'    => 5,		# 4 through 6 is probably right...
                      'a_bitrate'       => 192,

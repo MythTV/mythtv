@@ -91,16 +91,17 @@ package mythtv::recordings;
         $description = 'No Description' unless ($description =~ /\S/);
     # Build a clean filename
         my $outfile = 'Untitled';
-		if ($show ne 'Untitled' and $episode ne 'Untitled') {
-			$outfile = "$show - $episode";
-		}
-		elsif($show ne 'Untitled') {
-			$outfile = $show;
-		}
-		elsif($episode ne 'Untitled') {
-			$outfile = $episode;
-		}
-        $outfile =~ s/(?:[:\?&\/]+\s*?)+\s?/-/sg;
+        if ($show ne 'Untitled' and $episode ne 'Untitled') {
+            $outfile = "$show - $episode";
+        }
+        elsif($show ne 'Untitled') {
+            $outfile = $show;
+        }
+        elsif($episode ne 'Untitled') {
+            $outfile = $episode;
+        }
+        $outfile =~ s/(?:[\/\\\:\*\?\<\>\|\-]+\s*?)+\s?/-/sg;
+        $outfile =~ tr/"/'/s;
     #$description =~ s/(?:''|``)/"/sg;
         push @{$Shows{$show}}, {'filename'       => "$video_dir/$file",
                                 'channel'        => $channel,

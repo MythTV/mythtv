@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.09.24 (xris)
+#Last Updated: 2004.09.28 (xris)
 #
 #  nuv_export::shared_utils
 #
@@ -14,7 +14,7 @@ package nuv_export::shared_utils;
         use Exporter;
         our @ISA = qw/ Exporter /;
 
-        our @EXPORT = qw/ &clear &find_program &num_cpus &shell_escape &wrap &system
+        our @EXPORT = qw/ &clear &find_program &num_cpus &shell_escape &wrap &system &wipe_tmpfiles
                           @Exporters %Prog %Args %cli_args $DEBUG
                           $is_child
                           @tmpfiles %children
@@ -37,14 +37,7 @@ package nuv_export::shared_utils;
     END {
         if (!$is_child) {
         # Clean up temp files/directories
-            foreach my $file (@tmpfiles) {
-                if (-d $file) {
-                    rmdir $file;
-                }
-                elsif (-e $file) {
-                    unlink $file;
-                }
-            }
+            wipe_tmpfiles();
         # Make sure any child processes also go away
             if (%children) {
                 foreach my $child (keys %children) {
@@ -200,6 +193,19 @@ package nuv_export::shared_utils;
         else {
             CORE::system($command);
         }
+    }
+
+# Remove tmpfiles
+    sub wipe_tmpfiles {
+        foreach my $file (@tmpfiles) {
+            if (-d $file) {
+                rmdir $file;
+            }
+            elsif (-e $file) {
+                unlink $file;
+            }
+        }
+        @tmpfiles = ();
     }
 
 

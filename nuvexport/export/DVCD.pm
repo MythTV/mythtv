@@ -26,6 +26,7 @@ package export::DVCD;
                     # Transcode-related settings
                      'denoise'         => 1,
                      'deinterlace'     => 1,
+                     'crop'            => 1,
                     };
         bless($self, $class);
 

@@ -32,6 +32,7 @@ package export::XviD;
                     # Transcode-related settings
                      'denoise'         => 1,
                      'deinterlace'     => 1,
+                     'crop'            => 1,
                     # VBR-specific settings
                      'vbr'             => 1,        # This enables vbr, and the multipass/quantisation options
                      'multipass'       => 0,        # You get multipass or quantisation, multipass will override

@@ -23,6 +23,7 @@ package export::transcode;
     $cli_args{'denoise|noise_reduction:s'} = 1; # Enable noise reduction
     $cli_args{'deinterlace:s'}             = 1; # Transcode-related settings
     $cli_args{'zoom_filter:s'}             = 1; # Which zoom filter to use
+    $cli_args{'crop'}                      = 1; # Crop out broadcast overscan
 
 # This superclass defines several object variables:
 #
@@ -71,9 +72,14 @@ package export::transcode;
                                             'yesno',
                                             $self->{'deinterlace'} ? 'Yes' : 'No');
     # Crop video to get rid of broadcast padding
-    #    $self->{'crop'} = query_text('Crop ',
-    #                                 'yesno',
-    #                                 $self->{'crop'} ? 'Yes' : 'No');
+        if ($Args{'crop'}) {
+            $self->{'crop'} = 1;
+        }
+        else {
+            $self->{'crop'} = query_text('Crop broadcast overscan (2% border)?',
+                                         'yesno',
+                                         $self->{'crop'} ? 'Yes' : 'No');
+        }
     }
 
     sub export {
@@ -117,7 +123,7 @@ package export::transcode;
                          ;
         }
     # Crop?
-        if (1 || $self->{'crop'}) {
+        if ($self->{'crop'}) {
             my $w = sprintf('%.0f', .02 * $episode->{'finfo'}{'width'});
             my $h = sprintf('%.0f', .02 * $episode->{'finfo'}{'height'});
             $transcode .= " -j $h,$w,$h,$w" if ($h || $w);
