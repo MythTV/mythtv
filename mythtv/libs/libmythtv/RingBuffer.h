@@ -4,6 +4,33 @@
 #include <qstring.h>
 #include <pthread.h>
 
+class ThreadedFileWriter
+{
+public:
+    ThreadedFileWriter(const char *filename, int flags, mode_t mode);
+    ~ThreadedFileWriter();                 /* commits all writes and closes the file. */
+
+    long long Seek(long long pos, int whence);
+    unsigned Write(const void *data, unsigned count);
+
+    unsigned BufUsed();  /* # of bytes queued for write by the write thread */
+    unsigned BufFree();  /* # of bytes that can be written, without blocking */
+
+protected:
+    static void *boot_writer(void *);
+    void DiskLoop(); /* The thread that actually calls write(). */
+
+private:
+    int fd;
+    char *buf;
+    unsigned rpos,wpos;
+    pthread_mutex_t buflock;
+    int in_dtor;
+    int child_live;
+    pthread_t writer;
+};
+
+
 class RingBuffer
 {
  public:
@@ -12,7 +39,7 @@ class RingBuffer
     
    ~RingBuffer();
 
-    bool IsOpen(void) { return (fd > 0 || fd2 > 0); }
+    bool IsOpen(void) { return (tfw || fd2 > 0); }
     
     int Read(void *buf, int count);
     int Write(const void *buf, int count);
@@ -46,11 +73,13 @@ class RingBuffer
 
     const QString GetFilename(void) { return filename; }
 
+    bool IsIOBound(void);
+
  private:
     QString filename;
 
-    int fd, fd2;
-    int dumpfd;   
+    ThreadedFileWriter *tfw, *dumpfw;
+    int fd2;
  
     bool normalfile;
     bool writemode;

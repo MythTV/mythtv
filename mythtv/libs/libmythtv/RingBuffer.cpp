@@ -4,17 +4,230 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <pthread.h>
 #include "RingBuffer.h"
+
+#define TFW_BUF_SIZE (2*1024*1024)
+
+static unsigned safe_write(int fd, const void *data, unsigned sz)
+{
+    int ret;
+    unsigned tot=0;
+    unsigned errcnt=0;
+    while(tot < sz) {
+	ret=write(fd, (char *)data+tot, sz-tot);
+	if(ret<0)
+	{
+	    perror("ERROR: file I/O problem in 'safe_write()' (RingBuffer.cpp)\n");
+	    errcnt++;
+	    if(errcnt==3) break;
+	}
+	else
+	{
+	    tot += ret;
+	}
+	if(tot < sz) usleep(1000);
+    }
+    return tot;
+}
+
+static unsigned safe_read(int fd, void *data, unsigned sz)
+{
+    int ret;
+    unsigned tot=0;
+    unsigned errcnt=0;
+    while(tot < sz) {
+	ret = read(fd, (char *)data+tot, sz-tot);
+	if(ret<0)
+	{
+	    perror("ERROR: file I/O problem in 'safe_read()' (RingBuffer.cpp)\n");
+	    errcnt++;
+	    if(errcnt==3) break;
+	}
+	else
+	{
+	    tot+=ret;
+	}
+	if(tot < sz) usleep(1000);
+    }
+    return tot;
+}
+
+void *ThreadedFileWriter::boot_writer(void *wotsit)
+{
+    ThreadedFileWriter *fw = (ThreadedFileWriter *)wotsit;
+    fw->DiskLoop();
+    return NULL;
+}
+
+ThreadedFileWriter::ThreadedFileWriter(const char *filename,
+				       int flags, mode_t mode)
+{
+    pthread_mutex_t init = PTHREAD_MUTEX_INITIALIZER;
+
+    buflock = init;
+    buf = NULL;
+    rpos = wpos = 0;
+    in_dtor = 0;
+
+    fd = open(filename, flags, mode);
+    child_live = 0;
+
+    if(fd<=0)
+    {
+	/* oops! */
+	printf("ERROR opening file '%s' in ThreadedFileWriter.\n", filename);
+    }
+    else
+    {
+	buf = (char *)malloc(TFW_BUF_SIZE);
+
+	child_live = 1;
+	pthread_create(&writer, NULL, boot_writer, this);
+    }
+}
+
+ThreadedFileWriter::~ThreadedFileWriter()
+{
+    in_dtor = 1; /* tells child thread to exit */
+
+    while(child_live)
+    {
+	usleep(10000);
+    }
+
+    close(fd);
+    fd = -1;
+
+    if(buf)
+    {
+	free(buf); 
+	buf = NULL;
+    }
+}
+
+unsigned ThreadedFileWriter::Write(const void *data, unsigned count)
+{
+    int first = 1;
+
+    while(count > BufFree())
+    {
+	if(first)
+	    printf("IOBOUND - blocking in ThreadedFileWriter::Write()\n");
+	first = 0;
+	usleep(5000);
+    }
+    
+    if((wpos + count) > TFW_BUF_SIZE)
+    {
+	int first_chunk_size = TFW_BUF_SIZE - wpos;
+	int second_chunk_size = count - first_chunk_size;
+	memcpy(buf + wpos, data, first_chunk_size );
+	memcpy(buf,        (char *)data+first_chunk_size, second_chunk_size );
+    }
+    else
+    {
+	memcpy(buf + wpos, data, count);
+    }
+    pthread_mutex_lock(&buflock);
+    wpos = (wpos + count) % TFW_BUF_SIZE;
+    pthread_mutex_unlock(&buflock);
+
+    return count;
+}
+
+long long ThreadedFileWriter::Seek(long long pos, int whence)
+{
+    /* Assumes that we don't seek very often. This is not a high
+       performance approach... we just block until the write thread
+       empties the buffer. */
+    while(BufUsed()>0)
+	usleep(5000);
+
+    return lseek(fd, pos, whence);
+}
+
+void ThreadedFileWriter::DiskLoop()
+{
+    int size;
+
+    while( !in_dtor || BufUsed()>0 )
+    {
+	size = BufUsed();
+	
+	if(size == 0)
+	{
+	    usleep(5000);
+	    continue;
+	}
+
+	/* cap the max. write size. Prevents the situation where 90% of the
+	   buffer is valid, and we try to write all of it at once which
+	   takes a long time. During this time, the other thread fills up
+	   the 10% that was free... */
+	if(size > (TFW_BUF_SIZE/4))
+	    size = TFW_BUF_SIZE/4;
+
+	if((rpos + size) > TFW_BUF_SIZE)
+	{
+	    int first_chunk_size  = TFW_BUF_SIZE - rpos;
+	    int second_chunk_size = size - first_chunk_size;
+	    safe_write(fd, buf+rpos, first_chunk_size);
+	    safe_write(fd, buf,      second_chunk_size);
+	}
+	else
+	{
+	    safe_write(fd, buf+rpos, size);
+	}
+	pthread_mutex_lock(&buflock);
+	rpos = (rpos + size) % TFW_BUF_SIZE;
+	pthread_mutex_unlock(&buflock);
+    }
+    child_live=0;
+}
+
+unsigned ThreadedFileWriter::BufUsed()
+{
+    unsigned ret;
+    pthread_mutex_lock(&buflock);
+
+    if(wpos >= rpos)
+	ret = wpos - rpos;
+    else
+	ret = TFW_BUF_SIZE - rpos + wpos;
+
+    pthread_mutex_unlock(&buflock);
+    return ret;
+}
+
+unsigned ThreadedFileWriter::BufFree()
+{
+    unsigned ret;
+    pthread_mutex_lock(&buflock);
+
+    if(wpos >= rpos)
+	ret = rpos + TFW_BUF_SIZE - wpos - 1;
+    else
+	ret = rpos - wpos - 1;
+
+    pthread_mutex_unlock(&buflock);
+    return ret;
+}
+
+/**********************************************************************/
 
 RingBuffer::RingBuffer(const QString &lfilename, bool write)
 {
     normalfile = true;
     filename = (QString)lfilename;
-    fd = fd2 = -1;
+    tfw = NULL;
+    fd2 = -1;
 
     if (write)
     {
-        fd = open(filename.ascii(), O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE, 0644);
+        tfw = new ThreadedFileWriter(filename.ascii(),
+				     O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE, 
+				     0644);
         writemode = true;
     }
     else
@@ -28,7 +241,7 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write)
     smudgeamount = 0;
 
     stopreads = false;
-    dumpfd = -1;
+    dumpfw = NULL;
     dumpwritepos = 0;
 
     pthread_rwlock_init(&rwlock, NULL);
@@ -41,9 +254,11 @@ RingBuffer::RingBuffer(const QString &lfilename, long long size,
     filename = (QString)lfilename;
     filesize = size;
    
-    fd = -1; fd2 = -1;
+    tfw = NULL;
+    fd2 = -1;
 
-    fd = open(filename.ascii(), O_WRONLY|O_CREAT|O_LARGEFILE, 0644);
+    tfw = new ThreadedFileWriter(filename.ascii(), 
+				 O_WRONLY|O_CREAT|O_LARGEFILE, 0644);
     fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE);
 
     totalwritepos = writepos = 0;
@@ -53,7 +268,7 @@ RingBuffer::RingBuffer(const QString &lfilename, long long size,
     smudgeamount = smudge;
 
     stopreads = false;
-    dumpfd = -1;
+    dumpfw = NULL;
     dumpwritepos = 0;
 
     pthread_rwlock_init(&rwlock, NULL);
@@ -61,19 +276,27 @@ RingBuffer::RingBuffer(const QString &lfilename, long long size,
 
 RingBuffer::~RingBuffer(void)
 {
-    if (fd > 0)
-        close(fd);
+    if (tfw)
+    {
+	delete tfw;
+	tfw = NULL;
+    }
     if (fd2 > 0)
+    {
         close(fd2);
-    if (dumpfd > 0)
-        close(dumpfd);
+    }
+    if (dumpfw)
+    {
+	delete dumpfw; 
+	dumpfw = NULL;
+    }
 }
 
 void RingBuffer::TransitionToFile(const QString &lfilename)
 {
     pthread_rwlock_wrlock(&rwlock);
 
-    dumpfd = open(lfilename.ascii(), 
+    dumpfw = new ThreadedFileWriter(lfilename.ascii(), 
                   O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE, 0644);
     dumpwritepos = 0;
 
@@ -84,8 +307,8 @@ void RingBuffer::TransitionToRing(void)
 {
     pthread_rwlock_wrlock(&rwlock);
  
-    close(dumpfd);
-    dumpfd = -1;
+    delete dumpfw;
+    dumpfw = NULL;
     dumpwritepos = 0;
 
     pthread_rwlock_unlock(&rwlock);
@@ -97,10 +320,11 @@ void RingBuffer::Reset(void)
 
     if (!normalfile)
     {
-        close(fd);
+	delete tfw;
         close(fd2);
 
-        fd = open(filename.ascii(), O_WRONLY|O_CREAT|O_LARGEFILE, 0644);
+        tfw = new ThreadedFileWriter(filename.ascii(),
+				     O_WRONLY|O_CREAT|O_LARGEFILE, 0644);
         fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE);
  
         totalwritepos = writepos = 0;
@@ -121,7 +345,7 @@ int RingBuffer::Read(void *buf, int count)
     {
         if (!writemode)
         {
-            ret = read(fd2, buf, count);
+            ret = safe_read(fd2, buf, count);
 	    totalreadpos += ret;
             readpos += ret;
         }
@@ -132,9 +356,10 @@ int RingBuffer::Read(void *buf, int count)
     }
     else
     {
-        while (totalreadpos + count >= totalwritepos)
+        while (totalreadpos + count >= 
+	       totalwritepos - (dumpfw ? dumpfw->BufUsed() : tfw->BufUsed() ) )
         {
-            usleep(50);
+            usleep(1000);
             if (stopreads)
             {
                 pthread_rwlock_unlock(&rwlock);
@@ -146,12 +371,12 @@ int RingBuffer::Read(void *buf, int count)
         {
 	    int toread = filesize - readpos;
 
-	    ret = read(fd2, buf, toread);
+	    ret = safe_read(fd2, buf, toread);
 	    
 	    int left = count - toread;
 	    lseek(fd2, 0, SEEK_SET);
 
-	    ret = read(fd2, (char *)buf + toread, left);
+	    ret = safe_read(fd2, (char *)buf + toread, left);
 	    ret += toread;
 
 	    totalreadpos += ret;
@@ -159,7 +384,7 @@ int RingBuffer::Read(void *buf, int count)
 	}
 	else
         {
-            ret = read(fd2, buf, count);
+            ret = safe_read(fd2, buf, count);
             readpos += ret;
 	    totalreadpos += ret;
         }
@@ -171,8 +396,26 @@ int RingBuffer::Read(void *buf, int count)
 
 int RingBuffer::WriteToDumpFile(const void *buf, int count)
 {
-    int ret = write(dumpfd, buf, count);
+    int ret = dumpfw->Write(buf, count);
     dumpwritepos += ret;
+    return ret;
+}
+
+bool RingBuffer::IsIOBound(void)
+{
+    bool ret;
+    int used, free;
+    ThreadedFileWriter *fw;
+    pthread_rwlock_rdlock(&rwlock);
+
+    fw = dumpfw ? dumpfw : tfw;
+
+    used = tfw->BufUsed();
+    free = tfw->BufFree();
+
+    ret = (used * 5 > free);
+
+    pthread_rwlock_unlock(&rwlock);
     return ret;
 }
 
@@ -186,7 +429,7 @@ int RingBuffer::Write(const void *buf, int count)
     {
         if (writemode)
         {
-            ret = write(fd, buf, count);
+	    ret = tfw->Write(buf, count);
 	    totalwritepos += ret;
             writepos += ret;
         }
@@ -200,12 +443,12 @@ int RingBuffer::Write(const void *buf, int count)
         if (writepos + count > filesize)
         {
 	    int towrite = filesize - writepos;
-	    ret = write(fd, buf, towrite);
+	    ret = tfw->Write(buf, towrite);
 
 	    int left = count - towrite;
-	    lseek(fd, 0, SEEK_SET);
+	    tfw->Seek(0, SEEK_SET);
 
-	    ret = write(fd, (char *)buf + towrite, left);
+	    ret = tfw->Write((char *)buf + towrite, left);
 	    writepos = left;
 
 	    ret += towrite;
@@ -215,27 +458,26 @@ int RingBuffer::Write(const void *buf, int count)
         }
 	else
 	{
-            ret = write(fd, buf, count);
+	    ret = tfw->Write(buf, count);
             writepos += ret;
 	    totalwritepos += ret;
 	}
 
-        if (dumpfd > 0)
+        if (dumpfw)
         {
-            int ret2 = write(dumpfd, buf, count);
+	    int ret2 = dumpfw->Write(buf, count);
             dumpwritepos += ret2;
         }
     }
 
     pthread_rwlock_unlock(&rwlock);
-
     return ret;
 }
 
 long long RingBuffer::GetFileWritePosition(void)
 {
     long long ret = -1;
-    if (dumpfd > 0)
+    if (dumpfw)
         ret = dumpwritepos;
     else
         ret = totalwritepos;
@@ -262,7 +504,7 @@ long long RingBuffer::Seek(long long pos, int whence)
         ret = lseek(fd2, pos, whence);
 	if (whence == SEEK_SET)
         {
-            // FIXME: set totalreadpos too
+	    // FIXME: set totalreadpos too
 	    readpos = ret;
         }
 	else if (whence == SEEK_CUR)
@@ -279,12 +521,11 @@ long long RingBuffer::Seek(long long pos, int whence)
 long long RingBuffer::WriterSeek(long long pos, int whence)
 {
     long long ret = -1;
-    int usefd = fd;
 
-    if (dumpfd > 0)
-        usefd = dumpfd;
-
-    ret = lseek(usefd, pos, whence);
+    if(dumpfw)
+	ret = dumpfw->Seek(pos, whence);
+    else
+	ret = tfw->Seek(pos, whence);
 
     return ret;
 }

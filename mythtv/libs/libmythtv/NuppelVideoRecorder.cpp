@@ -831,6 +831,7 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf)
 
     if (!videobuffer[act]->freeToBuffer) 
     {
+	printf("DROPPED frame due to full buffer in the recorder.\n");
         return; // we can't buffer the current frame
     }
 	
@@ -1306,11 +1307,20 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
             freecount++;
     }
 
-    if (freecount < ((2 * video_buffer_count) / 3)) 
-        compressthis = 0; // speed up the encode process
-
-    if (freecount < 5 || rawmode) 
-        raw = 1; // speed up the encode process
+    if ( freecount < (video_buffer_count / 3) ) 
+	compressthis = 0; // speed up the encode process
+    
+    if (freecount < 5 || rawmode)
+	raw = 1; // speed up the encode process
+    
+    if(raw==1 || compressthis==0) {
+	if(ringBuffer->IsIOBound())
+	{
+	    /* need to compress, the disk can't handle any more bandwidth*/
+	    raw=0;
+	    compressthis=1;
+	}
+    }
 
     // see if it's time for a seeker header, sync information and a keyframe
     frameheader.keyframe  = frameofgop;             // no keyframe defaulted
@@ -1345,7 +1355,7 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
         ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
 
         wantkeyframe = true;
-        sync();   
+        sync();
     }
 
     if (videoFilters.size() > 0)
