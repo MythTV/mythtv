@@ -69,21 +69,70 @@ void EditMetadataDialog::fillWidgets()
         //  with all available videos. 
         //  
 
+        bool trip_catch = false;
+        QString caught_name = "";
+        int possible_starting_point = 0;
         child_select->addItem(0, tr("None"));
+
         QString q_string = QString("SELECT intid, title FROM videometadata ORDER BY title ;");
         QSqlQuery a_query(q_string, db);
         if(a_query.isActive() && a_query.numRowsAffected() > 0)
         {
             while(a_query.next())
             {
+                if(trip_catch)
+                {
+                    //
+                    //  Previous loop told us to check if the two
+                    //  movie names are close enough to try and
+                    //  set a default starting point.
+                    //
+            
+                    QString target_name = a_query.value(1).toString();
+                    int length_compare = 0;
+                    if(target_name.length() < caught_name.length())
+                    {
+                        length_compare = target_name.length();
+                    }
+                    else
+                    {
+                        length_compare = caught_name.length();
+                    }
+
+                    QString caught_name_three_quarters = caught_name.left((int)(length_compare * 0.75));
+                    QString target_name_three_quarters = target_name.left((int)(length_compare * 0.75));
+                    
+                    if(caught_name_three_quarters == target_name_three_quarters)
+                    {
+                        possible_starting_point = a_query.value(0).toInt();
+                    }
+                    trip_catch = false;
+                }
                 if(a_query.value(0).toUInt() != working_metadata->ID())
                 {
                     child_select->addItem(a_query.value(0).toInt(),
                                           a_query.value(1).toString());
                 }
+                else
+                {
+                    //
+                    //  This is the current file. Set a flag so the default
+                    //  selected child will be set next loop
+                    //
+
+                    trip_catch = true;
+                    caught_name = a_query.value(1).toString();
+                }
             }
         }
-        child_select->setToItem(working_metadata->ChildID());
+        if(working_metadata->ChildID() > 0)
+        {
+            child_select->setToItem(working_metadata->ChildID());
+        }
+        else
+        {
+            child_select->setToItem(possible_starting_point);
+        }
     }
     if(browse_check)
     {
