@@ -3,7 +3,7 @@
 /*
 	mfdinterface.h
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
+	(c) 2003, 2004 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
 	Core entry point for the facilities available in libmfdclient
@@ -18,6 +18,7 @@
 #include "mfdcontent.h"
 
 class DiscoveryThread;
+class PlaylistChecker;
 class MfdInstance;
 
 class MfdInterface : public QObject
@@ -45,7 +46,18 @@ class MfdInterface : public QObject
     void nextAudio(int which_mfd);
     void prevAudio(int which_mfd);
     void askForStatus(int which_mfd);
+
+    //
+    //  Methods that will ask this library to perform some background work
+    //  on behalf of the linked in client
+    //    
     
+    void startPlaylistCheck(
+                            MfdContentCollection *mfd_collection,
+                            UIListGenericTree *playlist, 
+                            UIListGenericTree *content
+                           );
+    void stopPlaylistCheck();
     
   signals:
 
@@ -60,6 +72,7 @@ class MfdInterface : public QObject
     void audioStopped(int);
     void audioPlaying(int, int, int, int, int, int, int, int, int);
     void metadataChanged(int, MfdContentCollection*);
+    void playlistCheckDone();
 
   protected:
   
@@ -79,6 +92,7 @@ class MfdInterface : public QObject
     DiscoveryThread       *discovery_thread;
     QPtrList<MfdInstance> *mfd_instances;
     int                   mfd_id_counter;
+    PlaylistChecker       *playlist_checker;
     
     QIntDict<MfdContentCollection>   mfd_collections;
     

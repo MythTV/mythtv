@@ -1,7 +1,7 @@
 /*
 	mfdinterface.cpp
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
+	(c) 2003, 2004 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
 	Core entry point for the facilities available in libmfdclient
@@ -14,6 +14,7 @@ using namespace std;
 #include "mfdinterface.h"
 #include "mfdinstance.h"
 #include "discoverythread.h"
+#include "playlistchecker.h"
 #include "events.h"
 
 MfdInterface::MfdInterface(int client_screen_width, int client_screen_height)
@@ -45,6 +46,19 @@ MfdInterface::MfdInterface(int client_screen_width, int client_screen_height)
     mfd_instances = new QPtrList<MfdInstance>;
     mfd_instances->setAutoDelete(true);
     mfd_id_counter = 0;
+    
+    //
+    //  Create a thread that the linked client can use to properly check
+    //  mark
+    //
+    
+    playlist_checker = new PlaylistChecker(this);
+    
+    //
+    //  Set it running
+    //
+    
+    playlist_checker->start();
 }
 
 void MfdInterface::playAudio(int which_mfd, int container, int type, int which_id, int index)
@@ -60,7 +74,7 @@ void MfdInterface::playAudio(int which_mfd, int container, int type, int which_i
         an_mfd = mfd_instances->next()
        )
     {
-        if(an_mfd->getId() == which_mfd)
+        if (an_mfd->getId() == which_mfd)
         {
             an_mfd->addPendingCommand(
                                         QStringList::split(" ", QString("audio play %1 %2 %3 %4")
@@ -74,7 +88,7 @@ void MfdInterface::playAudio(int which_mfd, int container, int type, int which_i
         }
     }
     
-    if(!found_it)
+    if (!found_it)
     {
         cerr << "mfdinterface.o: could not find an mfd "
              << "for a playAudio() request"
@@ -95,7 +109,7 @@ void MfdInterface::stopAudio(int which_mfd)
         an_mfd = mfd_instances->next()
        )
     {
-        if(an_mfd->getId() == which_mfd)
+        if (an_mfd->getId() == which_mfd)
         {
             an_mfd->addPendingCommand(
                                         QStringList::split(" ", QString("audio stop"))
@@ -105,7 +119,7 @@ void MfdInterface::stopAudio(int which_mfd)
         }
     }
     
-    if(!found_it)
+    if (!found_it)
     {
         cerr << "mfdinterface.o: could not find an mfd "
              << "for a stopAudio() request"
@@ -127,9 +141,9 @@ void MfdInterface::pauseAudio(int which_mfd, bool on_or_off)
         an_mfd = mfd_instances->next()
        )
     {
-        if(an_mfd->getId() == which_mfd)
+        if (an_mfd->getId() == which_mfd)
         {
-            if(on_or_off)
+            if (on_or_off)
             {
                 an_mfd->addPendingCommand(
                                             QStringList::split(" ", QString("audio pause on"))
@@ -147,7 +161,7 @@ void MfdInterface::pauseAudio(int which_mfd, bool on_or_off)
         }
     }
     
-    if(!found_it)
+    if (!found_it)
     {
         cerr << "mfdinterface.o: could not find an mfd "
              << "for a pauseAudio() request"
@@ -168,7 +182,7 @@ void MfdInterface::seekAudio(int which_mfd, int how_much)
         an_mfd = mfd_instances->next()
        )
     {
-        if(an_mfd->getId() == which_mfd)
+        if (an_mfd->getId() == which_mfd)
         {
             an_mfd->addPendingCommand(
                                         QStringList::split(" ", QString("audio seek %1")
@@ -180,7 +194,7 @@ void MfdInterface::seekAudio(int which_mfd, int how_much)
         }
     }
     
-    if(!found_it)
+    if (!found_it)
     {
         cerr << "mfdinterface.o: could not find an mfd "
              << "for a seekAudio() request"
@@ -201,7 +215,7 @@ void MfdInterface::nextAudio(int which_mfd)
         an_mfd = mfd_instances->next()
        )
     {
-        if(an_mfd->getId() == which_mfd)
+        if (an_mfd->getId() == which_mfd)
         {
             an_mfd->addPendingCommand(
                                         QStringList::split(" ", QString("audio next"))
@@ -212,7 +226,7 @@ void MfdInterface::nextAudio(int which_mfd)
         }
     }
     
-    if(!found_it)
+    if (!found_it)
     {
         cerr << "mfdinterface.o: could not find an mfd "
              << "for a nextAudio() request"
@@ -233,7 +247,7 @@ void MfdInterface::prevAudio(int which_mfd)
         an_mfd = mfd_instances->next()
        )
     {
-        if(an_mfd->getId() == which_mfd)
+        if (an_mfd->getId() == which_mfd)
         {
             an_mfd->addPendingCommand(
                                         QStringList::split(" ", QString("audio prev"))
@@ -244,7 +258,7 @@ void MfdInterface::prevAudio(int which_mfd)
         }
     }
     
-    if(!found_it)
+    if (!found_it)
     {
         cerr << "mfdinterface.o: could not find an mfd "
              << "for a prevAudio() request"
@@ -265,7 +279,7 @@ void MfdInterface::askForStatus(int which_mfd)
         an_mfd = mfd_instances->next()
        )
     {
-        if(an_mfd->getId() == which_mfd)
+        if (an_mfd->getId() == which_mfd)
         {
             an_mfd->addPendingCommand(
                                         QStringList::split(" ", QString("audio status"))
@@ -276,13 +290,48 @@ void MfdInterface::askForStatus(int which_mfd)
         }
     }
     
-    if(!found_it)
+    if (!found_it)
     {
         cerr << "mfdinterface.o: could not find an mfd "
              << "for an askForStatus() request"
              << endl;
     }
 }
+
+
+void MfdInterface::startPlaylistCheck(
+                                        MfdContentCollection *mfd_collection,
+                                        UIListGenericTree *playlist, 
+                                        UIListGenericTree *content
+                                     )
+{
+    if (playlist_checker)
+    {
+        playlist_checker->startChecking(mfd_collection, playlist, content);
+    }
+    else
+    {
+        cerr << "mfdinterface.o: asked to startPlaylistCheck(), but I don't "
+             << "have a PlaylistChecker thread."
+             << endl;
+    }
+}
+
+
+void MfdInterface::stopPlaylistCheck()
+{
+    if (playlist_checker)
+    {
+        playlist_checker->stopChecking();
+    }
+    else
+    {
+        cerr << "mfdinterface.o: asked to stopPlaylistCheck(), but I don't "
+             << "have a PlaylistChecker thread."
+             << endl;
+    }
+}
+
 
 void MfdInterface::customEvent(QCustomEvent *ce)
 {
@@ -292,14 +341,14 @@ void MfdInterface::customEvent(QCustomEvent *ce)
     //  the client application code know what is going on
     //
 
-    if(ce->type() == MFD_CLIENTLIB_EVENT_DISCOVERY)
+    if (ce->type() == MFD_CLIENTLIB_EVENT_DISCOVERY)
     {
         //
         //  It's an mfd discovery event
         //
 
         MfdDiscoveryEvent *de = (MfdDiscoveryEvent*)ce;
-        if(de->getLostOrFound())
+        if (de->getLostOrFound())
         {
         
             //
@@ -311,7 +360,7 @@ void MfdInterface::customEvent(QCustomEvent *ce)
                                                 de->getAddress(), 
                                                 de->getPort()
                                               );
-            if(already_mfd)
+            if (already_mfd)
             {
                 cerr << "was told there is a new mfd, "
                      << "but it's the same as one that already "
@@ -347,7 +396,7 @@ void MfdInterface::customEvent(QCustomEvent *ce)
                                                 de->getAddress(), 
                                                 de->getPort()
                                               );
-            if(mfd_to_kill)
+            if (mfd_to_kill)
             {
                 mfd_to_kill->stop();
                 mfd_to_kill->wait();
@@ -366,17 +415,17 @@ void MfdInterface::customEvent(QCustomEvent *ce)
             }
         }
     }
-    else if(ce->type() == MFD_CLIENTLIB_EVENT_AUDIOPAUSE)
+    else if (ce->type() == MFD_CLIENTLIB_EVENT_AUDIOPAUSE)
     {
         MfdAudioPausedEvent *ape = (MfdAudioPausedEvent*)ce;
         emit audioPaused(ape->getMfd(), ape->getPaused());
     }
-    else if(ce->type() == MFD_CLIENTLIB_EVENT_AUDIOSTOP)
+    else if (ce->type() == MFD_CLIENTLIB_EVENT_AUDIOSTOP)
     {
         MfdAudioStoppedEvent *ase = (MfdAudioStoppedEvent*)ce;
         emit audioStopped(ase->getMfd());
     }
-    else if(ce->type() == MFD_CLIENTLIB_EVENT_AUDIOPLAY)
+    else if (ce->type() == MFD_CLIENTLIB_EVENT_AUDIOPLAY)
     {
         MfdAudioPlayingEvent *ape = (MfdAudioPlayingEvent*)ce;
         emit audioPlaying(
@@ -391,16 +440,21 @@ void MfdInterface::customEvent(QCustomEvent *ce)
                             ape->getSampleFrequency()
                          );
     }
-    else if(ce->type() == MFD_CLIENTLIB_EVENT_METADATA)
+    else if (ce->type() == MFD_CLIENTLIB_EVENT_METADATA)
     {
         MfdMetadataChangedEvent *mce = (MfdMetadataChangedEvent*)ce;
         swapMetadata(mce->getMfd(), mce->getNewCollection());
     }
-    else if(ce->type() == MFD_CLIENTLIB_EVENT_AUDIOPLUGIN_EXISTS)
+    else if (ce->type() == MFD_CLIENTLIB_EVENT_AUDIOPLUGIN_EXISTS)
     {
         MfdAudioPluginExistsEvent *apee = (MfdAudioPluginExistsEvent*)ce;
         emit audioPluginDiscovery(apee->getMfd());
     }
+    else if (ce->type() == MFD_CLIENTLIB_EVENT_PLAYLIST_CHECKED)
+    {
+        emit playlistCheckDone();
+    }
+    
     else
     {
         cerr << "mfdinterface is getting CustomEvents it does not understand" 
@@ -420,7 +474,7 @@ MfdInstance* MfdInterface::findMfd(
         an_mfd = mfd_instances->next()
        )
     {
-        if(
+        if (
             an_mfd->getHostname() == a_host &&
             an_mfd->getAddress() == an_ip_address &&
             an_mfd->getPort() == a_port
@@ -448,7 +502,7 @@ void MfdInterface::swapMetadata(int which_mfd, MfdContentCollection *new_collect
 
     old_collection = mfd_collections.find(which_mfd);
     
-    if(old_collection)
+    if (old_collection)
     {
         mfd_collections.remove(which_mfd);
     }
@@ -469,7 +523,7 @@ void MfdInterface::swapMetadata(int which_mfd, MfdContentCollection *new_collect
     //  Delete the old one
     //
     
-    if(old_collection)
+    if (old_collection)
     {
         delete old_collection;
         old_collection = NULL;
@@ -483,14 +537,15 @@ MfdInterface::~MfdInterface()
     //  Shut down and delete the discovery thread
     //
     
-    if(discovery_thread)
+    if (discovery_thread)
     {
         discovery_thread->stop();
         discovery_thread->wait();
         delete discovery_thread;
+        discovery_thread= NULL;
     }
 
-    if(mfd_instances)
+    if (mfd_instances)
     {
         //
         //  Shut them all down
@@ -514,4 +569,17 @@ MfdInterface::~MfdInterface()
         delete mfd_instances;
         mfd_instances = NULL;
     }
+    
+    //
+    //  Shutdown the playlist checker
+    //
+    
+    if (playlist_checker)
+    {
+        playlist_checker->stop();
+        playlist_checker->wait();
+        delete playlist_checker;
+        playlist_checker = NULL;
+    }
+    
 }

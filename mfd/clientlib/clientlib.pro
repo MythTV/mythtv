@@ -21,7 +21,7 @@ HEADERS += mfdinterface.h   discoverythread.h   mfdinstance.h \
            ../mfdlib/httpheader.h \
            ../mfdlib/httpgetvar.h \
            mdcaprequest.h mdcapresponse.h metadatacollection.h ../mfdlib/metadata.h \
-           playlist.h playlistentry.h mfdcontent.h
+           playlist.h playlistentry.h mfdcontent.h playlistchecker.h
 
 SOURCES += mfdinterface.cpp discoverythread.cpp mfdinstance.cpp \
            ./mdnsd/mdnsd.c ./mdnsd/1035.c discovered.cpp \
@@ -31,7 +31,7 @@ SOURCES += mfdinterface.cpp discoverythread.cpp mfdinstance.cpp \
            ../mfdlib/httpheader.cpp \
            ../mfdlib/httpgetvar.cpp \
            mdcaprequest.cpp mdcapresponse.cpp metadatacollection.cpp ../mfdlib/metadata.cpp \
-           playlist.cpp playlistentry.cpp mfdcontent.cpp
+           playlist.cpp playlistentry.cpp mfdcontent.cpp playlistchecker.cpp
 
 inc.path = $${PREFIX}/include/mfdclient/
 inc.files  = mfdinterface.h mfdcontent.h ../mfdlib/metadata.h playlist.h playlistentry.h

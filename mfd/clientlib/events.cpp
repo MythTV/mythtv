@@ -164,3 +164,13 @@ int MfdAudioPluginExistsEvent::getMfd()
     return mfd_id;
 }
 
+/*
+---------------------------------------------------------------------
+*/
+
+MfdPlaylistCheckedEvent::MfdPlaylistCheckedEvent()
+                    :QCustomEvent(MFD_CLIENTLIB_EVENT_PLAYLIST_CHECKED)
+
+{
+}
+

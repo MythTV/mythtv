@@ -20,6 +20,7 @@
 #define MFD_CLIENTLIB_EVENT_AUDIOPLAY           65429
 #define MFD_CLIENTLIB_EVENT_METADATA            65428
 #define MFD_CLIENTLIB_EVENT_AUDIOPLUGIN_EXISTS  65427
+#define MFD_CLIENTLIB_EVENT_PLAYLIST_CHECKED    65426
 
 
 class MfdDiscoveryEvent: public QCustomEvent
@@ -176,6 +177,19 @@ class MfdAudioPluginExistsEvent: public QCustomEvent
   private:
   
     int                mfd_id;
+};
+
+class MfdPlaylistCheckedEvent: public QCustomEvent
+{
+    //
+    //  Sent by the playlist checking thread when it is finished massaging a
+    //  content tree
+    //
+    
+  public:
+  
+    MfdPlaylistCheckedEvent();
+
 };
 
 

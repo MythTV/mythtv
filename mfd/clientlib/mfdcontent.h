@@ -23,6 +23,7 @@ class GenericTree;
 class UIListGenericTree;
 class UIListTreeType;
 class MetadataCollection;
+class PlaylistChecker;
 
 class MfdContentCollection
 {
@@ -40,8 +41,8 @@ class MfdContentCollection
                                     int playlist_id, 
                                     int spot_counter
                                   );
-    void addItemToAudioArtistTree(AudioMetadata *item, GenericTree *starting_point, bool do_checks = false);
-    void addItemToAudioGenreTree(AudioMetadata *item, GenericTree *starting_point, bool do_checks = false);
+    void addItemToAudioArtistTree(AudioMetadata *item, GenericTree *starting_point, bool do_checks = false, bool do_map =false);
+    void addItemToAudioGenreTree(AudioMetadata *item, GenericTree *starting_point, bool do_checks = false, bool do_map = false);
     void addItemToAudioCollectionTree(AudioMetadata *item, const QString &collection_name);
     void addItemToSelectableTrees(AudioMetadata *item);
     void addPlaylistToSelectableTrees(ClientPlaylist *playlist);
@@ -57,16 +58,19 @@ class MfdContentCollection
     
     AudioMetadata*     getAudioItem(int which_collection, int which_id);
     ClientPlaylist*    getAudioPlaylist(int which_collection, int which_id);
-    UIListGenericTree* constructPlaylistTree(int which_collection, int which_playlist);
-    UIListGenericTree* constructContentTree(int which_collection, int which_playlist);
-    void               turnOffTree(UIListGenericTree *node);
+    UIListGenericTree* getPlaylistTree(int which_collection, int which_playlist, bool pristine=false);
+    UIListGenericTree* constructPlaylistTree(ClientPlaylist *playlist);
+    UIListGenericTree* getContentTree(int which_collection, bool pristine=false);
     void               toggleItem(UIListGenericTree *node, bool turn_on);
     void               toggleTree(UIListTreeType *menu, UIListGenericTree *playlist_tree, UIListGenericTree *node, bool turn_on);
     void               alterPlaylist(UIListTreeType *menu, UIListGenericTree *playlist_tree, UIListGenericTree *node, bool turn_on);
     void               checkParent(UIListGenericTree *node);
     bool               crossReferenceExists(ClientPlaylist *subject, ClientPlaylist *object, int depth);
     void               markNodeAsHeld(UIListGenericTree *node, bool held_or_not);
-    
+    void               turnOffTree(PlaylistChecker *playlist_checker, UIListGenericTree *content_tree);
+    void               processContentTree(PlaylistChecker *playlist_checker, UIListGenericTree *playlist_tree, UIListGenericTree *content_tree);
+    void               printTree(UIListGenericTree *node, int depth=0);  //  for debugging
+
     void sort();
     void setupPixmaps();
     
@@ -95,6 +99,10 @@ class MfdContentCollection
 
 
     QIntDict<UIListGenericTree> selectable_content_trees;
+    QIntDict<UIListGenericTree> pristine_content_trees;
+
+    QIntDict<UIListGenericTree> editable_playlist_trees;
+    QIntDict<UIListGenericTree> pristine_playlist_trees;
 
     int   client_width;
     int   client_height;
