@@ -168,11 +168,13 @@ package nuv_export::cli;
 
 # Retrieve the value of a commandline argument
     sub arg {
-        my ($arg, $default) = @_;
+        my $arg     = lc(shift);
+        my $default = shift;
+        my $package = lc(shift or (caller())[0]);
     # Commandline preference/override
         return $args{$arg} if (defined($args{$arg}));
     # Load rc preference
-        $args{$arg} = rc_arg($arg);
+        $args{$arg} = rc_arg($arg, $package);
     # Return the rc preference, or the passed-in default value
         return defined($args{$arg})
                 ? $args{$arg}

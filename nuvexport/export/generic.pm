@@ -266,7 +266,7 @@ package export::generic;
         my $arg  = shift;
         if (!defined $self->{$arg}) {
         # Look for a config option, a commandline option, or the code-specified default
-            $self->{$arg} = arg($arg, $self->{'defaults'}{$arg});
+            $self->{$arg} = arg($arg, $self->{'defaults'}{$arg}, $self);
         }
         return $self->{$arg};
     }

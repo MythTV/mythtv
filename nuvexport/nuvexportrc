@@ -79,7 +79,18 @@
 #
 
 <ffmpeg>
-    noise_reduction = no
+#
+# ffmpeg is almost twice as fast if you disable noise reduction
+#
+#    noise_reduction = no
+#
+# If you have a clean signal, you might want to try to use fast_denoise
+# with ffmpeg (it's actually part of yuvdenoise, which the ffmpeg exporter
+# uses).  It can be almost twice as fast as normal noise reduction, but is
+# nowhere near as effective.
+#
+#    fast_denoise = yes
+#
 </ffmpeg>
 
 <transcode>
