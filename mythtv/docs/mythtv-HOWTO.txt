@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-01-20, v1.081
+  2003-01-24, v1.082
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -725,6 +725,13 @@
   started at boot.  Click on Mandrake Control Center->System->Services,
   find mysql and click the "On Boot" button and the "Start" button if
   the mysql status shows that it isn't running yet.
+
+  [1mNOTE[22m:  There have been reports that mysql isn't starting at boot.
+
+       $ su
+       # chkconfig --level 35 mysql on
+       # /etc/rc.d/init.d/mysql start
+       # exit
 
   [1m6.2.  Red Hat Linux 8.0[0m
 

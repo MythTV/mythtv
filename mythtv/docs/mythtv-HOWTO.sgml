@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-01-20, v1.081
+<date>2003-01-24, v1.082
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -594,6 +594,15 @@ name="http://www.snowman.net/pipermail/mythtv-dev/2002-November/001116.html">.
 at boot.  Click on Mandrake Control Center->System->Services, find mysql and
 click the "On Boot" button and the "Start" button if the mysql status shows
 that it isn't running yet.
+
+<bf>NOTE</bf>:  There have been reports that mysql isn't starting at boot.
+
+<tscreen><verb>
+$ su
+# chkconfig --level 35 mysql on
+# /etc/rc.d/init.d/mysql start
+# exit
+</verb></tscreen>
 
 <sect1>Red Hat Linux 8.0
 <p>If this is the master system, make sure that mysql is running and started at boot. Click on
@@ -2351,6 +2360,7 @@ knew it was so difficult?)
 v1.080, 2003-01-17.  Adjustment to RH80 docs by Cedar.  Added recommendation
 to use KDE vs. Gnome for RH8.
 v1.081, 2003-01-20.  Fixed XMLTV version error (Darren Mak)
+v1.082, 2003-01-24.  Added help for MDK 9.0 mysql startup.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

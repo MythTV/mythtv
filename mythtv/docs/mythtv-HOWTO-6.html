@@ -21,6 +21,17 @@
 at boot.  Click on Mandrake Control Center->System->Services, find mysql and
 click the "On Boot" button and the "Start" button if the mysql status shows
 that it isn't running yet.</P>
+<P><B>NOTE</B>:  There have been reports that mysql isn't starting at boot.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# chkconfig --level 35 mysql on
+# /etc/rc.d/init.d/mysql start
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
 <H2><A NAME="ss6.2">6.2</A> <A HREF="mythtv-HOWTO.html#toc6.2">Red Hat Linux 8.0</A>
 </H2>
