@@ -214,7 +214,6 @@ void SearchDir(QSqlDatabase *db, QString &directory)
             title.replace(QRegExp("_"), " ");
             title = title.left(title.findRev("."));
             title.replace(QRegExp("\\."), " ");
-            cout << "Replace .: " << title << endl;
             title = title.left(title.find("["));
             title = title.left(title.find("("));
 
