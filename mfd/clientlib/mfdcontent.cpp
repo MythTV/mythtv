@@ -379,6 +379,7 @@ void MfdContentCollection::addNewPlaylistAbility(const QString &collection_name)
     
     UIListGenericTree *new_node = new UIListGenericTree(new_playlist_tree, QString("in %1").arg(collection_name));
     new_node->setPixmap(pixnewplaylist);
+    new_node->setInt(collection_id);
     new_node->setAttribute(1, 4);
 }
 

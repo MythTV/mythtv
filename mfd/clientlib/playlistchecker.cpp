@@ -11,7 +11,8 @@
 
 */
 
-
+#include <iostream>
+using namespace std;
 
 #include <qapplication.h>
 

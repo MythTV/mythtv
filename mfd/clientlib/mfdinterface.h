@@ -14,7 +14,6 @@
 #include <qptrlist.h>
 #include <qintdict.h>
 
-#include <mythtv/uilistbtntype.h>
 #include "mfdcontent.h"
 
 class DiscoveryThread;

@@ -43,8 +43,8 @@ to your usr/local/include/ directory.
 files). This should be included with just about any Linux distribution.
 
     You'll also need libopendaap if you want to play iTunes content. Make
-_sure_ to get the right version. Some details are in the daapclient plugin
-README.
+_sure_ to get the right version. Also, make _sure_ you read the daapclient
+plugin README for further details (./mfd/plugins/daapclient/README).
 
 INFORMATION FOR DEVELOPERS
 --------------------------
