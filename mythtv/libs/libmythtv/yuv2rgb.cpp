@@ -539,9 +539,9 @@ static void non_vec_yuv420_2vuy (uint8_t * image, uint8_t * py,
     for (y = v_size / 2; y--; )
     {
         pi1  = pi2;
-        pi2 += v_size * 2;
+        pi2 += h_size * 2;
         py1  = py2;
-        py2 += v_size;
+        py2 += h_size;
 
         for (x = h_size / 2; x--; )
         {
@@ -658,4 +658,142 @@ yuv2vuy_fun yuv2vuy_init_altivec (void)
     return altivec_yuv420_2vuy;
 #endif
     return non_vec_yuv420_2vuy; /* Fallback to C */
+}
+
+static void non_vec_2vuy_yuv420 (uint8_t * image, uint8_t * py,
+                                 uint8_t * pu, uint8_t * pv,
+                                 int h_size, int v_size,
+                                 int vuy_stride, int y_stride, int uv_stride)
+{
+    uint8_t *pi1, *pi2 = image;
+    uint8_t *py1, *py2 = py;
+
+    int x, y;
+
+    for (y = v_size / 2; y--; )
+    {
+        pi1  = pi2;
+        pi2 += h_size * 2;
+        py1  = py2;
+        py2 += h_size;
+
+        for (x = h_size / 2; x--; )
+        {
+            *(pu)++  = (*(pi1)++ +            *(pi2)++) / 2;
+            *(py1)++ =  *(pi1)++;  *(py2)++ = *(pi2)++;
+            *(pv)++  = (*(pi1)++ +            *(pi2)++) / 2;
+            *(py1)++ =  *(pi1)++;  *(py2)++ = *(pi2)++;
+        }
+
+        py1 += y_stride;
+        py2 += y_stride;
+        pu  += uv_stride;
+        pv  += uv_stride;
+        pi1 += vuy_stride;
+        pi2 += vuy_stride;
+    }
+}
+
+#ifdef USING_ALTIVEC
+// Altivec code adapted from VLC's i420_yuv2.c (thanks to Titer and Paul Jara) 
+
+#define VEC_READ_LINE(ptr, y, uv)                                           \
+    pa_vec = vec_ld(0, ptr); ptr += 16;                                     \
+    pb_vec = vec_ld(0, ptr); ptr += 16;                                     \
+    vec_st(vec_pack((vector unsigned short)pa_vec,                          \
+                    (vector unsigned short)pb_vec),                         \
+           0, y); y += 16;                                                  \
+    uv = vec_pack(vec_sr((vector unsigned short)pa_vec, eight_vec),         \
+                  vec_sr((vector unsigned short)pb_vec, eight_vec));
+
+#define VEC_SPLIT(a)                                                        \
+    VEC_READ_LINE(pi1, py1, uv1_vec);                                       \
+    VEC_READ_LINE(pi2, py2, uv2_vec);                                       \
+    a = vec_avg(uv1_vec, uv2_vec);
+
+#define VEC_STORE_UV()                                                      \
+    vec_st(vec_pack((vector unsigned short)uva_vec,                         \
+                    (vector unsigned short)uvb_vec),                        \
+           0, pv); pv += 16;                                                \
+    vec_st(vec_pack(vec_sr((vector unsigned short)uva_vec, eight_vec),      \
+                    vec_sr((vector unsigned short)uvb_vec, eight_vec)),     \
+           0, pu); pu += 16;
+
+    
+static void altivec_2vuy_yuv420 (uint8_t * image, uint8_t * py,
+                                 uint8_t * pu, uint8_t * pv,
+                                 int h_size, int v_size,
+                                 int vuy_stride, int y_stride, int uv_stride)
+{
+    uint8_t *pi1, *pi2 = image;
+    uint8_t *py1, *py2 = py;
+        
+    int x, y;
+    
+    vector unsigned short eight_vec = vec_splat_u16(8);
+    vector unsigned char pa_vec, pb_vec,
+                         uv1_vec, uv2_vec,
+                         uva_vec, uvb_vec;
+
+    if (!((h_size % 32) | (v_size % 2)))
+    {
+        // Width is a multiple of 32, process 2 lines at a time
+        for (y = v_size / 2; y--; )
+        {
+            VEC_NEXT_LINES();
+            for (x = h_size / 32; x--; )
+            {
+                VEC_SPLIT(uva_vec);
+                VEC_SPLIT(uvb_vec);
+                VEC_STORE_UV();
+            }
+        }
+    
+    }
+    else if (!((h_size % 16) | (v_size % 4)))
+    {
+        // Width is a multiple of 16, process 4 lines at a time
+        for (y = v_size / 4; y--; )
+        {
+            // Lines 1-2, pixels 0 to (width - 16)
+            VEC_NEXT_LINES();
+            for (x = h_size / 32; x--; )
+            {
+                VEC_SPLIT(uva_vec);
+                VEC_SPLIT(uvb_vec);
+                VEC_STORE_UV();
+            }
+            
+            // Lines 1-2, pixels (width - 16) to width
+            VEC_SPLIT(uva_vec);
+            
+            // Lines 3-4, pixels 0-16
+            VEC_NEXT_LINES();
+            VEC_SPLIT(uvb_vec);
+            VEC_STORE_UV();
+            
+            // Lines 3-4, pixels 16 to width
+            for (x = h_size / 32; x--; )
+            {
+                VEC_SPLIT(uva_vec);
+                VEC_SPLIT(uvb_vec);
+                VEC_STORE_UV();
+            }
+        }
+    }
+    else
+    {
+        // Fall back to C version
+        non_vec_2vuy_yuv420(image, py, pu, pv, h_size, v_size,
+                            vuy_stride, y_stride, uv_stride);
+    }
+}
+#endif
+
+vuy2yuv_fun vuy2yuv_init_altivec (void)
+{
+#ifdef USING_ALTIVEC
+    return altivec_2vuy_yuv420;
+#endif
+    return non_vec_2vuy_yuv420; /* Fallback to C */
 }
