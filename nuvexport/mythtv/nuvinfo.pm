@@ -122,8 +122,8 @@ package mythtv::nuvinfo;
         die "You need mplayer to use this script on mpeg-based nuv files.\n\n" unless ($program);
     # Set the is_mpeg flag
         $info{'is_mpeg'} = 1;
-    # Grab the info we want from mplayer
-        my $data = `$program -vo null -ao null -frames 0 -identify '$file' 2>/dev/null`;
+    # Grab the info we want from mplayer (go uber-verbose to override --really-quiet)
+        my $data = `$program -v -v -v -v -vo null -ao null -frames 0 -identify '$file' 2>/dev/null`;
         study $data;
         ($info{'video_type'})            = $data =~ m/^VIDEO:\s*(MPEG[12])/m;
         ($info{'width'})                 = $data =~ m/^ID_VIDEO_WIDTH=(\d+)/m;
@@ -135,7 +135,7 @@ package mythtv::nuvinfo;
         ($info{'mpeg_stream_type'})      = $data =~ m/^ID_VIDEO_FPS=(\d+(?:\.\d*)?)/m;
         ($info{'aspect'})                = $data =~ m/^ID_VIDEO_ASPECT=(\d+(?:\.\d*)?)/m;
         ($info{'audio_type'})            = $data =~ m/^ID_AUDIO_CODEC=(\d+(?:\.\d*)?)/m;
-        if ($data =~ m/^MPEG-(PE?S) file format detected/m) {
+        if ($data =~ m/\bMPEG-(PE?S) file format detected/m) {
             $info{'mpeg_stream_type'} = $1;
         }
         elsif ($data =~ m/^TS file format detected/m) {
@@ -143,7 +143,8 @@ package mythtv::nuvinfo;
         }
         else {
             die "Unrecognized mpeg stream type.  Please execute the following and see if you\n"
-               ."notice errors.  If not, email the output to the nuvexport author.\n\n"
+               ."notice errors (make sure that you don't have the \"really quiet\" option set\n"
+               ."in your mplayer config).  If not, email the output to the nuvexport author.\n\n"
                ."    $program -vo null -ao null -frames 0 -identify '$file'\n\n";
         }
 # ID_VIDEO_BITRATE=6500000
