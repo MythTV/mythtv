@@ -82,13 +82,21 @@ PlaybackBox::PlaybackBox(MythMainWindow *parent, QString window_name,
     
     // Figure out the shuffle mode
 
-    QString playmode = gContext->GetSetting("PlayMode");
+    QString playmode = gContext->GetSetting("PlayMode", "none");
     if (playmode.lower() == "random")
         setShuffleMode(SHUFFLE_RANDOM);
     else if (playmode.lower() == "intelligent")
         setShuffleMode(SHUFFLE_INTELLIGENT);
     else
         setShuffleMode(SHUFFLE_OFF);
+
+    QString repeatmode = gContext->GetSetting("RepeatMode", "all");
+    if (repeatmode.lower() == "track")
+        setRepeatMode(REPEAT_TRACK);
+    else if (repeatmode.lower() == "all")
+        setRepeatMode(REPEAT_ALL);
+    else
+        setRepeatMode(REPEAT_OFF);
 
     // Set some button values
     
@@ -132,8 +140,6 @@ PlaybackBox::PlaybackBox(MythMainWindow *parent, QString window_name,
             SLOT(checkForPlaylists()));
     waiting_for_playlists_timer->start(100);
 
-    setRepeatMode(REPEAT_ALL);
-    
     // Warm up the visualizer
     
     mainvisual = new MainVisual(this);
@@ -181,6 +187,20 @@ PlaybackBox::~PlaybackBox(void)
         delete volume_control;
     if (playlist_tree)
         delete playlist_tree;
+
+    if (shufflemode == SHUFFLE_INTELLIGENT)
+        gContext->SaveSetting("PlayMode", "intelligent");
+    else if (shufflemode == SHUFFLE_RANDOM)
+        gContext->SaveSetting("PlayMode", "random");
+    else
+        gContext->SaveSetting("PlayMode", "none");
+
+    if (repeatmode == REPEAT_TRACK)
+        gContext->SaveSetting("RepeatMode", "track");
+    else if (repeatmode == REPEAT_ALL)
+        gContext->SaveSetting("RepeatMode", "all");
+    else
+        gContext->SaveSetting("RepeatMode", "none");
 }
 
 void PlaybackBox::keyPressEvent(QKeyEvent *e)
