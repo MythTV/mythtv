@@ -27,7 +27,8 @@ Watching TV or a recording
 - [ to decrease volume
 - ] to increase volume
 - | to toggle mute
-- Z to skip through current commercial(s)
+- Z to skip to next program marker (beginning/ending of commercial break)
+- Q to skip back to previous program marker
 - / to jump to the next "favorite" channel
 - ? to mark/unmark the current channel as a "favorite"
 

@@ -74,7 +74,7 @@ class NuppelVideoPlayer
     void FastForward(float seconds);
     void Rewind(float seconds);
 
-    void SkipCommercials(void);
+    void SkipCommercials(int direction);
 
     void ResetPlaying(void) { resetplaying = true; actuallyreset = false; }
     bool ResetYet(void) { return actuallyreset; }
@@ -100,8 +100,7 @@ class NuppelVideoPlayer
 
     void ReencodeFile(char *inputname, char *outputname);
 
-//Kulagowski
-    void FindCommercial(char *inputname);
+    int FlagCommercials(int show_percentage = false);
 
     unsigned char *GetCurrentFrame(int &w, int &h);
 
@@ -170,12 +169,14 @@ class NuppelVideoPlayer
     bool DoRewind();
    
     void ClearAfterSeek(); // caller should not hold any locks
-   
+
+    int GetStatusbarPos(void);
+
     bool FrameIsBlank(int vposition);
     bool LastFrameIsBlank(void) { return FrameIsBlank(vpos); }
     int SkipTooCloseToEnd(int frames);
     void SkipCommercialsByBlanks(void);
-    bool DoSkipCommercials(void);
+    bool DoSkipCommercials(int direction);
     void AutoCommercialSkip(void);
 
     void JumpToFrame(long long frame);
@@ -408,6 +409,7 @@ class NuppelVideoPlayer
     int skipcommercials;
     int autocommercialskip;
     int commercialskipmethod;
+    int commercialskipeverywhere;
 };
 
 #endif

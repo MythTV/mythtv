@@ -94,11 +94,10 @@ class TVRec
  protected:
     void RunTV(void);
     static void *EventThread(void *param);
+    static void *FlagCommercialsThread(void *param);
 
     void DoReadThread(void);
     static void *ReadThread(void *param);
-
-    void FlagBlankFrames();
 
  private:
     void SetChannel(bool needopen = false);
@@ -124,6 +123,8 @@ class TVRec
     TVState RemovePlaying(TVState state);
     TVState RemoveRecording(TVState state);
 
+    void FlagCommercials(void);
+
     void WriteRecordedRecord();
 
     NuppelVideoRecorder *nvr;
@@ -138,11 +139,12 @@ class TVRec
     bool runMainLoop;
     bool exitPlayer;
     bool paused;
+    bool prematurelystopped;
     QDateTime recordEndTime;
 
     float frameRate;
 
-    pthread_t event, encode, readthread;
+    pthread_t event, encode, readthread, commercials;
 
     bool changeState;
     TVState nextState;
@@ -151,6 +153,7 @@ class TVRec
     bool watchingLiveTV;
 
     ProgramInfo *curRecording;
+    ProgramInfo *prevRecording;
     int tvtorecording;
     
     QString videodev, vbidev, audiodev;
@@ -162,6 +165,7 @@ class TVRec
     long long readrequest;
     QSocket *readthreadSock;
     bool readthreadlive;
+    bool flagthreadstarted;
     pthread_mutex_t readthreadLock;
 
     int m_capturecardnum;

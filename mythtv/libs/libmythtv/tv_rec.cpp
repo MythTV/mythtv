@@ -88,6 +88,7 @@ void TVRec::Init(void)
         usleep(50);
 
     curRecording = NULL;
+    prevRecording = NULL;
     tvtorecording = 1;
 }
 
@@ -147,6 +148,7 @@ void TVRec::StopRecording(void)
     {
         nextState = RemoveRecording(internalState);
         changeState = true;
+        prematurelystopped = true;
     }
 }
 
@@ -377,6 +379,8 @@ void TVRec::HandleStateChange(void)
 
         RecordingProfile profile;
 
+        prematurelystopped = false;
+
         if (!profile.loadByName(db_conn, gContext->GetHostName()))
         {
             if (curRecording) 
@@ -480,7 +484,18 @@ void TVRec::SetupRecorder(RecordingProfile& profile)
 
 void TVRec::TeardownRecorder(bool killFile)
 {
+    QMap<long long, int> blank_frame_map;
+    QMap<long long, int> comm_breaks;
+
     int filelen = -1;
+
+    if (prevRecording)
+        delete prevRecording;
+
+    if (curRecording)
+        prevRecording = new ProgramInfo(*curRecording);
+    else
+        prevRecording = NULL;
 
     ispip = false;
 
@@ -495,8 +510,8 @@ void TVRec::TeardownRecorder(bool killFile)
 
         nvr->StopRecording();
 
-        if (curRecording && !killFile)
-            FlagBlankFrames();
+        if (prevRecording && !killFile)
+            nvr->GetBlankFrameMap(blank_frame_map);
 
         pthread_join(encode, NULL);
         delete nvr;
@@ -529,6 +544,24 @@ void TVRec::TeardownRecorder(bool killFile)
 
         MythEvent me("RECORDING_LIST_CHANGE");
         gContext->dispatch(me);
+    }
+
+    if ((prevRecording) && (!killFile))
+    {
+        prevRecording->SetBlankFrameList(blank_frame_map, db_conn);
+
+        if ((!prematurelystopped) &&
+            (gContext->GetNumSetting("AutoCommercialFlag", 0)))
+        {
+            flagthreadstarted = false;
+            pthread_create(&commercials, NULL, FlagCommercialsThread, this);
+
+            while (!flagthreadstarted)
+                usleep(50);
+        }
+
+        delete prevRecording;
+        prevRecording = NULL;
     }
 }    
 
@@ -595,6 +628,14 @@ void *TVRec::EventThread(void *param)
 {
     TVRec *thetv = (TVRec *)param;
     thetv->RunTV();
+
+    return NULL;
+}
+
+void *TVRec::FlagCommercialsThread(void *param)
+{
+    TVRec *thetv = (TVRec *)param;
+    thetv->FlagCommercials();
 
     return NULL;
 }
@@ -1586,26 +1627,27 @@ void *TVRec::ReadThread(void *param)
     return NULL;
 }
 
-void TVRec::FlagBlankFrames()
+void TVRec::FlagCommercials(void)
 {
-    QMap<long long, int> blank_frame_map;
-    QMap<long long, int> comm_breaks;
-    int skipMethod = gContext->GetNumSetting("CommercialSkipMethod");
+    ProgramInfo *program_info = new ProgramInfo(*prevRecording);
 
-    nvr->GetBlankFrameMap(blank_frame_map);
-    curRecording->SetBlankFrameList(blank_frame_map, db_conn);
+    flagthreadstarted = true;
 
-    if (!gContext->GetNumSetting("AutoCommercialFlag"))
-        return;
+    nice(19);
 
-    // this only takes a couple seconds to do so rather than
-    // post-processing if user detects commercials on blanks we do it here.
-    if (skipMethod == COMMERCIAL_SKIP_BLANKS)
-    {
-        BuildCommListFromBlanks(blank_frame_map, nvr->GetFrameRate(),
-            comm_breaks);
-        curRecording->SetCommBreakList(comm_breaks, db_conn);
-    }
+    QString filename = program_info->GetRecordFilename(
+                                gContext->GetSetting("RecordFilePrefix"));
+
+    RingBuffer *tmprbuf = new RingBuffer(filename, false);
+
+    NuppelVideoPlayer *nvp = new NuppelVideoPlayer(db_conn, program_info);
+    nvp->SetRingBuffer(tmprbuf);
+
+    nvp->FlagCommercials();
+
+    delete nvp;
+    delete tmprbuf;
+    delete program_info;
 }
 
 void TVRec::RetrieveInputChannels(map<int, QString> &inputChannel,

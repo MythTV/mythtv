@@ -275,6 +275,54 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(QString channel, QDateTime &dtime
     return GetProgramAtDateTime(channel, sqltime);
 }
 
+ProgramInfo *ProgramInfo::GetProgramFromRecorded(QString channel, QString starttime)
+{
+    QSqlQuery query;
+    QString thequery;
+   
+    thequery = QString("SELECT recorded.chanid,starttime,endtime,title,subtitle,"
+                       "description,channel.channum,channel.callsign, "
+                       "channel.name FROM recorded,channel WHERE "
+                       "recorded.chanid = %1 AND starttime = %2 AND "
+                       "recorded.chanid = channel.chanid;")
+                       .arg(channel).arg(starttime);
+
+    query.exec(thequery);
+
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+
+        ProgramInfo *proginfo = new ProgramInfo;
+        proginfo->chanid = query.value(0).toString();
+        proginfo->startts = QDateTime::fromString(query.value(1).toString(),
+                                                  Qt::ISODate);
+        proginfo->endts = QDateTime::fromString(query.value(2).toString(),
+                                                Qt::ISODate);
+        proginfo->title = QString::fromUtf8(query.value(3).toString());
+        proginfo->subtitle = QString::fromUtf8(query.value(4).toString());
+        proginfo->description = QString::fromUtf8(query.value(5).toString());
+        proginfo->chanstr = query.value(6).toString();
+        proginfo->chansign = query.value(7).toString();
+        proginfo->channame = query.value(8).toString();
+        proginfo->spread = -1;
+
+        if (proginfo->title == QString::null)
+            proginfo->title = "";
+        if (proginfo->subtitle == QString::null)
+            proginfo->subtitle = "";
+        if (proginfo->description == QString::null)
+            proginfo->description = "";
+        if (proginfo->category == QString::null)
+            proginfo->category = "";
+
+        return proginfo;
+    }
+
+    return NULL;
+}
+
+
 // -1 for no data, 0 for no, 1 for weekdaily, 2 for weekly.
 int ProgramInfo::IsProgramRecurring(void)
 {
@@ -672,7 +720,24 @@ void ProgramInfo::SetCommBreakList(QMap<long long, int> &frames,
     QString starts = startts.toString("yyyyMMddhhmm");
     starts += "00";
 
-    QString querystr = QString("DELETE FROM recordedmarkup "
+    QString querystr;
+
+    // check to make sure the show still exists before saving markups
+    querystr = QString("SELECT starttime FROM recorded "
+                               "WHERE chanid = '%1' AND starttime = '%2'"
+                               ).arg(chanid).arg(starts);
+
+    QSqlQuery check_query = db->exec(querystr);
+    if (!check_query.isActive())
+        MythContext::DBError("Check recorded program before writing markups",
+            querystr);
+
+    if (check_query.isActive())
+        if ((check_query.numRowsAffected() == 0) ||
+            (!check_query.next()))
+            return;
+
+    querystr = QString("DELETE FROM recordedmarkup "
                                "WHERE chanid = '%1' AND starttime = '%2' "
                                "AND (type = %3 OR type = %4);"
                                ).arg(chanid).arg(starts)

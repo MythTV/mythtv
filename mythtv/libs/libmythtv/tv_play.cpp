@@ -803,7 +803,14 @@ void TV::ProcessKeypress(int keypressed)
         {
             doing_ff = false;
             doing_rew = false;
-            DoSkipCommercials();
+            DoSkipCommercials(1);
+            break;
+        }
+        case 'q': case 'Q':
+        {
+            doing_ff = false;
+            doing_rew = false;
+            DoSkipCommercials(-1);
             break;
         }
         case 's': case 'S': case 'p': case 'P': 
@@ -1264,7 +1271,7 @@ void TV::DoJumpBack(void)
     activenvp->Rewind(jumptime * 60);
 }
 
-void TV::DoSkipCommercials()
+void TV::DoSkipCommercials(int direction)
 {
     bool slidertype = false;
     if (internalState == kState_WatchingLiveTV)
@@ -1278,7 +1285,7 @@ void TV::DoSkipCommercials()
         osd->StartPause(pos, slidertype, "SKIP", desc, 6);
     }
 
-    activenvp->SkipCommercials();
+    activenvp->SkipCommercials(direction);
 }
 
 void TV::ToggleInputs(void)

@@ -55,40 +55,46 @@ bool CheckFrameIsBlank(unsigned char *buf, int width, int height)
 void BuildCommListFromBlanks(QMap<long long, int> &blanks, double fps,
          QMap<long long, int> &commMap)
 {
-	long long bframes[10240];
-	long long c_start[512];
-	long long c_end[512];
-	int frames = 0;
-	int commercials = 0;
-	int i, x;
+    long long bframes[10240];
+    long long c_start[512];
+    long long c_end[512];
+    int frames = 0;
+    int commercials = 0;
+    int i, x;
     QMap<long long, int>::Iterator it;
 
     for (it = blanks.begin(); it != blanks.end(); ++it)
-		bframes[frames++] = it.key();
+        bframes[frames++] = it.key();
 
-	if (frames == 0)
-		return;
+    if (frames == 0)
+        return;
 
-	for(i=0, x=0; i < frames; i++ )
-	{
-		if ((( bframes[i] - bframes[i-1] ) == 1 ) ||
-			(( bframes[i] - bframes[i-1] ) > (10 * fps)))
-		{
-			bframes[x++] = bframes[i];
-		}
-	}
-	frames = x;
-
-    for(i = 1; i < frames; i++ )
+    for(i=0, x=0; i < frames; i++ )
     {
-        for(x=i; x < frames; x++ )
+        if ((( bframes[i] - bframes[i-1] ) == 1 ) ||
+            (( bframes[i] - bframes[i-1] ) > (10 * fps)))
         {
-            /* check 15, 20, 30, and 60 second spots */
-			int gap_length = bframes[x] - bframes[i];
+            bframes[x++] = bframes[i];
+        }
+    }
+    frames = x;
+
+    for(i = 0; i < frames; i++ )
+    {
+        for(x=i+1; x < frames; x++ )
+        {
+            // check for various length spots since some channels don't
+            // have blanks inbetween commercials just at the beginning and
+            // end of breaks
+            int gap_length = bframes[x] - bframes[i];
             if ((abs((int)(gap_length - (15 * fps))) < 10 ) ||
                 (abs((int)(gap_length - (20 * fps))) < 10 ) ||
                 (abs((int)(gap_length - (30 * fps))) < 10 ) ||
-                (abs((int)(gap_length - (60 * fps))) < 10 ))
+                (abs((int)(gap_length - (60 * fps))) < 10 ) ||
+                (abs((int)(gap_length - (90 * fps))) < 20 ) ||
+                (abs((int)(gap_length - (120 * fps))) < 30 ) ||
+                (abs((int)(gap_length - (150 * fps))) < 35 ) ||
+                (abs((int)(gap_length - (180 * fps))) < 40 ))
             {
                 c_start[commercials] = bframes[i];
                 c_end[commercials] = bframes[x];
@@ -102,32 +108,32 @@ void BuildCommListFromBlanks(QMap<long long, int> &blanks, double fps,
 
     for(i = 0; i < (commercials-1); i++ )
     {
-		long long int r = c_start[i];
-		for(x=0; x<frames; x++ )
-			if (bframes[x] == r)
-				break;
-		while((x>0) && ((bframes[x]-1) == bframes[x-1]))
-		{
-			r--;
-			x--;
-		}
+        long long int r = c_start[i];
+        for(x=0; x<frames; x++ )
+            if (bframes[x] == r)
+                break;
+        while((x>0) && ((bframes[x]-1) == bframes[x-1]))
+        {
+            r--;
+            x--;
+        }
 
-		commMap[r] = MARK_COMM_START;
+        commMap[r] = MARK_COMM_START;
         while((( c_end[i] == c_start[i+1] ) ||
                (( c_end[i] + 450 ) > c_start[i+1] )) &&
               ( i < (commercials-1)))
             i++;
 
-		r = c_end[i];
-		for(x=0; x<frames; x++ )
-			if (bframes[x] == r)
-				break;
-		while((bframes[x] + 1 ) == bframes[x+1])
-		{
-			r++;
-			x++;
-		}
-		commMap[r] = MARK_COMM_END;
+        r = c_end[i];
+        for(x=0; x<frames; x++ )
+            if (bframes[x] == r)
+                break;
+        while((bframes[x] + 1 ) == bframes[x+1])
+        {
+            r++;
+            x++;
+        }
+        commMap[r] = MARK_COMM_END;
     }
 }
 

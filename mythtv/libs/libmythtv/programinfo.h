@@ -60,6 +60,7 @@ class ProgramInfo
                                         const QString &ltime, const QString &rtime);
     static ProgramInfo *GetProgramAtDateTime(QString channel, const QString &time);
     static ProgramInfo *GetProgramAtDateTime(QString channel, QDateTime &dtime);
+    static ProgramInfo *GetProgramFromRecorded(QString channel, QString starttime);
 
     QString title;
     QString subtitle;
