@@ -5,7 +5,7 @@ using namespace std;
 
 #include "videoscan.h"
 #include "metadata.h"
-#include "mythcontext.h"
+#include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythdialogs.h>
 
