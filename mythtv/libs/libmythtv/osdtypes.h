@@ -161,6 +161,9 @@ class OSDTypeText : public OSDType
     void SetScrolling(int x, int y) { m_scroller = true; m_scrollx = x;
                                       m_scrolly = y; }
 
+    void SetLineSpacing(float linespacing) { m_linespacing = linespacing; }
+    float GetLineSpacing() { return m_linespacing; }
+
     QRect DisplayArea() { return m_displaysize; }
 
     void Draw(OSDSurface *surface, int fade, int maxfade, int xoff, int yoff);
@@ -195,6 +198,8 @@ class OSDTypeText : public OSDType
     int m_scrollposy;
 
     bool m_scrollinit;
+
+    float m_linespacing;
 };
     
 class OSDTypeImage : public OSDType

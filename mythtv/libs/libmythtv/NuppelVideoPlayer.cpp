@@ -496,15 +496,17 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 
 void NuppelVideoPlayer::InitFilters(void)
 {
-    VideoFrameType tmp = FMT_YV12;
+    VideoFrameType itmp = FMT_YV12;
+    VideoFrameType otmp = FMT_YV12;
+    int btmp;
 
     if (videoFilters)
         delete videoFilters;
 
     postfilt_width = video_width;
     postfilt_height = video_height;
-    videoFilters = FiltMan->LoadFilters(videoFilterList, tmp, tmp, 
-                                        postfilt_width, postfilt_height);
+    videoFilters = FiltMan->LoadFilters(videoFilterList, itmp, otmp, 
+                                        postfilt_width, postfilt_height, btmp);
 }
 
 int NuppelVideoPlayer::tbuffer_numvalid(void)

@@ -116,7 +116,7 @@ void FilterManager::LoadFilterLib(QString Path)
 FilterChain *FilterManager::LoadFilters(QString Filters, 
                                         VideoFrameType &inpixfmt,
                                         VideoFrameType &outpixfmt, int &width,
-                                        int &height)
+                                        int &height, int &bufsize)
 {
     QPtrList<FilterInfo> FiltInfoChain;
     FilterChain *FiltChain = new FilterChain;
@@ -130,6 +130,8 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
     FmtConv *FC;
     VideoFrameType ofmt;
     unsigned int i;
+    int nbufsize;
+    int cbufsize;
     int postfilt_width = width;
     int postfilt_height = height;
     FmtList.setAutoDelete(TRUE);
@@ -142,21 +144,28 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         QString FiltOpts = (*i).section('=', 1);
         FI = GetFilterInfoByName(FiltName);
 
-        if (FI != NULL)
+        if (FI)
         {
             FiltInfoChain.append(FI);
             OptsList.append(FiltOpts);
         }
         else
-            return NULL;
+        {
+            FiltInfoChain.clear();
+            break;
+        }
     }
-    if (FiltInfoChain.count() == 0)
-        return NULL;
-
-    if (inpixfmt == -1)
-        inpixfmt = FiltInfoChain.first()->formats[0].in;
-    if (outpixfmt == -1)
-        outpixfmt = FiltInfoChain.last()->formats[0].out;
+    if (FiltInfoChain.count())
+    {
+        if (inpixfmt == -1)
+            inpixfmt = FiltInfoChain.first()->formats[0].in;
+        if (outpixfmt == -1)
+            outpixfmt = FiltInfoChain.last()->formats[0].out;
+    }
+    else if (inpixfmt == -1)
+        inpixfmt = outpixfmt;
+    else if (outpixfmt == -1)
+        outpixfmt = inpixfmt;
     ofmt = outpixfmt;
 
     i = FiltInfoChain.count();
@@ -165,10 +174,10 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         i--;
         FI = FiltInfoChain.at(i);
         Opts = OptsList.at(i);
-        if (FiltInfoChain.count() == 0)
+        if (!i)
         {
             for (FC = FI->formats;
-                 FC->in != -1 && FC->out != ofmt && FC->in != inpixfmt; FC++)
+                 FC->in != -1 && (FC->out != ofmt || FC->in != inpixfmt); FC++)
                 ;
 
             if (FC->in == -1)
@@ -188,6 +197,11 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
 
         if (FC->out != ofmt)
         {
+            if (!Convert)
+            {
+                FiltInfoChain.clear();
+                break;
+            }
             FiltInfoChain.insert(i + 1, Convert);
             OptsList.insert(i + 1, QString ());
             FmtList.insert(0, new FmtConv);
@@ -197,7 +211,10 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
                 FmtList.first()->out = ofmt;
             }
             else
-                return NULL;
+            {
+                FiltInfoChain.clear();
+                break;
+            }
         }
         FmtList.insert(0, new FmtConv);
         if (FmtList.first())
@@ -206,48 +223,98 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
             FmtList.first()->out = FC->out;
         }
         else
-            return NULL;
+        {
+            FiltInfoChain.clear();
+            break;
+        }
 
         ofmt = FC->in;
     }
 
     if (ofmt != inpixfmt)
     {
-        FiltInfoChain.insert(0, Convert);
-        OptsList.insert(0, QString());
-        FmtList.insert(0, new FmtConv);
-        if (FmtList.first())
-        {
-            FmtList.first()->in = inpixfmt;
-            FmtList.first()->out = ofmt;
-        }
+        if (!Convert)
+            FiltInfoChain.clear();
         else
-            delete FiltChain;
-
-        return NULL;
+        {
+            FiltInfoChain.insert(0, Convert);
+            OptsList.insert(0, QString());
+            FmtList.insert(0, new FmtConv);
+            if (FmtList.first())
+            {
+                FmtList.first()->in = inpixfmt;
+                FmtList.first()->out = ofmt;
+            }
+            else
+                FiltInfoChain.clear();
+        }
     }
 
-    if (!FiltInfoChain.count())
-        return NULL;
+    switch (inpixfmt)
+    {
+        case FMT_YV12:
+            bufsize = postfilt_width * postfilt_height * 3 / 2;
+            break;
+        case FMT_YUV422P:
+            bufsize = postfilt_width * postfilt_height * 2;
+            break;
+        case FMT_RGB24:
+            bufsize = postfilt_width * postfilt_height * 3;
+            break;
+        case FMT_ARGB32:
+            bufsize = postfilt_width * postfilt_height * 4;
+            break;
+        default:
+            bufsize = 0;
+    }
+    nbufsize = bufsize;
 
+    if (!FiltInfoChain.count())
+    {
+        delete FiltChain;
+        FiltChain = NULL;
+    }
+    
     for (i = 0; i < FiltInfoChain.count(); i++)
     {
-        if (FiltInfoChain.at(i) == NULL)
-        {
-            return NULL;
-        }
         NewFilt = LoadFilter(FiltInfoChain.at(i), FmtList.at(i)->in,
                              FmtList.at(i)->out, postfilt_width, 
                              postfilt_height, OptsList.at(i));
+
+        switch (inpixfmt)
+        {
+            case FMT_YV12:
+                cbufsize = postfilt_width * postfilt_height * 3 / 2;
+                break;
+            case FMT_YUV422P:
+                cbufsize = postfilt_width * postfilt_height * 2;
+                break;
+            case FMT_RGB24:
+                cbufsize = postfilt_width * postfilt_height * 3;
+                break;
+            case FMT_ARGB32:
+                cbufsize = postfilt_width * postfilt_height * 4;
+                break;
+            default:
+                cbufsize = 0;
+        }
+
+        if (cbufsize > nbufsize)
+            nbufsize = cbufsize;
 
         if (NewFilt)
             FiltChain->append(NewFilt);
         else
         {
             delete FiltChain;
+            FiltChain = NULL;
+            break;
         }
     }
 
+    if(!FiltChain)
+        return NULL;
+    nbufsize = cbufsize;
     width = postfilt_width;
     height = postfilt_height;
     return FiltChain;

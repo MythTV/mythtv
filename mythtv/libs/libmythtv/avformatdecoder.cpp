@@ -62,7 +62,8 @@ AvFormatDecoder::~AvFormatDecoder()
         for (int i = 0; i < ic->nb_streams; i++) 
         {
             AVStream *st = ic->streams[i];
-            avcodec_close(&st->codec);
+            if (st->codec.codec)
+                avcodec_close(&st->codec);
         } 
 
         ic->iformat->flags |= AVFMT_NOFILE;
@@ -88,7 +89,8 @@ void AvFormatDecoder::SeekReset(void)
     for (int i = 0; i < ic->nb_streams; i++)
     {
         AVCodecContext *enc = &ic->streams[i]->codec;
-        avcodec_flush_buffers(enc);
+        if (enc->codec)
+            avcodec_flush_buffers(enc);
     }
 
     VideoFrame *buffer;
@@ -998,6 +1000,13 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
             {
                 MpegPreProcessPkt(curstream, pkt);
             }
+        }
+
+        if (!curstream->codec.codec)
+        {
+            cerr << "no codec for stream index " << pkt->stream_index << endl;
+            av_free_packet(pkt);
+            continue;
         }
  
         firstloop = true;

@@ -5,4 +5,4 @@
 TEMPLATE = subdirs
 
 # Directories
-SUBDIRS += invert linearblend denoise3d quickdnr postprocess
+SUBDIRS += invert linearblend denoise3d quickdnr postprocess kerneldeint crop

@@ -601,6 +601,7 @@ int NuppelVideoRecorder::MJPEGInit(void)
 
 void NuppelVideoRecorder::InitFilters(void)
 {
+    int btmp;
     if (videoFilters)
         delete videoFilters;
 
@@ -608,7 +609,12 @@ void NuppelVideoRecorder::InitFilters(void)
     h_out = h;
     VideoFrameType tmp = FMT_YV12;
     videoFilters = FiltMan->LoadFilters(videoFilterList, inpixfmt, tmp, 
-                                        w_out, h_out);
+                                        w_out, h_out, btmp);
+    if (video_buffer_size && btmp != video_buffer_size)
+    {
+        video_buffer_size = btmp;
+        ResizeVideoBuffers();
+    }
 }
 
 void NuppelVideoRecorder::InitBuffers(void)
@@ -616,10 +622,13 @@ void NuppelVideoRecorder::InitBuffers(void)
     int videomegs;
     int audiomegs = 2;
 
-    if (picture_format == PIX_FMT_YUV422P)
-        video_buffer_size = w_out * h_out * 2;
-    else
-        video_buffer_size = w_out * h_out * 3 / 2;
+    if (!video_buffer_size)
+    {
+        if (picture_format == PIX_FMT_YUV422P)
+            video_buffer_size = w_out * h_out * 2;
+        else
+            video_buffer_size = w_out * h_out * 3 / 2;
+    }
 
     if (w >= 480 || h > 288)
         videomegs = 20;
@@ -670,6 +679,15 @@ void NuppelVideoRecorder::InitBuffers(void)
     }
 }
 
+void NuppelVideoRecorder::ResizeVideoBuffers(void)
+{
+    for (unsigned int i = 0; i < videobuffer.size(); i++)
+    {
+        delete [] (videobuffer.at(i)->buffer);
+        videobuffer.at(i)->buffer = new unsigned char[video_buffer_size];
+    }
+}
+
 void NuppelVideoRecorder::StopRecording(void)
 {
     encoding = false;
@@ -688,8 +706,6 @@ void NuppelVideoRecorder::StartRecording(void)
         return;
     }
 
-    inpixfmt = FMT_YV12;
-    InitFilters();
     StreamAllocate();
     positionMap.clear();
 
@@ -788,6 +804,8 @@ void NuppelVideoRecorder::StartRecording(void)
             return;
         }
      
+        inpixfmt = FMT_NONE;
+        InitFilters();
         DoV4L2();
         return;
     }
@@ -820,6 +838,9 @@ void NuppelVideoRecorder::StartRecording(void)
         DoMJPEG();
         return;
     }
+
+    inpixfmt = FMT_NONE;
+    InitFilters();
 
     if (ioctl(fd, VIDIOCGMBUF, &vm) < 0)
     {

@@ -6,6 +6,7 @@
 #include <qurl.h>
 #include <qthread.h>
 #include <qwaitcondition.h>
+#include <qregexp.h>
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -2406,6 +2407,22 @@ void MainServer::PrintStatus(QSocket *socket)
           << " that " << (iNum == 1 ? "is" : "are") 
           << " scheduled for recording:<BR>\r\n";
 
+       os << "<Script language=JavaScript>";
+       os << "function dispDesc(i) {\r\n";
+       os << "wnd=window.open(\"\", \"\",\"width=250 height=180\");";
+       os << "wnd.document.write(\"<font face=arial size=+1><b>\");";
+       os << "wnd.document.write("
+          << "document.forms['Desc'].elements['title_' + i].value);";
+       os << "wnd.document.write(\"</b></font><br><br>\");";
+       os << "wnd.document.write(\"<font face=helvetica size=-1>\");";
+       os << "wnd.document.write("
+          << "document.forms['Desc'].elements['desc_' + i].value);";
+       os << "wnd.document.write(\"</font>\");";
+       os << "}";
+       os << "</script>";
+
+       os << "<form name=\"Desc\">\r\n";
+
        os << "<TABLE BORDER WIDTH=80%>\r\n"; 
        os << "<TR><TH>Start Time</TH><TH>Show</TH><TH>Encoder</TH></TR>\r\n";
        list<ProgramInfo *>::iterator iter = recordingList.begin();
@@ -2419,15 +2436,25 @@ void MainServer::PrintStatus(QSocket *socket)
            }
            else
            {
+               QString qstrTitle = ((*iter)->title).replace(QRegExp("\""), 
+                                                            "&quot;");
+               QString qstrDescription = ((*iter)->description).replace(
+                                                     QRegExp("\""), "&quot;");
                os << "<TR " << ((i % 2 == 0) ? "BGCOLOR=EEEEEE" : "") << ">" 
                   << "<TD>" << ((*iter)->recstartts).toString(shortdateformat) 
                   << " " << ((*iter)->recstartts).toString(timeformat) << "</TD>" 
-                  << "<TD>" << (*iter)->title << "</TD>"
+                  << "<TD><input type=\"hidden\" name=\"desc_" << i << "\""
+                  << "value=\"" << qstrDescription << "\">"
+                  << "<input type=\"hidden\" name=\"title_" << i << "\""
+                  << "value=\"" << qstrTitle << "\">"
+                  << "<a href=\"javascript:dispDesc('" << i << "')\">"
+                  << (*iter)->title << "</a></TD>"
                   << "<TD>" << (*iter)->cardid << "</TD></TR>\r\n";
            }
        }
        os << "</TABLE>";
-    }
+       os << "</form>";
+   }
 
     os << "<P>Machine Information:\r\n";
     os << "<TABLE WIDTH =100% BGCOLOR=EEEEEE>";

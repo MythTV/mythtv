@@ -37,7 +37,7 @@ class FilterManager
 
     FilterChain *LoadFilters(QString filters, VideoFrameType &inpixfmt,
                              VideoFrameType &outpixfmt, int &width,
-                             int &height);
+                             int &height, int &bufsize);
 
     FilterInfo *GetFilterInfoByName(QString name)
     {

@@ -426,6 +426,8 @@ OSDTypeText::OSDTypeText(const QString &name, TTFFont *font,
     m_scroller = false;
     m_scrollx = m_scrolly = 0;
     m_scrollinit = false;
+
+    m_linespacing = 1.5;
 }
 
 OSDTypeText::OSDTypeText(const OSDTypeText &other)
@@ -443,6 +445,7 @@ OSDTypeText::OSDTypeText(const OSDTypeText &other)
     m_scroller = other.m_scroller;
     m_scrollx = other.m_scrollx;
     m_scrolly = other.m_scrolly;
+    m_linespacing = other.m_linespacing;
 }
 
 OSDTypeText::~OSDTypeText()
@@ -531,8 +534,8 @@ void OSDTypeText::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
                 (word == "\n"))
             {
                 QRect drawrect = m_displaysize;
-                drawrect.setTop(m_displaysize.top() + 
-                                m_font->Size() * (lines) * 3 / 2);
+                drawrect.setTop((int)(m_displaysize.top() + m_font->Size() * 
+                                      (lines) * m_linespacing));
                 DrawString(surface, drawrect, line, fade, maxfade, xoff, yoff);
                 length = 0;
 
@@ -559,7 +562,8 @@ void OSDTypeText::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
         }
 
         QRect drawrect = m_displaysize;
-        drawrect.setTop(m_displaysize.top() + m_font->Size() * (lines) * 3 / 2);
+        drawrect.setTop((int)(m_displaysize.top() + m_font->Size() * (lines) *
+                              m_linespacing));
         DrawString(surface, drawrect, line, fade, maxfade, xoff, yoff);
     }           
     else if (m_scroller)

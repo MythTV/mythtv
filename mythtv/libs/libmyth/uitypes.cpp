@@ -351,13 +351,13 @@ void UIBarType::LoadImage(int loc, QString myFile)
         int doY = 0;
         if (m_orientation == 1)
         {
-            doX = (int)((m_displaysize.width() / m_size) * m_wmult);
-            doY = (int)(m_displaysize.height() * m_hmult);
+            doX = m_displaysize.width() / m_size;
+            doY = m_displaysize.height();
         }
         else if (m_orientation == 2)
         {
-            doX = (int)(m_displaysize.width() * m_wmult);
-            doY = (int)((m_displaysize.height() / m_size) * m_hmult);
+            doX = m_displaysize.width();
+            doY = m_displaysize.height() / m_size;
         }
         if (loc != -1)
         {

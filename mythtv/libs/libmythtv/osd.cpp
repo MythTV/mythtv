@@ -460,6 +460,7 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
     bool scroller = false;
     int scrollx = 0;
     int scrolly = 0;
+    float linespacing = 1.5;
 
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
@@ -505,6 +506,10 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
                 if (getFirstText(info).lower() == "yes")
                     scroller = true;
             }
+            else if (info.tagName() == "linespacing")
+            {
+                linespacing = getFirstText(info).toFloat();
+            }
             else if (info.tagName() == "scrollmovement")
             {
                 QPoint pos = parsePoint(getFirstText(info));
@@ -533,6 +538,7 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
     container->AddType(text);
 
     text->SetMultiLine(multiline);
+    text->SetLineSpacing(linespacing);
 
     if (altfont != "")
     {
