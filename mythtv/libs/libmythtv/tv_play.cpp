@@ -351,8 +351,8 @@ bool TV::Init(bool createWindow)
         }
         else if (fullscreen) 
         {
-            mainWindow->setGeometry(0, 0, width, height);
-            mainWindow->setFixedSize(QSize(width, height));
+            myWindow->setGeometry(0, 0, width, height);
+            myWindow->setFixedSize(QSize(width, height));
         }
 
         myWindow->show();
