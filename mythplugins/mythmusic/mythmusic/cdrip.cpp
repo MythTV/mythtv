@@ -163,6 +163,8 @@ Ripper::Ripper(MythContext *context, QSqlDatabase *ldb, QWidget *parent,
     bigvb = new QVBoxLayout(this, 0);
 
     firstdiag = new QFrame(this);
+    firstdiag->setPalette(palette());
+    firstdiag->setFont(font());
     bigvb->addWidget(firstdiag, 1);
 
     QVBoxLayout *vbox = new QVBoxLayout(firstdiag, (int)(24 * wmult));

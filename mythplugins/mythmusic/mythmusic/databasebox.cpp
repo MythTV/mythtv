@@ -4,6 +4,7 @@
 #include <qsqldatabase.h>
 #include <qcursor.h>
 #include <qstringlist.h>
+#include <qheader.h>
 #include <qpixmap.h>
 
 #include "metadata.h"
@@ -46,6 +47,12 @@ DatabaseBox::DatabaseBox(MythContext *context, QSqlDatabase *ldb,
     listview->setAllColumnsShowFocus(true);
     listview->setColumnWidth(0, (int)(730 * wmult));
     listview->setColumnWidthMode(0, QListView::Manual);
+
+    listview->viewport()->setPalette(palette());
+    listview->horizontalScrollBar()->setPalette(palette());
+    listview->verticalScrollBar()->setPalette(palette());
+    listview->header()->setPalette(palette());
+    listview->header()->setFont(font());
 
     connect(listview, SIGNAL(returnPressed(QListViewItem *)), this,
             SLOT(selected(QListViewItem *)));

@@ -12,6 +12,10 @@
 #include <qslider.h>
 #include <qstyle.h>
 #include <qimage.h>
+#include <qheader.h>
+
+#include <iostream>
+using namespace std;
 
 #include "scrolllabel.h"
 #include "metadata.h"
@@ -25,6 +29,7 @@
 #include "mainvisual.h"
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythwidgets.h>
 
 #include "res/nextfile.xpm"
 #include "res/next.xpm"
@@ -33,49 +38,6 @@
 #include "res/prevfile.xpm"
 #include "res/prev.xpm"
 #include "res/stop.xpm"
-
-class MyButton : public QToolButton
-{   
-  public:
-    MyButton(QWidget *parent) : QToolButton(parent) 
-                { setFocusPolicy(StrongFocus); } 
-    
-    void drawButton(QPainter *p);
-};  
-
-
-void MyButton::drawButton( QPainter * p )
-{
-    QStyle::SCFlags controls = QStyle::SC_ToolButton;
-    QStyle::SCFlags active = QStyle::SC_None;
-
-    if (isDown())
-        active |= QStyle::SC_ToolButton;
-
-    QStyle::SFlags flags = QStyle::Style_Default;
-    if (isEnabled())
-        flags |= QStyle::Style_Enabled;
-    if (hasFocus())
-        flags |= QStyle::Style_MouseOver;
-    if (isDown())
-        flags |= QStyle::Style_Down;
-    if (isOn())
-        flags |= QStyle::Style_On;
-    if (!autoRaise()) {
-        flags |= QStyle::Style_AutoRaise;
-        if (uses3D()) {
-            flags |= QStyle::Style_MouseOver;
-            if (! isOn() && ! isDown())
-                flags |= QStyle::Style_Raised;
-        }
-    } else if (! isOn() && ! isDown())
-        flags |= QStyle::Style_Raised;
-
-    style().drawComplexControl(QStyle::CC_ToolButton, p, this, rect(), 
-                               colorGroup(), flags, controls, active,
-                               QStyleOption());
-    drawButtonLabel(p);
-}
 
 PlaybackBox::PlaybackBox(MythContext *context, QSqlDatabase *ldb, 
                          QValueList<Metadata> *playlist,
@@ -96,7 +58,7 @@ PlaybackBox::PlaybackBox(MythContext *context, QSqlDatabase *ldb,
             QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
-    //context->ThemeWidget(this);
+    context->ThemeWidget(this);
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
@@ -117,6 +79,7 @@ PlaybackBox::PlaybackBox(MythContext *context, QSqlDatabase *ldb,
     QVBoxLayout *framebox = new QVBoxLayout(topdisplay, (int)(10 * wmult));
 
     titlelabel = new ScrollLabel(topdisplay);
+    titlelabel->setFont(font());
     titlelabel->setText("  ");
     titlelabel->setPaletteBackgroundColor(palette().color(QPalette::Active,
                                                           QColorGroup::Mid));
@@ -125,6 +88,7 @@ PlaybackBox::PlaybackBox(MythContext *context, QSqlDatabase *ldb,
     QHBoxLayout *framehbox = new QHBoxLayout(framebox);
 
     timelabel = new QLabel(topdisplay);
+    timelabel->setFont(font());
     timelabel->setText("  ");
     timelabel->setPaletteBackgroundColor(palette().color(QPalette::Active,
                                                          QColorGroup::Mid));
@@ -140,37 +104,37 @@ PlaybackBox::PlaybackBox(MythContext *context, QSqlDatabase *ldb,
 
     QHBoxLayout *controlbox = new QHBoxLayout(vbox2, (int)(2 * wmult));
 
-    MyButton *prevfileb = new MyButton(this);
+    MyToolButton *prevfileb = new MyToolButton(this);
     prevfileb->setAutoRaise(true);
     prevfileb->setIconSet(scalePixmap((const char **)prevfile_pix));  
     connect(prevfileb, SIGNAL(clicked()), this, SLOT(previous()));
  
-    MyButton *prevb = new MyButton(this);
+    MyToolButton *prevb = new MyToolButton(this);
     prevb->setAutoRaise(true);
     prevb->setIconSet(scalePixmap((const char **)prev_pix));
     connect(prevb, SIGNAL(clicked()), this, SLOT(seekback()));
 
-    MyButton *pauseb = new MyButton(this);
+    MyToolButton *pauseb = new MyToolButton(this);
     pauseb->setAutoRaise(true);
     pauseb->setIconSet(scalePixmap((const char **)pause_pix));
     connect(pauseb, SIGNAL(clicked()), this, SLOT(pause()));
 
-    MyButton *playb = new MyButton(this);
+    MyToolButton *playb = new MyToolButton(this);
     playb->setAutoRaise(true);
     playb->setIconSet(scalePixmap((const char **)play_pix));
     connect(playb, SIGNAL(clicked()), this, SLOT(play()));
 
-    MyButton *stopb = new MyButton(this);
+    MyToolButton *stopb = new MyToolButton(this);
     stopb->setAutoRaise(true);
     stopb->setIconSet(scalePixmap((const char **)stop_pix));
     connect(stopb, SIGNAL(clicked()), this, SLOT(stop()));
     
-    MyButton *nextb = new MyButton(this);
+    MyToolButton *nextb = new MyToolButton(this);
     nextb->setAutoRaise(true);
     nextb->setIconSet(scalePixmap((const char **)next_pix));
     connect(nextb, SIGNAL(clicked()), this, SLOT(seekforward()));
 
-    MyButton *nextfileb = new MyButton(this);
+    MyToolButton *nextfileb = new MyToolButton(this);
     nextfileb->setAutoRaise(true);
     nextfileb->setIconSet(scalePixmap((const char **)nextfile_pix));
     connect(nextfileb, SIGNAL(clicked()), this, SLOT(next()));    
@@ -188,28 +152,28 @@ PlaybackBox::PlaybackBox(MythContext *context, QSqlDatabase *ldb,
     QFont buttonfont("Arial", (int)((context->GetSmallFontSize() + 2) * hmult),
                      QFont::Bold);
 
-    randomize = new MyButton(this);
+    randomize = new MyToolButton(this);
     randomize->setAutoRaise(true);
     randomize->setText("Shuffle: Normal");
     randomize->setFont(buttonfont); 
     secondcontrol->addWidget(randomize);
     connect(randomize, SIGNAL(clicked()), this, SLOT(toggleShuffle()));
 
-    repeat = new MyButton(this);
+    repeat = new MyToolButton(this);
     repeat->setAutoRaise(true);
     repeat->setText("Repeat: Playlist");
     repeat->setFont(buttonfont);
     secondcontrol->addWidget(repeat);
     connect(repeat, SIGNAL(clicked()), this, SLOT(toggleRepeat()));
 
-    MyButton *pledit = new MyButton(this);
+    MyToolButton *pledit = new MyToolButton(this);
     pledit->setAutoRaise(true);
     pledit->setText("Edit Playlist");
     pledit->setFont(buttonfont);
     secondcontrol->addWidget(pledit);
     connect(pledit, SIGNAL(clicked()), this, SLOT(editPlaylist()));
 
-    MyButton *vis = new MyButton(this);
+    MyToolButton *vis = new MyToolButton(this);
     vis->setAutoRaise(true);
     vis->setText("Visualize");
     vis->setFont(buttonfont);
@@ -227,8 +191,8 @@ PlaybackBox::PlaybackBox(MythContext *context, QSqlDatabase *ldb,
 
     playview->setColumnWidth(0, (int)(50 * wmult));
     playview->setColumnWidth(1, (int)(210 * wmult));
-    playview->setColumnWidth(2, (int)(400 * wmult));
-    playview->setColumnWidth(3, (int)(80 * wmult));
+    playview->setColumnWidth(2, (int)(385 * wmult));
+    playview->setColumnWidth(3, (int)(90 * wmult));
     playview->setColumnWidthMode(0, QListView::Manual);
     playview->setColumnWidthMode(1, QListView::Manual);
     playview->setColumnWidthMode(2, QListView::Manual);
@@ -238,6 +202,12 @@ PlaybackBox::PlaybackBox(MythContext *context, QSqlDatabase *ldb,
 
     playview->setSorting(-1);
     playview->setAllColumnsShowFocus(true);
+
+    playview->viewport()->setPalette(palette());
+    playview->horizontalScrollBar()->setPalette(palette());
+    playview->verticalScrollBar()->setPalette(palette());
+    playview->header()->setPalette(palette());
+    playview->header()->setFont(font());
 
     plist = playlist;
     playlistindex = 0;

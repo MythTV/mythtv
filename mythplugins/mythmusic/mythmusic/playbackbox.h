@@ -22,7 +22,7 @@ class QListView;
 class QListViewItem;
 class QSlider;
 class ScrollLabel;
-class MyButton;
+class MyToolButton;
 class MainVisual;
 class MythContext;
 
@@ -102,8 +102,8 @@ class PlaybackBox : public QDialog
 
     QSlider *seekbar;
 
-    MyButton *randomize;
-    MyButton *repeat;
+    MyToolButton *randomize;
+    MyToolButton *repeat;
 
     bool shufflemode;
     bool repeatmode;
