@@ -1171,6 +1171,11 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         bool up = slist[2].toInt(); 
         retlist << QString::number(enc->ChangeBrightness(up));
     }
+    else if (command == "CHANGE_HUE")
+    {
+        bool up = slist[2].toInt(); 
+        retlist << QString::number(enc->ChangeHue(up));
+    }
     else if (command == "CHANGE_DEINTERLACER")
     {
         int deinterlacer_mode = slist[2].toInt();

@@ -38,7 +38,8 @@ CREATE TABLE IF NOT EXISTS channel
     rank INT(10) DEFAULT '0' NOT NULL,
     contrast INT DEFAULT 32768,
     brightness INT DEFAULT 32768,
-    colour INT DEFAULT 32768
+    colour INT DEFAULT 32768,
+    hue INT DEFAULT 32768
 );
 CREATE TABLE IF NOT EXISTS channel_dvb
 (

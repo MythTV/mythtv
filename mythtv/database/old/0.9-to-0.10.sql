@@ -21,7 +21,7 @@ ALTER TABLE oldrecorded ADD COLUMN category VARCHAR(64) NULL;
 
 ALTER TABLE record ADD rank INT(10) DEFAULT '0' NOT NULL;
 ALTER TABLE channel ADD rank INT(10) DEFAULT '0' NOT NULL;
-
+ALTER TABLE channel ADD hue INT DEFAULT '32768';
 ALTER TABLE channel ADD COLUMN freqid VARCHAR(5) NOT NULL;
 UPDATE channel set freqid=channum;
 

@@ -56,9 +56,10 @@ With the stickykeys option selected:
 
 Watching TV only:
 
-- J/j increase/decrease contrast
-- K/k increase/decrease brightness
-- L/l increase/decrease color
+- F1/F2 decrease/increase contrast
+- F3/F4 decrease/increase brightness
+- F5/F6 decrease/increase color
+- F7/F8 decrease/increase hue
 - O   Turns on 'Browse' mode, allowing user to browse channels and program
       info while watching current show FullScreen.
 

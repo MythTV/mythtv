@@ -319,6 +319,18 @@ int RemoteEncoder::ChangeColour(bool direction)
     return retval;
 }
 
+int RemoteEncoder::ChangeHue(bool direction)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    strlist << "CHANGE_HUE";
+    strlist << QString::number((int)direction);
+
+    SendReceiveStringList(strlist);
+
+    int retval = strlist[0].toInt();
+    return retval;
+}
+
 void RemoteEncoder::ChangeDeinterlacer(int deint_mode)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);

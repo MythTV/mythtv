@@ -1735,6 +1735,12 @@ int TVRec::ChangeColour(bool direction)
     return ret;
 }
 
+int TVRec::ChangeHue(bool direction)
+{
+    int ret = channel->ChangeHue(direction);
+    return ret;
+}
+
 void TVRec::ChangeDeinterlacer(int deint_mode)
 {
     deinterlace_mode = deint_mode;

@@ -15,6 +15,8 @@ INSERT INTO settings VALUES ('DBSchemaVer', 1000, NULL);
 #   when a previously executed command is encountered.
 #
 
+ALTER TABLE channel ADD hue INT DEFAULT '32768';
+
 ALTER TABLE channel ADD COLUMN freqid VARCHAR(5) NOT NULL;
 UPDATE channel set freqid=channum;
 

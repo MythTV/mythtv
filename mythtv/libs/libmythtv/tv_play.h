@@ -101,6 +101,7 @@ class TV : public QObject
     void ChangeContrast(bool up);
     void ChangeBrightness(bool up);
     void ChangeColour(bool up);
+    void ChangeHue(bool up);
     void ChangeDeinterlacer();   
  
     void ChannelKey(int key);

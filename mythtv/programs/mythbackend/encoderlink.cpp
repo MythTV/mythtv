@@ -398,6 +398,18 @@ int EncoderLink::ChangeColour(bool direction)
     return ret;
 }
 
+int EncoderLink::ChangeHue(bool direction)
+{
+    int ret = 0;
+
+    if (local)
+        ret = tv->ChangeHue(direction);
+    else
+        cerr << "Should be local only query: ChangeHue\n";
+
+    return ret;
+}
+
 void EncoderLink::ChangeDeinterlacer(int deinterlacer_mode)
 {
     if (local)

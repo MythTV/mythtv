@@ -913,7 +913,7 @@ void TV::ProcessKeypress(int keypressed)
             DoPause();
             break;
         }
-        case Key_Right: case Key_D: case Key_F8: 
+        case Key_Right: case Key_D: 
         {
             if (!stickykeys)
             {
@@ -936,7 +936,7 @@ void TV::ProcessKeypress(int keypressed)
             DoFF(1); 
             break;
         }
-        case Key_Left: case Key_A: case Key_F5:
+        case Key_Left: case Key_A:
         {
             if (!stickykeys)
             {
@@ -1054,15 +1054,15 @@ void TV::ProcessKeypress(int keypressed)
             case Key_B: ToggleActiveWindow(); break;
             case Key_N: SwapPIP(); break;
 
+            case Key_F1: ChangeContrast(false); break;
+            case Key_F2: ChangeContrast(true); break;
+            case Key_F3: ChangeBrightness(false); break;
+            case Key_F4: ChangeBrightness(true); break;
+            case Key_F5: ChangeColour(false); break;
+            case Key_F6: ChangeColour(true); break;
+            case Key_F7: ChangeHue(false); break;
+            case Key_F8: ChangeHue(true); break;
 /*
-            // Contrast, brightness, colour of the input source
-            case 'j': ChangeContrast(false); break;
-            case 'J': ChangeContrast(true); break;
-            case 'k': ChangeBrightness(false); break;
-            case 'K': ChangeBrightness(true); break;
-            case 'l': ChangeColour(false); break;
-            case 'L': ChangeColour(true); break;
-
             case 'x': ChangeDeinterlacer(); break;
 */
             case Key_O: BrowseStart(); break;
@@ -1941,6 +1941,16 @@ void TV::ChangeColour(bool up)
     int colour = activerecorder->ChangeColour(up);
 
     QString text = QString(tr("Colour %1 %")).arg(colour);
+
+    if (osd)
+        osd->StartPause(colour * 10, true, tr("Adjust Picture"), text, 5);
+}
+
+void TV::ChangeHue(bool up)
+{
+    int colour = activerecorder->ChangeHue(up);
+
+    QString text = QString(tr("Hue %1 %")).arg(colour);
 
     if (osd)
         osd->StartPause(colour * 10, true, tr("Adjust Picture"), text, 5);

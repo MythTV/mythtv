@@ -333,6 +333,7 @@ bool Channel::SetChannelByString(const QString &chan)
     SetContrast();
     SetColour();
     SetBrightness();
+    SetHue();
 
     inputChannel[currentcapchannel] = curchannelname;
 
@@ -405,246 +406,252 @@ void Channel::SwitchToInput(int newcapchannel, bool setstarting)
         SetChannelByString(inputChannel[currentcapchannel]);
 }
 
-void Channel::SetContrast()
+unsigned short *Channel::GetV4L1Field(int attrib, struct video_picture vid_pic)
 {
-   struct video_picture vid_pic;
-   memset(&vid_pic, 0, sizeof(vid_pic));
-
-    if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
+    switch (attrib)
     {
-        return;
+        case V4L2_CID_CONTRAST:
+            return &vid_pic.contrast;
+        case V4L2_CID_BRIGHTNESS:
+            return &vid_pic.brightness;
+        case V4L2_CID_SATURATION:
+            return &vid_pic.colour;
+        case V4L2_CID_HUE:
+            return &vid_pic.hue;
+        default:
+            fprintf(stderr, "Channel::SetColourAttribute(): invalid attribute argument: %d\n", attrib);
     }
+    return NULL;
+}
 
-    QString field_name = "contrast";
-    int contrast = pParent->GetChannelValue(field_name, this, curchannelname);
-    if (contrast != -1)
+void Channel::SetColourAttribute(int attrib, const char *name)
+{
+    QString field_name = name;
+    int field = pParent->GetChannelValue(field_name, this, curchannelname);
+
+    if (usingv4l2)
     {
-        vid_pic.contrast = contrast;
+        struct v4l2_control ctrl;
+        struct v4l2_queryctrl qctrl;
+        memset(&ctrl, 0, sizeof(ctrl));
+        memset(&qctrl, 0, sizeof(qctrl));
 
-        if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
+        if (field != -1)
+        {
+            ctrl.id = qctrl.id = attrib;
+            if (ioctl(videofd, VIDIOC_QUERYCTRL, &qctrl) < 0)
+            {
+                return;
+            }
+            ctrl.value = (int)((qctrl.maximum - qctrl.minimum) 
+                               / 65535.0 * field + qctrl.minimum);
+            ctrl.value = ctrl.value > qctrl.maximum
+                              ? qctrl.maximum
+                                  : ctrl.value < qctrl.minimum
+                                       ? qctrl.minimum
+                                            : ctrl.value;
+            if (ioctl(videofd, VIDIOC_S_CTRL, &ctrl) < 0)
+            {
+                return;
+            }
+        }
+    }
+    else
+    {
+        unsigned short *setfield;
+        struct video_picture vid_pic;
+        memset(&vid_pic, 0, sizeof(vid_pic));
+
+        if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
         {
             return;
         }
+        setfield = GetV4L1Field(attrib, vid_pic);
+        if (field != -1 && setfield)
+        {
+            *setfield = field;
+            if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
+            {
+                return;
+            }
+        }
     }
+    return;
+}
 
+void Channel::SetContrast(void)
+{
+    SetColourAttribute(V4L2_CID_CONTRAST, "contrast");
     return;
 }
 
 void Channel::SetBrightness()
 {
-   struct video_picture vid_pic;
-   memset(&vid_pic, 0, sizeof(vid_pic));
-
-    if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
-    {
-        return;
-    }
-
-    QString field_name = "brightness";
-    int brightness = pParent->GetChannelValue(field_name, this, curchannelname);
-    if (brightness != -1)
-    {
-        vid_pic.brightness = brightness;
-
-        if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
-        {
-            return;
-        }
-    }
-
+    SetColourAttribute(V4L2_CID_BRIGHTNESS, "brightness");
     return;
 }
 
 void Channel::SetColour()
 {
-   struct video_picture vid_pic;
-   memset(&vid_pic, 0, sizeof(vid_pic));
+    SetColourAttribute(V4L2_CID_SATURATION, "colour");
+    return;
+}
 
-    if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
+void Channel::SetHue(void)
+{
+    SetColourAttribute(V4L2_CID_HUE, "hue");
+    return;
+}
+
+int Channel::ChangeColourAttribute(int attrib, const char *name, bool up)
+{
+    int newvalue;    // The int should have ample space to avoid overflow
+                     // in the case that we're just over or under 65535
+
+    QString channel_field = name;
+    int current_value = pParent->GetChannelValue(channel_field, this, 
+                                                 curchannelname);
+
+    int card_value;
+
+    if (usingv4l2)
     {
-        return;
+        struct v4l2_control ctrl;
+        struct v4l2_queryctrl qctrl;
+        memset(&ctrl, 0, sizeof(ctrl));
+        memset(&qctrl, 0, sizeof(qctrl));
+
+        ctrl.id = qctrl.id = attrib;
+        if (ioctl(videofd, VIDIOC_QUERYCTRL, &qctrl) < 0)
+        {
+            return -1;
+        }
+
+        if (ioctl(videofd, VIDIOC_G_CTRL, &ctrl) < 0)
+        {
+            return -1;
+        }
+        card_value = (int)(65535.0 / (qctrl.maximum - qctrl.minimum) * 
+                           ctrl.value);
+    }
+    else
+    {
+        unsigned short *setfield;
+        struct video_picture vid_pic;
+        memset(&vid_pic, 0, sizeof(vid_pic));
+
+        if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
+        {
+            return -1;
+        }
+
+        setfield = GetV4L1Field(attrib, vid_pic);
+        if (!setfield)
+        {
+            return -1;
+        }
+
+        card_value = *setfield;
     }
 
-    QString field_name = "colour";
-    int colour = pParent->GetChannelValue(field_name, this, curchannelname);
-    if (colour != -1)
+    if (current_value < -1) // Couldn't get from database
     {
-        vid_pic.colour = colour;
-
-        if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
+        if (up)
         {
-            return;
+            newvalue = card_value + 655;
+            newvalue = (newvalue > 65535) ? (65535) : (newvalue);
+        }
+        else
+        {
+            newvalue = card_value - 655;
+            newvalue = (newvalue < 0) ? (0) : (newvalue);
+        }
+    }
+    else
+    {
+        if (up)
+        {
+            newvalue = current_value + 655;
+            newvalue = (newvalue > 65535) ? (65535) : (newvalue);
+        }
+        else
+        {
+            newvalue = current_value - 655;
+            newvalue = (newvalue < 0) ? (0) : (newvalue);
+        }
+
+        pParent->SetChannelValue(channel_field, newvalue, this, curchannelname);
+    }
+
+    if (usingv4l2)
+    {
+        struct v4l2_control ctrl;
+        struct v4l2_queryctrl qctrl;
+        memset(&ctrl, 0, sizeof(ctrl));
+        memset(&qctrl, 0, sizeof(qctrl));
+
+        ctrl.id = qctrl.id = attrib;
+        if (ioctl(videofd, VIDIOC_QUERYCTRL, &qctrl) < 0)
+        {
+            return -1;
+        }
+        ctrl.value = (int)((qctrl.maximum - qctrl.minimum) / 65535.0 * 
+                           newvalue + qctrl.minimum);
+        ctrl.value = ctrl.value > qctrl.maximum
+                        ? qctrl.maximum
+                            : ctrl.value < qctrl.minimum
+                                ? qctrl.minimum
+                                    : ctrl.value;
+        if (ioctl(videofd, VIDIOC_S_CTRL, &ctrl) < 0)
+        {
+            return -1;
+        }
+    }
+    else
+    {
+        unsigned short *setfield;
+        struct video_picture vid_pic;
+        memset(&vid_pic, 0, sizeof(vid_pic));
+
+        if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
+        {
+            return -1;
+        }
+        setfield = GetV4L1Field(attrib, vid_pic);
+        if (newvalue != -1 && setfield)
+        {
+            *setfield = newvalue;
+            if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
+            {
+                return -1;
+            }
+        }
+        else
+        {
+            return -1;
         }
     }
 
-    return;
+    return newvalue / 655;
 }
 
 int Channel::ChangeContrast(bool up)
 {
-    struct video_picture vid_pic;
-    memset(&vid_pic, 0, sizeof(vid_pic));
-
-    int newcontrast;    // The int should have ample space to avoid overflow
-                        // in the case that we're just over or under 65535
-
-    QString channel_field = "contrast";
-    int current_contrast = pParent->GetChannelValue(channel_field, this, 
-                                                    curchannelname);
-
-    if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
-    {
-        return -1;
-    }
-    if (current_contrast < -1) // Couldn't get from database
-    {
-        if (up)
-        {
-            newcontrast = vid_pic.contrast + 655;
-            newcontrast = (newcontrast > 65535)?(65535):(newcontrast);
-        }
-        else
-        {
-            newcontrast = vid_pic.contrast - 655;
-            newcontrast = (newcontrast < 0)?(0):(newcontrast);
-        }
-    }
-    else
-    {
-        if (up)
-        {
-            newcontrast = current_contrast + 655;
-            newcontrast = (newcontrast > 65535)?(65535):(newcontrast);
-        }
-        else
-        {
-            newcontrast = current_contrast - 655;
-            newcontrast = (newcontrast < 0)?(0):(newcontrast);
-        }
-
-        QString field_name = "contrast";
-        pParent->SetChannelValue(field_name, newcontrast, this, curchannelname);
-    }
-
-    vid_pic.contrast = newcontrast;
-
-    if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
-    {
-        return -1;
-    }
-
-    return vid_pic.contrast / 655;
+    return ChangeColourAttribute(V4L2_CID_CONTRAST, "contrast", up);
 }
 
 int Channel::ChangeBrightness(bool up)
 {
-    struct video_picture vid_pic;
-    memset(&vid_pic, 0, sizeof(vid_pic));
-
-    int newbrightness;  // The int should have ample space to avoid overflow
-                        // in the case that we're just over or under 65535
-
-    QString channel_field = "brightness";
-    int current_brightness = pParent->GetChannelValue(channel_field, this, 
-                                                      curchannelname);
-
-    if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
-    {
-        return -1;
-    }
-    if (current_brightness < -1) // Couldn't get from database
-    {
-        if (up)
-        {
-            newbrightness = vid_pic.brightness + 655;
-            newbrightness = (newbrightness > 65535)?(65535):(newbrightness);
-        }
-        else
-        {
-            newbrightness = vid_pic.brightness - 655;
-            newbrightness = (newbrightness < 0)?(0):(newbrightness);
-        }
-    }
-    else
-    {
-        if (up)
-        {
-            newbrightness = current_brightness + 655;
-            newbrightness = (newbrightness > 65535)?(65535):(newbrightness);
-        }
-        else
-        {
-            newbrightness = current_brightness - 655;
-            newbrightness = (newbrightness < 0)?(0):(newbrightness);
-        }
-
-        QString field_name = "brightness";
-        pParent->SetChannelValue(field_name, newbrightness, this, 
-                                 curchannelname);
-    }
-
-    vid_pic.brightness = newbrightness;
-
-    if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
-    {
-        return -1;
-    }
-
-    return vid_pic.brightness / 655;
+    return ChangeColourAttribute(V4L2_CID_BRIGHTNESS, "brightness", up);
 }
 
 int Channel::ChangeColour(bool up)
 {
-    struct video_picture vid_pic;
-    memset(&vid_pic, 0, sizeof(vid_pic));
-
-    int newcolour;    // The int should have ample space to avoid overflow
-                      // in the case that we're just over or under 65535
-
-    QString channel_field = "colour";
-    int current_colour = pParent->GetChannelValue(channel_field, this, 
-                                                  curchannelname);
-
-    if (ioctl(videofd, VIDIOCGPICT, &vid_pic) < 0)
-    {
-        return -1;
-    }
-    if (current_colour < -1) // Couldn't get from database
-    {
-        if (up)
-        {
-            newcolour = vid_pic.colour + 655;
-            newcolour = (newcolour > 65535)?(65535):(newcolour);
-        }
-        else
-        {
-            newcolour = vid_pic.colour - 655;
-            newcolour = (newcolour < 0)?(0):(newcolour);
-        }
-    }
-    else
-    {
-        if (up)
-        {
-            newcolour = current_colour + 655;
-            newcolour = (newcolour > 65535)?(65535):(newcolour);
-        }
-        else
-        {
-            newcolour = current_colour - 655;
-            newcolour = (newcolour < 0)?(0):(newcolour);
-        }
-
-        QString field_name = "colour";
-        pParent->SetChannelValue(field_name, newcolour, this, curchannelname);
-    }
-
-    vid_pic.colour = newcolour;
-
-    if (ioctl(videofd, VIDIOCSPICT, &vid_pic) < 0)
-    {
-        return -1;
-    }
-    
-    return vid_pic.colour / 655;
+    return ChangeColourAttribute(V4L2_CID_SATURATION, "colour", up);
 }
+
+int Channel::ChangeHue(bool up)
+{
+    return ChangeColourAttribute(V4L2_CID_HUE, "hue", up);
+}
+

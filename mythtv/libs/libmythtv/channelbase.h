@@ -35,9 +35,11 @@ class ChannelBase
     virtual int ChangeColour(bool up) { (void)up; return 0; };
     virtual int ChangeBrightness(bool up) { (void)up; return 0; };
     virtual int ChangeContrast(bool up) { (void)up; return 0; };
+    virtual int ChangeHue(bool up) { (void)up; return 0; };
     virtual void SetContrast() {};
     virtual void SetBrightness() {};
     virtual void SetColour() {};
+    virtual void SetHue() {};
 
     virtual void ToggleInputs(void);
     virtual void SwitchToInput(const QString &input);

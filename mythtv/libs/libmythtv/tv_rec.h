@@ -96,6 +96,7 @@ class TVRec
     int ChangeColour(bool direction);
     int ChangeContrast(bool direction);
     int ChangeBrightness(bool direction);
+    int ChangeHue(bool direction);
     void ChangeDeinterlacer(int deinterlace_mode);
     bool CheckChannel(QString name);
     void GetNextProgram(int direction,

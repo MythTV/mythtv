@@ -39,6 +39,7 @@ class RemoteEncoder
     int ChangeContrast(bool direction);
     int ChangeBrightness(bool direction);
     int ChangeColour(bool direction);
+    int ChangeHue(bool direction);
     void ChangeChannel(int channeldirection);
     void ChangeDeinterlacer(int deint_mode);
     void ToggleChannelFavorite(void);
