@@ -1,5 +1,4 @@
 #include <qlayout.h>
-#include <qaccel.h>
 #include <qpushbutton.h>
 #include <qbuttongroup.h>
 #include <qlabel.h>
@@ -48,26 +47,7 @@ ViewScheduled::ViewScheduled(QSqlDatabase *ldb, MythMainWindow *parent,
     infoRect = QRect(0, 0, 0, 0);
     conflictRect = QRect(0, 0, 0, 0);
 
-    accel = new QAccel(this);
-
-    space_itemid = accel->insertItem(Key_Space);
-    enter_itemid = accel->insertItem(Key_Enter);
-    return_itemid = accel->insertItem(Key_Return);
-    edit_itemid = accel->insertItem(Key_I);
-
-    accel->connectItem(accel->insertItem(Key_Down), this, SLOT(cursorDown()));
-    accel->connectItem(accel->insertItem(Key_Up), this, SLOT(cursorUp()));
-    accel->connectItem(space_itemid, this, SLOT(selected()));
-    accel->connectItem(enter_itemid, this, SLOT(selected()));
-    accel->connectItem(return_itemid, this, SLOT(selected()));
-    accel->connectItem(edit_itemid, this, SLOT(edit()));
-    accel->connectItem(accel->insertItem(Key_PageUp), this, SLOT(pageUp()));
-    accel->connectItem(accel->insertItem(Key_3), this, SLOT(pageUp()));
-    accel->connectItem(accel->insertItem(Key_PageDown), this, SLOT(pageDown()));
-    accel->connectItem(accel->insertItem(Key_9), this, SLOT(pageDown()));
-    accel->connectItem(accel->insertItem(Key_Escape), this, SLOT(exitWin()));
-
-    connect(this, SIGNAL(killTheApp()), this, SLOT(accept()));
+    allowselect = true;
 
     theme = new XMLParse();
     theme->SetWMult(wmult);
@@ -106,10 +86,31 @@ ViewScheduled::~ViewScheduled()
 {
     gContext->removeListener(this);
     delete theme;
-    delete accel;
     delete bgTransBackup;
     if (curitem)
         delete curitem;
+}
+
+void ViewScheduled::keyPressEvent(QKeyEvent *e)
+{
+    if (allowselect)
+    {
+        switch (e->key())
+        {
+            case Key_Space: case Key_Enter: case Key_Return: selected(); return;
+            case Key_I: edit(); return;
+            default: break;
+        }
+    }
+
+    switch (e->key())
+    {
+        case Key_Up: cursorUp(); break;
+        case Key_Down: cursorDown(); break;
+        case Key_PageUp: case Key_3: pageUp(); break;
+        case Key_PageDown: case Key_9: pageDown(); break;
+        default: MythDialog::keyPressEvent(e); break;
+    }
 }
 
 void ViewScheduled::LoadWindow(QDomElement &element)
@@ -281,11 +282,6 @@ void ViewScheduled::grayOut(QPainter *tmp)
     else if (transparentFlag == 1)
         tmp->drawPixmap(0, 0, *bgTransBackup, 0, 0, (int)(800*wmult), 
                         (int)(600*hmult));
-}
-
-void ViewScheduled::exitWin()
-{
-    emit killTheApp();
 }
 
 void ViewScheduled::cursorDown(bool page)
@@ -660,11 +656,7 @@ void ViewScheduled::updateInfo(QPainter *p)
             norec->Draw(&tmp, 8, 0);
         }
 
-        //Disable the accelorators when there is nothing to delete
-        accel->setItemEnabled(space_itemid, false);
-        accel->setItemEnabled(enter_itemid, false);
-        accel->setItemEnabled(return_itemid, false);
-        accel->setItemEnabled(edit_itemid, false);
+        allowselect = false;
     }
 
     tmp.end();

@@ -45,8 +45,11 @@ void DialogBox::AddButton(const QString &title)
 {
     MythPushButton *button = new MythPushButton(title, this);
 
-    if (buttongroup->count() == 0)
+    if (buttongroup->count() == 0 ||
+        (checkbox && buttongroup->count() == 1))
+    {
         button->setFocus();
+    }
 
     buttongroup->insert(button);
 

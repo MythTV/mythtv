@@ -19,9 +19,6 @@ class ViewScheduled : public MythDialog
                   const char *name = 0);
     ~ViewScheduled();
 
-  signals:
-    void killTheApp();
-
   protected slots:
     void edit();
     void selected();
@@ -29,10 +26,10 @@ class ViewScheduled : public MythDialog
     void cursorUp(bool page = false);
     void pageDown() { cursorDown(true); }
     void pageUp() { cursorUp(true); }
-    void exitWin();
 
   protected:
     void paintEvent(QPaintEvent *);
+    void keyPressEvent(QKeyEvent *e);
 
   private:
     void FillList(void);
@@ -72,8 +69,6 @@ class ViewScheduled : public MythDialog
     QString shortdateformat;
     bool displayChanNum;
 
-    QAccel *accel;
-
     int inList;
     int inData;
     int listCount;
@@ -84,10 +79,7 @@ class ViewScheduled : public MythDialog
     QRect conflictRect;
     QRect fullRect;
 
-    int space_itemid;
-    int enter_itemid;
-    int return_itemid;
-    int edit_itemid;
+    bool allowselect;
 
     int listsize;
     int titleitems;

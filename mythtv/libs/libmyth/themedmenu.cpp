@@ -809,7 +809,16 @@ void ThemedMenu::parseThemeButton(QDomElement &element)
             }
             else if (info.tagName() == "alttext")
             {
-                alttext = getFirstText(info);
+                if ((alttext.isNull() || alttext.isEmpty()) &&
+                    info.attribute("lang","") == "")
+                {
+                    alttext = getFirstText(info);
+                }
+                else if (info.attribute("lang","").lower() ==
+                         gContext->GetLanguage())
+                {
+                    alttext = getFirstText(info);
+                }
             }
             else if (info.tagName() == "action")
             {
