@@ -63,7 +63,7 @@ public:
     int getTimestamp() { return Timestamp; }
     int getStatusCode() { return statusCode; }
     QString getReasonPhrase() { return statusText; }
-    SipCallId &getCallId() { return *callId; }
+    SipCallId *getCallId() { return callId; }
     SipMsg &operator= (SipMsg &rhs);
     SipSdp *getSdp()         { return sdp; }
     SipXpidf *getXpidf()     { return xpidf; }

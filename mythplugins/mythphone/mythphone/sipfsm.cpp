@@ -624,10 +624,10 @@ QString SipFsm::OpenSocket(int Port)
 #endif
 
 #ifdef WIN32  // SIOCGIFADDR not supported on Windows
-	char         hostname[100];
-	HOSTENT FAR *hostAddr;
+    char         hostname[100];
+    HOSTENT FAR *hostAddr;
     int ifNum = atoi(gContext->GetSetting("SipBindInterface"));
-	if ((gethostname(hostname, 100) != 0) || ((hostAddr = gethostbyname(hostname)) == NULL)) 
+    if ((gethostname(hostname, 100) != 0) || ((hostAddr = gethostbyname(hostname)) == NULL)) 
     {
         cerr << "Failed to find network interface " << endl;
         delete sipSocket;
@@ -696,7 +696,13 @@ QString SipFsm::DetermineNatAddress()
             // Need a DNS lookup on the URL
             struct hostent *h;
             h = gethostbyname((const char *)Url.host());
-            hostIp.setAddress(ntohl(*(long *)h->h_addr));
+            if (h)
+                hostIp.setAddress(ntohl(*(long *)h->h_addr));
+            else
+            {
+                cout << "SIP: Failed to detect your NAT settings\n";
+                return "";
+            }
         }
 
         // Now send the HTTP GET to the web server and parse the response
@@ -728,7 +734,7 @@ QString SipFsm::DetermineNatAddress()
                         natIP = temp3.stripWhiteSpace();
                     }
                     else
-                        cout << "Got invalid HTML response: " << endl;
+                        cout << "SIP: Got invalid HTML response whilst detecting your NAT settings " << endl;
                     delete httpResponse;
                     break;
                 }
@@ -737,7 +743,7 @@ QString SipFsm::DetermineNatAddress()
                 cerr << "Error sending NAT discovery packet to socket\n";
         }
         else
-            cout << "Could not connect to NAT discovery host " << Url.host() << ":" << Url.port() << endl;
+            cout << "SIP: Could not connect to NAT discovery host " << Url.host() << ":" << Url.port() << endl;
         httpSock->close();
         delete httpSock;
     }
@@ -887,6 +893,7 @@ void SipFsm::CheckRxEvent()
         {
             switch (Event)
             {
+            case SIP_UNKNOWN:     fsm = 0;                       break;//ignore event
             case SIP_REGISTER:    fsm = sipRegistrar;            break;
             case SIP_SUBSCRIBE:   fsm = CreateSubscriberFsm();   break;
             case SIP_MESSAGE:     fsm = CreateIMFsm();           break;
@@ -900,7 +907,7 @@ void SipFsm::CheckRxEvent()
             if ((fsm->FSM(Event, &sipRcv)) == SIP_IDLE)
                 DestroyFsm(fsm);
         }
-        else
+        else if (Event != SIP_UNKNOWN)
             cerr << "SIP: fsm should not be zero here\n";
     }
 }
@@ -958,7 +965,7 @@ int SipFsm::MsgToEvent(SipMsg *sipMsg)
     }
     else
         cerr << "SIP: Unknown method " << Method << endl << sipMsg->string() << endl;
-    return 0;
+    return SIP_UNKNOWN;
 }
 
 SipCall *SipFsm::MatchCall(int cr)
@@ -970,17 +977,21 @@ SipCall *SipFsm::MatchCall(int cr)
     return 0;
 }
 
-SipFsmBase *SipFsm::MatchCallId(SipCallId &CallId)
+SipFsmBase *SipFsm::MatchCallId(SipCallId *CallId)
 {
     SipFsmBase *it;
     SipFsmBase *match=0;
-    for (it=FsmList.first(); it; it=FsmList.next())
+    
+    if (CallId != 0)
     {
-        if (it->callId() == CallId.string())
+        for (it=FsmList.first(); it; it=FsmList.next())
         {
-            if (match != 0)
-                cerr << "SIP: Oops; we have two FSMs with the same Call Id\n";
-            match = it;
+            if (it->callId() == CallId->string())
+            {
+                if (match != 0)
+                    cerr << "SIP: Oops; we have two FSMs with the same Call Id\n";
+                match = it;
+            }
         }
     }
     return match;
@@ -1052,7 +1063,7 @@ void SipFsm::SendIM(QString destUrl, QString CallId, QString imMsg)
 {
     SipCallId sipCallId;
     sipCallId.setValue(CallId);
-    SipFsmBase *Fsm = MatchCallId(sipCallId);
+    SipFsmBase *Fsm = MatchCallId(&sipCallId);
     if ((Fsm) && (Fsm->type() == "IM"))
     {
         if ((Fsm->FSM(SIP_USER_MESSAGE, 0, &imMsg)) == SIP_IDLE)
@@ -1174,7 +1185,7 @@ void SipFsmBase::ParseSipMsg(int Event, SipMsg *sipMsg)
         rxedFrom = sipMsg->getCompleteFrom();
         RecRoute = sipMsg->getCompleteRR();
         Via      = sipMsg->getCompleteVia();
-        CallId   = sipMsg->getCallId();
+        CallId   = *(sipMsg->getCallId());
         viaIp    = sipMsg->getViaIp();
         viaPort  = sipMsg->getViaPort();
         rxedTimestamp = sipMsg->getTimestamp();
@@ -2166,7 +2177,7 @@ void SipRegistrar::SendResponse(int Code, SipMsg *sipMsg, QString rIp, int rPort
     Status.addVia(sipLocalIp, sipLocalPort);
     Status.addFrom(*(sipMsg->getFromUrl()), sipMsg->getFromTag());
     Status.addTo(*(sipMsg->getFromUrl()), myTag);
-    Status.addCallId(sipMsg->getCallId());
+    Status.addCallId(*sipMsg->getCallId());
     Status.addCSeq(sipMsg->getCSeqValue());
     Status.addExpires(sipMsg->getExpires());
     Status.addContact(sipMsg->getContactUrl());
