@@ -295,6 +295,7 @@ class NuppelVideoPlayer
     float video_aspect;
     FrameScanType m_scan;
     bool m_double_framerate;
+    bool m_can_double;
 
     int filesize;
     int startpos;
