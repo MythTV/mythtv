@@ -3,6 +3,7 @@
 #include <qstring.h>
 #include <unistd.h>
 #include "tv.h"
+#include "programinfo.h"
 
 #include "libmyth/mythcontext.h"
 
@@ -15,7 +16,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    gContext = new MythContext();
+    gContext = new MythContext(MYTH_BINARY_VERSION);
 
     QString themename = gContext->GetSetting("Theme");
     QString themedir = gContext->FindThemeDir(themename);
@@ -46,7 +47,17 @@ int main(int argc, char *argv[])
     TV *tv = new TV(db);
     tv->Init();
 
-    tv->LiveTV();
+    if (a.argc() > 1)
+    {
+        QString filename = a.argv()[1];
+
+        ProgramInfo *pginfo = new ProgramInfo();
+        pginfo->pathname = filename;
+    
+        tv->Playback(pginfo);
+    }
+    else
+        tv->LiveTV();
 
     qApp->unlock();
     while (tv->GetState() == kState_None)

@@ -1,0 +1,29 @@
+<mythmenu name="SCHEDULE">
+
+   <button>
+      <type>TV_SCHEDULE</type>
+      <text>Program Guide</text>
+      <action>TV_SCHEDULE</action>
+   </button>
+
+   <button>
+      <type>TV_SCHEDULE</type>
+      <text>Program Finder</text>
+      <action>TV_PROGFIND</action>
+   </button>
+
+   <button>
+      <type>TV_SCHEDULE</type>
+      <text>Manual Recording</text>
+      <alttext>Manual Record</alttext>
+      <action>TV_MANUAL</action>
+   </button>
+
+   <button>
+      <type>TV_CONFLICTS</type>
+      <text>Fix Scheduling Conflicts</text>
+      <alttext>Fix Conflicts</alttext>
+      <action>TV_FIX_CONFLICTS</action>
+   </button>
+
+</mythmenu>

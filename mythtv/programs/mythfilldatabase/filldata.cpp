@@ -27,6 +27,9 @@ using namespace std;
 bool interactive = false;
 bool non_us_updating = false;
 bool from_file = false;
+bool quiet = false;
+bool no_delete = false;
+bool isgist = false;
 
 MythContext *gContext;
 
@@ -50,6 +53,18 @@ class ChanInfo
     QString finetune;
 };
 
+struct ProgRating
+{
+    QString system;
+    QString rating;
+};
+
+struct ProgCredit
+{
+    QString role;
+    QString name;
+};
+
 class ProgInfo
 {
   public:
@@ -63,6 +78,11 @@ class ProgInfo
                                       category = other.category;
                                       start = other.start;
                                       end = other.end;
+                                      airdate = other.airdate;
+                                      stars = other.stars;
+                                      ratings = other.ratings;
+                                      repeat = other.repeat;
+                                      credits = other.credits;
                                     }
 
     QString startts;
@@ -72,9 +92,15 @@ class ProgInfo
     QString subtitle;
     QString desc;
     QString category;
+    QString airdate;
+    QString stars;
+    QValueList<ProgRating> ratings;
 
     QDateTime start;
     QDateTime end;
+
+    bool repeat;
+    QValueList<ProgCredit> credits;
 };
 
 bool operator<(const ProgInfo &a, const ProgInfo &b)
@@ -97,6 +123,7 @@ struct Source
     int id;
     QString name;
     QString xmltvgrabber;
+    QString userid;
 };
 
 QDateTime fromXMLTVDate(QString &text)
@@ -149,12 +176,21 @@ ChanInfo *parseChannel(QDomElement &element, QUrl baseUrl)
     QString xmltvid = element.attribute("id", "");
     QStringList split = QStringList::split(" ", xmltvid);
 
-    chaninfo->xmltvid = split[0];
-    chaninfo->chanstr = split[0];
-    if (split.size() > 1)
-        chaninfo->callsign = split[1];
+    if (!isgist)
+    {
+        chaninfo->xmltvid = split[0];
+        chaninfo->chanstr = split[0];
+        if (split.size() > 1)
+            chaninfo->callsign = split[1];
+        else
+            chaninfo->callsign = "";
+    }
     else
+    {
         chaninfo->callsign = "";
+        chaninfo->chanstr = "";
+        chaninfo->xmltvid = xmltvid;
+    }
 
     chaninfo->iconpath = "";
     chaninfo->name = "";
@@ -171,10 +207,27 @@ ChanInfo *parseChannel(QDomElement &element, QUrl baseUrl)
                 QUrl iconUrl(baseUrl, info.attribute("src", ""), true);
                 chaninfo->iconpath = iconUrl.toString();
             }
-            else if (info.tagName() == "display-name" && 
-                     chaninfo->name.length() == 0)
+            else if (info.tagName() == "display-name")
             {
-                chaninfo->name = info.text();
+                if (!isgist)
+                {
+                    if (chaninfo->name.length() == 0)
+                    {
+                        chaninfo->name = info.text();
+                    }
+                }
+                else
+                {
+                    if (chaninfo->callsign == "")
+                    {
+                        chaninfo->callsign = info.text();
+                        chaninfo->name = info.text();
+                    }
+                    else if (chaninfo->chanstr == "")
+                    {
+                        chaninfo->chanstr = QString::number(info.text().toInt());
+                    }
+                }
             }
         }
     }
@@ -186,7 +239,7 @@ void addTimeOffset(QString &timestr, int config_off, QString offset )
 {
     bool ok;
     int off = offset.stripWhiteSpace().left(3).toInt(&ok, 10);
-               
+            
     if (ok && (off != config_off))
     {
         int diff = config_off - off;
@@ -218,6 +271,46 @@ void addTimeOffset(QString &timestr, int config_off, QString offset )
         QDateTime dt = QDateTime(QDate(year, month, day),QTime(hour, min, sec));
         dt = dt.addSecs(diff * 60 * 60);
         timestr = dt.toString("yyyyMMddhhmmss");
+    }
+    else if (isgist)
+    {
+#if 0
+        int year = 0, month = 0, day = 0, hour = 0, min = 0, sec = 0;
+
+        if (timestr.length() == 14)
+        {
+            year  = timestr.left(4).toInt(&ok, 10);
+            month = timestr.mid(4,2).toInt(&ok, 10);
+            day   = timestr.mid(6,2).toInt(&ok, 10);
+            hour  = timestr.mid(8,2).toInt(&ok, 10);
+            min   = timestr.mid(10,2).toInt(&ok, 10);
+            sec   = timestr.mid(12,2).toInt(&ok, 10);
+        }
+
+        int houroff = 0;
+
+        houroff = offset.mid(3, 3).toInt(&ok, 10);
+
+        QDateTime dt = QDateTime(QDate(year, month, day),QTime(hour, min, sec));
+        dt = dt.addSecs(houroff * 60 * 60);
+        timestr = dt.toString("yyyyMMddhhmmss");   
+#endif
+    }
+}
+
+void parseCredits(QDomElement &element, ProgInfo *pginfo)
+{
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            ProgCredit credit;
+            credit.role = info.tagName();
+            credit.name = getFirstText(info);
+            pginfo->credits.append(credit);
+        }
     }
 }
 
@@ -278,7 +371,8 @@ ProgInfo *parseProgram(QDomElement &element)
     pginfo->end = fromXMLTVDate(pginfo->endts);
 
     pginfo->subtitle = pginfo->title = pginfo->desc = pginfo->category = "";
-    
+    pginfo->repeat = false;   
+ 
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
     {
@@ -301,6 +395,58 @@ ProgInfo *parseProgram(QDomElement &element)
             {
                 pginfo->category = getFirstText(info);
             }
+            else if (info.tagName() == "date" && pginfo->airdate == "")
+            {
+                pginfo->airdate = getFirstText(info);
+
+                if (4 != pginfo->airdate.length())
+                    pginfo->airdate = "";
+            }
+            else if (info.tagName() == "star-rating")
+            {
+                QDomNodeList values = info.elementsByTagName("value");
+                QDomElement item;
+                QString stars, num, den;
+                float avg = 0.0;
+                // not sure why the XML suggests multiple ratings,
+                // but the following will average them anyway.
+                for (unsigned int i = 0; i < values.length(); i++)
+                {
+                    item = values.item(i).toElement();
+                    if (item.isNull())
+                        continue;
+                    stars = getFirstText(item);
+                    num = stars.section('/', 0, 0);
+                    den = stars.section('/', 1, 1);
+                    if (0.0 >= den.toFloat())
+                        continue;
+                    avg *= i/(i+1);
+                    avg += (num.toFloat()/den.toFloat()) / (i+1);
+                }
+                pginfo->stars.setNum(avg);
+            }
+            else if (info.tagName() == "rating")
+            {
+                // again, the structure of ratings seems poorly represented
+                // in the XML.  no idea what we'd do with multiple values.
+                QDomNodeList values = info.elementsByTagName("value");
+                QDomElement item = values.item(0).toElement();
+                if (item.isNull())
+                    continue;
+                ProgRating rating;
+                rating.system = info.attribute("system", "");
+                rating.rating = getFirstText(item);
+                if ("" != rating.system)
+                    pginfo->ratings.append(rating);
+            }
+            else if (info.tagName() == "previously-shown")
+            {
+                pginfo->repeat = true;
+            } 
+            else if (info.tagName() == "credits")
+            {
+                parseCredits(info, pginfo);
+            }  
         }
     }
 
@@ -315,8 +461,16 @@ void parseFile(QString filename, QValueList<ChanInfo> *chanlist,
 
     if (!f.open(IO_ReadOnly))
         return;
-    if (!doc.setContent(&f))
+
+    QString errorMsg = "unknown";
+    int errorLine = 0;
+    int errorColumn = 0;
+
+    if (!doc.setContent(&f, &errorMsg, &errorLine, &errorColumn))
     {
+        cout << "Error in " << errorLine << ":" << errorColumn << ": "
+             << errorMsg << endl;
+
         f.close();
         return;
     }
@@ -326,6 +480,11 @@ void parseFile(QString filename, QValueList<ChanInfo> *chanlist,
     QDomElement docElem = doc.documentElement();
 
     QUrl baseUrl(docElem.attribute("source-data-url", ""));
+
+    if (docElem.attribute("source-info-name") == "Gist Communications, Inc.")
+    {
+        isgist = true;
+    }
 
     QDomNode n = docElem.firstChild();
     while (!n.isNull())
@@ -418,6 +577,13 @@ void fixProgramList(QValueList<ProgInfo> *fixlist)
             if (todelete == i)
                 i = cur;
             fixlist->erase(todelete);
+        }
+        else if (isgist && (*cur).start.date().day() < (*i).start.date().day())
+        {
+            cerr << "removing lead-in program: " << (*cur).title << endl
+                 << (*cur).start.toString("hhmmss").ascii() << " - "
+                 << (*i).start.toString("hhmmss").ascii() << endl << endl;
+            fixlist->erase(cur);
         }
     }
 }
@@ -705,6 +871,9 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
 
 void clearDBAtOffset(int offset, int chanid)
 {
+    if (no_delete)
+        return;
+
     int nextoffset = offset + 1;
 
     if (offset == -1)
@@ -713,14 +882,25 @@ void clearDBAtOffset(int offset, int chanid)
         nextoffset = 10;
     }
 
+    QSqlQuery query;
     QString querystr;
+
     querystr.sprintf("DELETE FROM program WHERE starttime >= "
                      "DATE_ADD(CURRENT_DATE, INTERVAL %d DAY) "
                      "AND starttime < DATE_ADD(CURRENT_DATE, INTERVAL "
                      "%d DAY) AND chanid = %d;", offset, nextoffset, chanid);
+    query.exec(querystr);
 
-    QSqlQuery query;
+    querystr.sprintf("DELETE FROM programrating WHERE starttime >= "
+                     "DATE_ADD(CURRENT_DATE, INTERVAL %d DAY) "
+                     "AND starttime < DATE_ADD(CURRENT_DATE, INTERVAL "
+                     "%d DAY) AND chanid = %d;", offset, nextoffset, chanid);
+    query.exec(querystr);
 
+    querystr.sprintf("DELETE FROM credits WHERE starttime >= "
+                     "DATE_ADD(CURRENT_DATE, INTERVAL %d DAY) "
+                     "AND starttime < DATE_ADD(CURRENT_DATE, INTERVAL "
+                     "%d DAY) AND chanid = %d;", offset, nextoffset, chanid);
     query.exec(querystr);
 }
 
@@ -769,22 +949,181 @@ void handlePrograms(int id, int offset, QMap<QString,
             (*i).title.replace(QRegExp("\""), QString("\\\""));
             (*i).subtitle.replace(QRegExp("\""), QString("\\\""));
             (*i).desc.replace(QRegExp("\""), QString("\\\""));
+            if ("" == (*i).airdate)
+                (*i).airdate = "0";
+            if ("" == (*i).stars)
+                (*i).stars = "0";
+
+            if (no_delete)
+            {
+                querystr.sprintf("SELECT * FROM program WHERE chanid=%d AND "
+                                 "starttime=\"%s\" AND endtime=\"%s\" AND "
+                                 "title=\"%s\" AND subtitle=\"%s\" AND "
+                                 "description=\"%s\" AND category=\"%s\";",
+                                 chanid, 
+                                 (*i).start.toString("yyyyMMddhhmmss").ascii(), 
+                                 (*i).end.toString("yyyyMMddhhmmss").ascii(), 
+                                 (*i).title.utf8().data(), 
+                                 (*i).subtitle.utf8().data(), 
+                                 (*i).desc.utf8().data(), 
+                                 (*i).category.utf8().data());
+
+                query.exec(querystr.utf8().data());
+
+                if (query.isActive() && query.numRowsAffected() > 0)
+                    continue;
+
+                querystr.sprintf("SELECT title,subtitle,starttime,endtime "
+                                 "FROM program WHERE chanid=%d AND "
+                                 "starttime>=\"%s\" AND starttime<\"%s\";",
+                                 chanid, 
+                                 (*i).start.toString("yyyyMMddhhmmss").ascii(), 
+                                 (*i).end.toString("yyyyMMddhhmmss").ascii());
+                query.exec(querystr.utf8().data());
+
+                if (query.isActive() && query.numRowsAffected() > 0)
+                {
+                    while(query.next())
+                    {
+                        cerr << "removing existing program: "
+                             << (*i).channel << " "
+                             << query.value(0).toString() << " "
+                             << query.value(2).toDateTime().toString("yyyyMMddhhmmss") << "-"
+                             << query.value(3).toDateTime().toString("yyyyMMddhhmmss") << endl;
+                    }
+
+                    cerr << "inserting new program    : "
+                         << (*i).channel << " "
+                         << (*i).title << " "
+                         << (*i).startts << "-" << (*i).endts << endl;
+                    cerr << endl;
+
+                    querystr.sprintf("DELETE FROM program WHERE chanid=%d AND "
+                                     "starttime>=\"%s\" AND starttime<\"%s\";",
+                                     chanid, 
+                                     (*i).start.toString("yyyyMMddhhmmss").ascii(), 
+                                     (*i).end.toString("yyyyMMddhhmmss").ascii());
+                    query.exec(querystr.utf8().data());
+
+                    querystr.sprintf("DELETE FROM programrating WHERE chanid=%d AND "
+                                     "starttime>=\"%s\" AND starttime<\"%s\";",
+                                     chanid, 
+                                     (*i).start.toString("yyyyMMddhhmmss").ascii(), 
+                                     (*i).end.toString("yyyyMMddhhmmss").ascii());
+                    query.exec(querystr.utf8().data());
+
+                    querystr.sprintf("DELETE FROM credits WHERE chanid=%d AND "
+                                     "starttime>=\"%s\" AND starttime<\"%s\";",
+                                     chanid,
+                                     (*i).start.toString("yyyyMMddhhmmss").ascii(),
+                                     (*i).end.toString("yyyyMMddhhmmss").ascii());
+                    query.exec(querystr.utf8().data());
+                }
+            }
 
             querystr.sprintf("INSERT INTO program (chanid,starttime,endtime,"
-                             "title,subtitle,description,category) VALUES(%d,"
-                             " \"%s\", \"%s\", \"%s\", \"%s\", \"%s\","
-                             " \"%s\");", 
+                             "title,subtitle,description,category,airdate,"
+                             "stars,previouslyshown) "
+                             "VALUES(%d,\"%s\",\"%s\",\"%s\",\"%s\","
+                             "\"%s\",\"%s\",\"%s\",\"%s\",\"%d\");", 
                              chanid, 
                              (*i).start.toString("yyyyMMddhhmmss").ascii(), 
                              (*i).end.toString("yyyyMMddhhmmss").ascii(), 
                              (*i).title.utf8().data(), 
                              (*i).subtitle.utf8().data(), 
                              (*i).desc.utf8().data(), 
-                             (*i).category.utf8().data());
+                             (*i).category.utf8().data(),
+                             (*i).airdate.utf8().data(),
+                             (*i).stars.utf8().data(),
+                             (*i).repeat);
 
             if (!query.exec(querystr.utf8().data()))
             {
                 MythContext::DBError("program insert", query);
+            }
+
+            QValueList<ProgRating>::iterator j = (*i).ratings.begin();
+            for (; j != (*i).ratings.end(); j++)
+            {
+                querystr.sprintf("INSERT INTO programrating (chanid,starttime,"
+                "system,rating) VALUES (%d, \"%s\", \"%s\", \"%s\");",
+                chanid,
+                (*i).start.toString("yyyyMMddhhmmss").ascii(),
+                (*j).system.utf8().data(),
+                (*j).rating.utf8().data());
+
+                if (!query.exec(querystr.utf8().data()))
+                {
+                    MythContext::DBError("programrating insert", query);
+                }
+            }
+
+            QValueList<ProgCredit>::iterator k = (*i).credits.begin();
+            for (; k != (*i).credits.end(); k++)
+            {
+                (*k).name.replace(QRegExp("\""), QString("\\\""));
+
+                querystr.sprintf("SELECT person FROM people WHERE "
+                                 "name = \"%s\";", (*k).name.utf8().data());
+                if (!query.exec(querystr.utf8().data()))
+                    MythContext::DBError("person lookup", query);
+
+                int personid = -1;
+                if (query.isActive() && query.numRowsAffected() > 0)
+                {
+                    query.next();
+                    personid = query.value(0).toInt();
+                }
+
+                if (personid < 0)
+                {
+                    querystr.sprintf("INSERT INTO people (name) VALUES "
+                                     "(\"%s\");", (*k).name.utf8().data());
+                    if (!query.exec(querystr.utf8().data()))
+                        MythContext::DBError("person insert", query);
+
+                    querystr.sprintf("SELECT person FROM people WHERE "
+                                     "name = \"%s\";", (*k).name.utf8().data());
+                    if (!query.exec(querystr.utf8().data()))
+                        MythContext::DBError("person lookup", query);
+
+                    if (query.isActive() && query.numRowsAffected() > 0)
+                    {
+                        query.next();
+                        personid = query.value(0).toInt();
+                    }
+                }
+
+                if (personid < 0)
+                {
+                    cerr << "Error inserting person\n";
+                    continue;
+                }
+
+                querystr.sprintf("INSERT INTO credits (chanid,starttime,"
+                                 "role,person) VALUES "
+                                 "(%d, \"%s\", \"%s\", %d);",
+                                 chanid,
+                                 (*i).start.toString("yyyyMMddhhmmss").ascii(),
+                                 (*k).role.ascii(),
+                                 personid);
+
+                if (!query.exec(querystr.utf8().data()))
+                {
+                    // be careful of the startime/timestamp "feature"!
+                    querystr.sprintf("UPDATE credits SET "
+                                     "role = concat(role,',%s'), "
+                                     "starttime = %s "
+                                     "WHERE chanid = %d AND "
+                                        "starttime = %s and person = %d",
+                                     (*k).role.ascii(),
+                                     (*i).start.toString("yyyyMMddhhmmss").ascii(),
+                                     chanid,
+                                     (*i).start.toString("yyyyMMddhhmmss").ascii(),
+                                     personid);
+                    if (!query.exec(querystr.utf8().data()))
+                        MythContext::DBError("credits update", query);
+                }
             }
         }
     }
@@ -800,6 +1139,22 @@ void grabDataFromFile(int id, int offset, QString &filename)
 
     handleChannels(id, &chanlist);
     handlePrograms(id, offset, &proglist);
+}
+
+time_t toTime_t(QDateTime &dt)
+{
+    tm brokenDown;
+    brokenDown.tm_sec = dt.time().second();
+    brokenDown.tm_min = dt.time().minute();
+    brokenDown.tm_hour = dt.time().hour();
+    brokenDown.tm_mday = dt.date().day();
+    brokenDown.tm_mon = dt.date().month() - 1;
+    brokenDown.tm_year = dt.date().year() - 1900;
+    brokenDown.tm_isdst = -1;
+    int secsSince1Jan1970UTC = (int) mktime( &brokenDown );
+    if ( secsSince1Jan1970UTC < -1 )
+        secsSince1Jan1970UTC = -1;
+    return secsSince1Jan1970UTC;
 }
 
 bool grabData(Source source, int offset)
@@ -828,19 +1183,74 @@ bool grabData(Source source, int offset)
         command.sprintf("nice -19 %s --days 7 --output %s",
                         xmltv_grabber.ascii(),
                         filename.ascii());
+    else if (xmltv_grabber == "tv_grab_fi")
+        // Use the default of 10 days for Finland's grabber
+        command.sprintf("nice -19 %s --offset %d --config-file %s --output %s",
+                        xmltv_grabber.ascii(), offset,
+                        configfile.ascii(), filename.ascii());
+    else if (xmltv_grabber == "tv_grab_es")
+        // Use fixed of 4 days for Spanish grabber
+        command.sprintf("nice -19 %s --days=4 --offset %d --config-file %s --output %s",
+                        xmltv_grabber.ascii(), offset,
+                        configfile.ascii(), filename.ascii());
+    else if (xmltv_grabber == "gist")
+    {    
+        QDateTime desiredDate = QDateTime::currentDateTime().addDays(offset);
+        QString day = desiredDate.toString("yyyyMMdd");
+
+        desiredDate.setTime(QTime(12, 0));
+
+        time_t noon = toTime_t(desiredDate);
+
+        struct tm loctime, utctime;
+
+        localtime_r(&noon, &loctime);
+        gmtime_r(&noon, &utctime);
+
+        if (utctime.tm_yday > loctime.tm_yday)
+            utctime.tm_hour += 24;
+        if (utctime.tm_yday < loctime.tm_yday)
+            utctime.tm_hour -= 24;
+
+        int hourdiff = loctime.tm_hour - utctime.tm_hour; 
+        QString reqtz;
+
+        reqtz.sprintf("%+.2d00", hourdiff);
+
+        command.sprintf("wget -nv -O %s --header \"Accept-encoding: gzip\" "
+                        "http://www.gist.com/tv/xmltv/?userid=%s\\&date=%s"
+                        "\\&tz_offset=%s", filename.ascii(),
+                        source.userid.ascii(),
+                        day.ascii(), reqtz.ascii());
+    }
     else
         command.sprintf("nice -19 %s --days 1 --offset %d --config-file %s "
                         "--output %s", xmltv_grabber.ascii(),
                         offset, configfile.ascii(), filename.ascii());
 
+    if (quiet &&
+        (xmltv_grabber == "tv_grab_na" ||
+         xmltv_grabber == "tv_grab_de" ||
+         xmltv_grabber == "tv_grab_fi" ||
+         xmltv_grabber == "tv_grab_es" ||
+         xmltv_grabber == "tv_grab_nz" ||
+         xmltv_grabber == "tv_grab_sn" ||
+         xmltv_grabber == "tv_grab_uk" ||
+         xmltv_grabber == "tv_grab_uk_rt" ||
+         xmltv_grabber == "tv_grab_fi"))
+         command += " --quiet";
 
-    cout << "Fetching data for " <<
-         QDate::currentDate().addDays(offset).toString() << "...\n";
-    cout << "----------------- Start of XMLTV output -----------------" << endl;
- 
+
+    if (!quiet) {
+         cout << "Fetching data for " <<
+              QDate::currentDate().addDays(offset).toString() << "...\n";
+         cout << "----------------- Start of XMLTV output -----------------" << endl;
+    }
+
     int status = system(command.ascii());
  
-    cout << "------------------ End of XMLTV output ------------------" << endl;
+    if (!quiet)
+         cout << "------------------ End of XMLTV output ------------------" << endl;
 
     grabDataFromFile(source.id, offset, filename);
 
@@ -852,10 +1262,23 @@ bool grabData(Source source, int offset)
 
 void clearOldDBEntries(void)
 {
-    QString querystr = "DELETE FROM program WHERE starttime <= "
-                       "DATE_SUB(CURRENT_DATE, INTERVAL 1 DAY);";
     QSqlQuery query;
+    QString querystr;
+    int offset = 1;
 
+    if (no_delete)
+        offset=7;
+
+    querystr.sprintf("DELETE FROM program WHERE starttime <= "
+                     "DATE_SUB(CURRENT_DATE, INTERVAL %d DAY);", offset);
+    query.exec(querystr);
+
+    querystr.sprintf("DELETE FROM programrating WHERE starttime <= "
+                     "DATE_SUB(CURRENT_DATE, INTERVAL %d DAY);", offset);
+    query.exec(querystr);
+
+    querystr.sprintf("DELETE FROM credits WHERE starttime <= "
+                     "DATE_SUB(CURRENT_DATE, INTERVAL %d DAY);", offset);
     query.exec(querystr);
 }
 
@@ -866,7 +1289,8 @@ bool fillData(QValueList<Source> &sourcelist)
     int failures = 0;
     for (it = sourcelist.begin(); it != sourcelist.end(); ++it) {
         QString xmltv_grabber = (*it).xmltvgrabber;
-        if (xmltv_grabber == "tv_grab_uk" || xmltv_grabber == "tv_grab_de")
+        if (xmltv_grabber == "tv_grab_uk" || xmltv_grabber == "tv_grab_de" ||
+            xmltv_grabber == "tv_grab_fi" || xmltv_grabber == "tv_grab_es")
         {
             // tv_grab_uk|de doesn't support the --offset option, so just grab a 
             // week.
@@ -880,67 +1304,74 @@ bool fillData(QValueList<Source> &sourcelist)
 
             for (int i = 0; i < 7; i++)
             {
-                int nextoffset = i + 1;
                 QString querystr;
-                querystr.sprintf("SELECT COUNT(*) FROM program, channel "
-                                 "WHERE program.chanid = channel.chanid "
-                                 "AND channel.sourceid = %d "
-                                 "AND starttime >= "
-                                 "DATE_ADD(CURRENT_DATE, INTERVAL %d DAY) AND "
-                                 "starttime < DATE_ADD(CURRENT_DATE, INTERVAL %d "
-                                 "DAY);", (*it).id, i, nextoffset);
-                
+                querystr.sprintf("SELECT COUNT(*) as 'hits' "
+                                 "FROM channel LEFT JOIN program USING (chanid) "
+                                 "WHERE sourceid = %d AND starttime >= "
+                                 "DATE_ADD(CURRENT_DATE(), INTERVAL %d DAY) "
+                                 "AND starttime < DATE_ADD(CURRENT_DATE(), "
+                                 "INTERVAL 1+%d DAY) "
+                                 "GROUP BY channel.chanid "
+                                 "ORDER BY hits DESC LIMIT 1",
+                                 (*it).id, i, i);               
+ 
                 QSqlQuery query;
                 query.exec(querystr);
                 
-                if (query.isActive() && query.numRowsAffected() > 0) {
-
-                    query.next();
-                    if (query.value(0).toInt() < 20)
-                        grabData(*it, i);
-
-                } else {
-                    cout << "DB error when checking for existing program data: "
-                         << query.lastError().databaseText() << endl;
-                }
+                if (query.isActive()) 
+                {
+                    if (!query.numRowsAffected() ||
+                        (query.next() && query.value(0).toInt() <= 1))
+                    {
+                        if (!grabData(*it, i))
+                            ++failures;
+                    }
+                } 
+                else
+                    MythContext::DBError("checking existing program data", 
+                                         query);
             }
-	}
-        else if (xmltv_grabber == "tv_grab_na" || xmltv_grabber == "tv_grab_aus" ||
-             xmltv_grabber == "tv_grab_sn")
+        }
+        else if (xmltv_grabber == "tv_grab_na" || 
+                 xmltv_grabber == "tv_grab_aus" ||
+                 xmltv_grabber == "tv_grab_sn" ||
+                 xmltv_grabber == "gist")
         {
             if (!grabData(*it, 1))
                 ++failures;
 
             for (int i = 0; i < 9; i++)
             {
-                int nextoffset = i + 1;
                 QString querystr;
-                querystr.sprintf("SELECT COUNT(*) FROM program, channel "
-                                 "WHERE program.chanid = channel.chanid "
-                                 "AND channel.sourceid = %d "
-                                 "AND starttime >= "
-                                 "DATE_ADD(CURRENT_DATE, INTERVAL %d DAY) AND "
-                                 "starttime < DATE_ADD(CURRENT_DATE, INTERVAL %d "
-                                 "DAY);", (*it).id, i, nextoffset);
-                
+                querystr.sprintf("SELECT COUNT(*) as 'hits' "
+                                 "FROM channel LEFT JOIN program USING (chanid) "
+                                 "WHERE sourceid = %d AND starttime >= "
+                                 "DATE_ADD(CURRENT_DATE(), INTERVAL %d DAY) "
+                                 "AND starttime < DATE_ADD(CURRENT_DATE(), "
+                                 "INTERVAL 1+%d DAY) "
+                                 "GROUP BY channel.chanid "
+                                 "ORDER BY hits DESC LIMIT 1",
+                                 (*it).id, i, i); 
                 QSqlQuery query;
                 query.exec(querystr);
-                
-                if (query.isActive() && query.numRowsAffected() > 0) {
-
-                    query.next();
-                    if (query.value(0).toInt() < 20)
+               
+                if (query.isActive()) 
+                {
+                    if (!query.numRowsAffected() ||
+                        (query.next() && query.value(0).toInt() <= 1)) 
+                    {
                         if (!grabData(*it, i))
                             ++failures;
-
-                } else {
-                    MythContext::DBError("checking existing program data", query);
-                }
+                    }
+                } 
+                else
+                    MythContext::DBError("checking existing program data", 
+                                         query);
             }
         }
         else
         {
-            cout << "Grabbing XMLTV data using " << xmltv_grabber.ascii() 
+            cerr << "Grabbing XMLTV data using " << xmltv_grabber.ascii() 
                  << " is not verified as working.\n";
         }
     }
@@ -1110,6 +1541,12 @@ int main(int argc, char *argv[])
             // users in xmltv zones that do not provide channel data.
             non_us_updating = true;
         }
+        else if (!strcmp(a.argv()[argpos], "--no-delete"))
+        {
+            // Do not delete old programs from the database until 7 days old.
+            // Do not delete existing programs from the database when updating.
+            no_delete = true;
+        }
         else if (!strcmp(a.argv()[argpos], "--file"))
         {
             if (((argpos + 3) >= a.argc()) ||
@@ -1125,7 +1562,8 @@ int main(int argc, char *argv[])
             fromfile_offset = atoi(a.argv()[++argpos]);
             fromfile_name = a.argv()[++argpos];
 
-            cout << "### bypassing grabbers, reading directly from file\n";
+	    if (!quiet)
+                 cout << "### bypassing grabbers, reading directly from file\n";
             from_file = true;
         }
         else if (!strcmp(a.argv()[argpos], "--xawchannels"))
@@ -1141,8 +1579,14 @@ int main(int argc, char *argv[])
             fromxawfile_id = atoi(a.argv()[++argpos]);
             fromxawfile_name = a.argv()[++argpos];
 
-            cout << "### reading channels from xawtv configfile\n";
+	    if (!quiet)
+                 cout << "### reading channels from xawtv configfile\n";
             from_xawfile = true;
+        }
+        else if (!strcmp(a.argv()[argpos], "--quiet"))
+        {
+             quiet = true;
+             ++argpos;
         }
         else if (!strcmp(a.argv()[argpos], "--help"))
         {
@@ -1154,6 +1598,10 @@ int main(int argc, char *argv[])
             cout << "--update\n";
             cout << "   For running non-destructive updates on the database for\n";
             cout << "   users in xmltv zones that do not provide channel data\n";
+            cout << "\n";
+            cout << "--no-delete\n";
+            cout << "   Do not delete old programs from the database until 7 days old.\n";
+            cout << "   Do not delete existing programs from the database when updating.\n";
             cout << "\n";
             cout << "--file <sourceid> <offset> <xmlfile>\n";
             cout << "   Bypass the grabbers and read data directly from a file\n";
@@ -1177,19 +1625,20 @@ int main(int argc, char *argv[])
         }
         else
         {
-            printf("illegal option: '%s' (use --help)\n", a.argv()[argpos]);
+            fprintf(stderr, "illegal option: '%s' (use --help)\n",
+                    a.argv()[argpos]);
             return -1;
         }
 
         ++argpos;
     }
 
-    gContext = new MythContext(false);
+    gContext = new MythContext(MYTH_BINARY_VERSION, false);
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!gContext->OpenDatabase(db))
     {
-        printf("couldn't open db\n");
+        cerr << "couldn't open db\n";
         return -1;
     }
 
@@ -1206,8 +1655,8 @@ int main(int argc, char *argv[])
         QValueList<Source> sourcelist;
 
         QSqlQuery sourcequery;
-        QString querystr = QString("SELECT sourceid,name,xmltvgrabber FROM videosource "
-                                   "ORDER BY sourceid;");
+        QString querystr = QString("SELECT sourceid,name,xmltvgrabber,userid "
+                                   "FROM videosource ORDER BY sourceid;");
         sourcequery.exec(querystr);
         
         if (sourcequery.isActive())
@@ -1221,7 +1670,8 @@ int main(int argc, char *argv[])
                        newsource.id = sourcequery.value(0).toInt();
                        newsource.name = sourcequery.value(1).toString();
                        newsource.xmltvgrabber = sourcequery.value(2).toString();
-            
+                       newsource.userid = sourcequery.value(3).toString();
+
                        sourcelist.append(newsource);
                   }
              }
@@ -1246,11 +1696,12 @@ int main(int argc, char *argv[])
         }
     }
 
-     cout << "Adjusting program database end times...\n";
-     int update_count = fix_end_times();
-     if (update_count == -1)
-         cout << "fix_end_times failed!\a\n";
-     else
+    if (!quiet)
+         cout << "Adjusting program database end times...\n";
+    int update_count = fix_end_times();
+    if (update_count == -1)
+         cerr << "fix_end_times failed!\a\n";
+    else if (!quiet)
          cout << update_count << " replacements made.\n";
 
     delete gContext;

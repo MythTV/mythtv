@@ -3,11 +3,15 @@
 #include <qfile.h>
 #include <qmap.h>
 #include <unistd.h>
+#include <qdir.h>
+#include <qtextcodec.h>
 
 #include <iostream>
 using namespace std;
 
 #include "tv.h"
+#include "progfind.h"
+#include "manualbox.h"
 #include "playbackbox.h"
 #include "viewscheduled.h"
 #include "globalsettings.h"
@@ -18,6 +22,7 @@ using namespace std;
 #include "libmyth/mythcontext.h"
 #include "libmyth/dialogbox.h"
 #include "libmythtv/guidegrid.h"
+#include "libmyth/mythplugin.h"
 
 #define QUIT     1
 #define HALTWKUP 2
@@ -72,6 +77,18 @@ int startDelete(void)
     return 0;
 }
 
+int startManual(void)
+{
+    ManualBox manbox;
+
+    manbox.Show();
+    qApp->unlock();
+    manbox.exec();
+    qApp->lock();
+
+    return 0;
+}
+
 void startTV(void)
 {
     QSqlDatabase *db = QSqlDatabase::database();
@@ -100,6 +117,8 @@ void startTV(void)
         }
     }
 
+    delete tv;
+
     qApp->lock();
 }
 
@@ -116,8 +135,12 @@ void TVMenuCallback(void *data, QString &selection)
         startGuide();
     else if (sel == "tv_delete")
         startDelete();
+    else if (sel == "tv_manual")
+        startManual();
     else if (sel == "tv_fix_conflicts")
         startManaged();
+    else if (sel == "tv_progfind")
+        RunProgramFind();
     else if (sel == "settings appearance") {
         AppearanceSettings settings;
         settings.exec(QSqlDatabase::database());
@@ -129,6 +152,7 @@ void TVMenuCallback(void *data, QString &selection)
     } else if (sel == "settings general") {
         GeneralSettings settings;
         settings.exec(QSqlDatabase::database());
+        menu->ReloadExitKey();
     } else if (sel == "settings playback") {
         PlaybackSettings settings;
         settings.exec(QSqlDatabase::database());
@@ -182,7 +206,16 @@ void haltnow(int how)
 
 int RunMenu(QString themedir)
 {
-    menu = new ThemedMenu(themedir.ascii(), "mainmenu.xml");
+    QString MenuName = "mainmenu_" + 
+                       QString(gContext->GetSetting("Locale").lower()) + 
+                       ".xml";
+    QFile filetest(PREFIX + QString("/share/mythtv/") + MenuName);
+
+    if (!filetest.exists())
+        menu = new ThemedMenu(themedir.ascii(), "mainmenu.xml");
+    else
+        menu = new ThemedMenu(themedir.ascii(), MenuName);
+
     menu->setCallback(TVMenuCallback, gContext);
    
     int exitstatus = 0;
@@ -219,14 +252,54 @@ void WriteDefaults(QSqlDatabase* db) {
     as.save(db);
 }
 
+QString RandTheme(QString &themename, QSqlDatabase *db)
+{
+    QDir themes(PREFIX"/share/mythtv/themes");
+    themes.setFilter(QDir::Dirs);
+
+    const QFileInfoList *fil = themes.entryInfoList(QDir::Dirs);
+
+    QFileInfoListIterator it( *fil);
+    QFileInfo *theme;
+    QStringList themelist;
+
+    srand(time(NULL));
+
+    for ( ; it.current() !=0; ++it)
+    {
+        theme = it.current();
+        if (theme->fileName() == "." || theme->fileName() =="..")
+            continue;
+
+        QFileInfo preview(theme->absFilePath() + "/preview.jpg");
+        QFileInfo xml(theme->absFilePath() + "/theme.xml");
+
+        if (!preview.exists() || !xml.exists())
+            continue;
+
+        // We don't want the same one as last time.
+        if (theme->fileName() != themename)
+            themelist.append(theme->fileName());
+    }
+
+    themename = themelist[rand() % themelist.size()];
+
+    ThemeSelector Theme;
+    Theme.setValue(themename);
+    Theme.save(db);
+
+    return themename;
+}
+
 int main(int argc, char **argv)
 {
     QString lcd_host;
     int lcd_port;
 
     QApplication a(argc, argv);
+    QTranslator translator( 0 );
 
-    gContext = new MythContext;
+    gContext = new MythContext(MYTH_BINARY_VERSION);
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
@@ -241,6 +314,13 @@ int main(int argc, char **argv)
         return -1;
     }
 
+    MythPluginManager::init(db, gContext);
+
+    translator.load(PREFIX + QString("/share/mythtv/i18n/mythfrontend_") + 
+                    QString(gContext->GetSetting("Locale").lower()) + 
+                    QString(".qm"), ".");
+    a.installTranslator(&translator);
+
     QString server = gContext->GetSetting("MasterServerIP", "localhost");
     int port = gContext->GetNumSetting("MasterServerPort", 6543);
     gContext->ConnectServer(server, port);
@@ -248,6 +328,11 @@ int main(int argc, char **argv)
     WriteDefaults(db);
 
     QString themename = gContext->GetSetting("Theme", "blue");
+    bool randomtheme = gContext->GetNumSetting("RandomTheme", 0);
+
+    if (randomtheme)
+        themename = RandTheme(themename, db);
+
     QString themedir = gContext->FindThemeDir(themename);
     if (themedir == "")
     {

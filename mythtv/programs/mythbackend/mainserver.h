@@ -4,6 +4,8 @@
 #include <qmap.h>
 #include <qsocket.h>
 #include <qtimer.h>
+#include <qurl.h>
+#include <qmutex.h>
 #include <vector>
 using namespace std;
 
@@ -14,6 +16,7 @@ using namespace std;
 #include "filetransfer.h"
 
 class HttpStatus;
+class ProcessRequestThread;
 
 class MainServer : public QObject
 {
@@ -26,6 +29,10 @@ class MainServer : public QObject
 
     void customEvent(QCustomEvent *e);
     void PrintStatus(QSocket *socket);
+
+    void ProcessRequest(QStringList &listline, QStringList &tokens, 
+                        PlaybackSock *pbs);
+    void MarkUnused(ProcessRequestThread *prt);
 
   protected slots:
     void reconnectTimeout(void);
@@ -66,6 +73,8 @@ class MainServer : public QObject
     FileTransfer *getFileTransferByID(int id);
     FileTransfer *getFileTransferBySock(QSocket *socket);
 
+    QString LocalFilePath(QUrl &url);
+
     bool isRingBufSock(QSocket *sock);
 
     QMap<int, EncoderLink *> *encoderList;
@@ -84,6 +93,10 @@ class MainServer : public QObject
     PlaybackSock *masterServer;
     
     bool ismaster;
+
+    QMutex dblock;
+    QMutex threadPoolLock;
+    vector<ProcessRequestThread *> threadPool;
 };
 
 #endif

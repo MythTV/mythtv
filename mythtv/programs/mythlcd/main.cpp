@@ -33,7 +33,7 @@ int main(int argc, char **argv)
 	QString lcd_host;
 	int		lcd_port;
 	QApplication a(argc, argv);
-	gContext = new MythContext(FALSE);
+	gContext = new MythContext(MYTH_BINARY_VERSION, FALSE);
 
     db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!gContext->OpenDatabase(db))

@@ -18,6 +18,10 @@ EncoderLink::EncoderLink(int capturecardnum, PlaybackSock *lsock,
     tv = NULL;
     local = false;
     m_capturecardnum = capturecardnum;
+
+    endRecordingTime = QDateTime::currentDateTime().addDays(-2);
+    startRecordingTime = endRecordingTime;
+    chanid = "";
 }
 
 EncoderLink::EncoderLink(int capturecardnum, TVRec *ltv)
@@ -26,6 +30,10 @@ EncoderLink::EncoderLink(int capturecardnum, TVRec *ltv)
     tv = ltv;
     local = true;
     m_capturecardnum = capturecardnum;
+
+    endRecordingTime = QDateTime::currentDateTime().addDays(-2);
+    startRecordingTime = endRecordingTime;
+    chanid = "";
 }
 
 EncoderLink::~EncoderLink()
@@ -68,6 +76,16 @@ TVState EncoderLink::GetState(void)
         retval = tv->GetState();
     else
         retval = (TVState)sock->GetEncoderState(m_capturecardnum);
+
+    return retval;
+}
+
+bool EncoderLink::isRecording(ProgramInfo *rec)
+{
+    bool retval = false;
+
+    if (rec->chanid == chanid && rec->startts == startRecordingTime)
+        retval = true;
 
     return retval;
 }
@@ -124,8 +142,23 @@ int EncoderLink::AllowRecording(ProgramInfo *rec, int timeuntil)
     return -1;
 }
 
+bool EncoderLink::WouldConflict(ProgramInfo *rec)
+{
+    if (!isConnected())
+        return true;
+
+    if (rec->startts < endRecordingTime)
+        return true;
+
+    return false;
+}
+
 void EncoderLink::StartRecording(ProgramInfo *rec)
 {
+    endRecordingTime = rec->endts;
+    startRecordingTime = rec->startts;
+    chanid = rec->chanid;
+
     if (local)
         tv->StartRecording(rec);
     else
@@ -134,13 +167,28 @@ void EncoderLink::StartRecording(ProgramInfo *rec)
 
 void EncoderLink::StopRecording(void)
 {
+    endRecordingTime = QDateTime::currentDateTime().addDays(-2);
+    startRecordingTime = endRecordingTime;
+    chanid = "";
+
     if (local)
     {
         tv->StopRecording();
         return;
     }
+}
 
-    cerr << "Should be local only query: StopRecording\n";
+void EncoderLink::FinishRecording(void)
+{
+    if (local)
+    {
+        tv->FinishRecording();
+        return;
+    }
+    else
+    {
+        endRecordingTime = QDateTime::currentDateTime().addDays(-2);
+    }
 }
 
 bool EncoderLink::IsReallyRecording(void)
@@ -308,37 +356,51 @@ void EncoderLink::SetChannel(QString name)
     cerr << "Should be local only query: SetChannel\n";
 }
 
-void EncoderLink::ChangeContrast(bool direction)
+int EncoderLink::ChangeContrast(bool direction)
 {
-    if (local)
-    {
-        tv->ChangeContrast(direction);
-        return;
-    }
+    int ret = 0;
 
-    cerr << "Should be local only query: ChangeContrast\n";
+    if (local)
+        ret = tv->ChangeContrast(direction);
+    else
+        cerr << "Should be local only query: ChangeContrast\n";
+
+    return ret;
 }
 
-void EncoderLink::ChangeBrightness(bool direction)
+int EncoderLink::ChangeBrightness(bool direction)
 {
-    if (local)
-    {
-        tv->ChangeBrightness(direction);
-        return;
-    }
+    int ret = 0;
 
-    cerr << "Should be local only query: ChangeBrightness\n";
+    if (local)
+        ret = tv->ChangeBrightness(direction);
+    else
+        cerr << "Should be local only query: ChangeBrightness\n";
+
+    return ret;
 }
 
-void EncoderLink::ChangeColour(bool direction)
+int EncoderLink::ChangeColour(bool direction)
+{
+    int ret = 0;
+
+    if (local)
+        ret = tv->ChangeColour(direction);
+    else
+        cerr << "Should be local only query: ChangeColor\n";
+
+    return ret;
+}
+
+void EncoderLink::ChangeDeinterlacer(int deinterlacer_mode)
 {
     if (local)
     {
-        tv->ChangeColour(direction);
+        tv->ChangeDeinterlacer(deinterlacer_mode);
         return;
     }
 
-    cerr << "Should be local only query: ChangeColor\n";
+    cerr << "Should be local only query: ChangeDeinterlacer\n";
 }
 
 bool EncoderLink::CheckChannel(QString name)
@@ -350,16 +412,34 @@ bool EncoderLink::CheckChannel(QString name)
     return false;
 }
 
+void EncoderLink::GetNextProgram(int direction,
+                                 QString &title, QString &subtitle, 
+                                 QString &desc, QString &category, 
+                                 QString &starttime, QString &endtime, 
+                                 QString &callsign, QString &iconpath,
+                                 QString &channelname, QString &chanid)
+{
+    if (local)
+    {
+        tv->GetNextProgram(direction,
+                           title, subtitle, desc, category, starttime,
+                           endtime, callsign, iconpath, channelname, chanid);
+        return;
+    }
+
+    cerr << "Should be local only query: GetNextProgram\n";
+}
+
 void EncoderLink::GetChannelInfo(QString &title, QString &subtitle, 
                                  QString &desc, QString &category, 
                                  QString &starttime, QString &endtime, 
                                  QString &callsign, QString &iconpath,
-                                 QString &channelname)
+                                 QString &channelname, QString &chanid)
 {
     if (local)
     {
         tv->GetChannelInfo(title, subtitle, desc, category, starttime,
-                           endtime, callsign, iconpath, channelname);
+                           endtime, callsign, iconpath, channelname, chanid);
         return;
     }
 
@@ -473,3 +553,12 @@ char *EncoderLink::GetScreenGrab(QString filename, int secondsin,
     cerr << "Should be local only query: GetScreenGrab\n";
     return NULL;
 }
+
+bool EncoderLink::isParsingCommercials(ProgramInfo *pginfo)
+{
+    if (local)
+        return tv->isParsingCommercials(pginfo);
+
+    return false;
+}
+

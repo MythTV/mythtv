@@ -10,30 +10,23 @@
 class AudioOutputDevice: public ComboBoxSetting, public GlobalSetting {
 public:
     AudioOutputDevice();
-protected:
-    static const char* paths[];
 };
-
-const char* AudioOutputDevice::paths[] = { "/dev/dsp",
-                                           "/dev/dsp1",
-                                           "/dev/dsp2",
-                                           "/dev/dsp3",
-                                           "/dev/dsp4",
-                                           "/dev/sound/dsp",
-                                           "/dev/sound/dsp1",
-                                           "/dev/sound/dsp2",
-                                           "/dev/sound/dsp3",
-                                           "/dev/sound/dsp4" };
 
 AudioOutputDevice::AudioOutputDevice():
     ComboBoxSetting(true),
     GlobalSetting("AudioOutputDevice") {
 
     setLabel("Audio output device");
-    for(unsigned int i = 0; i < sizeof(paths) / sizeof(char*); ++i) {
-        if (QFile(paths[i]).exists())
-            addSelection(paths[i]);
-    }
+    QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
+    fillSelectionsFromDir(dev);
+    dev.setNameFilter("adsp*");
+    fillSelectionsFromDir(dev);
+
+    dev.setNameFilter("dsp*");
+    dev.setPath("/dev/sound");
+    fillSelectionsFromDir(dev);
+    dev.setNameFilter("adsp*");
+    fillSelectionsFromDir(dev);
 }
 
 class MythControlsVolume: public CheckBoxSetting, public GlobalSetting {
@@ -75,6 +68,27 @@ MixerDevice::MixerDevice():
         if (QFile(paths[i]).exists())
             addSelection(paths[i]);
     }
+}
+
+class MixerControl: public ComboBoxSetting, public GlobalSetting {
+public:
+    MixerControl();
+protected:
+    static const char* controls[];
+};
+
+const char* MixerControl::controls[] = { "PCM",
+                                         "Master" };
+
+MixerControl::MixerControl():
+    ComboBoxSetting(true),
+    GlobalSetting("MixerControl") {
+
+    setLabel("Mixer Controls");
+    for(unsigned int i = 0; i < sizeof(controls) / sizeof(char*); ++i) {
+        addSelection(controls[i]);
+    }
+    setHelpText("Changing the volume adjusts the selected mixer.");
 }
 
 class MixerVolume: public SliderSetting, public GlobalSetting {
@@ -121,7 +135,7 @@ public:
     JumpAmount():
         SpinBoxSetting(1, 30, 1),
         GlobalSetting("JumpAmount") {
-        setLabel("Jump amount (minutes)");
+        setLabel("Jump amount (in minutes)");
         setValue(10);
         setHelpText("How many minutes to jump forward or backward "
                    "when the jump keys are pressed.");
@@ -174,15 +188,26 @@ public:
     };
 };
 
+class CommercialSkipEverywhere: public CheckBoxSetting, public GlobalSetting {
+public:
+    CommercialSkipEverywhere():
+        GlobalSetting("CommercialSkipEverywhere") {
+        setLabel("Commercial Skip Everywhere");
+        setValue(true);
+        setHelpText("Allow the commercial skip buttons to jump to the "
+                    "beginning of a commercial break as well as the end.");
+    };
+};
+
 class AutoCommercialSkip: public CheckBoxSetting, public GlobalSetting {
 public:
     AutoCommercialSkip():
         GlobalSetting("AutoCommercialSkip") {
         setLabel("Automatically Skip Commercials");
         setValue(false);
-        setHelpText("If enabled, MythTV will attempt to automatically skip "
-                    "commercials using the selected Commercial Skip Method. "
-                    "If a commercial cutlist exists, it will be used.");
+        setHelpText("Automatically skip commercial breaks using the selected "
+                    "Commercial Skip Method. If a commercial break cutlist "
+                    "exists, it will be used instead.");
     };
 };
 
@@ -192,9 +217,8 @@ public:
         GlobalSetting("AutoCommercialFlag") {
         setLabel("Automatically Flag Commercials");
         setValue(false);
-        setHelpText("If enabled, MythTV will attempt to automatically flag "
-                    "commercials during the recording process if you have your "
-                    "'Commercial Skip Method' set to 'Blank Screen Detection'");
+        setHelpText("Automatically flag commercials after a recording "
+                    "completes.");
     };
 };
 
@@ -205,6 +229,18 @@ public:
         GlobalSetting("RecordOverTime") {
         setLabel("Time to record past end of show (in seconds)");
         setValue(0);
+    };
+};
+
+class PlayBoxOrdering: public CheckBoxSetting, public GlobalSetting {
+public:
+    PlayBoxOrdering():
+        GlobalSetting("PlayBoxOrdering") {
+        setLabel("List Newest Recording First");
+        setValue(true);
+        setHelpText("If checked (default) the most recent recording will be listed "
+		    "first in the 'Watch Recordings' screen. If unchecked the oldest recording "
+		    "will be listed first.");
     };
 };
 
@@ -238,11 +274,25 @@ public:
         GlobalSetting("OSDTheme") {
         setLabel("OSD theme");
 
-        addSelection("defaultosd");
-        addSelection("blueosd");
-        addSelection("oldosd");
-        addSelection("none");
-    };
+        QDir themes(PREFIX"/share/mythtv/themes");
+        themes.setFilter(QDir::Dirs);
+        themes.setSorting(QDir::Name | QDir::IgnoreCase);
+
+        const QFileInfoList *fil = themes.entryInfoList(QDir::Dirs);
+        if (!fil)
+            return;
+
+        QFileInfoListIterator it( *fil );
+        QFileInfo *theme;
+
+        for( ; it.current() != 0 ; ++it ) {
+            theme = it.current();
+            QFileInfo xml(theme->absFilePath() + "/osd.xml");
+
+            if (theme->fileName()[0] != '.' && xml.exists())
+                addSelection(theme->fileName());
+        }
+    }
 };
 
 class OSDFont: public ComboBoxSetting, public GlobalSetting {
@@ -252,6 +302,7 @@ public:
 
         setLabel("OSD font");
         addSelection("FreeSans.ttf");
+        addSelection("FreeMono.ttf");
     };
 };
 
@@ -261,6 +312,7 @@ public:
         GlobalSetting("OSDCCFont") {
 
         setLabel("Closed Caption font");
+        addSelection("FreeMono.ttf");
         addSelection("FreeSans.ttf");
         addSelection("ClosedCaption.ttf");
     };
@@ -406,6 +458,33 @@ public:
     };
 };
 
+class PlayBoxTransparency: public CheckBoxSetting, public GlobalSetting {
+public:
+    PlayBoxTransparency():
+        GlobalSetting("PlayBoxTransparency") {
+        setLabel("Use Transparent Boxes");
+        setValue(true);
+        setHelpText("If set, the Watch Recording and Delete Recording "
+                    "screens will use transparency. Unset this option "
+		    "if selecting the recordings is slow.");
+
+    };
+};
+
+class PlayBoxShading: public ComboBoxSetting, public GlobalSetting {
+public:
+    PlayBoxShading():
+        GlobalSetting("PlayBoxShading") {
+        setLabel("Popup Background Shading Method");
+        addSelection("Fill", "0");
+        addSelection("Image", "1");
+        addSelection("None", "2");
+        setHelpText("Fill is the quickest method, but it doesn't look good up close. "
+                    "Image looks good from up close, but is somewhat slow. "
+                    "And of course no shading will be the fastest.");
+    };
+};
+
 class AllowQuitShutdown: public ComboBoxSetting, public GlobalSetting {
 public:
     AllowQuitShutdown():
@@ -484,17 +563,39 @@ public:
     };
 };
 
+class RandomTheme: public CheckBoxSetting, public GlobalSetting {
+public:
+    RandomTheme():
+        GlobalSetting("RandomTheme") {
+        setLabel("Use a random theme");
+        setValue(false);
+        setHelpText("Use a random theme each time MythTV is started.");
+    };
+};
+
 class MythDateFormat: public ComboBoxSetting, public GlobalSetting {
 public:
     MythDateFormat():
         ComboBoxSetting(true), GlobalSetting("DateFormat") {
         setLabel("Date format");
-        addSelection("ddd MMMM d");
         addSelection("ddd MMM d");
+        addSelection("ddd MMMM d");
         addSelection("MMM d");
         addSelection("MM/dd");
         addSelection("MM.dd");
+        addSelection("ddd d MMM");
 	setHelpText("Your preferred date format.");
+    };
+};
+
+class MythShortDateFormat: public ComboBoxSetting, public GlobalSetting {
+public:
+    MythShortDateFormat():
+        ComboBoxSetting(true), GlobalSetting("ShortDateFormat") {
+        setLabel("Short Date format");
+        addSelection("M/d");
+        addSelection("d/M");
+        setHelpText("Your preferred short date format.");
     };
 };
 
@@ -504,7 +605,9 @@ public:
         ComboBoxSetting(true), GlobalSetting("TimeFormat") {
         setLabel("Time format");
         addSelection("h:mm AP");
+        addSelection("h:mm ap");
         addSelection("hh:mm AP");
+        addSelection("hh:mm ap");
         addSelection("hh:mm");
         addSelection("h:mm");
 	setHelpText("Your preferred time format.  Choose a format "
@@ -532,14 +635,10 @@ ThemeSelector::ThemeSelector():
 
     for( ; it.current() != 0 ; ++it ) {
         theme = it.current();
-
-        if ( theme->fileName() == "." || theme->fileName() == ".." )
-            continue;
-
         QFileInfo preview(theme->absFilePath() + "/preview.jpg");
         QFileInfo xml(theme->absFilePath() + "/theme.xml");
 
-        if (!preview.exists() || !xml.exists()) {
+        if (theme->fileName()[0] == '.' || !preview.exists() || !xml.exists()) {
             //cout << theme->absFilePath() << " doesn't look like a theme\n";
             continue;
         }
@@ -592,21 +691,28 @@ public:
 
 // EPG settings
 
-class EPGShowTitle: public CheckBoxSetting, public GlobalSetting {
+class EPGScrollType: public CheckBoxSetting, public GlobalSetting {
 public:
-    EPGShowTitle():
-        GlobalSetting("EPGShowTitle") {
-        setLabel("Display the program title at the bottom");
+    EPGScrollType():
+        GlobalSetting("EPGScrollType") {
+        setLabel("Program Guide Selection Placement");
         setValue(true);
+        setHelpText("If unchecked, the program guide's selector will "
+                    "stay in the middle of the guide at all times.");
     };
 };
 
-class EPGProgramBar: public CheckBoxSetting, public GlobalSetting {
+class EPGFillType: public ComboBoxSetting, public GlobalSetting {
 public:
-    EPGProgramBar():
-        GlobalSetting("EPGProgramBar") {
-        setLabel("Display the guide / program finder information bar at the bottom");
-        setValue(true);
+    EPGFillType():
+        GlobalSetting("EPGFillType") {
+        setLabel("Guide Shading Method");
+        addSelection("Colorized (alpha)", "6");
+        addSelection("Colorized (shaded)", "5");
+        addSelection("Embossed (shaded)", "3");
+        addSelection("Embossed (solid)", "4");
+        addSelection("Rounded (shaded)", "1");
+        addSelection("Rounded (solid)", "2");
     };
 };
 
@@ -619,95 +725,23 @@ public:
     };
 };
 
-class EPGTimeFontSize: public SpinBoxSetting, public GlobalSetting {
+class EPGChanDisplay: public SpinBoxSetting, public GlobalSetting {
 public:
-    EPGTimeFontSize():
-        SpinBoxSetting(1, 48, 1), GlobalSetting("EPGTimeFontSize") {
-        setLabel("Font size for time");
-        setValue(13);
-    };
-};
-
-class EPGChanFontSize: public SpinBoxSetting, public GlobalSetting {
-public:
-    EPGChanFontSize():
-        SpinBoxSetting(1, 48, 1), GlobalSetting("EPGChanFontSize") {
-        setLabel("Font size for channel");
-        setValue(13);
-    };
-};
-
-class EPGChanCallsignFontSize: public SpinBoxSetting, public GlobalSetting {
-public:
-    EPGChanCallsignFontSize():
-        SpinBoxSetting(1, 48, 1), GlobalSetting("EPGChanCallsignFontSize") {
-        setLabel("Font size for callsign");
-        setValue(11);
-    };
-};
-
-class EPGProgFontSize: public SpinBoxSetting, public GlobalSetting {
-public:
-    EPGProgFontSize():
-        SpinBoxSetting(1, 48, 1), GlobalSetting("EPGProgFontSize") {
-        setLabel("Font size for program");
-        setValue(13);
-    };
-};
-
-class EPGTitleFontSize: public SpinBoxSetting, public GlobalSetting {
-public:
-    EPGTitleFontSize():
-        SpinBoxSetting(1, 48, 1), GlobalSetting("EPGTitleFontSize") {
-        setLabel("Font size for title");
-        setValue(19);
-    };
-};
-
-class EPGShowCurrentTime: public CheckBoxSetting, public GlobalSetting {
-public:
-    EPGShowCurrentTime():
-        GlobalSetting("EPGShowCurrentTime") {
-        setLabel("Display a line indicating the current time");
-        setValue(false);
-    };
-};
-
-class EPGType: public CheckBoxSetting, public GlobalSetting {
-public:
-    EPGType():
-        GlobalSetting("EPGType") {
-        setLabel("Use alternative EPG layout");
-        setValue(false);
-    };
-};
-
-class altEPGChanDisplay: public SpinBoxSetting, public GlobalSetting {
-public:
-    altEPGChanDisplay():
+    EPGChanDisplay():
         SpinBoxSetting(3, 8, 1), GlobalSetting("chanPerPage") {
-        setLabel("Channels to Display (in Alternate EPG)");
-	setValue(8);
+        setLabel("Channels to Display");
+	setValue(5);
 	
     };
 };
 
-class altEPGTimeDisplay: public SpinBoxSetting, public GlobalSetting {
+class EPGTimeDisplay: public SpinBoxSetting, public GlobalSetting {
 public:
-    altEPGTimeDisplay():
+    EPGTimeDisplay():
         SpinBoxSetting(1, 5, 1), GlobalSetting("timePerPage") {
-        setLabel("Time Blocks (30 mins) to Display (in Alternate EPG)");
-        setValue(5);
+        setLabel("Time Blocks (30 mins) to Display");
+        setValue(4);
 
-    };
-};
-
-class EPGCurrentTimeColor: public LineEditSetting, public GlobalSetting {
-public:
-    EPGCurrentTimeColor():
-        GlobalSetting("EPGCurrentTimeColor") {
-        setLabel("Color of line indicating the current time");
-        setValue("red");
     };
 };
 
@@ -722,12 +756,14 @@ public:
     };
 };
 
-class DefaultTVChannel: public SpinBoxSetting, public GlobalSetting {
+class DefaultTVChannel: public LineEditSetting, public GlobalSetting {
 public:
     DefaultTVChannel():
-        SpinBoxSetting(1, 1024, 1), GlobalSetting("DefaultTVChannel") {
-        setLabel("Starting channel");
-        setValue(3);
+        GlobalSetting("DefaultTVChannel") {
+        setLabel("Guide starts at channel");
+        setValue("3");
+        setHelpText("The program guide starts on this channel if it is run "
+                    "from outside of LiveTV mode.");
     };
 };
 
@@ -765,8 +801,9 @@ public:
          addChild(volumeControl);
          setTrigger(volumeControl);
 
-         ConfigurationGroup* settings = new VerticalConfigurationGroup(true);
+         ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
          settings->addChild(new MixerDevice());
+         settings->addChild(new MixerControl());
          settings->addChild(new MixerVolume());
          settings->addChild(new PCMVolume());
          addTarget("1", settings);
@@ -798,8 +835,9 @@ PlaybackSettings::PlaybackSettings()
     seek->addChild(new ExactSeeking());
     seek->addChild(new JumpAmount());
     seek->addChild(new CommercialSkipMethod());
+    seek->addChild(new CommercialSkipEverywhere());
     seek->addChild(new AutoCommercialSkip());
-//    seek->addChild(new AutoCommercialFlag());
+    seek->addChild(new AutoCommercialFlag());
     addChild(seek);
 
     VerticalConfigurationGroup* oscan = new VerticalConfigurationGroup(false);
@@ -816,13 +854,13 @@ GeneralSettings::GeneralSettings()
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
     general->setLabel("General");
     general->addChild(new RecordOverTime());
+    general->addChild(new PlayBoxOrdering());
     addChild(general);
 
     VerticalConfigurationGroup* general2 = new VerticalConfigurationGroup(false);
     general2->setLabel("General");
     general2->addChild(new ChannelOrdering());
     general2->addChild(new ChannelSorting());
-    general2->addChild(new DefaultTVChannel());
     general2->addChild(new DisplayChanNum());
     addChild(general2);
 
@@ -841,29 +879,18 @@ EPGSettings::EPGSettings()
     VerticalConfigurationGroup* epg = new VerticalConfigurationGroup(false);
     epg->setLabel("Program Guide");
 
-    epg->addChild(new EPGShowTitle());
-    epg->addChild(new EPGProgramBar());
+    epg->addChild(new EPGFillType());
+    epg->addChild(new EPGScrollType());
     epg->addChild(new EPGShowChannelIcon());
-    epg->addChild(new EPGShowCurrentTime());
-    epg->addChild(new EPGCurrentTimeColor());
-    epg->addChild(new EPGType());
-    epg->addChild(new altEPGChanDisplay());
-    epg->addChild(new altEPGTimeDisplay());
+    epg->addChild(new EPGChanDisplay());
+    epg->addChild(new EPGTimeDisplay());
     addChild(epg);
-
-    VerticalConfigurationGroup* fonts = new VerticalConfigurationGroup(false);
-    fonts->setLabel("Program Guide Font Sizes");
-    fonts->addChild(new EPGTimeFontSize());
-    fonts->addChild(new EPGChanFontSize());
-    fonts->addChild(new EPGChanCallsignFontSize());
-    fonts->addChild(new EPGProgFontSize());
-    fonts->addChild(new EPGTitleFontSize());
-    addChild(fonts);
 
     VerticalConfigurationGroup* gen = new VerticalConfigurationGroup(false);
     gen->setLabel("Program Guide");
     gen->addChild(new UnknownTitle());
     gen->addChild(new UnknownCategory());
+    gen->addChild(new DefaultTVChannel());
     addChild(gen);
 }
 
@@ -873,11 +900,17 @@ AppearanceSettings::AppearanceSettings()
     theme->setLabel("Theme");
 
     theme->addChild(new ThemeSelector());
+    theme->addChild(new RandomTheme());
     theme->addChild(new GuiWidth());
     theme->addChild(new GuiHeight());
-    theme->addChild(new MythDateFormat());
-    theme->addChild(new MythTimeFormat());
     addChild(theme);
+
+    VerticalConfigurationGroup* dates = new VerticalConfigurationGroup(false);
+    dates->setLabel("Time and Date Formatting");    
+    dates->addChild(new MythDateFormat());
+    dates->addChild(new MythShortDateFormat());
+    dates->addChild(new MythTimeFormat());
+    addChild(dates);
 
     VerticalConfigurationGroup* qttheme = new VerticalConfigurationGroup(false);
     qttheme->setLabel("QT");
@@ -885,6 +918,8 @@ AppearanceSettings::AppearanceSettings()
     qttheme->addChild(new QtFontMedium());
     qttheme->addChild(new QtFontBig());
     qttheme->addChild(new ThemeQt());
+    qttheme->addChild(new PlayBoxTransparency());
+    qttheme->addChild(new PlayBoxShading());
     addChild(qttheme);
 
     VerticalConfigurationGroup* osd = new VerticalConfigurationGroup(false);

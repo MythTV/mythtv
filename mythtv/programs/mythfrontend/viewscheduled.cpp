@@ -1,10 +1,10 @@
 #include <qlayout.h>
+#include <qaccel.h>
 #include <qpushbutton.h>
 #include <qbuttongroup.h>
 #include <qlabel.h>
 #include <qcursor.h>
 #include <qsqldatabase.h>
-#include <qlistview.h>
 #include <qdatetime.h>
 #include <qapplication.h>
 #include <qregexp.h>
@@ -21,132 +21,394 @@ using namespace std;
 #include "libmyth/dialogbox.h"
 #include "libmyth/mythcontext.h"
 #include "libmythtv/remoteutil.h"
-    
+
 ViewScheduled::ViewScheduled(QSqlDatabase *ldb, QWidget *parent, 
                              const char *name)
              : MythDialog(parent, name)
 {
     db = ldb;
 
-    title = NULL;
+    doingSel = false;
+    curitem = NULL;
+    conflictBool = false;
+    pageDowner = false;
 
-    QVBoxLayout *vbox = new QVBoxLayout(this, (int)(10 * wmult));
+    inList = 0;
+    inData = 0;
+    listCount = 0;
+    dataCount = 0;
 
-    desclabel = new QLabel("Select a recording to view:", this);
-    desclabel->setBackgroundOrigin(WindowOrigin);
-    vbox->addWidget(desclabel);
+    accel = new QAccel(this);
 
-    listview = new MythListView(this);
-    listview->addColumn("Chan");
-    listview->addColumn("Date");
-    listview->addColumn("Title");
-    //listview->addColumn("Quality");
- 
-//     listview->setColumnWidth(0, (int)(100 * wmult));
-//     listview->setColumnWidth(1, (int)(210 * wmult)); 
-//     listview->setColumnWidth(2, (int)(350 * wmult));
-//     listview->setColumnWidth(3, (int)(90 * wmult));
-    listview->setColumnWidth(0, (int)(80 * wmult));
-    listview->setColumnWidth(1, (int)(210 * wmult)); 
-    listview->setColumnWidth(2, (int)(460 * wmult));
+    space_itemid = accel->insertItem(Key_Space);
+    enter_itemid = accel->insertItem(Key_Enter);
+    return_itemid = accel->insertItem(Key_Return);
 
-    listview->setColumnWidthMode(0, QListView::Manual);
-    listview->setColumnWidthMode(1, QListView::Manual);
+    accel->connectItem(accel->insertItem(Key_Down), this, SLOT(cursorDown()));
+    accel->connectItem(accel->insertItem(Key_Up), this, SLOT(cursorUp()));
+    accel->connectItem(space_itemid, this, SLOT(selected()));
+    accel->connectItem(enter_itemid, this, SLOT(selected()));
+    accel->connectItem(return_itemid, this, SLOT(selected()));
+    accel->connectItem(accel->insertItem(Key_PageUp), this, SLOT(pageUp()));
+    accel->connectItem(accel->insertItem(Key_PageDown), this, SLOT(pageDown()));
+    accel->connectItem(accel->insertItem(Key_Escape), this, SLOT(exitWin()));
 
-    listview->setSorting(-1);
-    listview->setAllColumnsShowFocus(TRUE);
+    connect(this, SIGNAL(killTheApp()), this, SLOT(accept()));
 
-    connect(listview, SIGNAL(returnPressed(QListViewItem *)), this,
-            SLOT(selected(QListViewItem *)));
-    connect(listview, SIGNAL(spacePressed(QListViewItem *)), this,
-            SLOT(selected(QListViewItem *))); 
-    connect(listview, SIGNAL(selectionChanged(QListViewItem *)), this,
-            SLOT(changed(QListViewItem *)));
+    theme = new XMLParse();
+    theme->SetWMult(wmult);
+    theme->SetHMult(hmult);
+    theme->LoadTheme(xmldata, "conflict");
+    LoadWindow(xmldata);
 
-    vbox->addWidget(listview, 1);
+    LayerSet *container = theme->GetSet("selector");
+    if (container)
+    {
+        UIListType *ltype = (UIListType *)container->GetType("conflictlist");
+        if (ltype)
+        {
+            listsize = ltype->GetItems();
+        }
+    }
+    else
+    {
+        cerr << "MythFrontEnd: ViewSchedule - Failed to get selector object.\n";
+        exit(0);
+    }
 
-    listview->setFixedHeight((int)(250 * hmult));
+    bgTransBackup = new QPixmap();
+    resizeImage(bgTransBackup, "trans-backup.png");
 
-    QLabel *key = new QLabel("Conflicting recordings are highlighted in "
-                             "<font color=\"red\">red</font>.<br>Deactivated "
-                             "recordings are highlighted in <font "
-                             "color=\"gray\">gray</font>.", this);
-    key->setFont(QFont("Arial", (int)(gContext->GetSmallFontSize() * hmult), 
-                 QFont::Bold));
-    key->setBackgroundOrigin(WindowOrigin);
-    vbox->addWidget(key);
-
-    QFrame *f = new QFrame(this);
-    f->setFrameStyle(QFrame::HLine | QFrame::Plain);
-    f->setLineWidth((int)(4 * hmult));
-    vbox->addWidget(f);     
-
-    QGridLayout *grid = new QGridLayout(vbox, 5, 2, 1);
-    
-    title = new QLabel(" ", this);
-    title->setBackgroundOrigin(WindowOrigin);
-    title->setFont(QFont("Arial", (int)(gContext->GetBigFontSize() * hmult), 
-                   QFont::Bold));
-
-    QLabel *datelabel = new QLabel("Airdate: ", this);
-    datelabel->setBackgroundOrigin(WindowOrigin);
-    date = new QLabel(" ", this);
-    date->setBackgroundOrigin(WindowOrigin);
-
-    QLabel *chanlabel = new QLabel("Channel: ", this);
-    chanlabel->setBackgroundOrigin(WindowOrigin);
-    chan = new QLabel(" ", this);
-    chan->setBackgroundOrigin(WindowOrigin);
-
-    QLabel *sublabel = new QLabel("Episode: ", this);
-    sublabel->setBackgroundOrigin(WindowOrigin);
-    subtitle = new QLabel(" ", this);
-    subtitle->setBackgroundOrigin(WindowOrigin);
-    subtitle->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-
-    QLabel *desclabel = new QLabel("Description: ", this);
-    desclabel->setBackgroundOrigin(WindowOrigin);
-    description = new QLabel(" ", this);
-    description->setBackgroundOrigin(WindowOrigin);
-    description->setAlignment(Qt::WordBreak | Qt::AlignLeft | Qt::AlignTop);
- 
-    grid->addMultiCellWidget(title, 0, 0, 0, 1, Qt::AlignLeft);
-    grid->addWidget(datelabel, 1, 0, Qt::AlignLeft);
-    grid->addWidget(date, 1, 1, Qt::AlignLeft);
-    grid->addWidget(chanlabel, 2, 0, Qt::AlignLeft);
-    grid->addWidget(chan, 2, 1, Qt::AlignLeft);
-    grid->addWidget(sublabel, 3, 0, Qt::AlignLeft | Qt::AlignTop);
-    grid->addWidget(subtitle, 3, 1, Qt::AlignLeft | Qt::AlignTop);
-    grid->addWidget(desclabel, 4, 0, Qt::AlignLeft | Qt::AlignTop);   
-    grid->addWidget(description, 4, 1, Qt::AlignLeft | Qt::AlignTop);
- 
-    grid->setColStretch(1, 1);
-    grid->setRowStretch(4, 1);
+    updateBackground();
 
     FillList();
+
+    WFlags flags = getWFlags();
+    flags |= WRepaintNoErase;
+    setWFlags(flags);
+
+    showFullScreen();
+    setActiveWindow();
+
+    gContext->addListener(this);
 }
+
+ViewScheduled::~ViewScheduled()
+{
+
+    //delete XMLParse;
+    delete accel;
+    delete bgTransBackup;
+    if (curitem)
+        delete curitem;
+}
+
+void ViewScheduled::LoadWindow(QDomElement &element)
+{
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement e = child.toElement();
+        if (!e.isNull())
+        {
+            if (e.tagName() == "font")
+            {
+                theme->parseFont(e);
+            }
+            else if (e.tagName() == "container")
+            {
+                parseContainer(e);
+            }
+            else if (e.tagName() == "popup")
+            {
+                parsePopup(e);
+            }
+            else
+            {
+                cerr << "Unknown element: " << e.tagName() << endl;
+                exit(0);
+            }
+        }
+    }
+}
+
+void ViewScheduled::parseContainer(QDomElement &element)
+{
+    QRect area;
+    QString name;
+    int context;
+    theme->parseContainer(element, name, context, area);
+
+    if (name.lower() == "selector")
+    {
+        rectListLeft = area.left();
+        rectListTop = area.top();
+        rectListWidth = area.width();
+        rectListHeight = area.height();
+    }
+    if (name.lower() == "program_info")
+    {
+        rectInfoLeft = area.left();
+        rectInfoTop = area.top();
+        rectInfoWidth = area.width();
+        rectInfoHeight = area.height();
+    }
+    if (name.lower() == "conflict_info")
+    {
+        rectConLeft = area.left();
+        rectConTop = area.top();
+        rectConWidth = area.width();
+        rectConHeight = area.height();
+    }
+}
+
+void ViewScheduled::parsePopup(QDomElement &element)
+{
+    QString name = element.attribute("name", "");
+    if (name.isNull() || name.isEmpty())
+    {
+        cerr << "Popup needs a name\n";
+        exit(0);
+    }
+
+    if (name != "selectrec")
+    {
+        cerr << "Unknown popup name! (try using 'selectrec')\n";
+        exit(0);
+    }
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "solidbgcolor")
+            {
+                QString col = theme->getFirstText(info);
+                popupBackground = QColor(col);
+                graphicPopup = false;
+            }
+            else if (info.tagName() == "foreground")
+            {
+                QString col = theme->getFirstText(info);
+                popupForeground = QColor(col);
+            }
+            else if (info.tagName() == "highlight")
+            {
+                QString col = theme->getFirstText(info);
+                popupHighlight = QColor(col);
+            }
+            else
+            {
+                cerr << "Unknown popup child: " << info.tagName() << endl;
+                exit(0);
+            }
+
+        }
+    }
+}
+
+void ViewScheduled::resizeImage(QPixmap *dst, QString file)
+{
+    QString baseDir = gContext->GetInstallPrefix();
+    QString themeDir = gContext->FindThemeDir("");
+    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
+    baseDir = baseDir + "/share/mythtv/themes/default/";
+
+    QFile checkFile(themeDir + file);
+
+    if (checkFile.exists())
+         file = themeDir + file;
+    else
+         file = baseDir + file;
+
+    if (hmult == 1 && wmult == 1)
+    {
+         dst->load(file);
+    }
+    else
+    {
+        QImage *sourceImg = new QImage();
+        if (sourceImg->load(file))
+        {
+            QImage scalerImg;
+            scalerImg = sourceImg->smoothScale((int)(sourceImg->width() * wmult),
+                                               (int)(sourceImg->height() * hmult));
+            dst->convertFromImage(scalerImg);
+        }
+        delete sourceImg;
+    }
+}
+
+void ViewScheduled::updateBackground(void)
+{
+    QPixmap bground(size());
+    bground.fill(this, 0, 0);
+
+    QPainter tmp(&bground);
+
+    LayerSet *container = theme->GetSet("background");
+        container->Draw(&tmp, 0, 0);
+
+    tmp.end();
+    myBackground = bground;
+
+    setPaletteBackgroundPixmap(myBackground);
+}
+
+void ViewScheduled::paintEvent(QPaintEvent *e)
+{
+    QRect r = e->rect();
+    QPainter p(this);
+ 
+    if (r.intersects(listRect()))
+    {
+        updateList(&p);
+    }
+    if (r.intersects(infoRect()))
+    {
+        updateInfo(&p);
+    }
+    if (r.intersects(conflictRect()))
+    {
+        updateConflict(&p);
+    }
+}
+
+void ViewScheduled::grayOut(QPainter *tmp)
+{
+    int transparentFlag = gContext->GetNumSetting("PlayBoxShading", 0);
+    if (transparentFlag == 0)
+        tmp->fillRect(QRect(QPoint(0, 0), size()), QBrush(QColor(10, 10, 10), Dense4Pattern));
+    else if (transparentFlag == 1)
+        tmp->drawPixmap(0, 0, *bgTransBackup, 0, 0, (int)(800*wmult), (int)(600*hmult));
+}
+
+void ViewScheduled::exitWin()
+{
+    emit killTheApp();
+}
+
+void ViewScheduled::cursorDown(bool page)
+{
+    if (page == false)
+    {
+        if (inList > (int)((int)(listsize / 2) - 1)
+            && ((int)(inData + listsize) <= (int)(dataCount - 1))
+            && pageDowner == true)
+        {
+            inData++;
+            inList = (int)(listsize / 2);
+        }
+        else
+        {
+            inList++;
+
+            if (inList >= listCount)
+                inList = listCount - 1;
+        }
+
+    }
+    else if (page == true && pageDowner == true)
+    {
+        if (inList >= (int)(listsize / 2) || inData != 0)
+        {
+            inData = inData + listsize;
+        }
+        else if (inList < (int)(listsize / 2) && inData == 0)
+        {
+            inData = (int)(listsize / 2) + inList;
+            inList = (int)(listsize / 2);
+        }
+    }
+    else if (page == true && pageDowner == false)
+    {
+        inList = listsize - 1;
+    }
+
+    if ((int)(inData + inList) >= (int)(dataCount))
+    {
+        inData = dataCount - listsize;
+        inList = listsize - 1;
+    }
+    else if ((int)(inData + listsize) >= (int)dataCount)
+    {
+        inData = dataCount - listsize;
+    }
+
+    if (inList >= listCount)
+        inList = listCount - 1;
+
+    update(fullRect());
+}
+
+void ViewScheduled::cursorUp(bool page)
+{
+
+    if (page == false)
+    {
+        if (inList < ((int)(listsize / 2) + 1) && inData > 0)
+        {
+            inList = (int)(listsize / 2);
+            inData--;
+            if (inData < 0)
+            {
+                inData = 0;
+                inList--;
+            }
+         }
+         else
+         {
+             inList--;
+         }
+     }
+     else if (page == true && inData > 0)
+     {
+         inData = inData - listsize;
+         if (inData < 0)
+         {
+             inList = inList + inData;
+             inData = 0;
+             if (inList < 0)
+                 inList = 0;
+          }
+
+          if (inList > (int)(listsize / 2))
+          {
+               inList = (int)(listsize / 2);
+               inData = inData + (int)(listsize / 2) - 1;
+           }
+       }
+       else if (page == true)
+       {
+           inData = 0;
+           inList = 0;
+       }
+
+       if (inList > -1)
+       {
+           update(fullRect());
+       }
+       else
+           inList = 0;
+
+}
+
+
 
 void ViewScheduled::FillList(void)
 {
     QString chanid = "";
-    QDateTime startts;
+    int cnt = 999;
+    conflictBool = false;
 
-    QListViewItem *curitem = listview->selectedItem();
-
-    if (curitem)
-    {
-        ProgramListItem *pgitem = (ProgramListItem *)curitem;
-        ProgramInfo *rec = pgitem->getProgramInfo();
-        startts = rec->startts;
-        chanid = rec->chanid;
-    }
-
-    listview->clear();
+    conflictData.clear();
 
     bool conflicts = false;
     vector<ProgramInfo *> recordinglist;
-    ProgramListItem *selected = NULL;
-    ProgramListItem *item = NULL;
+    QString cntStr = "";
 
     conflicts = RemoteGetAllPendingRecordings(recordinglist);
 
@@ -154,94 +416,277 @@ void ViewScheduled::FillList(void)
 
     for (; pgiter != recordinglist.rend(); pgiter++)
     {
-        item = new ProgramListItem(listview, (*pgiter), 2);
-        if (startts == (*pgiter)->startts && chanid == (*pgiter)->chanid)
-            selected = item;
+        cntStr.sprintf("%d", cnt);
+        if ((*pgiter)->conflicting)
+            conflictBool = true;
+        conflictData[cntStr] = *(*pgiter);
+        delete (*pgiter);
+        cnt--;
+        dataCount++;
     }
+}
 
-    if (conflicts)
-        desclabel->setText("You have time conflicts.");
-    else
-        desclabel->setText("You have no recording conflicts.");
+void ViewScheduled::updateList(QPainter *p)
+{
+    QRect pr = listRect();
+    QPixmap pix(pr.size());
+    pix.fill(this, pr.topLeft());
+    QPainter tmp(&pix);
+    
+    int pastSkip = (int)inData;
+    pageDowner = false;
+    listCount = 0;
 
-    if (!selected)
-        selected = item;
+    typedef QMap<QString, ProgramInfo> ConflictData;
+    ProgramInfo *tempInfo;
+  
+    QString tempSubTitle = "";
+    QString tempDate = "";
+    QString showDateFormat = "M/d";
+    QString showTimeFormat = "h:mm AP";
+    QString tempTime = "";
+    QString tempChan = "";
 
-    if (selected)
+    ConflictData::Iterator it;
+    ConflictData::Iterator start;
+    ConflictData::Iterator end;
+
+    start = conflictData.begin();
+    end = conflictData.end();
+
+    LayerSet *container = NULL;
+    container = theme->GetSet("selector");
+    if (container)
     {
-        listview->setCurrentItem(selected);
-        listview->setSelected(selected, true);
+        UIListType *ltype = (UIListType *)container->GetType("conflictlist");
+        if (ltype)
+        {
+            int cnt = 0;
+            ltype->ResetList();
+            ltype->SetActive(true);
 
-        if (selected->itemBelow())
-            listview->ensureItemVisible(selected->itemBelow());
-        if (selected->itemAbove())
-            listview->ensureItemVisible(selected->itemAbove());
-        listview->ensureItemVisible(selected);
+            for (it = start; it != end; ++it)
+            {
+               if (cnt < listsize)
+               {
+                  if (pastSkip <= 0)
+                  {
+                      tempInfo = &(it.data());
+
+                      tempSubTitle = tempInfo->title;
+                      if ((tempInfo->subtitle).stripWhiteSpace().length() > 0)
+                          tempSubTitle = tempSubTitle + " - \"" + tempInfo->subtitle + "\"";
+
+                      tempDate = (tempInfo->startts).toString(showDateFormat);
+                      tempTime = (tempInfo->startts).toString(showTimeFormat);
+
+                      tempChan = tempInfo->chanstr;
+
+                      if (cnt == inList)
+                      {
+                          if (curitem)
+                              delete curitem;
+                          curitem = new ProgramInfo(*tempInfo);
+                          ltype->SetItemCurrent(cnt);
+                      }
+
+                      ltype->SetItemText(cnt, 1, tempChan);
+                      ltype->SetItemText(cnt, 2, tempDate + " " + tempTime);
+                      ltype->SetItemText(cnt, 3, tempSubTitle);
+
+                      if (tempInfo->conflicting)
+                      {
+                          ltype->EnableForcedFont(cnt, "conflictingrecording");
+                      }
+                      if (!tempInfo->recording)
+                      {
+                          ltype->EnableForcedFont(cnt, "disabledrecording");
+                      }
+
+                      cnt++;
+                      listCount++;
+                  }
+                  pastSkip--;
+               }
+               else
+                   pageDowner = true;
+            }
+        }
+
+        ltype->SetDownArrow(pageDowner);
+        if (inData > 0)
+            ltype->SetUpArrow(true);
+        else
+            ltype->SetUpArrow(false);
     }
+
+    if (conflictData.count() <= 0)
+        container = theme->GetSet("norecordings_list");
+
+    if (container)
+    {
+       container->Draw(&tmp, 0, 0);
+       container->Draw(&tmp, 1, 0);
+       container->Draw(&tmp, 2, 0);
+       container->Draw(&tmp, 3, 0);
+       container->Draw(&tmp, 4, 0);
+       container->Draw(&tmp, 5, 0);
+       container->Draw(&tmp, 6, 0);
+       container->Draw(&tmp, 7, 0);
+       container->Draw(&tmp, 8, 0);
+    }
+
+    tmp.end();
+    p->drawPixmap(pr.topLeft(), pix);
+
 }
 
-void ViewScheduled::changed(QListViewItem *lvitem)
+void ViewScheduled::updateConflict(QPainter *p)
 {
-    ProgramListItem *pgitem = (ProgramListItem *)lvitem;
-    if (!pgitem)
-        return;
-   
-    if (!title)
-        return;
+    QRect pr = conflictRect();
+    QPixmap pix(pr.size());
+    pix.fill(this, pr.topLeft());
+    QPainter tmp(&pix);
 
-    ProgramInfo *rec = pgitem->getProgramInfo();
-
-    QDateTime startts = rec->startts;
-    QDateTime endts = rec->endts;
-
-    QString dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
-    QString timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
-        
-    QString timedate = endts.date().toString(dateformat) + QString(", ") +
-                       startts.time().toString(timeformat) + QString(" - ") +
-                       endts.time().toString(timeformat);
-        
-    date->setText(timedate);
-
-    QString chantext;
-    if (gContext->GetNumSetting("DisplayChanNum") != 0)
-        chantext = rec->channame + " [" + rec->chansign + "]";
+    LayerSet *container = NULL;
+    container = theme->GetSet("conflict_info");
+    if (conflictBool == true)
+    {
+        if (container)
+        {
+           UITextType *type = (UITextType *)container->GetType("status");
+           if (type)
+               type->SetText("Time Conflict");
+        }
+    }
     else
-        chantext = rec->chanstr;
-    chan->setText(chantext);
+    {
+        if (container)
+        {
+           UITextType *type = (UITextType *)container->GetType("status");
+           if (type)
+               type->SetText("No Conflicts");
+        }
+    }
 
-    title->setText(rec->title);
-    if (rec->subtitle != "(null)")
-        subtitle->setText(rec->subtitle);
-    else
-        subtitle->setText("");
-    if (rec->description != "(null)")
-        description->setText(rec->description);
-    else
-        description->setText("");
+    if (container)
+    {
+        container->Draw(&tmp, 4, 0);
+        container->Draw(&tmp, 5, 0);
+        container->Draw(&tmp, 6, 0);
+        container->Draw(&tmp, 7, 0);
+        container->Draw(&tmp, 8, 0);
+    }
 
-    int minwidth = (int)(500 * wmult);
-
-    title->setMinimumWidth(minwidth);
-    title->setMaximumWidth(minwidth);
-
-    subtitle->setMinimumWidth(minwidth);
-    subtitle->setMaximumWidth(minwidth);
-
-    description->setMinimumWidth(minwidth);
-    description->setMaximumWidth(minwidth);
-
-    if (pgitem->itemBelow())
-        listview->ensureItemVisible(pgitem->itemBelow());
-    if (pgitem->itemAbove())
-        listview->ensureItemVisible(pgitem->itemAbove());
-    listview->ensureItemVisible(pgitem);
+    tmp.end();
+    p->drawPixmap(pr.topLeft(), pix);
 }
 
-void ViewScheduled::selected(QListViewItem *lvitem)
+void ViewScheduled::updateInfo(QPainter *p)
 {
-    ProgramListItem *pgitem = (ProgramListItem *)lvitem;
-    ProgramInfo *rec = pgitem->getProgramInfo();
+    QRect pr = infoRect();
+    QPixmap pix(pr.size());
+    pix.fill(this, pr.topLeft());
+    QPainter tmp(&pix);
+
+    if (conflictData.count() > 0 && curitem)
+    {  
+
+       QDateTime startts = curitem->startts;
+       QDateTime endts = curitem->endts;
+
+       QString dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+       QString timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
+        
+       QString timedate = startts.date().toString(dateformat) + QString(", ") +
+                          startts.time().toString(timeformat) + QString(" - ") +
+                          endts.time().toString(timeformat);
+
+       QString subtitle = "";
+       QString chantext = "";
+       QString description = "";
+
+       if (gContext->GetNumSetting("DisplayChanNum") != 0)
+           chantext = curitem->channame + " [" + curitem->chansign + "]";
+       else
+           chantext = curitem->chanstr;
+
+       if (curitem->subtitle != "(null)")
+           subtitle = curitem->subtitle;
+       else
+           subtitle = "";
+
+       if (curitem->description != "(null)")
+           description = curitem->description;
+       else
+           description = "";
+
+       LayerSet *container = NULL;
+       container = theme->GetSet("program_info");
+       if (container)
+       {
+           UITextType *type = (UITextType *)container->GetType("title");
+           if (type)
+               type->SetText(curitem->title);
+
+           type = (UITextType *)container->GetType("subtitle");
+           if (type)
+               type->SetText(subtitle);
+
+           type = (UITextType *)container->GetType("timedate");
+           if (type)
+               type->SetText(timedate);
+
+           type = (UITextType *)container->GetType("description");
+           if (type)
+               type->SetText(curitem->description);
+
+           type = (UITextType *)container->GetType("channel");
+           if (type)
+               type->SetText(chantext);
+
+       }
+       
+       if (container)
+       {
+           container->Draw(&tmp, 4, 0);
+           container->Draw(&tmp, 5, 0);
+           container->Draw(&tmp, 6, 0);
+           container->Draw(&tmp, 7, 0);
+           container->Draw(&tmp, 8, 0);
+       }
+
+    }
+    else
+    {
+       LayerSet *norec = theme->GetSet("norecordings_info");
+       if (norec)
+       {
+           norec->Draw(&tmp, 4, 0);
+           norec->Draw(&tmp, 5, 0);
+           norec->Draw(&tmp, 6, 0);
+           norec->Draw(&tmp, 7, 0);
+           norec->Draw(&tmp, 8, 0);
+       }
+
+       //Disable the accelorators when there is nothing to delete
+       accel->setItemEnabled(space_itemid, false);
+       accel->setItemEnabled(enter_itemid, false);
+       accel->setItemEnabled(return_itemid, false);
+
+    }
+    tmp.end();
+    p->drawPixmap(pr.topLeft(), pix);
+}
+
+void ViewScheduled::selected()
+{
+    if (doingSel)
+        return;
+
+    doingSel = true;
+
+    ProgramInfo *rec = curitem;
 
     MythContext::KickDatabase(db);
 
@@ -256,20 +701,22 @@ void ViewScheduled::selected(QListViewItem *lvitem)
     {
         handleConflicting(rec);
     }
+
+    doingSel = false;
 }
 
 void ViewScheduled::handleNotRecording(ProgramInfo *rec)
 {
-    QString message = "Recording this program has been deactivated because it "
-                      "conflicts with another scheduled recording.  Do you "
-                      "want to re-enable this recording?";
+    QString message = tr("Recording this program has been deactivated because "
+                         "it conflicts with another scheduled recording.  Do "
+                         "you want to re-enable this recording?");
 
     DialogBox diag(message);
 
-    QString button = "Yes, I want to record it.";
+    QString button = tr("Yes, I want to record it.");
     diag.AddButton(button);
 
-    button = "No, leave it disabled.";
+    button = tr("No, leave it disabled.");
     diag.AddButton(button);
 
     diag.Show();
@@ -338,6 +785,9 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
 
 void ViewScheduled::handleConflicting(ProgramInfo *rec)
 {
+    chooseConflictingProgram(rec);
+    return;
+#if 0
     DialogBox diag("How do you want to resolve this conflict?");
 
     diag.AddButton("Adjust this program's recording time");
@@ -356,15 +806,16 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
     {
         chooseConflictingProgram(rec);
     }
+#endif
 }
 
 void ViewScheduled::handleDuplicate(ProgramInfo *rec)
 {
-    QString message = "Recording this program has been suppressed because it "
-                      "has already been recorded in the past.";
+    QString message = tr("Recording this program has been suppressed because "
+                         "it has already been recorded in the past.");
 
     DialogBox diag(message);
-    diag.AddButton("OK");
+    diag.AddButton(tr("OK"));
     diag.Show();
     diag.exec();
 }
@@ -376,11 +827,11 @@ void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
     QString dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
     QString timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
 
-    QString message = "The follow scheduled recordings conflict with each "
-                      "other.  Which would you like to record?";
+    QString message = tr("The follow scheduled recordings conflict with each "
+                         "other.  Which would you like to record?");
 
-    DialogBox diag(message, "Remember this choice and use it automatically in "
-                   "the future");
+    DialogBox diag(message, tr("Remember this choice and use it automatically "
+                               "in the future"));
  
     QString button; 
     button = rec->title + QString("\n");
@@ -554,4 +1005,28 @@ void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
     db->exec(thequery);
 
     FillList();
+}
+
+QRect ViewScheduled::listRect() const
+{
+    QRect r(rectListLeft, rectListTop, rectListWidth, rectListHeight);
+    return r;
+}
+
+QRect ViewScheduled::infoRect() const
+{
+    QRect r(rectInfoLeft, rectInfoTop, rectInfoWidth, rectInfoHeight);
+    return r;
+}
+
+QRect ViewScheduled::fullRect() const
+{
+    QRect r(0, 0, (int)(800*wmult), (int)(600*hmult));
+    return r;
+}
+
+QRect ViewScheduled::conflictRect() const
+{
+    QRect r(rectConLeft, rectConTop, rectConWidth, rectConHeight);
+    return r;
 }

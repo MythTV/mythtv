@@ -1,0 +1,202 @@
+<mythosdtheme>
+
+  <timeformat>h:mm ap</timeformat>
+  <fadeaway>30</fadeaway>
+
+  <font name="infofont">
+    <color>255</color>
+    <size>16</size>
+    <outline>no</outline>
+  </font>
+
+  <font name="infofontgray">
+    <color>128</color>
+    <size>16</size>
+  </font>
+
+  <font name="channelfont">
+    <color>255</color>
+    <size>50</size>
+    <outline>yes</outline>
+    <shadow>5,5</shadow>
+  </font>
+ 
+  <font name="timefont">
+    <color>255</color>
+    <size>40</size>
+    <outline>yes</outline>
+    <shadow>5,5</shadow>
+  </font>
+
+  <font name="settings">
+    <color>255</color>
+    <size>24</size>
+    <outline>yes</outline>
+  </font>
+
+  <container name="channel_number">
+    <textarea name="channum">
+      <area>90,20,160,90</area>
+      <font>channelfont</font>
+    </textarea>
+  </container> 
+
+  <container name="program_info">
+    <image name="background">
+      <filename>osd-mid.png</filename>
+      <position>0,360</position>
+    </image>
+    <textarea name="title">
+      <area>40,398,440,27</area>
+      <font>infofont</font>
+    </textarea>
+    <textarea name="description">
+      <multiline>no</multiline>
+      <area>45,423,560,27</area>
+      <font>infofont</font>
+<!--
+      <value>%DESCRIPTION% (%LENMINS% minutes)</value>
+-->
+    </textarea>
+    <textarea name="callsign" align="center">
+       <area>20,368,142,27</area>
+       <font>infofont</font>
+    </textarea>
+
+    <image name="channelicon"> <!-- set internally, doesn't need a filename -->
+      <position>20,20</position>
+      <staticsize>64,64</staticsize> <!-- resize the image to these dimensions -->
+    </image>
+    <textarea name="time">
+        <area>365,25,240,90</area>
+        <font>timefont</font>
+     </textarea>
+  </container>
+
+  <container name="browse_info">
+    <image name="background">
+      <filename>osd-mid.png</filename>
+      <position>0,360</position>
+    </image>
+    <textarea name="title">
+      <area>40,398,440,27</area>
+      <font>infofont</font>
+      <value>%TITLE% (%STARTTIME% %LENMINS% minutes)</value>
+    </textarea>
+    <textarea name="description">
+      <multiline>no</multiline>
+      <area>45,423,560,27</area>
+      <font>infofont</font>
+    </textarea>
+    <textarea name="callsign" align="center">
+       <area>20,368,142,27</area>
+       <font>infofont</font>
+       <value>%CALLSIGN% - %CHANNUM%</value>
+    </textarea>
+    <image name="channelicon">
+      <position>20,20</position>
+      <staticsize>64,64</staticsize>
+    </image>
+    <textarea name="time">
+        <area>365,25,240,90</area>
+        <font>timefont</font>
+     </textarea>
+  </container>
+
+  <container name="status" priority="10" fademovement="0,6">
+    <image name="background">
+      <filename>osd-small.png</filename>
+      <position>0,20</position>
+    </image>
+    <textarea name="status">
+      <area>430,30,180,27</area>
+      <font>infofont</font>
+    </textarea>
+    <slider name="statusslider" type="fill">
+      <area>430,80,180,20</area>
+      <filename>fill-blue.png</filename>
+    </slider>
+    <textarea name="slidertext">
+      <area>430,55,180,45</area>
+      <font>infofont</font>
+      <multiline>yes</multiline>
+    </textarea>
+  </container>
+
+  <container name="editmode">
+    <slider name="editslider" type="edit">
+      <area>25,425,590,65</area>
+      <filename>fill-blue.png</filename>
+      <altfilename>red.png</altfilename>
+    </slider>
+    <slider name="editposition" type="position">
+      <area>25,415,590,65</area>
+      <filename>position-indicator.png</filename>
+    </slider>
+    <editarrow name="left">
+      <filename>cut-end.png</filename>
+      <area>25,400,590,65</area>
+    </editarrow>
+    <editarrow name="right">
+      <filename>cut-start.png</filename>
+      <area>25,400,590,65</area>
+    </editarrow>
+    <textarea name="timedisplay" align="right">
+      <area>270,30,330,30</area>
+      <font>settings</font>
+    </textarea>
+    <textarea name="cutindicator">
+      <area>40,30,100,30</area>
+      <font>settings</font>
+    </textarea>
+    <textarea name="seekamount" align="right">
+      <area>200,390,400,30</area>
+      <font>infofont</font>
+    </textarea>
+  </container>
+
+  <container name="settings">
+    <textarea name="settings">
+      <area>50,50,350,32</area>
+      <font>settings</font>
+    </textarea>
+  </container>
+
+  <container name="basedialog" priority="0"> <!-- must be named this -->
+    <box name="background">
+      <area>80,60,480,360</area>
+    </box>
+    <textarea name="message">
+      <area>85,65,470,220</area>
+      <font>infofont</font>
+      <multiline>yes</multiline>
+    </textarea>
+    <textarea name="option1">
+      <area>85,300,470,30</area>
+      <font>infofont</font>
+      <altfont>infofontgray</altfont>
+    </textarea>
+    <textarea name="option2">
+      <area>85,330,470,30</area>
+      <font>infofont</font>
+      <altfont>infofontgray</altfont>
+    </textarea>
+    <textarea name="option3">
+      <area>85,360,470,30</area>
+      <font>infofont</font>
+      <altfont>infofontgray</altfont>
+    </textarea>
+    <textarea name="option4">
+      <area>85,390,470,30</area>
+      <font>infofont</font>
+      <altfont>infofontgray</altfont>
+    </textarea>
+    <positionrects name="selector">
+      <area>80,296,480,30</area>
+      <area>80,326,480,30</area>
+      <area>80,356,480,30</area>
+      <area>80,386,480,30</area>
+    </positionrects>
+  </container>
+
+</mythosdtheme>

@@ -29,7 +29,7 @@ class PlaybackSock
     QString getIP(void) { return ip; }
 
     void GetFreeSpace(int &totalspace, int &usedspace);
-    void DeleteRecording(ProgramInfo *pginfo);
+    int DeleteRecording(ProgramInfo *pginfo);
     void FillProgramInfo(ProgramInfo *pginfo, QString &playbackhost);
     void GenPreviewPixmap(ProgramInfo *pginfo);
     bool CheckFile(ProgramInfo *pginfo);

@@ -13,6 +13,7 @@ using namespace std;
 
 #include "tv.h"
 #include "scheduler.h"
+#include "transcoder.h"
 #include "mainserver.h"
 #include "encoderlink.h"
 
@@ -24,10 +25,6 @@ MythContext *gContext;
 
 void setupTVs(bool ismaster)
 {
-    QString startchannel = gContext->GetSetting("DefaultTVChannel");
-    if (startchannel == "")
-        startchannel = "3";
-
     QString localhostname = gContext->GetHostName();
 
     QSqlQuery query;
@@ -53,7 +50,7 @@ void setupTVs(bool ismaster)
             {
                 if (host == localhostname)
                 {
-                    TVRec *tv = new TVRec(startchannel, cardid);
+                    TVRec *tv = new TVRec(cardid);
                     tv->Init();
                     EncoderLink *enc = new EncoderLink(cardid, tv);
                     tvList[cardid] = enc;
@@ -63,7 +60,7 @@ void setupTVs(bool ismaster)
             {
                 if (host == localhostname)
                 {
-                    TVRec *tv = new TVRec(startchannel, cardid);
+                    TVRec *tv = new TVRec(cardid);
                     tv->Init();
                     EncoderLink *enc = new EncoderLink(cardid, tv);
                     tvList[cardid] = enc;
@@ -85,6 +82,9 @@ void setupTVs(bool ismaster)
     
 int main(int argc, char **argv)
 {
+    for(int i = 3; i < sysconf(_SC_OPEN_MAX) - 1; ++i)
+        close(i);
+
     QApplication a(argc, argv, false);
 
     QString logfile = "";
@@ -112,15 +112,24 @@ int main(int argc, char **argv)
         } else if (!strcmp(a.argv()[argpos],"-d") ||
                    !strcmp(a.argv()[argpos],"--daemon")) {
             daemonize = true;
+        } else if (!strcmp(a.argv()[argpos],"-v") ||
+                   !strcmp(a.argv()[argpos],"--verbose")) {
+            print_verbose_messages = true;
         } else {
-            cerr << "Invalid argument: " << a.argv()[argpos] << endl;
+            cerr << "Invalid argument: " << a.argv()[argpos] << endl <<
+                    "Valid options are: " << endl <<
+                    "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
+                    "-p or --pidfile filename       Write PID of mythbackend " <<
+                                                    "to filename" << endl <<
+                    "-d or --daemon                 Runs mythbackend as a daemon" << endl <<
+                    "-v or --verbose                Prints more information" << endl;
             return -1;
         }
 
     int logfd = -1;
 
     if (logfile != "") {
-        logfd = open(logfile.ascii(), O_WRONLY|O_CREAT|O_APPEND);
+        logfd = open(logfile.ascii(), O_WRONLY|O_CREAT|O_APPEND, 0664);
          
         if (logfd < 0) {
             perror("open(logfile)");
@@ -157,7 +166,7 @@ int main(int argc, char **argv)
         dup2(logfd, 2);
     }
 
-    gContext = new MythContext(false);
+    gContext = new MythContext(MYTH_BINARY_VERSION, false);
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
@@ -173,7 +182,15 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    if (!gContext->OpenDatabase(db) || !gContext->OpenDatabase(subthread))
+    QSqlDatabase *transthread = QSqlDatabase::addDatabase("QMYSQL3", "TRANSDB");
+    if (!transthread)
+    {
+        printf("Couldn't connect to database\n");
+        return -1;
+    }
+
+    if (!gContext->OpenDatabase(db) || !gContext->OpenDatabase(subthread) ||
+        !gContext->OpenDatabase(transthread))
     {
         printf("couldn't open db\n");
         return -1;
@@ -214,6 +231,11 @@ int main(int argc, char **argv)
         sched = new Scheduler(true, &tvList, scdb);
     }
 
+    QSqlDatabase *trandb = QSqlDatabase::database("TRANSDB");
+    Transcoder *trans = new Transcoder(&tvList, trandb);
+
+// cout << "verbose is: " << print_verbose_messages << endl;
+
     new MainServer(ismaster, port, statusport, &tvList);
 
     a.exec();
@@ -222,6 +244,8 @@ int main(int argc, char **argv)
 
     if (sched)
         delete sched;
+
+    delete trans;
 
     if (pidfile != "")
         unlink(pidfile.ascii());

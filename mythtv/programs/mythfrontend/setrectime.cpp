@@ -48,7 +48,7 @@ SetRecTimeDialog::SetRecTimeDialog(ProgramInfo *rec, QSqlDatabase *ldb,
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
-    QLabel *desclabel = new QLabel("Change recording time:", this);
+    QLabel *desclabel = new QLabel(tr("Change recording time:"), this);
     desclabel->setBackgroundOrigin(WindowOrigin);
     vbox->addWidget(desclabel);
 
@@ -62,12 +62,12 @@ SetRecTimeDialog::SetRecTimeDialog(ProgramInfo *rec, QSqlDatabase *ldb,
     date->setBackgroundOrigin(WindowOrigin);
 
 
-    QLabel *subtitlelabel = new QLabel("Episode:", this);
+    QLabel *subtitlelabel = new QLabel(tr("Episode:"), this);
     subtitlelabel->setBackgroundOrigin(WindowOrigin);
     QLabel *subtitlefield = new QLabel(rec->subtitle, this);
     subtitlefield->setBackgroundOrigin(WindowOrigin);
     subtitlefield->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-    QLabel *descriptionlabel = new QLabel("Description:", this);
+    QLabel *descriptionlabel = new QLabel(tr("Description:"), this);
     descriptionlabel->setBackgroundOrigin(WindowOrigin);
     QLabel *descriptionfield = new QLabel(rec->description, this);
     descriptionfield->setBackgroundOrigin(WindowOrigin);
@@ -77,11 +77,11 @@ SetRecTimeDialog::SetRecTimeDialog(ProgramInfo *rec, QSqlDatabase *ldb,
     descriptionfield->setMinimumWidth((int)(800 * wmult -
                                       descriptionlabel->width() - 100 * wmult));
 
-    QLabel *startlabel = new QLabel("Start Time: ", this);
+    QLabel *startlabel = new QLabel(tr("Start Time: "), this);
     startlabel->setFont(QFont("Arial", (int)(bigfont * hmult), QFont::Bold));
     startlabel->setBackgroundOrigin(WindowOrigin);
 
-    QLabel *endlabel = new QLabel("End Time: ", this);
+    QLabel *endlabel = new QLabel(tr("End Time: "), this);
     endlabel->setFont(QFont("Arial", (int)(bigfont * hmult), QFont::Bold));
 
     endlabel->setBackgroundOrigin(WindowOrigin);
@@ -160,7 +160,7 @@ QLabel *SetRecTimeDialog::getDateLabel(ProgramInfo *pginfo)
     QString dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
     QString timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
 
-    QString timedate = endts.date().toString(dateformat) + QString(", ") +
+    QString timedate = startts.date().toString(dateformat) + QString(", ") +
                        startts.time().toString(timeformat) + QString(" - ") +
                        endts.time().toString(timeformat);
 

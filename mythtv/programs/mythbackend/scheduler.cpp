@@ -181,13 +181,13 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
             askIter = askedList.begin();
         }
     }
-    
+
     if (recordingList.size() > 0)
     {
         recordingList.sort(comp_proginfo());
         MarkKnownInputs();
         MarkConflicts();
-        PruneList(); 
+        PruneList();
         MarkConflicts();
 
         if (numcards > 1 || numinputs > 1)
@@ -195,6 +195,8 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
             DoMultiCard();
             MarkConflicts();
         }
+
+        // PrintList();
 
         MarkConflictsToRemove();
         if (doautoconflicts)
@@ -211,25 +213,20 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
 
 void Scheduler::PrintList(void)
 {
+    cout << "--- print list start ---\n";
     list<ProgramInfo *>::iterator i = recordingList.begin();
     for (; i != recordingList.end(); i++)
     {
         ProgramInfo *first = (*i);
-        cout << first->title << " " << first->chanstr << " " << first->chanid 
+        cout << first->title.leftJustify(24, ' ', true)
+             << first->chanstr.rightJustify(4, ' ') << "  " << first->chanid 
              << " \"" << first->startts.toString() << "\" " << first->sourceid 
-             << " " << first->inputid << " " << first->cardid << " --\t"  
+             << " " << first->inputid << " " << first->cardid << " -- "  
              << first->conflicting << " " << first->recording << " "
              << first->duplicate << endl;
     }
 
-    cout << endl << endl;
-}
-
-ProgramInfo *Scheduler::GetNextRecording(void)
-{
-    if (recordingList.size() > 0)
-        return recordingList.front();
-    return NULL;
+    cout << "---  print list end  ---\n";
 }
 
 void Scheduler::RemoveRecording(ProgramInfo *pginfo)
@@ -246,19 +243,6 @@ void Scheduler::RemoveRecording(ProgramInfo *pginfo)
             break;
         }
     }
-}
-
-void Scheduler::RemoveFirstRecording(void)
-{
-    if (recordingList.size() == 0)
-        return;
-
-    ProgramInfo *rec = recordingList.front();
-
-    askedList.remove(rec->schedulerid);
-
-    delete rec;
-    recordingList.pop_front();
 }
 
 bool Scheduler::Conflict(ProgramInfo *a, ProgramInfo *b)
@@ -331,8 +315,38 @@ void Scheduler::MarkConflicts(list<ProgramInfo *> *uselist)
 
 void Scheduler::PruneList(void)
 {
-    list<ProgramInfo *>::reverse_iterator i = recordingList.rbegin();
-    list<ProgramInfo *>::iterator deliter;
+    list<ProgramInfo *>::reverse_iterator i;
+    list<ProgramInfo *>::iterator deliter, q;
+
+    q = recordingList.begin();
+    while (q != recordingList.end())
+    {
+        ProgramInfo *rec = (*q);
+
+        if (rec->startts > QDateTime::currentDateTime())
+        {
+            break;
+        }
+
+        bool removed = false;
+
+        QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
+        for (; enciter != m_tvList->end(); ++enciter)
+        {
+            EncoderLink *elink = enciter.data();
+            if (elink->isRecording(rec))
+            {
+                delete rec;
+                rec = NULL;
+                recordingList.erase(q++);
+                removed = true;
+                break;
+            }
+        }
+
+        if (!removed)
+            q++;
+    }
 
     i = recordingList.rbegin();
     while (i != recordingList.rend())
@@ -697,8 +711,26 @@ list<ProgramInfo *> *Scheduler::CopyList(list<ProgramInfo *> *sourcelist)
 
         if (second->cardid <= 0)
         {
-            second->inputid = sourceToInput[first->sourceid][0];
-            second->cardid = inputToCard[second->inputid];
+            int numinputs = numInputsPerSource[first->sourceid];
+            bool placed = false;
+
+            for (int z = 0; z < numinputs; z++)
+            {
+                second->inputid = sourceToInput[first->sourceid][z];
+                second->cardid = inputToCard[second->inputid];
+
+                EncoderLink *enc = (*m_tvList)[second->cardid];
+                if (enc->WouldConflict(second))
+                    continue;
+                placed = true;
+                break;
+            }
+
+            if (!placed)
+            {
+                second->inputid = sourceToInput[first->sourceid][0];
+                second->cardid = inputToCard[second->inputid];
+            }
         }
 
         retlist->push_back(second);
@@ -733,6 +765,8 @@ void Scheduler::DoMultiCard(void)
         }
     }
 
+    list<ProgramInfo *> fixedList;
+    
     list<bool>::iterator biter;
     for (biter = canMoveList.begin(), i = allConflictList.begin(); 
          biter != canMoveList.end(); biter++, i++)
@@ -765,15 +799,30 @@ void Scheduler::DoMultiCard(void)
                     second->inputid = sourceToInput[second->sourceid][z];
                     second->cardid = inputToCard[second->inputid];
 
-                    if (!((*m_tvList)[second->cardid])->isConnected())
+                    if (((*m_tvList)[second->cardid])->WouldConflict(second))
                     {
                         continue;
                     }
 
                     if (!Conflict(first, second))
                     {
-                        fixed = true;
-                        break;
+                        bool allclear = true;
+                        list<ProgramInfo *>::iterator k = fixedList.begin();
+                        for (; k != fixedList.end(); k++)
+                        {
+                            ProgramInfo *test = (*k);
+                            if (Conflict(test, second))
+                            {
+                                allclear = false;
+                                break;
+                            }
+                        }
+
+                        if (allclear)
+                        {
+                            fixed = true;
+                            break;
+                        }
                     }
                 }
                 if (!fixed)
@@ -793,15 +842,30 @@ void Scheduler::DoMultiCard(void)
                     first->inputid = sourceToInput[first->sourceid][z];
                     first->cardid = inputToCard[first->inputid];
 
-                    if (!((*m_tvList)[first->cardid])->isConnected())
+                    if (((*m_tvList)[first->cardid])->WouldConflict(first))
                     {
                         continue;
                     }
 
                     if (!Conflict(first, second))
                     {
-                        fixed = true;
-                        break;
+                        bool allclear = true;
+                        list<ProgramInfo *>::iterator k = fixedList.begin();
+                        for (; k != fixedList.end(); k++)
+                        {
+                            ProgramInfo *test = (*k);
+                            if (Conflict(test, second))
+                            {
+                                allclear = false;
+                                break;
+                            }
+                        }
+
+                        if (allclear)
+                        {
+                            fixed = true;
+                            break;
+                        }
                     }
                 }
                 if (!fixed)
@@ -815,7 +879,10 @@ void Scheduler::DoMultiCard(void)
         delete conflictList;
         conflictList = getConflicting(first, true, copylist);
         if (!conflictList || conflictList->size() == 0)
+        {
             first->conflictfixed = true;
+            fixedList.push_back(first);
+        }
 
         delete conflictList;
     }
@@ -841,6 +908,7 @@ void Scheduler::DoMultiCard(void)
 void Scheduler::RunScheduler(void)
 {
     int secsleft;
+    bool resetIter = false;
     EncoderLink *nexttv = NULL;
 
     ProgramInfo *nextRecording = NULL;
@@ -866,7 +934,7 @@ void Scheduler::RunScheduler(void)
         }
 
         recIter = recordingList.begin();
-        for (; recIter != recordingList.end(); recIter++)
+        while (recIter != recordingList.end())
         {
             nextRecording = (*recIter);
 
@@ -885,6 +953,8 @@ void Scheduler::RunScheduler(void)
                 exit(0);
             }
             nexttv = (*m_tvList)[nextRecording->cardid];
+            // cerr << "nexttv = " << nextRecording->cardid;
+            // cerr << " title: " << nextRecording->title << endl;
 
             if (nexttv->GetState() == kState_WatchingLiveTV &&
                 secsleft <= 30 && secsleft > 0)
@@ -914,8 +984,13 @@ void Scheduler::RunScheduler(void)
                     RemoveRecording(nextRecording);
                     nextRecording = NULL;
                     recIter = recordingList.begin();
+                    resetIter = true;
                 }
             }
+            if (resetIter)
+                resetIter = false;
+            else
+                recIter++;
         }
 
         pthread_mutex_unlock(&schedulerLock);

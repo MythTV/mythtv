@@ -2,6 +2,7 @@
 Makefile
 moc_deletebox.cpp
 moc_menubox.cpp
+moc_manualbox.cpp
 moc_playbackbox.cpp
 moc_programlistitem.cpp
 moc_viewscheduled.cpp

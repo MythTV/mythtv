@@ -23,9 +23,6 @@ class Scheduler : public QObject
 
     void RemoveRecording(ProgramInfo *pginfo);
 
-    void RemoveFirstRecording(void); 
-    ProgramInfo *GetNextRecording(void);
-
     list<ProgramInfo *> *getAllPending(void) { return &recordingList; }
 
     list<ProgramInfo *> *getConflicting(ProgramInfo *pginfo,

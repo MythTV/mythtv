@@ -1,4 +1,5 @@
 #include <qapplication.h>
+#include <qdatetime.h>
 
 #include <unistd.h>
 #include <iostream>
@@ -71,15 +72,41 @@ bool FileTransfer::RequestBlock(int size)
     if (size > 128000)
         size = 128000;
 
-    pthread_mutex_lock(&readthreadLock);
+    bool locked = false;
+    QTime curtime = QTime::currentTime();
+    curtime = curtime.addSecs(15);
+
+    while (QTime::currentTime() < curtime)
+    {
+        locked = pthread_mutex_trylock(&readthreadLock);
+        if (locked)
+            break;
+        usleep(50);
+    }
+
+    if (!locked)
+    {
+        cerr << "Backend stopped in RequestBlock\n";
+        rbuffer->StopReads();
+        return true;
+    }
+
     readrequest = size;
     pthread_mutex_unlock(&readthreadLock);
 
+    curtime = QTime::currentTime();
+    curtime = curtime.addSecs(15);
+
     while (readrequest > 0 && readthreadlive && !ateof)
     {
-        qApp->unlock();
         usleep(100);
-        qApp->lock();
+
+        if (QTime::currentTime() > curtime)
+        {
+            cerr << "Backend stuffed up in RequestBlock\n";
+            rbuffer->StopReads();
+            break;
+        }
     }
 
     return ateof;
@@ -126,9 +153,13 @@ void FileTransfer::DoFTReadThread(void)
         int ret = rbuffer->Read(buffer, readrequest);
         if (!rbuffer->GetStopReads())
         {
-            WriteBlock(sock, buffer, ret);
-            if (ret == 0)
+            if (ret)
+                WriteBlock(sock, buffer, ret);
+            else
+            {
                 ateof = true;
+                readrequest = 0;
+            }
         }        
 
         readrequest -= ret;
@@ -151,10 +182,10 @@ long long FileTransfer::GetFileSize(void)
 {
     QString filename = rbuffer->GetFilename();
 
-    struct stat64 st;
+    struct stat st;
     long long size = 0;
 
-    if (stat64(filename.ascii(), &st) == 0)
+    if (stat(filename.ascii(), &st) == 0)
         size = st.st_size;
 
     return size;

@@ -1,7 +1,11 @@
 #include <qapplication.h>
 #include <qsqldatabase.h>
+#include <qdatetime.h>
 #include <qfile.h>
 #include <qurl.h>
+#include <qthread.h>
+#include <qwaitcondition.h>
+
 #include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -23,6 +27,56 @@ using namespace std;
 #include "httpstatus.h"
 #include "programinfo.h"
 
+class ProcessRequestThread : public QThread
+{
+  public:
+    ProcessRequestThread(MainServer *ms) { parent = ms; dostuff = false; }
+   
+    void setup(QStringList list, QStringList tok, PlaybackSock *pb)
+    {
+        listline = list;
+        tokens = tok;
+        pbs = pb;
+        dostuff = true;
+        waitCond.wakeOne();
+    }
+
+    void killit(void)
+    {
+        threadlives = false;
+        waitCond.wakeOne();
+    }
+
+    virtual void run()
+    {
+        threadlives = true;
+
+        while (threadlives)
+        {
+            if (!dostuff)
+                waitCond.wait();
+
+            if (dostuff)
+            {
+                parent->ProcessRequest(listline, tokens, pbs);
+                dostuff = false;
+                parent->MarkUnused(this);
+            }
+        }
+    }
+
+  private:
+    MainServer *parent;
+
+    QStringList listline;
+    QStringList tokens;
+    PlaybackSock *pbs;   
+
+    QWaitCondition waitCond;
+    bool dostuff;
+    bool threadlives;
+};
+
 MainServer::MainServer(bool master, int port, int statusport, 
                        QMap<int, EncoderLink *> *tvList)
 {
@@ -30,6 +84,13 @@ MainServer::MainServer(bool master, int port, int statusport,
     masterServer = NULL;
 
     encoderList = tvList;
+
+    for (int i = 0; i < 5; i++)
+    {
+        ProcessRequestThread *prt = new ProcessRequestThread(this);
+        prt->start();
+        threadPool.push_back(prt);
+    }
 
     recordfileprefix = gContext->GetFilePrefix();
 
@@ -87,7 +148,8 @@ void MainServer::readSocket(void)
         if (command == "ANN")
         {
             if (tokens.size() < 3 || tokens.size() > 4)
-                cerr << "Bad ANN query\n";
+                cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+                     << " Bad ANN query" << endl;
             else
                 HandleAnnounce(listline, tokens, socket);
             return;
@@ -101,95 +163,133 @@ void MainServer::readSocket(void)
         PlaybackSock *pbs = getPlaybackBySock(socket);
         if (pbs)
         {
-            if (command == "QUERY_RECORDINGS")
+            ProcessRequestThread *prt = NULL;
+            while (!prt)
             {
-                if (tokens.size() != 2)
-                    cerr << "Bad QUERY_RECORDINGS query\n";
-                else
-                    HandleQueryRecordings(tokens[1], pbs);
-            }
-            else if (command == "QUERY_FREESPACE")
-            {
-                HandleQueryFreeSpace(pbs);
-            }
-            else if (command == "QUERY_CHECKFILE")
-            {
-                HandleQueryCheckFile(listline, pbs);
-            }
-            else if (command == "DELETE_RECORDING")
-            {
-                HandleDeleteRecording(listline, pbs);
-            }
-            else if (command == "QUERY_GETALLPENDING")
-            {
-                HandleGetPendingRecordings(pbs);
-            }
-            else if (command == "QUERY_GETCONFLICTING")
-            {
-                if (tokens.size() != 2)
-                    cerr << "Bad QUERY_GETCONFLICTING\n";
-                else
-                    HandleGetConflictingRecordings(listline, tokens[1], pbs);
-            }
-            else if (command == "GET_FREE_RECORDER")
-            {
-                HandleGetFreeRecorder(pbs);
-            }
-            else if (command == "QUERY_RECORDER")
-            {
-                if (tokens.size() != 2)
-                    cerr << "Bad QUERY_RECORDER\n";
-                else
-                    HandleRecorderQuery(listline, tokens, pbs);
-            }
-            else if (command == "QUERY_REMOTEENCODER")
-            {
-                if (tokens.size() != 2)
-                    cerr << "Bad QUERY_REMOTEENCODER\n";
-                else
-                    HandleRemoteEncoder(listline, tokens, pbs);
-            }
-            else if (command == "GET_RECORDER_NUM")
-            {
-                HandleGetRecorderNum(listline, pbs);
-            }
-            else if (command == "QUERY_FILETRANSFER")
-            {
-                if (tokens.size() != 2)
-                    cerr << "Bad QUERY_FILETRANSFER\n";
-                else
-                    HandleFileTransferQuery(listline, tokens, pbs);
-            }
-            else if (command == "QUERY_GENPIXMAP")
-            {
-                HandleGenPreviewPixmap(listline, pbs);
-            }
-            else if (command == "MESSAGE")
-            {
-                HandleMessage(listline, pbs);
-            } 
-            else if (command == "FILL_PROGRAM_INFO")
-            {
-                HandleFillProgramInfo(listline, pbs);
-            }
-            else if (command == "BACKEND_MESSAGE")
-            {
-                QString message = listline[1];
-                QString extra = listline[2];
+                threadPoolLock.lock();
+                if (!threadPool.empty())
+                {
+                    prt = threadPool.back();
+                    threadPool.pop_back();
+                }
+                threadPoolLock.unlock();
 
-                MythEvent me(message, extra);
-                gContext->dispatch(me);
+                if (!prt)
+                {
+                    cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+                         << " waiting for a thread.." << endl;
+                    usleep(50);
+                }
             }
-            else
-            {
-               cout << "unknown command: " << command << endl;
-            }
+
+            prt->setup(listline, tokens, pbs);
         }
         else
-        {
-            cout << "unknown socket\n";
-        }
+            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+                 << " Unknown socket" << endl;    
     }
+}
+
+void MainServer::ProcessRequest(QStringList &listline, QStringList &tokens,
+                                PlaybackSock *pbs)
+{
+    QString command = tokens[0];
+
+    if (command == "QUERY_RECORDINGS")
+    {
+        if (tokens.size() != 2)
+            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+                 << " Bad QUERY_RECORDINGS query" << endl;
+        else
+            HandleQueryRecordings(tokens[1], pbs);
+    }
+    else if (command == "QUERY_FREESPACE")
+    {
+        HandleQueryFreeSpace(pbs);
+    }
+    else if (command == "QUERY_CHECKFILE")
+    {
+        HandleQueryCheckFile(listline, pbs);
+    }
+    else if (command == "DELETE_RECORDING")
+    {
+        HandleDeleteRecording(listline, pbs);
+    }
+    else if (command == "QUERY_GETALLPENDING")
+    {
+        HandleGetPendingRecordings(pbs);
+    }
+    else if (command == "QUERY_GETCONFLICTING")
+    {
+        if (tokens.size() != 2)
+            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+                 << " Bad QUERY_GETCONFLICTING" << endl;
+        else
+            HandleGetConflictingRecordings(listline, tokens[1], pbs);
+    }
+    else if (command == "GET_FREE_RECORDER")
+    {
+        HandleGetFreeRecorder(pbs);
+    }
+    else if (command == "QUERY_RECORDER")
+    {
+        if (tokens.size() != 2)
+            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+                 << " Bad QUERY_RECORDER" << endl;
+        else
+            HandleRecorderQuery(listline, tokens, pbs);
+    }
+    else if (command == "QUERY_REMOTEENCODER")
+    {
+        if (tokens.size() != 2)
+            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+                 << " Bad QUERY_REMOTEENCODER" << endl;
+        else
+            HandleRemoteEncoder(listline, tokens, pbs);
+    }
+    else if (command == "GET_RECORDER_NUM")
+    {
+        HandleGetRecorderNum(listline, pbs);
+    }
+    else if (command == "QUERY_FILETRANSFER")
+    {
+        if (tokens.size() != 2)
+            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+                 << " Bad QUERY_FILETRANSFER" << endl;
+        else
+            HandleFileTransferQuery(listline, tokens, pbs);
+    }
+    else if (command == "QUERY_GENPIXMAP")
+    {
+        HandleGenPreviewPixmap(listline, pbs);
+    }
+    else if (command == "MESSAGE")
+    {
+        HandleMessage(listline, pbs);
+    } 
+    else if (command == "FILL_PROGRAM_INFO")
+    {
+        HandleFillProgramInfo(listline, pbs);
+    }
+    else if (command == "BACKEND_MESSAGE")
+    {
+        QString message = listline[1];
+        QString extra = listline[2];
+        MythEvent me(message, extra);
+        gContext->dispatch(me);
+    }
+    else
+    {
+        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+             << " unknown command: " << command << endl;
+    }
+}
+
+void MainServer::MarkUnused(ProcessRequestThread *prt)
+{
+    threadPoolLock.lock();
+    threadPool.push_back(prt);
+    threadPoolLock.unlock();
 }
 
 void MainServer::customEvent(QCustomEvent *e)
@@ -200,6 +300,9 @@ void MainServer::customEvent(QCustomEvent *e)
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
         MythEvent *me = (MythEvent *)e;
+
+        if (me->Message().left(6) == "LOCAL_")
+            return;
 
         broadcast = "BACKEND_MESSAGE";
         broadcast << me->Message();
@@ -229,15 +332,16 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
     if (commands[1] == "Playback")
     {
         bool wantevents = commands[3].toInt();
-
-        cout << "adding: " << commands[2] << " as a player " << wantevents
-             << "\n";
+        VERBOSE("MainServer::HandleAnnounce Playback");
+        cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") 
+             << " adding: " << commands[2] << " as a player " << wantevents << endl;
         PlaybackSock *pbs = new PlaybackSock(socket, commands[2], wantevents);
         playbackList.push_back(pbs);
     }
     else if (commands[1] == "SlaveBackend")
     {
-        cout << "adding: " << commands[2] << " as a slave backend server\n";
+        cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") 
+             << " adding: " << commands[2] << " as a slave backend server" << endl;
         PlaybackSock *pbs = new PlaybackSock(socket, commands[2], false);
         pbs->setAsSlaveBackend();
         pbs->setIP(commands[3]);
@@ -250,20 +354,24 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                 elink->setSocket(pbs);
         }
 
+        dblock.lock();
         ScheduledRecording::signalChange(QSqlDatabase::database());
+        dblock.unlock();
 
         playbackList.push_back(pbs);
     }
     else if (commands[1] == "RingBuffer")
     {
-        cout << "adding: " << commands[2] << " as a remote ringbuffer\n";
+        cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+             << " adding: " << commands[2] << " as a remote ringbuffer" << endl;
         ringBufList.push_back(socket);
         int recnum = commands[3].toInt();
 
         QMap<int, EncoderLink *>::Iterator iter = encoderList->find(recnum);
         if (iter == encoderList->end())
         {
-            cerr << "Unknown encoder.\n";
+            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+                 << " Unknown encoder." << endl;
             exit(0);
         }
 
@@ -304,26 +412,33 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                     if (dsp_status != -1)
                     {
                         if (!(soundcardcaps & DSP_CAP_DUPLEX))
-                        cerr << "WARNING:  Capture device " << audiodevice 
-                             << "is not reporting full duplex "
-                             << " capability.\nSee docs/mythtv-HOWTO, "
-                             << "section 17 for more information.\n" << endl;
+                        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+                             << " WARNING:  Capture device " << audiodevice 
+                             << " is not reporting full duplex "
+                             << "capability.\nSee docs/mythtv-HOWTO, "
+                             << "section 18 for more information." << endl;
                     }
                     else 
-                        cerr << "Could not get capabilities for "
+                        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+                             << " Could not get capabilities for "
                              << "audio device: " << audiodevice << endl;
                     close(dsp_fd);
                 }
                 else 
-                    cerr << "Could not open audio device: " 
+                    cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+                         << " Could not open audio device: " 
                          << audiodevice << endl;
             }
         }
     }
     else if (commands[1] == "FileTransfer")
     {
-        cout << "adding: " << commands[2] << " as a remote file transfer\n";
-        QString filename = slist[1];    
+        VERBOSE("MainServer::HandleAnnounce FileTransfer");
+        cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+             << " adding: " << commands[2] << " as a remote file transfer"
+             << endl;
+        QUrl qurl = slist[1];
+        QString filename = LocalFilePath(qurl);
 
         FileTransfer *ft = new FileTransfer(filename, socket);
 
@@ -346,16 +461,21 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
     QSqlQuery query;
     QString thequery;
 
+    dblock.lock();
     MythContext::KickDatabase(QSqlDatabase::database());
 
-    thequery = "SELECT chanid,starttime,endtime,title,subtitle,description, "
-               "hostname FROM recorded ORDER BY starttime";
+    thequery = "SELECT recorded.chanid,starttime,endtime,title,subtitle,"
+               "description,hostname,channum,name,callsign FROM recorded "
+               "LEFT JOIN channel ON recorded.chanid = channel.chanid "
+               "ORDER BY starttime";
 
     if (type == "Delete")
         thequery += " DESC";
     thequery += ";";
 
     query.exec(thequery);
+
+    dblock.unlock();
 
     QStringList outputlist;
 
@@ -391,20 +511,11 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             if (proginfo->description == QString::null)
                 proginfo->description = "";
 
-            QSqlQuery subquery;
-            QString subquerystr;
-
-            subquerystr = QString("SELECT channum,name,callsign FROM channel "
-                                  "WHERE chanid = %1;").arg(proginfo->chanid);
-            subquery.exec(subquerystr);
-
-            if (subquery.isActive() && subquery.numRowsAffected() > 0)
+            if (!query.value(7).toString().isNull())
             {
-                subquery.next();
-
-                proginfo->chanstr = subquery.value(0).toString();
-                proginfo->channame = subquery.value(1).toString();
-                proginfo->chansign = subquery.value(2).toString();
+                proginfo->chanstr = query.value(7).toString();
+                proginfo->channame = query.value(8).toString();
+                proginfo->chansign = query.value(9).toString();
             }
             else
             {
@@ -416,30 +527,37 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             QString lpath = proginfo->GetRecordFilename(fileprefix);
             QString ip = gContext->GetSetting("BackendServerIP");
             QString port = gContext->GetSetting("BackendServerPort");
+            PlaybackSock *slave = NULL;
+            QFile checkFile(lpath);
 
-            if (proginfo->hostname == gContext->GetHostName())
+            if (proginfo->hostname != gContext->GetHostName())
+            {
+                slave = getSlaveByHostname(proginfo->hostname);
+            }
+
+            if ((proginfo->hostname == gContext->GetHostName()) ||
+                ((!slave) && checkFile.exists()))
             {
                 if (pbs->isLocal())
                     proginfo->pathname = lpath;
                 else
-                    proginfo->pathname = QString("myth://") + ip + ":" + port + 
-                                         lpath;
+                    proginfo->pathname = QString("myth://") + ip + ":" + port
+                                         + "/" + proginfo->GetRecordBasename();
 
-                struct stat64 st;
+                struct stat st;
 
                 long long size = 0;
-                if (stat64(lpath.ascii(), &st) == 0)
+                if (stat(lpath.ascii(), &st) == 0)
                     size = st.st_size;
 
                 proginfo->filesize = size;
             }
             else
             {
-                PlaybackSock *slave = getSlaveByHostname(proginfo->hostname);
- 
                 if (!slave)
                 {
-                    cerr << "Couldn't find backend for: " << proginfo->title
+                    cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+                         << " Couldn't find backend for: " << proginfo->title
                          << " : " << proginfo->subtitle << endl;
                     proginfo->filesize = 0;
                     proginfo->pathname = "file not found";
@@ -477,12 +595,13 @@ void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)
     if (playbackhost == gContext->GetHostName())
         pginfo->pathname = lpath;
     else
-        pginfo->pathname = QString("myth://") + ip + ":" + port + lpath;
+        pginfo->pathname = QString("myth://") + ip + ":" + port
+                           + "/" + pginfo->GetRecordBasename();
 
-    struct stat64 st;
+    struct stat st;
 
     long long size = 0;
-    if (stat64(lpath.ascii(), &st) == 0)
+    if (stat(lpath.ascii(), &st) == 0)
         size = st.st_size;
 
     pginfo->filesize = size;
@@ -538,13 +657,19 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
     {
         PlaybackSock *slave = getSlaveByHostname(pginfo->hostname);
 
+        int num = -1;
+
         if (!slave)
-            cerr << "Couldn't find backend for: " << pginfo->title
+            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+                 << " Couldn't find backend for: " << pginfo->title
                  << " : " << pginfo->subtitle << endl;
         else
-            slave->DeleteRecording(pginfo);
+            num = slave->DeleteRecording(pginfo);
 
-        QStringList outputlist = "OK";
+        if (num > 0)
+            (*encoderList)[num]->StopRecording();
+
+        QStringList outputlist = "0";
         WriteStringList(pbs->getSocket(), outputlist);
         delete pginfo;
         return;
@@ -552,14 +677,17 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
 
     if (pginfo->hostname != gContext->GetHostName())
     {
-        cout << "Somehow we got a request to delete a program for: " 
+        cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+             << " Somehow we got a request to delete a program for: " 
              << pginfo->hostname << endl;
 
-        QStringList outputlist = "BAD";
+        QStringList outputlist = "-1";
         WriteStringList(pbs->getSocket(), outputlist);
         delete pginfo;
         return;
     }
+
+    int recnum = -1;
 
     QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
     for (; iter != encoderList->end(); ++iter)
@@ -568,6 +696,8 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
 
         if (elink->isLocal() && elink->MatchesRecording(pginfo))
         {
+            recnum = iter.key();
+
             elink->StopRecording();
 
             while (elink->isBusy())
@@ -586,6 +716,8 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
     QString endts = pginfo->endts.toString("yyyyMMddhhmm");
     endts += "00";
 
+    dblock.lock();
+
     MythContext::KickDatabase(QSqlDatabase::database());
 
     thequery = QString("DELETE FROM recorded WHERE chanid = %1 AND title "
@@ -594,9 +726,11 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
                        .arg(startts).arg(endts);
 
     query.exec(thequery);
+
     if (!query.isActive())
     {
-        cerr << "DB Error: recorded program deletion failed, SQL query "
+        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+             << " DB Error: recorded program deletion failed, SQL query "
              << "was:" << endl;
         cerr << thequery << endl;
     }
@@ -609,10 +743,13 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
     query.exec(thequery);
     if (!query.isActive())
     {
-        cerr << "DB Error: recorded program deletion failed, SQL query "
+        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+             << " DB Error: recorded program deletion failed, SQL query "
              << "was:" << endl;
         cerr << thequery << endl;
     }
+
+    dblock.unlock();
 
     DeleteStruct *ds = new DeleteStruct;
     ds->filename = filename;
@@ -624,7 +761,7 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
 
     pthread_create(&deletethread, &attr, SpawnDelete, ds);
 
-    QStringList outputlist = "OK";
+    QStringList outputlist = QString::number(recnum);
     WriteStringList(pbs->getSocket(), outputlist);
 
     delete pginfo;
@@ -673,7 +810,8 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
         PlaybackSock *slave = getSlaveByHostname(pginfo->hostname);
 
         if (!slave)
-            cerr << "Couldn't find backend for: " << pginfo->title
+            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+                 << " Couldn't find backend for: " << pginfo->title
                  << " : " << pginfo->subtitle << endl;
         else
             exists = slave->CheckFile(pginfo);
@@ -686,7 +824,8 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
 
     if (pginfo->hostname != gContext->GetHostName())
     {
-        cout << "Somehow we got a request to check a file for: "
+        cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+             << " Somehow we got a request to check a file for: "
              << pginfo->hostname << endl;
 
         QStringList outputlist = QString::number(exists);
@@ -696,7 +835,8 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
     }
 
     QUrl qurl(pginfo->pathname);
-    QFile checkFile(qurl.path());
+    QString cpath = LocalFilePath(qurl);
+    QFile checkFile(cpath);
 
     if (checkFile.exists() == true)
         exists = 1;
@@ -709,6 +849,8 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
 
 void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs)
 {
+    dblock.lock();
+
     MythContext::KickDatabase(QSqlDatabase::database());
 
     Scheduler *sched = new Scheduler(false, encoderList, 
@@ -716,6 +858,8 @@ void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs)
 
     bool conflicts = sched->FillRecordLists(false);
     list<ProgramInfo *> *recordinglist = sched->getAllPending();
+
+    dblock.unlock();
 
     QStringList strlist;
 
@@ -735,6 +879,8 @@ void MainServer::HandleGetConflictingRecordings(QStringList &slist,
                                                 QString purge,
                                                 PlaybackSock *pbs)
 {
+    dblock.lock();
+
     MythContext::KickDatabase(QSqlDatabase::database());
 
     Scheduler *sched = new Scheduler(false, encoderList, 
@@ -749,6 +895,8 @@ void MainServer::HandleGetConflictingRecordings(QStringList &slist,
 
     list<ProgramInfo *> *conflictlist = sched->getConflicting(pginfo, 
                                                               removenonplaying);
+
+    dblock.unlock();
 
     QStringList strlist = QString::number(conflictlist->size());
 
@@ -817,7 +965,8 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     QMap<int, EncoderLink *>::Iterator iter = encoderList->find(recnum);
     if (iter == encoderList->end())
     {
-        cerr << "Unknown encoder.\n";
+        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+             << " Unknown encoder." << endl;
         exit(0);
     }
 
@@ -902,6 +1051,11 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         enc->PauseRecorder();
         retlist << "ok";
     }
+    else if (command == "FINISH_RECORDING")
+    {
+        enc->FinishRecording();
+        retlist << "ok";
+    }
     else if (command == "TOGGLE_INPUTS")
     {
         enc->ToggleInputs();
@@ -927,34 +1081,42 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     else if (command == "CHANGE_COLOUR")
     {
         bool up = slist[2].toInt(); 
-        enc->ChangeColour(up);
-        retlist << "ok";
+        retlist << QString::number(enc->ChangeColour(up));
     }
     else if (command == "CHANGE_CONTRAST")
     {
         bool up = slist[2].toInt(); 
-        enc->ChangeContrast(up);
-        retlist << "ok";
+        retlist << QString::number(enc->ChangeContrast(up));
     }
     else if (command == "CHANGE_BRIGHTNESS")
     {
         bool up = slist[2].toInt(); 
-        enc->ChangeBrightness(up);
-        retlist << "ok";
+        retlist << QString::number(enc->ChangeBrightness(up));
+    }
+    else if (command == "CHANGE_DEINTERLACER")
+    {
+        int deinterlacer_mode = slist[2].toInt();
+        enc->ChangeDeinterlacer(deinterlacer_mode);
+        retlist << "OK";
     }
     else if (command == "CHECK_CHANNEL")
     {
         QString name = slist[2];
         retlist << QString::number((int)(enc->CheckChannel(name)));
     }
-    else if (command == "GET_PROGRAM_INFO")
+    else if (command == "GET_NEXT_PROGRAM_INFO")
     {
-        QString title = "", subtitle = "", desc = "", category = "";
-        QString starttime = "", endtime = "", callsign = "", iconpath = "";
-        QString channelname = "";
+        QString channelname = slist[2];
+        QString chanid = slist[3];
+        int direction = slist[4].toInt();
+        QString starttime = slist[5];
 
-        enc->GetChannelInfo(title, subtitle, desc, category, starttime,
-                            endtime, callsign, iconpath, channelname);
+        QString title = "", subtitle = "", desc = "", category = "";
+        QString endtime = "", callsign = "", iconpath = "";
+
+        enc->GetNextProgram(direction,
+                            title, subtitle, desc, category, starttime,
+                            endtime, callsign, iconpath, channelname, chanid);
 
         if (title == "")
             title = " ";
@@ -974,6 +1136,8 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
             iconpath = " ";
         if (channelname == "")
             channelname = " ";
+        if (chanid == "")
+            chanid = " ";
 
         retlist << title;
         retlist << subtitle;
@@ -984,6 +1148,48 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         retlist << callsign;
         retlist << iconpath;
         retlist << channelname;
+        retlist << chanid;
+    }
+    else if (command == "GET_PROGRAM_INFO")
+    {
+        QString title = "", subtitle = "", desc = "", category = "";
+        QString starttime = "", endtime = "", callsign = "", iconpath = "";
+        QString channelname = "", chanid = "";
+
+        enc->GetChannelInfo(title, subtitle, desc, category, starttime,
+                            endtime, callsign, iconpath, channelname, chanid);
+
+        if (title == "")
+            title = " ";
+        if (subtitle == "")
+            subtitle = " ";
+        if (desc == "")
+            desc = " ";
+        if (category == "")
+            category = " ";
+        if (starttime == "")
+            starttime = " ";
+        if (endtime == "")
+            endtime = " ";
+        if (callsign == "")
+            callsign = " ";
+        if (iconpath == "")
+            iconpath = " ";
+        if (channelname == "")
+            channelname = " ";
+        if (chanid == "")
+            chanid = " ";
+
+        retlist << title;
+        retlist << subtitle;
+        retlist << desc;
+        retlist << category;
+        retlist << starttime;
+        retlist << endtime;
+        retlist << callsign;
+        retlist << iconpath;
+        retlist << channelname;
+        retlist << chanid;
     }
     else if (command == "GET_INPUT_NAME")
     {
@@ -1036,7 +1242,8 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     }
     else
     {
-        cout << "unknown command: " << command << endl;
+        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+             << " unknown command: " << command << endl;
         retlist << "ok";
     }
 
@@ -1051,7 +1258,8 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     QMap<int, EncoderLink *>::Iterator iter = encoderList->find(recnum);
     if (iter == encoderList->end())
     {
-        cerr << "Unknown encoder.\n";
+        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+             << " Unknown encoder." << endl;
         exit(0);
     }
 
@@ -1097,7 +1305,8 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
     FileTransfer *ft = getFileTransferByID(recnum);
     if (!ft)
     {
-        cerr << "Unknown file transfer socket\n";
+        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+             << " Unknown file transfer socket" << endl;
         return;
     }
 
@@ -1143,7 +1352,8 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
     }
     else 
     {
-        cout << "Unknown command: " << command << endl;
+        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+             << " Unknown command: " << command << endl;
         retlist << "ok";
     }
 
@@ -1221,7 +1431,8 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
         PlaybackSock *slave = getSlaveByHostname(pginfo->hostname);
 
         if (!slave)
-            cerr << "Couldn't find backend for: " << pginfo->title
+            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+                 << " Couldn't find backend for: " << pginfo->title
                  << " : " << pginfo->subtitle << endl;
         else
             slave->GenPreviewPixmap(pginfo);
@@ -1234,7 +1445,8 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
     if (pginfo->hostname != gContext->GetHostName())
     {
-        cout << "Somehow we got a request to generate a preview pixmap for: "
+        cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+             << " Somehow we got a request to generate a preview pixmap for: "
              << pginfo->hostname << endl;
 
         QStringList outputlist = "BAD";
@@ -1245,6 +1457,9 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
     QUrl qurl = pginfo->pathname;
     QString filename = qurl.path();
+
+    if (qurl.host() != "")
+        filename = LocalFilePath(qurl);
 
     int len = 0;
     int width = 0, height = 0;
@@ -1283,7 +1498,8 @@ void MainServer::endConnection(QSocket *socket)
         {
             if (ismaster && (*it)->isSlaveBackend())
             {
-                cout << "Slave backend: " << (*it)->getHostname() 
+                cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+                     << " Slave backend: " << (*it)->getHostname() 
                      << " has left the building\n";
 
                 QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
@@ -1343,7 +1559,8 @@ void MainServer::endConnection(QSocket *socket)
         }
     }
 
-    cout << "unknown socket\n";
+    cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+         << " unknown socket" << endl;
 }
 
 PlaybackSock *MainServer::getSlaveByHostname(QString &hostname)
@@ -1416,6 +1633,41 @@ FileTransfer *MainServer::getFileTransferBySock(QSocket *sock)
     return retval;
 }
 
+QString MainServer::LocalFilePath(QUrl &url)
+{
+    QString lpath = url.path();
+
+    if (lpath.section('/', -2, -2) == "channels")
+    {
+        // This must be an icon request. Check channel.icon to be safe.
+
+        QString querytext;
+        QSqlQuery query;
+
+        QString file = lpath.section('/', -1);
+        lpath = "";
+
+        querytext = QString("SELECT icon FROM channel "
+                            "WHERE icon LIKE '%%1';").arg(file);
+        query.exec(querytext);
+        if (query.isActive() && query.numRowsAffected())
+        {
+            query.next();
+            lpath = query.value(0).toString();
+        }
+        else
+        {
+            MythContext::DBError("Icon path", query);
+        }
+    }
+    else
+    {
+        lpath = lpath.section('/', -1);
+        lpath = gContext->GetFilePrefix() + url.path();
+    }
+    return lpath;
+}
+
 bool MainServer::isRingBufSock(QSocket *sock)
 {
     vector<QSocket *>::iterator it = ringBufList.begin();
@@ -1442,7 +1694,9 @@ void MainServer::reconnectTimeout(void)
     QString server = gContext->GetSetting("MasterServerIP", "localhost");
     int port = gContext->GetNumSetting("MasterServerPort", 6543);
 
-    cerr << "Attempting to connect to master server\n";
+    cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") 
+         << " - Connecting to master server: " << server << ":" << 
+            port << endl;
 
     masterServerSock->connectToHost(server, port);
 
@@ -1455,7 +1709,8 @@ void MainServer::reconnectTimeout(void)
         num++;
         if (num > 100)
         {
-            cerr << "Connection to master server timed out.\n";
+            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+                 << " - Connection to master server timed out." << endl;
             masterServerReconnect->start(1000, true);
             delete masterServerSock;
             return;
@@ -1464,13 +1719,15 @@ void MainServer::reconnectTimeout(void)
 
     if (masterServerSock->state() != QSocket::Connected)
     {
-        cerr << "Could not connect to master server\n";
+        cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+             << " - Could not connect to master server." << endl;
         masterServerReconnect->start(1000, true);
         delete masterServerSock;
         return;
     }
 
-    cerr << "done\n";
+    cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") 
+         << " - Connected." << endl;
 
     QString str = QString("ANN SlaveBackend %1 %2")
                           .arg(gContext->GetHostName())

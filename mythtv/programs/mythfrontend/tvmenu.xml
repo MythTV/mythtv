@@ -8,22 +8,15 @@
 
    <button>
       <type>TV_SCHEDULE</type>
-      <text>Schedule a Recording</text>
-      <alttext>Program Guide</alttext>
-      <action>TV_SCHEDULE</action>
+      <text>Schedule Recordings</text>
+      <alttext>Schedule</alttext>
+      <action>MENU tv_schedule.xml</action>
    </button>
 
    <button>
       <type>TV_PLAYBACK</type>
       <text>Watch Recordings</text>
       <action>TV_WATCH_RECORDING</action>
-   </button>
-
-   <button>
-      <type>TV_CONFLICTS</type>
-      <text>Fix Scheduling Conflicts</text>
-      <alttext>Fix Conflicts</alttext>
-      <action>TV_FIX_CONFLICTS</action>
    </button>
 
    <button>

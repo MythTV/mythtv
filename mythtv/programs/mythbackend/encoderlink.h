@@ -30,10 +30,14 @@ class EncoderLink
 
     bool isBusy();
     TVState GetState();
+    bool isRecording(ProgramInfo *rec); // scheduler call only.
+
     bool MatchesRecording(ProgramInfo *rec);
     int AllowRecording(ProgramInfo *rec, int timeuntil);
     void StartRecording(ProgramInfo *rec);
     void StopRecording(void);
+    void FinishRecording(void);
+    bool WouldConflict(ProgramInfo *rec);
 
     bool IsReallyRecording(void);
     float GetFramerate(void);
@@ -52,14 +56,20 @@ class EncoderLink
     void ToggleChannelFavorite(void);
     void ChangeChannel(int channeldirection);
     void SetChannel(QString name);
-    void ChangeContrast(bool direction);
-    void ChangeBrightness(bool direction);
-    void ChangeColour(bool direction);
+    int ChangeContrast(bool direction);
+    int ChangeBrightness(bool direction);
+    int ChangeColour(bool direction);
+    void ChangeDeinterlacer(int deinterlacer_mode);
     bool CheckChannel(QString name);
+    void GetNextProgram(int direction,
+                        QString &title, QString &subtitle, QString &desc,
+                        QString &category, QString &starttime,
+                        QString &endtime, QString &callsign, QString &iconpath,
+                        QString &channelname, QString &chanid);
     void GetChannelInfo(QString &title, QString &subtitle, QString &desc,
                         QString &category, QString &starttime,
                         QString &endtime, QString &callsign, QString &iconpath,
-                        QString &channelname);
+                        QString &channelname, QString &chanid);
     void GetInputName(QString &inputname);
 
     void SpawnReadThread(QSocket *sock);
@@ -74,6 +84,9 @@ class EncoderLink
 
     char *GetScreenGrab(QString filename, int secondsin, int &bufferlen,
                         int &video_width, int &video_height);
+
+    bool isParsingCommercials(ProgramInfo *pginfo);
+
   private:
     int m_capturecardnum;
 
@@ -83,6 +96,10 @@ class EncoderLink
     TVRec *tv;
 
     bool local;
+
+    QDateTime endRecordingTime;
+    QDateTime startRecordingTime;
+    QString chanid;
 };
 
 #endif

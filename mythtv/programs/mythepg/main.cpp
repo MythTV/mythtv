@@ -13,7 +13,7 @@ int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
 
-    gContext = new MythContext();
+    gContext = new MythContext(MYTH_BINARY_VERSION);
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!gContext->OpenDatabase(db))

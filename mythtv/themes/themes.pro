@@ -8,9 +8,12 @@ TEMPLATE = app
 CONFIG -= moc qt
 
 themes.path = $${PREFIX}/share/mythtv/themes/
-themes.files = blue liquid defaultosd blueosd oldosd
+themes.files = blue liquid defaultosd blueosd oldosd default
 
-INSTALLS += themes 
+fonts.path = $${PREFIX}/share/mythtv
+fonts.files = FreeSans.ttf FreeMono.ttf
+
+INSTALLS += themes fonts
 
 # Input
 SOURCES += dummy.c
