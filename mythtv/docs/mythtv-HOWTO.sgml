@@ -797,7 +797,7 @@ command be run twice. Red Hat will also frequently "forget" about the path.
 It's recommended to run <bf>/sbin/ldconfig</bf> after installing every
 package. Failing that, always run it if you get an unexpected error about
 not finding libraries.
-<sect1>Shell-Alias Requirements for MythTV
+<sect1>Environment variable Requirements for MythTV
 <sect2>General requirements
 <sect3>QT libraries and binaries
 <p>The compiler needs to be able to locate QT binaries and libraries in order 
@@ -808,19 +808,16 @@ earlier.
 
 One way to do this is as follows: <label id="Checking_that_it_worked">
 
-Open a new shell and switch to superuser mode.
+Open a shell and execute the following:
 <tscreen><verb>
-$ su
-# set
-[lots of text]
-     	
-PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
-QTDIR=/usr/lib/qt3
-
-[lots more text]
+$ echo $PATH
+/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
+$ echo $QTDIR
+/usr/lib/qt3
 </verb></tscreen>
 
-You should see <tt>QTDIR</tt> and <tt>/usr/lib/qt3/bin</tt> in your path.
+You should see a value like <tt>/usr/lib/qt3</tt> for <tt>QTDIR</tt>
+and <tt>/usr/lib/qt3/bin</tt> should be in $PATH.
 
 If you don't, do not proceed past this step until you have resolved this
 error. You may need to manually specify the QTDIR and PATH at the shell
