@@ -363,8 +363,8 @@ public:
         addSelection("+1100");
         addSelection("+1200");
         setHelpText("If your local timezone does not match the timezone "
-                    "returned by XMLTV, use this setting to automatically adjust the "
-                    "program start and end times.");
+                    "returned by XMLTV, use this setting to have "
+                    "mythfilldatabase adjust the program start and end times.");
     };
 };
 
