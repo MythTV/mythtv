@@ -61,6 +61,7 @@ void privateTypes::reset()
     GuideTransportID = 0;
     CustomGuidePID = false;
     GuideOnSingleTransport = false;
+    ParseSubtitleServiceIDs.clear();
 }
 
 void pullStatus::Reset()

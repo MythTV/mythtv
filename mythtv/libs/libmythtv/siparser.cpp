@@ -347,6 +347,16 @@ void SIParser::LoadPrivateTypes(uint16_t NetworkID)
                     SIPARSER(QString("Added TV Type %1").arg((*i).toInt()));
                 }
             }
+            if (QString(query.value(0).toString()) == "parse_subtitle_list")
+            {
+                PrivateTypes.ParseSubtitleServiceIDs.clear();
+                QStringList temp  = QStringList::split(",",query.value(1).toString());
+                for (QStringList::Iterator i = temp.begin();i!=temp.end();i++)
+                {
+                    PrivateTypes.ParseSubtitleServiceIDs[(*i).toInt()]=1;
+                    SIPARSER(QString("Added ServiceID %1 to list of channels to parse subtitle from").arg((*i).toInt()));
+                }
+            }
             query.next();
         }
     }
@@ -3088,6 +3098,17 @@ void SIParser::EITFixUpStyle4(Event& event)
         the begining of the description
         "^(?:[dD]el|[eE]pisode)\\s([0-9]+)(?:\\s?(?:/|:|av)\\s?([0-9]+))?\\."
         */
+
+        //is this event on a channel we shoud look for a subtitle?
+        if(PrivateTypes.ParseSubtitleServiceIDs.contains(event.ServiceID))
+        {
+            int pos=event.Description.find(". ");
+            if(pos!=-1 && pos<=40 && (event.Description.length()-(pos+2))>0 )
+            {
+                event.Event_Subtitle=event.Description.left(pos);
+                event.Description=event.Description.mid(pos+2);
+            }
+        }
 
         //try to findout if this is a rerun and if so the date.
         QRegExp rx("[Rr]epris\\sfrån\\s([^\\.]+)(?:\\.|$)");

@@ -1037,6 +1037,33 @@ void SIScan::AddEvents()
 
                 if (!query.isActive())
                    MythContext::DBError("Adding Event", query);
+
+                for(QValueList<Person>::Iterator it=(*e).Credits.begin();it!=(*e).Credits.end();it++)
+                {
+                    query.prepare("INSERT IGNORE INTO people (name) VALUES (:NAME);");
+                    query.bindValue(":NAME",(*it).name.utf8());
+
+                    if(!query.exec())
+                        MythContext::DBError("Adding Event (People)", query);
+
+                    if (!query.isActive())
+                        MythContext::DBError("Adding Event (People)", query);
+
+                    query.prepare("INSERT INTO credits (person,chanid,starttime,"
+                        "role) SELECT person,:CHANID,:STARTTIME,:ROLE FROM "
+                        "people WHERE people.name=:NAME");
+                    query.bindValue(":CHANID",ChanID);
+                    query.bindValue(":STARTTIME",(*e).StartTime.toString(QString("yyyy-MM-dd hh:mm:00")));
+                    query.bindValue(":ROLE",(*it).role.utf8());
+                    query.bindValue(":NAME",(*it).name.utf8());
+
+                    if(!query.exec())
+                        MythContext::DBError("Adding Event (Credits)", query);
+
+                    if (!query.isActive())
+                        MythContext::DBError("Adding Event (Credits)", query);
+                }
+
             }
         }
 

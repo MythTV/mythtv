@@ -9,7 +9,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdbcon.h"
 
-const QString currentDatabaseVersion = "1077";
+const QString currentDatabaseVersion = "1078";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -1567,6 +1567,19 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 ""
         }; 
         if (!performActualUpdate(updates, "1077", dbver))
+            return false;
+    }
+
+    if (dbver = "1077")
+    {
+        const QString updates[] = {
+"INSERT INTO `dtv_privatetypes` "
+"(`sitype`,`networkid`,`private_type`,`private_value`) VALUES "
+"('dvb',40999,'parse_subtitle_list',"
+"'1070,1049,1041,1039,1038,1030,1016,1131,1068,1069');",
+""
+        }; 
+        if (!performActualUpdate(updates, "1078", dbver))
             return false;
     }
 

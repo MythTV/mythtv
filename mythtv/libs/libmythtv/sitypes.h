@@ -114,6 +114,9 @@ public:
     uint16_t      GuidePID;
     bool          GuideOnSingleTransport;
     uint16_t      GuideTransportID;
+    /* List of ServiceID:s for which to parse out subtitle from the description.
+       Used in EITFixUpStyle4() */
+    QMap_uint16_t ParseSubtitleServiceIDs;
 
 };
 
