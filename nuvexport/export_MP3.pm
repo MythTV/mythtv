@@ -91,20 +91,10 @@ package export_MP3;
 #		my $command = "nice -n 19 mythtranscode -p autodetect -c $self->{episode}->{channel} -s $self->{episode}->{start_time_sep} -f $self->{fifodir} --fifosync";
 		my $command = "nice -n 19 mythtranscode -p autodetect -c $self->{episode}->{channel} -s $self->{episode}->{start_time_sep} -f $self->{fifodir} --fifosync";
 	#	$command .= ' --honorcutlist' if ($self->{use_cutlist});
-		print "$command \n" ;
 		push @{$self->{children}}, fork_command($command);
-	# Sleep a bit to let mythtranscode start up
-		my $overload = 0;
-		while (++$overload < 30 && !(-e "$self->{fifodir}/audout" && -e "$self->{fifodir}/vidout")) {
-			sleep 1;
-			print "Waiting for mythtranscode to set up the fifos.\n";
-		}
-		unless (-e "$self->{fifodir}/audout" && -e "$self->{fifodir}/vidout") {
-			die "Waited too long for mythtranscode to create its fifos.  Please try again.\n\n";
-		}
+		fifos_wait($self->{fifodir});
 	# Now we fork off a process to extract  the audio
 	$command = "nice -19 cat < $self->{fifodir}/audout > $self->{tmp_a}" ;
-		print "$command \n";
 		push @{$self->{children}}, fork_command($command);
 
 	# Null command for video
@@ -119,13 +109,10 @@ package export_MP3;
 			$sample = $nuv_info{audio_sample_rate} / 1000;
 		         my $safe_outfile = shell_escape($self->{outfile});
 			$command = "nice -n 19 toolame -t1 -s $sample -m j -b $self->{bitrate} $self->{tmp_a} $safe_outfile";
-			#$command = "nice -n 19 lame -r -v -q 2  -s $sample -m j -V 2  -B $self->{bitrate}  $self->{tmp_a} $safe_outfile";
-print "$command \n";
 		system($command);
 
 	# Now tag it
 	$command = "id3tag -A\"$self->{episode}->{title}\" -a\"$self->{episode}->{channel}\" -c\"$self->{episode}->{description}\" -s\"$self->{episode}->{show_name}\" $safe_outfile";
-		print "$command \n";
 		system($command);
 	}
 

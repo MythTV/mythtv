@@ -2,7 +2,9 @@ package nuv_utils;
 
 	use Exporter;
 	our @ISA = qw/ Exporter /;
-	our @EXPORT = qw/ generate_showtime find_program nuv_info num_cpus fork_command shell_escape mysql_escape Quit /;
+	our @EXPORT = qw/ generate_showtime find_program nuv_info num_cpus fork_command shell_escape mysql_escape Quit system fifos_wait /;
+
+	*DEBUG = *main::DEBUG;
 
 # Returns a nicely-formatted timestamp from a specified time
 	sub generate_showtime {
@@ -187,6 +189,11 @@ package nuv_utils;
 # This subroutine forks and executes one system command - nothing fancy
 	sub fork_command {
 		my $command = shift;
+		if ($DEBUG) {
+			print "\nforking:\n$command\n";
+			return undef;
+		}
+
 	# Fork and return the child's pid
 		my $pid = undef;
 		if ($pid = fork) {
@@ -228,6 +235,30 @@ package nuv_utils;
 		if (@main::Functions) {
 			foreach $function (@main::Functions) {
 				$function->cleanup;
+			}
+		}
+	}
+
+	sub system {
+		my $command = shift;
+		if ($DEBUG) {
+			print "\nsystem call:\n$command\n";
+		} else {
+			system($command);
+		}
+	}
+
+	sub fifos_wait {
+	# Sleep a bit to let mythtranscode start up
+		my $fifodir = shift;
+		my $overload = 0;
+		if (!$DEBUG) {
+			while (++$overload < 30 && !(-e "$fifodir/audout" && -e "$fifodir/vidout" )) {
+				sleep 1;
+				print "Waiting for mythtranscode to set up the fifos.\n";
+			}
+			unless (-e "$fifodir/audout" && -e "$fifodir/vidout") {
+				die "Waited too long for mythtranscode to create its fifos.  Please try again.\n\n";
 			}
 		}
 	}

@@ -16,7 +16,6 @@ package export_SVCD;
 	*Args  = *main::Args;
 	*Prog  = *main::Prog;
 	*gui   = *main::gui;
-	*DEBUG = *main::DEBUG;
 
 	sub new {
 		my $class = shift;
@@ -198,31 +197,11 @@ package export_SVCD;
 	# Here, we have to fork off a copy of mythtranscode
 		my $command = "nice -n 19 mythtranscode -p autodetect -c $self->{episode}->{channel} -s $self->{episode}->{start_time_sep} -f $self->{fifodir} --fifosync";
 		$command .= ' --honorcutlist' if ($self->{use_cutlist});
-		if ($DEBUG) {
-			print "\nmythtranscode command:\n\n$command\n";
-		}
-		else {
-			push @{$self->{children}}, fork_command($command);
-		}
-	# Sleep a bit to let mythtranscode start up
-		if (!$DEBUG) {
-			my $overload = 0;
-			while (++$overload < 30 && !(-e "$self->{fifodir}/audout" && -e "$self->{fifodir}/vidout")) {
-				sleep 1;
-				print "Waiting for mythtranscode to set up the fifos.\n";
-			}
-			unless (-e "$self->{fifodir}/audout" && -e "$self->{fifodir}/vidout") {
-				die "Waited too long for mythtranscode to create its fifos.  Please try again.\n\n";
-			}
-		}
+		push @{$self->{children}}, fork_command($command);
+		fifos_wait($self->{fifodir});
 	# Now we fork off a process to encode the audio
 		$command = "nice -n 19 ffmpeg -f s16le -ar $nuv_info{audio_sample_rate} -ac 2 -i $self->{fifodir}/audout -ar 44100 -ab $self->{a_bitrate} -vn -f mp2 $self->{tmp_a}";
-		if ($DEBUG) {
-			print "\naudio command:\n\n$command\n";
-		}
-		else {
-			push @{$self->{children}}, fork_command($command);
-		}
+		push @{$self->{children}}, fork_command($command);
 	# And lastly, we fork off a process to encode the video
 	# Multiple CPU's?  Let's multiprocess
 		$cpus = num_cpus();
@@ -256,12 +235,7 @@ package export_SVCD;
 					." --reduction-4x4 2 --reduction-2x2 1"
 					.($cpus > 1 ? " --multi-thread $cpus" : '')
 					." -o $self->{tmp_v}";
-		if ($DEBUG) {
-			print "\nmpeg2enc command:\n\n$command\n";
-		}
-		else {
-			push @{$self->{children}}, fork_command($command);
-		}
+		push @{$self->{children}}, fork_command($command);
 	# Wait for child processes to finish
 		1 while (wait > 0);
 		$self->{children} = undef;
@@ -272,10 +246,6 @@ package export_SVCD;
 		}
 		else {
 			$command = "nice -n 19 mplex -f 5 $self->{tmp_v} $self->{tmp_a} -o $safe_outfile";
-		}
-		if ($DEBUG) {
-			print "\nmultiplex command:\n\n$command\n\n";
-			exit;
 		}
 		system($command);
 	}

@@ -99,15 +99,7 @@ package export_VCD;
 		my $command = "nice -n 19 mythtranscode -p autodetect -c $self->{episode}->{channel} -s $self->{episode}->{start_time_sep} -f $self->{fifodir} --fifosync";
 		$command .= ' --honorcutlist' if ($self->{use_cutlist});
 		push @{$self->{children}}, fork_command($command);
-	# Sleep a bit to let mythtranscode start up
-		my $overload = 0;
-		while (++$overload < 30 && !(-e "$self->{fifodir}/audout" && -e "$self->{fifodir}/vidout")) {
-			sleep 1;
-			print "Waiting for mythtranscode to set up the fifos.\n";
-		}
-		unless (-e "$self->{fifodir}/audout" && -e "$self->{fifodir}/vidout") {
-			die "Waited too long for mythtranscode to create its fifos.  Please try again.\n\n";
-		}
+		fifos_wait($self->{fifodir});
 	# Now we fork off a process to encode the audio
 		if ($Prog{mp2_encoder} =~ /\btoolame$/) {
 			$sample = $nuv_info{audio_sample_rate} / 1000;

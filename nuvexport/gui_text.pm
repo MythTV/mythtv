@@ -6,6 +6,7 @@ package gui_text;
 	*Shows     = *main::Shows;
 	*Functions = *main::Functions;
 	*num_shows = *main::num_shows;
+	*DEBUG = *main::DEBUG;
 
 	sub new {
 		my $class = shift;
@@ -25,7 +26,7 @@ package gui_text;
 	# Display the show list
 		while (1) {
 		# Clear the screen
-			system('clear');
+			system('clear') unless ($DEBUG);
 		# Stage "quit" means, well, quit...
 			if ($self->stage eq 'quit') {
 			# Report the duration

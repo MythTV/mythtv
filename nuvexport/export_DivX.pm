@@ -16,6 +16,7 @@ package export_DivX;
 					 'episode'     => undef,
 					 'savepath'    => '.',
 					 'outfile'     => 'out.avi',
+                                         'fifodir'     => "fifodir.$$",
 					 'use_cutlist' => 0,
 					 'a_bitrate'   => 64,
 					 'v_bitrate'   => 256,
@@ -79,7 +80,7 @@ package export_DivX;
 	sub execute {
 		my $self = shift;
 	# make sure that the fifo dir is clean
-		if (-e 'fifodir/vidout' || -e 'fifodir/audout') {
+		if (-e "$self->{fifodir}/vidout" || -e "$self->{fifodir}/audout") {
 			die "Possibly stale mythtranscode fifo's in fifodir.\nPlease remove them before running nuvexport.\n\n";
 		}
 	# Gather any necessary data
@@ -90,25 +91,17 @@ package export_DivX;
 	# Set this to true so that the cleanup routine actually runs
 		$self->{started} = 1;
 	# Create a directory for mythtranscode's fifo's
-		unless (-d 'fifodir') {
-			mkdir('fifodir', 0755) or die "Can't create fifodir:  $!\n\n";
+		unless (-d $self->{fifodir}) {
+			mkdir($self->{fifodir}, 0755) or die "Can't create $self->{fifodir}:  $!\n\n";
 		}
 	# Here, we have to fork off a copy of mythtranscode
-		my $command = "nice -n 19 mythtranscode -p autodetect -c $self->{episode}->{channel} -s $self->{episode}->{start_time_sep} -f fifodir";
+		my $command = "nice -n 19 mythtranscode -p autodetect -c $self->{episode}->{channel} -s $self->{episode}->{start_time_sep} -f $self->{fifodir}";
 		$command .= ' --honorcutlist' if ($self->{use_cutlist});
 		push @{$self->{children}}, fork_command($command);
-	# Sleep a bit to let mythtranscode start up
-		my $overload = 0;
-		while (++$overload < 30 && !(-e 'fifodir/audout' && -e 'fifodir/vidout')) {
-			sleep 1;
-			print "Waiting for mythtranscode to set up the fifos.\n";
-		}
-		unless (-e 'fifodir/audout' && -e 'fifodir/vidout') {
-			die "Waited too long for mythtranscode to create its fifos.  Please try again.\n\n";
-		}
+		fifos_wait($self->{fifodir});
 	# Now we fork off a process to encode everything
 		$safe_outfile = shell_escape($self->{outfile});
-		$command = "nice -n 19 ffmpeg -y -f s16le -ar $nuv_info{audio_sample_rate} -ac 2 -i fifodir/audout -f rawvideo -s $nuv_info{width}x$nuv_info{height} -r $nuv_info{fps} -i fifodir/vidout -b $self->{v_bitrate} -ab $self->{a_bitrate} -s $self->{h_res}x$self->{v_res} $safe_outfile";
+		$command = "nice -n 19 ffmpeg -y -f s16le -ar $nuv_info{audio_sample_rate} -ac 2 -i $self->{fifodir}/audout -f rawvideo -s $nuv_info{width}x$nuv_info{height} -r $nuv_info{fps} -i $self->{fifodir}/vidout -b $self->{v_bitrate} -ab $self->{a_bitrate} -s $self->{h_res}x$self->{v_res} $safe_outfile";
 		push @{$self->{children}}, fork_command($command);
 	# Wait for child processes to finish
 		1 while (wait > 0);
@@ -126,10 +119,10 @@ package export_DivX;
 			1 while (wait > 0);
 		}
 	# Remove any temporary files
-		foreach my $file ('fifodir/audout', 'fifodir/vidout') {
+		foreach my $file ("$self->{fifodir}/audout", "$self->{fifodir}/vidout") {
 			unlink $file if (-e $file);
 		}
-		rmdir 'fifodir' if (-e 'fifodir');
+		rmdir $self->{fifodir} if (-e $self->{fifodir});
 	}
 
 1;	#return true

@@ -17,7 +17,6 @@ package export_DVD;
 	*Args  = *main::Args;
 	*Prog  = *main::Prog;
 	*gui   = *main::gui;
-	*DEBUG = *main::DEBUG;
 
 	sub new {
 		my $class = shift;
@@ -223,23 +222,8 @@ package export_DVD;
 	# Here, we have to fork off a copy of mythtranscode
 		my $command = "nice -n 19 mythtranscode -p autodetect -c $self->{episode}->{channel} -s $self->{episode}->{start_time_sep} -f $self->{fifodir} --fifosync";
 		$command .= ' --honorcutlist' if ($self->{use_cutlist});
-		if ($DEBUG) {
-			print "\nmythtranscode command:\n\n$command\n";
-		}
-		else {
-			push @{$self->{children}}, fork_command($command);
-		}
-	# Sleep a bit to let mythtranscode start up
-		if (!$DEBUG) {
-			my $overload = 0;
-			while (++$overload < 30 && !(-e "$self->{fifodir}/audout" && -e "$self->{fifodir}/vidout")) {
-				sleep 1;
-				print "Waiting for mythtranscode to set up the fifos.\n";
-			}
-			unless (-e "$self->{fifodir}/audout" && -e "$self->{fifodir}/vidout") {
-				die "Waited too long for mythtranscode to create its fifos.  Please try again.\n\n";
-			}
-		}
+		push @{$self->{children}}, fork_command($command);
+		fifos_wait($self->{fifodir});
 	# Now we fork off a process to encode the audio
 		if ($Prog{toolame}) {
 		$command = "nice -n 19 sox -t raw -r $nuv_info{audio_sample_rate} -s -w  -c 2 $self->{fifodir}/audout -t raw -r 48000 -s -w -c 2 - | nice -n 19 toolame -s 48.0 -m j -b $self->{a_bitrate} - $self->{tmp_a}";
@@ -247,12 +231,7 @@ package export_DVD;
 		$command = "nice -n 19 ffmpeg -f s16le -ar $nuv_info{audio_sample_rate} -ac 2 -i $self->{fifodir}/audout -ac 2 -ar 48000 -ab $self->{a_bitrate} -vn -f mp2 $self->{tmp_a}";
 		}
 
-		if ($DEBUG) {
-			print "\naudio command:\n\n$command\n";
-		}
-		else {
-			push @{$self->{children}}, fork_command($command);
-		}
+		push @{$self->{children}}, fork_command($command);
 	# And lastly, we fork off a process to encode the video
 	# Multiple CPU's?  Let's multiprocess
 		$cpus = num_cpus();
@@ -283,12 +262,7 @@ package export_DVD;
 					." --reduction-4x4 2 --reduction-2x2 1 --keep-hf"
 					.($cpus > 1 ? " --multi-thread $cpus" : '')
 					." -o $self->{tmp_v}";
-		if ($DEBUG) {
-			print "\nmpeg2enc command:\n\n$command\n";
-		}
-		else {
-			push @{$self->{children}}, fork_command($command);
-		}
+		push @{$self->{children}}, fork_command($command);
 	# Wait for child processes to finish
 		1 while (wait > 0);
 		$self->{children} = undef;
@@ -300,39 +274,19 @@ package export_DVD;
 		else {
 			$command = "nice -n 19 mplex -f 8 $self->{tmp_v} $self->{tmp_a} -o $safe_outfile";
 		}
-		if ($DEBUG) {
-			print "\nmultiplex command:\n\n$command\n\n";
-		} else {
 		system($command);
-		} 
 
 		if ($self->{author_now}) {
 			$command = "nice -n 20 dvdauthor -t -o $self->{dvddir} $safe_outfile";
-			if ($DEBUG) {
-				print "\nauthor command 1:\n\n$command\n\n";
-			} else {
-				system($command);
-			} 
+			system($command);
 			$command = "nice -n 20 dvdauthor -T -o $self->{dvddir}";
-			if ($DEBUG) {
-				print "\nauthor command 2:\n\n$command\n\n";
-			} else {
-				system($command);
-			} 
+			system($command);
 			if ($self->{burn_now}) {
 				$command = "nice -n 20 growisofs -speed=$self->{dvdr_speed} -Z $self->{dvdr_path} -dvd-video $self->{dvddir}";
-				if ($DEBUG) {
-					print "\nburn command:\n\n$command\n\n";
-				} else {
-					system($command);
-				} 
+				system($command);
 			} else {
 				$command = "nice -n 20 mkisofs -dvd-video -udf -o $safe_outfile.dvd.iso $self->{dvddir}";
-				if ($DEBUG) {
-					print "\nmkisofs command 1:\n\n$command\n\n";
-				} else {
-					system($command);
-				} 
+				system($command);
 			}
 		} 
 	}
