@@ -1024,6 +1024,17 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         long long value = enc->GetKeyframePosition(desired);
         encodeLongLong(retlist, value);
     }
+    else if (command == "FILL_POSITION_MAP")
+    {
+        int start = slist[2].toInt();
+        int end   = slist[3].toInt();
+
+        for (int keynum = start; keynum <= end; keynum++)
+        {
+            long long value = enc->GetKeyframePosition(keynum);
+            encodeLongLong(retlist, value);
+        }
+    }
     else if (command == "SETUP_RING_BUFFER")
     {
         bool pip = slist[2].toInt();

@@ -3,6 +3,7 @@
 
 #include <qstringlist.h>
 #include <pthread.h>
+#include <qmap.h>
 
 class ProgramInfo;
 class QSocket;
@@ -23,6 +24,8 @@ class RemoteEncoder
     long long GetFilePosition(void);
     long long GetFreeSpace(long long totalreadpos);
     long long GetKeyframePosition(long long desired);
+    void FillPositionMap(int start, int end,
+                         QMap<long long, long long> &positionMap);
     void TriggerRecordingTransition(void);
     void StopPlaying(void);
     void SetupRingBuffer(QString &path, long long &filesize, 

@@ -928,20 +928,21 @@ bool NuppelDecoder::DoFastForward(long long desiredFrame)
 
     if (desiredKey != lastKey)
     {
-        if (positionMap->find(desiredKey / keyframedist) != positionMap->end())
+        int desiredIndex = desiredKey / keyframedist;
+
+        if (positionMap->find(desiredIndex) != positionMap->end())
         {
-            keyPos = (*positionMap)[desiredKey / keyframedist];
+            keyPos = (*positionMap)[desiredIndex];
         }
         else if (livetv || (watchingrecording && nvr_enc &&
                             nvr_enc->IsValidRecorder()))
         {
-            for (int i = lastKey / keyframedist; i <= desiredKey / keyframedist;
-                 i++)
+            for (int i = lastKey / keyframedist; i <= desiredIndex; i++)
             {
                 if (positionMap->find(i) == positionMap->end())
-                    (*positionMap)[i] = nvr_enc->GetKeyframePosition(i);
+                    nvr_enc->FillPositionMap(i, desiredIndex, *positionMap);
             }
-            keyPos = (*positionMap)[desiredKey / keyframedist];
+            keyPos = (*positionMap)[desiredIndex];
         }
     }
 
