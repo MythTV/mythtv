@@ -799,12 +799,12 @@ void ProgramInfo::ToggleRecord(QSqlDatabase *db)
 
 bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
 {
+    if (title == other.title && rectype == kFindOneRecord)
+        return true;
+
     if ((title != other.title) ||
         (dupmethod & kDupCheckNone))
         return false;
-
-    if (rectype == kFindOneRecord)
-        return true;
 
     if ((dupmethod & kDupCheckSub) &&
         ((subtitle == "") ||
