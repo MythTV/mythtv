@@ -117,7 +117,7 @@ void zoom_filter_xmmx (int prevX, int prevY,
 				"andl $15,%%eax\n"
 
 				"movd (%%ebx,%%eax,4),%%mm3\n"
-				::"X"(precalCoef):"eax","ebx");
+				::"m"(precalCoef):"eax","ebx");
 
 			/*
 			 * extraction des coefficients...
