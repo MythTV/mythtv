@@ -28,6 +28,11 @@
       <shadow>1,1</shadow>
     </font>
     
+    <font name="metadata" base="info">
+      <color>#ffffdd</color>
+      <shadow>1,1</shadow>
+    </font>
+    
     <font name="help" base="info">
       <shadow>2,2</shadow>
       <color>#aaaaee</color>
@@ -67,7 +72,12 @@
     <font name="list-selected"  base="list-active">
       <color>#ffffff</color>
     </font>
-    
+
+    <font name="list-selectable" base="list-active">
+        <color>#ddddff</color>
+    </font>
+
+        
     <font name="recstatus" base="info">
       <color>#ffff33</color>
       <shadow>2,2</shadow>
@@ -116,10 +126,10 @@
     <text>
       <area>20,110,20,5</area>
       <color>white</color>
-      <fontname>Arial</fontname>
-      <fontsize>14</fontsize>
+      <fontname>Trebuchet Ms</fontname>
+      <fontsize>16</fontsize>
       <bold>yes</bold>
-      <italics>yes</italics>
+      <italics>no</italics>
       <centered>yes</centered>
 <!--      <outline>
          <color>black</color>
@@ -127,7 +137,7 @@
       </outline> -->
       <shadow>
          <color>black</color>
-         <offset>3,3</offset>
+         <offset>2,2</offset>
          <alpha>128</alpha>
       </shadow>
     </text>
