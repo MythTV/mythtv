@@ -201,6 +201,7 @@ CardType::CardType(const CaptureCard& parent)
     setLabel("Card type");
     addSelection("Standard V4L or MJPEG capture card", "V4L");
     addSelection("Hardware MPEG Encoder card", "MPEG");
+    addSelection("pcHDTV ATSC capture card", "HDTV");
 };
 
 void CardInput::loadByID(QSqlDatabase* db, int inputid) {

@@ -131,6 +131,7 @@ struct video_tuner
 #define VIDEO_MODE_NTSC		1
 #define VIDEO_MODE_SECAM	2
 #define VIDEO_MODE_AUTO		3
+#define VIDEO_MODE_ATSC         4
 	__u16 signal;			/* Signal strength 16bit scale */
 };
 

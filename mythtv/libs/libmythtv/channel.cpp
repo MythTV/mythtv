@@ -109,6 +109,8 @@ void Channel::SetFormat(const QString &format)
 
         if (format == "NTSC")
             videomode = V4L2_STD_NTSC;
+        else if (format == "ATSC")
+            videomode = V4L2_STD_ATSC_8_VSB;
         else if (format == "PAL")
             videomode = V4L2_STD_PAL;
         else if (format == "SECAM")
@@ -136,6 +138,8 @@ void Channel::SetFormat(const QString &format)
     
     if (format == "NTSC")
         mode = VIDEO_MODE_NTSC;
+    else if (format == "ATSC")
+        mode = VIDEO_MODE_ATSC;
     else if (format == "PAL")
         mode = VIDEO_MODE_PAL;
     else if (format == "SECAM")

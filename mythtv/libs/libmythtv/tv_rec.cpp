@@ -21,6 +21,7 @@ using namespace std;
 #include "recorderbase.h"
 #include "NuppelVideoRecorder.h"
 #include "mpegrecorder.h"
+#include "hdtvrecorder.h"
 #include "dvbrecorder.h"
 #include "NuppelVideoPlayer.h"
 #include "channel.h"
@@ -74,7 +75,7 @@ TVRec::TVRec(int capturecardnum)
         channel->SetChannelOrdering(chanorder);
         // don't close this channel, otherwise we cannot read data
     }
-    else // "V4L" or "MPEG", ie, analog TV
+    else // "V4L" or "MPEG", ie, analog TV, or "HDTV"
     {
         Channel *achannel = new Channel(this, videodev);
         channel = achannel; // here for SetFormat()->RetrieveInputChannels()
@@ -507,6 +508,17 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
             nvr->SetOption("width", 160);
             nvr->SetOption("height", 128);
         }
+
+        nvr->Initialize();
+        return;
+    }
+    else if (cardtype == "HDTV")
+    {
+        nvr = new HDTVRecorder();
+        nvr->SetRingBuffer(rbuffer);
+        nvr->SetOption("videodevice", videodev);
+        nvr->SetOption("tvformat", gContext->GetSetting("TVFormat"));
+        nvr->SetOption("vbiformat", gContext->GetSetting("VbiFormat"));
 
         nvr->Initialize();
         return;

@@ -127,6 +127,7 @@ public:
         BackendSetting("TVFormat") {
         setLabel("TV format");
         addSelection("NTSC");
+        addSelection("ATSC");
         addSelection("PAL");
         addSelection("SECAM");
         addSelection("PAL-NC");
