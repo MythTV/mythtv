@@ -242,7 +242,9 @@ bool ManagedListGroup::addItem(ManagedListItem* item, int where)
 
 void ManagedListGroup::doGoBack()
 {
+    emit goingBack();
     getParentList()->setCurGroup(parentGroup);
+    emit wentBack();
 }
 
 void ManagedListGroup::cursorRight(bool)

@@ -56,32 +56,6 @@ void SRDupSettingsGroup::syncText()
 }
 
 
-SROffsetGroup::SROffsetGroup(ScheduledRecording& _rec, ManagedList* _parentList, ManagedListGroup* _parentGroup)
-                : ManagedListGroup(QObject::tr("Pre/Post Roll"), _parentGroup, _parentList, _parentGroup, "rollGroup")
-    {
-           
-        startOffset = new SRStartOffset(_rec, _parentList);
-        addItem(startOffset->getItem());
-        
-        endOffset = new SREndOffset(_rec, _parentList);
-        addItem(endOffset->getItem());        
-        
-        syncText();
-    }
-
-
-
-void SROffsetGroup::syncText()
-{
-    text = QString("Start recording %1, end %2").arg(startOffset->getShortText()).arg(endOffset->getShortText());
-}
-
-
-
-void SROffsetGroup::itemChanged(ManagedListItem*) 
-{ 
-    syncText(); 
-}
 
 
 SREpisodesGroup::SREpisodesGroup(ScheduledRecording& _rec, ManagedList* _list, ManagedListGroup* _group, QObject* _parent)
@@ -208,6 +182,14 @@ void SRStorageOptionsGroup::itemChanged(ManagedListItem*)
 void SRStorageOptionsGroup::setEnabled(bool isScheduled, bool)
 {
     ManagedListGroup::setEnabled(isScheduled);
+}
+
+void SRRecGroup::onGoingBack()
+{
+    if ( selectItem->getCurItemValue() == "__NEW_GROUP__" )
+    {
+        selectItem->selectValue("Default");
+    }   
 }
 
 
