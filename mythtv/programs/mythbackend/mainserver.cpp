@@ -452,7 +452,7 @@ void MainServer::customEvent(QCustomEvent *e)
                                                                      startts);
             if (pinfo)
             {
-                if (gContext->GetSetting("RerecordAutoExpired", 0))
+                if (gContext->GetNumSetting("RerecordAutoExpired", 0))
                     pinfo->DeleteHistory();
                 DoHandleDeleteRecording(pinfo, NULL);
             }
