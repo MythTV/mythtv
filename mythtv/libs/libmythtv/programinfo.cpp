@@ -89,6 +89,10 @@ void ProgramInfo::ToStringList(QStringList &list)
         chanid = " ";
     if (chanstr == "")
         chanstr = " ";
+    if (chansign == "")
+        chansign = " ";
+    if (channame == "")
+        channame = " ";
     if (pathname == "")
         pathname = " ";
 
@@ -160,6 +164,10 @@ void ProgramInfo::FromStringList(QStringList &list, int offset)
         chanstr = "";
     if (pathname == " ")
         pathname = "";
+    if (channame == " ")
+        channame = "";
+    if (chansign == " ")
+        chansign = "";
     if (channame == " ")
         channame = "";
 }
