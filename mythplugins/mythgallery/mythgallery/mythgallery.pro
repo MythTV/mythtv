@@ -15,7 +15,7 @@ installfiles.files = mythgallery-settings.txt
 
 INSTALLS += installfiles
 
-LIBS += -L/usr/local/lib -lmyth
+LIBS += -L/usr/local/lib -lmyth-$$LIBVERSION
 
 # Input
 HEADERS += embdata.h iconview.h singleview.h
