@@ -16,6 +16,8 @@
 #include <mmsystem.h>
 #endif
 
+#include <dtmffilter.h>
+
 
 #define IP_MAX_MTU                1500     // Max size of rxed RTP packet
 #define IP_MTU                    1290     // Max size of txed RTP packet. Standard MTU is 1500, leave some room for IPSec etc
@@ -271,24 +273,26 @@ private:
     bool StopRx();
 
     HWND        hwndLast;
-	int			MicDevice;
-	int			SpeakerDevice;
+    int         MicDevice;
+    int         SpeakerDevice;
 
-	// Microphone stuff
-	HWAVEIN		hMicrophone;
-	WAVEHDR		micBufferDescr[NUM_MIC_BUFFERS];
-	short		MicBuffer[NUM_MIC_BUFFERS][MIC_BUFFER_SIZE];
-	int			micCurrBuffer;
+    // Microphone stuff
+    HWAVEIN     hMicrophone;
+    WAVEHDR     micBufferDescr[NUM_MIC_BUFFERS];
+    short       MicBuffer[NUM_MIC_BUFFERS][MIC_BUFFER_SIZE];
+    int         micCurrBuffer;
 
-	// Speaker stuff
-	HWAVEOUT	hSpeaker;
-	WAVEHDR		spkBufferDescr[NUM_SPK_BUFFERS];
-	short		SpkBuffer[NUM_SPK_BUFFERS][SPK_BUFFER_SIZE];
+    // Speaker stuff
+    HWAVEOUT    hSpeaker;
+    WAVEHDR     spkBufferDescr[NUM_SPK_BUFFERS];
+    short       SpkBuffer[NUM_SPK_BUFFERS][SPK_BUFFER_SIZE];
 #else
-	short		SpkBuffer[1][SPK_BUFFER_SIZE];
+    short SpkBuffer[1][SPK_BUFFER_SIZE];
 #endif
-	int			spkInBuffer;
+    int spkInBuffer;
 
+    DtmfFilter *DTMFFilter;
+    
     QObject *eventWindow;
     QMutex rtpMutex;
     QSocketDevice *rtpSocket;

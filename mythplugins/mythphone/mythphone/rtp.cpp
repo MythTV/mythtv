@@ -30,6 +30,7 @@
 #include "gcontext.h"
 #endif
 
+#include "dtmffilter.h"
 #include "rtp.h"
 #include "g711.h"
 
@@ -58,6 +59,14 @@ rtp::rtp(QWidget *callingApp, int localPort, QString remoteIP, int remotePort, i
         videoPayload = -1;
         audioPayload = mediaPay;
         dtmfPayload = dtmfPay;
+    }
+    
+    // Setup a DTMF Signal Analysis filter to capture DTMF from the inband signal if RFC2833 is not
+    // negotiated.  This is not used during 2-way speech, just using voicemail
+    DTMFFilter = 0;
+    if ((dtmfPayload == -1) && (audioPayload != -1) && (rxMode != RTP_RX_AUDIO_TO_SPEAKER))
+    {
+        DTMFFilter = new DtmfFilter();
     }
 
     // Clear variables within the calling tasks thread that are used by the calling 
@@ -94,6 +103,8 @@ rtp::~rtp()
         eventCond->wakeAll();
     wait();
     destroyVideoBuffers();
+    if (DTMFFilter)
+        delete DTMFFilter;
 }
 
 void rtp::run()
@@ -1054,6 +1065,30 @@ void rtp::PlayOutAudio()
                 {
                     PlayLen = Codec->Decode(JBuf->RtpData, SpkBuffer[spkInBuffer], mLen, spkPower);
                     recordInPacket(SpkBuffer[spkInBuffer], PlayLen);
+                    if (DTMFFilter)
+                    {
+                        QChar dtmf = DTMFFilter->process(SpkBuffer[spkInBuffer], PlayLen/sizeof(short));
+                        if (dtmf)
+                        {
+                            rtpMutex.lock();
+                            dtmfIn.append(dtmf);
+                            rtpMutex.unlock();
+                        }
+                    }
+                }
+                else // rxMode is RTP_RX_AUDIO_DISCARD
+                {
+                    if (DTMFFilter)
+                    {
+                        PlayLen = Codec->Decode(JBuf->RtpData, SpkBuffer[spkInBuffer], mLen, spkPower);
+                        QChar dtmf = DTMFFilter->process(SpkBuffer[spkInBuffer], PlayLen/sizeof(short));
+                        if (dtmf)
+                        {
+                            rtpMutex.lock();
+                            dtmfIn.append(dtmf);
+                            rtpMutex.unlock();
+                        }
+                    }
                 }
                 rxTimestamp += mLen;
                 pJitter->FreeJBuffer(JBuf);
