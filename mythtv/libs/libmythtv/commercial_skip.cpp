@@ -1320,7 +1320,7 @@ void CommDetect::BuildAllMethodsCommList(void)
                             "block %1 and going to end of program. length "
                             "is %2 frames")
                             .arg(curBlock)
-                            .arg(framesProcessed - breakStart - 1));
+                            .arg((long)(framesProcessed - breakStart - 1)));
 
         commBreakMap[breakStart] = MARK_COMM_START;
         commBreakMap[framesProcessed - 1] = MARK_COMM_END;
