@@ -57,6 +57,7 @@ class MythContextPrivate
     bool IsSquareMode() const {return (m_baseWidth == 800);}
     void SetSquareMode() {m_baseWidth = 800; m_baseHeight = 600;}
 
+    void GetScreenBounds(void);
 
     void LoadLogSettings(void);
     void LoadDatabaseSettings(bool reload);
@@ -177,6 +178,65 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
     m_baseWidth = 800;
 }
 
+// Get screen size from Qt.
+// If the GUI environment has multiple screens (e.g. Xinerama or Mac OS X),
+// QApplication::desktop()->width() will span all of them,
+// so we usually need to get the geometry of a specific screen.
+
+void MythContextPrivate::GetScreenBounds()
+{
+    QDesktopWidget * desktop = QApplication::desktop();
+
+    int screen = parent->GetNumSetting("XineramaScreen", 0);
+
+    if (screen == -1)       // Special case - span all screens
+    {
+        VERBOSE(VB_GENERAL, QString("Using all screens (currently %1)")
+                            .arg(desktop->numScreens()));
+        m_xbase  = 0;
+        m_ybase  = 0;
+        m_width  = desktop->width();
+        m_height = desktop->height();
+
+        VERBOSE(VB_GENERAL, QString("Total width = %1, height = %2")
+                            .arg(m_width).arg(m_height));
+    }
+    else                    // User specified a single screen
+    {
+        if (screen < 0 || screen >= desktop->numScreens())
+        {
+            VERBOSE(VB_ALL, QString("Xinerama screen %1 was specified,"
+                                    " but only %2 available?")
+                            .arg(screen).arg(desktop->numScreens()));
+            screen = 0;
+        }
+
+
+        QRect bounds;
+
+        bool inWindow = parent->GetNumSetting("RunFrontendInWindow", 0);
+
+        if (inWindow)
+            VERBOSE(VB_ALL, QString("Running in a window"));
+
+        if (inWindow)
+            // This doesn't include the area occupied by the
+            // Windows taskbar, or the Mac OS X menu bar and Dock
+            bounds = desktop->availableGeometry(screen);
+        else
+            bounds = desktop->screenGeometry(screen);
+
+        m_xbase  = bounds.x();
+        m_ybase  = bounds.y();
+        m_width  = bounds.width();
+        m_height = bounds.height();
+
+        VERBOSE(VB_GENERAL, QString("Using screen %1, %2x%3 at %4,%5")
+                            .arg(screen).arg(m_width).arg(m_height)
+                            .arg(m_xbase).arg(m_ybase));
+    }
+}
+
 bool MythContextPrivate::Init(bool gui)
 {
     m_gui = gui;
@@ -186,8 +246,7 @@ bool MythContextPrivate::Init(bool gui)
 
     if (gui)
     {
-        m_height = QApplication::desktop()->height();
-        m_width = QApplication::desktop()->width();
+        GetScreenBounds();
     }
     else
     {
@@ -822,8 +881,7 @@ void MythContext::LoadQtConfig(void)
     }
     else if (d->m_width <= 0 || d->m_height <= 0)
     {
-        d->m_height = QApplication::desktop()->height();
-        d->m_width = QApplication::desktop()->width();
+        d->GetScreenBounds();
     }
 
     if (d->m_qtThemeSettings)
@@ -1092,10 +1150,6 @@ void MythContext::GetScreenSettings(int &xbase, int &width, float &wmult,
 void MythContext::InitializeScreenSettings()
 {
     int x = 0, y = 0, w = 0, h = 0;
-
-#if defined(Q_WS_X11)
-    GetMythTVGeometry(qt_xdisplay(), qt_xscreen(), &x, &y, &w, &h);
-#endif
 
     d->m_xbase = x + GetNumSetting("GuiOffsetX", 0);
     d->m_ybase = y + GetNumSetting("GuiOffsetY", 0);

@@ -1051,11 +1051,11 @@ static HostCheckBox *SetupPinCodeRequired()
 
 static HostSpinBox *XineramaScreen()
 {
-    HostSpinBox *gs = new HostSpinBox("XineramaScreen", 0, 8, 1);
+    HostSpinBox *gs = new HostSpinBox("XineramaScreen", -1, 8, 1);
     gs->setLabel(QObject::tr("Xinerama screen"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("If using Xinerama, run only on the specified "
-                    "screen."));
+                    "screen. A value of -1 means use all screens."));
     return gs;
 }
 

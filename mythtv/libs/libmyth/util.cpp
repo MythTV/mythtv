@@ -26,13 +26,6 @@ using namespace std;
 #include "util.h"
 #include "mythcontext.h"
 
-#if defined(Q_WS_X11)
-extern "C" {
-#include <X11/Xlib.h>
-#include <X11/extensions/Xinerama.h>
-}
-#endif
-
 #include <qimage.h>
 #include <qpainter.h>
 #include <qpixmap.h>
@@ -588,55 +581,6 @@ long long decodeLongLong(QStringList &list, QStringList::iterator &it)
 
     return retval;
 } 
-
-#if defined(Q_WS_X11)
-void GetMythTVGeometry(Display *dpy, int screen_num, int *x, int *y, 
-                       int *w, int *h) 
-{
-    int event_base, error_base;
-
-    if (XineramaQueryExtension(dpy, &event_base, &error_base) &&
-        XineramaIsActive(dpy)) 
-    {
-        XineramaScreenInfo *xinerama_screens;
-        XineramaScreenInfo *screen;
-        int nr_xinerama_screens;
-
-        int screen_nr = gContext->GetNumSetting("XineramaScreen", 0);
-
-        xinerama_screens = XineramaQueryScreens(dpy, &nr_xinerama_screens);
-
-        printf("Found %d Xinerama Screens.\n", nr_xinerama_screens);
-
-        if (screen_nr > 0 && screen_nr < nr_xinerama_screens)
-        {
-            screen = &xinerama_screens[screen_nr];
-            printf("Using screen %d, %dx%d+%d+%d\n",
-                   screen_nr, screen->width, screen->height, screen->x_org, 
-                   screen->y_org );
-        } 
-        else 
-        {
-            screen = &xinerama_screens[0];
-            printf("Using first Xinerama screen, %dx%d+%d+%d\n",
-                   screen->width, screen->height, screen->x_org, screen->y_org);
-        }
-
-        *w = screen->width;
-        *h = screen->height;
-        *x = screen->x_org;
-        *y = screen->y_org;
-
-        XFree(xinerama_screens);
-    } 
-    else 
-    {
-        *w = DisplayWidth(dpy, screen_num);
-        *h = DisplayHeight(dpy, screen_num);
-        *x = 0; *y = 0;
-    }
-}
-#endif
 
 QRgb blendColors(QRgb source, QRgb add, int alpha)
 {

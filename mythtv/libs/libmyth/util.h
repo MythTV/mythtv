@@ -34,11 +34,6 @@ void encodeLongLong(QStringList &list, long long num);
 long long decodeLongLong(QStringList &list, int offset);
 long long decodeLongLong(QStringList &list, QStringList::iterator &it);
 
-#if defined(Q_WS_X11)
-void GetMythTVGeometry(Display *dpy, int screen_num, int *x, int *y, 
-                       int *w, int *h);
-#endif
-
 QRgb blendColors(QRgb source, QRgb add, int alpha);
 
 #define MYTH_SYSTEM_DONT_BLOCK_LIRC (1)

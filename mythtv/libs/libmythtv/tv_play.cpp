@@ -317,6 +317,13 @@ bool TV::Init(bool createWindow)
         bool fullscreen = !gContext->GetNumSetting("GuiSizeForTV", 0);
         bool switchMode = gContext->GetNumSetting("UseVideoModes", 0);
 
+        int   xbase, width, ybase, height;
+        float wmult, hmult;
+
+        if (fullscreen)
+            gContext->GetScreenSettings(xbase, width, wmult,
+                                        ybase, height, hmult);
+
         if (switchMode)
         {
             // For "video playback window" to be as big as 1920x1080
@@ -326,10 +333,8 @@ bool TV::Init(bool createWindow)
         }
         else if (fullscreen) 
         {
-            mainWindow->setGeometry(0, 0, QApplication::desktop()->width(),
-                                    QApplication::desktop()->height());
-            mainWindow->setFixedSize(QSize(QApplication::desktop()->width(),
-                                           QApplication::desktop()->height()));
+            mainWindow->setGeometry(0, 0, width, height);
+            mainWindow->setFixedSize(QSize(width, height));
         }
 
         myWindow = new MythDialog(mainWindow, "video playback window");
@@ -346,10 +351,8 @@ bool TV::Init(bool createWindow)
         }
         else if (fullscreen) 
         {
-            myWindow->setGeometry(0, 0, QApplication::desktop()->width(),
-                                  QApplication::desktop()->height());
-            myWindow->setFixedSize(QSize(QApplication::desktop()->width(),
-                                         QApplication::desktop()->height()));
+            mainWindow->setGeometry(0, 0, width, height);
+            mainWindow->setFixedSize(QSize(width, height));
         }
 
         myWindow->show();
