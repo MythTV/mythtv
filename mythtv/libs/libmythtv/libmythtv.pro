@@ -20,4 +20,6 @@ INSTALLS = installfiles
  
 # Input
 HEADERS += channel.h frequencies.h recordingprofile.h tv_play.h tv_rec.h
+HEADERS += videosource.h
 SOURCES += channel.cpp frequencies.c recordingprofile.cpp tv_play.cpp tv_rec.cpp
+SOURCES += videosource.cpp

@@ -1,0 +1,20 @@
+<mythmenu>
+   <button>
+      <type>SETUP</type>
+      <text>Capture cards</text>
+      <action>SETTINGS TUNER CAPTURECARD</action>
+   </button>
+
+   <button>
+      <type>SETUP</type>
+      <text>Video sources</text>
+      <action>SETTINGS TUNER VIDEOSOURCE</action>
+   </button>
+
+   <button>
+      <type>SETUP</type>
+      <text>Connections</text>
+      <action>SETTINGS TUNER CARDINPUT</action>
+   </button>
+</mythmenu>
+

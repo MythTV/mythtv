@@ -450,11 +450,11 @@ void AutoIncrementStorage::save(QSqlDatabase* db) {
 }
 
 QWidget* ListBoxSetting::configWidget(QWidget* parent, const char* widgetName) {
-    QWidget* box = new QHBox(parent, widgetName);
+    QWidget* box = new QVBox(parent, widgetName);
     box->setBackgroundOrigin(QWidget::WindowOrigin);
 
     QLabel* label = new QLabel(box);
-    label->setText(getLabel() + ":");
+    label->setText(getLabel());
     label->setBackgroundOrigin(QWidget::WindowOrigin);
     MythListBox* widget = new MythListBox(box);
     widget->setBackgroundOrigin(QWidget::WindowOrigin);

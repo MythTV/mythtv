@@ -94,6 +94,7 @@ struct Source
 {
     int id;
     QString name;
+    QString xmltvgrabber;
 };
 
 QDateTime fromXMLTVDate(QString &text)
@@ -785,7 +786,7 @@ void grabDataFromFile(int id, int offset, QString &filename)
     handlePrograms(id, offset, &proglist);
 }
 
-void grabData(Source source, QString xmltv_grabber, int offset)
+void grabData(Source source, int offset)
 {
     char tempfilename[128];
     strcpy(tempfilename, "/tmp/mythXXXXXX");
@@ -797,6 +798,7 @@ void grabData(Source source, QString xmltv_grabber, int offset)
     QString configfile = QString("%1/.mythtv/%2.xmltv").arg(home)
                                                        .arg(source.name);
     QString command;
+    QString xmltv_grabber = source.xmltvgrabber;
 
     if (xmltv_grabber == "tv_grab_uk")
         command.sprintf("nice -19 %s --days 7 --config-file %s --output %s",
@@ -836,47 +838,46 @@ void clearOldDBEntries(void)
 void fillData(QValueList<Source> &sourcelist)
 {
     QValueList<Source>::Iterator it;
-    QString xmltv_grabber = context->GetSetting("XMLTVGrab");
 
-    if (xmltv_grabber == "tv_grab_uk" || xmltv_grabber == "tv_grab_de")
-    {
-        // tv_grab_uk|de doesn't support the --offset option, so just grab a 
-        // week.
-        for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
-             grabData(*it, xmltv_grabber, -1);
-    }
-    else if (xmltv_grabber == "tv_grab_na" || xmltv_grabber == "tv_grab_aus" ||
-             xmltv_grabber == "tv_grab_sn")
-    {
-        for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
-            grabData(*it, xmltv_grabber, 1);
-
-        for (int i = 0; i < 9; i++)
+    for (it = sourcelist.begin(); it != sourcelist.end(); ++it) {
+        QString xmltv_grabber = (*it).xmltvgrabber;
+        if (xmltv_grabber == "tv_grab_uk" || xmltv_grabber == "tv_grab_de")
         {
-            int nextoffset = i + 1;
-            QString querystr;
-            querystr.sprintf("SELECT NULL FROM program WHERE starttime >= "
-                             "DATE_ADD(CURRENT_DATE, INTERVAL %d DAY) AND "
-                             "starttime < DATE_ADD(CURRENT_DATE, INTERVAL %d "
-                             "DAY);", i, nextoffset);
+            // tv_grab_uk|de doesn't support the --offset option, so just grab a 
+            // week.
+            grabData(*it, -1);
+        }
+        else if (xmltv_grabber == "tv_grab_na" || xmltv_grabber == "tv_grab_aus" ||
+             xmltv_grabber == "tv_grab_sn")
+        {
+            grabData(*it, 1);
 
-            QSqlQuery query;
-            query.exec(querystr);
- 
-            if (query.isActive() && query.numRowsAffected() > 20)
+            for (int i = 0; i < 9; i++)
             {
-            }
-            else
-            {
-                for (it = sourcelist.begin(); it != sourcelist.end(); ++it)
-                    grabData(*it, xmltv_grabber, i);
+                int nextoffset = i + 1;
+                QString querystr;
+                querystr.sprintf("SELECT NULL FROM program WHERE starttime >= "
+                                 "DATE_ADD(CURRENT_DATE, INTERVAL %d DAY) AND "
+                                 "starttime < DATE_ADD(CURRENT_DATE, INTERVAL %d "
+                                 "DAY);", i, nextoffset);
+                
+                QSqlQuery query;
+                query.exec(querystr);
+                
+                if (query.isActive() && query.numRowsAffected() > 20)
+                {
+                }
+                else
+                {
+                    grabData(*it, i);
+                }
             }
         }
-    }
-    else
-    {
-        cout << "Grabbing XMLTV data using " << xmltv_grabber.ascii() 
-             << " is not verified as working.\n";
+        else
+        {
+            cout << "Grabbing XMLTV data using " << xmltv_grabber.ascii() 
+                 << " is not verified as working.\n";
+        }
     }
 
     clearOldDBEntries();
@@ -1084,7 +1085,7 @@ int main(int argc, char *argv[])
         QValueList<Source> sourcelist;
 
         QSqlQuery sourcequery;
-        QString querystr = QString("SELECT sourceid,name FROM videosource "
+        QString querystr = QString("SELECT sourceid,name,xmltvgrabber FROM videosource "
                                    "ORDER BY sourceid;");
         sourcequery.exec(querystr);
         
@@ -1096,6 +1097,7 @@ int main(int argc, char *argv[])
             
                 newsource.id = sourcequery.value(0).toInt();
                 newsource.name = sourcequery.value(1).toString();
+                newsource.xmltvgrabber = sourcequery.value(2).toString();
             
                 sourcelist.append(newsource);
             }   

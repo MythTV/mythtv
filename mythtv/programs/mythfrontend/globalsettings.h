@@ -21,18 +21,6 @@ protected:
     };
 };
 
-class XMLTVGrab: public ComboBoxSetting, public GlobalSetting {
-public:
-    XMLTVGrab(): GlobalSetting("XMLTVGrab") {
-        setLabel("XMLTV listings grabber");
-        addSelection("tv_grab_na");
-        addSelection("tv_grab_de");
-        addSelection("tv_grab_sn");
-        addSelection("tv_grab_uk");
-        addSelection("tv_grab_uk_rt");
-    };
-};
-
 class BufferName: public LineEditSetting, public GlobalSetting {
 public:
     BufferName():
@@ -590,7 +578,6 @@ class GeneralSettings: virtual public ConfigurationDialog,
                        virtual public VerticalConfigurationGroup {
 public:
     GeneralSettings(MythContext *context) : ConfigurationDialog(context) {
-        addChild(new XMLTVGrab());
         addChild(new RecordFilePrefix());
         addChild(new ChannelOrdering());
         addChild(new TunerCardInput());

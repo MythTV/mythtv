@@ -115,6 +115,7 @@ void VideoInputSelector::probeInputs(const QString& videoDevice, QString cardID)
     memset(&vidcap, 0, sizeof(vidcap));
     if (ioctl(videofd, VIDIOCGCAP, &vidcap) != 0) {
         perror("ioctl");
+        close(videofd);
         return;
     }
     
@@ -130,6 +131,8 @@ void VideoInputSelector::probeInputs(const QString& videoDevice, QString cardID)
 
         name->addSelection(test.name);
     }
+
+    close(videofd);
 }
 
 int CaptureCardEditor::exec(QSqlDatabase* db) {

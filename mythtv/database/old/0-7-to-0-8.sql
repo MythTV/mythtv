@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS codecparams
 ALTER TABLE allrecord ADD COLUMN profile INT UNSIGNED NOT NULL DEFAULT 0 REFERENCES recordingprofiles(id);
 ALTER TABLE singlerecord ADD COLUMN profile INT UNSIGNED NOT NULL DEFAULT 0 REFERENCES recordingprofiles(id);
 ALTER TABLE timeslotrecord ADD COLUMN profile INT UNSIGNED NOT NULL DEFAULT 0 REFERENCES recordingprofiles(id);
+ALTER TABLE videosource ADD COLUMN xmltvgrabber VARCHAR(128);
 
 UPDATE allrecord SET profile = 0;
 UPDATE singlerecord SET profile = 0;

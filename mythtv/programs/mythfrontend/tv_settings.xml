@@ -14,7 +14,7 @@
    <button>
       <type>TV</type>
       <text>Channel Setup</text>
-      <action>SETTINGS TUNER</action>
+      <action>MENU tv_tuner_settings.xml</action>
    </button>
 
    <button>

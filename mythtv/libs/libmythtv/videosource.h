@@ -10,8 +10,8 @@
 class VideoSource;
 class VSSetting: public SimpleDBStorage {
 protected:
-    VSSetting(const VideoSource& _parent, QString table, QString name):
-        SimpleDBStorage(table, name),
+    VSSetting(const VideoSource& _parent, QString name):
+        SimpleDBStorage("videosource", name),
         parent(_parent) {
         setName(name);
     };
@@ -28,6 +28,7 @@ public:
         // must be first
         addChild(id = new ID());
         addChild(new Name(*this));
+        addChild(new XMLTVGrab(*this));
     };
         
     int getSourceID(void) const { return id->intValue(); };
@@ -54,10 +55,23 @@ private:
                 virtual public LineEditSetting {
     public:
         Name(const VideoSource& parent):
-            VSSetting(parent, "videosource", "name") {
+            VSSetting(parent, "name") {
             setLabel("Video source name");
         };
     };
+
+    class XMLTVGrab: public ComboBoxSetting, public VSSetting {
+    public:
+        XMLTVGrab(const VideoSource& parent): VSSetting(parent, "xmltvgrabber") {
+            setLabel("XMLTV listings grabber");
+            addSelection("tv_grab_na");
+            addSelection("tv_grab_de");
+            addSelection("tv_grab_sn");
+            addSelection("tv_grab_uk");
+            addSelection("tv_grab_uk_rt");
+        };
+    };
+
 private:
     ID* id;
 };
@@ -284,7 +298,9 @@ class CaptureCardEditor: public ListBoxSetting, public ConfigurationDialog {
     Q_OBJECT
 public:
     CaptureCardEditor(MythContext* context, QSqlDatabase* _db):
-        ConfigurationDialog(context), db(_db) {};
+        ConfigurationDialog(context), db(_db) {
+        setLabel("Capture cards");
+    };
 
     virtual int exec(QSqlDatabase* db);
     virtual void load(QSqlDatabase* db);
@@ -308,7 +324,9 @@ class VideoSourceEditor: public ListBoxSetting, public ConfigurationDialog {
     Q_OBJECT
 public:
     VideoSourceEditor(MythContext* context, QSqlDatabase* _db):
-        ConfigurationDialog(context), db(_db) {};
+        ConfigurationDialog(context), db(_db) {
+        setLabel("Video sources");
+    };
 
     virtual int exec(QSqlDatabase* db);
     virtual void load(QSqlDatabase* db);
@@ -332,7 +350,9 @@ class CardInputEditor: public ListBoxSetting, public ConfigurationDialog {
     Q_OBJECT
 public:
     CardInputEditor(MythContext* context, QSqlDatabase* _db):
-        ConfigurationDialog(context), db(_db) {};
+        ConfigurationDialog(context), db(_db) {
+        setLabel("Input connections");
+    };
 
     virtual int exec(QSqlDatabase* db);
     virtual void load(QSqlDatabase* db);
