@@ -274,6 +274,7 @@ class SelectManagedListItem : public ManagedListGroup
         SelectManagedListItem(const QString& baseText, ManagedListGroup* pGroup, ManagedList* parentList, 
                               QObject* _parent=NULL, const char* _name=0);
         virtual ManagedListItem* addSelection(const QString& label, QString value=QString::null, bool select=false);
+        virtual ManagedListItem* addButton(const QString& label, QString value=QString::null, bool select=false);
 
         virtual void clearSelections(void);
         
@@ -315,9 +316,12 @@ class SelectManagedListItem : public ManagedListGroup
     signals:
         void selectionAdded(const QString& label, QString value, bool select = false);
         void selectionsCleared(void);
+        void buttonPressed(ManagedListItem* itm, ManagedListItem* button);
+    
     public slots:
-        void itemSelected(ManagedListItem* itm);
-        
+        virtual void buttonSelected(ManagedListItem* itm);
+        virtual void itemSelected(ManagedListItem* itm);
+        virtual void doGoBack();
     
     protected:
         bool isSet;    
@@ -431,6 +435,19 @@ class SelectManagedListSetting : public ManagedListSetting
             return NULL;
         }
 
+        ManagedListItem* addButton(const QString& label, const QString& value, bool trans = true ) 
+        {
+            if(selectItem)
+            {
+                if(trans)
+                    return selectItem->addButton(QObject::tr(label), value);
+                else
+                    return selectItem->addButton(label, value);
+            }
+            
+            return NULL;
+        }
+        
         ManagedListItem* addSelection(const QString& label, int value, bool trans = true ) 
         {
             if(selectItem)
@@ -565,7 +582,8 @@ class ManagedList : public QObject
         void setCurGroup(ManagedListGroup* newGroup);
         
         bool goBack();
-       
+        bool getLocked() const { return locked; }
+        void setLocked(bool val = true) { locked = val; }
         
     public slots:
         void cursorDown(bool page = false);
@@ -582,6 +600,7 @@ class ManagedList : public QObject
         QString containerName;
         QString listName;
         QRect listRect;
+        bool locked;
 };
 
 

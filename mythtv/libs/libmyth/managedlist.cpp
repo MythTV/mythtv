@@ -356,6 +356,20 @@ ManagedListItem* SelectManagedListItem::addSelection(const QString& label, QStri
     
     return ret;
 }
+
+ManagedListItem* SelectManagedListItem::addButton(const QString& label, QString value, bool select)
+{
+    ManagedListItem* newItem = new ManagedListItem(label, parentList, this, label);
+    newItem->setValue(value);        
+    addItem(newItem);
+    
+    
+    connect(newItem, SIGNAL(selected(ManagedListItem*)), this, SLOT(buttonSelected(ManagedListItem* )));
+    if(select)
+        selectValue(value);
+    return newItem;
+}
+
         
 void SelectManagedListItem::clearSelections(void)
 {
@@ -425,10 +439,6 @@ void SelectManagedListItem::select(const QString& newValue, bool bValue)
         text = getCurItemText();
         setValue(getCurItemValue());
     }
-    else
-    {
-        addSelection(newValue, newValue, true);
-    }
 }
 
 
@@ -438,18 +448,30 @@ void SelectManagedListItem::select()
     ManagedListGroup::select();    
 }
 
-
-void SelectManagedListItem::itemSelected(ManagedListItem* itm)
+void SelectManagedListItem::doGoBack()
 {
-    
     if(curItem == 0)
         curItem = lastItem;
     else
-        text = QString( "[ %1 ]").arg(itm->getText());
+        text = QString( "[ %1 ]").arg(getCurItemText());
     
-    changed();    
+    if(curItem != lastItem)
+        changed();
+        
+    ManagedListGroup::doGoBack();
+}
+
+void SelectManagedListItem::itemSelected(ManagedListItem*)
+{
     doGoBack();
-    
+}
+
+void SelectManagedListItem::buttonSelected(ManagedListItem* itm)
+{
+    parentList->setLocked();
+    emit(buttonPressed(this, itm));
+    doGoBack();
+    parentList->setLocked(false);
 }
         
         
@@ -463,6 +485,7 @@ ManagedList::ManagedList(MythDialog* parent, const char* name) : QObject(parent,
     listRect = QRect(0, 0, 0, 0);
     theme = NULL;
     curGroup = NULL;
+    locked = false;
 }
 
 

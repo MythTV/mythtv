@@ -46,6 +46,7 @@ class RecOptDialog : public MythDialog
         void updateBackground(void);
         void LoadWindow(QDomElement &);
         void constructList(void);
+        QMap<QString, QString> infoMap;
 };
 
 #endif

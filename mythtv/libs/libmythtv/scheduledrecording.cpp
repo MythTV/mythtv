@@ -199,7 +199,7 @@ QString ScheduledRecording::ChannelText(QString format)
 void ScheduledRecording::ToMap(QMap<QString, QString>& progMap)
 {
     QString searchtitle = "";
-
+/*
     if(m_pginfo)
     {
         if (search->intValue() != kNoSearch)
@@ -208,7 +208,7 @@ void ScheduledRecording::ToMap(QMap<QString, QString>& progMap)
         m_pginfo->ToMap(NULL, progMap);
     }
     else
-    {
+    {*/
         progMap["title"] = title->getValue();
         progMap["subtitle"] = subtitle->getValue();
         progMap["description"] = description->getValue();
@@ -221,15 +221,26 @@ void ScheduledRecording::ToMap(QMap<QString, QString>& progMap)
         progMap["endtime"] = endTime->getValue();
         progMap["enddate"] = endTime->getValue();
         
-        progMap["searchtype"] = searchType;
-        progMap["searchforwhat"] = searchForWhat;
         
+        if(chanstr.isEmpty())
+        {
+            progMap["channum"] = QObject::tr("Any");
+            progMap["longchannel"] = QObject::tr("Any");
+            
+        }
+        else
+        {
+            progMap["channum"] = chanstr;
+            progMap["longchannel"] = ChannelText(longChannelFormat);
+        }
         
-        progMap["channum"] = chanstr;
         progMap["chanid"] = channel->getValue();
         progMap["channel"] = station->getValue();
-
-        progMap["longchannel"] = ChannelText(longChannelFormat);
+        
+        
+        
+        
+        
         
         QDateTime startts(startDate->dateValue(), startTime->timeValue());
         QDateTime endts(endDate->dateValue(), endTime->timeValue());
@@ -253,7 +264,12 @@ void ScheduledRecording::ToMap(QMap<QString, QString>& progMap)
         progMap["shorttimedate"] = startts.date().toString(shortDateFormat) + ", " +
                                    startts.time().toString(timeFormat) + " - " +
                                    endts.time().toString(timeFormat);
-    }
+    //}
+
+    progMap["searchtype"] = searchType;
+    progMap["searchforwhat"] = searchForWhat;
+
+        
     if (searchtitle != "")
     {
         progMap["banner"] = searchtitle;
@@ -701,6 +717,7 @@ void ScheduledRecording::makeOverride(void)
     recpriority->setChanged();
     recgroup->setChanged();
 }
+
 
 
 

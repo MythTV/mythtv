@@ -1,6 +1,7 @@
 #include "scheduledrecording.h"
 #include "sr_items.h"
-
+#include <qlayout.h>
+#include "mythdialogs.h"
 
 void SRDupSettingsGroup::itemChanged(ManagedListItem*) 
 { 
@@ -203,7 +204,24 @@ void SRStorageOptionsGroup::itemChanged(ManagedListItem*)
     maxNewest->getItem()->setEnabled(maxEpisodes->getValue().toInt() !=0); 
 }
 
-void SRStorageOptionsGroup::setEnabled(bool isScheduled, bool multiEpisode)
+void SRStorageOptionsGroup::setEnabled(bool isScheduled, bool)
 {
     ManagedListGroup::setEnabled(isScheduled);
 }
+
+
+void SRRecGroup::showNewRecGroup()
+{
+    QString newGroup;
+
+    bool ok = MythPopupBox::showGetTextPopup(gContext->GetMainWindow(), QObject::tr("Create New Recording Group"),
+                                       QObject::tr("Using your keyboard or the numbers keys on your remote enter the group name"),
+                                       newGroup);
+    if(ok)
+    {
+        addSelection(QString(QObject::tr("Store in the \"%1\" recording group")).arg(newGroup), newGroup, true);
+        selectItem->selectValue(newGroup);
+    }
+}
+
+

@@ -118,32 +118,34 @@ void RecOptDialog::keyPressEvent(QKeyEvent *e)
     {
         QString action = actions[i];
         handled = true;
-
         if (action == "ESCAPE")
         {
             if(!listMenu.goBack())
                 done(MythDialog::Rejected);
         }
-        else if (action == "UP")
-            listMenu.cursorUp(false);
-        else if (action == "DOWN")
-            listMenu.cursorDown(false);
-        else if (action == "PAGEUP")
-            listMenu.cursorUp(true);
-        else if (action == "PAGEDOWN")
-            listMenu.cursorDown(true);
-        else if (action == "SELECT")
-            listMenu.select();
-        else if (action == "LEFT")
-            listMenu.cursorLeft(false);
-        else if (action == "RIGHT")
-            listMenu.cursorRight(false);
-        else if (action == "PAGELEFT")
-            listMenu.cursorLeft(true);
-        else if (action == "PAGERIGHT")
-            listMenu.cursorRight(true);            
-        else
-            handled = false;
+        else if(!listMenu.getLocked())
+        {
+            if (action == "UP")
+                listMenu.cursorUp(false);
+            else if (action == "DOWN")
+                listMenu.cursorDown(false);
+            else if (action == "PAGEUP")
+                listMenu.cursorUp(true);
+            else if (action == "PAGEDOWN")
+                listMenu.cursorDown(true);
+            else if (action == "SELECT")
+                listMenu.select();
+            else if (action == "LEFT")
+                listMenu.cursorLeft(false);
+            else if (action == "RIGHT")
+                listMenu.cursorRight(false);
+            else if (action == "PAGELEFT")
+                listMenu.cursorLeft(true);
+            else if (action == "PAGERIGHT")
+                listMenu.cursorRight(true);            
+            else
+                handled = false;
+        }
     }
 
     if (!handled)
@@ -159,13 +161,15 @@ void RecOptDialog::updateInfo(QPainter *p)
     
     if (container)
     {  
-        QMap<QString, QString> infoMap;
         
-        if(schedRec)
-            schedRec->ToMap(infoMap);
-        else
-            // this should NEVER happen
-            return;
+        if(infoMap.isEmpty())
+        {
+            if(schedRec)
+                schedRec->ToMap(infoMap);
+            else
+                // this should NEVER happen
+                return;
+        }
         
         QRect pr = infoRect;
         QPixmap pix(pr.size());
