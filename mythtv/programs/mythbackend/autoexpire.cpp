@@ -61,7 +61,8 @@ void AutoExpire::RunExpirer(void)
         }
 
         int minFree = gContext->GetNumSetting("AutoExpireDiskThreshold", 0);
-        if ((minFree) && (freespace < minFree))
+
+        if ((minFree) && (freespace != -1) && (freespace < minFree))
         {
             QString msg = QString("Running AutoExpire: Want %1 Gigs free but "
                                   "only have %2.")
@@ -113,10 +114,17 @@ void AutoExpire::RunExpirer(void)
 
             VERBOSE(VB_GENERAL, msg);
         }
+        else if ((minFree) && (freespace == -1))
+        {
+            QString msg = QString("WARNING: AutoExpire Failed.   Want %1 Gigs "
+                                  "free but unable to calculate actual free.")
+                                  .arg(minFree);
+            VERBOSE(VB_GENERAL, msg);
+        }
 
         pthread_mutex_unlock(&expirerLock);
 
-        sleep(gContext->GetNumSetting("AutoExpireFrequency", 1) * 60);
+        sleep(gContext->GetNumSetting("AutoExpireFrequency", 10) * 60);
     }
 } 
 
