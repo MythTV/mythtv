@@ -11,7 +11,6 @@
 #include <qdir.h>
 #include <qfileinfo.h>
 #include <qregexp.h>
-#include <qdatetime.h>
 
 #include "mmusic.h"
 #include "mfd_events.h"
@@ -46,6 +45,13 @@ MMusicWatcher::MMusicWatcher(MFD *owner, int identity)
     sent_dir_is_not_readable_warning = false;
     sent_musicmetadata_table_warning = false;
     sent_playlist_table_warning = false;
+    sent_database_version_warning = false;
+
+    //
+    //  This is a "magic" number signifying what we want to see
+    //
+    
+    desired_database_version = "1001";
 
     //
     //  At startup we have no new data and no history. We create these lists
@@ -198,11 +204,27 @@ bool MMusicWatcher::checkDataSources(const QString &startdir, QSqlDatabase *a_db
     }
     
     //
-    //  Make sure the db exists, and we can see the two tables. At some
-    //  point, do version checking (FIX)
+    //  Check the database version 
     //
-    
 
+    QString dbver = mfdContext->GetSetting("MusicDBSchemaVer");
+
+    if (dbver != desired_database_version)
+    {
+        if(!sent_database_version_warning)
+        {
+            warning(QString("got desired (%1) versus actual (%2) "
+                            "database mismatch, will not touch db")
+                            .arg(desired_database_version)
+                            .arg(dbver));
+            sent_database_version_warning = true;
+        }
+        return false;
+    }
+                
+    //
+    //  Make sure the db exists, and we can see the two tables
+    //
     
     QSqlQuery query("SELECT COUNT(filename) FROM musicmetadata;", a_db);
     
@@ -235,6 +257,7 @@ bool MMusicWatcher::checkDataSources(const QString &startdir, QSqlDatabase *a_db
     sent_dir_is_not_readable_warning = false;
     sent_musicmetadata_table_warning = false;
     sent_playlist_table_warning = false;
+    sent_database_version_warning = false;
     return true;
 }
 
@@ -267,13 +290,10 @@ bool MMusicWatcher::sweepMetadata()
 
     if(!checkDataSources(startdir, db))
     {
-        return false;
+        prepareNewData();
+        return doDeltas();
     }
 
-
-
-
-    QTime sweep_timer;
     sweep_timer.start();
     log("beginning content sweep", 7);
 
@@ -443,20 +463,10 @@ bool MMusicWatcher::sweepMetadata()
     }
 
     //
-    //  OK, build the new metadata list of music files in memory if any of
-    //  the above actually showed that the status of music files has changed
+    //  Make storage for new data, and zero out the deltas
     //
-
-    new_metadata = new QIntDict<Metadata>;
-    new_metadata->setAutoDelete(true);
-    new_playlists = new QIntDict<Playlist>;
-    new_metadata->setAutoDelete(true);
     
-    metadata_additions.clear();
-    metadata_deletions.clear();
-    playlist_additions.clear();
-    playlist_deletions.clear();
-       
+    prepareNewData();
     
     //
     //  Load the playlists
@@ -567,10 +577,6 @@ bool MMusicWatcher::sweepMetadata()
         }
     }
 
-
-
-
-
     //
     //  Now, within this collection of metadata and playlists, we have a
     //  complete set. Time to map the numbers the playlists have to the
@@ -582,10 +588,33 @@ bool MMusicWatcher::sweepMetadata()
     {
         pl_it.current()->mapDatabaseToId(new_metadata);
     }
-            
+
+    return doDeltas();
+
+}
+
+void MMusicWatcher::prepareNewData()
+{
+
+    new_metadata = new QIntDict<Metadata>;
+    new_metadata->setAutoDelete(true);
+    new_playlists = new QIntDict<Playlist>;
+    new_metadata->setAutoDelete(true);
+    
+    metadata_additions.clear();
+    metadata_deletions.clear();
+    playlist_additions.clear();
+    playlist_deletions.clear();
+       
+    
+}
+
+bool MMusicWatcher::doDeltas()
+{
+
     //
     //  Ah Ha ... so ... we have a new set of metadata ... how does
-    //  it compare to the old set (what are the deltas!)
+    //  it compare to the old set (what are the deltas?)
     //
             
             
@@ -646,9 +675,6 @@ bool MMusicWatcher::sweepMetadata()
         }
     }
 
-
-
-
     //
     //  Make copies for next time through
     //    
@@ -702,9 +728,20 @@ bool MMusicWatcher::sweepMetadata()
         return true;
     }
 
-    warning("sweep rebuilt metatada, but got no changes ... Aristotle?");
+    //
+    //  We're going to return false, which means this storage is not going
+    //  to get used
+    //
+    
+    delete new_metadata;
+    new_metadata = NULL;
+    delete new_playlists;
+    new_playlists = NULL;
     return false;
 }
+
+
+
 
 void MMusicWatcher::buildFileList(QString &directory, MusicLoadedMap &music_files)
 {
@@ -858,10 +895,12 @@ MMusicWatcher::~MMusicWatcher()
     if(new_metadata)
     {
         delete new_metadata;
+        new_metadata = NULL;
     }
     if(new_playlists)
     {
         delete new_playlists;
+        new_playlists = NULL;
     }
     
 }

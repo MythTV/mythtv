@@ -42,6 +42,8 @@ class MMusicWatcher: public MFDServicePlugin
     bool    sweepMetadata();
     void    buildFileList(QString &directory, MusicLoadedMap &music_files);
     bool    checkNewMusicFile(const QString &filename, const QString &startdir);
+    void    prepareNewData();
+    bool    doDeltas();
 
   private:
 
@@ -75,6 +77,10 @@ class MMusicWatcher: public MFDServicePlugin
     bool    sent_dir_is_not_readable_warning;
     bool    sent_musicmetadata_table_warning;
     bool    sent_playlist_table_warning;
+    bool    sent_database_version_warning;
+    
+    QString desired_database_version;
+    QTime   sweep_timer;
 };
 
 
