@@ -9,7 +9,7 @@ using namespace std;
 
 #include "mythtv/mythcontext.h"
 
-const QString currentDatabaseVersion = "1001";
+const QString currentDatabaseVersion = "1002";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
