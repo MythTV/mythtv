@@ -1746,7 +1746,8 @@ void NuppelVideoPlayer::StartPlaying(void)
     if (OpenFile() < 0)
         return;
 
-    if (!disableaudio || forceVideoOutput == kVideoOutput_IVTV)
+    if (!disableaudio || (forceVideoOutput == kVideoOutput_IVTV &&
+                          !gContext->GetNumSetting("PVR350InternalAudioOnly")))
     {
         bool setVolume = gContext->GetNumSetting("MythControlsVolume", 1);
         audioOutput = AudioOutput::OpenAudio(audiodevice, audio_bits,

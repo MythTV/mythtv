@@ -639,8 +639,14 @@ Specific cards:
 <item>S3 Savage IX 8MB AGP. Has SVideo output. Reported to work.
 </itemize>
 
-<sect3>Hauppauge PVR-350
+<sect3>Hauppauge PVR-350 <label id="PVR-350">
 <p>MythTV supports the TV-out and MPEG-2 decoder functions in the IvyTV driver.
+
+The PVR-350 is unique in that it also supports audio output. As of MythTV 0.17, the
+IvyTV drivers available do not support volume control so a typical setup has the audio
+looped back into a soundcard where MythTV does have volume control. However, if you prefer
+to run the 350's audio directly to your television and control the volume there then
+you should indicate such on the PVR-350's setup panel.
 
 <sect3>Other Options
 <p>Some devices with on-board TV-out capability, such as XBoxes converted to 
@@ -6472,6 +6478,9 @@ card.
 
 Non-MPEG-2 content will be displayed on the PVR-350 output using framebuffer
 features, placing a large load on the host CPU.
+
+Note that for the PVR-350 there are some <ref id="PVR-350" name="considerations">
+around the way audio is to be handled.
 
 <sect1>Changing channels on an external Set Top Box
 <p>If you need to use an external Set Top Box (STB), such as for satellite

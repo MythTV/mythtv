@@ -2025,6 +2025,17 @@ static HostSpinBox *PVR350EPGAlphaValue()
     return gs;
 }
 
+static HostCheckBox *PVR350UseInternalSound()
+{
+    HostCheckBox *gc = new HostCheckBox("PVR350InternalAudioOnly");
+    gc->setLabel(QObject::tr("TV audio through PVR-350 only"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Normally PVR-350 audio is looped into a soundcard, "
+                    "here you can indicate when that is not the case. "
+                    "MythTV cannot control TV volume when this option is checked."));
+    return gc;
+}
+
 #ifdef USING_XVMC
 static HostCheckBox *UseXVMC()
 {
@@ -2063,6 +2074,7 @@ public:
          ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
          settings->addChild(PVR350VideoDev());
          settings->addChild(PVR350EPGAlphaValue());
+         settings->addChild(PVR350UseInternalSound());
          addTarget("1", settings);
 
          addTarget("0", new VerticalConfigurationGroup(true));

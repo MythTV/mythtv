@@ -74,6 +74,10 @@ bool AudioOutputJACK::OpenDevice()
             err = JACK_OpenEx(&audioid, 16, (unsigned long *) &audio_samplerate,
                               audio_channels, audio_channels, &jack_port_name,
                               jack_port_name_count, jack_port_flags);
+        } else if (err == ERR_PORT_NOT_FOUND) {
+            VERBOSE(VB_IMPORTANT, QString("Error opening audio device (%1), "
+                    " Port not found.").arg(audiodevice));
+            perror(audiodevice.ascii());
         }
 
         if (err != 0)

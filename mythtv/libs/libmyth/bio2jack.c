@@ -864,13 +864,18 @@ static int JACK_OpenDevice(jack_driver_t* drv)
     }
 
     /* display a trace of the output ports we found */
-    for(i = 0; ports[i]; i++)
+    if(ports) {
+      for(i = 0; ports[i]; i++)
 	TRACE("ports[%d] = '%s'\n", i, ports[i]);
+    } else {
+      i = 0; // No ports found
+    }
 
     /* see if we have enough ports */
     if(i < drv->num_output_channels)
     {
       TRACE("ERR: jack_get_ports() failed to find ports with jack port flags of 0x%lX'\n", drv->jack_port_flags);
+      JACK_CloseDevice(drv, TRUE);
       return ERR_PORT_NOT_FOUND;
     }
 
@@ -893,13 +898,13 @@ static int JACK_OpenDevice(jack_driver_t* drv)
     {
       TRACE("jack_get_ports() portname %d of '%s\n", i, drv->jack_port_name[i]);
       ports = jack_get_ports(drv->client, drv->jack_port_name[i], NULL, drv->jack_port_flags);
-      TRACE("ports[%d] = '%s'\n", 0, ports[0]);      /* display a trace of the output port we found */
 
       if(!ports)
       {
           ERR("jack_get_ports() failed to find ports with jack port flags of 0x%lX'\n", drv->jack_port_flags);
           return ERR_PORT_NOT_FOUND;
       }
+      TRACE("ports[%d] = '%s'\n", 0, ports[0]);      /* display a trace of the output port we found */
 
       /* connect the port */
       TRACE("jack_connect() to port %d('%p')\n", i, drv->output_port[i]);
