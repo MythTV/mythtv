@@ -135,7 +135,6 @@ void JobThread::setSubName(const QString &new_name, uint priority)
             subjob_name = new_name;
         }
     }
-    //cout << "SUBJOB name is now: " << subjob_name << endl;
     sub_name_mutex.unlock();
     
 }
@@ -437,9 +436,9 @@ bool DVDThread::ripTitle(int title_number,
             {
                 problem("Couldn't write blocks during a rip. Filesystem size exceeded? Disc full?");
                 ripfile->remove();
+                DVDCloseFile( title );
                 ifoClose(vts_file);
                 ifoClose(vmg_file);
-                DVDCloseFile( title );
                 DVDClose(the_dvd);
                 dvd_device_access->unlock();
                 return false;
@@ -458,9 +457,9 @@ bool DVDThread::ripTitle(int title_number,
             {
                 problem("abandoned job because master control said we need to shut down");
                 ripfile->remove();
+                DVDCloseFile( title );
                 ifoClose(vts_file);
                 ifoClose(vmg_file);
-                DVDCloseFile( title );
                 DVDClose(the_dvd);
                 dvd_device_access->unlock();
                 return false;

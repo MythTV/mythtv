@@ -20,6 +20,7 @@ using namespace std;
 #include "titledialog.h"
 
 MTDJob::MTDJob()
+       :QObject(NULL)
 {
     init();
 }
@@ -45,6 +46,7 @@ void MTDJob::setName(const QString &a_name)
     if(a_name != job_name && cancelled)
     {
         cancelled = false;
+        emit toggledCancelled();
     }
     job_name = a_name;
 }
@@ -164,6 +166,14 @@ void DVDRipBox::checkDisc()
 
     if(have_disc)
     {
+        if(ripscreen_button)
+        {
+            if(ripscreen_button->GetContext() != -1)
+            {
+                ripscreen_button->SetContext(-1);
+                ripscreen_button->refresh();
+            }    
+        }
         if(!first_disc_found)
         {
             first_disc_found = true;
@@ -173,10 +183,22 @@ void DVDRipBox::checkDisc()
             //  probably has what they want.
             //
 
-            disc_checking_timer->changeInterval(10000);
+            disc_checking_timer->changeInterval(4000);
         }
         
     }
+    else
+    {
+        if(ripscreen_button)
+        {
+            if(ripscreen_button->GetContext() != -2)
+            {
+                ripscreen_button->SetContext(-2);
+                ripscreen_button->refresh();
+            }
+        }
+    }
+
     //
     //  Ask the mtd to send us info about 
     //  current media (DVD) information
@@ -209,8 +231,16 @@ void DVDRipBox::connectionClosed()
     stopStatusPolling();
     setContext(0);
     have_disc = false;
-    ripscreen_button->SetContext(-2);
-    cancel_button->SetContext(-2);
+    if(ripscreen_button)
+    {
+        ripscreen_button->SetContext(-2);
+        ripscreen_button->refresh();
+    }
+    if(cancel_button)
+    {
+        cancel_button->SetContext(-2);
+        cancel_button->refresh();
+    }
     QString warning = "Your connection to the Myth "
                       "Transcoding Daemon has gone "
                       "away. This is not a good thing.";
@@ -274,8 +304,14 @@ void DVDRipBox::keyPressEvent(QKeyEvent *e)
         switch (e->key())
         {
             case Key_0:
+                if(ripscreen_button)
+                {
+                    if(ripscreen_button->GetContext() == -1)
+                    {
+                        ripscreen_button->push();
+                    }
+                }
                 handled=true;
-                goRipScreen();
                 break;
         }
     }
@@ -301,7 +337,10 @@ void DVDRipBox::keyPressEvent(QKeyEvent *e)
                 handled=true;
                 if(ripscreen_button)
                 {
-                    ripscreen_button->push();
+                    if(ripscreen_button->GetContext() != -2)
+                    {
+                        ripscreen_button->push();
+                    }
                 }
                 break;
                 
@@ -568,7 +607,6 @@ void DVDRipBox::handleStatus(QStringList tokens)
         //
         //  All jobs are updated
         //
-        ignore_cancels = false;
         showCurrentJob();
         return;
     }
@@ -595,7 +633,7 @@ void DVDRipBox::handleStatus(QStringList tokens)
            tokens[3].toInt() > 0) ||
            (tokens[2] == "job"))
         {
-            ripscreen_button->SetContext(3);
+            //ripscreen_button->SetContext(3);
             cancel_button->SetContext(3);
             setContext(3);
             update();
@@ -750,6 +788,24 @@ void DVDRipBox::handleMedia(QStringList tokens)
             if(dvd_info->getTitles()->count() > 0)
             {
                 have_disc = true;
+                if(ripscreen_button)
+                {
+                    if(ripscreen_button->GetContext() != -1)
+                    {
+                    }
+                }
+            }
+            else
+            {
+                have_disc = false;
+                if(ripscreen_button)
+                {
+                    if(ripscreen_button->GetContext() != -2)
+                    {
+                        ripscreen_button->SetContext(-1);
+                        ripscreen_button->refresh();
+                    }
+                }
             }
         }
         return;
@@ -778,6 +834,14 @@ void DVDRipBox::handleMedia(QStringList tokens)
         else
         {
             have_disc = false;
+            if(ripscreen_button)
+            {
+                if(ripscreen_button->GetContext() != -2)
+                {
+                    ripscreen_button->SetContext(-2);
+                    ripscreen_button->refresh();
+                }
+            }
         }
         return;
     }
@@ -866,6 +930,7 @@ void DVDRipBox::adjustJobs(uint new_number)
         for(uint i = 0; i < (new_number - numb_jobs); i++)
         {
             MTDJob *new_one = new MTDJob("I am a job");
+            connect(new_one, SIGNAL(toggledCancelled()), this, SLOT(toggleCancel()));
             jobs.append(new_one);
         }
         if(current_job < 0)
@@ -885,6 +950,13 @@ void DVDRipBox::adjustJobs(uint new_number)
         }
     }
     numb_jobs = new_number;
+    if(numb_jobs == 0)
+    {
+        if(ignore_cancels)
+        {
+            toggleCancel();
+        }
+    }
 }
 
 void DVDRipBox::goRipScreen()
@@ -931,6 +1003,11 @@ void DVDRipBox::cancelJob()
             startStatusPolling();
         }
     }
+}
+
+void DVDRipBox::toggleCancel()
+{
+    ignore_cancels = false;
 }
 
 void DVDRipBox::wireUpTheme()

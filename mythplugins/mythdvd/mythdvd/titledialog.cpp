@@ -269,7 +269,10 @@ void TitleDialog::keyPressEvent(QKeyEvent *e)
         //
         
         case Key_0:
-            ripaway_button->push();
+            if(ripaway_button->GetContext() == -1)
+            {
+                ripaway_button->push();
+            }
             handled = true;
             break;
     }
@@ -327,6 +330,46 @@ void TitleDialog::setAudio(int audio_index)
 void TitleDialog::toggleTitle(bool on_or_off)
 {
     current_title->setSelected(on_or_off);
+    
+    //
+    //  Should we be showing the Process Title(s)
+    //  Button ?
+    //
+    
+    int numb_selected = 0;
+    for(uint i = 0; i < dvd_titles->count(); i++)
+    {
+        if(dvd_titles->at(i)->getSelected())
+        {
+            ++numb_selected;
+        }
+    }
+    if(!ripaway_button)
+    {
+        return;
+    }
+    if(numb_selected == 0)
+    {
+        if(ripaway_button->GetContext() != -2)
+        {
+            ripaway_button->SetContext(-2);
+            ripaway_button->refresh();
+        }
+        return;
+    }
+    if(numb_selected == 1)
+    {
+        ripaway_button->setText("0 Process Selected Title");
+    }
+    else
+    {
+        ripaway_button->setText("0 Process Selected Titles");
+    }
+    if(ripaway_button->GetContext() != -1)
+    {
+        ripaway_button->SetContext(-1);
+    }
+    ripaway_button->refresh();
 }
 
 void TitleDialog::changeName(QString new_name)
@@ -428,10 +471,9 @@ void TitleDialog::ripTitles()
             
             QTextStream os(socket_to_mtd);
             os << job_string << "\n" ;
-            done(0);
         }
     }
-    
+    done(0);
 }
 
 void TitleDialog::takeFocusAwayFromEditor(bool up_or_down)

@@ -22,8 +22,10 @@
 
 #include "dvdinfo.h"
 
-class MTDJob 
+class MTDJob : public QObject
 {
+    Q_OBJECT
+
     //
     //  A little class that stores
     //  data about jobs running on the
@@ -57,6 +59,10 @@ class MTDJob
     QString getActivity(){return current_activity;}
     double  getOverall(){return overall_progress;}
     double  getSubjob(){return subjob_progress;}
+
+  signals:
+  
+    void    toggledCancelled();
           
   private:
   
@@ -109,6 +115,7 @@ class DVDRipBox : public MythThemedDialog
     void goRipScreen();
     void checkDisc();
     void cancelJob();
+    void toggleCancel();
      
   private:
 

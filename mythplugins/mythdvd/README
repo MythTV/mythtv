@@ -19,9 +19,8 @@ BUILD INSTRUCTIONS
 First, you need MythTV to be installed. If you don't have that
 done, don't even bother with this, as it won't work.
 
-Also, you need MythVideo installed if you want to be able to transcode DVDs
-(because mythDVD needs to know where you like to store your videos, and
-that's defined in the MythVideo setup).
+Also, you need MythVideo installed (because mythDVD needs to know where you
+like to store your videos, and that's defined in the MythVideo setup).
 
 In addition to MythTV's prerequisites, you'll should have these software
 packages installed for *transcoding* to work:

@@ -634,20 +634,20 @@ void MTD::startDVD(const QStringList &tokens)
         return;
     }
 
-    QFile final_file(dest_dir.filePath(file_name));
-
-    if(!checkFinalFile(&final_file))
-    {
-        emit writeToLog("Final file name is not useable. File exists? Other Pending job?");
-        return;
-    }
-    
     //
     //  OK, we are ready to launch this job
     // 
 
     if(quality == 0)
     {
+        QFile final_file(dest_dir.filePath(file_name));
+
+        if(!checkFinalFile(&final_file, ".mpg"))
+        {
+            emit writeToLog("Final file name is not useable. File exists? Other Pending job?");
+            return;
+        }
+    
         emit writeToLog(QString("launching job: %1").arg(flat));
 
         //
@@ -667,6 +667,14 @@ void MTD::startDVD(const QStringList &tokens)
     }
     else if (quality > 0)
     {
+        QFile final_file(dest_dir.filePath(file_name));
+
+        if(!checkFinalFile(&final_file, ".avi"))
+        {
+            emit writeToLog("Final file name is not useable. File exists? Other Pending job?");
+            return;
+        }
+    
         while(!titles_mutex->tryLock())
         {
             sleep(1);
@@ -712,13 +720,16 @@ void MTD::startDVD(const QStringList &tokens)
     }
 }
 
-bool MTD::checkFinalFile(QFile *final_file)
+bool MTD::checkFinalFile(QFile *final_file, const QString &extension)
 {
     //
     //  Check if file exists
     //
     
-    if(final_file->exists())
+    QString final_with_extension_string = final_file->name() + extension;
+    QFile tester(final_with_extension_string);
+    
+    if(tester.exists())
     {
         return false;
     }

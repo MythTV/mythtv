@@ -80,7 +80,7 @@ class MTD : public QObject
     void startDVD(const QStringList &tokens);
     void cleanThreads();
     void checkDisc();
-    bool checkFinalFile(QFile *final_file);
+    bool checkFinalFile(QFile *final_file, const QString &extension);
     
   private:
   
