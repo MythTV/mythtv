@@ -16,6 +16,7 @@ class MMAudioOutput;
 #include "constants.h"
 #endif
 
+struct ReSampleContext;
 
 class MMAudioOutput : public Output
 {
@@ -52,6 +53,10 @@ private:
     long total_written, current_seconds,bps;
     int stat;
     int lr, lf, lc, lp;
+
+    bool needresample;
+    ReSampleContext *resampctx;
+
 #if defined(_OS_UNIX_) || defined(Q_OS_UNIX)
     bool do_select;
     int audio_fd;

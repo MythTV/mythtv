@@ -19,6 +19,15 @@
 
 using namespace std;
 
+extern "C" {
+extern ReSampleContext *audio_resample_init(int output_channels, 
+                                            int input_channels,
+                                            int output_rate, int input_rate);
+extern int audio_resample(ReSampleContext *s, short *output, short *input, 
+                          int nb_samples);
+void audio_resample_close(ReSampleContext *s);
+}
+
 void MMAudioOutput::stop()
 {
     user_stop = TRUE;
@@ -75,6 +84,7 @@ MMAudioOutput::MMAudioOutput(unsigned int sz, const QString &d)
       do_select(TRUE),
       audio_fd(-1)
 {
+    resampctx = NULL;
 }
 
 MMAudioOutput::~MMAudioOutput()
@@ -83,6 +93,9 @@ MMAudioOutput::~MMAudioOutput()
 	close(audio_fd);
 	audio_fd = -1;
     }
+
+    if (resampctx)
+        audio_resample_close(resampctx);
 }
 
 void MMAudioOutput::configure(long freq, int chan, int prec, int rate)
@@ -121,6 +134,19 @@ void MMAudioOutput::configure(long freq, int chan, int prec, int rate)
 	int stereo = (chan > 1) ? 1 : 0;
 	ioctl(audio_fd, SNDCTL_DSP_STEREO, &stereo);
 	ioctl(audio_fd, SNDCTL_DSP_SPEED, &freq);
+
+        needresample = false;
+        if (resampctx)
+        {
+            audio_resample_close(resampctx);
+            resampctx = NULL;
+        }
+
+        if (freq != lf)
+        {
+            needresample = true;
+            resampctx = audio_resample_init(chan, chan, freq, lf);
+        }
     }
 
     lr = rate;
@@ -282,6 +308,8 @@ void MMAudioOutput::run()
     bool done = FALSE;
     unsigned long n = 0, m = 0, l = 0;
 
+    unsigned char *resampbuf = new unsigned char[globalBufferSize * 2];
+
     FD_ZERO(&afd);
 
     while (! done) {
@@ -337,8 +365,19 @@ void MMAudioOutput::run()
 			     FD_ISSET(audio_fd, &afd)))) {
 	    l = QMIN(2048, b->nbytes - n);
 	    if (l > 0) {
-		m = write(audio_fd, b->data + n, l);
-		n += m;
+                if (needresample && resampctx)
+                {
+                    int size = audio_resample(resampctx, (short int *)resampbuf,
+                                              (short int*)(b->data + n), l / 4);
+                    m = write(audio_fd, resampbuf, size * 4);
+
+                    n += l;
+                }
+                else
+                {
+		    m = write(audio_fd, b->data + n, l);
+		    n += m;
+                }
 
 		status();
                 dispatchVisual(b, total_written, lc, lp);
@@ -378,5 +417,7 @@ void MMAudioOutput::run()
     }
 
     mutex()->unlock();
+
+    delete [] resampbuf;
 }
 

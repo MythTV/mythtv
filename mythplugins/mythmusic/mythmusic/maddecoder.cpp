@@ -606,6 +606,8 @@ Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
                 if (!latin1)
                     continue;
 
+                bool found = true;
+
                 switch (i)
                 {
                     case 0: title = (char *)latin1; break;
@@ -614,10 +616,13 @@ Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
                     case 3: year = atoi((char *)latin1); break;
                     case 4: tracknum = atoi((char *)latin1); break;
                     case 5: genre = (char *)latin1; break;
-                    default: break;
+                    default: found = false; break;
                 }
 
                 free(latin1);
+
+                if (found)
+                    break;
             }
         }
 
@@ -718,7 +723,7 @@ Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
 
     fclose(input);
 
-    if(vbr)
+    if (vbr)
     {
         length = mad_timer_count(timer, MAD_UNITS_MILLISECONDS);
     }
