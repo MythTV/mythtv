@@ -97,6 +97,7 @@ class MythMainWindow : public QDialog
   protected:
     void keyPressEvent(QKeyEvent *e);
     void customEvent(QCustomEvent *ce);
+    void closeEvent(QCloseEvent *e);
 
     void ExitToMainMenu();
 

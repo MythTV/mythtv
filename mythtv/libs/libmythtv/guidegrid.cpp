@@ -491,16 +491,16 @@ void GuideGrid::fillChannelInfos(int &maxchannel, bool gotostartchannel)
     QString queryall = "SELECT channel.channum, channel.callsign, "
                        "channel.icon, channel.chanid, favorites.favid "
                        "FROM channel LEFT JOIN favorites ON "
-                       "favorites.chanid = channel.chanid ORDER BY " +
-                       channelOrdering + ";";
+                       "favorites.chanid = channel.chanid WHERE visible = 1 "
+                       "ORDER BY " + channelOrdering + ";";
 
     if (showFavorites)
     {
         queryfav = "SELECT channel.channum, channel.callsign, "
                    "channel.icon, channel.chanid, favorites.favid "
                    "FROM favorites, channel WHERE "
-                   "channel.chanid = favorites.chanid ORDER BY " + 
-                   channelOrdering + ";";
+                   "channel.chanid = favorites.chanid and visible = 1 "
+                   "ORDER BY " + channelOrdering + ";";
 
         query.exec(queryfav);   
 

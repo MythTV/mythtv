@@ -185,6 +185,12 @@ MythMainWindow::~MythMainWindow()
     delete d;
 }
 
+void MythMainWindow::closeEvent(QCloseEvent *e)
+{
+    (void)e;
+    qApp->quit();
+}
+
 void MythMainWindow::Init(void)
 {
     gContext->GetScreenSettings(d->xbase, d->screenwidth, d->wmult,

@@ -16,6 +16,7 @@
 using namespace std;
 
 #include "videoout_viaslice.h"
+#include "../libmyth/mythcontext.h"
 #include "../libmyth/util.h"
 
 extern "C" {

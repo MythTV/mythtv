@@ -251,7 +251,7 @@ bool DVBChannel::GetChannelOptions(QString channum)
 
     if (query.numRowsAffected() <= 0)
     {
-        thequery += QString("SELECT satid FROM dvb_channel WHERE chanid='%1'")
+        thequery = QString("SELECT satid FROM dvb_channel WHERE chanid='%1'")
                     .arg(chanid);
         query = db_conn->exec(thequery);
 
@@ -266,7 +266,7 @@ bool DVBChannel::GetChannelOptions(QString channum)
         else if (info.type == FE_QPSK)
         {
             int satid = query.value(0).toInt();
-            thequery += QString("SELECT * FROM dvb_sat WHERE satid='%1'")
+            thequery = QString("SELECT * FROM dvb_sat WHERE satid='%1'")
                         .arg(satid);
             query = db_conn->exec(thequery);
 
