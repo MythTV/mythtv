@@ -1313,6 +1313,20 @@ void CommDetect::BuildAllMethodsCommList(void)
         curBlock++;
     }
 
+    if (breakStart != -1)
+    {
+        if (verboseDebugging)
+            VERBOSE(VB_COMMFLAG,
+                    QString("Closing final commercial block started at "
+                            "block %1 and going to end of program. length "
+                            "is %2 frames")
+                            .arg(curBlock)
+                            .arg(framesProcessed - breakStart - 1));
+
+        commBreakMap[breakStart] = MARK_COMM_START;
+        commBreakMap[framesProcessed - 1] = MARK_COMM_END;
+    }
+
     delete [] fblock;
 }
 
@@ -2214,8 +2228,8 @@ void CommDetect::SearchForLogo(NuppelVideoPlayer *nvp, bool fullSpeed)
 
         SetLogoMaskArea();
 
-        VERBOSE(VB_COMMFLAG, QString("Detected Logo area: topleft (%1,%2), "
-                                     "bottomright (%3,%4)")
+        VERBOSE(VB_COMMFLAG, QString("Detected potential Logo area: topleft "
+                                     "(%1,%2), bottomright (%3,%4)")
                                      .arg(logoMinX).arg(logoMinY)
                                      .arg(logoMaxX).arg(logoMaxY));
 
@@ -2248,10 +2262,28 @@ void CommDetect::SearchForLogo(NuppelVideoPlayer *nvp, bool fullSpeed)
         {
             logoInfoAvailable = true;
             logoEdgeDiff = edgeDiffs[i];
+
+            VERBOSE(VB_COMMFLAG, QString("Using Logo area: topleft "
+                                         "(%1,%2), bottomright (%3,%4)")
+                                         .arg(logoMinX).arg(logoMinY)
+                                         .arg(logoMaxX).arg(logoMaxY));
+        }
+        else
+        {
+            VERBOSE(VB_COMMFLAG, QString("Rejecting Logo area: topleft "
+                                         "(%1,%2), bottomright (%3,%4), "
+                                         "pixelsInMask (%5). "
+                                         "Not within specified limits.")
+                                         .arg(logoMinX).arg(logoMinY)
+                                         .arg(logoMaxX).arg(logoMaxY)
+                                         .arg(pixelsInMask));
         }
     }
 
     delete [] edgeCounts;
+
+    if (!logoInfoAvailable)
+        VERBOSE(VB_COMMFLAG, "No suitable logo area found.");
 
     nvp->JumpToFrame(0);
     nvp->ClearAfterSeek();
