@@ -51,6 +51,8 @@ class Scheduler : public QObject
     void MarkConflictsToRemove(void);
     void MarkSingleConflict(ProgramInfo *info,
                             list<ProgramInfo *> *conflictList);
+
+    int totalRank(ProgramInfo *info);
     void CheckRank(ProgramInfo *info, list<ProgramInfo *> *conflictList);
     void CheckOverride(ProgramInfo *info, list<ProgramInfo *> *conflictList);
     void RemoveConflicts(void);
@@ -71,6 +73,9 @@ class Scheduler : public QObject
 
     list<ProgramInfo *> recordingList;
     list<ProgramInfo *> scheduledList;
+
+    bool doRank;
+    bool doRankFirst;
 
     QMap<QString, int> rankMap;
     QMap<QString, int> channelRankMap;

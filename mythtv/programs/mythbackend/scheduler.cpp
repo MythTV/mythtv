@@ -157,6 +157,9 @@ void Scheduler::FillEncoderFreeSpaceCache()
 
 bool Scheduler::FillRecordLists(bool doautoconflicts)
 {
+    doRank = (bool)gContext->GetNumSetting("RankingActive");
+    doRankFirst = (bool)gContext->GetNumSetting("RankingOrder");
+
     if (rankMap.size() > 0)
         rankMap.clear();
     if (channelRankMap.size() > 0)
@@ -217,20 +220,27 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
 
 void Scheduler::PrintList(void)
 {
+    QString totrank;
+
     cout << "--- print list start ---\n";
     list<ProgramInfo *>::iterator i = recordingList.begin();
-    cout << "Title               Chan  ChID StartTime                  S I C "
-            "-- C R D S Rank" << endl;
+    cout << "Title                 Chan  ChID  StartTime       S I C "
+            "-- C R D S Rank Total" << endl;
     for (; i != recordingList.end(); i++)
     {
         ProgramInfo *first = (*i);
-        cout << first->title.leftJustify(20, ' ', true)
+
+        totrank = QString::number(totalRank(first));
+
+        cout << first->title.leftJustify(22, ' ', true)
              << first->chanstr.rightJustify(4, ' ') << "  " << first->chanid 
-             << " \"" << first->startts.toString() << "\" " << first->sourceid 
+             << first->startts.toString("  MMM dd hh:mmap  ")
+             << first->sourceid 
              << " " << first->inputid << " " << first->cardid << " -- "  
              << first->conflicting << " " << first->recording << " "
              << first->duplicate << " " << first->suppressed << " "
-             << first->rank.rightJustify(4, ' ')
+             << first->rank.rightJustify(4, ' ') << " "
+             << totrank.rightJustify(4, ' ')
              << endl;
     }
 
@@ -521,12 +531,13 @@ list<ProgramInfo *> *Scheduler::getConflicting(ProgramInfo *pginfo,
     return retlist;
 }
 
-void Scheduler::CheckRank(ProgramInfo *info,
-                          list<ProgramInfo *> *conflictList)
+int Scheduler::totalRank(ProgramInfo *info)
 {
-    int rank, srank, resolved = 0;
-    QString chanid;
+    int rank = 0;
     RecordingType rectype;
+
+    if (rankMap.contains(info->schedulerid))
+        return rankMap[info->schedulerid];
 
     if (!channelRankMap.contains(info->chanid))
         channelRankMap[info->chanid] = info->GetChannelRank(db, info->chanid);
@@ -535,38 +546,27 @@ void Scheduler::CheckRank(ProgramInfo *info,
     if (!recTypeRankMap.contains(rectype))
         recTypeRankMap[rectype] = info->GetRecordingTypeRank(rectype);
 
-    if (!rankMap.contains(info->schedulerid))
-    {
-        rank = info->rank.toInt();
-        rank += channelRankMap[info->chanid];
-        rank += recTypeRankMap[rectype];
-        rankMap[info->schedulerid] = rank;
-    }
-    else
-        rank = rankMap[info->schedulerid];
+    rank = info->rank.toInt();
+    rank += channelRankMap[info->chanid];
+    rank += recTypeRankMap[rectype];
+    rankMap[info->schedulerid] = rank;
+
+    return rank;
+}
+
+void Scheduler::CheckRank(ProgramInfo *info,
+                          list<ProgramInfo *> *conflictList)
+{
+    int rank, srank, resolved = 0;
+
+    rank = totalRank(info);
 
     list<ProgramInfo *>::iterator i = conflictList->begin();
     for (; i != conflictList->end(); i++)
     {
         ProgramInfo *second = (*i);
 
-        if (!channelRankMap.contains(second->chanid))
-            channelRankMap[second->chanid] = second->GetChannelRank(db, 
-                                                               second->chanid);
-
-        rectype = second->GetProgramRecordingStatus(db);
-        if (!recTypeRankMap.contains(rectype))
-            recTypeRankMap[rectype] = second->GetRecordingTypeRank(rectype);
-
-        if (!rankMap.contains(second->schedulerid))
-        {
-            srank = second->rank.toInt();
-            srank += channelRankMap[second->chanid];
-            srank += recTypeRankMap[rectype];
-            rankMap[second->schedulerid] = srank;
-        }
-        else
-            srank = rankMap[second->schedulerid];
+        srank = totalRank(second);
 
         if (rank == srank)
             continue;
@@ -713,9 +713,6 @@ void Scheduler::MarkSingleConflict(ProgramInfo *info,
 void Scheduler::MarkConflictsToRemove(void)
 {
     list<ProgramInfo *>::iterator i;
-
-    bool doRank = (bool)gContext->GetNumSetting("RankingActive");
-    bool doRankFirst = (bool)gContext->GetNumSetting("RankingOrder");
 
     if (doRank && doRankFirst) 
     {
@@ -934,6 +931,9 @@ list<ProgramInfo *> *Scheduler::CopyList(list<ProgramInfo *> *sourcelist)
         
 void Scheduler::DoMultiCard(void)
 {
+    bool highermove, lowermove;
+    ProgramInfo *higher, *lower;
+
     list<ProgramInfo *> *copylist = CopyList(&recordingList);
 
     MarkConflicts(copylist);
@@ -981,39 +981,54 @@ void Scheduler::DoMultiCard(void)
             if (second->conflictfixed)
                 secondmove = false;
 
-            bool fixed = false;
-            if (secondmove)
+            if (doRank && totalRank(second) > totalRank(first))
             {
-                int storeinput = second->inputid;
-                int numinputs = numInputsPerSource[second->sourceid];
+                highermove = secondmove;
+                higher = second;
+                lowermove = firstmove;
+                lower = first;
+            }
+            else
+            {
+                highermove = firstmove;
+                higher = first;
+                lowermove = secondmove;
+                lower = second;
+            }
+
+            bool fixed = false;
+            if (lowermove)
+            {
+                int storeinput = lower->inputid;
+                int numinputs = numInputsPerSource[lower->sourceid];
 
                 for (int z = 0; z < numinputs; z++)
                 {
-                    second->inputid = sourceToInput[second->sourceid][z];
-                    second->cardid = inputToCard[second->inputid];
+                    lower->inputid = sourceToInput[lower->sourceid][z];
+                    lower->cardid = inputToCard[lower->inputid];
 
-                    if (!m_tvList->contains(second->cardid))
+                    if (!m_tvList->contains(lower->cardid))
                     {
-                        cerr << "Missing: " << second->cardid << " in tvList\n";
+                        cerr << "Missing: " << lower->cardid << " in tvList\n";
                         continue;
                     }
 
-                    if (((*m_tvList)[second->cardid])->WouldConflict(second))
+                    if (((*m_tvList)[lower->cardid])->WouldConflict(lower))
                     {
                         continue;
                     }
 
-                    if (((*m_tvList)[second->cardid])->isLowOnFreeSpace())
+                    if (((*m_tvList)[lower->cardid])->isLowOnFreeSpace())
                         continue;
 
-                    if (!Conflict(first, second))
+                    if (!Conflict(higher, lower))
                     {
                         bool allclear = true;
                         list<ProgramInfo *>::iterator k = fixedList.begin();
                         for (; k != fixedList.end(); k++)
                         {
                             ProgramInfo *test = (*k);
-                            if (Conflict(test, second))
+                            if (Conflict(test, lower))
                             {
                                 allclear = false;
                                 break;
@@ -1029,36 +1044,36 @@ void Scheduler::DoMultiCard(void)
                 }
                 if (!fixed)
                 {
-                    second->inputid = storeinput;
-                    second->cardid = inputToCard[second->inputid];
+                    lower->inputid = storeinput;
+                    lower->cardid = inputToCard[lower->inputid];
                 }
             }
 
-            if (!fixed && firstmove)
+            if (!fixed && highermove)
             {
-                int storeinput = first->inputid;
-                int numinputs = numInputsPerSource[first->sourceid];
+                int storeinput = higher->inputid;
+                int numinputs = numInputsPerSource[higher->sourceid];
 
                 for (int z = 0; z < numinputs; z++)
                 {
-                    first->inputid = sourceToInput[first->sourceid][z];
-                    first->cardid = inputToCard[first->inputid];
+                    higher->inputid = sourceToInput[higher->sourceid][z];
+                    higher->cardid = inputToCard[higher->inputid];
 
-                    if (!m_tvList->contains(first->cardid))
+                    if (!m_tvList->contains(higher->cardid))
                     {
-                        cerr << "Missing: " << first->cardid << " in tvList\n";
+                        cerr << "Missing: " << higher->cardid << " in tvList\n";
                         continue;
                     }
 
-                    if (((*m_tvList)[first->cardid])->WouldConflict(first))
+                    if (((*m_tvList)[higher->cardid])->WouldConflict(higher))
                     {
                         continue;
                     }
 
-                    if (((*m_tvList)[first->cardid])->isLowOnFreeSpace())
+                    if (((*m_tvList)[higher->cardid])->isLowOnFreeSpace())
                         continue;
 
-                    if (!Conflict(first, second))
+                    if (!Conflict(higher, second))
                     {
                         bool allclear = true;
                         list<ProgramInfo *>::iterator k = fixedList.begin();
@@ -1081,8 +1096,8 @@ void Scheduler::DoMultiCard(void)
                 }
                 if (!fixed)
                 {
-                    first->inputid = storeinput;
-                    first->cardid = inputToCard[first->inputid];
+                    higher->inputid = storeinput;
+                    higher->cardid = inputToCard[higher->inputid];
                 }
             }
         }
