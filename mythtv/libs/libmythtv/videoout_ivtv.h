@@ -62,6 +62,7 @@ class VideoOutputIvtv: public VideoOutput
 
     float fps;
     QString videoDevice;
+    unsigned driver_version;
 
     QMutex lock;
 

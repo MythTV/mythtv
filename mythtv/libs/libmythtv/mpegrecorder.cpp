@@ -17,7 +17,7 @@ extern "C" {
 #ifdef USING_IVTV_HEADER
 #include <linux/ivtv.h>
 #else
-#include "ivtv-ext-api.h"
+#include "ivtv_myth.h"
 #endif
 }
 

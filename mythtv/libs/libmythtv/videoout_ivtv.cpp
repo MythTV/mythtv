@@ -28,7 +28,7 @@ extern "C" {
 #ifdef USING_IVTV_HEADER
 #include <linux/ivtv.h>
 #else
-#include "ivtv-ext-api.h"
+#include "ivtv_myth.h"
 #endif
 }
 
@@ -45,6 +45,7 @@ VideoOutputIvtv::VideoOutputIvtv(void)
     pixels = NULL;
     lastcleared = false;
     videoDevice = "/dev/video16";
+    driver_version = 0;
     last_speed = 1.0;
     last_normal = true;
     last_mask = 2;
@@ -89,36 +90,39 @@ void VideoOutputIvtv::ClearOSD(void)
 {
     if (fbfd > 0) 
     {
-#ifdef IVTVFB_IOCTL_BLT_FILL
-        struct ivtvfb_ioctl_blt_fill_args args;
-        args.rasterop = 0xa;
-        args.alpha_mode = 0x1;
-        args.alpha_mask = 0x0;
-        args.width = XJ_width;
-        args.height = XJ_height;
-        args.x = args.y = 0;
-        args.destPixelMask = 0xffffffff;
-        args.colour = 0;
-        if (ioctl(fbfd, IVTVFB_IOCTL_BLT_FILL, &args) < 0) 
-            perror("IVTVFB_IOCTL_BLT_FILL");
-#else
-        struct ivtv_osd_coords osdcoords;
-        memset(&osdcoords, 0, sizeof(osdcoords));
+        if (driver_version >= 0x00000200)
+        {
+            struct ivtvfb_ioctl_blt_fill_args args;
+            args.rasterop = 0xa;
+            args.alpha_mode = 0x1;
+            args.alpha_mask = 0x0;
+            args.width = XJ_width;
+            args.height = XJ_height;
+            args.x = args.y = 0;
+            args.destPixelMask = 0xffffffff;
+            args.colour = 0;
+            if (ioctl(fbfd, IVTVFB_IOCTL_BLT_FILL, &args) < 0) 
+                perror("IVTVFB_IOCTL_BLT_FILL");
+        }
+        else
+        {
+            struct ivtv_osd_coords osdcoords;
+            memset(&osdcoords, 0, sizeof(osdcoords));
 
-        if (ioctl(fbfd, IVTVFB_IOCTL_GET_ACTIVE_BUFFER, &osdcoords) < 0)
-            perror("IVTVFB_IOCTL_GET_ACTIVE_BUFFER");
-        struct ivtvfb_ioctl_dma_host_to_ivtv_args prep;
-        memset(&prep, 0, sizeof(prep));
+            if (ioctl(fbfd, IVTVFB_IOCTL_GET_ACTIVE_BUFFER, &osdcoords) < 0)
+                perror("IVTVFB_IOCTL_GET_ACTIVE_BUFFER");
+            struct ivtvfb_ioctl_dma_host_to_ivtv_args prep;
+            memset(&prep, 0, sizeof(prep));
 
-        prep.source = osdbuf_aligned;
-        prep.dest_offset = 0;
-        prep.count = osdcoords.max_offset;
+            prep.source = osdbuf_aligned;
+            prep.dest_offset = 0;
+            prep.count = osdcoords.max_offset;
 
-        memset(osdbuf_aligned, 0x00, osdbufsize);
+            memset(osdbuf_aligned, 0x00, osdbufsize);
 
-        if (ioctl(fbfd, IVTVFB_IOCTL_PREP_FRAME, &prep) < 0)
-            perror("IVTVFB_IOCTL_PREP_FRAME");
-#endif
+            if (ioctl(fbfd, IVTVFB_IOCTL_PREP_FRAME, &prep) < 0)
+                perror("IVTVFB_IOCTL_PREP_FRAME");
+        }
         lastcleared = true;
     }
 }
@@ -257,6 +261,12 @@ void VideoOutputIvtv::Open(void)
         return;
     }
 
+    struct v4l2_capability vcap;
+    memset(&vcap, 0, sizeof(vcap));
+    if (ioctl(videofd, VIDIOC_QUERYCAP, &vcap) < 0)
+        perror("VIDIOC_QUERYCAP");
+    else
+        driver_version = vcap.version;
 }
 
 void VideoOutputIvtv::EmbedInWidget(WId wid, int x, int y, int w, int h)
