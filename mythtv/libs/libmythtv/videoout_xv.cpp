@@ -662,7 +662,7 @@ int XvVideoOutput::CheckEvents(void)
             } break;
             case ConfigureNotify: 
             {
-                ReConfigure(Event.xconfigure.x, Event.xconfigure.y,
+                ResizeVideo(Event.xconfigure.x, Event.xconfigure.y,
                             Event.xconfigure.width, Event.xconfigure.height);
                 return key;
             } break;
@@ -673,7 +673,7 @@ int XvVideoOutput::CheckEvents(void)
     return key;
 }
 
-void XvVideoOutput::ReConfigure(int x, int y, int w, int h)
+void XvVideoOutput::ResizeVideo(int x, int y, int w, int h)
 {
     if (XEventsQueued(data->XJ_disp, QueuedAlready))
         return;

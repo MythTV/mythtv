@@ -19,7 +19,7 @@ class XvVideoOutput
 
     void EmbedInWidget(unsigned long wid, int x, int y, int w, int h);
     void StopEmbedding(void);
-    void ReConfigure(int x, int y, int w, int h);
+    void ResizeVideo(int x, int y, int w, int h);
     void MoveResize(void);
 
   private:
