@@ -12,7 +12,9 @@ SOURCES += ../libs/libmythtv/NuppelVideoPlayer.cpp
 SOURCES += ../programs/mythfrontend/manualschedule.cpp
 SOURCES += ../programs/mythfrontend/rankprograms.cpp
 SOURCES += ../programs/mythfrontend/rankchannels.cpp
+SOURCES += ../libs/libmythtv/programinfo.cpp
+SOURCES += ../libs/libmythtv/proglist.cpp
 
 TRANSLATIONS  = mythfrontend_it.ts mythfrontend_es.ts mythfrontend_ca.ts
 TRANSLATIONS += mythfrontend_nl.ts mythfrontend_fr.ts mythfrontend_de.ts
-TRANSLATIONS += mythfrontend_dk.ts
+TRANSLATIONS += mythfrontend_dk.ts mythfrontend_sv.ts

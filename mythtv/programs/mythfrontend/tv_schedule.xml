@@ -10,12 +10,14 @@
       <text lang="FR">Grille Horaire</text>
       <text lang="DE">TV Planer</text>
       <text lang="DK">Program Guide</text>
+      <text lang="SV">Programguide</text>
       <alttext>Guide</alttext>
       <alttext lang="FR">Grille</alttext>
       <alttext lang="ES">Parilla</alttext>
       <alttext lang="CA">Guia</alttext>
       <alttext lang="DK">Guide</alttext>
       <alttext lang="NL">Gids</alttext>
+      <alttext lang="SV">Guide</alttext>
       <action>TV_SCHEDULE</action>
    </button>
 
@@ -29,12 +31,14 @@
       <text lang="FR">Recherche de programmes</text>
       <text lang="DE">Sendung suchen</text>
       <text lang="DK">Program Finder</text>
+      <text lang="SV">Sök program</text>
       <alttext>Finder</alttext>
       <alttext lang="FR">Recherche</alttext>
       <alttext lang="ES">Buscar</alttext>
       <alttext lang="CA">Cercar</alttext>
       <alttext lang="DK">Finder</alttext>
       <alttext lang="NL">Zoeker</alttext>
+      <alttext lang="SV">Sökaren</alttext>
       <action>TV_PROGFIND</action>
    </button>
 
@@ -48,12 +52,14 @@
       <text lang="FR">Enregistrement manuel</text>
       <text lang="DE">Sofortige Aufnahme</text>
       <text lang="DK">Optag lige nu</text>
+      <text lang="SV">Omedelbar inspelning</text>
       <alttext>Instant Record</alttext>
       <alttext lang="FR">Enreg. manuel</alttext>
       <alttext lang="ES">Grab. inst.</alttext>
       <alttext lang="CA">Grav. inst.</alttext>
       <alttext lang="DK">Optag nu</alttext>
       <alttext lang="NL">Instant</alttext>
+      <alttext lang="SV">Omedelbar</alttext>
       <action>TV_MANUAL</action>
    </button>
 
@@ -65,11 +71,13 @@
       <text lang="DE">Manuelle Planung</text>
       <text lang="DK">Manuel programmering</text>
       <text lang="NL">Manuele Opname</text>
+      <text lang="SV">Manuell schemaläggning</text>
       <alttext>Man. Sched.</alttext>
       <alttext lang="ES">Programar</alttext>
       <alttext lang="CA">Programar</alttext>
       <alttext lang="DK">Manuel prog.</alttext>
       <alttext lang="NL">Manueel</alttext>
+      <alttext lang="SV">Manuell</alttext>
       <action>TV_MANUALSCHEDULE</action>
    </button>
 
@@ -81,11 +89,13 @@
       <text lang="DE">Sendungen bewerten</text>
       <text lang="DK">Sæt program rangering</text>
       <text lang="NL">Programma's Rangeren</text>
+      <text lang="SV">Sätt upp programrankning</text>
       <alttext>Set Rankings</alttext>
       <alttext lang="ES">Por programas</alttext>
       <alttext lang="CA">Per programes</alttext>
       <alttext lang="DK">Sæt rangering</alttext>
       <alttext lang="NL">Rangeren</alttext>
+      <alttext lang="SV">Rankning</alttext>
       <action>TV_SET_RANKINGS</action>
    </button>
 
@@ -99,12 +109,14 @@
       <text lang="FR">Gestion des conflits</text>
       <text lang="DE">Konflikte beheben</text>
       <text lang="DK">Løs optagelseskonflikter</text>
+      <text lang="SV">Åtgärda schemakonflikter</text>
       <alttext>Fix Conflicts</alttext>
       <alttext lang="FR">Conflits</alttext>
       <alttext lang="ES">Conflictos</alttext>
       <alttext lang="FR">Conflictes</alttext>
       <alttext lang="DK">Løs konflikter</alttext>
       <alttext lang="NL">Conflicten</alttext>
+      <alttext lang="SV">Konflikter</alttext>
       <action>TV_FIX_CONFLICTS</action>
    </button>
 

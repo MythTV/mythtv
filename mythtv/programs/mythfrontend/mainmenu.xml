@@ -16,6 +16,7 @@
      <text lang="FR">Musique</text>
      <text lang="DE">Musik</text>
      <text lang="DK">Musik</text>
+     <text lang="SV">Musik</text>
      <action>PLUGIN mythmusic</action>
      <depends>mythmusic</depends>
    </button>
@@ -30,6 +31,7 @@
      <text lang="FR">Jeux</text>
      <text lang="DE">Spiele</text>
      <text lang="DK">Spil</text>
+     <text lang="SV">Spel</text>
      <action>PLUGIN mythgame</action>
      <depends>mythgame</depends>
    </button>
@@ -44,6 +46,7 @@
      <text lang="FR">Images</text>
      <text lang="DE">Photos</text>
      <text lang="DK">Billeder</text>
+     <text lang="SV">Bilder</text>
      <action>PLUGIN mythgallery</action>
      <depends>mythgallery</depends>
    </button>
@@ -58,6 +61,7 @@
      <text lang="FR">Vidéos</text>
      <text lang="DE">Videos</text>
      <text lang="DK">Film</text>
+     <text lang="SV">Filmer</text>
      <action>PLUGIN mythvideo</action>
      <depends>mythvideo</depends>
    </button>
@@ -72,6 +76,7 @@
      <text lang="FR">Météo</text>
      <text lang="DE">Wetter</text>
      <text lang="DK">Vejret</text>
+     <text lang="SV">Vädret</text>
      <action>PLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>
@@ -93,6 +98,7 @@
       <text lang="DE">Konfiguration</text>
       <text lang="DK">Konfiguration</text>
       <text lang="NL">Configuratie</text>
+      <text lang="SV">Inställningar</text>
       <action>MENU main_settings.xml</action>
    </button>
 

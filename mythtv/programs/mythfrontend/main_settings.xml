@@ -9,6 +9,7 @@
       <text lang="DE">Allgemeines</text>
       <text lang="DK">Generelt</text>
       <text lang="NL">Algemeen</text>
+      <text lang="SV">Generellt</text>
       <action>SETTINGS MAINGENERAL</action>
    </button>
 
@@ -22,6 +23,7 @@
       <text lang="DE">Aussehen</text>
       <text lang="DK">Udseende</text>
       <text lang="NL">Uiterlijk</text>
+      <text lang="SV">Utseende</text>
       <action>SETTINGS APPEARANCE</action>
    </button>
 
@@ -34,6 +36,7 @@
      <text lang="DE">TV Einstellungen</text>
      <text lang="DK">TV indstillinger</text>
      <text lang="NL">TV Instellingen</text>
+     <text lang="SV">TV-inställningar</text>
      <action>MENU tv_settings.xml</action>
    </button>
 
@@ -45,6 +48,7 @@
      <text lang="DE">Musik Einstellungen</text>
      <text lang="DK">Musik indstillinger</text>
      <text lang="NL">Muziek Instellingen</text>
+     <text lang="SV">Musikspelarens inställningar</text>
      <action>CONFIGPLUGIN mythmusic</action>
      <depends>mythmusic</depends>
    </button>
@@ -57,6 +61,7 @@
      <text lang="DE">Spiele Einstellungen</text>
      <text lang="DK">Spil indstillinger</text>
      <text lang="NL">Spelen Instellingen</text>
+     <text lang="SV">Spelinställningar</text>
      <action>CONFIGPLUGIN mythgame</action>
      <depends>mythgame</depends>
    </button>
@@ -69,6 +74,7 @@
       <text lang="DE">Bilder Einstellungen</text>
       <text lang="DK">Billed indstillinger</text>
       <text lang="NL">Beelden Instellingen</text>
+      <text lang="SV">Bildvisarens inställningar</text>
       <action>CONFIGPLUGIN mythgallery</action>
       <depends>mythgallery</depends>
    </button>
@@ -81,6 +87,7 @@
        <text lang="DE">Videos Einstellungen</text>
        <text lang="DK">Video indstillinger</text>
        <text lang="NL">Films Instellingen</text>
+       <text lang="SV">Filmvisarens inställningar</text>
        <action>CONFIGPLUGIN mythvideo</action>
        <depends>mythvideo</depends>
    </button>
@@ -93,6 +100,7 @@
      <text lang="DE">Wetter Einstellungen</text>
      <text lang="DK">Vejr indstililnger</text>
      <text lang="NL">"Het Weer" Instellingen</text>
+     <text lang="SV">Vädervisarens inställningar</text>
      <action>CONFIGPLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>
@@ -100,6 +108,7 @@
    <button>
      <type>DVD</type>
      <text>DVD Settings</text>
+     <text lang="SV">Inställningar för DVD</text>
      <action>CONFIGPLUGIN mythdvd</action>
      <depends>mythdvd</depends>
    </button>

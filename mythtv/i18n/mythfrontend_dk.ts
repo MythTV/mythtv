@@ -250,6 +250,37 @@
     </message>
 </context>
 <context>
+    <name>ProgLister</name>
+    <message>
+        <source>Recording just this showing</source>
+        <translation type="unfinished">Optager kun denne sending</translation>
+    </message>
+    <message>
+        <source>Recording every day when shown in this timeslot</source>
+        <translation type="unfinished">Optager hver dag når programmet vises på dette klokkeslet</translation>
+    </message>
+    <message>
+        <source>Recording every week when shown in this timeslot</source>
+        <translation type="unfinished">Optager hver uge når programmet vises på dette klokkeslet</translation>
+    </message>
+    <message>
+        <source>Recording when shown on this channel</source>
+        <translation type="unfinished">Optager når programmet vises på denne kanal</translation>
+    </message>
+    <message>
+        <source>Recording all showings</source>
+        <translation type="unfinished">Optager alle sendinger af programmet</translation>
+    </message>
+    <message>
+        <source>Not recording this showing</source>
+        <translation type="unfinished">Optager ikke denne sending</translation>
+    </message>
+    <message>
+        <source>Error!</source>
+        <translation type="unfinished">Fejl!</translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>Do you really want to exit MythTV?</source>
@@ -393,11 +424,11 @@
     </message>
     <message>
         <source>Auto-Skip %1 seconds</source>
-        <translation>Auto-hop %1 sekunder</translation>
+        <translation type="obsolete">Auto-hop %1 sekunder</translation>
     </message>
     <message>
         <source>SKIP</source>
-        <translation>Hop</translation>
+        <translation type="obsolete">Hop</translation>
     </message>
     <message>
         <source>Found %1 sec. commercial</source>
@@ -405,7 +436,7 @@
     </message>
     <message>
         <source>At Start of program.</source>
-        <translation>ved starten af udsendelsen.</translation>
+        <translation type="obsolete">ved starten af udsendelsen.</translation>
     </message>
     <message>
         <source>At End, can not Skip.</source>
@@ -434,6 +465,78 @@
     <message>
         <source>Record new episodes and delete oldest once maximum count is reached</source>
         <translation>Optag nye episoder og slet de ældste når maksimalt antal er nået</translation>
+    </message>
+    <message>
+        <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
+        <translation type="unfinished">%02d:%02d:%02d bagud  --  %.2f%% fuld</translation>
+    </message>
+    <message>
+        <source>%02d:%02d:%02d behind</source>
+        <translation type="unfinished">%02d:%02d:%02d bagud</translation>
+    </message>
+    <message>
+        <source>%02d:%02d behind  --  %.2f%% full</source>
+        <translation type="unfinished">%02d:%02d bagud  --  %.2f%% fuld</translation>
+    </message>
+    <message>
+        <source>%02d:%02d behind</source>
+        <translation type="unfinished">%02d:%02d bagud</translation>
+    </message>
+    <message>
+        <source>%02d:%02d:%02d of %02d:%02d:%02d</source>
+        <translation type="unfinished">%02d:%02d:%02d af %02d:%02d:%02d</translation>
+    </message>
+    <message>
+        <source>%02d:%02d of %02d:%02d</source>
+        <translation type="unfinished">%02d:%02d af %02d:%02d</translation>
+    </message>
+    <message>
+        <source>Skip %1 seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not Currently Suppressed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not Recording</source>
+        <translation type="unfinished">Optag ikke</translation>
+    </message>
+    <message>
+        <source>Recording Once</source>
+        <translation type="unfinished">Enkelt optagelse</translation>
+    </message>
+    <message>
+        <source>Timeslot Recording</source>
+        <translation type="unfinished">Klokkeslet optagelse</translation>
+    </message>
+    <message>
+        <source>Weekslot Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Recording</source>
+        <translation type="unfinished">Optag på denne kanal</translation>
+    </message>
+    <message>
+        <source>All Recording</source>
+        <translation type="unfinished">Optag altid</translation>
+    </message>
+    <message>
+        <source>Air Date:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record Schedule:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Episode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation type="unfinished">Beskrivelse:</translation>
     </message>
 </context>
 <context>
@@ -522,27 +625,27 @@
     </message>
     <message>
         <source>%02d:%02d:%02d behind  --  %.2f%% full</source>
-        <translation>%02d:%02d:%02d bagud  --  %.2f%% fuld</translation>
+        <translation type="obsolete">%02d:%02d:%02d bagud  --  %.2f%% fuld</translation>
     </message>
     <message>
         <source>%02d:%02d:%02d behind</source>
-        <translation>%02d:%02d:%02d bagud</translation>
+        <translation type="obsolete">%02d:%02d:%02d bagud</translation>
     </message>
     <message>
         <source>%02d:%02d behind  --  %.2f%% full</source>
-        <translation>%02d:%02d bagud  --  %.2f%% fuld</translation>
+        <translation type="obsolete">%02d:%02d bagud  --  %.2f%% fuld</translation>
     </message>
     <message>
         <source>%02d:%02d behind</source>
-        <translation>%02d:%02d bagud</translation>
+        <translation type="obsolete">%02d:%02d bagud</translation>
     </message>
     <message>
         <source>%02d:%02d:%02d of %02d:%02d:%02d</source>
-        <translation>%02d:%02d:%02d af %02d:%02d:%02d</translation>
+        <translation type="obsolete">%02d:%02d:%02d af %02d:%02d:%02d</translation>
     </message>
     <message>
         <source>%02d:%02d of %02d:%02d</source>
-        <translation>%02d:%02d af %02d:%02d</translation>
+        <translation type="obsolete">%02d:%02d af %02d:%02d</translation>
     </message>
     <message>
         <source>Paused</source>
@@ -578,7 +681,7 @@
     </message>
     <message>
         <source>SKIP</source>
-        <translation>Hop</translation>
+        <translation type="obsolete">Hop</translation>
     </message>
     <message>
         <source>Brightness %1 %</source>
@@ -623,6 +726,62 @@
     <message>
         <source>Transcoding</source>
         <translation>Genkoder</translation>
+    </message>
+    <message>
+        <source>Forward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip Ahead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rewind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed 5X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed 3X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed 2X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed 1/3X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed 1/8X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed 1/16X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>16:9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4:3</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
