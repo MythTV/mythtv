@@ -609,7 +609,7 @@
         <skipin>0,58</skipin>
         <interval>200</interval>
         <startinterval>1000</startinterval>
-        <imagecount>6</imagecount>
+        <imagecount>5</imagecount>
       </animatedimage>
 
       <image name="logo" draworder="7">
