@@ -1131,9 +1131,10 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "  updatetimestamp timestamp(14) NOT NULL,"
 "  PRIMARY KEY  (mplexid)"
 ") TYPE=MyISAM;",
-"DROP TABLE IF EXISTS dvb_channel;",
-"DROP TABLE IF EXISTS dvb_pids;",
-"DROP TABLE IF EXISTS dvb_sat;",
+// These should be included in an update after the 0.17 release.
+// "DROP TABLE IF EXISTS dvb_channel;",
+// "DROP TABLE IF EXISTS dvb_pids;",
+// "DROP TABLE IF EXISTS dvb_sat;",
 "CREATE TABLE dtv_privatetypes ("
 "  sitype varchar(4) NOT NULL, "
 "  networkid int(11) NOT NULL, "
