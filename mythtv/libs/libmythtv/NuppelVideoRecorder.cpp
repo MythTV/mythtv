@@ -1680,11 +1680,7 @@ void NuppelVideoRecorder::WriteHeader(void)
     fileheader.desiredheight = 0;
     fileheader.pimode = 'P';
     fileheader.aspect = video_aspect;
-    if (ntsc_framerate)
-        fileheader.fps = 29.97;
-    else
-        fileheader.fps = 25.0;
-    video_frame_rate = fileheader.fps;
+    fileheader.fps = video_frame_rate;
     fileheader.fps *= framerate_multiplier;
     fileheader.videoblocks = -1;
     fileheader.audioblocks = -1;

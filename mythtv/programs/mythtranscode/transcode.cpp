@@ -375,9 +375,8 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             VERBOSE(VB_IMPORTANT, "Transcoding aborted, need MPEG-2.");
             return REENCODE_MPEG2TRANS;
         }
+
         // Recorder setup
-        nvr->SetFrameRate(video_frame_rate);
-        nvr->SetTranscoding(true);
 
         // this is ripped from tv_rec SetupRecording. It'd be nice to merge
         nvr->SetOption("inpixfmt", FMT_YV12);
@@ -439,7 +438,10 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         }
 
         nvr->AudioInit(true);
+
+        nvr->SetFrameRate(video_frame_rate);
         nvr->SetVideoAspect(video_aspect);
+        nvr->SetTranscoding(true);
 
         outRingBuffer = new RingBuffer(outputname, true, false);
         nvr->SetRingBuffer(outRingBuffer);
