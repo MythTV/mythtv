@@ -360,9 +360,19 @@ void EditMetadataDialog::findCoverArt()
         *new_coverart_file = working_metadata->CoverFile();
     }
 
+    QString fileprefix = gContext->GetSetting("VideoArtworkDir");
+    // If the video artwork setting hasn't been set default to
+    // using ~/.mythtv/MythVideo
+    if( fileprefix.length() == 0 )
+    {
+        char *home = getenv("HOME");
+        fileprefix = QString(home) + "/.mythtv/MythVideo";
+    }
+
+
     MythImageFileDialog *nca = 
         new MythImageFileDialog(new_coverart_file,
-                                gContext->GetSetting("VideoStartupDir"),
+                                fileprefix,
                                 gContext->GetMainWindow(),
                                 "file_chooser",
                                 "video-",

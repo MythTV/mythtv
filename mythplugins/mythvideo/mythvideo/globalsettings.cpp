@@ -137,6 +137,20 @@ public:
     };
 };
 
+
+class VideoArtworkDirectory: public LineEditSetting, public GlobalSetting {
+public:
+    VideoArtworkDirectory():
+        GlobalSetting("VideoArtworkDir") {
+        setLabel(QObject::tr("Directory that holds movie posters"));
+        char *home = getenv("HOME");
+        setValue(QString(home) + "/.mythtv/MythVideo");
+        setHelpText(QObject::tr("This directory must exist, and the user "
+                    "running MythVideo needs to have read/write permission "
+                    "to the directory."));
+    };
+};
+
 //Player Settings
 
 class VideoDefaultPlayer: public LineEditSetting, public GlobalSetting {
@@ -157,6 +171,7 @@ VideoGeneralSettings::VideoGeneralSettings()
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
     general->setLabel(QObject::tr("General Settings"));
     general->addChild(new VideoStartupDirectory());
+    general->addChild(new VideoArtworkDirectory());
     general->addChild(new VideoDefaultParentalLevel());
     general->addChild(new VideoAdminPassword());
     general->addChild(new VideoAggressivePC());

@@ -282,14 +282,23 @@ QString VideoManager::GetMoviePoster(QString movieNum)
        return "";
     }
 
-    char *home = getenv("HOME");
-    QString fileprefix = QString(home) + "/.mythtv";
+    
+    QString fileprefix = gContext->GetSetting("VideoArtworkDir");
+    QDir dir;
 
-    QDir dir(fileprefix);
-    if (!dir.exists())
-        dir.mkdir(fileprefix);
+    // If the video artwork setting hasn't been set default to
+    // using ~/.mythtv/MythVideo
+    if( fileprefix.length() == 0 )
+    {
+        char *home = getenv("HOME");
+        fileprefix = QString(home) + "/.mythtv";
 
-    fileprefix += "/MythVideo";
+        dir = QDir(fileprefix);
+        if (!dir.exists())
+            dir.mkdir(fileprefix);
+
+        fileprefix += "/MythVideo";
+    }
 
     dir = QDir(fileprefix);
     if (!dir.exists())

@@ -18,6 +18,8 @@ using namespace std;
 #include <mythtv/mythcontext.h>
 #include <mythtv/util.h>
 
+
+
 VideoBrowser::VideoBrowser(QSqlDatabase *ldb,
                            MythMainWindow *parent, const char *name)
             : MythDialog(parent, name)
@@ -662,13 +664,12 @@ void VideoBrowser::selected(Metadata *someItem)
     QString ext = someItem->Filename().section('.',-1);
 
     QString handler = gContext->GetSetting("VideoDefaultPlayer");
-
+    QString special_handler = someItem->PlayCommand();
+    
     //
     //  Does this specific metadata have its own
     //  unique player command?
     //
-    
-    QString special_handler = someItem->PlayCommand();
     if(special_handler.length() > 1)
     {
         handler = special_handler;
@@ -703,6 +704,11 @@ void VideoBrowser::selected(Metadata *someItem)
             }
         }
     }
+    
+
+    // See if this is being handled by a plugin..
+    if(gContext->GetMainWindow()->HandleMedia(handler, filename))
+	return;
 
     // See if this is being handled by a plugin..
     if (gContext->GetMainWindow()->HandleMedia(handler, filename))
