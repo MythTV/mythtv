@@ -1,6 +1,7 @@
 #include "recorderbase.h"
 
 #include "RingBuffer.h"
+#include "programinfo.h"
 
 RecorderBase::RecorderBase(void)
 {
@@ -15,18 +16,36 @@ RecorderBase::RecorderBase(void)
     ntsc = 1;
     video_frame_rate = 29.97;
     vbimode = 0;
+
+    curRecording = NULL;
 }
 
 RecorderBase::~RecorderBase(void)
 {
     if (weMadeBuffer)
         delete ringBuffer;
+    if (curRecording)
+        delete curRecording;
 }
 
 void RecorderBase::SetRingBuffer(RingBuffer *rbuf)
 {
     ringBuffer = rbuf;
     weMadeBuffer = false;
+}
+
+void RecorderBase::SetRecording(ProgramInfo *pginfo)
+{
+    if (pginfo)
+    {
+        curRecording = new ProgramInfo(*pginfo);
+    }
+}
+
+void RecorderBase::SetDB(QSqlDatabase *db, pthread_mutex_t *lock)
+{
+    db_conn = db;
+    db_lock = lock;
 }
 
 void RecorderBase::SetBaseOption(const QString &name, const QString &value)

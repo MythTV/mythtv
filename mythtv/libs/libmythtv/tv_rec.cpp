@@ -435,6 +435,8 @@ void TVRec::HandleStateChange(void)
         pthread_mutex_unlock(&db_lock);
 
         SetupRecorder(profile);
+        nvr->SetRecording(curRecording);
+        nvr->SetDB(db_conn, &db_lock);
 
         pthread_create(&encode, NULL, SpawnEncode, nvr);
 

@@ -3,8 +3,12 @@
 
 #include <qstring.h>
 #include <qmap.h>
+#include <qsqldatabase.h>
+
+#include <pthread.h>
 
 class RingBuffer;
+class ProgramInfo;
 
 class RecorderBase
 {
@@ -13,6 +17,8 @@ class RecorderBase
     virtual ~RecorderBase();
 
     void SetRingBuffer(RingBuffer *rbuf);
+    void SetRecording(ProgramInfo *pginfo);
+    void SetDB(QSqlDatabase *db, pthread_mutex_t *lock);
 
     float GetFrameRate(void) { return video_frame_rate; }
     void SetFrameRate(float rate) { video_frame_rate = rate; }
@@ -56,6 +62,11 @@ class RecorderBase
     char vbimode;
     int ntsc;
     double video_frame_rate;
+
+    ProgramInfo *curRecording;
+
+    QSqlDatabase *db_conn;
+    pthread_mutex_t *db_lock;
 };
 
 #endif

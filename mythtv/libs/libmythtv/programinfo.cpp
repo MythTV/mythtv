@@ -761,8 +761,8 @@ void ProgramInfo::SetBlankFrameList(QMap<long long, int> &frames,
 
     QString querystr = QString("DELETE FROM recordedmarkup "
                                "WHERE chanid = '%1' AND starttime = '%2' "
-                               "AND type = %3;"
-                               ).arg(chanid).arg(starts).arg(MARK_BLANK_FRAME);
+                               "AND type = %3;")
+                               .arg(chanid).arg(starts).arg(MARK_BLANK_FRAME);
     QSqlQuery query = db->exec(querystr);
     if (!query.isActive())
         MythContext::DBError("blank frame list clear", querystr);
@@ -775,8 +775,8 @@ void ProgramInfo::SetBlankFrameList(QMap<long long, int> &frames,
         QString frame_str = tempc;
 
         querystr = QString("INSERT recordedmarkup (chanid, starttime, "
-                           "mark, type) values ( '%1', '%2', %3, "
-                           "%4);").arg(chanid).arg(starts)
+                           "mark, type) values ( '%1', '%2', %3, %4);")
+                           .arg(chanid).arg(starts)
                            .arg(frame_str).arg(MARK_BLANK_FRAME);
         QSqlQuery subquery = db->exec(querystr);
         if (!subquery.isActive())
@@ -820,8 +820,8 @@ void ProgramInfo::SetCommBreakList(QMap<long long, int> &frames,
 
     // check to make sure the show still exists before saving markups
     querystr = QString("SELECT starttime FROM recorded "
-                               "WHERE chanid = '%1' AND starttime = '%2'"
-                               ).arg(chanid).arg(starts);
+                       "WHERE chanid = '%1' AND starttime = '%2'")
+                       .arg(chanid).arg(starts);
 
     QSqlQuery check_query = db->exec(querystr);
     if (!check_query.isActive())
@@ -834,10 +834,10 @@ void ProgramInfo::SetCommBreakList(QMap<long long, int> &frames,
             return;
 
     querystr = QString("DELETE FROM recordedmarkup "
-                               "WHERE chanid = '%1' AND starttime = '%2' "
-                               "AND (type = %3 OR type = %4);"
-                               ).arg(chanid).arg(starts)
-                               .arg(MARK_COMM_START).arg(MARK_COMM_END);
+                       "WHERE chanid = '%1' AND starttime = '%2' "
+                       "AND (type = %3 OR type = %4);")
+                       .arg(chanid).arg(starts)
+                       .arg(MARK_COMM_START).arg(MARK_COMM_END);
     QSqlQuery query = db->exec(querystr);
     if (!query.isActive())
         MythContext::DBError("blank frame list clear", querystr);
@@ -853,9 +853,9 @@ void ProgramInfo::SetCommBreakList(QMap<long long, int> &frames,
         frame_str += tempc;
         
         querystr = QString("INSERT recordedmarkup (chanid, starttime, "
-                               "mark, type) values ( '%1', '%2', %3, "
-                               "%4);").arg(chanid).arg(starts)
-                               .arg(frame_str).arg(mark_type);
+                           "mark, type) values ( '%1', '%2', %3, %4);")
+                           .arg(chanid).arg(starts)
+                           .arg(frame_str).arg(mark_type);
         QSqlQuery query = db->exec(querystr);
         if (!query.isActive())
             MythContext::DBError("commercial break list insert", querystr);
@@ -884,6 +884,80 @@ void ProgramInfo::GetCommBreakList(QMap<long long, int> &frames,
     {
         while(query.next())
             frames[query.value(0).toInt()] = query.value(1).toInt();
+    }
+}
+
+void ProgramInfo::GetPositionMap(QMap<long long, long long> &posMap,
+                                 QSqlDatabase *db)
+{
+    posMap.clear();
+
+    MythContext::KickDatabase(db);
+
+    QString starts = startts.toString("yyyyMMddhhmm");
+    starts += "00";
+
+    QString querystr = QString("SELECT mark, offset FROM recordedmarkup "
+                               "WHERE chanid = '%1' AND starttime = '%2' "
+                               "AND type = %3;")
+                               .arg(chanid).arg(starts).arg(MARK_GOP_START);
+
+    QSqlQuery query = db->exec(querystr);
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        while (query.next())
+        {
+            QString val = query.value(1).toString();
+            if (val != QString::null)
+            {
+                long long offset = 0;
+                sscanf(val.ascii(), "%lld", &offset);
+
+                posMap[query.value(0).toInt()] = offset;
+            }
+        }
+    }
+}
+
+void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap,
+                                 QSqlDatabase *db)
+{
+    QMap<long long, long long>::Iterator i;
+
+    QString starts = startts.toString("yyyyMMddhhmm");
+    starts += "00";
+
+    QString querystr = QString("DELETE FROM recordedmarkup "
+                               "WHERE chanid = '%1' AND starttime = '%2' "
+                               "AND type = %3;")
+                               .arg(chanid).arg(starts).arg(MARK_GOP_START);
+    QSqlQuery query = db->exec(querystr);
+    if (!query.isActive())
+        MythContext::DBError("position map clear", querystr);
+
+    for (i = posMap.begin(); i != posMap.end(); ++i)
+    {
+        long long frame = i.key();
+        char tempc[128];
+        sprintf(tempc, "%lld", frame);
+
+        QString frame_str = tempc;
+
+        long long offset = i.data();
+        sprintf(tempc, "%lld", offset);
+       
+        QString offset_str = tempc;
+
+        querystr = QString("INSERT recordedmarkup (chanid, starttime, "
+                           "mark, type, offset) values "
+                           "( '%1', '%2', %3, %4, \"%5\");")
+                           .arg(chanid).arg(starts)
+                           .arg(frame_str).arg(MARK_GOP_START)
+                           .arg(offset_str);
+
+        QSqlQuery subquery = db->exec(querystr);
+        if (!subquery.isActive())
+            MythContext::DBError("position map insert", querystr);
     }
 }
 

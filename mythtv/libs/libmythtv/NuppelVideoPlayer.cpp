@@ -489,7 +489,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     if (NuppelDecoder::CanHandle(testbuf))
         decoder = new NuppelDecoder(this);
     else if (AvFormatDecoder::CanHandle(testbuf, ringBuffer->GetFilename()))
-        decoder = new AvFormatDecoder(this);
+        decoder = new AvFormatDecoder(this, m_db, m_playbackinfo);
 
     if (!decoder)
     {

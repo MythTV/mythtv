@@ -53,18 +53,28 @@ class ProgramInfo
     long long GetBookmark(QSqlDatabase *db);
     bool IsEditing(QSqlDatabase *db);
     void SetEditing(bool edit, QSqlDatabase *db);
+
     void GetCutList(QMap<long long, int> &delMap, QSqlDatabase *db);
     void SetCutList(QMap<long long, int> &delMap, QSqlDatabase *db);
+
     void SetBlankFrameList(QMap<long long, int> &frames, QSqlDatabase *db);
     void GetBlankFrameList(QMap<long long, int> &frames, QSqlDatabase *db);
+
     void SetCommBreakList(QMap<long long, int> &frames, QSqlDatabase *db);
     void GetCommBreakList(QMap<long long, int> &frames, QSqlDatabase *db);
 
-    static void GetProgramRangeDateTime(QPtrList<ProgramInfo> *proglist, QString channel, 
-                                        const QString &ltime, const QString &rtime);
-    static ProgramInfo *GetProgramAtDateTime(QString channel, const QString &time);
+    void GetPositionMap(QMap<long long, long long> &posMap, QSqlDatabase *db);
+    void SetPositionMap(QMap<long long, long long> &posMap, QSqlDatabase *db);
+
+    static void GetProgramRangeDateTime(QPtrList<ProgramInfo> *proglist, 
+                                        QString channel, 
+                                        const QString &ltime, 
+                                        const QString &rtime);
+    static ProgramInfo *GetProgramAtDateTime(QString channel, 
+                                             const QString &time);
     static ProgramInfo *GetProgramAtDateTime(QString channel, QDateTime &dtime);
-    static ProgramInfo *GetProgramFromRecorded(QString channel, QString starttime);
+    static ProgramInfo *GetProgramFromRecorded(QString channel, 
+                                               QString starttime);
 
     QString title;
     QString subtitle;

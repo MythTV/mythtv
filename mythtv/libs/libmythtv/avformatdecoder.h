@@ -3,6 +3,7 @@
 
 #include <qstring.h>
 #include <qmap.h>
+#include <qsqldatabase.h>
 
 #include "decoderbase.h"
 
@@ -11,10 +12,13 @@ extern "C" {
 #include "../libavformat/avformat.h"
 }
 
+class ProgramInfo;
+
 class AvFormatDecoder : public DecoderBase
 {
   public:
-    AvFormatDecoder(NuppelVideoPlayer *parent);
+    AvFormatDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
+                    ProgramInfo *pginfo);
    ~AvFormatDecoder();
 
     void Reset(void);
@@ -90,6 +94,9 @@ class AvFormatDecoder : public DecoderBase
     bool ateof;
 
     bool gopset;
+
+    QSqlDatabase *m_db;
+    ProgramInfo *m_playbackinfo;
 };
 
 #endif

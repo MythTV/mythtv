@@ -34,6 +34,8 @@ extern "C" {
 #include "RingBuffer.h"
 #include "RTjpegN.h"
 
+#include "programinfo.h"
+
 pthread_mutex_t avcodeclock = PTHREAD_MUTEX_INITIALIZER;
 
 NuppelVideoRecorder::NuppelVideoRecorder(void)

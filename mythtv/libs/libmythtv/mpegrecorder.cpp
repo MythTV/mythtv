@@ -16,12 +16,15 @@ using namespace std;
 #include "mpegrecorder.h"
 #include "RingBuffer.h"
 
+#include "mythcontext.h"
+
 extern "C" {
 #include "../libavcodec/avcodec.h"
 #include "../libavformat/avformat.h"
-
 extern AVInputFormat mpegps_demux;
 }
+
+#include "programinfo.h"
 
 MpegRecorder::MpegRecorder()
 {
@@ -140,9 +143,6 @@ void MpegRecorder::StartRecording(void)
     encoding = true;
     recording = true;
 
-    struct timeval stm, now;
-    gettimeofday(&stm, NULL);
-
     AVInputFormat *fmt = &mpegps_demux;
     fmt->flags |= AVFMT_NOFILE;
 
@@ -193,8 +193,6 @@ void MpegRecorder::StartRecording(void)
             }
             mainpaused = true;
             usleep(50);
-            if (cleartimeonpause)
-                gettimeofday(&stm, NULL);
             continue;
         }
 
@@ -211,8 +209,14 @@ void MpegRecorder::StartRecording(void)
         }
         else if (ret > 0)
             ProcessData(buffer, ret);
-  
-        gettimeofday(&now, NULL);
+    }
+
+    if (curRecording)
+    {
+        pthread_mutex_lock(db_lock);
+        MythContext::KickDatabase(db_conn);
+        curRecording->SetPositionMap(positionMap, db_conn);
+        pthread_mutex_unlock(db_lock);
     }
 
     recording = false;
@@ -363,6 +367,17 @@ void MpegRecorder::TransitionToFile(const QString &lfilename)
 
 void MpegRecorder::TransitionToRing(void)
 {
+    if (curRecording)
+    {
+        pthread_mutex_lock(db_lock);
+        MythContext::KickDatabase(db_conn);
+        curRecording->SetPositionMap(positionMap, db_conn);
+        pthread_mutex_unlock(db_lock);
+
+        delete curRecording;
+        curRecording = NULL;
+    }
+
     ringBuffer->TransitionToRing();
 }
 

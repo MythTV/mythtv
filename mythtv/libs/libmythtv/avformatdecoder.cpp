@@ -7,12 +7,17 @@ using namespace std;
 #include "RingBuffer.h"
 #include "NuppelVideoPlayer.h"
 #include "remoteencoder.h"
+#include "programinfo.h"
 
 extern pthread_mutex_t avcodeclock;
 
-AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent)
+AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
+                                 ProgramInfo *pginfo)
                : DecoderBase(parent)
 {
+    m_db = db;
+    m_playbackinfo = pginfo;
+
     ic = NULL;
     directrendering = false;
     pkt = NULL;
@@ -310,6 +315,18 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     ringBuffer->CalcReadAheadThresh(bitrate);
 
+    if (m_playbackinfo)
+    {
+        m_playbackinfo->GetPositionMap(positionMap, m_db);
+        if (positionMap.size() > 1)
+        {
+            haspositionmap = true;
+            long long totframes = positionMap.size() * keyframedist;
+            int length = (int)((totframes * 1.0) / fps);
+            m_parent->SetFileLength(length, totframes);            
+        }
+    }
+
     if (!haspositionmap)
     {
         // the pvr-250 seems to overreport the bitrate by * 2
@@ -320,8 +337,10 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     }
 
     dump_format(ic, 0, filename, 0);
+    if (haspositionmap)
+        cout << "Position map found\n";
 
-    return 0;
+    return haspositionmap;
 }
 
 int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
@@ -630,7 +649,7 @@ bool AvFormatDecoder::DoRewind(long long desiredFrame)
 
     ringBuffer->Seek(diff, SEEK_CUR);
 
-    framesPlayed = lastKey - 1;
+    framesPlayed = lastKey;
     framesRead = lastKey;
 
     normalframes = desiredFrame - framesPlayed;
@@ -697,8 +716,11 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame)
 
         ringBuffer->Seek(diff, SEEK_CUR);
         needflush = true;
+
+        framesPlayed = lastKey;
+        framesRead = lastKey;
     }
-    else
+    else if (desiredKey != lastKey)
     {
         AVCodecContext *videoenc = NULL;
 
@@ -741,12 +763,11 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame)
             long long diff = keyPos - ringBuffer->GetTotalReadPosition();
 
             ringBuffer->Seek(diff, SEEK_CUR);
-            framesPlayed = lastKey - 1;
         }
-    }
 
-    framesPlayed = lastKey - 1;
-    framesRead = lastKey;
+        framesPlayed = lastKey;
+        framesRead = lastKey;
+    }
 
     normalframes = desiredFrame - framesPlayed;
 

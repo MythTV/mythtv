@@ -167,6 +167,7 @@ CREATE TABLE IF NOT EXISTS recordedmarkup
     chanid INT UNSIGNED NOT NULL,
     starttime TIMESTAMP NOT NULL,
     mark BIGINT(20) NOT NULL,
+    offset VARCHAR(32) NULL,
     type INT NOT NULL,
     primary key (chanid,starttime, mark, type )
 );

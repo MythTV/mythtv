@@ -1,5 +1,7 @@
 USE mythconverg;
 
+ALTER TABLE recordedmarkup ADD COLUMN offset VARCHAR(32) NULL;
+
 INSERT INTO recordingprofiles (name) VALUES ('Transcode');
 
 CREATE TABLE IF NOT EXISTS transcoding (
