@@ -365,6 +365,7 @@ void DVDTitle::determineInputID(QSqlDatabase *db)
     else
     {
         cerr << "dvdprobe.o: You have a title on your dvd in format myth doesn't understand." << endl;
+        cerr << "dvdprobe.o: Either that, or you haven't installed the dvdinput table." << endl;
         cerr << "dvdprobe.o: You probably want to report this to a mailing list or something: " << endl;
         cerr << "                  height = " << hsize << endl;
         cerr << "                   width = " << vsize << endl;
