@@ -171,6 +171,7 @@ class NuppelVideoPlayer
     int vbuffer_numfree(void); // number of free slots in the video buffer
     int tbuffer_numvalid(void); // number of valid slots in the text buffer
     int tbuffer_numfree(void); // number of free slots in the text buffer
+    inline int getSpaceOnSoundcard(void);
 
     void ResetNexttrigger(struct timeval *tv);
 
@@ -374,6 +375,8 @@ class NuppelVideoPlayer
     ProgramInfo *m_playbackinfo;
 
     long long bookmarkseek;
+
+    int numbadioctls;
 };
 
 #endif

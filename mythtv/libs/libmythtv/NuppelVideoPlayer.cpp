@@ -170,6 +170,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
 
     cc = false;
 
+    numbadioctls = 0;
+
     pthread_mutex_init(&eventLock, NULL);
 }
 
@@ -1697,12 +1699,36 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     }
 }
 
+inline int NuppelVideoPlayer::getSpaceOnSoundcard(void)
+{
+    audio_buf_info info;
+    int space = 0;
+
+    ioctl(audiofd, SNDCTL_DSP_GETOSPACE, &info);
+    space = info.bytes - audio_buffer_unused;
+
+    if (space < 0)
+    {
+        numbadioctls++;
+        if (numbadioctls > 2 || space < -5000)
+        {
+            cerr << "Your soundcard is not reporting free space correctly.\n"
+                 << "Falling back to old method...\n";
+            audio_buffer_unused = 0;
+            space = info.bytes;
+        }
+    }
+    else
+        numbadioctls = 0;
+
+    return space;
+}
+
 void NuppelVideoPlayer::OutputAudioLoop(void)
 {
     int bytesperframe;
     int space_on_soundcard;
     unsigned char zeros[1024];
-    audio_buf_info info;   
  
     bzero(zeros, 1024);
 
@@ -1717,9 +1743,7 @@ void NuppelVideoPlayer::OutputAudioLoop(void)
             //usleep(50);
             audiotime = 0; // mark 'audiotime' as invalid.
 
-            ioctl(audiofd, SNDCTL_DSP_GETOSPACE, &info);
-            space_on_soundcard = info.bytes - audio_buffer_unused;
-
+            space_on_soundcard = getSpaceOnSoundcard();
             if (1024 < space_on_soundcard)
             {
                 WriteAudio(zeros, 1024);
@@ -1737,9 +1761,7 @@ void NuppelVideoPlayer::OutputAudioLoop(void)
         {
 	    audiotime = 0; // mark 'audiotime' as invalid
 
-            ioctl(audiofd, SNDCTL_DSP_GETOSPACE, &info);
-            space_on_soundcard = info.bytes - audio_buffer_unused;
-
+            space_on_soundcard = getSpaceOnSoundcard();
             if (1024 < space_on_soundcard)
             {
                 WriteAudio(zeros, 1024);
@@ -1773,10 +1795,7 @@ void NuppelVideoPlayer::OutputAudioLoop(void)
         // wait for there to be free space on the sound card so we can write
         // without blocking.  We don't want to block while holding audio_buflock
 	
-        audio_buf_info info;
-        ioctl(audiofd, SNDCTL_DSP_GETOSPACE, &info);
-        space_on_soundcard = info.bytes - audio_buffer_unused;
-
+        space_on_soundcard = getSpaceOnSoundcard();
         if (bytesperframe > space_on_soundcard)
         {
             //printf("waiting for space to write %d bytes on soundcard whish has %d bytes free\n", bytesperframe, space_on_soundcard);

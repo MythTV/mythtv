@@ -370,14 +370,25 @@ void fixProgramList(QValueList<ProgInfo> *fixlist)
     {
         cur = i;
         i++;
-        if (i == fixlist->end())
-            break;
         // fill in miss stop times
         if ((*cur).endts == "")
         {
-            (*cur).endts = (*i).startts;
-            (*cur).end = (*i).start;
+            if (i != fixlist->end())
+            {
+                (*cur).endts = (*i).startts;
+                (*cur).end = (*i).start;
+            }
+            else
+            {
+                // set the end time to tomorrow, midnight.
+                (*cur).end.setTime(0, 0);
+                (*cur).end.setDate((*cur).end.date().addDays(1));
+
+                (*cur).endts = (*cur).end.toString("yyyyMMddhhmmss").ascii();
+            }
         }
+        if (i == fixlist->end())
+            break;
         // remove overlapping programs
         if (conflict(*cur, *i))
         {
