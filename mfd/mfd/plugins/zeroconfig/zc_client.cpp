@@ -103,7 +103,7 @@ void MFDService::setResolved(uint ip1, uint ip2, uint ip3, uint ip4, uint port_h
     QString service_hostname = "";
     if(!host_information)
     {
-        warning(QString("could not call gethostbyaddr() using ip address %1 (will assume local)")
+        warning(QString("could not call gethostbyaddr() using ip address %1 (will assume lan/net)")
                 .arg(ip_address_string));
     }
     else
@@ -119,7 +119,7 @@ void MFDService::setResolved(uint ip1, uint ip2, uint ip3, uint ip4, uint port_h
     //  we'll want to add net (on the network, beyond the local lan).
     //
 
-    if(service_hostname == local_hostname || service_hostname.length() == 0)
+    if(service_hostname == local_hostname)
     {
         service_location = SLOCATION_HOST;
     }
