@@ -2689,11 +2689,11 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Do NOT use DVB driver for filtering.</source>
-        <translation>Använd INTE DVB-drivrutinen för filtrering.</translation>
+        <translation type="obsolete">Använd INTE DVB-drivrutinen för filtrering.</translation>
     </message>
     <message>
         <source>(BROKEN) This option is used to get around filtering limitations on some DVB cards.</source>
-        <translation>(UR FUNKTION) Denna inställning används för att komma runt filterbegränsningar på en del DVB-kort.</translation>
+        <translation type="obsolete">(UR FUNKTION) Denna inställning används för att komma runt filterbegränsningar på en del DVB-kort.</translation>
     </message>
     <message>
         <source>Normally the dvb-recording will drop packets from the card untill a sequence start header is seen. This option turns off this feature.</source>
@@ -2993,11 +2993,11 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Length of time to retain DVB signal data (in days)</source>
-        <translation>Antal dagar att behålla data om DVB-signal</translation>
+        <translation type="obsolete">Antal dagar att behålla data om DVB-signal</translation>
     </message>
     <message>
         <source>DVB Global Settings</source>
-        <translation>Globala DVB-inställningar</translation>
+        <translation type="obsolete">Globala DVB-inställningar</translation>
     </message>
     <message>
         <source>Pre Shutdown check-command</source>
@@ -4151,11 +4151,11 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Sample interval for DVB signal statistics (in seconds)</source>
-        <translation>Samplingsintervall för DVB signalstatistik (i sekunder)</translation>
+        <translation type="obsolete">Samplingsintervall för DVB signalstatistik (i sekunder)</translation>
     </message>
     <message>
         <source>MythTV will monitor the DVB signal statistics using the specified interval.  Set to &quot;0&quot; to disable.</source>
-        <translation>MythTV kommer att bevaka DVB signalstatistiken med specificerat intervall. Sätt till &quot;0&quot; för att avaktivera.</translation>
+        <translation type="obsolete">MythTV kommer att bevaka DVB signalstatistiken med specificerat intervall. Sätt till &quot;0&quot; för att avaktivera.</translation>
     </message>
     <message>
         <source>Log MythTV events to database</source>
@@ -4480,20 +4480,20 @@ som du startade detta programmet ifrån.</translation>
     <message>
         <source>Details of DVB error statistics for last 48 hours:
 </source>
-        <translation>Detaljer för DVB-felstatistik de senaste 48 timmarna:
+        <translation type="obsolete">Detaljer för DVB-felstatistik de senaste 48 timmarna:
 </translation>
     </message>
     <message>
         <source>Recording period from %1 to %2</source>
-        <translation>Inspelningsperiod från %1 till %2</translation>
+        <translation type="obsolete">Inspelningsperiod från %1 till %2</translation>
     </message>
     <message>
         <source>Encoder %1 Min SNR: %2 Avg SNR: %3 Min BER %4 Avg BER %5 Cont Errs: %6 Overflows: %7</source>
-        <translation>Kort %1 Min SNR: %2 Med SNR: %3 Min BER %4 Med BER %5 Antal fel: %6 Överfyllningar: %7</translation>
+        <translation type="obsolete">Kort %1 Min SNR: %2 Med SNR: %3 Min BER %4 Med BER %5 Antal fel: %6 Överfyllningar: %7</translation>
     </message>
     <message>
         <source>There is no DVB signal quality data available to display.</source>
-        <translation>Det finns ingen tillgänglig DVB-signalkvalitetsdata att visa.</translation>
+        <translation type="obsolete">Det finns ingen tillgänglig DVB-signalkvalitetsdata att visa.</translation>
     </message>
     <message>
         <source>No items found at priority level %1 or lower.</source>
@@ -5709,6 +5709,82 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>Normally PVR-350 audio is looped into a soundcard, here you can indicate when that is not the case. MythTV cannot control TV volume when this option is checked.</source>
         <translation>Normalt loopas ljudet från PVR-350 genom ljudkortet, ändra här om så inte är fallet. MythTV kan inte kontrollera TV-volymen med detta alternativ aktiverat.</translation>
+    </message>
+    <message>
+        <source>Building Detection Buffer</source>
+        <translation>Bygger detekteringsbuffert</translation>
+    </message>
+    <message>
+        <source>%1 Frames Completed @ %2 fps.</source>
+        <translation>%1 bildrutor färdiga med %2 fps.</translation>
+    </message>
+    <message>
+        <source>Terrestrial</source>
+        <translation>Marksänt</translation>
+    </message>
+    <message>
+        <source>Cable</source>
+        <translation>Kabel</translation>
+    </message>
+    <message>
+        <source>ATSC Transport</source>
+        <translation>ATSC-transport</translation>
+    </message>
+    <message>
+        <source>ATSC transport, cable or terrestrial</source>
+        <translation>ATSC-transport, kabel eller marksänt</translation>
+    </message>
+    <message>
+        <source>Use hardware MPEG decoder</source>
+        <translation>Använd MPEG-hårdvaruavkodare</translation>
+    </message>
+    <message>
+        <source>If your DVB card has a built in MPEG decoder you can activate it here. (Only for full featured cards &amp; certain USB devices).</source>
+        <translation>Använd ditt DVB-korts inbyggda MPEG-avkodare. (Endast för fullutrustade kort &amp; vissa USB-enheter).</translation>
+    </message>
+    <message>
+        <source>Hide Mouse Cursor in Myth</source>
+        <translation>Göm muspekare i MythTV</translation>
+    </message>
+    <message>
+        <source>Toggles mouse cursor visibility. Most of the Myth GUI does not respond to mouse clicks, this is only to avoid &quot;losing&quot; your mouse cursor.</source>
+        <translation>Merparten av gränssnittet i MythTV reagerar inte på musklick, detta är endast för att undvika att bli av med muspekaren.</translation>
+    </message>
+    <message>
+        <source>Job Queue Start Time</source>
+        <translation>Jobbkö starttid</translation>
+    </message>
+    <message>
+        <source>This setting controls the start of the Job Queue time window which determines when new jobs will be started.</source>
+        <translation>Definiera början på den tidsperiod då nya jobb tillåts att starta.</translation>
+    </message>
+    <message>
+        <source>Job Queue End Time</source>
+        <translation>Jobbkö sluttid</translation>
+    </message>
+    <message>
+        <source>This setting controls the end of the Job Queue time window which determines when new jobs will be started.</source>
+        <translation>Definiera slutet på den tidsperiod då nya jobb tillåts att starta.</translation>
+    </message>
+    <message>
+        <source>Run Transcode Jobs before Auto-Commercial Flagging</source>
+        <translation>Kör omkodningsjobb före reklamflaggning</translation>
+    </message>
+    <message>
+        <source>If set, if both auto-transcode and auto commercial flagging are turned ON for a recording, transcoding will run first, otherwise, commercial flagging runs first.</source>
+        <translation>Om både automatisk omkodning och automatisk reklamflaggning är aktiverade, börja med omkodningen, annars börjar reklamflaggningen först.</translation>
+    </message>
+    <message>
+        <source>Start Auto-Commercial Flagging jobs when the recording starts</source>
+        <translation>Starta automatisk reklamflaggning när inspelningen startar</translation>
+    </message>
+    <message>
+        <source>If set and Auto Commercial Flagging is ON for a recording, the flagging job will be started as soon as the recording starts.  NOT recommended on underpowered systems</source>
+        <translation>Om automatisk reklamflaggning är aktiverad, börja detta så fort inspelningen startar. EJ rekommenderat på svagare system</translation>
+    </message>
+    <message>
+        <source>Job Queue (Job Commands)</source>
+        <translation>Jobbkö (jobbkommando)</translation>
     </message>
 </context>
 <context>

@@ -2706,11 +2706,11 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>Do NOT use DVB driver for filtering.</source>
-        <translation>Älä käytä DVB-ajuria suodatukseen.</translation>
+        <translation type="obsolete">Älä käytä DVB-ajuria suodatukseen.</translation>
     </message>
     <message>
         <source>(BROKEN) This option is used to get around filtering limitations on some DVB cards.</source>
-        <translation>(RIKKINÄINEN) Tämä asetus ohittaa joidenkin DVB-korttien suodatusongelmat.</translation>
+        <translation type="obsolete">(RIKKINÄINEN) Tämä asetus ohittaa joidenkin DVB-korttien suodatusongelmat.</translation>
     </message>
     <message>
         <source>Normally the dvb-recording will drop packets from the card untill a sequence start header is seen. This option turns off this feature.</source>
@@ -3010,11 +3010,11 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>Length of time to retain DVB signal data (in days)</source>
-        <translation>Kuinka pitkään DVB-signaalin dataa säilytetään (päivissä)</translation>
+        <translation type="obsolete">Kuinka pitkään DVB-signaalin dataa säilytetään (päivissä)</translation>
     </message>
     <message>
         <source>DVB Global Settings</source>
-        <translation>DVB Yleiset Asetukset</translation>
+        <translation type="obsolete">DVB Yleiset Asetukset</translation>
     </message>
     <message>
         <source>Pre Shutdown check-command</source>
@@ -4159,11 +4159,11 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>Sample interval for DVB signal statistics (in seconds)</source>
-        <translation>DVB-signaalin tulosteen intervalli (sekunteina)</translation>
+        <translation type="obsolete">DVB-signaalin tulosteen intervalli (sekunteina)</translation>
     </message>
     <message>
         <source>MythTV will monitor the DVB signal statistics using the specified interval.  Set to &quot;0&quot; to disable.</source>
-        <translation>MythTV tutkii DVB-signaalia asetetulla aikavälillä. Aseta 0 poistaaksesi käytöstä.</translation>
+        <translation type="obsolete">MythTV tutkii DVB-signaalia asetetulla aikavälillä. Aseta 0 poistaaksesi käytöstä.</translation>
     </message>
     <message>
         <source>Log MythTV events to database</source>
@@ -4684,20 +4684,16 @@ Myth will now exit.</translation>
     <message>
         <source>Details of DVB error statistics for last 48 hours:
 </source>
-        <translation>Lisätietoja DVB:n virheistä 48 tunnilta:
+        <translation type="obsolete">Lisätietoja DVB:n virheistä 48 tunnilta:
 </translation>
     </message>
     <message>
         <source>Recording period from %1 to %2</source>
-        <translation>Nauhoitusjakso %1:sta %2:iin</translation>
-    </message>
-    <message>
-        <source>Encoder %1 Min SNR: %2 Avg SNR: %3 Min BER %4 Avg BER %5 Cont Errs: %6 Overflows: %7</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Nauhoitusjakso %1:sta %2:iin</translation>
     </message>
     <message>
         <source>There is no DVB signal quality data available to display.</source>
-        <translation>Ei tilastoja DVB:n signaalin vahvuudesta.</translation>
+        <translation type="obsolete">Ei tilastoja DVB:n signaalin vahvuudesta.</translation>
     </message>
     <message>
         <source>No items found at priority level %1 or lower.</source>
@@ -5701,6 +5697,82 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     </message>
     <message>
         <source>Normally PVR-350 audio is looped into a soundcard, here you can indicate when that is not the case. MythTV cannot control TV volume when this option is checked.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Building Detection Buffer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Frames Completed @ %2 fps.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Terrestrial</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC transport, cable or terrestrial</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use hardware MPEG decoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If your DVB card has a built in MPEG decoder you can activate it here. (Only for full featured cards &amp; certain USB devices).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Mouse Cursor in Myth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggles mouse cursor visibility. Most of the Myth GUI does not respond to mouse clicks, this is only to avoid &quot;losing&quot; your mouse cursor.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Job Queue Start Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting controls the start of the Job Queue time window which determines when new jobs will be started.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Job Queue End Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting controls the end of the Job Queue time window which determines when new jobs will be started.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run Transcode Jobs before Auto-Commercial Flagging</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, if both auto-transcode and auto commercial flagging are turned ON for a recording, transcoding will run first, otherwise, commercial flagging runs first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Auto-Commercial Flagging jobs when the recording starts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set and Auto Commercial Flagging is ON for a recording, the flagging job will be started as soon as the recording starts.  NOT recommended on underpowered systems</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Job Queue (Job Commands)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -54,8 +54,8 @@ public:
     enum Type {Terrestrial,Cable} ;
     ScanATSCTransport()
     {
-        addSelection(tr("Terrestrial"),QString::number(Terrestrial),true);
-        addSelection(tr("Cable"),QString::number(Cable));
+        addSelection(QObject::tr("Terrestrial"),QString::number(Terrestrial),true);
+        addSelection(QObject::tr("Cable"),QString::number(Cable));
 
         setLabel(QObject::tr("ATSC Transport"));
         setHelpText(QObject::tr("ATSC transport, cable or terrestrial"));

@@ -2997,11 +2997,11 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
     </message>
     <message>
         <source>Do NOT use DVB driver for filtering.</source>
-        <translation>Ne PAS utiliser le driver DVB pour le filtrage.</translation>
+        <translation type="obsolete">Ne PAS utiliser le driver DVB pour le filtrage.</translation>
     </message>
     <message>
         <source>(BROKEN) This option is used to get around filtering limitations on some DVB cards.</source>
-        <translation>(CASSÉ) Cette option est utilisé pour outrepasser des limitations de filtrages de certaines cartes DVB.</translation>
+        <translation type="obsolete">(CASSÉ) Cette option est utilisé pour outrepasser des limitations de filtrages de certaines cartes DVB.</translation>
     </message>
     <message>
         <source>Wait for SEQ start header.</source>
@@ -3665,15 +3665,15 @@ Votre carte d&apos;acquisition n&apos;a pas fourni de canaux. Vous devez les sai
     </message>
     <message>
         <source>Sample interval for DVB signal statistics (in seconds)</source>
-        <translation>Intervalle d&apos;échantillonnage pour les statistiques du signal DVB (en secondes)</translation>
+        <translation type="obsolete">Intervalle d&apos;échantillonnage pour les statistiques du signal DVB (en secondes)</translation>
     </message>
     <message>
         <source>MythTV will monitor the DVB signal statistics using the specified interval.  Set to &quot;0&quot; to disable.</source>
-        <translation>MythTV surveillera les statistiques du signal DVB en respectant l&apos;intervalle de temps fourni.  0 désactive cette fonctionnalité.</translation>
+        <translation type="obsolete">MythTV surveillera les statistiques du signal DVB en respectant l&apos;intervalle de temps fourni.  0 désactive cette fonctionnalité.</translation>
     </message>
     <message>
         <source>Length of time to retain DVB signal data (in days)</source>
-        <translation>Durée de temps de sauvegarde des données de signal DVB (en jours)</translation>
+        <translation type="obsolete">Durée de temps de sauvegarde des données de signal DVB (en jours)</translation>
     </message>
     <message>
         <source>Log MythTV events to database</source>
@@ -4060,15 +4060,15 @@ Myth will now exit.</source>
     <message>
         <source>Details of DVB error statistics for last 48 hours:
 </source>
-        <translation>détail des statistiques des erreurs DVB des dernières 48 heures</translation>
+        <translation type="obsolete">détail des statistiques des erreurs DVB des dernières 48 heures</translation>
     </message>
     <message>
         <source>Encoder %1 Min SNR: %2 Avg SNR: %3 Min BER %4 Avg BER %5 Cont Errs: %6 Overflows: %7</source>
-        <translation>Encodeur %1 SNR Min: %2 SNR Moy: %3 BER Min %4 BER Moy %5 Errs Cont: %6 Overflows: %7</translation>
+        <translation type="obsolete">Encodeur %1 SNR Min: %2 SNR Moy: %3 BER Min %4 BER Moy %5 Errs Cont: %6 Overflows: %7</translation>
     </message>
     <message>
         <source>There is no DVB signal quality data available to display.</source>
-        <translation>Il n&apos;y a aucune donnée de qualité de signal DVB à afficher</translation>
+        <translation type="obsolete">Il n&apos;y a aucune donnée de qualité de signal DVB à afficher</translation>
     </message>
     <message>
         <source>No items found at priority level %1 or lower.</source>
@@ -4732,7 +4732,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>DVB Global Settings</source>
-        <translation>Paramètres globaux DVB</translation>
+        <translation type="obsolete">Paramètres globaux DVB</translation>
     </message>
     <message>
         <source>Listings Status</source>
@@ -4756,7 +4756,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Recording period from %1 to %2</source>
-        <translation>Enregistrement de %1 à %2</translation>
+        <translation type="obsolete">Enregistrement de %1 à %2</translation>
     </message>
     <message>
         <source>If your local timezone does not match the timezone returned by XMLTV, use this setting to have mythfilldatabase adjust the program start and end times.None disables this feature, Auto automatically detects your local timezone</source>
@@ -5698,6 +5698,82 @@ La plupart des cartes peuvent autodétecter cela maintenant. Laisser Auto sauf s
     <message>
         <source>Normally PVR-350 audio is looped into a soundcard, here you can indicate when that is not the case. MythTV cannot control TV volume when this option is checked.</source>
         <translation>Normalement l&apos;audio du PVR 350 est rebouclé dans une carte son. Ici, vous pouvez indiquer lorsque ce n&apos;est pas le cas. Mythtv ne peut pas contrôler le volume lorsque cette case est cochée.</translation>
+    </message>
+    <message>
+        <source>Building Detection Buffer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Frames Completed @ %2 fps.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Terrestrial</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC transport, cable or terrestrial</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use hardware MPEG decoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If your DVB card has a built in MPEG decoder you can activate it here. (Only for full featured cards &amp; certain USB devices).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Mouse Cursor in Myth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggles mouse cursor visibility. Most of the Myth GUI does not respond to mouse clicks, this is only to avoid &quot;losing&quot; your mouse cursor.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Job Queue Start Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting controls the start of the Job Queue time window which determines when new jobs will be started.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Job Queue End Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting controls the end of the Job Queue time window which determines when new jobs will be started.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run Transcode Jobs before Auto-Commercial Flagging</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, if both auto-transcode and auto commercial flagging are turned ON for a recording, transcoding will run first, otherwise, commercial flagging runs first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Auto-Commercial Flagging jobs when the recording starts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set and Auto Commercial Flagging is ON for a recording, the flagging job will be started as soon as the recording starts.  NOT recommended on underpowered systems</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Job Queue (Job Commands)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
