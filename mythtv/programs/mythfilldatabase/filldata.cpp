@@ -2340,7 +2340,8 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
                          filename.ascii());
          isJapan = true;
     }
-    else if (xmltv_grabber == "tv_grab_sn")
+    else if (xmltv_grabber == "tv_grab_se" ||
+             xmltv_grabber == "tv_grab_no")
         command.sprintf("nice %s --days 1 --offset %d --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), offset, configfile.ascii(),
                         filename.ascii());
@@ -2363,7 +2364,8 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
          xmltv_grabber == "tv_grab_fi" ||
          xmltv_grabber == "tv_grab_es" ||
          xmltv_grabber == "tv_grab_nz" ||
-         xmltv_grabber == "tv_grab_sn" ||
+         xmltv_grabber == "tv_grab_se" ||
+         xmltv_grabber == "tv_grab_no" ||
          xmltv_grabber == "tv_grab_dk" ||
          xmltv_grabber == "tv_grab_uk" ||
          xmltv_grabber == "tv_grab_uk_rt" ||
@@ -2546,9 +2548,11 @@ bool fillData(QValueList<Source> &sourcelist)
         else if (xmltv_grabber == "datadirect" ||
                  //xmltv_grabber == "tv_grab_na" || 
                  xmltv_grabber == "tv_grab_uk_rt" ||
-                 xmltv_grabber == "tv_grab_sn")
+                 xmltv_grabber == "tv_grab_se" ||
+                 xmltv_grabber == "tv_grab_no")
         {
-            if (xmltv_grabber == "tv_grab_sn")
+            if (xmltv_grabber == "tv_grab_se" ||
+                xmltv_grabber == "tv_grab_no")
                 listing_wrap_offset = 6 * 3600;
 
             QDate qCurrentDate = QDate::currentDate();
@@ -2578,9 +2582,12 @@ bool fillData(QValueList<Source> &sourcelist)
             }
 
             int maxday = 9;
+
             if (xmltv_grabber == "tv_grab_uk_rt" ||
-                xmltv_grabber == "tv_grab_sn")
+                xmltv_grabber == "tv_grab_se" ||
+                xmltv_grabber == "tv_grab_no")
                 maxday = 14;
+
             if (xmltv_grabber == "datadirect")
                 maxday = 14;
 
