@@ -33,7 +33,7 @@ bool Scheduler::CheckForChanges(void)
 
     bool retval = false;
 
-    sprintf(thequery, "SELECT * FROM settings WHERE value = "
+    sprintf(thequery, "SELECT data FROM settings WHERE value = "
                       "\"RecordChanged\";");
     query = db->exec(thequery);
 
@@ -41,7 +41,7 @@ bool Scheduler::CheckForChanges(void)
     {
         query.next();
 
-        QString value = query.value(1).toString();
+        QString value = query.value(0).toString();
         if (value == "yes")
         {
             sprintf(thequery, "UPDATE settings SET data = \"no\" WHERE "
@@ -77,7 +77,8 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
     QSqlQuery query;
     QSqlQuery subquery;
 
-    sprintf(thequery, "SELECT * FROM singlerecord;");
+    sprintf(thequery, "SELECT channum,starttime,endtime,title,subtitle,"
+                      "description FROM singlerecord;");
 
     query = db->exec(thequery);
     if (query.isActive() && query.numRowsAffected() > 0)
@@ -95,16 +96,19 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
             proginfo->channum = query.value(0).toString();
             proginfo->recordtype = 1;
 
-            if (proginfo->subtitle == 0)
+            if (proginfo->title == QString::null)
+                proginfo->title = "";
+            if (proginfo->subtitle == QString::null)
                 proginfo->subtitle = "";
-            if (proginfo->description == 0)
+            if (proginfo->description == QString::null)
                 proginfo->description = "";
 
             recordingList.push_back(proginfo);
         }
     }
 
-    sprintf(thequery, "SELECT * FROM timeslotrecord;");
+    sprintf(thequery, "SELECT channum,starttime,endtime,title FROM "
+                      "timeslotrecord;");
 
     query = db->exec(thequery);
     if (query.isActive() && query.numRowsAffected() > 0)
@@ -115,6 +119,9 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
             QString starttime = query.value(1).toString();
             QString endtime = query.value(2).toString();
             QString title = query.value(3).toString();
+
+            if (title == QString::null)
+                continue;
 
             int hour, min;
 
@@ -131,10 +138,12 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
             sprintf(endquery, "%4d%02d%02d%02d%02d00", curdate.year(),
                     curdate.month(), curdate.day(), hour, min);
 
-            sprintf(thequery, "SELECT * FROM program WHERE channum = %s AND "
-                              "starttime = %s AND endtime < %s AND "
-                              "title = \"%s\";", channum.ascii(), startquery,
-                              endquery, title.ascii());
+            sprintf(thequery, "SELECT channum,starttime,endtime,title,subtitle,"
+                              "description,category FROM program WHERE "
+                              "channum = %s AND starttime = %s AND "
+                              "endtime < %s AND title = \"%s\";", 
+                              channum.ascii(), startquery, endquery, 
+                              title.ascii());
             subquery = db->exec(thequery);
 
             if (subquery.isActive() && subquery.numRowsAffected() > 0)
@@ -154,9 +163,11 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
                     proginfo->channum = subquery.value(0).toString();
                     proginfo->recordtype = 2;
 
-                    if (proginfo->subtitle == 0)
+                    if (proginfo->title == QString::null)
+                        proginfo->title = "";
+                    if (proginfo->subtitle == QString::null)
                         proginfo->subtitle = "";
-                    if (proginfo->description == 0)
+                    if (proginfo->description == QString::null)
                         proginfo->description = "";
 
                     recordingList.push_back(proginfo);
@@ -165,7 +176,7 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
         }
     }
 
-    sprintf(thequery, "SELECT * FROM allrecord;");
+    sprintf(thequery, "SELECT title FROM allrecord;");
 
     query = db->exec(thequery);
     if (query.isActive() && query.numRowsAffected() > 0)
@@ -173,6 +184,9 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
         while (query.next())
         {
             QString title = query.value(0).toString();
+   
+            if (title == QString::null)
+                continue;
 
             QTime curtime = QTime::currentTime();
             QDate curdate = QDate::currentDate();
@@ -187,7 +201,8 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
                     curdate.month(), curdate.day(), curtime.hour(), 
                     curtime.minute());
 
-            sprintf(thequery, "SELECT * FROM program WHERE "
+            sprintf(thequery, "SELECT channum,starttime,endtime,title,subtitle,"
+                              "description,category FROM program WHERE "
                               "starttime >= %s AND endtime < %s AND "
                               "title = \"%s\";", startquery,
                               endquery, title.ascii());
@@ -210,9 +225,11 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
                     proginfo->channum = subquery.value(0).toString();
                     proginfo->recordtype = 3;
 
-                    if (proginfo->subtitle == 0)
+                    if (proginfo->title == QString::null)
+                        proginfo->title = "";
+                    if (proginfo->subtitle == QString::null)
                         proginfo->subtitle = "";
-                    if (proginfo->description == 0)
+                    if (proginfo->description == QString::null)
                         proginfo->description = "";
 
                     recordingList.push_back(proginfo);
@@ -469,7 +486,8 @@ void Scheduler::MarkSingleConflict(ProgramInfo *info,
     QString ends = info->endts.toString("yyyyMMddhhmm");
     ends += "00";
   
-    sprintf(thequery, "SELECT * FROM conflictresolutionsingle WHERE "
+    sprintf(thequery, "SELECT dislikechannum,dislikestarttime,dislikeendtime "
+                      "FROM conflictresolutionsingle WHERE "
                       "preferchannum = %d AND preferstarttime = %s AND "
                       "preferendtime = %s;", info->channum.toInt(), 
                       starts.ascii(), ends.ascii());
@@ -480,10 +498,10 @@ void Scheduler::MarkSingleConflict(ProgramInfo *info,
     {
         while (query.next())
         {
-            QString badchannum = query.value(3).toString();
-            QDateTime badst = QDateTime::fromString(query.value(4).toString(),
+            QString badchannum = query.value(0).toString();
+            QDateTime badst = QDateTime::fromString(query.value(1).toString(),
                                                     Qt::ISODate);
-            QDateTime badend = QDateTime::fromString(query.value(5).toString(),
+            QDateTime badend = QDateTime::fromString(query.value(2).toString(),
                                                      Qt::ISODate);
 
             i = conflictList->begin();
@@ -514,7 +532,7 @@ void Scheduler::MarkSingleConflict(ProgramInfo *info,
         return;
     }
 
-    sprintf(thequery, "SELECT * FROM conflictresolutionany WHERE "
+    sprintf(thequery, "SELECT disliketitle FROM conflictresolutionany WHERE "
                       "prefertitle = \"%s\";", info->title.ascii());
 
     query = db->exec(thequery);
@@ -523,7 +541,7 @@ void Scheduler::MarkSingleConflict(ProgramInfo *info,
     {
         while (query.next())
         {
-            QString badtitle = query.value(1).toString();
+            QString badtitle = query.value(0).toString();
 
             i = conflictList->begin();
             for (; i != conflictList->end(); i++)

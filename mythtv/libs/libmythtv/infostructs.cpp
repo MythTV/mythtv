@@ -38,8 +38,9 @@ ProgramInfo *GetProgramAtDateTime(int channel, const char *time)
     char thequery[512];
     QSqlQuery query;
 
-    sprintf(thequery, "SELECT * FROM program WHERE channum = %d AND "
-                      "starttime < %s AND endtime > %s;",
+    sprintf(thequery, "SELECT channum,starttime,endtime,title,subtitle,"
+                      "description,category FROM program WHERE channum = %d "
+                      "AND starttime < %s AND endtime > %s;",
                       channel, time, time);
 
     query.exec(thequery);
@@ -61,10 +62,14 @@ ProgramInfo *GetProgramAtDateTime(int channel, const char *time)
         proginfo->spread = -1;
         proginfo->recordtype = -1;
 
-        if (proginfo->subtitle == 0)           
+        if (proginfo->title == QString::null)
+            proginfo->title = "";
+        if (proginfo->subtitle == QString::null)           
             proginfo->subtitle = "";
-        if (proginfo->description == 0)
+        if (proginfo->description == QString::null)
             proginfo->description = "";
+        if (proginfo->category == QString::null)
+            proginfo->category = "";
 
         return proginfo;
     }

@@ -123,6 +123,8 @@ ChannelInfo *GuideGrid::getChannelInfo(int channum)
 
         retval = new ChannelInfo;
         retval->callsign = query.value(1).toString();
+        if (retval->callsign == QString::null)
+            retval->callsign = "";
         retval->iconpath = query.value(2).toString();
         retval->chanstr = query.value(0).toString();
         retval->channum = channum;

@@ -61,7 +61,8 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     char thequery[512];
     ProgramListItem *item;
     
-    sprintf(thequery, "SELECT * FROM recorded;");
+    sprintf(thequery, "SELECT channum,starttime,endtime,title,subtitle,"
+                      "description FROM recorded;");
 
     query = db->exec(thequery);
 
@@ -80,6 +81,13 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
             proginfo->subtitle = query.value(4).toString();
             proginfo->description = query.value(5).toString();
             proginfo->conflicting = false;
+
+            if (proginfo->title == QString::null)
+                proginfo->title = "";
+            if (proginfo->subtitle == QString::null)
+                proginfo->subtitle = "";
+            if (proginfo->description == QString::null)
+                proginfo->description = "";
 
             char startt[128];
             char endt[128];

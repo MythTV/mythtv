@@ -172,7 +172,7 @@ void *runScheduler(void *dummy)
                     }
                 }
             }
-            if (secsleft <= 0)
+            if (secsleft <= -2)
             {
                 // don't record stuff that's already started..
                 if (secsleft > -30)

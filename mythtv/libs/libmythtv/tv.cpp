@@ -1022,20 +1022,29 @@ void TV::GetChannelInfo(int lchannel, string &title, string &subtitle,
     strftime(curtimestr, 128, "%Y%m%d%H%M%S", loctime);
 
     char thequery[1024];
-    sprintf(thequery, "SELECT * FROM program WHERE channum = %d AND starttime < %s AND endtime > %s;", lchannel, curtimestr, curtimestr);
+    sprintf(thequery, "SELECT channum,starttime,endtime,title,subtitle,description,category FROM program WHERE channum = %d AND starttime < %s AND endtime > %s;", lchannel, curtimestr, curtimestr);
 
     QSqlQuery query = db_conn->exec(thequery);
 
+    QString test;
     if (query.isActive() && query.numRowsAffected() > 0)
     {
         query.next();
 
         starttime = query.value(1).toString().ascii();
         endtime = query.value(2).toString().ascii();
-        title = query.value(3).toString().ascii();
-        subtitle = query.value(4).toString().ascii();
-        desc = query.value(5).toString().ascii();
-        category = query.value(6).toString().ascii();
+        test = query.value(3).toString();
+        if (test != QString::null)
+            title = test.ascii();
+        test = query.value(4).toString();
+        if (test != QString::null)
+            subtitle = test.ascii();
+        test = query.value(5).toString();
+        if (test != QString::null)
+            desc = test.ascii();
+        test = query.value(6).toString();
+        if (test != QString::null)
+            category = test.ascii();
     }
 }
 
