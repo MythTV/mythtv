@@ -7,6 +7,7 @@
 #include <qobject.h>
 #include <qptrlist.h>
 #include <qevent.h>
+#include <qmutex.h>
 
 #include <vector>
 using namespace std;
@@ -162,5 +163,37 @@ class MythContext : public QObject
 };
 
 extern MythContext *gContext;
+
+#if (QT_VERSION < 0x030100)
+class QMutexLocker
+{
+  public:
+    QMutexLocker(QMutex *);
+   ~QMutexLocker();
+
+    QMutex *mutex() const;
+
+  private:
+    QMutex *mtx;
+};
+
+inline QMutexLocker::QMutexLocker(QMutex *m)
+{
+    mtx = m;
+    if (mtx)
+        mtx->lock();
+}
+
+inline QMutexLocker::~QMutexLocker()
+{
+    if (mtx)
+        mtx->unlock();
+}
+
+inline QMutex *QMutexLocker::mutex() const
+{
+    return mtx;
+}
+#endif
 
 #endif
