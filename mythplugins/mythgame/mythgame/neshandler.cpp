@@ -29,7 +29,8 @@ NesHandler* NesHandler::getHandler()
 void NesHandler::start_game(RomInfo* romdata)
 {
     QString exec = gContext->GetSetting("NesBinary") + " " +
-        "'" + gContext->GetSetting("NesRomLocation") + "/" + romdata->Romname() + "'";
+                   "\"" + gContext->GetSetting("NesRomLocation") + "/" + 
+                   romdata->Romname() + "\"";
     cout << exec << endl;
     
     // Run the emulator and wait for it to terminate.      

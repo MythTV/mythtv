@@ -423,7 +423,7 @@ void SnesHandler::start_game(RomInfo * romdata)
         exec+= " ";
     }
     exec+= game_settings.extra_options;
-    exec+= " '" + gContext->GetSetting("SnesRomLocation") + "/" + romdata->Romname() + "'";
+    exec+= " \"" + gContext->GetSetting("SnesRomLocation") + "/" + romdata->Romname() + "\"";
     cout << exec << endl;
 
     // Run the emulator and wait for it to terminate.

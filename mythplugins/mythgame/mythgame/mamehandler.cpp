@@ -413,7 +413,7 @@ void MameHandler::start_game(RomInfo * romdata)
         int romcount = 0;
 
         QString romlistcmd;
-        makecmd_line("-lr " + romdata->Romname() + " 2>/dev/null", &romlistcmd, NULL);
+        makecmd_line("-lr \"" + romdata->Romname() + "\" 2>/dev/null", &romlistcmd, NULL);
 
         FILE* romlist_info = popen(romlistcmd, "r");
 
