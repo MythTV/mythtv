@@ -67,7 +67,7 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     listview->setColumnWidthMode(0, QListView::Manual);
     listview->setColumnWidthMode(1, QListView::Manual);
 
-    listview->setSorting(1, false);
+    listview->setSorting(-1, false);
     listview->setAllColumnsShowFocus(TRUE);
 
     connect(listview, SIGNAL(returnPressed(QListViewItem *)), this,
@@ -84,7 +84,7 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     ProgramListItem *item;
     
     thequery = "SELECT channum,starttime,endtime,title,subtitle,description "
-               "FROM recorded;";
+               "FROM recorded ORDER BY starttime;";
     query = db->exec(thequery);
 
     if (query.isActive() && query.numRowsAffected() > 0)

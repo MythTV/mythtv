@@ -130,7 +130,7 @@ OSD::OSD(int width, int height, const QString &filename, const QString &prefix,
         usingtheme = LoadTheme();
     }
 
-    if (vid_width < 400 || vid_height < 400)
+    if (vid_height < 400)
     {
         infofontsize /= 2;
         channumfontsize /= 2;

@@ -41,7 +41,7 @@ ProgramListItem::ProgramListItem(QListView *parent, ProgramInfo *lpginfo,
     pixmap = NULL;
 
     setText(0, pginfo->channum);
-    setText(1, pginfo->startts.toString("MMMM d h:mm AP"));
+    setText(1, pginfo->startts.toString("ddd MMM d h:mmap"));
     setText(2, pginfo->title);
 
     if (numcols == 4)

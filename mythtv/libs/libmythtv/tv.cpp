@@ -721,7 +721,7 @@ void TV::SetupPlayer(void)
     {
         if (filters.length() > 1)
             filters += ",";
-        filters += "linearblend";
+        filters += "postprocess";
     }
 
     nvp->SetVideoFilters(filters);

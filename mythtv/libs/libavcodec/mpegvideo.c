@@ -259,9 +259,13 @@ int MPV_common_init(MpegEncContext *s)
         /* MV prediction */
         size = (2 * s->mb_width + 2) * (2 * s->mb_height + 2);
         CHECKED_ALLOCZ(s->motion_val, size * 2 * sizeof(INT16));
-        
-        /* 4mv direct mode decoding table */
-        CHECKED_ALLOCZ(s->non_b_mv4_table, size * sizeof(UINT8))
+    }
+
+    if(s->codec_id==CODEC_ID_MPEG4){
+        /* 4mv and interlaced direct mode decoding tables */
+        CHECKED_ALLOCZ(s->co_located_type_table, s->mb_num * sizeof(UINT8))
+        CHECKED_ALLOCZ(s->field_mv_table, s->mb_num*2*2 * sizeof(INT16))
+        CHECKED_ALLOCZ(s->field_select_table, s->mb_num*2* sizeof(INT8))
     }
 
     if (s->h263_pred || s->h263_plus) {
@@ -350,7 +354,9 @@ void MPV_common_end(MpegEncContext *s)
     av_freep(&s->tex_pb_buffer);
     av_freep(&s->pb2_buffer);
     av_freep(&s->edge_emu_buffer);
-    av_freep(&s->non_b_mv4_table);
+    av_freep(&s->co_located_type_table);
+    av_freep(&s->field_mv_table);
+    av_freep(&s->field_select_table);
     av_freep(&s->avctx->stats_out);
     av_freep(&s->ac_stats);
     
@@ -871,7 +877,7 @@ int MPV_encode_picture(AVCodecContext *avctx,
         MPV_frame_start(s, avctx);
 
         encode_picture(s, s->picture_number);
-
+        
         avctx->real_pict_num  = s->picture_number;
         avctx->header_bits = s->header_bits;
         avctx->mv_bits     = s->mv_bits;
@@ -879,7 +885,7 @@ int MPV_encode_picture(AVCodecContext *avctx,
         avctx->i_tex_bits  = s->i_tex_bits;
         avctx->p_tex_bits  = s->p_tex_bits;
         avctx->i_count     = s->i_count;
-        avctx->p_count     = s->p_count;
+        avctx->p_count     = s->mb_num - s->i_count - s->skip_count; //FIXME f/b_count in avctx
         avctx->skip_count  = s->skip_count;
 
         MPV_frame_end(s);
@@ -1466,21 +1472,32 @@ void MPV_decode_mb(MpegEncContext *s, DCTELEM block[6][64])
         
         const int wrap = s->block_wrap[0];
         const int xy = s->block_index[0];
+        const int mb_index= s->mb_x + s->mb_y*s->mb_width;
         if(s->mv_type == MV_TYPE_8X8){
-            s->non_b_mv4_table[xy]=1;
+            s->co_located_type_table[mb_index]= CO_LOCATED_TYPE_4MV;
         } else {
             int motion_x, motion_y;
             if (s->mb_intra) {
                 motion_x = 0;
                 motion_y = 0;
+                if(s->co_located_type_table)
+                    s->co_located_type_table[mb_index]= 0;
             } else if (s->mv_type == MV_TYPE_16X16) {
                 motion_x = s->mv[0][0][0];
                 motion_y = s->mv[0][0][1];
+                if(s->co_located_type_table)
+                    s->co_located_type_table[mb_index]= 0;
             } else /*if (s->mv_type == MV_TYPE_FIELD)*/ {
+                int i;
                 motion_x = s->mv[0][0][0] + s->mv[0][1][0];
                 motion_y = s->mv[0][0][1] + s->mv[0][1][1];
                 motion_x = (motion_x>>1) | (motion_x&1);
-                motion_y = (motion_y>>1) | (motion_y&1);
+                for(i=0; i<2; i++){
+                    s->field_mv_table[mb_index][i][0]= s->mv[0][i][0];
+                    s->field_mv_table[mb_index][i][1]= s->mv[0][i][1];
+                    s->field_select_table[mb_index][i]= s->field_select[0][i];
+                }
+                s->co_located_type_table[mb_index]= CO_LOCATED_TYPE_FIELDMV;
             }
             /* no update if 8X8 because it has been done during parsing */
             s->motion_val[xy][0] = motion_x;
@@ -1491,7 +1508,6 @@ void MPV_decode_mb(MpegEncContext *s, DCTELEM block[6][64])
             s->motion_val[xy + wrap][1] = motion_y;
             s->motion_val[xy + 1 + wrap][0] = motion_x;
             s->motion_val[xy + 1 + wrap][1] = motion_y;
-            s->non_b_mv4_table[xy]=0;
         }
     }
     
@@ -1894,7 +1910,8 @@ static inline void copy_context_before_encode(MpegEncContext *d, MpegEncContext 
     d->i_tex_bits= s->i_tex_bits;
     d->p_tex_bits= s->p_tex_bits;
     d->i_count= s->i_count;
-    d->p_count= s->p_count;
+    d->f_count= s->f_count;
+    d->b_count= s->b_count;
     d->skip_count= s->skip_count;
     d->misc_bits= s->misc_bits;
     d->last_bits= 0;
@@ -1918,7 +1935,8 @@ static inline void copy_context_after_encode(MpegEncContext *d, MpegEncContext *
     d->i_tex_bits= s->i_tex_bits;
     d->p_tex_bits= s->p_tex_bits;
     d->i_count= s->i_count;
-    d->p_count= s->p_count;
+    d->f_count= s->f_count;
+    d->b_count= s->b_count;
     d->skip_count= s->skip_count;
     d->misc_bits= s->misc_bits;
 
@@ -2063,7 +2081,7 @@ static void encode_picture(MpegEncContext *s, int picture_number)
 //printf("Scene change detected, encoding as I Frame %d %d\n", s->mb_var_sum, s->mc_mb_var_sum);
     }
     
-    if(s->pict_type==P_TYPE || s->pict_type==S_TYPE) 
+    if(s->pict_type==P_TYPE || s->pict_type==S_TYPE)
     {
         s->f_code= ff_get_best_fcode(s, s->p_mv_table, MB_TYPE_INTER);
         ff_fix_long_p_mvs(s);
@@ -2120,7 +2138,8 @@ static void encode_picture(MpegEncContext *s, int picture_number)
     s->i_tex_bits=0;
     s->p_tex_bits=0;
     s->i_count=0;
-    s->p_count=0;
+    s->f_count=0;
+    s->b_count=0;
     s->skip_count=0;
 
     /* init last dc values */

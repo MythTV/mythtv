@@ -74,7 +74,7 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     listview->setColumnWidth(2, 435 * wmult);
     listview->setColumnWidth(3, 90 * wmult);
 
-    listview->setSorting(1, false);
+    listview->setSorting(-1, false);
     listview->setAllColumnsShowFocus(TRUE);
 
     connect(listview, SIGNAL(returnPressed(QListViewItem *)), this,
@@ -91,7 +91,7 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     ProgramListItem *item;
     
     thequery = "SELECT channum,starttime,endtime,title,subtitle,description "
-               "FROM recorded;";
+               "FROM recorded ORDER BY starttime DESC;";
 
     query = db->exec(thequery);
 

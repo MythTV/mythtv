@@ -347,7 +347,9 @@ bool NuppelVideoPlayer::InitAVCodec(int codectype)
 
     mpa_ctx.width = video_width;
     mpa_ctx.height = video_height;
-
+    mpa_ctx.error_resilience = 0;
+    mpa_ctx.workaround_bugs = 0;
+    
     if (avcodec_open(&mpa_ctx, mpa_codec) < 0)
     {
         cerr << "Couldn't find codec\n";

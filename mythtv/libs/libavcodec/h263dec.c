@@ -110,6 +110,23 @@ static int h263_decode_end(AVCodecContext *avctx)
     return 0;
 }
 
+/**
+ * retunrs the number of bytes consumed for building the current frame
+ */
+static int get_consumed_bytes(MpegEncContext *s, int buf_size){
+    int pos= (get_bits_count(&s->gb)+7)>>3;
+
+    if(s->divx_version>=500){
+        //we would have to scan through the whole buf to handle the weird reordering ...
+        return buf_size; 
+    }else{
+        if(pos==0) pos=1; //avoid infinite loops (i doubt thats needed but ...)
+        if(pos+10>buf_size) pos=buf_size; // oops ;)
+
+        return pos;
+    }
+}
+
 static int h263_decode_frame(AVCodecContext *avctx, 
                              void *data, int *data_size,
                              UINT8 *buf, int buf_size)
@@ -130,9 +147,10 @@ uint64_t time= rdtsc();
     s->workaround_bugs= avctx->workaround_bugs;
     s->flags= avctx->flags;
 
-    /* no supplementary picture */
+    *data_size = 0;
+   
+   /* no supplementary picture */
     if (buf_size == 0) {
-        *data_size = 0;
         return 0;
     }
 
@@ -175,24 +193,29 @@ uint64_t time= rdtsc();
         avctx->width = s->width;
         avctx->height = s->height;
         avctx->aspect_ratio_info= s->aspect_ratio_info;
+	if (s->aspect_ratio_info == FF_ASPECT_EXTENDED)
+	{
+	    avctx->aspected_width = s->aspected_width;
+	    avctx->aspected_height = s->aspected_height;
+	}
         if (MPV_common_init(s) < 0)
             return -1;
     }
 
-    if(ret==FRAME_SKIPED) return buf_size;
+    if(ret==FRAME_SKIPED) return get_consumed_bytes(s, buf_size);
     /* skip if the header was thrashed */
     if (ret < 0){
         fprintf(stderr, "header damaged\n");
         return -1;
     }
     /* skip b frames if we dont have reference frames */
-    if(s->num_available_buffers<2 && s->pict_type==B_TYPE) return buf_size;
+    if(s->num_available_buffers<2 && s->pict_type==B_TYPE) return get_consumed_bytes(s, buf_size);
     /* skip b frames if we are in a hurry */
-    if(s->hurry_up && s->pict_type==B_TYPE) return buf_size;
+    if(s->hurry_up && s->pict_type==B_TYPE) return get_consumed_bytes(s, buf_size);
     
     if(s->next_p_frame_damaged){
         if(s->pict_type==B_TYPE)
-            return buf_size;
+            return get_consumed_bytes(s, buf_size);
         else
             s->next_p_frame_damaged=0;
     }
@@ -354,14 +377,14 @@ uint64_t time= rdtsc();
         if(msmpeg4_decode_ext_header(s, buf_size) < 0) return -1;
     
     /* divx 5.01+ bistream reorder stuff */
-    if(s->codec_id==CODEC_ID_MPEG4 && s->bitstream_buffer_size==0){
+    if(s->codec_id==CODEC_ID_MPEG4 && s->bitstream_buffer_size==0 && s->divx_version>=500){
         int current_pos= get_bits_count(&s->gb)>>3;
 
         if(   buf_size - current_pos > 5 
            && buf_size - current_pos < BITSTREAM_BUFFER_SIZE){
             int i;
             int startcode_found=0;
-            for(i=current_pos; i<buf_size; i++){
+            for(i=current_pos; i<buf_size-3; i++){
                 if(buf[i]==0 && buf[i+1]==0 && buf[i+2]==1 && buf[i+3]==0xB6){
                     startcode_found=1;
                     break;
@@ -454,7 +477,7 @@ uint64_t time= rdtsc();
 #ifdef PRINT_FRAME_TIME
 printf("%Ld\n", rdtsc()-time);
 #endif
-    return buf_size;
+    return get_consumed_bytes(s, buf_size);
 }
 
 AVCodec mpeg4_decoder = {
