@@ -33,55 +33,56 @@
     $Prog{'nice'} = find_program('nice');
     die "You need nice in order to use nuvexport.\n\n" unless ($Prog{'nice'});
 
-# Load the recordings, and the $video_dir variable
-    use mythtv::recordings;
+# Load some options early, before anything else:
+# --help, --ffmpeg, --transcode.  Default is --ffmpeg
+    BEGIN {
 
-# Decipher --ffmpeg/--transcode.  default is --ffmpeg
+        our $export_prog = 'ffmpeg';
 
-    my $export_prog = 'ffmpeg';
+        use Getopt::Long qw(:config pass_through);
+        GetOptions('ffmpeg'    => sub { $export_prog = 'ffmpeg';    },
+                   'transcode' => sub { $export_prog = 'transcode'; },
+                  );
+    }
 
-    use Getopt::Long qw(:config pass_through);
-
-    GetOptions( 'ffmpeg' => sub { $export_prog = 'ffmpeg' },
-                'transcode' => sub { $export_prog = 'transcode' } );
-
-    # Load the exporters based on which suite was selected above
-    if( $export_prog eq 'transcode' ) {
-        # Transcode - doesn't seem to work for many MPEG recordings
-        use export::transcode::XviD;
+# Load the exporters based on which suite was selected above
+    if ($export_prog eq 'transcode') {
+    # transcode - doesn't seem to work for many MPEG recordings these days
+        require export::transcode::XviD;
             push @Exporters, export::transcode::XviD->new;
-        use export::transcode::SVCD;
+        require export::transcode::SVCD;
             push @Exporters, export::transcode::SVCD->new;
-        use export::transcode::VCD;
+        require export::transcode::VCD;
             push @Exporters, export::transcode::VCD->new;
-        use export::transcode::DVCD;
+        require export::transcode::DVCD;
             push @Exporters, export::transcode::DVCD->new;
-        use export::transcode::DVD;
+        require export::transcode::DVD;
             push @Exporters, export::transcode::DVD->new;
-    } elsif ( $export_prog eq 'ffmpeg' ) {
-        # Ffmpeg - seems to work better and is the default
-        use export::ffmpeg::XviD;
+    }
+    elsif ($export_prog eq 'ffmpeg') {
+    # ffmpeg - seems to work better and is the default
+        require export::ffmpeg::XviD;
             push @Exporters, export::ffmpeg::XviD->new;
-        use export::ffmpeg::SVCD;
+        require export::ffmpeg::SVCD;
             push @Exporters, export::ffmpeg::SVCD->new;
-        use export::ffmpeg::VCD;
+        require export::ffmpeg::VCD;
             push @Exporters, export::ffmpeg::VCD->new;
-        use export::ffmpeg::DVCD;
+        require export::ffmpeg::DVCD;
             push @Exporters, export::ffmpeg::DVCD->new;
-        use export::ffmpeg::DVD;
+        require export::ffmpeg::DVD;
             push @Exporters, export::ffmpeg::DVD->new;
-        use export::ffmpeg::DivX;
+        require export::ffmpeg::DivX;
             push @Exporters, export::ffmpeg::DivX->new;
-        use export::ffmpeg::ASF;
+        require export::ffmpeg::ASF;
             push @Exporters, export::ffmpeg::ASF->new;
-        use export::ffmpeg::MP3;
+        require export::ffmpeg::MP3;
             push @Exporters, export::ffmpeg::MP3->new;
     }
 
 # Load the other export modules
-    use export::MPEG2_cut;
+    require export::MPEG2_cut;
         push @Exporters, export::MPEG2_cut->new;
-    use export::NUV_SQL;
+    require export::NUV_SQL;
         push @Exporters, export::NUV_SQL->new;
 
 # Load the ui
@@ -98,9 +99,12 @@
 
 # Print the help - for now, this is just perldoc
     if ($Args{'help'}) {
-        print "Help section still needs to be updated\n";
-        exec("perldoc $0");
+        require nuv_export::help;
     }
+
+# Load the recordings, and the $video_dir variable
+    use mythtv::recordings;
+    load_recordings();
 
 # Load episodes from the commandline (and display/quit if this is search-only)
     my @episodes = load_cli_episodes();

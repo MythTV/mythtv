@@ -31,7 +31,8 @@ MODULE_SUBDIRS    = transcode \
 MYTHTV_MODULES	  = mythtv/nuvinfo.pm \
 		    mythtv/db.pm      \
 		    mythtv/recordings.pm
-NUVEXPORT_MODULES = nuv_export/shared_utils.pm \
+NUVEXPORT_MODULES = nuv_export/help.pm         \
+		    nuv_export/shared_utils.pm \
 		    nuv_export/task.pm         \
 		    nuv_export/ui.pm
 MODULES		  = ${EXPORT_MODULES} ${MYTHTV_MODULES} ${NUVEXPORT_MODULES}
