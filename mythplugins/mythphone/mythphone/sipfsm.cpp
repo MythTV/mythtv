@@ -1449,6 +1449,7 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
 
     // Events ignored in states
     case SIP_OCONNECTING2_INVITESTATUS_1xx:
+        parent->SetNotification("CALLSTATUS", "", QString::number(sipMsg->getStatusCode()), sipMsg->getReasonPhrase());
         break;
 
     // Everything else is an error, just flag it for now
