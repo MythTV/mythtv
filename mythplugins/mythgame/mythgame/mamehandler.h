@@ -9,12 +9,10 @@
 
 using namespace std;
 
-class MythContext;
-
 class MameHandler : public GameHandler
 {
   public:
-    MameHandler(MythContext *context) : GameHandler(context) {
+    MameHandler() : GameHandler() {
                     systemname = "Mame";
                     SetGeneralPrefs();
                     SetDefaultSettings();
@@ -29,7 +27,7 @@ class MameHandler : public GameHandler
     QString Systemname() { return systemname; }
     void processGames();
 
-    static MameHandler* getHandler(MythContext *context);
+    static MameHandler* getHandler(void);
 
   protected:
     bool check_xmame_exe();

@@ -15,14 +15,13 @@
 
 class QSqlDatabase;
 class QDateTime;
-class MythContext;
 class OSD;
 class RemoteEncoder;
 
 class TV : public QObject
 {
  public:
-    TV(MythContext *lcontext, QSqlDatabase *db);
+    TV(QSqlDatabase *db);
    ~TV(void);
 
     void Init(void);
@@ -110,8 +109,6 @@ class TV : public QObject
     void ToggleActiveWindow(void);
     void SwapPIP(void);
 
-    MythContext *m_context;
-    
     int osd_display_time;
 
     bool channelqueued;

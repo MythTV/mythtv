@@ -7,24 +7,26 @@
 
 #include "libmythtv/progfind.h"
 
+MythContext *gContext;
+
 int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
 
-    MythContext *context = new MythContext();
+    gContext = new MythContext();
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
-    if (!context->OpenDatabase(db))
+    if (!gContext->OpenDatabase(db))
     {
         printf("couldn't open db\n");
         return -1;
     }
 
-    context->LoadQtConfig();
+    gContext->LoadQtConfig();
     
-    RunProgramFind(context);
+    RunProgramFind();
 
-    delete context;
+    delete gContext;
 
     return 0;
 }

@@ -14,7 +14,6 @@ class NuppelVideoPlayer;
 class RingBuffer;
 class QTimer;
 class ProgramInfo;
-class MythContext;
 
 class PlaybackBox : public MythDialog
 {
@@ -22,8 +21,7 @@ class PlaybackBox : public MythDialog
   public:
     typedef enum { Play, Delete } BoxType;
 
-    PlaybackBox(MythContext *context, BoxType ltype, QWidget *parent = 0, 
-                const char *name = 0);
+    PlaybackBox(BoxType ltype, QWidget *parent = 0, const char *name = 0);
    ~PlaybackBox(void);
    
     void customEvent(QCustomEvent *e);

@@ -2,7 +2,6 @@
 #define VIDEOSOURCE_H
 
 #include "libmyth/settings.h"
-#include "libmyth/mythcontext.h"
 #include <qlistview.h>
 #include <qdialog.h>
 #include <qregexp.h>
@@ -188,9 +187,9 @@ private:
             setVisible(false);
         };
         virtual QWidget* configWidget(ConfigurationGroup *cg, 
-                                      QWidget* parent, float hmult = 1.0,
+                                      QWidget* parent,
                                       const char* widgetName = 0) {
-            (void)cg; (void)parent; (void)widgetName; (void)hmult;
+            (void)cg; (void)parent; (void)widgetName;
             return NULL;
         };
     };
@@ -441,9 +440,8 @@ private:
             setName("CardInputID");
         };
         virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
-                                      float hmult = 1.0,
                                       const char* widgetName = 0) {
-            (void)cg; (void)parent; (void)widgetName; (void)hmult;
+            (void)cg; (void)parent; (void)widgetName;
             return NULL;
         };
     };
@@ -464,7 +462,7 @@ public:
         setLabel("Capture cards");
     };
 
-    virtual int exec(MythContext* context, QSqlDatabase* db);
+    virtual int exec(QSqlDatabase* db);
     virtual void load(QSqlDatabase* db);
     virtual void save(QSqlDatabase* db) { (void)db; };
 
@@ -475,11 +473,10 @@ protected slots:
         if (id != 0)
             cc.loadByID(db,id);
 
-        cc.exec(m_context, db);
+        cc.exec(db);
     };
 
 protected:
-    MythContext* m_context;
     QSqlDatabase* db;
 };
 
@@ -491,7 +488,7 @@ public:
         setLabel("Video sources");
     };
 
-    virtual int exec(MythContext* context, QSqlDatabase* db);
+    virtual int exec(QSqlDatabase* db);
     virtual void load(QSqlDatabase* db);
     virtual void save(QSqlDatabase* db) { (void)db; };
 
@@ -502,11 +499,10 @@ protected slots:
         if (id != 0)
             vs.loadByID(db,id);
 
-        vs.exec(m_context, db);
+        vs.exec(db);
     };
 
 protected:
-    MythContext* m_context;
     QSqlDatabase* db;
 };
 
@@ -519,19 +515,18 @@ public:
     };
     virtual ~CardInputEditor();
 
-    virtual int exec(MythContext* context, QSqlDatabase* db);
+    virtual int exec(QSqlDatabase* db);
     virtual void load(QSqlDatabase* db);
     virtual void save(QSqlDatabase* db) { (void)db; };
 
 protected slots:
     void edit(int id) {
-        cardinputs[id]->exec(m_context,db);
+        cardinputs[id]->exec(db);
     };
 
 protected:
     vector<CardInput*> cardinputs;
     QSqlDatabase* db;
-    MythContext* m_context;
 };
 
 #endif

@@ -360,9 +360,8 @@ void RecordingProfileEditor::load(QSqlDatabase* db) {
     RecordingProfile::fillSelections(db, this);
 }
 
-int RecordingProfileEditor::exec(MythContext* context, QSqlDatabase* db) {
-    m_context = context;
-    while (ConfigurationDialog::exec(context, db) == QDialog::Accepted)
+int RecordingProfileEditor::exec(QSqlDatabase* db) {
+    while (ConfigurationDialog::exec(db) == QDialog::Accepted)
         open(getValue().toInt());
 
     return QDialog::Rejected;

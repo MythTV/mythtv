@@ -24,7 +24,6 @@
 
 class QLabel;
 class QListView;
-class MythContext;
 class Settings;
 class WeatherSock;
 
@@ -38,8 +37,7 @@ class Weather : public MythDialog
 {
     Q_OBJECT
   public:
-    Weather(MythContext *context,
-	    QWidget *parent = 0, const char *name = 0);
+    Weather(QWidget *parent = 0, const char *name = 0);
 
     bool UpdateData();
     void processEvents();
@@ -97,8 +95,6 @@ private slots:
     QString GetString(QString);
     int GetInt(QString);
     float GetFloat(QString);
-
-    MythContext *m_context;
 
     void loadWeatherTypes();
     weatherTypes *wData;

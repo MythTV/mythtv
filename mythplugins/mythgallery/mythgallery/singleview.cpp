@@ -11,17 +11,16 @@
 
 #include <mythtv/mythcontext.h>
 
-SingleView::SingleView(MythContext *context, QSqlDatabase *db,
-                       vector<Thumbnail> *imagelist, 
-                       int pos, QWidget *parent, const char *name)
-	  : MythDialog(context, parent, name)
+SingleView::SingleView(QSqlDatabase *db, vector<Thumbnail> *imagelist, int pos,
+                       QWidget *parent, const char *name)
+	  : MythDialog(parent, name)
 {
     m_db = db;
     redraw = false;
     rotateAngle = 0; 
     imageRotateAngle = 0;
 
-    m_font = new QFont("Arial", (int)(context->GetSmallFontSize() * hmult), 
+    m_font = new QFont("Arial", (int)(gContext->GetSmallFontSize() * hmult), 
                        QFont::Bold);
 
     images = imagelist;
@@ -31,7 +30,7 @@ SingleView::SingleView(MythContext *context, QSqlDatabase *db,
     image = NULL;
 
     timerrunning = false;
-    timersecs = context->GetNumSetting("SlideshowDelay");
+    timersecs = gContext->GetNumSetting("SlideshowDelay");
     if (!timersecs)
         timersecs = 5;
 

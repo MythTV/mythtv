@@ -17,9 +17,9 @@ using namespace std;
 
 #include <mythtv/mythcontext.h>
 
-CdDecoder::CdDecoder(MythContext *context, const QString &file, 
-                     DecoderFactory *d, QIODevice *i, Output *o) 
-         : Decoder(context, d, i, o)
+CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i, 
+                     Output *o) 
+         : Decoder(d, i, o)
 {
     filename = file;
     inited = FALSE;
@@ -44,7 +44,7 @@ CdDecoder::CdDecoder(MythContext *context, const QString &file,
 
     settracknum = -1;
 
-    devicename = context->GetSetting("CDDevice");
+    devicename = gContext->GetSetting("CDDevice");
 }
 
 CdDecoder::~CdDecoder(void)
@@ -460,16 +460,15 @@ const QString &CdDecoderFactory::description() const
     return desc;
 }
 
-Decoder *CdDecoderFactory::create(MythContext *context, const QString &file,
-                                  QIODevice *input, Output *output,
-                                  bool deletable)
+Decoder *CdDecoderFactory::create(const QString &file, QIODevice *input, 
+                                  Output *output, bool deletable)
 {
     if (deletable)
-        return new CdDecoder(context, file, this, input, output);
+        return new CdDecoder(file, this, input, output);
 
     static CdDecoder *decoder = 0;
     if (! decoder) {
-        decoder = new CdDecoder(context, file, this, input, output);
+        decoder = new CdDecoder(file, this, input, output);
     } else {
         decoder->setInput(input);
         decoder->setOutput(output);

@@ -7,7 +7,6 @@
 
 #include "metadata.h"
 
-#include <mythtv/mythcontext.h>
 #include <mythtv/mythwidgets.h>
 
 class QSqlDatabase;
@@ -21,8 +20,7 @@ class Ripper : public MythDialog
 {
     Q_OBJECT
   public:
-    Ripper(MythContext *context, QSqlDatabase *ldb, QWidget *parent = 0, 
-           const char *name = 0);
+    Ripper(QSqlDatabase *ldb, QWidget *parent = 0, const char *name = 0);
    ~Ripper(void);
   
     QSizePolicy sizePolicy(void);

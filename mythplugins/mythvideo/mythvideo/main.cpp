@@ -7,7 +7,6 @@ using namespace std;
 #include <unistd.h>
 #include <qsocketnotifier.h>
 
-//#include <cdaudio.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/types.h>
@@ -30,10 +29,11 @@ int lfd;
 struct lirc_config *config;
 #endif
 
-void startDatabaseTree(MythContext *context, QSqlDatabase *db, 
-                       QValueList<Metadata> *playlist)
+MythContext *gContext;
+
+void startDatabaseTree(QSqlDatabase *db, QValueList<Metadata> *playlist)
 {
-    DatabaseBox dbbox(context, db, playlist);
+    DatabaseBox dbbox(db, playlist);
 
 #ifdef ENABLE_LIRC
     int flags;
@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     
-    MythContext *context = new MythContext();
+    gContext = new MythContext();
 
 #ifdef ENABLE_LIRC
     lfd=lirc_init("mythvideo",1);
@@ -73,35 +73,35 @@ int main(int argc, char *argv[])
         printf("Couldn't connect to database\n");
         return -1;
     }
-    if (!context->OpenDatabase(db))
+    if (!gContext->OpenDatabase(db))
     {
         printf("couldn't open db\n");
         return -1;
     }
 
-    context->LoadQtConfig();
+    gContext->LoadQtConfig();
 
-    context->LoadSettingsFiles("mythexplorer-settings.txt");
+    gContext->LoadSettingsFiles("mythexplorer-settings.txt");
 
     if (a.argc() > 1)
-        context->SetSetting("StartDir",a.argv()[1]);
+        gContext->SetSetting("StartDir",a.argv()[1]);
     if (a.argc() > 2)
-        context->SetSetting("LoadProfile",
-                           QString("profile_%1").arg(a.argv()[2]));
+        gContext->SetSetting("LoadProfile",
+                             QString("profile_%1").arg(a.argv()[2]));
 
-    context->SetSetting("Profile",
-                        context->GetSetting(context->GetSetting("LoadProfile")));
+    gContext->SetSetting("Profile",
+                    gContext->GetSetting(gContext->GetSetting("LoadProfile")));
       
-    QString startdir = context->GetSetting("StartDir");
+    QString startdir = gContext->GetSetting("StartDir");
     
-    Dirlist md = Dirlist(context, startdir);
+    Dirlist md = Dirlist(startdir);
     QValueList<Metadata> playlist = md.GetPlaylist();
 
-    startDatabaseTree(context, db, &playlist);
+    startDatabaseTree(db, &playlist);
 
     db->close();
 
-    delete context;
+    delete gContext;
 
     return 0;
 }

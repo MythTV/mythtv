@@ -34,11 +34,9 @@ using namespace std;
 
 #include <mythtv/mythcontext.h>
 
-Weather::Weather(MythContext *context, 
-                         QWidget *parent, const char *name)
-           : MythDialog(context, parent, name)
+Weather::Weather(QWidget *parent, const char *name)
+       : MythDialog(parent, name)
 {
-    m_context = context;
     debug = false;
     validArea = true;
     convertData = false;
@@ -49,7 +47,7 @@ Weather::Weather(MythContext *context,
 
     if (debug == true)
 	cout << "MythWeather: Reading 'locale' from context.\n";
-    locale = context->GetSetting("locale");
+    locale = gContext->GetSetting("locale");
     if (locale.length() == 0)
     {
 	if (debug == true)
@@ -67,7 +65,7 @@ Weather::Weather(MythContext *context,
     if (debug == true)
 	cout << "MythWeather: Reading 'SIUnits' from context.\n";
     
-    QString convertFlag = context->GetSetting("SIUnits");
+    QString convertFlag = gContext->GetSetting("SIUnits");
     if (convertFlag.upper() == "YES")
     {
 	if (debug == true)
@@ -78,7 +76,7 @@ Weather::Weather(MythContext *context,
 
     if (debug == true)
 	cout << "MythWeather: Reading InstrallPrefix from context.\n";
-    baseDir = context->GetInstallPrefix();
+    baseDir = gContext->GetInstallPrefix();
     if (debug == true)
 	cout << "MythWeather: baseDir = " << baseDir << endl;
 
@@ -169,7 +167,6 @@ Weather::Weather(MythContext *context,
 
     if (debug == true)
 	cout << "MythWeather: Theming widget, show(), showFullScreen(), setActiveWindow(), setFocus();\n";
-    m_context->ThemeWidget(this);
     show();
     showFullScreen();
     setActiveWindow();
@@ -193,7 +190,7 @@ QString Weather::getLocation()
 void Weather::setupColorScheme()
 {
 
-    Settings *themed = m_context->qtconfig();
+    Settings *themed = gContext->qtconfig();
     QString curColor = "";
     curColor = themed->GetSetting("time_bgColor");
     if (curColor != "")
@@ -411,7 +408,7 @@ void Weather::holdPage()
 
 void Weather::resetLocale()
 {
-	locale = m_context->GetSetting("locale");
+	locale = gContext->GetSetting("locale");
 	update_timeout();
 }
 

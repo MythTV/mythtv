@@ -31,8 +31,7 @@ public:
     void setStart(const QDateTime& start);
     void setEnd(const QDateTime& end);
 
-    virtual MythDialog* dialogWidget(MythContext* context,
-                                     QWidget* parent=NULL, const char* name=0);
+    virtual MythDialog* dialogWidget(QWidget* parent=NULL, const char* name=0);
     virtual void save(QSqlDatabase* db);
 
     void loadByID(QSqlDatabase* db, int id);
@@ -87,7 +86,7 @@ public:
         db(_db) {};
     virtual ~ScheduledRecordingEditor() {};
 
-    virtual int exec(MythContext* context, QSqlDatabase* db);
+    virtual int exec(QSqlDatabase* db);
     virtual void load(QSqlDatabase* db);
     virtual void save(QSqlDatabase* db) { (void)db; };
 
@@ -95,7 +94,6 @@ protected slots:
     void open(int id);
 
 protected:
-    MythContext* m_context;
     QSqlDatabase* db;
 };
 

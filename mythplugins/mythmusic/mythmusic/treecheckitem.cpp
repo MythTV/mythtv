@@ -20,28 +20,24 @@ QPixmap *TreeCheckItem::catalog = NULL;
 QPixmap *TreeCheckItem::cd = NULL;
 bool TreeCheckItem::pixmapsSet = false;
 
-TreeCheckItem::TreeCheckItem(MythContext *context, QListView *parent, 
-                             QString &ltext, const QString &llevel, 
-                             Metadata *mdata)
+TreeCheckItem::TreeCheckItem(QListView *parent, QString &ltext, 
+                             const QString &llevel, Metadata *mdata)
              : QCheckListItem(parent, ltext.prepend(" "), 
                               QCheckListItem::CheckBox)
 {
     level = llevel;
     metadata = mdata;
-    m_context = context;
 
     pickPixmap();
 }
 
-TreeCheckItem::TreeCheckItem(MythContext *context, TreeCheckItem *parent, 
-                             QString &ltext, const QString &llevel, 
-                             Metadata *mdata)
+TreeCheckItem::TreeCheckItem(TreeCheckItem *parent, QString &ltext, 
+                             const QString &llevel, Metadata *mdata)
              : QCheckListItem(parent, ltext.prepend(" "), 
                               QCheckListItem::CheckBox)
 {
     level = llevel;
     metadata = mdata;
-    m_context = context;
 
     pickPixmap();
 }
@@ -49,7 +45,7 @@ TreeCheckItem::TreeCheckItem(MythContext *context, TreeCheckItem *parent,
 void TreeCheckItem::pickPixmap(void)
 {
     if (!pixmapsSet)
-        setupPixmaps(m_context);
+        setupPixmaps();
 
     if (level == "artist")
         setPixmap(0, *artist);
@@ -63,12 +59,12 @@ void TreeCheckItem::pickPixmap(void)
         setPixmap(0, *cd);
 }
 
-void TreeCheckItem::setupPixmaps(MythContext *context)
+void TreeCheckItem::setupPixmaps(void)
 {
     int screenheight = 0, screenwidth = 0;
     float wmult = 0, hmult = 0;
 
-    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     if (screenheight != 600 || screenwidth != 800) 
     {   

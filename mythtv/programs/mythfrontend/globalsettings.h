@@ -3,8 +3,6 @@
 
 #include "libmyth/settings.h"
 
-class MythContext;
-
 class PlaybackSettings: virtual public ConfigurationWizard {
 public:
     PlaybackSettings();

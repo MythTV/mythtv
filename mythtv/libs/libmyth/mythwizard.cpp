@@ -94,9 +94,8 @@ public:
 
 };
 
-MythWizard::MythWizard(MythContext *context, QWidget *parent, 
-                       const char *name, bool modal)
-    : MythDialog(context, parent, name, modal)
+MythWizard::MythWizard(QWidget *parent, const char *name, bool modal)
+    : MythDialog(parent, name, modal)
 {
     d = new MythWizardPrivate();
     d->current = 0; // not quite true, but...

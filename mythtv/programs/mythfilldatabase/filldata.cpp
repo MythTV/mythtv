@@ -27,7 +27,8 @@ using namespace std;
 bool interactive = false;
 bool non_us_updating = false;
 bool from_file = false;
-MythContext *context;
+
+MythContext *gContext;
 
 class ChanInfo
 {
@@ -222,7 +223,7 @@ void addTimeOffset(QString &timestr, int config_off, QString offset )
 
 ProgInfo *parseProgram(QDomElement &element)
 {
-    QString config_offset = context->GetSetting("TimeOffset");
+    QString config_offset = gContext->GetSetting("TimeOffset");
     
     bool ok;
     int config_off = 0;
@@ -1118,10 +1119,10 @@ int main(int argc, char *argv[])
         ++argpos;
     }
 
-    context = new MythContext(false);
+    gContext = new MythContext(false);
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
-    if (!context->OpenDatabase(db))
+    if (!gContext->OpenDatabase(db))
     {
         printf("couldn't open db\n");
         return -1;
@@ -1180,7 +1181,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    delete context;
+    delete gContext;
 
     return 0;
 }

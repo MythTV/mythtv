@@ -26,8 +26,7 @@ using namespace std;
 #include "oldsettings.h"
 #include "tv.h"
 
-QString RunProgramGuide(MythContext *context, QString startchannel, bool thread,
-                        TV *player)
+QString RunProgramGuide(QString startchannel, bool thread, TV *player)
 {
     QString chanstr;
    
@@ -37,7 +36,7 @@ QString RunProgramGuide(MythContext *context, QString startchannel, bool thread,
     if (startchannel == QString::null)
         startchannel = "";
 
-    GuideGrid gg(context, startchannel, player);
+    GuideGrid gg(startchannel, player);
 
     if (thread)
     {
@@ -63,9 +62,9 @@ QString RunProgramGuide(MythContext *context, QString startchannel, bool thread,
     return chanstr;
 }
 
-GuideGrid::GuideGrid(MythContext *context, const QString &channel, TV *player,
-                     QWidget *parent, const char *name)
-         : MythDialog(context, parent, name)
+GuideGrid::GuideGrid(const QString &channel, TV *player, QWidget *parent, 
+                     const char *name)
+         : MythDialog(parent, name)
 {
     DISPLAY_CHANS = 6;
     DISPLAY_TIMES = 30;
@@ -74,78 +73,57 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel, TV *player,
     m_player = player;
     m_db = QSqlDatabase::database();
 
-    context->KickDatabase(m_db);
+    MythContext::KickDatabase(m_db);
 
-    usetheme = m_context->GetNumSetting("ThemeQt");
-    showtitle = m_context->GetNumSetting("EPGShowTitle");
-    showIcon = m_context->GetNumSetting("EPGShowChannelIcon");
+    usetheme = gContext->GetNumSetting("ThemeQt");
+    showtitle = gContext->GetNumSetting("EPGShowTitle");
+    showIcon = gContext->GetNumSetting("EPGShowChannelIcon");
 
-    channelOrdering = context->GetSetting("ChannelSorting", "channum + 0");
+    channelOrdering = gContext->GetSetting("ChannelSorting", "channum + 0");
 
-    dateformat = m_context->GetSetting("DateFormat", "ddd MMMM d");
-    timeformat = m_context->GetSetting("TimeFormat", "h:mm AP");
+    dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
 
-    unknownTitle = m_context->GetSetting("UnknownTitle", "Unknown");
-    unknownCategory = m_context->GetSetting("UnknownCategory", "Unknown");
+    unknownTitle = gContext->GetSetting("UnknownTitle", "Unknown");
+    unknownCategory = gContext->GetSetting("UnknownCategory", "Unknown");
 
-    showCurrentTime = m_context->GetNumSetting("EPGShowCurrentTime", 0);
-    currentTimeColor = m_context->GetSetting("EPGCurrentTimeColor", "red");
+    showCurrentTime = gContext->GetNumSetting("EPGShowCurrentTime", 0);
+    currentTimeColor = gContext->GetSetting("EPGCurrentTimeColor", "red");
 
     bgcolor = paletteBackgroundColor();
     fgcolor = paletteForegroundColor();
 
     // The 'Current Listings' and 'Future Programs' bar at the bottom of the screen.
-    showProgramBar = m_context->GetNumSetting("EPGProgramBar", 1);
+    showProgramBar = gContext->GetNumSetting("EPGProgramBar", 1);
 
-    programGuideType = m_context->GetNumSetting("EPGType");
+    programGuideType = gContext->GetNumSetting("EPGType");
     if (programGuideType == 1)
     {
-	int dNum = m_context->GetNumSetting("chanPerPage");
-	if (dNum != 0)
-		DISPLAY_CHANS = dNum;
-	else
-        	DISPLAY_CHANS = 8;
+	int dNum = gContext->GetNumSetting("chanPerPage", 8);
+	DISPLAY_CHANS = dNum;
 
-	dNum = m_context->GetNumSetting("timePerPage");
-	switch (dNum)
-	{
-		case 5:
-                        DISPLAY_TIMES = 30; // 2.5 hours
-                        break;
-                case 4:
-                        DISPLAY_TIMES = 24; // 2 hours
-                        break;
-                case 3:
-                        DISPLAY_TIMES = 18; // 1.5 hours
-                        break;
-                case 2:
-                        DISPLAY_TIMES = 12; // 1 hour
-                        break;
-                case 1:
-                        DISPLAY_TIMES = 6; // 30 mins
-                        break;
-                default:
-                        DISPLAY_TIMES = 30;
-                        break;
-	}
+	dNum = gContext->GetNumSetting("timePerPage", 5);
+        if (dNum > 5)
+            dNum = 5;
+        DISPLAY_TIMES = 6 * dNum;
 
         setupColorScheme();
     }
 
-    int timefontsize = m_context->GetNumSetting("EPGTimeFontSize", 13);
+    int timefontsize = gContext->GetNumSetting("EPGTimeFontSize", 13);
     m_timeFont = new QFont("Arial", (int)(timefontsize * hmult), QFont::Bold);
 
-    int chanfontsize = m_context->GetNumSetting("EPGChanFontSize", 13);
+    int chanfontsize = gContext->GetNumSetting("EPGChanFontSize", 13);
     m_chanFont = new QFont("Arial", (int)(chanfontsize * hmult), QFont::Bold);
 
-    chanfontsize = m_context->GetNumSetting("EPGChanCallsignFontSize", 11);
+    chanfontsize = gContext->GetNumSetting("EPGChanCallsignFontSize", 11);
     m_chanCallsignFont = new QFont("Arial", (int)(chanfontsize * hmult), 
                                    QFont::Bold);
 
-    int progfontsize = m_context->GetNumSetting("EPGProgFontSize", 13);
+    int progfontsize = gContext->GetNumSetting("EPGProgFontSize", 13);
     m_progFont = new QFont("Arial", (int)(progfontsize * hmult), QFont::Bold);
 
-    int titlefontsize = m_context->GetNumSetting("EPGTitleFontSize", 19);
+    int titlefontsize = gContext->GetNumSetting("EPGTitleFontSize", 19);
     m_titleFont = new QFont("Arial", (int)(titlefontsize * hmult), QFont::Bold);
 
     m_originalStartTime = QDateTime::currentDateTime();
@@ -305,7 +283,7 @@ GuideGrid::~GuideGrid()
 void GuideGrid::setupColorScheme()
 {
 
-    Settings *themed = m_context->qtconfig();
+    Settings *themed = gContext->qtconfig();
     QString curColor = "";
     curColor = themed->GetSetting("curTimeChan_bgColor");
     if (curColor != "")
@@ -536,7 +514,7 @@ void GuideGrid::createProgramLabel(int titlefontsize, int progfontsize)
     currentTime->setPaletteForegroundColor(curTimeChan_fgColor);
 
     ChannelInfo *chinfo = &(m_channelInfos[m_currentStartChannel]);
-    if (m_context->GetNumSetting("DisplayChanNum") != 0)
+    if (gContext->GetNumSetting("DisplayChanNum") != 0)
         currentChan = new QLabel(chinfo->callsign, this);
     else
         currentChan = new QLabel(chinfo->chanstr + "*" + chinfo->callsign, 
@@ -958,7 +936,7 @@ void GuideGrid::paintChannels(QPainter *p)
                 showIcon)
             {
                 if (!chinfo->icon)
-                    chinfo->LoadIcon(m_context);
+                    chinfo->LoadIcon();
                 if (chinfo->icon)
                 {
                     int yoffset = (int)(4 * hmult);
@@ -971,7 +949,7 @@ void GuideGrid::paintChannels(QPainter *p)
             if (showIcon)
                 yoffset = (int)(43 * hmult); 
 
-            if (m_context->GetNumSetting("DisplayChanNum") == 0)
+            if (gContext->GetNumSetting("DisplayChanNum") == 0)
             {
                 int width = lfm.width(chinfo->chanstr);
                 
@@ -995,7 +973,7 @@ void GuideGrid::paintChannels(QPainter *p)
         {
             QString chData;
 
-            if (m_context->GetNumSetting("DisplayChanNum") != 0)
+            if (gContext->GetNumSetting("DisplayChanNum") != 0)
                 chData = chinfo->callsign;
             else
                 chData = chinfo->chanstr + " " + chinfo->callsign;
@@ -1157,7 +1135,7 @@ QBrush GuideGrid::getBGColor(const QString &category)
 
     QString cat = "Cat_" + category;
 
-    QString color = m_context->qtconfig()->GetSetting(cat);
+    QString color = gContext->qtconfig()->GetSetting(cat);
     if (color != "")
     {
         br = QBrush(color);
@@ -1745,7 +1723,7 @@ void GuideGrid::updateTopInfo()
     if (chinfo->iconpath != "none" && chinfo->iconpath != "" && showIcon)
     {
         if (!chinfo->icon)
-            chinfo->LoadIcon(m_context);
+            chinfo->LoadIcon();
         if (chinfo->icon)
         {
             channelimage->setText("");
@@ -2238,12 +2216,7 @@ void GuideGrid::showProgFinder()
 {
     showInfo = 1;
 
-/*
-    ProgFinder pFind(m_context, this, "ProgramFinder");
-    pFind.setCaption("BLAH!!!");
-    pFind.exec();
-*/
-    RunProgramFind(m_context);
+    RunProgramFind();
 
     showInfo = 0;
 
@@ -2311,7 +2284,7 @@ void GuideGrid::displayInfo()
 
     if (pginfo)
     {
-        InfoDialog diag(m_context, pginfo, this, "Program Info");
+        InfoDialog diag(pginfo, this, "Program Info");
         diag.setCaption("BLAH!!!");
         diag.exec();
     }

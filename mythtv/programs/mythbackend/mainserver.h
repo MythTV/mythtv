@@ -10,15 +10,13 @@
 #include "encoderlink.h"
 #include "filetransfer.h"
 
-class MythContext;
 class HttpStatus;
 
 class MainServer : public QObject
 {
     Q_OBJECT
   public:
-    MainServer(MythContext *context, int port, int statusport,
-               QMap<int, EncoderLink *> *tvList);
+    MainServer(int port, int statusport, QMap<int, EncoderLink *> *tvList);
 
    ~MainServer();
 
@@ -65,8 +63,6 @@ class MainServer : public QObject
     vector<PlaybackSock *> playbackList;
     vector<QSocket *> ringBufList;
     vector<FileTransfer *> fileTransferList;
-
-    MythContext *m_context;
 
     QString recordfileprefix;
 

@@ -5,15 +5,13 @@
 #include <qpixmap.h>
 #include <qdatetime.h>
 
-class MythContext;
-
 class ChannelInfo
 {
  public:
     ChannelInfo() { icon = NULL; }
    ~ChannelInfo() { if (icon) delete icon; }
 
-    void LoadIcon(MythContext *context);
+    void LoadIcon(void);
 
     QString callsign;
     QString iconpath;

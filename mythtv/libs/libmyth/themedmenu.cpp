@@ -18,10 +18,9 @@ using namespace std;
 #include "themedmenu.h"
 #include "mythcontext.h"
 
-ThemedMenu::ThemedMenu(MythContext *context, const char *cdir, 
-                       const char *menufile, 
+ThemedMenu::ThemedMenu(const char *cdir, const char *menufile, 
                        QWidget *parent, const char *name)
-          : MythDialog(context, parent, name)
+          : MythDialog(parent, name)
 {
     setPalette(QPalette(QColor(250, 250, 250)));
 
@@ -37,11 +36,11 @@ ThemedMenu::ThemedMenu(MythContext *context, const char *cdir,
         return;
     }
 
-    prefix = context->GetInstallPrefix();
+    prefix = gContext->GetInstallPrefix();
     menulevel = 0;
 
     callback = NULL;
-    int allowsd = m_context->GetNumSetting("AllowQuitShutdown");
+    int allowsd = gContext->GetNumSetting("AllowQuitShutdown");
     killable = (allowsd == 4);
 
     if (allowsd == 1)
@@ -112,7 +111,7 @@ void ThemedMenu::parseBackground(QString dir, QDomElement &element)
             if (info.tagName() == "image")
             {
                 path = dir + getFirstText(info);
-                bground = m_context->LoadScalePixmap(path);
+                bground = gContext->LoadScalePixmap(path);
             }
             else if (info.tagName() == "buttonarea")
             {
@@ -363,13 +362,13 @@ void ThemedMenu::parseButtonDefinition(QString dir, QDomElement &element)
             if (info.tagName() == "normal")
             {
                 setting = dir + getFirstText(info);
-                buttonnormal = m_context->LoadScalePixmap(setting);
+                buttonnormal = gContext->LoadScalePixmap(setting);
                 hasnormal = true;
             }
             else if (info.tagName() == "active")
             {
                 setting = dir + getFirstText(info);
-                buttonactive = m_context->LoadScalePixmap(setting);
+                buttonactive = gContext->LoadScalePixmap(setting);
                 hasactive = true;
             }
             else if (info.tagName() == "text")
@@ -417,7 +416,7 @@ void ThemedMenu::parseLogo(QString dir, QDomElement &element)
             if (info.tagName() == "image")
             {
                 QString logopath = dir + getFirstText(info);
-                logo = m_context->LoadScalePixmap(logopath); 
+                logo = gContext->LoadScalePixmap(logopath); 
                 hasimage = true;
             }
             else if (info.tagName() == "position")
@@ -465,7 +464,7 @@ void ThemedMenu::parseTitle(QString dir, QDomElement &element)
             if (info.tagName() == "image")
             {
                 QString titlepath = dir + getFirstText(info);
-                QPixmap *tmppix = m_context->LoadScalePixmap(titlepath);
+                QPixmap *tmppix = gContext->LoadScalePixmap(titlepath);
 
                 QString name = info.attribute("mode", "");
                 if (name != "")
@@ -535,13 +534,13 @@ void ThemedMenu::parseButton(QString dir, QDomElement &element)
             if (info.tagName() == "image")
             {
                 QString imagepath = dir + getFirstText(info); 
-                image = m_context->LoadScalePixmap(imagepath);
+                image = gContext->LoadScalePixmap(imagepath);
                 hasicon = true;
             }
             else if (info.tagName() == "activeimage")
             {
                 QString imagepath = dir + getFirstText(info);
-                activeimage = m_context->LoadScalePixmap(imagepath);
+                activeimage = gContext->LoadScalePixmap(imagepath);
             }
             else if (info.tagName() == "offset")
             {
@@ -1246,8 +1245,8 @@ void ThemedMenu::ReloadTheme(void)
         delete buttonactive;
     buttonactive = NULL;
 
-    QString theme = m_context->GetSetting("Theme");
-    QString themedir = m_context->FindThemeDir(theme);
+    QString theme = gContext->GetSetting("Theme");
+    QString themedir = gContext->FindThemeDir(theme);
  
     erase(menuRect());
 

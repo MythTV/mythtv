@@ -19,16 +19,14 @@ class QPushButton;
 class QSlider;
 class QTabWidget;
 class QWidget;
-class MythContext;
 
 class MameSettingsDlg : public QDialog
 { 
     Q_OBJECT
 
 public:
-    MameSettingsDlg(MythContext *context, QWidget* parent = 0, 
-                    const char* name = 0, bool modal = FALSE, 
-                    bool system = false, WFlags fl = 0 );
+    MameSettingsDlg(QWidget* parent = 0, const char* name = 0, 
+                    bool modal = FALSE, bool system = false, WFlags fl = 0 );
     ~MameSettingsDlg();
 
     QTabWidget* MameTab;
@@ -110,7 +108,6 @@ public:
     bool bSystem;
 
 private:
-    MythContext *m_context;
     float wmult, hmult;
 };
 

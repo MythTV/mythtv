@@ -9,22 +9,24 @@
 #include <iostream>
 using namespace std;
 
+MythContext *gContext;
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    MythContext *context = new MythContext();
-    context->ConnectServer("localhost", 6543);
+    gContext = new MythContext();
+    gContext->ConnectServer("localhost", 6543);
 
-    QString themename = context->GetSetting("Theme");
-    QString themedir = context->FindThemeDir(themename);
+    QString themename = gContext->GetSetting("Theme");
+    QString themedir = gContext->FindThemeDir(themename);
     if (themedir == "")
     {   
         cerr << "Couldn't find theme " << themename << endl;
         exit(0);
     }
     
-    context->LoadQtConfig();
+    gContext->LoadQtConfig();
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
@@ -32,13 +34,13 @@ int main(int argc, char *argv[])
         printf("Couldn't connect to database\n");
         return -1; 
     }       
-    if (!context->OpenDatabase(db))
+    if (!gContext->OpenDatabase(db))
     {
         printf("couldn't open db\n");
         return -1;
     }
 
-    TV *tv = new TV(context, db);
+    TV *tv = new TV(db);
     tv->Init();
 
     tv->LiveTV();
@@ -58,6 +60,7 @@ int main(int argc, char *argv[])
 
     sleep(1);
     delete tv;
+    delete gContext;
 
     exit(0);
 }

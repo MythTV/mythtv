@@ -15,17 +15,16 @@
 
 QPixmap *IconView::foldericon = NULL;
 
-IconView::IconView(MythContext *context, QSqlDatabase *db,
-                   const QString &startdir, 
+IconView::IconView(QSqlDatabase *db, const QString &startdir, 
                    QWidget *parent, const char *name)
-        : MythDialog(context, parent, name)
+        : MythDialog(parent, name)
 {
     m_db = db;
 
     fgcolor = paletteForegroundColor();
     highlightcolor = fgcolor;
 
-    m_font = new QFont("Arial", (int)(context->GetSmallFontSize() * hmult), 
+    m_font = new QFont("Arial", (int)(gContext->GetSmallFontSize() * hmult), 
                        QFont::Bold);
 
     thumbw = screenwidth / (THUMBS_W + 1);
@@ -315,12 +314,12 @@ void IconView::keyPressEvent(QKeyEvent *e)
 
             if (thumbs[pos].isdir)
             {
-                IconView iv(m_context, m_db, thumbs[pos].filename); 
+                IconView iv(m_db, thumbs[pos].filename); 
                 iv.exec();
             }
             else
             {
-                SingleView sv(m_context, m_db, &thumbs, pos);
+                SingleView sv(m_db, &thumbs, pos);
                 sv.exec();
             }
             handled = true;

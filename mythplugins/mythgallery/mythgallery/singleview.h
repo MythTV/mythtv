@@ -9,7 +9,6 @@
 class QImage;
 class QFont;
 class QTimer;
-class MythContext;
 
 #include "iconview.h"
 
@@ -17,8 +16,7 @@ class SingleView : public MythDialog
 {
     Q_OBJECT
   public:
-    SingleView(MythContext *context, QSqlDatabase *db,
-               vector<Thumbnail> *imagelist, int pos, 
+    SingleView(QSqlDatabase *db, vector<Thumbnail> *imagelist, int pos, 
                QWidget *parent = 0, const char *name = 0);
    ~SingleView();
 

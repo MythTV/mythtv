@@ -21,7 +21,6 @@ class Output;
 class VisualNode;
 
 class QTimer;
-class MythContext;
 
 class VisualNode
 {
@@ -58,7 +57,7 @@ class MainVisual : public QDialog, public Visual
     Q_OBJECT
 
 public:
-    MainVisual(MythContext *context, QWidget *parent = 0, const char * = 0);
+    MainVisual(QWidget *parent = 0, const char * = 0);
     virtual ~MainVisual();
 
     VisualBase *visual() const { return vis; }

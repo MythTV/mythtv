@@ -19,13 +19,12 @@ using namespace std;
 #include "scheduler.h"
 #include "httpstatus.h"
 
-MainServer::MainServer(MythContext *context, int port, int statusport,
+MainServer::MainServer(int port, int statusport, 
                        QMap<int, EncoderLink *> *tvList)
 {
     encoderList = tvList;
-    m_context = context;
 
-    recordfileprefix = context->GetFilePrefix();
+    recordfileprefix = gContext->GetFilePrefix();
 
     mythserver = new MythServer(port);
     connect(mythserver, SIGNAL(newConnect(QSocket *)), 
@@ -35,7 +34,7 @@ MainServer::MainServer(MythContext *context, int port, int statusport,
 
     statusserver = new HttpStatus(this, statusport);    
 
-    m_context->addListener(this);
+    gContext->addListener(this);
 }
 
 MainServer::~MainServer()
@@ -219,7 +218,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         cout << "adding: " << commands[2] << " as a remote file transfer\n";
         QString filename = slist[1];    
 
-        FileTransfer *ft = new FileTransfer(m_context, filename, socket);
+        FileTransfer *ft = new FileTransfer(filename, socket);
 
         fileTransferList.push_back(ft);
 
@@ -244,7 +243,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
     QSqlQuery query;
     QString thequery;
 
-    m_context->KickDatabase(QSqlDatabase::database());
+    MythContext::KickDatabase(QSqlDatabase::database());
 
     thequery = "SELECT chanid,starttime,endtime,title,subtitle,description "
                "FROM recorded ORDER BY starttime";
@@ -257,7 +256,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 
     QStringList outputlist;
 
-    QString fileprefix = m_context->GetFilePrefix();
+    QString fileprefix = gContext->GetFilePrefix();
 
     if (query.isActive() && query.numRowsAffected() > 0)
     {
@@ -307,8 +306,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             }
 
             QString lpath = proginfo->GetRecordFilename(fileprefix);
-            QString ip = m_context->GetSetting("ServerIP");
-            QString port = m_context->GetSetting("ServerPort");
+            QString ip = gContext->GetSetting("ServerIP");
+            QString port = gContext->GetSetting("ServerPort");
 
             if (pbs->isLocal())
                 proginfo->pathname = lpath;
@@ -336,7 +335,6 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 struct DeleteStruct
 {
     QString filename;
-    MythContext *context;
 };
 
 static void *SpawnDelete(void *param)
@@ -360,7 +358,7 @@ static void *SpawnDelete(void *param)
     sleep(2);
 
     MythEvent me("RECORDING_LIST_CHANGE");
-    ds->context->dispatch(me);
+    gContext->dispatch(me);
 
     delete ds;
 
@@ -386,7 +384,7 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
         }
     }
 
-    QString fileprefix = m_context->GetFilePrefix();
+    QString fileprefix = gContext->GetFilePrefix();
 
     QString filename = pginfo->GetRecordFilename(fileprefix);
 
@@ -398,7 +396,7 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
     QString endts = pginfo->endts.toString("yyyyMMddhhmm");
     endts += "00";
 
-    m_context->KickDatabase(QSqlDatabase::database());
+    MythContext::KickDatabase(QSqlDatabase::database());
 
     thequery = QString("DELETE FROM recorded WHERE chanid = %1 AND title "
                        "= \"%2\" AND starttime = %3 AND endtime = %4;")
@@ -415,7 +413,6 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
 
     DeleteStruct *ds = new DeleteStruct;
     ds->filename = filename;
-    ds->context = m_context;
 
     pthread_t deletethread;
     pthread_attr_t attr;
@@ -466,9 +463,9 @@ void MainServer::HandleQueryCheckFile(QString filename, PlaybackSock *pbs)
 
 void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs)
 {
-    m_context->KickDatabase(QSqlDatabase::database());
+    MythContext::KickDatabase(QSqlDatabase::database());
 
-    Scheduler *sched = new Scheduler(NULL, NULL, QSqlDatabase::database());
+    Scheduler *sched = new Scheduler(NULL, QSqlDatabase::database());
 
     bool conflicts = sched->FillRecordLists(false);
     list<ProgramInfo *> *recordinglist = sched->getAllPending();
@@ -491,9 +488,9 @@ void MainServer::HandleGetConflictingRecordings(QStringList &slist,
                                                 QString purge,
                                                 PlaybackSock *pbs)
 {
-    m_context->KickDatabase(QSqlDatabase::database());
+    MythContext::KickDatabase(QSqlDatabase::database());
 
-    Scheduler *sched = new Scheduler(NULL, NULL, QSqlDatabase::database());
+    Scheduler *sched = new Scheduler(NULL, QSqlDatabase::database());
 
     bool removenonplaying = purge.toInt();
 
@@ -535,8 +532,8 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
     }
 
     strlist << QString::number(retval);
-    strlist << m_context->GetSetting("ServerIP");
-    strlist << m_context->GetSetting("ServerPort");
+    strlist << gContext->GetSetting("ServerIP");
+    strlist << gContext->GetSetting("ServerPort");
 
     WriteStringList(pbs->getSocket(), strlist);
 }
@@ -601,9 +598,8 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
 
         enc->SetupRingBuffer(path, filesize, fillamount, pip);
 
-        QString ip = m_context->GetSetting("ServerIP");
-        QString port = m_context->GetSetting("ServerPort");
-
+        QString ip = gContext->GetSetting("ServerIP");
+        QString port = gContext->GetSetting("ServerPort");
         QString url = QString("rbuf://") + ip + ":" + port + path;
 
         retlist << url;
@@ -850,8 +846,8 @@ void MainServer::HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs)
     }
     
     QStringList retlist = QString::number(retval);
-    retlist << m_context->GetSetting("ServerIP");
-    retlist << m_context->GetSetting("ServerPort");
+    retlist << gContext->GetSetting("ServerIP");
+    retlist << gContext->GetSetting("ServerPort");
 
     WriteStringList(pbs->getSocket(), retlist);    
 }
@@ -861,7 +857,7 @@ void MainServer::HandleMessage(QStringList &slist, PlaybackSock *pbs)
     QString message = slist[1];
 
     MythEvent me(message);
-    m_context->dispatch(me);
+    gContext->dispatch(me);
 
     QStringList retlist = "OK";
 

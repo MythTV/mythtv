@@ -9,14 +9,12 @@ class QSqlDatabase;
 class QListViewItem;
 class QLabel;
 class ProgramInfo;
-class MythContext;
 
 class ViewScheduled : public MythDialog
 {
     Q_OBJECT
   public:
-    ViewScheduled(MythContext *context, QSqlDatabase *ldb, QWidget *parent = 0, 
-                  const char *name = 0);
+    ViewScheduled(QSqlDatabase *ldb, QWidget *parent = 0, const char *name = 0);
 
   protected slots:
     void selected(QListViewItem *);

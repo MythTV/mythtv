@@ -28,13 +28,12 @@ extern "C" {
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythwidgets.h>
 
-Ripper::Ripper(MythContext *context, QSqlDatabase *ldb, QWidget *parent, 
-               const char *name)
-      : MythDialog(context, parent, name)
+Ripper::Ripper(QSqlDatabase *ldb, QWidget *parent, const char *name)
+      : MythDialog(parent, name)
 {
     db = ldb;
     
-    CdDecoder *decoder = new CdDecoder(context, "cda", NULL, NULL, NULL);
+    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
     Metadata *track = decoder->getMetadata(db, 1);
 
     bigvb = new QVBoxLayout(this, 0);
@@ -177,7 +176,7 @@ QSizePolicy Ripper::sizePolicy(void)
 
 void Ripper::artistChanged(const QString &newartist)
 {
-    CdDecoder *decoder = new CdDecoder(m_context, "cda", NULL, NULL, NULL);
+    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
     Metadata *data = decoder->getMetadata(db, 1);
     
     data->setArtist(newartist);
@@ -191,7 +190,7 @@ void Ripper::artistChanged(const QString &newartist)
 
 void Ripper::albumChanged(const QString &newalbum)
 {
-    CdDecoder *decoder = new CdDecoder(m_context, "cda", NULL, NULL, NULL);
+    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
     Metadata *data = decoder->getMetadata(db, 1);
 
     data->setAlbum(newalbum);
@@ -205,7 +204,7 @@ void Ripper::albumChanged(const QString &newalbum)
 
 void Ripper::tableChanged(int row, int col)
 {
-    CdDecoder *decoder = new CdDecoder(m_context, "cda", NULL, NULL, NULL);
+    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
     Metadata *data = decoder->getMetadata(db, row + 1 );
 
     data->setTitle(table->text(row, col));
@@ -243,15 +242,12 @@ void Ripper::ripthedisc(void)
     int screenwidth = 0, screenheight = 0;
     float wmult = 0, hmult = 0;
 
-    m_context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
-    MythDialog *newdiag = new MythDialog(m_context, NULL, 0, TRUE);
-    newdiag->setGeometry(0, 0, screenwidth, screenheight);
-    newdiag->setFixedSize(QSize(screenwidth, screenheight));
+    MythDialog *newdiag = new MythDialog(NULL, 0, TRUE);
     
-    newdiag->setFont(QFont("Arial", (int)(m_context->GetBigFontSize() * hmult),
+    newdiag->setFont(QFont("Arial", (int)(gContext->GetBigFontSize() * hmult),
                      QFont::Bold));
-    newdiag->setCursor(QCursor(Qt::BlankCursor));
 
     QVBoxLayout *vb = new QVBoxLayout(newdiag, 20);
 
@@ -281,15 +277,15 @@ void Ripper::ripthedisc(void)
     qApp->processEvents();
 
     QString textstatus;
-    QString cddevice = m_context->GetSetting("CDDevice");
+    QString cddevice = gContext->GetSetting("CDDevice");
 
     char tempfile[512], outfile[4096];
-    CdDecoder *decoder = new CdDecoder(m_context, "cda", NULL, NULL, NULL);
+    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
 
     int encodequal = qualitygroup->id(qualitygroup->selected());
 
-    QString tempdir = m_context->GetSetting("TemporarySpace");
-    QString findir = m_context->GetSetting("MusicLocation");
+    QString tempdir = gContext->GetSetting("TemporarySpace");
+    QString findir = gContext->GetSetting("MusicLocation");
 
     for (int i = 0; i < totaltracks; i++)
     {
@@ -322,14 +318,14 @@ void Ripper::ripthedisc(void)
         if (encodequal < 3)
         {
             strcat(outfile, ".ogg");
-            VorbisEncode(m_context, tempfile, outfile, encodequal, track, 
-                         totalbytes, current);
+            VorbisEncode(tempfile, outfile, encodequal, track, totalbytes, 
+                         current);
         }
         else
         {
             strcat(outfile, ".flac");
-            FlacEncode(m_context, tempfile, outfile, encodequal, track, 
-                       totalbytes, current);
+            FlacEncode(tempfile, outfile, encodequal, track, totalbytes, 
+                       current);
         }
 
         unlink(tempfile);

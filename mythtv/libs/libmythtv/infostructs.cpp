@@ -8,12 +8,12 @@
 #include "infostructs.h"
 #include "mythcontext.h"
 
-void ChannelInfo::LoadIcon(MythContext *context)
+void ChannelInfo::LoadIcon(void)
 {
     int screenheight = 0, screenwidth = 0;
     float wmult = 0, hmult = 0;
 
-    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     icon = new QPixmap();
 
@@ -21,13 +21,13 @@ void ChannelInfo::LoadIcon(MythContext *context)
 
     if (tempimage.width() == 0)
     {
-        QString url = context->GetMasterHostPrefix();
+        QString url = gContext->GetMasterHostPrefix();
         if (url.length() < 1)
             return;
 
         url += iconpath;
 
-        tempimage = *(context->CacheRemotePixmap(url));
+        tempimage = *(gContext->CacheRemotePixmap(url));
     }
 
     if (tempimage.width() > 0)

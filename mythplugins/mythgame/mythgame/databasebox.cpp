@@ -14,11 +14,9 @@ using namespace std;
 #include "gamehandler.h"
 #include "extendedlistview.h"
 
-#include <mythtv/mythcontext.h>
-
-DatabaseBox::DatabaseBox(MythContext *context, QSqlDatabase *ldb, 
-                         QString &paths, QWidget *parent, const char *name)
-           : MythDialog(context, parent, name)
+DatabaseBox::DatabaseBox(QSqlDatabase *ldb, QString &paths, QWidget *parent, 
+                         const char *name)
+           : MythDialog(parent, name)
 {
     db = ldb;
 
@@ -52,8 +50,7 @@ void DatabaseBox::fillList(QListView *listview, QString &paths)
 {
     QString templevel = "system";
     QString temptitle = "All Games";
-    TreeItem *allgames = new TreeItem(m_context, listview, temptitle,
-                                      templevel, NULL);
+    TreeItem *allgames = new TreeItem(listview, temptitle, templevel, NULL);
     
     QStringList lines = QStringList::split(" ", paths);
 
@@ -83,8 +80,7 @@ void DatabaseBox::fillList(QListView *listview, QString &paths)
             RomInfo *rinfo = new RomInfo();
             rinfo->setField(first, current);
 
-            TreeItem *item = new TreeItem(m_context, allgames, current,
-                                          first, rinfo);
+            TreeItem *item = new TreeItem(allgames, current, first, rinfo);
             fillNextLevel(level, num, querystr, matchstr, line, lines,
                           item);
         }
@@ -130,7 +126,7 @@ void DatabaseBox::fillNextLevel(QString level, int num, QString querystr,
             RomInfo *rinfo;
             if(isleaf)
             {
-                rinfo = GameHandler::CreateRomInfo(m_context, parentinfo);
+                rinfo = GameHandler::CreateRomInfo(parentinfo);
                 rinfo->setField(level, current);
                 rinfo->fillData(db);
             }
@@ -140,8 +136,7 @@ void DatabaseBox::fillNextLevel(QString level, int num, QString querystr,
                 rinfo->setField(level, current);
             }
 
-            TreeItem *item = new TreeItem(m_context, parent, current, level,
-                                          rinfo);
+            TreeItem *item = new TreeItem(parent, current, level, rinfo);
 
             if (line != lines.end())
                 fillNextLevel(*line, num + 1, querystr, matchstr2, line, lines,
@@ -182,11 +177,11 @@ void DatabaseBox::editSettings(QListViewItem *item)
 
     if (tcitem->childCount() <= 0)
     {
-        GameHandler::EditSettings(m_context, this, tcitem->getRomInfo());
+        GameHandler::EditSettings(this, tcitem->getRomInfo());
     }
     else if("system" == tcitem->getLevel())
     {
-        GameHandler::EditSystemSettings(m_context, this, tcitem->getRomInfo());
+        GameHandler::EditSystemSettings(this, tcitem->getRomInfo());
     }
 }
 
@@ -196,7 +191,7 @@ void DatabaseBox::doSelected(QListViewItem *item)
 
     if (tcitem->childCount() <= 0)
     {
-        GameHandler::Launchgame(m_context, tcitem->getRomInfo());
+        GameHandler::Launchgame(tcitem->getRomInfo());
     }
 }
 

@@ -15,14 +15,12 @@
 
 class QSqlDatabase;
 class QDateTime;
-class MythContext;
 class QSocket;
 
 class TVRec
 {
  public:
-    TVRec(MythContext *lcontext, const QString &startchannel, 
-          int capturecardnum);
+    TVRec(const QString &startchannel, int capturecardnum);
    ~TVRec(void);
 
     void Init(void);
@@ -116,8 +114,6 @@ class TVRec
 
     void WriteRecordedRecord();
 
-    MythContext *context;
-    
     NuppelVideoRecorder *nvr;
     RingBuffer *rbuffer;
     Channel *channel;

@@ -19,7 +19,6 @@ class QFont;
 class ProgramInfo;
 class TimeInfo;
 class ChannelInfo;
-class MythContext;
 class QSqlDatabase;
 class TV;
 
@@ -28,15 +27,15 @@ class TV;
 
 
 // Use this function to instantiate a guidegrid instance.
-QString RunProgramGuide(MythContext *context, QString startchannel, 
-                        bool thread = false, TV *player = NULL);
+QString RunProgramGuide(QString startchannel, bool thread = false, 
+                        TV *player = NULL);
 
 
 class GuideGrid : public MythDialog
 {
     Q_OBJECT
   public:
-    GuideGrid(MythContext *context, const QString &channel, TV *player = NULL,
+    GuideGrid(const QString &channel, TV *player = NULL,
               QWidget *parent = 0, const char *name = 0);
    ~GuideGrid();
 

@@ -53,12 +53,9 @@ long read_samples(float **buffer, FILE *in, int samples, long int totalsamples,
     return realsamples;
 }
 
-void VorbisEncode(MythContext *context, const char *infile, 
-                  const char *outfile, int qualitylevel, Metadata *metadata, 
-                  int totalbytes, QProgressBar *progressbar)
+void VorbisEncode(const char *infile, const char *outfile, int qualitylevel, 
+                  Metadata *metadata, int totalbytes, QProgressBar *progressbar)
 {
-    context = context;
-
     long int totalsamples = (totalbytes / 4);
     progressbar->setTotalSteps(totalsamples);
     progressbar->setProgress(0);

@@ -9,10 +9,9 @@
 #include "mythcontext.h"
 #include "mythwidgets.h"
 
-DialogBox::DialogBox(MythContext *context, const QString &text, 
-                     const char *checkboxtext,
+DialogBox::DialogBox(const QString &text, const char *checkboxtext,
                      QWidget *parent, const char *name)
-         : MythDialog(context, parent, name)
+         : MythDialog(parent, name)
 {
     QLabel *maintext = new QLabel(text, this);
     maintext->setBackgroundOrigin(WindowOrigin);

@@ -124,4 +124,6 @@ class MythContext : public QObject
     QMap<QString, QImage> imageCache;
 };
 
+extern MythContext *gContext;
+
 #endif

@@ -36,16 +36,15 @@ private:
     int m_type;
 };
 
-SetRecTimeDialog::SetRecTimeDialog(MythContext *context, ProgramInfo *rec,
-                                   QSqlDatabase *ldb, QWidget *parent,
-                                   const char *name)
-                : MythDialog(context, parent, name)
+SetRecTimeDialog::SetRecTimeDialog(ProgramInfo *rec, QSqlDatabase *ldb, 
+                                   QWidget *parent, const char *name)
+                : MythDialog(parent, name)
 {
     m_proginfo = rec;
     db = ldb;
 
-    int bigfont = m_context->GetBigFontSize();
-    int mediumfont = m_context->GetMediumFontSize();
+    int bigfont = gContext->GetBigFontSize();
+    int mediumfont = gContext->GetMediumFontSize();
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
@@ -158,12 +157,8 @@ QLabel *SetRecTimeDialog::getDateLabel(ProgramInfo *pginfo)
     QDateTime startts = pginfo->startts;
     QDateTime endts = pginfo->endts;
 
-    QString dateformat = m_context->GetSetting("DateFormat");
-    if (dateformat == "")
-        dateformat = "ddd MMMM d";
-    QString timeformat = m_context->GetSetting("TimeFormat");
-    if (timeformat == "")
-        timeformat = "h:mm AP";
+    QString dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    QString timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
 
     QString timedate = endts.date().toString(dateformat) + QString(", ") +
                        startts.time().toString(timeformat) + QString(" - ") +

@@ -313,25 +313,22 @@ void MythPushButton::drawButton( QPainter * p )
     drawButtonLabel(p);
 }
 
-MythDialog::MythDialog(MythContext *context, QWidget *parent, const char *name,
-                       bool modal)
+MythDialog::MythDialog(QWidget *parent, const char *name, bool modal)
           : QDialog(parent, name, modal)
 {
-    m_context = context;
-
-    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     int x, y, w, h;
-    GetMythTVGeometry(context, qt_xdisplay(), qt_xscreen(), &x, &y, &w, &h);
+    GetMythTVGeometry(qt_xdisplay(), qt_xscreen(), &x, &y, &w, &h);
 
     setGeometry(x, y, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
-    setFont(QFont("Arial", (int)(context->GetMediumFontSize() * hmult),
+    setFont(QFont("Arial", (int)(gContext->GetMediumFontSize() * hmult),
             QFont::Bold));
     setCursor(QCursor(Qt::BlankCursor));
 
-    context->ThemeWidget(this);
+    gContext->ThemeWidget(this);
 }
 
 void MythDialog::Show(void)

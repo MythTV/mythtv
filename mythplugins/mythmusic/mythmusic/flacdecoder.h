@@ -10,8 +10,7 @@ class Metadata;
 class FlacDecoder : public Decoder
 {
   public:
-    FlacDecoder(MythContext *context, const QString &file, DecoderFactory *, 
-                QIODevice *, Output *);
+    FlacDecoder(const QString &file, DecoderFactory *, QIODevice *, Output *);
     virtual ~FlacDecoder(void);
 
     bool initialize();

@@ -19,8 +19,6 @@
 
 #include <vector>
 
-class MythContext;
-
 // These widgets follow these general navigation rules:
 //
 // - Up and Down shift focus to the previous/next widget in the tab
@@ -194,8 +192,7 @@ class MythCheckBox: public QCheckBox
 class MythDialog : public QDialog
 {
   public:
-    MythDialog(MythContext *context, QWidget *parent = 0, const char *name = 0,
-               bool modal = FALSE);
+    MythDialog(QWidget *parent = 0, const char *name = 0, bool modal = FALSE);
     
     virtual void Show();
 
@@ -203,7 +200,6 @@ class MythDialog : public QDialog
     float getWFactor(void) { return wmult; }
 
   protected:
-    MythContext *m_context;
     float wmult, hmult;
     int screenwidth, screenheight;
 };

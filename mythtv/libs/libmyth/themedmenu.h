@@ -44,13 +44,11 @@ struct MenuRow
     vector<ThemedButton *> buttons;
 };
 
-class MythContext;
-
 class ThemedMenu : public MythDialog
 {
     Q_OBJECT
   public:
-    ThemedMenu(MythContext *context, const char *cdir, const char *menufile, 
+    ThemedMenu(const char *cdir, const char *menufile, 
                QWidget *parent = 0, const char *name = 0);
    ~ThemedMenu();
 

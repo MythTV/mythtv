@@ -19,8 +19,8 @@ class ScreenBox : public MythDialog
 {
     Q_OBJECT
   public:
-    ScreenBox(MythContext *context, QSqlDatabase *ldb, QString &paths,
-              QWidget *parent = 0, const char *name = 0);
+    ScreenBox(QSqlDatabase *ldb, QString &paths, QWidget *parent = 0, 
+              const char *name = 0);
 
   protected slots:
     void setImages(QListViewItem *);

@@ -14,8 +14,6 @@ using namespace std;
 #include "recycler.h"
 #include "metadata.h"
 
-#include <mythtv/mythcontext.h>
-
 // static functions for OggVorbis
 
 static size_t oggread (void *buf, size_t size, size_t nmemb, void *src) {
@@ -66,9 +64,9 @@ static long oggtell(void *src)
     return t;
 }
 
-VorbisDecoder::VorbisDecoder(MythContext *context, const QString &file, 
-                             DecoderFactory *d, QIODevice *i, Output *o) 
-             : Decoder(context, d, i, o)
+VorbisDecoder::VorbisDecoder(const QString &file, DecoderFactory *d, 
+                             QIODevice *i, Output *o) 
+             : Decoder(d, i, o)
 {
     filename = file;
     inited = FALSE;
@@ -400,16 +398,15 @@ const QString &VorbisDecoderFactory::description() const
     return desc;
 }
 
-Decoder *VorbisDecoderFactory::create(MythContext *context, const QString &file,
-                                      QIODevice *input, Output *output,
-                                      bool deletable)
+Decoder *VorbisDecoderFactory::create(const QString &file, QIODevice *input, 
+                                      Output *output, bool deletable)
 {
     if (deletable)
-        return new VorbisDecoder(context, file, this, input, output);
+        return new VorbisDecoder(file, this, input, output);
 
     static VorbisDecoder *decoder = 0;
     if (! decoder) {
-        decoder = new VorbisDecoder(context, file, this, input, output);
+        decoder = new VorbisDecoder(file, this, input, output);
     } else {
         decoder->setInput(input);
         decoder->setOutput(output);

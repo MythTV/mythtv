@@ -16,8 +16,6 @@ class QFont;
 #define THUMBS_W 3
 #define THUMBS_H 3
 
-class MythContext;
-
 class Thumbnail
 {
   public:
@@ -38,8 +36,7 @@ class IconView : public MythDialog
 {
     Q_OBJECT
   public:
-    IconView(MythContext *context, QSqlDatabase *db, 
-             const QString &startdir, QWidget *parent = 0,
+    IconView(QSqlDatabase *db, const QString &startdir, QWidget *parent = 0,
              const char *name = 0);
    ~IconView();
 

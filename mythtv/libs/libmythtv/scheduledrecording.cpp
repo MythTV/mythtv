@@ -1,6 +1,7 @@
 #include "scheduledrecording.h"
 #include "programinfo.h"
 #include "recordingprofile.h"
+#include "mythcontext.h"
 #include <qlayout.h>
 #include <qlabel.h>
 #include <qapplication.h>
@@ -375,16 +376,16 @@ void ScheduledRecording::doneRecording(QSqlDatabase* db, const ProgramInfo& prog
         remove(db);
 }
 
-MythDialog* ScheduledRecording::dialogWidget(MythContext* context,
-                                             QWidget* parent, const char* name) {
+MythDialog* ScheduledRecording::dialogWidget(QWidget* parent, const char* name)
+{
     float wmult, hmult;
     int screenwidth, screenheight;
-    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
-    int bigfont = context->GetBigFontSize();
-    int mediumfont = context->GetMediumFontSize();
+    int bigfont = gContext->GetBigFontSize();
+    int mediumfont = gContext->GetMediumFontSize();
 
-    MythDialog* dialog = new ConfigurationDialogWidget(context, parent, name);
+    MythDialog* dialog = new ConfigurationDialogWidget(parent, name);
     QVBoxLayout* vbox = new QVBoxLayout(dialog);
 
     QGridLayout *grid = new QGridLayout(vbox, 4, 2, (int)(10*wmult));
@@ -393,8 +394,8 @@ MythDialog* ScheduledRecording::dialogWidget(MythContext* context,
     titlefield->setBackgroundOrigin(QWidget::WindowOrigin);
     titlefield->setFont(QFont("Arial", (int)(bigfont * hmult), QFont::Bold));
 
-    QString dateFormat = context->GetSetting("DateFormat");
-    QString timeFormat = context->GetSetting("TimeFormat");
+    QString dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
     
     QString dateText = "Date: ";
     switch (getRecordingType()) {
@@ -460,8 +461,8 @@ MythDialog* ScheduledRecording::dialogWidget(MythContext* context,
     f->setLineWidth((int)(4 * hmult));
     vbox->addWidget(f);    
 
-    vbox->addWidget(type->configWidget(this, dialog, hmult));
-    vbox->addWidget(profile->configWidget(this, dialog, hmult));
+    vbox->addWidget(type->configWidget(this, dialog));
+    vbox->addWidget(profile->configWidget(this, dialog));
 
     return dialog;
 }
@@ -515,9 +516,8 @@ void ScheduledRecordingEditor::load(QSqlDatabase* db) {
 }
 
 
-int ScheduledRecordingEditor::exec(MythContext* context, QSqlDatabase* db) {
-    m_context = context;
-    while (ConfigurationDialog::exec(context, db) == QDialog::Accepted)
+int ScheduledRecordingEditor::exec(QSqlDatabase* db) {
+    while (ConfigurationDialog::exec(db) == QDialog::Accepted)
         open(getValue().toInt());
 
     return QDialog::Rejected;
@@ -529,7 +529,7 @@ void ScheduledRecordingEditor::open(int id) {
     if (id != 0)
         sr->loadByID(db,id);
 
-    if (sr->exec(m_context, db) == QDialog::Accepted)
+    if (sr->exec(db) == QDialog::Accepted)
         sr->save(db);
     delete sr;
 }

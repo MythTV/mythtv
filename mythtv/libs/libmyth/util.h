@@ -4,8 +4,6 @@
 #include <qsocket.h>
 #include <qstringlist.h>
 
-class MythContext;
-
 bool WriteStringList(QSocket *socket, QStringList &list);
 bool ReadStringList(QSocket *socket, QStringList &list);
 
@@ -15,7 +13,7 @@ int ReadBlock(QSocket *socket, void *data, int maxlen);
 void encodeLongLong(QStringList &list, long long num);
 long long decodeLongLong(QStringList &list, int offset);
 
-void GetMythTVGeometry(MythContext *context, Display *dpy, int screen_num, 
-                       int *x, int *y, int *w, int *h);
+void GetMythTVGeometry(Display *dpy, int screen_num, int *x, int *y, 
+                       int *w, int *h);
 
 #endif

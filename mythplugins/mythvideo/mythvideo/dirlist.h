@@ -4,13 +4,13 @@
 class Dirlist
 {
   public:
-    Dirlist::Dirlist(MythContext *context, QString &directory);
+    Dirlist::Dirlist(QString &directory);
     QValueList<Metadata> Dirlist::GetPlaylist()
     {
         return playlist;
     };
   private:
-    Metadata * Dirlist::CheckFile(MythContext *context, QString &filename);
+    Metadata * Dirlist::CheckFile(QString &filename);
     QValueList<Metadata> playlist;
 };
 

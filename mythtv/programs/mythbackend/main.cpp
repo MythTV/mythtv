@@ -20,10 +20,11 @@ using namespace std;
 #include "libmyth/mythcontext.h"
 
 QMap<int, EncoderLink *> tvList;
+MythContext *gContext;
 
-void setupTVs(MythContext *context)
+void setupTVs(void)
 {
-    QString startchannel = context->GetSetting("DefaultTVChannel");
+    QString startchannel = gContext->GetSetting("DefaultTVChannel");
     if (startchannel == "")
         startchannel = "3";
 
@@ -37,7 +38,7 @@ void setupTVs(MythContext *context)
         {
             int cardid = query.value(0).toInt();
 
-            TVRec *tv = new TVRec(context, startchannel, cardid);
+            TVRec *tv = new TVRec(startchannel, cardid);
             tv->Init();
             EncoderLink *enc = new EncoderLink(tv);
             tvList[cardid] = enc;
@@ -122,8 +123,8 @@ int main(int argc, char **argv)
         dup2(logfd, 2);
     }
 
-    MythContext *context = new MythContext(false);
-    context->LoadSettingsFiles("backend_settings.txt");
+    gContext = new MythContext(false);
+    gContext->LoadSettingsFiles("backend_settings.txt");
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
@@ -139,25 +140,25 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    if (!context->OpenDatabase(db) || !context->OpenDatabase(subthread))
+    if (!gContext->OpenDatabase(db) || !gContext->OpenDatabase(subthread))
     {
         printf("couldn't open db\n");
         return -1;
     }
 
-    setupTVs(context);
+    setupTVs();
 
     QSqlDatabase *scdb = QSqlDatabase::database("SUBDB");
-    Scheduler *sched = new Scheduler(context, &tvList, scdb);
+    Scheduler *sched = new Scheduler(&tvList, scdb);
 
-    int port = context->GetNumSetting("ServerPort", 6543);
-    int statusport = context->GetNumSetting("StatusPort", 6544);
+    int port = gContext->GetNumSetting("ServerPort", 6543);
+    int statusport = gContext->GetNumSetting("StatusPort", 6544);
 
-    new MainServer(context, port, statusport, &tvList);
+    new MainServer(port, statusport, &tvList);
 
     a.exec();
 
-    delete context;
+    delete gContext;
     delete sched;
 
     if (pidfile != "")

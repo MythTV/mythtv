@@ -18,7 +18,7 @@ class DatabaseBox : public MythDialog
 {
     Q_OBJECT
   public:
-    DatabaseBox(MythContext *context, QSqlDatabase *ldb, QString &paths,
+    DatabaseBox(QSqlDatabase *ldb, QString &paths,
                 QWidget *parent = 0, const char *name = 0);
 
   protected slots:

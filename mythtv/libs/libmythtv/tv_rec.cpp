@@ -23,10 +23,8 @@ void *SpawnEncode(void *param)
     return NULL;
 }
 
-TVRec::TVRec(MythContext *lcontext, const QString &startchannel, 
-             int capturecardnum) 
+TVRec::TVRec(const QString &startchannel, int capturecardnum) 
 {
-    context = lcontext;
     db_conn = NULL;
     channel = NULL;
     rbuffer = NULL;
@@ -41,20 +39,18 @@ TVRec::TVRec(MythContext *lcontext, const QString &startchannel,
 
     ConnectDB(capturecardnum);
 
-    QString chanorder = context->GetSetting("ChannelOrdering");
-    if (chanorder == "")
-        chanorder = "channum + 0";
+    QString chanorder = gContext->GetSetting("ChannelOrdering", "channum + 0");
 
     audiosamplerate = -1;
 
     GetDevices(capturecardnum, videodev, vbidev, audiodev, audiosamplerate);
 
-    QString inputname = context->GetSetting("TunerCardInput");
+    QString inputname = gContext->GetSetting("TunerCardInput");
 
     channel = new Channel(this, videodev);
     channel->Open();
-    channel->SetFormat(context->GetSetting("TVFormat"));
-    channel->SetFreqTable(context->GetSetting("FreqTable"));
+    channel->SetFormat(gContext->GetSetting("TVFormat"));
+    channel->SetFreqTable(gContext->GetSetting("FreqTable"));
     if (inputname != "")
         channel->SwitchToInput(inputname);
     channel->SetChannelByString(startchannel);
@@ -65,7 +61,7 @@ TVRec::TVRec(MythContext *lcontext, const QString &startchannel,
 void TVRec::Init(void)
 {
     inoverrecord = false;
-    overrecordseconds = context->GetNumSetting("RecordOverTime");
+    overrecordseconds = gContext->GetNumSetting("RecordOverTime");
 
     nvr = NULL;
     rbuffer = NULL;
@@ -109,7 +105,7 @@ int TVRec::AllowRecording(ProgramInfo *rcinfo, int timeuntil)
     }
 
     QString message = QString("MythTV wants to record \"") + rcinfo->title;
-    if (context->GetNumSetting("DisplayChanNum") != 0)
+    if (gContext->GetNumSetting("DisplayChanNum") != 0)
         message += QString("\" on ") + rcinfo->channame + " [" +
                    rcinfo->chansign + "]";
     else
@@ -120,14 +116,14 @@ int TVRec::AllowRecording(ProgramInfo *rcinfo, int timeuntil)
                                                   .arg(timeuntil - 2);
 
     MythEvent me(query, message);
-    context->dispatch(me);
+    gContext->dispatch(me);
 
     return -1;
 }
 
 void TVRec::StartRecording(ProgramInfo *rcinfo)
 {  
-    QString recprefix = context->GetSetting("RecordFilePrefix");
+    QString recprefix = gContext->GetSetting("RecordFilePrefix");
 
     if (inoverrecord)
     {
@@ -156,7 +152,7 @@ void TVRec::StartRecording(ProgramInfo *rcinfo)
         QString message = QString("LIVE_TV_READY %1").arg(m_capturecardnum);
         MythEvent me(message);
 
-        context->dispatch(me);
+        gContext->dispatch(me);
     }  
 }
 
@@ -236,13 +232,13 @@ void TVRec::WriteRecordedRecord(void)
         return;
 
     pthread_mutex_lock(&db_lock);
-    context->KickDatabase(db_conn);
+    MythContext::KickDatabase(db_conn);
 
     curRecording->WriteRecordedToDB(db_conn);
     pthread_mutex_unlock(&db_lock);
 
     MythEvent me("RECORDING_LIST_CHANGE");
-    context->dispatch(me);
+    gContext->dispatch(me);
 }
 
 void TVRec::HandleStateChange(void)
@@ -287,7 +283,7 @@ void TVRec::HandleStateChange(void)
              nextState == kState_RecordingOnly) 
     {
         SetChannel(true);  
-        rbuffer = new RingBuffer(context, outputFilename, true);
+        rbuffer = new RingBuffer(outputFilename, true);
 
         WriteRecordedRecord();
 
@@ -345,15 +341,15 @@ void TVRec::HandleStateChange(void)
         QString message = QString("DONE_RECORDING %1 %2").arg(m_capturecardnum)
                                                          .arg(filelen);
         MythEvent me(message);
-        context->dispatch(me);
+        gContext->dispatch(me);
 
         delete curRecording;
         curRecording = NULL;
 
         MythEvent me2("RECORDING_LIST_CHANGE");
-        context->dispatch(me2);
+        gContext->dispatch(me2);
 
-        outputFilename = context->GetSetting("LiveBufferDir") + 
+        outputFilename = gContext->GetSetting("LiveBufferDir") + 
                          QString("/ringbuf%1.nuv").arg(m_capturecardnum);
 
         inoverrecord = false;
@@ -388,7 +384,7 @@ void TVRec::HandleStateChange(void)
     {
         pthread_mutex_lock(&db_lock);
 
-        context->KickDatabase(db_conn);
+        MythContext::KickDatabase(db_conn);
 
         RecordingProfile profile;
         if (curRecording) {
@@ -467,8 +463,8 @@ void TVRec::SetupRecorder(RecordingProfile& profile)
     nvr->SetResolution(profile.byName("width")->getValue().toInt(),
                        profile.byName("height")->getValue().toInt());
 
-    nvr->SetTVFormat(context->GetSetting("TVFormat"));
-    nvr->SetVbiFormat(context->GetSetting("VbiFormat"));
+    nvr->SetTVFormat(gContext->GetSetting("TVFormat"));
+    nvr->SetVbiFormat(gContext->GetSetting("VbiFormat"));
 
     nvr->SetAudioDevice(audiodev);
    
@@ -498,7 +494,7 @@ void TVRec::TeardownRecorder(bool killFile)
         QString message = QString("DONE_RECORDING %1 %2").arg(m_capturecardnum)
                                                          .arg(filelen);
         MythEvent me(message);
-        context->dispatch(me);
+        gContext->dispatch(me);
 
         nvr->StopRecording();
         pthread_join(encode, NULL);
@@ -531,18 +527,18 @@ void TVRec::TeardownRecorder(bool killFile)
         curRecording = NULL;
 
         MythEvent me("RECORDING_LIST_CHANGE");
-        context->dispatch(me);
+        gContext->dispatch(me);
     }
 }    
 
 char *TVRec::GetScreenGrab(QString filename, int secondsin, int &bufferlen,
                            int &video_width, int &video_height)
 {
-    RingBuffer *tmprbuf = new RingBuffer(context, filename, false);
+    RingBuffer *tmprbuf = new RingBuffer(filename, false);
 
-    NuppelVideoPlayer *nupvidplay = new NuppelVideoPlayer(context);
+    NuppelVideoPlayer *nupvidplay = new NuppelVideoPlayer();
     nupvidplay->SetRingBuffer(tmprbuf);
-    nupvidplay->SetAudioSampleRate(context->GetNumSetting("AudioSampleRate"));
+    nupvidplay->SetAudioSampleRate(gContext->GetNumSetting("AudioSampleRate"));
 
     char *retbuf = nupvidplay->GetScreenGrab(secondsin, bufferlen, video_width,
                                              video_height);
@@ -559,7 +555,7 @@ void TVRec::SetChannel(bool needopen)
         channel->Open();
 
     pthread_mutex_lock(&db_lock);
-    context->KickDatabase(db_conn);
+    MythContext::KickDatabase(db_conn);
 
     QString thequery = QString("SELECT channel.channum,cardinput.inputname "
                                "FROM channel,capturecard,cardinput WHERE "
@@ -681,7 +677,7 @@ void TVRec::GetChannelInfo(Channel *chan, QString &title, QString &subtitle,
         return;
     pthread_mutex_lock(&db_lock);
 
-    context->KickDatabase(db_conn);
+    MythContext::KickDatabase(db_conn);
 
     char curtimestr[128];
     time_t curtime;
@@ -754,7 +750,7 @@ void TVRec::ConnectDB(int cardnum)
         printf("Couldn't initialize mysql connection\n");
         return;
     }
-    if (!context->OpenDatabase(db_conn))
+    if (!gContext->OpenDatabase(db_conn))
     {
         printf("Couldn't open database\n");
     }
@@ -784,7 +780,7 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
 
     pthread_mutex_lock(&db_lock);
 
-    context->KickDatabase(db_conn);
+    MythContext::KickDatabase(db_conn);
 
     QString thequery = QString("SELECT videodevice,vbidevice,audiodevice,"
                                "audioratelimit FROM capturecard "
@@ -831,7 +827,7 @@ bool TVRec::CheckChannel(Channel *chan, const QString &channum, int &finetuning)
 
     pthread_mutex_lock(&db_lock);
 
-    context->KickDatabase(db_conn);
+    MythContext::KickDatabase(db_conn);
 
     bool ret = false;
 
@@ -882,7 +878,7 @@ QString TVRec::GetNextChannel(Channel *chan, bool direction)
 
     pthread_mutex_lock(&db_lock);
 
-    context->KickDatabase(db_conn);
+    MythContext::KickDatabase(db_conn);
 
     QString channelorder = chan->GetOrdering();
 
@@ -1080,10 +1076,10 @@ void TVRec::SetupRingBuffer(QString &path, long long &filesize,
                             long long &fillamount, bool pip)
 {
     ispip = pip;
-    filesize = context->GetNumSetting("BufferSize");
-    fillamount = context->GetNumSetting("MaxBufferFill");
+    filesize = gContext->GetNumSetting("BufferSize");
+    fillamount = gContext->GetNumSetting("MaxBufferFill");
 
-    path = context->GetSetting("LiveBufferDir") + QString("/ringbuf%1.nuv")
+    path = gContext->GetSetting("LiveBufferDir") + QString("/ringbuf%1.nuv")
                                                        .arg(m_capturecardnum);
 
     outputFilename = path;
@@ -1091,7 +1087,7 @@ void TVRec::SetupRingBuffer(QString &path, long long &filesize,
     filesize = filesize * 1024 * 1024 * 1024;
     fillamount = fillamount * 1024 * 1024;
 
-    rbuffer = new RingBuffer(context, path, filesize, fillamount);
+    rbuffer = new RingBuffer(path, filesize, fillamount);
 }
 
 void TVRec::SpawnLiveTV(void)

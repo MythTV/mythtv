@@ -6,12 +6,10 @@ using namespace std;
 
 struct XvData;
 
-class MythContext;
-
 class XvVideoOutput
 {
   public:
-    XvVideoOutput(MythContext *context);
+    XvVideoOutput();
    ~XvVideoOutput();
 
     bool Init(int width, int height, char *window_name, 
@@ -64,8 +62,6 @@ class XvVideoOutput
     unsigned char *scratchspace;
 
     pthread_mutex_t lock;
-
-    MythContext *m_context;
 };
 
 #endif

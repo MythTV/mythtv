@@ -1,38 +1,38 @@
 # Order in which to sort the game roms - this is for all systems
-str TreeLevels=system year genre gamename
+TreeLevels=system year genre gamename
 
 # Number of screenshots to show per column. if 0 then use game names only.
 # default is 0 -- set this to 5 if you want the screenshot selection menu.
-int ShotCount=0
+ShotCount=0
 
 ### Mame specific settings ###
 
 # Path and name of xmame binary
-str XMameBinary=/usr/X11R6/bin/xmame
+XMameBinary=/usr/X11R6/bin/xmame
 
 # Directory where mame roms are located.
-str MameRomLocation=/roms
+MameRomLocation=/roms
 
 # path and name of catver file.
-str XMameCatFile=/home/chuck/catver.ini
+XMameCatFile=/home/chuck/catver.ini
 
 # Directory where screenshots are kept
-str MameScreensLocation=/screens
+MameScreensLocation=/screens
 
 # Directory where high scores are kept
-#str MameScoresLocation=
+#MameScoresLocation=
 
 # Directory where flyers are kept
-str MameFlyersLocation=/flyers
+MameFlyersLocation=/flyers
 
 # Directory where cabinets are kept
-str MameCabinetsLocation=/cabs
+MameCabinetsLocation=/cabs
 
 # Directory where history files are kept
-#str MameHistoryLocation=
+#MameHistoryLocation=
 
 # Direstory where cheat files are kept
-#str MameCheatLocation=
+#MameCheatLocation=
 
 
 

@@ -39,17 +39,15 @@ using namespace std;
 #include "res/prev.xpm"
 #include "res/stop.xpm"
 
-PlaybackBox::PlaybackBox(MythContext *context, QSqlDatabase *ldb, 
-                         QValueList<Metadata> *playlist,
+PlaybackBox::PlaybackBox(QSqlDatabase *ldb, QValueList<Metadata> *playlist,
                          QWidget *parent, const char *name)
-           : MythDialog(context, parent, name)
+           : MythDialog(parent, name)
 {
     db = ldb;
-    m_context = context;
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
-    mainvisual = new MainVisual(context);
+    mainvisual = new MainVisual();
     
     QVBoxLayout *vbox2 = new QVBoxLayout(vbox, (int)(2 * wmult));
 
@@ -136,7 +134,7 @@ PlaybackBox::PlaybackBox(MythContext *context, QSqlDatabase *ldb,
 
     QHBoxLayout *secondcontrol = new QHBoxLayout(vbox2, (int)(2 * wmult));
 
-    QFont buttonfont("Arial", (int)((context->GetSmallFontSize() + 2) * hmult),
+    QFont buttonfont("Arial", (int)((gContext->GetSmallFontSize() + 2) * hmult),
                      QFont::Bold);
 
     randomize = new MythToolButton(this);
@@ -206,7 +204,7 @@ PlaybackBox::PlaybackBox(MythContext *context, QSqlDatabase *ldb,
 
     curMeta = ((*plist)[playlistindex]);
 
-    QString playmode = m_context->GetSetting("PlayMode");
+    QString playmode = gContext->GetSetting("PlayMode");
     if(playmode == "random")
     {
         toggleShuffle();
@@ -359,7 +357,7 @@ void PlaybackBox::play()
 
     if (!output)
     {
-        QString adevice = m_context->GetSetting("AudioDevice");
+        QString adevice = gContext->GetSetting("AudioDevice");
 
         output = new AudioOutput(outputBufferSize * 1024, adevice);
         output->setBufferSize(outputBufferSize * 1024);
@@ -384,7 +382,7 @@ void PlaybackBox::play()
         decoder = 0;
 
     if (!decoder) {
-        decoder = Decoder::create(m_context, sourcename, input, output);
+        decoder = Decoder::create(sourcename, input, output);
 
         if (! decoder) {
             printf("mythmusic: unsupported fileformat\n");
@@ -675,8 +673,8 @@ void PlaybackBox::editPlaylist()
     Metadata firstdata = curMeta;
     
     QValueList<Metadata> dblist = *plist; 
-    QString paths = m_context->GetSetting("TreeLevels");
-    DatabaseBox dbbox(m_context, db, paths, &dblist);
+    QString paths = gContext->GetSetting("TreeLevels");
+    DatabaseBox dbbox(db, paths, &dblist);
 
     dbbox.Show();
     dbbox.exec();

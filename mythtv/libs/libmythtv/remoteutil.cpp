@@ -5,7 +5,7 @@
 #include "mythcontext.h"
 #include "remoteencoder.h"
 
-vector<ProgramInfo *> *RemoteGetRecordedList(MythContext *context, bool deltype)
+vector<ProgramInfo *> *RemoteGetRecordedList(bool deltype)
 {
     QString str = "QUERY_RECORDINGS ";
     if (deltype)
@@ -15,7 +15,7 @@ vector<ProgramInfo *> *RemoteGetRecordedList(MythContext *context, bool deltype)
 
     QStringList strlist = str;
 
-    context->SendReceiveStringList(strlist);
+    gContext->SendReceiveStringList(strlist);
 
     int numrecordings = strlist[0].toInt();
 
@@ -34,41 +34,40 @@ vector<ProgramInfo *> *RemoteGetRecordedList(MythContext *context, bool deltype)
     return info;
 }
 
-void RemoteGetFreeSpace(MythContext *context, int &totalspace, int &usedspace)
+void RemoteGetFreeSpace(int &totalspace, int &usedspace)
 {
     QStringList strlist = QString("QUERY_FREESPACE");
 
-    context->SendReceiveStringList(strlist);
+    gContext->SendReceiveStringList(strlist);
 
     totalspace = strlist[0].toInt();
     usedspace = strlist[1].toInt();
 }
 
-bool RemoteGetCheckFile(MythContext *context, const QString &url)
+bool RemoteGetCheckFile(const QString &url)
 {
     QString str = "QUERY_CHECKFILE " + url;
     QStringList strlist = str;
 
-    context->SendReceiveStringList(strlist);
+    gContext->SendReceiveStringList(strlist);
 
     bool exists = strlist[0].toInt();
     return exists;
 }
 
-void RemoteDeleteRecording(MythContext *context, ProgramInfo *pginfo)
+void RemoteDeleteRecording(ProgramInfo *pginfo)
 {
     QStringList strlist = QString("DELETE_RECORDING");
     pginfo->ToStringList(strlist);
 
-    context->SendReceiveStringList(strlist);
+    gContext->SendReceiveStringList(strlist);
 }
 
-bool RemoteGetAllPendingRecordings(MythContext *context, 
-                                   vector<ProgramInfo *> &recordinglist)
+bool RemoteGetAllPendingRecordings(vector<ProgramInfo *> &recordinglist)
 {
     QStringList strlist = QString("QUERY_GETALLPENDING");
 
-    context->SendReceiveStringList(strlist);
+    gContext->SendReceiveStringList(strlist);
 
     bool conflicting = strlist[0].toInt();
     int numrecordings = strlist[1].toInt();
@@ -87,15 +86,14 @@ bool RemoteGetAllPendingRecordings(MythContext *context,
     return conflicting;
 }
 
-vector<ProgramInfo *> *RemoteGetConflictList(MythContext *context,
-                                             ProgramInfo *pginfo,
+vector<ProgramInfo *> *RemoteGetConflictList(ProgramInfo *pginfo,
                                              bool removenonplaying)
 {
     QString cmd = QString("QUERY_GETCONFLICTING %1").arg(removenonplaying);
     QStringList strlist = cmd;
     pginfo->ToStringList(strlist);
 
-    context->SendReceiveStringList(strlist);
+    gContext->SendReceiveStringList(strlist);
 
     int numrecordings = strlist[0].toInt();
     int offset = 1;
@@ -114,11 +112,11 @@ vector<ProgramInfo *> *RemoteGetConflictList(MythContext *context,
     return retlist;
 }
 
-RemoteEncoder *RemoteRequestRecorder(MythContext *context)
+RemoteEncoder *RemoteRequestRecorder(void)
 {
     QStringList strlist = "GET_FREE_RECORDER";
 
-    context->SendReceiveStringList(strlist);
+    gContext->SendReceiveStringList(strlist);
 
     int num = strlist[0].toInt();
     QString hostname = strlist[1];
@@ -127,13 +125,12 @@ RemoteEncoder *RemoteRequestRecorder(MythContext *context)
     return new RemoteEncoder(num, hostname, port);
 }
 
-RemoteEncoder *RemoteGetExistingRecorder(MythContext *context,
-                                         ProgramInfo *pginfo)
+RemoteEncoder *RemoteGetExistingRecorder(ProgramInfo *pginfo)
 {
     QStringList strlist = "GET_RECORDER_NUM";
     pginfo->ToStringList(strlist);
 
-    context->SendReceiveStringList(strlist);
+    gContext->SendReceiveStringList(strlist);
 
     int num = strlist[0].toInt();
     QString hostname = strlist[1];
@@ -142,18 +139,18 @@ RemoteEncoder *RemoteGetExistingRecorder(MythContext *context,
     return new RemoteEncoder(num, hostname, port);
 }
 
-void RemoteSendMessage(MythContext *context, const QString &message)
+void RemoteSendMessage(const QString &message)
 {
     QStringList strlist = "MESSAGE";
     strlist << message;
 
-    context->SendReceiveStringList(strlist);
+    gContext->SendReceiveStringList(strlist);
 }
 
-void RemoteGeneratePreviewPixmap(MythContext *context, ProgramInfo *pginfo)
+void RemoteGeneratePreviewPixmap(ProgramInfo *pginfo)
 {
     QStringList strlist = "QUERY_GENPIXMAP";
     pginfo->ToStringList(strlist);
 
-    context->SendReceiveStringList(strlist);
+    gContext->SendReceiveStringList(strlist);
 }

@@ -10,8 +10,6 @@
 
 #define NUMPROGRAMLINES 15
 
-class MythContext;
-
 class ProgramInfo
 {
   public:

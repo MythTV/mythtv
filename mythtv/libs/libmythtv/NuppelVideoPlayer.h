@@ -33,7 +33,6 @@ using namespace std;
 class NuppelVideoPlayer;
 class XvVideoOutput;
 class OSDSet;
-class MythContext;
 class RemoteEncoder;
 class QSqlDatabase;
 class ProgramInfo;
@@ -41,8 +40,7 @@ class ProgramInfo;
 class NuppelVideoPlayer
 {
  public:
-    NuppelVideoPlayer(MythContext *context, QSqlDatabase *ldb = NULL, 
-                      ProgramInfo *info = NULL);
+    NuppelVideoPlayer(QSqlDatabase *ldb = NULL, ProgramInfo *info = NULL);
    ~NuppelVideoPlayer();
 
     void SetAsPIP(void) { disableaudio = disablevideo = true; }
@@ -367,8 +365,6 @@ class NuppelVideoPlayer
     char *ffmpeg_extradata;
 
     bool own_vidbufs;
-
-    MythContext *m_context;
 
     unsigned int embedid;
     int embx, emby, embw, embh;

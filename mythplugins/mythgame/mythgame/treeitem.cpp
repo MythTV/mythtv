@@ -15,24 +15,22 @@ QPixmap *TreeItem::game = NULL;
 QPixmap *TreeItem::genre = NULL;
 bool TreeItem::pixmapsSet = false;
 
-TreeItem::TreeItem(MythContext *context, QListView *parent, QString &ltext,
-                   const QString &llevel, RomInfo *rinfo)
+TreeItem::TreeItem(QListView *parent, QString &ltext, const QString &llevel, 
+                   RomInfo *rinfo)
         : QListViewItem(parent, ltext.prepend(" "))
 {
     level = llevel;
     rominfo = rinfo;
-    m_context = context;
 
     pickPixmap();
 }
 
-TreeItem::TreeItem(MythContext *context, TreeItem *parent, QString &ltext,
-                   const QString &llevel, RomInfo *rinfo)
+TreeItem::TreeItem(TreeItem *parent, QString &ltext, const QString &llevel, 
+                   RomInfo *rinfo)
         : QListViewItem(parent, ltext.prepend(" "))
 {
     level = llevel;
     rominfo = rinfo;
-    m_context = context;
 
     pickPixmap();
 }
@@ -40,7 +38,7 @@ TreeItem::TreeItem(MythContext *context, TreeItem *parent, QString &ltext,
 void TreeItem::pickPixmap(void)
 {
     if (!pixmapsSet)
-        setupPixmaps(m_context);
+        setupPixmaps();
 
     if (level == "system")
         setPixmap(0, *system);
@@ -58,12 +56,12 @@ void TreeItem::pickPixmap(void)
         setPixmap(0, *genre);
 }
 
-void TreeItem::setupPixmaps(MythContext *context)
+void TreeItem::setupPixmaps(void)
 {
     int screenwidth = 0, screenheight = 0;
     float wmult = 0, hmult = 0;
 
-    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     if (screenheight != 600 || screenwidth != 800) 
     {   

@@ -21,12 +21,13 @@ using namespace std;
 #include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
 
+MythContext *gContext;
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    MythContext *context = new MythContext();
+    gContext = new MythContext();
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
@@ -35,30 +36,19 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    if (!context->OpenDatabase(db))
+    if (!gContext->OpenDatabase(db))
     {
         printf("couldn't open db\n");
         return -1;
     }
 
-    QString themename = context->GetSetting("Theme");
-    QString themedir = context->FindThemeDir(themename);
+    gContext->LoadQtConfig();
 
-    QString paths = context->GetSetting("TreeLevels");
-
-    if (themedir == "")
-    {
-        cerr << "Couldn't find theme " << themename << endl;
-        exit(0);
-    }
-
-    context->LoadQtConfig();
-
-    Weather weatherDat(context);
+    Weather weatherDat;
     weatherDat.Show();
     weatherDat.exec();
  
-    delete context;
+    delete gContext;
 
     return 0;
 }

@@ -10,8 +10,7 @@ class Metadata;
 class VorbisDecoder : public Decoder
 {
   public:
-    VorbisDecoder(MythContext *context, const QString &file, DecoderFactory *, 
-                  QIODevice *, Output *);
+    VorbisDecoder(const QString &file, DecoderFactory *, QIODevice *, Output *);
     virtual ~VorbisDecoder(void);
 
     bool initialize();

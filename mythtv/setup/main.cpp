@@ -23,7 +23,7 @@
 
 using namespace std;
 
-MythContext* context;
+MythContext* gContext;
 QSqlDatabase* db;
 
 QString getResponse(const QString &query, const QString &def)
@@ -60,31 +60,32 @@ void clearDB(void)
 }
 
 void SetupMenuCallback(void* data, QString& selection) {
-    MythContext* context = (MythContext*)data;
+    (void)data;
+
     QString sel = selection.lower();
 
     if (sel == "general") {
         BackendSettings be;
-        be.exec(context, db);
+        be.exec(db);
     } else if (sel == "capture cards") {
         CaptureCardEditor cce(db);
-        cce.exec(context, db);
+        cce.exec(db);
     } else if (sel == "video sources") {
         VideoSourceEditor vse(db);
-        vse.exec(context, db);
+        vse.exec(db);
     } else if (sel == "card inputs") {
         CardInputEditor cie(db);
-        cie.exec(context, db);
+        cie.exec(db);
     }
 }
 
-void SetupMenu(MythContext* context) {
-    QString theme = context->GetSetting("Theme");
+void SetupMenu(void) {
+    QString theme = gContext->GetSetting("Theme");
 
-    ThemedMenu* menu = new ThemedMenu(context,
-                                      context->FindThemeDir(theme),
+    ThemedMenu* menu = new ThemedMenu(gContext->FindThemeDir(theme),
                                       "setup.xml");
-    menu->setCallback(SetupMenuCallback, context);
+
+    menu->setCallback(SetupMenuCallback, gContext);
     menu->setKillable();
 
     if (menu->foundTheme()) {
@@ -99,10 +100,10 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    context = new MythContext(true);
+    gContext = new MythContext(true);
 
     db = QSqlDatabase::addDatabase("QMYSQL3");
-    if (!context->OpenDatabase(db))
+    if (!gContext->OpenDatabase(db))
     {
         cerr << "Unable to open database:\n"
              << "Driver error was:" << endl
@@ -113,9 +114,9 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    context->SetSetting("ThemeQt", "1");
-    context->SetSetting("Theme", "blue");
-    context->LoadQtConfig();
+    gContext->SetSetting("ThemeQt", "1");
+    gContext->SetSetting("Theme", "blue");
+    gContext->LoadQtConfig();
 
     char *home = getenv("HOME");
     QString fileprefix = QString(home) + "/.mythtv";
@@ -129,7 +130,7 @@ int main(int argc, char *argv[])
     if (response == "y")
         clearDB();
 
-    SetupMenu(context);
+    SetupMenu();
 
     cout << "Now, please run 'mythfilldatabase' to populate the database\n";
     cout << "with channel information.\n";

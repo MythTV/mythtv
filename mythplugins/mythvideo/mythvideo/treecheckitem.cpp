@@ -7,16 +7,12 @@ using namespace std;
 
 #include "treecheckitem.h"
 
-#include <mythtv/mythcontext.h>
-
-TreeCheckItem::TreeCheckItem(MythContext *context, QListView *parent, 
-                             QString &ltext, const QString &llevel, 
-                             Metadata *mdata)
-  : QListViewItem(parent, ltext.prepend(" "))
+TreeCheckItem::TreeCheckItem(QListView *parent, QString &ltext, 
+                             const QString &llevel, Metadata *mdata)
+             : QListViewItem(parent, ltext.prepend(" "))
 {
     level = llevel;
     metadata = mdata;
-    m_context = context;
 }
 
 void TreeCheckItem::paintCell(QPainter* p, const QColorGroup& cg,
@@ -34,13 +30,11 @@ void TreeCheckItem::paintCell(QPainter* p, const QColorGroup& cg,
     QListViewItem::paintCell(p,newCg,column,width,align);
 }
 
-TreeCheckItem::TreeCheckItem(MythContext *context, TreeCheckItem *parent, 
-                             QString &ltext, const QString &llevel, 
-                             Metadata *mdata)
+TreeCheckItem::TreeCheckItem(TreeCheckItem *parent, QString &ltext, 
+                             const QString &llevel, Metadata *mdata)
              : QListViewItem(parent, ltext.prepend(" "))
 {
     level = llevel;
     metadata = mdata;
-    m_context = context;
 }
 

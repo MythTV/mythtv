@@ -73,7 +73,7 @@ void SelectFrame::focusInEvent(QFocusEvent* e)
 
 void SelectFrame::EditEvent()
 {
-    GameHandler::EditSettings(m_context, this, RomList->current());
+    GameHandler::EditSettings(this, RomList->current());
 }
 
 void SelectFrame::focusOutEvent(QFocusEvent* e)
@@ -90,7 +90,7 @@ void SelectFrame::focusOutEvent(QFocusEvent* e)
 
 void SelectFrame::CallSelection()
 {
-  GameHandler::Launchgame(m_context, RomList->current());
+  GameHandler::Launchgame(RomList->current());
 }
 
 void SelectFrame::UpEvent()
@@ -178,8 +178,7 @@ void SelectFrame::RightEvent()
     }
 }
 
-SelectFrame::SelectFrame(MythContext *context, QWidget * parent, 
-                         const char * name, WFlags f):
+SelectFrame::SelectFrame(QWidget * parent, const char * name, WFlags f):
     QFrame(parent,name,f),
     mColumns(0),
     mMinSpacer(0),
@@ -189,13 +188,12 @@ SelectFrame::SelectFrame(MythContext *context, QWidget * parent,
     mImageSize(0),
     mRows(0),
     mButtons(NULL),
-    RomList(NULL),
-    m_context(context)
+    RomList(NULL)
 {
     mScrollBar = new QScrollBar(Qt::Vertical, this); 
 
     int screenheight = 0, screenwidth = 0;
-    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 }
 
 void SelectFrame::setDimensions()
@@ -203,7 +201,7 @@ void SelectFrame::setDimensions()
     const int ScrollWidth = mScrollBar->sizeHint().width(); 
     mScrollBar->setGeometry(width() - ScrollWidth,0,ScrollWidth,height());
     mScrollBar->hide();
-    mColumns = m_context->GetNumSetting("ShotCount");               //will come from a setting.
+    mColumns = gContext->GetNumSetting("ShotCount"); //will come from a setting.
     mMinSpacer = (int)(5 * wmult);
     mWidth = maximumWidth() - ScrollWidth;
     mImageSize = (mWidth - ((mColumns - 1) * mMinSpacer) - (mMinSpacer * 2)) / mColumns;

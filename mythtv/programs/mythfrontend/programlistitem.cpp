@@ -13,20 +13,15 @@
 
 #include "libmyth/mythcontext.h"
 
-ProgramListItem::ProgramListItem(MythContext *context, QListView *parent, 
-                                 ProgramInfo *lpginfo, int type)
+ProgramListItem::ProgramListItem(QListView *parent, ProgramInfo *lpginfo, 
+                                 int type)
                : QListViewItem(parent)
 {
     pginfo = lpginfo;
     pixmap = NULL;
-    m_context = context;
   
-    QString dateformat = context->GetSetting("DateFormat");
-    if (dateformat == "")
-        dateformat = "ddd MMMM d";
-    QString timeformat = context->GetSetting("TimeFormat");
-    if (timeformat == "")
-        timeformat = "h:mm AP";
+    QString dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    QString timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
  
     if (type == 0 || type == 1)
     { 
@@ -49,7 +44,7 @@ ProgramListItem::ProgramListItem(MythContext *context, QListView *parent,
     }
     else
     {
-        if (context->GetNumSetting("DisplayChanNum") != 0)
+        if (gContext->GetNumSetting("DisplayChanNum") != 0)
             setText(0, pginfo->chansign);
         else
             setText(0, pginfo->chanstr);
@@ -61,7 +56,7 @@ ProgramListItem::ProgramListItem(MythContext *context, QListView *parent,
 
 QPixmap ProgramListItem::getPixmap(void)
 {
-    if (m_context->GetNumSetting("GeneratePreviewPixmaps") != 1)
+    if (gContext->GetNumSetting("GeneratePreviewPixmaps") != 1)
         return QPixmap();
 
     if (pixmap)
@@ -73,19 +68,23 @@ QPixmap ProgramListItem::getPixmap(void)
     int screenheight = 0, screenwidth = 0;
     float wmult = 0, hmult = 0;
 
-    m_context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
-    pixmap = m_context->LoadScalePixmap(filename);
+    pixmap = gContext->LoadScalePixmap(filename);
     if (pixmap)
         return *pixmap;
 
-    QImage *image = m_context->CacheRemotePixmap(filename);
+    QImage *image = gContext->CacheRemotePixmap(filename);
 
     if (!image)
     {
-        RemoteGeneratePreviewPixmap(m_context, pginfo);
+        RemoteGeneratePreviewPixmap(pginfo);
 
-        image = m_context->CacheRemotePixmap(filename);
+        pixmap = gContext->LoadScalePixmap(filename);
+        if (pixmap)
+            return *pixmap;
+
+        image = gContext->CacheRemotePixmap(filename);
     }
 
     if (image)

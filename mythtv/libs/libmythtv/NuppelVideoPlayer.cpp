@@ -29,7 +29,6 @@ extern "C" {
 #include "../libvbitext/vbi.h"
 }
 
-#include "mythcontext.h"
 #include "remoteencoder.h"
 
 extern pthread_mutex_t avcodeclock;
@@ -52,11 +51,9 @@ extern pthread_mutex_t avcodeclock;
 #define wsEnter         0x8d + 256
 #define wsReturn        0x0d + 256
 
-NuppelVideoPlayer::NuppelVideoPlayer(MythContext *context,
-                                     QSqlDatabase *ldb,
+NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
                                      ProgramInfo *info)
 {
-    m_context = context;
     m_db = ldb;
     m_playbackinfo = NULL;
 
@@ -280,7 +277,7 @@ void NuppelVideoPlayer::UnpauseAudio(void)
 void NuppelVideoPlayer::InitVideo(void)
 {
     char name[] = "MythTV"; 
-    videoOutput = new XvVideoOutput(m_context);
+    videoOutput = new XvVideoOutput();
     videoOutput->Init(video_width, video_height, name, name, MAXVBUFFER + 1, 
                       vbuffer, embedid);
     if (embedid > 0)

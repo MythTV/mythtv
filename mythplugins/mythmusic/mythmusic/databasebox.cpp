@@ -12,12 +12,10 @@
 #include "treecheckitem.h"
 #include "cddecoder.h"
 
-#include <mythtv/mythcontext.h>
-
-DatabaseBox::DatabaseBox(MythContext *context, QSqlDatabase *ldb, 
-                         QString &paths, QValueList<Metadata> *playlist, 
+DatabaseBox::DatabaseBox(QSqlDatabase *ldb, QString &paths, 
+                         QValueList<Metadata> *playlist, 
                          QWidget *parent, const char *name)
-           : MythDialog(context, parent, name)
+           : MythDialog(parent, name)
 {
     db = ldb;
     plist = playlist;
@@ -59,7 +57,7 @@ void DatabaseBox::fillCD(void)
         cditem->setText(0, "CD -- none");
     }
 
-    CdDecoder *decoder = new CdDecoder(m_context, "cda", NULL, NULL, NULL);
+    CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
     int tracknum = decoder->getNumTracks();
 
     bool setTitle = false;
@@ -81,8 +79,7 @@ void DatabaseBox::fillCD(void)
 
         QString level = "title";
 
-        TreeCheckItem *item = new TreeCheckItem(m_context, cditem, title, 
-                                                level, track);
+        TreeCheckItem *item = new TreeCheckItem(cditem, title, level, track);
 
         if (plist->find(*track) != plist->end())
             item->setOn(true);
@@ -97,12 +94,12 @@ void DatabaseBox::fillList(QListView *listview, QString &paths)
 {
     QString title = "CD -- none";
     QString level = "cd";
-    cditem = new TreeCheckItem(m_context, listview, title, level, NULL);
+    cditem = new TreeCheckItem(listview, title, level, NULL);
 
     QString templevel = "genre";
     QString temptitle = "All My Music";
-    TreeCheckItem *allmusic = new TreeCheckItem(m_context, listview, temptitle,
-                                                templevel, NULL);
+    TreeCheckItem *allmusic = new TreeCheckItem(listview, temptitle, templevel,
+                                                NULL);
     
     QStringList lines = QStringList::split(" ", paths);
 
@@ -132,8 +129,8 @@ void DatabaseBox::fillList(QListView *listview, QString &paths)
             Metadata *mdata = new Metadata();
             mdata->setField(first, current);
 
-            TreeCheckItem *item = new TreeCheckItem(m_context, allmusic, 
-                                                    current, first, mdata);
+            TreeCheckItem *item = new TreeCheckItem(allmusic, current, first, 
+                                                    mdata);
 
             fillNextLevel(level, num, querystr, matchstr, line, lines,
                           item);
@@ -201,8 +198,8 @@ void DatabaseBox::fillNextLevel(QString level, int num, QString querystr,
             }
 
 
-            TreeCheckItem *item = new TreeCheckItem(m_context, parent, current,
-                                                    level, mdata);
+            TreeCheckItem *item = new TreeCheckItem(parent, current, level, 
+                                                    mdata);
 
             if (isleaf)
             {

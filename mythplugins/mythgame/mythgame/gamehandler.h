@@ -9,22 +9,19 @@
 class GameHandler;
 class QSqlDatabase;
 class QObject;
-class MythContext;
 
 class GameHandler
 {
   public:
-    GameHandler(MythContext *context) { m_context = context; }
+    GameHandler() {  }
     virtual ~GameHandler();
 
-    static void processAllGames(MythContext *context);
+    static void processAllGames(void);
     static void registerHandler(GameHandler *);
-    static void Launchgame(MythContext *context, RomInfo *romdata);
-    static void EditSettings(MythContext *contet, QWidget* parent,
-                             RomInfo *romdata);
-    static void EditSystemSettings(MythContext *context, QWidget* parent,
-                                   RomInfo *romdata);
-    static RomInfo* CreateRomInfo(MythContext *context, RomInfo* parent);
+    static void Launchgame(RomInfo *romdata);
+    static void EditSettings(QWidget* parent, RomInfo *romdata);
+    static void EditSystemSettings(QWidget* parent, RomInfo *romdata);
+    static RomInfo* CreateRomInfo(RomInfo* parent);
     virtual void start_game(RomInfo *romdata) = 0;
     virtual void edit_settings(QWidget *parent,RomInfo *romdata) = 0;
     virtual void edit_system_settings(QWidget *parent,RomInfo *romdata) = 0;
@@ -33,10 +30,9 @@ class GameHandler
     QString Systemname() const { return systemname; }
 
   protected:
-    static GameHandler* GetHandler(MythContext *context, RomInfo *rominfo);
+    static GameHandler* GetHandler(RomInfo *rominfo);
 
     QString systemname;
-    MythContext *m_context;
 };
 
 #endif

@@ -22,6 +22,8 @@ using namespace std;
 #include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
 
+MythContext *gContext;
+
 void CheckFreeDBServerFile(void)
 {
     char filename[1024];
@@ -51,15 +53,15 @@ void CheckFreeDBServerFile(void)
     }
 }
 
-Decoder *getDecoder(MythContext *context, const QString &filename)
+Decoder *getDecoder(const QString &filename)
 {
-    Decoder *decoder = Decoder::create(context, filename, NULL, NULL, true);
+    Decoder *decoder = Decoder::create(filename, NULL, NULL, true);
     return decoder;
 }
 
-void CheckFile(MythContext *context, const QString &filename)
+void CheckFile(const QString &filename)
 {
-    Decoder *decoder = getDecoder(context, filename);
+    Decoder *decoder = getDecoder(filename);
 
     if (decoder)
     {
@@ -83,8 +85,7 @@ enum MusicFileLocation
 
 typedef map<QString, MusicFileLocation> MusicLoadedMap;
 
-void BuildFileList(MythContext *context, QString &directory,
-                   MusicLoadedMap &music_files)
+void BuildFileList(QString &directory, MusicLoadedMap &music_files)
 {
     QDir d(directory);
 
@@ -105,18 +106,18 @@ void BuildFileList(MythContext *context, QString &directory,
             continue;
         QString filename = fi->absFilePath();
         if (fi->isDir())
-            BuildFileList(context, filename, music_files);
+            BuildFileList(filename, music_files);
         else
             music_files[filename] = kFileSystem;
     }
 }
 
-void SearchDir(MythContext *context, QString &directory)
+void SearchDir(QString &directory)
 {
     MusicLoadedMap music_files;
     MusicLoadedMap::iterator iter;
 
-    BuildFileList(context, directory, music_files);
+    BuildFileList(directory, music_files);
 
     QSqlQuery query;
 
@@ -141,7 +142,7 @@ void SearchDir(MythContext *context, QString &directory)
     {
         if ((*iter).second == kFileSystem)
         {
-            CheckFile(context, (*iter).first);
+            CheckFile((*iter).first);
         }
         else if ((*iter).second == kDatabase)
         {
@@ -155,10 +156,9 @@ void SearchDir(MythContext *context, QString &directory)
     }
 }
 
-void startPlayback(MythContext *context, QSqlDatabase *db, 
-                   QValueList<Metadata> *playlist)
+void startPlayback(QSqlDatabase *db, QValueList<Metadata> *playlist)
 {
-    PlaybackBox *pbb = new PlaybackBox(context, db, playlist);
+    PlaybackBox *pbb = new PlaybackBox(db, playlist);
     pbb->Show();
 
     pbb->exec();
@@ -169,25 +169,24 @@ void startPlayback(MythContext *context, QSqlDatabase *db,
     delete pbb;
 }
 
-void startDatabaseTree(MythContext *context, QSqlDatabase *db, QString &paths, 
+void startDatabaseTree(QSqlDatabase *db, QString &paths, 
                        QValueList<Metadata> *playlist)
 {
-    DatabaseBox dbbox(context, db, paths, playlist);
+    DatabaseBox dbbox(db, paths, playlist);
     dbbox.Show();
 
     dbbox.exec();
 }
 
-void startRipper(MythContext *context, QSqlDatabase *db)
+void startRipper(QSqlDatabase *db)
 {
-    Ripper rip(context, db);
+    Ripper rip(db);
     rip.Show();
     rip.exec();
 }
 
 struct MusicData
 {
-    MythContext *context;
     QString paths;
     QSqlDatabase *db;
     QString startdir;
@@ -201,28 +200,26 @@ void MusicCallback(void *data, QString &selection)
     QString sel = selection.lower();
 
     if (sel == "music_create_playlist")
-        startDatabaseTree(mdata->context, mdata->db, mdata->paths, 
-                          mdata->playlist);
+        startDatabaseTree(mdata->db, mdata->paths, mdata->playlist);
     else if (sel == "music_play")
-        startPlayback(mdata->context, mdata->db, mdata->playlist);
+        startPlayback(mdata->db, mdata->playlist);
     else if (sel == "music_rip")
     {
-        startRipper(mdata->context, mdata->db);
-        SearchDir(mdata->context, mdata->startdir);
+        startRipper(mdata->db);
+        SearchDir(mdata->startdir);
     }
     else if (sel == "music_setup")
         ;
 }
 
-void runMenu(MythContext *context, QString themedir, QSqlDatabase *db, 
-             QString paths, QValueList<Metadata> &playlist, QString startdir)
+void runMenu(QString themedir, QSqlDatabase *db, QString paths,
+             QValueList<Metadata> &playlist, QString startdir)
 {
-    ThemedMenu *diag = new ThemedMenu(context, themedir.ascii(), 
+    ThemedMenu *diag = new ThemedMenu(themedir.ascii(), 
                                       "musicmenu.xml");
        
     MusicData data;
    
-    data.context = context;
     data.paths = paths;
     data.db = db;
     data.startdir = startdir;
@@ -246,9 +243,9 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    MythContext *context = new MythContext();
+    gContext = new MythContext();
 
-    context->LoadSettingsFiles("mythmusic-settings.txt");
+    gContext->LoadSettingsFiles("mythmusic-settings.txt");
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
@@ -256,26 +253,26 @@ int main(int argc, char *argv[])
         printf("Couldn't connect to database\n");
         return -1;
     }
-    if (!context->OpenDatabase(db))
+    if (!gContext->OpenDatabase(db))
     {
         printf("couldn't open db\n");
         return -1;
     }
 
-    context->LoadQtConfig();
+    gContext->LoadQtConfig();
 
     CheckFreeDBServerFile();
 
-    QString startdir = context->GetSetting("MusicLocation");
+    QString startdir = gContext->GetSetting("MusicLocation");
 
     if (startdir != "")
-        SearchDir(context, startdir);
+        SearchDir(startdir);
 
-    QString paths = context->GetSetting("TreeLevels");
+    QString paths = gContext->GetSetting("TreeLevels");
     QValueList<Metadata> playlist;
 
-    QString themename = context->GetSetting("Theme");
-    QString themedir = context->FindThemeDir(themename);
+    QString themename = gContext->GetSetting("Theme");
+    QString themedir = gContext->FindThemeDir(themename);
 
     if (themedir == "")
     {
@@ -284,12 +281,12 @@ int main(int argc, char *argv[])
     }
 
     LoadDefaultPlaylist(db, playlist);
-    runMenu(context, themedir, db, paths, playlist, startdir);
+    runMenu(themedir, db, paths, playlist, startdir);
     SaveDefaultPlaylist(db, playlist);
 
     db->close();
 
-    delete context;
+    delete gContext;
 
     return 0;
 }

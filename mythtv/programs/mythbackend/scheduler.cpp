@@ -15,12 +15,10 @@ using namespace std;
 #include "encoderlink.h"
 #include "libmyth/mythcontext.h"
 
-Scheduler::Scheduler(MythContext *context, QMap<int, EncoderLink *> *tvList,
-                     QSqlDatabase *ldb)
+Scheduler::Scheduler(QMap<int, EncoderLink *> *tvList, QSqlDatabase *ldb)
 {
     hasconflicts = false;
     db = ldb;
-    m_context = context;
     m_tvList = tvList;
 
     pthread_mutex_init(&schedulerLock, NULL);
@@ -33,8 +31,8 @@ Scheduler::Scheduler(MythContext *context, QMap<int, EncoderLink *> *tvList,
         pthread_create(&scthread, NULL, SchedulerThread, this);
     }
 
-    if (context)
-        context->addListener(this);
+    if (gContext)
+        gContext->addListener(this);
 }
 
 Scheduler::~Scheduler()
@@ -46,8 +44,8 @@ Scheduler::~Scheduler()
         recordingList.pop_back();
     }
 
-    if (m_context)
-        m_context->removeListener(this);
+    if (gContext)
+        gContext->removeListener(this);
 }
 
 void Scheduler::setupCards(void)

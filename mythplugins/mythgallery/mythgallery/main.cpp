@@ -10,11 +10,13 @@ using namespace std;
 #include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
 
+MythContext *gContext;
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    MythContext *context = new MythContext();
+    gContext = new MythContext();
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
@@ -23,23 +25,23 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    if (!context->OpenDatabase(db))
+    if (!gContext->OpenDatabase(db))
     {
         printf("couldn't open db\n");
         return -1;
     }
 
-    context->LoadSettingsFiles("mythgallery-settings.txt");
+    gContext->LoadSettingsFiles("mythgallery-settings.txt");
 
-    context->LoadQtConfig();
+    gContext->LoadQtConfig();
 
-    QString startdir = context->GetSetting("GalleryDir");
+    QString startdir = gContext->GetSetting("GalleryDir");
 
-    IconView icv(context, db, startdir);
+    IconView icv(db, startdir);
 
     icv.exec();
 
-    delete context;
+    delete gContext;
 
     return 0;
 }

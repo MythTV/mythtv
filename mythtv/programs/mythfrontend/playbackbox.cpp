@@ -30,9 +30,8 @@ using namespace std;
 #include "libmythtv/programinfo.h"
 #include "libmythtv/remoteutil.h"
 
-PlaybackBox::PlaybackBox(MythContext *context, BoxType ltype, QWidget *parent, 
-                         const char *name)
-           : MythDialog(context, parent, name)
+PlaybackBox::PlaybackBox(BoxType ltype, QWidget *parent, const char *name)
+           : MythDialog(parent, name)
 {
     type = ltype;
 
@@ -102,7 +101,7 @@ PlaybackBox::PlaybackBox(MythContext *context, BoxType ltype, QWidget *parent,
  
     title = new QLabel(" ", this);
     title->setBackgroundOrigin(WindowOrigin);
-    title->setFont(QFont("Arial", (int)(context->GetBigFontSize() * hmult), 
+    title->setFont(QFont("Arial", (int)(gContext->GetBigFontSize() * hmult), 
                    QFont::Bold));
 
     QLabel *datelabel = new QLabel("Airdate: ", this);
@@ -139,11 +138,11 @@ PlaybackBox::PlaybackBox(MythContext *context, BoxType ltype, QWidget *parent,
     grid->setColStretch(1, 1);
     grid->setRowStretch(4, 1);
 
-    playbackPreview = (context->GetNumSetting("PlaybackPreview") != 0);
-    generatePreviewPixmap = (context->GetNumSetting("GeneratePreviewPixmaps") != 0);
-    displayChanNum = (context->GetNumSetting("DisplayChanNum") != 0);
-    dateformat = context->GetSetting("DateFormat", "ddd MMMM d");
-    timeformat = context->GetSetting("TimeFormat");
+    playbackPreview = gContext->GetNumSetting("PlaybackPreview");
+    generatePreviewPixmap = gContext->GetNumSetting("GeneratePreviewPixmaps");
+    displayChanNum = gContext->GetNumSetting("DisplayChanNum");
+    dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
 
     if (playbackPreview || generatePreviewPixmap)
     {
@@ -194,12 +193,12 @@ PlaybackBox::PlaybackBox(MythContext *context, BoxType ltype, QWidget *parent,
     connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
     timer->start(1000 / 30);
 
-    m_context->addListener(this);
+    gContext->addListener(this);
 }
 
 PlaybackBox::~PlaybackBox(void)
 {
-    m_context->removeListener(this);
+    gContext->removeListener(this);
     killPlayer();
     delete timer;
 }
@@ -225,14 +224,13 @@ QListViewItem *PlaybackBox::FillList(bool selectsomething)
     ProgramListItem *item = NULL;
 
     vector<ProgramInfo *> *infoList;
-    infoList = RemoteGetRecordedList(m_context, type == Delete);
+    infoList = RemoteGetRecordedList(type == Delete);
     if (infoList)
     {
         vector<ProgramInfo *>::iterator i = infoList->begin();
         for (; i != infoList->end(); i++)
         {
-            item = new ProgramListItem(m_context, listview, (*i), 
-                                       type == Delete);
+            item = new ProgramListItem(listview, (*i), type == Delete);
             if (startts == (*i)->startts && chanid == (*i)->chanid)
             {
                 selected = item;
@@ -307,14 +305,14 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
         return;
     }
 
-    rbuffer = new RingBuffer(m_context, rec->pathname, false, true);
+    rbuffer = new RingBuffer(rec->pathname, false, true);
 
-    nvp = new NuppelVideoPlayer(m_context);
+    nvp = new NuppelVideoPlayer();
     nvp->SetRingBuffer(rbuffer);
     nvp->SetAsPIP();
-    nvp->SetOSDFontName(m_context->GetSetting("OSDFont"),
-                        m_context->GetSetting("OSDCCFont"),
-                        m_context->GetInstallPrefix());
+    nvp->SetOSDFontName(gContext->GetSetting("OSDFont"),
+                        gContext->GetSetting("OSDCCFont"),
+                        gContext->GetInstallPrefix());
     QString filters = "";
     nvp->SetVideoFilters(filters);
  
@@ -464,7 +462,7 @@ void PlaybackBox::play(QListViewItem *lvitem)
     ProgramInfo *tvrec = new ProgramInfo(*rec);
 
     QSqlDatabase *db = QSqlDatabase::database();
-    TV *tv = new TV(m_context, db);
+    TV *tv = new TV(db);
     tv->Init();
     tv->Playback(tvrec);
 
@@ -485,7 +483,7 @@ void PlaybackBox::play(QListViewItem *lvitem)
         remove(lvitem);
     }
     else if (tv->getEndOfRecording() && 
-             m_context->GetNumSetting("EndOfRecordingExitPrompt"))
+             gContext->GetNumSetting("EndOfRecordingExitPrompt"))
     {
         promptEndOfRecording(lvitem);
     }
@@ -510,7 +508,7 @@ void PlaybackBox::doRemove(QListViewItem *lvitem)
 
     ProgramInfo *rec = pgitem->getProgramInfo();
 
-    RemoteDeleteRecording(m_context, rec);
+    RemoteDeleteRecording(rec);
 
     if (lvitem->itemBelow())
     {
@@ -568,7 +566,7 @@ void PlaybackBox::remove(QListViewItem *lvitem)
 
     message += "<br><br>It will be gone forever.";
 
-    DialogBox diag(m_context, message);
+    DialogBox diag(message);
 
     diag.AddButton("Yes, get rid of it");
     diag.AddButton("No, keep it, I changed my mind");
@@ -627,7 +625,7 @@ void PlaybackBox::promptEndOfRecording(QListViewItem *lvitem)
     message += "<br><br>Would you like to delete this recording?  It will "
                "be gone forever.";
 
-    DialogBox diag(m_context, message);
+    DialogBox diag(message);
 
     diag.AddButton("Yes, get rid of it");
     diag.AddButton("No, I might want to watch it again.");
@@ -649,7 +647,7 @@ void PlaybackBox::promptEndOfRecording(QListViewItem *lvitem)
 void PlaybackBox::UpdateProgressBar(void)
 {
     int total, used;
-    RemoteGetFreeSpace(m_context, total, used);
+    RemoteGetFreeSpace(total, used);
 
     QString usestr;
     usestr.sprintf("Storage: %d,%03d MB used out of %d,%03d MB total", 
@@ -749,7 +747,7 @@ void PlaybackBox::customEvent(QCustomEvent *e)
 bool PlaybackBox::fileExists(const QString &pathname)
 {
     if (pathname.left(7) == "myth://")
-        return RemoteGetCheckFile(m_context, pathname);
+        return RemoteGetCheckFile(pathname);
 
     QFile checkFile(pathname);
 

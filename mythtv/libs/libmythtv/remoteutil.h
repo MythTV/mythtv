@@ -5,31 +5,18 @@
 using namespace std;
 
 class ProgramInfo;
-class MythContext;
 class RemoteEncoder;
 
-vector<ProgramInfo *> *RemoteGetRecordedList(MythContext *context, 
-                                             bool deltype);
-
-void RemoteGetFreeSpace(MythContext *context, int &totalspace, int &usedspace);
-
-bool RemoteGetCheckFile(MythContext *context, const QString &url);
-
-void RemoteDeleteRecording(MythContext *context, ProgramInfo *pginfo);
-
-bool RemoteGetAllPendingRecordings(MythContext *context, 
-                                   vector<ProgramInfo *> &recordinglist);
-
-vector<ProgramInfo *> *RemoteGetConflictList(MythContext *context, 
-                                             ProgramInfo *pginfo,
+vector<ProgramInfo *> *RemoteGetRecordedList(bool deltype);
+void RemoteGetFreeSpace(int &totalspace, int &usedspace);
+bool RemoteGetCheckFile(const QString &url);
+void RemoteDeleteRecording(ProgramInfo *pginfo);
+bool RemoteGetAllPendingRecordings(vector<ProgramInfo *> &recordinglist);
+vector<ProgramInfo *> *RemoteGetConflictList(ProgramInfo *pginfo,
                                              bool removenonplaying);
-
-void RemoteSendMessage(MythContext *context, const QString &message);
-
-RemoteEncoder *RemoteRequestRecorder(MythContext *context);
-RemoteEncoder *RemoteGetExistingRecorder(MythContext *context,
-                                         ProgramInfo *pginfo);
-
-void RemoteGeneratePreviewPixmap(MythContext *context, ProgramInfo *pginfo);
+void RemoteSendMessage(const QString &message);
+RemoteEncoder *RemoteRequestRecorder(void);
+RemoteEncoder *RemoteGetExistingRecorder(ProgramInfo *pginfo);
+void RemoteGeneratePreviewPixmap(ProgramInfo *pginfo);
 
 #endif

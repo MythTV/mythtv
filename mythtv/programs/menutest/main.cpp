@@ -8,11 +8,13 @@ using namespace std;
 #include "mythcontext.h"
 #include "themedmenu.h"
 
+MythContext *gContext;
+
 int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
 
-    MythContext *context = new MythContext;
+    gContext = new MythContext;
 
     if (argc != 3)
     {
@@ -20,7 +22,7 @@ int main(int argc, char **argv)
         exit(0);
     }
 
-    ThemedMenu *diag = new ThemedMenu(context, argv[1], argv[2]);
+    ThemedMenu *diag = new ThemedMenu(argv[1], argv[2]);
 
     diag->Show();
     int result = diag->exec();
@@ -28,7 +30,7 @@ int main(int argc, char **argv)
     cout << diag->getSelection() << endl;
 
     delete diag;
-    delete context;
+    delete gContext;
 
     return result;
 }

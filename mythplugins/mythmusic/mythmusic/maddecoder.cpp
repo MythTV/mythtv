@@ -20,9 +20,9 @@ using namespace std;
 
 #define XING_MAGIC     (('X' << 24) | ('i' << 16) | ('n' << 8) | 'g')
 
-MadDecoder::MadDecoder(MythContext *context, const QString &file, 
-                       DecoderFactory *d, QIODevice *i, Output *o)
-          : Decoder(context, d, i, o)
+MadDecoder::MadDecoder(const QString &file, DecoderFactory *d, QIODevice *i, 
+                       Output *o)
+          : Decoder(d, i, o)
 {
     filename = file;
     inited = false;
@@ -46,8 +46,8 @@ MadDecoder::MadDecoder(MythContext *context, const QString &file,
     output_at = 0;
     output_size = 0;
 
-    filename_format = context->GetSetting("NonID3FileNameFormat").upper();
-    ignore_id3 = context->GetNumSetting("Ignore_ID3", 0);
+    filename_format = gContext->GetSetting("NonID3FileNameFormat").upper();
+    ignore_id3 = gContext->GetNumSetting("Ignore_ID3", 0);
 }
 
 MadDecoder::~MadDecoder(void)
@@ -736,17 +736,16 @@ const QString &MadDecoderFactory::description() const
     return desc;
 }
 
-Decoder *MadDecoderFactory::create(MythContext *context, const QString &file, 
-                                   QIODevice *input, Output *output, 
-                                   bool deletable)
+Decoder *MadDecoderFactory::create(const QString &file, QIODevice *input, 
+                                   Output *output, bool deletable)
 {
     if (deletable)
-        return new MadDecoder(context, file, this, input, output);
+        return new MadDecoder(file, this, input, output);
 
     static MadDecoder *decoder = 0;
 
     if (! decoder) {
-        decoder = new MadDecoder(context, file, this, input, output);
+        decoder = new MadDecoder(file, this, input, output);
     } else {
         decoder->setInput(input);
         decoder->setOutput(output);

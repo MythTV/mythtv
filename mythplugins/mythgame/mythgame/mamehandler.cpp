@@ -417,7 +417,7 @@ void MameHandler::edit_settings(QWidget *parent,RomInfo * romdata)
     MameRomInfo *mamedata = dynamic_cast<MameRomInfo*>(romdata);
     SetGameSettings(game_settings, mamedata);
 
-    MameSettingsDlg settingsdlg(m_context, parent, "gamesettings", true);
+    MameSettingsDlg settingsdlg(parent, "gamesettings", true);
     QString ImageFile;
     if(mamedata->FindImage("screenshot", &ImageFile))
         settingsdlg.SetScreenshot(ImageFile);
@@ -432,7 +432,7 @@ void MameHandler::edit_settings(QWidget *parent,RomInfo * romdata)
 void MameHandler::edit_system_settings(QWidget *parent,RomInfo * romdata)
 {
     romdata = romdata;
-    MameSettingsDlg settingsDlg(m_context, parent, "mamesettings", true, true);
+    MameSettingsDlg settingsDlg(parent, "mamesettings", true, true);
     if(settingsDlg.Show(&defaultSettings, true))
         SaveGameSettings(defaultSettings, NULL);    
 }
@@ -811,14 +811,14 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
 
 void MameHandler::SetGeneralPrefs()
 {
-    general_prefs.xmame_exe = m_context->GetSetting("XMameBinary");
-    general_prefs.rom_dir = m_context->GetSetting("MameRomLocation");
-    general_prefs.screenshot_dir = m_context->GetSetting("MameScreensLocation");
-    general_prefs.highscore_dir = m_context->GetSetting("MameScoresLocation");
-    general_prefs.flyer_dir = m_context->GetSetting("MameFlyersLocation");
-    general_prefs.cabinet_dir = m_context->GetSetting("MameCabinetsLocation");
-    general_prefs.game_history_file = m_context->GetSetting("MameHistoryLocation");
-    general_prefs.cheat_file = m_context->GetSetting("MameCheatLocation");
+    general_prefs.xmame_exe = gContext->GetSetting("XMameBinary");
+    general_prefs.rom_dir = gContext->GetSetting("MameRomLocation");
+    general_prefs.screenshot_dir = gContext->GetSetting("MameScreensLocation");
+    general_prefs.highscore_dir = gContext->GetSetting("MameScoresLocation");
+    general_prefs.flyer_dir = gContext->GetSetting("MameFlyersLocation");
+    general_prefs.cabinet_dir = gContext->GetSetting("MameCabinetsLocation");
+    general_prefs.game_history_file = gContext->GetSetting("MameHistoryLocation");
+    general_prefs.cheat_file = gContext->GetSetting("MameCheatLocation");
 
 }
 
@@ -965,11 +965,11 @@ void MameHandler::SetDefaultSettings()
     }
 }
 
-MameHandler* MameHandler::getHandler(MythContext *context)
+MameHandler* MameHandler::getHandler(void)
 {
     if(!pInstance)
     {
-        pInstance = new MameHandler(context);
+        pInstance = new MameHandler();
     }
     return pInstance;
 }
@@ -981,7 +981,7 @@ RomInfo* MameHandler::create_rominfo(RomInfo *parent)
 
 void MameHandler::LoadCatfile(map<QString, QString>* pCatMap)
 {
-    QString CatFile = m_context->GetSetting("XMameCatFile");
+    QString CatFile = gContext->GetSetting("XMameCatFile");
     fstream fin(CatFile.ascii(), ios::in);
     if (!fin.is_open())
         return;

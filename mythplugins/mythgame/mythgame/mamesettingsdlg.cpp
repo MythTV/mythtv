@@ -28,20 +28,17 @@ using namespace std;
 #define SAVE_SETTINGS 1
 #define DONT_SAVE_SETTINGS 0
 
-MameSettingsDlg::MameSettingsDlg(MythContext *context, QWidget* parent,  
-                                 const char* name, bool modal, bool system, 
-                                 WFlags fl)
-    : QDialog( parent, name, modal, fl ), bSystem(system)
+MameSettingsDlg::MameSettingsDlg(QWidget* parent, const char* name, 
+                                 bool modal, bool system, WFlags fl)
+               : QDialog( parent, name, modal, fl ), bSystem(system)
 {
-    m_context = context;
-
     setCursor(QCursor(Qt::BlankCursor));
     if ( !name )
       setName( "MameSettings" );
 
     int screenwidth = 0, screenheight = 0;
 
-    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     resize( screenwidth, screenheight );
     setSizePolicy( QSizePolicy( (QSizePolicy::SizeType)0, (QSizePolicy::SizeType)0, 0, 0, sizePolicy().hasHeightForWidth() ) );
@@ -57,7 +54,7 @@ MameSettingsDlg::MameSettingsDlg(MythContext *context, QWidget* parent,
     MameTab->setBackgroundOrigin( QTabWidget::WindowOrigin );
     QFont MameTab_font(  MameTab->font() );
     MameTab_font.setFamily( "Helvetica [Urw]" );
-    MameTab_font.setPointSize( (int)(m_context->GetMediumFontSize() * wmult));
+    MameTab_font.setPointSize( (int)(gContext->GetMediumFontSize() * wmult));
     MameTab_font.setBold( TRUE );
     MameTab->setFont( MameTab_font );
 
@@ -571,5 +568,5 @@ void MameSettingsDlg::ScaleImageLabel(QPixmap &pixmap, QLabel *label)
 
 void MameSettingsDlg::loadList()
 {
-    MameHandler::getHandler(m_context)->processGames();
+    MameHandler::getHandler()->processGames();
 }

@@ -13,11 +13,9 @@ using namespace std;
 #include "gamehandler.h"
 #include "extendedlistview.h"
 
-#include <mythtv/mythcontext.h>
-
-ScreenBox::ScreenBox(MythContext *context, QSqlDatabase *ldb, QString &paths,
-                     QWidget *parent, const char *name)
-           : MythDialog(context, parent, name)
+ScreenBox::ScreenBox(QSqlDatabase *ldb, QString &paths, QWidget *parent, 
+                     const char *name)
+         : MythDialog(parent, name)
 {
     db = ldb;
 
@@ -40,7 +38,7 @@ ScreenBox::ScreenBox(MythContext *context, QSqlDatabase *ldb, QString &paths,
     listview->setColumnWidthMode(0, QListView::Maximum);
     listview->setResizeMode(QListView::LastColumn);
 
-    PicFrame = new SelectFrame(context, this);
+    PicFrame = new SelectFrame(this);
     PicFrame->setFixedWidth((int)(790 * wmult));
     PicFrame->setFixedHeight((int)(350 * hmult));
     PicFrame->setPaletteBackgroundColor(palette().color(QPalette::Active,
@@ -72,8 +70,7 @@ void ScreenBox::fillList(QListView *listview, QString &paths)
 {
     QString templevel = "system";
     QString temptitle = "All Games";
-    TreeItem *allgames = new TreeItem(m_context, listview, temptitle,
-                                      templevel, NULL);
+    TreeItem *allgames = new TreeItem(listview, temptitle, templevel, NULL);
     
     QStringList lines = QStringList::split(" ", paths);
     int Levels = lines.count();
@@ -109,8 +106,7 @@ void ScreenBox::fillList(QListView *listview, QString &paths)
             RomInfo *rinfo = new RomInfo();
             rinfo->setField(first, current);
 
-            TreeItem *item = new TreeItem(m_context, allgames, current,
-                                          first, rinfo);
+            TreeItem *item = new TreeItem(allgames, current, first, rinfo);
             fillNextLevel(level, num, querystr, matchstr, line, lines,
                           item);
         }
@@ -156,8 +152,7 @@ void ScreenBox::fillNextLevel(QString level, int num, QString querystr,
             RomInfo *rinfo;
             rinfo = new RomInfo(*parentinfo);
             rinfo->setField(level, current);
-            TreeItem *item = new TreeItem(m_context, parent, current, level,
-                                          rinfo);
+            TreeItem *item = new TreeItem(parent, current, level, rinfo);
 
             if (line != lines.end() && *line != "gamename")
                 fillNextLevel(*line, num + 1, querystr, matchstr2, line, lines,
@@ -216,7 +211,7 @@ void ScreenBox::setImages(QListViewItem *item)
             QPtrList<RomInfo> *romlist = new QPtrList<RomInfo>;
             while (query.next())
             {
-                rinfo = GameHandler::CreateRomInfo(m_context, romdata);
+                rinfo = GameHandler::CreateRomInfo(romdata);
                 rinfo->setField("gamename",query.value(0).toString());
                 rinfo->fillData(db);
                 romlist->append(rinfo);
@@ -237,7 +232,7 @@ void ScreenBox::editSettings(QListViewItem *item)
 
     if("system" == tcitem->getLevel())
     {
-        GameHandler::EditSystemSettings(m_context, this, tcitem->getRomInfo());
+        GameHandler::EditSystemSettings(this, tcitem->getRomInfo());
     }
 }
 

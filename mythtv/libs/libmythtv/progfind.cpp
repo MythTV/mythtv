@@ -34,12 +34,12 @@ using namespace std;
 #include "libmyth/mythcontext.h"
 
 
-void RunProgramFind(MythContext *context, bool thread)
+void RunProgramFind(bool thread)
 {
     if (thread)
         qApp->lock();
 
-    ProgFinder programFind(context);
+    ProgFinder programFind;
 
     if (thread)
     {
@@ -56,18 +56,16 @@ void RunProgramFind(MythContext *context, bool thread)
 }
 
 
-ProgFinder::ProgFinder(MythContext *context, 
-                         QWidget *parent, const char *name)
-           : MythDialog(context, parent, name)
+ProgFinder::ProgFinder(QWidget *parent, const char *name)
+           : MythDialog(parent, name)
 {
     running = true;
-    m_context = context;
     m_db = QSqlDatabase::database();
 
-    baseDir = context->GetInstallPrefix();
+    baseDir = gContext->GetInstallPrefix();
 
     // The 'Current Listings' and 'Future Programs' bar at the bottom of the screen.
-    showProgramBar = m_context->GetNumSetting("EPGProgramBar", 1);
+    showProgramBar = gContext->GetNumSetting("EPGProgramBar", 1);
 
     accel = new QAccel(this);
     accel->connectItem(accel->insertItem(Key_Left), this, SLOT(cursorLeft()));
@@ -91,7 +89,7 @@ ProgFinder::ProgFinder(MythContext *context,
     curSearch = 10;
     progData = new QString[1];
     listCount = 1;
-    showsPerListing = m_context->GetNumSetting("showsPerListing");;
+    showsPerListing = gContext->GetNumSetting("showsPerListing");;
     if (showsPerListing < 1)
         showsPerListing = 7;
     if (showsPerListing % 2 == 0)
@@ -215,7 +213,7 @@ void ProgFinder::getInfo()
 
   	if (curPick)
     	{
-        	InfoDialog diag(m_context, curPick, this, "Program Info");
+        	InfoDialog diag(curPick, this, "Program Info");
         	diag.setCaption("BLAH!!!");
         	diag.exec();
     	}
@@ -299,7 +297,7 @@ void ProgFinder::update_timeout()
 void ProgFinder::setupColorScheme()
 {
 
-    Settings *themed = m_context->qtconfig();
+    Settings *themed = gContext->qtconfig();
     QString curColor = "";
     curColor = themed->GetSetting("time_bgColor");
     if (curColor != "")

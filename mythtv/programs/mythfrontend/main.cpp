@@ -24,20 +24,21 @@ using namespace std;
 #define HALT     3
 
 ThemedMenu *menu;
+MythContext *gContext;
 
-QString startGuide(MythContext *context)
+QString startGuide(void)
 {
-    QString startchannel = context->GetSetting("DefaultTVChannel");
+    QString startchannel = gContext->GetSetting("DefaultTVChannel");
     if (startchannel == "")
         startchannel = "3";
 
-    return RunProgramGuide(context, startchannel);
+    return RunProgramGuide(startchannel);
 }
 
-int startManaged(MythContext *context)
+int startManaged(void)
 {
     QSqlDatabase *db = QSqlDatabase::database();
-    ViewScheduled vsb(context, db);
+    ViewScheduled vsb(db);
 
     vsb.Show();
     qApp->unlock();
@@ -47,9 +48,9 @@ int startManaged(MythContext *context)
     return 0;
 }
 
-int startPlayback(MythContext *context)
+int startPlayback(void)
 {
-    PlaybackBox pbb(context, PlaybackBox::Play);
+    PlaybackBox pbb(PlaybackBox::Play);
 
     pbb.Show();
     qApp->unlock();
@@ -59,9 +60,9 @@ int startPlayback(MythContext *context)
     return 0;
 }
 
-int startDelete(MythContext *context)
+int startDelete(void)
 {
-    PlaybackBox delbox(context, PlaybackBox::Delete);
+    PlaybackBox delbox(PlaybackBox::Delete);
    
     delbox.Show();
     qApp->unlock();
@@ -71,10 +72,10 @@ int startDelete(MythContext *context)
     return 0;
 }
 
-void startTV(MythContext *context)
+void startTV(void)
 {
     QSqlDatabase *db = QSqlDatabase::database();
-    TV *tv = new TV(context, db);
+    TV *tv = new TV(db);
     tv->Init();
     TVState nextstate = tv->LiveTV();
 
@@ -104,45 +105,44 @@ void startTV(MythContext *context)
 
 void TVMenuCallback(void *data, QString &selection)
 {
-    MythContext *context = (MythContext *)data;
-
+    (void)data;
     QString sel = selection.lower();
 
     if (sel == "tv_watch_live")
-        startTV(context);
+        startTV();
     else if (sel == "tv_watch_recording")
-        startPlayback(context);
+        startPlayback();
     else if (sel == "tv_schedule")
-        startGuide(context);
+        startGuide();
     else if (sel == "tv_delete")
-        startDelete(context);
+        startDelete();
     else if (sel == "tv_fix_conflicts")
-        startManaged(context);
+        startManaged();
     else if (sel == "settings appearance") {
         AppearanceSettings settings;
-        settings.exec(context, QSqlDatabase::database());
-        context->LoadQtConfig();
+        settings.exec(QSqlDatabase::database());
+        gContext->LoadQtConfig();
         menu->ReloadTheme();
     } else if (sel == "settings recording") {
         RecordingProfileEditor editor(QSqlDatabase::database());
-        editor.exec(context, QSqlDatabase::database());
+        editor.exec(QSqlDatabase::database());
     } else if (sel == "settings general") {
         GeneralSettings settings;
-        settings.exec(context, QSqlDatabase::database());
+        settings.exec(QSqlDatabase::database());
     } else if (sel == "settings playback") {
         PlaybackSettings settings;
-        settings.exec(context, QSqlDatabase::database());
+        settings.exec(QSqlDatabase::database());
     } else if (sel == "settings epg") {
         EPGSettings settings;
-        settings.exec(context, QSqlDatabase::database());
+        settings.exec(QSqlDatabase::database());
     }
 }
 
-int handleExit(MythContext *context)
+int handleExit(void)
 {
     QString title = "Do you really want to exit MythTV?";
 
-    DialogBox diag(context, title);
+    DialogBox diag(title);
     diag.AddButton("No");
     diag.AddButton("Yes, Exit now");
     diag.AddButton("Yes, Exit and shutdown the computer");
@@ -164,13 +164,13 @@ int handleExit(MythContext *context)
     return 0;
 }
 
-void haltnow(MythContext *context, int how)
+void haltnow(int how)
 {
-    QString halt_cmd = context->GetSetting("HaltCommand", "halt");
-    QString haltwkup_cmd = context->GetSetting("HaltCommandWhenWakeup",
-                                               "echo 'would halt now, and set "
-                                               "wakeup time to %1 (secs since "
-                                               "1970) if command was set'");
+    QString halt_cmd = gContext->GetSetting("HaltCommand", "halt");
+    QString haltwkup_cmd = gContext->GetSetting("HaltCommandWhenWakeup",
+                                                "echo 'would halt now, and set "
+                                                "wakeup time to %1 (secs since "
+                                                "1970) if command was set'");
 
     if (how == HALTWKUP)
     {
@@ -179,10 +179,10 @@ void haltnow(MythContext *context, int how)
         system(halt_cmd.ascii());
 }
 
-int RunMenu(QString themedir, MythContext *context)
+int RunMenu(QString themedir)
 {
-    menu = new ThemedMenu(context, themedir.ascii(), "mainmenu.xml");
-    menu->setCallback(TVMenuCallback, context);
+    menu = new ThemedMenu(themedir.ascii(), "mainmenu.xml");
+    menu->setCallback(TVMenuCallback, gContext);
    
     int exitstatus = 0;
  
@@ -191,7 +191,7 @@ int RunMenu(QString themedir, MythContext *context)
         do {
             menu->Show();
             menu->exec();
-        } while (!(exitstatus = handleExit(context)));
+        } while (!(exitstatus = handleExit()));
     }
     else
     {
@@ -222,8 +222,8 @@ int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
 
-    MythContext *context = new MythContext;
-    context->ConnectServer("localhost", 6543);
+    gContext = new MythContext;
+    gContext->ConnectServer("localhost", 6543);
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
     if (!db)
@@ -232,7 +232,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    if (!context->OpenDatabase(db))
+    if (!gContext->OpenDatabase(db))
     {
         printf("couldn't open db\n");
         return -1;
@@ -240,23 +240,23 @@ int main(int argc, char **argv)
 
     WriteDefaults(db);
 
-    QString themename = context->GetSetting("Theme");
-    QString themedir = context->FindThemeDir(themename);
+    QString themename = gContext->GetSetting("Theme", "blue");
+    QString themedir = gContext->FindThemeDir(themename);
     if (themedir == "")
     {
         cerr << "Couldn't find theme " << themename << endl;
         exit(0);
     }
 
-    context->LoadQtConfig();
+    gContext->LoadQtConfig();
 
     qApp->unlock();
 
-    int exitstatus = RunMenu(themedir, context);
+    int exitstatus = RunMenu(themedir);
 
-    haltnow(context, exitstatus);
+    haltnow(exitstatus);
 
-    delete context;
+    delete gContext;
 
     return exitstatus;
 }

@@ -4,7 +4,6 @@
 class ProgramInfo;
 class QSqlDatabase;
 class EncoderLink;
-class MythContext;
 
 #include <qmap.h> 
 #include <list>
@@ -15,8 +14,7 @@ using namespace std;
 class Scheduler : public QObject
 {
   public:
-    Scheduler(MythContext *context, QMap<int, EncoderLink *> *tvList,
-              QSqlDatabase *ldb);
+    Scheduler(QMap<int, EncoderLink *> *tvList, QSqlDatabase *ldb);
    ~Scheduler();
 
     bool CheckForChanges(void);
@@ -80,7 +78,6 @@ class Scheduler : public QObject
     QMap<int, vector<int> > sourceToInput;
     QMap<int, int> inputToCard;
 
-    MythContext *m_context;
     QMap<int, EncoderLink *> *m_tvList;   
 
     QMap<QString, bool> askedList;

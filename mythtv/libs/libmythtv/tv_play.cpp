@@ -47,10 +47,9 @@ void *SpawnDecode(void *param)
     return NULL;
 }
 
-TV::TV(MythContext *lcontext, QSqlDatabase *db)
+TV::TV(QSqlDatabase *db)
   : QObject()
 {
-    m_context = lcontext;
     m_db = db;
 
     dialogname = "";
@@ -62,14 +61,14 @@ TV::TV(MythContext *lcontext, QSqlDatabase *db)
     requestDelete = false;
     endOfRecording = false;
 
-    m_context->addListener(this);
+    gContext->addListener(this);
 }
 
 void TV::Init(void)
 {
-    fftime = m_context->GetNumSetting("FastForwardAmount", 30);
-    rewtime = m_context->GetNumSetting("RewindAmount", 5);
-    jumptime = m_context->GetNumSetting("JumpAmount", 10);
+    fftime = gContext->GetNumSetting("FastForwardAmount", 30);
+    rewtime = gContext->GetNumSetting("RewindAmount", 5);
+    jumptime = gContext->GetNumSetting("JumpAmount", 10);
 
     recorder = piprecorder = activerecorder = NULL;
     nvp = pipnvp = activenvp = NULL;
@@ -92,7 +91,7 @@ void TV::Init(void)
 
 TV::~TV(void)
 {
-    m_context->removeListener(this);
+    gContext->removeListener(this);
 
     runMainLoop = false;
     pthread_join(event, NULL);
@@ -107,7 +106,7 @@ TVState TV::LiveTV(void)
 {
     if (internalState == kState_None)
     {
-        RemoteEncoder *testrec = RemoteRequestRecorder(m_context);
+        RemoteEncoder *testrec = RemoteRequestRecorder();
 
         if (!testrec->IsValidRecorder())
         {
@@ -117,7 +116,7 @@ TVState TV::LiveTV(void)
                             "you want to watch live TV, cancel one of the "
                             "in-progress recordings from the delete menu.";
     
-            DialogBox diag(m_context, title);
+            DialogBox diag(title);
             diag.AddButton("Cancel and go back to the TV menu");
 
             diag.Show();
@@ -291,8 +290,7 @@ void TV::HandleStateChange(void)
         recorder->Setup();
         recorder->SetupRingBuffer(name, filesize, smudge);
 
-        prbuffer = new RingBuffer(m_context, name, filesize, smudge, 
-                                  recorder);
+        prbuffer = new RingBuffer(name, filesize, smudge, recorder);
 
         internalState = nextState;
         changed = true;
@@ -328,11 +326,11 @@ void TV::HandleStateChange(void)
              (internalState == kState_None &&
               nextState == kState_WatchingRecording))
     {
-        prbuffer = new RingBuffer(m_context, inputFilename, false);
+        prbuffer = new RingBuffer(inputFilename, false);
 
         if (nextState == kState_WatchingRecording)
         {
-            recorder = RemoteGetExistingRecorder(m_context, playbackinfo);
+            recorder = RemoteGetExistingRecorder(playbackinfo);
             if (!recorder->IsValidRecorder())
             {
                 cout << "ERROR: couldn't find recorder for in-progress "
@@ -469,21 +467,21 @@ void TV::SetupPlayer(void)
     }
 
     QString filters = "";
-    nvp = new NuppelVideoPlayer(m_context, m_db, playbackinfo);
+    nvp = new NuppelVideoPlayer(m_db, playbackinfo);
     nvp->SetRingBuffer(prbuffer);
     nvp->SetRecorder(recorder);
-    nvp->SetOSDFontName(m_context->GetSetting("OSDFont"),
-                        m_context->GetSetting("OSDCCFont"),
-                        m_context->GetInstallPrefix()); 
-    nvp->SetOSDThemeName(m_context->GetSetting("OSDTheme"));
-    nvp->SetAudioSampleRate(m_context->GetNumSetting("AudioSampleRate"));
-    nvp->SetAudioDevice(m_context->GetSetting("AudioOutputDevice"));
+    nvp->SetOSDFontName(gContext->GetSetting("OSDFont"),
+                        gContext->GetSetting("OSDCCFont"),
+                        gContext->GetInstallPrefix()); 
+    nvp->SetOSDThemeName(gContext->GetSetting("OSDTheme"));
+    nvp->SetAudioSampleRate(gContext->GetNumSetting("AudioSampleRate"));
+    nvp->SetAudioDevice(gContext->GetSetting("AudioOutputDevice"));
     nvp->SetLength(playbackLen);
-    nvp->SetExactSeeks(m_context->GetNumSetting("ExactSeeking"));
+    nvp->SetExactSeeks(gContext->GetNumSetting("ExactSeeking"));
 
-    osd_display_time = m_context->GetNumSetting("OSDDisplayTime");
+    osd_display_time = gContext->GetNumSetting("OSDDisplayTime");
 
-    if (m_context->GetNumSetting("Deinterlace"))
+    if (gContext->GetNumSetting("Deinterlace"))
     {
         if (filters.length() > 1)
             filters += ",";
@@ -506,17 +504,17 @@ void TV::SetupPipPlayer(void)
         return;
     }
 
-    pipnvp = new NuppelVideoPlayer(m_context);
+    pipnvp = new NuppelVideoPlayer();
     pipnvp->SetAsPIP();
     pipnvp->SetRingBuffer(piprbuffer);
     pipnvp->SetRecorder(piprecorder);
-    pipnvp->SetOSDFontName(m_context->GetSetting("OSDFont"),
-                           m_context->GetSetting("OSDCCFont"),
-                           m_context->GetInstallPrefix());
-    pipnvp->SetOSDThemeName(m_context->GetSetting("OSDTheme"));
-    pipnvp->SetAudioSampleRate(m_context->GetNumSetting("AudioSampleRate"));
-    pipnvp->SetAudioDevice(m_context->GetSetting("AudioOutputDevice"));
-    pipnvp->SetExactSeeks(m_context->GetNumSetting("ExactSeeking"));
+    pipnvp->SetOSDFontName(gContext->GetSetting("OSDFont"),
+                           gContext->GetSetting("OSDCCFont"),
+                           gContext->GetInstallPrefix());
+    pipnvp->SetOSDThemeName(gContext->GetSetting("OSDTheme"));
+    pipnvp->SetAudioSampleRate(gContext->GetNumSetting("AudioSampleRate"));
+    pipnvp->SetAudioDevice(gContext->GetSetting("AudioOutputDevice"));
+    pipnvp->SetExactSeeks(gContext->GetNumSetting("ExactSeeking"));
 
     pipnvp->SetLength(playbackLen);
 }
@@ -582,7 +580,7 @@ void TV::RunTV(void)
     paused = false;
     int keypressed;
 
-    stickykeys = m_context->GetNumSetting("StickyKeys");
+    stickykeys = gContext->GetNumSetting("StickyKeys");
     doing_ff = false;
     doing_rew = false;
     ff_rew_scaling = 1.0;
@@ -770,7 +768,7 @@ void TV::ProcessKeypress(int keypressed)
         case wsEscape:
         {
             if (StateIsPlaying(internalState) && 
-                m_context->GetNumSetting("PlaybackExitPrompt")) 
+                gContext->GetNumSetting("PlaybackExitPrompt")) 
             {
                 nvp->Pause();
 
@@ -879,7 +877,7 @@ void TV::TogglePIPView(void)
 {
     if (!pipnvp)
     {
-        RemoteEncoder *testrec = RemoteRequestRecorder(m_context);
+        RemoteEncoder *testrec = RemoteRequestRecorder();
 
         if (!testrec->IsValidRecorder())
         {
@@ -896,8 +894,7 @@ void TV::TogglePIPView(void)
         piprecorder->Setup();
         piprecorder->SetupRingBuffer(name, filesize, smudge, true);
 
-        piprbuffer = new RingBuffer(m_context, name, filesize, smudge,
-                                    piprecorder);
+        piprbuffer = new RingBuffer(name, filesize, smudge, piprecorder);
 
         piprecorder->SpawnLiveTV();
 
@@ -1352,7 +1349,7 @@ void TV::doLoadMenu(void)
         recorder->GetChannelInfo(dummy, dummy, dummy, dummy, dummy, dummy, 
                                  dummy, dummy, channame);
 
-    QString chanstr = RunProgramGuide(m_context, channame, true, this);
+    QString chanstr = RunProgramGuide(channame, true, this);
 
     if (chanstr != "")
     {
@@ -1485,7 +1482,7 @@ void TV::customEvent(QCustomEvent *e)
                 QString resp = QString("ASK_RECORDING_RESPONSE %1 %2")
                                     .arg(cardnum)
                                     .arg(retval);
-                RemoteSendMessage(m_context, resp);
+                RemoteSendMessage(resp);
             }
         }
         else if (internalState == kState_WatchingLiveTV &&

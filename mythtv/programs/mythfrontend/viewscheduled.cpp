@@ -22,9 +22,9 @@ using namespace std;
 #include "libmyth/mythcontext.h"
 #include "libmythtv/remoteutil.h"
     
-ViewScheduled::ViewScheduled(MythContext *context, QSqlDatabase *ldb,
-                             QWidget *parent, const char *name)
-             : MythDialog(context, parent, name)
+ViewScheduled::ViewScheduled(QSqlDatabase *ldb, QWidget *parent, 
+                             const char *name)
+             : MythDialog(parent, name)
 {
     db = ldb;
 
@@ -71,7 +71,7 @@ ViewScheduled::ViewScheduled(MythContext *context, QSqlDatabase *ldb,
                              "<font color=\"red\">red</font>.<br>Deactivated "
                              "recordings are highlighted in <font "
                              "color=\"gray\">gray</font>.", this);
-    key->setFont(QFont("Arial", (int)(m_context->GetSmallFontSize() * hmult), 
+    key->setFont(QFont("Arial", (int)(gContext->GetSmallFontSize() * hmult), 
                  QFont::Bold));
     key->setBackgroundOrigin(WindowOrigin);
     vbox->addWidget(key);
@@ -85,7 +85,7 @@ ViewScheduled::ViewScheduled(MythContext *context, QSqlDatabase *ldb,
     
     title = new QLabel(" ", this);
     title->setBackgroundOrigin(WindowOrigin);
-    title->setFont(QFont("Arial", (int)(m_context->GetBigFontSize() * hmult), 
+    title->setFont(QFont("Arial", (int)(gContext->GetBigFontSize() * hmult), 
                    QFont::Bold));
 
     QLabel *datelabel = new QLabel("Airdate: ", this);
@@ -133,12 +133,12 @@ void ViewScheduled::FillList(void)
     bool conflicts = false;
     vector<ProgramInfo *> recordinglist;
 
-    conflicts = RemoteGetAllPendingRecordings(m_context, recordinglist);
+    conflicts = RemoteGetAllPendingRecordings(recordinglist);
 
     vector<ProgramInfo *>::reverse_iterator pgiter = recordinglist.rbegin();
 
     for (; pgiter != recordinglist.rend(); pgiter++)
-        new ProgramListItem(m_context, listview, (*pgiter), 2);
+        new ProgramListItem(listview, (*pgiter), 2);
 
     if (conflicts)
         desclabel->setText("You have time conflicts.");
@@ -163,12 +163,8 @@ void ViewScheduled::changed(QListViewItem *lvitem)
     QDateTime startts = rec->startts;
     QDateTime endts = rec->endts;
 
-    QString dateformat = m_context->GetSetting("DateFormat");
-    if (dateformat == "")
-        dateformat = "ddd MMMM d";
-    QString timeformat = m_context->GetSetting("TimeFormat");
-    if (timeformat == "")
-        timeformat = "h:mm AP";
+    QString dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    QString timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
         
     QString timedate = endts.date().toString(dateformat) + QString(", ") +
                        startts.time().toString(timeformat) + QString(" - ") +
@@ -177,7 +173,7 @@ void ViewScheduled::changed(QListViewItem *lvitem)
     date->setText(timedate);
 
     QString chantext;
-    if (m_context->GetNumSetting("DisplayChanNum") != 0)
+    if (gContext->GetNumSetting("DisplayChanNum") != 0)
         chantext = rec->channame + " [" + rec->chansign + "]";
     else
         chantext = rec->chanstr;
@@ -210,7 +206,7 @@ void ViewScheduled::selected(QListViewItem *lvitem)
     ProgramListItem *pgitem = (ProgramListItem *)lvitem;
     ProgramInfo *rec = pgitem->getProgramInfo();
 
-    m_context->KickDatabase(db);
+    MythContext::KickDatabase(db);
 
     if (!rec->recording)
     {
@@ -228,7 +224,7 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
                       "conflicts with another scheduled recording.  Do you "
                       "want to re-enable this recording?";
 
-    DialogBox diag(m_context, message);
+    DialogBox diag(message);
 
     QString button = "Yes, I want to record it.";
     diag.AddButton(button);
@@ -261,8 +257,7 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
         cerr << thequery << endl;
     }
 
-    vector<ProgramInfo *> *conflictlist = RemoteGetConflictList(m_context, rec, 
-                                                                     false);
+    vector<ProgramInfo *> *conflictlist = RemoteGetConflictList(rec, false);
 
     QString dstart, dend;
     vector<ProgramInfo *>::iterator i;
@@ -303,7 +298,7 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
 
 void ViewScheduled::handleConflicting(ProgramInfo *rec)
 {
-    DialogBox diag(m_context, "How do you want to resolve this conflict?");
+    DialogBox diag("How do you want to resolve this conflict?");
 
     diag.AddButton("Adjust this program's recording time");
     diag.AddButton("Record only one program in this timeslot");
@@ -313,7 +308,7 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
 
     if (ret == 1)
     {
-        SetRecTimeDialog srt(m_context,rec,db);
+        SetRecTimeDialog srt(rec, db);
         srt.Show();
         srt.exec();
     }
@@ -325,26 +320,21 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
 
 void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
 {
-    vector<ProgramInfo *> *conflictlist = RemoteGetConflictList(m_context, rec,
-                                                                true);
+    vector<ProgramInfo *> *conflictlist = RemoteGetConflictList(rec, true);
 
-    QString dateformat = m_context->GetSetting("DateFormat");
-    if (dateformat == "")
-        dateformat = "ddd MMMM d";
-    QString timeformat = m_context->GetSetting("TimeFormat");
-    if (timeformat == "")
-        timeformat = "h:mm AP";
+    QString dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    QString timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
 
     QString message = "The follow scheduled recordings conflict with each "
                       "other.  Which would you like to record?";
 
-    DialogBox diag(m_context, message, "Remember this choice and use it "
-                   "automatically in the future");
+    DialogBox diag(message, "Remember this choice and use it automatically in "
+                   "the future");
  
     QString button; 
     button = rec->title + QString("\n");
     button += rec->startts.toString(dateformat + " " + timeformat);
-    if (m_context->GetNumSetting("DisplayChanNum") != 0)
+    if (gContext->GetNumSetting("DisplayChanNum") != 0)
         button += " on " + rec->channame + " [" + rec->chansign + "]";
     else
         button += QString(" on channel ") + rec->chanstr;
@@ -358,7 +348,7 @@ void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
 
         button = info->title + QString("\n");
         button += info->startts.toString(dateformat + " " + timeformat);
-        if (m_context->GetNumSetting("DisplayChanNum") != 0)
+        if (gContext->GetNumSetting("DisplayChanNum") != 0)
             button += " on " + info->channame + " [" + info->chansign + "]";
         else
             button += QString(" on channel ") + info->chanstr;

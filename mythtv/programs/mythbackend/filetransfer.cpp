@@ -7,13 +7,11 @@ using namespace std;
 #include "filetransfer.h"
 
 #include "RingBuffer.h"
-#include "libmyth/mythcontext.h"
 #include "libmyth/util.h"
 
-FileTransfer::FileTransfer(MythContext *context, QString &filename, 
-                           QSocket *remote)
+FileTransfer::FileTransfer(QString &filename, QSocket *remote)
 {
-    rbuffer = new RingBuffer(context, filename, false);
+    rbuffer = new RingBuffer(filename, false);
     pthread_mutex_init(&readthreadLock, NULL);
     sock = remote;
     readthreadlive = false;

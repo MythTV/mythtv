@@ -220,10 +220,8 @@ unsigned ThreadedFileWriter::BufFree()
 
 /**********************************************************************/
 
-RingBuffer::RingBuffer(MythContext *context, const QString &lfilename, 
-                       bool write, bool needevents)
+RingBuffer::RingBuffer(const QString &lfilename, bool write, bool needevents)
 {
-    m_context = context;
     recorder_num = 0;   
  
     normalfile = true;
@@ -259,10 +257,9 @@ RingBuffer::RingBuffer(MythContext *context, const QString &lfilename,
     pthread_rwlock_init(&rwlock, NULL);
 }
 
-RingBuffer::RingBuffer(MythContext *context, const QString &lfilename, 
-                       long long size, long long smudge, RemoteEncoder *enc)
+RingBuffer::RingBuffer(const QString &lfilename, long long size, 
+                       long long smudge, RemoteEncoder *enc)
 {
-    m_context = context;
     recorder_num = 0;
 
     remoteencoder = NULL;

@@ -13,7 +13,7 @@ using namespace std;
 #include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
 
-Metadata * Dirlist::CheckFile(MythContext *context, QString &filename)
+Metadata * Dirlist::CheckFile(QString &filename)
 {
     QString s = filename.section( '/',-1); // s == "myapp"
 
@@ -22,7 +22,7 @@ Metadata * Dirlist::CheckFile(MythContext *context, QString &filename)
     return(retdata);
 }
 
-Dirlist::Dirlist(MythContext *context, QString &directory)
+Dirlist::Dirlist(QString &directory)
 {
     QDir d(directory);
     d.setSorting(QDir::DirsFirst| QDir::Name | QDir::IgnoreCase);
@@ -63,12 +63,12 @@ Dirlist::Dirlist(MythContext *context, QString &directory)
         else
         {
             QString ext = filename.section('.',-1);
-	    //	  printf("profile:%s\n",context->GetSetting("Profile").ascii());
-	    QString prof=context->GetSetting("Profile");
+	    //printf("profile:%s\n",gContext->GetSetting("Profile").ascii());
+	    QString prof = gContext->GetSetting("Profile");
 	    QString prof_name = "profile_" + prof;
-	    if (context->GetSetting(prof_name).contains(ext))
+	    if (gContext->GetSetting(prof_name).contains(ext))
             {
-                data = CheckFile(context, filename);
+                data = CheckFile(filename);
                 playlist.append(*data);
                 delete data;
 	    }

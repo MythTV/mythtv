@@ -56,9 +56,8 @@ int XJ_error_catcher(Display * d, XErrorEvent * xeev)
   return 0;
 }
 
-XvVideoOutput::XvVideoOutput(MythContext *context)
+XvVideoOutput::XvVideoOutput(void)
 {
-    m_context = context;
     XJ_started = 0; 
     xv_port = -1; 
     scratchspace = NULL; 
@@ -133,14 +132,14 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
     data->XJ_screen = DefaultScreenOfDisplay(data->XJ_disp);
     XJ_screen_num = DefaultScreen(data->XJ_disp);
 
-    QString HorizScanMode = m_context->GetSetting("HorizScanMode", "overscan");
-    QString VertScanMode = m_context->GetSetting("VertScanMode", "overscan");
+    QString HorizScanMode = gContext->GetSetting("HorizScanMode", "overscan");
+    QString VertScanMode = gContext->GetSetting("VertScanMode", "overscan");
 
-    img_hscanf = m_context->GetNumSetting("HorizScanPercentage", 5) / 100.0;
-    img_vscanf = m_context->GetNumSetting("VertScanPercentage",5) / 100.0;
+    img_hscanf = gContext->GetNumSetting("HorizScanPercentage", 5) / 100.0;
+    img_vscanf = gContext->GetNumSetting("VertScanPercentage", 5) / 100.0;
    
-    img_xoff = m_context->GetNumSetting("xScanDisplacement", 0);
-    img_yoff = m_context->GetNumSetting("yScanDisplacement",0);
+    img_xoff = gContext->GetNumSetting("xScanDisplacement", 0);
+    img_yoff = gContext->GetNumSetting("yScanDisplacement", 0);
 
 
     if (VertScanMode == "underscan") 
@@ -155,7 +154,7 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
     printf("Over/underscanning. V: %f, H: %f, XOff: %d, YOff: %d\n", 
            img_vscanf, img_hscanf, img_xoff, img_yoff);
  
-    XJ_aspect = m_context->GetNumSetting("FixedAspectRatio", 0);
+    XJ_aspect = gContext->GetNumSetting("FixedAspectRatio", 0);
 
     XJ_white = XWhitePixel(data->XJ_disp, XJ_screen_num);
     XJ_black = XBlackPixel(data->XJ_disp, XJ_screen_num);
@@ -164,7 +163,7 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
   
     data->XJ_root = DefaultRootWindow(data->XJ_disp);
 
-    GetMythTVGeometry(m_context, data->XJ_disp, XJ_screen_num,
+    GetMythTVGeometry(data->XJ_disp, XJ_screen_num,
                       &XJ_screenx, &XJ_screeny, 
                       &XJ_screenwidth, &XJ_screenheight);
 

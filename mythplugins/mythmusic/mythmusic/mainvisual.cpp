@@ -29,13 +29,13 @@
 
 #include <mythtv/mythcontext.h>
 
-MainVisual::MainVisual(MythContext *context, QWidget *parent, const char *name)
+MainVisual::MainVisual(QWidget *parent, const char *name)
     : QDialog( parent, name ), vis( 0 ), playing( FALSE ), fps( 30 )
 {
     int screenwidth = 0, screenheight = 0;
     float wmult = 0, hmult = 0;
    
-    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));

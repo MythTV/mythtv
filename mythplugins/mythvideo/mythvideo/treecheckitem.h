@@ -4,15 +4,13 @@
 #include <qlistview.h>
 #include "metadata.h"
 
-class MythContext;
-
 class TreeCheckItem : public QListViewItem
 {
   public:
-    TreeCheckItem(MythContext *context, QListView *parent, QString &ltext, 
-                  const QString &llevel, Metadata *mdata);
-    TreeCheckItem(MythContext *context, TreeCheckItem *parent, QString &ltext, 
-                  const QString &llevel, Metadata *mdata);
+    TreeCheckItem(QListView *parent, QString &ltext, const QString &llevel, 
+                  Metadata *mdata);
+    TreeCheckItem(TreeCheckItem *parent, QString &ltext, const QString &llevel,
+                  Metadata *mdata);
 
    ~TreeCheckItem(void) { if (metadata) delete metadata; }
 
@@ -25,8 +23,6 @@ class TreeCheckItem : public QListViewItem
 
     Metadata *metadata;
     QString level;
-
-    MythContext *m_context;
 };
 
 #endif

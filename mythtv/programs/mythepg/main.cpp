@@ -7,21 +7,22 @@
 
 #include "libmythtv/guidegrid.h"
 
+MythContext *gContext;
+
 int main(int argc, char **argv)
 {
     QApplication a(argc, argv);
 
-    MythContext *context = new MythContext();
-
+    gContext = new MythContext();
 
     QSqlDatabase *db = QSqlDatabase::addDatabase("QMYSQL3");
-    if (!context->OpenDatabase(db))
+    if (!gContext->OpenDatabase(db))
     {
         printf("couldn't open db\n");
         return -1;
     }
 
-    QString startchannel = context->GetSetting("DefaultTVChannel");
+    QString startchannel = gContext->GetSetting("DefaultTVChannel");
     if (startchannel == "")
         startchannel = "3";
 
@@ -30,16 +31,16 @@ int main(int argc, char **argv)
         startchannel = a.argv()[1];
     }
 
-    context->LoadQtConfig();
+    gContext->LoadQtConfig();
     
-    QString chanstr = RunProgramGuide(context, startchannel);
+    QString chanstr = RunProgramGuide(startchannel);
 
     int chan = 0;
     
     if (chanstr != QString::null)
         chan = atoi(chanstr.ascii());
 
-    delete context;
+    delete gContext;
 
     return chan;
 }

@@ -158,8 +158,8 @@ long long decodeLongLong(QStringList &list, int offset)
     return retval;
 } 
 
-void GetMythTVGeometry(MythContext *context, Display *dpy, int screen_num, 
-                       int *x, int *y, int *w, int *h) 
+void GetMythTVGeometry(Display *dpy, int screen_num, int *x, int *y, 
+                       int *w, int *h) 
 {
     int event_base, error_base;
 
@@ -170,7 +170,7 @@ void GetMythTVGeometry(MythContext *context, Display *dpy, int screen_num,
         XineramaScreenInfo *screen;
         int nr_xinerama_screens;
 
-        int screen_nr = context->GetNumSetting("XineramaScreen",0);
+        int screen_nr = gContext->GetNumSetting("XineramaScreen", 0);
 
         xinerama_screens = XineramaQueryScreens(dpy, &nr_xinerama_screens);
 

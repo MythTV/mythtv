@@ -11,15 +11,13 @@ class QLabel;
 class TV;
 class Scheduler;
 class ProgramInfo;
-class MythContext;
 class QDateTimeEdit;
 
 class SetRecTimeDialog : public MythDialog
 {
     Q_OBJECT
   public:
-    SetRecTimeDialog(MythContext *context, ProgramInfo *rec,
-                     QSqlDatabase *ldb, QWidget *parent = 0,
+    SetRecTimeDialog(ProgramInfo *rec, QSqlDatabase *ldb, QWidget *parent = 0,
                      const char *name = 0);
 
   protected slots:

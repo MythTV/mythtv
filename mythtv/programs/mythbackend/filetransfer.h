@@ -6,12 +6,11 @@
 #include <pthread.h>
 
 class RingBuffer;
-class MythContext;
 
 class FileTransfer
 {
   public:
-    FileTransfer(MythContext *context, QString &filename, QSocket *remote);
+    FileTransfer(QString &filename, QSocket *remote);
    ~FileTransfer();
 
     QSocket *getSocket() { return sock; }

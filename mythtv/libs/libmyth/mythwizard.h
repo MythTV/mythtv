@@ -42,7 +42,6 @@
 
 class QHBoxLayout;
 class MythWizardPrivate;
-class MythContext;
 
 class Q_EXPORT MythWizard : public MythDialog
 {
@@ -50,8 +49,7 @@ class Q_EXPORT MythWizard : public MythDialog
     Q_PROPERTY(QFont titleFont READ titleFont WRITE setTitleFont)
 
 public:
-    MythWizard(MythContext *context, QWidget* parent = 0, 
-               const char* name = 0, bool modal = FALSE);
+    MythWizard(QWidget* parent = 0, const char* name = 0, bool modal = FALSE);
     ~MythWizard();
 
     void Show();

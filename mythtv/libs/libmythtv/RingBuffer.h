@@ -4,7 +4,6 @@
 #include <qstring.h>
 #include <pthread.h>
 
-class MythContext;
 class RemoteFile;
 class RemoteEncoder;
 class ThreadedFileWriter;
@@ -12,10 +11,9 @@ class ThreadedFileWriter;
 class RingBuffer
 {
  public:
-    RingBuffer(MythContext *context, const QString &lfilename, bool write,
-               bool needevents = false);
-    RingBuffer(MythContext *context, const QString &lfilename, long long size, 
-               long long smudge, RemoteEncoder *enc = NULL);
+    RingBuffer(const QString &lfilename, bool write, bool needevents = false);
+    RingBuffer(const QString &lfilename, long long size, long long smudge,
+               RemoteEncoder *enc = NULL);
     
    ~RingBuffer();
 
@@ -88,7 +86,6 @@ class RingBuffer
 
     pthread_rwlock_t rwlock;
 
-    MythContext *m_context;
     int recorder_num;
     RemoteEncoder *remoteencoder;
     RemoteFile *remotefile;

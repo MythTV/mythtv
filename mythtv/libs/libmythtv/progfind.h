@@ -27,10 +27,9 @@
 
 class QLabel;
 class QListView;
-class MythContext;
 class ProgramInfo;
 
-void RunProgramFind(MythContext *context, bool thread = false);
+void RunProgramFind(bool thread = false);
 
 class ProgFinder : public MythDialog
 {
@@ -64,8 +63,7 @@ struct recordingRecord {
 };
     Q_OBJECT
   public:
-    ProgFinder(MythContext *context,
-	    QWidget *parent = 0, const char *name = 0);
+    ProgFinder(QWidget *parent = 0, const char *name = 0);
     ~ProgFinder();
 
   protected:

@@ -8,7 +8,6 @@
 
 class QLabel;
 class QCheckBox;
-class MythContext;
 class QListView;
 class QListViewItem;
 
@@ -16,8 +15,7 @@ class InfoDialog : public MythDialog
 {
     Q_OBJECT
   public:
-    InfoDialog(MythContext *context, ProgramInfo *pginfo, 
-               QWidget *parent = 0, const char *name = 0);
+    InfoDialog(ProgramInfo *pginfo, QWidget *parent = 0, const char *name = 0);
 
   protected slots:
     void selected(QListViewItem *);

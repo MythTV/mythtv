@@ -62,9 +62,8 @@ void format_input(FLAC__int32 *dest[], FLAC__int16 *ssbuffer,
             dest[channel][wide_sample] = (FLAC__int32)ssbuffer[sample];
 }
 
-void FlacEncode(MythContext *context, const char *infile, const char *outfile, 
-                int qualitylevel, Metadata *metadata, int totalbytes,
-                QProgressBar *progressbar)
+void FlacEncode(const char *infile, const char *outfile, int qualitylevel, 
+                Metadata *metadata, int totalbytes, QProgressBar *progressbar)
 {
     qualitylevel = qualitylevel;
 
@@ -169,8 +168,7 @@ void FlacEncode(MythContext *context, const char *infile, const char *outfile,
 
     if (metadata)
     {
-        FlacDecoder *decoder = new FlacDecoder(context, outfile, NULL, NULL, 
-                                               NULL);
+        FlacDecoder *decoder = new FlacDecoder(outfile, NULL, NULL, NULL);
         decoder->commitMetadata(metadata);
 
         delete decoder;

@@ -33,12 +33,11 @@ class RecListItem : public QListViewItem
     ScheduledRecording::RecordingType m_type;
 };
 
-InfoDialog::InfoDialog(MythContext *context, ProgramInfo *pginfo, 
-                       QWidget *parent, const char *name)
-          : MythDialog(context, parent, name)
+InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
+          : MythDialog(parent, name)
 {
-    int bigfont = m_context->GetBigFontSize();
-    int mediumfont = m_context->GetMediumFontSize();
+    int bigfont = gContext->GetBigFontSize();
+    int mediumfont = gContext->GetMediumFontSize();
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
@@ -168,12 +167,8 @@ QLabel *InfoDialog::getDateLabel(ProgramInfo *pginfo)
     QDateTime startts = pginfo->startts;
     QDateTime endts = pginfo->endts;
 
-    QString dateformat = m_context->GetSetting("DateFormat");
-    if (dateformat == "")
-        dateformat = "ddd MMMM d";
-    QString timeformat = m_context->GetSetting("TimeFormat");
-    if (timeformat == "")
-        timeformat = "h:mm AP";
+    QString dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    QString timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
 
     QString timedate = endts.date().toString(dateformat) + QString(", ") +
                        startts.time().toString(timeformat) + QString(" - ") +
