@@ -49,12 +49,11 @@ TV::TV(const string &startchannel)
 
     menurunning = false;
 
-    internalState = kStatus_None; 
+    internalState = nextState = kState_None; 
     secsToRecord = -1;
 
     runMainLoop = false;
     changeState = false;
-    nextState = kStatus_None;
 
     pthread_create(&event, NULL, EventThread, this);
 
@@ -73,7 +72,7 @@ TV::~TV(void)
         delete settings;
     if (rbuffer)
         delete rbuffer;
-    if (prbuffer != rbuffer)
+    if (prbuffer && prbuffer != rbuffer)
         delete prbuffer;
     if (nvp)
         delete nvp;
@@ -85,7 +84,7 @@ TV::~TV(void)
 
 void TV::LiveTV(void)
 {
-    if (internalState != kStatus_None)
+    if (internalState != kState_None)
     {
         printf("Error, attempting to watch live tv when there's something "
                "already going on.\n");
@@ -93,39 +92,110 @@ void TV::LiveTV(void)
     }
     else
     {
-        nextState = kStatus_WatchingLiveTV;
+        nextState = kState_WatchingLiveTV;
         changeState = true;
     }
 }
 
 void TV::StartRecording(const string &channelName, int duration,
                         const string &outputFileName)
-{                                
-    if (internalState != kStatus_None)
-    {   
-    }
-    else
+{   
+    if (internalState == kState_None || 
+        internalState == kState_WatchingPreRecorded)
     {
         recordChannel = channelName;
         outputFilename = outputFileName;
         secsToRecord = duration;
-        nextState = kStatus_RecordingOnly;
+        if (internalState == kState_None)
+            nextState = kState_RecordingOnly;
+        else if (internalState == kState_WatchingPreRecorded)
+            nextState = kState_WatchingOtherRecording;
         changeState = true;
     }   
 }
 
 void TV::Playback(const string &inputFileName)
 {
-    if (internalState != kStatus_None)
-    {
-    }
-    else
+    if (internalState == kState_None || internalState == kState_RecordingOnly)
     {
         inputFilename = inputFileName;
 
-        nextState = kStatus_WatchingPreRecorded;
+        if (internalState == kState_None)
+            nextState = kState_WatchingPreRecorded;
+        else if (internalState == kState_RecordingOnly)
+        {
+            if (inputFilename == outputFilename)
+                nextState = kState_WatchingRecording;
+            else
+                nextState = kState_WatchingOtherRecording;
+        }
         changeState = true;
     }
+}
+
+void TV::StateToString(TVState state, string &statestr)
+{
+    switch (state) {
+        case kState_None: statestr = "None"; break;
+        case kState_WatchingLiveTV: statestr = "WatchingLiveTV"; break;
+        case kState_WatchingPreRecorded: statestr = "WatchingPreRecorded";
+                                         break;
+        case kState_WatchingRecording: statestr = "WatchingRecording"; break;
+        case kState_WatchingOtherRecording: statestr = "WatchingOtherRecording";
+                                            break;
+        case kState_RecordingOnly: statestr = "RecordingOnly"; break;
+        default: statestr = "Unknown"; break;
+    }
+}
+
+bool TV::StateIsRecording(TVState state)
+{
+    bool retval = false;
+
+    if (state == kState_RecordingOnly || 
+        state == kState_WatchingRecording ||
+        state == kState_WatchingOtherRecording)
+    {
+        retval = true;
+    }
+
+    return retval;
+}
+
+bool TV::StateIsPlaying(TVState state)
+{
+    bool retval = false;
+
+    if (state == kState_WatchingPreRecorded || 
+        state == kState_WatchingRecording ||
+        state == kState_WatchingOtherRecording)
+    {
+        retval = true;
+    }
+
+    return retval;
+}
+
+TVState TV::RemoveRecording(TVState state)
+{
+    if (StateIsRecording(state))
+    {
+        if (state == kState_RecordingOnly)
+            return kState_None;
+        return kState_WatchingPreRecorded;
+    }
+    return kState_Error;
+}
+
+TVState TV::RemovePlaying(TVState state)
+{
+    if (StateIsPlaying(state))
+    {
+        if (state == kState_WatchingPreRecorded)
+            return kState_None;
+        return kState_RecordingOnly;
+    }
+    return kState_Error;
 }
 
 void TV::HandleStateChange(void)
@@ -137,7 +207,18 @@ void TV::HandleStateChange(void)
     bool closePlayer = false;
     bool closeRecorder = false;
 
-    if (internalState == kStatus_None && nextState == kStatus_WatchingLiveTV)
+    string statename;
+    StateToString(nextState, statename);
+    string origname;
+    StateToString(internalState, origname);
+
+    if (nextState == kState_Error)
+    {
+        printf("ERROR: Attempting to set to an error state.\n");
+        exit(-1);
+    }
+
+    if (internalState == kState_None && nextState == kState_WatchingLiveTV)
     {
         long long filesize = settings->GetNumSetting("BufferSize");
         filesize = filesize * 1024 * 1024 * 1024;
@@ -153,9 +234,10 @@ void TV::HandleStateChange(void)
 
         startPlayer = startRecorder = pauseBetween = true;
 
-        printf("Changing from None to WatchingTV\n");
+        printf("Changing from %s to %s\n", origname.c_str(), statename.c_str());
     }
-    if (internalState == kStatus_WatchingLiveTV && nextState == kStatus_None)
+    else if (internalState == kState_WatchingLiveTV && 
+             nextState == kState_None)
     {
         closePlayer = true;
         closeRecorder = true;
@@ -163,10 +245,12 @@ void TV::HandleStateChange(void)
         internalState = nextState;
         changed = true;
 
-        printf("Changing from WatchingTV to None\n");
+        printf("Changing from %s to %s\n", origname.c_str(), statename.c_str());
     }
-
-    if (internalState == kStatus_None && nextState == kStatus_RecordingOnly)
+    else if ((internalState == kState_None && 
+              nextState == kState_RecordingOnly) || 
+             (internalState == kState_WatchingPreRecorded &&
+              nextState == kState_WatchingOtherRecording))
     {   
         channel->Open();
         channel->SetChannelByString(recordChannel);
@@ -175,26 +259,33 @@ void TV::HandleStateChange(void)
         rbuffer = new RingBuffer(outputFilename, true);
 
         internalState = nextState;
-        nextState = kStatus_None;
+        nextState = kState_None;
         changed = true;
 
         startRecorder = true;
 
-        printf("Changing from None to RecordingOnly\n");
+        printf("Changing from %s to %s\n", origname.c_str(), statename.c_str());
     }   
-
-    if (internalState == kStatus_RecordingOnly && nextState == kStatus_None)
+    else if ((internalState == kState_RecordingOnly && 
+              nextState == kState_None) ||
+             (internalState == kState_WatchingRecording &&
+              nextState == kState_WatchingPreRecorded) ||
+             (internalState == kState_WatchingOtherRecording &&
+              nextState == kState_WatchingPreRecorded))
     {
         closeRecorder = true;
 
         internalState = nextState;
         changed = true;
 
-        printf("Changing from RecordingOnly to None\n");
+        printf("Changing from %s to %s\n", origname.c_str(), statename.c_str());
     }
-
-    if (internalState == kStatus_None && 
-        nextState == kStatus_WatchingPreRecorded)
+    else if ((internalState == kState_None && 
+              nextState == kState_WatchingPreRecorded) ||
+             (internalState == kState_RecordingOnly &&
+              nextState == kState_WatchingOtherRecording) ||
+             (internalState == kState_RecordingOnly &&
+              nextState == kState_WatchingRecording))
     {
         prbuffer = new RingBuffer(inputFilename, false);
 
@@ -202,22 +293,25 @@ void TV::HandleStateChange(void)
         changed = true;
 
         startPlayer = true;
-        
-        printf("Changing from None to WatchingPreRecorded\n");
+    
+        printf("Changing from %s to %s\n", origname.c_str(), statename.c_str());
     }
-
-    if (internalState == kStatus_WatchingPreRecorded && 
-        nextState == kStatus_None)
+    else if ((internalState == kState_WatchingPreRecorded && 
+              nextState == kState_None) || 
+             (internalState == kState_WatchingOtherRecording &&
+              nextState == kState_RecordingOnly) ||
+             (internalState == kState_WatchingRecording &&
+              nextState == kState_RecordingOnly))
     {
         closePlayer = true;
         
         internalState = nextState;
         changed = true;
 
-        printf("Changing from WatchingPreRecorded to None\n");
+        printf("Changing from %s to %s\n", origname.c_str(), statename.c_str());
     }
-
-    if (internalState == kStatus_None && nextState == kStatus_None)
+    else if (internalState == kState_None && 
+             nextState == kState_None)
     {
         changed = true;
     }
@@ -378,37 +472,41 @@ void TV::RunTV(void)
            ProcessKeypress(keypressed);
         }
 
-        if (internalState == kStatus_RecordingOnly)
+        if (StateIsRecording(internalState))
         {
             if ((float)nvr->GetFramesWritten() >
                 (float)secsToRecord * frameRate)
             {
-                nextState = kStatus_None;
+                nextState = RemoveRecording(internalState);
                 changeState = true;
             }
         }
 
-        if (internalState == kStatus_WatchingPreRecorded)
+        if (StateIsPlaying(internalState))
         {
             if (!nvp->IsPlaying())
             {
-                nextState = kStatus_None;
+                nextState = RemovePlaying(internalState);
                 changeState = true;
             }
         }
 
         if (exitPlayer)
         {
-            if ((internalState == kStatus_WatchingLiveTV) ||
-                (internalState == kStatus_WatchingPreRecorded))
+            if (internalState == kState_WatchingLiveTV)
             {
-                nextState = kStatus_None;
+                nextState = kState_None;
+                changeState = true;
+            }
+            else if (StateIsPlaying(internalState))
+            {
+                nextState = RemovePlaying(internalState);
                 changeState = true;
             }
             exitPlayer = false;
         }
 
-        if (internalState == kStatus_WatchingLiveTV)
+        if (internalState == kState_WatchingLiveTV)
         {
             if (paused)
             {
@@ -427,7 +525,7 @@ void TV::RunTV(void)
         }
     }
   
-    nextState = kStatus_None;
+    nextState = kState_None;
     HandleStateChange();
 }
 
@@ -447,7 +545,7 @@ void TV::ProcessKeypress(int keypressed)
         default: break;
     }
 
-    if (internalState == kStatus_WatchingLiveTV)
+    if (internalState == kState_WatchingLiveTV)
     {
         switch (keypressed)
         {

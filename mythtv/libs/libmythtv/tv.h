@@ -16,12 +16,13 @@ using namespace std;
 
 typedef enum 
 {
-    kStatus_None = 0,
-    kStatus_WatchingLiveTV,
-    kStatus_WatchingPreRecorded,
-    kStatus_WatchingRecording,       // watching _what_ you're recording
-    kStatus_WatchingOtherRecording,  // watching something else
-    kStatus_RecordingOnly
+    kState_Error = -1,
+    kState_None = 0,
+    kState_WatchingLiveTV,
+    kState_WatchingPreRecorded,
+    kState_WatchingRecording,       // watching _what_ you're recording
+    kState_WatchingOtherRecording,  // watching something else
+    kState_RecordingOnly
 } TVState;
 
 class TV
@@ -74,7 +75,12 @@ class TV
 
     void ProcessKeypress(int keypressed);
 
+    void StateToString(TVState state, string &statestr);
     void HandleStateChange();
+    bool StateIsRecording(TVState state);
+    bool StateIsPlaying(TVState state);
+    TVState RemovePlaying(TVState state);
+    TVState RemoveRecording(TVState state);
 
     NuppelVideoRecorder *nvr;
     NuppelVideoPlayer *nvp;
