@@ -757,10 +757,10 @@ void UIGuideType::drawBackground(QPainter *dr, UIGTCon *data)
     else
         area.addCoords(breakin, breakin, -breakin, -breakin);
 
-    if (area.width() <= 0)
-        area.setWidth(1);
-    if (area.height() <= 0)
-        area.setHeight(1);
+    if (area.width() <= 1)
+        area.setWidth(2);
+    if (area.height() <= 1)
+        area.setHeight(2);
 
     if (filltype == Alpha)
     {
