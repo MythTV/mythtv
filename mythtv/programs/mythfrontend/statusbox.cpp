@@ -569,14 +569,14 @@ void StatusBox::doTunerStatus()
 
             gContext->SendReceiveStringList(strlist);
   
-            QString Status = QString("Tuner %1 ").arg(cardid);
+            QString Status = QString(tr("Tuner %1 ")).arg(cardid);
             if (strlist[0].toInt()==kState_WatchingLiveTV)
-                Status += "is watching live TV";
+                Status += tr("is watching live TV");
             else if (strlist[0].toInt()==kState_RecordingOnly ||
                      strlist[0].toInt()==kState_WatchingRecording)
-                Status += "is recording";
+                Status += tr("is recording");
             else 
-                Status += "is not recording";
+                Status += tr("is not recording");
 
             contentLines[count] = Status;
             contentDetail[count] = Status;
