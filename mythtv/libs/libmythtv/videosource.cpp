@@ -17,6 +17,14 @@
 #include <sys/types.h>
 #include <linux/videodev.h>
 
+#ifdef HAVE_V4L2
+#ifdef V4L2_CAP_VIDEO_CAPTURE
+#define USING_V4L2 1
+#else
+#warning old broken version of v4l2 detected.
+#endif
+#endif
+
 QString VSSetting::whereClause(void) {
     return QString("sourceid = %1").arg(parent.getSourceID());
 }
@@ -314,7 +322,7 @@ QStringList VideoDevice::probeInputs(QString device) {
         return ret;
     }
 
-#ifdef HAVE_V4L2
+#ifdef USING_V4L2
     bool usingv4l2 = false;
 
     struct v4l2_capability vcap;

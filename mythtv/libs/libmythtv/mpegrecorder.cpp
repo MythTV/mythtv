@@ -16,8 +16,14 @@ using namespace std;
 #include "mpegrecorder.h"
 #include "RingBuffer.h"
 
-#ifndef HAVE_V4L2
-#warning Hardware MPEG-2 supports requires v4l2 in the kernel.
+#ifdef HAVE_V4L2
+#ifdef V4L2_CAP_VIDEO_CAPTURE
+#define USING_V4L2 1
+#else
+#warning old broken version of v4l2 detected.
+#endif
+#else
+#warning v4l2 support required for hardware mpeg capture
 #endif
 
 MpegRecorder::MpegRecorder()
@@ -73,7 +79,7 @@ void MpegRecorder::Initialize(void)
 
 void MpegRecorder::StartRecording(void)
 {
-#ifndef HAVE_V4L2
+#ifndef USING_V4L2
     return;
 #else
     if (childrenLive)

@@ -14,6 +14,14 @@
 #include <iostream>
 using namespace std;
 
+#ifdef HAVE_V4L2
+#ifdef V4L2_CAP_VIDEO_CAPTURE
+#define USING_V4L2 1
+#else
+#warning old broken version of v4l2 detected.
+#endif
+#endif
+
 Channel::Channel(TVRec *parent, const QString &videodevice)
 {
     device = videodevice;
@@ -45,7 +53,7 @@ bool Channel::Open(void)
     else
          perror(device.ascii());
 
-#ifdef HAVE_V4L2
+#ifdef USING_V4L2
     struct v4l2_capability vcap;
     memset(&vcap, 0, sizeof(vcap));
     if (ioctl(videofd, VIDIOC_QUERYCAP, &vcap) < 0)
@@ -74,7 +82,7 @@ void Channel::SetFormat(const QString &format)
     if (!isopen)
         return;
    
-#ifdef HAVE_V4L2
+#ifdef USING_V4L2
     if (usingv4l2)
     {
         struct v4l2_input vin;
@@ -236,7 +244,7 @@ bool Channel::TuneTo(const QString &chan, int finetune)
     int i = GetCurrentChannelNum(chan);
     int frequency = curList[i].freq * 16 / 1000 + finetune;
 
-#ifdef HAVE_V4L2
+#ifdef USING_V4L2
     if (usingv4l2)
     {
         struct v4l2_frequency vf;
@@ -414,7 +422,7 @@ void Channel::SwitchToInput(int newcapchannel, bool setstarting)
     if (newcapchannel == currentcapchannel)
         return;
 
-#ifdef HAVE_V4L2
+#ifdef USING_V4L2
     if (usingv4l2)
     {
         if (ioctl(videofd, VIDIOC_S_INPUT, &newcapchannel) < 0)
