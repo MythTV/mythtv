@@ -2,4 +2,5 @@ diff.diff
 .qmake.internal.cache
 config.h
 config.mak
+config.log
 Makefile

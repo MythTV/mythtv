@@ -20,6 +20,7 @@ using namespace std;
 #include "manualschedule.h"
 #include "playbackbox.h"
 #include "previousbox.h"
+#include "customrecord.h"
 #include "viewscheduled.h"
 #include "programrecpriority.h"
 #include "channelrecpriority.h"
@@ -219,6 +220,15 @@ void startPrevious(void)
     qApp->lock();
 }
 
+void startCustomRecord(void)
+{
+    CustomRecord custom(gContext->GetMainWindow(), "custom record");
+
+    qApp->unlock();
+    custom.exec();
+    qApp->lock();
+}
+
 void startManual(void)
 {
     ManualBox manbox(gContext->GetMainWindow(), "manual box");
@@ -352,6 +362,8 @@ void TVMenuCallback(void *data, QString &selection)
         startManual();
     else if (sel == "tv_manualschedule")
         startManualSchedule();
+    else if (sel == "tv_custom_record")
+        startCustomRecord();
     else if (sel == "tv_fix_conflicts")
         startManaged();
     else if (sel == "tv_set_recpriorities")

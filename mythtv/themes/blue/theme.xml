@@ -494,6 +494,11 @@
     <offset>12,10</offset>
   </buttondef>
 
+  <buttondef name="TV_CUSTOM_RECORD">
+    <image>record.png</image>
+    <offset>25,10</offset>
+  </buttondef>
+
   <buttondef name="TV_MANUAL_SCHEDULE">
     <image>MANUAL.png</image>
     <offset>25,10</offset>

@@ -317,18 +317,11 @@ void MythLineEdit::focusOutEvent(QFocusEvent *e)
     QLineEdit::focusOutEvent(e);
 }
 
-MythRemoteLineEdit::MythRemoteLineEdit(QFont *a_font, QWidget * parent, 
-                                       const char * name)
-                  : QTextEdit(parent, name)
-{
-    my_font = a_font;
-    this->Init();
-}
-
 MythRemoteLineEdit::MythRemoteLineEdit(QWidget * parent, const char * name)
                   : QTextEdit(parent, name)
 {
     my_font = NULL;
+    m_lines = 1;
     this->Init();
 }
 
@@ -337,8 +330,27 @@ MythRemoteLineEdit::MythRemoteLineEdit(const QString & contents,
                   : QTextEdit(parent, name)
 {
     my_font = NULL;
+    m_lines = 1;
     this->Init();
     setText(contents);
+}
+
+MythRemoteLineEdit::MythRemoteLineEdit(QFont *a_font, QWidget * parent, 
+                                       const char * name)
+                  : QTextEdit(parent, name)
+{
+    my_font = a_font;
+    m_lines = 1;
+    this->Init();
+}
+
+MythRemoteLineEdit::MythRemoteLineEdit(int lines, QWidget * parent, 
+                                       const char * name)
+                  : QTextEdit(parent, name)
+{
+    my_font = NULL;
+    m_lines = lines;
+    this->Init();
 }
 
 void MythRemoteLineEdit::Init()
@@ -383,7 +395,7 @@ void MythRemoteLineEdit::Init()
     QFontMetrics fontsize(font());
     
     setMinimumHeight(fontsize.height() * 5 / 4);
-    setMaximumHeight(fontsize.height() * 5 / 4);
+    setMaximumHeight(fontsize.height() * m_lines * 5 / 4);
 
     connect(cycle_timer, SIGNAL(timeout()), this, SLOT(endCycle()));
 }

@@ -30,11 +30,12 @@ LIBS += -lmythavcodec-$$LIBVERSION -lmyth-$$LIBVERSION $$EXTRA_LIBS
 # Input
 HEADERS += manualbox.h playbackbox.h viewscheduled.h globalsettings.h
 HEADERS += manualschedule.h programrecpriority.h channelrecpriority.h
-HEADERS += statusbox.h previousbox.h
+HEADERS += statusbox.h previousbox.h customrecord.h
 
 SOURCES += main.cpp manualbox.cpp playbackbox.cpp viewscheduled.cpp
 SOURCES += globalsettings.cpp manualschedule.cpp programrecpriority.cpp 
 SOURCES += channelrecpriority.cpp statusbox.cpp previousbox.cpp
+SOURCES += customrecord.cpp
 
 macx {
     RC_FILE += mythfrontend.icns

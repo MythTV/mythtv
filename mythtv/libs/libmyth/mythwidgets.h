@@ -149,6 +149,7 @@ class MythRemoteLineEdit : public QTextEdit
     MythRemoteLineEdit( QWidget * parent, const char * name = 0 );
     MythRemoteLineEdit( const QString & contents, QWidget * parent, const char * name = 0 );    
     MythRemoteLineEdit( QFont *a_font, QWidget * parent, const char * name = 0 );    
+    MythRemoteLineEdit( int lines, QWidget * parent, const char * name = 0 );
    ~MythRemoteLineEdit();
     void setHelpText(QString help) { helptext = help; }
     void setCycleTime(float desired_interval); // in seconds
@@ -208,6 +209,8 @@ class MythRemoteLineEdit : public QTextEdit
     QString  hex_unselected;
     QString  hex_selected;
     QString  hex_special;
+
+    int m_lines;
 };
 
 class MythTable : public QTable

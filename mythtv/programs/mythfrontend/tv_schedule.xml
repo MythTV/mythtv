@@ -113,6 +113,12 @@
       <action>TV_MANUAL</action>
    </button>
 -->
+   
+   <button>
+      <type>TV_CUSTOM_RECORD</type>
+      <text>Custom Record</text>
+      <action>TV_CUSTOM_RECORD</action>
+   </button>
 
    <button>
       <type>TV_MANUAL_SCHEDULE</type>

@@ -547,6 +547,12 @@
     <offset>0,0</offset>
   </buttondef>
 
+  <buttondef name="TV_CUSTOM_RECORD">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_schedule.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
   <buttondef name="TV_MANUAL_SCHEDULE">
     <image>text-blank.png</image>
     <watermarkimage>watermark/tv_schedule.png</watermarkimage>
