@@ -487,6 +487,10 @@ bool IvtvDecoder::DoFastForward(long long desiredFrame)
                     nvr_enc->FillPositionMap(i, tmpIndex, positionMap);
             }
 
+            long long totframes = positionMap.size() * keyframedist;
+            int length = (int)((totframes * 1.0) / fps);
+            m_parent->SetFileLength(length, totframes);            
+
             if (positionMap.find(tmpIndex) != positionMap.end())
                 keyPos = positionMap[tmpIndex];
         }
@@ -497,6 +501,10 @@ bool IvtvDecoder::DoFastForward(long long desiredFrame)
                                            m_db->db());
             m_db->unlock();
             hasFullPositionMap = true;
+
+            long long totframes = positionMap.size() * keyframedist;
+            int length = (int)((totframes * 1.0) / fps);
+            m_parent->SetFileLength(length, totframes);            
 
             if (positionMap.find(tmpIndex) != positionMap.end())
                 keyPos = positionMap[tmpIndex];

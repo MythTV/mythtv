@@ -1238,6 +1238,10 @@ bool NuppelDecoder::DoFastForward(long long desiredFrame)
                     nvr_enc->FillPositionMap(i, tmpIndex, *positionMap);
             }
 
+            totalFrames = (long long)positionMap->size() * keyframedist;
+            totalLength = (int)((totalFrames * 1.0) / video_frame_rate);
+            m_parent->SetFileLength(totalLength, totalFrames);
+
             if (positionMap->find(tmpIndex) != positionMap->end())
                 keyPos = (*positionMap)[tmpIndex];
         }
@@ -1248,6 +1252,10 @@ bool NuppelDecoder::DoFastForward(long long desiredFrame)
                                            m_db->db());
             m_db->unlock();
             hasFullPositionMap = true;
+
+            totalFrames = (long long)positionMap->size() * keyframedist;
+            totalLength = (int)((totalFrames * 1.0) / video_frame_rate);
+            m_parent->SetFileLength(totalLength, totalFrames);
 
             if (positionMap->find(tmpIndex) != positionMap->end())
                 keyPos = (*positionMap)[tmpIndex];
