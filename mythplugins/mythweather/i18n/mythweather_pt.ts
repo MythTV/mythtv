@@ -1048,5 +1048,15 @@
         <source>satellite image</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
+Press OK to try again with a larger timeout value. Press Cancel to try again without animated radar maps.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
+Press OK to try again with a larger timeout value. Press Cancel to abort.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

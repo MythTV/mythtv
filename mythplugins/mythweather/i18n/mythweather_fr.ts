@@ -885,5 +885,19 @@
         <source>satellite image</source>
         <translation>image satellite</translation>
     </message>
+    <message>
+        <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
+Press OK to try again with a larger timeout value. Press Cancel to try again without animated radar maps.</source>
+        <translation>Myth n&apos;est pas capable de retrouver les données météo dans le temps imparti (%1 secondes). 
+Presser OK pour essayer encore avec un délai plus grand. 
+Presser sur Annuler pour réessayer sans les données radar animées.</translation>
+    </message>
+    <message>
+        <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
+Press OK to try again with a larger timeout value. Press Cancel to abort.</source>
+        <translation>Myth n&apos;est pas capable de retrouver les données météo dans le temps imparti (%1 secondes). 
+Presser OK pour essayer encore avec un délai plus grand. 
+Presser sur Annuler pour arrêter.</translation>
+    </message>
 </context>
 </TS>
