@@ -1,1 +1,3 @@
 Makefile
+moc_mfdctl.cpp
+mfdctl

@@ -1,1 +1,6 @@
 Makefile
+moc_serversocket.cpp
+moc_pluginmanager.cpp
+moc_mfd.cpp
+moc_logging.cpp
+mfd
