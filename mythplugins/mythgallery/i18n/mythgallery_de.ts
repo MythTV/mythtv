@@ -3,47 +3,47 @@
     <name>GLSingleView</name>
     <message>
         <source>Folder: </source>
-        <translation type="unfinished">Verzeichnis:</translation>
+        <translation>Verzeichnis: </translation>
     </message>
     <message>
         <source>Created: </source>
-        <translation type="unfinished">Erzeugt:</translation>
+        <translation>Erzeugt: </translation>
     </message>
     <message>
         <source>Modified: </source>
-        <translation type="unfinished">Geändert:</translation>
+        <translation>Geändert: </translation>
     </message>
     <message>
         <source>Bytes</source>
-        <translation type="unfinished">Bytes</translation>
+        <translation>Bytes</translation>
     </message>
     <message>
         <source>Width</source>
-        <translation type="unfinished">Breite</translation>
+        <translation>Breite</translation>
     </message>
     <message>
         <source>pixels</source>
-        <translation type="unfinished">pixel</translation>
+        <translation>Pixel</translation>
     </message>
     <message>
         <source>Height</source>
-        <translation type="unfinished">Höhe</translation>
+        <translation>Höhe</translation>
     </message>
     <message>
         <source>Pixel Count</source>
-        <translation type="unfinished">Pixelzahl</translation>
+        <translation>Pixelanzahl</translation>
     </message>
     <message>
         <source>megapixels</source>
-        <translation type="unfinished">Megapixel</translation>
+        <translation>Megapixel</translation>
     </message>
     <message>
         <source>Rotation Angle</source>
-        <translation type="unfinished">Drehwinkel</translation>
+        <translation>Drehung</translation>
     </message>
     <message>
         <source>degrees</source>
-        <translation type="unfinished">Grad</translation>
+        <translation>°</translation>
     </message>
 </context>
 <context>
@@ -62,7 +62,7 @@
     </message>
     <message>
         <source>Nothing found to import</source>
-        <translation>Nichts neues gefunden</translation>
+        <translation>Nichts Neues gefunden</translation>
     </message>
     <message>
         <source>OK</source>
@@ -74,19 +74,19 @@
     </message>
     <message>
         <source>Sorry: OpenGL support not available</source>
-        <translation>OpenGL Unterstützung nicht verfügbar</translation>
+        <translation>OpenGL-Unterstützung nicht verfügbar</translation>
     </message>
     <message>
         <source>SlideShow</source>
-        <translation>Diaschau</translation>
+        <translation>Diashow</translation>
     </message>
     <message>
         <source>Rotate CW</source>
-        <translation type="unfinished"></translation>
+        <translation>90° drehen</translation>
     </message>
     <message>
         <source>Rotate CCW</source>
-        <translation type="unfinished"></translation>
+        <translation>270° drehen</translation>
     </message>
     <message>
         <source>Import</source>
@@ -98,7 +98,7 @@
     </message>
     <message>
         <source>Random</source>
-        <translation type="unfinished"></translation>
+        <translation>Zufall</translation>
     </message>
 </context>
 <context>
@@ -109,7 +109,7 @@
     </message>
     <message>
         <source>This directory must exist and MythGallery needs to have read permission.</source>
-        <translation>Dieses Verzeichnis muß existieren und MythGallery Schreibrechte dafür besitzen.</translation>
+        <translation>Dieses Verzeichnis muß existieren und MythGallery Leserechte dafür besitzen.</translation>
     </message>
     <message>
         <source>Paths to import images from</source>
@@ -133,11 +133,11 @@
     </message>
     <message>
         <source>This is a colon separated list of paths. If the path in the list is a directory, its contents will be copied. If it is an executable, it will be run.</source>
-        <translation>Durch Komma getrennt Liste mit Verzeichnissen. Ist das Element in der Liste ein Verzeichnis, wird sein Inhalt kopiert. Ist es eine ausführbare Datei wird diese gestartet.</translation>
+        <translation>Eine durch Kommas getrennte Liste von Verzeichnissen. Ist das Element in der Liste ein Verzeichnis, wird sein Inhalt kopiert. Ist es eine ausführbare Datei wird diese gestartet.</translation>
     </message>
     <message>
         <source>This is the type of transition used between pictures in slideshow mode.</source>
-        <translation>Wählt die Art des Übergangs zwischen zwei Bildern im Diaschau Modus.</translation>
+        <translation>Wählt die Art des Übergangs zwischen zwei Bildern im Diashow Modus.</translation>
     </message>
     <message>
         <source>This is the type of background for each picture in single view mode.</source>
@@ -145,23 +145,23 @@
     </message>
     <message>
         <source>Slideshow Delay</source>
-        <translation>Anzeigedauer im Diaschaumodus</translation>
+        <translation>Anzeigedauer im Diashow-Modus</translation>
     </message>
     <message>
         <source>Use OpenGL transitions</source>
-        <translation>Nutze OpenGL Übergänge</translation>
+        <translation>Nutze OpenGL-Übergänge</translation>
     </message>
     <message>
         <source>Check this to enable OpenGL based slideshow transitions</source>
-        <translation>Aktiviert OpenGL basierende Übergänge für den Diaschaumodus</translation>
+        <translation>Aktiviert auf OpenGL basierende Übergänge für den Diashow-Modus.</translation>
     </message>
     <message>
         <source>Type of OpenGL transition</source>
-        <translation>Art des OpenGL Übergangs</translation>
+        <translation>Art des OpenGL-Übergangs</translation>
     </message>
     <message>
         <source>This is the type of OpenGL transition used between pictures in slideshow mode.</source>
-        <translation>Bestimmt welcher OpenGL Übergang im Diaschaumodus verwendet wird.</translation>
+        <translation>Bestimmt welcher OpenGL-Übergang im Diashow-Modus verwendet wird.</translation>
     </message>
     <message>
         <source>Gallery Directory does not exist or is unreadable.</source>
@@ -173,11 +173,11 @@
     </message>
     <message>
         <source>Command run to display movie files</source>
-        <translation type="unfinished"></translation>
+        <translation>Befehl zum Abspielen von Filmen</translation>
     </message>
     <message>
         <source>This command is executed whenever a movie file is selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Dieser Befehl wird ausgeführt, wenn ein Film ausgewählt wird</translation>
     </message>
 </context>
 <context>
@@ -196,15 +196,15 @@
     </message>
     <message>
         <source>Pixel Count</source>
-        <translation>Pixelzahl</translation>
+        <translation>Pixelanzahl</translation>
     </message>
     <message>
         <source>Rotation Angle</source>
-        <translation>Drehwinkel</translation>
+        <translation>Drehung</translation>
     </message>
     <message>
         <source>pixels</source>
-        <translation>pixel</translation>
+        <translation>Pixel</translation>
     </message>
     <message>
         <source>megapixels</source>
@@ -212,19 +212,19 @@
     </message>
     <message>
         <source>degrees</source>
-        <translation>Grad</translation>
+        <translation>°</translation>
     </message>
     <message>
         <source>Created: </source>
-        <translation>Erzeugt:</translation>
+        <translation>Erzeugt: </translation>
     </message>
     <message>
         <source>Modified: </source>
-        <translation>Geändert:</translation>
+        <translation>Geändert: </translation>
     </message>
     <message>
         <source>Folder: </source>
-        <translation>Verzeichnis:</translation>
+        <translation>Verzeichnis: </translation>
     </message>
 </context>
 </TS>

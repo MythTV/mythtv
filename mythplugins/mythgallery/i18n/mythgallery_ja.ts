@@ -98,7 +98,7 @@
     </message>
     <message>
         <source>Random</source>
-        <translation type="unfinished"></translation>
+        <translation>ランダム</translation>
     </message>
 </context>
 <context>
@@ -173,11 +173,11 @@
     </message>
     <message>
         <source>Command run to display movie files</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオファイルを実行するコマンド</translation>
     </message>
     <message>
         <source>This command is executed whenever a movie file is selected</source>
-        <translation type="unfinished"></translation>
+        <translation>このコマンドはビデオファイルを選択したときに実行するコマンドです</translation>
     </message>
 </context>
 <context>
