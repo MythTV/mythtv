@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-07-13, v2.53
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-07-21, v2.54
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -126,7 +126,7 @@ necessary.</EM>
 <UL>
 <LI><A NAME="toc15.1">15.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss15.1">Manual installation of prerequisites.</A>
 <LI><A NAME="toc15.2">15.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss15.2">Mandrake 9.0</A>
-<LI><A NAME="toc15.3">15.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss15.3">Red Hat Linux 8.0</A>
+<LI><A NAME="toc15.3">15.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss15.3">Red Hat Linux 9/8.0</A>
 <LI><A NAME="toc15.4">15.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss15.4">Compiling MythMusic. </A>
 <LI><A NAME="toc15.5">15.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss15.5">Configuring MythMusic.</A>
 <LI><A NAME="toc15.6">15.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss15.6">Using MythMusic. </A>
@@ -187,7 +187,7 @@ necessary.</EM>
 <LI><A NAME="toc19.12">19.12</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.12">I'd like to automatically start mythbackend at system boot time.</A>
 <LI><A NAME="toc19.13">19.13</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.13">Advanced Backend Configurations. </A>
 <LI><A NAME="toc19.14">19.14</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.14">Advanced Partition Formatting. </A>
-<LI><A NAME="toc19.15">19.15</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.15">I'd like to have more flexible disk storage with LVM.</A>
+<LI><A NAME="toc19.15">19.15</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.15">I'd like to have more flexible disk storage with LVM. </A>
 </UL>
 
 <HR>
@@ -266,7 +266,7 @@ American environment.  See the website at
 <A HREF="mailto:help@pdscc.com">mailto:help@pdscc.com</A></LI>
 <LI>Mandrake 9.0 and 9.1 packages: Thac, 
 <A HREF="mailto:thac@nyvalls.se">mailto:thac@nyvalls.se</A></LI>
-<LI>Red Hat Linux package: Axel Thimm, 
+<LI>Red Hat Linux 9 packages: Axel Thimm, 
 <A HREF="mailto:Axel.Thimm@physik.fu-berlin.de">mailto:Axel.Thimm@physik.fu-berlin.de</A></LI>
 </UL>
 </P>
@@ -613,20 +613,24 @@ additional configuration steps in this HOWTO.  The next logical step is
 <A HREF="#mysql">configuring MySQL</A>, which you may or may not have to
 perform.  See your package documentation.</P>
 
-<H3>Red Hat </H3>
+<H3><A NAME="atrpms"></A> Red Hat Linux 9</H3>
 
-<P>Axel Thimm has created RPMs for MythTV which may be obtained from 
-<A HREF="http://atrpms.physik.fu-berlin.de/name/mythtv/">http://atrpms.physik.fu-berlin.de/name/mythtv/</A>.  If you have
-problems with the RPMs, please send him email directly at 
-<A HREF="mailto:Axel.Thimm@physik.fu-berlin.de">mailto:Axel.Thimm@physik.fu-berlin.de</A>.</P>
-<P>A meta-package created by Axel, called mythtv-suite, will allow you to
-install all of MythTV and its add-ons, plus all dependencies, but is
-dependant on having <B>apt</B> or <B>yum</B> installed and have
-<CODE>atrpms</CODE> enabled as a source. If you haven't downloaded the
-atrpms-kickstart packages, you can download it here:</P>
-<P>
-<A HREF="http://atrpms.physik.fu-berlin.de/dist/rh9/atrpms-kickstart/">http://atrpms.physik.fu-berlin.de/dist/rh9/atrpms-kickstart/</A></P>
-<P>Install the package with:
+<P>Red Hat Linux 9 packages for MythTV and most of its add-on modules and
+some themes have been packaged by 
+<A HREF="mailto:Axel.Thimm@physik.fu-berlin.de">mailto:Axel.Thimm@physik.fu-berlin.de</A> and are available at 
+<A HREF="http://atrpms.physik.fu-berlin.de/topic/multimedia/">http://atrpms.physik.fu-berlin.de/topic/multimedia/</A>. All of the
+prerequisites for MythTV (such as XMLTV) are available as rpm packages. If
+you have problems with the RPMs, please send him email directly.</P>
+<P>Given the large number of dependent rpms you are advised to use tools like
+apt or yum for automatic retrieval and installation of the required rpms.
+(
+<A HREF="http://atrpms.physik.fu-berlin.de/install.html">http://atrpms.physik.fu-berlin.de/install.html</A>) In this case a
+special meta-package called mythtv-suite will allow you to install all of
+MythTV and its add-ons, plus all dependencies.</P>
+<P>If you don't have <B>apt</B> or <B>yum</B> on your machine, download and
+install the 
+<A HREF="http://atrpms.physik.fu-berlin.de/dist/rh9/atrpms-kickstart/">atrpms-kickstart package</A>.
+Install the package with:
 <BLOCKQUOTE><CODE>
 <PRE>
 # rpm -Uvh atrpms-kickstart*
@@ -647,8 +651,11 @@ And finally:
 </PRE>
 </CODE></BLOCKQUOTE>
         
-These steps however, do NOT perform the installation of any drivers 
-required for <B>ALSA</B>, capture cards, <B>lirc</B>, etc.</P>
+These steps however, do NOT perform the installation of any drivers required
+for <B>ALSA</B>, capture cards, <B>lirc</B>, etc., nor do they set up
+your MythTV database. Check 
+<A HREF="http://atrpms.physik.fu-berlin.de/topic/multimedia/">ATrpms</A> for
+the drivers you need.</P>
 
 <H3>Mandrake</H3>
 
@@ -1080,24 +1087,15 @@ $ exit
 The last two commands are to exit out of the shell. This way, when you next 
 open a shell your new commands
 will take effect.</P>
-<H3>Red Hat</H3>
+<H3>Red Hat Linux 9/8.0</H3>
 
-<P>Red Hat Linux 8.0 uses an unusual character encoding scheme which causes
-problems when running certain programs. As a result, whenever you run setup
-or mythfilldatabase you will have to set a variable to correct this problem.
-Failure to set this variable will result in a lot of UTF-8 errors.</P>
-<P>There are two modifications that you can make to your system to avoid this
-problem. The first is a system wide solution, the second will only apply to
-your current user.</P>
-<P>The global change is to modify the <CODE>/etc/sysconfig/i18n</CODE> file and set
-<CODE>LANG="en_US"</CODE>. If you want the change to only affect a single user,
-you could create a file called <CODE>~/.i18n</CODE>:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ echo LANG="en_US" > ~/.i18n
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
+<P>Red Hat Linux 9/8.0 use a default locale with UTF-8 encoding.
+Date::Manip, a perl module used by XMLTV, is not UTF-8 safe. As a result,
+whenever you run setup or mythfilldatabase you will get a lot of UTF-8
+warnings. There is an 
+<A HREF="http://membled.com/work/patches/DateManip/">http://membled.com/work/patches/DateManip/</A> updated version of
+Date::Manip at the XMLTV site fixing this and other XMLTV related bugs.</P>
+
 <H2><A NAME="s5">5.</A> <A HREF="#toc5">Downloading and compiling.</A></H2>
 
 <P>Get MythTV from the 
@@ -1117,9 +1115,10 @@ next step and type:
 
 # urpmi libmp3lame0 libmp3lame0-devel
 
-NOTE for Red Hat users:  lame and lame-devel may be obtained from
-http://freshrpms.net/rpm/lame/. After downloading, be sure to install both:
+NOTE for Red Hat users: If you are installing with apt or yum, you may skip this step, it will be taken care
+of. Otherwise get lame and lame-devel from FreshRPMS: http://freshrpms.net/rpm/lame/
 
+After downloading, be sure to install both:
 # rpm -Uvh lame*
 </PRE>
 <HR>
@@ -1185,7 +1184,7 @@ $
 <H2><A NAME="ss5.3">5.3</A> <A HREF="#toc5.3">XMLTV. </A>
 </H2>
 
-<H3>Red Hat Linux 8.0 &amp; 9:</H3>
+<H3>Red Hat Linux 9:</H3>
 
 <P>RPMs for <B>XMLTV</B> and all of its dependencies can be obtained from
 <A HREF="http://atrpms.physik.fu-berlin.de/name/xmltv/">http://atrpms.physik.fu-berlin.de/name/xmltv/</A>. The web page has a
@@ -1895,6 +1894,12 @@ Red Hat defaults. And as a side benefit, your kernel will be compiled
 specifically for your architecture. For a more detailed description (or  
 if you run into trouble) of how to do this go to  
 <A HREF="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/ch-custom-kernel.html">http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/ch-custom-kernel.html</A></P>
+<P><B>NOTE</B>: Suitable Red Hat kernels for MythTV (i2c update, v4l2 api,
+CONFIG_SERIAL modularized) are available from ATrpms: 
+<A HREF="http://atrpms.physik.fu-berlin.de/name/kernel/">http://atrpms.physik.fu-berlin.de/name/kernel/</A>. You will also find
+suitable kernel modules for ALSA, lirc, bttv, ivtv, saa7134 etc. there. See
+also the 
+<A HREF="#atrpms">main Red Hat section</A>.</P>
 <P>For the impatient:
 Make sure you have an emergency floppy boot disk available!
 <BLOCKQUOTE><CODE>
@@ -2691,7 +2696,7 @@ default as-is until you're sure that MythTV is operational.</P>
 <H2><A NAME="s11">11.</A> <A HREF="#toc11">Using MythTV.</A></H2>
 
 <P>The <CODE>keys.txt</CODE> file describes what the various keyboard commands are.</P>
-<P><B>NOTE to Red Hat 8.0 users</B>:Red Hat Linux 8.0 ships with Gnome as
+<P><B>NOTE to Red Hat users</B>:Red Hat Linux 9/8.0 ships with Gnome as
 the default desktop environment.  However, Gnome seems to have issues with
 window focus and window switching which sometimes cause mythfrontend to
 obscure the video. KDE does not seem to have any such issues. Therefore you
@@ -3057,7 +3062,7 @@ typing:
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss15.3">15.3</A> <A HREF="#toc15.3">Red Hat Linux 8.0</A>
+<H2><A NAME="ss15.3">15.3</A> <A HREF="#toc15.3">Red Hat Linux 9/8.0</A>
 </H2>
 
 <P>Red Hat provides packages for several of the prerequisites, making 
@@ -3078,6 +3083,9 @@ have all of those packages installed.</P>
 optionally fftw) manually following the installation directions above. When
 installing fftw do not use the rpm package offered on the website because it
 will cause an error, so use the source package instead.</P>
+<P><B>NOTE</B>: you can use the instructions given at the 
+<A HREF="#atrpms">automated installation section</A> to install all of MythMusic in one
+step.</P>
 
 <H2><A NAME="ss15.4">15.4</A> <A HREF="#toc15.4">Compiling MythMusic. </A>
 </H2>
@@ -4571,14 +4579,14 @@ percentage after it has been created using the <B>tune2fs</B> program:
 <P>You can check on your filesystem using the <B>dumpe2fs</B> program.  See
 the <B>man</B> page for details.</P>
 
-<H2><A NAME="ss19.15">19.15</A> <A HREF="#toc19.15">I'd like to have more flexible disk storage with LVM.</A>
+<H2><A NAME="ss19.15">19.15</A> <A HREF="#toc19.15">I'd like to have more flexible disk storage with LVM. </A>
 </H2>
 
 <P>LVM greatly increases the flexibility you have in managing your storage
 than traditional physical partitions. This section will provide some brief
 notes on how to use LVM to create storage space for your video files and how
-to add additional disk space in future. There's lots more that can be done
-with LVM, so check the LVM HOWTO 
+to add additional disk space in the future. There's lots more that can be
+done with LVM, so check the LVM HOWTO 
 <A HREF="http://tldp.org/HOWTO/lvm-HOWTO/">http://tldp.org/HOWTO/lvm-HOWTO/</A> document for details.</P>
 <P>Make sure your kernel configuration includes LVM support or that it's
 available as a module. Today, most vendors include this by default. You'll

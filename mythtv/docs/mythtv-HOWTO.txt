@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-07-13, v2.53
+  2003-07-21, v2.54
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -32,7 +32,7 @@
         3.1.8 External Adapters
      3.2 Software.
         3.2.1 Pre-compiled packages.
-           3.2.1.1 Red Hat
+           3.2.1.1 Red Hat Linux 9
            3.2.1.2 Mandrake
            3.2.1.3 Debian
         3.2.2 Manual installation
@@ -59,13 +59,13 @@
            4.3.1.1 QT libraries and binaries
         4.3.2 Distribution-Specific Notes
            4.3.2.1 Mandrake
-           4.3.2.2 Red Hat
+           4.3.2.2 Red Hat Linux 9/8.0
 
   5. Downloading and compiling.
      5.1 Notes on compiling on a system with non-Intel processors.
      5.2 Building LAME.
      5.3 XMLTV.
-        5.3.1 Red Hat Linux 8.0 & 9:
+        5.3.1 Red Hat Linux 9:
         5.3.2 Mandrake
         5.3.3 Other distributions and manual installation.
      5.4 Manually building MythTV.
@@ -137,7 +137,7 @@
      15.1 Manual installation of prerequisites.
      15.2 Mandrake 9.0
         15.2.1 Additional options with MythMusic
-     15.3 Red Hat Linux 8.0
+     15.3 Red Hat Linux 9/8.0
      15.4 Compiling MythMusic.
      15.5 Configuring MythMusic.
      15.6 Using MythMusic.
@@ -296,8 +296,8 @@
 
   +o  Mandrake 9.0 and 9.1 packages: Thac,  <mailto:thac@nyvalls.se>
 
-  +o  Red Hat Linux package: Axel Thimm,  <mailto:Axel.Thimm@physik.fu-
-     berlin.de>
+  +o  Red Hat Linux 9 packages: Axel Thimm,
+     <mailto:Axel.Thimm@physik.fu-berlin.de>
 
 
   [1m3.  Checking prerequisites.[0m
@@ -709,25 +709,27 @@
   to perform.  See your package documentation.
 
 
-  [1m3.2.1.1.  Red Hat[0m
+  [1m3.2.1.1.  Red Hat Linux 9[0m
 
-  Axel Thimm has created RPMs for MythTV which may be obtained from
-  http://atrpms.physik.fu-berlin.de/name/mythtv/
-  <http://atrpms.physik.fu-berlin.de/name/mythtv/>.  If you have
-  problems with the RPMs, please send him email directly at
-  mailto:Axel.Thimm@physik.fu-berlin.de <mailto:Axel.Thimm@physik.fu-
-  berlin.de>.
+  Red Hat Linux 9 packages for MythTV and most of its add-on modules and
+  some themes have been packaged by mailto:Axel.Thimm@physik.fu-
+  berlin.de <mailto:Axel.Thimm@physik.fu-berlin.de> and are available at
+  http://atrpms.physik.fu-berlin.de/topic/multimedia/
+  <http://atrpms.physik.fu-berlin.de/topic/multimedia/>. All of the
+  prerequisites for MythTV (such as XMLTV) are available as rpm
+  packages. If you have problems with the RPMs, please send him email
+  directly.
 
-  A meta-package created by Axel, called mythtv-suite, will allow you to
-  install all of MythTV and its add-ons, plus all dependencies, but is
-  dependant on having [1mapt [22mor [1myum [22minstalled and have atrpms enabled as a
-  source. If you haven't downloaded the atrpms-kickstart packages, you
-  can download it here:
+  Given the large number of dependent rpms you are advised to use tools
+  like apt or yum for automatic retrieval and installation of the
+  required rpms.  (http://atrpms.physik.fu-berlin.de/install.html
+  <http://atrpms.physik.fu-berlin.de/install.html>) In this case a
+  special meta-package called mythtv-suite will allow you to install all
+  of MythTV and its add-ons, plus all dependencies.
 
-  http://atrpms.physik.fu-berlin.de/dist/rh9/atrpms-kickstart/
-  <http://atrpms.physik.fu-berlin.de/dist/rh9/atrpms-kickstart/>
-
-  Install the package with:
+  If you don't have [1mapt [22mor [1myum [22mon your machine, download and install the
+  atrpms-kickstart package <http://atrpms.physik.fu-
+  berlin.de/dist/rh9/atrpms-kickstart/>.  Install the package with:
 
 
        # rpm -Uvh atrpms-kickstart*
@@ -735,6 +737,8 @@
 
 
   Then update your [1mapt [22mpackage listings:
+
+
        # apt-get update
 
 
@@ -747,7 +751,9 @@
 
 
   These steps however, do NOT perform the installation of any drivers
-  required for [1mALSA[22m, capture cards, [1mlirc[22m, etc.
+  required for [1mALSA[22m, capture cards, [1mlirc[22m, etc., nor do they set up your
+  MythTV database. Check ATrpms <http://atrpms.physik.fu-
+  berlin.de/topic/multimedia/> for the drivers you need.
 
 
   [1m3.2.1.2.  Mandrake[0m
@@ -783,6 +789,7 @@
   package in order to compile [1mlircd [22mif your distribution doesn't have a
   pre-packaged [1mlirc[22m.  If you are using [1mXMLTV [22mas a grabber, you will need
   [1mperl[22m.
+
 
 
   ______________________________________________________________________
@@ -850,8 +857,6 @@
   NOTE for Mandrake 9.1 users:  Mandrake 9.1 has removed the MySQL modules
   from the default installation.  Ensure that you install libqt3-mysql.
   ______________________________________________________________________
-
-
 
   Make sure that cdialog is installed if you want to use MythTV with a
   remote control if you need to compile [1mlirc [22mfrom source.
@@ -980,14 +985,14 @@
   name, you can install them with
 
 
-       # rpm -Uvh [filename1]
-       # rpm -Uvh [filename2]
+
+  # rpm -Uvh [filename1]
+  # rpm -Uvh [filename2]
 
 
 
   Once this has completed (it can take a while, so please be patient),
   continue by following the Mandrake 9.0 instructions.
-
 
 
   [1m3.2.4.1.2.  Mandrake 8.2 and 9.0[0m
@@ -1050,6 +1055,7 @@
        USE="mysql qt alsa"
 
 
+
   Next you need to build Qt. If you don't plan on using the ebuilds as
   described in the Gentoo section then you also need to install lame.
 
@@ -1110,7 +1116,6 @@
   The reference compilation system for MythTV is Debian.
 
 
-
   [1m4.1.2.  Distribution-Specific Notes[0m
 
   None
@@ -1166,14 +1171,16 @@
   Open a new shell and switch to superuser mode.
 
 
-       $ su
-       # set
-       [lots of text]
 
-       PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
-       QTDIR=/usr/lib/qt3
+  $ su
+  # set
+  [lots of text]
 
-       [lots more text]
+  PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
+  QTDIR=/usr/lib/qt3
+
+  [lots more text]
+
 
 
   You should see QTDIR and /usr/lib/qt3/bin in your path.
@@ -1217,25 +1224,16 @@
   The last two commands are to exit out of the shell. This way, when you
   next open a shell your new commands will take effect.
 
-  [1m4.3.2.2.  Red Hat[0m
+  [1m4.3.2.2.  Red Hat Linux 9/8.0[0m
 
-  Red Hat Linux 8.0 uses an unusual character encoding scheme which
-  causes problems when running certain programs. As a result, whenever
-  you run setup or mythfilldatabase you will have to set a variable to
-  correct this problem.  Failure to set this variable will result in a
-  lot of UTF-8 errors.
-
-  There are two modifications that you can make to your system to avoid
-  this problem. The first is a system wide solution, the second will
-  only apply to your current user.
-
-  The global change is to modify the /etc/sysconfig/i18n file and set
-  LANG="en_US". If you want the change to only affect a single user, you
-  could create a file called ~/.i18n:
-
-
-       $ echo LANG="en_US" > ~/.i18n
-
+  Red Hat Linux 9/8.0 use a default locale with UTF-8 encoding.
+  Date::Manip, a perl module used by XMLTV, is not UTF-8 safe. As a
+  result, whenever you run setup or mythfilldatabase you will get a lot
+  of UTF-8 warnings. There is an
+  http://membled.com/work/patches/DateManip/
+  <http://membled.com/work/patches/DateManip/> updated version of
+  Date::Manip at the XMLTV site fixing this and other XMLTV related
+  bugs.
 
 
   [1m5.  Downloading and compiling.[0m
@@ -1258,9 +1256,10 @@
 
   # urpmi libmp3lame0 libmp3lame0-devel
 
-  NOTE for Red Hat users:  lame and lame-devel may be obtained from
-  http://freshrpms.net/rpm/lame/. After downloading, be sure to install both:
+  NOTE for Red Hat users: If you are installing with apt or yum, you may skip this step, it will be taken care
+  of. Otherwise get lame and lame-devel from FreshRPMS: http://freshrpms.net/rpm/lame/
 
+  After downloading, be sure to install both:
   # rpm -Uvh lame*
   ______________________________________________________________________
 
@@ -1328,7 +1327,7 @@
 
   [1m5.3.  XMLTV.[0m
 
-  [1m5.3.1.  Red Hat Linux 8.0 & 9:[0m
+  [1m5.3.1.  Red Hat Linux 9:[0m
 
   RPMs for [1mXMLTV [22mand all of its dependencies can be obtained from
   http://atrpms.physik.fu-berlin.de/name/xmltv/
@@ -2074,6 +2073,13 @@
   <http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-
   guide/ch-custom-kernel.html>
 
+  [1mNOTE[22m: Suitable Red Hat kernels for MythTV (i2c update, v4l2 api,
+  CONFIG_SERIAL modularized) are available from ATrpms:
+  http://atrpms.physik.fu-berlin.de/name/kernel/
+  <http://atrpms.physik.fu-berlin.de/name/kernel/>. You will also find
+  suitable kernel modules for ALSA, lirc, bttv, ivtv, saa7134 etc.
+  there. See also the ``main Red Hat section''.
+
   For the impatient: Make sure you have an emergency floppy boot disk
   available!
 
@@ -2092,10 +2098,9 @@
   processor P4 you might choose "kernel-2.4.18-i686-smp.config"
 
 
-
-  # cp yourconfig.config ../.config
-  # cd ../
-  # make xconfig
+       # cp yourconfig.config ../.config
+       # cd ../
+       # make xconfig
 
 
 
@@ -2150,12 +2155,11 @@
        # /sbin/ldconfig
 
 
-
   Next, we're going to manually start lircd the first time.  Mandrake
   9.1 users, type: # /etc/rc.d/init.d/lircd start instead of:
 
 
-  # /usr/local/sbin/lircd
+       # /usr/local/sbin/lircd
 
 
 
@@ -2205,13 +2209,14 @@
   All other distributions:
 
 
-       # cd /etc/rc.d
-       # cat >> rc.local
-       echo "Starting lircd"
-       /usr/local/sbin/lircd
-       ^D
-       # exit
-       $
+
+  # cd /etc/rc.d
+  # cat >> rc.local
+  echo "Starting lircd"
+  /usr/local/sbin/lircd
+  ^D
+  # exit
+  $
 
 
 
@@ -2264,6 +2269,7 @@
   control.
 
 
+
   [1m8.6.  Additional information for lirc.[0m
 
   Take a look at the lircrc.example files in the configfiles/ directory.
@@ -2274,18 +2280,17 @@
   The lircrc.example file has this:
 
 
+       begin
+           prog = irxevent
+           button = ChannelUp
+           config = Key Up CurrentWindow
+       end
 
-  begin
-      prog = irxevent
-      button = ChannelUp
-      config = Key Up CurrentWindow
-  end
-
-  begin
-      prog = irxevent
-      button = ChannelDown
-      config = Key Down CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = ChannelDown
+           config = Key Down CurrentWindow
+       end
 
 
 
@@ -2328,13 +2333,11 @@
   [1mirw [22mprogram to make sure that your remote is working, you can create
   the appropriate mappings in .lircrc to get excellent remote
   functionality with MythTV.
-
   Note the [1mrepeat = [22mparameter.  This informs the irxevent program to
   pass through every third keypress.  By default, lirc will only send
   one keypress to the application, even if you're holding down the key.
   The actual [1mrepeat = [22mnumber will vary from system to system, so
   experiment and see which value works best for you.
-
 
 
   [1m8.7.  Configuring lirc for use with an IR blaster.[0m
@@ -2400,15 +2403,16 @@
   sending and receiving IR versus just receiving.
 
 
-  # cd /etc/rc.d
-  # cat >> rc.local
-  echo "Starting lircd"
-  setserial /dev/ttySx uart none        # (if required)
-  modprobe lirc_sir
-  /usr/local/sbin/lircd
-  ^D
-  # exit
-  $
+
+       # cd /etc/rc.d
+       # cat >> rc.local
+       echo "Starting lircd"
+       setserial /dev/ttySx uart none        # (if required)
+       modprobe lirc_sir
+       /usr/local/sbin/lircd
+       ^D
+       # exit
+       $
 
 
 
@@ -2446,22 +2450,22 @@
   parent file descriptors before they start.
 
 
-       $ cd /usr/local/bin
-       # su
-       # cat > change_channel.csh
-       #!/bin/csh
-       echo "changing to $1"
-       /usr/local/bin/channel.pl $1 &
-       ^D
-       # chmod a+x change_channel.csh
-       # exit
-       $ exit
+
+  $ cd /usr/local/bin
+  # su
+  # cat > change_channel.csh
+  #!/bin/csh
+  echo "changing to $1"
+  /usr/local/bin/channel.pl $1 &
+  ^D
+  # chmod a+x change_channel.csh
+  # exit
+  $ exit
 
 
 
   See contrib/channel.pl for the actual file.  Copy it to
   /usr/local/bin/
-
 
   The last statement within the perl script is the lirc rc command. This
   is the command that transmits the code to your cable/dss box. Make
@@ -2511,7 +2515,6 @@
   tuner on the master will always be the first choice. You will then
   want to add your ``other backends'' in the order of your preference
   for recording.
-
   See ``Advanced Backend Configurations'' for information on configuring
   multiple backend systems in various ways.
 
@@ -2641,6 +2644,7 @@
   the load of the listings provider and the speed of your connection to
   the internet.  Be patient!
 
+
   You will then be returned to the Video Sources screen.  If you have
   multiple video sources available, such as Antenna, Cable, etc, go
   ahead and define them all, even if they're not all going to be
@@ -2656,7 +2660,6 @@
   have multiple tuners, and each tuner has a different input, so on this
   screen you let MythTV know which device will connect to which input
   source.
-
 
   When you start this screen, you should see a listing of the various
   input connections available on each of the Capture cards you defined
@@ -2706,8 +2709,6 @@
        -p or --pidfile filename       Write PID of mythbackend to filename
        -d or --daemon                 Runs mythbackend as a daemon
        -v or --verbose                Prints more information
-
-
 
   Running mythbackend as a daemon and using the logfile option will
   allow you to have mythbackend automatically start up during the boot
@@ -2774,9 +2775,10 @@
   can perform the following steps:
 
 
-       $ cd configfiles
-       $ su
-       # cp mythfilldatabasecron /etc/cron.daily
+
+  $ cd configfiles
+  $ su
+  # cp mythfilldatabasecron /etc/cron.daily
 
 
 
@@ -2784,20 +2786,19 @@
   following:
 
 
+       # cat /etc/crontab
+       SHELL=/bin/bash
+       PATH=/sbin:/bin:/usr/sbin:/usr/bin
+       MAILTO=root
+       HOME=/
 
-  # cat /etc/crontab
-  SHELL=/bin/bash
-  PATH=/sbin:/bin:/usr/sbin:/usr/bin
-  MAILTO=root
-  HOME=/
-
-  # run-parts
-  01 * * * * root nice -n 19 run-parts /etc/cron.hourly
-  02 4 * * * root nice -n 19 run-parts /etc/cron.daily
-  22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
-  42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
-  # exit
-  $
+       # run-parts
+       01 * * * * root nice -n 19 run-parts /etc/cron.hourly
+       02 4 * * * root nice -n 19 run-parts /etc/cron.daily
+       22 4 * * 0 root nice -n 19 run-parts /etc/cron.weekly
+       42 4 1 * * root nice -n 19 run-parts /etc/cron.monthly
+       # exit
+       $
 
 
 
@@ -2838,8 +2839,6 @@
 
        $ crontab -e
 
-
-
   The [1mcrontab -e [22mcommand will allow you to edit the existing crontab.
   [1mNOTE[22m:  By default, the crontab will use [1mvi [22mas your editor.  If you
   don't like to use [1mvi[22m, make sure that you've set VISUAL to something
@@ -2847,8 +2846,8 @@
 
 
 
-  $ export VISUAL=/usr/bin/joe
-  $ crontab -e
+       $ export VISUAL=/usr/bin/joe
+       $ crontab -e
 
 
 
@@ -2905,8 +2904,6 @@
   not use the same font settings as defined in Appearance, so if the EPG
   is unreadable this is where you make the adjustments to fonts, number
   of elements displayed, etc.
-
-
   [1m10.4.  Playback[0m
 
   The one configuration item which may cause problems on your system is
@@ -2955,7 +2952,7 @@
 
   The keys.txt file describes what the various keyboard commands are.
 
-  [1mNOTE to Red Hat 8.0 users[22m:Red Hat Linux 8.0 ships with Gnome as the
+  [1mNOTE to Red Hat users[22m:Red Hat Linux 9/8.0 ships with Gnome as the
   default desktop environment.  However, Gnome seems to have issues with
   window focus and window switching which sometimes cause mythfrontend
   to obscure the video. KDE does not seem to have any such issues.
@@ -2971,15 +2968,15 @@
   the program functionality.  The MythTV website has a Themes section;
   pick a theme you'd like to use and download it to your system.
 
+
   Once it's on your machine, you must move the file and untar it:
 
 
-
-  $ su
-  # cp funhouse.tar.gz /usr/local/share/mythtv/themes
-  # cd /usr/local/share/mythtv/themes
-  # tar -xjf funhouse.tar.gz
-  # exit
+       $ su
+       # cp funhouse.tar.gz /usr/local/share/mythtv/themes
+       # cd /usr/local/share/mythtv/themes
+       # tar -xjf funhouse.tar.gz
+       # exit
 
 
 
@@ -3032,6 +3029,7 @@
   and save it to a location where you can find it.  The next step
   depends on whether your distribution has a web server and if you have
   php support.
+
 
 
   [1m12.1.1.  Mandrake 9.0[0m
@@ -3099,7 +3097,6 @@
   The configuration for MythGallery is accessed through the main Setup
   option in mythfrontend.  Make sure you set your pictures directory to
   wherever you're storing your photos.
-
 
 
   +o  Use the arrow keys to move around the thumbnails.
@@ -3341,7 +3338,7 @@
 
 
 
-  [1m15.3.  Red Hat Linux 8.0[0m
+  [1m15.3.  Red Hat Linux 9/8.0[0m
 
   Red Hat provides packages for several of the prerequisites, making
   installation very simple. Of the prerequisites, Red Hat provides
@@ -3362,6 +3359,9 @@
   optionally fftw) manually following the installation directions above.
   When installing fftw do not use the rpm package offered on the website
   because it will cause an error, so use the source package instead.
+
+  [1mNOTE[22m: you can use the instructions given at the ``automated
+  installation section'' to install all of MythMusic in one step.
 
 
   [1m15.4.  Compiling MythMusic.[0m
@@ -4994,7 +4994,7 @@
   LVM greatly increases the flexibility you have in managing your
   storage than traditional physical partitions. This section will
   provide some brief notes on how to use LVM to create storage space for
-  your video files and how to add additional disk space in future.
+  your video files and how to add additional disk space in the future.
   There's lots more that can be done with LVM, so check the LVM HOWTO
   http://tldp.org/HOWTO/lvm-HOWTO/ <http://tldp.org/HOWTO/lvm-HOWTO/>
   document for details.

@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-07-13, v2.53
+<date>2003-07-21, v2.54
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -82,7 +82,7 @@ The contributors to MythTV are:<label id="contributors">
 <item>Debian package: Matthew Zimmerman, <url url="mailto:mdz@debian.org">
 <item>Mandrake 8.2 documentation: Harondel J. Sibble, <url url="mailto:help@pdscc.com">
 <item>Mandrake 9.0 and 9.1 packages: Thac, <url url="mailto:thac@nyvalls.se">
-<item>Red Hat Linux package: Axel Thimm, <url url="mailto:Axel.Thimm@physik.fu-berlin.de">
+<item>Red Hat Linux 9 packages: Axel Thimm, <url url="mailto:Axel.Thimm@physik.fu-berlin.de">
 </itemize>
 
 <sect>Checking prerequisites. 
@@ -435,23 +435,28 @@ additional configuration steps in this HOWTO.  The next logical step is
 <ref id="mysql" name="configuring MySQL">, which you may or may not have to
 perform.  See your package documentation.
 
-<sect3>Red Hat 
-<p>Axel Thimm has created RPMs for MythTV which may be obtained from <url
-url="http://atrpms.physik.fu-berlin.de/name/mythtv/"
-name="http://atrpms.physik.fu-berlin.de/name/mythtv/">.  If you have
-problems with the RPMs, please send him email directly at <url
+<sect3>Red Hat Linux 9
+<label id="atrpms">
+<p>Red Hat Linux 9 packages for MythTV and most of its add-on modules and
+some themes have been packaged by <url
 url="mailto:Axel.Thimm@physik.fu-berlin.de"
-name="mailto:Axel.Thimm@physik.fu-berlin.de">.
+name="mailto:Axel.Thimm@physik.fu-berlin.de"> and are available at <url
+url="http://atrpms.physik.fu-berlin.de/topic/multimedia/"
+name="http://atrpms.physik.fu-berlin.de/topic/multimedia/">. All of the
+prerequisites for MythTV (such as XMLTV) are available as rpm packages. If
+you have problems with the RPMs, please send him email directly.
+ 
+Given the large number of dependent rpms you are advised to use tools like
+apt or yum for automatic retrieval and installation of the required rpms.
+(<url url="http://atrpms.physik.fu-berlin.de/install.html"
+name="http://atrpms.physik.fu-berlin.de/install.html">) In this case a
+special meta-package called mythtv-suite will allow you to install all of
+MythTV and its add-ons, plus all dependencies.
 
-A meta-package created by Axel, called mythtv-suite, will allow you to
-install all of MythTV and its add-ons, plus all dependencies, but is
-dependant on having <bf>apt</bf> or <bf>yum</bf> installed and have
-<tt>atrpms</tt> enabled as a source. If you haven't downloaded the
-atrpms-kickstart packages, you can download it here:
-
-<url url="http://atrpms.physik.fu-berlin.de/dist/rh9/atrpms-kickstart/"
-name="http://atrpms.physik.fu-berlin.de/dist/rh9/atrpms-kickstart/">
-
+If you don't have <bf>apt</bf> or <bf>yum</bf> on your machine, download and
+install the <url
+url="http://atrpms.physik.fu-berlin.de/dist/rh9/atrpms-kickstart/"
+name="atrpms-kickstart package">.
 Install the package with:
 <tscreen><verb>
 # rpm -Uvh atrpms-kickstart*
@@ -464,8 +469,11 @@ And finally:
 <tscreen><verb>
 # apt-get install mythtv-suite
 </verb></tscreen>	
-These steps however, do NOT perform the installation of any drivers 
-required for <bf>ALSA</bf>, capture cards, <bf>lirc</bf>, etc.
+These steps however, do NOT perform the installation of any drivers required
+for <bf>ALSA</bf>, capture cards, <bf>lirc</bf>, etc., nor do they set up
+your MythTV database. Check <url
+url="http://atrpms.physik.fu-berlin.de/topic/multimedia/" name="ATrpms"> for
+the drivers you need.
 
 <sect3>Mandrake
 <p>Thac has created RPMs for MythTV for Mandrake 9.0 and 9.1 which may be
@@ -839,22 +847,14 @@ $ exit
 The last two commands are to exit out of the shell. This way, when you next 
 open a shell your new commands
 will take effect.
-<sect3>Red Hat
-<p>Red Hat Linux 8.0 uses an unusual character encoding scheme which causes
-problems when running certain programs. As a result, whenever you run setup
-or mythfilldatabase you will have to set a variable to correct this problem.
-Failure to set this variable will result in a lot of UTF-8 errors.
+<sect3>Red Hat Linux 9/8.0
+<p>Red Hat Linux 9/8.0 use a default locale with UTF-8 encoding.
+Date::Manip, a perl module used by XMLTV, is not UTF-8 safe. As a result,
+whenever you run setup or mythfilldatabase you will get a lot of UTF-8
+warnings. There is an <url url="http://membled.com/work/patches/DateManip/"
+name="http://membled.com/work/patches/DateManip/"> updated version of
+Date::Manip at the XMLTV site fixing this and other XMLTV related bugs.
 
-There are two modifications that you can make to your system to avoid this
-problem. The first is a system wide solution, the second will only apply to
-your current user.
-
-The global change is to modify the <tt>/etc/sysconfig/i18n</tt> file and set
-<tt>LANG="en_US"</tt>. If you want the change to only affect a single user,
-you could create a file called <tt>~/.i18n</tt>:
-<tscreen><verb>
-$ echo LANG="en_US" > ~/.i18n
-</verb></tscreen>
 <sect>Downloading and compiling.
 <p>Get MythTV from the <url url="http://www.mythtv.org" name="mythtv.org">
 web site.  Save the tarball to a directory you can find.
@@ -873,9 +873,10 @@ next step and type:
 
 # urpmi libmp3lame0 libmp3lame0-devel
 
-NOTE for Red Hat users:  lame and lame-devel may be obtained from
-http://freshrpms.net/rpm/lame/. After downloading, be sure to install both:
+NOTE for Red Hat users: If you are installing with apt or yum, you may skip this step, it will be taken care
+of. Otherwise get lame and lame-devel from FreshRPMS: http://freshrpms.net/rpm/lame/
 
+After downloading, be sure to install both:
 # rpm -Uvh lame*
 
 </code>
@@ -926,7 +927,7 @@ $
 </verb></tscreen>
 
 <sect1>XMLTV. 
-<sect2>Red Hat Linux 8.0 & 9:
+<sect2>Red Hat Linux 9:
 <p>RPMs for <bf>XMLTV</bf> and all of its dependencies can be obtained from
 <url url="http://atrpms.physik.fu-berlin.de/name/xmltv/"
 name="http://atrpms.physik.fu-berlin.de/name/xmltv/">. The web page has a
@@ -1530,6 +1531,13 @@ specifically for your architecture. For a more detailed description (or
 if you run into trouble) of how to do this go to  
 <url url="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/ch-custom-kernel.html" 
 name="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/ch-custom-kernel.html">
+
+<bf>NOTE</bf>: Suitable Red Hat kernels for MythTV (i2c update, v4l2 api,
+CONFIG_SERIAL modularized) are available from ATrpms: <url
+url="http://atrpms.physik.fu-berlin.de/name/kernel/"
+name="http://atrpms.physik.fu-berlin.de/name/kernel/">. You will also find
+suitable kernel modules for ALSA, lirc, bttv, ivtv, saa7134 etc. there. See
+also the <ref id="atrpms" name="main Red Hat section">.
 
 For the impatient:
 Make sure you have an emergency floppy boot disk available!
@@ -2279,7 +2287,7 @@ default as-is until you're sure that MythTV is operational.
 <sect>Using MythTV.
 <p>The <tt>keys.txt</tt> file describes what the various keyboard commands are.
 
-<bf>NOTE to Red Hat 8.0 users</bf>:Red Hat Linux 8.0 ships with Gnome as
+<bf>NOTE to Red Hat users</bf>:Red Hat Linux 9/8.0 ships with Gnome as
 the default desktop environment.  However, Gnome seems to have issues with
 window focus and window switching which sometimes cause mythfrontend to
 obscure the video. KDE does not seem to have any such issues. Therefore you
@@ -2596,7 +2604,7 @@ typing:
 # urpmi libSDL1.2 libSDL1.2-devel
 </verb></tscreen>
 
-<sect1>Red Hat Linux 8.0
+<sect1>Red Hat Linux 9/8.0
 <p>Red Hat provides packages for several of the prerequisites, making 
 installation very simple. Of the prerequisites, Red Hat provides 
 packages for Vorbis, cdparanoia, SDL, and OpenGL (which you probably 
@@ -2614,6 +2622,10 @@ You must install the remaining packages, (MAD, FLAC, libcdaudio and
 optionally fftw) manually following the installation directions above. When
 installing fftw do not use the rpm package offered on the website because it
 will cause an error, so use the source package instead.
+
+<bf>NOTE</bf>: you can use the instructions given at the <ref id="atrpms"
+name="automated installation section"> to install all of MythMusic in one
+step.
 
 <sect1>Compiling MythMusic.  
 <p>Once all the prerequisites have been installed, you can proceed with
@@ -3989,13 +4001,14 @@ percentage after it has been created using the <bf>tune2fs</bf> program:
 You can check on your filesystem using the <bf>dumpe2fs</bf> program.  See
 the <bf>man</bf> page for details.
 
-<sect1>I'd like to have more flexible disk storage with LVM.
+<sect1>I'd like to have more flexible disk storage with LVM. 
 <!-- Contributed by Martin Smith martin at spamcop.net -->
 <p>LVM greatly increases the flexibility you have in managing your storage
 than traditional physical partitions. This section will provide some brief
 notes on how to use LVM to create storage space for your video files and how
-to add additional disk space in future. There's lots more that can be done
-with LVM, so check the LVM HOWTO <url url="http://tldp.org/HOWTO/lvm-HOWTO/"
+to add additional disk space in the future. There's lots more that can be
+done with LVM, so check the LVM HOWTO <url
+url="http://tldp.org/HOWTO/lvm-HOWTO/"
 name="http://tldp.org/HOWTO/lvm-HOWTO/"> document for details.
 
 Make sure your kernel configuration includes LVM support or that it's
@@ -4219,6 +4232,7 @@ Added note that you don't need to transcode .nuv files if they're made by a
 PVR-250/350.  Added example for LVM/ext2 and ext3.  Added note to not run
 XMLTV 0.5.15 if you're not running CVS.  Add link in first section to single
 page and PDF version of docs.
+v2.54, 2003-07-21.  Fix grammar in LVM section.  Axel Thimm's updates.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or

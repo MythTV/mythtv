@@ -354,20 +354,24 @@ additional configuration steps in this HOWTO.  The next logical step is
 <A HREF="mythtv-HOWTO-6.html#mysql">configuring MySQL</A>, which you may or may not have to
 perform.  See your package documentation.</P>
 
-<H3>Red Hat </H3>
+<H3><A NAME="atrpms"></A> Red Hat Linux 9</H3>
 
-<P>Axel Thimm has created RPMs for MythTV which may be obtained from 
-<A HREF="http://atrpms.physik.fu-berlin.de/name/mythtv/">http://atrpms.physik.fu-berlin.de/name/mythtv/</A>.  If you have
-problems with the RPMs, please send him email directly at 
-<A HREF="mailto:Axel.Thimm@physik.fu-berlin.de">mailto:Axel.Thimm@physik.fu-berlin.de</A>.</P>
-<P>A meta-package created by Axel, called mythtv-suite, will allow you to
-install all of MythTV and its add-ons, plus all dependencies, but is
-dependant on having <B>apt</B> or <B>yum</B> installed and have
-<CODE>atrpms</CODE> enabled as a source. If you haven't downloaded the
-atrpms-kickstart packages, you can download it here:</P>
-<P>
-<A HREF="http://atrpms.physik.fu-berlin.de/dist/rh9/atrpms-kickstart/">http://atrpms.physik.fu-berlin.de/dist/rh9/atrpms-kickstart/</A></P>
-<P>Install the package with:
+<P>Red Hat Linux 9 packages for MythTV and most of its add-on modules and
+some themes have been packaged by 
+<A HREF="mailto:Axel.Thimm@physik.fu-berlin.de">mailto:Axel.Thimm@physik.fu-berlin.de</A> and are available at 
+<A HREF="http://atrpms.physik.fu-berlin.de/topic/multimedia/">http://atrpms.physik.fu-berlin.de/topic/multimedia/</A>. All of the
+prerequisites for MythTV (such as XMLTV) are available as rpm packages. If
+you have problems with the RPMs, please send him email directly.</P>
+<P>Given the large number of dependent rpms you are advised to use tools like
+apt or yum for automatic retrieval and installation of the required rpms.
+(
+<A HREF="http://atrpms.physik.fu-berlin.de/install.html">http://atrpms.physik.fu-berlin.de/install.html</A>) In this case a
+special meta-package called mythtv-suite will allow you to install all of
+MythTV and its add-ons, plus all dependencies.</P>
+<P>If you don't have <B>apt</B> or <B>yum</B> on your machine, download and
+install the 
+<A HREF="http://atrpms.physik.fu-berlin.de/dist/rh9/atrpms-kickstart/">atrpms-kickstart package</A>.
+Install the package with:
 <BLOCKQUOTE><CODE>
 <PRE>
 # rpm -Uvh atrpms-kickstart*
@@ -388,8 +392,11 @@ And finally:
 </PRE>
 </CODE></BLOCKQUOTE>
         
-These steps however, do NOT perform the installation of any drivers 
-required for <B>ALSA</B>, capture cards, <B>lirc</B>, etc.</P>
+These steps however, do NOT perform the installation of any drivers required
+for <B>ALSA</B>, capture cards, <B>lirc</B>, etc., nor do they set up
+your MythTV database. Check 
+<A HREF="http://atrpms.physik.fu-berlin.de/topic/multimedia/">ATrpms</A> for
+the drivers you need.</P>
 
 <H3>Mandrake</H3>
 

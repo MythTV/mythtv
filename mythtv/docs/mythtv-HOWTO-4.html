@@ -139,24 +139,15 @@ $ exit
 The last two commands are to exit out of the shell. This way, when you next 
 open a shell your new commands
 will take effect.</P>
-<H3>Red Hat</H3>
+<H3>Red Hat Linux 9/8.0</H3>
 
-<P>Red Hat Linux 8.0 uses an unusual character encoding scheme which causes
-problems when running certain programs. As a result, whenever you run setup
-or mythfilldatabase you will have to set a variable to correct this problem.
-Failure to set this variable will result in a lot of UTF-8 errors.</P>
-<P>There are two modifications that you can make to your system to avoid this
-problem. The first is a system wide solution, the second will only apply to
-your current user.</P>
-<P>The global change is to modify the <CODE>/etc/sysconfig/i18n</CODE> file and set
-<CODE>LANG="en_US"</CODE>. If you want the change to only affect a single user,
-you could create a file called <CODE>~/.i18n</CODE>:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ echo LANG="en_US" > ~/.i18n
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
+<P>Red Hat Linux 9/8.0 use a default locale with UTF-8 encoding.
+Date::Manip, a perl module used by XMLTV, is not UTF-8 safe. As a result,
+whenever you run setup or mythfilldatabase you will get a lot of UTF-8
+warnings. There is an 
+<A HREF="http://membled.com/work/patches/DateManip/">http://membled.com/work/patches/DateManip/</A> updated version of
+Date::Manip at the XMLTV site fixing this and other XMLTV related bugs.</P>
+
 <HR>
 <A HREF="mythtv-HOWTO-5.html">Next</A>
 <A HREF="mythtv-HOWTO-3.html">Previous</A>
