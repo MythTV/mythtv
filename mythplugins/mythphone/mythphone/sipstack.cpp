@@ -44,6 +44,8 @@ SipMsg::SipMsg(QString Method)
     Expires = -1;
     msgContainsSDP = false;
     msgContainsXPIDF = false;
+    msgContainsPlainText = false;
+    PlainTextContent = "";
     callId = 0;
     sdp = 0;
     xpidf = 0;
@@ -70,6 +72,8 @@ SipMsg::SipMsg()
     Expires = -1;
     msgContainsSDP = false;
     msgContainsXPIDF = false;
+    msgContainsPlainText = false;
+    PlainTextContent = "";
     callId = 0;
     sdp = 0;
     xpidf = 0;
@@ -118,6 +122,8 @@ SipMsg &SipMsg::operator= (SipMsg &rhs)
     cseqMethod = rhs.cseqMethod;
     msgContainsSDP = rhs.msgContainsSDP;
     msgContainsXPIDF = rhs.msgContainsXPIDF;
+    msgContainsPlainText = rhs.msgContainsPlainText;
+    PlainTextContent = rhs.PlainTextContent;
 
     //
     // TODO --- Should this do more???  What is this fn used for; delete if not used
@@ -352,6 +358,8 @@ void SipMsg::decode(QString sipString)
         decodeSdp(sipString.section("\r\n\r\n", 1, 1));
     if (msgContainsXPIDF) 
         decodeXpidf(sipString.section("\r\n\r\n", 1, 1));
+    if (msgContainsPlainText) 
+        decodePlainText(sipString.section("\r\n\r\n", 1, 1));
 }
 
 void SipMsg::decodeLine(QString line)
@@ -383,7 +391,7 @@ void SipMsg::decodeLine(QString line)
 void SipMsg::decodeRequestLine(QString line)
 {
     QString Token = line.section(' ', 0, 0);
-    if ((Token == "INVITE") || (Token == "ACK") || (Token == "BYE") || (Token == "CANCEL") || (Token == "REGISTER") || (Token == "SUBSCRIBE") || (Token == "NOTIFY"))
+    if ((Token == "INVITE") || (Token == "ACK") || (Token == "BYE") || (Token == "CANCEL") || (Token == "REGISTER") || (Token == "SUBSCRIBE") || (Token == "NOTIFY") || (Token == "MESSAGE"))
         thisMethod = Token;
     else if (Token == "SIP/2.0")
     {
@@ -550,6 +558,8 @@ void SipMsg::decodeContentType(QString cType)
         msgContainsSDP = true;
     if (content.startsWith("application/xpidf+xml"))
         msgContainsXPIDF = true;
+    if (content.startsWith("text/plain"))
+        msgContainsPlainText = true;
 }
 
 
@@ -607,6 +617,11 @@ void SipMsg::decodeXpidf(QString content)
             nextNode = n.parentNode().nextSibling();
         n = nextNode;
     }
+}
+
+void SipMsg::decodePlainText(QString content)
+{
+    PlainTextContent = content;
 }
 
 QPtrList<sdpCodec> *SipMsg::decodeSDPLine(QString sdpLine, QPtrList<sdpCodec> *codecList)

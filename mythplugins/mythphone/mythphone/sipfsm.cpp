@@ -734,9 +734,6 @@ int SipFsm::getPrimaryCallState()
 
 void SipFsm::CheckRxEvent()
 {
-    int newState = -1;
-    SipCall *call = 0;
-
     SipMsg sipRcv;
     if ((sipSocket->waitForMore(1000/SIP_POLL_PERIOD) > 0) && (Receive(sipRcv)))
     {
@@ -749,27 +746,21 @@ void SipFsm::CheckRxEvent()
         {
             switch (Event)
             {
-            case SIP_REGISTER:
-                fsm = sipRegistrar;
-                break;
-            case SIP_SUBSCRIBE:
-                fsm = CreateSubscriberFsm();
-                break;
-            default:
-                fsm = CreateCallFsm();
-                break;
+            case SIP_REGISTER:    fsm = sipRegistrar;            break;
+            case SIP_SUBSCRIBE:   fsm = CreateSubscriberFsm();   break;
+            case SIP_MESSAGE:     fsm = CreateIMFsm();           break;
+            default:              fsm = CreateCallFsm();         break;
             }
         }
 
-        // Now push the event through the FSM
+        // Now push the event through the FSM and see if the event causes the FSM to self-destruct
         if (fsm)
-            newState = fsm->FSM(Event, &sipRcv);
+        {
+            if ((fsm->FSM(Event, &sipRcv)) == SIP_IDLE)
+                DestroyFsm(fsm);
+        }
         else
             cerr << "SIP: fsm should not be zero here\n";
-
-        // See if the event has caused the FSM to self-destruct
-        if ((newState == SIP_IDLE) && (fsm))
-            DestroyFsm(fsm);
     }
 }
 
@@ -796,6 +787,7 @@ int SipFsm::MsgToEvent(SipMsg *sipMsg)
     if (Method == "REGISTER")   return SIP_REGISTER;
     if (Method == "SUBSCRIBE")  return SIP_SUBSCRIBE;
     if (Method == "NOTIFY")     return SIP_NOTIFY;
+    if (Method == "MESSAGE")    return SIP_MESSAGE;
 
     if (Method == "STATUS")
     {
@@ -805,6 +797,7 @@ int SipFsm::MsgToEvent(SipMsg *sipMsg)
         if (statusMethod == "NOTIFY")      return SIP_NOTSTATUS;
         if (statusMethod == "BYE")         return SIP_BYESTATUS;
         if (statusMethod == "CANCEL")      return SIP_CANCELSTATUS;
+        if (statusMethod == "MESSAGE")     return SIP_MESSAGESTATUS;
 
         if (statusMethod == "INVITE")
         {
@@ -867,6 +860,13 @@ SipWatcher *SipFsm::CreateWatcherFsm(QString Url)
     SipWatcher *watcher = new SipWatcher(this, natIp, localPort, sipRegistration, Url);
     FsmList.append(watcher);
     return watcher;
+}
+
+SipIM *SipFsm::CreateIMFsm()
+{
+    SipIM *im = new SipIM(this, natIp, localPort, sipRegistration);
+    FsmList.append(im);
+    return im;
 }
 
 void SipFsm::StopWatchers()
@@ -1080,6 +1080,8 @@ QString SipFsmBase::EventtoString(int Event)
     case SIP_SUBSCRIBE_EXPIRE:    return "SUB_EXPIRE";
     case SIP_WATCH:               return "WATCH";
     case SIP_STOPWATCH:           return "STOPWATCH";
+    case SIP_MESSAGE:             return "MESSAGE";
+    case SIP_MESSAGESTATUS:       return "MESSAGESTATUS";
     default:
         break;
     }
@@ -1455,7 +1457,7 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
     // Everything else is an error, just flag it for now
     default:
         if (debugStream)
-            *debugStream << "SIP FSM Error received " << EventtoString(Event) << " in state " << StatetoString(State) << endl << endl;
+            *debugStream << "SIP CALL FSM Error received " << EventtoString(Event) << " in state " << StatetoString(State) << endl << endl;
         break;
     }
 
@@ -2437,6 +2439,103 @@ void SipWatcher::SendSubscribe(SipMsg *authMsg)
     retx = Subscribe.string();
     t1 = 500;
     (parent->Timer())->Start(this, t1, SIP_RETX);
+}
+
+
+
+/**********************************************************************
+SipIM
+
+FSM to handle Instant Messaging
+**********************************************************************/
+
+SipIM::SipIM(SipFsm *par, QString localIp, int localPort, SipRegistration *reg) : SipFsmBase(par)
+{
+    sipLocalIp = localIp;
+    sipLocalPort = localPort;
+    regProxy = reg;
+
+    State = SIP_IDLE;
+    cseq = 1;
+    CallId.Generate(sipLocalIp);
+    if (regProxy)
+        MyUrl = new SipUrl("", regProxy->registeredAs(), regProxy->registeredTo(), 5060);
+    else
+        MyUrl = new SipUrl("", "MythPhone", sipLocalIp, sipLocalPort);
+    MyContactUrl = new SipUrl("", "", sipLocalIp, sipLocalPort);
+}
+
+SipIM::~SipIM()
+{
+    (parent->Timer())->StopAll(this); 
+    if (MyUrl)
+        delete MyUrl;
+    if (MyContactUrl)
+        delete MyContactUrl;
+    MyUrl = MyContactUrl = 0;
+}
+
+int SipIM::FSM(int Event, SipMsg *sipMsg, void *Value)
+{
+    int OldState = State;
+    QString textContent;
+
+    switch (Event)
+    {
+    case SIP_MESSAGE:
+        ParseSipMsg(Event, sipMsg);
+        //State = SIP_IDLE;
+        textContent = sipMsg->getPlainText();
+        parent->SetNotification("IM", remoteUrl->getUser(), textContent, "");
+        //(parent->Timer())->Start(this, 120*1000, SIP_WATCH); 
+        BuildSendStatus(200, "MESSAGE", sipMsg->getCSeqValue(), SIP_OPT_CONTACT);
+        break;
+
+    default:
+        if (debugStream)
+            *debugStream << "SIP IM FSM Error received " << EventtoString(Event) << " in state " << StatetoString(State) << endl << endl;
+        break;
+    }
+
+    DebugFsm(Event, OldState, State);
+    return State;
+}
+
+void SipIM::SendMessage(SipMsg *authMsg, QString Text)
+{
+    SipMsg Message("MESSAGE");
+/*    Subscribe.addRequestLine(*watchedUrl);
+    Subscribe.addVia(sipLocalIp, sipLocalPort);
+    Subscribe.addFrom(*MyUrl);
+    Subscribe.addTo(*watchedUrl);
+    Subscribe.addCallId(CallId);
+    if (authMsg == 0)
+        cseq++;
+    Subscribe.addCSeq(cseq);
+    if (State == SIP_WATCH_STOPPING)
+        Subscribe.addExpires(0);
+
+    if (authMsg)
+    {
+        if (authMsg->getAuthMethod() == "Digest")
+            Subscribe.addProxyAuthorization(authMsg->getAuthMethod(), regProxy->registeredAs(), regProxy->registeredPasswd(), authMsg->getAuthRealm(), authMsg->getAuthNonce(), "sip:" + regProxy->registeredTo());
+        else
+            cout << "SIP: Unknown Auth Type: " << authMsg->getAuthMethod() << endl;
+    }
+
+    Subscribe.addUserAgent();
+    Subscribe.addContact(MyContactUrl);
+
+    Subscribe.addEvent("presence");
+    Subscribe.addGenericLine("Accept: application/xpidf+xml\r\n");
+    //Subscribe.addGenericLine("Accept: application/xpidf+xml, text/xml+msrtc.pidf\r\n");
+    //Subscribe.addGenericLine("Supported: com.microsoft.autoextend\r\n");
+    Subscribe.addNullContent();
+
+    parent->Transmit(Subscribe.string(), retxIp = watchedUrl->getHostIp(), retxPort = watchedUrl->getPort());
+    retx = Subscribe.string();
+    t1 = 500;
+    (parent->Timer())->Start(this, t1, SIP_RETX);*/
 }
 
 

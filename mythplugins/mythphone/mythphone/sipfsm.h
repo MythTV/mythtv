@@ -83,8 +83,10 @@
 #define SIP_SUBSCRIBE_EXPIRE    0x1700
 #define SIP_WATCH               0x1800
 #define SIP_STOPWATCH           0x1900
+#define SIP_MESSAGE             0x1A00
+#define SIP_MESSAGESTATUS       0x1B00
 
-#define SIP_CMD(s)              (((s)==SIP_INVITE) || ((s)==SIP_ACK) || ((s)==SIP_BYE) || ((s)==SIP_CANCEL) || ((s)==SIP_REGISTER) || ((s)==SIP_SUBSCRIBE) || ((s)==SIP_NOTIFY) )
+#define SIP_CMD(s)              (((s)==SIP_INVITE) || ((s)==SIP_ACK) || ((s)==SIP_BYE) || ((s)==SIP_CANCEL) || ((s)==SIP_REGISTER) || ((s)==SIP_SUBSCRIBE) || ((s)==SIP_NOTIFY) || ((s)==SIP_MESSAGE))
 #define SIP_STATUS(s)           (((s)==SIP_INVITESTATUS_2xx) || ((s)==SIP_INVITESTATUS_1xx) || ((s)==SIP_INVITESTATUS_3456xx) || ((s)==SIP_BYTESTATUS) || ((s)==SIP_CANCELSTATUS) || ((s)==SIP_SUBSTATUS) || ((s)==SIP_NOTSTATUS) )
 #define SIP_MSG(s)              (SIP_CMD(s) || SIP_STATUS(s))
 
@@ -429,6 +431,25 @@ class SipWatcher : public SipFsmBase
 };
 
 
+class SipIM : public SipFsmBase
+{
+  public:
+    SipIM(SipFsm *par, QString localIp, int localPort, SipRegistration *reg);
+    ~SipIM();
+    virtual int  FSM(int Event, SipMsg *sipMsg=0, void *Value=0);
+    virtual QString type() { return "IM"; };
+
+  private:
+    void SendMessage(SipMsg *authMsg, QString Text);
+
+    QString sipLocalIp;
+    int sipLocalPort;
+    SipRegistration *regProxy;
+    int State;
+    int cseq;
+};
+
+
 class SipFsm : public QWidget
 {
 
@@ -449,6 +470,7 @@ class SipFsm : public QWidget
     SipCall *CreateCallFsm();
     SipSubscriber *CreateSubscriberFsm();
     SipWatcher *CreateWatcherFsm(QString Url);
+    SipIM *CreateIMFsm();
     void StopWatchers();
     int numCalls();
     int getPrimaryCall() { return primaryCall; };

@@ -65,6 +65,7 @@ public:
     SipMsg &operator= (SipMsg &rhs);
     SipSdp *getSdp()         { return sdp; }
     SipXpidf *getXpidf()     { return xpidf; }
+    QString getPlainText()   { return PlainTextContent; }
     SipUrl *getContactUrl()  { return contactUrl; }
     SipUrl *getRecRouteUrl() { return recRouteUrl; }
     SipUrl *getFromUrl()     { return fromUrl; }
@@ -99,6 +100,7 @@ private:
     void decodeContentType(QString cType);
     void decodeSdp(QString content);
     void decodeXpidf(QString content);
+    void decodePlainText(QString content);
     QPtrList<sdpCodec> *decodeSDPLine(QString sdpLine, QPtrList<sdpCodec> *codecList);
     void decodeSDPConnection(QString c);
     QPtrList<sdpCodec> *decodeSDPMedia(QString m);
@@ -116,8 +118,10 @@ private:
     int Expires;
     bool msgContainsSDP;
     bool msgContainsXPIDF;
+    bool msgContainsPlainText;
     SipSdp *sdp;
     SipXpidf *xpidf;
+    QString PlainTextContent;
     SipUrl *contactUrl;
     SipUrl *recRouteUrl;
     SipUrl *fromUrl;
