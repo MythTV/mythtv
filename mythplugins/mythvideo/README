@@ -1,0 +1,32 @@
+                                   MythVideo
+
+BUILD/CONFIGURATION INSTRUCTIONS
+--------------------------------
+
+Requirements:
+	MythTV installed and working
+
+If you have met the requirements above, simply type 'make' in the main directory
+to begin compiling.
+
+Compiling note:  If you get an error on building this, that says something
+                 about 'mkspecs', then you don't have the QTDIR environment
+                 variable set.  On debian, this should be set to /usr/share/qt.
+                 I hear on mandrake, it's /usr/lib/qt3.  You'll need to figure
+                 out what it should be on your system, set the variable,
+                 and attempt to compile again.
+
+
+Once the make is completed, you should switch to root and do a 'make install'.  
+
+- mythvideo will go into /usr/local/bin
+- the mythexplorer-settings.txt will go into the /usr/local/share/mythtv directory
+
+Before running mythvideo, edit the /usr/local/share/mythtv/mythexplorer-settings.txt
+file and adjust your StartDir.  By default, it is set to /mnt/store
+
+The default media player is set to mplayer, and will default to full-screen
+mode.  If you do not want full-screen mode, remove the "-vm" parameter.
+
+If you wish to add helper applications, they must be defined as 
+str <format>_helper=<program>
