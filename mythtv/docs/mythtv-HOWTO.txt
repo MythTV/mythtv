@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2004-10-18, v0.16.01
+  2004-11-26, v0.16.04
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -2430,7 +2430,7 @@
 
        $ amixer set Master,0 100%,100% unmute
        $ amixer set Line,0 75%,75% mute captur
-       $ amixer set Capture,0 100%,100% mute captur
+       $ amixer set Capture,0 100%,100% captur
        $ su
        # alsactl store
        # exit
@@ -3403,9 +3403,8 @@
   Ensure that you've granted access to the master MySQL database for
   remote backends as discussed in the section titled ``Modifying access
   to the MySQL database for multiple systems'' and that you've edited
-  the /usr/local/share/mythtv/mysql.txt or
-  /usr/local/share/mythtv/mysql.txt file and put the correct IP address
-  for the database server.
+  the /usr/local/share/mythtv/mysql.txt or ~/.mythtv/mysql.txt file and
+  put the correct IP address for the database server.
 
   Make sure that the IP addresses on the General setup screen are
   accurate.  If the slave backend can't communicate with the master
@@ -3460,6 +3459,7 @@
   job, or as a system based cron.  If you use a user-based cron, you can
   select the time that the cron job will be run.  A system-based cron
   job will run at the same time as any other system cron jobs.
+
 
 
   [1m9.4.1.1.  Using the built-in method.[0m
@@ -4054,7 +4054,7 @@
   G           rotate between the various Picture Adjustments (Colour, Hue, etc.) for recording. These values affect the look of the resulting .nuv file, and are independent of the playback picture settings. While Picture Adjustment is on-screen, use Left and Right arrows to adjust.
   H           Channel history. Each repeat steps back through the previous channels.
   O           Turns on 'Browse' mode, allowing user to browse channels and program info while watching current show FullScreen.
-  F8          toggle the sleep timer 30m->1hr->1hr30m->2hr->Off
+  F8          toggle the sleep timer 30m->1hr->1hr30m->2hr->OffY                                                                                                                                                                                                                               switch between multiple capture cards.  [1mNOTE[22m:you lose your LiveTV buffer on your current card. Useful for different-sourced cards (such as Dish Network on one, HDTV over-the-air on another card.)
 
 
   [1m11.1.4.  Watching a recording only[0m
@@ -6612,7 +6612,7 @@
   add something like:
 
 
-       masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,soft,nfsvers=3
+       masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,hard,intr,nfsvers=3
 
 
 
@@ -6621,8 +6621,9 @@
   In this case, the source is a machine called "masterbackend" which is
   exporting the directory "/var/video", which we're mounting locally at
   "/var/video".  The rsize and wsize options are used to increase the
-  performance of NFS; soft mean that NFS will eventually timeout on an
-  error, and the nfsvers is required for filesizes over 2GB.
+  performance of NFS; "hard,intr" is there because that's the
+  recommendation of the NFS-HOWTO, and the nfsvers is required for
+  filesizes over 2GB.
 
 
   [1m21.10.  Automatically starting mythfrontend at system boot time[0m
@@ -6658,7 +6659,6 @@
 
        session.screen0.focusNewWindows:        True
        session.screen0.focusModel:     SloppyFocus
-
 
   in it.
 

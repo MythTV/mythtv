@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-10-18, v0.16.01
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2004-11-26, v0.16.04
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2237,7 +2237,7 @@ Note the spelling in the following commands.
 <PRE>
 $ amixer set Master,0 100%,100% unmute
 $ amixer set Line,0 75%,75% mute captur
-$ amixer set Capture,0 100%,100% mute captur
+$ amixer set Capture,0 100%,100% captur
 $ su
 # alsactl store
 # exit
@@ -3178,7 +3178,7 @@ the steps outlined in the section called
 backends as discussed in the section titled 
 <A HREF="#modify_perm_mysql">Modifying access to the MySQL database for multiple systems</A> and that
 you've edited the <CODE>/usr/local/share/mythtv/mysql.txt</CODE> or
-<CODE>/usr/local/share/mythtv/mysql.txt</CODE> file and put the correct IP
+<CODE>~/.mythtv/mysql.txt</CODE> file and put the correct IP
 address for the database server.</P>
 <P>Make sure that the IP addresses on the General setup screen are accurate. 
 If the slave backend can't communicate with the master backend due to IP
@@ -3820,7 +3820,7 @@ Right </TD><TD> advance 1 frame </TD></TR><TR><TD>
 G       </TD><TD> rotate between the various Picture Adjustments (Colour, Hue, etc.)&nbsp;for recording. These values affect the look of the resulting .nuv&nbsp;file, and are independent of the playback picture settings. While&nbsp;Picture Adjustment is on-screen, use Left and Right arrows to adjust. </TD></TR><TR><TD>
 H       </TD><TD> Channel history. Each repeat steps back through the previous channels. </TD></TR><TR><TD>
 O       </TD><TD> Turns on 'Browse' mode, allowing user to browse channels and program&nbsp;info while watching current show FullScreen. </TD></TR><TR><TD>
-F8      </TD><TD> toggle the sleep timer 30m->1hr->1hr30m->2hr->Off
+F8      </TD><TD> toggle the sleep timer 30m->1hr->1hr30m->2hr->OffY    </TD><TD> switch between multiple capture cards.&nbsp; <B>NOTE</B>:you lose your LiveTV buffer on your current card. Useful&nbsp;for different-sourced cards (such as Dish Network on one, HDTV over-the-air on another card.) </TD></TR><TR><TD>
 </TD></TR></TABLE>
 </CENTER><BR>
 </P>
@@ -6184,7 +6184,7 @@ want to edit your <CODE>/etc/exports</CODE> file and use something like:
 add something like:
 <BLOCKQUOTE><CODE>
 <PRE>
-masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,soft,nfsvers=3
+masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,hard,intr,nfsvers=3
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -6192,8 +6192,8 @@ masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,soft,nfsvers=3
 <P>In this case, the source is a machine called "masterbackend" which is
 exporting the directory "/var/video", which we're mounting locally at
 "/var/video".  The rsize and wsize options are used to increase the
-performance of NFS; soft mean that NFS will eventually timeout on an error,
-and the nfsvers is required for filesizes over 2GB.</P>
+performance of NFS; "hard,intr" is there because that's the recommendation
+of the NFS-HOWTO, and the nfsvers is required for filesizes over 2GB.</P>
 
 <H2><A NAME="ss21.10">21.10</A> <A HREF="#toc21.10">Automatically starting mythfrontend at system boot time</A>
 </H2>

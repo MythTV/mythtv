@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2004-10-18, v0.16.01
+<date>2004-11-26, v0.16.04
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2733,7 +2733,7 @@ name="Automatically starting mythbackend at system boot time">.
 backends as discussed in the section titled <ref id="modify_perm_mysql"
 name="Modifying access to the MySQL database for multiple systems"> and that
 you've edited the <tt>/usr/local/share/mythtv/mysql.txt</tt> or
-<tt>/usr/local/share/mythtv/mysql.txt</tt> file and put the correct IP
+<tt>~/.mythtv/mysql.txt</tt> file and put the correct IP
 address for the database server.
 
 Make sure that the IP addresses on the General setup screen are accurate. 
@@ -3394,6 +3394,9 @@ H	| Channel history. Each repeat steps back through the previous channels.  @
 O	| Turns on 'Browse' mode, allowing user to browse channels and program&nbsp; 
           info while watching current show FullScreen.				  @     
 F8	| toggle the sleep timer 30m->1hr->1hr30m->2hr->Off			       
+Y	| switch between multiple capture cards.&nbsp; <bf>NOTE</bf>:
+	  you lose your LiveTV buffer on your current card. Useful&nbsp;
+	  for different-sourced cards (such as Dish Network on one, HDTV over-the-air on another card.) @
 </tabular>
 </table>
 <sect2>Watching a recording only
@@ -5595,7 +5598,7 @@ To export the <tt>/var/video</tt> directory with read / write privileges.
 On the "slave" machine, you'll want to edit the <tt>/etc/fstab</tt> file and
 add something like:
 <tscreen><verb>
-masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,soft,nfsvers=3
+masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,hard,intr,nfsvers=3
 </verb></tscreen>
 
 Then run <tt># fstab -a</tt> to re-read the file to mount the file system.
@@ -5603,8 +5606,8 @@ Then run <tt># fstab -a</tt> to re-read the file to mount the file system.
 In this case, the source is a machine called "masterbackend" which is
 exporting the directory "/var/video", which we're mounting locally at
 "/var/video".  The rsize and wsize options are used to increase the
-performance of NFS; soft mean that NFS will eventually timeout on an error,
-and the nfsvers is required for filesizes over 2GB.
+performance of NFS; "hard,intr" is there because that's the recommendation
+of the NFS-HOWTO, and the nfsvers is required for filesizes over 2GB.
 
 <sect1>Automatically starting mythfrontend at system boot time
 <p>Here's an example submitted to the mythtv-dev list by Pat Pflaum
@@ -7230,10 +7233,11 @@ update, update by bline.  David Greaves' suggestion about mythcommflag and
 the seektable. Add a section on differences between a PVR-250 and a 350. Add
 bugzilla pointer.  Add a section on changing channels on STBs.  Add section on
 making mythfrontend SUID root.
-
 v0.16.01, 2004-10-18.  Add stuff about ~/.mythtv directory (Gavin Hurlbut)
 Bruce Markey's scheduler description.
-
+v0.16.02, 2004-10-20.  Fix double mention of /usr/local/share/mythtv/mysql.txt
+v0.16.03, 2004-10-31.  Tyler Drake's "Y" key.
+v0.16.04, 2004-11-26.  Change NFS recommendation to hard,intr
 -->
 
 <!--

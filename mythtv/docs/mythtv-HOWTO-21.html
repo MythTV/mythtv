@@ -373,7 +373,7 @@ want to edit your <CODE>/etc/exports</CODE> file and use something like:
 add something like:
 <BLOCKQUOTE><CODE>
 <PRE>
-masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,soft,nfsvers=3
+masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,hard,intr,nfsvers=3
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -381,8 +381,8 @@ masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,soft,nfsvers=3
 <P>In this case, the source is a machine called "masterbackend" which is
 exporting the directory "/var/video", which we're mounting locally at
 "/var/video".  The rsize and wsize options are used to increase the
-performance of NFS; soft mean that NFS will eventually timeout on an error,
-and the nfsvers is required for filesizes over 2GB.</P>
+performance of NFS; "hard,intr" is there because that's the recommendation
+of the NFS-HOWTO, and the nfsvers is required for filesizes over 2GB.</P>
 
 <H2><A NAME="ss21.10">21.10</A> <A HREF="mythtv-HOWTO.html#toc21.10">Automatically starting mythfrontend at system boot time</A>
 </H2>
