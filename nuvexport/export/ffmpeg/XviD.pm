@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2005.02.23 (xris)
+#Last Updated: 2005.03.01 (xris)
 #
 #  export::ffmpeg::XviD
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
@@ -36,10 +36,10 @@ package export::ffmpeg::XviD;
         bless($self, $class);
 
     # Verify any commandline or config file options
-        die "Audio bitrate must be > 0\n" unless (defined $self->val('a_bitrate') && $self->{'a_bitrate'} > 0);
-        die "Video bitrate must be > 0\n" unless (defined $self->val('v_bitrate') && $self->{'v_bitrate'} > 0);
-        die "Width must be > 0\n"         unless (!defined $self->val('width')    || $self->{'width'} =~ /^\s*\D/  || $self->{'width'}  > 0);
-        die "Height must be > 0\n"        unless (!defined $self->val('height')   || $self->{'height'} =~ /^\s*\D/ || $self->{'height'} > 0);
+        die "Audio bitrate must be > 0\n" unless (!defined $self->val('a_bitrate') || $self->{'a_bitrate'} > 0);
+        die "Video bitrate must be > 0\n" unless (!defined $self->val('v_bitrate') || $self->{'v_bitrate'} > 0);
+        die "Width must be > 0\n"         unless (!defined $self->val('width')     || $self->{'width'} =~ /^\s*\D/  || $self->{'width'}  > 0);
+        die "Height must be > 0\n"        unless (!defined $self->val('height')    || $self->{'height'} =~ /^\s*\D/ || $self->{'height'} > 0);
 
     # VBR, multipass, etc.
         if ($self->val('multipass')) {
