@@ -1008,7 +1008,7 @@
     </font>
 
     <font name="grayinfo" face="Arial">
-      <color>#777777</color>
+      <color>#cccccc</color>
       <size>17</size>
       <size:small>10</size:small>
       <shadow>1,1</shadow>
@@ -1956,8 +1956,8 @@
         <fcnfont name="conflict_font" function="conflicting"></fcnfont>
         <columnpadding>5</columnpadding>
         <column number="1" width="170" context="-1"></column>
-        <column number="2" width="130" context="-1"></column>
-        <column number="3" width="450" context="-1"></column>
+        <column number="2" width="145" context="-1"></column>
+        <column number="3" width="435" context="-1"></column>
         <items>11</items>
         <image function="selectionbar" filename="rk-selectbar.png" location="-6,-2"></image>
         <image function="uparrow" filename="uparrow.png" location="755,22"></image>
