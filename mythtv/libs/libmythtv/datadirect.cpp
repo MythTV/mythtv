@@ -278,6 +278,26 @@ bool DDStructureParser::characters(const QString& pchars)
     if (pchars.stripWhiteSpace().isEmpty())
         return true;
 
+    if (currtagname == "message")
+    {
+        if (pchars.contains("expire"))
+        {
+	   QString ExtractDateFromMessage = pchars.right(20);
+           QDateTime EDFM = QDateTime::fromString(ExtractDateFromMessage, Qt::ISODate);
+	   QString ExpirationDate = EDFM.toString(Qt::LocalDate);
+           QString ExpirationDateMessage = "Your subscription expires on " + ExpirationDate;
+           cout << ExpirationDateMessage << endl;
+
+           QSqlQuery query;
+
+           QString querystr = (QString("UPDATE settings SET data ='%1' "
+                              "WHERE value='DataDirectMessage'")
+                              .arg(ExpirationDateMessage));
+           // cout << "querystr is:" << querystr << endl;
+           if (!query.exec(querystr))
+               MythContext::DBError("Updating DataDirect Status Message", query);
+        }
+    }
     if (currtagname == "callSign") 
         curr_station.callsign = pchars;
     else if (currtagname == "name")

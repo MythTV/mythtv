@@ -3097,10 +3097,12 @@ void MainServer::PrintStatus(QSocket *socket)
     dblock.unlock();
 
     QString mfdLastRunStart, mfdLastRunEnd, mfdLastRunStatus;
+    QString DataDirectMessage;
 
     mfdLastRunStart = gContext->GetSetting("mythfilldatabaseLastRunStart");
     mfdLastRunEnd = gContext->GetSetting("mythfilldatabaseLastRunEnd");
     mfdLastRunStatus = gContext->GetSetting("mythfilldatabaseLastRunStatus");
+    DataDirectMessage = gContext->GetSetting("DataDirectMessage");
 
     os << "    Last mythfilldatabase run started on " << mfdLastRunStart
        << " and ";
@@ -3131,6 +3133,9 @@ void MainServer::PrintStatus(QSocket *socket)
     else
         os << "    There's <strong>no guide data</strong> available! "
            << "Have you run mythfilldatabase?";
+
+    if (!DataDirectMessage.isNull())
+        os << "<br />\r\nDataDirect Status: " << DataDirectMessage;
 
     os << "\r\n  </div>\r\n";
 

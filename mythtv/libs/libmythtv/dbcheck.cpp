@@ -8,7 +8,7 @@ using namespace std;
 
 #include "mythcontext.h"
 
-const QString currentDatabaseVersion = "1042";
+const QString currentDatabaseVersion = "1043";
 
 void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -792,6 +792,16 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 };
         performActualUpdate(updates, "1042", dbver);
     }
+
+    if (dbver == "1042")
+    {
+        const QString updates[] = {
+"INSERT INTO settings SET value=\"DataDirectMessage\";",
+""
+};
+        performActualUpdate(updates, "1043", dbver);
+    }
+
 }
 
 void InitializeDatabase(void)
