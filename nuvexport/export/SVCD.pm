@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.09.26 (xris)
+#Last Updated: 2004.10.02 (xris)
 #
 #  export::SVCD
 #  Maintained by Chris Petersen <mythtv@forevermore.net>
@@ -122,7 +122,7 @@ package export::SVCD;
         my $size = ($episode->{'finfo'}{'fps'} =~ /^2(?:5|4\.9)/) ? '480x576' : '480x480';
     # Build the transcode string
         $self->{'transcode_xtra'} = " -y mpeg2enc,mp2enc -Z $size"
-                                   .' -F 5,"-q '.$self->{'quantisation'}.'"'
+                                   .' -F 5,"-q '.$self->{'quantisation'}.'"'    # could add "-M $num_cpus" for multi-cpu here, but it actually seems to slow things down
                                    .' -w '.$self->{'v_bitrate'}
                                    .' -E 44100 -b '.$self->{'a_bitrate'};
     # Add the temporary files that will need to be deleted
@@ -131,7 +131,7 @@ package export::SVCD;
         $self->SUPER::export($episode);
     # Multiplex the streams
         my $safe_outfile = shell_escape($self->{'path'}.'/'.$episode->{'outfile'});
-        $command = "nice -n 19 mplex -f 5 $safe_outfile.m2v $safe_outfile.mpa -o $safe_outfile.mpg";
+        $command = "nice -n $Args{'nice'} mplex -f 5 $safe_outfile.m2v $safe_outfile.mpa -o $safe_outfile.mpg";
         system($command);
     }
 

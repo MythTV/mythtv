@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.09.28 (xris)
+#Last Updated: 2004.10.02 (xris)
 #
 #  nuv_export::shared_utils
 #
@@ -16,7 +16,7 @@ package nuv_export::shared_utils;
 
         our @EXPORT = qw/ &clear &find_program &num_cpus &shell_escape &wrap &system &wipe_tmpfiles
                           @Exporters %Prog %Args %cli_args $DEBUG
-                          $is_child
+                          $num_cpus $is_child
                           @tmpfiles %children
                         /;
     }
@@ -29,6 +29,7 @@ package nuv_export::shared_utils;
     our $is_child = 0;  # This is set to 1 after forking to a new process
     our @tmpfiles;      # Keep track of temporary files, so we can clean them up upon quit
     our %children;      # Keep track of child pid's so we can kill them off if we quit unexpectedly
+    our $num_cpus = 0;  # How many cpu's on this machine?
 
     our $DEBUG;
     $Args{'debug'} = \$DEBUG;
@@ -59,6 +60,14 @@ package nuv_export::shared_utils;
     };
     our $terminal = Term::Cap->Tgetent({OSPEED=>$OSPEED});
 
+# Gather info about how many cpu's this machine has
+    my $cpuinfo = `cat /proc/cpuinfo`;
+    while ($cpuinfo =~ /^processor\s*:\s*\d+/mg) {
+        $num_cpus++;
+    }
+    return $num_cpus;
+
+# Clear the screen
     sub clear {
         print $DEBUG ? "\n" : $terminal->Tputs('cl');
     }
@@ -87,16 +96,6 @@ package nuv_export::shared_utils;
     # Return
         return undef unless ($found{'path'} && $found{'name'});
         return $found{'path'}.'/'.$found{'name'};
-    }
-
-# Queries /proc/cpuinfo to find out how many cpu's are available on this machine
-    sub num_cpus {
-        my $cpuinfo = `cat /proc/cpuinfo`;
-        $num = 0;
-        while ($cpuinfo =~ /^processor\s*:\s*\d+/mg) {
-            $num++;
-        }
-        return $num;
     }
 
 # Escape a parameter for safe use in a commandline call

@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.09.30 (xris)
+#Last Updated: 2004.10.03 (xris)
 #
 #  transcode.pm
 #
@@ -91,10 +91,10 @@ package export::transcode;
         my $mythtranscode = '';
     # Load nuv info
         load_finfo($episode);
-
     # Start the transcode command
-        $transcode = 'nice -n 19 transcode'
-                    .' -V'  # use YV12/I420 instead of RGB, for faster processing
+        $transcode = "nice -n $Args{'nice'} transcode"
+                    .' -V'                     # use YV12/I420 instead of RGB, for faster processing
+                    #.' -u 100,'.($num_cpus);   # Take advantage of multiple CPU's?  currently disabled because it actually seems to slow things down
                     ;
     # Not an mpeg
         unless ($episode->{'finfo'}{'is_mpeg'}) {
@@ -105,7 +105,7 @@ package export::transcode;
                 die "Possibly stale mythtranscode fifo's in /tmp/fifodir_$$/.\nPlease remove them before running nuvexport.\n\n";
             }
         # Here, we have to fork off a copy of mythtranscode (no need to use --fifosync with transcode -- it seems to do this on its own)
-            $mythtranscode = "nice -n 19 mythtranscode --showprogress -p autodetect -c $episode->{channel} -s $episode->{start_time_sep} -f \"/tmp/fifodir_$$/\"";
+            $mythtranscode = "nice -n $Args{'nice'} mythtranscode --showprogress -p autodetect -c $episode->{'channel'} -s $episode->{'start_time_sep'} -f \"/tmp/fifodir_$$/\"";
             # let transcode handle the cutlist -- got too annoyed with the first/last frame(s) showing up no matter what I told mythtranscode
             #$mythtranscode .= ' --honorcutlist' if ($self->{'use_cutlist'});
         }

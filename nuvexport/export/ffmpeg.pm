@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.09.27 (xris)
+#Last Updated: 2004.10.02 (xris)
 #
 #  ffmpeg.pm
 #
@@ -83,7 +83,7 @@ package export::ffmpeg;
         }
 
     # Here, we have to fork off a copy of mythtranscode (no need to use --fifosync with transcode -- it seems to do this on its own)
-        $mythtranscode = "nice -n 19 mythtranscode --showprogress -p autodetect -c $episode->{channel} -s $episode->{start_time_sep} -f \"/tmp/fifodir_$$/\"";
+        $mythtranscode = "nice -n $Args{'nice'} mythtranscode --showprogress -p autodetect -c $episode->{channel} -s $episode->{start_time_sep} -f \"/tmp/fifodir_$$/\"";
         $mythtranscode .= ' --honorcutlist' if ($self->{use_cutlist});
 
         my $videofifo = "/tmp/fifodir_$$/vidout";
@@ -101,12 +101,12 @@ package export::ffmpeg;
         else {
         # Do noise reduction
             if ($self->{'noise_reduction'}) {
-                $ffmpeg .= "nice -n 19 ffmpeg -f rawvideo ";
+                $ffmpeg .= "nice -n $Args{'nice'} ffmpeg -f rawvideo ";
                 $ffmpeg .= "-s " . $episode->{'finfo'}{'width'} . "x" . $episode->{'finfo'}{'height'};
                 $ffmpeg .= " -r " . $episode->{'finfo'}{'fps'};
                 $ffmpeg .= " -i /tmp/fifodir_$$/vidout -f yuv4mpegpipe -";
                 $ffmpeg .= " 2> /dev/null | ";
-                $ffmpeg .= "nice -n 19 yuvdenoise -F -r 16";
+                $ffmpeg .= "nice -n $Args{'nice'} yuvdenoise -F -r 16";
 #            $ffmpeg .= " -b $cropw,$croph,-$cropw,-$croph" if( $cropw || $croph );
                 $ffmpeg .= " 2> /dev/null | ";
                 $videofifo = "-";
@@ -115,7 +115,7 @@ package export::ffmpeg;
         }
 
     # Start the ffmpeg command
-        $ffmpeg .= "nice -n 19 ffmpeg -y -f s16le";
+        $ffmpeg .= "nice -n $Args{'nice'} ffmpeg -y -f s16le";
         $ffmpeg .= " -ar " . $episode->{'finfo'}{'audio_sample_rate'};
         $ffmpeg .= " -ac " . $episode->{'finfo'}{'audio_channels'};
         $ffmpeg .= " -i /tmp/fifodir_$$/audout";

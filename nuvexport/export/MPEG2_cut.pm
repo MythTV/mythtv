@@ -47,7 +47,8 @@ package export::MPEG2_cut;
 
     sub gather_settings {
         my $self    = shift;
-    # No parameters to setup
+    # Load the parent module's settings
+        $self->{'path'} = query_savepath();
     }
 
     sub export {

@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.09.27 (xris)
+#Last Updated: 2004.10.02 (xris)
 #
 #   nuvexport::ui
 #
@@ -41,6 +41,8 @@ package nuv_export::ui;
 
     $cli_args{'noserver|no-server'}     = 1; # Don't talk to the server -- do all encodes here in this execution
 
+    $cli_args{'nice=i'}              = 1; # Set the value of "nice" for subprocesses
+
 # Load the commandline options
     $cli_args{'help'}  = 1;
     $cli_args{'debug'} = 1;
@@ -51,7 +53,15 @@ package nuv_export::ui;
 
 # Load the commandline arguments
     sub load_cli_args {
-        GetOptions(\%Args, keys %cli_args);
+        die "Invalid commandline parameter(s).\n" unless GetOptions(\%Args, keys %cli_args);
+    # Make sure nice is defined
+        if (defined($Args{'nice'})) {
+            die "--nice must be between -20 (highest priority) and 19 (lowest)\n" if (int($Args{'nice'}) != $Args{'nice'} || $Args{'nice'} > 19 || $Args{'nice'} < -20);
+            $Args{'nice'} = int($Args{'nice'});
+        }
+        else {
+            $Args{'nice'} = 19;
+        }
     }
 
 # Load episodes from the commandline

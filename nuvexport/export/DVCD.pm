@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.09.26 (xris)
+#Last Updated: 2004.10.02 (xris)
 #
 #  export::DVCD
 #  Maintained by Gavin Hurlbut <gjhurlbu@gmail.com>
@@ -64,7 +64,7 @@ package export::DVCD;
         $self->SUPER::export($episode);
     # Multiplex the streams
         my $safe_outfile = shell_escape($self->{'path'}.'/'.$episode->{'outfile'});
-        $command = "nice -n 19 mplex -f 1 $safe_outfile.m1v $safe_outfile.mpa -o $safe_outfile.mpg";
+        $command = "nice -n $Args{'nice'} mplex -f 1 $safe_outfile.m1v $safe_outfile.mpa -o $safe_outfile.mpg";
         system($command);
     }
 

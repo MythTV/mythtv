@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-#Last Updated: 2004.09.26 (xris)
+#Last Updated: 2004.10.02 (xris)
 #
 #  generic.pm
 #
@@ -77,7 +77,7 @@ package export::generic;
                 next unless (length $data > 0);
             # Convert CR's to linefeeds so the data will flush properly
                 $data =~ tr/\r/\n/s;
-            # Some magic so that we only send whole lines (which helps us do 
+            # Some magic so that we only send whole lines (which helps us do
             # nonblocking reads on the other end)
                 substr($data, 0, 0) = $buffer;
                 $buffer  = '';
