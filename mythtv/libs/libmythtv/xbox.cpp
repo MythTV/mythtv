@@ -36,6 +36,9 @@ void XBox::GetSettings(void)
 
 void XBox::CheckRec(void)
 {
+    if (gContext->IsDoingNetworkStuff())
+        return;
+
     bool recording = RemoteIsRecording();
 
     QString color = (recording) ? RecordingLED : DefaultLED;

@@ -940,12 +940,30 @@ list<ProgramInfo *> *Scheduler::CopyList(list<ProgramInfo *> *sourcelist)
 
             if (!placed)
             {
-                second->inputid = sourceToInput[first->sourceid][0];
-                second->cardid = inputToCard[second->inputid];
+                if (numinputs > 0)
+                {
+                    second->inputid = sourceToInput[first->sourceid][0];
+                    second->cardid = inputToCard[second->inputid];
+                }
+                else
+                {
+                    cerr << "Source: " << first->sourceid << " is not attached"
+                         << " to an input on a capture card.\n";
+                    cerr << "Unable to schedule:\n";
+                    cerr << first->title.leftJustify(22, ' ', true)
+                         << first->chanstr.rightJustify(4, ' ') << "  " 
+                         << first->chanid 
+                         << first->startts.toString("  MMM dd hh:mmap  ")
+                         << endl;
+                    cerr << " for recording.  It will be removed.";
+                    delete second;
+                    second = NULL;
+                }
             }
         }
 
-        retlist->push_back(second);
+        if (second)
+            retlist->push_back(second);
     }
 
     return retlist;

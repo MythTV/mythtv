@@ -158,6 +158,9 @@ class MythContext : public QObject
 
     bool TestPopupVersion(const QString &name, const QString &libversion,
                           const QString &pluginversion);
+
+    bool IsDoingNetworkStuff(void) { return expectingReply; }
+
   private slots:
     void readSocket();
 
