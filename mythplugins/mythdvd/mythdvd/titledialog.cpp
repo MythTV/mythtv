@@ -175,8 +175,20 @@ void TitleDialog::viewTitle()
         return;
     }
     
+    QString title_string = which_button->name();
+    int which_title = title_string.toInt() - 1;
+    
+    DVDTitleInfo *title_in_question = dvd_titles->at(which_title);
+    
+    int audio_track = 1;
+    if(title_in_question)
+    {
+        audio_track = title_in_question->getAudio();
+    }
+    
     player_string = player_string.replace(QRegExp("%d"), dvd_device);
     player_string = player_string.replace(QRegExp("%t"), which_button->name());
+    player_string = player_string.replace(QRegExp("%a"), QString("%1").arg(audio_track));
     system(player_string);
 }
 

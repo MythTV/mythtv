@@ -40,7 +40,7 @@ DVDTitleInfo::DVDTitleInfo()
 
     is_selected = false;
     selected_quality = 0;
-    selected_audio = 0;
+    selected_audio = 1;
     name = "";
 }
 
