@@ -171,6 +171,9 @@ void MergeCommList(QMap<long long, int> &commMap, double fps,
     for (it = commMap.begin(); it != commMap.end(); ++it)
         commBreakMap[it.key()] = it.data();
 
+    if (commMap.isEmpty() || commBreakMap.isEmpty())
+        return;
+
     it = commMap.begin();
     prev = it;
     it++;
