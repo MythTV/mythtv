@@ -2,19 +2,18 @@
 .Dd Sept 26, 2004 
 .ds volume-operating-system NuvExport
 .Os NUVEXPORT
-.Dt NUVEXPORT-XVID 1 1
+.Dt NUVEXPORT-VCD 1 1
 .Sh NAME
-.Nm nuvexport-xvid
-.Nd export nuv files created by mythtv to xvid
+.Nm nuvexport-vcd
+.Nd export nuv files created by mythtv to vcd compliand mpeg files
 .Sh SYNOPSIS
 .Nm
 
 .Sh DESCRIPTION
 .Nm
-is a perl script built to assist in exporting .NUV files from mythtv into xvid directly, it runs nuvexport using the xvid export option
+is a perl script built to assist in exporting .NUV files from mythtv into vcd directly, it runs nuvexport using the vcd export option
 
-The output is a Xvid encoded AVI file with MP3 audio.
-
+The output is a VCD compliant .mpg file
 .Sh OPTIONS
 .Nm
 takes all the same options as nuvexport, except for the --mode option
@@ -25,7 +24,7 @@ See nuvexport's main manpage for the general usage of the program, this manpage 
 exporter
 
 .Bd -literal
-The following are all the questions that are asked as part of the encode process for the most part, the defaults should work well.
+The following are all the questions that are asked as part of the encode process for the most part, the defaults should work well.  VCD requires these options to stay standard.
 
 Where would you like to export the files to? [.]
     This is where you would like to export the files to
@@ -43,26 +42,6 @@ Enable deinterlacing? [Yes]
     outputs, and does not render well on a standard monitor
 Crop broadcast overscan (2% border)? [Yes]
     Removes the border around the video to clean up the recording.
-Audio bitrate? [128]
-    Sets the bitrate of the audio. Default is almost always safe 
-    for this option.
-Variable bitrate video? [Yes]
-    Allows the bitrate to vary inside of the transcode, this is useful 
-    to keep the file size down, but may cause problems with some 
-    media players.
-Multi-pass (slower, but better quality)? [No]
-    Reencodes each frame multiple times and average the frames to give 
-    a better picture.  As reported, this will take more time, but 
-    should give better result, especially on noisy video. 
-VBR quality/quantisation (1-31)? [6]
-    Quantisation  controls  the
-    Quantisation controls the precision with which image information is 
-    encoded.  The lower the number the higher the quality but the greater 
-    the required data-rate. (See mpeg2enc webpage for more details - option
-    -q )
-Width? [624]
-Height? [468]
-    Sets with Width and Height of the output file.
 .Ed 
 
 .Sh DIAGNOSTICS
