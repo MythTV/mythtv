@@ -381,9 +381,9 @@ class UIListType : public UIType
     int GetCurrentItem() { return m_current; }
     int GetItems() { return m_count; }
     QString GetItemText(int, int col = 1);
-    void ResetList() { listData.clear(); forceFonts.clear();
+    void ResetList() { listData.clear(); forceFonts.clear(); listArrows.clear();
                        m_current = -1; m_columns = 0; }
-
+    void ResetArrows() { listArrows.clear(); }
     void Draw(QPainter *, int drawlayer, int);
     bool ShowSelAlways() const { return m_showSelAlways; }
     void ShowSelAlways(bool bnew) { m_showSelAlways = bnew; }

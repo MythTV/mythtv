@@ -121,7 +121,7 @@ void RecOptDialog::keyPressEvent(QKeyEvent *e)
         if (action == "ESCAPE")
         {
             if (!listMenu.goBack())
-                done(MythDialog::Accepted);
+                done(MythDialog::Rejected );
         }
         else if (!listMenu.getLocked())
         {
