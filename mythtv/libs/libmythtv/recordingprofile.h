@@ -87,10 +87,10 @@ public:
         ConfigurationGroup* params = new VerticalConfigurationGroup();
         params->setLabel("MP3");
         params->addChild(new MP3Quality(parent));
-        addTrigger("MP3", params);
+        addTarget("MP3", params);
         codecName->addSelection("MP3");
 
-        addTrigger("Uncompressed", new VerticalConfigurationGroup());
+        addTarget("Uncompressed", new VerticalConfigurationGroup());
         codecName->addSelection("Uncompressed");
     };
 };
@@ -209,66 +209,7 @@ public:
 class VideoCompressionSettings: public VerticalConfigurationGroup,
                                 public TriggeredConfigurationGroup {
 public:
-    VideoCompressionSettings(const RecordingProfile& parent) {
-
-        setName("Video Compression");
-
-        VideoCodecName* codecName = new VideoCodecName(parent);
-        addChild(codecName);
-        setTrigger(codecName);
-
-        ConfigurationGroup* allParams = new VerticalConfigurationGroup();
-        allParams->setLabel("RTjpeg");
-
-        ConfigurationGroup* params = new VerticalConfigurationGroup();
-        params->setLabel("Parameters");
-        params->addChild(new RTjpegQuality(parent));
-
-        allParams->addChild(params);
-
-        params = new VerticalConfigurationGroup();
-        params->setLabel("Advanced parameters");
-        params->addChild(new RTjpegLumaFilter(parent));
-        params->addChild(new RTjpegChromaFilter(parent));
-
-        allParams->addChild(params);
-
-        addTrigger("RTjpeg", allParams);
-        codecName->addSelection("RTjpeg");
-
-        allParams = new VerticalConfigurationGroup();
-        allParams->setLabel("MPEG-4");
-
-        params = new VerticalConfigurationGroup();
-        params->setLabel("Parameters");
-        params->addChild(new MPEG4bitrate(parent));
-
-        allParams->addChild(params);
-
-        params = new VerticalConfigurationGroup();
-        params->setLabel("Advanced parameters");
-        params->addChild(new MPEG4MaxQuality(parent));
-        params->addChild(new MPEG4MinQuality(parent));
-        params->addChild(new MPEG4QualDiff(parent));
-        params->addChild(new MPEG4ScaleBitrate(parent));
-
-        allParams->addChild(params);
-
-        addTrigger("MPEG-4", allParams);
-        codecName->addSelection("MPEG-4");
-
-        allParams = new VerticalConfigurationGroup();
-        allParams->setLabel("Hardware MJPEG");
-
-        params = new VerticalConfigurationGroup();
-        params->addChild(new HardwareMJPEGQuality(parent));
-        params->addChild(new HardwareMJPEGDecimation(parent));
-
-        allParams->addChild(params);
-
-        addTrigger("Hardware MJPEG", allParams);
-        codecName->addSelection("Hardware MJPEG");
-    };
+    VideoCompressionSettings(const RecordingProfile& parent);
 };
 
 class ImageSize: public HorizontalConfigurationGroup {

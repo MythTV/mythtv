@@ -27,6 +27,40 @@
 
 #include "mythcontext.h"
 
+ConfigurationGroup::~ConfigurationGroup()  {
+    for(childList::iterator i = children.begin() ;
+        i != children.end() ;
+        ++i )
+        delete *i;
+}
+
+Setting* ConfigurationGroup::byName(QString name) {
+    for(childList::iterator i = children.begin() ;
+        i != children.end() ;
+        ++i ) {
+        
+        Setting* c = (*i)->byName(name);
+        if (c != NULL)
+            return c;
+    }
+    
+    return NULL;
+}
+
+void ConfigurationGroup::load(QSqlDatabase* db) {
+    for(childList::iterator i = children.begin() ;
+        i != children.end() ;
+        ++i )
+        (*i)->load(db);
+}
+
+void ConfigurationGroup::save(QSqlDatabase* db) {
+    for(childList::iterator i = children.begin() ;
+        i != children.end() ;
+        ++i )
+        (*i)->save(db);
+}
+
 QWidget* VerticalConfigurationGroup::configWidget(QWidget* parent,
                                                   const char* widgetName) {
     
@@ -94,6 +128,54 @@ void StackedConfigurationGroup::raise(Configurable* child) {
             return;
         }
     cout << "BUG: StackedConfigurationGroup::raise(): unrecognized child " << child << " on setting " << getName() << '/' << getLabel() << endl;
+}
+
+void TriggeredConfigurationGroup::setTrigger(Configurable* _trigger) {
+    trigger = _trigger;
+    // Make sure the stack is after the trigger
+    addChild(configStack = new StackedConfigurationGroup());
+
+    connect(trigger, SIGNAL(valueChanged(const QString&)),
+            this, SLOT(triggerChanged(const QString&)));
+}
+
+void TriggeredConfigurationGroup::addTarget(QString triggerValue, Configurable* target) {
+    configStack->addChild(target);
+    triggerMap[triggerValue] = target;
+}
+
+void StringSelectSetting::addSelection(const QString& label, QString value, bool select) {
+    if (value == QString::null)
+        value = label;
+    
+    labels.push_back(label);
+    values.push_back(value);
+    
+    emit selectionAdded(label, value);
+    
+    if (select || !isSet)
+        setValue(value);
+}
+
+void StringSelectSetting::clearSelections(void) {
+    labels.clear();
+    values.clear();
+    isSet = false;
+}
+
+void StringSelectSetting::setValue(const QString& newValue)  {
+    bool found = false;
+    for(unsigned i = 0 ; i < values.size() ; ++i)
+        if (values[i] == newValue) {
+            current = i;
+            found = true;
+            isSet = true;
+            break;
+        }
+    if (found)
+        Setting::setValue(newValue);
+    else
+        addSelection(newValue, newValue, true);
 }
 
 QWidget* LineEditSetting::configWidget(QWidget* parent,

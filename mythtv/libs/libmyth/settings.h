@@ -78,44 +78,18 @@ protected:
 
 class ConfigurationGroup: virtual public Configurable {
 public:
-    virtual ~ConfigurationGroup() {
-        for(childList::iterator i = children.begin() ;
-            i != children.end() ;
-            ++i )
-            delete *i;
-    };
+    virtual ~ConfigurationGroup();
 
 
     void addChild(Configurable* child) {
         children.push_back(child);
     };
 
-    virtual Setting* byName(QString name) {
-        for(childList::iterator i = children.begin() ;
-            i != children.end() ;
-            ++i ) {
+    virtual Setting* byName(QString name);
 
-            Setting* c = (*i)->byName(name);
-            if (c != NULL)
-                return c;
-        }
+    virtual void load(QSqlDatabase* db);
 
-        return NULL;
-    }
-
-    virtual void load(QSqlDatabase* db) {
-        for(childList::iterator i = children.begin() ;
-            i != children.end() ;
-            ++i )
-            (*i)->load(db);
-    };
-
-    virtual void save(QSqlDatabase* db) {
-        for(childList::iterator i = children.begin() ;
-            i != children.end() ;
-            ++i )
-            (*i)->save(db);
-    };
+    virtual void save(QSqlDatabase* db);
 
 protected:
     typedef vector<Configurable*> childList;
@@ -247,45 +221,16 @@ protected:
 public:
     virtual void addSelection(const QString& label,
                               QString value=QString::null,
-                              bool select=false) {
+                              bool select=false);
 
-        if (value == QString::null)
-            value = label;
-
-        labels.push_back(label);
-        values.push_back(value);
-
-        emit selectionAdded(label, value);
-
-        if (select || !isSet)
-            setValue(value);
-    };
-
-    virtual void clearSelections(void) {
-        labels.clear();
-        values.clear();
-        isSet = false;
-    };
+    virtual void clearSelections(void);
 
 signals:
     void selectionAdded(const QString& label, QString value);
 
 public slots:
 
-    virtual void setValue(const QString& newValue) {
-        bool found = false;
-        for(unsigned i = 0 ; i < values.size() ; ++i)
-            if (values[i] == newValue) {
-                current = i;
-                found = true;
-                isSet = true;
-                break;
-            }
-        if (found)
-            Setting::setValue(newValue);
-        else
-            addSelection(newValue, newValue, true);
-    }
+    virtual void setValue(const QString& newValue);
 
     virtual void setValue(int which) {
         setValue(values[which]);
@@ -369,19 +314,9 @@ public:
         trigger = configStack = NULL;
     };
 
-    void setTrigger(Configurable* _trigger) {
-        trigger = _trigger;
-        // Make sure the stack is after the trigger
-        addChild(configStack = new StackedConfigurationGroup());
+    void setTrigger(Configurable* _trigger);
 
-        connect(trigger, SIGNAL(valueChanged(const QString&)),
-                this, SLOT(triggerChanged(const QString&)));
-    };
-
-    void addTrigger(QString triggerValue, Configurable* target) {
-        configStack->addChild(target);
-        triggerMap[triggerValue] = target;
-    };
+    void addTarget(QString triggerValue, Configurable* target);
 
 protected slots:
     virtual void triggerChanged(const QString& value) {
