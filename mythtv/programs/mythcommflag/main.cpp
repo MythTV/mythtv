@@ -499,7 +499,7 @@ int main(int argc, char *argv[])
                     "-s OR --starttime starttime  Flag recording with given starttime" << endl <<
                     "-f OR --file filename        Flag recording with specific filename" << endl <<
                     "--video filename             Rebuild the seektable for a video (non-recording) file" << endl <<
-                    "--sleep                      Give up some cpu time after processing" << endl <<
+                    "--sleep                      Give up some CPU time after processing" << endl <<
                     "--rebuild                    Do not flag commercials, just rebuild seektable" << endl <<
                     "                             each frame." << endl <<
                     "-v OR --verbose debug-level  Prints more information" << endl <<
@@ -507,7 +507,7 @@ int main(int argc, char *argv[])
                     "                             of all,none,quiet,record,playback," << endl <<
                     "                             channel,osd,file,schedule,network,commflag" << endl <<
                     "--quiet                      Turn OFF display (also causes the program to" << endl <<
-                    "                             sleep a little every frame so it doesn't hog cpu)" << endl <<
+                    "                             sleep a little every frame so it doesn't hog CPU)" << endl <<
                     "                             (takes precedence over --blanks if given first)" << endl <<
                     "--blanks                     Show list of blank frames if already in database" << endl <<
                     "                             (takes precedence over --quiet if given first)" << endl <<
@@ -520,7 +520,7 @@ int main(int argc, char *argv[])
                     "--force                      Force flagging of a video even if mythcommflag" << endl <<
                     "                             thinks it is already in use by another instance." << endl <<
                     "--hogcpu                     Do not nice the flagging process." << endl <<
-                    "                             WARNING: This will consume all free cpu time." << endl <<
+                    "                             WARNING: This will consume all free CPU time." << endl <<
                     "-h OR --help                 This text" << endl << endl <<
                     "Note: both --chanid and --starttime must be used together" << endl <<
                     "      if either is used." << endl << endl <<
@@ -553,7 +553,7 @@ int main(int argc, char *argv[])
         exit(12);
     }
 
-    // be nice to other programs since FlagCommercials() can consume 100% cpu
+    // be nice to other programs since FlagCommercials() can consume 100% CPU
     if (be_nice)
         nice(19);
 
