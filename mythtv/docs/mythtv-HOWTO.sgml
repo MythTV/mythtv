@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-09-18, v2.76
+<date>2003-09-18, v2.77
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1528,6 +1528,12 @@ id="completing_lirc_install" name="Completing the lirc install"> section.
 See the contrib/mandrake91.etc.sysconfig.lircd file for an example of how to
 configure lircd.
 
+<bf>NOTE</bf>:  If you wish to use the remote control that comes with the
+Hauppauge PVR-250/350 cards, you will need to run the lirc 0.7.0pre2 code. 
+See the example installation in the "I'd like to use the remote that came
+with my Hauppauge PVR-250 and use MythTV's native LIRC support." <ref
+id="hauppauge_remote" name="section">.
+
 Some IR devices require a kernel recompile, and some don't. However, all at
 least require having the kernel source available as a resource for the lirc
 build process. 
@@ -1801,7 +1807,9 @@ maps the buttons on the remote control to the IR pulses coming from the
 receiver.
 
 The next step is to convert those signals into something that can be used
-to control MythTV.
+to control MythTV.  MythTV now inclues native support for lirc and can
+interact directly with 
+
 <tscreen><verb>
 $ cd ~/mythtv-0.11/configfiles
 $ cp lircrc.example ~/.lircrc
@@ -1821,19 +1829,20 @@ to troubleshoot further by going back to the lirc home page and investigating
 from there.
 
 If it is working, then press <bf>CTRL-C</bf> to abort the program.  Once you
-know that your remote is working, you need to run the <bf>irxevent</bf>
-program, which takes the key presses and sends them to MythTV. 
-<bf>irxevent</bf>
-isn't a daemon, so if you know that your remote is working you need to
-invoke it like this: 
+know that your remote is working, you can either recompile MythTV with
+native lirc support (edit the <tt>settings.pro</tt> file and remove the "#"
+from the lirc option, then make <tt>distclean</tt> and <tt>make</tt>) or you
+need to run the <bf>irxevent</bf> program, which takes the key presses and
+sends them to MythTV.  If you use native lirc support, you don't need to run
+<bf>irxevent</bf>.  If you are going to use irxevent, then you need to run
+it like this:
 <tscreen><verb>
 $ irxevent &
 </verb></tscreen>
 If <bf>irxevent</bf> isn't running, then MythTV will not respond to your remote
-control.
+control unless you're using native lirc support.
 
 <sect1>Additional information for lirc.
-
 <p>Take a look at the lircrc.example files in the <tt>configfiles/</tt>
 directory.  In my case, (Pinnacle Studio card) the channel up and down functions
 weren't working, due to the fact that the button names were different than
@@ -3899,6 +3908,7 @@ Add the following to <tt>/etc/modules.conf</tt>:
 <tscreen><verb>
 alias char-major-81     videodev
 alias char-major-81-0   ivtv
+alias char-major-61 lirc_i2c
 options ivtv debug=1
 options tuner type=2
 options msp3400 once=1 simple=1
@@ -4019,6 +4029,182 @@ To turn off DNR, add the following to your <tt>rc.local</tt>:
 <tscreen><verb>
 /path/to/ivtv/utils/test_ioctl --set-codec-params=dnr_mode=0,dnr_temporal=0
 </verb></tscreen>
+
+<sect1>I'd like to use the remote that came with my Hauppauge PVR-250 and
+use MythTV's native LIRC support.
+<label id="hauppauge_remote">
+<p><bf>NOTE</bf>:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS
+NOT GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR LIRC DRIVER ASSISTANCE,
+SEE THE LIRC MAILING LIST.  <url
+url="http://lists.sourceforge.net/lists/listinfo/lirc-list"
+name="http://lists.sourceforge.net/lists/listinfo/lirc-list">
+
+These instructions work for Mandrake 9.2 on a frontend machine which is
+hosting a single PVR-250 capture card using MythTV's native LIRC support.
+
+First, you need to ensure that you've installed the kernel source
+appropriate for the kernel that you're running.  In this case, we're using
+kernel 2.4.22-9, so when installing the kernel-source ensure that you've got
+the correct version.
+
+<tscreen><verb>
+$ su
+# uname -a
+Linux frontend 2.4.22-9mdk #1 sam sep 13 06:54:11 CEST 2003 i686 unknown
+unknown GNU/Linux
+# rpm -qa|grep kernel-source
+kernel-source-2.4.22-9mdk
+</verb></tscreen>
+
+Next, you need to remove the kernel modules for LIRC that Mandrake has
+packaged for you.  They won't work, and will cause problems later.
+
+<tscreen><verb>
+# rm -rf /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc
+</verb></tscreen>
+
+If you've already installed LIRC from the Mandrake packages, it's going to
+be version 0.6.6, and that won't work.  Uninstall it:
+<tscreen><verb>
+$ su
+# urpme lirc lirc-remotes liblirc-devel
+# rm -rf /dev/lirc*
+# exit
+</verb></tscreen>
+
+Download the lirc-0.7.0pre2 tarball:
+<tscreen><verb>
+$ wget http://lirc.sourceforge.net/software/snapshots/lirc-0.7.0pre2.tar.bz2
+$ tar -xjf lirc-0.7.0pre2.tar.bz2
+</verb></tscreen>
+
+Mandrake now includes i2c version 2.8.0 which changes the semantics of some
+low-level calls.  You will need to patch LIRC in order for it to work
+correctly.  Download the patch and install:
+<tscreen><verb>
+$ cd lirc-0.7.0pre2
+$ wget http://delvare.free.fr/i2c/other/lirc-CVS-i2c-2.8.0.patch
+$ patch -p1 < lirc-CVS-i2c-2.8.0.patch
+</verb></tscreen>
+
+Next, run the LIRC setup program:
+<tscreen><verb>
+$ ./setup.sh
+</verb></tscreen>
+
+Select "1" (Driver configuration), then scroll down to "5" (TV Card), press
+ENTER, then scroll down to "f" (Hauppauge TV card) and press ENTER again. 
+Once back at the main menu, press "3" for Save and run configure.
+
+If your build environment is ready, LIRC will create a Makefile for you. 
+Switch to root and compile:
+<tscreen><verb>
+$ su
+# make
+# make install
+</verb></tscreen>
+
+As a part of the <tt>make install</tt> process, LIRC will create the
+appropriate device for you in <tt>/dev</tt>.  Check to make sure:
+<tscreen><verb>
+$ ls -l /dev/lirc*
+crw-r--r--    1 root     root      61,   0 Sep 18 15:36 /dev/lirc
+srw-rw-rw-    1 root     root            0 Sep 18 15:38 /dev/lircd=
+</verb></tscreen>
+
+Your <tt>modules.conf</tt> file should have already been modified if you've
+followed the instructions above for installing the PVR-250. 
+<bf>modprobe</bf> the lirc_i2c driver, run the <bf>lircd</bf> program and
+then check your <tt>/var/log/messages</tt> and <tt>/var/log/lircd</tt>
+files.
+<tscreen><verb>
+$ su
+# modprobe lirc_i2c
+# lsmod
+Module                  Size  Used by    Not tainted
+lirc_i2c                5124   0
+lirc_dev               10096   1  [lirc_i2c]
+...
+# lircd
+# tail /var/log/messages
+Sep 18 15:38:26 frontend kernel: lirc_i2c: chip found @ 0x18 (Hauppauge IR)
+Sep 18 15:38:26 frontend kernel: lirc_dev: lirc_register_plugin:sample_rate:
+10
+...
+# tail /var/log/lircd
+Sep 18 15:24:52 frontend lircd 0.7.0pre2: lircd(hauppauge) ready
+</verb></tscreen>
+
+To check that your remote is working correctly, run the <bf>irw</bf> program
+and start pressing buttons.  If nothing is happening, you must begin
+troubleshooting.  Things to check:
+<itemize>
+<item>Are there batteries in the remote?  
+<item>Does the remote work?  You may be able to see the
+flashes of IR coming from the remote if you look at it with a video camera.
+<item>Is the IR dongle cable plugged in?
+<item>Did you remove all of the old LIRC device drivers?  Run "updatedb" as
+root, then "locate lirc_i2c".  The only lirc_i2c should be the one in the
+misc/ directory for your kernel version.
+<item>Did you run depmod?
+<item>Is your modules.conf setup correctly?
+<item>Did you modprobe lirc_i2c?
+<item>Did you run lircd?
+<item>Do you have an /etc/lircd.conf?
+<item>Is /dev/lirc a character mode file, major 61, minor 0?  Is it readable
+by all groups?
+<item>If you think you may have had old LIRC device drivers you may need to
+reboot to ensure that they're totally out of the system.  Try running
+modprobe -r lirc_i2c as root first, then modprobe lirc_i2c and try again.
+</itemize>
+
+If none of the above works, and <bf>irw</bf> still isn't showing keypresses,
+then you will need to ask your question on the LIRC list.
+
+Assuming that <bf>irw</bf> is showing keypresses, you can continue:
+To enable native LIRC support within MythTV, you will need to modify your
+<tt>settings.pro</tt> file and recompile.  Your <tt>settings.pro</tt> should
+look like this:
+<tscreen><verb>
+# Native lirc support
+CONFIG += using_lirc
+EXTRA_LIBS += -llirc_client
+</verb></tscreen>
+
+Recompile and install:
+<tscreen><verb>
+$ make distclean; make
+$ su
+# make install
+</verb></tscreen>
+
+If you're not using native LIRC support, ensure that the button names that
+come up with <bf>irw</bf> match the ones in the <tt>.lircrc</tt> file in
+your home directory.  Note that if you are not using native LIRC support,
+the <tt>.lircrc</tt> file is in your home directory and has a "." as the first
+character.
+
+Since we're using native LIRC support within MythTV, copy the
+<tt>configfiles/hauppauge-lircrc-nativelirc</tt> file into your
+<tt>.mythtv/</tt> directory and call it <tt>lircrc</tt>.  It has a slightly
+different format than what you would use if you were using
+<bf>irxevent</bf>.  Also note that it is in your <tt>.mythtv</tt> directory
+and does <em>not</em> have a "." in the filename.  
+
+<tscreen><verb>
+$ cp configfiles/hauppauge-lircrc-nativelirc ~/.mythtv/lircrc
+</verb></tscreen>
+
+Add the commands to load the LIRC device drivers and start <bf>lircd</bf> to
+your <tt>rc.local</tt>:
+<tscreen><verb>
+$ su
+# echo "modprobe lirc_i2c" >> /etc/rc.d/rc.local
+# echo "lircd" >> /etc/rc.d/rc.local
+# exit
+</verb></tscreen>
+
+You should now have native LIRC support within MythTV.
 
 <sect1>I'd like to use NFS.
 <p>You may want to use a central server to store your files.  
@@ -4576,6 +4762,10 @@ PVR-250 troubleshooting.
 v2.75, 2003-09-17.  Don't connect line level stuff to the mic input.  Bad
 things can happen. Holger.Beetz at debitel.net
 v2.76, 2003-09-18.  Add a check for "Am I running the correct msp3400"?
+v2.77, 2003-09-18.  Add a check for lirc_i2c and lirc_dev in unusual places. 
+Stupid Mandrake.  Add section for lirc-0.7.0/Hauppauge remotes.  Discuss
+native lirc support.  Start thinking about a re-write of the lirc section -
+it's confusing.
 -->
 
 <!--

@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-09-18, v2.76
+  2003-09-18, v2.77
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -194,19 +194,21 @@
      20.8 btaudio
      20.9 Removing unwanted channels.
      20.10 I'd like to use a hardware MPEG-2 encoder (ie, a PVR-250/350).
-     20.11 I'd like to use NFS.
-     20.12 I'd like to automatically start mythbackend at system boot time.
-        20.12.1 Red Hat And Mandrake
-           20.12.1.1 Log files
-           20.12.1.2 Mandrake 9.x
-        20.12.2 Gentoo
-     20.13 Advanced Backend Configurations.
-     20.14 Advanced Partition Formatting.
-        20.14.1 Ext3
-     20.15 I'd like to have more flexible disk storage with LVM.
-        20.15.1 ReiserFS
-        20.15.2 ext2 or ext3
-     20.16 What is this transcoder thing, and how do I use it?
+     20.11 I'd like to use the remote that came with my Hauppauge PVR-250 and use MythTV's native LIRC support.
+     20.12 I'd like to use NFS.
+     20.13 I'd like to automatically start mythbackend at system boot time.
+        20.13.1 Red Hat And Mandrake
+           20.13.1.1 Log files
+           20.13.1.2 Mandrake 9.x
+        20.13.2 Gentoo
+     20.14 Advanced Backend Configurations.
+     20.15 Advanced Partition Formatting.
+        20.15.1 Ext3
+     20.16 I'd like to have more flexible disk storage with LVM.
+        20.16.1 ReiserFS
+        20.16.2 ext2 or ext3
+     20.17 What is this transcoder thing, and how do I use it?
+
 
 
   ______________________________________________________________________
@@ -277,6 +279,7 @@
 
   +o  Red Hat Linux 8.0 documentation: Cedar McKay,
      <mailto:mythhowto.3.ohthetrees@spamgourmet.com>
+
   +o  Gentoo documentation and package: Tony Clark,
      <mailto:tclark@telia.com>
 
@@ -404,7 +407,6 @@
   with almost no CPU impact.
 
   See the Troubleshooting ``section'' for more information.
-
 
 
   [1m3.1.4.  Filesystems[0m
@@ -2042,6 +2044,12 @@
   install'' section.  See the contrib/mandrake91.etc.sysconfig.lircd
   file for an example of how to configure lircd.
 
+  [1mNOTE[22m:  If you wish to use the remote control that comes with the
+  Hauppauge PVR-250/350 cards, you will need to run the lirc 0.7.0pre2
+  code.  See the example installation in the "I'd like to use the remote
+  that came with my Hauppauge PVR-250 and use MythTV's native LIRC
+  support." ``section''.
+
   Some IR devices require a kernel recompile, and some don't. However,
   all at least require having the kernel source available as a resource
   for the lirc build process.
@@ -2072,8 +2080,9 @@
   Install using urpmi.
 
 
-       $ su
-       # urpmi kernel-source
+
+  $ su
+  # urpmi kernel-source
 
 
 
@@ -2129,20 +2138,22 @@
   Once the configuration step is complete:
 
 
-       $ make
-       $ su
-       # make install
-       # chmod 666 /dev/lircd
+
+  $ make
+  $ su
+  # make install
+  # chmod 666 /dev/lircd
 
 
 
   At this point, if you're using a serial receiver, check that there's a
   lirc device in /dev:
 
-  $ ls -l /dev/li*
-  lr-xr-xr-x    1 root     root            5 Jan 27 09:00 /dev/lirc -> ttyS0
-  srw-rw-rw-    1 root     root            0 Jan 27 15:01 /dev/lircd=
-  prw-r--r--    1 root     root            0 Jan 27 09:00 /dev/lircm|
+
+       $ ls -l /dev/li*
+       lr-xr-xr-x    1 root     root            5 Jan 27 09:00 /dev/lirc -> ttyS0
+       srw-rw-rw-    1 root     root            0 Jan 27 15:01 /dev/lircd=
+       prw-r--r--    1 root     root            0 Jan 27 09:00 /dev/lircm|
 
 
 
@@ -2265,6 +2276,8 @@
        # make modules_install
        # make install
 
+
+
   if you are using [1mgrub[22m, that should be it, reboot and select your
   custom kernel upon boot. If you are using [1mlilo[22m, change your lilo
   configuration according to
@@ -2327,8 +2340,9 @@
   If your remote ends up working well, you should consider submitting
   your lircd.conf file back to the lirc developers. Once finished:
 
-  $ su
-  # cp myremote /etc/lircd.conf
+
+       $ su
+       # cp myremote /etc/lircd.conf
 
 
 
@@ -2369,9 +2383,8 @@
   coming from the receiver.
 
   The next step is to convert those signals into something that can be
-  used to control MythTV.
-
-
+  used to control MythTV.  MythTV now inclues native support for lirc
+  and can interact directly with
        $ cd ~/mythtv-0.11/configfiles
        $ cp lircrc.example ~/.lircrc
 
@@ -2386,7 +2399,8 @@
 
   if you've got a Pinnacle Studio PCTV remote.
 
-  $ irw
+
+       $ irw
 
 
 
@@ -2396,10 +2410,13 @@
   the lirc home page and investigating from there.
 
   If it is working, then press [1mCTRL-C [22mto abort the program.  Once you
-  know that your remote is working, you need to run the [1mirxevent[0m
-  program, which takes the key presses and sends them to MythTV.
-  [1mirxevent [22misn't a daemon, so if you know that your remote is working
-  you need to invoke it like this:
+  know that your remote is working, you can either recompile MythTV with
+  native lirc support (edit the settings.pro file and remove the "#"
+  from the lirc option, then make distclean and make) or you need to run
+  the [1mirxevent [22mprogram, which takes the key presses and sends them to
+  MythTV.  If you use native lirc support, you don't need to run
+  [1mirxevent[22m.  If you are going to use irxevent, then you need to run it
+  like this:
 
 
        $ irxevent &
@@ -2407,7 +2424,7 @@
 
 
   If [1mirxevent [22misn't running, then MythTV will not respond to your remote
-  control.
+  control unless you're using native lirc support.
 
 
   [1m8.6.  Additional information for lirc.[0m
@@ -2420,17 +2437,18 @@
   The lircrc.example file has this:
 
 
-       begin
-           prog = irxevent
-           button = ChannelUp
-           config = Key Up CurrentWindow
-       end
 
-       begin
-           prog = irxevent
-           button = ChannelDown
-           config = Key Down CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = ChannelUp
+      config = Key Up CurrentWindow
+  end
+
+  begin
+      prog = irxevent
+      button = ChannelDown
+      config = Key Down CurrentWindow
+  end
 
 
 
@@ -2447,20 +2465,19 @@
   my /home/[yourusername]/.lircrc file:
 
 
+       begin
+           prog = irxevent
+           button = channel+
+           repeat = 3
+           config = Key Up CurrentWindow
+       end
 
-  begin
-      prog = irxevent
-      button = channel+
-      repeat = 3
-      config = Key Up CurrentWindow
-  end
-
-  begin
-      prog = irxevent
-      button = channel-
-      repeat = 3
-      config = Key Down CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = channel-
+           repeat = 3
+           config = Key Down CurrentWindow
+       end
 
 
 
@@ -2480,6 +2497,7 @@
   one keypress to the application, even if you're holding down the key.
   The actual [1mrepeat = [22mnumber will vary from system to system, so
   experiment and see which value works best for you.
+
 
 
   [1m8.7.  Configuring lirc for use with an IR blaster.[0m
@@ -2512,19 +2530,19 @@
   kernel module you might see the following message during make:
 
 
-  lirc_sir.c:56:2: warning: #warning
-  "******************************************"
+       lirc_sir.c:56:2: warning: #warning
+       "******************************************"
 
-  lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
+       lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
 
-  lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
+       lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
 
-  lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
+       lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
 
-  lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
+       lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
 
-  lirc_sir.c:61:2: warning: #warning
-  "******************************************"
+       lirc_sir.c:61:2: warning: #warning
+       "******************************************"
 
 
 
@@ -2545,16 +2563,15 @@
   sending and receiving IR versus just receiving.
 
 
-
-       # cd /etc/rc.d
-       # cat >> rc.local
-       echo "Starting lircd"
-       setserial /dev/ttySx uart none        # (if required)
-       modprobe lirc_sir
-       /usr/local/sbin/lircd
-       ^D
-       # exit
-       $
+  # cd /etc/rc.d
+  # cat >> rc.local
+  echo "Starting lircd"
+  setserial /dev/ttySx uart none        # (if required)
+  modprobe lirc_sir
+  /usr/local/sbin/lircd
+  ^D
+  # exit
+  $
 
 
 
@@ -2574,6 +2591,8 @@
        0000000000007ff0 00 1 gi-motorola-dct2000
        000000000000bff8 00 2 gi-motorola-dct2000
        000000000000f7f0 00 ENTER gi-motorola-dct2000
+
+
 
   Once you've verified lirc is working you can press [1mCTRL-C [22mto exit [1mirw[0m
   and configure the channel changing script.
@@ -2605,6 +2624,7 @@
 
   See contrib/channel.pl for the actual file.  Copy it to
   /usr/local/bin/
+
 
   The last statement within the perl script is the lirc rc command. This
   is the command that transmits the code to your cable/DSS box. Make
@@ -2638,6 +2658,7 @@
        # mkdir /var/video
        # chmod a+rwx /var/video
        # exit
+
 
 
   The first thing to configure is the master backend system.  If you are
@@ -2799,6 +2820,7 @@
   screen you let MythTV know which device will connect to which input
   source.
 
+
   When you start this screen, you should see a listing of the various
   input connections available on each of the Capture cards you defined
   earlier.  For example, you may have a capture card with a tuner, a
@@ -2836,6 +2858,8 @@
 
        $ mythbackend
 
+
+
   mythbackend will print information about connections and what it's
   doing to the console.  If you'd like to see the options that are
   available for mythbackend, type mythbackend -h for help.
@@ -2860,7 +2884,6 @@
   process.  For example, you may add this to your rc.local file, or you
   can follow the steps outlined in the section called ``I'd like to
   automatically start mythbackend at system boot time''.
-
 
   [1m9.3.  Configuring a non-master backend.[0m
 
@@ -2899,7 +2922,6 @@
   [1mmythfilldatabase --file [22mis an option if there isn't an XMLTV grabber
   for your country, but you [1mdo [22mhave an XML formatted listings file
   created by some other program.
-
 
   [1mmythfilldatabase --xawchannels [22mis an option if you have used [1mxawtv [22mto
   fine-tune your channels and would like to import the fine tuning
@@ -2960,19 +2982,18 @@
   will run, save and exit, and return to the shell prompt.
 
 
-
-  $ cd configfiles
-  $ crontab mythcrontab
-  $ crontab -l  NOTE: this is a lowercase L.
-  # The following will run the mythfilldatabase shell script at 0430
-  # every day.  Format is
-  # minutes hour day_of_month month day_of_week
-  # man 5 crontab for more information
-  # Need to use a shell script because the QTDIR environment variable isn't
-  # being honored by crontab?
-  # The next text should be all on the same line.
-  30 04 * * * /bin/bash $HOME/mythtv-0.11/configfiles/mythfilldatabasecron
-  $
+       $ cd configfiles
+       $ crontab mythcrontab
+       $ crontab -l  NOTE: this is a lowercase L.
+       # The following will run the mythfilldatabase shell script at 0430
+       # every day.  Format is
+       # minutes hour day_of_month month day_of_week
+       # man 5 crontab for more information
+       # Need to use a shell script because the QTDIR environment variable isn't
+       # being honored by crontab?
+       # The next text should be all on the same line.
+       30 04 * * * /bin/bash $HOME/mythtv-0.11/configfiles/mythfilldatabasecron
+       $
 
 
 
@@ -2991,9 +3012,6 @@
   [1mNOTE[22m:  By default, the crontab will use [1mvi [22mas your editor.  If you
   don't like to use [1mvi[22m, make sure that you've set VISUAL to something
   other than [1mvi[22m.
-
-
-
        $ export VISUAL=/usr/bin/joe
        $ crontab -e
 
@@ -3024,6 +3042,7 @@
   the number of seconds to record before or after a program, which is
   useful if the broadcast network or your system clock are out of sync
   and will help prevent you missing the beginning or end of a program.
+
   To change the value, use the left and right arrow keys to increment
   and decrement the number of seconds.  When you're satisfied with the
   result, use the down arrow to put the input focus on the Next button
@@ -3120,6 +3139,7 @@
   "KDE".
 
 
+
   [1m11.1.  Using themes with MythTV.[0m
 
   MythTV is "themeable", meaning that the visual appearance of the
@@ -3149,7 +3169,6 @@
   at http://tarek.2y.net/myth/ppv.pl <http://tarek.2y.net/myth/ppv.pl>.
   This is currently an external user-supplied program, so if you have
   issues with the script, please contact the author.
-
 
 
   [1m11.3.  Adding support for an external tuner.[0m
@@ -3212,13 +3231,13 @@
 
 
 
-  $ tar -xjf mythweb-0.11.tar.bz2
-  $ cd mythweb-0.11
-  $ su
-  # mkdir /var/www/html/mythweb
-  # cp -r . /var/www/html/mythweb
-  # exit
-  $
+       $ tar -xjf mythweb-0.11.tar.bz2
+       $ cd mythweb-0.11
+       $ su
+       # mkdir /var/www/html/mythweb
+       # cp -r . /var/www/html/mythweb
+       # exit
+       $
 
 
 
@@ -3275,6 +3294,8 @@
   The configuration for MythGallery is accessed through the main Setup
   option in mythfrontend.  Make sure you set your pictures directory to
   wherever you're storing your photos.
+
+
   +o  Use the arrow keys to move around the thumbnails.
 
   +o  Use SPACE or ENTER to maximize a photo.
@@ -3322,33 +3343,32 @@
   Here is an example script that a user may want to run on import:
 
 
+       #!/bin/csh
 
-  #!/bin/csh
+       if ($#argv == 0) then
+               echo "Usage: $0 dest_dir"
+               exit
+       endif
 
-  if ($#argv == 0) then
-          echo "Usage: $0 dest_dir"
-          exit
-  endif
+       cd $argv[1]
 
-  cd $argv[1]
+       # get stuff over the network
+       wget http://www.somesite.dom/dir/file1.jpg
+       wget http://www.somesite.dom/dir/file2.jpg
+       wget http://www.somesite.dom/dir/file3.jpg
 
-  # get stuff over the network
-  wget http://www.somesite.dom/dir/file1.jpg
-  wget http://www.somesite.dom/dir/file2.jpg
-  wget http://www.somesite.dom/dir/file3.jpg
+       # stuff that requires manual module loading and/or fs mounting
+       modprobe camera_module
+       mount /dev/camera /mnt/camera
+       cp /mnt/camera/* $argv[1]
+       umount /mnt/camera
+       rmmod camera_module
 
-  # stuff that requires manual module loading and/or fs mounting
-  modprobe camera_module
-  mount /dev/camera /mnt/camera
-  cp /mnt/camera/* $argv[1]
-  umount /mnt/camera
-  rmmod camera_module
-
-  # perform some processing
-  foreach pname (`ls *.jpg`)
-          jpegtran -flip vertical $pname > $pname.new
-          mv $pname.new $pname
-  end
+       # perform some processing
+       foreach pname (`ls *.jpg`)
+               jpegtran -flip vertical $pname > $pname.new
+               mv $pname.new $pname
+       end
 
 
 
@@ -3375,6 +3395,7 @@
 
   +o  libcdaudio
 
+
   +o  CDParanoia
 
 
@@ -3387,14 +3408,15 @@
   <http://www.mars.org/home/rob/proj/mpeg/>  Save it to a directory you
   can find later.
 
-  $ tar -xzf mad-0.14.2b.tar.gz
-  $ cd mad-0.14.2b
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
-  $
+
+       $ tar -xzf mad-0.14.2b.tar.gz
+       $ cd mad-0.14.2b
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
+       $
 
 
 
@@ -3435,20 +3457,23 @@
   install:
 
 
-       $ tar -xzf libcdaudio-0.99.9.tar.gz
-       $ cd libcdaudio-0.99.9
-       $ ./configure
-       $ make
-       $ su
-       # make install
-       # exit
-       $
+
+  $ tar -xzf libcdaudio-0.99.9.tar.gz
+  $ cd libcdaudio-0.99.9
+  $ ./configure
+  $ make
+  $ su
+  # make install
+  # exit
+  $
 
 
 
   Download cdparanoia from http://www.xiph.org/paranoia/down.html
   <http://www.xiph.org/paranoia/download/cdparanoia-III-
   alpha9.8.src.tgz>.
+
+
        $ tar -xzf cdparanoia-III-alpha9.8.src.tgz
        $ cd cdparanoia-III-alpha9.8
        $ ./configure
@@ -3511,6 +3536,8 @@
 
        # urpmi libfftw2 libfftw2-devel
 
+
+
   OpenGL should be installed on practically all distributions.  However,
   you will need the devel module.  In Mandrake 9.1 it may be installed
   by typing:
@@ -3561,7 +3588,6 @@
   getting MythMusic going. Make sure that you run ./configure first.  If
   you wish to use the new visualizations, make sure you install the
   prerequisites.  Run ./configure --help for help.
-
 
 
   ______________________________________________________________________
@@ -3615,7 +3641,6 @@
 
   Genre/Artist/Album/Title Artist/Genre/Album/Title Artist/Album/Title
   (with Genre left as Unknown)
-
   The track number is optional but can be specified with the title by
   using the TRACK_TITLE keyword instead of TITLE.  If TRACK_TITLE is
   used, then the filename can have a space, hyphen, or underscore
@@ -3805,12 +3830,13 @@
   Change into the MythVideo directory, then make and make install:
 
 
-       $ cd mythvideo
-       $ qmake mythvideo.pro
-       $ make
-       $ su
-       # make install
-       # exit
+
+  $ cd mythvideo
+  $ qmake mythvideo.pro
+  $ make
+  $ su
+  # make install
+  # exit
 
 
 
@@ -3820,6 +3846,7 @@
 
        $ cd videodb
        $ mysql -u mythtv -p < metadata.sql
+
 
 
   See MythVideo's README file for additional information.
@@ -3864,11 +3891,12 @@
   ./configure
 
 
-       $ ./configure --enable-transcode
-       $ qmake mythdvd.pro
-       $ make
-       $ su
-       # make install
+
+  $ ./configure --enable-transcode
+  $ qmake mythdvd.pro
+  $ make
+  $ su
+  # make install
 
 
 
@@ -3927,8 +3955,6 @@
        hda: 156301488 sectors (80026 MB) w/2048KiB Cache, CHS=9729/255/63, UDMA(33)
        hdb: 80043264 sectors (40982 MB) w/2048KiB Cache, CHS=4982/255/63, UDMA(33)
 
-
-
   From the listing above, you can see that hda, hdb and hdc are set for
   DMA, and hdd is set for pio.  If your kernel is not reporting DMA
   being enabled, you may need to recompile your kernel. Check your
@@ -3945,6 +3971,7 @@
 
   will tell you the DMA status for your hard drives.  If you run [1mhdparm[0m
   with the -d1 parameter, it will turn DMA on.
+
 
   You may also setup your PC to do this at boot time, either by adding
   the command to your /etc/rc.local file, or by adding files to
@@ -4055,6 +4082,7 @@
 
   Ensure that there isn't an Option "DPMS" in the Monitor configuration.
 
+
   You can also turn off DPMS from the Command Line, but this will not
   survive a reboot.
 
@@ -4135,6 +4163,8 @@
        Signal        Stop      Print   Pass to program Description
        SIGPIPE       No        Yes     Yes             Broken pipe
 
+
+
   [1mgdb [22mhas a number of options, read the man page for more information.
 
   Once at the (gdb) prompt, type run to start program execution.  When
@@ -4198,7 +4228,6 @@
   delayed behind the realtime video.  Once this test succeeds, MythTV
   should work correctly because it writes to and read from /dev/dsp in
   the same way that [1maplay [22mdoes.
-
 
   To record audio along with video the audio signal must be digitized by
   a DSP so that the audio data can be stored in a file. On playback, the
@@ -4309,6 +4338,7 @@
   users/2003-April/002527.html>
 
 
+
   [1m19.16.  Where's my "canada-cable" entry gone to?[0m
 
   [1m19.17.  My channels are off by one.[0m
@@ -4374,7 +4404,6 @@
   You didn't set your QTDIR.  Re-read the section on ``Setting up
   paths''.
 
-
   [1m19.22.  My mouse pointer disappears when placed over the MythTV win-[0m
   [1mdows.[0m
 
@@ -4393,7 +4422,6 @@
 
   Something's wrong with your program database.  Did mythfilldatabase
   run with no major errors?
-
 
 
   [1m19.25.  Colors are wrong, people have blue faces.[0m
@@ -4437,11 +4465,12 @@
   Download the source to MPlayer and patch:
 
 
-       $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90.tar.bz2
-       $ tar -xjf MPlayer-0.90.tar.bz2
-       $ cp mplayer-0.90rc5-mythtv-20030407.diff MPlayer-0.90
-       $ cd MPlayer-0.90
-       $ patch -p1 < mplayer-0.90rc5-mythtv-20030407.diff
+
+  $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90.tar.bz2
+  $ tar -xjf MPlayer-0.90.tar.bz2
+  $ cp mplayer-0.90rc5-mythtv-20030407.diff MPlayer-0.90
+  $ cd MPlayer-0.90
+  $ patch -p1 < mplayer-0.90rc5-mythtv-20030407.diff
 
 
 
@@ -4460,6 +4489,8 @@
 
   Here's an example submitted to the mythtv-dev list by Pat Pflaum
   mailto:pat@netburp.com <mailto:pat@netburp.com> using fvwm:
+
+
        $ cat > .xinitrc
        fvwm &
        mythfrontend
@@ -4523,7 +4554,6 @@
 
   +o  480x480 (Video CD resolution)
 
-
   +o  352x480 (ReplayTV "Standard" quality)
 
   +o  320x480
@@ -4564,7 +4594,6 @@
 
   There are three sizes that are important for matching the MythTV GUI
   and full screen TV playback to fit the screen:
-
 
   +o  the X display size
 
@@ -4656,7 +4685,8 @@
 
   See the [1mmysqldump [22mmanpage for more information.
 
-  $ mysqldump -u mythtv -pmythtv mythconverg > mythtv_backup.sql
+
+       $ mysqldump -u mythtv -pmythtv mythconverg > mythtv_backup.sql
 
 
 
@@ -4716,7 +4746,6 @@
 
   +o  Pinnacle Studio PCTV Pro - note: this has a MSP34xx, but it's not
      wired correctly to the BT878 chip.
-
 
   +o  ATI TV Wonder VE
 
@@ -4838,14 +4867,14 @@
   Add the following to /etc/modules.conf:
 
 
-
-  alias char-major-81     videodev
-  alias char-major-81-0   ivtv
-  options ivtv debug=1
-  options tuner type=2
-  options msp3400 once=1 simple=1
-  add below ivtv msp3400 saa7115 tuner
-  add above ivtv lirc_dev lirc_i2c
+       alias char-major-81     videodev
+       alias char-major-81-0   ivtv
+       alias char-major-61 lirc_i2c
+       options ivtv debug=1
+       options tuner type=2
+       options msp3400 once=1 simple=1
+       add below ivtv msp3400 saa7115 tuner
+       add above ivtv lirc_dev lirc_i2c
 
 
 
@@ -4876,15 +4905,16 @@
   Check that the card is being recognized on the PCI bus:
 
 
-       $ lspci -v
-       <snip>
 
-       00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
-       Encoder (rev 01)
-               Subsystem: Hauppauge computer works Inc.: Unknown device 4801
-               Flags: bus master, medium devsel, latency 32, IRQ 11
-               Memory at d0000000 (32-bit, prefetchable) [size=64M]
-               Capabilities: <available only to root>
+  $ lspci -v
+  <snip>
+
+  00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
+  Encoder (rev 01)
+          Subsystem: Hauppauge computer works Inc.: Unknown device 4801
+          Flags: bus master, medium devsel, latency 32, IRQ 11
+          Memory at d0000000 (32-bit, prefetchable) [size=64M]
+          Capabilities: <available only to root>
 
 
 
@@ -4899,6 +4929,7 @@
        crw-------    1 mythtv   sys       81, 224 Dec 31  1969 vbi0
        crw-------    1 mythtv   sys       81,   0 Dec 31  1969 video0
        crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
+
 
 
   In this case, the ivtv device is video0.
@@ -4976,7 +5007,221 @@
 
 
 
-  [1m20.11.  I'd like to use NFS.[0m
+  [1m20.11.  I'd like to use the remote that came with my Hauppauge PVR-250[0m
+  [1mand use MythTV's native LIRC support.[0m
+
+  [1mNOTE[22m:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS NOT
+  GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR LIRC DRIVER
+  ASSISTANCE, SEE THE LIRC MAILING LIST.
+  http://lists.sourceforge.net/lists/listinfo/lirc-list
+  <http://lists.sourceforge.net/lists/listinfo/lirc-list>
+
+  These instructions work for Mandrake 9.2 on a frontend machine which
+  is hosting a single PVR-250 capture card using MythTV's native LIRC
+  support.
+
+  First, you need to ensure that you've installed the kernel source
+  appropriate for the kernel that you're running.  In this case, we're
+  using kernel 2.4.22-9, so when installing the kernel-source ensure
+  that you've got the correct version.
+
+
+
+  $ su
+  # uname -a
+  Linux frontend 2.4.22-9mdk #1 sam sep 13 06:54:11 CEST 2003 i686 unknown
+  unknown GNU/Linux
+  # rpm -qa|grep kernel-source
+  kernel-source-2.4.22-9mdk
+
+
+
+  Next, you need to remove the kernel modules for LIRC that Mandrake has
+  packaged for you.  They won't work, and will cause problems later.
+
+
+
+       # rm -rf /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc
+
+
+
+  If you've already installed LIRC from the Mandrake packages, it's
+  going to be version 0.6.6, and that won't work.  Uninstall it:
+
+
+       $ su
+       # urpme lirc lirc-remotes liblirc-devel
+       # rm -rf /dev/lirc*
+       # exit
+
+
+
+  Download the lirc-0.7.0pre2 tarball:
+
+
+       $ wget http://lirc.sourceforge.net/software/snapshots/lirc-0.7.0pre2.tar.bz2
+       $ tar -xjf lirc-0.7.0pre2.tar.bz2
+
+
+
+  Mandrake now includes i2c version 2.8.0 which changes the semantics of
+  some low-level calls.  You will need to patch LIRC in order for it to
+  work correctly.  Download the patch and install:
+
+
+       $ cd lirc-0.7.0pre2
+       $ wget http://delvare.free.fr/i2c/other/lirc-CVS-i2c-2.8.0.patch
+       $ patch -p1 < lirc-CVS-i2c-2.8.0.patch
+
+
+
+  Next, run the LIRC setup program:
+
+
+       $ ./setup.sh
+
+
+
+  Select "1" (Driver configuration), then scroll down to "5" (TV Card),
+  press ENTER, then scroll down to "f" (Hauppauge TV card) and press
+  ENTER again.  Once back at the main menu, press "3" for Save and run
+  configure.
+
+  If your build environment is ready, LIRC will create a Makefile for
+  you.  Switch to root and compile:
+
+
+       $ su
+       # make
+       # make install
+
+
+
+  As a part of the make install process, LIRC will create the
+  appropriate device for you in /dev.  Check to make sure:
+
+
+       $ ls -l /dev/lirc*
+       crw-r--r--    1 root     root      61,   0 Sep 18 15:36 /dev/lirc
+       srw-rw-rw-    1 root     root            0 Sep 18 15:38 /dev/lircd=
+
+
+
+  Your modules.conf file should have already been modified if you've
+  followed the instructions above for installing the PVR-250.  [1mmodprobe[0m
+  the lirc_i2c driver, run the [1mlircd [22mprogram and then check your
+  /var/log/messages and /var/log/lircd files.
+
+
+       $ su
+       # modprobe lirc_i2c
+       # lsmod
+       Module                  Size  Used by    Not tainted
+       lirc_i2c                5124   0
+       lirc_dev               10096   1  [lirc_i2c]
+       ...
+       # lircd
+       # tail /var/log/messages
+       Sep 18 15:38:26 frontend kernel: lirc_i2c: chip found @ 0x18 (Hauppauge IR)
+       Sep 18 15:38:26 frontend kernel: lirc_dev: lirc_register_plugin:sample_rate:
+       10
+       ...
+       # tail /var/log/lircd
+       Sep 18 15:24:52 frontend lircd 0.7.0pre2: lircd(hauppauge) ready
+
+
+
+  To check that your remote is working correctly, run the [1mirw [22mprogram
+  and start pressing buttons.  If nothing is happening, you must begin
+  troubleshooting.  Things to check:
+
+  +o  Are there batteries in the remote?
+
+  +o  Does the remote work?  You may be able to see the flashes of IR
+     coming from the remote if you look at it with a video camera.
+
+  +o  Is the IR dongle cable plugged in?
+
+  +o  Did you remove all of the old LIRC device drivers?  Run "updatedb"
+     as root, then "locate lirc_i2c".  The only lirc_i2c should be the
+     one in the misc/ directory for your kernel version.
+
+  +o  Did you run depmod?
+
+  +o  Is your modules.conf setup correctly?
+
+  +o  Did you modprobe lirc_i2c?
+
+  +o  Did you run lircd?
+
+  +o  Do you have an /etc/lircd.conf?
+
+  +o  Is /dev/lirc a character mode file, major 61, minor 0?  Is it
+     readable by all groups?
+
+  +o  If you think you may have had old LIRC device drivers you may need
+     to reboot to ensure that they're totally out of the system.  Try
+     running modprobe -r lirc_i2c as root first, then modprobe lirc_i2c
+     and try again.
+
+  If none of the above works, and [1mirw [22mstill isn't showing keypresses,
+  then you will need to ask your question on the LIRC list.
+
+  Assuming that [1mirw [22mis showing keypresses, you can continue: To enable
+  native LIRC support within MythTV, you will need to modify your
+  settings.pro file and recompile.  Your settings.pro should look like
+  this:
+
+
+       # Native lirc support
+       CONFIG += using_lirc
+       EXTRA_LIBS += -llirc_client
+
+
+
+  Recompile and install:
+
+
+       $ make distclean; make
+       $ su
+       # make install
+
+
+
+  If you're not using native LIRC support, ensure that the button names
+  that come up with [1mirw [22mmatch the ones in the .lircrc file in your home
+  directory.  Note that if you are not using native LIRC support, the
+  .lircrc file is in your home directory and has a "." as the first
+  character.
+
+  Since we're using native LIRC support within MythTV, copy the
+  configfiles/hauppauge-lircrc-nativelirc file into your .mythtv/
+  directory and call it lircrc.  It has a slightly different format than
+  what you would use if you were using [1mirxevent[22m.  Also note that it is
+  in your .mythtv directory and does [4mnot[24m have a "." in the filename.
+
+
+
+       $ cp configfiles/hauppauge-lircrc-nativelirc ~/.mythtv/lircrc
+
+
+
+  Add the commands to load the LIRC device drivers and start [1mlircd [22mto
+  your rc.local:
+
+
+
+  $ su
+  # echo "modprobe lirc_i2c" >> /etc/rc.d/rc.local
+  # echo "lircd" >> /etc/rc.d/rc.local
+  # exit
+
+
+
+  You should now have native LIRC support within MythTV.
+
+
+  [1m20.12.  I'd like to use NFS.[0m
 
   You may want to use a central server to store your files.
 
@@ -5007,10 +5252,10 @@
   error, and the nfsvers is required for filesizes over 2GB.
 
 
-  [1m20.12.  I'd like to automatically start mythbackend at system boot[0m
+  [1m20.13.  I'd like to automatically start mythbackend at system boot[0m
   [1mtime.[0m
 
-  [1m20.12.1.  Red Hat And Mandrake[0m
+  [1m20.13.1.  Red Hat And Mandrake[0m
 
   Here's a method for automatically starting mythbackend submitted by
   Mike Thomson (mailto:linux@m-thomson.net <mailto:linux@m-thomson.net>)
@@ -5057,7 +5302,7 @@
 
 
 
-  [1m20.12.1.1.  Log files[0m
+  [1m20.13.1.1.  Log files[0m
 
   By default, the log file for mythbackend will be written to
   /var/tmp/mythbackend.log. This has been tested and is known to work on
@@ -5084,7 +5329,7 @@
 
 
 
-  [1m20.12.1.2.  Mandrake 9.x[0m
+  [1m20.13.1.2.  Mandrake 9.x[0m
 
   Mandrake adds one more twist in the form of the msec utility, which
   runs regularly and (at the default or any higher security level) sets
@@ -5129,7 +5374,7 @@
   get the results you expect, check that you're not asking msec to add
   missing permissions to the files or directories you created.
 
-  [1m20.12.2.  Gentoo[0m
+  [1m20.13.2.  Gentoo[0m
 
   The portage file for MythTV has scripts that will allow you to run
   mythbackend at startup.
@@ -5153,7 +5398,7 @@
 
 
 
-  [1m20.13.  Advanced Backend Configurations.[0m
+  [1m20.14.  Advanced Backend Configurations.[0m
 
   MythTV is flexible in the way that you define multiple backend tuner
   configurations.  The only hard-and-fast rule is that the Master
@@ -5202,14 +5447,14 @@
   is not available.
 
 
-  [1m20.14.  Advanced Partition Formatting.[0m
+  [1m20.15.  Advanced Partition Formatting.[0m
 
   MythTV creates large files.  The partitions that your distribution
   sets up for you may not be optimized for large files.
 
 
 
-  [1m20.14.1.  Ext3[0m
+  [1m20.15.1.  Ext3[0m
 
   With Ext3, your biggest gain is that in case of a crash and reboot you
   don't have to wait very long for your partition to be remounted.  With
@@ -5242,7 +5487,7 @@
   [1mman [22mpage for details.
 
 
-  [1m20.15.  I'd like to have more flexible disk storage with LVM.[0m
+  [1m20.16.  I'd like to have more flexible disk storage with LVM.[0m
 
   LVM greatly increases the flexibility you have in managing your
   storage than traditional physical partitions. This section will
@@ -5350,7 +5595,7 @@
   check that you've got more space.
 
 
-  [1m20.15.1.  ReiserFS[0m
+  [1m20.16.1.  ReiserFS[0m
 
   Make the logical volume used for video bigger:
 
@@ -5366,7 +5611,7 @@
 
 
 
-  [1m20.15.2.  ext2 or ext3[0m
+  [1m20.16.2.  ext2 or ext3[0m
 
   LVM comes with a program called [1me2fsadm[22m.
 
@@ -5380,7 +5625,7 @@
 
 
 
-  [1m20.16.  What is this transcoder thing, and how do I use it?[0m
+  [1m20.17.  What is this transcoder thing, and how do I use it?[0m
 
   The transcoder re-encodes files from one MythTV format to another.
   The main purpose of the transcoder is to allow users with hardware

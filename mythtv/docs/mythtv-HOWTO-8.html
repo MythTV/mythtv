@@ -26,6 +26,11 @@ the manual compilation steps described below by jumping to the
 <A HREF="#completing_lirc_install">Completing the lirc install</A> section. 
 See the contrib/mandrake91.etc.sysconfig.lircd file for an example of how to
 configure lircd.</P>
+<P><B>NOTE</B>:  If you wish to use the remote control that comes with the
+Hauppauge PVR-250/350 cards, you will need to run the lirc 0.7.0pre2 code. 
+See the example installation in the "I'd like to use the remote that came
+with my Hauppauge PVR-250 and use MythTV's native LIRC support." 
+<A HREF="mythtv-HOWTO-20.html#hauppauge_remote">section</A>.</P>
 <P>Some IR devices require a kernel recompile, and some don't. However, all at
 least require having the kernel source available as a resource for the lirc
 build process. </P>
@@ -341,7 +346,9 @@ configuration file for your remote into <CODE>/etc/lircd.conf</CODE> This file
 maps the buttons on the remote control to the IR pulses coming from the
 receiver.</P>
 <P>The next step is to convert those signals into something that can be used
-to control MythTV.
+to control MythTV.  MythTV now inclues native support for lirc and can
+interact directly with </P>
+<P>
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cd ~/mythtv-0.11/configfiles
@@ -369,11 +376,13 @@ print the name of the button as it is defined in your
 to troubleshoot further by going back to the lirc home page and investigating
 from there.</P>
 <P>If it is working, then press <B>CTRL-C</B> to abort the program.  Once you
-know that your remote is working, you need to run the <B>irxevent</B>
-program, which takes the key presses and sends them to MythTV. 
-<B>irxevent</B>
-isn't a daemon, so if you know that your remote is working you need to
-invoke it like this: 
+know that your remote is working, you can either recompile MythTV with
+native lirc support (edit the <CODE>settings.pro</CODE> file and remove the "#"
+from the lirc option, then make <CODE>distclean</CODE> and <CODE>make</CODE>) or you
+need to run the <B>irxevent</B> program, which takes the key presses and
+sends them to MythTV.  If you use native lirc support, you don't need to run
+<B>irxevent</B>.  If you are going to use irxevent, then you need to run
+it like this:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ irxevent &amp;
@@ -381,7 +390,7 @@ $ irxevent &amp;
 </CODE></BLOCKQUOTE>
 
 If <B>irxevent</B> isn't running, then MythTV will not respond to your remote
-control.</P>
+control unless you're using native lirc support.</P>
 
 <H2><A NAME="ss8.6">8.6</A> <A HREF="mythtv-HOWTO.html#toc8.6">Additional information for lirc.</A>
 </H2>
