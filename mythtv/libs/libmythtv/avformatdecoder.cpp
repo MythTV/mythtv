@@ -1022,7 +1022,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
         len = pkt->size;
         ptr = pkt->data;
         pts = 0;
-        if (pkt->pts != (unsigned int)AV_NOPTS_VALUE)
+        if (pkt->pts != (int64_t)AV_NOPTS_VALUE)
             pts = pkt->pts / (AV_TIME_BASE / 1000);
 
         AVStream *curstream = ic->streams[pkt->stream_index];
@@ -1068,7 +1068,7 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
             {
                 case CODEC_TYPE_AUDIO:
                 {
-                    if (firstloop && pkt->pts != (unsigned int)AV_NOPTS_VALUE)
+                    if (firstloop && pkt->pts != (int64_t)AV_NOPTS_VALUE)
                         lastapts = pkt->pts / (AV_TIME_BASE / 1000);
 
                     if (onlyvideo != 0)
