@@ -350,6 +350,7 @@ public:
 
         connect(device, SIGNAL(valueChanged(const QString&)),
                 input, SLOT(fillSelections(const QString&)));
+        input->fillSelections(device->getValue());
     };
 
     int getCardID(void) const {
