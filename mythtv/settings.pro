@@ -8,7 +8,6 @@ isEmpty( PREFIX ) {
 LIBVERSION = 0.16
 
 INCLUDEPATH += $${PREFIX}/include
-INCLUDEPATH *= /usr/local/include
 
 DEFINES += _GNU_SOURCE
 DEFINES += _FILE_OFFSET_BITS=64
