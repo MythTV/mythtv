@@ -46,6 +46,11 @@ class MfdInstance : public QThread
     void    parseFromMfd(QStringList &tokens);
     void    announceMyDemise();
     int     getId(){return mfd_id;}
+    void    commitListEdits(
+                            UIListGenericTree *playlist_tree,
+                            bool new_list,
+                            QString playlist_name
+                           );
     
     //
     //  Adding and removing interfaces to services _this_ mfd offers

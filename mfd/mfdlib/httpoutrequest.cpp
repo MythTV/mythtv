@@ -10,7 +10,7 @@
 #include <iostream>
 using namespace std;
 
-
+#include "httpinrequest.h"
 #include "httpoutrequest.h"
 
 
@@ -80,6 +80,17 @@ bool HttpOutRequest::send(QSocketDevice *where_to_send)
     addText(&the_request, top_line);
 
     //
+    //  If there's a payload, add a Content-Length: header
+    //
+    
+    if(payload.size() > 0)
+    {
+        QString content_length_header = QString("Content-Length: %1\r\n")
+                                        .arg(payload.size());
+        addText(&the_request, content_length_header);
+    }
+
+    //
     //  You can change this to stored_request = extended URL if you want
     //  to get debugging output that includes the GET variables
     //
@@ -105,7 +116,13 @@ bool HttpOutRequest::send(QSocketDevice *where_to_send)
 
     addText(&the_request, "\r\n");
 
-    sendBlock(the_request, where_to_send);
+    if(sendBlock(the_request, where_to_send))
+    {
+        if(payload.size() > 0)
+        {
+            sendBlock(payload, where_to_send);
+        }
+    }
 
     return true;
 }
@@ -280,6 +297,30 @@ void HttpOutRequest::addHeader(const QString &new_header)
     HttpHeader *a_new_header = new HttpHeader(new_header);
     headers.insert(a_new_header->getField(), a_new_header);
 }
+
+void HttpOutRequest::setPayload(QValueVector<char> *new_payload)
+{
+    uint new_payload_size = new_payload->size();
+
+    if(new_payload_size > MAX_CLIENT_OUTGOING)
+    {
+        cerr << "httpresponse.o: something is trying to send an http "
+             << "request with a huge payload size of " 
+             << new_payload_size 
+             << endl;
+
+        new_payload_size = MAX_CLIENT_OUTGOING;
+    }
+
+    payload.clear();
+    
+    for(uint i = 0; i < new_payload_size; i++)
+    {
+        payload.insert(payload.end(), new_payload->at(i));
+    }
+}
+
+
 
 void HttpOutRequest::warning(const QString &warn_text)
 {

@@ -268,6 +268,7 @@ class Playlist
     void             setDbId(int an_int){db_id = an_int;}
     uint             getUniversalId();
     QString          getName(){return name;}
+    void             setName(const QString &new_name){ name = new_name; }
     QString          getRawSongList(){return raw_song_list;}
     uint             getCount(){return song_references.count();}
     uint             getFlatCount(){return flat_tree_item_count;}

@@ -48,6 +48,17 @@ class MfdInterface : public QObject
     void askForStatus(int which_mfd);
 
     //
+    //  For sending updates back the mfd metadata server
+    //
+    
+    void commitListEdits(
+                            int which_mfd, 
+                            UIListGenericTree *playlist_tree,
+                            bool new_playlist,
+                            QString playlist_name
+                        );
+
+    //
     //  Methods that will ask this library to perform some background work
     //  on behalf of the linked in client
     //    

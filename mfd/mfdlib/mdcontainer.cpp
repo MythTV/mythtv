@@ -234,7 +234,7 @@ void MetadataContainer::dataDelta(
     //
     //  NB: these are QDeepCopy variables, so this object now has its own
     //  private copy of the deltas (additions, deletions). That means the
-    //  thread that assigned them can keep looking at (iterating over) it's
+    //  thread that assigned them can keep looking at (iterating over) its
     //  copy without screwing up _this_ copy (I think).
     //
 
@@ -256,6 +256,7 @@ void MetadataContainer::dataDelta(
         //  Add the new playlists (and/or change playlists that have changed)
         //
 
+        current_playlists->setAutoDelete(true);    
         QIntDictIterator<Playlist> iterc( *new_playlists ); 
         for ( ; iterc.current(); ++iterc )
         {

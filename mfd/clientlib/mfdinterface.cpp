@@ -298,6 +298,44 @@ void MfdInterface::askForStatus(int which_mfd)
     }
 }
 
+void MfdInterface::commitListEdits(
+                                    int which_mfd, 
+                                    UIListGenericTree *playlist_tree,
+                                    bool new_playlist,
+                                    QString playlist_name
+                                  )
+{
+    //
+    //  This has to happen here in the main execution thread, as
+    //  playlist_tree will probably get deleted very shortly after we return
+    //
+
+    bool found_it = false;
+    for(
+        MfdInstance *an_mfd = mfd_instances->first();
+        an_mfd;
+        an_mfd = mfd_instances->next()
+       )
+    {
+        if (an_mfd->getId() == which_mfd)
+        {
+            an_mfd->commitListEdits(
+                                    playlist_tree,
+                                    new_playlist,
+                                    playlist_name
+                                   );
+            found_it = true;
+            break;
+        }
+    }
+    
+    if (!found_it)
+    {
+        cerr << "mfdinterface.o: could not find an mfd "
+             << "for a commitEdits() request"
+             << endl;
+    }
+}
 
 void MfdInterface::startPlaylistCheck(
                                         MfdContentCollection *mfd_collection,

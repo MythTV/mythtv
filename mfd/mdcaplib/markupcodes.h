@@ -47,6 +47,8 @@ class MarkupCodes
     static const char deleted_lists_group    = 13;
     static const char added_list_group       = 14;
     
+    static const char commit_list_group      = 15;
+    static const char commit_list_group_list = 16;    
     //
     //  Smaller items that implicitly imply groups (by virtue of being of
     //  variable length)
@@ -91,6 +93,7 @@ class MarkupCodes
     static const char list_id                = 123;
     static const char list_item              = 124;
     static const char deleted_list           = 125;
+    static const char commit_list_type       = 126;  // new or edit of existing
 
   private:
 

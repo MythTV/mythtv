@@ -25,6 +25,7 @@ MdcapRequest::MdcapRequest()
     //
     
     container_id = -1;
+    commit_list_id = -1;
     generation = 0;
     delta = 0;
     item_request = false;
@@ -68,7 +69,7 @@ void MdcapRequest::parsePath(HttpInRequest *http_request)
         QStringList request_tokens = QStringList::split( "/", the_path );
         if(request_tokens.count() < 3)
         {
-            warning(QString("bad /containers reguest: \"%1\"")
+            warning(QString("bad /containers request: \"%1\"")
                     .arg(the_path));
             setRequestType(MDCAP_REQUEST_SCREWEDUP);
             http_request->getResponse()->setError(400);
@@ -135,6 +136,63 @@ void MdcapRequest::parsePath(HttpInRequest *http_request)
         }
         
     }
+    else if(the_path.startsWith("/commit") && the_path.contains("list"))
+    {
+        setRequestType(MDCAP_REQUEST_COMMIT_LIST);
+
+        //
+        //  Parse out /commit request details
+        //
+        
+        QStringList request_tokens = QStringList::split( "/", the_path );
+        if(request_tokens.count() < 4)
+        {
+            warning(QString("bad /commit request: \"%1\"")
+                    .arg(the_path));
+            setRequestType(MDCAP_REQUEST_SCREWEDUP);
+            http_request->getResponse()->setError(400);
+            return;
+        }
+
+        bool ok;
+        container_id = request_tokens[1].toInt(&ok);
+        if(!ok || container_id < 1) 
+        {
+            container_id = -1;
+            warning(QString("bad container id in commit request: \"%1\"")
+                    .arg(the_path));
+            setRequestType(MDCAP_REQUEST_SCREWEDUP);
+            http_request->getResponse()->setError(400);
+            return;
+        }
+        if(request_tokens[2] != "list")
+        {
+            container_id = -1;
+            warning(QString("bad 3rd token in list commit request: \"%1\"")
+                    .arg(the_path));
+            setRequestType(MDCAP_REQUEST_SCREWEDUP);
+            http_request->getResponse()->setError(400);
+            return;
+        }
+        commit_list_id = request_tokens[3].toInt(&ok);
+        if(!ok || container_id < 1) 
+        {
+            container_id = -1;
+            commit_list_id = -1;
+            warning(QString("bad list id in commit request: \"%1\"")
+                    .arg(the_path));
+            setRequestType(MDCAP_REQUEST_SCREWEDUP);
+            http_request->getResponse()->setError(400);
+            return;
+        }
+
+    }
+    /*
+    else if(the_path.startsWith("/commit") && the_path.contains("item"))
+    {
+        setRequestType(MDCAP_REQUEST_COMMIT_ITEM);
+    }
+    */
     else
     {
         warning(QString("does not understand the path of this request: %1")

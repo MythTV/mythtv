@@ -104,15 +104,21 @@ const QString& ServiceEvent::getString()
 ---------------------------------------------------------------------
 */
 
-MetadataChangeEvent::MetadataChangeEvent(int which_collection)
+MetadataChangeEvent::MetadataChangeEvent(int which_collection, bool external)
             :QCustomEvent(65427)
 {
     identifier = which_collection;
+    was_external = external;
 }
 
 int MetadataChangeEvent::getIdentifier()
 {
     return identifier;
+}
+
+bool MetadataChangeEvent::getExternalFlag()
+{
+    return was_external;
 }
 
 /*

@@ -53,7 +53,9 @@ class MdcapOutput
     void addListItemGroup();
     void addListListGroup();
     void addDeletedListsGroup();
-    
+
+    void addCommitListGroup();
+    void addCommitListGroupList();
 
     void endGroup();
     
@@ -102,6 +104,12 @@ class MdcapOutput
     void addItemTrack(int item_track);
     void addItemLength(int item_length); 
     void addItemDupFlag(bool true_or_false);
+
+    //
+    //  Stuff for commits
+    //
+
+    void addCommitListType(bool new_or_not);
 
     //
     //  "element" functions for lists

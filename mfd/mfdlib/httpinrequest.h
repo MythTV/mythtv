@@ -10,6 +10,9 @@
 
 */
 
+#include <vector>
+using namespace std;
+
 #include <qstring.h>
 #include <qdict.h>
 
@@ -50,6 +53,7 @@ class HttpInRequest
     void                printHeaders();     //  Debugging
     void                printGetVariables();//  Debugging
     MFDHttpPlugin*      getParent(){return parent;}
+    std::vector<char>*  getPayload(){return &payload;}
 
   private:
 
@@ -67,6 +71,8 @@ class HttpInRequest
     QDict<HttpHeader>      headers;
     QDict<HttpGetVariable> get_variables;
 
+    int                     expected_payload_size;
+    std::vector<char>       payload;
     
 };
 

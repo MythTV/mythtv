@@ -159,6 +159,20 @@ void MdcapOutput::addDeletedListsGroup()
     append((uint32_t) 0);
 }
 
+void MdcapOutput::addCommitListGroup()
+{
+    append(MarkupCodes::commit_list_group);
+    open_groups.push(contents.size());
+    append((uint32_t) 0);
+}
+
+void MdcapOutput::addCommitListGroupList()
+{
+    append(MarkupCodes::commit_list_group_list);
+    open_groups.push(contents.size());
+    append((uint32_t) 0);
+}
+
 void MdcapOutput::endGroup()
 {
     //
@@ -588,6 +602,24 @@ void MdcapOutput::addItemDupFlag(bool true_or_false)
         append((uint8_t) 0);
     }
 }
+
+void MdcapOutput::addCommitListType(bool new_or_not)
+{
+    //
+    //  Update type is 2 bytes
+    //
+
+    append(MarkupCodes::commit_list_type);
+    if(new_or_not)
+    {
+        append((uint8_t) 1);
+    }    
+    else
+    {
+        append((uint8_t) 0);
+    }
+}
+
 
 void MdcapOutput::addListId(int list_id)
 {

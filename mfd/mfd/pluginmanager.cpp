@@ -223,11 +223,11 @@ bool MFDPluginWrapper::tryToUnload()
     return false;
 }
 
-void MFDPluginWrapper::metadataChanged(int which_collection)
+void MFDPluginWrapper::metadataChanged(int which_collection, bool external)
 {
     if(metadata_change_function)
     {
-        metadata_change_function(which_collection);
+        metadata_change_function(which_collection, external);
     }
 }
 
@@ -416,14 +416,14 @@ void MFDPluginManager::stopPlugin(int which_one)
     }
 }
 
-void MFDPluginManager::tellPluginsMetadataChanged(int which_collection)
+void MFDPluginManager::tellPluginsMetadataChanged(int which_collection, bool external)
 {
     QPtrListIterator<MFDPluginWrapper> iterator( available_plugins );
     MFDPluginWrapper *a_plugin;
     while ( (a_plugin = iterator.current()) != 0 )
     {
         ++iterator;
-        a_plugin->metadataChanged(which_collection);
+        a_plugin->metadataChanged(which_collection, external);
     }
 }
 

@@ -27,6 +27,7 @@ HttpInRequest::HttpInRequest(MFDHttpPlugin *owner, char *raw_incoming, int incom
     send_response = true;
     headers.setAutoDelete(true);
     get_variables.setAutoDelete(true); 
+    expected_payload_size = -1;
        
     //
     //  Every request gets a response
@@ -154,6 +155,47 @@ HttpInRequest::HttpInRequest(MFDHttpPlugin *owner, char *raw_incoming, int incom
             HttpHeader *new_header = new HttpHeader(header_line);
             headers.insert(new_header->getField(), new_header);
             
+        }
+    }
+
+    // printHeaders();
+    
+    //
+    //  Now we need to store the payload.
+    //
+    
+
+    payload.clear();
+    payload.insert( 
+                    payload.begin(), 
+                    (raw_incoming + parse_point), 
+                    (raw_incoming + parse_point + (incoming_length - parse_point))
+                  );
+    
+    //
+    //  Make note of how many bytes we expect in total
+    //
+    
+    HttpHeader *content_length_header = headers.find("Content-Length");
+    if(content_length_header)
+    {
+        bool ok = true;
+        int content_length = content_length_header->getValue().toInt(&ok);
+        if(ok)
+        {
+            expected_payload_size = content_length;
+            if(expected_payload_size != (int) payload.size())
+            {
+                cerr << "httpinrequest.o: mismatch between Content-Length: "
+                     << "header and actual amount of data. Not good"
+                     << endl;
+            }
+        }
+        else
+        {
+            cerr << "httpinrequest.o: No Content-Length header in input, "
+                 << "things will probably screw up."
+                 << endl;
         }
     }
 

@@ -1205,6 +1205,48 @@ QString MdcapInput::popListItemName()
     return the_list_item_name;
 }
 
+bool MdcapInput::popCommitListType()
+{
+    //
+    //  Update type is 2 bytes
+    //  1 - content markup code
+    //  2 - int; 0 is false (partial update)
+    //           1 is true  (full update)
+    //
+    
+    if(amountLeft() < 2)
+    {
+        cerr << "mdcapinput.o: asked to popCommitListType(), but not enough "
+             << "bytes left";
+        return false;
+    }
+    
+    char content_code = popByte();
+    if(content_code != MarkupCodes::commit_list_type)
+    {
+        cerr << "mdcapinput.o: asked to popCommitListType(), but "
+             << "content code is not commit_list_type "
+             << endl;
+        return false;
+    }
+    
+    uint8_t result = popByte();
+    if(result == 1)
+    {
+        return true;
+    }
+    else if(result == 0)
+    {
+        return false;
+    }
+    
+    cerr << "mdcapinput.o: asked to popCommitListType(), but value was "
+         << "neither true not false"
+         << endl;
+    return false;
+}
+
+
 
 
 void MdcapInput::printContents()

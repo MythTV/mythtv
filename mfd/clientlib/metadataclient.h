@@ -12,8 +12,11 @@
 
 #include <qptrlist.h>
 
+#include <mythtv/uilistbtntype.h>
+
 #include "serviceclient.h"
 #include "../mdcaplib/mdcapinput.h"
+#include "../mdcaplib/mdcapoutput.h"
 #include "metadatacollection.h"
 
 class MdcapResponse;
@@ -34,6 +37,16 @@ class MetadataClient : public ServiceClient
     void handleIncoming();
     void processResponse(MdcapResponse *mdcap_response);
     void sendFirstRequest();
+
+    //
+    //  Methods for sending things _to_ the server
+    //
+    
+    void commitListEdits(
+                            UIListGenericTree *playlist_tree,
+                            bool new_playlist,
+                            QString playlist_name
+                        );
 
     //
     //  Methods for handling different responses from the server

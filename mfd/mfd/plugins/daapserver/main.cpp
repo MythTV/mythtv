@@ -18,7 +18,7 @@ bool         mfdplugin_init(MFD*, int);
 bool         mfdplugin_run();
 bool         mfdplugin_stop();
 bool         mfdplugin_can_unload();
-void         mfdplugin_metadata_change(int);
+void         mfdplugin_metadata_change(int, bool);
 }
 
 bool mfdplugin_init(MFD *owner, int identifier)
@@ -61,7 +61,7 @@ bool mfdplugin_can_unload()
     return true;
 }
 
-void mfdplugin_metadata_change(int which_collection)
+void mfdplugin_metadata_change(int which_collection, bool /* external */)
 {
     if(daap_server)
     {

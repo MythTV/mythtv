@@ -211,7 +211,10 @@ void MFD::customEvent(QCustomEvent *ce)
         //        
         
         MetadataChangeEvent *mce = (MetadataChangeEvent*)ce;
-        plugin_manager->tellPluginsMetadataChanged(mce->getIdentifier());
+        plugin_manager->tellPluginsMetadataChanged(
+                                                    mce->getIdentifier(), 
+                                                    mce->getExternalFlag()
+                                                  );
                 
     }
     else if(ce->type() == 65426)

@@ -15,6 +15,7 @@ using namespace std;
 
 #include <qsocketdevice.h>
 #include <qdict.h>
+#include <qvaluevector.h>
 
 #include "httpheader.h"
 #include "httpgetvar.h"
@@ -40,7 +41,7 @@ class HttpOutRequest
     void addGetVariable(const QString &label, const QString &value);
     void addHeader(const QString &new_header);
     QString getRequestString();
-
+    void setPayload(QValueVector<char>* new_payload);
     virtual void warning(const QString &warn_text);
         
   protected:
@@ -59,6 +60,9 @@ class HttpOutRequest
     QDict<HttpGetVariable>   get_variables;
     QDict<HttpHeader>        headers;
 
+    std::vector<char> payload;
+
+  
 };
 
 #endif

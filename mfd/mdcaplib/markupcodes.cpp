@@ -24,6 +24,8 @@ const char MarkupCodes::list_group;
 const char MarkupCodes::added_lists_group;
 const char MarkupCodes::deleted_lists_group;
 const char MarkupCodes::added_list_group;
+const char MarkupCodes::commit_list_group;
+const char MarkupCodes::commit_list_group_list;
 
 
 const char MarkupCodes::name;

@@ -20,6 +20,7 @@ using namespace std;
 #include "mfd_events.h"
 #include "httpoutresponse.h"
 #include "mdcaprequest.h"
+#include "../mdcaplib/mdcapinput.h"
 
 MetadataServer::MetadataServer(MFD* owner, int port)
                :MFDHttpPlugin(owner, -1, port, "metadata server", 2)
@@ -175,6 +176,11 @@ void MetadataServer::handleIncoming(HttpInRequest *http_request, int client_id)
     else if(mdcap_request->getRequestType() == MDCAP_REQUEST_CONTAINERS)
     {
         sendContainers(http_request, mdcap_request);
+    }
+    else if(mdcap_request->getRequestType() == MDCAP_REQUEST_COMMIT_LIST)
+    {
+        http_request->sendResponse(false);
+        dealWithListCommit(http_request, mdcap_request);
     }
     else
     {
@@ -878,7 +884,7 @@ void MetadataServer::doAtomicDataDelta(
         }
         else
         {
-            warning("cannot do a an AtomicDataDelta() "
+            warning("cannot do an AtomicDataDelta() "
                     "on a Container I don't own");
         }
         
@@ -1697,6 +1703,224 @@ void MetadataServer::dealWithHangingUpdates()
     hanging_updates_mutex.unlock();
     
     delete hu_response;
+}
+
+void MetadataServer::dealWithListCommit(HttpInRequest *http_request, MdcapRequest *mdcap_request)
+{
+    log(QString("beginning list commit for list %1 in container %2")
+               .arg(mdcap_request->getCommitListId())
+               .arg(mdcap_request->getContainerId()), 8);
+
+    
+    //
+    //  Get the mdcap payload out of the http request
+    //
+    
+    MdcapInput mdcap_input(http_request->getPayload());
+
+    char first_tag = mdcap_input.peekAtNextCode();
+    
+    if (first_tag != MarkupCodes::commit_list_group)
+    {
+        warning("tried to do dealWithCommits(), but first mdcap code "
+                "is not a commit_list_group");
+        return;
+    }
+
+    QValueVector<char> *group_contents = new QValueVector<char>;
+    
+    mdcap_input.popGroup(group_contents);
+    MdcapInput rebuilt_internals(group_contents);
+    
+    QValueVector<char> *list_contents = NULL;
+    int     parsed_collection_id = -1;
+    int     parsed_list_id = -1;
+    QString parsed_list_name = "";
+    bool    parsed_new_flag = false;
+    
+    bool all_is_well = true;
+    while(rebuilt_internals.size() > 0 && all_is_well)
+    {
+        char content_code = rebuilt_internals.peekAtNextCode();
+
+        //
+        //  Depending on what the code is, we set various things
+        //
+        
+        switch(content_code)
+        {
+            case MarkupCodes::list_name:
+                parsed_list_name = rebuilt_internals.popListName();
+                break;
+            
+            case MarkupCodes::list_id:
+                parsed_list_id = rebuilt_internals.popListId();
+                break;
+
+            case MarkupCodes::collection_id:
+                parsed_collection_id = rebuilt_internals.popCollectionId();
+                break;
+
+            case MarkupCodes::commit_list_type:
+                parsed_new_flag = rebuilt_internals.popCommitListType();
+                break;           
+
+            case MarkupCodes::commit_list_group_list:
+                list_contents = new QValueVector<char>;
+                rebuilt_internals.popGroup(list_contents);
+                break;                
+
+            default:
+                warning("mdserver.o getting content codes I don't "
+                        "understand while doing dealWithListCommit()");
+                all_is_well = false;
+
+            break;
+        }
+    }
+
+    if(all_is_well)
+    {
+        //
+        //  Check a couple things
+        //
+        
+        if(parsed_collection_id != mdcap_request->getContainerId())
+        {
+            warning("collection id in mdcap request differs between "
+                    "url and payload");
+                    
+            delete group_contents;
+            if(list_contents)
+            {
+                delete list_contents;
+                list_contents = NULL;
+            }
+            return;
+        }
+    
+        if(parsed_list_id != mdcap_request->getCommitListId())
+        {
+            warning("list id in mdcap request differs between "
+                    "url and payload");
+                    
+            delete group_contents;
+            if(list_contents)
+            {
+                delete list_contents;
+                list_contents = NULL;
+            }
+            return;
+        }
+    
+        if(parsed_new_flag)
+        {
+            //
+            //  It's a new playlist to add
+            //
+        }
+        else
+        {
+            //
+            //  Try and find the container and playlist in question
+            //
+            
+            lockMetadata();
+
+                MetadataContainer *metadata_container = getMetadataContainer(parsed_collection_id);
+                
+                if(!metadata_container)
+                {
+                    warning("could not find metadata container referenced by a "
+                            "mdcap commit request");
+                    delete group_contents;
+                    if(list_contents)
+                    {
+                        delete list_contents;
+                        list_contents = NULL;
+                    }
+                    unlockMetadata();
+                    return;
+                }
+                
+                Playlist *existing_playlist = getPlaylistByContainerAndId(
+                                                                parsed_collection_id,
+                                                                parsed_list_id
+                                                                         );
+                if(!existing_playlist)
+                {
+                    warning("could not find playlist to update specified by "
+                            "mdcap commit request");
+                    delete group_contents;
+                    if(list_contents)
+                    {
+                        delete list_contents;
+                        list_contents = NULL;
+                    }
+                    unlockMetadata();
+                    return;
+                }
+
+            unlockMetadata();
+
+            //
+            //  Create a new playlist
+            //
+
+            Playlist *new_playlist = new Playlist(
+                                                    parsed_collection_id,
+                                                    parsed_list_name,
+                                                    "",
+                                                    parsed_list_id
+                                                 );
+
+            MdcapInput actual_list(list_contents);
+            while(actual_list.size() > 0)
+            {
+                new_playlist->addToList(actual_list.popListItem());
+            }
+
+            //
+            //  We create enough bits and pieces to do our own internal
+            //  Atomic Data Delta. Don't have to delete any of these, as
+            //  they get deleted as part of the AtomicDataDelta();
+            //
+            
+            QIntDict<Metadata> *empty_new_metadata = new QIntDict<Metadata>;
+            QValueList<int>     empty_metadata_additions;
+            QValueList<int>     empty_metadata_deletions;
+            QIntDict<Playlist> *new_playlists = new QIntDict<Playlist>;
+            QValueList<int>     playlist_additions;
+            QValueList<int>     playlist_deletions;
+            
+            new_playlists->insert(parsed_list_id, new_playlist);
+            playlist_additions.push_back(parsed_list_id);
+
+            doAtomicDataDelta(
+                                metadata_container,
+                                empty_new_metadata,
+                                empty_metadata_additions,
+                                empty_metadata_deletions,
+                                new_playlists,
+                                playlist_additions,
+                                playlist_deletions,
+                                false
+                             );
+
+            MetadataChangeEvent *mce = new MetadataChangeEvent(parsed_collection_id, true);
+            QApplication::postEvent(parent, mce);    
+            
+            dealWithHangingUpdates();
+        }
+    }
+    
+    delete group_contents;
+    if(list_contents)
+    {
+        delete list_contents;
+        list_contents = NULL;
+    }
+    
 }
 
 

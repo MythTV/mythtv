@@ -519,6 +519,47 @@ void MfdInstance::announceMyDemise()
     QApplication::postEvent( mfd_interface, de );
 }
 
+void MfdInstance::commitListEdits(
+                                    UIListGenericTree *playlist_tree,
+                                    bool new_playlist,
+                                    QString playlist_name
+                                 )
+{
+    //
+    //  Find the metadata client object that will deal with this
+    //
+    
+    bool found_one = false;
+    for(
+            ServiceClient *an_sc = my_service_clients->first();
+            an_sc;
+            an_sc = my_service_clients->next()
+           )
+    {
+        if(an_sc->getMagicToken() == "metadata")
+        {
+            if ( MetadataClient *a_metadata_sc = dynamic_cast<MetadataClient*>(an_sc) )
+            {
+                found_one = true;
+                a_metadata_sc->commitListEdits(
+                                                playlist_tree,
+                                                new_playlist,
+                                                playlist_name
+                                              );
+                break;
+            }
+        }
+    }
+
+    if(!found_one)
+    {
+        cerr << "mfdinstance.o: found no metadata service "
+             << "client to hand off a commitEdits() to "
+             << endl;
+        return;
+    }    
+}
+
 void MfdInstance::addPendingCommand(QStringList new_command)
 {
     if(new_command.count() < 1)

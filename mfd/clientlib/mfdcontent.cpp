@@ -1249,6 +1249,7 @@ void MfdContentCollection::updatePlaylistDeltas(
         is fun
     */
     
+    /*
     cout << "playlist +: ";
     QIntDictIterator<bool> pit( *playlist_additions ); 
     for ( ; pit.current(); ++pit )
@@ -1264,6 +1265,7 @@ void MfdContentCollection::updatePlaylistDeltas(
         cout << mit.currentKey() << ", ";
     }
     cout << endl;
+    */
 }                                               
 
 void MfdContentCollection::alterPlaylist(UIListTreeType *menu, UIListGenericTree *playlist_tree, UIListGenericTree *node, bool turn_on)

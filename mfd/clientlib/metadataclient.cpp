@@ -44,6 +44,7 @@ MetadataClient::MetadataClient(
 {
     //
     //  until I'm logged in, I have no session_id
+
     //
     
     session_id = 0;
@@ -64,6 +65,67 @@ void MetadataClient::sendFirstRequest()
 
     MdcapRequest first_request("/server-info", ip_address);   
     first_request.send(client_socket_to_service); 
+}
+
+void MetadataClient::commitListEdits(
+                                        UIListGenericTree *playlist_tree,
+                                        bool new_playlist,
+                                        QString playlist_name
+                                    )
+{
+    //
+    //  We need to build an mdcap out request with the new playlist properly
+    //  marked up as it's payload
+    //
+
+
+    //
+    //  Create a mdcap output request object with the correct URL
+    //
+    
+    QString commit_url = QString("/commit/%1/list/%2/")
+                                .arg(playlist_tree->getAttribute(0))
+                                .arg(playlist_tree->getInt());
+
+    MdcapRequest commit_request(commit_url, ip_address);
+    commit_request.addGetVariable("session-id", session_id);
+
+
+    MdcapOutput outgoing_payload;
+    
+    outgoing_payload.addCommitListGroup();
+
+        outgoing_payload.addCollectionId(playlist_tree->getAttribute(0));
+        outgoing_payload.addListId(playlist_tree->getInt());
+        outgoing_payload.addListName(playlist_name);
+        if(new_playlist)
+        {
+            outgoing_payload.addCommitListType(true);
+        }    
+        else
+        {
+            outgoing_payload.addCommitListType(false);
+        }
+
+        outgoing_payload.addCommitListGroupList();
+
+            QPtrList<GenericTree> *all_children = playlist_tree->getAllChildren();
+            QPtrListIterator<GenericTree> it(*all_children);
+            GenericTree *child;
+            while ((child = it.current()) != 0)
+            {
+                outgoing_payload.addListItem(child->getInt() * child->getAttribute(3));
+                ++it;
+            }    
+
+        outgoing_payload.endGroup();
+
+    outgoing_payload.endGroup();
+
+    commit_request.setPayload(outgoing_payload.getContents());
+
+    commit_request.send(client_socket_to_service);
+
 }
 
 void MetadataClient::handleIncoming()

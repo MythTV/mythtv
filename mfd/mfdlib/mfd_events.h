@@ -122,17 +122,20 @@ class MetadataChangeEvent : public QCustomEvent
 {
     //
     //  Whenever any metadata container/monitor has found new/changed
-    //  metadata, it emits this.
+    //  metadata, it emits this. If something else changed it, that
+    //  something else should set the external flag true.
     //
     
   public:
   
-    MetadataChangeEvent(int which_collection);
+    MetadataChangeEvent(int which_collection, bool external = false);
     int getIdentifier();
+    bool getExternalFlag();
     
   private:
   
     int identifier;
+    bool was_external;
 };
 
 class ShutdownEvent : public QCustomEvent

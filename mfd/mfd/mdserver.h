@@ -117,7 +117,8 @@ class MetadataServer : public MFDHttpPlugin
 
     void buildUpdateResponse(MdcapOutput *response);
     void dealWithHangingUpdates();
-
+    void dealWithListCommit(HttpInRequest *http_request, MdcapRequest *mdcap_request);
+    
   private:
 
     void                        updateDictionary(
