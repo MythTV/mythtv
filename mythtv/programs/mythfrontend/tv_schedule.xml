@@ -96,8 +96,8 @@
 
    <button>
       <type>TV_RECPRIORITIES</type>
-      <text>Set Program Recording Priorities</text>
-      <alttext>Set Recording Priorities</alttext>
+      <text>Recording Priorities</text>
+      <alttext>Priorities</alttext>
       <action>TV_SET_RECPRIORITIES</action>
    </button>
 

@@ -21,7 +21,7 @@ DialogBox::DialogBox(MythMainWindow *parent, const QString &text,
     maintext->setBackgroundOrigin(WindowOrigin);
     maintext->setAlignment(Qt::WordBreak | Qt::AlignLeft | Qt::AlignTop);
 
-    box = new QVBoxLayout(this, (int)(20 * wmult));
+    box = new QVBoxLayout(this, (int)(150 * wmult), (int)(20 * wmult));
 
     box->addWidget(maintext, 1);
 

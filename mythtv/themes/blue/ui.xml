@@ -584,12 +584,12 @@
         <position>0,39</position>
       </image>
       <textarea name="highlighting" draworder="0" align="right">
-        <area>410,330,130,40</area>
+        <area>360,330,140,40</area>
         <font>message</font>
         <value>Highlighting:</value>
       </textarea>
       <textarea name="conyellow" draworder="0" align="right">
-        <area>545,330,120,40</area>
+        <area>505,330,130,40</area>
         <font>messageyellow</font>
         <value>Conflicting</value>
         <value lang="IT">Conflitto</value>
@@ -602,7 +602,7 @@
         <value lang="SV">Konflikter</value>
       </textarea>
       <textarea name="disgray" draworder="0" align="right">
-        <area>670,330,120,40</area>
+        <area>650,330,130,40</area>
         <font>messagegray</font>
         <value>Deactivated</value>
         <value lang="IT">Disattivate</value>
@@ -630,14 +630,14 @@
     </container>
 
     <container name="showlevel_info">
-      <area>10,330,260,20</area>
+      <area>10,330,280,30</area>
       <textarea name="showing" draworder="4">
-        <area>0,0,95,20</area>
+        <area>0,0,105,30</area>
         <font>message</font>
         <value>Showing:</value>
       </textarea>
       <textarea name="showlevel" draworder="4">
-        <area>100,0,140,20</area>
+        <area>110,0,150,30</area>
         <font>message</font>
       </textarea>
     </container>
@@ -653,8 +653,8 @@
         <fcnfont name="active_font" function="selected"></fcnfont>
         <columnpadding>10</columnpadding>
         <column number="1" width="60" context="-1"></column>
-        <column number="2" width="150" context="-1"></column>
-        <column number="3" width="460" context="-1"></column>
+        <column number="2" width="170" context="-1"></column>
+        <column number="3" width="440" context="-1"></column>
         <column number="4" width="30" context="-1"></column>
         <items>9</items>
         <image function="selectionbar" filename="cr-selectbar.png" location="-14,-5"></image>
@@ -1937,10 +1937,10 @@
         <fcnfont name="active_font" function="selected"></fcnfont>
         <fcnfont name="record_font" function="recording"></fcnfont>
         <fcnfont name="conflict_font" function="conflicting"></fcnfont>
-        <columnpadding>1</columnpadding>
-        <column number="1" width="150" context="-1"></column>
+        <columnpadding>5</columnpadding>
+        <column number="1" width="170" context="-1"></column>
         <column number="2" width="130" context="-1"></column>
-        <column number="3" width="500" context="-1"></column>
+        <column number="3" width="450" context="-1"></column>
         <items>11</items>
         <image function="selectionbar" filename="rk-selectbar.png" location="-6,-2"></image>
         <image function="uparrow" filename="uparrow.png" location="755,22"></image>

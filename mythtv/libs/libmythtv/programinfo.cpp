@@ -1384,9 +1384,9 @@ QString ProgramInfo::NoRecordText(void)
     case nrManualOverride:
         return "it was manually set to not record";
     case nrPreviousRecording:
-        return "this episode was recorded previously and recording of duplicates is not set";
+        return "this episode was previously recorded according to the duplicate policy chosen for this title";
     case nrCurrentRecording:
-        return "this episode was recorded previously and is still available for watching";
+        return "this episode was previously recorded and is still available in the list of recordings";
     case nrOtherShowing:
         return "this episode will be recorded at another time instead";
     case nrTooManyRecordings:
@@ -1394,7 +1394,7 @@ QString ProgramInfo::NoRecordText(void)
     case nrDontRecordList:
         return "it is currently being recorded or was manually canceled";
     case nrLowerRecPriority:
-        return "another prog with a higher rec priority will be recorded";
+        return "another program with a higher recording priority will be recorded";
     case nrManualConflict:
         return "another program was manually chosen to be recorded instead";
     case nrAutoConflict:

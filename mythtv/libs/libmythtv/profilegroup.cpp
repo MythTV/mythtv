@@ -196,8 +196,8 @@ void ProfileGroupEditor::open(int id) {
 
 void ProfileGroupEditor::load(QSqlDatabase* db) {
     clearSelections();
-    addSelection(QObject::tr("(Create new profile group)"), "0");
     ProfileGroup::fillSelections(db, this);
+    addSelection(QObject::tr("(Create new profile group)"), "0");
 }
 
 int ProfileGroupEditor::exec(QSqlDatabase* db) {
