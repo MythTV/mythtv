@@ -114,7 +114,7 @@ void ProgLister::keyPressEvent(QKeyEvent *e)
             cursorUp(true);
         else if (action == "PAGEDOWN")
             cursorDown(true);
-        else if (action == "SELECT")
+        else if (action == "SELECT" || action == "RIGHT" || action == "LEFT")
             select();
         else if (action == "MENU" || action == "INFO")
             edit();
