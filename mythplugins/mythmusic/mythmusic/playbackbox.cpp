@@ -307,6 +307,8 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
             changeVolume(true);
         else if (action == "MUTE")
             toggleMute();
+        else if (action == "INFO")
+            showEditMetadataDialog();
         else
             handled = false;
     }
@@ -407,6 +409,31 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
         MythThemedDialog::keyPressEvent(e);
 }
 
+void PlaybackBox::showEditMetadataDialog()
+{
+    // stop music playing
+    stop();
+    
+    EditMetadataDialog editDialog(curMeta, gContext->GetMainWindow(),
+                      "edit_metadata", "music-", "edit metadata");
+    if (editDialog.exec())
+    {
+        // update the metadata copy stored in all_music
+        if (all_music->updateMetadata(curMeta->ID(), curMeta))
+        {
+           // update the displayed track info
+           GenericTree *node = music_tree_list->getCurrentNode();
+           if (node)
+           {
+               bool errorFlag;
+               node->setString(all_music->getLabel(curMeta->ID(), &errorFlag));
+           }    
+        }   
+    }
+    
+    music_tree_list->select();    
+}
+
 void PlaybackBox::checkForPlaylists()
 {
     if (first_playlist_check)
@@ -437,7 +464,21 @@ void PlaybackBox::checkForPlaylists()
                 setContext(2);
             updateForeground();
             mainvisual->setVisual(visual_mode);
-        }
+            
+            if (class LCD * lcd = LCD::Get())
+            {
+                //Show the artist stuff on the LCD
+                QPtrList<LCDTextItem> textItems;
+                textItems.setAutoDelete(true);
+
+                textItems.append(new LCDTextItem(1, ALIGN_CENTERED,
+                                 curMeta->Artist() +" [" + 
+                                 curMeta->Album() + "] " +
+                                 curMeta->Title(), "Generic", true));
+                lcd->switchToGeneric(&textItems);
+
+            }
+        }    
         else
             constructPlaylistTree();
     }

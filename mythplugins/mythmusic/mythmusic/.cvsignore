@@ -1,14 +1,6 @@
 .qmake.internal.cache
 Makefile
-moc_cdrip.cpp
-moc_databasebox.cpp
-moc_mainvisual.cpp
-moc_menubox.cpp
-moc_playbackbox.cpp
-moc_scrolllabel.cpp
-moc_streaminput.cpp
-moc_themedmenu.cpp
-moc_visualize.cpp
+moc_*
 config.h
 config.pro
 mythmusic

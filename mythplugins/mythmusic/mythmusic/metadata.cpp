@@ -53,6 +53,7 @@ Metadata& Metadata::operator=(Metadata *rhs)
     rating = rhs->Rating();
     lastplay = rhs->LastPlayStr();
     playcount = rhs->Playcount();
+    compilation = rhs->Compilation();
     id = rhs->ID();
     filename = rhs->Filename();
     changed = rhs->hasChanged();
@@ -96,7 +97,7 @@ bool Metadata::isInDatabase(QSqlDatabase *db, QString startdir)
     sqlfilename.replace(QRegExp("\""), QString("\\\""));
 
     QString thequery = QString("SELECT artist,album,title,genre,year,tracknum,"
-                               "length,intid,rating,playcount,lastplay FROM "
+                               "length,intid,rating,playcount,lastplay,compilation FROM "
                                "musicmetadata WHERE filename = \"%1\";")
                                .arg(sqlfilename);
 
@@ -117,7 +118,8 @@ bool Metadata::isInDatabase(QSqlDatabase *db, QString startdir)
         rating = query.value(8).toInt();
         playcount = query.value(9).toInt();
         lastplay = query.value(10).toString();
-
+        compilation = (query.value(11).toInt() > 0);
+        
         retval = true;
     }
 
@@ -169,8 +171,8 @@ void Metadata::dumpToDatabase(QSqlDatabase *db, QString startdir)
         return;
 
     QString thequery = QString("INSERT INTO musicmetadata (artist,album,title,"
-                               "genre,year,tracknum,length,filename) VALUES "
-                               "(\"%1\",\"%2\",\"%3\",\"%4\",%5,%6,%7,\"%8\");")
+                               "genre,year,tracknum,length,filename,compilation) VALUES "
+                               "(\"%1\",\"%2\",\"%3\",\"%4\",%5,%6,%7,\"%8\", %9);")
                               .arg(artist.latin1())
                               .arg(album.latin1())
                               .arg(title.latin1())
@@ -178,11 +180,47 @@ void Metadata::dumpToDatabase(QSqlDatabase *db, QString startdir)
                               .arg(year)
                               .arg(tracknum)
                               .arg(length)
-                              .arg(sqlfilename);
+                              .arg(sqlfilename)
+                              .arg((int) compilation);
     db->exec(thequery);
 
     // easiest way to ensure we've got 'id' filled.
     fillData(db);
+}
+
+void Metadata::updateDatabase(QSqlDatabase *db, QString startdir)
+{
+    startdir = startdir; 
+    // only save to DB if something changed
+    //if (!hasChanged())
+    //    return;
+
+    if (artist == "")
+        artist = QObject::tr("Unknown Artist");
+    if (album == "")
+        album = QObject::tr("Unknown Album");
+    if (title == "")
+        title = filename;
+    if (genre == "")
+        genre = QObject::tr("Unknown Genre");
+
+    QSqlQuery query(QString::null, db);
+
+    query.prepare("UPDATE musicmetadata SET artist = :ARTIST, album = :ALBUM, "
+                  "title = :TITLE, genre = :GENRE, year = :YEAR, tracknum = :TRACKNUM, "
+                  "compilation = :COMPILATION "
+                  "WHERE intid = :ID;");
+    query.bindValue(":ARTIST", artist.latin1());
+    query.bindValue(":ALBUM", album.latin1());
+    query.bindValue(":TITLE", title.latin1());
+    query.bindValue(":GENRE", genre);
+    query.bindValue(":YEAR", year);
+    query.bindValue(":TRACKNUM", tracknum);
+    query.bindValue(":COMPILATION", (int) compilation);
+    query.bindValue(":ID", id);
+
+    if (!query.exec())
+         MythContext::DBError("Update musicmetadata", query.lastQuery());
 }
 
 void Metadata::setField(const QString &field, const QString &data)
@@ -203,6 +241,9 @@ void Metadata::setField(const QString &field, const QString &data)
         tracknum = data.toInt();
     else if (field == "length")
         length = data.toInt();
+    else if (field == "compilation")
+        compilation = (data.toInt() > 0);
+    
     else
     {
         cerr << "metadata.o: Something asked me to return data about a field called " << field << endl ;
@@ -297,7 +338,7 @@ void Metadata::fillData(QSqlDatabase *db)
     sqltitle.replace(QRegExp("\""), QString("\\\""));
 
     QString thequery = "SELECT artist,album,title,genre,year,tracknum,length,"
-                       "filename,intid,rating,playcount,lastplay FROM "
+                       "filename,intid,rating,playcount,lastplay,compilation FROM "
                        "musicmetadata WHERE title=\"" + sqltitle + "\"";
 
     if (album != "")
@@ -335,6 +376,7 @@ void Metadata::fillData(QSqlDatabase *db)
         rating = query.value(9).toInt();
         playcount = query.value(10).toInt();
         lastplay = query.value(11).toString();
+        compilation = (query.value(12).toInt() > 0);
     }
 }
 
@@ -345,7 +387,7 @@ void Metadata::fillDataFromID(QSqlDatabase *db)
         
     QString thequery;
     thequery = QString("SELECT title,artist,album,title,genre,year,tracknum,"
-                       "length,filename,rating,playcount,lastplay FROM "
+                       "length,filename,rating,playcount,lastplay,compilation FROM "
                        "musicmetadata WHERE intid=%1;").arg(id);
         
     QSqlQuery query = db->exec(thequery);
@@ -366,6 +408,7 @@ void Metadata::fillDataFromID(QSqlDatabase *db)
         rating = query.value(9).toInt();
         playcount = query.value(10).toInt();
         lastplay = query.value(11).toString();
+        compilation = (query.value(12).toInt() > 0);
     }
 }
 
@@ -490,7 +533,7 @@ void AllMusic::resync()
     done_loading = false;
     QString aquery =    "SELECT intid, artist, album, title, genre, "
                         "year, tracknum, length, filename, rating, "
-                        "lastplay, playcount FROM musicmetadata "
+                        "lastplay, playcount, compilation FROM musicmetadata "
                         "ORDER BY intid;";
 
     QString filename;
@@ -524,7 +567,8 @@ void AllMusic::resync()
                                         query.value(0).toInt(),
                                         query.value(9).toInt(),
                                         query.value(11).toInt(),
-                                        query.value(10).toString()
+                                        query.value(10).toString(),
+                                        (query.value(12).toInt() > 0)
                                     );
             all_music.append(temp); //  Don't delete temp, as PtrList now owns it
 
@@ -864,6 +908,20 @@ Metadata* AllMusic::getMetadata(int an_id)
         }
     }
     return NULL;
+}
+
+bool AllMusic::updateMetadata(int an_id, Metadata *the_track)
+{
+    if(an_id > 0)
+    {
+        Metadata *mdata = getMetadata(an_id);
+        if (mdata)
+        {
+            *mdata = the_track;
+            return true;    
+        }
+    }
+    return false;
 }
 
 void AllMusic::save()

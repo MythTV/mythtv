@@ -570,15 +570,25 @@ void MadDecoder::commitMetadata(Metadata *mdata)
     delete p_tagger;
 }
 
-
 bool MadDecoderFactory::supports(const QString &source) const
 {
-    return (source.right(extension().length()).lower() == extension());
+    bool res = false;
+    QStringList list = QStringList::split("|", extension());
+
+    for (QStringList::Iterator it = list.begin(); it != list.end(); ++it)
+    {
+        if (*it == source.right((*it).length()).lower())
+        {
+            res = true;
+            break;
+        }
+    }
+    return res;
 }
 
 const QString &MadDecoderFactory::extension() const
 {
-    static QString ext(".mp3");
+    static QString ext(".mp3|.mp2");
     return ext;
 }
 

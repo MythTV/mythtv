@@ -392,7 +392,7 @@ void MetaIOID3v2::removeComment(id3_tag *pTag,
         
     struct id3_frame* p_frame = NULL;
         
-    while (p_frame = id3_tag_findframe(pTag, pLabel, 0))
+    while ((p_frame = id3_tag_findframe(pTag, pLabel, 0)))
     {
         // Let's delete it!!
         if (0 == id3_tag_detachframe(pTag, p_frame))

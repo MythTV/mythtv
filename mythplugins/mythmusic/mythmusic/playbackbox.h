@@ -12,6 +12,7 @@
 #include "mainvisual.h"
 #include "metadata.h"
 #include "playlist.h"
+#include "editmetadata.h"
 
 class Output;
 class Decoder;
@@ -59,6 +60,7 @@ class PlaybackBox : public MythThemedDialog
     void toggleRepeat();
     void editPlaylist();
     void nextAuto();
+    void showEditMetadataDialog();
     void checkForPlaylists();
     void handleTreeListSignals(int, IntVector*);
     void visEnable();

@@ -19,7 +19,8 @@ class Metadata
     Metadata(QString lfilename = "", QString lartist = "", QString lalbum = "", 
              QString ltitle = "", QString lgenre = "", int lyear = 0, 
              int ltracknum = 0, int llength = 0, int lid = 0,
-             int lrating = 0, int lplaycount = 0, QString llastplay = "")
+             int lrating = 0, int lplaycount = 0, QString llastplay = "",
+             bool lcompilation = false)
             {
                 filename = lfilename;
                 artist = lartist;
@@ -33,6 +34,7 @@ class Metadata
                 rating = lrating;
                 playcount = lplaycount;
                 lastplay = llastplay;
+                compilation = lcompilation;
                 changed = false;
             }
 
@@ -50,6 +52,7 @@ class Metadata
                 rating = other.rating;
                 lastplay = other.lastplay;
                 playcount = other.playcount;
+                compilation = other.compilation;
                 changed = false;
             }
 
@@ -84,7 +87,7 @@ class Metadata
     
     QString Filename() const { return filename; }
     void setFilename(QString &lfilename) { filename = lfilename; }
-
+    
     int Rating() { return rating; }
     void decRating();
     void incRating();
@@ -96,9 +99,13 @@ class Metadata
     int PlayCount() { return playcount; }
     void incPlayCount();
 
+    // track is part of a compilation album
+    bool Compilation() { return compilation; }
+    void setCompilation(bool state) { compilation = state; };
+    
     bool isInDatabase(QSqlDatabase *db, QString startdir);
     void dumpToDatabase(QSqlDatabase *db, QString startdir);
-
+    void updateDatabase(QSqlDatabase *db, QString startdir);
     void setField(const QString &field, const QString &data);
     void getField(const QString &field, QString *data);
     void getField(const QStringList& tree_levels, QString *data, const QString &paths, const QString &startdir, uint depth);
@@ -119,7 +126,8 @@ class Metadata
     int rating;
     QString lastplay;
     int playcount;
-
+    bool compilation;
+     
     unsigned int id;
     QString filename;
     bool    changed;
@@ -200,6 +208,7 @@ class AllMusic
 
     QString     getLabel(int an_id, bool *error_flag);
     Metadata*   getMetadata(int an_id);
+    bool        updateMetadata(int an_id, Metadata *the_track);
     void        save();
     void        resync();   //  After a CD rip, for example
     void        clearCDData();
