@@ -377,7 +377,7 @@ MythDialog* ScheduledRecording::dialogWidget(MythContext* context, QWidget* pare
     int bigfont = context->GetBigFontSize();
     int mediumfont = context->GetMediumFontSize();
 
-    MythDialog* dialog = new MythDialog(context, parent, name, TRUE);
+    MythDialog* dialog = new ConfigurationDialogWidget(context, parent, name);
     QVBoxLayout* vbox = new QVBoxLayout(dialog);
 
     QGridLayout *grid = new QGridLayout(vbox, 4, 2, (int)(10*wmult));
