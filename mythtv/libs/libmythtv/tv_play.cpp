@@ -3530,14 +3530,19 @@ void TV::BuildOSDTreeMenu(void)
 
     if (internalState == kState_WatchingLiveTV)
     {
+        int freeRecorders = RemoteGetFreeRecorderCount();
+
         item = new OSDGenericTree(treeMenu, tr("Program Guide"), "GUIDE");
 
-        item = new OSDGenericTree(treeMenu, tr("Picture-in-Picture"));
-        subitem = new OSDGenericTree(item, tr("Enable/Disable"), 
-                                     "TOGGLEPIPMODE");
-        subitem = new OSDGenericTree(item, tr("Swap Channels"), "SWAPPIP");
-        subitem = new OSDGenericTree(item, tr("Change Active Window"),
-                                     "TOGGLEPIPWINDOW");
+        if (freeRecorders)
+        {
+            item = new OSDGenericTree(treeMenu, tr("Picture-in-Picture"));
+            subitem = new OSDGenericTree(item, tr("Enable/Disable"), 
+                                         "TOGGLEPIPMODE");
+            subitem = new OSDGenericTree(item, tr("Swap Channels"), "SWAPPIP");
+            subitem = new OSDGenericTree(item, tr("Change Active Window"),
+                                         "TOGGLEPIPWINDOW");
+        }
 
         item = new OSDGenericTree(treeMenu, tr("Enable Browse Mode"),
                                   "TOGGLEBROWSE");

@@ -20,13 +20,8 @@ release {
 
 EXTRA_LIBS = -lfreetype -lmp3lame
 
-UNAME = $$system(uname -s)
-contains( UNAME, [lL]inux ) {
-  CONFIG += linux
-}
-contains( UNAME, FreeBSD ) {
-  CONFIG += freebsd
-}
+unix:linux*: CONFIG += linux
+unix:freebsd*: CONFIG += freebsd
 
 # X11 support
 CONFIG += using_x11

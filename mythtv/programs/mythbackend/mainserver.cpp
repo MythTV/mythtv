@@ -287,6 +287,10 @@ void MainServer::ProcessRequest(QSocket *sock)
     {
         HandleGetFreeRecorder(pbs);
     }
+    else if (command == "GET_FREE_RECORDER_COUNT")
+    {
+        HandleGetFreeRecorderCount(pbs);
+    }
     else if (command == "GET_NEXT_FREE_RECORDER")
     {
         HandleGetNextFreeRecorder(listline, pbs);
@@ -385,7 +389,16 @@ void MainServer::ProcessRequest(QSocket *sock)
         HandleBackendRefresh(sock);
     }
     else
+    {
         VERBOSE(VB_ALL, "Unknown command: " + command);
+
+        QSocket *pbssock = pbs->getSocket();
+
+        QStringList strlist;
+        strlist << "UNKNOWN_COMMAND";
+        
+        SendResponse(pbssock, strlist);
+    }
 }
 
 void MainServer::MarkUnused(ProcessRequestThread *prt)
@@ -1668,6 +1681,31 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
         strlist << "-1";
     }
 
+    SendResponse(pbssock, strlist);
+}
+
+void MainServer::HandleGetFreeRecorderCount(PlaybackSock *pbs)
+{
+    QSocket *pbssock = pbs->getSocket();
+
+    QStringList strlist;
+    int count = 0;
+
+    QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
+    for (; iter != encoderList->end(); ++iter)
+    {
+        EncoderLink *elink = iter.data();
+
+        if ((elink->isConnected()) &&
+            (!elink->IsBusy()) &&
+            (!elink->isTunerLocked()))
+        {
+            count++;
+        }
+    }
+
+    strlist << QString::number(count);
+        
     SendResponse(pbssock, strlist);
 }
 

@@ -26,6 +26,7 @@ void RemoteGeneratePreviewPixmap(ProgramInfo *pginfo);
 void RemoteFillProginfo(ProgramInfo *pginfo, const QString &playbackhostname);
 int RemoteIsRecording(void);
 int RemoteGetRecordingMask(void);
+int RemoteGetFreeRecorderCount(void);
 
 int RemoteCheckForRecording(ProgramInfo *pginfo);
 int RemoteGetRecordingStatus(ProgramInfo *pginfo, int overrecsecs, 

@@ -68,6 +68,7 @@ class MainServer : public QObject
     void HandleGetConflictingRecordings(QStringList &slist, PlaybackSock *pbs);
     void HandleGetNextFreeRecorder(QStringList &slist, PlaybackSock *pbs);
     void HandleGetFreeRecorder(PlaybackSock *pbs);
+    void HandleGetFreeRecorderCount(PlaybackSock *pbs);
     void HandleRecorderQuery(QStringList &slist, QStringList &commands,
                              PlaybackSock *pbs);
     void HandleFileTransferQuery(QStringList &slist, QStringList &commands,

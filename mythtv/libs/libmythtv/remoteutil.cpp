@@ -336,6 +336,23 @@ int RemoteGetRecordingMask(void)
     return mask;
 }
 
+int RemoteGetFreeRecorderCount(void)
+{
+    QStringList strlist = "GET_FREE_RECORDER_COUNT";
+
+    if (!gContext->SendReceiveStringList(strlist, true))
+        return 0;
+
+    if (strlist[0] == "UNKNOWN_COMMAND")
+    {
+        cerr << "Unknown command GET_FREE_RECORDER_COUNT, upgrade "
+                "your backend version." << endl;
+        return 0;
+    }
+
+    return strlist[0].toInt();
+}
+
 int RemoteCheckForRecording(ProgramInfo *pginfo)
 {  //returns recordernum if pginfo recording in progress, else 0
     QStringList strlist = QString("CHECK_RECORDING");
