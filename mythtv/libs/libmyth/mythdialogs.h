@@ -96,8 +96,9 @@ class MythMainWindow : public QDialog
 
     void RegisterMediaPlugin(const QString &name, const QString &desc,
                              MediaPlayCallback fn);
-    bool HandleMedia(QString& handler, const QString& mrl, const QString& plot,
-                     const QString& title, const QString& director, int lenMins, const QString& year);
+    bool HandleMedia(QString& handler, const QString& mrl, const QString& plot="",
+                     const QString& title="", const QString& director="", int lenMins=120, 
+                     const QString& year="1895");
 
     void JumpTo(const QString &destination);
     bool DestinationExists(const QString &destination) const;
