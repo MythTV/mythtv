@@ -120,6 +120,14 @@ void ATSCStreamData::HandleTables(const TSPacket* tspacket, HDTVRecorder* record
             VERBOSE(VB_RECORD, QString("VCT Terra"));
             TerrestrialVirtualChannelTable vct(*psip);
             SetVersionTVCT(vct.TransportStreamID(), version);
+
+            if (vct.ChannelCount() < 1) {
+                VERBOSE(VB_IMPORTANT, "TVCT: table has no channels");
+                HT_RETURN;
+            }
+
+            bool found = false;
+
             for (uint i=0; i<vct.ChannelCount(); i++) {
                 VERBOSE(VB_RECORD, vct.toString(i));
                 if (vct.MinorChannel(i)==(uint)DesiredSubchannel()) {
@@ -133,8 +141,17 @@ void ATSCStreamData::HandleTables(const TSPacket* tspacket, HDTVRecorder* record
                         // Do a (partial?) reset here if old desired
                         // program is not 0?
                         setDesiredProgram(vct.ProgramNumber(i));
+                        found = true;
                     }
                 }
+            }
+
+            if (!found) {
+                VERBOSE(VB_IMPORTANT, 
+                        QString("Desired subchannel %1 not found;"
+                                " using %2 instead")
+                        .arg(DesiredSubchannel()).arg(vct.MinorChannel(0)));
+                setDesiredProgram(vct.ProgramNumber(0));
             }
         }
         break;

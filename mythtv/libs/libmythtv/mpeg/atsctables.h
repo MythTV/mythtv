@@ -154,7 +154,10 @@ class TerrestrialVirtualChannelTable : public PSIPTable {
         QString str;
         const unsigned short* ustr =
             reinterpret_cast<const unsigned short*>(_ptrs[i]);
-        for (int j=0; j<7; j++) str.append(QChar((ustr[j]<<8) | (ustr[j]>>8)));
+        for (int j=0; j<7; j++) {
+            QChar c((ustr[j]<<8) | (ustr[j]>>8));
+            if (c != QChar('\0')) str.append(c);
+        }
         return str;
     }
     //   reserved               4  14.0        0xf
