@@ -70,7 +70,11 @@
     </message>
     <message>
         <source>SlideshowDelay</source>
-        <translation>Pausa en presentación</translation>
+        <translation type="obsolete">Pausa en presentación</translation>
+    </message>
+    <message>
+        <source>Slideshow Delay</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

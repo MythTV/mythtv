@@ -63,7 +63,8 @@ class SlideshowDelay: public SpinBoxSetting, public GlobalSetting {
 public:
     SlideshowDelay():
         SpinBoxSetting(1,600,1) ,
-        GlobalSetting(QObject::tr("SlideshowDelay")) {
+        GlobalSetting("SlideshowDelay") {
+        setLabel(QObject::tr("Slideshow Delay"));
         setValue(5);
         setHelpText(QObject::tr("This is the number of seconds to display each "
                     "picture."));

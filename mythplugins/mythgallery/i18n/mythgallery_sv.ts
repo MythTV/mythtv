@@ -62,7 +62,7 @@
     </message>
     <message>
         <source>SlideshowDelay</source>
-        <translation>Visningstid vid bildspel</translation>
+        <translation type="obsolete">Visningstid vid bildspel</translation>
     </message>
     <message>
         <source>This is the number of seconds to display each picture.</source>
@@ -71,6 +71,10 @@
     <message>
         <source>MythGallery Settings</source>
         <translation>Inställningar för Bildvisaren</translation>
+    </message>
+    <message>
+        <source>Slideshow Delay</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

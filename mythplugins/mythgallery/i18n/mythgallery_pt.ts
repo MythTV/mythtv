@@ -91,7 +91,7 @@
     </message>
     <message>
         <source>Slideshow Delay</source>
-        <translation type="obsolete">Tempo de visualização no modo contínuo</translation>
+        <translation type="unfinished">Tempo de visualização no modo contínuo</translation>
     </message>
     <message>
         <source>This is a colon separated list of paths. If the path in the list is a directory, its contents will be copied. If it is an executable, it will be run.</source>
@@ -107,7 +107,7 @@
     </message>
     <message>
         <source>SlideshowDelay</source>
-        <translation>Tempo de visualização no modo contínuo</translation>
+        <translation type="obsolete">Tempo de visualização no modo contínuo</translation>
     </message>
 </context>
 <context>

@@ -70,7 +70,11 @@
     </message>
     <message>
         <source>SlideshowDelay</source>
-        <translation>Espera en Presentació</translation>
+        <translation type="obsolete">Espera en Presentació</translation>
+    </message>
+    <message>
+        <source>Slideshow Delay</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
