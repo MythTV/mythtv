@@ -72,6 +72,8 @@ class RingBuffer
     void ReadAheadThread(void);
 
   private:
+    void Init(void);
+
     int safe_read(int fd, void *data, unsigned sz);
     int safe_read(RemoteFile *rf, void *data, unsigned sz);
 
@@ -127,6 +129,9 @@ class RingBuffer
     bool wantseek;
     int fill_threshold;
     int fill_min;
+
+    int readblocksize;
+    int requestedblocks;
 };
 
 #endif

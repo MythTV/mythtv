@@ -360,7 +360,16 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     delete [] space;
 
+    setreadahead = false;
+
+    // mpeg4 encodes are small enough that this shouldn't matter
+    if (usingextradata && extradata.video_fourcc == MKTAG('D', 'I', 'V', 'X'))
+        setreadahead = true;
+
     ringBuffer->CalcReadAheadThresh(0);
+
+    videosizetotal = 0;
+    videoframesread = 0;
 
     ringBuffer->Seek(startpos, SEEK_SET);
 
@@ -792,6 +801,23 @@ void NuppelDecoder::GetFrame(int onlyvideo)
             m_parent->ReleaseNextVideoFrame(true, frameheader.timecode);
             gotvideo = 1;
             framesPlayed++;
+
+            if (!setreadahead)
+            {
+                videosizetotal += frameheader.packetlength;
+                videoframesread++;
+
+                if (videoframesread > 15)
+                {
+                    videosizetotal /= videoframesread;
+
+                    float bps = videosizetotal * 8.0 / 1024 * video_frame_rate;
+                    bps = bps * 3 / 2;
+
+                    ringBuffer->CalcReadAheadThresh((int)bps);
+                    setreadahead = true;
+                }
+            }
             continue;
         }
 

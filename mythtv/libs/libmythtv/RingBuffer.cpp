@@ -249,19 +249,10 @@ unsigned ThreadedFileWriter::BufFree()
 
 RingBuffer::RingBuffer(const QString &lfilename, bool write, bool needevents)
 {
-    readaheadrunning = false;
-    readaheadpaused = false;
-    wantseek = false;
-    fill_threshold = -1;
-    fill_min = -1;
+    Init();
 
-    recorder_num = 0;   
- 
     normalfile = true;
     filename = (QString)lfilename;
-    tfw = NULL;
-    remotefile = NULL;
-    fd2 = -1;
 
     if (write)
     {
@@ -303,28 +294,13 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write, bool needevents)
         writemode = false;
     }
 
-    totalwritepos = writepos = 0;
-    totalreadpos = readpos = 0;
     smudgeamount = 0;
-
-    stopreads = false;
-    dumpfw = NULL;
-    dumpwritepos = 0;
-
-    pthread_rwlock_init(&rwlock, NULL);
 }
 
 RingBuffer::RingBuffer(const QString &lfilename, long long size, 
                        long long smudge, RemoteEncoder *enc)
 {
-    readaheadrunning = false;
-    readaheadpaused = false;
-    wantseek = false;
-    fill_threshold = -1;
-    fill_min = -1;
-
-    recorder_num = 0;
-    remoteencoder = NULL;
+    Init();
 
     if (enc)
     {
@@ -336,10 +312,6 @@ RingBuffer::RingBuffer(const QString &lfilename, long long size,
     filename = (QString)lfilename;
     filesize = size;
    
-    remotefile = NULL;
-    tfw = NULL;
-    fd2 = -1;
-
     if (recorder_num == 0)
     {
         tfw = new ThreadedFileWriter(filename.ascii(), 
@@ -352,11 +324,29 @@ RingBuffer::RingBuffer(const QString &lfilename, long long size,
         remotefile = new RemoteFile(filename, false, recorder_num);
     }
 
-    totalwritepos = writepos = 0;
-    totalreadpos = readpos = 0;
-
     wrapcount = 0;
     smudgeamount = smudge;
+}
+
+void RingBuffer::Init(void)
+{
+    readaheadrunning = false;
+    readaheadpaused = false;
+    wantseek = false;
+    fill_threshold = -1;
+    fill_min = -1;
+
+    readblocksize = 128000;
+    requestedblocks = 0;
+
+    recorder_num = 0;
+    remoteencoder = NULL;
+    tfw = NULL;
+    remotefile = NULL;
+    fd2 = -1;
+
+    totalwritepos = writepos = 0;
+    totalreadpos = readpos = 0;
 
     stopreads = false;
     dumpfw = NULL;
@@ -495,6 +485,9 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
     int ret;
     unsigned tot = 0;
     unsigned zerocnt = 0;
+    bool hiteof = false;
+    int reqsize = readblocksize;
+
 
     QSocket *sock = rf->getSocket();
 
@@ -504,24 +497,39 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
 
     while (available < sz) 
     {
-        int reqsize = 128000;
-
-        if (rf->RequestBlock(reqsize))
+        do
+        {
+            if (requestedblocks > 3)
+                break;
+ 
+            if (rf->RequestBlock(reqsize))
+            {
+                hiteof = true;
+                break;
+            }
+            requestedblocks++;
+        }
+        while (requestedblocks < 2);
+ 
+        if (hiteof)
             break;
 
         zerocnt++;
-        if (zerocnt >= 10)
+        if (zerocnt >= 20)
         {
             break;
         }
         if (stopreads)
             break;
 
-        usleep(100);
-
         qApp->lock();
         available = sock->bytesAvailable();
         qApp->unlock();
+
+        if (available >= sz)
+            break;
+
+        usleep(100);
     }
 
     qApp->lock();
@@ -537,11 +545,13 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
 
         tot += ret;
     }
+
+    requestedblocks--;
+
     return tot;
 }
 
 #define READ_AHEAD_SIZE (10 * 1024 * 1024)
-#define READ_AHEAD_BLOCK_SIZE (128000)
 
 void RingBuffer::CalcReadAheadThresh(int estbitrate)
 {
@@ -564,10 +574,10 @@ void RingBuffer::CalcReadAheadThresh(int estbitrate)
     if (estbitrate > 14000)
         fill_threshold += 256000;
 
-    if (fill_threshold == 256000)
-        fill_min = 128000;
-    if (fill_threshold > 256000)
-        fill_min = 256000;
+    if (estbitrate > 17000)
+        readblocksize = 256000;
+
+    fill_min = readblocksize;
 
     readsallowed = false;
 
@@ -619,6 +629,7 @@ void RingBuffer::ResetReadAhead(long long newinternal)
     internalreadpos = newinternal;
     ateof = false;
     readsallowed = false;
+    requestedblocks = 0;
     pthread_mutex_unlock(&readAheadLock);
 }
 
@@ -696,10 +707,10 @@ void RingBuffer::ReadAheadThread(void)
         readaheadpaused = false;
 
         pthread_rwlock_rdlock(&rwlock);
-        if (totfree > READ_AHEAD_BLOCK_SIZE)
+        if (totfree > readblocksize)
         {
             // limit the read size
-            totfree = READ_AHEAD_BLOCK_SIZE;
+            totfree = readblocksize;
 
             if (rbwpos + totfree > READ_AHEAD_SIZE)
                 totfree = READ_AHEAD_SIZE - rbwpos;
@@ -779,7 +790,7 @@ void RingBuffer::ReadAheadThread(void)
             totfree = 0;
         }
 
-        if (!readsallowed && used >= fill_threshold)
+        if (!readsallowed && used >= fill_min)
             readsallowed = true;        
 
         if (readsallowed && used < fill_min && !ateof)
@@ -792,6 +803,8 @@ void RingBuffer::ReadAheadThread(void)
 
         if (used >= fill_threshold || wantseek)
             usleep(500);
+
+        sched_yield();
     }
 
     delete [] readAheadBuffer;

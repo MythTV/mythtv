@@ -122,6 +122,10 @@ class NuppelDecoder : public DecoderBase
 
     QPtrList <RawDataList> StoredData;
     bool getrawframes;
+
+    int videosizetotal;
+    int videoframesread;
+    bool setreadahead;
 };
 
 #endif

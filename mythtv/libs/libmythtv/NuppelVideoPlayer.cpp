@@ -61,7 +61,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
     eof = 0;
 
     keyframedist = 30;
-    usepre = 3;
+    usepre = 12;
 
     wpos = rpos = 0;
     wtxt = rtxt = 0;
@@ -1115,7 +1115,6 @@ void NuppelVideoPlayer::OldAVSync(void)
     if (audioOutput)
     {
         lastaudiotime = audioOutput->GetAudiotime(); // ms, same scale as timecodes
-
         if (lastaudiotime != 0) // lastaudiotime = 0 after a seek
         {
             /* if we were perfect, (timecodes[rpos] - frame_time)
@@ -1229,15 +1228,16 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         if (prebuffering)
         {
             //printf("prebuffering...\n");
-            usleep(200);
+            usleep(frame_interval);
             ResetNexttrigger(&nexttrigger);
             continue;
         }
 
         if (vbuffer_numvalid() < 2)
         {
-           setPrebuffering(true); 
-           continue;
+            //printf("entering prebuffering mode\n");
+            setPrebuffering(true); 
+            continue;
         }
 
         if (!disablevideo)
