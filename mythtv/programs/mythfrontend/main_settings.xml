@@ -51,7 +51,7 @@
      <text>Info Center Settings</text>
      <text lang="DE">Informationszentrale</text>
      <action>MENU info_settings.xml</action>
-     <depends>mythnews mythweather mythbookmarkmanager mythrecipe<depends> 
+     <depends>mythnews mythweather mythbookmarkmanager mythrecipe</depends> 
    </button>
 
    <button>
