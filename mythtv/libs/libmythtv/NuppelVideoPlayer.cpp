@@ -3298,7 +3298,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
     bool flaggingPaused = false;
     int flagFPS = 0;
     float elapsed = 0.0;
-    long long framesRead = 0;
+    VideoFrame *currentFrame;
 
     killplayer = false;
     framesPlayed = 0;
@@ -3315,6 +3315,17 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
     m_playbackinfo->SetCommFlagged(COMM_FLAG_PROCESSING, m_db->db());
     m_db->unlock();
 
+    if (inJobQueue)
+    {
+        m_db->lock();
+        jobID = JobQueue::GetJobID(m_db->db(), JOB_COMMFLAG,
+                                  m_playbackinfo->chanid,
+                                  m_playbackinfo->startts);
+        JobQueue::ChangeJobStatus(m_db->db(), jobID, JOB_RUNNING,
+                                  "0% " + QObject::tr("Completed"));
+        m_db->unlock();
+    }
+
     playing = true;
 
     InitVideo();
@@ -3328,7 +3339,18 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
         gContext->GetNumSetting("CommSkipAllBlanks", 1));
 
     if (commercialskipmethod & COMM_DETECT_LOGO)
-        commDetect->SearchForLogo(this, fullSpeed, showPercentage);
+    {
+        if (inJobQueue)
+        {
+            m_db->lock();
+            JobQueue::ChangeJobStatus(m_db->db(), jobID, JOB_RUNNING,
+                                      QObject::tr("Searching for Logo"));
+            m_db->unlock();
+        }
+
+        commDetect->SearchForLogo(this, fullSpeed);
+    }
+
 
     QTime flagTime;
     flagTime.start();
@@ -3344,21 +3366,11 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
             printf( "%6lld", 0LL );
     }
 
-    if (inJobQueue)
-    {
-        m_db->lock();
-        jobID = JobQueue::GetJobID(m_db->db(), JOB_COMMFLAG,
-                                  m_playbackinfo->chanid,
-                                  m_playbackinfo->startts);
-        JobQueue::ChangeJobStatus(m_db->db(), jobID, JOB_RUNNING,
-                                  "0% " + QObject::tr("Completed"));
-        m_db->unlock();
-    }
-
     while (!eof)
     {
-        framesRead = decoder->GetFramesRead();
-        if ((jobID != -1) && ((framesRead % 500) == 0))
+        currentFrame = videoOutput->GetLastDecodedFrame();
+
+        if ((jobID != -1) && ((currentFrame->frameNumber % 500) == 0))
         {
             int curCmd;
 
@@ -3408,18 +3420,18 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
         if (!fullSpeed)
             usleep(10000);
 
-        if (((jobID != -1) && ((framesRead % 500) == 0)) ||
-            ((showPercentage) && (framesRead % 100) == 0))
+        if (((jobID != -1) && ((currentFrame->frameNumber % 500) == 0)) ||
+            ((showPercentage) && (currentFrame->frameNumber % 100) == 0))
         {
             elapsed = flagTime.elapsed() / 1000.0;
 
             if (elapsed)
-                flagFPS = (int)(framesRead / elapsed);
+                flagFPS = (int)(currentFrame->frameNumber / elapsed);
             else
                 flagFPS = 0;
 
             if (totalFrames)
-                percentage = framesRead * 100 / totalFrames;
+                percentage = currentFrame->frameNumber * 100 / totalFrames;
             else
                 percentage = 0;
 
@@ -3433,12 +3445,12 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
                 else
                 {
                     printf( "\b\b\b\b\b\b" );
-                    printf( "%6lld", framesRead );
+                    printf( "%6lld", currentFrame->frameNumber );
                 }
                 fflush( stdout );
             }
 
-            if ((jobID != -1) && ((framesRead % 500) == 0))
+            if ((jobID != -1) && ((currentFrame->frameNumber % 500) == 0))
             {
                 m_db->lock();
                 JobQueue::ChangeJobComment(m_db->db(), jobID,
@@ -3449,8 +3461,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
             }
         }
 
-        commDetect->ProcessNextFrame(videoOutput->GetLastDecodedFrame(),
-                                     framesRead);
+        commDetect->ProcessNextFrame(currentFrame, currentFrame->frameNumber);
 
         GetFrame(1,true);
     }

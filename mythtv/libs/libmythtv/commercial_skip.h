@@ -22,6 +22,18 @@ enum SkipTypes {
     COMM_DETECT_ALL         = 0xFF
 };
 
+enum frameMaskValues {
+    COMM_FRAME_BLANK         = 0x0001,
+    COMM_FRAME_SCENE_CHANGE  = 0x0002,
+    COMM_FRAME_LOGO_PRESENT  = 0x0004,
+    COMM_FRAME_ASPECT_CHANGE = 0x0008,
+    COMM_FRAME_RATING_SYMBOL = 0x0010
+};
+
+// Set max comm break length to 00:08:05 minutes & max comm length to 00:02:05
+#define MIN_COMM_BREAK_LENGTH   60
+#define MAX_COMM_BREAK_LENGTH  485
+#define MAX_COMM_LENGTH  125
 
 extern "C" {
 #include "frame.h"
@@ -36,6 +48,8 @@ class CommDetect
     void Init(int w, int h, double frame_rate, int method);
 
     void ProcessNextFrame(VideoFrame *frame, long long frame_number = -1);
+    void SetVerboseDebugging(bool beVerbose = true)
+                             { verboseDebugging = beVerbose; };
 
     bool FrameIsBlank(void);
     bool SceneHasChanged(void);
@@ -69,34 +83,76 @@ class CommDetect
 
     void SetMinMaxPixels(VideoFrame *frame);
 
-    void SearchForLogo(NuppelVideoPlayer *nvp, bool fullSpeed, bool verbose);
+    void SearchForLogo(NuppelVideoPlayer *nvp, bool fullSpeed);
     void SetLogoMaskArea();
     void GetLogoMask(unsigned char *mask);
     void SetLogoMask(unsigned char *mask);
 
 
   private:
+    typedef struct edgemaskentry {
+        int isedge;
+        int horiz;
+        int vert;
+        int rdiag;
+        int ldiag;
+    } EdgeMaskEntry;
+
+    typedef struct frameinfo {
+        int minBrightness;
+        int maxBrightness;
+        int avgBrightness;
+        int sceneChangePercent;
+        int flagMask;
+    } FrameInfoEntry;
+
+    typedef struct frameblock {
+        long start;
+        long end;
+        long frames;
+        double length;
+        int bf_count;
+        int logo_count;
+        int rating_count;
+        int sc_count;
+        double sc_rate;
+        int score;
+    } FrameBlock;
+
     bool CheckFrameIsBlank(void);
     bool CheckSceneHasChanged(void);
     bool CheckStationLogo(void);
-
-    int GetAvgBrightness(void);
+    bool CheckEdgeLogo(void);
+    bool CheckRatingSymbol(void);
+    bool CheckFrameIsInCommMap(long long frameNumber, QMap<long long, int>);
 
     void CondenseMarkMap(QMap<long long, int>&map, int spacing, int length);
     void ConvertShowMapToCommMap(QMap<long long, int>&map);
 
+    void CleanupFrameInfo(void);
+    void DumpFrameInfo(void);
+    void DetectEdges(VideoFrame *frame, EdgeMaskEntry *edges, int edgeDiff);
+
     bool aggressiveDetection;
 
     int commDetectMethod;
+    bool verboseDebugging;
+
+    long long curFrameNumber;
 
     int width;
     int height;
+    int horizSpacing;
+    int vertSpacing;
     int border;
     double fps;
     double fpm;
     bool blankFramesOnly;
+    int blankFrameCount;
 
     long long framesProcessed;
+
+    int totalMinBrightness;
 
     bool detectBlankFrames;
     bool detectSceneChanges;
@@ -104,12 +160,18 @@ class CommDetect
 
     bool skipAllBlanks;
 
+    EdgeMaskEntry *edgeMask;
+
     unsigned char *logoMaxValues;
     unsigned char *logoMinValues;
     unsigned char *logoFrame;
     unsigned char *logoMask;
     unsigned char *logoCheckMask;
+    unsigned char *tmpBuf;
     bool logoInfoAvailable;
+    int logoEdgeDiff;
+    double logoGoodEdgeThreshold;
+    double logoBadEdgeThreshold;
     int logoFrameCount;
     int logoMinX;
     int logoMaxX;
@@ -118,6 +180,7 @@ class CommDetect
 
     unsigned char *frame_ptr;
 
+    QMap<long long, FrameInfoEntry> frameInfo;
     QMap<long long, int> blankFrameMap;
     QMap<long long, int> blankCommMap;
     QMap<long long, int> blankCommBreakMap;
@@ -140,3 +203,5 @@ class CommDetect
 };
 
 #endif
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
