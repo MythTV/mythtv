@@ -39,7 +39,8 @@ class AudioPlugin: public MFDServicePlugin
     void    handleInternalMessage(QString the_message);
     void    setPlaylistMode(int container, int id, int index = 0);
     void    stopPlaylistMode();
-    void    playFromPlaylist(bool augment_index = true);
+    void    playFromPlaylist(int augment_index = 0);
+    void    nextPrevAudio(bool forward);
         
   private:
   

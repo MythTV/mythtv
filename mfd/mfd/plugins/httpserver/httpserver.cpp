@@ -31,7 +31,8 @@ ClientHttpServer::ClientHttpServer(MFD *owner, int identity)
     //
     
     metadata_server = owner->getMetadataServer();
-    
+
+    other_ufpi.setAutoDelete(true);
 }
 
 
@@ -317,7 +318,14 @@ void ClientHttpServer::addMHttpServer(QString server_address, uint server_port, 
         .arg(service_name)
         .arg(server_address)
         .arg(server_port), 10);
-        
+
+    QString constructed_url = QString("http://%1:%2/").arg(server_address).arg(server_port);
+
+    OtherUFPI *new_ufpi = new OtherUFPI(service_name, constructed_url);
+
+    other_ufpi_mutex.lock();
+        other_ufpi.append(new_ufpi);
+    other_ufpi_mutex.unlock();
 }
 
 void ClientHttpServer::removeMHttpServer(QString server_address, uint server_port, QString service_name)
@@ -326,6 +334,33 @@ void ClientHttpServer::removeMHttpServer(QString server_address, uint server_por
         .arg(service_name)
         .arg(server_address)
         .arg(server_port), 10);
+        
+    //
+    //  Find it and delete it
+    //
+    
+    other_ufpi_mutex.lock();
+        QPtrListIterator<OtherUFPI> it( other_ufpi );
+        OtherUFPI *which_one = NULL;
+        OtherUFPI *a_ufpi;
+        while ( (a_ufpi = it.current()) != 0 )
+        {
+            ++it;
+            if(a_ufpi->getName() == service_name)
+            {
+                which_one = a_ufpi;
+                break;
+            }
+        }
+        if(which_one)
+        {
+            other_ufpi.remove(which_one);
+        }
+        else
+        {
+            warning("told to delete a UFPI I wasn't aware of:"); 
+        }
+    other_ufpi_mutex.unlock();
 }
 
 
@@ -387,7 +422,18 @@ void ClientHttpServer::handleIncoming(HttpRequest *http_request, int)
     
     if(stop_command.length() > 0)
     {
-        stopAudio();
+        if(stop_command == "stop")
+        {
+            stopAudio();
+        }
+        if(stop_command == "prev")
+        {
+            prevAudio();
+        }
+        if(stop_command == "next")
+        {
+            nextAudio();
+        }
     }
 
 
@@ -440,6 +486,17 @@ void ClientHttpServer::listMFDs(HttpRequest *http_request)
     http_request->getResponse()->addToPayload("<tr>");
     http_request->getResponse()->addToPayload(QString("<td colspan=\"%1\" align=\"left\">").arg(core_table_columns));
     http_request->getResponse()->addToPayload(QString("UFPI on %1").arg(mfdContext->getHostName()));
+
+    other_ufpi_mutex.lock();
+        for(uint i = 0; i < other_ufpi.count(); i++)
+        {
+            http_request->getResponse()->addToPayload(QString(" | <a href=\"%1\">%2</a>")
+            .arg(other_ufpi.at(i)->getUrl())
+            .arg(other_ufpi.at(i)->getName())
+            );
+        }
+    other_ufpi_mutex.unlock();
+
     http_request->getResponse()->addToPayload("</td>");
     http_request->getResponse()->addToPayload("</tr>");
 
@@ -549,8 +606,15 @@ void ClientHttpServer::showCurrentSection(HttpRequest *http_request, const QStri
             http_request->getResponse()->addToPayload("</tr>");
             
             http_request->getResponse()->addToPayload("<tr>");
-            http_request->getResponse()->addToPayload("<td colspan=\"3\" align=\"center\"><a href=\"/audio/playlists?stopcommand=stop\">STOP</a></td>");
+
+            http_request->getResponse()->addToPayload("<td colspan=\"3\" align=\"center\">");
+
+            http_request->getResponse()->addToPayload(" <a href=\"/audio/playlists?stopcommand=prev\">PREV</a> ");
+            http_request->getResponse()->addToPayload(" <a href=\"/audio/playlists?stopcommand=stop\">STOP</a> ");
+            http_request->getResponse()->addToPayload(" <a href=\"/audio/playlists?stopcommand=next\">NEXT</a> ");
+
             http_request->getResponse()->addToPayload("</td>");
+
             http_request->getResponse()->addToPayload("</tr>");
 
             showPlaylists(http_request);
@@ -760,6 +824,18 @@ void ClientHttpServer::playPlaylist(int which_container, int which_playlist)
 void ClientHttpServer::stopAudio()
 {
     QString stop_command = "stop";
+    client_socket_to_audio->writeBlock(stop_command.ascii(), stop_command.length());
+}
+
+void ClientHttpServer::prevAudio()
+{
+    QString stop_command = "previous";
+    client_socket_to_audio->writeBlock(stop_command.ascii(), stop_command.length());
+}
+
+void ClientHttpServer::nextAudio()
+{
+    QString stop_command = "next";
     client_socket_to_audio->writeBlock(stop_command.ascii(), stop_command.length());
 }
 

@@ -14,6 +14,33 @@ using namespace std;
 
 #include "mfd_plugin.h"
 
+
+//
+//  Tiny little class to hold data about other mfd's running a UFPI (Ultra
+//  Fancy Pants Interface)
+//
+
+class OtherUFPI
+{
+  public:
+  
+    OtherUFPI(const QString &new_name, const QString &new_url)
+    {
+        name = new_name;
+        url = new_url;
+    }
+  
+    ~OtherUFPI(){;}
+    
+    QString getName(){return name;}
+    QString getUrl(){return url;}
+  
+  private:
+  
+    QString name;
+    QString url;
+};
+
 class ClientHttpServer: public MFDHttpPlugin
 {
 
@@ -49,14 +76,18 @@ class ClientHttpServer: public MFDHttpPlugin
     void    playTrack(int which_container, int which_track);
     void    playPlaylist(int which_container, int which_playlist);
     void    stopAudio();
+    void    prevAudio();
+    void    nextAudio();
         
   private:
   
-    QString         my_hostname;
-    QSocketDevice   *client_socket_to_mfd;
-    QSocketDevice   *client_socket_to_audio;
-    int             core_table_columns;
-    MetadataServer  *metadata_server;
+    QString             my_hostname;
+    QSocketDevice       *client_socket_to_mfd;
+    QSocketDevice       *client_socket_to_audio;
+    int                 core_table_columns;
+    MetadataServer      *metadata_server;
+    QPtrList<OtherUFPI> other_ufpi;
+    QMutex              other_ufpi_mutex;
     
 };
 

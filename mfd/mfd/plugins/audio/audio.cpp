@@ -194,13 +194,13 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
                                     else
                                     {
                                         setPlaylistMode(collection_id, playlist_id, index_position);
-                                        playFromPlaylist(false);
+                                        playFromPlaylist();
                                     }
                                 }
                                 else
                                 {
                                     setPlaylistMode(collection_id, playlist_id);
-                                    playFromPlaylist(false);
+                                    playFromPlaylist();
                                 }
                             }
                         }
@@ -255,6 +255,14 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
         else if(tokens[0] == "stop")
         {
             stopAudio();
+        }
+        else if(tokens[0] == "next")
+        {
+            nextPrevAudio(true);
+        }
+        else if(tokens[0] == "previous" || tokens[0] == "prev")
+        {
+            nextPrevAudio(false);
         }
         else
         {
@@ -677,7 +685,7 @@ void AudioPlugin::handleInternalMessage(QString the_message)
 
         if(playlist_mode)
         {
-            playFromPlaylist(true);
+            playFromPlaylist(1);
         }
         else
         {
@@ -713,15 +721,20 @@ void AudioPlugin::stopPlaylistMode()
     playlist_mode_mutex.unlock();
 }
 
-void AudioPlugin::playFromPlaylist(bool augment_index)
+void AudioPlugin::playFromPlaylist(int augment_index)
 {
+    if(!playlist_mode)
+    {
+        return;
+    }
+    
     QUrl url_to_play_next;
 
     playlist_mode_mutex.lock();
 
     if(augment_index)
     {
-        ++current_playlist_item_index;
+        current_playlist_item_index += augment_index;
     }
 
     //
@@ -753,17 +766,32 @@ void AudioPlugin::playFromPlaylist(bool augment_index)
         
     QValueList<uint> song_list = playlist_to_play->getList();
 
-    if(current_playlist_item_index >= (int) song_list.count())
+
+    //
+    //  At some point, do something about shuffle modes here
+    //
+
+    if(song_list.count() == 0)
     {
         //
-        //  No (more?) songs to play in this list
+        //  No point in trying to cycle through a playlist of 0 length
         //
-        
         metadata_server->unlockMetadata();
         playlist_mode_mutex.unlock();
         stopPlaylistMode();
         sendMessage("stop");
         return;
+    }
+   
+
+    if(current_playlist_item_index >= (int) song_list.count())
+    {
+        current_playlist_item_index = 0;
+    }
+        
+    if(current_playlist_item_index < 0)
+    {
+        current_playlist_item_index = (int) song_list.count() - 1;
     }
         
     //
@@ -780,6 +808,18 @@ void AudioPlugin::playFromPlaylist(bool augment_index)
     {
         stopPlaylistMode();
         sendMessage("stop");
+    }
+}
+
+void AudioPlugin::nextPrevAudio(bool forward)
+{
+    if(forward)
+    {
+        playFromPlaylist(1);
+    }
+    else
+    {
+        playFromPlaylist(-1);
     }
 }
 
