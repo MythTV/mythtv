@@ -1060,20 +1060,48 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
         }
     }
 
-    frameheader.frametype = 'V'; // video frame
-    frameheader.timecode  = timecode;
-    lasttimecode = frameheader.timecode;
-    frameheader.filters   = 0;             // no filters applied
-
     dropped = (((fnum-lf)>>1) - 1); // should be += 0 ;-)
 
-    if (dropped>0) 
+    if (dropped>0)
     {
+//	printf("recorder dropped = '%ld' fnum = '%d' lf = '%d'\n", dropped, fnum, lf);
 	if (ntsc)
 	    timeperframe = 1000/30;
 	else
 	    timeperframe = 1000/25;
     }
+   
+    // if we have lost frames we insert "copied" frames until we have the
+    // exact count because of that we should have no problems with audio 
+    // sync, as long as we don't loose audio samples :-/
+  
+    while (dropped > 0) 
+    {
+        frameheader.timecode = lasttimecode + timeperframe;
+	/*
+	  if(frameheader.timecode - lasttimecode > 49 ||
+	  frameheader.timecode - lasttimecode < 16)
+	  printf("Recorder timecode irregularity 2, last = '%d' cur = '%d'\n", lasttimecode, frameheader.timecode); */
+
+        lasttimecode = frameheader.timecode;
+        frameheader.keyframe  = frameofgop;             // no keyframe defaulted
+        frameheader.packetlength =  0;   // no additional data needed
+        frameheader.frametype    = 'V';  // last frame (or nullframe if first)
+        frameheader.comptype    = 'L';
+        ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+        // we don't calculate sizes for lost frames for compression computation
+        dropped--;
+        frameofgop++;
+    }
+
+    frameheader.frametype = 'V'; // video frame
+    frameheader.timecode  = timecode;
+    /*
+      if(frameheader.timecode - lasttimecode > 49 ||
+      frameheader.timecode - lasttimecode < 16)
+      printf("Recorder timecode irregularity 1, last = '%d' cur = '%d' fnum = '%d' lf = '%d'\n", lasttimecode, frameheader.timecode, fnum, lf); */
+    lasttimecode = frameheader.timecode;
+    frameheader.filters   = 0;             // no filters applied
 
     // compr ends here
     if (compressthis == 0 || (tmp < out_len)) 
@@ -1107,28 +1135,9 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
     frameofgop++;
     framesWritten++;
    
-    // if we have lost frames we insert "copied" frames until we have the
-    // exact count because of that we should have no problems with audio 
-    // sync, as long as we don't loose audio samples :-/
-  
-    while (dropped > 0) 
-    {
-        frameheader.timecode = lasttimecode + timeperframe;
-        lasttimecode = frameheader.timecode;
-        frameheader.keyframe  = frameofgop;             // no keyframe defaulted
-        frameheader.packetlength =  0;   // no additional data needed
-        frameheader.frametype    = 'V';  // last frame (or nullframe if first)
-        frameheader.comptype    = 'L';
-        ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
-        // we don't calculate sizes for lost frames for compression computation
-        dropped--;
-        frameofgop++;
-    }
-
     // now we reset the last frame number so that we can find out
     // how many frames we didn't get next time
     lf = fnum;
-    lasttimecode = timecode;
 }
 
 void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
