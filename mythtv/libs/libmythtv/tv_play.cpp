@@ -2308,7 +2308,8 @@ void TV::ChannelKey(int key)
      * the only way to enter a channel number to browse without waiting for the
      * OSD to fadeout after entering numbers.
      */
-    if (activerecorder && (smartChannelChange || browsemode))
+    if (internalState == kState_WatchingLiveTV && 
+        (smartChannelChange || browsemode))
     {
         char *chan_no_leading_zero = NULL;
         for (int i = 0; i < channelkeysstored; i++)
