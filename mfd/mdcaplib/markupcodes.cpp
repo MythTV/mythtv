@@ -11,8 +11,10 @@
 #include "markupcodes.h"
 
 const char MarkupCodes::server_info_group;
+const char MarkupCodes::login_group;
 
 const char MarkupCodes::name;
 
 const char MarkupCodes::status_code;
 const char MarkupCodes::protocol_version;
+const char MarkupCodes::session_id;

@@ -57,6 +57,7 @@ char MdcapInput::popGroup(QValueVector<char> *group_contents)
     
     if(
         return_value != MarkupCodes::server_info_group &&
+        return_value != MarkupCodes::login_group &&
         return_value != MarkupCodes::name
       )
     {
@@ -160,6 +161,21 @@ uint16_t MdcapInput::popU16()
 }
 
 
+uint32_t MdcapInput::popU32()
+{
+    uint8_t byte_one   = popByte();
+    uint8_t byte_two   = popByte();
+    uint8_t byte_three = popByte();
+    uint8_t byte_four  = popByte();
+    
+    uint32_t result =   (byte_one   * 256 * 256 * 256) 
+                      + (byte_two   * 256 * 256)
+                      + (byte_three * 256)    
+                      + (byte_four);
+    return result;
+}
+
+
 QString MdcapInput::popName()
 {
     QValueVector<char> name_string_vector;
@@ -252,6 +268,35 @@ void MdcapInput::popProtocol(int *major, int *minor)
     
     *major = (int) v_major;
     *minor = (int) v_minor;
+}
+
+
+uint32_t MdcapInput::popSessionId()
+{
+    //
+    //  Session id is always 5 bytes
+    //  1st byte - session id markup code
+    //    next 4 - 32 bit session id
+    //
+    
+    if(contents.size() < 5)
+    {
+        cerr << "mdcapinput.o: asked to popSessionId(), but there are not "
+             << "enough bytes left in the stream "
+             << endl;
+        return 0;
+    }
+
+    char content_code = popByte();
+    if(content_code != MarkupCodes::session_id)
+    {
+        cerr << "mdcapinput.o: asked to popSessionId(), but content code is "
+             << "not session_id "
+             << endl;
+        return 0;       
+    }
+
+    return popU32();    
 }
 
 

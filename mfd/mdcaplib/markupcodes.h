@@ -31,6 +31,7 @@ class MarkupCodes
     //
 
     static const char server_info_group = 1;
+    static const char login_group = 2;
     
     
     //
@@ -46,6 +47,7 @@ class MarkupCodes
 
     static const char status_code = 32;
     static const char protocol_version = 33;
+    static const char session_id = 34;
     
 
   private:

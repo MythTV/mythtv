@@ -38,6 +38,7 @@ class MdcapOutput
     //
 
     void addServerInfoGroup();
+    void addLoginGroup();
     void endGroup();
     
     //
@@ -47,7 +48,7 @@ class MdcapOutput
     void addStatus(uint16_t the_status);
     void addServiceName(const QString &service_name);
     void addProtocolVersion();
-    void addCollectionCount();
+    void addSessionId(uint32_t session_id);
 
 
   private:

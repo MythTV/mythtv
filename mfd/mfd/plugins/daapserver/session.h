@@ -15,6 +15,7 @@
 */
 
 #include <qvaluelist.h>
+#include <qmutex.h>
 
 #include "./daaplib/basic.h"
 
@@ -33,6 +34,8 @@ class DaapSessions
   private:
 
     QValueList<int> session_ids;
+    QMutex sessions_mutex;
+    
 };
 
 #endif

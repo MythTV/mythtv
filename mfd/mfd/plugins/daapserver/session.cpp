@@ -21,6 +21,7 @@ u32  DaapSessions::getNewId()
 {
     u32 session_id = random();
     
+    sessions_mutex.lock();
     while(session_ids.contains(session_id))
     {
         session_id = random(); 
@@ -28,13 +29,16 @@ u32  DaapSessions::getNewId()
     }
     
     session_ids.append(session_id);
+    sessions_mutex.unlock();
     return session_id;
 }
 
 bool DaapSessions::isValid( const u32 session_id)
 {
-    return true;
-    if(session_ids.contains(session_id) > 0)
+    sessions_mutex.lock();
+        uint occurences = session_ids.contains(session_id);
+    sessions_mutex.unlock();
+    if(occurences > 0)
     {
         return true;
     }
@@ -43,7 +47,9 @@ bool DaapSessions::isValid( const u32 session_id)
 
 bool DaapSessions::erase( const u32 session_id )
 {
-    uint how_many = session_ids.remove(session_id);
+    sessions_mutex.lock();
+        uint how_many = session_ids.remove(session_id);
+    sessions_mutex.unlock();
     if(how_many < 1)
     {
         cerr << "something tried to remove a session id that does not exist" << endl;

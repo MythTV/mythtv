@@ -33,6 +33,11 @@ MetadataClient::MetadataClient(
                             l_port
                           )
 {
+    //
+    //  until I'm logged in, I have no session_id
+    //
+    
+    session_id = 0;
 }
 
 void MetadataClient::sendFirstRequest()
@@ -163,6 +168,57 @@ void MetadataClient::processResponse(MdcapResponse *mdcap_response)
         return;
     }
     
+    //
+    //  Another sanity check on the version number of the protocol
+    //
+
+    QString protocol_version_string = mdcap_response->getHeader("MDCAP-Server");
+    if(protocol_version_string.length() > 0)
+    {
+        QString substring = protocol_version_string.section("/", 1, 1);
+        substring = substring.section(" ", 0, 0);
+        bool ok;
+        int protocol_major = substring.section(".", 0, 0).toInt(&ok);
+        if(ok)
+        {
+            int protocol_minor = substring.section(".", 1, 1).toInt(&ok);
+            if(ok)
+            {
+                if(
+                    protocol_major == MDCAP_PROTOCOL_VERSION_MAJOR &&
+                    protocol_minor == MDCAP_PROTOCOL_VERSION_MINOR
+                  )
+                {
+                    //
+                    //  Cool
+                    //
+                }
+                else
+                {
+                    cerr << "metadataclient.o: mdcap protocol mismatch" 
+                         << endl;
+                    return;
+                }          
+            }
+            else
+            {
+                cerr << "metadataclient.o: can't parse protocol version from "
+                     << "headers" << endl;
+            }
+        }
+        else
+        {
+            cerr << "metadataclient.o: can't parse protocol version from "
+                 << "headers" << endl;
+        }
+    }
+    else
+    {
+        cerr << "metadataclient.o: mdcap server has no MDCAP-Server header, "
+             << "can't determine protocol version"
+             << endl;
+    }
+    
 
     //
     //  Create an mdcap input object with the payload from the response
@@ -176,9 +232,10 @@ void MetadataClient::processResponse(MdcapResponse *mdcap_response)
     {
         parseServerInfo(mdcap_input);
     }
-    //else if
-    //{
-    //}
+    else if(first_tag == MarkupCodes::login_group)
+    {
+        parseLogin(mdcap_input);
+    }
     else
     {
         cerr << "metadataclient.o: did not understand first markup code "
@@ -205,7 +262,14 @@ void MetadataClient::parseServerInfo(MdcapInput &mdcap_input)
 
     MdcapInput rebuilt_internals(group_contents);
     
-    while(rebuilt_internals.size() > 0)
+    
+    QString new_service_name;
+    int     new_response_status;
+    int     new_protocol_major;
+    int     new_protocol_minor;
+    
+    bool all_is_well = true;
+    while(rebuilt_internals.size() > 0 && all_is_well)
     {
         char content_code = rebuilt_internals.peekAtNextCode();
         
@@ -213,30 +277,135 @@ void MetadataClient::parseServerInfo(MdcapInput &mdcap_input)
         //  Depending on what the code is, we set various things
         //
         
-        if(content_code == MarkupCodes::name)
+        switch(content_code)
         {
-            QString service_name = rebuilt_internals.popName();
-            cout << "I see the service name as " << service_name << endl;
+            case MarkupCodes::name:
+                new_service_name = rebuilt_internals.popName();
+                break;
+                
+            case MarkupCodes::status_code:
+                new_response_status = rebuilt_internals.popStatus();
+                break;
+                
+            case MarkupCodes::protocol_version:
+                rebuilt_internals.popProtocol(
+                                                &new_protocol_major, 
+                                                &new_protocol_minor
+                                             );
+                break;
+                
+            default:
+                cerr << "metadataclient.o getting content codes I don't "
+                     << "understand while doing parseServerInfo(). "
+                     << endl;
+                all_is_well = false;
+
+            break;
         }
-        else if(content_code == MarkupCodes::status_code)
+    }
+
+    if(all_is_well)
+    {
+        if(
+            new_protocol_major == MDCAP_PROTOCOL_VERSION_MAJOR &&
+            new_protocol_minor == MDCAP_PROTOCOL_VERSION_MINOR
+          )
         {
-            int response_status = rebuilt_internals.popStatus();
-            cout << "I see the server's status as " << response_status << endl;
-        }
-        else if(content_code == MarkupCodes::protocol_version)
-        {
-            int protocol_minor = 0;
-            int protocol_major = 0;
-            rebuilt_internals.popProtocol(&protocol_major, &protocol_minor);
-            cout << "I see the protcol version as " << protocol_major << "." << protocol_minor << endl;
+            if(new_response_status == 200)  // HTTP-like ok
+            {
+                setName(new_service_name);
+                
+                //
+                //  Ok, the /server-info call worked ... so we should try and
+                //  log in.
+                //
+
+                MdcapRequest login_request("/login", ip_address);   
+                login_request.send(client_socket_to_service);
+            }
+            else
+            {
+                cerr << "metadataclient.o: server send back bad status"
+                     << endl;
+            }
         }
         else
         {
-            cerr << "metadataclient.o getting content codes I don't understand "
-                 << "while doing parseServerInfo(). Code I got was "
-                 << (int) content_code
+            cerr << "metadataclient.o: wrong mdcap protocol from server" 
                  << endl;
+        }
+    }
+    
+    delete group_contents;
+}
+
+void MetadataClient::parseLogin(MdcapInput &mdcap_input)
+{
+    QValueVector<char> *group_contents = new QValueVector<char>;
+    
+    char group_code = mdcap_input.popGroup(group_contents);
+    
+    if(group_code != MarkupCodes::login_group)
+    {
+        cerr << "metadataclient.o: asked to parseLogin(), but "
+             << "group code was not login_group "
+             << endl;
+        delete group_contents;
+        return;
+    }
+    
+
+    MdcapInput rebuilt_internals(group_contents);
+    
+    
+    int         new_response_status;
+    uint32_t    new_session_id;
+    
+    bool all_is_well = true;
+    while(rebuilt_internals.size() > 0 && all_is_well)
+    {
+        char content_code = rebuilt_internals.peekAtNextCode();
+        
+        //
+        //  Depending on what the code is, we set various things
+        //
+        
+        switch(content_code)
+        {
+            case MarkupCodes::status_code:
+                new_response_status = rebuilt_internals.popStatus();
+                break;
+                
+            case MarkupCodes::session_id:
+                new_session_id = rebuilt_internals.popSessionId();
+                break;
+                
+            default:
+                cerr << "metadataclient.o getting content codes I don't "
+                     << "understand while doing parseLogin(). "
+                     << endl;
+                all_is_well = false;
+
             break;
+        }
+    }
+
+    if(all_is_well)
+    {
+        if(new_response_status == 200 && new_session_id > 0)  // HTTP-like ok
+        {
+            //
+            //  Ok, I can set my session id for all future communications
+            //  with this server
+            //
+            session_id = new_session_id;
+
+        }
+        else
+        {
+            cerr << "metadataclient.o: got bad server or bad session id "
+                 << "status while doing parseLogin()"
+                 << endl;
         }
     }
     

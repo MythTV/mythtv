@@ -37,6 +37,11 @@ class MetadataClient : public ServiceClient
     //
     
     void parseServerInfo(MdcapInput &mdcap_input);
+    void parseLogin(MdcapInput &mdcap_input);
+
+  private:
+  
+    uint32_t session_id;
 };
 
 #endif

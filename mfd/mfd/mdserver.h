@@ -17,6 +17,9 @@
 
 #include "../mfdlib/mfd_plugin.h"
 #include "../mdcaplib/mdcapoutput.h"
+#include "../mdcaplib/markupcodes.h"
+
+#include "mdcapsession.h"
 
 class MFD;
 
@@ -96,6 +99,7 @@ class MetadataServer : public MFDHttpPlugin
     //
     
     void sendServerInfo(HttpInRequest *http_request);
+    void sendLogin(HttpInRequest *http_request, uint32_t session_id);
 
     void sendResponse(HttpInRequest *http_request, MdcapOutput &response);
 
@@ -136,6 +140,8 @@ class MetadataServer : public MFDHttpPlugin
     QValueList<int>             last_destroyed_playlists;
 
     QDict<Metadata>             *local_mythdigest_dictionary;
+
+    MdcapSessions               mdcap_sessions;
 };
 
 

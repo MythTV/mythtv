@@ -21,7 +21,6 @@ using namespace std;
 #include "httpoutresponse.h"
 #include "mdcaprequest.h"
 
-
 MetadataServer::MetadataServer(MFD* owner, int port)
                :MFDHttpPlugin(owner, -1, port, "metadata server", 2)
 {
@@ -133,13 +132,11 @@ void MetadataServer::handleIncoming(HttpInRequest *http_request, int /* client_i
 
     else if(mdcap_request->getRequestType() == MDCAP_REQUEST_LOGIN)
     {
-        /*
-        u32 session_id = daap_sessions.getNewId();
+        uint32_t session_id = mdcap_sessions.getNewId();
         sendLogin( http_request, session_id);
-        delete daap_request;
-        daap_request = NULL;
+        delete mdcap_request;
+        mdcap_request = NULL;
         return;
-        */
     }
 
 
@@ -1008,7 +1005,15 @@ void MetadataServer::sendResponse(HttpInRequest *http_request, MdcapOutput &resp
     //  Set some header stuff 
     //
     
-    http_request->getResponse()->addHeader("Content-Type: application/x-mdcap-tagged");
+    http_request->getResponse()->addHeader(
+                        QString("MDCAP-Server: MythTV/%1.%1 (Probably Linux)")
+                            .arg(MDCAP_PROTOCOL_VERSION_MAJOR)
+                            .arg(MDCAP_PROTOCOL_VERSION_MINOR)
+                                          );
+                        
+    http_request->getResponse()->addHeader(
+                        "Content-Type: application/x-mdcap-tagged"
+                                          );
     
     //
     //  Set the payload
@@ -1024,12 +1029,29 @@ void MetadataServer::sendServerInfo(HttpInRequest *http_request)
 
     response.addServerInfoGroup();
        response.addStatus(200); // like http ok!
-       response.addServiceName("metadata server on some host");
+       response.addServiceName(
+                                QString("metadata server on %1")
+                                        .arg(mfdContext->getHostName())
+                              );
        response.addProtocolVersion();
     response.endGroup();
 
-    sendResponse( http_request, response);
+    sendResponse(http_request, response);
 }
+
+void MetadataServer::sendLogin(HttpInRequest *http_request, uint32_t session_id)
+{
+    MdcapOutput response;
+    
+    response.addLoginGroup();
+        response.addStatus(200);
+        response.addSessionId(session_id);
+    response.endGroup();
+
+    sendResponse(http_request, response);
+}
+
+
 
 MetadataServer::~MetadataServer()
 {

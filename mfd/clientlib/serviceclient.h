@@ -44,6 +44,9 @@ class ServiceClient
     uint            getPort(){return port;}
     int             bytesAvailable();
     virtual void    handleIncoming();
+    void            setName(const QString &a_name){name = a_name;}
+    QString         getName(){return name;}
+    
 
   protected:
   
@@ -53,6 +56,7 @@ class ServiceClient
     QString        ip_address;
     MfdServiceType service_type;
     uint           port;  
+    QString        name;
 };
 
 #endif

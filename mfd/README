@@ -64,7 +64,11 @@ MetadataServer and make calls on it.
 
 The mfd itself speaks a protocol called mfdp (mfd protocol). This is a
 classic example of YAMUP (yet another made up protocol). The audio plugin
-speaks macp (myth audio control protocol ... which is also YAMUP).
+speaks macp (myth audio control protocol ... which is also YAMUP). Most
+importantly, the metadata server embedded in the core mfd object speaks a
+protocol called mdcap (Myth Digital Content Access Protocol). This is what
+lets frontend clients figure what content a given mfd has on offer. See
+./mdcaplib/README for a few more details.
 
 Here's a list of client side mfdp commands (by the time you read this, it
 will probably be out of date). Note that you can play with these at a telnet

@@ -31,11 +31,13 @@ class MdcapInput
     char        popGroup(QValueVector<char> *group_contents);
     char        popByte();
     uint16_t    popU16();
+    uint32_t    popU32();
     uint        size(){return contents.size();}
 
     QString     popName();
     int         popStatus();
     void        popProtocol(int *major, int *minor);   
+    uint32_t    popSessionId();
 
   private:
 

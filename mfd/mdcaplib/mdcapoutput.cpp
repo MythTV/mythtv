@@ -55,6 +55,26 @@ void MdcapOutput::addServerInfoGroup()
     
 }
 
+void MdcapOutput::addLoginGroup()
+{
+    //
+    //  Add a login group markup code
+    //
+
+    append(MarkupCodes::login_group);
+    
+    //
+    //  Leave four empty bytes where we'll store the length of this group
+    //  once it is done (ie. when endGroup()) is called. We store where
+    //  these 4 bytes begin by pushing an index value onto our open_groups
+    //  stack.
+    //
+    
+    open_groups.push(contents.size());
+    append((uint32_t) 0);
+    
+}
+
 void MdcapOutput::endGroup()
 {
     //
@@ -133,8 +153,14 @@ void MdcapOutput::addProtocolVersion()
     append((uint16_t) MDCAP_PROTOCOL_VERSION_MINOR);
 }
 
-void MdcapOutput::addCollectionCount()
+void MdcapOutput::addSessionId(uint32_t session_id)
 {
+    //
+    //  session id is always 4 bytes long
+    //
+    
+    append(MarkupCodes::session_id);
+    append((uint32_t) session_id);
 }
 
 void MdcapOutput::append(char a_char)
