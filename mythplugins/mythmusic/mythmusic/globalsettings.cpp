@@ -7,6 +7,26 @@
 #include <qdir.h>
 #include <qimage.h>
 
+class GlobalSetting: public SimpleDBStorage, virtual public Configurable {
+public:
+    GlobalSetting(QString name):
+        SimpleDBStorage("settings", "data") {
+        setName(name);
+    };
+
+protected:
+    virtual QString whereClause(void) {
+        return QString("value = '%1' AND hostname = '%2'")
+                       .arg(getName()).arg(gContext->GetHostName());
+    };
+
+    virtual QString setClause(void) {
+        return QString("value = '%1', data = '%2', hostname = '%3'")
+                       .arg(getName()).arg(getValue())
+                       .arg(gContext->GetHostName());
+    };
+};
+
 // General Settings
 
 class SetMusicDirectory: public LineEditSetting, public GlobalSetting {
@@ -21,10 +41,11 @@ public:
     };
 };
 
-class AudioDevice: public ComboBoxSetting, public GlobalSetting {
+class MusicAudioDevice: public ComboBoxSetting, public GlobalSetting {
 public:
-    AudioDevice() : ComboBoxSetting(true),
-      GlobalSetting("AudioDevice") {
+    MusicAudioDevice() : ComboBoxSetting(true),
+                         GlobalSetting("AudioDevice") 
+    {
         setLabel(QObject::tr("Audio device"));
         QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
         fillSelectionsFromDir(dev);
@@ -398,7 +419,7 @@ MusicGeneralSettings::MusicGeneralSettings()
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
     general->setLabel(QObject::tr("General Settings"));
     general->addChild(new SetMusicDirectory());
-    general->addChild(new AudioDevice());
+    general->addChild(new MusicAudioDevice());
     general->addChild(new CDDevice());
     general->addChild(new TreeLevels());
     general->addChild(new NonID3FileNameFormat());
