@@ -16,7 +16,7 @@ installfiles.path = $${PREFIX}/share/mythtv/mythweather
 installfiles.files = weathertypes.dat accid.dat
 installimages.path = $${PREFIX}/share/mythtv/themes/default
 installimages.files = images/*.png
-
+ 
 INSTALLS += installfiles installimages uifiles
 
 # Input

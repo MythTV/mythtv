@@ -51,7 +51,7 @@ class Weather : public MythDialog
     bool UpdateData();
     void processEvents();
     QString getLocation();
-
+    void setLocation(QString newLocale);
   private slots:
     void update_timeout();
     void showtime_timeout();
@@ -68,7 +68,6 @@ class Weather : public MythDialog
     void convertFlip();
     void resetLocale();
     void newLocaleX(int);
-    void radarImgDone(QNetworkOperation *);
 
   protected:
     void paintEvent(QPaintEvent *);
@@ -142,7 +141,6 @@ class Weather : public MythDialog
     bool GetWeatherData();
     bool GetAnimatedRadarMap();
     bool GetStaticRadarMap();
-    bool downloadImage(QString URL, QString filename);
     bool gotDataHook;
     void setWeatherTypeIcon(QString[]);
     void setWeatherIcon(QString);

@@ -132,7 +132,7 @@ Weather::Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent,
 
     if (debug == true)
         cerr << "MythWeather: Reading 'locale' from context.\n";
-    locale = gContext->GetSetting("locale");
+    setLocation(gContext->GetSetting("locale"));
     config_Location = locale;
 
     if (locale.length() == 0)
@@ -446,7 +446,7 @@ void Weather::saveConfig()
             {
                  config_accid = findAccidbyName(cfgCity.stripWhiteSpace());
                  gContext->SetSetting("locale", config_accid);
-                 locale = config_accid;
+                 setLocation(config_accid);
                  setSetting("locale", locale, false);
             }
         }
@@ -819,6 +819,115 @@ QString Weather::getLocation()
         return locale;
 }
 
+void Weather::setLocation(QString newLocale)
+{
+    locale = newLocale;
+
+    if (locale == "" || locale.length() < 2)
+        return;
+
+    LayerSet* container = theme->GetSet("weatherpages");
+    UITextType *texttype;
+    UIImageType *imagetype;
+
+    if (!AnimatedImage)
+        return;
+
+    // locale starts with "US" or locale is a zip code
+    if (locale.left(2) == "US" || locale.left(5).contains(QRegExp("[0-9]{5,5}")) > 0)
+    {
+        // update page to show US radar images
+        if (AnimatedImage)
+        {
+            AnimatedImage->SetSize(765, 500);
+            AnimatedImage->SetSkip(0, 58);
+        }
+
+        if (container)
+        {
+            texttype = (UITextType *) container->GetType("header5");
+            if (texttype)
+                texttype->SetText(tr("doppler radar"));
+
+            for (int x = 1; x <= 9; x++)
+            {
+                texttype = (UITextType *) container->GetType(QString("maplabel-%1")
+                           .arg(x));
+                if (texttype)
+                  texttype->show();
+            }
+
+            for (int x = 10; x <= 12; x++)
+            {
+                texttype = (UITextType *) container->GetType(QString("maplabel-%1")
+                           .arg(x));
+                if (texttype)
+                    texttype->hide();
+            }
+
+            imagetype = (UIImageType *) container->GetType("logo");
+            if (imagetype)
+            {
+                imagetype->SetSize(80, 60);
+                imagetype->LoadImage();
+            }
+
+            imagetype = (UIImageType *) container->GetType("radarbk");
+            if (imagetype)
+            {
+                imagetype->SetImage("mw-map.png");
+                imagetype->LoadImage();
+            }
+        }
+    }
+    else
+    {
+       // show satellite images
+       if (AnimatedImage)
+        {
+            AnimatedImage->SetSize(765, 500 - 58);
+            AnimatedImage->SetSkip(0, 0);
+        }
+
+        if (container)
+        {
+            texttype = (UITextType *) container->GetType("header5");
+            if (texttype)
+                texttype->SetText(tr("satellite image"));
+
+            for (int x = 1; x <= 9; x++)
+            {
+                texttype = (UITextType *) container->GetType(QString("maplabel-%1")
+                           .arg(x));
+                if (texttype)
+                    texttype->hide();
+            }
+
+            for (int x = 10; x <= 12; x++)
+            {
+                texttype = (UITextType *) container->GetType(QString("maplabel-%1")
+                           .arg(x));
+                if (texttype)
+                    texttype->show();
+            }
+
+            imagetype = (UIImageType *) container->GetType("logo");
+            if (imagetype)
+            {
+                imagetype->SetSize(100, 80);
+                imagetype->LoadImage();
+            }
+
+            imagetype = (UIImageType *) container->GetType("radarbk");
+            if (imagetype)
+            {
+                imagetype->SetImage("mw-map-sat.png");
+                imagetype->LoadImage();
+            }
+        }
+    }
+}
+
 void Weather::loadWeatherTypes()
 {
    wData = new weatherTypes[128];
@@ -933,7 +1042,7 @@ void Weather::newLocaleX(int newDigit)
         }
         if (newLocaleHold.length() == 5)
         {
-                locale = newLocaleHold;
+                setLocation(newLocaleHold);
                 newLocaleHold = "";
                 update(newlocRect);
                 update_timeout();
@@ -997,7 +1106,7 @@ void Weather::resetLocale()
 {
      if (inSetup == false)
      {
-        locale = gContext->GetSetting("locale");
+        setLocation(gContext->GetSetting("locale"));
         update_timeout();
      }
 }
@@ -2048,8 +2157,9 @@ bool Weather::UpdateData()
     if (haveData == true)
     {
 
-        updated = GetString("this.swLastUp");
-    
+        //updated = GetString("this.swLastUp");
+        updated = QDateTime::currentDateTime().toString(gContext->GetSetting("dateformat") +
+                  " " + gContext->GetSetting("timeformat"));
         city = GetString("this.swCity");
         state = GetString("this.swSubDiv");
         country = GetString("this.swCountry");
@@ -2423,10 +2533,11 @@ bool Weather::GetStaticRadarMap()
     
     VERBOSE(VB_NETWORK, QString("MythWeather: Copying map file from server (%1)").arg(imageLoc));
      
-    QUrlOperator *op = new QUrlOperator();
-    connect(op, SIGNAL(finished(QNetworkOperation *)), SLOT(radarImgDone(QNetworkOperation *)));
-    op->copy(QString("http://image.weather.com/" + imageLoc),
-                      "file:" + fileprefix);
+    QString sURL("http://image.weather.com/" + imageLoc);
+    QString sFilename(fileprefix + "radar.jpg");
+
+    if (!HttpComms::getHttpFile(sFilename, sURL, weatherTimeoutInt))
+        cerr << "Failed to download image from:" << sURL << endl;
 
     if (debug)
         cerr << "Done.\n";
@@ -2434,15 +2545,14 @@ bool Weather::GetStaticRadarMap()
     LayerSet *container = theme->GetSet("weatherpages");
     if (container)
     {
-        QString filename = imageLoc.mid(imageLoc.findRev("/"), imageLoc.length() - imageLoc.findRev("/"));
         UIImageType *type = (UIImageType *)container->GetType("radarimg");
         if (type)
         {
-            QString fullfile = fileprefix + filename;
             if (debug)
-                cerr << "MythWeather: Full path to radar image: " << fullfile << endl;
+                cerr << "MythWeather: Full path to radar image: " << sFilename << endl;
             
-            type->SetImage(fullfile);
+            type->SetImage(sFilename);
+            type->LoadImage();
         }
     }
     
@@ -2456,8 +2566,7 @@ bool Weather::GetAnimatedRadarMap()
 
      // find radar maps url's
      QString sURL = "http://w3.weather.com/weather/map/" + locale +
-        "?name=index_large_animated&day=1";// HTTP/1.1\nConnection: close\n" +
-        //"Host: w3.weather.com\n\n\n";
+        "?name=index_large_animated&day=1";
      QString tempData = "";
 
      if (debug)
@@ -2510,8 +2619,9 @@ bool Weather::GetAnimatedRadarMap()
 
      for (int x = 1; x <= 6; x++)
      {
+         QString sFile = QString(fileprefix + "/radar%1.jpg").arg(x);
          sURL = QString("http://image.weather.com" + imageLoc + "%1L.jpg").arg(x);
-         if (!downloadImage(sURL, QString(fileprefix + "/radar%1.jpg").arg(x)))
+         if (!HttpComms::getHttpFile(sFile, sURL, weatherTimeoutInt))
              cerr << "Failed to download image from:" << sURL << endl;
      }
 
@@ -2521,78 +2631,9 @@ bool Weather::GetAnimatedRadarMap()
      if (AnimatedImage)
      {
          AnimatedImage->SetFilename(fileprefix + "/radar%1.jpg");
-         AnimatedImage->ReloadImages();
+         AnimatedImage->LoadImages();
      }
      return true;
-}
-
-// synchronous function to download images
-bool Weather::downloadImage(QString URL, QString filename)
-{
-     QPtrList<QNetworkOperation> NetOps;
-
-     if (debug)
-        cerr << "MythWeather: downloadImage() URL: " << URL << endl;
-
-     QUrlOperator *op = new QUrlOperator();
-     stopProcessing = false;
-     urlTimer->start(weatherTimeoutInt);
-
-     NetOps = op->copy(URL, filename, false, false);
-
-     while (NetOps.at(1)->state() != QNetworkProtocol::StDone)
-     {
-           qApp->processEvents();
-           usleep(10000);
-           if (NetOps.at(0)->state() == QNetworkProtocol::StFailed)
-           {
-               cerr << "MythWeather: downloadImage() get failed!!" << endl;
-               return false;
-           }
-           if (NetOps.at(1)->state() == QNetworkProtocol::StFailed)
-           {
-               cerr << "MythWeather: downloadImage() put failed!!" << endl;
-               return false;
-           }
-
-           if (stopProcessing)
-           {
-               cerr << "MythWeather: downloadImage() timeout" << endl;
-               return false;
-           }
-     }
-     urlTimer->stop();
-
-     if (debug)
-         cerr << "MythWeather: downloadImage() success" << endl;;
-
-     return true;
-}
-
-void Weather::radarImgDone(QNetworkOperation *op)
-{
-    if (op->operation() == QNetworkProtocol::OpListChildren) 
-    {
-        if (op->state() == QNetworkProtocol::StFailed)
-        {
-            VERBOSE(VB_IMPORTANT, "MythWeather: Error while grabbing the radar map.");
-            cerr << "MythWeather: Error while grabbing the radar map." << endl;
-            return;
-        }
-    }
-      
-    LayerSet *container = theme->GetSet("weatherpages");
-
-    if (debug)
-        cerr << "MythWeather: Radar Image Done. (Loading...)\n";
-
-    if (container)
-    {    
-        UIImageType *type = (UIImageType *)container->GetType("radarimg");
-        if (type)
-            type->LoadImage();
-    }
-
 }
 
 QString Weather::parseData(QString data, QString beg, QString end)
