@@ -1402,6 +1402,7 @@ void JobQueue::DoTranscodeThread(void)
         nice(19);
 
     bool retry = true;
+    int retrylimit = 3;
     while (retry)
     {
         retry = false;
@@ -1446,10 +1447,13 @@ void JobQueue::DoTranscodeThread(void)
             dblock.lock();
             if (status == JOB_ABORTING) // Stop command was sent
                 ChangeJobStatus(m_db, jobID, JOB_ABORTED);
-            else if (status == JOB_ERRORED) // Unrecoverabble error
+            else if (status == JOB_ERRORING) // Unrecoverabble error
                 ChangeJobStatus(m_db, jobID, JOB_ERRORED);
-            else // This is likely a recoverable problem
+            else if (retrylimit) // This is likely a recoverable problem
+            {
                 retry = true;
+                retrylimit--;
+            }
             dblock.unlock();
         }
     }
