@@ -29,9 +29,6 @@ NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
 
     positionMapType = MARK_KEYFRAME;
 
-    hasKeyFrameAdjustMap = false;
-    keyFrameAdjustMap = new QMap<long long, int>;
-
     totalLength = 0;
     totalFrames = 0;
 
@@ -82,8 +79,6 @@ NuppelDecoder::~NuppelDecoder()
         delete rtjd;
     if (ffmpeg_extradata)
         delete [] ffmpeg_extradata;
-    if (keyFrameAdjustMap)
-        delete keyFrameAdjustMap;
     if (buf)
         delete [] buf;
     if (buf2)
@@ -277,7 +272,9 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                            sizeof(struct seektable_entry));
                     offset += sizeof(struct seektable_entry);
 
-                    PosMapEntry e = {ste.keyframe_number, ste.file_offset};
+                    PosMapEntry e = {ste.keyframe_number,
+                                     ste.keyframe_number * keyframedist,
+                                     ste.file_offset};
                     m_positionMap.push_back(e);
                 }
                 hasFullPositionMap = true;
@@ -326,6 +323,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 struct kfatable_entry kfate;
                 int offset = 0;
                 int adjust = 0;
+                QMap<long long, int> keyFrameAdjustMap;
 
                 for (int z = 0; z < numentries; z++)
                 {
@@ -333,14 +331,23 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                            sizeof(struct kfatable_entry));
                     offset += sizeof(struct kfatable_entry);
 
-                    (*keyFrameAdjustMap)[kfate.keyframe_number] = kfate.adjust;
+                    keyFrameAdjustMap[kfate.keyframe_number] = kfate.adjust;
                     adjust += kfate.adjust;
                 }
-                hasKeyFrameAdjustMap = true;
+                hasKeyFrameAdjustTable = true;
 
                 totalLength -= (int)(adjust / video_frame_rate);
                 totalFrames -= adjust;
                 m_parent->SetFileLength(totalLength, totalFrames);
+
+                adjust = 0;
+                for (unsigned int i=0; i < m_positionMap.size(); i++) 
+                {
+                    if (keyFrameAdjustMap.contains(m_positionMap[i].adjFrame))
+                        adjust += keyFrameAdjustMap[m_positionMap[i].adjFrame];
+
+                    m_positionMap[i].adjFrame -= adjust;
+                }
 
                 delete [] kfa_buf;
             }
@@ -885,8 +892,8 @@ void NuppelDecoder::GetFrame(int avignore)
                     // Grow positionMap vector several entries at a time
                     if (m_positionMap.capacity() == m_positionMap.size())
                         m_positionMap.reserve(m_positionMap.size() + 60);
-                    PosMapEntry entry =
-                                      {lastKey / keyframedist, currentposition};
+                    PosMapEntry entry = {lastKey / keyframedist,
+                                         lastKey, currentposition};
                     m_positionMap.push_back(entry);
                 }
             }
@@ -1009,9 +1016,10 @@ void NuppelDecoder::GetFrame(int avignore)
     UpdateFramesPlayed();
 }
 
-void NuppelDecoder::SeekReset(long long newKey, int skipFrames)
+void NuppelDecoder::SeekReset(long long newKey, int skipFrames,
+                              bool needFlush)
 {
-    if (mpa_codec)
+    if (mpa_codec && needFlush)
         avcodec_flush_buffers(mpa_ctx);
 
     while (skipFrames > 0)

@@ -46,6 +46,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
     seq_count = 0;
     firstgoppos = 0;
     prevgoppos = 0;
+    rewindExtraFrame = true;
 
     fps = 29.97;
 
@@ -81,7 +82,8 @@ AvFormatDecoder::~AvFormatDecoder()
     }
 }
 
-void AvFormatDecoder::SeekReset(long long newKey, int skipFrames)
+void AvFormatDecoder::SeekReset(long long newKey, int skipFrames,
+                                bool needFlush)
 {
     lastapts = 0;
     lastvpts = 0;
@@ -130,7 +132,7 @@ void AvFormatDecoder::SeekReset(long long newKey, int skipFrames)
 
 void AvFormatDecoder::Reset(void)
 {
-    SeekReset(0, 0);
+    SeekReset();
 
     m_positionMap.clear();
     framesPlayed = 0;
@@ -823,7 +825,8 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
             // Grow positionMap vector several entries at a time
             if (m_positionMap.capacity() == m_positionMap.size())
                 m_positionMap.reserve(m_positionMap.size() + 60);
-            PosMapEntry entry = {prevgoppos / keyframedist, startpos};
+            PosMapEntry entry = {prevgoppos / keyframedist,
+                                 prevgoppos, startpos};
             m_positionMap.push_back(entry);
         }
 

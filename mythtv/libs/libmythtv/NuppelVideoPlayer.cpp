@@ -2016,7 +2016,7 @@ long long NuppelVideoPlayer::GetBookmark(void)
 
 bool NuppelVideoPlayer::DoRewind(void)
 {
-    long long number = rewindtime + 1;
+    long long number = rewindtime;
     long long desiredFrame = framesPlayed - number;
 
     if (!editmode && hasdeletetable && IsInDelete(desiredFrame))
@@ -2739,7 +2739,7 @@ void NuppelVideoPlayer::HandleArbSeek(bool right)
         if (right)
         {
             decoder->setExactSeeks(false);
-            fftime = keyframedist * 3 / 2;
+            fftime = (long long)(keyframedist * 1.1);
             while (fftime > 0)
                 usleep(50);
         }

@@ -37,6 +37,7 @@ IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
     validvpts = false;
 
     lastKey = 0;
+    rewindExtraFrame = true;
 
     prvpkt[0] = prvpkt[1] = prvpkt[2] = 0;
 
@@ -49,7 +50,7 @@ IvtvDecoder::~IvtvDecoder()
 {
 }
 
-void IvtvDecoder::SeekReset(long long newkey, int skipframes)
+void IvtvDecoder::SeekReset(long long newkey, int skipframes, bool needFlush)
 {
     //fprintf(stderr, "seek reset frame = %llu, skip = %d, exact = %d\n", 
     //        newkey, skipframes, exactseeks);
@@ -263,8 +264,8 @@ void IvtvDecoder::MpegPreProcessPkt(unsigned char *buf, int len,
                             if (m_positionMap.capacity() ==
                                     m_positionMap.size())
                                 m_positionMap.reserve(m_positionMap.size() + 60);
-                            PosMapEntry entry =
-                                        {lastKey / keyframedist, laststartpos};
+                            PosMapEntry entry = {lastKey / keyframedist,
+                                                 lastKey, laststartpos};
                             m_positionMap.push_back(entry);
                         }
 

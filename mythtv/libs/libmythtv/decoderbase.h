@@ -53,20 +53,19 @@ class DecoderBase
     virtual bool PosMapFromDb(void);
     virtual bool PosMapFromEnc(void);
 
-    virtual bool FindPosition(long long desired_value, bool search_pos,
+    virtual bool FindPosition(long long desired_value, bool search_adjusted,
                               int &lower_bound, int &upper_bound);
 
     virtual void SetPositionMap(void);
-    virtual void SeekReset(long long newKey = 0, int skipFrames = 0) { }
-
-    long long GetKeyFrameAdjustmentAtPos(long long desiredFrame);
-    int GetKeyIndex(int keyFrame);
+    virtual void SeekReset(long long newKey = 0, int skipFrames = 0,
+                           bool needFlush = false) { }
 
   protected:
     typedef struct posmapentry
     {
-        long long index; // frame or keyframe number
-        long long pos; // position in stream
+        long long index;    // frame or keyframe number
+        long long adjFrame; // keyFrameAdjustTable adjusted frame number
+        long long pos;      // position in stream
     } PosMapEntry;
 
     NuppelVideoPlayer *m_parent;
@@ -93,17 +92,17 @@ class DecoderBase
  
     QValueVector<PosMapEntry> m_positionMap;
 
-    bool hasKeyFrameAdjustMap;
-    QMap<long long, int> *keyFrameAdjustMap;
-
     int keyframedist;
 
     double fps;
 
+    bool rewindExtraFrame;
     bool exactseeks;
     bool livetv;
     bool watchingrecording;
     RemoteEncoder *nvr_enc;
+
+    bool hasKeyFrameAdjustTable;
 
     bool lowbuffers;
 

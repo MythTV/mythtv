@@ -73,7 +73,8 @@ class AvFormatDecoder : public DecoderBase
     float GetMpegAspect(AVCodecContext *context, int aspect_ratio_info,
                         int width, int height);
 
-    void SeekReset(long long newKey = 0, int skipFrames = 0);
+    void SeekReset(long long newKey = 0, int skipFrames = 0,
+                   bool needFlush = false);
 
     bool CheckVideoParams(int width, int height);
     bool CheckAudioParams(int freq, int channels);
