@@ -361,6 +361,10 @@ static void *SpawnDelete(void *param)
     filename += ".bookmark";
     unlink(filename.ascii());
 
+    filename = *filenameptr;
+    filename += ".cutlist";
+    unlink(filename.ascii());
+
     delete filenameptr;
 
     return NULL;

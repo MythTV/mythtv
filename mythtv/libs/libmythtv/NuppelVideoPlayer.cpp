@@ -1567,7 +1567,10 @@ void NuppelVideoPlayer::StartPlaying(void)
             framesPlayed >= deleteIter.key())
         {
             ++deleteIter;
-            fftime = deleteIter.key() - framesPlayed;
+            if (deleteIter.key() == totalFrames)
+                eof = 1;
+            else
+                fftime = deleteIter.key() - framesPlayed;
             ++deleteIter;
         }
     }
@@ -1879,6 +1882,11 @@ void NuppelVideoPlayer::ClearAfterSeek(void)
     pthread_mutex_unlock(&video_buflock);
     pthread_mutex_unlock(&audio_buflock);
 
+    SetDeleteIter();
+}
+
+void NuppelVideoPlayer::SetDeleteIter(void)
+{
     deleteIter = deleteMap.begin();
     if (hasdeletetable)  
     {
@@ -1945,6 +1953,13 @@ void NuppelVideoPlayer::DisableEdit(void)
     timedisplay = NULL;
 
     SaveCutList();
+
+    LoadCutList();
+    if (!deleteMap.isEmpty())
+    {
+        hasdeletetable = true;
+        SetDeleteIter();
+    }
 
     Unpause();
 }

@@ -167,6 +167,7 @@ class NuppelVideoPlayer
     void SaveCutList(void);
     void LoadCutList(void);
     void DisableEdit(void);
+    void SetDeleteIter(void);
 
     int audiofd;
 

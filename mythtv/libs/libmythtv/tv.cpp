@@ -463,7 +463,10 @@ void TV::HandleStateChange(void)
         closeRecorder = true;
 
         if (internalState == kState_WatchingRecording)
+        {
             nvp->SetWatchingRecording(false);
+            nvp->SetLength((int)(((float)nvr->GetFramesWritten() / frameRate)));
+        }
 
         internalState = nextState;
         changed = true;
