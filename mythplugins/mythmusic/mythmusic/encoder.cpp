@@ -14,7 +14,7 @@ Encoder::Encoder(const QString &outfile, int qualitylevel, Metadata *metadata)
             cout << "ERROR opening output file " << outfile << "\n";
     } 
     else 
-      out = NULL;
+        out = NULL;
 
     this->outfile = &outfile;
     this->quality = qualitylevel;

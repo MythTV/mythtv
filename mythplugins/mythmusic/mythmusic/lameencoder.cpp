@@ -164,7 +164,7 @@ int LameEncoder::addSamples(int16_t * bytes, unsigned int length)
         cout << "Lame encoder error '" << lameret << "', aborting.\n";
         return EENCODEERROR;
     } 
-    else if (lameret > 0)
+    else if (lameret > 0 && out)
     {
         if (write_buffer(mp3buf, lameret, out) != lameret)
             cout << "Failed to write mp3 data to output file\n";

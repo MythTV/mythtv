@@ -489,6 +489,13 @@ void Ripper::ripthedisc(void)
                 encoder = new FlacEncoder(outfile, encodequal, track); 
             }
 
+            if (!encoder->isValid()) 
+            {
+                delete encoder;
+                delete track;
+                break;
+            }
+
             ripTrack(cddevice, encoder, trackno + 1);
 
             overall->setProgress(trackno + 1);

@@ -17,6 +17,8 @@ class Encoder
     virtual ~Encoder();
     virtual int addSamples(int16_t * bytes, unsigned int len) = 0;
 
+    virtual bool isValid() { return (out != NULL); }
+
   protected:
     const QString *outfile;
     FILE *out;

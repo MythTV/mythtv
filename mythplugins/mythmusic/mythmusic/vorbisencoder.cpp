@@ -85,7 +85,7 @@ VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
 
     while ((result = ogg_stream_flush(&os, &og)))
     {
-        if (!result)
+        if (!result || !out)
             break;
         int ret = write_page(&og, out);
         if (ret != og.header_len + og.body_len)
@@ -112,6 +112,9 @@ int VorbisEncoder::addSamples(int16_t * bytes, unsigned int length)
     signed char *chars = (signed char *)bytes;
 
     realsamples = length / 4;
+
+    if (!out)
+        return 0;
 
     float** buffer = vorbis_analysis_buffer(&vd, realsamples);
 
