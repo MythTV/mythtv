@@ -113,8 +113,10 @@ PlaybackBox::PlaybackBox(MythMainWindow *parent, QString window_name,
     
     if (!keyboard_accelerators) 
     {
-        pledit_button->setText(tr("Edit Playlist"));
-        vis_button->setText(tr("Visualize"));
+        if(pledit_button)
+            pledit_button->setText(tr("Edit Playlist"));
+        if(vis_button)
+            vis_button->setText(tr("Visualize"));
         if(!assignFirstFocus())
         {
             cerr << "playbackbox.o: Could not find a button to assign focus to. What's in your theme?" << endl;
@@ -123,8 +125,10 @@ PlaybackBox::PlaybackBox(MythMainWindow *parent, QString window_name,
     } 
     else 
     {
-        pledit_button->setText(tr("3 Edit Playlist"));
-        vis_button->setText(tr("4 Visualize"));
+        if(pledit_button)
+            pledit_button->setText(tr("3 Edit Playlist"));
+        if(vis_button)
+            vis_button->setText(tr("4 Visualize"));
     }
 
     //  
@@ -148,8 +152,16 @@ PlaybackBox::PlaybackBox(MythMainWindow *parent, QString window_name,
     //
     
     mainvisual = new MainVisual(this);
-    mainvisual->setGeometry(visual_blackhole->getScreenArea());
+    if(visual_blackhole)
+    {
+        mainvisual->setGeometry(visual_blackhole->getScreenArea());
+    }
+    else
+    {
+        mainvisual->setGeometry(screenwidth + 10, screenheight + 10, 160, 160);
+    }
     mainvisual->show();   
+    
  
     visual_mode = gContext->GetSetting("VisualMode");
     visual_mode.simplifyWhiteSpace();
@@ -208,30 +220,55 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
     switch (e->key())
     {
         case Key_PageDown:
-            next_button->push();
+            if(next_button)
+                next_button->push();
+            else
+                next();
             handled = true;
             break;
         case Key_PageUp:
-            prev_button->push();
+            if(prev_button)
+                prev_button->push();
+            else
+                previous();
             handled = true;
             break;
         case Key_F:
-            ff_button->push();
+            if(ff_button)
+                ff_button->push();
+            else
+                seekforward();
             handled = true;
             break;
         case Key_R:
-            rew_button->push();
+            if(rew_button)
+                rew_button->push();
+            else
+                seekback();
             handled = true;
             break;
         case Key_P:
             if (isplaying)
-                pause_button->push();
+            {
+                if(pause_button)
+                    pause_button->push();
+                else
+                    pause();
+            }
             else
-                play_button->push();
+            {
+                if(play_button)
+                    play_button->push();
+                else
+                    play();
+            }
             handled = true;
             break;
         case Key_S:
-            stop_button->push();
+            if(stop_button)
+                stop_button->push();
+            else
+                stop();
             handled = true;
             break;
         case Key_U:
@@ -243,15 +280,24 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
             handled = true;
             break;
         case Key_1:
-            shuffle_button->push();
+            if(shuffle_button)
+                shuffle_button->push();
+            else
+                toggleShuffle();
             handled = true;
             break;
         case Key_2:
-            repeat_button->push();
+            if(repeat_button)
+                repeat_button->push();
+            else
+                toggleRepeat();
             handled = true;
             break;
         case Key_3:
-            pledit_button->push();
+            if(pledit_button)
+                pledit_button->push();
+            else
+                editPlaylist();
             handled = true;
             break;
         case Key_6:
@@ -277,7 +323,14 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
         if (e->key() == Key_Escape || e->key() == Key_4)
         {
             visualizer_status = 1;
-            mainvisual->setGeometry(visual_blackhole->getScreenArea());
+            if(visual_blackhole)
+            {
+                mainvisual->setGeometry(visual_blackhole->getScreenArea());
+            }
+            else
+            {
+                mainvisual->setGeometry(screenwidth + 10, screenheight + 10, 160, 160);
+            }
             setUpdatesEnabled(true);
             handled = true;
         }
@@ -312,7 +365,10 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
                     handled = true;
                     break;
                 case Key_4:
-                    vis_button->push();
+                    if(vis_button)
+                        vis_button->push();
+                    else
+                        visEnable();
                     handled = true;
                     break;
                 case Key_Space:
@@ -706,9 +762,10 @@ void PlaybackBox::stop(void)
     {
         time_string.sprintf("%02d:%02d", maxm, maxs);
     }
-    time_text->SetText(time_string);
-    info_text->SetText("");
-    //ratinglabel->setText(" ");
+    if(time_text)
+        time_text->SetText(time_string);
+    if(info_text)
+        info_text->SetText("");
 
     isplaying = false;
 }
@@ -835,24 +892,33 @@ void PlaybackBox::setShuffleMode(unsigned int mode)
     switch (shufflemode)
     {
         case SHUFFLE_INTELLIGENT:
-            if (keyboard_accelerators)
-                shuffle_button->setText(tr("1 Shuffle: Smart"));
-            else
-                shuffle_button->setText(tr("Shuffle: Smart"));
+            if(shuffle_button)
+            {
+                if (keyboard_accelerators)
+                    shuffle_button->setText(tr("1 Shuffle: Smart"));
+                else
+                    shuffle_button->setText(tr("Shuffle: Smart"));
+            }
             music_tree_list->scrambleParents(true);
             break;
         case SHUFFLE_RANDOM:
-            if (keyboard_accelerators)
-                shuffle_button->setText(tr("1 Shuffle: Rand"));
-            else
-                shuffle_button->setText(tr("Shuffle: Rand"));
+            if(shuffle_button)
+            {
+                if (keyboard_accelerators)
+                    shuffle_button->setText(tr("1 Shuffle: Rand"));
+                else
+                    shuffle_button->setText(tr("Shuffle: Rand"));
+            }
             music_tree_list->scrambleParents(true);
             break;
         default:
-            if (keyboard_accelerators)
-                shuffle_button->setText(tr("1 Shuffle: None"));
-            else
-                shuffle_button->setText(tr("Shuffle: None"));
+            if(shuffle_button)
+            {
+                if (keyboard_accelerators)
+                    shuffle_button->setText(tr("1 Shuffle: None"));
+                else
+                    shuffle_button->setText(tr("Shuffle: None"));
+            }
             music_tree_list->scrambleParents(false);
             break;
     }
@@ -889,7 +955,8 @@ void PlaybackBox::increaseRating()
     if(showrating)
     {
         curMeta->incRating();
-        ratings_image->setRepeat(curMeta->Rating());
+        if(ratings_image)
+            ratings_image->setRepeat(curMeta->Rating());
     }
 }
 
@@ -902,7 +969,8 @@ void PlaybackBox::decreaseRating()
     if(showrating)
     {
         curMeta->decRating();
-        ratings_image->setRepeat(curMeta->Rating());
+        if(ratings_image)
+            ratings_image->setRepeat(curMeta->Rating());
     }
 }
 
@@ -910,6 +978,10 @@ void PlaybackBox::setRepeatMode(unsigned int mode)
 {
     repeatmode = mode;
 
+    if(!repeat_button)
+    {
+        return;
+    }
     switch (repeatmode)
     {
         case REPEAT_ALL:
@@ -1104,9 +1176,12 @@ void PlaybackBox::customEvent(QCustomEvent *event)
         
             if(curMeta)
             {
-                time_text->SetText(time_string);
-                info_text->SetText(info_string);
-                current_visualization_text->SetText(mainvisual->getCurrentVisual());
+                if(time_text)
+                    time_text->SetText(time_string);
+                if(info_text)
+                    info_text->SetText(info_string);
+                if(current_visualization_text)
+                    current_visualization_text->SetText(mainvisual->getCurrentVisual());
             }
 
             break;
@@ -1157,13 +1232,20 @@ void PlaybackBox::customEvent(QCustomEvent *event)
 
 void PlaybackBox::wipeTrackInfo()
 {
-        title_text->SetText("");
-        artist_text->SetText("");
-        album_text->SetText("");
-        time_text->SetText("");
-        info_text->SetText("");
-        ratings_image->setRepeat(0);
-        current_visualization_text->SetText("");
+        if(title_text)
+            title_text->SetText("");
+        if(artist_text)
+            artist_text->SetText("");
+        if(album_text)
+            album_text->SetText("");
+        if(time_text)
+            time_text->SetText("");
+        if(info_text)
+            info_text->SetText("");
+        if(ratings_image)
+            ratings_image->setRepeat(0);
+        if(current_visualization_text)
+            current_visualization_text->SetText("");
 }
 
 void PlaybackBox::handleTreeListSignals(int node_int, IntVector *attributes)
@@ -1184,9 +1266,12 @@ void PlaybackBox::handleTreeListSignals(int node_int, IntVector *attributes)
         stop();
 
         curMeta = all_music->getMetadata(node_int);
-        title_text->SetText(curMeta->Title());
-        artist_text->SetText(curMeta->Artist());
-        album_text->SetText(curMeta->Album());
+        if(title_text)
+            title_text->SetText(curMeta->Title());
+        if(artist_text)
+            artist_text->SetText(curMeta->Artist());
+        if(album_text)
+            album_text->SetText(curMeta->Album());
         maxTime = curMeta->Length() / 1000;
 
         QString time_string;
@@ -1201,10 +1286,12 @@ void PlaybackBox::handleTreeListSignals(int node_int, IntVector *attributes)
         {
             time_string.sprintf("%02d:%02d", maxm, maxs);
         }
-        time_text->SetText(time_string);
+        if(time_text)
+            time_text->SetText(time_string);
         if(showrating)
         {
-            ratings_image->setRepeat(curMeta->Rating());
+            if(ratings_image)
+                ratings_image->setRepeat(curMeta->Rating());
         }
 
         play();
@@ -1226,6 +1313,8 @@ void PlaybackBox::wireUpTheme()
     //
     //  The self managed music tree list
     //
+    //  Complain if we can't find this
+    //
     music_tree_list = getUIManagedTreeListType("musictreelist");
     if(!music_tree_list)
     {
@@ -1235,183 +1324,79 @@ void PlaybackBox::wireUpTheme()
     connect(music_tree_list, SIGNAL(nodeSelected(int, IntVector*)), this, SLOT(handleTreeListSignals(int, IntVector*)));
 
     //
-    //  Text area for title (of song)
+    //  All the other GUI elements are **optional**
     //
     title_text = getUITextType("title_text");
-    if(!title_text)
-    {
-        cerr << "playbackbox.o: Couldn't find a text area called title_text in your theme" << endl;
-        exit(0);
-    }
-
-    //
-    //  Text area for artist
-    //
     artist_text = getUITextType("artist_text");
-    if(!artist_text)
-    {
-        cerr << "playbackbox.o: Couldn't find a text area called artist_text in your theme" << endl;
-        exit(0);
-    }
-
-    //
-    //  Text area for time
-    //
     time_text = getUITextType("time_text");
-    if(!time_text)
-    {
-        cerr << "playbackbox.o: Couldn't find a text area called time_text in your theme" << endl;
-        exit(0);
-    }
-
-    //
-    //  Text area for info (encoding type, bits, etc.)
-    //
     info_text = getUITextType("info_text");
-    if(!info_text)
-    {
-        cerr << "playbackbox.o: Couldn't find a text area called info_text in your theme" << endl;
-        exit(0);
-    }
-
-    //
-    //  Text area for album
-    //
     album_text = getUITextType("album_text");
-    if(!album_text)
-    {
-        cerr << "playbackbox.o: Couldn't find a text area called album_text in your theme" << endl;
-        exit(0);
-    }
-
-    //
-    //  Ratings image for track
-    //
     ratings_image = getUIRepeatedImageType("ratings_image");
-    if(!ratings_image)
-    {
-        cerr << "playbackbox.o: Couldn't find a repeated image called ratings_image in your theme" << endl;
-        exit(0);
-    }
-
-    //
-    //  Current visualization
-    //
     current_visualization_text = getUITextType("current_visualization_text");
-    if(!current_visualization_text)
-    {
-        cerr << "playbackbox.o: Couldn't find a text area called current_visualization in your theme" << endl;
-        exit(0);
-    }
-
-    //
-    //  Status bar for volume display
-    //  (but don't complain if we can't find it)
     volume_status = getUIStatusBarType("volume_status");
     if(volume_status)
     {
         volume_status->SetTotal(100);
         volume_status->SetOrder(-1);
     }
-        
-    //
-    //  Black Hole for visualizer
-    //
     visual_blackhole = getUIBlackHoleType("visual_blackhole");
-    if(!visual_blackhole)
-    {
-        cerr << "playbackbox.o: Couldn't find a black hole called visual_blackhole in your theme" << endl;
-        exit(0);
-    }
 
     //
     //  Buttons
     //
     prev_button = getUIPushButtonType("prev_button");
-    if(!prev_button)
+    if(prev_button)
     {
-        cerr << "playbackbox.o: Couldn't find a push button called prev_button in your theme" << endl;
-        exit(0);
+        connect(prev_button, SIGNAL(pushed()), this, SLOT(previous()));
     }
-    connect(prev_button, SIGNAL(pushed()), this, SLOT(previous()));
-
     rew_button = getUIPushButtonType("rew_button");
-    if(!rew_button)
+    if(rew_button)
     {
-        cerr << "playbackbox.o: Couldn't find a push button called rew_button in your theme" << endl;
-        exit(0);
+        connect(rew_button, SIGNAL(pushed()), this, SLOT(seekback()));
     }
-    connect(rew_button, SIGNAL(pushed()), this, SLOT(seekback()));
-
     pause_button = getUIPushButtonType("pause_button");
-    if(!pause_button)
+    if(pause_button)
     {
-        cerr << "playbackbox.o: Couldn't find a push button called pause_button in your theme" << endl;
-        exit(0);
+        connect(pause_button, SIGNAL(pushed()), this, SLOT(pause()));
     }
-    connect(pause_button, SIGNAL(pushed()), this, SLOT(pause()));
-
     play_button = getUIPushButtonType("play_button");
-    if(!play_button)
+    if(play_button)
     {
-        cerr << "playbackbox.o: Couldn't find a push button called play_button in your theme" << endl;
-        exit(0);
+        connect(play_button, SIGNAL(pushed()), this, SLOT(play()));
     }
-    connect(play_button, SIGNAL(pushed()), this, SLOT(play()));
-
     stop_button = getUIPushButtonType("stop_button");
-    if(!stop_button)
+    if(stop_button)
     {
-        cerr << "playbackbox.o: Couldn't find a push button called stop_button in your theme" << endl;
-        exit(0);
+        connect(stop_button, SIGNAL(pushed()), this, SLOT(stop()));
     }
-    connect(stop_button, SIGNAL(pushed()), this, SLOT(stop()));
-
     ff_button = getUIPushButtonType("ff_button");
-    if(!ff_button)
+    if(ff_button)
     {
-        cerr << "playbackbox.o: Couldn't find a push button called ff_button in your theme" << endl;
-        exit(0);
+        connect(ff_button, SIGNAL(pushed()), this, SLOT(seekforward()));
     }
-    connect(ff_button, SIGNAL(pushed()), this, SLOT(seekforward()));
-
     next_button = getUIPushButtonType("next_button");
-    if(!next_button)
+    if(next_button)
     {
-        cerr << "playbackbox.o: Couldn't find a push button called next_button in your theme" << endl;
-        exit(0);
+        connect(next_button, SIGNAL(pushed()), this, SLOT(next()));
     }
-    connect(next_button, SIGNAL(pushed()), this, SLOT(next()));
-
     shuffle_button = getUITextButtonType("shuffle_button");
-    if(!shuffle_button)
+    if(shuffle_button)
     {
-        cerr << "playbackbox.o: Couldn't find a text button called shuffle_button in your theme" << endl;
-        exit(0);
+        connect(shuffle_button, SIGNAL(pushed()), this, SLOT(toggleShuffle()));
     }
-    connect(shuffle_button, SIGNAL(pushed()), this, SLOT(toggleShuffle()));
-
     repeat_button = getUITextButtonType("repeat_button");
-    if(!repeat_button)
+    if(repeat_button)
     {
-        cerr << "playbackbox.o: Couldn't find a text button called repeat_button in your theme" << endl;
-        exit(0);
+        connect(repeat_button, SIGNAL(pushed()), this, SLOT(toggleRepeat()));
     }
-    connect(repeat_button, SIGNAL(pushed()), this, SLOT(toggleRepeat()));
-
     pledit_button = getUITextButtonType("pledit_button");
-    if(!pledit_button)
+    if(pledit_button)
     {
-        cerr << "playbackbox.o: Couldn't find a text button called pledit_button in your theme" << endl;
-        exit(0);
+        connect(pledit_button, SIGNAL(pushed()), this, SLOT(editPlaylist()));
     }
-    connect(pledit_button, SIGNAL(pushed()), this, SLOT(editPlaylist()));
-
     vis_button = getUITextButtonType("vis_button");
-    if(!vis_button)
+    if(vis_button)
     {
-        cerr << "playbackbox.o: Couldn't find a text button called vis_button in your theme" << endl;
-        exit(0);
+        connect(vis_button, SIGNAL(pushed()), this, SLOT(visEnable()));
     }
-    connect(vis_button, SIGNAL(pushed()), this, SLOT(visEnable()));
 }
