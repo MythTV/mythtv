@@ -33,7 +33,11 @@ void MythComboBox::keyPressEvent(QKeyEvent *e)
             setCurrentItem((currentItem() + 1) % count());
         break;
     default:
-        e->ignore();
+        if (editable())
+            QComboBox::keyPressEvent(e);
+        else
+            e->ignore();
+        break;
     }
 }
 
