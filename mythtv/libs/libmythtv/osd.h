@@ -6,6 +6,24 @@
 #include <time.h>
 
 class QImage;
+
+class OSDImage
+{
+  public:
+    OSDImage(QString pathname);
+   ~OSDImage();
+   
+    unsigned char *yuv;
+    unsigned char *ybuffer;
+    unsigned char *ubuffer;
+    unsigned char *vbuffer;
+
+    unsigned char *alpha;
+
+    int width;
+    int height;
+};
+    
 class OSD
 {
  public:
@@ -33,12 +51,29 @@ class OSD
     bool Visible(void) { return (time(NULL) <= displayframes); }
    
  private:
+    void SetNoThemeDefaults();
+    Efont *LoadFont(QString name, int size); 
+    
     void DarkenBox(int xstart, int ystart, int xend, int yend,
                    unsigned char *screen);
     void DrawStringIntoBox(int xstart, int ystart, int xend, int yend, 
                            const QString &text, unsigned char *screen);
+
+    void DrawStringWithOutline(unsigned char *yuvptr, int x, int y, 
+                               const QString &text, Efont *font, int maxx,
+                               int maxy, bool rightjustify = false);
+
     void DrawRectangle(int xstart, int ystart, int xend, int yend,
                        unsigned char *screen);
+
+    void BlendImage(OSDImage *image, int xstart, int ystart, 
+                    unsigned char *screen);
+
+    
+    void DisplayDialogNoTheme(unsigned char *yuvptr);
+    void DisplayInfoNoTheme(unsigned char *yuvptr);
+    void DisplayChannumNoTheme(unsigned char *yuvptr);
+    
     QString fontname;
 
     int vid_width;
@@ -88,8 +123,12 @@ class OSD
     int currentdialogoption;
     bool show_dialog;
 
-    QImage *qosdoverlay;
-    unsigned char *osdoverlayyuv;
+    QString fontprefix;
+    
+    
+    bool usingtheme;
+    
+    OSDImage *channelbackground;
 };
     
 #endif
