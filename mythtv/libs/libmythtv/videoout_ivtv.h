@@ -33,31 +33,33 @@ class VideoOutputIvtv: public VideoOutput
                       FilterChain *filterList,
                       NuppelVideoPlayer *pipPlayer);
 
-    int WriteBuffer(unsigned char *buf, int count, int &frames);
+    int WriteBuffer(unsigned char *buf, int count);
+    void Poll(int delay);
     void Pause(void);
-    void Play(void);
+    void Start(int skip, int mute);
+    void Stop(bool hide);
 
-    void Reopen(int skipframes = 0, int newstartframe = 0);
+    void Open(void);
+    void Close(void);
 
     void SetFPS(float lfps) { fps = lfps; }
 
     void ClearOSD(void);
 
-    void InterruptDisplay(void);
+    bool Play(float speed, bool normal);
+    bool Play(void) { return Play(last_speed, last_normal); };
+    void Flush(void);
+    void Step(void);
+    int GetFramesPlayed(void);
 
   private:
     int videofd;
     int fbfd;
 
-    int storedglobalalpha;
-    unsigned long initglobalalpha;
-
     float fps;
     QString videoDevice;
 
     QMutex lock;
-
-    long long startframenum;
 
     int mapped_offset;
     int mapped_memlen;
@@ -71,12 +73,10 @@ class VideoOutputIvtv: public VideoOutput
     char *osdbuffer;
     char *osdbuf_aligned;
 
-    bool firstframe;
-
     int osdbufsize;
 
-    bool skipplay;
-    bool interruptdisplay;
+    float last_speed;
+    bool last_normal;
 };
 
 #endif

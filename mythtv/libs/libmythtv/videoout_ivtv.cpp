@@ -37,23 +37,13 @@ VideoOutputIvtv::VideoOutputIvtv(void)
     pixels = NULL;
     lastcleared = false;
     videoDevice = "/dev/video16";
-    skipplay = false;
-    interruptdisplay = false;
+    last_speed = 1.0;
+    last_normal = true;
 }
 
 VideoOutputIvtv::~VideoOutputIvtv()
 {
-    if (videofd)
-    {
-        ivtv_cfg_stop_decode sd;
-        memset(&sd, 0, sizeof(sd));
-
-        sd.hide_last = 1;
-        ioctl(videofd, IVTV_IOC_S_STOP_DECODE, &sd);
-
-        close(videofd);
-    }
-    videofd = -1;
+    Close();
 
     if (fbfd > 0)
     {
@@ -66,8 +56,9 @@ VideoOutputIvtv::~VideoOutputIvtv()
             return;
         }
 
-        fbstate.status = initglobalalpha;
-        fbstate.alpha = storedglobalalpha;
+        fbstate.status |= IVTVFB_STATUS_GLOBAL_ALPHA;
+        fbstate.status &= ~IVTVFB_STATUS_LOCAL_ALPHA;
+        fbstate.alpha = 255;
 
         if (ioctl(fbfd, IVTVFB_IOCTL_SET_STATE, &fbstate) < 0)
         {
@@ -91,7 +82,8 @@ void VideoOutputIvtv::ClearOSD(void)
         struct ivtv_osd_coords osdcoords;
         memset(&osdcoords, 0, sizeof(osdcoords));
 
-        ioctl(fbfd, IVTVFB_IOCTL_GET_ACTIVE_BUFFER, &osdcoords);
+        if (ioctl(fbfd, IVTVFB_IOCTL_GET_ACTIVE_BUFFER, &osdcoords) < 0)
+            perror("IVTVFB_IOCTL_GET_ACTIVE_BUFFER");
 
         struct ivtvfb_ioctl_dma_host_to_ivtv_args prep;
         memset(&prep, 0, sizeof(prep));
@@ -102,7 +94,8 @@ void VideoOutputIvtv::ClearOSD(void)
 
         memset(osdbuf_aligned, 0x00, osdbufsize);
 
-        ioctl(fbfd, IVTVFB_IOCTL_PREP_FRAME, &prep);
+        if (ioctl(fbfd, IVTVFB_IOCTL_PREP_FRAME, &prep) < 0)
+            perror("IVTVFB_IOCTL_PREP_FRAME");
 
         usleep(20000);
 
@@ -110,7 +103,8 @@ void VideoOutputIvtv::ClearOSD(void)
         osdcoords.offset = 0;
         osdcoords.pixel_stride = XJ_width * 2;
 
-        ioctl(fbfd, IVTVFB_IOCTL_SET_ACTIVE_BUFFER, &osdcoords);
+        if (ioctl(fbfd, IVTVFB_IOCTL_SET_ACTIVE_BUFFER, &osdcoords) < 0)
+            perror("IVTVFB_IOCTL_SET_ACTIVE_BUFFER");
     }
 }
 
@@ -138,7 +132,7 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
 
     MoveResize();
 
-    Reopen();
+    Open();
 
     if (videofd <= 0)
         return false;
@@ -179,9 +173,6 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
             return false;
         }
 
-        initglobalalpha = fbstate.status;
-        storedglobalalpha = fbstate.alpha;
-
         fbstate.status &= ~IVTVFB_STATUS_GLOBAL_ALPHA;
         fbstate.status |= IVTVFB_STATUS_LOCAL_ALPHA;
         fbstate.alpha = 0;
@@ -195,7 +186,8 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
         struct ivtvfb_ioctl_get_frame_buffer igfb;
         memset(&igfb, 0, sizeof(igfb));
 
-        ioctl(fbfd, IVTVFB_IOCTL_GET_FRAME_BUFFER, &igfb);
+        if (ioctl(fbfd, IVTVFB_IOCTL_GET_FRAME_BUFFER, &igfb) < 0)
+            perror("IVTVFB_IOCTL_GET_FRAME_BUFFER");
 
         stride = igfb.sizex * 4;
 
@@ -212,62 +204,43 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
     return true;
 }
 
-void VideoOutputIvtv::Reopen(int skipframes, int newstartframe)
+void VideoOutputIvtv::Close(void)
+{
+    if (videofd < 0)
+        return;
+
+    Stop(true);
+
+    close(videofd);
+    videofd = -1;
+}
+
+void VideoOutputIvtv::Open(void)
 {
     if (videofd >= 0)
-    {
-        ivtv_cfg_stop_decode sd;
-        memset(&sd, 0, sizeof(sd));
+        return;
 
-        ioctl(videofd, IVTV_IOC_S_STOP_DECODE, &sd);
-        close(videofd);
-
-        skipplay = true;
-    }
-
-    videofd = -1;
-
-    if ((videofd = open(videoDevice.ascii(), O_WRONLY | O_LARGEFILE, 0555)) < 0)
+    if ((videofd = open(videoDevice.ascii(), 
+        O_WRONLY | O_LARGEFILE | O_NONBLOCK, 0555)) < 0)
     {
         perror("Cannot open ivtv video out device");
         return;
     }
-    else
-    {
-        struct v4l2_control ctrl;
-        memset(&ctrl, 0, sizeof(ctrl));
 
-        ctrl.id = V4L2_CID_IVTV_DEC_PREBUFFER;
-        ctrl.value = 0;
+    struct v4l2_control ctrl;
+    memset(&ctrl, 0, sizeof(ctrl));
 
-        ioctl(videofd, VIDIOC_S_CTRL, &ctrl);
+    ctrl.id = V4L2_CID_IVTV_DEC_PREBUFFER;
+    ctrl.value = 1;
 
-        ctrl.id = V4L2_CID_IVTV_DEC_NUM_BUFFERS;
-        ctrl.value = 0;
+    if (ioctl(videofd, VIDIOC_S_CTRL, &ctrl) < 0)
+        perror("VIDIOC_S_CTRL prebuffer");
 
-        ioctl(videofd, VIDIOC_S_CTRL, &ctrl);
-        
-        ivtv_cfg_start_decode startd;
-        memset(&startd, 0, sizeof(startd));
+    ctrl.id = V4L2_CID_IVTV_DEC_NUM_BUFFERS;
+    ctrl.value = 1;
 
-        if (skipframes > 0)
-        {
-            startd.gop_offset = skipframes;
-            startd.muted_audio_frames = 6;
-        }
-
-        ioctl(videofd, IVTV_IOC_S_START_DECODE, &startd);
-
-        // change it back to hide last frame, in case we die unexpectedly.
-        ivtv_cfg_stop_decode stopd;
-        memset(&stopd, 0, sizeof(stopd));
-
-        stopd.hide_last = 1;
-        ioctl(videofd, IVTV_IOC_S_STOP_DECODE, &stopd);
-    }
-
-    startframenum = newstartframe;
-    firstframe = true;
+    if (ioctl(videofd, VIDIOC_S_CTRL, &ctrl) < 0)
+        perror("VIDIOC_S_CTRL numbuffers");
 }
 
 void VideoOutputIvtv::EmbedInWidget(unsigned long wid, int x, int y, int w, 
@@ -282,7 +255,8 @@ void VideoOutputIvtv::EmbedInWidget(unsigned long wid, int x, int y, int w,
     if (ioctl(fbfd, IVTVFB_IOCTL_GET_STATE, &fbstate) < 0)
         perror("IVTVFB_IOCTL_GET_STATE");
 
-    fbstate.status = initglobalalpha;
+    fbstate.status |= IVTVFB_STATUS_GLOBAL_ALPHA;
+    fbstate.status &= ~IVTVFB_STATUS_LOCAL_ALPHA;
     fbstate.alpha = 164;
 
     if (ioctl(fbfd, IVTVFB_IOCTL_SET_STATE, &fbstate) < 0)
@@ -366,89 +340,155 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
             prep.dest_offset = 0;
             prep.count = XJ_height * stride;
 
-            ioctl(fbfd, IVTVFB_IOCTL_PREP_FRAME, &prep);
+            if (ioctl(fbfd, IVTVFB_IOCTL_PREP_FRAME, &prep) < 0)
+                perror("IVTVFB_IOCTL_PREP_FRAME");
         }
     }
 }
 
-void VideoOutputIvtv::Play()
+void VideoOutputIvtv::Start(int skip, int mute)
 {
-    if (!skipplay)
-        ioctl(videofd, IVTV_IOC_PLAY, 0);
-    skipplay = false;
+    struct ivtv_cfg_start_decode start;
+    memset(&start, 0, sizeof start);
+    start.gop_offset = skip;
+    start.muted_audio_frames = mute;
+
+    while (ioctl(videofd, IVTV_IOC_START_DECODE, &start) < 0)
+    {
+        if (errno != EBUSY)
+        {
+            perror("IVTV_IOC_START_DECODE");
+            break;
+        }
+    }
 }
 
-void VideoOutputIvtv::Pause()
+void VideoOutputIvtv::Stop(bool hide)
 {
-    ioctl(videofd, IVTV_IOC_PAUSE, 0);
+    struct ivtv_cfg_stop_decode stop;
+    memset(&stop, 0, sizeof stop);
+    stop.hide_last = hide;
+
+    while (ioctl(videofd, IVTV_IOC_STOP_DECODE, &stop) < 0)
+    {
+        if (errno != EBUSY)
+        {
+            perror("IVTV_IOC_STOP_DECODE");
+            break;
+        }
+    }
 }
 
-void VideoOutputIvtv::InterruptDisplay(void)
+void VideoOutputIvtv::Pause(void)
 {
-    interruptdisplay = true;
+    while (ioctl(videofd, IVTV_IOC_PAUSE, 0) < 0)
+    {
+        if (errno != EBUSY)
+        {
+            perror("IVTV_IOC_PAUSE");
+            break;
+        }
+    }
 }
 
-int VideoOutputIvtv::WriteBuffer(unsigned char *buf, int count, int &frames)
+void VideoOutputIvtv::Poll(int delay)
 {
-    int n = 0;
-
     struct pollfd polls;
     polls.fd = videofd;
     polls.events = POLLOUT;
     polls.revents = 0;
 
-    int ret = 0;
-    int totalpassed = count;
-    const int maxwrite = 32768;
-    
-    while (count > 0 && !interruptdisplay)
+    if (poll(&polls, 1, delay) < 0)
+        perror("Polling on videodev");
+}
+
+int VideoOutputIvtv::WriteBuffer(unsigned char *buf, int len)
+{
+    int count;
+
+    //cerr << "ivtv writing video... ";
+    count = write(videofd, buf, len);
+    if (count < 0)
     {
-        ret = poll(&polls, 1, 20);
-
-        if (ret == 1 && polls.revents & POLLOUT)
+        if (errno != EAGAIN)
         {
-            n = write(videofd, buf, (count > maxwrite) ? maxwrite : count);
-            if (n < 0)
-            {
-                perror("Writing to videodev");
-                return n;
-            }
-            count -= n;
-            buf += n;
+            perror("Writing to videodev");
+            return count;
         }
+        count = 0;
+    }
+    //cerr << "wrote " << count << " of " << len << endl;
 
-        if (interruptdisplay)
+    return count;
+}
+
+int VideoOutputIvtv::GetFramesPlayed(void)
+{
+    struct ivtv_ioctl_framesync frameinfo;
+    memset(&frameinfo, 0, sizeof frameinfo);
+
+    if (ioctl(videofd, IVTV_IOC_GET_TIMING, &frameinfo) < 0)
+        perror("IVTV_IOC_GET_TIMING");
+
+    return frameinfo.frame;
+}
+
+bool VideoOutputIvtv::Play(float speed, bool normal)
+{
+    if (speed > 3.0)
+        return false;
+
+    struct ivtv_speed play;
+    memset(&play, 0, sizeof play);
+    if (speed >= 2.0)
+        play.scale = (int)roundf(speed);
+    else if (speed <= 0.5)
+        play.scale = (int)roundf(1 / speed);
+    else
+        play.scale = 1;
+    play.smooth = 0;
+    play.speed = (speed > 1.0);
+    play.direction = 0;
+    play.fr_mask = 2;
+    play.b_per_gop = 0;
+    play.aud_mute = !normal;
+    play.fr_field = 0;
+    play.mute = 0;
+
+    while (ioctl(videofd, IVTV_IOC_S_SPEED, &play) < 0)
+    {
+        if (errno != EBUSY)
         {
+            perror("IVTV_IOC_S_SPEED");
             break;
         }
     }
 
-    interruptdisplay = false;
-       
-    struct ivtv_ioctl_framesync frameinfo;
-    memset(&frameinfo, 0, sizeof(frameinfo));
-    if (ioctl(videofd, IVTV_IOC_GET_TIMING, &frameinfo) < 0)
+    last_speed = speed;
+    last_normal = normal;
+
+    return true;
+}
+
+void VideoOutputIvtv::Flush(void)
+{
+    int arg = 0;
+
+    if (ioctl(videofd, IVTV_IOC_DEC_FLUSH, &arg) < 0)
+        perror("IVTV_IOC_DEC_FLUSH");
+}
+
+void VideoOutputIvtv::Step(void)
+{
+    int arg = 0;
+
+    while (ioctl(videofd, IVTV_IOC_DEC_STEP, &arg) < 0)
     {
-        perror("IVTV_IOC_FRAMESYNC");
-        frames = 0;
-        return (totalpassed - count);
+        if (errno != EBUSY)
+        {
+            perror("IVTV_IOC_DEC_STEP");
+            break;
+        }
     }
-
-    // seems the decoder doesn't initialize this properly.
-    if (frameinfo.frame >= 20000000)
-        frameinfo.frame = 0;
-
-    if (firstframe)
-    {
-        if (frameinfo.frame > 5)
-            frameinfo.frame = 0;
-        else
-            firstframe = false;
-    }
-
-    interruptdisplay = false;
-    
-    frames = frameinfo.frame + startframenum;
-    return totalpassed - count;
 }
 

@@ -91,7 +91,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
 
     nvr_enc = NULL;
 
-    paused = 0;
+    paused = false;
+    previously_paused = false;
 
     audiodevice = "/dev/dsp";
     audioOutput = NULL;
@@ -216,6 +217,9 @@ void NuppelVideoPlayer::SetRecorder(RemoteEncoder *recorder)
 
 void NuppelVideoPlayer::Pause(bool waitvideo)
 {
+    if (paused)
+        return;
+
     actuallypaused = false;
 
     // pause the decoder thread first, as it's usually waiting for the video
@@ -233,10 +237,32 @@ void NuppelVideoPlayer::Pause(bool waitvideo)
 
     if (ringBuffer)
         ringBuffer->Pause();
+
+    play_speed = 1.0;
+    normal_speed = false;
+    frame_interval = (int)(1000000.0 / video_frame_rate / 1.0);
+    if (osd && forceVideoOutput != kVideoOutput_IVTV)
+        osd->SetFrameInterval(frame_interval);
 }
 
-void NuppelVideoPlayer::Unpause(bool unpauseaudio)
+bool NuppelVideoPlayer::Play(float speed, bool normal, bool unpauseaudio)
 {
+    if (forceVideoOutput == kVideoOutput_IVTV && speed > 3.0)
+        return false;
+
+    play_speed = speed;
+    normal_speed = normal;
+    frame_interval = (int)(1000000.0 / video_frame_rate / speed);
+    if (osd && forceVideoOutput != kVideoOutput_IVTV)
+        osd->SetFrameInterval(frame_interval);
+
+    if (!paused)
+    {
+        // Force speed update for IVTV
+        previously_paused = true;
+        return true;
+    }
+
     paused = false;
     UnpauseVideo();
     if (audioOutput && unpauseaudio)
@@ -244,6 +270,8 @@ void NuppelVideoPlayer::Unpause(bool unpauseaudio)
 
     if (ringBuffer)
         ringBuffer->Unpause();
+
+    return true;
 }
 
 bool NuppelVideoPlayer::GetPause(void)
@@ -274,15 +302,6 @@ void NuppelVideoPlayer::PauseVideo(bool wait)
 void NuppelVideoPlayer::UnpauseVideo(void)
 {
     pausevideo = false;
-}
-
-void NuppelVideoPlayer::SetPlaySpeed(float speed, bool normal)
-{
-    play_speed = speed;
-    normal_speed = normal;
-    frame_interval = (int)(1000000.0 / video_frame_rate / speed);
-    if (osd)
-        osd->SetFrameInterval(frame_interval);
 }
 
 void NuppelVideoPlayer::setPrebuffering(bool prebuffer)
@@ -1564,56 +1583,29 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 void NuppelVideoPlayer::IvtvVideoLoop(void)
 {
     refreshrate = frame_interval;
+    int delay = frame_interval;
 
     VideoOutputIvtv *vidout = (VideoOutputIvtv *)videoOutput;
-
     vidout->SetFPS(GetFrameRate());
-
-    bool previously_paused = false;
 
     while (!eof && !killvideo)
     {
+        resetvideo = false;
+        video_actually_paused = pausevideo;
+
         if (pausevideo)
         {
-            if (!previously_paused)
-                vidout->Pause();
-
-            if (!video_actually_paused)
-                videoOutput->UpdatePauseFrame();
-
-            if (resetvideo)
-            {
-                videoOutput->UpdatePauseFrame();
-                resetvideo = false;
-            }
-
-            video_actually_paused = true;
             videoThreadPaused.wakeAll();
-
             videoOutput->ProcessFrame(NULL, osd, videoFilters, pipplayer);
-
-            previously_paused = true;
-
-            //printf("video waiting for unpause\n");
-            usleep(frame_interval);
-            continue;
         }
-
-        if (previously_paused)
+        else
         {
-            vidout->Play();
-            previously_paused = false;
+            if (cc)
+                ShowText();
+            videoOutput->ProcessFrame(NULL, osd, videoFilters, NULL);
         }
 
-        video_actually_paused = false;
-        resetvideo = false;
-
-        if (cc)
-            ShowText();
-
-        videoOutput->ProcessFrame(NULL, osd, videoFilters, NULL);
-
-        usleep(frame_interval);
+        usleep(delay);
     }
 
     delete videoOutput;
@@ -1634,11 +1626,7 @@ void *NuppelVideoPlayer::kickoffOutputVideoLoop(void *player)
 bool NuppelVideoPlayer::FastForward(float seconds)
 {
     if (fftime == 0)
-    {
         fftime = (int)(seconds * video_frame_rate);
-        if (decoder)
-            decoder->InterruptDisplay();
-    }
 
     return fftime > CalcMaxFFTime(fftime);
 }
@@ -1646,11 +1634,7 @@ bool NuppelVideoPlayer::FastForward(float seconds)
 bool NuppelVideoPlayer::Rewind(float seconds)
 {
     if (rewindtime == 0)
-    {
         rewindtime = (int)(seconds * video_frame_rate);
-        if (decoder)
-            decoder->InterruptDisplay();
-    }
 
     return rewindtime >= framesPlayed;
 }
@@ -1756,6 +1740,17 @@ void NuppelVideoPlayer::StartPlaying(void)
     {
         if (paused)
         { 
+            if (!previously_paused)
+            {
+                if (forceVideoOutput == kVideoOutput_IVTV)
+                {
+                    VideoOutputIvtv *vidout = (VideoOutputIvtv *)videoOutput;
+                    vidout->Pause();
+                }
+                decoder->UpdateFramesPlayed();
+                previously_paused = true;
+            }
+
             actuallypaused = true;
             decoderThreadPaused.wakeAll();
             pausecheck++;
@@ -1764,7 +1759,7 @@ void NuppelVideoPlayer::StartPlaying(void)
             {
                 if (livetv && ringBuffer->GetFreeSpace() < -1000)
                 {
-                    Unpause();
+                    Play();
                     printf("forced unpause\n");
                 }
                 pausecheck = 0;
@@ -1801,6 +1796,16 @@ void NuppelVideoPlayer::StartPlaying(void)
                 usleep(500);
                 continue;
             }
+        }
+
+        if (previously_paused)
+        {
+            if (forceVideoOutput == kVideoOutput_IVTV)
+            {
+                VideoOutputIvtv *vidout = (VideoOutputIvtv *)videoOutput;
+                vidout->Play(play_speed, normal_speed);
+            }
+            previously_paused = false;
         }
 
         if (rewindtime > 0)
@@ -1856,7 +1861,7 @@ void NuppelVideoPlayer::StartPlaying(void)
             if (deleteIter.key() == totalFrames)
                 eof = 1;
             else
-                fftime = deleteIter.key() - framesPlayed;
+                JumpToFrame(deleteIter.key());
             ++deleteIter;
         }
     }
@@ -2345,8 +2350,6 @@ void NuppelVideoPlayer::DisableEdit(void)
    
     QMutexLocker lockit(&db_lock);
     m_playbackinfo->SetEditing(false, m_db);
-
-    Unpause();
 }
 
 bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
@@ -3684,7 +3687,7 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
         commBreakIter++;
 
         GetFrame(1, true);
-        while (LastFrameIsBlank())
+        while (LastFrameIsBlank() && !eof && !killplayer)
             GetFrame(1, true);
 
         return true;

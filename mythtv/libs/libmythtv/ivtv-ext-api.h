@@ -25,14 +25,23 @@
 #define IVTV_IOC_S_OSD          0xFFEE7788
 #define IVTV_IOC_GET_FB         0xFFEE7789
 
+#define IVTV_IOC_START_DECODE   _IOW('@', 29, struct ivtv_cfg_start_decode)
+#define IVTV_IOC_STOP_DECODE    _IOW('@', 30, struct ivtv_cfg_stop_decode)
+#define IVTV_IOC_G_SPEED        _IOR('@', 31, struct ivtv_speed)
+#define IVTV_IOC_S_SPEED        _IOW('@', 32, struct ivtv_speed)
+#define IVTV_IOC_DEC_STEP       _IOW('@', 33, int)
+#define IVTV_IOC_DEC_FLUSH      _IOW('@', 34, int)
+
+
 /* ioctl for MSP_SET_MATRIX will have to be registered */
 #define MSP_SET_MATRIX     _IOW('m',17,struct msp_matrix)
 
-#ifndef V4L2_CID_PRIVATE_BASE
-#define V4L2_CID_PRIVATE_BASE               0x08000000
-#endif
 
 /* Custom v4l controls */
+#ifndef V4L2_CID_PRIVATE_BASE
+#define V4L2_CID_PRIVATE_BASE			0x08000000
+#endif
+
 #define V4L2_CID_IVTV_FREQ      (V4L2_CID_PRIVATE_BASE)
 #define V4L2_CID_IVTV_ENC       (V4L2_CID_PRIVATE_BASE + 1)
 #define V4L2_CID_IVTV_BITRATE   (V4L2_CID_PRIVATE_BASE + 2)
@@ -70,6 +79,18 @@ struct ivtv_ioctl_framesync {
 	uint64_t scr;
 };
 
+struct ivtv_speed {
+	int scale;	/* 1-?? (50 for now) */
+	int smooth;	/* Smooth mode when in slow/fast mode */
+	int speed;	/* 0 = slow, 1 = fast */
+	int direction;	/* 0 = forward, 1 = reverse (not supportd */
+	int fr_mask;	/* 0 = I, 1 = I,P, 2 = I,P,B    2 = default!*/
+	int b_per_gop;	/* frames per GOP (reverse only) */
+	int aud_mute;	/* Mute audio while in slow/fast mode */
+	int fr_field;	/* 1 = show every field, 0 = show every frame */
+	int mute;	/* # of audio frames to mute on playback resume */
+};
+
 struct ivtv_slow_fast {
 	int speed; /* 0 = slow, 1 = fast */
 	int scale; /* 1-?? (50 for now) */
@@ -81,7 +102,8 @@ struct ivtv_cfg_start_decode {
 };
 
 struct ivtv_cfg_stop_decode {
-	int		hide_last;/* 1 = show black after stop,0 = show last frame */
+	int		hide_last; /* 1 = show black after stop,
+				      0 = show last frame */
 	uint64_t	pts_stop; /* PTS to stop at */
 };
 
@@ -164,3 +186,6 @@ struct rectangle {
 #define IVTVFB_STATUS_GLOBAL_ALPHA      (1 << 1)
 #define IVTVFB_STATUS_LOCAL_ALPHA       (1 << 2)
 #define IVTVFB_STATUS_FLICKER_REDUCTION (1 << 3)
+
+#define IVTV_IOCTL_SET_DEBUG_LEVEL _IOWR('@', 98, int *)
+#define IVTV_IOCTL_GET_DEBUG_LEVEL _IOR('@', 99, int *)

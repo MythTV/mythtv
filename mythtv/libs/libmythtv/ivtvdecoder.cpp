@@ -27,15 +27,15 @@ IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
     m_db = db;
     m_playbackinfo = pginfo;
 
-    framesPlayed = 0;
     framesRead = 0;
+    framesPlayed = 0;
+    lastStartFrame = 0;
 
     hasFullPositionMap = false;
 
     keyframedist = 15;
 
     exitafterdecoded = false;
-    ateof = false;
     gopset = false;
     firstgoppos = 0;
     prevgoppos = 0;
@@ -47,26 +47,54 @@ IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
 
     prvpkt[0] = prvpkt[1] = prvpkt[2] = 0;
 
-    ingetframe = false;
+    vidread = vidwrite = vidfull = 0;
+    ateof = false;
 }
 
 IvtvDecoder::~IvtvDecoder()
 {
 }
 
-void IvtvDecoder::SeekReset(int skipframes)
+void IvtvDecoder::SeekReset(long long newkey, int skipframes)
 {
+    //fprintf(stderr, "seek reset frame = %llu, skip = %d, exact = %d\n", 
+    //        newkey, skipframes, exactseeks);
+
+    if (!exactseeks)
+        skipframes = 0;
+
+    vidread = vidwrite = vidfull = 0;
+    ateof = false;
+
+    framesRead = newkey;
+    lastStartFrame = newkey;
+
     VideoOutputIvtv *videoout = (VideoOutputIvtv *)m_parent->getVideoOutput();
-    videoout->Reopen(skipframes, framesPlayed);
+
+    videoout->Stop(false);
+    videoout->Flush();
+
+    videoout->Start(0, skipframes+5);
+    videoout->Pause();
+
+    while (ReadWrite(1, 0))
+        ;
+    while (!videoout->GetFramesPlayed() && !ateof)
+        ReadWrite(1, 0);
+
+    if (m_parent->GetPause())
+        StepFrames(newkey, skipframes);
+    else
+        videoout->Play();
+
+    framesPlayed = newkey + skipframes + 1;
+    m_parent->SetFramesPlayed(framesPlayed);
 }
 
 void IvtvDecoder::Reset(void)
 {
     positionMap.clear();
-    framesPlayed = 0;
-    framesRead = 0;
-
-    SeekReset();
+    SeekReset(0, 0);
 }
 
 bool IvtvDecoder::CanHandle(char testbuf[2048], const QString &filename)
@@ -84,16 +112,24 @@ bool IvtvDecoder::CanHandle(char testbuf[2048], const QString &filename)
 
     struct v4l2_capability vcap;
     memset(&vcap, 0, sizeof(vcap));
-    if (ioctl(testfd, VIDIOC_QUERYCAP, &vcap) >= 0)
+    if (ioctl(testfd, VIDIOC_QUERYCAP, &vcap) < 0)
+        perror("VIDIOC_QUERYCAP");
+    else
     {
-        if (vcap.capabilities & V4L2_CAP_VIDEO_OUTPUT)
+        if (vcap.version < 0x00000109)
+            cerr << "ivtv driver is version " << hex << vcap.version <<
+                ", version " << hex <<  0x00000109 << " (or later) " <<
+                "is required" << endl;
+        else if (vcap.capabilities & V4L2_CAP_VIDEO_OUTPUT)
             ok = true;
     }
 
     v4l2_std_id std = V4L2_STD_NTSC;
     ntsc = true;
 
-    if (ioctl(testfd, VIDIOC_G_STD, &std) >= 0)
+    if (ioctl(testfd, VIDIOC_G_STD, &std) < 0)
+        perror("VIDIOC_G_STD");
+    else
     {
         if (std & V4L2_STD_PAL)
             ntsc = false;
@@ -248,49 +284,97 @@ void IvtvDecoder::MpegPreProcessPkt(unsigned char *buf, int len,
     memcpy(prvpkt, buf + len - 3, 3);
 }
 
-void IvtvDecoder::GetFrame(int onlyvideo)
+bool IvtvDecoder::ReadWrite(int onlyvideo, int delay)
 {
+    if (ateof)
+        return false;
+
     gotvideo = false;
     frame_decoded = 0;
 
-    bool allowedquit = false;
+    int count, total = 0;
 
-    unsigned char buf[256001];
-
-    VideoOutputIvtv *videoout = (VideoOutputIvtv *)m_parent->getVideoOutput();
-    long long startpos = ringBuffer->GetReadPosition();
-    int count = 0;
-    int newframes = 0;
-    int onlywrote = 0;
-    
-    while (!allowedquit)
-    {
-        count = ringBuffer->Read(buf, 131072);
-
-        MpegPreProcessPkt(buf, count, startpos);
-        if (onlyvideo >= 0)
-        {
-            ingetframe = true;
-            onlywrote = videoout->WriteBuffer(buf, count, newframes);
-            ingetframe = false;
-	}
-	    
-        allowedquit = true;
-    }                    
-
-    if (newframes > framesPlayed)
-        framesPlayed = newframes;
-
-    m_parent->SetFramesPlayed(framesPlayed);
-}
-
-void IvtvDecoder::InterruptDisplay(void)
-{
-    if (ingetframe)
+    if (onlyvideo < 0)
+        vidread = vidwrite = vidfull = 0;
+    else if (vidfull || vidread != vidwrite)
     {
         VideoOutputIvtv *videoout = (VideoOutputIvtv *)m_parent->getVideoOutput();
-        videoout->InterruptDisplay();
+        if (delay)
+            videoout->Poll(delay);
+
+        if (vidwrite >= vidread)
+        {
+            count = videoout->WriteBuffer(&vidbuf[vidwrite], vidmax - vidwrite);
+            if (count < 0)
+                ateof = true;
+            else if (count > 0)
+            {
+                vidwrite = (vidwrite + count) & (vidmax - 1);
+                vidfull = 0;
+                total += count;
+                //fprintf(stderr, "write1 = %d, %d, %d, %d\n", count, vidread, vidwrite, vidfull);
+            }
+        }
+
+        if (vidwrite < vidread)
+        {
+            count = videoout->WriteBuffer(&vidbuf[vidwrite], vidread - vidwrite);
+            if (count < 0)
+                ateof = true;
+            else if (count > 0)
+            {
+                vidwrite = (vidwrite + count) & (vidmax - 1);
+                vidfull = 0;
+                total += count;
+                //fprintf(stderr, "write2 = %d, %d, %d, %d\n", count, vidread, vidwrite, vidfull);
+            }
+        }
     }
+
+    if (!vidfull || vidread != vidwrite)
+    {
+        if (vidread >= vidwrite)
+        {
+            long long startpos = ringBuffer->GetReadPosition();
+            count = ringBuffer->Read(&vidbuf[vidread], vidmax - vidread);
+            if (count > 0)
+            {
+                MpegPreProcessPkt(&vidbuf[vidread], count, startpos);
+                vidread = (vidread + count) & (vidmax - 1);
+                vidfull = (vidread == vidwrite);
+                total += count;
+                //fprintf(stderr, "read1 = %d, %d, %d, %d\n", count, vidread, vidwrite, vidfull);
+            }
+        }
+
+        if (vidread < vidwrite)
+        {
+            long long startpos = ringBuffer->GetReadPosition();
+            count = ringBuffer->Read(&vidbuf[vidread], vidwrite - vidread);
+            if (count > 0)
+            {
+                MpegPreProcessPkt(&vidbuf[vidread], count, startpos);
+                vidread = (vidread + count) & (vidmax - 1);
+                vidfull = (vidread == vidwrite);
+                total += count;
+                //fprintf(stderr, "read2 = %d, %d, %d, %d\n", count, vidread, vidwrite, vidfull);
+            }
+        }
+
+        if (total == 0)
+            ateof = true;
+    }
+
+    return (total > 0);
+}
+
+void IvtvDecoder::GetFrame(int onlyvideo)
+{
+    ReadWrite(onlyvideo, 1);
+    UpdateFramesPlayed();
+
+    if (ateof && !m_parent->GetEditMode())
+        m_parent->SetEof();
 }
 
 bool IvtvDecoder::DoRewind(long long desiredFrame)
@@ -305,7 +389,6 @@ bool IvtvDecoder::DoRewind(long long desiredFrame)
     if (lastKey < 0)
         lastKey = 0;
 
-    int normalframes = desiredFrame - lastKey;
     long long keyPos = positionMap[lastKey / keyframedist];
     long long curPosition = ringBuffer->GetTotalReadPosition();
     long long diff = keyPos - curPosition;
@@ -317,12 +400,10 @@ bool IvtvDecoder::DoRewind(long long desiredFrame)
         if (keyPos == 0)
             continue;
         diff = keyPos - curPosition;
-        normalframes = 0;
         if (lastKey > storelastKey)
         {
             lastKey = storelastKey;
             diff = 0;
-            normalframes = 0;
             return false;
         }
     }
@@ -337,7 +418,6 @@ bool IvtvDecoder::DoRewind(long long desiredFrame)
         lastKey -= keyframedist;
         keyPos = positionMap[lastKey / keyframedist];
         diff = keyPos - curPosition;
-        normalframes += keyframedist;
 
         if (keyPos != 0)
            VERBOSE(VB_PLAYBACK, QString("Using seek position: %1")
@@ -353,31 +433,30 @@ bool IvtvDecoder::DoRewind(long long desiredFrame)
 
         lastKey = storelastKey;
         diff = 0;
-        normalframes = 0;
 
         return false;
     }
 
     ringBuffer->Seek(diff, SEEK_CUR);
 
-    framesPlayed = lastKey;
-    framesRead = lastKey;
+    SeekReset(lastKey, desiredFrame - lastKey);
 
-    normalframes = desiredFrame - framesPlayed;
-
-    if (!exactseeks)
-        normalframes = 0;
-
-    SeekReset(normalframes);
-
-    m_parent->SetFramesPlayed(framesPlayed);
     return true;
 }
 
 bool IvtvDecoder::DoFastForward(long long desiredFrame)
 {
-    lastKey = (framesPlayed / keyframedist) * keyframedist;
     long long number = desiredFrame - framesPlayed;
+
+    if (m_parent->GetPause() && number < 15)
+    {
+        StepFrames(framesPlayed, number+1);
+        framesPlayed = desiredFrame + 1;
+        m_parent->SetFramesPlayed(framesPlayed);
+        return !ateof;
+    }
+
+    lastKey = (framesPlayed / keyframedist) * keyframedist;
     long long desiredKey = lastKey;
 
     while (desiredKey <= desiredFrame)
@@ -386,11 +465,6 @@ bool IvtvDecoder::DoFastForward(long long desiredFrame)
     }
     desiredKey -= keyframedist;
    
-    int normalframes = desiredFrame - desiredKey;
-
-    if (desiredKey == lastKey)
-        normalframes = number;
-
     long long keyPos = -1;
 
     long long tmpKey = desiredKey;
@@ -464,16 +538,8 @@ bool IvtvDecoder::DoFastForward(long long desiredFrame)
 
     ringBuffer->Seek(diff, SEEK_CUR);
 
-    framesPlayed = framesRead = lastKey;
+    SeekReset(lastKey, desiredFrame - lastKey);
 
-    normalframes = desiredFrame - framesPlayed;
-
-    if (!exactseeks)
-        normalframes = 0;
-
-    SeekReset(normalframes);
-
-    m_parent->SetFramesPlayed(framesPlayed);
     return true;
 }
 
@@ -481,5 +547,78 @@ void IvtvDecoder::SetPositionMap(void)
 {
     if (m_playbackinfo && m_db)
         m_playbackinfo->SetPositionMap(positionMap, MARK_GOP_START, m_db);
+}
+
+void IvtvDecoder::UpdateFramesPlayed(void)
+{
+    VideoOutputIvtv *videoout = (VideoOutputIvtv *)m_parent->getVideoOutput();
+
+    int newframes = videoout->GetFramesPlayed();
+
+    if (lastStartFrame + newframes >= framesPlayed &&
+        lastStartFrame + newframes <= framesRead)
+        framesPlayed = lastStartFrame + newframes;
+    else
+        fprintf(stderr, "bad newframes: %d %lld %lld %lld\n",
+                newframes, lastStartFrame, framesRead, framesPlayed);
+
+    m_parent->SetFramesPlayed(framesPlayed);
+}
+
+bool IvtvDecoder::StepFrames(int start, int count)
+{
+    VideoOutputIvtv *videoout = (VideoOutputIvtv *)m_parent->getVideoOutput();
+
+    int step, cur = 0, last = start;
+
+    //fprintf(stderr, "stepping %d from %d\n", count, last);
+
+    for (step = 0; step < count && !ateof; step++)
+    {
+        while (ReadWrite(1, 0))
+            ;
+
+        //fprintf(stderr, "    step %d at %d\n", step, last);
+        videoout->Step();
+        usleep(1000);
+
+        int tries;
+        const int maxtries = 500000;
+        const int restep = 100000;
+
+        for (tries = 0; tries < maxtries && !ateof; tries++)
+        {
+            while (ReadWrite(1, 0))
+                ;
+
+            cur = lastStartFrame + videoout->GetFramesPlayed();
+            if (cur > last)
+                break;
+
+            if (tries && !(tries % restep))
+            {
+                videoout->Pause();
+                fprintf(stderr, "        extra step %d at %d\n", step, last);
+                videoout->Step();
+                usleep(1000);
+            }
+        }
+
+        videoout->Pause();
+
+        //fprintf(stderr, "        %d tries to %d\n", tries, cur);
+
+        if (tries >= maxtries)
+        {
+            cerr << "timed out while stepping, giving up" << endl;
+            break;
+        }
+        
+        last = cur;
+    }
+
+    //fprintf(stderr, "    stepped to %d\n", cur);
+
+    return true;
 }
 

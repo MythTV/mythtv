@@ -69,15 +69,10 @@ class NuppelVideoPlayer
 
     void SetAudioSampleRate(int rate) { audio_samplerate = rate; }
 
-    bool TogglePause(void) { if (paused) Unpause(); else Pause(); 
-                             return paused; 
-                           }
     void Pause(bool waitvideo = true);
-    void Unpause(bool unpauseaudio = true); 
+    bool Play(float speed = 1.0, bool normal = true, 
+              bool unpauseaudio = true); 
     bool GetPause(void);
-
-    float GetPlaySpeed(void) { return play_speed; };
-    void SetPlaySpeed(float speed, bool normal);
 
     bool FastForward(float seconds);
     bool Rewind(float seconds);
@@ -295,7 +290,7 @@ class NuppelVideoPlayer
 
     AudioOutput *audioOutput;
 
-    bool paused, pausevideo;
+    bool paused, previously_paused, pausevideo;
     bool actuallypaused, video_actually_paused;
     QWaitCondition decoderThreadPaused, videoThreadPaused;
  

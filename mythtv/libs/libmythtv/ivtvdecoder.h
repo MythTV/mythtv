@@ -48,21 +48,24 @@ class IvtvDecoder : public DecoderBase
 
     QString GetEncodingType(void) { return QString("MPEG-2"); }
 
-    void InterruptDisplay(void);
+    void UpdateFramesPlayed(void);
 
   protected:
     RingBuffer *getRingBuf(void) { return ringBuffer; }
 
   private:
     void MpegPreProcessPkt(unsigned char *buf, int len, long long startpos);
-    void SeekReset(int skipframes = 0);
+    void SeekReset(long long newkey, int skipframes = 0);
+    bool ReadWrite(int onlyvideo, int delay);
+    bool StepFrames(int start, int count);
 
     RingBuffer *ringBuffer;
 
     int frame_decoded;
 
-    long long framesPlayed;
     long long framesRead;
+    long long framesPlayed;
+    long long lastStartFrame;
 
     bool hasFullPositionMap;
     QMap<long long, long long> positionMap;
@@ -92,7 +95,9 @@ class IvtvDecoder : public DecoderBase
 
     static bool ntsc;
 
-    bool ingetframe;
+    static const int vidmax = 131072; // must be a power of 2
+    unsigned char vidbuf[vidmax];
+    int vidread, vidwrite, vidfull;
 };
 
 #endif

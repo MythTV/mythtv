@@ -986,7 +986,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
         if (!nvp->DoKeypress(e))
             editmode = nvp->GetEditMode();
         if (!editmode)
-            nvp->SetPlaySpeed(1.0, true);
+        {
+            paused = !paused;
+            DoPause();
+        }
         return;
     }
 
@@ -1074,8 +1077,11 @@ void TV::ProcessKeypress(QKeyEvent *e)
                     {
                        playbackinfo->SetEditing(false, m_db);
                        editmode = nvp->EnableEdit();
-                       if (editmode)
-                           nvp->SetPlaySpeed(1.0, false);
+                    }
+                    else
+                    {
+                        paused = !paused;
+                        DoPause();
                     }
                 }
                 else if (dialogname == "exitplayoptions") 
@@ -1091,7 +1097,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                             exitPlayer = true;
                             break;
                         case 3: case 0:
-                            nvp->Unpause();
+                            paused = !paused;
+                            DoPause();
                             break;
                         case 4:
                             wantsToQuit = true;
@@ -1226,8 +1233,6 @@ void TV::ProcessKeypress(QKeyEvent *e)
             DoSeek(jumptime * 60, tr("Jump Ahead"));
         else if (action == "ESCAPE")
         {
-            StopFFRew();
-
             if (osd)
             {
                 QStringList osetname;
@@ -1238,6 +1243,9 @@ void TV::ProcessKeypress(QKeyEvent *e)
                     return;
                 }
             }
+
+            NormalSpeed();
+            StopFFRew();
 
             if (StateIsPlaying(internalState) &&
                 gContext->GetNumSetting("PlaybackExitPrompt") == 1) 
@@ -1297,7 +1305,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             {
                 float time = StopFFRew();
                 UpdatePosOSD(time, tr("Play"));
-                was_doing_ff_rew = true;
+                handled = true;
             }
         }
 
@@ -1305,7 +1313,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         {
             NormalSpeed();
             UpdatePosOSD(0.0, tr("Play"));
-            was_doing_ff_rew = true;
+            handled = true;
         }
     }
 
@@ -1408,8 +1416,6 @@ void TV::ProcessKeypress(QKeyEvent *e)
                     return;
                 }
                 editmode = nvp->EnableEdit();
-                if (editmode)
-                    nvp->SetPlaySpeed(1.0, false);
             }
             else if (action == "TOGGLEBROWSE")
                 DoProgramMenu();
@@ -1529,10 +1535,15 @@ void TV::SwapPIP(void)
 
 void TV::DoPause(void)
 {
-    NormalSpeed();
+    speed_index = 0;
     float time = StopFFRew();
 
-    paused = activenvp->TogglePause();
+    if (paused)
+        activenvp->Play(1.0, true);
+    else
+        activenvp->Pause();
+
+    paused = !paused;
 
     if (activenvp != nvp)
         return;
@@ -1540,7 +1551,7 @@ void TV::DoPause(void)
     if (paused)
         UpdatePosOSD(time, tr("Paused"));
     else
-        osd->EndPause();
+        UpdatePosOSD(time, tr("Play"));
 }
 
 void TV::DoInfo(void)
@@ -1633,7 +1644,7 @@ void TV::NormalSpeed(void)
         return;
 
     speed_index = 0;
-    activenvp->SetPlaySpeed(1.0, true);
+    activenvp->Play(1.0, true);
 }
 
 void TV::ChangeSpeed(int direction)
@@ -1662,11 +1673,14 @@ void TV::ChangeSpeed(int direction)
         default: speed_index = old_speed; return; break;
     }
 
-    activenvp->SetPlaySpeed(speed, (speed == 1.0));
-    UpdatePosOSD(time, mesg);
+    if (!activenvp->Play(speed, (speed == 1.0)))
+    {
+        speed_index = old_speed;
+        return;
+    }
 
-    if (paused)
-        paused = activenvp->TogglePause();
+    paused = false;
+    UpdatePosOSD(time, mesg);
 }
 
 float TV::StopFFRew(void)
@@ -1687,7 +1701,7 @@ float TV::StopFFRew(void)
     doing_ff_rew = 0;
     ff_rew_index = SSPEED_NORMAL;
 
-    activenvp->SetPlaySpeed(1.0, true);
+    activenvp->Play(1.0, true);
 
     return time;
 }
@@ -1713,10 +1727,8 @@ void TV::ChangeFFRew(int direction)
         doing_ff_rew = direction;
         ff_rew_index = SSPEED_NORMAL;
 
-        if (paused)
-            paused = activenvp->TogglePause();
-
-        activenvp->SetPlaySpeed(1.0, false);
+        activenvp->Play(1.0, false);
+        paused = false;
     }
 }
 
@@ -1837,7 +1849,7 @@ void TV::ToggleInputs(void)
     activerecorder->ToggleInputs();
 
     activenvp->ResetPlaying();
-    activenvp->Unpause(false);
+    activenvp->Play(1.0, true, false);
 
     if (activenvp == nvp)
         UpdateOSDInput();
@@ -1878,7 +1890,7 @@ void TV::ChangeChannel(int direction)
     activerecorder->ChangeChannel(direction);
 
     activenvp->ResetPlaying();
-    activenvp->Unpause(false);
+    activenvp->Play(1.0, true, false);
 
     if (activenvp == nvp)
     {
@@ -2030,7 +2042,7 @@ void TV::ChangeChannelByString(QString &name)
     activerecorder->SetChannel(name);
 
     activenvp->ResetPlaying();
-    activenvp->Unpause(false);
+    activenvp->Play(1.0, true, false);
 
     if (activenvp == nvp)
     {
