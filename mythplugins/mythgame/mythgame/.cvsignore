@@ -1,10 +1,7 @@
 .qmake.internal.cache
 Makefile
-moc_databasebox.cpp
-moc_extendedlistview.cpp
+moc_gametree.cpp
 moc_mamesettingsdlg.cpp
-moc_screenbox.cpp
-moc_selectframe.cpp
 moc_nessettingsdlg.cpp
 moc_pcsettingsdlg.cpp
 moc_snessettingsdlg.cpp

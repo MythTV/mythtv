@@ -235,7 +235,7 @@ public:
     };
 };
 
-GameSettings::GameSettings()
+MythGameSettings::MythGameSettings()
 {
     VerticalConfigurationGroup *general = new VerticalConfigurationGroup(false);
     general->setLabel("MythGame Settings -- General");

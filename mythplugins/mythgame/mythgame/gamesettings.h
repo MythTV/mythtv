@@ -26,9 +26,9 @@ protected:
 
 // The real work.
 
-class GameSettings: virtual public ConfigurationWizard {
+class MythGameSettings: virtual public ConfigurationWizard {
 public:
-    GameSettings();
+    MythGameSettings();
 };
 
 #endif

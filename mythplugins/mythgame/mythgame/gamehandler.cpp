@@ -3,7 +3,6 @@
 #include "neshandler.h"
 #include "sneshandler.h"
 #include "pchandler.h"
-#include "constants.h"
 
 #include <qobject.h>
 #include <qptrlist.h>

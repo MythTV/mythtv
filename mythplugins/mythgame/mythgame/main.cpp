@@ -7,10 +7,9 @@ using namespace std;
 #include <unistd.h>
 
 #include "gamehandler.h"
-#include "databasebox.h"
-#include "screenbox.h"
 #include "rominfo.h"
 #include "gamesettings.h"
+#include "gametree.h"
 
 #include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
@@ -28,7 +27,7 @@ int mythplugin_init(const char *libversion)
         return -1;
 
 
-    GameSettings settings;
+    MythGameSettings settings;
     settings.load(QSqlDatabase::database());
     settings.save(QSqlDatabase::database());
 
@@ -72,17 +71,9 @@ int mythplugin_run(void)
 
     QString paths = gContext->GetSetting("GameTreeLevels");
 
-    if(gContext->GetNumSetting("ShotCount")) // this will be a choice in the settings menu.
-    {
-        ScreenBox screenbox(db, paths, gContext->GetMainWindow(), 
-                            "game screen");
-        screenbox.exec();
-    }
-    else
-    {
-        DatabaseBox dbbox(db, paths, gContext->GetMainWindow(), "game list");
-        dbbox.exec();
-    }
+    GameTree gametree(gContext->GetMainWindow(), db, "gametree", "game-",
+                      paths);
+    gametree.exec();
 
     qApp->removeTranslator(&translator);
 
@@ -91,7 +82,7 @@ int mythplugin_run(void)
 
 int mythplugin_config(void)
 {
-    GameSettings settings;
+    MythGameSettings settings;
     settings.exec(QSqlDatabase::database());
 
     return 0;

@@ -10,17 +10,22 @@ TARGET = mythgame
 target.path = $${PREFIX}/lib/mythtv/plugins
 INSTALLS += target
 
-# Input
-HEADERS += constants.h databasebox.h gamehandler.h mamehandler.h rominfo.h 
-HEADERS += mamerominfo.h treeitem.h mamesettingsdlg.h extendedlistview.h 
-HEADERS += selectframe.h screenbox.h neshandler.h nesrominfo.h nessettingsdlg.h
-HEADERS += unzip.h sneshandler.h snesrominfo.h snessettingsdlg.h pchandler.h
-HEADERS += pcrominfo.h pcsettingsdlg.h gamesettings.h
+uifiles.path = $${PREFIX}/share/mythtv/themes/default
+uifiles.files = game-ui.xml
 
-SOURCES += databasebox.cpp selectframe.cpp screenbox.cpp
-SOURCES += main.cpp gamehandler.cpp mamehandler.cpp rominfo.cpp neshandler.cpp
-SOURCES += treeitem.cpp mamerominfo.cpp mamesettingsdlg.cpp extendedlistview.cpp
-SOURCES += nesrominfo.cpp nessettingsdlg.cpp unzip.c sneshandler.cpp
-SOURCES += snesrominfo.cpp snessettingsdlg.cpp pchandler.cpp pcrominfo.cpp
-SOURCES += pcsettingsdlg.cpp gamesettings.cpp
+INSTALLS += uifiles
+
+# Input
+HEADERS += gamehandler.h rominfo.h unzip.h gamesettings.h gametree.h
+HEADERS += mamehandler.h mamerominfo.h mamesettingsdlg.h
+HEADERS += neshandler.h nesrominfo.h nessettingsdlg.h
+HEADERS += sneshandler.h snesrominfo.h snessettingsdlg.h
+HEADERS += pchandler.h pcrominfo.h pcsettingsdlg.h 
+
+SOURCES += main.cpp gamehandler.cpp rominfo.cpp gametree.cpp unzip.c
+SOURCES += gamesettings.cpp
+SOURCES += mamehandler.cpp mamerominfo.cpp mamesettingsdlg.cpp
+SOURCES += neshandler.cpp nesrominfo.cpp nessettingsdlg.cpp 
+SOURCES += sneshandler.cpp snesrominfo.cpp snessettingsdlg.cpp 
+SOURCES += pchandler.cpp pcrominfo.cpp pcsettingsdlg.cpp
 
