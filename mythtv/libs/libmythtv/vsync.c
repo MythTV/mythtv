@@ -151,7 +151,7 @@ const char *nvidia_dev = "/dev/nvidia0";
 
 static struct timeval lastvbi;
 
-int drmWaitVBlank( int fd, drmVBlankPtr vbl )
+static int drmWaitVBlank( int fd, drmVBlankPtr vbl )
 {
     struct timeval curvbi;
     int ret;
