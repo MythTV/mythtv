@@ -47,7 +47,7 @@ Weather::Weather(QSqlDatabase *db, int appCode, MythMainWindow *parent,
     stopProcessing = false;
 
     allowkeys = true;
-    wantAnimated = gContext->GetNumSetting("WeatherWantAnimated", 0);   
+    wantAnimated = gContext->GetNumSetting("WeatherWantAnimated", 1);   
     weatherTimeoutInt = gContext->GetNumSetting("WeatherTimeout", 20);
     weatherTimeoutInt *= 1000;
     
