@@ -2155,6 +2155,22 @@ UIListTreeType* MythThemedDialog::getUIListTreeType(const QString &name)
     return NULL;
 }
 
+LayerSet* MythThemedDialog::getContainer(const QString& name)
+{
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
+
+    while( (looper = an_it.current()) != 0)
+    {
+        if (looper->GetName() == name)
+            return looper;
+        
+        ++an_it;
+    }
+    
+    return NULL;
+}
+
 /*
 ---------------------------------------------------------------------
 */

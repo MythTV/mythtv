@@ -262,6 +262,7 @@ class MythThemedDialog : public MythDialog
     UIStatusBarType *getUIStatusBarType(const QString &name);
     UIListBtnType *getUIListBtnType(const QString &name);
     UIListTreeType *getUIListTreeType(const QString &name);
+    LayerSet* getContainer(const QString &name);
 
     void setContext(int a_context) { context = a_context; }
     int  getContext(){return context;}
@@ -283,7 +284,9 @@ class MythThemedDialog : public MythDialog
     UIType *widget_with_current_focus;
 
     // These need to be just "protected" so that subclasses can mess with them
-
+    XMLParse *getTheme() {return theme;}
+    QDomElement& getXmlData() {return xmldata;}
+    
     QPixmap my_background;
     QPixmap my_foreground;
 
