@@ -9,6 +9,7 @@
 using namespace std;
 
 #include <sys/stat.h>
+#include <sys/vfs.h>
 
 
 #include "../../libs/libmyth/mythcontext.h"
@@ -425,27 +426,13 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
 
 void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs)
 {
-    QString command;
-    command.sprintf("df -k -P %s", recordfileprefix.ascii());
-
-    FILE *file = popen(command.ascii(), "r");
-
+    
+    struct statfs statbuf;
     int totalspace = -1, usedspace = -1;
-
-    if (file)
-    {
-        char buffer[1024];
-        fgets(buffer, 1024, file);
-        fgets(buffer, 1024, file);
-
-        char dummy[1024];
-        int dummyi;
-        sscanf(buffer, "%s %d %d %d %s %s\n", dummy, &totalspace, &usedspace,
-               &dummyi, dummy, dummy);
-
-        totalspace /= 1000;
-        usedspace /= 1000;
-        pclose(file);
+    if (statfs(recordfileprefix.ascii(), &statbuf) == 0) {
+        totalspace = statbuf.f_blocks / (1024*1024/statbuf.f_bsize);
+        usedspace = (statbuf.f_blocks - statbuf.f_bfree) / (1024*1024/statbuf.f_bsize);
+        cout << "totalspace: " << totalspace << " usedspace: " << usedspace << endl;
     }
 
     QStringList strlist;
