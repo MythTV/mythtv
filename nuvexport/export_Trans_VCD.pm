@@ -29,10 +29,10 @@ package export_Trans_VCD;
 		push @{$self->{errors}}, 'You need transcode to use this exporter.' unless ($Prog{transcode});
 	# Make sure that we have an mp2 encoder
 		$Prog{mp2_encoder} = find_program('toolame', 'mp2enc');
-		push @{$self->{errors}}, 'You need toolame or mp2enc to export an svcd.' unless ($Prog{mp2_encoder});
+		push @{$self->{errors}}, 'You need toolame or mp2enc to export an vcd.' unless ($Prog{mp2_encoder});
 	# Make sure that we have an mplexer
 		$Prog{mplexer} = find_program('tcmplex', 'mplex');
-		push @{$self->{errors}}, 'You need tcmplex or mplex to export an svcd.' unless ($Prog{mplexer});
+		push @{$self->{errors}}, 'You need tcmplex or mplex to export an vcd.' unless ($Prog{mplexer});
 	# Any errors?  disable this function
 		$self->{enabled} = 0 if ($self->{errors} && @{$self->{errors}} > 0);
 	# Return

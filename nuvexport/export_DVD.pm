@@ -2,7 +2,7 @@ package export_DVD;
 
 # Define any command line parameters used by this module
 	*Arg_str  = *main::Arg_str;
-# These are loaded by export_SVCD, so putting them here is redundant
+# These are loaded by export_DVD, so putting them here is redundant
 #	push @Arg_str,
 #			'a_bitrate|ar:i',
 #			'v_bitrate|vr:i',
@@ -25,7 +25,7 @@ package export_DVD;
 					# The name of this export function - displayed to users in interactive mode
 					 'name'            => 'Export to DVD',
 					# The --mode match (regex) for non-interactive command line interface
-					 'cli_mode'        => 'svcd',
+					 'cli_mode'        => 'dvd',
 					# Set to 0 to disable this export function (eg. if there are errors)
 					 'enabled'         => 1,
 					# An array of errors - generally displayed to users when they try to use a disabled function
@@ -47,17 +47,28 @@ package export_DVD;
 					 'v_bitrate'       => 3800,
 					 'quantisation'    => 5,		# 4 through 6 is probably right...
 					 'noise_reduction' => 1,
+					 'author_now'      => 1,
+					 'burn_now'        => 0,
+					 'dvddir'          => "dvddir.$$",
+					 'dvdr_speed'      => 4,		# 4x drives are most popular now ...
+					 'dvdr_path'       => '/dev/dvd',
 					 @_		#allows user-specified attributes to override the defaults
 					};
 		bless($self, $class);
 	# Make sure that we have an mplexer
 		$Prog{mplexer} = find_program('tcmplex', 'mplex');
-		push @{$self->{errors}}, 'You need tcmplex or mplex to export an svcd.' unless ($Prog{mplexer});
+		push @{$self->{errors}}, 'You need tcmplex or mplex to export a dvd.' unless ($Prog{mplexer});
 	# Make sure that we have the other necessary programs
 		find_program('yuvscaler')
-			or push @{$self->{errors}}, 'You need yuvscaler to export an svcd.';
+			or push @{$self->{errors}}, 'You need yuvscaler to export a dvd.';
 	# Do we have yuvdenoise?
 		$Prog{yuvdenoise} = find_program('yuvdenoise');
+	# Do we have toolame?
+		$Prog{toolame} = find_program('toolame');
+	# Do we have dvdauthor?
+		$Prog{dvdauthor} = find_program('dvdauthor');
+	# Do we have growisofs?
+		$Prog{growisofs} = find_program('growisofs');
 	# Any errors?  disable this function
 		$self->{enabled} = 0 if ($self->{errors} && @{$self->{errors}} > 0);
 	# Return
@@ -68,7 +79,7 @@ package export_DVD;
 		my $self = shift;
 		return undef unless ($Args{mode} && $Args{mode} =~ /$self->{cli_mode}/i);
 	# Get the save path
-		($self->{savepath}, $self->{outfile}) = $gui->query_filename($self->{default_outfile}, 'vob', $self->{savepath});
+		($self->{savepath}, $self->{outfile}) = $gui->query_filename($self->{default_outfile}, 'mpeg', $self->{savepath});
 	# Audio bitrate
 		$self->{a_bitrate} = $Args{a_bitrate} if ($Args{a_bitrate});
 		die "Audio bitrate is too low; please choose a bitrate >= 64.\n\n"  if ($self->{a_bitrate} < 64);
@@ -105,7 +116,7 @@ package export_DVD;
 		return if ($self->gather_cli_data());
 	# Get the save path
 		$self->{savepath} = $gui->query_savepath();
-		$self->{outfile}  = $gui->query_filename($self->{default_outfile}, 'vob', $self->{savepath});
+		$self->{outfile}  = $gui->query_filename($self->{default_outfile}, 'mpeg', $self->{savepath});
 	# Ask the user if he/she wants to use the cutlist
 		if ($self->{episode}->{cutlist} && $self->{episode}->{cutlist} =~ /\d/) {
 			$self->{use_cutlist} = $gui->query_text('Enable Myth cutlist?',
@@ -172,8 +183,21 @@ package export_DVD;
 		else {
 			$gui->notify('Couldn\'t find yuvdenoise.  Please install it if you want noise reduction.');
 		}
-	# Do we want bin/cue files, or just an mpeg?
-		# nothing, at the moment.
+	# Do we want dvd/iso files, or just an mpeg?
+		if ($Prog{dvdauthor}) {
+			$self->{author_now} = $gui->query_text('Author a DVD (versus just outputting an MPEG)?',
+														'yesno',
+														$self->{author_now} ? 'Yes' : 'No');
+		} else {
+			$self->{author_now} = 0;
+		} 
+		if ($self->{author_now} && $Prog{growisofs}) {
+			$self->{burn_now} = $gui->query_text('Burn the authored DVD?',
+														'yesno',
+														$self->{burn_now} ? 'Yes' : 'No');
+		} else {
+			$self->{burn_now} = 0;
+		} 
 	}
 
 	sub execute {
@@ -217,8 +241,12 @@ package export_DVD;
 			}
 		}
 	# Now we fork off a process to encode the audio
-#		$command = "nice -n 19 ffmpeg -f s16le -ar $nuv_info{audio_sample_rate} -ac 2 -i $self->{fifodir}/audout -ar 44100 -ab $self->{a_bitrate} -vn -f mp2 $self->{tmp_a}";
-		$command = "nice -n 19 sox -t raw -r $nuv_info{audio_sample_rate} -s -w  -c 2 $self->{fifodir}/audout -t raw -r 48000 -s -w -c 2 - resample| nice -n 19 toolame -s 48.0 -m j -b $self->{a_bitrate} - $self->{tmp_a}";
+		if ($Prog{toolame}) {
+		$command = "nice -n 19 sox -t raw -r $nuv_info{audio_sample_rate} -s -w  -c 2 $self->{fifodir}/audout -t raw -r 48000 -s -w -c 2 - | nice -n 19 toolame -s 48.0 -m j -b $self->{a_bitrate} - $self->{tmp_a}";
+		} else {
+		$command = "nice -n 19 ffmpeg -f s16le -ar $nuv_info{audio_sample_rate} -ac 2 -i $self->{fifodir}/audout -ac 2 -ar 48000 -ab $self->{a_bitrate} -vn -f mp2 $self->{tmp_a}";
+		}
+
 		if ($DEBUG) {
 			print "\naudio command:\n\n$command\n";
 		}
@@ -274,9 +302,39 @@ package export_DVD;
 		}
 		if ($DEBUG) {
 			print "\nmultiplex command:\n\n$command\n\n";
-			exit;
-		}
+		} else {
 		system($command);
+		} 
+
+		if ($self->{author_now}) {
+			$command = "nice -n 20 dvdauthor -t -o $self->{dvddir} $safe_outfile";
+			if ($DEBUG) {
+				print "\nauthor command 1:\n\n$command\n\n";
+			} else {
+				system($command);
+			} 
+			$command = "nice -n 20 dvdauthor -T -o $self->{dvddir}";
+			if ($DEBUG) {
+				print "\nauthor command 2:\n\n$command\n\n";
+			} else {
+				system($command);
+			} 
+			if ($self->{burn_now}) {
+				$command = "nice -n 20 growisofs -speed=$self->{dvdr_speed} -Z $self->{dvdr_path} -dvd-video $self->{dvddir}";
+				if ($DEBUG) {
+					print "\nburn command:\n\n$command\n\n";
+				} else {
+					system($command);
+				} 
+			} else {
+				$command = "nice -n 20 mkisofs -dvd-video -udf -o $safe_outfile.dvd.iso $self->{dvddir}";
+				if ($DEBUG) {
+					print "\nmkisofs command 1:\n\n$command\n\n";
+				} else {
+					system($command);
+				} 
+			}
+		} 
 	}
 
 	sub cleanup {

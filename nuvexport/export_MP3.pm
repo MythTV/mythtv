@@ -29,7 +29,7 @@ package export_MP3;
 		bless($self, $class);
 	# Make sure that we have an mp2 encoder
 		$Prog{mp2_encoder} = find_program('toolame', 'mp2enc');
-		push @{$self->{errors}}, 'You need toolame or mp2enc to export an svcd.' unless ($Prog{mp2_encoder});
+		push @{$self->{errors}}, 'You need toolame or mp2enc to export an mp3.' unless ($Prog{mp2_encoder});
 	# Any errors?  disable this function
 		$self->{enabled} = 0 if ($self->{errors} && @{$self->{errors}} > 0);
 	# Return
