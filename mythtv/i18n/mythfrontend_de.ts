@@ -88,6 +88,117 @@
     </message>
 </context>
 <context>
+    <name>CustomRecord</name>
+    <message>
+        <source>Power Search Recording Rule Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rule Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Match words in the title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Match in any descriptive field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Limit by category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New episodes only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exclude unidentified episodes (Data Direct)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exclude unidentified episodes (XMLTV)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Limit movies by the year of release</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimum star rating (0.0 to 1.0 for movies only)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exclude one station</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Match related callsigns</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only channels from a specific video source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only channels marked as commercial free</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Anytime on a specific day of the week</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only on weekdays (Monday through Friday)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only on weekends</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only in primetime</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not in primetime</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multiple sports teams (complete example)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sci-fi B-movies (complete example)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add this example clause</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Test</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record</source>
+        <translation type="unfinished">Aufnahme</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Abbrechen</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DataDirectLineupSelector</name>
     <message>
         <source>Fetching lineups from DataDirect service...</source>
@@ -317,6 +428,17 @@
     </message>
 </context>
 <context>
+    <name>MythSearchDialog</name>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">Ok</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Abbrechen</translation>
+    </message>
+</context>
+<context>
     <name>MythWizard</name>
     <message>
         <source>&amp;Cancel</source>
@@ -532,6 +654,42 @@
     <message>
         <source>^(The |A |An )</source>
         <translation>^(Der |Ein |Eine )</translation>
+    </message>
+    <message>
+        <source>Play from beginning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play from bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A preserved episode is ignored in calculations for deleting episodes above the limit.  Auto-expiration is used to remove eligable programs when disk space is low.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not preserve this episode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preserve this episode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play from...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage Options</source>
+        <translation type="unfinished">Speicherplatz</translation>
+    </message>
+    <message>
+        <source>Recording Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Job Options</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5194,15 +5352,15 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Would you like to clear all program and channel settings before starting configuration?</source>
-        <translation>Möchten Sie alle Programm- und Sendereinstellungen löschen bevor Sie mit der Konfiguration beginnen?</translation>
+        <translation type="obsolete">Möchten Sie alle Programm- und Sendereinstellungen löschen bevor Sie mit der Konfiguration beginnen?</translation>
     </message>
     <message>
         <source>No, leave my program settings alone</source>
-        <translation>Nein, nicht löschen</translation>
+        <translation type="obsolete">Nein, nicht löschen</translation>
     </message>
     <message>
         <source>Yes, delete my program settings</source>
-        <translation>Ja, die Programmeinstellungen löschen</translation>
+        <translation type="obsolete">Ja, die Programmeinstellungen löschen</translation>
     </message>
     <message>
         <source>%1% Completed @ %2 fps.</source>
@@ -5330,6 +5488,22 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec-enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Host</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Would you like to clear all program data and channel settings before starting configuration? This will not affect any existing recordings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, leave my channel settings alone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete my channel settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

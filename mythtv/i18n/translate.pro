@@ -29,6 +29,7 @@ SOURCES += ../libs/libmythtv/videosource.cpp
 SOURCES += ../libs/libmythtv/videosource.h
 SOURCES += ../programs/mythbackend/scheduler.cpp
 SOURCES += ../programs/mythfilldatabase/filldata.cpp
+SOURCES += ../programs/mythfrontend/customrecord.cpp
 SOURCES += ../programs/mythfrontend/globalsettings.cpp
 SOURCES += ../programs/mythfrontend/main.cpp
 SOURCES += ../programs/mythfrontend/manualbox.cpp

@@ -88,6 +88,117 @@
     </message>
 </context>
 <context>
+    <name>CustomRecord</name>
+    <message>
+        <source>Power Search Recording Rule Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rule Name</source>
+        <translation>Regelnamn</translation>
+    </message>
+    <message>
+        <source>Match words in the title</source>
+        <translation>Matcha ord i titel</translation>
+    </message>
+    <message>
+        <source>Match in any descriptive field</source>
+        <translation>Matcha i alla beskrivande fält</translation>
+    </message>
+    <message>
+        <source>Limit by category</source>
+        <translation>Begränsa med kategori</translation>
+    </message>
+    <message>
+        <source>New episodes only</source>
+        <translation>Endast nya avsnitt</translation>
+    </message>
+    <message>
+        <source>Exclude unidentified episodes (Data Direct)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exclude unidentified episodes (XMLTV)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category type</source>
+        <translation>Kategorityp</translation>
+    </message>
+    <message>
+        <source>Limit movies by the year of release</source>
+        <translation>Begränsa filmer efter år</translation>
+    </message>
+    <message>
+        <source>Minimum star rating (0.0 to 1.0 for movies only)</source>
+        <translation>Minimumbetyg (0.0 till 1.0 endast för filmer)</translation>
+    </message>
+    <message>
+        <source>Exclude one station</source>
+        <translation>Uteslut en kanal</translation>
+    </message>
+    <message>
+        <source>Match related callsigns</source>
+        <translation>Matcha relaterade kanalnamn</translation>
+    </message>
+    <message>
+        <source>Only channels from a specific video source</source>
+        <translation>Endast kanaler från en specifik videokälla</translation>
+    </message>
+    <message>
+        <source>Only channels marked as commercial free</source>
+        <translation>Endast reklamfria kanaler</translation>
+    </message>
+    <message>
+        <source>Anytime on a specific day of the week</source>
+        <translation>Specifik dag</translation>
+    </message>
+    <message>
+        <source>Only on weekdays (Monday through Friday)</source>
+        <translation>Endast på vardagar</translation>
+    </message>
+    <message>
+        <source>Only on weekends</source>
+        <translation>Endast på helger</translation>
+    </message>
+    <message>
+        <source>Only in primetime</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not in primetime</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multiple sports teams (complete example)</source>
+        <translation type="unfinished">Flera sportlag (komplett exempel)</translation>
+    </message>
+    <message>
+        <source>Sci-fi B-movies (complete example)</source>
+        <translation>Sci-fi B-filmer (komplett exempel)</translation>
+    </message>
+    <message>
+        <source>Add this example clause</source>
+        <translation>Lägg till detta exempel</translation>
+    </message>
+    <message>
+        <source>Test</source>
+        <translation>Testa</translation>
+    </message>
+    <message>
+        <source>Record</source>
+        <translation>Spela in</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation>eller</translation>
+    </message>
+</context>
+<context>
     <name>DataDirectLineupSelector</name>
     <message>
         <source>Fetching lineups from DataDirect service...</source>
@@ -317,6 +428,17 @@
     </message>
 </context>
 <context>
+    <name>MythSearchDialog</name>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+</context>
+<context>
     <name>MythWizard</name>
     <message>
         <source>&amp;Cancel</source>
@@ -528,6 +650,42 @@
     <message>
         <source>^(The |A |An )</source>
         <translation>^(The |A |An )</translation>
+    </message>
+    <message>
+        <source>Play from beginning</source>
+        <translation>Spela upp från början</translation>
+    </message>
+    <message>
+        <source>Play from bookmark</source>
+        <translation>Spela upp från bokmärke</translation>
+    </message>
+    <message>
+        <source>A preserved episode is ignored in calculations for deleting episodes above the limit.  Auto-expiration is used to remove eligable programs when disk space is low.</source>
+        <translation>Ett bevarat avsnitt ignoreras i beräkningar för borttagning av avsnitt över gränsen. Autoradering används för att ta bort möjliga program vid otillräckligt diskutrymme.</translation>
+    </message>
+    <message>
+        <source>Do not preserve this episode</source>
+        <translation>Bevara inte detta avsnitt</translation>
+    </message>
+    <message>
+        <source>Preserve this episode</source>
+        <translation>Bevara detta avsnitt</translation>
+    </message>
+    <message>
+        <source>Play from...</source>
+        <translation>Spela från...</translation>
+    </message>
+    <message>
+        <source>Storage Options</source>
+        <translation>Lagringsinställningar</translation>
+    </message>
+    <message>
+        <source>Recording Options</source>
+        <translation>Inspelningsinställningar</translation>
+    </message>
+    <message>
+        <source>Job Options</source>
+        <translation>Jobbinställningar</translation>
     </message>
 </context>
 <context>
@@ -1430,7 +1588,7 @@
     </message>
     <message>
         <source>This enables support for Xbox Specific hardware. Requires a frontend restart for changes to take effect.</source>
-        <translation>Slår på stöd för hårdvara som är specifik för Xbox. Kräver en omstart av datorn för att ändringarna aktiveras.</translation>
+        <translation>Slår på stöd för hårdvara som är specifik för Xbox. Kräver en omstart av datorn för att aktivera ändringarna.</translation>
     </message>
     <message>
         <source>Xbox Linux Distribution</source>
@@ -2881,7 +3039,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Length of time the frontend waits between the tries to wake up the master backend. This should be the time your masterbackend needs to startup. Set 0 to disable.</source>
-        <translation>Tid som uppspelningsservern väntar mellan försöken att väcka huvudinspelningsservern. Detta bör vara så lång tid det tar för servern att starta. 0 avaktiverar.</translation>
+        <translation>Tid som uppspelningsklienten väntar mellan försöken att väcka huvudinspelningsservern. Detta bör vara så lång tid det tar för servern att starta. 0 avaktiverar.</translation>
     </message>
     <message>
         <source>Count of reconnect tries</source>
@@ -3848,34 +4006,6 @@ som du startade detta programmet i.</translation>
         <translation>detta avsnitt kommer att spelas in vid ett senare tillfälle.</translation>
     </message>
     <message>
-        <source>Category:  </source>
-        <translation type="obsolete">Kategori:  </translation>
-    </message>
-    <message>
-        <source>Type:  </source>
-        <translation type="obsolete">Typ:  </translation>
-    </message>
-    <message>
-        <source>Episode Number:  </source>
-        <translation type="obsolete">Avsnitt:  </translation>
-    </message>
-    <message>
-        <source>Original Airdate:  </source>
-        <translation type="obsolete">Ursprungligt sändningsdatum:  </translation>
-    </message>
-    <message>
-        <source>Program ID:  </source>
-        <translation type="obsolete">Program-ID:  </translation>
-    </message>
-    <message>
-        <source>Filesize:  </source>
-        <translation type="obsolete">Filstorlek:  </translation>
-    </message>
-    <message>
-        <source>Recording Group:  </source>
-        <translation type="obsolete">Inspelningsgrupp:  </translation>
-    </message>
-    <message>
         <source> The following programs will be recorded instead:
 </source>
         <translation>Följande program kommer att spelas in istället:
@@ -3976,10 +4106,6 @@ som du startade detta programmet i.</translation>
     <message>
         <source>One field</source>
         <translation>Ett fält</translation>
-    </message>
-    <message>
-        <source>Deinterlace algorithm.  &apos;Linear blend&apos; and &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
-        <translation type="obsolete">Avflätningsalgoritm. &apos;Linjär blandning&apos; och &apos;Kärna&apos; kräver SSE. &apos;Bob&apos; kräver Xv eller XvMC video ut.</translation>
     </message>
     <message>
         <source>Deinterlace settings</source>
@@ -4976,18 +5102,6 @@ som du startade detta programmet i.</translation>
         <translation>stjärna</translation>
     </message>
     <message>
-        <source>Keep this episode in the list</source>
-        <translation type="obsolete">Behåll detta avsnitt i listan</translation>
-    </message>
-    <message>
-        <source>Remove this episode from the list</source>
-        <translation type="obsolete">Ta bort detta avsnitt från listan</translation>
-    </message>
-    <message>
-        <source>Remove all episodes for this title</source>
-        <translation type="obsolete">Ta bort alla avsnitt för denna titel</translation>
-    </message>
-    <message>
         <source>(New Channel)</source>
         <translation>(Ny kanal)</translation>
     </message>
@@ -5087,7 +5201,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>Machine Status shows some operating system statistics of this machine</source>
-        <translation>Maskinstatus visar statistik för denna datorn</translation>
+        <translation>Maskinstatus visar statistik för den här datorn</translation>
     </message>
     <message>
         <source>used</source>
@@ -5171,15 +5285,15 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>Would you like to clear all program and channel settings before starting configuration?</source>
-        <translation>Vill du rensa alla program och kanalinställningar innan konfigurationen fortsätter?</translation>
+        <translation type="obsolete">Vill du rensa alla program och kanalinställningar innan konfigurationen fortsätter?</translation>
     </message>
     <message>
         <source>No, leave my program settings alone</source>
-        <translation>Nej, lämna mina programinställningar som de är</translation>
+        <translation type="obsolete">Nej, lämna mina programinställningar som de är</translation>
     </message>
     <message>
         <source>Yes, delete my program settings</source>
-        <translation>Ja, ta bort mina programinställningar</translation>
+        <translation type="obsolete">Ja, ta bort mina programinställningar</translation>
     </message>
     <message>
         <source>%1% Completed @ %2 fps.</source>
@@ -5187,7 +5301,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>Use custom identifier for frontend preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd egen id för uppspelningsklientinställningar</translation>
     </message>
     <message>
         <source>Wake-On-LAN settings</source>
@@ -5199,11 +5313,11 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>All database settings take effect when you restart this program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Alla databasinställningar aktiveras när du startar om detta program.</translation>
     </message>
     <message>
         <source>Myth could not connect to the database. Please verify your database settings below.</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth kunde inte ansluta till databasen. Kontrollera dina databasinställningar nedan.</translation>
     </message>
     <message>
         <source>Host name</source>
@@ -5211,7 +5325,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>The host name or IP address of the machine hosting the database. This information is required.</source>
-        <translation type="unfinished"></translation>
+        <translation>Värddatornamn eller IP-adress för den maskin som kör databasen. Denna information krävs.</translation>
     </message>
     <message>
         <source>Database</source>
@@ -5219,7 +5333,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>The name of the database. This information is required.</source>
-        <translation type="unfinished"></translation>
+        <translation>Databasens namn. Denna information krävs.</translation>
     </message>
     <message>
         <source>User</source>
@@ -5227,11 +5341,11 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>The user name to use while connecting to the database. This information is required.</source>
-        <translation type="unfinished"></translation>
+        <translation>Användarnamn att använda vid anslutning till databasen. Denna information krävs.</translation>
     </message>
     <message>
         <source>The password to use while connecting to the database. This information is required.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lösenord att använda vid anslutning till databasen. Denna information krävs.</translation>
     </message>
     <message>
         <source>Database type</source>
@@ -5243,43 +5357,43 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>The database implementation used for your server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Databashanterare som används på din server.</translation>
     </message>
     <message>
         <source>If this frontend&apos;s host name changes often, check this box and provide a network-unique name to identify it. If unchecked, the frontend machine&apos;s local host name will be used to save preferences in the database.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om denna uppspelningsklients värddatornamn ändras ofta, aktivera och ange ett nätverksunikt namn som id. Annars används uppspelningsklientens lokala värddatornamn när inställningarna sparas i databasen.</translation>
     </message>
     <message>
         <source>Custom identifier</source>
-        <translation type="unfinished"></translation>
+        <translation>Egen identifierare</translation>
     </message>
     <message>
         <source>An identifier to use while saving the settings for this frontend.</source>
-        <translation type="unfinished"></translation>
+        <translation>En identifierare att använda när inställningarna sparas för denna inspelningsklient.</translation>
     </message>
     <message>
         <source>Use Wake-On-LAN to wake database</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd Wake-On-LAN för att väcka databas</translation>
     </message>
     <message>
         <source>If checked, the frontend will use Wake-On-LAN parameters to reconnect to the database server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om aktiverat kommer inspelningsklienten använda Wake-On-LAN-parametrar för att återansluta till databasservern.</translation>
     </message>
     <message>
         <source>Reconnect time</source>
-        <translation type="unfinished"></translation>
+        <translation>Återanslutningstid</translation>
     </message>
     <message>
         <source>The time in seconds to wait for the server to wake up.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tid i sekunder att vänta på att servern ska vakna.</translation>
     </message>
     <message>
         <source>Retry attempts</source>
-        <translation type="unfinished"></translation>
+        <translation>Antal nya försök</translation>
     </message>
     <message>
         <source>The number of retries to wake the server before the frontend gives up.</source>
-        <translation type="unfinished"></translation>
+        <translation>Antal gånger uppspelningsklienten försöker väcka servern innan den ger upp.</translation>
     </message>
     <message>
         <source>Wake command</source>
@@ -5287,34 +5401,43 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>The command executed on this frontend to wake up the database server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommandot som körs på denna uppspelningsklient för att väcka databasservern.</translation>
     </message>
     <message>
         <source>Deinterlace algorithm. &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
-        <translation type="unfinished"></translation>
+        <translation>Avflätningsalgoritm. &apos;Kärna&apos; kräver SSE. &apos;Bob&apos; kräver Xv eller XvMC video ut.</translation>
     </message>
     <message>
         <source>Enable gamma correction for video</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivera gammakorrektion</translation>
     </message>
     <message>
         <source>If checked, QuickTime will correct the gamma of the video to match your monitor.  Turning this off can save some CPU cycles.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om aktiverat kommer QuickTime korrigera bildens gammavärde för att matcha din monitor. Att stänga av detta kan spara några CPU-cykler.</translation>
     </message>
     <message>
         <source>Use Altivec-enhanced color space conversion</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd Altivec-förbättrad färgrymdskonvertering</translation>
     </message>
     <message>
         <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec-enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om aktiverat kommer YUV 4:2:0 konverteras till UYVY 4:2:2 i en Altivec-optimerad rutin. Annars hanterar QuickTime konverteringen i stället.</translation>
     </message>
-</context>
-<context>
-    <name>ScheduledRecording</name>
     <message>
-        <source>Power Search</source>
-        <translation type="obsolete">Avancerad sökning</translation>
+        <source>Recording Host</source>
+        <translation>Inspelningsvärd</translation>
+    </message>
+    <message>
+        <source>Would you like to clear all program data and channel settings before starting configuration? This will not affect any existing recordings.</source>
+        <translation>Vill du rensa alla program och kanalinställningar innan konfigurationen fortsätter? Detta kommer inte att påverka befintliga inspelningar.</translation>
+    </message>
+    <message>
+        <source>No, leave my channel settings alone</source>
+        <translation>Nej, lämna mina kanalinställningar som de är</translation>
+    </message>
+    <message>
+        <source>Yes, delete my channel settings</source>
+        <translation>Ja, ta bort mina kanalinställningar</translation>
     </message>
 </context>
 <context>
@@ -5425,10 +5548,6 @@ som du startade detta programmet i.</translation>
     <message>
         <source>Position</source>
         <translation>Position</translation>
-    </message>
-    <message>
-        <source>Speed 5X</source>
-        <translation type="obsolete">Hastighet 5X</translation>
     </message>
     <message>
         <source>Speed 3X</source>
