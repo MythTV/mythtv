@@ -14,9 +14,9 @@ DEPENDPATH += ../libmyth ../libavcodec ../libavformat
 LIBS += -L../libmyth -L../libavcodec -L../libavformat
 LIBS += -lmyth-$${LIBVERSION} -lmythavcodec-$${LIBVERSION} -lmythavformat-$${LIBVERSION} $$EXTRA_LIBS
 
-TARGETDEPS += ../libmyth/libmyth-$${LIBVERSION}.so
-TARGETDEPS += ../libavcodec/libmythavcodec-$${LIBVERSION}.so
-TARGETDEPS += ../libavformat/libmythavformat-$${LIBVERSION}.so
+TARGETDEPS += ../libmyth/libmyth-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
+TARGETDEPS += ../libavcodec/libmythavcodec-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
+TARGETDEPS += ../libavformat/libmythavformat-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 
 QMAKE_CFLAGS_RELEASE = $$OPTFLAGS -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
 QMAKE_CFLAGS_DEBUG = -g -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
