@@ -1301,8 +1301,8 @@ void OSD::HideSet(const QString &name)
     pthread_mutex_unlock(&osdlock);
 }
 
-void OSD::UpdateEditText(const QString &seek_amount, 
-                         const QString &deletemarker, const QString &edittime)
+void OSD::UpdateEditText(const QString &seek_amount, const QString &deletemarker, 
+		           const QString &edittime, const QString &framecnt)
 {
     pthread_mutex_lock(&osdlock);
 
@@ -1319,6 +1319,9 @@ void OSD::UpdateEditText(const QString &seek_amount,
         text = (OSDTypeText *)set->GetType("timedisplay");
         if (text && edittime != QString::null)
             text->SetText(edittime);
+        text = (OSDTypeText *)set->GetType("framedisplay");
+        if (text && framecnt != QString::null)
+            text->SetText(framecnt);
 
         set->Display();
         m_setsvisible = true;

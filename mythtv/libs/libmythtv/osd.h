@@ -68,8 +68,7 @@ class OSD
 
     void ShowEditArrow(long long number, long long totalframes, int type);
     void HideEditArrow(long long number, int type);
-    void UpdateEditText(const QString &seek_amount,
-                        const QString &deletemarker, const QString &edittime);
+    void UpdateEditText(const QString &seek_amount, const QString &deletemarker, const QString &edittime, const QString &framecnt);
     void DoEditSlider(QMap<long long, int> deleteMap, long long curFrame,
                       long long totalFrames);
 

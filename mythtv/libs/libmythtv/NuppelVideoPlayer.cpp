@@ -2146,7 +2146,7 @@ void NuppelVideoPlayer::UpdateSeekAmount(bool up)
         default: text = "error"; seekamount = fps; break;
     }
 
-    osd->UpdateEditText(text, QString::null, QString::null);
+    osd->UpdateEditText(text, QString::null, QString::null, QString::null);
 }
 
 void NuppelVideoPlayer::UpdateTimeDisplay(void)
@@ -2165,14 +2165,17 @@ void NuppelVideoPlayer::UpdateTimeDisplay(void)
                              (hours * 60 * 60 * fps));
 
     char timestr[128];
-    sprintf(timestr, "%1d:%02d:%02d.%02d (frm %lld)",
-        hours, mins, secs, frames, framesPlayed);
+    sprintf(timestr, "%1d:%02d:%02d.%02d",
+        hours, mins, secs, frames);
+
+    char framestr[128];
+    sprintf(framestr, "%11d", framesPlayed);
 
     QString cutmarker = "";
     if (IsInDelete(framesPlayed))
         cutmarker = "cut";
 
-    osd->UpdateEditText(QString::null, cutmarker, timestr);
+    osd->UpdateEditText(QString::null, cutmarker, timestr, framestr);
 }
 
 void NuppelVideoPlayer::HandleSelect(void)
