@@ -164,44 +164,33 @@ void VideoBrowser::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Gallery", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("Video", e, actions);
 
-    for (unsigned int i = 0; i < actions.size(); i++)
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
+        handled = true;
 
         if (action == "SELECT" && allowselect)
         {
             selected(curitem);
             return;
         }
-
-        if (action == "UP")
-        {
+        else if (action == "UP")
             cursorUp();
-            handled = true;
-        }
         else if (action == "DOWN")
-        {
             cursorDown();
-            handled = true;
-        }
         else if (action == "LEFT")
-        {
             cursorLeft();
-            handled = true;
-        }
         else if (action == "RIGHT")
-        {
             cursorRight();
-            handled = true;
-        }
         else if (action == "1" || action == "2" || action == "3" ||
                  action == "4")
         {
             setParentalLevel(action.toInt());
-            handled = true;
         }
+        else
+            handled = false;
     }
 
     if (!handled)

@@ -162,25 +162,24 @@ void FileAssocDialog::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Gallery", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("Video", e, actions);
 
-    for (unsigned int i = 0; i < actions.size(); i++)
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
+        handled = true;
 
         if (action == "UP")    
         {
             nextPrevWidgetFocus(false);
             while (getCurrentFocusWidget()->GetContext() < -1)
                 nextPrevWidgetFocus(false);
-            handled = true;
         }
         else if (action == "DOWN")
         {
             nextPrevWidgetFocus(true);
             while (getCurrentFocusWidget()->GetContext() < -1)
                 nextPrevWidgetFocus(true);
-            handled = true;
         }
         else if (action == "LEFT")
         {
@@ -199,7 +198,6 @@ void FileAssocDialog::keyPressEvent(QKeyEvent *e)
                 if (ignore_check == getCurrentFocusWidget())
                     activateCurrent();
             }
-            handled = true;
         }
         else if (action == "RIGHT")
         {
@@ -218,13 +216,11 @@ void FileAssocDialog::keyPressEvent(QKeyEvent *e)
                 if (ignore_check == getCurrentFocusWidget())
                     activateCurrent();
             }
-            handled = true;
         }
         else if (action == "SELECT")
-        {
             activateCurrent();
-            handled = true;
-        }
+        else
+            handled = false;
     }
 
     if (!handled)

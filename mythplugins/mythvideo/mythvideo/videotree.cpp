@@ -53,53 +53,34 @@ void VideoTree::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Gallery", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("Video", e, actions);
 
-    for (unsigned int i = 0; i < actions.size(); i++)
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
+        handled = true;
 
         if (action == "SELECT")
-        {
             video_tree_list->select();
-            handled = true;
-        }
         else if (action == "UP")
-        {
             video_tree_list->moveUp();
-            handled = true;
-        }
         else if (action == "DOWN")
-        {
             video_tree_list->moveDown();
-            handled = true;
-        }
         else if (action == "LEFT")
-        {
             video_tree_list->popUp();
-            handled = true;
-        }
         else if (action == "RIGHT")
-        {
             video_tree_list->pushDown();
-            handled = true;
-        }
         else if (action == "PAGEUP")
-        {
             video_tree_list->pageUp();
-            handled = true;
-        }
         else if (action == "PAGEDOWN")
-        {
             video_tree_list->pageDown();
-            handled = true;
-        }
         else if (action == "1" || action == "2" || action == "3" ||
                  action == "4")
         {
             setParentalLevel(action.toInt());
-            handled = true;
         }
+        else
+            handled = false;
     }
 
     if (!handled) 

@@ -118,11 +118,12 @@ void VideoManager::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Gallery", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("Video", e, actions);
 
-    for (unsigned int i = 0; i < actions.size(); i++)
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
+        handled = true;
 
         if (action == "SELECT" && allowselect)
         {
@@ -142,45 +143,23 @@ void VideoManager::keyPressEvent(QKeyEvent *e)
         }
 
         if (action == "UP")
-        {
             cursorUp();
-            handled = true;
-        }
         else if (action == "DOWN")
-        {
             cursorDown();
-            handled = true;
-        }
         else if (action == "LEFT")
-        {
             cursorLeft();
-            handled = true;
-        }
         else if (action == "RIGHT")
-        {
             cursorRight();
-            handled = true;
-        }
         else if (action == "PAGEUP")
-        {
             pageUp();
-            handled = true;
-        }
         else if (action == "PAGEDOWN")
-        {
             pageDown();
-            handled = true;
-        }
         else if (action == "ESCAPE")
-        {
             exitWin();
-            handled = true;
-        }
         else if (action == "MENU" || action == "INFO")
-        {
             videoMenu();
-            handled = true;
-        }
+        else
+            handled = false;
     }
 
     if (!handled)

@@ -156,22 +156,17 @@ void EditMetadataDialog::keyPressEvent(QKeyEvent *e)
     bool something_pushed = false;
 
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Gallery", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("Video", e, actions);
 
-    for (unsigned int i = 0; i < actions.size(); i++)
+    for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
+        handled = true;
 
         if (action == "UP")
-        {
             nextPrevWidgetFocus(false);
-            handled = true;
-        }
         else if (action == "DOWN")
-        { 
             nextPrevWidgetFocus(true);
-            handled = true;
-        }
         else if (action == "LEFT") 
         {
             something_pushed = false;
@@ -195,7 +190,6 @@ void EditMetadataDialog::keyPressEvent(QKeyEvent *e)
             {
                 activateCurrent();
             }
-            handled = true;
         }
         else if (action == "RIGHT")
         {
@@ -220,21 +214,16 @@ void EditMetadataDialog::keyPressEvent(QKeyEvent *e)
             {
                 activateCurrent();
             }
-            handled = true;
         }
         else if (action == "SELECT")
-        {
             activateCurrent();
-            handled = true;
-        }
         else if (action == "0")
         {    
-            if(done_button)
-            {
+            if (done_button)
                 done_button->push();
-            }
-            handled = true;
         }
+        else
+            handled = false;
     }
     
     if (!handled)
