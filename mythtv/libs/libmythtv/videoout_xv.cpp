@@ -273,6 +273,9 @@ void XJ_exit(void)
     if(XJ_SHMInfo.shmid > 0)
       shmctl(XJ_SHMInfo.shmid, IPC_RMID, 0);
     XvUngrabPort(XJ_disp, xv_port, CurrentTime);
+    XDestroyWindow(XJ_disp, XJ_win);
+    XCloseDisplay(XJ_disp);
+    XJ_started = false;
   }
 }
 

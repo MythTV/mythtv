@@ -5,6 +5,7 @@
 using namespace std;
 
 #include <mysql.h>
+#include <pthread.h>
 
 #include "NuppelVideoRecorder.h"
 #include "NuppelVideoPlayer.h"
@@ -34,14 +35,21 @@ class TV
                         const string &outputFileName);
     void Playback(const string &inputFileName);
 
+    bool IsRunning(void) { return runMainLoop; }
+    void Stop(void) { runMainLoop = false; }
+
+    TVState GetState(void) { return internalState; }
+
     bool CheckChannel(int channum); 
+
  protected:
     void doLoadMenu(void);
     static void *MenuHandler(void *param);
 
- private:
     void RunTV(void);
+    static void *EventThread(void *param);
 
+ private:
     void ChangeChannel(bool up);
     void ChangeChannel(char *name);
     
@@ -59,14 +67,19 @@ class TV
     void LoadMenu(void);
 
     void SetupRecorder();
+    void TeardownRecorder();
+
     void SetupPlayer();
+    void TeardownPlayer();
 
     void ProcessKeypress(int keypressed);
+
+    void HandleStateChange();
 
     NuppelVideoRecorder *nvr;
     NuppelVideoPlayer *nvp;
 
-    RingBuffer *rbuffer;
+    RingBuffer *rbuffer, *prbuffer;
     Channel *channel;
 
     Settings *settings;
@@ -84,8 +97,17 @@ class TV
     TVState internalState;
 
     bool runMainLoop;
+    bool exitPlayer;
     bool paused;
     int secsToRecord;
+
+    float frameRate;
+
+    pthread_t event, encode, decode;
+    bool changeState;
+    TVState nextState;
+    string inputFilename, outputFilename;
+    string recordChannel;
 };
 
 #endif

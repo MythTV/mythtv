@@ -45,22 +45,36 @@ TV::TV(const string &startchannel)
 
     nvr = NULL;
     nvp = NULL;
-    rbuffer = NULL;
+    prbuffer = rbuffer = NULL;
 
     menurunning = false;
 
     internalState = kStatus_None; 
     secsToRecord = -1;
+
+    runMainLoop = false;
+    changeState = false;
+    nextState = kStatus_None;
+
+    pthread_create(&event, NULL, EventThread, this);
+
+    while (!runMainLoop)
+        usleep(50);
 }
 
 TV::~TV(void)
 {
+    runMainLoop = false;
+    pthread_join(event, NULL);
+
     if (channel)
         delete channel;
     if (settings)
         delete settings;
     if (rbuffer)
         delete rbuffer;
+    if (prbuffer != rbuffer)
+        delete prbuffer;
     if (nvp)
         delete nvp;
     if (nvr)
@@ -73,40 +87,31 @@ void TV::LiveTV(void)
 {
     if (internalState != kStatus_None)
     {
+        printf("Error, attempting to watch live tv when there's something "
+               "already going on.\n");
+        return;
     }
     else
     {
-        long long filesize = settings->GetNumSetting("BufferSize");
-        filesize = filesize * 1024 * 1024 * 1024;
-        long long smudge = settings->GetNumSetting("MaxBufferFill");
-        smudge = smudge * 1024 * 1024; 
-
-        rbuffer = new RingBuffer(settings->GetSetting("BufferName"), filesize, 
-                                 smudge);
-
-        internalState = kStatus_WatchingLiveTV;
-        RunTV();
+        nextState = kStatus_WatchingLiveTV;
+        changeState = true;
     }
 }
 
 void TV::StartRecording(const string &channelName, int duration,
                         const string &outputFileName)
-{
+{                                
     if (internalState != kStatus_None)
-    {
+    {   
     }
     else
     {
-        channel->Open();
-        channel->SetChannelByString(channelName);
-        channel->Close();
-
-        rbuffer = new RingBuffer(outputFileName, true);
-
+        recordChannel = channelName;
+        outputFilename = outputFileName;
         secsToRecord = duration;
-        internalState = kStatus_RecordingOnly;
-        RunTV();
-    }
+        nextState = kStatus_RecordingOnly;
+        changeState = true;
+    }   
 }
 
 void TV::Playback(const string &inputFileName)
@@ -116,18 +121,157 @@ void TV::Playback(const string &inputFileName)
     }
     else
     {
-        rbuffer = new RingBuffer(inputFileName, false);
+        inputFilename = inputFileName;
 
-        internalState = kStatus_WatchingPreRecorded;
-        RunTV();
+        nextState = kStatus_WatchingPreRecorded;
+        changeState = true;
     }
+}
+
+void TV::HandleStateChange(void)
+{
+    bool changed = false;
+    bool startPlayer = false;
+    bool startRecorder = false;
+    bool pauseBetween = false;
+    bool closePlayer = false;
+    bool closeRecorder = false;
+
+    if (internalState == kStatus_None && nextState == kStatus_WatchingLiveTV)
+    {
+        long long filesize = settings->GetNumSetting("BufferSize");
+        filesize = filesize * 1024 * 1024 * 1024;
+        long long smudge = settings->GetNumSetting("MaxBufferFill");
+        smudge = smudge * 1024 * 1024; 
+
+        rbuffer = new RingBuffer(settings->GetSetting("BufferName"), filesize, 
+                                 smudge);
+        prbuffer = rbuffer;
+
+        internalState = nextState;
+        changed = true;
+
+        startPlayer = startRecorder = pauseBetween = true;
+
+        printf("Changing from None to WatchingTV\n");
+    }
+    if (internalState == kStatus_WatchingLiveTV && nextState == kStatus_None)
+    {
+        closePlayer = true;
+        closeRecorder = true;
+
+        internalState = nextState;
+        changed = true;
+
+        printf("Changing from WatchingTV to None\n");
+    }
+
+    if (internalState == kStatus_None && nextState == kStatus_RecordingOnly)
+    {   
+        channel->Open();
+        channel->SetChannelByString(recordChannel);
+        channel->Close();
+
+        rbuffer = new RingBuffer(outputFilename, true);
+
+        internalState = nextState;
+        nextState = kStatus_None;
+        changed = true;
+
+        startRecorder = true;
+
+        printf("Changing from None to RecordingOnly\n");
+    }   
+
+    if (internalState == kStatus_RecordingOnly && nextState == kStatus_None)
+    {
+        closeRecorder = true;
+
+        internalState = nextState;
+        changed = true;
+
+        printf("Changing from RecordingOnly to None\n");
+    }
+
+    if (internalState == kStatus_None && 
+        nextState == kStatus_WatchingPreRecorded)
+    {
+        prbuffer = new RingBuffer(inputFilename, false);
+
+        internalState = nextState;
+        changed = true;
+
+        startPlayer = true;
+        
+        printf("Changing from None to WatchingPreRecorded\n");
+    }
+
+    if (internalState == kStatus_WatchingPreRecorded && 
+        nextState == kStatus_None)
+    {
+        closePlayer = true;
+        
+        internalState = nextState;
+        changed = true;
+
+        printf("Changing from WatchingPreRecorded to None\n");
+    }
+
+    if (internalState == kStatus_None && nextState == kStatus_None)
+    {
+        changed = true;
+    }
+
+    if (!changed)
+    {
+        printf("Unknown state transition: %d to %d\n", internalState,
+                                                       nextState);
+    }
+    changeState = false;
+ 
+    if (startRecorder)
+    {
+        SetupRecorder();
+        pthread_create(&encode, NULL, SpawnEncode, nvr);
+
+        while (!nvr->IsRecording())
+            usleep(50);
+
+        // evil.
+        channel->SetFd(nvr->GetVideoFd());
+
+        frameRate = nvr->GetFrameRate();
+    }
+
+    if (pauseBetween)
+    {
+        usleep(500000);
+    }
+
+    if (startPlayer)
+    {
+        SetupPlayer();
+        pthread_create(&decode, NULL, SpawnDecode, nvp);
+
+        while (!nvp->IsPlaying())
+            usleep(50);
+
+        frameRate = nvp->GetFrameRate();
+    }
+
+    if (closeRecorder)
+        TeardownRecorder();
+
+    if (closePlayer)
+        TeardownPlayer();
 }
 
 void TV::SetupRecorder(void)
 {
     if (nvr)
-    {  // TODO: handle this
-
+    {  
+        printf("Attempting to setup a recorder, but it already exists\n");
+        return;
     }
 
     nvr = new NuppelVideoRecorder();
@@ -142,14 +286,33 @@ void TV::SetupRecorder(void)
     nvr->Initialize();
 }
 
+void TV::TeardownRecorder(void)
+{
+    if (nvr)
+    {
+        nvr->StopRecording();
+        pthread_join(encode, NULL);
+        delete nvr;
+    }
+    nvr = NULL;
+
+    if (rbuffer && rbuffer != prbuffer)
+    {
+        delete rbuffer;
+        rbuffer = NULL;
+    }
+}    
+
 void TV::SetupPlayer(void)
 {
     if (nvp)
-    {  // TODO: handle this
+    { 
+        printf("Attempting to setup a player, but it already exists.\n");
+        return;
     }
 
     nvp = new NuppelVideoPlayer();
-    nvp->SetRingBuffer(rbuffer);
+    nvp->SetRingBuffer(prbuffer);
     nvp->SetRecorder(nvr);
     nvp->SetDeinterlace((bool)settings->GetNumSetting("Deinterlace"));
     nvp->SetOSDFontName((char *)settings->GetSetting("OSDFont").c_str());
@@ -157,42 +320,41 @@ void TV::SetupPlayer(void)
     osd_display_time = settings->GetNumSetting("OSDDisplayTime");
 }
 
+void TV::TeardownPlayer(void)
+{
+    if (nvp)
+    {
+        nvp->StopPlaying();
+        pthread_join(decode, NULL);
+        delete nvp;
+    }
+    paused = false;
+    nvp = NULL;
+
+    if (prbuffer && prbuffer != rbuffer)
+    {
+        delete prbuffer;
+        prbuffer = NULL;
+    }
+
+    if (prbuffer && prbuffer == rbuffer)
+    {
+        delete prbuffer;
+        prbuffer = rbuffer = NULL;
+    }
+}
+
+void *TV::EventThread(void *param)
+{
+    TV *thetv = (TV *)param;
+    thetv->RunTV();
+
+    return NULL;
+}
+
 void TV::RunTV(void)
 { 
-    pthread_t encode, decode;
-
-    float frameRate = 29.97; // not used, but give it a default anyway.
-
-    if (internalState != kStatus_WatchingPreRecorded)
-    { 
-        SetupRecorder();
-        pthread_create(&encode, NULL, SpawnEncode, nvr);
-
-        while (!nvr->IsRecording())
-            usleep(50);
-
-        // evil.
-        channel->SetFd(nvr->GetVideoFd());
-
-        frameRate = nvr->GetFrameRate();
-    }
-
-    if (internalState != kStatus_WatchingPreRecorded && 
-        internalState != kStatus_RecordingOnly)
-    {
-        usleep(500000);
-    }
-
-    if (internalState != kStatus_RecordingOnly)
-    {
-        SetupPlayer();
-        pthread_create(&decode, NULL, SpawnDecode, nvp);
-
-        while (!nvp->IsPlaying())
-            usleep(50);
-
-        frameRate = nvp->GetFrameRate();
-    }
+    frameRate = 29.97; // the default's not used, but give it a default anyway.
 
     paused = false;
     int keypressed;
@@ -202,16 +364,48 @@ void TV::RunTV(void)
     channelKeys[3] = 0;
     channelkeysstored = 0;    
 
-    cout << endl;
-
     runMainLoop = true;
+    exitPlayer = false;
     while (runMainLoop)
     {
+        if (changeState)
+            HandleStateChange();
+
         usleep(1000);
 
         if ((keypressed = XJ_CheckEvents()))
         {
            ProcessKeypress(keypressed);
+        }
+
+        if (internalState == kStatus_RecordingOnly)
+        {
+            if ((float)nvr->GetFramesWritten() >
+                (float)secsToRecord * frameRate)
+            {
+                nextState = kStatus_None;
+                changeState = true;
+            }
+        }
+
+        if (internalState == kStatus_WatchingPreRecorded)
+        {
+            if (!nvp->IsPlaying())
+            {
+                nextState = kStatus_None;
+                changeState = true;
+            }
+        }
+
+        if (exitPlayer)
+        {
+            if ((internalState == kStatus_WatchingLiveTV) ||
+                (internalState == kStatus_WatchingPreRecorded))
+            {
+                nextState = kStatus_None;
+                changeState = true;
+            }
+            exitPlayer = false;
         }
 
         if (internalState == kStatus_WatchingLiveTV)
@@ -231,41 +425,10 @@ void TV::RunTV(void)
                 ChannelCommit();
             }
         }
-
-        if (internalState == kStatus_RecordingOnly)
-        {
-            if ((float)nvr->GetFramesWritten() > 
-                (float)secsToRecord * frameRate)
-            {
-                runMainLoop = false;
-            }
-        }
-
-        if (nvp)
-        {
-            if (!nvp->IsPlaying())
-                runMainLoop = false;
-        }
     }
-
-    if (nvp)
-    {
-        nvp->StopPlaying();
-        pthread_join(decode, NULL);
-        delete nvp;
-    }
-    if (nvr)
-    {
-        nvr->StopRecording();
-        pthread_join(encode, NULL);
-        delete nvr;
-    }  
-
-    delete rbuffer;
-
-    nvr = NULL;
-    nvp = NULL;
-    rbuffer = NULL;
+  
+    nextState = kStatus_None;
+    HandleStateChange();
 }
 
 void TV::ProcessKeypress(int keypressed)
@@ -279,7 +442,7 @@ void TV::ProcessKeypress(int keypressed)
 
         case wsLeft: case 'a': case 'A': nvp->Rewind(5); break;
 
-        case wsEscape: runMainLoop = false; break;
+        case wsEscape: exitPlayer = true; break;
 
         default: break;
     }
