@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2002-12-23, v1.055
+  2002-12-24, v1.056
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -44,11 +44,12 @@
   6. MySQL.
      6.1 Mandrake 9.0
      6.2 Red Hat Linux 8.0
-     6.3 Gentoo.
+     6.3 Gentoo. After installing mysql you need to initialise the database by running mysql_install_db as root.
      6.4 Setting up the initial database.
         6.4.1 Mandrake 9.0
         6.4.2 Debian 3.0
         6.4.3 Red Hat Linux 8.0
+        6.4.4 Gentoo
 
   7. Setting up ALSA and the mixer.
      7.1 Graphically setting up the mixer.
@@ -706,7 +707,8 @@
   enter the root password when asked.  Check "mysqld" and then click
   Start. Click Save, then close the window.
 
-  [1m6.3.  Gentoo.[0m
+  [1m6.3.  Gentoo. After installing mysql you need to initialise the[0m
+  [1mdatabase by running mysql_install_db as root.[0m
 
   [1m6.4.  Setting up the initial database.[0m
 
@@ -728,14 +730,13 @@
 
   [1m6.4.3.  Red Hat Linux 8.0[0m
 
-       $ mysql < mc.sql
-
-  if this returns an error message try switching to root first.
-
        $ su
        # mysql < mc.sql
-       # exit
-       $
+
+  [1m6.4.4.  Gentoo[0m
+
+       $ su
+       # mysql < /usr/share/mythtv/database/mc.sql
 
   [1m7.  Setting up ALSA and the mixer.[0m
 

@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.20">
+ <TITLE>Installing and using mythtv: Miscellaneous.</TITLE>
+ <LINK HREF="mythtv-HOWTO-15.html" REL=previous>
+ <LINK HREF="mythtv-HOWTO.html#toc16" REL=contents>
+</HEAD>
+<BODY>
+Next
+<A HREF="mythtv-HOWTO-15.html">Previous</A>
+<A HREF="mythtv-HOWTO.html#toc16">Contents</A>
+<HR>
+<H2><A NAME="s16">16.</A> <A HREF="mythtv-HOWTO.html#toc16">Miscellaneous.</A></H2>
+
+<H2><A NAME="ss16.1">16.1</A> <A HREF="mythtv-HOWTO.html#toc16.1">I'd like to watch the files without using mythtv / I'd like to convert the files to some other format.</A>
+</H2>
+
+<P>Matthew Zimmerman has created a patch for MPlayer / Mencoder
+<A HREF="http://www.mplayerhq.hu">http://www.mplayerhq.hu</A> that allows
+you view the files created by mythtv.  Mythtv doesn't use standard
+Nupplevideo files, which is why you MPlayer complains if you try to view
+them.</P>
+<P>Download the patch to MPlayer from Matt's website. 
+<A HREF="http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/">http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/</A>.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ wget http://dijkstra.csh.rit.edu:8088/~mdz/mythtv/mplayer-0.90pre10+mythtv.patch
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Download the source to MPlayer and patch:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
+$ tar -xjf MPlayer-0.90rc1.tar.bz2
+$ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
+$ cd MPlayer-0.90rc1
+$ patch -p1 &lt; mplayer-0.90pre10+mythtv.patch
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>At this point, you can read the MPlayer documentation and start the compile
+process.</P>
+
+<HR>
+Next
+<A HREF="mythtv-HOWTO-15.html">Previous</A>
+<A HREF="mythtv-HOWTO.html#toc16">Contents</A>
+</BODY>
+</HTML>

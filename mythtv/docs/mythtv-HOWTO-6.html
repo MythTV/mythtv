@@ -29,7 +29,7 @@ that it isn't running yet.</P>
 menu>Server Settings>Services and enter the root password when asked.
 Check "mysqld" and then click Start. Click Save, then close the window.</P>
 <H2><A NAME="ss6.3">6.3</A> <A HREF="mythtv-HOWTO.html#toc6.3">Gentoo.</A>
-</H2>
+After installing mysql you need to initialise the database by runningmysql_install_db as root. </H2>
 
 <H2><A NAME="ss6.4">6.4</A> <A HREF="mythtv-HOWTO.html#toc6.4">Setting up the initial database.</A>
 </H2>
@@ -67,18 +67,18 @@ $ mysql &lt; mc.sql
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ mysql &lt; mc.sql
+$ su
+# mysql &lt; mc.sql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>if this returns an error message try switching to root first.</P>
+<H3>Gentoo</H3>
+
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
-# mysql &lt; mc.sql
-# exit
-$ 
+# mysql &lt; /usr/share/mythtv/database/mc.sql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>

@@ -3,7 +3,7 @@
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-12-23, v1.055
+<date>2002-12-24, v1.056
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -594,6 +594,8 @@ that it isn't running yet.
 menu>Server Settings>Services and enter the root password when asked.
 Check "mysqld" and then click Start. Click Save, then close the window.
 <sect1>Gentoo.
+After installing mysql you need to initialise the database by running
+mysql_install_db as root. 
 
 <sect1>Setting up the initial database.
 <p>This step is only required for systems that will be maintaining a
@@ -611,21 +613,19 @@ $ mysql -u root < mc.sql
 <sect2>Debian 3.0
 <p>
 <tscreen><verb>
-$ mysql &lt; mc.sql
+$ mysql < mc.sql
 </verb></tscreen>
 <sect2>Red Hat Linux 8.0
 <p>
 <tscreen><verb>
-$ mysql < mc.sql
-</verb></tscreen>
-
-if this returns an error message try switching to root first.
-
-<tscreen><verb>
 $ su
 # mysql < mc.sql
-# exit
-$ 
+</verb></tscreen>
+<sect2>Gentoo
+<p>
+<tscreen><verb>
+$ su
+# mysql < /usr/share/mythtv/database/mc.sql
 </verb></tscreen>
 
 <sect>Setting up ALSA and the mixer.
@@ -1761,6 +1761,7 @@ CVS checkouts.
 v1.055, 2002-12-23.  James Wiggins (wigginjs@mailbox.sc.edu) Remove the
 "./configure" step from mythmusic - doesn't belong there.  Add
 libcdda0-devel.
+v1.056, 2002-12-24.  Updated Gentoo mysql instruction.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
