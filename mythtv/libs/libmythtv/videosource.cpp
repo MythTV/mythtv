@@ -115,10 +115,10 @@ void ProviderSelector::fillSelections(const QString& location) {
 
     if (fp == NULL) {
         pdlg.Close();
-        VERBOSE(VB_GENERAL, "Failed to get providers");
+        VERBOSE(VB_GENERAL, "Failed to retrieve provider list");
 
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
-                            QObject::tr("Failed to get provider information"), 
+                            QObject::tr("Failed to retrieve provider list"), 
                             QObject::tr("You probably need to update XMLTV."));
         qApp->processEvents();
 
@@ -147,13 +147,13 @@ void XMLTV_na_config::save(QSqlDatabase* db) {
     (void)db;
 
     QString waitMsg(QObject::tr("Please wait while MythTV retrieves the "
-                                "list of channels for\nyour provider.  You "
-                                "might want to check the output as it\n"
+                                "list of available channels.\nYou "
+                                "may wish to check the output as it\n"
                                 "runs by switching to the terminal from "
                                 "which you started\nthis program."));
     MythProgressDialog pdlg( waitMsg, 2 );
-    VERBOSE(VB_GENERAL, QString("Please wait while we MythTV retrieves the "
-                                "list of channelsfor your provider")); 
+    VERBOSE(VB_GENERAL, QString("Please wait while MythTV retrieves the "
+                                "list of available channels"));
     pdlg.show(); 
 
     QString filename = QString("%1/.mythtv/%2.xmltv")
@@ -174,11 +174,11 @@ void XMLTV_na_config::save(QSqlDatabase* db) {
         VERBOSE(VB_GENERAL, command);
         VERBOSE(VB_GENERAL, QString("exited with status %1").arg(ret));
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
-                                  QObject::tr("Failed to get channel "
+                                  QObject::tr("Failed to retrieve channel "
                                               "information."),
                                   QObject::tr("MythTV was unable to retrieve "
                                               "channel information for your "
-                                              "provider.\nPlesae check the "
+                                              "provider.\nPlease check the "
                                               "terminal window for more "
                                               "information"));
     }
@@ -191,13 +191,13 @@ void XMLTV_uk_config::save(QSqlDatabase* db) {
     (void)db;
 
     QString waitMsg(QObject::tr("Please wait while MythTV retrieves the "
-                                "list of channels for\nyour provider.  You "
+                                "list of available channels\n.  You "
                                 "might want to check the output as it\n"
                                 "runs by switching to the terminal from "
                                 "which you started\nthis program."));
     MythProgressDialog pdlg( waitMsg, 2 );
-    VERBOSE(VB_GENERAL, QString("Please wait while we MythTV retrieves the "
-                                "list of channelsfor your provider"));
+    VERBOSE(VB_GENERAL, QString("Please wait while MythTV retrieves the "
+                                "list of available channels"));
     pdlg.show();
 
     QString filename = QString("%1/.mythtv/%2.xmltv")
@@ -217,11 +217,11 @@ void XMLTV_uk_config::save(QSqlDatabase* db) {
         VERBOSE(VB_GENERAL, command);
         VERBOSE(VB_GENERAL, QString("exited with status %1").arg(ret));
         MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                                  QObject::tr("Failed to get channel "
+                                  QObject::tr("Failed to retrieve channel "
                                               "information."),
                                   QObject::tr("MythTV was unable to retrieve "
                                               "channel information for your "
-                                              "provider.\nPlesae check the "
+                                              "provider.\nPlease check the "
                                               "terminal window for more "
                                               "information"));
     }
@@ -234,13 +234,13 @@ void XMLTV_generic_config::save(QSqlDatabase* db) {
     (void)db;
 
     QString waitMsg(QObject::tr("Please wait while MythTV retrieves the "
-                                "list of channels for\nyour provider.  You "
+                                "list of available channels.\nYou "
                                 "might want to check the output as it\n"
                                 "runs by switching to the terminal from "
                                 "which you started\nthis program."));
     MythProgressDialog pdlg( waitMsg, 2 );
-    VERBOSE(VB_GENERAL, QString("Please wait while we MythTV retrieves the "
-                                "list of channelsfor your provider"));
+    VERBOSE(VB_GENERAL, QString("Please wait while MythTV retrieves the "
+                                "list of available channels"));
     pdlg.show();
 
     QString command;
@@ -263,11 +263,11 @@ void XMLTV_generic_config::save(QSqlDatabase* db) {
         VERBOSE(VB_GENERAL, QString("exited with status %1").arg(ret));
 
         MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                                  QObject::tr("Failed to get channel "
+                                  QObject::tr("Failed to retrieve channel "
                                               "information."),
                                   QObject::tr("MythTV was unable to retrieve "
                                               "channel information for your "
-                                              "provider.\nPlesae check the "
+                                              "provider.\nPlease check the "
                                               "terminal window for more "
                                               "information"));
     }
