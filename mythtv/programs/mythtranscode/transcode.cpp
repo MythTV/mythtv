@@ -147,6 +147,7 @@ Transcode::Transcode(QSqlDatabase *db, ProgramInfo *pginfo)
     outRingBuffer = NULL;
     fifow = NULL;
     kfa_table = NULL;
+    showprogress = false;
 }
 Transcode::~Transcode()
 {
@@ -240,6 +241,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     nvp->SetNoVideo();
 
     QDateTime curtime = QDateTime::currentDateTime();
+    QDateTime statustime = curtime;
     if (honorCutList && m_proginfo)
     {
         if (m_proginfo->IsEditing(m_db) || m_proginfo->IsCommProcessing(m_db))
@@ -248,6 +250,10 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         curtime = curtime.addSecs(60);
     }
 
+    if (showprogress)
+    {
+        statustime = statustime.addSecs(5);
+    }
     // Input setup
     nvr = new NuppelVideoRecorder(NULL);
     inRingBuffer = new RingBuffer(inputname, false, false);
@@ -269,6 +275,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     int video_width = nvp->GetVideoWidth();
     int video_height = nvp->GetVideoHeight();
     float video_frame_rate = nvp->GetFrameRate();
+    long long total_frame_count = nvp->GetTotalFrameCount();
 
     kfa_table = new QPtrList<struct kfatable_entry>;
 
@@ -562,7 +569,14 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             else
                 nvr->WriteVideo(&frame);
         }
-
+        if (showprogress && QDateTime::currentDateTime() > statustime)
+        {
+            cerr << "Processed: " << curFrameNum << " of " << total_frame_count
+                 << " frames (" << (long)(curFrameNum / video_frame_rate)
+                 << " seconds)\r";
+            statustime = QDateTime::currentDateTime();
+            statustime = statustime.addSecs(5);
+        }
         if (QDateTime::currentDateTime() > curtime) 
         {
             if (honorCutList && 

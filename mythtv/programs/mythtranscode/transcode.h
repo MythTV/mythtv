@@ -23,6 +23,7 @@ class Transcode : public QObject
                               QString profileName,
                               bool honorCutList, bool framecontrol,
                               bool chkTranscodeDB, QString fifodir);
+     void ShowProgress(bool val) { showprogress = val; }
   private:
     bool GetProfile(QString profileName, QString encodingType);
     void ReencoderAddKFA(long curframe, long lastkey, long num_keyframes);
@@ -37,5 +38,6 @@ class Transcode : public QObject
     FIFOWriter::FIFOWriter *fifow;
     QPtrList<struct kfatable_entry> *kfa_table;
     MythSqlDatabase *nvpdb;
+    bool showprogress;
 };
 

@@ -43,6 +43,7 @@ void usage(char *progname)
     cerr << "\t--fifosync          : Enforce fifo sync\n";
     cerr << "\t--buildindex   or -b: Build a new keyframe index\n";
     cerr << "\t\t(use only if audio and video fifos are read independantly)\n";
+    cerr << "\t--showprogress      : Display status info to the stdout\n";
     cerr << "\t--help         or -h: Prints this help statement.\n";
 }
 
@@ -52,7 +53,7 @@ int main(int argc, char *argv[])
     QString profilename = QString("autodetect");
     QString fifodir = NULL;
     bool useCutlist = false, keyframesonly = false, use_db = false;
-    bool build_index = false, fifosync = false;
+    bool build_index = false, fifosync = false, showprogress = false;
     QMap<long long, int> deleteMap;
     QMap<long long, long long> posMap;
     srand(time(NULL));
@@ -188,6 +189,10 @@ int main(int argc, char *argv[])
         {
             fifosync = true;
         }
+        else if (!strcmp(a.argv()[argpos],"--showprogress"))
+        {
+            showprogress = true;
+        }
         else if (!strcmp(a.argv()[argpos],"-h") ||
                  !strcmp(a.argv()[argpos],"--help")) 
         {
@@ -271,6 +276,8 @@ int main(int argc, char *argv[])
     VERBOSE(VB_GENERAL, QString("Transcoding from %1 to %2")
                         .arg(infile).arg(tmpfile));
 
+    if(showprogress)
+        transcode->ShowProgress(true);
     int result = 0;
     result = transcode->TranscodeFile((char *)infile.ascii(),
                                    (char *)tmpfile.ascii(),
