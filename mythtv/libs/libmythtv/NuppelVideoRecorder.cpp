@@ -16,6 +16,8 @@ using namespace std;
 
 #include "NuppelVideoRecorder.h"
 
+#include <linux/videodev.h>
+
 #ifndef MJPIOC_S_PARAMS
 #include "videodev_mjpeg.h"
 #endif
@@ -110,10 +112,14 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     hmjpg_maxw = 640;
 	
     videoFilterList = "";
+
+    origaudio = new struct video_audio;
 }
 
 NuppelVideoRecorder::~NuppelVideoRecorder(void)
 {
+    if (origaudio)
+        delete origaudio;
     if (weMadeBuffer)
         delete ringBuffer;
     if (rtjc)
@@ -727,7 +733,7 @@ again:
         va.audio = 0; // use audio channel 0
         if (ioctl(fd, VIDIOCGAUDIO, &va)<0) 
             perror("VIDIOCGAUDIO"); 
-        origaudio = va;
+        memcpy(origaudio, &va, sizeof(struct video_audio));
         //if (!quiet) 
         //    fprintf(stderr, "audio volume was '%d'\n", va.volume);
         va.audio = 0;
@@ -992,7 +998,7 @@ void NuppelVideoRecorder::KillChildren(void)
     childrenLive = false;
    
 #ifndef V4L2
-    if (ioctl(fd, VIDIOCSAUDIO, &origaudio) < 0)
+    if (ioctl(fd, VIDIOCSAUDIO, origaudio) < 0)
         perror("VIDIOCSAUDIO");
 #endif
 

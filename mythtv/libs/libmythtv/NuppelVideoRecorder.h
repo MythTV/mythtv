@@ -7,8 +7,6 @@
 #include <time.h>
 #include <pthread.h>
 
-#include <linux/videodev.h>
-
 #ifdef MMX
 #undef MMX
 #define MMXBLAH
@@ -29,6 +27,8 @@ extern "C" {
 }
 
 using namespace std;
+
+struct video_audio;
 
 class NuppelVideoRecorder
 {
@@ -142,7 +142,7 @@ class NuppelVideoRecorder
     int quiet;
     int rawmode;
     int usebttv;
-    struct video_audio origaudio;
+    struct video_audio *origaudio;
 
     int mp3quality;
     char *mp3buf;
