@@ -35,6 +35,7 @@ MythContext::MythContext(const QString &binversion, bool gui)
     m_settings = new Settings;
     m_qtThemeSettings = new Settings;
 
+    language = "";
     m_themeloaded = false;
 
     pthread_mutex_init(&dbLock, NULL);
@@ -69,7 +70,6 @@ MythContext::MythContext(const QString &binversion, bool gui)
     expectingReply = false;
 	
     lcd_device = new LCD();
-
 }
 
 MythContext::~MythContext()
@@ -149,6 +149,8 @@ void MythContext::LoadSettingsFiles(const QString &filename)
 
 void MythContext::LoadQtConfig(void)
 {
+    language = "";
+
     m_height = QApplication::desktop()->height();
     m_width = QApplication::desktop()->width();
 
@@ -757,4 +759,12 @@ void MythContext::LCDdestroy()
     lcd_device->shutdown();
     delete lcd_device;
     lcd_device = NULL;
+}
+
+QString MythContext::GetLanguage(void)
+{
+    if (language == QString::null || language == "")
+        language = GetSetting("Language").lower();
+
+    return language;
 }

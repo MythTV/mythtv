@@ -434,6 +434,7 @@
         <area>20,10,800,40</area>
         <font>info</font>
         <value>Scheduled Recordings:</value>
+        <value lang="IT">Registrazioni programmate:</value>
       </textarea>
       <image name="filler" draworder="0" fleximage="yes">
         <filename>cr-background.png</filename>
@@ -443,21 +444,25 @@
         <area>20,330,800,40</area>
         <font>message</font>
         <value>Conflicting recordings are highlighted in</value>
+        <value lang="IT">Le registrazioni in conflitto sono evidenziate in</value>
       </textarea>
       <textarea name="conyellow" draworder="0">
         <area>452,330,800,40</area>
         <font>messageyellow</font>
         <value>yellow</value>
+        <value lang="IT">giallo</value>
       </textarea>
       <textarea name="disingray" draworder="0">
         <area>20,357,800,40</area>
         <font>message</font>
         <value>Deactivated recordings are highlighted in</value>
+        <value lang="IT">Le registrazioni disattivate sono evidenziate in</value>
       </textarea>
       <textarea name="disgray" draworder="0">
         <area>458,357,800,40</area>
         <font>messagegray</font>
         <value>gray</value>
+        <value lang="IT">grigio</value>
       </textarea>
     </container>
  
@@ -539,6 +544,7 @@
          <area>0,110,800,70</area>
          <font>info</font>
          <value>You Haven't Scheduled Any Programs To Be Recorded</value>
+         <value lang="IT">Non hai programmato nessuna registrazione</value>
          <multiline>yes</multiline> 
       </textarea>
     </container>
@@ -548,11 +554,13 @@
          <area>20,40,760,30</area>
          <font>info</font>
          <value>To schedule a recording, exit this screen and</value>
+         <value lang="IT">Per programmare una registrazione,</value>
       </textarea>
       <textarea name="botline" align="center" draworder="8">
          <area>20,70,760,30</area>
          <font>info</font>
          <value>Select 'Program Guide' or 'Program Finder'</value>
+         <value lang="IT">esci e seleziona "Guida Programmi" o "Ricerca Programmi"</value>
       </textarea>
     </container>
 
@@ -615,12 +623,14 @@
         <area>20,15,800,35</area>
         <font>message</font>
         <value>Select a recording to permanently delete:</value>
+        <value lang="IT">Seleziona una registrazione da cancellare:</value>
         <context>1</context>
       </textarea>
       <textarea name="messageplay" draworder="0">
         <area>20,15,800,35</area>
         <font>message</font>
         <value>Select a recording to view:</value>
+        <value lang="IT">Seleziona una registrazione da vedere:</value>
         <context>0</context>
       </textarea>
     </container>
@@ -781,6 +791,7 @@
          <area>200,140,600,30</area>
          <font>info</font>
          <value>Sorry, No Recordings Available</value>
+         <value lang="IT">Spiacente, nessuna registrazione disponibile</value>
       </textarea>
     </container>
 
@@ -789,11 +800,13 @@
          <area>20,80,580,30</area>
          <font>info</font>
          <value>To schedule a recording, exit this screen and</value>
+         <value lang="IT">Per programmare una registrazione,</value>
       </textarea>
       <textarea name="botline" align="center" draworder="8">
          <area>20,110,580,30</area>
          <font>info</font>
          <value>Select 'Schedule a Recording' from the Main Menu</value>
+         <value lang="IT">esci e seleziona 'Programma una registrazione'</value>
       </textarea>
     </container>
 
@@ -860,6 +873,7 @@
         <area>0,570,800,30</area>
         <font>info</font>
         <value>(4) Program Guide   **(6) Program Finder **</value>
+        <value lang="IT">(4) Guida Programmi   **(6) Ricerca Programmi **</value>
         <context>1</context>
       </textarea>
     </container>
@@ -942,6 +956,7 @@
         <area>10,75,500,60</area>
         <font>info</font>
         <value>Pick the letter in which the show starts with, then hit ENTER or the right arrow</value>
+        <value lang="IT">Seleziona la lettera iniziale del programma e premi OK oppure la freccia destra</value>
         <multiline>yes</multiline>
       </textarea>
     </container>
@@ -952,11 +967,13 @@
         <area>10,5,500,30</area>
         <font>info</font>
         <value>Select a program...</value>
+        <value lang="IT">Seleziona un programma...</value>
       </textarea>
       <textarea name="pickprog" draworder="6">
         <area>10,75,500,120</area>
         <font>info</font>
         <value>Select the title of the program you wish to find. When finished return with the left arrow key. Hitting 'info' will allow you to setup recording options.</value>
+        <value lang="IT">Seleziona il titolo del programma che vuoi trovare. Quando hai finito torna indietro con la freccia a sinistra. Premendo 'info' potrai impostare la registrazione.</value>
         <multiline>yes</multiline>
       </textarea>
     </container>
@@ -967,11 +984,13 @@
         <area>10,5,500,30</area>
         <font>info</font>
         <value>No Programs</value>
+        <value lang="IT">Nessun programma</value>
       </textarea>
       <textarea name="research" draworder="6">
         <area>10,75,500,120</area>
         <font>info</font>
         <value>There are no available programs under this search. Please select another search.</value>
+        <value lang="IT">Non ci sono programmi disponibili con questa ricerca. Seleziona un'altra ricerca.</value>
         <multiline>yes</multiline>
       </textarea>
     </container>

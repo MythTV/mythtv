@@ -49,7 +49,7 @@ class MythEvent : public QCustomEvent
     QString extradata;
 };
 
-#define MYTH_BINARY_VERSION "0.9.04292003-2"
+#define MYTH_BINARY_VERSION "0.9.05062003-1"
 
 extern bool print_verbose_messages;
 
@@ -99,6 +99,8 @@ class MythContext : public QObject
     int GetMediumFontSize() { return GetNumSetting("QtFontMedium", 16); }
     int GetSmallFontSize() { return GetNumSetting("QtFontSmall", 12); }
 
+    QString GetLanguage(void);
+
     void ThemeWidget(QWidget *widget);
 
     QPixmap *LoadScalePixmap(QString filename); 
@@ -116,7 +118,8 @@ class MythContext : public QObject
     void LCDswitchToTime();
     void LCDswitchToMusic(QString artist, QString track);
     void LCDsetLevels(int numb_levels, float *levels);
-    void LCDswitchToChannel(QString channum = "", QString title = "", QString subtitle = "");
+    void LCDswitchToChannel(QString channum = "", QString title = "", 
+                            QString subtitle = "");
     void LCDsetChannelProgress(float percentViewed);
     void LCDswitchToNothing();
     void LCDpopMenu(QString menu_choice, QString menu_title);
@@ -154,6 +157,8 @@ class MythContext : public QObject
     QMap<QString, QImage> imageCache;
 
     LCD *lcd_device;
+
+    QString language;
 };
 
 extern MythContext *gContext;

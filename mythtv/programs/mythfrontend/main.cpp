@@ -206,16 +206,7 @@ void haltnow(int how)
 
 int RunMenu(QString themedir)
 {
-    QString MenuName = "mainmenu_" + 
-                       QString(gContext->GetSetting("Locale").lower()) + 
-                       ".xml";
-    QFile filetest(PREFIX + QString("/share/mythtv/") + MenuName);
-
-    if (!filetest.exists())
-        menu = new ThemedMenu(themedir.ascii(), "mainmenu.xml");
-    else
-        menu = new ThemedMenu(themedir.ascii(), MenuName);
-
+    menu = new ThemedMenu(themedir.ascii(), "mainmenu.xml");
     menu->setCallback(TVMenuCallback, gContext);
    
     int exitstatus = 0;
@@ -317,7 +308,7 @@ int main(int argc, char **argv)
     MythPluginManager::init(db, gContext);
 
     translator.load(PREFIX + QString("/share/mythtv/i18n/mythfrontend_") + 
-                    QString(gContext->GetSetting("Locale").lower()) + 
+                    QString(gContext->GetSetting("Language").lower()) + 
                     QString(".qm"), ".");
     a.installTranslator(&translator);
 

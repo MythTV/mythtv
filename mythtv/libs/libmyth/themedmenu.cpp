@@ -717,7 +717,16 @@ void ThemedMenu::parseThemeButton(QDomElement &element)
             }
             else if (info.tagName() == "text")
             {
-                text = getFirstText(info);
+                if ((text.isNull() || text.isEmpty()) && 
+                    info.attribute("lang","") == "")
+                {
+                    text = getFirstText(info);
+                }
+                else if (info.attribute("lang","").lower() == 
+                         gContext->GetLanguage())
+                {
+                    text = getFirstText(info);
+                }
             }
             else if (info.tagName() == "alttext")
             {

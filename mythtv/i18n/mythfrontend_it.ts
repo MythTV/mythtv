@@ -3,47 +3,47 @@
     <name>GuideGrid</name>
     <message>
         <source>Episode:</source>
-        <translation>Episodio: </translation>
+        <translation type="obsolete">Episodio: </translation>
     </message>
     <message>
         <source>Recording:</source>
-        <translation>Registrazione: </translation>
+        <translation type="obsolete">Registrazione: </translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation>Descrizione: </translation>
+        <translation type="obsolete">Descrizione: </translation>
     </message>
     <message>
         <source>   (6) Program Finder   </source>
-        <translation>   (6) Ricerca Programmi    </translation>
+        <translation type="obsolete">   (6) Ricerca Programmi    </translation>
     </message>
     <message>
         <source>   (4) All Programs   </source>
-        <translation>   (4) Tutti i Programmi   </translation>
+        <translation type="obsolete">   (4) Tutti i Programmi   </translation>
     </message>
     <message>
         <source>   (4) Favorite Programs   </source>
-        <translation>    (4) Programmi Preferiti   </translation>
+        <translation type="obsolete">    (4) Programmi Preferiti   </translation>
     </message>
     <message>
         <source>Not Recording</source>
-        <translation>Nessuna</translation>
+        <translation>Nessuna Registrazione</translation>
     </message>
     <message>
         <source>Recording Once</source>
-        <translation>Singolo evento</translation>
+        <translation>Registrazione singolo evento</translation>
     </message>
     <message>
         <source>Timeslot Recording</source>
-        <translation>In questa fascia oraria</translation>
+        <translation>Registrazione a fascia oraria</translation>
     </message>
     <message>
         <source>Channel Recording</source>
-        <translation>Automatica su questo canale</translation>
+        <translation>Reg. automatica sul canale</translation>
     </message>
     <message>
         <source>All Recording</source>
-        <translation>Automatica su tutti i canali</translation>
+        <translation>Reg. aut. su tutti i canali</translation>
     </message>
 </context>
 <context>
@@ -101,7 +101,7 @@
     </message>
     <message>
         <source>Erase</source>
-        <translation>Cancella</translation>
+        <translation type="obsolete">Cancella</translation>
     </message>
     <message>
         <source>Title:</source>
@@ -139,6 +139,10 @@
         <source>Unknown</source>
         <translation>Sconosciuto</translation>
     </message>
+    <message>
+        <source>Rubber</source>
+        <translation>Cancella</translation>
+    </message>
 </context>
 <context>
     <name>PlaybackBox</name>
@@ -168,7 +172,7 @@
     </message>
     <message>
         <source>It will be gone forever.</source>
-        <translation>La cancellazione sara' definitiva.</translation>
+        <translation>La cancellazione sara&apos; definitiva.</translation>
     </message>
     <message>
         <source>Yes, get rid of it</source>
@@ -262,52 +266,72 @@
         <source>MythTV is already using all available inputs for recording.  If you want to watch an in-progress recording, select one from the playback menu.  If you want to watch live TV, cancel one of the in-progress recordings from the delete menu.</source>
         <translation>MythTV sta gia&apos; utilizzando la scheda TV per registrare un programma. Se vuoi vedere il programma che sta registrando, vai al menu Guarda una registrazione. Se vuoi vedere comunque la TV, cancella la registrazione dal menu Elimina una registrazione.</translation>
     </message>
+    <message>
+        <source>You are exiting this recording</source>
+        <translation>Stai uscendo da questa registrazione</translation>
+    </message>
+    <message>
+        <source>Save this position and go to the menu</source>
+        <translation>Salva questa posizione e vai al menu</translation>
+    </message>
+    <message>
+        <source>Do not save, just exit to the menu</source>
+        <translation>Non salvare, esci e vai al menu</translation>
+    </message>
+    <message>
+        <source>Keep watching</source>
+        <translation>Continua a guardare</translation>
+    </message>
+    <message>
+        <source>Delete this recording</source>
+        <translation>Cancella questa registrazione</translation>
+    </message>
 </context>
 <context>
     <name>ViewScheduled</name>
     <message>
         <source>Channel: </source>
-        <translation>Canale: </translation>
+        <translation type="obsolete">Canale: </translation>
     </message>
     <message>
         <source>Episode: </source>
-        <translation>Episodio: </translation>
+        <translation type="obsolete">Episodio: </translation>
     </message>
     <message>
         <source>Description: </source>
-        <translation>Descrizione: </translation>
+        <translation type="obsolete">Descrizione: </translation>
     </message>
     <message>
         <source>Airdate: </source>
-        <translation>Trasmissione del: </translation>
+        <translation type="obsolete">Trasmissione del: </translation>
     </message>
     <message>
         <source>Select a recording to view:</source>
-        <translation>Seleziona la registrazione da vedere:</translation>
+        <translation type="obsolete">Seleziona la registrazione da vedere:</translation>
     </message>
     <message>
         <source>Chan</source>
-        <translation>Canale</translation>
+        <translation type="obsolete">Canale</translation>
     </message>
     <message>
         <source>Date</source>
-        <translation>Data</translation>
+        <translation type="obsolete">Data</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation>Titolo</translation>
+        <translation type="obsolete">Titolo</translation>
     </message>
     <message>
         <source>Conflicting recordings are highlighted in &lt;font color=&quot;red&quot;&gt;red&lt;/font&gt;.&lt;br&gt;Deactivated recordings are highlighted in &lt;font color=&quot;gray&quot;&gt;gray&lt;/font&gt;.</source>
-        <translation>Le registrazioni in conflitto sono evidenziate in &lt;font color=&quot;red&quot;&gt;rosso&lt;/font&gt;.&lt;br&gt;Le registrazioni disattivate sono evidenziate in &lt;font color=&quot;gray&quot;&gt;grigio&lt;/font&gt;.</translation>
+        <translation type="obsolete">Le registrazioni in conflitto sono evidenziate in &lt;font color=&quot;red&quot;&gt;rosso&lt;/font&gt;.&lt;br&gt;Le registrazioni disattivate sono evidenziate in &lt;font color=&quot;gray&quot;&gt;grigio&lt;/font&gt;.</translation>
     </message>
     <message>
         <source>You have time conflicts.</source>
-        <translation>Hai dei conflitti nelle registrazioni</translation>
+        <translation type="obsolete">Hai dei conflitti nelle registrazioni</translation>
     </message>
     <message>
         <source>You have no recording conflicts.</source>
-        <translation>Non hai nessun conflitto nelle registrazioni</translation>
+        <translation type="obsolete">Non hai nessun conflitto nelle registrazioni</translation>
     </message>
     <message>
         <source>Recording this program has been deactivated because it conflicts with another scheduled recording.  Do you want to re-enable this recording?</source>
@@ -336,6 +360,14 @@
     <message>
         <source>Remember this choice and use it automatically in the future</source>
         <translation>Usa questa scelta automaticamente in futuro</translation>
+    </message>
+    <message>
+        <source>Time Conflict</source>
+        <translation>Ci sono conflitti</translation>
+    </message>
+    <message>
+        <source>No Conflicts</source>
+        <translation>Nessun conflitto</translation>
     </message>
 </context>
 </TS>

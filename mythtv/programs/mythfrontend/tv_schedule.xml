@@ -3,18 +3,23 @@
    <button>
       <type>TV_SCHEDULE</type>
       <text>Program Guide</text>
+      <text lang="IT">Guida programmi</text>
+      <alttext>Guide</alttext>
       <action>TV_SCHEDULE</action>
    </button>
 
    <button>
       <type>TV_SCHEDULE</type>
       <text>Program Finder</text>
+      <text lang="IT">Ricerca programmi</text>
+      <alttext>Finder</alttext>
       <action>TV_PROGFIND</action>
    </button>
 
    <button>
       <type>TV_SCHEDULE</type>
       <text>Manual Recording</text>
+      <text lang="IT">Registrazione manuale</text>
       <alttext>Manual Record</alttext>
       <action>TV_MANUAL</action>
    </button>
@@ -22,6 +27,7 @@
    <button>
       <type>TV_CONFLICTS</type>
       <text>Fix Scheduling Conflicts</text>
+      <text lang="IT">Correggi i conflitti</text>
       <alttext>Fix Conflicts</alttext>
       <action>TV_FIX_CONFLICTS</action>
    </button>

@@ -24,14 +24,7 @@ XMLParse::~XMLParse()
 bool XMLParse::LoadTheme(QDomElement &ele, QString winName, QString specialfile)
 {
     QString themepath = gContext->FindThemeDir("") + gContext->GetSetting("Theme");
-    QString themefile = themepath + "/" + specialfile + "ui_" +
-                        QString(gContext->GetSetting("Locale").lower()) +
-                        ".xml";
-
-    QFile filetest(themefile);
-    
-    if (!filetest.exists())
-        themefile = themepath + "/" + specialfile + "ui.xml";
+    QString themefile = themepath + "/" + specialfile + "ui.xml";
 
     QDomDocument doc;
     QFile f(themefile);
@@ -766,7 +759,16 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
             }
             else if (info.tagName() == "value")
             {
-                value = getFirstText(info);
+                if ((value.isNull() || value.isEmpty()) && 
+                    info.attribute("lang","") == "")
+                {
+                    value = getFirstText(info);
+                }
+                else if (info.attribute("lang","").lower() == 
+                         gContext->GetLanguage())
+                {
+                    value = getFirstText(info);
+                }
             }
             else if (info.tagName() == "cutdown")
             {

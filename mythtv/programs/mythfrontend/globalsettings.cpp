@@ -816,6 +816,17 @@ public:
      };
 };
 
+class MythLanguage: public ComboBoxSetting, public GlobalSetting {
+public:
+    MythLanguage():
+        ComboBoxSetting(true), GlobalSetting("Language") {
+        setLabel("Language");
+        addSelection("English", "EN");
+        addSelection("Italian", "IT");
+        setHelpText("Your preferred language.");
+    };
+};
+
 PlaybackSettings::PlaybackSettings()
 {
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
@@ -909,7 +920,8 @@ AppearanceSettings::AppearanceSettings()
     addChild(theme);
 
     VerticalConfigurationGroup* dates = new VerticalConfigurationGroup(false);
-    dates->setLabel("Time and Date Formatting");    
+    dates->setLabel("Localization");    
+    dates->addChild(new MythLanguage());
     dates->addChild(new MythDateFormat());
     dates->addChild(new MythShortDateFormat());
     dates->addChild(new MythTimeFormat());
