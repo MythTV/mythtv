@@ -2198,12 +2198,11 @@ void NuppelVideoPlayer::DoPlay(void)
     }
 #endif
 
-    if (normal_speed)
+    if (normal_speed && audioOutput)
     {
         audioOutput->SetStretchFactor(play_speed);
 #ifdef USING_DIRECTX
-        if (audioOutput)
-            audioOutput->Reset();
+        audioOutput->Reset();
 #endif
     }
 

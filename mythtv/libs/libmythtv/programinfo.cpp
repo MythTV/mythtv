@@ -1425,7 +1425,7 @@ void ProgramInfo::SetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
         // check to make sure the show still exists before saving markups
         query.prepare("SELECT starttime FROM recorded"
                       " WHERE chanid = :CHANID"
-                      " AND starttime :STARTTIME ;");
+                      " AND starttime = :STARTTIME ;");
         query.bindValue(":CHANID", chanid);
         query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
 
@@ -1724,7 +1724,7 @@ void ProgramInfo::SetPositionMapDelta(QMap<long long, long long> &posMap,
             query.prepare("INSERT INTO recordedmarkup"
                           " (chanid, starttime, mark, type, offset)"
                           " VALUES"
-                          " ( :CHANID , :STARTTIME , :MARK , :TYPE , OFFSET );");
+                          " ( :CHANID , :STARTTIME , :MARK , :TYPE , :OFFSET );");
             query.bindValue(":CHANID", chanid);
             query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
         }
