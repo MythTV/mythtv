@@ -1213,7 +1213,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
         if (prebuffering)
         {
-            VERBOSE(VB_GENERAL, "prebuffering...");
+            VERBOSE(VB_PLAYBACK, "waiting for prebuffer...");
             usleep(frame_interval * 4);
             ResetNexttrigger(&nexttrigger);
             continue;
@@ -1221,7 +1221,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
         if (!videoOutput->EnoughPrebufferedFrames())
         {
-            //printf("entering prebuffering mode\n");
+            VERBOSE(VB_GENERAL, "prebuffering pause");
             setPrebuffering(true); 
             continue;
         }
