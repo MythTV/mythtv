@@ -1298,7 +1298,10 @@ void TV::StopEmbeddingOutput(void)
 static void embedcb(void *data, unsigned long wid, int x, int y, int w, int h)
 {
     TV *tv = (TV *)data;
-    tv->EmbedOutput(wid, x, y, w, h);
+    if (x == -1 && y == -1 && w == -1 && h == -1)
+        tv->StopEmbeddingOutput();
+    else
+        tv->EmbedOutput(wid, x, y, w, h);
 }
 
 void TV::doLoadMenu(void)

@@ -26,9 +26,7 @@ MythContext::MythContext(bool gui)
     pthread_mutex_init(&dbLock, NULL);
     m_db = QSqlDatabase::addDatabase("QMYSQL3", "MythContext");
 
-    LoadSettingsFiles("settings.txt");
     LoadSettingsFiles("mysql.txt");
-    LoadSettingsFiles("theme.txt");
 
     if (gui)
     {

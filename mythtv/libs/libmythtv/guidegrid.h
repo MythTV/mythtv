@@ -190,6 +190,8 @@ class GuideGrid : public MythDialog
     QString unknownCategory;
     bool showCurrentTime;
     QString currentTimeColor;
+
+    QTimer *timeCheck;
 };
 
 #endif

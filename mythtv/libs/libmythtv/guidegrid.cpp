@@ -188,10 +188,11 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel,
 
     connect(this, SIGNAL(killTheApp()), this, SLOT(accept()));
 
+    timeCheck = NULL;
     if (programGuideType == 1)
     {
         // One second timer for clock
-        QTimer *timeCheck = new QTimer(this);
+        timeCheck = new QTimer(this);
         connect(timeCheck, SIGNAL(timeout()), SLOT(timeout()) );
         timeCheck->start(1000);
     }
@@ -2000,6 +2001,13 @@ void GuideGrid::pageUp()
 
 void GuideGrid::enter()
 {
+    if (timeCheck)
+    {
+        timeCheck->stop();
+        if (embedcallback)
+            embedcallback(callbackdata, 0, -1, -1, -1, -1);
+    }
+
     unsetCursor();
     selectState = 1;
     emit killTheApp();
@@ -2007,6 +2015,13 @@ void GuideGrid::enter()
 
 void GuideGrid::escape()
 {
+    if (timeCheck)
+    {
+        timeCheck->stop();
+        if (embedcallback)
+            embedcallback(callbackdata, 0, -1, -1, -1, -1);
+    }
+
     unsetCursor();
     emit killTheApp();
 }

@@ -223,6 +223,11 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
     long long retval = decodeLongLong(strlist, 0);
     readposition = retval;
 
+    avail = sock->bytesAvailable();
+    trash = new char[avail + 1];
+    sock->readBlock(trash, avail);
+    delete [] trash;
+
     return retval;
 }
 
