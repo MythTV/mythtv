@@ -641,7 +641,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
         thequery += " DESC";
     thequery += ";";
 
-    VERBOSE(VB_GENERAL, thequery);
+    
     
     QSqlQuery query = m_db->exec(thequery);
 
