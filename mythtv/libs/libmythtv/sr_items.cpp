@@ -37,7 +37,7 @@ void SRDupSettingsGroup::syncText()
 {
     int meth;
     int loc;
-    cerr << dupMethItem->getItem()->getValue() << " - " << dupMethItem->getItem()->getText() << endl;
+    //cerr << dupMethItem->getItem()->getValue() << " - " << dupMethItem->getItem()->getText() << endl;
     
     meth = dupMethItem->getItem()->getValue().toInt();
     loc = dupLocItem->getItem()->getValue().toInt();
@@ -84,4 +84,38 @@ void SROffsetGroup::syncText()
 void SROffsetGroup::itemChanged(ManagedListItem*) 
 { 
     syncText(); 
+}
+
+
+SREpisodesGroup::SREpisodesGroup(ScheduledRecording& _rec, ManagedList* _list, ManagedListGroup* _group, QObject* _parent)
+                  : ManagedListGroup(QObject::tr("Duplicate detection"), _group, _list, _parent, "depGroup")
+{
+
+    maxEpisodes = new SRMaxEpisodes(_rec, _list);
+    _rec.setMaxEpisodesObj(maxEpisodes);
+    addItem(maxEpisodes->getItem(), -1);
+    
+    connect(maxEpisodes->getItem(), SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
+    
+    maxNewest = new SRMaxNewest(_rec, _list);
+    _rec.setMaxNewestObj(maxNewest);
+    addItem(maxNewest->getItem(), -1);
+    
+    connect(maxNewest->getItem(), SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
+    
+    syncText();
+}
+
+
+void SREpisodesGroup::syncText()
+{
+    int maxEpi;
+    
+    maxEpi = maxEpisodes->getItem()->getValue().toInt();
+    
+    text = maxEpisodes->getItem()->getText();
+    
+    if(maxEpi != 0)
+        text += QString(", %1").arg(maxNewest->getItem()->getText());
+    
 }

@@ -455,6 +455,8 @@ class SRAutoExpire: public SRBoolSetting
         }
 };
 
+
+
 class SRMaxNewest: public SRBoolSetting 
 {
     public:
@@ -483,6 +485,34 @@ class SRMaxEpisodes : public SRBoundedIntegerSetting
 };
 
 
+class SREpisodesGroup : public ManagedListGroup
+{
+    Q_OBJECT
+    
+    public:
+        SREpisodesGroup(ScheduledRecording& _rec, ManagedList* _list, ManagedListGroup* _group, QObject* _parent);
+        
+        virtual void doGoBack()
+        {
+            syncText();
+            ManagedListGroup::doGoBack();
+        }
+
+    
+        void syncText();
+    
+    public slots:
+        void itemChanged(ManagedListItem*) 
+        {
+            maxNewest->getItem()->setEnabled(maxEpisodes->getValue().toInt() !=0); 
+            syncText();
+        }        
+        
+    protected:
+        SRMaxNewest* maxNewest;
+        SRMaxEpisodes* maxEpisodes;
+};
+
 
 class SRRecPriority: public SRBoundedIntegerSetting 
 {
@@ -490,7 +520,7 @@ class SRRecPriority: public SRBoundedIntegerSetting
         SRRecPriority(ScheduledRecording& _parent, ManagedList* _list)
                     : SRBoundedIntegerSetting( -99, 99, 5, _parent, "recpriorityList", "recpriority", _list) 
         {
-            setTemplates( "Reduce priority by %1", "Reduce priority by %1", "No recording priority", 
+            setTemplates( "Reduce priority by %1", "Reduce priority by %1", "Normal recording priority", 
                           "Raise priority by %1", "Raise priority by %1" );
             setValue(0);
             _parent.setRecPriorityObj(this);
@@ -499,9 +529,11 @@ class SRRecPriority: public SRBoundedIntegerSetting
 
 class SRRecGroup: public SRSelectSetting {
 public:
-    SRRecGroup(ScheduledRecording& _parent, ManagedListGroup* _group, ManagedList* _list)
+    SRRecGroup(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
         : SRSelectSetting(_parent, "recgroupList", "Select recording group...", _group, "recgroup", _list ) 
     {
+        setValue(QObject::tr("Default"));
+        _parent.setRecGroupObj(this);
     }
 
     virtual void load(QSqlDatabase *db) {
@@ -510,7 +542,7 @@ public:
     }
 
     virtual void fillSelections(QSqlDatabase *db) {
-        addSelection("Store in the default recording group", QString("Default"), false);
+        addSelection("Store in the \"default\" recording group", QObject::tr("Default"), false);
 
         QString thequery = QString("SELECT DISTINCT recgroup from recorded "
                                    "WHERE recgroup <> '%1'")
@@ -519,7 +551,7 @@ public:
 
         if (query.isActive() && query.numRowsAffected() > 0)
             while (query.next())
-                addSelection(QString(QObject::tr("Store in the '%1' group")).arg(query.value(0).toString()),
+                addSelection(QString(QObject::tr("Store in the '%1' recording group")).arg(query.value(0).toString()),
                              query.value(0).toString(), false);
 
         thequery = QString("SELECT DISTINCT recgroup from record "
@@ -529,7 +561,7 @@ public:
 
         if (query.isActive() && query.numRowsAffected() > 0)
             while (query.next())
-                addSelection(QString(QObject::tr("Store in the '%1' group")).arg(query.value(0).toString()),
+                addSelection(QString(QObject::tr("Store in the \"%1\" recording group")).arg(query.value(0).toString()),
                              query.value(0).toString(), false);
     }
 };
