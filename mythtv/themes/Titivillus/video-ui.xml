@@ -238,90 +238,6 @@
   </window>
   
   <window name="browser">
-
-    <font name="active_font" face="Arial">
-      <color>#ffffff</color>
-      <size>16</size>
-      <bold>yes</bold>
-    </font>
-
-    <font name="directorfnt" face="Arial">
-      <color>#ffff33</color>
-      <size>16</size>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="labels" face="Arial">
-      <color>#ffffff</color>
-      <size>16</size>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="moviedata" face="Arial">
-      <color>#ffffbb</color>
-      <size>15</size>
-      <shadow>1,1</shadow>
-    </font>
-
-    <font name="plotfnt" face="Arial">
-      <color>#ffffbb</color>
-      <size>15</size>
-      <shadow>1,1</shadow>
-    </font>
-
-    <font name="inactive_font" face="Arial">
-      <color>#9999cc</color>
-      <size>16</size>
-      <bold>yes</bold>
-    </font>
-
-    <font name="bigtitle" face="Arial">
-      <color>#ffffff</color>
-      <dropcolor>#000000</dropcolor>
-      <size>50</size>
-      <shadow>3,3</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="titlefnt" face="Arial">
-      <color>#ffffff</color>
-      <dropcolor>#000000</dropcolor>
-      <shadow>1,1</shadow>
-      <size>26</size>
-      <bold>yes</bold>
-    </font>
-
-    <font name="leadfnt" face="Arial">
-      <color>#ddddff</color>
-      <dropcolor>#000000</dropcolor>
-      <shadow>4,4</shadow>
-      <size>24</size>
-      <bold>yes</bold>
-    </font>
-
-    <font name="info" face="Arial">
-      <color>#ffffff</color>
-      <size>15</size>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="helptext" face="Arial">
-      <color>#ffffff</color>
-      <size>15</size>
-      <shadow>1,1</shadow>
-      <bold>no</bold>
-    </font>
-
-    <font name="message" face="Arial">
-      <color>#ffffff</color>
-      <size>16</size>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
     <container name="background">
       <image name="filler" draworder="0" fleximage="no">
         <filename>video/mv-background.png</filename>
@@ -333,29 +249,29 @@
       <area>10,440,780,150</area>
       <textarea name="videoin" draworder="3" align="left">
         <area>40,115,780,35</area>
-        <font>helptext</font>
+        <font>help</font>
         <value>Up/Down, Page Up/Down: Browse   MENU: Options   INFO: Action Menu</value>
       </textarea>
 
 
       <textarea name="currentvideo" draworder="3" align="hcenter">
         <area>140,46,500,35</area>
-        <font>directorfnt</font>
+        <font>info</font>
       </textarea>  
       <textarea name="pl_label" draworder="4" align="left">
         <area>665, 13,160,40</area>
-        <font>labels</font>
+        <font>info</font>
         <value>Parental</value>
       </textarea>
       <textarea name="pl_label2" draworder="4" align="hcenter">
         <area>665,80,100,40</area>
-        <font>labels</font>
+        <font>info</font>
         <value>Level</value>
       </textarea>
 
       <textarea name="pl_value" draworder="4" align="right">
         <area>700,46,20,40</area>
-        <font>directorfnt</font>
+        <font>info</font>
         <value>1</value>
       </textarea>
     </container>
@@ -364,54 +280,54 @@
       <area>10,10,790,440</area>
       <textarea name="title" draworder="4" align="hcenter">
         <area>20,8,760,100</area>
-        <font>leadfnt</font>
+        <font>title</font>
 	<multiline>yes</multiline> 
       </textarea>
       <textarea name="dirlbl" draworder="4" align="left">
         <area>235, 90,150,35</area>
-        <font>labels</font>
+        <font>info</font>
         <value>Directed by</value>
       </textarea>
       <textarea name="director" draworder="4">
-        <area>370,90,350,35</area>
-        <font>labels</font>
+        <area>350,90,350,35</area>
+        <font>metadata</font>
       </textarea>
       <textarea name="yrlbl" draworder="4">
         <area>450,364,90,35</area>
-        <font>labels</font>
+        <font>info</font>
         <value>Year</value>
       </textarea>
       <textarea name="year" draworder="4">
         <area>455,393,100,45</area>
-        <font>moviedata</font>
+        <font>metadata</font>
       </textarea>
       <textarea name="plot" draworder="4">
         <area>234,120,533,145</area>
-        <font>plotfnt</font>
+        <font>metadata</font>
         <multiline>yes</multiline>
       </textarea>
       <textarea name="rating" draworder="4">
         <area>234,280,533,90</area>
-        <font>moviedata</font>
+        <font>metadata</font>
         <multiline>yes</multiline>
       </textarea>
       <textarea name="lenlbl" draworder="4">
         <area>240,364,150,35</area>
-        <font>labels</font>
+        <font>info</font>
         <value>Runtime</value>
       </textarea>
      <textarea name="length" draworder="4">
         <area>240,393,350,35</area>
-        <font>moviedata</font>
+        <font>metadata</font>
       </textarea>
       <textarea name="userratinglbl" draworder="4" align="right">
         <area>600,364,150,35</area>
-        <font>labels</font>
+        <font>info</font>
         <value>User Rating</value>
       </textarea>
       <textarea name="userrating" draworder="4" align="right">
         <area>550,393,150,35</area>
-        <font>moviedata</font>
+        <font>metadata</font>
       </textarea>
       <image name="coverart" draworder="5" fleximage="no">
         <position>21,116</position>
@@ -443,100 +359,215 @@
 
     </window>
 
-    <window name="videotree">
+  <window name="gallery">
 
-        <font name="active" face="Arial">
-            <color>#ffffff</color>
-            <size>15</size>
-            <size:big>18</size:big>
-            <size:small>11</size:small>
-            <shadow>1,1</shadow>
-        </font>
-        
-        <font name="inactive" face="Arial">
-            <color>#9999cc</color>
-            <size>15</size>
-            <size:big>18</size:big>
-            <size:small>11</size:small>
-            <shadow>1,1</shadow>
-        </font>
+    <font name="icontitle" base="info">
+      <size>20</size>
+    </font>
 
-        <font name="moviedata" face="Arial">
-            <color>#ffffbb</color>
-            <size>15</size>
-            <size:big>18</size:big>
-            <shadow>1,1</shadow>
-        </font>
+    <container name="arrows">
+      <area>760,530,780,60</area>
 
-        <font name="selectable" face="Arial">
-            <color>#ffffff</color>
-            <size>15</size>
-            <size:big>18</size:big>
-            <shadow>1,1</shadow>
-        </font>
+      <image name="scrollUpReg" draworder="0" fleximage="no">
+        <context>0</context>
+        <filename>lb-uparrow-reg.png</filename>
+        <position>0,0</position>
+      </image>
 
-        <font name="leadfnt" face="Arial">
-            <color>#ddddff</color>
-            <dropcolor>#000000</dropcolor>
-            <shadow>4,4</shadow>
-            <size>24</size>
-            <size:big>26</size:big>
-            <size:small>20</size:small>
-            <bold>yes</bold>
-        </font>
+      <image name="scrollUpSel" draworder="0" fleximage="no">
+        <context>1</context>
+        <filename>lb-uparrow-sel.png</filename>
+        <position>0,0</position>
+      </image>
 
-        
-        <font name="labelfont" face="Arial">
-            <color>#ffffff</color>
-            <dropcolor>#000000</dropcolor>
-            <size>16</size>
-            <shadow>2,2</shadow>
-            <bold>yes</bold>
-        </font>
-        
-        <font name="infofont" face="Arial">
-            <color>#ffff33</color>
-            <size>16</size>
-            <bold>yes</bold>
-        </font>
-        
+      <image name="scrollDnReg" draworder="1" fleximage="no">
+        <context>0</context>
+        <filename>lb-dnarrow-reg.png</filename>
+        <position>0,20</position>
+      </image>
+
+      <image name="scrollDnSel" draworder="1" fleximage="no">
+        <context>1</context>
+        <filename>lb-dnarrow-sel.png</filename>
+        <position>0,20</position>
+      </image>
+
+    </container>
+
+<container name="text">
+
+      <area>50,5,700,30</area>
+      <textarea name="text" draworder="0">
+        <area>0,0,700,30</area>
+        <font>title</font>
+        <cutdown>yes</cutdown>
+        <multiline>no</multiline>
+      </textarea>
+
+    </container>
+
+    <container name="view">
+      <area>50,50,700,530</area>
+
+      <blackhole name="view" draworder="0">
+            <area>0,0,700,530</area>
+      </blackhole>
+
+      <textarea name="icontext" draworder="1" align="left">
+        <area>0,0,0,0</area>
+        <font>icontitle</font>
+        <cutdown>yes</cutdown>
+        <multiline>yes</multiline>
+      </textarea>
+
+      <textarea name="subtext" draworder="1" align="center">
+        <area>0,0,0,20</area>
+        <font>info</font>
+        <cutdown>yes</cutdown>
+        <multiline>no</multiline>
+      </textarea>
+
+    </container>
+  </window>
+
+  <window name="selected">
+
+    <font name="bigtitle" base="basefont">
+      <size>50</size>
+      <shadow>3,3</shadow>
+    </font>
+
+
+
+    <container name="background">
+      <image name="filler" draworder="0" fleximage="no">
+        <filename>mv_selected.png</filename>
+        <position>0,0</position>
+      </image>
+    </container>
+
+    <container name="info">
+      <area>10,10,790,440</area>
+      <textarea name="title" draworder="4" align="hcenter">
+        <area>20,8,760,100</area>
+        <font>title</font>
+	<multiline>yes</multiline>
+      </textarea>
+      <textarea name="dirlbl" draworder="4" align="left">
+        <area>235, 90,150,35</area>
+        <font>info</font>
+        <value>Directed by</value>
+      </textarea>
+      <textarea name="director" draworder="4">
+        <area>370,90,350,35</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="yrlbl" draworder="4">
+        <area>450,364,90,35</area>
+        <font>info</font>
+        <value>Year</value>
+      </textarea>
+      <textarea name="year" draworder="4">
+        <area>455,393,100,45</area>
+        <font>metadata</font>
+      </textarea>
+      <textarea name="plot" draworder="4">
+        <area>234,120,533,145</area>
+        <font>metadata</font>
+        <multiline>yes</multiline>
+      </textarea>
+      <textarea name="rating" draworder="4">
+        <area>234,280,533,90</area>
+        <font>metadata</font>
+        <multiline>yes</multiline>
+      </textarea>
+      <textarea name="lenlbl" draworder="4">
+        <area>240,364,150,35</area>
+        <font>info</font>
+        <value>Runtime</value>
+      </textarea>
+     <textarea name="length" draworder="4">
+        <area>240,393,350,35</area>
+        <font>metadata</font>
+      </textarea>
+      <textarea name="userratinglbl" draworder="4" align="right">
+        <area>600,364,150,35</area>
+        <font>info</font>
+        <value>User Rating</value>
+      </textarea>
+      <textarea name="userrating" draworder="4" align="right">
+        <area>550,393,150,35</area>
+        <font>metadata</font>
+      </textarea>
+      <image name="coverart" draworder="5" fleximage="no">
+        <position>21,116</position>
+        <staticsize>200,308</staticsize>
+      </image>
+    </container>
+
+    <container name="playwait">
+      <area>0,0,800,600</area>
+      <textarea name="ld1" draworder="0">
+        <area>68,140,350,90</area>
+        <font>bigtitle</font>
+        <value>loading...</value>
+      </textarea>
+      <textarea name="title" draworder="0" align="center">
+        <area>0,320,800,60</area>
+        <font>title</font>
+      </textarea>
+    </container>
+
+    <container name="novideos_info">
+      <textarea name="msg" align="center" draworder="8">
+         <area>0,110,800,70</area>
+         <font>info</font>
+         <value>No Videos Found</value>
+         <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+  </window>
+
+  <window name="videotree">
+       
         <container name="background">
             <image name="filler" draworder="0" fleximage="yes">
-                <filename>background.jpg</filename>
+                <filename>playback_box/pbb_back.png</filename>
+                <position>0,20</position>
+            </image>
+            <image name="titlelines" draworder="0" fleximage="no">
+                <filename>shared/trans-titles.png</filename>
                 <position>0,10</position>
             </image>
-            <image name="morefiller" draworder="0" fleximage="no">
+            <!--<image name="morefiller" draworder="0" fleximage="no">
                 <filename>mv_other_background.png</filename>
                 <position>0,300</position>
-            </image>
+            </image> -->
         </container>
 
         <container name="videoselector">
-            <area>0,10,800,295</area>
-            <image name="titlelines" draworder="5" fleximage="no">
-                <filename>shared/trans-titles.png</filename>
-                <position>0,0</position>
-            </image>
-            <managedtreelist name="videotreelist" draworder="1" bins="2">
+            <area>0,10,800,310</area>
+            <managedtreelist name="videotreelist" draworder="4" bins="2">
                 <area>40,10,720,270</area>
-                <image function="selectionbar" filename="shared/long_bar.png" location="150,-5"> </image>
-                <image function="uparrow" filename="shared/up_arrow.png"></image>
+                <image function="selectionbar" filename="shared/long_bar.png" location="-18,-5" padding="17" fleximage="no"></image>
+                <image function="uparrow" filename="shared/up_arrow.png" ></image>
                 <image function="downarrow" filename="shared/down_arrow.png"></image>
-                <image function="leftarrow" filename="shared/left_arrow.png"></image>
-                <image function="rightarrow" filename="shared/right_arrow.png"></image>
+                <image function="leftarrow" filename="leftarrow.png"></image>
+                <image function="rightarrow" filename="rightarrow.png"></image>
                 <bin number="1">
                     <area>30,16,190,250</area>
-                    <fcnfont name="active" function="active"></fcnfont>
-                    <fcnfont name="inactive" function="inactive"></fcnfont>
-                    <fcnfont name="active" function="selected"></fcnfont>
-                    <fcnfont name="selectable" function="selectable"></fcnfont>
+                    <fcnfont name="list-active" function="active"></fcnfont>
+                    <fcnfont name="list-inactive" function="inactive"></fcnfont>
+                    <fcnfont name="list-selected" function="selected"></fcnfont>
+                    <fcnfont name="list-selectable" function="selectable"></fcnfont>
                 </bin>
                 <bin number="2">
-                    <area>235,10,530,270</area>
-                    <fcnfont name="active" function="active"></fcnfont>
-                    <fcnfont name="active" function="selected"></fcnfont>
-                    <fcnfont name="inactive" function="inactive"></fcnfont>
-                    <fcnfont name="selectable" function="selectable"></fcnfont>
+                    <area>235,10,535,270</area>
+                    <fcnfont name="list-active" function="active"></fcnfont>
+                    <fcnfont name="list-selected" function="selected"></fcnfont>
+                    <fcnfont name="list-inactive" function="inactive"></fcnfont>
+                    <fcnfont name="list-selectable" function="selectable"></fcnfont>
                 </bin>
             </managedtreelist>
 
@@ -548,48 +579,52 @@
         </container>
 
         <container name="videoinfo">
-            <area>0,316,800,300</area>
+            <area>0,301,800,300</area>
             <textarea name="video_title" draworder="4">
-                <area>30,10,530,60</area>
-                <font>leadfnt</font>
+                <area>50,20,530,60</area>
+                <font>title</font>
             </textarea>
-
-            <textarea name="plot" draworder="4">
-                <area>30,50,525,100</area>
-                <font>moviedata</font>
-                <multiline>yes</multiline>
-            </textarea>
-
             <textarea name="file_label" draworder="4" align="right">
-                <area>30,140,90,40</area>
-                <font>labelfont</font>
+                <area>30,73,90,40</area>
+                <font>info</font>
                 <value>File:</value>
             </textarea>
             <textarea name="player_label" draworder="4" align="right">
-                <area>30,185,90,40</area>
-                <font>labelfont</font>
+                <area>30,106,90,40</area>
+                <font>info</font>
                 <value>Player:</value>
             </textarea>
+            <textarea name="plot" draworder="4">
+              <area>30,146,570,145</area>
+              <font>metadata</font>
+              <multiline>yes</multiline>
+            </textarea>
+
             <textarea name="video_file" draworder="4">
-                <area>130,140,380,40</area>
-                <font>moviedata</font>
+                <area>130,73,380,40</area>
+                <font>metadata</font>
             </textarea>
             <textarea name="video_player" draworder="4">
-                <area>130,185,380,40</area>
-                <font>moviedata</font>
+                <area>130,106,570,40</area>
+                <font>metadata</font>
             </textarea>
-            <image name="video_poster" draworder="4" fleximage="no">
-                <position>551,5</position>
-                <staticsize>166,260</staticsize>
+            <image name="video_poster" draworder="1" fleximage="no">
+                <position>605,20</position>
+                <staticsize>166,235</staticsize>
             </image>
+            <textarea name="help" draworder="4" align="left">
+                <area>30,267,360,40</area>
+                <font>help</font>
+                <value>MENU - Options    INFO - Action Menu</value>
+            </textarea>
             <textarea name="pl_label" draworder="4" align="right">
-                <area>700,255,60,40</area>
-                <font>labelfont</font>
-                <value>PL </value>
+                <area>512,267,260,40</area>
+                <font>info</font>
+                <value>Current Parental Level: </value>
             </textarea>
             <textarea name="pl_value" draworder="4">
-                <area>760,255,20,40</area>
-                <font>labelfont</font>
+                <area>770,267,20,40</area>
+                <font>info</font>
                 <value>1</value>
             </textarea>
         </container>
@@ -1066,334 +1101,6 @@
 	</container>
     </window>
 
-  <window name="gallery">
 
-    <font name="active" face="Arial">
-      <color>#ffffff</color>
-      <size>16</size>
-      <bold>yes</bold>
-    </font>
-
-    <font name="inactive" face="Arial">
-      <color>#9999cc</color>
-      <size>16</size>
-      <bold>yes</bold>
-    </font>
-
-    <font name="title" face="Arial">
-      <color>#ddddff</color>
-      <dropcolor>#000000</dropcolor>
-      <shadow>4,4</shadow>
-      <size:small>20</size:small>
-      <size>30</size>
-      <bold>yes</bold>
-    </font>
-
-
-    <font name="menu" face="Arial">
-      <color>#ffffff</color>
-      <size>18</size>
-      <bold>yes</bold>
-      <shadow>2,2</shadow>
-    </font>
-
-    <font name="subtitle" face="Arial">
-      <color>#ffffbb</color>
-      <size:big>18</size:big>
-      <size>16</size>
-      <size:small>14</size:small>
-      <shadow>2,2</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="icontitle" face="Arial">
-      <color>#ffffbb</color>
-      <size:big>20</size:big>
-      <size>18</size>
-      <size:small>18</size:small>
-      <shadow>2,2</shadow>
-      <bold>yes</bold>
-    </font>
-
-
-    <container name="menu">
-      <area>20,20,160,560</area>
-
-      <textarea name="subdir" draworder="0" align="right">
-        <area>0,0,160,30</area>
-	<font>menu</font>
-      </textarea>
-
-      <textarea name="pl_label" draworder="1" align="left">
-        <area>0,540,30,20</area>
-        <font>subtitle</font>
-        <value>PL</value>
-      </textarea>
-      <textarea name="pl_value" draworder="1" align="left">
-        <area>30,540,30,20</area>
-        <font>subtitle</font>
-        <value>1</value>
-      </textarea>
-
-    </container>
-
-    <container name="arrows">
-      <area>76,530,730,60</area>
-
-      <image name="scrollUpReg" draworder="0" fleximage="no">
-        <context>0</context>
-        <filename>lb-uparrow-reg.png</filename>
-        <position>0,0</position>
-      </image>
-
-      <image name="scrollUpSel" draworder="0" fleximage="no">
-        <context>1</context>
-        <filename>lb-uparrow-sel.png</filename>
-        <position>0,0</position>
-      </image>
-
-      <image name="scrollDnReg" draworder="1" fleximage="no">
-        <context>0</context>
-        <filename>lb-dnarrow-reg.png</filename>
-        <position>0,20</position>
-      </image>
-
-      <image name="scrollDnSel" draworder="1" fleximage="no">
-        <context>1</context>
-        <filename>lb-dnarrow-sel.png</filename>
-        <position>0,20</position>
-      </image>
-      
-      <textarea name="help1" draworder="1">
-        <area>60,15,175,35</area>
-        <font>menu</font>
-        <value>SELECT: Details</value>
-      </textarea>
-
-       <textarea name="help1" draworder="1">
-        <area>275,15,175,35</area>
-        <font>menu</font>
-        <value>MENU: Options</value>
-      </textarea>
-
-      <textarea name="help1" draworder="1">
-        <area>500,15,200,35</area>
-        <font>menu</font>
-        <value>INFO: Action Menu</value>
-      </textarea>
-      
-    </container>
-
-    <container name="text">
-
-      <area>110,40,680,30</area>
-      <textarea name="text" draworder="0" align="center">
-        <area>0,0,700,30</area>
-        <font>title</font>
-        <cutdown>yes</cutdown>
-        <multiline>no</multiline>
-      </textarea>
-
-    </container>
-
-    <container name="view">
-      <area>110,77,680,450</area>
-
-      <blackhole name="view" draworder="0">
-            <area>0,0,680,450</area>
-      </blackhole>
-
-      <textarea name="icontext" draworder="1" align="left">
-        <area>0,0,0,0</area>
-        <font>icontitle</font>
-        <cutdown>yes</cutdown>
-        <multiline>yes</multiline>
-      </textarea>
-
-      <textarea name="subtext" draworder="1" align="center">
-        <area>0,0,0,20</area>
-        <font>subtitle</font>
-        <cutdown>yes</cutdown>
-        <multiline>no</multiline>
-      </textarea>
-
-    </container>
-
-  </window>
-
-  <window name="selected">
-
-<font name="active_font" face="Arial">
-      <color>#ffffff</color>
-      <size>16</size>
-      <bold>yes</bold>
-    </font>
-
-    <font name="directorfnt" face="Arial">
-      <color>#ffff33</color>
-      <size>16</size>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="labels" face="Arial">
-      <color>#ffffff</color>
-      <size>16</size>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="moviedata" face="Arial">
-      <color>#ffffbb</color>
-      <size>15</size>
-      <shadow>1,1</shadow>
-    </font>
-
-    <font name="plotfnt" face="Arial">
-      <color>#ffffbb</color>
-      <size>15</size>
-      <shadow>1,1</shadow>
-    </font>
-
-    <font name="inactive_font" face="Arial">
-      <color>#9999cc</color>
-      <size>16</size>
-      <bold>yes</bold>
-    </font>
-
-    <font name="bigtitle" face="Arial">
-      <color>#ffffff</color>
-      <dropcolor>#000000</dropcolor>
-      <size>50</size>
-      <shadow>3,3</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="titlefnt" face="Arial">
-      <color>#ffffff</color>
-      <dropcolor>#000000</dropcolor>
-      <shadow>1,1</shadow>
-      <size>26</size>
-      <bold>yes</bold>
-    </font>
-
-    <font name="leadfnt" face="Arial">
-      <color>#ddddff</color>
-      <dropcolor>#000000</dropcolor>
-      <shadow>4,4</shadow>
-      <size>24</size>
-      <bold>yes</bold>
-    </font>
-
-    <font name="info" face="Arial">
-      <color>#ffffff</color>
-      <size>15</size>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-
-    <font name="helptext" face="Arial">
-      <color>#ffffff</color>
-      <size>15</size>
-      <shadow>1,1</shadow>
-      <bold>no</bold>
-    </font>
-
-    <font name="message" face="Arial">
-      <color>#ffffff</color>
-      <size>16</size>
-      <shadow>1,1</shadow>
-      <bold>yes</bold>
-    </font>
-    
-    <container name="background">
-      <image name="filler" draworder="0" fleximage="no">
-        <filename>mv_selected.png</filename>
-        <position>0,0</position>
-      </image>
-    </container>
-
-    <container name="info">
-      <area>10,10,790,440</area>
-      <textarea name="title" draworder="4" align="hcenter">
-        <area>20,8,760,100</area>
-        <font>leadfnt</font>
-	<multiline>yes</multiline>
-      </textarea>
-      <textarea name="dirlbl" draworder="4" align="left">
-        <area>235, 90,150,35</area>
-        <font>labels</font>
-        <value>Directed by</value>
-      </textarea>
-      <textarea name="director" draworder="4">
-        <area>370,90,350,35</area>
-        <font>labels</font>
-      </textarea>
-      <textarea name="yrlbl" draworder="4">
-        <area>450,364,90,35</area>
-        <font>labels</font>
-        <value>Year</value>
-      </textarea>
-      <textarea name="year" draworder="4">
-        <area>455,393,100,45</area>
-        <font>moviedata</font>
-      </textarea>
-      <textarea name="plot" draworder="4">
-        <area>234,120,533,145</area>
-        <font>plotfnt</font>
-        <multiline>yes</multiline>
-      </textarea>
-      <textarea name="rating" draworder="4">
-        <area>234,280,533,90</area>
-        <font>moviedata</font>
-        <multiline>yes</multiline>
-      </textarea>
-      <textarea name="lenlbl" draworder="4">
-        <area>240,364,150,35</area>
-        <font>labels</font>
-        <value>Runtime</value>
-      </textarea>
-     <textarea name="length" draworder="4">
-        <area>240,393,350,35</area>
-        <font>moviedata</font>
-      </textarea>
-      <textarea name="userratinglbl" draworder="4" align="right">
-        <area>600,364,150,35</area>
-        <font>labels</font>
-        <value>User Rating</value>
-      </textarea>
-      <textarea name="userrating" draworder="4" align="right">
-        <area>550,393,150,35</area>
-        <font>moviedata</font>
-      </textarea>
-      <image name="coverart" draworder="5" fleximage="no">
-        <position>21,116</position>
-        <staticsize>200,308</staticsize>
-      </image>
-    </container>
-
-    <container name="playwait">
-      <area>0,0,800,600</area>
-      <textarea name="ld1" draworder="0">
-        <area>68,140,350,90</area>
-        <font>bigtitle</font>
-        <value>loading...</value>
-      </textarea>
-      <textarea name="title" draworder="0" align="center">
-        <area>0,320,800,60</area>
-        <font>titlefnt</font>
-      </textarea>
-    </container>
-
-    <container name="novideos_info">
-      <textarea name="msg" align="center" draworder="8">
-         <area>0,110,800,70</area>
-         <font>info</font>
-         <value>No Videos Found</value>
-         <multiline>yes</multiline>
-      </textarea>
-    </container>
-
-  </window>
 
 </mythuitheme>
