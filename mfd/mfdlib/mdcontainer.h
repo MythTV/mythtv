@@ -114,6 +114,7 @@ class MetadataContainer
                             bool delta
                         );
     int     bumpPlaylistId(){current_playlist_id++; return current_playlist_id;}
+    void    checkPlaylists();
   
     MFD *parent;
     int unique_identifier;

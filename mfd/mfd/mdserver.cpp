@@ -315,24 +315,27 @@ Metadata* MetadataServer::getMetadataByContainerAndId(int container_id, int meta
         {
             return_value = a_container->getMetadata(metadata_id);
 
-            //
-            //  if this container is not local, check and see if we can
-            //  return something local instead
-            //
-            
-            if(!a_container->isLocal())
+            if(return_value)
             {
-                QString myth_digest = return_value->getMythDigest();
-                if(myth_digest.length() > 0)
+                //
+                //  if this container is not local, check and see if we can
+                //  return something local instead
+                //
+            
+                if(!a_container->isLocal())
                 {
-                    Metadata *alternative = local_mythdigest_dictionary->find(myth_digest);
-                    if(alternative)
+                    QString myth_digest = return_value->getMythDigest();
+                    if(myth_digest.length() > 0)
                     {
-                        return_value = alternative;
+                        Metadata *alternative = local_mythdigest_dictionary->find(myth_digest);
+                        if(alternative)
+                        {
+                            return_value = alternative;
+                        }
                     }
                 }
-            }
-            break; 
+                break; 
+            } 
         }
     }
     

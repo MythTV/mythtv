@@ -308,6 +308,42 @@ void Playlist::addToList(int an_id)
     song_references.push_back(an_id);
 }
 
+bool Playlist::removeFromList(int an_id)
+{
+    int how_many = song_references.remove(an_id);
+    if(how_many == 1)
+    {
+        return true;
+    }
+    if(how_many == 0)
+    {
+        return false;
+    }
+    cerr << "metadata.o: playlist had more than 1 reference to same track"
+         << endl;
+    return true;
+}
+
+void Playlist::checkAgainstMetadata(QIntDict<Metadata> *the_metadata)
+{
+    //
+    //  Make sure all my song references actually point to something
+    //   
+    
+    QValueList<int>::iterator it;
+    for ( it = song_references.begin(); it != song_references.end(); )
+    {
+        if(!the_metadata->find((*it)))
+        {
+            it = song_references.remove(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+}
+
 uint Playlist::getUniversalId()
 {
     return ((collection_id * METADATA_UNIVERSAL_ID_DIVIDER) + id );

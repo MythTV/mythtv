@@ -57,12 +57,14 @@ class Database
     void    parseDeletedContainers(TagInput &dmap_data, int new_generation);
 
     void    doDatabasePlaylistResponse(TagInput &dmap_data, int which_playlist, int new_generation);
-    void    parsePlaylist(TagInput &dmap_data, int how_many, Playlist *which_playlist);
+    void    parsePlaylist(TagInput &dmap_data, int how_many, Playlist *which_playlist, int update_type);
+    void    parsePlaylistItemDeletions(TagInput &dmap_data, Playlist *which_playlist, int update_type);
 
     void    doTheMetadataSwap(int new_generation);
     
     int     getKnownGeneration(){return generation_delta;}
     void    beIgnorant();
+    void    checkUpdate(u8 update_type, bool set_type=false);
     void    checkUpdateType(int new_numb_items, int new_received_numb_items);
          
   private:   
@@ -88,17 +90,17 @@ class Database
     QString host_address;
     int host_port;
 
-    QIntDict<Metadata>  *new_metadata;
-    QIntDict<Playlist>  *new_playlists;
-
-    QValueList<int>     metadata_additions;
-    QValueList<int>     metadata_deletions;
+    QIntDict<Metadata>      *new_metadata;
+    QIntDict<Playlist>      *new_playlists;
     
-    QValueList<int>     playlist_additions;
-    QValueList<int>     playlist_deletions;
+    QValueList<int>         metadata_additions;
+    QValueList<int>         metadata_deletions;
+    
+    QValueList<int>         playlist_additions;
+    QValueList<int>         playlist_deletions;
 
-    QValueList<int>     previous_metadata;
-    QValueList<int>     previous_playlists;
+    QValueList<int>         previous_metadata;
+    QValueList<int>         previous_playlists;
 
     int     generation_delta;
     bool    full_data_update;

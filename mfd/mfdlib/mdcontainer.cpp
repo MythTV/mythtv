@@ -178,8 +178,8 @@ void MetadataContainer::dataSwap(
     
         playlist_additions = playlist_in;
         playlist_deletions = playlist_out;
+        checkPlaylists();
     }
-
     ++generation;
 }
 
@@ -279,6 +279,7 @@ void MetadataContainer::dataDelta(
         playlist_additions = playlist_in;
         playlist_deletions = playlist_out;
 
+        checkPlaylists();
     }
     
     ++generation;
@@ -380,6 +381,22 @@ void MetadataContainer::mapPlaylists(
 
     playlist_additions = playlist_in;
     playlist_deletions = playlist_out;
+}
+
+void MetadataContainer::checkPlaylists()
+{
+    //
+    //  Go through all the playlists, and make sure they actually point at
+    //  something
+    //
+
+    QIntDictIterator<Playlist> play_it( *current_playlists );
+    for ( ; play_it.current(); ++play_it )
+    {
+        play_it.current()->checkAgainstMetadata(current_metadata);
+    }
+                                                                
+
 }
 
 MetadataContainer::~MetadataContainer()

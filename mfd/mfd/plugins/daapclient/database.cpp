@@ -142,10 +142,12 @@ void Database::doDatabaseItemsResponse(TagInput& dmap_data)
             case 'muty':
             
                 //
-                //  update type ... only ever seen 0 here ... dunno ?
+                //  0 - full update
+                //  1 - delta
                 //
                 
                 dmap_data >> a_u8_variable;
+                checkUpdate(a_u8_variable, true);
                 break;
                 
             case 'mtco':
@@ -219,28 +221,64 @@ void Database::checkUpdateType(int new_numb_items, int new_received_numb_items)
 
     if(new_numb_items == new_received_numb_items)
     {
-        //
-        //  We're getting all data from the daap server, not a partial
-        //  update
-        //
-        log("receiving a complete data update from daap server", 9);
-        full_data_update = true;
-        metadata_additions.clear();
-        metadata_deletions.clear();
-        playlist_additions.clear();
-        playlist_deletions.clear();
+        if(!full_data_update)
+        {
+            warning("getting all items in delta update mode");
+        }
     }
     else
     {
-        log("receiving a partial (delta) update from daap server", 9);
-        full_data_update = false;
-        metadata_additions.clear();
-        metadata_deletions.clear();
-        playlist_additions.clear();
-        playlist_deletions.clear();
+        if(full_data_update)
+        {
+            warning("getting partial items in full update mode");
+        }
     }
-    
+}    
 
+void Database::checkUpdate(u8 update_type, bool set_type)
+{
+    if(set_type)
+    {
+        if(update_type == 0)
+        {
+            //
+            //  Full update
+            //
+
+            log("receiving a complete data update from daap server", 9);
+            full_data_update = true;
+            metadata_additions.clear();
+            metadata_deletions.clear();
+            playlist_additions.clear();
+            playlist_deletions.clear();
+        }
+        else if(update_type == 1)
+        {
+            log("receiving a partial (delta) update from daap server", 9);
+            full_data_update = false;
+            metadata_additions.clear();
+            metadata_deletions.clear();
+            playlist_additions.clear();
+            playlist_deletions.clear();
+        }
+        else
+        {
+            warning("unknown update type");
+        }
+    }
+    else
+    {
+        if(update_type == 0 && ! full_data_update)
+        {
+            warning("I thought we were supposed to be getting "
+                    "a partial update");
+        }
+        if(update_type == 1 && full_data_update)
+        {
+            warning("I thought we were supposed to be getting "
+                    "a full update");
+        }
+    }
 }    
 
 void Database::parseItems(TagInput& dmap_data, int how_many_now)
@@ -849,10 +887,13 @@ void Database::doDatabaseListPlaylistsResponse(TagInput &dmap_data, int new_gene
             case 'muty':
             
                 //
-                //  update type ... only ever seen 0 here ... dunno ?
+                //  Update type
+                //  0 = full
+                //  1 = partial
                 //
                 
                 dmap_data >> a_u8_variable;
+                checkUpdate(a_u8_variable, true);
                 break;
                 
             case 'mtco':
@@ -1135,6 +1176,7 @@ void Database::doDatabasePlaylistResponse(TagInput &dmap_data, int which_playlis
     bool list_status = false;
     int  numb_list_items = 0;
     int  numb_received_list_items;
+    int  update_type = -1;
 
     while(!dmap_data.isFinished())
     {
@@ -1169,10 +1211,12 @@ void Database::doDatabasePlaylistResponse(TagInput &dmap_data, int which_playlis
             case 'muty':
             
                 //
-                //  update type ... only ever seen 0 here ... dunno ?
+                //  0 - full update
+                //  1 - partial update
                 //
                 
                 dmap_data >> a_u8_variable;
+                update_type = (int) a_u8_variable;
                 break;
                 
             case 'mtco':
@@ -1204,9 +1248,23 @@ void Database::doDatabasePlaylistResponse(TagInput &dmap_data, int which_playlis
                 dmap_data >> a_chunk;
                 {
                     TagInput re_rebuilt_internal(a_chunk);
-                    parsePlaylist(re_rebuilt_internal, numb_received_list_items, the_playlist);
+                    parsePlaylist(re_rebuilt_internal, numb_received_list_items, the_playlist, update_type);
                 }
                 break;
+                
+            case 'mudl':
+            
+                //
+                //  list of individual items removed from a playlist (delta)
+                //
+
+                dmap_data >> a_chunk;
+                {
+                    TagInput re_rebuilt_internal(a_chunk);
+                    parsePlaylistItemDeletions(re_rebuilt_internal, the_playlist, update_type);
+                }
+                break;
+                
 
             default:
                 warning("got an unknown tag type "
@@ -1249,8 +1307,33 @@ void Database::doDatabasePlaylistResponse(TagInput &dmap_data, int which_playlis
     
 }
 
-void Database::parsePlaylist(TagInput &dmap_data, int how_many, Playlist *which_playlist)
+void Database::parsePlaylist(TagInput &dmap_data, int how_many, Playlist *which_playlist, int update_type)
 {
+    if(update_type == 1)
+    {
+        //
+        //  This happens occassionaly and under mysterious circumstances
+        //  from iTunes. It's sending us a list of songs, but assumes they
+        //  are in addition to what is already on the playlist. That means
+        //  we have to prefill the playlist with what was on there before.
+        //
+        
+        metadata_server->lockMetadata();
+            Playlist *existing_playlist = metadata_server->getPlaylistByContainerAndId(container_id, which_playlist->getId());
+            if(existing_playlist)
+            {
+                QValueList<int> existing_tracks = existing_playlist->getList();
+                QValueList<int>::iterator it;
+                for(it = existing_tracks.begin(); it != existing_tracks.end(); ++it)
+                {
+                    which_playlist->addToList((*it));
+                }
+            }
+        metadata_server->unlockMetadata();
+        
+        
+    }
+    
     Tag a_tag;
 
     u8  a_u8_variable;
@@ -1348,6 +1431,83 @@ void Database::parsePlaylist(TagInput &dmap_data, int how_many, Playlist *which_
             internal_listing >> end;
         }
     }
+}
+
+void Database::parsePlaylistItemDeletions(TagInput &dmap_data, Playlist *which_playlist, int update_type)
+{
+
+    if(update_type != 1)
+    {
+        warning("deleting from a non delta update make no sense");
+    }
+
+
+    //
+    //  If it's got no items, we need to refill it from copy in mdserver copy
+    //
+
+    if(which_playlist->getCount() < 1)
+    {
+        metadata_server->lockMetadata();
+            Playlist *existing_playlist = metadata_server->getPlaylistByContainerAndId(container_id, which_playlist->getId());
+            if(existing_playlist)
+            {
+                QValueList<int> existing_tracks = existing_playlist->getList();
+                QValueList<int>::iterator it;
+                for(it = existing_tracks.begin(); it != existing_tracks.end(); ++it)
+                {
+                    which_playlist->addToList((*it));
+                }
+            }
+            else
+            {
+                warning("you want deletions from something that doesn't exist");
+                metadata_server->unlockMetadata();
+                return;
+            }
+    metadata_server->unlockMetadata();
+        
+        
+    }
+
+
+    while(!dmap_data.isFinished())
+    {
+    
+        u32 a_u32_variable;
+
+        Tag a_tag;
+        Chunk emergency_throwaway_chunk;
+        dmap_data >> a_tag;
+        
+        switch(a_tag.type)
+        {
+            //
+            //  Just store a list of deletions
+            //
+
+            case 'miid':
+                
+                    //
+                    //  item id, the thing that has been deleted
+                    //
+
+                    dmap_data >> a_u32_variable;
+                    if(!which_playlist->removeFromList(a_u32_variable))
+                    {
+                        warning("tried to delete an item from a "
+                                "playlist that did not contain the item");
+                    }
+                    break;
+
+            default:
+                    
+                warning("unknown tag while parsing playlist item deletion");
+                dmap_data >> emergency_throwaway_chunk;
+        }
+        dmap_data >> end;
+    }
+
 }
 
 void Database::doTheMetadataSwap(int new_generation)
@@ -1613,6 +1773,5 @@ Database::~Database()
         delete new_playlists;
         new_playlists = NULL;
     }
-
 }
 

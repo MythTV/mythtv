@@ -250,7 +250,7 @@ class Playlist
   public:
   
     Playlist(int l_collection_id, QString new_name, QString raw_songlist, uint new_id);
-    ~Playlist();
+    virtual ~Playlist();
 
     uint             getId(){return id;}
     int              getDbId(){return db_id;}
@@ -264,6 +264,7 @@ class Playlist
     QValueList<int>* getListPtr(){return &song_references;}
     QValueList<int>* getDbList(){return &db_references;}
     void             addToList(int an_id);
+    bool             removeFromList(int an_id);
 
     void             mapDatabaseToId(
                                         QIntDict<Metadata> *the_metadata, 
@@ -278,7 +279,8 @@ class Playlist
     void             internalChange(bool uh_huh_or_nope_not_me){internal_change = uh_huh_or_nope_not_me;}
     bool             waitingForList(){ return waiting_for_list; }
     void             waitingForList(bool uh_huh_or_nope_not_me){waiting_for_list = uh_huh_or_nope_not_me;}
-    
+    void             checkAgainstMetadata(QIntDict<Metadata> *the_metadata);
+
   private:
   
     QString          name;
