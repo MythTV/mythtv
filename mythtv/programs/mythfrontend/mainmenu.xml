@@ -96,6 +96,13 @@
    </button>
 
    <button>
+     <type>NEWS</type>
+     <text>News Feeds</text>
+     <action>PLUGIN mythnews</action>
+     <depends>mythnews</depends>
+   </button>
+
+   <button>
      <type>SETUP</type>
      <text>Setup</text>
      <text lang="IT">Impostazioni</text>

@@ -148,4 +148,9 @@
     <offset>10,25</offset>
   </buttondef>
 
+  <buttondef name="NEWS">
+    <image>news.png</image>
+    <offset>14,22</offset>
+  </buttondef>
+
 </myththeme>

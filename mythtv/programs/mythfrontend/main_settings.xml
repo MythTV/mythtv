@@ -123,6 +123,13 @@
    </button>
 
    <button>
+     <type>NEWS</type>
+     <text>News Settings</text>
+     <action>CONFIGPLUGIN mythnews</action>
+     <depends>mythnews</depends>
+   </button>
+
+   <button>
      <type>SETUP</type>
      <text>Xbox</text>
      <text lang="PT">Configurar XBox</text>
