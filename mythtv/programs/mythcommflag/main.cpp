@@ -18,6 +18,7 @@
 #include "libmythtv/commercial_skip.h"
 #include "libmythtv/NuppelVideoPlayer.h"
 #include "libmythtv/programinfo.h"
+#include "libmyth/mythdbcon.h"
 
 using namespace std;
 
@@ -219,7 +220,19 @@ void FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
 
     RingBuffer *tmprbuf = new RingBuffer(filename, false);
 
-    NuppelVideoPlayer *nvp = new NuppelVideoPlayer(db, program_info);
+    QString name = QString("commflag%1%2").arg(getpid()).arg(rand());
+
+    MythSqlDatabase *mdb = new MythSqlDatabase(name);
+
+    if (!mdb || !mdb->isOpen())
+    {
+        cerr << "Unable to open commflag db connection\n";
+        delete tmprbuf;
+        delete program_info;
+        return;
+    }
+    
+    NuppelVideoPlayer *nvp = new NuppelVideoPlayer(mdb, program_info);
     nvp->SetRingBuffer(tmprbuf);
 
     int comms_found = nvp->FlagCommercials(show_percentage, full_speed);
@@ -230,6 +243,7 @@ void FlagCommercials(QSqlDatabase *db, QString chanid, QString starttime)
     delete nvp;
     delete tmprbuf;
     delete program_info;
+    delete mdb;
 }
 
 int main(int argc, char *argv[])
