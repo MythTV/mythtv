@@ -102,7 +102,7 @@ enum DeinterlaceMode {
   DEINTERLACE_LAST
 };
 
-char *deinterlacer_names[] =
+const char *deinterlacer_names[] =
 { "None",
   "Field Bob",
   "Line Doubler",
