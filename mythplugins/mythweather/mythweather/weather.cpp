@@ -100,7 +100,7 @@ Weather::Weather(MythContext *context,
     status_Timer = new QTimer(this);
     connect(status_Timer, SIGNAL(timeout()), SLOT(status_timeout()) );
 
-    QAccel *accel = new QAccel(this);
+    accel = new QAccel(this);
     accel->connectItem(accel->insertItem(Key_Left), this, SLOT(cursorLeft()));
     accel->connectItem(accel->insertItem(Key_Right), this, SLOT(cursorRight()));
     accel->connectItem(accel->insertItem(Key_Space), this, SLOT(holdPage()));
@@ -1297,7 +1297,9 @@ void Weather::Show()
 
 void Weather::UpdateData()
 {
+	accel->setEnabled(false);
 	GetWeatherData();
+	accel->setEnabled(true);
 
 	if (httpData.find("<html>", 0) > 0 || 
 	    httpData.find("Microsoft VBScript runtime", 0) > 0 ||

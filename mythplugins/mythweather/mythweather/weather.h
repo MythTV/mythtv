@@ -73,6 +73,8 @@ private slots:
 
 
   private:
+    QAccel *accel;
+
     bool readReadme;
     bool convertData;
     int updateInterval;
