@@ -105,12 +105,6 @@ int mythplugin_init(const char *libversion)
 
 void runGames(void)
 {
-    QTranslator translator( 0 );
-    translator.load(gContext->GetTranslationsDir() + QString("mythgame_") +
-                    QString(gContext->GetSetting("Language").lower()) +
-                    QString(".qm"), ".");
-    qApp->installTranslator(&translator);
-
     QSqlDatabase *db = QSqlDatabase::database();
 
     //look for new systems that haven't been added to the database
@@ -143,8 +137,6 @@ void runGames(void)
     GameTree gametree(gContext->GetMainWindow(), db, "gametree", "game-",
                       paths);
     gametree.exec();
-
-    qApp->removeTranslator(&translator);
 }
 
 int mythplugin_run(void)
@@ -155,15 +147,7 @@ int mythplugin_run(void)
 
 int mythplugin_config(void)
 {
-    QTranslator translator( 0 );
-    translator.load(gContext->GetTranslationsDir() + QString("mythgame_") +
-                    QString(gContext->GetSetting("Language").lower()) +
-                    QString(".qm"), ".");
-    qApp->installTranslator(&translator);
-
     runMenu("game_settings.xml");
-
-    qApp->removeTranslator(&translator);
     return 0;
 }
 

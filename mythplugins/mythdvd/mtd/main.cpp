@@ -18,6 +18,7 @@ using namespace std;
 #include <unistd.h>
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/langsettings.h>
 
 #include "../mythdvd/config.h"
 #include "../mythdvd/dbcheck.h"
@@ -144,18 +145,12 @@ int main(int argc, char **argv)
     //  Nice ourself
     //
    
-    QTranslator translator( 0 );
-    translator.load(gContext->GetTranslationsDir() + QString("mythdvd_") +
-                    QString(gContext->GetSetting("Language").lower()) +
-                    QString(".qm"), ".");
-    qApp->installTranslator(&translator); 
+    LanguageSettings::load("mythdvd");
     
     new MTD(db, assigned_port, log_stdout);
     
     a.exec();
                                 
-    qApp->removeTranslator(&translator);
-
     delete db;
     delete gContext;
     return 0;

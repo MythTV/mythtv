@@ -279,7 +279,6 @@ struct MusicData
     QString startdir;
     PlaylistsContainer *all_playlists;
     AllMusic *all_music;
-    QTranslator *trans;
 };
 
 void MusicCallback(void *data, QString &selection)
@@ -419,12 +418,6 @@ int mythplugin_init(const char *libversion)
 
 static void preMusic(MusicData *mdata)
 {
-    mdata->trans = new QTranslator(0);
-    mdata->trans->load(PREFIX + QString("/share/mythtv/i18n/mythmusic_") +
-                       QString(gContext->GetSetting("Language").lower()) +
-                       QString(".qm"), ".");
-    qApp->installTranslator(mdata->trans);
-
     srand(time(NULL));
 
     CheckFreeDBServerFile();
@@ -489,9 +482,6 @@ static void postMusic(MusicData *mdata)
 
     delete mdata->all_music;
     delete mdata->all_playlists;
-
-    qApp->removeTranslator(mdata->trans);
-    delete mdata->trans;
 }
 
 int mythplugin_run(void)
@@ -507,12 +497,6 @@ int mythplugin_run(void)
 
 int mythplugin_config(void)
 {
-    QTranslator translator( 0 );
-    translator.load(PREFIX + QString("/share/mythtv/i18n/mythmusic_") +
-                    QString(gContext->GetSetting("Language").lower()) +
-                    QString(".qm"), ".");
-    qApp->installTranslator(&translator);
-
     MusicData mdata;
     mdata.paths = gContext->GetSetting("TreeLevels");
     mdata.startdir = gContext->GetSetting("MusicLocation");
@@ -526,8 +510,6 @@ int mythplugin_config(void)
     Decoder::SetLocationFormatUseTags();
 
     runMenu(&mdata, "music_settings.xml");
-
-    qApp->removeTranslator(&translator);
 
     return 0;
 }

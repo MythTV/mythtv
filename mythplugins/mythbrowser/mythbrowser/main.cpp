@@ -20,6 +20,7 @@
 #include "tabview.h"
 
 #include "mythtv/mythcontext.h"
+#include "mythtv/langsettings.h"
 
 
 static const char *version = "v0.31";
@@ -74,11 +75,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    QTranslator translator(0);
-    translator.load(PREFIX + QString("/share/mythtv/i18n/mythbrowser_") +
-                    QString(gContext->GetSetting("Language").lower()) +
-                    QString(".qm"), ".");
-    a.installTranslator(&translator);
+    LanguageSettings::load("mythbrowser");
 
     gContext->SetSetting("Theme", "blue");
     gContext->LoadQtConfig();

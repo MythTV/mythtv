@@ -23,6 +23,7 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdialogs.h>
 #include <mythtv/mythplugin.h>
+#include <mythtv/langsettings.h>
 
 using namespace std;
 
@@ -36,39 +37,24 @@ int mythplugin_init(const char *libversion)
 {
     if (!gContext->TestPopupVersion("mythbookmarks", libversion, MYTH_BINARY_VERSION))
         return -1;
+    LanguageSettings::load("mythbrowser");
     return 0;
 }
 
 int mythplugin_run(void)
 {
-    QTranslator translator(0);
-    translator.load(PREFIX + QString("/share/mythtv/i18n/mythbrowser_") +
-                    QString(gContext->GetSetting("Language").lower()) +
-                    QString(".qm"), ".");
-    qApp->installTranslator(&translator);
-
     Bookmarks bookmarks(QSqlDatabase::database(),
                   gContext->GetMainWindow(), "bookmarks");
     bookmarks.exec();
-
-    qApp->removeTranslator(&translator);
 
     return 0;
 }
 
 int mythplugin_config(void)
 {
-    QTranslator translator(0);
-    translator.load(PREFIX + QString("/share/mythtv/i18n/mythbrowser_") +
-                    QString(gContext->GetSetting("Language").lower()) +
-                    QString(".qm"), ".");
-    qApp->installTranslator(&translator);
-
     BookmarksConfig config(QSqlDatabase::database(),
                           gContext->GetMainWindow(),"bookmarks");
     config.exec();
-
-    qApp->removeTranslator(&translator);
 
     return 0;
 }

@@ -279,34 +279,17 @@ int mythplugin_init(const char *libversion)
 
 int mythplugin_run(void)
 {
-    QTranslator translator( 0 );
-    translator.load(PREFIX + QString("/share/mythtv/i18n/mythphone_") +
-                    QString(gContext->GetSetting("Language").lower()) +
-                    QString(".qm"), ".");
-    qApp->installTranslator(&translator);
-
     PhoneUI();
-
-    qApp->removeTranslator(&translator);
 
     return 0;
 }
 
 int mythplugin_config(void)
 {
-    QTranslator translator( 0 );
-    translator.load(PREFIX + QString("/share/mythtv/i18n/mythphone_") +
-                    QString(gContext->GetSetting("Language").lower()) +
-                    QString(".qm"), ".");
-    qApp->installTranslator(&translator);
-
-
     // Was several options under here; and probably will be again so just comment this out for now
     //runMenu("phone_settings.xml");
     MythPhoneSettings settings;
     settings.exec(QSqlDatabase::database());
-
-    qApp->removeTranslator(&translator);
 
     return 0;
 }

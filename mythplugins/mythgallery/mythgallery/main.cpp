@@ -24,12 +24,6 @@ int mythplugin_config(void);
 
 void runGallery(void)
 {
-    QTranslator translator( 0 );
-    translator.load(gContext->GetTranslationsDir() + QString("mythgallery_") +
-                    QString(gContext->GetSetting("Language").lower()) +
-                    QString(".qm"), ".");
-    qApp->installTranslator(&translator);
-
     QString startdir = gContext->GetSetting("GalleryDir");
     QDir dir(startdir);
     if (!dir.exists() || !dir.isReadable()) {
@@ -44,8 +38,6 @@ void runGallery(void)
                      gContext->GetMainWindow(), "IconView");
         icv.exec();
     }
-    
-    qApp->removeTranslator(&translator);
 }
 
 void setupKeys(void)
@@ -103,16 +95,9 @@ int mythplugin_run(void)
 
 int mythplugin_config(void)
 {
-    QTranslator translator( 0 );
-    translator.load(gContext->GetTranslationsDir() + QString("mythgallery_") +
-                    QString(gContext->GetSetting("Language").lower()) +
-                    QString(".qm"), ".");
-    qApp->installTranslator(&translator);
-
     GallerySettings settings;
     settings.exec(QSqlDatabase::database());
 
-    qApp->removeTranslator(&translator);
     return 0;
 }
 

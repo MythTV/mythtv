@@ -65,17 +65,9 @@ int mythplugin_init(const char *libversion)
 
 void runNews(void)
 {
-    QTranslator translator(0);
-    translator.load(gContext->GetTranslationsDir() + QString("mythnews_") +
-                    QString(gContext->GetSetting("Language").lower()) +
-                    QString(".qm"), ".");
-    qApp->installTranslator(&translator);
-
     MythNews news(QSqlDatabase::database(),
                   gContext->GetMainWindow(), "news");
     news.exec();
-
-    qApp->removeTranslator(&translator);
 }
 
 int mythplugin_run(void)
@@ -86,17 +78,9 @@ int mythplugin_run(void)
 
 int mythplugin_config(void)
 {
-    QTranslator translator(0);
-    translator.load(gContext->GetTranslationsDir() + QString("mythnews_") +
-                    QString(gContext->GetSetting("Language").lower()) +
-                    QString(".qm"), ".");
-    qApp->installTranslator(&translator);
-
     MythNewsConfig config(QSqlDatabase::database(),
                           gContext->GetMainWindow(), "news");
     config.exec();
-
-    qApp->removeTranslator(&translator);
 
     return 0;
 }

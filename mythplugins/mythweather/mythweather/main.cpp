@@ -52,18 +52,9 @@ void runWeather(void)
 {
     int appCode = 0;
 
-    QTranslator translator(0);
-    translator.load(gContext->GetTranslationsDir() + QString("mythweather_") +
-                    QString(gContext->GetSetting("Language").lower()) +
-                    QString(".qm"), ".");
-
-    qApp->installTranslator(&translator);
-
     Weather weatherDat(QSqlDatabase::database(), appCode, 
                        gContext->GetMainWindow(), "weather");
     weatherDat.exec();
-
-    qApp->removeTranslator(&translator);
 }
 
 int mythplugin_run(void)
@@ -76,18 +67,9 @@ int mythplugin_config(void)
 {
     int appCode = 2;
 
-    QTranslator translator(0);
-    translator.load(gContext->GetTranslationsDir() + QString("mythweather_") +
-                    QString(gContext->GetSetting("Language").lower()) +
-                    QString(".qm"), ".");
-
-    qApp->installTranslator(&translator);
-
     Weather weatherDat(QSqlDatabase::database(), appCode,
                        gContext->GetMainWindow(), "weather");
     weatherDat.exec();
-
-    qApp->removeTranslator(&translator);
 
     return 0;
 }

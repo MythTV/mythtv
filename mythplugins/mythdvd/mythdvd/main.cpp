@@ -41,12 +41,6 @@ using namespace std;
 #ifdef TRANSCODE_SUPPORT
 void startDVDRipper(void)
 {
-    QTranslator translator( 0 );
-    translator.load(gContext->GetTranslationsDir() + QString("mythdvd_") +
-                    QString(gContext->GetSetting("Language").lower()) +
-                    QString(".qm"), ".");
-    qApp->installTranslator(&translator);
-
     DVDRipBox *drb = new DVDRipBox(QSqlDatabase::database(), 
                                    gContext->GetMainWindow(),
                                    "dvd_rip", "dvd-"); 
@@ -57,8 +51,6 @@ void startDVDRipper(void)
     qApp->processEvents();
 
     delete drb;
-
-    qApp->removeTranslator(&translator);
 }
 #endif
 
@@ -68,12 +60,6 @@ void startDVDRipper(void)
 #ifdef VCD_SUPPORT
 void playVCD()
 {
-    QTranslator translator( 0 );
-    translator.load(gContext->GetTranslationsDir() + QString("mythdvd_") +
-                    QString(gContext->GetSetting("Language").lower()) +
-                    QString(".qm"), ".");
-    qApp->installTranslator(&translator);
-
     //
     //  Get the command string to play a VCD
     //
@@ -90,7 +76,6 @@ void playVCD()
         no_player_dialog->exec();
         
         delete no_player_dialog;
-        qApp->removeTranslator(&translator);
         return;
     }
     else
@@ -112,7 +97,6 @@ void playVCD()
                 no_device_dialog->exec();
                 
                 delete no_device_dialog;
-                qApp->removeTranslator(&translator);
                 return;
             }
             else
@@ -125,19 +109,11 @@ void playVCD()
         gContext->GetMainWindow()->setActiveWindow();
         gContext->GetMainWindow()->currentWidget()->setFocus();
     }
-
-    qApp->removeTranslator(&translator); 
 }
 #endif
 
 void playDVD(void)
 {
-    QTranslator translator( 0 );
-    translator.load(gContext->GetTranslationsDir() + QString("mythdvd_") +
-                    QString(gContext->GetSetting("Language").lower()) +
-                    QString(".qm"), ".");
-    qApp->installTranslator(&translator);
-
     //
     //  Get the command string to play a DVD
     //
@@ -155,7 +131,6 @@ void playDVD(void)
         no_player_dialog->exec();
         
         delete no_player_dialog;
-        qApp->removeTranslator(&translator);
         return;
     }
     else
@@ -177,7 +152,6 @@ void playDVD(void)
                 no_device_dialog->exec();
         
                 delete no_device_dialog;
-                qApp->removeTranslator(&translator);
                 return;
             }
             else
@@ -191,8 +165,6 @@ void playDVD(void)
         gContext->GetMainWindow()->currentWidget()->setFocus();
         
     }
-
-    qApp->removeTranslator(&translator);
 }
 
 void DVDCallback(void *data, QString &selection)
@@ -350,30 +322,14 @@ int mythplugin_init(const char *libversion)
 
 int mythplugin_run(void)
 {
-    QTranslator translator( 0 );
-    translator.load(gContext->GetTranslationsDir() + QString("mythdvd_") +
-                    QString(gContext->GetSetting("Language").lower()) +
-                    QString(".qm"), ".");
-    qApp->installTranslator(&translator);
-
     runMenu("dvdmenu.xml");
-
-    qApp->removeTranslator(&translator);
 
     return 0;
 }
 
 int mythplugin_config(void)
 {
-    QTranslator translator( 0 );
-    translator.load(gContext->GetTranslationsDir() + QString("mythdvd_") +
-                    QString(gContext->GetSetting("Language").lower()) +
-                    QString(".qm"), ".");
-    qApp->installTranslator(&translator);
-
     runMenu("dvd_settings.xml");
-
-    qApp->removeTranslator(&translator);
 
     return 0;
 }
