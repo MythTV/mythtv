@@ -134,7 +134,11 @@ bool UpgradeTVDatabaseSchema(void)
 
     bool ret = doUpgradeTVDatabaseSchema();
 
-    VERBOSE(VB_IMPORTANT, "Database Schema upgrade complete, unlocking.");
+    if (ret)
+        VERBOSE(VB_IMPORTANT, "Database Schema upgrade complete, unlocking.");
+    else
+        VERBOSE(VB_IMPORTANT, "Database Schema upgrade FAILED, unlocking.");
+
     lockquery.prepare("UNLOCK TABLES;");
     lockquery.exec();
 
@@ -1480,14 +1484,15 @@ bool InitializeDatabase(void)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SHOW TABLES;");
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    // check for > 1 table here since the schemalock table should exist
+    if (query.exec() && query.isActive() && query.size() > 1)
     {
         QString msg = QString(
             "Told to create a NEW database schema, but the database\n"
             "already has %1 tables.\n"
             "If you are sure this is a good mythtv database, verify\n"
             "that the settings table has the DBSchemaVer variable.\n")
-            .arg(query.size());
+            .arg(query.size() - 1);
         VERBOSE(VB_ALL, msg);
         return false;   
     }
