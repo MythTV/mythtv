@@ -662,7 +662,7 @@ void AudioPlugin::stopAudio()
         //  wake them up 
         //
     
-        if (decoder)
+        if(decoder)
         {
             decoder->mutex()->lock();
                 decoder->cond()->wakeAll();
@@ -807,7 +807,15 @@ void AudioPlugin::handleInternalMessage(QString the_message)
     
     if (the_message == "decoder error")
     {
-        //  Don't do anything about this at the moment
+        //
+        //  Stop the audio and null the decoder
+        //
+
+        stopAudio();
+        if(decoder)
+        {
+            decoder = NULL;
+        }
     }
     if (the_message == "decoder stop")
     {
