@@ -67,16 +67,7 @@ class Weather : public MythDialog
     void setupPage();
     void convertFlip();
     void resetLocale();
-    void newLocale0();
-    void newLocale1();
-    void newLocale2();
-    void newLocale3();
-    void newLocale4();
-    void newLocale5();
-    void newLocale6();
-    void newLocale7();
-    void newLocale8();
-    void newLocale9();
+    void newLocaleX(int);
     void radarImgDone(QNetworkOperation *);
 
   protected:

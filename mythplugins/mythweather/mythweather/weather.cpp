@@ -211,16 +211,16 @@ void Weather::keyPressEvent(QKeyEvent *e)
         case Key_M: convertFlip(); break;
         case Key_I: setupPage(); break;
 
-        case Key_0: newLocale0(); break;
-        case Key_1: newLocale1(); break;
-        case Key_2: newLocale2(); break;
-        case Key_3: newLocale3(); break;
-        case Key_4: newLocale4(); break;
-        case Key_5: newLocale5(); break;
-        case Key_6: newLocale6(); break;
-        case Key_7: newLocale7(); break;
-        case Key_8: newLocale8(); break;
-        case Key_9: newLocale9(); break;
+        case Key_0: newLocaleX(0); break;
+        case Key_1: newLocaleX(1); break;
+        case Key_2: newLocaleX(2); break;
+        case Key_3: newLocaleX(3); break;
+        case Key_4: newLocaleX(4); break;
+        case Key_5: newLocaleX(5); break;
+        case Key_6: newLocaleX(6); break;
+        case Key_7: newLocaleX(7); break;
+        case Key_8: newLocaleX(8); break;
+        case Key_9: newLocaleX(9); break;
  
         default: MythDialog::keyPressEvent(e); break;
     }
@@ -830,230 +830,55 @@ void Weather::showtime_timeout()
 
 }
 
-void Weather::newLocale0()
-{
-    if (inSetup == false)
-    {
-	newLocaleHold = newLocaleHold + "0";
-        LayerSet *container = theme->GetSet("newlocation");
-        if (container)
-        {
-            UITextType *type = (UITextType *)container->GetType("locationhold");
-            if (type)
-                type->SetText(newLocaleHold);
-        }
-	if (newLocaleHold.length() == 5)
-	{
-		locale = newLocaleHold; 
-		newLocaleHold = "";
-                update(newlocRect);
-		update_timeout();	
-	}
-        update(newlocRect);
-    }
-}
-
-void Weather::newLocale1()
+void Weather::newLocaleX(int newDigit)
 {
     if (inSetup == true && deepSetup == true && curConfig == 2 && gotLetter == true)
     {
 	changeLoc = true;
-        curCity = curCity - 25;
+
+        switch (newDigit)
+    {
+            case 0: break;
+            case 1: curCity = curCity - 25;           break;
+            case 2: curCity = curCity - 50;           break;
+            case 3: curCity = curCity - 100;          break;
+            case 4: curCity = 0;                      break;
+            case 5: curCity = (int)(lastCityNum / 2); break;
+            case 6: curCity = lastCityNum;            break;
+            case 7: curCity = curCity + 25;           break;
+            case 8: curCity = curCity + 50;           break;
+            case 9: curCity = curCity + 100;          break;
+
+            default: cerr << "MythWeather: Non-digit passed to newLocaleX" << endl; break;
+        }
+
         if (curCity < 0)
-               curCity = 0;
-
-        loadCityData(curCity);
-        showCityName();
-    }
-    else
-    {
-        newLocaleHold = newLocaleHold + "1";
-        LayerSet *container = theme->GetSet("newlocation");
-        if (container)
-        {
-            UITextType *type = (UITextType *)container->GetType("locationhold");
-            if (type)
-                type->SetText(newLocaleHold);
-        }
-        if (newLocaleHold.length() == 5)
-        {
-                locale = newLocaleHold;
-		newLocaleHold = "";
-                update(newlocRect);
-                update_timeout();
-        }
-        update(newlocRect);
-    }
-}
-void Weather::newLocale2()
-{
-    if (inSetup == true && deepSetup == true && curConfig == 2 && gotLetter == true)
-    {
-	changeLoc = true;
-        curCity = curCity - 50;
-        if (curCity < 0)
-               curCity = 0;
-
-        loadCityData(curCity);
-        showCityName();
-    }
-    else
-    {
-        newLocaleHold = newLocaleHold + "2";
-        LayerSet *container = theme->GetSet("newlocation");
-        if (container)
-        {
-            UITextType *type = (UITextType *)container->GetType("locationhold");
-            if (type)
-                type->SetText(newLocaleHold);
-        }
-        if (newLocaleHold.length() == 5)
-        {
-                locale = newLocaleHold;
-		newLocaleHold = "";
-                update(newlocRect);
-                update_timeout();
-        }
-        update(newlocRect);
-    }
-}
-void Weather::newLocale3()
-{
-    if (inSetup == true && deepSetup == true && curConfig == 2 && gotLetter == true)
-    {
-	changeLoc = true;
-        curCity = curCity - 100;
-        if (curCity < 0)
-               curCity = 0;
-
-        loadCityData(curCity);
-        showCityName();
-    }
-    else
-    {
-        newLocaleHold = newLocaleHold + "3";
-        LayerSet *container = theme->GetSet("newlocation");
-        if (container)
-        {
-            UITextType *type = (UITextType *)container->GetType("locationhold");
-            if (type)
-                type->SetText(newLocaleHold);
-        }
-        if (newLocaleHold.length() == 5)
-        {
-                locale = newLocaleHold;
-		newLocaleHold = "";
-                update(newlocRect);
-                update_timeout();
-        }
-        update(newlocRect);
-    }
-}
-void Weather::newLocale4()
-{
-    if (inSetup == true && deepSetup == true && curConfig == 2 && gotLetter == true)
-    {
-	changeLoc = true;
         curCity = 0;
 
-        loadCityData(curCity);
-        showCityName();
-    }
-    else
-    {
-        newLocaleHold = newLocaleHold + "4";
-        LayerSet *container = theme->GetSet("newlocation");
-        if (container)
-        {
-            UITextType *type = (UITextType *)container->GetType("locationhold");
-            if (type)
-                type->SetText(newLocaleHold);
-        }
-        if (newLocaleHold.length() == 5)
-        {
-                locale = newLocaleHold;
-		newLocaleHold = "";
-                update(newlocRect);
-                update_timeout();
-        }
-        update(newlocRect);
-    }
-}
-void Weather::newLocale5()
-{
-    if (inSetup == true && deepSetup == true && curConfig == 2 && gotLetter == true)
-    {
-	changeLoc = true;
-        curCity = (int)(lastCityNum / 2);
-
-        loadCityData(curCity);
-        showCityName();
-    }
-    else
-    {
-        newLocaleHold = newLocaleHold + "5";
-        LayerSet *container = theme->GetSet("newlocation");
-        if (container)
-        {
-            UITextType *type = (UITextType *)container->GetType("locationhold");
-            if (type)
-                type->SetText(newLocaleHold);
-        }
-        if (newLocaleHold.length() == 5)
-        {
-                locale = newLocaleHold;
-		newLocaleHold = "";
-                update(newlocRect);
-                update_timeout();
-        }
-        update(newlocRect);
-    }
-}
-void Weather::newLocale6()
-{
-    if (inSetup == true && deepSetup == true && curConfig == 2 && gotLetter == true)
-    {
-	changeLoc = true;
-        curCity = lastCityNum;
-
-        loadCityData(curCity);
-        showCityName();
-    }
-    else
-    {
-        newLocaleHold = newLocaleHold + "6";
-        LayerSet *container = theme->GetSet("newlocation");
-        if (container)
-        {
-            UITextType *type = (UITextType *)container->GetType("locationhold");
-            if (type)
-                type->SetText(newLocaleHold);
-        }
-        if (newLocaleHold.length() == 5)
-        {
-                locale = newLocaleHold;
-		newLocaleHold = "";
-                update(newlocRect);
-                update_timeout();
-        }
-        update(newlocRect);
-    }
-}
-void Weather::newLocale7()
-{
-    if (inSetup == true && deepSetup == true && curConfig == 2 && gotLetter == true)
-    {
-	changeLoc = true;
-	curCity = curCity + 25;
 	if (curCity > lastCityNum)
                 curCity = lastCityNum;
 
         loadCityData(curCity);
         showCityName();
     }
-    else
+    else if (inSetup == false)
     {
-        newLocaleHold = newLocaleHold + "7";
+        switch (newDigit)
+        {
+            case 0: newLocaleHold = newLocaleHold + "0"; break;
+            case 1: newLocaleHold = newLocaleHold + "1"; break;
+            case 2: newLocaleHold = newLocaleHold + "2"; break;
+            case 3: newLocaleHold = newLocaleHold + "3"; break;
+            case 4: newLocaleHold = newLocaleHold + "4"; break;
+            case 5: newLocaleHold = newLocaleHold + "5"; break;
+            case 6: newLocaleHold = newLocaleHold + "6"; break;
+            case 7: newLocaleHold = newLocaleHold + "7"; break;
+            case 8: newLocaleHold = newLocaleHold + "8"; break;
+            case 9: newLocaleHold = newLocaleHold + "9"; break;
+
+            default: cerr << "MythWeather: Non-digit passed to newLocaleX" << endl; break;
+        } 
+
         LayerSet *container = theme->GetSet("newlocation");
         if (container)
         {
@@ -1071,72 +896,6 @@ void Weather::newLocale7()
         update(newlocRect);
     }
 }
-void Weather::newLocale8()
-{
-    if (inSetup == true && deepSetup == true && curConfig == 2 && gotLetter == true)
-    {
-	changeLoc = true;
-        curCity = curCity + 50;
-	if (curCity > lastCityNum)
-                curCity = lastCityNum;
-
-        loadCityData(curCity);
-        showCityName();
-    }
-    else
-    {
-        newLocaleHold = newLocaleHold + "8";
-        LayerSet *container = theme->GetSet("newlocation");
-        if (container)
-        {
-            UITextType *type = (UITextType *)container->GetType("locationhold");
-            if (type)
-                type->SetText(newLocaleHold);
-        }
-        if (newLocaleHold.length() == 5)
-        {
-                locale = newLocaleHold;
-		newLocaleHold = "";
-                update(newlocRect);
-                update_timeout();
-        }
-        update(newlocRect);
-    }
-}
-
-void Weather::newLocale9()
-{
-    if (inSetup == true && deepSetup == true && curConfig == 2 && gotLetter == true)
-    {
-   	changeLoc = true;
-        curCity = curCity + 100;
-        if (curCity > lastCityNum)
-                curCity = lastCityNum;
-
-       	loadCityData(curCity);
-        showCityName();
-    }
-    else
-    {
-        newLocaleHold = newLocaleHold + "9";
-        LayerSet *container = theme->GetSet("newlocation");
-        if (container)
-        {
-            UITextType *type = (UITextType *)container->GetType("locationhold");
-            if (type)
-                type->SetText(newLocaleHold);
-        }
-        if (newLocaleHold.length() == 5)
-        {
-                locale = newLocaleHold;
-		newLocaleHold = "";
-                update(newlocRect);
-                update_timeout();
-        }
-        update(newlocRect);
-    }
-}
-
 
 void Weather::holdPage()
 {
