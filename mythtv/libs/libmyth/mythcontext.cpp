@@ -136,7 +136,7 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
     do
     {
         VERBOSE(VB_GENERAL, QString("Connecting to backend server: "
-                                    "%1:%2 (try %3 of %4")
+                                    "%1:%2 (try %3 of %4)")
                                     .arg(hostname).arg(port).arg(cnt+1)
                                     .arg(maxConnTry));
 
