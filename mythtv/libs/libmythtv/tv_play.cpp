@@ -805,6 +805,8 @@ void TV::SetupPlayer(void)
     }
 
     QString filters = "";
+    QString chanFilters = "";
+    
     nvp = new NuppelVideoPlayer(m_db, playbackinfo);
     nvp->SetParentWidget(myWindow);
     nvp->SetRingBuffer(prbuffer);
@@ -831,16 +833,34 @@ void TV::SetupPlayer(void)
     if (gContext->GetNumSetting("DefaultCCMode"))
         nvp->ToggleCC(vbimode, 0);
 
-    if (gContext->GetNumSetting("Deinterlace"))
+    if(playbackinfo)
+        chanFilters = playbackinfo->chanOutputFilters;
+    
+    if((chanFilters.length() > 1) && (chanFilters[0] != '+'))
     {
+        filters = chanFilters;
+    }
+    else
+    {
+        if (gContext->GetNumSetting("Deinterlace"))
+        {
+            if (filters.length() > 1)
+                filters += ",";
+            filters += "linearblend";
+        }
+
         if (filters.length() > 1)
             filters += ",";
-        filters += "linearblend";
-    }
 
-    if (filters.length() > 1)
-        filters += ",";
-    filters += gContext->GetSetting("CustomFilters");
+        filters += gContext->GetSetting("CustomFilters");
+
+        if ((filters.length() > 1) && (filters.right(1) != ","))
+            filters += ",";
+
+        filters += chanFilters.mid(1);
+    }
+    
+    VERBOSE(VB_PLAYBACK, QString("Output filters for this recording are: '%1'").arg(filters));
 
     nvp->SetVideoFilters(filters);
 

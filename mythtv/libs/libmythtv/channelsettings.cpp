@@ -143,8 +143,26 @@ public:
     VideoFilters(const ChannelID& id):
         LineEditSetting(), CSetting(id, "videofilters") {
         setLabel(QObject::tr("Video filters"));
+        setHelpText(QObject::tr("Filters to be used when recording "
+                                "from this channel.  Not used with "
+                                "hardware encoding cards."));
+
     };
 };
+
+
+class OutputFilters: public LineEditSetting, public CSetting {
+public:
+    OutputFilters(const ChannelID& id):
+        LineEditSetting(), CSetting(id, "outputfilters") {
+        setLabel(QObject::tr("Playback filters"));
+        setHelpText(QObject::tr("Filters to be used when recordings "
+                                "from this channel are viewed.  "
+                                "Start with a plus to append to the "
+                                "global playback filters."));
+    };
+};
+
 
 class XmltvID: public LineEditSetting, public CSetting {
 public:
@@ -552,6 +570,7 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID& id)
 
     addChild(new Icon(id));
     addChild(new VideoFilters(id));
+    addChild(new OutputFilters(id));
     addChild(new XmltvID(id));
     addChild(new CommFree(id));
 };

@@ -25,6 +25,7 @@ ProgramInfo::ProgramInfo(void)
     chansign = "";
     channame = "";
     chancommfree = 0;
+    chanOutputFilters = "";
 
     pathname = "";
     filesize = 0;
@@ -70,6 +71,8 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
     chansign = other.chansign;
     channame = other.channame;
     chancommfree = other.chancommfree;
+    chanOutputFilters = other.chanOutputFilters;
+    
     pathname = other.pathname;
     filesize = other.filesize;
     hostname = other.hostname;
@@ -120,6 +123,8 @@ ProgramInfo &ProgramInfo::operator=(const ProgramInfo &other)
     chansign = other.chansign;
     channame = other.channame;
     chancommfree = other.chancommfree;
+    chanOutputFilters = other.chanOutputFilters;
+    
     pathname = other.pathname;
     filesize = other.filesize;
     hostname = other.hostname;
@@ -202,6 +207,7 @@ void ProgramInfo::ToStringList(QStringList &list)
     list << QString::number(programflags);
     list << ((recgroup != "") ? recgroup : QString("Default"));
     list << QString::number(chancommfree);
+    list << ((chanOutputFilters != "") ? chanOutputFilters : QString(" "));
 }
 
 void ProgramInfo::FromStringList(QStringList &list, int offset)
@@ -251,6 +257,7 @@ void ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     programflags = (*(it++)).toInt();
     recgroup = *(it++);
     chancommfree = (*(it++)).toInt();
+    chanOutputFilters = *(it++);
 
     if (title == " ")
         title = "";
@@ -276,6 +283,8 @@ void ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
         chansign = "";
     if (recgroup == " ")
         recgroup = QString("Default");
+    if(chanOutputFilters == " ")
+        chanOutputFilters = "";
 }
 
 void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
@@ -308,6 +317,7 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
     progMap["category"] = category;
     progMap["callsign"] = chansign;
     progMap["commfree"] = chancommfree;
+    progMap["outputfilters"] = chanOutputFilters;
     progMap["starttime"] = startts.toString(timeFormat);
     progMap["startdate"] = startts.toString(shortDateFormat);
     progMap["endtime"] = endts.toString(timeFormat);
@@ -381,11 +391,11 @@ void ProgramInfo::GetProgramListByQuery(QSqlDatabase *db,
                                         const QString &where)
 {
     QString thequery;
-
+     
     thequery = QString("SELECT channel.chanid,starttime,endtime,title,"
                        "subtitle,description,category,channel.channum,"
                        "channel.callsign,channel.name,previouslyshown,"
-                       "channel.commfree "
+                       "channel.commfree, channel.outputfilters "
                        "FROM program,channel ")
                        + where;
 
@@ -413,6 +423,7 @@ void ProgramInfo::GetProgramListByQuery(QSqlDatabase *db,
             proginfo->channame = query.value(9).toString();
             proginfo->repeat = query.value(10).toInt();
             proginfo->chancommfree = query.value(11).toInt();
+            proginfo->chanOutputFilters = query.value(12).toString();
 
             proginfo->spread = -1;
 
@@ -424,6 +435,8 @@ void ProgramInfo::GetProgramListByQuery(QSqlDatabase *db,
                 proginfo->description = "";
             if (proginfo->category == QString::null)
                 proginfo->category = "";
+            if (proginfo->chanOutputFilters == QString::null)
+                proginfo->chanOutputFilters = "";    
 
             proglist->append(proginfo);
         }
@@ -454,7 +467,7 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(QSqlDatabase *db,
    
     thequery = QString("SELECT channel.chanid,starttime,endtime,title,subtitle,"
                        "description,category,channel.channum,channel.callsign, "
-                       "channel.name,previouslyshown,channel.commfree "
+                       "channel.name,previouslyshown,channel.commfree,channel.outputfilters "
                        "FROM program,channel "
                        "WHERE program.chanid = %1 AND starttime < %2 AND "
                        "endtime > %3 AND program.chanid = channel.chanid;")
@@ -483,6 +496,8 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(QSqlDatabase *db,
         proginfo->channame = query.value(9).toString();
         proginfo->repeat = query.value(10).toInt();
         proginfo->chancommfree = query.value(11).toInt();
+        proginfo->chanOutputFilters = query.value(12).toString();
+        
         proginfo->spread = -1;
 
         if (proginfo->title == QString::null)
@@ -493,6 +508,8 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(QSqlDatabase *db,
             proginfo->description = "";
         if (proginfo->category == QString::null)
             proginfo->category = "";
+        if (proginfo->chanOutputFilters == QString::null)
+            proginfo->chanOutputFilters = "";
 
         return proginfo;
     }
@@ -525,10 +542,11 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
                                                  const QString &starttime)
 {
     QString thequery;
-   
+    
     thequery = QString("SELECT recorded.chanid,starttime,endtime,title, "
                        "subtitle,description,channel.channum, "
-                       "channel.callsign,channel.name,channel.commfree "
+                       "channel.callsign,channel.name,channel.commfree, "
+                       "channel.outputfilters "
                        "FROM recorded "
                        "LEFT JOIN channel "
                        "ON recorded.chanid = channel.chanid "
@@ -538,6 +556,9 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
 
     QSqlQuery query = db->exec(thequery);
 
+
+    
+    
     if (query.isActive() && query.numRowsAffected() > 0)
     {
         query.next();
@@ -558,6 +579,8 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
         proginfo->chansign = query.value(7).toString();
         proginfo->channame = query.value(8).toString();
         proginfo->chancommfree = query.value(9).toInt();
+        proginfo->chanOutputFilters = query.value(10).toString();
+
         proginfo->spread = -1;
 
         if (proginfo->title == QString::null)
@@ -575,6 +598,9 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
             proginfo->chansign = "";
         if (proginfo->channame == QString::null)
             proginfo->channame = "";
+
+        if (proginfo->chanOutputFilters == QString::null)
+            proginfo->chanOutputFilters = "";
 
         proginfo->programflags = proginfo->getProgramFlags(db);
 
@@ -2143,6 +2169,7 @@ void ProgramInfo::handleNotRecording(QSqlDatabase *db)
     return;
 }
 
+
 PGInfoCon::PGInfoCon()
 {
     init();
@@ -2288,4 +2315,5 @@ ProgramInfo *PGInfoCon::findNearest(const ProgramInfo &pginfo)
     }
     return allData.last();
 }
+
 

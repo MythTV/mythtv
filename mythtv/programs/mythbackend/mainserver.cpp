@@ -630,7 +630,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                "recorded.hostname,channum,name,callsign,commflagged,cutlist,"
                "recorded.autoexpire,editing,bookmark,recorded.category,"
                "recorded.recgroup,record.dupin,record.dupmethod,"
-               "record.recordid "
+               "record.recordid, outputfilters "
                "FROM recorded "
                "LEFT JOIN record ON recorded.recordid = record.recordid "
                "LEFT JOIN channel ON recorded.chanid = channel.chanid "
@@ -640,6 +640,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
         thequery += " DESC";
     thequery += ";";
 
+    VERBOSE(VB_GENERAL, thequery);
+    
     QSqlQuery query = m_db->exec(thequery);
 
     QStringList outputlist;
@@ -668,6 +670,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             proginfo->dupin = RecordingDupInType(query.value(17).toInt());
             proginfo->dupmethod = RecordingDupMethodType(query.value(18).toInt());
             proginfo->recordid = query.value(19).toInt();
+            proginfo->chanOutputFilters = query.value(20).toString();
 
             if (proginfo->hostname.isEmpty() || proginfo->hostname.isNull())
                 proginfo->hostname = gContext->GetHostName();
@@ -678,6 +681,9 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                 proginfo->subtitle = "";
             if (proginfo->description == QString::null)
                 proginfo->description = "";
+
+            if (proginfo->chanOutputFilters == QString::null)
+                proginfo->chanOutputFilters = "";
 
             if (!query.value(7).toString().isNull())
             {
