@@ -45,15 +45,15 @@
     </message>
     <message>
         <source>Advanced Configuration</source>
-        <translation type="unfinished">詳細設定</translation>
+        <translation>詳細設定</translation>
     </message>
     <message>
         <source>Recording Options</source>
-        <translation type="unfinished">録画オプション</translation>
+        <translation>録画オプション</translation>
     </message>
     <message>
         <source>Diseqc</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -237,7 +237,7 @@
     </message>
     <message>
         <source>or</source>
-        <translation type="unfinished"></translation>
+        <translation>または</translation>
     </message>
 </context>
 <context>
@@ -299,7 +299,7 @@
     </message>
     <message>
         <source>Record one showing of this title</source>
-        <translation type="unfinished"></translation>
+        <translation>このタイトルの番組を一つ録画する</translation>
     </message>
 </context>
 <context>
@@ -741,67 +741,67 @@
     </message>
     <message>
         <source>Show group list as recording groups</source>
-        <translation type="unfinished"></translation>
+        <translation>レコーディンググループ事に表示する</translation>
     </message>
     <message>
         <source>Show group list as titles</source>
-        <translation type="unfinished"></translation>
+        <translation>タイトル毎に表示する</translation>
     </message>
     <message>
         <source>Shuffle Play</source>
-        <translation type="unfinished"></translation>
+        <translation>シャッフルプレイ</translation>
     </message>
     <message>
         <source>Playlist options</source>
-        <translation type="unfinished"></translation>
+        <translation>プレイリストオプション</translation>
     </message>
     <message>
         <source>Add this Category/Title Group to Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>このカテゴリー/タイトルをプレイリストに追加する</translation>
     </message>
     <message>
         <source>Add this Recording Group to Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>このレコーディンググループをプレイリストに追加する</translation>
     </message>
     <message>
         <source>Add this recording to Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>この録画をプレイリストに追加する</translation>
     </message>
     <message>
         <source>There are %1 items in the playlist.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1個のアイテムがプレイリストにあります。</translation>
     </message>
     <message>
         <source>There is %1 item in the playlist.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1個のアイテムがプレイリストにあります。</translation>
     </message>
     <message>
         <source>Clear Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>プレイリストをクリアする</translation>
     </message>
     <message>
         <source>Toggle playlist for this Category/Title</source>
-        <translation type="unfinished"></translation>
+        <translation>このカテゴリー/タイトルのプレイリストを交換する</translation>
     </message>
     <message>
         <source>Toggle playlist for this Recording Group</source>
-        <translation type="unfinished"></translation>
+        <translation>このレコーディンググループのプレイリストを交換する</translation>
     </message>
     <message>
         <source>Toggle playlist for this recording</source>
-        <translation type="unfinished"></translation>
+        <translation>この録画のプレイリストを交換する</translation>
     </message>
     <message>
         <source>These actions affect all items in the playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>個の動作はプレイリストの全てのアイテムに影響します</translation>
     </message>
     <message>
         <source>Remove from Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>プレイリストから削除する</translation>
     </message>
     <message>
         <source>Add to Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>プレイリストに追加する</translation>
     </message>
 </context>
 <context>
@@ -1105,10 +1105,18 @@
     </message>
     <message>
         <source>Recording a showing daily</source>
-        <translation type="unfinished"></translation>
+        <translation>毎日録画</translation>
     </message>
     <message>
         <source>Recording a showing weekly</source>
+        <translation>毎週録画</translation>
+    </message>
+    <message>
+        <source>listing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>listings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4007,99 +4015,49 @@ MythTVは終了します。</translation>
         <translation>CMフリー</translation>
     </message>
     <message>
-        <source>S</source>
-        <comment>RecTypeChar</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>T</source>
         <comment>RecTypeChar</comment>
-        <translation>T</translation>
+        <translation type="obsolete">T</translation>
     </message>
     <message>
         <source>W</source>
         <comment>RecTypeChar</comment>
-        <translation>W</translation>
+        <translation type="obsolete">W</translation>
     </message>
     <message>
         <source>C</source>
         <comment>RecTypeChar</comment>
-        <translation>C</translation>
+        <translation type="obsolete">C</translation>
     </message>
     <message>
         <source>A</source>
         <comment>RecTypeChar</comment>
-        <translation>A</translation>
+        <translation type="obsolete">A</translation>
     </message>
     <message>
         <source>F</source>
         <comment>RecTypeChar</comment>
-        <translation>F</translation>
+        <translation type="obsolete">F</translation>
     </message>
     <message>
         <source>O</source>
         <comment>RecTypeChar</comment>
-        <translation>O</translation>
+        <translation type="obsolete">O</translation>
     </message>
     <message>
         <source>D</source>
         <comment>RecStatusChar</comment>
-        <translation>D</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <comment>RecStatusChar</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>R</source>
-        <comment>RecStatusChar</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>X</source>
-        <comment>RecStatusChar</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>P</source>
-        <comment>RecStatusChar</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>E</source>
-        <comment>RecStatusChar</comment>
-        <translation></translation>
+        <translation type="obsolete">D</translation>
     </message>
     <message>
         <source>T</source>
         <comment>RecStatusChar</comment>
-        <translation>T</translation>
-    </message>
-    <message>
-        <source>N</source>
-        <comment>RecStatusChar</comment>
-        <translation></translation>
+        <translation type="obsolete">T</translation>
     </message>
     <message>
         <source>C</source>
         <comment>RecStatusChar</comment>
-        <translation>C</translation>
-    </message>
-    <message>
-        <source>L</source>
-        <comment>RecStatusChar</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>K</source>
-        <comment>RecStatusChar</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>B</source>
-        <comment>RecStatusChar</comment>
-        <translation></translation>
+        <translation type="obsolete">C</translation>
     </message>
     <message>
         <source>Startup command</source>
@@ -4153,11 +4111,6 @@ MythTVは終了します。</translation>
     <message>
         <source>stars</source>
         <translation>俳優</translation>
-    </message>
-    <message>
-        <source>r</source>
-        <comment>RecStatusChar</comment>
-        <translation></translation>
     </message>
     <message>
         <source>this episode is a repeat.</source>
@@ -4379,7 +4332,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>How often the AutoExpire process checks for free disk space.</source>
-        <translation type="unfinished"></translation>
+        <translation>自動削除プロセスがディスク空き容量をチェックする間隔。</translation>
     </message>
     <message>
         <source>When enabled, any newly recorded programs will be marked as eligible for Auto-Expiration. Existing recordings will keep their current value.</source>
@@ -4503,7 +4456,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Switch X Window video modes for TV. Requires &quot;xrandr&quot; support.</source>
-        <translation type="unfinished"></translation>
+        <translation>X WindowのビデオモードをTVのとき切替える。&quot;xrandr&quot;のサポートが必要です。</translation>
     </message>
     <message>
         <source>Horizontal resolution for GUI video mode. This mode must be defined in your X configuration file.</source>
@@ -5503,7 +5456,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Use custom identifier for frontend preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>フロントエンドの設定にカスタムIDを使用する</translation>
     </message>
     <message>
         <source>Wake-On-LAN settings</source>
@@ -5619,7 +5572,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Use Altivec-enhanced color space conversion</source>
-        <translation type="unfinished"></translation>
+        <translation>Altivec-enhancedカラースペース変換を使用</translation>
     </message>
     <message>
         <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec-enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
@@ -5643,7 +5596,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Scan for channels(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネルをスキャン</translation>
     </message>
     <message>
         <source>This button will scan for digital channels.</source>
@@ -5651,15 +5604,15 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation>アドバンスド</translation>
     </message>
     <message>
         <source>Advanced editing options for digital channels</source>
-        <translation type="unfinished"></translation>
+        <translation>デジタルチャンネルのアドバンスドオプション</translation>
     </message>
     <message>
         <source>Use on air guide</source>
-        <translation type="unfinished"></translation>
+        <translation>エアガイドを使用する</translation>
     </message>
     <message>
         <source>If set the guide information will be taken from the On Air Channel guide.</source>
@@ -5667,53 +5620,43 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Unable to initialize video.</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオを初期化できません。</translation>
     </message>
     <message>
         <source>Error was encountered while displaying video.</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオを表示中にエラーが発生しました。</translation>
     </message>
     <message>
         <source>Return to Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>メニューに戻る</translation>
     </message>
     <message>
         <source>Searching for Logo</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>d</source>
-        <comment>RecTypeChar</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>w</source>
-        <comment>RecTypeChar</comment>
-        <translation type="unfinished"></translation>
+        <translation>ロゴを検索</translation>
     </message>
     <message>
         <source>Single Record</source>
-        <translation type="unfinished"></translation>
+        <translation>シングル録画</translation>
     </message>
     <message>
         <source>Record Daily</source>
-        <translation type="unfinished"></translation>
+        <translation>毎日録画</translation>
     </message>
     <message>
         <source>Record Weekly</source>
-        <translation type="unfinished"></translation>
+        <translation>毎週録画</translation>
     </message>
     <message>
         <source>Channel Record</source>
-        <translation type="unfinished"></translation>
+        <translation>チャンネル録画</translation>
     </message>
     <message>
         <source>Record All</source>
-        <translation type="unfinished"></translation>
+        <translation>全て録画</translation>
     </message>
     <message>
         <source>Find One</source>
-        <translation type="unfinished"></translation>
+        <translation>最初の一つ</translation>
     </message>
     <message>
         <source>Find Daily</source>
@@ -5724,29 +5667,24 @@ MythTVは終了します。</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>x</source>
-        <comment>RecStatusChar</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Previously Recorded</source>
-        <translation type="unfinished">以前の録画</translation>
+        <translation>以前の録画</translation>
     </message>
     <message>
         <source>Currently Recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>最新の録画</translation>
     </message>
     <message>
         <source>Inactive</source>
-        <translation type="unfinished"></translation>
+        <translation>無効</translation>
     </message>
     <message>
         <source>this recording schedule is inactive.</source>
-        <translation type="unfinished"></translation>
+        <translation>この予約は録画されません。</translation>
     </message>
     <message>
         <source>Find ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ID検索</translation>
     </message>
     <message>
         <source>[Common] Frequency (Option has no default)
@@ -5760,59 +5698,59 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>6 MHz</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>7 MHz</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>8 MHz</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Transport</source>
-        <translation type="unfinished"></translation>
+        <translation>トランスポート</translation>
     </message>
     <message>
         <source>Capture Card</source>
-        <translation type="unfinished"></translation>
+        <translation>キャプチャーカード</translation>
     </message>
     <message>
         <source>Scanning</source>
-        <translation type="unfinished"></translation>
+        <translation>スキャニング</translation>
     </message>
     <message>
         <source>Scan Activity</source>
-        <translation type="unfinished"></translation>
+        <translation>スキャン状態</translation>
     </message>
     <message>
         <source>Record one showing of this title</source>
-        <translation type="unfinished"></translation>
+        <translation>このタイトルの番組を一回録画する</translation>
     </message>
     <message>
         <source>Record one showing of this title every week</source>
-        <translation type="unfinished"></translation>
+        <translation>このタイトルの番組を毎週一回録画する</translation>
     </message>
     <message>
         <source>Record one showing of this title every day</source>
-        <translation type="unfinished"></translation>
+        <translation>このタイトルの番組を毎日一回録画する</translation>
     </message>
     <message>
         <source>This recording schedule is inactive</source>
-        <translation type="unfinished"></translation>
+        <translation>この予約は録画されません</translation>
     </message>
     <message>
         <source>This recording schedule is active</source>
-        <translation type="unfinished"></translation>
+        <translation>この予約は録画されます</translation>
     </message>
     <message>
         <source>Delete oldest if this would exceed the max episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>最大録画数に達したら古い方から削除されます</translation>
     </message>
     <message>
         <source>Record in TS format instead of PS.</source>
-        <translation type="unfinished"></translation>
+        <translation>PSの変わりにTSフォーマットで録画する。</translation>
     </message>
     <message>
         <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk for processing errors.</source>
@@ -5820,7 +5758,7 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>DiSEqC Input Type: (DVB-S)</source>
-        <translation type="unfinished"></translation>
+        <translation>DiSEqC入力タイプ：(DVB-S)</translation>
     </message>
     <message>
         <source>Select the input type for DVB-S cards. Leave as Single LNB/Input for DVB-C or DVB-T. The inputs are mapped from Input Connections option on the main menu</source>
@@ -5828,7 +5766,7 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>pcHDTV capture card (HD-2000, HD-3000)</source>
-        <translation type="unfinished"></translation>
+        <translation>pcHDTV キャプチャーカード (HD-2000, HD-3000)</translation>
     </message>
     <message>
         <source>This defines at what frequency (in Hz) the LNB will do a switch from high to low setting, and vice versa.</source>
@@ -5844,7 +5782,7 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>DiSEqC Satellite Location</source>
-        <translation type="unfinished"></translation>
+        <translation>DiSEqC 衛星位置</translation>
     </message>
     <message>
         <source>The longitude of the satellite you are aiming at.  For western hemisphere use a negative value.  Value is in decimal.</source>
@@ -5868,11 +5806,11 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Diseqc Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Diseqcオプション</translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished">全て</translation>
+        <translation>全て</translation>
     </message>
     <message>
         <source>This is the default policy used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
@@ -5880,7 +5818,7 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Use libmpeg2 for decoding</source>
-        <translation type="unfinished"></translation>
+        <translation>libmpeg2デコードを使用する</translation>
     </message>
     <message>
         <source>If enabled, libmpeg2 will be used instead of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. This can be faster. Not available when XvMC is used.</source>
@@ -5888,15 +5826,15 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>4/3</source>
-        <translation type="unfinished">4/3</translation>
+        <translation>4/3</translation>
     </message>
     <message>
         <source>16/9</source>
-        <translation type="unfinished">16/9</translation>
+        <translation>16/9</translation>
     </message>
     <message>
         <source>16/9 Stretch</source>
-        <translation type="unfinished">16/9 伸張</translation>
+        <translation>16/9 ストレッチ</translation>
     </message>
     <message>
         <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback. Fill will &quot;fill&quot; the screen with the image clipping as required. Fill is useful when using 4:3 interlaced TV&apos;s for display.</source>
@@ -5904,7 +5842,7 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>HD Ringbuffer size (KB)</source>
-        <translation type="unfinished"></translation>
+        <translation>HD リングバッファーサイズ (KB)</translation>
     </message>
     <message>
         <source>The HD device ringbuffer allows the backend to weather moments of stress. The larger the ringbuffer, the longer the moments of stress can be. However, setting the size too large can cause swapping, which is detrimental.</source>
@@ -5932,6 +5870,126 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Sort shows</source>
+        <translation>ファイルを削除するときにシンボリックリンクをたどる</translation>
+    </message>
+    <message>
+        <source>S</source>
+        <comment>RecTypeChar kSingleRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>T</source>
+        <comment>RecTypeChar kTimeslotRecord</comment>
+        <translation type="unfinished">T</translation>
+    </message>
+    <message>
+        <source>W</source>
+        <comment>RecTypeChar kWeekslotRecord</comment>
+        <translation type="unfinished">W</translation>
+    </message>
+    <message>
+        <source>C</source>
+        <comment>RecTypeChar kChannelRecord</comment>
+        <translation type="unfinished">C</translation>
+    </message>
+    <message>
+        <source>A</source>
+        <comment>RecTypeChar kAllRecord</comment>
+        <translation type="unfinished">A</translation>
+    </message>
+    <message>
+        <source>F</source>
+        <comment>RecTypeChar kFindOneRecord</comment>
+        <translation type="unfinished">F</translation>
+    </message>
+    <message>
+        <source>d</source>
+        <comment>RecTypeChar kFindDailyRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>w</source>
+        <comment>RecTypeChar kFindWeeklyRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>O</source>
+        <comment>RecTypeChar kOverrideRecord/kDontRecord</comment>
+        <translation type="unfinished">O</translation>
+    </message>
+    <message>
+        <source>D</source>
+        <comment>RecStatusChar rsDeleted</comment>
+        <translation type="unfinished">D</translation>
+    </message>
+    <message>
+        <source>S</source>
+        <comment>RecStatusChar rsStopped</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>R</source>
+        <comment>RecStatusChar rsRecorded</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>X</source>
+        <comment>RecStatusChar rsDontRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>P</source>
+        <comment>RecStatusChar rsPreviousRecording</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>R</source>
+        <comment>RecStatusChar rsCurrentRecording</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>r</source>
+        <comment>RecStatusChar rsRepeat</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E</source>
+        <comment>RecStatusChar rsEarlierShowing</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>T</source>
+        <comment>RecStatusChar rsTooManyRecordings</comment>
+        <translation type="unfinished">T</translation>
+    </message>
+    <message>
+        <source>N</source>
+        <comment>RecStatusChar rsCancelled</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>C</source>
+        <comment>RecStatusChar rsConflict</comment>
+        <translation type="unfinished">C</translation>
+    </message>
+    <message>
+        <source>L</source>
+        <comment>RecStatusChar rsLaterShowing</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>K</source>
+        <comment>RecStatusChar rsLowDiskSpace</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>B</source>
+        <comment>RecStatusChar rsTunerBusy</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>x</source>
+        <comment>RecStatusChar rsInactive</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5939,59 +5997,59 @@ The frequency for this channel in Hz.</source>
     <name>ScanProgressPopup</name>
     <message>
         <source>Scan Progress</source>
-        <translation type="unfinished"></translation>
+        <translation>スキャン進捗</translation>
     </message>
     <message>
         <source>Tuning</source>
-        <translation type="unfinished"></translation>
+        <translation>チューニング</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル</translation>
     </message>
 </context>
 <context>
     <name>ScanWizardScanType</name>
     <message>
         <source>Scan Type</source>
-        <translation type="unfinished"></translation>
+        <translation>スキャンタイプ</translation>
     </message>
 </context>
 <context>
     <name>ScanWizardScanner</name>
     <message>
         <source>Scanning</source>
-        <translation type="unfinished"></translation>
+        <translation>スキャニング</translation>
     </message>
     <message>
         <source>ScanWizard</source>
-        <translation type="unfinished"></translation>
+        <translation>スキャンウィザード</translation>
     </message>
     <message>
         <source>Error tuning to transport</source>
-        <translation type="unfinished"></translation>
+        <translation>トランスポートチューニングエラー</translation>
     </message>
     <message>
         <source>Error detecting card type</source>
-        <translation type="unfinished"></translation>
+        <translation>カードタイプ検出エラー</translation>
     </message>
     <message>
         <source>Error parsing parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>パラメータエラー</translation>
     </message>
 </context>
 <context>
     <name>ScanWizardTuningPage</name>
     <message>
         <source>Tuning</source>
-        <translation type="unfinished"></translation>
+        <translation>チューニング</translation>
     </message>
 </context>
 <context>
     <name>ScheduledRecording</name>
     <message>
         <source>or later</source>
-        <translation type="unfinished"></translation>
+        <translation>より遅い</translation>
     </message>
 </context>
 <context>
@@ -6473,11 +6531,11 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Fill</source>
-        <translation type="unfinished">埋める</translation>
+        <translation>埋める</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation type="unfinished">オフ</translation>
+        <translation>オフ</translation>
     </message>
 </context>
 <context>

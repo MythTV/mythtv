@@ -725,23 +725,23 @@
     </message>
     <message>
         <source>Add this Category/Title Group to Playlist</source>
-        <translation>Lägg till denna kategori/titelgrupp till spellistan</translation>
+        <translation>Lägg till denna kategori/titelgrupp i spellistan</translation>
     </message>
     <message>
         <source>Add this Recording Group to Playlist</source>
-        <translation>Lägg till denna inspelningsgrupp till spellistan</translation>
+        <translation>Lägg till denna inspelningsgrupp i spellistan</translation>
     </message>
     <message>
         <source>Add this recording to Playlist</source>
-        <translation>Lägg till denna inspelning till spellistan</translation>
+        <translation>Lägg till denna inspelning i spellistan</translation>
     </message>
     <message>
         <source>There are %1 items in the playlist.</source>
-        <translation>Det finns %1 objekt i spellistan.</translation>
+        <translation>Det finns %1 poster i spellistan.</translation>
     </message>
     <message>
         <source>There is %1 item in the playlist.</source>
-        <translation>Det finns %1 objekt i spellistan.</translation>
+        <translation>Det finns %1 post i spellistan.</translation>
     </message>
     <message>
         <source>Clear Playlist</source>
@@ -761,7 +761,7 @@
     </message>
     <message>
         <source>These actions affect all items in the playlist</source>
-        <translation>Dessa handlingar påverkar alla objekt i spellistan</translation>
+        <translation>Dessa handlingar påverkar alla poster i spellistan</translation>
     </message>
     <message>
         <source>Remove from Playlist</source>
@@ -769,7 +769,7 @@
     </message>
     <message>
         <source>Add to Playlist</source>
-        <translation>Lägg till spellista</translation>
+        <translation>Lägg till i spellista</translation>
     </message>
 </context>
 <context>
@@ -1058,6 +1058,14 @@
     <message>
         <source>Recording a showing weekly</source>
         <translation>Spelar in en visning per vecka</translation>
+    </message>
+    <message>
+        <source>listing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>listings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3686,97 +3694,97 @@ MythTV kommer nu att avslutas.</translation>
     <message>
         <source>S</source>
         <comment>RecTypeChar</comment>
-        <translation>E</translation>
+        <translation type="obsolete">E</translation>
     </message>
     <message>
         <source>T</source>
         <comment>RecTypeChar</comment>
-        <translation>T</translation>
+        <translation type="obsolete">T</translation>
     </message>
     <message>
         <source>W</source>
         <comment>RecTypeChar</comment>
-        <translation>V</translation>
+        <translation type="obsolete">V</translation>
     </message>
     <message>
         <source>C</source>
         <comment>RecTypeChar</comment>
-        <translation>K</translation>
+        <translation type="obsolete">K</translation>
     </message>
     <message>
         <source>A</source>
         <comment>RecTypeChar</comment>
-        <translation>A</translation>
+        <translation type="obsolete">A</translation>
     </message>
     <message>
         <source>F</source>
         <comment>RecTypeChar</comment>
-        <translation>H</translation>
+        <translation type="obsolete">H</translation>
     </message>
     <message>
         <source>O</source>
         <comment>RecTypeChar</comment>
-        <translation>Ö</translation>
+        <translation type="obsolete">Ö</translation>
     </message>
     <message>
         <source>D</source>
         <comment>RecStatusChar</comment>
-        <translation>B</translation>
+        <translation type="obsolete">B</translation>
     </message>
     <message>
         <source>S</source>
         <comment>RecStatusChar</comment>
-        <translation>S</translation>
+        <translation type="obsolete">S</translation>
     </message>
     <message>
         <source>R</source>
         <comment>RecStatusChar</comment>
-        <translation>I</translation>
+        <translation type="obsolete">I</translation>
     </message>
     <message>
         <source>X</source>
         <comment>RecStatusChar</comment>
-        <translation>X</translation>
+        <translation type="obsolete">X</translation>
     </message>
     <message>
         <source>P</source>
         <comment>RecStatusChar</comment>
-        <translation>F</translation>
+        <translation type="obsolete">F</translation>
     </message>
     <message>
         <source>E</source>
         <comment>RecStatusChar</comment>
-        <translation>T</translation>
+        <translation type="obsolete">T</translation>
     </message>
     <message>
         <source>T</source>
         <comment>RecStatusChar</comment>
-        <translation>M</translation>
+        <translation type="obsolete">M</translation>
     </message>
     <message>
         <source>N</source>
         <comment>RecStatusChar</comment>
-        <translation>A</translation>
+        <translation type="obsolete">A</translation>
     </message>
     <message>
         <source>C</source>
         <comment>RecStatusChar</comment>
-        <translation>K</translation>
+        <translation type="obsolete">K</translation>
     </message>
     <message>
         <source>L</source>
         <comment>RecStatusChar</comment>
-        <translation>S</translation>
+        <translation type="obsolete">S</translation>
     </message>
     <message>
         <source>K</source>
         <comment>RecStatusChar</comment>
-        <translation>D</translation>
+        <translation type="obsolete">D</translation>
     </message>
     <message>
         <source>B</source>
         <comment>RecStatusChar</comment>
-        <translation>U</translation>
+        <translation type="obsolete">U</translation>
     </message>
     <message>
         <source>Startup command</source>
@@ -3839,7 +3847,7 @@ som du startade detta programmet ifrån.</translation>
     <message>
         <source>r</source>
         <comment>RecStatusChar</comment>
-        <translation>R</translation>
+        <translation type="obsolete">R</translation>
     </message>
     <message>
         <source>this episode is a repeat.</source>
@@ -5298,12 +5306,12 @@ som du startade detta programmet ifrån.</translation>
     <message>
         <source>d</source>
         <comment>RecTypeChar</comment>
-        <translation>d</translation>
+        <translation type="obsolete">d</translation>
     </message>
     <message>
         <source>w</source>
         <comment>RecTypeChar</comment>
-        <translation>v</translation>
+        <translation type="obsolete">v</translation>
     </message>
     <message>
         <source>Single Record</source>
@@ -5428,7 +5436,7 @@ som du startade detta programmet ifrån.</translation>
     <message>
         <source>x</source>
         <comment>RecStatusChar</comment>
-        <translation>x</translation>
+        <translation type="obsolete">x</translation>
     </message>
     <message>
         <source>Inactive</source>
@@ -5557,6 +5565,126 @@ Kanalens frekvens i Hz.</translation>
     <message>
         <source>Sort shows</source>
         <translation>Sortera program</translation>
+    </message>
+    <message>
+        <source>S</source>
+        <comment>RecTypeChar kSingleRecord</comment>
+        <translation>E</translation>
+    </message>
+    <message>
+        <source>T</source>
+        <comment>RecTypeChar kTimeslotRecord</comment>
+        <translation>T</translation>
+    </message>
+    <message>
+        <source>W</source>
+        <comment>RecTypeChar kWeekslotRecord</comment>
+        <translation>V</translation>
+    </message>
+    <message>
+        <source>C</source>
+        <comment>RecTypeChar kChannelRecord</comment>
+        <translation>K</translation>
+    </message>
+    <message>
+        <source>A</source>
+        <comment>RecTypeChar kAllRecord</comment>
+        <translation>A</translation>
+    </message>
+    <message>
+        <source>F</source>
+        <comment>RecTypeChar kFindOneRecord</comment>
+        <translation>h</translation>
+    </message>
+    <message>
+        <source>d</source>
+        <comment>RecTypeChar kFindDailyRecord</comment>
+        <translation>d</translation>
+    </message>
+    <message>
+        <source>w</source>
+        <comment>RecTypeChar kFindWeeklyRecord</comment>
+        <translation>v</translation>
+    </message>
+    <message>
+        <source>O</source>
+        <comment>RecTypeChar kOverrideRecord/kDontRecord</comment>
+        <translation>Ö</translation>
+    </message>
+    <message>
+        <source>D</source>
+        <comment>RecStatusChar rsDeleted</comment>
+        <translation>B</translation>
+    </message>
+    <message>
+        <source>S</source>
+        <comment>RecStatusChar rsStopped</comment>
+        <translation>a</translation>
+    </message>
+    <message>
+        <source>R</source>
+        <comment>RecStatusChar rsRecorded</comment>
+        <translation>I</translation>
+    </message>
+    <message>
+        <source>X</source>
+        <comment>RecStatusChar rsDontRecord</comment>
+        <translation>X</translation>
+    </message>
+    <message>
+        <source>P</source>
+        <comment>RecStatusChar rsPreviousRecording</comment>
+        <translation>F</translation>
+    </message>
+    <message>
+        <source>R</source>
+        <comment>RecStatusChar rsCurrentRecording</comment>
+        <translation>I</translation>
+    </message>
+    <message>
+        <source>r</source>
+        <comment>RecStatusChar rsRepeat</comment>
+        <translation>R</translation>
+    </message>
+    <message>
+        <source>E</source>
+        <comment>RecStatusChar rsEarlierShowing</comment>
+        <translation>T</translation>
+    </message>
+    <message>
+        <source>T</source>
+        <comment>RecStatusChar rsTooManyRecordings</comment>
+        <translation>M</translation>
+    </message>
+    <message>
+        <source>N</source>
+        <comment>RecStatusChar rsCancelled</comment>
+        <translation>a</translation>
+    </message>
+    <message>
+        <source>C</source>
+        <comment>RecStatusChar rsConflict</comment>
+        <translation>K</translation>
+    </message>
+    <message>
+        <source>L</source>
+        <comment>RecStatusChar rsLaterShowing</comment>
+        <translation>S</translation>
+    </message>
+    <message>
+        <source>K</source>
+        <comment>RecStatusChar rsLowDiskSpace</comment>
+        <translation>D</translation>
+    </message>
+    <message>
+        <source>B</source>
+        <comment>RecStatusChar rsTunerBusy</comment>
+        <translation>U</translation>
+    </message>
+    <message>
+        <source>x</source>
+        <comment>RecStatusChar rsInactive</comment>
+        <translation>x</translation>
     </message>
 </context>
 <context>

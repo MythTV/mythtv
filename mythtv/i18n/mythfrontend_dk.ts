@@ -1059,6 +1059,14 @@
         <source>Recording a showing weekly</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>listing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>listings</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -3699,101 +3707,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>S</source>
-        <comment>RecTypeChar</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>T</source>
-        <comment>RecTypeChar</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>W</source>
-        <comment>RecTypeChar</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>C</source>
-        <comment>RecTypeChar</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>A</source>
-        <comment>RecTypeChar</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>F</source>
-        <comment>RecTypeChar</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>O</source>
-        <comment>RecTypeChar</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>D</source>
-        <comment>RecStatusChar</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>S</source>
-        <comment>RecStatusChar</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>R</source>
-        <comment>RecStatusChar</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>X</source>
-        <comment>RecStatusChar</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>P</source>
-        <comment>RecStatusChar</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>E</source>
-        <comment>RecStatusChar</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>T</source>
-        <comment>RecStatusChar</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>N</source>
-        <comment>RecStatusChar</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>C</source>
-        <comment>RecStatusChar</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>L</source>
-        <comment>RecStatusChar</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>K</source>
-        <comment>RecStatusChar</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>B</source>
-        <comment>RecStatusChar</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Startup command</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3828,11 +3741,6 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>stars</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>r</source>
-        <comment>RecStatusChar</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5292,16 +5200,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>d</source>
-        <comment>RecTypeChar</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>w</source>
-        <comment>RecTypeChar</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Single Record</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5331,11 +5229,6 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Find Weekly</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>x</source>
-        <comment>RecStatusChar</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5542,6 +5435,126 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Sort shows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S</source>
+        <comment>RecTypeChar kSingleRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>T</source>
+        <comment>RecTypeChar kTimeslotRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>W</source>
+        <comment>RecTypeChar kWeekslotRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>C</source>
+        <comment>RecTypeChar kChannelRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A</source>
+        <comment>RecTypeChar kAllRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>F</source>
+        <comment>RecTypeChar kFindOneRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>d</source>
+        <comment>RecTypeChar kFindDailyRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>w</source>
+        <comment>RecTypeChar kFindWeeklyRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>O</source>
+        <comment>RecTypeChar kOverrideRecord/kDontRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>D</source>
+        <comment>RecStatusChar rsDeleted</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S</source>
+        <comment>RecStatusChar rsStopped</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>R</source>
+        <comment>RecStatusChar rsRecorded</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>X</source>
+        <comment>RecStatusChar rsDontRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>P</source>
+        <comment>RecStatusChar rsPreviousRecording</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>R</source>
+        <comment>RecStatusChar rsCurrentRecording</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>r</source>
+        <comment>RecStatusChar rsRepeat</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E</source>
+        <comment>RecStatusChar rsEarlierShowing</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>T</source>
+        <comment>RecStatusChar rsTooManyRecordings</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>N</source>
+        <comment>RecStatusChar rsCancelled</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>C</source>
+        <comment>RecStatusChar rsConflict</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>L</source>
+        <comment>RecStatusChar rsLaterShowing</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>K</source>
+        <comment>RecStatusChar rsLowDiskSpace</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>B</source>
+        <comment>RecStatusChar rsTunerBusy</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>x</source>
+        <comment>RecStatusChar rsInactive</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

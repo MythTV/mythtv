@@ -19,7 +19,7 @@
     </message>
     <message>
         <source>Recording Options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Opname Opties</translation>
     </message>
     <message>
         <source>Diseqc</source>
@@ -734,27 +734,15 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
     <message>
         <source>Show group list as titles</source>
-        <translation>Groepeer op titels</translation>
+        <translation>Groepeer per Titel</translation>
     </message>
     <message>
         <source>Playlist Actions</source>
-        <translation>Afspeellijst Taken</translation>
+        <translation type="obsolete">Afspeellijst Taken</translation>
     </message>
     <message>
         <source>There are %1 items in the list.</source>
-        <translation>Er zijn %1 items in de lijst.</translation>
-    </message>
-    <message>
-        <source>Shuffle Play</source>
-        <translation>Willekeurige Volgorde</translation>
-    </message>
-    <message>
-        <source>Show group list as recording groups</source>
-        <translation>Groepeer per opnamegroep</translation>
-    </message>
-    <message>
-        <source>Show group list as titles</source>
-        <translation>Groepeer per Titel</translation>
+        <translation type="obsolete">Er zijn %1 items in de lijst.</translation>
     </message>
     <message>
         <source>Shuffle Play</source>
@@ -1120,6 +1108,14 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     <message>
         <source>Recording a showing weekly</source>
         <translation>Uitzending wekelijks opnemen</translation>
+    </message>
+    <message>
+        <source>listing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>listings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3978,101 +3974,6 @@ Laat leeg om niet te loggen.</translation>
         <translation>Reclamevrij</translation>
     </message>
     <message>
-        <source>S</source>
-        <comment>RecTypeChar</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>T</source>
-        <comment>RecTypeChar</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>W</source>
-        <comment>RecTypeChar</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>C</source>
-        <comment>RecTypeChar</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>A</source>
-        <comment>RecTypeChar</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>F</source>
-        <comment>RecTypeChar</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>O</source>
-        <comment>RecTypeChar</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>D</source>
-        <comment>RecStatusChar</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>S</source>
-        <comment>RecStatusChar</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>R</source>
-        <comment>RecStatusChar</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>X</source>
-        <comment>RecStatusChar</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>P</source>
-        <comment>RecStatusChar</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>E</source>
-        <comment>RecStatusChar</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>T</source>
-        <comment>RecStatusChar</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>N</source>
-        <comment>RecStatusChar</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>C</source>
-        <comment>RecStatusChar</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>L</source>
-        <comment>RecStatusChar</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>K</source>
-        <comment>RecStatusChar</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>B</source>
-        <comment>RecStatusChar</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>Startup command</source>
         <translation>Opstartcommando</translation>
     </message>
@@ -4104,11 +4005,6 @@ Laat leeg om niet te loggen.</translation>
     <message>
         <source>stars</source>
         <translation>sterren</translation>
-    </message>
-    <message>
-        <source>r</source>
-        <comment>RecStatusChar</comment>
-        <translation></translation>
     </message>
     <message>
         <source>this episode is a repeat.</source>
@@ -5621,16 +5517,6 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>d</source>
-        <comment>RecTypeChar</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>w</source>
-        <comment>RecTypeChar</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Single Record</source>
         <translation>Eenmalige Opname</translation>
     </message>
@@ -5661,11 +5547,6 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     <message>
         <source>Find Weekly</source>
         <translation>Vind wekelijkse opname</translation>
-    </message>
-    <message>
-        <source>x</source>
-        <comment>RecStatusChar</comment>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Previously Recorded</source>
@@ -5727,7 +5608,7 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Record one showing of this title</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Neem een aflevering op van deze serie</translation>
     </message>
     <message>
         <source>Record one showing of this title every week</source>
@@ -5871,6 +5752,126 @@ The frequency for this channel in Hz.</source>
     </message>
     <message>
         <source>Sort shows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S</source>
+        <comment>RecTypeChar kSingleRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>T</source>
+        <comment>RecTypeChar kTimeslotRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>W</source>
+        <comment>RecTypeChar kWeekslotRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>C</source>
+        <comment>RecTypeChar kChannelRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A</source>
+        <comment>RecTypeChar kAllRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>F</source>
+        <comment>RecTypeChar kFindOneRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>d</source>
+        <comment>RecTypeChar kFindDailyRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>w</source>
+        <comment>RecTypeChar kFindWeeklyRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>O</source>
+        <comment>RecTypeChar kOverrideRecord/kDontRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>D</source>
+        <comment>RecStatusChar rsDeleted</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S</source>
+        <comment>RecStatusChar rsStopped</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>R</source>
+        <comment>RecStatusChar rsRecorded</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>X</source>
+        <comment>RecStatusChar rsDontRecord</comment>
+        <translation type="unfinished">X</translation>
+    </message>
+    <message>
+        <source>P</source>
+        <comment>RecStatusChar rsPreviousRecording</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>R</source>
+        <comment>RecStatusChar rsCurrentRecording</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>r</source>
+        <comment>RecStatusChar rsRepeat</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E</source>
+        <comment>RecStatusChar rsEarlierShowing</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>T</source>
+        <comment>RecStatusChar rsTooManyRecordings</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>N</source>
+        <comment>RecStatusChar rsCancelled</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>C</source>
+        <comment>RecStatusChar rsConflict</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>L</source>
+        <comment>RecStatusChar rsLaterShowing</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>K</source>
+        <comment>RecStatusChar rsLowDiskSpace</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>B</source>
+        <comment>RecStatusChar rsTunerBusy</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>x</source>
+        <comment>RecStatusChar rsInactive</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

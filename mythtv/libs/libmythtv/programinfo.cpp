@@ -4,6 +4,7 @@
 #include <qmap.h>
 #include <qlayout.h>
 #include <qlabel.h>
+#include <qapplication.h>
 
 #include "programinfo.h"
 #include "scheduledrecording.h"
@@ -1811,24 +1812,24 @@ QString ProgramInfo::RecTypeChar(void)
     switch (rectype)
     {
     case kSingleRecord:
-        return QObject::tr("S", "RecTypeChar");
+        return QObject::tr("S", "RecTypeChar kSingleRecord");
     case kTimeslotRecord:
-        return QObject::tr("T", "RecTypeChar");
+        return QObject::tr("T", "RecTypeChar kTimeslotRecord");
     case kWeekslotRecord:
-        return QObject::tr("W", "RecTypeChar");
+        return QObject::tr("W", "RecTypeChar kWeekslotRecord");
     case kChannelRecord:
-        return QObject::tr("C", "RecTypeChar");
+        return QObject::tr("C", "RecTypeChar kChannelRecord");
     case kAllRecord:
-        return QObject::tr("A", "RecTypeChar");
+        return QObject::tr("A", "RecTypeChar kAllRecord");
     case kFindOneRecord:
-        return QObject::tr("F", "RecTypeChar");
+        return QObject::tr("F", "RecTypeChar kFindOneRecord");
     case kFindDailyRecord:
-        return QObject::tr("d", "RecTypeChar");
+        return QObject::tr("d", "RecTypeChar kFindDailyRecord");
     case kFindWeeklyRecord:
-        return QObject::tr("w", "RecTypeChar");
+        return QObject::tr("w", "RecTypeChar kFindWeeklyRecord");
     case kOverrideRecord:
     case kDontRecord:
-        return QObject::tr("O", "RecTypeChar");
+        return QObject::tr("O", "RecTypeChar kOverrideRecord/kDontRecord");
     case kNotRecording:
     default:
         return " ";
@@ -1868,39 +1869,39 @@ QString ProgramInfo::RecStatusChar(void)
     switch (recstatus)
     {
     case rsDeleted:
-        return QObject::tr("D", "RecStatusChar");
+        return QObject::tr("D", "RecStatusChar rsDeleted");
     case rsStopped:
-        return QObject::tr("S", "RecStatusChar");
+        return QObject::tr("S", "RecStatusChar rsStopped");
     case rsRecorded:
-        return QObject::tr("R", "RecStatusChar");
+        return QObject::tr("R", "RecStatusChar rsRecorded");
     case rsRecording:
         return QString::number(cardid);
     case rsWillRecord:
         return QString::number(cardid);
     case rsDontRecord:
-        return QObject::tr("X", "RecStatusChar");
+        return QObject::tr("X", "RecStatusChar rsDontRecord");
     case rsPreviousRecording:
-        return QObject::tr("P", "RecStatusChar");
+        return QObject::tr("P", "RecStatusChar rsPreviousRecording");
     case rsCurrentRecording:
-        return QObject::tr("R", "RecStatusChar");
+        return QObject::tr("R", "RecStatusChar rsCurrentRecording");
     case rsRepeat:
-        return QObject::tr("r", "RecStatusChar");    
+        return QObject::tr("r", "RecStatusChar rsRepeat");    
     case rsEarlierShowing:
-        return QObject::tr("E", "RecStatusChar");
+        return QObject::tr("E", "RecStatusChar rsEarlierShowing");
     case rsTooManyRecordings:
-        return QObject::tr("T", "RecStatusChar");
+        return QObject::tr("T", "RecStatusChar rsTooManyRecordings");
     case rsCancelled:
-        return QObject::tr("N", "RecStatusChar");
+        return QObject::tr("N", "RecStatusChar rsCancelled");
     case rsConflict:
-        return QObject::tr("C", "RecStatusChar");
+        return QObject::tr("C", "RecStatusChar rsConflict");
     case rsLaterShowing:
-        return QObject::tr("L", "RecStatusChar");
+        return QObject::tr("L", "RecStatusChar rsLaterShowing");
     case rsLowDiskSpace:
-        return QObject::tr("K", "RecStatusChar");
+        return QObject::tr("K", "RecStatusChar rsLowDiskSpace");
     case rsTunerBusy:
-        return QObject::tr("B", "RecStatusChar");
+        return QObject::tr("B", "RecStatusChar rsTunerBusy");
     case rsInactive:
-        return QObject::tr("x", "RecStatusChar");
+        return QObject::tr("x", "RecStatusChar rsInactive");
     default:
         return "-";
     }
@@ -2338,7 +2339,8 @@ void ProgramInfo::showDetails(QSqlDatabase *db)
     msg += "\n";
 
     if (category != "")
-        msg += QObject::tr("Category") + ":  " + category + "\n";
+        msg += QObject::tr("Category") + ":  " +
+               qApp->translate("Category", category) + "\n";
 
     if (category_type  != "")
     {
@@ -2913,4 +2915,3 @@ int ProgramList::compareItems(QPtrCollection::Item item1,
     else
         return 0;
 }
-
