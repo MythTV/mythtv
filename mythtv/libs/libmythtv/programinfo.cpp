@@ -889,11 +889,13 @@ bool ProgramInfo::IsSameProgram(const ProgramInfo& other) const
     if (dupmethod & kDupCheckNone)
         return false;
 
-    // if (programid != "" && other.programid != "")
-        // do dup checks for seriesid and programid here
-        // handle generic episodes vs specials weirdness
-        // return true or false
-    // else fall through to string matching methods
+    if (programid != "" && 
+        (seriesid == "" || !programid.contains(QRegExp("0000$"))) &&
+        programid == other.programid)
+        return true;
+
+    if (dupmethod & kDupCheckIdOnly)
+        return false;
 
     if ((dupmethod & kDupCheckSub) &&
         ((subtitle == "") ||
