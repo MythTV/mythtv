@@ -13,6 +13,18 @@
         <source>No, don&apos;t</source>
         <translation>Nej, låt bli</translation>
     </message>
+    <message>
+        <source>Advanced Configuration</source>
+        <translation>Avancerad konfiguration</translation>
+    </message>
+    <message>
+        <source>Recording Options</source>
+        <translation>Inspelningsinställningar</translation>
+    </message>
+    <message>
+        <source>Diseqc</source>
+        <translation>DiSEqC</translation>
+    </message>
 </context>
 <context>
     <name>CaptureCardEditor</name>
@@ -699,6 +711,14 @@
         <source>Shuffle Play</source>
         <translation>Blandad spelning</translation>
     </message>
+    <message>
+        <source>Show group list as recording groups</source>
+        <translation>Visa grupplista som inspelningsgrupper</translation>
+    </message>
+    <message>
+        <source>Show group list as titles</source>
+        <translation>Visa grupplista som titlar</translation>
+    </message>
 </context>
 <context>
     <name>PreviousBox</name>
@@ -979,6 +999,14 @@
         <source>^(The |A |An )</source>
         <translation>^(The |A |An )</translation>
     </message>
+    <message>
+        <source>Recording a showing daily</source>
+        <translation>Spelar in en visning per dag</translation>
+    </message>
+    <message>
+        <source>Recording a showing weekly</source>
+        <translation>Spelar in en visning per vecka</translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -1107,14 +1135,6 @@
         <translation>Ingen inspelning</translation>
     </message>
     <message>
-        <source>Channel Recording</source>
-        <translation>Kanalinspelning</translation>
-    </message>
-    <message>
-        <source>All Recording</source>
-        <translation>Spela in alla visningar</translation>
-    </message>
-    <message>
         <source>Air Date:</source>
         <translation>Sändningstid:</translation>
     </message>
@@ -1196,7 +1216,7 @@
     </message>
     <message>
         <source>If enabled, seeking is frame exact, but slower.</source>
-        <translation>Om funktionen är aktiverad kommer snabbspolning att vara exakt på bildrutor men långsammare.</translation>
+        <translation>Gör snabbspolning exakt på bildrutor (långsammare).</translation>
     </message>
     <message>
         <source>Commercial Skip Method</source>
@@ -1221,10 +1241,6 @@
     <message>
         <source>Automatically Flag Commercials</source>
         <translation>Automatisk reklamdetektering</translation>
-    </message>
-    <message>
-        <source>Automatically flag commercials after a recording completes.</source>
-        <translation>Identifiera reklampauser efter att varje inspelning har avslutats.</translation>
     </message>
     <message>
         <source>Strict Commercial Detection</source>
@@ -1296,7 +1312,7 @@
     </message>
     <message>
         <source>If set, you will not be able to return to this screen and reset the Setup PIN without first entering the current PIN.</source>
-        <translation>Om denna funktion är aktiverad måste PIN-koden för inställningsmenyerna matas in innan det går att komma tillbaka hit.</translation>
+        <translation>PIN-koden för inställningsmenyerna måste matas in innan det går att komma tillbaka hit.</translation>
     </message>
     <message>
         <source>Reposition after fast forward/rewind</source>
@@ -1408,7 +1424,7 @@
     </message>
     <message>
         <source>If set to prompt, a menu will be displayed when you exit playback mode.  The options available will allow you to save your position, delete the recording, or continue watching.</source>
-        <translation>Om denna funktion aktiveras kommer en meny att visas när uppspelningsläget avslutas. Där visas alternativ för att spara nuvarande position, radera inspelningen eller fortsätta titta.</translation>
+        <translation>Om satt till &apos;Fråga alltid&apos; visas en meny när uppspelningsläget avslutas med alternativ för att spara nuvarande position, radera inspelningen eller fortsätta titta.</translation>
     </message>
     <message>
         <source>Prompt at end of recording</source>
@@ -1416,7 +1432,7 @@
     </message>
     <message>
         <source>If set, a menu will be displayed allowing you to delete the recording when it has finished playing.</source>
-        <translation>Om funktionen är aktiverad kommer en dialogruta att visas när uppspelningen av ett inspelat program är klar. Dialogrutan innehåller en fråga om inspelningen skall raderas eller sparas.</translation>
+        <translation>Visa en meny när uppspelningen av ett inspelat program är klar där du kan välja om inspelningen skall raderas eller sparas.</translation>
     </message>
     <message>
         <source>Display live preview of recordings</source>
@@ -1684,7 +1700,7 @@
     </message>
     <message>
         <source>If enabled, then immediately after rewinding, only skip forward the same amount as skipping backwards.</source>
-        <translation>Om denna funktion aktiveras kommer framspolning omedelbart efter en återspolning att hoppa framåt lika mycket som det föregående hoppet hoppade bakåt.</translation>
+        <translation>Gör så att framspolning omedelbart efter en återspolning hoppar framåt lika mycket som det föregående hoppet hoppade bakåt.</translation>
     </message>
     <message>
         <source>(Create new profile group)</source>
@@ -1776,7 +1792,7 @@
     </message>
     <message>
         <source>If set, the MPEG4 bitrate will be used for 640x480.  If other resolutions are used, the bitrate will be scaled appropriately.</source>
-        <translation>Om denna funktion aktiveras kommer den konfigurerade bithastigheten att användas vid upplösningen 640x480. Används andra upplösningar skalas bithastigheten för att bibehålla samma bildkvalitet.</translation>
+        <translation>Använd MPEG4-bithastigheten vid upplösningen 640x480. Används andra upplösningar skalas bithastigheten för att bibehålla samma bildkvalitet.</translation>
     </message>
     <message>
         <source>Minimum quality</source>
@@ -1800,7 +1816,7 @@
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use &apos;high-quality&apos; encoding options.  This requires much more processing, but can result in better video.</source>
-        <translation>Om denna funktion aktiveras kommer MPEG4-enkodern att köra i &apos;högkvalitetsläge&apos;. Detta kräver mycker mer beräkningar men kan resultera i högre kvalitet.</translation>
+        <translation>Kör MPEG4-enkodern i &apos;högkvalitetsläge&apos;. Detta kräver mycket mer beräkningar men kan resultera i högre kvalitet.</translation>
     </message>
     <message>
         <source>Enable 4MV encoding</source>
@@ -1958,7 +1974,7 @@
     </message>
     <message>
         <source>Skip blank frames after commercials</source>
-        <translation>Hoppa över svarta bildrutor efter reklamer</translation>
+        <translation>Hoppa över svarta bildrutor efter reklam</translation>
     </message>
     <message>
         <source>OK</source>
@@ -1967,18 +1983,6 @@
     <message>
         <source>Repeat</source>
         <translation>Upprepa</translation>
-    </message>
-    <message>
-        <source>Single Recording</source>
-        <translation>Enstaka inspelning</translation>
-    </message>
-    <message>
-        <source>Daily Recording</source>
-        <translation>Daglig inspelning</translation>
-    </message>
-    <message>
-        <source>Weekly Recording</source>
-        <translation>Veckovis inspelning</translation>
     </message>
     <message>
         <source>Conflicting</source>
@@ -2118,7 +2122,7 @@
     </message>
     <message>
         <source>This enables support for monitoring your CD/DVD drives for new disks and launching the proper plugin to handle them.</source>
-        <translation>Denna funktionen aktiverar stöd för att övervaka CD/DVD-enheter efter nya skivor som matas in och starta en lämplig plugin.</translation>
+        <translation>Övervaka CD/DVD-enheter efter nya skivor som matas in och starta en lämplig plugin.</translation>
     </message>
     <message>
         <source>Hardware Decoding Settings</source>
@@ -2139,14 +2143,6 @@
     <message>
         <source>Recording</source>
         <translation>Spelar in</translation>
-    </message>
-    <message>
-        <source>Previous Recording</source>
-        <translation>Föregående inspelning</translation>
-    </message>
-    <message>
-        <source>Current Recording</source>
-        <translation>Nuvarande inspelning</translation>
     </message>
     <message>
         <source>Max Recordings</source>
@@ -2361,12 +2357,6 @@
         <translation>Frekvens</translation>
     </message>
     <message>
-        <source>[Common] Frequency (Option has no default)
-The frequency for this channel in hz.</source>
-        <translation>[Gemensam] Frekvens (Inget standardvärde)
-Kanalens frekvens i Hz.</translation>
-    </message>
-    <message>
         <source>Symbol Rate</source>
         <translation>Symbolhastighet</translation>
     </message>
@@ -2377,22 +2367,8 @@ Kanalens frekvens i Hz.</translation>
 ???</translation>
     </message>
     <message>
-        <source>Satellite</source>
-        <translation>Satellit</translation>
-    </message>
-    <message>
-        <source>[NONE CONFIGURED]</source>
-        <translation>[INGA KONFIGURERADE]</translation>
-    </message>
-    <message>
         <source>Polarity</source>
         <translation>Polaritet</translation>
-    </message>
-    <message>
-        <source>[DVB-S] Polarity (Option has no default)
-???</source>
-        <translation>[DVB-S] Polaritet (Inget standardvärde)
-???</translation>
     </message>
     <message>
         <source>Horizontal</source>
@@ -2437,18 +2413,6 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
 ???</source>
         <translation>[DVB-C/T] Bandbredd (Standard: Auto)
 ???</translation>
-    </message>
-    <message>
-        <source>6 Mhz</source>
-        <translation>6 MHz</translation>
-    </message>
-    <message>
-        <source>7 Mhz</source>
-        <translation>7 MHz</translation>
-    </message>
-    <message>
-        <source>8 Mhz</source>
-        <translation>8 MHz</translation>
     </message>
     <message>
         <source>Modulation</source>
@@ -2531,56 +2495,12 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
 ???</translation>
     </message>
     <message>
-        <source>Video</source>
-        <translation>Video</translation>
-    </message>
-    <message>
-        <source>Teletext</source>
-        <translation>Text-TV</translation>
-    </message>
-    <message>
-        <source>Subtitle</source>
-        <translation>Undertitel</translation>
-    </message>
-    <message>
-        <source>Pcr</source>
-        <translation>Pcr</translation>
-    </message>
-    <message>
-        <source>Service ID</source>
-        <translation>Service-ID</translation>
-    </message>
-    <message>
-        <source>Provider ID</source>
-        <translation>Leverantörs-ID</translation>
-    </message>
-    <message>
-        <source>Transport ID</source>
-        <translation>Transport-ID</translation>
-    </message>
-    <message>
-        <source>Network ID</source>
-        <translation>Nätverks-ID</translation>
-    </message>
-    <message>
         <source>Channel Options - Common</source>
         <translation>Kanalinställningar - gemensamma</translation>
     </message>
     <message>
         <source>Channel Options - Video 4 Linux</source>
         <translation>Kanalinställningar - Video 4 Linux</translation>
-    </message>
-    <message>
-        <source>Channel Options - DVB</source>
-        <translation>Kanalinställningar - DVB</translation>
-    </message>
-    <message>
-        <source>Channel Options - DVB Pids &amp; IDs</source>
-        <translation>Kanalinställningar - DVB Pids &amp; IDs</translation>
-    </message>
-    <message>
-        <source>A comma separated list of pids for each type. Note that currently MythTV only supports recording and not playback of multiple audio or video pids. It does not support showing teletext or subtitles either, but these do not crash the player as audio and video might.</source>
-        <translation>En kommasepererad lista med pids för varje typ. Notera att MythTV endast stödjer inspelning och inte uppspelning av flera ljud eller video-pids och det finns inte heller stöd för Text-TV eller undertexter.</translation>
     </message>
     <message>
         <source>Profile Group Name</source>
@@ -2646,10 +2566,6 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>MPEG2 TV-kort (PVR-250, PVR-350)</translation>
     </message>
     <message>
-        <source>pcHDTV ATSC capture card</source>
-        <translation>pcHDTV ATSC TV-kort</translation>
-    </message>
-    <message>
         <source>Digital Video Broadcast card (DVB)</source>
         <translation>Digital Video Broadcast-kort (DVB)</translation>
     </message>
@@ -2666,56 +2582,12 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>FEL, inga ingångar hittade</translation>
     </message>
     <message>
-        <source>[All VideoSources]</source>
-        <translation>[Alla videokällor]</translation>
-    </message>
-    <message>
-        <source>[No VideoSources Defined]</source>
-        <translation>[Inga videokällor definierade]</translation>
-    </message>
-    <message>
-        <source>[No Channels Defined]</source>
-        <translation>[Inga kanaler  definierade]</translation>
-    </message>
-    <message>
-        <source>Load &amp; Tune</source>
-        <translation>Ladda &amp; ställ in</translation>
-    </message>
-    <message>
-        <source>Will load the selected channel above into the previous screen, and try to tune it. If it fails to tune the channel, press back and check the settings.</source>
-        <translation>Kommer att ladda den valda kanalan ovan till föregående skärm och försöka ställa in den. Om det misslyckas, tryck &apos;Bakåt&apos; och kontrollera inställningarna.</translation>
-    </message>
-    <message>
-        <source>Tune Only</source>
-        <translation>Ställ endast in</translation>
-    </message>
-    <message>
-        <source>Will ONLY try to tune the previous screen, not alter it. If it fails to tune, press back and check the settings.</source>
-        <translation>Kommer endast att försöka ställa in föregående skärm, inte ändra den. Om det misslyckas, tryck &apos;Bakåt&apos; och kontrollera inställningarna.</translation>
-    </message>
-    <message>
-        <source>Card Verification Wizard (DVB#</source>
-        <translation>Kortverifieringsguide (DVB)</translation>
-    </message>
-    <message>
-        <source>Bit Error Rate</source>
-        <translation>Bitfelshastighet</translation>
-    </message>
-    <message>
-        <source>Uncorrected Blocks</source>
-        <translation>Okorrigerade block</translation>
-    </message>
-    <message>
         <source>Signal/Noise</source>
         <translation>Signal/Brus</translation>
     </message>
     <message>
         <source>Signal Strength</source>
         <translation>Signalstyrka</translation>
-    </message>
-    <message>
-        <source>FAILED TO OPEN CARD, CHECK CONSOLE!!</source>
-        <translation>MISSLYCKADES MED ATT ÖPPNA KORTET, KONTROLLERA KONSOLLEN!!</translation>
     </message>
     <message>
         <source>Advanced Configuration</source>
@@ -2806,16 +2678,8 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>(UR FUNKTION) Denna inställning används för att komma runt filterbegränsningar på en del DVB-kort.</translation>
     </message>
     <message>
-        <source>Record the TS, not PS.</source>
-        <translation>Spela in TS, inte PS.</translation>
-    </message>
-    <message>
-        <source>This will make the backend not perform Transport Stream to Program Stream conversion.</source>
-        <translation>Avaktivera konvertering av transportström (&quot;TS&quot;) till programström (&quot;PS&quot;).</translation>
-    </message>
-    <message>
         <source>Normally the dvb-recording will drop packets from the card untill a sequence start header is seen. This option turns off this feature.</source>
-        <translation>Normalt börjar inte inspelning från DVB förrän en startheader hittas. Denna inställning avaktiverar detta.</translation>
+        <translation>Normalt börjar inte inspelning från DVB förrän en startrubrik hittas. Denna inställning avaktiverar detta.</translation>
     </message>
     <message>
         <source>Per PID driver buffer size</source>
@@ -2826,84 +2690,24 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>Paketbuffer</translation>
     </message>
     <message>
-        <source>Channels</source>
-        <translation>Kanaler</translation>
-    </message>
-    <message>
-        <source>This box contains all channels from the selected video source. Select a channel here and press the &apos;Load and Tune&apos; button to load the channel settings into the previous screen and try to tune it.</source>
-        <translation>Denna ruta innehåller alla kanaler från vald videokälla. Välj en kanal här och tryck &apos;Ladda och ställ in&apos;-knappen för att ladda kanalinställningen till föregående skärm och försöka ställa in den.</translation>
-    </message>
-    <message>
         <source>Status</source>
         <translation>Status</translation>
-    </message>
-    <message>
-        <source>Select the type of satellite equipment you have. Selecting &apos;Finish&apos; on this screen will only save the type, and not the individual satellite, move down to the list to do this.</source>
-        <translation>Välj vilken typ av satellitutrustning du har. Genom att välja &apos;Slutför&apos; sparar du endast typen och inte den individuella satelliten. För att göra detta, skrolla ner i listan.</translation>
-    </message>
-    <message>
-        <source>Satellites</source>
-        <translation>Satelliter</translation>
-    </message>
-    <message>
-        <source>Select the satellite you want to configure and press the &apos;menu&apos; key, and edit the satellite, when you are done configuring, press &apos;OK&apos; to leave this wizard.</source>
-        <translation>Välj satelliten du vill konfigurera och tryck på &apos;Meny&apos;-knappen. När du är klar, tryck &apos;OK&apos; för att lämna guiden.</translation>
-    </message>
-    <message>
-        <source>Satellite Configuration</source>
-        <translation>Satellitkonfiguration</translation>
-    </message>
-    <message>
-        <source>Satellite Name</source>
-        <translation>Satellitnamn</translation>
-    </message>
-    <message>
-        <source>A textual representation of this satellite or cluster of satellites.</source>
-        <translation>Textrepresentation av denna satellit eller samling av satelliter.</translation>
-    </message>
-    <message>
-        <source>Satellite Position</source>
-        <translation>Satellitposition</translation>
-    </message>
-    <message>
-        <source>A textual representation of which position the satellite is located at (&apos;1W&apos;)</source>
-        <translation>Textrepresentation av satellitens position (&apos;1W&apos;)</translation>
     </message>
     <message>
         <source>LNB LOF Switch</source>
         <translation>LNB LOF väljare</translation>
     </message>
     <message>
-        <source>This defines at what frequency (in hz) the LNB will do a switch from high to low setting, and vice versa.</source>
-        <translation>Definierar vid vilken frekvens (i Hz) som LNB:n ändrar från hög till låg inställning, och vice versa.</translation>
-    </message>
-    <message>
         <source>LNB LOF High</source>
         <translation>LNB LOF Hög</translation>
-    </message>
-    <message>
-        <source>This defines the offset (in hz) the frequency coming from the lnb will be in high setting.</source>
-        <translation>Definierar förskjutning (i Hz) för frekvensen som kommer från LNB:n i högt läge.</translation>
     </message>
     <message>
         <source>LNB LOF Low</source>
         <translation>LNB LOF låg</translation>
     </message>
     <message>
-        <source>This defines the offset (in hz) the frequency coming from the lnb will be in low setting.</source>
-        <translation>Definierar förskjutning (i Hz) för frekvensen som kommer från LNB:n i lågt läge.</translation>
-    </message>
-    <message>
         <source>Recorder Options</source>
         <translation>Inspelningsinställningar</translation>
-    </message>
-    <message>
-        <source>Configuration Options</source>
-        <translation>Inställningsalternativ</translation>
-    </message>
-    <message>
-        <source>Card Verification Wizard</source>
-        <translation>Kortverifieringsguide</translation>
     </message>
     <message>
         <source>Capture device</source>
@@ -3035,7 +2839,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>When set and the transcoder is active, the original nuv files will be renamed to nuv.old once the transcoding is complete.</source>
-        <translation>När denna funktionen är aktiverad kommer originalfilen (nuv) att döpas om till nuv.old så fort omkodningen är klar.</translation>
+        <translation>Döp om originalfilen (nuv) till nuv.old när omkodningen är klar.</translation>
     </message>
     <message>
         <source>Time offset for XMLTV listings</source>
@@ -3158,10 +2962,6 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>Aktivera buffervarning vid kanalbyte</translation>
     </message>
     <message>
-        <source>Find One Recording</source>
-        <translation>Hitta en visning</translation>
-    </message>
-    <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
         <translation>Aktivera detta för DVB-T budgetkort baserade på BT878 som t.ex. AverTV DVT-T som kräver att ljudvolymen lämnas ifred.</translation>
     </message>
@@ -3172,10 +2972,6 @@ så du måste ställa in dessa manuellt.</translation>
     <message>
         <source>Find One Recordings Priority</source>
         <translation>Prioritet för &apos;hitta en visning&apos;</translation>
-    </message>
-    <message>
-        <source>Find One Recording types will receive this additional recording priority value.</source>
-        <translation>Det angivna värdet kommer att läggas till prioriteten för inspelningar av typen &apos;hitta en visning&apos;.</translation>
     </message>
     <message>
         <source>Length of time to retain DVB signal data (in days)</source>
@@ -3467,11 +3263,11 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>mythfilldatabase Path</source>
-        <translation>mythfilldatabase katalog</translation>
+        <translation>mythfilldatabase sökväg</translation>
     </message>
     <message>
         <source>Path (including executable) of the mythfilldatabase program.</source>
-        <translation>Katalog (inklusive program) till mythfilldatabase (ex. /usr/local/bin/mythfilldatabase).</translation>
+        <translation>Sökväg (inklusive program) till mythfilldatabase (ex. /usr/local/bin/mythfilldatabase).</translation>
     </message>
     <message>
         <source>mythfilldatabase Arguments</source>
@@ -3642,24 +3438,12 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>Åsidosätt aspekt</translation>
     </message>
     <message>
-        <source>16/9 Anamorphic</source>
-        <translation>16/9 anamorfisk</translation>
-    </message>
-    <message>
-        <source>4/3 Normal</source>
-        <translation>4/3 normal</translation>
-    </message>
-    <message>
         <source>16/9 Zoom</source>
         <translation>16/9 zoom</translation>
     </message>
     <message>
         <source>4/3 Zoom</source>
         <translation>4/3 zoom</translation>
-    </message>
-    <message>
-        <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback.</source>
-        <translation>Detta kommer att åsidosätta bildaspekt i inspelningar, på samma sätt som att använda W under uppspelning.</translation>
     </message>
     <message>
         <source>GUI width (px)</source>
@@ -3955,21 +3739,21 @@ MythTV kommer nu att avslutas.</translation>
 .  You might want to check the output as it
 runs by switching to the terminal from which you started
 this program.</source>
-        <translation>Vänligen vänta medans MythTV hämtar listan 
+        <translation>Vänta... MythTV hämtar listan 
 med tillgängliga kanaler.
 
 För att välja vilka kanaler som ska hämtas i fortsättningen,
-byt över till terminalfönstret som du startade detta
-programmet i. Detta gör du vanligtvis med Alt+Tab.</translation>
+växla till terminalfönstret som du startade detta
+program ifrån. Detta gör du vanligtvis med Alt+Tab.</translation>
     </message>
     <message>
         <source>Please wait while MythTV retrieves the list of available channels.
 You might want to check the output as it
 runs by switching to the terminal from which you started
 this program.</source>
-        <translation>Vänligen vänta medans MythTV hämtar lista med tillfängliga kanaler.
-Du kan kontrollera förloppet genom att byta över till terminalfönstret
-som du startade detta programmet i.</translation>
+        <translation>Vänta... MythTV hämtar listan med tillgängliga kanaler.
+Du kan kontrollera förloppet genom att växla till terminalfönstret
+som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Commercial Free</source>
@@ -4125,7 +3909,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>Enable this setting if MythTV is playing &quot;crackly&quot; audio and you are using hardware encoding. This setting will have no effect on MPEG-4 or RTJPEG video. MythTV will keep extra audio data in its internal buffers to workaround this bug.</source>
-        <translation>Aktivera denna inställning om MythTV spelar upp med hack i ljudet och du använder hårdvarukodning. Denna inställning har ingen effekt på MPEG-4- eller RTJPEG-video. MythTV kommer att lagra extra mycket ljuddata i sina interna buffertar för att kringgå denna bugg.</translation>
+        <translation>Aktivera om MythTV spelar upp med hack i ljudet och du använder hårdvarukodning. Denna inställning har ingen effekt på MPEG-4- eller RTJPEG-video. MythTV kommer att lagra extra mycket ljuddata i sina interna buffertar för att kringgå denna bugg.</translation>
     </message>
     <message>
         <source>Default Recording Group to display on the View Recordings screen.</source>
@@ -4189,19 +3973,19 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>When enabled, any newly recorded programs will be marked as eligible for Auto-Expiration. Existing recordings will keep their current value.</source>
-        <translation>Om aktiverat kommer alla nya inspelade program att markeras som valbara för autoradering. Existerande inspelningar behåller sitt nuvarande värde.</translation>
+        <translation>Markera alla framtida inspelningar som valbara för autoradering. Existerande inspelningar behåller sitt nuvarande värde.</translation>
     </message>
     <message>
         <source>When enabled, the most recent recording will be listed first in the &apos;Watch Recordings&apos; screen, otherwise the oldest recording will be listed first.</source>
-        <translation>Om aktiverat kommer de inspelningar som gjordes senast att listas först under &apos;Titta på inspelningar&apos;, annars de äldsta.</translation>
+        <translation>Lista senaste inspelningar först under &apos;Titta på inspelningar&apos;, annars de äldsta.</translation>
     </message>
     <message>
         <source>If enabled, fast forward and rewind continue after the key is released.  Pressing the key again increases the fast forward or rewind speed.  The alternate fast forward and rewind keys always behave in this way.</source>
-        <translation>Om aktiverat fortsätter snabbspolning fram och bakåt efter att knappen släpps. Ytterligare tryck ökar eller minskar hastigheten. De alternativa snabbspolningsknapparna fungerar alltid på detta vis.</translation>
+        <translation>Fortsätt snabbspolning fram och bakåt efter att knappen släpps. Ytterligare tryck ökar eller minskar hastigheten. De alternativa snabbspolningsknapparna fungerar alltid på detta vis.</translation>
     </message>
     <message>
         <source>If enabled, pressing the sticky rewind key in fast forward mode switches to rewind mode, and vice versa.  If disabled, it will decrease the current speed or switch to play mode if the speed can&apos;t be decreased further.</source>
-        <translation>Om aktiverat kommer den klistriga återspolningsknappen i snabbspolning framåt att växla till snabbspolning bakåt, och vice versa. Om avaktiverat minskas hastigheten eller återgår till normal uppspelning om den inte kan minskas mer.</translation>
+        <translation>Låt den klistriga återspolningsknappen i snabbspolning framåt att växla till snabbspolning bakåt, och vice versa. Annars minskas hastigheten eller återgår till normal uppspelning om den inte kan minskas mer.</translation>
     </message>
     <message>
         <source>Always display Closed Captioning</source>
@@ -4209,11 +3993,11 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>If enabled, captions will be displayed when playing back recordings or watching live TV.  Closed Captioning can be turned on or off by pressing &quot;T&quot; during playback.</source>
-        <translation>Om aktiverad visas alltid undertexter vid uppspelning eller i TV-läge. Textning kan slås på/av genom att trycka på &quot;T&quot; under uppspelning.</translation>
+        <translation>Visa alltid textning vid uppspelning eller i TV-läge. Textning kan slås på/av genom att trycka på &quot;T&quot; under uppspelning.</translation>
     </message>
     <message>
         <source>If enabled, Browse mode will automatically be activated whenever you use Channel UP/DOWN while watching Live TV.</source>
-        <translation>Om aktiverat kommer bläddringsläget att aktiveras automatiskt när du använder kanal UPP/NER i TV-läge.</translation>
+        <translation>Aktivera bläddringsläget automatiskt när du använder kanal UPP/NER i TV-läge.</translation>
     </message>
     <message>
         <source>If enabled, MythTV will pretend to have a smaller soundcard buffer than is really present.  This may speed up seeking, but can also cause playback problems.</source>
@@ -4225,7 +4009,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>During playback the Select key (Enter or Space) will alternate between &quot;Position Saved&quot; and &quot;Position Cleared&quot;. If disabled, the Select key will save the current position for each keypress.</source>
-        <translation>Om funktionen aktiveras så kommer OK (enter eller mellanslag) att alternera mellan &quot;Spara position&quot; och &quot;Rensa position&quot;. Om den inte aktiveras kommer den att spara positionen för varje tryck.</translation>
+        <translation>Låt OK (enter eller mellanslag) alternera mellan &quot;Spara position&quot; och &quot;Rensa position&quot;, annars sparas positionen vid varje tryck.</translation>
     </message>
     <message>
         <source>If enabled, Xv picture controls (brightness, contrast, etc.) are used during playback. These are independent of the Video4Linux controls used for recording. The Xv controls may not work properly on some systems.</source>
@@ -4233,7 +4017,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>If enabled, MythTV will warn you whenever you change the channel but are not caught up to live TV.</source>
-        <translation>Om denna funktion aktiveras kommer MythTV att varna dig om du försöker ändra kanal när du ligger efter verklig tid.</translation>
+        <translation>Varna om du försöker ändra kanal när du ligger efter verklig tid.</translation>
     </message>
     <message>
         <source>During playback, MythTV will listen for connections from the &quot;mythtvosd&quot; or &quot;mythudprelay&quot; programs on this port.  See the README in contrib/mythnotify/ for additional information.</source>
@@ -4245,7 +4029,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>If enabled, a static image of the recording will be displayed on the &quot;Watch a Recording&quot; menu.</source>
-        <translation>Om aktiverat visas en statisk bild av inspelningen i menyn &quot;Titta på inspelningar&quot;.</translation>
+        <translation>Visa en statisk bild av inspelningen i menyn &quot;Titta på inspelningar&quot;.</translation>
     </message>
     <message>
         <source>MythTV will make a thumbnail image this many seconds from the beginning of the recording. Useful to skip over advertisements.</source>
@@ -4253,11 +4037,11 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>When enabled, a preview of the recording will play in a small window on the &quot;Watch a Recording&quot; menu.</source>
-        <translation>Om aktiverat spelas en förhandsgranskning av inspelningen upp i ett litet fönster i menyn &quot;Titta på inspelningar&quot;.</translation>
+        <translation>Spela upp en förhandsgranskning av inspelningen i ett litet fönster i menyn &quot;Titta på inspelningar&quot;.</translation>
     </message>
     <message>
         <source>If enabled, the Watch Recording and Delete Recording screens will use transparency. Disable if selecting the recordings is slow due to high CPU usage.</source>
-        <translation>Om aktiverat använder menyerna &quot;Titta på inspelningar&quot; och &quot;Ta bort inspelningar&quot; transparens. Stäng av om val av inspelning blir för långsamt p.g.a. hög CPU-belastning.</translation>
+        <translation>Använd transparens för menyerna &quot;Titta på inspelningar&quot; och &quot;Ta bort inspelningar&quot;. Stäng av om val av inspelning blir för långsamt p.g.a. hög CPU-belastning.</translation>
     </message>
     <message>
         <source>&quot;Fill&quot; is the quickest shading method. &quot;Image&quot; is somewhat slow, but has a higher visual quality. No shading will be the fastest.</source>
@@ -4273,7 +4057,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>When enabled, MythTV will prompt for confirmation when you press the System Exit key.</source>
-        <translation>Om aktiverat kommer MythTV att kräva bekräftelse när du trycker på Systemavslutningstangenten.</translation>
+        <translation>Kräv bekräftelse när du trycker på Systemavslutningstangenten.</translation>
     </message>
     <message>
         <source>If you have configured an exit key using the System Shutdown option, you will be given the opportunity to exit MythTV or halt the system completely. Another possibility for this field is &quot;poweroff&quot;</source>
@@ -4285,7 +4069,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>If enabled, Arrow key accelerators will be used, with LEFT performing an exit action and RIGHT selecting the current item.</source>
-        <translation>Om aktiverat används piltangentsacceleratorer med vänsterpil som avsluta och högerpil för att välja aktiv post.</translation>
+        <translation>Använd piltangentsacceleratorer med vänsterpil som avsluta och högerpil för att välja aktiv post.</translation>
     </message>
     <message>
         <source>Display Size - Width</source>
@@ -4305,7 +4089,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>If enabled, use the above size for TV, otherwise use full screen.</source>
-        <translation>Om aktiverat, använd ovanstående storlek för TV, annars använd fullskärm.</translation>
+        <translation>Använd ovanstående storlek för TV (annars används fullskärm).</translation>
     </message>
     <message>
         <source>Switch X Window video modes for TV. Requires &quot;xrandr&quot; support.</source>
@@ -4389,7 +4173,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>If enabled, live TV will choose a tuner card that is less likely to have scheduled recordings rather than the best card available.</source>
-        <translation>Om aktiverat väljer TV-läge ett TV-kort som är mindre sannolikt att ha schemalagda inspelningar i stället för det bästa tillgängliga kortet.</translation>
+        <translation>Välj ett TV-kort för TV-läge som är mindre sannolikt att ha schemalagda inspelningar i stället för det bästa tillgängliga kortet.</translation>
     </message>
     <message>
         <source>Floating Program Guide Selector</source>
@@ -4397,7 +4181,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>If enabled, the program guide&apos;s selector will be free to move throughout the guide, otherwise it will stay in the center of the guide at all times.</source>
-        <translation>Om aktiverat är programguidens väljare fri att röra sig igenom guiden, annars stannar den alltid i centrum av guiden.</translation>
+        <translation>Låt programguidens väljare röra sig fritt igenom guiden, annars stannar den alltid i centrum av guiden.</translation>
     </message>
     <message>
         <source>Colorize program guide using genre colors. (Not available for all grabbers.)</source>
@@ -4409,7 +4193,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>If enabled, the EPG will initially display only the channels marked as favorites. Pressing &quot;4&quot; will toggle between displaying favorites and all channels.</source>
-        <translation>Om aktiverat kommer programguiden initialt att endast visa de kanaler som är markerade som favoritkanaler. Ett tryck på &quot;4&quot; växlar mellan favoriter och alla kanaler.</translation>
+        <translation>Låt programguiden initialt endast visa de kanaler som är markerade som favoritkanaler. Ett tryck på &quot;4&quot; växlar mellan favoriter och alla kanaler.</translation>
     </message>
     <message>
         <source>Move higher priority programs to other cards and showings when resolving conflicts.  This can be used to record lower priority programs that would otherwise not be recorded, but risks missing a higher priority program if the schedule changes.</source>
@@ -4417,7 +4201,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>If enabled, the Select key will change the channel while using the program guide during live TV.  If disabled, the select key will bring up the recording options screen.</source>
-        <translation>Om aktiverat ändrar valtangenten kanal när programguiden används i TV-läge. Annars tar valtangenten fram inspelningsinställningarna.</translation>
+        <translation>Låt valtangenten ändra kanal när programguiden används i TV-läge. Annars tar valtangenten fram inspelningsinställningarna.</translation>
     </message>
     <message>
         <source>If the option to use Select to change the channel is on, pressing Select on a show that is at least this many minutes into the future will schedule a recording.</source>
@@ -4461,7 +4245,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>If enabled, MythTV modules will send event details to the database, where they can be viewed with MythLog or periodically emailed to the administrator.</source>
-        <translation>Om aktiverat kommer MythTVs moduler skicka händelsedetaljer till databasen, där de kan visas med MythLog eller periodiskt e-postas till administratören.</translation>
+        <translation>Låt MythTVs moduler skicka händelsedetaljer till databasen, där de kan visas med MythLog eller periodiskt e-postas till administratören.</translation>
     </message>
     <message>
         <source>Maximum Number of Entries per Module</source>
@@ -4601,19 +4385,19 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>Look for duplicates in current and previous recordings</source>
-        <translation>Sök dubletter i nuvarande och tidigare inspelningar</translation>
+        <translation>Sök dubbletter i nuvarande och tidigare inspelningar</translation>
     </message>
     <message>
         <source>Look for duplicates in current recordings only</source>
-        <translation>Sök dubletter endast i nuvarande inspelningar</translation>
+        <translation>Sök dubbletter endast i nuvarande inspelningar</translation>
     </message>
     <message>
         <source>Look for duplicates in previous recordings only</source>
-        <translation>Sök dubletter endast i tidigare inspelningar</translation>
+        <translation>Sök dubbletter endast i tidigare inspelningar</translation>
     </message>
     <message>
         <source>[ Match duplicates with ]</source>
-        <translation>[ Matcha dubletter med ]</translation>
+        <translation>[ Matcha dubbletter med ]</translation>
     </message>
     <message>
         <source>Record new episodes only</source>
@@ -4621,19 +4405,19 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>Match duplicates using subtitle &amp; description</source>
-        <translation>Matcha dubletter mot undertitel &amp; beskrivning</translation>
+        <translation>Matcha dubbletter mot undertitel &amp; beskrivning</translation>
     </message>
     <message>
         <source>Match duplicates using subtitle</source>
-        <translation>Matcha dubletter mot undertitel</translation>
+        <translation>Matcha dubbletter mot undertitel</translation>
     </message>
     <message>
         <source>Match duplicates using description</source>
-        <translation>Matcha dubletter mot beskrivning</translation>
+        <translation>Matcha dubbletter mot beskrivning</translation>
     </message>
     <message>
         <source>Don&apos;t match duplicates</source>
-        <translation>Matcha inte dubletter</translation>
+        <translation>Matcha inte dubbletter</translation>
     </message>
     <message>
         <source>[ Select recording Profile ]</source>
@@ -4835,7 +4619,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>If enabled, captions will be displayed over a black space for maximum contrast. Otherwise, captions will use outlined text over the picture.</source>
-        <translation>Om aktiverad visas undertexter på ett svart område för maximal kontrast. Annars visas undertexter med konturerad text på bilden.</translation>
+        <translation>Visa textning på ett svart område för maximal kontrast. Annars visas textning med konturerad text på bilden.</translation>
     </message>
     <message>
         <source>The horizontal offset the GUI will be displayed at.  May only work if run in a window.</source>
@@ -4891,7 +4675,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>If set, jobs in the queue will be required to run on the backend that made the original recording.</source>
-        <translation>Om aktiverad kommer jobb i kön endast att köras på den inspelningsserver som skapade den ursprunliga inspelningen.</translation>
+        <translation>Kör jobb i kön endast på den inspelningsserver som skapade den ursprungliga inspelningen.</translation>
     </message>
     <message>
         <source>User Job #1 Description</source>
@@ -4903,7 +4687,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>User Job #1 Command</source>
-        <translation>Kommando för användardjobb #1</translation>
+        <translation>Kommando för användarjobb #1</translation>
     </message>
     <message>
         <source>The command to run whenever this User Job number is scheduled.</source>
@@ -4915,7 +4699,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>User Job #2 Command</source>
-        <translation>Kommando för användardjobb #2</translation>
+        <translation>Kommando för användarjobb #2</translation>
     </message>
     <message>
         <source>User Job #3 Description</source>
@@ -4923,7 +4707,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>User Job #3 Command</source>
-        <translation>Kommando för användardjobb #3</translation>
+        <translation>Kommando för användarjobb #3</translation>
     </message>
     <message>
         <source>User Job #4 Description</source>
@@ -4931,7 +4715,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>User Job #4 Command</source>
-        <translation>Kommando för användardjobb #4</translation>
+        <translation>Kommando för användarjobb #4</translation>
     </message>
     <message>
         <source>Allow Transcoding jobs</source>
@@ -4979,11 +4763,11 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>If set, programs that are automatically deleted (expired) will be allowed to re-recorded if they are shown again.</source>
-        <translation>Om aktiverat kommer program som tas bort automatiskt (av funktionen autoradera) att tillåtas bli återinspelade om de visas igen.</translation>
+        <translation>Tillåt program som tas bort automatiskt (av funktionen autoradera) att bli återinspelade om de visas igen.</translation>
     </message>
     <message>
         <source>Enables the use of viaXvMC HW Mpeg decoding for the Via Unichrome Chipset</source>
-        <translation>Aktiverar användning av viaXvMC MPEG-hårdvaruavkodning för Via Unichrome-chipsetet</translation>
+        <translation>Använd viaXvMC MPEG-hårdvaruavkodning för Via Unichrome-chipsetet</translation>
     </message>
     <message>
         <source>Scale video as necessary</source>
@@ -4991,7 +4775,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>If checked, video will be scaled to fit your window or screen. If unchecked, video will never be made larger than its actual pixel size.</source>
-        <translation>Om aktiverat kommer video att skalas för att passa ditt fönster eller skärm. Annars kommer aldrig video att göras större än verklig pixelstorlek.</translation>
+        <translation>Skala video för att passa ditt fönster eller skärm. Annars kommer aldrig video att göras större än verklig pixelstorlek.</translation>
     </message>
     <message>
         <source>Frames to skip in fullscreen mode</source>
@@ -5007,7 +4791,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>If checked, video will be displayed in the main GUI window. Disable this when you only want video on the desktop or in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation>Om aktiverat visas video i huvudfönstret. Avaktivera detta när du endast vill ha video på skrivbordet eller i ett flytande fönster. Endast giltigt när &quot;Använd GUI-storlek för uppspelning&quot; och &quot;Kör användargränssnittet i ett fönster&quot; är aktiverade.</translation>
+        <translation>Visa video i huvudfönstret. Avaktivera detta när du endast vill ha video på skrivbordet eller i ett flytande fönster. Endast giltigt när &quot;Använd GUI-storlek för uppspelning&quot; och &quot;Kör användargränssnittet i ett fönster&quot; är aktiverade.</translation>
     </message>
     <message>
         <source>Frames to skip</source>
@@ -5031,7 +4815,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>If checked, video will be displayed in a floating window. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation>Om aktiverat kommer video att visas i ett flytande fönster. Endast giltigt när &quot;Använd GUI-storlek för uppspelning&quot; och &quot;Kör användargränssnittet i ett fönster&quot; är aktiverade.</translation>
+        <translation>Visa video i ett flytande fönster. Endast giltigt när &quot;Använd GUI-storlek för uppspelning&quot; och &quot;Kör användargränssnittet i ett fönster&quot; är aktiverade.</translation>
     </message>
     <message>
         <source>Video in the floating window will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
@@ -5047,7 +4831,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>If checked, video will be displayed in the application&apos;s dock icon. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation>Om aktiverat kommer video att visas i applikationens dockningsikon. Endast giltigt när &quot;Använd GUI-storlek för uppspelning&quot; och &quot;Kör användargränssnittet i ett fönster&quot; är aktiverade.</translation>
+        <translation>Visa video i applikationens dockningsikon. Endast giltigt när &quot;Använd GUI-storlek för uppspelning&quot; och &quot;Kör användargränssnittet i ett fönster&quot; är aktiverade.</translation>
     </message>
     <message>
         <source>Video in the dock icon will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
@@ -5059,7 +4843,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>If checked, video will be displayed on the desktop, behind the Finder icons. Only valid when &quot;Use GUI size for TV playback&quot; and &quot;Run the frontend in a window&quot; are checked.</source>
-        <translation>Om aktiverat visas video på skrivbordet, bakom ikonerna. Endast giltigt när &quot;Använd GUI-storlek för uppspelning&quot; och &quot;Kör användargränssnittet i ett fönster&quot; är aktiverade.</translation>
+        <translation>Visa video på skrivbordet, bakom ikonerna. Endast giltigt när &quot;Använd GUI-storlek för uppspelning&quot; och &quot;Kör användargränssnittet i ett fönster&quot; är aktiverade.</translation>
     </message>
     <message>
         <source>Video on the desktop will skip this many frames for each frame drawn. Set to 0 to show every frame.</source>
@@ -5301,7 +5085,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>All database settings take effect when you restart this program.</source>
-        <translation>Alla databasinställningar aktiveras när du startar om detta program.</translation>
+        <translation>Databasinställningarna aktiveras när du startar om detta program.</translation>
     </message>
     <message>
         <source>Myth could not connect to the database. Please verify your database settings below.</source>
@@ -5365,7 +5149,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>If checked, the frontend will use Wake-On-LAN parameters to reconnect to the database server.</source>
-        <translation>Om aktiverat kommer inspelningsklienten använda Wake-On-LAN-parametrar för att återansluta till databasservern.</translation>
+        <translation>Aktivera om uppspelningsklienten använder Wake-On-LAN-parametrar för att återansluta till databasservern.</translation>
     </message>
     <message>
         <source>Reconnect time</source>
@@ -5401,7 +5185,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>If checked, QuickTime will correct the gamma of the video to match your monitor.  Turning this off can save some CPU cycles.</source>
-        <translation>Om aktiverat kommer QuickTime korrigera bildens gammavärde för att matcha din monitor. Att stänga av detta kan spara några CPU-cykler.</translation>
+        <translation>Låt QuickTime korrigera bildens gammavärde för att matcha din monitor. Att stänga av detta kan spara några CPU-cykler.</translation>
     </message>
     <message>
         <source>Use Altivec-enhanced color space conversion</source>
@@ -5409,7 +5193,7 @@ som du startade detta programmet i.</translation>
     </message>
     <message>
         <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec-enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
-        <translation>Om aktiverat kommer YUV 4:2:0 konverteras till UYVY 4:2:2 i en Altivec-optimerad rutin. Annars hanterar QuickTime konverteringen i stället.</translation>
+        <translation>Konvertera YUV 4:2:0 till UYVY 4:2:2 i en Altivec-optimerad rutin. Annars hanterar QuickTime konverteringen i stället.</translation>
     </message>
     <message>
         <source>Recording Host</source>
@@ -5446,6 +5230,324 @@ som du startade detta programmet i.</translation>
     <message>
         <source>Follow symbolic links when deleting files</source>
         <translation>Följ symboliska länkar vid borttagning av filer</translation>
+    </message>
+    <message>
+        <source>Unable to initialize video.</source>
+        <translation>Kan inte initiera video.</translation>
+    </message>
+    <message>
+        <source>Error was encountered while displaying video.</source>
+        <translation>Fel uppstod vid videovisning.</translation>
+    </message>
+    <message>
+        <source>Return to Menu</source>
+        <translation>Återgå till meny</translation>
+    </message>
+    <message>
+        <source>d</source>
+        <comment>RecTypeChar</comment>
+        <translation>d</translation>
+    </message>
+    <message>
+        <source>w</source>
+        <comment>RecTypeChar</comment>
+        <translation>v</translation>
+    </message>
+    <message>
+        <source>Single Record</source>
+        <translation>Enstaka inspelning</translation>
+    </message>
+    <message>
+        <source>Record Daily</source>
+        <translation>Daglig inspelning</translation>
+    </message>
+    <message>
+        <source>Record Weekly</source>
+        <translation>Veckovis inspelning</translation>
+    </message>
+    <message>
+        <source>Channel Record</source>
+        <translation>Kanalinspelning</translation>
+    </message>
+    <message>
+        <source>Record All</source>
+        <translation>Spela in alla visningar</translation>
+    </message>
+    <message>
+        <source>Find One</source>
+        <translation>Hitta en</translation>
+    </message>
+    <message>
+        <source>Find Daily</source>
+        <translation>Hitta dagligen</translation>
+    </message>
+    <message>
+        <source>Find Weekly</source>
+        <translation>Hitta veckovis</translation>
+    </message>
+    <message>
+        <source>Previously Recorded</source>
+        <translation>Tidigare inspelat</translation>
+    </message>
+    <message>
+        <source>Currently Recorded</source>
+        <translation>Nuvarande inspelat</translation>
+    </message>
+    <message>
+        <source>Find ID</source>
+        <translation>Hitta ID</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every week</source>
+        <translation>Spela in en visning av denna titel varje vecka</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every day</source>
+        <translation>Spela in en visning av denna titel varje dag</translation>
+    </message>
+    <message>
+        <source>pcHDTV capture card (HD-2000, HD-3000)</source>
+        <translation>pcHDTV-kort (HD-2000, HD-3000)</translation>
+    </message>
+    <message>
+        <source>This is the default policy used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
+        <translation>Detta är den förvalda policyn för automatisk reklamdetektering när en ny schemalagd inspelning skapas.</translation>
+    </message>
+    <message>
+        <source>4/3</source>
+        <translation>4/3</translation>
+    </message>
+    <message>
+        <source>16/9</source>
+        <translation>16/9</translation>
+    </message>
+    <message>
+        <source>16/9 Stretch</source>
+        <translation>16/9 utsträckning</translation>
+    </message>
+    <message>
+        <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback. Fill will &quot;fill&quot; the screen with the image clipping as required. Fill is useful when using 4:3 interlaced TV&apos;s for display.</source>
+        <translation>Detta åsidosätter bildaspekt i inspelningar (W-tangenten under uppspelning). Fyll &quot;fyller&quot; skärmen med bilden med klippning vid behov; användbart när en 4:3 interlaced TV används.</translation>
+    </message>
+    <message>
+        <source>HD Ringbuffer size (KB)</source>
+        <translation>HD ringbuffertstorlek (KB)</translation>
+    </message>
+    <message>
+        <source>The HD device ringbuffer allows the backend to weather moments of stress. The larger the ringbuffer, the longer the moments of stress can be. However, setting the size too large can cause swapping, which is detrimental.</source>
+        <translation>HDTV-enhetsringbufferten låter inspelningsservern stå emot belastning. Ju större ringbuffert desto större marginal men ett för stort värde kan orsaka swappning.</translation>
+    </message>
+    <message>
+        <source>Find One, Find Weekly and Find Daily recording types will receive this additional recording priority value.</source>
+        <translation>Det angivna värdet läggs till prioriteten för inspelningar av typerna &apos;Hitta en&apos;, &apos;Hitta veckovis&apos; och &apos;Hitta dagligen&apos;.</translation>
+    </message>
+    <message>
+        <source>Use libmpeg2 for decoding</source>
+        <translation>Använd libmpeg2 för avkodning</translation>
+    </message>
+    <message>
+        <source>If enabled, libmpeg2 will be used instead of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. This can be faster. Not available when XvMC is used.</source>
+        <translation>Använd libmpeg2 i stället för ffmpeg för avkodning av MPEG-1 och MPEG-2 bildrutor. Detta kan vara snabbare. Inte tillgängligt när XvMC används.</translation>
+    </message>
+    <message>
+        <source>Scan for channels(s)</source>
+        <translation>Sök efter kanaler</translation>
+    </message>
+    <message>
+        <source>This button will scan for digital channels.</source>
+        <translation>Denna knapp söker efter digitala kanaler.</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <translation>Avancerat</translation>
+    </message>
+    <message>
+        <source>Advanced editing options for digital channels</source>
+        <translation>Avancerade inställningar för digitala kanaler</translation>
+    </message>
+    <message>
+        <source>Use on air guide</source>
+        <translation>Använd programguide</translation>
+    </message>
+    <message>
+        <source>If set the guide information will be taken from the On Air Channel guide.</source>
+        <translation>Hämta tablåinformationen från kanalens egen inbyggda programguide.</translation>
+    </message>
+    <message>
+        <source>x</source>
+        <comment>RecStatusChar</comment>
+        <translation>x</translation>
+    </message>
+    <message>
+        <source>Inactive</source>
+        <translation>Inaktiv</translation>
+    </message>
+    <message>
+        <source>this recording schedule is inactive.</source>
+        <translation>detta inspelningsschema är inaktivt.</translation>
+    </message>
+    <message>
+        <source>This recording schedule is inactive</source>
+        <translation>Detta inspelningsschema är inaktivt</translation>
+    </message>
+    <message>
+        <source>This recording schedule is active</source>
+        <translation>Detta inspelningsschema är aktivt</translation>
+    </message>
+    <message>
+        <source>Record in TS format instead of PS.</source>
+        <translation>Spela in i TS-format i stället för PS.</translation>
+    </message>
+    <message>
+        <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk for processing errors.</source>
+        <translation>Avaktiverar konvertering av transportström (TS) till programström (PS) vilket resulterar i något större filer men minskar risken för bearbetningsfel.</translation>
+    </message>
+    <message>
+        <source>DiSEqC Input Type: (DVB-S)</source>
+        <translation>DiSEqC ingångstyp: (DVB-S)</translation>
+    </message>
+    <message>
+        <source>Select the input type for DVB-S cards. Leave as Single LNB/Input for DVB-C or DVB-T. The inputs are mapped from Input Connections option on the main menu</source>
+        <translation>Välj ingångstyp för DVB-S-kort. Lämna som Single LNB/Input för DVB-C eller DVB-T. Ingångarna mappas från valet Anslutningar i huvudmenyn</translation>
+    </message>
+    <message>
+        <source>This defines at what frequency (in Hz) the LNB will do a switch from high to low setting, and vice versa.</source>
+        <translation>Definierar vid vilken frekvens (i Hz) som LNB:n ändrar från högt till lågt läge, och vice versa.</translation>
+    </message>
+    <message>
+        <source>This defines the offset (in Hz) the frequency coming from the lnb will be in high setting.</source>
+        <translation>Definierar förskjutning (i Hz) för frekvensen som kommer från LNB:n i högt läge.</translation>
+    </message>
+    <message>
+        <source>This defines the offset (in Hz) the frequency coming from the lnb will be in low setting.</source>
+        <translation>Definierar förskjutning (i Hz) för frekvensen som kommer från LNB:n i lågt läge.</translation>
+    </message>
+    <message>
+        <source>DiSEqC Satellite Location</source>
+        <translation>DiSEqC satellitläge</translation>
+    </message>
+    <message>
+        <source>The longitude of the satellite you are aiming at.  For western hemisphere use a negative value.  Value is in decimal.</source>
+        <translation>Longitud för den satellit du siktar på. För västra hemisfären använd ett negativt värde. Värdet är i decimalform.</translation>
+    </message>
+    <message>
+        <source>If set, only free to air channels will be used.</source>
+        <translation>Använd endast &quot;free to air&quot;-kanaler.</translation>
+    </message>
+    <message>
+        <source>The Latitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format 35.78 for 35.78 degrees North Longitude</source>
+        <translation>Latituden för din parabol. Detta används med DiSEqC motorstöd. Ange 35.78 för 35.78 grader nordlig latitud</translation>
+    </message>
+    <message>
+        <source>The Longitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format -78.93 for 78.93 degrees West Longitude</source>
+        <translation>Longituden för din parabol. Detta används med DiSEqC motorstöd. Ange -78.93 för 78.93 grader västlig longitud</translation>
+    </message>
+    <message>
+        <source>Diseqc Options</source>
+        <translation>DiSEqC-inställningar</translation>
+    </message>
+    <message>
+        <source>[Common] Frequency (Option has no default)
+The frequency for this channel in Hz.</source>
+        <translation>[Gemensam] Frekvens (Inget standardvärde)
+Kanalens frekvens i Hz.</translation>
+    </message>
+    <message>
+        <source>[DVB-S] Polarity (Option has no default)
+</source>
+        <translation>[DVB-S] Polaritet (Inget standardvärde)
+</translation>
+    </message>
+    <message>
+        <source>6 MHz</source>
+        <translation>6 MHz</translation>
+    </message>
+    <message>
+        <source>7 MHz</source>
+        <translation>7 MHz</translation>
+    </message>
+    <message>
+        <source>8 MHz</source>
+        <translation>8 MHz</translation>
+    </message>
+    <message>
+        <source>Transport</source>
+        <translation>Transport</translation>
+    </message>
+    <message>
+        <source>Capture Card</source>
+        <translation>TV-kort</translation>
+    </message>
+    <message>
+        <source>Scanning</source>
+        <translation>Sökning</translation>
+    </message>
+    <message>
+        <source>Scan Activity</source>
+        <translation>Sök aktivitet</translation>
+    </message>
+    <message>
+        <source>Free to air channels only.</source>
+        <translation>Endast &quot;free to air&quot;-kanaler.</translation>
+    </message>
+</context>
+<context>
+    <name>ScanProgressPopup</name>
+    <message>
+        <source>Scan Progress</source>
+        <translation>Sökförlopp</translation>
+    </message>
+    <message>
+        <source>Tuning</source>
+        <translation>Justerar</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+</context>
+<context>
+    <name>ScanWizardScanType</name>
+    <message>
+        <source>Scan Type</source>
+        <translation>Söktyp</translation>
+    </message>
+</context>
+<context>
+    <name>ScanWizardScanner</name>
+    <message>
+        <source>Scanning</source>
+        <translation>Söker</translation>
+    </message>
+    <message>
+        <source>ScanWizard</source>
+        <translation>Sökguide</translation>
+    </message>
+    <message>
+        <source>Error tuning to transport</source>
+        <translation>Fel vid justering till transport</translation>
+    </message>
+    <message>
+        <source>Error detecting card type</source>
+        <translation>Fel vid korttypsdetektering</translation>
+    </message>
+    <message>
+        <source>Error parsing parameters</source>
+        <translation>Fel vid inläsning av parametrar</translation>
+    </message>
+</context>
+<context>
+    <name>ScanWizardTuningPage</name>
+    <message>
+        <source>Tuning</source>
+        <translation>Justering</translation>
+    </message>
+</context>
+<context>
+    <name>ScheduledRecording</name>
+    <message>
+        <source>or later</source>
+        <translation>eller senare</translation>
     </message>
 </context>
 <context>
@@ -5920,6 +6022,14 @@ som du startade detta programmet i.</translation>
     <message>
         <source>Sleep</source>
         <translation>Insomning</translation>
+    </message>
+    <message>
+        <source>Fill</source>
+        <translation>Fyll</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>Av</translation>
     </message>
 </context>
 <context>
