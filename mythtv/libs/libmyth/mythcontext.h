@@ -65,7 +65,7 @@ enum LogPriorities {
 #define VERBOSE(mask,args...) \
 do { \
 if ((print_verbose_messages & mask) != 0) \
-    cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") \
+    cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz") \
          << " " << args << endl; \
 } while (0)
 

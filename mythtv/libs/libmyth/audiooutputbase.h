@@ -15,7 +15,9 @@ using namespace std;
 class AudioOutputBase : public AudioOutput
 {
  public:
-    AudioOutputBase(QString audiodevice);
+    AudioOutputBase(QString audiodevice, int laudio_bits,
+                   int laudio_channels, int laudio_samplerate,
+		   AudioOutputSource source, bool set_initial_vol);    
     virtual ~AudioOutputBase();
 
     // reconfigure sound out for new params
@@ -50,6 +52,14 @@ class AudioOutputBase : public AudioOutput
     virtual void WriteAudio(unsigned char *aubuf, int size) = 0;
     virtual int getSpaceOnSoundcard(void) = 0;
     virtual int getBufferedOnSoundcard(void) = 0;
+    virtual int GetVolumeChannel(int channel) = 0; // Returns 0-100
+    virtual void SetVolumeChannel(int channel, int volume) = 0; // range 0-100 for vol
+
+    // The following functions may be overridden, but don't need to be
+    virtual void StartOutputThread(void);
+    virtual void StopOutputThread(void);
+
+    int GetAudioData(unsigned char *buffer, int buf_size, bool fill_buffer);
 
     void _AddSamples(void *buffer, bool interleaved, int samples, long long timecode);
 	 
@@ -61,6 +71,8 @@ class AudioOutputBase : public AudioOutput
     int audiolen(bool use_lock); // number of valid bytes in audio buffer
     int audiofree(bool use_lock); // number of free bytes in audio buffer
 
+    void UpdateVolume(void);
+    
     int effdsp; // from the recorded stream
 
     // Basic details about the audio stream
@@ -70,7 +82,14 @@ class AudioOutputBase : public AudioOutput
     int audio_samplerate;
     int audio_buffer_unused;
     int fragment_size;
+    long soundcard_buffer_size;
     QString audiodevice;
+    AudioOutputSource source;
+
+    bool killaudio;
+
+    bool pauseaudio, audio_actually_paused;
+    bool set_initial_vol;
     
  private:
     QString lastError;
@@ -82,10 +101,6 @@ class AudioOutputBase : public AudioOutput
     float src_in[16384], src_out[16384*6];
     short tmp_buff[16384*6];
 
-
-    bool killaudio;
-
-    bool pauseaudio, audio_actually_paused;
 
     bool blocking; // do AddSamples calls block?
 
@@ -114,6 +129,7 @@ class AudioOutputBase : public AudioOutput
     int numlowbuffer;
 
     QMutex killAudioLock;
+    
 };
 
 #endif

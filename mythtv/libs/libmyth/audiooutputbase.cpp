@@ -8,10 +8,12 @@ using namespace std;
 #include <iostream>
 #include <qdatetime.h>
 #include <sys/time.h>
+#include <unistd.h>
 
 
-AudioOutputBase::AudioOutputBase(QString audiodevice) 
-               : AudioOutput()
+AudioOutputBase::AudioOutputBase(QString audiodevice, int, 
+                                 int, int,
+                                 AudioOutputSource source, bool set_initial_vol)
 {
     pthread_mutex_init(&audio_buflock, NULL);
     pthread_mutex_init(&avsync_lock, NULL);
@@ -22,6 +24,9 @@ AudioOutputBase::AudioOutputBase(QString audiodevice)
     audio_bits = -1;
     audio_channels = -1;
     audio_samplerate = -1;    
+    this->source = source;
+    this->set_initial_vol = set_initial_vol;
+    soundcard_buffer_size = 0;
 
     src_ctx = NULL;
 
@@ -65,10 +70,12 @@ void AudioOutputBase::Reconfigure(int laudio_bits, int laudio_channels,
         Error("AudioOutput only supports 8 or 16bit audio.");
         return;
     }
+    audio_bytes_per_sample = audio_channels * audio_bits / 8;
     
     need_resampler = false;
     killaudio = false;
     pauseaudio = false;
+    internal_vol = gContext->GetNumSetting("MythControlsVolume", 0);
     
     numlowbuffer = 0;
 
@@ -76,15 +83,20 @@ void AudioOutputBase::Reconfigure(int laudio_bits, int laudio_channels,
             .arg(audiodevice));
     
     // Actually do the device specific open call
-    if (!OpenDevice())
+    if (!OpenDevice()) {
+        pthread_mutex_unlock(&avsync_lock);
+        pthread_mutex_unlock(&audio_buflock);
+        VERBOSE(VB_AUDIO, "Aborting reconfigure");
         return;
+    }
 
+    SyncVolume();
+    
     VERBOSE(VB_AUDIO, QString("Audio fragment size: %1")
-                                 .arg(fragment_size));
+            .arg(fragment_size));
 
-    audio_bytes_per_sample = audio_channels * audio_bits / 8;
     if (audio_buffer_unused < 0)
-       audio_buffer_unused = 0;
+        audio_buffer_unused = 0;
 
     if (!gContext->GetNumSetting("AggressiveSoundcardBuffer", 0))
         audio_buffer_unused = 0;
@@ -97,37 +109,40 @@ void AudioOutputBase::Reconfigure(int laudio_bits, int laudio_channels,
     // Check if we need the resampler
     if (audio_samplerate != laudio_samplerate)
     {
-    	int error;
-	VERBOSE(VB_GENERAL, QString("Using resampler") );
+        int error;
+        VERBOSE(VB_GENERAL, QString("Using resampler") );
         src_ctx = src_new (SRC_SINC_BEST_QUALITY, audio_channels, &error);
-	if (error) {
+        if (error)
+        {
             Error(QString("Error creating resampler, the error was: %1")
-	              .arg(src_strerror(error)) );
+                  .arg(src_strerror(error)) );
             return;
-	}
+        }
         src_data.src_ratio = (double) audio_samplerate / laudio_samplerate;
         src_data.data_in = src_in;
         src_data.data_out = src_out;
-	src_data.output_frames = 16384*6;
-	need_resampler = true;
+        src_data.output_frames = 16384*6;
+        need_resampler = true;
     }
-
-    pthread_create(&output_audio, NULL, kickoffOutputAudioLoop, this);
-    
+    StartOutputThread();
     pthread_mutex_unlock(&avsync_lock);
     pthread_mutex_unlock(&audio_buflock);
     VERBOSE(VB_AUDIO, "Ending reconfigure");
 }
 
-bool AudioOutputBase::OpenDevice()
+void AudioOutputBase::StartOutputThread(void)
 {
-    // OVERRIDE ME!
-    return false; 
+    pthread_create(&output_audio, NULL, kickoffOutputAudioLoop, this);    
 }
 
-void AudioOutputBase::CloseDevice()
+
+void AudioOutputBase::StopOutputThread(void)
 {
-    // Override me
+    if (output_audio)
+    {
+        pthread_join(output_audio, NULL);
+        output_audio = 0;
+    }
 }
 
 void AudioOutputBase::KillAudio()
@@ -135,12 +150,8 @@ void AudioOutputBase::KillAudio()
     killAudioLock.lock();
 
     VERBOSE(VB_AUDIO, "Killing AudioOutputDSP");
-    if (output_audio)
-    {
-        killaudio = true;
-        pthread_join(output_audio, NULL);
-        output_audio = 0;
-    }
+    killaudio = true;
+    StopOutputThread();
 
     // Close resampler?
     if (src_ctx)
@@ -295,9 +306,6 @@ void AudioOutputBase::SetAudiotime(void)
 void AudioOutputBase::AddSamples(char *buffers[], int samples, 
                                 long long timecode)
 {
-    VERBOSE(VB_AUDIO, QString("AddSamples[] %1")
-                              .arg(samples * audio_bytes_per_sample));
-
     // resample input if necessary
     if (need_resampler && src_ctx) 
     {
@@ -332,9 +340,6 @@ void AudioOutputBase::AddSamples(char *buffers[], int samples,
 
 void AudioOutputBase::AddSamples(char *buffer, int samples, long long timecode)
 {
-    VERBOSE(VB_AUDIO, QString("AddSamples %1")
-                              .arg(samples * audio_bytes_per_sample));
-
     // resample input if necessary
     if (need_resampler && src_ctx) 
     {
@@ -342,9 +347,9 @@ void AudioOutputBase::AddSamples(char *buffer, int samples, long long timecode)
         short *buf_ptr = (short*)buffer;
         for (int sample = 0; sample < samples * audio_channels; sample++) 
         {       
-            src_in[sample] = (float)buf_ptr[sample] / (1.0 * 0x8000) ;
+            src_in[sample] = (float)buf_ptr[sample] / (1.0 * 0x8000);
         }
-	
+        
         src_data.input_frames = samples;
         src_data.end_of_input = 0;
         int error = src_process(src_ctx, &src_data);
@@ -352,7 +357,7 @@ void AudioOutputBase::AddSamples(char *buffer, int samples, long long timecode)
             VERBOSE(VB_IMPORTANT, QString("Error occured while resampling "
                     "audio: %1").arg(src_strerror(error)));
         src_float_to_short_array(src_data.data_out, (short int*)tmp_buff, 
-	                         src_data.output_frames_gen*audio_channels);
+                                 src_data.output_frames_gen*audio_channels);
 
         _AddSamples(tmp_buff, false, src_data.output_frames_gen, timecode);
     } 
@@ -371,6 +376,10 @@ void AudioOutputBase::_AddSamples(void *buffer, bool interleaved, int samples,
     int afree = audiofree(false);
     int len = samples * audio_bytes_per_sample;
     int audio_bytes = audio_bits / 8;
+
+    VERBOSE(VB_AUDIO, QString("_AddSamples bytes=%1, used=%2, free=%3, timecode=%4")
+            .arg(samples * audio_bytes_per_sample)
+            .arg(AUDBUFSIZE-afree).arg(afree).arg((long)timecode));
     
     while (len > afree)
     {
@@ -384,16 +393,16 @@ void AudioOutputBase::_AddSamples(void *buffer, bool interleaved, int samples,
         else
         {
             VERBOSE(VB_IMPORTANT, "Audio buffer overflow, audio data lost!");
-	    samples = afree / audio_bytes_per_sample;
+            samples = afree / audio_bytes_per_sample;
             len = samples * audio_bytes_per_sample;
             if (src_ctx) 
             {
                 int error = src_reset(src_ctx);
-		if (error)
-		    VERBOSE(VB_IMPORTANT, QString("Error occured while "
+                if (error)
+                    VERBOSE(VB_IMPORTANT, QString("Error occured while "
                             "resetting resampler: %1")
                             .arg(src_strerror(error)));
-	    }
+            }
 //            pthread_mutex_unlock(&audio_buflock);
 //            Reset();
 //            return;
@@ -445,10 +454,11 @@ void AudioOutputBase::_AddSamples(void *buffer, bool interleaved, int samples,
 
 void AudioOutputBase::OutputAudioLoop(void)
 {
-    int space_on_soundcard;
+    int space_on_soundcard, last_space_on_soundcard;
     unsigned char zeros[fragment_size];
  
     bzero(zeros, fragment_size);
+    last_space_on_soundcard = 0;
 
     while (!killaudio)
     {
@@ -457,51 +467,75 @@ void AudioOutputBase::OutputAudioLoop(void)
 
         if (pauseaudio)
         {
+            if (!audio_actually_paused)
+                VERBOSE(VB_AUDIO, "OutputAudioLoop: audio paused");
+
             audio_actually_paused = true;
             
-            //usleep(50);
             audiotime = 0; // mark 'audiotime' as invalid.
 
-            // should this use ioctl(audio_fd, SNDCTL_DSP_POST, 0) instead ?
-            
             space_on_soundcard = getSpaceOnSoundcard();
-            if (fragment_size <= space_on_soundcard)
-            {
-                WriteAudio(zeros, fragment_size);
-            }
-            else
-            {
-                VERBOSE(VB_AUDIO, QString("waiting for space to write 1024 "
-                        "zeros on soundcard which has %1 bytes free")
+
+            if (space_on_soundcard != last_space_on_soundcard) {
+                VERBOSE(VB_AUDIO, QString("%1 bytes free on soundcard")
                         .arg(space_on_soundcard));
-                usleep(50);
+                last_space_on_soundcard = space_on_soundcard;
             }
 
+            // only send zeros if card doesn't already have at least one
+            // fragment of zeros -dag
+            if (fragment_size >= soundcard_buffer_size - space_on_soundcard) {
+                if (fragment_size <= space_on_soundcard) {
+                    WriteAudio(zeros, fragment_size);
+                } else {
+                    // this should never happen now -dag
+                    VERBOSE(VB_AUDIO,
+                            QString("waiting for space on soundcard "
+                                    "to write zeros: have %1 need %2")
+                            .arg(space_on_soundcard).arg(fragment_size));
+                    usleep(50);
+                }
+            }
+
+            usleep(200);
             continue;
         }
+
+        space_on_soundcard = getSpaceOnSoundcard();
         
-        SetAudiotime(); // once per loop, calculate stuff for a/v sync
+        // if nothing has gone out the soundcard yet no sense calling
+        // this (think very fast loops here when soundcard doesn't have
+        // space to take another fragment) -dag
+        if (space_on_soundcard != last_space_on_soundcard)
+            SetAudiotime(); // once per loop, calculate stuff for a/v sync
 
         /* do audio output */
         
         // wait for the buffer to fill with enough to play
         if (fragment_size > audiolen(true))
         {
-            VERBOSE(VB_AUDIO, QString("audio thread waiting for buffer to fill"
-                                      " fragment_size=%1, audiolen=%2")
-                                      .arg(fragment_size).arg(audiolen(true)));
+            if (audiolen(true) > 0)  // only log if we're sending some audio
+                VERBOSE(VB_AUDIO,
+                        QString("audio waiting for buffer to fill: "
+                                "have %1 want %2")
+                        .arg(audiolen(true)).arg(fragment_size));
+
             usleep(200);
             continue;
         }
         
         // wait for there to be free space on the sound card so we can write
         // without blocking.  We don't want to block while holding audio_buflock
-        
-        space_on_soundcard = getSpaceOnSoundcard();
         if (fragment_size > space_on_soundcard)
         {
-            VERBOSE(VB_AUDIO, QString("Waiting for space on soundcard: "
-                                 "space=%1").arg(space_on_soundcard));
+            if (space_on_soundcard != last_space_on_soundcard) {
+                VERBOSE(VB_AUDIO,
+                        QString("audio waiting for space on soundcard: "
+                                "have %1 need %2")
+                        .arg(space_on_soundcard).arg(fragment_size));
+                last_space_on_soundcard = space_on_soundcard;
+            }
+
             numlowbuffer++;
             if (numlowbuffer > 5 && audio_buffer_unused)
             {
@@ -515,33 +549,73 @@ void AudioOutputBase::OutputAudioLoop(void)
         else
             numlowbuffer = 0;
 
-        pthread_mutex_lock(&audio_buflock); // begin critical section
-
-        // re-check audiolen() in case things changed.
-        // for example, ClearAfterSeek() might have run
-        if (fragment_size <= audiolen(false))
-        {
-            int bdiff = AUDBUFSIZE - raud;
-            if (fragment_size > bdiff)
-            {
-                // always want to write whole fragments
-                unsigned char fragment[fragment_size];
-                memcpy(fragment, audiobuffer + raud, bdiff);
-                memcpy(fragment + bdiff, audiobuffer, fragment_size - bdiff);
-                WriteAudio(fragment, fragment_size);
-            }
-            else
-            {
-                WriteAudio(audiobuffer + raud, fragment_size);
-            }
-
-            /* update raud */
-            raud = (raud + fragment_size) % AUDBUFSIZE;
-            VERBOSE(VB_AUDIO, "Broadcasting free space avail");
-            pthread_cond_broadcast(&audio_bufsig);
-        }
-        pthread_mutex_unlock(&audio_buflock); // end critical section
+        unsigned char fragment[fragment_size];
+        if (GetAudioData(fragment, fragment_size, true))
+            WriteAudio(fragment, fragment_size);
     }
+}
+
+int AudioOutputBase::GetAudioData(unsigned char *buffer, int buf_size, bool fill_buffer)
+{
+    pthread_mutex_lock(&audio_buflock); // begin critical section
+    
+    // re-check audiolen() in case things changed.
+    // for example, ClearAfterSeek() might have run
+    int avail_size = audiolen(false);
+    int fragment_size = buf_size;
+    int written_size = 0;
+    if (!fill_buffer && (buf_size > avail_size))
+    {
+        // when fill_buffer is false, return any available data
+        fragment_size = avail_size;
+    }
+    
+    if (avail_size && (fragment_size <= avail_size))
+    {
+        int bdiff = AUDBUFSIZE - raud;
+        if (fragment_size > bdiff)
+        {
+            // always want to write whole fragments
+            memcpy(buffer, audiobuffer + raud, bdiff);
+            memcpy(buffer + bdiff, audiobuffer, fragment_size - bdiff);
+        }
+        else
+        {
+            memcpy(buffer, audiobuffer + raud, fragment_size);
+        }
+
+        /* update raud */
+        raud = (raud + fragment_size) % AUDBUFSIZE;
+        VERBOSE(VB_AUDIO, "Broadcasting free space avail");
+        pthread_cond_broadcast(&audio_bufsig);
+        
+        written_size = fragment_size;
+    }
+    pthread_mutex_unlock(&audio_buflock); // end critical section
+    
+    // Mute individual channels through mono->stereo duplication
+    kMuteState mute_state = GetMute();
+    if (written_size &&
+        audio_channels > 1 &&
+        (mute_state == MUTE_LEFT || mute_state == MUTE_RIGHT))
+    {
+        int offset_src = 0;
+        int offset_dst = 0;
+        
+        if (mute_state == MUTE_LEFT)
+            offset_src = audio_bits / 8;    // copy channel 1 to channel 0
+        else if (mute_state == MUTE_RIGHT)
+            offset_dst = audio_bits / 8;    // copy channel 0 to channel 1
+            
+        for (int i = 0; i < written_size; i += audio_bytes_per_sample)
+        {
+            buffer[i + offset_dst] = buffer[i + offset_src];
+            if (audio_bits == 16)
+                buffer[i + offset_dst + 1] = buffer[i + offset_src + 1];
+        }
+    }
+    
+    return written_size;
 }
 
 void *AudioOutputBase::kickoffOutputAudioLoop(void *player)

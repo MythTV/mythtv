@@ -95,7 +95,8 @@ void JACK_GetVolumeForChannel(int deviceID, unsigned int channel, unsigned int *
 
 long JACK_GetOutputBytesPerSecond(int deviceID); /* bytes_per_frame * sample_rate */
 long JACK_GetInputBytesPerSecond(int deviceID);  /* bytes_per_frame * sample_rate */
-long JACK_GetBytesStored(int deviceID);          /* bytes currently buffered in the device */
+long JACK_GetBytesStored(int deviceID);          /* bytes currently buffered in the device,
+                                                  this is a real-time approximation */
 long JACK_GetBytesFreeSpace(int deviceID);       /* bytes of free space in the buffers */
 long JACK_GetBytesPerOutputFrame(int deviceID);
 int  JACK_GetNumInputChannels(int deviceID);

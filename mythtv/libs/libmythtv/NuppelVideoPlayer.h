@@ -175,6 +175,7 @@ class NuppelVideoPlayer
     void SetFramesPlayed(long long played) { framesPlayed = played; }
 
     VideoOutput *getVideoOutput(void) { return videoOutput; }
+    AudioOutput *getAudioOutput(void) { return audioOutput; }
 
     VideoSync *getVideoSync() const { return videosync; }
 

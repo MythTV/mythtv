@@ -129,6 +129,54 @@ class AudioReencodeBuffer : public AudioOutput
         return last_audiotime;
     }
 
+    virtual int GetVolumeChannel(int)
+    { 
+        // Do nothing
+        return 100;
+    }
+    virtual void SetVolumeChannel(int, int) 
+    {
+        // Do nothing
+    }
+    virtual void SetVolumeAll(int)
+    {
+        // Do nothing
+    }
+    
+
+    virtual int GetCurrentVolume(void)
+    { 
+        // Do nothing
+        return 100;
+    }
+    virtual void SetCurrentVolume(int) 
+    {
+        // Do nothing
+    }
+    virtual void AdjustCurrentVolume(int) 
+    {
+        // Do nothing
+    }
+    virtual void SetMute(bool) 
+    {
+        // Do nothing
+    }
+    virtual void ToggleMute(void) 
+    {
+        // Do nothing
+    }
+    virtual kMuteState GetMute(void) 
+    {
+        // Do nothing
+        return MUTE_OFF;
+    }
+    virtual kMuteState IterateMutedChannels(void) 
+    {
+        // Do nothing
+        return MUTE_OFF;
+    }
+    
+
     int bufsize;
     unsigned char *audiobuffer;
     int audiobuffer_len, channels, bits, bytes_per_sample, eff_audiorate;

@@ -20,8 +20,10 @@ extern "C"
 }
 
 AudioOutputJACK::AudioOutputJACK(QString audiodevice, int laudio_bits, 
-                               int laudio_channels, int laudio_samplerate)
-               : AudioOutputBase(audiodevice) 
+                               int laudio_channels, int laudio_samplerate,
+			       AudioOutputSource source, bool set_initial_vol)
+              : AudioOutputBase(audiodevice, laudio_bits, 
+	                      laudio_channels, laudio_samplerate, source, set_initial_vol)
 {
     // Initialise the Jack output layer
     JACK_Init();
@@ -58,10 +60,8 @@ bool AudioOutputJACK::OpenDevice()
     audioid = -1;
     while (timer.elapsed() < 2000 && audioid == -1)
     {
-cout << "About to open\n";
         err = JACK_OpenEx(&audioid, 16, (unsigned long *) &audio_samplerate, audio_channels, audio_channels,
 	                &jack_port_name, jack_port_name_count, jack_port_flags);
-cout << "Err: " << err << "\n";
 	if (err == 1) {
 	    Error(QString("Error connecting to jackd:%1.  Is it running?").arg(audiodevice));
 	    return false;
@@ -89,9 +89,6 @@ cout << "Err: " << err << "\n";
         return false;
     }
     
-    // Set volumes to 100%
-    JACK_SetAllVolume(audioid, 100);
-
     // TODO: Should we get this from the driver?
     fragment_size = 512;
 
@@ -101,6 +98,10 @@ cout << "Err: " << err << "\n";
     audio_buffer_unused = JACK_GetBytesFreeSpace(audioid);
     JACK_SetPosition(audioid, BYTES, 0);
 
+    // Setup volume control
+    if (internal_vol)
+        VolumeInit();
+	
     // Device opened successfully
     return true; 
 }
@@ -139,15 +140,13 @@ void AudioOutputJACK::WriteAudio(unsigned char *aubuf, int size)
 
 inline int AudioOutputJACK::getBufferedOnSoundcard(void)
 {
-    return  JACK_GetBytesStored(audioid);
+    return  JACK_GetBytesStored(audioid) + JACK_GetJackBufferedBytes(audioid)*2;
 }
 
 inline int AudioOutputJACK::getSpaceOnSoundcard(void)
 {
     int space = 0;
 
-//    ioctl(audiofd, SNDCTL_DSP_GETOSPACE, &info);
-//    space = info.bytes - audio_buffer_unused;
     space = JACK_GetBytesFreeSpace(audioid);
 
     if (space < 0)
@@ -156,5 +155,31 @@ inline int AudioOutputJACK::getSpaceOnSoundcard(void)
     }
 
     return space;
+}
+
+void AudioOutputJACK::VolumeInit(void)
+{
+    int volume = 100;
+    if (set_initial_vol)
+        volume = gContext->GetNumSetting("MasterMixerVolume", 80);
+
+    JACK_SetAllVolume(audioid, volume);
+}
+
+int AudioOutputJACK::GetVolumeChannel(int channel)
+{
+    unsigned int vol = 0;
+    
+    if (!internal_vol)
+        return 100;
+	
+    JACK_GetVolumeForChannel(audioid, channel, &vol);
+    return vol;
+}
+
+void AudioOutputJACK::SetVolumeChannel(int channel, int volume)
+{
+    if (internal_vol)
+        JACK_SetVolumeForChannel(audioid, channel, volume);
 }
 

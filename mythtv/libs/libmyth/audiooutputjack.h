@@ -13,9 +13,14 @@ class AudioOutputJACK : public AudioOutputBase
 {
   public:
     AudioOutputJACK(QString audiodevice, int laudio_bits, 
-                   int laudio_channels, int laudio_samplerate);
+                   int laudio_channels, int laudio_samplerate,
+		   AudioOutputSource source, bool set_initial_vol);
     virtual ~AudioOutputJACK();
-    
+   
+    // Volume control
+    virtual int GetVolumeChannel(int channel); // Returns 0-100
+    virtual void SetVolumeChannel(int channel, int volume); // range 0-100 for vol
+ 
   protected:
 
     // You need to implement the following functions
@@ -26,6 +31,8 @@ class AudioOutputJACK : public AudioOutputBase
     virtual inline int getBufferedOnSoundcard(void);
 
   private:
+
+    void VolumeInit(void);
 
     int audioid;
 

@@ -5,15 +5,22 @@
 using namespace std;
 
 #include "mythcontext.h"
+#include "volumebase.h"
 
-class AudioOutput
+typedef enum {
+    AUDIOOUTPUT_VIDEO,
+    AUDIOOUTPUT_MUSIC
+} AudioOutputSource;
+
+class AudioOutput : public VolumeBase
 {
  public:
     // opens one of the concrete subclasses
     static AudioOutput *OpenAudio(QString audiodevice, int audio_bits, 
-                                 int audio_channels, int audio_samplerate);
+                                 int audio_channels, int audio_samplerate,
+                                 AudioOutputSource source, bool set_initial_vol);
 
-    AudioOutput() { lastError = QString::null; };
+    AudioOutput() : VolumeBase() { lastError = QString::null; };
     virtual ~AudioOutput() { };
 
     // reconfigure sound out for new params
@@ -37,7 +44,6 @@ class AudioOutput
     virtual void Pause(bool paused) = 0;
  
     virtual int GetAudiotime(void) = 0;
-//  virtual int WaitForFreeSpace(int bytes) = 0;
 
     QString GetError() { return lastError; };
 

@@ -17,7 +17,6 @@ class MythSqlDatabase;
 class QDateTime;
 class OSD;
 class RemoteEncoder;
-class VolumeControl;
 class NuppelVideoPlayer;
 class RingBuffer;
 class ProgramInfo;
@@ -274,8 +273,6 @@ class TV : public QObject
     ProgramInfo *playbackinfo;
 
     MythSqlDatabase *m_db;
-
-    VolumeControl *volumeControl;
 
     WId embedid;
     int embx, emby, embw, embh;

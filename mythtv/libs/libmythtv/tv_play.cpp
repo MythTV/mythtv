@@ -21,7 +21,6 @@ using namespace std;
 #include "remoteencoder.h"
 #include "remoteutil.h"
 #include "guidegrid.h"
-#include "volumecontrol.h"
 #include "NuppelVideoPlayer.h"
 #include "programinfo.h"
 #include "udpnotify.h"
@@ -29,6 +28,7 @@ using namespace std;
 #include "vsync.h"
 #include "lcddevice.h"
 #include "jobqueue.h"
+#include "audiooutput.h"
 
 struct SeekSpeedInfo {
     QString   dispString;
@@ -236,7 +236,6 @@ TV::TV(void)
     osd = NULL;
     requestDelete = false;
     endOfRecording = false;
-    volumeControl = NULL;
     embedid = 0;
     times_pressed = 0;
     last_channel = "";
@@ -357,9 +356,6 @@ void TV::Init(bool createWindow)
         qApp->processEvents();
     }
 
-    if (gContext->GetNumSetting("MythControlsVolume", 1))
-        volumeControl = new VolumeControl(true);
-
     pthread_create(&event, NULL, EventThread, this);
 
     while (!runMainLoop)
@@ -377,8 +373,6 @@ TV::~TV(void)
         delete prbuffer;
     if (nvp)
         delete nvp;
-    if (volumeControl)
-        delete volumeControl;
     if (myWindow)
     {
         delete myWindow;
@@ -2098,9 +2092,10 @@ bool TV::UpdatePosOSD(float time, const QString &mesg)
 {
     bool muted = false;
 
-    if (volumeControl && !volumeControl->GetMute())
+    AudioOutput *aud = nvp->getAudioOutput(); 
+    if (aud && !aud->GetMute())
     {
-        volumeControl->ToggleMute();
+        aud->ToggleMute();
         muted = true;
     }
 
@@ -2341,9 +2336,10 @@ void TV::DoSkipCommercials(int direction)
 
     bool muted = false;
 
-    if (volumeControl && !volumeControl->GetMute())
+    AudioOutput *aud = nvp->getAudioOutput();
+    if (aud && !aud->GetMute())
     {
-        volumeControl->ToggleMute();
+        aud->ToggleMute();
         muted = true;
     }
 
@@ -2442,9 +2438,10 @@ void TV::ChangeChannel(int direction, bool force)
         }
     }
 
-    if (volumeControl && !volumeControl->GetMute() && activenvp == nvp)
+    AudioOutput *aud = nvp->getAudioOutput();
+    if (aud && !aud->GetMute() && activenvp == nvp)
     {
-        volumeControl->ToggleMute();
+        aud->ToggleMute();
         muted = true;
     }
 
@@ -2641,9 +2638,10 @@ void TV::ChangeChannelByString(QString &name, bool force)
         }
     }
 
-    if (volumeControl && !volumeControl->GetMute() && activenvp == nvp)
+    AudioOutput *aud = nvp->getAudioOutput();
+    if (aud && !aud->GetMute() && activenvp == nvp)
     {
-        volumeControl->ToggleMute();
+        aud->ToggleMute();
         muted = true;
     }
 
@@ -3217,15 +3215,16 @@ void TV::ChangeHue(bool up, bool recorder)
 
 void TV::ChangeVolume(bool up)
 {
-    if (!volumeControl)
+    AudioOutput *aud = nvp->getAudioOutput();
+    if (!aud)
         return;
 
     if (up)
-        volumeControl->AdjustCurrentVolume(2);
+        aud->AdjustCurrentVolume(2);
     else 
-        volumeControl->AdjustCurrentVolume(-2);
+        aud->AdjustCurrentVolume(-2);
 
-    int curvol = volumeControl->GetCurrentVolume();
+    int curvol = aud->GetCurrentVolume();
     QString text = QString(tr("Volume %1 %")).arg(curvol);
 
     if (osd && !browsemode)
@@ -3240,19 +3239,20 @@ void TV::ToggleMute(void)
 {
     kMuteState mute_status;
 
-    if (!volumeControl)
+    AudioOutput *aud = nvp->getAudioOutput();
+    if (!aud)
         return;
 
     if (!MuteIndividualChannels)
     {
-        volumeControl->ToggleMute();
-        bool muted = volumeControl->GetMute();
+        aud->ToggleMute();
+        bool muted = aud->GetMute();
         if (muted) 
             mute_status = MUTE_BOTH;
         else
             mute_status = MUTE_OFF;
     }
-    else mute_status = volumeControl->IterateMutedChannels();
+    else mute_status = aud->IterateMutedChannels();
 
     QString text;
 
@@ -3341,8 +3341,9 @@ void TV::KeyRepeatOK(void)
 void TV::UnMute(void)
 {
     // If muted, unmute
-    if (volumeControl && volumeControl->GetMute())
-        volumeControl->ToggleMute();
+    AudioOutput *aud = nvp->getAudioOutput();
+    if (aud && aud->GetMute())
+        aud->ToggleMute();
 }
 
 void TV::customEvent(QCustomEvent *e)
@@ -3605,6 +3606,7 @@ void TV::DoTogglePictureAttribute(void)
         char *title = "Adjust Picture";
         QString picName;
 
+        AudioOutput *aud = NULL;
         switch (picAdjustment)
         {
             case kPictureAttribute_Brightness:
@@ -3624,7 +3626,8 @@ void TV::DoTogglePictureAttribute(void)
                 picName = QString("%1 %2 %").arg(tr("Hue")).arg(value);
                 break;
             case kPictureAttribute_Volume:
-                value = (volumeControl) ? (volumeControl->GetCurrentVolume()) 
+                aud = nvp->getAudioOutput();
+                value = (aud) ? (aud->GetCurrentVolume()) 
                         : 99; 
                 title = "Adjust Volume";
                 picName = QString("%1 %2 %").arg(tr("Volume")).arg(value);

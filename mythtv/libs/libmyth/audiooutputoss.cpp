@@ -18,8 +18,10 @@ using namespace std;
 #include "audiooutputoss.h"
 
 AudioOutputOSS::AudioOutputOSS(QString audiodevice, int laudio_bits, 
-                               int laudio_channels, int laudio_samplerate)
-              : AudioOutputBase(audiodevice)
+                               int laudio_channels, int laudio_samplerate,
+                               AudioOutputSource source, bool set_initial_vol)
+              : AudioOutputBase(audiodevice, laudio_bits,
+                              laudio_channels, laudio_samplerate, source, set_initial_vol)
 {
     // our initalisation
     audiofd = -1;
@@ -122,6 +124,10 @@ bool AudioOutputOSS::OpenDevice()
                 " the error was: %1").arg(strerror(errno)));
     }
 
+    // Setup volume control
+    if (internal_vol)
+        VolumeInit();
+
     // Device opened successfully
     return true;
 }
@@ -166,8 +172,9 @@ void AudioOutputOSS::CloseDevice()
         close(audiofd);
 
     audiofd = -1;
+    
+    VolumeCleanup();
 }
-
 
 
 void AudioOutputOSS::WriteAudio(unsigned char *aubuf, int size)
@@ -230,5 +237,118 @@ inline int AudioOutputOSS::getSpaceOnSoundcard(void)
         numbadioctls = 0;
 
     return space;
+}
+
+void AudioOutputOSS::VolumeInit()
+{
+    mixerfd = 0;
+    int volume = 0;
+
+    QString device = gContext->GetSetting("MixerDevice", "/dev/mixer");
+    mixerfd = open(device.ascii(), O_RDONLY);
+
+    QString controlLabel = gContext->GetSetting("MixerControl", "PCM");
+
+    if (controlLabel == "Master")
+    {
+        control = SOUND_MIXER_VOLUME;
+    }
+    else
+    {
+        control = SOUND_MIXER_PCM;
+    }
+
+    if (mixerfd < 0)
+    {
+        cerr << "Unable to open mixer: '" << device << "'\n";
+        return;
+    }
+
+    if (set_initial_vol)
+    {
+        int tmpVol;
+        volume = gContext->GetNumSetting("MasterMixerVolume", 80);
+        tmpVol = (volume << 8) + volume;
+        int ret = ioctl(mixerfd, MIXER_WRITE(SOUND_MIXER_VOLUME), &tmpVol);
+        if (ret < 0) {
+	    VERBOSE(VB_IMPORTANT, QString("Error Setting initial Master Volume"));
+            perror("Setting master volume: ");
+	}
+
+        volume = gContext->GetNumSetting("PCMMixerVolume", 80);
+        tmpVol = (volume << 8) + volume;
+        ret = ioctl(mixerfd, MIXER_WRITE(SOUND_MIXER_PCM), &tmpVol);
+        if (ret < 0) {
+	    VERBOSE(VB_IMPORTANT, QString("Error setting initial PCM Volume"));
+            perror("Setting PCM volume: ");
+	}
+    }
+}
+
+void AudioOutputOSS::VolumeCleanup()
+{
+    if (mixerfd)
+    {
+        close(mixerfd);
+        mixerfd = 0;
+    }
+}
+
+int AudioOutputOSS::GetVolumeChannel(int channel)
+{
+    int volume=0;
+    int tmpVol=0;
+
+    if (!mixerfd)
+        return 100;
+
+    int ret = ioctl(mixerfd, MIXER_READ(control), &tmpVol);
+    if (ret < 0) {
+        VERBOSE(VB_IMPORTANT, QString("Error reading volume for channel %1")
+                          .arg(channel));
+        perror("Reading PCM volume: ");
+        return 0;
+    }
+
+    if (channel == 0) {
+        volume = tmpVol & 0xff; // left
+    } else if (channel == 1) {
+        volume = (tmpVol >> 8) & 0xff; // right
+    } else {
+        VERBOSE(VB_IMPORTANT, QString("Invalid channel. Only stereo volume supported"));
+    }
+
+    return volume;
+}
+
+void AudioOutputOSS::SetVolumeChannel(int channel, int volume)
+{
+    if (channel > 1) {
+        // Don't support more than two channels!
+	VERBOSE(VB_IMPORTANT, QString("Error setting channel: %1.  Only stereo volume supported")
+	                            .arg(channel));
+        return;
+    }
+
+    if (volume > 100)
+        volume = 100;
+    if (volume < 0)
+        volume = 0;
+
+    if (mixerfd > 0)
+    {
+        int tmpVol = 0;
+	if (channel == 0) {
+	    tmpVol = (GetVolumeChannel(1) << 8) + volume;
+	} else {
+	    tmpVol = (volume << 8) + GetVolumeChannel(0);
+	}
+        int ret = ioctl(mixerfd, MIXER_WRITE(control), &tmpVol);
+        if (ret < 0) {
+            VERBOSE(VB_IMPORTANT, QString("Error setting volume on channel: %1").arg(channel));
+            perror("Setting volume: ");
+	}
+    }
+
 }
 

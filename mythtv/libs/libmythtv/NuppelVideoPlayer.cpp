@@ -1631,8 +1631,10 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     if (!disableaudio)
     {
+        bool setVolume = gContext->GetNumSetting("MythControlsVolume", 1);
         audioOutput = AudioOutput::OpenAudio(audiodevice, audio_bits,
-                                             audio_channels, audio_samplerate);
+                                             audio_channels, audio_samplerate, AUDIOOUTPUT_VIDEO,
+                                             setVolume );
 
         DialogBox *dialog = NULL ;
         if (audioOutput == NULL)

@@ -109,7 +109,7 @@ typedef struct jack_driver_s
 
   unsigned long    latencyMS;                     /* latency in ms between writing and actual audio output of the written data */
 
-  long             clientBytesInJack;             /* number of INPUT bytes we wrote to jack(not necessary the number of bytes we wrote to jack */
+  long             clientBytesInJack;             /* number of INPUT bytes(from the client of bio2jack) we wrote to jack(not necessary the number of bytes we wrote to jack) */
   unsigned long    buffer_size;                   /* number of bytes in the buffer allocated for processing data in JACK_Callback */
 
   unsigned char*   sound_buffer;
@@ -118,7 +118,7 @@ typedef struct jack_driver_s
   unsigned long    written_client_bytes;          /* input bytes we wrote to jack, not necessarily actual bytes we wrote to jack due to channel and other conversion */
   unsigned long    played_client_bytes;           /* input bytes that jack has played */
 
-  unsigned long    client_bytes;                  /* total bytes written by the client via JACK_Write() */
+  unsigned long    client_bytes;                  /* total bytes written by the client of bio2jack via JACK_Write() */
 
   jack_port_t*     output_port[MAX_OUTPUT_PORTS]; /* output ports */
   jack_client_t*   client;                        /* pointer to jack client */
@@ -176,8 +176,9 @@ static void	JACK_CloseDevice(jack_driver_t* drv);
 
 /* Prototypes */
 static int JACK_OpenDevice(jack_driver_t* drv);
-static long JACK_GetBytesStoredFromDriver(jack_driver_t *drv);
+static long JACK_GetBytesFreeSpaceFromDriver(jack_driver_t *drv);
 static void JACK_ResetFromDriver(jack_driver_t *drv);
+static long JACK_GetPositionFromDriver(jack_driver_t *drv, enum pos_enum position, int type);
 
 
 
@@ -786,6 +787,7 @@ static int JACK_OpenDevice(jack_driver_t* drv)
   if ((drv->client = jack_client_new(client_name)) == 0)
   {
     /* try once more */
+    TRACE("trying once more to jack_client_new");
     if ((drv->client = jack_client_new(client_name)) == 0)
     {
       ERR("jack server not running?\n");
@@ -1037,9 +1039,12 @@ int JACK_Open(int* deviceID, unsigned int bits_per_channel, unsigned long *rate,
  *
  * we set *deviceID
  */
-int JACK_OpenEx(int* deviceID, unsigned int bits_per_channel, unsigned long *rate, 
-		unsigned int input_channels, unsigned int output_channels, const char** jack_port_name, 
-		unsigned int jack_port_name_count, unsigned long jack_port_flags)
+int JACK_OpenEx(int* deviceID, unsigned int bits_per_channel,
+                unsigned long *rate, 
+                unsigned int input_channels, unsigned int output_channels,
+                const char** jack_port_name, 
+                unsigned int jack_port_name_count,
+                unsigned long jack_port_flags)
 {
   jack_driver_t *drv = getDriver(first_free_device);
   unsigned int i;
@@ -1076,7 +1081,7 @@ int JACK_OpenEx(int* deviceID, unsigned int bits_per_channel, unsigned long *rat
       for(i = 0; i < drv->jack_port_name_count; i++)
       {
           drv->jack_port_name[i] = strdup(jack_port_name[i]);
-          TRACE("jack_port_name[%d] == %s\n", i, jack_port_name[i]);
+          TRACE("jack_port_name[%d] == '%s'\n", i, jack_port_name[i]);
       }
     }
     else
@@ -1180,7 +1185,7 @@ long JACK_Write(int deviceID, unsigned char *data, unsigned long bytes)
   wave_header_t *newWaveHeader;
   wave_header_t **wh;
   struct timeval now;
-  long bytes_stored;
+  long bytes_free;
 
   TRACE("deviceID(%d), bytes == %ld\n", deviceID, bytes);
 
@@ -1188,14 +1193,18 @@ long JACK_Write(int deviceID, unsigned char *data, unsigned long bytes)
   TRACE("Starting Time = %ld.%ld\n", now.tv_sec, now.tv_usec);
 
   /* check and see that we have enough space for this audio */
-  bytes_stored = JACK_GetBytesStoredFromDriver(drv);
-  TRACE("bytes stored == %ld\n", bytes_stored);
-  if(bytes_stored + bytes > (unsigned long)MAX_BUFFERED_BYTES) /* hackish check for now */
+  bytes_free = JACK_GetBytesFreeSpaceFromDriver(drv);
+  TRACE("bytes free == %ld\n", bytes_free);
+  if(bytes > bytes_free)
   {
-    TRACE("bytes stored(%ld) + bytes(%ld) > MAX_BUFFERED_BYTES(%ld), returning 0\n",
-          bytes_stored, bytes, MAX_BUFFERED_BYTES);
-    releaseDriver(drv);
-    return 0; /* indicate that we couldn't write any bytes */
+    bytes = 0; /* act as if we were told to write 0 bytes */
+  }
+
+  /* handle the case where the user calls this routine with 0 bytes */
+  if(bytes == 0)
+  {
+      releaseDriver(drv);
+      return 0; /* indicate that we couldn't write any bytes */
   }
 
   newWaveHeader = (wave_header_t*)malloc(sizeof(wave_header_t));   /* create a wave header for this data */
@@ -1229,9 +1238,6 @@ long JACK_Write(int deviceID, unsigned char *data, unsigned long bytes)
     TRACE("currently STOPPED, transitioning to PLAYING\n");
     drv->state = PLAYING;
   }
-
-  bytes_stored = JACK_GetBytesStoredFromDriver(drv);
-  TRACE("bytes stored == %ld\n", bytes_stored);
 
   gettimeofday(&now, 0);
   TRACE("Ending Time = %ld.%ld\n", now.tv_sec, now.tv_usec);
@@ -1432,18 +1438,27 @@ long JACK_GetInputBytesPerSecond(int deviceID)
 /* NOTE: convert from output bytes to input bytes in here */
 static long JACK_GetBytesStoredFromDriver(jack_driver_t *drv)
 {
+  struct timeval now;
+  long elapsedMS;
   long return_val;
 
-  return_val = (drv->client_bytes - drv->played_client_bytes);
+  /* get the number of bytes free space */
+  /* TODO: its gross to subtract away the position byte offset here, consider */
+  /*       other cleaner ways of doing this */
+  return_val = (drv->client_bytes -
+                  (JACK_GetPositionFromDriver(drv, BYTES, PLAYED)
+                   - drv->position_byte_offset));
 
-  if(return_val < 0)
-    ERR("client_bytes == %ld < played_client_bytes == %ld\n", drv->client_bytes, drv->played_client_bytes);
+  if(return_val < 0) return_val = 0;
 
   TRACE("drv->deviceID(%d), return_val = %ld\n", drv->deviceID, return_val);
 
   return return_val;
 }
 
+/* An approximation of how many bytes we have to send out to jack */
+/* that is computed as if we were sending jack a continuous stream of */
+/* bytes rather than chunks during discrete callbacks.  */
 /* Return the number of bytes we have buffered thus far for output */
 /* NOTE: convert from output bytes to input bytes in here */
 long JACK_GetBytesStored(int deviceID)
@@ -1455,13 +1470,22 @@ long JACK_GetBytesStored(int deviceID)
   return retval;
 }
 
+static long JACK_GetBytesFreeSpaceFromDriver(jack_driver_t *drv)
+{
+    return MAX_BUFFERED_BYTES - (drv->client_bytes - drv->played_client_bytes);
+}
+
 /* Return the number of bytes we can write to the device */
 long JACK_GetBytesFreeSpace(int deviceID)
 {
+  jack_driver_t *drv = getDriver(deviceID);
   long return_val;
 
-  return_val = MAX_BUFFERED_BYTES - JACK_GetBytesStored(deviceID);
-  TRACE("deviceID(%d), MAX_BUFFERED_BYTES - bytes stored == %ld\n", deviceID, return_val);
+  return_val = JACK_GetBytesFreeSpaceFromDriver(drv);
+  releaseDriver(drv);
+
+  if(return_val < 0) return_val = 0;
+  TRACE("deviceID(%d), JACK_GetFreeSpacesFromDriver(deviceID) == %ld\n", deviceID, return_val);
 
   return return_val;
 }
@@ -1476,7 +1500,7 @@ static long JACK_GetPositionFromDriver(jack_driver_t *drv, enum pos_enum positio
   long elapsedMS;
   double sec2msFactor = 1000;
 
-  char *type_str;
+  char *type_str = "UNKNOWN type";
 
   /* if we are reset we should return a position of 0 */
   if(drv->state == RESET)
@@ -1719,7 +1743,7 @@ long JACK_GetJackLatency(int deviceID)
   jack_driver_t *drv = getDriver(deviceID);
   long return_val;
 
-  return_val = jack_port_get_latency(drv->output_port[0]);
+  return_val = jack_port_get_total_latency(drv->client, drv->output_port[0]);
   TRACE("got latency of %ldms\n", return_val);
 
   releaseDriver(drv);

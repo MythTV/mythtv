@@ -96,7 +96,8 @@ DEFINE_GUID( _KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF, WAVE_FORMAT_DOLBY_AC3_SPDIF,
 
 
 AudioOutputDX::AudioOutputDX(QString audiodevice, int audio_bits, 
-                                 int audio_channels, int audio_samplerate)
+                                 int audio_channels, int audio_samplerate,
+				 AudioOutputSource source, bool set_initial_vol)
 {
     this->audiodevice = audiodevice;
     
@@ -717,5 +718,15 @@ int AudioOutputDX::FillBuffer(int frames, char *buffer)
 //    VERBOSE(VB_ALL, "finished fillbuffer");
 
     return 0;
+}
+
+int AudioOutputDX::GetVolumeChannel(int channel)
+{
+    // Do nothing
+    return 100;
+}
+void AudioOutputDX::SetVolumeChannel(int channel, int volume)
+{
+    // Do nothing
 }
 

@@ -9,39 +9,37 @@
 
 using namespace std;
 
-#include "audiooutput.h"
+#include "audiooutputbase.h"
 
-class AudioOutputARTS : public AudioOutput
+class AudioOutputARTS : public AudioOutputBase
 {
-public:
+  public:
      AudioOutputARTS(QString audiodevice, int audio_bits, 
-                   int audio_channels, int audio_samplerate);
-    virtual ~AudioOutputARTS();
+                   int audio_channels, int audio_samplerate,
+		   AudioOutputSource source, bool set_initial_vol);
+     virtual ~AudioOutputARTS();
 
-     virtual void Reset(void);
-     virtual void Reconfigure(int audio_bits, 
-                             int audio_channels, int audio_samplerate);
-     virtual void SetBlocking(bool blocking);
+    // Volume control
+    virtual int GetVolumeChannel(int channel); // Returns 0-100
+    virtual void SetVolumeChannel(int channel, int volume); // range 0-100 for vol
 
-     virtual void AddSamples(char *buffer, int samples, long long timecode);
-     virtual void AddSamples(char *buffers[], int samples, long long timecode);
-     virtual void SetEffDsp(int dsprate);
-     virtual void SetTimecode(long long timecode);
-    
-     virtual bool GetPause(void);
-     virtual void Pause(bool paused);
- 
-     virtual int GetAudiotime(void);
+  protected:
 
- private:
+    // You need to implement the following functions
+    virtual bool OpenDevice(void);
+    virtual void CloseDevice(void);
+    virtual void WriteAudio(unsigned char *aubuf, int size);
+    virtual inline int getSpaceOnSoundcard(void);
+    virtual inline int getBufferedOnSoundcard(void);
+
+     
+
+  private:
     QString audiodevice;
     arts_stream_t pcm_handle;
-    int effdsp; // from the recorded stream
-    int audio_bytes_per_sample;
-    int audio_bits;
-    int audio_channels;
-    int audbuf_timecode;    /* timecode of audio most recently placed into
-                   buffer */
+//    int audbuf_timecode;    /* timecode of audio most recently placed into
+//                   buffer */
+    int buff_size;
     bool can_hw_pause;
     bool paused;
 };

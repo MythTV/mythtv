@@ -15,7 +15,8 @@ class AudioOutputDX : public AudioOutput
 {
 public:
     AudioOutputDX(QString audiodevice, int audio_bits, 
-                  int audio_channels, int audio_samplerate);
+                  int audio_channels, int audio_samplerate,
+		  AudioOutputSource source, bool set_initial_vol);
     virtual ~AudioOutputDX();
 
     virtual void Reset(void);
@@ -32,6 +33,10 @@ public:
     virtual void Pause(bool paused);
 
     virtual int GetAudiotime(void);
+
+    // Volume control
+    virtual int GetVolumeChannel(int channel); // Returns 0-100
+    virtual void SetVolumeChannel(int channel, int volume); // range 0-100 for vol
 
  private:
     HINSTANCE dsound_dll;      /* handle of the opened dsound dll */

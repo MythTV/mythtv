@@ -8,24 +8,33 @@ using namespace std;
 #include "audiooutputarts.h"
 
 AudioOutputARTS::AudioOutputARTS(QString audiodevice, int audio_bits, 
-                                 int audio_channels, int audio_samplerate)
-                : AudioOutput()
+                                 int audio_channels, int audio_samplerate,
+				 AudioOutputSource source, bool set_initial_vol)
+              : AudioOutputBase(audiodevice, laudio_bits,
+                              laudio_channels, laudio_samplerate, source, set_initial_vol)
 {
-    this->audiodevice = audiodevice;
+    // our initalisation
     pcm_handle = NULL;
-    effdsp = 0;
-    paused = false;
+
+    // Set everything up
     Reconfigure(audio_bits, audio_channels, audio_samplerate);
 }
 
-void AudioOutputARTS::SetBlocking(bool blocking)
+AudioOutputARTS::~AudioOutputARTS()
 {
-    (void)blocking;
-    // FIXME: kedl: not sure what else could be required here?
+    // Close down all audio stuff
+    KillAudio();
 }
 
-void AudioOutputARTS::Reconfigure(int audio_bits, 
-                                  int audio_channels, int audio_samplerate)
+void AudioOutputARTS::CloseDevice()
+{
+    if (pcm_handle != NULL)
+        arts_close_stream(pcm_handle);
+
+    pcm_handle = NULL;
+}
+
+void AudioOutputARTS::OpenDevice()
 {
     arts_stream_t stream;
     int err;
@@ -49,16 +58,11 @@ void AudioOutputARTS::Reconfigure(int audio_bits,
     stream = arts_play_stream(audio_samplerate, audio_bits, audio_channels, 
                               "mythtv");
 
-    effdsp = audio_samplerate * 100;
-    pcm_handle = stream;
-    this->audio_bits = audio_bits;
-    this->audio_channels = audio_channels;
-}
+    buff_size = arts_stream_get(stream, ARTS_P_BUFFER_SIZE) + 
+		(arts_stream_get(stream, ARTS_P_SERVER_LATENCY) * 
+			audio_bits * audio_channels * audio_samplerate / 8);
 
-AudioOutputARTS::~AudioOutputARTS()
-{
-    if (pcm_handle != NULL)
-        arts_close_stream(pcm_handle);
+    pcm_handle = stream;
 }
 
 void AudioOutputARTS::Reset(void)
@@ -69,14 +73,14 @@ void AudioOutputARTS::Reset(void)
     // FIXME: kedl: not sure what else could be required here?
 }
 
-void AudioOutputARTS::AddSamples(char *buffer, int frames, long long timecode)
+void AudioOutputARTS::WriteAudio(unsigned char *aubuf, int size)
 {
     int err;
     
     if (pcm_handle == NULL)
         return;
 
-    err = arts_write(pcm_handle, buffer, 
+    err = arts_write(pcm_handle, aubuf, 
                      frames * audio_bits / 8 * audio_channels);
     if (err < 0)
     {
@@ -84,90 +88,25 @@ void AudioOutputARTS::AddSamples(char *buffer, int frames, long long timecode)
         VERBOSE(VB_IMPORTANT, QString("Write error: %1")
                               .arg(arts_error_text(err)));
         return;
-    }
-
-    if (timecode < 0) 
-        timecode = audbuf_timecode; // add to current timecode
-    
-    /* we want the time at the end -- but the file format stores
-       time at the start of the chunk. */
-    audbuf_timecode = timecode + (int)((frames*100000.0) / effdsp);
 }
 
-
-void AudioOutputARTS::AddSamples(char *buffers[], int frames, long long timecode)
+inline int AudioOutputARTS::getBufferedOnSoundcard(void)
 {
-    int err;
-    int waud=0;
-    int audio_bytes = audio_bits / 8;
-    int audbufsize = frames*audio_bytes*audio_channels;
-    char *audiobuffer = (char *) calloc(1,audbufsize);
-
-    if (audiobuffer==NULL)
-    {
-        // FIXME: Fatal?
-        VERBOSE(VB_IMPORTANT, "Couldn't get memory to write audio to artsd");
-        return;
-    }
-
-    if (pcm_handle == NULL)
-    {
-    	free(audiobuffer);
-        return;
-    }
-
-    for (int itemp = 0; itemp < frames*audio_bytes; itemp+=audio_bytes)
-    {
-        for(int chan = 0; chan < audio_channels; chan++)
-        {
-            audiobuffer[waud++] = buffers[chan][itemp];
-            if (audio_bits == 16)
-                audiobuffer[waud++] = buffers[chan][itemp+1];
-            if (waud >= audbufsize)
-                waud -= audbufsize;
-        }
-    }
-
-    err = arts_write(pcm_handle, audiobuffer, frames*4);
-    free(audiobuffer);
-
-    if (err < 0)
-    {
-        // FIXME: Fatal?
-        VERBOSE(VB_IMPORTANT, QString("Write error: %1").arg(arts_error_text(err)));
-        return;
-    }
-
-    if (timecode < 0) 
-        timecode = audbuf_timecode; // add to current timecode
-    
-    /* we want the time at the end -- but the file format stores
-       time at the start of the chunk. */
-    audbuf_timecode = timecode + (int)((frames*100000.0) / effdsp);
+    return buff_size - getSpaceOnSoundcard();
 }
 
-void AudioOutputARTS::SetTimecode(long long timecode)
+inline int AudioOutputARTS::getSpaceOnSoundcard(void)
 {
-    audbuf_timecode = timecode;
-}
-void AudioOutputARTS::SetEffDsp(int dsprate)
-{
-    effdsp = dsprate;
+    return arts_stream_get(pcm_handle, ARTS_P_BUFFER_SIZE);
 }
 
-bool AudioOutputARTS::GetPause(void)
+int AudioOutputARTS::GetVolumeChannel(int channel)
 {
-    return paused;
+    // Do nothing
+    return 100;
+}
+void AudioOutputARTS::SetVolumeChannel(int channel, int volume)
+{
+    // Do nothing
 }
 
-void AudioOutputARTS::Pause(bool paused)
-{
-    this->paused = paused;
-    // FIXME: kedl: not sure what else could be required here?
-}
-
-int AudioOutputARTS::GetAudiotime(void)
-{
-    // FIXME: kedl: not sure what else could be required here?
-    return 0;
-}
