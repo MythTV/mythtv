@@ -634,6 +634,9 @@ void MetadataServer::doAtomicDataDelta(
             
                     if(target->isLocal() && target->isAudio())
                     {
+                        local_audio_metadata_count = 
+                                local_audio_metadata_count 
+                                - target->getPlaylistCount();
                         local_audio_playlist_count = 
                                 local_audio_playlist_count 
                                 - target->getPlaylistCount();
@@ -668,7 +671,6 @@ void MetadataServer::doAtomicDataDelta(
                     if(target->isLocal() && target->isAudio())
                     {
                         local_audio_metadata_count = 
-                                local_audio_metadata_count 
                                 + target->getMetadataCount();
                         local_audio_playlist_count = 
                                 local_audio_playlist_count 

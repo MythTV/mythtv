@@ -169,7 +169,7 @@ void MMusicWatcher::run()
         //  minutes). Set to 0 to only sweep when a sweep is forced
         //
 
-        int sweep_wait = mfdContext->getNumSetting("music_sweep_time", 1) * 60 * 1000;  
+        int sweep_wait = mfdContext->getNumSetting("music_sweep_time", 15) * 60 * 1000;  
         if( ( metadata_sweep_time.elapsed() > sweep_wait  &&
               sweep_wait > 0 && keep_going ) || ( force_sweep && keep_going) )
         {
@@ -648,12 +648,12 @@ void MMusicWatcher::compareToMasterList(MusicFileMap &music_files, const QString
             if(updateMetadata(new_item))
             {
                 persistMetadata(new_item);
-                new_metadata->insert(new_item->getId(), new_item);
-                metadata_additions.push_back(new_item->getId());
+                //new_metadata->insert(new_item->getId(), new_item);
+                //metadata_additions.push_back(new_item->getId());
                 MusicFile new_master_item(file_name, it.data().lastModified());
                 new_master_item.setMetadataId(new_item->getId());
                 new_master_item.setDbId(new_item->getDbId());
-                new_master_item.checkedDatabase(true);
+                //new_master_item.checkedDatabase(true);
                 new_master_item.setMythDigest(new_item->getMythDigest());
 
                 master_list[file_name] = new_master_item;
@@ -696,11 +696,13 @@ void MMusicWatcher::compareToMasterList(MusicFileMap &music_files, const QString
             
         }
     }
-    log(QString("added %1 audio files (total now %2) to the master list in %3 second(s)")
-        .arg(counter)
-        .arg(master_list.count())
-        .arg(master_add_timer.elapsed() / 1000.0), 10);
-
+    if(counter > 0)
+    {
+        log(QString("added %1 audio files (total now %2) to the master list in %3 second(s)")
+            .arg(counter)
+            .arg(master_list.count())
+            .arg(master_add_timer.elapsed() / 1000.0), 10);
+    }
 }
 
 
