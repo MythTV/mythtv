@@ -569,7 +569,7 @@ void DVDRipBox::handleStatus(QStringList tokens)
                 {
                     if(warning_text)
                     {
-                        warning_text->SetText("No jobs and nothing else to do. You could 0 to rip a DVD.");
+                        warning_text->SetText("No jobs and nothing else to do. You could hit 0 to rip a DVD.");
                     }
                 }
             }

@@ -206,6 +206,9 @@ void TitleDialog::viewTitle()
     player_string = player_string.replace(QRegExp("%c"), QString("%1").arg(channels));
 
     system(player_string);
+    gContext->GetMainWindow()->raise();
+    gContext->GetMainWindow()->setActiveWindow();
+    gContext->GetMainWindow()->currentWidget()->setFocus();
 }
 
 void TitleDialog::ripTitles()

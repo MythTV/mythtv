@@ -54,7 +54,7 @@ public:
     PlayerCommand():
         GlobalSetting("DVDPlayerCommand") {
         setLabel("DVD Player Command");
-        setValue("mplayer dvd:// -dvd-device %d -fs -vo xv");
+        setValue("mplayer dvd:// -dvd-device %d -fs -zoom -vo xv");
         setHelpText("This can be any command to launch a DVD player "
                     "(e.g. MPlayer, ogle, etc.). If present %d will "
                     "be substituted for the DVD device (e.g. /dev/dvd).");
@@ -92,7 +92,7 @@ public:
     TitlePlayCommand():
         GlobalSetting("TitlePlayCommand"){
         setLabel("Title Playing Command");
-        setValue("mplayer -dvd-device %d -fs -vo xv -dvd %t -aid %a -channels %c");
+        setValue("mplayer -dvd-device %d -fs -zoom -vo xv -dvd %t -aid %a -channels %c");
         setHelpText("This is a command used to preview a given "
                     "title on a DVD. If present %t will be set "
                     "to the title, %d for device, %a for audio "

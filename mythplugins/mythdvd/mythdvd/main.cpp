@@ -97,6 +97,10 @@ void playDVD()
             }
         }
         system(command_string);
+        gContext->GetMainWindow()->raise();
+        gContext->GetMainWindow()->setActiveWindow();
+        gContext->GetMainWindow()->currentWidget()->setFocus();
+        
     }
 }
 
