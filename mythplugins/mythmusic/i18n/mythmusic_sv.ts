@@ -2,10 +2,6 @@
 <context>
     <name>DatabaseBox</name>
     <message>
-        <source>Select music to be played:</source>
-        <translation type="obsolete">Välj musik som skall spelas:</translation>
-    </message>
-    <message>
         <source>Active Play Queue</source>
         <translation>Aktiv spellista</translation>
     </message>
@@ -113,225 +109,114 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     </message>
 </context>
 <context>
-    <name>PlaybackBox</name>
-    <message>
-        <source>Edit Playlist</source>
-        <translation type="unfinished">Editera spellista</translation>
-    </message>
-    <message>
-        <source>Visualize</source>
-        <translation type="unfinished">Visualisera</translation>
-    </message>
-    <message>
-        <source>3 Edit Playlist</source>
-        <translation type="unfinished">3 Redigera spellista</translation>
-    </message>
-    <message>
-        <source>4 Visualize</source>
-        <translation type="unfinished">4 Visualisera</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Smart</source>
-        <translation type="unfinished">1 Ordning: Intelligent</translation>
-    </message>
-    <message>
-        <source>Shuffle: Smart</source>
-        <translation type="unfinished">Ordning: Intelligent</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Rand</source>
-        <translation type="unfinished">1 Ordning: Slump</translation>
-    </message>
-    <message>
-        <source>Shuffle: Rand</source>
-        <translation type="unfinished">Ordning: Slump</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: None</source>
-        <translation type="unfinished">1 Ordning: Rak</translation>
-    </message>
-    <message>
-        <source>Shuffle: None</source>
-        <translation type="unfinished">Ordning: Rak</translation>
-    </message>
-    <message>
-        <source>2 Repeat: All</source>
-        <translation type="unfinished">2 Repetera: Alla</translation>
-    </message>
-    <message>
-        <source>Repeat: All</source>
-        <translation type="unfinished">Repetera: Alla</translation>
-    </message>
-    <message>
-        <source>2 Repeat: Track</source>
-        <translation type="unfinished">2 Repetera: Spår</translation>
-    </message>
-    <message>
-        <source>Repeat: Track</source>
-        <translation type="unfinished">Repetera: Spår</translation>
-    </message>
-    <message>
-        <source>2 Repeat: None</source>
-        <translation type="unfinished">2 Repetera: Ej</translation>
-    </message>
-    <message>
-        <source>Repeat: None</source>
-        <translation type="unfinished">Repetera: Inte</translation>
-    </message>
-    <message>
-        <source>playlist root</source>
-        <translation type="unfinished">rot för spellistor</translation>
-    </message>
-    <message>
-        <source>Playing stream.</source>
-        <translation type="unfinished">Spelar ström.</translation>
-    </message>
-    <message>
-        <source>Buffering stream.</source>
-        <translation type="unfinished">Buffrar ström.</translation>
-    </message>
-    <message>
-        <source>Stream paused.</source>
-        <translation type="unfinished">Ström pausad.</translation>
-    </message>
-    <message>
-        <source>kbps</source>
-        <translation type="unfinished">kbps</translation>
-    </message>
-    <message>
-        <source>kHz</source>
-        <translation type="unfinished">kHz</translation>
-    </message>
-    <message>
-        <source>ch</source>
-        <translation type="unfinished">ch</translation>
-    </message>
-    <message>
-        <source>Output error.</source>
-        <translation type="unfinished">Utmatningsfel.</translation>
-    </message>
-    <message>
-        <source>Stream stopped.</source>
-        <translation type="unfinished">Ström stoppad.</translation>
-    </message>
-    <message>
-        <source>Finished playing stream.</source>
-        <translation type="unfinished">Strömmen färdigspelad.</translation>
-    </message>
-    <message>
-        <source>Decoder error.</source>
-        <translation type="unfinished">Avkodningsfel.</translation>
-    </message>
-</context>
-<context>
     <name>PlaybackBoxMusic</name>
     <message>
         <source>Edit Playlist</source>
-        <translation type="obsolete">Editera spellista</translation>
+        <translation>Redigera spellista</translation>
     </message>
     <message>
         <source>Visualize</source>
-        <translation type="obsolete">Visualisera</translation>
+        <translation>Visualisera</translation>
     </message>
     <message>
         <source>3 Edit Playlist</source>
-        <translation type="obsolete">3 Redigera spellista</translation>
+        <translation>3 Redigera spellista</translation>
     </message>
     <message>
         <source>4 Visualize</source>
-        <translation type="obsolete">4 Visualisera</translation>
+        <translation>4 Visualisera</translation>
     </message>
     <message>
         <source>1 Shuffle: Smart</source>
-        <translation type="obsolete">1 Ordning: Intelligent</translation>
+        <translation>1 Ordning: Intelligent</translation>
     </message>
     <message>
         <source>Shuffle: Smart</source>
-        <translation type="obsolete">Ordning: Intelligent</translation>
+        <translation>Ordning: Intelligent</translation>
     </message>
     <message>
         <source>1 Shuffle: Rand</source>
-        <translation type="obsolete">1 Ordning: Slump</translation>
+        <translation>1 Ordning: Slump</translation>
     </message>
     <message>
         <source>Shuffle: Rand</source>
-        <translation type="obsolete">Ordning: Slump</translation>
+        <translation>Ordning: Slump</translation>
     </message>
     <message>
         <source>1 Shuffle: None</source>
-        <translation type="obsolete">1 Ordning: Rak</translation>
+        <translation>1 Ordning: Rak</translation>
     </message>
     <message>
         <source>Shuffle: None</source>
-        <translation type="obsolete">Ordning: Rak</translation>
+        <translation>Ordning: Rak</translation>
     </message>
     <message>
         <source>2 Repeat: All</source>
-        <translation type="obsolete">2 Repetera: Alla</translation>
+        <translation>2 Repetera: Alla</translation>
     </message>
     <message>
         <source>Repeat: All</source>
-        <translation type="obsolete">Repetera: Alla</translation>
+        <translation>Repetera: Alla</translation>
     </message>
     <message>
         <source>2 Repeat: Track</source>
-        <translation type="obsolete">2 Repetera: Spår</translation>
+        <translation>2 Repetera: Spår</translation>
     </message>
     <message>
         <source>Repeat: Track</source>
-        <translation type="obsolete">Repetera: Spår</translation>
+        <translation>Repetera: Spår</translation>
     </message>
     <message>
         <source>2 Repeat: None</source>
-        <translation type="obsolete">2 Repetera: Ej</translation>
+        <translation>2 Repetera: Ej</translation>
     </message>
     <message>
         <source>Repeat: None</source>
-        <translation type="obsolete">Repetera: Inte</translation>
+        <translation>Repetera: Inte</translation>
     </message>
     <message>
         <source>playlist root</source>
-        <translation type="obsolete">rot för spellistor</translation>
+        <translation>rot för spellistor</translation>
     </message>
     <message>
         <source>Playing stream.</source>
-        <translation type="obsolete">Spelar ström.</translation>
+        <translation>Spelar ström.</translation>
     </message>
     <message>
         <source>Buffering stream.</source>
-        <translation type="obsolete">Buffrar ström.</translation>
+        <translation>Buffrar ström.</translation>
     </message>
     <message>
         <source>Stream paused.</source>
-        <translation type="obsolete">Ström pausad.</translation>
+        <translation>Ström pausad.</translation>
     </message>
     <message>
         <source>kbps</source>
-        <translation type="obsolete">kbps</translation>
+        <translation>kbps</translation>
     </message>
     <message>
         <source>kHz</source>
-        <translation type="obsolete">kHz</translation>
+        <translation>kHz</translation>
     </message>
     <message>
         <source>ch</source>
-        <translation type="obsolete">ch</translation>
+        <translation>ch</translation>
     </message>
     <message>
         <source>Output error.</source>
-        <translation type="obsolete">Utmatningsfel.</translation>
+        <translation>Utmatningsfel.</translation>
     </message>
     <message>
         <source>Stream stopped.</source>
-        <translation type="obsolete">Ström stoppad.</translation>
+        <translation>Ström stoppad.</translation>
     </message>
     <message>
         <source>Finished playing stream.</source>
-        <translation type="obsolete">Strömmen färdigspelad.</translation>
+        <translation>Strömmen färdigspelad.</translation>
     </message>
     <message>
         <source>Decoder error.</source>
-        <translation type="obsolete">Avkodningsfel.</translation>
+        <translation>Avkodningsfel.</translation>
     </message>
 </context>
 <context>
@@ -383,12 +268,6 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     <message>
         <source>Tree Sorting</source>
         <translation>Trädsortering</translation>
-    </message>
-    <message>
-        <source>Order in which to sort the Music Selection Tree. Possible values are space-separated list of genre, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the actual directory tree.</source>
-        <translation type="obsolete">Den ordning som trädet för musikval sorteras i. Möjliga värden är:
-* Mellanslagsseparerad lista med &apos;genre&apos;, &apos;artist&apos;, &apos;album&apos; och &apos;title&apos;
-* &apos;directory&apos; (=katalog), vilket betyder att trädet speglar den faktiska katalogstrukturen.</translation>
     </message>
     <message>
         <source>Script Path</source>
@@ -691,26 +570,6 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
         <translation>Uppdaterar musikdatabas</translation>
     </message>
     <message>
-        <source>music database</source>
-        <translation type="obsolete">musikdatabas</translation>
-    </message>
-    <message>
-        <source>cd ripper</source>
-        <translation type="obsolete">cd-kopierare</translation>
-    </message>
-    <message>
-        <source>
-
-You have no MythMusic tables in your database.</source>
-        <translation type="obsolete">
-
-Du har inga tabeller för Musikspelaren (MythMusic) i din databas.</translation>
-    </message>
-    <message>
-        <source>OK, I&apos;ll read the documentation</source>
-        <translation type="obsolete">OK, jag skall läsa dokumentationen</translation>
-    </message>
-    <message>
         <source>Unknown Artist</source>
         <translation>Okänd artist</translation>
     </message>
@@ -984,51 +843,51 @@ Du har inga tabeller för Musikspelaren (MythMusic) i din databas.</translation>
     </message>
     <message>
         <source>Track Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Spårinformation</translation>
     </message>
     <message>
         <source>Artist:</source>
-        <translation type="unfinished"></translation>
+        <translation>Artist: </translation>
     </message>
     <message>
         <source>Album:</source>
-        <translation type="unfinished"></translation>
+        <translation>Album: </translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel: </translation>
     </message>
     <message>
         <source>Genre:</source>
-        <translation type="unfinished"></translation>
+        <translation>Genre: </translation>
     </message>
     <message>
         <source>Year:</source>
-        <translation type="unfinished"></translation>
+        <translation>År:</translation>
     </message>
     <message>
         <source>Track No.:</source>
-        <translation type="unfinished"></translation>
+        <translation>Spår nr:</translation>
     </message>
     <message>
         <source>Rating:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rankning:</translation>
     </message>
     <message>
         <source>Play Count:</source>
-        <translation type="unfinished"></translation>
+        <translation>Spelantal:</translation>
     </message>
     <message>
         <source>Last Play:</source>
-        <translation type="unfinished"></translation>
+        <translation>Senast spelad:</translation>
     </message>
     <message>
         <source>Compilation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kompilering:</translation>
     </message>
     <message>
         <source>Filename:</source>
-        <translation type="unfinished"></translation>
+        <translation>Filnamn:</translation>
     </message>
 </context>
 </TS>
