@@ -532,14 +532,17 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             QString port = gContext->GetSetting("BackendServerPort");
             PlaybackSock *slave = NULL;
             QFile checkFile(lpath);
+            bool MasterBackendOverride = gContext->GetSetting("MasterBackendOverride",0);
 
             if (proginfo->hostname != gContext->GetHostName())
             {
                 slave = getSlaveByHostname(proginfo->hostname);
             }
-
-            if ((proginfo->hostname == gContext->GetHostName()) ||
-                ((!slave) && checkFile.exists()))
+            if ( 
+                 (MasterBackendOverride && checkFile.exists() ) || 
+                 (proginfo->hostname == gContext->GetHostName() ) ||
+                 (!slave && checkFile.exists() )
+               )
             {
                 if (pbs->isLocal())
                     proginfo->pathname = lpath;
@@ -662,32 +665,18 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
 
         int num = -1;
 
-        if (!slave)
-            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                 << " Couldn't find backend for: " << pginfo->title
-                 << " : " << pginfo->subtitle << endl;
-        else
-            num = slave->DeleteRecording(pginfo);
+        if (slave) 
+        {
+           num = slave->DeleteRecording(pginfo);
 
-        if (num > 0)
-            (*encoderList)[num]->StopRecording();
+           if (num > 0)
+              (*encoderList)[num]->StopRecording();
 
-        QStringList outputlist = "0";
-        WriteStringList(pbs->getSocket(), outputlist);
-        delete pginfo;
-        return;
-    }
-
-    if (pginfo->hostname != gContext->GetHostName())
-    {
-        cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-             << " Somehow we got a request to delete a program for: " 
-             << pginfo->hostname << endl;
-
-        QStringList outputlist = "-1";
-        WriteStringList(pbs->getSocket(), outputlist);
-        delete pginfo;
-        return;
+           QStringList outputlist = "0";
+           WriteStringList(pbs->getSocket(), outputlist);
+           delete pginfo;
+           return;
+        }
     }
 
     int recnum = -1;
@@ -710,6 +699,20 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs)
 
     QString fileprefix = gContext->GetFilePrefix();
     QString filename = pginfo->GetRecordFilename(fileprefix);
+    QFile checkFile(filename);
+
+    if (!checkFile.exists())
+    {
+       cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
+            << " Strange.  File: " << filename << " doesn't exist." << endl;
+
+       QStringList outputlist;
+       outputlist << "BAD: Tried to delete a file that was in "
+                     "the database but wasn't on the disk.";
+       WriteStringList(pbs->getSocket(), outputlist);
+       delete pginfo;
+       return;
+    }
 
     QSqlQuery query;
     QString thequery;
@@ -812,29 +815,15 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
     {
         PlaybackSock *slave = getSlaveByHostname(pginfo->hostname);
 
-        if (!slave)
-            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                 << " Couldn't find backend for: " << pginfo->title
-                 << " : " << pginfo->subtitle << endl;
-        else
-            exists = slave->CheckFile(pginfo);
+        if (slave) 
+        {
+             exists = slave->CheckFile(pginfo);
 
-        QStringList outputlist = QString::number(exists);
-        WriteStringList(pbs->getSocket(), outputlist);
-        delete pginfo;
-        return;
-    }
-
-    if (pginfo->hostname != gContext->GetHostName())
-    {
-        cout << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-             << " Somehow we got a request to check a file for: "
-             << pginfo->hostname << endl;
-
-        QStringList outputlist = QString::number(exists);
-        WriteStringList(pbs->getSocket(), outputlist);
-        delete pginfo;
-        return;
+             QStringList outputlist = QString::number(exists);
+             WriteStringList(pbs->getSocket(), outputlist);
+             delete pginfo;
+             return;
+        }
     }
 
     QUrl qurl(pginfo->pathname);

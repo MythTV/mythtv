@@ -248,6 +248,19 @@ public:
     };
 };
 
+class MasterBackendOverride: public CheckBoxSetting, public BackendSetting {
+public:
+    MasterBackendOverride():
+        BackendSetting("MasterBackendOverride") {
+        setLabel("Master Backend Override");
+        setValue(true);
+        setHelpText("If enabled, the master backend will stream and "
+                    "delete files if it finds them in the video directory. "
+                    "Useful if you are using a central storage location, like "
+                    "an NFS share, and your slave backend isn't running.");
+    };
+};
+
 BackendSettings::BackendSettings() {
     VerticalConfigurationGroup* server = new VerticalConfigurationGroup(false);
     server->setLabel("Host Address Backend Setup");
@@ -273,6 +286,7 @@ BackendSettings::BackendSettings() {
     group2->addChild(new VbiFormat());
     group2->addChild(new FreqTable());
     group2->addChild(new TimeOffset());
+    group2->addChild(new MasterBackendOverride());
     addChild(group2);
 }
 
