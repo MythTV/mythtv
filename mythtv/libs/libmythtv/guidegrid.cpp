@@ -19,7 +19,7 @@ using namespace std;
 
 extern Settings *globalsettings;
 
-GuideGrid::GuideGrid(int channel, QWidget *parent, const char *name)
+GuideGrid::GuideGrid(const QString &channel, QWidget *parent, const char *name)
          : QDialog(parent, name)
 {
     screenheight = QApplication::desktop()->height();
@@ -44,7 +44,8 @@ GuideGrid::GuideGrid(int channel, QWidget *parent, const char *name)
 
     m_originalStartTime = QDateTime::currentDateTime();
     m_currentStartTime = m_originalStartTime;
-    m_currentStartChannel = channel;
+    m_currentStartChannel = 0;
+    m_startChanStr = channel;
 
     m_currentRow = 0;
     m_currentCol = 0;
@@ -116,14 +117,14 @@ GuideGrid::~GuideGrid()
     m_channelInfos.clear();
 }
 
-int GuideGrid::getLastChannel(void)
+QString GuideGrid::getLastChannel(void)
 {
     unsigned int chanNum = m_currentRow + m_currentStartChannel;
     if (chanNum >= m_channelInfos.size())
         chanNum -= m_channelInfos.size();
 
     if (selectState)
-        return m_channelInfos[chanNum].channum;
+        return m_channelInfos[chanNum].chanstr;
     return 0;
 }
 
@@ -131,11 +132,10 @@ void GuideGrid::fillChannelInfos()
 {
     m_channelInfos.clear();
 
-    char thequery[512];
+    QString thequery;
     QSqlQuery query;
     
-    sprintf(thequery, "SELECT channum,callsign,icon FROM channel ORDER BY "
-                      "channum;");
+    thequery = "SELECT channum,callsign,icon FROM channel ORDER BY channum;";
     query.exec(thequery);
     
     bool set = false;
@@ -150,10 +150,9 @@ void GuideGrid::fillChannelInfos()
                 val.callsign = "";
             val.iconpath = query.value(2).toString();
             val.chanstr = query.value(0).toString();
-            val.channum = atoi(val.chanstr);
             val.icon = NULL;
         
-            if ((unsigned int)val.channum == m_currentStartChannel && !set)
+            if (val.chanstr == m_startChanStr && !set)
             {
                 m_currentStartChannel = m_channelInfos.size();
                 set = true;
@@ -239,7 +238,7 @@ ProgramInfo *GuideGrid::getProgramInfo(unsigned int row, unsigned int col)
     if (m_channelInfos[chanNum].chanstr == "" || !m_timeInfos[col])
         return NULL;
 
-    ProgramInfo *pginfo = GetProgramAtDateTime(m_channelInfos[chanNum].channum,
+    ProgramInfo *pginfo = GetProgramAtDateTime(m_channelInfos[chanNum].chanstr,
                                              m_timeInfos[col]->sqltime.ascii());
     if (pginfo)
     {

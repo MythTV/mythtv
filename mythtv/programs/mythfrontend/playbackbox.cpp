@@ -80,12 +80,11 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     vbox->addWidget(listview, 1);
 
     QSqlQuery query;
-    char thequery[512];
+    QString thequery;
     ProgramListItem *item;
     
-    sprintf(thequery, "SELECT channum,starttime,endtime,title,subtitle,"
-                      "description FROM recorded;");
-
+    thequery = "SELECT channum,starttime,endtime,title,subtitle,description "
+               "FROM recorded;";
     query = db->exec(thequery);
 
     if (query.isActive() && query.numRowsAffected() > 0)
@@ -167,16 +166,8 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
 
 PlaybackBox::~PlaybackBox(void)
 {
-    if (nvp)
-    {
-        nvp->StopPlaying();
-        pthread_join(decoder, NULL);
-        delete nvp;
-        delete rbuffer;
-
-        nvp = NULL;
-        rbuffer = NULL;
-    }
+    killPlayer();
+    delete timer;
 }
 
 void PlaybackBox::Show()
@@ -193,7 +184,7 @@ static void *SpawnDecoder(void *param)
     return NULL;
 }
 
-void PlaybackBox::changed(QListViewItem *lvitem)
+void PlaybackBox::killPlayer(void)
 {
     timer->stop();
     while (timer->isActive())
@@ -209,16 +200,10 @@ void PlaybackBox::changed(QListViewItem *lvitem)
         nvp = NULL;
         rbuffer = NULL;
     }
+}	
 
-    ProgramListItem *pgitem = (ProgramListItem *)lvitem;
-    if (!pgitem)
-        return;
-   
-    if (!title)
-        return;
-
-    ProgramInfo *rec = pgitem->getProgramInfo();
-
+void PlaybackBox::startPlayer(ProgramInfo *rec)
+{
     rbuffer = new RingBuffer(rec->GetRecordFilename(fileprefix), false);
 
     nvp = new NuppelVideoPlayer();
@@ -231,6 +216,22 @@ void PlaybackBox::changed(QListViewItem *lvitem)
 
     while (!nvp->IsPlaying())
          usleep(50);
+}
+
+void PlaybackBox::changed(QListViewItem *lvitem)
+{
+    killPlayer();
+
+    ProgramListItem *pgitem = (ProgramListItem *)lvitem;
+    if (!pgitem)
+        return;
+   
+    if (!title)
+        return;
+
+    ProgramInfo *rec = pgitem->getProgramInfo();
+
+    startPlayer(rec);
 
     QDateTime startts = rec->startts;
     QDateTime endts = rec->endts;
@@ -261,11 +262,22 @@ void PlaybackBox::changed(QListViewItem *lvitem)
 
 void PlaybackBox::selected(QListViewItem *lvitem)
 {
+    killPlayer();
+
     ProgramListItem *pgitem = (ProgramListItem *)lvitem;
     ProgramInfo *rec = pgitem->getProgramInfo();
 
     ProgramInfo *tvrec = new ProgramInfo(*rec);
     tv->Playback(tvrec);
+
+    sleep(1);
+
+    TVState curstate = tv->GetState();
+    while (tv->GetState() == curstate)
+        usleep(50);
+
+    startPlayer(rec);
+    timer->start(1000 / 30);
 }
 
 void PlaybackBox::timeout(void)

@@ -19,14 +19,13 @@ char installprefix[] = "/usr/local";
 
 Settings *globalsettings;
 
-int startGuide(int startchannel)
+QString startGuide(const QString &startchannel)
 {
     GuideGrid gg(startchannel);
 
     gg.exec();
 
-    int chan = gg.getLastChannel();
-    return chan;
+    return gg.getLastChannel();
 }
 
 int startManaged(TV *tv, QString prefix)
@@ -66,7 +65,21 @@ int startDelete(TV *tv, QString prefix)
 
 void startTV(TV *tv)
 {
-    tv->LiveTV();
+    TVState nextstate = tv->LiveTV();
+
+    if (nextstate == kState_WatchingLiveTV ||
+           nextstate == kState_WatchingRecording)
+    {
+        while (tv->ChangingState())
+            usleep(50);
+
+        while (nextstate == kState_WatchingLiveTV ||
+               nextstate == kState_WatchingRecording)
+        {
+            usleep(2000);
+            nextstate = tv->GetState();
+        }
+    }
 }
 
 void startRecording(TV *tv, ProgramInfo *rec)
@@ -196,7 +209,7 @@ bool RunTVMenu(bool usetheme, QString themedir, TV *tv, QString prefix)
             else if (sel == "tv_watch_recording")
                 startPlayback(tv, prefix);
             else if (sel == "tv_schedule")
-                startGuide(3);
+                startGuide("3");
             else if (sel == "tv_delete")
                 startDelete(tv, prefix);
             else if (sel == "tv_fix_conflicts")
@@ -228,7 +241,7 @@ bool RunTVMenu(bool usetheme, QString themedir, TV *tv, QString prefix)
     switch (ret)
     {
         case 1: startTV(tv); break;
-        case 2: startGuide(3); break;
+        case 2: startGuide("3"); break;
         case 3: startManaged(tv, prefix); break;
         case 4: startPlayback(tv, prefix); break;
         case 5: startDelete(tv, prefix); break;

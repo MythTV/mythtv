@@ -16,7 +16,8 @@ Channel::Channel(TV *parent, const QString &videodevice)
     isopen = false;
     videofd = -1;
     curchannel = -1;
-
+    currentcapchannel = 0;
+    
     pParent = parent;
 }
 
@@ -154,13 +155,13 @@ bool Channel::SetChannelByString(const QString &chan)
    
 bool Channel::SetChannel(int i)
 {
-    char channame[128];
+    QString channame;
  
     if (currentcapchannel == 0)
-        sprintf(channame, "%s", curList[i].name);
+        channame = curList[i].name;
     else
-        sprintf(channame, "%s:%s", channelnames[currentcapchannel].ascii(), 
-                                   curList[i].name);
+        channame = QString("%1:%2").arg(channelnames[currentcapchannel]) 
+                                   .arg(curList[i].name);
 
     if (pParent->CheckChannel(channame))
     {
@@ -175,7 +176,7 @@ bool Channel::SetChannel(int i)
         }
         else
         {
-            sprintf(channame, "%s", curList[i].name);
+            channame = curList[i].name;
             return pParent->ChangeExternalChannel(channame);
         }
     }
@@ -222,12 +223,8 @@ QString Channel::GetCurrentName(void)
     else
     {
         QString ret = channelnames[currentcapchannel];
-        ret += ":";
-        char temp[128];
-        sprintf(temp, "%s", curList[curchannel].name);
-
-        ret += temp;
-        return temp;
+        ret += QString(":") + curList[curchannel].name;
+        return ret;
     }
 }
 

@@ -13,6 +13,7 @@ class TV;
 class NuppelVideoPlayer;
 class RingBuffer;
 class QTimer;
+class ProgramInfo;
 
 class PlaybackBox : public QDialog
 {
@@ -27,7 +28,6 @@ class PlaybackBox : public QDialog
   protected slots:
     void selected(QListViewItem *);
     void changed(QListViewItem *);
-
     void timeout(void);
 
   private:
@@ -43,6 +43,9 @@ class PlaybackBox : public QDialog
     QLabel *pixlabel;
 
     float wmult, hmult;
+
+    void killPlayer(void);
+    void startPlayer(ProgramInfo *rec);
 
     QTimer *timer;
     NuppelVideoPlayer *nvp;

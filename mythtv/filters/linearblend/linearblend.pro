@@ -4,7 +4,7 @@
 
 TEMPLATE = lib
 CONFIG -= moc
-CONFIG += plugin
+CONFIG += plugin thread
 target.path = /usr/local/lib/mythtv/filters
 INSTALLS = target
 

@@ -29,17 +29,21 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    int startchannel = 0;
+    QString startchannel = "3";
 
     if (a.argc() > 1)
     {
-        startchannel = atoi(a.argv()[1]);
+        startchannel = a.argv()[1];
     }
 
     GuideGrid gg(startchannel);
 
     gg.exec();
 
-    int chan = gg.getLastChannel();
+    QString chanstr = gg.getLastChannel();
+    int chan = 0;
+    
+    if (chanstr != QString::null)
+        atoi(chanstr.ascii());
     return chan;
 }

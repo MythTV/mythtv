@@ -15,6 +15,7 @@ class TV;
 class NuppelVideoPlayer;
 class RingBuffer;
 class QTimer;
+class ProgramInfo;
 
 class DeleteBox : public QDialog
 {
@@ -52,6 +53,9 @@ class DeleteBox : public QDialog
     QString fileprefix;
 
     float wmult, hmult;
+
+    void killPlayer(void);
+    void startPlayer(ProgramInfo *rec);
 
     QTimer *timer;
     NuppelVideoPlayer *nvp;

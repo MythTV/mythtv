@@ -109,19 +109,18 @@ QString TV::GetInstallPrefix(void)
     return QString(theprefix); 
 }
 
-void TV::LiveTV(void)
+TVState TV::LiveTV(void)
 {
     if (internalState == kState_RecordingOnly)
     {
-        char cmdline[4096];
+        QString cmdline = QString("mythdialog \"MythTV is already recording "
+                                  "'%1' on channel %2.  Do you want to:\" "
+                                  "\"Stop recording and watch TV\" \"Watch the "
+                                  "in-progress recording\" \"Cancel\"")
+                                  .arg(curRecording->title)
+                                  .arg(curRecording->channum);
 
-        sprintf(cmdline, "mythdialog \"MythTV is already recording '%s' on "
-                         "channel %s.  Do you want to:\" \"Stop recording and "
-                         "watch TV\" \"Watch the in-progress recording\" "
-                         "\"Cancel\"", curRecording->title.ascii(), 
-                         curRecording->channum.ascii());
-
-        int result = system(cmdline);
+        int result = system(cmdline.ascii());
 
         if (result > 0)
             result = WEXITSTATUS(result);
@@ -143,6 +142,16 @@ void TV::LiveTV(void)
         nextState = kState_WatchingLiveTV;
         changeState = true;
     }
+
+    TVState retval = kState_None;
+    
+    if (nextState != internalState)
+    {
+        retval = nextState;
+        changeState = true;
+    }
+
+    return retval;
 }
 
 int TV::AllowRecording(ProgramInfo *rcinfo, int timeuntil)
@@ -1303,7 +1312,7 @@ void TV::ChannelCommit(void)
 
 void TV::ChangeChannelByString(QString &name)
 {
-    if (!CheckChannel((char *)name.ascii()))
+    if (!CheckChannel(name))
         return;
 
     if (activenvp == nvp)
@@ -1357,8 +1366,8 @@ void TV::UpdateOSD(void)
     {
         QString title, subtitle, desc, category, starttime, endtime;
         QString callsign, iconpath;
-        GetChannelInfo(channel->GetCurrent(), title, subtitle, desc, category, 
-                       starttime, endtime, callsign, iconpath);
+        GetChannelInfo(channel->GetCurrentName(), title, subtitle, desc, 
+                       category, starttime, endtime, callsign, iconpath);
 
         osd->SetInfoText(title, subtitle, desc, category, starttime, endtime,
                          callsign, iconpath, osd_display_time);
@@ -1366,7 +1375,7 @@ void TV::UpdateOSD(void)
     }
 }
 
-void TV::GetChannelInfo(int lchannel, QString &title, QString &subtitle,
+void TV::GetChannelInfo(QString lchannel, QString &title, QString &subtitle,
                         QString &desc, QString &category, QString &starttime,
                         QString &endtime, QString &callsign, QString &iconpath)
 {
@@ -1389,8 +1398,11 @@ void TV::GetChannelInfo(int lchannel, QString &title, QString &subtitle,
 
     strftime(curtimestr, 128, "%Y%m%d%H%M%S", loctime);
     
-    char thequery[1024];
-    sprintf(thequery, "SELECT channum,starttime,endtime,title,subtitle,description,category FROM program WHERE channum = %d AND starttime < %s AND endtime > %s;", lchannel, curtimestr, curtimestr);
+    QString thequery = QString("SELECT channum,starttime,endtime,title,"
+                               "subtitle,description,category FROM program "
+                               "WHERE channum = %1 AND starttime < %2 AND "
+                               "endtime > %3;").arg(lchannel).arg(curtimestr)
+                               .arg(curtimestr);
 
     QSqlQuery query = db_conn->exec(thequery);
 
@@ -1415,8 +1427,8 @@ void TV::GetChannelInfo(int lchannel, QString &title, QString &subtitle,
             category = QString::fromUtf8(test);
     }
 
-    sprintf(thequery, "SELECT callsign,icon FROM channel WHERE channum = %d", 
-            lchannel);
+    thequery = QString("SELECT callsign,icon FROM channel WHERE channum "
+                       "= %1;").arg(lchannel);
 
     query = db_conn->exec(thequery);
     if (query.isActive() && query.numRowsAffected() > 0)
@@ -1460,21 +1472,21 @@ void TV::DisconnectDB(void)
     }
 }
 
-bool TV::CheckChannel(char *channum)
+bool TV::CheckChannel(QString &channum)
 {
     if (!db_conn)
         return true;
 
     bool ret = false;
-    char thequery[1024];
-    sprintf(thequery, "SELECT * FROM channel WHERE channum = %s;", channum);
+    QString thequery = QString("SELECT * FROM channel WHERE channum = "
+                               "%1;").arg(channum);
 
     QSqlQuery query = db_conn->exec(thequery);
 
     if (query.isActive() && query.numRowsAffected() > 0)
-        ret = true;
+        return true;
 
-    sprintf(thequery, "SELECT * FROM channel;");
+    thequery = "SELECT * FROM channel;";
     query = db_conn->exec(thequery);
 
     if (query.numRowsAffected() == 0)
@@ -1483,7 +1495,7 @@ bool TV::CheckChannel(char *channum)
     return ret;
 }
 
-bool TV::ChangeExternalChannel(char *channum)
+bool TV::ChangeExternalChannel(QString &channum)
 {
     QString command = settings->GetSetting("ExternalChannelCommand");
 
@@ -1502,7 +1514,7 @@ void TV::doLoadMenu(void)
 
     char runname[512];
 
-    sprintf(runname, "%s %d", epgname.ascii(), channel->GetCurrent());
+    sprintf(runname, "%s %s", epgname.ascii(), channel->GetCurrentName().ascii());
     int ret = system(runname);
 
     if (ret > 0)

@@ -34,7 +34,7 @@ class TV
     TV(const QString &startchannel);
    ~TV(void);
 
-    void LiveTV(void);
+    TVState LiveTV(void);
 
     int AllowRecording(ProgramInfo *rcinfo, int timeuntil);
     void StartRecording(ProgramInfo *rcinfo);
@@ -50,9 +50,10 @@ class TV
     void Stop(void) { runMainLoop = false; }
 
     TVState GetState(void) { return internalState; }
-
-    bool CheckChannel(char *channum); 
-    bool ChangeExternalChannel(char *channum);
+    bool ChangingState(void) { return changeState; }
+    
+    bool CheckChannel(QString &channum); 
+    bool ChangeExternalChannel(QString &channum);
 
     QString GetFilePrefix() { return settings->GetSetting("RecordFilePrefix"); }
     QString GetInstallPrefix();
@@ -79,7 +80,7 @@ class TV
     int  calcSliderPos(int offset, QString &desc);
     
     void UpdateOSD(void); 
-    void GetChannelInfo(int lchannel, QString &title, QString &subtitle, 
+    void GetChannelInfo(QString lchannel, QString &title, QString &subtitle, 
                         QString &desc, QString &category, QString &starttime,
                         QString &endtime, QString &callsign, QString &iconpath);
 

@@ -17,10 +17,11 @@ class GuideGrid : public QDialog
 {
     Q_OBJECT
   public:
-    GuideGrid(int channel, QWidget *parent = 0, const char *name = 0);
+    GuideGrid(const QString &channel, QWidget *parent = 0, 
+              const char *name = 0);
    ~GuideGrid();
 
-    int getLastChannel(void);
+    QString getLastChannel(void);
 
   signals:
     void killTheApp();
@@ -71,7 +72,8 @@ class GuideGrid : public QDialog
     QDateTime m_originalStartTime;
     QDateTime m_currentStartTime;
     unsigned int m_currentStartChannel;
-
+    QString m_startChanStr;
+    
     int m_currentRow;
     int m_currentCol;
 

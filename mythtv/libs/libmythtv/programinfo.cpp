@@ -33,15 +33,15 @@ int ProgramInfo::CalculateLength(void)
     return startts.secsTo(endts);
 }
     
-ProgramInfo *GetProgramAtDateTime(int channel, const char *time)
+ProgramInfo *GetProgramAtDateTime(QString channel, const QString &ltime)
 {
-    char thequery[512];
     QSqlQuery query;
-
-    sprintf(thequery, "SELECT channum,starttime,endtime,title,subtitle,"
-                      "description,category FROM program WHERE channum = %d "
-                      "AND starttime < %s AND endtime > %s;",
-                      channel, time, time);
+    QString thequery;
+   
+    thequery = QString("SELECT channum,starttime,endtime,title,subtitle,"
+                       "description,category FROM program WHERE channum = %1 "
+                       "AND starttime < %2 AND endtime > %3;").arg(channel)
+                       .arg(ltime).arg(ltime);
 
     query.exec(thequery);
 
@@ -77,17 +77,10 @@ ProgramInfo *GetProgramAtDateTime(int channel, const char *time)
     return NULL;
 }
 
-ProgramInfo *GetProgramAtDateTime(int channel, QDateTime &dtime)
+ProgramInfo *GetProgramAtDateTime(QString channel, QDateTime &dtime)
 {
-    int year, month, day, hour, mins;
-    year = dtime.date().year();
-    month = dtime.date().month();
-    day = dtime.date().day();
-    hour = dtime.time().hour();
-    mins = dtime.time().minute();
-
-    char sqltime[512];
-    sprintf(sqltime, "%d%02d%02d%02d%02d50", year, month, day, hour, mins);
+    QString sqltime = dtime.toString("yyyyMMddhhmm");
+    sqltime += "50"; 
 
     return GetProgramAtDateTime(channel, sqltime);
 }
@@ -107,7 +100,7 @@ int ProgramInfo::IsProgramRecurring(void)
 
         QDateTime checktime = dtime.addDays(daysadd);
 
-        ProgramInfo *nextday = GetProgramAtDateTime(channum.toInt(), checktime);
+        ProgramInfo *nextday = GetProgramAtDateTime(channum, checktime);
 
         if (nextday && nextday->title == title)
         {
@@ -119,7 +112,7 @@ int ProgramInfo::IsProgramRecurring(void)
     }
 
     QDateTime checktime = dtime.addDays(7);
-    ProgramInfo *nextweek = GetProgramAtDateTime(channum.toInt(), checktime);
+    ProgramInfo *nextweek = GetProgramAtDateTime(channum, checktime);
 
     if (nextweek && nextweek->title == title)
     {
@@ -144,12 +137,12 @@ int ProgramInfo::GetProgramRecordingStatus(void)
     char sqlendtime[128];
     sprintf(sqlendtime, "%s00", ends.ascii());
 
-    char thequery[512];
+    QString thequery;
     QSqlQuery query;
 
-    sprintf(thequery, "SELECT * FROM singlerecord WHERE channum = %s AND "
-                      "starttime = %s AND endtime = %s;",
-                      channum.ascii(), sqlstarttime, sqlendtime);
+    thequery = QString("SELECT * FROM singlerecord WHERE channum = %1 AND "
+                       "starttime = %2 AND endtime = %3;")
+                       .arg(channum).arg(sqlstarttime).arg(sqlendtime);
 
     query.exec(thequery);
 
@@ -166,9 +159,9 @@ int ProgramInfo::GetProgramRecordingStatus(void)
         sqlendtime[i] = '0';
     }
 
-    sprintf(thequery, "SELECT * FROM timeslotrecord WHERE channum = %s AND "
-                      "starttime = %s AND endtime = %s;",
-                      channum.ascii(), sqlstarttime, sqlendtime);
+    thequery = QString("SELECT * FROM timeslotrecord WHERE channum = %1 AND "
+                       "starttime = %2 AND endtime = %3;")
+                       .arg(channum).arg(sqlstarttime).arg(sqlendtime);
 
     query.exec(thequery);
 
@@ -179,8 +172,8 @@ int ProgramInfo::GetProgramRecordingStatus(void)
         return 2;
     }
 
-    sprintf(thequery, "SELECT * FROM allrecord WHERE title = \"%s\";",
-                      title.ascii());
+    thequery = QString("SELECT * FROM allrecord WHERE title = \"%1\";")
+                       .arg(title);
 
     query.exec(thequery);
 
@@ -207,15 +200,15 @@ void ProgramInfo::ApplyRecordStateChange(int newstate)
     char sqlendtime[128];
     sprintf(sqlendtime, "%s00", ends.ascii());
 
-    char thequery[512];
+    QString thequery;
     QSqlQuery query;
 
     if (recordtype == 1)
     {
-        sprintf(thequery, "DELETE FROM singlerecord WHERE "
-                          "channum = %s AND starttime = %s AND "
-                          "endtime = %s;", channum.ascii(),
-                          sqlstarttime, sqlendtime);
+        thequery = QString("DELETE FROM singlerecord WHERE "
+                           "channum = %1 AND starttime = %2 AND "
+                           "endtime = %3;").arg(channum).arg(sqlstarttime)
+                           .arg(sqlendtime);
         query.exec(thequery);
     }
     else if (recordtype == 2)
@@ -230,30 +223,27 @@ void ProgramInfo::ApplyRecordStateChange(int newstate)
             tempendtime[i] = '0';
         }
 
-        sprintf(thequery, "DELETE FROM timeslotrecord WHERE channum = %s "
-                          "AND starttime = %s AND endtime = %s;",
-                          channum.ascii(), tempstarttime,
-                          tempendtime);
+        thequery = QString("DELETE FROM timeslotrecord WHERE channum = %1 "
+                           "AND starttime = %2 AND endtime = %3;")
+                           .arg(channum).arg(tempstarttime).arg(tempendtime);
 
         query.exec(thequery);
     }
     else if (recordtype == 3)
     {
-        sprintf(thequery, "DELETE FROM allrecord WHERE title = \"%s\";",
-                          title.ascii());
+        thequery = QString("DELETE FROM allrecord WHERE title = \"%1\";")
+                          .arg(title);
 
         query.exec(thequery);
     }
 
     if (newstate == 1)
     {
-        sprintf(thequery, "INSERT INTO singlerecord (channum,starttime,endtime,"
-                          "title,subtitle,description) VALUES(%s, %s, %s, "
-                          "\"%s\", \"%s\", \"%s\");",
-                          channum.ascii(), sqlstarttime, sqlendtime,
-                          title.ascii(), subtitle.ascii(),
-                          description.ascii());
-
+        thequery = QString("INSERT INTO singlerecord (channum,starttime,"
+                           "endtime,title,subtitle,description) "
+                           "VALUES(%1, %2, %3, \"%4\", \"%5\", \"%6\");")
+                           .arg(channum).arg(sqlstarttime).arg(sqlendtime)
+                           .arg(title).arg(subtitle).arg(description);
         query.exec(thequery);
     }
     else if (newstate == 2)
@@ -264,34 +254,33 @@ void ProgramInfo::ApplyRecordStateChange(int newstate)
             sqlendtime[i] = '0';
         }
 
-        sprintf(thequery, "INSERT INTO timeslotrecord (channum,starttime,"
-                          "endtime,title) VALUES(%s,%s,%s,\"%s\");",
-                          channum.ascii(), sqlstarttime, sqlendtime,
-                          title.ascii());
+        thequery = QString("INSERT INTO timeslotrecord (channum,starttime,"
+                           "endtime,title) VALUES(%1,%2,%3,\"%4\");")
+                           .arg(channum).arg(sqlstarttime).arg(sqlendtime)
+                           .arg(title);
         query.exec(thequery);
     }
     else if (newstate == 3)
     {
-        sprintf(thequery, "INSERT INTO allrecord (title) VALUES(\"%s\");",
-                          title.ascii());
+        thequery = QString("INSERT INTO allrecord (title) VALUES(\"%1\");")
+                           .arg(title);
         query.exec(thequery);
     }
 
     if (newstate != recordtype)
     {
-        sprintf(thequery, "SELECT * FROM settings WHERE value = "
-                          "\"RecordChanged\";");
+        thequery = "SELECT * FROM settings WHERE value = \"RecordChanged\";";
         query.exec(thequery);
 
         if (query.isActive() && query.numRowsAffected() > 0)
         {
-            sprintf(thequery, "UPDATE settings SET data = \"yes\" WHERE "
-                              "value = \"RecordChanged\";");
+            thequery = "UPDATE settings SET data = \"yes\" WHERE "
+                       "value = \"RecordChanged\";";
         }
         else
         {
-            sprintf(thequery, "INSERT settings (value,data) "
-                              "VALUES(\"RecordChanged\", \"yes\");");
+            thequery = "INSERT settings (value,data) "
+                       "VALUES(\"RecordChanged\", \"yes\");";
         }
         query.exec(thequery);
     }
@@ -304,18 +293,12 @@ QString ProgramInfo::GetRecordFilename(const QString &prefix)
     QString starts = startts.toString("yyyyMMddhhmm");
     QString ends = endts.toString("yyyyMMddhhmm");
 
-    char sqlstarttime[128];
-    sprintf(sqlstarttime, "%s00", starts.ascii());
+    starts += "00";
+    ends += "00";
 
-    char sqlendtime[128];
-    sprintf(sqlendtime, "%s00", ends.ascii());
-
-    char text[1024];
-    sprintf(text, "%s/%s_%s_%s.nuv", prefix.ascii(), channum.ascii(),
-            sqlstarttime, sqlendtime);
+    QString retval = QString("%1/%2_%3_%4.nuv").arg(prefix).arg(channum)
+                             .arg(starts).arg(ends);
     
-    QString retval = text;
-
     return retval;
 }               
 
@@ -327,18 +310,15 @@ void ProgramInfo::WriteRecordedToDB(QSqlDatabase *db)
     QString starts = startts.toString("yyyyMMddhhmm");
     QString ends = endts.toString("yyyyMMddhhmm");
 
-    char sqlstarttime[128];
-    sprintf(sqlstarttime, "%s00", starts.ascii());
+    starts += "00";
+    ends += "00";
 
-    char sqlendtime[128];
-    sprintf(sqlendtime, "%s00", ends.ascii());
-
-    char query[4096];
-    sprintf(query, "INSERT INTO recorded (channum,starttime,endtime,title,"
-                   "subtitle,description) "
-                   "VALUES(%s,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\");",
-                   channum.ascii(), sqlstarttime, sqlendtime, title.ascii(), 
-                   subtitle.ascii(), description.ascii());
+    QString query;
+    query = QString("INSERT INTO recorded (channum,starttime,endtime,title,"
+                    "subtitle,description) "
+                    "VALUES(%1,\"%2\",\"%3\",\"%4\",\"%5\",\"%6\");")
+                    .arg(channum).arg(starts).arg(ends).arg(title) 
+                    .arg(subtitle).arg(description);
 
     QSqlQuery qquery = db->exec(query);
 
@@ -347,11 +327,11 @@ void ProgramInfo::WriteRecordedToDB(QSqlDatabase *db)
         printf("couldn't insert recording into db\n");
     }
 
-    sprintf(query, "INSERT INTO oldrecorded (channum,starttime,endtime,title,"
-                   "subtitle,description) "
-                   "VALUES(%s,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\");",
-                   channum.ascii(), sqlstarttime, sqlendtime, title.ascii(),
-                   subtitle.ascii(), description.ascii());
+    query = QString("INSERT INTO oldrecorded (channum,starttime,endtime,title,"
+                    "subtitle,description) "
+                    "VALUES(%1,\"%2\",\"%3\",\"%4\",\"%5\",\"%6\");")
+                    .arg(channum).arg(starts).arg(ends).arg(title) 
+                    .arg(subtitle).arg(description);
 
     qquery = db->exec(query);
 

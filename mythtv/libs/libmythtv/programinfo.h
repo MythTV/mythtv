@@ -41,7 +41,7 @@ class ProgramInfo
     bool recording;
 };
 
-ProgramInfo *GetProgramAtDateTime(int channel, const char *time);
-ProgramInfo *GetProgramAtDateTime(int channel, QDateTime &dtime);
+ProgramInfo *GetProgramAtDateTime(QString channel, const QString &time);
+ProgramInfo *GetProgramAtDateTime(QString channel, QDateTime &dtime);
 
 #endif

@@ -218,11 +218,10 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
     QString pend = rec->endts.toString("yyyyMMddhhmm");
     pend += "00";
 
-    char thequery[512];
-
-    sprintf(thequery, "INSERT INTO conflictresolutionoverride (channum, "
-                      "starttime, endtime) VALUES (%d, %s, %s);",
-                      rec->channum.toInt(), pstart.ascii(), pend.ascii());
+    QString thequery;
+    thequery = QString("INSERT INTO conflictresolutionoverride (channum, "
+                       "starttime, endtime) VALUES (%1, %2, %3);")
+                       .arg(rec->channum).arg(pstart).arg(pend);
 
     db->exec(thequery);
 
@@ -237,19 +236,18 @@ void ViewScheduled::handleNotRecording(ProgramInfo *rec)
         dend = (*i)->endts.toString("yyyyMMddhhmm");
         dend += "00";
 
-        sprintf(thequery, "DELETE FROM conflictresolutionoverride WHERE "
-                          "channum = %d AND starttime = %s AND "
-                          "endtime = %s;",
-                          (*i)->channum.toInt(), dstart.ascii(), dend.ascii());
+        thequery = QString("DELETE FROM conflictresolutionoverride WHERE "
+                           "channum = %1 AND starttime = %2 AND "
+                           "endtime = %3;")
+                           .arg((*i)->channum).arg(dstart).arg(dend);
 
         db->exec(thequery);
     }
 
     delete conflictlist;
 
-    sprintf(thequery, "UPDATE settings SET data = \"yes\" WHERE "
-                      "value = \"RecordChanged\";");
-
+    thequery = "UPDATE settings SET data = \"yes\" WHERE value = "
+               "\"RecordChanged\";";
     db->exec(thequery);
 
     FillList();
@@ -259,9 +257,11 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
 {
     list<ProgramInfo *> *conflictlist = sched->getConflicting(rec, true);
 
-    QString message = "The follow scheduled recordings conflict with each other.  Which would you like to record?";
+    QString message = "The follow scheduled recordings conflict with each "
+                      "other.  Which would you like to record?";
 
-    DialogBox diag(message, "Remember this choice and use it automatically in the future");
+    DialogBox diag(message, "Remember this choice and use it automatically in "
+                            "the future");
  
     QString button; 
     button = rec->title + QString("\n");
@@ -322,16 +322,16 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
         return;
     }
 
-    char thequery[512];
+    QString thequery;
 
     if (boxstatus == 1)
     {
         for (i = dislike->begin(); i != dislike->end(); i++)
         {
-            sprintf(thequery, "INSERT INTO conflictresolutionany "
-                              "(prefertitle, disliketitle) VALUES "
-                              "(\"%s\", \"%s\");", prefer->title.ascii(),
-                              (*i)->title.ascii());
+            thequery = QString("INSERT INTO conflictresolutionany "
+                               "(prefertitle, disliketitle) VALUES "
+                               "(\"%1\", \"%2\");").arg(prefer->title)
+                               .arg((*i)->title);
             db->exec(thequery);
         }
     } 
@@ -351,14 +351,13 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
             dend = (*i)->endts.toString("yyyyMMddhhmm");
             dend += "00";
 
-            sprintf(thequery, "INSERT INTO conflictresolutionsingle "
-                              "(preferchannum, preferstarttime, "
-                              "preferendtime, dislikechannum, "
-                              "dislikestarttime, dislikeendtime) VALUES "
-                              "(%d, %s, %s, %d, %s, %s);", 
-                              prefer->channum.toInt(), pstart.ascii(),
-                              pend.ascii(), (*i)->channum.toInt(),
-                              dstart.ascii(), dend.ascii());
+            thequery = QString("INSERT INTO conflictresolutionsingle "
+                               "(preferchannum, preferstarttime, "
+                               "preferendtime, dislikechannum, "
+                               "dislikestarttime, dislikeendtime) VALUES "
+                               "(%1, %2, %3, %4, %5, %6);") 
+                               .arg(prefer->channum).arg(pstart).arg(pend)
+                               .arg((*i)->channum).arg(dstart).arg(dend);
 
             db->exec(thequery);
         }
@@ -372,10 +371,10 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
         dend = (*i)->endts.toString("yyyyMMddhhmm");
         dend += "00";
 
-        sprintf(thequery, "DELETE FROM conflictresolutionoverride WHERE "
-                          "channum = %d AND starttime = %s AND "
-                          "endtime = %s;",
-                          (*i)->channum.toInt(), dstart.ascii(), dend.ascii());
+        thequery = QString("DELETE FROM conflictresolutionoverride WHERE "
+                           "channum = %1 AND starttime = %2 AND "
+                           "endtime = %3;").arg((*i)->channum).arg(dstart)
+                           .arg(dend);
 
         db->exec(thequery);
     }
@@ -383,8 +382,8 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
     delete dislike;
     delete conflictlist;
 
-    sprintf(thequery, "UPDATE settings SET data = \"yes\" WHERE "
-                      "value = \"RecordChanged\";");
+    thequery = "UPDATE settings SET data = \"yes\" WHERE value = "
+               "\"RecordChanged\";";
 
     db->exec(thequery);
 

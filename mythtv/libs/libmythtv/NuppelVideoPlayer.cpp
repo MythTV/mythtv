@@ -94,8 +94,11 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
 
     CloseAVCodec();
 
-    filters_cleanup(&videoFilters[0], videoFilters.size());
-    videoFilters.clear();
+    if (videoFilters.size() > 0)
+    {
+        filters_cleanup(&videoFilters[0], videoFilters.size());
+        videoFilters.clear();
+    }
 }
 
 bool NuppelVideoPlayer::GetPause(void)
@@ -676,8 +679,9 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
 
             frame.buf = vbuffer[wpos];
 
-            process_video_filters(&frame, &videoFilters[0],
-                                  videoFilters.size());
+            if (videoFilters.size() > 0)
+                process_video_filters(&frame, &videoFilters[0],
+                                      videoFilters.size());
 
             wpos = (wpos+1) % MAXVBUFFER;
             pthread_mutex_unlock(&video_buflock);

@@ -18,7 +18,6 @@ class ChannelInfo
     QString chanstr;
 
     QPixmap *icon;
-    int channum;
 };
 
 class TimeInfo

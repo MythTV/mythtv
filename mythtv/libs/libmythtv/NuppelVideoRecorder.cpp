@@ -133,8 +133,11 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         avcodec_close(&mpa_ctx);
     numencoders--;
 
-    filters_cleanup(&videoFilters[0], videoFilters.size());
-    videoFilters.clear();
+    if (videoFilters.size() > 0)
+    {
+        filters_cleanup(&videoFilters[0], videoFilters.size());
+        videoFilters.clear();
+    }
 }
 
 void NuppelVideoRecorder::SetTVFormat(QString tvformat)
@@ -1226,7 +1229,8 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
         sync();   
     }
 
-    process_video_filters(&frame, &videoFilters[0], videoFilters.size());
+    if (videoFilters.size() > 0)
+        process_video_filters(&frame, &videoFilters[0], videoFilters.size());
 
     if (useavcodec)
     {

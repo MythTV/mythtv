@@ -20,9 +20,7 @@ int main(int argc, char *argv[])
         usleep(1000);
 
     sleep(1);
-    printf("shutting down\n");
     delete tv;
-    printf("Goodbye\n");
 
     exit(0);
 }

@@ -233,11 +233,74 @@ static void yuv420_argb32_mmx (uint8_t * image, uint8_t * py,
     __asm__ ("emms\n\t");
 }
 
+#define SCALE_BITS 10
+
+#define C_Y  (76309 >> (16 - SCALE_BITS))
+#define C_RV (117504 >> (16 - SCALE_BITS))
+#define C_BU (138453 >> (16 - SCALE_BITS))
+#define C_GU (13954 >> (16 - SCALE_BITS))
+#define C_GV (34903 >> (16 - SCALE_BITS))
+
+#define RGBOUT(r, g, b, y1)\
+{\
+    y = (y1 - 16) * C_Y;\
+    r = (y + r_add) >> SCALE_BITS;\
+    g = (y + g_add) >> SCALE_BITS;\
+    b = (y + b_add) >> SCALE_BITS;\
+}
+
+static void yuv420_argba32(unsigned char *image, unsigned char *py,
+                           unsigned char *pu, unsigned char *pv,
+                           int h_size, int v_size)
+{
+    unsigned char *y1_ptr, *y2_ptr, *cb_ptr, *cr_ptr, *d, *d1, *d2;
+    int w, y, cb, cr, r_add, g_add, b_add, width2;
+    int dstwidth;
+    
+    d = image;
+    y1_ptr = py;
+    cb_ptr = pu;
+    cr_ptr = pv;
+    dstwidth = h_size * 4;
+    width2 = h_size / 2;
+    
+    for(;v_size > 0; v_size -= 2) {
+        d1 = d;
+        d2 = d + h_size * 4;
+        y2_ptr = y1_ptr + h_size;
+        for(w = width2; w > 0; w--) {
+            cb = cb_ptr[0] - 128;
+            cr = cr_ptr[0] - 128;
+            r_add = C_RV * cr + (1 << (SCALE_BITS - 1));
+            g_add = - C_GU * cb - C_GV * cr + (1 << (SCALE_BITS - 1));
+            b_add = C_BU * cb + (1 << (SCALE_BITS - 1));
+
+            /* output 4 pixels */
+            RGBOUT(d1[0], d1[1], d1[2], y1_ptr[0]);
+            RGBOUT(d1[4], d1[5], d1[6], y1_ptr[1]);
+            RGBOUT(d2[0], d2[1], d2[2], y2_ptr[0]);
+            RGBOUT(d2[4], d2[5], d2[6], y2_ptr[1]);
+
+            d1[3] = d1[7] = d2[3] = d2[7] = 255;
+
+            d1 += 8;
+            d2 += 8;
+            y1_ptr += 2;
+            y2_ptr += 2;
+            cb_ptr++;
+            cr_ptr++;
+        }
+        d += 2 * dstwidth;
+        y1_ptr += h_size;
+    }
+}
+
 yuv2rgb_fun yuv2rgb_init_mmx (int bpp, int mode)
 {
-//    if (bpp == 15 || bpp == 16) {
+#ifdef MMX
     if (bpp == 32 && mode == MODE_RGB) return yuv420_argb32_mmx;
-    return NULL; // Fallback to C.
+#endif
+    return yuv420_argba32; // Fallback to C.
 }
 
 #define SCALEBITS 8

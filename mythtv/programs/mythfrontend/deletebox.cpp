@@ -87,11 +87,11 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     vbox->addWidget(listview, 1);
 
     QSqlQuery query;
-    char thequery[512];
+    QString thequery;
     ProgramListItem *item;
     
-    sprintf(thequery, "SELECT channum,starttime,endtime,title,subtitle,"
-                      "description FROM recorded;");
+    thequery = "SELECT channum,starttime,endtime,title,subtitle,description "
+               "FROM recorded;";
 
     query = db->exec(thequery);
 
@@ -181,16 +181,8 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
 
 DeleteBox::~DeleteBox(void)
 {
-    if (nvp)
-    {
-        nvp->StopPlaying();
-        pthread_join(decoder, NULL);
-        delete nvp;
-        delete rbuffer;
-
-        nvp = NULL;
-        rbuffer = NULL;
-    }
+    killPlayer();
+    delete timer;
 }
 
 void DeleteBox::Show()
@@ -199,6 +191,7 @@ void DeleteBox::Show()
     setActiveWindow();
 }
 
+
 static void *SpawnDecoder(void *param)
 {
     NuppelVideoPlayer *nvp = (NuppelVideoPlayer *)param;
@@ -206,7 +199,7 @@ static void *SpawnDecoder(void *param)
     return NULL;
 }
 
-void DeleteBox::changed(QListViewItem *lvitem)
+void DeleteBox::killPlayer(void)
 {
     timer->stop();
     while (timer->isActive())
@@ -222,7 +215,28 @@ void DeleteBox::changed(QListViewItem *lvitem)
         nvp = NULL;
         rbuffer = NULL;
     }
+}
 
+void DeleteBox::startPlayer(ProgramInfo *rec)
+{
+    rbuffer = new RingBuffer(rec->GetRecordFilename(fileprefix), false);
+
+    nvp = new NuppelVideoPlayer();
+    nvp->SetRingBuffer(rbuffer);
+    nvp->SetAsPIP();
+    nvp->SetOSDFontName(globalsettings->GetSetting("OSDFont"),
+                        installprefix);
+
+    pthread_create(&decoder, NULL, SpawnDecoder, nvp);
+
+    while (!nvp->IsPlaying())
+         usleep(50);
+}
+
+void DeleteBox::changed(QListViewItem *lvitem)
+{
+    killPlayer();
+	
     ProgramListItem *pgitem = (ProgramListItem *)lvitem;
     if (!pgitem)
         return;
@@ -231,19 +245,8 @@ void DeleteBox::changed(QListViewItem *lvitem)
         return;
 
     ProgramInfo *rec = pgitem->getProgramInfo();
-
-    rbuffer = new RingBuffer(rec->GetRecordFilename(fileprefix), false);
-
-    nvp = new NuppelVideoPlayer();
-    nvp->SetRingBuffer(rbuffer);
-    nvp->SetAsPIP();
-    nvp->SetOSDFontName(globalsettings->GetSetting("OSDFont"), 
-                        installprefix);
- 
-    pthread_create(&decoder, NULL, SpawnDecoder, nvp);
-
-    while (!nvp->IsPlaying())
-         usleep(50);
+   
+    startPlayer(rec);
 
     QDateTime startts = rec->startts;
     QDateTime endts = rec->endts;
@@ -274,6 +277,8 @@ void DeleteBox::changed(QListViewItem *lvitem)
 
 void DeleteBox::selected(QListViewItem *lvitem)
 {
+    killPlayer();
+	
     ProgramListItem *pgitem = (ProgramListItem *)lvitem;
     ProgramInfo *rec = pgitem->getProgramInfo();
 
@@ -312,17 +317,17 @@ void DeleteBox::selected(QListViewItem *lvitem)
         QString filename = rec->GetRecordFilename(fileprefix);
 
         QSqlQuery query;
-        char thequery[512];
+        QString thequery;
 
         QString startts = rec->startts.toString("yyyyMMddhhmm");
         startts += "00";
         QString endts = rec->endts.toString("yyyyMMddhhmm");
         endts += "00";
 
-        sprintf(thequery, "DELETE FROM recorded WHERE channum = %s AND "
-                          "title = \"%s\" AND starttime = %s AND endtime = %s;",
-                          rec->channum.ascii(), rec->title.ascii(), 
-                          startts.ascii(), endts.ascii());
+        thequery = QString("DELETE FROM recorded WHERE channum = %1 AND title "
+                           "= \"%2\" AND starttime = %3 AND endtime = %4;")
+                           .arg(rec->channum).arg(rec->title).arg(startts)
+                           .arg(startts).arg(endts);
 
         query = db->exec(thequery);
 
@@ -339,9 +344,13 @@ void DeleteBox::selected(QListViewItem *lvitem)
         delete lvitem;
         UpdateProgressBar();
     }    
+    else
+        startPlayer(rec);
 
     setActiveWindow();
     raise();
+
+    timer->start(1000 / 30);
 }
 
 void DeleteBox::GetFreeSpaceStats(int &totalspace, int &usedspace)
