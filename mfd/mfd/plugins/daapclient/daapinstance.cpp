@@ -586,6 +586,18 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
                     "have no current database ");
         }
     }
+    else if(top_level_tag.type == 'aply')
+    {
+        if(current_request_db)
+        {
+            current_request_db->doDatabaseListPlaylistsResponse(rebuilt_internal);            
+        }
+        else
+        {
+            warning("got an aply response, but "
+                    "have no current database ");
+        }
+    }
     else
     {
         warning("got a top level "
@@ -650,6 +662,24 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
                                                     "daap.songdataurl"
                                                  ));
 
+            current_request_db = a_database;            
+            update_request.send(client_socket_to_daap_server);
+            
+            //
+            //  We've already sent a request, don't send another one
+            //
+
+            a_database = databases.last();
+        }
+        else if(!a_database->hasPlaylistList())
+        {
+            int which_database = a_database->getDaapId();
+            QString request_string = QString("/databases/%1/containers").arg(which_database);
+            DaapRequest update_request(this, request_string, server_address);
+            update_request.addGetVariable("session-id", session_id);
+
+            //update_request.addGetVariable("revision-number", metadata_generation);
+            
             current_request_db = a_database;            
             update_request.send(client_socket_to_daap_server);
             

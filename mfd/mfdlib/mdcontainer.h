@@ -85,6 +85,10 @@ class MetadataContainer
                                     QValueList<int> playlist_in,
                                     QValueList<int> playlist_out
                                 );
+
+    MetadataCollectionContentType  getContentType(){ return content_type;}
+    MetadataCollectionLocationType getLocationType(){ return location_type;}
+
  
   protected:
   

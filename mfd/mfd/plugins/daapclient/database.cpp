@@ -59,6 +59,23 @@ Database::Database(
     metadata_server = the_mfd->getMetadataServer();
     metadata_container = metadata_server->createContainer(MCCT_audio, MCLT_lan);
     container_id = metadata_container->getIdentifier();
+
+    //
+    //  Prepare the metadata
+    //
+    
+    new_metadata = new QIntDict<Metadata>;
+    new_metadata->setAutoDelete(true);
+    new_playlists = new QIntDict<Playlist>;
+    new_metadata->setAutoDelete(true);
+    
+    /*
+    metadata_additions.clear();
+    metadata_deletions.clear();
+    playlist_additions.clear();
+    playlist_deletions.clear();
+    */
+
 }
 
 void Database::doDatabaseItemsResponse(TagInput& dmap_data)
@@ -148,6 +165,8 @@ void Database::doDatabaseItemsResponse(TagInput& dmap_data)
         dmap_data >> end;
 
     }
+
+    have_items = true;    
 }    
 
 void Database::parseItems(TagInput& dmap_data, int how_many)
@@ -577,7 +596,7 @@ void Database::parseItems(TagInput& dmap_data, int how_many)
                               .arg(session_id);
 
 
-            AudioMetadata *new_metadata = new AudioMetadata
+            AudioMetadata *new_item = new AudioMetadata
                                 (
                                     new_url,
                                     new_item_artist_name,
@@ -595,30 +614,32 @@ void Database::parseItems(TagInput& dmap_data, int how_many)
 
             QDateTime when;
             when.setTime_t(new_item_date_added);
-            new_metadata->setDateAdded(when);
+            new_item->setDateAdded(when);
             
             when.setTime_t(new_item_date_modified);
-            new_metadata->setDateModified(when);
+            new_item->setDateModified(when);
 
-            new_metadata->setBpm(new_item_bpm);
-            new_metadata->setBitrate(new_item_bitrate);
-            new_metadata->setComment(new_item_comment);
-            new_metadata->setCompilation(new_item_compilation);
-            new_metadata->setComposer(new_item_composer_name);
-            new_metadata->setDiscCount(new_item_disc_count);            
-            new_metadata->setDiscNumber(new_item_disc_number);
-            new_metadata->setEqPreset(new_item_eqpreset);
-            new_metadata->setFormat(new_item_format);
-            new_metadata->setDescription(new_item_description);
-            new_metadata->setRelativeVolume(new_item_relative_volume);
-            new_metadata->setSampleRate(new_item_sample_rate);
-            new_metadata->setSize(new_item_size);
-            new_metadata->setStartTime(new_item_start_time);
-            new_metadata->setStopTime(new_item_stop_time);
-            new_metadata->setTrackCount(new_item_track_count);
-            new_metadata->setRating(new_item_rating);
-
+            new_item->setBpm(new_item_bpm);
+            new_item->setBitrate(new_item_bitrate);
+            new_item->setComment(new_item_comment);
+            new_item->setCompilation(new_item_compilation);
+            new_item->setComposer(new_item_composer_name);
+            new_item->setDiscCount(new_item_disc_count);            
+            new_item->setDiscNumber(new_item_disc_number);
+            new_item->setEqPreset(new_item_eqpreset);
+            new_item->setFormat(new_item_format);
+            new_item->setDescription(new_item_description);
+            new_item->setRelativeVolume(new_item_relative_volume);
+            new_item->setSampleRate(new_item_sample_rate);
+            new_item->setSize(new_item_size);
+            new_item->setStartTime(new_item_start_time);
+            new_item->setStopTime(new_item_stop_time);
+            new_item->setTrackCount(new_item_track_count);
+            new_item->setRating(new_item_rating);
             
+            new_metadata->insert(new_item->getId(), new_item);
+
+                                
             
         }
         else
@@ -634,7 +655,206 @@ void Database::parseItems(TagInput& dmap_data, int how_many)
                 "items in %2 seconds")
                 .arg(how_many)
                 .arg(elapsed_time), 4);
-    have_items = true;    
+}
+
+void Database::doDatabaseListPlaylistsResponse(TagInput &dmap_data)
+{
+    //
+    //  Figure out how many playlists there are and instantiate an object
+    //  for each.
+    //
+
+    Tag a_tag;
+    Chunk a_chunk;
+
+    bool database_playlist_list_status = false;
+    int new_numb_playlists = -1;
+    int new_numb_received_playlists = -1;
+
+    while(!dmap_data.isFinished())
+    {
+        //
+        //  parse responses to a /database/x/containers request
+        //
+
+        dmap_data >> a_tag;
+
+        u32 a_u32_variable;
+        u8  a_u8_variable;
+
+        switch(a_tag.type)
+        {
+            case 'mstt':
+
+                //
+                //  status of request
+                //
+                
+                dmap_data >> a_u32_variable;
+                if(a_u32_variable == 200)    // like HTTP 200 (OK!)
+                {
+                    database_playlist_list_status = true;
+                }
+                break;
+
+            case 'muty':
+            
+                //
+                //  update type ... only ever seen 0 here ... dunno ?
+                //
+                
+                dmap_data >> a_u8_variable;
+                break;
+                
+            case 'mtco':
+                
+                //
+                //  number of total playlists
+                //
+                
+                dmap_data >> a_u32_variable;
+                new_numb_playlists = a_u32_variable;
+                break;
+                
+            case 'mrco':
+            
+                //
+                //  received number of items
+                //                
+                
+                dmap_data >> a_u32_variable;
+                new_numb_received_playlists = a_u32_variable;
+                break;
+                
+            case 'mlcl':
+
+                //
+                //  This is "listing" tag, saying there's a list of other tags to come
+                //
+                
+                dmap_data >> a_chunk;
+                {
+                    TagInput re_rebuilt_internal(a_chunk);
+                    parseContainers(re_rebuilt_internal, new_numb_received_playlists);
+                }
+                break;
+
+            default:
+                warning("got an unknown tag type "
+                        "while doing doDatabaseListPlaylistsResponse()");
+                dmap_data >> a_chunk;
+        }
+
+        dmap_data >> end;
+
+    }
+
+    have_playlist_list = true;
+}
+
+void Database::parseContainers(TagInput& dmap_data, int how_many)
+{
+
+    Tag a_tag;
+
+    u32 a_u32_variable;
+    std::string a_string;
+    Chunk listing;
+
+    QTime loading_time;
+    loading_time.start();    
+    
+    for(int i = 0; i < how_many; i++)
+    {
+        Chunk emergency_throwaway_chunk;
+
+        dmap_data >> a_tag >> listing >> end;
+    
+        if(a_tag.type != 'mlit')
+        {
+            //
+            //  this should not happen
+            //
+            warning("got a non mlit tag "
+                    "that I really really wanted one.");
+        }
+        
+        int     new_playlist_id = -1;
+        QString new_playlist_name = "";
+        int     new_playlist_expected_count = 1;
+        
+        TagInput internal_listing(listing);
+        while(!internal_listing.isFinished())
+        {
+    
+            internal_listing >> a_tag;
+        
+            switch(a_tag.type)
+            {
+
+                case 'miid':
+            
+                    //
+                    //  playlist id !
+                    //
+                
+                    internal_listing >> a_u32_variable;
+                    new_playlist_id = a_u32_variable;
+                    break;
+                    
+                case 'minm':
+            
+                    //
+                    //   Item name
+                    //
+                
+                    internal_listing >> a_string;
+                    new_playlist_name = QString::fromUtf8(a_string.c_str());
+                    break;
+                
+                case 'mimc':
+                
+                    //
+                    //  Count of playlist
+                    //
+                    
+                    internal_listing >> a_u32_variable;
+                    new_playlist_expected_count = a_u32_variable;
+                    break;
+                
+                default:
+                    
+                    warning("unknown tag while parsing database playlist");
+                    internal_listing >> emergency_throwaway_chunk;
+            }
+            internal_listing >> end;
+        }
+        
+        //
+        //  If we have enough data, make a Metadata object
+        //
+
+
+        if(new_playlist_id > -1 && new_playlist_name.length() > 0)
+        {
+            //
+            //  Make a playlist
+            //
+        }
+        else
+        {
+            warning("got incomplete data for a playlist, "
+                    "going to try to ignore it");
+        }        
+        
+    }
+    
+    double elapsed_time = loading_time.elapsed() / 1000.0;
+    log(QString("parsed and loaded metadata for %1 "
+                "containers (playlists) in %2 seconds")
+                .arg(how_many)
+                .arg(elapsed_time), 4);
+
 }
 
 
@@ -651,5 +871,15 @@ void Database::warning(const QString &warning_message)
 
 Database::~Database()
 {
+    if(new_metadata)
+    {
+        delete new_metadata;
+        new_metadata = NULL;
+    }
+    if(new_playlists)
+    {
+        delete new_playlists;
+        new_playlists = NULL;
+    }
 }
 

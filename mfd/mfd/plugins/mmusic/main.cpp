@@ -42,6 +42,7 @@ bool mfdplugin_stop()
     if(mmusic_watcher)
     {
         mmusic_watcher->stop();
+        mmusic_watcher->wakeUp();
     }
     return true;
 }

@@ -42,9 +42,15 @@ bool mfdplugin_stop()
     if(daap_client)
     {
         daap_client->stop();
+        daap_client->wakeUp();
     }
     return true;
 }
+
+
+
+
+
 
 bool mfdplugin_can_unload()
 {

@@ -546,6 +546,8 @@ void DaapServer::sendMetadata(HttpRequest *http_request, QString request_path, D
         } 
         else 
         {
+            warning(QString("this request makes no sense: %1")
+                    .arg(request_path));
             http_request->getResponse()->setError(403);
             return;
         }
@@ -605,7 +607,10 @@ void DaapServer::addItemToResponse(DaapRequest *daap_request, TagOutput &respons
 
     if(meta_codes & DAAP_META_PERSISTENTID)
     {
-        response << Tag('mper') << (u64) which_item->getDatabaseId() << end;
+        if(which_item->getDbId() > 0)
+        {
+            response << Tag('mper') << (u64) which_item->getDbId() << end;
+        }
     }
                     
     if(meta_codes & DAAP_META_SONGALBUM)
@@ -829,7 +834,7 @@ void DaapServer::addItemToResponse(DaapRequest *daap_request, TagOutput &respons
     
     if(meta_codes & DAAP_META_NORMVOLUME)
     {
-        // 
+        // I have no idea why anyone would ever want to use this ?
     }
     
     
@@ -1272,14 +1277,21 @@ void DaapServer::handleMetadataChange(int which_collection)
 {
     bool take_action = false;
     uint audio_generation = 0;
-    metadata_server->lockMetadata();
-        MetadataContainer *which_one = metadata_server->getMetadataContainer(which_collection);
-        if(which_one->isAudio() && which_one->isLocal())
-        {
-            take_action = true;
-        }
-        audio_generation = metadata_server->getMetadataAudioGeneration();
-    metadata_server->unlockMetadata();
+    if(which_collection > 0)
+    {
+        metadata_server->lockMetadata();
+            MetadataContainer *which_one = metadata_server->getMetadataContainer(which_collection);
+            if(which_one->isAudio() && which_one->isLocal())
+            {
+                take_action = true;
+            }
+            audio_generation = metadata_server->getMetadataAudioGeneration();
+        metadata_server->unlockMetadata();
+    }
+    else
+    {
+        take_action = true;
+    }
 
     if(take_action)
     {

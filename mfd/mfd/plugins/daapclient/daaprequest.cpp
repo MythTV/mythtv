@@ -173,10 +173,16 @@ bool DaapRequest::sendBlock(std::vector<char> block_to_send, QSocketDevice *wher
         }
 
         FD_ZERO(&writefds);
-        FD_SET(where_to_send->socket(), &writefds);
-        if(nfds <= where_to_send->socket())
+        if(where_to_send)
         {
-            nfds = where_to_send->socket() + 1;
+            if(where_to_send->socket() > 0)
+            {
+                FD_SET(where_to_send->socket(), &writefds);
+                if(nfds <= where_to_send->socket())
+                {
+                    nfds = where_to_send->socket() + 1;
+                }
+            }
         }
         
         timeout.tv_sec = 1;
@@ -189,6 +195,21 @@ bool DaapRequest::sendBlock(std::vector<char> block_to_send, QSocketDevice *wher
         }
         else
         {
+            if(!where_to_send)
+            {
+                parent->warning("daap request's socket to the "
+                                "server went away in the middle "
+                                "of sending something");
+                return false;
+            }
+            if(where_to_send->socket() < 1)
+            {
+                parent->warning("daap request's socket to the "
+                                "server got closed in the middle "
+                                "of sending something");
+                return false;
+            }
+
             if(FD_ISSET(where_to_send->socket(), &writefds))
             {
                 //

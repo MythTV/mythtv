@@ -45,36 +45,64 @@ class Metadata
                 QUrl l_url = QUrl(""),
                 int l_rating = 0,
                 QDateTime l_last_played = QDateTime(),
-                int l_play_count = 0,
-                bool l_ephemeral = false
+                int l_play_count = 0
             );
 
     virtual ~Metadata();
 
     //
-    //  Get 'em
+    //  Set and get
     //
-  
+
     QUrl          getUrl(){return url;}
+    void          setUrl(QUrl l_url){url = l_url;}
+
     int           getRating(){return rating;}
+    void          setRating(int l_rating);
+
     int           getId(){return id;}
+    void          setId(int l_id){id = l_id;}
+
+    int           getUniversalId(); // no set, it's a function 
+                                    // of collection_id and id
+
+    int           getDbId(){return db_id;}
+    void          setDbId(int l_db_id){db_id = l_db_id;}
+
     int           getCollectionId(){return collection_id;}
+    void          setCollectionId(int l_collection_id){collection_id = l_collection_id;}
+
     QDateTime     getLastPlayed(){return last_played;}
+    void          setLastPlayed(QDateTime l_last_played){last_played = l_last_played;}
+
     int           getPlayCount(){return play_count;}
-    bool          getEphemeral(){return ephemeral;}
-    MetadataType  getType(){return metadata_type;}
-    int           getDatabaseId(){return db_id;}
-    int           getUniversalId();
-        
-    //
-    //  Set 'em
-    //    
+    void          setPlayCount(int l_play_count){play_count = l_play_count;}
     
-    void    setUrl(QUrl l_url){url = l_url;}
-    void    setRating(int l_rating){rating = l_rating;}
-    void    setId(int l_id){id = l_id;}
-    void    setLastPlayed(QDateTime l_last_played){last_played = l_last_played;}
-    void    setPlayCount(int l_play_count){play_count = l_play_count;}
+    MetadataType  getType(){return metadata_type;}
+    void          setMetadataType(MetadataType l_metadata_type){metadata_type = l_metadata_type;}        
+
+    QString       getTitle() { return title; }
+    void          setTitle(const QString &ltitle) { title = ltitle; }
+    
+    QDateTime     getDateAdded(){ return date_added;}
+    void          setDateAdded(QDateTime ldate_added){ date_added = ldate_added; }
+    
+    QDateTime     getDateModified(){ return date_modified;}
+    void          setDateModified(QDateTime ldate_modified){ date_modified = ldate_modified; }
+
+    QString       getFormat(){ return format;}
+    void          setFormat(const QString &lformat){ format = lformat;}
+    
+    QString       getDescription(){ return description;}
+    void          setDescription(const QString &ldescription){description = ldescription;}
+    
+    QString       getComment(){ return comment; }
+    void          setComment(const QString &lcomment){ comment = lcomment;}
+
+    int           getSize(){ return size;}
+    void          setSize(int lsize){size = lsize;}
+    
+
     
   protected:
 
@@ -84,9 +112,16 @@ class Metadata
     int             id;
     QDateTime       last_played;
     int             play_count;
-    bool            ephemeral;
     MetadataType    metadata_type;
     int             db_id;
+    QString         title;
+    QDateTime       date_added;
+    QDateTime       date_modified;
+    QString         format;
+    QString         description;
+    QString         comment;
+    int             size;
+
 };
 
 class AudioMetadata : public Metadata
@@ -100,7 +135,6 @@ class AudioMetadata : public Metadata
                     int l_rating = 0,
                     QDateTime l_last_played = QDateTime(),
                     int l_play_count = 0,
-                    bool l_ephemeral = false,
                     QString l_artist = "", 
                     QString l_album = "", 
                     QString l_title = "", 
@@ -123,15 +157,12 @@ class AudioMetadata : public Metadata
                  
     ~AudioMetadata();
 
-
     QString     getArtist() { return artist; }
     void        setArtist(const QString &lartist) { artist = lartist; }
     
     QString     getAlbum() { return album; }
     void        setAlbum(const QString &lalbum) { album = lalbum; }
 
-    QString     getTitle() { return title; }
-    void        setTitle(const QString &ltitle) { title = ltitle; }
 
     QString     getGenre() { return genre; }
     void        setGenre(const QString &lgenre) { genre = lgenre; }
@@ -151,20 +182,11 @@ class AudioMetadata : public Metadata
     int         getBitrate(){ return bitrate; }
     void        setBitrate(int lbitrate){ bitrate = lbitrate;}
     
-    QString     getComment(){ return comment; }
-    void        setComment(const QString &lcomment){ comment = lcomment;}
-
     bool        getCompilation(){ return compilation;}
     void        setCompilation(bool yah_or_nah){ compilation = yah_or_nah;}
     
     QString     getComposer(){ return composer; }
     void        setComposer(const QString lcomposer){composer = lcomposer;}
-
-    QDateTime   getDateAdded(){ return date_added;}
-    void        setDateAdded(QDateTime ldate_added){ date_added = ldate_added; }
-    
-    QDateTime   getDateModified(){ return date_modified;}
-    void        setDateModified(QDateTime ldate_modified){ date_modified = ldate_modified; }
 
     int         getDiscCount(){ return disc_count;}
     void        setDiscCount(int ldisc_count){ disc_count = ldisc_count;}
@@ -175,20 +197,11 @@ class AudioMetadata : public Metadata
     QString     getEqPreset(){ return eq_preset;}
     void        setEqPreset(const QString &leq_preset){ eq_preset = leq_preset;}
     
-    QString     getFormat(){ return format;}
-    void        setFormat(const QString &lformat){ format = lformat;}
-    
-    QString     getDescription(){ return description;}
-    void        setDescription(const QString &ldescription){description = ldescription;}
-    
     int         getRelativeVolume(){ return relative_volume;}
     void        setRelativeVolume(int lrelative_volume){relative_volume = lrelative_volume;}
     
     int         getSampleRate(){ return sample_rate;}
     void        setSampleRate(int lsample_rate){ sample_rate = lsample_rate;}
-    
-    int         getSize(){ return size;}
-    void        setSize(int lsize){size = lsize;}
     
     int         getStartTime(){ return start_time;}
     void        setStartTime(int lstart_time){ start_time = lstart_time;}
@@ -203,26 +216,21 @@ class AudioMetadata : public Metadata
 
     QString     artist;
     QString     album;
-    QString     title;
     QString     genre;
     int         year;
     int         tracknum;
     int         length;
     int         bpm;
     int         bitrate;
-    QString     comment;
     bool        compilation;
     QString     composer;
-    QDateTime   date_added;
-    QDateTime   date_modified;
+
     int         disc_count;
     int         disc_number;
     QString     eq_preset;
-    QString     format;
-    QString     description;
+
     int         relative_volume;
     int         sample_rate;
-    int         size;
     int         start_time;
     int         stop_time;
     int         track_count;

@@ -134,12 +134,22 @@ void MMusicWatcher::run()
                                                  );
                 
                 //
+                //  the metadata server owns the data now (and will delete
+                //  it when required). We point away from it.
+                //
+                
+                new_metadata = NULL;
+                new_playlists = NULL;
+
+                //
                 //  Something changed. Fire off an event (this will tell the
-                //  container "above" me that it's time to update
+                //  mfd to tell all the plusins (that care) that it's time
+                //  to update)
                 //
                 
                 MetadataChangeEvent *mce = new MetadataChangeEvent(container_id);
                 QApplication::postEvent(parent, mce);    
+                
             }
             
             //
@@ -152,13 +162,24 @@ void MMusicWatcher::run()
         else
         {
             //
-            //  Sleep for a while, unless someone wakes us up
+            //  Sleep for a while, unless someone wakes us up. But only
+            //  sleep to a time close to our next sweep time
             //
 
-            main_wait_condition.wait(1000);
+            int seconds_to_sleep = metadata_sweep_time.elapsed() - sweep_wait;
+            if(seconds_to_sleep > 0)
+            {
+                setTimeout(seconds_to_sleep, 0);
+                waitForSomethingToHappen();
+            }
         }
     }
+    
+    //
+    //  We are going away, tell the metadata server we no longer exist
+    //
 
+    metadata_server->deleteContainer(container_id);
 }
 
 bool MMusicWatcher::checkDataSources(const QString &startdir, QSqlDatabase *a_db)
@@ -551,7 +572,6 @@ bool MMusicWatcher::sweepMetadata()
                                     m_query.value(9).toInt(),
                                     QDateTime::fromString(timestamp, Qt::ISODate),
                                     m_query.value(11).toInt(),
-                                    false,
                                     m_query.value(1).toString(),
                                     m_query.value(2).toString(),
                                     m_query.value(3).toString(),

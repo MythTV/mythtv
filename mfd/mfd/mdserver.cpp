@@ -275,6 +275,79 @@ MetadataContainer* MetadataServer::createContainer(
     return return_value;
 }                                                                                                                                                        
 
+void MetadataServer::deleteContainer(int container_id)
+{
+    //
+    //  A collection of metadata is going away
+    //
+    
+    lockMetadata();
+
+    MetadataContainer *target = NULL;
+    MetadataContainer *a_container;
+    for (
+            a_container = metadata_containers->first(); 
+            a_container; 
+            a_container = metadata_containers->next()
+        )
+    {
+        if(a_container->getIdentifier() == container_id)
+        {
+            target = a_container;
+            break; 
+        }
+    }
+    
+    if(target)
+    {
+        //
+        //  Remember what kind it was
+        //
+        
+        MetadataCollectionContentType ex_type = target->getContentType();
+        MetadataCollectionLocationType ex_location = target->getLocationType();
+        
+        //
+        //  Remove other references to this container
+        //
+        
+        if(ex_type == MCCT_audio && ex_location == MCLT_host)
+        {
+            local_audio_metadata_containers->remove(target);
+        }
+        
+        //
+        //  Take it off our master list, which automatically destructs it
+        //
+        
+        metadata_containers->remove(target);
+        
+        //
+        //  Finally we bump the relevant generation twice (so no plugin will
+        //  ask for deltas, cause deltas only last for one change in
+        //  generation)
+        //
+        
+        if(ex_type == MCCT_audio)
+        {
+            metadata_audio_generation_mutex.lock();
+                ++metadata_audio_generation;
+                ++metadata_audio_generation;
+            metadata_audio_generation_mutex.unlock();
+        }
+
+        MetadataChangeEvent *mce = new MetadataChangeEvent(-1);
+        QApplication::postEvent(parent, mce);    
+    }
+    else
+    {
+        warning(QString("asked to delete container "
+                        "with bad id: %1")
+                       .arg(container_id));
+    }
+    unlockMetadata();
+}
+
 int MetadataServer::bumpContainerId()
 {
     int return_value;
@@ -371,10 +444,13 @@ void MetadataServer::doAtomicDataSwap(
 
 MetadataContainer* MetadataServer::getMetadataContainer(int which_one)
 {
-    //
-    //  Hope and pray that whoever called this locked the metadata first!
-    //
-    
+    if(metadata_mutex.tryLock())
+    {
+        metadata_mutex.unlock();
+        warning("getMetadataContainer() called without "
+                "metadata_mutex being locked");
+    }
+
     MetadataContainer *target = NULL;
     MetadataContainer *a_container;
     for (

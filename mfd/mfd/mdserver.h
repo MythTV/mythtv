@@ -56,6 +56,8 @@ class MetadataServer : public MFDServicePlugin
                                                     MetadataCollectionLocationType location_type
                                                 );
 
+    void                         deleteContainer(int container_id);
+
     void                         doAtomicDataSwap(
                                                     MetadataContainer *which_one,
                                                     QIntDict<Metadata>* new_metadata,

@@ -50,7 +50,8 @@ class Database
     void    doDatabaseItemsResponse(TagInput &dmap_data);
     void    parseItems(TagInput &dmap_Data, int how_many);
 
-    
+    void    doDatabaseListPlaylistsResponse(TagInput &dmap_data);    
+    void    parseContainers(TagInput &dmap_Data, int how_many);
 
      
   private:   
@@ -75,5 +76,9 @@ class Database
     int session_id;
     QString host_address;
     int host_port;
+
+    QIntDict<Metadata>  *new_metadata;
+    QIntDict<Playlist>  *new_playlists;
+
 };
 #endif  // database_h_

@@ -154,5 +154,17 @@ void MetadataContainer::dataSwap(
 
 MetadataContainer::~MetadataContainer()
 {
+    if(current_metadata)
+    {
+        current_metadata->setAutoDelete(true);
+        delete current_metadata;
+        current_metadata = NULL;
+    }
+    if(current_playlists)
+    {
+        current_playlists->setAutoDelete(true);
+        delete current_playlists;
+        current_playlists = NULL;
+    }
 }
 
