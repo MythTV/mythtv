@@ -1439,7 +1439,7 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
             from << ", people, credits";
             where << QString("record.recordid = %1 AND "
                              "program.manualid = 0 AND "
-                             "people.name LIKE '\%%2\%' AND "
+                             "people.name LIKE '%2' AND "
                              "credits.person = people.person AND "
                              "program.chanid = credits.chanid AND "
                              "program.starttime = credits.starttime")

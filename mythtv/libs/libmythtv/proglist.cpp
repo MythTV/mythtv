@@ -1367,12 +1367,12 @@ void ProgLister::fillItemList(void)
     }
     else if (type == plPeopleSearch) // people search
     {
-        where = QString("LEFT JOIN credits ON credits.chanid = program.chanid "
-                        "  AND credits.starttime = program.starttime "
-                        "LEFT JOIN people ON people.person = credits.person "
-                        "WHERE channel.visible = 1 "
+        where = QString(", people, credits WHERE channel.visible = 1 "
                         "  AND program.endtime > %1 "
-                        "  AND people.name LIKE '\%%2\%' ")
+                        "  AND people.name LIKE '%2' "
+                        "  AND credits.person = people.person "
+                        "  AND program.chanid = credits.chanid "
+                        "  AND program.starttime = credits.starttime")
                         .arg(startstr).arg(qphrase);
     }
     else if (type == plPowerSearch) // complex search
