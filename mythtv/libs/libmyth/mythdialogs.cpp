@@ -12,6 +12,7 @@ using namespace std;
 #ifdef USE_LIRC
 #include <pthread.h>
 #include "lirc.h"
+#include "lircevent.h"
 #endif
 
 #include "uitypes.h"
@@ -118,6 +119,61 @@ void MythMainWindow::keyPressEvent(QKeyEvent *e)
         qApp->notify(current, e);
     else
         QDialog::keyPressEvent(e);
+}
+
+void MythMainWindow::customEvent(QCustomEvent *ce)
+{
+#ifdef USE_LIRC
+    if (ce->type() == kLircKeycodeEventType) 
+    {
+        LircKeycodeEvent *lke = (LircKeycodeEvent *)ce;
+        int keycode = lke->getKeycode();
+
+        if (keycode) 
+        {
+            int mod = keycode & MODIFIER_MASK;
+            int k = keycode & ~MODIFIER_MASK; /* trim off the mod */
+            QString text(QChar(k >> 24));
+            QKeyEvent key(lke->isKeyDown() ? QEvent::KeyPress :
+                          QEvent::KeyRelease, k, k >> 24, mod, text);
+
+            // Make the key events go to the widgets almost
+            // the same way Qt would.
+
+            QObject *key_target = NULL;
+            if (!key_target)
+                key_target = QWidget::keyboardGrabber();
+
+            if (!key_target)
+            {
+                QWidget *focus_widget = qApp->focusWidget();
+                if (focus_widget && focus_widget->isEnabled())
+                {
+                    key_target = focus_widget;
+
+                    // Yes this is special code for handling the
+                    // the escape key.
+                    if (key.key() == Key_Escape &&
+                        focus_widget->topLevelWidget())
+                    {
+                        key_target = focus_widget->topLevelWidget();
+                    }
+                }
+            }
+
+            if (!key_target)
+                key_target = this;
+
+            QApplication::sendEvent(key_target, &key);
+        }
+        else
+        {
+            cerr << "LircClient warning: attempt to convert '"
+                 << lke->getLircText() << "' to a key sequence failed. Fix"
+                                           " your key mappings.\n";
+        }
+    }
+#endif
 }
 
 MythDialog::MythDialog(MythMainWindow *parent, const char *name, bool setsize)

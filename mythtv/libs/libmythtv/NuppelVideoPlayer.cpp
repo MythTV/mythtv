@@ -55,6 +55,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
         m_playbackinfo = new ProgramInfo(*info);
 
     playing = false;
+    decoder_thread_alive = true;
     filename = "output.nuv";
     prebuffering = false;
 

@@ -265,55 +265,93 @@ ChanInfo *parseChannel(QDomElement &element, QUrl baseUrl)
     return chaninfo;
 }
 
+int TimezoneToInt (QString timezone)
+{
+    // we signal an error by setting it invalid (> 720min = 12hr)
+    int result = 721;
+
+    if (timezone.length() == 5)
+    {
+        bool ok;
+
+        result = timezone.mid(1,2).toInt(&ok, 10);
+
+        if (!ok)
+            result = 721;
+        else
+        {
+            result *= 60;
+
+            int min = timezone.right(2).toInt(&ok, 10);
+
+            if (!ok)
+                result = 721;
+            else
+            {
+                result += min;
+                if (timezone.left(1) == "-")
+                    result *= -1;
+            }
+        }
+    }
+    return result;
+}
+
 void addTimeOffset(QString &timestr, int localTimezoneOffset)
 {
-    if (timestr.isEmpty() || localTimezoneOffset < -12 || 
-        localTimezoneOffset > 12)
+    if (timestr.isEmpty() || abs(localTimezoneOffset) > 720)
         return;
-
-    bool ok;
 
     QStringList split = QStringList::split(" ", timestr);
     QString ts = split[0];
     int ts_offset = localTimezoneOffset;
+
     if (split.size() > 1)
     {
         QString tmp = split[1];
-        ts_offset = tmp.stripWhiteSpace().left(3).toInt(&ok, 10);
-        if (!ok)
+        tmp.stripWhiteSpace();
+
+        ts_offset = TimezoneToInt(tmp);
+        if (abs(ts_offset) > 720)
             ts_offset = localTimezoneOffset;
     }
 
-    if (ts_offset != localTimezoneOffset)
+    int diff = localTimezoneOffset - ts_offset;
+    int year = 0, month = 0, day = 0, hour = 0, min = 0, sec = 0;
+
+    if (diff != 0)
     {
-        int diff = localTimezoneOffset - ts_offset;
-        int year = 0, month = 0, day = 0, hour = 0, min = 0, sec = 0;
-                
-        if (ts.length() == 14)
-        {
-            year  = ts.left(4).toInt(&ok, 10);
-            month = ts.mid(4,2).toInt(&ok, 10);
-            day   = ts.mid(6,2).toInt(&ok, 10);
-            hour  = ts.mid(8,2).toInt(&ok, 10);
-            min   = ts.mid(10,2).toInt(&ok, 10);
-            sec   = ts.mid(12,2).toInt(&ok, 10);
-        }
-        else if (ts.length() == 12)
-        {
-            year  = ts.left(4).toInt(&ok, 10);
-            month = ts.mid(4,2).toInt(&ok, 10);
-            day   = ts.mid(6,2).toInt(&ok, 10);
-            hour  = ts.mid(8,2).toInt(&ok, 10);
-            min   = ts.mid(10,2).toInt(&ok, 10);
-            sec   = 0;
-        }
-        else
-        {
-            cerr << "Unknown timestamp format: " << ts << endl;
-        }
-                
+        bool ok;
+                    
+            if (ts.length() == 14)
+            {
+                year  = ts.left(4).toInt(&ok, 10);
+                month = ts.mid(4,2).toInt(&ok, 10);
+                day   = ts.mid(6,2).toInt(&ok, 10);
+                hour  = ts.mid(8,2).toInt(&ok, 10);
+                min   = ts.mid(10,2).toInt(&ok, 10);
+                sec   = ts.mid(12,2).toInt(&ok, 10);
+            }
+            else if (ts.length() == 12)
+            {
+                year  = ts.left(4).toInt(&ok, 10);
+                month = ts.mid(4,2).toInt(&ok, 10);
+                day   = ts.mid(6,2).toInt(&ok, 10);
+                hour  = ts.mid(8,2).toInt(&ok, 10);
+                min   = ts.mid(10,2).toInt(&ok, 10);
+                sec   = 0;
+            }
+            else
+            {
+                diff = 0;
+                cerr << "Ignoring unknown timestamp format: " << ts << endl;
+            }
+    }
+
+    if (diff != 0)
+    {
         QDateTime dt = QDateTime(QDate(year, month, day),QTime(hour, min, sec));
-        dt = dt.addSecs(diff * 60 * 60);
+        dt = dt.addSecs(diff * 60 );
         timestr = dt.toString("yyyyMMddhhmmss");
     }
 }
@@ -501,26 +539,21 @@ void parseFile(QString filename, QValueList<ChanInfo> *chanlist,
     // now we calculate the localTimezoneOffset, so that we can fix
     // the programdata if needed
     QString config_offset = gContext->GetSetting("TimeOffset", "None");
-    int localTimezoneOffset = 13;
+    // we disable this feature by setting it invalid (> 720min = 12hr)
+    int localTimezoneOffset = 721;
 
-    if (config_offset == "None")
-    {
-        // we disable this feature by setting it invalid
-        localTimezoneOffset = 13;
-    }
-    else if (config_offset == "Auto")
+    if (config_offset == "Auto")
     {
         time_t now = time(NULL);
         struct tm local_tm;
         localtime_r(&now, &local_tm);
-        localTimezoneOffset = local_tm.tm_gmtoff / 3600;
+        localTimezoneOffset = local_tm.tm_gmtoff / 60;
     }
-    else
+    else if (config_offset != "None")
     {
-        bool ok;
-        localTimezoneOffset = config_offset.left(3).toInt(&ok, 10);
-        if (!ok)
-            localTimezoneOffset = 13;
+        localTimezoneOffset = TimezoneToInt(config_offset);
+        if (abs(localTimezoneOffset) > 720)
+            cerr << "Ignoring invalid TimeOffset " << config_offset << endl;
     }
 
     QDomElement docElem = doc.documentElement();
@@ -1368,7 +1401,7 @@ bool fillData(QValueList<Source> &sourcelist)
         }
         else if (xmltv_grabber == "tv_grab_nz")
         {
-	    // tv_grab_nz only supports a 7-day "grab".
+            // tv_grab_nz only supports a 7-day "grab".
             grabData(*it, 1);
 
             for (int i = 0; i < 7; i++)
@@ -1651,8 +1684,8 @@ int main(int argc, char *argv[])
             fromfile_offset = atoi(a.argv()[++argpos]);
             fromfile_name = a.argv()[++argpos];
 
-	    if (!quiet)
-                 cout << "### bypassing grabbers, reading directly from file\n";
+            if (!quiet)
+                cout << "### bypassing grabbers, reading directly from file\n";
             from_file = true;
         }
         else if (!strcmp(a.argv()[argpos], "--xawchannels"))
@@ -1668,7 +1701,7 @@ int main(int argc, char *argv[])
             fromxawfile_id = atoi(a.argv()[++argpos]);
             fromxawfile_name = a.argv()[++argpos];
 
-	    if (!quiet)
+            if (!quiet)
                  cout << "### reading channels from xawtv configfile\n";
             from_xawfile = true;
         }

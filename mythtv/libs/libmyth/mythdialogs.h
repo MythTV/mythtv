@@ -44,6 +44,7 @@ class MythMainWindow : public QDialog
 
    protected:
     void keyPressEvent(QKeyEvent *e);
+    void customEvent(QCustomEvent *ce);
 
     float wmult, hmult;
     int screenwidth, screenheight;

@@ -145,7 +145,7 @@ public:
         addSelection("None");
         addSelection("PAL Teletext");
         addSelection("NTSC Closed Caption");
-	setHelpText("VBI stands for Vertical Blanking Interrupt.  VBI is used "
+        setHelpText("VBI stands for Vertical Blanking Interrupt.  VBI is used "
                     "to carry Teletext and Closed Captioning data.");
     };
 };
@@ -244,29 +244,52 @@ public:
         setLabel("Time offset for XMLTV listings");
         addSelection("None", "");
         addSelection("Auto");
+        addSelection("+0030");
         addSelection("+0100");
+        addSelection("+0130");
         addSelection("+0200");
+        addSelection("+0230");
         addSelection("+0300");
+        addSelection("+0330");
         addSelection("+0400");
+        addSelection("+0430");
         addSelection("+0500");
+        addSelection("+0530");
         addSelection("+0600");
+        addSelection("+0630");
         addSelection("+0700");
+        addSelection("+0730");
         addSelection("+0800");
+        addSelection("+0830");
         addSelection("+0900");
+        addSelection("+0930");
         addSelection("+1000");
+        addSelection("+1030");
         addSelection("+1100");
+        addSelection("+1130");
         addSelection("+1200");
         addSelection("-1100");
+        addSelection("-1030");
         addSelection("-1000");
+        addSelection("-0930");
         addSelection("-0900");
+        addSelection("-0830");
         addSelection("-0800");
+        addSelection("-0730");
         addSelection("-0700");
+        addSelection("-0630");
         addSelection("-0600");
+        addSelection("-0530");
         addSelection("-0500");
+        addSelection("-0430");
         addSelection("-0400");
+        addSelection("-0330");
         addSelection("-0300");
+        addSelection("-0230");
         addSelection("-0200");
+        addSelection("-0130");
         addSelection("-0100");
+        addSelection("-0030");
         setHelpText("If your local timezone does not match the timezone "
                     "returned by XMLTV, use this setting to have "
                     "mythfilldatabase adjust the program start and end times."

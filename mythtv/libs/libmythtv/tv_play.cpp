@@ -65,6 +65,7 @@ void *SpawnDecode(void *param)
 {
     NuppelVideoPlayer *nvp = (NuppelVideoPlayer *)param;
     nvp->StartPlaying();
+    nvp->StopPlaying();
     return NULL;
 }
 
@@ -267,9 +268,11 @@ int TV::Playback(ProgramInfo *rcinfo)
     playbackLen = rcinfo->CalculateLength();
     playbackinfo = rcinfo;
 
+    int overrecordseconds = gContext->GetNumSetting("RecordOverTime");
     QDateTime curtime = QDateTime::currentDateTime();
+    QDateTime endts = rcinfo->endts.addSecs(overrecordseconds);
 
-    if (curtime < rcinfo->endts)
+    if (curtime < endts)
         nextState = kState_WatchingRecording;
     else
         nextState = kState_WatchingPreRecorded;
@@ -498,7 +501,7 @@ void TV::StartPlayerAndRecorder(bool startPlayer, bool startRecorder)
         SetupPlayer();
         pthread_create(&decode, NULL, SpawnDecode, nvp);
 
-        while (!nvp->IsPlaying())
+        while (!nvp->IsPlaying() && nvp->IsDecoderThreadAlive())
             usleep(50);
 
         activenvp = nvp;

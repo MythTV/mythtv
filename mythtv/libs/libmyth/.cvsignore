@@ -2,15 +2,4 @@
 Makefile
 libmyth.so.*
 libmyth-*
-moc_dialogbox.cpp
-moc_guidegrid.cpp
-moc_infodialog.cpp
-moc_lcddevice.cpp
-moc_themedmenu.cpp
-moc_settings.cpp
-moc_mythwidgets.cpp
-moc_mythcontext.cpp
-moc_mythwizard.cpp
-moc_uitypes.cpp
-moc_mythdialogs.cpp
-moc_inetcomms.cpp
+moc_*

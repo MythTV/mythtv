@@ -9,6 +9,11 @@
 using namespace std;
 
 #include "lirc.h"
+#include "lircevent.h"
+
+#if (QT_VERSION < 0x030100)
+#error Native LIRC support requires Qt 3.1 or greater.
+#endif
 
 LircClient::LircClient(QObject *main_window)
 {
@@ -60,62 +65,22 @@ void LircClient::Process(void)
             QKeySequence a(code);
 
             int keycode = 0;
-#if (QT_VERSION > 0x030100)
+
+            // Send a dummy keycode if we couldn't convert the key sequence.
+            // This is done so the main code can output a warning for bad
+            // mappings.
+            if (!a.count())
+                QApplication::postEvent(mainWindow, new LircKeycodeEvent(code, 
+                                        keycode, true));
+
             for (unsigned int i = 0; i < a.count(); i++)
             {
                 keycode = a[i];
-#else
-                keycode = a;
-#endif
-                if (keycode)
-                {
-                    int mod = keycode & MODIFIER_MASK;
-                    int k = keycode & ~MODIFIER_MASK; /* trim off the mod */
-                    QString text(QChar(k >> 24));
-                    QKeyEvent *key_down = new QKeyEvent(QEvent::KeyPress, k,
-                                                        k >> 24, mod, text);
-                    QKeyEvent *key_up = new QKeyEvent(QEvent::KeyRelease, k,
-                                                      k >> 24, mod, text);
 
-                    // Make the key events go to the widgets almost
-                    // the same way Qt would.
-                    //
-                    // Note: You might be tempted to lock the app mutex, don't.
-                    // If you are unfortunate enough to be in the modal
-                    // processing loop your lock will block until that loop
-                    // is done.
-                    QObject *key_target = NULL;
-                    if (!key_target) 
-                        key_target = QWidget::keyboardGrabber();
-                    if (!key_target) 
-                    {
-                        QWidget *focus_widget = qApp->focusWidget();
-                        if (focus_widget && focus_widget->isEnabled()) 
-                        {
-                            key_target = focus_widget;
-
-                            // Yes this is special code for handling the
-                            // the escape key.
-                            if (key_down->key() == Key_Escape &&
-                                focus_widget->topLevelWidget()) 
-                            {
-                                key_target = focus_widget->topLevelWidget();
-                            }
-                        }
-                    }
-                    if (!key_target) 
-                        key_target = mainWindow;
-                    QApplication::postEvent(key_target, key_down);
-                    QApplication::postEvent(key_target, key_up);
-                }
-#if (QT_VERSION > 0x030100)
-            }
-#endif
-            if (!keycode)
-            {
-                cerr << "LircClient warning: attempt to convert '"
-                     <<  code << "' to a key sequence failed. Fix your "
-                                "key mappings.\n";
+                QApplication::postEvent(mainWindow, new LircKeycodeEvent(code, 
+                                        keycode, true));
+                QApplication::postEvent(mainWindow, new LircKeycodeEvent(code, 
+                                        keycode, false));
             }
         }
 

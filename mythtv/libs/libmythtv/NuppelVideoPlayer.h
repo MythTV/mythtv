@@ -62,9 +62,10 @@ class NuppelVideoPlayer
     void SetCommercialSkipMethod(int method) { commercialskipmethod = method; }
 
     void StartPlaying(void);
-    void StopPlaying(void) { killplayer = true; }
+    void StopPlaying(void) { killplayer = true; decoder_thread_alive = false; }
     
     bool IsPlaying(void) { return playing; }
+    bool IsDecoderThreadAlive(void) { return decoder_thread_alive; }
 
     void SetRingBuffer(RingBuffer *rbuf) { ringBuffer = rbuf; }
 
@@ -296,6 +297,7 @@ class NuppelVideoPlayer
     bool cc;
 
     bool playing;
+    bool decoder_thread_alive;
 
     RingBuffer *ringBuffer;
     bool weMadeBuffer; 
