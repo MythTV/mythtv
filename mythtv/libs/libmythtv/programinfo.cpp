@@ -377,6 +377,20 @@ bool ProgramInfo::IsSameTimeslot(const ProgramInfo& other) const
         return false;
 }
 
+QString ProgramInfo::GetRecordBasename(void)
+{
+    QString starts = startts.toString("yyyyMMddhhmm");
+    QString ends = endts.toString("yyyyMMddhhmm");
+
+    starts += "00";
+    ends += "00";
+
+    QString retval = QString("%1_%2_%3.nuv").arg(chanid)
+                             .arg(starts).arg(ends);
+    
+    return retval;
+}               
+
 QString ProgramInfo::GetRecordFilename(const QString &prefix)
 {
     QString starts = startts.toString("yyyyMMddhhmm");

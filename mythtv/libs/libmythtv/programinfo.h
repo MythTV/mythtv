@@ -37,6 +37,7 @@ class ProgramInfo
 
     void WriteRecordedToDB(QSqlDatabase *db);
 
+    QString GetRecordBasename(void);
     QString GetRecordFilename(const QString &prefix);
 
     int CalculateLength(void);
