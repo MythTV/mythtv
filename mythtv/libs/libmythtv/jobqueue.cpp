@@ -1350,6 +1350,10 @@ QString JobQueue::GetJobCommand(QSqlDatabase* db, int jobType,
                         tmpInfo->startts.toString("yyyyMMddhhmm00"));
         command.replace(QRegExp("%ENDTIME%"),
                         tmpInfo->endts.toString("yyyyMMddhhmm00"));
+        command.replace(QRegExp("%STARTTIMEISO%"),
+                        tmpInfo->startts.toString(Qt::ISODate));
+        command.replace(QRegExp("%ENDTIMEISO%"),
+                        tmpInfo->endts.toString(Qt::ISODate));
     }
 
     return command;
