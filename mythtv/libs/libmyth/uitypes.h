@@ -603,8 +603,10 @@ class UIManagedTreeListType : public UIType
 
     bool    popUp();
     bool    pushDown();
-    bool    moveUp();
-    bool    moveDown();
+    bool    moveUp(bool do_refresh = true);
+    bool    moveDown(bool do_refresh = true);
+    bool    pageUp();
+    bool    pageDown();
     bool    nextActive(bool wrap_around, bool traverse_up_down);
     bool    prevActive(bool wrap_around, bool traverse_up_down);
     void    select();
@@ -619,6 +621,7 @@ class UIManagedTreeListType : public UIType
 
   private:
 
+    int   calculateEntriesInBin(int bin_number);
     bool  complexInternalNextPrevActive(bool forward_or_reverse, bool wrap_around);    
     QRect area;
     int   bins;

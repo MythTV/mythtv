@@ -3055,7 +3055,7 @@ bool UIManagedTreeListType::pushDown()
     return true;
 }
 
-bool UIManagedTreeListType::moveUp()
+bool UIManagedTreeListType::moveUp(bool do_refresh)
 {
     if(!current_node)
     {
@@ -3071,16 +3071,19 @@ bool UIManagedTreeListType::moveUp()
     if(new_node)
     {
         current_node = new_node;
-        if(show_whole_tree)
+        if(do_refresh)
         {
-            for(int i = active_bin; i <= bins; i++)
+            if(show_whole_tree)
             {
-                emit requestUpdate(screen_corners[i]);
+                for(int i = active_bin; i <= bins; i++)
+                {
+                    emit requestUpdate(screen_corners[i]);
+                }
             }
-        }
-        else
-        {
-            refresh();
+            else
+            {
+                refresh();
+            }
         }
         emit nodeEntered(current_node->getInt(), current_node->getAttributes());
         current_node->becomeSelectedChild();
@@ -3089,12 +3092,13 @@ bool UIManagedTreeListType::moveUp()
     return false;
 }
 
-bool UIManagedTreeListType::moveDown()
+bool UIManagedTreeListType::moveDown(bool do_refresh)
 {
     if(!current_node)
     {
         return false;
     }
+
     //
     //  Move the active node to the
     //  current active node's next
@@ -3105,22 +3109,137 @@ bool UIManagedTreeListType::moveDown()
     if(new_node)
     {
         current_node = new_node;
-        if(show_whole_tree)
+        if(do_refresh)
         {
-            for(int i = active_bin; i <= bins; i++)
+            if(show_whole_tree)
             {
-                emit requestUpdate(screen_corners[i]);
+                for(int i = active_bin; i <= bins; i++)
+                {
+                    emit requestUpdate(screen_corners[i]);
+                }
             }
-        }
-        else
-        {
-            refresh();
+            else
+            {
+                refresh();
+            }
         }
         emit nodeEntered(current_node->getInt(), current_node->getAttributes());
         current_node->becomeSelectedChild();
         return true;
     }
     return false;
+}
+
+int UIManagedTreeListType::calculateEntriesInBin(int bin_number)
+{
+    //
+    //  Given the various font metrics and the
+    //  size of the bin, figure out how many lines
+    //  the draw() method would use to know how many
+    //  entries can appear in a given bin
+    //
+    
+    if(bin_number < 1 || bin_number > bins)
+    {
+        return 0;
+    }
+    int return_value = 1;
+    
+    
+    QString a_string = QString("bin%1-active").arg(bin_number);
+    fontProp *tmpfont = &m_fontfcns[m_fonts[a_string]];
+    int y_location =    bin_corners[bin_number].top() 
+                        + (bin_corners[bin_number].height() / 2) 
+                        + (QFontMetrics(tmpfont->face).height() / 2);
+    if(!show_whole_tree)
+    {
+        y_location = area.top() + (area.height() / 2) + (QFontMetrics(tmpfont->face).height() / 2);
+    }
+    int another_y_location = y_location - QFontMetrics(tmpfont->face).height();
+    int a_limit = bin_corners[bin_number].top();
+    if(!show_whole_tree)
+    {
+        a_limit = area.top();
+    }
+    while (another_y_location - QFontMetrics(tmpfont->face).height() > a_limit)
+    {
+        another_y_location -= QFontMetrics(tmpfont->face).height();
+         ++return_value;
+    }
+    y_location += QFontMetrics(tmpfont->face).height();
+    a_limit = bin_corners[bin_number].bottom();
+    if(!show_whole_tree)
+    {
+        a_limit = area.bottom();
+    }
+    while (y_location < a_limit)
+    {
+        y_location += QFontMetrics(tmpfont->face).height();
+        ++return_value;
+    }
+    return return_value;
+}
+
+bool UIManagedTreeListType::pageUp()
+{
+    if(!current_node)
+    {
+        return false;
+    }
+    int entries_to_jump = calculateEntriesInBin(active_bin);
+    for(int i = 0; i < entries_to_jump; i++)
+    {
+        if(!moveUp(false))
+        {
+            i = entries_to_jump;
+        }
+        
+    }
+    if(show_whole_tree)
+    {
+        for(int i = active_bin; i <= bins; i++)
+        {
+            emit requestUpdate(screen_corners[i]);
+        }
+    }
+    else
+    {
+        refresh();
+    }
+    return true;
+}
+
+bool UIManagedTreeListType::pageDown()
+{
+    if(!current_node)
+    {
+        return false;
+    }
+    if(!current_node)
+    {
+        return false;
+    }
+    int entries_to_jump = calculateEntriesInBin(active_bin);
+    for(int i = 0; i < entries_to_jump; i++)
+    {
+        if(!moveDown(false))
+        {
+            i = entries_to_jump;
+        }
+        
+    }
+    if(show_whole_tree)
+    {
+        for(int i = active_bin; i <= bins; i++)
+        {
+            emit requestUpdate(screen_corners[i]);
+        }
+    }
+    else
+    {
+        refresh();
+    }
+    return true;
 }
 
 void UIManagedTreeListType::select()
