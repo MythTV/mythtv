@@ -359,7 +359,6 @@ void XMLParse::parseRepeatedImage(LayerSet *container, QDomElement &element)
         image->SetContext(context);
     }
     image->SetParent(container);
-    image->calculateScreenArea();
     container->AddType(image);
 }
 

@@ -1388,6 +1388,7 @@ UIRepeatedImageType::UIRepeatedImageType(const QString &name, const QString &fil
         : UIImageType(name, filename, dorder, displaypos)
 {
     m_repeat = 0;
+    m_highest_repeat = 0;
 }
 
 void UIRepeatedImageType::Draw(QPainter *p, int drawlayer, int context)
@@ -1431,22 +1432,48 @@ void UIRepeatedImageType::setRepeat(int how_many)
     if(how_many >= 0)
     {
         m_repeat = how_many;
+        if(how_many > m_highest_repeat)
+        {
+            m_highest_repeat = how_many;
+        }
         refresh();
     }
 }
 
-void UIRepeatedImageType::calculateScreenArea()
+void UIRepeatedImageType::refresh()
 {
+    //
+    //  Figure out how big we are
+    //  and where we are in screen
+    //  coordinates
+    //
+    
     QRect r = QRect(m_displaypos.x(),
                     m_displaypos.y(),
-                    img.width() * 10,   //  that needs to be theme-ui.xml defined soon
+                    img.width() * m_highest_repeat,
                     img.height());
+    
+    if(m_parent)
+    {
+        r.moveBy(m_parent->GetAreaRect().left(),
+                 m_parent->GetAreaRect().top());
 
-    r.moveBy(m_parent->GetAreaRect().left(),
-             m_parent->GetAreaRect().top());
-
-    screen_area = r;
+        //
+        //  Tell someone who cares
+        //
+    
+        emit requestUpdate(r);
+    }
+    else
+    {
+        //
+        //  This happens when parent isn't set, 
+        //  usually during initial parsing.
+        //
+        emit requestUpdate();
+    }
 }
+
 
 
 

@@ -328,10 +328,12 @@ class UIImageType : public UIType
   
     //
     //  We have to redefine this, as pixmaps
-    //  are not of a fixed size
+    //  are not of a fixed size. And it has to
+    //  be virtual because RepeatedImage does
+    //  it differently.
     //
 
-    void refresh();
+    virtual void refresh();
 
   protected:
 
@@ -357,11 +359,15 @@ class UIRepeatedImageType : public UIImageType
     UIRepeatedImageType(const QString &, const QString &, int, QPoint);
     void setRepeat(int how_many);
     void Draw(QPainter *, int, int);
-    void calculateScreenArea();
+
+  public slots:
+  
+    void refresh();
     
   protected:
   
     int m_repeat;
+    int m_highest_repeat;
 };
 
 
@@ -548,6 +554,7 @@ class UIManagedTreeListType : public UIType
     int     getJustification() { return m_justification; }
     void    makeHighlights();
     void    syncCurrentWithActive();
+    void    forceLastBin(){active_bin = bins; refresh();}
     void    calculateScreenArea();
     void    setTreeOrdering(int an_int){tree_order = an_int;}
     void    setVisualOrdering(int an_int){visual_order = an_int;}    
