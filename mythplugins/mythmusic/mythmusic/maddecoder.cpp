@@ -236,6 +236,15 @@ bool MadDecoder::findHeader()
         findXingHeader(stream.anc_ptr, stream.anc_bitlen);
 
         result = done;
+
+        if (stream.error == MAD_ERROR_BUFLEN)
+        {
+            // we've got a large tag.  picture, most likely.
+            count = 0;
+            input_bytes = 0;
+            continue;
+        }
+
         if (count || stream.error != MAD_ERROR_BUFLEN)
             break;
 

@@ -551,7 +551,7 @@ void PlaybackBox::play()
         pause();
         return;
     }
- 
+
     if (!sourceurl.isLocalFile()) 
     {
         StreamInput streaminput(sourceurl);
@@ -560,7 +560,7 @@ void PlaybackBox::play()
     } 
     else
     {
-        input = new QFile(sourceurl.toString(FALSE, FALSE));
+        input = new QFile(playfile);
     }
 
     if (decoder && !decoder->factory()->supports(sourcename))
@@ -1193,6 +1193,8 @@ void PlaybackBox::customEvent(QCustomEvent *event)
         {
             statusString = tr("Output error.");
 
+            OutputEvent *aoe = (OutputEvent *) event;
+            cerr << statusString << " " << *aoe->errorMessage() << endl;
             //OutputEvent *aoe = (OutputEvent *) event;
             //QMessageBox::critical(qApp->activeWindow(),
             //                      statusString,
@@ -1222,7 +1224,8 @@ void PlaybackBox::customEvent(QCustomEvent *event)
 
             statusString = tr("Decoder error.");
 
-            //DecoderEvent *dxe = (DecoderEvent *) event;
+            DecoderEvent *dxe = (DecoderEvent *) event;
+            cerr << statusString << " " << *dxe->errorMessage() << endl;
             //QMessageBox::critical(qApp->activeWindow(),
             //                      statusString,
             //                      *dxe->errorMessage());
