@@ -2751,7 +2751,7 @@ bool ProgramList::FromOldRecorded(QSqlDatabase *db, const QString sql)
     QString querystr = QString(
         "SELECT oldrecorded.chanid, starttime, endtime, "
         "    title, subtitle, description, category, seriesid, programid, "
-        "    category_type, channel.channum, channel.callsign, channel.name "
+        "    channel.channum, channel.callsign, channel.name "
         "FROM oldrecorded "
         "LEFT JOIN channel ON oldrecorded.chanid = channel.chanid "
          "%1 ").arg(sql);
@@ -2780,10 +2780,9 @@ bool ProgramList::FromOldRecorded(QSqlDatabase *db, const QString sql)
         p->category = QString::fromUtf8(query.value(6).toString());
         p->seriesid = query.value(7).toString();
         p->programid = query.value(8).toString();
-        p->catType = query.value(9).toString();
-        p->chanstr = query.value(10).toString();
-        p->chansign = QString::fromUtf8(query.value(11).toString());
-        p->channame = QString::fromUtf8(query.value(12).toString());
+        p->chanstr = query.value(9).toString();
+        p->chansign = QString::fromUtf8(query.value(10).toString());
+        p->channame = QString::fromUtf8(query.value(11).toString());
         p->recstatus = rsPreviousRecording;
 
         append(p);
