@@ -31,6 +31,7 @@ VideoOutputIvtv::VideoOutputIvtv(void)
     fbfd = -1;
     mapped_mem = NULL;
     pixels = NULL;
+    lastcleared = false;
     videoDevice = "/dev/video16";
 }
 
@@ -76,7 +77,11 @@ VideoOutputIvtv::~VideoOutputIvtv()
         }
 
         if (mapped_mem)
+        {
+            memset(pixels, 0x00, 720 * 480 * 4);
             munmap(mapped_mem, mapped_memlen);
+        }
+
         close(fbfd);
     }
 }
@@ -206,7 +211,7 @@ void VideoOutputIvtv::Reopen(int skipframes, int newstartframe)
         mapped_memlen = osdcoords.max_offset;
 
         mapped_mem = (char *)mmap(0, mapped_memlen, PROT_READ|PROT_WRITE,
-                                  MAP_SHARED, fbfd, 0);
+                                  MAP_SHARED, fbfd, mapped_offset);
         if (mapped_mem == (char *)-1)
         {
             perror("Unable to mmap ivtv-fb buffer");
@@ -219,20 +224,7 @@ void VideoOutputIvtv::Reopen(int skipframes, int newstartframe)
         height = igfb.sizey;
         stride = igfb.sizex * 4;
 
-        unsigned char *dest = (unsigned char *)pixels;
-
-        memset(dest, 0xff, 720 * 480);
-
-        for (int y = 0; y < 120; y++)
-        {
-            for (int x = 0; x < 720; x++)
-            {
-                *dest++ = 0xff;
-                *dest++ = 0xff;
-                *dest++ = 0xff;
-                *dest++ = 0xff;
-            }
-        }
+        memset(pixels, 0x00, 720 * 480 * 4);
     }
 }
 
@@ -285,6 +277,15 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
         tmpframe.buf = (unsigned char *)pixels;
 
         int ret = DisplayOSD(&tmpframe, osd, stride);
+
+        if (ret < 0 && !lastcleared)
+        {
+            memset(pixels, 0x0, XJ_height * stride);
+            lastcleared = true;
+        }
+
+        if (ret >= 0)
+            lastcleared = false;
     }
 }
 

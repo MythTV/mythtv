@@ -818,8 +818,83 @@ blendimagei44end:
     }
 }
 
+#define SCALE_BITS 10
+
+#define C_Y  (76309 >> (16 - SCALE_BITS))
+#define C_RV (117504 >> (16 - SCALE_BITS))
+#define C_BU (138453 >> (16 - SCALE_BITS))
+#define C_GU (13954 >> (16 - SCALE_BITS))
+#define C_GV (34903 >> (16 - SCALE_BITS))
+
+#define RGBOUT(r, g, b, a, y1, a1)\
+{\
+    y = (y1 - 16) * C_Y;\
+    r = (y + r_add) >> SCALE_BITS;\
+    g = (y + g_add) >> SCALE_BITS;\
+    b = (y + b_add) >> SCALE_BITS;\
+}
+
 void VideoOutput::BlendSurfaceToARGB(OSDSurface *surface, 
                                      unsigned char *argbptr, int stride)
 {
+    if (stride < 0)
+        stride = XJ_width;
+
+    memset(argbptr, 0x0, stride * XJ_height);
+
+    QMemArray<QRect> rects = surface->usedRegions.rects();
+    QMemArray<QRect>::Iterator it = rects.begin();
+    for (; it != rects.end(); ++it)
+    {
+        QRect drawRect = *it;
+
+        int startcol, startline, endcol, endline;
+        startcol = drawRect.left();
+        startline = drawRect.top();
+        endcol = drawRect.right();
+        endline = drawRect.bottom();
+
+        unsigned char *src, *usrc, *vsrc;
+        unsigned char *dest;
+        unsigned char *alpha;
+
+        int yoffset;
+        int destyoffset;
+
+        for (int y = startline; y <= endline; y++)
+        {
+            yoffset = y * surface->width;
+            destyoffset = y * stride;
+
+            src = surface->y + yoffset + startcol;
+            dest = argbptr + destyoffset + startcol * 4;
+            alpha = surface->alpha + yoffset + startcol;
+
+            usrc = surface->u + yoffset / 4 + startcol / 2;
+            vsrc = surface->v + yoffset / 4 + startcol / 2;
+
+            for (int x = startcol; x <= endcol; x++)
+            {
+                if (*alpha == 0)
+                    goto blendimageargbend;
+
+                dest[0] = *src; 
+                dest[1] = *src;
+                dest[2] = *src;
+                dest[3] = alpha[0];
+
+blendimageargbend:
+                src++;
+                alpha++;
+                dest += 4;
+
+                if ((y % 2 == 0) && (x % 2 == 0))
+                {
+                    usrc++;
+                    vsrc++;
+                }
+            }
+        }
+    }
 }
 

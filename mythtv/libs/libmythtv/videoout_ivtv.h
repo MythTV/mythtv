@@ -61,6 +61,8 @@ class VideoOutputIvtv: public VideoOutput
     char *pixels;
 
     int width, height, stride;
+
+    bool lastcleared;
 };
 
 #endif
