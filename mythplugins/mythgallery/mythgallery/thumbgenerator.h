@@ -53,8 +53,8 @@ protected:
 private:
 
     bool moreWork();
-    void loadGalleryDir(QImage& image, const QFileInfo& fi);
-    void loadGalleryFile(QImage& image, const QFileInfo& fi);
+    bool checkGalleryDir(const QFileInfo& fi);
+    bool checkGalleryFile(const QFileInfo& fi);
     void loadDir(QImage& image, const QFileInfo& fi);
     void loadFile(QImage& image, const QFileInfo& fi);
 
@@ -66,7 +66,5 @@ private:
     int          m_width, m_height;
 
 };
-
-//}
 
 #endif /* THUMBGENERATOR_H */

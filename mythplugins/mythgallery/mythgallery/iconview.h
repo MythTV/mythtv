@@ -98,6 +98,7 @@ private:
     void actionSettings();
     void actionImport();
 
+    void loadThumbnail(ThumbItem *item);
     void importFromDir(const QString &fromDir, const QString &toDir);
     
     QSqlDatabase*       m_db;
@@ -119,6 +120,7 @@ private:
     QPixmap             m_folderSelPix;
 
     QString             m_currDir;
+    bool                m_isGallery;
 
     int                 m_currRow;
     int                 m_currCol;

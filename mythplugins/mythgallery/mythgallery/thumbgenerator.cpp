@@ -52,7 +52,7 @@ void ThumbGenerator::setDirectory(const QString& directory, bool isGallery)
 void ThumbGenerator::addFile(const QString& filePath)
 {
     m_mutex.lock();
-    m_fileList.append(QString(filePath.latin1())); // deep copy
+    m_fileList.append(QString(filePath.latin1()));
     m_mutex.unlock();
     if (!running())
         start();
@@ -89,55 +89,52 @@ void ThumbGenerator::run()
         if (!fileInfo.exists())
             continue;
 
-        QImage image;
-
         if (isGallery) {
+            
             if (fileInfo.isDir()) 
-                loadGalleryDir(image, fileInfo);
+                isGallery = checkGalleryDir(fileInfo);
             else
-                loadGalleryFile(image, fileInfo);
+                isGallery = checkGalleryFile(fileInfo);
         }
 
-        if (!isGallery || image.isNull()) {
+        if (!isGallery) {
         
             QString cachePath = dir + QString("/.thumbcache/") + file;
             QFileInfo cacheInfo(cachePath);
 
             if (cacheInfo.exists() &&
-                (cacheInfo.lastModified() >= fileInfo.lastModified())) {
-                image.load(cachePath);
-                image = image.smoothScale(m_width,m_width,QImage::ScaleMax);
+                cacheInfo.lastModified() >= fileInfo.lastModified()) {
+                continue;
             }
             else {
-                if (fileInfo.isDir()) {
+                
+                // cached thumbnail not there or out of date
+                QImage image;
+
+                if (fileInfo.isDir()) 
                     loadDir(image, fileInfo);
-                }
-                else {
+                else
                     loadFile(image, fileInfo);
-                }
 
                 if (image.isNull())
-                    continue;
+                    continue; // give up;
+                
                 image = image.smoothScale(m_width,m_width,QImage::ScaleMax);
                 image.save(cachePath, "JPEG");
+
+                // deep copies all over
+                ThumbData *td = new ThumbData;
+                td->directory = QString(dir.latin1());
+                td->fileName  = QString(file.latin1());
+                td->thumb     = image.copy();
+
+                // inform parent we have thumbnail ready for it
+                QApplication::postEvent(m_parent,
+                                        new QCustomEvent(QEvent::User, td));
+                
             }
-
         }
-        
-        if (image.isNull())
-            continue;
-
-        // deep copies all over
-        ThumbData *td = new ThumbData;
-        td->directory = QString(dir.latin1());
-        td->fileName  = QString(file.latin1());
-        td->thumb     = QImage(image.copy());
-        
-        QApplication::postEvent(m_parent,
-                                new QCustomEvent(QEvent::User, td));
-        
     }
-        
 }
 
 bool ThumbGenerator::moreWork()
@@ -149,16 +146,23 @@ bool ThumbGenerator::moreWork()
     return result;
 }
 
-void ThumbGenerator::loadGalleryDir(QImage& image, const QFileInfo& fi)
+bool ThumbGenerator::checkGalleryDir(const QFileInfo& fi)
 {
     // try to find a highlight
     QDir subdir(fi.absFilePath(), "*.highlight.*", QDir::Name, 
                 QDir::Files);
-    if (subdir.count()>0) 
-        image.load(subdir.entryInfoList()->getFirst()->absFilePath());
+
+    
+    if (subdir.count() > 0) {
+        // check if the image format is understood
+        QString path(subdir.entryInfoList()->getFirst()->absFilePath());
+        return (QImageIO::imageFormat(path) != 0);
+    }
+    else
+        return false;
 }
 
-void ThumbGenerator::loadGalleryFile(QImage& image, const QFileInfo& fi)
+bool ThumbGenerator::checkGalleryFile(const QFileInfo& fi)
 {
     // if the image name is xyz.jpg, then look
     // for a file named xyz.thumb.jpg.
@@ -169,10 +173,11 @@ void ThumbGenerator::loadGalleryFile(QImage& image, const QFileInfo& fi)
         fn.insert(firstDot, ".thumb");
         QFileInfo galThumb(fi.dirPath(true) + "/" + fn);
         if (galThumb.exists()) 
-        {
-            image.load(galThumb.absFilePath());
-        }
+            return (QImageIO::imageFormat(galThumb.absFilePath()) != 0);
+        else
+            return false;
     }
+    return false;
 }
 
 void ThumbGenerator::loadDir(QImage& image, const QFileInfo& fi)

@@ -44,6 +44,7 @@ IconView::IconView(QSqlDatabase *db, const QString& galleryDir,
 {
     m_db         = db;
     m_galleryDir = galleryDir;    
+    m_isGallery  = false;
 
     m_inMenu     = false;
     m_itemList.setAutoDelete(true);
@@ -164,6 +165,8 @@ void IconView::updateView()
                 continue;
 
             ThumbItem* item = m_itemList.at(curPos);
+            if (!item->pixmap)
+                loadThumbnail(item);
 
             int xpos = m_spaceW * (x + 1) + m_thumbW * x;
 
@@ -365,6 +368,7 @@ void IconView::customEvent(QCustomEvent *e)
     if (item) {
         if (item->pixmap)
             delete item->pixmap;
+        item->pixmap = 0;
 
         QString queryStr = "SELECT angle FROM gallerymetadata WHERE image =\"" +
                            item->path + "\";";
@@ -543,8 +547,12 @@ void IconView::loadDirectory(const QString& dir)
     m_lastRow = 0;
     m_lastCol = 0;
     m_topRow  = 0;
-    
-    bool isGallery = d.entryInfoList("serial*.dat", QDir::Files);
+
+    const QFileInfoList* gList = d.entryInfoList("serial*.dat", QDir::Files);
+    if (gList)
+        m_isGallery = (gList->count() != 0);
+    else
+        m_isGallery = false;
 
     QFileInfo cdir(d.absPath() + "/.thumbcache");
     if (!cdir.exists())
@@ -563,7 +571,7 @@ void IconView::loadDirectory(const QString& dir)
     QFileInfo *fi;
 
     m_thumbGen->cancel();
-    m_thumbGen->setDirectory(m_currDir, isGallery);
+    m_thumbGen->setDirectory(m_currDir, m_isGallery);
         
     while ((fi = it.current()) != 0)
     {
@@ -572,7 +580,7 @@ void IconView::loadDirectory(const QString& dir)
             continue;
 
         // remove these already-resized pictures.  
-        if (isGallery && (
+        if (m_isGallery && (
                 (fi->fileName().find(".thumb.") > 0) ||
                 (fi->fileName().find(".sized.") > 0) ||
                 (fi->fileName().find(".highlight.") > 0)))
@@ -590,6 +598,67 @@ void IconView::loadDirectory(const QString& dir)
 
     m_lastRow = QMAX((int)ceilf((float)m_itemList.count()/(float)m_nCols)-1,0);
     m_lastCol = QMAX(m_itemList.count()-m_lastRow*m_nCols-1,0);
+}
+
+void IconView::loadThumbnail(ThumbItem *item)
+{
+    if (!item)
+        return;
+
+    bool canLoadGallery = m_isGallery;
+    QImage image;
+    
+    if (canLoadGallery) {
+
+        if (item->isDir) {
+            // try to find a highlight
+            QDir subdir(item->path, "*.highlight.*", QDir::Name, 
+                        QDir::Files);
+            if (subdir.count() > 0) {
+                // check if the image format is understood
+                QString path(subdir.entryInfoList()->getFirst()->absFilePath());
+                image.load(path);
+            }
+        }
+        else {
+            QString fn = item->name;
+            int firstDot = fn.find('.');
+            if (firstDot > 0) {
+                fn.insert(firstDot, ".thumb");
+                QString galThumbPath(m_currDir + "/" + fn);
+                image.load(galThumbPath);
+            }
+        }
+
+        canLoadGallery = !(image.isNull());
+    }
+
+    if (!canLoadGallery) {
+        QString cachePath = m_currDir + QString("/.thumbcache/") +
+                            item->name;
+        image.load(cachePath);
+    }
+
+    if (!image.isNull()) {
+        image = image.smoothScale((int)(m_thumbW-10*wmult),
+                                  (int)(m_thumbW-10*wmult),
+                                  QImage::ScaleMax);
+        int rotateAngle = 0;
+        
+        QString queryStr = "SELECT angle FROM gallerymetadata WHERE image =\"" +
+                           item->path + "\";";
+        QSqlQuery query = m_db->exec(queryStr);
+        if (query.isActive() && query.numRowsAffected() > 0) {
+            query.next();
+            rotateAngle = query.value(0).toInt();
+        }
+
+        QWMatrix matrix;
+        matrix.rotate(rotateAngle);
+        image = image.xForm(matrix);
+        
+        item->pixmap = new QPixmap(image);
+    }
 }
 
 bool IconView::moveUp()
@@ -681,14 +750,8 @@ void IconView::actionRotateCW()
     query = m_db->exec(queryStr);
 
     if (item->pixmap) {
-        QPixmap pix(*item->pixmap);
-
-        QWMatrix matrix;
-        matrix.rotate(90);
-        pix = pix.xForm(matrix);
-
         delete item->pixmap;
-        item->pixmap = new QPixmap(pix);
+        item->pixmap = 0;
     }
 }
 
@@ -723,14 +786,8 @@ void IconView::actionRotateCCW()
     query = m_db->exec(queryStr);
 
     if (item->pixmap) {
-        QPixmap pix(*item->pixmap);
-
-        QWMatrix matrix;
-        matrix.rotate(-90);
-        pix = pix.xForm(matrix);
-
         delete item->pixmap;
-        item->pixmap = new QPixmap(pix);
+        item->pixmap = 0;
     }
 }
 
