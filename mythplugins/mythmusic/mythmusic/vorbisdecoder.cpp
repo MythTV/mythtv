@@ -1,4 +1,4 @@
-#include <stdio.h>
+ #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
 #include <string>
@@ -345,19 +345,32 @@ Metadata *VorbisDecoder::getMetadata(QSqlDatabase *db)
     comment = ov_comment(&vf, -1);
     length = (int)ov_time_total(&vf, -1) * 1000;
 
+    //
+    //  Try and fill metadata info from tags in the ogg file
+    //
+
+    artist = getComment(comment, "artist");
+    album = getComment(comment, "album");
+    title = getComment(comment, "title");
+    genre = getComment(comment, "genre");
+    tracknum = atoi(getComment(comment, "tracknumber").ascii()); 
+    year = atoi(getComment(comment, "date").ascii());
+
+    //
+    //  If the user has elected to get metadata from file names or if the
+    //  above did not find a title tag
+    //
+
     if (ignore_id3 || title.isEmpty())
     {
+        artist = "";
+        album = "";
+        title = "";
+        genre = "";
+        tracknum = 0;
+        year = 0;
         getMetadataFromFilename(filename, QString(".ogg$"), artist, album, 
                                 title, genre, tracknum);
-    }
-    else
-    {
-        artist = getComment(comment, "artist");
-        album = getComment(comment, "album");
-        title = getComment(comment, "title");
-        genre = getComment(comment, "genre");
-        tracknum = atoi(getComment(comment, "tracknumber").ascii()); 
-        year = atoi(getComment(comment, "date").ascii());
     }
 
     ov_clear(&vf);
