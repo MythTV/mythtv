@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-01-06, v1.063
+  2003-01-06, v1.064
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -1983,10 +1983,19 @@
   If you [1mgdb [22mkeeps pausing during the debug, printing things like
   "SIG32", you need to type in:
 
-       (gdb) handle SIG32 nostop
-       (gdb) handle SIG33 nostop
+       (gdb) handle SIG32 nostop noprint
+       (gdb) handle SIG33 nostop noprint
 
   so that the program will continue to execute rather than stopping.
+
+  You may also put these commands into the .gdbinit file so that they
+  always take effect.
+
+       $ cat > .gdbinit
+       handle SIG32 nostop noprint
+       handle SIG33 nostop noprint
+       ^D
+       $
 
   [1m15.10.  Mythtv makes my system crash.[0m
 
@@ -2087,14 +2096,14 @@
   Here's an example submitted to the mythtv-dev list by Pat Pflaum
   mailto:pat@netburp.com <mailto:pat@netburp.com> using fvwm:
 
-       $ cat > .xinitrc
-       fvwm &
-       mythfrontend
-       ^D
-       $ cat > .fvwmrc
-       Style "myth*"      NoTitle, NoHandles, Sticky, WindowListSkip, BorderWidth 0
-       ^D
-       $
+  $ cat > .xinitrc
+  fvwm &
+  mythfrontend
+  ^D
+  $ cat > .fvwmrc
+  Style "myth*"      NoTitle, NoHandles, Sticky, WindowListSkip, BorderWidth 0
+  ^D
+  $
 
   [1m16.4.  I'd like to delete the mysql database.[0m
 
@@ -2143,7 +2152,6 @@
 
   [1mNOTE[22m:  Problem reports for version 0.8 posted to the mailing list
   should have accompanying solutions.
-
   Before you begin, shutdown all running instances of 0.7.  You should
   perform a make clean distclean before starting the compile process.
 

@@ -8,7 +8,7 @@
 <H1>Installing and using mythtv</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-01-06, v1.063
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-01-06, v1.064
 <HR>
 <EM>Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2156,12 +2156,25 @@ along with the steps you followed to get the program to crash.</P>
 "SIG32", you need to type in:
 <BLOCKQUOTE><CODE>
 <PRE>
-(gdb) handle SIG32 nostop
-(gdb) handle SIG33 nostop
+(gdb) handle SIG32 nostop noprint
+(gdb) handle SIG33 nostop noprint
 </PRE>
 </CODE></BLOCKQUOTE>
  so that the program will continue to execute rather than
 stopping.</P>
+<P>You may also put these commands into the <CODE>.gdbinit</CODE> file so that they
+always take effect.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cat > .gdbinit
+handle SIG32 nostop noprint
+handle SIG33 nostop noprint
+^D
+$
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
 <H2><A NAME="ss15.10">15.10 Mythtv makes my system crash. </A>
 </H2>

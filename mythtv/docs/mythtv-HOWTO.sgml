@@ -3,7 +3,7 @@
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-01-06, v1.063
+<date>2003-01-06, v1.064
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1877,10 +1877,21 @@ along with the steps you followed to get the program to crash.
 If you <bf>gdb</bf> keeps pausing during the debug, printing things like
 "SIG32", you need to type in:
 <tscreen><verb>
-(gdb) handle SIG32 nostop
-(gdb) handle SIG33 nostop
+(gdb) handle SIG32 nostop noprint
+(gdb) handle SIG33 nostop noprint
 </verb</tscreen> so that the program will continue to execute rather than
 stopping.
+
+You may also put these commands into the <tt>.gdbinit</tt> file so that they
+always take effect.
+
+<tscreen><verb>
+$ cat > .gdbinit
+handle SIG32 nostop noprint
+handle SIG33 nostop noprint
+^D
+$
+</verb></tscreen>
 
 <sect1>Mythtv makes my system crash. 
 <p>mythtv <em>can not</em> crash your system - it is a user-level program. 
@@ -2156,6 +2167,8 @@ v1.063, 2003-01-06.  More modifications from Cedar on RH8.0.  Slight tweak on
 debugging instructions.  Slight change to CPU requirements.  Added Suse 8.1
 to distros with buggy libexpat.  Added DMA requirement in Hardware
 Prerequisites.  Changed to single HTML file vs 17 seperate HTML subfiles.
+v1.064, 2003-01-06.  Modified the gdb "handle" instructions a little.  Added
+instructions for .gdbinit
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html -s 0 mythtv-HOWTO.sgml" or
