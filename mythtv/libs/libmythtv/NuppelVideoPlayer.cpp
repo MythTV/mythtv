@@ -3248,7 +3248,7 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm
 
     if (honorCutList && (!deleteMap.isEmpty()))
     {
-        if (framesPlayed >= dm_iter.key())
+        if (videoOutput->GetLastDecodedFrame()->frameNumber >= dm_iter.key())
         {
             while((dm_iter.data() == 1) && (dm_iter != deleteMap.end()))
             {
