@@ -57,3 +57,8 @@
 ) Colors are all messed up, people's faces are blue!
 - Using the binary nvidia drivers?  Make sure you're using at least version
   1.0-2960 of their drivers.
+
+) When trying to run setup, I get an error like this:
+  "./setup: error while loading shared libraries: libmyth.so.0: cannot open
+   shared object file: No such file or directory"
+- Make sure that /usr/local/lib is in /etc/ld.so.conf and then re-run ldconfig.
