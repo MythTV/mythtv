@@ -939,6 +939,16 @@ static HostCheckBox *PlaybackPreview()
     return gc;
 }
 
+static HostCheckBox *PlaybackPreviewLowCPU()
+{
+    HostCheckBox *gc = new HostCheckBox("PlaybackPreviewLowCPU");
+    gc->setLabel(QObject::tr("CPU friendly preview of recordings"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("When enabled, recording previews "
+                    "will play with reduced FPS to save CPU."));
+    return gc;
+}
+
 static HostCheckBox *PlayBoxTransparency()
 {
     HostCheckBox *gc = new HostCheckBox("PlayBoxTransparency");
@@ -2686,6 +2696,7 @@ PlaybackSettings::PlaybackSettings()
     pbox->addChild(GeneratePreviewPixmaps());
     pbox->addChild(PreviewPixmapOffset());
     pbox->addChild(PlaybackPreview());
+    pbox->addChild(PlaybackPreviewLowCPU());
     pbox->addChild(PBBStartInTitle());
     pbox->addChild(PBBShowGroupSummary());
     addChild(pbox);

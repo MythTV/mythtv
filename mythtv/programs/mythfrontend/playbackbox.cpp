@@ -1378,7 +1378,14 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
         nvpTimeout.start();
 
         state = kStarting;
-        timer->start(1000 / 30); 
+
+        int previewRate = 30;
+        if (gContext->GetNumSetting("PlaybackPreviewLowCPU", 0))
+        {
+            previewRate = 12;
+        }
+        
+        timer->start(1000 / previewRate); 
     }
 }
 
