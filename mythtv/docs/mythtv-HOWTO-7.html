@@ -21,7 +21,11 @@ Because MythTV is a personal video recorder, "Live TV" isn't really live -
 to let you pause live TV, MythTV is actually encoding the video, saving to
 disk, and then playing it back.  This procedure puts your MythTV "live" TV
 about 2 seconds behind real-time, so it's important that you're not
-listening to the live audio.</P>
+listening to the live audio.  However, if you're having an issue where the
+audio and video aren't synchronized by small but varying amount, it's most
+likely because the sound driver that you're using doesn't have the
+DSP_CAP_REALTIME capability.  This was the case with ALSA (0.5), but not
+with newer versions (0.9).</P>
 <P>What you need to do is to mute the "line-in" of your sound card and also
 set it as the recording source.</P>
 <P>There are two ways to do this.  Graphically, and from the command line.</P>

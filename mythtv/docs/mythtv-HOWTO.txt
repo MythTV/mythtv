@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-06-12, v2.48
+  2003-06-12, v2.49
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -152,6 +152,11 @@
      18.18 error: can't find a register in class 'BREG' while reloading 'asm'
      18.19 make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
      18.20 make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
+     18.21 My mouse pointer disappears when placed over the MythTV windows.
+     18.22 What does "strange error flushing buffer" mean on my console?
+     18.23 I can't change the channel when watching Live TV.
+     18.24 Colors are wrong, people have blue faces.
+     18.25 When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"
 
   19. Miscellaneous.
      19.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
@@ -339,7 +344,6 @@
   Capture Device'' section for details.
 
 
-
   [1m3.1.2.  Memory[0m
 
   A MythTV host that is both a backend and a frontend and using software
@@ -467,10 +471,9 @@
   details if you are uncertain about your preferred card.  You may also
   run xvinfo; look for your video card to be listed as one of the
   adapters.
-
-
   If you want to use MythTV with a standard television, there are two
   things that you're going to need:
+
   1. A physical connection from your video card to your TV set, which
   can either be a TV-out port on the card itself, or an external adapter
   that converts the VGA signal to an appropriate video signal.
@@ -534,9 +537,6 @@
 
   +o  Radeon 7500. Ports not described. Reported to work, but no details
      reported.
-
-
-
   [1m3.1.7.2.  Matrox[0m
 
   The standard Matrox driver included with XFree86 does not support TV-
@@ -1487,6 +1487,11 @@
   encoding the video, saving to disk, and then playing it back.  This
   procedure puts your MythTV "live" TV about 2 seconds behind real-time,
   so it's important that you're not listening to the live audio.
+  However, if you're having an issue where the audio and video aren't
+  synchronized by small but varying amount, it's most likely because the
+  sound driver that you're using doesn't have the DSP_CAP_REALTIME
+  capability.  This was the case with ALSA (0.5), but not with newer
+  versions (0.9).
 
   What you need to do is to mute the "line-in" of your sound card and
   also set it as the recording source.
@@ -1512,6 +1517,7 @@
   click on the red LED so that it turns bright red, indicating that it's
   "ON"; this insures that the Line-in is used as the source.  Click OK,
   and make sure that you save the settings so that this is your default.
+
 
 
   [1m7.1.2.  Red Hat Linux 8.0[0m
@@ -1573,20 +1579,22 @@
   Start with the alsa-driver package:
 
 
-       $ tar -xjf alsa-driver-0.9.x.tar.bz2
-       $ cd alsa-driver-0.9.x
-       $ ./configure --with-cards=XXX --with-sequencer=yes
-       $ make
-       $ su
-       # make install
-       # ./snddevices
-       # exit
-       $
+
+  $ tar -xjf alsa-driver-0.9.x.tar.bz2
+  $ cd alsa-driver-0.9.x
+  $ ./configure --with-cards=XXX --with-sequencer=yes
+  $ make
+  $ su
+  # make install
+  # ./snddevices
+  # exit
+  $
 
 
 
   This will compile and install the kernel modules and initialization
   scripts, as well as create device nodes in /dev.
+
   Install the rest of the packages:
 
 
@@ -1635,7 +1643,6 @@
   options are descried in the "INSTALL" file in the alsa-driver
   directory or at http://www.alsa-project.org/alsa-doc/
   <http://www.alsa-project.org/alsa-doc/>.
-
   For now we will assume that no extra options are required.  The next
   step is to ensure that the ALSA drivers are started during boot-up.
 
@@ -1693,13 +1700,13 @@
 
 
 
-       $ amixer set Master,0 100%,100% unmute
-       $ amixer set Line,0 75%,75% mute captur
-       $ amixer set Capture,0 100%,100% mute captur
-       $ su
-       # alsactl store
-       # exit
-       $
+  $ amixer set Master,0 100%,100% unmute
+  $ amixer set Line,0 75%,75% mute captur
+  $ amixer set Capture,0 100%,100% mute captur
+  $ su
+  # alsactl store
+  # exit
+  $
 
 
 
@@ -1833,10 +1840,11 @@
   At this point, if you're using a serial receiver, check that the link
   has been correctly made in /dev:
 
-  $ ls -l /dev/li*
-  lr-xr-xr-x    1 root     root            5 Jan 27 09:00 /dev/lirc -> ttyS0
-  srw-rw-rw-    1 root     root            0 Jan 27 15:01 /dev/lircd=
-  prw-r--r--    1 root     root            0 Jan 27 09:00 /dev/lircm|
+
+       $ ls -l /dev/li*
+       lr-xr-xr-x    1 root     root            5 Jan 27 09:00 /dev/lirc -> ttyS0
+       srw-rw-rw-    1 root     root            0 Jan 27 15:01 /dev/lircd=
+       prw-r--r--    1 root     root            0 Jan 27 09:00 /dev/lircm|
 
 
 
@@ -1958,6 +1966,7 @@
        # /sbin/ldconfig
 
 
+
   Next, we're going to manually start lircd the first time.  Mandrake
   9.1 users, type: # /etc/rc.d/init.d/lircd start instead of:
 
@@ -2012,14 +2021,13 @@
   All other distributions:
 
 
-
-  # cd /etc/rc.d
-  # cat >> rc.local
-  echo "Starting lircd"
-  /usr/local/sbin/lircd
-  ^D
-  # exit
-  $
+       # cd /etc/rc.d
+       # cat >> rc.local
+       echo "Starting lircd"
+       /usr/local/sbin/lircd
+       ^D
+       # exit
+       $
 
 
 
@@ -2070,7 +2078,6 @@
 
   If [1mirxevent [22misn't running, then MythTV will not respond to your remote
   control.
-
 
 
   [1m8.6.  Additional information for lirc.[0m
@@ -2124,8 +2131,6 @@
            config = Key Down CurrentWindow
        end
 
-
-
   which took care of basic functionality.  Because the PCTV Studio
   remote has additional buttons, look at the configfiles/lircrc.exam-
   ple.pinnaclestudiopctv for an example of how to define additional but-
@@ -2136,6 +2141,7 @@
   [1mirw [22mprogram to make sure that your remote is working, you can create
   the appropriate mappings in .lircrc to get excellent remote
   functionality with MythTV.
+
   Note the [1mrepeat = [22mparameter.  This informs the irxevent program to
   pass through every third keypress.  By default, lirc will only send
   one keypress to the application, even if you're holding down the key.
@@ -2251,8 +2257,6 @@
   will create a frustrating symptom to diagnose where MythTV cannot open
   /dev/device. Unlike bourne or bash, csh scripts automatically close
   parent file descriptors before they start.
-
-
 
   $ cd /usr/local/bin
   # su
@@ -3879,6 +3883,39 @@
   paths''.
 
 
+  [1m18.21.  My mouse pointer disappears when placed over the MythTV win-[0m
+  [1mdows.[0m
+
+  This is the intended behavior.  The MythTV interface is meant for use
+  with a remote control or a keyboard.
+
+
+  [1m18.22.  What does "strange error flushing buffer" mean on my console?[0m
+
+  Nothing, really.  It's just lame (the mp3 encoder) complaining for
+  some obscure reason.  This seems to be fixed in more recent versions
+  of the libmp3lame library.
+
+
+  [1m18.23.  I can't change the channel when watching Live TV.[0m
+
+  Something's wrong with your program database.  Did mythfilldatabase
+  run with no major errors?
+
+
+  [1m18.24.  Colors are wrong, people have blue faces.[0m
+
+  If you are using the binary nVidia drivers, make sure you're using at
+  least version 1.0-2960.
+
+
+  [1m18.25.  When trying to run setup, I get an error like this: "./setup:[0m
+  [1merror while loading shared libraries:"[0m
+
+  You didn't add /usr/local/lib to ld.so.conf.  See the section on
+  modifying ``/etc/ld.so.conf''.
+
+
   [1m19.  Miscellaneous.[0m
 
   [1m19.1.  I'd like to watch the files without using MythTV / I'd like to[0m
@@ -3940,11 +3977,12 @@
   The following also works with blackbox:
 
 
-       $ cat > .xinitrc
-       xset -dpms s off &
-       irxevent &
-       mythfrontend &
-       blackbox
+
+  $ cat > .xinitrc
+  xset -dpms s off &
+  irxevent &
+  mythfrontend &
+  blackbox
 
 
 
@@ -4005,7 +4043,6 @@
   720x240 is possible, but isn't a good tradeoff relative to the number
   of vertical lines lost.  In a PAL country, the you would use values
   like 720x576 or x288.
-
   The higher resolutions will be more CPU intensive. If the CPU is
   overtaxed, frames will be dropped causing uneven motion. You will
   likely see the best results at resolutions which average at least 10%
@@ -4039,6 +4076,7 @@
 
   The MythTV GUI uses its GUI dimensions regardless of the other two and
   is anchored to the upper left corner of the X Desktop.
+
   The MythTV full screen mode uses the X display size dimensions
   regardless of the other two and is anchored to the upper left corner
   of the X display.
@@ -4199,7 +4237,6 @@
   Once btaudio loads, it should register additional /dev/dsp and
   /dev/mixer devices.  Typing $ dmesg will let you know what's going on.
 
-
   [1m19.9.  Removing unwanted channels.[0m
 
   If [1mmythfilldatabase [22mgrabbed a channel which you do not want to include
@@ -4232,6 +4269,8 @@
        $ mysql -u root mythconverg
        mysql> delete from program where chanid = '1015';
 
+
+
   [1m19.10.  I'd like to use a hardware MPEG-2 encoder.[0m
 
   [1mNOTE[22m:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS NOT
@@ -4258,6 +4297,7 @@
 
 
   [1mNOTE[22m:  You do not need to recompile your kernel.
+
 
   Download the IVTV driver from CVS:
 
@@ -4294,12 +4334,13 @@
 
   Add the following to /etc/modules.conf:
 
-  alias char-major-81     videodev
-  alias char-major-81-0   ivtv
-  options ivtv debug=1
-  options tuner type=2
-  options msp3400 once=1 simple=1
-  add below ivtv msp3400 saa7115 tuner
+
+       alias char-major-81     videodev
+       alias char-major-81-0   ivtv
+       options ivtv debug=1
+       options tuner type=2
+       options msp3400 once=1 simple=1
+       add below ivtv msp3400 saa7115 tuner
 
 
 
@@ -4382,8 +4423,6 @@
 
        # echo "/sbin/modprobe ivtv" >> /etc/rc.d/rc.local
 
-
-
   By default, the IVTV driver uses a 16Mbps peak rate with a 8Mbps VBR.
   This will create files at about 4GB/hour.  If you wish to adjust these
   parameters, add something like the following to your rc.local:
@@ -4419,8 +4458,7 @@
   To turn off DNR, add the following to your rc.local:
 
 
-
-  /path/to/ivtv/utils/test_ioctl --set-codec-params=dnr_mode=0,dnr_temporal=0
+       /path/to/ivtv/utils/test_ioctl --set-codec-params=dnr_mode=0,dnr_temporal=0
 
 
 
@@ -4541,12 +4579,13 @@
   to edit the /etc/security/msec/perm.local file to include the
   following:
 
-  # /etc/security/msec/perm.local
-  # Local overrides to the msec program
-  #
-  # Full file path                user.group              permissions
-  /var/log/mythtv/                root.mythtv             775
-  /var/log/mythtv/*               root.mythtv             664
+
+       # /etc/security/msec/perm.local
+       # Local overrides to the msec program
+       #
+       # Full file path                user.group              permissions
+       /var/log/mythtv/                root.mythtv             775
+       /var/log/mythtv/*               root.mythtv             664
 
 
 
@@ -4568,8 +4607,6 @@
        # msec
        # exit
        $
-
-
 
   [1mNOTE[22m: msec can only [4mreduce[24m the permissions of files, so if you don't
   get the results you expect, check that you're not asking msec to add
@@ -4667,7 +4704,7 @@
   already been created using [1mfdisk[22m.
 
 
-  # mkfs.ext3 -T largefile4 -m 0 /dev/hdb1
+       # mkfs.ext3 -T largefile4 -m 0 /dev/hdb1
 
 
 
