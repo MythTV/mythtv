@@ -38,10 +38,12 @@ static void *run_priv_thread(void *data)
                                     "some threads to run with realtime priority, "
                                     "improving video smoothness.");
                         }
+                        else
+                            VERBOSE(VB_GENERAL, "Using realtime priority.");
                     }
                     else
                     {
-                        VERBOSE(VB_IMPORTANT, "Something sus here. NULL thread ptr "
+                        VERBOSE(VB_IMPORTANT, "Unexpected NULL thread ptr "
                                 "for MythPrivRequest::MythRealtime");
                     }
                 }

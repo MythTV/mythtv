@@ -648,7 +648,7 @@ static void *run_priv_thread(void *data)
                     }
                     else
                     {
-                        VERBOSE(VB_IMPORTANT, "Something sus here. NULL thread ptr "
+                        VERBOSE(VB_IMPORTANT, "Unexpected NULL thread ptr "
                                 "for MythPrivRequest::MythRealtime");
                     }
                 }
