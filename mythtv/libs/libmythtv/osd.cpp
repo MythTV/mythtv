@@ -728,22 +728,17 @@ void OSD::DrawStringWithOutline(unsigned char *yuvptr, QRect rect,
     int maxx = rect.right();
     int maxy = rect.bottom();
 
-    int i;
-    for (i = x - 1; i <= x + 1; i++)
-        EFont_draw_string(yuvptr, i, y - 1, text, font, maxx, maxy, false,
-                          rightjustify);
+    EFont_draw_string(yuvptr, x - 1, y - 1, text, font, maxx, maxy, false,
+                      rightjustify);
 
-    for (i = y - 1; i <= y + 1; i++)
-        EFont_draw_string(yuvptr, x + 1, i, text, font, maxx, maxy, false,
-                          rightjustify);
+    EFont_draw_string(yuvptr, x + 1, y - 1, text, font, maxx, maxy, false,
+                      rightjustify);
 
-    for (i = x + 1; i >= x - 1; i--)
-        EFont_draw_string(yuvptr, i, y + 1, text, font, maxx, maxy, false,
-                          rightjustify);
+    EFont_draw_string(yuvptr, x - 1, y + 1, text, font, maxx, maxy, false,
+                      rightjustify);
 
-    for (i = y + 1; i >= y - 1; i--)
-        EFont_draw_string(yuvptr, x - 1, i, text, font, maxx, maxy, false,
-                          rightjustify);
+    EFont_draw_string(yuvptr, x + 1, y + 1, text, font, maxx, maxy, false,
+                      rightjustify);
 
     EFont_draw_string(yuvptr, x, y, text, font, maxx, maxy, true, rightjustify);
 }    
