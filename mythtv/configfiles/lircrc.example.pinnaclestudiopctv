@@ -1,0 +1,280 @@
+# lircrc.example.pinnaclestudiopctv
+# 2002-11-11, Robert Kulagowski
+# mailto:rkulagow@rocketmail.com
+
+# These are standard definitions which should exist on any remote control
+
+begin
+    prog = irxevent
+    button = Power
+    config = Key Escape CurrentWindow
+end
+
+begin
+    prog = irxevent
+    button = 1
+    config = Key 1 CurrentWindow
+end
+
+begin
+    prog = irxevent
+    button = 2
+    config = Key 2 CurrentWindow
+end
+
+begin
+    prog = irxevent
+    button = 3
+    config = Key 3 CurrentWindow
+end
+
+begin
+    prog = irxevent
+    button = 4
+    config = Key 4 CurrentWindow
+end
+
+begin
+    prog = irxevent
+    button = 5
+    config = Key 5 CurrentWindow
+end
+
+begin
+    prog = irxevent
+    button = 6
+    config = Key 6 CurrentWindow
+end
+
+begin
+    prog = irxevent
+    button = 7
+    config = Key 7 CurrentWindow
+end
+
+begin
+    prog = irxevent
+    button = 8
+    config = Key 8 CurrentWindow
+end
+
+begin
+    prog = irxevent
+    button = 9
+    config = Key 9 CurrentWindow
+end
+
+begin
+    prog = irxevent
+    button = 0
+    config = Key KP_0 CurrentWindow
+end
+
+
+# Below are keys used with the Pinnacle/Miro remote
+
+# begin
+#    prog = irxevent
+# This is the "P" key below the power button
+#    button = Preview
+#    config = Key  CurrentWindow
+# end
+
+# begin
+#    prog = irxevent
+# This is the "L" key
+#    button = L
+#    config = Key  CurrentWindow
+# end
+
+# begin
+#    prog = irxevent
+# This is the "I" key
+#    button = Info
+#    config = Key  CurrentWindow
+# end
+
+# begin
+#    prog = irxevent
+# This is the open rectangle with the dark rectangle in the upper right
+#    button = Fullscreen
+#    config = Key  CurrentWindow
+# end
+
+# begin
+#    prog = irxevent
+# This is the Zoom button
+#    button = Zoom
+#    config = Key  CurrentWindow
+# end
+
+# These are used to implement volume functionality.
+# Make sure that you're running % irexec -d for this to
+# work.
+
+begin
+    prog = irexec
+    button = Mute
+    config = /usr/bin/amixer -q set Master,0 mute
+end
+
+begin
+    prog = irexec
+    button = vol+
+    config = /usr/bin/amixer -q set Master,0 10+,10+ unmute
+end
+
+begin
+    prog = irexec
+    button = vol-
+    config = /usr/bin/amixer -q set Master,0 10-,10- unmute
+end
+
+# begin
+#    prog = irxevent
+# This is the Ch. button with the arrowed semicircle around it
+#    button = Chan_Last
+#    config = Key  CurrentWindow
+# end
+
+begin
+    prog = irxevent
+    button = channel+
+    config = Key Up CurrentWindow
+end
+
+begin
+    prog = irxevent
+    button = channel-
+    config = Key Down CurrentWindow
+end
+
+begin
+    prog = irxevent
+    button = Chan+Play
+# This is the "up" on the central diamond 
+    config = Key Up CurrentWindow
+end
+
+begin
+    prog = irxevent
+    button = Chan-Stop
+# This is the "down" on the central diamond 
+    config = Key Down CurrentWindow
+end
+
+begin
+    prog = irxevent
+    button = Vol-REW
+# This is the "left" on the central diamond 
+    config = Key Left CurrentWindow
+end
+
+begin
+    prog = irxevent
+    button = Vol+FF
+# This is the "right" on the central diamond 
+    config = Key Right CurrentWindow
+end
+
+begin
+    prog = irxevent
+# Middle button on the diamond
+    button = middle
+    config = Key Return CurrentWindow
+end
+
+begin
+    prog = irxevent
+    button = Menu
+    config = Key M CurrentWindow
+end
+
+# begin
+#    prog = irxevent
+#    button = next
+# This is the "Triangle Bar" symbol on the remote.  Like the Tivo jump to end button
+# Not used for anything yet
+#    config = Key  CurrentWindow
+# end
+
+# begin
+#    prog = irxevent
+#    button = undo
+# This is the arced left arrow
+# Not used for anything yet
+#    config = Key U CurrentWindow
+# end
+
+# begin
+#    prog = irxevent
+#    button = Record
+# Not used for anything yet
+#    config = Key  CurrentWindow
+#end
+
+begin
+    prog = irxevent
+    button = pause
+    config = Key P CurrentWindow
+end
+
+# begin
+#    prog = irxevent
+#    button = redo
+# This is the arced right arrow
+# Not used for anything yet
+#    config = Key  CurrentWindow
+# end
+
+begin
+    prog = irxevent
+    button = Rewind
+    config = Key Left CurrentWindow
+end
+
+begin
+    prog = irxevent
+    button = Play
+    config = Key P CurrentWindow
+end
+
+# begin
+#    prog = irxevent
+# Not used for anything yet
+#    button = Stop
+#    config = Key  CurrentWindow
+# end
+
+begin
+    prog = irxevent
+    button = FForward
+    config = Key Right CurrentWindow
+end
+
+# begin
+#    prog = irxevent
+# Not used for anything yet
+#    button = F_TV
+#    config = Key  CurrentWindow
+# end
+
+# begin
+#    prog = irxevent
+# Not used for anything yet
+#    button = F_TELETEXT
+#    config = Key  CurrentWindow
+# end
+
+# begin
+#    prog = irxevent
+# Not used for anything yet
+#    button = F_RADIO
+#    config = Key  CurrentWindow
+# end
+
+begin
+    prog = irxevent
+    button = EPG
+    config = Key I CurrentWindow
+end
