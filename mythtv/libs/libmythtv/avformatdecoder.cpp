@@ -61,6 +61,11 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
     memset(&params, 0, sizeof(AVFormatParameters));
     memset(prvpkt, 0, 3);
 
+    if (print_verbose_messages & VB_LIBAV)
+        av_log_set_level(AV_LOG_DEBUG);
+    else
+        av_log_set_level(AV_LOG_ERROR);
+
     do_ac3_passthru = gContext->GetNumSetting("AC3PassThru", false);
 }
 

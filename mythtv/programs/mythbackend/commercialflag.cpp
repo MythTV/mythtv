@@ -218,10 +218,14 @@ void *CommercialFlagger::RestartUnfinishedJobs(void *param)
 
 void CommercialFlagger::ProcessUnflaggedRecordings(QString flagHost)
 {
-    QString querystr = QString("SELECT DISTINCT a.chanid, a.starttime, a.hostname, b.commfree "
-                       "FROM recorded a, channel b "
-                       "WHERE (b.chanid = a.chanid AND b.commfree = 0) "
-                       "AND ( ( commflagged = %1 ) OR ( commflagged = %2 AND endtime < now()));")
+    QString querystr = QString("SELECT DISTINCT a.chanid, a.starttime, "
+                                   "a.hostname, b.commfree "
+                               "FROM recorded a, channel b "
+                               "WHERE (b.chanid = a.chanid AND b.commfree = 0) "
+                                   "AND (( commflagged = %1 ) OR "
+                                        "(( commflagged = %2 ) AND "
+                                         "(endtime < now()))) "
+                               "ORDER BY a.starttime DESC LIMIT 5;")
                        .arg(COMM_FLAG_PROCESSING)
                        .arg(COMM_FLAG_NOT_FLAGGED);
     dblock.lock();

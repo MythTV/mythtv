@@ -20,6 +20,8 @@ using namespace std;
 #include "remoteencoder.h"
 
 #define TFW_BUF_SIZE (2*1024*1024)
+#define TFW_MAX_WRITE_SIZE (TFW_BUF_SIZE / 4)
+#define TFW_MIN_WRITE_SIZE (TFW_BUF_SIZE / 8)
 
 #ifndef O_STREAMING
 #define O_STREAMING 0
@@ -54,6 +56,9 @@ protected:
     void DiskLoop(); /* The thread that actually calls write(). */
 
 private:
+    // allow DiskLoop() to flush buffer completely ignoring low watermark
+    void Flush(void);
+
     int fd;
     char *buf;
     unsigned rpos,wpos;
@@ -61,6 +66,7 @@ private:
     int in_dtor;
     pthread_t writer;
     bool no_writes;
+    bool flush;
 };
 
 static unsigned safe_write(int fd, const void *data, unsigned sz)
@@ -74,8 +80,13 @@ static unsigned safe_write(int fd, const void *data, unsigned sz)
         ret = write(fd, (char *)data + tot, sz - tot);
         if (ret < 0)
         {
-            perror("ERROR: file I/O problem in 'safe_write()'");
+            char msg[128];
+
             errcnt++;
+            snprintf(msg, 127,
+                     "ERROR: file I/O problem in safe_write(), errcnt = %d",
+                     errcnt );
+            perror(msg);
             if (errcnt == 3) 
                 break;
         }
@@ -106,6 +117,7 @@ ThreadedFileWriter::ThreadedFileWriter(const char *filename,
     buf = NULL;
     rpos = wpos = 0;
     in_dtor = 0;
+    flush = false;
 
     fd = open(filename, flags, mode);
 
@@ -126,9 +138,8 @@ ThreadedFileWriter::ThreadedFileWriter(const char *filename,
 ThreadedFileWriter::~ThreadedFileWriter()
 {
     no_writes = true;
-    while (BufUsed() > 0)
-        usleep(5000);
 
+    Flush();
     in_dtor = 1; /* tells child thread to exit */
 
     pthread_join(writer, NULL);
@@ -185,10 +196,17 @@ long long ThreadedFileWriter::Seek(long long pos, int whence)
     /* Assumes that we don't seek very often. This is not a high
        performance approach... we just block until the write thread
        empties the buffer. */
-    while (BufUsed() > 0)
-        usleep(5000);
+    Flush();
 
     return lseek(fd, pos, whence);
+}
+
+void ThreadedFileWriter::Flush(void)
+{
+    flush = true;
+    while (BufUsed() > 0)
+        usleep(5000);
+    flush = false;
 }
 
 void ThreadedFileWriter::Sync(void)
@@ -210,7 +228,9 @@ void ThreadedFileWriter::DiskLoop()
     {
         size = BufUsed();
         
-        if (size == 0)
+        if ((!in_dtor) &&
+            (!flush) &&
+            (size <= TFW_MIN_WRITE_SIZE))
         {
             usleep(500);
             continue;
@@ -226,19 +246,20 @@ void ThreadedFileWriter::DiskLoop()
            buffer is valid, and we try to write all of it at once which
            takes a long time. During this time, the other thread fills up
            the 10% that was free... */
-        if (size > (TFW_BUF_SIZE / 4))
-            size = TFW_BUF_SIZE / 4;
+        if (size > TFW_MAX_WRITE_SIZE)
+            size = TFW_MAX_WRITE_SIZE;
 
         if ((rpos + size) > TFW_BUF_SIZE)
         {
             int first_chunk_size  = TFW_BUF_SIZE - rpos;
             int second_chunk_size = size - first_chunk_size;
-            safe_write(fd, buf+rpos, first_chunk_size);
-            safe_write(fd, buf,      second_chunk_size);
+            size = safe_write(fd, buf+rpos, first_chunk_size);
+            if (size == first_chunk_size)
+                size += safe_write(fd, buf, second_chunk_size);
         }
         else
         {
-            safe_write(fd, buf+rpos, size);
+            size = safe_write(fd, buf+rpos, size);
         }
 
         pthread_mutex_lock(&buflock);

@@ -781,6 +781,11 @@ int main(int argc, char **argv)
                             print_verbose_messages |= VB_AUDIO;
                             verboseString += " " + *it;
                         }
+                        else if(!strcmp(*it,"libav"))
+                        {
+                            print_verbose_messages |= VB_LIBAV;
+                            verboseString += " " + *it;
+                        }
                         else
                         {
                             cerr << "Unknown argument for -v/--verbose: "
@@ -814,7 +819,7 @@ int main(int argc, char **argv)
                     "-v or --verbose debug-level    Prints more information" << endl <<
                     "                               Accepts any combination (separated by comma)" << endl << 
                     "                               of all,none,quiet,record,playback,channel," << endl <<
-                    "                               osd,file,schedule,network,commflag,audio" << endl <<
+                    "                               osd,file,schedule,network,commflag,audio,libav" << endl <<
                     "--version                      Version information" << endl <<
                     "<plugin>                       Initialize and run this plugin" << endl;
             return -1;
