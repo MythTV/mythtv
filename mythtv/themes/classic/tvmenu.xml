@@ -1,0 +1,101 @@
+<mythmenu name="TV">
+
+   <button>
+      <type>TV</type>
+      <text>Watch TV</text>
+      <text lang="IT">Guarda la TV</text>
+      <text lang="ES">Ver la TV</text>
+      <text lang="CA">Veure la TV</text>
+      <text lang="NL">Kijk TV</text>
+      <text lang="FR">Regarder la TV</text>
+      <text lang="DE">Fernsehen</text>
+      <text lang="DK">Se TV</text>
+      <text lang="PT">Ver Televisão</text>
+      <text lang="SV">Se på TV</text>
+      <text lang="JA">TVを見る</text>
+      <action>TV_WATCH_LIVE</action>
+   </button>
+
+   <button>
+      <type>TV_SCHEDULE</type>
+      <text>Schedule Recordings</text>
+      <text lang="IT">Programma una registrazione</text>
+      <text lang="ES">Programar Grabaciones</text>
+      <text lang="CA">Programar Gravacions</text>
+      <text lang="NL">Opnames Plannen</text>
+      <text lang="FR">Programmer des enregistrements</text>
+      <text lang="DE">Aufnahmen planen</text>
+      <text lang="DK">Optag udsendelse</text>
+      <text lang="PT">Gravação Programada</text>
+      <text lang="SV">Schemalägg inspelningar</text>
+      <text lang="JA">録画予約</text>
+      <alttext>Schedule</alttext>
+      <alttext lang="FR">Programmer</alttext>
+      <alttext lang="ES">Temporizadores</alttext>
+      <alttext lang="CA">Temporitzadors</alttext>
+      <alttext lang="DK">Optagelser</alttext>
+      <alttext lang="NL">Planning</alttext>
+      <alttext lang="PT">Programar</alttext>
+      <alttext lang="SV">Schemalägg</alttext>
+      <alttext lang="JA">予約</alttext>
+      <alttext lang="IT">Programmazione</alttext>
+      <action>MENU tv_schedule.xml</action>
+   </button>
+
+   <button>
+      <type>TV_PLAYBACK</type>
+      <text>Watch Recordings</text>
+      <text lang="IT">Guarda una registrazione</text>
+      <text lang="ES">Ver Grabaciones</text>
+      <text lang="CA">Veure Gravacions</text>
+      <text lang="NL">Opnames Bekijken</text>
+      <text lang="FR">Visionner</text>
+      <text lang="DE">Aufnahmen ansehen</text>
+      <text lang="DK">Afspil optagelser</text>
+      <text lang="PT">Ver Gravações</text>
+      <text lang="SV">Titta på inspelningar</text>
+      <text lang="JA">録画再生</text>
+      <action>TV_WATCH_RECORDING</action>
+   </button>
+
+   <button>
+      <type>TV_DELETE</type>
+      <text>Delete Recordings</text>
+      <text lang="IT">Elimina una registrazione</text>
+      <text lang="ES">Borrar Grabaciones</text>
+      <text lang="CA">Esborrar Gravacions</text>
+      <text lang="NL">Opnames Verwijderen</text>
+      <text lang="FR">Supprimer</text>
+      <text lang="DE">Aufnahmen löschen</text>
+      <text lang="DK">Slet optagelser</text>
+      <text lang="PT">Apagar Gravações</text>
+      <text lang="SV">Radera inspelningar</text>
+      <text lang="JA">録画削除</text>
+      <action>TV_DELETE</action>
+   </button> 
+
+<!-- EXECTV sample.  %s args in order are video, audio, and vbi devices
+   <button>
+      <type>TV_PLAYBACK</type>
+      <text>Passthrough Mode</text>
+      <text lang="PT">Modo Directo de TV</text>
+      <text lang="ES">TV directo</text>
+      <text lang="CA">TV directe</text>
+      <text lang="DE">TV direkt</text>
+      <text lang="SV">TV direkt</text>
+      <text lang="JA">パススルーモード</text>
+      <action>EXECTV xawtv -f -device %s -dspdev %s -vbidev %s</action>
+   </button>
+-->
+
+   <button>
+      <type>TV_STATUS</type>
+      <text>System Status</text>
+      <text lang="DE">Systemstatus</text>
+      <text lang="SV">Systemstatus</text>
+      <text lang="JA">システムステータス</text>
+      <action>TV_STATUS</action>
+   </button>
+
+
+</mythmenu>

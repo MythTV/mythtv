@@ -1,0 +1,158 @@
+<mythmenu name="SCHEDULE">
+
+   <button>
+      <type>TV_SCHEDULE</type>
+      <text>Program Guide</text>
+      <text lang="IT">Guida programmi</text>
+      <text lang="ES">Guía de programas</text>
+      <text lang="CA">Guia de programes</text>
+      <text lang="NL">Programma Gids</text>
+      <text lang="FR">Grille Horaire</text>
+      <text lang="DE">Programm- übersicht</text>
+      <text lang="DK">Program Guide</text>
+      <text lang="PT">Guia de Programação</text>
+      <text lang="SV">Programguide</text>
+      <text lang="JA">番組ガイド</text>
+      <alttext>Guide</alttext>
+      <alttext lang="FR">Grille</alttext>
+      <alttext lang="ES">Parilla</alttext>
+      <alttext lang="CA">Guia</alttext>
+      <alttext lang="DE">Programm</alttext>
+      <alttext lang="DK">Guide</alttext>
+      <alttext lang="NL">Gids</alttext>
+      <alttext lang="NL">Guia</alttext>
+      <alttext lang="SV">Guide</alttext>
+      <alttext lang="JA">ガイド</alttext>
+      <action>TV_SCHEDULE</action>
+   </button>
+
+   <button>
+      <type>TV_PROGFIND</type>
+      <text>Program Finder</text>
+      <text lang="IT">Ricerca programmi</text>
+      <text lang="ES">Buscar programas</text>
+      <text lang="CA">Cercar programes</text>
+      <text lang="NL">Programma Zoeker</text>
+      <text lang="FR">Recherche de programmes</text>
+      <text lang="DE">Alphabetische Suche</text>
+      <text lang="DK">Program Finder</text>
+      <text lang="PT">Procurar Programa</text>
+      <text lang="SV">Programletaren</text>
+      <text lang="JA">番組検索</text>
+      <alttext>Finder</alttext>
+      <alttext lang="FR">Recherche</alttext>
+      <alttext lang="ES">Buscar</alttext>
+      <alttext lang="CA">Cercar</alttext>
+      <alttext lang="DE">ABC Suche</alttext>
+      <alttext lang="DK">Finder</alttext>
+      <alttext lang="NL">Zoeker</alttext>
+      <alttext lang="PT">Procurar</alttext>
+      <alttext lang="SV">Sökaren</alttext>
+      <alttext lang="JA">検索</alttext>
+      <action>TV_PROGFIND</action>
+   </button>
+
+   <button>
+      <type>TV_PROGFIND</type>
+      <text>Search Listings</text>
+      <text lang="DE">Suche</text>
+      <text lang="SV">Sök i TV-tablå</text>
+      <text lang="NL">Zoekfunctie</text>
+      <text lang="JA">リスト検索</text>
+      <alttext>Search</alttext>
+      <alttext lang="SV">Sök tablå</alttext>
+      <alttext lang="NL">Zoek</alttext>      
+      <action>MENU tv_search.xml</action>
+   </button>
+
+<!--
+   <button>
+      <type>TV_SCHEDULE</type>
+      <text>Instant Recording</text>
+      <text lang="IT">Registrazione manuale</text>
+      <text lang="ES">Grabación Instanánea</text>
+      <text lang="CA">Gravar ara</text>
+      <text lang="NL">Instant Opname</text>
+      <text lang="FR">Enregistrement manuel</text>
+      <text lang="DE">Sofortige Aufnahme</text>
+      <text lang="DK">Optag lige nu</text>
+      <text lang="PT">Gravar Agora</text>
+      <text lang="SV">Omedelbar inspelning</text>
+      <text lang="JA">簡単録画</text>
+      <alttext>Instant Record</alttext>
+      <alttext lang="FR">Enreg. manuel</alttext>
+      <alttext lang="ES">Grab. inst.</alttext>
+      <alttext lang="CA">Grav. inst.</alttext>
+      <alttext lang="DK">Optag nu</alttext>
+      <alttext lang="NL">Instant</alttext>
+      <alttext lang="PT">Gravar Agora</alttext>
+      <alttext lang="SV">Omedelbar</alttext>
+      <alttext lang="JA">簡単録画</alttext>
+      <action>TV_MANUAL</action>
+   </button>
+-->
+
+   <button>
+      <type>TV_SCHEDULE</type>
+      <text>Manual Schedule</text>
+      <text lang="ES">Programar Grabaciones</text>
+      <text lang="CA">Programar Gravacions</text>
+      <text lang="DE">Manuelle Aufnahme</text>
+      <text lang="DK">Manuel programmering</text>
+      <text lang="NL">Manuele Opname</text>
+      <text lang="PT">Gravação Manual</text>
+      <text lang="SV">Manuell schemaläggning</text>
+      <text lang="JA">手動予約</text>
+      <alttext>Man. Sched.</alttext>
+      <alttext lang="ES">Programar</alttext>
+      <alttext lang="CA">Programar</alttext>
+      <alttext lang="DE">Manuell</alttext>
+      <alttext lang="DK">Manuel prog.</alttext>
+      <alttext lang="NL">Manueel</alttext>
+      <alttext lang="PT">Manual</alttext>
+      <alttext lang="SV">Manuell</alttext>
+      <alttext lang="JA">手動</alttext>
+      <action>TV_MANUALSCHEDULE</action>
+   </button>
+
+   <button>
+      <type>TV_RECPRIORITIES</type>
+      <text>Recording Priorities</text>
+      <text lang="DE">Aufnahme- prioritäten</text>
+      <text lang="NL">Opname Prioriteiten</text>      
+      <text lang="SV">Inspelningsprioriteter</text>
+      <text lang="JA">録画優先順位</text>
+      <alttext>Priorities</alttext>
+      <alttext lang="SV">Prioriteter</alttext>
+      <alttext lang="NL">Prioriteiten</alttext>
+      
+      <action>TV_SET_RECPRIORITIES</action>
+   </button>
+
+   <button>
+      <type>TV_CONFLICTS</type>
+      <text>Fix Scheduling Conflicts</text>
+      <text lang="IT">Correggi i conflitti</text>
+      <text lang="ES">Resolver conflictos</text>
+      <text lang="CA">Resoldre Conflictes</text>
+      <text lang="NL">Conflicten Oplossen</text>
+      <text lang="FR">Gestion des conflits</text>
+      <text lang="DE">Aufnahmeplan</text>
+      <text lang="DK">Løs optagelseskonflikter</text>
+      <text lang="PT">Resolver Conflitos</text>
+      <text lang="SV">Åtgärda schemakonflikter</text>
+      <text lang="JA">予約衝突修正</text>
+      <alttext>Fix Schedule</alttext>
+      <alttext lang="FR">Conflits</alttext>
+      <alttext lang="ES">Conflictos</alttext>
+      <alttext lang="FR">Conflictes</alttext>
+      <alttext lang="DE">Konflikte</alttext>
+      <alttext lang="DK">Løs konflikter</alttext>
+      <alttext lang="NL">Conflicten</alttext>
+      <alttext lang="PT">Conflitos</alttext>
+      <alttext lang="SV">Åtgärda konflikter</alttext>
+      <alttext lang="JA">予約修正</alttext>
+      <action>TV_FIX_CONFLICTS</action>
+   </button>
+
+</mythmenu>

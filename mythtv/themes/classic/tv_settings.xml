@@ -1,0 +1,77 @@
+<mythmenu name="TVSETUP">
+   <button>
+      <type>SETUP</type>
+      <text>General</text>
+      <text lang="IT">Generale</text>
+      <text lang="ES">General</text>
+      <text lang="CA">General</text>
+      <text lang="NL">Algemeen</text>
+      <text lang="FR">Général</text>
+      <text lang="DE">Allgemeines</text>
+      <text lang="DK">Generelt</text>
+      <text lang="PT">Configurações Gerais</text>
+      <text lang="SV">Generellt</text>
+      <text lang="JA">一般</text>
+      <action>SETTINGS GENERAL</action>
+   </button>
+
+   <button>
+      <type>TV_SCHEDULE</type>
+      <text>Program Guide</text>
+      <text lang="IT">Guida programmi</text>
+      <text lang="ES">Guía de programas</text>
+      <text lang="CA">Guia de programes</text>
+      <text lang="NL">Programma Gids</text>
+      <text lang="FR">Grille horaire</text>
+      <text lang="DE">Programm- übersicht</text>
+      <text lang="DK">Program Guide</text>
+      <text lang="PT">Configurações do Guia</text>
+      <text lang="SV">Programguide</text>
+      <text lang="JA">番組ガイド</text>
+      <action>SETTINGS EPG</action>
+   </button>
+
+   <button>
+      <type>TV_PLAYBACK</type>
+      <text>Playback</text>
+      <text lang="IT">Riproduzione</text>
+      <text lang="ES">Reproducción</text>
+      <text lang="CA">Reproducció</text>
+      <text lang="NL">Afspelen</text>
+      <text lang="FR">Visionnement</text>
+      <text lang="DE">Wiedergabe</text>
+      <text lang="DK">Afspilning</text>
+      <text lang="PT">Configurações de Leitura</text>
+      <text lang="SV">Uppspelning</text>
+      <text lang="JA">再生</text>
+      <action>SETTINGS PLAYBACK</action>
+   </button>
+
+   <button>
+      <type>TV_SCHEDULE</type>
+      <text>Recording Profiles</text>
+      <text lang="IT">Registrazione</text>
+      <text lang="ES">Grabación</text>
+      <text lang="CA">Gravació</text>
+      <text lang="NL">Opnemen</text>
+      <text lang="FR">Enregistrement</text>
+      <text lang="DE">Aufnahme- profile</text>
+      <text lang="DK">Optagelse</text>
+      <text lang="PT">Configurações de Gravação</text>
+      <text lang="SV">Inspelningsprofiler</text>
+      <text lang="JA">録画プロフィール</text>
+      <alttext lang="SV">Inspelning</alttext>
+      <action>SETTINGS RECORDING</action>
+   </button>
+
+   <button>
+      <type>TV_RECPRIORITIES</type>
+      <text>Recording Priorities</text>
+      <text lang="DE">Aufnahme- prioritäten</text>
+      <text lang="SV">Inspelningsprioriteter</text>
+      <text lang="JA">録画優先順位</text>
+      <action>MENU recpriorities_settings.xml</action>
+   </button>
+
+</mythmenu>
+
