@@ -278,6 +278,7 @@ class NuppelVideoPlayer
     AVCodec *mpa_codec;
     AVCodecContext *mpa_ctx;
     AVPicture mpa_picture;
+    AVPicture tmppicture;
 
     bool disablevideo;
     bool disableaudio;
@@ -311,6 +312,9 @@ class NuppelVideoPlayer
     int dialogtype;
     long long deleteframe;
     bool hasdeletetable;
+
+    int ffmpeg_extradatasize;
+    char *ffmpeg_extradata;
 };
 
 #endif

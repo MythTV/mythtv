@@ -10,7 +10,7 @@ CONFIG += thread dll
 target.path = $${PREFIX}/lib
 INSTALLS = target
 
-VERSION = 0.7.0
+VERSION = 0.8.0
 
 # Input
 HEADERS += dialogbox.h guidegrid.h infodialog.h infostructs.h lcddevice.h 

@@ -218,6 +218,8 @@ class NuppelVideoRecorder
 
     QString videoFilterList;
     vector<VideoFilter *> videoFilters;
+
+    PixelFormat picture_format;
 };
 
 #endif

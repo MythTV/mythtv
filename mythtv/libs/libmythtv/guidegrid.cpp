@@ -131,11 +131,11 @@ GuideGrid::GuideGrid(MythContext *context, const QString &channel,
 
     accel->connectItem(accel->insertItem(Key_C), this, SLOT(escape()));
     accel->connectItem(accel->insertItem(Key_Escape), this, SLOT(escape()));
-    accel->connectItem(accel->insertItem(Key_Enter), this, SLOT(enter()));
     accel->connectItem(accel->insertItem(Key_M), this, SLOT(enter()));
 
     accel->connectItem(accel->insertItem(Key_I), this, SLOT(displayInfo()));
     accel->connectItem(accel->insertItem(Key_Space), this, SLOT(displayInfo()));
+    accel->connectItem(accel->insertItem(Key_Enter), this, SLOT(displayInfo()));
 
     connect(this, SIGNAL(killTheApp()), this, SLOT(accept()));
 

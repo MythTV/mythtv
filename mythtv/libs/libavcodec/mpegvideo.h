@@ -221,6 +221,7 @@ typedef struct MpegEncContext {
     int unrestricted_mv;
     int h263_long_vectors; /* use horrible h263v1 long vector mode */
 
+    DSPContext dsp;             /* pointers for accelerated dsp fucntions */
     int f_code; /* forward MV resolution */
     int b_code; /* backward MV resolution for B Frames (mpeg4) */
     INT16 (*motion_val)[2];            /* used for MV prediction (4MV per MB) */
@@ -508,8 +509,8 @@ typedef struct MpegEncContext {
     UINT8 *ptr_lastgob;
     UINT8 *ptr_last_mb_line;
     UINT32 mb_line_avgsize;
-   
-    INT16 __align8 dct_quantize_temp_block[64];
+
+    INT16 __align8 dct_quantize_temp_block[64];   
  
     DCTELEM (*block)[64]; /* points to one of the following blocks */
     DCTELEM blocks[2][6][64] __align8; // for HQ mode we need to keep the best block

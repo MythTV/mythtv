@@ -5,8 +5,8 @@
 
 #define LIBAVCODEC_VERSION_INT 0x000406
 #define LIBAVCODEC_VERSION     "0.4.6"
-#define LIBAVCODEC_BUILD       4637
-#define LIBAVCODEC_BUILD_STR   "4637"
+#define LIBAVCODEC_BUILD       4639
+#define LIBAVCODEC_BUILD_STR   "4639"
 
 enum CodecID {
     CODEC_ID_NONE, 
@@ -27,13 +27,14 @@ enum CodecID {
     CODEC_ID_H263P,
     CODEC_ID_H263I,
     CODEC_ID_SVQ1,
+    CODEC_ID_VORBIS,
     CODEC_ID_DVVIDEO,
     CODEC_ID_DVAUDIO,
-    CODEC_ID_VORBIS,
     CODEC_ID_WMAV1,
     CODEC_ID_WMAV2,
     CODEC_ID_MACE3,
     CODEC_ID_MACE6,
+    CODEC_ID_HUFFYUV,
 
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE,
@@ -68,7 +69,14 @@ enum PixelFormat {
     PIX_FMT_RGBA32,
     PIX_FMT_BGRA32,
     PIX_FMT_YUV410P,
-    PIX_FMT_YUV411P
+    PIX_FMT_YUV411P,
+    PIX_FMT_RGB565,
+    PIX_FMT_RGB555,
+//    PIX_FMT_RGB5551,
+    PIX_FMT_BGR565,
+    PIX_FMT_BGR555,
+//    PIX_FMT_GBR565,
+//    PIX_FMT_GBR555
 };
 
 /* currently unused, may be used if 24/32 bits samples ever supported */
@@ -408,7 +416,7 @@ typedef struct AVCodecContext {
     /**
      * number of bits used for the previously encoded frame
      * encoding: set by lavc
-     * decoding: unused
+     * decoding: - for audio - bits_per_sample
      */
     int frame_bits;
                  
@@ -752,24 +760,45 @@ typedef struct AVCodecContext {
      * encoding; unused
      * decoding: set by lavc
      */
-     int8_t *current_qscale_table;
+    int8_t *current_qscale_table;
     /**
      * QP table of the currently displayed frame
      * encoding; unused
      * decoding: set by lavc
      */
-     int8_t *display_qscale_table;
-     
+    int8_t *display_qscale_table;
     /**
      * force specific pict_type.
      * encoding; set by user (I/P/B_TYPE)
      * decoding: unused
      */
     int force_type;
+    /**
+     * dsp_mask could be used to disable unwanted
+     * CPU features (i.e. MMX, SSE. ...)
+     */
+     unsigned dsp_mask;
+
+    /**
+     * bits per sample/pixel from the demuxer (needed for huffyuv)
+     * encoding; set by lavc
+     * decoding: set by user
+     */
+     int bits_per_sample;
+    
+    /**
+     * prediction method (needed for huffyuv)
+     * encoding; set by user
+     * decoding: unused
+     */
+     int prediction_method;
+#define FF_PRED_LEFT   0
+#define FF_PRED_PLANE  1
+#define FF_PRED_MEDIAN 2
 } AVCodecContext;
 
 typedef struct AVCodec {
-    char *name;
+    const char *name;
     int type;
     int id;
     int priv_data_size;
@@ -806,6 +835,7 @@ extern AVCodec msmpeg4v2_encoder;
 extern AVCodec msmpeg4v3_encoder;
 extern AVCodec wmv1_encoder;
 extern AVCodec wmv2_encoder;
+extern AVCodec huffyuv_encoder;
 
 extern AVCodec h263_decoder;
 extern AVCodec mpeg4_decoder;
@@ -827,6 +857,7 @@ extern AVCodec mp2_decoder;
 extern AVCodec mp3_decoder;
 extern AVCodec mace3_decoder;
 extern AVCodec mace6_decoder;
+extern AVCodec huffyuv_decoder;
 
 /* pcm codecs */
 #define PCM_CODEC(id, name) \
@@ -1017,8 +1048,8 @@ typedef enum {
 int avcodec(void* handle, avc_cmd_t cmd, void* pin, void* pout);
 
 /* memory */
-void *av_malloc(int size);
-void *av_mallocz(int size);
+void *av_malloc(unsigned int size);
+void *av_mallocz(unsigned int size);
 void av_free(void *ptr);
 void __av_freep(void **ptr);
 #define av_freep(p) __av_freep((void **)(p))

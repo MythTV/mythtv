@@ -114,6 +114,7 @@ static int dvvideo_decode_init(AVCodecContext *avctx)
     /* XXX: fix it */
     memset(&s2, 0, sizeof(MpegEncContext));
     s2.avctx = avctx;
+    dsputil_init(&s2.dsp, avctx->dsp_mask);
     if (DCT_common_init(&s2) < 0)
        return -1;
 
@@ -494,7 +495,8 @@ static int dvvideo_decode_frame(AVCodecContext *avctx,
                                  UINT8 *buf, int buf_size)
 {
     DVVideoDecodeContext *s = avctx->priv_data;
-    int sct, dsf, apt, ds, nb_dif_segs, vs, size, width, height, i, packet_size;
+    int sct, dsf, apt, ds, nb_dif_segs, vs, width, height, i, packet_size;
+    unsigned size;
     UINT8 *buf_ptr;
     const UINT16 *mb_pos_ptr;
     AVPicture *picture;
@@ -559,11 +561,12 @@ static int dvvideo_decode_frame(AVCodecContext *avctx,
     avctx->width = width;
     avctx->height = height;
 
-    if (avctx->flags & CODEC_FLAG_DR1 && avctx->get_buffer_callback)
+    if (avctx->flags & CODEC_FLAG_DR1)
     {
 	s->width = -1;
 	avctx->dr_buffer[0] = avctx->dr_buffer[1] = avctx->dr_buffer[2] = 0;
-	if(avctx->get_buffer_callback(avctx, width, height, I_TYPE) < 0){
+	if(avctx->get_buffer_callback(avctx, width, height, I_TYPE) < 0
+	   && avctx->flags & CODEC_FLAG_DR1) {
 	    fprintf(stderr, "get_buffer() failed\n");
 	    return -1;
 	}

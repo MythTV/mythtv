@@ -66,6 +66,9 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
 
     paused = 0;
 
+    ffmpeg_extradata = NULL;
+    ffmpeg_extradatasize = 0;
+
     audiodevice = "/dev/dsp";
 
     ringBuffer = NULL;
@@ -139,6 +142,8 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
         delete [] strm;
     if (positionMap)
         delete positionMap;
+    if (ffmpeg_extradata)
+        delete [] ffmpeg_extradata;
 
     for (int i = 0; i < MAXVBUFFER; i++)
     {
@@ -346,11 +351,30 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
         cerr << "Illegal file format\n";
         return -1;
     }
-    if (frameheader.packetlength != ringBuffer->Read(space, 
-                                                     frameheader.packetlength))
+
+    if (frameheader.comptype == 'F')
     {
-        cerr << "File not big enough for first frame data\n";
-        return -1;
+        ffmpeg_extradatasize = frameheader.packetlength;
+        if (ffmpeg_extradatasize > 0)
+        {
+            ffmpeg_extradata = new char[ffmpeg_extradatasize];
+            if (frameheader.packetlength != ringBuffer->Read(ffmpeg_extradata,
+                                                     frameheader.packetlength))
+            {
+                cerr << "File not big enough for first frame data\n";
+                delete [] ffmpeg_extradata;
+                ffmpeg_extradata = NULL;
+            }
+        }
+    }
+    else
+    {
+        if (frameheader.packetlength != ringBuffer->Read(space, 
+                                                     frameheader.packetlength))
+        {
+            cerr << "File not big enough for first frame data\n";
+            return -1;
+        }
     }
 
     if ((video_height & 1) == 1)
@@ -563,6 +587,7 @@ bool NuppelVideoPlayer::InitAVCodec(int codec)
             case MKTAG('H', '2', '6', '3'): codec = CODEC_ID_H263; break;
             case MKTAG('I', '2', '6', '3'): codec = CODEC_ID_H263I; break;
             case MKTAG('M', 'P', 'E', 'G'): codec = CODEC_ID_MPEG1VIDEO; break;
+            case MKTAG('H', 'F', 'Y', 'U'): codec = CODEC_ID_HUFFYUV; break;
             default: codec = -1;
         }
     }
@@ -585,7 +610,14 @@ bool NuppelVideoPlayer::InitAVCodec(int codec)
     mpa_ctx->width = video_width;
     mpa_ctx->height = video_height;
     mpa_ctx->error_resilience = 2;
-    
+    mpa_ctx->bits_per_sample = 12;   
+
+    if (ffmpeg_extradatasize > 0)
+    {
+        mpa_ctx->extradata = ffmpeg_extradata;
+        mpa_ctx->extradata_size = ffmpeg_extradatasize;
+    }
+
     if (avcodec_open(mpa_ctx, mpa_codec) < 0)
     {
         cerr << "Couldn't find lavc codec\n";
@@ -632,6 +664,8 @@ unsigned char *NuppelVideoPlayer::DecodeFrame(struct rtframeheader *frameheader,
         planes[0] = buf;
         planes[1] = planes[0] + video_width * video_height;
         planes[2] = planes[1] + (video_width * video_height) / 4;
+        avpicture_fill(&tmppicture, buf, PIX_FMT_YUV420P, video_width,
+                       video_height);
     }
 
     if (frameheader->comptype == 'N') {
@@ -694,7 +728,6 @@ unsigned char *NuppelVideoPlayer::DecodeFrame(struct rtframeheader *frameheader,
 #ifdef EXTRA_LOCKING
         pthread_mutex_unlock(&avcodeclock);
 #endif
-
         if (ret < 0)
         {
             cout << "decoding error\n";
@@ -706,33 +739,8 @@ unsigned char *NuppelVideoPlayer::DecodeFrame(struct rtframeheader *frameheader,
             return NULL;
         }
 
-        if (mpa_picture.linesize[0] != video_width)
-        {
-            for (int i = 0; i < video_height; i++)
-            {
-                memcpy(planes[0] + i * video_width, 
-                       mpa_picture.data[0] + i * mpa_picture.linesize[0], 
-                       video_width);
-            }
-
-            for (int i = 0; i < video_height / 2; i++)
-            {
-                memcpy(planes[1] + i * video_width / 2, 
-                       mpa_picture.data[1] + i * mpa_picture.linesize[1],
-                       video_width / 2);
-                memcpy(planes[2] + i * video_width / 2,
-                       mpa_picture.data[2] + i * mpa_picture.linesize[2],
-                       video_width / 2);
-            }
-        }
-        else
-        {
-            memcpy(planes[0], mpa_picture.data[0], video_width * video_height);
-            memcpy(planes[1], mpa_picture.data[1], 
-                   video_width * video_height / 4);
-            memcpy(planes[2], mpa_picture.data[2], 
-                   video_width * video_height / 4);
-        }
+        img_convert(&tmppicture, PIX_FMT_YUV420P, &mpa_picture,
+                    mpa_ctx->pix_fmt, video_width, video_height);
     }
 
     return buf;

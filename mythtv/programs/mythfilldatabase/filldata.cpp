@@ -103,12 +103,18 @@ QDateTime fromXMLTVDate(QString &text)
     if (text == QString::null)
         return dt;
 
+    if (text.find(QRegExp("^\\d{12}")) != 0)
+        return dt;
+
     year = atoi(text.mid(0, 4).ascii());
     month = atoi(text.mid(4, 2).ascii());
     day = atoi(text.mid(6, 2).ascii());
     hour = atoi(text.mid(8, 2).ascii());
     min = atoi(text.mid(10, 2).ascii());
-    sec = atoi(text.mid(12, 2).ascii());
+    if (text.find(QRegExp("^\\d\\d"), 12) == 0)
+        sec = atoi(text.mid(12, 2).ascii());
+    else
+        sec = 0;
 
     ldate = QDate(year, month, day);
     ltime = QTime(hour, min, sec);

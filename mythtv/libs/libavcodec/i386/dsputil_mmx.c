@@ -22,7 +22,7 @@
 #include "../dsputil.h"
 
 int mm_flags; /* multimedia extension flags */
-
+/* FIXME use them in static form */
 int pix_abs16x16_mmx(UINT8 *blk1, UINT8 *blk2, int lx);
 int pix_abs16x16_x2_mmx(UINT8 *blk1, UINT8 *blk2, int lx);
 int pix_abs16x16_y2_mmx(UINT8 *blk1, UINT8 *blk2, int lx);
@@ -242,7 +242,7 @@ static void diff_pixels_mmx(DCTELEM *block, const UINT8 *s1, const UINT8 *s2, in
     );
 }
 
-static void put_pixels_clamped_mmx(const DCTELEM *block, UINT8 *pixels, int line_size)
+void put_pixels_clamped_mmx(const DCTELEM *block, UINT8 *pixels, int line_size)
 {
     const DCTELEM *p;
     UINT8 *pix;
@@ -297,7 +297,7 @@ static void put_pixels_clamped_mmx(const DCTELEM *block, UINT8 *pixels, int line
 	    :"memory");
 }
 
-static void add_pixels_clamped_mmx(const DCTELEM *block, UINT8 *pixels, int line_size)
+void add_pixels_clamped_mmx(const DCTELEM *block, UINT8 *pixels, int line_size)
 {
     const DCTELEM *p;
     UINT8 *pix;
@@ -453,11 +453,56 @@ static int pix_sum16_mmx(UINT8 * pix, int line_size){
         return sum;
 }
 
+static void add_bytes_mmx(uint8_t *dst, uint8_t *src, int w){
+    int i=0;
+    asm volatile(
+        "1:				\n\t"
+        "movq  (%1, %0), %%mm0		\n\t"
+        "movq  (%2, %0), %%mm1		\n\t"
+        "paddb %%mm0, %%mm1		\n\t"
+        "movq %%mm1, (%2, %0)		\n\t"
+        "movq 8(%1, %0), %%mm0		\n\t"
+        "movq 8(%2, %0), %%mm1		\n\t"
+        "paddb %%mm0, %%mm1		\n\t"
+        "movq %%mm1, 8(%2, %0)		\n\t"
+        "addl $16, %0			\n\t"
+        "cmpl %3, %0			\n\t"
+        " jb 1b				\n\t"
+        : "+r" (i)
+        : "r"(src), "r"(dst), "r"(w-15)
+    );
+    for(; i<w; i++)
+        dst[i+0] += src[i+0];
+}
+
+static void diff_bytes_mmx(uint8_t *dst, uint8_t *src1, uint8_t *src2, int w){
+    int i=0;
+    asm volatile(
+        "1:				\n\t"
+        "movq  (%2, %0), %%mm0		\n\t"
+        "movq  (%1, %0), %%mm1		\n\t"
+        "psubb %%mm0, %%mm1		\n\t"
+        "movq %%mm1, (%3, %0)		\n\t"
+        "movq 8(%2, %0), %%mm0		\n\t"
+        "movq 8(%1, %0), %%mm1		\n\t"
+        "psubb %%mm0, %%mm1		\n\t"
+        "movq %%mm1, 8(%3, %0)		\n\t"
+        "addl $16, %0			\n\t"
+        "cmpl %4, %0			\n\t"
+        " jb 1b				\n\t"
+        : "+r" (i)
+        : "r"(src1), "r"(src2), "r"(dst), "r"(w-15)
+    );
+    for(; i<w; i++)
+        dst[i+0] = src1[i+0]-src2[i+0];
+}
+
+
 #if 0
 static void just_return() { return; }
 #endif
 
-void dsputil_init_mmx(void)
+void dsputil_init_mmx(DSPContext* c, unsigned mask)
 {
     mm_flags = mm_support();
 #if 0
@@ -476,112 +521,115 @@ void dsputil_init_mmx(void)
 #endif
 
     if (mm_flags & MM_MMX) {
-        get_pixels = get_pixels_mmx;
-        diff_pixels = diff_pixels_mmx;
-        put_pixels_clamped = put_pixels_clamped_mmx;
-        add_pixels_clamped = add_pixels_clamped_mmx;
-        clear_blocks= clear_blocks_mmx;
-        pix_sum= pix_sum16_mmx;
+        c->get_pixels = get_pixels_mmx;
+        c->diff_pixels = diff_pixels_mmx;
+        c->put_pixels_clamped = put_pixels_clamped_mmx;
+        c->add_pixels_clamped = add_pixels_clamped_mmx;
+        c->clear_blocks = clear_blocks_mmx;
+        c->pix_sum = pix_sum16_mmx;
 
-        pix_abs16x16     = pix_abs16x16_mmx;
-        pix_abs16x16_x2  = pix_abs16x16_x2_mmx;
-        pix_abs16x16_y2  = pix_abs16x16_y2_mmx;
-        pix_abs16x16_xy2 = pix_abs16x16_xy2_mmx;
-        pix_abs8x8    = pix_abs8x8_mmx;
-        pix_abs8x8_x2 = pix_abs8x8_x2_mmx;
-        pix_abs8x8_y2 = pix_abs8x8_y2_mmx;
-        pix_abs8x8_xy2= pix_abs8x8_xy2_mmx;
+        c->pix_abs16x16     = pix_abs16x16_mmx;
+        c->pix_abs16x16_x2  = pix_abs16x16_x2_mmx;
+        c->pix_abs16x16_y2  = pix_abs16x16_y2_mmx;
+        c->pix_abs16x16_xy2 = pix_abs16x16_xy2_mmx;
+        c->pix_abs8x8     = pix_abs8x8_mmx;
+        c->pix_abs8x8_x2  = pix_abs8x8_x2_mmx;
+        c->pix_abs8x8_y2  = pix_abs8x8_y2_mmx;
+        c->pix_abs8x8_xy2 = pix_abs8x8_xy2_mmx;
 
-        put_pixels_tab[0][0] = put_pixels16_mmx;
-        put_pixels_tab[0][1] = put_pixels16_x2_mmx;
-        put_pixels_tab[0][2] = put_pixels16_y2_mmx;
-        put_pixels_tab[0][3] = put_pixels16_xy2_mmx;
+        c->put_pixels_tab[0][0] = put_pixels16_mmx;
+        c->put_pixels_tab[0][1] = put_pixels16_x2_mmx;
+        c->put_pixels_tab[0][2] = put_pixels16_y2_mmx;
+        c->put_pixels_tab[0][3] = put_pixels16_xy2_mmx;
 
-        put_no_rnd_pixels_tab[0][0] = put_pixels16_mmx;
-        put_no_rnd_pixels_tab[0][1] = put_no_rnd_pixels16_x2_mmx;
-        put_no_rnd_pixels_tab[0][2] = put_no_rnd_pixels16_y2_mmx;
-        put_no_rnd_pixels_tab[0][3] = put_no_rnd_pixels16_xy2_mmx;
+        c->put_no_rnd_pixels_tab[0][0] = put_pixels16_mmx;
+        c->put_no_rnd_pixels_tab[0][1] = put_no_rnd_pixels16_x2_mmx;
+        c->put_no_rnd_pixels_tab[0][2] = put_no_rnd_pixels16_y2_mmx;
+        c->put_no_rnd_pixels_tab[0][3] = put_no_rnd_pixels16_xy2_mmx;
 
-        avg_pixels_tab[0][0] = avg_pixels16_mmx;
-        avg_pixels_tab[0][1] = avg_pixels16_x2_mmx;
-        avg_pixels_tab[0][2] = avg_pixels16_y2_mmx;
-        avg_pixels_tab[0][3] = avg_pixels16_xy2_mmx;
+        c->avg_pixels_tab[0][0] = avg_pixels16_mmx;
+        c->avg_pixels_tab[0][1] = avg_pixels16_x2_mmx;
+        c->avg_pixels_tab[0][2] = avg_pixels16_y2_mmx;
+        c->avg_pixels_tab[0][3] = avg_pixels16_xy2_mmx;
 
-        avg_no_rnd_pixels_tab[0][0] = avg_no_rnd_pixels16_mmx;
-        avg_no_rnd_pixels_tab[0][1] = avg_no_rnd_pixels16_x2_mmx;
-        avg_no_rnd_pixels_tab[0][2] = avg_no_rnd_pixels16_y2_mmx;
-        avg_no_rnd_pixels_tab[0][3] = avg_no_rnd_pixels16_xy2_mmx;
+        c->avg_no_rnd_pixels_tab[0][0] = avg_no_rnd_pixels16_mmx;
+        c->avg_no_rnd_pixels_tab[0][1] = avg_no_rnd_pixels16_x2_mmx;
+        c->avg_no_rnd_pixels_tab[0][2] = avg_no_rnd_pixels16_y2_mmx;
+        c->avg_no_rnd_pixels_tab[0][3] = avg_no_rnd_pixels16_xy2_mmx;
+
+        c->put_pixels_tab[1][0] = put_pixels8_mmx;
+        c->put_pixels_tab[1][1] = put_pixels8_x2_mmx;
+        c->put_pixels_tab[1][2] = put_pixels8_y2_mmx;
+        c->put_pixels_tab[1][3] = put_pixels8_xy2_mmx;
+
+        c->put_no_rnd_pixels_tab[1][0] = put_pixels8_mmx;
+        c->put_no_rnd_pixels_tab[1][1] = put_no_rnd_pixels8_x2_mmx;
+        c->put_no_rnd_pixels_tab[1][2] = put_no_rnd_pixels8_y2_mmx;
+        c->put_no_rnd_pixels_tab[1][3] = put_no_rnd_pixels8_xy2_mmx;
+
+        c->avg_pixels_tab[1][0] = avg_pixels8_mmx;
+        c->avg_pixels_tab[1][1] = avg_pixels8_x2_mmx;
+        c->avg_pixels_tab[1][2] = avg_pixels8_y2_mmx;
+        c->avg_pixels_tab[1][3] = avg_pixels8_xy2_mmx;
+
+        c->avg_no_rnd_pixels_tab[1][0] = avg_no_rnd_pixels8_mmx;
+        c->avg_no_rnd_pixels_tab[1][1] = avg_no_rnd_pixels8_x2_mmx;
+        c->avg_no_rnd_pixels_tab[1][2] = avg_no_rnd_pixels8_y2_mmx;
+        c->avg_no_rnd_pixels_tab[1][3] = avg_no_rnd_pixels8_xy2_mmx;
         
-        put_pixels_tab[1][0] = put_pixels8_mmx;
-        put_pixels_tab[1][1] = put_pixels8_x2_mmx;
-        put_pixels_tab[1][2] = put_pixels8_y2_mmx;
-        put_pixels_tab[1][3] = put_pixels8_xy2_mmx;
-
-        put_no_rnd_pixels_tab[1][0] = put_pixels8_mmx;
-        put_no_rnd_pixels_tab[1][1] = put_no_rnd_pixels8_x2_mmx;
-        put_no_rnd_pixels_tab[1][2] = put_no_rnd_pixels8_y2_mmx;
-        put_no_rnd_pixels_tab[1][3] = put_no_rnd_pixels8_xy2_mmx;
-
-        avg_pixels_tab[1][0] = avg_pixels8_mmx;
-        avg_pixels_tab[1][1] = avg_pixels8_x2_mmx;
-        avg_pixels_tab[1][2] = avg_pixels8_y2_mmx;
-        avg_pixels_tab[1][3] = avg_pixels8_xy2_mmx;
-
-        avg_no_rnd_pixels_tab[1][0] = avg_no_rnd_pixels8_mmx;
-        avg_no_rnd_pixels_tab[1][1] = avg_no_rnd_pixels8_x2_mmx;
-        avg_no_rnd_pixels_tab[1][2] = avg_no_rnd_pixels8_y2_mmx;
-        avg_no_rnd_pixels_tab[1][3] = avg_no_rnd_pixels8_xy2_mmx;
+        c->add_bytes= add_bytes_mmx;
+        c->diff_bytes= diff_bytes_mmx;
 
         if (mm_flags & MM_MMXEXT) {
-            pix_abs16x16    = pix_abs16x16_mmx2;
-            pix_abs16x16_x2 = pix_abs16x16_x2_mmx2;
-            pix_abs16x16_y2 = pix_abs16x16_y2_mmx2;
-            pix_abs16x16_xy2= pix_abs16x16_xy2_mmx2;
+            c->pix_abs16x16     = pix_abs16x16_mmx2;
+            c->pix_abs16x16_x2  = pix_abs16x16_x2_mmx2;
+            c->pix_abs16x16_y2  = pix_abs16x16_y2_mmx2;
+            c->pix_abs16x16_xy2 = pix_abs16x16_xy2_mmx2;
 
-            pix_abs8x8    = pix_abs8x8_mmx2;
-            pix_abs8x8_x2 = pix_abs8x8_x2_mmx2;
-            pix_abs8x8_y2 = pix_abs8x8_y2_mmx2;
-            pix_abs8x8_xy2= pix_abs8x8_xy2_mmx2;
+            c->pix_abs8x8     = pix_abs8x8_mmx2;
+            c->pix_abs8x8_x2  = pix_abs8x8_x2_mmx2;
+            c->pix_abs8x8_y2  = pix_abs8x8_y2_mmx2;
+            c->pix_abs8x8_xy2 = pix_abs8x8_xy2_mmx2;
 
-            put_pixels_tab[0][1] = put_pixels16_x2_mmx2;
-            put_pixels_tab[0][2] = put_pixels16_y2_mmx2;
-            put_no_rnd_pixels_tab[0][1] = put_no_rnd_pixels16_x2_mmx2;
-            put_no_rnd_pixels_tab[0][2] = put_no_rnd_pixels16_y2_mmx2;
+            c->put_pixels_tab[0][1] = put_pixels16_x2_mmx2;
+            c->put_pixels_tab[0][2] = put_pixels16_y2_mmx2;
+            c->put_no_rnd_pixels_tab[0][1] = put_no_rnd_pixels16_x2_mmx2;
+            c->put_no_rnd_pixels_tab[0][2] = put_no_rnd_pixels16_y2_mmx2;
 
-            avg_pixels_tab[0][0] = avg_pixels16_mmx2;
-            avg_pixels_tab[0][1] = avg_pixels16_x2_mmx2;
-            avg_pixels_tab[0][2] = avg_pixels16_y2_mmx2;
-            avg_pixels_tab[0][3] = avg_pixels16_xy2_mmx2;
+            c->avg_pixels_tab[0][0] = avg_pixels16_mmx2;
+            c->avg_pixels_tab[0][1] = avg_pixels16_x2_mmx2;
+            c->avg_pixels_tab[0][2] = avg_pixels16_y2_mmx2;
+            c->avg_pixels_tab[0][3] = avg_pixels16_xy2_mmx2;
 
-            put_pixels_tab[1][1] = put_pixels8_x2_mmx2;
-            put_pixels_tab[1][2] = put_pixels8_y2_mmx2;
-            put_no_rnd_pixels_tab[1][1] = put_no_rnd_pixels8_x2_mmx2;
-            put_no_rnd_pixels_tab[1][2] = put_no_rnd_pixels8_y2_mmx2;
+            c->put_pixels_tab[1][1] = put_pixels8_x2_mmx2;
+            c->put_pixels_tab[1][2] = put_pixels8_y2_mmx2;
+            c->put_no_rnd_pixels_tab[1][1] = put_no_rnd_pixels8_x2_mmx2;
+            c->put_no_rnd_pixels_tab[1][2] = put_no_rnd_pixels8_y2_mmx2;
 
-            avg_pixels_tab[1][0] = avg_pixels8_mmx2;
-            avg_pixels_tab[1][1] = avg_pixels8_x2_mmx2;
-            avg_pixels_tab[1][2] = avg_pixels8_y2_mmx2;
-            avg_pixels_tab[1][3] = avg_pixels8_xy2_mmx2;
+            c->avg_pixels_tab[1][0] = avg_pixels8_mmx2;
+            c->avg_pixels_tab[1][1] = avg_pixels8_x2_mmx2;
+            c->avg_pixels_tab[1][2] = avg_pixels8_y2_mmx2;
+            c->avg_pixels_tab[1][3] = avg_pixels8_xy2_mmx2;
         } else if (mm_flags & MM_3DNOW) {
-            put_pixels_tab[0][1] = put_pixels16_x2_3dnow;
-            put_pixels_tab[0][2] = put_pixels16_y2_3dnow;
-            put_no_rnd_pixels_tab[0][1] = put_no_rnd_pixels16_x2_3dnow;
-            put_no_rnd_pixels_tab[0][2] = put_no_rnd_pixels16_y2_3dnow;
+            c->put_pixels_tab[0][1] = put_pixels16_x2_3dnow;
+            c->put_pixels_tab[0][2] = put_pixels16_y2_3dnow;
+            c->put_no_rnd_pixels_tab[0][1] = put_no_rnd_pixels16_x2_3dnow;
+            c->put_no_rnd_pixels_tab[0][2] = put_no_rnd_pixels16_y2_3dnow;
 
-            avg_pixels_tab[0][0] = avg_pixels16_3dnow;
-            avg_pixels_tab[0][1] = avg_pixels16_x2_3dnow;
-            avg_pixels_tab[0][2] = avg_pixels16_y2_3dnow;
-            avg_pixels_tab[0][3] = avg_pixels16_xy2_3dnow;
-            
-            put_pixels_tab[1][1] = put_pixels8_x2_3dnow;
-            put_pixels_tab[1][2] = put_pixels8_y2_3dnow;
-            put_no_rnd_pixels_tab[1][1] = put_no_rnd_pixels8_x2_3dnow;
-            put_no_rnd_pixels_tab[1][2] = put_no_rnd_pixels8_y2_3dnow;
+            c->avg_pixels_tab[0][0] = avg_pixels16_3dnow;
+            c->avg_pixels_tab[0][1] = avg_pixels16_x2_3dnow;
+            c->avg_pixels_tab[0][2] = avg_pixels16_y2_3dnow;
+            c->avg_pixels_tab[0][3] = avg_pixels16_xy2_3dnow;
 
-            avg_pixels_tab[1][0] = avg_pixels8_3dnow;
-            avg_pixels_tab[1][1] = avg_pixels8_x2_3dnow;
-            avg_pixels_tab[1][2] = avg_pixels8_y2_3dnow;
-            avg_pixels_tab[1][3] = avg_pixels8_xy2_3dnow;
+            c->put_pixels_tab[1][1] = put_pixels8_x2_3dnow;
+            c->put_pixels_tab[1][2] = put_pixels8_y2_3dnow;
+            c->put_no_rnd_pixels_tab[1][1] = put_no_rnd_pixels8_x2_3dnow;
+            c->put_no_rnd_pixels_tab[1][2] = put_no_rnd_pixels8_y2_3dnow;
+
+            c->avg_pixels_tab[1][0] = avg_pixels8_3dnow;
+            c->avg_pixels_tab[1][1] = avg_pixels8_x2_3dnow;
+            c->avg_pixels_tab[1][2] = avg_pixels8_y2_3dnow;
+            c->avg_pixels_tab[1][3] = avg_pixels8_xy2_3dnow;
         }
     }
 
@@ -624,25 +672,24 @@ void dsputil_init_mmx(void)
 /* remove any non bit exact operation (testing purpose). NOTE that
    this function should be kept as small as possible because it is
    always difficult to test automatically non bit exact cases. */
-void dsputil_set_bit_exact_mmx(void)
+void dsputil_set_bit_exact_mmx(DSPContext* c, unsigned mask)
 {
     if (mm_flags & MM_MMX) {
-    
         /* MMX2 & 3DNOW */
-        put_no_rnd_pixels_tab[0][1] = put_no_rnd_pixels16_x2_mmx;
-        put_no_rnd_pixels_tab[0][2] = put_no_rnd_pixels16_y2_mmx;
-        avg_pixels_tab[0][3] = avg_pixels16_xy2_mmx;
-        put_no_rnd_pixels_tab[1][1] = put_no_rnd_pixels8_x2_mmx;
-        put_no_rnd_pixels_tab[1][2] = put_no_rnd_pixels8_y2_mmx;
-        avg_pixels_tab[1][3] = avg_pixels8_xy2_mmx;
+        c->put_no_rnd_pixels_tab[0][1] = put_no_rnd_pixels16_x2_mmx;
+        c->put_no_rnd_pixels_tab[0][2] = put_no_rnd_pixels16_y2_mmx;
+        c->avg_pixels_tab[0][3] = avg_pixels16_xy2_mmx;
+        c->put_no_rnd_pixels_tab[1][1] = put_no_rnd_pixels8_x2_mmx;
+        c->put_no_rnd_pixels_tab[1][2] = put_no_rnd_pixels8_y2_mmx;
+        c->avg_pixels_tab[1][3] = avg_pixels8_xy2_mmx;
 
         if (mm_flags & MM_MMXEXT) {
-            pix_abs16x16_x2  = pix_abs16x16_x2_mmx;
-            pix_abs16x16_y2  = pix_abs16x16_y2_mmx;
-            pix_abs16x16_xy2 = pix_abs16x16_xy2_mmx;
-            pix_abs8x8_x2 = pix_abs8x8_x2_mmx;
-            pix_abs8x8_y2 = pix_abs8x8_y2_mmx;
-            pix_abs8x8_xy2= pix_abs8x8_xy2_mmx;
+            c->pix_abs16x16_x2  = pix_abs16x16_x2_mmx;
+            c->pix_abs16x16_y2  = pix_abs16x16_y2_mmx;
+            c->pix_abs16x16_xy2 = pix_abs16x16_xy2_mmx;
+            c->pix_abs8x8_x2 = pix_abs8x8_x2_mmx;
+            c->pix_abs8x8_y2 = pix_abs8x8_y2_mmx;
+            c->pix_abs8x8_xy2= pix_abs8x8_xy2_mmx;
         }
     }
 }

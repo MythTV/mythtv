@@ -20,7 +20,7 @@
 #include "dsputil.h"
 #include "mpegvideo.h"
 
-void *av_mallocz(int size)
+void *av_mallocz(unsigned int size)
 {
     void *ptr;
     ptr = av_malloc(size);
@@ -470,7 +470,7 @@ void avcodec_init(void)
 	return;
     inited = 1;
 
-    dsputil_init();
+    //dsputil_init();
 }
 
 /* this should be called after seeking and before trying to decode the next frame */

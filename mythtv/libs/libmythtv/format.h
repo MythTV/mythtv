@@ -27,7 +27,7 @@ typedef struct rtframeheader
    char frametype;	// A .. Audio, V .. Video, S .. Sync, T .. Text
    			// R .. Seekpoint: String RTjjjjjjjj (use full packet)
 			// D .. Addition Data for Compressors
-   			//      ct: R .. RTjpeg Tables
+   			//      ct: R .. RTjpeg Tables, F .. FFMpeg extradata
                         // X .. eXtended data, Q .. SeekTable
    
    char comptype;	// V: 0 .. raw YUV420

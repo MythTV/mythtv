@@ -69,6 +69,8 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     audiobytes = 0;
     audio_samplerate = 44100;
 
+    picture_format = PIX_FMT_YUV420P;
+
     avcodec_init();
     avcodec_register_all();
 
@@ -173,13 +175,26 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     }
 
     mpa_ctx = avcodec_alloc_context();
-    
-    mpa_ctx->pix_fmt = PIX_FMT_YUV420P;
-    
-    mpa_picture.linesize[0] = w;
-    mpa_picture.linesize[1] = w / 2;
-    mpa_picture.linesize[2] = w / 2;
    
+    if (picture_format == PIX_FMT_YUV420P)
+    { 
+        mpa_ctx->pix_fmt = PIX_FMT_YUV420P;
+    
+        mpa_picture.linesize[0] = w;
+        mpa_picture.linesize[1] = w / 2;
+        mpa_picture.linesize[2] = w / 2;
+    }
+    else if (picture_format == PIX_FMT_YUV422P)
+    {
+        mpa_ctx->pix_fmt = PIX_FMT_YUV422P;
+
+        mpa_picture.linesize[0] = w;
+        mpa_picture.linesize[1] = w / 2;
+        mpa_picture.linesize[2] = w / 2;
+    }   
+    else
+        cerr << "Unknown picture format: " << picture_format << endl;
+
     mpa_ctx->width = w;
     mpa_ctx->height = h;
 
@@ -215,12 +230,16 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     mpa_ctx->rc_initial_cplx = 0;
     mpa_ctx->dct_algo = FF_DCT_AUTO;
     mpa_ctx->idct_algo = FF_IDCT_AUTO;
+    mpa_ctx->prediction_method = FF_PRED_LEFT;
+    if (codec.lower() == "huffyuv")
+        mpa_ctx->strict_std_compliance = -1;
  
     if (avcodec_open(mpa_ctx, mpa_codec) < 0)
     {
-        cerr << "Unable to open FFMPEG/MPEG4 codex\n" << endl;
+        cerr << "Unable to open FFMPEG/" <<  codec << " codec\n" << endl;
         return false;
     }
+
     return true;
 }
 
@@ -240,11 +259,15 @@ void NuppelVideoRecorder::Initialize(void)
 	lame_init_params(gf);
     }
 
-    video_buffer_size = w * h * 3 / 2;
-    if (w >= 480 || h > 288) 
-        videomegs = 14;
+    if (picture_format == PIX_FMT_YUV422P)
+        video_buffer_size = w * h * 2;
     else
-        videomegs = 8;
+        video_buffer_size = w * h * 3 / 2;
+
+    if (w >= 480 || h > 288) 
+        videomegs = 20;
+    else
+        videomegs = 12;
 
     video_buffer_count = (videomegs * 1000 * 1000) / video_buffer_size;
 
@@ -260,8 +283,6 @@ void NuppelVideoRecorder::Initialize(void)
 
     mp3buf_size = (int)(1.25 * 8192 + 7200);
     mp3buf = new char[mp3buf_size];
-
-//  fprintf(stderr, "We are using %dx%ldB video buffers and %dx%ldB audio blocks\n", video_buffer_count, video_buffer_size, audio_buffer_count, audio_buffer_size);
 
     if (!ringBuffer)
     {
@@ -395,6 +416,8 @@ void NuppelVideoRecorder::StartRecording(void)
 
     if (!useavcodec)
     {
+        picture_format = PIX_FMT_YUV420P;
+
         int setval;
         rtjc = new RTjpeg();
         setval = RTJ_YUV420;
@@ -674,8 +697,11 @@ again:
 
     mm.height = h;
     mm.width  = w;
-    mm.format = VIDEO_PALETTE_YUV420P    ; /* YCrCb422 */
-  
+    if (picture_format == PIX_FMT_YUV422P)
+        mm.format = VIDEO_PALETTE_YUV422P;
+    else
+        mm.format = VIDEO_PALETTE_YUV420P;  
+
     mm.frame  = 0;
     if (ioctl(fd, VIDIOCMCAPTURE, &mm)<0) 
         perror("VIDIOCMCAPTUREi0");
@@ -884,20 +910,40 @@ void NuppelVideoRecorder::WriteHeader(bool todumpfile)
 
     memset(&frameheader, 0, sizeof(frameheader));
     frameheader.frametype = 'D'; // compressor data
-    frameheader.comptype  = 'R'; // compressor data for RTjpeg
-    frameheader.packetlength = sizeof(tbls);
 
-    // compression configuration header
-    if (todumpfile)
-        ringBuffer->WriteToDumpFile(&frameheader, FRAMEHEADERSIZE);
-    else
-        ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+    if (useavcodec)
+    {
+        frameheader.comptype = 'F';
+        frameheader.packetlength = mpa_ctx->extradata_size;
 
-    memset(tbls, 0, sizeof(tbls));
-    if (todumpfile)
-        ringBuffer->WriteToDumpFile(tbls, sizeof(tbls));
+        if (todumpfile)
+            ringBuffer->WriteToDumpFile(&frameheader, FRAMEHEADERSIZE);
+        else
+            ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+
+        if (todumpfile)
+            ringBuffer->WriteToDumpFile(mpa_ctx->extradata, 
+                                        frameheader.packetlength);
+        else
+            ringBuffer->Write(mpa_ctx->extradata, frameheader.packetlength);
+    }
     else
-        ringBuffer->Write(tbls, sizeof(tbls));
+    {
+        frameheader.comptype = 'R'; // compressor data for RTjpeg
+        frameheader.packetlength = sizeof(tbls);
+
+        // compression configuration header
+        if (todumpfile)
+            ringBuffer->WriteToDumpFile(&frameheader, FRAMEHEADERSIZE);
+        else
+            ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+
+        memset(tbls, 0, sizeof(tbls));
+        if (todumpfile)
+            ringBuffer->WriteToDumpFile(tbls, sizeof(tbls));
+        else
+            ringBuffer->Write(tbls, sizeof(tbls));
+    }
 
     memset(&frameheader, 0, sizeof(frameheader));
     frameheader.frametype = 'X'; // extended data
@@ -928,6 +974,7 @@ void NuppelVideoRecorder::WriteHeader(bool todumpfile)
             case CODEC_ID_H263P: vidfcc = MKTAG('H', '2', '6', '3'); break;
             case CODEC_ID_H263I: vidfcc = MKTAG('I', '2', '6', '3'); break;
             case CODEC_ID_MPEG1VIDEO: vidfcc = MKTAG('M', 'P', 'E', 'G'); break;
+            case CODEC_ID_HUFFYUV: vidfcc = MKTAG('H', 'F', 'Y', 'U'); break;
             default: break;
         }
         moredata.video_fourcc = vidfcc;
@@ -1280,8 +1327,11 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
     memset(&frameheader, 0, sizeof(frameheader));
 
     planes[0] = buf;
-    planes[1] = planes[0] + w*h;
-    planes[2] = planes[1] + (w*h)/4;
+    planes[1] = planes[0] + w * h;
+    if (picture_format == PIX_FMT_YUV422P)
+        planes[2] = planes[1] + (w * h) / 2;
+    else
+        planes[2] = planes[1] + (w * h) / 4;
     compressthis = compression;
 
     frame.codec = CODEC_YUV;
@@ -1375,7 +1425,7 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
         pthread_mutex_lock(&avcodeclock);
 #endif
         tmp = avcodec_encode_video(mpa_ctx, (unsigned char *)strm, 
-                                   w * h + (w * h) / 2, &mpa_picture); 
+                                   video_buffer_size, &mpa_picture); 
 #ifdef EXTRA_LOCKING
         pthread_mutex_unlock(&avcodeclock);
 #endif
@@ -1462,7 +1512,7 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
         }
         else
         {
-            frameheader.comptype = '3' + (int)(mpa_codec->id);
+            frameheader.comptype = '4';
             frameheader.packetlength = tmp;
             ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
             ringBuffer->Write(strm, tmp);

@@ -5,6 +5,10 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <pthread.h>
+
+#include <iostream>
+using namespace std;
+
 #include "RingBuffer.h"
 
 #define TFW_BUF_SIZE (2*1024*1024)
