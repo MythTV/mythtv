@@ -1,0 +1,41 @@
+/* XPM */
+static const char * const catalog_pix[] = {
+/* width height num_colors chars_per_pixel */
+"    16    16       18            1",
+/* colors */
+". c #000000",
+"# c #808080",
+"a c #c0dcc0",
+"b c #a6caf0",
+"c c #2a7faa",
+"d c #553f55",
+"e c #555f55",
+"f c #559faa",
+"g c #aa9fff",
+"h c #aabfaa",
+"i c #aaff00",
+"j c #d4dfff",
+"k c #2a1f00",
+"l c #2a1f55",
+"m c #a0a0a4",
+"n c #ff0000",
+"o c None",
+"p c #ffffff",
+/* pixels */
+"oooooooooooooooo",
+"oooooooooooooooo",
+"oooooooooooooooo",
+"o..e.e.e.ooooooo",
+"o.gpnpip.ooo..oo",
+"o.gpnpip.oo.bp.o",
+"o.gjnjij.oo.bj.o",
+"o.ganaia.o.ba.oo",
+"o.ghnhih.o.bh.oo",
+"o.gmnmim..fa.ooo",
+"o.gmnmiml.ch.ooo",
+"o.g#n#i#kc#.oooo",
+"o.geneiedc#.oooo",
+"o.......#..#oooo",
+"oooooooooooooooo",
+"oooooooooooooooo"
+};

@@ -1,0 +1,7 @@
+# Directory where mame roms are located.
+str MameRomLocation=/mnt/mame/roms/
+
+# Order in which to sort the game roms - this is for all systems
+str TreeLevels=system gamename
+
+
