@@ -277,6 +277,8 @@ void RemoteEncoder::ToggleInputs(void)
     strlist << "TOGGLE_INPUTS";
 
     SendReceiveStringList(strlist);
+
+    lastchannel = "";
 }
 
 void RemoteEncoder::ToggleChannelFavorite(void)
@@ -294,6 +296,8 @@ void RemoteEncoder::ChangeChannel(int channeldirection)
     strlist << QString::number(channeldirection);
 
     SendReceiveStringList(strlist);
+
+    lastchannel = "";
 }
 
 void RemoteEncoder::SetChannel(QString channel)
@@ -303,6 +307,8 @@ void RemoteEncoder::SetChannel(QString channel)
     strlist << channel;
 
     SendReceiveStringList(strlist);
+
+    lastchannel = "";
 }
 
 int RemoteEncoder::ChangeContrast(bool direction)
