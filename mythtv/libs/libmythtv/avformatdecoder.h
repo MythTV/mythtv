@@ -31,9 +31,6 @@ class AvFormatDecoder : public DecoderBase
     int OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[2048]);
     void GetFrame(int onlyvideo);
 
-    bool DoRewind(long long desiredFrame);
-    bool DoFastForward(long long desiredFrame);
-
     bool isLastFrameKey(void) { return false; }
     void WriteStoredData(RingBuffer *rb, bool storevid)
                            { (void)rb; (void)storevid; }
@@ -42,15 +39,7 @@ class AvFormatDecoder : public DecoderBase
     void SetRawVideoState(bool state) { (void)state; }
     bool GetRawVideoState(void) { return false; }
 
-    void setWatchingRecording(bool mode);
-
     long UpdateStoredFrameNum(long frame) { (void)frame; return 0;}
-
-    void SetPositionMap(void);
-    
-    bool SyncPositionMap();
-    bool PosMapFromDb();
-    bool PosMapFromEnc();
 
     QString GetEncodingType(void) { return QString("MPEG-2"); }
 
@@ -60,12 +49,6 @@ class AvFormatDecoder : public DecoderBase
     RingBuffer *getRingBuf(void) { return ringBuffer; }
 
   private:
-    typedef struct posmapentry 
-    {
-        long long index; // frame or keyframe number
-        long long pos; // position in stream
-    } PosMapEntry;
-
     friend int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
     friend void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
 
@@ -90,19 +73,15 @@ class AvFormatDecoder : public DecoderBase
     float GetMpegAspect(AVCodecContext *context, int aspect_ratio_info,
                         int width, int height);
 
-    void SeekReset(void);
+    void SeekReset(long long newKey = 0, int skipFrames = 0);
 
     bool CheckVideoParams(int width, int height);
     bool CheckAudioParams(int freq, int channels);
 
     int EncodeAC3Frame(unsigned char* data, int len, short *samples,
                        int &samples_size);
-    bool FindPosition(long long desired_value, bool search_pos,
-                      int &lower_bound, int &upper_bound);
 
     void HandleGopStart(AVPacket *pkt);
-
-    RingBuffer *ringBuffer;
 
     AVFormatContext *ic;
     AVFormatParameters params;
@@ -113,8 +92,6 @@ class AvFormatDecoder : public DecoderBase
 
     bool directrendering;
     bool drawband;
-    long long framesPlayed;
-    long long framesRead;
 
     int audio_sample_size;
     int audio_sampling_rate;
@@ -126,33 +103,13 @@ class AvFormatDecoder : public DecoderBase
 
     bool hasbframes;
 
-    bool hasFullPositionMap;
-    bool recordingHasPositionMap;
-    bool positionMapByFrame;
-    bool posmapStarted;
-    
-    QValueVector<PosMapEntry> m_positionMap;
-
-    long long lastKey;
-
-    int keyframedist;
-
-    bool exitafterdecoded;
-
     int bitrate;
-    bool ateof;
 
     bool gopset;
     bool seen_gop;
     int seq_count;
 
-    double fps;
-
     QPtrList<VideoFrame> inUseBuffers;
-
-    int current_width;
-    int current_height;
-    float current_aspect;
 
     QPtrList<AVPacket> storedPackets;
 

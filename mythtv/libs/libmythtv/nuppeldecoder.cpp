@@ -27,8 +27,7 @@ NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
     usingextradata = false;
     memset(&extradata, 0, sizeof(extendeddata));
 
-    hasFullPositionMap = false;
-    positionMap = new QMap<long long, long long>;
+    positionMapType = MARK_KEYFRAME;
 
     hasKeyFrameAdjustMap = false;
     keyFrameAdjustMap = new QMap<long long, int>;
@@ -83,8 +82,6 @@ NuppelDecoder::~NuppelDecoder()
         delete rtjd;
     if (ffmpeg_extradata)
         delete [] ffmpeg_extradata;
-    if (positionMap)
-        delete positionMap;
     if (keyFrameAdjustMap)
         delete keyFrameAdjustMap;
     if (buf)
@@ -271,13 +268,17 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 struct seektable_entry ste;
                 int offset = 0;
 
+                m_positionMap.clear();
+                m_positionMap.reserve(numentries);
+
                 for (int z = 0; z < numentries; z++)
                 {
                     memcpy(&ste, seekbuf + offset,
                            sizeof(struct seektable_entry));
                     offset += sizeof(struct seektable_entry);
 
-                    (*positionMap)[ste.keyframe_number] = ste.file_offset;
+                    PosMapEntry e = {ste.keyframe_number, ste.file_offset};
+                    m_positionMap.push_back(e);
                 }
                 hasFullPositionMap = true;
                 totalLength = (int)((ste.keyframe_number * keyframedist * 1.0) /
@@ -467,44 +468,10 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     if (hasFullPositionMap)
         return 1;
 
-    if (m_playbackinfo && m_db && positionMap)
-    {
-        m_db->lock();
-        m_playbackinfo->GetPositionMap(*positionMap, MARK_KEYFRAME, m_db->db());
-        m_db->unlock();
-
-        if (positionMap->size() && !livetv && !watchingrecording)
-        {
-            QMap<long long, long long>::Iterator it;
-            long long max_keyframe = -1;
-            for (it = positionMap->begin(); it != positionMap->end(); ++it)
-                if (it.key() > max_keyframe)
-                    max_keyframe = it.key();
-
-            if (max_keyframe >= 0)
-            {
-                totalLength = (int)((max_keyframe * keyframedist * 1.0) /
-                                     video_frame_rate);
-                totalFrames = (long long)max_keyframe * keyframedist;
-                m_parent->SetFileLength(totalLength, totalFrames);
-            }
-            hasFullPositionMap = true;
-            return 1;
-        }
-    }
+    if (SyncPositionMap())
+        return 1;
 
     return 0;
-}
-
-void NuppelDecoder::Reset(void)
-{
-    delete positionMap;
-    positionMap = new QMap<long long, long long>;
-
-    if (mpa_codec)
-        avcodec_flush_buffers(mpa_ctx);
-
-    framesPlayed = 0;
 }
 
 int get_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic)
@@ -847,6 +814,7 @@ void NuppelDecoder::GetFrame(int avignore)
         if ((ringBuffer->Read(&frameheader, FRAMEHEADERSIZE) != FRAMEHEADERSIZE)
             || (frameheader.frametype == 'Q') || (frameheader.frametype == 'K'))
         {
+            ateof = true;
             m_parent->SetEof();
             return;
         }
@@ -865,6 +833,7 @@ void NuppelDecoder::GetFrame(int avignore)
             if (ringBuffer->Read(&frameheader, FRAMEHEADERSIZE)
                 != FRAMEHEADERSIZE)
             {
+                ateof = true;
                 m_parent->SetEof();
                 return;
             }
@@ -879,6 +848,7 @@ void NuppelDecoder::GetFrame(int avignore)
             if (ringBuffer->Read(dummy, sizetoskip) != sizetoskip)
             {
                 delete [] dummy;
+                ateof = true;
                 m_parent->SetEof();
                 return;
             }
@@ -909,8 +879,16 @@ void NuppelDecoder::GetFrame(int avignore)
             {
                 lastKey = frameheader.timecode;
                 framesPlayed = frameheader.timecode - 1;
+
                 if (!hasFullPositionMap)
-                    (*positionMap)[lastKey / keyframedist] = currentposition;
+                {
+                    // Grow positionMap vector several entries at a time
+                    if (m_positionMap.capacity() == m_positionMap.size())
+                        m_positionMap.reserve(m_positionMap.size() + 60);
+                    PosMapEntry entry =
+                                      {lastKey / keyframedist, currentposition};
+                    m_positionMap.push_back(entry);
+                }
             }
             if (getrawframes)
                 StoreRawData(NULL);
@@ -922,12 +900,14 @@ void NuppelDecoder::GetFrame(int avignore)
             {
                 cerr << "Broken packet: " << frameheader.frametype
                      << " " << frameheader.packetlength << endl;
+                ateof = true;
                 m_parent->SetEof();
                 return;
             }
             if (ringBuffer->Read(strm, frameheader.packetlength) !=
                 frameheader.packetlength)
             {
+                ateof = true;
                 m_parent->SetEof();
                 return;
             }
@@ -1026,331 +1006,18 @@ void NuppelDecoder::GetFrame(int avignore)
         }
     }
 
-    m_parent->SetFramesPlayed(framesPlayed);
+    UpdateFramesPlayed();
 }
 
-int NuppelDecoder::GetKeyIndex(int keyFrame)
+void NuppelDecoder::SeekReset(long long newKey, int skipFrames)
 {
-    if (hasKeyFrameAdjustMap)
-    {
-        int accum = 0;
-        QMap <long long, int>::Iterator ki;
-        for (ki = (*keyFrameAdjustMap).begin();
-             ki != (*keyFrameAdjustMap).end(); ki++)
-        {
-            if (keyFrame < (ki.key() * keyframedist - ki.data() - accum))
-                break;
-            accum += ki.data();
-        }
-        return ((keyFrame + accum) / keyframedist);
-    }
-    else
-       return (keyFrame / keyframedist);
-}
-
-bool NuppelDecoder::DoRewind(long long desiredFrame)
-{
-    long long storelastKey = lastKey;
-    int keyIndex;
-
-    if (hasKeyFrameAdjustMap)
-    {
-        keyIndex = GetKeyIndex(lastKey);
-        QMap <long long, int>::Iterator keyiter = NULL;
-        keyiter = (*keyFrameAdjustMap).find(lastKey);
-        if (keyiter != (*keyFrameAdjustMap).end())
-            lastKey += keyiter.data();
-
-        while (lastKey > desiredFrame)
-        {
-            lastKey -= keyframedist;
-            keyIndex--;
-            keyiter = (*keyFrameAdjustMap).find(lastKey);
-            if (keyiter != (*keyFrameAdjustMap).end())
-                lastKey += keyiter.data();
-        }
-    }
-    else
-    {
-        while (lastKey > desiredFrame)
-        {
-            lastKey -= keyframedist;
-        }
-        keyIndex = lastKey / keyframedist;
-    }
-
-    if (lastKey < 1)
-        lastKey = 1;
-
-    int normalframes = desiredFrame - lastKey;
-    long long keyPos = (*positionMap)[keyIndex];
-    long long curPosition = ringBuffer->GetTotalReadPosition();
-    long long diff = keyPos - curPosition;
-
-    while (ringBuffer->GetFreeSpaceWithReadChange(diff) < 0)
-    {
-        lastKey += keyframedist;
-        keyIndex++;
-        keyPos = (*positionMap)[keyIndex];
-        if (keyPos == 0)
-            continue;
-        diff = keyPos - curPosition;
-        normalframes = 0;
-        if (lastKey > storelastKey)
-        {
-            lastKey = storelastKey;
-            diff = 0;
-            normalframes = 0;
-            return false;
-        }
-    }
-
-    int iter = 0;
-
-    while (keyPos == 0 && lastKey > 1 && iter < 4)
-    {
-        VERBOSE(VB_PLAYBACK, QString("No keyframe in position map for %1")
-                                     .arg((int)lastKey));
-
-        lastKey -= keyframedist;
-        keyIndex--;
-        keyPos = (*positionMap)[keyIndex];
-        diff = keyPos - curPosition;
-        normalframes += keyframedist;
-
-        if (keyPos != 0)
-           VERBOSE(VB_PLAYBACK, QString("Using seek position: %1")
-                                       .arg((int)lastKey));
-
-        iter++;
-    }
-
-    if (keyPos == 0)
-    {
-        VERBOSE(VB_GENERAL, QString("Unknown seek position: %1")
-                                    .arg((int)lastKey));
-
-        lastKey = storelastKey;
-        diff = 0;
-        normalframes = 0;
-
-        return false;
-    }
-
-    ringBuffer->Seek(diff, SEEK_CUR);
-    framesPlayed = lastKey - 1;
-
-    int fileend = 0;
-
-    normalframes = desiredFrame - framesPlayed;
-
-    if (!exactseeks)
-        normalframes = 0;
-
     if (mpa_codec)
         avcodec_flush_buffers(mpa_ctx);
 
-    // disbale frame storage
-    int oldrawstate = getrawframes;
-    getrawframes = 0;
-
-    while (normalframes > 0 && !fileend)
+    while (skipFrames > 0)
     {
-        if (normalframes != 1)
-            GetFrame(1);
-        else
-        {
-            getrawframes = oldrawstate;
-            GetFrame(0);
-        }
-
-        fileend = m_parent->GetEof();
-        normalframes--;
-    }
-
-    getrawframes = oldrawstate;
-
-    return true;
-}
-
-bool NuppelDecoder::DoFastForward(long long desiredFrame)
-{
-    // disable frame storage
-    int oldrawstate = getrawframes;
-    getrawframes = 0;
-
-    long long number = desiredFrame - framesPlayed;
-    long long desiredKey = lastKey;
-    int lastKeyIndex = GetKeyIndex(lastKey);
-    int desiredIndex = lastKeyIndex;
-
-    if (hasKeyFrameAdjustMap)
-    {
-        QMap <long long, int>::Iterator keyiter = NULL;
-        keyiter = (*keyFrameAdjustMap).begin();
-        while (keyiter.key() < lastKey && keyiter != (*keyFrameAdjustMap).end())
-            keyiter++;
-        long long prevKey = desiredKey;
-        while (desiredKey <= desiredFrame)
-        {
-            prevKey = desiredKey;
-            desiredKey += keyframedist;
-            desiredIndex++;
-            if (desiredKey == keyiter.key())
-            {
-                desiredKey -= keyiter.data();
-                keyiter++;
-            }
-        }
-        desiredKey = prevKey;
-        desiredIndex--;
-    }
-    else
-    {
-        while (desiredKey <= desiredFrame)
-            desiredKey += keyframedist;
-        desiredKey -= keyframedist;
-        desiredIndex = desiredKey / keyframedist;
-    }
-
-    int normalframes = desiredFrame - desiredKey;
-    int fileend = 0;
-
-    if (desiredKey == lastKey)
-        normalframes = number;
-
-    long long keyPos = -1;
-
-    long long tmpKey = desiredKey;
-    int tmpIndex = desiredIndex;
-
-    while (keyPos == -1 && tmpKey > lastKey)
-    {
-        if (positionMap->find(tmpIndex) != positionMap->end())
-        {
-            keyPos = (*positionMap)[tmpIndex];
-        }
-        else if (livetv || (watchingrecording && nvr_enc &&
-                            nvr_enc->IsValidRecorder()))
-        {
-            for (int i = lastKeyIndex; i <= tmpIndex; i++)
-            {
-                if (positionMap->find(i) == positionMap->end())
-                    nvr_enc->FillPositionMap(i, tmpIndex, *positionMap);
-            }
-
-            totalFrames = (long long)positionMap->size() * keyframedist;
-            totalLength = (int)((totalFrames * 1.0) / video_frame_rate);
-            m_parent->SetFileLength(totalLength, totalFrames);
-
-            if (positionMap->find(tmpIndex) != positionMap->end())
-                keyPos = (*positionMap)[tmpIndex];
-        }
-        else if (!hasFullPositionMap && !livetv && !watchingrecording)
-        {
-            m_db->lock();
-            m_playbackinfo->GetPositionMap(*positionMap, MARK_KEYFRAME,
-                                           m_db->db());
-            m_db->unlock();
-            hasFullPositionMap = true;
-
-            totalFrames = (long long)positionMap->size() * keyframedist;
-            totalLength = (int)((totalFrames * 1.0) / video_frame_rate);
-            m_parent->SetFileLength(totalLength, totalFrames);
-
-            if (positionMap->find(tmpIndex) != positionMap->end())
-                keyPos = (*positionMap)[tmpIndex];
-        }
-
-        if (keyPos == -1)
-        {
-            VERBOSE(VB_PLAYBACK, QString("No keyframe in position map for %1")
-                    .arg((int)tmpKey));
-
-            tmpKey -= keyframedist;
-            tmpIndex--;
-        }
-        else
-        {
-            desiredKey = tmpKey;
-            desiredIndex = tmpIndex;
-        }
-    }
-
-    bool needflush = false;
-
-    if (keyPos != -1)
-    {
-        lastKey = desiredKey;
-        long long diff = keyPos - ringBuffer->GetTotalReadPosition();
-
-        ringBuffer->Seek(diff, SEEK_CUR);
-        framesPlayed = lastKey - 1;
-        needflush = true;
-    }
-    else if (!livetv && !watchingrecording)
-    {
-        if (lastKey < desiredKey)
-        {
-            VERBOSE(VB_IMPORTANT, "Did not find keyframe position.");
-
-            VERBOSE(VB_PLAYBACK, QString("lastKey: %1 desiredKey: %2")
-                    .arg((int)lastKey).arg((int)desiredKey));
-        }
-
-        while (lastKey < desiredKey && !fileend)
-        {
-            GetFrame(-1);
-            needflush = true;
-            fileend = m_parent->GetEof();
-        }
-
-        if (needflush)
-        {
-            lastKey = desiredKey;
-            keyPos = (*positionMap)[desiredKey / keyframedist];
-            long long diff = keyPos - ringBuffer->GetTotalReadPosition();
-
-            ringBuffer->Seek(diff, SEEK_CUR);
-
-            framesPlayed = lastKey - 1;
-        }
-    }
-
-    normalframes = desiredFrame - framesPlayed;
-
-    if (!exactseeks)
-        normalframes = 0;
-
-    if (mpa_codec && needflush)
-        avcodec_flush_buffers(mpa_ctx);
-
-    while (normalframes > 0 && !fileend)
-    {
-        if (normalframes != 1)
-            GetFrame(1);
-        else
-        {
-            getrawframes = oldrawstate;
-            GetFrame(false);
-        }
-        fileend = m_parent->GetEof();
-        normalframes--;
-    }
-
-    getrawframes = oldrawstate;
-
-    return true;
-}
-
-void NuppelDecoder::SetPositionMap(void)
-{
-    if (m_playbackinfo && m_db && positionMap)
-    {
-        m_db->lock();
-        m_playbackinfo->SetPositionMap(*positionMap, MARK_KEYFRAME, 
-                                       m_db->db());
-        m_db->unlock();
+        GetFrame(0);
+        skipFrames--;
     }
 }
 

@@ -60,7 +60,7 @@ SOURCES += recorderbase.cpp filtermanager.cpp vsync.cpp proglist.cpp videooutbas
 SOURCES += videoout_null.cpp xbox.cpp dbcheck.cpp profilegroup.cpp
 SOURCES += udpnotify.cpp channeleditor.cpp channelsettings.cpp
 SOURCES += osdsurface.cpp osdlistbtntype.cpp blend.c datadirect.cpp
-SOURCES += sr_dialog.cpp sr_root.cpp sr_items.cpp
+SOURCES += sr_dialog.cpp sr_root.cpp sr_items.cpp decoderbase.cpp
 
 
 linux {

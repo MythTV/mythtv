@@ -25,15 +25,10 @@ IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
                          ProgramInfo *pginfo)
            : DecoderBase(parent, db, pginfo)
 {
-    framesRead = 0;
-    framesPlayed = 0;
     lastStartFrame = 0;
-
-    hasFullPositionMap = false;
 
     keyframedist = 15;
 
-    exitafterdecoded = false;
     gopset = false;
     firstgoppos = 0;
     prevgoppos = 0;
@@ -46,7 +41,8 @@ IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
     prvpkt[0] = prvpkt[1] = prvpkt[2] = 0;
 
     vidread = vidwrite = vidfull = 0;
-    ateof = false;
+
+    positionMapType = MARK_GOP_START;
 }
 
 IvtvDecoder::~IvtvDecoder()
@@ -85,12 +81,6 @@ void IvtvDecoder::SeekReset(long long newkey, int skipframes)
 
     framesPlayed = newkey + skipframes + 1;
     m_parent->SetFramesPlayed(framesPlayed);
-}
-
-void IvtvDecoder::Reset(void)
-{
-    positionMap.clear();
-    SeekReset(0, 0);
 }
 
 bool IvtvDecoder::CanHandle(char testbuf[2048], const QString &filename)
@@ -174,22 +164,17 @@ int IvtvDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
      
     ringBuffer->CalcReadAheadThresh(8000);
 
-    if (m_playbackinfo && m_db)
+    if ((m_playbackinfo && m_db) || livetv || watchingrecording)
     {
-        m_db->lock();
-        m_playbackinfo->GetPositionMap(positionMap, MARK_GOP_START, m_db->db());
-        m_db->unlock();
-        if (positionMap.size() && !livetv && !watchingrecording)
+        recordingHasPositionMap = SyncPositionMap();
+        if (recordingHasPositionMap && !livetv && !watchingrecording)
         {
-            long long totframes = positionMap.size() * keyframedist;
-            int length = (int)((totframes * 1.0) / fps);
-            m_parent->SetFileLength(length, totframes);            
             hasFullPositionMap = true;
             gopset = true;
         }
     }
 
-    if (!hasFullPositionMap)
+    if (!recordingHasPositionMap)
     {
         int bitrate = 8000;
         float bytespersec = (float)bitrate / 8 / 2;
@@ -199,7 +184,13 @@ int IvtvDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     }
 
     if (hasFullPositionMap)
+    {
         VERBOSE(VB_PLAYBACK, "Position map found");
+    }
+    else if (recordingHasPositionMap)
+    {
+        VERBOSE(VB_PLAYBACK, "Partial position map found");
+    }
 
     return hasFullPositionMap;
 }
@@ -260,7 +251,37 @@ void IvtvDecoder::MpegPreProcessPkt(unsigned char *buf, int len,
 
                     lastKey = frameNum;
                     if (!hasFullPositionMap)
-                        positionMap[lastKey / keyframedist] = laststartpos;
+                    {
+                        long long last_frame = 0;
+                        if (!m_positionMap.empty())
+                            last_frame =
+                                m_positionMap[m_positionMap.size() - 1].index;
+                        if (keyframedist > 1)
+                            last_frame *= keyframedist;
+                        if (framesRead > last_frame && keyframedist > 0)
+                        {       
+                            if (m_positionMap.capacity() ==
+                                    m_positionMap.size())
+                                m_positionMap.reserve(m_positionMap.size() + 60);
+                            PosMapEntry entry =
+                                        {lastKey / keyframedist, laststartpos};
+                            m_positionMap.push_back(entry);
+                        }
+
+                        if ((framesRead > 150) &&
+                            (!recordingHasPositionMap) &&
+                            (!livetv))
+                        {
+                            int bitrate = (int)((laststartpos * 8 * fps) /
+                                             (framesRead - 1));
+                            float bytespersec = (float)bitrate / 8;
+                            float secs = ringBuffer->GetRealFileSize() * 1.0 /
+                                             bytespersec;
+                            m_parent->SetFileLength((int)(secs),
+                                                    (int)(secs * fps));
+                        }
+
+                    }
 
                     break;
                 }
@@ -379,73 +400,6 @@ void IvtvDecoder::GetFrame(int onlyvideo)
         m_parent->SetEof();
 }
 
-bool IvtvDecoder::DoRewind(long long desiredFrame)
-{
-    lastKey = (framesPlayed / keyframedist) * keyframedist;
-    long long storelastKey = lastKey;
-    while (lastKey > desiredFrame)
-    {
-        lastKey -= keyframedist;
-    }
-
-    if (lastKey < 0)
-        lastKey = 0;
-
-    long long keyPos = positionMap[lastKey / keyframedist];
-    long long curPosition = ringBuffer->GetTotalReadPosition();
-    long long diff = keyPos - curPosition;
-
-    while (ringBuffer->GetFreeSpaceWithReadChange(diff) < 0)
-    {
-        lastKey += keyframedist;
-        keyPos = positionMap[lastKey / keyframedist];
-        if (keyPos == 0)
-            continue;
-        diff = keyPos - curPosition;
-        if (lastKey > storelastKey)
-        {
-            lastKey = storelastKey;
-            diff = 0;
-            return false;
-        }
-    }
-
-    int iter = 0;
-
-    while (keyPos == 0 && lastKey > 1 && iter < 4)
-    {
-        VERBOSE(VB_PLAYBACK, QString("No keyframe in position map for %1")
-                                     .arg((int)lastKey));
-
-        lastKey -= keyframedist;
-        keyPos = positionMap[lastKey / keyframedist];
-        diff = keyPos - curPosition;
-
-        if (keyPos != 0)
-           VERBOSE(VB_PLAYBACK, QString("Using seek position: %1")
-                                       .arg((int)lastKey));
-
-        iter++;
-    }
-
-    if (keyPos == 0)
-    {
-        VERBOSE(VB_GENERAL, QString("Unknown seek position: %1")
-                                    .arg((int)lastKey));
-
-        lastKey = storelastKey;
-        diff = 0;
-
-        return false;
-    }
-
-    ringBuffer->Seek(diff, SEEK_CUR);
-
-    SeekReset(lastKey, desiredFrame - lastKey);
-
-    return true;
-}
-
 bool IvtvDecoder::DoFastForward(long long desiredFrame)
 {
     long long number = desiredFrame - framesPlayed;
@@ -458,122 +412,7 @@ bool IvtvDecoder::DoFastForward(long long desiredFrame)
         return !ateof;
     }
 
-    lastKey = (framesPlayed / keyframedist) * keyframedist;
-    long long desiredKey = lastKey;
-
-    while (desiredKey <= desiredFrame)
-    {
-        desiredKey += keyframedist;
-    }
-    desiredKey -= keyframedist;
-   
-    long long keyPos = -1;
-
-    long long tmpKey = desiredKey;
-    int tmpIndex = tmpKey / keyframedist;
-
-    while (keyPos == -1 && tmpKey >= lastKey)
-    {
-        if (positionMap.find(tmpIndex) != positionMap.end())
-        {
-            keyPos = positionMap[tmpIndex];
-        }
-        else if (livetv || (watchingrecording && nvr_enc &&
-                            nvr_enc->IsValidRecorder()))
-        {
-            for (int i = lastKey / keyframedist; i <= tmpIndex; i++)
-            {
-                if (positionMap.find(i) == positionMap.end())
-                    nvr_enc->FillPositionMap(i, tmpIndex, positionMap);
-            }
-
-            long long totframes = positionMap.size() * keyframedist;
-            int length = (int)((totframes * 1.0) / fps);
-            m_parent->SetFileLength(length, totframes);            
-
-            if (positionMap.find(tmpIndex) != positionMap.end())
-                keyPos = positionMap[tmpIndex];
-        }
-        else if (!hasFullPositionMap && !livetv && !watchingrecording)
-        {
-            m_db->lock();
-            m_playbackinfo->GetPositionMap(positionMap, MARK_GOP_START,
-                                           m_db->db());
-            m_db->unlock();
-            hasFullPositionMap = true;
-
-            long long totframes = positionMap.size() * keyframedist;
-            int length = (int)((totframes * 1.0) / fps);
-            m_parent->SetFileLength(length, totframes);            
-
-            if (positionMap.find(tmpIndex) != positionMap.end())
-                keyPos = positionMap[tmpIndex];
-        }
-
-        if (keyPos == -1 && (hasFullPositionMap || livetv || 
-                             (watchingrecording && nvr_enc)))
-        {
-            VERBOSE(VB_PLAYBACK, QString("No keyframe in position map for %1")
-                    .arg((int)tmpKey));
-
-            tmpKey -= keyframedist;
-            tmpIndex--;
-        }
-        else if (keyPos == -1)
-        {
-            break;
-        }
-        else
-        {
-            desiredKey = tmpKey;
-        }
-    }
-
-    if (keyPos == -1 && desiredKey != lastKey && !livetv && !watchingrecording)
-    {
-        VERBOSE(VB_IMPORTANT, "Did not find keyframe position.");
-
-        VERBOSE(VB_PLAYBACK, QString("lastKey: %1 desiredKey: %2")
-                .arg((int)lastKey).arg((int)desiredKey));
-
-        while (framesRead < desiredKey + 1 || 
-               !positionMap.contains(desiredKey / keyframedist))
-        {
-            exitafterdecoded = true;
-            GetFrame(-1);
-            exitafterdecoded = false;
-
-            if (ateof)
-                return false;
-        }
-
-        keyPos = positionMap[desiredKey / keyframedist];
-    }
-
-    if (keyPos == -1)
-    {
-        cerr << "Didn't find keypos, time to bail ff\n";
-        return false;
-    }
-
-    lastKey = desiredKey;
-    long long diff = keyPos - ringBuffer->GetTotalReadPosition();
-
-    ringBuffer->Seek(diff, SEEK_CUR);
-
-    SeekReset(lastKey, desiredFrame - lastKey);
-
-    return true;
-}
-
-void IvtvDecoder::SetPositionMap(void)
-{
-    if (m_playbackinfo && m_db)
-    {
-        m_db->lock();
-        m_playbackinfo->SetPositionMap(positionMap, MARK_GOP_START, m_db->db());
-        m_db->unlock();
-    }
+    return DecoderBase::DoFastForward(desiredFrame);
 }
 
 void IvtvDecoder::UpdateFramesPlayed(void)

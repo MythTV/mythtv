@@ -42,26 +42,15 @@ class NuppelDecoder : public DecoderBase
                   ProgramInfo *pginfo);
    ~NuppelDecoder();
 
-    void Reset(void);
-
     static bool CanHandle(char testbuf[2048]);
 
     int OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[2048]);
     void GetFrame(int onlyvideo);
 
-    bool DoRewind(long long desiredFrame);
-    bool DoFastForward(long long desiredFrame);
-
     bool isLastFrameKey(void) { return (lastKey == framesPlayed); }
     void WriteStoredData(RingBuffer *rb, bool writevid);
-    void SetRawAudioState(bool state) { getrawframes = state; }
-    bool GetRawAudioState(void) { return getrawframes; }
-    void SetRawVideoState(bool state) { getrawvideo = state; }
-    bool GetRawVideoState(void) { return getrawvideo; }
 
     long UpdateStoredFrameNum(long framenumber);
-
-    void SetPositionMap(void);
 
     QString GetEncodingType(void);
 
@@ -74,7 +63,7 @@ class NuppelDecoder : public DecoderBase
     void CloseAVCodec(void);
     void StoreRawData(unsigned char *strm);
 
-    int GetKeyIndex(int KeyFrame);
+    void SeekReset(long long newKey = 0, int skipFrames = 0);
 
     friend int get_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic);
     friend void release_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic);
@@ -85,7 +74,7 @@ class NuppelDecoder : public DecoderBase
     lame_global_flags *gf;
     RTjpeg *rtjd;
 
-    int video_width, video_height, video_size, keyframedist;
+    int video_width, video_height, video_size;
     double video_frame_rate;
     int audio_samplerate;
 
@@ -96,12 +85,6 @@ class NuppelDecoder : public DecoderBase
     bool usingextradata;
 
     bool disablevideo;
-
-    bool hasFullPositionMap;
-    QMap<long long, long long> *positionMap;
-
-    bool hasKeyFrameAdjustMap;
-    QMap<long long, int> *keyFrameAdjustMap;
 
     int totalLength;
     long long totalFrames;
@@ -125,12 +108,7 @@ class NuppelDecoder : public DecoderBase
     unsigned char *buf2;
     unsigned char *planes[3];
 
-    long long lastKey;
-    long long framesPlayed;
-
     QPtrList <RawDataList> StoredData;
-    bool getrawframes;
-    bool getrawvideo;
 
     int videosizetotal;
     int videoframesread;

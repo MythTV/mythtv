@@ -24,14 +24,11 @@ class IvtvDecoder : public DecoderBase
                     ProgramInfo *pginfo);
    ~IvtvDecoder();
 
-    void Reset(void);
-
     static bool CanHandle(char testbuf[2048], const QString &filename);
 
     int OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[2048]);
     void GetFrame(int onlyvideo);
 
-    bool DoRewind(long long desiredFrame);
     bool DoFastForward(long long desiredFrame);
 
     bool isLastFrameKey(void) { return false; }
@@ -43,8 +40,6 @@ class IvtvDecoder : public DecoderBase
     bool GetRawVideoState(void) { return false; }
 
     long UpdateStoredFrameNum(long frame) { (void)frame; return 0; }
-
-    void SetPositionMap(void);
 
     QString GetEncodingType(void) { return QString("MPEG-2"); }
 
@@ -59,28 +54,14 @@ class IvtvDecoder : public DecoderBase
     bool ReadWrite(int onlyvideo, int delay);
     bool StepFrames(int start, int count);
 
-    RingBuffer *ringBuffer;
-
     int frame_decoded;
 
-    long long framesRead;
-    long long framesPlayed;
     long long lastStartFrame;
 
-    bool hasFullPositionMap;
-    QMap<long long, long long> positionMap;
-
-    long long lastKey;
-
-    int keyframedist;
     int prevgoppos;
 
-    bool exitafterdecoded;
-
-    bool ateof;
     bool gopset;
 
-    double fps;
     bool validvpts;
 
     int firstgoppos;

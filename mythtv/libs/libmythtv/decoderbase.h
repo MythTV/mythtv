@@ -1,70 +1,104 @@
 #ifndef DECODERBASE_H_
 #define DECODERBASE_H_
 
+#include "RingBuffer.h"
+#include "NuppelVideoPlayer.h"
+#include "remoteencoder.h"
+#include "mythcontext.h"
+#include "mythdbcon.h"
+#include "programinfo.h"
+
 class RingBuffer;
-class NuppelVideoPlayer;
-class RemoteEncoder;
-class MythSqlDatabase;
-class ProgramInfo;
 
 class DecoderBase
 {
   public:
     DecoderBase(NuppelVideoPlayer *parent, MythSqlDatabase *db,
-                ProgramInfo *pginfo) 
-    { 
-        m_parent = parent; 
-        m_db = db;
-        m_playbackinfo = pginfo;
-
-        exactseeks = false;
-        livetv = false;
-        watchingrecording = false;
-        nvr_enc = NULL;
-        lowbuffers = false; 
-    }
+                ProgramInfo *pginfo);
     virtual ~DecoderBase() { }
 
-    virtual void Reset(void) = 0;
+    virtual void Reset(void);
 
     virtual int OpenFile(RingBuffer *rbuffer, bool novideo,
                          char testbuf[2048]) = 0;
 
     void setExactSeeks(bool exact) { exactseeks = exact; }
     void setLiveTVMode(bool live) { livetv = live; }
-    virtual void setWatchingRecording(bool mode) { watchingrecording = mode; }
     void setRecorder(RemoteEncoder *recorder) { nvr_enc = recorder; }
 
     void setLowBuffers(void) { lowbuffers = true; }
 
+    virtual void setWatchingRecording(bool mode);
     virtual void GetFrame(int onlyvideo) = 0;
     
-    virtual bool DoRewind(long long desiredFrame) = 0;
-    virtual bool DoFastForward(long long desiredFrame) = 0;
+    virtual bool DoRewind(long long desiredFrame);
+    virtual bool DoFastForward(long long desiredFrame);
 
     virtual bool isLastFrameKey() = 0;
     virtual void WriteStoredData(RingBuffer *rb, bool storevid) = 0;
-    virtual void SetRawAudioState(bool state) = 0;
-    virtual bool GetRawAudioState() = 0;
-    virtual void SetRawVideoState(bool state) = 0;
-    virtual bool GetRawVideoState() = 0;
+    virtual void SetRawAudioState(bool state) { getrawframes = state; }
+    virtual bool GetRawAudioState(void) { return getrawframes; }
+    virtual void SetRawVideoState(bool state) { getrawvideo = state; }
+    virtual bool GetRawVideoState(void) { return getrawvideo; }
 
     virtual long UpdateStoredFrameNum(long frame) = 0;
 
-    virtual void SetPositionMap() = 0;
-
     virtual QString GetEncodingType(void) = 0;
 
-    virtual void UpdateFramesPlayed(void) { };
+    virtual void UpdateFramesPlayed(void);
 
     virtual void SetPixelFormat(const int) { }
 
+    virtual bool SyncPositionMap(void);
+    virtual bool PosMapFromDb(void);
+    virtual bool PosMapFromEnc(void);
+
+    virtual bool FindPosition(long long desired_value, bool search_pos,
+                              int &lower_bound, int &upper_bound);
+
+    virtual void SetPositionMap(void);
+    virtual void SeekReset(long long newKey = 0, int skipFrames = 0) { }
+
+    long long GetKeyFrameAdjustmentAtPos(long long desiredFrame);
+    int GetKeyIndex(int keyFrame);
+
   protected:
+    typedef struct posmapentry
+    {
+        long long index; // frame or keyframe number
+        long long pos; // position in stream
+    } PosMapEntry;
+
     NuppelVideoPlayer *m_parent;
     MythSqlDatabase *m_db;
     ProgramInfo *m_playbackinfo;
 
     RingBuffer *ringBuffer;
+
+    int current_width;
+    int current_height;
+    float current_aspect;
+
+    long long framesPlayed;
+    long long framesRead;
+    long long lastKey;
+
+    bool ateof;
+    bool exitafterdecoded;
+
+    bool hasFullPositionMap;
+    bool recordingHasPositionMap;
+    bool posmapStarted;
+    MarkTypes positionMapType;
+ 
+    QValueVector<PosMapEntry> m_positionMap;
+
+    bool hasKeyFrameAdjustMap;
+    QMap<long long, int> *keyFrameAdjustMap;
+
+    int keyframedist;
+
+    double fps;
 
     bool exactseeks;
     bool livetv;
@@ -72,6 +106,9 @@ class DecoderBase
     RemoteEncoder *nvr_enc;
 
     bool lowbuffers;
+
+    bool getrawframes;
+    bool getrawvideo;
 };
 
 #endif
