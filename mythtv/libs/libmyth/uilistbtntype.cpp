@@ -151,6 +151,13 @@ UIListTreeType::UIListTreeType(const QString &name, const QRect &area,
     m_margin = 0;
 
     m_order = order;
+    
+    //
+    //  This is a flag that renders the whole GUI list tree inactive (draws
+    //  everything as unselected)
+    //
+
+    list_tree_active = true;
 }
 
 UIListTreeType::~UIListTreeType()
@@ -288,7 +295,9 @@ void UIListTreeType::Draw(QPainter *p, int order, int blah)
     while ((child = it.current()) != 0)
     {
         if (child->IsVisible())
+        {
             maxx = child->GetArea().right();
+        }
         ++it;
     }
 
@@ -296,15 +305,22 @@ void UIListTreeType::Draw(QPainter *p, int order, int blah)
     while ((child = it.current()) != 0)
     {
         if (!child->IsVisible())
+        {
             break;
+        }
 
         int offset = 0;
         if (maxx > m_totalarea.right())
+        {
             offset = -1 * (maxx - m_totalarea.right());
+        }
+
         child->SetDrawOffset(offset);
 
         if (child->GetArea().right() + offset > m_totalarea.left())
-            child->Draw(p, order, blah);
+        {
+            child->Draw(p, order, blah, list_tree_active);
+        }
         ++it;
     }
 }
@@ -342,7 +358,7 @@ void UIListTreeType::DrawRegion(QPainter *p, QRect &area, int order, int blah)
             drawRect == area)
         {
             child->SetDrawOffset(0 - child->GetArea().x());
-            child->Draw(p, order, blah);
+            child->Draw(p, order, blah, list_tree_active);
             child->SetDrawOffset(offset);
         }
 
@@ -365,14 +381,17 @@ void UIListTreeType::ClearLevel(UIListBtnType *list)
 
 void UIListTreeType::RefreshCurrentLevel(void)
 {
-    QPtrListIterator<UIListBtnTypeItem> it = currentlevel->GetIterator();
-
-    UIListBtnTypeItem *item;
-    while ((item = it.current()))
+    if(currentlevel)
     {
-        UIListGenericTree *ui = (UIListGenericTree *)item->getData();
-        ui->setActive(ui->getActive());
-        ++it;
+        QPtrListIterator<UIListBtnTypeItem> it = currentlevel->GetIterator();
+
+        UIListBtnTypeItem *item;
+        while ((item = it.current()))
+        {
+            UIListGenericTree *ui = (UIListGenericTree *)item->getData();
+            ui->setActive(ui->getActive());
+            ++it;
+        }
     }
 }
 
@@ -438,6 +457,10 @@ void UIListTreeType::SetCurrentPosition(void)
 
 void UIListTreeType::Redraw(void)
 {
+    if(!currentlevel)
+    {
+        return;
+    }
     if (currentlevel->GetCount() == 0)
         MoveLeft();
     else
@@ -446,6 +469,10 @@ void UIListTreeType::Redraw(void)
 
 void UIListTreeType::RedrawCurrent(void)
 {
+    if(!currentlevel)
+    {
+        return;
+    }
     QRect dr = currentlevel->GetArea();
     dr.moveBy(currentlevel->GetDrawOffset(), 0);
     dr.moveBy(m_parent->GetAreaRect().x(), m_parent->GetAreaRect().y());
@@ -455,6 +482,10 @@ void UIListTreeType::RedrawCurrent(void)
 
 void UIListTreeType::MoveDown(MovementUnit unit)
 {
+    if(!currentlevel)
+    {
+        return;
+    }
     currentlevel->MoveDown((UIListBtnType::MovementUnit)unit);
     SetCurrentPosition();
     RedrawCurrent();
@@ -462,6 +493,10 @@ void UIListTreeType::MoveDown(MovementUnit unit)
 
 void UIListTreeType::MoveUp(MovementUnit unit)
 {
+    if(!currentlevel)
+    {
+        return;
+    }
     currentlevel->MoveUp((UIListBtnType::MovementUnit)unit);
     SetCurrentPosition();
     RedrawCurrent();
@@ -469,6 +504,10 @@ void UIListTreeType::MoveUp(MovementUnit unit)
 
 void UIListTreeType::MoveLeft(bool do_refresh)
 {
+    if(!currentlevel)
+    {
+        return;
+    }
     if (curlevel > 0)
     {
         ClearLevel(currentlevel);
@@ -487,8 +526,12 @@ void UIListTreeType::MoveLeft(bool do_refresh)
     }
 }
 
-void UIListTreeType::MoveRight(bool do_refresh)
+bool UIListTreeType::MoveRight(bool do_refresh)
 {
+    if(!currentpos || !currentlevel)
+    {
+        return true;
+    }
     if (currentpos->childCount() > 0)
     {
         currentlevel->SetActive(false);
@@ -509,7 +552,11 @@ void UIListTreeType::MoveRight(bool do_refresh)
         {
             Redraw();
         }
+
+        return true;
     }
+    
+    return false;
 }
 
 void UIListTreeType::calculateScreenArea()
@@ -537,36 +584,8 @@ void UIListTreeType::select()
     if(currentpos)
     {
         emit selected(currentpos);
+        emit itemSelected(this, currentpos);
     }
-/*
-        if(current_node->isSelectable())
-        {
-            active_node = current_node;
-            active_parent = active_node->getParent();
-            if(show_whole_tree)
-            {
-                emit requestUpdate(screen_corners[active_bin]);
-            }
-            else
-            {
-                refresh();
-            }
-            emit nodeSelected(current_node->getInt(), current_node->getAttributes());
-        }
-        else
-        {
-            GenericTree *first_leaf = current_node->findLeaf(tree_order);
-            if(first_leaf->isSelectable())
-            {
-                active_node = first_leaf;
-                active_parent = current_node;
-                active_parent->buildFlatListOfSubnodes(tree_order, scrambled_parents);
-                refresh();
-                emit nodeSelected(active_node->getInt(), active_node->getAttributes());
-            }
-        }
-    }
-*/
 }
 
 QStringList UIListTreeType::getRouteToCurrent()
@@ -623,7 +642,7 @@ void UIListTreeType::tryToSetCurrent(QStringList route)
     //  If we have no currentpos (no active node), we are done
     //
     
-    if(!currentpos)
+    if(!currentpos || !currentlevel)
     {
         return;
     }
@@ -681,17 +700,25 @@ void UIListTreeType::tryToSetCurrent(QStringList route)
         }
         ++it;
     }
+}
 
-    //
-    //  We need to make the buttons actually use currentpos, rather than
-    //  first child of the current level
-    //
-    
-//    if(!currentlevel->MoveToNamedPosition(currentpos->getString()))
-//    {
-//        cerr << "uilistbtntype.o: had a problem setting the current item" << endl;
-//    }
-    
+int UIListTreeType::getDepth()
+{
+    return curlevel;
+}
+
+void UIListTreeType::setActive(bool x)
+{
+    list_tree_active = x;
+    Redraw();
+}
+
+void UIListTreeType::enter()
+{
+    if(currentpos)
+    {
+        emit itemEntered(this, currentpos);
+    }
 }
 
 
@@ -1189,7 +1216,7 @@ bool UIListBtnType::MoveItemUpDown(UIListBtnTypeItem *item, bool flag)
     if (m_itemList.current() == item)
     {
         m_itemList.take();
-        cout << "speedy\n";
+        //  cout << "speedy\n";
     }
     else
         m_itemList.take(oldpos);
@@ -1208,7 +1235,19 @@ bool UIListBtnType::MoveItemUpDown(UIListBtnTypeItem *item, bool flag)
     return true;
 }
 
-void UIListBtnType::Draw(QPainter *p, int order, int)
+
+void UIListBtnType::Draw(QPainter *p, int order, int blah)
+{
+    //
+    //  Just call the other Draw() function. Tried to accomplish the same
+    //  goal with default parameters, but that broke MythGallery (?)
+    //
+
+    Draw(p, order, blah, true);
+}
+
+
+void UIListBtnType::Draw(QPainter *p, int order, int, bool active_on)
 {
     if (!m_visible)
         return;
@@ -1221,6 +1260,11 @@ void UIListBtnType::Draw(QPainter *p, int order, int)
 
     fontProp* font = m_active ? m_fontActive : m_fontInactive;
     
+    if(!active_on)
+    {
+        font = m_fontInactive;
+    }
+    
     p->setFont(font->face);
     p->setPen(font->color);
 
@@ -1231,20 +1275,19 @@ void UIListBtnType::Draw(QPainter *p, int order, int)
     while (it.current() && 
            (y - m_rect.y()) <= (m_contentsRect.height() - m_itemHeight)) 
     {
-        if (it.current()->getOverrideInactive())
+        if(active_on && it.current()->getOverrideInactive())
         {
             font = m_fontInactive;
             p->setFont(font->face);
             p->setPen(font->color);
-        }
-
-        it.current()->paint(p, font, x, y);
-
-        if (it.current()->getOverrideInactive())
-        {
+            it.current()->paint(p, font, x, y, active_on);
             font = m_active ? m_fontActive : m_fontInactive;;
             p->setFont(font->face);
             p->setPen(font->color);
+        }
+        else
+        {
+            it.current()->paint(p, font, x, y, active_on);
         }
 
         y += m_itemHeight + m_itemSpacing;
@@ -1600,14 +1643,25 @@ bool UIListBtnTypeItem::moveUpDown(bool flag)
     return m_parent->MoveItemUpDown(this, flag);
 }
 
-void UIListBtnTypeItem::paint(QPainter *p, fontProp *font, int x, int y)
+void UIListBtnTypeItem::paint(QPainter *p, fontProp *font, int x, int y, bool active_on)
 {
     if (this == m_parent->m_selItem)
     {
-        if (m_parent->m_active && !m_overrideInactive)
+        if (m_parent->m_active && !m_overrideInactive && active_on)
+        {
             p->drawPixmap(x, y, m_parent->m_itemSelActPix);
+        }
         else
-            p->drawPixmap(x, y, m_parent->m_itemSelInactPix);
+        {
+            if(active_on)
+            {
+                p->drawPixmap(x, y, m_parent->m_itemSelInactPix);
+            }
+            else
+            {
+                p->drawPixmap(x, y, m_parent->m_itemRegPix);
+            }
+        }
 
         if (m_parent->m_showArrow || m_showArrow)
         {
@@ -1618,10 +1672,22 @@ void UIListBtnTypeItem::paint(QPainter *p, fontProp *font, int x, int y)
     }
     else
     {
+
+        p->drawPixmap(x, y, m_parent->m_itemRegPix);
+        /*
+        
+            Don't understand this
+                    - thor
+                    
         if (m_parent->m_active && !m_overrideInactive)
+        {
             p->drawPixmap(x, y, m_parent->m_itemRegPix);
+        }
         else
+        {
             p->drawPixmap(x, y, m_parent->m_itemRegPix);
+        }
+        */
     }
 
     if (m_checkable)

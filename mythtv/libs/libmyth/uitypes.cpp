@@ -1515,6 +1515,10 @@ void UITextType::SetText(const QString &text)
 
 void UITextType::Draw(QPainter *dr, int drawlayer, int context)
 {
+    if(hidden)
+    {
+        return;
+    }
   if (m_context == context || m_context == -1)
     if (drawlayer == m_order)
     {

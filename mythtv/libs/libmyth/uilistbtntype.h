@@ -97,13 +97,16 @@ class UIListTreeType : public UIType
     void MoveDown(MovementUnit unit = MoveItem);
     void MoveUp(MovementUnit unit = MoveItem);
     void MoveLeft(bool do_refresh = true);
-    void MoveRight(bool do_refresh = true);
+    bool MoveRight(bool do_refresh = true);
     void calculateScreenArea();
     void GoHome();
     void select();
     QStringList getRouteToCurrent();
     void tryToSetCurrent(QStringList route);
-
+    int  getDepth();
+    void setActive(bool x);
+    bool isActive(){ return list_tree_active; } 
+    void enter();
 
   signals:
     
@@ -146,6 +149,8 @@ class UIListTreeType : public UIType
     int m_levelspacing;
 
     int m_order;
+
+    bool    list_tree_active;
 };
 
 class UIListBtnType : public UIType
@@ -164,6 +169,7 @@ class UIListBtnType : public UIType
     void  SetItemSelColor(const QColor& beg, const QColor& end, uint alpha);
     
     void  Draw(QPainter *p, int order, int);
+    void  Draw(QPainter *p, int order, int, bool active_on);
     void  SetActive(bool active);
     void  Reset();
 
@@ -305,7 +311,7 @@ class UIListBtnTypeItem
 
     bool moveUpDown(bool flag);
     
-    void paint(QPainter *p, fontProp *font, int x, int y);
+    void paint(QPainter *p, fontProp *font, int x, int y, bool active_on);
     
   protected:
     void  CalcDimensions(void);
