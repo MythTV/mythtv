@@ -158,12 +158,12 @@
                 <filename>music/mm-background.png</filename>
                 <position>0,10</position>
             </image>
-            -->
-            <!-- <image name="titlelines" draworder="0" fleximage="no">
-                <filename>trans-titles.png</filename>
+
+            <image name="titlelines" draworder="0" fleximage="no">
+                <filename>shared/trans-titles.png</filename>
                 <position>0,10</position>
             </image>
-	     -->
+            -->
             <image name="track_info_background" draworder="0" fleximage="no">
                 <filename>music/mm_track_info_background.png</filename>
                 <position>0,315</position>
@@ -226,17 +226,13 @@
                     <fcnfont name="inactive" function="inactive"></fcnfont>
                 </bin>
             </managedtreelist>
-
-            <!--
-                An image that go "on top" of the list bins
             
-
             <image name="showinglines" draworder="2" fleximage="yes">
                 <context>1</context>
-                <filename>music/mm-showings.png</filename>
+                <filename>playback_box/showings.png</filename>
                 <position>0,0</position>
             </image>
-            -->
+
             <!--
                 An image for when we're waiting for data
             -->
