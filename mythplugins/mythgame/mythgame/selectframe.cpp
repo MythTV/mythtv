@@ -92,6 +92,8 @@ void SelectFrame::focusOutEvent(QFocusEvent* e)
 void SelectFrame::CallSelection()
 {
   GameHandler::Launchgame(RomList->current());
+  raise();
+  setActiveWindow();
 }
 
 void SelectFrame::UpEvent()

@@ -14,6 +14,7 @@
 #include <unistd.h>
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/mythwidgets.h>
 
 #include <string>
 using namespace std;
@@ -404,13 +405,36 @@ void MameHandler::processGames()
 
 void MameHandler::start_game(RomInfo * romdata)
 {
-        FILE *command;
         QString exec;
         check_xmame_exe();
         makecmd_line(romdata->Romname(), &exec, static_cast<MameRomInfo*>(romdata));
-        command = popen(exec, "w");
-        /* Send a newline to *command in case xmame wants the user to "press any key" */
-        fprintf(command, "\n");
+
+        // Get count of roms used for total in progress bar
+        int romcount = 0;
+
+        QString romlistcmd;
+        makecmd_line("-lr " + romdata->Romname() + " 2>/dev/null", &romlistcmd, NULL);
+
+        FILE* romlist_info = popen(romlistcmd, "r");
+
+        char line[500];
+        while (fgets(line, 500 - 1, romlist_info))
+            ++romcount;
+        // Adjust for non rom lines.  I think it's always the same.
+        romcount -= 6;
+
+        FILE *command;
+        command = popen(exec + " 2>&1", "r");
+
+        MythProgressDialog pdial("Loading game...", romcount);
+        int loadprogress = 0;
+
+        while (fgets(line, 500 - 1, command))
+        {
+            if (strncmp(line, "loading rom", 11) == 0)
+                pdial.setProgress(++loadprogress);
+        }
+
         pclose(command);
 }
 

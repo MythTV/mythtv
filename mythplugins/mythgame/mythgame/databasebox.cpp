@@ -135,6 +135,8 @@ void DatabaseBox::doSelected(QListViewItem *item)
     if (tcitem->childCount() <= 0 && tcitem->parent())
     {
         GameHandler::Launchgame(tcitem->getRomInfo());
+        raise();
+        setActiveWindow();
     }
 }
 
