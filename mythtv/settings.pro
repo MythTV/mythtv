@@ -95,7 +95,6 @@ CONFIG += using_oss
 #DEFINES += USING_FIREWIRE
 #EXTRA_LIBS += -lraw1394 -liec61883
 
-
 # Joystick menu support
 CONFIG += using_joystick_menu
 
@@ -104,9 +103,9 @@ CONFIG += using_joystick_menu
 #LIRC_LIBS = -llirc_client
 
 # XvMC support, modify as necessary.
-CONFIG += using_xvmc
-DEFINES += USING_XVMC
-EXTRA_LIBS += -lXvMCNVIDIA -lXvMC
+#CONFIG += using_xvmc
+#DEFINES += USING_XVMC
+#EXTRA_LIBS += -lXvMCNVIDIA -lXvMC
 
 # XvMC_VLD support, modify as necessary. Incompatible with normal XvMC support.
 #CONFIG += using_xvmc using_xvmc_vld
