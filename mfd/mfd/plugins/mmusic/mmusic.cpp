@@ -844,11 +844,14 @@ void MMusicWatcher::checkDatabaseAgainstMaster(const QString &startdir)
     //      File in database & digests match --> excellent
     //
     
+    int delete_me_counter = 0;
+    
     MusicFileMap::Iterator it;
     for ( it = master_list.begin(); it != master_list.end(); )
     {
         if(!it.data().checkedDatabase())
         {
+            ++delete_me_counter;
             AudioMetadata *new_item = loadFromDatabase(it.key(), startdir);
             if(!new_item)
             {
@@ -867,11 +870,11 @@ void MMusicWatcher::checkDatabaseAgainstMaster(const QString &startdir)
                     //  Excellent
                     //
 
-                    new_metadata->insert(new_item->getId(), new_item);
-                    metadata_additions.push_back(new_item->getId());
                     it.data().checkedDatabase(true);
                     it.data().setMetadataId(new_item->getId());
                     it.data().setDbId(new_item->getDbId());
+                    new_metadata->insert(new_item->getId(), new_item);
+                    metadata_additions.push_back(new_item->getId());
                 }
                 else
                 {
@@ -882,11 +885,11 @@ void MMusicWatcher::checkDatabaseAgainstMaster(const QString &startdir)
                     if(updateMetadata(new_item))
                     {
                         persistMetadata(new_item);
-                        new_metadata->insert(new_item->getId(), new_item);
-                        metadata_additions.push_back(new_item->getId());
                         it.data().checkedDatabase(true);
                         it.data().setMetadataId(new_item->getId());
                         it.data().setDbId(new_item->getDbId());
+                        new_metadata->insert(new_item->getId(), new_item);
+                        metadata_additions.push_back(new_item->getId());
                     }
                     else
                     {
@@ -1206,6 +1209,7 @@ AudioMetadata *MMusicWatcher::checkNewFile(
         new_item->setDateAdded(QDateTime::currentDateTime());
         new_item->setLastPlayed(earliest_possible);
         new_item->setId(bumpMetadataId());
+        new_item->setCollectionId(container_id);
         
         log(QString("added audio file: \"%1\"").arg(filename), 4);
         
