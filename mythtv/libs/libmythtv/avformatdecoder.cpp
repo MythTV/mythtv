@@ -208,10 +208,10 @@ URLProtocol rbuffer_protocol = {
     NULL
 };
 
-static void avf_write_packet(void *opaque, uint8_t *buf, int buf_size)
+static int avf_write_packet(void *opaque, uint8_t *buf, int buf_size)
 {
     URLContext *h = (URLContext *)opaque;
-    url_write(h, buf, buf_size);
+    return url_write(h, buf, buf_size);
 }
 
 static int avf_read_packet(void *opaque, uint8_t *buf, int buf_size)

@@ -19,6 +19,9 @@
  */
 #include "avformat.h"
 
+/* XXX: this is a hack */
+extern int loop_input;
+
 typedef struct {
     int img_first;
     int img_last;
@@ -37,6 +40,12 @@ static const IdStrMap img_tags[] = {
     { CODEC_ID_MJPEG     , "jpeg"},
     { CODEC_ID_MJPEG     , "jpg"},
     { CODEC_ID_LJPEG     , "ljpg"},
+    { CODEC_ID_PNG       , "png"},
+    { CODEC_ID_PPM       , "ppm"},
+    { CODEC_ID_PGM       , "pgm"},
+    { CODEC_ID_PGMYUV    , "pgmyuv"},
+    { CODEC_ID_PBM       , "pbm"},
+    { CODEC_ID_PAM       , "pam"},
     { CODEC_ID_MPEG1VIDEO, "mpg1-img"},
     { CODEC_ID_MPEG2VIDEO, "mpg2-img"},
     { CODEC_ID_MPEG4     , "mpg4-img"},
@@ -46,8 +55,9 @@ static const IdStrMap img_tags[] = {
 
 static enum CodecID av_str2id(const IdStrMap *tags, const char *str)
 {
-    while(*str && *str!='.') str++;
-    if(*str) str++;
+    str= strrchr(str, '.');
+    if(!str) return CODEC_ID_NONE;
+    str++;
 
     while (tags->id) {
         int i;
@@ -131,6 +141,10 @@ static int image_probe(AVProbeData *p)
         return 0;
 }
 
+enum CodecID av_guess_image2_codec(const char *filename){
+    return av_str2id(img_tags, filename);
+}
+
 static int img_read_header(AVFormatContext *s1, AVFormatParameters *ap)
 {
     VideoData *s = s1->priv_data;
@@ -152,8 +166,10 @@ static int img_read_header(AVFormatContext *s1, AVFormatParameters *ap)
     /* find format */
     if (s1->iformat->flags & AVFMT_NOFILE)
         s->is_pipe = 0;
-    else
+    else{
         s->is_pipe = 1;
+        st->need_parsing= 1;
+    }
         
     if (!ap || !ap->frame_rate) {
         st->codec.frame_rate      = 25;
@@ -176,8 +192,16 @@ static int img_read_header(AVFormatContext *s1, AVFormatParameters *ap)
                         st->codec.frame_rate_base) / st->codec.frame_rate;
     }
     
-    st->codec.codec_type = CODEC_TYPE_VIDEO;
-    st->codec.codec_id = av_str2id(img_tags, s->path);
+    if(ap->video_codec_id){
+        st->codec.codec_type = CODEC_TYPE_VIDEO;
+        st->codec.codec_id = ap->video_codec_id;
+    }else if(ap->audio_codec_id){
+        st->codec.codec_type = CODEC_TYPE_AUDIO;
+        st->codec.codec_id = ap->audio_codec_id;
+    }else{
+        st->codec.codec_type = CODEC_TYPE_VIDEO;
+        st->codec.codec_id = av_str2id(img_tags, s->path);
+    }
 
     return 0;
  
@@ -195,9 +219,9 @@ static int img_read_packet(AVFormatContext *s1, AVPacket *pkt)
 
     if (!s->is_pipe) {
         /* loop over input */
-/*        if (loop_input && s->img_number > s->img_last) {
+        if (loop_input && s->img_number > s->img_last) {
             s->img_number = s->img_first;
-        }*/
+        }
         if (get_frame_filename(filename, sizeof(filename),
                                s->path, s->img_number)<0 && s->img_number > 1)
             return AVERROR_IO;
@@ -227,6 +251,7 @@ static int img_read_packet(AVFormatContext *s1, AVPacket *pkt)
         av_free_packet(pkt);
         return AVERROR_IO; /* signal EOF */
     } else {
+        pkt->size = ret;
         s->img_count++;
         s->img_number++;
         return 0;

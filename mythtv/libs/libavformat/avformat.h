@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#define LIBAVFORMAT_BUILD       4616
+#define LIBAVFORMAT_BUILD       4621
 
 #define LIBAVFORMAT_VERSION_INT FFMPEG_VERSION_INT
 #define LIBAVFORMAT_VERSION     FFMPEG_VERSION
@@ -43,6 +43,8 @@ typedef struct AVPacket {
 } AVPacket; 
 #define PKT_FLAG_KEY   0x0001
 
+void av_destruct_packet_nofree(AVPacket *pkt);
+
 /* initialize optional fields of a packet */
 static inline void av_init_packet(AVPacket *pkt)
 {
@@ -52,6 +54,7 @@ static inline void av_init_packet(AVPacket *pkt)
     pkt->flags = 0;
     pkt->stream_index = 0;
     pkt->startpos = 0;
+    pkt->destruct= av_destruct_packet_nofree;
 }
 
 int av_new_packet(AVPacket *pkt, int size);
@@ -114,6 +117,8 @@ typedef struct AVFormatParameters {
                                   mpeg2ts_raw is TRUE */
     int initial_pause:1;       /* do not begin to play the stream
                                   immediately (RTSP only) */
+    enum CodecID video_codec_id;
+    enum CodecID audio_codec_id;
 } AVFormatParameters;
 
 #define AVFMT_NOFILE        0x0001 /* no file should be opened */
@@ -139,6 +144,7 @@ typedef struct AVOutputFormat {
     int flags;
     /* currently only used to set pixel format if not YUV420P */
     int (*set_parameters)(struct AVFormatContext *, AVFormatParameters *);
+    int (*interleave_packet)(struct AVFormatContext *, AVPacket *out, AVPacket*in, int flush);
     /* private fields */
     struct AVOutputFormat *next;
 } AVOutputFormat;
@@ -163,10 +169,15 @@ typedef struct AVInputFormat {
     /* close the stream. The AVFormatContext and AVStreams are not
        freed by this function */
     int (*read_close)(struct AVFormatContext *);
-    /* seek at or before a given timestamp (given in AV_TIME_BASE
-       units) relative to the frames in stream component stream_index */
+    /** 
+     * seek to a given timestamp relative to the frames in
+     * stream component stream_index
+     * @param stream_index must not be -1
+     * @param flags selects which direction should be preferred if no exact
+     *              match is available
+     */
     int (*read_seek)(struct AVFormatContext *, 
-                     int stream_index, int64_t timestamp);
+                     int stream_index, int64_t timestamp, int flags);
     /**
      * gets the next timestamp in AV_TIME_BASE units.
      */
@@ -252,7 +263,7 @@ typedef struct AVStream {
 
 /* format I/O context */
 typedef struct AVFormatContext {
-    AVClass *av_class; /* set by av_alloc_format_context */
+    const AVClass *av_class; /* set by av_alloc_format_context */
     /* can only be iformat or oformat, not both at the same time */
     struct AVInputFormat *iformat;
     struct AVOutputFormat *oformat;
@@ -304,6 +315,11 @@ typedef struct AVFormatContext {
     int64_t data_offset; /* offset of the first packet */
     int index_built;
 
+    int mux_rate;
+    int packet_size;
+    int preload;
+    int max_delay;
+
     int build_index;
     void (*streams_changed)(void*);
     void *stream_change_data;
@@ -353,6 +369,7 @@ typedef struct AVImageFormat {
 void av_register_image_format(AVImageFormat *img_fmt);
 AVImageFormat *av_probe_image_format(AVProbeData *pd);
 AVImageFormat *guess_image_format(const char *filename);
+enum CodecID av_guess_image2_codec(const char *filename);
 int av_read_image(ByteIOContext *pb, const char *filename,
                   AVImageFormat *fmt,
                   int (*alloc_cb)(void *, AVImageInfo *info), void *opaque);
@@ -438,7 +455,7 @@ int ff_wav_init(void);
 
 /* raw.c */
 int pcm_read_seek(AVFormatContext *s, 
-                  int stream_index, int64_t timestamp);
+                  int stream_index, int64_t timestamp, int flags);
 int raw_init(void);
 
 /* mp3.c */
@@ -496,6 +513,12 @@ int vmd_init(void);
 /* matroska.c */
 int matroska_init(void);
 
+/* sol.c */
+int sol_init(void);
+
+/* electronicarts.c */
+int ea_init(void);
+
 //#include "rtp.h"
 
 //#include "rtsp.h"
@@ -510,6 +533,8 @@ AVOutputFormat *guess_stream_format(const char *short_name,
                                     const char *filename, const char *mime_type);
 AVOutputFormat *guess_format(const char *short_name, 
                              const char *filename, const char *mime_type);
+enum CodecID av_guess_codec(AVOutputFormat *fmt, const char *short_name,
+                            const char *filename, const char *mime_type, enum CodecType type);
 
 void av_hex_dump(FILE *f, uint8_t *buf, int size);
 void av_pkt_dump(FILE *f, AVPacket *pkt, int dump_payload);
@@ -526,6 +551,7 @@ void fifo_free(FifoBuffer *f);
 int fifo_size(FifoBuffer *f, uint8_t *rptr);
 int fifo_read(FifoBuffer *f, uint8_t *buf, int buf_size, uint8_t **rptr_ptr);
 void fifo_write(FifoBuffer *f, uint8_t *buf, int size, uint8_t **wptr_ptr);
+int put_fifo(ByteIOContext *pb, FifoBuffer *f, int buf_size, uint8_t **rptr_ptr);
 
 /* media file input */
 AVInputFormat *av_find_input_format(const char *short_name);
@@ -553,7 +579,7 @@ void av_estimate_timings(AVFormatContext *ic);
 int av_read_packet(AVFormatContext *s, AVPacket *pkt);
 int av_read_frame(AVFormatContext *s, AVPacket *pkt);
 void av_read_frame_flush(AVFormatContext *s);
-int av_seek_frame(AVFormatContext *s, int stream_index, int64_t timestamp);
+int av_seek_frame(AVFormatContext *s, int stream_index, int64_t timestamp, int flags);
 int av_read_play(AVFormatContext *s);
 int av_read_pause(AVFormatContext *s);
 void av_close_input_file(AVFormatContext *s);
@@ -563,11 +589,14 @@ void av_remove_stream(AVFormatContext *s, int id);
 void av_set_pts_info(AVStream *s, int pts_wrap_bits,
                      int pts_num, int pts_den);
 
+#define AVSEEK_FLAG_BACKWARD 1 ///< seek backward
+#define AVSEEK_FLAG_BYTE     2 ///< seeking based on position in bytes
+
 int av_find_default_stream_index(AVFormatContext *s);
-int av_index_search_timestamp(AVStream *st, int timestamp);
+int av_index_search_timestamp(AVStream *st, int timestamp, int flags);
 int av_add_index_entry(AVStream *st,
                        int64_t pos, int64_t timestamp, int distance, int flags);
-int av_seek_frame_binary(AVFormatContext *s, int stream_index, int64_t target_ts);
+int av_seek_frame_binary(AVFormatContext *s, int stream_index, int64_t target_ts, int flags);
 
 /* media file output */
 int av_set_parameters(AVFormatContext *s, AVFormatParameters *ap);
@@ -605,6 +634,7 @@ int audio_init(void);
 
 /* DV1394 */
 int dv1394_init(void);
+int dc1394_init(void);
 
 #ifdef HAVE_AV_CONFIG_H
 

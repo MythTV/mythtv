@@ -4,12 +4,20 @@
 #include <stdlib.h>
 #include "../dsputil.h"
 
+#ifdef ARCH_X86_64
+#  define REG_b "rbx"
+#  define REG_S "rsi"
+#else
+#  define REG_b "ebx"
+#  define REG_S "esi"
+#endif
+
 /* ebx saving is necessary for PIC. gcc seems unable to see it alone */
 #define cpuid(index,eax,ebx,ecx,edx)\
     __asm __volatile\
-	("movl %%ebx, %%esi\n\t"\
+	("mov %%"REG_b", %%"REG_S"\n\t"\
          "cpuid\n\t"\
-         "xchgl %%ebx, %%esi"\
+         "xchg %%"REG_b", %%"REG_S\
          : "=a" (eax), "=S" (ebx),\
            "=c" (ecx), "=d" (edx)\
          : "0" (index));
@@ -19,29 +27,30 @@ int mm_support(void)
 {
     int rval;
     int eax, ebx, ecx, edx;
+    long a, c;
     
     __asm__ __volatile__ (
                           /* See if CPUID instruction is supported ... */
                           /* ... Get copies of EFLAGS into eax and ecx */
                           "pushf\n\t"
-                          "popl %0\n\t"
-                          "movl %0, %1\n\t"
+                          "pop %0\n\t"
+                          "mov %0, %1\n\t"
                           
                           /* ... Toggle the ID bit in one copy and store */
                           /*     to the EFLAGS reg */
-                          "xorl $0x200000, %0\n\t"
+                          "xor $0x200000, %0\n\t"
                           "push %0\n\t"
                           "popf\n\t"
                           
                           /* ... Get the (hopefully modified) EFLAGS */
                           "pushf\n\t"
-                          "popl %0\n\t"
-                          : "=a" (eax), "=c" (ecx)
+                          "pop %0\n\t"
+                          : "=a" (a), "=c" (c)
                           :
                           : "cc" 
                           );
     
-    if (eax == ecx)
+    if (a == c)
         return 0; /* CPUID not supported */
     
     cpuid(0, eax, ebx, ecx, edx);

@@ -281,7 +281,7 @@ static void generate_len_table(uint8_t *dst, uint64_t *stats, int size){
             for(len=0; up[index] != -1; len++)
                 index= up[index];
                 
-            if(len > 32) break;
+            if(len >= 32) break;
             
             dst[i]= len;
         }
@@ -409,7 +409,10 @@ s->bgr32=1;
             return -1;
     }
     
-    s->interlaced= height > 288;
+    if(((uint8_t*)avctx->extradata)[2] & 0x20)
+	s->interlaced= ((uint8_t*)avctx->extradata)[2] & 0x10 ? 1 : 0;
+    else
+	s->interlaced= height > 288;
     
     switch(s->bitstream_bpp){
     case 12:
@@ -434,8 +437,8 @@ s->bgr32=1;
         assert(0);
     }
     
-//    printf("pred:%d bpp:%d hbpp:%d il:%d\n", s->predictor, s->bitstream_bpp, avctx->bits_per_sample, s->interlaced);
-    
+//    av_log(NULL, AV_LOG_DEBUG, "pred:%d bpp:%d hbpp:%d il:%d\n", s->predictor, s->bitstream_bpp, avctx->bits_per_sample, s->interlaced);
+
     return 0;
 }
 
@@ -485,6 +488,10 @@ static int encode_init(AVCodecContext *avctx)
     
     switch(avctx->pix_fmt){
     case PIX_FMT_YUV420P:
+        if(avctx->strict_std_compliance>=0){
+            av_log(avctx, AV_LOG_ERROR, "Warning: YV12-huffyuv is not supported by windows huffyuv use a different colorspace or use (v)strict=-1\n");
+            return -1;
+        }
         s->bitstream_bpp= 12;
         break;
     case PIX_FMT_YUV422P:
@@ -497,10 +504,14 @@ static int encode_init(AVCodecContext *avctx)
     avctx->bits_per_sample= s->bitstream_bpp;
     s->decorrelate= s->bitstream_bpp >= 24;
     s->predictor= avctx->prediction_method;
+    s->interlaced= avctx->flags&CODEC_FLAG_INTERLACED_ME ? 1 : 0;
+    if(s->interlaced != ( height > 288 )){
+        av_log(avctx, AV_LOG_INFO, "using huffyuv 2.2.0 or newer interlacing flag\n");
+    }
     
     ((uint8_t*)avctx->extradata)[0]= s->predictor;
     ((uint8_t*)avctx->extradata)[1]= s->bitstream_bpp;
-    ((uint8_t*)avctx->extradata)[2]=
+    ((uint8_t*)avctx->extradata)[2]= 0x20 | (s->interlaced ? 0x10 : 0);
     ((uint8_t*)avctx->extradata)[3]= 0;
     s->avctx->extradata_size= 4;
     
@@ -546,8 +557,6 @@ static int encode_init(AVCodecContext *avctx)
         for(j=0; j<256; j++)
             s->stats[i][j]= 0;
     
-    s->interlaced= height > 288;
-
 //    printf("pred:%d bpp:%d hbpp:%d il:%d\n", s->predictor, s->bitstream_bpp, avctx->bits_per_sample, s->interlaced);
 
     s->picture_number=0;
@@ -887,7 +896,7 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size, uint8
                     
                     add_left_prediction_bgr32(p->data[0] + p->linesize[0]*y, s->temp[0], width, &leftr, &leftg, &leftb);
                     if(s->predictor == PLANE){
-                        if((y&s->interlaced)==0 && y<s->height-2){
+                        if((y&s->interlaced)==0 && y<s->height-1-s->interlaced){
                             s->dsp.add_bytes(p->data[0] + p->linesize[0]*y, 
                                              p->data[0] + p->linesize[0]*y + fake_ystride, fake_ystride);
                         }
@@ -969,8 +978,8 @@ static int encode_frame(AVCodecContext *avctx, unsigned char *buf, int buf_size,
             }
             
             lefty= sub_left_prediction(s, s->temp[0], p->data[0]+fake_ystride, 4, lefty);
-            leftu= sub_left_prediction(s, s->temp[1], p->data[1]+fake_ystride, 2, leftu);
-            leftv= sub_left_prediction(s, s->temp[2], p->data[2]+fake_ystride, 2, leftv);
+            leftu= sub_left_prediction(s, s->temp[1], p->data[1]+fake_ustride, 2, leftu);
+            leftv= sub_left_prediction(s, s->temp[2], p->data[2]+fake_vstride, 2, leftv);
         
             encode_422_bitstream(s, 4);
 
@@ -1068,6 +1077,7 @@ static int encode_frame(AVCodecContext *avctx, unsigned char *buf, int buf_size,
     }else{
         flush_put_bits(&s->pb);
         s->dsp.bswap_buf((uint32_t*)buf, (uint32_t*)buf, size);
+        avctx->stats_out[0] = '\0';
     }
     
     s->picture_number++;

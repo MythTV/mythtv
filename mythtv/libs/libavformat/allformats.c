@@ -26,6 +26,12 @@
  */
 void av_register_all(void)
 {
+    static int inited = 0;
+    
+    if (inited != 0)
+        return;
+    inited = 1;
+
     avcodec_init();
     avcodec_register_all();
 
@@ -85,46 +91,56 @@ void av_register_all(void)
 #ifndef CONFIG_WIN32
     ffm_init();
 #endif
-//#ifdef CONFIG_VIDEO4LINUX
-//    video_grab_init();
-//#endif
+#ifdef CONFIG_VIDEO4LINUX
+    //video_grab_init();
+#endif
 #if defined(CONFIG_AUDIO_OSS) || defined(CONFIG_AUDIO_BEOS)
     audio_init();
 #endif
 
-//#ifdef CONFIG_DV1394
-//    dv1394_init();
-//#endif
+#ifdef CONFIG_DV1394
+    //dv1394_init();
+#endif
+
+#ifdef CONFIG_DC1394
+    //dc1394_init();
+#endif
 
     nut_init();
     matroska_init();
+    sol_init();
+    ea_init();
 
 #ifdef CONFIG_ENCODERS
     /* image formats */
-//    av_register_image_format(&pnm_image_format);
-//    av_register_image_format(&pbm_image_format);
-//    av_register_image_format(&pgm_image_format);
-//    av_register_image_format(&ppm_image_format);
-//    av_register_image_format(&pam_image_format);
-//    av_register_image_format(&pgmyuv_image_format);
-//    av_register_image_format(&yuv_image_format);
-#ifdef CONFIG_ZLIB
-//    av_register_image_format(&png_image_format);
+#if 0
+    av_register_image_format(&pnm_image_format);
+    av_register_image_format(&pbm_image_format);
+    av_register_image_format(&pgm_image_format);
+    av_register_image_format(&ppm_image_format);
+    av_register_image_format(&pam_image_format);
+    av_register_image_format(&pgmyuv_image_format);
 #endif
-//    av_register_image_format(&jpeg_image_format);
-//    av_register_image_format(&gif_image_format);
-//    av_register_image_format(&sgi_image_format);
+    //av_register_image_format(&yuv_image_format);
+#if 0
+#ifdef CONFIG_ZLIB
+    av_register_image_format(&png_image_format);
+#endif
+    av_register_image_format(&jpeg_image_format);
+#endif
+    //av_register_image_format(&gif_image_format);
+    //av_register_image_format(&sgi_image_format);
 #endif //CONFIG_ENCODERS
 
     /* file protocols */
     register_protocol(&file_protocol);
     register_protocol(&pipe_protocol);
-//#ifdef CONFIG_NETWORK
-//    rtsp_init();
-//    rtp_init();
-//    register_protocol(&udp_protocol);
-//    register_protocol(&rtp_protocol);
-//    register_protocol(&tcp_protocol);
-//    register_protocol(&http_protocol);
-//#endif
+#if 0 //def CONFIG_NETWORK
+    rtsp_init();
+    rtp_init();
+    register_protocol(&udp_protocol);
+    register_protocol(&rtp_protocol);
+    register_protocol(&tcp_protocol);
+    register_protocol(&http_protocol);
+#endif
 }

@@ -115,6 +115,7 @@ static const CodecTag mov_video_tags[] = {
     { CODEC_ID_8BPS, MKTAG('8', 'B', 'P', 'S') }, /* Planar RGB (8BPS) */
     { CODEC_ID_SMC, MKTAG('s', 'm', 'c', ' ') }, /* Apple Graphics (SMC) */
     { CODEC_ID_QTRLE, MKTAG('r', 'l', 'e', ' ') }, /* Apple Animation (RLE) */
+    { CODEC_ID_QDRAW, MKTAG('q', 'd', 'r', 'w') }, /* QuickDraw */
     { CODEC_ID_NONE, 0 },
 };
 
@@ -238,7 +239,7 @@ typedef struct MOVStreamContext {
     long current_sample;
     long left_in_chunk; /* how many samples before next chunk */
     /* specific MPEG4 header which is added at the beginning of the stream */
-    int header_len;
+    unsigned int header_len;
     uint8_t *header_data;
     MOV_esds_t esds;
 } MOVStreamContext;
@@ -568,7 +569,7 @@ static int mov_read_esds(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
 #ifdef DEBUG
 	    av_log(NULL, AV_LOG_DEBUG, "Specific MPEG4 header len=%d\n", len);
 #endif
-	    st->codec.extradata = (uint8_t*) av_mallocz(len);
+	    st->codec.extradata = (uint8_t*) av_mallocz(len + FF_INPUT_BUFFER_PADDING_SIZE);
 	    if (st->codec.extradata) {
 		get_buffer(pb, st->codec.extradata, len);
 		st->codec.extradata_size = len;
@@ -679,7 +680,7 @@ static int mov_read_smi(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
     // this should be fixed and just SMI header should be passed
     av_free(st->codec.extradata);
     st->codec.extradata_size = 0x5a + atom.size;
-    st->codec.extradata = (uint8_t*) av_mallocz(st->codec.extradata_size);
+    st->codec.extradata = (uint8_t*) av_mallocz(st->codec.extradata_size + FF_INPUT_BUFFER_PADDING_SIZE);
 
     if (st->codec.extradata) {
 	strcpy(st->codec.extradata, "SVQ3"); // fake
@@ -1845,7 +1846,7 @@ readchunk:
 /**
  * Seek method based on the one described in the Appendix C of QTFileFormat.pdf
  */
-static int mov_read_seek(AVFormatContext *s, int stream_index, int64_t timestamp)
+static int mov_read_seek(AVFormatContext *s, int stream_index, int64_t timestamp, int flags)
 {
     MOVContext* mov = (MOVContext *) s->priv_data;
     MOVStreamContext* sc;

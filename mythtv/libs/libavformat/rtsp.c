@@ -211,7 +211,7 @@ static void sdp_parse_fmtp(AVCodecContext *codec, const char *p)
             if (!strcmp(attr, "config")) {
                 /* decode the hexa encoded parameter */
                 len = hex_to_data(NULL, value);
-                codec->extradata = av_mallocz(len);
+                codec->extradata = av_mallocz(len + FF_INPUT_BUFFER_PADDING_SIZE);
                 if (!codec->extradata)
                     goto fail;
                 codec->extradata_size = len;
@@ -1111,7 +1111,7 @@ static int rtsp_read_pause(AVFormatContext *s)
 }
 
 static int rtsp_read_seek(AVFormatContext *s, int stream_index, 
-                          int64_t timestamp)
+                          int64_t timestamp, int flags)
 {
     RTSPState *rt = s->priv_data;
     

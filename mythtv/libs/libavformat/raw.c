@@ -60,6 +60,7 @@ static int raw_read_header(AVFormatContext *s, AVFormatParameters *ap)
         case CODEC_TYPE_AUDIO:
             st->codec.sample_rate = ap->sample_rate;
             st->codec.channels = ap->channels;
+            av_set_pts_info(st, 64, 1, st->codec.sample_rate);
             break;
         case CODEC_TYPE_VIDEO:
             st->codec.frame_rate      = ap->frame_rate;
@@ -126,7 +127,7 @@ static int raw_read_close(AVFormatContext *s)
 }
 
 int pcm_read_seek(AVFormatContext *s, 
-                  int stream_index, int64_t timestamp)
+                  int stream_index, int64_t timestamp, int flags)
 {
     AVStream *st;
     int block_align, byte_rate;
@@ -158,8 +159,11 @@ int pcm_read_seek(AVFormatContext *s,
         return -1;
 
     /* compute the position by aligning it to block_align */
-    pos = av_rescale(timestamp * byte_rate, st->time_base.num, st->time_base.den);
-    pos = (pos / block_align) * block_align;
+    pos = av_rescale_rnd(timestamp * byte_rate, 
+                         st->time_base.num, 
+                         st->time_base.den * (int64_t)block_align,
+                         (flags & AVSEEK_FLAG_BACKWARD) ? AV_ROUND_DOWN : AV_ROUND_UP);
+    pos *= block_align;
 
     /* recompute exact position */
     st->cur_dts = av_rescale(pos, st->time_base.den, byte_rate * (int64_t)st->time_base.num);
@@ -339,6 +343,21 @@ AVInputFormat h261_iformat = {
     .extensions = "h261",
     .value = CODEC_ID_H261,
 };
+
+#ifdef CONFIG_ENCODERS
+AVOutputFormat h261_oformat = {
+    "h261",
+    "raw h261",
+    "video/x-h261",
+    "h261",
+    0,
+    0,
+    CODEC_ID_H261,
+    raw_write_header,
+    raw_write_packet,
+    raw_write_trailer,
+};
+#endif //CONFIG_ENCODERS
 
 AVInputFormat h263_iformat = {
     "h263",
@@ -557,7 +576,7 @@ static int rawvideo_read_packet(AVFormatContext *s, AVPacket *pkt)
 
     packet_size = avpicture_get_size(st->codec.pix_fmt, width, height);
     if (packet_size < 0)
-        av_abort();
+        return -1;
 
     if (av_new_packet(pkt, packet_size) < 0)
         return AVERROR_IO;
@@ -644,6 +663,7 @@ int raw_init(void)
     av_register_input_format(&dts_iformat);
 
     av_register_input_format(&h261_iformat);
+    av_register_output_format(&h261_oformat);
 
     av_register_input_format(&h263_iformat);
     av_register_output_format(&h263_oformat);

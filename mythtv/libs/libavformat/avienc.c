@@ -134,6 +134,7 @@ const CodecTag codec_bmp_tags[] = {
     { CODEC_ID_MPEG1VIDEO, MKTAG('V', 'C', 'R', '2') }, 
     { CODEC_ID_MPEG1VIDEO, 0x10000001 }, 
     { CODEC_ID_MPEG2VIDEO, 0x10000002 }, 
+    { CODEC_ID_MPEG2VIDEO, MKTAG('D', 'V', 'R', ' ') },
     { CODEC_ID_MJPEG, MKTAG('M', 'J', 'P', 'G') },
     { CODEC_ID_MJPEG, MKTAG('L', 'J', 'P', 'G') },
     { CODEC_ID_LJPEG, MKTAG('L', 'J', 'P', 'G') },
@@ -167,6 +168,11 @@ const CodecTag codec_bmp_tags[] = {
     { CODEC_ID_FLV1, MKTAG('F', 'L', 'V', '1') },
     { CODEC_ID_SVQ1, MKTAG('s', 'v', 'q', '1') },
     { CODEC_ID_TSCC, MKTAG('t', 's', 'c', 'c') },
+    { CODEC_ID_ULTI, MKTAG('U', 'L', 'T', 'I') },
+    { CODEC_ID_VIXL, MKTAG('V', 'I', 'X', 'L') },
+    { CODEC_ID_QPEG, MKTAG('Q', 'P', 'E', 'G') },
+    { CODEC_ID_QPEG, MKTAG('Q', '1', '.', '0') },
+    { CODEC_ID_QPEG, MKTAG('Q', '1', '.', '1') },
     { CODEC_ID_RAWVIDEO, 0 },
     { 0, 0 },
 };
@@ -181,7 +187,7 @@ unsigned int codec_get_tag(const CodecTag *tags, int id)
     return 0;
 }
 
-static unsigned int codec_get_asf_tag(const CodecTag *tags, int id)
+static unsigned int codec_get_asf_tag(const CodecTag *tags, unsigned int id)
 {
     while (tags->id != 0) {
         if (!tags->invalid_asf && tags->id == id)
@@ -248,33 +254,24 @@ void put_bmp_header(ByteIOContext *pb, AVCodecContext *enc, const CodecTag *tags
         put_byte(pb, 0);
 }
 
-static void parse_specific_params(AVCodecContext *stream, int *au_byterate, int *au_ssize, int *au_scale)
+static void parse_specific_params(AVCodecContext *stream, int *au_rate, int *au_ssize, int *au_scale)
 {
-    switch(stream->codec_id) {
-    case CODEC_ID_PCM_S16LE:
-       *au_scale = *au_ssize = 2*stream->channels;
-       *au_byterate = *au_ssize * stream->sample_rate;
-        break;
-    case CODEC_ID_PCM_U8:
-    case CODEC_ID_PCM_ALAW:
-    case CODEC_ID_PCM_MULAW:
-        *au_scale = *au_ssize = stream->channels;
-        *au_byterate = *au_ssize * stream->sample_rate;
-        break;
-    case CODEC_ID_MP2:
-        *au_ssize = 1;
-        *au_scale = 1;
-        *au_byterate = stream->bit_rate / 8;
-    case CODEC_ID_MP3:
-        *au_ssize = 1;
-        *au_scale = 1;
-        *au_byterate = stream->bit_rate / 8;    
-    default:
-        *au_ssize = 1;
-        *au_scale = 1; 
-        *au_byterate = stream->bit_rate / 8;
-        break;
+    int gcd;
+
+    *au_ssize= stream->block_align;
+    if(stream->frame_size && stream->sample_rate){
+        *au_scale=stream->frame_size;
+        *au_rate= stream->sample_rate;
+    }else if(stream->codec_type == CODEC_TYPE_VIDEO){
+        *au_scale= stream->frame_rate_base;
+        *au_rate = stream->frame_rate;
+    }else{
+        *au_scale= stream->block_align ? stream->block_align*8 : 8;
+        *au_rate = stream->bit_rate;
     }
+    gcd= ff_gcd(*au_scale, *au_rate);
+    *au_scale /= gcd;
+    *au_rate /= gcd;
 }
 
 static offset_t avi_start_new_riff(AVIContext *avi, ByteIOContext *pb, 
@@ -421,7 +418,7 @@ static int avi_write_header(AVFormatContext *s)
             put_le32(pb, 0);
             break;
         default:
-            av_abort();
+            return -1;
         }
         end_tag(pb, strh);
 
@@ -437,7 +434,7 @@ static int avi_write_header(AVFormatContext *s)
             }
             break;
         default:
-            av_abort();
+            return -1;
         }
         end_tag(pb, strf);
 	
@@ -592,18 +589,12 @@ static int avi_write_idx1(AVFormatContext *s)
             if (avi->frames_hdr_strm[n] != 0) {
                 stream = &s->streams[n]->codec;
                 url_fseek(pb, avi->frames_hdr_strm[n], SEEK_SET);
-                if (stream->codec_type == CODEC_TYPE_VIDEO) {
-                    put_le32(pb, stream->frame_number); 
-                    if (nb_frames < stream->frame_number)
-                        nb_frames = stream->frame_number;
+                parse_specific_params(stream, &au_byterate, &au_ssize, &au_scale);
+                if (au_ssize == 0) {
+                    put_le32(pb, stream->frame_number);
+                    nb_frames += stream->frame_number;
                 } else {
-                    if (stream->codec_id == CODEC_ID_MP2 || stream->codec_id == CODEC_ID_MP3) {
-                        put_le32(pb, stream->frame_number);
-                        nb_frames += stream->frame_number;
-                    } else {
-                        parse_specific_params(stream, &au_byterate, &au_ssize, &au_scale);
-                        put_le32(pb, avi->audio_strm_length[n] / au_ssize);
-                    }
+                    put_le32(pb, avi->audio_strm_length[n] / au_ssize);
                 }
             }
        }

@@ -20,8 +20,8 @@ INCLUDEPATH = ../../
 # out of registers
 QMAKE_CFLAGS_SHLIB = 
 
-QMAKE_CFLAGS_RELEASE = $$OPTFLAGS -DPIC -fPIC -fomit-frame-pointer -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
-QMAKE_CFLAGS_DEBUG = -g -O -DHAVE_AV_CONFIG_H -I.. -DPIC -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
+QMAKE_CFLAGS_RELEASE += $$OPTFLAGS -DPIC -fPIC -fomit-frame-pointer -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
+QMAKE_CFLAGS_DEBUG += -g -O -DHAVE_AV_CONFIG_H -I.. -DPIC -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
 
 # Input
 SOURCES += common.c utils.c mem.c allcodecs.c mpegvideo.c h263.c jrevdct.c
@@ -36,6 +36,7 @@ SOURCES += interplayvideo.c xan.c rpza.c cinepak.c msrle.c msvideo1.c
 SOURCES += vqavideo.c idcinvideo.c adx.c rational.c faandct.c snow.c sonic.c
 SOURCES += 8bps.c parser.c smc.c flicvideo.c truemotion1.c vmdav.c lcl.c
 SOURCES += qtrle.c g726.c flac.c vp3dsp.c integer.c h261.c resample2.c
+SOURCES += h264idct.c png.c pnm.c qdrw.c qpeg.c rangecoder.c ulti.c xl.c
 SOURCES += libpostproc/postprocess.c #ffv1.c 
 
 inc.path = $${PREFIX}/include/mythtv/ffmpeg/
@@ -125,6 +126,7 @@ contains( TARGET_ARCH_POWERPC, yes ) {
 contains( TARGET_ALTIVEC, yes ) {
     SOURCES += ppc/dsputil_altivec.c ppc/mpegvideo_altivec.c ppc/idct_altivec.c
     SOURCES += ppc/gmc_altivec.c ppc/fdct_altivec.c ppc/fft_altivec.c
+    SOURCES += ppc/dsputil_h264_altivec.c
   macx {
     QMAKE_CFLAGS_RELEASE += -faltivec
     QMAKE_CFLAGS_DEBUG   += -faltivec

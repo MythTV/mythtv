@@ -17,10 +17,10 @@ release {
         QMAKE_CXXFLAGS_RELEASE = -O3 -march=pentiumpro -fomit-frame-pointer
     macx {
         DEFINES -= MMX
-        # Don't use -O3, it causes some Qt moc methods to go missing
+        # Don't use -O3, it causes some Qt moc methods to go missing '
         QMAKE_CXXFLAGS_RELEASE = -O2
     }
-        QMAKE_CFLAGS_RELEASE = $${QMAKE_CXXFLAGS_RELEASE}
+    QMAKE_CFLAGS_RELEASE = $${QMAKE_CXXFLAGS_RELEASE}
 }
 
 EXTRA_LIBS = -lfreetype -lmp3lame

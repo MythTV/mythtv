@@ -456,11 +456,12 @@ int MpegRecorder::GetVideoFd(void)
 
 // start common code to the dvbrecorder class.
 
-static void mpg_write_packet(void *opaque, uint8_t *buf, int buf_size)
+static int mpg_write_packet(void *opaque, uint8_t *buf, int buf_size)
 {
     (void)opaque;
     (void)buf;
     (void)buf_size;
+    return 0;
 }
 
 static int mpg_read_packet(void *opaque, uint8_t *buf, int buf_size)

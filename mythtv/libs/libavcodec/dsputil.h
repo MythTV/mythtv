@@ -42,10 +42,17 @@ void ff_jpeg_fdct_islow (DCTELEM *data);
 void ff_fdct248_islow (DCTELEM *data);
 
 void j_rev_dct (DCTELEM *data);
+void j_rev_dct4 (DCTELEM *data);
+void j_rev_dct2 (DCTELEM *data);
+void j_rev_dct1 (DCTELEM *data);
 
 void ff_fdct_mmx(DCTELEM *block);
 void ff_fdct_mmx2(DCTELEM *block);
 void ff_fdct_sse2(DCTELEM *block);
+
+void ff_h264_idct_add_c(uint8_t *dst, DCTELEM *block, int stride);
+void ff_h264_lowres_idct_add_c(uint8_t *dst, int stride, DCTELEM *block);
+void ff_h264_lowres_idct_put_c(uint8_t *dst, int stride, DCTELEM *block);
 
 /* encoding scans */
 extern const uint8_t ff_alternate_horizontal_scan[64];
@@ -327,7 +334,8 @@ typedef struct DSPContext {
      */
     void (*vp3_idct)(int16_t *input_data, int16_t *dequant_matrix,
         int coeff_count, DCTELEM *output_samples);
-
+ 
+    void (*h264_idct_add)(uint8_t *dst, DCTELEM *block, int stride);
 } DSPContext;
 
 void dsputil_static_init(void);
@@ -418,6 +426,7 @@ static inline void emms(void)
 }
 
 #define __align8 __attribute__ ((aligned (8)))
+#define STRIDE_ALIGN 8
 
 void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx);
 void dsputil_init_pix_mmx(DSPContext* c, AVCodecContext *avctx);
@@ -427,6 +436,7 @@ void dsputil_init_pix_mmx(DSPContext* c, AVCodecContext *avctx);
 /* This is to use 4 bytes read to the IDCT pointers for some 'zero'
    line optimizations */
 #define __align8 __attribute__ ((aligned (4)))
+#define STRIDE_ALIGN 4
 
 void dsputil_init_armv4l(DSPContext* c, AVCodecContext *avctx);
 
@@ -434,6 +444,7 @@ void dsputil_init_armv4l(DSPContext* c, AVCodecContext *avctx);
 
 /* SPARC/VIS IDCT needs 8-byte aligned DCT blocks */
 #define __align8 __attribute__ ((aligned (8)))
+#define STRIDE_ALIGN 8
 
 void dsputil_init_mlib(DSPContext* c, AVCodecContext *avctx);
 
@@ -441,11 +452,13 @@ void dsputil_init_mlib(DSPContext* c, AVCodecContext *avctx);
 
 /* SPARC/VIS IDCT needs 8-byte aligned DCT blocks */
 #define __align8 __attribute__ ((aligned (8)))
+#define STRIDE_ALIGN 8
 void dsputil_init_vis(DSPContext* c, AVCodecContext *avctx);
 
 #elif defined(ARCH_ALPHA)
 
 #define __align8 __attribute__ ((aligned (8)))
+#define STRIDE_ALIGN 8
 
 void dsputil_init_alpha(DSPContext* c, AVCodecContext *avctx);
 
@@ -462,24 +475,28 @@ extern int mm_flags;
 #endif
 
 #define __align8 __attribute__ ((aligned (16)))
+#define STRIDE_ALIGN 16
 
 void dsputil_init_ppc(DSPContext* c, AVCodecContext *avctx);
 
 #elif defined(HAVE_MMI)
 
 #define __align8 __attribute__ ((aligned (16)))
+#define STRIDE_ALIGN 16
 
 void dsputil_init_mmi(DSPContext* c, AVCodecContext *avctx);
 
 #elif defined(ARCH_SH4)
 
 #define __align8 __attribute__ ((aligned (8)))
+#define STRIDE_ALIGN 8
 
 void dsputil_init_sh4(DSPContext* c, AVCodecContext *avctx);
 
 #else
 
-#define __align8
+#define __align8 __attribute__ ((aligned (8)))
+#define STRIDE_ALIGN 8
 
 #endif
 
