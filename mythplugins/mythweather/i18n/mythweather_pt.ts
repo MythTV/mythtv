@@ -1,80 +1,199 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name>String::Accid</name>
+    <message>
+        <source>Alcacer do Sal, Portugal</source>
+        <translation type="obsolete">Alcácer do Sal, Portugal</translation>
+    </message>
+    <message>
+        <source>Barca D&apos;alva, Portugal</source>
+        <translation type="obsolete">Barca d&apos;Alva, Portugal</translation>
+    </message>
+    <message>
+        <source>Braganca, Portugal</source>
+        <translation type="obsolete">Bragança, Portugal</translation>
+    </message>
+    <message>
+        <source>Caldar Da Rainha, Portugal</source>
+        <translation type="obsolete">Caldas da Rainha, Portugal</translation>
+    </message>
+    <message>
+        <source>Castro Daire, Portugal</source>
+        <translation type="obsolete">Castro d&apos;Aire, Portugal</translation>
+    </message>
+    <message>
+        <source>Castro Verd, Portugal</source>
+        <translation type="obsolete">Castro Verde, Portugal</translation>
+    </message>
+    <message>
+        <source>Covilha, Portugal</source>
+        <translation type="obsolete">Covilhâ, Portugal</translation>
+    </message>
+    <message>
+        <source>Evora/C. Coord, Portugal</source>
+        <translation type="obsolete">Évora/C. Coord, Portugal</translation>
+    </message>
+    <message>
+        <source>Figueira Da Foz, Portugal</source>
+        <translation type="obsolete">Figueira da Foz, Portugal</translation>
+    </message>
+    <message>
+        <source>Flores Acores, Portugal</source>
+        <translation type="obsolete">Flores, Açores, Portugal</translation>
+    </message>
+    <message>
+        <source>Gaviao, Portugal</source>
+        <translation type="obsolete">Gavião, Portugal</translation>
+    </message>
+    <message>
+        <source>Lajes Acores, Portugal</source>
+        <translation type="obsolete">Lajes, Açores, Portugal</translation>
+    </message>
+    <message>
+        <source>Lisbon, Portugal</source>
+        <translation type="obsolete">Lisboa, Portugal</translation>
+    </message>
+    <message>
+        <source>London, United Kingdom</source>
+        <translation type="obsolete">Londres, Grã Bretanha</translation>
+    </message>
+    <message>
+        <source>Mertola, Portugal</source>
+        <translation type="obsolete">Mértola, Portugal</translation>
+    </message>
+    <message>
+        <source>Misterio Da Prai, Portugal</source>
+        <translation type="obsolete">Mistério da Praia, Portugal</translation>
+    </message>
+    <message>
+        <source>Olhao, Portugal</source>
+        <translation type="obsolete">Olhão, Portugal</translation>
+    </message>
+    <message>
+        <source>Portimao, Portugal</source>
+        <translation type="obsolete">Portimão, Portugal</translation>
+    </message>
+    <message>
+        <source>Povoacao, Portugal</source>
+        <translation type="obsolete">Povoação, Portugal</translation>
+    </message>
+    <message>
+        <source>Santa Cruz Da Gr, Portugal</source>
+        <translation type="obsolete">Santa Cruz da Graça, Portugal</translation>
+    </message>
+    <message>
+        <source>Santa Maria Acores, Portugal</source>
+        <translation type="obsolete">Santa Maria, Açores, Portugal</translation>
+    </message>
+    <message>
+        <source>Santarem, Portugal</source>
+        <translation type="obsolete">Santarém, Portugal</translation>
+    </message>
+    <message>
+        <source>Sao Joao da Madeira, Portugal</source>
+        <translation type="obsolete">São João da Madeira, Portugal</translation>
+    </message>
+    <message>
+        <source>Sao Marcos Da Se, Portugal</source>
+        <translation type="obsolete">São Marcos da Sé, Portugal</translation>
+    </message>
+    <message>
+        <source>Sao Vicente, Portugal</source>
+        <translation type="obsolete">São Vicente, Portugal</translation>
+    </message>
+    <message>
+        <source>Setubal, Portugal</source>
+        <translation type="obsolete">Setúbal, Portugal</translation>
+    </message>
+    <message>
+        <source>Torrao, Portugal</source>
+        <translation type="obsolete">Torrão, Portugal</translation>
+    </message>
+    <message>
+        <source>Vila Real De San, Portugal</source>
+        <translation type="obsolete">Vila Real de Santo António, Portugal</translation>
+    </message>
+    <message>
+        <source>Western Madeira, Portugal</source>
+        <translation type="obsolete">Madeira Oeste, Portugal</translation>
+    </message>
+</context>
+<context>
     <name>String::DayOfWeek</name>
     <message>
         <source>MON</source>
-        <translation type="unfinished">LUN</translation>
+        <translation>SEG</translation>
     </message>
     <message>
         <source>TUE</source>
-        <translation type="unfinished">MAR</translation>
+        <translation>TER</translation>
     </message>
     <message>
         <source>WED</source>
-        <translation type="unfinished">MIE</translation>
+        <translation>QUA</translation>
     </message>
     <message>
         <source>THU</source>
-        <translation type="unfinished">JUE</translation>
+        <translation>QUI</translation>
     </message>
     <message>
         <source>FRI</source>
-        <translation type="unfinished">VIE</translation>
+        <translation>SEX</translation>
     </message>
     <message>
         <source>SAT</source>
-        <translation type="unfinished">SAB</translation>
+        <translation>SÁB</translation>
     </message>
     <message>
         <source>SUN</source>
-        <translation type="unfinished">DOM</translation>
+        <translation>DOM</translation>
     </message>
 </context>
 <context>
     <name>String::WeatherType</name>
     <message>
         <source>Cloudy</source>
-        <translation type="unfinished"></translation>
+        <translation>Nublado</translation>
     </message>
     <message>
         <source>Mostly Cloudy</source>
-        <translation type="unfinished"></translation>
+        <translation>Muito Nublado</translation>
     </message>
     <message>
         <source>Partly Cloudy</source>
-        <translation type="unfinished"></translation>
+        <translation>Nublado</translation>
     </message>
     <message>
         <source>Light Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Aguaceiros</translation>
     </message>
     <message>
         <source>Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuviscos</translation>
     </message>
     <message>
         <source>Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva</translation>
     </message>
     <message>
         <source>AM Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuviscos Matinais</translation>
     </message>
     <message>
         <source>Fog</source>
-        <translation type="unfinished"></translation>
+        <translation>Nevoeiro</translation>
     </message>
     <message>
         <source>Few Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Alguns Chuviscos</translation>
     </message>
     <message>
         <source>Mostly Sunny</source>
-        <translation type="unfinished"></translation>
+        <translation>Muito Sol</translation>
     </message>
     <message>
         <source>Sunny</source>
-        <translation type="unfinished"></translation>
+        <translation>Sol</translation>
     </message>
     <message>
         <source>Scattered Flurries</source>
@@ -82,11 +201,11 @@
     </message>
     <message>
         <source>AM Clouds/PM Sun</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuvens Manhã/Sol Tarde</translation>
     </message>
     <message>
         <source>Isolated T-Storms</source>
-        <translation type="unfinished"></translation>
+        <translation>Trovoadas Espontâneas</translation>
     </message>
     <message>
         <source>Scattered Thunderstorms</source>
@@ -94,11 +213,11 @@
     </message>
     <message>
         <source>PM Showers</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuviscos Tarde</translation>
     </message>
     <message>
         <source>PM Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuviscos Tarde/Vento</translation>
     </message>
     <message>
         <source>Rain/Snow Showers</source>
@@ -110,7 +229,7 @@
     </message>
     <message>
         <source>Cloudy/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Nublado/Vento</translation>
     </message>
     <message>
         <source>Flurries/Wind</source>
@@ -122,7 +241,7 @@
     </message>
     <message>
         <source>Rain/Thunder</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva/Trovoada</translation>
     </message>
     <message>
         <source>Partly Cloudy/Windy</source>
@@ -138,7 +257,7 @@
     </message>
     <message>
         <source>Showers/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuviscos/Vento</translation>
     </message>
     <message>
         <source>Mostly Sunny/Wind</source>
@@ -150,7 +269,7 @@
     </message>
     <message>
         <source>Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva/Vento</translation>
     </message>
     <message>
         <source>Sct Flurries/Wind</source>
@@ -166,7 +285,7 @@
     </message>
     <message>
         <source>Thunderstorms</source>
-        <translation type="unfinished"></translation>
+        <translation>Trovoada</translation>
     </message>
     <message>
         <source>Sunny/Windy</source>
@@ -178,7 +297,7 @@
     </message>
     <message>
         <source>AM Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva Manhã</translation>
     </message>
     <message>
         <source>Iso T-Storms/Wind</source>
@@ -186,7 +305,7 @@
     </message>
     <message>
         <source>Rain/Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva/Neve</translation>
     </message>
     <message>
         <source>Sct T-Storms/Wind</source>
@@ -218,7 +337,7 @@
     </message>
     <message>
         <source>PM Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva Tarde</translation>
     </message>
     <message>
         <source>Snow Showers</source>
@@ -238,7 +357,7 @@
     </message>
     <message>
         <source>Snow/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Neve/Vento</translation>
     </message>
     <message>
         <source>PM Rain/Snow Showers</source>
@@ -258,11 +377,11 @@
     </message>
     <message>
         <source>Light Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Neve Ligeira</translation>
     </message>
     <message>
         <source>PM Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Neve Tarde</translation>
     </message>
     <message>
         <source>Few Snow Showers/Wind</source>
@@ -330,7 +449,7 @@
     </message>
     <message>
         <source>Heavy Rain</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva Pesada</translation>
     </message>
     <message>
         <source>AM Rain/Ice</source>
@@ -358,7 +477,7 @@
     </message>
     <message>
         <source>Heavy Rain/Wind</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuva Pesada/Vento</translation>
     </message>
     <message>
         <source>PM Snow Shower</source>
@@ -374,7 +493,7 @@
     </message>
     <message>
         <source>AM Snow</source>
-        <translation type="unfinished"></translation>
+        <translation>Neve Manhã</translation>
     </message>
     <message>
         <source>Snow to Ice</source>
@@ -454,11 +573,11 @@
     </message>
     <message>
         <source>Clear</source>
-        <translation type="unfinished"></translation>
+        <translation>Limpo</translation>
     </message>
     <message>
         <source>A Few Clouds</source>
-        <translation type="unfinished"></translation>
+        <translation>Algumas Nuvens</translation>
     </message>
     <message>
         <source>Fair</source>
@@ -469,138 +588,138 @@
     <name>String::WindDirection</name>
     <message>
         <source>N</source>
-        <translation type="unfinished"></translation>
+        <translation>N</translation>
     </message>
     <message>
         <source>NNE</source>
-        <translation type="unfinished"></translation>
+        <translation>NNE</translation>
     </message>
     <message>
         <source>NE</source>
-        <translation type="unfinished"></translation>
+        <translation>NE</translation>
     </message>
     <message>
         <source>NEE</source>
-        <translation type="unfinished"></translation>
+        <translation>NEE</translation>
     </message>
     <message>
         <source>E</source>
-        <translation type="unfinished"></translation>
+        <translation>E</translation>
     </message>
     <message>
         <source>SEE</source>
-        <translation type="unfinished"></translation>
+        <translation>SEE</translation>
     </message>
     <message>
         <source>SE</source>
-        <translation type="unfinished"></translation>
+        <translation>SE</translation>
     </message>
     <message>
         <source>SSE</source>
-        <translation type="unfinished"></translation>
+        <translation>SSE</translation>
     </message>
     <message>
         <source>S</source>
-        <translation type="unfinished"></translation>
+        <translation>S</translation>
     </message>
     <message>
         <source>SSW</source>
-        <translation type="unfinished"></translation>
+        <translation>SSO</translation>
     </message>
     <message>
         <source>SW</source>
-        <translation type="unfinished"></translation>
+        <translation>SO</translation>
     </message>
     <message>
         <source>SWW</source>
-        <translation type="unfinished"></translation>
+        <translation>SOO</translation>
     </message>
     <message>
         <source>W</source>
-        <translation type="unfinished"></translation>
+        <translation>O</translation>
     </message>
     <message>
         <source>NWW</source>
-        <translation type="unfinished"></translation>
+        <translation>NOO</translation>
     </message>
     <message>
         <source>NW</source>
-        <translation type="unfinished"></translation>
+        <translation>NO</translation>
     </message>
     <message>
         <source>NNW</source>
-        <translation type="unfinished"></translation>
+        <translation>NNO</translation>
     </message>
 </context>
 <context>
     <name>Weather</name>
     <message>
         <source> is invalid)</source>
-        <translation>es invàlido)</translation>
+        <translation>é invalida)</translation>
     </message>
     <message>
         <source>   No Location Set, Please read the README</source>
-        <translation>  No hay una estación definida, lea el README</translation>
+        <translation>Tem de especificar uma localização. Em caso de dúvida, leia a documentaçáo</translation>
     </message>
     <message>
         <source>Configuring MythWeather...</source>
-        <translation>Configurando MythWeather...</translation>
+        <translation>A configurar o MythWeather...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select unit conversion...</source>
-        <translation>Escoja unidad de conversión con la flecha derecha...</translation>
+        <translation>Use o cursor para a direita para selecionar a unidade de conversão...</translation>
     </message>
     <message>
         <source>Weather Units</source>
-        <translation>Unidad</translation>
+        <translation>Unidades de Meteorologia</translation>
     </message>
     <message>
         <source>Location</source>
-        <translation>Estación</translation>
+        <translation>Localização</translation>
     </message>
     <message>
         <source>Aggressiveness</source>
-        <translation>Tipo de conexión</translation>
+        <translation>Agressividade</translation>
     </message>
     <message>
         <source>Configuration Saved...</source>
-        <translation>Configuración guardada...</translation>
+        <translation>Configuração Guardada...</translation>
     </message>
     <message>
         <source>Retrieving weather data...</source>
-        <translation>Obteniendo información...</translation>
+        <translation>A obter os dados meteorológicos...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select your location...</source>
-        <translation>Escoja la estación con la flecha derecha...</translation>
+        <translation>Use o cursor para a direita para selecionar a localização...</translation>
     </message>
     <message>
         <source>Use the right arrow key to select the aggressiveness level...</source>
-        <translation>Escoja el tipo de conexión con la flecha derecha...</translation>
+        <translation>Use o cursor para a direita p ara selecionar o nível de agressividade...</translation>
     </message>
     <message>
         <source> 1  High Speed Connection</source>
-        <translation>1  Alta velocidad</translation>
+        <translation>1 Ligação de Banda-Larga</translation>
     </message>
     <message>
         <source> 8  Medium Speed Connection</source>
-        <translation>8  Velocidad media</translation>
+        <translation>8 Ligação de velocidade média (RDIS)</translation>
     </message>
     <message>
         <source> 15 Low Speed Connection</source>
-        <translation>15 Conexión de baja velocidad</translation>
+        <translation>15 Ligação de velocidade baixa (Modem)</translation>
     </message>
     <message>
         <source>Obtaining initial weather data...</source>
-        <translation>Obteniendo datos iniciales...</translation>
+        <translation>A obter os dados meteorológicos iniciais...</translation>
     </message>
     <message>
         <source>Updating weather data...</source>
-        <translation>Actualizando información del tiempo...</translation>
+        <translation>A actualizar os dados meteorológicos...</translation>
     </message>
     <message>
         <source>Calm</source>
-        <translation>Calma </translation>
+        <translation>Calmo</translation>
     </message>
     <message>
         <source> at </source>
@@ -608,71 +727,71 @@
     </message>
     <message>
         <source>Unlimited</source>
-        <translation>ilimitada</translation>
+        <translation>Ilimitado</translation>
     </message>
     <message>
         <source> (minimal)</source>
-        <translation>(mínima)</translation>
+        <translation> (mínimo)</translation>
     </message>
     <message>
         <source> (moderate)</source>
-        <translation>(moderada)</translation>
+        <translation> (moderado)</translation>
     </message>
     <message>
         <source> (high)</source>
-        <translation>(alta)</translation>
+        <translation> (alta)</translation>
     </message>
     <message>
         <source> (extreme)</source>
-        <translation>(extrema)</translation>
+        <translation> (extrema)</translation>
     </message>
     <message>
         <source>Today a high of </source>
-        <translation>Hoy hay una máxima de </translation>
+        <translation>Para hoje, prevê-se uma temperatura máxima de </translation>
     </message>
     <message>
         <source> and a low of </source>
-        <translation> y una mínima de </translation>
+        <translation>° e uma mínima de </translation>
     </message>
     <message>
         <source>. Currently there is a humidity of </source>
-        <translation>. La humedad actual es de </translation>
+        <translation>°, a humidade actual é de </translation>
     </message>
     <message>
         <source>% and the winds are</source>
-        <translation>% y un viento </translation>
+        <translation>% e o vento </translation>
     </message>
     <message>
         <source> calm.</source>
-        <translation>en calma. </translation>
+        <translation>é fraco. </translation>
     </message>
     <message>
         <source> coming in at </source>
-        <translation> soplando a </translation>
+        <translation>tem uma velocidade de </translation>
     </message>
     <message>
         <source> mph from the </source>
-        <translation>mph dirección </translation>
+        <translation> milhas por hora com direcção </translation>
     </message>
     <message>
         <source> Km/h from the </source>
-        <translation> km/h dirección </translation>
+        <translation> kilometros por hora de direcção </translation>
     </message>
     <message>
         <source> Visibility will be unlimited for today.</source>
-        <translation> La visibilidad hoy es ilimitada.</translation>
+        <translation>A visibilidade é ilimitada.</translation>
     </message>
     <message>
         <source> Visibility conditions are unknown.</source>
-        <translation> Se desconoce la visibilidad.</translation>
+        <translation>As condições de visibilidade são desconhecidas.</translation>
     </message>
     <message>
         <source> There will be a visibility of </source>
-        <translation> Habrá una visibilidad de </translation>
+        <translation>A visibilidade é de </translation>
     </message>
     <message>
         <source> miles.</source>
-        <translation> millas.</translation>
+        <translation> milhas.</translation>
     </message>
     <message>
         <source> km.</source>
@@ -688,47 +807,47 @@
     </message>
     <message>
         <source>MON</source>
-        <translation type="obsolete">LUN</translation>
+        <translation type="obsolete">SEG</translation>
     </message>
     <message>
         <source>Monday</source>
-        <translation>Lunes</translation>
+        <translation>Segunda</translation>
     </message>
     <message>
         <source>TUE</source>
-        <translation type="obsolete">MAR</translation>
+        <translation type="obsolete">TER</translation>
     </message>
     <message>
         <source>Tuesday</source>
-        <translation>Martes</translation>
+        <translation>Terça</translation>
     </message>
     <message>
         <source>WED</source>
-        <translation type="obsolete">MIE</translation>
+        <translation type="obsolete">QUA</translation>
     </message>
     <message>
         <source>Wednesday</source>
-        <translation>Miércoles</translation>
+        <translation>Quarta</translation>
     </message>
     <message>
         <source>THU</source>
-        <translation type="obsolete">JUE</translation>
+        <translation type="obsolete">QUI</translation>
     </message>
     <message>
         <source>Thursday</source>
-        <translation>Jueves</translation>
+        <translation>Quinta</translation>
     </message>
     <message>
         <source>FRI</source>
-        <translation type="obsolete">VIE</translation>
+        <translation type="obsolete">SEX</translation>
     </message>
     <message>
         <source>Friday</source>
-        <translation>Viernes</translation>
+        <translation>Sexta</translation>
     </message>
     <message>
         <source>SAT</source>
-        <translation type="obsolete">SAB</translation>
+        <translation type="obsolete">SÁB</translation>
     </message>
     <message>
         <source>Saturday</source>
@@ -736,67 +855,55 @@
     </message>
     <message>
         <source>Date Error</source>
-        <translation>Error en la fecha</translation>
+        <translation>Erro de Data</translation>
     </message>
     <message>
         <source>Tomorrow expect a high of </source>
-        <translation>Mañana se espera una máxima de </translation>
+        <translation>Para amanhã, prevê-se uma temperatura máxima de </translation>
     </message>
     <message>
         <source>Expected conditions: </source>
-        <translation>Previsión: </translation>
+        <translation>Tempo Previsto: </translation>
     </message>
     <message>
         <source>Weather data from: </source>
-        <translation>Datos del tiempo de: </translation>
+        <translation>Dados meteorológicos de: </translation>
     </message>
     <message>
         <source>Updating...</source>
-        <translation>Actualizando...</translation>
+        <translation>A Actualizar...</translation>
     </message>
     <message>
         <source> (Not All Information Available)</source>
-        <translation>(No toda la información está disponible)</translation>
-    </message>
-    <message>
-        <source>*** Invalid Area ID Entered *** Use a valid area id.</source>
-        <translation type="obsolete">*** ID de Area inválido *** Use uno correcto.</translation>
-    </message>
-    <message>
-        <source>Weather Data Not Available</source>
-        <translation type="obsolete">Datos del tiempo no disponibles</translation>
-    </message>
-    <message>
-        <source>!!! Timeout Limit !!! Change aggressiveness level.</source>
-        <translation type="obsolete">¡¡¡ Tiempo de espera excedido !!! Cambie el tipo de conexión,</translation>
+        <translation>(Não estão disponíveis os dados todos)</translation>
     </message>
     <message>
         <source>*** Invalid Area ID or Server Error ***</source>
-        <translation type="unfinished"></translation>
+        <translation>*** ID de àrea inválida ou erro no servidor ***</translation>
     </message>
     <message>
         <source>Imperial (Fahrenheit, in, etc)</source>
-        <translation type="unfinished"></translation>
+        <translation>Imperial (Fahrenheit, polegadas, etc)</translation>
     </message>
     <message>
         <source>Metric (Celsius, kPa, etc)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source> F</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source> C</source>
-        <translation type="unfinished"></translation>
+        <translation>Métrico (Centígrados, Pascais, etc)</translation>
     </message>
     <message>
         <source>.</source>
-        <translation type="unfinished"></translation>
+        <translation>°.</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Desconhecido</translation>
+    </message>
+    <message>
+        <source> F</source>
+        <translation>°F</translation>
+    </message>
+    <message>
+        <source> C</source>
+        <translation>°C</translation>
     </message>
 </context>
 </TS>

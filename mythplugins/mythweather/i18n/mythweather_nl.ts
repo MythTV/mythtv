@@ -1,5 +1,538 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name>String::DayOfWeek</name>
+    <message>
+        <source>MON</source>
+        <translation type="unfinished">MA</translation>
+    </message>
+    <message>
+        <source>TUE</source>
+        <translation type="unfinished">DI</translation>
+    </message>
+    <message>
+        <source>WED</source>
+        <translation type="unfinished">WO</translation>
+    </message>
+    <message>
+        <source>THU</source>
+        <translation type="unfinished">DO</translation>
+    </message>
+    <message>
+        <source>FRI</source>
+        <translation type="unfinished">VR</translation>
+    </message>
+    <message>
+        <source>SAT</source>
+        <translation type="unfinished">ZA</translation>
+    </message>
+    <message>
+        <source>SUN</source>
+        <translation type="unfinished">ZO</translation>
+    </message>
+</context>
+<context>
+    <name>String::WeatherType</name>
+    <message>
+        <source>Cloudy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mostly Cloudy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Partly Cloudy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Light Rain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Showers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AM Showers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Few Showers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mostly Sunny</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sunny</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scattered Flurries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AM Clouds/PM Sun</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Isolated T-Storms</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scattered Thunderstorms</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PM Showers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PM Showers/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rain/Snow Showers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Few Snow Showers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cloudy/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flurries/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mostly Cloudy/Windy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rain/Thunder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Partly Cloudy/Windy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AM Rain/Snow Showers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Light Rain/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Showers/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mostly Sunny/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flurries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rain/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sct Flurries/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sct Strong Storms</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PM T-Storms</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Thunderstorms</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sunny/Windy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AM Thunderstorms</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AM Rain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Iso T-Storms/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rain/Snow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sct T-Storms/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AM Showers/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sct Snow Showers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Snow to Ice/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Snow to Rain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AM Light Rain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PM Light Rain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PM Rain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Snow Showers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rain to Snow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PM Rain/Snow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Few Showers/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Snow/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PM Rain/Snow Showers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PM Rain/Snow/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rain/Snow Showers/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rain/Snow/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Light Snow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PM Snow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Few Snow Showers/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Light Snow/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wintry Mix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AM Wintry Mix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hvy Rain/Freezing Rain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AM Light Snow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rain/Freezing Rain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>T-Storms/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sprinkles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AM Snow Showers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AM Clouds/PM Sun/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AM Rain/Snow/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rain to Snow/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Snow to Wintry Mix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PM Snow Showers/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Snow and Ice to Rain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Heavy Rain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AM Rain/Ice</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AM Snow Showers/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AM Light Snow/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PM Light Rain/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AM Light Wintry Mix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PM Light Snow/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Heavy Rain/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PM Snow Shower</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Snow to Rain/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PM Light Rain/Ice</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AM Snow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Snow to Ice</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wintry Mix/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PM Light Snow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AM Drizzle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Strong Storms/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PM Drizzle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drizzle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AM Light Rain/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AM Rain/Wind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wintry Mix to Snow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Snow Showers/Windy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Light Rain Shower</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Light Rain with Thunder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Light Drizzle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smoke</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Haze</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Light Snow Shower</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Light Snow Shower/ Windy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A Few Clouds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fair</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>String::WindDirection</name>
+    <message>
+        <source>N</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NNE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NEE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SEE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SSE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SSW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SWW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>W</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NWW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NNW</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Weather</name>
     <message>
         <source> is invalid)</source>
@@ -147,7 +680,7 @@
     </message>
     <message>
         <source>SUN</source>
-        <translation>ZO</translation>
+        <translation type="obsolete">ZO</translation>
     </message>
     <message>
         <source>Sunday</source>
@@ -155,7 +688,7 @@
     </message>
     <message>
         <source>MON</source>
-        <translation>MA</translation>
+        <translation type="obsolete">MA</translation>
     </message>
     <message>
         <source>Monday</source>
@@ -163,7 +696,7 @@
     </message>
     <message>
         <source>TUE</source>
-        <translation>DI</translation>
+        <translation type="obsolete">DI</translation>
     </message>
     <message>
         <source>Tuesday</source>
@@ -171,7 +704,7 @@
     </message>
     <message>
         <source>WED</source>
-        <translation>WO</translation>
+        <translation type="obsolete">WO</translation>
     </message>
     <message>
         <source>Wednesday</source>
@@ -179,7 +712,7 @@
     </message>
     <message>
         <source>THU</source>
-        <translation>DO</translation>
+        <translation type="obsolete">DO</translation>
     </message>
     <message>
         <source>Thursday</source>
@@ -187,7 +720,7 @@
     </message>
     <message>
         <source>FRI</source>
-        <translation>VR</translation>
+        <translation type="obsolete">VR</translation>
     </message>
     <message>
         <source>Friday</source>
@@ -195,7 +728,7 @@
     </message>
     <message>
         <source>SAT</source>
-        <translation>ZA</translation>
+        <translation type="obsolete">ZA</translation>
     </message>
     <message>
         <source>Saturday</source>
@@ -239,6 +772,30 @@
     </message>
     <message>
         <source>*** Invalid Area ID or Server Error ***</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Imperial (Fahrenheit, in, etc)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Metric (Celsius, kPa, etc)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> F</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

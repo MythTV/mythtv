@@ -760,7 +760,8 @@ void Weather::showCityName()
 	   int cnt = 0;
 	   for (int i = 0; i < 9; i++)
 	   {
-                ltype->SetItemText(i, cityNames[i]);
+                ltype->SetItemText(i, tr(cityNames[i].left(cityNames[i].find("(",0)-1)) 
+				+ cityNames[i].mid(cityNames[i].find("(",0)-1));
 		cnt++;
 	   }
            cfgCity = cityNames[4];
@@ -806,6 +807,7 @@ void Weather::loadWeatherTypes()
 	wData[wCount].typeNum = datas[0].toInt();
 	wData[wCount].typeName = datas[1];
         wData[wCount].typeIcon = datas[2];
+
 	wCount++;
 	}
    }
@@ -927,7 +929,8 @@ void Weather::holdPage()
 
         LayerSet *container = theme->GetSet("weatherpages");
         if (container)
-            SetText(container, "location", txtLocale);
+            SetText(container, "location", tr(txtLocale.left(txtLocale.find("(",0)-1)) 
+				+ txtLocale.mid(txtLocale.find("(",0)-1));
    }
    else
    {
@@ -993,8 +996,8 @@ void Weather::setupPage()
             if (ltype)
             {
                 ltype->ResetList();
-                ltype->SetItemText(0, "Imperial (Fahrenheit, in, etc)");
-                ltype->SetItemText(1, "Metric (Celsius, kPa, etc)");
+                ltype->SetItemText(0, tr("Imperial (Fahrenheit, in, etc)"));
+                ltype->SetItemText(1, tr("Metric (Celsius, kPa, etc)"));
                 ltype->SetItemCurrent(config_Units - 1);
             }
             ltype = (UIListType *)container->GetType("alpha");
@@ -1130,8 +1133,8 @@ void Weather::upKey()
                            UIListType *ltype = (UIListType *)container->GetType("mainlist");
                            if (ltype)
                            {
-                               ltype->SetItemText(0, "Imperial (Fahrenheit, in, etc)");
-                               ltype->SetItemText(1, "Metric (Celsius, kPa, etc)");
+                               ltype->SetItemText(0, tr("Imperial (Fahrenheit, in, etc)"));
+                               ltype->SetItemText(1, tr("Metric (Celsius, kPa, etc)"));
                                ltype->SetItemCurrent(config_Units - 1);
                            }
                        }
@@ -1708,9 +1711,9 @@ void Weather::update_timeout()
         else
         {
             if (convertData == false)
-                SetText(container, "winddata", winddir + tr(" at ") + curWind + " mph");
+                SetText(container, "winddata", tr(winddir) + tr(" at ") + curWind + " mph");
             else
-                SetText(container, "winddata", winddir + tr(" at ") + curWind + " Km/h");
+                SetText(container, "winddata", tr(winddir) + tr(" at ") + curWind + " Km/h");
         }
 
         if (visibility.toFloat() != 999.00)
@@ -1726,9 +1729,9 @@ void Weather::update_timeout()
             SetText(container, "visibility", tr("Unlimited"));
 
         if (convertData == false)
-            SetText(container, "windchill", curFeel + " F");
+            SetText(container, "windchill", curFeel + tr(" F"));
         else
-            SetText(container, "windchill", curFeel + " C");
+            SetText(container, "windchill", curFeel + tr(" C"));
 
         if (uvIndex.toInt() < 3)
             SetText(container, "uvlevel", uvIndex + tr(" (minimal)"));
@@ -1771,7 +1774,8 @@ void Weather::update_timeout()
     container = theme->GetSet("weatherpages");
     if (container)
     {
-        SetText(container, "location", txtLocale);
+        SetText(container, "location", tr(txtLocale.left(txtLocale.find("(",0)-1)) 
+				+ txtLocale.mid(txtLocale.find("(",0)-1));
         SetText(container, "curcond", description);
     }
 
@@ -1786,9 +1790,9 @@ void Weather::update_timeout()
     else
     {
 	if (convertData == false)
-		todayDesc += tr(" coming in at ") + curWind + tr(" mph from the ") + winddir + ".";
+		todayDesc += tr(" coming in at ") + curWind + tr(" mph from the ") + tr(winddir) + ".";
 	else 
-		todayDesc += tr(" coming in at ") + curWind + tr(" Km/h from the ") + winddir + ".";
+		todayDesc += tr(" coming in at ") + curWind + tr(" Km/h from the ") + tr(winddir) + ".";
     }
   
     if (visibility.toFloat() == 999.00)
@@ -1812,25 +1816,25 @@ void Weather::update_timeout()
     QString tomDesc;
  
     QString tomDate;
-    if (date[0].upper() == tr("SUN"))
+    if (date[0].upper() == "SUN")
         tomDate = tr("Sunday");
-    else if (date[0].upper() == tr("MON"))
+    else if (date[0].upper() == "MON")
         tomDate = tr("Monday");
-    else if (date[0].upper() == tr("TUE"))
+    else if (date[0].upper() == "TUE")
         tomDate = tr("Tuesday");
-    else if (date[0].upper() == tr("WED"))
+    else if (date[0].upper() == "WED")
         tomDate = tr("Wednesday");
-    else if (date[0].upper() == tr("THU"))
+    else if (date[0].upper() == "THU")
         tomDate = tr("Thursday");
-    else if (date[0].upper() == tr("FRI"))
+    else if (date[0].upper() == "FRI")
         tomDate = tr("Friday");
-    else if (date[0].upper() == tr("SAT"))
+    else if (date[0].upper() == "SAT")
         tomDate = tr("Saturday");
     else
         tomDate = tr("Date Error");
 
     tomDesc = tr("Tomorrow expect a high of ") + highTemp[0] + tr(" and a low of ");
-    tomDesc += lowTemp[0];
+    tomDesc += lowTemp[0] + tr(".");
 
     QString tomCond = tr("Expected conditions: ") + weatherType[0];
  
@@ -1872,9 +1876,9 @@ void Weather::update_timeout()
             itype->SetImage(weatherIcon[3]);
             itype->LoadImage();
         }
-        SetText(container, "date1", date[1]);
-        SetText(container, "date2", date[2]);
-        SetText(container, "date3", date[3]);
+        SetText(container, "date1", tr(date[1]));
+        SetText(container, "date2", tr(date[2]));
+        SetText(container, "date3", tr(date[3]));
         SetText(container, "desc1", weatherType[1]);
         SetText(container, "desc2", weatherType[2]);
         SetText(container, "desc3", weatherType[3]);
@@ -2123,7 +2127,7 @@ void Weather::setWeatherTypeIcon(QString wt[5])
         	{
                 	if (wt[i].toInt() == wData[j].typeNum)
                 	{
-				wt[i] = wData[j].typeName;
+				wt[i] = tr(wData[j].typeName);
                 	        weatherIcon[i] = wData[j].typeIcon;
 				isSet = true;
 				j = 128;
@@ -2132,7 +2136,7 @@ void Weather::setWeatherTypeIcon(QString wt[5])
 
 		if (isSet == false)
 		{
-			wt[i] = "Unknown [" + wt[i] + "]";
+			wt[i] = tr("Unknown") + " [" + wt[i] + "]";
                         weatherIcon[i] = "unknown.png";
 		}
 	}
@@ -2146,12 +2150,13 @@ void Weather::setWeatherIcon(QString txtType)
 		    (wData[j].typeName).replace(QRegExp("  "),  "" ))
 		{
 			curIcon = wData[j].typeIcon;
+			description = tr(wData[j].typeName);
 			return;
 		}
 		if (txtType.toInt() == wData[j].typeNum)
 		{
 			curIcon = wData[j].typeIcon;
-			description = wData[j].typeName;
+			description = tr(wData[j].typeName);
                         return;
 		}
 	}
