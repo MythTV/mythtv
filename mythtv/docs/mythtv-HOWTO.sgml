@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-12-14, v0.13.02
+<date>2003-12-18, v0.13.03
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -3338,6 +3338,17 @@ devices, rename and/or copy the file to <tt>harddiskhda</tt>,
 <tt>harddiskhdb</tt>, etc.  Edit the file to your liking and on the next
 reboot your setting will be preserved.
 
+<sect1>I have a MPEG-2 encoder card and my video appears "jittery".
+<sect1>I have a MPEG-2 encoder card and my video is jumping up and down.
+<p>This is a different problem than the one discussed in the previous
+section.  Currently, the ivtv driver or firmware appear to have some issues
+if the vertical capture resolution is not the full screen height.  If you
+are having a jitter problem then ensure that you are capturing either 480
+lines (for NTSC) or 576 lines (for PAL).  The default capture profiles may
+need to be edited for your setup.  Go to Settings->TV Settings->Recording
+Profiles and adjust the <bf>Default</bf> and <bf>Live TV</bf> options to
+480 or 576 from their defaults.
+
 <sect1>I keep losing all of my settings every time I compile!
 <p>MythTV will overwrite any settings in <tt>/usr/local/share/mythtv</tt>.
 If you want to make sure that you don't lose your modifications, make a
@@ -3720,7 +3731,6 @@ examples on finding and removing old versions of lirc.
 Check that <tt>/etc/mysql/my.cnf</tt> <em>does not</em> contain
 <tt>skip-networking</tt>.  If it does, remove it, and restart
 <bf>MySQL</bf>.
-
 <sect1>My screen goes black when I try to play something.
 <p>MythTV prints error and status messages to the shell that was used to
 start the application.  If nothing seems to be happening when you try to
@@ -4871,6 +4881,7 @@ next.
 v0.13.01, 2003-12-13.  Add step for alsa compile for Red Hat. Mike Smith,
 easygreenus at yahoo.com
 v0.13.02, 2003-12-14.  MythTV .debs are now available.
+v0.13.03, 2003-12-17.  Add "jittery" troubleshooting step for PVR users.
 -->
 
 <!--

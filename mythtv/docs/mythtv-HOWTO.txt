@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-12-14, v0.13.02
+  2003-12-18, v0.13.03
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -159,30 +159,32 @@
      20.2 mythfilldatabase failing.
      20.3 MythTV seems to disappear; can't see video.
      20.4 Fast CPU, choppy or jittery video.
-     20.5 I keep losing all of my settings every time I compile!
-     20.6 Compile errors.
-     20.7 My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.
-     20.8 I get segfaults / MythTV isn't doing anything.
-     20.9 Debugging with GDB.
-     20.10 MythTV makes my system crash.
-     20.11 Troubleshooting audio.
-     20.12 I can't see parts of the On Screen Display.
-     20.13 The mythbackend program told me to look at this section.
-     20.14 My remote doesn't work / works sometimes and not others / "ghost" keypresses.
-     20.15 My PVR-250 card doesn't show inputs in the setup screen.
-     20.16 Where's my "canada-cable" entry gone to?
-     20.17 My channels are off by one.
-     20.18 Mythweb is showing a db_open error when I connect to it.
-     20.19 error: can't find a register in class 'BREG' while reloading 'asm'
-     20.20 make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
-     20.21 make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
-     20.22 My mouse pointer disappears when placed over the MythTV windows.
-     20.23 What does "strange error flushing buffer" mean on my console?
-     20.24 I can't change the channel when watching Live TV.
-     20.25 When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"
-     20.26 Troubleshooting the Hauppauge PVR-250 IR remote
-     20.27 MySQL not connecting correctly.
-     20.28 My screen goes black when I try to play something.
+     20.5 I have a MPEG-2 encoder card and my video appears "jittery".
+     20.6 I have a MPEG-2 encoder card and my video is jumping up and down.
+     20.7 I keep losing all of my settings every time I compile!
+     20.8 Compile errors.
+     20.9 My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.
+     20.10 I get segfaults / MythTV isn't doing anything.
+     20.11 Debugging with GDB.
+     20.12 MythTV makes my system crash.
+     20.13 Troubleshooting audio.
+     20.14 I can't see parts of the On Screen Display.
+     20.15 The mythbackend program told me to look at this section.
+     20.16 My remote doesn't work / works sometimes and not others / "ghost" keypresses.
+     20.17 My PVR-250 card doesn't show inputs in the setup screen.
+     20.18 Where's my "canada-cable" entry gone to?
+     20.19 My channels are off by one.
+     20.20 Mythweb is showing a db_open error when I connect to it.
+     20.21 error: can't find a register in class 'BREG' while reloading 'asm'
+     20.22 make: *** No rule to make target /usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
+     20.23 make: *** No rule to make target /mkspecs/default/qmake.conf', needed by Makefile'.  Stop.
+     20.24 My mouse pointer disappears when placed over the MythTV windows.
+     20.25 What does "strange error flushing buffer" mean on my console?
+     20.26 I can't change the channel when watching Live TV.
+     20.27 When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"
+     20.28 Troubleshooting the Hauppauge PVR-250 IR remote
+     20.29 MySQL not connecting correctly.
+     20.30 My screen goes black when I try to play something.
 
   21. Miscellaneous.
      21.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
@@ -341,8 +343,6 @@
   hardware selection, mainly because there are so many tradeoffs which
   can be made.  For example, if you have plenty of CPU, you can use
   higher bitrates or capture sizes, etc.
-
-
   MythTV has two modes of operation.  First, it can function as a
   software video encoder, which means that it uses a fairly generic
   "dumb" video capture card to get frames of video, encodes them using
@@ -4199,18 +4199,31 @@
   your setting will be preserved.
 
 
-  [1m20.5.  I keep losing all of my settings every time I compile![0m
+  [1m20.5.  I have a MPEG-2 encoder card and my video appears "jittery".[0m
+
+  [1m20.6.  I have a MPEG-2 encoder card and my video is jumping up and[0m
+  [1mdown.[0m
+
+  This is a different problem than the one discussed in the previous
+  section.  Currently, the ivtv driver or firmware appear to have some
+  issues if the vertical capture resolution is not the full screen
+  height.  If you are having a jitter problem then ensure that you are
+  capturing either 480 lines (for NTSC) or 576 lines (for PAL).  The
+  default capture profiles may need to be edited for your setup.  Go to
+  Settings->TV Settings->Recording Profiles and adjust the [1mDefault [22mand
+  [1mLive TV [22moptions to 480 or 576 from their defaults.
+
+
+  [1m20.7.  I keep losing all of my settings every time I compile![0m
 
   MythTV will overwrite any settings in /usr/local/share/mythtv.  If you
   want to make sure that you don't lose your modifications, make a
   directory ~/.mythtv and copy your mysql.txt file to this location.
 
-  [1m20.6.  Compile errors.[0m
+  [1m20.8.  Compile errors.[0m
 
   Some compile errors are worse than others.  If you get an error that
   doesn't abort the compilation, and says something like:
-
-
        cc1plus: warning: changing search order for system directory
        "/usr/local/include"
        cc1plus: warning:   as it has already been specified as a non-system
@@ -4226,7 +4239,7 @@
   fixed before MythTV will compile.
 
 
-  [1m20.7.  My screen goes blank, but comes back when I wiggle the mouse or[0m
+  [1m20.9.  My screen goes blank, but comes back when I wiggle the mouse or[0m
   [1muse the keyboard.[0m
 
   This is due to DPMS, the Display Power Management System, which is
@@ -4323,9 +4336,9 @@
   off from within the control panel.
 
 
-  [1m20.8.  I get segfaults / MythTV isn't doing anything.[0m
+  [1m20.10.  I get segfaults / MythTV isn't doing anything.[0m
 
-  [1m20.9.  Debugging with GDB.[0m
+  [1m20.11.  Debugging with GDB.[0m
 
   Without details, the developers will not be able to determine if you
   have discovered a genuine code-bug,  or if the problem is with your
@@ -4403,7 +4416,7 @@
   instructions.
 
 
-  [1m20.10.  MythTV makes my system crash.[0m
+  [1m20.12.  MythTV makes my system crash.[0m
 
   MythTV [4mcan[24m [4mnot[24m crash your system - it is a user-level program.  If
   your system is crashing when you run MythTV, then you have some issue
@@ -4412,7 +4425,7 @@
   perform a CPU intensive task like encoding video.
 
 
-  [1m20.11.  Troubleshooting audio.[0m
+  [1m20.13.  Troubleshooting audio.[0m
 
   By Bruce Markey, mailto:bjm@lvcm.com <mailto:bjm@lvcm.com> [1mNOTE[22m:  the
   following instructions do not apply to PVR-250/350 encoders; the
@@ -4486,14 +4499,14 @@
   #0, the second card is #1, etc.
 
 
-  [1m20.12.  I can't see parts of the On Screen Display.[0m
+  [1m20.14.  I can't see parts of the On Screen Display.[0m
 
   If you're a Red Hat 8.0 user, make sure that you've followed the
   instructions which tell you how to modify the Themes makefile.
   ``Link''.
 
 
-  [1m20.13.  The mythbackend program told me to look at this section.[0m
+  [1m20.15.  The mythbackend program told me to look at this section.[0m
 
   mythbackend does a check to see if your sound device is capable of
   full duplex operation.  If it's not, it's most likely that you're
@@ -4514,7 +4527,7 @@
   will need to get btaudio ``operational''.
 
 
-  [1m20.14.  My remote doesn't work / works sometimes and not others /[0m
+  [1m20.16.  My remote doesn't work / works sometimes and not others /[0m
   [1m"ghost" keypresses.[0m
 
   This can be due to a number of factors.  The simplest case is the
@@ -4539,16 +4552,16 @@
   +o  blackbox  (using "Sloppy Focus" and "Focus New Windows")
 
 
-  [1m20.15.  My PVR-250 card doesn't show inputs in the setup screen.[0m
+  [1m20.17.  My PVR-250 card doesn't show inputs in the setup screen.[0m
 
   See message http://www.mythtv.org/pipermail/mythtv-
   users/2003-April/002527.html <http://www.mythtv.org/pipermail/mythtv-
   users/2003-April/002527.html>
 
 
-  [1m20.16.  Where's my "canada-cable" entry gone to?[0m
+  [1m20.18.  Where's my "canada-cable" entry gone to?[0m
 
-  [1m20.17.  My channels are off by one.[0m
+  [1m20.19.  My channels are off by one.[0m
 
   There is no such thing as "Canada Cable"; Canada uses the same
   frequencies as the United States.  "Canada Cable" was a hack that some
@@ -4562,7 +4575,7 @@
   more information.
 
 
-  [1m20.18.  Mythweb is showing a db_open error when I connect to it.[0m
+  [1m20.20.  Mythweb is showing a db_open error when I connect to it.[0m
 
   Find your php.ini file. Make sure you've got a line in it like this:
 
@@ -4571,7 +4584,7 @@
   Restart apache for it to take effect.
 
 
-  [1m20.19.  error: can't find a register in class 'BREG' while reloading[0m
+  [1m20.21.  error: can't find a register in class 'BREG' while reloading[0m
   [1m'asm'[0m
 
   This is due to the broken Qt that is being distributed by Suse.  To
@@ -4579,7 +4592,7 @@
   you find there and then recompile.
 
 
-  [1m20.20.  make: *** No rule to make target[0m
+  [1m20.22.  make: *** No rule to make target[0m
   [1m/usr/lib/qt3/mkspecs/default/qmake.conf', needed by Makefile'.  Stop.[0m
 
   This error happens when there's a missing link in the
@@ -4605,41 +4618,41 @@
   choice is the better solution.
 
 
-  [1m20.21.  make: *** No rule to make target /mkspecs/default/qmake.conf',[0m
+  [1m20.23.  make: *** No rule to make target /mkspecs/default/qmake.conf',[0m
   [1mneeded by Makefile'.  Stop.[0m
 
   You didn't set your QTDIR.  Re-read the section on ``Setting up
   paths''.
 
 
-  [1m20.22.  My mouse pointer disappears when placed over the MythTV win-[0m
+  [1m20.24.  My mouse pointer disappears when placed over the MythTV win-[0m
   [1mdows.[0m
 
   This is the intended behavior.  The MythTV interface is meant for use
   with a remote control or a keyboard.
 
 
-  [1m20.23.  What does "strange error flushing buffer" mean on my console?[0m
+  [1m20.25.  What does "strange error flushing buffer" mean on my console?[0m
 
   Nothing, really.  It's just lame (the mp3 encoder) complaining for
   some obscure reason.  This seems to be fixed in more recent versions
   of the libmp3lame library.
 
 
-  [1m20.24.  I can't change the channel when watching Live TV.[0m
+  [1m20.26.  I can't change the channel when watching Live TV.[0m
 
   Something's wrong with your program database.  Did mythfilldatabase
   run with no major errors?
 
 
-  [1m20.25.  When trying to run setup, I get an error like this: "./setup:[0m
+  [1m20.27.  When trying to run setup, I get an error like this: "./setup:[0m
   [1merror while loading shared libraries:"[0m
 
   You didn't add /usr/local/lib to /etc/ld.so.conf.  See the section on
   modifying ``/etc/ld.so.conf''.
 
 
-  [1m20.26.  Troubleshooting the Hauppauge PVR-250 IR remote[0m
+  [1m20.28.  Troubleshooting the Hauppauge PVR-250 IR remote[0m
 
   The most likely issue is that you have incompatible versions of the
   [1mlirc_i2c [22mand [1mlirc_dev [22mmodules and the various [1mlircd [22mprograms.  See the
@@ -4647,19 +4660,19 @@
   support.'' for examples on finding and removing old versions of lirc.
 
 
-  [1m20.27.  MySQL not connecting correctly.[0m
+  [1m20.29.  MySQL not connecting correctly.[0m
 
   Your [1mMySQL [22minstallation may have networking turned off.  Check that
   /etc/mysql/my.cnf [4mdoes[24m [4mnot[24m contain skip-networking.  If it does,
   remove it, and restart [1mMySQL[22m.
 
-
-  [1m20.28.  My screen goes black when I try to play something.[0m
+  [1m20.30.  My screen goes black when I try to play something.[0m
 
   MythTV prints error and status messages to the shell that was used to
   start the application.  If nothing seems to be happening when you try
   to view a program, try switching back to the shell and look for error
   messages there.
+
   [1m21.  Miscellaneous.[0m
 
   [1m21.1.  I'd like to watch the files without using MythTV / I'd like to[0m
