@@ -240,25 +240,27 @@ void showStatus(void)
     else
        Status += "Successful";
 
-    Status += "\n\nThere is guide data until ";
-    Status += QDateTime(GuideDataThrough).toString("yyyy-MM-dd hh:mm");
-
     DaysOfData = qdtNow.daysTo(GuideDataThrough);
 
-    Status += "\nThere ";
+    if (!GuideDataThrough.isNull())
+    {
+        Status += "\n\nThere's guide data until ";
+        Status += QDateTime(GuideDataThrough).toString("yyyy-MM-dd hh:mm");
 
-    if (DaysOfData == 1) 
-       Status += "is ";
-    else 
-       Status += "are ";
-
-    Status += QString::number(DaysOfData);
-    Status += " day";
-
-    if (DaysOfData != 1)
-       Status += "s";
-
-    Status += " of guide data remaining in the database.\n";
+        if (DaysOfData > 0)
+        {
+            Status += QString("\n(%1 day").arg(DaysOfData);
+            Status += (DaysOfData == 1 ? "" : "s" );
+            Status += ").";
+        }
+        else
+            Status += ".";
+    }
+    else
+    {
+        Status += "There's no guide data available! ";
+        Status += "Have you run mythfilldatabase?\n";
+    }
 
     if (DaysOfData <= 3)
        Status += "\nWARNING: is mythfilldatabase running?";

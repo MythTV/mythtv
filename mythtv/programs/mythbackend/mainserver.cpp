@@ -2785,8 +2785,8 @@ void MainServer::PrintStatus(QSocket *socket)
             os << " <strong>WARNING</strong>: is mythfilldatabase running?";
     }
     else
-        os << "    There's <strong>no guide data</strong> availible! "
-           << "You need to run mythfilldatabase!";
+        os << "    There's <strong>no guide data</strong> available! "
+           << "Have you run mythfilldatabase?";
 
     os << "\r\n  </div>\r\n\r\n</body>\r\n</html>\r\n";
 
