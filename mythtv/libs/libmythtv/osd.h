@@ -19,8 +19,8 @@ class OSDTypeImage;
 class OSD
 {
  public:
-    OSD(int width, int height, int framerate, const QString &filename, 
-        const QString &prefix, const QString &osdtheme);
+    OSD(int width, int height, int framerate, const QString &font, 
+        const QString &ccfont, const QString &prefix, const QString &osdtheme);
    ~OSD(void);
 
     void Display(unsigned char *yuvptr);
@@ -31,6 +31,9 @@ class OSD
                      const QString &callsign, const QString &iconpath,
                      int length);
     void SetChannumText(const QString &text, int length);
+    void AddCCText(const QString &text, int x, int y, int color, 
+                   bool teletextmode = false);
+    void ClearAllCCText();
     void SetSettingsText(const QString &text, int length);
 
     void NewDialogBox(const QString &name, const QString &message, 
@@ -83,6 +86,7 @@ class OSD
     void RemoveSet(OSDSet *set);
 
     QString fontname;
+    QString ccfontname;
 
     int vid_width;
     int vid_height;

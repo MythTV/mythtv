@@ -23,6 +23,7 @@ using namespace std;
 
 extern "C" {
 #include "../libavcodec/mythav.h"
+#include "../libvbitext/vbi.h"
 }
 
 #include "mythcontext.h"
@@ -57,9 +58,12 @@ NuppelVideoPlayer::NuppelVideoPlayer(MythContext *context)
     audiofd = -1;
     filename = "output.nuv";
 
+    vbimode = ' ';
+    vbipagenr = 0x08880000;
     video_height = 0;
     video_width = 0;
     video_size = 0;
+    text_size = 0;
 
     eof = 0;
     buf = NULL;
@@ -76,6 +80,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(MythContext *context)
     strm = NULL;
     wpos = rpos = 0;
     waud = raud = 0;
+    wtxt = rtxt = 0;
 
     embedid = 0;
     embx = emby = embw = embh = -1;
@@ -141,7 +146,10 @@ NuppelVideoPlayer::NuppelVideoPlayer(MythContext *context)
     dialogname = "";
 
     for (int i = 0; i <= MAXVBUFFER; i++)
-         vbuffer[i] = NULL;
+        vbuffer[i] = NULL;
+
+    for (int i = 0; i < MAXTBUFFER; i++)
+        tbuffer[i] = NULL;
 
     own_vidbufs = false;
 
@@ -150,6 +158,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(MythContext *context)
 
     killaudio = false;
     pauseaudio = false;
+
+    cc = false;
 
     pthread_mutex_init(&eventLock, NULL);
 }
@@ -182,6 +192,12 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
             if (vbuffer[i])
                 delete [] vbuffer[i];
         }
+    }
+
+    for (int i = 0; i <= MAXTBUFFER; i++)
+    {
+        if (tbuffer[i])
+            delete [] tbuffer[i];
     }
 
     CloseAVCodec();
@@ -423,6 +439,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
         video_height = fileheader.height;
         video_frame_rate = fileheader.fps;
         video_size = video_height * video_width * 3 / 2;
+        text_size = 8 * (sizeof(teletextsubtitle) + VT_WIDTH);
         eof = 0;
     }
 
@@ -974,6 +991,29 @@ int NuppelVideoPlayer::vbuffer_numfree(void)
        MAXVBUFFER - 1. */
 }
 
+int NuppelVideoPlayer::tbuffer_numvalid(void)
+{
+    /* thread safe, returns number of valid slots in the text buffer */
+    int ret;
+    pthread_mutex_lock(&text_buflock);
+
+    if (wtxt >= rtxt)
+        ret = wtxt - rtxt;
+    else
+        ret = MAXTBUFFER - (rtxt - wtxt);
+
+    pthread_mutex_unlock(&text_buflock);
+    return ret;
+}
+
+int NuppelVideoPlayer::tbuffer_numfree(void)
+{
+    return MAXTBUFFER - tbuffer_numvalid() - 1;
+    /* There's one wasted slot, because the case when rtxt = wtxt is
+       interpreted as an empty buffer. So the fullest the buffer can be is
+       MAXTBUFFER - 1. */
+}
+
 int NuppelVideoPlayer::GetAudiotime(void)
 {
     /* Returns the current timecode of audio leaving the soundcard, based
@@ -1242,6 +1282,23 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
                 pthread_mutex_unlock(&audio_buflock); // end critical section
             }
         }
+        if (frameheader.frametype == 'T')
+        {
+            if (!tbuffer_numfree())
+            {
+                cerr << "text buffer overflow\n";
+            }
+            else
+            {
+                memcpy(tbuffer[wtxt], strm, frameheader.packetlength);
+                txttimecodes[wtxt] = frameheader.timecode;
+                txttype[wtxt] = frameheader.comptype;
+
+                pthread_mutex_lock(&text_buflock);
+                wtxt = (wtxt+1) % MAXTBUFFER;
+                pthread_mutex_unlock(&text_buflock);
+            }
+        }
     }
 }
 
@@ -1358,6 +1415,75 @@ void NuppelVideoPlayer::ToggleFullScreen(void)
         videoOutput->ToggleFullScreen();
 }
 
+void NuppelVideoPlayer::ToggleCC(void)
+{
+    if (cc)
+    {
+        printf("turn tt off\n");
+        cc = false;
+    }
+    else
+    {
+        printf("turn tt on\n");
+        cc = true;
+    }
+}
+
+void NuppelVideoPlayer::ShowText(void)
+{
+    // check if subtitles need to be updated on the OSD
+    if (tbuffer_numvalid() && txttimecodes[rtxt] && 
+        (txttimecodes[rtxt] <= timecodes[rpos]))
+    {
+        if (txttype[rtxt] == 'T')
+        {
+            // display full page of teletext
+            //
+            // all formatting is always defined in the page itself,
+            // if scrolling is needed for live closed captions this
+            // is handled by the broadcaster:
+            // the pages are then very often transmitted (sometimes as often as
+            // every 2 frames) with small differences between them
+            unsigned char *inpos = tbuffer[rtxt];
+            int pagenr;
+            memcpy(&pagenr, inpos, sizeof(int));
+            inpos += sizeof(int);
+
+            if (pagenr == vbipagenr)
+            {
+                // show teletext subtitles
+                osd->ClearAllCCText();
+                while (*inpos)
+                {
+                    struct teletextsubtitle st;
+                    memcpy(&st, inpos, sizeof(st));
+                    inpos += sizeof(st);
+                    printf("%s\n", (char*) inpos);
+                    QString s((const char*) inpos);
+                    osd->AddCCText(s, st.row, st.col, 1, true);
+                    inpos += st.len;
+                }
+            }
+        }
+        else if (txttype[rtxt] == 'C')
+        {
+            // TODO: show US close caption
+            //
+            // as far as I understand this is a stream of characters,
+            // which upon display is broken into words and lines and scrolled,
+            // vbipagenr could be used to select the streamnr like
+            // the pagenr for teletext
+        }
+
+        /* update rtxt */
+        pthread_mutex_lock(&text_buflock);
+        if (rtxt != wtxt) // if a seek occurred, rtxt == wtxt, in this case do
+                          // nothing
+            rtxt = (rtxt + 1) % MAXTBUFFER;
+        pthread_mutex_unlock(&text_buflock);
+    }
+}
+
 void NuppelVideoPlayer::OutputVideoLoop(void)
 {
     int laudiotime;
@@ -1465,6 +1591,9 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
             if (pipplayer)
                 ShowPip(vbuffer[rpos]);
+
+            ShowText();
+
             osd->Display(vbuffer[rpos]);
         }
 	
@@ -1697,7 +1826,7 @@ void NuppelVideoPlayer::StartPlaying(void)
     {
         InitVideo();
         osd = new OSD(video_width, video_height, (int)ceil(video_frame_rate),
-                      osdfilename, osdprefix, osdtheme);
+                      osdfontname, osdccfontname, osdprefix, osdtheme);
     }
     else
         own_vidbufs = true;
@@ -1728,6 +1857,10 @@ void NuppelVideoPlayer::StartPlaying(void)
             for (int i = 0; i < MAXVBUFFER; i++)
                 vbuffer[i] = new unsigned char[video_size];
         }
+
+        for (int i = 0; i < MAXTBUFFER; i++)
+            tbuffer[i] = new unsigned char[text_size];
+
         ClearAfterSeek();
     }
 
@@ -2219,12 +2352,21 @@ void NuppelVideoPlayer::ClearAfterSeek(void)
     }
     wpos = 0;
     rpos = 0;
+    for (int i = 0; i < MAXTBUFFER; i++)
+    {
+        txttimecodes[i] = 0;
+    }
+    wtxt = 0;
+    rtxt = 0;
     raud = waud = 0;
     weseeked = 1;
     audbuf_timecode = 0;
     audiotime = 0;
     gettimeofday(&audiotime_updated, NULL);
     prebuffering = true;
+
+    if (osd)
+        osd->ClearAllCCText();
 
     //if (audiofd)
     //    ioctl(audiofd, SNDCTL_DSP_RESET, NULL);

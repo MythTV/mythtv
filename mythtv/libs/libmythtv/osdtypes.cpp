@@ -69,14 +69,21 @@ OSDType *OSDSet::GetType(const QString &name)
     return ret;
 }
 
-void OSDSet::Display(void)
+void OSDSet::Display(bool onoff)
 {
-    m_notimeout = true;
-    m_displaying = true;
-    m_framesleft = 1;
-    m_fadeframes = -1;
-    m_xoff = 0;
-    m_yoff = 0;
+    if (onoff)
+    {
+        m_notimeout = true;
+        m_displaying = true;
+        m_framesleft = 1;
+        m_fadeframes = -1;
+        m_xoff = 0;
+        m_yoff = 0;
+    }
+    else
+    {
+        m_displaying = false;
+    }
 }
 
 void OSDSet::DisplayFor(int frames)
@@ -1030,6 +1037,97 @@ void OSDTypePositionRectangle::Draw(unsigned char *screenptr, int vid_width,
         {
             src = screenptr + x + y * vid_width;
             *src = 255;
+        }
+    }
+}
+
+OSDTypeCC::OSDTypeCC(const QString &name, TTFFont *font)
+          : OSDType(name)
+{
+    m_font = font;
+    m_textlist = NULL;
+}
+
+OSDTypeCC::~OSDTypeCC()
+{
+}
+
+void OSDTypeCC::AddCCText(const QString &text, int x, int y, int color, 
+                          bool teletextmode)
+{
+    ccText *cc = new ccText();
+    cc->text = text;
+    cc->x = x;
+    cc->y = y;
+    cc->color = color;
+    cc->teletextmode = teletextmode;
+
+    if (!m_textlist)
+        m_textlist = new vector<ccText*>;
+
+    m_textlist->push_back(cc);
+}
+
+void OSDTypeCC::ClearAllCCText()
+{
+    if (m_textlist)
+    {
+        vector<ccText*>::iterator i = m_textlist->begin();
+        for (; i != m_textlist->end(); i++)
+        {
+            ccText *cc = (*i);
+            if (cc)
+                delete cc;
+        }
+        delete m_textlist;
+        m_textlist = NULL;
+    }
+}
+
+void OSDTypeCC::Draw(unsigned char *screenptr, int vid_width, int vid_height,
+                     int fade, int maxfade, int xoff, int yoff)
+{
+    // not used
+    fade = fade;
+    maxfade = maxfade;
+    xoff = xoff;
+    yoff = yoff;
+
+    vector<ccText*>::iterator i = m_textlist->begin();
+    for (; i != m_textlist->end(); i++)
+    {
+        ccText *cc = (*i);
+
+        if (cc && (cc->text != QString::null))
+        {
+            int textlength = 0;
+            m_font->CalcWidth(cc->text, &textlength);
+
+            int x, y;
+            if (cc->teletextmode)
+            {
+                // position as if we use a fixed size font
+                // on a 24 row / 40 char grid (teletext expects us to)
+                x = cc->y * vid_width / 40;
+                y = cc->x * vid_height / 25;
+            }
+            else
+            {
+                x = cc->x;
+                y = cc->y;
+            }
+
+            int maxx = x + textlength;
+            int maxy = y + m_font->Size();
+
+            if (maxx > vid_width)
+                maxx = vid_width;
+
+            if (maxy > vid_height)
+                maxy = vid_height;
+
+            m_font->DrawString(screenptr, x, y, cc->text, maxx, maxy, 255, 
+                               cc->color, false);
         }
     }
 }

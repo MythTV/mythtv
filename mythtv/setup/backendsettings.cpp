@@ -56,6 +56,17 @@ public:
     };
 };
 
+class VbiFormat: public ComboBoxSetting, public BackendSetting {
+public:
+    VbiFormat():
+        BackendSetting("VbiFormat") {
+        setLabel("Vbi format");
+        addSelection("None");
+        addSelection("PAL Teletext");
+        addSelection("NTSC CC");
+    };
+};
+
 class FreqTable: public ComboBoxSetting, public BackendSetting {
 public:
     FreqTable():
@@ -115,6 +126,7 @@ BackendSettings::BackendSettings() {
     group1->addChild(new BufferSize());
     group1->addChild(new MaxBufferFill());
     group1->addChild(new TVFormat());
+    group1->addChild(new VbiFormat());
     group1->addChild(new FreqTable());
     addChild(group1);
 }

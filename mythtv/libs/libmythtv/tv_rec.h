@@ -98,7 +98,8 @@ class TVRec
                         QString &endtime, QString &callsign, QString &iconpath,
                         QString &channelname);
 
-    void GetDevices(int cardnum, QString &video, QString &audio, int &rate);
+    void GetDevices(int cardnum, QString &video, QString &vbi, QString &audio,
+                    int &rate);
 
     void ConnectDB(int cardnum);
     void DisconnectDB(void);
@@ -144,7 +145,7 @@ class TVRec
     ProgramInfo *curRecording;
     int tvtorecording;
     
-    QString videodev, audiodev;
+    QString videodev, vbidev, audiodev;
     int audiosamplerate;
 
     bool inoverrecord;

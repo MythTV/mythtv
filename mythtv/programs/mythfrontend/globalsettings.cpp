@@ -160,6 +160,17 @@ public:
     };
 };
 
+class OSDCCFont: public ComboBoxSetting, public GlobalSetting {
+public:
+    OSDCCFont():
+        GlobalSetting("OSDCCFont") {
+
+        setLabel("Closed Caption font");
+        addSelection("FreeSans.ttf");
+        addSelection("ClosedCaption.ttf");
+    };
+};
+
 class ChannelOrdering: public ComboBoxSetting, public GlobalSetting {
 public:
     ChannelOrdering():
@@ -770,5 +781,6 @@ AppearanceSettings::AppearanceSettings()
     osd->addChild(new OSDTheme());
     osd->addChild(new OSDDisplayTime());
     osd->addChild(new OSDFont());
+    osd->addChild(new OSDCCFont());
     addChild(osd);
 }

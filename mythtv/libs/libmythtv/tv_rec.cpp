@@ -47,7 +47,7 @@ TVRec::TVRec(MythContext *lcontext, const QString &startchannel,
 
     audiosamplerate = -1;
 
-    GetDevices(capturecardnum, videodev, audiodev, audiosamplerate);
+    GetDevices(capturecardnum, videodev, vbidev, audiodev, audiosamplerate);
 
     QString inputname = context->GetSetting("TunerCardInput");
 
@@ -428,6 +428,7 @@ void TVRec::SetupRecorder(RecordingProfile& profile)
     nvr = new NuppelVideoRecorder();
     nvr->SetRingBuffer(rbuffer);
     nvr->SetVideoDevice(videodev);
+    nvr->SetVbiDevice(vbidev);
 
     QString setting = profile.byName("videocodec")->getValue();
     if (setting == "MPEG-4") {
@@ -467,6 +468,7 @@ void TVRec::SetupRecorder(RecordingProfile& profile)
                        profile.byName("height")->getValue().toInt());
 
     nvr->SetTVFormat(context->GetSetting("TVFormat"));
+    nvr->SetVbiFormat(context->GetSetting("VbiFormat"));
 
     nvr->SetAudioDevice(audiodev);
    
@@ -775,17 +777,20 @@ void TVRec::DisconnectDB(void)
     pthread_mutex_unlock(&db_lock);
 }
 
-void TVRec::GetDevices(int cardnum, QString &video, QString &audio, int &rate)
+void TVRec::GetDevices(int cardnum, QString &video, QString &vbi, 
+                       QString &audio, int &rate)
 {
     video = "";
+    vbi = "";
     audio = "";
 
     pthread_mutex_lock(&db_lock);
 
     context->KickDatabase(db_conn);
 
-    QString thequery = QString("SELECT videodevice,audiodevice,audioratelimit "
-                               "FROM capturecard WHERE cardid = %1;")
+    QString thequery = QString("SELECT videodevice,vbidevice,audiodevice,"
+                               "audioratelimit FROM capturecard "
+                               "WHERE cardid = %1;")
                               .arg(cardnum);
 
     QSqlQuery query = db_conn->exec(thequery);
@@ -802,8 +807,11 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &audio, int &rate)
             video = QString::fromUtf8(test);
         test = query.value(1).toString();
         if (test != QString::null)
+            vbi = QString::fromUtf8(test);
+        test = query.value(2).toString();
+        if (test != QString::null)
             audio = QString::fromUtf8(test);
-        testnum = query.value(2).toInt();
+        testnum = query.value(3).toInt();
 
         if (testnum > 0)
             rate = testnum;

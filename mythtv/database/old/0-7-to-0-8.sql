@@ -59,6 +59,8 @@ WHERE chanid IS NULL;
 ALTER TABLE settings ADD COLUMN hostname VARCHAR(255) NULL;
 
 ALTER TABLE capturecard ADD COLUMN hostname VARCHAR(255);
+ALTER TABLE capturecard ADD COLUMN vbidevice VARCHAR(255);
+
 ALTER TABLE recorded ADD COLUMN hostname VARCHAR(255);
 
 ALTER TABLE videosource ADD COLUMN xmltvgrabber VARCHAR(128);

@@ -118,6 +118,7 @@ CREATE TABLE IF NOT EXISTS capturecard
     cardid INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
     videodevice VARCHAR(128),
     audiodevice VARCHAR(128),
+    vbidevice VARCHAR(128),
     cardtype VARCHAR(32) DEFAULT 'V4L',
     audioratelimit INT,
     hostname VARCHAR(255)

@@ -27,6 +27,7 @@ extern "C" {
 using namespace std;
 
 #define MAXVBUFFER 21
+#define MAXTBUFFER 11
 #define AUDBUFSIZE 512000
 
 class NuppelVideoPlayer;
@@ -81,8 +82,9 @@ class NuppelVideoPlayer
 
     OSD *GetOSD(void) { return osd; }
 
-    void SetOSDFontName(QString filename, QString prefix) 
-                      { osdfilename = filename; osdprefix = prefix; }
+    void SetOSDFontName(QString filename, QString osdccfont, QString prefix) 
+    { osdfontname = filename; osdccfontname = osdccfont; osdprefix = prefix; }
+
     void SetOSDThemeName(QString themename) { osdtheme = themename; }
 
     // don't use this on something you're playing
@@ -110,6 +112,8 @@ class NuppelVideoPlayer
     void SetBookmark(void);
 
     void ToggleFullScreen(void);
+
+    void ToggleCC(void);
 
     // edit mode stuff
     bool EnableEdit(void);
@@ -163,10 +167,13 @@ class NuppelVideoPlayer
     int audiofree(bool use_lock); // number of free bytes in audio buffer
     int vbuffer_numvalid(void); // number of valid slots in video buffer
     int vbuffer_numfree(void); // number of free slots in the video buffer
+    int tbuffer_numvalid(void); // number of valid slots in the text buffer
+    int tbuffer_numfree(void); // number of free slots in the text buffer
 
     void ResetNexttrigger(struct timeval *tv);
 
     void ShowPip(unsigned char *xvidbuf);
+    void ShowText();
 
     void UpdateTimeDisplay(void);
     void UpdateSeekAmount(bool up);
@@ -209,6 +216,10 @@ class NuppelVideoPlayer
     unsigned char *strm;
     struct rtframeheader frameheader;
 
+    char vbimode;
+    int vbipagenr;
+    int text_size;
+
     /* Video circular buffer */
     int wpos;		/* next slot to write */
     int rpos;		/* next slot to read */
@@ -223,11 +234,19 @@ class NuppelVideoPlayer
     int raud, waud;		/* read and write positions */
     int audbuf_timecode;	/* timecode of audio most recently placed into
 				   buffer */
+    /* Text circular buffer */
+    int wtxt;          /* next slot to write */
+    int rtxt;          /* next slot to read */
+    int txttimecodes[MAXTBUFFER];      /* timecode for each slot */
+    char txttype[MAXTBUFFER];  /* texttype for each slot */
+    unsigned char *tbuffer[MAXTBUFFER+1];      /* decoded subtitles */
 
     pthread_mutex_t audio_buflock; /* adjustments to audiotimecode, waud, and
                                       raud can only be made while holding this
                                       lock */
     pthread_mutex_t video_buflock; /* adjustments to rpos and wpos can only
+                                      be made while holding this lock */
+    pthread_mutex_t text_buflock;  /* adjustments to rtxt and wtxt can only
                                       be made while holding this lock */
 
     /* A/V Sync state */
@@ -257,6 +276,7 @@ class NuppelVideoPlayer
 
     bool paused, pausevideo, pauseaudio;
     bool actuallypaused, audio_actually_paused, video_actually_paused;
+    bool cc;
 
     bool playing;
 
@@ -287,7 +307,8 @@ class NuppelVideoPlayer
     int totalLength;
     long long totalFrames;
 
-    QString osdfilename;
+    QString osdfontname;
+    QString osdccfontname;
     QString osdprefix;
     QString osdtheme;
     OSD *osd;

@@ -16,6 +16,10 @@ using namespace std;
 
 #include "NuppelVideoRecorder.h"
 
+extern "C" {
+#include "../libvbitext/vbi.h"
+}
+
 #include <linux/videodev.h>
 
 #ifndef MJPIOC_S_PARAMS
@@ -40,6 +44,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
     ntsc = 1;
     rawmode = 0;
     usebttv = 1;
+    vbimode = 0;
     w = 352;
     h = 240;
 
@@ -51,15 +56,22 @@ NuppelVideoRecorder::NuppelVideoRecorder(void)
 
     act_video_encode = 0;
     act_video_buffer = 0;
+    video_buffer_count = 0;
+    video_buffer_size = 0;
+
     act_audio_encode = 0;
     act_audio_buffer = 0;
-    video_buffer_count = 0;
     audio_buffer_count = 0;
-    video_buffer_size = 0;
     audio_buffer_size = 0;
+
+    act_text_encode = 0;
+    act_text_buffer = 0;
+    text_buffer_count = 0;
+    text_buffer_size = 0;
 
     audiodevice = "/dev/dsp";
     videodevice = "/dev/video";
+    vbidevice = "/dev/vbi";
 
     childrenLive = false;
 
@@ -152,6 +164,13 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         delete ab;
         audiobuffer.pop_back();
     }
+    while (textbuffer.size() > 0)
+    {
+        struct txtbuffertype *tb = textbuffer.back();
+        delete [] tb->buffer;
+        delete tb;
+        textbuffer.pop_back();
+    }
 
     if (mpa_codec)
         avcodec_close(mpa_ctx);
@@ -173,6 +192,16 @@ void NuppelVideoRecorder::SetTVFormat(QString tvformat)
         ntsc = 1;
     else 
         ntsc = 0;
+}
+
+void NuppelVideoRecorder::SetVbiFormat(QString vbiformat)
+{
+    if (vbiformat.lower() == "pal teletext")
+        vbimode = 1;
+    else if (vbiformat.lower() == "ntsc cc")
+        vbimode = 2;
+    else
+        vbimode = 0;
 }
 
 bool NuppelVideoRecorder::SetupAVCodec(void)
@@ -343,6 +372,9 @@ void NuppelVideoRecorder::Initialize(void)
     mp3buf_size = (int)(1.25 * 8192 + 7200);
     mp3buf = new char[mp3buf_size];
 
+    text_buffer_size = 8 * (sizeof(teletextsubtitle) + VT_WIDTH);
+    text_buffer_count = video_buffer_count;
+
     if (!ringBuffer)
     {
         cerr << "Warning: Old ringbuf creation\n";
@@ -446,6 +478,16 @@ void NuppelVideoRecorder::InitBuffers(void)
         audbuf->freeToBuffer = 1;
       
         audiobuffer.push_back(audbuf);
+    }
+
+    for (int i = 0; i < text_buffer_count; i++)
+    {
+        txtbuffertype *txtbuf = new txtbuffertype;
+        txtbuf->buffer = new unsigned char[text_buffer_size];
+        txtbuf->freeToEncode = 0;
+        txtbuf->freeToBuffer = 1;
+
+        textbuffer.push_back(txtbuf);
     }
 }
 
@@ -990,6 +1032,18 @@ int NuppelVideoRecorder::SpawnChildren(void)
 	return -1;
     }
 
+    if (vbimode)
+    {
+        result = pthread_create(&vbi_tid, NULL,
+                                NuppelVideoRecorder::VbiThread, this);
+
+        if (result)
+        {
+            cerr << "Couldn't spawn vbi thread, exiting\n";
+            return -1;
+        }
+    }
+
     return 0;
 }
 
@@ -1004,6 +1058,8 @@ void NuppelVideoRecorder::KillChildren(void)
 
     pthread_join(write_tid, NULL);
     pthread_join(audio_tid, NULL);
+    if (vbimode)
+        pthread_join(vbi_tid, NULL);
 }
 
 void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len)
@@ -1095,7 +1151,7 @@ void NuppelVideoRecorder::WriteHeader(bool todumpfile)
     video_frame_rate = fileheader.fps;
     fileheader.videoblocks = -1;
     fileheader.audioblocks = -1;
-    fileheader.textsblocks = 0;
+    fileheader.textsblocks = -1; // TODO: make only -1 if VBI support active?
     fileheader.keyframedist = KEYFRAMEDIST;
 
     if (todumpfile)
@@ -1335,6 +1391,15 @@ void *NuppelVideoRecorder::AudioThread(void *param)
     return NULL;
 }
 
+void *NuppelVideoRecorder::VbiThread(void *param)
+{
+    NuppelVideoRecorder *nvr = (NuppelVideoRecorder *)param;
+
+    nvr->doVbiThread();
+
+    return NULL;
+}
+
 void NuppelVideoRecorder::doAudioThread(void)
 {
     int afmt = 0, trigger = 0;
@@ -1468,10 +1533,261 @@ void NuppelVideoRecorder::doAudioThread(void)
     close(afd);
 }
 
+struct VBIData
+{
+    NuppelVideoRecorder *nvr;
+    vt_page teletextpage;
+    bool foundteletextpage;
+};
+
+void NuppelVideoRecorder::FormatTeletextSubtitles(struct VBIData *vbidata)
+{
+    struct timeval tnow;
+    gettimeofday(&tnow, &tzone);
+
+    int act = act_text_buffer;
+    if (!textbuffer[act]->freeToBuffer)
+    {
+        cerr << act << " ran out of free TEXT buffers :-(\n";
+        return;
+    }
+
+    // calculate timecode:
+    // compute the difference  between now and stm (start time)
+    textbuffer[act]->timecode = (tnow.tv_sec-stm.tv_sec) * 1000 +
+                                tnow.tv_usec/1000 - stm.tv_usec/1000;
+    textbuffer[act]->pagenr = (vbidata->teletextpage.pgno << 16) + 
+                              vbidata->teletextpage.subno;
+
+    unsigned char *inpos = vbidata->teletextpage.data[0];
+    unsigned char *outpos = textbuffer[act]->buffer;
+    *outpos = 0;
+    struct teletextsubtitle st;
+    unsigned char linebuf[VT_WIDTH + 1];
+    unsigned char *linebufpos = linebuf;
+
+    for (int y = 0; y < VT_HEIGHT; y++)
+    {
+        char c = ' ';
+        char last_c = ' ';
+        int hid = 0;
+        int gfx = 0;
+        int dbl = 0;
+        int box = 0;
+        int sep = 0;
+        int hold = 0;
+        int visible = 0;
+        int fg = 7;
+        int bg = 0;
+
+        for (int x = 0; x < VT_WIDTH; ++x)
+        {
+            c = *inpos++;
+            switch (c)
+            {
+                case 0x00 ... 0x07:     /* alpha + fg color */
+                    fg = c & 7;
+                    gfx = 0;
+                    sep = 0;
+                    hid = 0;
+                    goto ctrl;
+                case 0x08:              /* flash */
+                    goto ctrl;
+                case 0x09:              /* steady */
+                    goto ctrl;
+                case 0x0a:              /* end box */
+                    box = 0;
+                    goto ctrl;
+                case 0x0b:              /* start box */
+                    box = 1;
+                    goto ctrl;
+                case 0x0c:              /* normal height */
+                    dbl = 0;
+                    goto ctrl;
+                case 0x0d:              /* double height */
+                    if (y < VT_HEIGHT-2)        /* ignored on last 2 lines */
+                    {
+                        dbl = 1;
+                    }
+                    goto ctrl;
+                case 0x10 ... 0x17:     /* gfx + fg color */
+                    fg = c & 7;
+                    gfx = 1;
+                    hid = 0;
+                    goto ctrl;
+                case 0x18:              /* conceal */
+                    hid = 1;
+                    goto ctrl;
+                case 0x19:              /* contiguous gfx */
+                    hid = 0;
+                    sep = 0;
+                    goto ctrl;
+                case 0x1a:              /* separate gfx */
+                    sep = 1;
+                    goto ctrl;
+                case 0x1c:              /* black bf */
+                    bg = 0;
+                    goto ctrl;
+                case 0x1d:              /* new bg */
+                    bg = fg;
+                    goto ctrl;
+                case 0x1e:              /* hold gfx */
+                    hold = 1;
+                    goto ctrl;
+                case 0x1f:              /* release gfx */
+                    hold = 0;
+                    goto ctrl;
+                case 0x0e:              /* SO */
+                    goto ctrl;
+                case 0x0f:              /* SI */
+                    goto ctrl;
+                case 0x1b:              /* ESC */
+                    goto ctrl;
+ 
+                ctrl:
+                    c = ' ';
+                    if (hold && gfx)
+                        c = last_c;
+                    break;
+            }
+            if (gfx)
+                if ((c & 0xa0) == 0x20)
+                {
+                    last_c = c;
+                    c += (c & 0x40) ? 32 : -32;
+                }
+            if (hid)
+                c = ' ';
+            if ((c & 0x80) || !c )
+                c = ' ';
+
+            if (visible || (c != ' '))
+            {
+                if (!visible)
+                {
+                    st.row = y;
+                    st.col = x;
+                    st.dbl = dbl;
+                    st.fg  = fg;
+                    st.bg  = bg;
+                    linebufpos = linebuf;
+                    *linebufpos = 0;
+                }
+                *linebufpos++ = c;
+                *linebufpos = 0;
+                visible = 1;
+            }
+        }
+        if (visible)
+        {
+            st.len = linebufpos - linebuf + 1;;
+            memcpy(outpos, &st, sizeof(st));
+            outpos += sizeof(st);
+            memcpy(outpos, linebuf, st.len);
+            outpos += st.len;
+            *outpos = 0;
+        }
+    }
+
+    textbuffer[act]->bufferlen = outpos - textbuffer[act]->buffer + 1;
+    textbuffer[act]->freeToBuffer = 0;
+    act_text_buffer++;
+    if (act_text_buffer >= text_buffer_count)
+        act_text_buffer = 0;
+    textbuffer[act]->freeToEncode = 1;
+}
+
+static void vbi_event(struct VBIData *data, struct vt_event *ev)
+{
+    switch (ev->type)
+    {
+       case EV_PAGE:
+       {
+            struct vt_page *vtp = (struct vt_page *) ev->p1;
+            if (vtp->flags & PG_SUBTITLE)
+            {
+                //printf("subtitle page %x.%x\n", vtp->pgno, vtp->subno);
+                data->foundteletextpage = true;
+                memcpy(&(data->teletextpage), vtp, sizeof(vt_page));
+            }
+       }
+
+       case EV_HEADER:
+       case EV_XPACKET:
+           break;
+    }
+}
+
+// for now just european teletext support,
+// should be easy to add US closed captioning
+void NuppelVideoRecorder::doVbiThread(void)
+{
+    struct vbi *vbi;
+
+    if ((vbi = vbi_open(vbidevice.ascii(), 0, 99, -1)) <= 0)
+    {
+        cerr << "Can't open vbi device: " << vbidevice << "\n";
+        return;
+    }
+    cout << "opened vbi device\n";
+
+    struct VBIData vbicallbackdata;
+
+    vbicallbackdata.nvr = this;
+
+    vbi_add_handler(vbi, (void*) vbi_event, &vbicallbackdata);
+
+    while (childrenLive) 
+    {
+        if (paused)
+        {
+            usleep(50);
+            continue;
+        }
+
+        struct timeval tv;
+        fd_set rdset;
+
+        tv.tv_sec = 5;
+        tv.tv_usec = 0;
+        FD_ZERO(&rdset);
+        FD_SET(vbi->fd, &rdset);
+
+        switch (select(vbi->fd+1, &rdset, 0, 0, &tv))
+        {
+            case -1:
+                  perror("vbi select");
+                  continue;
+            case 0:
+                  //printf("vbi select timeout\n");
+                  continue;
+        }
+
+        if (vbimode == 1)
+        {
+            vbicallbackdata.foundteletextpage = false;
+            vbi_handler(vbi, vbi->fd);
+            if (vbicallbackdata.foundteletextpage)
+            {
+                // decode VBI as teletext subtitles
+                FormatTeletextSubtitles(&vbicallbackdata);
+            }
+        }
+        else if (vbimode == 2)
+        {
+            // TODO: decode VBI as US close caption
+        }
+    }
+
+    vbi_del_handler(vbi, (void*) vbi_event, &vbicallbackdata);
+
+    vbi_close(vbi);
+    cout << "closed vbi device\n";
+}
+
+
 void NuppelVideoRecorder::doWriteThread(void)
 {
-    int videofirst;
-
     actuallypaused = false;
     while (childrenLive)
     {
@@ -1482,31 +1798,41 @@ void NuppelVideoRecorder::doWriteThread(void)
             continue;
 	}
 	
-        if (!videobuffer[act_video_encode]->freeToEncode && 
-            (!audio_buffer_count || 
-             !audiobuffer[act_audio_encode]->freeToEncode))
-        {
-            usleep(1000);
-            continue;
-        }
+        enum 
+        { ACTION_NONE, 
+          ACTION_VIDEO, 
+          ACTION_AUDIO, 
+          ACTION_TEXT 
+        } action = ACTION_NONE;
+        int firsttimecode = -1;
 
         if (videobuffer[act_video_encode]->freeToEncode)
         {
-            if (audio_buffer_count && 
-                audiobuffer[act_audio_encode]->freeToEncode) 
-            {
-                videofirst = (videobuffer[act_video_encode]->timecode <=
-                              audiobuffer[act_audio_encode]->timecode);
-            }
-            else
-                videofirst = 1;
+            action = ACTION_VIDEO;
+            firsttimecode = videobuffer[act_video_encode]->timecode;
         }
-        else
-            videofirst = 0;
 
-        if (videofirst)
+
+        if (audio_buffer_count && 
+            audiobuffer[act_audio_encode]->freeToEncode &&
+            (action == ACTION_NONE ||
+             (audiobuffer[act_audio_encode]->timecode < firsttimecode)))
         {
-            if (videobuffer[act_video_encode]->freeToEncode)
+            action = ACTION_AUDIO;
+            firsttimecode = audiobuffer[act_audio_encode]->timecode;
+        }
+
+        if (text_buffer_count &&
+            textbuffer[act_text_encode]->freeToEncode &&
+            (action == ACTION_NONE ||
+             (textbuffer[act_text_encode]->timecode < firsttimecode)))
+        {
+            action = ACTION_TEXT;
+        }
+
+        switch (action)
+        {
+            case ACTION_VIDEO:
             {
                 WriteVideo(videobuffer[act_video_encode]->buffer,
                            videobuffer[act_video_encode]->bufferlen,
@@ -1518,12 +1844,9 @@ void NuppelVideoRecorder::doWriteThread(void)
                 act_video_encode++;
                 if (act_video_encode >= video_buffer_count)
                     act_video_encode = 0;
+                break;
             }
-        }
-        else
-        {
-            if (audio_buffer_count && 
-                audiobuffer[act_audio_encode]->freeToEncode)
+            case ACTION_AUDIO:
             {
                 WriteAudio(audiobuffer[act_audio_encode]->buffer,
                            audiobuffer[act_audio_encode]->sample,
@@ -1534,6 +1857,25 @@ void NuppelVideoRecorder::doWriteThread(void)
                 act_audio_encode++;
                 if (act_audio_encode >= audio_buffer_count) 
                     act_audio_encode = 0; 
+                break;
+            }
+            case ACTION_TEXT:
+            {
+                WriteText(textbuffer[act_text_encode]->buffer,
+                          textbuffer[act_text_encode]->bufferlen,
+                          textbuffer[act_text_encode]->timecode,
+                          textbuffer[act_text_encode]->pagenr);
+                textbuffer[act_text_encode]->freeToEncode = 0;
+                textbuffer[act_text_encode]->freeToBuffer = 1;
+                act_text_encode++;
+                if (act_text_encode >= text_buffer_count)
+                    act_text_encode = 0;
+                break;
+            }
+            default:
+            {
+                usleep(100);
+                break;
             }
         }
     }
@@ -1933,5 +2275,30 @@ void NuppelVideoRecorder::WriteAudio(unsigned char *buf, int fnum, int timecode)
     }
 
     last_block = fnum;
+}
+
+void NuppelVideoRecorder::WriteText(unsigned char *buf, int len, int timecode, 
+                                    int pagenr)
+{
+    struct rtframeheader frameheader;
+
+    frameheader.frametype = 'T'; // text frame
+    frameheader.timecode = timecode;
+
+    if (vbimode == 1)
+    {
+        frameheader.comptype = 'T'; // european teletext
+        frameheader.packetlength = sizeof(int) + len;
+
+        ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
+        ringBuffer->Write(&pagenr, sizeof(int));
+        ringBuffer->Write(buf, len);
+        printf((char*) buf);
+    }
+    else if (vbimode == 2)
+    {
+        // TODO: maybe CC can be stored in the same way,
+        // perhaps the pagenr can be used to store the streamnumber
+    }
 }
 

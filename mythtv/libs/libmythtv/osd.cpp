@@ -18,8 +18,8 @@ using namespace std;
 #include "osdtypes.h"
 #include "libmyth/oldsettings.h"
 
-OSD::OSD(int width, int height, int framerate, const QString &filename, 
-         const QString &prefix, const QString &osdtheme)
+OSD::OSD(int width, int height, int framerate, const QString &font, 
+         const QString &ccfont, const QString &prefix, const QString &osdtheme)
 {
     pthread_mutex_init(&osdlock, NULL);
 
@@ -35,7 +35,8 @@ OSD::OSD(int width, int height, int framerate, const QString &filename,
     combinedescsub = 0;
     timeType = 0; 
     totalfadeframes = 0;
-    fontname = filename;
+    fontname = font;
+    ccfontname = ccfont;
     fontprefix = prefix;
     m_setsvisible = false;
     setList = NULL;
@@ -187,6 +188,38 @@ void OSD::SetNoThemeDefaults(void)
         text->SetMultiLine(true);
         container->AddType(text);
     }
+
+    TTFFont *ccfont = GetFont("cc_font");
+    if (!ccfont)
+    {
+        name = "cc_font";
+        int fontsize = vid_height / 24;
+        fontsize = (int)(fontsize * hmult);
+
+        ccfont = LoadFont(ccfontname, fontsize);
+
+        if (ccfont)
+        {
+            fontMap[name] = ccfont;
+        }
+    }
+
+    if (!ccfont)
+    {
+        return;
+    }
+
+    container = GetSet("cc_page");
+    if (!container)
+    {
+        QString name = "cc_page";
+        container = new OSDSet(name, true, vid_width, vid_height, wmult, hmult);
+        AddSet(container, name);
+
+        OSDTypeCC *ccpage = new OSDTypeCC(name, ccfont);
+        container->AddType(ccpage);
+    }
+
 }
 
 QString OSD::FindTheme(QString name)
@@ -774,6 +807,41 @@ void OSD::SetChannumText(const QString &text, int length)
         m_setsvisible = true;
     }
 
+    pthread_mutex_unlock(&osdlock);
+}
+
+void OSD::AddCCText(const QString &text, int x, int y, int color, 
+                    bool teletextmode)
+{
+    pthread_mutex_lock(&osdlock);
+    OSDSet *container = GetSet("cc_page");
+    if (container)
+    {
+        OSDTypeCC *ccpage = (OSDTypeCC *)container->GetType("cc_page");
+        if (ccpage)
+            ccpage->AddCCText(text, x, y, color, teletextmode);
+
+        container->Display();
+        m_setsvisible = true;
+    }
+    pthread_mutex_unlock(&osdlock);
+}
+
+void OSD::ClearAllCCText()
+{
+    pthread_mutex_lock(&osdlock);
+    OSDSet *container = GetSet("cc_page");
+    if (container)
+    {
+        OSDTypeCC *ccpage = (OSDTypeCC *)container->GetType("cc_page");
+        if (ccpage)
+        {
+            ccpage->ClearAllCCText();
+        }
+
+        container->Display(false);
+        m_setsvisible = true;
+    }
     pthread_mutex_unlock(&osdlock);
 }
 

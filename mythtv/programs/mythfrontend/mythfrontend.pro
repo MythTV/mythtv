@@ -18,13 +18,16 @@ INSTALLS += setting
 
 INCLUDEPATH += ../../libs/libmythtv ../../libs ../../libs/libmyth
 DEPENDPATH += ../../libs/libmythtv ../../libs/libmyth
-DEPENDPATH += ../../libs/libavcodec
+DEPENDPATH += ../../libs/libavcodec ../../libs/libvbitext
 
 LIBS += -L../../libs/libmythtv -L../../libs/libavcodec -L../../libs/libmyth
-LIBS += -lmythtv -lavcodec -lmyth-$$LIBVERSION -lXv -lXinerama -lmp3lame 
+LIBS += -L../../libs/libvbitext
+LIBS += -lmythtv -lavcodec -lvbitext -lmyth-$$LIBVERSION -lXv -lXinerama 
+LIBS += -lmp3lame 
 
 TARGETDEPS += ../../libs/libmythtv/libmythtv.a
 TARGETDEPS += ../../libs/libavcodec/libavcodec.a
+TARGETDEPS += ../../libs/libvbitext/libvbitext.a
 
 # Input
 HEADERS += playbackbox.h programlistitem.h viewscheduled.h 

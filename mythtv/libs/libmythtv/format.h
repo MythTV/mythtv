@@ -54,6 +54,8 @@ typedef struct rtframeheader
 			//    V .. Next Video Sync 
 			//         timecode == next video framenumber
 			//    S .. Audio,Video,Text Correlation [NI]
+			// T: C .. Closed Caption (US)
+			//    T .. Teletext Subtitles (Europe)
    char keyframe;	//    0 .. keyframe
 			//    1 .. nr of frame in gop => no keyframe
 
@@ -137,5 +139,25 @@ typedef struct audbuffertype
     int freeToBuffer;
     unsigned char *buffer;
 } audbuffertyp;
+
+typedef struct txtbuffertype
+{
+    int timecode;
+    int pagenr;
+    int freeToEncode;
+    int freeToBuffer;
+    unsigned char *buffer;
+    int bufferlen;
+} txtbuffertyp;
+
+typedef struct teletextsubtitle
+{
+    unsigned char row;
+    unsigned char col;
+    unsigned char dbl;
+    unsigned char fg;
+    unsigned char bg;
+    unsigned char len;
+} teletextsubtitle;
 
 #endif

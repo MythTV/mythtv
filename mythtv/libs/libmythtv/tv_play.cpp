@@ -469,7 +469,8 @@ void TV::SetupPlayer(void)
     nvp = new NuppelVideoPlayer(m_context);
     nvp->SetRingBuffer(prbuffer);
     nvp->SetRecorder(recorder);
-    nvp->SetOSDFontName(m_context->GetSetting("OSDFont"), 
+    nvp->SetOSDFontName(m_context->GetSetting("OSDFont"),
+                        m_context->GetSetting("OSDCCFont"),
                         m_context->GetInstallPrefix()); 
     nvp->SetOSDThemeName(m_context->GetSetting("OSDTheme"));
     nvp->SetAudioSampleRate(m_context->GetNumSetting("AudioSampleRate"));
@@ -507,6 +508,7 @@ void TV::SetupPipPlayer(void)
     pipnvp->SetRingBuffer(piprbuffer);
     pipnvp->SetRecorder(piprecorder);
     pipnvp->SetOSDFontName(m_context->GetSetting("OSDFont"),
+                           m_context->GetSetting("OSDCCFont"),
                            m_context->GetInstallPrefix());
     pipnvp->SetOSDThemeName(m_context->GetSetting("OSDTheme"));
     pipnvp->SetAudioSampleRate(m_context->GetNumSetting("AudioSampleRate"));
@@ -722,6 +724,12 @@ void TV::ProcessKeypress(int keypressed)
         case 'f': case 'F':
         {
             nvp->ToggleFullScreen();
+            break;
+        }
+ 
+        case 't': case 'T':
+        {
+            nvp->ToggleCC();
             break;
         }
 

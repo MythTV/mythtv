@@ -1,3 +1,4 @@
 USE mythconverg;
 
-ALTER TABLE settings ADD COLUMN hostname VARCHAR(255) NULL;
+ALTER TABLE capturecard ADD COLUMN vbidevice VARCHAR(255);
+

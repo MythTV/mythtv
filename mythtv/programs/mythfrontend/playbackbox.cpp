@@ -312,7 +312,8 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
     nvp = new NuppelVideoPlayer(m_context);
     nvp->SetRingBuffer(rbuffer);
     nvp->SetAsPIP();
-    nvp->SetOSDFontName(m_context->GetSetting("OSDFont"), 
+    nvp->SetOSDFontName(m_context->GetSetting("OSDFont"),
+                        m_context->GetSetting("OSDCCFont"),
                         m_context->GetInstallPrefix());
     QString filters = "";
     nvp->SetVideoFilters(filters);

@@ -242,6 +242,22 @@ public:
     };
 };
 
+class VbiDevice: public PathSetting, public CCSetting {
+public:
+    VbiDevice(const CaptureCard& parent):
+        PathSetting(true),
+        CCSetting(parent, "vbidevice") {
+        setLabel("Vbi device");
+        addSelection("/dev/vbi");
+        addSelection("/dev/vbi0");
+        addSelection("/dev/vbi1");
+        addSelection("/dev/vbi2");
+        addSelection("/dev/v4l/vbi0");
+        addSelection("/dev/v4l/vbi1");
+        addSelection("/dev/v4l/vbi2");
+    };
+};
+
 class AudioDevice: public PathSetting, public CCSetting {
 public:
     AudioDevice(const CaptureCard& parent):
@@ -286,6 +302,7 @@ public:
         // must be first
         addChild(id = new ID());
         addChild(new VideoDevice(*this));
+        addChild(new VbiDevice(*this));
         addChild(new AudioDevice(*this));
         addChild(new AudioRateLimit(*this));
         addChild(new Hostname(*this));

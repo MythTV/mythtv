@@ -8,8 +8,8 @@ CONFIG += thread staticlib
 
 include ( ../../settings.pro )
 
-INCLUDEPATH += ../libmyth ../
-DEPENDPATH += ../libmyth 
+INCLUDEPATH += ../libmyth ../ 
+DEPENDPATH += ../libmyth ../libvbitext ../libavcodec
 
 QMAKE_CXXFLAGS_RELEASE += `freetype-config --cflags`
 QMAKE_CXXFLAGS_DEBUG += `freetype-config --cflags`

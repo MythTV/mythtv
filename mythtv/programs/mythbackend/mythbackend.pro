@@ -17,13 +17,16 @@ INSTALLS += setting
 
 INCLUDEPATH += ../../libs/libmythtv ../../libs
 DEPENDPATH += ../../libs/libmythtv ../../libs/libmyth ../../libs/libavcodec
+DEPENDPATH += ../../libs/libvbitext
 
 LIBS += -L../../libs/libmythtv -L../../libs/libavcodec -L../../libs/libmyth
-
-LIBS += -lmythtv -lavcodec -lmyth-$$LIBVERSION -lXv -lXinerama -lmp3lame 
+LIBS += -L../../libs/libvbitext
+LIBS += -lmythtv -lavcodec -lvbitext -lmyth-$$LIBVERSION -lXv -lXinerama 
+LIBS += -lmp3lame 
 
 TARGETDEPS += ../../libs/libmythtv/libmythtv.a
 TARGETDEPS += ../../libs/libavcodec/libavcodec.a
+TARGETDEPS += ../../libs/libvbitext/libvbitext.a
 
 # Input
 HEADERS += encoderlink.h filetransfer.h httpstatus.h mainserver.h playbacksock.h

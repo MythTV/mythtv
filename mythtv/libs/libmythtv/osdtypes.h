@@ -38,7 +38,7 @@ class OSDSet
     bool Displaying() { return m_displaying; }
     bool HasDisplayed() { return m_hasdisplayed; }
 
-    void Display(void);
+    void Display(bool onoff = true);
     void DisplayFor(int frames);
     void FadeFor(int frames);
     void Hide(void);
@@ -293,6 +293,35 @@ class OSDTypePositionRectangle : public OSDType
     vector<QRect> positions; 
     int m_numpositions;
     int m_curposition;
+};
+
+class ccText
+{
+  public:
+    QString text;
+    int x;
+    int y;
+    int color;
+    bool teletextmode;
+};
+
+class OSDTypeCC : public OSDType
+{
+  public:
+    OSDTypeCC(const QString &name, TTFFont *font);
+   ~OSDTypeCC();
+
+    void AddCCText(const QString &text, int x, int y, int color, 
+                   bool teletextmode = false);
+    void ClearAllCCText();
+
+    void Draw(unsigned char *screenptr, int vid_width, int vid_height,
+              int fade, int maxfade, int xoff, int yoff);
+
+  private:
+    TTFFont *m_font;
+    vector<ccText *> *m_textlist;
+
 };
 
 #endif

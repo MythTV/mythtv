@@ -29,6 +29,7 @@ extern "C" {
 using namespace std;
 
 struct video_audio;
+struct VBIData;
 
 class NuppelVideoRecorder
 {
@@ -53,7 +54,9 @@ class NuppelVideoRecorder
     void SetFilename(QString filename) { sfilename = filename; }
     void SetAudioDevice(QString device) { audiodevice = device; }
     void SetVideoDevice(QString device) { videodevice = device; }
+    void SetVbiDevice(QString device) { vbidevice = device; }
     void SetTVFormat(QString tvformat);
+    void SetVbiFormat(QString vbiformat);
     void SetHMJPGQuality(int quality) { hmjpg_quality = quality; }
     void SetHMJPGHDecimation(int deci) { hmjpg_hdecimation = deci; }
     void SetHMJPGVDecimation(int deci) { hmjpg_vdecimation = deci; }
@@ -93,9 +96,11 @@ class NuppelVideoRecorder
  protected:
     static void *WriteThread(void *param);
     static void *AudioThread(void *param);
+    static void *VbiThread(void *param);
 
     void doWriteThread(void);
     void doAudioThread(void);
+    void doVbiThread(void);
     
  private:
     int AudioInit(void);
@@ -111,12 +116,15 @@ class NuppelVideoRecorder
 
     void WriteVideo(unsigned char *buf, int len, int fnum, int timecode);
     void WriteAudio(unsigned char *buf, int fnum, int timecode);
+    void WriteText(unsigned char *buf, int len, int timecode, int pagenr);
 
     bool SetupAVCodec(void);
 
     void WriteSeekTable(bool todumpfile);
 
     void DoMJPEG();
+
+    void FormatTeletextSubtitles(struct VBIData *vbidata);
     
     QString sfilename;
     bool encoding;
@@ -142,6 +150,7 @@ class NuppelVideoRecorder
     int quiet;
     int rawmode;
     int usebttv;
+    char vbimode;
     struct video_audio *origaudio;
 
     int mp3quality;
@@ -159,9 +168,11 @@ class NuppelVideoRecorder
 
     QString audiodevice;
     QString videodevice;
+    QString vbidevice;
  
     vector<struct vidbuffertype *> videobuffer;
     vector<struct audbuffertype *> audiobuffer;
+    vector<struct txtbuffertype *> textbuffer;
 
     int act_video_encode;
     int act_video_buffer;
@@ -169,12 +180,17 @@ class NuppelVideoRecorder
     int act_audio_encode;
     int act_audio_buffer;
     long long act_audio_sample;
-    
+   
+    int act_text_encode;
+    int act_text_buffer;
+ 
     int video_buffer_count;
     int audio_buffer_count;
+    int text_buffer_count;
 
     long video_buffer_size;
     long audio_buffer_size;
+    long text_buffer_size;
 
     struct timeval stm;
     struct timezone tzone;
@@ -183,6 +199,7 @@ class NuppelVideoRecorder
 
     pthread_t write_tid;
     pthread_t audio_tid;
+    pthread_t vbi_tid;
 
     bool recording;
 
