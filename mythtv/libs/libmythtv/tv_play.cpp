@@ -2020,6 +2020,9 @@ void TV::EPGChannelUpdate(QString chanstr)
 
 void TV::customEvent(QCustomEvent *e)
 {
+    while (changeState)
+        usleep(100);
+
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
         MythEvent *me = (MythEvent *)e;
