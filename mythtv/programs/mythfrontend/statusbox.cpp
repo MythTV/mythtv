@@ -673,12 +673,15 @@ void StatusBox::doTunerStatus()
             strlist << "GET_STATE";
 
             gContext->SendReceiveStringList(strlist);
+            int state = strlist[0].toInt();
   
             QString Status = QString(tr("Tuner %1 ")).arg(cardid);
-            if (strlist[0].toInt()==kState_WatchingLiveTV)
+            if (state==kState_Error)
+                Status += tr("is not available");
+            else if (state==kState_WatchingLiveTV)
                 Status += tr("is watching live TV");
-            else if (strlist[0].toInt()==kState_RecordingOnly ||
-                     strlist[0].toInt()==kState_WatchingRecording)
+            else if (state==kState_RecordingOnly ||
+                     state==kState_WatchingRecording)
                 Status += tr("is recording");
             else 
                 Status += tr("is not recording");
@@ -686,7 +689,8 @@ void StatusBox::doTunerStatus()
             contentLines[count] = Status;
             contentDetail[count] = Status;
 
-            if (strlist[0].toInt()==kState_RecordingOnly)
+            if (state==kState_RecordingOnly ||
+                state==kState_WatchingRecording)
             {
                 strlist = QString("QUERY_RECORDER %1").arg(cardid);
                 strlist << "GET_RECORDING";
@@ -694,7 +698,7 @@ void StatusBox::doTunerStatus()
                 ProgramInfo *proginfo = new ProgramInfo;
                 proginfo->FromStringList(strlist, 0);
    
-                Status = proginfo->title;
+                Status += proginfo->title;
                 Status += "\n";
                 Status += proginfo->subtitle;
                 contentDetail[count] = Status;

@@ -1187,7 +1187,7 @@ void NuppelVideoPlayer::InitAVSync(void)
         QString timing_type = videosync->getName();
 
         QString msg = QString("Video timing method: %1").arg(timing_type);
-        VERBOSE(VB_PLAYBACK, msg);
+        VERBOSE(VB_GENERAL, msg);
         msg = QString("Refresh rate: %1, frame interval: %2")
                        .arg(refreshrate).arg(frame_interval);
         VERBOSE(VB_PLAYBACK, msg);

@@ -38,10 +38,8 @@ static void *run_priv_thread(void *data)
                             *target_thread, SCHED_FIFO, &sp);
                         if (status) 
                         {
-                            perror("pthread_setschedparam");
-                            VERBOSE(VB_GENERAL, "Running as SUID root would allow "
-                                    "some threads to run with realtime priority, "
-                                    "improving video smoothness.");
+                            // perror("pthread_setschedparam");
+                            VERBOSE(VB_GENERAL, "Realtime priority would require SUID as root.");
                         }
                         else
                             VERBOSE(VB_GENERAL, "Using realtime priority.");
