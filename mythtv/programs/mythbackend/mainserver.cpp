@@ -318,9 +318,9 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                                                       Qt::ISODate);
             proginfo->endts = QDateTime::fromString(query.value(2).toString(),
                                                     Qt::ISODate);
-            proginfo->title = query.value(3).toString();
-            proginfo->subtitle = query.value(4).toString();
-            proginfo->description = query.value(5).toString();
+            proginfo->title = QString::fromUtf8(query.value(3).toString());
+            proginfo->subtitle = QString::fromUtf8(query.value(4).toString());
+            proginfo->description = QString::fromUtf8(query.value(5).toString());
             proginfo->conflicting = false;
 
             if (proginfo->title == QString::null)

@@ -459,8 +459,8 @@ void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)
 
             thequery = QString("INSERT INTO conflictresolutionany "
                                "(prefertitle, disliketitle) VALUES "
-                               "(\"%1\", \"%2\");").arg(sqltitle1)
-                               .arg(sqltitle2);
+                               "(\"%1\", \"%2\");").arg(sqltitle1.utf8())
+                               .arg(sqltitle2.utf8());
             QSqlQuery qquery = db->exec(thequery);
             if (!qquery.isActive())
             {

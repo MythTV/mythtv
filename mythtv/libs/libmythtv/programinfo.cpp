@@ -394,8 +394,8 @@ void ProgramInfo::WriteRecordedToDB(QSqlDatabase *db)
     query = QString("INSERT INTO recorded (chanid,starttime,endtime,title,"
                     "subtitle,description) "
                     "VALUES(%1,\"%2\",\"%3\",\"%4\",\"%5\",\"%6\");")
-                    .arg(chanid).arg(starts).arg(ends).arg(sqltitle) 
-                    .arg(sqlsubtitle).arg(sqldescription);
+                    .arg(chanid).arg(starts).arg(ends).arg(sqltitle.utf8()) 
+                    .arg(sqlsubtitle.utf8()).arg(sqldescription.utf8());
 
     QSqlQuery qquery = db->exec(query);
     if (!qquery.isActive())
@@ -412,8 +412,8 @@ void ProgramInfo::WriteRecordedToDB(QSqlDatabase *db)
     query = QString("INSERT INTO oldrecorded (chanid,starttime,endtime,title,"
                     "subtitle,description) "
                     "VALUES(%1,\"%2\",\"%3\",\"%4\",\"%5\",\"%6\");")
-                    .arg(chanid).arg(starts).arg(ends).arg(sqltitle) 
-                    .arg(sqlsubtitle).arg(sqldescription);
+                    .arg(chanid).arg(starts).arg(ends).arg(sqltitle.utf8()) 
+                    .arg(sqlsubtitle.utf8()).arg(sqldescription.utf8());
 
     qquery = db->exec(query);
     if (!qquery.isActive())

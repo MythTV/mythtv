@@ -335,8 +335,9 @@ bool Scheduler::FindInOldRecordings(ProgramInfo *pginfo)
 
     thequery = QString("SELECT NULL FROM oldrecorded WHERE "
                        "title = \"%1\" AND subtitle = \"%2\" AND "
-                       "description = \"%3\";").arg(pginfo->title)
-                       .arg(pginfo->subtitle).arg(pginfo->description);
+                       "description = \"%3\";").arg(pginfo->title.utf8())
+                       .arg(pginfo->subtitle.utf8())
+                       .arg(pginfo->description.utf8());
 
     QSqlQuery query = db->exec(thequery);
 
@@ -369,11 +370,6 @@ void Scheduler::PruneList(void)
         {
             if (FindInOldRecordings(first))
             {
-//                 cout << "Pruning duplicate program (already recorded):" << endl
-//                      << first->title << endl
-//                      << first->subtitle << endl
-//                      << first->description << endl
-//                      << first->startts.toString() << endl;
                 delete first;
                 deliter = i.base();
                 deliter--;
@@ -541,7 +537,7 @@ void Scheduler::MarkSingleConflict(ProgramInfo *info,
     }
 
     thequery = QString("SELECT disliketitle FROM conflictresolutionany WHERE "
-                       "prefertitle = \"%1\";").arg(info->title);
+                       "prefertitle = \"%1\";").arg(info->title.utf8());
 
     query = db->exec(thequery);
 
@@ -549,7 +545,7 @@ void Scheduler::MarkSingleConflict(ProgramInfo *info,
     {
         while (query.next())
         {
-            QString badtitle = query.value(0).toString();
+            QString badtitle = QString::fromUtf8(query.value(0).toString());
 
             i = conflictList->begin();
             for (; i != conflictList->end(); i++)

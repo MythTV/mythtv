@@ -209,9 +209,9 @@ void ScheduledRecording::findAllProgramsToRecord(QSqlDatabase* db,
              proginfo->sourceid = result.value(1).toInt();
              proginfo->startts = result.value(2).toDateTime();
              proginfo->endts = result.value(3).toDateTime();
-             proginfo->title = result.value(4).toString();
-             proginfo->subtitle = result.value(5).toString();
-             proginfo->description = result.value(6).toString();
+             proginfo->title = QString::fromUtf8(result.value(4).toString());
+             proginfo->subtitle = QString::fromUtf8(result.value(5).toString());
+             proginfo->description = QString::fromUtf8(result.value(6).toString());
              proginfo->chanstr = result.value(7).toString();
              proginfo->chansign = result.value(8).toString();
              proginfo->channame = result.value(9).toString();
@@ -271,7 +271,7 @@ bool ScheduledRecording::loadByProgram(QSqlDatabase* db,
 "  )"
 " )"
 ");")
-        .arg(sqltitle)
+        .arg(sqltitle.utf8())
         .arg(AllRecord)
         .arg(chanid)
         .arg(ChannelRecord)
