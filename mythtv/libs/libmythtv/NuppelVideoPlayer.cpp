@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <assert.h>
+#include <errno.h>
 #include <sys/soundcard.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
