@@ -130,7 +130,8 @@ class MythDialog : public QFrame
     void hide(void);
 
     void setNoErase(void);
-
+    
+    
   signals:
     void menuButtonPressed();
 
@@ -193,6 +194,8 @@ class MythPopupBox : public MythDialog
                                 QString message, QString button1msg,
                                 QString button2msg, int defvalue);
 
+    static bool showGetTextPopup(MythMainWindow *parent, QString title,
+                                 QString message, QString& text);
   signals:
     void popupDone();
 

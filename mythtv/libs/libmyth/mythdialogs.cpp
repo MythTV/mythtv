@@ -1168,6 +1168,31 @@ bool MythPopupBox::showOkCancelPopup(MythMainWindow *parent, QString title,
     return (popup.ExecPopup() == 0);
 }
 
+bool MythPopupBox::showGetTextPopup(MythMainWindow *parent, QString title,
+                                    QString message, QString& text)
+{
+    MythPopupBox popup(parent, title);
+    popup.addLabel(message, Medium, true);
+    
+    MythRemoteLineEdit* textEdit = new MythRemoteLineEdit(&popup, "chooseEdit");
+    textEdit->setText(text);
+    popup.addWidget(textEdit);
+    
+    popup.addButton(tr("OK"));
+    popup.addButton(tr("Cancel"));
+    
+    textEdit->setFocus();
+    
+    if(popup.ExecPopup() == 0)
+    {
+        text = textEdit->text();
+        return true;
+    }
+    
+    return false;
+}
+
+
 int MythPopupBox::show2ButtonPopup(MythMainWindow *parent, QString title,
                                    QString message, QString button1msg,
                                    QString button2msg, int defvalue)
