@@ -43,6 +43,9 @@ class MythOpenGLPainter : public MythPainter
     StringImageCache *m_StringImageCache;
     IntImageCache *m_IntImageCache;
     QMap<MythImage *, unsigned int> m_ImageIntMap;
+
+    int q_gl_texture;
+    bool texture_rects;
 };
 
 #endif
