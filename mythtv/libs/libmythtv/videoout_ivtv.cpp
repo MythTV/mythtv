@@ -32,11 +32,6 @@ VideoOutputIvtv::VideoOutputIvtv(void)
     pixels = NULL;
     lastcleared = false;
     videoDevice = "/dev/video16";
-
-    osdbuffers[0] = NULL;
-    osdbuffers[1] = NULL;
-
-    bufferuse = 0;
 }
 
 VideoOutputIvtv::~VideoOutputIvtv()
@@ -53,7 +48,7 @@ VideoOutputIvtv::~VideoOutputIvtv()
     }
     videofd = -1;
 
-    if (fbfd)
+    if (fbfd > 0)
     {
         struct ivtvfb_ioctl_state_info fbstate;
         memset(&fbstate, 0, sizeof(fbstate));
@@ -80,16 +75,52 @@ VideoOutputIvtv::~VideoOutputIvtv()
             return;
         }
 
-        // clear osd here
-        
+        ClearOSD();       
+ 
         close(fbfd);
     }
 
-    if (osdbuffers[0])
-        delete [] osdbuffers[0];
+    if (osdbuffer)
+        delete [] osdbuffer;
+}
 
-    if (osdbuffers[1])
-        delete [] osdbuffers[1];
+void VideoOutputIvtv::ClearOSD(void) 
+{
+    if (fbfd > 0) 
+    {
+        struct ivtvfb_ioctl_get_frame_buffer igfb;
+        memset(&igfb, 0, sizeof(igfb));
+
+        ioctl(fbfd, IVTVFB_IOCTL_GET_FRAME_BUFFER, &igfb);
+
+        width = igfb.sizex;
+        height = igfb.sizey;
+        stride = igfb.sizex * 4;
+
+        struct ivtv_osd_coords osdcoords;
+        memset(&osdcoords, 0, sizeof(osdcoords));
+
+        ioctl(fbfd, IVTVFB_IOCTL_GET_ACTIVE_BUFFER, &osdcoords);
+
+        struct ivtvfb_ioctl_dma_host_to_ivtv_args prep;
+        memset(&prep, 0, sizeof(prep));
+
+        prep.source = osdbuf_aligned;
+        prep.dest_offset = 0;
+        prep.count = osdcoords.max_offset;
+
+        memset(osdbuf_aligned, 0x00, 720 * 480 * 4);
+
+        ioctl(fbfd, IVTVFB_IOCTL_PREP_FRAME, &prep);
+
+        usleep(20000);
+
+        osdcoords.lines = 480;
+        osdcoords.offset = 0;
+        osdcoords.pixel_stride = 720 * 2;
+
+        ioctl(fbfd, IVTVFB_IOCTL_SET_ACTIVE_BUFFER, &osdcoords);
+    }
 }
 
 void VideoOutputIvtv::InputChanged(int width, int height, float aspect)
@@ -171,13 +202,13 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
         height = igfb.sizey;
         stride = igfb.sizex * 4;
 
-        osdbuffers[0] = new char[720 * 480 * 4 + 20];
-        osdbuffers[1] = new char[720 * 480 * 4 + 20];
+        osdbuffer = new char[720 * 480 * 4 + PAGE_SIZE];
+        osdbuf_aligned = (char *)((int)osdbuffer + (PAGE_SIZE - 1));
+        osdbuf_aligned = (char *)((int)osdbuf_aligned & PAGE_MASK);
 
-        memset(osdbuffers[0], 0x00, 720 * 480 * 4);
-        memset(osdbuffers[1], 0x00, 720 * 480 * 4);
+        memset(osdbuf_aligned, 0x00, 720 * 480 * 4);
 
-        // should set one fo them active here
+        ClearOSD();
     }
 
     cout << "Using the PVR-350 decoder/TV-out\n";
@@ -208,7 +239,10 @@ void VideoOutputIvtv::Reopen(int skipframes, int newstartframe)
         memset(&startd, 0, sizeof(startd));
 
         if (skipframes > 0)
+        {
             startd.gop_offset = skipframes;
+            startd.muted_audio_frames = 6;
+        }
 
         ioctl(videofd, IVTV_IOC_S_START_DECODE, &startd);
 
@@ -265,36 +299,13 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
     (void)frame;
     (void)pipPlayer;
 
-    if (fbfd && osd)
+    if (fbfd > 0 && osd)
     {
         bool drawanyway = false;
 
-        struct ivtv_osd_coords osdcoords;
-        struct ivtvfb_ioctl_dma_host_to_ivtv_args prep;
-        char *fbuf = NULL;
-
-        memset(&osdcoords, 0, sizeof(osdcoords));
-        memset(&prep, 0, sizeof(prep));
-
-        ioctl(fbfd, IVTVFB_IOCTL_GET_ACTIVE_BUFFER, &osdcoords);
-
-        if (bufferuse)
-        {
-            osdcoords.offset = 0;
-            fbuf = osdbuffers[0];
-        }
-        else
-        {
-            int offset = (height * stride + (PAGE_SIZE - 1));
-            offset &= PAGE_MASK;
-
-            osdcoords.offset = offset;
-            fbuf = osdbuffers[1];
-        }
-
         VideoFrame tmpframe;
         tmpframe.codec = FMT_ARGB32;
-        tmpframe.buf = (unsigned char *)fbuf;
+        tmpframe.buf = (unsigned char *)osdbuf_aligned;
 
         int ret = DisplayOSD(&tmpframe, osd, stride);
 
@@ -310,20 +321,27 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
 
         if (ret > 0 || drawanyway)
         {
-            prep.source = fbuf;
-            prep.dest_offset = osdcoords.offset;
+            struct ivtv_osd_coords osdcoords;
+            memset(&osdcoords, 0, sizeof(osdcoords));
+
+            struct ivtvfb_ioctl_dma_host_to_ivtv_args prep;
+            memset(&prep, 0, sizeof(prep));
+
+            ioctl(fbfd, IVTVFB_IOCTL_GET_ACTIVE_BUFFER, &osdcoords);
+
+            prep.source = osdbuf_aligned;
+            prep.dest_offset = 0;
             prep.count = XJ_height * stride;
 
             ioctl(fbfd, IVTVFB_IOCTL_PREP_FRAME, &prep);
 
             usleep(20000);
 
+            osdcoords.offset = 0;
             osdcoords.lines = 480;
             osdcoords.pixel_stride = 720 * 2;
 
             ioctl(fbfd, IVTVFB_IOCTL_SET_ACTIVE_BUFFER, &osdcoords);
-
-            bufferuse = !bufferuse;
         }
     }
 }

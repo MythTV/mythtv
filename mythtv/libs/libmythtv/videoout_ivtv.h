@@ -41,6 +41,8 @@ class VideoOutputIvtv: public VideoOutput
 
     void SetFPS(float lfps) { fps = lfps; }
 
+    void ClearOSD(void);
+
   private:
     int videofd;
     int fbfd;
@@ -64,8 +66,8 @@ class VideoOutputIvtv: public VideoOutput
 
     bool lastcleared;
 
-    char *osdbuffers[2];
-    int bufferuse;
+    char *osdbuffer;
+    char *osdbuf_aligned;
 };
 
 #endif
