@@ -1232,9 +1232,6 @@ QRect ThemedMenu::menuRect() const
 
 void ThemedMenu::clearToBackground(void)
 {
-    if (backgroundPixmap.width() > 0)
-        setPaletteBackgroundPixmap(backgroundPixmap);
-
     drawInactiveButtons();
 }
 
@@ -1260,7 +1257,9 @@ void ThemedMenu::drawInactiveButtons(void)
 
     setPaletteBackgroundPixmap(bground);
 
-    erase(menuRect());
+    erase(buttonArea);
+    erase(uparrowRect);
+    erase(downarrowRect);
 }
 
 void ThemedMenu::drawScrollArrows(QPainter *p)
@@ -1320,12 +1319,19 @@ void ThemedMenu::paintTitle(QPainter *p)
 
 void ThemedMenu::paintWatermark(QPainter *p)
 {
-    erase(watermarkRect);
+    QPixmap pix(watermarkRect.size());
+
+    QPainter tmp(&pix, this);
+    tmp.drawPixmap(QPoint(0, 0), backgroundPixmap, watermarkRect);
+
     if (activebutton && activebutton->buttonicon &&
         activebutton->buttonicon->watermark)
     {
-        p->drawImage(watermarkPos, *(activebutton->buttonicon->watermark));
+        tmp.drawImage(QPoint(0, 0), *(activebutton->buttonicon->watermark));
     }
+
+    tmp.end();
+    p->drawPixmap(watermarkPos, pix);
 }
 
 void ThemedMenu::paintButton(unsigned int button, QPainter *p, bool erased,

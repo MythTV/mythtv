@@ -244,7 +244,13 @@ TVState TVRec::RemoveRecording(TVState state)
     {
         if (state == kState_RecordingOnly)
             return kState_None;
-        return kState_WatchingPreRecorded;
+        else if (state == kState_WatchingRecording)
+            return kState_WatchingLiveTV;
+        else
+        {
+            cerr << "Unknown state in RemoveRecording: " << state << endl;
+            return kState_Error;
+        }
     }
     return kState_Error;
 }
