@@ -1,5 +1,5 @@
                                    MythWeather
-			           Release 0.8c
+			           Release 0.8e
 
 BUILD/CONFIGURATION INSTRUCTIONS
 --------------------------------
@@ -51,6 +51,7 @@ MYTHWEATHER KEYBOARD COMMANDS
    Numeric Keys		You can check other weather by keying in other ZIP codes.
    Enter Key		Switch between celsius and fahrenheit. Can also
 			be used a way to force a data update.
+   'm' Key		Resets the location to the database default, then updates the data.
 
 OTHER INFORMATION
 -----------------
@@ -85,7 +86,7 @@ TODO LIST
    - Ability to save a new location using MythWeather
    - Radar Map Page
    - Finish list of weather types and icons
-   - Get a real graphics person to make the weather icons :)
+   - Better theme support for customizing colors
 
 KNOWN ISSUES
 ------------
