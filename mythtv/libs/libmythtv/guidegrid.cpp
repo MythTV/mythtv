@@ -92,6 +92,8 @@ GuideGrid::GuideGrid(const QString &channel, TV *player, QWidget *parent,
     showCurrentTime = gContext->GetNumSetting("EPGShowCurrentTime", 0);
     currentTimeColor = gContext->GetSetting("EPGCurrentTimeColor", "red");
 
+    displaychannum = gContext->GetNumSetting("DisplayChanNum");
+
     bgcolor = paletteBackgroundColor();
     fgcolor = paletteForegroundColor();
 
@@ -180,7 +182,7 @@ GuideGrid::GuideGrid(const QString &channel, TV *player, QWidget *parent,
 
             QHBoxLayout *holdA = new QHBoxLayout(0, 0, 0);
 
-            holdA->addStrut( (int)((int)(600*hmult) - (int)(1.5*25*hmult)) );
+            holdA->addStrut((int)((int)(600*hmult) - (int)(1.5*25*hmult)));
 
             mainHold->addLayout(holdA, 0);
 
@@ -519,7 +521,7 @@ void GuideGrid::createProgramLabel(int titlefontsize, int progfontsize)
     currentTime->setPaletteForegroundColor(curTimeChan_fgColor);
 
     ChannelInfo *chinfo = &(m_channelInfos[m_currentStartChannel]);
-    if (gContext->GetNumSetting("DisplayChanNum") != 0)
+    if (displaychannum)
         currentChan = new QLabel(chinfo->callsign, this);
     else
         currentChan = new QLabel(chinfo->chanstr + "*" + chinfo->callsign, 
@@ -611,7 +613,7 @@ QString GuideGrid::getLastChannel(void)
 void GuideGrid::timeout()
 {
     QTime new_time = QTime::currentTime();
-    QString curTime = new_time.toString("h:mm:ss ap");
+    QString curTime = new_time.toString(timeformat);
 
     if (currentTime != NULL)
         currentTime->setText("  " + curTime);
@@ -966,24 +968,25 @@ void GuideGrid::paintChannels(QPainter *p)
 
         if (programGuideType != 1)
         {
+            int yoffset = 0;
+
             if (chinfo->iconpath != "none" && chinfo->iconpath != "" && 
                 showIcon)
             {
+                int iconsize = ydifference - (int)(4 * hmult) - bheight * 2;
                 if (!chinfo->icon)
-                    chinfo->LoadIcon();
+                    chinfo->LoadIcon(iconsize);
                 if (chinfo->icon)
                 {
                     int yoffset = (int)(4 * hmult);
                     tmp.drawPixmap((cr.width() - chinfo->icon->width()) / 2, 
                                    ydifference * y + yoffset, *(chinfo->icon));
                 }
+
+                yoffset += iconsize; 
             }
          
-            int yoffset = 0;
-            if (showIcon)
-                yoffset = (int)(43 * hmult); 
-
-            if (gContext->GetNumSetting("DisplayChanNum") == 0)
+            if (!displaychannum)
             {
                 int width = lfm.width(chinfo->chanstr);
                 
@@ -1010,7 +1013,7 @@ void GuideGrid::paintChannels(QPainter *p)
         {
             QString chData;
 
-            if (gContext->GetNumSetting("DisplayChanNum") != 0)
+            if (displaychannum)
                 chData = chinfo->callsign + " " + favstr;
             else
                 chData = chinfo->chanstr + " " + chinfo->callsign + " " + 
@@ -1210,8 +1213,6 @@ void GuideGrid::paintPrograms(QPainter *p)
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
 
-    QImage bgimage = pix.convertToImage();
-
     QPainter tmp(&pix);
     tmp.setPen(QPen(fgcolor, (int)(2 * wmult)));
 
@@ -1282,6 +1283,8 @@ void GuideGrid::paintPrograms(QPainter *p)
                 if (br != QBrush(bgcolor))
                 {
                     QRgb blendcolor = br.color().rgb();
+                    blendcolor = qRgba(qRed(blendcolor), qGreen(blendcolor),
+                                       qBlue(blendcolor), 96);
 
                     int startx = (int)(x * xdifference + 1 * tmpwmult);
                     int endx = (int)((x + spread) * xdifference - 2 * tmpwmult);
@@ -1305,20 +1308,24 @@ void GuideGrid::paintPrograms(QPainter *p)
 		    if (altTransparent == 0 || programGuideType != 1)
 		    {
                        unsigned int *data = NULL;
-                   
-                       for (int tmpy = starty; tmpy <= endy; tmpy++)
+
+                       QPixmap orig(endx - startx + 1, endy - starty + 1);
+                       orig.fill(this, startx + pr.x(), starty + pr.y());
+
+                       QImage bgimage = orig.convertToImage();
+
+                       for (int tmpy = 0; tmpy <= endy - starty; tmpy++)
                        {
-                          data = (unsigned int *)bgimage.scanLine(tmpy);
-                          for (int tmpx = startx; tmpx <= endx; tmpx++)
-                          {
-                              QRgb pixelcolor = data[tmpx];
-                              data[tmpx] = blendColors(pixelcolor, blendcolor, 
-                                                     96);
-                          }
+                           data = (unsigned int *)bgimage.scanLine(tmpy);
+                           for (int tmpx = 0; tmpx <= endx - startx; tmpx++)
+                           {
+                               QRgb pixelcolor = data[tmpx];
+                               data[tmpx] = blendColors(pixelcolor, blendcolor,
+                                                        96);
+                           }
                        }
-                       tmp.drawImage(startx, starty, bgimage, startx, starty, 
-                                  endx - startx + 1, 
-                                  endy - starty + 1);
+
+                       tmp.drawImage(startx, starty, bgimage); 
 		    }
                 }
 
@@ -1784,8 +1791,9 @@ void GuideGrid::updateTopInfo()
 
     if (chinfo->iconpath != "none" && chinfo->iconpath != "" && showIcon)
     {
+        int iconsize = (int)(40 * hmult);
         if (!chinfo->icon)
-            chinfo->LoadIcon();
+            chinfo->LoadIcon(iconsize);
         if (chinfo->icon)
         {
             channelimage->setText("");
@@ -1822,9 +1830,9 @@ void GuideGrid::paintTitle(QPainter *p)
     if (pginfo->category != "" && usetheme)
        info += " (" + pginfo->category + ")";
 
-    tmp.drawText((tr.height() - titleheight) / 2 , 
-                 (tr.height() - titleheight) / 2 + titleheight,
-                 info);
+    int ypos = (tr.height() - titleheight) / 2 + titleheight - lfm.descent();
+
+    tmp.drawText((tr.height() - titleheight) / 2, ypos, info);
 
     tmp.end();
     
@@ -1884,15 +1892,15 @@ QRect GuideGrid::programRect() const
 
         unsigned int min_dateheight = 50;  // also min_timeheight
         unsigned int min_datewidth = 74;   // also min_chanwidth
-        unsigned int titleheight = showtitle ? 40 : 0;
+        unsigned int titleheight = (int)((showtitle ? 40 : 0) * hmult);
 
         unsigned int programheight = (int)((600 - min_dateheight - 
-                                           titleheight) * wmult);
+                                           titleheight) * hmult);
 
         if (showProgramBar == 0)
             programheight = DISPLAY_CHANS * (int)(programheight / DISPLAY_CHANS);
         else
-            programheight = (DISPLAY_CHANS * (int)(programheight / DISPLAY_CHANS)) - (int)(25 * 1.5);
+            programheight = (DISPLAY_CHANS * (int)(programheight / DISPLAY_CHANS)) - (int)(25 * 1.5 * hmult);
 
         unsigned int programwidth = (int)((800 - min_datewidth) * hmult);
         programwidth = DISPLAY_TIMES * (int)(programwidth / DISPLAY_TIMES);

@@ -147,6 +147,7 @@ class GuideGrid : public MythDialog
     bool showInfo;
     bool showIcon;
     bool showFavorites;
+    bool displaychannum;
 
     bool showtitle;
     bool usetheme;
