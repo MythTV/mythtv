@@ -95,19 +95,19 @@
     </message>
     <message>
         <source>This is a colon separated list of paths. If the path in the list is a directory, its contents will be copied. If it is an executable, it will be run.</source>
-        <translation type="unfinished"></translation>
+        <translation>Introduza uma lista de valores separados por dois pontos. Se o valor for uma directoria, o seu conteúdo serã copiad. Se for um ficheiro executável, este será executado.</translation>
     </message>
     <message>
         <source>This is the type of transition used between pictures in slideshow mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Este é o tipo de transição a ser usado ao mudar de fotografia no modo contínuo.</translation>
     </message>
     <message>
         <source>This is the type of background for each picture in single view mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Este é o tipo de imagem de fundo a ser usado na pãgina da fotografia.</translation>
     </message>
     <message>
         <source>SlideshowDelay</source>
-        <translation type="unfinished"></translation>
+        <translation>Tempo de visualização no modo contínuo</translation>
     </message>
 </context>
 <context>
@@ -162,15 +162,15 @@
     </message>
     <message>
         <source>Filename: </source>
-        <translation type="unfinished"></translation>
+        <translation>Ficheiro: </translation>
     </message>
     <message>
         <source>Created: </source>
-        <translation type="unfinished"></translation>
+        <translation>Criado em: </translation>
     </message>
     <message>
         <source>Modified: </source>
-        <translation type="unfinished"></translation>
+        <translation>Modificado em: </translation>
     </message>
 </context>
 <context>
