@@ -505,7 +505,7 @@ void MameSettingsDlg::ScaleImageLabel(QPixmap &pixmap, QLabel *label)
     int ImageWidth = pixmap.width();
     int ImageHeight = pixmap.height();
     int x = 0, y = 0;
-    QPoint test = label->mapToGlobal(QPoint(0,0));
+    //QPoint test = label->mapToGlobal(QPoint(0,0));
     if (float(ImageHeight)/float(ImageWidth) < float(FrameHeight)/float(FrameWidth))
     {
         int temp = ImageWidth;

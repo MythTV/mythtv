@@ -15,6 +15,9 @@
 
 #include <mythtv/settings.h>
 
+#include <string>
+using namespace std;
+
 extern Settings *globalsettings;
 
 struct Prefs general_prefs;
@@ -49,7 +52,7 @@ void MameHandler::processGames()
 
         char *p;
         char *keyword;
-        char *value;
+        char *value = NULL;
         char *verifyname;
         char *drivername;
 
@@ -426,6 +429,7 @@ void MameHandler::edit_settings(QWidget *parent,RomInfo * romdata)
 
 void MameHandler::edit_system_settings(QWidget *parent,RomInfo * romdata)
 {
+    romdata = romdata;
     MameSettingsDlg settingsDlg(parent, "mamesettings", true, true);
     if(settingsDlg.Show(&defaultSettings, true))
         SaveGameSettings(defaultSettings, NULL);    
@@ -517,7 +521,7 @@ bool MameHandler::check_xmame_exe()
                                 else
                                         release = 0;
 
-                                int supported_games;
+                                //int supported_games;
 
                                 if (!general_prefs.xmame_minor ||
                                     general_prefs.xmame_major != major ||
@@ -720,9 +724,9 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
                 grabmouse = " ";
                 nograbmouse = " ";
                 if (game_settings.fullscreen && !getuid())
-                        putenv("GGI_DISPLAY=DGA");
+                        putenv((char *)"GGI_DISPLAY=DGA");
                 else
-                        putenv("GGI_DISPLAY=X");
+                        putenv((char *)"GGI_DISPLAY=X");
         }
 
         *exec = general_prefs.xmame_exe;
@@ -838,7 +842,7 @@ void MameHandler::SaveGameSettings(GameSettings &game_settings, MameRomInfo *rom
 {
     QSqlDatabase *db = QSqlDatabase::database();
     char thequery[1024];
-    bool exists = false;
+    //bool exists = false;
     QString RomName = "default";
     if(rominfo)
         RomName = rominfo->Romname();

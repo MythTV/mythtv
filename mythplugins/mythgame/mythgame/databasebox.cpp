@@ -230,7 +230,6 @@ void DatabaseBox::checkParent(QListViewItem *item)
     if (!child)
         return;
 
-    bool same = true;
     while (child)
     {
         child = (TreeItem *)child->nextSibling();

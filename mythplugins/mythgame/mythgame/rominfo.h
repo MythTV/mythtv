@@ -45,7 +45,9 @@ class RomInfo
     virtual void setField(QString field, QString data);
     virtual void fillData(QSqlDatabase *db);
 
-    virtual bool FindImage(QString type, QString *result) { return false; }
+    virtual bool FindImage(QString type, QString *result) { type = type;
+                                                            result = result;
+                                                            return false; }
 
   protected:
     QString romname;

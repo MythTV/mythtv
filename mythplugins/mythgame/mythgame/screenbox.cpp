@@ -196,7 +196,7 @@ void ScreenBox::checkParent(QListViewItem *item)
     if (!child)
         return;
 
-    bool same = true;
+    //bool same = true;
     while (child)
     {
         child = (TreeItem *)child->nextSibling();

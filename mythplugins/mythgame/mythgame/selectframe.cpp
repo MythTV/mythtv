@@ -24,6 +24,7 @@ void SelectFrame::keyPressEvent( QKeyEvent *e )
       switch(e->key())
       {
       case Key_Tab:
+      case Key_Escape: 
           clearFocus();
           break;
       case Key_Enter:
@@ -56,13 +57,14 @@ void SelectFrame::keyPressEvent( QKeyEvent *e )
 
 void SelectFrame::focusInEvent(QFocusEvent* e)
 {
+    e = e;
     if(mButtons[mCurrentRow][mCurrentColumn]->isVisible())
     {
         mButtons[mCurrentRow][mCurrentColumn]->setFrameStyle(QFrame::Box | QFrame::Plain);
         mButtons[mCurrentRow][mCurrentColumn]->setLineWidth(3);
         emit gameChanged(RomList->current()->Gamename());
     }
-    if(RomList->count() > mRows * mColumns)
+    if((int)RomList->count() > mRows * mColumns)
     {
         mScrollBar->show();
     }    
@@ -76,6 +78,7 @@ void SelectFrame::EditEvent()
 
 void SelectFrame::focusOutEvent(QFocusEvent* e)
 {
+    e = e;
     if(mButtons[mCurrentRow][mCurrentColumn]->isVisible())
     {
         mButtons[mCurrentRow][mCurrentColumn]->setFrameStyle(QFrame::NoFrame);
@@ -117,7 +120,7 @@ void SelectFrame::UpEvent()
 void SelectFrame::DownEvent()
 {
     int current = RomList->at();
-    if(RomList->count() > current + mColumns - current % mColumns)
+    if((int)RomList->count() > current + mColumns - current % mColumns)
     {
         mButtons[mCurrentRow][mCurrentColumn]->setFrameStyle(QFrame::NoFrame);
         if(mCurrentRow < mRows - 1)
@@ -128,7 +131,7 @@ void SelectFrame::DownEvent()
         {
             setButtons(RomList->at(current - (current % mColumns + mColumns * (mRows - 2))));
         }
-        if(current + mColumns < RomList->count())
+        if(current + mColumns < (int)RomList->count())
         {
             RomList->at(current + mColumns);
         }
@@ -163,7 +166,7 @@ void SelectFrame::LeftEvent()
 void SelectFrame::RightEvent()
 {
     int current = RomList->at();
-    if(current % mColumns != mColumns - 1 && current < RomList->count() - 1)
+    if(current % mColumns != mColumns - 1 && current < (int)RomList->count() - 1)
     {
         mButtons[mCurrentRow][mCurrentColumn]->setFrameStyle(QFrame::NoFrame);
         mCurrentColumn++;
@@ -178,12 +181,12 @@ void SelectFrame::RightEvent()
 SelectFrame::SelectFrame(QWidget * parent, const char * name, WFlags f):
     QFrame(parent,name,f),
     mColumns(0),
-    mRows(0),
     mMinSpacer(0),
-    mWidth(0),
-    mImageSize(0),
     mHSpacer(0),
     mVSpacer(0),
+    mWidth(0),
+    mImageSize(0),
+    mRows(0),
     mButtons(NULL),
     RomList(NULL)
 {
