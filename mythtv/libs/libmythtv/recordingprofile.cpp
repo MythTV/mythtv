@@ -190,8 +190,9 @@ public:
         CodecParam(parent, "mpeg4qualdiff"),
         SliderSetting(1,31,1) {
 
-        setLabel("Modifying the default may have severe consequences.");
+        setLabel("Max quality difference between frames");
         setValue(3);
+        setLabel("Modifying the default may have severe consequences.");
     };
 };
 
