@@ -1327,19 +1327,46 @@ void UIImageType::LoadImage()
         }
     }
 
-    QFile checkFile(filename);
+    int pathStart = m_filename.findRev('/');
+    bool bFound = false;
+    
+    // look in theme directory first including any sub directory
+    file = themeDir + m_filename;
+    bFound = QFile::exists(file);
+ 
+    if (!bFound && pathStart > 0)
+    {
+        // look in theme directory minus any sub directories
+        file = themeDir + m_filename.mid(pathStart + 1);
+        bFound = QFile::exists(file);
+    }
 
-    if (checkFile.exists())
-        file = themeDir + m_filename;
-    else
+    // look in default theme directory
+    if (!bFound)
+    {
         file = baseDir + m_filename;
-    checkFile.setName(file);
-    if (!checkFile.exists())
+        bFound = QFile::exists(file);
+    }
+    
+    if (!bFound && pathStart > 0)
+    {
+        file = baseDir + m_filename.mid(pathStart + 1);
+        bFound = QFile::exists(file);
+    }        
+    
+    // look in tmp directory
+    if (!bFound)
+    {
         file = "/tmp/" + m_filename;
-
-    checkFile.setName(file);
-    if (!checkFile.exists())
-        file = m_filename;
+        bFound = QFile::exists(file);
+    }
+    
+    if (!bFound)
+    {
+        cerr << "UIImageType::LoadImage() - Cannot find image: " << m_filename << endl;
+        m_show = false;
+        return;
+    }    
 
     if (m_debug == true)
         cerr << "     -Filename: " << file << endl;
