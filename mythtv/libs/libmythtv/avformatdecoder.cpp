@@ -25,12 +25,12 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent)
     hasbframes = false;
 
     haspositionmap = false;
-    lastvideostart = -1;
 
-    keyframedist = 30;
+    keyframedist = 15;
 
     exitafterdecoded = false;
     ateof = false;
+    gopset = 0;
 }
 
 AvFormatDecoder::~AvFormatDecoder()
@@ -67,8 +67,6 @@ void AvFormatDecoder::Reset(void)
         AVCodecContext *enc = &ic->streams[i]->codec;
         avcodec_flush_buffers(enc);
     }
-
-    lastvideostart = -1;
 }
 
 bool AvFormatDecoder::CanHandle(char testbuf[2048], const QString &filename)
@@ -236,6 +234,10 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 bitrate += enc->bit_rate;
 
                 fps = (double)enc->frame_rate / enc->frame_rate_base;
+
+                if (fps < 26 && fps > 24)
+                    keyframedist = 12;
+
                 m_parent->SetVideoParams(enc->width, enc->height, fps, 
                                          keyframedist);
              
@@ -357,6 +359,36 @@ void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
         pic->data[i] = NULL;
 }
 
+#define GOP_START     0x000001B8
+#define PICTURE_START 0x00000100
+#define SLICE_MIN     0x00000101
+#define SLICE_MAX     0x000001af
+
+bool AvFormatDecoder::PacketHasHeader(unsigned char *buf, int len,
+                                      unsigned int startcode)
+{
+    unsigned char *bufptr;
+    unsigned int state = 0xFFFFFFFF, v;
+    
+    bufptr = buf;
+
+    while (bufptr < buf + len)
+    {
+        v = *bufptr++;
+        if (state == 0x000001)
+        {
+            state = ((state << 8) | v) & 0xFFFFFF;
+            if (state >= SLICE_MIN && state <= SLICE_MAX)
+                return false;
+            if (state == startcode)
+                return true;
+        }
+        state = ((state << 8) | v) & 0xFFFFFF;
+    }
+
+    return false;
+}
+
 void AvFormatDecoder::GetFrame(int onlyvideo)
 {
     AVPacket pkt;
@@ -390,6 +422,35 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
         }
 
         AVStream *curstream = ic->streams[pkt.stream_index];
+
+        if (len > 0 && curstream->codec.codec_type == CODEC_TYPE_VIDEO)
+        {
+            AVCodecContext *context = &(curstream->codec);
+            if (context->codec_id == CODEC_ID_MPEG1VIDEO)
+            {
+                if (PacketHasHeader(pkt.data, pkt.size, PICTURE_START))
+                    framesRead++;
+
+                if (PacketHasHeader(pkt.data, pkt.size, GOP_START))
+                {
+                    int frameNum = framesRead - 1;
+ 
+                    if (!gopset && frameNum > 0)
+                    {
+                        keyframedist = frameNum;
+                        gopset = true;
+                        m_parent->SetVideoParams(-1, -1, -1, keyframedist);
+                    }
+
+                    if (frameNum % keyframedist == 0)
+                    {
+                        lastKey = frameNum;
+                        if (!haspositionmap)
+                            positionMap[lastKey / keyframedist] = pkt.startpos;
+                    }
+                }
+            }
+        }
  
         while (len > 0)
         {
@@ -438,9 +499,6 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                 }
                 case CODEC_TYPE_VIDEO:
                 {
-                    if (lastvideostart < 0)
-                        lastvideostart = pkt.startpos;
-
                     AVCodecContext *context = &(curstream->codec);
                     AVFrame mpa_pic;
 
@@ -461,16 +519,6 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
 
                     if (ret == 0)
                     {
-                        if (framesRead % keyframedist == 0)
-                        {
-                            long long keyframenum = framesRead;
-                            lastKey = keyframenum;
-                            if (!haspositionmap)
-                                positionMap[lastKey / keyframedist] = lastvideostart;
-                        }
-                        framesRead++;
-                        lastvideostart = pkt.startpos;
-
                         if (exitafterdecoded)
                             gotvideo = 1;
                     }
@@ -542,8 +590,8 @@ bool AvFormatDecoder::DoRewind(long long desiredFrame)
         lastKey -= keyframedist;
     }
 
-    if (lastKey < 1)
-        lastKey = 1;
+    if (lastKey < 0)
+        lastKey = 0;
 
     int normalframes = desiredFrame - lastKey;
     long long keyPos = positionMap[lastKey / keyframedist];

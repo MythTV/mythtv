@@ -48,6 +48,7 @@ class AvFormatDecoder : public DecoderBase
     friend int close_avf(URLContext *h);
 
     void InitByteContext(void);
+    bool PacketHasHeader(unsigned char *buf, int len, unsigned int startcode);
 
     RingBuffer *ringBuffer;
 
@@ -77,7 +78,6 @@ class AvFormatDecoder : public DecoderBase
     bool haspositionmap;
     QMap<long long, long long> positionMap;
 
-    long long lastvideostart;
     long long lastKey;
 
     int keyframedist;
@@ -86,6 +86,8 @@ class AvFormatDecoder : public DecoderBase
 
     int bitrate;
     bool ateof;
+
+    bool gopset;
 };
 
 #endif

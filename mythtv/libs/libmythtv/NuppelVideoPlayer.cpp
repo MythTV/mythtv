@@ -416,9 +416,13 @@ void NuppelVideoPlayer::WriteAudio(unsigned char *aubuf, int size)
 void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps, 
                                        int keyframedistance)
 {
-    video_width = width; 
-    video_height = height;
-    video_frame_rate = fps;
+    if (width > 0)
+        video_width = width; 
+    if (height > 0)
+        video_height = height;
+    if (fps > 0)
+        video_frame_rate = fps;
+
     video_size = video_height * video_width * 3 / 2;
     keyframedist = keyframedistance;
 }
@@ -2255,7 +2259,10 @@ void NuppelVideoPlayer::HandleSelect(void)
 
     for (i = deleteMap.begin(); i != deleteMap.end(); ++i)
     {
-        if (llabs(framesPlayed - i.key()) < (int)ceil(20 * video_frame_rate))
+        long long pos = framesPlayed - i.key();
+        if (pos < 0)
+            pos = 0 - pos;
+        if (pos < (int)ceil(20 * video_frame_rate))
         {
             deletepoint = true;
             deleteframe = i.key();

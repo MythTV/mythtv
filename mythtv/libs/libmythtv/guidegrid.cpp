@@ -714,12 +714,12 @@ void GuideGrid::fillTimeInfos()
 
     for (int x = 0; x < DISPLAY_TIMES; x++)
     {
-        TimeInfo *timeinfo = new TimeInfo;
-
         int mins = t.time().minute();
         mins = 5 * (mins / 5);
         if (mins % 30 == 0)
         {
+            TimeInfo *timeinfo = new TimeInfo;
+
             int hour = t.time().hour();
             timeinfo->hour = hour;
             timeinfo->min = mins;
@@ -747,15 +747,9 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
     QPtrList<ProgramInfo> *proglist;
     ProgramInfo *program;
 
-    proglist = m_programs[row];
-    if (proglist)
-    {
-        for (program = proglist->first(); program; program = proglist->next())
-        {
-            delete program;
-        }
-        delete proglist;
-    }
+    if (m_programs[row])
+        delete m_programs[row];
+    m_programs[row] = NULL;
 
     for (int x = 0; x < DISPLAY_TIMES; x++)
     {
@@ -771,6 +765,7 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
     if (m_channelInfos[chanNum].chanstr != "")
     {
         m_programs[row] = proglist = new QPtrList<ProgramInfo>;
+        m_programs[row]->setAutoDelete(true);
 
         QString chanid = QString("%1").arg(m_channelInfos[chanNum].chanid);
 

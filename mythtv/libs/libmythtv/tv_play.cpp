@@ -1817,9 +1817,9 @@ void TV::doLoadMenu(void)
     QString dummy;
     QString channame = "3";
 
-    if (recorder)
-        recorder->GetChannelInfo(dummy, dummy, dummy, dummy, dummy, dummy, 
-                                 dummy, dummy, channame, dummy);
+    if (activerecorder)
+        activerecorder->GetChannelInfo(dummy, dummy, dummy, dummy, dummy, dummy,
+                                       dummy, dummy, channame, dummy);
 
     QString chanstr = RunProgramGuide(channame, true, this);
 
