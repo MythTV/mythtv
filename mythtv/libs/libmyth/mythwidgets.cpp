@@ -488,16 +488,20 @@ void MythRemoteLineEdit::updateCycle(QString current_choice, QString set)
     {
         set.replace(index, current_choice.length(), bString);
     }    
-    
-        
-    aString = pre_cycle_text_upto;
+
+    QString esc_upto =  pre_cycle_text_upto;
+    QString esc_from =  pre_cycle_text_from;
+
+    esc_upto.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>");
+    esc_from.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>");
+
+    aString = esc_upto;
     aString += "<FONT COLOR=\"#";
     aString += hex_unselected;
     aString += "\">[";
     aString += set;
     aString += "]</FONT>";
-    aString += pre_cycle_text_from;
-    aString.replace("\n", "<br>");
+    aString += esc_from;
     setTextFormat(Qt::RichText);
     setText(aString);
     setCursorPosition(pre_cycle_para, pre_cycle_pos + set.length());
