@@ -1297,6 +1297,9 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     }
 */
 
+                    picframe->interlaced_frame = mpa_pic.interlaced_frame;
+                    picframe->top_field_first = mpa_pic.top_field_first;
+
                     m_parent->ReleaseNextVideoFrame(picframe, temppts);
                     if (directrendering)
                         inUseBuffers.removeRef(picframe);

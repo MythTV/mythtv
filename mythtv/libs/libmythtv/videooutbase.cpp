@@ -107,6 +107,7 @@ VideoOutput::VideoOutput()
     m_deinterlacing = false;
     m_deintFiltMan = NULL;
     m_deintFilter = NULL;
+    m_deinterlaceBeforeOSD = true;
 }
 
 VideoOutput::~VideoOutput()
@@ -193,9 +194,13 @@ bool VideoOutput::SetupDeinterlace(bool interlaced)
 {
     if (m_deinterlacing == interlaced)
         return m_deinterlacing;
+
     m_deinterlacing = interlaced;
+
     if (m_deinterlacing) 
     {
+        m_deinterlaceBeforeOSD = true;
+
         VideoFrameType itmp = FMT_YV12;
         VideoFrameType otmp = FMT_YV12;
         int btmp;
@@ -217,6 +222,9 @@ bool VideoOutput::SetupDeinterlace(bool interlaced)
         }
         VERBOSE(VB_PLAYBACK, QString("Using deinterlace method %1")
                 .arg(m_deintfiltername));
+
+        if (m_deintfiltername == "bobdeint")
+            m_deinterlaceBeforeOSD = false;
     }
     else 
     {
@@ -811,6 +819,8 @@ void VideoOutput::InitBuffers(int numdecode, bool extra_for_pause,
         vbuffers[i].frameNumber = 0;
         vbuffers[i].qscale_table = NULL;
         vbuffers[i].qstride = 0;
+        vbuffers[i].interlaced_frame = -1;
+        vbuffers[i].top_field_first = 1;
     }
 
     numbuffers = numdecode;

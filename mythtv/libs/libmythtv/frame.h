@@ -32,6 +32,9 @@ typedef struct VideoFrame_
 
     unsigned char *qscale_table;
     int            qstride;
+
+    int interlaced_frame; // 1 if interlaced.
+    int top_field_first; // 1 if top field is first.
 } VideoFrame;
 
 #endif

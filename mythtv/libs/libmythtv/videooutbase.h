@@ -260,6 +260,8 @@ class VideoOutput
     QString m_deintfiltername;
     FilterManager *m_deintFiltMan;
     FilterChain *m_deintFilter;
+
+    bool m_deinterlaceBeforeOSD;;
 };
 
 #endif

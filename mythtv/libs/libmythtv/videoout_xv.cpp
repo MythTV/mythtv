@@ -850,17 +850,22 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 
         int src_x = imgx, src_y = imgy, src_w = imgw, src_h = imgh;
 
-        if (m_deinterlacing && t == kScan_Interlaced) 
+        if (m_deinterlacing)
         {
-            // Show top field
-            src_y = imgy / 2;
-            src_h = imgh / 2;
-        }
-        else if (m_deinterlacing && t == kScan_Intr2ndField) 
-        {
-            // Show bottom field
-            src_y = (buffer->height + imgy) / 2;
-            src_h = imgh / 2;
+            if ((t == kScan_Interlaced && buffer->top_field_first == 1) ||
+                (t == kScan_Intr2ndField && buffer->top_field_first == 0))
+            {
+                // Show top field
+                src_y = imgy / 2;
+                src_h = imgh / 2;
+            }
+            else if ((t == kScan_Interlaced && buffer->top_field_first == 0) ||
+                     (t == kScan_Intr2ndField && buffer->top_field_first == 1))
+            {
+                // Show bottom field
+                src_y = (buffer->height + imgy) / 2;
+                src_h = imgh / 2;
+            }
         }
 
         XvShmPutImage(data->XJ_disp, xv_port, data->XJ_curwin, data->XJ_gc,
@@ -1023,11 +1028,20 @@ void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
     if (filterList)
         filterList->ProcessFrame(frame);
 
+    if (m_deinterlacing && m_deintFilter != NULL && m_deinterlaceBeforeOSD &&
+        !pauseframe)
+    {
+        m_deintFilter->ProcessFrame(frame);
+    }
+
     ShowPip(frame, pipPlayer);
     DisplayOSD(frame, osd);
 
-    if (m_deinterlacing && m_deintFilter != NULL && !pauseframe)
+    if (m_deinterlacing && m_deintFilter != NULL && !m_deinterlaceBeforeOSD &&
+        !pauseframe)
+    {
         m_deintFilter->ProcessFrame(frame);
+    }
 
     pthread_mutex_unlock(&lock);
 }
