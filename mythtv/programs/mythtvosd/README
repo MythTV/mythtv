@@ -56,7 +56,7 @@
 
 ** Continuing the above example, you would invoke this program as follows:
 
-mythtvosd --file=cid.xml --caller_name="JOE SCHMOE" --caller_number="8885551212"
+mythtvosd --template=cid.xml --caller_name="JOE SCHMOE" --caller_number="8885551212"
 
 **
 ** It is the responsibility of an external program to invoke the
