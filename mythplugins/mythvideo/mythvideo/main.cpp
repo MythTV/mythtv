@@ -29,6 +29,7 @@ using namespace std;
 #include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythplugin.h>
+#include <mythtv/lcddevice.h>
 
 enum VideoFileLocation
 {
@@ -143,7 +144,9 @@ void runMenu(QString themedir, const QString &menuname)
 
     if (diag->foundTheme())
     {
-        gContext->GetLCDDevice()->switchToTime();
+        if (class LCD * lcd = LCD::Get())
+            lcd->switchToTime();
+
         qApp->unlock();
         diag->exec();
         qApp->lock();
