@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2002-12-20, v1.053
+  2002-12-20, v1.054
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -97,6 +97,7 @@
      15.5 I keep losing all of my settings every time I compile!
      15.6 Compile errors.
      15.7 My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.
+     15.8 I can't checkout using CVS anymore!
 
   16. Miscellaneous.
      16.1 I'd like to watch the files without using mythtv / I'd like to convert the files to some other format.
@@ -114,10 +115,10 @@
 
        $ mkdir mythtv
        $ cd mythtv
-       $ cvs -d :pserver:mythtv@mythtv.org:/var/lib/cvs login
-       Logging in to :pserver:mythtv@mythtv.org:/var/lib/cvs
+       $ cvs -d :pserver:mythtv@cvs.mythtv.org:/var/lib/cvs login
+       Logging in to :pserver:mythtv@cvs.mythtv.org:/var/lib/cvs
        CVS password: mythtv
-       $ cvs -z3 -d :pserver:mythtv@mythtv.org:/var/lib/cvs checkout MC
+       $ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/cvs checkout MC
 
   This documentation will be in the docs/ subdirectory.
 
@@ -1765,6 +1766,13 @@
 
   Finally, depending on your distribution, you may be able to turn it
   off from within the control panel.
+
+  [1m15.8.  I can't checkout using CVS anymore![0m
+
+  Isaac has changed some things around.  The CVS repository is now known
+  as cvs.mythtv.org, rather than www.mythtv.org or mythtv.org.  Make
+  sure you change your CVSROOT to point to the new server, delete your
+  old tree, and re-do the checkout.
 
   [1m16.  Miscellaneous.[0m
 
