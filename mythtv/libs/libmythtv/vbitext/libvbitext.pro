@@ -1,7 +1,7 @@
 
 TEMPLATE = lib
 TARGET = vbitext
-CONFIG += thread staticlib warn_off
+CONFIG += thread staticlib
 
 include ( ../../settings.pro )
 include ( ../../config.mak )

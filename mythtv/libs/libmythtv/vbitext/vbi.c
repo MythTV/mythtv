@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <sys/ioctl.h>
+#include <stdarg.h>
 //#include "os.h"
 #include "vt.h"
 #include "vbi.h"
@@ -62,7 +63,16 @@ struct v4l2_format
 
 /***** end of api definitions *****/
 
+static void
+error(char *str, ...)
+{
+    va_list ap;
 
+    va_start(ap, str);
+    vfprintf(stderr, str, ap);
+    fprintf(stderr, "\n");
+    va_end(ap);
+}
 
 static void
 out_of_sync(struct vbi *vbi)
@@ -90,7 +100,8 @@ vbi_send(struct vbi *vbi, int type, int i1, int i2, int i3, void *p1)
     ev->i3 = i3;
     ev->p1 = p1;
 
-    for (cl = (void*) vbi->clients->first; cln = (void*) cl->node->next; cl = cln)
+    for (cl = (void*)vbi->clients->first; (cln = (void*)cl->node->next); 
+         (cl = cln))
        cl->handler(cl->data, ev);
 }
 
@@ -396,11 +407,13 @@ vbi_line(struct vbi *vbi, unsigned char *p)
            if (data[0] != 0x27)        // really 11100100? (rev order!)
                return -1;
 
-           if (i = vt_line(vbi, data+1))
+           if ((i = vt_line(vbi, data+1)))
+           {
                if (i < 0)
                    pll_add(vbi, 2, -i);
                else
                    pll_add(vbi, 1, i);
+           }
            return 0;
        }
     return -1;
@@ -415,6 +428,8 @@ vbi_handler(struct vbi *vbi, int fd)
 {
     int n, i;
     unsigned int seq;
+
+    (void)fd;
 
     n = read(vbi->fd, rawbuf, vbi->bufsize);
 
@@ -609,6 +624,8 @@ vbi_open(const char *vbi_name, struct cache *ca, int fine_tune, int big_buf)
     static int inited = 0;
     struct vbi *vbi;
 
+    (void)ca;
+
     if (! inited)
        lang_init();
     inited = 1;
@@ -667,6 +684,9 @@ struct vt_page *
 vbi_query_page(struct vbi *vbi, int pgno, int subno)
 {
     struct vt_page *vtp = 0;
+
+    (void)pgno;
+    (void)subno;
 
 //    if (vbi->cache)
 //     vtp = vbi->cache->op->get(vbi->cache, pgno, subno);

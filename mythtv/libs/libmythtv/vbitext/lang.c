@@ -203,10 +203,12 @@ enhance(struct enhance *eh, struct vt_page *vtp)
                {
                    case 15: // char from G2 set
                        if (adr < VT_WIDTH && row < VT_HEIGHT)
+                       {
                            if (latin1)
                                vtp->data[row][adr] = g2map_latin1[data-32];
                            else
                                vtp->data[row][adr] = g2map_latin2[data-32];
+                       }
                        break;
                    case 16 ... 31: // char from G0 set with diacritical mark
                        if (adr < VT_WIDTH && row < VT_HEIGHT)
@@ -214,11 +216,13 @@ enhance(struct enhance *eh, struct vt_page *vtp)
                            struct mark *mark = marks + (mode - 16);
                            unsigned char *x;
 
-                           if (x = strchr(mark->g0, data))
+                           if ((x = strchr(mark->g0, data)))
+                           {
                                if (latin1)
                                    data = mark->latin1[x - mark->g0];
                                else
                                    data = mark->latin2[x - mark->g0];
+                           }
                            vtp->data[row][adr] = data;
                        }
                        break;
