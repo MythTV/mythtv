@@ -276,6 +276,11 @@ struct TranscodeData *Transcoder::CheckTranscodeTable(bool skipPartial)
                     QString filename = pinfo->GetRecordFilename(fileprefix);
                     QString tmpfile = filename;
                     tmpfile += ".tmp";
+                    // Get new filesize
+                    struct stat st;
+                    long long filesize = 0;
+                    if (stat(tmpfile.ascii(), &st) == 0)
+                        filesize = st.st_size;
                     // To save the original file...
                     QString oldfile = filename;
                     oldfile += ".old";
@@ -308,6 +313,8 @@ struct TranscodeData *Transcoder::CheckTranscodeTable(bool skipPartial)
                                         .arg(MARK_KEYFRAME);
                         db_conn->exec(query);
                     }
+                    if (filesize > 0)
+                        pinfo->SetFilesize(filesize, db_conn);
                     QString mapfile = tmpfile + ".map";
                     if (QFile::exists(mapfile))
                     {
