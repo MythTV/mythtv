@@ -921,7 +921,7 @@ void HDTVRecorder::ChannelNameChanged(const QString& new_chan)
     int pos = freqid.find('-');
     if (pos != -1) 
     {
-        desired_channel = atoi(freqid.left(pos));
+        desired_channel = -1;
         desired_subchannel = atoi(freqid.mid(pos+1).ascii());
     }
     else
