@@ -10,6 +10,7 @@ using namespace std;
 #include "rominfo.h"
 #include "gamesettings.h"
 #include "gametree.h"
+#include "dbcheck.h"
 
 #include <mythtv/themedmenu.h>
 #include <mythtv/mythcontext.h>
@@ -76,6 +77,8 @@ int mythplugin_init(const char *libversion)
                                     MYTH_BINARY_VERSION))
         return -1;
 
+
+    UpgradeGameDatabaseSchema();
 
     MythGameSettings settings;
     settings.load(QSqlDatabase::database());

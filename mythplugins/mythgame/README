@@ -30,9 +30,6 @@ one of the required pieces of software installed.
 Follow this by a 'make install'.  It'll put a 'libmythgame.so' plugin in your
 /usr/local/lib/mythtv/plugins directory.
 
-Finally, insert gamedb/metadata.sql, gamedb/nesdb.sql, and gamedb/snesdata.sql 
-into your existing MythTV database (in that order).
-
 MythGame will also read the mysql.txt settings files used by MythTV, so any 
 changes you made to those will be carried over into this.
 

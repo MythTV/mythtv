@@ -18,10 +18,10 @@ HEADERS += gamehandler.h rominfo.h unzip.h gamesettings.h gametree.h
 HEADERS += mamehandler.h mamerominfo.h mamesettingsdlg.h
 HEADERS += neshandler.h nesrominfo.h nessettingsdlg.h
 HEADERS += sneshandler.h snesrominfo.h snessettingsdlg.h
-HEADERS += pchandler.h pcrominfo.h pcsettingsdlg.h 
+HEADERS += pchandler.h pcrominfo.h pcsettingsdlg.h dbcheck.h
 
 SOURCES += main.cpp gamehandler.cpp rominfo.cpp gametree.cpp unzip.c
-SOURCES += gamesettings.cpp
+SOURCES += gamesettings.cpp dbcheck.cpp
 SOURCES += mamehandler.cpp mamerominfo.cpp mamesettingsdlg.cpp
 SOURCES += neshandler.cpp nesrominfo.cpp nessettingsdlg.cpp 
 SOURCES += sneshandler.cpp snesrominfo.cpp snessettingsdlg.cpp 
