@@ -232,30 +232,10 @@ public:
     };
 };
 
-class VertScanMode: public ComboBoxSetting, public GlobalSetting {
-public:
-    VertScanMode():
-        GlobalSetting("VertScanMode") {
-        setLabel("Vertical scan mode");
-        addSelection("overscan");
-        addSelection("underscan");
-    };
-};
-
-class HorizScanMode: public ComboBoxSetting, public GlobalSetting {
-public:
-    HorizScanMode():
-        GlobalSetting("HorizScanMode") {
-        setLabel("Horizontal scan mode");
-        addSelection("overscan");
-        addSelection("underscan");
-    };
-};
-
 class VertScanPercentage: public SpinBoxSetting, public GlobalSetting {
 public:
     VertScanPercentage():
-        SpinBoxSetting(0, 100, 1),
+        SpinBoxSetting(-100, 100, 1),
         GlobalSetting("VertScanPercentage") {
         setLabel("Vertical over/underscan percentage");
         setValue(0);
@@ -265,7 +245,7 @@ public:
 class HorizScanPercentage: public SpinBoxSetting, public GlobalSetting {
 public:
     HorizScanPercentage():
-        SpinBoxSetting(0, 100, 1),
+        SpinBoxSetting(-100, 100, 1),
         GlobalSetting("HorizScanPercentage") {
         setLabel("Horizontal over/underscan percentage");
         setValue(0);
@@ -303,8 +283,6 @@ public:
         general->addChild(new RewindAmount());
         general->addChild(new StickyKeys());
         general->addChild(new ExactSeeking());
-        general->addChild(new VertScanMode());
-        general->addChild(new HorizScanMode());
         general->addChild(new VertScanPercentage());
         general->addChild(new HorizScanPercentage());
         general->addChild(new XScanDisplacement());
@@ -323,7 +301,7 @@ public:
         liveTV->addChild(new BufferName());
         liveTV->addChild(new BufferSize());
         liveTV->addChild(new MaxBufferFill());
-        // add PIP stuff here
+        // xxx add PIP stuff here
         addChild(liveTV);
 
     };
