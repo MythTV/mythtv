@@ -9,6 +9,7 @@
 
 #define NUMPROGRAMLINES 20
 
+#define MARK_PROCESSING    0
 #define MARK_CUT_START     1
 #define MARK_CUT_END       2
 #define MARK_BLANK_FRAME   3

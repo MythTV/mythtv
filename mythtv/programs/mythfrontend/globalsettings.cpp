@@ -174,28 +174,19 @@ public:
     };
 };
 
-class CommercialSkipMethod: public ComboBoxSetting, public GlobalSetting {
+class CommercialSkipMethod: public ComboBoxSetting, public BackendSetting {
 public:
     CommercialSkipMethod():
-        GlobalSetting("CommercialSkipMethod") {
+        BackendSetting("CommercialSkipMethod") {
 
         setLabel("Commercial Skip Method");
-        addSelection("Blank Screen Detection (default)", "1");
-        setHelpText("This determines the method used by MythTV to detect when "
-                    "commercials start and end.  The manual "
-                    "and automatic commercial skip modes of MythTV will "
-                    "both use this function." );
-    };
-};
-
-class CommercialSkipEverywhere: public CheckBoxSetting, public GlobalSetting {
-public:
-    CommercialSkipEverywhere():
-        GlobalSetting("CommercialSkipEverywhere") {
-        setLabel("Commercial Skip Everywhere");
-        setValue(true);
-        setHelpText("Allow the commercial skip buttons to jump to the "
-                    "beginning of a commercial break as well as the end.");
+        addSelection("Blank Frame Detection (default)", "1");
+        addSelection("Blank Frame + Scene Change Detection", "3");
+        addSelection("Scene Change Detection", "2");
+        setHelpText("This determines the method used by MythTV to detect "
+                    "when commercials start and end.  You must have "
+                    "automatic commercial turned on to use anything "
+                    "other than 'Blank Frame'." );
     };
 };
 
@@ -211,10 +202,10 @@ public:
     };
 };
 
-class AutoCommercialFlag: public CheckBoxSetting, public GlobalSetting {
+class AutoCommercialFlag: public CheckBoxSetting, public BackendSetting {
 public:
     AutoCommercialFlag():
-        GlobalSetting("AutoCommercialFlag") {
+        BackendSetting("AutoCommercialFlag") {
         setLabel("Automatically Flag Commercials");
         setValue(false);
         setHelpText("Automatically flag commercials after a recording "
@@ -850,10 +841,9 @@ PlaybackSettings::PlaybackSettings()
     seek->addChild(new StickyKeys());
     seek->addChild(new ExactSeeking());
     seek->addChild(new JumpAmount());
-    seek->addChild(new CommercialSkipMethod());
-    seek->addChild(new CommercialSkipEverywhere());
-    seek->addChild(new AutoCommercialSkip());
     seek->addChild(new AutoCommercialFlag());
+    seek->addChild(new CommercialSkipMethod());
+    seek->addChild(new AutoCommercialSkip());
     addChild(seek);
 
     VerticalConfigurationGroup* oscan = new VerticalConfigurationGroup(false);

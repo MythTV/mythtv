@@ -136,9 +136,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
     exactseeks = false;
 
     autocommercialskip = 0;
-    commercialskipmethod = COMMERCIAL_SKIP_BLANKS;
-    commercialskipeverywhere =
-        gContext->GetNumSetting("CommercialSkipEverywhere", 1);
+    commercialskipmethod =
+        gContext->GetNumSetting("CommercialSkipMethod", 1);
 
     eventvalid = false;
 
@@ -2843,8 +2842,6 @@ bool NuppelVideoPlayer::ReencodeFile(char *inputname, char *outputname,
 
 int NuppelVideoPlayer::FlagCommercials(int show_percentage)
 {
-    QMap<long long, int> commBlankMap;
-    QMap<long long, int> commBlankBreakMap;
     int comms_found = 0;
     int percentage = 0;
 
@@ -2875,6 +2872,11 @@ int NuppelVideoPlayer::FlagCommercials(int show_percentage)
     wpos = 0;
     ClearAfterSeek();
 
+    if ( ! (commercialskipmethod & 0x01))
+        commDetect->SetBlankFrameDetection(false);
+    if (commercialskipmethod & 0x02)
+        commDetect->SetSceneChangeDetection(true);
+
     // the meat of the offline commercial detection code, scan through whole
     // file looking for indications of commercial breaks
     GetFrame(1,true);
@@ -2896,10 +2898,7 @@ int NuppelVideoPlayer::FlagCommercials(int show_percentage)
             fflush( stdout );
         }
 
-        if(LastFrameIsBlank())
-        {
-            blankMap[framesPlayed] = MARK_BLANK_FRAME;
-        }
+        commDetect->ProcessNextFrame(vbuffer[vpos], framesPlayed);
 
         GetFrame(1,true);
     }
@@ -2907,21 +2906,27 @@ int NuppelVideoPlayer::FlagCommercials(int show_percentage)
     if (show_percentage)
         printf( "\b\b\b\b      \b\b\b\b\b\b" );
 
-    // done scanning through file, now process learned info
-    db_lock.lock();
-    m_playbackinfo->SetBlankFrameList(blankMap, m_db);
-    db_lock.unlock();
+    if (commercialskipmethod & 0x01)
+    {
+        commDetect->GetBlankFrameMap(blankMap);
 
-    commDetect->BuildCommListFromBlanks(blankMap, commBlankMap);
-    commDetect->MergeCommList(commBlankMap, commBlankBreakMap);
+        if (blankMap.size())
+        {
+            db_lock.lock();
+            m_playbackinfo->SetBlankFrameList(blankMap, m_db);
+            db_lock.unlock();
+        }
+    }
 
-    // Merge/resolve differences between the lists here
+    commDetect->GetCommBreakMap(commBreakMap);
 
-    // only list now is blank frame map so use that for final list
-    db_lock.lock();
-    m_playbackinfo->SetCommBreakList(commBlankBreakMap, m_db);
-    db_lock.unlock();
-    comms_found = commBlankBreakMap.size() / 2;
+    if (commBreakMap.size())
+    {
+        db_lock.lock();
+        m_playbackinfo->SetCommBreakList(commBreakMap, m_db);
+        db_lock.unlock();
+    }
+    comms_found = commBreakMap.size() / 2;
 
     playing = false;
     killplayer = true;
@@ -2949,7 +2954,9 @@ int NuppelVideoPlayer::GetStatusbarPos(void)
 
 bool NuppelVideoPlayer::FrameIsBlank(int vposition)
 {
-    return(commDetect->FrameIsBlank(vbuffer[vposition]));
+    commDetect->ProcessNextFrame(vbuffer[vposition]);
+
+    return(commDetect->FrameIsBlank());
 }
 
 void NuppelVideoPlayer::AutoCommercialSkip(void)
@@ -3050,10 +3057,9 @@ void NuppelVideoPlayer::SkipCommercialsByBlanks(void)
 
     if ((hasblanktable) && (!hascommbreaktable))
     {
-        QMap<long long, int> commBlankMap;
-
-        commDetect->BuildCommListFromBlanks(blankMap, commBlankMap);
-        commDetect->MergeCommList(commBlankMap, commBreakMap);
+        commDetect->ClearAllMaps();
+        commDetect->SetBlankFrameMap(blankMap);
+        commDetect->GetCommBreakMap(commBreakMap);
         if (!commBreakMap.isEmpty())
         {
             hascommbreaktable = true;
@@ -3219,10 +3225,9 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
     if (( ! hascommbreaktable) &&
         (hasblanktable))
     {
-        QMap<long long, int> commBlankMap;
-
-        commDetect->BuildCommListFromBlanks(blankMap, commBlankMap);
-        commDetect->MergeCommList(commBlankMap, commBreakMap);
+        commDetect->ClearAllMaps();
+        commDetect->SetBlankFrameMap(blankMap);
+        commDetect->GetCommBreakMap(commBreakMap);
         if (!commBreakMap.isEmpty())
             hascommbreaktable = true;
     }
@@ -3254,38 +3259,29 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
         if (direction < 0)
             commBreakIter--;
 
-        if ((commBreakIter.data() == MARK_COMM_END) ||
-            (commercialskipeverywhere)) 
+        if (osd)
         {
-            if (osd)
-            {
-                int skipped_seconds = (int)((commBreakIter.key() -
-                        framesPlayed) / video_frame_rate);
-                QString comm_msg = QString("Auto-Skip %1 seconds")
-                                      .arg(skipped_seconds);
-                int spos = GetStatusbarPos();
-                osd->StartPause(spos, false, "SKIP", comm_msg, 1);
-            }
-            JumpToFrame(commBreakIter.key());
-            commBreakIter++;
-
-            GetFrame(1, true);
-            while (LastFrameIsBlank())
-                GetFrame(1, true);
+            int skipped_seconds = (int)((commBreakIter.key() -
+                    framesPlayed) / video_frame_rate);
+            QString comm_msg = QString("Auto-Skip %1 seconds")
+                                  .arg(skipped_seconds);
+            int spos = GetStatusbarPos();
+            osd->StartPause(spos, false, "SKIP", comm_msg, 1);
         }
-        else
-            if (osd)
-            {
-                QString comm_msg = QString("NOT In Commercial Break...");
-                int spos = GetStatusbarPos();
-                osd->StartPause(spos, false, "SKIP", comm_msg, 1);
-            }
+        JumpToFrame(commBreakIter.key());
+        commBreakIter++;
+
+        GetFrame(1, true);
+        while (LastFrameIsBlank())
+            GetFrame(1, true);
 
         return true;
     }
 
     switch (commercialskipmethod)
     {
+        case COMMERCIAL_SKIP_SCENE:  osd->EndPause();
+                                     break;
         case COMMERCIAL_SKIP_BLANKS:
         default                    : SkipCommercialsByBlanks();
                                      break;

@@ -760,6 +760,21 @@ void ProgramInfo::SetBlankFrameList(QMap<long long, int> &frames,
     QString starts = startts.toString("yyyyMMddhhmm");
     starts += "00";
 
+    // check to make sure the show still exists before saving markups
+    querystr = QString("SELECT starttime FROM recorded "
+                       "WHERE chanid = '%1' AND starttime = '%2'")
+                       .arg(chanid).arg(starts);
+
+    QSqlQuery check_query = db->exec(querystr);
+    if (!check_query.isActive())
+        MythContext::DBError("Check recorded program before writing markups",
+            querystr);
+
+    if (check_query.isActive())
+        if ((check_query.numRowsAffected() == 0) ||
+            (!check_query.next()))
+            return;
+
     QString min_comp = " ";
     QString max_comp = " ";
 

@@ -660,7 +660,7 @@ void NuppelVideoRecorder::StartRecording(void)
     }
 
     if (commDetect)
-        commDetect->ReInit(w, h, video_frame_rate);
+        commDetect->Init(w, h, video_frame_rate);
     else
         commDetect = new CommDetect(w, h, video_frame_rate);
 
@@ -2929,19 +2929,23 @@ void NuppelVideoRecorder::WriteVideo(Frame *frame, bool skipsync, bool forcekey)
     frameofgop++;
     framesWritten++;
 
-    if (!hardware_encode && commDetect->FrameIsBlank(buf))
+    if (!hardware_encode)
     {
-        blank_frames[(fnum-startnum)>>1] = 1;
-
-        if ((!livetv) &&
-            ((blank_frames.size() % 15 ) == 0))
+        commDetect->ProcessNextFrame(buf, (fnum-startnum)>>1 );
+        if (commDetect->FrameIsBlank())
         {
-            pthread_mutex_lock(db_lock);
-            curRecording->ProgramInfo::SetBlankFrameList(blank_frames,
-                db_conn, prev_bframe_save_pos, (fnum-startnum)>>1 );
-            pthread_mutex_unlock(db_lock);
+            commDetect->GetBlankFrameMap(blank_frames);
 
-            prev_bframe_save_pos = ((fnum-startnum)>>1) + 1;
+            if ((!livetv) &&
+                ((blank_frames.size() % 15 ) == 0))
+            {
+                pthread_mutex_lock(db_lock);
+                curRecording->ProgramInfo::SetBlankFrameList(blank_frames,
+                    db_conn, prev_bframe_save_pos, (fnum-startnum)>>1 );
+                pthread_mutex_unlock(db_lock);
+
+                prev_bframe_save_pos = ((fnum-startnum)>>1) + 1;
+            }
         }
     }
    
@@ -3102,8 +3106,5 @@ void NuppelVideoRecorder::WriteText(unsigned char *buf, int len, int timecode,
 
 void NuppelVideoRecorder::GetBlankFrameMap(QMap<long long, int> &blank_frame_map)
 {
-    QMap<long long, int>::Iterator i;
-
-    for (i = blank_frames.begin(); i != blank_frames.end(); ++i)
-        blank_frame_map[i.key()] = 1;
+    commDetect->GetBlankFrameMap(blank_frame_map);
 }

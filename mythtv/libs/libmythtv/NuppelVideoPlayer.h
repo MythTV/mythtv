@@ -20,9 +20,6 @@ using namespace std;
 #define MAXTBUFFER 11
 #define AUDBUFSIZE 512000
 
-#define COMMERCIAL_SKIP_OFF     0
-#define COMMERCIAL_SKIP_BLANKS  1
-
 class XvVideoOutput;
 class OSDSet;
 class RemoteEncoder;
@@ -388,7 +385,6 @@ class NuppelVideoPlayer
     int skipcommercials;
     int autocommercialskip;
     int commercialskipmethod;
-    int commercialskipeverywhere;
 
     QString cclines[4];
     int ccindent[4];
