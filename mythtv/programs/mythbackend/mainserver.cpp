@@ -229,11 +229,7 @@ void MainServer::ProcessRequest(QStringList &listline, QStringList &tokens,
     }
     else if (command == "GET_FREE_RECORDER")
     {
-        if (tokens.size() != 2)
-            cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
-                 << " Bad GET_FREE_RECORDER" << endl;
-        else
-            HandleGetFreeRecorder(tokens[1], pbs);
+        HandleGetFreeRecorder(pbs);
     }
     else if (command == "QUERY_RECORDER")
     {
@@ -914,10 +910,12 @@ void MainServer::HandleGetConflictingRecordings(QStringList &slist,
     delete pginfo;
 }
 
-void MainServer::HandleGetFreeRecorder(QString prefhost, PlaybackSock *pbs)
+void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
 {
     QStringList strlist;
     int retval = -1;
+
+    QString pbshost = pbs->getHostname();
 
     EncoderLink *encoder = NULL;
     QString enchost;
@@ -932,7 +930,7 @@ void MainServer::HandleGetFreeRecorder(QString prefhost, PlaybackSock *pbs)
         else
             enchost = elink->getHostname();
 
-        if (enchost == prefhost && elink->isConnected() && !elink->isBusy())
+        if (enchost == pbshost && elink->isConnected() && !elink->isBusy())
         {
             encoder = elink;
             retval = iter.key();

@@ -114,9 +114,7 @@ vector<ProgramInfo *> *RemoteGetConflictList(ProgramInfo *pginfo,
 
 RemoteEncoder *RemoteRequestRecorder(void)
 {
-    QString str =  "GET_FREE_RECORDER ";
-    str += gContext->GetHostName();
-    QStringList strlist = str;
+    QStringList strlist = "GET_FREE_RECORDER";
 
     gContext->SendReceiveStringList(strlist);
 
