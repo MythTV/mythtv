@@ -31,7 +31,7 @@ MfdInfo::MfdInfo( int an_id, const QString &a_name, const QString &a_host)
 
 AudioMetadata*  MfdInfo::getAudioMetadata(int collection_id, int item_id)
 {
-    if(mfd_content_collection)
+    if (mfd_content_collection)
     {
         return mfd_content_collection->getAudioItem(collection_id, item_id);    
     }
@@ -40,7 +40,7 @@ AudioMetadata*  MfdInfo::getAudioMetadata(int collection_id, int item_id)
 
 ClientPlaylist*  MfdInfo::getAudioPlaylist(int collection_id, int item_id)
 {
-    if(mfd_content_collection)
+    if (mfd_content_collection)
     {
         return mfd_content_collection->getAudioPlaylist(collection_id, item_id);    
     }
@@ -52,7 +52,7 @@ UIListGenericTree* MfdInfo::constructPlaylistTree(
                                     int playlist_id
                                    )
 {
-    if(mfd_content_collection)
+    if (mfd_content_collection)
     {
     
         return mfd_content_collection->constructPlaylistTree(
@@ -68,7 +68,7 @@ UIListGenericTree* MfdInfo::constructContentTree(
                                     int playlist_id
                                    )
 {
-    if(mfd_content_collection)
+    if (mfd_content_collection)
     {
     
         return mfd_content_collection->constructContentTree(
@@ -79,9 +79,33 @@ UIListGenericTree* MfdInfo::constructContentTree(
     return NULL;
 }
 
+void MfdInfo::toggleItem(UIListGenericTree *node, bool turn_on)
+{
+    if (mfd_content_collection)
+    {
+        mfd_content_collection->toggleItem(node, turn_on);
+    }
+}
+
+void MfdInfo::toggleTree(UIListTreeType *menu, UIListGenericTree *playlist_tree, UIListGenericTree *node, bool turn_on)
+{
+    if (mfd_content_collection)
+    {
+        mfd_content_collection->toggleTree(menu, playlist_tree, node, turn_on);
+    }
+}
+
+void MfdInfo::alterPlaylist(UIListTreeType *menu, UIListGenericTree *playlist_tree, UIListGenericTree *node, bool turn_on)
+{
+    if (mfd_content_collection)
+    {
+        mfd_content_collection->alterPlaylist(menu, playlist_tree, node, turn_on);
+    }
+}
+
 void MfdInfo::setCurrentPlayingData()
 {
-    if(
+    if (
         current_container > -1 &&
         current_item > -1 &&
         current_elapsed > -1
@@ -101,7 +125,7 @@ bool MfdInfo::setCurrentPlayingData(int which_container, int which_metadata, int
 
     AudioMetadata *whats_playing = getAudioMetadata(which_container, which_metadata);
     playing_strings.clear();
-    if(whats_playing)
+    if (whats_playing)
     {
         bool return_value = true;
         playing_strings.append(whats_playing->getTitle());
@@ -110,7 +134,7 @@ bool MfdInfo::setCurrentPlayingData(int which_container, int which_metadata, int
         played_percentage = (double) ((numb_seconds + 0.0) * 1000.0) / (whats_playing->getLength() + 0.0);
         knows_whats_playing = true;
         
-        if(previous_container == current_container && previous_item == current_item)
+        if (previous_container == current_container && previous_item == current_item)
         {
             return_value = false;
         }
@@ -129,6 +153,13 @@ bool MfdInfo::setCurrentPlayingData(int which_container, int which_metadata, int
     return false;
 }
 
+void MfdInfo::markNodeAsHeld(UIListGenericTree *node, bool held_or_not)
+{
+    if (mfd_content_collection)
+    {
+        mfd_content_collection->markNodeAsHeld(node, held_or_not);
+    }
+}
 
 MfdInfo::~MfdInfo()
 {

@@ -44,7 +44,7 @@
             <area>0,0,800,80</area>
             <multitextarea name="now_playing_text" draworder="2" align="center">
                 <font>now_playing_font</font>
-                <area>48,15,704,35</area>
+                <area>48,14,704,33</area>
 
                 <!--    
                 <padding> is spaces to add to beginning and end of each
@@ -213,10 +213,10 @@
 
         <container name="title">
             <area>0,0,800,80</area>
-            <textarea name="title" draworder="0" align="center">
-                <area>50,10,700,30</area>
+            <textarea name="edit_title" draworder="0" align="center">
+                <area>50,10,700,35</area>
                 <font>title</font>
-                <value>Edit Playlist</value>
+                <value>user should not see this</value>
             </textarea>
             <textarea name="playlist_subtitle" draworder="0" align="center">
                 <area>50,50,300,30</area>
@@ -306,7 +306,6 @@
                 <value>Title</value>
             </textarea>
             
-
             <image name="mfe_genre_icon" draworder="0" fleximage="no">
                 <filename>mfe_genre_icon.png</filename>
                 <position>225,5</position>
@@ -355,22 +354,22 @@
 
             <textarea name="genre_text" draworder="0" align="left">
                 <font>active</font>
-                <area>260,5,520,35</area>
+                <area>260,5,500,35</area>
             </textarea>
             
             <textarea name="artist_text" draworder="0" align="left">
                 <font>active</font>
-                <area>260,40,520,35</area>
+                <area>260,40,500,35</area>
             </textarea>
             
             <textarea name="album_text" draworder="0" align="left">
                 <font>active</font>
-                <area>260,75,520,35</area>
+                <area>260,75,500,35</area>
             </textarea>
             
             <textarea name="title_text" draworder="0" align="left">
                 <font>active</font>
-                <area>260,110,520,35</area>
+                <area>260,110,500,35</area>
             </textarea>
             
 

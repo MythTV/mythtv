@@ -27,7 +27,8 @@ class PlaylistDialog : public MythThemedDialog
                     QString theme_filename,
                     MfdInfo *an_mfd,
                     UIListGenericTree *a_playlist_tree,
-                    UIListGenericTree *all_content_tree
+                    UIListGenericTree *all_content_tree,
+                    const QString&  playlist_name
                   ); 
 
     void keyPressEvent(QKeyEvent *e);
@@ -38,6 +39,9 @@ class PlaylistDialog : public MythThemedDialog
   
     void handlePlaylistEntered(UIListTreeType*, UIListGenericTree*);
     void handlePlaylistSelected(UIListTreeType*, UIListGenericTree*);
+    void startHoldingTrack(UIListGenericTree *node);
+    void stopHoldingTrack();
+    void moveHeldUpDown(bool up_or_down);
     void handleContentEntered(UIListTreeType*, UIListGenericTree*);
     void handleContentSelected(UIListTreeType*, UIListGenericTree*);
     void setDisplayInfo(
@@ -48,6 +52,15 @@ class PlaylistDialog : public MythThemedDialog
                         const QString &string4 = ""
                        );
     void clearDisplayInfo(bool clear_only_right = true);
+    void fillWhatWeKnow(
+                        UIListGenericTree *node, 
+                        QString &genre_string, 
+                        QString &artist_string, 
+                        QString &album_string
+                       );
+
+    void toggleItem(UIListGenericTree *node, bool turn_on);
+    void toggleTree(UIListGenericTree *node, bool turn_on);
 
   private:
   
@@ -85,6 +98,7 @@ class PlaylistDialog : public MythThemedDialog
     UITextType          *playlist_source_label;
     UITextType          *playlist_type_label;
     UITextType          *playlist_numtracks_label;
+    UITextType          *edit_title;
 
     //
     //  The playlist tree that gets handed to us
@@ -95,7 +109,9 @@ class PlaylistDialog : public MythThemedDialog
 
 
     MfdInfo    *current_mfd;   
-  
+
+    bool                holding_track;
+    UIListGenericTree*  held_track;
 };
 
 

@@ -7,6 +7,7 @@
 */
 
 #include <mythtv/mythcontext.h>
+#include <mfdclient/playlist.h>
 #include "mfedialog.h"
 #include "playlistdialog.h"
 
@@ -66,8 +67,19 @@ void MfeDialog::keyPressEvent(QKeyEvent *e)
             
         case Key_Left:
         
-            menu->MoveLeft();
-            handled = true;
+            if(menu->isShown())
+            {
+                if(menu->getDepth() > 0)
+                {
+                    menu->MoveLeft();
+                    handled = true;
+                }
+                else
+                {
+                    menu->toggleShow();
+                    handled = true;
+                }
+            }
             break;
             
         case Key_Right:
@@ -292,7 +304,7 @@ void MfeDialog::handleTreeSignals(UIListGenericTree *node)
             
             if(current_mfd)
             {
-                UIListGenericTree *prechecked_playlist_tree
+                UIListGenericTree *playlist_tree
                     = current_mfd->constructPlaylistTree(
                                                          node->getAttribute(0),
                                                          node->getInt()
@@ -302,8 +314,7 @@ void MfeDialog::handleTreeSignals(UIListGenericTree *node)
                                                         node->getAttribute(0),
                                                         node->getInt()
                                                        );
-
-                if(possible_content_tree && prechecked_playlist_tree)
+                if(possible_content_tree && playlist_tree)
                 {
 
                     PlaylistDialog *pldiag = new PlaylistDialog(
@@ -311,12 +322,17 @@ void MfeDialog::handleTreeSignals(UIListGenericTree *node)
                                                         "playlist_dialog",
                                                         "mfe-",
                                                         current_mfd,
-                                                        prechecked_playlist_tree,
-                                                        possible_content_tree
+                                                        playlist_tree,
+                                                        possible_content_tree,
+                                                        current_mfd->getAudioPlaylist(
+                                                                                    node->getAttribute(0),
+                                                                                    node->getInt()
+                                                                                     )
+                                                                   ->getName()
                                                                );
                     pldiag->exec();
                     delete pldiag;
-                    delete prechecked_playlist_tree;
+                    delete playlist_tree;
                 }
                 else
                 {
@@ -334,8 +350,6 @@ void MfeDialog::handleTreeSignals(UIListGenericTree *node)
                      << "to playlist editing"
                      <<endl;
             }
-            
-        
         }
     }
 }

@@ -40,6 +40,9 @@ class MfdInfo
     ClientPlaylist*         getAudioPlaylist(int collection_id, int item_id);
     UIListGenericTree*      constructPlaylistTree(int collection_id, int playlist_id);
     UIListGenericTree*      constructContentTree(int collection_id, int playlist_id);
+    void                    toggleItem(UIListGenericTree *node, bool turn_on);
+    void                    toggleTree(UIListTreeType *menu, UIListGenericTree *playlist_tree, UIListGenericTree *node, bool turn_on);
+    void                    alterPlaylist(UIListTreeType *menu, UIListGenericTree *playlist_tree, UIListGenericTree *node, bool turn_on);
     void                    setCurrentPlayingData();
     bool                    setCurrentPlayingData(int which_container, int which_metadata, int numb_seconds);
     QStringList             getPlayingStrings(){return playing_strings;}
@@ -52,6 +55,7 @@ class MfdInfo
     bool                    knowsWhatsPlaying(){return knows_whats_playing;}
     bool                    isStopped(){return is_stopped;}
     void                    isStopped(bool yon){is_stopped = yon;}
+    void                    markNodeAsHeld(UIListGenericTree* node, bool held_or_not);
     
   private:
   
