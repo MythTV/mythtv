@@ -1541,7 +1541,25 @@ void *NuppelVideoPlayer::kickoffOutputVideoLoop(void *player)
 bool NuppelVideoPlayer::FastForward(float seconds)
 {
     if (fftime == 0)
+    {
         fftime = (int)(seconds * video_frame_rate);
+
+        // account for the fact that framesPlayed is ahead of what we're
+        // actually showing on the screen because of the videoOutput buffers
+        if (fftime > videoOutput->ValidVideoFrames())
+        {
+            fftime -= videoOutput->ValidVideoFrames();
+        }
+        else if (fftime < videoOutput->ValidVideoFrames())
+        {
+            rewindtime = videoOutput->ValidVideoFrames() - 1 - fftime;
+            fftime = 0;
+        }
+        else
+        {
+            fftime = 1;
+        }
+    }
 
     return fftime > CalcMaxFFTime(fftime);
 }
@@ -2252,6 +2270,12 @@ bool NuppelVideoPlayer::EnableEdit(void)
     editmode = true;
     Pause();
     while (!GetPause())
+        usleep(50);
+
+    // jump to the frame being displayed since framesPlayed is actually ahead
+    // of us because of videoOutput's buffering
+    rewindtime = videoOutput->ValidVideoFrames() - 1;
+    while (rewindtime)
         usleep(50);
 
     seekamount = keyframedist;
