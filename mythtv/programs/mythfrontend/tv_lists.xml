@@ -1,0 +1,49 @@
+<mythmenu name="LISTS">
+
+   <button>
+      <type>TV_SEARCH_NEW_TITLES</type>
+      <text>New Titles</text>
+      <text lang="DE">Neue Titel</text>
+      <text lang="SV">Nya titlar</text>
+      <text lang="JA">新タイトル</text>
+      <text lang="NL">Nieuwe Titels</text>
+      <action>TV_SEARCH_NEW</action>
+   </button>
+
+   <button>
+      <type>TV_SEARCH_MOVIES</type>
+      <text>Movies</text>
+      <text lang="DE">Spielfilme</text>
+      <text lang="SV">Filmer</text>
+      <text lang="JA">映画</text>
+      <text lang="NL">Films</text>
+      <action>TV_SEARCH_MOVIE</action>
+   </button>
+
+   <button>
+      <type>TV_SEARCH_CATEGORIES</type>
+      <text>Categories</text>
+      <text lang="DE">Kategorie</text>
+      <text lang="SV">Kategori</text>
+      <text lang="JA">カテゴリー</text>
+      <text lang="NL">Categorie</text>
+      <action>TV_SEARCH_CATEGORY</action>
+   </button>
+   
+   <button>
+      <type>TV_SEARCH_CHANNELS</type>
+      <text>Channels</text>
+      <text lang="DE">Sender</text>
+      <text lang="SV">Kanal</text>
+      <text lang="NL">Zender</text>
+      <text lang="JA">チャンネル</text>
+      <action>TV_SEARCH_CHANNEL</action>
+   </button>
+
+   <button>
+      <type>TV_SEARCH_TIMES</type>
+      <text>Time</text>
+      <action>TV_SEARCH_TIME</action>
+   </button>
+
+</mythmenu>

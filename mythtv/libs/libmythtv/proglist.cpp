@@ -228,6 +228,7 @@ void ProgLister::updateBackground(void)
                 case plChannel: value = tr("Channel Search"); break;
                 case plCategory: value = tr("Category Search"); break;
                 case plMovies: value = tr("Movie Search"); break;
+                case plTime: value = tr("Time Search"); break;
                 default: value = tr("Unknown Search"); break;
             }
             ltype->SetText(value);
@@ -735,7 +736,7 @@ void ProgLister::fillViewList(const QString &view)
         else
             curView = -1;
     }
-    else if (type == plNewListings || type == plMovies)
+    else if (type == plNewListings || type == plMovies || type == plTime)
     {
         viewList << "";
         viewTextList << "";
@@ -822,6 +823,12 @@ void ProgLister::fillItemList(void)
         where = QString("WHERE channel.visible = 1 "
                         "  AND program.endtime > %1 "
                         "  AND program.category_type = 'movie' ")
+                        .arg(startstr);
+    }
+    else if (type == plTime) // list by time
+    {
+        where = QString("WHERE channel.visible = 1 "
+                        "  AND program.endtime > %1 ")
                         .arg(startstr);
     }
 

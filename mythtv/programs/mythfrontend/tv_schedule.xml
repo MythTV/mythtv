@@ -53,14 +53,21 @@
    </button>
 
    <button>
-      <type>TV_SEARCH_LISTINGS</type>
-      <text>Search Listings</text>
+      <type>TV_SEARCH_WORDS</type>
+      <text>Search Words</text>
       <text lang="DE">Suche</text>
       <text lang="SV">Sök i TV-tablå</text>
       <text lang="JA">リスト検索</text>
       <alttext>Search</alttext>
       <alttext lang="SV">Sök tablå</alttext>
       <action>MENU tv_search.xml</action>
+   </button>
+
+   <button>
+      <type>TV_SEARCH_LISTS</type>
+      <text>Search Lists</text>
+      <alttext>Lists</alttext>
+      <action>MENU tv_lists.xml</action>
    </button>
 
 <!--

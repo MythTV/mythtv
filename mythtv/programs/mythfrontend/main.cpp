@@ -133,6 +133,17 @@ void startSearchNew(void)
     qApp->lock();
 }
 
+void startSearchTime(void)
+{
+  ProgLister searchTime(plTime, "",
+                         QSqlDatabase::database(),
+                         gContext->GetMainWindow(), "proglist");
+
+    qApp->unlock();
+    searchTime.exec();
+    qApp->lock();
+}
+
 void startManaged(void)
 {
     QSqlDatabase *db = QSqlDatabase::database();
@@ -417,6 +428,8 @@ void TVMenuCallback(void *data, QString &selection)
         startSearchMovie();
     else if (sel == "tv_search_new")
         startSearchNew();
+    else if (sel == "tv_search_time")
+        startSearchTime();
     else if (sel == "settings appearance") 
     {
         AppearanceSettings settings;

@@ -433,7 +433,13 @@
     <offset>0,0</offset>
   </buttondef>
 
-  <buttondef name="TV_SEARCH_LISTINGS">
+  <buttondef name="TV_SEARCH_WORDS">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_searchlistings.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="TV_SEARCH_LISTS">
     <image>text-blank.png</image>
     <watermarkimage>watermark/tv_searchlistings.png</watermarkimage>
     <offset>0,0</offset>
@@ -466,12 +472,6 @@
     <watermarkimage>watermark/tv_searchlistings.png</watermarkimage>
     <offset>0,0</offset>
   </buttondef>
-  
-  <buttondef name="TV_SEARCH_PEOPLE">
-    <image>text-blank.png</image>
-    <watermarkimage>watermark/tv_searchlistings.png</watermarkimage>
-    <offset>0,0</offset>
-  </buttondef>
 
   <buttondef name="TV_SEARCH_KEYWORDS">
     <image>text-blank.png</image>
@@ -479,19 +479,17 @@
     <offset>0,0</offset>
   </buttondef>
   
-  <buttondef name="TV_SEARCH_DESCRIPTIONS">
+  <buttondef name="TV_SEARCH_PEOPLE">
     <image>text-blank.png</image>
     <watermarkimage>watermark/tv_searchlistings.png</watermarkimage>
     <offset>0,0</offset>
   </buttondef>
 
-  <buttondef name="TV_SEARCH_CHANNELS">
-    <image>text-blank.png</image>
-    <watermarkimage>watermark/tv_searchlistings.png</watermarkimage>
-    <offset>0,0</offset>
-  </buttondef>
+<!-- ################################-->
+<!-- ########  tv_lists.xml  ########-->
+<!-- ################################-->
 
-  <buttondef name="TV_SEARCH_CATEGORIES">
+  <buttondef name="TV_SEARCH_NEW_TITLES">
     <image>text-blank.png</image>
     <watermarkimage>watermark/tv_searchlistings.png</watermarkimage>
     <offset>0,0</offset>
@@ -503,7 +501,19 @@
     <offset>0,0</offset>
   </buttondef>
 
-  <buttondef name="TV_SEARCH_NEW_TITLES">
+  <buttondef name="TV_SEARCH_CATEGORIES">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_searchlistings.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="TV_SEARCH_CHANNELS">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_searchlistings.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="TV_SEARCH_TIMES">
     <image>text-blank.png</image>
     <watermarkimage>watermark/tv_searchlistings.png</watermarkimage>
     <offset>0,0</offset>

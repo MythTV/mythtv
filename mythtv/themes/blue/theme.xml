@@ -364,11 +364,15 @@
     <offset>20,10</offset>
   </buttondef>
 
-  <buttondef name="TV_SEARCH_LISTINGS">
+  <buttondef name="TV_SEARCH_WORDS">
     <image>record.png</image>
     <offset>20,10</offset>
   </buttondef>
   
+  <buttondef name="TV_SEARCH_LISTS">
+    <image>record.png</image>
+    <offset>20,10</offset>
+  </buttondef>
 
   <buttondef name="TV_MANUAL_SCHEDULE">
     <image>record.png</image>
@@ -393,28 +397,22 @@
     <image>record.png</image>
     <offset>20,10</offset>
   </buttondef>
+
+  <buttondef name="TV_SEARCH_KEYWORDS">
+    <image>record.png</image>
+    <offset>20,10</offset>
+  </buttondef>
   
   <buttondef name="TV_SEARCH_PEOPLE">
     <image>record.png</image>
     <offset>20,10</offset>
   </buttondef>
-  
-  <buttondef name="TV_SEARCH_KEYWORD">
-    <image>record.png</image>
-    <offset>20,10</offset>
-  </buttondef>
 
-  <buttondef name="TV_SEARCH_DESCRIPTIONS">
-    <image>record.png</image>
-    <offset>20,10</offset>
-  </buttondef>
+<!-- ################################-->
+<!-- ########  tv_lists.xml  ########-->
+<!-- ################################-->
 
-  <buttondef name="TV_SEARCH_CHANNELS">
-    <image>record.png</image>
-    <offset>20,10</offset>
-  </buttondef>
-
-  <buttondef name="TV_SEARCH_CATEGORIES">
+  <buttondef name="TV_SEARCH_NEW_TITLES">
     <image>record.png</image>
     <offset>20,10</offset>
   </buttondef>
@@ -424,7 +422,17 @@
     <offset>20,10</offset>
   </buttondef>
 
-  <buttondef name="TV_SEARCH_NEW_TITLES">
+  <buttondef name="TV_SEARCH_CATEGORIES">
+    <image>record.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="TV_SEARCH_CHANNELS">
+    <image>record.png</image>
+    <offset>20,10</offset>
+  </buttondef>
+
+  <buttondef name="TV_SEARCH_TIMES">
     <image>record.png</image>
     <offset>20,10</offset>
   </buttondef>

@@ -18,7 +18,8 @@ enum ProgListType {
     plChannel = 5,
     plCategory = 6,
     plMovies = 7,
-    plPeopleSearch = 8
+    plPeopleSearch = 8,
+    plTime = 9
 };
 
 class QSqlDatabase;
