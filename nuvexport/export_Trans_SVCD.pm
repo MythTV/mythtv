@@ -143,33 +143,33 @@ package export_Trans_SVCD;
 		$self->{started} = 1;
 
 	# Generate some names for the temporary audio and video files
-                my $safe_outfile = shell_escape($self->{outfile});
-                my $safe_outfile_sub = shell_escape(substr($self->{outfile},0,-4));
+		my $safe_outfile = shell_escape($self->{outfile});
+		my $safe_outfile_sub = shell_escape(substr($self->{outfile},0,-4));
 
 		my $command = "nice -n 19 transcode -i $main::video_dir/$self->{episode}->{filename} -x mpeg2 -y mpeg2enc,mp2enc -F 5,\"-b $self->{v_bitrate} -q $self->{quantisation}\" -E 44100 -b $self->{a_bitrate} -o $safe_outfile_sub -V";
 
 		if ($nuv_info{fps} =~ /^2(?:5|4\.9)/) {
-                     $command .= " -Z 480x576";
+			$command .= " -Z 480x576";
 		}
 	# Other options for NTSC
- 		else {
-                     $command .= " -Z 480x480";
+		else {
+			$command .= " -Z 480x480";
 		}
 
-		if ($self->{use_cutlist}) {
-		  @cuts = split("\n",$self->{episode}->{cutlist});
-		  my @skiplist;
-		  foreach my $cut (@cuts) {
-		     push @skiplist, (split(" - ", $cut))[0]."-".(split(" - ", $cut))[1];
-	          }
-		  $command .= " -J skip=\"".join(" ", @skiplist)."\"";
-	        }
+		if ($self->{use_cutlist} && $self->{episode}->{cutlist} =~ /\d/) {
+			@cuts = split("\n", $self->{episode}->{cutlist});
+			my @skiplist;
+			foreach my $cut (@cuts) {
+				push @skiplist, (split(" - ", $cut))[0]."-".(split(" - ", $cut))[1];
+			}
+			$command .= " -J skip=\"".join(" ", @skiplist)."\"";
+		}
 		if ($self->{deinterlace}) {
-                  $command .= " -J smartdeinter";
-	        }
+			$command .= " -J smartdeinter";
+		}
 		if ($self->{noise_reduction}) {
-                  $command .= " -J yuvdenoise=mode=2";
-	        }
+			$command .= " -J yuvdenoise=mode=2";
+		}
 		push @{$self->{children}}, fork_command($command);
 
 	# Wait for child processes to finish
