@@ -10,11 +10,11 @@ CONFIG += plugin thread
 target.path = $${PREFIX}/lib/mythtv/filters
 INSTALLS = target
 
-LIBS += -L../../libs/libavcodec -lavcodec
-
-TARGETDEPS += ../../libs/libavcodec/libavcodec.a
-
 INCLUDEPATH += ../../libs/libmythtv ../../libs/libavcodec
+DEPENDPATH += ../../libs/libmythtv ../../libs/libavcodec
+
+TARGETDEPS += ../../libs/libmythtv/libmythtv-$${LIBVERSION}.so
+TARGETDEPS += ../../libs/libavcodec/libmythavcodec-$${LIBVERSION}.so
 
 QMAKE_CFLAGS_RELEASE += -Wno-missing-prototypes
 QMAKE_CFLAGS_DEBUG += -Wno-missing-prototypes

@@ -11,8 +11,8 @@
 
 extern "C" {
 #include "frame.h"
-#include "libavcodec/avcodec.h"
-#include "libavformat/avformat.h"
+#include "../libavcodec/avcodec.h"
+#include "../libavformat/avformat.h"
 }
 
 class ProgramInfo;
@@ -141,6 +141,8 @@ class AvFormatDecoder : public DecoderBase
     bool ateof;
 
     bool gopset;
+    bool seen_gop;
+    int seq_count;
 
     QSqlDatabase *m_db;
     ProgramInfo *m_playbackinfo;

@@ -16,11 +16,11 @@ using namespace std;
 
 #include "videoout_xvmc.h"
 #include "../libmyth/util.h"
-#include "mythcontext.h"
+#include "../libmyth/mythcontext.h"
 
 extern "C" {
-#include "libavcodec/avcodec.h"
-#include "libavcodec/xvmc_render.h"
+#include "../libavcodec/avcodec.h"
+#include "../libavcodec/xvmc_render.h"
 }
 
 #include <X11/keysym.h>

@@ -17,7 +17,7 @@ extern "C" {
 
 #define FFMPEG_VERSION_INT     0x000408
 #define FFMPEG_VERSION         "0.4.8"
-#define LIBAVCODEC_BUILD       4698
+#define LIBAVCODEC_BUILD       4699
 
 #define LIBAVCODEC_VERSION_INT FFMPEG_VERSION_INT
 #define LIBAVCODEC_VERSION     FFMPEG_VERSION
@@ -90,6 +90,8 @@ enum CodecID {
     CODEC_ID_SMC,
     CODEC_ID_FLIC,
     CODEC_ID_TRUEMOTION1,
+    CODEC_ID_VMDVIDEO,
+    CODEC_ID_VMDAUDIO,
 
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE,
@@ -266,6 +268,7 @@ static const __attribute__((unused)) int Motion_Est_QTab[] =
 #define CODEC_FLAG_LOOP_FILTER    0x00000800 ///< loop filter
 #define CODEC_FLAG_H263P_SLICE_STRUCT 0x10000000
 #define CODEC_FLAG_INTERLACED_ME  0x20000000 ///< interlaced motion estimation
+#define CODEC_FLAG_SVCD_SCAN_OFFSET 0x40000000 ///< will reserve space for SVCD scan offset user data
 /* Unsupported options :
  * 		Syntax Arithmetic coding (SAC)
  * 		Reference Picture Selection
@@ -1194,6 +1197,12 @@ typedef struct AVCodecContext {
      * - decoding: unused
      */
     int mb_cmp;
+    /**
+     * interlaced dct compare function
+     * - encoding: set by user.
+     * - decoding: unused
+     */
+    int ildct_cmp;
 #define FF_CMP_SAD  0
 #define FF_CMP_SSE  1
 #define FF_CMP_SATD 2
@@ -1202,6 +1211,8 @@ typedef struct AVCodecContext {
 #define FF_CMP_BIT  5
 #define FF_CMP_RD   6
 #define FF_CMP_ZERO 7
+#define FF_CMP_VSAD 8
+#define FF_CMP_VSSE 9
 #define FF_CMP_CHROMA 256
     
     /**
@@ -1672,6 +1683,8 @@ extern AVCodec idcin_decoder;
 extern AVCodec eightbps_decoder;
 extern AVCodec smc_decoder;
 extern AVCodec flic_decoder;
+extern AVCodec vmdvideo_decoder;
+extern AVCodec vmdaudio_decoder;
 extern AVCodec truemotion1_decoder;
 extern AVCodec ra_144_decoder;
 extern AVCodec ra_288_decoder;

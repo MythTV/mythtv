@@ -56,6 +56,6 @@ EXTRA_LIBS += -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm
 
 # DirectFB support
 #CONFIG += using_directfb
-#EXTRA_LIBS = `directfb-config --libs`
+#EXTRA_LIBS += `directfb-config --libs`
 #QMAKE_CXXFLAGS += `directfb-config --cflags`
 

@@ -51,6 +51,8 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, QSqlDatabase *db,
     exitafterdecoded = false;
     ateof = false;
     gopset = false;
+    seen_gop = false;
+    seq_count = 0;
     firstgoppos = 0;
     prevgoppos = 0;
 
@@ -129,6 +131,8 @@ void AvFormatDecoder::Reset(void)
     m_positionMap.clear();
     framesPlayed = 0;
     framesRead = 0;
+    seen_gop = false;
+    seq_count = 0;
 }
 
 bool AvFormatDecoder::CanHandle(char testbuf[2048], const QString &filename)
@@ -898,12 +902,18 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                         prevgoppos = 0;
                         video_last_P_pts = lastapts = lastvpts = 0;
                     }
+
+                    seq_count++;
+ 
+                    if (!seen_gop && seq_count > 1)
+                        HandleGopStart(pkt);
                 }
                 break;
 
                 case GOP_START:
                 {
                     HandleGopStart(pkt);
+                    seen_gop = true;
                 }
                 break;
             }

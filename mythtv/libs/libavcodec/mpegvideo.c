@@ -57,6 +57,7 @@ static void draw_edges_c(uint8_t *buf, int wrap, int width, int height, int w);
 static int dct_quantize_c(MpegEncContext *s, DCTELEM *block, int n, int qscale, int *overflow);
 static int dct_quantize_trellis_c(MpegEncContext *s, DCTELEM *block, int n, int qscale, int *overflow);
 static int sse_mb(MpegEncContext *s);
+static void  denoise_dct_c(MpegEncContext *s, DCTELEM *block);
 #endif //CONFIG_ENCODERS
 
 #ifdef HAVE_XVMC
@@ -219,6 +220,7 @@ int DCT_common_init(MpegEncContext *s)
 
 #ifdef CONFIG_ENCODERS
     s->dct_quantize= dct_quantize_c;
+    s->denoise_dct= denoise_dct_c;
 #endif
         
 #ifdef HAVE_MMX
@@ -971,6 +973,8 @@ int MPV_encode_init(AVCodecContext *avctx)
     s->progressive_frame= 
     s->progressive_sequence= !(avctx->flags & (CODEC_FLAG_INTERLACED_DCT|CODEC_FLAG_INTERLACED_ME));
     
+    ff_set_cmp(&s->dsp, s->dsp.ildct_cmp, s->avctx->ildct_cmp);
+    
     ff_init_me(s);
 
 #ifdef CONFIG_ENCODERS
@@ -1489,10 +1493,12 @@ void ff_print_debug_info(MpegEncContext *s, AVFrame *pict){
         int mb_y;
         uint8_t *ptr;
         int i;
+        int h_chroma_shift, v_chroma_shift;
         s->low_delay=0; //needed to see the vectors without trashing the buffers
 
+        avcodec_get_chroma_sub_sample(s->avctx->pix_fmt, &h_chroma_shift, &v_chroma_shift);
         for(i=0; i<3; i++){
-            memcpy(s->visualization_buffer[i], pict->data[i], (i==0) ? pict->linesize[i]*s->height:pict->linesize[i]*s->height/2);
+            memcpy(s->visualization_buffer[i], pict->data[i], (i==0) ? pict->linesize[i]*s->height:pict->linesize[i]*s->height >> v_chroma_shift);
             pict->data[i]= s->visualization_buffer[i];
         }
         pict->type= FF_BUFFER_TYPE_COPY;
@@ -3138,6 +3144,7 @@ static inline void clip_coeffs(MpegEncContext *s, DCTELEM *block, int last_index
     int i;
     const int maxlevel= s->max_qcoeff;
     const int minlevel= s->min_qcoeff;
+    int overflow=0;
     
     if(s->mb_intra){
         i=1; //skip clipping of intra dc
@@ -3148,77 +3155,20 @@ static inline void clip_coeffs(MpegEncContext *s, DCTELEM *block, int last_index
         const int j= s->intra_scantable.permutated[i];
         int level = block[j];
        
-        if     (level>maxlevel) level=maxlevel;
-        else if(level<minlevel) level=minlevel;
-
+        if     (level>maxlevel){
+            level=maxlevel;
+            overflow++;
+        }else if(level<minlevel){
+            level=minlevel;
+            overflow++;
+        }
+        
         block[j]= level;
     }
+    
+    if(overflow && s->avctx->mb_decision == FF_MB_DECISION_SIMPLE)
+        av_log(s->avctx, AV_LOG_INFO, "warning, cliping %d dct coefficents to %d..%d\n", overflow, minlevel, maxlevel);
 }
-
-#if 0
-static int pix_vcmp16x8(uint8_t *s, int stride){ //FIXME move to dsputil & optimize
-    int score=0;
-    int x,y;
-    
-    for(y=0; y<7; y++){
-        for(x=0; x<16; x+=4){
-            score+= ABS(s[x  ] - s[x  +stride]) + ABS(s[x+1] - s[x+1+stride]) 
-                   +ABS(s[x+2] - s[x+2+stride]) + ABS(s[x+3] - s[x+3+stride]);
-        }
-        s+= stride;
-    }
-    
-    return score;
-}
-
-static int pix_diff_vcmp16x8(uint8_t *s1, uint8_t*s2, int stride){ //FIXME move to dsputil & optimize
-    int score=0;
-    int x,y;
-    
-    for(y=0; y<7; y++){
-        for(x=0; x<16; x++){
-            score+= ABS(s1[x  ] - s2[x ] - s1[x  +stride] + s2[x +stride]);
-        }
-        s1+= stride;
-        s2+= stride;
-    }
-    
-    return score;
-}
-#else
-#define SQ(a) ((a)*(a))
-
-static int pix_vcmp16x8(uint8_t *s, int stride){ //FIXME move to dsputil & optimize
-    int score=0;
-    int x,y;
-    
-    for(y=0; y<7; y++){
-        for(x=0; x<16; x+=4){
-            score+= SQ(s[x  ] - s[x  +stride]) + SQ(s[x+1] - s[x+1+stride]) 
-                   +SQ(s[x+2] - s[x+2+stride]) + SQ(s[x+3] - s[x+3+stride]);
-        }
-        s+= stride;
-    }
-    
-    return score;
-}
-
-static int pix_diff_vcmp16x8(uint8_t *s1, uint8_t*s2, int stride){ //FIXME move to dsputil & optimize
-    int score=0;
-    int x,y;
-    
-    for(y=0; y<7; y++){
-        for(x=0; x<16; x++){
-            score+= SQ(s1[x  ] - s2[x ] - s1[x  +stride] + s2[x +stride]);
-        }
-        s1+= stride;
-        s2+= stride;
-    }
-    
-    return score;
-}
-
-#endif
 
 #endif //CONFIG_ENCODERS
 
@@ -3339,16 +3289,20 @@ static void encode_mb(MpegEncContext *s, int motion_x, int motion_y)
         if(s->flags&CODEC_FLAG_INTERLACED_DCT){
             int progressive_score, interlaced_score;
 
-            progressive_score= pix_vcmp16x8(ptr, wrap_y  ) + pix_vcmp16x8(ptr + wrap_y*8, wrap_y );
-            interlaced_score = pix_vcmp16x8(ptr, wrap_y*2) + pix_vcmp16x8(ptr + wrap_y  , wrap_y*2);
+            s->interlaced_dct=0;
+            progressive_score= s->dsp.ildct_cmp[4](s, ptr           , NULL, wrap_y, 8) 
+                              +s->dsp.ildct_cmp[4](s, ptr + wrap_y*8, NULL, wrap_y, 8) - 400;
+
+            if(progressive_score > 0){
+                interlaced_score = s->dsp.ildct_cmp[4](s, ptr           , NULL, wrap_y*2, 8) 
+                                  +s->dsp.ildct_cmp[4](s, ptr + wrap_y  , NULL, wrap_y*2, 8);
+                if(progressive_score > interlaced_score){
+                    s->interlaced_dct=1;
             
-            if(progressive_score > interlaced_score + 100){
-                s->interlaced_dct=1;
-            
-                dct_offset= wrap_y;
-                wrap_y<<=1;
-            }else
-                s->interlaced_dct=0;
+                    dct_offset= wrap_y;
+                    wrap_y<<=1;
+                }
+            }
         }
         
 	s->dsp.get_pixels(s->block[0], ptr                 , wrap_y);
@@ -3417,19 +3371,24 @@ static void encode_mb(MpegEncContext *s, int motion_x, int motion_y)
         
         if(s->flags&CODEC_FLAG_INTERLACED_DCT){
             int progressive_score, interlaced_score;
+
+            s->interlaced_dct=0;
+            progressive_score= s->dsp.ildct_cmp[0](s, dest_y           , ptr_y           , wrap_y, 8) 
+                              +s->dsp.ildct_cmp[0](s, dest_y + wrap_y*8, ptr_y + wrap_y*8, wrap_y, 8) - 400;
             
-            progressive_score= pix_diff_vcmp16x8(ptr_y           , dest_y           , wrap_y  ) 
-                             + pix_diff_vcmp16x8(ptr_y + wrap_y*8, dest_y + wrap_y*8, wrap_y  );
-            interlaced_score = pix_diff_vcmp16x8(ptr_y           , dest_y           , wrap_y*2)
-                             + pix_diff_vcmp16x8(ptr_y + wrap_y  , dest_y + wrap_y  , wrap_y*2);
+            if(s->avctx->ildct_cmp == FF_CMP_VSSE) progressive_score -= 400;
+
+            if(progressive_score>0){
+                interlaced_score = s->dsp.ildct_cmp[0](s, dest_y           , ptr_y           , wrap_y*2, 8) 
+                                  +s->dsp.ildct_cmp[0](s, dest_y + wrap_y  , ptr_y + wrap_y  , wrap_y*2, 8);
             
-            if(progressive_score > interlaced_score + 600){
-                s->interlaced_dct=1;
+                if(progressive_score > interlaced_score){
+                    s->interlaced_dct=1;
             
-                dct_offset= wrap_y;
-                wrap_y<<=1;
-            }else
-                s->interlaced_dct=0;
+                    dct_offset= wrap_y;
+                    wrap_y<<=1;
+                }
+            }
         }
         
 	s->dsp.diff_pixels(s->block[0], ptr_y                 , dest_y                 , wrap_y);
@@ -4616,7 +4575,7 @@ static void encode_picture(MpegEncContext *s, int picture_number)
 
 #endif //CONFIG_ENCODERS
 
-void ff_denoise_dct(MpegEncContext *s, DCTELEM *block){
+static void  denoise_dct_c(MpegEncContext *s, DCTELEM *block){
     const int intra= s->mb_intra;
     int i;
 
@@ -4647,31 +4606,31 @@ static int dct_quantize_trellis_c(MpegEncContext *s,
                         int qscale, int *overflow){
     const int *qmat;
     const uint8_t *scantable= s->intra_scantable.scantable;
+    const uint8_t *perm_scantable= s->intra_scantable.permutated;
     int max=0;
     unsigned int threshold1, threshold2;
     int bias=0;
     int run_tab[65];
     int level_tab[65];
     int score_tab[65];
+    int survivor[65];
+    int survivor_count;
     int last_run=0;
     int last_level=0;
     int last_score= 0;
-    int last_i= 0;
+    int last_i;
     int coeff[2][64];
     int coeff_count[64];
     int qmul, qadd, start_i, last_non_zero, i, dc;
     const int esc_length= s->ac_esc_length;
     uint8_t * length;
     uint8_t * last_length;
-    int score_limit=0;
-    int left_limit= 0;
     const int lambda= s->lambda2 >> (FF_LAMBDA_SHIFT - 6);
-    const int patch_table= s->out_format == FMT_MPEG1 && !s->mb_intra;
         
     s->dsp.fdct (block);
     
     if(s->dct_error_sum)
-        ff_denoise_dct(s, block);
+        s->denoise_dct(s, block);
     qmul= qscale*16;
     qadd= ((qscale-1)|1)*8;
 
@@ -4705,6 +4664,7 @@ static int dct_quantize_trellis_c(MpegEncContext *s,
         length     = s->inter_ac_vlc_length;
         last_length= s->inter_ac_vlc_last_length;
     }
+    last_i= start_i;
 
     threshold1= (1<<QMAT_SHIFT) - bias - 1;
     threshold2= (threshold1<<1);
@@ -4721,7 +4681,6 @@ static int dct_quantize_trellis_c(MpegEncContext *s,
 
     for(i=start_i; i<=last_non_zero; i++) {
         const int j = scantable[i];
-        const int k= i-start_i;
         int level = block[j] * qmat[j];
 
 //        if(   bias+level >= (1<<(QMAT_SHIFT - 3))
@@ -4729,21 +4688,21 @@ static int dct_quantize_trellis_c(MpegEncContext *s,
         if(((unsigned)(level+threshold1))>threshold2){
             if(level>0){
                 level= (bias + level)>>QMAT_SHIFT;
-                coeff[0][k]= level;
-                coeff[1][k]= level-1;
+                coeff[0][i]= level;
+                coeff[1][i]= level-1;
 //                coeff[2][k]= level-2;
             }else{
                 level= (bias - level)>>QMAT_SHIFT;
-                coeff[0][k]= -level;
-                coeff[1][k]= -level+1;
+                coeff[0][i]= -level;
+                coeff[1][i]= -level+1;
 //                coeff[2][k]= -level+2;
             }
-            coeff_count[k]= FFMIN(level, 2);
-            assert(coeff_count[k]);
+            coeff_count[i]= FFMIN(level, 2);
+            assert(coeff_count[i]);
             max |=level;
         }else{
-            coeff[0][k]= (level>>31)|1;
-            coeff_count[k]= 1;
+            coeff[0][i]= (level>>31)|1;
+            coeff_count[i]= 1;
         }
     }
     
@@ -4754,19 +4713,15 @@ static int dct_quantize_trellis_c(MpegEncContext *s,
         return last_non_zero;
     }
 
-    score_tab[0]= 0;
+    score_tab[start_i]= 0;
+    survivor[0]= start_i;
+    survivor_count= 1;
     
-    if(patch_table){
-//        length[UNI_AC_ENC_INDEX(0, 63)]=
-//        length[UNI_AC_ENC_INDEX(0, 65)]= 2;
-    }
-
-    for(i=0; i<=last_non_zero - start_i; i++){
-        int level_index, run, j;
-        const int dct_coeff= ABS(block[ scantable[i + start_i] ]);
+    for(i=start_i; i<=last_non_zero; i++){
+        int level_index, j;
+        const int dct_coeff= ABS(block[ scantable[i] ]);
         const int zero_distoration= dct_coeff*dct_coeff;
         int best_score=256*256*256*120;
-
         for(level_index=0; level_index < coeff_count[i]; level_index++){
             int distoration;
             int level= coeff[level_index][i];
@@ -4778,7 +4733,7 @@ static int dct_quantize_trellis_c(MpegEncContext *s,
             if(s->out_format == FMT_H263){
                 unquant_coeff= alevel*qmul + qadd;
             }else{ //MPEG1
-                j= s->dsp.idct_permutation[ scantable[i + start_i] ]; //FIXME optimize
+                j= s->dsp.idct_permutation[ scantable[i] ]; //FIXME optimize
                 if(s->mb_intra){
                         unquant_coeff = (int)(  alevel  * qscale * s->intra_matrix[j]) >> 3;
                         unquant_coeff =   (unquant_coeff - 1) | 1;
@@ -4792,20 +4747,21 @@ static int dct_quantize_trellis_c(MpegEncContext *s,
             distoration= (unquant_coeff - dct_coeff) * (unquant_coeff - dct_coeff) - zero_distoration;
             level+=64;
             if((level&(~127)) == 0){
-                for(run=0; run<=i - left_limit; run++){
+                for(j=survivor_count-1; j>=0; j--){
+                    int run= i - survivor[j];
                     int score= distoration + length[UNI_AC_ENC_INDEX(run, level)]*lambda;
                     score += score_tab[i-run];
                     
                     if(score < best_score){
-                        best_score= 
-                        score_tab[i+1]= score;
+                        best_score= score;
                         run_tab[i+1]= run;
                         level_tab[i+1]= level-64;
                     }
                 }
 
                 if(s->out_format == FMT_H263){
-                    for(run=0; run<=i - left_limit; run++){
+                    for(j=survivor_count-1; j>=0; j--){
+                        int run= i - survivor[j];
                         int score= distoration + last_length[UNI_AC_ENC_INDEX(run, level)]*lambda;
                         score += score_tab[i-run];
                         if(score < last_score){
@@ -4818,19 +4774,20 @@ static int dct_quantize_trellis_c(MpegEncContext *s,
                 }
             }else{
                 distoration += esc_length*lambda;
-                for(run=0; run<=i - left_limit; run++){
+                for(j=survivor_count-1; j>=0; j--){
+                    int run= i - survivor[j];
                     int score= distoration + score_tab[i-run];
                     
                     if(score < best_score){
-                        best_score= 
-                        score_tab[i+1]= score;
+                        best_score= score;
                         run_tab[i+1]= run;
                         level_tab[i+1]= level-64;
                     }
                 }
 
                 if(s->out_format == FMT_H263){
-                    for(run=0; run<=i - left_limit; run++){
+                  for(j=survivor_count-1; j>=0; j--){
+                        int run= i - survivor[j];
                         int score= distoration + score_tab[i-run];
                         if(score < last_score){
                             last_score= score;
@@ -4842,22 +4799,28 @@ static int dct_quantize_trellis_c(MpegEncContext *s,
                 }
             }
         }
-
-        if(score_tab[i+1] < score_limit)
-            score_limit= score_tab[i+1];
         
+        score_tab[i+1]= best_score;
+
         //Note: there is a vlc code in mpeg4 which is 1 bit shorter then another one with a shorter run and the same level
-        while(score_tab[ left_limit ] > score_limit + lambda) left_limit++;
-    
-        if(patch_table){
-//            length[UNI_AC_ENC_INDEX(0, 63)]=
-//            length[UNI_AC_ENC_INDEX(0, 65)]= 3;
+        if(last_non_zero <= 27){
+            for(; survivor_count; survivor_count--){
+                if(score_tab[ survivor[survivor_count-1] ] <= best_score)
+                    break;
+            }
+        }else{
+            for(; survivor_count; survivor_count--){
+                if(score_tab[ survivor[survivor_count-1] ] <= best_score + lambda)
+                    break;
+            }
         }
+
+        survivor[ survivor_count++ ]= i+1;
     }
 
     if(s->out_format != FMT_H263){
         last_score= 256*256*256*120;
-        for(i= left_limit; i<=last_non_zero - start_i + 1; i++){
+        for(i= survivor[0]; i<=last_non_zero + 1; i++){
             int score= score_tab[i];
             if(i) score += lambda*2; //FIXME exacter?
 
@@ -4873,7 +4836,7 @@ static int dct_quantize_trellis_c(MpegEncContext *s,
     s->coded_score[n] = last_score;
     
     dc= ABS(block[0]);
-    last_non_zero= last_i - 1 + start_i;
+    last_non_zero= last_i - 1;
     memset(block + start_i, 0, (64-start_i)*sizeof(DCTELEM));
     
     if(last_non_zero < start_i)
@@ -4915,15 +4878,12 @@ static int dct_quantize_trellis_c(MpegEncContext *s,
 
     i= last_i;
     assert(last_level);
-//FIXME use permutated scantable
-    block[ s->dsp.idct_permutation[ scantable[last_non_zero] ] ]= last_level;
+
+    block[ perm_scantable[last_non_zero] ]= last_level;
     i -= last_run + 1;
     
-    for(;i>0 ; i -= run_tab[i] + 1){
-        const int j= s->dsp.idct_permutation[ scantable[i - 1 + start_i] ];
-    
-        block[j]= level_tab[i];
-        assert(block[j]);
+    for(; i>start_i; i -= run_tab[i] + 1){
+        block[ perm_scantable[i-1] ]= level_tab[i];
     }
 
     return last_non_zero;
@@ -4943,7 +4903,7 @@ static int dct_quantize_c(MpegEncContext *s,
     s->dsp.fdct (block);
 
     if(s->dct_error_sum)
-        ff_denoise_dct(s, block);
+        s->denoise_dct(s, block);
 
     if (s->mb_intra) {
         if (!s->h263_aic) {

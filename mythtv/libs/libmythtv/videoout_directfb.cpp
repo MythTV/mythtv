@@ -14,7 +14,7 @@ using namespace std;
 #include "filtermanager.h"
 
 extern "C" {
-#include "libavcodec/avcodec.h"
+#include "../libavcodec/avcodec.h"
 }
 
 #define DFB_KBID_OFFSET 62976

@@ -64,9 +64,9 @@ using namespace std;
 #include "programinfo.h"
 
 extern "C" {
-#include "libavcodec/avcodec.h"
-#include "libavformat/avformat.h"
-#include "libavformat/mpegts.h"
+#include "../libavcodec/avcodec.h"
+#include "../libavformat/avformat.h"
+#include "../libavformat/mpegts.h"
 }
 
 // n.b. at 19 Mbits/sec, default buffer size is approx. 1/10 sec.
@@ -94,7 +94,8 @@ HDTVRecorder::HDTVRecorder()
     keyframedist = 30;
     gopset = false;
     m_in_mpg_headers = false;
-    pict_start_is_gop = false;
+    seq_start_is_gop = false;
+    seq_count = 0;
     m_header_sync = 0;
 
     firstgoppos = 0;
@@ -347,18 +348,18 @@ void HDTVRecorder::FindKeyframes(const unsigned char *buffer,
                             if (gopset || firstgoppos > 0)
                                 framesWritten++;
                             framesSeen++;
-                            if (framesSeen >= 30 && firstgoppos <= 0)
+                        }
+
+                        if (buffer[i+1] == 0xB3)
+                        {
+                            seq_count ++;
+                            if (seq_count > 1 && !gopset) 
                             {
-                                // seen 30 frames with no GOP; assume that
-                                // each GOP only contains one I-frame, and
-                                // treat the I-frame as the beginning of the
-                                // GOP.
-                                pict_start_is_gop = true;
+                                seq_start_is_gop = true;
                             }
                         }
                         if (buffer[i+1] == 0xB8 || 
-                            (pict_start_is_gop && buffer[i+1] == 0x00 &&
-                             (framesSeen) % 15 == 0))
+                            (seq_start_is_gop && buffer[i+1] == 0xB3))
                         {
                             // group_of_pictures
                             int frameNum = framesWritten - 1;
@@ -799,7 +800,8 @@ void HDTVRecorder::Reset(void)
     framesSeen = 0;
     gopset = false;
     m_in_mpg_headers = false;
-    pict_start_is_gop = false;
+    seq_start_is_gop = false;
+    seq_count = 0;
     m_header_sync = 0;
     firstgoppos = 0;
     ts_packets = 0;
