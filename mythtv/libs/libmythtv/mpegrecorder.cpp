@@ -125,7 +125,7 @@ void MpegRecorder::StartRecording(void)
         return;
     }
 
-    char buffer[256000];
+    char buffer[256001];
     int ret;
 
     encoding = true;
@@ -153,7 +153,8 @@ void MpegRecorder::StartRecording(void)
         if (readfd < 0)
             readfd = open(videodevice.ascii(), O_RDWR);
 
-        ret = read(readfd, buffer, 128000);
+        ret = read(readfd, buffer, 256000);
+
         ringBuffer->Write(buffer, ret);
 
         gettimeofday(&now, NULL);

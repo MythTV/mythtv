@@ -160,13 +160,17 @@ public:
     };
 };
 
-class VideoSource: public VerticalConfigurationGroup, public ConfigurationDialog {
+class VideoSource: public ConfigurationWizard {
 public:
     VideoSource() {
         // must be first
         addChild(id = new ID());
-        addChild(name = new Name(*this));
-        addChild(new XMLTVConfig(*this));
+
+        ConfigurationGroup *group = new VerticalConfigurationGroup(false);
+        group->setLabel("Video source setup");
+        group->addChild(name = new Name(*this));
+        group->addChild(new XMLTVConfig(*this));
+        addChild(group);
     };
         
     int getSourceID(void) const { return id->intValue(); };
@@ -266,16 +270,6 @@ public:
     };
 };
 
-// unused
-class CardType: public ComboBoxSetting, public CCSetting {
-public:
-    CardType(const CaptureCard& parent):
-        CCSetting(parent, "cardtype") {
-        setLabel("Card type");
-        addSelection("V4L");
-    };
-};
-
 class AudioRateLimit: public ComboBoxSetting, public CCSetting {
 public:
     AudioRateLimit(const CaptureCard& parent):
@@ -298,20 +292,38 @@ public:
         addSelection("Composite1");
         addSelection("Composite3");
         addSelection("S-Video");
+        addSelection("Tuner 0");
+        addSelection("Composite 0");
+        addSelection("S-Video 0");
     };
 };
 
-class CaptureCard: public VerticalConfigurationGroup, public ConfigurationDialog {
+class CardType: public ComboBoxSetting, public CCSetting {
+public:
+    CardType(const CaptureCard& parent):
+        CCSetting(parent, "cardtype") {
+        setLabel("Card type");
+        addSelection("Standard V4L or MJPEG capture card", "V4L");
+        addSelection("Hardware MPEG Encoder card", "MPEG");
+    };
+};
+
+class CaptureCard: public ConfigurationWizard {
 public:
     CaptureCard() {
-        setLabel("Capture card");
         // must be first
         addChild(id = new ID());
-        addChild(new VideoDevice(*this));
-        addChild(new VbiDevice(*this));
-        addChild(new AudioDevice(*this));
-        addChild(new AudioRateLimit(*this));
-        addChild(new TunerCardInput(*this));
+
+        ConfigurationGroup *devices = new VerticalConfigurationGroup(false);
+        devices->setLabel("Capture card");
+        devices->addChild(new VideoDevice(*this));
+        devices->addChild(new VbiDevice(*this));
+        devices->addChild(new AudioDevice(*this));
+        devices->addChild(new AudioRateLimit(*this));
+        devices->addChild(new TunerCardInput(*this));
+        devices->addChild(new CardType(*this));
+        addChild(devices);
+
         addChild(new Hostname(*this));
     };
 
@@ -415,7 +427,7 @@ public:
         setValue("");
         setHelpText("If specified, this command will be run to change the "
                     "channel for inputs which do not have a tuner.  The "
-                    "first argument will be the channel number");
+                    "first argument will be the channel number.");
     };
 };
 
@@ -427,7 +439,7 @@ public:
         setValue("");
         setHelpText("If specified, the tuner will change to this channel "
                     "when the input is selected.  This is only useful if you "
-                    "use your tuner input with an external channel changer");
+                    "use your tuner input with an external channel changer.");
     };
 };
 
@@ -438,21 +450,24 @@ public:
         setLabel("Starting channel");
         setValue("3");
         setHelpText("LiveTV will change to the above channel when the "
-                    "input is first selected");
+                    "input is first selected.");
     };
 };
 
-class CardInput: public VerticalConfigurationGroup, public ConfigurationDialog {
+class CardInput: public ConfigurationWizard {
 public:
     CardInput() {
-        setLabel("Connect source to input");
         addChild(id = new ID());
-        addChild(cardid = new CardID(*this));
-        addChild(inputname = new InputName(*this));
-        addChild(sourceid = new SourceID(*this));
-        addChild(new ExternalChannelCommand(*this));
-        addChild(new PresetTuner(*this));
-        addChild(new StartingChannel(*this));
+
+        ConfigurationGroup *group = new VerticalConfigurationGroup(false);
+        group->setLabel("Connect source to input");
+        group->addChild(cardid = new CardID(*this));
+        group->addChild(inputname = new InputName(*this));
+        group->addChild(sourceid = new SourceID(*this));
+        group->addChild(new ExternalChannelCommand(*this));
+        group->addChild(new PresetTuner(*this));
+        group->addChild(new StartingChannel(*this));
+        addChild(group);
     };
 
     int getInputID(void) const { return id->intValue(); };
