@@ -1,6 +1,8 @@
 #include "gamehandler.h"
 #include "mamehandler.h"
 #include "neshandler.h"
+#include "sneshandler.h"
+#include "pchandler.h"
 #include "constants.h"
 
 #include <qobject.h>
@@ -28,6 +30,10 @@ static void checkHandlers(void)
             GameHandler::registerHandler(MameHandler::getHandler());
         if (gContext->GetSetting("NesBinary") != "")
             GameHandler::registerHandler(NesHandler::getHandler());
+        if (gContext->GetSetting("SnesBinary") != "")
+            GameHandler::registerHandler(SnesHandler::getHandler());
+        if (gContext->GetSetting("PCGameList") != "")
+            GameHandler::registerHandler(PCHandler::getHandler());
     }
 }
 

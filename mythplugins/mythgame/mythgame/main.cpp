@@ -109,7 +109,6 @@ int main(int argc, char *argv[])
         systems.append(name);
     }
 
-    cout << "Looking for games..\n";
     //run through the list of registered systems, and if they're not
     //in the database, tell them to scan for games
     for (uint i = 0; i < GameHandler::count(); ++i)
@@ -121,7 +120,6 @@ int main(int argc, char *argv[])
             handler->processGames();
         }
     }
-    cout << "done\n";
 
     QString paths = gContext->GetSetting("TreeLevels");
 

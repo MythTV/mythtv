@@ -1,0 +1,8 @@
+<gamelist>
+  <game>
+    <name>TuxRacer</name>
+    <command>/usr/bin/tuxracer</command>
+    <genre>penguin themed winter sports</genre>
+    <year>1901</year>
+  </game>
+</gamelist>

@@ -3,7 +3,7 @@ TreeLevels=system year genre gamename
 
 # Number of screenshots to show per column. if 0 then use game names only.
 # default is 0 -- set this to 5 if you want the screenshot selection menu.
-ShotCount=0
+ShotCount=3
 
 ### Nes specific settings ###
 
@@ -20,14 +20,27 @@ NesCRCFile=/home/media/games/nes/nes.crc
 # Directory where screenshots are kept
 NesScreensLocation=/home/media/games/nes/screens
 
+### Snes specific settings ###
+
+# Path and name of snes9x binary
+SnesBinary=/usr/X11R6/bin/snes9x
+
+# directory where snes roms are located.
+SnesRomLocation=/snes/roms
+
+# directory where snes screenshots are kept
+# looks for screenshots with file names matching the rom file name.
+# if rom file is myrom.smc, myrom.zip, etc looks for myrom.gif, myrom.bmp etc.
+SnesScreensLocation=/snes/screens
+
 
 ### Mame specific settings ###
 
 # Path and name of xmame binary
-XMameBinary=/usr/X11R6/bin/xmame
+XMameBinary=/usr/local/bin/xmame.x11
 
 # Directory where mame roms are located.
-MameRomLocation=/roms
+MameRomLocation=/usr/lib/games/xmame/roms
 
 # path and name of catver file.
 XMameCatFile=/home/chuck/catver.ini
@@ -53,4 +66,14 @@ MameCabinetsLocation=/cabs
 # Choose to show or not to show the disclaimer
 MameShowDisclaimer=0
 MameShowGameInfo=1
+
+### PC Game Specific settings ###
+
+# Path to the Game List xml file.
+PCGameList=/usr/games/gamelist.xml
+
+# Directory where screenshots are kept
+# looks for screenshots with file names matching the game name in the gamelist.
+# if name value is mygame looks for mygame.gif, mygame.bmp etc.
+PCScreensLocation=/usr/games/screens
 
