@@ -23,7 +23,7 @@ protected:
         return QString("recordid = %1, %2 = \"%3\"")
             .arg(parent.getRecordID())
             .arg(getColumn())
-            .arg(getValue());
+            .arg(value.utf8());
     };
 
     virtual QString whereClause(void) {
