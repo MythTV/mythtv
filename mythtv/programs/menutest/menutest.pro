@@ -8,11 +8,6 @@ TARGET = menutest
 
 include ( ../settings.pro )
 
-themes.path = /usr/local/share/mythtv/themes/
-themes.files = blue liquid
-
-INSTALLS += themes
-
 INCLUDEPATH += ../libmyth
 LIBS += -lmyth -L/usr/local/lib -L../libmyth
 

@@ -10,37 +10,11 @@ include ( ../settings.pro )
 
 INCLUDEPATH += ../
 
-themes.path = /usr/local/share/mythtv/themes/
-themes.files = defaultosd
-
-INSTALLS += themes
-
 # Input
-HEADERS += effects.h \
-           filter.h \
-           format.h \
-           frame.h \
-           jitterometer.h \
-           lzoconf.h \
-           minilzo.h \
-           mmx.h \
-           NuppelVideoPlayer.h \
-           NuppelVideoRecorder.h \
-           osd.h \
-           RingBuffer.h \
-           RTjpegN.h \
-           ttfont.h \
-           XJ.h \
-           yuv2rgb.h
-SOURCES += effects.cpp \
-           filter.c \
-           jitterometer.cpp \
-           minilzo.cpp \
-           NuppelVideoPlayer.cpp \
-           NuppelVideoRecorder.cpp \
-           osd.cpp \
-           RingBuffer.cpp \
-           RTjpegN.cpp \
-           ttfont.cpp \
-           XJ.cpp \
-           yuv2rgb.cpp
+HEADERS += effects.h filter.h format.h frame.h jitterometer.h lzoconf.h 
+HEADERS += minilzo.h mmx.h NuppelVideoPlayer.h NuppelVideoRecorder.h osd.h 
+HEADERS += RingBuffer.h RTjpegN.h ttfont.h XJ.h yuv2rgb.h
+
+SOURCES += effects.cpp filter.c jitterometer.cpp minilzo.cpp 
+SOURCES += NuppelVideoPlayer.cpp NuppelVideoRecorder.cpp osd.cpp RingBuffer.cpp
+SOURCES += RTjpegN.cpp ttfont.cpp XJ.cpp yuv2rgb.cpp
