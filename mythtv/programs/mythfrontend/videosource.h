@@ -40,6 +40,7 @@ private:
     public:
         ID():
             AutoIncrementStorage("videosource", "sourceid") {
+            setName("VideoSourceName");
             setVisible(false);
         };
         virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0) {
@@ -240,7 +241,7 @@ public:
 class CardInput: public VerticalConfigurationGroup {
 public:
     CardInput() {
-        setLabel("Capture card input");
+        setLabel("Associate input with source");
         addChild(id = new ID());
         addChild(selector = new VideoInputSelector(*this));
         addChild(sourceid = new SourceID(*this));
@@ -257,7 +258,7 @@ private:
         ID():
             AutoIncrementStorage("cardinput", "cardid") {
             setVisible(false);
-            setName("ID");
+            setName("CardInputID");
         };
         virtual QWidget* configWidget(QWidget* parent, const char* widgetName = 0) {
             (void)parent; (void)widgetName;
@@ -272,7 +273,31 @@ private:
     QSqlDatabase* db;
 };
 
+class CaptureCardDialog: public ConfigurationWizard {
+public:
+    CaptureCardDialog() {
+        CaptureCard* cc = new CaptureCard();
+        cc->setLabel("Configure new capture card");
+        addChild(cc);
+    };
+};
+
 class VideoSourceDialog: public ConfigurationWizard {
+public:
+    VideoSourceDialog() {
+        VideoSource* vs = new VideoSource();
+        vs->setLabel("Configure new video source");
+        addChild(vs);
+    };
+};
+
+class CardInputDialog: public ConfigurationWizard {
+public:
+    CardInputDialog() {
+        CardInput* ci = new CardInput();
+        ci->setLabel("Configure capture card input");
+        addChild(ci);
+    };
 };
 
 #endif
