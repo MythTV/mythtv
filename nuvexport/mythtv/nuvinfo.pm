@@ -106,7 +106,7 @@ package mythtv::nuvinfo;
         $info{'width'}  += 0;
         $info{'height'} += 0;
     # Make some corrections for a myth bug
-        $info{'audio_sample_rate'} = 44100 if ($info{'audio_sample_rate'} == 42501);
+        $info{'audio_sample_rate'} = 44100 if ($info{'audio_sample_rate'} == 42501 || $info{'audio_sample_rate'} =~ /^44\d\d\d$/);
     # Return
         return %info;
     }
