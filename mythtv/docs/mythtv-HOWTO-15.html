@@ -61,6 +61,60 @@ the <B>hdparm</B> program to check and enable DMA.
 If you want to make sure that you don't lose your modifications, make a
 directory <CODE>~/.mythtv</CODE> and copy your settings.txt file to this
 location.</P>
+<H2><A NAME="ss15.6">15.6</A> <A HREF="mythtv-HOWTO.html#toc15.6">Compile errors.</A>
+</H2>
+
+<P>Some compile errors are worse than others.  If you get an error that
+doesn't abort the compilation, and says something like:
+<BLOCKQUOTE><CODE>
+<PRE>
+cc1plus: warning: changing search order for system directory
+"/usr/local/include"
+cc1plus: warning:   as it has already been specified as a non-system
+directory
+</PRE>
+</CODE></BLOCKQUOTE>
+
+then it shouldn't be a problem.</P>
+<P>If you get an error like <CODE>/usr/bin/ld: cannot find -lXext</CODE>, the
+compiler is telling you that you don't have XFree86-devel installed, and
+this needs to be fixed before mythtv will work correctly.</P>
+<H2><A NAME="ss15.7">15.7</A> <A HREF="mythtv-HOWTO.html#toc15.7">My screen goes blank, but comes back when I wiggle the mouse or use</A>
+the keyboard.</H2>
+
+<P>This is due to DPMS, the Display Power Management System, which is used
+to save power by turning off your monitor when the system decides that it's
+not being used.  Since it's likely that watching TV will not generate
+keyboard or mouse events for a time, you need to turn off DPMS.  There are a
+few ways to do this.</P>
+<P>You can edit your <CODE>/etc/X11/XF86Config-4</CODE> file, and look for:
+<BLOCKQUOTE><CODE>
+<PRE>
+Section "Device"
+    Identifier "device1"
+    VendorName "nVidia Corporation"
+    BoardName "NVIDIA GeForce 256 (generic)"
+    Driver "nv"
+    Option "DPMS"
+EndSection
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>In this case, you would need to either delete the <CODE>Option "DPMS"</CODE>
+line, or change it to <CODE># Option "DPMS"</CODE> to comment it out.  The next
+time you start XFree this change will take effect.</P>
+<P>You can also turn off DPMS from the Command Line, but this will not survive
+a reboot.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ xset -DPMS
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Using <CODE>xset +DPMS</CODE> will turn it back on.</P>
+<P>Finally, depending on your distribution, you may be able to turn it off from
+within the control panel.</P>
 
 <HR>
 Next

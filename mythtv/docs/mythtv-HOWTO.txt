@@ -1,6 +1,6 @@
   Installing and using mythtv
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2002-12-17, v1.050
+  2002-12-17, v1.051
 
   Initially, installation of mythtv seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -95,6 +95,8 @@
      15.3 mythtv seems to disappear; can't see video
      15.4 Fast CPU, choppy or jittery video.
      15.5 I keep losing all of my settings every time I compile!
+     15.6 Compile errors.
+     15.7 My screen goes blank, but comes back when I wiggle the mouse or use the keyboard.
 
   ______________________________________________________________________
 
@@ -137,6 +139,7 @@
 
   +o  Red Hat Linux 8.0: Cedar McKay,
      <mailto:mythhowto.3.ohthetrees@spamgourmet.com>
+
   +o  Gentoo: Tony Clark,  <mailto:tclark@telia.com>
 
   +o  Debian: Matthew Zimmerman,  <mailto:mdz@debian.org>
@@ -202,11 +205,10 @@
   them will maintain the master database and will need mysql installed.
 
   In order to compile mythtv, we need to make sure that the software it
-  needs is installed.  As of 2002-12-02, this list includes [1mperl[22m, [1mmysql[0m
-  (only on the master system; remote viewers do not need mysql installed
-  and will use the master database), [1mgcc[22m, [1mfreetype2-devel [22mand [1mqt-devel[22m.
-  If you're going to use a remote control with mythtv, you're going to
-  need the [1mcdialog [22mpackage in order to compile [1mlircd[22m.
+  needs is installed.  As of 2002-12-17, this list includes [1mperl[22m, [1mmysql[22m,
+  [1mgcc[22m, [1mfreetype2-devel[22m, [1mXFree86-devel [22mand [1mqt-devel[22m.  If you're going to
+  use a remote control with mythtv, you're going to need the [1mcdialog[0m
+  package in order to compile [1mlircd[22m.
 
   There appears to be issues with ALSA and simultaneously recording and
   playing sound, which is a core requirement for mythtv.  If you are not
@@ -243,6 +245,8 @@
 
   Search for freetype2.  Make sure that you've got freetype2 and
   freetype2-devel installed.
+
+  Search for XFree86-devel.
 
   Finally, check for qt.  You'll need libqt3-devel (under folder "KDE
   and Qt") and libqt3 ("Libraries").
@@ -356,21 +360,17 @@
   answer "YES".
 
        $ su
-       # urpmi perl gcc gcc-c++ freetype2-devel cdialog alsa-utils
-
-  If this is the master system maintaining the database, you will need
-  to install mysql:
-
-       # urpmi mysql
+       # urpmi perl mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
+       # urpmi XFree86-devel
 
   [1mNOTE[22m: Mandrake 8.2 users, [4mdo[24m [4mnot[24m execute the following command.
   You've already manually installed the files in the previous section.
 
-  # urpmi libqt3-devel
+       # urpmi libqt3-devel
 
   However, you might get this when you execute the command above:
 
-       [root@pvr root]# urpmi perl mysql gcc gcc-c++ freetype2-devel libqt3-devel cdialog alsa-utils
+       [root@pvr root]# urpmi perl mysql gcc gcc-c++ freetype2-devel libqt3-devel cdialog alsa-utils XFree86-devel
        everything already installed
 
   In that case, you're ready to move to the next ``section''.
@@ -460,12 +460,12 @@
 
   Open a shell and switch to superuser mode.
 
-       $ su
-       # set
+  $ su
+  # set
 
-       [lots of text]
-       QTDIR=/usr/lib/qt3
-       PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
+  [lots of text]
+  QTDIR=/usr/lib/qt3
+  PATH=/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
 
   You should see QTDIR and the path changes you made.
 
@@ -484,6 +484,9 @@
        # ldconfig
        # exit
        $
+
+  [1mNOTE[22m:  It appears that Red Hat Linux 8.0 requires that the [1mldconfig[0m
+  command needs to be run twice.
 
   [1m5.  Downloading and compiling.[0m
 
@@ -1454,11 +1457,11 @@
        str ExternalChannelCommand=/usr/local/bin/changechannel
 
   The [1mchangechannel [22mprogram is not supplied with mythtv, so this is
-  going to be dependant on what sort of external tuner you have.  An
-  example script can be obtained from http://tarek.2y.net/myth/sony.pl
-  <http://tarek.2y.net/myth/sony.pl>.  This is currently an external
-  user-supplied program, so if you have issues with the script, please
-  contact the author.
+  going to be dependant on what sort of external tuner you have.
+  Example scripts for Sony and RCA receivers can be obtained from
+  http://tarek.2y.net/myth/ <http://tarek.2y.net/myth/>.  This is
+  currently an external user-supplied program, so if you have issues
+  with the script, please contact the author.
 
   Feel free to browse some of what sort of hardware is available at
   http://shop.store.yahoo.com/snapstreammedia/cablepacks.html
@@ -1706,4 +1709,53 @@
   mythtv will overwrite any settings in /usr/local/share/mythtv.  If you
   want to make sure that you don't lose your modifications, make a
   directory ~/.mythtv and copy your settings.txt file to this location.
+
+  [1m15.6.  Compile errors.[0m
+
+  Some compile errors are worse than others.  If you get an error that
+  doesn't abort the compilation, and says something like:
+
+       cc1plus: warning: changing search order for system directory
+       "/usr/local/include"
+       cc1plus: warning:   as it has already been specified as a non-system
+       directory
+
+  then it shouldn't be a problem.
+
+  If you get an error like /usr/bin/ld: cannot find -lXext, the compiler
+  is telling you that you don't have XFree86-devel installed, and this
+  needs to be fixed before mythtv will work correctly.
+
+  [1m15.7.  My screen goes blank, but comes back when I wiggle the mouse or[0m
+  [1muse the keyboard.[0m
+
+  This is due to DPMS, the Display Power Management System, which is
+  used to save power by turning off your monitor when the system decides
+  that it's not being used.  Since it's likely that watching TV will not
+  generate keyboard or mouse events for a time, you need to turn off
+  DPMS.  There are a few ways to do this.
+
+  You can edit your /etc/X11/XF86Config-4 file, and look for:
+
+       Section "Device"
+           Identifier "device1"
+           VendorName "nVidia Corporation"
+           BoardName "NVIDIA GeForce 256 (generic)"
+           Driver "nv"
+           Option "DPMS"
+       EndSection
+
+  In this case, you would need to either delete the Option "DPMS" line,
+  or change it to # Option "DPMS" to comment it out.  The next time you
+  start XFree this change will take effect.
+
+  You can also turn off DPMS from the Command Line, but this will not
+  survive a reboot.
+
+       $ xset -DPMS
+
+  Using xset +DPMS will turn it back on.
+
+  Finally, depending on your distribution, you may be able to turn it
+  off from within the control panel.
 

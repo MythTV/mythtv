@@ -3,7 +3,7 @@
 
 <title>Installing and using mythtv
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2002-12-17, v1.050
+<date>2002-12-17, v1.051
 <abstract>
 Initially, installation of mythtv seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -103,12 +103,11 @@ depends on your comfort level with Linux.
 them will maintain the master database and will need mysql installed.  
 
 In order to compile mythtv, we need to make sure that the software it needs
-is installed.  As of 2002-12-02, this list includes <bf>perl</bf>,
-<bf>mysql</bf> (only on the master system; remote viewers do not need mysql
-installed and will use the master database), <bf>gcc</bf>, <bf>freetype2-devel</bf> and
-<bf>qt-devel</bf>.  If you're going to use a remote control with mythtv,
-you're going to need the <bf>cdialog</bf> package in order to compile
-<bf>lircd</bf>.
+is installed.  As of 2002-12-17, this list includes <bf>perl</bf>,
+<bf>mysql</bf>, <bf>gcc</bf>, <bf>freetype2-devel</bf>,
+<bf>XFree86-devel</bf> and <bf>qt-devel</bf>.  If you're going to use a
+remote control with mythtv, you're going to need the <bf>cdialog</bf>
+package in order to compile <bf>lircd</bf>.
 
 There appears to be issues with ALSA and simultaneously recording and playing 
 sound, which is a core requirement for mythtv.  If you are not running 
@@ -141,6 +140,8 @@ Search for gcc.  You're going to need gcc and gcc-c++ installed.
 
 Search for freetype2.  Make sure that you've got freetype2 and
 freetype2-devel installed.
+
+Search for XFree86-devel.
 
 Finally, check for qt.  You'll need libqt3-devel (under folder "KDE and
 Qt") and libqt3 ("Libraries").
@@ -246,12 +247,8 @@ asked a number of questions regarding dependencies.  It's best to answer
 
 <tscreen><verb>
 $ su
-# urpmi perl gcc gcc-c++ freetype2-devel cdialog alsa-utils
-</verb></tscreen>
-
-If this is the master system maintaining the database, you will need to install mysql:
-<tscreen><verb>
-# urpmi mysql
+# urpmi perl mysql gcc gcc-c++ freetype2-devel cdialog alsa-utils
+# urpmi XFree86-devel
 </verb></tscreen>
 
 <bf>NOTE</bf>: Mandrake 8.2 users, <em>do not</em> execute the following
@@ -263,7 +260,7 @@ section.
 
 However, you might get this when you execute the command above:
 <tscreen><verb>
-[root@pvr root]# urpmi perl mysql gcc gcc-c++ freetype2-devel libqt3-devel cdialog alsa-utils
+[root@pvr root]# urpmi perl mysql gcc gcc-c++ freetype2-devel libqt3-devel cdialog alsa-utils XFree86-devel
 everything already installed
 </verb></tscreen>
 
@@ -377,6 +374,9 @@ found when we need them.
 # exit
 $ 
 </verb></tscreen>
+
+<bf>NOTE</bf>:  It appears that Red Hat Linux 8.0 requires that the
+<bf>ldconfig</bf> command needs to be run twice.
 
 <sect>Downloading and compiling.
 
@@ -1376,9 +1376,9 @@ str ExternalChannelCommand=/usr/local/bin/changechannel
 </verb></tscreen>
 
 The <bf>changechannel</bf> program is not supplied with mythtv, so this is
-going to be dependant on what sort of external tuner you have.  An example
-script can be obtained from <url url="http://tarek.2y.net/myth/sony.pl"
-name="http://tarek.2y.net/myth/sony.pl">.  This is currently an external
+going to be dependant on what sort of external tuner you have.  Example
+scripts for Sony and RCA receivers can be obtained from <url url="http://tarek.2y.net/myth/"
+name="http://tarek.2y.net/myth/">.  This is currently an external
 user-supplied program, so if you have issues with the script, please contact
 the author.
 
@@ -1389,8 +1389,6 @@ you wish to assemble your own, rather than purchase, the following may be
 helpful: <url url="http://www.snapstream.com/products/irblaster/sonydss.htm"
 name="http://www.snapstream.com/products/irblaster/sonydss.htm"> for cable
 pinouts for RCA DSS receivers.
-
-
 
 <sect>mythweb.
 <p>mythweb allows you to use a web page to control various aspects of your
@@ -1614,6 +1612,54 @@ the <bf>hdparm</bf> program to check and enable DMA.<tscreen><verb>
 If you want to make sure that you don't lose your modifications, make a
 directory <tt>~/.mythtv</tt> and copy your settings.txt file to this
 location.
+<sect1>Compile errors.
+<p>Some compile errors are worse than others.  If you get an error that
+doesn't abort the compilation, and says something like:
+<tscreen><verb>
+cc1plus: warning: changing search order for system directory
+"/usr/local/include"
+cc1plus: warning:   as it has already been specified as a non-system
+directory
+</verb></tscreen>
+then it shouldn't be a problem.
+
+If you get an error like <tt>/usr/bin/ld: cannot find -lXext</tt>, the
+compiler is telling you that you don't have XFree86-devel installed, and
+this needs to be fixed before mythtv will work correctly.
+<sect1>My screen goes blank, but comes back when I wiggle the mouse or use
+the keyboard.
+<p>This is due to DPMS, the Display Power Management System, which is used
+to save power by turning off your monitor when the system decides that it's
+not being used.  Since it's likely that watching TV will not generate
+keyboard or mouse events for a time, you need to turn off DPMS.  There are a
+few ways to do this.
+
+You can edit your <tt>/etc/X11/XF86Config-4</tt> file, and look for:
+<tscreen><verb>
+Section "Device"
+    Identifier "device1"
+    VendorName "nVidia Corporation"
+    BoardName "NVIDIA GeForce 256 (generic)"
+    Driver "nv"
+    Option "DPMS"
+EndSection
+</verb></tscreen>
+
+In this case, you would need to either delete the <tt>Option "DPMS"</tt>
+line, or change it to <tt># Option "DPMS"</tt> to comment it out.  The next
+time you start XFree this change will take effect.
+
+You can also turn off DPMS from the Command Line, but this will not survive
+a reboot.
+
+<tscreen><verb>
+$ xset -DPMS
+</verb></tscreen>
+
+Using <tt>xset +DPMS</tt> will turn it back on.
+
+Finally, depending on your distribution, you may be able to turn it off from
+within the control panel.
 
 </article>
 <!-- Revision History
@@ -1667,6 +1713,11 @@ Sipple.
 v1.050, 2002-12-17.  Moved revision history to end of document.  Added
 version information that the HOWTO was created for.  Currently, mythtv v0.7.
 Added text mode instructions for setting alsamixer.
+v1.051, 2002-12-17.  Added instruction to run ldconfig twice for RH8.0.  Why
+does it have to be done?  No idea...  Modified section on changechannel
+script to make it generic for Tarek's website since he now has Sony and RCA
+scripts.  Added XFree86-devel requirement.  Added compile warning text in
+Troubleshooting section.  Added screen blanking (DPMS) stuff.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
