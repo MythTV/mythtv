@@ -6,8 +6,7 @@
 #include <fcntl.h>
 #include "RingBuffer.h"
 
-RingBuffer::RingBuffer(const string &lfilename, bool actasnormalfile, 
-                       bool write)
+RingBuffer::RingBuffer(const string &lfilename, bool write)
 {
     normalfile = true;
     filename = (string)lfilename;

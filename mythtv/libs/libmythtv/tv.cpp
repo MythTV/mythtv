@@ -25,7 +25,7 @@ void *SpawnDecode(void *param)
     return NULL;
 }
 
-TV::TV(void)
+TV::TV(const string &startchannel)
 {
     settings = new Settings("settings.txt");
 
@@ -39,7 +39,7 @@ TV::TV(void)
     channel->SetFormat(settings->GetSetting("TVFormat"));
     channel->SetFreqTable(settings->GetSetting("FreqTable"));
 
-    channel->SetChannelByString("3");
+    channel->SetChannelByString(startchannel);
 
     channel->Close();  
 
@@ -48,6 +48,9 @@ TV::TV(void)
     rbuffer = NULL;
 
     menurunning = false;
+
+    internalState = kStatus_None; 
+    secsToRecord = -1;
 }
 
 TV::~TV(void)
@@ -68,51 +71,130 @@ TV::~TV(void)
 
 void TV::LiveTV(void)
 {
-    pthread_t encode, decode; 
-  
-    long long filesize = settings->GetNumSetting("BufferSize");
-    filesize = filesize * 1024 * 1024 * 1024;
-    long long smudge = settings->GetNumSetting("MaxBufferFill");
-    smudge = smudge * 1024 * 1024; 
+    if (internalState != kStatus_None)
+    {
+    }
+    else
+    {
+        long long filesize = settings->GetNumSetting("BufferSize");
+        filesize = filesize * 1024 * 1024 * 1024;
+        long long smudge = settings->GetNumSetting("MaxBufferFill");
+        smudge = smudge * 1024 * 1024; 
 
-    osd_display_time = settings->GetNumSetting("OSDDisplayTime");
-  
-    rbuffer = new RingBuffer(settings->GetSetting("BufferName"), filesize, 
-                             smudge);
-  
+        rbuffer = new RingBuffer(settings->GetSetting("BufferName"), filesize, 
+                                 smudge);
+
+        internalState = kStatus_WatchingLiveTV;
+        RunTV();
+    }
+}
+
+void TV::StartRecording(const string &channelName, int duration,
+                        const string &outputFileName)
+{
+    if (internalState != kStatus_None)
+    {
+    }
+    else
+    {
+        channel->Open();
+        channel->SetChannelByString(channelName);
+        channel->Close();
+
+        rbuffer = new RingBuffer(outputFileName, true);
+
+        secsToRecord = duration;
+        internalState = kStatus_RecordingOnly;
+        RunTV();
+    }
+}
+
+void TV::Playback(const string &inputFileName)
+{
+    if (internalState != kStatus_None)
+    {
+    }
+    else
+    {
+        rbuffer = new RingBuffer(inputFileName, false);
+
+        internalState = kStatus_WatchingPreRecorded;
+        RunTV();
+    }
+}
+
+void TV::SetupRecorder(void)
+{
+    if (nvr)
+    {  // TODO: handle this
+
+    }
+
     nvr = new NuppelVideoRecorder();
     nvr->SetRingBuffer(rbuffer);
-    nvr->SetMotionLevels(settings->GetNumSetting("LumaFilter"), 
+    nvr->SetMotionLevels(settings->GetNumSetting("LumaFilter"),
                          settings->GetNumSetting("ChromaFilter"));
     nvr->SetQuality(settings->GetNumSetting("Quality"));
     nvr->SetResolution(settings->GetNumSetting("Width"),
                      settings->GetNumSetting("Height"));
     nvr->SetMP3Quality(settings->GetNumSetting("MP3Quality"));
     nvr->Initialize();
- 
+}
+
+void TV::SetupPlayer(void)
+{
+    if (nvp)
+    {  // TODO: handle this
+    }
+
     nvp = new NuppelVideoPlayer();
     nvp->SetRingBuffer(rbuffer);
     nvp->SetRecorder(nvr);
     nvp->SetDeinterlace((bool)settings->GetNumSetting("Deinterlace"));
     nvp->SetOSDFontName((char *)settings->GetSetting("OSDFont").c_str());
-  
-    pthread_create(&encode, NULL, SpawnEncode, nvr);
 
-    while (!nvr->IsRecording())
-        usleep(50);
+    osd_display_time = settings->GetNumSetting("OSDDisplayTime");
+}
 
-    // evil.
-    channel->SetFd(nvr->GetVideoFd());
+void TV::RunTV(void)
+{ 
+    pthread_t encode, decode;
 
-    sleep(1);
-    pthread_create(&decode, NULL, SpawnDecode, nvp);
+    float frameRate = 29.97; // not used, but give it a default anyway.
 
-    while (!nvp->IsPlaying())
-       usleep(50);
+    if (internalState != kStatus_WatchingPreRecorded)
+    { 
+        SetupRecorder();
+        pthread_create(&encode, NULL, SpawnEncode, nvr);
 
+        while (!nvr->IsRecording())
+            usleep(50);
+
+        // evil.
+        channel->SetFd(nvr->GetVideoFd());
+
+        frameRate = nvr->GetFrameRate();
+    }
+
+    if (internalState != kStatus_WatchingPreRecorded && 
+        internalState != kStatus_RecordingOnly)
+    {
+        usleep(500000);
+    }
+
+    if (internalState != kStatus_RecordingOnly)
+    {
+        SetupPlayer();
+        pthread_create(&decode, NULL, SpawnDecode, nvp);
+
+        while (!nvp->IsPlaying())
+            usleep(50);
+
+        frameRate = nvp->GetFrameRate();
+    }
+
+    paused = false;
     int keypressed;
-    bool paused = false;
-    float frameRate = nvp->GetFrameRate();
  
     channelqueued = false;
     channelKeys[0] = channelKeys[1] = channelKeys[2] = ' ';
@@ -121,59 +203,109 @@ void TV::LiveTV(void)
 
     cout << endl;
 
-    while (nvp->IsPlaying())
+    runMainLoop = true;
+    while (runMainLoop)
     {
         usleep(50);
+
         if ((keypressed = XJ_CheckEvents()))
         {
-           switch (keypressed) {
-               case 's': case 'S':
-	       case 'p': case 'P': paused = nvp->TogglePause(); break;
-               case 'i': case 'I': UpdateOSD(); break;
-               case wsRight: case 'd': case 'D': nvp->FastForward(5); break;
-               case wsLeft: case 'a': case 'A': nvp->Rewind(5); break;
-               case wsEscape: nvp->StopPlaying(); break;
-               case wsUp: ChangeChannel(true); break; 
-               case wsDown: ChangeChannel(false); break;
-               case wsZero: case wsOne: case wsTwo: case wsThree: case wsFour: 
-               case wsFive: case wsSix: case wsSeven: case wsEight:
-               case wsNine: case '0': case '1': case '2': case '3': case '4':
-               case '5': case '6': case '7': case '8': case '9':
-                             ChannelKey(keypressed); break;
-               case wsEnter: ChannelCommit(); break;
-               case 'M': case 'm': LoadMenu(); break;
-               default: break;
-           }
+           ProcessKeypress(keypressed);
         }
-        if (paused)
+
+        if (internalState == kStatus_WatchingLiveTV)
         {
-            fprintf(stderr, "\r Paused: %f seconds behind realtime (%f%% buffer left)", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate, (float)rbuffer->GetFreeSpace() / (float)rbuffer->GetFileSize() * 100.0);
+            if (paused)
+            {
+                fprintf(stderr, "\r Paused: %f seconds behind realtime (%f%% buffer left)", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate, (float)rbuffer->GetFreeSpace() / (float)rbuffer->GetFileSize() * 100.0);
+            }
+            else
+            {
+                fprintf(stderr, "\r                                                                      ");
+                fprintf(stderr, "\r Playing: %f seconds behind realtime (%lld skipped frames)", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate, nvp->GetFramesSkipped());
+            }
+
+            if (channelqueued && !nvp->OSDVisible())
+            {
+                ChannelCommit();
+            }
         }
-        else
+
+        if (internalState == kStatus_RecordingOnly)
         {
-            fprintf(stderr, "\r                                                                      ");
-            fprintf(stderr, "\r Playing: %f seconds behind realtime (%lld skipped frames)", (float)(nvr->GetFramesWritten() - nvp->GetFramesPlayed()) / frameRate, nvp->GetFramesSkipped());
+            if ((float)nvr->GetFramesWritten() > 
+                (float)secsToRecord * frameRate)
+            {
+                runMainLoop = false;
+            }
         }
-        if (channelqueued && !nvp->OSDVisible())
+
+        if (nvp)
         {
-            ChannelCommit();
+            if (!nvp->IsPlaying())
+                runMainLoop = false;
         }
     }
 
-    printf("exited for some reason\n");
-  
-    nvr->StopRecording();
-  
-    pthread_join(encode, NULL);
-    pthread_join(decode, NULL);
+    if (nvp)
+    {
+        nvp->StopPlaying();
+        pthread_join(decode, NULL);
+        delete nvp;
+    }
+    if (nvr)
+    {
+        nvr->StopRecording();
+        pthread_join(encode, NULL);
+        delete nvr;
+    }  
 
-    delete nvr;
-    delete nvp;
     delete rbuffer;
 
     nvr = NULL;
     nvp = NULL;
     rbuffer = NULL;
+}
+
+void TV::ProcessKeypress(int keypressed)
+{
+    switch (keypressed) 
+    {
+        case 's': case 'S':
+        case 'p': case 'P': paused = nvp->TogglePause(); break;
+
+        case wsRight: case 'd': case 'D': nvp->FastForward(5); break;
+
+        case wsLeft: case 'a': case 'A': nvp->Rewind(5); break;
+
+        case wsEscape: runMainLoop = false; break;
+
+        default: break;
+    }
+
+    if (internalState == kStatus_WatchingLiveTV)
+    {
+        switch (keypressed)
+        {
+            case 'i': case 'I': UpdateOSD(); break;
+
+            case wsUp: ChangeChannel(true); break;
+
+            case wsDown: ChangeChannel(false); break;
+
+            case wsZero: case wsOne: case wsTwo: case wsThree: case wsFour:
+            case wsFive: case wsSix: case wsSeven: case wsEight:
+            case wsNine: case '0': case '1': case '2': case '3': case '4':
+            case '5': case '6': case '7': case '8': case '9':
+                     ChannelKey(keypressed); break;
+
+            case wsEnter: ChannelCommit(); break;
+
+            case 'M': case 'm': LoadMenu(); break;
+
+            default: break;
+        }
+    }
 }
 
 void TV::ChangeChannel(bool up)

@@ -338,6 +338,9 @@ void XJ_show(int width, int height)
 
 int XJ_CheckEvents(void)
 {
+  if (!XJ_started)
+      return 0;
+
   XEvent Event;
   char buf[100];
   KeySym keySym;

@@ -132,7 +132,7 @@ void NuppelVideoRecorder::Initialize(void)
 
     if (!ringBuffer)
     {
-        ringBuffer = new RingBuffer(sfilename.c_str(), true, true);
+        ringBuffer = new RingBuffer(sfilename, true);
 	weMadeBuffer = true;
 	livetv = false;
     }
@@ -671,7 +671,7 @@ int NuppelVideoRecorder::CreateNuppelFile(void)
     
     if (!ringBuffer)
     {
-        ringBuffer = new RingBuffer(sfilename.c_str(), true, true);
+        ringBuffer = new RingBuffer(sfilename, true);
         weMadeBuffer = true;
 	livetv = false;
     }
@@ -694,6 +694,7 @@ int NuppelVideoRecorder::CreateNuppelFile(void)
         fileheader.fps = 29.97;
     else  
         fileheader.fps = 25.0;
+    video_frame_rate = fileheader.fps;
     fileheader.videoblocks = -1;
     fileheader.audioblocks = -1;
     fileheader.textsblocks = 0;
@@ -1092,14 +1093,14 @@ void NuppelVideoRecorder::WriteVideo(unsigned char *buf, int fnum, int timecode)
 
     frameofgop++;
     framesWritten++;
-    
+   
     // if we have lost frames we insert "copied" frames until we have the
     // exact count because of that we should have no problems with audio 
     // sync, as long as we don't loose audio samples :-/
   
     while (dropped > 0) 
     {
-	    printf("dropped frames\n");
+        printf("dropped frames\n");
         frameheader.timecode = lasttimecode + timeperframe;
         lasttimecode = frameheader.timecode;
         frameheader.keyframe  = frameofgop;             // no keyframe defaulted

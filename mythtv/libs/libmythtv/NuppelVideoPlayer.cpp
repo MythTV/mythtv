@@ -155,7 +155,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     {
         if (!ringBuffer)
         {
-            ringBuffer = new RingBuffer(filename.c_str(), true, false);
+            ringBuffer = new RingBuffer(filename, false);
             weMadeBuffer = true;
 	    livetv = false;
         }

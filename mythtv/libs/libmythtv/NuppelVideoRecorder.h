@@ -59,7 +59,9 @@ class NuppelVideoRecorder
 
     int GetVideoFd(void) { return fd; }
     void Reset(void);
-    
+ 
+    float GetFrameRate(void) { return video_frame_rate; }
+   
  protected:
     static void *WriteThread(void *param);
     static void *AudioThread(void *param);

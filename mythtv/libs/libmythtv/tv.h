@@ -1,6 +1,9 @@
 #ifndef TV_H
 #define TV_H
 
+#include <string>
+using namespace std;
+
 #include <mysql.h>
 
 #include "NuppelVideoRecorder.h"
@@ -10,21 +13,35 @@
 
 #include "channel.h"
 
+typedef enum 
+{
+    kStatus_None = 0,
+    kStatus_WatchingLiveTV,
+    kStatus_WatchingPreRecorded,
+    kStatus_WatchingRecording,       // watching _what_ you're recording
+    kStatus_WatchingOtherRecording,  // watching something else
+    kStatus_RecordingOnly
+} TVState;
+
 class TV
 {
  public:
-    TV(void);
+    TV(const string &startchannel);
    ~TV(void);
 
     void LiveTV(void);
+    void StartRecording(const string &channelName, int duration, 
+                        const string &outputFileName);
+    void Playback(const string &inputFileName);
 
-    bool CheckChannel(int channum);
-
+    bool CheckChannel(int channum); 
  protected:
     void doLoadMenu(void);
     static void *MenuHandler(void *param);
 
  private:
+    void RunTV(void);
+
     void ChangeChannel(bool up);
     void ChangeChannel(char *name);
     
@@ -40,6 +57,11 @@ class TV
     void DisconnectDB(void);
 
     void LoadMenu(void);
+
+    void SetupRecorder();
+    void SetupPlayer();
+
+    void ProcessKeypress(int keypressed);
 
     NuppelVideoRecorder *nvr;
     NuppelVideoPlayer *nvp;
@@ -58,6 +80,12 @@ class TV
     MYSQL *db_conn;
 
     bool menurunning;
+
+    TVState internalState;
+
+    bool runMainLoop;
+    bool paused;
+    int secsToRecord;
 };
 
 #endif
