@@ -88,28 +88,28 @@ QString ProgramInfo::MakeUniqueKey(void)
 
 void ProgramInfo::ToStringList(QStringList &list)
 {
-    list << ((title != "") ? title : " ");
-    list << ((subtitle != "") ? subtitle : " ");
-    list << ((description != "") ? description : " ");
-    list << ((category != "") ? category : " ");
-    list << ((chanid != "") ? chanid : " ");
-    list << ((chanstr != "") ? chanstr : " ");
-    list << ((chansign != "") ? chansign : " ");
-    list << ((channame != "") ? channame : " ");
-    list << ((pathname != "") ? pathname : " ");
+    list << ((title != "") ? title : QString(" "));
+    list << ((subtitle != "") ? subtitle : QString(" "));
+    list << ((description != "") ? description : QString(" "));
+    list << ((category != "") ? category : QString(" "));
+    list << ((chanid != "") ? chanid : QString(" "));
+    list << ((chanstr != "") ? chanstr : QString(" "));
+    list << ((chansign != "") ? chansign : QString(" "));
+    list << ((channame != "") ? channame : QString(" "));
+    list << ((pathname != "") ? pathname : QString(" "));
     encodeLongLong(list, filesize);
     list << startts.toString(Qt::ISODate);
     list << endts.toString(Qt::ISODate);
     list << QString::number(conflicting);
     list << QString::number(recording);
     list << QString::number(duplicate);
-    list << ((hostname != "") ? hostname : " ");
+    list << ((hostname != "") ? hostname : QString(" "));
     list << QString::number(sourceid);
     list << QString::number(cardid);
     list << QString::number(inputid);
-    list << ((rank != "") ? rank : " ");
+    list << ((rank != "") ? rank : QString(" "));
     list << QString::number(suppressed);
-    list << ((reasonsuppressed != "") ? reasonsuppressed : " ");
+    list << ((reasonsuppressed != "") ? reasonsuppressed : QString(" "));
 }
 
 void ProgramInfo::FromStringList(QStringList &list, int offset)
