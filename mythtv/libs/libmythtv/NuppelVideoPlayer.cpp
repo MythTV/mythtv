@@ -691,6 +691,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
                 continue;
             }
         }
+	video_actually_paused = false;
 
         if (prebuffering)
         {
