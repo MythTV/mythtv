@@ -1387,24 +1387,24 @@
         </textarea>
 
       <image name="commflagged" draworder="6">
-        <filename>type/commflagged.png</filename>
+        <filename>commflagged.png</filename>
         <position>84,106</position>
       </image>
       <image name="autoexpire" draworder="6">
-        <filename>type/autoexpire.png</filename>
+        <filename>autoexpire.png</filename>
         <position>52,106</position>
       </image>
       <image name="bookmark" draworder="6">
-        <filename>type/bookmark.png</filename>
+        <filename>bookmark.png</filename>
         <position>116,106</position>
       </image>
       <image name="cutlist" draworder="6">
-        <filename>type/cutlist.png</filename>
+        <filename>cutlist.png</filename>
         <position>148,106</position>
       </image>
 
       <image name="processing" draworder="6">
-        <filename>type/processing.png</filename>
+        <filename>processing.png</filename>
         <position>20,106</position>
       </image>
 
