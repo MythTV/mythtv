@@ -2821,7 +2821,7 @@ void NuppelVideoRecorder::WriteVideo(Frame *frame, bool skipsync, bool forcekey)
         ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
 
         wantkeyframe = true;
-        ringBuffer->Sync();
+        //ringBuffer->Sync();
     }
 
     if (videoFilters.size() > 0)

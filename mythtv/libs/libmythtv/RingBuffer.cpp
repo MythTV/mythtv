@@ -1,4 +1,5 @@
 #include <qapplication.h>
+#include <qdatetime.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -182,6 +183,8 @@ void ThreadedFileWriter::Sync(void)
 void ThreadedFileWriter::DiskLoop()
 {
     int size;
+    QDateTime lastsynctime = QDateTime::currentDateTime();
+    QDateTime curtime = lastsynctime;
 
     while(!in_dtor || BufUsed() > 0)
     {
@@ -192,6 +195,13 @@ void ThreadedFileWriter::DiskLoop()
 	    usleep(500);
 	    continue;
 	}
+
+        curtime = QDateTime::currentDateTime();
+        if (curtime > lastsynctime.addSecs(1))
+        {
+            Sync();
+            lastsynctime = curtime;
+        }
 
 	/* cap the max. write size. Prevents the situation where 90% of the
 	   buffer is valid, and we try to write all of it at once which

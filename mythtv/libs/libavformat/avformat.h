@@ -49,7 +49,9 @@ int av_new_packet(AVPacket *pkt, int size, int64_t startpos);
  */
 static inline void av_free_packet(AVPacket *pkt)
 {
-    pkt->destruct(pkt);
+    if (pkt && pkt->destruct) {
+       pkt->destruct(pkt);
+    }
 }
 
 /*************************************************/

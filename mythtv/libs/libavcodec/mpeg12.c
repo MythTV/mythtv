@@ -1647,7 +1647,10 @@ static void mpeg_decode_sequence_extension(MpegEncContext *s)
     s->bit_rate = ((s->bit_rate / 400) | (bit_rate_ext << 12)) * 400;
     skip_bits1(&s->gb); /* marker */
     vbv_buf_ext = get_bits(&s->gb, 8);
+
     s->low_delay = get_bits1(&s->gb);
+    if(s->flags & CODEC_FLAG_LOW_DELAY) s->low_delay=1;
+
     frame_rate_ext_n = get_bits(&s->gb, 2);
     frame_rate_ext_d = get_bits(&s->gb, 5);
     av_reduce(
@@ -2294,6 +2297,9 @@ static int mpeg_decode_frame(AVCodecContext *avctx,
                 case USER_START_CODE:
                     mpeg_decode_user_data(avctx, 
                                           buf_ptr, input_size);
+                    break;
+                case GOP_START_CODE:
+                    s2->first_field=0;
                     break;
                 default:
                     if (start_code >= SLICE_MIN_START_CODE &&
