@@ -1165,7 +1165,7 @@ void TV::ProcessKeypress(int keypressed)
         switch (keypressed)
         {
             case 'i': case 'I': DoPosition(); break;
-
+            case ' ': case wsEnter: case wsReturn: nvp->SetBookmark(); break;
             default: break;
         }
     }

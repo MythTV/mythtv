@@ -67,8 +67,8 @@ class NuppelVideoPlayer
     bool ToggleEdit(void) { editmode = !editmode; return editmode; }
     void AdvanceOneFrame(void) { advancedecoder = true; } 
  
-    void FastForward(float seconds) { fftime = seconds; }
-    void Rewind(float seconds) { rewindtime = seconds; }
+    void FastForward(float seconds) { ufftime = seconds; }
+    void Rewind(float seconds) { urewindtime = seconds; }
     void ResetPlaying(void) { resetplaying = true; actuallyreset = false; }
     bool ResetYet(void) { return actuallyreset; }
 
@@ -102,6 +102,7 @@ class NuppelVideoPlayer
     int CheckEvents(void); 
 
     void SetWatchingRecording(bool mode) { watchingrecording = mode; }
+    void SetBookmark(void);
 
     void ToggleFullScreen(void);
 
@@ -129,7 +130,7 @@ class NuppelVideoPlayer
     void GetFrame(int onlyvideo);
     
     long long CalcMaxPausePosition(void);
-    void CalcMaxFFTime();
+    float CalcMaxFFTime(float ff);
    
     bool DoFastForward();
     bool DoRewind();
@@ -234,7 +235,8 @@ class NuppelVideoPlayer
     map<long long, long long> *positionMap;
     long long lastKey;
     
-    float rewindtime, fftime;
+    float urewindtime, ufftime;
+    long long rewindtime, fftime;
     NuppelVideoRecorder *nvr;
 
     bool resetplaying;

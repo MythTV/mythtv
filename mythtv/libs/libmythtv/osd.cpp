@@ -18,13 +18,14 @@ using namespace std;
 #include "osdtypes.h"
 #include "libmyth/settings.h"
 
-OSD::OSD(int width, int height, const QString &filename, const QString &prefix,
-         const QString &osdtheme)
+OSD::OSD(int width, int height, int framerate, const QString &filename, 
+         const QString &prefix, const QString &osdtheme)
 {
     pthread_mutex_init(&osdlock, NULL);
 
     vid_width = width;
     vid_height = height;
+    fps = framerate;
 
     wmult = vid_width / 640.0;
     hmult = vid_height / 480.0;
@@ -582,7 +583,7 @@ void OSD::SetInfoText(const QString &text, const QString &subtitle,
         if (cs)
             cs->LoadImage(iconpath, wmult, hmult, 30, 30);
 
-        container->DisplayFor(length * 30);
+        container->DisplayFor(length * fps);
         m_setsvisible = true;
     }
     pthread_mutex_unlock(&osdlock);
@@ -609,7 +610,7 @@ void OSD::StartPause(int position, bool fill, QString msgtext,
             slider->SetPosition(position);
 
         if (displaytime > 0)
-            container->DisplayFor(displaytime * 30);
+            container->DisplayFor(displaytime * fps);
         else
             container->Display();
         m_setsvisible = true;
@@ -658,7 +659,7 @@ void OSD::SetChannumText(const QString &text, int length)
         if (type)
             type->SetText(text);
 
-        container->DisplayFor(length * 30);
+        container->DisplayFor(length * fps);
         m_setsvisible = true;
     }
 
@@ -688,6 +689,7 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
     container = new OSDSet(name, false, vid_width, vid_height, wmult, hmult);
     container->SetPriority(0);
     container->SetAllowFade(false);
+    container->SetFrameRate(fps);
     AddSet(container, name, false);
 
     QRect dialogRect;
@@ -752,7 +754,7 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
     opr->SetPosition(0);
     dialogResponseList[name] = 0;
 
-    container->DisplayFor(length * 30);
+    container->DisplayFor(length * fps);
     m_setsvisible = true;
 
     pthread_mutex_unlock(&osdlock);
@@ -821,6 +823,36 @@ int OSD::GetDialogResponse(const QString &name)
         return ret;
     }
     return -1;
+}
+
+OSDSet *OSD::ShowText(const QString &name, const QString &message, int xpos,
+                      int ypos, int width, int height, int secs)
+{
+    pthread_mutex_lock(&osdlock);
+
+    OSDSet *set = new OSDSet(name, false, vid_width, vid_height, wmult, hmult);
+    set->SetPriority(3);
+    set->SetFrameRate(fps);
+    AddSet(set, name, false);
+
+    TTFFont *font = GetFont("channel_font");
+    if (!font)
+    {
+        delete set;
+        pthread_mutex_unlock(&osdlock);
+        return NULL;
+    }
+
+    QRect rect = QRect(xpos, ypos, width, height); 
+    OSDTypeText *text = new OSDTypeText("message", font, message, rect);
+    text->SetMultiLine(true);
+    set->AddType(text);
+
+    set->DisplayFor(secs * fps);
+    m_setsvisible = true;
+
+    pthread_mutex_unlock(&osdlock);
+    return set;
 }
 
 void OSD::Display(unsigned char *yuvptr)

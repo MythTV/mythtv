@@ -476,6 +476,29 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 
     ringBuffer->Seek(startpos, SEEK_SET);
 
+    if (haspositionmap)
+    {
+        QString bookmarkname = ringBuffer->GetFilename();
+        bookmarkname += ".bookmark";
+        FILE *bookmarkfile = fopen(bookmarkname.ascii(), "r");
+        if (bookmarkfile)
+        {
+            long long pos = 0;
+            fscanf(bookmarkfile, "%lld", &pos);
+            fclose(bookmarkfile);
+            unlink(bookmarkname);
+            
+            bool seeks = exactseeks;
+            exactseeks = false;
+
+            fftime = pos;
+            DoFastForward(); 
+            fftime = 0;
+
+            exactseeks = seeks;
+        }
+    }
+
     return 0;
 }
 
@@ -1368,8 +1391,8 @@ void NuppelVideoPlayer::StartPlaying(void)
     InitFilters();
 
     if (!disablevideo)
-        osd = new OSD(video_width, video_height, osdfilename, osdprefix, 
-                      osdtheme);
+        osd = new OSD(video_width, video_height, (int)ceil(video_frame_rate),
+                      osdfilename, osdprefix, osdtheme);
 
     playing = true;
   
@@ -1380,8 +1403,8 @@ void NuppelVideoPlayer::StartPlaying(void)
     gettimeofday(&audiotime_updated, NULL);
 
     weseeked = 0;
-    rewindtime = 0;
-    fftime = 0;
+    urewindtime = ufftime = 0;
+    rewindtime = fftime = 0;
 
     resetplaying = false;
     
@@ -1460,23 +1483,24 @@ void NuppelVideoPlayer::StartPlaying(void)
             }
 	}
 	
-	if (rewindtime > 0)
+	if (urewindtime > 0)
 	{
-	    rewindtime *= video_frame_rate;
+	    rewindtime = (long long)(urewindtime * video_frame_rate);
 
             if (rewindtime >= 5)
                 DoRewind();
 
+            urewindtime = 0;
             rewindtime = 0;
 	}
-	if (fftime > 0)
+	if (ufftime > 0)
 	{
-            CalcMaxFFTime();
-	    fftime *= video_frame_rate;
+            fftime = (long long)(CalcMaxFFTime(ufftime) * video_frame_rate);
 
             if (fftime >= 5)
                 DoFastForward();
 
+            ufftime = 0;
             fftime = 0;
 	}
 
@@ -1494,9 +1518,36 @@ void NuppelVideoPlayer::StartPlaying(void)
     playing = false;
 }
 
+void NuppelVideoPlayer::SetBookmark(void)
+{
+    if (!haspositionmap)
+        return;
+
+    if (livetv)
+        return;
+
+    long long framenum = framesPlayed;
+    QString filename = ringBuffer->GetFilename();
+    filename += ".bookmark";
+
+    FILE *bookmarkfile = fopen(filename.ascii(), "w");
+    if (!bookmarkfile)
+    {
+        cerr << "Unable to open bookmark file: " << bookmarkfile << endl;
+        return;
+    }
+
+    fprintf(bookmarkfile, "%lld\n", framenum);
+    fclose(bookmarkfile);
+
+    osd->ShowText("bookmark", "Position Saved", video_width * 1 / 8, 
+                  video_height * 1 / 8, video_width * 7 / 8, video_height / 2, 
+                  1);
+}
+
 bool NuppelVideoPlayer::DoRewind(void)
 {
-    int number = (int)rewindtime;
+    long long number = rewindtime;
 
     long long desiredFrame = framesPlayed - number;
 
@@ -1583,32 +1634,35 @@ bool NuppelVideoPlayer::DoRewind(void)
     return true;
 }
 
-
-void NuppelVideoPlayer::CalcMaxFFTime(void)
+float NuppelVideoPlayer::CalcMaxFFTime(float ff)
 {
     float maxtime = 1.0;
     if (watchingrecording && nvr)
         maxtime = 3.0;
     
+    float ret = ff;
+
     if (livetv || (watchingrecording && nvr))
     {
         float behind = (float)(nvr->GetFramesWritten() - framesPlayed) / 
                        video_frame_rate;
 	if (behind < maxtime) // if we're close, do nothing
-	    fftime = 0.0;
+	    ret = 0.0;
 	else if (behind - fftime <= maxtime)
 	{
-            fftime = behind - maxtime;
+            ret = behind - maxtime;
 	}
     }
     else
     {
     }
+
+    return ret;
 }
 
 bool NuppelVideoPlayer::DoFastForward(void)
 {
-    int number = (int)fftime;
+    long long number = fftime;
 
     long long desiredFrame = framesPlayed + number;
     long long desiredKey = lastKey;

@@ -18,8 +18,8 @@ class OSDSet;
 class OSD
 {
  public:
-    OSD(int width, int height, const QString &filename, const QString &prefix,
-        const QString &osdtheme);
+    OSD(int width, int height, int framerate, const QString &filename, 
+        const QString &prefix, const QString &osdtheme);
    ~OSD(void);
 
     void Display(unsigned char *yuvptr);
@@ -48,6 +48,8 @@ class OSD
 
     bool Visible(void);
 
+    OSDSet *ShowText(const QString &name, const QString &message, int xpos,
+                     int ypos, int width, int height, int secs);
     void AddSet(OSDSet *set, QString name, bool withlock = true);
  
  private:
@@ -69,6 +71,7 @@ class OSD
 
     int vid_width;
     int vid_height;
+    int fps;
 
     QString fontprefix;
     
