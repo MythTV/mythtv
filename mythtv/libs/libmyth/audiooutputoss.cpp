@@ -152,11 +152,15 @@ void AudioOutputOSS::Reconfigure(int laudio_bits, int laudio_channels,
 
     int caps;
     
-    if (ioctl(audiofd, SNDCTL_DSP_GETCAPS, &caps) >= 0 && 
-        !(caps & DSP_CAP_REALTIME))
+    if (ioctl(audiofd, SNDCTL_DSP_GETCAPS, &caps) == 0)
     {
-        cerr << "audio device cannot report buffer state accurately,\n"
-             << "audio/video sync will be bad, continuing anyway\n";
+        if (!(caps & DSP_CAP_REALTIME))
+        {
+            cerr << "audio device cannot report buffer state accurately!\n"
+                 << "audio/video sync will be bad, continuing anyway...\n";
+        }
+    } else {
+        perror("ioctl(SNDCTL_DSP_GETCAPS)");
     }
 
     audbuf_timecode = 0;
