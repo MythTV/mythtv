@@ -12,7 +12,7 @@
 
 #include <qobject.h>
 
-#include "discoverythread.h"
+class DiscoveryThread;
 
 class MfdInterface : public QObject
 {
@@ -21,6 +21,10 @@ class MfdInterface : public QObject
 
     MfdInterface();
     ~MfdInterface();
+
+  protected:
+  
+    void customEvent(QCustomEvent *ce);
  
   private:
   

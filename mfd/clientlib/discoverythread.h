@@ -10,25 +10,47 @@
 
 */
 
+#include <unistd.h>
+
 #include <qthread.h>
 #include <qmutex.h>
+#include <qptrlist.h>
+
+#include "mfdinterface.h"
+#include "mdnsd/mdnsd.h"
+#include "discovered.h"
+
+
 
 class DiscoveryThread : public QThread
 {
 
   public:
 
-    DiscoveryThread();
+    DiscoveryThread(MfdInterface *the_interface);
     ~DiscoveryThread();
     
     void run();
     void stop();
-
+    void wakeUp();
+    int  createMulticastSocket();
+    void handleMdnsdCallback(mdnsda answer);
+    void cleanDeadMfds();
+    
+    
   private:
   
     QMutex keep_going_mutex;
     bool   keep_going;
+
+    QMutex  u_shaped_pipe_mutex;
+    int     u_shaped_pipe[2];
+
+    mdnsd   mdns_daemon;        
     
+    QPtrList<DiscoveredMfd> *discovered_mfds;
+    
+    MfdInterface    *mfd_interface;
 };
 
 #endif

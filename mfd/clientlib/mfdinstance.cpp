@@ -15,9 +15,11 @@ using namespace std;
 
 MfdInstance::MfdInstance()
 {
+    cout << "mfd instance exists " << endl;
 }
 
 MfdInstance::~MfdInstance()    
 {
+    cout << "mfd instance being destroyed " << endl;
 }
 
