@@ -240,7 +240,7 @@ int TVRec::StartRecording(ProgramInfo *rcinfo)
     if (internalState == kState_None)
     {
         outputFilename = rcinfo->GetRecordFilename(recprefix);
-        recordEndTime = rcinfo->endts;
+        recordEndTime = rcinfo->recendts;
         curRecording = new ProgramInfo(*rcinfo);
 
         nextState = kState_RecordingOnly;
@@ -733,7 +733,7 @@ void TVRec::TeardownRecorder(bool killFile)
             {
                 QString message = QString("LOCAL_TRANSCODE %1 %2 %3")
                            .arg(prevRecording->chanid)
-                           .arg(prevRecording->startts.toString(Qt::ISODate))
+                           .arg(prevRecording->recstartts.toString(Qt::ISODate))
                            .arg(oldProfileName);
                 MythEvent me(message);
                 gContext->dispatch(me);
@@ -2222,7 +2222,7 @@ bool TVRec::isParsingCommercials(ProgramInfo *pginfo)
     pthread_mutex_lock(&commLock);
     for (pinfo = commercialFlag.first(); pinfo; pinfo = commercialFlag.next())
     {
-        if(pginfo->chanid == pinfo->chanid || pginfo->startts == pinfo->startts)
+        if(pginfo->chanid == pinfo->chanid || pginfo->recstartts == pinfo->recstartts)
         {
             pthread_mutex_unlock(&commLock);
             return true;

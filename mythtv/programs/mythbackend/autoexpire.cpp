@@ -256,6 +256,8 @@ void AutoExpire::FillOldestFirst(void)
                                                       Qt::ISODate);
             proginfo->endts = QDateTime::fromString(query.value(2).toString(),
                                                     Qt::ISODate);
+            proginfo->recstartts = proginfo->startts;
+            proginfo->recendts = proginfo->endts;
             proginfo->title = QString::fromUtf8(query.value(3).toString());
             proginfo->subtitle = QString::fromUtf8(query.value(4).toString());
             proginfo->description = QString::fromUtf8(query.value(5).toString());

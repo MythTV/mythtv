@@ -591,6 +591,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                                                       Qt::ISODate);
             proginfo->endts = QDateTime::fromString(query.value(2).toString(),
                                                     Qt::ISODate);
+            proginfo->recstartts = proginfo->startts;
+            proginfo->recendts = proginfo->endts;
             proginfo->title = QString::fromUtf8(query.value(3).toString());
             proginfo->subtitle = QString::fromUtf8(query.value(4).toString());
             proginfo->description = QString::fromUtf8(query.value(5).toString());
@@ -733,7 +735,7 @@ void MainServer::HandleQueueTranscode(QStringList &slist, PlaybackSock *pbs,
     QString message = QString("%1 %2 %3")
                             .arg(cmd)
                             .arg(pginfo->chanid)
-                            .arg(pginfo->startts.toString(Qt::ISODate));
+                            .arg(pginfo->recstartts.toString(Qt::ISODate));
     MythEvent me(message);
     gContext->dispatch(me);
 
@@ -874,7 +876,7 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
         }
     }
 
-    if (QDateTime::currentDateTime() > pginfo->endts)
+    if (QDateTime::currentDateTime() > pginfo->recendts)
     { //don't update filename if in overrecord
         if (pbssock)
         {
@@ -892,7 +894,7 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
 
     MythContext::KickDatabase(m_db);
 
-    QString startts = pginfo->startts.toString("yyyyMMddhhmm");
+    QString startts = pginfo->recstartts.toString("yyyyMMddhhmm");
     startts += "00";
     QString endts = pginfo->endts.toString("yyyyMMddhhmm");
     endts += "00";
@@ -1020,9 +1022,9 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
 
     QString thequery;
 
-    QString startts = pginfo->startts.toString("yyyyMMddhhmm");
+    QString startts = pginfo->recstartts.toString("yyyyMMddhhmm");
     startts += "00";
-    QString endts = pginfo->endts.toString("yyyyMMddhhmm");
+    QString endts = pginfo->recendts.toString("yyyyMMddhhmm");
     endts += "00";
 
     dblock.lock();
@@ -2415,7 +2417,7 @@ void MainServer::PrintStatus(QSocket *socket)
                 if (pi)
                 {
                     os << " '" << pi->title << "'.  This recording will end "
-                       << "at " << (pi->endts).toString(timeformat);
+                       << "at " << (pi->recendts).toString(timeformat);
                     delete pi;
                 }
             }
@@ -2458,15 +2460,15 @@ void MainServer::PrintStatus(QSocket *socket)
             iter++, i++)
        {
            if (!(*iter)->recording ||     // bad entry, don't show as upcoming
-               ((*iter)->startts) < QDateTime::currentDateTime()) // recording
+               ((*iter)->recstartts) < QDateTime::currentDateTime()) // recording
            {                       
                i--;
            }
            else
            {
                os << "<TR " << ((i % 2 == 0) ? "BGCOLOR=EEEEEE" : "") << ">" 
-                  << "<TD>" << ((*iter)->startts).toString(shortdateformat) 
-                  << " " << ((*iter)->startts).toString(timeformat) << "</TD>" 
+                  << "<TD>" << ((*iter)->recstartts).toString(shortdateformat) 
+                  << " " << ((*iter)->recstartts).toString(timeformat) << "</TD>" 
                   << "<TD>" << (*iter)->title << "</TD>"
                   << "<TD>" << (*iter)->cardid << "</TD></TR>\r\n";
            }

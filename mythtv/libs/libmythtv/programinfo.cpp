@@ -284,6 +284,8 @@ void ProgramInfo::GetProgramListByQuery(QSqlDatabase *db,
                                                       Qt::ISODate);
             proginfo->endts = QDateTime::fromString(query.value(2).toString(),
                                                     Qt::ISODate);
+            proginfo->recstartts = proginfo->startts;
+            proginfo->recendts = proginfo->endts;
             proginfo->title = QString::fromUtf8(query.value(3).toString());
             proginfo->subtitle = QString::fromUtf8(query.value(4).toString());
             proginfo->description = 
@@ -349,6 +351,8 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(QSqlDatabase *db,
                                                   Qt::ISODate);
         proginfo->endts = QDateTime::fromString(query.value(2).toString(),
                                                 Qt::ISODate);
+        proginfo->recstartts = proginfo->startts;
+        proginfo->recendts = proginfo->endts;
         proginfo->title = QString::fromUtf8(query.value(3).toString());
         proginfo->subtitle = QString::fromUtf8(query.value(4).toString());
         proginfo->description = QString::fromUtf8(query.value(5).toString());
@@ -418,6 +422,8 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
                                                   Qt::ISODate);
         proginfo->endts = QDateTime::fromString(query.value(2).toString(),
                                                 Qt::ISODate);
+        proginfo->recstartts = proginfo->startts;
+        proginfo->recendts = proginfo->endts;
         proginfo->title = QString::fromUtf8(query.value(3).toString());
         proginfo->subtitle = QString::fromUtf8(query.value(4).toString());
         proginfo->description = QString::fromUtf8(query.value(5).toString());
@@ -665,8 +671,8 @@ bool ProgramInfo::IsSameProgramTimeslot(const ProgramInfo &other) const
 
 QString ProgramInfo::GetRecordBasename(void)
 {
-    QString starts = startts.toString("yyyyMMddhhmm");
-    QString ends = endts.toString("yyyyMMddhhmm");
+    QString starts = recstartts.toString("yyyyMMddhhmm");
+    QString ends = recendts.toString("yyyyMMddhhmm");
 
     starts += "00";
     ends += "00";
@@ -679,8 +685,8 @@ QString ProgramInfo::GetRecordBasename(void)
 
 QString ProgramInfo::GetRecordFilename(const QString &prefix)
 {
-    QString starts = startts.toString("yyyyMMddhhmm");
-    QString ends = endts.toString("yyyyMMddhhmm");
+    QString starts = recstartts.toString("yyyyMMddhhmm");
+    QString ends = recendts.toString("yyyyMMddhhmm");
 
     starts += "00";
     ends += "00";
@@ -701,8 +707,8 @@ void ProgramInfo::StartedRecording(QSqlDatabase *db)
         record->loadByProgram(db, this);
     }
 
-    QString starts = startts.toString("yyyyMMddhhmm");
-    QString ends = endts.toString("yyyyMMddhhmm");
+    QString starts = recstartts.toString("yyyyMMddhhmm");
+    QString ends = recendts.toString("yyyyMMddhhmm");
 
     starts += "00";
     ends += "00";
@@ -753,7 +759,7 @@ void ProgramInfo::SetBookmark(long long pos, QSqlDatabase *db)
     char position[128];
     sprintf(position, "%lld", pos);
 
-    QString starts = startts.toString("yyyyMMddhhmm");
+    QString starts = recstartts.toString("yyyyMMddhhmm");
     starts += "00";
 
     QString querystr;
@@ -780,7 +786,7 @@ long long ProgramInfo::GetBookmark(QSqlDatabase *db)
 
     long long pos = 0;
 
-    QString starts = startts.toString("yyyyMMddhhmm");
+    QString starts = recstartts.toString("yyyyMMddhhmm");
     starts += "00";
 
     QString querystr = QString("SELECT bookmark FROM recorded WHERE "
@@ -808,7 +814,7 @@ bool ProgramInfo::IsEditing(QSqlDatabase *db)
 
     bool result = false;
 
-    QString starts = startts.toString("yyyyMMddhhmm");
+    QString starts = recstartts.toString("yyyyMMddhhmm");
     starts += "00";
 
     QString querystr = QString("SELECT editing FROM recorded WHERE "
@@ -830,7 +836,7 @@ void ProgramInfo::SetEditing(bool edit, QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
 
-    QString starts = startts.toString("yyyyMMddhhmm");
+    QString starts = recstartts.toString("yyyyMMddhhmm");
     starts += "00";
 
     QString querystr = QString("UPDATE recorded SET editing = '%1', "
@@ -846,7 +852,7 @@ void ProgramInfo::SetAutoExpire(bool autoExpire, QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
 
-    QString starts = startts.toString("yyyyMMddhhmm");
+    QString starts = recstartts.toString("yyyyMMddhhmm");
     starts += "00";
 
     QString querystr = QString("UPDATE recorded SET autoexpire = '%1', "
@@ -862,7 +868,7 @@ bool ProgramInfo::GetAutoExpireFromRecorded(QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
 
-    QString starts = startts.toString("yyyyMMddhhmm");
+    QString starts = recstartts.toString("yyyyMMddhhmm");
     starts += "00";
 
     QString querystr = QString("SELECT autoexpire FROM recorded WHERE "
@@ -890,7 +896,7 @@ void ProgramInfo::GetCutList(QMap<long long, int> &delMap, QSqlDatabase *db)
 
     MythContext::KickDatabase(db);
 
-    QString starts = startts.toString("yyyyMMddhhmm");
+    QString starts = recstartts.toString("yyyyMMddhhmm");
     starts += "00";
 
     QString querystr = QString("SELECT cutlist FROM recorded WHERE "
@@ -956,7 +962,7 @@ void ProgramInfo::SetCutList(QMap<long long, int> &delMap, QSqlDatabase *db)
 
     MythContext::KickDatabase(db);
 
-    QString starts = startts.toString("yyyyMMddhhmm");
+    QString starts = recstartts.toString("yyyyMMddhhmm");
     starts += "00";
 
     QString querystr = QString("UPDATE recorded SET cutlist = \"%1\", "
@@ -1000,7 +1006,7 @@ void ProgramInfo::GetCommBreakList(QMap<long long, int> &frames,
 void ProgramInfo::ClearMarkupMap(QSqlDatabase *db, int type,
                                  long long min_frame, long long max_frame)
 {
-    QString starts = startts.toString("yyyyMMddhhmm");
+    QString starts = recstartts.toString("yyyyMMddhhmm");
     starts += "00";
 
     QString min_comp = " ";
@@ -1040,7 +1046,7 @@ void ProgramInfo::SetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
 {
     QMap<long long, int>::Iterator i;
 
-    QString starts = startts.toString("yyyyMMddhhmm");
+    QString starts = recstartts.toString("yyyyMMddhhmm");
     starts += "00";
 
     QString querystr;
@@ -1099,7 +1105,7 @@ void ProgramInfo::GetMarkupMap(QMap<long long, int> &marks, QSqlDatabase *db,
 
     MythContext::KickDatabase(db);
 
-    QString starts = startts.toString("yyyyMMddhhmm");
+    QString starts = recstartts.toString("yyyyMMddhhmm");
     starts += "00";
 
     QString querystr = QString("SELECT mark, type FROM recordedmarkup WHERE "
@@ -1146,7 +1152,7 @@ void ProgramInfo::GetPositionMap(QMap<long long, long long> &posMap, int type,
 
     MythContext::KickDatabase(db);
 
-    QString starts = startts.toString("yyyyMMddhhmm");
+    QString starts = recstartts.toString("yyyyMMddhhmm");
     starts += "00";
 
     QString querystr = QString("SELECT mark, offset FROM recordedmarkup "
@@ -1177,7 +1183,7 @@ void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
 {
     QMap<long long, long long>::Iterator i;
 
-    QString starts = startts.toString("yyyyMMddhhmm");
+    QString starts = recstartts.toString("yyyyMMddhhmm");
     starts += "00";
 
     QString min_comp = " ";

@@ -455,6 +455,8 @@ void ScheduledRecording::findAllScheduledPrograms(QSqlDatabase* db,
             proginfo->description = QString::fromUtf8(result.value(7).toString());
             proginfo->rank = result.value(8).toString();
             proginfo->channame = result.value(10).toString();
+            proginfo->recstartts = proginfo->startts;
+            proginfo->recendts = proginfo->endts;
 
             if (proginfo->title == QString::null)
                 proginfo->title = "";
@@ -661,8 +663,8 @@ void ScheduledRecording::doneRecording(QSqlDatabase* db,
                             "VALUES(%1,\"%2\",\"%3\",\"%4\",\"%5\",\"%6\","
                             "\"%7\");")
         .arg(proginfo.chanid)
-        .arg(proginfo.startts.toString(Qt::ISODate))
-        .arg(proginfo.endts.toString(Qt::ISODate))
+        .arg(proginfo.recstartts.toString(Qt::ISODate))
+        .arg(proginfo.recendts.toString(Qt::ISODate))
         .arg(sqltitle.utf8()) 
         .arg(sqlsubtitle.utf8())
         .arg(sqldescription.utf8())

@@ -97,7 +97,7 @@ pid_t Transcoder::Transcode(ProgramInfo *pginfo, bool useCutlist)
     QString path = "mythtranscode";
     QString command = QString("%1 -c %2 -s %3 -p %4 -d %5").arg(path.ascii())
                       .arg(pginfo->chanid)
-                      .arg(pginfo->startts.toString(Qt::ISODate))
+                      .arg(pginfo->recstartts.toString(Qt::ISODate))
                       .arg("autodetect")
                       .arg(useCutlist ? "-l" : "");
     // cout << "DEBUG: " << command.ascii() << endl;
@@ -124,7 +124,7 @@ void Transcoder::EnqueueTranscode(ProgramInfo *pinfo, bool useCutlist)
     QString query = QString("SELECT status FROM transcoding "
                             "WHERE chanid = '%1' AND starttime = '%2';")
                             .arg(pinfo->chanid)
-                            .arg(pinfo->startts.toString("yyyyMMddhhmmss"));
+                            .arg(pinfo->recstartts.toString("yyyyMMddhhmmss"));
 
     dblock->lock();
     QSqlQuery result = db_conn->exec(query);
@@ -144,7 +144,7 @@ void Transcoder::EnqueueTranscode(ProgramInfo *pinfo, bool useCutlist)
                         "(chanid,starttime,status,hostname) "
                         "VALUES ('%1','%2','%3','%4');")
                         .arg(pinfo->chanid)
-                        .arg(pinfo->startts.toString("yyyyMMddhhmmss"))
+                        .arg(pinfo->recstartts.toString("yyyyMMddhhmmss"))
                         .arg(TRANSCODE_QUEUED |
                               ((useCutlist) ? TRANSCODE_USE_CUTLIST : 0))
                         .arg(gContext->GetHostName());
@@ -159,7 +159,7 @@ void Transcoder::StopTranscoder(ProgramInfo *pinfo)
     QString query = QString("SELECT status FROM transcoding "
                             "WHERE chanid = '%1' AND starttime = '%2';")
                             .arg(pinfo->chanid)
-                            .arg(pinfo->startts.toString("yyyyMMddhhmmss"));
+                            .arg(pinfo->recstartts.toString("yyyyMMddhhmmss"));
     dblock->lock();
     MythContext::KickDatabase(db_conn);
     QSqlQuery result = db_conn->exec(query);
@@ -185,7 +185,7 @@ void Transcoder::UpdateTranscoder(ProgramInfo *pginfo, int status)
                      "AND hostname = '%3';")
                      .arg(status)
                      .arg(pginfo->chanid)
-                     .arg(pginfo->startts.toString("yyyyMMddhhmmss"))
+                     .arg(pginfo->recstartts.toString("yyyyMMddhhmmss"))
                      .arg(gContext->GetHostName());
      dblock->lock();
      MythContext::KickDatabase(db_conn);
@@ -199,7 +199,7 @@ void Transcoder::DeleteTranscode(ProgramInfo *pinfo)
                              "chanid = '%1' AND starttime = '%2' "
                              "AND hostname = '%3';")
                              .arg(pinfo->chanid)
-                             .arg(pinfo->startts.toString("yyyyMMddhhmmss"))
+                             .arg(pinfo->recstartts.toString("yyyyMMddhhmmss"))
                              .arg(gContext->GetHostName());
      dblock->lock();
      MythContext::KickDatabase(db_conn);

@@ -104,7 +104,7 @@ bool EncoderLink::isRecording(ProgramInfo *rec)
 {
     bool retval = false;
 
-    if (rec->chanid == chanid && rec->startts == startRecordingTime)
+    if (rec->chanid == chanid && rec->recstartts == startRecordingTime)
         retval = true;
 
     return retval;
@@ -126,8 +126,8 @@ bool EncoderLink::MatchesRecording(ProgramInfo *rec)
         if (tvrec)
         {
             if (tvrec->chanid == rec->chanid && 
-                tvrec->startts == rec->startts &&
-                tvrec->endts == rec->endts)
+                tvrec->recstartts == rec->recstartts &&
+                tvrec->recendts == rec->recendts)
             {
                 retval = true;
             }
@@ -157,7 +157,7 @@ bool EncoderLink::WouldConflict(ProgramInfo *rec)
     if (!isConnected())
         return true;
 
-    if (rec->startts < endRecordingTime)
+    if (rec->recstartts < endRecordingTime)
         return true;
 
     return false;
@@ -237,8 +237,8 @@ int EncoderLink::StartRecording(ProgramInfo *rec)
 {
     int retval = 0;
 
-    endRecordingTime = rec->endts;
-    startRecordingTime = rec->startts;
+    endRecordingTime = rec->recendts;
+    startRecordingTime = rec->recstartts;
     chanid = rec->chanid;
 
     if (local)
