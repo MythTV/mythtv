@@ -17,6 +17,8 @@
 
 #include <stream.h>
 #include <qapplication.h>
+#include <qsqldatabase.h>
+#include <qsqlquery.h>
 
 using namespace std;
 
@@ -24,14 +26,43 @@ using namespace std;
 #include "libmyth/mythcontext.h"
 
 MythContext *gContext;
+QSqlDatabase* db;
 
 int main(int argc, char **argv)
 {
+	QString lcd_host;
+	int		lcd_port;
 	QApplication a(argc, argv);
 	gContext = new MythContext(FALSE);
-	gContext->LCDconnectToHost("localhost", 13666);
-	MythLCD mythLCD;
-	a.setMainWidget(&mythLCD);
-	mythLCD.show();
-	return a.exec();
+
+    db = QSqlDatabase::addDatabase("QMYSQL3");
+    if (!gContext->OpenDatabase(db))
+    {
+        cerr << "Unable to open database:\n"
+             << "Driver error was:" << endl
+             << db->lastError().driverText() << endl
+             << "Database error was:" << endl
+             << db->lastError().databaseText() << endl;
+
+        return -1;
+    }
+
+
+
+	lcd_host = gContext->GetSetting("LCDHost");
+	lcd_port = gContext->GetNumSetting("LCDPort");
+
+	if(lcd_host.length() > 0 && lcd_port > 1024)
+	{
+		gContext->LCDconnectToHost("localhost", 13666);
+		MythLCD mythLCD;
+		a.setMainWidget(&mythLCD);
+		mythLCD.show();
+		return a.exec();
+	}
+	else
+	{
+		cout << "Could not get LCD host and port settings from database" << endl;
+		cout << "Did you run cvs.sql in the database directory?" << endl;
+	}
 }

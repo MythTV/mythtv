@@ -21,7 +21,7 @@ MythLCD::MythLCD(QWidget *parent, const char *name )
 	//	Create the LCD device
 	//
 	
-	resize(200, 210);
+	resize(200, 250);
 
 	//
 	//	Create the buttons
@@ -29,7 +29,7 @@ MythLCD::MythLCD(QWidget *parent, const char *name )
 	
 	QPushButton	*quitButton = new QPushButton("Quit", this);
 	quitButton->resize(180,30);
-	quitButton->move(10,170);
+	quitButton->move(10,210);
 	connect(quitButton, SIGNAL(clicked()), qApp, SLOT(quit()));
 
 	QPushButton *timeButton= new QPushButton("Time", this);
