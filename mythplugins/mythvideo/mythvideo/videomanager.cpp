@@ -35,8 +35,8 @@ VideoManager::VideoManager(QSqlDatabase *ldb,
 
     expectingPopup = false;
     popup = NULL;
-    
-
+    videoDir = gContext->GetSetting("VideoStartupDir");    
+    artDir = gContext->GetSetting("VideoArtworkDir");
     currentVideoFilter = new VideoFilterSettings(db, true, "VideoManager");
     RefreshMovieList();
 
@@ -58,7 +58,7 @@ VideoManager::VideoManager(QSqlDatabase *ldb,
     inDataMovie = 0;
     listCountMovie = 0;
     dataCountMovie = 0;
-
+    
     m_state = SHOWING_MAINWINDOW;
 
     theme = new XMLParse();
@@ -867,7 +867,10 @@ void VideoManager::updateInfo(QPainter *p)
 
            type = (UITextType *)container->GetType("filename");
            if (type)
-               type->SetText(filename);
+           {
+                filename.remove(videoDir + "/");
+                type->SetText(filename);
+           }
 
            type = (UITextType *)container->GetType("director");
            if (type)
@@ -879,8 +882,11 @@ void VideoManager::updateInfo(QPainter *p)
 
            type = (UITextType *)container->GetType("coverfile");
            if (type)
+           {
+               coverfile.remove(artDir + "/");
                type->SetText(coverfile);
-
+           }
+           
            type = (UITextType *)container->GetType("inetref");
            if (type)
                type->SetText(inetref);

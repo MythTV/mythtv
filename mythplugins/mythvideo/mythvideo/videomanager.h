@@ -157,7 +157,8 @@ class VideoManager : public MythDialog
     MythPopupBox* popup;
     bool expectingPopup;
     
-        
+    QString videoDir;    
+    QString artDir;
     QString theMovieName;
     bool allowselect;
     bool isbusy;
