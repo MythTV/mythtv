@@ -7,31 +7,21 @@ using namespace std;
 #include "iconview.h"
 
 #include <mythtv/themedmenu.h>
-#include <mythtv/settings.h>
-
-Settings *globalsettings;
-char theprefix[] = PREFIX;
+#include <mythtv/mythcontext.h>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    globalsettings = new Settings();
+    MythContext *context = new MythContext();
 
-    globalsettings->LoadSettingsFiles("mythgallery-settings.txt", theprefix);
-    globalsettings->LoadSettingsFiles("theme.txt", theprefix);
+    context->LoadSettingsFiles("mythgallery-settings.txt");
 
-    QString themename = globalsettings->GetSetting("Theme");
-    QString themedir = findThemeDir(themename, theprefix);
+    context->LoadQtConfig();
 
-    globalsettings->SetSetting("ThemePathName", themedir + "/");
+    QString startdir = context->GetSetting("GalleryDir");
 
-    themedir += "/qtlook.txt";
-    globalsettings->ReadSettings(themedir);
-
-    QString startdir = globalsettings->GetSetting("GalleryDir");
-
-    IconView icv(startdir);
+    IconView icv(context, startdir);
 
     icv.exec();
 

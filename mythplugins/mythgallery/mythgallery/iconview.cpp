@@ -9,82 +9,32 @@
 #include "iconview.h"
 #include "singleview.h"
 
-#include <mythtv/settings.h>
-
-extern Settings *globalsettings;
+#include "mythtv/mythcontext.h"
 
 #include "embdata.h"
 
 QPixmap *IconView::foldericon = NULL;
 
-IconView::IconView(const QString &startdir, QWidget *parent, const char *name)
+IconView::IconView(MythContext *context, const QString &startdir, 
+                   QWidget *parent, const char *name)
         : QDialog(parent, name)
 {
-    screenheight = QApplication::desktop()->height();
-    screenwidth = QApplication::desktop()->width();
+    m_context = context;
 
-    if (globalsettings->GetNumSetting("GuiWidth") > 0)
-        screenwidth = globalsettings->GetNumSetting("GuiWidth");
-    if (globalsettings->GetNumSetting("GuiHeight") > 0)
-        screenheight = globalsettings->GetNumSetting("GuiHeight");
-
-    wmult = screenwidth / 800.0;
-    hmult = screenheight / 600.0;
+    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
     setCursor(QCursor(Qt::BlankCursor));
 
-    bool usetheme = globalsettings->GetNumSetting("ThemeQt");
+    context->ThemeWidget(this, screenwidth, screenheight, wmult, hmult);
 
-    if (usetheme)
-    {
-        bgcolor = QColor(globalsettings->GetSetting("BackgroundColor"));
-        fgcolor = QColor(globalsettings->GetSetting("ForegroundColor"));
-
-        QPixmap *bgpixmap = NULL;
-
-        if (globalsettings->GetSetting("BackgroundPixmap") != "")
-        {
-            QString pmapname = globalsettings->GetSetting("ThemePathName") +
-                               globalsettings->GetSetting("BackgroundPixmap");
-
-            bgpixmap = loadScalePixmap(pmapname, screenwidth, screenheight,
-                                       wmult, hmult);
-            setPaletteBackgroundPixmap(*bgpixmap);
-        } 
-        else if (globalsettings->GetSetting("TiledBackgroundPixmap") != "")
-        {
-            QString pmapname = globalsettings->GetSetting("ThemePathName") +
-                          globalsettings->GetSetting("TiledBackgroundPixmap");
-
-            bgpixmap = loadScalePixmap(pmapname, screenwidth, screenheight,
-                                       wmult, hmult);
-
-            QPixmap background(screenwidth, screenheight);
-            QPainter tmp(&background);
-    
-            tmp.drawTiledPixmap(0, 0, screenwidth, screenheight, *bgpixmap);
-            tmp.end();
-            setPaletteBackgroundPixmap(background);
-        }
-        else
-            setPalette(QPalette(bgcolor));
-
-        if (bgpixmap)
-            delete bgpixmap;
-    }
-    else
-    {
-        bgcolor = QColor("white");
-        fgcolor = QColor("black");
-        setPalette(QPalette(bgcolor));
-    }
-
+    fgcolor = paletteForegroundColor();
     highlightcolor = fgcolor;
 
-    m_font = new QFont("Arial", (int)(13 * hmult), QFont::Bold);
+    m_font = new QFont("Arial", (int)(context->GetSmallFontSize() * hmult), 
+                       QFont::Bold);
 
     thumbw = screenwidth / (THUMBS_W + 1);
     thumbh = screenheight / (THUMBS_H + 1);
@@ -122,6 +72,8 @@ IconView::~IconView()
             delete thumbs.back().pixmap;
         thumbs.pop_back();
     }
+
+    delete m_font;
 }
 
 void IconView::paintEvent(QPaintEvent *e)
@@ -332,12 +284,12 @@ void IconView::keyPressEvent(QKeyEvent *e)
 
             if (thumbs[pos].isdir)
             {
-                IconView iv(thumbs[pos].filename); 
+                IconView iv(m_context, thumbs[pos].filename); 
                 iv.exec();
             }
             else
             {
-                SingleView sv(&thumbs, pos);
+                SingleView sv(m_context, &thumbs, pos);
                 sv.exec();
             }
             handled = true;

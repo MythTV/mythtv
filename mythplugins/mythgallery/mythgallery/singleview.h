@@ -8,6 +8,7 @@
 class QImage;
 class QFont;
 class QTimer;
+class MythContext;
 
 #include "iconview.h"
 
@@ -15,8 +16,8 @@ class SingleView : public QDialog
 {
     Q_OBJECT
   public:
-    SingleView(vector<Thumbnail> *imagelist, int pos, QWidget *parent = 0,
-               const char *name = 0);
+    SingleView(MythContext *context, vector<Thumbnail> *imagelist, int pos, 
+               QWidget *parent = 0, const char *name = 0);
    ~SingleView();
 
   protected slots:
@@ -30,9 +31,7 @@ class SingleView : public QDialog
 
     QImage *image;
 
-    QColor bgcolor, fgcolor;
     int screenwidth, screenheight;
-
     float wmult, hmult;
 
     QFont *m_font;
@@ -45,6 +44,8 @@ class SingleView : public QDialog
     int timersecs;
 
     bool timerrunning;
+
+    MythContext *m_context;
 };
 
 #endif

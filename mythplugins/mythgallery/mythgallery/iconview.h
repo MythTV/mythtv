@@ -14,6 +14,8 @@ class QFont;
 #define THUMBS_W 3
 #define THUMBS_H 3
 
+class MythContext;
+
 class Thumbnail
 {
   public:
@@ -34,7 +36,7 @@ class IconView : public QDialog
 {
     Q_OBJECT
   public:
-    IconView(const QString &startdir, QWidget *parent = 0,
+    IconView(MythContext *context, const QString &startdir, QWidget *parent = 0,
              const char *name = 0);
    ~IconView();
 
@@ -51,7 +53,7 @@ class IconView : public QDialog
     int screenwidth, screenheight;
     float wmult, hmult;
 
-    QColor fgcolor, bgcolor;
+    QColor fgcolor;
     QColor highlightcolor;
 
     int thumbw, thumbh;
@@ -63,6 +65,8 @@ class IconView : public QDialog
     int currow, curcol;
 
     static QPixmap *foldericon;
+
+    MythContext *m_context;
 };
 
 #endif

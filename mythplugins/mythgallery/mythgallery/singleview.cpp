@@ -9,77 +9,25 @@
 
 #include "singleview.h"
 
-#include <mythtv/settings.h>
+#include <mythtv/mythcontext.h>
 
-extern Settings *globalsettings;
-
-SingleView::SingleView(vector<Thumbnail> *imagelist, int pos, QWidget *parent, 
-                       const char *name)
+SingleView::SingleView(MythContext *context, vector<Thumbnail> *imagelist, 
+                       int pos, QWidget *parent, const char *name)
 	  : QDialog(parent, name)
 {
-    screenheight = QApplication::desktop()->height();
-    screenwidth = QApplication::desktop()->width();
+    m_context = context;
 
-    if (globalsettings->GetNumSetting("GuiWidth") > 0)
-        screenwidth = globalsettings->GetNumSetting("GuiWidth");
-    if (globalsettings->GetNumSetting("GuiHeight") > 0)
-        screenheight = globalsettings->GetNumSetting("GuiHeight");
-
-    wmult = screenwidth / 800.0;
-    hmult = screenheight / 600.0;
+    context->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
 
     setGeometry(0, 0, screenwidth, screenheight);
     setFixedSize(QSize(screenwidth, screenheight));
 
     setCursor(QCursor(Qt::BlankCursor));
 
-    bool usetheme = globalsettings->GetNumSetting("ThemeQt");
+    context->ThemeWidget(this, screenwidth, screenheight, wmult, hmult);
 
-    if (usetheme)
-    {
-        bgcolor = QColor(globalsettings->GetSetting("BackgroundColor"));
-        fgcolor = QColor(globalsettings->GetSetting("ForegroundColor"));
-
-        QPixmap *bgpixmap = NULL;
-
-        if (globalsettings->GetSetting("BackgroundPixmap") != "")
-        {
-            QString pmapname = globalsettings->GetSetting("ThemePathName") +
-                               globalsettings->GetSetting("BackgroundPixmap");
-
-            bgpixmap = loadScalePixmap(pmapname, screenwidth, screenheight,
-                                       wmult, hmult);
-            setPaletteBackgroundPixmap(*bgpixmap);
-        }
-        else if (globalsettings->GetSetting("TiledBackgroundPixmap") != "")
-        { 
-            QString pmapname = globalsettings->GetSetting("ThemePathName") +
-                          globalsettings->GetSetting("TiledBackgroundPixmap");
-
-            bgpixmap = loadScalePixmap(pmapname, screenwidth, screenheight,
-                                       wmult, hmult);
-    
-            QPixmap background(screenwidth, screenheight);
-            QPainter tmp(&background);
-
-            tmp.drawTiledPixmap(0, 0, screenwidth, screenheight, *bgpixmap);
-            tmp.end();
-            setPaletteBackgroundPixmap(background);
-        }
-        else
-            setPalette(QPalette(bgcolor));
-
-        if (bgpixmap)
-            delete bgpixmap;
-    }   
-    else
-    {       
-        bgcolor = QColor("white");
-        fgcolor = QColor("black");
-        setPalette(QPalette(bgcolor));
-    }
-
-    m_font = new QFont("Arial", (int)(13 * hmult), QFont::Bold);
+    m_font = new QFont("Arial", (int)(context->GetSmallFontSize() * hmult), 
+                       QFont::Bold);
 
     images = imagelist;
     imagepos = pos;
@@ -88,7 +36,7 @@ SingleView::SingleView(vector<Thumbnail> *imagelist, int pos, QWidget *parent,
     image = NULL;
 
     timerrunning = false;
-    timersecs = globalsettings->GetNumSetting("SlideshowDelay");
+    timersecs = context->GetNumSetting("SlideshowDelay");
     if (!timersecs)
         timersecs = 5;
 
@@ -112,6 +60,8 @@ SingleView::~SingleView()
             usleep(50);
         delete timer;
     }
+
+    delete m_font;
 }
 
 void SingleView::paintEvent(QPaintEvent *e)
