@@ -1,5 +1,6 @@
 #include <qsqldatabase.h>
 #include <qfile.h>
+#include <cmath>
 #include <iostream>
 
 using namespace std;
