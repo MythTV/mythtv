@@ -76,6 +76,7 @@ int XVMC_VLD_field_start(MpegEncContext* s, AVCodecContext* avctx)
         break;
     case  P_TYPE:
         render->p_past_surface = findPastSurface(s, render);
+        render->p_future_surface = render->p_surface;	
         if (!render->p_past_surface)
             av_log(avctx, AV_LOG_ERROR, "error: decoding P frame and past frameis null!");
         break;
@@ -123,7 +124,7 @@ int XVMC_VLD_field_start(MpegEncContext* s, AVCodecContext* avctx)
 
     if (s->intra_vlc_format)
         binfo.flags |= XVMC_INTRA_VLC_FORMAT;
-    if (s->first_field)
+    if (!s->first_field && !s->progressive_sequence)
         binfo.flags |= XVMC_SECOND_FIELD;
     if (s->q_scale_type)
         binfo.flags |= XVMC_Q_SCALE_TYPE;
@@ -219,7 +220,8 @@ int XVMC_VLD_decode_slice(MpegEncContext* s, int mb_y, uint8_t* buffer, int buf_
 
     if (slicelen < 0)
     {
-        if (mb_y == s->mb_height - 1)
+        if ((mb_y == s->mb_height - 1) || 
+            (!s->progressive_sequence && (mb_y == ((s->mb_height >> 1) -1))))
             slicelen = buf_size;
         else
             return -1;
