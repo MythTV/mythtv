@@ -1687,7 +1687,7 @@ void TVRec::RequestRingBufferBlock(int size)
 
     bool locked = false;
     QTime curtime = QTime::currentTime();
-    curtime = curtime.addSecs(5);
+    curtime = curtime.addSecs(15);
 
     while (QTime::currentTime() < curtime)
     {
@@ -1708,13 +1708,11 @@ void TVRec::RequestRingBufferBlock(int size)
     pthread_mutex_unlock(&readthreadLock);
 
     curtime = QTime::currentTime();
-    curtime = curtime.addSecs(5);
+    curtime = curtime.addSecs(15);
 
     while (readrequest > 0 && readthreadlive)
     {
-        qApp->unlock();
         usleep(500);
-        qApp->lock();
 
         if (QTime::currentTime() > curtime)
         {
