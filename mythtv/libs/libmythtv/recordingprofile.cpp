@@ -623,6 +623,15 @@ public:
     };
 };
 
+class TranscodeResize: public CodecParam, public CheckBoxSetting {
+public:
+    TranscodeResize(const RecordingProfile& parent):
+        CodecParam(parent, "transcoderesize") {
+        setLabel(QObject::tr("Resize Video while transcoding"));
+        setValue(false);
+    };
+};
+
 class ImageSize: public HorizontalConfigurationGroup {
 public:
     class Width: public SpinBoxSetting, public CodecParam {
@@ -689,7 +698,20 @@ RecordingProfile::RecordingProfile(QString profName)
         labelName = profName + "->" + QObject::tr("Profile");
     profile->setLabel(labelName);
     profile->addChild(name = new Name(*this));
-    profile->addChild(new AutoTranscode(*this));
+
+    if (profName != NULL)
+    {
+        if (profName.left(11) == "Transcoders")
+            profile->addChild(new TranscodeResize(*this));
+        else
+            profile->addChild(new AutoTranscode(*this));
+    }
+    else
+    {
+        profile->addChild(new TranscodeResize(*this));
+        profile->addChild(new AutoTranscode(*this));
+    }
+
     addChild(profile);
 
     QString tvFormat = gContext->GetSetting("TVFormat");

@@ -3437,6 +3437,7 @@ void NuppelVideoPlayer::InitForTranscode(bool copyaudio, bool copyvideo)
         decoder->SetRawAudioState(true);
 
     decoder->setExactSeeks(true);
+    decoder->setLowBuffers();
 }
 
 bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm_iter,
@@ -3462,6 +3463,8 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm
                 msg += QString(" to %1").arg((int)dm_iter.key());
                 VERBOSE(VB_GENERAL, msg);
                 decoder->DoFastForward(dm_iter.key());
+                ClearAfterSeek();
+                decoder->GetFrame(0);
                 *did_ff = 1;
             }
             while((dm_iter.data() == 0) && (dm_iter != deleteMap.end()))

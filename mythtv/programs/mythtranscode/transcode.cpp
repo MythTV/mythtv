@@ -21,6 +21,10 @@ using namespace std;
 #include "mythcontext.h"
 #include "jobqueue.h"
 
+extern "C" {
+#include "../libavcodec/avcodec.h"
+}
+
 // This class is to act as a fake audio output device to store the data
 // for reencoding.
 
@@ -184,7 +188,6 @@ class AudioReencodeBuffer : public AudioOutput
         // Do nothing
         return MUTE_OFF;
     }
-    
 
     int bufsize;
     unsigned char *audiobuffer;
@@ -351,6 +354,8 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     int video_height = nvp->GetVideoHeight();
     float video_frame_rate = nvp->GetFrameRate();
     long long total_frame_count = nvp->GetTotalFrameCount();
+    int newWidth = video_width;
+    int newHeight = video_height;
 
     kfa_table = new QPtrList<struct kfatable_entry>;
 
@@ -367,8 +372,15 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
 
         // this is ripped from tv_rec SetupRecording. It'd be nice to merge
         nvr->SetOption("inpixfmt", FMT_YV12);
-        nvr->SetOption("width", video_width);
-        nvr->SetOption("height", video_height);
+
+        if (profile.byName("transcoderesize")->getValue().toInt())
+        {
+            newWidth = profile.byName("width")->getValue().toInt();
+            newHeight = profile.byName("height")->getValue().toInt();
+        }
+
+        nvr->SetOption("width", newWidth);
+        nvr->SetOption("height", newHeight);
 
         nvr->SetOption("tvformat", gContext->GetSetting("TVFormat"));
         nvr->SetOption("vbiformat", gContext->GetSetting("VbiFormat"));
@@ -426,7 +438,8 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     }
 
     if (vidsetting == encodingType && !framecontrol &&
-        fifodir == NULL && honorCutList)
+        fifodir == NULL && honorCutList &&
+        video_width == newWidth && video_height == newHeight)
     {
         copyvideo = true;
         VERBOSE(VB_GENERAL, "Reencoding video in 'raw' mode");
@@ -443,9 +456,9 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
 
     VideoFrame frame;
     frame.codec = FMT_YV12;
-    frame.width = video_width;
-    frame.height = video_height;
-    frame.size = video_width * video_height * 3 / 2;
+    frame.width = newWidth;
+    frame.height = newHeight;
+    frame.size = newWidth * newHeight * 3 / 2;
 
     if (fifodir != NULL)
     {
@@ -486,6 +499,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     long totalAudio = 0;
     int dropvideo = 0;
     long long lasttimecode = 0;
+    long long timecodeOffset = 0;
 
     float rateTimeConv = arb->eff_audiorate * arb->bytes_per_sample / 1000.0;
     float vidFrameTime = 1000.0 / video_frame_rate;
@@ -493,6 +507,17 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     VideoOutput *videoOutput = nvp->getVideoOutput();
     bool is_key = 0;
     bool first_loop = true;
+    unsigned char *newFrame = new unsigned char[newWidth * newHeight * 3 / 2];
+
+    frame.buf = newFrame;
+    AVPicture imageIn, imageOut;
+    ImgReSampleContext *scontext;
+
+    if (video_width != newWidth || video_height != newHeight)
+        VERBOSE(VB_GENERAL, QString("Resizing video from %1x%2 to %3x%4")
+                                    .arg(video_width).arg(video_height)
+                                    .arg(newWidth).arg(newHeight));
+
     while (nvp->TranscodeGetNextFrame(dm_iter, &did_ff, &is_key, honorCutList))
     {
         if (first_loop)
@@ -501,15 +526,15 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             first_loop = false;
         }
         VideoFrame *lastDecode = videoOutput->GetLastDecodedFrame();
-        frame.buf = lastDecode->buf;
+
         frame.timecode = lastDecode->timecode;
 
         if (frame.timecode < lasttimecode)
             frame.timecode = (long long)(lasttimecode + vidFrameTime);
-        lasttimecode = frame.timecode;
 
         if (fifow)
         {
+            frame.buf = lastDecode->buf;
             totalAudio += arb->audiobuffer_len;
             int audbufTime = (int)(totalAudio / rateTimeConv);
             int auddelta = arb->last_audiotime - audbufTime;
@@ -583,6 +608,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             videoOutput->DoneDisplayingFrame();
             audioOutput->Reset();
             nvp->FlushTxtBuffers();
+            lasttimecode = frame.timecode;
         }
         else if (copyaudio)
         {
@@ -592,6 +618,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             {
                 // The Raw state changed during decode.  This is not good
                 unlink(outputname);
+                delete newFrame;
                 return REENCODE_ERROR;
             }
 
@@ -628,28 +655,74 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                   did_ff = 2;
                   writekeyframe = true;
                 }
+
+                if ((video_width == newWidth) && (video_height == newHeight))
+                {
+                    frame.buf = lastDecode->buf;
+                }
+                else
+                {
+                    avpicture_fill(&imageIn, lastDecode->buf, PIX_FMT_YUV420P,
+                                   video_width, video_height);
+                    avpicture_fill(&imageOut, frame.buf, PIX_FMT_YUV420P,
+                                   newWidth, newHeight);
+                    scontext = img_resample_init(newWidth, newHeight,
+                                                 video_width, video_height);
+                    img_resample(scontext, &imageOut, &imageIn);
+                    img_resample_close(scontext);
+                }
+
                 nvr->WriteVideo(&frame, true, writekeyframe);
             }
             audioOutput->Reset();
             nvp->FlushTxtBuffers();
+            lasttimecode = frame.timecode;
         } 
         else 
         {
+            if (did_ff == 1)
+            {
+                did_ff = 2;
+                timecodeOffset +=
+                    (frame.timecode - lasttimecode - (int)vidFrameTime);
+            }
+
+            if ((video_width == newWidth) && (video_height == newHeight))
+            {
+                frame.buf = lastDecode->buf;
+            }
+            else
+            {
+                avpicture_fill(&imageIn, lastDecode->buf, PIX_FMT_YUV420P,
+                               video_width, video_height);
+                avpicture_fill(&imageOut, frame.buf, PIX_FMT_YUV420P,
+                               newWidth, newHeight);
+                scontext = img_resample_init(newWidth, newHeight,
+                                             video_width, video_height);
+                img_resample(scontext, &imageOut, &imageIn);
+                img_resample_close(scontext);
+            }
+
             // audio is fully decoded, so we need to reencode it
             audioframesize = arb->audiobuffer_len;
             if (audioframesize > 0)
             {
                 nvr->SetOption("audioframesize", audioframesize);
                 int starttime = audioOutput->GetAudiotime();
-                nvr->WriteAudio(arb->audiobuffer, audioFrame++, starttime);
+                nvr->WriteAudio(arb->audiobuffer, audioFrame++,
+                                starttime - timecodeOffset);
                 if (nvr->IsErrored()) {
                     VERBOSE(VB_IMPORTANT, "Transcode: Encountered "
                             "irrecoverable error in NVR::WriteAudio");
+                    delete newFrame;
                     return REENCODE_ERROR;
                 }
                 arb->audiobuffer_len = 0;
             }
             nvp->TranscodeWriteText(&TranscodeWriteText, (void *)(nvr));
+
+            lasttimecode = frame.timecode;
+            frame.timecode -= timecodeOffset;
 
             if (forceKeyFrames)
                 nvr->WriteVideo(&frame, true, true);
@@ -670,6 +743,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                 m_proginfo->CheckMarkupFlag(MARK_UPDATED_CUT, m_db)) 
             {
                 unlink(outputname);
+                delete newFrame;
                 return REENCODE_CUTLIST_CHANGE;
             }
 
@@ -678,6 +752,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                 if (JobQueue::GetJobCmd(m_db, jobID) == JOB_STOP)
                 {
                     unlink(outputname);
+                    delete newFrame;
                     return REENCODE_STOPPED;
                 }
                 int percentage = curFrameNum * 100 / total_frame_count;
@@ -701,6 +776,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     } else {
         fifow->FIFODrain();
     }
+    delete newFrame;
     return REENCODE_OK;
 }
 
