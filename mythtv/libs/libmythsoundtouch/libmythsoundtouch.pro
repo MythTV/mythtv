@@ -16,6 +16,9 @@ include ( ../../config.mak )
 
 INCLUDEPATH += ../../ 
 
+QMAKE_CXXFLAGS_RELEASE += -fPIC -DPIC
+QMAKE_CXXFLAGS_DEBUG   += -fPIC -DPIC
+
 # Input
 HEADERS += AAFilter.h
 HEADERS += cpu_detect.h
