@@ -2,6 +2,7 @@
 
 #include "globalsettings.h"
 #include "scheduledrecording.h"
+#include <qstylefactory.h>
 #include <qsqldatabase.h>
 #include <qfile.h>
 #include <qdialog.h>
@@ -1240,6 +1241,34 @@ ThemeSelector::ThemeSelector():
     }
 }
 
+class StyleSetting: public ComboBoxSetting, public GlobalSetting {
+public:
+    StyleSetting():
+        GlobalSetting("Style") {
+        setLabel(QObject::tr("Qt Style"));
+        fillSelections();
+        setHelpText("This setting will change the qt widget style on startup, "
+                    "if this setting is set to anything other than 'Desktop "
+                    "Style'. Setting this setting to 'Desktop Style' will have "
+                    "no effect on the currently running MythTV session.");
+    };
+
+    void fillSelections(void) {
+        clearSelections();
+        addSelection(QObject::tr("Desktop Style"), "");
+        QStyleFactory factory;
+        QStringList list = factory.keys();
+        QStringList::iterator iter = list.begin();
+        for (; iter != list.end(); iter++ )
+            addSelection(*iter);
+    };
+
+    void load(QSqlDatabase *db) {
+        fillSelections();
+        GlobalSetting::load(db);
+    };
+};
+
 class DisplayChanNum: public CheckBoxSetting, public GlobalSetting {
 public:
     DisplayChanNum():
@@ -2245,6 +2274,7 @@ AppearanceSettings::AppearanceSettings()
     theme->setLabel(QObject::tr("Theme"));
 
     theme->addChild(new ThemeSelector());
+    theme->addChild(new StyleSetting());
     theme->addChild(new ThemeFontSizeType());
     theme->addChild(new RandomTheme());
     theme->addChild(new MenuTheme());    

@@ -383,6 +383,10 @@ void MythContext::LoadQtConfig(void)
 
     d->m_qtThemeSettings = new Settings;
 
+    QString style = GetSetting("Style", "");
+    if (style != "")
+        qApp->setStyle(style);
+
     QString themename = GetSetting("Theme");
     QString themedir = FindThemeDir(themename);
     

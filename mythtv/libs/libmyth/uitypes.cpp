@@ -1051,10 +1051,12 @@ void UIListType::Draw(QPainter *dr, int drawlayer, int context)
         QPoint fontdrop = tmpfont->shadowOffset;
 
         dr->setFont(tmpfont->face);
-        dr->drawPixmap(m_area.left() + m_selection_loc.x(),
-                       m_area.top() + m_selection_loc.y() + 
-                       (int)(m_current * m_selheight),
-                       m_selection);
+
+        if (m_active == true)
+            dr->drawPixmap(m_area.left() + m_selection_loc.x(),
+                           m_area.top() + m_selection_loc.y() + 
+                           (int)(m_current * m_selheight),
+                           m_selection);
 
         left = m_area.left();
         for (int j = 1; j <= m_columns; j++)
