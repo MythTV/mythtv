@@ -1225,9 +1225,15 @@ void MythContext::DBError(const QString &where, const QSqlQuery& query)
         cerr << "DB Error (" << where << "):" << endl;
     }
 
+#if QT_VERSION >= 0x030200
     cerr << "Query was:" << endl
+         << query.executedQuery() << endl
+         << DBErrorMessage(query.lastError()) << endl;
+#else
+    cerr << "Query was:" << endl;
          << query.lastQuery() << endl
          << DBErrorMessage(query.lastError()) << endl;
+#endif
 }
 
 QString MythContext::DBErrorMessage(const QSqlError& err)

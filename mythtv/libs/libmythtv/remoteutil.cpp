@@ -87,8 +87,10 @@ bool RemoteGetUptime(time_t &uptime)
         uptime = strlist[0].toUInt();
     else if (sizeof(time_t) == sizeof(long))
         uptime = strlist[0].toULong();
+#if QT_VERSION >= 0x030200
     else if (sizeof(time_t) == sizeof(long long))
         uptime = strlist[0].toULongLong();
+#endif
 
     return false;
 }

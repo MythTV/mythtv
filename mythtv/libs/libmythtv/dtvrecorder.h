@@ -30,7 +30,7 @@ class DTVRecorder: public RecorderBase
     {
         RecorderBase::SetOption(opt, value);
     }
-    void SetOption(const QString &name, int value);
+    virtual void SetOption(const QString &name, int value);
 
     virtual void StopRecording(void) { _request_recording = false; }
     bool IsRecording(void) { return _recording; }

@@ -140,7 +140,7 @@ void DVBRecorder::SetOptionsFromProfile(RecordingProfile*,
                                         const QString&, const QString&, int)
 {
     SetOption("cardnum", videodev.toInt());
-    SetOption("tvformat", gContext->GetSetting("TVFormat"));
+    DTVRecorder::SetOption("tvformat", gContext->GetSetting("TVFormat"));
 }
 
 void DVBRecorder::ChannelChanged(dvb_channel_t& chan)
