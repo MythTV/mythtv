@@ -15,7 +15,7 @@ class Metadata
              QString ltitle = "", int lyear = 0, QString linetref = "", 
              QString ldirector = "", QString lplot = "", 
              float luserrating = 0.0, QString lrating = "", int llength = 0, 
-             int lid = 0, int lshowlevel = 1, unsigned int lchildID = 0,
+             int lid = 0, int lshowlevel = 1, int lchildID = -1,
              bool lbrowse = true, QString lplaycommand = "")
     {
         filename = lfilename;
@@ -83,7 +83,7 @@ class Metadata
     unsigned int ID() { return id; }
     void setID(int lid) { id = lid; }
 
-    unsigned int ChildID() { return childID; }
+    int ChildID() { return childID; }
     void setChildID(int lchildID) { childID = lchildID; }
     
     bool Browse() {return browse; }
@@ -114,7 +114,7 @@ class Metadata
     QString director;
     QString plot;
     QString rating;
-    unsigned int childID;
+    int childID;
     int year;
     float userrating;
     int length;
