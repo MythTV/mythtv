@@ -664,8 +664,9 @@ void MythContext::LCDsetLevels(int numb_levels, float *levels)
     lcd_device->setLevels(numb_levels, levels);
 }
 
-void MythContext::LCDswitchToChannel(QString channum, QString title, 
-                                     QString subtitle)
+void MythContext::LCDswitchToChannel(QString channum = "", 
+                                     QString title = "", 
+                                     QString subtitle = "")
 {
     lcd_device->switchToChannel(channum, title, subtitle);
 }
@@ -685,3 +686,9 @@ void MythContext::LCDpopMenu(QString menu_choice, QString menu_title)
     lcd_device->popMenu(menu_choice, menu_title);
 }
 
+void MythContext::LCDdestroy()
+{
+    lcd_device->shutdown();
+    delete lcd_device;
+    lcd_device = NULL;
+}

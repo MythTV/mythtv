@@ -42,6 +42,7 @@ LCD::LCD()
 	scrollingText = "";
 	progress = 0.0;
 	connected = FALSE;
+	send_buffer = "";
 
 	timeTimer = new QTimer(this);
 	connect(timeTimer, SIGNAL(timeout()), this, SLOT(outputTime()));	
@@ -118,6 +119,16 @@ void LCD::sendToServer(QString someText)
 		//
 
 		os << someText << "\n";
+	}
+	else
+	{
+	    //  Buffer this up in the hope that
+	    //  the connection will open soon
+	    //
+	    //  I wonder how large a QString can get?
+
+	    send_buffer += someText;
+	    send_buffer += "\n";
 	}
 #else
 	someText = someText;
@@ -296,6 +307,16 @@ void LCD::init()
 	
 	
 	switchToTime();	// clock is on by default
+	
+	//
+	//  send buffer if there's anything in there
+	//
+	
+	if(send_buffer.length() > 0)
+	{
+	    sendToServer(send_buffer);
+	    send_buffer = "";
+	}
 }
 
 void LCD::setWidth(unsigned int x)
@@ -694,7 +715,7 @@ void LCD::switchToMusic(QString artist, QString track)
 	startMusic(artist, track);
 }
 
-void LCD::switchToChannel(QString channum, QString title, QString subtitle)
+void LCD::switchToChannel(QString channum = "", QString title = "", QString subtitle = "")
 {
 	stopAll();
 	startChannel(channum, title, subtitle);
@@ -705,14 +726,48 @@ void LCD::switchToNothing()
 	stopAll();
 }
 
+void LCD::shutdown()
+{
+#ifdef LCD_DEVICE
+
+	stopAll();
+
+    //
+    //  Remove all the widgets and screens for
+    //  a clean exit from the server
+    //
+    
+    sendToServer("widget_del Channel progressBar");
+    sendToServer("widget_del Channel topWidget");
+    sendToServer("screen_del Channel");
+
+    QString aString;
+    for(int i = 0 ; i < 10; i++)
+    {
+        aString = QString("widget_del Music vbar%1").arg(i);
+        sendToServer(aString);
+    }
+    sendToServer("widget_del Music topWidget");
+    sendToServer("screen_del Music");
+    
+    sendToServer("widget_del Menu menuWidget");
+    sendToServer("widget_del Menu topWidget");
+    sendToServer("screen_del Menu");
+
+    sendToServer("widget_del Time timeWidget");
+    sendToServer("widget_del Time topWidget");
+    sendToServer("screen_del Time");
+    
+	socket->close();
+
+#endif
+    connected = false;
+}
+
 LCD::~LCD()
 {
 #ifdef LCD_DEVICE_DEBUG
     cout << "lcddevice: An LCD device is being snuffed out of existence (~LCD() was called)" << endl ;
-#endif
-	stopAll();
-#ifdef LCD_DEVICE
-	socket->close();
 #endif
     if(socket)
     {

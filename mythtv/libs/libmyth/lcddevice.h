@@ -84,7 +84,7 @@ class LCD : public QObject
 				//	mythlcd for an example)
 				//
 				
-		void	switchToChannel(QString channum, QString title, QString subtitle);
+		void	switchToChannel(QString channum = "", QString title = "", QString subtitle = "");
 
 				//
 				//	While watching Live/Recording/Pause Buffer, 
@@ -116,6 +116,13 @@ class LCD : public QObject
 				
 		void	popMenu(QString menu_item, QString menu_title); 
 
+                //
+                //  If you want to be pleasant, call shutdown()
+                //  before deleting your LCD device
+                //
+                
+        void    shutdown();             //  close communications
+    
 
 	private slots:
 	
@@ -128,7 +135,7 @@ class LCD : public QObject
 
 		void	scrollText();			//	Scroll the topline text
 		void	beginScrollingText();	//	But only after a bit of time has gone by
-		void	unPopMenu();			//	If no actiivty, remove the Pop Menu display
+		void	unPopMenu();			//	If no activity, remove the Pop Menu display
 		
 	private:
 	
@@ -171,6 +178,8 @@ class LCD : public QObject
 		unsigned int	scrollPosition;
 		
 		bool	connected;
+		
+		QString send_buffer;
 
 };
 

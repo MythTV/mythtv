@@ -105,10 +105,11 @@ class MythContext : public QObject
     void LCDswitchToTime();
     void LCDswitchToMusic(QString artist, QString track);
     void LCDsetLevels(int numb_levels, float *levels);
-    void LCDswitchToChannel(QString channum, QString title, QString subtitle);
+    void LCDswitchToChannel(QString channum = "", QString title = "", QString subtitle = "");
     void LCDsetChannelProgress(float percentViewed);
     void LCDswitchToNothing();
     void LCDpopMenu(QString menu_choice, QString menu_title);
+    void LCDdestroy();
 	
   private slots:
     void readSocket();

@@ -867,8 +867,10 @@ MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)
     steps = totalSteps / 1000;
     if (steps == 0)
         steps = 1;
+  
 
     Show();
+    gContext->LCDswitchToChannel(message);
 
     qApp->processEvents();
 
@@ -878,10 +880,12 @@ MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)
 void MythProgressDialog::Close(void)
 {
     accept();
+    gContext->LCDswitchToTime();
 }
 
 void MythProgressDialog::setProgress(int curprogress)
 {
+    gContext->LCDsetChannelProgress( (curprogress + 0.0) / (steps * 1000.0));
     progress->setProgress(curprogress);
     if (curprogress % steps == 0)
         qApp->processEvents();
