@@ -1,0 +1,3 @@
+#!/bin/bash
+export QTDIR=/usr/lib/qt3
+/usr/local/bin/mythfilldatabase
