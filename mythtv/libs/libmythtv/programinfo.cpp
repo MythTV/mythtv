@@ -2014,14 +2014,15 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
 
     if (recendts > now)
     {
-        if (rectype != kSingleRecord &&
-            recstatus == rsWillRecord)
+        if (rectype != kSingleRecord && rectype != kOverrideRecord)
         {
             diag.AddButton(QObject::tr("Don't record"));
             addov = button++;
             if (rectype != kFindOneRecord &&
-                (((dupmethod & kDupCheckSub)  && (subtitle != "")) ||
-                 ((dupmethod & kDupCheckDesc) && (description != ""))))
+                !programid.contains(QRegExp("^SH.*0000$")) &&
+                ((!(dupmethod & kDupCheckNone) && programid != "") ||
+                 ((dupmethod & kDupCheckSub) && subtitle != "") ||
+                 ((dupmethod & kDupCheckDesc) && description != "")))
             {
                 diag.AddButton(QObject::tr("Never record"));
                 forget = button++;
@@ -2058,7 +2059,7 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
         ApplyRecordStateChange(db, kDontRecord);
     else if (ret == forget)
     {
-        ApplyRecordStateChange(db, kDontRecord);
+        GetProgramRecordingStatus(db);
         record->addHistory(db, *this);
     }
     else if (ret == clearov)
@@ -2117,7 +2118,7 @@ void ProgramInfo::handleNotRecording(QSqlDatabase *db)
 
     DialogBox diag(gContext->GetMainWindow(), message);
     int button = 1, ok = -1, react = -1, addov = -1, clearov = -1,
-        ednorm = -1, edcust = -1;
+        ednorm = -1, edcust = -1, forget = -1;
 
     diag.AddButton(QObject::tr("OK"));
     ok = button++;
@@ -2145,6 +2146,11 @@ void ProgramInfo::handleNotRecording(QSqlDatabase *db)
         {
             diag.AddButton(QObject::tr("Record anyway"));
             addov = button++;
+            if (recstatus == rsPreviousRecording)
+            {
+                diag.AddButton(QObject::tr("Forget Previous"));
+                forget = button++;
+            }
         }
 
         if (rectype != kOverrideRecord && rectype != kDontRecord)
@@ -2178,6 +2184,11 @@ void ProgramInfo::handleNotRecording(QSqlDatabase *db)
         ApplyRecordStateChange(db, kOverrideRecord);
         if (recstartts < now)
             RemoteReactivateRecording(this);
+    }
+    else if (ret == forget)
+    {
+        GetProgramRecordingStatus(db);
+        record->forgetHistory(db, *this);
     }
     else if (ret == clearov)
         ApplyRecordStateChange(db, kNotRecording);

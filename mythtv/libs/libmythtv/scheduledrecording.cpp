@@ -452,10 +452,14 @@ void ScheduledRecording::forgetHistory(QSqlDatabase* db,
     sqlsubtitle.replace(QRegExp("'"), QString("\\'"));
     sqldescription.replace(QRegExp("'"), QString("\\'"));
 
-    QString query = QString("DELETE FROM oldrecorded WHERE title = '%1' AND subtitle = '%2' AND description = '%3'")
+    QString query = QString("DELETE FROM oldrecorded WHERE title = '%1' AND "
+                            "((subtitle = '%2' AND description = '%3') OR "
+                            "(programid <> '' AND programid = '%4'))")
         .arg(sqltitle.utf8()) 
         .arg(sqlsubtitle.utf8())
-        .arg(sqldescription.utf8());
+        .arg(sqldescription.utf8())
+        .arg(proginfo.programid);
+    
     QSqlQuery result = db->exec(query);
     if (!result.isActive())
     {
