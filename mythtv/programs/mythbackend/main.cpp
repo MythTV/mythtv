@@ -51,7 +51,9 @@ bool setupTVs(bool ismaster)
                    "WHERE record.station='' "
                    "AND record.chanid=channel.chanid;");
         query.exec("UPDATE recordoverride,channel "
-                   "SET recordoverride.station=channel.callsign "
+                   "SET recordoverride.station=channel.callsign, "
+                   "    recordoverride.starttime=recordoverride.starttime, "
+                   "    recordoverride.endtime=recordoverride.endtime "
                    "WHERE recordoverride.station='' "
                    "AND recordoverride.chanid=channel.chanid;");
     }
