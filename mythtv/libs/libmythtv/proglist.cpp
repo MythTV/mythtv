@@ -569,9 +569,8 @@ void ProgLister::fillViewList(const QString &view)
     if (type == plChannel) // list by channel
     {
         QString querystr = "SELECT channel.chanid, channel.channum, "
-            "channel.callsign, IF(channel.callsign IS NOT NULL AND "
-            "channel.callsign <> '',channel.callsign,channel.chanid) "
-            "AS uniquesign FROM channel GROUP BY channum,uniquesign "
+            "channel.callsign FROM channel WHERE channel.visible = 1 "
+            "GROUP BY channum, callsign "
             "ORDER BY " + channelOrdering + ";";
         QSqlQuery query;
         query.exec(querystr);
@@ -677,10 +676,11 @@ void ProgLister::fillItemList(void)
 
     if (type == plTitle) // per title listings
     {
-        where = QString("WHERE program.title = \"%1\" "
+        where = QString("WHERE channel.visible = 1 "
+                        "AND program.title = \"%1\" "
                         "AND program.endtime > %2 "
                         "AND program.chanid = channel.chanid "
-                        "GROUP BY starttime,endtime,channum,uniquesign "
+                        "GROUP BY starttime,endtime,channum,callsign "
                         "ORDER BY program.starttime,%3;")
                         .arg(viewList[curView].utf8())
                         .arg(startTime.toString("yyyyMMddhhmm50"))
@@ -689,7 +689,8 @@ void ProgLister::fillItemList(void)
     else if (type == plNewListings) // what's new list
     {
         where = QString("LEFT JOIN oldprogram ON title=oldtitle "
-                        "WHERE oldtitle IS NULL AND program.endtime > %1 "
+                        "WHERE channel.visible = 1 "
+                        "AND oldtitle IS NULL AND program.endtime > %1 "
                         "AND program.chanid = channel.chanid "
                         "AND ( program.airdate = 0 OR "
                         "program.airdate >= YEAR(NOW() - INTERVAL 1 YEAR)) "
@@ -698,10 +699,11 @@ void ProgLister::fillItemList(void)
     }
     else if (type == plTitleSearch) // keyword search
     {
-        where = QString("WHERE program.title LIKE \"\%%1\%\" "
+        where = QString("WHERE channel.visible = 1 "
+                        "AND program.title LIKE \"\%%1\%\" "
                         "AND program.endtime > %2 "
                         "AND program.chanid = channel.chanid "
-                        "GROUP BY starttime,endtime,channum,uniquesign "
+                        "GROUP BY starttime,endtime,channum,callsign "
                         "ORDER BY program.starttime,%3 "
                         "LIMIT 500;")
                         .arg(viewList[curView].utf8())
@@ -710,12 +712,13 @@ void ProgLister::fillItemList(void)
     }
     else if (type == plDescSearch) // description search
     {
-        where = QString("WHERE (program.title LIKE \"\%%1\%\" "
+        where = QString("WHERE channel.visible = 1 "
+                        "AND (program.title LIKE \"\%%1\%\" "
                         "OR program.subtitle LIKE \"\%%2\%\" "
                         "OR program.description LIKE \"\%%3\%\") "
                         "AND program.endtime > %4 "
                         "AND program.chanid = channel.chanid "
-                        "GROUP BY starttime,endtime,channum,uniquesign "
+                        "GROUP BY starttime,endtime,channum,callsign "
                         "ORDER BY program.starttime,%5 "
                         "LIMIT 500;")
                         .arg(viewList[curView].utf8()).arg(viewList[curView].utf8()).arg(viewList[curView].utf8())
@@ -724,7 +727,8 @@ void ProgLister::fillItemList(void)
     }
     else if (type == plChannel) // list by channel
     {
-        where = QString("WHERE channel.chanid = \"%1\" "
+        where = QString("WHERE channel.visible = 1 "
+                        "AND channel.chanid = \"%1\" "
                         "AND program.endtime > %2 "
                         "AND program.chanid = channel.chanid "
                         "ORDER BY program.starttime;")
@@ -733,10 +737,11 @@ void ProgLister::fillItemList(void)
     }
     else if (type == plCategory) // list by category
     {
-        where = QString("WHERE program.category = \"\%1\" "
+        where = QString("WHERE channel.visible = 1 "
+                        "AND program.category = \"\%1\" "
                         "AND program.endtime > %2 "
                         "AND program.chanid = channel.chanid "
-                        "GROUP BY starttime,endtime,channum,uniquesign "
+                        "GROUP BY starttime,endtime,channum,callsign "
                         "ORDER BY program.starttime,%3 "
                         "LIMIT 500;")
                         .arg(viewList[curView].utf8())
@@ -745,10 +750,11 @@ void ProgLister::fillItemList(void)
     }
     else if (type == plMovies) // list movies
     {
-        where = QString("WHERE program.category_type LIKE \"\%%1\%\" "
+        where = QString("WHERE channel.visible = 1 "
+                        "AND program.category_type LIKE \"\%%1\%\" "
                         "AND program.endtime > %2 "
                         "AND program.chanid = channel.chanid "
-                        "GROUP BY starttime,endtime,channum,uniquesign "
+                        "GROUP BY starttime,endtime,channum,callsign "
                         "ORDER BY program.starttime,%3 "
                         "LIMIT 500;")
                         .arg(tr("Movie").utf8())

@@ -494,12 +494,10 @@ void GuideGrid::fillChannelInfos(int &maxchannel, bool gotostartchannel)
     QSqlQuery query;
 
     QString queryall = "SELECT channel.channum, channel.callsign, "
-                       "channel.icon, channel.chanid, favorites.favid, "
-                       "IF(callsign IS NOT NULL AND callsign <> '',"
-                       "  callsign,channel.chanid) AS uniquesign "
+                       "channel.icon, channel.chanid, favorites.favid "
                        "FROM channel LEFT JOIN favorites ON "
                        "favorites.chanid = channel.chanid WHERE visible = 1 "
-                       "GROUP BY channum,uniquesign "
+                       "GROUP BY channum, callsign "
                        "ORDER BY " + channelOrdering + ";";
 
     if (showFavorites)

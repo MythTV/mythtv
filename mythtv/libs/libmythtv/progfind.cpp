@@ -1254,14 +1254,12 @@ void ProgFinder::selectShowData(QString progTitle)
     QSqlQuery query(QString::null, m_db);
     query.prepare("SELECT subtitle,starttime,channel.channum,"
                   "channel.callsign,description,endtime,channel.chanid,"
-                  "channel.sourceid,"
-                  "IF(channel.callsign IS NOT NULL AND channel.callsign <> '',"
-                  "  channel.callsign,channel.chanid) AS uniquesign "
+                  "channel.sourceid "
                   "FROM program,channel "
                   "WHERE program.title = :TITLE AND "
                   "program.chanid = channel.chanid "
                   "AND program.starttime > :STARTTIME "
-                  "GROUP BY starttime,endtime,channum,uniquesign "
+                  "GROUP BY starttime,endtime,channum,callsign "
                   "ORDER BY starttime," +
                   gContext->GetSetting("ChannelOrdering", "channum + 0") +";");
     query.bindValue(":TITLE", progTitle.utf8());
