@@ -640,9 +640,17 @@ void DaapInstance::processResponse(DaapResponse *daap_response)
     
     std::vector<char> *daap_payload = daap_response->getPayload();
     u8 *daap_payload_u8 = new u8[daap_payload->size()];
-    for(uint i = 0; i < daap_payload->size(); i++)
+
+    std::vector<char>::iterator iter;
+    int i = 0;
+    for(
+        iter = daap_payload->begin() ;
+        iter != daap_payload->end() ;
+        ++iter
+       )
     {
-        daap_payload_u8[i] = daap_payload->at(i);
+        daap_payload_u8[i] = (*iter);
+        ++i;
     }
 
     Chunk raw_dmap_data(daap_payload_u8, daap_payload->size());
