@@ -18,7 +18,7 @@ bool WriteStringList(QSocket *socket, QStringList &list)
 
     socket->writeBlock((const char *)&size, sizeof(int));
 
-    while (written < size)
+    while (size > 0)
     {
         int temp = socket->writeBlock(utf8.data() + written, size);
         written += temp;
@@ -27,7 +27,10 @@ bool WriteStringList(QSocket *socket, QStringList &list)
             qApp->processEvents();
     }
 
-    socket->flush();
+    qApp->lock();
+    if (socket->bytesToWrite() > 0)
+        socket->flush();
+    qApp->unlock();
 
     return true;
 }
@@ -47,7 +50,7 @@ bool ReadStringList(QSocket *socket, QStringList &list)
     QCString utf8(size + 1);
 
     int read = 0;
-    while (read < size)
+    while (size > 0)
     {
         int temp = socket->readBlock(utf8.data() + read, size);
         read += temp;
@@ -68,7 +71,7 @@ void WriteBlock(QSocket *socket, void *data, int len)
     int size = len;
     int written = 0;
 
-    while (written < size)
+    while (size > 0)
     {
         int temp = socket->writeBlock((char *)data + written, size);
         written += temp;
@@ -88,7 +91,7 @@ int ReadBlock(QSocket *socket, void *data, int maxlen)
 {
     int read = 0;
     int size = maxlen;
-    while (read < size)
+    while (size > 0)
     {
         int temp = socket->readBlock((char *)data + read, size);
         read += temp;
