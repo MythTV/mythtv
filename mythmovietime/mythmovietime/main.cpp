@@ -27,11 +27,12 @@
 #include <mythtv/mythdialogs.h>
 #include <mythtv/mythplugin.h>
 
-
-
+#include "mainwnd.h"
 
 
 using namespace std;
+
+
 
 extern "C" {
 int mythplugin_init(const char *libversion);
@@ -63,7 +64,11 @@ int mythplugin_init(const char *libversion)
 
 void runMovietime(void)
 {
-    
+    MMTMainWindow mainWnd(gContext->GetMainWindow(),
+                          "movietime_main", "movietime-", "movietime main");
+    qApp->unlock();
+    mainWnd.exec();
+    qApp->lock();    
 }
 
 int mythplugin_run(void)

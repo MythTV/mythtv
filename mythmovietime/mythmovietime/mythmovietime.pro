@@ -10,13 +10,17 @@ CONFIG += plugin thread warn_on debug
 
 TARGET = mythmovietime
 
+HEADERS += mainwnd.h mtdbitem.h
+SOURCES += main.cpp mainwnd.cpp mtdbitem.cpp
 
-SOURCES += main.cpp
 
 target.path = $${PREFIX}/lib/mythtv/plugins
-INSTALLS += target
 
 uifiles.path = $${PREFIX}/share/mythtv/themes/default
+uifiles.files = movietime-ui.xml
+
+INSTALLS += target uifiles
+
 
 macx{
   QMAKE_LFLAGS += -flat_namespace -undefined suppress
