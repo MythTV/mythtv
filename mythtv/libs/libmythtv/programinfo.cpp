@@ -1737,7 +1737,12 @@ void ProgramInfo::EditScheduled(QSqlDatabase *db)
 
 void ProgramInfo::handleRecording(QSqlDatabase *db)
 {
-    QString message = "This showing will be recorded.";
+    QString message = title;
+
+    if (subtitle != "")
+        message += QString(" - \"%1\"").arg(subtitle);
+
+    message += "\n\nThis showing will be recorded.";
 
     DialogBox diag(gContext->GetMainWindow(), QObject::tr(message));
     diag.AddButton(QObject::tr("OK"));
@@ -1764,7 +1769,12 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
 
 void ProgramInfo::handleNotRecording(QSqlDatabase *db)
 {
-    QString message = QString("This showing will not be recorded because %1.")
+    QString message = title;
+
+    if (subtitle != "")
+        message += QString(" - \"%1\"").arg(subtitle);
+
+    message += QString("\n\nThis showing will not be recorded because %1.")
         .arg(NoRecordText());
 
     DialogBox diag(gContext->GetMainWindow(), QObject::tr(message));
