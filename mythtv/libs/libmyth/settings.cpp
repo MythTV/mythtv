@@ -545,11 +545,12 @@ void SimpleDBStorage::load(QSqlDatabase* db) {
     if (query.isActive() && query.numRowsAffected() > 0) {
         query.next();
         QString result = query.value(0).toString();
-        if (result != QString::null)
+        if (result != QString::null) {
           setValue(result);
-    }
-    setUnchanged();
-}
+          setUnchanged();
+        }
+   }
+ }
 
 void SimpleDBStorage::save(QSqlDatabase* db) {
     if (!isChanged())
