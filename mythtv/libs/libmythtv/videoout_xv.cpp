@@ -849,6 +849,7 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType t)
         }
 
         int src_x = imgx, src_y = imgy, src_w = imgw, src_h = imgh;
+        int dest_y = dispyoff;
 
         if (m_deinterlacing)
         {
@@ -865,11 +866,12 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType t)
                 // Show bottom field
                 src_y = (buffer->height + imgy) / 2;
                 src_h = imgh / 2;
+                dest_y++;
             }
         }
 
         XvShmPutImage(data->XJ_disp, xv_port, data->XJ_curwin, data->XJ_gc,
-                      image, src_x, src_y, src_w, src_h, dispxoff, dispyoff,
+                      image, src_x, src_y, src_w, src_h, dispxoff, dest_y,
                       dispwoff, disphoff, False);
 
         pthread_mutex_unlock(&lock);

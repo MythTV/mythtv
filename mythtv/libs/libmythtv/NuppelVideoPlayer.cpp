@@ -1423,12 +1423,13 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             videoOutput->ProcessFrame(NULL, osd, videoFilters, pipplayer);
             videofiltersLock.unlock();
 
-            videoOutput->PrepareFrame(NULL, kScan_Ignore); 
-            videoOutput->Show(m_scan);
-            videosync->Start();
+            videoOutput->PrepareFrame(NULL, kScan_Ignore);
 
             //printf("video waiting for unpause\n");
             usleep(frame_interval);
+
+            videoOutput->Show(m_scan);
+            videosync->Start();
             continue;
         }
         video_actually_paused = false;
