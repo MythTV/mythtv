@@ -2,6 +2,7 @@
 #include <qpixmap.h>
 #include <qimage.h>
 #include <qstring.h>
+#include <qfile.h>
 #include <qsqlquery.h>
 #include <qapplication.h>
 
@@ -16,6 +17,12 @@ void ChannelInfo::LoadIcon(int size)
 
     if (tempimage.width() == 0)
     {
+        QFile existtest(iconpath);
+
+        // we have the file, just couldn't load it.
+        if (existtest.exists())
+            return;
+
         QString url = gContext->GetMasterHostPrefix();
         if (url.length() < 1)
             return;
