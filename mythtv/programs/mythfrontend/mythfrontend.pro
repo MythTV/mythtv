@@ -24,11 +24,11 @@ TARGETDEPS += ../libavcodec/libavcodec.a
 
 # Input
 HEADERS += ../mythepg/guidegrid.h ../mythepg/infodialog.h 
-HEADERS += ../mythepg/infostructs.h ../mythdialog/dialogbox.h menubox.h 
+HEADERS += ../mythepg/infostructs.h ../mythdialog/dialogbox.h 
 HEADERS += scheduler.h playbackbox.h deletebox.h programlistitem.h 
 HEADERS += viewscheduled.h themedmenu.h
 
 SOURCES += ../mythepg/guidegrid.cpp ../mythepg/infodialog.cpp 
 SOURCES += ../mythepg/infostructs.cpp ../mythdialog/dialogbox.cpp main.cpp 
-SOURCES += menubox.cpp scheduler.cpp playbackbox.cpp deletebox.cpp 
+SOURCES += scheduler.cpp playbackbox.cpp deletebox.cpp 
 SOURCES += programlistitem.cpp viewscheduled.cpp themedmenu.cpp
