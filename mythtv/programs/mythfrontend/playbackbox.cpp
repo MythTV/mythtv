@@ -447,10 +447,14 @@ void PlaybackBox::updateGroupInfo(QPainter *p, QRect& pr, QPixmap& pix, QString 
         {
            countInGroup = progLists[""].count(); 
            infoMap["title"] = groupDisplayName;
+           infoMap["group"] = groupDisplayName;
+           infoMap["show"] = QObject::tr("All Programs");
         }
         else
         {                  
             countInGroup = progLists[titleList[titleIndex]].count();
+            infoMap["group"] = groupDisplayName;
+            infoMap["show"] = titleList[titleIndex];
             infoMap["title"] = QString("%1 - %2").arg(groupDisplayName)
                                                  .arg(titleList[titleIndex]);
         }
