@@ -102,6 +102,7 @@ avfDecoder::avfDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     output_at = 0;
 
     ic = NULL;
+    oc = NULL;
     ifmt = NULL;
     ap = &params;
     pkt = &pkt1;
@@ -113,8 +114,10 @@ avfDecoder::~avfDecoder(void)
         deinit();
 
     if (output_buf)
+    {
         delete [] output_buf;
-    output_buf = 0;
+        output_buf = NULL;
+    }
 }
 
 void avfDecoder::stop()
@@ -243,9 +246,13 @@ bool avfDecoder::initialize()
     totalTime = (ic->duration / AV_TIME_BASE) * 1000;
 
     if (output())
-    // Do I need to modify this?
-        output()->configure(44100, 2, 16, 44100 * 2 * 16);
-
+    {
+        output()->configure(audio_dec->sample_rate, 
+                            audio_dec->channels, 
+                            16, 
+                            audio_dec->sample_rate * 
+                            audio_dec->channels * 16);
+    }
     inited = TRUE;
     return TRUE;
 }
@@ -265,9 +272,16 @@ void avfDecoder::deinit()
     setOutput(0);
 
     // Cleanup here
-    av_close_input_file(ic);
-
-    ic = NULL;
+    if(ic)
+    {
+        av_close_input_file(ic);
+        ic = NULL;
+    }
+    if(oc)
+    {
+        av_free(oc);
+        oc = NULL;
+    }
 }
 
 void avfDecoder::run()
@@ -442,6 +456,8 @@ Metadata* avfDecoder::getMetadata(QSqlDatabase *x)
                                      year, tracknum, length);
 
     retdata->dumpToDatabase(x, musiclocation);
+
+    
     av_close_input_file(ic);
 
     ic = NULL;
