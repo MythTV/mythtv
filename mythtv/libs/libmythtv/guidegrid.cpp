@@ -174,6 +174,10 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
     container = theme->GetSet("chanbar");
 
     int dNum = gContext->GetNumSetting("chanPerPage", 8);
+
+    if (m_player && m_player->IsRunning() && allowsecondaryepg)
+        dNum = dNum * 2 / 3 + 1;
+
     desiredDisplayChans = DISPLAY_CHANS = dNum;
     if (container)
     {
