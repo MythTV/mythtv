@@ -639,7 +639,6 @@ ProgramInfo *Scheduler::GetBest(ProgramInfo *info,
     {
         ProgramInfo *test = (*i);
         ScheduledRecording::RecordingType testtype = test->GetProgramRecordingStatus(db);
-        cerr << (int)type << " vs. " << (int)testtype << endl;
         if (testtype < type)
         {
             best = test;
