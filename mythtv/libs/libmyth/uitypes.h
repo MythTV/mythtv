@@ -128,6 +128,7 @@ class UIListType : public UIType
     void EnableForcedColor(int num, QString color) { forceColors[num] = color; }
 
     int GetItems() { return m_count; }
+    QString GetItemText(int, int col = 1);
     void ResetList() { listData.clear(); forceColors.clear(); 
                        m_current = -1; m_columns = 0; }
  
@@ -172,6 +173,8 @@ class UIImageType : public UIType
     void SetOrder(int order) { m_order = order; }
     void SetFlex(bool flex) { m_flex = flex; }
     void SetImage(QString file) { m_filename = file; }
+    void SetSize(int x, int y) { m_force_x = x; m_force_y = y; }
+    void SetSkip(int x, int y) { m_drop_x = x; m_drop_y = y; }
 
     void LoadImage();
     QPixmap GetImage() { return img; }
@@ -183,6 +186,10 @@ class UIImageType : public UIType
     QString m_filename;
     bool m_isvalid;
     bool m_flex;
+    int m_drop_x;
+    int m_drop_y;
+    int m_force_x;
+    int m_force_y;
     QPixmap img;
 
 };

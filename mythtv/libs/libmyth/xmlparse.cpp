@@ -20,18 +20,24 @@ XMLParse::~XMLParse()
     }
 }
 
-bool XMLParse::LoadTheme(QDomElement &ele, QString winName)
+bool XMLParse::LoadTheme(QDomElement &ele, QString winName, QString specialfile)
 {
     QString themepath = gContext->FindThemeDir("") + gContext->GetSetting("Theme");
-    QString themefile = themepath + "/ui.xml";
+    QString themefile = themepath + "/" + specialfile + "ui.xml";
 
     QDomDocument doc;
     QFile f(themefile);
 
     if (!f.open(IO_ReadOnly))
     {
-        cerr << "Can't open: " << themefile << endl;
-        return false;
+        themepath = gContext->FindThemeDir("") + "default/";
+        themefile = themepath + "/" + specialfile + "ui.xml";
+        f.setName(themefile);
+        if (!f.open(IO_ReadOnly))
+        {
+            cerr << "Can't open: " << themefile << endl;
+            return false;
+        }
     }
 
     QString errorMsg;
@@ -206,6 +212,7 @@ void XMLParse::parseImage(LayerSet *container, QDomElement &element)
     QPoint pos = QPoint(0, 0);
 
     QPoint scale = QPoint(-1, -1);
+    QPoint skipin = QPoint(0, 0);
 
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
@@ -231,6 +238,10 @@ void XMLParse::parseImage(LayerSet *container, QDomElement &element)
             {
                 scale = parsePoint(getFirstText(info));
             }
+            else if (info.tagName() == "skipin")
+            {
+                skipin = parsePoint(getFirstText(info));
+            }
             else
             {
                 cerr << "Unknown: " << info.tagName() << " in image\n";
@@ -241,6 +252,9 @@ void XMLParse::parseImage(LayerSet *container, QDomElement &element)
 
     UIImageType *image = new UIImageType(name, filename, order.toInt(), pos);
     image->SetScreen(wmult, hmult);
+    if (scale.x() != -1 || scale.y() != -1)
+        image->SetSize(scale.x(), scale.y());
+    image->SetSkip(skipin.x(), skipin.y());
     QString flex = element.attribute("fleximage", "");
     if (!flex.isNull() && !flex.isEmpty())
     {
@@ -441,7 +455,7 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
     fontProp *testfont = GetFont(font);
     if (!testfont)
     {
-        cerr << "Unknown font: " << font << " in listarea: " << name << endl;
+        cerr << "Unknown font: " << font << " in textarea: " << name << endl;
         exit(0);
     }
 

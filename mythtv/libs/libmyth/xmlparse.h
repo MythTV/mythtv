@@ -20,7 +20,7 @@ class XMLParse
     void SetWMult(double wm) { wmult = wm; }
     void SetHMult(double hm) { hmult = hm; }
 
-    bool LoadTheme(QDomElement &, QString);
+    bool LoadTheme(QDomElement &, QString, QString sf = "");
     QString getFirstText(QDomElement &);
     void parseFont(QDomElement &);
     void normalizeRect(QRect &);

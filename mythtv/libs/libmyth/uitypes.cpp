@@ -307,6 +307,13 @@ void UIListType::SetItemText(int num, int column, QString data)
     listData[(int)(num + (int)(column * 100))] = data;
 }
 
+QString UIListType::GetItemText(int num, int column)
+{
+    QString ret;
+    ret = listData[(int)(num + (int)(column * 100))];
+    return ret;
+}
+
 void UIListType::SetItemText(int num, QString data)
 {
     m_columns = 1;
@@ -321,6 +328,10 @@ UIImageType::UIImageType(const QString &name, const QString &filename, int dorde
     m_filename = filename;
     m_displaypos = displaypos;
     m_order = dorder;
+    m_force_x = -1;
+    m_force_y = -1;
+    m_drop_x = 0;
+    m_drop_y = 0;
 }
 
 UIImageType::~UIImageType()
@@ -350,8 +361,14 @@ void UIImageType::LoadImage()
         file = themeDir + m_filename;
     else
         file = baseDir + m_filename;
+    checkFile.setName(file);
+    if (!checkFile.exists())
+        file = "/tmp/" + m_filename;
 
-    if (m_hmult == 1 && m_wmult == 1)
+    if (m_debug == true)
+        cerr << "     -Filename: " << file << endl;
+
+    if (m_hmult == 1 && m_wmult == 1 && m_force_x == -1 && m_force_y == -1)
     {
         img.load(file);
     }
@@ -361,8 +378,21 @@ void UIImageType::LoadImage()
         if (sourceImg->load(file))
         {
             QImage scalerImg;
-            scalerImg = sourceImg->smoothScale((int)(sourceImg->width() * m_wmult),
-                                               (int)(sourceImg->height() * m_hmult));
+            int doX = sourceImg->width();
+            int doY = sourceImg->height();
+            if (m_force_x != -1)
+            {
+                doX = m_force_x;
+                cerr << "         +Force X: " << doX << endl;
+            }
+            if (m_force_y != -1)
+            {
+                doY = m_force_y;
+                cerr << "         +Force Y: " << doY << endl;
+            }
+
+            scalerImg = sourceImg->smoothScale((int)(doX * m_wmult),
+                                               (int)(doY * m_hmult));
             img.convertFromImage(scalerImg);
             if (m_debug == true)
                     cerr << "     -Image: " << file << " loaded.\n";
@@ -383,8 +413,9 @@ void UIImageType::Draw(QPainter *dr, int drawlayer, int context)
         {
             cerr << "   +UIImageType::Draw() <- inside Layer\n";
             cerr << "       -Drawing @ (" << m_displaypos.x() << ", " << m_displaypos.y() << ")" << endl;
+            cerr << "       -Skip Section: (" << m_drop_x << ", " << m_drop_y << ")\n";
         }
-        dr->drawPixmap(m_displaypos, img);
+        dr->drawPixmap(m_displaypos.x(), m_displaypos.y(), img, m_drop_x, m_drop_y);
     }
     else
         if (m_debug == true)
