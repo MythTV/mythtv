@@ -15,6 +15,7 @@ using namespace std;
 enum ManagedListItemStates{MLS_NORMAL, MLS_BOLD, MLS_USER};
 
 class ManagedList;
+class ManagedListGroup;
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -27,7 +28,8 @@ class ManagedListItem : public QObject
     Q_OBJECT
 
     public:
-        ManagedListItem(const QString& startingText = "", ManagedList* _parentList=NULL, QObject* _parent=NULL, const char* _name=0);
+        ManagedListItem(const QString& startingText = "", ManagedList* _parentList=NULL,
+                        QObject* _parent=NULL, const char* _name=0);
 
         virtual bool hasLeft(){ return false; }
         virtual bool hasRight(){ return false; }
@@ -55,6 +57,7 @@ class ManagedListItem : public QObject
         virtual void cursorRight(bool) { selected(); }
         virtual void select() { selected(); }
         virtual void gotFocus() {}
+        virtual void slotGuiActivate(ManagedListGroup*) {};
 
     signals:
         void selected(ManagedListItem*);
@@ -171,8 +174,8 @@ class ManagedListGroup : public ManagedListItem
     Q_OBJECT
 
     public:
-        ManagedListGroup(const QString& txt, ManagedListGroup* pGroup, ManagedList* parentList=NULL, QObject* _parent=NULL,
-                         const char* _name=0);
+        ManagedListGroup(const QString& txt, ManagedListGroup* pGroup, ManagedList* parentList=NULL,
+                         QObject* _parent=NULL, const char* _name=0);
 
         const QPtrList<ManagedListItem>* getItems() const { return &itemList;}
         bool addItem(ManagedListItem* item, int where = -1);
@@ -209,7 +212,7 @@ class ManagedListGroup : public ManagedListItem
 
     public slots:
         virtual void doGoBack();
-
+        virtual void slotGuiActivate(ManagedListGroup*);
     signals:
         void goingBack();
         void wentBack();
@@ -322,12 +325,15 @@ class BoolManagedListItem : public SelectManagedListItem
     public slots:
         virtual void cursorLeft(bool) { if (enabled) setValue(!boolValue()); }
         virtual void cursorRight(bool) { if (enabled) setValue(!boolValue()); }
+        virtual void slotGuiActivate(ManagedListGroup*) { generateList(); }
 
     protected:
+        void generateList();
         void setText(const QString& newText) { text = newText; emit(changed(this)); }
         QString trueLabel;
         QString falseLabel;
         bool initialValue;
+        bool listBuilt;
 };
 
 
@@ -366,6 +372,7 @@ class BoundedIntegerManagedListItem : public SelectManagedListItem
     public slots:
         virtual void cursorLeft(bool page = false) { if (enabled) changeValue(page ? (0 - bigStep) : (0 - step)); }
         virtual void cursorRight(bool page = false) { if (enabled) changeValue(page ? bigStep : step); }
+        virtual void slotGuiActivate(ManagedListGroup*) { generateList(); }
 
     protected:
         void generateList();
@@ -380,6 +387,7 @@ class BoundedIntegerManagedListItem : public SelectManagedListItem
     protected:
         int maxVal;
         int minVal;
+        bool listBuilt;
 };
 
 
@@ -403,6 +411,7 @@ class ManagedListSetting: public SimpleDBStorage
 
 
     public:
+
         virtual void load(QSqlDatabase* db) {
             SimpleDBStorage::load(db);
             syncItemFromDB();
@@ -556,14 +565,14 @@ class IntegerManagedListSetting : public ManagedListSetting
 
         operator IntegerManagedListItem* () { return IntegerListItem; }
 
-        void setTemplates(const QString& negStr, const QString& negOneStr, const QString& zeroStr, const QString& oneStr,
-                          const QString& posStr)
+        void setTemplates(const QString& negStr, const QString& negOneStr, const QString& zeroStr,
+                          const QString& oneStr, const QString& posStr)
         {
             IntegerListItem->setTemplates(negStr, negOneStr, zeroStr, oneStr, posStr);
         }
 
-        void setShortTemplates(const QString& negStr, const QString& negOneStr, const QString& zeroStr, const QString& oneStr,
-                          const QString& posStr)
+        void setShortTemplates(const QString& negStr, const QString& negOneStr, const QString& zeroStr,
+                               const QString& oneStr, const QString& posStr)
         {
             IntegerListItem->setShortTemplates(negStr, negOneStr, zeroStr, oneStr, posStr);
         }

@@ -40,17 +40,25 @@ BoolManagedListItem::BoolManagedListItem(bool _initialValue, ManagedListGroup* p
                    : SelectManagedListItem("", pGroup, pList, _parent, _name)
 {
     initialValue = _initialValue;
-
+    listBuilt = false;
 }
 
-void BoolManagedListItem::setLabels(const QString& trueLbl, const QString& falseLbl)
+void BoolManagedListItem::setLabels(const QString& _trueLabel, const QString& _falseLabel)
 {
-    addSelection(trueLbl, "1", false);
-    addSelection(falseLbl, "0", false);
-
-    trueLabel = trueLbl;
-    falseLabel = falseLbl;
+    trueLabel = _trueLabel;
+    falseLabel = _falseLabel;
     setValue(initialValue);
+}
+
+void BoolManagedListItem::generateList()
+{
+    if (!listBuilt)
+    {
+        addSelection(trueLabel, "1", false);
+        addSelection(falseLabel, "0", false);
+        listBuilt = true;
+        selectValue(valueText);
+    }
 }
 
 
@@ -150,6 +158,7 @@ BoundedIntegerManagedListItem::BoundedIntegerManagedListItem(int _minVal, int _m
     bigStep = _bigStep;
     minVal = _minVal;
     maxVal = _maxVal;
+    listBuilt = false;
 //    setValue(0);
 }
 
@@ -178,9 +187,14 @@ void BoundedIntegerManagedListItem::setValue(int val)
 
 void BoundedIntegerManagedListItem::generateList()
 {
-    for (int i = minVal; i <= maxVal; i++)
+    if (!listBuilt)
     {
-        addSelection( numericToString(i), QString::number(i), false);
+        for (int i = minVal; i <= maxVal; i++)
+        {
+            addSelection( numericToString(i), QString::number(i), false);
+        }
+
+        listBuilt = true;
     }
 
 }
@@ -219,8 +233,8 @@ QString BoundedIntegerManagedListItem::numericToString(int v)
 // ManagedListGroup
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ManagedListGroup::ManagedListGroup(const QString& txt, ManagedListGroup* pGroup, ManagedList* pList, QObject* _parent,
-                                   const char* _name)
+ManagedListGroup::ManagedListGroup(const QString& txt, ManagedListGroup* pGroup, ManagedList* pList,
+                                   QObject* _parent, const char* _name)
                 : ManagedListItem(txt, pList, _parent, _name)
 {
     parentGroup = pGroup;
@@ -239,6 +253,18 @@ ManagedListGroup::ManagedListGroup(const QString& txt, ManagedListGroup* pGroup,
     curItem = 0;
     itemCount = 0;
 
+}
+
+void ManagedListGroup::slotGuiActivate(ManagedListGroup* _group)
+{
+    if (_group != this)
+        return;
+
+    ManagedListItem* item = NULL;
+    for (item = itemList.first(); item; item = itemList.next())
+    {
+        item->slotGuiActivate(_group);
+    }
 }
 
 void ManagedListGroup::setCurIndex(int newVal)
@@ -760,6 +786,7 @@ bool ManagedList::init(XMLParse *themeIn, const QString& containerNameIn, const 
 
 void ManagedList::setCurGroup(ManagedListGroup* newGroup)
 {
+    newGroup->slotGuiActivate(newGroup);
     curGroup = newGroup;
     getParent()->update(listRect);
 }
