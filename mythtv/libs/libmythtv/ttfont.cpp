@@ -259,12 +259,15 @@ void TTFFont::render_text(Raster_Map *rmap, Raster_Map *rchr,
        // Blit-or the resulting small pixmap into the biggest one
        // We do that by hand, and provide also clipping.
 
+#if 0
+// Kerning isn't available everywhere...
        if (use_kerning && previous && j)
        {
            FT_Vector delta;
            FT_Get_Kerning(face, previous, j, FT_KERNING_DEFAULT, &delta);
            x_offset += delta.x >> 6;
        }
+#endif
 
        xmin = (xmin >> 6) + x_offset;
        ymin = (ymin >> 6) + y_offset;
