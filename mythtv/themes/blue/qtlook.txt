@@ -95,19 +95,3 @@ str curProg_dsColor=#000000
 str curProg_fgColor=#eefb92
 str misChanIcon_bgColor=#000000
 str misChanIcon_fgColor=#ffffff
-
-str progressRecForeground=#ff3333
-str sideSelectForeground=#ffffff
-str sideUnSelectForeground=#9999cc
-str selectedForeground=#ffff33
-str titleForeground=#ffffff
-str titleDropshadow=#000000
-str dataForeground=#ffffff
-str dataDropshadow=#000000
-str infoForeground=#ffffff
-str infoDropshadow=#000000
-str baseForeground=#ffffff
-str baseDropshadow=#000000
-str popupBackground=background
-str popupHighlight=#ffff33
-
