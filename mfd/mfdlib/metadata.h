@@ -10,7 +10,8 @@
 
 */
 
-
+#include <inttypes.h>
+        
 #include <qstring.h>
 #include <qurl.h>
 #include <qdatetime.h>
@@ -101,9 +102,11 @@ class Metadata
 
     int           getSize(){ return size;}
     void          setSize(int lsize){size = lsize;}
-    
 
-    
+    QString       getMythDigest(){ return myth_digest;}
+    void          setMythDigest(const QString &new_digest){ myth_digest = new_digest; }
+    bool          hasMythDigest(){ if(myth_digest.length() > 0){ return true ; } return false; }
+
   protected:
 
     int             collection_id;
@@ -121,6 +124,8 @@ class Metadata
     QString         description;
     QString         comment;
     int             size;
+    QString         myth_digest;
+
 
 };
 

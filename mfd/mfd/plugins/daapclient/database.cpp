@@ -1349,6 +1349,12 @@ void Database::doTheMetadataSwap()
                                             playlist_additions,
                                             playlist_deletions
                                          );
+        
+        //
+        //  The swap (above) returns these NULL in any case, but can't hurt
+        //  to be redundant
+        //
+
         new_metadata = NULL;
         new_playlists = NULL;
 
@@ -1434,6 +1440,11 @@ void Database::doTheMetadataSwap()
                                             playlist_additions,
                                             playlist_deletions
                                          );
+
+        //
+        //  The delta (above) returns these NULL already
+        //
+
         new_metadata = NULL;
         new_playlists = NULL;
 
@@ -1487,8 +1498,6 @@ Database::~Database()
             
     metadata_server->deleteContainer(container_id);    
     
-/*    
-    
     if(new_metadata)
     {
         delete new_metadata;
@@ -1499,6 +1508,6 @@ Database::~Database()
         delete new_playlists;
         new_playlists = NULL;
     }
-*/
+
 }
 

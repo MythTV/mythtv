@@ -198,7 +198,7 @@ void MetadataContainer::dataDelta(
         }
     }
 
-    delete new_metadata;
+    new_metadata = NULL;
 
     if(current_playlists)
     {
@@ -206,6 +206,7 @@ void MetadataContainer::dataDelta(
     }
 
     current_playlists = new_playlists;
+    new_playlists = NULL;
 
     //
     //  NB: these are QDeepCopy variables, so this object now has its own

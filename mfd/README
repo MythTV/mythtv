@@ -40,6 +40,8 @@ manually copy mp4ff_int_types.h from faad2/common/mp4ff/ to your
 
     This is fairly annoying, but not insurmountable.            
 
+    Also required is openssl (for generating unique identifiers for content
+files). This should be included with just about any Linux distribution.
 
 INFORMATION FOR DEVELOPERS
 --------------------------

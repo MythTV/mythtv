@@ -419,19 +419,27 @@ void MetadataServer::deleteContainer(int container_id)
         last_destroyed_container = target->getIdentifier();
 
         last_destroyed_metadata.clear();
-        QIntDictIterator<Metadata> iter(*(target->getMetadata()));
-        for (; iter.current(); ++iter)
+        QIntDict<Metadata> *last_metadata = target->getMetadata();
+        if(last_metadata)
         {
-            int an_integer = iter.currentKey();
-            last_destroyed_metadata.push_back(an_integer);
+            QIntDictIterator<Metadata> iter(*last_metadata);
+            for (; iter.current(); ++iter)
+            {
+                int an_integer = iter.currentKey();
+                last_destroyed_metadata.push_back(an_integer);
+            }
         }
             
         last_destroyed_playlists.clear();
-        QIntDictIterator<Playlist> oiter(*(target->getPlaylists()));
-        for (; oiter.current(); ++oiter)
+        QIntDict<Playlist> *last_playlists = target->getPlaylists();
+        if(last_playlists)
         {
-            int an_integer = oiter.currentKey();
-            last_destroyed_playlists.push_back(an_integer);
+            QIntDictIterator<Playlist> oiter(*last_playlists);
+            for (; oiter.current(); ++oiter)
+            {
+                int an_integer = oiter.currentKey();
+                last_destroyed_playlists.push_back(an_integer);
+            }
         }
 
         last_destroyed_mutex.unlock();
@@ -541,6 +549,9 @@ void MetadataServer::doAtomicDataSwap(
                                     playlist_additions,
                                     playlist_deletions
                                     );
+                                    
+                    new_metadata = NULL;
+                    new_playlists = NULL;
 
                     log(QString("container %1 swapped in new data: "
                                 "%2 items (+%3/-%4) and "
@@ -551,7 +562,7 @@ void MetadataServer::doAtomicDataSwap(
                                 .arg(metadata_additions.count())
                                 .arg(metadata_deletions.count())
                                 
-                                .arg(new_playlists->count())
+                                .arg(target->getPlaylistCount())
                                 .arg(playlist_additions.count())
                                 .arg(playlist_deletions.count())
                                 ,4);
@@ -636,6 +647,9 @@ void MetadataServer::doAtomicDataDelta(
                                     playlist_additions,
                                     playlist_deletions
                                     );
+                                   
+                    new_metadata = NULL;
+                    new_playlists = NULL;
 
                     log(QString("container %1 did delta of new data: "
                                 "%2 items (+%3/-%4) and "

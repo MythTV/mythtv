@@ -18,7 +18,7 @@
 #include "mfd_events.h"
 #include "settings.h"
 #include "decoder.h"
-
+#include "mythdigest.h"
 
 
 MMusicWatcher::MMusicWatcher(MFD *owner, int identity)
@@ -612,7 +612,6 @@ bool MMusicWatcher::sweepMetadata()
     }
 
     return doDeltas();
-
 }
 
 void MMusicWatcher::prepareNewData()
@@ -813,11 +812,13 @@ void MMusicWatcher::buildFileList(QString &directory, MusicLoadedMap &music_file
             if(
                 fi->extension(FALSE) == "ogg"  ||
                 fi->extension(FALSE) == "flac" ||
-                fi->extension(FALSE) == "mp3"  ||
 #ifdef WMA_AUDIO_SUPPORT
                 fi->extension(FALSE) == "wma"  ||
 #endif
-                fi->extension(FALSE) == "m4a"
+#ifdef AAC_AUDIO_SUPPORT
+                fi->extension(FALSE) == "m4a"  ||
+#endif
+                fi->extension(FALSE) == "mp3" 
               )
             {
                 music_files[filename] = MFL_on_file_system;

@@ -36,11 +36,11 @@ SOURCES += flacdecoder.cpp cddecoder.cpp
 HEADERS += metadata.h   mdcontainer.h   settings.h
 SOURCES += metadata.cpp mdcontainer.cpp settings.cpp
 
-HEADERS += avfdecoder.h   wavdecoder.h   aacdecoder.h
-SOURCES += avfdecoder.cpp wavdecoder.cpp aacdecoder.cpp
+HEADERS += avfdecoder.h   wavdecoder.h   aacdecoder.h   mythdigest.h
+SOURCES += avfdecoder.cpp wavdecoder.cpp aacdecoder.cpp mythdigest.cpp
 
 LIBS += -logg -lvorbisfile -lvorbis  -lmad -lid3tag -lcdaudio \
-        -lFLAC -lcdda_interface -lcdda_paranoia
+        -lFLAC -lcdda_interface -lcdda_paranoia -lssl
 
 !isEmpty(USE_AAC_AUDIO) {
 LIBS += -lfaad -lmp4ff

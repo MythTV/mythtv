@@ -11,7 +11,10 @@
 #include <iostream>
 using namespace std;
 
+#include <openssl/evp.h>
+
 #include <qstringlist.h>
+#include <qfile.h>
 
 #include "metadata.h"
 
@@ -42,6 +45,7 @@ Metadata::Metadata(
     description = "";
     comment = "";
     size = -1;    
+    myth_digest = "";
 }
 
 void Metadata::setRating(int l_rating)
