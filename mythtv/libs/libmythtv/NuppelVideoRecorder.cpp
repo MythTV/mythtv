@@ -2792,7 +2792,6 @@ void NuppelVideoRecorder::WriteVideo(Frame *frame, bool skipsync, bool forcekey)
         ringBuffer->Write(&frameheader, FRAMEHEADERSIZE);
 
         wantkeyframe = true;
-        sync();
 
         if ((curRecording) &&
             ((positionMap.size() % 15) == 0))

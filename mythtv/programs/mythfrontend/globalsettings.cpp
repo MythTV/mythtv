@@ -377,6 +377,17 @@ public:
     };
 };
 
+class ExperimentalSync: public CheckBoxSetting, public GlobalSetting {
+public:
+    ExperimentalSync():
+        GlobalSetting("ExperimentalAVSync") {
+        setLabel("Experimental A/V Sync");
+        setValue(false);
+        setHelpText("If this is set, more experimental code will be in charge "
+                    "of video output.  Use at your own risk.");
+    };
+};
+
 class AggressiveBuffer: public CheckBoxSetting, public GlobalSetting {
 public:
     AggressiveBuffer():
@@ -827,6 +838,7 @@ PlaybackSettings::PlaybackSettings()
     general->setLabel("General playback");
     general->addChild(new Deinterlace());
     general->addChild(new ReduceJitter());
+    general->addChild(new ExperimentalSync());
     general->addChild(new PlaybackExitPrompt());
     general->addChild(new EndOfRecordingExitPrompt());
     general->addChild(new FixedAspectRatio());

@@ -1148,48 +1148,8 @@ void NuppelVideoPlayer::ShowText(void)
     }
 }
 
-void NuppelVideoPlayer::OutputVideoLoop(void)
+void NuppelVideoPlayer::InitExAVSync(void)
 {
-    int laudiotime;
-    int delay;
-    int avsync_delay = 0;
-    int avsync_avg = 0;
-
-    int refreshrate = 0;
-
-    bool lastsync = false;
-
-    bool hasvsync = false;
-    bool hasvgasync = false;
-
-    struct timeval nexttrigger;
-
-    bool reducejitter = gContext->GetNumSetting("ReduceJitter", 0);
-
-    // Jitterometer *output_jmeter = new Jitterometer("video_output", 100);
-
-    if (!disablevideo)
-    {
-        eventvalid = true;
-    }
-
-    int frame_interval = (int)(1000000.0/video_frame_rate);
-
-    refreshrate = frame_interval;
-
-    Frame frame;
-    
-    frame.codec = CODEC_YUV;
-    frame.width = video_width;
-    frame.height = video_height;
-    frame.bpp = -1;
-    frame.frameNumber = framesPlayed;
-
-    int pause_rpos = 0;
-    unsigned char *pause_buf = new unsigned char[video_size];
-
-    gettimeofday(&nexttrigger, NULL);
-
     QString timing_type = "next trigger";
 
     if (reducejitter && !disablevideo)
@@ -1203,7 +1163,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             if ( ret == 1 )
                 timing_type = "nVidia polling";
             /*
-            // not yet tested
+             // not yet tested
             else if ( ret == 2 )
                 timing_type = "DRM vblank";
             */
@@ -1212,9 +1172,9 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         // not yet implemented
         else if (vgasync_init(0) == 1)
         {
-            hasvgasync = true;
+             hasvgasync = true;
 
-            timing_type = "VGA refresh";
+             timing_type = "VGA refresh";
         }
         */
         else
@@ -1231,9 +1191,293 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         refreshrate = videoOutput->GetRefreshRate();
         if (refreshrate <= 0)
             refreshrate = frame_interval;
-        cout << "Refresh rate: " << refreshrate << ", frame interval: " 
+        cout << "Refresh rate: " << refreshrate << ", frame interval: "
              << frame_interval << endl;
     }
+}
+
+void NuppelVideoPlayer::ExAVSync(void)
+{
+    if (disablevideo)
+    {
+        delay = UpdateDelay(&nexttrigger);
+        if (delay > 0)
+            usleep(delay);
+    }
+    else
+    {
+        // if we get here, we're actually going to do video output
+        videoOutput->PrepareFrame(vbuffer[rpos], video_width, video_height);
+
+        delay = UpdateDelay(&nexttrigger);
+
+        if (hasvsync)
+        {
+            while (delay > 0)
+            {
+                vsync_wait_for_retrace();
+                delay = UpdateDelay(&nexttrigger);
+            }
+
+            videoOutput->Show();
+
+            // reset the clock if delay and refresh are too close
+            if (delay > -1000 && !lastsync)
+            {
+                nexttrigger.tv_usec += 2000;
+                NormalizeTimeval(&nexttrigger);
+            }
+        }
+        else
+        {
+            // If delay is sometwhat more than a frame or < 0ms,
+            // we clip it to these amounts and reset nexttrigger
+            if ( delay > frame_interval * 2)
+            {
+                // cerr << "Delaying to next trigger: " << delay << endl;
+                usleep(frame_interval);
+                delay = 0;
+                avsync_avg = 0;
+                gettimeofday(&nexttrigger, NULL);
+            }
+            else if (delay < 0 - frame_interval)
+            {
+                // cerr << "clipped negative delay " << delay << endl;
+                delay = 0;
+                avsync_avg = 0;
+                gettimeofday(&nexttrigger, NULL);
+            }
+
+            if (reducejitter)
+                ReduceJitter(&nexttrigger);
+            else
+            {
+                if (delay > 0)
+                    usleep(delay);
+            }
+
+            videoOutput->Show();
+        }
+    }
+
+    if (output_jmeter && output_jmeter->RecordCycleTime())
+        cout << avsync_delay  / 1000 << endl;
+
+    /* The value of nexttrigger is perfect -- we calculated it to
+       be exactly one frame time after the previous frame,
+       Show frames at the frame rate as long as audio is in sync */
+
+    nexttrigger.tv_usec += frame_interval;
+
+    if (audiofd > 0)
+    {
+        lastaudiotime = GetAudiotime(); // ms, same scale as timecodes
+
+        if (lastaudiotime != 0) // lastaudiotime = 0 after a seek
+        {
+            /* The time at the start of this frame (ie, now) is
+               given by timecodes[rpos] */
+
+            avsync_delay = (timecodes[rpos] - lastaudiotime) * 1000; // uSecs
+
+            avsync_avg = (avsync_delay + (avsync_avg * 3)) / 4;
+
+            /* If the audio time codes and video diverge, shift
+               the video by one interlaced field (1/2 frame) */
+
+            if (!lastsync)
+            {
+                if (avsync_avg > frame_interval * 3 / 2)
+                {
+                    nexttrigger.tv_usec += refreshrate;
+                    //cerr << "added field: " << timecodes[rpos] << " "
+                    //     << avsync_avg << " " << avsync_delay << endl;
+                    lastsync = true;
+                }
+                else if (avsync_avg < 0 - frame_interval * 3 / 2)
+                {
+                    nexttrigger.tv_usec -= refreshrate;
+                    //cerr << "dropped field: " << timecodes[rpos] << " "
+                    //     << avsync_avg << " " << avsync_delay << endl;
+                    lastsync = true;
+                }
+            }
+            else
+                lastsync = false;
+        }
+        else
+            avsync_avg = 0;
+    }
+}
+
+void NuppelVideoPlayer::ShutdownExAVSync(void)
+{
+    if (hasvsync)
+        vsync_shutdown();
+
+    if (hasvgasync)
+        vgasync_cleanup();
+}
+
+void NuppelVideoPlayer::OldAVSync(void)
+{
+    /* if we get here, we're actually going to do video output */
+
+    // calculate 'delay', that we need to get from 'now' to 'nexttrigger'
+    gettimeofday(&now, NULL);
+
+    delay = (nexttrigger.tv_sec - now.tv_sec) * 1000000 +
+            (nexttrigger.tv_usec - now.tv_usec); // uSecs
+
+    if (reducejitter)
+    {
+        /* If delay is sometwhat more than a frame or < 0ms,
+           we clip it to these amounts and reset nexttrigger */
+        if ( delay > frame_interval )
+        {
+            // cerr << "Delaying to next trigger: " << delay << endl;
+            delay = frame_interval;
+            usleep(delay);
+
+            gettimeofday(&nexttrigger, NULL);
+        }
+        else if (delay <= 0)
+        {
+            // cerr << "clipped negative delay " << delay << endl;
+            gettimeofday(&nexttrigger, NULL);
+
+        }
+        else
+        {
+            if (!disablevideo)
+                ReduceJitter(&nexttrigger);
+            else
+                usleep(delay);
+        }
+    }
+    else
+    {
+        if (delay > 200000)
+        {
+            cout << "Delaying to next trigger: " << delay << endl;
+            delay = 200000;
+            delay_clipping = true;
+        }
+
+        /* trigger */
+        if (delay > 0)
+            usleep(delay);
+        else
+        {
+            //cout << "clipped negative delay: " << delay << endl;
+            delay_clipping = true;
+        }
+        /* The time right now is a good approximation of nexttrigger. */
+        /* It's not perfect, because usleep() is only pseudo-
+           approximate about waking us up. So we jitter a few ms. */
+        /* The value of nexttrigger is perfect -- we calculated it to
+           be exactly one frame time after the previous frame,
+           plus just enough feedback to stay synchronized with audio. */
+        /* UNLESS... we had to clip.  In this case, resync nexttrigger
+           with the wall clock. */
+        if (delay_clipping)
+        {
+            gettimeofday(&nexttrigger, NULL);
+            delay_clipping = false;
+        }
+    }
+
+    if (!disablevideo)
+    {
+        videoOutput->PrepareFrame(vbuffer[rpos], video_width, video_height);
+        videoOutput->Show();
+    }
+    /* a/v sync assumes that when 'Show' returns, that is the instant
+       the frame has become visible on screen */
+
+    if (output_jmeter && output_jmeter->RecordCycleTime())
+        cout << avsync_delay / 1000 << endl;
+
+    /* The value of nexttrigger is perfect -- we calculated it to
+        be exactly one frame time after the previous frame,
+        plus just enough feedback to stay synchronized with audio. */
+
+    nexttrigger.tv_usec += (int)(1000000 / video_frame_rate);
+
+    /* Apply just a little feedback. The ComputeAudiotime() function is
+       jittery, so if we try to correct our entire A/V drift on each frame,
+       video output is jerky. Instead, correct a fraction of the computed
+       drift on each frame.
+
+       In steady state, very little feedback is needed. However, if we are
+       far out of sync, we need more feedback. So, we case on this. */
+
+    if (audiofd > 0)
+    {
+        lastaudiotime = GetAudiotime(); // ms, same scale as timecodes
+
+        if (lastaudiotime != 0) // lastaudiotime = 0 after a seek
+        {
+            /* if we were perfect, (timecodes[rpos] - frame_time)
+               and lastaudiotime would match, and this adjustment
+               wouldn't do anything */
+
+            /* The time at the start of this frame (ie, now) is
+               given by timecodes[rpos] */
+
+            avsync_delay = (timecodes[rpos] - lastaudiotime) * 1000; // uSecs
+
+            if (avsync_delay < -100000 || avsync_delay > 100000)
+                nexttrigger.tv_usec += avsync_delay / 3; // re-syncing
+            else
+                nexttrigger.tv_usec += avsync_delay / 30; // steady state
+        }
+    }
+}
+
+void NuppelVideoPlayer::OutputVideoLoop(void)
+{
+    lastaudiotime = 0;
+    delay = 0;
+    avsync_delay = 0;
+    avsync_avg = 0;
+
+    delay_clipping = false;
+
+    refreshrate = 0;
+    lastsync = false;
+    hasvsync = false;
+    hasvgasync = false;
+
+    reducejitter = gContext->GetNumSetting("ReduceJitter", 0);
+    experimentalsync = gContext->GetNumSetting("ExperimentalAVSync", 0);
+
+    output_jmeter = NULL;
+    //output_jmeter = new Jitterometer("video_output", 100);
+
+    if (!disablevideo)
+    {
+        eventvalid = true;
+    }
+
+    frame_interval = (int)(1000000.0/video_frame_rate);
+    refreshrate = frame_interval;
+
+    Frame frame;
+    
+    frame.codec = CODEC_YUV;
+    frame.width = video_width;
+    frame.height = video_height;
+    frame.bpp = -1;
+    frame.frameNumber = framesPlayed;
+
+    int pause_rpos = 0;
+    unsigned char *pause_buf = new unsigned char[video_size];
+
+    gettimeofday(&nexttrigger, NULL);
+
+    if (experimentalsync)
+        InitExAVSync();
 
     while (!eof && !killvideo)
     {
@@ -1296,20 +1540,12 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
            continue;
         }
 
-        if (disablevideo)
+        if (!disablevideo)
         {
-            delay = UpdateDelay(&nexttrigger);
-            if (delay > 0)
-                usleep(delay);
-        }
-        else
-        {
-            // if we get here, we're actually going to do video output
             frame.buf = vbuffer[rpos];
             if (videoFilters.size() > 0)
                 process_video_filters(&frame, &videoFilters[0],
                                       videoFilters.size());
-
             if (pipplayer)
                 ShowPip(vbuffer[rpos]);
 
@@ -1317,111 +1553,12 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
                 ShowText();
 
             osd->Display(vbuffer[rpos]);
-
-            videoOutput->PrepareFrame(vbuffer[rpos], video_width,
-                                      video_height);
-
-            delay = UpdateDelay(&nexttrigger);
-
-            if (hasvsync)
-            {
-                while (delay > 0)
-                {
-                    vsync_wait_for_retrace();
-                    delay = UpdateDelay(&nexttrigger);
-                }
-
-                videoOutput->Show();
-
-                // reset the clock if delay and refresh are too close
-                if (delay > -1000 && !lastsync)
-                {
-                    nexttrigger.tv_usec += 2000;
-                    NormalizeTimeval(&nexttrigger);
-                }
-            }
-            else
-            {
-                // If delay is sometwhat more than a frame or < 0ms,
-                // we clip it to these amounts and reset nexttrigger
-                if ( delay > frame_interval * 2)
-                {
-                    // cerr << "Delaying to next trigger: " << delay << endl;
-
-                    usleep(frame_interval);
-
-                    delay = 0;
-                    avsync_avg = 0;
-                    gettimeofday(&nexttrigger, NULL);
-                }
-                else if (delay < 0 - frame_interval)
-                {
-                    // cerr << "clipped negative delay " << delay << endl;
-
-                    delay = 0;
-                    avsync_avg = 0;
-                    gettimeofday(&nexttrigger, NULL);
-                }
-
-                if (reducejitter)
-                    ReduceJitter(&nexttrigger);
-                else
-                {
-                    if (delay > 0)
-                        usleep(delay);
-                }
-
-                videoOutput->Show();
-            }
         }
-        //if (output_jmeter->RecordCycleTime())
-        //    cout << avsync_delay  / 1000 << endl;
 
-        /* The value of nexttrigger is perfect -- we calculated it to
-           be exactly one frame time after the previous frame, 
-           Show frames at the frame rate as long as audio is in sync */
-
-        nexttrigger.tv_usec += frame_interval;
-        
-        if (audiofd > 0)
-        {
-            laudiotime = GetAudiotime(); // ms, same scale as timecodes
-            
-            if (laudiotime != 0) // laudiotime = 0 after a seek
-            {
-                /* The time at the start of this frame (ie, now) is
-                   given by timecodes[rpos] */
-
-                avsync_delay = (timecodes[rpos] - laudiotime) * 1000; // uSecs
-
-                avsync_avg = (avsync_delay + (avsync_avg * 3)) / 4;
-
-                /* If the audio time codes and video diverge, shift 
-                   the video by one interlaced field (1/2 frame) */
-
-                if (!lastsync)
-                {
-                    if (avsync_avg > frame_interval * 3 / 2)
-                    {
-                        nexttrigger.tv_usec += refreshrate;
-                        // cerr << "added field: " << timecodes[rpos] << " "
-                        //      << avsync_avg << " " << avsync_delay << endl;
-                        lastsync = true;
-                    }
-                    else if (avsync_avg < 0 - frame_interval * 3 / 2)
-                    {
-                        nexttrigger.tv_usec -= refreshrate;
-                        // cerr << "dropped field: " << timecodes[rpos] << " "
-                        //      << avsync_avg << " " << avsync_delay << endl;
-                        lastsync = true;
-                    }
-                }
-                else
-                    lastsync = false;
-            }
-            else
-                avsync_avg = 0;
-        }
+        if (experimentalsync)
+            ExAVSync();
+        else 
+            OldAVSync();
 
         NormalizeTimeval(&nexttrigger);
 
@@ -1446,11 +1583,8 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         pthread_mutex_unlock(&eventLock);
     }
 
-    if (hasvsync)
-        vsync_shutdown();
-
-    if (hasvgasync)
-        vgasync_cleanup();
+    if (experimentalsync)
+        ShutdownExAVSync();
 }
 
 inline int NuppelVideoPlayer::getSpaceOnSoundcard(void)

@@ -392,6 +392,31 @@ class NuppelVideoPlayer
     int lastccrow;
 
     DecoderBase *decoder;
+
+    /* avsync stuff */
+    int lastaudiotime;
+    int delay;
+    int avsync_delay;
+    int avsync_avg;
+    int refreshrate;
+    int frame_interval;
+   
+    bool delay_clipping;
+    struct timeval nexttrigger, now;
+
+    bool lastsync;
+    bool hasvsync;
+    bool hasvgasync;
+
+    Jitterometer *output_jmeter;
+
+    void InitExAVSync(void);
+    void OldAVSync(void);
+    void ExAVSync(void);
+    void ShutdownExAVSync(void);
+
+    bool reducejitter;
+    bool experimentalsync;
 };
 
 #endif
