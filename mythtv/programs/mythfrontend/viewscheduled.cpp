@@ -60,6 +60,10 @@ ViewScheduled::ViewScheduled(QSqlDatabase *ldb, MythMainWindow *parent,
 
     updateBackground();
 
+    inEvent = false;
+    inFill = false;
+    needFill = false;
+
     listPos = 0;
     FillList();
  
@@ -77,6 +81,11 @@ ViewScheduled::~ViewScheduled()
 
 void ViewScheduled::keyPressEvent(QKeyEvent *e)
 {
+    if (inEvent)
+        return;
+
+    inEvent = true;
+
     bool handled = false;
     QStringList actions;
     if (gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions))
@@ -113,6 +122,19 @@ void ViewScheduled::keyPressEvent(QKeyEvent *e)
 
     if (!handled)
         MythDialog::keyPressEvent(e);
+
+    if (needFill)
+    {
+        do
+        {
+            needFill = false;
+            FillList();
+        } while (needFill);
+
+        update(fullRect);
+    }
+
+    inEvent = false;
 }
 
 void ViewScheduled::LoadWindow(QDomElement &element)
@@ -173,6 +195,9 @@ void ViewScheduled::updateBackground(void)
 
 void ViewScheduled::paintEvent(QPaintEvent *e)
 {
+    if (inFill)
+        return;
+
     QRect r = e->rect();
     QPainter p(this);
  
@@ -210,14 +235,10 @@ void ViewScheduled::cursorUp(bool page)
     }
 }
 
-void ViewScheduled::fillUpdateAll(void)
-{
-    FillList();
-    update(fullRect);
-}
-
 void ViewScheduled::FillList(void)
 {
+    inFill = true;
+
     QString callsign;
     QDateTime startts, recstartts;
 
@@ -246,7 +267,7 @@ void ViewScheduled::FillList(void)
         }
     }
 
-    if (!callsign.isEmpty())
+    if (!callsign.isNull())
     {
         listPos = recList.count() - 1;
         int i;
@@ -262,6 +283,8 @@ void ViewScheduled::FillList(void)
                 listPos = i;
         }
     }
+
+    inFill = false;
 }
 
 void ViewScheduled::updateList(QPainter *p)
@@ -516,14 +539,28 @@ void ViewScheduled::customEvent(QCustomEvent *e)
     if (message != "SCHEDULE_CHANGE")
         return;
 
-    FillList();
+    if (inEvent)
+    {
+        needFill = true;
+        return;
+    }
+
+    inEvent = true;
+
+    do
+    {
+        needFill = false;
+        FillList();
+    } while (needFill);
+
     update(fullRect);
+
+    inEvent = false;
 }
 
 void ViewScheduled::setShowAll(bool all)
 {
     showAll = all;
 
-    FillList();
-    update(fullRect);
+    needFill = true;
 }

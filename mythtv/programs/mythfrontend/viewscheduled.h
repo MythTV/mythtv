@@ -36,8 +36,6 @@ class ViewScheduled : public MythDialog
     void FillList(void);
     void setShowAll(bool all);
 
-    void fillUpdateAll();
-
     void updateBackground(void);
     void updateList(QPainter *);
     void updateConflict(QPainter *);
@@ -69,6 +67,10 @@ class ViewScheduled : public MythDialog
     int listsize;
 
     bool showAll;
+
+    bool inEvent;
+    bool inFill;
+    bool needFill;
 
     int listPos;
     ProgramList recList;
