@@ -966,7 +966,7 @@ int TVRec::GetChannelValue(const QString &channel_field,Channel *chan,
     {
         query.next();
 
-        if (query.value(0).isNull())
+        if (query.value(0) == "")
         {
             pthread_mutex_unlock(&db_lock);
             return -1;
