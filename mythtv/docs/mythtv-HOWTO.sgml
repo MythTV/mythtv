@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-11-09, v2.90
+<date>2003-12-08, v2.91
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1024,7 +1024,7 @@ url="http://www.mythtv.org/mailman/listinfo/mythtv-dev/"
 name="http://www.mythtv.org/mailman/listinfo/mythtv-dev/"> mailing lists.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
-name="http://xmltv.sourceforge.net">.  Download version 0.5.21 if you're in
+name="http://xmltv.sourceforge.net">.  Download version 0.5.25 if you're in
 North America.
 
 <code>
@@ -1144,7 +1144,7 @@ Continuing on:
 
 <label id="untarring_xmltv">Untar the xmltv file:
 <tscreen><verb>
-$ tar -xjf xmltv-0.5.21.tar.bz2
+$ tar -xjf xmltv-0.5.25.tar.bz2
 </verb></tscreen>
 Install the xmltv prerequisites:
 
@@ -1161,7 +1161,7 @@ cpan> exit
 
 Change to the XMLTV directory and compile it:
 <tscreen><verb>
-$ cd xmltv-0.5.21
+$ cd xmltv-0.5.25
 $ perl Makefile.PL
 </verb></tscreen>
 You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
@@ -4221,7 +4221,7 @@ content even if the slave backend that recorded a program is not available.
 main purpose of the transcoder is to allow users with hardware
 encoders (PVR-250) or systems that can only record in RTJpeg due to
 performance reasons (multiple capture cards, slow system, etc) to create
-MPEG44 streams to save space.
+MPEG-4 streams to save space.
 
 The transcoder can be used in two ways:
 <itemize>
@@ -5028,6 +5028,7 @@ revision.  Incorporate bstoneaz suggestion on crontab location.
 v2.89, 2003-11-04.  Add note on Debian .debs, remove Cedar from authors
 section, add note on RH8, add note for Qt3.1 minimum.
 v2.90, 2003-11-09.  Update XMLTV version.
+v2.91, 2003-12-08.  Update XMLTV version.  Fix "MPEG44".
 -->
 
 <!--

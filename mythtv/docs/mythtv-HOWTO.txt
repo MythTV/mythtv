@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-11-09, v2.90
+  2003-12-08, v2.91
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -1429,7 +1429,7 @@
   <http://www.mythtv.org/mailman/listinfo/mythtv-dev/> mailing lists.
 
   Get XMLTV from http://xmltv.sourceforge.net
-  <http://xmltv.sourceforge.net>.  Download version 0.5.21 if you're in
+  <http://xmltv.sourceforge.net>.  Download version 0.5.25 if you're in
   North America.
 
 
@@ -1582,7 +1582,7 @@
   Untar the xmltv file:
 
 
-       $ tar -xjf xmltv-0.5.21.tar.bz2
+       $ tar -xjf xmltv-0.5.25.tar.bz2
 
 
 
@@ -1602,7 +1602,7 @@
   Change to the XMLTV directory and compile it:
 
 
-       $ cd xmltv-0.5.21
+       $ cd xmltv-0.5.25
        $ perl Makefile.PL
 
 
@@ -5249,7 +5249,7 @@
   The main purpose of the transcoder is to allow users with hardware
   encoders (PVR-250) or systems that can only record in RTJpeg due to
   performance reasons (multiple capture cards, slow system, etc) to
-  create MPEG44 streams to save space.
+  create MPEG-4 streams to save space.
 
   The transcoder can be used in two ways:
 
