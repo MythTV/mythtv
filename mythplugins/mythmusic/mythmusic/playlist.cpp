@@ -1444,6 +1444,7 @@ int Playlist::CreateCDMP3(void)
     args += "-o";
     args += tmprecordisofs;
     args += "-J";
+    args += "-R";
 
     cout << "Running: " << args.join(" ") << endl;
 
@@ -1459,7 +1460,10 @@ int Playlist::CreateCDMP3(void)
             {
                 QString buf = isofs.readLineStderr();
                 if (buf[6] == '%')
-                    progress->setProgress(buf.toInt());
+                {
+                    buf = buf.mid(0, 3);
+                    progress->setProgress(buf.stripWhiteSpace().toInt());
+                }
             }
             if (isofs.isRunning())
             {
@@ -1491,6 +1495,7 @@ int Playlist::CreateCDMP3(void)
 
     args = "cdrecord";
     args += "-v";
+    //args += "-dummy";
     args += "dev=";
     args += scsidev;
 
@@ -1511,7 +1516,7 @@ int Playlist::CreateCDMP3(void)
     {
         while (1)
         {
-            if (burn.canReadLineStderr())
+            while (burn.canReadLineStderr())
             {
                 QString err = burn.readLineStderr();
                 if (err == "cdrecord: Drive needs to reload the media" ||
@@ -1523,13 +1528,13 @@ int Playlist::CreateCDMP3(void)
                     retval = 1;
                 }
             }
-            if (burn.canReadLineStdout())
+            while (burn.canReadLineStdout())
             {
                 QString line = burn.readLineStdout();
                 if (line.mid(15, 2) == "of")
                 {
-                    int mbdone = line.mid(10, 5).toInt();
-                    int mbtotal = line.mid(17, 5).toInt();
+                    int mbdone = line.mid(10, 5).stripWhiteSpace().toInt();
+                    int mbtotal = line.mid(17, 5).stripWhiteSpace().toInt();
 
                     if (mbtotal > 0)
                     {
@@ -1541,7 +1546,7 @@ int Playlist::CreateCDMP3(void)
             if (burn.isRunning())
             {
                 qApp->processEvents();
-                usleep(100000);
+                usleep(10000);
             }
             else
             {

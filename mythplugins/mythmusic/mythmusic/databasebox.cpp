@@ -781,6 +781,7 @@ void DatabaseBox::doActivePopup(PlaylistTitle *item_ptr)
 
         cdmp3b->setEnabled((ratio_MB <= 100.0));
         cdaudiob->setEnabled((ratio_sec <= 100.0));
+        cdaudiob->setEnabled(false);
     }
  
     int x, y;
