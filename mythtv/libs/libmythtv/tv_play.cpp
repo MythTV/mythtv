@@ -280,7 +280,9 @@ void TV::Playback(ProgramInfo *rcinfo)
         playbackLen = rcinfo->CalculateLength();
         playbackinfo = rcinfo;
 
-        if (rcinfo->conflicting)
+        QDateTime curtime = QDateTime::currentDateTime();
+
+        if (curtime < rcinfo->endts && curtime > rcinfo->startts)
             nextState = kState_WatchingRecording;
         else
             nextState = kState_WatchingPreRecorded;
