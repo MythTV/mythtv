@@ -44,6 +44,7 @@ class ViewScheduled : public MythDialog
     void updateBackground(void);
     void updateList(QPainter *);
     void updateConflict(QPainter *);
+    void updateShowLevel(QPainter *);
     void updateInfo(QPainter *);
 
     void LoadWindow(QDomElement &);
@@ -76,6 +77,7 @@ class ViewScheduled : public MythDialog
     QRect listRect;
     QRect infoRect;
     QRect conflictRect;
+    QRect showLevelRect;
     QRect fullRect;
 
     bool allowselect;
@@ -89,6 +91,14 @@ class ViewScheduled : public MythDialog
 
     bool doingSel;
     bool allowKeys;
+
+    enum ShowLevel
+    {
+        showAll = 1,
+        showImportant,
+        showRecording
+    };
+    ShowLevel showLevel;
 };
 
 #endif

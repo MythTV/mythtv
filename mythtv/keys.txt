@@ -155,6 +155,15 @@ Set Program Rankings and Set Channel Rankings
 - I to edit recording options.
 - ESC commits changes and exits.
 
+Viewing Schedulded Recordings/Resolving Conflicts
+-------------------------------------------------
+
+- 1 to show all recordings.
+- 2 to show only important recordings.
+- 3 to show only recording/conflicting recordings.
+- I to edit recording options.
+- Space or Enter to resolve conflict or override.
+
 Recording Profiles Setup Screen
 -------------------------------
 

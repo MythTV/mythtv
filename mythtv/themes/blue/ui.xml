@@ -580,57 +580,41 @@
         <filename>cr-background.png</filename>
         <position>0,39</position>
       </image>
-      <textarea name="coninyellow" draworder="0" align="right">
-        <area>20,330,700,40</area>
+      <textarea name="highlighting" draworder="0" align="right">
+        <area>410,330,130,40</area>
         <font>message</font>
-        <value>Conflicting recordings are highlighted in</value>
-        <value lang="IT">Le registrazioni in conflitto sono evidenziate in</value>
-        <value lang="ES">Las grabaciones en conflicto están resaltadas en</value>
-        <value lang="CA">Les gravacions en conflicte són les de color</value>
-        <value lang="NL">Conflicterende opnames zijn gekleurd in</value>
-        <value lang="DE">Überschneidungen sind markiert in</value>
-        <value lang="DK">Optagelser med konflikter er markeret med</value>
-        <value lang="PT">As gravações em conflito estão salientadas a</value>
-        <value lang="SV">Inspelningar med konflikter visas i</value>
+        <value>Highlighting:</value>
       </textarea>
-      <textarea name="conyellow" draworder="0">
-        <area>725,330,800,40</area>
+      <textarea name="conyellow" draworder="0" align="right">
+        <area>545,330,120,40</area>
         <font>messageyellow</font>
-        <value>yellow</value>
-        <value lang="IT">giallo</value>
-        <value lang="ES">amarillo</value>
-        <value lang="CA">groc</value>
-        <value lang="NL">geel</value>
-        <value lang="DE">gelb</value>
-        <value lang="DK">gul</value>
-        <value lang="PT">amarelo</value>
-        <value lang="SV">gult</value>
+        <value>Conflicting</value>
+        <value lang="IT">Conflitto</value>
+        <value lang="ES">Conflicto</value>
+        <value lang="CA">Conflicte</value>
+        <value lang="NL">Conflicterende</value>
+        <value lang="DE">Überschneidungen</value>
+        <value lang="DK">Konflikter</value>
+        <value lang="PT">Conflito</value>
+        <value lang="SV">Konflikter</value>
       </textarea>
-      <textarea name="disingray" draworder="0" align="right">
-        <area>20,357,700,40</area>
-        <font>message</font>
-        <value>Deactivated recordings are highlighted in</value>
-        <value lang="IT">Le registrazioni disattivate sono evidenziate in</value>
-        <value lang="ES">Las grabaciones desactivadas se resaltan en</value>
-        <value lang="CA">Les gravacions desactivades són de color</value>
-        <value lang="NL">Gedesactiveerde opnames zijn gekleurd in</value>
-        <value lang="DE">Blockierte Aufnahmen sind markiert in</value>
-        <value lang="DK">Deaktiverede optagelser er markeret med</value>
-        <value lang="PT">As gravaçoes desactivadas estão salientadas a</value>
-        <value lang="SV">Deaktiverade inspelningar visas i</value>
-      </textarea>
-      <textarea name="disgray" draworder="0">
-        <area>725,357,800,40</area>
+      <textarea name="disgray" draworder="0" align="right">
+        <area>670,330,120,40</area>
         <font>messagegray</font>
-        <value>gray</value>
-        <value lang="IT">grigio</value>
-        <value lang="ES">gris</value>
-        <value lang="CA">gris</value>
-        <value lang="NL">grijs</value>
-        <value lang="DE">grau</value>
-        <value lang="DK">grå</value>
-        <value lang="PT">cinzento</value>
-        <value lang="SV">grått</value>
+        <value>Deactivated</value>
+        <value lang="IT">Disattivate</value>
+        <value lang="ES">Desactivadas</value>
+        <value lang="CA">Desactivades</value>
+        <value lang="NL">Gedesactiveerde</value>
+        <value lang="DE">Blockierte</value>
+        <value lang="DK">Deaktiverede</value>
+        <value lang="PT">Desactivadas</value>
+        <value lang="SV">Deaktiverade</value>
+      </textarea>
+      <textarea name="showinstr" align="center" draworder="0">
+        <area>0,570,800,30</area>
+        <font>message</font>
+        <value>Show  (1) All  (2) Important  (3) Recording</value>
       </textarea>
     </container>
  
@@ -642,8 +626,21 @@
       </textarea>
     </container>
 
+    <container name="showlevel_info">
+      <area>10,330,260,20</area>
+      <textarea name="showing" draworder="4">
+        <area>0,0,95,20</area>
+        <font>message</font>
+        <value>Showing:</value>
+      </textarea>
+      <textarea name="showlevel" draworder="4">
+        <area>100,0,140,20</area>
+        <font>message</font>
+      </textarea>
+    </container>
+
     <container name="selector">
-      <area>0,39,800,310</area>
+      <area>0,39,800,290</area>
       <listarea name="conflictlist" draworder="4">
         <area>20,12,760,265</area>
         <fcnfont name="conflictfnt" function="conflictingrecording"></fcnfont>
@@ -668,7 +665,7 @@
     </container>
 
     <container name="program_info">
-      <area>0,390,800,240</area>
+      <area>0,360,800,210</area>
       <textarea name="title" draworder="6">
         <area>20,0,800,40</area>
         <font>title</font>
@@ -725,7 +722,7 @@
         <value lang="SV">Beskrivning:</value>
       </textarea>
       <textarea name="description" draworder="6">
-        <area>180,130,600,120</area>
+        <area>180,130,600,80</area>
         <font>info</font>
         <multiline>yes</multiline>
       </textarea>

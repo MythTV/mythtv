@@ -41,11 +41,14 @@ ViewScheduled::ViewScheduled(QSqlDatabase *ldb, MythMainWindow *parent,
     shortdateformat = gContext->GetSetting("ShortDateFormat", "M/d");
     timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
     displayChanNum = gContext->GetNumSetting("DisplayChanNum");
+    showLevel = ShowLevel(gContext->GetNumSetting("ViewSchedShowLevel",
+                                                      (int)showAll));
 
     fullRect = QRect(0, 0, size().width(), size().height());
     listRect = QRect(0, 0, 0, 0);
     infoRect = QRect(0, 0, 0, 0);
     conflictRect = QRect(0, 0, 0, 0);
+    showLevelRect = QRect(0, 0, 0, 0);
 
     allowselect = true;
     allowKeys = true;
@@ -104,6 +107,20 @@ void ViewScheduled::keyPressEvent(QKeyEvent *e)
         {
             case Key_Space: case Key_Enter: case Key_Return: selected(); return;
             case Key_I: edit(); return;
+            case Key_Escape:
+                gContext->SaveSetting("ViewSchedShowLevel", (int)showLevel);
+                done(MythDialog::Accepted);
+                break;
+            case Key_1: case Key_2: case Key_3:
+                if (showLevel != ShowLevel(e->key() - Key_0))
+                {
+                    showLevel = ShowLevel(e->key() - Key_0);
+                    inList = 0;
+                    inData = 0;
+                    FillList();
+                    update(fullRect);
+                }
+                break;
             default: break;
         }
     }
@@ -160,6 +177,8 @@ void ViewScheduled::parseContainer(QDomElement &element)
         infoRect = area;
     if (name.lower() == "conflict_info")
         conflictRect = area;
+    if (name.lower() == "showlevel_info")
+        showLevelRect = area;
 }
 
 void ViewScheduled::parsePopup(QDomElement &element)
@@ -216,7 +235,7 @@ void ViewScheduled::updateBackground(void)
     QPainter tmp(&bground);
 
     LayerSet *container = theme->GetSet("background");
-        container->Draw(&tmp, 0, 0);
+    container->Draw(&tmp, 0, 0);
 
     tmp.end();
     myBackground = bground;
@@ -243,6 +262,10 @@ void ViewScheduled::paintEvent(QPaintEvent *e)
     if (r.intersects(conflictRect))
     {
         updateConflict(&p);
+    }
+    if (r.intersects(showLevelRect))
+    {
+        updateShowLevel(&p);
     }
 }
 
@@ -379,11 +402,16 @@ void ViewScheduled::FillList(void)
 
     for (; pgiter != recordinglist.rend(); pgiter++)
     {
+        ProgramInfo *p = *pgiter;
         cntStr.sprintf("%d", cnt);
-        if ((*pgiter)->conflicting)
+        if (p->conflicting)
             conflictBool = true;
-        conflictData[cntStr] = *(*pgiter);
-        delete (*pgiter);
+        if (!p->recording && showLevel != showAll &&
+              (showLevel != showImportant ||
+               p->norecord <= nrOtherShowing))
+            continue;
+        conflictData[cntStr] = *p;
+        delete p;
         cnt--;
         dataCount++;
     }
@@ -554,6 +582,40 @@ void ViewScheduled::updateConflict(QPainter *p)
            if (type)
                type->SetText(tr("No Conflicts"));
         }
+    }
+
+    if (container)
+    {
+        container->Draw(&tmp, 4, 0);
+        container->Draw(&tmp, 5, 0);
+        container->Draw(&tmp, 6, 0);
+        container->Draw(&tmp, 7, 0);
+        container->Draw(&tmp, 8, 0);
+    }
+
+    tmp.end();
+    p->drawPixmap(pr.topLeft(), pix);
+}
+
+void ViewScheduled::updateShowLevel(QPainter *p)
+{
+    QRect pr = showLevelRect;
+    QPixmap pix(pr.size());
+    pix.fill(this, pr.topLeft());
+    QPainter tmp(&pix);
+
+    LayerSet *container = NULL;
+    container = theme->GetSet("showlevel_info");
+    if (container)
+    {
+        UITextType *type = (UITextType *)container->GetType("showlevel");
+        if (type)
+            switch (showLevel)
+            {
+                case showAll: type->SetText(tr("All")); break;
+                case showImportant: type->SetText(tr("Important")); break;
+                case showRecording: type->SetText(tr("Recording")); break;
+            }
     }
 
     if (container)
