@@ -2807,7 +2807,7 @@ QString MainServer::LocalFilePath(QUrl &url)
     else
     {
         lpath = lpath.section('/', -1);
-        lpath = gContext->GetFilePrefix() + url.path();
+        lpath = gContext->GetFilePrefix() + lpath;
     }
     return lpath;
 }

@@ -446,37 +446,40 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
 {
     QString keybind = key;
 
-    QSqlDatabase *db = QSqlDatabase::database();
-
-    QString thequery = QString("SELECT keylist FROM keybindings WHERE "
-                               "context = \"%1\" AND action = \"%2\" AND "
-                               "hostname = \"%2\";")
-                              .arg(context).arg(action)
-                              .arg(gContext->GetHostName());
-
-    QSqlQuery query = db->exec(thequery);
-
-    if (query.isActive() && query.numRowsAffected() > 0)
+    QSqlDatabase *db = QSqlDatabase::database(QSqlDatabase::defaultConnection,
+                                              false);
+    if (db && db->isOpen())
     {
-        query.next();
-
-        keybind = query.value(0).toString();
-    }
-    else
-    {
-        QString inskey = keybind;
-        inskey.replace('\\', "\\\\");
-        inskey.replace('\"', "\\\"");
-
-        thequery = QString("INSERT INTO keybindings (context, action, "
-                           "description, keylist, hostname) VALUES "
-                           "(\"%1\", \"%2\", \"%3\", \"%4\", \"%5\");")
-                           .arg(context).arg(action).arg(description)
-                           .arg(inskey).arg(gContext->GetHostName());
-
-        query = db->exec(thequery);
-        if (!query.isActive())
-            MythContext::DBError("Insert Keybinding", query);
+        QString thequery = QString("SELECT keylist FROM keybindings WHERE "
+                                   "context = \"%1\" AND action = \"%2\" AND "
+                                   "hostname = \"%2\";")
+                                  .arg(context).arg(action)
+                                  .arg(gContext->GetHostName());
+    
+        QSqlQuery query = db->exec(thequery);
+    
+        if (query.isActive() && query.numRowsAffected() > 0)
+        {
+            query.next();
+    
+            keybind = query.value(0).toString();
+        }
+        else
+        {
+            QString inskey = keybind;
+            inskey.replace('\\', "\\\\");
+            inskey.replace('\"', "\\\"");
+    
+            thequery = QString("INSERT INTO keybindings (context, action, "
+                               "description, keylist, hostname) VALUES "
+                               "(\"%1\", \"%2\", \"%3\", \"%4\", \"%5\");")
+                               .arg(context).arg(action).arg(description)
+                               .arg(inskey).arg(gContext->GetHostName());
+    
+            query = db->exec(thequery);
+            if (!query.isActive())
+                MythContext::DBError("Insert Keybinding", query);
+        }
     }
 
     QKeySequence keyseq(keybind);
@@ -514,35 +517,38 @@ void MythMainWindow::RegisterJump(const QString &destination,
 {
     QString keybind = key;
 
-    QSqlDatabase *db = QSqlDatabase::database();
-
-    QString thequery = QString("SELECT keylist FROM jumppoints WHERE "
-                               "destination = \"%1\" and hostname = \"%2\";")
-                              .arg(destination).arg(gContext->GetHostName());
-
-    QSqlQuery query = db->exec(thequery);
-
-    if (query.isActive() && query.numRowsAffected() > 0)
+    QSqlDatabase *db = QSqlDatabase::database(QSqlDatabase::defaultConnection,
+                                              false);
+    if (db && db->isOpen())
     {
-        query.next();
- 
-        keybind = query.value(0).toString();
-    }
-    else
-    {
-        QString inskey = keybind;
-        inskey.replace('\\', "\\\\");
-        inskey.replace('\"', "\\\"");
-
-        thequery = QString("INSERT INTO jumppoints (destination, description, "
-                           "keylist, hostname) VALUES (\"%1\", \"%2\", \"%3\", "
-                           "\"%4\");").arg(destination).arg(description)
-                                      .arg(inskey)
-                                      .arg(gContext->GetHostName());
-
-        query = db->exec(thequery);
-        if (!query.isActive())
-            MythContext::DBError("Insert Jump Point", query);
+        QString thequery = QString("SELECT keylist FROM jumppoints WHERE "
+                                   "destination = \"%1\" and hostname = \"%2\";")
+                                  .arg(destination).arg(gContext->GetHostName());
+    
+        QSqlQuery query = db->exec(thequery);
+    
+        if (query.isActive() && query.numRowsAffected() > 0)
+        {
+            query.next();
+     
+            keybind = query.value(0).toString();
+        }
+        else
+        {
+            QString inskey = keybind;
+            inskey.replace('\\', "\\\\");
+            inskey.replace('\"', "\\\"");
+    
+            thequery = QString("INSERT INTO jumppoints (destination, description, "
+                               "keylist, hostname) VALUES (\"%1\", \"%2\", \"%3\", "
+                               "\"%4\");").arg(destination).arg(description)
+                                          .arg(inskey)
+                                          .arg(gContext->GetHostName());
+    
+            query = db->exec(thequery);
+            if (!query.isActive())
+                MythContext::DBError("Insert Jump Point", query);
+        }
     }
    
     JumpData jd = { callback, destination, description };

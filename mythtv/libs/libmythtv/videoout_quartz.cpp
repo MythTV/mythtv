@@ -42,6 +42,7 @@ using namespace std;
 #include <qptrlist.h>
 #include <qmutex.h>
 
+#include "yuv2rgb.h"
 #include "uitypes.h"
 #include "mythcontext.h"
 #include "filtermanager.h"
@@ -92,6 +93,8 @@ struct QuartzData
     bool               windowedMode;      // GUI runs in window?
     bool               changeResolution;  // Switch resolution for fullscreen?
     bool               scaleUpVideo;      // Enlarge video as needed?
+    bool               correctGamma;      // Video gamma correction
+    yuv2vuy_fun        yuvConverter;      // 420 -> 2vuy conversion function
     
     // Zoom preferences:
     int                ZoomedIn;          // These mirror the videooutbase
@@ -278,6 +281,12 @@ bool VideoOutputQuartzView::Begin(void)
         viewLock.unlock();
         return false;
     }
+    
+    // Turn off gamma correction unless requested
+    if (!parentData->correctGamma)
+        QTSetPixMapHandleRequestedGammaLevel(GetPortPixMap(thePort),
+                                             kQTUseSourceGammaLevel);
+    
     SetDSequenceFlags(theCodec,
                       codecDSequenceFlushInsteadOfDirtying,
                       codecDSequenceFlushInsteadOfDirtying);
@@ -1382,8 +1391,14 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     data->scaleUpVideo = gContext->GetNumSetting("MacScaleUp", 1);
     data->drawInWindow = gContext->GetNumSetting("GuiSizeForTV", 0);
     data->windowedMode = gContext->GetNumSetting("RunFrontendInWindow", 0);
+    data->correctGamma = gContext->GetNumSetting("MacGammaCorrect", 0);
     // From tv_play.cpp:
     data->changeResolution = gContext->GetNumSetting("UseVideoModes", 0);
+    
+    if (gContext->GetNumSetting("MacYuvConversion", 1))
+        data->yuvConverter = yuv2vuy_init_altivec();
+    else
+        data->yuvConverter = NULL;
 
     if (!CreateQuartzBuffers())
     {
@@ -1510,27 +1525,45 @@ bool VideoOutputQuartz::CreateQuartzBuffers(void)
     desc->frameCount = 0;
     desc->dataSize = 0;
     desc->clutID = -1;
+    
+    if (data->yuvConverter)
+    {
+        desc->cType = k422YpCbCr8CodecType;
+        desc->version = 2;
+    }
 
     HUnlock((Handle)(data->imgDesc));
 
     // Set up storage area for one YUV frame (header + data)
-    data->pixelSize = (width * height * 3) / 2;
-    data->pixmapSize = sizeof(PlanarPixmapInfoYUV420) + data->pixelSize;
-    data->pixmap = (PlanarPixmapInfoYUV420 *) new char[data->pixmapSize];
-    data->pixelData = &(data->pixmap[1]);
-
-    long offset = sizeof(PlanarPixmapInfoYUV420);
-    data->pixmap->componentInfoY.offset = offset;
-    data->pixmap->componentInfoY.rowBytes = width;
-
-    offset += width * height;
-    data->pixmap->componentInfoCb.offset = offset;
-    data->pixmap->componentInfoCb.rowBytes = width / 2;
-
-    offset += (width * height) / 4;
-    data->pixmap->componentInfoCr.offset = offset;
-    data->pixmap->componentInfoCr.rowBytes = width / 2;
-
+    if (data->yuvConverter)
+    {
+        // 2VUY data needs no header
+        data->pixelSize = width * height * 2;
+        data->pixmapSize = data->pixelSize;
+        data->pixmap = (PlanarPixmapInfoYUV420 *) new char[data->pixmapSize];
+        data->pixelData = data->pixmap;
+    }
+    else
+    {
+        // YUV420 uses a descriptive header
+        data->pixelSize = (width * height * 3) / 2;
+        data->pixmapSize = sizeof(PlanarPixmapInfoYUV420) + data->pixelSize;
+        data->pixmap = (PlanarPixmapInfoYUV420 *) new char[data->pixmapSize];
+        data->pixelData = &(data->pixmap[1]);
+    
+        long offset = sizeof(PlanarPixmapInfoYUV420);
+        data->pixmap->componentInfoY.offset = offset;
+        data->pixmap->componentInfoY.rowBytes = width;
+    
+        offset += width * height;
+        data->pixmap->componentInfoCb.offset = offset;
+        data->pixmap->componentInfoCb.rowBytes = width / 2;
+    
+        offset += (width * height) / 4;
+        data->pixmap->componentInfoCr.offset = offset;
+        data->pixmap->componentInfoCr.rowBytes = width / 2;
+    }
+    
     data->pixelLock.unlock();
 
     return true;
@@ -1723,6 +1756,19 @@ void VideoOutputQuartz::ProcessFrame(VideoFrame *frame, OSD *osd,
     // copy data to our buffer
     data->pixelLock.lock();
     if (data->pixelData)
-        memcpy(data->pixelData, frame->buf, frame->size);
+    {
+        if (data->yuvConverter)
+        {
+            int frameSize = frame->width * frame->height;
+            data->yuvConverter((uint8_t *)(data->pixelData),
+                               frame->buf,
+                               &frame->buf[frameSize],
+                               &frame->buf[frameSize * 5 / 4],
+                               frame->width, frame->height,
+                               (frame->width % 2), (frame->width % 2), 0);
+        }
+        else
+            memcpy(data->pixelData, frame->buf, frame->size);
+    }
     data->pixelLock.unlock();
 }

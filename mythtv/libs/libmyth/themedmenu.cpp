@@ -2412,8 +2412,7 @@ bool ThemedMenuPrivate::findDepends(const QString &fileList)
         if (filename != "")
             return true;
     
-        QString newname = QString(PREFIX) + "/lib/mythtv/plugins/lib" + *it +
-                          ".so";
+        QString newname = gContext->FindPlugin(*it);
     
         QFile checkFile(newname);
         if (checkFile.exists())

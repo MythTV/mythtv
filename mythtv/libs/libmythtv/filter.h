@@ -7,8 +7,6 @@
 
 #include "frame.h"
 
-#define MYTHTV_FILTER_PATH PREFIX"/lib/mythtv/filters"
-
 typedef struct FmtConv_
 {
     VideoFrameType in;

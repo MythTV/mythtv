@@ -44,3 +44,9 @@ void rgb32_to_yuv420p(unsigned char *lum, unsigned char *cb, unsigned char *cr,
                       unsigned char *alpha, unsigned char *src, 
                       int width, int height, int srcwidth);
 
+typedef void (* yuv2vuy_fun) (uint8_t * image, uint8_t * py,
+                              uint8_t * pu, uint8_t * pv,
+                              int h_size, int v_size,
+                              int vuy_stride, int y_stride, int uv_stride);
+
+yuv2vuy_fun yuv2vuy_init_altivec (void);

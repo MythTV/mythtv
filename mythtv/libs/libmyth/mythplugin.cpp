@@ -9,16 +9,6 @@
 
 using namespace std;
 
-// These defines provide portability for different
-// plugin file names.
-#ifdef CONFIG_DARWIN
-const QString kPluginLibPrefix = "lib";
-const QString kPluginLibSuffix = ".dylib";
-#else
-const QString kPluginLibPrefix = "lib";
-const QString kPluginLibSuffix = ".so";
-#endif
-
 MythPlugin::MythPlugin(const QString &libname)
           : QLibrary(libname)
 {
@@ -95,17 +85,21 @@ MythPluginManager::MythPluginManager()
 {
     m_dict.setAutoDelete(true);
 
-    QString pluginprefix = QString(PREFIX) + "/lib/mythtv/plugins/";
+    QString pluginprefix = gContext->GetPluginsDir();
 
     QDir filterDir(pluginprefix);
 
     filterDir.setFilter(QDir::Files | QDir::Readable);
-    filterDir.setNameFilter(kPluginLibPrefix + "*" + kPluginLibSuffix);
+    QString filter = gContext->GetPluginsNameFilter();
+    filterDir.setNameFilter(filter);
 
     gContext->SetDisableLibraryPopup(true);
 
     if (filterDir.exists())
     {
+        int prefixLength = filter.find("*");
+        int suffixLength = filter.length() - prefixLength - 1;
+
         QStringList libraries = filterDir.entryList();
         for (QStringList::iterator i = libraries.begin(); i != libraries.end();
              i++)
@@ -113,8 +107,8 @@ MythPluginManager::MythPluginManager()
             QString library = *i;
 
             // pull out the base library name
-            library = library.right(library.length() - kPluginLibPrefix.length());
-            library = library.left(library.length() - kPluginLibSuffix.length());
+            library = library.right(library.length() - prefixLength);
+            library = library.left(library.length() - suffixLength);
 
             init_plugin(library);
         }
@@ -127,8 +121,7 @@ MythPluginManager::MythPluginManager()
 
 bool MythPluginManager::init_plugin(const QString &plugname)
 {
-    QString newname = QString(PREFIX) + "/lib/mythtv/plugins/" +
-                      kPluginLibPrefix + plugname + kPluginLibSuffix;
+    QString newname = gContext->FindPlugin(plugname);
    
     if (m_dict.find(newname) == 0)
     {
@@ -161,8 +154,7 @@ bool MythPluginManager::init_plugin(const QString &plugname)
 
 bool MythPluginManager::run_plugin(const QString &plugname)
 {
-    QString newname = QString(PREFIX) + "/lib/mythtv/plugins/" +
-                      kPluginLibPrefix + plugname + kPluginLibSuffix;
+    QString newname = gContext->FindPlugin(plugname);
 
     if (m_dict.find(newname) == 0 && init_plugin(plugname) == false)
     {
@@ -177,8 +169,7 @@ bool MythPluginManager::run_plugin(const QString &plugname)
 
 bool MythPluginManager::config_plugin(const QString &plugname)
 {
-    QString newname = QString(PREFIX) + "/lib/mythtv/plugins/lib" + plugname +
-                      ".so";
+    QString newname = gContext->FindPlugin(plugname);
 
     if (m_dict.find(newname) == 0 && init_plugin(plugname) == false)
     {
@@ -193,8 +184,7 @@ bool MythPluginManager::config_plugin(const QString &plugname)
 
 MythPlugin *MythPluginManager::GetPlugin(const QString &plugname)
 {
-    QString newname = QString(PREFIX) + "/lib/mythtv/plugins/lib" + plugname +
-                      ".so";
+    QString newname = gContext->FindPlugin(plugname);
 
     if (moduleMap.find(newname) == moduleMap.end())
         return NULL;
@@ -204,8 +194,7 @@ MythPlugin *MythPluginManager::GetPlugin(const QString &plugname)
 
 MythPlugin *MythPluginManager::GetMenuPlugin(const QString &plugname)
 {
-    QString newname = QString(PREFIX) + "/lib/mythtv/plugins/lib" + plugname +
-                      ".so";
+    QString newname = gContext->FindPlugin(plugname);
 
     if (menuPluginMap.find(newname) == menuPluginMap.end())
         return NULL;

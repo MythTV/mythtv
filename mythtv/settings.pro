@@ -115,12 +115,28 @@ macx {
 
     # This .pro file doesn't include config.mak. Force processor architecture:
     TARGET_ARCH_POWERPC=yes
+    # Also force Altivec support:
+    TARGET_ALTIVEC=yes
 }
 
 contains( TARGET_ARCH_POWERPC, yes ) {
     # Source that has endian-specific code should include config.h,
     # but until this happens, we define it here:
     DEFINES += WORDS_BIGENDIAN
+}
+
+contains( TARGET_ALTIVEC, yes ) {
+    # Altivec support
+    CONFIG  += using_altivec
+    DEFINES += USING_ALTIVEC
+    macx {
+        QMAKE_CFLAGS   += -faltivec
+        QMAKE_CXXFLAGS += -faltivec
+    }
+    !macx {
+        QMAKE_CFLAGS   += -maltivec -mabi=altivec
+        QMAKE_CXXFLAGS += -maltivec -mabi=altivec
+    }
 }
 
 # DirectX support

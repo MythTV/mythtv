@@ -27,11 +27,12 @@ typedef struct LBFilter
     TF_STRUCT;
 } LBFilter;
 
-#define MM_MMX    0x0001 /* standard MMX */
-#define MM_3DNOW  0x0004 /* AMD 3DNOW */
-#define MM_MMXEXT 0x0002 /* SSE integer functions or AMD MMX ext */
-#define MM_SSE    0x0008 /* SSE functions */
-#define MM_SSE2   0x0010 /* PIV SSE2 functions */
+#define MM_MMX     0x0001 /* standard MMX */
+#define MM_3DNOW   0x0004 /* AMD 3DNOW */
+#define MM_MMXEXT  0x0002 /* SSE integer functions or AMD MMX ext */
+#define MM_SSE     0x0008 /* SSE functions */
+#define MM_SSE2    0x0010 /* PIV SSE2 functions */
+#define MM_ALTIVEC 0x0020 /* Altivec */
 
 #ifdef i386
 
@@ -257,11 +258,124 @@ void linearBlend3DNow(unsigned char *src, int stride)
        : "%eax", "%edx"
     );
 }
+
+int linearBlendFilterAltivec(VideoFilter *f, VideoFrame *frame) {(void)f; (void)frame; return 0;};
 #else // i386
 #define emms()
-int mm_support(void) { return 0; }
 void linearBlendMMX(unsigned char *src, int stride) {(void)src; (void)stride;};
 void linearBlend3DNow(unsigned char *src, int stride) {(void)src;(void)stride;};
+
+#ifdef USING_ALTIVEC
+
+#include <Accelerate/Accelerate.h>
+
+// we fall back to the default routines in some situations
+void linearBlend(unsigned char *src, int stride);
+
+int mm_support(void) { return MM_ALTIVEC; }
+
+inline void linearBlendAltivec(unsigned char *src, int stride)
+{
+    vector unsigned char a, b, c;
+    int i;
+    
+    b = vec_ld(0, src);
+    c = vec_ld(stride, src);
+    
+    for (i = 2; i < 10; i++)
+    {
+        a = b;
+        b = c;
+        c = vec_ld(stride * i, src);
+        vec_st(vec_avg(vec_avg(a, c), b), stride * (i - 2), src);
+    }
+}
+
+int linearBlendFilterAltivec(VideoFilter *f, VideoFrame *frame)
+{
+    int width = frame->width;
+    int height = frame->height;
+    unsigned char *yuvptr = frame->buf;
+    int stride = width;
+    int ymax = height - 8;
+    int x,y;
+    unsigned char *src;
+    unsigned char *uoff;
+    unsigned char *voff;
+    TF_VARS;
+
+    TF_START;
+ 
+    if ((stride % 16) || ((unsigned int)yuvptr % 16))
+    {
+        for (y = 0; y < ymax; y += 8)
+        {  
+            for (x = 0; x < stride; x+= 8)
+            {
+                src = yuvptr + x + y * stride;  
+                linearBlend(src, stride);  
+            }
+        }
+    }
+    else
+    {
+        src = yuvptr;
+        for (y = 0; y < ymax; y += 8)
+        {  
+            for (x = 0; x < stride; x+= 16)
+            {
+                linearBlendAltivec(src, stride);
+                src += 16;
+            }
+            src += stride * 7;
+        }
+    }
+ 
+    stride = width / 2;
+    ymax = height / 2 - 8;
+  
+    uoff = yuvptr + width * height;
+    voff = yuvptr + width * height * 5 / 4;
+ 
+    if ((stride % 16) || ((unsigned int)uoff % 16))
+    {
+        for (y = 0; y < ymax; y += 8)
+        {
+            for (x = 0; x < stride; x += 8)
+            {
+                src = uoff + x + y * stride;
+                linearBlend(src, stride);
+           
+                src = voff + x + y * stride;
+                linearBlend(src, stride);
+            }
+        }
+    }
+    else
+    {
+        for (y = 0; y < ymax; y += 8)
+        {
+            for (x = 0; x < stride; x += 16)
+            {
+                linearBlendAltivec(src, stride);
+                uoff += 16;
+           
+                linearBlendAltivec(src, stride);
+                voff += 16;
+            }
+            uoff += stride * 7;
+            voff += stride * 7;
+        }
+    }
+
+    TF_END(vf, "LinearBlendAltivec: ");
+    return 0;
+}
+
+#else  // Altivec
+int mm_support(void) { return 0; };
+int linearBlendFilterAltivec(VideoFilter *f, VideoFrame *frame) {(void)f; (void)frame; return 0;};
+#endif // Altivec
 #endif // i386
 
 void linearBlend(unsigned char *src, int stride)
@@ -383,6 +497,8 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
         filter->subfilter = &linearBlendMMX;
     else if (filter->mm_flags & MM_3DNOW)
         filter->subfilter = &linearBlend3DNow;
+    else if (filter->mm_flags && MM_ALTIVEC)
+        filter->filter = &linearBlendFilterAltivec;
     else
         filter->subfilter = &linearBlend;
 

@@ -26,6 +26,17 @@
 #include "mythplugin.h"
 #include "screensaver.h"
 #include "DisplayRes.h"
+#include "dbsettings.h"
+
+// These defines provide portability for different
+// plugin file names.
+#ifdef CONFIG_DARWIN
+const QString kPluginLibPrefix = "lib";
+const QString kPluginLibSuffix = ".dylib";
+#else
+const QString kPluginLibPrefix = "lib";
+const QString kPluginLibSuffix = ".so";
+#endif
 
 MythContext *gContext = NULL;
 
@@ -40,6 +51,16 @@ class MythContextPrivate
     void Init(bool gui);
 
     void LoadLogSettings(void);
+    void LoadDatabaseSettings(bool reload);
+    
+    bool FixSettingsFile(void);
+    bool WriteSettingsFile(const DatabaseParams &params,
+                           bool overwrite = false);
+    bool FindSettingsProbs(void);
+    bool RetryDatabaseConnection(QSqlDatabase *db);
+    QString getResponse(const QString &query, const QString &def);
+    int intResponse(const QString &query, int def);
+    bool PromptForDatabaseParams(void);
 
     MythContext *parent;
 
@@ -48,6 +69,7 @@ class MythContextPrivate
 
     QString m_installprefix;
 
+    bool m_gui;
     bool m_themeloaded;
     QString m_menuthemepathname;
     QString m_themepathname;
@@ -126,21 +148,8 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
 
 void MythContextPrivate::Init(bool gui)
 {
-    if (!parent->LoadSettingsFiles("mysql.txt"))
-        cerr << "Unable to read configuration file mysql.txt" << endl;
-
-    m_localhostname = m_settings->GetSetting("LocalHostName", NULL);
-    if (m_localhostname == NULL)
-    {
-        char localhostname[1024];
-        if (gethostname(localhostname, 1024))
-        {
-            perror("gethostname");
-            VERBOSE(VB_IMPORTANT, "MCP: Could not determine host name, exiting");
-            exit(-29);
-        }
-        m_localhostname = localhostname;
-    }
+    m_gui = gui;
+    LoadDatabaseSettings(false);
 
     m_xbase = m_ybase = 0;
 
@@ -199,6 +208,291 @@ void MythContextPrivate::LoadLogSettings(void)
     m_logenable = parent->GetNumSetting("LogEnabled", 0);
     m_logmaxcount = parent->GetNumSetting("LogMaxCount", 0);
     m_logprintlevel = parent->GetNumSetting("LogPrintLevel", LP_ERROR);
+}
+
+void MythContextPrivate::LoadDatabaseSettings(bool reload)
+{
+    if (reload)
+    {
+        if (m_settings)
+            delete m_settings;
+        m_settings = new Settings;
+    }
+    
+    if (!parent->LoadSettingsFiles("mysql.txt"))
+    {
+        VERBOSE(VB_IMPORTANT, "Unable to read configuration file mysql.txt");
+        if (!FixSettingsFile())
+            exit(-29);
+    }
+
+    // Even if we have loaded the settings file, it may be incomplete,
+    // so we check for missing values and warn user
+    FindSettingsProbs();
+
+    m_localhostname = m_settings->GetSetting("LocalHostName", NULL);
+    if (m_localhostname == NULL)
+    {
+        char localhostname[1024];
+        if (gethostname(localhostname, 1024))
+        {
+            perror("gethostname");
+            VERBOSE(VB_IMPORTANT, "MCP: Could not determine host name, exiting");
+            exit(-29);
+        }
+        m_localhostname = localhostname;
+    }
+}
+
+bool MythContextPrivate::FixSettingsFile(void)
+{
+    DatabaseParams defaultParams = parent->GetDatabaseParams();
+    
+    return WriteSettingsFile(defaultParams);
+}
+
+bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
+                                           bool overwrite)
+{
+    QString path = QDir::homeDirPath() + "/.mythtv/mysql.txt";
+    QFile   * f  = new QFile(path);
+    
+    if (!overwrite && f->exists())
+    {
+        return false;
+    }
+    if (!f->open(IO_WriteOnly))
+    {
+        VERBOSE(VB_IMPORTANT, QString("Could not open settings file %1 "
+                                      "for writing").arg(path));
+        return false;
+    }
+    
+    VERBOSE(VB_IMPORTANT, QString("Writing settings file %1").arg(path));
+    QTextStream s(f);
+    s << "DBHostName=" << params.dbHostName << endl
+      << "DBUserName=" << params.dbUserName << endl
+      << "DBPassword=" << params.dbPassword << endl
+      << "DBName="     << params.dbName     << endl
+      << "DBType="     << params.dbType     << endl
+      << endl
+      << "# Set the following if you want to use something other than the\n"
+      << "# machine's real hostname for identifying settings in the database.\n"
+      << "# This is useful if your hostname changes often, as otherwise\n"
+      << "# you'll need to reconfigure mythtv (or futz with the DB) every time.\n"
+      << "# TWO HOSTS MUST NOT USE THE SAME VALUE\n"
+      << "#\n";
+    
+    if (params.localEnabled)
+        s << "LocalHostName=" << params.localHostName << endl;
+    else
+        s << "#LocalHostName=my-unique-identifier-goes-here\n";
+    
+    s << endl
+      << "# If you want your frontend to be able to wake your MySQL server\n"
+      << "# using WakeOnLan, have a look at the following settings:\n"
+      << "#\n"
+      << "# Set the time the frontend waits (in seconds) between reconnect tries.\n"
+      << "# This should be the rough time your MySQL server needs for startup\n";
+
+    if (params.wolEnabled)
+        s << "WOLsqlReconnectWaitTime=" << params.wolReconnect << endl;
+    else
+        s << "#WOLsqlReconnectWaitTime=0\n";
+    
+    s << "#\n"
+      << "#\n"
+      << "# This is the amount of retries to wake the MySQL server until the frontend\n"
+      << "# gives up\n";
+     
+    if (params.wolEnabled)
+        s << "WOLsqlConnectRetry=" << params.wolRetry << endl;
+    else
+        s << "#WOLsqlConnectRetry=5\n";
+    
+    s << "#\n"
+      << "#\n"
+      << "# This is the command executed to wake your MySQL server.\n";
+    
+    if (params.wolEnabled)
+        s << "WOLsqlCommand=" << params.wolCommand << endl;
+    else
+        s << "#WOLsqlCommand=echo 'WOLsqlServerCommand not set'\n";
+    
+    f->close();
+    return true;
+}
+
+bool MythContextPrivate::FindSettingsProbs(void)
+{
+    bool problems = false;
+    
+    if (m_settings->GetSetting("DBHostName").isEmpty())
+    {
+        problems = true;
+        VERBOSE(VB_IMPORTANT, "DBHostName is not set in mysql.txt");
+    }
+    if (m_settings->GetSetting("DBUserName").isEmpty())
+    {
+        problems = true;
+        VERBOSE(VB_IMPORTANT, "DBUserName is not set in mysql.txt");
+    }
+    if (m_settings->GetSetting("DBPassword").isEmpty())
+    {
+        problems = true;
+        VERBOSE(VB_IMPORTANT, "DBPassword is not set in mysql.txt");
+    }
+    if (m_settings->GetSetting("DBName").isEmpty())
+    {
+        problems = true;
+        VERBOSE(VB_IMPORTANT, "DBName is not set in mysql.txt");
+    }
+    return problems;
+}
+
+bool MythContextPrivate::RetryDatabaseConnection(QSqlDatabase *db)
+{
+    while (!parent->OpenDatabase(db, false))
+    {
+        printf("couldn't open db\n");
+        int pause = m_settings->GetNumSetting("WOLsqlReconnectWaitTime", 0);
+        if (pause > 0)
+        {
+            int acttry = 1;
+            int retries = m_settings->GetNumSetting("WOLsqlConnectRetry", 5);
+
+            QString WOLsqlCommand = m_settings->GetSetting("WOLsqlCommand", 
+                                                   "echo \'WOLsqlServerCommand "
+                                                   "not set\nPlease do so in "
+                                                   "your mysql.txt!\'");
+
+            if (!WOLsqlCommand.isEmpty())
+            {
+                while (acttry <= retries && !parent->OpenDatabase(db, false))
+                {
+                    printf("Trying to wakeup SQLserver (Try %d of %d)\n",
+                           acttry, retries);
+                    system(WOLsqlCommand);
+                    sleep(pause);
+                    ++acttry;
+                }
+            }
+
+            if (WOLsqlCommand.isEmpty() || (acttry > retries))
+            {
+                printf("Sorry, couldn't open db\n");
+                if (!PromptForDatabaseParams())
+                    return false;
+            }
+        }
+        else if (!PromptForDatabaseParams())
+            return false;
+    }
+    return true;
+}
+
+QString MythContextPrivate::getResponse(const QString &query,
+                                        const QString &def)
+{
+    cout << query;
+
+    if (def != "")
+        cout << " [" << def << "]  ";
+    else
+        cout << "  ";
+    
+    char response[80];
+    cin.getline(response, 80);
+
+    QString qresponse = response;
+
+    if (qresponse == "")
+        qresponse = def;
+
+    return qresponse;
+}
+
+int MythContextPrivate::intResponse(const QString &query, int def)
+{
+    QString str_resp = getResponse(query, QString("%1").arg(def));
+    bool ok;
+    int resp = str_resp.toInt(&ok);
+    return (ok ? resp : def);
+}
+
+bool MythContextPrivate::PromptForDatabaseParams(void)
+{
+    bool accepted = false;
+    if (m_gui)
+    {
+        // construct minimal MythMainWindow
+        m_settings->SetSetting("Theme", "blue");
+#ifdef Q_WS_MACX
+        // Myth looks horrible in default Mac style for Qt
+        m_settings->SetSetting("Style", "Windows");
+#endif
+        parent->LoadQtConfig();
+        MythMainWindow *mainWindow = new MythMainWindow();
+        parent->SetMainWindow(mainWindow);
+    
+        // ask user for database parameters
+        DatabaseSettings settings;
+        accepted = (settings.exec(NULL) == QDialog::Accepted);
+        if (!accepted)
+            VERBOSE(VB_IMPORTANT, "User canceled database configuration");
+    
+        // tear down temporary main window
+        delete mainWindow;
+    }
+    else
+    {
+        DatabaseParams params = parent->GetDatabaseParams();
+        QString response;
+        
+        // give user chance to skip config
+        response = getResponse("Would you like to configure the database "
+                               "connection now?",
+                               "yes");
+        if (response.left(1).lower() != "y")
+            return false;
+        
+        params.dbHostName = getResponse("Database host name:",
+                                        params.dbHostName);
+        params.dbName     = getResponse("Database name:",
+                                        params.dbName);
+        params.dbUserName = getResponse("Database user name:",
+                                        params.dbUserName);
+        params.dbPassword = getResponse("Database password:",
+                                        params.dbPassword);
+        
+        params.localHostName = getResponse("Unique identifier for this machine "
+                                           "(if empty, the local host name "
+                                           "will be used):",
+                                           params.localHostName);
+        params.localEnabled = !params.localHostName.isEmpty();
+        
+        response = getResponse("Would you like to use Wake-On-LAN to retry "
+                               "database connections?",
+                               (params.wolEnabled ? "no" : "yes"));
+        if (response.left(1).lower() == "y")
+        {
+            params.wolEnabled   = true;
+            params.wolReconnect = intResponse("Seconds to wait for "
+                                              "reconnection:",
+                                              params.wolReconnect);
+            params.wolRetry     = intResponse("Number of times to retry:",
+                                              params.wolRetry);
+            params.wolCommand   = getResponse("Command to use to wake server:",
+                                              params.wolCommand);
+        }
+        else
+            params.wolEnabled   = false;
+        
+        accepted = parent->SaveDatabaseParams(params);
+    }
+    if (accepted)
+        LoadDatabaseSettings(true);
+    return accepted;
 }
 
 MythContext::MythContext(const QString &binversion, bool gui)
@@ -362,6 +656,66 @@ QString MythContext::GetInstallPrefix(void)
 QString MythContext::GetShareDir(void) 
 { 
     return d->m_installprefix + "/share/mythtv/"; 
+}
+
+QString MythContext::GetLibraryDir(void) 
+{ 
+    return d->m_installprefix + "/lib/mythtv/"; 
+}
+
+QString MythContext::GetThemesParentDir(void) 
+{ 
+    return GetShareDir() + "themes/"; 
+}
+
+QString MythContext::GetPluginsDir(void) 
+{ 
+    return GetLibraryDir() + "plugins/"; 
+}
+
+QString MythContext::GetPluginsNameFilter(void) 
+{ 
+    return kPluginLibPrefix + "*" + kPluginLibSuffix; 
+}
+
+QString MythContext::FindPlugin(const QString &plugname) 
+{ 
+    return GetPluginsDir() + kPluginLibPrefix + plugname + kPluginLibSuffix; 
+}
+
+QString MythContext::GetTranslationsDir(void) 
+{ 
+    return GetShareDir() + "i18n/"; 
+}
+
+QString MythContext::GetTranslationsNameFilter(void) 
+{ 
+    return "mythfrontend_*.qm"; 
+}
+
+QString MythContext::FindTranslation(const QString &translation) 
+{ 
+    return GetTranslationsDir() + "mythfrontend_" + translation.lower() + ".qm"; 
+}
+
+QString MythContext::GetFontsDir(void) 
+{ 
+    return GetShareDir();
+}
+
+QString MythContext::GetFontsNameFilter(void) 
+{ 
+    return "*ttf"; 
+}
+
+QString MythContext::FindFont(const QString &fontname) 
+{ 
+    return GetFontsDir() + fontname + ".ttf"; 
+}
+
+QString MythContext::GetFiltersDir(void) 
+{ 
+    return GetLibraryDir() + "filters/"; 
 }
 
 bool MythContext::LoadSettingsFiles(const QString &filename)
@@ -749,27 +1103,46 @@ QString MythContext::GetThemeDir(void)
     return d->m_themepathname;
 }
 
-int MythContext::OpenDatabase(QSqlDatabase *db)
+int MythContext::OpenDatabase(QSqlDatabase *db, bool promptOnFailure)
 {
+    if (promptOnFailure)
+    {
+        // RetryDatabaseConnection will use GUI or console prompts
+        // to edit settings if connection fails
+        return (int)(d->RetryDatabaseConnection(db));
+    }
+    
+    int res = 1;
+    
     d->dbLock.lock();
     if (!d->m_db->isOpen()) {
         d->m_db->setDatabaseName(d->m_settings->GetSetting("DBName"));
         d->m_db->setUserName(d->m_settings->GetSetting("DBUserName"));
         d->m_db->setPassword(d->m_settings->GetSetting("DBPassword"));
         d->m_db->setHostName(d->m_settings->GetSetting("DBHostName"));
-        d->m_db->open();
+        res = d->m_db->open();
     }
     d->dbLock.unlock();
-        
-    db->setDatabaseName(d->m_settings->GetSetting("DBName"));
-    db->setUserName(d->m_settings->GetSetting("DBUserName"));
-    db->setPassword(d->m_settings->GetSetting("DBPassword"));
-    db->setHostName(d->m_settings->GetSetting("DBHostName"));
- 
-    int res = db->open();
+    
     if (!res)
-        cerr << "Unable to connect to database!" << endl
-             << DBErrorMessage(db->lastError()) << endl;
+    {
+        VERBOSE(VB_IMPORTANT, "Unable to connect to database!");
+        VERBOSE(VB_IMPORTANT, DBErrorMessage(d->m_db->lastError()));
+    }
+    else if (db)
+    {
+        db->setDatabaseName(d->m_settings->GetSetting("DBName"));
+        db->setUserName(d->m_settings->GetSetting("DBUserName"));
+        db->setPassword(d->m_settings->GetSetting("DBPassword"));
+        db->setHostName(d->m_settings->GetSetting("DBHostName"));
+        
+        res = db->open();
+        if (!res)
+        {
+            VERBOSE(VB_IMPORTANT, "Unable to connect to database!");
+            VERBOSE(VB_IMPORTANT, DBErrorMessage(db->lastError()));
+        }
+    }
     return res;
 }
 
@@ -1680,3 +2053,60 @@ MythPrivRequest MythContext::popPrivRequest()
     }
     return ret_val;
 }
+
+DatabaseParams MythContext::GetDatabaseParams(void)
+{
+    DatabaseParams params;
+    
+    params.dbHostName = d->m_settings->GetSetting("DBHostName", "localhost");
+    params.dbUserName = d->m_settings->GetSetting("DBUserName", "mythtv");
+    params.dbPassword = d->m_settings->GetSetting("DBPassword", "mythtv");
+    params.dbName     = d->m_settings->GetSetting("DBName",     "mythconverg");
+    params.dbType     = d->m_settings->GetSetting("DBType",     "QMYSQL3");
+    
+    params.localHostName = d->m_settings->GetSetting("LocalHostName", "");
+    if (params.localHostName.isEmpty())
+    {
+        params.localEnabled = false;
+        params.localHostName = "my-unique-identifier-goes-here";
+    }
+    else
+        params.localEnabled = true;
+    
+    params.wolReconnect = d->m_settings->GetNumSetting("WOLsqlReconnectWaitTime", -1);
+    if (params.wolReconnect == -1)
+    {
+        params.wolEnabled = false;
+        params.wolReconnect = 0;
+    }
+    else
+        params.wolEnabled = true;
+
+    params.wolRetry = d->m_settings->GetNumSetting("WOLsqlConnectRetry", 5);
+    params.wolCommand = d->m_settings->GetSetting("WOLsqlCommand", "echo 'WOLsqlServerCommand not set'");
+    
+    return params;
+}
+
+bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
+{
+    DatabaseParams cur_params = GetDatabaseParams();
+    
+    // only rewrite file if it hasn't changed
+    if (params.dbHostName   != cur_params.dbHostName          ||
+        params.dbUserName   != cur_params.dbUserName          ||
+        params.dbPassword   != cur_params.dbPassword          ||
+        params.dbName       != cur_params.dbName              ||
+        params.dbType       != cur_params.dbType              ||
+        params.localEnabled != cur_params.localEnabled        ||
+        params.wolEnabled   != cur_params.wolEnabled          ||
+        (params.localEnabled &&
+         (params.localHostName != cur_params.localHostName))  ||
+        (params.wolEnabled &&
+         (params.wolReconnect  != cur_params.wolReconnect ||
+          params.wolRetry      != cur_params.wolRetry     ||
+          params.wolCommand    != cur_params.wolCommand)))
+        return d->WriteSettingsFile(params, true);
+    return true;
+}
+    

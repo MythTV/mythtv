@@ -1,4 +1,5 @@
 #include "mythcontext.h"
+#include "dbsettings.h"
 
 #include "globalsettings.h"
 #include "scheduledrecording.h"
@@ -213,7 +214,7 @@ static GenericComboBox *DeinterlaceFilter()
     gc->addSelection(QObject::tr("Kernel (less motion blur)"), "kerneldeint");
     gc->addSelection(QObject::tr("Bob (2x framerate)"), "bobdeint");
     gc->addSelection(QObject::tr("One field"), "onefield");
-    gc->setHelpText(QObject::tr("Deinterlace algorithm.  'Linear blend' and "
+    gc->setHelpText(QObject::tr("Deinterlace algorithm. "
                                 "'Kernel' require SSE. 'Bob' requires "
                                 "Xv or XvMC video out."));
     return gc;
@@ -666,7 +667,7 @@ static GenericComboBox *MenuTheme()
     GenericComboBox *gc = new GenericComboBox("MenuTheme");
     gc->setLabel(QObject::tr("Menu theme"));
 
-    QDir themes(PREFIX"/share/mythtv/themes");
+    QDir themes(gContext->GetThemesParentDir());
     themes.setFilter(QDir::Dirs);
     themes.setSorting(QDir::Name | QDir::IgnoreCase);
     gc->addSelection(QObject::tr("Default"));
@@ -693,7 +694,7 @@ static GenericComboBox *OSDTheme()
     GenericComboBox *gc = new GenericComboBox("OSDTheme");
     gc->setLabel(QObject::tr("OSD theme"));
 
-    QDir themes(PREFIX"/share/mythtv/themes");
+    QDir themes(gContext->GetThemesParentDir());
     themes.setFilter(QDir::Dirs);
     themes.setSorting(QDir::Name | QDir::IgnoreCase);
 
@@ -719,7 +720,7 @@ static GenericComboBox *OSDFont()
 {
     GenericComboBox *gc = new GenericComboBox("OSDFont");
     gc->setLabel(QObject::tr("OSD font"));
-    QDir ttf(PREFIX"/share/mythtv", "*ttf");
+    QDir ttf(gContext->GetFontsDir(), gContext->GetFontsNameFilter());
     gc->fillSelectionsFromDir(ttf, false);
 
     return gc;
@@ -729,7 +730,7 @@ static GenericComboBox *OSDCCFont()
 {
     GenericComboBox *gc = new GenericComboBox("OSDCCFont");
     gc->setLabel(QObject::tr("Closed Caption font"));
-    QDir ttf(PREFIX"/share/mythtv", "*ttf");
+    QDir ttf(gContext->GetFontsDir(), gContext->GetFontsNameFilter());
     gc->fillSelectionsFromDir(ttf, false);
 
     return gc;
@@ -1474,7 +1475,7 @@ ThemeSelector::ThemeSelector():
 
     setLabel(QObject::tr("Theme"));
 
-    QDir themes(PREFIX"/share/mythtv/themes");
+    QDir themes(gContext->GetThemesParentDir());
     themes.setFilter(QDir::Dirs);
     themes.setSorting(QDir::Name | QDir::IgnoreCase);
 
@@ -2387,6 +2388,32 @@ static GenericCheckBox *LCDBacklightOn()
 #endif
 
 #ifdef CONFIG_DARWIN
+static GenericCheckBox *MacGammaCorrect()
+{
+    GenericCheckBox *gc = new GenericCheckBox("MacGammaCorrect");
+    gc->setLabel(QObject::tr("Enable gamma correction for video"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If checked, QuickTime will correct the gamma "
+                    "of the video to match your monitor.  Turning this off can "
+                    "save some CPU cycles."));
+    return gc;
+}
+
+static GenericCheckBox *MacYuvConversion()
+{
+    GenericCheckBox *gc = new GenericCheckBox("MacYuvConversion");
+    gc->setLabel(QObject::tr("Use Altivec-enhanced color space conversion"));
+#ifdef USING_ALTIVEC
+    gc->setValue(true);
+#else
+    gc->setValue(false);
+#endif
+    gc->setHelpText(QObject::tr("If checked, YUV 4:2:0 will be converted to "
+                    "UYVY 4:2:2 in an Altivec-enabled routine.  If unchecked, "
+                    "QuickTime will handle the conversion instead."));
+    return gc;
+}
+
 static GenericCheckBox *MacScaleUp()
 {
     GenericCheckBox *gc = new GenericCheckBox("MacScaleUp");
@@ -2619,6 +2646,8 @@ static GenericCheckBox *WatchTVGuide()
 
 MainGeneralSettings::MainGeneralSettings()
 {
+    DatabaseSettings::addDatabaseSettings(this);
+
     AudioSettings *audio = new AudioSettings();
     addChild(audio);
 
@@ -2733,6 +2762,8 @@ PlaybackSettings::PlaybackSettings()
 #ifdef CONFIG_DARWIN
     VerticalConfigurationGroup* mac1 = new VerticalConfigurationGroup(false);
     mac1->setLabel(QObject::tr("Mac OS X video settings") + " 1/2");
+    mac1->addChild(MacGammaCorrect());
+    mac1->addChild(MacYuvConversion());
     mac1->addChild(MacScaleUp());
     mac1->addChild(MacFullSkip());
     addChild(mac1);

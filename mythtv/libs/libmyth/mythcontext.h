@@ -62,6 +62,23 @@ enum LogPriorities {
     LP_DEBUG     = 7
 };
 
+struct DatabaseParams {
+    QString dbHostName;         // database server
+    QString dbUserName;         // DB user name 
+    QString dbPassword;         // DB password
+    QString dbName;             // database name
+    QString dbType;             // database type (MySQL, Postgres, etc.)
+    
+    bool    localEnabled;       // true if localHostName is not default
+    QString localHostName;      // name used for loading/saving settings
+    
+    bool    wolEnabled;         // true if wake-on-lan params are used
+    int     wolReconnect;       // seconds to wait for reconnect
+    int     wolRetry;           // times to retry
+    QString wolCommand;         // command to use for wake-on-lan
+};
+    
+
 #define VERBOSE(mask,args...) \
 do { \
 if ((print_verbose_messages & mask) != 0) \
@@ -110,7 +127,7 @@ class MythPrivRequest
     void *m_data;
 };
 
-#define MYTH_BINARY_VERSION "0.16.20041129-1"
+#define MYTH_BINARY_VERSION "0.16.20041207-1"
 #define MYTH_PROTO_VERSION "14"
 
 extern int print_verbose_messages;
@@ -134,6 +151,7 @@ class MythContext : public QObject
 
     QString GetInstallPrefix(void);
     QString GetShareDir(void);
+    QString GetLibraryDir(void);
 
     QString GetFilePrefix(void);
 
@@ -154,11 +172,30 @@ class MythContext : public QObject
 
     QString GetMenuThemeDir(void);
 
-    int OpenDatabase(QSqlDatabase *db);
+    QString GetThemesParentDir(void);
+
+    QString GetPluginsDir(void);
+    QString GetPluginsNameFilter(void);
+    QString FindPlugin(const QString &plugname);
+
+    QString GetTranslationsDir(void);
+    QString GetTranslationsNameFilter(void);
+    QString FindTranslation(const QString &translation);
+
+    QString GetFontsDir(void);
+    QString GetFontsNameFilter(void);
+    QString FindFont(const QString &fontname);
+
+    QString GetFiltersDir(void);
+
+    int OpenDatabase(QSqlDatabase *db, bool promptOnFailure = true);
     static void KickDatabase(QSqlDatabase *db);
     static void DBError(const QString &where, const QSqlQuery& query);
     static QString DBErrorMessage(const QSqlError& err);
 
+    DatabaseParams GetDatabaseParams(void);
+    bool SaveDatabaseParams(const DatabaseParams &params);
+    
     void LogEntry(const QString &module, int priority,
                   const QString &message, const QString &details);
 

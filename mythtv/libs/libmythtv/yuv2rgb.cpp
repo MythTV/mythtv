@@ -32,6 +32,9 @@
 #define CPU_MMXEXT 0
 #define CPU_MMX 1
 #endif
+#ifdef USING_ALTIVEC
+#include <Accelerate/Accelerate.h>
+#endif
 #include "yuv2rgb.h"
 
 static void yuv420_argb32_non_mmx(unsigned char *image, unsigned char *py,
@@ -521,4 +524,138 @@ void rgb32_to_yuv420p(unsigned char *lum, unsigned char *cb, unsigned char *cr,
         lum += wrap;
         alpha += wrap;
     }
+}
+
+static void non_vec_yuv420_2vuy (uint8_t * image, uint8_t * py,
+                                 uint8_t * pu, uint8_t * pv,
+                                 int h_size, int v_size,
+                                 int vuy_stride, int y_stride, int uv_stride)
+{
+    uint8_t *pi1, *pi2 = image;
+    uint8_t *py1, *py2 = py;
+
+    int x, y;
+
+    for (y = v_size / 2; y--; )
+    {
+        pi1  = pi2;
+        pi2 += v_size * 2;
+        py1  = py2;
+        py2 += v_size;
+
+        for (x = h_size / 2; x--; )
+        {
+            *(pi1)++ =            *(pi2)++ = *(pu)++;
+            *(pi1)++ = *(py1)++;  *(pi2)++ = *(py2)++;
+            *(pi1)++ =            *(pi2)++ = *(pv)++;
+            *(pi1)++ = *(py1)++;  *(pi2)++ = *(py2)++;
+        }
+
+        py1 += y_stride;
+        py2 += y_stride;
+        pu  += uv_stride;
+        pv  += uv_stride;
+        pi1 += vuy_stride;
+        pi2 += vuy_stride;
+    }
+}
+
+#ifdef USING_ALTIVEC
+// Altivec code adapted from VLC's i420_yuv2.c (thanks to Titer and Paul Jara) 
+
+#define VEC_NEXT_LINES()                                                    \
+    pi1  = pi2;                                                             \
+    pi2 += h_size * 2;                                                      \
+    py1  = py2;                                                             \
+    py2 += h_size;
+
+#define VEC_LOAD_UV()                                                       \
+    u_vec = vec_ld(0, pu); pu += 16;                                        \
+    v_vec = vec_ld(0, pv); pv += 16;
+
+#define VEC_MERGE(a)                                                        \
+    uv_vec = a(u_vec, v_vec);                                               \
+    y_vec = vec_ld(0, py1); py1 += 16;                                      \
+    vec_st(vec_mergeh(uv_vec, y_vec), 0, pi1); pi1 += 16;                   \
+    vec_st(vec_mergel(uv_vec, y_vec), 0, pi1); pi1 += 16;                   \
+    y_vec = vec_ld(0, py2); py2 += 16;                                      \
+    vec_st(vec_mergeh(uv_vec, y_vec), 0, pi2); pi2 += 16;                   \
+    vec_st(vec_mergel(uv_vec, y_vec), 0, pi2); pi2 += 16;
+
+static void altivec_yuv420_2vuy (uint8_t * image, uint8_t * py,
+                                 uint8_t * pu, uint8_t * pv,
+                                 int h_size, int v_size,
+                                 int vuy_stride, int y_stride, int uv_stride)
+{
+    uint8_t *pi1, *pi2 = image;
+    uint8_t *py1, *py2 = py;
+        
+    int x, y;
+
+    vector unsigned char u_vec;
+    vector unsigned char v_vec;
+    vector unsigned char uv_vec;
+    vector unsigned char y_vec;
+
+    if (!((h_size % 32) | (v_size % 2)))
+    {
+        // Width is a multiple of 32, process 2 lines at a time
+        for (y = v_size / 2; y--; )
+        {
+            VEC_NEXT_LINES();
+            for (x = h_size / 32; x--; )
+            {
+                VEC_LOAD_UV();
+                VEC_MERGE(vec_mergeh);
+                VEC_MERGE(vec_mergel);
+            }
+        }
+    
+    }
+    else if (!((h_size % 16) | (v_size % 4)))
+    {
+        // Width is a multiple of 16, process 4 lines at a time
+        for (y = v_size / 4; y--; )
+        {
+            // Lines 1-2, pixels 0 to (width - 16)
+            VEC_NEXT_LINES();
+            for (x = h_size / 32; x--; )
+            {
+                VEC_LOAD_UV();
+                VEC_MERGE(vec_mergeh);
+                VEC_MERGE(vec_mergel);
+            }
+            
+            // Lines 1-2, pixels (width - 16) to width
+            VEC_LOAD_UV();
+            VEC_MERGE(vec_mergeh);
+            
+            // Lines 3-4, pixels 0-16
+            VEC_NEXT_LINES();
+            VEC_MERGE(vec_mergel);
+            
+            // Lines 3-4, pixels 16 to width
+            for (x = h_size / 32; x--; )
+            {
+                VEC_LOAD_UV();
+                VEC_MERGE(vec_mergeh);
+                VEC_MERGE(vec_mergel);
+            }
+        }
+    }
+    else
+    {
+        // Fall back to C version
+        non_vec_yuv420_2vuy(image, py, pu, pv, h_size, v_size,
+                            vuy_stride, y_stride, uv_stride);
+    }
+}
+#endif
+
+yuv2vuy_fun yuv2vuy_init_altivec (void)
+{
+#ifdef USING_ALTIVEC
+    return altivec_yuv420_2vuy;
+#endif
+    return non_vec_yuv420_2vuy; /* Fallback to C */
 }

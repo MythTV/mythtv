@@ -122,9 +122,9 @@ int main(int argc, char *argv[])
 
     UpgradeTVDatabaseSchema();
 
-    translator->load(PREFIX + QString("/share/mythtv/i18n/mythfrontend_") + 
-                     QString(gContext->GetSetting("Language").lower()) + 
-                     QString(".qm"), ".");
+    translator->load(
+        gContext->FindTranslation(gContext->GetSetting("Language")),
+        ".");
     a.installTranslator(translator);
 
     gContext->SetSetting("Theme", "blue");

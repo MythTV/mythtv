@@ -66,7 +66,7 @@ void FilterChain::deleteItem(QPtrCollection::Item d)
 
 FilterManager::FilterManager()
 {
-    QDir FiltDir(MYTHTV_FILTER_PATH);
+    QDir FiltDir(gContext->GetFiltersDir());
     QString Path;
 
     FiltDir.setFilter(QDir::Files | QDir::Readable);

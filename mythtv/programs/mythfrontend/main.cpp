@@ -396,9 +396,9 @@ void TVMenuCallback(void *data, QString &selection)
         settings.exec(QSqlDatabase::database());
 
         qApp->removeTranslator(translator);
-        translator->load(PREFIX + QString("/share/mythtv/i18n/mythfrontend_") +
-                         QString(gContext->GetSetting("Language").lower()) +
-                         QString(".qm"), ".");
+        translator->load(
+            gContext->FindTranslation(gContext->GetSetting("Language")),
+            ".");
         qApp->installTranslator(translator);
 
         gContext->LoadQtConfig();
@@ -550,7 +550,7 @@ void WriteDefaults(QSqlDatabase* db)
 
 QString RandTheme(QString &themename, QSqlDatabase *db)
 {
-    QDir themes(PREFIX"/share/mythtv/themes");
+    QDir themes(gContext->GetThemesParentDir());
     themes.setFilter(QDir::Dirs);
 
     const QFileInfoList *fil = themes.entryInfoList(QDir::Dirs);
@@ -932,37 +932,7 @@ int main(int argc, char **argv)
     if (!gContext->OpenDatabase(db))
     {
         printf("couldn't open db\n");
-        int pause;
-        if ((pause = gContext->GetNumSetting("WOLsqlReconnectWaitTime", 0)) > 0)
-        {
-            int acttry = 1;
-            int retries = gContext->GetNumSetting("WOLsqlConnectRetry", 5);
-
-            QString WOLsqlCommand = gContext->GetSetting("WOLsqlCommand", 
-                                                   "echo \'WOLsqlServerCommand "
-                                                   "not set\nPlease do so in "
-                                                   "your mysql.txt!\'");
-
-            if (!WOLsqlCommand.isEmpty())
-            {
-                while (acttry <= retries && !gContext->OpenDatabase(db))
-                {
-                    printf("Trying to wakeup SQLserver (Try %d of %d)\n",
-                           acttry, retries);
-                    system(WOLsqlCommand);
-                    sleep(pause);
-                    ++acttry;
-                }
-            }
-
-            if (WOLsqlCommand.isEmpty() || (acttry > retries))
-            {
-                printf("Sorry, couldn't open db\nExiting.\n");
-                return -1;
-            }
-        }
-        else
-            return -1;
+        return -1;
     }
 
     UpgradeTVDatabaseSchema();
@@ -983,9 +953,9 @@ int main(int argc, char **argv)
             lcd->setupLEDs(RemoteGetRecordingMask);
     }
 
-    translator->load(PREFIX + QString("/share/mythtv/i18n/mythfrontend_") + 
-                     QString(gContext->GetSetting("Language").lower()) + 
-                     QString(".qm"), ".");
+    translator->load(
+        gContext->FindTranslation(gContext->GetSetting("Language")),
+        ".");
     a.installTranslator(translator);
 
     WriteDefaults(db);
