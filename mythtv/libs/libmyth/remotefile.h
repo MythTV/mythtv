@@ -24,6 +24,7 @@ class RemoteFile
     long long Seek(long long pos, int whence, long long curpos = -1);
 
     int Read(void *data, int size);
+    void Reset(void);
 
   private:
     QSocket *openSocket(bool control);

@@ -161,6 +161,18 @@ void RemoteFile::Close(void)
         controlSock->close();
 }
 
+void RemoteFile::Reset(void)
+{
+    usleep(10000);
+
+    pthread_mutex_lock(&lock);
+    int avail = sock->bytesAvailable();
+    char *trash = new char[avail + 1];
+    sock->readBlock(trash, avail);
+    delete [] trash;
+    pthread_mutex_unlock(&lock);
+}
+    
 bool RemoteFile::RequestBlock(int size)
 {
     QStringList strlist = QString(query).arg(recordernum);

@@ -96,7 +96,7 @@ void XvVideoOutput::sizehint(int x, int y, int width, int height, int max)
 
 bool XvVideoOutput::Init(int width, int height, char *window_name, 
                          char *icon_name, int num_buffers, 
-                         unsigned char **out_buffers)
+                         unsigned char **out_buffers, unsigned int wid)
 {
     pthread_mutex_init(&lock, NULL);
 
@@ -140,45 +140,57 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
     XJ_fullscreen = 0;
   
     data->XJ_root = DefaultRootWindow(data->XJ_disp);
-  
-    data->XJ_win = XCreateSimpleWindow(data->XJ_disp, data->XJ_root, 0, 0,
-                                       XJ_width, XJ_height, 0, XJ_white,
-                                       XJ_black);
-    data->XJ_curwin = data->XJ_win;
 
-    if (!data->XJ_win) 
-    {  
-        printf("create window failed\n");
-        return false; 
-    }
-
-    XSetClassHint(data->XJ_disp, data->XJ_win, &hint);
- 
     curx = 0; cury = 0;
     curw = XJ_width; curh = XJ_height;
 
     dispx = 0; dispy = 0;
-    dispw = curw; disph = curh; 
+    dispw = curw; disph = curh;
 
     embedding = false;
+
+    bool createwindow = true;
+    if (wid > 0)
+    {
+        data->XJ_win = wid;
+        data->XJ_curwin = data->XJ_win;
+        createwindow = false;
+    }
+
+    if (createwindow)
+    {
+        data->XJ_win = XCreateSimpleWindow(data->XJ_disp, data->XJ_root, 0, 0,
+                                           XJ_width, XJ_height, 0, XJ_white,
+                                           XJ_black);
+        data->XJ_curwin = data->XJ_win;
+
+        if (!data->XJ_win) 
+        {  
+            printf("create window failed\n");
+            return false; 
+        } 
+
+        XSetClassHint(data->XJ_disp, data->XJ_win, &hint);
  
-    /* tell window manager about our window */
+        /* tell window manager about our window */
 
-    sizehint(curx, cury, curw, curh, 0);
+        sizehint(curx, cury, curw, curh, 0);
   
-    wmhints.input=True;
-    wmhints.flags=InputHint;
+        wmhints.input=True;
+        wmhints.flags=InputHint;
 
-    XStringListToTextProperty(&window_name, 1 ,&windowName);
-    XStringListToTextProperty(&icon_name, 1 ,&iconName);
+        XStringListToTextProperty(&window_name, 1 ,&windowName);
+        XStringListToTextProperty(&icon_name, 1 ,&iconName);
 
-    XSetWMProperties(data->XJ_disp, data->XJ_win, 
-                     &windowName, &iconName,
-                     NULL, 0, &(data->hints), &wmhints, NULL);
+
+        XSetWMProperties(data->XJ_disp, data->XJ_win, 
+                         &windowName, &iconName,
+                         NULL, 0, &(data->hints), &wmhints, NULL);
   
-    XSelectInput(data->XJ_disp, data->XJ_win, ExposureMask|KeyPressMask);
-    XMapRaised(data->XJ_disp, data->XJ_win);
-  
+        XSelectInput(data->XJ_disp, data->XJ_win, ExposureMask|KeyPressMask);
+        XMapRaised(data->XJ_disp, data->XJ_win);
+    }
+ 
     old_handler = XSetErrorHandler(XJ_error_catcher);
     XSync(data->XJ_disp, 0);
 
@@ -290,7 +302,8 @@ bool XvVideoOutput::Init(int width, int height, char *window_name,
   
     XJ_started = 1;
 
-    ToggleFullScreen();
+    if (createwindow)
+        ToggleFullScreen();
 
     if (colorid != GUID_I420_PLANAR)
     {

@@ -74,6 +74,9 @@ NuppelVideoPlayer::NuppelVideoPlayer(void)
     wpos = rpos = 0;
     waud = raud = 0;
 
+    embedid = 0;
+    embx = emby = embw = embh = -1;
+
     nvr_num = -1;
 
     paused = 0;
@@ -248,7 +251,11 @@ void NuppelVideoPlayer::InitVideo(void)
     char name[] = "MythTV"; 
     videoOutput = new XvVideoOutput();
     videoOutput->Init(video_width, video_height, name, name, MAXVBUFFER + 1, 
-                      vbuffer);
+                      vbuffer, embedid);
+    if (embedid > 0)
+    {
+        videoOutput->EmbedInWidget(embedid, embx, emby, embw, embh);
+    }
 }
 
 void NuppelVideoPlayer::InitSound(void)
@@ -1287,6 +1294,14 @@ void NuppelVideoPlayer::EmbedInWidget(unsigned long wid, int x, int y, int w,
     if (videoOutput)
     {
         videoOutput->EmbedInWidget(wid, x, y, w, h);
+    }
+    else
+    {
+        embedid = wid;
+        embx = x; 
+        emby = y; 
+        embw = w; 
+        embh = h;
     }
 }
 

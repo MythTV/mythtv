@@ -63,6 +63,7 @@ void MainServer::readSocket(void)
         else if (command == "DONE")
         {
             HandleDone(socket);
+            return;
         }
 
         PlaybackSock *pbs = getPlaybackBySock(socket);
@@ -112,6 +113,14 @@ void MainServer::readSocket(void)
                 else
                     HandleFileTransferQuery(listline, tokens, pbs);
             }
+            else
+            {
+               cout << "unknown command: " << command << endl;
+            }
+        }
+        else
+        {
+            cout << "unknown socket\n";
         }
     }
 }
@@ -604,11 +613,16 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         long long ret = enc->SeekRingBuffer(curpos, pos, whence);
         encodeLongLong(retlist, ret);
     }
-    else if (command == "STOP_RINGBUF")
+    else if (command == "DONE_RINGBUF")
     {
         enc->KillReadThread();
 
         retlist << "OK";
+    }
+    else
+    {
+        cout << "unknown command: " << command << endl;
+        retlist << "ok";
     }
 
     WriteStringList(pbs->getSocket(), retlist);    
@@ -640,14 +654,17 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
     else if (command == "STOP")
     {
         ft->Stop();
+        retlist << "ok";
     }
     else if (command == "PAUSE")
     {
         ft->Pause();
+        retlist << "ok";
     }
     else if (command == "UNPAUSE")
     {
         ft->Unpause();
+        retlist << "ok";
     }
     else if (command == "REQUEST_BLOCK")
     {
@@ -664,7 +681,11 @@ void MainServer::HandleFileTransferQuery(QStringList &slist,
         long long ret = ft->Seek(curpos, pos, whence);
         encodeLongLong(retlist, ret);
     }
-
+    else 
+    {
+        cout << "Unknown command: " << command << endl;
+        retlist << "ok";
+    }
 
     WriteStringList(pbs->getSocket(), retlist);
 }

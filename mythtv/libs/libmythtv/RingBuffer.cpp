@@ -331,13 +331,7 @@ void RingBuffer::Reset(void)
     {
         if (remotefile)
         {
-            usleep(10000);
-
-            QSocket *sock = remotefile->getSocket();
-            int avail = sock->bytesAvailable();
-            char *trash = new char[avail + 1];
-            sock->readBlock(trash, avail);
-            delete [] trash;
+            remotefile->Reset();
         }
         else
         {

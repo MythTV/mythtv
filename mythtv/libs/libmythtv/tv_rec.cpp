@@ -577,12 +577,15 @@ void TVRec::GetChannelInfo(Channel *chan, QString &title, QString &subtitle,
                            QString &callsign, QString &iconpath, 
                            QString &channelname)
 {
-    title = "";
-    subtitle = "";
-    desc = "";
-    category = "";
-    starttime = "";
-    endtime = "";
+    title = " ";
+    subtitle = " ";
+    desc = " ";
+    category = " ";
+    starttime = " ";
+    endtime = " ";
+    callsign = " ";
+    iconpath = " ";
+    channelname = " ";
 
     if (!db_conn)
         return;

@@ -41,6 +41,7 @@ class NuppelVideoPlayer
    ~NuppelVideoPlayer();
 
     void SetAsPIP(void) { disableaudio = disablevideo = true; }
+    void SetNoAudio(void) { disableaudio = true; }
 
     void SetAudioDevice(QString device) { audiodevice = device; }
     void SetFileName(QString lfilename) { filename = lfilename; }
@@ -341,6 +342,9 @@ class NuppelVideoPlayer
     bool own_vidbufs;
 
     MythContext *m_context;
+
+    unsigned int embedid;
+    int embx, emby, embw, embh;
 };
 
 #endif

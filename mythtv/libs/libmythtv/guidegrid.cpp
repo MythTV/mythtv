@@ -367,7 +367,7 @@ void GuideGrid::createProgramLabel(int titlefontsize, int progfontsize)
     // CURRENT TIME AND CHANNEL FOREGROUND COLOR
     currentTime->setPaletteForegroundColor(curTimeChan_fgColor);
 
-    ChannelInfo *chinfo = &(m_channelInfos[m_currentRow]);
+    ChannelInfo *chinfo = &(m_channelInfos[m_currentStartChannel]);
     currentChan = new QLabel(chinfo->chanstr + "*" + chinfo->callsign, this);
     currentChan->setMinimumWidth((int)(180*wmult));
     currentChan->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
