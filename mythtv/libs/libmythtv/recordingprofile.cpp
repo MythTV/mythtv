@@ -49,6 +49,9 @@ public:
         SliderSetting(1,9,1) {
         setLabel("MP3 Quality");
         setValue(7);
+	setHelpText("The higher the slider number, the lower the quality "
+                    "of the audio.  Better quality audio (lower numbers) "
+                    "requires more CPU.");
     };
 };
 
@@ -60,6 +63,9 @@ public:
         addSelection("32000");
         addSelection("44100");
         addSelection("48000");
+	setHelpText("Used to set the audio sampling rate from your DSP. "
+                    "Ensure that you choose a sampling rate appropriate "
+                    "for your device.  btaudio may only allow 32000.");
     };
 };
 
@@ -102,6 +108,7 @@ public:
         SliderSetting(1,255,1) {
         setLabel("RTjpeg Quality");
         setValue(170);
+	setHelpText("Higher is better quality.");
     };
 };
 
@@ -112,6 +119,7 @@ public:
         SpinBoxSetting(0,31,1) {
         setLabel("Luma filter");
         setValue(0);
+	setHelpText("Lower is better.");
     };
 };
 
@@ -122,6 +130,7 @@ public:
         SpinBoxSetting(0,31,1) {
         setLabel("Chroma filter");
         setValue(0);
+	setHelpText("Lower is better.");
     };
 };
 
@@ -133,6 +142,8 @@ public:
 
         setLabel("Bitrate");
         setValue(2200);
+	setHelpText("Bitrate in kilobits/second.  2200Kbps is "
+                    "approximately 1 Gigabyte per hour.");
     };
 };
 
