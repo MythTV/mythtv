@@ -83,7 +83,6 @@ int getAlphaSortId(QString s)
     return v;
 }
 
-
 void DirEntry::writeTree(GenericTree *tree_to_write_to, GenericTree *sdTree)
 {
     GenericTree *sub_node;
@@ -104,6 +103,7 @@ void DirEntry::writeTree(GenericTree *tree_to_write_to, GenericTree *sdTree)
         sub_node->setAttribute(0, TA_SPEEDDIALENTRY);
         sub_node->setAttribute(1, id);
         sub_node->setAttribute(2, getAlphaSortId(NickName));
+        sub_node->setAttribute(3, ICON_PRES_UNKNOWN);
         SpeeddialNode = sub_node;
     }
 }
@@ -272,10 +272,11 @@ void Directory::ChangePresenceStatus(QString Uri, int Status, QString StatusStri
         {
             if (!SpeeddialsOnly) 
             {
-                (it->getTreeNode())->setSelectable(Status == 1 ? true : false);
+                (it->getTreeNode())->setSelectable(Status == ICON_PRES_OFFLINE ? false : true);
                 (it->getTreeNode())->setString(it->getNickName() + "      (" + StatusString + ")");
             }
-            (it->getSpeeddialNode())->setSelectable(Status == 1 ? true : false);
+            (it->getSpeeddialNode())->setSelectable(Status == ICON_PRES_OFFLINE ? false : true);
+            (it->getSpeeddialNode())->setAttribute(3, Status);
             (it->getSpeeddialNode())->setString(it->getNickName() + "      (" + StatusString + ")");
         }
     }
@@ -646,7 +647,7 @@ void DirectoryContainer::ChangeEntry(DirEntry *entry, QString nn, QString Url, Q
     entry->setOnHomeLan(OnHomeLan);
 
     // Change the entry in the GUI
-    GenericTree *Tree = findInTree(TreeRoot, 0, TA_DIRENTRY, 1, entry->getId());
+    findInTree(TreeRoot, 0, TA_DIRENTRY, 1, entry->getId());
 
     // TODO -- not yet allowed to change the name in the tree
     // because there is no GenericTree 'delete' fn to do so

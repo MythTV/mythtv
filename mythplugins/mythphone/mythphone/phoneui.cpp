@@ -70,6 +70,7 @@ PhoneUIBox::PhoneUIBox(QSqlDatabase *db,
 
     DirectoryList->setVisualOrdering(2); // Attribute 2 has ordering info
     DirectoryList->setTreeOrdering(2);
+    DirectoryList->setIconSelector(3); // Attribute 3 has icon info
 
     DirContainer->writeTree();
     DirectoryList->assignTreeData(DirContainer->getTreeRoot());
@@ -842,7 +843,14 @@ void PhoneUIBox::ProcessSipNotification()
         // See if the notification is a change in presence status of a remote client
         else if (NotifyType == "PRESENCE")
         {
-            DirContainer->ChangePresenceStatus(NotifyUrl, (NotifyParam1 == "offline" ? 0 : 1), NotifyParam2, true);
+            int newStatus = ICON_PRES_UNKNOWN;
+            if (NotifyParam1 == "offline")
+                newStatus = ICON_PRES_OFFLINE;
+            else if (NotifyParam1 == "open")
+                newStatus = ICON_PRES_ONLINE;
+            else if (NotifyParam1 == "inactive")
+                newStatus = ICON_PRES_AWAY;
+            DirContainer->ChangePresenceStatus(NotifyUrl, newStatus, NotifyParam2, true);
             DirectoryList->refresh();
         }
 
@@ -2095,6 +2103,7 @@ void PhoneUIStatusBar::updateMidCallTime(int Seconds)
 void PhoneUIStatusBar::updateMidCallAudioStats(int pIn, int pMiss, int pLate, int pOut)
 {
     audioStatsString = statsAudioCodec;
+    (void)pOut;
 
     // Estimate line quality
     int pLoss = pMiss + pLate;
@@ -2119,6 +2128,7 @@ void PhoneUIStatusBar::updateMidCallAudioStats(int pIn, int pMiss, int pLate, in
 void PhoneUIStatusBar::updateMidCallVideoStats(int pIn, int pMiss, int pLate, int pOut)
 {
     videoStatsString = statsVideoCodec;
+    (void)pOut;
 
     // Estimate line quality
     int pLoss = pMiss + pLate;
@@ -2143,6 +2153,7 @@ void PhoneUIStatusBar::updateMidCallVideoStats(int pIn, int pMiss, int pLate, in
 
 void PhoneUIStatusBar::updateMidCallBandwidth(int bIn, int bOut)
 {
+    (void)bIn;
     int duration = lastPoll.msecsTo(QTime::currentTime());
     lastPoll = QTime::currentTime();
 

@@ -146,6 +146,12 @@
                 <image function="downarrow" filename="mp_down_arrow.png"></image>
                 <image function="leftarrow" filename="mp_left_arrow.png"></image>
                 <image function="rightarrow" filename="mp_right_arrow.png"></image>
+                
+                <image function="icon" number="1" filename="mp_presence_online.png"></image>
+                <image function="icon" number="2" filename="mp_presence_offline.png"></image>
+                <image function="icon" number="3" filename="mp_presence_away.png"></image>
+
+                
                 <!--
                     the area of particular bins
                     you can make them show right to left,

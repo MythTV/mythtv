@@ -27,6 +27,11 @@
 #define TA_CALLHISTENTRY  5
 #define TA_SPEEDDIALENTRY 6
 
+// Values for the Attribute[3] on the Managed Tree, which determines which icon
+#define ICON_PRES_UNKNOWN     0
+#define ICON_PRES_ONLINE      1
+#define ICON_PRES_OFFLINE     2
+#define ICON_PRES_AWAY        3
 
 class DirEntry
 {
