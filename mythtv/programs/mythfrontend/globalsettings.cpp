@@ -158,10 +158,10 @@ public:
     ChannelOrdering():
         GlobalSetting("ChannelOrdering") {
         setLabel("Channel ordering");
-        addSelection("channum + 0");
-        addSelection("channum");
-        addSelection("chanid");
-        addSelection("callsign");
+        addSelection("channel number (numeric)", "channum + 0");
+        addSelection("channel number (alpha)", "channum");
+        addSelection("database order", "chanid");
+        addSelection("channel name", "callsign");
     };
 };
 
