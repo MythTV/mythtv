@@ -101,7 +101,7 @@ void Channel::SetFormat(const string &format)
 void Channel::SetFreqTable(const string &name)
 {
     int i = 0;
-    char *listname = chanlists[i].name;
+    char *listname = (char *)chanlists[i].name;
 
     curList = NULL;
     while (listname != NULL)
@@ -113,7 +113,7 @@ void Channel::SetFreqTable(const string &name)
             break;
         }
         i++;
-        listname = chanlists[i].name;
+        listname = (char *)chanlists[i].name;
     }
     if (!curList)
     {

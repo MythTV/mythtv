@@ -39,7 +39,7 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     QLabel *label = new QLabel("Select a recording to permanantly delete:", this);
     vbox->addWidget(label);
 
-    listview = new QListView(this);
+    listview = new MyListView(this);
     listview->addColumn("#");
     listview->addColumn("Date");
     listview->addColumn("Title");
@@ -159,6 +159,7 @@ DeleteBox::DeleteBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
 void DeleteBox::Show()
 {
     showFullScreen();
+    setActiveWindow();
 }
 
 void DeleteBox::changed(QListViewItem *lvitem)

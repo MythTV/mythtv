@@ -115,6 +115,7 @@ int RTjpeg::b2s(int16_t *data, int8_t *strm, uint8_t bt8)
  register unsigned char bitten;
  register unsigned char bitoff;
 
+ bt8 = bt8;
 #ifdef SHOWBLOCK
 
   int ii;
@@ -287,6 +288,7 @@ int RTjpeg::s2b(int16_t *data, int8_t *strm, uint8_t bt8, int32_t *qtbla)
  register unsigned char bitten;
  register unsigned char bitoff;
 
+ bt8 = bt8;
  /* first byte always read */
  i=RTjpeg_ZZ[0];
  data[i]=((uint8_t)strm[0])*qtbl[i];

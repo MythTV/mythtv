@@ -95,6 +95,11 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
             proginfo->channum = query.value(0).toString();
             proginfo->recordtype = 1;
 
+            if (proginfo->subtitle == 0)
+                proginfo->subtitle = "";
+            if (proginfo->description == 0)
+                proginfo->description = "";
+
             recordingList.push_back(proginfo);
         }
     }
@@ -149,6 +154,11 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
                     proginfo->channum = subquery.value(0).toString();
                     proginfo->recordtype = 2;
 
+                    if (proginfo->subtitle == 0)
+                        proginfo->subtitle = "";
+                    if (proginfo->description == 0)
+                        proginfo->description = "";
+
                     recordingList.push_back(proginfo);
                 }
             }
@@ -199,6 +209,11 @@ bool Scheduler::FillRecordLists(bool doautoconflicts)
                                                    Qt::ISODate);
                     proginfo->channum = subquery.value(0).toString();
                     proginfo->recordtype = 3;
+
+                    if (proginfo->subtitle == 0)
+                        proginfo->subtitle = "";
+                    if (proginfo->description == 0)
+                        proginfo->description = "";
 
                     recordingList.push_back(proginfo);
                 }

@@ -36,7 +36,7 @@ ViewScheduled::ViewScheduled(QString prefix, TV *ltv, QSqlDatabase *ldb,
     desclabel = new QLabel("Select a recording to view:", this);
     vbox->addWidget(desclabel);
 
-    listview = new QListView(this);
+    listview = new MyListView(this);
     listview->addColumn("#");
     listview->addColumn("Date");
     listview->addColumn("Title");
@@ -146,6 +146,7 @@ void ViewScheduled::FillList(void)
 void ViewScheduled::Show()
 {
     showFullScreen();
+    setActiveWindow();
 }
 
 void ViewScheduled::changed(QListViewItem *lvitem)

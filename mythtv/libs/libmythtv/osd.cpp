@@ -101,6 +101,10 @@ void OSD::SetInfoText(const string &text, const string &subtitle,
     infotext = text;
     subtitletext = subtitle;
     desctext = desc;
+
+    string dummy = category;
+    dummy = start;
+    dummy = end;
 }
 
 void OSD::SetChannumText(const string &text, int length)

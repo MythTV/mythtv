@@ -43,6 +43,7 @@ void MenuBox::AddButton(const char *title)
 void MenuBox::Show()
 {
     showFullScreen();
+    setActiveWindow();
 }
 
 void MenuBox::buttonPressed(int which)

@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <qsqldatabase.h>
 
 #include "XJ.h"
 #include "tv.h"
@@ -1020,64 +1021,50 @@ void TV::GetChannelInfo(int lchannel, string &title, string &subtitle,
 
     strftime(curtimestr, 128, "%Y%m%d%H%M%S", loctime);
 
-    char query[1024];
-    sprintf(query, "SELECT * FROM program WHERE channum = %d AND starttime < %s AND endtime > %s;", lchannel, curtimestr, curtimestr);
+    char thequery[1024];
+    sprintf(thequery, "SELECT * FROM program WHERE channum = %d AND starttime < %s AND endtime > %s;", lchannel, curtimestr, curtimestr);
 
-    MYSQL_RES *res_set;
+    QSqlQuery query = db_conn->exec(thequery);
 
-    if (mysql_query(db_conn, query) == 0)
+    if (query.isActive() && query.numRowsAffected() > 0)
     {
-        res_set = mysql_store_result(db_conn);
-  
-        MYSQL_ROW row;
+        query.next();
 
-        row = mysql_fetch_row(res_set);
-
-        if (row != NULL)
-        {
-            for (unsigned int i = 0; i < mysql_num_fields(res_set); i++)
-            {
-                switch (i) 
-                {
-                    case 0: break;
-                    case 1: starttime = row[i]; break;
-                    case 2: endtime = row[i]; break;
-                    case 3: if (row[i]) title = row[i]; break;
-                    case 4: if (row[i]) subtitle = row[i]; break;
-                    case 5: if (row[i]) desc = row[i]; break;
-                    case 6: if (row[i]) category = row[i]; break;
-                    default: break;
-                }
-            }
-        }
-
-        mysql_free_result(res_set);
+        starttime = query.value(1).toString().ascii();
+        endtime = query.value(2).toString().ascii();
+        title = query.value(3).toString().ascii();
+        subtitle = query.value(4).toString().ascii();
+        desc = query.value(5).toString().ascii();
+        category = query.value(6).toString().ascii();
     }
 }
 
 void TV::ConnectDB(void)
 {
-    db_conn = mysql_init(NULL);
+    db_conn = QSqlDatabase::addDatabase("QMYSQL3", "TV");
     if (!db_conn)
     {
-        printf("Couldn't init mysql connection\n");
+        printf("Couldn't initialize mysql connection\n");
+        return;
     }
-    else
+    db_conn->setDatabaseName("mythconverg");
+    db_conn->setUserName("mythtv");
+    db_conn->setPassword("mythtv");
+    db_conn->setHostName("localhost");
+
+    if (!db_conn->open())
     {
-        if (mysql_real_connect(db_conn, "localhost", "mythtv", "mythtv",
-                               "mythconverg", 0, NULL, 0) == NULL)
-        {
-            printf("Couldn't connect to mysql database, no channel info\n");
-            mysql_close(db_conn);
-            db_conn = NULL;
-        }
+        printf("Couldn't open database\n");
     }
 }
 
 void TV::DisconnectDB(void)
 {
     if (db_conn)
-        mysql_close(db_conn);
+    {
+        db_conn->close();
+        delete db_conn;
+    }
 }
 
 bool TV::CheckChannel(char *channum)
@@ -1086,26 +1073,13 @@ bool TV::CheckChannel(char *channum)
         return true;
 
     bool ret = false;
-    char query[1024];
-    sprintf(query, "SELECT * FROM channel WHERE channum = %s", channum);
+    char thequery[1024];
+    sprintf(thequery, "SELECT * FROM channel WHERE channum = %s", channum);
 
-    MYSQL_RES *res_set;
+    QSqlQuery query = db_conn->exec(thequery);
 
-    if (mysql_query(db_conn, query) == 0)
-    {
-        res_set = mysql_store_result(db_conn);
-
-        MYSQL_ROW row;
-
-        row = mysql_fetch_row(res_set);
-
-        if (row != NULL)
-        {
-            ret = true;
-        }
-            
-        mysql_free_result(res_set);
-    }
+    if (query.isActive() && query.numRowsAffected() > 0)
+        ret = true;
 
     return ret;
 }

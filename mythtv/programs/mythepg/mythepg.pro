@@ -7,6 +7,8 @@ CONFIG += thread
 target.path = /usr/local/bin
 INSTALLS = target
 
+include (../settings.pro)
+
 # Input
 HEADERS += guidegrid.h infodialog.h infostructs.h
 SOURCES += guidegrid.cpp infodialog.cpp infostructs.cpp main.cpp

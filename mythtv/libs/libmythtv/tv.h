@@ -4,7 +4,6 @@
 #include <string>
 using namespace std;
 
-#include <mysql.h>
 #include <pthread.h>
 
 #include "NuppelVideoRecorder.h"
@@ -25,6 +24,8 @@ typedef enum
     kState_WatchingOtherRecording,  // watching something else
     kState_RecordingOnly
 } TVState;
+
+class QSqlDatabase;
 
 class TV
 {
@@ -110,7 +111,7 @@ class TV
     char channelKeys[4];
     int channelkeysstored;
 
-    MYSQL *db_conn;
+    QSqlDatabase *db_conn;
 
     bool menurunning;
 

@@ -61,6 +61,11 @@ ProgramInfo *GetProgramAtDateTime(int channel, const char *time)
         proginfo->spread = -1;
         proginfo->recordtype = -1;
 
+        if (proginfo->subtitle == 0)           
+            proginfo->subtitle = "";
+        if (proginfo->description == 0)
+            proginfo->description = "";
+
         return proginfo;
     }
 

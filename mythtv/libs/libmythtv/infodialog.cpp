@@ -124,6 +124,7 @@ InfoDialog::InfoDialog(ProgramInfo *pginfo, QWidget *parent, const char *name)
     myinfo = pginfo;
      
     showFullScreen();
+    setActiveWindow();
 }
 
 QLabel *InfoDialog::getDateLabel(ProgramInfo *pginfo)

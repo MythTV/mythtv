@@ -55,6 +55,8 @@ void XJ_toggleFullscreen(void);
 
 int XJ_error_catcher(Display * d, XErrorEvent * xeev)
 {
+  d = d; 
+  xeev = xeev;
   ++XJ_caught_error;
   return 0;
 }
@@ -281,6 +283,7 @@ void XJ_exit(void)
 
 static void decorate(int dec)
 {
+   dec = dec;
 }
 
 static void hide_cursor(void)

@@ -10,6 +10,23 @@
 #include "infostructs.h"
 #include "programlistitem.h"
 
+void MyListView::keyPressEvent(QKeyEvent *e)
+{
+    if (e->key() == Key_Space) 
+    {
+        if ( currentItem() && !currentItem()->isEnabled() )
+        {
+        }
+        else
+        {   
+            emit spacePressed( currentItem() );
+            return;
+        }
+    }
+
+    QListView::keyPressEvent(e);
+}
+
 ProgramListItem::ProgramListItem(QListView *parent, ProgramInfo *lpginfo,
                                  RecordingInfo *lrecinfo, int numcols,
                                  TV *ltv, QString lprefix)

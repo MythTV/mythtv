@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <qsqldatabase.h>
 #include "recordinginfo.h"
 
 RecordingInfo::RecordingInfo(const string &chan, const string &start, 
@@ -65,9 +66,9 @@ struct tm *RecordingInfo::GetStructTM(string &timestamp)
     return rettm;
 }
 
-void RecordingInfo::WriteToDB(MYSQL *conn)
+void RecordingInfo::WriteToDB(QSqlDatabase *db)
 {
-    if (!conn)
+    if (!db)
         return;
 
     char query[4096];
@@ -77,7 +78,9 @@ void RecordingInfo::WriteToDB(MYSQL *conn)
                    channel.c_str(), starttime.c_str(), endtime.c_str(), 
                    title.c_str(), subtitle.c_str(), description.c_str());
 
-    if (mysql_query(conn, query) != 0)
+    QSqlQuery qquery = db->exec(query);
+
+    if (!qquery.isActive())
     {
         printf("couldn't insert recording into db\n");
     }
@@ -88,7 +91,9 @@ void RecordingInfo::WriteToDB(MYSQL *conn)
                    channel.c_str(), starttime.c_str(), endtime.c_str(),
                    title.c_str(), subtitle.c_str(), description.c_str());
 
-    if (mysql_query(conn, query) != 0)
+    qquery = db->exec(query);
+
+    if (!qquery.isActive())
     {
         printf("couldn't insert recording into db\n");
     }

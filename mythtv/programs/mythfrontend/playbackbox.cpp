@@ -147,6 +147,7 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
 void PlaybackBox::Show()
 {
     showFullScreen();
+    setActiveWindow();
 }
 
 void PlaybackBox::changed(QListViewItem *lvitem)

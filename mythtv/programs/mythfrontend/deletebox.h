@@ -6,7 +6,7 @@
 
 class QSqlDatabase;
 class QListViewItem;
-class QListView;
+class MyListView;
 class QLabel;
 class QProgressBar;
 class TV;
@@ -37,7 +37,7 @@ class DeleteBox : public QDialog
     QLabel *date;
     QLabel *pixlabel;
 
-    QListView *listview;
+    MyListView *listview;
 
     QLabel *freespace;
     QProgressBar *progressbar;

@@ -3,20 +3,26 @@
 ######################################################################
 
 TEMPLATE = app
-CONFIG += thread release
+CONFIG += thread
 TARGET = mythfrontend
 target.path = /usr/local/bin
 INSTALLS = target
 
-DEFINES += _GNU_SOURCE
-INCLUDEPATH += ../epg ../dialog ../tv ../tv/libNuppelVideo /usr/include/mysql
-LIBS += -L../tv -L../tv/libNuppelVideo -lmythtv -lNuppelVideo 
-LIBS += `../tv/libNuppelVideo/nuppelvideo-config --libs` `mysql_config --libs`
+include ( ../settings.pro )
+
+INCLUDEPATH += ../mythepg ../mythdialog ../libNuppelVideo ../libmythtv
+LIBS += -L../libmythtv -L../libNuppelVideo -lmythtv -lNuppelVideo -lXv
+LIBS += -lttf -lmp3lame
+
+TARGETDEPS = ../libNuppelVideo/libNuppelVideo.a ../libmythtv/libmythtv.a
 
 # Input
-HEADERS += ../epg/guidegrid.h ../epg/infodialog.h ../epg/infostructs.h 
-HEADERS += ../dialog/dialogbox.h menubox.h scheduler.h playbackbox.h
-HEADERS += deletebox.h programlistitem.h viewscheduled.h
-SOURCES += ../epg/guidegrid.cpp ../epg/infodialog.cpp ../epg/infostructs.cpp 
-SOURCES += ../dialog/dialogbox.cpp main.cpp menubox.cpp scheduler.cpp
-SOURCES += playbackbox.cpp deletebox.cpp programlistitem.cpp viewscheduled.cpp
+HEADERS += ../mythepg/guidegrid.h ../mythepg/infodialog.h 
+HEADERS += ../mythepg/infostructs.h ../mythdialog/dialogbox.h menubox.h 
+HEADERS += scheduler.h playbackbox.h deletebox.h programlistitem.h 
+HEADERS += viewscheduled.h
+
+SOURCES += ../mythepg/guidegrid.cpp ../mythepg/infodialog.cpp 
+SOURCES += ../mythepg/infostructs.cpp ../mythdialog/dialogbox.cpp main.cpp 
+SOURCES += menubox.cpp scheduler.cpp playbackbox.cpp deletebox.cpp 
+SOURCES += programlistitem.cpp viewscheduled.cpp

@@ -7,6 +7,8 @@ CONFIG += thread
 target.path = /usr/local/bin
 INSTALLS = target
 
+include (../settings.pro)
+
 # Input
 HEADERS += dialogbox.h
 SOURCES += dialogbox.cpp main.cpp

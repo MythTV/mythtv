@@ -7,6 +7,15 @@ class ProgramInfo;
 class RecordingInfo;
 class QPixmap;
 
+class MyListView : public QListView
+{
+  public:
+    MyListView(QWidget *parent) : QListView(parent) {}
+
+  protected:
+    void keyPressEvent( QKeyEvent *e );
+};
+
 class ProgramListItem : public QListViewItem
 {   
   public:

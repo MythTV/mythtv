@@ -6,7 +6,7 @@
 
 class QSqlDatabase;
 class QListViewItem;
-class QListView;
+class MyListView;
 class QLabel;
 class TV;
 class Scheduler;
@@ -44,7 +44,7 @@ class ViewScheduled : public QDialog
 
     Scheduler *sched;
 
-    QListView *listview;
+    MyListView *listview;
 };
 
 #endif

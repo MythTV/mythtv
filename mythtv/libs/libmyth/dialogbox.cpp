@@ -49,6 +49,7 @@ void DialogBox::AddButton(const QString &title)
 void DialogBox::Show()
 {
     showFullScreen();
+    setActiveWindow();
 }
 
 void DialogBox::buttonPressed(int which)

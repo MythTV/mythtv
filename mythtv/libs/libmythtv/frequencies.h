@@ -92,12 +92,12 @@
 /* --------------------------------------------------------------------- */
 
 typedef struct CHANLIST {
-    char *name;
+    const char *name;
     int   freq;
 } _chanlist;
 
 typedef struct CHANLISTS {
-    char             *name;
+    const char       *name;
     struct CHANLIST  *list;
     int               count;
 } _chanlists;

@@ -663,8 +663,9 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     //Jitterometer *output_jmeter = new Jitterometer("video_output", 100);
 
     videosize = video_width * video_height * 3 / 2;
- 
-    X11videobuf = XJ_init(video_width, video_height, "MythTV", "MythTV");
+
+    char name[] = "MythTV"; 
+    X11videobuf = XJ_init(video_width, video_height, name, name);
 
     int pause_rpos = 0;
     while (!eof && !killplayer)

@@ -4,7 +4,7 @@
 #include <string>
 using namespace std;
 
-#include <mysql.h>
+class QSqlDatabase;
 
 class RecordingInfo
 {
@@ -18,7 +18,7 @@ class RecordingInfo
     time_t GetStartTime(void);
     time_t GetEndTime(void);
 
-    void WriteToDB(MYSQL *conn);
+    void WriteToDB(QSqlDatabase *db);
 
     void GetChannel(string &schan) { schan = channel; }
     void GetStartTimeStamp(string &start) { start = starttime; }
