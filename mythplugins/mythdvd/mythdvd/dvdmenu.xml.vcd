@@ -4,7 +4,7 @@
       <text lang="DK">Afspil VCD</text>
       <text lang="FR">Lecture VCD</text>
       <text lang="PT">Tocar VCD</text>
-      <text lang="DE">VCD spielen</text>
+      <text lang="DE">VCD abspielen</text>
       <text lang="NL">VCD Afspelen</text>
       <text lang="JA">VCD再生</text>
       <action>VCD_PLAY</action>

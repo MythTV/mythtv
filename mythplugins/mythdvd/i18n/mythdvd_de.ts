@@ -7,7 +7,7 @@
     </message>
     <message>
         <source>Cannot connect to your Myth Transcoding Daemon. You can try hitting any number key to start it. If you still see this message, then something is really wrong.</source>
-        <translation>Kann nicht zum Myth Transcoding Daemon verbinden. Drücken Sie eine Zifferntaste um ihn zu starten. Sollte diese Meldung wieder erscheinen, dann ist etwas wirklich nicht in Ordnung.</translation>
+        <translation>Kann nicht zum Myth Transcoding Daemon verbinden. Drücken Sie eine Zifferntaste um ihn zu starten. Sollte diese Meldung wieder erscheinen, dann ist wirklich etwas nicht in Ordnung.</translation>
     </message>
     <message>
         <source>Attempting to connect to your mtd said host not found. This is unrecoverably bad. </source>
@@ -27,7 +27,7 @@
     </message>
     <message>
         <source>No jobs and nothing else to do. You could hit 0 to rip a DVD.</source>
-        <translation>Es gibt nichts zu tun. Drücken Sie &apos;0&apos; um eine DVD zu rippen.</translation>
+        <translation>Es gibt nichts zu tun. Drücken Sie &apos;0&apos; um eine DVD zu importieren.</translation>
     </message>
     <message>
         <source>No Jobs. Checking and/or waiting for DVD.</source>
@@ -35,7 +35,7 @@
     </message>
     <message>
         <source>No jobs and nothing else to do. You could hit 0 to rip a disc if you like.</source>
-        <translation>Es gibt nichts zu tun. Drücken Sie &apos;0&apos; um eine DVD zu rippen.</translation>
+        <translation>Es gibt nichts zu tun. Drücken Sie &apos;0&apos; um eine CD zu importieren.</translation>
     </message>
     <message>
         <source>Cancelling ...</source>
@@ -43,7 +43,7 @@
     </message>
     <message>
         <source>0 New Rip</source>
-        <translation>&apos;0&apos; Neuer Rip</translation>
+        <translation>&apos;0&apos; Neuer Import</translation>
     </message>
     <message>
         <source>9 Cancel Job</source>
@@ -56,7 +56,9 @@
         <source>
 
 You have no VCD Player command defined.</source>
-        <translation>Sie haben keinen VCD Abspielbefehl eingerichtet.</translation>
+        <translation>
+
+Sie haben keinen Befehl zum Abspielen von VCDs definiert.</translation>
     </message>
     <message>
         <source>OK, I&apos;ll go run Setup</source>
@@ -72,7 +74,9 @@ You have no VCD Device defined.</source>
         <source>
 
 You have no DVD Player command defined.</source>
-        <translation>Sie haben keinen DVD Abspielbefehl eingerichtet.</translation>
+        <translation>
+
+Sie haben keinen Befehl zum Abspielen von DVDs definiert.</translation>
     </message>
     <message>
         <source>
@@ -94,11 +98,11 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>General Settings</source>
-        <translation>Allgemeines</translation>
+        <translation>Grundeinstellungen</translation>
     </message>
     <message>
         <source>DVD Player Command</source>
-        <translation>DVD Spieler Befehlszeile</translation>
+        <translation>DVD Abspielbefehl</translation>
     </message>
     <message>
         <source>This can be any command to launch a DVD player (e.g. MPlayer, ogle, etc.). If present, %d will be substituted for the DVD device (e.g. /dev/dvd).</source>
@@ -106,7 +110,7 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>VCD Player Command</source>
-        <translation>VCD Spieler Befehlszeile</translation>
+        <translation>VCD Abspielbefehl</translation>
     </message>
     <message>
         <source>This can be any command to launch a VCD player (e.g. MPlayer, xine, etc.). If present, %d will be substituted for the VCD device (e.g. /dev/cdrom).</source>
@@ -114,15 +118,15 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>DVD Player Settings</source>
-        <translation>DVD Spieler Einstellungen</translation>
+        <translation>DVD Wiedergabe</translation>
     </message>
     <message>
         <source>VCD Player Settings</source>
-        <translation>VCD Spieler Einstellungen</translation>
+        <translation>VCD Wiedergabe</translation>
     </message>
     <message>
         <source>Directory to hold temporary files</source>
-        <translation>Temp. Verzeichnis</translation>
+        <translation>Verzeichnis für temp. Dateien</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythDVD needs to have write permission to the directory.</source>
@@ -150,15 +154,15 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>This is the base (without arguments) command to run transcode on your system.</source>
-        <translation>vollständiger Pfad und Dateiname zu &apos;transcode&apos; (z.B. /usr/bin/transcode).</translation>
+        <translation>Vollständiger Pfad und Dateiname zu &apos;transcode&apos; (z.B. /usr/bin/transcode).</translation>
     </message>
     <message>
         <source>MTD port number</source>
-        <translation>MTD Portnummer</translation>
+        <translation>Portnummer des MTD</translation>
     </message>
     <message>
         <source>The port number that should be used for communicating with the MTD (Myth Transcoding Daemon)</source>
-        <translation>Die Portnummer für die Kommunikation mit dem MTD (Myth Transcoding Daemon)</translation>
+        <translation>Die Portnummer für die Kommunikation mit dem MTD.</translation>
     </message>
     <message>
         <source>MTD logs to terminal window</source>
@@ -166,11 +170,11 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>If set, the MTD (Myth Transcoding Daemon) will log to the window it is started from. Otherwise, it will write to a file called  mtd.log in the top level ripping directory.</source>
-        <translation>Falls gesetzt, so protokolliert der MTD im Ursprungsfenster. Ansonsten werden alle Meldungen in die Datei &apos;mtd.log&apos; im obersten Rippingverzeichnis geschrieben.</translation>
+        <translation>Falls gesetzt, protokolliert der MTD im Terminalfenster in dem er gestartet wurde. Ansonsten werden alle Meldungen in die Datei &apos;mtd.log&apos; im obersten Importverzeichnis geschrieben.</translation>
     </message>
     <message>
         <source>Transcode AC3 Audio</source>
-        <translation>AC3 Audio umwandeln</translation>
+        <translation>AC3 Audio erhalten</translation>
     </message>
     <message>
         <source>If set, the MTD (Myth Transcoding Daemon) will, by default, preserve AC3 (Dolby Digital) audio in transcoded files. </source>
@@ -182,11 +186,11 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>If set, mythdvd will use the (open, free) xvid codec rather than divx whenever possible.</source>
-        <translation>Falls gesetzt, so wird der Opensource Kodierer &apos;xvid&apos; verwendet. Ansonsten der &apos;divx&apos; Kodierer.</translation>
+        <translation>Falls gesetzt, so wird der Opensource &apos;xvid&apos; Videocodec verwendet. Ansonsten der &apos;divx&apos; Videocodec.</translation>
     </message>
     <message>
         <source>Nice level for MTD</source>
-        <translation>&apos;Nice&apos; Wert für den MTD</translation>
+        <translation>Priorität des MTD</translation>
     </message>
     <message>
         <source>This determines the priority of the Myth Transcoding Daemon. Higher numbers mean lower priority (more CPU to other tasks).</source>
@@ -198,15 +202,15 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>If set to something other than 0, ripped video titles will be broken up into files of this size (in MB). Applies to both perfect quality recordings and intermediate files used for transcoding.</source>
-        <translation>Falls ungleich Null, so werden gerippte Videotitel in mehrere Dateien dieser Größe (in MB) aufgeteilt. Gilt für Perfekte Qualität und für temporäre Dateien während der Umwandlung.</translation>
+        <translation>Falls ungleich Null, so werden importierte Videotitel in mehrere Dateien dieser Größe (in MB) aufgeteilt. Gilt für Perfekte Qualität und für temporäre Dateien während der Umwandlung.</translation>
     </message>
     <message>
         <source>DVD Ripper Settings</source>
-        <translation>DVD Ripper Einstellungen</translation>
+        <translation>DVD Import</translation>
     </message>
     <message>
         <source>MTD Settings</source>
-        <translation>MTD Einstellungen</translation>
+        <translation>MTD (Myth Transcoding Daemon)</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -218,11 +222,11 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>Ripping to file ~</source>
-        <translation>Rippe in Datei ~</translation>
+        <translation>Importiere in Datei ~</translation>
     </message>
     <message>
         <source>Perfect DVD Rip of %1</source>
-        <translation>Perfekter DVD Rip von %1</translation>
+        <translation>Perfekter DVD Import von %1</translation>
     </message>
     <message>
         <source>Transcode of %1</source>
@@ -246,7 +250,7 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>Transcode is thinking </source>
-        <translation>&apos;transcode&apos; denkt nach</translation>
+        <translation>Transcode denkt nach </translation>
     </message>
     <message>
         <source>Simultaneous Transcode Jobs</source>
@@ -258,34 +262,34 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>On DVD insertion</source>
-        <translation type="unfinished"></translation>
+        <translation>Beim DVD einlegen</translation>
     </message>
     <message>
         <source>Do nothing</source>
-        <translation type="unfinished"></translation>
+        <translation>Nichts tun</translation>
     </message>
     <message>
         <source>Play DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD abspielen</translation>
     </message>
     <message>
         <source>Rip DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD importieren</translation>
     </message>
     <message>
         <source>Media Monitoring should be turned on to allow this feature (Setup -&gt; General -&gt; CD/DVD Monitor</source>
-        <translation type="unfinished"></translation>
+        <translation>Für diese Funktion muß die Überwachung der CD/DVD Laufwerke eingeschalten sein (Konfiguration -&gt; Grundeinstellungen -&gt; Allgemeines, Option &apos;CD/DVD Lw beobachten&apos;)</translation>
     </message>
     <message>
         <source>Display mythdvd menu</source>
-        <translation type="unfinished"></translation>
+        <translation>MythDVD Menü anzeigen</translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
         <source>Rip/Transcode</source>
-        <translation>Rippen/Umwandeln</translation>
+        <translation>Import/Umwandeln</translation>
     </message>
     <message>
         <source>Job 1 of 1</source>
@@ -329,7 +333,7 @@ You have no DVD Device defined.</source>
     </message>
     <message>
         <source>0:00:00</source>
-        <translation type="unfinished"></translation>
+        <translation>0:00:00</translation>
     </message>
 </context>
 <context>
