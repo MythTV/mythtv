@@ -1,7 +1,7 @@
 <mythmenu name="VIDEO_SETTINGS">
 
    <button>
-      <type>SETUP</type>
+      <type>VIDEO_SETTINGS_GENERAL</type>
       <text>General Settings</text>
       <text lang="ES">Opciones Generales</text>
       <text lang="CA">Opcions Generals</text>
@@ -16,7 +16,7 @@
    </button>
 
    <button>
-      <type>VIDEO</type>
+      <type>VIDEO_SETTINGS_PLAYER</type>
       <text>Player Settings</text>
       <text lang="ES">Opciones de reproducción</text>
       <text lang="CA">Opcions de reproducció</text>
@@ -31,7 +31,7 @@
    </button>
 
    <button>
-      <type>VIDEO</type>
+      <type>VIDEO_FILE_TYPES</type>
       <text>File Types</text>
       <text lang="PT">Tipos de Ficheiros</text>
       <text lang="SV">Filtyper</text>

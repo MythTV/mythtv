@@ -28,8 +28,6 @@ VideoBrowser::VideoBrowser(QSqlDatabase *ldb,
 {
     updateML = false;
     
-    if (currentVideoFilter)
-        currentVideoFilter->setAllowBrowse(false);
         
     fetchVideos();
 

@@ -31,12 +31,6 @@
    </button>
 
    <button>
-     <type>VIDEO_GALLERY</type>
-     <text>Video Gallery</text>
-     <action>GALLERY</action>
-   </button>    
-
-   <button>
      <type>VIDEO_MANAGER</type>
      <text>Video Manager</text>
      <text lang="ES">Gestionar vídeos</text>
@@ -50,7 +44,6 @@
      <text lang="JA">ビデオマネージャー</text>
      <action>MANAGER</action>
    </button>
-
 
 </mythmenu>
 
