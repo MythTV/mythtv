@@ -93,7 +93,7 @@ void linearBlendYUV420(unsigned char *yuvptr, int width, int height)
 
   stride = width / 2;
   ymax = height / 2 - 8;
-
+  
   unsigned char *uoff = yuvptr + width * height;
   unsigned char *voff = yuvptr + width * height * 5 / 4;
  
@@ -110,4 +110,65 @@ void linearBlendYUV420(unsigned char *yuvptr, int width, int height)
   }
 
   emms();
+}
+
+
+static int vid_width;
+static int vid_height;
+static int info_y_start;
+static int info_y_end;
+static int info_x_start;
+static int info_x_end;
+static int info_width;
+static int info_height;
+
+static int displayframes;
+static int darken_info;
+
+void InitializeOSD(int width, int height)
+{
+    vid_width = width;
+    vid_height = height;
+
+    info_y_start = height * 5 / 8;
+    info_y_end = height * 15 / 16;
+    info_x_start = width / 8;
+    info_x_end = width * 7 / 8;
+
+    info_width = info_x_end - info_x_start;
+    info_height = info_y_end - info_y_start;
+
+    displayframes = 0;
+}
+
+void SetOSDInfoText(char *text, int length)
+{
+    displayframes = length;
+    darken_info = true;
+}
+
+void DisplayOSD(unsigned char *yuvptr)
+{
+    if (displayframes <= 0)
+    {
+        darken_info = false; 
+    	return;
+    }
+
+    displayframes--;
+
+    unsigned char *src;
+
+    char c = 128;
+    if (darken_info)
+    {
+        for (int y = info_y_start ; y < info_y_end; y++)
+        {
+            for (int x = info_x_start; x < info_x_end; x++)
+            {
+                src = yuvptr + x + y * vid_width;
+	        *src = ((*src * c) >> 8) + *src;
+            }
+        }
+    }
 }

@@ -8,12 +8,13 @@
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <time.h>
+#include <math.h>
 
 #include "NuppelVideoPlayer.h"
 #include "NuppelVideoRecorder.h"
 #include "minilzo.h"
 #include "XJ.h"
-#include "linearBlend.h"
+#include "effects.h"
 
 NuppelVideoPlayer::NuppelVideoPlayer(void)
 {
@@ -617,6 +618,8 @@ void NuppelVideoPlayer::StartPlaying(void)
                           "NuppelVideo");
     videobuf3 = new unsigned char[videosize];
 
+    InitializeOSD(video_width, video_height);
+
     playing = true;
     killplayer = false;
   
@@ -744,6 +747,7 @@ void NuppelVideoPlayer::StartPlaying(void)
         {
             if (deinterlace)
                 linearBlendYUV420(videobuf3, video_width, video_height);
+	    DisplayOSD(videobuf3);
             memcpy(X11videobuf, videobuf3, video_width * video_height);
             memcpy(X11videobuf + video_width * video_height, videobuf3 +
                    video_width * video_height * 5 / 4, video_width * 
@@ -974,4 +978,9 @@ void NuppelVideoPlayer::ClearAfterSeek(void)
     weseeked = 1;
     fafterseek = 0;
     audiotimecode = 0;
+}
+
+void NuppelVideoPlayer::SetInfoText(char *text, int secs)
+{
+    SetOSDInfoText(text, (int)(secs * ceil(video_frame_rate)));
 }

@@ -58,6 +58,8 @@ class NuppelVideoPlayer
 
     void SetRecorder(NuppelVideoRecorder *nvcr) { nvr = nvcr; }
 
+    void SetInfoText(char *text, int secs);
+
  private:
     void InitSound(void);
     void WriteAudio(unsigned char *aubuf, int size);

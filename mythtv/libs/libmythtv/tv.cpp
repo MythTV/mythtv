@@ -52,6 +52,8 @@ int main(int argc, char *argv[])
   long long smudge = settings.GetNumSetting("MaxBufferFill");
   smudge = smudge * 1024 * 1024; 
 
+  int osd_display_time = settings.GetNumSetting("OSDDisplayTime");
+  
   RingBuffer *rbuffer = new RingBuffer(settings.GetSetting("BufferName"), 
 		                       filesize, smudge);
   
@@ -119,6 +121,7 @@ int main(int argc, char *argv[])
 			    nvp->ResetPlaying();
 			    while (!nvp->ResetYet())
                                 usleep(5);
+			    nvp->SetInfoText("Placeholder", osd_display_time);
 			    nvp->Unpause();
                           } break;
                case wsDown: {
@@ -141,6 +144,7 @@ int main(int argc, char *argv[])
                             nvp->ResetPlaying();
                             while (!nvp->ResetYet())
                                 usleep(5);
+			    nvp->SetInfoText("Placeholder 2", osd_display_time);
                             nvp->Unpause();
                           } break;
                default: break;
