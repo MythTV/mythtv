@@ -608,6 +608,7 @@ void MpegRecorder::ProcessData(unsigned char *buffer, int len)
                 if (!positionMap.contains(keyCount))
                 {
                     positionMapDelta[keyCount] = startpos;
+                    positionMap[keyCount] = startpos;
 
                     if (curRecording && db_lock && db_conn &&
                         ((positionMapDelta.size() % 30) == 0))
@@ -620,7 +621,6 @@ void MpegRecorder::ProcessData(unsigned char *buffer, int len)
                         positionMapDelta.clear();
                     }
                 }
-                positionMap[keyCount] = startpos;
             }
         }
 

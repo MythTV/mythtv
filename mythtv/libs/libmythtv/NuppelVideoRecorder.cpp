@@ -1814,6 +1814,7 @@ void NuppelVideoRecorder::UpdateSeekTable(int frame_num, bool use_db, long offse
     if (!positionMap.contains(ste.keyframe_number))
     {
         positionMapDelta[ste.keyframe_number] = position;
+        positionMap[ste.keyframe_number] = position;
 
         if (use_db && curRecording && db_lock && db_conn &&
             (positionMapDelta.size() % 15) == 0)
@@ -1826,7 +1827,6 @@ void NuppelVideoRecorder::UpdateSeekTable(int frame_num, bool use_db, long offse
             positionMapDelta.clear();
         }
     }
-    positionMap[ste.keyframe_number] = position;
 }
 
 int NuppelVideoRecorder::CreateNuppelFile(void)

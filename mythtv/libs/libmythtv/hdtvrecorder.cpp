@@ -401,6 +401,7 @@ void HDTVRecorder::FindKeyframes(const unsigned char *buffer,
                             if (!positionMap.contains(frameNum))
                             {
                                 positionMapDelta[frameNum] = startpos;
+                                positionMap[frameNum] = startpos;
                             
                                 if (curRecording && db_lock && db_conn &&
                                     ((positionMapDelta.size() % 30) == 0))
@@ -414,7 +415,6 @@ void HDTVRecorder::FindKeyframes(const unsigned char *buffer,
                                     positionMapDelta.clear();
                                 }
                             }
-                            positionMap[frameNum] = startpos;
                         }
                         if (buffer[i+1] >= 0x01 && buffer[i+1] <= 0xAF)
                         {

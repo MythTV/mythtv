@@ -672,6 +672,7 @@ void DVBRecorder::LocalProcessData(unsigned char *buffer, int len)
                         if (!positionMap.contains(framesWritten))
                         {
                             positionMapDelta[framesWritten] = startpos;
+                            positionMap[framesWritten] = startpos;
 
                             if (curRecording && db_lock && db_conn &&
                                 ((positionMapDelta.size() % 30) == 0))
@@ -685,7 +686,6 @@ void DVBRecorder::LocalProcessData(unsigned char *buffer, int len)
                                 positionMapDelta.clear();
                             }
                         }
-                        positionMap[framesWritten] = startpos;
                     }
                     break;
 
