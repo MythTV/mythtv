@@ -109,15 +109,15 @@
       <position>0,20</position>
     </image>
     <textarea name="status">
-      <area>430,30,180,27</area>
+      <area>410,30,200,27</area>
       <font>infofont</font>
     </textarea>
     <slider name="statusslider" type="fill">
-      <area>430,80,180,20</area>
+      <area>410,80,200,20</area>
       <filename>fill-blue.png</filename>
     </slider>
     <textarea name="slidertext">
-      <area>430,55,180,45</area>
+      <area>410,55,200,45</area>
       <font>infofont</font>
       <multiline>yes</multiline>
     </textarea>
