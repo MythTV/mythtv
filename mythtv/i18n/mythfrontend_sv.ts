@@ -3685,7 +3685,8 @@ som du startade detta programmet i.</translation>
     <message>
         <source> The following programs will be recorded instead:
 </source>
-        <translation>Följande program kommer att spelas in istället:  </translation>
+        <translation>Följande program kommer att spelas in istället:
+</translation>
     </message>
     <message>
         <source>Forget Previous</source>
@@ -4210,6 +4211,319 @@ som du startade detta programmet i.</translation>
     <message>
         <source>Directed By</source>
         <translation>Regisserad av</translation>
+    </message>
+    <message>
+        <source>Go Back</source>
+        <translation>Gå tillbaka</translation>
+    </message>
+    <message>
+        <source>No Change</source>
+        <translation>Ingen ändring</translation>
+    </message>
+    <message>
+        <source>Do not record this program</source>
+        <translation>Spela inte in detta program</translation>
+    </message>
+    <message>
+        <source>Record only this showing</source>
+        <translation>Spela endast in denna visning</translation>
+    </message>
+    <message>
+        <source>Record one showing of this program</source>
+        <translation>Spela in en visning av detta program</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every week</source>
+        <translation>Spela in denna tid varje vecka</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every day</source>
+        <translation>Spela in denna tid varje dag</translation>
+    </message>
+    <message>
+        <source>Record at any time on this channel</source>
+        <translation>Spela in vilken tid som helst på denna kanal</translation>
+    </message>
+    <message>
+        <source>Record at any time on any channel</source>
+        <translation>Spela in vilken tid som helst på alla kanaler</translation>
+    </message>
+    <message>
+        <source>Record this showing with normal options</source>
+        <translation>Spela in visning med vanliga inställningar</translation>
+    </message>
+    <message>
+        <source>Record this showing with override options</source>
+        <translation>Spela in visning med specifika inställningar</translation>
+    </message>
+    <message>
+        <source>Do not allow this showing to be recorded</source>
+        <translation>Tillåt inte denna visning att spelas in</translation>
+    </message>
+    <message>
+        <source>Start recording %1 minutes late</source>
+        <translation>Börja spela in %1 minuter senare</translation>
+    </message>
+    <message>
+        <source>Start recording %1 minute late</source>
+        <translation>Börja spela in %1 minut senare</translation>
+    </message>
+    <message>
+        <source>Start recording on time</source>
+        <translation>Börja spela in i tid</translation>
+    </message>
+    <message>
+        <source>Start recording %1 minute early</source>
+        <translation>Börja spela in %1 minut tidigare</translation>
+    </message>
+    <message>
+        <source>Start recording %1 minutes early</source>
+        <translation>Börja spela in %1 minuter tidigare</translation>
+    </message>
+    <message>
+        <source>End recording %1 minutes early</source>
+        <translation>Sluta spela in %1 minuter tidigare</translation>
+    </message>
+    <message>
+        <source>End recording %1 minute early</source>
+        <translation>Sluta spela in %1 minut tidigare</translation>
+    </message>
+    <message>
+        <source>End recording on time</source>
+        <translation>Sluta spela in i tid</translation>
+    </message>
+    <message>
+        <source>End recording %1 minute late</source>
+        <translation>Sluta spela in %1 minut senare</translation>
+    </message>
+    <message>
+        <source>End recording %1 minutes late</source>
+        <translation>Sluta spela in %1 minuter senare</translation>
+    </message>
+    <message>
+        <source>Look for duplicates in current and previous recordings</source>
+        <translation>Sök dubletter i nuvarande och tidigare inspelningar</translation>
+    </message>
+    <message>
+        <source>Look for duplicates in current recordings only</source>
+        <translation>Sök dubletter endast i nuvarande inspelningar</translation>
+    </message>
+    <message>
+        <source>Look for duplicates in previous recordings only</source>
+        <translation>Sök dubletter endast i tidigare inspelningar</translation>
+    </message>
+    <message>
+        <source>[ Match duplicates with ]</source>
+        <translation>[ Matcha dubletter med ]</translation>
+    </message>
+    <message>
+        <source>Record new episodes only</source>
+        <translation>Spela endast in nya avsnitt</translation>
+    </message>
+    <message>
+        <source>Match duplicates using subtitle &amp; description</source>
+        <translation>Matcha dubletter mot undertitel &amp; beskrivning</translation>
+    </message>
+    <message>
+        <source>Match duplicates using subtitle</source>
+        <translation>Matcha dubletter mot undertitel</translation>
+    </message>
+    <message>
+        <source>Match duplicates using description</source>
+        <translation>Matcha dubletter mot beskrivning</translation>
+    </message>
+    <message>
+        <source>Don&apos;t match duplicates</source>
+        <translation>Matcha inte dubletter</translation>
+    </message>
+    <message>
+        <source>[ Select recording Profile ]</source>
+        <translation>[ Välj inspelningsprofil ]</translation>
+    </message>
+    <message>
+        <source>Allow auto expire</source>
+        <translation>Tillåt autoradering</translation>
+    </message>
+    <message>
+        <source>Don&apos;t allow auto expire</source>
+        <translation>Tillåt inte autoradering</translation>
+    </message>
+    <message>
+        <source>Delete oldest if this recording exceedes the max episodes</source>
+        <translation>Radera äldsta om max antal avsnitt överskrids</translation>
+    </message>
+    <message>
+        <source>Don&apos;t record if this would exceed the max episodes</source>
+        <translation>Spela inte in om max antal avsnitt överskrids</translation>
+    </message>
+    <message>
+        <source>No episode limit</source>
+        <translation>Ingen begränsning för antalet avsnitt</translation>
+    </message>
+    <message>
+        <source>Keep only one episode.</source>
+        <translation>Behåll endast ett avsnitt</translation>
+    </message>
+    <message>
+        <source>Keep at most %1 episodes</source>
+        <translation>Behåll max %1 avsnitt</translation>
+    </message>
+    <message>
+        <source>Reduce priority by %1</source>
+        <translation>Minska prioritet med %1</translation>
+    </message>
+    <message>
+        <source>Normal recording priority</source>
+        <translation>Normal prioritet</translation>
+    </message>
+    <message>
+        <source>Raise priority by %1</source>
+        <translation>Öka prioritet med %1</translation>
+    </message>
+    <message>
+        <source>List upcoming episodes</source>
+        <translation>Visa kommande avsnitt</translation>
+    </message>
+    <message>
+        <source>Listings Status</source>
+        <translation>TV-tablåstatus</translation>
+    </message>
+    <message>
+        <source>Tuner Status</source>
+        <translation>Mottagarstatus</translation>
+    </message>
+    <message>
+        <source>DVB Status</source>
+        <translation>DVB-status</translation>
+    </message>
+    <message>
+        <source>Log Entries</source>
+        <translation>Loggbok</translation>
+    </message>
+    <message>
+        <source>Acknowledge all log entries at this priority level or lower?</source>
+        <translation>Bekräfta alla loggmeddelanden med denna prioritet eller lägre?</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Ja</translation>
+    </message>
+    <message>
+        <source>Setting priority level to %1</source>
+        <translation>Sätter prioritet till %1</translation>
+    </message>
+    <message>
+        <source>Listings Status shows the latest status information from mythfilldatabase</source>
+        <translation>TV-tablåstatus visar senaste statusinformationen från mythfilldatabase</translation>
+    </message>
+    <message>
+        <source>Tuner Status shows the current information about the state of backend tuner cards</source>
+        <translation>Mottagarstatus visar aktuell information om TV-mottagarkorten i inspelningsservern</translation>
+    </message>
+    <message>
+        <source>DVB Status shows the quality statistics of all DVB cards, if present</source>
+        <translation>DVB-status visar kvalitetsstatistik över alla DVB-kort</translation>
+    </message>
+    <message>
+        <source>Log Entries shows any unread log entries from the system if you have logging enabled</source>
+        <translation>Loggboken visar olästa loggposter från systemet förutsatt att du har aktiverat loggning</translation>
+    </message>
+    <message>
+        <source>Acknowledge this log entry?</source>
+        <translation>Bekräfta meddelande?</translation>
+    </message>
+    <message>
+        <source>Myth version:</source>
+        <translation>Myth-version:</translation>
+    </message>
+    <message>
+        <source>Last mythfilldatabase guide update:</source>
+        <translation>Senaste TV-tablåuppdatering:</translation>
+    </message>
+    <message>
+        <source>Started:   </source>
+        <translation>Startade: </translation>
+    </message>
+    <message>
+        <source>Finished: </source>
+        <translation>Slutade: </translation>
+    </message>
+    <message>
+        <source>Result: </source>
+        <translation>Resultat: </translation>
+    </message>
+    <message>
+        <source>There&apos;s no guide data available!</source>
+        <translation>Det finns ingen TV-tablåinformation tillgänglig!</translation>
+    </message>
+    <message>
+        <source>Have you run mythfilldatabase?</source>
+        <translation>Har du kört mythfilldatabase?</translation>
+    </message>
+    <message>
+        <source>There is guide data until </source>
+        <translation>Det finns guidedata till </translation>
+    </message>
+    <message>
+        <source>days</source>
+        <translation>dagar</translation>
+    </message>
+    <message>
+        <source>day</source>
+        <translation>dag</translation>
+    </message>
+    <message>
+        <source>WARNING: is mythfilldatabase running?</source>
+        <translation>VARNING: körs mythfilldatabase?</translation>
+    </message>
+    <message>
+        <source>DataDirect Status: </source>
+        <translation>DataDirect-status:</translation>
+    </message>
+    <message>
+        <source>Details of DVB error statistics for last 48 hours:
+</source>
+        <translation>Detaljer för DVB-felstatistik de senaste 48 timmarna:
+</translation>
+    </message>
+    <message>
+        <source>Recording period from %1 to %2</source>
+        <translation>Inspelningsperiod från %1 till %2</translation>
+    </message>
+    <message>
+        <source>Encoder %1 Min SNR: %2 Avg SNR: %3 Min BER %4 Avg BER %5 Cont Errs: %6 Overflows: %7</source>
+        <translation>Kort %1 Min SNR: %2 Med SNR: %3 Min BER %4 Med BER %5 Antal fel: %6 Överfyllningar: %7</translation>
+    </message>
+    <message>
+        <source>There is no DVB signal quality data available to display.</source>
+        <translation>Det finns ingen tillgänglig DVB-signalkvalitetsdata att visa.</translation>
+    </message>
+    <message>
+        <source>No items found at priority level %1 or lower.</source>
+        <translation>Inga poster med prioritet %1 eller lägre.</translation>
+    </message>
+    <message>
+        <source>Use 1-8 to change priority level.</source>
+        <translation>1-8 ändrar prioritet.</translation>
+    </message>
+</context>
+<context>
+    <name>StatusBox</name>
+    <message>
+        <source>Tuner %1 </source>
+        <translation>Mottagare %1 </translation>
+    </message>
+    <message>
+        <source>is watching live TV</source>
+        <translation>ser på TV</translation>
+    </message>
+    <message>
+        <source>is recording</source>
+        <translation>spelar in</translation>
+    </message>
+    <message>
+        <source>is not recording</source>
+        <translation>spelar inte in</translation>
     </message>
 </context>
 <context>
