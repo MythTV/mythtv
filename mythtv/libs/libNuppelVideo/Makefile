@@ -15,7 +15,7 @@ CXXLINK = $(CXX) $(CXXFLAGS) -o $@
 
 all:   nuvplay nuvrec 
 
-NUVPLAYOBJ = XJ.o minilzo.o RTjpegN.o linearBlend.o rtjpeg_plugin.o nuvplay.o
+NUVPLAYOBJ = XJ.o minilzo.o RTjpegN.o linearBlend.o NuppelVideoPlayer.o nuvplay.o
 NUVPLAYLDF = -L/usr/X11R6/lib -lmp3lame -lX11 -lXext -lXv -lm
 
 NUVRECOBJ = NuppelVideoRecorder.o linearBlend.o minilzo.o RTjpegN.o nuvrec.o

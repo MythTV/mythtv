@@ -20,9 +20,6 @@
 
 using namespace std;
 
-#define NUV_Record   0
-#define NUV_Playback 1
-
 class NuppelVideoRecorder
 {
  public:
