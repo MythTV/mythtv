@@ -16,8 +16,8 @@ INSTALLS += uifiles
 
 
 
-HEADERS +=          mfedialog.h   mfdinfo.h
+HEADERS +=          mfedialog.h   mfdinfo.h   playlistdialog.h
 
-SOURCES += main.cpp mfedialog.cpp mfdinfo.cpp
+SOURCES += main.cpp mfedialog.cpp mfdinfo.cpp playlistdialog.cpp
 
 LIBS += -L/usr/local/lib -lmfdclient

@@ -37,7 +37,9 @@ class MfdInfo
     void                    setShowingMenu(bool y_or_n){showing_menu = y_or_n;}
     
     AudioMetadata*          getAudioMetadata(int collection_id, int item_id);
-
+    ClientPlaylist*         getAudioPlaylist(int collection_id, int item_id);
+    UIListGenericTree*      constructPlaylistTree(int collection_id, int playlist_id);
+    UIListGenericTree*      constructContentTree(int collection_id, int playlist_id);
     void                    setCurrentPlayingData();
     bool                    setCurrentPlayingData(int which_container, int which_metadata, int numb_seconds);
     QStringList             getPlayingStrings(){return playing_strings;}

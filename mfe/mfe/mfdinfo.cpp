@@ -38,6 +38,47 @@ AudioMetadata*  MfdInfo::getAudioMetadata(int collection_id, int item_id)
     return NULL;
 }
 
+ClientPlaylist*  MfdInfo::getAudioPlaylist(int collection_id, int item_id)
+{
+    if(mfd_content_collection)
+    {
+        return mfd_content_collection->getAudioPlaylist(collection_id, item_id);    
+    }
+    return NULL;
+}
+
+UIListGenericTree* MfdInfo::constructPlaylistTree(
+                                    int collection_id, 
+                                    int playlist_id
+                                   )
+{
+    if(mfd_content_collection)
+    {
+    
+        return mfd_content_collection->constructPlaylistTree(
+                                                                collection_id, 
+                                                                playlist_id
+                                                            );
+    }
+    return NULL;
+}
+
+UIListGenericTree* MfdInfo::constructContentTree(
+                                    int collection_id, 
+                                    int playlist_id
+                                   )
+{
+    if(mfd_content_collection)
+    {
+    
+        return mfd_content_collection->constructContentTree(
+                                                            collection_id, 
+                                                            playlist_id
+                                                           );
+    }
+    return NULL;
+}
+
 void MfdInfo::setCurrentPlayingData()
 {
     if(

@@ -6,7 +6,9 @@
 	
 */
 
+#include <mythtv/mythcontext.h>
 #include "mfedialog.h"
+#include "playlistdialog.h"
 
 MfeDialog::MfeDialog(
                         MythMainWindow *parent, 
@@ -70,7 +72,10 @@ void MfeDialog::keyPressEvent(QKeyEvent *e)
             
         case Key_Right:
         
-            menu->MoveRight();
+            if(!menu->MoveRight())
+            {
+                menu->select();
+            }
             handled = true;
             break;
 
@@ -274,21 +279,63 @@ void MfeDialog::handleTreeSignals(UIListGenericTree *node)
     else if(node->getAttribute(1) == 5)
     {
         //
-        //  Use wants to edit a playlist
+        //  Use wants to edit a playlist, see if they selected an actualy playlist
         //
         
         if(node->getInt() > 0)
         {
             //
-            //  It's a real playlist to edit, not something higher up the
-            //  edit playlist tree
+            //  We need a UIListGenericTree object that contains everything
+            //  that could go on this playlist and is already "checked" to
+            //  indicate things already on this playlist
             //
             
-            cout << "You want to edit playlist with id of "
-                 << node->getInt()
-                 << " in collection with id of "
-                 << node->getAttribute(0)
-                 << endl;
+            if(current_mfd)
+            {
+                UIListGenericTree *prechecked_playlist_tree
+                    = current_mfd->constructPlaylistTree(
+                                                         node->getAttribute(0),
+                                                         node->getInt()
+                                                        );
+                UIListGenericTree *possible_content_tree
+                    = current_mfd->constructContentTree(
+                                                        node->getAttribute(0),
+                                                        node->getInt()
+                                                       );
+
+                if(possible_content_tree && prechecked_playlist_tree)
+                {
+
+                    PlaylistDialog *pldiag = new PlaylistDialog(
+                                                        gContext->GetMainWindow(),
+                                                        "playlist_dialog",
+                                                        "mfe-",
+                                                        current_mfd,
+                                                        prechecked_playlist_tree,
+                                                        possible_content_tree
+                                                               );
+                    pldiag->exec();
+                    delete pldiag;
+                    delete prechecked_playlist_tree;
+                }
+                else
+                {
+                    cerr << "mfedialog.o: current mfd could not give us a "
+                         << "playlist tree for playlist id of "
+                         << node->getInt()
+                         << " in collection with id of "
+                         << node->getAttribute(0)
+                         << endl;
+                }
+            }
+            else
+            {
+                cerr << "mfedialog.o: no current_mfd while trying to switch "
+                     << "to playlist editing"
+                     <<endl;
+            }
+            
+        
         }
     }
 }
@@ -437,7 +484,6 @@ void MfeDialog::mfdDiscovered(int which_mfd, QString name, QString host, bool fo
 void MfeDialog::audioPluginDiscovered(int which_mfd)
 {
     mfd_interface->askForStatus(which_mfd);
-    //cout << "ok, mfd number " << which_mfd << "has an audio plugin" << endl;
 }
 
 void MfeDialog::changeMetadata(int which_mfd, MfdContentCollection *new_collection)

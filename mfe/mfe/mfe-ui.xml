@@ -15,7 +15,7 @@
     
         <font name="now_playing_font" face="Arial">
             <color>#8cc4fc</color>
-            <size>24</size>
+            <size>22</size>
             <bold>yes</bold>
         </font>
 
@@ -167,5 +167,216 @@
 
         </container>
 
+    </window>
+
+    <window name="playlist_dialog">
+
+        <font name="active" face="Arial">
+            <color>#ffffff</color>
+            <size>18</size>
+            <bold>yes</bold>
+        </font>
+
+        <font name="inactive" face="Arial">
+            <color>#aaaaaa</color>
+            <size>18</size>
+            <bold>yes</bold>
+        </font>
+    
+        <font name="title" face="Arial">
+            <color>#ffffff</color>
+            <dropcolor>#000000</dropcolor>
+            <size>22</size>
+            <shadow>2,2</shadow>
+            <bold>yes</bold>
+        </font>
+    
+        <font name="subtitle" face="Arial">
+            <color>#ffffff</color>
+            <dropcolor>#000000</dropcolor>
+            <size>16</size>
+            <shadow>2,2</shadow>
+            <bold>yes</bold>
+        </font>
+    
+        <container name="background">
+            <area>0,0,800,600</area>
+            <image name="mfe_background" draworder="0" fleximage="no">
+                <filename>mfe_back.png</filename>
+                <position>0,0</position>
+            </image>
+            <image name="mfe_playlistedit_back" draworder="0" fleximage="no">
+                <filename>mfe_playlistedit_back.png</filename>
+                <position>0,450</position>
+            </image>
+        </container>
+
+        <container name="title">
+            <area>0,0,800,80</area>
+            <textarea name="title" draworder="0" align="center">
+                <area>50,10,700,30</area>
+                <font>title</font>
+                <value>Edit Playlist</value>
+            </textarea>
+            <textarea name="playlist_subtitle" draworder="0" align="center">
+                <area>50,50,300,30</area>
+                <font>subtitle</font>
+                <value>Playlist</value>
+            </textarea>
+            <textarea name="playlist_subtitle" draworder="0" align="center">
+                <area>450,50,300,30</area>
+                <font>subtitle</font>
+                <value>Available Content</value>
+            </textarea>
+        </container>
+
+        <container name="playlist_editor">
+            <area>20,90,760,380</area>
+
+            <listtreearea name="playlist_tree" draworder="0">
+                <area>0,0,360,340</area>
+                <listsize>0,0,360,340</listsize>
+                <leveloffset>0</leveloffset>
+                <gradient type="unselected" start="#000000" end="#000000" alpha="40">
+                </gradient>
+                <gradient type="selected" start="#0000ff" end="#505050" alpha="255">
+                </gradient>
+                <fcnfont name="active" function="active"></fcnfont>
+                <fcnfont name="inactive" function="inactive"></fcnfont>
+            </listtreearea>
+
+            <image name="mfe_leftarrow_off" draworder="0" fleximage="no">
+                <filename>mfe_leftarrow_off.png</filename>
+                <position>367,0</position>
+            </image>
+            
+            <image name="mfe_rightarrow_off" draworder="0" fleximage="no">
+                <filename>mfe_rightarrow_off.png</filename>
+                <position>367,28</position>
+            </image>
+            
+            <image name="mfe_leftarrow_on" draworder="0" fleximage="no">
+                <filename>mfe_leftarrow_on.png</filename>
+                <position>367,0</position>
+            </image>
+            
+            <image name="mfe_rightarrow_on" draworder="0" fleximage="no">
+                <filename>mfe_rightarrow_on.png</filename>
+                <position>367,28</position>
+            </image>
+            
+            <listtreearea name="content_tree" draworder="0">
+                <area>390,0,360,340</area>
+                <listsize>390,0,360,340</listsize>
+                <leveloffset>0</leveloffset>
+                <gradient type="unselected" start="#000000" end="#000000" alpha="40">
+                </gradient>
+                <gradient type="selected" start="#0000ff" end="#505050" alpha="255">
+                </gradient>
+                <fcnfont name="active" function="active"></fcnfont>
+                <fcnfont name="inactive" function="inactive"></fcnfont>
+            </listtreearea>
+
+        </container>
+
+        <container name="selection_info">
+            <area>0,450,800,150</area>
+
+            <textarea name="genre_label" draworder="0" align="right">
+                <font>active</font>
+                <area>20,5,200,35</area>
+                <value>Genre</value>
+            </textarea>
+            
+            <textarea name="artist_label" draworder="0" align="right">
+                <font>active</font>
+                <area>20,40,200,35</area>
+                <value>Artist</value>
+            </textarea>
+            
+            <textarea name="album_label" draworder="0" align="right">
+                <font>active</font>
+                <area>20,75,200,35</area>
+                <value>Album</value>
+            </textarea>
+            
+            <textarea name="title_label" draworder="0" align="right">
+                <font>active</font>
+                <area>20,110,200,35</area>
+                <value>Title</value>
+            </textarea>
+            
+
+            <image name="mfe_genre_icon" draworder="0" fleximage="no">
+                <filename>mfe_genre_icon.png</filename>
+                <position>225,5</position>
+            </image>
+
+            <image name="mfe_artist_icon" draworder="0" fleximage="no">
+                <filename>mfe_artist_icon.png</filename>
+                <position>225,40</position>
+            </image>
+
+            <image name="mfe_album_icon" draworder="0" fleximage="no">
+                <filename>mfe_album_icon.png</filename>
+                <position>225,75</position>
+            </image>
+
+            <image name="mfe_title_icon" draworder="0" fleximage="no">
+                <filename>mfe_title_icon.png</filename>
+                <position>225,110</position>
+            </image>
+
+
+            <textarea name="playlist_name_label" draworder="0" align="right">
+                <font>active</font>
+                <area>20,5,230,35</area>
+                <value>Playlist:</value>
+            </textarea>
+            
+            <textarea name="playlist_source_label" draworder="0" align="right">
+                <font>active</font>
+                <area>20,40,230,35</area>
+                <value>Source:</value>
+            </textarea>
+            
+            <textarea name="playlist_type_label" draworder="0" align="right">
+                <font>active</font>
+                <area>20,75,230,35</area>
+                <value>Type:</value>
+            </textarea>
+            
+            <textarea name="playlist_numtracks_label" draworder="0" align="right">
+                <font>active</font>
+                <area>20,110,230,35</area>
+                <value>Tracks:</value>
+            </textarea>
+
+
+            <textarea name="genre_text" draworder="0" align="left">
+                <font>active</font>
+                <area>260,5,520,35</area>
+            </textarea>
+            
+            <textarea name="artist_text" draworder="0" align="left">
+                <font>active</font>
+                <area>260,40,520,35</area>
+            </textarea>
+            
+            <textarea name="album_text" draworder="0" align="left">
+                <font>active</font>
+                <area>260,75,520,35</area>
+            </textarea>
+            
+            <textarea name="title_text" draworder="0" align="left">
+                <font>active</font>
+                <area>260,110,520,35</area>
+            </textarea>
+            
+
+
+        </container>
+
+    
     </window>
 </mythuitheme>
