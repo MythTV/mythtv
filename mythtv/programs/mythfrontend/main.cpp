@@ -126,12 +126,16 @@ void *runScheduler(void *dummy)
     }
     QDateTime curtime = QDateTime::currentDateTime();
 
+    QDateTime lastupdate = curtime;
+
     while (1)
     {
         sleep(1);
 
-        if (sched->CheckForChanges())
+        if (sched->CheckForChanges() ||
+            (lastupdate.date().day() != curtime.date().day()))
         {
+            lastupdate = curtime;
             sched->FillRecordLists();
             nextRecording = sched->GetNextRecording();
             if (nextRecording)
@@ -141,9 +145,9 @@ void *runScheduler(void *dummy)
             }
         }
 
+        curtime = QDateTime::currentDateTime();
         if (nextRecording)
         {
-            curtime = QDateTime::currentDateTime();
             secsleft = curtime.secsTo(nextrectime);
             asksecs = secsleft - 30;
 

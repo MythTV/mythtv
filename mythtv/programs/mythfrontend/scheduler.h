@@ -38,7 +38,8 @@ class Scheduler
       void GuessConflicts(void);
 
       bool Conflict(ProgramInfo *a, ProgramInfo *b);
-      
+
+      bool FindInOldRecordings(ProgramInfo *pginfo);      
 
       QSqlDatabase *db;
 

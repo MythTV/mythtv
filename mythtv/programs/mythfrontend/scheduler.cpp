@@ -304,26 +304,58 @@ void Scheduler::MarkConflicts(void)
     }
 }
 
+bool Scheduler::FindInOldRecordings(ProgramInfo *pginfo)
+{
+    QSqlQuery query;
+    char thequery[512];
+    
+    sprintf(thequery, "SELECT * FROM oldrecorded WHERE "
+                      "title = \"%s\" AND subtitle = \"%s\" AND "
+                      "description = \"%s\";", pginfo->title.ascii(),
+                      pginfo->subtitle.ascii(), pginfo->description.ascii());
+
+    query = db->exec(thequery);
+
+    if (query.isActive() && query.numRowsAffected() > 0)
+    {
+        query.next();
+
+        return true;
+    }
+    return false;
+}
+
 void Scheduler::PruneList(void)
 {
     list<ProgramInfo *>::reverse_iterator i = recordingList.rbegin();
     list<ProgramInfo *>::iterator deliter;
 
     i = recordingList.rbegin();
-    for (; i != recordingList.rend(); i++)
+    while (i != recordingList.rend())
     {
         list<ProgramInfo *>::reverse_iterator j = i;
         j++;
-        for (; j != recordingList.rend(); j++)
-        {
-            ProgramInfo *first = (*i);
-            ProgramInfo *second = (*j);
 
-            if (first->title == second->title)
+        ProgramInfo *first = (*i);
+
+        if (first->recordtype > 1 && 
+            (first->subtitle.length() > 2 || first->description.length() > 2))
+        {
+            if (FindInOldRecordings(first))
             {
-                if (first->subtitle == second->subtitle)
+                delete first;
+                deliter = i.base();
+                deliter--;
+                recordingList.erase(deliter);
+            }
+            else
+            {
+                for (; j != recordingList.rend(); j++)
                 {
-                    if (first->description == second->description)
+                    ProgramInfo *second = (*j);
+                    if ((first->title == second->title) && 
+                        (first->subtitle == second->subtitle) &&
+                        (first->description == second->description))
                     {
                         if (second->conflicting && !first->conflicting)
                         {
@@ -345,6 +377,7 @@ void Scheduler::PruneList(void)
                 }
             }
         }
+        i++;
     }    
 }
 

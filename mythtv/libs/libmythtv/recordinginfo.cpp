@@ -81,4 +81,15 @@ void RecordingInfo::WriteToDB(MYSQL *conn)
     {
         printf("couldn't insert recording into db\n");
     }
+
+    sprintf(query, "INSERT INTO oldrecorded (channum,starttime,endtime,title,"
+                   "subtitle,description) "
+                   "VALUES(%s,\"%s\",\"%s\",\"%s\",\"%s\",\"%s\");",
+                   channel.c_str(), starttime.c_str(), endtime.c_str(),
+                   title.c_str(), subtitle.c_str(), description.c_str());
+
+    if (mysql_query(conn, query) != 0)
+    {
+        printf("couldn't insert recording into db\n");
+    }
 }
