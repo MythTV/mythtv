@@ -18,7 +18,6 @@ using namespace std;
 
 #define MAXVBUFFER 21
 #define MAXTBUFFER 11
-#define AUDBUFSIZE 512000
 
 class XvVideoOutput;
 class OSDSet;
@@ -26,6 +25,7 @@ class RemoteEncoder;
 class QSqlDatabase;
 class ProgramInfo;
 class DecoderBase;
+class AudioOutput;
 
 struct TextContainer
 {
@@ -142,16 +142,12 @@ class NuppelVideoPlayer
     void SetFramesPlayed(long long played) { framesPlayed = played; }
 
  protected:
-    void OutputAudioLoop(void);
     void OutputVideoLoop(void);
 
-    static void *kickoffOutputAudioLoop(void *player);
     static void *kickoffOutputVideoLoop(void *player);
     
  private:
-    void InitSound(void);
     void InitVideo(void);
-    void WriteAudio(unsigned char *aubuf, int size);
 
     void InitFilters(void);
    
@@ -159,14 +155,10 @@ class NuppelVideoPlayer
     void PauseVideo(void);
     void UnpauseVideo(void);
 
-    bool GetAudioPause(void);
-    void PauseAudio(void);
-    void UnpauseAudio(void);
+    void setPrebuffering(bool prebuffer);
  
     int OpenFile(bool skipDsp = false);
 
-    int GetAudiotime(void);
-    void SetAudiotime(void);
     bool DecodeFrame(struct rtframeheader *frameheader,
                      unsigned char *strm, unsigned char *outbuf);
     void GetFrame(int onlyvideo, bool unsafe = false);
@@ -192,13 +184,10 @@ class NuppelVideoPlayer
     void JumpToFrame(long long frame);
     void JumpToNetFrame(long long net) { JumpToFrame(framesPlayed + net); }
  
-    int audiolen(bool use_lock); // number of valid bytes in audio buffer
-    int audiofree(bool use_lock); // number of free bytes in audio buffer
     int vbuffer_numvalid(void); // number of valid slots in video buffer
     int vbuffer_numfree(void); // number of free slots in the video buffer
     int tbuffer_numvalid(void); // number of valid slots in the text buffer
     int tbuffer_numfree(void); // number of free slots in the text buffer
-    inline int getSpaceOnSoundcard(void);
 
     void ResetNexttrigger(struct timeval *tv);
 
@@ -225,10 +214,7 @@ class NuppelVideoPlayer
     void SetBlankIter(void);
     void SetCommBreakIter(void);
 
-    int audiofd;
-
     QString filename;
-    QString audiodevice;
     
     /* rtjpeg_plugin stuff */
     int eof;
@@ -237,16 +223,8 @@ class NuppelVideoPlayer
     int video_size;
     double video_frame_rate;
 
-    int effdsp; // from the recorded stream
-    int audio_channels;
-    int audio_bits;
-    int audio_bytes_per_sample;
-    int audio_samplerate;
-    int audio_buffer_unused;
     int filesize;
     int startpos;
-
-    int lastaudiolen;
 
     char vbimode;
     int vbipagenr;
@@ -260,44 +238,35 @@ class NuppelVideoPlayer
     int timecodes[MAXVBUFFER];	/* timecode for each slot */
     unsigned char *vbuffer[MAXVBUFFER+1];	/* decompressed video data */
 
-    /* Audio circular buffer */
-    unsigned char audiobuffer[AUDBUFSIZE];	/* buffer */
-    unsigned char tmpaudio[AUDBUFSIZE];		/* temporary space */
-    int raud, waud;		/* read and write positions */
-    int audbuf_timecode;	/* timecode of audio most recently placed into
-				   buffer */
     /* Text circular buffer */
     int wtxt;          /* next slot to write */
     int rtxt;          /* next slot to read */
     struct TextContainer txtbuffers[MAXTBUFFER+1];
 
-    pthread_mutex_t audio_buflock; /* adjustments to audiotimecode, waud, and
-                                      raud can only be made while holding this
-                                      lock */
     pthread_mutex_t video_buflock; /* adjustments to rpos and wpos can only
                                       be made while holding this lock */
     pthread_mutex_t text_buflock;  /* adjustments to rtxt and wtxt can only
                                       be made while holding this lock */
 
-    /* A/V Sync state */
-  
-    pthread_mutex_t avsync_lock; /* must hold avsync_lock to read or write
-                                    'audiotime' and 'audiotime_updated' */
-    int audiotime; // timecode of audio leaving the soundcard (same units as
-                   //                                          timecodes) ...
-    struct timeval audiotime_updated; // ... which was last updated at this time
+    /* Audio stuff */
+    QString audiodevice;
+
+    int audio_channels;
+    int audio_bits;
+    int audio_samplerate;
+
+    AudioOutput *audioOutput;
 
     /* Locking note:
        A thread needing multiple locks must acquire in this order:
   
        1. audio_buflock
        2. video_buflock
-       3. avsync_lock
 
        and release in reverse order. This should avoid deadlock situations. */
 
-    bool paused, pausevideo, pauseaudio;
-    bool actuallypaused, audio_actually_paused, video_actually_paused;
+    bool paused, pausevideo;
+    bool actuallypaused, video_actually_paused;
     bool cc;
 
     bool playing;
@@ -305,7 +274,6 @@ class NuppelVideoPlayer
     RingBuffer *ringBuffer;
     bool weMadeBuffer; 
     bool killplayer;
-    bool killaudio;
     bool killvideo;
 
     long long framesPlayed;
@@ -378,9 +346,6 @@ class NuppelVideoPlayer
     ProgramInfo *m_playbackinfo;
 
     long long bookmarkseek;
-
-    int numbadioctls;
-    int numlowbuffer;
 
     int consecutive_blanks;
     int vpos;

@@ -873,12 +873,13 @@ void TV::ProcessKeypress(int keypressed)
 
     switch (keypressed) 
     {
+/*
         case Key_F:
         {
             nvp->ToggleFullScreen();
             break;
         }
- 
+*/
         case Key_T:
         {
             nvp->ToggleCC();
@@ -945,12 +946,12 @@ void TV::ProcessKeypress(int keypressed)
         }
         case Key_PageUp:
         {
-            DoJumpAhead(); 
+            DoJumpBack(); 
             break;
         }
         case Key_PageDown:
         {
-            DoJumpBack(); 
+            DoJumpAhead(); 
             break;
         }
         case Key_Escape:

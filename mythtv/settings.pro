@@ -19,6 +19,9 @@ release {
 
 EXTRA_LIBS = -L/usr/X11R6/lib -lXinerama -lXv -lX11 -lXext -lXxf86vm
 
+
+#CONFIG += using_alsa
+
 # DVB stuff
 #CONFIG += using_dvb
 #DEFINES += USING_DVB
