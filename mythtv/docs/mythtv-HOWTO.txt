@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-04-11, v2.11
+  2003-04-12, v2.12
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -127,6 +127,7 @@
      18.11 Troubleshooting audio
      18.12 I can't see parts of the On Screen Display.
      18.13 The mythbackend program told me to look at this section.
+     18.14 My remote doesn't work / works sometimes and not others / "ghost" keypresses.
 
   19. Miscellaneous.
      19.1 I'd like to watch the files without using MythTV / I'd like to convert the files to some other format.
@@ -142,7 +143,6 @@
      19.7 I'd like to delete the mysql database.
      19.8 btaudio
      19.9 Removing unwanted channels.
-
   ______________________________________________________________________
 
   [1m1.  How to obtain this document.[0m
@@ -2007,6 +2007,8 @@
   RedHatMenu>Extras>System Settings>Desktop Switching Tool and choose
   "KDE".
 
+  The keys.txt file describes what the various keyboard commands are.
+
   [1m11.1.  Using themes with MythTV.[0m
 
   MythTV is "themeable", meaning that the visual appearance of the
@@ -2742,6 +2744,22 @@
   much out of luck and will either need to purchase a new sound card, or
   will need to get btaudio ``operational''.
 
+  [1m18.14.  My remote doesn't work / works sometimes and not others /[0m
+  [1m"ghost" keypresses.[0m
+
+  This can be due to a number of factors.  The simplest case is the
+  "ghost" keypresses.  For me, it was due to compact flourescent lights
+  in the same room as the IR receiver, which the receiver was picking up
+  as keypresses.  Once the lights were switched to incandescent bulbs,
+  the ghost went away.
+
+  If your remote has been properly configured, and [1mirw [22mand [1mirxevent [22mare
+  working correctly, then it's highly likely that your window manager is
+  not giving focus correctly to the various Myth programs as they run.
+  The following window managers are known to work correctly:
+
+  +o  fvwm
+
   [1m19.  Miscellaneous.[0m
 
   [1m19.1.  I'd like to watch the files without using MythTV / I'd like to[0m
@@ -2760,11 +2778,11 @@
 
   Download the source to MPlayer and patch:
 
-  $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
-  $ tar -xjf MPlayer-0.90rc1.tar.bz2
-  $ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
-  $ cd MPlayer-0.90rc1
-  $ patch -p1 < mplayer-0.90pre10+mythtv.patch
+       $ wget http://ftp.lug.udel.edu/MPlayer/releases/MPlayer-0.90rc1.tar.bz2
+       $ tar -xjf MPlayer-0.90rc1.tar.bz2
+       $ cp mplayer-0.90pre10+mythtv.patch MPlayer-0.90rc1
+       $ cd MPlayer-0.90rc1
+       $ patch -p1 < mplayer-0.90pre10+mythtv.patch
 
   At this point, you can read the MPlayer documentation and start the
   compile process.
@@ -2773,7 +2791,7 @@
 
   MythTV is not dependent on any particular window manager.  If you wish
   to run a lightweight window manager, the configfiles/ directory has an
-  example of a .twmrc file you may use.
+  example of a .twmrc and .fvwmrc file you may use.
 
   [1m19.3.  I'd like MythTV to automatically startup.[0m
 
@@ -3029,7 +3047,6 @@
   Old program data will be removed over the course of a week. However,
   you may want to immediately delete any current program listings for
   the channel that has been removed:
-
        $ mysql -u root mythconverg
        mysql> delete from program where chanid = '1015';
 

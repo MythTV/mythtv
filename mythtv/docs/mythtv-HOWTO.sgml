@@ -3,7 +3,7 @@
 
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-04-11, v2.11
+<date>2003-04-12, v2.12
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1871,7 +1871,7 @@ obscure the video. KDE does not seem to have any such issues. Therefore you
 will need to switch to KDE by selecting RedHatMenu>Extras>System
 Settings>Desktop Switching Tool and choose "KDE".
 
-<!-- insert stuff on getting around, key sequences, etc -->
+The <tt>keys.txt</tt> file describes what the various keyboard commands are.
 
 <sect1>Using themes with MythTV.
 <p>MythTV is "themeable", meaning that the visual appearance of the program
@@ -2598,6 +2598,23 @@ it, or it has been designed that way, then you're pretty much out of luck
 and will either need to purchase a new sound card, or will need to get
 btaudio <ref id="btaudio" name="operational">.
 
+<sect1>My remote doesn't work / works sometimes and not others / "ghost"
+keypresses.
+<p>This can be due to a number of factors.  The simplest case is the
+"ghost" keypresses.  For me, it was due to compact flourescent lights in
+the same room as the IR receiver, which the receiver was picking up as
+keypresses.  Once the lights were switched to incandescent bulbs, the ghost
+went away.
+
+If your remote has been properly configured, and <bf>irw</bf> and
+<bf>irxevent</bf> are working correctly, then it's highly likely that your
+window manager is not giving focus correctly to the various Myth programs as
+they run.  The following window managers are known to work correctly:
+
+<itemize>
+<item>fvwm
+</itemize>
+
 <sect>Miscellaneous. 
 <sect1>I'd like to watch the files without using MythTV / I'd like to convert the files to some other format. 
 <p>Matthew Zimmerman has created a patch for MPlayer / Mencoder <url
@@ -2629,7 +2646,7 @@ process.
 <sect1>I'd like to use some other window manager.
 <p>MythTV is not dependent on any particular window manager.  If you wish to
 run a lightweight window manager, the <tt>configfiles/</tt> directory has an
-example of a <tt>.twmrc</tt> file you may use.
+example of a <tt>.twmrc</tt> and <tt>.fvwmrc</tt> file you may use.
 
 <sect1>I'd like MythTV to automatically startup.
 <p>Here's an example submitted to the mythtv-dev list by Pat Pflaum
@@ -2903,6 +2920,7 @@ v2.09, 2003-04-11.  Add spec for P4 2.4Ghz machine.  Added comment on repeat
 = commands for .lircrc file.
 v2.10, 2003-04-11.  Fixed typo.  AMD SSE info.  Channel removal information.
 v2.11, 2003-04-11.  Updated channel removal.
+v2.12, 2003-04-12.  keys.txt.  troubleshooting the remote.
 -->
 <!--
 To create documentation, execute "$ linuxdoc -B html mythtv-HOWTO.sgml" or
