@@ -153,7 +153,7 @@ QWidget* RadioSetting::configWidget(QWidget* parent,
 }
 
 QWidget* CheckBoxSetting::configWidget(QWidget* parent,
-                                       const char* widgetName = 0) {
+                                       const char* widgetName) {
     
     QCheckBox* widget = new QCheckBox(parent, widgetName);
     widget->setText(getLabel());
