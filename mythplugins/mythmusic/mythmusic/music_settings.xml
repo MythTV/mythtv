@@ -1,7 +1,7 @@
 <mythmenu name="MUSIC_SETTINGS">
 
    <button>
-      <type>MUSIC</type>
+      <type>MUSIC_SETTINGS_GENERAL</type>
       <text>General Settings</text>
       <text lang="IT">Impostazioni generali</text>
       <text lang="ES">Opciones Generales</text>
@@ -17,7 +17,7 @@
    </button>
 
    <button>
-      <type>MUSIC</type>
+      <type>MUSIC_SETTINGS_PLAYER</type>
       <text>Player Settings</text>
       <text lang="IT">Opzioni di lettura</text>
       <text lang="ES">Opciones de reproducción</text>
@@ -33,7 +33,7 @@
    </button>
 
    <button>
-      <type>MUSIC</type>
+      <type>MUSIC_SETTINGS_RIP</type>
       <text>Ripper Settings</text>
       <text lang="DE">Ripper Einstellungen</text>
       <text lang="PT">Configurações de Cópia de CD</text>

@@ -1,7 +1,7 @@
 <mythmenu name="MUSIC">
 
    <button>
-      <type>MUSIC</type>
+      <type>MUSIC_PLAY</type>
       <text>Play Music</text>
       <text lang="IT">Esegui brani musicali</text>
       <text lang="ES">Escuchar Música</text>
