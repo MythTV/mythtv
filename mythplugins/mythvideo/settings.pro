@@ -1,7 +1,7 @@
 #CONFIG += debug
 CONFIG += release
 
-PREFIX = /usr
+PREFIX = /usr/local
 
 INCLUDEPATH += $${PREFIX}/include
 INCLUDEPATH *= /usr/local/include
