@@ -118,7 +118,7 @@
         <value>Rated:</value>
       </textarea>
       <textarea name="rating" draworder="4">
-        <area>170,105,600,35</area>
+        <area>170,105,350,35</area>
         <font>moviedata</font>
       </textarea>
       <textarea name="lvllbl" draworder="4" align="right">
@@ -208,17 +208,17 @@
         <staticsize>800,290</staticsize>
       </image>
       <textarea name="keyslbl_one" draworder="4" align="left">
-        <area>15,275,200,15</area>
+        <area>15,275,200,30</area>
         <font>keysfont</font>
         <value>0-9: Edit</value>
       </textarea>
       <textarea name="keyslbl_two" draworder="4" align="center">
-        <area>300,275,200,15</area>
+        <area>300,275,200,30</area>
         <font>keysfont</font>
         <value>Menu/Info: Manual IMDB</value>
       </textarea>
       <textarea name="keyslbl_three" draworder="4" align="right">
-        <area>580,275,200,15</area>
+        <area>580,275,200,30</area>
         <font>keysfont</font>
         <value>Enter/OK: Auto IMDB</value>
       </textarea>
