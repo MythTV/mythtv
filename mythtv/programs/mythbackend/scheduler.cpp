@@ -1438,10 +1438,11 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
 "record.startdate, record.endtime, record.enddate, record.title, "
 "record.subtitle, record.description, record.recpriority, record.type, "
 "channel.name, record.recordid, record.recgroup, record.dupin, "
-"record.dupmethod, channel.commfree, channel.channum, channel.callsign, "
+"record.dupmethod, channel.commfree, channel.channum, record.station, "
 "record.seriesid, record.programid "
-"FROM record,channel "
-"WHERE channel.callsign = record.station GROUP BY recordid "
+"FROM record "
+"LEFT JOIN channel ON channel.callsign = record.station "
+"GROUP BY recordid "
 "ORDER BY title ASC;");
 
     QSqlQuery result = db->exec(query);
@@ -1482,12 +1483,16 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
 
             proginfo->recpriority = result.value(8).toInt();
             proginfo->channame = QString::fromUtf8(result.value(10).toString());
+            if (proginfo->channame.isNull())
+                proginfo->channame = "";
             proginfo->recgroup = result.value(12).toString();
             proginfo->dupin = RecordingDupInType(result.value(13).toInt());
             proginfo->dupmethod =
                 RecordingDupMethodType(result.value(14).toInt());
             proginfo->chancommfree = result.value(15).toInt();
             proginfo->chanstr = result.value(16).toString();
+            if (proginfo->chanstr.isNull())
+                proginfo->chanstr = "";
             proginfo->chansign = result.value(17).toString();
             proginfo->seriesid = result.value(18).toString();
             proginfo->programid = result.value(19).toString();
