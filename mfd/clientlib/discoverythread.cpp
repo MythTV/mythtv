@@ -49,10 +49,12 @@ DiscoveryThread::DiscoveryThread(MfdInterface *the_interface)
     mfd_interface = the_interface;
 
     //
-    //  This gets  initialized in run()
+    //  These get initialized in run()
     //
     
     mdns_daemon = NULL;
+    mdns_ipaddr_daemon = NULL;
+    
 
     //
     //  By default, run
@@ -92,29 +94,61 @@ void DiscoveryThread::run()
     int bsize, ssize = sizeof(struct sockaddr_in);
     unsigned char buf[MAX_PACKET_LEN];
     struct sockaddr_in from, to;
-    int multicast_socket;
 
 
     //
-    //  Get a multicast socket
-    //
-    
-
-    multicast_socket = createMulticastSocket();
-
-    if( multicast_socket < 1)
-    {
-        cerr << "discoverythread.o: could not create multicast socket" << endl;
-        return;
-    }
-
-    //
-    //  Create the mdsnd process
+    //  Create the main mdsnd process. I have no idea what either of these
+    //  parameters are supposed to mean.
     //
 
     mdns_daemon = mdnsd_new(1,1000);
+    
+    //
+    //  Create a separate one just to do IP address lookups. Why? Well, if
+    //  you try to do IP lookups with just the "main" mdns_daemon, there
+    //  always seem to be timing issues (ie. doesn't work properly)
+    //
+    
+    mdns_ipaddr_daemon = mdnsd_new(1, 1000);
 
 
+    //
+    //  Get a multicast socket for the main mdns daemon
+    //
+    
+
+    int multicast_socket = createMulticastSocket();
+    
+    if( multicast_socket < 1)
+    {
+        mdnsd_shutdown(mdns_daemon);
+        mdnsd_free(mdns_daemon);
+        mdns_daemon = NULL;
+        cerr << "discoverythread.o: could not create multicast socket" << endl;
+        return;
+    }
+    
+    //
+    //  Get a multicast socket for the ip address mdns daemon
+    //
+    
+
+    int ipaddr_socket = createMulticastSocket();
+    
+    if( ipaddr_socket < 1)
+    {
+        mdnsd_shutdown(mdns_daemon);
+        mdnsd_free(mdns_daemon);
+        mdns_daemon = NULL;
+
+        mdnsd_shutdown(mdns_ipaddr_daemon);
+        mdnsd_free(mdns_ipaddr_daemon);
+        mdns_ipaddr_daemon = NULL;
+
+        cerr << "discoverythread.o: could not create multicast socket" << endl;
+        return;
+    }
+    
     //
     //  We watch only for mfdp services, cause once we've found an mfd, we
     //  can query it directly about what services it has
@@ -122,28 +156,35 @@ void DiscoveryThread::run()
 
     mdnsd_query(mdns_daemon,"_mfdp._tcp.local.", QTYPE_PTR, callbackAnswer, this);
 
-
     //
     //  Go to work
     //
 
     while(keep_going)
     {
-        //
-        //  Set up for select() to watch the multicast socket
-        //
-
         fd_set fds;
         int nfds = 0;
         FD_ZERO(&fds);
 
+        //
+        //  Set up for select() to watch the multicast socket
+        //
 
         FD_SET(multicast_socket,&fds);
         if(nfds <= multicast_socket)
         {
             nfds = multicast_socket + 1;
         }
-        
+
+        //
+        //  Set up for select() to watch the multicast ipaddress socket
+        //
+
+        FD_SET(ipaddr_socket,&fds);
+        if(nfds <= ipaddr_socket)
+        {
+            nfds = ipaddr_socket + 1;
+        }
 
         //
         //  Add every mfd we are already connected to
@@ -192,12 +233,23 @@ void DiscoveryThread::run()
         struct timeval *tv;
         tv = mdnsd_sleep(mdns_daemon);
         
+        struct timeval *another_tv;
+        another_tv = mdnsd_sleep(mdns_ipaddr_daemon);
         
         //
         //  Sit in select until something happens
         //
         
-        int result = select(nfds,&fds,NULL,NULL,tv);
+        int result = 0;
+        if(another_tv->tv_sec * 1000 + another_tv->tv_usec < tv->tv_sec * 1000 + tv->tv_usec)
+        {
+            result = select(nfds,&fds,NULL,NULL,another_tv);
+        }
+        else
+        {
+            result = select(nfds,&fds,NULL,NULL,tv);
+        }
+
         if(result < 0)
         {
             cerr << "discoverythread.o: got an error on select (?), "
@@ -291,6 +343,56 @@ void DiscoveryThread::run()
             }
         }
         
+        if(FD_ISSET(ipaddr_socket,&fds))
+        {
+            while((bsize = recvfrom(
+                                    ipaddr_socket,
+                                    buf,
+                                    MAX_PACKET_LEN,
+                                    0,
+                                    (struct sockaddr*)&from, 
+                                    (socklen_t *)&ssize)
+                                   ) > 0)
+            {
+                bzero(&m,sizeof(struct message));
+                message_parse(&m,buf);
+                mdnsd_in(
+                            mdns_ipaddr_daemon,
+                            &m,
+                            (unsigned long int)from.sin_addr.s_addr,
+                            from.sin_port
+                        );
+            }
+            if(bsize < 0 && errno != EAGAIN) 
+            { 
+                printf("can't read socket %d: %s\n",errno,strerror(errno)); 
+                //return 1; 
+            }
+        }
+        while(mdnsd_out(mdns_ipaddr_daemon,&m,&ip,&port))
+        {
+            bzero(&to, sizeof(to));
+            to.sin_family = AF_INET;
+            to.sin_port = port;
+            to.sin_addr.s_addr = ip;
+            if(
+                    sendto(
+                            ipaddr_socket,
+                            message_packet(&m),
+                            message_packet_len(&m),
+                            0,
+                            (struct sockaddr *)&to,
+                            sizeof(struct sockaddr_in)
+                           ) 
+                           != message_packet_len(&m)
+              )
+            { 
+                printf("can't write to socket: %s\n",strerror(errno)); 
+                //return 1; 
+            }
+        }
+        
+        
         //
         //  Check if any of our mfd's went away without removing themselves
         //  from mDNS (ie. someone hit ctrl-c)
@@ -306,7 +408,13 @@ void DiscoveryThread::run()
     mdnsd_shutdown(mdns_daemon);
     mdnsd_free(mdns_daemon);
     mdns_daemon = NULL;
+
+    mdnsd_shutdown(mdns_ipaddr_daemon);
+    mdnsd_free(mdns_ipaddr_daemon);
+    mdns_ipaddr_daemon = NULL;
+
     close(multicast_socket);
+    close(ipaddr_socket);
 }
 
 int DiscoveryThread::createMulticastSocket()
@@ -378,7 +486,6 @@ void DiscoveryThread::handleMdnsdCallback(mdnsda answer)
 
     if(answer->type == QTYPE_PTR)
     {
-    
         //
         //  QTYPE_PTR answers tell us about the appearance and disapperance
         //  of basic services without those services being resolved to
@@ -402,6 +509,7 @@ void DiscoveryThread::handleMdnsdCallback(mdnsda answer)
                 break;
             }
         }
+
         if(which_one)
         {
             which_one->setTimeToLive(now);
@@ -428,6 +536,7 @@ void DiscoveryThread::handleMdnsdCallback(mdnsda answer)
                             callbackAnswer, 
                             this
                            );
+
             }
             else
             {
@@ -468,9 +577,10 @@ void DiscoveryThread::handleMdnsdCallback(mdnsda answer)
     }
     else if(answer->type == QTYPE_SRV)
     {
+    
         //
-        //  A QTYPE_SRV answer is giving us resolved host name and port (but
-        //  not yet an ip address)
+        //  A QTYPE_SRV answer is giving us resolved host name and port for
+        //  a service (but not yet an ip address)
         //
 
         //
@@ -496,7 +606,9 @@ void DiscoveryThread::handleMdnsdCallback(mdnsda answer)
                 which_one->setHostName(QString((char *) answer->rdname).section('.',0,0));
                 which_one->setPort(answer->srv.port);
                 which_one->isPortResolved(true);
-                
+            }
+            if(!which_one->isIpResolved())
+            {
                 //
                 //  Ask mdsnd for the actual ip address for this hostname
                 //  (no, we can't just ask DNS)
@@ -505,16 +617,15 @@ void DiscoveryThread::handleMdnsdCallback(mdnsda answer)
                 QString ip_address_question = QString("%1.local.")
                                               .arg(which_one->getHostName());
 
+
                 mdnsd_query(    
-                            mdns_daemon,
+                            mdns_ipaddr_daemon,
                             (char *) ip_address_question.ascii(), 
                             QTYPE_A, 
                             callbackAnswer, 
                             this
                            );
-                
-                
-            }                
+            }
         }
         else
         {
@@ -610,6 +721,8 @@ void DiscoveryThread::handleMdnsdCallback(mdnsda answer)
         cerr << "discoverythread.o: gettting mdnsd answer types I don't understand"
              << endl;
     }
+
+    // answer = mdnsd_list();
 }
 
 void DiscoveryThread::cleanDeadMfds()

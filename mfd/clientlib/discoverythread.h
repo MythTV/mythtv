@@ -46,7 +46,8 @@ class DiscoveryThread : public QThread
     QMutex  u_shaped_pipe_mutex;
     int     u_shaped_pipe[2];
 
-    mdnsd   mdns_daemon;        
+    mdnsd   mdns_daemon;
+    mdnsd   mdns_ipaddr_daemon;
     
     QPtrList<DiscoveredMfd> *discovered_mfds;
     

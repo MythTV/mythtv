@@ -148,6 +148,7 @@ void MfdInterface::customEvent(QCustomEvent *ce)
                 mfd_to_kill->stop();
                 mfd_to_kill->wait();
                 mfd_instances->remove(mfd_to_kill);
+                cout << "and here I am emiting a kill event" << endl;
                 emit mfdDiscovery(
                                     mfd_to_kill->getId(), 
                                     mfd_to_kill->getName().section(".", 0, 0), 
