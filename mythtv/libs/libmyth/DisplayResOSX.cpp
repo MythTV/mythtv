@@ -61,7 +61,11 @@ bool DisplayResOSX::switch_res(int width, int height)
     
     // switch mode and return success
     CGDisplayCapture(d);
-    CGDisplayErr err = CGDisplaySwitchToMode(d, dispMode);
+    CGDisplayConfigRef cfg;
+    CGBeginDisplayConfiguration(&cfg);
+    CGConfigureDisplayFadeEffect(cfg, 0.3f, 0.5f, 0, 0, 0);
+    CGConfigureDisplayMode(cfg, d, dispMode);
+    CGError err = CGCompleteDisplayConfiguration(cfg, kCGConfigureForAppOnly);
     CGDisplayRelease(d);
-    return (err == CGDisplayNoErr);
+    return (err == kCGErrorSuccess);
 }
