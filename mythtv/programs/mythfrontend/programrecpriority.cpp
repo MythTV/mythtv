@@ -185,6 +185,9 @@ void RankPrograms::keyPressEvent(QKeyEvent *e)
                     SortList(); 
                     update(fullRect);
                     break;
+        case Key_Space:
+        case Key_Enter:
+        case Key_Return:
         case Key_I: saveRank(); 
                     edit(); 
                     break;
