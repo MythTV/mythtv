@@ -26,8 +26,7 @@ ThemeSelector::ThemeSelector():
 
     setLabel("Theme");
 
-    //QDir themes(PREFIX"/share/mythtv/themes");
-    QDir themes("/tmp/themes");
+    QDir themes(PREFIX"/share/mythtv/themes");
     themes.setFilter(QDir::Dirs);
     themes.setSorting(QDir::Name | QDir::IgnoreCase);
 
