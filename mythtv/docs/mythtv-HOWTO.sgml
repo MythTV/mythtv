@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-08-21, v2.65
+<date>2003-08-23, v2.66
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -3433,57 +3433,6 @@ least version 1.0-2960.
 <p>You didn't add <tt>/usr/local/lib</tt> to <tt>/etc/ld.so.conf</tt>.  See the
 section on modifying <ref id="modifying_ld.so.conf" name="/etc/ld.so.conf">.
 
-<sect1>What is this transcoder thing, and how do I use it?
-<p>The transcoder re-encodes files from one MythTV format to another.  The
-main purpose of the transcoder is to allow users with hardware
-encoders (PVR-250) or systems that can only record in RTJpeg due to
-performance reasons (multiple capture cards, slow system, etc) to create
-MPEG4 streams to save space.
-
-The transcoder can be used in two ways:
-<itemize>
-<item>Automatically re-encode every file once it has completed recording
-<item> After marking commercials, the transcoder can be run manually to
-delete the commercials from the file (thus further saving space)
-</itemize>
-The two methods are independent.  The first is an automatic process that can be
-enabled/disabled through the setup program; the second is a manual method which
-must be invoked on each recording individually.
-
-The second method can be used on files that have already been transcoded (or
-files which were are already in the correct format), so only the frames
-immediately following a cut section will be re-encoded, resultiing in a very
-minimal loss of quality.
-
-To enable automatic transcoding, do the following:
-   start the setup program
-   under the host-specific settings:
-      set the Transcoder Auto-run checkbox
-
-For either manual or automatic transcoding:
-   start mythbackend
-   start mythfrontend
-   select setup, and the Transcoding recording profile.
-      now select either RTJPEG or MPEG4 (selecting any of the hardware
-      encoders will result in the transcoder not working).
-      set the other parameters as you'd like.  For best performance, you
-      should match the audio to the 'Default' profile.  If you plan to
-      only use the manual transcoder, you can choose to set the video to
-      be the same as the default profile too (as long as it is MPEG4 or
-      RTJpeg)
-
-Everything should now be setup properly.  If you elected to use the
-Auto-Run feature, the transcoder will automatically launch after each
-recording is complete.  The transcoder thread runs at a low priority, so it
-should not impact any critical tasks or other recordings.
-
-If you want to manually transcode a program, simply press 'X' while
-watching a recording (you should have already finished marking all
-commercials).  If you change your mind, hitting 'X' again will stop the
-transcoding.
-
-Once the transcode is complete, mythbackend will replace the old file
-with the new as soon as it is no longer in use.
 
 <sect>Miscellaneous. 
 <sect1>I'd like to watch the files without using MythTV / I'd like to convert the files to some other format. 
@@ -4301,6 +4250,59 @@ unmounted during this procedure.
 # mount /dev/VGforMyth/video /var/video
 </verb></tscreen>
 
+<sect1>What is this transcoder thing, and how do I use it?
+<p>The transcoder re-encodes files from one MythTV format to another.  The
+main purpose of the transcoder is to allow users with hardware
+encoders (PVR-250) or systems that can only record in RTJpeg due to
+performance reasons (multiple capture cards, slow system, etc) to create
+MPEG4 streams to save space.
+
+The transcoder can be used in two ways:
+<itemize>
+<item>Automatically re-encode every file once it has completed recording
+<item> After marking commercials, the transcoder can be run manually to
+delete the commercials from the file (thus further saving space)
+</itemize>
+The two methods are independent.  The first is an automatic process that can be
+enabled/disabled through the setup program; the second is a manual method which
+must be invoked on each recording individually.
+
+The second method can be used on files that have already been transcoded (or
+files which were are already in the correct format), so only the frames
+immediately following a cut section will be re-encoded, resultiing in a very
+minimal loss of quality.
+
+To enable automatic transcoding, do the following:
+   start the setup program
+   under the host-specific settings:
+      set the Transcoder Auto-run checkbox
+
+For either manual or automatic transcoding:
+   start mythbackend
+   start mythfrontend
+   select setup, and the Transcoding recording profile.
+      now select either RTJPEG or MPEG4 (selecting any of the hardware
+      encoders will result in the transcoder not working).
+      set the other parameters as you'd like.  For best performance, you
+      should match the audio to the 'Default' profile.  If you plan to
+      only use the manual transcoder, you can choose to set the video to
+      be the same as the default profile too (as long as it is MPEG4 or
+      RTJpeg)
+
+Everything should now be setup properly.  If you elected to use the
+Auto-Run feature, the transcoder will automatically launch after each
+recording is complete.  The transcoder thread runs at a low priority, so it
+should not impact any critical tasks or other recordings.
+
+If you want to manually transcode a program, simply press 'X' while
+watching a recording (you should have already finished marking all
+commercials).  If you change your mind, hitting 'X' again will stop the
+transcoding.
+
+Once the transcode is complete, mythbackend will replace the old file
+with the new as soon as it is no longer in use.
+
+
 </article>
 <!-- Revision History
 v2.00, 2003-03-14.  Initial release for 0.8.  Added xset command for
@@ -4447,6 +4449,7 @@ v2.64, 2003-08-21.  MythDVD instructions.  Work in progress.
 v2.65, 2003-08-21.  Change "add below" to "above" in PVR section.  Guess
 they flip-flopped at some point. Add some advice about mixer levels.  Add
 libid3tag to MythMusic section.
+v2.66, 2003-08-23.  Move transcoder docs to Misc section.
 -->
 
 <!--

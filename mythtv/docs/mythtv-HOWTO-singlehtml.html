@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-08-21, v2.65
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2003-08-23, v2.66
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -175,7 +175,6 @@ necessary.</EM>
 <LI><A NAME="toc19.24">19.24</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.24">I can't change the channel when watching Live TV.</A>
 <LI><A NAME="toc19.25">19.25</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.25">Colors are wrong, people have blue faces.</A>
 <LI><A NAME="toc19.26">19.26</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.26">When trying to run setup, I get an error like this: "./setup: error while loading shared libraries:"</A>
-<LI><A NAME="toc19.27">19.27</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss19.27">What is this transcoder thing, and how do I use it?</A>
 </UL>
 <P>
 <H2><A NAME="toc20">20.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s20">Miscellaneous. </A></H2>
@@ -196,6 +195,7 @@ necessary.</EM>
 <LI><A NAME="toc20.13">20.13</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.13">Advanced Backend Configurations. </A>
 <LI><A NAME="toc20.14">20.14</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.14">Advanced Partition Formatting. </A>
 <LI><A NAME="toc20.15">20.15</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.15">I'd like to have more flexible disk storage with LVM. </A>
+<LI><A NAME="toc20.16">20.16</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss20.16">What is this transcoder thing, and how do I use it?</A>
 </UL>
 
 <HR>
@@ -3973,53 +3973,6 @@ least version 1.0-2960.</P>
 section on modifying 
 <A HREF="#modifying_ld.so.conf">/etc/ld.so.conf</A>.</P>
 
-<H2><A NAME="ss19.27">19.27</A> <A HREF="#toc19.27">What is this transcoder thing, and how do I use it?</A>
-</H2>
-
-<P>The transcoder re-encodes files from one MythTV format to another.  The
-main purpose of the transcoder is to allow users with hardware
-encoders (PVR-250) or systems that can only record in RTJpeg due to
-performance reasons (multiple capture cards, slow system, etc) to create
-MPEG4 streams to save space.</P>
-<P>The transcoder can be used in two ways:
-<UL>
-<LI>Automatically re-encode every file once it has completed recording</LI>
-<LI> After marking commercials, the transcoder can be run manually to
-delete the commercials from the file (thus further saving space)</LI>
-</UL>
-
-The two methods are independent.  The first is an automatic process that can be
-enabled/disabled through the setup program; the second is a manual method which
-must be invoked on each recording individually.</P>
-<P>The second method can be used on files that have already been transcoded (or
-files which were are already in the correct format), so only the frames
-immediately following a cut section will be re-encoded, resultiing in a very
-minimal loss of quality.</P>
-<P>To enable automatic transcoding, do the following:
-start the setup program
-under the host-specific settings:
-set the Transcoder Auto-run checkbox</P>
-<P>For either manual or automatic transcoding:
-start mythbackend
-start mythfrontend
-select setup, and the Transcoding recording profile.
-now select either RTJPEG or MPEG4 (selecting any of the hardware
-encoders will result in the transcoder not working).
-set the other parameters as you'd like.  For best performance, you
-should match the audio to the 'Default' profile.  If you plan to
-only use the manual transcoder, you can choose to set the video to
-be the same as the default profile too (as long as it is MPEG4 or
-RTJpeg)</P>
-<P>Everything should now be setup properly.  If you elected to use the
-Auto-Run feature, the transcoder will automatically launch after each
-recording is complete.  The transcoder thread runs at a low priority, so it
-should not impact any critical tasks or other recordings.</P>
-<P>If you want to manually transcode a program, simply press 'X' while
-watching a recording (you should have already finished marking all
-commercials).  If you change your mind, hitting 'X' again will stop the
-transcoding.</P>
-<P>Once the transcode is complete, mythbackend will replace the old file
-with the new as soon as it is no longer in use.</P>
 
 <H2><A NAME="s20">20.</A> <A HREF="#toc20">Miscellaneous. </A></H2>
 
@@ -4897,6 +4850,55 @@ unmounted during this procedure.
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+
+<H2><A NAME="ss20.16">20.16</A> <A HREF="#toc20.16">What is this transcoder thing, and how do I use it?</A>
+</H2>
+
+<P>The transcoder re-encodes files from one MythTV format to another.  The
+main purpose of the transcoder is to allow users with hardware
+encoders (PVR-250) or systems that can only record in RTJpeg due to
+performance reasons (multiple capture cards, slow system, etc) to create
+MPEG4 streams to save space.</P>
+<P>The transcoder can be used in two ways:
+<UL>
+<LI>Automatically re-encode every file once it has completed recording</LI>
+<LI> After marking commercials, the transcoder can be run manually to
+delete the commercials from the file (thus further saving space)</LI>
+</UL>
+
+The two methods are independent.  The first is an automatic process that can be
+enabled/disabled through the setup program; the second is a manual method which
+must be invoked on each recording individually.</P>
+<P>The second method can be used on files that have already been transcoded (or
+files which were are already in the correct format), so only the frames
+immediately following a cut section will be re-encoded, resultiing in a very
+minimal loss of quality.</P>
+<P>To enable automatic transcoding, do the following:
+start the setup program
+under the host-specific settings:
+set the Transcoder Auto-run checkbox</P>
+<P>For either manual or automatic transcoding:
+start mythbackend
+start mythfrontend
+select setup, and the Transcoding recording profile.
+now select either RTJPEG or MPEG4 (selecting any of the hardware
+encoders will result in the transcoder not working).
+set the other parameters as you'd like.  For best performance, you
+should match the audio to the 'Default' profile.  If you plan to
+only use the manual transcoder, you can choose to set the video to
+be the same as the default profile too (as long as it is MPEG4 or
+RTJpeg)</P>
+<P>Everything should now be setup properly.  If you elected to use the
+Auto-Run feature, the transcoder will automatically launch after each
+recording is complete.  The transcoder thread runs at a low priority, so it
+should not impact any critical tasks or other recordings.</P>
+<P>If you want to manually transcode a program, simply press 'X' while
+watching a recording (you should have already finished marking all
+commercials).  If you change your mind, hitting 'X' again will stop the
+transcoding.</P>
+<P>Once the transcode is complete, mythbackend will replace the old file
+with the new as soon as it is no longer in use.</P>
+
 
 </BODY>
 </HTML>
