@@ -434,7 +434,7 @@ ProgInfo *parseProgram(QDomElement &element, int localTimezoneOffset)
                         pginfo->catType = cat;
                 }
 
-                if (cat == "File" && !isNorthAmerica)
+                if (cat == "Film" && !isNorthAmerica)
                 {
                     // Hack for tv_grab_uk_rt
                     pginfo->catType = cat;
