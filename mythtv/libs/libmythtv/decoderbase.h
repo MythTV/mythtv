@@ -103,7 +103,6 @@ class DecoderBase
 
     double fps;
 
-    bool rewindExtraFrame;
     bool exactseeks;
     bool livetv;
     bool watchingrecording;

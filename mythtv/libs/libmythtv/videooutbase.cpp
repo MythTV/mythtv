@@ -79,6 +79,8 @@ VideoOutput::VideoOutput()
     rpos = 0;
     vpos = 0;
 
+    framesPlayed = 0;
+
     vbuffers = NULL;
     numbuffers = 0;
 
@@ -1322,6 +1324,8 @@ void VideoOutput::CopyFrame(VideoFrame *to, VideoFrame *from)
 {
     if (to == NULL || from == NULL)
         return;
+
+    to->frameNumber = from->frameNumber;
 
     // guaranteed to be correct sizes.
     memcpy(to->buf, from->buf, from->size);

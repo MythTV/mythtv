@@ -57,6 +57,7 @@ void VideoOutputNull::InputChanged(int width, int height, float aspect)
     pauseFrame.bpp = scratchFrame->bpp;
     pauseFrame.size = scratchFrame->size;
     pauseFrame.buf = new unsigned char[pauseFrame.size];
+    pauseFrame.frameNumber = scratchFrame->frameNumber;
 }
 
 int VideoOutputNull::GetRefreshRate(void)
@@ -84,6 +85,7 @@ bool VideoOutputNull::Init(int width, int height, float aspect,
     pauseFrame.bpp = scratchFrame->bpp;
     pauseFrame.size = scratchFrame->size;
     pauseFrame.buf = new unsigned char[pauseFrame.size];
+    pauseFrame.frameNumber = scratchFrame->frameNumber;
 
     MoveResize();
     XJ_started = true;
@@ -146,8 +148,12 @@ void VideoOutputNull::StopEmbedding(void)
 
 void VideoOutputNull::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 {
-    (void)buffer;
     (void)t;
+
+    if (!buffer)
+        buffer = scratchFrame;
+
+    framesPlayed = buffer->frameNumber + 1;
 }
 
 void VideoOutputNull::Show(FrameScanType )

@@ -172,6 +172,9 @@ class VideoOutput
         { needprebufferframes = (normal ? needprebufferframes_normal : 
                                  needprebufferframes_small); };
 
+    void SetFramesPlayed(long long fp) { framesPlayed = fp; };
+    long long GetFramesPlayed(void) { return framesPlayed; };
+
   protected:
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,
                      int needprebuffer_normal, int needprebuffer_small,
@@ -266,6 +269,8 @@ class VideoOutput
     FilterChain *m_deintFilter;
 
     bool m_deinterlaceBeforeOSD;;
+
+    long long framesPlayed;
 };
 
 #endif

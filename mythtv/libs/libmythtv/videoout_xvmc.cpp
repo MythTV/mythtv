@@ -859,6 +859,8 @@ void VideoOutputXvMC::PrepareFrame(VideoFrame *buffer, FrameScanType t)
     if (!buffer)
         return;
 
+    framesPlayed = buffer->frameNumber + 1;
+
     pthread_mutex_lock(&lock);
 
     xvmc_render_state_t *render = reinterpret_cast<xvmc_render_state_t *>(buffer->buf);

@@ -49,7 +49,6 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
     seq_count = 0;
     firstgoppos = 0;
     prevgoppos = 0;
-    rewindExtraFrame = true;
 
     fps = 29.97;
 
@@ -1398,11 +1397,13 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
                     picframe->interlaced_frame = mpa_pic.interlaced_frame;
                     picframe->top_field_first = mpa_pic.top_field_first;
 
+                    picframe->frameNumber = framesPlayed;
                     m_parent->ReleaseNextVideoFrame(picframe, temppts);
                     if (directrendering)
                         inUseBuffers.removeRef(picframe);
                     gotvideo = 1;
                     framesPlayed++;
+                    cout << "queue: " << framesPlayed << endl;
 
                     break;
                 }
@@ -1427,9 +1428,6 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
 
     if (pkt)
         delete pkt;
-
-    if (!have_err)
-        UpdateFramesPlayed();
 }
 
 int AvFormatDecoder::EncodeAC3Frame(unsigned char *data, int len,

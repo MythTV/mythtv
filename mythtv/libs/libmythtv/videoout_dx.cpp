@@ -124,6 +124,7 @@ void VideoOutputDX::InputChanged(int width, int height, float aspect)
     pauseFrame.bpp = scratchFrame->bpp;
     pauseFrame.size = scratchFrame->size;
     pauseFrame.buf = new unsigned char[pauseFrame.size];
+    pauseFrame.frameNumber = scratchFrame->frameNumber;
 }
 
 int VideoOutputDX::GetRefreshRate(void)
@@ -203,6 +204,7 @@ bool VideoOutputDX::Init(int width, int height, float aspect,
     pauseFrame.bpp = scratchFrame->bpp;
     pauseFrame.size = scratchFrame->size;
     pauseFrame.buf = new unsigned char[pauseFrame.size];
+    pauseFrame.frameNumber = scratchFrame->frameNumber;
     
     XJ_started = true;
     
@@ -267,6 +269,8 @@ void VideoOutputDX::PrepareFrame(VideoFrame *buffer, FrameScanType t)
     
     if (!buffer)
         buffer = scratchFrame;
+
+    framesPlayed = buffer->frameNumber + 1;
 
     if (DirectXLockSurface((void**) &picbuf, &stride) == 0)
     {

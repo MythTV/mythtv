@@ -35,7 +35,6 @@ IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, MythSqlDatabase *db,
     validvpts = false;
 
     lastKey = 0;
-    rewindExtraFrame = true;
 
     vidread = vidwrite = vidfull = 0;
     vidscan = vidpoll = vid2write = 0;
@@ -108,7 +107,9 @@ void IvtvDecoder::SeekReset(long long newkey, int skipframes, bool needFlush)
             }
         }
 
-        framesPlayed = newkey + (skipframes * m_parent->GetFFRewSkip()) + 1;
+        // Note: decoderbase::DoRewdind/DoFastforward will add 1 to
+        // framesPlayed so we shouldn't do it here.
+        framesPlayed = newkey + skipframes;
         m_parent->SetFramesPlayed(framesPlayed);
     }
     else

@@ -458,6 +458,7 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
     pauseFrame.bpp = scratchFrame->bpp;
     pauseFrame.size = scratchFrame->size;
     pauseFrame.buf = new unsigned char[pauseFrame.size];
+    pauseFrame.frameNumber = scratchFrame->frameNumber;
 
     VideoOutput::Init(width, height, aspect, winid, winx, winy, data->screen_width, data->screen_height,
                       embedid);
@@ -499,6 +500,8 @@ void VideoOutputDirectfb::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 {
     if (!buffer)
         buffer=scratchFrame;
+
+    framesPlayed = buffer->frameNumber + 1;
 
     IDirectFBSurface *bufferSurface = data->buffers[buffer->buf];
 
@@ -642,6 +645,7 @@ void VideoOutputDirectfb::InputChanged(int width, int height, float aspect)
     pauseFrame.bpp = scratchFrame->bpp;
     pauseFrame.size = scratchFrame->size;
     pauseFrame.buf = new unsigned char[pauseFrame.size];
+    pauseFrame.frameNumber = scratchFrame->frameNumber;
 }
 
 void VideoOutputDirectfb::AspectChanged(float aspect)

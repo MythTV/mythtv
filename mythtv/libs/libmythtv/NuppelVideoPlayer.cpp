@@ -285,12 +285,28 @@ void NuppelVideoPlayer::Pause(bool waitvideo)
             VERBOSE(VB_IMPORTANT, "Waited too long for decoder to pause");
     }
 
+    decoder_lock.lock();
+
     PauseVideo(waitvideo);
     if (audioOutput)
         audioOutput->Pause(true);
 
     if (ringBuffer)
         ringBuffer->Pause();
+
+#ifdef USING_IVTV
+    if (forceVideoOutput == kVideoOutput_IVTV)
+    {
+        VideoOutputIvtv *vidout = (VideoOutputIvtv *)videoOutput;
+        vidout->Pause();
+    }
+#endif
+    if (disablevideo || forceVideoOutput == kVideoOutput_IVTV)
+        decoder->UpdateFramesPlayed();
+    else
+        framesPlayed = videoOutput->GetFramesPlayed();
+
+    decoder_lock.unlock();
 }
 
 bool NuppelVideoPlayer::Play(float speed, bool normal, bool unpauseaudio)
@@ -810,8 +826,6 @@ bool NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
         if (videoOutput->EnoughDecodedFrames())
             setPrebuffering(false);
     }
-
-    decoder->UpdateFramesPlayed();
 
     if (ffrew_skip != 1)
     {
@@ -1645,30 +1659,10 @@ bool NuppelVideoPlayer::FastForward(float seconds)
     if (!videoOutput)
         return false;
 
-    QMutexLocker decoder_locker(&decoder_lock);
+    //QMutexLocker decoder_locker(&decoder_lock);
 
     if (fftime == 0)
-    {
         fftime = (int)(seconds * video_frame_rate);
-
-        // account for the fact that framesPlayed is ahead of what we're
-        // actually showing on the screen because of the videoOutput buffers
-        int inBuf = videoOutput->ValidVideoFrames();
-
-        if (fftime > inBuf)
-        {
-            fftime -= inBuf;
-        }
-        else if (fftime < inBuf)
-        {
-            rewindtime = inBuf - 1 - fftime;
-            fftime = 0;
-        }
-        else
-        {
-            fftime = 1;
-        }
-    }
 
     return fftime > CalcMaxFFTime(fftime);
 }
@@ -1678,21 +1672,10 @@ bool NuppelVideoPlayer::Rewind(float seconds)
     if (!videoOutput)
         return false;
 
-    QMutexLocker decoder_locker(&decoder_lock);
+    //QMutexLocker decoder_locker(&decoder_lock);
 
     if (rewindtime == 0)
-    {
         rewindtime = (int)(seconds * video_frame_rate);
-
-        // account for the fact that framesPlayed is ahead of what we're
-        // actually showing on the screen because of the videoOutput buffers
-        int inBuf = videoOutput->ValidVideoFrames();
-
-        if (inBuf > 0)
-        {
-            rewindtime += inBuf - 1;
-        }
-    }
 
     return rewindtime >= framesPlayed;
 }
@@ -1864,17 +1847,7 @@ void NuppelVideoPlayer::StartPlaying(void)
         if (paused && ffrew_skip == 1 && !skip_changed)
         {
             if (speed_changed)
-            {
                 speed_changed = false;
-#ifdef USING_IVTV
-                if (forceVideoOutput == kVideoOutput_IVTV)
-                {
-                    VideoOutputIvtv *vidout = (VideoOutputIvtv *)videoOutput;
-                    vidout->Pause();
-                }
-#endif
-                decoder->UpdateFramesPlayed();
-            }
 
             actuallypaused = true;
             decoderThreadPaused.wakeAll();
@@ -2005,6 +1978,11 @@ void NuppelVideoPlayer::StartPlaying(void)
 
         if (!GetFrame(audioOutput == NULL || !normal_speed))
             pthread_create(&output_video, NULL, kickoffOutputVideoLoop, this); 
+
+        if (disablevideo || forceVideoOutput == kVideoOutput_IVTV)
+            decoder->UpdateFramesPlayed();
+        else
+            framesPlayed = videoOutput->GetFramesPlayed();
 
         if (ffrew_skip != 1)
             continue;
@@ -2225,7 +2203,7 @@ long long NuppelVideoPlayer::GetBookmark(void)
 
 bool NuppelVideoPlayer::DoRewind(void)
 {
-    long long number = rewindtime;
+    long long number = rewindtime + 1;
     long long desiredFrame = framesPlayed - number;
 
     if (!editmode && hasdeletetable && IsInDelete(desiredFrame))

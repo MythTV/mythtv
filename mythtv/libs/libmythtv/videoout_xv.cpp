@@ -196,6 +196,7 @@ void VideoOutputXv::InputChanged(int width, int height, float aspect)
     pauseFrame.buf = new unsigned char[pauseFrame.size];
     pauseFrame.qscale_table = scratchFrame->qscale_table = NULL;
     pauseFrame.qstride = scratchFrame->qstride = 0;
+    pauseFrame.frameNumber = scratchFrame->frameNumber;
 
     pthread_mutex_unlock(&lock);
 }
@@ -499,6 +500,7 @@ bool VideoOutputXv::Init(int width, int height, float aspect,
     pauseFrame.buf = new unsigned char[pauseFrame.size];
     pauseFrame.qscale_table = NULL;
     pauseFrame.qstride = 0;
+    pauseFrame.frameNumber = scratchFrame->frameNumber;
 
     data->needdrawcolor = true;
 
@@ -834,6 +836,8 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 {
     if (!buffer)
         buffer = scratchFrame;
+
+    framesPlayed = buffer->frameNumber + 1;
 
     if (xv_port != -1)
     {

@@ -955,7 +955,7 @@ void NuppelDecoder::GetFrame(int avignore)
                 VERBOSE(VB_AUDIO, QString("Video timecode = %1")
                         .arg(frameheader.timecode));
                 lastKey = frameheader.timecode;
-                framesPlayed = frameheader.timecode - 1;
+                //framesPlayed = frameheader.timecode - 1;
 
                 if (!hasFullPositionMap)
                 {
@@ -1005,7 +1005,7 @@ void NuppelDecoder::GetFrame(int avignore)
         {
             if (avignore == -1)
             {
-                framesPlayed++;
+                //framesPlayed++;
                 gotvideo = 1;
                 continue;
             }
@@ -1019,6 +1019,7 @@ void NuppelDecoder::GetFrame(int avignore)
                 continue;
             }
 
+            buf->frameNumber = framesPlayed;
             m_parent->ReleaseNextVideoFrame(buf, frameheader.timecode);
             gotvideo = 1;
             if (getrawframes && getrawvideo)
@@ -1104,8 +1105,6 @@ void NuppelDecoder::GetFrame(int avignore)
                                   frameheader.timecode, frameheader.comptype);
         }
     }
-
-    framesRead = framesPlayed;
 }
 
 void NuppelDecoder::SeekReset(long long, int skipFrames,

@@ -1479,6 +1479,7 @@ bool VideoOutputQuartz::CreateQuartzBuffers(void)
     pauseFrame.bpp    = scratchFrame->bpp;
     pauseFrame.size   = scratchFrame->size;
     pauseFrame.buf    = new unsigned char[pauseFrame.size];
+    pauseFrame.frameNumber = scratchFrame->frameNumber;
 
     // Set up pixel storage and image description for source
     data->pixelLock.lock();
@@ -1642,8 +1643,12 @@ void VideoOutputQuartz::StopEmbedding(void)
 
 void VideoOutputQuartz::PrepareFrame(VideoFrame *buffer, FrameScanType t)
 {
-    (void)buffer;
     (void)t;
+
+    if (!buffer)
+        buffer = scratchFrame;
+
+    framesPlayed = buffer->frameNumber + 1;
 }
 
 void VideoOutputQuartz::Show(FrameScanType t)

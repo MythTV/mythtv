@@ -20,7 +20,6 @@ DecoderBase::DecoderBase(NuppelVideoPlayer *parent, MythSqlDatabase *db,
     lowbuffers = false; 
     ateof = false;
     exitafterdecoded = false;
-    rewindExtraFrame = false;
 
     framesRead = 0;
     framesPlayed = 0;
@@ -351,9 +350,6 @@ bool DecoderBase::DoRewind(long long desiredFrame, bool doflush)
     if (m_positionMap.empty())
         return false;
 
-    if (rewindExtraFrame && desiredFrame)
-        desiredFrame--;
-
     // Find keyframe <= desiredFrame, store in lastKey (frames)
     int pos_idx1, pos_idx2;
 
@@ -390,20 +386,30 @@ bool DecoderBase::DoRewind(long long desiredFrame, bool doflush)
 
     ringBuffer->Seek(diff, SEEK_CUR);
     
+    framesPlayed = lastKey;
     framesRead = lastKey;
 
-    int normalframes = desiredFrame - framesRead;
+    int normalframes = desiredFrame - framesPlayed;
 
     if (!exactseeks)
         normalframes = 0;
 
     SeekReset(lastKey, normalframes, doflush);
 
+    if (doflush)
+    {
+        m_parent->SetFramesPlayed(framesPlayed+1);
+        m_parent->getVideoOutput()->SetFramesPlayed(framesPlayed+1);
+    }
+
     return true;
 }
 
 bool DecoderBase::DoFastForward(long long desiredFrame, bool doflush)
 {
+    if (desiredFrame < framesPlayed)
+        return DoRewind(desiredFrame, doflush);
+
     bool oldrawstate = getrawframes;
     getrawframes = false;
 
@@ -476,16 +482,23 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool doflush)
         ringBuffer->Seek(diff, SEEK_CUR);
         needflush = true;
     
+        framesPlayed = lastKey;
         framesRead = lastKey;
     }
 
-    int normalframes = desiredFrame - framesRead;
+    int normalframes = desiredFrame - framesPlayed;
 
     if (!exactseeks)
         normalframes = 0;
 
     if (needflush || normalframes)
         SeekReset(lastKey, normalframes, needflush && doflush);
+
+    if (doflush)
+    {
+        m_parent->SetFramesPlayed(framesPlayed+1);
+        m_parent->getVideoOutput()->SetFramesPlayed(framesPlayed+1);
+    }
 
     getrawframes = oldrawstate;
 
@@ -494,7 +507,6 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool doflush)
 
 void DecoderBase::UpdateFramesPlayed(void)
 {
-    framesPlayed = framesRead;
     m_parent->SetFramesPlayed(framesPlayed);
 }
 
