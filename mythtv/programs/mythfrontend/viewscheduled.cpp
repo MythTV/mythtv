@@ -161,10 +161,17 @@ void ViewScheduled::changed(QListViewItem *lvitem)
 
     QDateTime startts = rec->startts;
     QDateTime endts = rec->endts;
+
+    QString dateformat = globalsettings->GetSetting("DateFormat");
+    if (dateformat == "")
+        dateformat = "ddd MMMM d";
+    QString timeformat = globalsettings->GetSetting("TimeFormat");
+    if (timeformat == "")
+        timeformat = "h:mm AP";
         
-    QString timedate = endts.date().toString("ddd MMMM d") + QString(", ") +
-                       startts.time().toString("h:mm AP") + QString(" - ") +
-                       endts.time().toString("h:mm AP");
+    QString timedate = endts.date().toString(dateformat) + QString(", ") +
+                       startts.time().toString(timeformat) + QString(" - ") +
+                       endts.time().toString(timeformat);
         
     date->setText(timedate);
 
@@ -257,6 +264,13 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
 {
     list<ProgramInfo *> *conflictlist = sched->getConflicting(rec, true);
 
+    QString dateformat = globalsettings->GetSetting("DateFormat");
+    if (dateformat == "")
+        dateformat = "ddd MMMM d";
+    QString timeformat = globalsettings->GetSetting("TimeFormat");
+    if (timeformat == "")
+        timeformat = "h:mm AP";
+
     QString message = "The follow scheduled recordings conflict with each "
                       "other.  Which would you like to record?";
 
@@ -265,7 +279,7 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
  
     QString button; 
     button = rec->title + QString("\n");
-    button += rec->startts.toString("ddd MMMM d h:mm AP");
+    button += rec->startts.toString(dateformat + " " + timeformat);
     button += QString(" on channel ") + rec->chanstr;
 
     diag.AddButton(button);
@@ -276,7 +290,7 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
         ProgramInfo *info = (*i);
 
         button = info->title + QString("\n");
-        button += info->startts.toString("ddd MMMM d h:mm AP");
+        button += info->startts.toString(dateformat + " " + timeformat);
         button += QString(" on channel ") + info->chanstr;
 
         diag.AddButton(button);

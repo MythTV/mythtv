@@ -285,10 +285,17 @@ void DeleteBox::changed(QListViewItem *lvitem)
 
     QDateTime startts = rec->startts;
     QDateTime endts = rec->endts;
+
+    QString dateformat = globalsettings->GetSetting("DateFormat");
+    if (dateformat == "")
+        dateformat = "ddd MMMM d";
+    QString timeformat = globalsettings->GetSetting("TimeFormat");
+    if (timeformat == "")
+        timeformat = "h:mm AP";
         
-    QString timedate = endts.date().toString("ddd MMMM d") + QString(", ") +
-                       startts.time().toString("h:mm AP") + QString(" - ") +
-                       endts.time().toString("h:mm AP");
+    QString timedate = endts.date().toString(dateformat) + QString(", ") +
+                       startts.time().toString(timeformat) + QString(" - ") +
+                       endts.time().toString(timeformat);
         
     date->setText(timedate);
 
@@ -334,9 +341,16 @@ void DeleteBox::selected(QListViewItem *lvitem)
     QDateTime startts = rec->startts;
     QDateTime endts = rec->endts;
 
-    QString timedate = endts.date().toString("ddd MMMM d") + QString(", ") +
-                       startts.time().toString("h:mm AP") + QString(" - ") +
-                       endts.time().toString("h:mm AP");
+    QString dateformat = globalsettings->GetSetting("DateFormat");
+    if (dateformat == "")
+        dateformat = "ddd MMMM d";
+    QString timeformat = globalsettings->GetSetting("TimeFormat");
+    if (timeformat == "")
+        timeformat = "h:mm AP";
+
+    QString timedate = endts.date().toString(dateformat) + QString(", ") +
+                       startts.time().toString(timeformat) + QString(" - ") +
+                       endts.time().toString(timeformat);
 
     message += timedate;
     message += "<br>";

@@ -39,10 +39,17 @@ ProgramListItem::ProgramListItem(QListView *parent, ProgramInfo *lpginfo,
     tv = ltv;
     pginfo = lpginfo;
     pixmap = NULL;
-   
+  
+    QString dateformat = globalsettings->GetSetting("DateFormat");
+    if (dateformat == "")
+        dateformat = "ddd MMMM d";
+    QString timeformat = globalsettings->GetSetting("TimeFormat");
+    if (timeformat == "")
+        timeformat = "h:mm AP";
+ 
     if (type == 0 || type == 1)
     { 
-        setText(0, pginfo->startts.toString("ddd MMM d h:mmap"));
+        setText(0, pginfo->startts.toString(dateformat + " " + timeformat));
         setText(1, pginfo->title);
 
         if (type == 1)
@@ -63,7 +70,7 @@ ProgramListItem::ProgramListItem(QListView *parent, ProgramInfo *lpginfo,
     else
     {
         setText(0, pginfo->chanstr);
-        setText(1, pginfo->startts.toString("ddd MMM d h:mmap"));
+        setText(1, pginfo->startts.toString(dateformat + " " + timeformat));
         setText(2, pginfo->title);
     }
 }

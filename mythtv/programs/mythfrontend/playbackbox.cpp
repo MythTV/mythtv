@@ -57,6 +57,7 @@ PlaybackBox::PlaybackBox(QString prefix, TV *ltv, QSqlDatabase *ldb,
     vbox->addWidget(label);
 
     QListView *listview = new QListView(this);
+
     listview->addColumn("Date");
     listview->addColumn("Title");
  
@@ -268,10 +269,17 @@ void PlaybackBox::changed(QListViewItem *lvitem)
 
     QDateTime startts = rec->startts;
     QDateTime endts = rec->endts;
-        
-    QString timedate = endts.date().toString("ddd MMMM d") + QString(", ") +
-                       startts.time().toString("h:mm AP") + QString(" - ") +
-                       endts.time().toString("h:mm AP");
+       
+    QString dateformat = globalsettings->GetSetting("DateFormat");
+    if (dateformat == "")
+        dateformat = "ddd MMMM d";
+    QString timeformat = globalsettings->GetSetting("TimeFormat");
+    if (timeformat == "")
+        timeformat = "h:mm AP";
+
+    QString timedate = endts.date().toString(dateformat) + QString(", ") +
+                       startts.time().toString(timeformat) + QString(" - ") +
+                       endts.time().toString(timeformat);
         
     date->setText(timedate);
 

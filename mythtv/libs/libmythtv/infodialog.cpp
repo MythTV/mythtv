@@ -156,9 +156,16 @@ QLabel *InfoDialog::getDateLabel(ProgramInfo *pginfo)
     QDateTime startts = pginfo->startts;
     QDateTime endts = pginfo->endts;
 
-    QString timedate = endts.date().toString("ddd MMMM d") + QString(", ") +
-                       startts.time().toString("h:mm AP") + QString(" - ") +
-                       endts.time().toString("h:mm AP");
+    QString dateformat = globalsettings->GetSetting("DateFormat");
+    if (dateformat == "")
+        dateformat = "ddd MMMM d";
+    QString timeformat = globalsettings->GetSetting("TimeFormat");
+    if (timeformat == "")
+        timeformat = "h:mm AP";
+
+    QString timedate = endts.date().toString(dateformat) + QString(", ") +
+                       startts.time().toString(timeformat) + QString(" - ") +
+                       endts.time().toString(timeformat);
 
     QLabel *date = new QLabel(timedate, this);
 

@@ -225,23 +225,17 @@ void GuideGrid::fillTimeInfos()
         if (hour >= 12)
             am = false;
 
-        if (hour == 0)
-            sprintf(temp, "12:%02d AM", mins);
-        else
-        {
-            if (hour > 12)
-                sprintf(temp, "%02d:%02d ", hour - 12, mins);
-            else 
-                sprintf(temp, "%02d:%02d ", hour, mins);
-            strcat(temp, (am ? "AM" : "PM"));
-        }
         timeinfo->year = year;
         timeinfo->month = month;
         timeinfo->day = day;
         timeinfo->hour = hour;
         timeinfo->min = mins;
 
-        timeinfo->usertime = temp;
+        QString timeformat = globalsettings->GetSetting("TimeFormat");
+        if (timeformat == "")
+            timeformat = "h:mm AP";
+
+        timeinfo->usertime = QTime(hour, mins).toString(timeformat);
 
         sprintf(temp, "%4d%02d%02d%02d%02d50", year, month, day, hour, sqlmins);
         timeinfo->sqltime = temp;

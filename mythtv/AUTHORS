@@ -21,6 +21,6 @@ Colorize the EPG:
     skrpub <skrpub at earthlink.net>
 Random bugfixes, EPG updates, more UK friendly database filling:
     Andrew M. Bishop <amb at gedanken.demon.co.uk>
-Non-integer channel fixes:
+Non-integer channel fixes, customizable date displays:
     Jens Lohmann-Hansen <JensLH at adslhome.dk>
 

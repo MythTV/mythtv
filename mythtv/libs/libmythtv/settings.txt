@@ -8,6 +8,12 @@ str XMLTVGrab=tv_grab_na
 str ChannelSorting=channum + 0
 # Starting channel
 str DefaultTVChannel=3
+# Date format: A meaningful value is "ddd MMMM d" (default); see the QT docs 
+# for formatting
+str DateFormat=ddd MMM d
+# Time format: Meaningful values are "h:mm AP" (default) and "h:mm"; see the
+# QT docs for formatting
+str TimeFormat=h:mm AP
 
 # Live TV options
 #
