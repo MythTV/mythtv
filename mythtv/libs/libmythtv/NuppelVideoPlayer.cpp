@@ -3365,7 +3365,7 @@ int NuppelVideoPlayer::FlagCommercials(bool showPercentage, bool fullSpeed,
                 m_playbackinfo->SetCommFlagged(COMM_FLAG_NOT_FLAGGED, m_db->db());
                 m_db->unlock();
 
-                return(0);
+                return(-1);
             }
             else if (curCmd == JOB_PAUSE)
             {
