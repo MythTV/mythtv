@@ -96,8 +96,8 @@ class Metadata
     int PlayCount() { return playcount; }
     void incPlayCount();
 
-    bool isInDatabase(QSqlDatabase *db);
-    void dumpToDatabase(QSqlDatabase *db);
+    bool isInDatabase(QSqlDatabase *db, QString startdir);
+    void dumpToDatabase(QSqlDatabase *db, QString startdir);
 
     void setField(const QString &field, const QString &data);
     void getField(const QString &field, QString *data);

@@ -81,6 +81,8 @@ class Decoder : public QThread
     virtual Metadata *getMetadata(QSqlDatabase *db) = 0;
     virtual void commitMetadata(Metadata *mdata) = 0;
 
+    static void SetLocationFormatUseTags(void);
+
   protected:
     Decoder(DecoderFactory *, QIODevice *, Output *);
 
@@ -94,8 +96,9 @@ class Decoder : public QThread
                                  QString &artist, QString &album,
                                  QString &title, QString &genre, int &tracknum);
 
-    QString filename_format;
-    int ignore_id3;
+    static QString filename_format;
+    static int ignore_id3;
+    static QString musiclocation;
 
   private:
     DecoderFactory *fctry;
@@ -147,6 +150,15 @@ public:
 };
 
 class FlacDecoderFactory : public DecoderFactory
+{
+public:
+    bool supports(const QString &) const;
+    const QString &extension() const;
+    const QString &description() const;
+    Decoder *create(const QString &, QIODevice *, Output *, bool);
+};
+
+class avfDecoderFactory : public DecoderFactory
 {
 public:
     bool supports(const QString &) const;

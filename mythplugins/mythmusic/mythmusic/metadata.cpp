@@ -69,13 +69,9 @@ void Metadata::persist(QSqlDatabase *db)
     
 }
 
-bool Metadata::isInDatabase(QSqlDatabase *db)
+bool Metadata::isInDatabase(QSqlDatabase *db, QString startdir)
 {
     bool retval = false;
-
-    QString startdir = gContext->GetSetting("MusicLocation");
-    if (!startdir.endsWith("/"))
-        startdir += "/";
 
     QString sqlfilename = filename;
     sqlfilename = filename.remove(0, startdir.length());
@@ -110,12 +106,8 @@ bool Metadata::isInDatabase(QSqlDatabase *db)
     return retval;
 }
 
-void Metadata::dumpToDatabase(QSqlDatabase *db)
+void Metadata::dumpToDatabase(QSqlDatabase *db, QString startdir)
 {
-    QString startdir = gContext->GetSetting("MusicLocation");
-    if (!startdir.endsWith("/"))
-        startdir += "/";
-
     if (artist == "")
         artist = QObject::tr("Unknown Artist");
     if (album == "")
@@ -434,7 +426,7 @@ void AllMusic::resync()
 
     QString filename;
     QString startdir = gContext->GetSetting("MusicLocation");
-    if (!startdir.endsWith("/"))
+    if (!startdir.endsWith("/"));
         startdir += "/";
 
     QSqlQuery query = db->exec(aquery);

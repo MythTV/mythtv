@@ -406,6 +406,8 @@ int mythplugin_init(const char *libversion)
 
     setupKeys();
 
+    Decoder::SetLocationFormatUseTags();
+
     return 0;
 }
 
@@ -439,6 +441,8 @@ static void preMusic(MusicData *mdata)
     QString startdir = gContext->GetSetting("MusicLocation");
     if (!startdir.endsWith("/"));
         startdir += "/";
+
+    Decoder::SetLocationFormatUseTags();
 
     // Only search music files if a directory was specified & there
     // is no data in the database yet (first run).  Otherwise, user
@@ -503,6 +507,10 @@ int mythplugin_config(void)
     MusicData mdata;
     mdata.paths = gContext->GetSetting("TreeLevels");
     mdata.startdir = gContext->GetSetting("MusicLocation");
+    if (!mdata.startdir.endsWith("/"));
+        mdata.startdir += "/";
+
+    Decoder::SetLocationFormatUseTags();
 
     runMenu(&mdata, "music_settings.xml");
 

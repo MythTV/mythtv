@@ -46,9 +46,6 @@ MadDecoder::MadDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     output_bytes = 0;
     output_at = 0;
     output_size = 0;
-
-    filename_format = gContext->GetSetting("NonID3FileNameFormat").upper();
-    ignore_id3 = gContext->GetNumSetting("Ignore_ID3", 0);
 }
 
 MadDecoder::~MadDecoder(void)
@@ -542,7 +539,7 @@ enum mad_flow MadDecoder::madError(struct mad_stream *stream,
 Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
 {
     Metadata *testdb = new Metadata(filename);
-    if (testdb->isInDatabase(db))
+    if (testdb->isInDatabase(db, musiclocation))
         return testdb;
 
     delete testdb;
@@ -735,7 +732,7 @@ Metadata *MadDecoder::getMetadata(QSqlDatabase *db)
     Metadata *retdata = new Metadata(filename, artist, album, title, genre,
                                      year, tracknum, length);
 
-    retdata->dumpToDatabase(db);
+    retdata->dumpToDatabase(db, musiclocation);
 
     return retdata;
 }

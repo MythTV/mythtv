@@ -176,9 +176,6 @@ FlacDecoder::FlacDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     output_size = 0;
 
     decoder = 0;
-
-    filename_format = gContext->GetSetting("NonID3FileNameFormat").upper();
-    ignore_id3 = gContext->GetNumSetting("Ignore_ID3", 0);
 }
 
 FlacDecoder::~FlacDecoder(void)
@@ -416,7 +413,7 @@ E=VALUE" */
 Metadata *FlacDecoder::getMetadata(QSqlDatabase *db)
 {
     Metadata *testdb = new Metadata(filename);
-    if (testdb->isInDatabase(db))
+    if (testdb->isInDatabase(db, musiclocation))
         return testdb;
 
     delete testdb;
@@ -490,7 +487,7 @@ Metadata *FlacDecoder::getMetadata(QSqlDatabase *db)
     FLAC__metadata_chain_delete(chain);
     FLAC__metadata_iterator_delete(iterator);
 
-    retdata->dumpToDatabase(db);
+    retdata->dumpToDatabase(db, musiclocation);
 
     fclose(input);
 

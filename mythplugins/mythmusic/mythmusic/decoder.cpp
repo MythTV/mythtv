@@ -15,6 +15,8 @@
 #include <qstringlist.h>
 #include <qregexp.h>
 
+#include <mythtv/mythcontext.h>
+
 Decoder::Decoder(DecoderFactory *d, QIODevice *i, Output *o)
        : fctry(d), in(i), out(o), blksize(0)
 {
@@ -88,6 +90,22 @@ void Decoder::removeListener(QObject *object)
 
 // static methods
 
+QString Decoder::filename_format = "";
+int Decoder::ignore_id3 = 0;
+QString Decoder::musiclocation = "";
+
+void Decoder::SetLocationFormatUseTags(void)
+{
+    QString startdir = gContext->GetSetting("MusicLocation");
+    if (!startdir.endsWith("/"))
+        startdir += "/";
+
+    musiclocation = startdir;
+
+    filename_format = gContext->GetSetting("NonID3FileNameFormat").upper();
+    ignore_id3 = gContext->GetNumSetting("Ignore_ID3", 0);
+}
+
 static QPtrList<DecoderFactory> *factories = 0;
 
 static void checkFactories() 
@@ -100,6 +118,7 @@ static void checkFactories()
         Decoder::registerFactory(new MadDecoderFactory);
         Decoder::registerFactory(new FlacDecoderFactory);
         Decoder::registerFactory(new CdDecoderFactory);
+        Decoder::registerFactory(new avfDecoderFactory);
     }
 }
 

@@ -87,9 +87,6 @@ VorbisDecoder::VorbisDecoder(const QString &file, DecoderFactory *d,
     totalTime = 0.0;
     chan = 0;
     output_size = 0;
-
-    filename_format = gContext->GetSetting("NonID3FileNameFormat").upper();
-    ignore_id3 = gContext->GetNumSetting("Ignore_ID3", 0);
 }
 
 VorbisDecoder::~VorbisDecoder(void)
@@ -324,7 +321,7 @@ void VorbisDecoder::run()
 Metadata *VorbisDecoder::getMetadata(QSqlDatabase *db)
 {
     Metadata *testdb = new Metadata(filename);
-    if (testdb->isInDatabase(db))
+    if (testdb->isInDatabase(db, musiclocation))
         return testdb;
 
     delete testdb;
@@ -369,7 +366,7 @@ Metadata *VorbisDecoder::getMetadata(QSqlDatabase *db)
     Metadata *retdata = new Metadata(filename, artist, album, title, genre,
                                      year, tracknum, length);
 
-    retdata->dumpToDatabase(db);
+    retdata->dumpToDatabase(db, musiclocation);
 
     return retdata;
 }    

@@ -112,6 +112,8 @@ class DatabaseBox : public MythDialog
     QTimer              *fill_list_timer;
     int                 wait_counter;
     int                 numb_wait_dots;
+
+    QStringList         treelevels;
 };
 
 #endif

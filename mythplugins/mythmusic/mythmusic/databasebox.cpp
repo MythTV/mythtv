@@ -43,6 +43,9 @@ DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
     cd_checking_flag = false;
     cd_checking_flag = gContext->GetNumSetting("AutoLookupCD");
 
+    QString tree = gContext->GetSetting("TreeLevels", "artist album title");
+    QStringList treelevels = QStringList::split(" ", tree.lower());
+
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
     listview = new MythListView(this);
@@ -1143,9 +1146,6 @@ LCDMenuItem *DatabaseBox::buildLCDMenuItem(QListViewItem *item_ptr,
 
 QString DatabaseBox::indentMenuItem(QString itemLevel)
 {
-    QString tree = gContext->GetSetting("TreeLevels", "artist album title");
-    QStringList treelevels = QStringList::split(" ", tree.lower());
-
     // Find the index and indent that number of spaces
     int count = 1;
     QStringList::ConstIterator it;
