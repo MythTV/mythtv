@@ -11,6 +11,9 @@ class RecordingProfile;
 class VideoCompressionSettings;
 class AudioCompressionSettings;
 
+class SelectManagedListItem;
+
+
 // Any setting associated with a recording profile
 class RecordingProfileSetting: virtual public Setting {
 protected:
@@ -71,6 +74,9 @@ public:
 
     static void fillSelections(QSqlDatabase* db, SelectSetting* setting,
                                int group);
+    static void fillSelections(QSqlDatabase* db, SelectManagedListItem* setting,
+                               int group);                           
+                               
     QString groupType(QSqlDatabase *db);
     void setCodecTypes(QSqlDatabase *db);
     int getProfileNum(void) const {
