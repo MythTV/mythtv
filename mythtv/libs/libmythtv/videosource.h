@@ -266,9 +266,11 @@ public:
         addSelection("/dev/dsp");
         addSelection("/dev/dsp1");
         addSelection("/dev/dsp2");
+        addSelection("/dev/dsp3");
         addSelection("/dev/sound/dsp");
         addSelection("/dev/sound/dsp1");
         addSelection("/dev/sound/dsp2");
+        addSelection("/dev/sound/dsp3");
     };
 };
 
