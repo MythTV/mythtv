@@ -268,7 +268,7 @@ int quickdnrMMX(VideoFilter *f, VideoFrame *frame)
   ThisFilter *tf = (ThisFilter *)f;
   int y;
   uint64_t *buf = (uint64_t *)frame->buf;
-  uint64_t *av_p = (uint64_t *)tf->average;;
+  uint64_t *av_p = (uint64_t *)tf->average;
   const uint64_t sign_convert = 0x8080808080808080LL;
 
   if (tf->first)
