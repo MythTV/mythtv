@@ -4,7 +4,7 @@
 
     <font name="active_font" face="Arial">
       <color>#ffffff</color>
-      <size>16</size>
+      <size>18</size>
       <bold>yes</bold>
     </font>
 
@@ -30,7 +30,7 @@
     </font>
 
     <font name="moviedata" face="Arial">
-      <color>#ffff33</color>
+      <color>#ffffbb</color>
       <size>16</size>
       <shadow>1,1</shadow>
       <bold>yes</bold>
@@ -59,10 +59,10 @@
     </font>
 
     <font name="leadfnt" face="Arial">
-      <color>#ffffff</color>
+      <color>#ffffbb</color>
       <dropcolor>#000000</dropcolor>
-      <shadow>3,3</shadow>
-      <size>40</size>
+      <shadow>2,2</shadow>
+      <size>30</size>
       <bold>yes</bold>
     </font>
 
@@ -81,17 +81,17 @@
     </font>
 
     <container name="background">
-      <image name="filler" draworder="0" fleximage="yes">
-        <filename>cr-background.png</filename>
-        <position>0,285</position>
-        <staticsize>800,290</staticsize>
+      <image name="filler" draworder="0" fleximage="no">
+        <filename>vm-background.png</filename>
+        <position>0,0</position>
+        <!--<staticsize>800,290</staticsize>-->
       </image>
-    </container>
+      </container>
 
     <container name="info">
       <area>0,0,800,280</area>
       <textarea name="title" draworder="4">
-        <area>20,10,800,80</area>
+        <area>30,35,800,80</area>
         <font>leadfnt</font>
       </textarea>
       <textarea name="dirlbl" draworder="4">
@@ -188,7 +188,7 @@
     </container>
  
     <container name="selector">
-      <area>0,285,800,320</area>
+      <area>0,300,800,320</area>
       <listarea name="listing" draworder="4">
         <area>20,12,760,242</area>
         <fcnfont name="active_font" function="active"></fcnfont>
@@ -219,7 +219,7 @@
         <value></value>
       </textarea>
       <textarea name="keyslbl_three" draworder="4" align="right">
-        <area>580,275,230,30</area>
+        <area>555,275,230,30</area>
         <font>keysfont</font>
         <value>INFO - Action Menu</value>        
       </textarea>
