@@ -1443,42 +1443,44 @@ MythPluginManager *MythContext::getPluginManager(void)
 }
 
 
-#ifdef QWS
-void MythContext::DisableScreensaver(void) {}
-#else
 void MythContext::DisableScreensaver(void)
 {
+#if 0
+#ifndef QWS
     if (!d->m_screensaver.saved)
     {
         XGetScreenSaver(qt_xdisplay(),
                         &d->m_screensaver.timeout, &d->m_screensaver.interval,
-                        &d->m_screensaver.preferblank, &d->m_screensaver.allowexposure);
+                        &d->m_screensaver.preferblank, 
+                        &d->m_screensaver.allowexposure);
         d->m_screensaver.saved = true;
     }
 
     XResetScreenSaver(qt_xdisplay());
     XSetScreenSaver(qt_xdisplay(), 0, 0, 0, 0);
-}
 #endif
+#endif
+}
 
-#ifdef QWS
-void MythContext::RestoreScreensaver(void) {}
-#else
 void MythContext::RestoreScreensaver(void)
 {
+#if 0
+#ifndef QWS
     XResetScreenSaver(qt_xdisplay());
     XSetScreenSaver(qt_xdisplay(),
                     d->m_screensaver.timeout, d->m_screensaver.interval,
-                    d->m_screensaver.preferblank, d->m_screensaver.allowexposure);
+                    d->m_screensaver.preferblank, 
+                    d->m_screensaver.allowexposure);
     d->m_screensaver.saved = false;
-}
 #endif
+#endif
+}
 
-#ifdef QWS
-void MythContext::ResetScreensaver(void) {}
-#else
 void MythContext::ResetScreensaver(void)
 {
+#if 0
+#ifndef QWS
     XResetScreenSaver(qt_xdisplay());
-}
 #endif
+#endif
+}
