@@ -119,18 +119,37 @@ void UIBarType::SetText(int num, QString myText)
     textData[num] = myText;
 }
 
-void UIBarType::SetIcon(int num, QPixmap myIcon)
+void UIBarType::SetIcon(int num, QString myIcon)
 {
-    iconData[num] = myIcon;
+    LoadImage(num, myIcon);
 }
 
-void UIBarType::LoadImage()
+void UIBarType::SetIcon(int num, QPixmap myIcon)
+{
+    QImage sourceImg = myIcon.convertToImage();
+    if (!sourceImg.isNull())
+    {
+        QImage scalerImg;
+
+        scalerImg = sourceImg.smoothScale((int)(m_iconsize.x()),
+                                               (int)(m_iconsize.y()));
+        iconData[num].convertFromImage(scalerImg);
+    }
+    else
+        iconData[num].resize(0, 0);
+}
+
+void UIBarType::LoadImage(int loc, QString myFile)
 {
     if (m_size == 0)
     {
         cerr << "uitypes.cpp:UIBarType:LoadImage:m_size == 0";
         return;
     }
+    QString filename = m_filename;
+    if (loc != -1)
+        filename = myFile;
+
     QString file;
 
     QString baseDir = gContext->GetInstallPrefix();
@@ -138,19 +157,19 @@ void UIBarType::LoadImage()
     themeDir = themeDir + gContext->GetSetting("Theme") + "/";
     baseDir = baseDir + "/share/mythtv/themes/default/";
 
-    QFile checkFile(themeDir + m_filename);
+    QFile checkFile(themeDir + filename);
 
     if (checkFile.exists())
-        file = themeDir + m_filename;
+        file = themeDir + filename;
     else
-        file = baseDir + m_filename;
+        file = baseDir + filename;
     checkFile.setName(file);
     if (!checkFile.exists())
-        file = "/tmp/" + m_filename;
+        file = "/tmp/" + filename;
 
     checkFile.setName(file);
     if (!checkFile.exists())
-        file = "~/.mythtv/" + m_filename;
+        file = filename;
 
     if (m_debug == true)
         cerr << "     -Filename: " << file << endl;
@@ -163,24 +182,35 @@ void UIBarType::LoadImage()
         int doY = 0;
         if (m_orientation == 1)
         {
-            doX = (int)(m_displaysize.width() / m_size);
-            doY = m_displaysize.height();
+            doX = (int)((m_displaysize.width() / m_size) * m_wmult);
+            doY = (int)(m_displaysize.height() * m_hmult);
         }
         else if (m_orientation == 2)
         {
-            doX = m_displaysize.width();
-            doY = (int)(m_displaysize.height() / m_size);
+            doX = (int)(m_displaysize.width() * m_wmult);
+            doY = (int)((m_displaysize.height() / m_size) * m_hmult);
+        }
+        if (loc != -1)
+        {
+            doX = m_iconsize.x();
+            doY = m_iconsize.y();
         }
 
-        scalerImg = sourceImg->smoothScale((int)(doX * m_wmult),
-                                               (int)(doY * m_hmult));
-        m_image.convertFromImage(scalerImg);
+        scalerImg = sourceImg->smoothScale(doX, doY);
+        if (loc == -1)
+            m_image.convertFromImage(scalerImg);
+        else
+            iconData[loc].convertFromImage(scalerImg);
+
         if (m_debug == true)
             cerr << "     -Image: " << file << " loaded.\n";
     }
     else
+    {
       if (m_debug == true)
           cerr << "     -Image: " << file << " failed to load.\n";
+      iconData[loc].resize(0, 0);
+    }
 
     delete sourceImg;
 
@@ -232,6 +262,12 @@ void UIBarType::Draw(QPainter *dr, int drawlayer, int context)
             drawy = m_displaysize.top() + (int)(i * ydrop);
         }
         dr->drawPixmap(drawx, drawy, m_image);
+        if (!iconData[i].isNull() && iconData[i].width() > 0)
+        {
+            dr->drawPixmap(drawx + m_iconoffset.x(), 
+                           drawy + (int)(ydrop / 2) - (int)(m_iconsize.y() / 2), 
+                           iconData[i]);
+        }
 
         dr->setFont(m_font->face);
         if (fontdrop.x() != 0 || fontdrop.y() != 0)
@@ -252,7 +288,7 @@ void UIBarType::Draw(QPainter *dr, int drawlayer, int context)
                 cerr << "    +UIBarType::Drawing Shadow @ (" << drawx 
                      << ", " << drawy << ")" << endl;
             dr->drawText(drawx + m_textoffset.x(), drawy + m_textoffset.y(),
-                           xdrop - (int)(2*m_textoffset.x()), ydrop - (int)(2 * m_textoffset.y()),
+                           xdrop - m_textoffset.x(), ydrop - (int)(2 * m_textoffset.y()),
                            m_justification, msg);
         }
 
@@ -274,7 +310,7 @@ void UIBarType::Draw(QPainter *dr, int drawlayer, int context)
             cerr << "     +UIBarType::Data = " << msg << endl;
         }
         dr->drawText(drawx + m_textoffset.x(), drawy + m_textoffset.y(),
-                     xdrop - (int)(2*m_textoffset.x()), ydrop - (int)(2 * m_textoffset.y()),
+                     xdrop - m_textoffset.x(), ydrop - (int)(2 * m_textoffset.y()),
                      m_justification, msg);
 
         if (m_debug == true)
@@ -360,6 +396,7 @@ void UIGuideType::Draw(QPainter *dr, int drawlayer, int context)
                 drawBox(dr, i, m_reccolor);
 
             drawText(dr, i);
+            drawRecStatus(dr, i);
         }
         drawCurrent(dr);
     }
@@ -419,6 +456,7 @@ void UIGuideType::drawCurrent(QPainter *dr)
     int num = 0;
     int breakin = 1;
     QRect area = curArea;
+
     area.setTop(area.top() + breakin);
     area.setLeft(area.left() + breakin);
     area.setHeight(area.height() - (int)(2*breakin));
@@ -462,7 +500,7 @@ void UIGuideType::drawCurrent(QPainter *dr)
   else
   {
     dr->setBrush(QBrush(m_selcolor));
-    dr->setPen(QPen(QColor(m_selcolor), (int)(10 * m_wmult)));
+    dr->setPen(QPen(QColor(m_selcolor), (int)(2 * m_wmult)));
     dr->drawLine(area.left(), area.top(), area.right(), area.top());
     dr->drawLine(area.left(), area.top(), area.left(), area.bottom());
     dr->drawLine(area.left(), area.bottom(), area.right(), area.bottom());
@@ -474,6 +512,24 @@ void UIGuideType::drawCurrent(QPainter *dr)
     dr->drawLine(area.right() - 1, area.top(), area.right() - 1, area.bottom());
   }
  }
+
+void UIGuideType::drawRecStatus(QPainter *dr, int num)
+{
+    int breakin = 2;
+    QRect area = drawArea[num];
+    area.setTop(area.top() + breakin);
+    area.setLeft(area.left() + breakin);
+    area.setHeight(area.height() - (int)(2*breakin));
+    area.setWidth(area.width() - (int)(2*breakin));
+ 
+    if (recStatus[num] != 0)
+    {
+        QPixmap recImg = recImages[recStatus[num]];
+
+        dr->drawPixmap(area.right() - recImg.width(), 
+                       area.bottom() - recImg.height(), recImg);
+    }
+}
 
 void UIGuideType::drawBox(QPainter *dr, int num, QString color)
 {
@@ -544,18 +600,50 @@ void UIGuideType::drawBackground(QPainter *dr, int num)
         dr->setBrush( QBrush( QColor(m_solidcolor), Qt::Dense4Pattern) );
         dr->setPen(QPen(QColor(m_solidcolor), (int)(2 * m_wmult)));
         dr->fillRect(area, QBrush( QColor(m_solidcolor), Qt::Dense4Pattern));
+
+        dr->setBrush( QBrush(QColor("#0000ee")) );
+        dr->setPen(QPen(QColor("#0000ee"), (int)(2 * m_wmult)));
+        dr->drawLine(area.left() - 1, area.top() - 1, area.right() + 1, area.top() - 1);
+        dr->drawLine(area.left(), area.top(), area.right(), area.top());
+
+        dr->setBrush( QBrush(QColor("#0000aa")) );
+        dr->setPen(QPen(QColor("#0000aa"), (int)(2 * m_wmult)));
+        dr->drawLine(area.left() - 1, area.top(), area.left() - 1, area.bottom());
+        dr->drawLine(area.left(), area.top() + 1, area.left(), area.bottom() - 1);
+
+        dr->setBrush( QBrush(QColor("#000033")) );
+        dr->setPen(QPen(QColor("#000033"), (int)(2 * m_wmult)));
+        dr->drawLine(area.left() - 1, area.bottom() + 1, area.right() + 1, area.bottom() + 1);
+        dr->drawLine(area.left(), area.bottom(), area.right(), area.bottom());
+        dr->drawLine(area.right() + 1, area.top() + 1, area.right() + 1, area.bottom());
+        dr->drawLine(area.right(), area.top(), area.right(), area.bottom());
     }
     else if (m_filltype == 4)
     {
         dr->setBrush( QBrush(QColor(m_solidcolor)) );
         dr->setPen(QPen(QColor(m_solidcolor), (int)(2 * m_wmult)));
         dr->fillRect(area, QBrush(QColor(m_solidcolor)));
+
+        dr->setBrush( QBrush(QColor("#0000bb")) );
+        dr->setPen(QPen(QColor("#0000bb"), (int)(2 * m_wmult)));
+
+        dr->drawLine(area.left() - 1, area.top() - 1, area.right() + 1, area.top() - 1);
+
+        dr->setBrush( QBrush(QColor("#000099")) );
+        dr->setPen(QPen(QColor("#000099"), (int)(2 * m_wmult)));
+        dr->drawLine(area.left() - 1, area.top(), area.left() - 1, area.bottom());
+
+        dr->setBrush( QBrush(QColor("#000033")) );
+        dr->setPen(QPen(QColor("#000033"), (int)(2 * m_wmult)));
+        dr->drawLine(area.left() - 1, area.bottom() + 1, area.right() + 1, area.bottom() + 1);
+        dr->drawLine(area.right() + 1, area.top() + 1, area.right() + 1, area.bottom());
+
     }
     else if (m_filltype == 5)
     {
-        dr->setBrush(QBrush(categoryColors[categoryMap[num]]));
+        dr->setBrush(QBrush(categoryColors[categoryMap[num]], Qt::Dense4Pattern));
         dr->setPen(QPen(QColor(categoryColors[categoryMap[num]]), (int)(2 * m_wmult)));
-        dr->fillRect(area, QBrush(categoryColors[categoryMap[num]]));
+        dr->fillRect(area, QBrush( QColor(categoryColors[categoryMap[num]]), Qt::Dense4Pattern));
     }
     else if (m_filltype == 6 && categoryMap[num] != "Other")
          Blender(dr, area, num);
@@ -602,11 +690,13 @@ void UIGuideType::Blender(QPainter *dr, QRect area, int num, QString force)
 void UIGuideType::drawText(QPainter *dr, int num)
 {
     QRect area = drawArea[num];
-    QString msg = dataMap[num];
+    QString msg = dataMap[num] + " (" + categoryMap[num] + ")";
     QPoint fontdrop = m_font->shadowOffset;
 
     area.setLeft(area.left() + m_textoffset.x());
     area.setTop(area.top() + m_textoffset.y());
+    area.setHeight(area.height() - m_textoffset.x());
+    area.setWidth(area.width() - m_textoffset.y());
 
     if (m_cutdown == true)
         msg = cutDown(msg, &(m_font->face), area.width(), area.height());
@@ -675,6 +765,61 @@ void UIGuideType::SetProgramInfo(unsigned int row, int num, QRect area,
         m_count = row;
 }
 
+void UIGuideType::LoadImage(int recType, QString file)
+{
+    QString tfile = "";
+    QString baseDir = gContext->GetInstallPrefix();
+    QString themeDir = gContext->FindThemeDir("");
+    themeDir = themeDir + gContext->GetSetting("Theme") + "/";
+    baseDir = baseDir + "/share/mythtv/themes/default/";
+
+    QFile checkFile(themeDir + file);
+
+    if (checkFile.exists())
+        tfile = themeDir + file;
+    else
+        tfile = baseDir + file;
+    checkFile.setName(tfile);
+    if (!checkFile.exists())
+        tfile = "/tmp/" + file;
+
+    checkFile.setName(tfile);
+    if (!checkFile.exists())
+        tfile = file;
+
+    if (m_debug == true)
+        cerr << "     -Filename: " << file << endl;
+
+    QPixmap img;
+    if (m_hmult == 1 && m_wmult == 1)
+    {
+        img.load(tfile);
+    }
+    else
+    {
+        QImage *sourceImg = new QImage();
+        if (sourceImg->load(tfile))
+        {
+            QImage scalerImg;
+            int doX = sourceImg->width();
+            int doY = sourceImg->height();
+
+            scalerImg = sourceImg->smoothScale((int)(doX * m_wmult),
+                                              (int)(doY * m_hmult));
+            img.convertFromImage(scalerImg);
+            if (m_debug == true)
+                    cerr << "     -Image: " << file << " loaded.\n";
+        }
+        else
+        {
+            if (m_debug == true)
+                cerr << "     -Image: " << file << " failed to load.\n";
+        }
+        delete sourceImg;
+    }
+    recImages[recType] = img;
+}
+
 // **************************************************************
 
 
@@ -691,7 +836,6 @@ UIListType::UIListType(const QString &name, QRect area, int dorder)
     m_justification = 0;
     m_uarrow = false;
     m_darrow = false;
-    m_fill_type = -1;
 }
 
 UIListType::~UIListType()
@@ -907,6 +1051,10 @@ void UIListType::SetItemText(int num, QString data)
 UIImageType::UIImageType(const QString &name, const QString &filename, int dorder, QPoint displaypos)
            : UIType(name)
 {
+    m_isvalid = false;
+    m_flex = false;
+    img = QPixmap();
+
     m_filename = filename;
     m_displaypos = displaypos;
     m_order = dorder;
@@ -914,6 +1062,7 @@ UIImageType::UIImageType(const QString &name, const QString &filename, int dorde
     m_force_y = -1;
     m_drop_x = 0;
     m_drop_y = 0;
+    m_show = false;
 }
 
 UIImageType::~UIImageType()
@@ -949,14 +1098,15 @@ void UIImageType::LoadImage()
 
     checkFile.setName(file);
     if (!checkFile.exists())
-        file = "~/.mythtv/" + m_filename;
+        file = m_filename;
 
     if (m_debug == true)
         cerr << "     -Filename: " << file << endl;
 
     if (m_hmult == 1 && m_wmult == 1 && m_force_x == -1 && m_force_y == -1)
     {
-        img.load(file);
+        if (img.load(file))
+            m_show = true;
     }
     else
     {
@@ -981,13 +1131,17 @@ void UIImageType::LoadImage()
 
             scalerImg = sourceImg->smoothScale((int)(doX * m_wmult),
                                                (int)(doY * m_hmult));
+            m_show = true;
             img.convertFromImage(scalerImg);
             if (m_debug == true)
                     cerr << "     -Image: " << file << " loaded.\n";
         }
         else
+        {
+            m_show = false;
             if (m_debug == true)
                 cerr << "     -Image: " << file << " failed to load.\n";
+        }
         delete sourceImg;
     }
 }
@@ -997,6 +1151,8 @@ void UIImageType::Draw(QPainter *dr, int drawlayer, int context)
   if (m_context == context || m_context == -1)
     if (drawlayer == m_order)
     {
+      if (!img.isNull() && m_show == true)
+      {
         if (m_debug == true)
         {
             cerr << "   +UIImageType::Draw() <- inside Layer\n";
@@ -1004,6 +1160,9 @@ void UIImageType::Draw(QPainter *dr, int drawlayer, int context)
             cerr << "       -Skip Section: (" << m_drop_x << ", " << m_drop_y << ")\n";
         }
         dr->drawPixmap(m_displaypos.x(), m_displaypos.y(), img, m_drop_x, m_drop_y);
+      } else if (m_debug == true)
+            cerr << "   +UIImageType::Draw() <= Image is null\n";
+      
     }
     else
         if (m_debug == true)

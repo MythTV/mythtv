@@ -91,8 +91,9 @@ class UIBarType : public UIType
     UIBarType(const QString &name, QString, int, QRect);
     ~UIBarType();
 
-    void SetText(int, QString);
     void SetIcon(int, QPixmap);
+    void SetText(int, QString);
+    void SetIcon(int, QString);
 
     void Draw(QPainter *, int, int);
 
@@ -103,10 +104,14 @@ class UIBarType : public UIType
     void SetOrientation(int ori) { m_orientation = ori; }
     void SetTextOffset(QPoint to) { m_textoffset = to; }
     void SetIconOffset(QPoint ic) { m_iconoffset = ic; }
+    void SetIconSize(QPoint is) { m_iconsize = is; }
+    void ResetImage(int loc) { iconData[loc].resize(0, 0); }
+    int GetSize() { return m_iconsize.x(); }
 
   private:
-    void LoadImage();
+    void LoadImage(int loc = -1, QString dat = "");
     QRect m_displaysize;
+    QPoint m_iconsize;
     QPoint m_textoffset;
     QPoint m_iconoffset;
     int m_justification;
@@ -149,6 +154,7 @@ class UIGuideType : public UIType
     void SetArea(QRect area) { m_area = area; }
     void SetScreenLocation(QPoint sl) { m_screenloc = sl; }
     void SetTextOffset(QPoint to) { m_textoffset = to; }
+    void LoadImage(int, QString);
 
   private:
     QRect m_area;
@@ -159,6 +165,7 @@ class UIGuideType : public UIType
     void drawBox(QPainter *, int, QString);
     void drawBackground(QPainter *, int); 
     void drawText(QPainter *, int);
+    void drawRecStatus(QPainter *, int);
     void Blender(QPainter *, QRect, int, QString force = "");
     QString cutDown(QString, QFont *, int, int);
     int m_justification;
@@ -177,6 +184,7 @@ class UIGuideType : public UIType
     QMap<int, QString> dataMap;
     QMap<int, QString> categoryMap;
     QMap<int, int> recStatus;
+    QMap<int, QPixmap> recImages;
 };
 
 class UIListType : public UIType
@@ -265,11 +273,14 @@ class UIImageType : public UIType
     void SetOrder(int order) { m_order = order; }
     void SetFlex(bool flex) { m_flex = flex; }
     void SetImage(QString file) { m_filename = file; }
+    void SetImage(QPixmap imgdata) { img = imgdata; }
     void SetSize(int x, int y) { m_force_x = x; m_force_y = y; }
     void SetSkip(int x, int y) { m_drop_x = x; m_drop_y = y; }
 
+    void ResetImage() { img = QPixmap(); }
     void LoadImage();
     QPixmap GetImage() { return img; }
+    int GetSize() { return m_force_x; }
   
     void Draw(QPainter *, int, int);
 
@@ -278,6 +289,7 @@ class UIImageType : public UIType
     QString m_filename;
     bool m_isvalid;
     bool m_flex;
+    bool m_show;
     int m_drop_x;
     int m_drop_y;
     int m_force_x;

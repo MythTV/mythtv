@@ -296,6 +296,7 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
     bool cutdown = true;
     bool multiline = false;
     QMap<QString, QString> catColors;
+    QMap<int, QString> recImgs;
 
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
@@ -368,6 +369,25 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
                 selcolor = col;
                 seltype = typ;
             }
+            else if (info.tagName() == "recordstatus")
+            {
+                QString typ = "";
+                QString img = "";
+                int inttype = 0;
+                typ = info.attribute("type");
+                img = info.attribute("image");
+
+                if (typ == "SingleRecord")
+                    inttype = 1;
+                else if (typ == "TimeslotRecord")
+                    inttype = 2;
+                else if (typ == "ChannelRecord")
+                    inttype = 3;
+                else if (typ == "AllRecord") 
+                    inttype = 4;
+
+                recImgs[inttype] = img;
+            }
             else if (info.tagName() == "catcolor")
             {
                 QString cat = "";
@@ -392,6 +412,7 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
     }
 
     UIGuideType *guide = new UIGuideType(name, order.toInt());
+    guide->SetScreen(wmult, hmult);
     guide->SetFont(testfont);
     guide->SetSolidColor(color);
     guide->SetCutDown(cutdown);
@@ -400,16 +421,19 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
     guide->SetTextOffset(textoff);
     guide->SetRecordingColor(reccolor);
     guide->SetSelectorColor(selcolor);
+    for (int i = 1; i < 5; i++)
+        guide->LoadImage(i, recImgs[i]);
     if (seltype.lower() == "box")
         guide->SetSelectorType(1);
     else
         guide->SetSelectorType(2); // solid
 
+    int jst = Qt::AlignLeft | Qt::AlignTop;
+    if (multiline == true)
+        jst = Qt::WordBreak;
+
     if (!align.isNull() && !align.isEmpty())
     {
-        int jst = 0;
-        if (multiline == true)
-           jst = Qt::WordBreak;
         if (align.lower() == "center")
             guide->SetJustification(Qt::AlignCenter | jst);
         else if (align.lower() == "right")
@@ -419,6 +443,9 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
         else if (align.lower() == "vcenter")
             guide->SetJustification(Qt::AlignVCenter | jst);
     }
+    else 
+        guide->SetJustification(jst);
+
     align = "";
 
     if (context != -1)
@@ -437,6 +464,7 @@ void XMLParse::parseBar(LayerSet *container, QDomElement &element)
     QString font = "";
     QPoint textoff = QPoint(0, 0);
     QPoint iconoff = QPoint(0, 0);
+    QPoint iconsize = QPoint(0, 0);
     QRect area;
 
     QString name = element.attribute("name", "");
@@ -496,6 +524,12 @@ void XMLParse::parseBar(LayerSet *container, QDomElement &element)
                 iconoff.setX((int)(iconoff.x() * wmult));
                 iconoff.setY((int)(iconoff.y() * hmult));
             }
+            else if (info.tagName() == "iconsize")
+            {
+                iconsize = parsePoint(getFirstText(info));
+                iconsize.setX((int)(iconsize.x() * wmult));
+                iconsize.setY((int)(iconsize.y() * hmult));
+            }
             else
             {
                 cerr << "Unknown: " << info.tagName() << " in bar\n";
@@ -515,6 +549,7 @@ void XMLParse::parseBar(LayerSet *container, QDomElement &element)
     bar->SetFont(testfont);
     bar->SetTextOffset(textoff);
     bar->SetIconOffset(iconoff);
+    bar->SetIconSize(iconsize);
     if (orientation == "horizontal") 
        bar->SetOrientation(1);
     else if (orientation == "vertical")
