@@ -722,7 +722,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             proginfo->chanOutputFilters = query.value(20).toString();
             proginfo->seriesid = query.value(21).toString();
             proginfo->programid = query.value(22).toString();
-            proginfo->filesize = query.value(23).toInt();
+            proginfo->filesize = stringToLongLong(query.value(23).toString());
             proginfo->lastmodified =
                       QDateTime::fromString(query.value(24).toString(),
                                             Qt::ISODate);

@@ -43,4 +43,6 @@ int myth_system(const QString &command, int flags = 0);
 
 QString cutDownString(QString text, QFont *testFont, int maxwidth);
 
+long long stringToLongLong(const QString &str);
+QString longLongToString(long long ll);
 #endif

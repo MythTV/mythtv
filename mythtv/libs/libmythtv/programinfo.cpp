@@ -352,8 +352,7 @@ void ProgramInfo::ToMap(QSqlDatabase *db, QMap<QString, QString> &progMap)
     tmpSize += QObject::tr("GB", "GigaBytes");
     progMap["filesize_str"] = tmpSize;
 
-    tmpSize.sprintf("%lld", filesize);
-    progMap["filesize"] = tmpSize;
+    progMap["filesize"] = longLongToString(filesize);
 
     seconds = recstartts.secsTo(recendts);
     minutes = seconds / 60;
@@ -491,7 +490,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(QSqlDatabase *db,
         proginfo->chanOutputFilters = query.value(10).toString();
         proginfo->seriesid = query.value(11).toString();
         proginfo->programid = query.value(12).toString();
-        proginfo->filesize = query.value(13).toInt();
+        proginfo->filesize = stringToLongLong(query.value(13).toString());
         proginfo->lastmodified =
                   QDateTime::fromString(query.value(14).toString(),
                                         Qt::ISODate);
@@ -892,10 +891,8 @@ void ProgramInfo::SetFilesize(long long fsize, QSqlDatabase *db)
 {
     MythContext::KickDatabase(db);
 
-    char size[21];
-
     filesize = fsize;
-    sprintf(size, "%lld", filesize);
+    QString size(longLongToString(filesize));
 
     QString starts = recstartts.toString("yyyyMMddhhmm");
     starts += "00";
@@ -931,11 +928,7 @@ long long ProgramInfo::GetFilesize(QSqlDatabase *db)
     {
         query.next();
 
-        QString result = query.value(0).toString();
-        if (result != QString::null)
-        {
-            sscanf(result.ascii(), "%lld", &size);
-        }
+        size = stringToLongLong(query.value(0).toString());
     }
 
     filesize = size;

@@ -648,3 +648,20 @@ QString cutDownString(QString text, QFont *testFont, int maxwidth)
     return text;
 }
 
+long long stringToLongLong(const QString &str)
+{
+    long long retval = 0;
+    if (str != QString::null)
+    {
+        retval = strtoll(str.ascii(), NULL, 0);
+    }
+    return retval;
+}
+
+QString longLongToString(long long ll)
+{
+    char str[21];
+    snprintf(str, 20, "%lld", ll);
+    str[20] = '\0';
+    return str;
+}
