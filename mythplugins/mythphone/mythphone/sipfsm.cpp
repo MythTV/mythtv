@@ -1045,6 +1045,9 @@ int SipCall::FSM(int Event, SipMsg *sipMsg, void *Value)
         BuildSendCancel(0);
         State = SIP_DISCONNECTING;
         break;
+    case SIP_ICONNECTING_INVITE:
+        BuildSendStatus(180, "INVITE", SIP_OPT_CONTACT | SIP_OPT_ALLOW); // Retxed INVITE, resend 180 Ringing
+        break;
     case SIP_ICONNECTING_ANSWER:
         BuildSendStatus(200, "INVITE", SIP_OPT_SDP | SIP_OPT_CONTACT | SIP_OPT_ALLOW);
         State = SIP_CONNECTED;
@@ -1315,7 +1318,7 @@ void SipCall::BuildSendStatus(int Code, QString Method, int Option)
     QString statusStr = QString("%1 ").arg(Code);
     debugSent.append(statusStr);
 
-    if ((myFromUrl == 0) || (remoteUrl == 0))
+    if (remoteUrl == 0)
     {
         cerr << "URL variables not setup\n";
         return;
