@@ -141,6 +141,7 @@ VideoManager::~VideoManager()
         InetGrabber->stop();
         delete InetGrabber;
     }
+    delete urlTimer;
 
     delete accel;
     delete theme;

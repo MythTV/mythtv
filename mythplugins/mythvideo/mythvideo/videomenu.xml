@@ -3,18 +3,24 @@
    <button>
      <type>VIDEO_BROWSER</type>
      <text>Browse Videos</text>
+     <text lang="ES">Ver vídeos</text>
+     <text lang="CA">Veure vídeos</text>
      <action>BROWSER</action>
    </button>
 
   <button>
      <type>VIDEO_LIST</type>
      <text>Video List</text>
+     <text lang="ES">Listar vídeos</text>
+     <text lang="CA">Llistar vídeos</text>
      <action>LISTING</action>
    </button>
 
    <button>
      <type>VIDEO_MANAGER</type>
      <text>Video Manager</text>
+     <text lang="ES">Gestionar vídeos</text>
+     <text lang="CA">Gestionar vídeos</text>
      <action>MANAGER</action>
    </button>
   
