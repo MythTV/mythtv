@@ -670,14 +670,14 @@ void NuppelVideoPlayer::GetFrame(int onlyvideo)
                 usleep(2000);
             }
 
-            frame.buf = ret;
-
-            process_video_filters(&frame, &videoFilters[0], 
-                                  videoFilters.size());
-
             pthread_mutex_lock(&video_buflock);
             memcpy(vbuffer[wpos], ret, (int)(video_width*video_height * 1.5));
             timecodes[wpos] = frameheader.timecode;
+
+            frame.buf = vbuffer[wpos];
+
+            process_video_filters(&frame, &videoFilters[0],
+                                  videoFilters.size());
 
             wpos = (wpos+1) % MAXVBUFFER;
             pthread_mutex_unlock(&video_buflock);
