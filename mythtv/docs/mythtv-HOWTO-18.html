@@ -353,10 +353,15 @@ btaudio
 keypresses.</H2>
 
 <P>This can be due to a number of factors.  The simplest case is the
-"ghost" keypresses.  For me, it was due to compact flourescent lights in
+"ghost" keypresses.  For me, it was due to compact fluorescent lights in
 the same room as the IR receiver, which the receiver was picking up as
 keypresses.  Once the lights were switched to incandescent bulbs, the ghost
 went away.</P>
+<P>You may have an issue with <B>lirc</B> misinterpreting IR commands from a
+different remote.  I also have an issue where the Tivo "Peanut" remote will
+eventually cause <B>lircd</B> to stop responding; even though <B>lircd</B>
+is configured for the Pinnacle Systems remote, the Tivo remote IR patterns
+are being seen by the IR receiver.</P>
 <P>If your remote has been properly configured, and <B>irw</B> and
 <B>irxevent</B> are working correctly, then it's highly likely that your
 window manager is not giving focus correctly to the various Myth programs as

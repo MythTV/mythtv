@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-04-15, v2.13
+  2003-04-16, v2.14
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -2757,10 +2757,16 @@
   [1m"ghost" keypresses.[0m
 
   This can be due to a number of factors.  The simplest case is the
-  "ghost" keypresses.  For me, it was due to compact flourescent lights
+  "ghost" keypresses.  For me, it was due to compact fluorescent lights
   in the same room as the IR receiver, which the receiver was picking up
   as keypresses.  Once the lights were switched to incandescent bulbs,
   the ghost went away.
+
+  You may have an issue with [1mlirc [22mmisinterpreting IR commands from a
+  different remote.  I also have an issue where the Tivo "Peanut" remote
+  will eventually cause [1mlircd [22mto stop responding; even though [1mlircd [22mis
+  configured for the Pinnacle Systems remote, the Tivo remote IR
+  patterns are being seen by the IR receiver.
 
   If your remote has been properly configured, and [1mirw [22mand [1mirxevent [22mare
   working correctly, then it's highly likely that your window manager is
@@ -3056,6 +3062,7 @@
   Old program data will be removed over the course of a week. However,
   you may want to immediately delete any current program listings for
   the channel that has been removed:
+
        $ mysql -u root mythconverg
        mysql> delete from program where chanid = '1015';
 
