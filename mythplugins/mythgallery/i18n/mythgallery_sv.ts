@@ -98,7 +98,7 @@
     </message>
     <message>
         <source>Random</source>
-        <translation type="unfinished"></translation>
+        <translation>Slumpvis</translation>
     </message>
 </context>
 <context>
