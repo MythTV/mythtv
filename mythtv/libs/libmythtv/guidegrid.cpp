@@ -673,7 +673,8 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
             {
                 for (int z = x + 1; z < DISPLAY_TIMES; z++)
                 {
-                    if (m_programInfos[row][z]->startts == proginfo->startts)
+                    ProgramInfo *test = m_programInfos[row][z];
+                    if (test && test->startts == proginfo->startts)
                         spread++;
                 }
                 proginfo->spread = spread;
@@ -681,8 +682,12 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
 
                 for (int z = x + 1; z < x + spread; z++)
                 {
-                    m_programInfos[row][z]->spread = spread;
-                    m_programInfos[row][z]->startCol = x;
+                    ProgramInfo *test = m_programInfos[row][z];
+                    if (test)
+                    {
+                        test->spread = spread;
+                        test->startCol = x;
+                    }
                 }
             }
 
@@ -960,6 +965,9 @@ void GuideGrid::paintPrograms(QPainter *p)
 void GuideGrid::paintInfo(QPainter *p)
 {
     ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
+    if (!pginfo)
+        return;
+
     QRect pr = infoRect;
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
@@ -1119,8 +1127,15 @@ void GuideGrid::toggleChannelFavorite()
 
 void GuideGrid::cursorLeft()
 {
-    int startCol = m_programInfos[m_currentRow][m_currentCol]->startCol;
+    ProgramInfo *test = m_programInfos[m_currentRow][m_currentCol];
+    
+    if (!test)
+    {
+        emit scrollLeft();
+        return;
+    }
 
+    int startCol = test->startCol;
     m_currentCol = startCol - 1;
 
     if (m_currentCol < 0)
@@ -1139,8 +1154,16 @@ void GuideGrid::cursorLeft()
 
 void GuideGrid::cursorRight()
 {
-    int spread = m_programInfos[m_currentRow][m_currentCol]->spread;
-    int startCol = m_programInfos[m_currentRow][m_currentCol]->startCol;
+    ProgramInfo *test = m_programInfos[m_currentRow][m_currentCol];
+
+    if (!test)
+    {
+        emit scrollRight();
+        return;
+    }
+
+    int spread = test->spread;
+    int startCol = test->startCol;
 
     m_currentCol = startCol + spread;
 
@@ -1420,10 +1443,10 @@ void GuideGrid::quickRecord()
 {
     ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
 
-    if (pginfo->title == unknownTitle)
+    if (!pginfo)
         return;
 
-    if (!pginfo)
+    if (pginfo->title == unknownTitle)
         return;
 
     pginfo->ToggleRecord(m_db);
@@ -1438,6 +1461,9 @@ void GuideGrid::displayInfo()
     showInfo = 1;
 
     ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
+
+    if (!pginfo)
+        return;
 
     if (pginfo->title == unknownTitle)
         return;
