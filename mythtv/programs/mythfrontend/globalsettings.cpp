@@ -252,6 +252,19 @@ public:
     };
 };
 
+class UseGroupNameAsAllPrograms: public CheckBoxSetting, public GlobalSetting {
+public:
+    UseGroupNameAsAllPrograms():
+        GlobalSetting("DispRecGroupAsAllProg") {
+        setLabel(QObject::tr("Show group name instead of \"all programs\"."));
+        setValue(true);
+        setHelpText(QObject::tr("Use the name of the display group currently "
+                    "being show in place of the term \"All Programs\" in the"
+                    "playback screen."));
+    };
+};
+
+
 class JumpAmount: public SpinBoxSetting, public GlobalSetting {
 public:
     JumpAmount():
@@ -2108,6 +2121,7 @@ PlaybackSettings::PlaybackSettings()
     pbox->addChild(new DisplayRecGroup());
     pbox->addChild(new RememberRecGroup());
     pbox->addChild(new UseCategoriesAsRecGroups());
+    pbox->addChild(new UseGroupNameAsAllPrograms());
     addChild(pbox);
 
     addChild(new HwDecSettings());

@@ -230,6 +230,7 @@ class PlaybackBox : public MythDialog
     MythPushButton *chooseOkButton;
     MythPushButton *chooseDeleteButton;
     QString chooseGroupPassword;
+    bool groupnameAsAllProg;
 };
 
 #endif

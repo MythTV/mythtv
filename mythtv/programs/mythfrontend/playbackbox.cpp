@@ -75,12 +75,17 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     curitem = NULL;
     delitem = NULL;
 
+    groupnameAsAllProg = gContext->GetNumSetting("DispRecGroupAsAllProg",1);
+    
     recGroupType.clear();
 
     curGroupPassword = QString("");
     recGroup = gContext->GetSetting("DisplayRecGroup", QString("Default"));
 
-    groupDisplayName = tr("All Programs");
+    if(!groupnameAsAllProg)
+        groupDisplayName = tr("All Programs");
+    else
+        groupDisplayName = recGroup;
 
     recGroupPassword = getRecGroupPassword(recGroup);
 
@@ -2356,6 +2361,9 @@ void PlaybackBox::chooseSetViewGroup(void)
     recGroup = chooseComboBox->currentText();
     recGroupPassword = chooseGroupPassword;
 
+    if(groupnameAsAllProg)
+        groupDisplayName = recGroup;
+
     if (recGroupPassword != "" )
     {
 
@@ -2527,7 +2535,7 @@ void PlaybackBox::changeSetRecGroup(void)
 
     QSqlDatabase *m_db = QSqlDatabase::database();
     delitem->ApplyRecordRecGroupChange(m_db, newRecGroup);
-
+    
     inTitle = true;
     curTitle = 0;
     curShowing = 0;
