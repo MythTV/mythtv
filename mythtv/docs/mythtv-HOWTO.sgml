@@ -2,7 +2,7 @@
 <article>
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com">
-<date>2003-09-29, v2.82
+<date>2003-10-05, v2.83
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -57,9 +57,8 @@ you use one of the big-name OS packages.
 See <url url="http://linpvr.org/" name="http://linpvr.org/"> if you'd like
 to install MythTV onto a VIA Epia M machine.
 
-See <url url="http://mysettopbox.tv"
-name="http://mysettopbox.tv"> if you'd like to install a custom
-version of Knoppix optimized for MythTV.
+See <url url="http://mysettopbox.tv" name="http://mysettopbox.tv"> if you'd
+like to install a custom version of Knoppix optimized for MythTV.
 
 The contributors to MythTV are:<label id="contributors">
 <itemize>
@@ -81,6 +80,14 @@ name="http://www.bucksch.com/1/projects/various/mythtv/">
 </itemize>
 
 <sect>Checking prerequisites. 
+<p>You must ensure that any firewalls (either hardware, or a software
+firewall installed by your distribution) will not block access to the ports
+that will be used by the MythTV clients and servers on the "inside" LAN. 
+The ports for MySQL (TCP port 3306) and mythbackend (TCP ports 6543 and
+6544) must be open.  It is <em>strongly</em> recommended that you do
+<em>not</em> expose the MythTV and MySQL ports to the Internet or your
+"Outside" LAN.
+
 <sect1>Hardware. 
 <p>Hardware selection is a complex topic, one this HOWTO will only discuss
 briefly and in general terms. The following subsections offer some general 
@@ -93,7 +100,9 @@ website will let you browse what other users have reported as their hardware
 configuration, and how happy they are with the results.
 
 If you have specific questions about the suitability of specific hardware
-choices, you can consult the archives of the mythtv-users mailing list or
+choices, you can consult the archives of the mythtv-users mailing list at
+(url url="http://www.gossamer-threads.com/archive/MythTV_C2/Users_F11/"
+name="http://www.gossamer-threads.com/archive/MythTV_C2/Users_F11/"> or
 post a question to the list.
 <sect2>CPU Type and Speed
 <p>Selection of CPU type and speed is one of the trickiest elements of
@@ -199,6 +208,11 @@ The most common inexpensive cards available use the Bt848 or Bt878 video
 capture chip; examples are the "Hauppauge WinTV Go" card and the "AverTV
 Desktop PVR" card, both of which use the bttv kernel module.
 
+<code>
+NOTE:  The ATI TV Wonder series and the ATI All-in-Wonder series of cards
+are not the same.  The All-in-Wonder cards will not work with MythTV.
+</code>
+
 Newer cards may use the CX23881 series of chips; a driver is available at
 <url url="http://bytesex.org/cx88/" name="http://bytesex.org/cx88/">.
 
@@ -243,10 +257,11 @@ for Live TV at 416x480.
 See the <ref id="pvr250" name="Hauppauge PVR-250/350 hardware MPEG-2 encoder.">
 section for information on installing a PVR-250 on Mandrake 9.1.
 
-<bf>NOTE</bf>: The ATI All-in-Wonder cards <em>will not</em> work as a
-MythTV capture device, as the <url url="http://gatos.sourceforge.net"
-name="GATOS"> drivers that are available provide only a limited subset
-of the V4L API.
+<bf>NOTE</bf>: The ATI All-in-Wonder cards (which are not the same as the ATI
+TV Wonder, TV Wonder VE or TV Wonder Pro) <em>will not</em> work as a MythTV
+capture device, as the <url url="http://gatos.sourceforge.net" name="GATOS">
+drivers that are available provide only a limited subset of the V4L API. 
+The TV Wonder series of cards are supported by the Bt8x8 Video4Linux driver.
 
 <sect2>Sound card
 <p>The system needs a sound card or an onboard equivalent on the motherboard
@@ -492,9 +507,9 @@ your MythTV database. Check <url
 url="http://atrpms.physik.fu-berlin.de/topic/multimedia/" name="ATrpms"> for
 the drivers you need.
 
-Further documentation on using ATrpms packages can be found in <url
-url="mailto:jcw@wilsonet.com" name="Jarod Wilson">'s "HOWTO Build a MythTV
-System on Red Hat Linux 9 w/ATrpms" document, <url
+Further documentation on using ATrpms packages can be found in Jarod
+Wilson's <url url="mailto:jcw@wilsonet.com" name="mailto:jcw@wilsonet.com">
+"HOWTO Build a MythTV System on Red Hat Linux 9 w/ATrpms" document, <url
 url="http://pvrhw.goldfish.org/tiki-page.php?pageName=rh9pvr250"
 name="http://pvrhw.goldfish.org/tiki-page.php?pageName=rh9pvr250">. Just
 like 3rd-party packages, any 3rd-party documentation problems should be
@@ -992,7 +1007,7 @@ url="http://www.mythtv.org/mailman/listinfo/mythtv-dev/"
 name="http://www.mythtv.org/mailman/listinfo/mythtv-dev/"> mailing lists.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
-name="http://xmltv.sourceforge.net">.  Download version 0.5.17 if you're in
+name="http://xmltv.sourceforge.net">.  Download version 0.5.19 if you're in
 North America.
 
 <code>
@@ -1112,8 +1127,7 @@ Continuing on:
 
 <label id="untarring_xmltv">Untar the xmltv file:
 <tscreen><verb>
-$ tar -xjf xmltv-0.5.17.tar.bz2
-$ cd xmltv-0.5.17
+$ tar -xjf xmltv-0.5.19.tar.bz2
 </verb></tscreen>
 Install the xmltv prerequisites:
 
@@ -1130,7 +1144,7 @@ cpan> exit
 
 Change to the XMLTV directory and compile it:
 <tscreen><verb>
-$ cd xmltv-0.5.17
+$ cd xmltv-0.5.19
 $ perl Makefile.PL
 </verb></tscreen>
 You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
@@ -1178,22 +1192,48 @@ $ su
 <bf>NOTE</bf>:  subsequent configuration steps assume that you are within
 the MythTV directory that you <tt>cd</tt>'d to above.
 
+<sect2>Frontend-only configuration <label id="frontend-only">
+<p>Since MythTV uses a client/server architecture, multiple frontend
+computers can simultaneously access content on a Myth system.  Live TV,
+watching and scheduling recordings, etc. are all possible from multiple
+frontends.
+
+To get a better picture of what is needed to run a frontend, note the
+following:
+<list>
+<item>You do NOT need the MySQL server installed on your remote frontend
+<item>You do NOT need XMLTV installed on your remote frontend
+<item>You do NOT need to run the MythTV setup program on
+your frontend machine
+</list>
+
+Other than the exclusion of the MySQL server and XMLTV, the MythTV
+compilation procedure is the same as when you're setting up both a backend
+and a frontend.  However, you <em>will</em> need to install the database
+access libraries.
+
+Once MythTV is compiled and installed, you must change your
+<tt>/usr/local/share/mythtv/mysql.txt</tt> or <tt>~/.mythtv/mysql.txt</tt>
+file's "DBHostName" field to point to your master backend's IP address.
+
+Run the MythTV setup program on your master backend. Under the "General"
+menu, change the IP address of the current machine (by default, "127.0.0.1")
+to the real external IP address - 127.0.0.1 is the loopback address and no
+external machine can access it. Change the Master Server IP setting to the
+same IP address as well.
+
 <sect1>Gentoo. <label id="Gentoo_build">
 <p>Installation of MythTV on Gentoo consists of simply emerging the desired
 ebuild because all of the packages are now part of the official Portage tree.
-
 <tscreen><verb>
 $ su -
 # emerge --sync # make sure portage is up to date.
 # vi /etc/make.conf
 </verb></tscreen>
-
 Add mysql to your USE variable.  i.e. <tt>USE="mysql ...."</tt>
-
 <tscreen><verb>
 # ACCEPT_KEYWORDS="~x86" emerge mythtv
 </verb></tscreen>
-
 <sect>MySQL.<label id="mysql">
 <sect1>Mandrake 9.0
 <p>If this is the system maintaining the database, make sure that mysql is
@@ -2116,7 +2156,8 @@ option you wish to configure.
 system that you're running setup on and any master backend you may have.  If
 you've only got one machine, then the default values are fine and you can
 move to the next page by pressing the space bar.  If you need to move around
-the screen, use the arrow keys to move focus between settings and not the mouse.
+the screen, use the arrow keys to move focus between settings, not the
+mouse.
 
 If you will have multiple backends, then <em>do not</em> use the "127.0.0.1"
 IP address.
@@ -2225,18 +2266,19 @@ mythbackend will print information about connections and what it's doing to
 the console.  If you'd like to see the options that are available for
 mythbackend, type <tt>mythbackend -h</tt> for help.
 
-As of 2003-03-27, the available options are:
+As of 2003-10-03, the available options are:
 <tscreen><verb>
 $ mythbackend -h
-Invalid argument: -h
 Valid options are:
 -l or --logfile filename       Writes STDERR and STDOUT messages to filename
 -p or --pidfile filename       Write PID of mythbackend to filename
 -d or --daemon                 Runs mythbackend as a daemon
--v or --verbose                Prints more information
+-v or --verbose debug-level    Prints more information
+                               Accepts any combination (separated by comma)
+                               of all,none,quiet,record,playback,
+                               channel,osd,file,schedule,network
 --printexpire                  List of auto-expire programs
---printsched                   Upcoming scheduled programs
-</verb></tscreen>
+--printsched                   Upcoming scheduled programs</verb></tscreen>
 
 Running mythbackend as a daemon and using the logfile option will allow you
 to have mythbackend automatically start up during the boot process.  For
@@ -3109,7 +3151,7 @@ $ cd dvddb
 $ mysql -u root < metadata.sql
 </verb></tscreen>
 
-<sect>MythNews
+<sect>MythNews.
 <p>
 
 <sect>Troubleshooting.
@@ -3563,7 +3605,7 @@ you view the files created by MythTV.  MythTV doesn't use standard
 Nupplevideo files, which is why you MPlayer complains if you try to view
 them.
 
-<bf>NOTE</bf>:  If you're using a hardware MPEG2 encoder like the
+<bf>NOTE</bf>:  If you're using a hardware MPEG-2 encoder like the
 PVR-250/350 you don't need to convert - the files are actually standard
 MPEG-2 with a <tt>.nuv</tt> extension.  Change it to <tt>.mpg</tt> and the
 files should display properly in other media players.
@@ -4052,13 +4094,12 @@ Using this round-robin scheme along with a shared storage directory like
 NFS and enabling the Master Backend Override setting will allow you to view
 content even if the slave backend that recorded a program is not available.
 
-
 <sect1>What is this transcoder thing, and how do I use it?
 <p>The transcoder re-encodes files from one MythTV format to another.  The
 main purpose of the transcoder is to allow users with hardware
 encoders (PVR-250) or systems that can only record in RTJpeg due to
 performance reasons (multiple capture cards, slow system, etc) to create
-MPEG4 streams to save space.
+MPEG44 streams to save space.
 
 The transcoder can be used in two ways:
 <itemize>
@@ -4084,12 +4125,12 @@ For either manual or automatic transcoding:
    start mythbackend
    start mythfrontend
    select setup, and the Transcoding recording profile.
-      now select either RTJPEG or MPEG4 (selecting any of the hardware
+      now select either RTJPEG or MPEG-4 (selecting any of the hardware
       encoders will result in the transcoder not working).
       set the other parameters as you'd like.  For best performance, you
       should match the audio to the 'Default' profile.  If you plan to
       only use the manual transcoder, you can choose to set the video to
-      be the same as the default profile too (as long as it is MPEG4 or
+      be the same as the default profile too (as long as it is MPEG-4 or
       RTJpeg)
 
 Everything should now be setup properly.  If you elected to use the
@@ -4106,7 +4147,7 @@ Once the transcode is complete, mythbackend will replace the old file
 with the new as soon as it is no longer in use.
 
 
-<sect>Example Configurations
+<sect>Example Configurations.
 <p>This section contains configurations which you may find useful.
 <sect1>Hauppauge PVR-250/350 hardware MPEG-2 encoder. <label id="pvr250">
 <p><bf>NOTE</bf>:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS
@@ -4256,21 +4297,6 @@ command to <tt>/etc/rc.d/rc.local</tt>:
 <tscreen><verb>
 # echo "/sbin/modprobe ivtv" >> /etc/rc.d/rc.local
 </verb></tscreen>
-
-By default, the IVTV driver uses a 16Mbps peak rate with a 8Mbps VBR.  This
-will create files at about 4GB/hour.  If you wish to adjust these
-parameters, add something like the following to your <tt>rc.local</tt>:
-<tscreen><verb>
-/usr/local/bin/test_ioctl -c bitrate=4500000,bitrate_peak=6000000
-</verb></tscreen>
-
-The actual values to use should be adjusted to your liking and in part
-depend on the capture resolution.  The above example is more than adequate
-for 480x480.  Once the IVTV API has settled down MythTV will incorporate the
-ability to modify the bitrate internally.
-
-If you have multiple cards, use the <tt>-d</tt> parameter to specify which
-<tt>/dev/video</tt> device to configure.
 
 <label id="troubleshooting_pvraudio"><bf>NOTE</bf>:  some people complain
 that their PVR-250/350 card is not capturing audio.  The most likely source
@@ -4681,6 +4707,7 @@ percentage after it has been created using the <bf>tune2fs</bf> program:
 You can check on your filesystem using the <bf>dumpe2fs</bf> program.  See
 the <bf>man</bf> page for details.
 
+
 </article>
 <!-- Revision History
 v2.00, 2003-03-14.  Initial release for 0.8.  Added xset command for
@@ -4861,6 +4888,10 @@ section.  Correct troubleshooting step.  Fix section header for PVR-250.
 Full path for lircd.  Incorporate suggestion from -users on test_ioctl and
 -d parameter.
 v2.82, 2003-09-29.  Changed website for KnoppMyth.  Fix some typos.
+v2.83, 2003-10-05.  Incorporate frontend-only docs.  Update XMLTV version. 
+Differentiate between ATI All-in-Wonder and TV Wonder cards for people that
+don't know the difference.  Remove the manual test_ioctl stuff for PVR-250
+bitrate since we now have profile support.
 -->
 
 <!--

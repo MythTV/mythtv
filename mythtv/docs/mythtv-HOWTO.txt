@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-09-29, v2.82
+  2003-10-05, v2.83
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -71,6 +71,7 @@
         5.3.2 Mandrake
         5.3.3 Other distributions and manual installation.
      5.4 Manually building MythTV.
+        5.4.1 Frontend-only configuration
      5.5 Gentoo.
 
   6. MySQL.
@@ -145,13 +146,14 @@
      15.6 Using MythMusic.
      15.7 Troubleshooting MythMusic.
         15.7.1 When I run MythMusic and try and look up a CD, I get an error message
+
   16. MythWeather.
   17. MythVideo.
   18. MythDVD.
      18.1 Manual Compilation of Prerequisites.
      18.2 Pre-compiled binaries.
 
-  19. MythNews
+  19. MythNews.
   20. Troubleshooting.
      20.1 Illegal Instruction.
      20.2 mythfilldatabase failing.
@@ -203,7 +205,7 @@
      21.12 Advanced Backend Configurations.
      21.13 What is this transcoder thing, and how do I use it?
 
-  22. Example Configurations
+  22. Example Configurations.
      22.1 Hauppauge PVR-250/350 hardware MPEG-2 encoder.
      22.2 Hauppauge PVR-250 remote and MythTV's native LIRC support.
      22.3 Logical Volume Manager (LVM).
@@ -211,6 +213,8 @@
         22.3.2 ext2 or ext3
      22.4 Advanced Partition Formatting.
         22.4.1 Ext3
+
+
   ______________________________________________________________________
 
   [1m1.  How to obtain this document.[0m
@@ -276,7 +280,6 @@
   +o  Overall structure of HOWTO and Mandrake 9.x documentation: Robert
      Kulagowski,  <mailto:rkulagow@rocketmail.com>
 
-
   +o  Red Hat Linux 8.0 documentation: Cedar McKay,
      <mailto:mythhowto.3.ohthetrees@spamgourmet.com>
 
@@ -304,6 +307,15 @@
 
   [1m3.  Checking prerequisites.[0m
 
+  You must ensure that any firewalls (either hardware, or a software
+  firewall installed by your distribution) will not block access to the
+  ports that will be used by the MythTV clients and servers on the
+  "inside" LAN.  The ports for MySQL (TCP port 3306) and mythbackend
+  (TCP ports 6543 and 6544) must be open.  It is [4mstrongly[24m recommended
+  that you do [4mnot[24m expose the MythTV and MySQL ports to the Internet or
+  your "Outside" LAN.
+
+
   [1m3.1.  Hardware.[0m
 
   Hardware selection is a complex topic, one this HOWTO will only
@@ -319,7 +331,10 @@
 
   If you have specific questions about the suitability of specific
   hardware choices, you can consult the archives of the mythtv-users
-  mailing list or post a question to the list.
+  mailing list at (url url="http://www.gossamer-
+  threads.com/archive/MythTV_C2/Users_F11/" name="http://www.gossamer-
+  threads.com/archive/MythTV_C2/Users_F11/"> or post a question to the
+  list.
 
   [1m3.1.1.  CPU Type and Speed[0m
 
@@ -394,7 +409,6 @@
   frames per second, but typical values for MythTV range from 700
   megabytes/hour to 2 gigabyte/hour for MPEG-4 and larger for MPEG-2 and
   RTJPEG.
-
   [1mNOTE[22m:  You [4mmust[24m use DMA for hard drive access to prevent choppy or
   jittery video.  Red Hat Linux 8.0 apparently does not enable DMA at
   boot time.  See the Troubleshooting Section for ``instructions'' on
@@ -439,6 +453,14 @@
   video capture chip; examples are the "Hauppauge WinTV Go" card and the
   "AverTV Desktop PVR" card, both of which use the bttv kernel module.
 
+
+  ______________________________________________________________________
+  NOTE:  The ATI TV Wonder series and the ATI All-in-Wonder series of cards
+  are not the same.  The All-in-Wonder cards will not work with MythTV.
+  ______________________________________________________________________
+
+
+
   Newer cards may use the CX23881 series of chips; a driver is available
   at http://bytesex.org/cx88/ <http://bytesex.org/cx88/>.
 
@@ -473,7 +495,6 @@
   Here are some data points for decoding:
 
 
-
   +o  An Athlon 1800XP can decode a 720x480 8Mbps MPEG-2 file using 10%
      CPU
 
@@ -489,9 +510,12 @@
   See the ``Hauppauge PVR-250/350 hardware MPEG-2 encoder.''  section
   for information on installing a PVR-250 on Mandrake 9.1.
 
-  [1mNOTE[22m: The ATI All-in-Wonder cards [4mwill[24m [4mnot[24m work as a MythTV capture
-  device, as the GATOS <http://gatos.sourceforge.net> drivers that are
-  available provide only a limited subset of the V4L API.
+  [1mNOTE[22m: The ATI All-in-Wonder cards (which are not the same as the ATI
+  TV Wonder, TV Wonder VE or TV Wonder Pro) [4mwill[24m [4mnot[24m work as a MythTV
+  capture device, as the GATOS <http://gatos.sourceforge.net> drivers
+  that are available provide only a limited subset of the V4L API.  The
+  TV Wonder series of cards are supported by the Bt8x8 Video4Linux
+  driver.
 
 
   [1m3.1.6.  Sound card[0m
@@ -517,7 +541,6 @@
 
   [1mNOTE[22m:  The PVR-250/350 does not require a sound card for audio
   capture.
-
   [1mNOTE[22m:  Plugging a Line-level device into the Mic input is not
   recommended.  Line-level devices have higher volatages and can damage
   the soundcard.  In addition, even if it doesn't break your card, you
@@ -539,6 +562,7 @@
   documentation for details if you are uncertain about your preferred
   card.  You may also run xvinfo; look for your video card to be listed
   as one of the adapters.
+
 
   If you want to use MythTV with a standard television, you will need a
   physical connection from your video card to your TV set, which can
@@ -649,7 +673,6 @@
 
   +o  GeForce4 MX440-SE AGP. Has Composite and SVideo ports. Works using
      the nVidia X driver.
-
   +o  GeForce2 GTS 64 MB DDR 4x AGP. Has SVideo port. Works using the
      nVidia X driver. Reportedly works using the nv driver plus nvtv.
 
@@ -716,8 +739,6 @@
   [1mNOTE[22m: you must have the MySQL database software installed on a system
   to store the master database.  This does not necessarily mean that
   MySQL must run on one of the MythTV boxes.
-
-
   [1m3.2.1.  Pre-compiled packages.[0m
 
   A number of people have created pre-compiled packages for MythTV that
@@ -734,7 +755,6 @@
   perform any additional configuration steps in this HOWTO.  The next
   logical step is ``configuring MySQL'', which you may or may not have
   to perform.  See your package documentation.
-
 
 
   [1m3.2.1.1.  Red Hat Linux 9[0m
@@ -782,13 +802,13 @@
   required for [1mALSA[22m, capture cards, [1mlirc[22m, etc., nor do they set up your
   MythTV database. Check ATrpms <http://atrpms.physik.fu-
   berlin.de/topic/multimedia/> for the drivers you need.
-
   Further documentation on using ATrpms packages can be found in Jarod
-  Wilson <mailto:jcw@wilsonet.com>'s "HOWTO Build a MythTV System on Red
-  Hat Linux 9 w/ATrpms" document, http://pvrhw.goldfish.org/tiki-
-  page.php?pageName=rh9pvr250 <http://pvrhw.goldfish.org/tiki-
-  page.php?pageName=rh9pvr250>. Just like 3rd-party packages, any 3rd-
-  party documentation problems should be brought up with the maintainer.
+  Wilson's mailto:jcw@wilsonet.com <mailto:jcw@wilsonet.com> "HOWTO
+  Build a MythTV System on Red Hat Linux 9 w/ATrpms" document,
+  http://pvrhw.goldfish.org/tiki-page.php?pageName=rh9pvr250
+  <http://pvrhw.goldfish.org/tiki-page.php?pageName=rh9pvr250>. Just
+  like 3rd-party packages, any 3rd-party documentation problems should
+  be brought up with the maintainer.
 
 
   [1m3.2.1.2.  Mandrake[0m
@@ -797,7 +817,6 @@
   obtained from http://rpm.nyvalls.se/ <http://rpm.nyvalls.se/> If you
   have problems with the RPMs, please send him email directly at
   thac@nyvalls.se <thac@nyvalls.se>.
-
 
 
   [1m3.2.1.3.  Debian[0m
@@ -848,7 +867,6 @@
   package in order to compile [1mlircd [22mif your distribution doesn't have a
   pre-packaged [1mlirc[22m.  If you are using [1mXMLTV [22mas a grabber, you will need
   [1mperl[22m.
-
 
   ______________________________________________________________________
   NOTE:  Qt v3.1 is recommended, but not required.
@@ -916,8 +934,6 @@
   from the default installation.  Ensure that you install libqt3-mysql.
   ______________________________________________________________________
 
-
-
   Make sure that cdialog is installed if you want to use MythTV with a
   remote control if you need to compile [1mlirc [22mfrom source.
 
@@ -928,7 +944,6 @@
 
   If you marked anything to install, click on Install Marked.  Click
   "Yes" or OK if you get a message about satisfying dependencies.
-
 
 
   [1m3.2.3.2.  Red Hat Linux 8.0[0m
@@ -1046,14 +1061,14 @@
   name, you can install them with
 
 
-       # rpm -Uvh [filename1]
-       # rpm -Uvh [filename2]
+
+  # rpm -Uvh [filename1]
+  # rpm -Uvh [filename2]
 
 
 
   Once this has completed (it can take a while, so please be patient),
   continue by following the Mandrake 9.0 instructions.
-
 
 
   [1m3.2.4.1.2.  Mandrake 8.2 and 9.0[0m
@@ -1116,6 +1131,7 @@
        USE="mysql alsa"
 
 
+
   Next you need to build Qt. If you don't plan on using the ebuilds as
   described in the Gentoo section then you also need to install lame.
 
@@ -1167,7 +1183,6 @@
   may have to adjust by hand before you compile MythTV.
 
   The reference compilation system for MythTV is Debian.
-
 
   [1m4.1.2.  Distribution-Specific Notes[0m
 
@@ -1233,7 +1248,6 @@
 
   You should see a value like /usr/lib/qt3 for QTDIR and
   /usr/lib/qt3/bin should be in $PATH.
-
   If you don't, do not proceed past this step until you have resolved
   this error. You may need to manually specify the QTDIR and PATH at the
   shell prompt before compiling.
@@ -1241,8 +1255,6 @@
   Also, check that there has been a link created in /usr/lib/qt3/mkspecs
   called default. If not, you'll get errors during the compile. See the
   Troubleshooting Section for more information.
-
-
 
   [1m4.3.2.  Distribution-Specific Notes[0m
 
@@ -1388,7 +1400,7 @@
   <http://www.mythtv.org/mailman/listinfo/mythtv-dev/> mailing lists.
 
   Get XMLTV from http://xmltv.sourceforge.net
-  <http://xmltv.sourceforge.net>.  Download version 0.5.17 if you're in
+  <http://xmltv.sourceforge.net>.  Download version 0.5.19 if you're in
   North America.
 
 
@@ -1541,12 +1553,12 @@
   Untar the xmltv file:
 
 
-       $ tar -xjf xmltv-0.5.17.tar.bz2
-       $ cd xmltv-0.5.17
+       $ tar -xjf xmltv-0.5.19.tar.bz2
 
 
 
   Install the xmltv prerequisites:
+
        $ su
        # perl -MCPAN -e shell
        cpan> install XML::Twig
@@ -1561,7 +1573,7 @@
   Change to the XMLTV directory and compile it:
 
 
-       $ cd xmltv-0.5.17
+       $ cd xmltv-0.5.19
        $ perl Makefile.PL
 
 
@@ -1619,12 +1631,44 @@
   MythTV directory that you cd'd to above.
 
 
+  [1m5.4.1.  Frontend-only configuration[0m
+
+  Since MythTV uses a client/server architecture, multiple frontend
+  computers can simultaneously access content on a Myth system.  Live
+  TV, watching and scheduling recordings, etc. are all possible from
+  multiple frontends.
+
+  To get a better picture of what is needed to run a frontend, note the
+  following:
+
+  You do NOT need the MySQL server installed on your remote frontend
+
+  You do NOT need XMLTV installed on your remote frontend
+
+  You do NOT need to run the MythTV setup program on your frontend
+  machine
+
+  Other than the exclusion of the MySQL server and XMLTV, the MythTV
+  compilation procedure is the same as when you're setting up both a
+  backend and a frontend.  However, you [4mwill[24m need to install the
+  database access libraries.
+
+  Once MythTV is compiled and installed, you must change your
+  /usr/local/share/mythtv/mysql.txt or ~/.mythtv/mysql.txt file's
+  "DBHostName" field to point to your master backend's IP address.
+
+  Run the MythTV setup program on your master backend. Under the
+  "General" menu, change the IP address of the current machine (by
+  default, "127.0.0.1") to the real external IP address - 127.0.0.1 is
+  the loopback address and no external machine can access it. Change the
+  Master Server IP setting to the same IP address as well.
+
+
   [1m5.5.  Gentoo.[0m
 
   Installation of MythTV on Gentoo consists of simply emerging the
   desired ebuild because all of the packages are now part of the
   official Portage tree.
-
 
 
        $ su -
@@ -1636,10 +1680,7 @@
   Add mysql to your USE variable.  i.e. USE="mysql ...."
 
 
-
        # ACCEPT_KEYWORDS="~x86" emerge mythtv
-
-
 
   [1m6.  MySQL.[0m
 
@@ -1702,8 +1743,6 @@
 
        $ mysql -u root < mc.sql
 
-
-
   [1m6.4.2.  Debian 3.0[0m
 
 
@@ -1764,8 +1803,9 @@
   This example has no security at all, and allows access from any host.
 
 
-       $ mysql -u root mythconverg
-       mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
+
+  $ mysql -u root mythconverg
+  mysql> grant all on mythconverg.* to mythtv@"%" identified by "mythtv";
 
 
 
@@ -1852,7 +1892,6 @@
 
   To configure sound to work with MythTV, select
 
-
   RedHat Menu>Sound &
   Video>Volume Control
 
@@ -1889,15 +1928,16 @@
   Start with the alsa-driver package:
 
 
-       $ tar -xjf alsa-driver-0.9.x.tar.bz2
-       $ cd alsa-driver-0.9.x
-       $ ./configure --with-cards=XXX --with-sequencer=yes
-       $ make
-       $ su
-       # make install
-       # ./snddevices
-       # exit
-       $
+
+  $ tar -xjf alsa-driver-0.9.x.tar.bz2
+  $ cd alsa-driver-0.9.x
+  $ ./configure --with-cards=XXX --with-sequencer=yes
+  $ make
+  $ su
+  # make install
+  # ./snddevices
+  # exit
+  $
 
 
 
@@ -1907,22 +1947,21 @@
   Install the rest of the packages:
 
 
-
-  $ cd ~
-  $ tar -xjf alsa-lib-0.9.x.tar.bz2
-  $ cd alsa-lib-0.9.x
-  $ ./configure
-  $ make
-  $ su
-  # make install
-  # exit
-  $ cd ..
-  $ tar -xjf alsa-utils-0.9.x.tar.bz2
-  $ cd alsa-utils-0.9.x
-  $ ./configure
-  $ make
-  $ su
-  # make install
+       $ cd ~
+       $ tar -xjf alsa-lib-0.9.x.tar.bz2
+       $ cd alsa-lib-0.9.x
+       $ ./configure
+       $ make
+       $ su
+       # make install
+       # exit
+       $ cd ..
+       $ tar -xjf alsa-utils-0.9.x.tar.bz2
+       $ cd alsa-utils-0.9.x
+       $ ./configure
+       $ make
+       $ su
+       # make install
 
 
 
@@ -1953,7 +1992,6 @@
   options are descried in the "INSTALL" file in the alsa-driver
   directory or at http://www.alsa-project.org/alsa-doc/
   <http://www.alsa-project.org/alsa-doc/>.
-
   For now we will assume that no extra options are required.  The next
   step is to ensure that the ALSA drivers are started during boot-up.
 
@@ -1971,7 +2009,7 @@
   you can do as root with:
 
 
-  # alsactl -f /etc/asound.state store
+       # alsactl -f /etc/asound.state store
 
 
 
@@ -2012,13 +2050,13 @@
 
 
 
-       $ amixer set Master,0 100%,100% unmute
-       $ amixer set Line,0 75%,75% mute captur
-       $ amixer set Capture,0 100%,100% mute captur
-       $ su
-       # alsactl store
-       # exit
-       $
+  $ amixer set Master,0 100%,100% unmute
+  $ amixer set Line,0 75%,75% mute captur
+  $ amixer set Capture,0 100%,100% mute captur
+  $ su
+  # alsactl store
+  # exit
+  $
 
 
 
@@ -2077,8 +2115,6 @@
 
        # emerge lirc
 
-
-
   [1m8.2.  Mandrake 9.0[0m
 
   lircd has two prerequisites:  [1mdialog[22m, available in Mandrake through
@@ -2095,9 +2131,8 @@
   Install using urpmi.
 
 
-
-  $ su
-  # urpmi kernel-source
+       $ su
+       # urpmi kernel-source
 
 
 
@@ -2140,6 +2175,7 @@
   your capture card and not to a serial port, so make sure that you've
   got the correct one.
 
+
   You then click "Save Configuration and run configure" to continue.
 
   Make sure you read the last text generated by the configure step. It
@@ -2153,11 +2189,10 @@
   Once the configuration step is complete:
 
 
-
-  $ make
-  $ su
-  # make install
-  # chmod 666 /dev/lircd
+       $ make
+       $ su
+       # make install
+       # chmod 666 /dev/lircd
 
 
 
@@ -2268,10 +2303,9 @@
   you should choose "kernel-2.4.18-athlon.config" but if you have a dual
   processor P4 you might choose "kernel-2.4.18-i686-smp.config"
 
-
-       # cp yourconfig.config ../.config
-       # cd ../
-       # make xconfig
+  # cp yourconfig.config ../.config
+  # cd ../
+  # make xconfig
 
 
 
@@ -2331,7 +2365,7 @@
   9.1 users, type: # /etc/rc.d/init.d/lircd start instead of:
 
 
-       # /usr/local/sbin/lircd
+  # /usr/local/sbin/lircd
 
 
 
@@ -2400,6 +2434,9 @@
   The next step is to convert those signals into something that can be
   used to control MythTV.  MythTV now includes native support for lirc
   and can interact directly with
+
+
+
        $ cd ~/mythtv-0.11/configfiles
        $ cp lircrc.example ~/.lircrc
 
@@ -2449,21 +2486,21 @@
   weren't working, due to the fact that the button names were different
   than the default lircrc.example file that came with MythTV.
 
+
   The lircrc.example file has this:
 
 
+       begin
+           prog = irxevent
+           button = ChannelUp
+           config = Key Up CurrentWindow
+       end
 
-  begin
-      prog = irxevent
-      button = ChannelUp
-      config = Key Up CurrentWindow
-  end
-
-  begin
-      prog = irxevent
-      button = ChannelDown
-      config = Key Down CurrentWindow
-  end
+       begin
+           prog = irxevent
+           button = ChannelDown
+           config = Key Down CurrentWindow
+       end
 
 
 
@@ -2512,8 +2549,6 @@
   one keypress to the application, even if you're holding down the key.
   The actual [1mrepeat = [22mnumber will vary from system to system, so
   experiment and see which value works best for you.
-
-
 
   [1m8.7.  Configuring lirc for use with an IR blaster.[0m
 
@@ -2755,7 +2790,7 @@
   may have.  If you've only got one machine, then the default values are
   fine and you can move to the next page by pressing the space bar.  If
   you need to move around the screen, use the arrow keys to move focus
-  between settings and not the mouse.
+  between settings, not the mouse.
 
   If you will have multiple backends, then [4mdo[24m [4mnot[24m use the "127.0.0.1" IP
   address.
@@ -2879,16 +2914,18 @@
   doing to the console.  If you'd like to see the options that are
   available for mythbackend, type mythbackend -h for help.
 
-  As of 2003-03-27, the available options are:
+  As of 2003-10-03, the available options are:
 
 
        $ mythbackend -h
-       Invalid argument: -h
        Valid options are:
        -l or --logfile filename       Writes STDERR and STDOUT messages to filename
        -p or --pidfile filename       Write PID of mythbackend to filename
        -d or --daemon                 Runs mythbackend as a daemon
-       -v or --verbose                Prints more information
+       -v or --verbose debug-level    Prints more information
+                                      Accepts any combination (separated by comma)
+                                      of all,none,quiet,record,playback,
+                                      channel,osd,file,schedule,network
        --printexpire                  List of auto-expire programs
        --printsched                   Upcoming scheduled programs
 
@@ -2899,6 +2936,7 @@
   process.  For example, you may add this to your rc.local file, or you
   can follow the steps outlined in the section called ``I'd like to
   automatically start mythbackend at system boot time''.
+
 
   [1m9.3.  Configuring a non-master backend.[0m
 
@@ -2961,7 +2999,6 @@
        $ cd configfiles
        $ su
        # cp mythfilldatabasecron /etc/cron.daily
-
 
 
   If you want to know what time your job will run, you can do the
@@ -3924,7 +3961,7 @@
 
 
 
-  [1m19.  MythNews[0m
+  [1m19.  MythNews.[0m
 
 
 
@@ -4467,7 +4504,7 @@
   the files created by MythTV.  MythTV doesn't use standard Nupplevideo
   files, which is why you MPlayer complains if you try to view them.
 
-  [1mNOTE[22m:  If you're using a hardware MPEG2 encoder like the PVR-250/350
+  [1mNOTE[22m:  If you're using a hardware MPEG-2 encoder like the PVR-250/350
   you don't need to convert - the files are actually standard MPEG-2
   with a .nuv extension.  Change it to .mpg and the files should display
   properly in other media players.
@@ -5045,14 +5082,13 @@
   is not available.
 
 
-
   [1m21.13.  What is this transcoder thing, and how do I use it?[0m
 
   The transcoder re-encodes files from one MythTV format to another.
   The main purpose of the transcoder is to allow users with hardware
   encoders (PVR-250) or systems that can only record in RTJpeg due to
   performance reasons (multiple capture cards, slow system, etc) to
-  create MPEG4 streams to save space.
+  create MPEG44 streams to save space.
 
   The transcoder can be used in two ways:
 
@@ -5077,12 +5113,12 @@
 
   For either manual or automatic transcoding: start mythbackend start
   mythfrontend select setup, and the Transcoding recording profile.  now
-  select either RTJPEG or MPEG4 (selecting any of the hardware encoders
+  select either RTJPEG or MPEG-4 (selecting any of the hardware encoders
   will result in the transcoder not working).  set the other parameters
   as you'd like.  For best performance, you should match the audio to
   the 'Default' profile.  If you plan to only use the manual transcoder,
   you can choose to set the video to be the same as the default profile
-  too (as long as it is MPEG4 or RTJpeg)
+  too (as long as it is MPEG-4 or RTJpeg)
 
   Everything should now be setup properly.  If you elected to use the
   Auto-Run feature, the transcoder will automatically launch after each
@@ -5099,9 +5135,10 @@
 
 
 
-  [1m22.  Example Configurations[0m
+  [1m22.  Example Configurations.[0m
 
   This section contains configurations which you may find useful.
+
 
   [1m22.1.  Hauppauge PVR-250/350 hardware MPEG-2 encoder.[0m
 
@@ -5275,23 +5312,6 @@
 
 
 
-  By default, the IVTV driver uses a 16Mbps peak rate with a 8Mbps VBR.
-  This will create files at about 4GB/hour.  If you wish to adjust these
-  parameters, add something like the following to your rc.local:
-
-
-       /usr/local/bin/test_ioctl -c bitrate=4500000,bitrate_peak=6000000
-
-
-
-  The actual values to use should be adjusted to your liking and in part
-  depend on the capture resolution.  The above example is more than
-  adequate for 480x480.  Once the IVTV API has settled down MythTV will
-  incorporate the ability to modify the bitrate internally.
-
-  If you have multiple cards, use the -d parameter to specify which
-  /dev/video device to configure.
-
   [1mNOTE[22m:  some people complain that their PVR-250/350 card is not
   capturing audio.  The most likely source for this is that your system
   is not loading the correct msp3400.o file; ivtv uses a custom
@@ -5364,7 +5384,6 @@
        kernel-source-2.4.22-9mdk
 
 
-
   If you've already installed LIRC from the Mandrake packages, it's
   going to be version 0.6.6, and that won't work.  Uninstall it:
 
@@ -5380,40 +5399,39 @@
   programs on your system:
 
 
+       $ su
+       # updatedb
+       # locate lirc_i2c|grep `uname -r`
+       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_i2c.c
+       /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_i2c.o.gz
 
-  $ su
-  # updatedb
-  # locate lirc_i2c|grep `uname -r`
-  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_i2c.c
-  /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_i2c.o.gz
+       # locate lirc_dev|grep `uname -r`
+       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.c
+       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.h
+       /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.stamp
+       /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.ver
+       /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_dev.o.gz
 
-  # locate lirc_dev|grep `uname -r`
-  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.c
-  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.h
-  /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.stamp
-  /usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.ver
-  /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_dev.o.gz
+       # locate irw|grep "/usr"
+       /usr/bin/irw
+       /usr/local/bin/irw
+       /usr/local/man/man1/irw.1
 
-  # locate irw|grep "/usr"
-  /usr/bin/irw
-  /usr/local/bin/irw
-  /usr/local/man/man1/irw.1
+       # locate lircd|grep "/usr"
+       /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lircd.conf.RM-050
+       /usr/share/man/man8/lircd.8.bz2
+       /usr/share/doc/lirc-0.6.6/html/lircd.html
+       /usr/sbin/lircd
+       /usr/local/sbin/lircd
+       /usr/local/man/man8/lircd.8
 
-  # locate lircd|grep "/usr"
-  /usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lircd.conf.RM-050
-  /usr/share/man/man8/lircd.8.bz2
-  /usr/share/doc/lirc-0.6.6/html/lircd.html
-  /usr/sbin/lircd
-  /usr/local/sbin/lircd
-  /usr/local/man/man8/lircd.8
-
-  # locate irxevent|grep "/usr"
-  /usr/share/man/man1/irxevent.1.bz2
-  /usr/share/doc/lirc-0.6.6/html/irxevent.html
-  /usr/share/doc/lirc-0.6.6/irxevent.keys
-  /usr/bin/irxevent
-  /usr/local/bin/irxevent
-  /usr/local/man/man1/irxevent.1
+       # locate irxevent|grep "/usr"
+       /usr/share/man/man1/irxevent.1.bz2
+       /usr/share/doc/lirc-0.6.6/html/irxevent.html
+       /usr/share/doc/lirc-0.6.6/irxevent.keys
+       /usr/bin/irxevent
+       /usr/local/bin/irxevent
+       /usr/local/man/man1/irxevent.1
 
 
 
@@ -5430,7 +5448,6 @@
        # rm -rf /usr/bin/irw /usr/local/bin/irw
 
 
-
   Download the lirc-0.7.0pre2 tarball:
 
 
@@ -5444,9 +5461,9 @@
   work correctly.  Download the patch and install:
 
 
-  $ cd lirc-0.7.0pre2
-  $ wget http://delvare.free.fr/i2c/other/lirc-CVS-i2c-2.8.0.patch
-  $ patch -p1 < lirc-CVS-i2c-2.8.0.patch
+       $ cd lirc-0.7.0pre2
+       $ wget http://delvare.free.fr/i2c/other/lirc-CVS-i2c-2.8.0.patch
+       $ patch -p1 < lirc-CVS-i2c-2.8.0.patch
 
 
 
@@ -5488,21 +5505,22 @@
   your /var/log/messages and /var/log/lircd files.
 
 
-       $ su
-       # modprobe lirc_i2c
-       # lsmod
-       Module                  Size  Used by    Not tainted
-       lirc_i2c                5124   0
-       lirc_dev               10096   1  [lirc_i2c]
-       ...
-       # lircd
-       # tail /var/log/messages
-       Sep 18 15:38:26 frontend kernel: lirc_i2c: chip found @ 0x18 (Hauppauge IR)
-       Sep 18 15:38:26 frontend kernel: lirc_dev: lirc_register_plugin:sample_rate:
-       10
-       ...
-       # tail /var/log/lircd
-       Sep 18 15:24:52 frontend lircd 0.7.0pre2: lircd(hauppauge) ready
+
+  $ su
+  # modprobe lirc_i2c
+  # lsmod
+  Module                  Size  Used by    Not tainted
+  lirc_i2c                5124   0
+  lirc_dev               10096   1  [lirc_i2c]
+  ...
+  # lircd
+  # tail /var/log/messages
+  Sep 18 15:38:26 frontend kernel: lirc_i2c: chip found @ 0x18 (Hauppauge IR)
+  Sep 18 15:38:26 frontend kernel: lirc_dev: lirc_register_plugin:sample_rate:
+  10
+  ...
+  # tail /var/log/lircd
+  Sep 18 15:24:52 frontend lircd 0.7.0pre2: lircd(hauppauge) ready
 
 
 
@@ -5551,9 +5569,10 @@
   this:
 
 
-       # Native lirc support
-       CONFIG += using_lirc
-       EXTRA_LIBS += -llirc_client
+
+  # Native lirc support
+  CONFIG += using_lirc
+  EXTRA_LIBS += -llirc_client
 
 
 
@@ -5674,7 +5693,6 @@
        # lvcreate --name music --size 5G VGforMyth
        # mkreiserfs /dev/VGforMyth/music
        # mount /dev/VGforMyth/music /var/music
-
 
 
   Display the volume group status: # vgdisplay -v

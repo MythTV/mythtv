@@ -43,7 +43,7 @@ join the
 <A HREF="http://www.mythtv.org/mailman/listinfo/mythtv-commits/">http://www.mythtv.org/mailman/listinfo/mythtv-commits/</A> and 
 <A HREF="http://www.mythtv.org/mailman/listinfo/mythtv-dev/">http://www.mythtv.org/mailman/listinfo/mythtv-dev/</A> mailing lists.</P>
 <P>Get XMLTV from 
-<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download version 0.5.17 if you're in
+<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download version 0.5.19 if you're in
 North America.</P>
 <P>
 <HR>
@@ -188,8 +188,7 @@ $
 <A NAME="untarring_xmltv"></A> Untar the xmltv file:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf xmltv-0.5.17.tar.bz2
-$ cd xmltv-0.5.17
+$ tar -xjf xmltv-0.5.19.tar.bz2
 </PRE>
 </CODE></BLOCKQUOTE>
 
@@ -211,7 +210,7 @@ cpan> exit
 <P>Change to the XMLTV directory and compile it:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd xmltv-0.5.17
+$ cd xmltv-0.5.19
 $ perl Makefile.PL
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -272,12 +271,37 @@ $ su
 <P><B>NOTE</B>:  subsequent configuration steps assume that you are within
 the MythTV directory that you <CODE>cd</CODE>'d to above.</P>
 
+<H3><A NAME="frontend-only"></A> Frontend-only configuration </H3>
+
+<P>Since MythTV uses a client/server architecture, multiple frontend
+computers can simultaneously access content on a Myth system.  Live TV,
+watching and scheduling recordings, etc. are all possible from multiple
+frontends.</P>
+<P>To get a better picture of what is needed to run a frontend, note the
+following:
+<LI>You do NOT need the MySQL server installed on your remote frontend</LI>
+<LI>You do NOT need XMLTV installed on your remote frontend</LI>
+<LI>You do NOT need to run the MythTV setup program on
+your frontend machine</LI>
+</P>
+<P>Other than the exclusion of the MySQL server and XMLTV, the MythTV
+compilation procedure is the same as when you're setting up both a backend
+and a frontend.  However, you <EM>will</EM> need to install the database
+access libraries.</P>
+<P>Once MythTV is compiled and installed, you must change your
+<CODE>/usr/local/share/mythtv/mysql.txt</CODE> or <CODE>~/.mythtv/mysql.txt</CODE>
+file's "DBHostName" field to point to your master backend's IP address.</P>
+<P>Run the MythTV setup program on your master backend. Under the "General"
+menu, change the IP address of the current machine (by default, "127.0.0.1")
+to the real external IP address - 127.0.0.1 is the loopback address and no
+external machine can access it. Change the Master Server IP setting to the
+same IP address as well.</P>
+
 <H2><A NAME="Gentoo_build"></A> <A NAME="ss5.5">5.5</A> <A HREF="mythtv-HOWTO.html#toc5.5">Gentoo. </A>
 </H2>
 
 <P>Installation of MythTV on Gentoo consists of simply emerging the desired
-ebuild because all of the packages are now part of the official Portage tree.</P>
-<P>
+ebuild because all of the packages are now part of the official Portage tree.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su -
@@ -285,16 +309,14 @@ $ su -
 # vi /etc/make.conf
 </PRE>
 </CODE></BLOCKQUOTE>
-</P>
-<P>Add mysql to your USE variable.  i.e. <CODE>USE="mysql ...."</CODE></P>
-<P>
+
+Add mysql to your USE variable.  i.e. <CODE>USE="mysql ...."</CODE>
 <BLOCKQUOTE><CODE>
 <PRE>
 # ACCEPT_KEYWORDS="~x86" emerge mythtv
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-
 <HR>
 <A HREF="mythtv-HOWTO-6.html">Next</A>
 <A HREF="mythtv-HOWTO-4.html">Previous</A>

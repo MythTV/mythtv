@@ -14,6 +14,14 @@
 <HR>
 <H2><A NAME="s3">3.</A> <A HREF="mythtv-HOWTO.html#toc3">Checking prerequisites. </A></H2>
 
+<P>You must ensure that any firewalls (either hardware, or a software
+firewall installed by your distribution) will not block access to the ports
+that will be used by the MythTV clients and servers on the "inside" LAN. 
+The ports for MySQL (TCP port 3306) and mythbackend (TCP ports 6543 and
+6544) must be open.  It is <EM>strongly</EM> recommended that you do
+<EM>not</EM> expose the MythTV and MySQL ports to the Internet or your
+"Outside" LAN.</P>
+
 <H2><A NAME="ss3.1">3.1</A> <A HREF="mythtv-HOWTO.html#toc3.1">Hardware. </A>
 </H2>
 
@@ -26,7 +34,9 @@ Cooper has setup a hardware database at
 website will let you browse what other users have reported as their hardware
 configuration, and how happy they are with the results.</P>
 <P>If you have specific questions about the suitability of specific hardware
-choices, you can consult the archives of the mythtv-users mailing list or
+choices, you can consult the archives of the mythtv-users mailing list at
+(url url="http://www.gossamer-threads.com/archive/MythTV_C2/Users_F11/"
+name="http://www.gossamer-threads.com/archive/MythTV_C2/Users_F11/"> or
 post a question to the list.</P>
 <H3>CPU Type and Speed</H3>
 
@@ -128,6 +138,14 @@ more information and for specific hardware questions.  </P>
 <P>The most common inexpensive cards available use the Bt848 or Bt878 video
 capture chip; examples are the "Hauppauge WinTV Go" card and the "AverTV
 Desktop PVR" card, both of which use the bttv kernel module.</P>
+<P>
+<HR>
+<PRE>
+NOTE:  The ATI TV Wonder series and the ATI All-in-Wonder series of cards
+are not the same.  The All-in-Wonder cards will not work with MythTV.
+</PRE>
+<HR>
+</P>
 <P>Newer cards may use the CX23881 series of chips; a driver is available at
 <A HREF="http://bytesex.org/cx88/">http://bytesex.org/cx88/</A>.</P>
 <P>After you have installed a suitable capture device, you can check that 
@@ -171,10 +189,12 @@ for Live TV at 416x480.</LI>
 <P>See the 
 <A HREF="mythtv-HOWTO-22.html#pvr250">Hauppauge PVR-250/350 hardware MPEG-2 encoder.</A>
 section for information on installing a PVR-250 on Mandrake 9.1.</P>
-<P><B>NOTE</B>: The ATI All-in-Wonder cards <EM>will not</EM> work as a
-MythTV capture device, as the 
-<A HREF="http://gatos.sourceforge.net">GATOS</A> drivers that are available provide only a limited subset
-of the V4L API.</P>
+<P><B>NOTE</B>: The ATI All-in-Wonder cards (which are not the same as the ATI
+TV Wonder, TV Wonder VE or TV Wonder Pro) <EM>will not</EM> work as a MythTV
+capture device, as the 
+<A HREF="http://gatos.sourceforge.net">GATOS</A>
+drivers that are available provide only a limited subset of the V4L API. 
+The TV Wonder series of cards are supported by the Bt8x8 Video4Linux driver.</P>
 
 <H3>Sound card</H3>
 
@@ -418,9 +438,10 @@ for <B>ALSA</B>, capture cards, <B>lirc</B>, etc., nor do they set up
 your MythTV database. Check 
 <A HREF="http://atrpms.physik.fu-berlin.de/topic/multimedia/">ATrpms</A> for
 the drivers you need.</P>
-<P>Further documentation on using ATrpms packages can be found in 
-<A HREF="mailto:jcw@wilsonet.com">Jarod Wilson</A>'s "HOWTO Build a MythTV
-System on Red Hat Linux 9 w/ATrpms" document, 
+<P>Further documentation on using ATrpms packages can be found in Jarod
+Wilson's 
+<A HREF="mailto:jcw@wilsonet.com">mailto:jcw@wilsonet.com</A>
+"HOWTO Build a MythTV System on Red Hat Linux 9 w/ATrpms" document, 
 <A HREF="http://pvrhw.goldfish.org/tiki-page.php?pageName=rh9pvr250">http://pvrhw.goldfish.org/tiki-page.php?pageName=rh9pvr250</A>. Just
 like 3rd-party packages, any 3rd-party documentation problems should be
 brought up with the maintainer.</P>
