@@ -99,8 +99,6 @@ class RingBuffer
     bool stopreads;
 
     pthread_rwlock_t rwlock;
-
-    long long transitionpoint;
 };
 
 #endif

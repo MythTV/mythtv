@@ -854,8 +854,14 @@ void NuppelVideoRecorder::DoMJPEG(void)
 
 void NuppelVideoRecorder::TransitionToFile(const QString &lfilename)
 {
+    pausewritethread = true;
+    while (!actuallypaused)
+	usleep(50);
+
     ringBuffer->TransitionToFile(lfilename);
     WriteHeader(true);
+
+    pausewritethread = false;
 }
 
 void NuppelVideoRecorder::TransitionToRing(void)
@@ -1208,7 +1214,7 @@ void NuppelVideoRecorder::Reset(void)
 
     audiobytes = 0;
     effectivedsp = 0;
-}    
+}
 
 void *NuppelVideoRecorder::WriteThread(void *param)
 {

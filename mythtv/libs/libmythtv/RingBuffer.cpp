@@ -108,7 +108,7 @@ ThreadedFileWriter::~ThreadedFileWriter()
 
     if(buf)
     {
-	free(buf); 
+	free(buf);
 	buf = NULL;
     }
 }
@@ -324,7 +324,7 @@ void RingBuffer::TransitionToRing(void)
 
 void RingBuffer::Reset(void)
 {
-    pthread_rwlock_rdlock(&rwlock);
+    pthread_rwlock_wrlock(&rwlock);
 
     if (!normalfile)
     {
@@ -364,8 +364,8 @@ int RingBuffer::Read(void *buf, int count)
     }
     else
     {
-        while (totalreadpos + count >= 
-	       totalwritepos - (dumpfw ? dumpfw->BufUsed() : tfw->BufUsed() ) )
+        while ( totalreadpos + count >= 
+		totalwritepos - tfw->BufUsed() )
         {
             usleep(1000);
             if (stopreads)
