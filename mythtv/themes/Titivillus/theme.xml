@@ -118,10 +118,10 @@
 
   <genericbutton>
     <watermarkposition>524,105</watermarkposition> <!-- 20px right margin -->
-    <normal>text-blank.png</normal>
-    <active>text-blank.png</active>
+    <normal>button_off.png</normal>
+    <active>button_on.png</active>
     <text>
-      <area>1,4,3,0</area>
+      <area>50,8,3,0</area>
       <color>white</color>
       <fontname>Trebuchet Ms</fontname>
       <fontsize>28</fontsize>
@@ -139,7 +139,7 @@
       </shadow>-->
     </text>
     <activetext>
-      <area>1,4,3,0</area>
+      <area>50,8,3,0</area>
       <color>#0086FF</color>
       <fontname>Trebuchet Ms</fontname>
       <fontsize>28</fontsize>
