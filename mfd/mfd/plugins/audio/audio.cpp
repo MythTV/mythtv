@@ -1,7 +1,7 @@
 /*
 	audio.cpp
 
-	(c) 2003 Thor Sigvaldason and Isaac Richards
+	(c) 2003, 2004 Thor Sigvaldason and Isaac Richards
 	Part of the mythTV project
 	
 
@@ -38,7 +38,7 @@ void AudioPlugin::swallowOutputUpdate(int type, int numb_seconds, int channels, 
     //  Get the latest data about the state of play if this is an info event
     //
 
-    if(type == OutputEvent::Info)
+    if (type == OutputEvent::Info)
     {
 
         playlist_mode_mutex.lock();
@@ -47,7 +47,7 @@ void AudioPlugin::swallowOutputUpdate(int type, int numb_seconds, int channels, 
                 current_channels = channels;
                 current_bitrate = bitrate;
                 current_frequency = frequency;
-                if(playlist_mode)
+                if (playlist_mode)
                 {
                     current_playlist = current_playlist_id;
                     current_playlist_item = current_playlist_item_index;
@@ -62,7 +62,7 @@ void AudioPlugin::swallowOutputUpdate(int type, int numb_seconds, int channels, 
                 //  Tell the client(s) what's going on
                 //
 
-                if(is_playing)
+                if (is_playing)
                 {
                     sendMessage(QString("playing %1 %2 %3 %4 %5 %6 %7 %8")
                                         .arg(current_playlist)
@@ -85,7 +85,7 @@ void AudioPlugin::run()
     char my_hostname[2049];
     QString local_hostname = "unknown";
 
-    if(gethostname(my_hostname, 2048) < 0)
+    if (gethostname(my_hostname, 2048) < 0)
     {
         warning("could not call gethostname()");
        
@@ -106,7 +106,7 @@ void AudioPlugin::run()
     //  Init our sockets
     //
     
-    if( !initServerSocket())
+    if ( !initServerSocket())
     {
         fatal("audio could not initialize its core server socket");
         return;
@@ -131,31 +131,31 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
 {
     bool ok = true;
 
-    if(tokens.count() < 1)
+    if (tokens.count() < 1)
     {
         ok = false;
     }
     else
     {
-        if(tokens[0] == "play")
+        if (tokens[0] == "play")
         {
-            if(tokens.count() < 3)
+            if (tokens.count() < 3)
             {
                 ok = false;
             }
             else
             {
-                if(tokens[1] == "url")
+                if (tokens[1] == "url")
                 {
                     QUrl play_url(tokens[2]);
-                    if(!playUrl(play_url))
+                    if (!playUrl(play_url))
                     {
                         ok = false;
                     }
                 }
-                else if(tokens[1] == "item" || tokens[1] == "metadata")
+                else if (tokens[1] == "item" || tokens[1] == "metadata")
                 {
-                    if(tokens.count() < 4)
+                    if (tokens.count() < 4)
                     {
                         ok = false;
                     }
@@ -163,20 +163,20 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
                     {
                         bool parsed_ok = true;
                         int collection_id = tokens[2].toInt(&parsed_ok);
-                        if(!parsed_ok)
+                        if (!parsed_ok)
                         {
                             ok = false;
                         }
                         else
                         {
                             int metadata_id = tokens[3].toInt(&parsed_ok);
-                            if(!parsed_ok)
+                            if (!parsed_ok)
                             {
                                 ok = false;
                             }
                             else
                             {
-                                if(!playMetadata(collection_id, metadata_id))
+                                if (!playMetadata(collection_id, metadata_id))
                                 {
                                     ok = false;
                                 }
@@ -184,13 +184,13 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
                         }
                     }
                 }
-                else if(
+                else if (
                         tokens[1] == "container" || 
                         tokens[1] == "playlist"  || 
                         tokens[1] == "list"
                         )
                 {
-                    if(tokens.count() < 4)
+                    if (tokens.count() < 4)
                     {
                         ok = false;
                     }
@@ -198,23 +198,23 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
                     {
                         bool parsed_ok = true;
                         int collection_id = tokens[2].toInt(&parsed_ok);
-                        if(!parsed_ok)
+                        if (!parsed_ok)
                         {
                             ok = false;
                         }
                         else
                         {
                             int playlist_id = tokens[3].toInt(&parsed_ok);
-                            if(!parsed_ok)
+                            if (!parsed_ok)
                             {
                                 ok = false;
                             }
                             else
                             {
-                                if(tokens.count() >= 5)
+                                if (tokens.count() >= 5)
                                 {
                                     int index_position = tokens[4].toInt(&parsed_ok);
-                                    if(!parsed_ok)
+                                    if (!parsed_ok)
                                     {
                                         ok = false;
                                     }
@@ -240,9 +240,9 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
                 }
             }
         }
-        else if(tokens[0] == "pause")
+        else if (tokens[0] == "pause")
         {
-            if(tokens.count() < 2)
+            if (tokens.count() < 2)
             {
                 ok = false;
             }
@@ -259,9 +259,9 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
                 ok = false;
             }
         }
-        else if(tokens[0] == "seek")
+        else if (tokens[0] == "seek")
         {
-            if(tokens.count() < 2)
+            if (tokens.count() < 2)
             {
                 ok = false;
             }
@@ -269,7 +269,7 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
             {
                 bool convert_ok;
                 int seek_amount = tokens[1].toInt(&convert_ok);
-                if(convert_ok)
+                if (convert_ok)
                 {
                     seekAudio(seek_amount);
                 }
@@ -279,19 +279,19 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
                 }
             }
         }
-        else if(tokens[0] == "stop")
+        else if (tokens[0] == "stop")
         {
             stopAudio();
         }
-        else if(tokens[0] == "next")
+        else if (tokens[0] == "next")
         {
             nextPrevAudio(true);
         }
-        else if(tokens[0] == "previous" || tokens[0] == "prev")
+        else if (tokens[0] == "previous" || tokens[0] == "prev")
         {
             nextPrevAudio(false);
         }
-        else if(tokens[0] == "status")
+        else if (tokens[0] == "status")
         {
             //
             //  Most/many/(all?) clients will want to get the status of the
@@ -301,7 +301,7 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
             playlist_mode_mutex.lock();
                 play_data_mutex.lock();
             
-                    if(is_playing)
+                    if (is_playing)
                     {
                         sendMessage(QString("playing %1 %2 %3 %4 %5 %6 %7 %8")
                                             .arg(current_playlist)
@@ -313,7 +313,7 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
                                             .arg(current_bitrate)
                                             .arg(current_frequency),
                                             socket_identifier);
-                        if(is_paused)
+                        if (is_paused)
                         {
                             sendMessage("pause on",  socket_identifier);
                         }
@@ -338,7 +338,7 @@ void AudioPlugin::doSomething(const QStringList &tokens, int socket_identifier)
         }
     }
 
-    if(!ok)
+    if (!ok)
     {
         warning(QString("did not understand or had "
                "problems with these tokens: %1")
@@ -359,7 +359,7 @@ bool AudioPlugin::playUrl(QUrl url, int collection_id)
     //  be playing.
     //
     
-    if(!url.isValid())
+    if (!url.isValid())
     {
         warning(QString("passed an invalid url: %1").arg(url.toString()));
         return false;
@@ -372,7 +372,7 @@ bool AudioPlugin::playUrl(QUrl url, int collection_id)
         //  for filenames with # in them
         //
 
-        if(url.hasRef())
+        if (url.hasRef())
         {
             path += "#";
             path += url.ref();
@@ -385,7 +385,7 @@ bool AudioPlugin::playUrl(QUrl url, int collection_id)
             return false;
         }
     }
-    else if(
+    else if (
             url.protocol() == "daap" ||
             url.protocol() == "cd"
            )
@@ -401,7 +401,7 @@ bool AudioPlugin::playUrl(QUrl url, int collection_id)
     
 
     state_of_play_mutex->lock();
-        if(is_playing || is_paused)
+        if (is_playing || is_paused)
         {
             state_of_play_mutex->unlock();
             stopAudio();
@@ -410,7 +410,7 @@ bool AudioPlugin::playUrl(QUrl url, int collection_id)
 
         bool start_output = false;
 
-        if(!output)
+        if (!output)
         {
             //
             //  output may not exist because this is a first run
@@ -419,7 +419,7 @@ bool AudioPlugin::playUrl(QUrl url, int collection_id)
         
             output = new MMAudioOutput(this, output_buffer_size * 1024, "/dev/dsp");
             output->setBufferSize(output_buffer_size * 1024);
-            if(!output->initialize())
+            if (!output->initialize())
             {
                 warning("could not initialize an output object");
                 delete output;
@@ -435,17 +435,17 @@ bool AudioPlugin::playUrl(QUrl url, int collection_id)
         // 
     
 
-        if(url.protocol() == "file" || url.protocol() == "cd")
+        if (url.protocol() == "file" || url.protocol() == "cd")
         {
             QString filename = url.path();
-            if(url.hasRef())
+            if (url.hasRef())
             {
                 filename += "#";
                 filename += url.ref();
             }
             input = new QFile(filename);
         }
-        else if(url.protocol() == "daap")
+        else if (url.protocol() == "daap")
         {
             //
             //  We know it's daap. Need to find out the server type of this
@@ -453,7 +453,7 @@ bool AudioPlugin::playUrl(QUrl url, int collection_id)
             //  hoops or not
             //
 
-            if(collection_id < 1)
+            if (collection_id < 1)
             {
                 input = new DaapInput(this, url, DAAP_SERVER_MYTH);
             }
@@ -464,23 +464,23 @@ bool AudioPlugin::playUrl(QUrl url, int collection_id)
                 int daap_server_type = which_container->getServerType();
                 metadata_server->unlockMetadata();
 
-                if(daap_server_type == MST_daap_itunes46)
+                if (daap_server_type == MST_daap_itunes46)
                 {
                     input = new DaapInput(this, url, DAAP_SERVER_ITUNES46);
                 }
-                else if(daap_server_type == MST_daap_itunes45)
+                else if (daap_server_type == MST_daap_itunes45)
                 {
                     input = new DaapInput(this, url, DAAP_SERVER_ITUNES45);
                 }
-                else if(daap_server_type == MST_daap_itunes43)
+                else if (daap_server_type == MST_daap_itunes43)
                 {
                     input = new DaapInput(this, url, DAAP_SERVER_ITUNES43);
                 }
-                else if(daap_server_type == MST_daap_itunes42)
+                else if (daap_server_type == MST_daap_itunes42)
                 {
                     input = new DaapInput(this, url, DAAP_SERVER_ITUNES42);
                 }
-                else if(daap_server_type == MST_daap_itunes41)
+                else if (daap_server_type == MST_daap_itunes41)
                 {
                     input = new DaapInput(this, url, DAAP_SERVER_ITUNES41);
                 }
@@ -501,15 +501,15 @@ bool AudioPlugin::playUrl(QUrl url, int collection_id)
             return false;
         }
 
-        if(decoder && !decoder->factory()->supports(url.path()))
+        if (decoder && !decoder->factory()->supports(url.path()))
         {
             decoder = 0;
         }
         
-        if(!decoder)
+        if (!decoder)
         {
             QString filename = url.path();
-            if(url.hasRef())
+            if (url.hasRef())
             {
                 filename += "#";
                 filename += url.ref();
@@ -517,7 +517,7 @@ bool AudioPlugin::playUrl(QUrl url, int collection_id)
             
             decoder = Decoder::create(filename, input, output);
 
-            if(!decoder)
+            if (!decoder)
             {
                 warning(QString("passed unsupported url in unsupported format: %1")
                         .arg(filename));
@@ -541,11 +541,11 @@ bool AudioPlugin::playUrl(QUrl url, int collection_id)
             elapsed_time = 0;
         play_data_mutex.unlock();
         
-        if(decoder->initialize())
+        if (decoder->initialize())
         {
-            if(output)
+            if (output)
             {
-                if(start_output)
+                if (start_output)
                 {
                     output->start();
                 }
@@ -591,7 +591,7 @@ bool AudioPlugin::playMetadata(int collection_id, int metadata_id)
                                                             metadata_id
                                                         );
     
-    if(!metadata_to_play)
+    if (!metadata_to_play)
     {
         warning(QString("was asked to play container %1 "
                         "item %2, but it does not exist")
@@ -605,7 +605,7 @@ bool AudioPlugin::playMetadata(int collection_id, int metadata_id)
     //  Make sure we can cast this to Audio metadata
     //
     
-    if(metadata_to_play->getType() == MDT_audio)
+    if (metadata_to_play->getType() == MDT_audio)
     {
         AudioMetadata *audio_metadata_to_play = (AudioMetadata *)metadata_to_play;
 
@@ -620,7 +620,7 @@ bool AudioPlugin::playMetadata(int collection_id, int metadata_id)
         QUrl url_to_play = audio_metadata_to_play->getUrl();
         metadata_server->unlockMetadata();
         bool result = playUrl(url_to_play, collection_id);
-        if(result)
+        if (result)
         {
             play_data_mutex.lock();
                 current_collection = collection_id;
@@ -692,7 +692,7 @@ void AudioPlugin::stopAudio()
             output = 0;
         }
     
-        if(input)
+        if (input)
         {
             delete input;
             input = NULL;
@@ -704,14 +704,13 @@ void AudioPlugin::stopAudio()
     state_of_play_mutex->unlock();
 
     sendMessage("stop");
-    
 }
 
 void AudioPlugin::pauseAudio(bool true_or_false)
 {
     state_of_play_mutex->lock();
     
-        if(!is_playing)
+        if (!is_playing)
         {
             //
             //  you can't be paused if you're not playing!
@@ -721,7 +720,7 @@ void AudioPlugin::pauseAudio(bool true_or_false)
             
         }
     
-        if(true_or_false == is_paused)
+        if (true_or_false == is_paused)
         {
             //
             //  already in the right state of pause
@@ -753,7 +752,7 @@ void AudioPlugin::pauseAudio(bool true_or_false)
         //
         //   Tell every connected client the state of the pause
         //
-        if(is_paused)
+        if (is_paused)
         {
             sendMessage("pause on");
         }
@@ -769,7 +768,7 @@ void AudioPlugin::seekAudio(int seek_amount)
     state_of_play_mutex->lock();
 
         int position = elapsed_time + seek_amount;
-        if(position < 0)
+        if (position < 0)
         {
             position = 0;
         }
@@ -806,27 +805,28 @@ void AudioPlugin::handleInternalMessage(QString the_message)
     //  This is where we handle internal messages (coming from the decoder)
     //
     
-    if(the_message == "decoder error")
+    if (the_message == "decoder error")
     {
         //  Don't do anything about this at the moment
     }
-    if(the_message == "decoder stop")
+    if (the_message == "decoder stop")
     {
         //
         //  Well, ok ... stop means we really stopped (not that we just
-        //  reached the end of a file), nothing to do
+        //  reached the end of a file) which can only mean (?) that
+        //  something already called stopAudio()
         //
 
-        stopAudio();
+        // stopAudio();
     }
-    if(the_message == "decoder finish")
+    if (the_message == "decoder finish")
     {
         //
         //  If we're in playlist mode, find the next thing to play.
         //  Otherwise, destruct everything.
         //
 
-        if(playlist_mode)
+        if (playlist_mode)
         {
             playFromPlaylist(1);
         }
@@ -868,7 +868,7 @@ void AudioPlugin::stopPlaylistMode()
 void AudioPlugin::playFromPlaylist(int augment_index)
 {
     uint playlist_size = 0;
-    if(!playlist_mode)
+    if (!playlist_mode)
     {
         warning("playFromPlaylist() called, but we're not in playlist mode");
         return;
@@ -878,7 +878,7 @@ void AudioPlugin::playFromPlaylist(int augment_index)
 
     playlist_mode_mutex.lock();
 
-    if(augment_index)
+    if (augment_index)
     {
         current_playlist_item_index += augment_index;
     }
@@ -896,7 +896,7 @@ void AudioPlugin::playFromPlaylist(int augment_index)
                                current_playlist_id
                                                          );        
                                                           
-    if(!playlist_to_play)
+    if (!playlist_to_play)
     {
         warning(QString("asked to play playlist %1 in "
                         "container %2, but that "
@@ -922,7 +922,7 @@ void AudioPlugin::playFromPlaylist(int augment_index)
     //  At some point, do something about shuffle modes here
     //
 
-    if(song_list.count() == 0)
+    if (song_list.count() == 0)
     {
         //
         //  No point in trying to cycle through a playlist of 0 length
@@ -937,14 +937,14 @@ void AudioPlugin::playFromPlaylist(int augment_index)
     }
    
 
-    if(current_playlist_item_index >= (int) song_list.count())
+    if (current_playlist_item_index >= (int) song_list.count())
     {
         //
         //  We've reached the end of the list moving forwards (down the
         //  list).  Perhaps we can pop up a level ?
         //
         
-        if(current_chain_playlist.count() > 0)
+        if (current_chain_playlist.count() > 0)
         {
             current_playlist_id         = current_chain_playlist.pop();
             current_playlist_item_index = current_chain_position.pop();
@@ -959,14 +959,14 @@ void AudioPlugin::playFromPlaylist(int augment_index)
         }
     }
         
-    if(current_playlist_item_index < 0)
+    if (current_playlist_item_index < 0)
     {
         //
         //  We've reached the end of the list moving backwards (up the
         //  list).  Perhaps we can pop up a level ?
         //
         
-        if(current_chain_playlist.count() > 0)
+        if (current_chain_playlist.count() > 0)
         {
             current_playlist_id         = current_chain_playlist.pop();
             current_playlist_item_index = current_chain_position.pop();
@@ -989,7 +989,7 @@ void AudioPlugin::playFromPlaylist(int augment_index)
     uint collection_to_play_from = current_playlist_container;
 
 
-    if(song_to_play < 0)
+    if (song_to_play < 0)
     {
         //
         //  We have a reference to another playlist, so we need to push down
@@ -999,7 +999,7 @@ void AudioPlugin::playFromPlaylist(int augment_index)
                                                             current_playlist_container,
                                                             song_to_play * -1
                                                                               );        
-        if(down_playlist)
+        if (down_playlist)
         {
             current_chain_playlist.push(current_playlist_id);
             current_chain_position.push(current_playlist_item_index);
@@ -1008,9 +1008,9 @@ void AudioPlugin::playFromPlaylist(int augment_index)
             int where_to_jump = 1;
             current_playlist_item_index = -1;
 
-            if(augment_index < 0)
+            if (augment_index < 0)
             {
-                if(down_playlist->getList().count() > 0)
+                if (down_playlist->getList().count() > 0)
                 {
                     current_playlist_item_index = down_playlist->getList().count();
                     where_to_jump = -1;
@@ -1036,7 +1036,7 @@ void AudioPlugin::playFromPlaylist(int augment_index)
     metadata_server->unlockMetadata();        
     playlist_mode_mutex.unlock();
 
-    if(!playMetadata(collection_to_play_from, song_to_play))
+    if (!playMetadata(collection_to_play_from, song_to_play))
     {
         log(QString("in playlist mode, could not find item number "
                     "%1 in playlist %2 (of size %3)")
@@ -1050,7 +1050,7 @@ void AudioPlugin::playFromPlaylist(int augment_index)
 
 void AudioPlugin::nextPrevAudio(bool forward)
 {
-    if(forward)
+    if (forward)
     {
         playFromPlaylist(1);
     }
@@ -1062,19 +1062,19 @@ void AudioPlugin::nextPrevAudio(bool forward)
 
 AudioPlugin::~AudioPlugin()
 {
-    if(output)
+    if (output)
     {
         delete output;
         output = NULL;        
     }
     
-    if(input)
+    if (input)
     {
         delete input;
         input = NULL;
     }
     
-    if(state_of_play_mutex)
+    if (state_of_play_mutex)
     {
         delete state_of_play_mutex;
         state_of_play_mutex = NULL;
