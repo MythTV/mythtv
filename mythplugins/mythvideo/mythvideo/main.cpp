@@ -20,6 +20,7 @@ using namespace std;
 #include "videomanager.h"
 #include "videobrowser.h"
 #include "videotree.h"
+#include "videogallery.h"
 #include "videofilter.h"
 #include "globalsettings.h"
 #include "fileassoc.h"
@@ -52,6 +53,7 @@ int mythplugin_config(void);
 void runVideoManager(void);
 void runVideoBrowser(void);
 void runVideoTree(void);
+void runVideoGallery(void);
 
 void setupKeys(void)
 {
@@ -61,6 +63,8 @@ void setupKeys(void)
              runVideoBrowser);
     REG_JUMP("Video Listings", "The MythVideo video listings", "", 
              runVideoTree);
+    REG_JUMP("Video Gallery", "The MythVideo video gallery", "",
+             runVideoGallery);
 
     
     REG_KEY("Video","FILTER","Open video filter dialog","F");
@@ -239,6 +243,15 @@ void runVideoTree(void)
     delete tree;
 }
 
+void runVideoGallery(void)
+{
+    VideoGallery *gallery = new VideoGallery(gContext->GetMainWindow(),
+                                             QSqlDatabase::database(),
+                                             "video gallery");
+    gallery->exec();
+    delete gallery;
+}
+
 void VideoCallback(void *data, QString &selection)
 {
     (void)data;
@@ -251,6 +264,8 @@ void VideoCallback(void *data, QString &selection)
         runVideoBrowser();
     else if (sel == "listing")
         runVideoTree();
+    else if (sel == "gallery")
+        runVideoGallery();
     else if (sel == "settings_general")
     {
         //
