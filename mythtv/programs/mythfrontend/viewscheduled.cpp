@@ -247,7 +247,10 @@ void ViewScheduled::selected(QListViewItem *lvitem)
 
     if (!rec->recording)
     {
-        handleNotRecording(rec);
+        if (rec->duplicate)
+            handleDuplicate(rec);
+        else
+            handleNotRecording(rec);
     } 
     else if (rec->conflicting)
     {
@@ -257,7 +260,7 @@ void ViewScheduled::selected(QListViewItem *lvitem)
 
 void ViewScheduled::handleNotRecording(ProgramInfo *rec)
 {
-    QString message = "Recording this program has been deactivated becuase it "
+    QString message = "Recording this program has been deactivated because it "
                       "conflicts with another scheduled recording.  Do you "
                       "want to re-enable this recording?";
 
@@ -353,6 +356,17 @@ void ViewScheduled::handleConflicting(ProgramInfo *rec)
     {
         chooseConflictingProgram(rec);
     }
+}
+
+void ViewScheduled::handleDuplicate(ProgramInfo *rec)
+{
+    QString message = "Recording this program has been suppressed because it "
+                      "has already been recorded in the past.";
+
+    DialogBox diag(message);
+    diag.AddButton("OK");
+    diag.Show();
+    diag.exec();
 }
 
 void ViewScheduled::chooseConflictingProgram(ProgramInfo *rec)

@@ -347,10 +347,7 @@ void Scheduler::PruneList(void)
         {
             if (first->duplicate)
             {
-                delete first;
-                deliter = i.base();
-                deliter--;
-                recordingList.erase(deliter);
+                first->recording = false;
             }
             else
             {

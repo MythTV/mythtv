@@ -21,6 +21,7 @@ class ViewScheduled : public MythDialog
   private:
     void FillList(void);
     void handleConflicting(ProgramInfo *rec);
+    void handleDuplicate(ProgramInfo *rec);
     void handleNotRecording(ProgramInfo *rec);
     void chooseConflictingProgram(ProgramInfo *rec);
 
