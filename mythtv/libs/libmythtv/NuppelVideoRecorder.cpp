@@ -983,13 +983,16 @@ again:
         if (ioctl(fd, VIDIOC_DQBUF, &vbuf) < 0)
         {
             perror("VIDIOC_DQBUF");
-            for (int i = 0; i < numbuffers; i++)
+            if (errno == -EINVAL)
             {
-                vbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-                vbuf.index = i;
-                ioctl(fd, VIDIOC_QBUF, &vbuf);
+                for (int i = 0; i < numbuffers; i++)
+                {
+                    vbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+                    vbuf.index = i;
+                    ioctl(fd, VIDIOC_QBUF, &vbuf);
+                }
+                continue;
             }
-            continue;
         }
 
         frame = vbuf.index;

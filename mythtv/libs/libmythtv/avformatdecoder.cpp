@@ -356,6 +356,13 @@ void AvFormatDecoder::GetFrame(int onlyvideo)
             {
                 case CODEC_TYPE_AUDIO:
                 {
+                    if (onlyvideo)
+                    {
+                        ptr += pkt.size;
+                        len -= pkt.size;
+                        continue;
+                    }
+
                     ret = avcodec_decode_audio(&curstream->codec, samples,
                                                &data_size, ptr, len);
                     if (data_size <= 0)

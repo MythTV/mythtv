@@ -447,6 +447,12 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
         SetOption(profile, "width");
         SetOption(profile, "height");
 
+        if (ispip)
+        {
+            nvr->SetEncodingOption("width", 160);
+            nvr->SetEncodingOption("height", 128);
+        }
+
         nvr->Initialize();
         return;
     }
@@ -1679,15 +1685,43 @@ void TVRec::RequestRingBufferBlock(int size)
     if (size > 128000)
         size = 128000;
 
-    pthread_mutex_lock(&readthreadLock);
+    bool locked = false;
+    QTime curtime = QTime::currentTime();
+    curtime = curtime.addSecs(5);
+
+    while (QTime::currentTime() < curtime)
+    {
+        locked = pthread_mutex_trylock(&readthreadLock);
+        if (locked)
+            break;
+        usleep(50);
+    }
+
+    if (!locked)
+    {
+        cerr << "Backend stopped in RequestRingBufferBlock\n";
+        rbuffer->StopReads();
+        return;
+    }
+
     readrequest = size; 
     pthread_mutex_unlock(&readthreadLock);
+
+    curtime = QTime::currentTime();
+    curtime = curtime.addSecs(5);
 
     while (readrequest > 0 && readthreadlive)
     {
         qApp->unlock();
         usleep(500);
         qApp->lock();
+
+        if (QTime::currentTime() > curtime)
+        {
+            cerr << "Backend stuffed up in RequestRingBufferBlock\n";
+            rbuffer->StopReads();
+            break;
+        }
     }
 }
 

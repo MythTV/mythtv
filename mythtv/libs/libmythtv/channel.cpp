@@ -51,7 +51,11 @@ bool Channel::Open(void)
     if (videofd > 0)
         isopen = true;
     else
+    {
+         cout << "Can't open: " << device << endl;
          perror(device.ascii());
+         return false;
+    }
 
 #ifdef USING_V4L2
     struct v4l2_capability vcap;
