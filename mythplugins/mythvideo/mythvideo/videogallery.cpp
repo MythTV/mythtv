@@ -1,13 +1,13 @@
 /*
-Copyright (c) 2004 Koninklijke Philips Electronics NV. All rights reserved. 
+Copyright (c) 2004 Koninklijke Philips Electronics NV. All rights reserved.
 Based on "iconview.cpp" of MythGallery.
 
-This is free software; you can redistribute it and/or modify it under the 
-terms of version 2 of the GNU General Public License as published by the 
+This is free software; you can redistribute it and/or modify it under the
+terms of version 2 of the GNU General Public License as published by the
 Free Software Foundation.
 
-This program is distributed in the hope that it will be useful, but WITHOUT 
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 */
 
@@ -36,20 +36,20 @@ VideoGallery::VideoGallery(QSqlDatabase *ldb, MythMainWindow *parent, const char
 {
     updateML = false;
 
-    // load default settings from the database 
+    // load default settings from the database
     curView              = gContext->GetNumSetting("VideoDefaultView",0);
     nCols                = gContext->GetNumSetting("VideoGalleryColsPerPage",4);
     nRows                = gContext->GetNumSetting("VideoGalleryRowsPerPage",3);
     subtitleOn           = gContext->GetNumSetting("VideoGallerySubtitle",1);
     keepAspectRatio      = gContext->GetNumSetting("VideoGalleryAspectRatio",1);
-    
+
     prefix = gContext->GetSetting("VideoStartupDir");
 
     QString videodir = gContext->GetSetting("VideoStartupDir");
     QStringList an_it(QStringList::split("/", videodir));
 
-    
-    loadWindow(xmldata);    
+
+    loadWindow(xmldata);
     LoadIconWindow(); // load icon settings
 
     if (!an_it.empty())
@@ -68,7 +68,7 @@ VideoGallery::~VideoGallery()
 {
     // save current settings as default
     gContext->SaveSetting("VideoDefaultView", curView);
-    
+
     delete video_tree_root;
 }
 
@@ -88,14 +88,14 @@ void VideoGallery::keyPressEvent(QKeyEvent *e)
         if (action == "SELECT")
         {
             handled = handleSelect();
-        }            
+        }
         else if ( (action == "UP")  || (action == "DOWN") ||
                   (action == "LEFT") ||(action == "RIGHT") ||
-                  (action == "PAGEUP") || (action == "PAGEDOWN")) 
+                  (action == "PAGEUP") || (action == "PAGEDOWN"))
         {
              moveCursor(action);
         }
-        else if (action == "1" || action == "2" || 
+        else if (action == "1" || action == "2" ||
                  action == "3" || action == "4")
         {
             setParentalLevel(action.toInt());        // parental control
@@ -104,19 +104,19 @@ void VideoGallery::keyPressEvent(QKeyEvent *e)
         {
             slotDoFilter();
         }
-        else if (action == "INFO") 
+        else if (action == "INFO")
         {
             // pop-up menu with video description
-            if ((where_we_are->getInt() > SUB_FOLDER )) 
+            if ((where_we_are->getInt() > SUB_FOLDER ))
             {
                 doMenu(true);
             }
         }
         else if (action == "MENU")
-        {     
+        {
             doMenu(false);
         }
-        else if (action == "ESCAPE") 
+        else if (action == "ESCAPE")
         {
              handled = goBack();
         }
@@ -132,12 +132,12 @@ bool VideoGallery::goBack()
 {
     bool handled = false;
     // one dir up
-    if ((curView == 1)) 
+    if ((curView == 1))
     {
         GenericTree *parent = where_we_are->getParent();
-        if (parent) 
+        if (parent)
         {
-            if (parent != video_tree_root) 
+            if (parent != video_tree_root)
             {
                 // move one node up in the video tree
                 QString subdir = parent->getString();
@@ -148,36 +148,36 @@ bool VideoGallery::goBack()
 
                 // determine the x,y position of the current icon anew
                 positionIcon();
-        
+
                 update(); // renew the screen
                 handled = true;
-            } 
-        } 
+            }
+        }
      }
      return handled;
 }
 
 void VideoGallery::handleMetaFetch(Metadata* myData)
 {
-    
+
     metas[myData->ID()] = *myData;
-    
+
     if (curView == 0)  // create a flat linear list
-    {     
+    {
         video_tree_data->addNode(myData->Title(), myData->ID(), true);
-    } 
+    }
     else // create hierarchical tree based on the dir structure
-    {                
+    {
         QString file_string = myData->Filename();
         file_string.remove(0, prefix.length());
         QStringList list(QStringList::split("/", file_string));
-    
-        // 
+
+        //
         // Analyze the complete path listing inside the filename.
         // Each directory is a node and each video a leaf node.
         //
         GenericTree *where_to_add = video_tree_data;
-    
+
         int a_counter = 0;
         QStringList::Iterator an_it = list.begin();
         for( ; an_it != list.end(); ++an_it)
@@ -187,9 +187,9 @@ void VideoGallery::handleMetaFetch(Metadata* myData)
             //   0 up-folder
             //   1 subfolders
             //   2 videos
-    
+
             GenericTree *sub_node;
-    
+
             if (a_counter + 1 >= (int) list.count())     // video
             {
                 sub_node = where_to_add->addNode(myData->Title(), myData->ID(), true);
@@ -206,7 +206,7 @@ void VideoGallery::handleMetaFetch(Metadata* myData)
                     sub_node = where_to_add->addNode(dirname, SUB_FOLDER, true);
                     sub_node->setAttribute(0, 1);
                     sub_node->setOrderingIndex(0);
-    
+
                     // up-folder
                     GenericTree *up_node = sub_node->addNode(where_to_add->getString(), UP_FOLDER, true);
                     up_node->setAttribute(0, 0);
@@ -225,7 +225,7 @@ void VideoGallery::fetchVideos()
         return;
     updateML = true;
     video_tree_data->deleteAllChildren();
-    
+
     VideoDialog::fetchVideos();
 
     video_tree_data->setOrderingIndex(0);
@@ -240,7 +240,7 @@ void VideoGallery::fetchVideos()
     lastRow = lastCol = 0;
 
     where_we_are = video_tree_data; // root directory
-    
+
     int list_count = where_we_are->childCount();
     if (list_count > 0)             // move already one node down if there are videos
     {
@@ -248,12 +248,12 @@ void VideoGallery::fetchVideos()
         lastRow = QMAX((int)ceilf((float)list_count/(float)nCols)-1,0);
         lastCol = QMAX(list_count-lastRow*nCols-1,0);
     }
-    
+
     allowselect = (bool)(where_we_are != video_tree_root);
 
     updateML = false;
     update();         // renew the screen
-    
+
     curitem = &metas[where_we_are->getInt()];
 }
 
@@ -261,27 +261,27 @@ void VideoGallery::paintEvent(QPaintEvent *e)
 {
     if (!allowPaint)
         return;
-        
+
     QRect r = e->rect();
     QPainter p(this);
 
     if (r.intersects(textRect))
         updateText(&p);
-    
+
     if (r.intersects(viewRect))
         updateView(&p);
-    
+
     if (r.intersects(arrowsRect))
         updateArrows(&p);
-    
-    MythDialog::paintEvent(e);        
+
+    MythDialog::paintEvent(e);
 }
 
 
 void VideoGallery::updateText(QPainter *p)
 {
     //
-    // Print the video title 
+    // Print the video title
     //
 
     QRect pr = textRect;
@@ -340,8 +340,8 @@ void VideoGallery::updateView(QPainter *p)
 
     // redraw the complete view rectangle
     QRect pr = viewRect;
-    
-    
+
+
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
@@ -415,16 +415,16 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
     int yoffset = 0;
     bool myImage = true;
     Metadata *meta = NULL;
-    
+
     if (curTreePos->getInt() < 0) // directory
-    {     
+    {
         if (curPos == (currRow*nCols+currCol))
             p->drawPixmap(xpos, ypos, folderSelPix); // highlighted
         else
             p->drawPixmap(xpos, ypos, folderRegPix);
 
         if (curTreePos->getInt() == SUB_FOLDER)  // subdirectory
-        { 
+        {
             // load folder icon
             QString filename = QString("%1/%2%3folder")
                                       .arg(prefix).arg(curPath)
@@ -436,17 +436,17 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
             if (!image->load(filename + ".png"))
                 if (!image->load(filename + ".jpg"))
                          image->load(filename + ".gif");
-        } 
+        }
         else if (curTreePos->getInt() == UP_FOLDER) // up-directory
-        { 
+        {
             image = gContext->LoadScaleImage("mv_gallery_dir_up.png");
         }
 
         // directory icons are 10% smaller
         yoffset = (int)(0.1*thumbH);
-    } 
+    }
     else // video
-    {                              
+    {
         if (curPos == (currRow*nCols+currCol))
             p->drawPixmap(xpos, ypos, backSelPix); // highlighted
         else
@@ -454,7 +454,7 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
 
         // load video icon
         meta = &metas[curTreePos->getInt()];
-        
+
         image = meta->getCoverImage();
         myImage = false;
     }
@@ -463,9 +463,9 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
     int bh  = backRegPix.height();
     int sw  = (int)(7*wmult);
     int sh  = (int)(7*hmult);
-    
-    
-    if (image && !image->isNull()) 
+
+
+    if (image && !image->isNull())
     {
 
         QPixmap *pixmap = NULL;
@@ -489,14 +489,14 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
         else
             meta->setCoverPixmap(pixmap);
     }
-    
-    
+
+
     UITextType *itype = (UITextType*)0;
     UITextType *ttype = (UITextType*)0;
 
     LayerSet* container = theme->GetSet("view");
-    
-    if (container) 
+
+    if (container)
     {
         itype = (UITextType*)container->GetType("icontext");
         ttype = (UITextType*)container->GetType("subtext");
@@ -507,7 +507,7 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
     }
 
     // text instead of an image
-    if (itype && (!image || image->isNull())) 
+    if (itype && (!image || image->isNull()))
     {
         QRect area = itype->DisplayArea();
 
@@ -527,10 +527,10 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
 
 
     // text underneath an icon
-    if (ttype && subtitleOn) 
+    if (ttype && subtitleOn)
     {
         QRect area = ttype->DisplayArea();
-        
+
         area.setX(xpos + sw);
         area.setY(ypos + thumbH);
         area.setWidth(bw-2*sw);
@@ -545,7 +545,7 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
         ttype->Draw(p, 3, 0);
     }
 
-    if (image && myImage) 
+    if (image && myImage)
         delete image;
 }
 
@@ -557,10 +557,10 @@ void VideoGallery::doMenu(bool info)
         QButton *focusButton = NULL;
         if(info)
         {
-            focusButton = popup->addButton(tr("Watch This Video"), this, SLOT(slotWatchVideo())); 
+            focusButton = popup->addButton(tr("Watch This Video"), this, SLOT(slotWatchVideo()));
             popup->addButton(tr("View Full Plot"), this, SLOT(slotViewPlot()));
             popup->addButton(tr("View Details"), this, SLOT(handleVideoSelect()));
-            
+
         }
         else
         {
@@ -572,14 +572,14 @@ void VideoGallery::doMenu(bool info)
 
             addDests();
         }
-        
+
         popup->addButton(tr("Cancel"), this, SLOT(slotDoCancel()));
-        
+
         popup->ShowPopup(this, SLOT(slotDoCancel()));
-    
+
         focusButton->setFocus();
     }
-    
+
 }
 
 
@@ -604,7 +604,7 @@ void VideoGallery::LoadIconWindow()
                   << std::endl;
         exit(-1);
     }
- 
+
     //
     // The minimum height of the subtitles is determined by the xml ui file.
     // The location and width depend on the screen layout and are calculated.
@@ -624,8 +624,8 @@ void VideoGallery::LoadIconWindow()
     thumbH = (int)floorf((float)(viewRect.height() - nRows * spaceH) / ((float)nRows * (1 + margin)));
     spaceW = (nCols <= 1 ? 0 : (viewRect.width()  - (nCols * thumbW)) / (nCols - 1));
     spaceH = (viewRect.height() - (nRows * thumbH)) / nRows;
-    
-    // 
+
+    //
     // download icon and folder backgrounds
     //
 
@@ -651,7 +651,7 @@ void VideoGallery::LoadIconWindow()
     }
 }
 
- 
+
 void VideoGallery::exitWin()
 {
     emit accept();
@@ -663,9 +663,9 @@ void VideoGallery::moveCursor(QString action)
     int prevRow = currRow;
     int oldRow  = topRow;
 
-    if (action == "LEFT") 
+    if (action == "LEFT")
     {
-        if (currRow == 0 && currCol == 0) 
+        if (currRow == 0 && currCol == 0)
             return;
 
         currCol--;
@@ -676,7 +676,7 @@ void VideoGallery::moveCursor(QString action)
                 topRow = currRow;
         }
     }
-    else if (action == "RIGHT") 
+    else if (action == "RIGHT")
     {
         if (currRow*nCols+currCol >= (int)(where_we_are->siblingCount())-1)
             return;
@@ -689,7 +689,7 @@ void VideoGallery::moveCursor(QString action)
                 topRow++;
         }
     }
-    else if (action == "UP") 
+    else if (action == "UP")
     {
         if (currRow == 0) {
             currRow = lastRow;
@@ -701,7 +701,7 @@ void VideoGallery::moveCursor(QString action)
                 topRow = currRow;
         }
     }
-    else if (action == "DOWN") 
+    else if (action == "DOWN")
     {
         if (currRow == lastRow) {
             currRow = 0;
@@ -711,12 +711,12 @@ void VideoGallery::moveCursor(QString action)
 
             if (currRow == lastRow)
                 currCol = QMIN(currCol,lastCol);
- 
+
             if (currRow >= topRow+nRows)
                 topRow++;
         }
     }
-    else if (action == "PAGEUP") 
+    else if (action == "PAGEUP")
     {
         if (currRow == 0)
             return; // or wrap around: currRow = QMAX(lastRow - nRows + 1, 0);
@@ -725,7 +725,7 @@ void VideoGallery::moveCursor(QString action)
 
         topRow = currRow;
     }
-    else if (action == "PAGEDOWN") 
+    else if (action == "PAGEDOWN")
     {
         if (currRow == lastRow)
             return; // or wrap around: currRow = QMAX(nRows - 1,0);
@@ -739,25 +739,24 @@ void VideoGallery::moveCursor(QString action)
 
         topRow = QMAX(currRow - nRows + 1,0);
     }
-    else 
+    else
         return;
 
     GenericTree *parent = where_we_are->getParent();
     if (parent)
         where_we_are = parent->getChildAt(currRow * nCols + currCol,0);
-    
-    
+
+
     curitem = &metas[where_we_are->getInt()];
-    
-        
+
+
     if (topRow != oldRow)     // renew the whole screen
     {
-        cerr << "redraw screen" << endl;
         update(viewRect);
+        update(textRect);
     }
     else                     // partial update only
-    {                    
-        cerr << "redraw singleicon" << endl;
+    {
         QPainter p(this);
         updateSingleIcon(&p,prevCol,prevRow);
         updateSingleIcon(&p,currCol,currRow);
@@ -767,8 +766,8 @@ void VideoGallery::moveCursor(QString action)
 
 void VideoGallery::slotChangeView()
 {
-    
-    // 
+
+    //
     // menu option to toggle between plain and folder view
     //
     cancelPopup();
@@ -798,37 +797,37 @@ void VideoGallery::handleDirSelect()
     // move one node down in the video tree
     int list_count = where_we_are->childCount();
     if (list_count > 0)  // should be
-    { 
+    {
         curPath.append(where_we_are->getString());
-    
+
         topRow = currRow = currCol = 0;  // top-left corner
-    
+
         where_we_are = where_we_are->getChildAt(0,0);
-    
+
         lastRow = QMAX((int)ceilf((float)list_count/(float)nCols)-1,0);
         lastCol = QMAX(list_count-lastRow*nCols-1,0);
     }
-    
+
     allowselect = (bool)(list_count > 0);
 }
 
 void VideoGallery::handleUpDirSelect()
 {
     GenericTree *parent = where_we_are->getParent();
-    if (parent) 
+    if (parent)
     {
-        if (parent != video_tree_root) 
+        if (parent != video_tree_root)
         {
             // move one node up in the video tree
             QString subdir = parent->getString();
             int length = curPath.length() - subdir.length();
             curPath.truncate(length);
-    
+
             where_we_are = parent;
-    
+
             // determine the x,y position of the current icon anew
             positionIcon();
-    
+
             allowselect = (bool)(where_we_are->siblingCount() > 0);
         }
     }
@@ -849,8 +848,8 @@ void VideoGallery::handleVideoSelect()
 bool VideoGallery::handleSelect()
 {
     bool handled = true;
-    
-    if (allowselect) 
+
+    if (allowselect)
     {
         switch (where_we_are->getInt())
         {
@@ -863,10 +862,10 @@ bool VideoGallery::handleSelect()
             default:
                 handleVideoSelect();
         };
-        
+
         update(); // renew the screen
     }
-    
+
     return handled;
 }
 
