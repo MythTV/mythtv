@@ -257,6 +257,10 @@ void MainServer::ProcessRequest(QSocket *sock)
     {
         HandleDeleteRecording(listline, pbs);
     }
+    else if (command == "REACTIVATE_RECORDING")
+    {
+        HandleReactivateRecording(listline, pbs);
+    }
     else if (command == "FORGET_RECORDING")
     {
         HandleForgetRecording(listline, pbs);
@@ -1199,6 +1203,25 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
     }
 
     delete pginfo;
+}
+
+void MainServer::HandleReactivateRecording(QStringList &slist, PlaybackSock *pbs)
+{
+    ProgramInfo pginfo;
+    pginfo.FromStringList(slist, 1);
+
+    QStringList result;
+    if (m_sched)
+        result = QString::number(m_sched->ReactivateRecording(&pginfo));
+    else
+        result = QString::number(0);
+
+    if (pbs)
+    {
+        QSocket *pbssock = pbs->getSocket();
+        if (pbssock)
+            SendResponse(pbssock, result);
+    }
 }
 
 void MainServer::HandleForgetRecording(QStringList &slist, PlaybackSock *pbs)

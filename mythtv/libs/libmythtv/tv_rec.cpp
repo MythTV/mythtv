@@ -359,7 +359,7 @@ void TVRec::FinishedRecording(void)
     pthread_mutex_lock(&db_lock);
     MythContext::KickDatabase(db_conn);
 
-    curRecording->FinishedRecording(db_conn);
+    curRecording->FinishedRecording(db_conn, prematurelystopped);
     pthread_mutex_unlock(&db_lock);
 }
 
@@ -514,6 +514,8 @@ void TVRec::HandleStateChange(void)
         }
         else
         {
+            if (nvr->IsErrored())
+                prematurelystopped = true;
             FinishedRecording();
             killRecordingFile = true;
             closeRecorder = true;

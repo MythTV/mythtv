@@ -118,7 +118,7 @@ class ProgramInfo
     }
 
     void StartedRecording(QSqlDatabase *db);
-    void FinishedRecording(QSqlDatabase* db);
+    void FinishedRecording(QSqlDatabase* db, bool prematurestop);
 
     QGridLayout* DisplayWidget(QWidget *parent = NULL);
 
@@ -235,6 +235,7 @@ class ProgramInfo
     RecStatusType savedrecstatus;
     int numconflicts;
     int conflictpriority;
+    bool reactivate;
     int recordid;
     RecordingType rectype;
     RecordingDupInType dupin;

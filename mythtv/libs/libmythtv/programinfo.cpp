@@ -40,6 +40,7 @@ ProgramInfo::ProgramInfo(void)
     savedrecstatus = rsUnknown;
     numconflicts = 0;
     conflictpriority = -1000;
+    reactivate = false;
     recordid = 0;
     rectype = kNotRecording;
     dupin = kDupsInAll;
@@ -85,6 +86,7 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other)
     savedrecstatus = other.savedrecstatus;
     numconflicts = other.numconflicts;
     conflictpriority = other.conflictpriority;
+    reactivate = other.reactivate;
     recordid = other.recordid;
     rectype = other.rectype;
     dupin = other.dupin;
@@ -134,6 +136,7 @@ ProgramInfo &ProgramInfo::operator=(const ProgramInfo &other)
     savedrecstatus = other.savedrecstatus;
     numconflicts = other.numconflicts;
     conflictpriority = other.conflictpriority;
+    reactivate = other.reactivate;
     recordid = other.recordid;
     rectype = other.rectype;
     dupin = other.dupin;
@@ -936,10 +939,11 @@ void ProgramInfo::StartedRecording(QSqlDatabase *db)
         MythContext::DBError("Clear markup on record", qquery);
 }
 
-void ProgramInfo::FinishedRecording(QSqlDatabase* db) 
+void ProgramInfo::FinishedRecording(QSqlDatabase* db, bool prematurestop) 
 {
     GetProgramRecordingStatus(db);
-    record->doneRecording(db, *this);
+    if (!prematurestop)
+        record->doneRecording(db, *this);
 }
 
 void ProgramInfo::SetBookmark(long long pos, QSqlDatabase *db)
@@ -1979,6 +1983,8 @@ int ProgramInfo::getProgramFlags(QSqlDatabase *db)
 
 void ProgramInfo::handleRecording(QSqlDatabase *db)
 {
+    QDateTime now = QDateTime::currentDateTime();
+
     QString message = title;
 
     if (subtitle != "")
@@ -1988,12 +1994,20 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
     message += RecStatusDesc();
 
     DialogBox diag(gContext->GetMainWindow(), message);
-    int button = 1, ok = -1, addov = -1, forget = -1, clearov = -1;
+    int button = 1, ok = -1, react = -1, addov = -1, forget = -1, clearov = -1;
 
     diag.AddButton(QObject::tr("OK"));
     ok = button++;
 
-    if (recstatus == rsWillRecord)
+    if (recendts > now &&
+        (recstatus == rsStopped ||
+         recstatus == rsDeleted))
+    {
+        diag.AddButton(QObject::tr("Reactivate it"));
+        react = button++;
+    }
+
+    if (recstartts > now && recstatus == rsWillRecord)
     {
         diag.AddButton(QObject::tr("Don't record it"));
         addov = button++;
@@ -2008,7 +2022,7 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
         }
     }
 
-    if (override != 0)
+    if (recendts > now && override != 0)
     {
         diag.AddButton(QObject::tr("Clear Override"));
         clearov = button++;
@@ -2016,7 +2030,9 @@ void ProgramInfo::handleRecording(QSqlDatabase *db)
 
     int ret = diag.exec();
 
-    if (ret == addov)
+    if (ret == react)
+        RemoteReactivateRecording(this);
+    else if (ret == addov)
         setOverride(db, 2);
     else if (ret == forget)
     {
@@ -2072,26 +2088,38 @@ void ProgramInfo::handleNotRecording(QSqlDatabase *db)
     }
 
     DialogBox diag(gContext->GetMainWindow(), message);
-    int button = 1, ok = -1, addov = -1, clearov = -1;
+    int button = 1, ok = -1, react = -1, addov = -1, clearov = -1;
 
     diag.AddButton(QObject::tr("OK"));
     ok = button++;
 
     QDateTime now = QDateTime::currentDateTime();
 
-    if (recstartts > now &&
+    if (recstartts < now && recendts > now &&
+        (recstatus == rsTooManyRecordings ||
+         recstatus == rsCancelled ||
+         recstatus == rsConflict || 
+         recstatus == rsLowDiskSpace ||
+         recstatus == rsTunerBusy))
+    {
+        diag.AddButton(QObject::tr("Reactivate it"));
+        react = button++;
+    }
+
+    if (recendts > now &&
         override != 1 &&
-        recstatus != rsTooManyRecordings &&
-        recstatus != rsCancelled &&
-        recstatus != rsOverlap &&
-        recstatus != rsLowDiskSpace &&
-        recstatus != rsTunerBusy)
+        (recstatus == rsManualOverride ||
+         recstatus == rsPreviousRecording ||
+         recstatus == rsCurrentRecording ||
+         recstatus == rsEarlierShowing ||
+         recstatus == rsConflict ||
+         recstatus == rsLaterShowing))
     {
         diag.AddButton(QObject::tr("Record it anyway"));
         addov = button++;
     }
 
-    if (override != 0)
+    if (recendts > now && override != 0)
     {
         diag.AddButton(QObject::tr("Clear Override"));
         clearov = button++;
@@ -2099,8 +2127,14 @@ void ProgramInfo::handleNotRecording(QSqlDatabase *db)
 
     int ret = diag.exec();
 
-    if (ret == addov)
+    if (ret == react)
+        RemoteReactivateRecording(this);
+    else if (ret == addov)
+    {
         setOverride(db, 1);
+        if (recstartts > now)
+            RemoteReactivateRecording(this);
+    }
     else if (ret == clearov)
         setOverride(db, 0);
 

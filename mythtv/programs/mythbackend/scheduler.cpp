@@ -329,6 +329,36 @@ void Scheduler::UpdateRecStatus(ProgramInfo *pginfo)
     }
 }
 
+bool Scheduler::ReactivateRecording(ProgramInfo *pginfo)
+{
+    QDateTime now = QDateTime::currentDateTime();
+
+    if (pginfo->recstartts >= now || pginfo->recendts <= now)
+        return false;
+
+    QMutexLocker lockit(reclist_lock);
+
+    RecIter dreciter = reclist.begin();
+    for (; dreciter != reclist.end(); ++dreciter)
+    {
+        ProgramInfo *p = *dreciter;
+        if (p->recordid == pginfo->recordid &&
+            p->IsSameProgramTimeslot(*pginfo))
+        {
+            if (p->recstatus != rsRecorded &&
+                p->recstatus != rsRecording &&
+                p->recstatus != rsWillRecord)
+            {
+                p->reactivate = true;
+                ScheduledRecording::signalChange(db);
+            }
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void Scheduler::PruneOldRecords(void)
 {
     QDateTime deltime = schedTime.addDays(-1);
@@ -1304,10 +1334,19 @@ void Scheduler::AddNewRecords(void) {
         for ( ; rec != reclist.end(); rec++)
         {
             ProgramInfo *r = *rec;
-            if (p->IsSameProgramTimeslot(*r))
+            if (p->recordid == r->recordid &&
+                p->IsSameProgramTimeslot(*r))
             {
-                delete p;
-                p = NULL;
+                if (r->reactivate)
+                {
+                    delete r;
+                    reclist.erase(rec);
+                }
+                else
+                {
+                    delete p;
+                    p = NULL;
+                }
                 break;
             }
         }

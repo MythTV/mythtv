@@ -33,6 +33,7 @@ class Scheduler : public QObject
     void FillEncoderFreeSpaceCache(void);
 
     void UpdateRecStatus(ProgramInfo *pginfo);
+    bool ReactivateRecording(ProgramInfo *pginfo);
 
     RecList *getAllPending(void) { return &reclist; }
     void getAllPending(RecList *retList);
