@@ -350,6 +350,8 @@ class MythPopupBox : public QFrame
 {
   public:
     MythPopupBox(QWidget *parent);
+  
+    void Show(void);
 
     void addWidget(QWidget *widget, bool setAppearance = true);
 

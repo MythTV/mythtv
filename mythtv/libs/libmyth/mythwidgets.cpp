@@ -1158,6 +1158,12 @@ void MythPopupBox::addWidget(QWidget *widget, bool setAppearance)
     vbox->addWidget(widget);
 }
 
+void MythPopupBox::Show(void)
+{
+    show();
+    setActiveWindow();
+}
+
 void MythPopupBox::closeEvent(QCloseEvent *e)
 {
 }
