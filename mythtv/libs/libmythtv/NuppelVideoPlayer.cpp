@@ -3989,6 +3989,8 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
             (((autocommercialskip == 1) &&
               (framesPlayed >= commBreakIter.key())) ||
              ((autocommercialskip == 2) &&
+              (framesPlayed >= commBreakIter.key())) ||
+             ((autocommercialskip == 3) &&
               (framesPlayed + commnotifyamount * video_frame_rate >=
                commBreakIter.key()))))
         {
@@ -4018,7 +4020,7 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
                         comm_msg = QString(QObject::tr("Skip %1"))
                                            .arg(skipTime);
                     }
-                    else if (autocommercialskip == 2)
+                    else
                     {
                         comm_msg = QString(QObject::tr("Commercial: %1"))
                                            .arg(skipTime);
@@ -4036,15 +4038,15 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
                     UnpauseVideo();
                     while (GetVideoPause())
                         usleep(50);
+
+                    GetFrame(1, true);
+                }
+                else
+                {
+                    ++commBreakIter;
                 }
             }
-
-            if (autocommercialskip == 1)
-                GetFrame(1, true);
-
-            ++commBreakIter;
         }
-        return;
     }
 }
 
