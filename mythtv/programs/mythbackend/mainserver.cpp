@@ -491,7 +491,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                                  << " WARNING:  Capture device " << audiodevice 
                                  << " is not reporting full duplex "
                                  << "capability.\nSee docs/mythtv-HOWTO, "
-                                 << "section 18 for more information." << endl;
+                                 << "section 20.13 for more information." << endl;
                     }
                     else 
                         cerr << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")
