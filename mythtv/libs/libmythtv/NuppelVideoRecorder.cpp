@@ -1872,8 +1872,6 @@ void NuppelVideoRecorder::FormatTeletextSubtitles(struct VBIData *vbidata)
                 }
             if (hid)
                 c = ' ';
-            if ((c & 0x80) || !c )
-                c = ' ';
 
             if (visible || (c != ' '))
             {
@@ -1895,10 +1893,22 @@ void NuppelVideoRecorder::FormatTeletextSubtitles(struct VBIData *vbidata)
         if (visible)
         {
             st.len = linebufpos - linebuf + 1;;
+            int max = 200;
+            int bufsize = ((outpos - textbuffer[act]->buffer + 1) + st.len);
+            if (bufsize > max)
+                break;
             memcpy(outpos, &st, sizeof(st));
             outpos += sizeof(st);
-            memcpy(outpos, linebuf, st.len);
-            outpos += st.len;
+            if (st.len < 42)
+            {
+                memcpy(outpos, linebuf, st.len);
+                outpos += st.len;
+            }
+            else
+            {
+                memcpy(outpos, linebuf, 41);
+                outpos += 41;
+            }
             *outpos = 0;
         }
     }

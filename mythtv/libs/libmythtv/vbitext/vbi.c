@@ -24,13 +24,24 @@ static int rawbuf_size;                // its current size
 
 /***** v4l2 vbi-api *****/
 
+/* #include "/usr/src/linux/include/linux/videodev2.h" */
+
+enum v4l2_buf_type {
+	V4L2_BUF_TYPE_VIDEO_CAPTURE  = 1,
+	V4L2_BUF_TYPE_VIDEO_OUTPUT   = 2,
+	V4L2_BUF_TYPE_VIDEO_OVERLAY  = 3,
+	V4L2_BUF_TYPE_VBI_CAPTURE    = 4,
+	V4L2_BUF_TYPE_VBI_OUTPUT     = 5,
+	V4L2_BUF_TYPE_PRIVATE        = 0x80,
+};
+
 struct v4l2_vbi_format
 {
     unsigned int sampling_rate;                /* in 1 Hz */
     unsigned int offset;                       /* sampling starts # samples after rising hs */
     unsigned int samples_per_line;
     unsigned int sample_format;                /* V4L2_VBI_SF_* */
-    int start[2];
+    signed int start[2];
     unsigned int count[2];
     unsigned int flags;                        /* V4L2_VBI_* */
     unsigned int reserved2;            /* must be zero */
@@ -38,7 +49,7 @@ struct v4l2_vbi_format
 
 struct v4l2_format
 {
-    unsigned int       type;                   /* V4L2_BUF_TYPE_* */
+    enum v4l2_buf_type type;                   /* V4L2_BUF_TYPE_* */
     union
     {
        struct v4l2_vbi_format vbi;     /*  VBI data  */
@@ -46,8 +57,7 @@ struct v4l2_format
     } fmt;
 };
 
-#define V4L2_VBI_SF_UBYTE      1
-#define V4L2_BUF_TYPE_VBI       0x00000009
+#define V4L2_PIX_FMT_GREY     0x59455247 /* v4l2_fourcc('G','R','E','Y') *//*  8  Greyscale     */
 #define VIDIOC_G_FMT           _IOWR('V',  4, struct v4l2_format)
 
 /***** end of api definitions *****/
@@ -424,8 +434,19 @@ vbi_handler(struct vbi *vbi, int fd)
     vbi->seq = seq;
 
     if (seq > 1)       // the first may contain data from prev channel
+    {
+#if 1
        for (i = 0; i+vbi->bpl <= n; i += vbi->bpl)
            vbi_line(vbi, rawbuf + i);
+#else
+        /* work-around for old saa7134 driver versions (prior 0.2.6) */
+       for (i = 16 * vbi->bpl; i + vbi->bpl <= n; i += vbi->bpl)
+           vbi_line(vbi, rawbuf + i);
+
+       for (i = 0; i + vbi->bpl <= 16 * vbi->bpl; i += vbi->bpl)
+           vbi_line(vbi, rawbuf + i);
+#endif
+    }
 }
 
 
@@ -469,8 +490,9 @@ set_decode_parms(struct vbi *vbi, struct v4l2_vbi_format *p)
     int soc, eoc;      // start/end of clock run-in
     int bpl;           // bytes per line
 
-    if (p->sample_format != V4L2_VBI_SF_UBYTE)
+    if (p->sample_format != V4L2_PIX_FMT_GREY)
     {
+       fprintf(stderr, "got pix fmt %x\n", p->sample_format);
        error("v4l2: unsupported vbi data format");
        return -1;
     }
@@ -527,13 +549,15 @@ setup_dev(struct vbi *vbi)
     struct v4l2_format v4l2_format[1];
     struct v4l2_vbi_format *vbifmt = &v4l2_format->fmt.vbi;
 
-    if (ioctl(vbi->fd, VIDIOC_G_FMT, v4l2_format) == -1
-       || v4l2_format->type != V4L2_BUF_TYPE_VBI)
+    memset(&v4l2_format, 0, sizeof(v4l2_format));
+    v4l2_format->type = V4L2_BUF_TYPE_VBI_CAPTURE;
+    if (ioctl(vbi->fd, VIDIOC_G_FMT, v4l2_format) == -1)
     {
        // not a v4l2 device.  assume bttv and create a standard fmt-struct.
        int size;
+       perror("ioctl VIDIOC_G_FMT");
 
-       vbifmt->sample_format = V4L2_VBI_SF_UBYTE;
+       vbifmt->sample_format = V4L2_PIX_FMT_GREY;
        vbifmt->sampling_rate = 35468950;
        vbifmt->samples_per_line = 2048;
        vbifmt->offset = 244;

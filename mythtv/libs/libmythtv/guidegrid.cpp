@@ -77,7 +77,6 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
     DISPLAY_TIMES = 30;
     int maxchannel = 0;
     m_currentStartChannel = 0;
-    showFavorites = false;
 
     m_player = player;
     m_db = QSqlDatabase::database();
@@ -108,6 +107,7 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
     }
     LoadWindow(xmldata);
 
+    showFavorites = gContext->GetNumSetting("EPGShowFavorites", 0);
     gridfilltype = gContext->GetNumSetting("EPGFillType", 6);
     scrolltype = gContext->GetNumSetting("EPGScrollType", 1);
 
@@ -432,29 +432,33 @@ void GuideGrid::fillChannelInfos(int &maxchannel, bool gotostartchannel)
         while (query.next())
         {
             ChannelInfo val;
-            val.callsign = query.value(1).toString();
-            if (val.callsign == QString::null)
-                val.callsign = "";
-            val.iconpath = query.value(2).toString();
-            if (val.iconpath == QString::null)
-                val.iconpath = "(null)";
-            if (val.iconpath.stripWhiteSpace().length() == 0)
-                val.iconpath = "(null)";
             val.chanstr = query.value(0).toString();
-            if (val.chanstr == QString::null)
-                val.chanstr = "";
-            val.chanid = query.value(3).toInt();
-            val.favid = query.value(4).toInt();
-            val.icon = NULL;
-        
-            if (gotostartchannel && val.chanstr == m_startChanStr && !set)
+            if ((val.chanstr != QString::null) && (val.chanstr != ""))
             {
-                m_currentStartChannel = m_channelInfos.size();
-                set = true;
-            }
+                val.callsign = query.value(1).toString();
+                if (val.callsign == QString::null)
+                    val.callsign = "";
+                val.iconpath = query.value(2).toString();
+                if (val.iconpath == QString::null)
+                    val.iconpath = "(null)";
+                if (val.iconpath.stripWhiteSpace().length() == 0)
+                    val.iconpath = "(null)";
+                val.chanstr = query.value(0).toString();
+                if (val.chanstr == QString::null)
+                val.chanstr = "";
+                val.chanid = query.value(3).toInt();
+                val.favid = query.value(4).toInt();
+                val.icon = NULL;
+        
+                if (gotostartchannel && val.chanstr == m_startChanStr && !set)
+                {
+                    m_currentStartChannel = m_channelInfos.size();
+                    set = true;
+                }
                 
-            m_channelInfos.push_back(val);
-            maxchannel++;
+                m_channelInfos.push_back(val);
+                maxchannel++;
+            }
         }
     }
     else
@@ -558,88 +562,85 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
     if (chanNum < 0)
         chanNum = 0;
 
-    if (m_channelInfos[chanNum].chanstr != "")
+    m_programs[row] = proglist = new QPtrList<ProgramInfo>;
+    m_programs[row]->setAutoDelete(true);
+
+    QString chanid = QString("%1").arg(m_channelInfos[chanNum].chanid);
+
+    char temp[16];
+    sprintf(temp, "%4d%02d%02d%02d%02d00",
+            m_currentStartTime.date().year(),
+            m_currentStartTime.date().month(),
+            m_currentStartTime.date().day(),
+            m_currentStartTime.time().hour(),
+            m_currentStartTime.time().minute());
+    QString starttime = temp;
+    sprintf(temp, "%4d%02d%02d%02d%02d00",
+            m_currentEndTime.date().year(),
+            m_currentEndTime.date().month(),
+            m_currentEndTime.date().day(),
+            m_currentEndTime.time().hour(),
+            m_currentEndTime.time().minute());
+    QString endtime = temp;
+
+    ProgramInfo::GetProgramRangeDateTime(m_db, proglist, chanid, starttime, 
+                                         endtime);
+
+    QDateTime ts = m_currentStartTime;
+
+    program = proglist->first();
+    QPtrList<ProgramInfo> unknownlist;
+    bool unknown = false;
+
+    for (int x = 0; x < DISPLAY_TIMES; x++)
     {
-        m_programs[row] = proglist = new QPtrList<ProgramInfo>;
-        m_programs[row]->setAutoDelete(true);
-
-        QString chanid = QString("%1").arg(m_channelInfos[chanNum].chanid);
-
-        char temp[16];
-        sprintf(temp, "%4d%02d%02d%02d%02d00",
-                m_currentStartTime.date().year(),
-                m_currentStartTime.date().month(),
-                m_currentStartTime.date().day(),
-                m_currentStartTime.time().hour(),
-                m_currentStartTime.time().minute());
-        QString starttime = temp;
-        sprintf(temp, "%4d%02d%02d%02d%02d00",
-                m_currentEndTime.date().year(),
-                m_currentEndTime.date().month(),
-                m_currentEndTime.date().day(),
-                m_currentEndTime.time().hour(),
-                m_currentEndTime.time().minute());
-        QString endtime = temp;
-
-        ProgramInfo::GetProgramRangeDateTime(m_db, proglist, chanid, starttime, 
-                                             endtime);
-
-        QDateTime ts = m_currentStartTime;
-
-        program = proglist->first();
-        QPtrList<ProgramInfo> unknownlist;
-        bool unknown = false;
-
-        for (int x = 0; x < DISPLAY_TIMES; x++)
+        if (program && (ts >= (*program).endts))
         {
-            if (program && (ts >= (*program).endts))
-            {
-                program = proglist->next();
-            }
+            program = proglist->next();
+        }
 
-            if ((!program) || (ts < (*program).startts))
+        if ((!program) || (ts < (*program).startts))
+        {
+            if (unknown)
             {
-                if (unknown)
-                {
-                    proginfo->spread++;
-                    proginfo->endts = proginfo->endts.addSecs(5 * 60);
-                }
-                else
-                {
-                    proginfo = new ProgramInfo;
-                    unknownlist.append(proginfo);
-                    proginfo->title = unknownTitle;
-                    proginfo->category = unknownCategory;
-                    proginfo->startCol = x;
-                    proginfo->spread = 1;
-                    proginfo->startts = ts;
-                    proginfo->endts = proginfo->startts.addSecs(5 * 60);
-                    unknown = true;
-                }
+                proginfo->spread++;
+                proginfo->endts = proginfo->endts.addSecs(5 * 60);
             }
             else
             {
-                if (proginfo == &*program)
-                {
-                    proginfo->spread++;
-                }
-                else
-                {
-                    proginfo = &*program;
-                    proginfo->startCol = x;
-                    proginfo->spread = 1;
-                    unknown = false;
-                }
+                proginfo = new ProgramInfo;
+                unknownlist.append(proginfo);
+                proginfo->title = unknownTitle;
+                proginfo->category = unknownCategory;
+                proginfo->startCol = x;
+                proginfo->spread = 1;
+                proginfo->startts = ts;
+                proginfo->endts = proginfo->startts.addSecs(5 * 60);
+                unknown = true;
             }
-            m_programInfos[row][x] = proginfo;
-            ts = ts.addSecs(5 * 60);
         }
-
-        for (proginfo = unknownlist.first(); proginfo; 
-             proginfo = unknownlist.next())
+        else
         {
-            proglist->append(proginfo);
+            if (proginfo == &*program)
+            {
+                proginfo->spread++;
+            }
+            else
+            {
+                proginfo = &*program;
+                proginfo->startCol = x;
+                proginfo->spread = 1;
+                unknown = false;
+            }
         }
+        m_programInfos[row][x] = proginfo;
+        ts = ts.addSecs(5 * 60);
+    }
+
+    for (proginfo = unknownlist.first(); proginfo; 
+         proginfo = unknownlist.next())
+    {
+        proglist->append(proginfo);
     }
 
     int ydifference = programRect.height() / DISPLAY_CHANS;
@@ -850,9 +851,6 @@ void GuideGrid::paintChannels(QPainter *p)
         if (chanNumber >= m_channelInfos.size())
             chanNumber -= m_channelInfos.size();
   
-        if (m_channelInfos[chanNumber].chanstr == "")
-            break;
-
         chinfo = &(m_channelInfos[chanNumber]);
         if ((y == (unsigned int)2 && scrolltype != 1) || 
             ((signed int)y == m_currentRow && scrolltype == 1))

@@ -49,7 +49,12 @@ NuppelVideoPlayer::NuppelVideoPlayer(QSqlDatabase *ldb,
     prebuffering = false;
 
     vbimode = ' ';
-    vbipagenr = 0x08880000;
+    QString mypage = gContext->GetSetting("VBIpageNr", "888");
+    bool valid = false;
+    if (mypage)
+        vbipagenr = mypage.toInt(&valid, 16) << 16;  
+    else
+        vbipagenr = 0x08880000;
     video_height = 0;
     video_width = 0;
     video_size = 0;
@@ -745,6 +750,7 @@ void NuppelVideoPlayer::ShowText(void)
             {
                 // show teletext subtitles
                 osd->ClearAllCCText();
+                (*inpos)++;
                 while (*inpos)
                 {
                     struct teletextsubtitle st;

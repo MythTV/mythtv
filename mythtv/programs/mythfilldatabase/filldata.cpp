@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 #include "libmyth/mythcontext.h"
 
@@ -509,9 +510,10 @@ void parseFile(QString filename, QValueList<ChanInfo> *chanlist,
     }
     else if (config_offset == "Auto")
     {
-        QDateTime utcdt = QDateTime::currentDateTime(Qt::UTC);
-        QDateTime ldt = QDateTime::currentDateTime();
-        localTimezoneOffset = utcdt.secsTo(ldt) / 3600;
+        time_t now = time(NULL);
+        struct tm local_tm;
+        localtime_r(&now, &local_tm);
+        localTimezoneOffset = local_tm.tm_gmtoff / 3600;
     }
     else
     {
