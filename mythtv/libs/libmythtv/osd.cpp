@@ -5,7 +5,7 @@
 #include "ttfont.h"
 #include "osd.h"
 
-OSD::OSD(int width, int height, const string &filename)
+OSD::OSD(int width, int height, const string &filename, const string &prefix)
 {
     vid_width = width;
     vid_height = height;
@@ -42,11 +42,30 @@ OSD::OSD(int width, int height, const string &filename)
         infofontsize /= 2;
         channumfontsize /= 2;
     }
-    
-    info_font = Efont_load((char *)fontname.c_str(), infofontsize, vid_width,
+  
+    enableosd = false;
+ 
+    string fullname = prefix + string("/share/mythtv/") + fontname;
+
+    info_font = Efont_load((char *)fullname.c_str(), infofontsize, vid_width,
                            vid_height);
-    channum_font = Efont_load((char *)fontname.c_str(), channumfontsize,
+    if (!info_font)
+    {
+        fullname = fontname;
+        info_font = Efont_load((char *)fullname.c_str(), infofontsize,
+                               vid_width, vid_height);
+    }
+
+    channum_font = Efont_load((char *)fullname.c_str(), channumfontsize,
                               vid_width, vid_height);
+
+    if (!info_font || !channum_font)
+    {
+        printf("Coudln't open the OSD font, disabling the OSD.\n");
+        return;
+    }
+
+    enableosd = true;
 
     int mwidth, twidth;
     Efont_extents(info_font, "M M", NULL, NULL, &twidth, NULL, NULL, NULL, 
@@ -94,6 +113,9 @@ void OSD::TurnOff(void)
 
 void OSD::Display(unsigned char *yuvptr)
 {
+    if (!enableosd)
+        return;
+
     if (displayframes <= 0)
     {
         show_info = false; 

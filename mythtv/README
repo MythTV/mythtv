@@ -7,10 +7,12 @@ There'll be more information here later, but for now:
 BUILD/CONFIGURATION INSTRUCTIONS
 --------------------------------
 
-There's basically two ways to configure this so far, with the program guide,
-and without it.  If you want the program guide to work and have program 
-information show up on channel changes, you just need to have a few more
-pieces of external software installed.
+There's basically two ways to configure this so far, with support for showing
+program info, and without it.  If you want basic live-tv functionality, that's
+fine, you don't need to follow all the instructions given here.
+If you want the program guide to work and be able to schedule programs to 
+record and information to show up on channel changes, you just need to have a 
+few more pieces of external software installed.
 
 One of these days I'll convert things over to use a real configure script, 
 but I haven't bothered yet.
@@ -43,16 +45,18 @@ And that's all.  To compile the tv app, just cd into the 'tv' subdirectory.
 Type 'make'.  If you get any link errors like 'Undefined reference to <blah>',
 you're most likely missing one of the dependencies mentioned above.
 
-There is no 'make install' yet.
+Next, you need to do a 'make install' in the tv/ subdir.  This will copy
+the 'mythtv' program to /usr/local/bin, and the settings file and included
+font to /usr/local/share/mythtv/
 
-IMPORTANT: You _must_ edit the settings.txt file in the tv before running the
-           application.  
+IMPORTANT: You _must_ edit the settings.txt file in /usr/local/share/mythtv/
+           before running the application.  
 
-Specifically, you need to at least change the 'BufferName' preference to 
-something that can exist on your machine.  Look through the rest of the file 
-and change whatever else you want.  If you change the Width/Height settings 
-and you don't get any video, then the resolution you selected wasn't liked by 
-the v4l subsystem.
+Specifically, you need to at least change the 'BufferName' and the 
+'RecordFilePrefix' preferences to directories that exist on your machine.  
+Look through the rest of the file and change whatever else you want.  If you 
+change the Width/Height settings and you don't get any video, then the 
+resolution you selected wasn't liked by the v4l subsystem.
 
 And that's it for the basic setup.  Run the 'mythtv' bin from the compile 
 directory.  Use the arrow keys to change channels up and down, type in channel 
@@ -60,8 +64,8 @@ numbers to directly skip channels, use the 'p' key to pause/unpause, and the
 right/left arrow keys to ff/rew.  Escape quits. These keybindings aren't 
 configurable yet.
 
-Extended Functionality (Program Information and Guide)
-------------------------------------------------------
+Extended Functionality (Program Information, Guide, and Scheduled Recordings)
+-----------------------------------------------------------------------------
 
 To get program infomation showing up, you need the following additional bits:
 
@@ -94,35 +98,70 @@ You need to run the mc.sql script.  So, something like mysql < mc.sql
 might work.  I dunno.  It worked for me with the default mysql installation on
 debian, might not work elsewhere.  Better instructions welcome.
 
+UPGRADING FROM PREVIEW RELEASE 1
+--------------------------------
+You need to add the record.sql script to the database, so, mysql < record.sql
+This is not needed on a new install.
+
 Once the database is setup, run the filldata script also in the same directory.
 This'll take awhile, as it's populating the database with the next week's worth
 of program information.
 
 The 'filldata' script should be run every day, around 10 pm or so.  If you want
 updated program info, that is.  You don't have to run it at all, but then, 
-what's the point of doing all this?  Probably should be crontab'd, but I'm not
-certain if all the paths in the scripts are good for that yet.
+what's the point of doing all this?  Probably should be crontab'd, but that's
+for the next release.
 
 Next, time to build the program guide binary.  Go to the 'epg' subdirectory
 of the main distribution.  Type 'make'.  If you've got qt3 installed properly,
-everything should compile all nicely.  Don't 'make install'. 
+everything should compile all nicely.  Follow the 'make' with a 'make install'.
+ 
+Compiling note:  If you get an error on building this, that says something
+                 about 'mkspecs', then you don't have the QTDIR environment
+                 variable set.  On debian, this should be set to /usr/share/qt.
+                 I hear on mandrake, it's /usr/lib/qt3.  You'll need to figure
+                 out what it should be on your system, set the variable, 
+                 and attempt to compile again.
 
-You now can run the 'epg' binary, and it should be populated with program info.
-Use the arrow keys to move around in the grid.  'M' and 'Enter' quit.  So does
-'C', but it's 'quit without selecting the channel'.
+You now can run the 'mythepg' binary, and it should be populated with program 
+info.  Use the arrow keys to move around in the grid.  'M' and 'Enter' quit.  
+So does 'C', but it's 'quit without selecting the channel'.
 
-Anyway.  Now that you have the 'epg' binary built, and the program database
-configured, go back and run the 'mythtv' binary  (from the tv subdir) again.
-When you change channels, it should show the proper information on the OSD.
-Hitting 'M' should pop up the program guide.  Exiting the program guide with
-'Enter' or 'M' will change to the channel it currently was on, exiting with
-'C' will just exit without changing the channel.
+Anyway.  Now that you have the 'mythepg' binary built, and the program database
+configured, try running the 'mythtv' binary again.  When you change channels, 
+it should show the proper information on the OSD.  Hitting 'M' should pop up 
+the program guide.  Exiting the program guide with 'Enter' or 'M' will change 
+to the channel it currently was on, exiting with 'C' will just exit without 
+changing the channel.  Pressing 'I' will let you get more information about
+a program, and if you're running mythfrontend (compiled below) allow you to
+schedule recordings.
 
-NOTE: epg is designed to show up at 800x600, so it's full screen on a TV. 
-      mythtv will just go to fullscreen regardless of the resolution, but it
-      also runs best at 800x600.  Things will look weird at other resolutions.
+NOTE: epg, and all the Qt interfaces included with MythTV are designed to be 
+      displayed only at 800x600, so it's full screen on a TV. 
+      Video playback will just go to fullscreen regardless of the resolution, 
+      but it also runs best at 800x600.  Things will look weird at other 
+      resolutions.
+
+Two more binaries to compile, and you're done.  Change to the dialog/ subdir, 
+and a quick 'make' and 'make install' will put together the little dialog app
+that the mythtv app will use occasionally to ask questions of the user.  After
+this step, 'mythdialog' will live in your /usr/local/bin
+
+Next, change to the 'mythtv/' subdirectory.  One more 'make' and 'make install'
+and you're done.  This will put 'mythfrontend' in your /usr/local/bin.
+
+Ok, so try running 'mythfrontend'.  You'll see a ugly little menu show up.
+This should be pretty simple to figure out.  Only thing to keep in mind, though,
+is that 'mythfrontend' needs to be running for scheduled recordings to happen.
 
 In the 'configfiles' subdir there are some example lirc config files to get a
 remote working with this stuff.  Just use irxevent and it should all work.
 
-Feel free to send patches to ijr@po.cwru.edu
+Whew.  Sorry 'bout the long and involved compile process.  It'll get better.
+Eventually.  It'll get better faster if someone else wants to improve it, too.
+
+Feel free to subscribe to the development mailing list at:
+http://www.snowman.net/mailman/listinfo/mythtv-dev
+
+A list that's restricted to the CVS commit messages is available at:
+http://www.snowman.net/mailman/listinfo/mythtv-commits

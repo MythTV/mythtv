@@ -7,6 +7,8 @@
 #include "XJ.h"
 #include "tv.h"
 
+char theprefix[] = "/usr/local";
+
 void *SpawnEncode(void *param)
 {
     NuppelVideoRecorder *nvr = (NuppelVideoRecorder *)param;
@@ -27,7 +29,11 @@ void *SpawnDecode(void *param)
 
 TV::TV(const string &startchannel)
 {
-    settings = new Settings("settings.txt");
+    string settingsfile = string(theprefix) + 
+                          string("/share/mythtv/settings.txt");
+    settings = new Settings(settingsfile);
+
+    settings->ReadSettings("settings.txt");
 
     db_conn = NULL;
     ConnectDB();
@@ -90,7 +96,7 @@ void TV::LiveTV(void)
     if (internalState == kState_RecordingOnly)
     {
         char cmdline[4096];
-        sprintf(cmdline, "%s \"MythTV is already recording something.  Do you want to:\" \"Stop recording and watch TV\" \"Watch the in-progress recording\" \"Cancel\"", settings->GetSetting("DialogPath").c_str());
+        sprintf(cmdline, "mythdialog \"MythTV is already recording something.  Do you want to:\" \"Stop recording and watch TV\" \"Watch the in-progress recording\" \"Cancel\"");
 
         int result = system(cmdline);
 
@@ -141,7 +147,7 @@ void TV::StartRecording(RecordingInfo *rcinfo)
         if (channame != channel->GetCurrentName())
         {
             char cmdline[4096];
-            sprintf(cmdline, "%s \"MythTV wants to record something.  Do you want to:\" \"Record and watch while it Records\" \"Let it record, and go back to the Main Menu\" \"Continue Watching TV\"", settings->GetSetting("DialogPath").c_str());
+            sprintf(cmdline, "mythdialog \"MythTV wants to record something.  Do you want to:\" \"Record and watch while it Records\" \"Let it record, and go back to the Main Menu\" \"Continue Watching TV\"");
  
             int result = system(cmdline);
 
@@ -587,7 +593,8 @@ void TV::SetupPlayer(void)
     nvp->SetRingBuffer(prbuffer);
     nvp->SetRecorder(nvr);
     nvp->SetDeinterlace((bool)settings->GetNumSetting("Deinterlace"));
-    nvp->SetOSDFontName((char *)settings->GetSetting("OSDFont").c_str());
+    nvp->SetOSDFontName((char *)settings->GetSetting("OSDFont").c_str(),
+                        theprefix);
     nvp->SetAudioSampleRate(settings->GetNumSetting("AudioSampleRate"));
     osd_display_time = settings->GetNumSetting("OSDDisplayTime");
 }
@@ -995,7 +1002,7 @@ bool TV::CheckChannel(int channum)
 
 void TV::doLoadMenu(void)
 {
-    string epgname = settings->GetSetting("ProgramGuidePath");
+    string epgname = "mythepg";
 
     char runname[512];
 

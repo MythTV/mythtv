@@ -66,7 +66,8 @@ class NuppelVideoPlayer
 
     void SetRecorder(NuppelVideoRecorder *nvcr) { nvr = nvcr; }
 
-    void SetOSDFontName(char *filename) { osdfilename = filename; }
+    void SetOSDFontName(char *filename, char *prefix) 
+                      { osdfilename = filename; osdprefix = prefix; }
     
     void SetInfoText(const string &text, const string &subtitle,
                      const string &desc, const string &category,
@@ -208,6 +209,7 @@ class NuppelVideoPlayer
     bool actuallyreset;
 
     string osdfilename;
+    string osdprefix;
     OSD *osd;
 };
 

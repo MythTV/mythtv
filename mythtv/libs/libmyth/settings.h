@@ -45,9 +45,9 @@ public:
 	/** Generic Setting Setting function for pointer values */
 	void SetSetting(string strSetting, void* pNewVal);
 
+        /** parse settings file */
+        int ReadSettings(const char *pszFile);
 private: // Private attributes
-	/** Private function to parse settings file */
-	int ReadSettings(const char* pszFile);
 	/** main property-value mapping for strings */
 	map<string, string>* m_pStringSettings;
 	/** main property-value mapping for ints */

@@ -9,7 +9,7 @@ using namespace std;
 class OSD
 {
  public:
-    OSD(int width, int height, const string &filename);
+    OSD(int width, int height, const string &filename, const string &prefix);
    ~OSD(void);
 
     void Display(unsigned char *yuvptr);
@@ -56,6 +56,8 @@ class OSD
     int displayframes;
 
     int space_width;
+
+    bool enableosd;
 };
     
 #endif

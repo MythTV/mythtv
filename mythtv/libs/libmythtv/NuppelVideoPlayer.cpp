@@ -856,7 +856,7 @@ void NuppelVideoPlayer::StartPlaying(void)
     if (fileheader.audioblocks != 0)
         InitSound();
 
-    osd = new OSD(video_width, video_height, osdfilename);
+    osd = new OSD(video_width, video_height, osdfilename, osdprefix);
 
     playing = true;
     killplayer = false;

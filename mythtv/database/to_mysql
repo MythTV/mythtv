@@ -44,7 +44,7 @@ elsif (@ARGV >= 2) {
 }
 else { die }
 
-my $sharepath = "/usr/local/share/mc/";
+my $sharepath = "/usr/local/share/mythtv/";
 chdir $sharepath;
 
 my ($encoding, $credits, $channels, $progs) = @{XMLTV::parsefile($filename)};

@@ -4,6 +4,9 @@
 
 TEMPLATE = app
 CONFIG += thread release
+TARGET = mythfrontend
+target.path = /usr/local/bin
+INSTALLS = target
 
 DEFINES += _GNU_SOURCE
 INCLUDEPATH += ../epg ../dialog ../tv ../tv/libNuppelVideo /usr/include/mysql

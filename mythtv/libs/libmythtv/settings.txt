@@ -37,6 +37,3 @@ str OSDFont=helr.ttf
 # TV options
 str TVFormat=NTSC
 str FreqTable=us-cable
-
-str ProgramGuidePath=../epg/mythepg
-str DialogPath=../dialog/mythdialog

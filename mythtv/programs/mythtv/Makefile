@@ -42,9 +42,12 @@ mythtv: $(TVOBJ) libNuppelVideo.a libmythtv.a
 	@rm -f mythtv
 	$(CXXLINK) $(TVOBJ) $(TVLDF)
 
-#install: tv
-#	 strip mythtv
-#	 install -m 755 tv /usr/local/bin
+install: mythtv
+	strip mythtv
+	install -m 755 mythtv /usr/local/bin
+	mkdir -p /usr/local/share/mythtv
+	install -m 755 settings.txt /usr/local/share/mythtv
+	install -m 755 helr.ttf /usr/local/share/mythtv
 
 clean:	
 	rm -f *.o mythtv libmythtv.a

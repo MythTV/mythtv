@@ -4,6 +4,8 @@
 
 TEMPLATE = app
 CONFIG += thread
+target.path = /usr/local/bin
+INSTALLS = target
 
 # Input
 HEADERS += guidegrid.h infodialog.h infostructs.h
