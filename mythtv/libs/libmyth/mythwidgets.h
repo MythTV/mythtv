@@ -157,6 +157,10 @@ class MythRemoteLineEdit : public QTextEdit
         void    changeHelpText(QString);
         void    lostFocus();
 
+    public slots:
+    
+        virtual void setText(const QString& text);
+    
     protected:
     
         virtual void focusInEvent(QFocusEvent *e);
@@ -165,7 +169,6 @@ class MythRemoteLineEdit : public QTextEdit
 
     private slots:
 
-        virtual void setText(const QString& text);
         void    startCycle(QString current_choice, QString set);
         void    updateCycle(QString current_choice, QString set);
         void    endCycle();
