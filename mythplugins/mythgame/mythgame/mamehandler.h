@@ -37,7 +37,7 @@ class MameHandler : public GameHandler
     void SetGeneralPrefs();
     void SetGameSettings(GameSettings &game_settings, MameRomInfo *rominfo);
     void SetDefaultSettings();
-    void LoadCatfile(map<QString, QString>* pCatMap);
+    bool LoadCatfile(map<QString, QString>* pCatMap);
 
     GameSettings defaultSettings;
     bool xmame_version_ok;

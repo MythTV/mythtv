@@ -80,6 +80,7 @@ void MameHandler::processGames()
                 chip[tmp_counter] = "";
         }
 
+        VERBOSE(VB_ALL, "Checking xmame version");
         check_xmame_exe();
         if (!xmame_version_ok) {
                 tmp_counter = 0;
@@ -88,10 +89,17 @@ void MameHandler::processGames()
                         tmp_counter++;
                 }
                 supported_games = 0;
+                VERBOSE(VB_GENERAL, "This version of xmame is not supported");
+                MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                          QObject::tr("Wrong xmame version."),
+                                          QObject::tr("This version of xmame "
+                                                      "is not supported."));
                 return;
         }
 
         /* Get number of supported games */
+        VERBOSE(VB_ALL, "Getting the number of supported games");
+
         makecmd_line("-list 2>/dev/null", &vrfycmd, NULL);
         xmame_info = popen(vrfycmd, "r");
 
@@ -111,23 +119,48 @@ void MameHandler::processGames()
         if (value)
             supported_games = atoi(value);
         else
+        {
+            VERBOSE(VB_ALL, "Failed to get supported games");
+            MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                      QObject::tr("Failed to get supported "
+                                                  "games."),
+                                      QObject::tr("MythTV was unable to "
+                                                  "retrieve the number of "
+                                                  "supported games.\nIs your "
+                                                  "path to xmame correct?"));
             return;
+        }
 
         /* Generate the list */
+        VERBOSE(VB_ALL, QString("This version of xmame supports %1 games... "
+                                "Getting the list.").arg(supported_games));
         makecmd_line("-listinfo 2>/dev/null", &infocmd, NULL);
         xmame_info = popen(infocmd, "r");
 
+        VERBOSE(VB_ALL, "Verifying the installed games.");
         makecmd_line("-verifyroms 2>/dev/null", &vrfycmd, NULL);
         xmame_vrfy = popen(vrfycmd, "r");
 
+        VERBOSE(VB_ALL, "Getting the list of source files associated with "
+                        "the various games.");
         makecmd_line("-listsourcefile 2>/dev/null", &drvcmd, NULL);
         xmame_drv = popen(drvcmd, "r");
 
         map<QString, QString> CatMap;
-        LoadCatfile(&CatMap);
- 
+        if (!LoadCatfile(&CatMap))
+        {
+            MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                      QObject::tr("Failed to read catver.ini"),
+                                      QObject::tr("MythTV was unable to read "
+                                                  "catver.ini.\nPlease enter "
+                                                  "the correct path and try "
+                                                  "again."));
+        }
+
+        VERBOSE(VB_ALL, "Looking for games..."); 
+
         MythProgressDialog pdial(QObject::tr("Looking for Mame games..."), 
-			supported_games);
+                                 supported_games);
 
         while (fgets(line, 500, xmame_info)) {
                 if (!strncmp(line, "game (", 6)) {
@@ -196,7 +229,7 @@ void MameHandler::processGames()
                         while (TRUE) {
                                 if (!fgets(line, 500, xmame_vrfy))
                                 {
-                                        cout << "breaking\n";
+                                        VERBOSE(VB_ALL, "breaking");
                                         break;
                                 }
                                 if (strstr(line, "romset")) {
@@ -255,10 +288,12 @@ void MameHandler::processGames()
                                         }
                                 }
                         }
+
                         rom = new MameRomInfo();
                         if (!rom)
                         {
-                            cout << "Out of memory while generating gamelist";
+                            VERBOSE(VB_ALL, "Out of memory while generating "
+                                            "gamelist");
                         }
 
                         /* Setting som default values */
@@ -399,6 +434,11 @@ void MameHandler::processGames()
                 }
 
         }
+
+        VERBOSE(VB_ALL, "Finished rom scan. Cleaning up");
+        VERBOSE(VB_ALL, "If the rom scan didn't detect any roms make sure "
+                        "your history and high score settings point to FILES "
+                        "not directories."); 
 
         pdial.Close();
 
@@ -712,7 +752,7 @@ void MameHandler::makecmd_line(const char * game, QString *exec, MameRomInfo * r
         if (!strcmp(general_prefs.xmame_display_target, "x11")) {
                 fullscreen = (game_settings.fullscreen == 1) ? " -x11-mode 1" :
                              " -fullscreen";
-                windowed = " -x11-mode 0";
+                windowed = " -x11-mode 3";
                 winkeys = " -winkeys";
                 nowinkeys = " -nowinkeys";
                 grabmouse = " -grabmouse";
@@ -991,12 +1031,14 @@ RomInfo* MameHandler::create_rominfo(RomInfo *parent)
     return new MameRomInfo(*parent);
 }
 
-void MameHandler::LoadCatfile(map<QString, QString>* pCatMap)
+bool MameHandler::LoadCatfile(map<QString, QString>* pCatMap)
 {
     QString CatFile = gContext->GetSetting("XMameCatFile");
+    VERBOSE(VB_GENERAL, QString("Loading xmame catfile from %1...")
+                               .arg(CatFile));
     fstream fin(CatFile.ascii(), ios::in);
     if (!fin.is_open())
-        return;
+        return false;
 
     string strLine;
     QString strKey;
@@ -1018,6 +1060,8 @@ void MameHandler::LoadCatfile(map<QString, QString>* pCatMap)
             }
         }
     }
+
+    return true;
 }   
 
 MameHandler* MameHandler::pInstance = 0;

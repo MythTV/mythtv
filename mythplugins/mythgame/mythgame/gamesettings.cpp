@@ -76,8 +76,8 @@ public:
     MameScoresLocation():
         GlobalSetting("MameScoresLocation") {
         setLabel(QObject::tr("MAME hiscores path"));
-        setValue("/var/lib/mythgame/highscores");
-        setHelpText(QObject::tr("Directory where MAME hiscores are kept."));
+        setValue("/var/lib/mythgame/hiscore.dat");
+        setHelpText(QObject::tr("The path to the MAME hiscore.dat file"));
     };
 };
 
@@ -106,9 +106,8 @@ public:
     MameHistoryLocation():
         GlobalSetting("MameHistoryLocation") {
         setLabel(QObject::tr("MAME history path"));
-        setValue("/var/lib/mythgame/history");
-        setHelpText(QObject::tr("Directory where MAME history files "
-                    "are kept."));
+        setValue("/var/lib/mythgame/history.dat");
+        setHelpText(QObject::tr("The path to the MAME history.dat file."));
     };
 };
 
@@ -118,7 +117,7 @@ public:
         GlobalSetting("MameCheatLocation") {
         setLabel(QObject::tr("MAME cheat files path"));
         setValue("");
-        setHelpText(QObject::tr("Directory where MAME cheat files are kept."));
+        setHelpText(QObject::tr("The path to the MAME cheat.dat file."));
     };
 };
 

@@ -76,7 +76,7 @@
     </message>
     <message>
         <source>Directory where MAME hiscores are kept.</source>
-        <translation>Sökväg till bibliotek där MAME-filer för toppnoteringar av poäng (highscore) lagras.</translation>
+        <translation type="obsolete">Sökväg till bibliotek där MAME-filer för toppnoteringar av poäng (highscore) lagras.</translation>
     </message>
     <message>
         <source>MAME flyers path</source>
@@ -100,7 +100,7 @@
     </message>
     <message>
         <source>Directory where MAME history files are kept.</source>
-        <translation>Sökväg till bibliotek där filer för MAME-historik lagras.</translation>
+        <translation type="obsolete">Sökväg till bibliotek där filer för MAME-historik lagras.</translation>
     </message>
     <message>
         <source>MAME cheat files path</source>
@@ -108,7 +108,7 @@
     </message>
     <message>
         <source>Directory where MAME cheat files are kept.</source>
-        <translation>Sökväg till bibliotek där fuskfiler för MAME lagras.</translation>
+        <translation type="obsolete">Sökväg till bibliotek där fuskfiler för MAME lagras.</translation>
     </message>
     <message>
         <source>Show disclaimer</source>
@@ -641,6 +641,52 @@
     <message>
         <source>sound page 2</source>
         <translation>ljud sida 2</translation>
+    </message>
+    <message>
+        <source>Show Only Favorites</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Limit games listed to only those tagged as &quot;favorite&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The path to the MAME hiscore.dat file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The path to the MAME history.dat file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The path to the MAME cheat.dat file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wrong xmame version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This version of xmame is not supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to get supported games.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV was unable to retrieve the number of supported games.
+Is your path to xmame correct?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to read catver.ini</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV was unable to read catver.ini.
+Please enter the correct path and try again.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
