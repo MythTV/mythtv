@@ -17,6 +17,7 @@ using namespace std;
 #include <qstring.h>
 #include <qdict.h>
 #include <qfile.h>
+#include <FLAC/all.h>
 
 #include "httprequest.h"
 #include "clientsocket.h"
@@ -45,6 +46,16 @@ class HttpResponse
                     int skip, 
                     FileSendTransformation transform = FILE_TRANSFORM_NONE
                  );
+
+
+    //
+    //  functions that are only of use for streaming out flac's as wav files
+    //
+    
+    FLAC__StreamDecoderWriteStatus flacWrite(const FLAC__Frame *frame, const FLAC__int32 *const buffer[]);
+    void                           flacMetadata(const FLAC__StreamMetadata *metadata);
+    void                           flacError(FLAC__StreamDecoderErrorStatus status);
+    
     
   private:
     
@@ -74,7 +85,17 @@ class HttpResponse
     
     QFile                  *file_to_send;
     FileSendTransformation file_transformation;
+
+    //
+    //  Some flac metadatadata values (yes, this is a cruddy place for this
+    //  to be)
+    //
     
+    int                     flac_bitspersample;
+    int                     flac_channels;
+    long                    flac_frequency;
+    unsigned long           flac_totalsamples;
+    MFDServiceClientSocket *flac_client;
 };
 
 #endif

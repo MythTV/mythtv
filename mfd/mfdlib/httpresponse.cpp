@@ -51,6 +51,17 @@ HttpResponse::HttpResponse(MFDHttpPlugin *owner, HttpRequest *requestor)
     stored_skip = 0;
     file_to_send = NULL;
     file_transformation = FILE_TRANSFORM_NONE;
+
+    //
+    //  flac stuff (only used if this response is going to end up streamins
+    //  a flac as a wav)
+    //
+    
+    flac_bitspersample = 0;
+    flac_channels = 0;
+    flac_frequency = 0;
+    flac_totalsamples = 0;
+    flac_client = NULL;
 }
 
 void HttpResponse::setError(int error_number)
@@ -282,7 +293,7 @@ void HttpResponse::createHeaderBlock(
                     if(parent)
                     {
                         parent->warning(QString("httpresponse is sending a range from "
-                                                "%1 to % 2 (size of %3), but "
+                                                "%1 to %2 (size of %3), but "
                                                 "the payload size is set to %4")
                                                 .arg(range_begin)
                                                 .arg(range_end)
@@ -332,6 +343,20 @@ void HttpResponse::createHeaderBlock(
            
     QString blank_line = QString("\r\n");
     addText(header_block, blank_line);
+    
+    
+    /*
+        Debuggin Output:
+
+    my_request->printHeaders();
+    cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& " << endl;
+    for(uint i = 0; i < header_block->size(); i++)
+    {
+        cout << header_block->at(i);
+    }
+    cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& " << endl;
+
+    */
 }
 
 
@@ -648,7 +673,7 @@ void HttpResponse::streamFile(MFDServiceClientSocket *which_client)
             if(parent)
             {
                 parent->log("httpresponse failed to send block "
-                            "while streaming file (client gone?)", 9);
+                            "while streaming ogg file (client gone?)", 9);
             }
 
             return;
@@ -670,12 +695,189 @@ void HttpResponse::streamFile(MFDServiceClientSocket *which_client)
                 //  Oh crap, we're shutting down
                 //
 
-                parent->log("httpresponse aborted reading a file to send because it thinks its time to shut down", 6);
+                parent->log(QString("httpresponse aborted reading a file "
+                                    "to send because it thinks its time "
+                                    "to shut down"), 6);
                 return;
             }
         }
     }
 }
+
+//
+//  *THREE* C functions that flac decoding (see below) needs to use because it
+//  uses callbacks
+//
+
+extern "C" FLAC__StreamDecoderWriteStatus flacWriteCallback(
+                                                            const FLAC__FileDecoder *flac_decoder, 
+                                                            const FLAC__Frame *frame, 
+                                                            const FLAC__int32 *const buffer[], 
+                                                            void *client_data
+                                                           )
+{
+    flac_decoder = flac_decoder;
+    HttpResponse *http_response = (HttpResponse *)client_data;
+    return http_response->flacWrite(frame, buffer);
+}
+
+
+extern "C" void flacMetadataCallback(
+                                    const FLAC__FileDecoder *decoder, 
+                                    const FLAC__StreamMetadata *metadata, 
+                                    void *client_data
+                                    )
+{
+    decoder = decoder;
+    HttpResponse *http_response = (HttpResponse *)client_data;
+    http_response->flacMetadata(metadata);
+}
+
+extern "C" void flacErrorCallback(
+                                    const FLAC__FileDecoder *decoder, 
+                                    FLAC__StreamDecoderErrorStatus status, 
+                                    void *client_data
+                                 )
+{
+    decoder = decoder;
+    HttpResponse *http_response = (HttpResponse *)client_data;
+    http_response->flacError(status);
+}
+
+
+//
+//  *THREE* corresponding object methods that do the real work of the
+//  *callbacks above
+//
+
+
+FLAC__StreamDecoderWriteStatus HttpResponse::flacWrite(
+                                                        const FLAC__Frame *frame, 
+                                                        const FLAC__int32 *const buffer[]
+                                                      )
+{
+
+    //
+    // First thing we do is check to see if we should be shutting down 
+    //
+    
+    if(parent)
+    {
+        if(!parent->keepGoing())
+        {
+            parent->warning("httpresponse interrupted \"flac as wav\" "
+                            "streaming as it is time to shut down ");
+            return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
+        }
+        
+    }
+    
+    //
+    //  make sure we have a client to send to
+    //
+    
+    if(!flac_client)
+    {
+        if(parent)
+        {
+            parent->warning("httpresponse could send flac PCM data as "
+                            "it has no pointer to a client");
+            return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
+        }
+    }
+    
+    
+    //
+    //  take the data we got from the decoder and munge into the right form
+    //  to send out the socket
+    //
+
+    unsigned int samples = frame->header.blocksize;
+
+
+    //
+    //  create a buffer just large enough to hold all the PCM data
+    //
+
+    int  buffer_length = samples * flac_channels * (flac_bitspersample / 8);
+    char *out_buffer = new char [buffer_length];
+    
+    buffer_length = 0;
+
+    unsigned int cursamp;
+    int sample;
+    int channel;
+
+
+    //
+    //  Stuff the data into the buffer
+    //
+
+    if (flac_bitspersample == 8)
+    {
+        for (cursamp = 0; cursamp < samples; cursamp++)
+        {
+            for (channel = 0; channel < flac_channels; channel++)
+            {
+               sample = (FLAC__int8)buffer[channel][cursamp];
+               *(out_buffer + buffer_length++) = ((sample >> 0) & 0xff);
+            }
+        }   
+    }
+    else if (flac_bitspersample == 16)
+    {
+        for (cursamp = 0; cursamp < samples; cursamp++)
+        {
+            for (channel = 0; channel < flac_channels; channel++)
+            { 
+               sample = (FLAC__int16)buffer[channel][cursamp];             
+               *(out_buffer + buffer_length++) = ((sample >> 0) & 0xff);
+               *(out_buffer + buffer_length++) = ((sample >> 8) & 0xff);
+            }
+        }
+    }
+    
+    //
+    //  Send the buffer (PCM) data down the socket
+    //
+
+    payload.clear();
+    payload.insert(payload.begin(), out_buffer, out_buffer + buffer_length);
+    if(!sendBlock(flac_client, payload))
+    {
+        if(parent)
+        {
+            parent->log("httpresponse failed to send block while streaming "
+                        "flac file (client gone?)", 9);
+        }
+        delete [] out_buffer;
+        return FLAC__STREAM_DECODER_WRITE_STATUS_ABORT;
+    }
+
+    delete [] out_buffer;
+    return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
+}
+
+void HttpResponse::flacMetadata(const FLAC__StreamMetadata *metadata)
+{
+    flac_bitspersample = metadata->data.stream_info.bits_per_sample;
+    flac_channels      = metadata->data.stream_info.channels;
+    flac_frequency     = metadata->data.stream_info.sample_rate;
+    flac_totalsamples  = metadata->data.stream_info.total_samples;
+}
+
+void HttpResponse::flacError(FLAC__StreamDecoderErrorStatus status)
+{
+    status = status;
+    
+    if(parent)
+    {
+        parent->log("httpresponse got an error during flac "
+                    "decoding, but will try to continue", 3);
+    }
+}
+
+
 
 void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_client)
 {
@@ -737,8 +939,6 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
         //
         //  Do some calculations to deal with range requests. 
         //
-        
-        range_begin = stored_skip;
 
         range_begin = stored_skip;
         range_end = final_file_size - 1;
@@ -756,7 +956,7 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
         {
             if(parent)
             {
-                parent->warning("client asked to seek in an wav "
+                parent->warning("client asked to seek in an ogg "
                                 "stream to somewhere inside the "
                                 "header");
             }
@@ -817,7 +1017,7 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
                 if(parent)
                 {
                     parent->warning("httpresponse was not able to send "
-                                    "a wav header");
+                                    "a wav header for an ogg");
                 }
                 ov_clear(&ov_file);
                 return;
@@ -923,14 +1123,302 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
             {
                 if(parent)
                 {
-                    parent->warning(QString("httpresponse found hole in an ogg "
-                                            "file ... will try to keep going"));
+                    parent->warning(QString("httpresponse found a hole in an "
+                                            "ogg file, will try to keep going"));
                 }
             }
         }
         
         ov_clear(&ov_file);
     }
+    else if(
+            file_to_send->name().section(".", -1, -1) == "flac" ||
+            file_to_send->name().section(".", -1, -1) == "fla"
+           )
+    {
+        //
+        //  Decode and send a flac.
+        //
+        
+        FLAC__FileDecoder *flac_decoder = FLAC__file_decoder_new();
+        flac_client = which_client;
+
+        //
+        //  Setup the decoder with the file to decode and all the silly
+        //  callbacks
+        //
+
+        if(!FLAC__file_decoder_set_md5_checking(flac_decoder, false))
+        {
+            if(parent)
+            {
+                parent->warning("httpresponse failed to turn of md5 checking on a flac file");
+            }
+            FLAC__file_decoder_delete(flac_decoder);
+            streamEmptyWav(which_client);
+            return;
+        }        
+
+        if(!FLAC__file_decoder_set_filename(flac_decoder, file_to_send->name().ascii()))
+        {
+            if(parent)
+            {
+               parent->warning("httpresponse failed to set a filename for a flac decode");
+            }
+            FLAC__file_decoder_delete(flac_decoder);
+            streamEmptyWav(which_client);
+            return;
+        }
+
+        if(!FLAC__file_decoder_set_write_callback(flac_decoder, flacWriteCallback))
+        {
+            if(parent)
+            {
+               parent->warning("httpresponse failed to set a flac write callback");
+            }
+            FLAC__file_decoder_delete(flac_decoder);
+            streamEmptyWav(which_client);
+            return;
+        }        
+        
+        if(!FLAC__file_decoder_set_metadata_callback(flac_decoder, flacMetadataCallback))
+        {
+            if(parent)
+            {
+               parent->warning("httpresponse failed to set a flac metadata callback");
+            }
+            FLAC__file_decoder_delete(flac_decoder);
+            streamEmptyWav(which_client);
+            return;
+        }
+
+        if(!FLAC__file_decoder_set_error_callback(flac_decoder, flacErrorCallback))
+        {
+            if(parent)
+            {
+               parent->warning("httpresponse failed to set a flac error callback");
+            }
+            FLAC__file_decoder_delete(flac_decoder);
+            streamEmptyWav(which_client);
+            return;
+        }
+
+        if(!FLAC__file_decoder_set_client_data(flac_decoder, this))
+        {
+            if(parent)
+            {
+               parent->warning("httpresponse failed to set flac client data");
+            }
+            FLAC__file_decoder_delete(flac_decoder);
+            streamEmptyWav(which_client);
+            return;
+        }
+
+        if(FLAC__file_decoder_init(flac_decoder) != FLAC__FILE_DECODER_OK)
+        {
+            if(parent)
+            {
+               parent->warning("httpresponse failed to init flac decoder");
+            }
+            FLAC__file_decoder_delete(flac_decoder);
+            streamEmptyWav(which_client);
+            return;
+        }
+
+
+        //
+        //  Tell the decoder to read in metadata (execution will jump to
+        //  flacMetadata(), then come back here). We need the metadata to
+        //  calculate the size of the file once decoded (so that we can
+        //  build the HTTP headers with a Content-Length: setting).
+        //
+
+        if(!FLAC__file_decoder_process_until_end_of_metadata(flac_decoder))
+        {
+            if(parent)
+            {
+               parent->warning("httpresponse failed to extract flac metadata");
+            }
+            FLAC__file_decoder_finish (flac_decoder);
+            FLAC__file_decoder_delete(flac_decoder);
+            streamEmptyWav(which_client);
+            return;
+        }
+        
+        //
+        //  Check that we got "sensible" metadata.
+        //
+        
+        if(
+            flac_bitspersample == 0 ||
+            flac_channels == 0 ||
+            flac_frequency == 0 ||
+            flac_totalsamples == 0
+          )
+        {
+            if(parent)
+            {
+               parent->warning("httpresponse did not get sensible flac metadata");
+            }
+            FLAC__file_decoder_finish (flac_decoder);
+            FLAC__file_decoder_delete(flac_decoder);
+            streamEmptyWav(which_client);
+            return;
+        }
+        
+        //
+        //  Figure out the PCM length of this file with the 44 bytes
+        //  required for a WAV header. I (thor) have no idea if this
+        //  math is correct, but it seems to work for 16 bit 2 channel
+        //  flacs at 44100.
+        //
+        
+        int64_t final_file_size = 44 +
+                                ((
+                                flac_totalsamples *
+                                flac_channels *
+                                flac_bitspersample
+                                ) / 8 );
+
+
+        //
+        //  Handle range requests (seeking)
+        //
+        
+        range_begin = stored_skip;
+        range_end = final_file_size - 1;
+        
+        if(range_end < 0)
+        {
+            range_end = 0;
+        }
+        if(range_begin > range_end)
+        {
+            range_begin = 0;
+        }
+
+        total_possible_range = final_file_size;
+
+        if(range_begin > 0 && range_begin < 44)
+        {
+            if(parent)
+            {
+                parent->warning("client asked to seek in a flac "
+                                "stream to somewhere inside the "
+                                "header");
+            }
+            range_begin = 44;
+        }
+        
+        //
+        //  We now know how big the file will be. Send the HTTP header.
+        //
+        
+        header_block.clear();
+        createHeaderBlock(&header_block, ((int) (range_end - range_begin) + 1));
+        if(!sendBlock(which_client, header_block))
+        {
+            if(parent)
+            {
+                parent->warning("httpresponse was not able to send "
+                                "an http header for a flac stream");
+            }
+            FLAC__file_decoder_finish (flac_decoder);
+            FLAC__file_decoder_delete(flac_decoder);
+            return;
+        }
+        
+        //
+        //  Seek to where we need to be
+        //
+
+        if(range_begin > 43 && flac_channels > 0)
+        {
+            FLAC__uint64 seek_position = (range_begin - 44) 
+                                         /
+                                         ((
+                                            flac_channels *
+                                            flac_bitspersample
+                                         ) / 8); 
+            
+            if(!FLAC__file_decoder_seek_absolute(flac_decoder, seek_position))
+            {
+                if(parent)
+                {
+                    parent->warning("httpresponse could not seek in a flac "
+                                    "file it was trying to stream");
+                }
+                FLAC__file_decoder_finish (flac_decoder);
+                FLAC__file_decoder_delete(flac_decoder);
+                
+                streamEmptyWav(which_client);
+                return;
+            }
+        }
+
+        if(range_begin == 0)
+        {
+            //
+            //  Build the wav header, but only if the client hasn't already
+            //  asked to seek to a point beyond it
+            //
+        
+            unsigned char headbuf[44];
+
+            int bits = flac_bitspersample;
+            int channels = flac_channels;
+            int samplerate = flac_frequency;
+            int bytespersec = (flac_channels * samplerate * flac_bitspersample )/8;
+            int align = channels*bits/8;
+            int samplesize = bits;
+                   
+            memcpy(headbuf, "RIFF", 4);
+            WRITE_U32(headbuf+4, final_file_size-8);
+            memcpy(headbuf+8, "WAVE", 4);
+            memcpy(headbuf+12, "fmt ", 4);
+            WRITE_U32(headbuf+16, 16);
+            WRITE_U16(headbuf+20, 1); /* format */
+            WRITE_U16(headbuf+22, channels);
+            WRITE_U32(headbuf+24, samplerate);
+            WRITE_U32(headbuf+28, bytespersec);
+            WRITE_U16(headbuf+32, align);
+            WRITE_U16(headbuf+34, samplesize);
+            memcpy(headbuf+36, "data", 4);
+            WRITE_U32(headbuf+40, final_file_size - 44);
+
+            payload.clear();
+            payload.insert(payload.begin(), headbuf, headbuf + 44);
+            if(!sendBlock(which_client, payload))
+            {
+                if(parent)
+                {
+                    parent->warning("httpresponse was not able to send "
+                                    "a wav header for a flac");
+                }
+                FLAC__file_decoder_finish (flac_decoder);
+                FLAC__file_decoder_delete(flac_decoder);
+                return;
+            }
+        }
+        
+        //
+        //  OK ... HTTP header sent, first bit of payload (wav header) sent
+        //  if client was seek'd to beginning, now we need to actually
+        //  stream out the PCM samples. This efficitvely turns control over
+        //  to the flacWrite() function (above).
+        //
+        
+        FLAC__file_decoder_process_until_end_of_file(flac_decoder);        
+        
+        //
+        //  Shut stuff down
+        //
+
+        FLAC__file_decoder_finish (flac_decoder);
+        FLAC__file_decoder_delete(flac_decoder);
+
+        return;
+    }    
     else
     {
         if(parent)
@@ -948,6 +1436,7 @@ void HttpResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_clien
 
 void HttpResponse::streamEmptyWav(MFDServiceClientSocket *which_client)
 {
+
     //
     //  If we get an error while trying to set up a file for conversion to a
     //  wav, we call this function which just sends an empty (actually, a
@@ -956,18 +1445,25 @@ void HttpResponse::streamEmptyWav(MFDServiceClientSocket *which_client)
     //  file.
     //
     
+
+    //
+    //  This file_size needs to be big enough for the client to swallow
+    //  (fill it's buffers enough that it starts trying to parse it).
+    //
+
     static int file_size = 8192;
+
+
     std::vector<char> header_block;
+    range_begin = -1;
+    range_end = -1;
+    total_possible_range = -1;
     header_block.clear();
     createHeaderBlock(&header_block, file_size);
     if(sendBlock(which_client, header_block))
     {
         if(range_begin == 0)
         {
-            //
-            //  Build the wav header, but only if the client hasn't already
-            //  asked to seek to a point beyond it
-            //
         
             char headbuf[file_size];
 
@@ -985,7 +1481,7 @@ void HttpResponse::streamEmptyWav(MFDServiceClientSocket *which_client)
             memcpy(headbuf+36, "data", 4);
             WRITE_U32(headbuf+40, file_size - 44);
             
-            for(int i = 44; i < file_size; i = i + 2)
+            for(int i = 44; i < file_size - 1; i = i + 2)
             {
                 WRITE_U16(headbuf + i, 0);
             }
