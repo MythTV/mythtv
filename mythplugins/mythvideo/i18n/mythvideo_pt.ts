@@ -1,36 +1,5 @@
 <!DOCTYPE TS><TS>
 <context>
-    <name>@default</name>
-    <message>
-        <source>Parental Pin:</source>
-        <translation type="obsolete">Código de Acesso:</translation>
-    </message>
-    <message>
-        <source>Searching for video files</source>
-        <translation type="obsolete">A procurar ficheiros de filmes</translation>
-    </message>
-    <message>
-        <source>Updating video database</source>
-        <translation type="obsolete">A actualizar a base de dados de filmes</translation>
-    </message>
-    <message>
-        <source>No Cover</source>
-        <translation type="obsolete">Sem Capa</translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation type="obsolete">Desconhecido</translation>
-    </message>
-    <message>
-        <source>None</source>
-        <translation type="obsolete">Nenhum</translation>
-    </message>
-    <message>
-        <source>NR</source>
-        <translation type="obsolete">SC</translation>
-    </message>
-</context>
-<context>
     <name>EditMetadataDialog</name>
     <message>
         <source>Level %1</source>
@@ -115,14 +84,6 @@
         <translation>Cõdigo de Acesso</translation>
     </message>
     <message>
-        <source>This PIN is used to control the current Parental Level. If you want to use this feature, then setting the value to all numbers will make your life much easier. If you don&apos;t want to be bothered by PC dialogs, please set it to be blank.</source>
-        <translation type="obsolete">Este código é usado para controlar o nível de acesso. Se desejar usar esta funcionalidade, configure este valor apenas com números para ser mais fácil a introdução com controlos remotos. Deixe em branco para desactivar.</translation>
-    </message>
-    <message>
-        <source>Aggresive Parental Control</source>
-        <translation type="obsolete">Controlo de Acesso Agressivo</translation>
-    </message>
-    <message>
         <source>If set, you will not be able to return to this screen and reset the Parental PIN without first entering the current PIN. You have been warned.</source>
         <translation>Se activar, só conseguirá aceder às configurações se introduzir o Código de Acesso. Cuidado.</translation>
     </message>
@@ -147,14 +108,6 @@
         <translation>Comando Padrão</translation>
     </message>
     <message>
-        <source>/usr/bin/mplayer -fs -zoom -quiet -vo xv %s</source>
-        <translation type="obsolete">/usr/bin/mplayer -fs -zoom -quiet -vo xv -alang pt -slang pt %s</translation>
-    </message>
-    <message>
-        <source>This is the command used for any file that the extension is not specifically defined.</source>
-        <translation type="obsolete">Este é o comando a ser executado para todos os ficheiros que não estejam definidos especificamente.</translation>
-    </message>
-    <message>
         <source>General Settings</source>
         <translation>Configurações Globais</translation>
     </message>
@@ -167,14 +120,6 @@
         <translation>Código de Acesso:</translation>
     </message>
     <message>
-        <source>Searching for video files</source>
-        <translation type="obsolete">A procurar ficheiros de filmes</translation>
-    </message>
-    <message>
-        <source>Updating video database</source>
-        <translation type="obsolete">A actualizar a base de dados de filmes</translation>
-    </message>
-    <message>
         <source>No Cover</source>
         <translation>Sem Capa</translation>
     </message>
@@ -185,10 +130,6 @@
     <message>
         <source>None</source>
         <translation>Nenhum</translation>
-    </message>
-    <message>
-        <source>NR</source>
-        <translation type="obsolete">SC</translation>
     </message>
     <message>
         <source>Unknown Rating</source>
@@ -351,18 +292,6 @@
         <translation>Chave IMDB:</translation>
     </message>
     <message>
-        <source>0-9: Edit</source>
-        <translation type="obsolete">0-9: Editar</translation>
-    </message>
-    <message>
-        <source>Menu/Info: Manual IMDB</source>
-        <translation type="obsolete">Menu/Info: IMDB Manual</translation>
-    </message>
-    <message>
-        <source>Enter/OK: Auto IMDB</source>
-        <translation type="obsolete">Enter/OK: IMDB Automático</translation>
-    </message>
-    <message>
         <source>retrieving data...</source>
         <translation>A obter a informação...</translation>
     </message>
@@ -381,10 +310,6 @@
     <message>
         <source>No Videos Found</source>
         <translation>Não foram encontrados nenhuns filmes</translation>
-    </message>
-    <message>
-        <source>Use the left and right arrows</source>
-        <translation type="obsolete">Use os cursores Esquerda e Direita</translation>
     </message>
     <message>
         <source>Directed by</source>
@@ -546,14 +471,6 @@
 <context>
     <name>VideoBrowser</name>
     <message>
-        <source>Parental Pin:</source>
-        <translation type="obsolete">Código de Acesso:</translation>
-    </message>
-    <message>
-        <source>The law of the exluded middle is officially OVER!</source>
-        <translation type="obsolete">A vida não é a preto e branco, tambem existem os cinzentos!</translation>
-    </message>
-    <message>
         <source>%1 of %2</source>
         <translation>%1 de %2</translation>
     </message>
@@ -678,16 +595,8 @@
 <context>
     <name>VideoManager</name>
     <message>
-        <source>Sorry there were no matches for the title</source>
-        <translation type="obsolete">Sem resultados para este título</translation>
-    </message>
-    <message>
         <source>Manually Enter IMDB #</source>
         <translation type="unfinished">Introduza Chave IMDB #</translation>
-    </message>
-    <message>
-        <source>Reset Entry</source>
-        <translation type="obsolete">Limpar Entrada</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -704,10 +613,6 @@
     <message>
         <source>No</source>
         <translation>Não</translation>
-    </message>
-    <message>
-        <source>Local</source>
-        <translation type="obsolete">Local</translation>
     </message>
     <message>
         <source>No Cover</source>

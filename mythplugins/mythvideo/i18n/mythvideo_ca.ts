@@ -84,14 +84,6 @@
         <translation>PIN de control d&apos;accès</translation>
     </message>
     <message>
-        <source>This PIN is used to control the current Parental Level. If you want to use this feature, then setting the value to all numbers will make your life much easier. If you don&apos;t want to be bothered by PC dialogs, please set it to be blank.</source>
-        <translation type="obsolete">Aquest PIN es fa servir per al control d&apos;accès parental. So vol activar aquesta funció utilitzi números, li resultarà més senzill. Si no vol ser molestat amb diàlegs sol·licitant el PIN, no hi assigni cap valor.</translation>
-    </message>
-    <message>
-        <source>Aggresive Parental Control</source>
-        <translation type="obsolete">Control d&apos;accès estricte</translation>
-    </message>
-    <message>
         <source>If set, you will not be able to return to this screen and reset the Parental PIN without first entering the current PIN. You have been warned.</source>
         <translation>Si està actiu, no podrà retornar a aquesta pantalla i reinicialitzar el PIN de control d&apos;accès sense avans entrar el PIN actual. És un avís.</translation>
     </message>
@@ -112,10 +104,6 @@
         <translation>Si està actiu, la pantalla que llista els vídeos visualitzará tots els arxius del directori de MythVideo encara que no hagin estat escanejats.</translation>
     </message>
     <message>
-        <source>This is the command used for any file that the extension is not specifically defined.</source>
-        <translation type="obsolete">Aquesta és la comanda emprada per a les extensions no definides.</translation>
-    </message>
-    <message>
         <source>General Settings</source>
         <translation>Opcions Generals</translation>
     </message>
@@ -126,14 +114,6 @@
     <message>
         <source>Parental Pin:</source>
         <translation>Pin d&apos;accés:</translation>
-    </message>
-    <message>
-        <source>Searching for video files</source>
-        <translation type="obsolete">Cercant arxius de vídeo</translation>
-    </message>
-    <message>
-        <source>Updating video database</source>
-        <translation type="obsolete">Actualitzant base de dades de vídeos</translation>
     </message>
     <message>
         <source>No Cover</source>
@@ -308,18 +288,6 @@
         <translation>Caràtula:</translation>
     </message>
     <message>
-        <source>0-9: Edit</source>
-        <translation type="obsolete">0-9: Editar</translation>
-    </message>
-    <message>
-        <source>Menu/Info: Manual IMDB</source>
-        <translation type="obsolete">Menu/Info: IMDB Manual</translation>
-    </message>
-    <message>
-        <source>Enter/OK: Auto IMDB</source>
-        <translation type="obsolete">Enter/OK: IMDB automatisch</translation>
-    </message>
-    <message>
         <source>retrieving data...</source>
         <translation>obtenint informació...</translation>
     </message>
@@ -338,10 +306,6 @@
     <message>
         <source>No Videos Found</source>
         <translation>No trovo vídeos</translation>
-    </message>
-    <message>
-        <source>Use the left and right arrows</source>
-        <translation type="obsolete">Cursor esq/dreta per navegar</translation>
     </message>
     <message>
         <source>Directed by</source>
@@ -507,10 +471,6 @@
 <context>
     <name>VideoBrowser</name>
     <message>
-        <source>Parental Pin:</source>
-        <translation type="obsolete">PIN de control d&apos;accès:</translation>
-    </message>
-    <message>
         <source>%1 of %2</source>
         <translation>%1 de %2</translation>
     </message>
@@ -635,16 +595,8 @@
 <context>
     <name>VideoManager</name>
     <message>
-        <source>Sorry there were no matches for the title</source>
-        <translation type="obsolete">Ho sento, no s&apos;han trovat coincidències per a aquest títol</translation>
-    </message>
-    <message>
         <source>Manually Enter IMDB #</source>
         <translation type="unfinished">Especificar manualment entrada IMDB#</translation>
-    </message>
-    <message>
-        <source>Reset Entry</source>
-        <translation type="obsolete">Reiniciar entrada</translation>
     </message>
     <message>
         <source>Cancel</source>

@@ -84,14 +84,6 @@
         <translation>PIN de control de acceso</translation>
     </message>
     <message>
-        <source>This PIN is used to control the current Parental Level. If you want to use this feature, then setting the value to all numbers will make your life much easier. If you don&apos;t want to be bothered by PC dialogs, please set it to be blank.</source>
-        <translation type="obsolete">Este PIN se usa para el control parental de acceso. Si quiere activar esta función, le será más fácil emplear números. Si no quiere que le molesten diálogos solicitando el PIN, déjelo en blanco.</translation>
-    </message>
-    <message>
-        <source>Aggresive Parental Control</source>
-        <translation type="obsolete">Control parental estricto</translation>
-    </message>
-    <message>
         <source>If set, you will not be able to return to this screen and reset the Parental PIN without first entering the current PIN. You have been warned.</source>
         <translation>Si se activa, no podrá volver a esta pantalla sin volver a introducir su PIN. Está avisado.</translation>
     </message>
@@ -112,10 +104,6 @@
         <translation>Si se activa, la Lista de Vídeos visualizará cualquier archivo encontrado a partir del directorio inicial de MythVideo.</translation>
     </message>
     <message>
-        <source>This is the command used for any file that the extension is not specifically defined.</source>
-        <translation type="obsolete">ESte es el comando a emplear cuando la extensión no está explícitamente definida.</translation>
-    </message>
-    <message>
         <source>General Settings</source>
         <translation>Configuración general</translation>
     </message>
@@ -126,14 +114,6 @@
     <message>
         <source>Parental Pin:</source>
         <translation>PIN de acceso:</translation>
-    </message>
-    <message>
-        <source>Searching for video files</source>
-        <translation type="obsolete">Buscando ficheros de vídeo</translation>
-    </message>
-    <message>
-        <source>Updating video database</source>
-        <translation type="obsolete">Actualizando la base de datos de vídeos</translation>
     </message>
     <message>
         <source>No Cover</source>
@@ -304,18 +284,6 @@
         <translation>Carátula:</translation>
     </message>
     <message>
-        <source>0-9: Edit</source>
-        <translation type="obsolete">0-9: Editar</translation>
-    </message>
-    <message>
-        <source>Menu/Info: Manual IMDB</source>
-        <translation type="obsolete">Menu/Info: IMDB Manual</translation>
-    </message>
-    <message>
-        <source>Enter/OK: Auto IMDB</source>
-        <translation type="obsolete">Enter/OK: IMDB Automático</translation>
-    </message>
-    <message>
         <source>retrieving data...</source>
         <translation>obteniendo información...</translation>
     </message>
@@ -334,10 +302,6 @@
     <message>
         <source>No Videos Found</source>
         <translation>No encuentro vídeos</translation>
-    </message>
-    <message>
-        <source>Use the left and right arrows</source>
-        <translation type="obsolete">Cursor izq/der para navegar</translation>
     </message>
     <message>
         <source>Directed by</source>
@@ -507,10 +471,6 @@
 <context>
     <name>VideoBrowser</name>
     <message>
-        <source>Parental Pin:</source>
-        <translation type="obsolete">PIN de acceso:</translation>
-    </message>
-    <message>
         <source>%1 of %2</source>
         <translation>%1 de %2</translation>
     </message>
@@ -635,16 +595,8 @@
 <context>
     <name>VideoManager</name>
     <message>
-        <source>Sorry there were no matches for the title</source>
-        <translation type="obsolete">Lo siento, no encuentro coincidencias para este título</translation>
-    </message>
-    <message>
         <source>Manually Enter IMDB #</source>
         <translation type="unfinished">Especificar manualmente el IMDB#</translation>
-    </message>
-    <message>
-        <source>Reset Entry</source>
-        <translation type="obsolete">Reiniciar entrada</translation>
     </message>
     <message>
         <source>Cancel</source>

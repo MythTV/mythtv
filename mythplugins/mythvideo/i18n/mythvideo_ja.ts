@@ -1,12 +1,5 @@
 <!DOCTYPE TS><TS>
 <context>
-    <name>Dirlist</name>
-    <message>
-        <source>(Up one level)</source>
-        <translation type="obsolete">(1レベル上がる)</translation>
-    </message>
-</context>
-<context>
     <name>EditMetadataDialog</name>
     <message>
         <source>Level %1</source>
@@ -91,10 +84,6 @@
         <translation>再生制限制御ピン</translation>
     </message>
     <message>
-        <source>Aggresive Parental Control</source>
-        <translation type="obsolete">積極的な再生制限制御</translation>
-    </message>
-    <message>
         <source>If set, you will not be able to return to this screen and reset the Parental PIN without first entering the current PIN. You have been warned.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -115,10 +104,6 @@
         <translation>これをセットすると、MythVideoの開始ディレクトリで関連の有るファイルをスキャンされてなくても表示します。</translation>
     </message>
     <message>
-        <source>This is the command used for any file that the extension is not specifically defined.</source>
-        <translation type="obsolete">拡張子が設定されていないときに使用されるコマンド。</translation>
-    </message>
-    <message>
         <source>General Settings</source>
         <translation>全般設定</translation>
     </message>
@@ -129,14 +114,6 @@
     <message>
         <source>Parental Pin:</source>
         <translation>再生制限ピン:</translation>
-    </message>
-    <message>
-        <source>Searching for video files</source>
-        <translation type="obsolete">ビデオファイルの検索</translation>
-    </message>
-    <message>
-        <source>Updating video database</source>
-        <translation type="obsolete">ビデオデータベースを更新中</translation>
     </message>
     <message>
         <source>No Cover</source>
@@ -316,18 +293,6 @@
         <translation>IMDB番号:</translation>
     </message>
     <message>
-        <source>0-9: Edit</source>
-        <translation type="obsolete">0-9: 編集</translation>
-    </message>
-    <message>
-        <source>Menu/Info: Manual IMDB</source>
-        <translation type="obsolete">メニュー/情報: IMDB入力</translation>
-    </message>
-    <message>
-        <source>Enter/OK: Auto IMDB</source>
-        <translation type="obsolete">Enter/OK: 自動IMDB</translation>
-    </message>
-    <message>
         <source>retrieving data...</source>
         <translation>データ取得中...</translation>
     </message>
@@ -346,10 +311,6 @@
     <message>
         <source>No Videos Found</source>
         <translation>ビデオファイルを削除できませんでした</translation>
-    </message>
-    <message>
-        <source>Use the left and right arrows</source>
-        <translation type="obsolete">左右キーを使用してください</translation>
     </message>
     <message>
         <source>Directed by</source>
@@ -476,18 +437,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>MENU: Options</source>
-        <translation type="obsolete">メニュー: オプション</translation>
-    </message>
-    <message>
-        <source>Up/Down, Page Up/Down - Browse</source>
-        <translation type="obsolete">Up/Down, Page Up/Down - 表示</translation>
-    </message>
-    <message>
-        <source>Menu - Options</source>
-        <translation type="obsolete">メニュー - オプション</translation>
-    </message>
-    <message>
         <source>Parental</source>
         <translation>再生制限</translation>
     </message>
@@ -523,10 +472,6 @@
 <context>
     <name>VideoBrowser</name>
     <message>
-        <source>Parental Pin:</source>
-        <translation type="obsolete">再生制限ピン:</translation>
-    </message>
-    <message>
         <source>%1 of %2</source>
         <translation>%1 / %2</translation>
     </message>
@@ -543,10 +488,6 @@
         <translation>分</translation>
     </message>
     <message>
-        <source>Select action</source>
-        <translation type="obsolete">動作選択</translation>
-    </message>
-    <message>
         <source>Watch This Video</source>
         <translation>このビデオを見る</translation>
     </message>
@@ -557,10 +498,6 @@
     <message>
         <source>Filter Display</source>
         <translation>表示絞りこみ</translation>
-    </message>
-    <message>
-        <source>Switch to Video Listings</source>
-        <translation type="obsolete">ビデオリストに切替える</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -659,16 +596,8 @@
 <context>
     <name>VideoManager</name>
     <message>
-        <source>Sorry there were no matches for the title</source>
-        <translation type="obsolete">該当するタイトルがありません｡</translation>
-    </message>
-    <message>
         <source>Manually Enter IMDB #</source>
         <translation>IMDB番号を入力する</translation>
-    </message>
-    <message>
-        <source>Reset Entry</source>
-        <translation type="obsolete">エントリーをリセットする</translation>
     </message>
     <message>
         <source>Cancel</source>

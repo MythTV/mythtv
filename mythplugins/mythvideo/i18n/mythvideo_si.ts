@@ -92,10 +92,6 @@
         <translation>Seznami</translation>
     </message>
     <message>
-        <source>The defualt view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
-        <translation type="obsolete">Privzeti pogled MythVidea. Ostali pogledi so dosegljivi preko popup menuja z MENU tipko.</translation>
-    </message>
-    <message>
         <source>Parental Control PIN</source>
         <translation>Originalna PIN kontrola</translation>
     </message>
@@ -220,14 +216,6 @@
         <translation>Originalni PIN:</translation>
     </message>
     <message>
-        <source>Searching for video files</source>
-        <translation type="obsolete">Iskanje video datotek</translation>
-    </message>
-    <message>
-        <source>Updating video database</source>
-        <translation type="obsolete">Nadgrajevanje video baze</translation>
-    </message>
-    <message>
         <source>No Cover</source>
         <translation>Ni ovitka</translation>
     </message>
@@ -238,10 +226,6 @@
     <message>
         <source>None</source>
         <translation>Nobeden</translation>
-    </message>
-    <message>
-        <source>NR</source>
-        <translation type="obsolete">NR</translation>
     </message>
     <message>
         <source>Unknown Rating</source>
@@ -317,10 +301,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>MENU: Options</source>
-        <translation type="obsolete">MENU: Možnosti</translation>
-    </message>
-    <message>
         <source>retrieving data...</source>
         <translation>sprejemanje podatkov...</translation>
     </message>
@@ -339,14 +319,6 @@
     <message>
         <source>No Videos Found</source>
         <translation>Ni najdenih videov</translation>
-    </message>
-    <message>
-        <source>Up/Down, Page Up/Down - Browse</source>
-        <translation type="obsolete">Gor/Dol, Stran Gor/Dol - Brskanje</translation>
-    </message>
-    <message>
-        <source>Menu - Options</source>
-        <translation type="obsolete">Menu - možnosti</translation>
     </message>
     <message>
         <source>Parental</source>

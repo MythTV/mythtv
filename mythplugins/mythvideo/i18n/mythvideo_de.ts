@@ -116,14 +116,6 @@
         <translation>Kindersicherungs-PIN:</translation>
     </message>
     <message>
-        <source>Searching for video files</source>
-        <translation type="obsolete">Suche nach Videodateien</translation>
-    </message>
-    <message>
-        <source>Updating video database</source>
-        <translation type="obsolete">Aktualisiere Videodatenbank</translation>
-    </message>
-    <message>
         <source>No Cover</source>
         <translation>Kein Cover</translation>
     </message>
@@ -134,10 +126,6 @@
     <message>
         <source>None</source>
         <translation>Nicht vorhanden</translation>
-    </message>
-    <message>
-        <source>NR</source>
-        <translation type="obsolete">Unbewertet</translation>
     </message>
     <message>
         <source>Unknown Rating</source>

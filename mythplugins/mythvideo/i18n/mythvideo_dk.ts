@@ -304,10 +304,6 @@
         <translation>Ingen videoer fundet</translation>
     </message>
     <message>
-        <source>Use the left and right arrows</source>
-        <translation type="obsolete">Brug venstre og højre piletast</translation>
-    </message>
-    <message>
         <source>Directed by</source>
         <translation>Instrueret af:</translation>
     </message>

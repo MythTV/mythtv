@@ -120,14 +120,6 @@
         <translation>PIN-kod (barnlås):</translation>
     </message>
     <message>
-        <source>Searching for video files</source>
-        <translation type="obsolete">Söker efter videofiler</translation>
-    </message>
-    <message>
-        <source>Updating video database</source>
-        <translation type="obsolete">Uppdaterar filmdatabasen</translation>
-    </message>
-    <message>
         <source>No Cover</source>
         <translation>Ingen omslagsbild</translation>
     </message>
@@ -138,10 +130,6 @@
     <message>
         <source>None</source>
         <translation>Inga</translation>
-    </message>
-    <message>
-        <source>NR</source>
-        <translation type="obsolete">Oklassificerad</translation>
     </message>
     <message>
         <source>Unknown Rating</source>
@@ -258,7 +246,7 @@
     </message>
     <message>
         <source>videos</source>
-        <translation type="unfinished"></translation>
+        <translation>filmer</translation>
     </message>
 </context>
 <context>

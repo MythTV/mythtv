@@ -116,14 +116,6 @@
         <translation>&apos;Parental PIN&apos;:</translation>
     </message>
     <message>
-        <source>Searching for video files</source>
-        <translation type="obsolete">Zoek naar videobestanden</translation>
-    </message>
-    <message>
-        <source>Updating video database</source>
-        <translation type="obsolete">Bezig met bijwerken film-databank</translation>
-    </message>
-    <message>
         <source>No Cover</source>
         <translation>Geen Cover</translation>
     </message>
@@ -134,10 +126,6 @@
     <message>
         <source>None</source>
         <translation>Geen</translation>
-    </message>
-    <message>
-        <source>NR</source>
-        <translation type="obsolete">Niet Beoordeeld</translation>
     </message>
     <message>
         <source>Unknown Rating</source>
@@ -217,10 +205,6 @@
     <message>
         <source>Listings</source>
         <translation>Lijst</translation>
-    </message>
-    <message>
-        <source>The defualt view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
-        <translation type="obsolete">Het standaard uiterlijk voor MythVideo. Een ander uiterlijk kiezen is mogelijk via het pop-up menu (MENU-toets).</translation>
     </message>
     <message>
         <source>Aggressive Parental Control</source>
@@ -454,18 +438,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>MENU: Options</source>
-        <translation type="obsolete">MENU: Opties</translation>
-    </message>
-    <message>
-        <source>Up/Down, Page Up/Down - Browse</source>
-        <translation type="obsolete">Gebruik navigatietoetsen om te bladeren</translation>
-    </message>
-    <message>
-        <source>Menu - Options</source>
-        <translation type="obsolete">Menu - Opties</translation>
-    </message>
-    <message>
         <source>Parental</source>
         <translation>&apos;Parental Control&apos;</translation>
     </message>
@@ -517,14 +489,6 @@
         <translation>minuten</translation>
     </message>
     <message>
-        <source>Ok</source>
-        <translation type="obsolete">Ok</translation>
-    </message>
-    <message>
-        <source>Select action</source>
-        <translation type="obsolete">Kies bewerking</translation>
-    </message>
-    <message>
         <source>Watch This Video</source>
         <translation>Bekijk deze Film</translation>
     </message>
@@ -535,10 +499,6 @@
     <message>
         <source>Filter Display</source>
         <translation>Filter weergave</translation>
-    </message>
-    <message>
-        <source>Switch to Video Listings</source>
-        <translation type="obsolete">Ga naar lijstweergave</translation>
     </message>
     <message>
         <source>Cancel</source>

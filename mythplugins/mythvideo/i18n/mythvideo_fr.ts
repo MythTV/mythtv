@@ -116,14 +116,6 @@
         <translation>Code parental:</translation>
     </message>
     <message>
-        <source>Searching for video files</source>
-        <translation type="obsolete">Rechercher les fichiers</translation>
-    </message>
-    <message>
-        <source>Updating video database</source>
-        <translation type="obsolete">Mise à jour de la BDD vidéo</translation>
-    </message>
-    <message>
         <source>No Cover</source>
         <translation>Pas d&apos;affiche</translation>
     </message>
@@ -134,10 +126,6 @@
     <message>
         <source>None</source>
         <translation>Aucun</translation>
-    </message>
-    <message>
-        <source>NR</source>
-        <translation type="obsolete">NR</translation>
     </message>
     <message>
         <source>Unknown Rating</source>
@@ -258,7 +246,7 @@
     </message>
     <message>
         <source>videos</source>
-        <translation type="unfinished"></translation>
+        <translation>videos</translation>
     </message>
 </context>
 <context>
@@ -445,7 +433,7 @@
     </message>
     <message>
         <source></source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Parental</source>
