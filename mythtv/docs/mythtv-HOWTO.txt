@@ -1,6 +1,6 @@
   Installing and using MythTV
   Robert Kulagowski,  <mailto:rkulagow@rocketmail.com>
-  2003-09-11, v2.73
+  2003-09-15, v2.74
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -4843,7 +4843,8 @@
   options ivtv debug=1
   options tuner type=2
   options msp3400 once=1 simple=1
-  add above ivtv msp3400 saa7115 tuner
+  add below ivtv msp3400 saa7115 tuner
+  add above ivtv lirc_dev lirc_i2c
 
 
 
@@ -4899,7 +4900,6 @@
        crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
 
 
-
   In this case, the ivtv device is video0.
 
   Go into setup/setup on the machine hosting the hardware MPEG-2 card.
@@ -4949,7 +4949,11 @@
   sound.  Switch to your /lib/modules directory and rename the existing
   msp3400.o file, then copy the msp3400.o from the ivtv driver directory
   and re-run [1mdepmod[22m.  If that still doesn't work, then check the ivtv
-  mailing list for more information.
+  mailing list for more information.  You may wish to perform an
+  [1mupdatedb [22mas root and then do a locate msp3400 to find all the
+  msp3400.o.gz files that may be on your system.  For example, Mandrake
+  has a msp3400.o.gz in the 3rdparty subdirectory which will take
+  precedence over the custom version created by ivtv.
 
   [1mNOTE[22m:  Some people report "ghosting" issues with their PVR-250s, where
   there is a faint copy of whatever is on the screen appearing to the
@@ -4963,8 +4967,7 @@
   To turn off DNR, add the following to your rc.local:
 
 
-
-  /path/to/ivtv/utils/test_ioctl --set-codec-params=dnr_mode=0,dnr_temporal=0
+       /path/to/ivtv/utils/test_ioctl --set-codec-params=dnr_mode=0,dnr_temporal=0
 
 
 
@@ -5021,7 +5024,6 @@
        $ su
        # chmod a+x etc.rc.d.init.d.mythbackend
        # cp etc.rc.d.init.d.mythbackend /etc/rc.d/init.d/mythbackend
-
 
 
   etc.sysconfig.mythbackend should be copied to /etc/sysconfig/:
