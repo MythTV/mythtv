@@ -536,7 +536,7 @@ void ConfigurationDialogWidget::keyPressEvent(QKeyEvent* e) {
         reject();
         break;
     default:
-        e->ignore();
+        MythDialog::keyPressEvent(e);
     }
 }
 
@@ -684,6 +684,8 @@ QWidget* ListBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     if (cg)
         connect(widget, SIGNAL(changeHelpText(QString)), cg,
                 SIGNAL(changeHelpText(QString)));
+
+    widget->setFocus();
 
     return box;
 }

@@ -124,10 +124,6 @@ int main(int argc, char *argv[])
     gContext->SetSetting("Theme", "blue");
     gContext->LoadQtConfig();
 
-    MythMainWindow *mainWindow = new MythMainWindow();
-    mainWindow->Show();
-    gContext->SetMainWindow(mainWindow);
-
     char *home = getenv("HOME");
     QString fileprefix = QString(home) + "/.mythtv";
 
@@ -148,6 +144,10 @@ int main(int argc, char *argv[])
 
     if (response.left(1).lower() == "y")
         clearAllDB();
+
+    MythMainWindow *mainWindow = new MythMainWindow();
+    mainWindow->Show();
+    gContext->SetMainWindow(mainWindow);
 
     SetupMenu();
 

@@ -308,7 +308,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    MythPluginManager::init(db, gContext);
+    MythPluginManager::init();
 
     translator.load(PREFIX + QString("/share/mythtv/i18n/mythfrontend_") + 
                     QString(gContext->GetSetting("Language").lower()) + 

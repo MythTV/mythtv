@@ -4,72 +4,67 @@
 
 using namespace std;
 
-MythPluginManager::MythPlugin::MythPlugin(const QString & libname)
-                 :QLibrary(libname)
+MythPluginManager::MythPlugin::MythPlugin(const QString &libname)
+                 : QLibrary(libname)
 {
 }
-
 
 MythPluginManager::MythPlugin::~MythPlugin()
 {
 }
 
-
-int MythPluginManager::MythPlugin::init(QSqlDatabase *db, MythContext *mc)
+int MythPluginManager::MythPlugin::init(void)
 {
-    typedef int (*PluginInitFunc)(QSqlDatabase *, MythContext *);
-	
-    PluginInitFunc ifunc = (PluginInitFunc)QLibrary::resolve("plugin_init");
+    typedef int (*PluginInitFunc)();
+    PluginInitFunc ifunc = (PluginInitFunc)QLibrary::resolve("mythplugin_init");
 	
     if (ifunc)
-        return ifunc(db, mc);
+        return ifunc();
 
     return (-1);
 }
 
-
-void MythPluginManager::MythPlugin::run ()
+void MythPluginManager::MythPlugin::run(void)
 {
     typedef int (*PluginRunFunc)();	
-    PluginRunFunc rfunc = (PluginRunFunc)QLibrary::resolve("plugin_run");
+    PluginRunFunc rfunc = (PluginRunFunc)QLibrary::resolve("mythplugin_run");
 	
     if (rfunc)
         rfunc();
 }
 
-QSqlDatabase * MythPluginManager::_db = NULL;
-MythContext * MythPluginManager::_mc = NULL;
-QDict<MythPluginManager::MythPlugin> MythPluginManager::_dict;
-
-void MythPluginManager::init (QSqlDatabase * db, MythContext * mc)
+void MythPluginManager::MythPlugin::config(void)
 {
-    _db = db;
-    _mc = mc;
-    _dict.setAutoDelete(true);
+    typedef int (*PluginConfigFunc)();
+    PluginConfigFunc rfunc = (PluginConfigFunc)QLibrary::resolve("mythplugin_config");
+
+    if (rfunc)
+        rfunc();
 }
 
-bool MythPluginManager::init_plugin (const QString & plugname)
+QDict<MythPluginManager::MythPlugin> MythPluginManager::m_dict;
+
+void MythPluginManager::init(void)
 {
-    if (NULL == _db || NULL == _mc)
-    {
-        cerr << "Plugin manager not initialized" << endl;
-        return false;
-    }
-   
+    m_dict.setAutoDelete(true);
+}
+
+bool MythPluginManager::init_plugin(const QString & plugname)
+{
     QString newname = QString(PREFIX) + "/lib/mythtv/plugins/lib" + plugname +
                       ".so";
    
-    if (0 == _dict.find(newname))
+    if (m_dict.find(newname) == 0)
     {
-        _dict.insert(newname, new MythPlugin(newname));
-        _dict[newname]->setAutoUnload(true);
+        m_dict.insert(newname, new MythPlugin(newname));
+        m_dict[newname]->setAutoUnload(true);
     }
    
-    int result = _dict[newname]->init(_db, _mc);
+    int result = m_dict[newname]->init();
    
-    if (-1 == result)
+    if (result == -1)
     {
-        _dict.remove(newname);
+        m_dict.remove(newname);
         cerr << "Unable to initialize plugin '" << plugname << "'." << endl;
         return false;
     }
@@ -77,23 +72,34 @@ bool MythPluginManager::init_plugin (const QString & plugname)
     return true;
 }
 
-void MythPluginManager::run_plugin (const QString & plugname)
+void MythPluginManager::run_plugin(const QString & plugname)
 {
-    if (NULL == _db || NULL == _mc)
-    {
-        cerr << "Plugin manager not initialized" << endl;
-        return;
-    }
-   
     QString newname = QString(PREFIX) + "/lib/mythtv/plugins/lib" + plugname +
                       ".so";
 
-    if (0 == _dict.find(newname) && false == init_plugin(plugname))
+    if (m_dict.find(newname) == 0 && init_plugin(plugname) == false)
     {
         cerr << "Unable to run plugin '" << plugname 
              << "': not initialized" << endl;
         return;
     }
    
-    _dict[newname]->run();
+    m_dict[newname]->run();
 }
+
+void MythPluginManager::config_plugin(const QString & plugname)
+{
+    QString newname = QString(PREFIX) + "/lib/mythtv/plugins/lib" + plugname +
+                      ".so";
+
+    if (m_dict.find(newname) == 0 && init_plugin(plugname) == false)
+    {
+        cerr << "Unable to run plugin '" << plugname
+             << "': not initialized" << endl;
+        return;
+    }
+
+    m_dict[newname]->config();
+}
+
+
